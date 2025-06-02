@@ -12,6 +12,8 @@ using BootstrapBlazor.Components;
 
 using Microsoft.Extensions.Localization;
 
+using System.Text;
+
 using ThingsGateway.NewLife;
 using ThingsGateway.NewLife.Threading;
 using ThingsGateway.Razor;
@@ -345,8 +347,9 @@ public abstract class DriverBase : DisposableObject, IDriver
 
     #region 插件重写
 
-    public virtual bool Authentication()
+    public virtual bool GetAuthentication(out DateTime? expireTime)
     {
+        expireTime = null;
         return true;
     }
 
@@ -354,8 +357,24 @@ public abstract class DriverBase : DisposableObject, IDriver
     {
         if (PluginServiceUtil.IsEducation(GetType()))
         {
-            ThingsGateway.Authentication.ProAuthentication.TryGetAuthorizeInfo(out var authorizeInfo);
-            return authorizeInfo.Auth ? Localizer["Authorized"] : Localizer["Unauthorized"];
+            StringBuilder stringBuilder = new();
+            var ret = GetAuthentication(out var expireTime);
+            if (ret)
+            {
+                stringBuilder.Append(Localizer["Authorized"]);
+            }
+            else
+            {
+                stringBuilder.Append(Localizer["Unauthorized"]);
+            }
+
+            stringBuilder.Append("   ");
+            if (expireTime.HasValue && (DateTime.Now - expireTime.Value).TotalHours > -72)
+            {
+                stringBuilder.Append(Localizer["ExpireTime", expireTime.Value.ToString("yyyy-MM-dd HH")]);
+            }
+
+            return stringBuilder.ToString();
         }
         return string.Empty;
     }

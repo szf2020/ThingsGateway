@@ -8,6 +8,8 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
+using System.Reflection;
+
 namespace ThingsGateway.Admin.Application;
 
 public class RequestAuditData
@@ -94,5 +96,6 @@ public class RequestAuditData
     /// 验证错误信息
     /// </summary>
     public Validation Validation { get; set; }
+    public MethodInfo MethodInfo { get; set; }
 }
 

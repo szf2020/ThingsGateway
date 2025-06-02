@@ -3,11 +3,13 @@ using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.AspNetCore.WebUtilities;
 
 using System.Net.Http.Headers;
+using System.Text.Json;
 
 namespace ThingsGateway.Admin.Application;
 
 public class GiteeOAuthOptions : AdminOAuthOptions
 {
+
     public GiteeOAuthOptions() : base()
     {
         this.SignInScheme = ClaimConst.Scheme;
@@ -31,6 +33,13 @@ public class GiteeOAuthOptions : AdminOAuthOptions
             return Task.CompletedTask;
         };
     }
+
+    public override string GetName(JsonElement element)
+    {
+        JsonElement.ObjectEnumerator target = element.EnumerateObject();
+        return target.TryGetValue("name");
+    }
+
     private static async Task HandlerGiteeStarredUrl(OAuthCreatingTicketContext context, string repoFullName = "ThingsGateway/ThingsGateway")
     {
         if (string.IsNullOrWhiteSpace(context.AccessToken))

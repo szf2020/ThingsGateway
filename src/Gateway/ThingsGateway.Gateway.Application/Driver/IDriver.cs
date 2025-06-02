@@ -43,6 +43,6 @@ namespace ThingsGateway.Gateway.Application
         Task SetLogAsync(LogLevel? logLevel = null, bool upDataBase = true);
         Task AfterVariablesChangedAsync(CancellationToken cancellationToken);
         string GetAuthString();
-        bool Authentication();
+        bool GetAuthentication(out DateTime? expireTime);
     }
 }

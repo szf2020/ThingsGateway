@@ -9,9 +9,8 @@
 // 许可证的完整文本可以在源代码树根目录中的 LICENSE-APACHE 和 LICENSE-MIT 文件中找到。
 // ------------------------------------------------------------------------
 
-global using System.Collections;
-
 global using Mapster;
-global using ThingsGateway.Razor;
+
 global using ThingsGateway.Admin.Application;
 global using ThingsGateway.Admin.Razor;
+global using ThingsGateway.Razor;

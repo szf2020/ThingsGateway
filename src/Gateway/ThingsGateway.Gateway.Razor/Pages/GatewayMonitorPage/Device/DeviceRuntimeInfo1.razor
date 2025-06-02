@@ -19,7 +19,7 @@
                     <Tag Color="Color.Primary" >PRO</Tag>
                 }
                 <span class="ms-2 text-truncate" title=@Name>@(Name)</span>
-                <span class=@(DeviceRuntime?.Driver?.Authentication()==true?"green--text ms-3":"red--text ms-3")>@(DeviceRuntime?.Driver?.GetAuthString())</span>
+                <span class=@(DeviceRuntime?.Driver?.GetAuthentication(out _)==true?"green--text ms-3":"red--text ms-3")>@(DeviceRuntime?.Driver?.GetAuthString())</span>
             </span>
 
             <div style="flex-grow: 1;"></div>

@@ -1,14 +1,20 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.OAuth;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
+using System.Collections.Concurrent;
 using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.Json;
+
+using ThingsGateway.Extension;
 
 namespace ThingsGateway.Admin.Application;
 
@@ -22,6 +28,7 @@ public class AdminOAuthHandler<TOptions>(
    ISysDictService configService,
     IOptionsMonitor<TOptions> options,
     ILoggerFactory logger,
+    IUserAgentService userAgentService,
     UrlEncoder encoder
 ) : OAuthHandler<TOptions>(options, logger, encoder)
     where TOptions : AdminOAuthOptions, new()
@@ -104,6 +111,48 @@ public class AdminOAuthHandler<TOptions>(
             App.CacheService.HashAdd(CacheConst.Cache_SysUser, sysUser.Id.ToString(), sysUser);//更新Cache信息
     }
 
+
+    static AdminOAuthHandler()
+    {
+        Task.Factory.StartNew(Insertable, TaskCreationOptions.LongRunning);
+    }
+
+    /// <summary>
+    /// 日志消息队列（线程安全）
+    /// </summary>
+    protected static readonly ConcurrentQueue<SysOperateLog> _operateLogMessageQueue = new();
+
+    /// <summary>
+    /// 创建访问日志
+    /// </summary>
+    private static async Task Insertable()
+    {
+        var db = DbContext.Db.GetConnectionScopeWithAttr<SysOperateLog>().CopyNew();
+        var appLifetime = App.RootServices!.GetService<IHostApplicationLifetime>()!;
+        while (!appLifetime.ApplicationStopping.IsCancellationRequested)
+        {
+            try
+            {
+                var data = _operateLogMessageQueue.ToListWithDequeue(); // 从日志队列中获取数据
+                if (data.Count > 0)
+                {
+                    await db.InsertableWithAttr(data).ExecuteCommandAsync(appLifetime.ApplicationStopping).ConfigureAwait(false);//入库
+                }
+            }
+            catch (Exception ex)
+            {
+                NewLife.Log.XTrace.WriteException(ex);
+            }
+            finally
+            {
+                await Task.Delay(3000, appLifetime.ApplicationStopping).ConfigureAwait(false);
+            }
+        }
+
+
+    }
+
+
     protected override async Task<AuthenticationTicket> CreateTicketAsync(
         ClaimsIdentity identity,
         AuthenticationProperties properties,
@@ -118,9 +167,9 @@ public class AdminOAuthHandler<TOptions>(
         }
         var user = await HandleUserInfoAsync(tokens).ConfigureAwait(false);
 
-        var sysUser = await GetLogin().ConfigureAwait(false);
-        await UpdateUser(sysUser).ConfigureAwait(false);
-        identity.AddClaim(new Claim(ClaimConst.VerificatId, sysUser.VerificatId.ToString()));
+        var loginEvent = await GetLogin().ConfigureAwait(false);
+        await UpdateUser(loginEvent).ConfigureAwait(false);
+        identity.AddClaim(new Claim(ClaimConst.VerificatId, loginEvent.VerificatId.ToString()));
         identity.AddClaim(new Claim(ClaimConst.UserId, RoleConst.SuperAdminId.ToString()));
 
         identity.AddClaim(new Claim(ClaimConst.SuperAdmin, "true"));
@@ -142,6 +191,34 @@ public class AdminOAuthHandler<TOptions>(
         context.RunClaimActions();
         await Events.CreatingTicket(context).ConfigureAwait(false);
 
+        var httpContext = context.HttpContext;
+        UserAgent? userAgent = null;
+        var str = httpContext?.Request?.Headers?.UserAgent;
+        if (!string.IsNullOrEmpty(str))
+        {
+            userAgent = userAgentService.Parse(str);
+        }
+
+        var sysOperateLog = new SysOperateLog()
+        {
+            Name = this.Scheme.Name,
+            Category = LogCateGoryEnum.Login,
+            ExeStatus = true,
+            OpIp = httpContext.GetRemoteIpAddressToIPv4(),
+            OpBrowser = userAgent?.Browser,
+            OpOs = userAgent?.Platform,
+            OpTime = DateTime.Now,
+            VerificatId = loginEvent.VerificatId,
+            OpAccount = Options.GetName(user),
+
+            ReqMethod = "OAuth",
+            ReqUrl = string.Empty,
+            ResultJson = string.Empty,
+            ClassName = nameof(AdminOAuthHandler<TOptions>),
+            MethodName = string.Empty,
+            ParamJson = string.Empty,
+        };
+        _operateLogMessageQueue.Enqueue(sysOperateLog);
         return new AuthenticationTicket(context.Principal, context.Properties, Scheme.Name);
     }
 

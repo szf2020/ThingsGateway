@@ -123,12 +123,12 @@ public class RequestAuditFilter : IAsyncActionFilter, IOrderedFilter
         var desc = App.CreateLocalizerByType(controllerActionDescriptor.ControllerTypeInfo.AsType())[actionMethod.Name];
         //获取特性
 
-
         logData.CateGory = desc.Value;//传操作名称
         logData.Operation = desc.Value;//传操作名称
         logData.Client = client;
         logData.Path = httpContext.Request.Path.Value;//请求地址
         logData.Method = httpContext.Request.Method;//请求方法
+        logData.MethodInfo = actionMethod;//请求方法
 
         logData.ControllerName = controllerActionDescriptor.ControllerName;
         logData.ActionName = controllerActionDescriptor.ActionName;

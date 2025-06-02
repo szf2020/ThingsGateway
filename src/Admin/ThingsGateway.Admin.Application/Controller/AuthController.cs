@@ -28,6 +28,7 @@ public class AuthController : ControllerBase
 
     [HttpPost("login")]
     [AllowAnonymous]
+    [LoginLog]
     public Task<LoginOutput> LoginAsync([FromBody] LoginInput input)
     {
 
@@ -37,6 +38,7 @@ public class AuthController : ControllerBase
 
     [HttpGet("oauth-login")]
     [AllowAnonymous]
+    [SuppressRequestAudit]
     public IActionResult OAuthLogin(string scheme = "Gitee", string returnUrl = "/")
     {
         var props = new AuthenticationProperties
@@ -50,6 +52,7 @@ public class AuthController : ControllerBase
     [HttpPost("logout")]
     [Authorize]
     [IgnoreRolePermission]
+    [LogoutLog]
     public Task LogoutAsync()
     {
         return _authService.LoginOutAsync();

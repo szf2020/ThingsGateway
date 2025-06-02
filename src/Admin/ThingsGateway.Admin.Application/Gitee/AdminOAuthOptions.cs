@@ -1,6 +1,6 @@
-﻿using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.OAuth;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authentication.OAuth;
+
+using System.Text.Json;
 
 namespace ThingsGateway.Admin.Application;
 
@@ -26,6 +26,12 @@ public abstract class AdminOAuthOptions : OAuthOptions
     protected virtual void ConfigureClaims()
     {
 
+    }
+
+    public virtual string GetName(JsonElement element)
+    {
+        JsonElement.ObjectEnumerator target = element.EnumerateObject();
+        return target.TryGetValue("name");
     }
 
     /// <summary>获得/设置 登陆后首页</summary>

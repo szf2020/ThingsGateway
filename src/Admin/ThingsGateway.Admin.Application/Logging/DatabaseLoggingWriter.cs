@@ -11,11 +11,13 @@
 using SqlSugar;
 
 using System.Collections.Concurrent;
+using System.Reflection;
 
 using ThingsGateway.Extension;
 using ThingsGateway.FriendlyException;
 using ThingsGateway.Logging;
 using ThingsGateway.NewLife.Json.Extension;
+using ThingsGateway.Razor;
 
 namespace ThingsGateway.Admin.Application;
 
@@ -51,13 +53,18 @@ public class DatabaseLoggingWriter : IDatabaseLoggingWriter
             var client = requestAuditData.Client;//获取客户端信息
             var path = requestAuditData.Path;//获取操作名称
             var method = requestAuditData.Method;//获取方法
+            var methodInfo = requestAuditData.MethodInfo;
+            var login = methodInfo.GetCustomAttribute(typeof(LoginLogAttribute));
+            var logout = methodInfo.GetCustomAttribute(typeof(LogoutLogAttribute));
+
             //表示访问日志
-            if (path == "/api/auth/login" || path == "/api/auth/logout")
+            if (login != null || logout != null)
             {
                 //如果没有异常信息
                 if (requestAuditData.Exception == null)
                 {
-                    save = await CreateVisitLog(operation, path, requestAuditData, client, flush).ConfigureAwait(false);//添加到访问日志
+                    LogCateGoryEnum logCateGoryEnum = login != null ? LogCateGoryEnum.Login : LogCateGoryEnum.Logout;
+                    save = await CreateVisitLog(operation, path, requestAuditData, client, logCateGoryEnum, flush).ConfigureAwait(false);//添加到访问日志
                 }
                 else
                 {
@@ -151,17 +158,20 @@ public class DatabaseLoggingWriter : IDatabaseLoggingWriter
     /// <param name="path"></param>
     /// <param name="requestAuditData">requestAuditData</param>
     /// <param name="userAgent">客户端信息</param>
+    /// <param name="logCateGoryEnum">logCateGory</param>
     /// <param name="flush"></param>
-    private async Task<bool> CreateVisitLog(string operation, string path, RequestAuditData requestAuditData, UserAgent userAgent, bool flush)
+    private async Task<bool> CreateVisitLog(string operation, string path, RequestAuditData requestAuditData, UserAgent userAgent, LogCateGoryEnum logCateGoryEnum, bool flush)
     {
         long verificatId = 0;//验证Id
         var opAccount = "";//用户账号
-        if (path == "/api/auth/login")
+        if (logCateGoryEnum == LogCateGoryEnum.Login)
         {
             //如果是登录，用户信息就从返回值里拿
-            dynamic userInfo = requestAuditData.ReturnInformation;
-            opAccount = userInfo.Data.Account;//赋值账号
-            verificatId = userInfo.Data.VerificatId;
+            if (requestAuditData.ReturnInformation is UnifyResult<LoginOutput> userInfo)
+            {
+                opAccount = userInfo.Data.Account;//赋值账号
+                verificatId = userInfo.Data.VerificatId;
+            }
         }
         else
         {
@@ -173,7 +183,7 @@ public class DatabaseLoggingWriter : IDatabaseLoggingWriter
         var sysLogVisit = new SysOperateLog
         {
             Name = operation,
-            Category = path == "/api/auth/login" ? LogCateGoryEnum.Login : LogCateGoryEnum.Logout,
+            Category = logCateGoryEnum,
             ExeStatus = true,
             OpIp = requestAuditData.RemoteIPv4,
             OpBrowser = userAgent?.Browser,
