@@ -11,7 +11,7 @@
 	</PropertyGroup>
 	
 	<ItemGroup>
-		<PackageReference Include="SqlSugarCore" Version="5.1.4.193" />
+		<PackageReference Include="SqlSugarCore" Version="5.1.4.195" />
 		<PackageReference Include="BootstrapBlazor.TableExport" Version="9.2.5" />
 	</ItemGroup>
 
