@@ -10,6 +10,8 @@
 
 using Mapster;
 
+using Newtonsoft.Json.Linq;
+
 using ThingsGateway.Gateway.Application;
 using ThingsGateway.NewLife.Extension;
 
@@ -133,5 +135,28 @@ public partial class PluginDebugPage
             }
         }
 
+    }
+
+    private TreeViewItem<PluginInfo> active;
+    private async Task OnClick(TreeViewItem<PluginInfo> item)
+    {
+        if (active == item)
+        {
+            var pluginInfo = item.Value;
+            if (pluginInfo.Children.Count == 0)
+            {
+                var debugRender = await GetDebugUIAsync(pluginInfo);
+                if (debugRender != null)
+                {
+                    tab.AddTab(new Dictionary<string, object?>
+                    {
+                        [nameof(TabItem.Text)] = pluginInfo.Name,
+                        [nameof(TabItem.IsActive)] = true,
+                        [nameof(TabItem.ChildContent)] = debugRender
+                    });
+                }
+            }
+        }
+        active = item;
     }
 }

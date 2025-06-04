@@ -18,7 +18,7 @@
     <Split Basis="20%" ShowBarHandle=false>
         <FirstPaneTemplate>
             <ContextMenuZone title="Right click operation">
-                <TreeView TItem="PluginInfo" Items="PluginTreeViewItems" ClickToggleNode IsVirtualize="true" />
+                <TreeView TItem="PluginInfo" Items="PluginTreeViewItems" ClickToggleNode IsVirtualize="true" OnTreeItemClick="OnClick" @ref=treeView />
                 <ContextMenu>
                     <ContextMenuItem Text=@Localizer["New"] OnClick="NewPluginRender"></ContextMenuItem>
                     <ContextMenuItem Text=@Localizer["NewWinbox"] OnClick="NewPluginWinboxRender"></ContextMenuItem>
@@ -35,4 +35,5 @@
 
 @code {
     Tab tab;
+    TreeView<PluginInfo> treeView;
 }
