@@ -33,83 +33,6 @@ public class AdminOAuthHandler<TOptions>(
 ) : OAuthHandler<TOptions>(options, logger, encoder)
     where TOptions : AdminOAuthOptions, new()
 {
-    private async Task<LoginEvent> GetLogin()
-    {
-        var sysUser = await sysUserService.GetUserByIdAsync(RoleConst.SuperAdminId).ConfigureAwait(false);//获取用户信息
-
-        var appConfig = await configService.GetAppConfigAsync().ConfigureAwait(false);
-
-
-        var expire = appConfig.LoginPolicy.VerificatExpireTime;
-
-        var loginEvent = new LoginEvent
-        {
-            Ip = appService.RemoteIpAddress,
-            Device = appService.UserAgent?.Platform,
-            Expire = expire,
-            SysUser = sysUser,
-            VerificatId = CommonUtils.GetSingleId()
-        };
-
-        //获取verificat列表
-        var tokenTimeout = loginEvent.DateTime.AddMinutes(loginEvent.Expire);
-        //生成verificat信息
-        var verificatInfo = new VerificatInfo
-        {
-            Device = loginEvent.Device,
-            Expire = loginEvent.Expire,
-            VerificatTimeout = tokenTimeout,
-            Id = loginEvent.VerificatId,
-            UserId = loginEvent.SysUser.Id,
-            LoginIp = loginEvent.Ip,
-            LoginTime = loginEvent.DateTime
-        };
-
-
-        //添加到verificat列表
-        verificatInfoService.Add(verificatInfo);
-
-        return loginEvent;
-    }
-    /// <summary>
-    /// 登录事件
-    /// </summary>
-    /// <param name="loginEvent"></param>
-    /// <returns></returns>
-    private async Task UpdateUser(LoginEvent loginEvent)
-    {
-        var sysUser = loginEvent.SysUser;
-
-        #region 登录/密码策略
-
-        var key = CacheConst.Cache_LoginErrorCount + sysUser.Account;//获取登录错误次数Key值
-        App.CacheService.Remove(key);//移除登录错误次数
-
-        //获取用户verificat列表
-        var userToken = verificatInfoService.GetOne(loginEvent.VerificatId);
-
-        #endregion 登录/密码策略
-
-        #region 重新赋值属性,设置本次登录信息为最新的信息
-
-        sysUser.LastLoginIp = sysUser.LatestLoginIp;
-        sysUser.LastLoginTime = sysUser.LatestLoginTime;
-        sysUser.LatestLoginIp = loginEvent.Ip;
-        sysUser.LatestLoginTime = loginEvent.DateTime;
-
-        #endregion 重新赋值属性,设置本次登录信息为最新的信息
-
-        using var db = DbContext.Db.GetConnectionScopeWithAttr<SysUser>().CopyNew();
-        //更新用户登录信息
-        if (await db.Updateable(sysUser).UpdateColumns(it => new
-        {
-            it.LastLoginIp,
-            it.LastLoginTime,
-            it.LatestLoginIp,
-            it.LatestLoginTime,
-        }).ExecuteCommandAsync().ConfigureAwait(false) > 0)
-            App.CacheService.HashAdd(CacheConst.Cache_SysUser, sysUser.Id.ToString(), sysUser);//更新Cache信息
-    }
 
 
     static AdminOAuthHandler()
@@ -152,7 +75,6 @@ public class AdminOAuthHandler<TOptions>(
 
     }
 
-
     protected override async Task<AuthenticationTicket> CreateTicketAsync(
         ClaimsIdentity identity,
         AuthenticationProperties properties,
@@ -160,14 +82,17 @@ public class AdminOAuthHandler<TOptions>(
     {
         properties.RedirectUri = Options.HomePath;
         properties.IsPersistent = true;
+        var appConfig = await configService.GetAppConfigAsync().ConfigureAwait(false);
 
+        int expire = appConfig.LoginPolicy.VerificatExpireTime;
         if (!string.IsNullOrEmpty(tokens.ExpiresIn) && int.TryParse(tokens.ExpiresIn, out var result))
         {
             properties.ExpiresUtc = TimeProvider.System.GetUtcNow().AddSeconds(result);
+            expire = (int)(result / 60.0);
         }
         var user = await HandleUserInfoAsync(tokens).ConfigureAwait(false);
 
-        var loginEvent = await GetLogin().ConfigureAwait(false);
+        var loginEvent = await GetLogin(expire).ConfigureAwait(false);
         await UpdateUser(loginEvent).ConfigureAwait(false);
         identity.AddClaim(new Claim(ClaimConst.VerificatId, loginEvent.VerificatId.ToString()));
         identity.AddClaim(new Claim(ClaimConst.UserId, RoleConst.SuperAdminId.ToString()));
@@ -222,29 +147,6 @@ public class AdminOAuthHandler<TOptions>(
         return new AuthenticationTicket(context.Principal, context.Properties, Scheme.Name);
     }
 
-    /// <summary>刷新 Token 方法</summary>
-    protected virtual async Task<OAuthTokenResponse> RefreshTokenAsync(OAuthTokenResponse oAuthToken)
-    {
-        var query = new Dictionary<string, string>
-        {
-            { "refresh_token", oAuthToken.RefreshToken },
-            { "grant_type", "refresh_token" }
-        };
-
-        var request = new HttpRequestMessage(HttpMethod.Post, QueryHelpers.AddQueryString(Options.TokenEndpoint, query));
-        request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
-        var response = await Backchannel.SendAsync(request, Context.RequestAborted).ConfigureAwait(false);
-
-        var content = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-
-        if (response.IsSuccessStatusCode)
-        {
-            return OAuthTokenResponse.Success(JsonDocument.Parse(content));
-        }
-
-        return OAuthTokenResponse.Failed(new OAuthTokenException($"OAuth token endpoint failure: {await Display(response).ConfigureAwait(false)}"));
-    }
 
     /// <summary>处理用户信息方法</summary>
     protected virtual async Task<JsonElement> HandleUserInfoAsync(OAuthTokenResponse tokens)
@@ -282,6 +184,79 @@ public class AdminOAuthHandler<TOptions>(
         output.Append($"Body: {await response.Content.ReadAsStringAsync().ConfigureAwait(false)};");
 
         return output.ToString();
+    }
+
+    private async Task<LoginEvent> GetLogin(int expire)
+    {
+        var sysUser = await sysUserService.GetUserByIdAsync(RoleConst.SuperAdminId).ConfigureAwait(false);//获取用户信息
+
+        var loginEvent = new LoginEvent
+        {
+            Ip = appService.RemoteIpAddress,
+            Device = appService.UserAgent?.Platform,
+            Expire = expire,
+            SysUser = sysUser,
+            VerificatId = CommonUtils.GetSingleId()
+        };
+
+        //获取verificat列表
+        var tokenTimeout = loginEvent.DateTime.AddMinutes(loginEvent.Expire);
+        //生成verificat信息
+        var verificatInfo = new VerificatInfo
+        {
+            Device = loginEvent.Device,
+            Expire = loginEvent.Expire,
+            VerificatTimeout = tokenTimeout,
+            Id = loginEvent.VerificatId,
+            UserId = loginEvent.SysUser.Id,
+            LoginIp = loginEvent.Ip,
+            LoginTime = loginEvent.DateTime
+        };
+
+
+        //添加到verificat列表
+        verificatInfoService.Add(verificatInfo);
+        return loginEvent;
+    }
+
+    /// <summary>
+    /// 登录事件
+    /// </summary>
+    /// <param name="loginEvent"></param>
+    /// <returns></returns>
+    private async Task UpdateUser(LoginEvent loginEvent)
+    {
+        var sysUser = loginEvent.SysUser;
+
+        #region 登录/密码策略
+
+        var key = CacheConst.Cache_LoginErrorCount + sysUser.Account;//获取登录错误次数Key值
+        App.CacheService.Remove(key);//移除登录错误次数
+
+        //获取用户verificat列表
+        var userToken = verificatInfoService.GetOne(loginEvent.VerificatId);
+
+        #endregion 登录/密码策略
+
+        #region 重新赋值属性,设置本次登录信息为最新的信息
+
+        sysUser.LastLoginIp = sysUser.LatestLoginIp;
+        sysUser.LastLoginTime = sysUser.LatestLoginTime;
+        sysUser.LatestLoginIp = loginEvent.Ip;
+        sysUser.LatestLoginTime = loginEvent.DateTime;
+
+        #endregion 重新赋值属性,设置本次登录信息为最新的信息
+
+        using var db = DbContext.Db.GetConnectionScopeWithAttr<SysUser>().CopyNew();
+        //更新用户登录信息
+        if (await db.Updateable(sysUser).UpdateColumns(it => new
+        {
+            it.LastLoginIp,
+            it.LastLoginTime,
+            it.LatestLoginIp,
+            it.LatestLoginTime,
+        }).ExecuteCommandAsync().ConfigureAwait(false) > 0)
+            App.CacheService.HashAdd(CacheConst.Cache_SysUser, sysUser.Id.ToString(), sysUser);//更新Cache信息
     }
 }
 

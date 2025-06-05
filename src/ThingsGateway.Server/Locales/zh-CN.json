@@ -15,7 +15,8 @@
     "Remark1": "边缘采集网关",
     "Remark2": "数据集中，多路转发",
     "Remark3": "边缘计算，高效处理",
-    "Welcome": "欢迎使用"
+    "Welcome": "欢迎使用",
+    "GiteeLogin": "Gitee授权登录"
   },
 
   "ThingsGateway.Server.MainLayout": {

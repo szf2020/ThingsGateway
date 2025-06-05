@@ -97,13 +97,15 @@ public class DDPTcpSessionClientChannel : TcpSessionClientChannel
                 {
                     if (message.Type == 0x01)
                     {
+                        bool log = false;
+                        if (id != Id) log = true;
                         //注册ID
                         await ResetIdAsync(id).ConfigureAwait(false);
 
                         //发送成功
                         await DDPAdapter.SendInputAsync(new DDPSend(ReadOnlyMemory<byte>.Empty, id, true, 0x81)).ConfigureAwait(false);
-
-                        Logger?.Info(DefaultResource.Localizer["DtuConnected", Id]);
+                        if (log)
+                            Logger?.Info(DefaultResource.Localizer["DtuConnected", Id]);
                     }
                     else if (message.Type == 0x02)
                     {

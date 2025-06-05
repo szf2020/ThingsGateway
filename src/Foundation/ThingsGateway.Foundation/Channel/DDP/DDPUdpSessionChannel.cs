@@ -138,19 +138,30 @@ public class DDPUdpSessionChannel : UdpSessionChannel, IClientChannel, IDtuUdpSe
                 {
                     if (message.Type == 0x01)
                     {
+                        bool log = false;
+
                         //注册ID
                         if (!IdDict.TryAdd(endPoint, id))
                         {
                             IdDict[endPoint] = id;
                         }
+                        else
+                        {
+                            log = true;
+                        }
                         if (!EndPointDcit.TryAdd(id, endPoint))
                         {
                             EndPointDcit[id] = endPoint;
                         }
+                        else
+                        {
+                            log = true;
+                        }
 
                         //发送成功
                         await DDPAdapter.SendInputAsync(endPoint, new DDPSend(ReadOnlyMemory<byte>.Empty, id, false, 0x81)).ConfigureAwait(false);
-                        Logger?.Info(DefaultResource.Localizer["DtuConnected", id]);
+                        if(log)
+                            Logger?.Info(DefaultResource.Localizer["DtuConnected", id]);
                     }
                     else if (message.Type == 0x02)
                     {

@@ -64,6 +64,14 @@ public partial class Login
         _versionString = $"v{VersionService.Version}";
         return base.OnInitializedAsync();
     }
+    private void GiteeLogin()
+    {
+        var websiteOptions = App.GetOptions<WebsiteOptions>()!;
+        if (websiteOptions.Demo)
+        {
+            NavigationManager.NavigateTo("/api/auth/oauth-login", forceLoad: true);
+        }
+    }
     [Inject]
     NavigationManager NavigationManager { get; set; }
     private async Task LoginAsync(EditContext context)

@@ -46,7 +46,14 @@
                 <div class="login-form d-flex align-items-center flex-column">
                     <img src=@($"{WebsiteConst.DefaultResourceUrl}images/defaultUser.svg") class="user-avatar" />
                     <h5 class="mt-2 mb-12 ">@Localizer["Welcome"] 👋</h5>
-                    <UserLogin Model="loginModel" OnLogin="LoginAsync"></UserLogin>
+                    @if(WebsiteOption.Value.Demo)
+                    {
+                        <Button Class="btn-block mt-5" IsAsync OnClick=GiteeLogin>@Localizer["GiteeLogin"]</Button>
+                    }
+                    else
+                    {
+                        <UserLogin Model="loginModel" OnLogin="LoginAsync"></UserLogin>
+                    }
                 </div>
             </div>
         </div>

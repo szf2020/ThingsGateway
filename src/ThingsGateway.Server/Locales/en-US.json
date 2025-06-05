@@ -14,7 +14,8 @@
     "Remark1": "Edge Collection Gateway",
     "Remark2": "Data Aggregation, Multi-path Forwarding",
     "Remark3": "Edge Computing, Efficient Processing",
-    "Welcome": "Welcome"
+    "Welcome": "Welcome",
+    "GiteeLogin": "Gitee OAuth"
   },
 
   "ThingsGateway.Server.MainLayout": {
