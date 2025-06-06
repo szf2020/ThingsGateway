@@ -54,6 +54,6 @@ public class ConfigSection : IConfigSection
 
     /// <summary>已重载。</summary>
     /// <returns></returns>
-    public override String ToString() => Childs != null && Childs.Count > 0 ? $"{Key}[{Childs.Count}]" : $"{Key}={Value}";
+    public override String ToString() => Childs?.Count > 0 ? $"{Key}[{Childs.Count}]" : $"{Key}={Value}";
     #endregion
 }

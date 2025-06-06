@@ -188,7 +188,7 @@ public partial class OpcUaImportVariable
                 if (ShowSubvariable || target.NodeClass != NodeClass.Variable)
                 {
                     var data = await GetReferenceDescriptionCollectionAsync((NodeId)target.NodeId);
-                    if (data != null && data.Count > 0)
+                    if (data?.Count > 0)
                     {
                         if (isAll)
                             child.Children = await PopulateBranchAsync((NodeId)target.NodeId);

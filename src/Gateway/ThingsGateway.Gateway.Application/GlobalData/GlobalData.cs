@@ -480,11 +480,11 @@ public static class GlobalData
     /// <param name="alarmVariable">报警变量</param>
     internal static void AlarmChange(AlarmVariable alarmVariable)
     {
-        if (AlarmChangedEvent != null)
-        {
-            // 触发设备状态变化事件，并将设备运行时对象转换为设备数据对象进行传递
-            AlarmChangedEvent.Invoke(alarmVariable);
-        }
+
+
+        // 触发设备状态变化事件，并将设备运行时对象转换为设备数据对象进行传递
+        AlarmChangedEvent?.Invoke(alarmVariable);
+
     }
 
     /// <summary>
@@ -495,11 +495,11 @@ public static class GlobalData
     {
         deviceRuntime.Driver?.LogMessage?.LogInformation($"Status changed: {deviceRuntime.DeviceStatus}");
 
-        if (DeviceStatusChangeEvent != null)
-        {
-            // 触发设备状态变化事件，并将设备运行时对象转换为设备数据对象进行传递
-            DeviceStatusChangeEvent.Invoke(deviceRuntime, deviceRuntime.Adapt<DeviceBasicData>());
-        }
+
+
+        // 触发设备状态变化事件，并将设备运行时对象转换为设备数据对象进行传递
+        DeviceStatusChangeEvent?.Invoke(deviceRuntime, deviceRuntime.Adapt<DeviceBasicData>());
+
     }
 
     /// <summary>
@@ -508,11 +508,11 @@ public static class GlobalData
     /// <param name="variableRuntime">变量运行时对象</param>
     internal static void VariableValueChange(VariableRuntime variableRuntime)
     {
-        if (VariableValueChangeEvent != null)
-        {
-            // 触发变量值变化事件，并将变量运行时对象转换为变量数据对象进行传递
-            VariableValueChangeEvent.Invoke(variableRuntime, variableRuntime.Adapt<VariableBasicData>());
-        }
+
+
+        // 触发变量值变化事件，并将变量运行时对象转换为变量数据对象进行传递
+        VariableValueChangeEvent?.Invoke(variableRuntime, variableRuntime.Adapt<VariableBasicData>());
+
     }
     /// <summary>
     /// 变量采集处理方法，用于处理变量进行采集时的逻辑
@@ -520,11 +520,11 @@ public static class GlobalData
     /// <param name="variableRuntime">变量运行时对象</param>
     internal static void VariableCollectChange(VariableRuntime variableRuntime)
     {
-        if (VariableCollectChangeEvent != null)
-        {
-            // 触发变量采集事件，并将变量运行时对象转换为变量数据对象进行传递
-            VariableCollectChangeEvent.Invoke(variableRuntime);
-        }
+
+
+        // 触发变量采集事件，并将变量运行时对象转换为变量数据对象进行传递
+        VariableCollectChangeEvent?.Invoke(variableRuntime);
+
     }
 
     #endregion

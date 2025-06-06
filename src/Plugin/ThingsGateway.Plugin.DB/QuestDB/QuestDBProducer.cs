@@ -56,8 +56,9 @@ public partial class QuestDBProducer : BusinessBaseWithCacheIntervalVariableMode
     public async Task<List<IDBHistoryValue>> GetDBHistoryValuesAsync(DBHistoryValuePageInput input)
     {
         var data = await Query(input).ToListAsync().ConfigureAwait(false);
-        return data.Cast<IDBHistoryValue>().ToList(); ;
+        return data.Cast<IDBHistoryValue>().ToList();
     }
+
     protected override async Task InitChannelAsync(IChannel? channel, CancellationToken cancellationToken)
     {
 

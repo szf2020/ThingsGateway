@@ -87,7 +87,7 @@ public class BlazorAuthenticationHandler : AppAuthorizeHandler
             var roles = await _sysRoleService.GetRoleListByUserIdAsync(userId).ConfigureAwait(false);
 
             //这里鉴别用户使能状态
-            if (user == null || !user.Status)
+            if (user?.Status != true)
             {
                 return false;
             }
@@ -137,7 +137,7 @@ public class BlazorAuthenticationHandler : AppAuthorizeHandler
         else
         {
             //这里鉴别用户使能状态
-            if (user == null || !user.Status)
+            if (user?.Status != true)
             {
                 return false;
             }

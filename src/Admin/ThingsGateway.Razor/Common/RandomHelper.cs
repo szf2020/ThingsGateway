@@ -17,7 +17,7 @@ using System.Text;
 /// 随机数
 /// </summary>
 [ThingsGateway.DependencyInjection.SuppressSniffer]
-public class RandomHelper
+public static class RandomHelper
 {
     /// <summary>
     /// 生成随机纯字母随机数

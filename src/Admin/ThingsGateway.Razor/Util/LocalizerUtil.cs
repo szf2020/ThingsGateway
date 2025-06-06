@@ -14,7 +14,7 @@ namespace ThingsGateway.Razor;
 
 /// <inheritdoc/>
 [ThingsGateway.DependencyInjection.SuppressSniffer]
-public class LocalizerUtil
+public static class LocalizerUtil
 {
     #region 是否启用
 

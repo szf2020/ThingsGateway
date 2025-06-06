@@ -61,10 +61,7 @@ public partial class ModbusMaster : ComponentBase, IDisposable
         {
              {nameof(ModbusAddressComponent.ModelChanged),  (string a) =>
             {
-                if(DeviceComponent!=null)
-                {
-                    DeviceComponent.SetRegisterAddress(a);
-                }
+                DeviceComponent?.SetRegisterAddress(a);
             }},
             {nameof(ModbusAddressComponent.Model),address },
         });

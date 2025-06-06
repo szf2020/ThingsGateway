@@ -30,7 +30,7 @@ public static class VariableServiceHelpers
 
     public static async Task<Dictionary<string, object>> ExportCoreAsync(IEnumerable<Variable> data, string deviceName = null)
     {
-        if (data == null || !data.Any())
+        if (data?.Any() != true)
         {
             data = new List<Variable>();
         }

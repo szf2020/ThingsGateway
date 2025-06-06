@@ -14,7 +14,7 @@ namespace ThingsGateway.Admin.Application;
 
 /// <inheritdoc/>
 [ThingsGateway.DependencyInjection.SuppressSniffer]
-public class OpenApiUtil
+public static class OpenApiUtil
 {
     /// <summary>
     /// 构建树节点，传入的列表已经是树结构

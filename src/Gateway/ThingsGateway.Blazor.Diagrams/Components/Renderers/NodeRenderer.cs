@@ -48,7 +48,7 @@ public class NodeRenderer : ComponentBase, IDisposable
             return;
 
         size = new Size(size.Width / BlazorDiagram.Zoom, size.Height / BlazorDiagram.Zoom);
-        if (Node.Size != null && Node.Size.Width.AlmostEqualTo(size.Width) &&
+        if (Node.Size?.Width.AlmostEqualTo(size.Width) == true &&
             Node.Size.Height.AlmostEqualTo(size.Height))
         {
             return;

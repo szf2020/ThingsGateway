@@ -48,7 +48,7 @@ public class Link
     public static Link[] Parse(String html, String? baseUrl = null, Func<Link, Boolean>? filter = null)
     {
         // baseurl必须是/结尾
-        if (baseUrl != null && !baseUrl.EndsWith('/')) baseUrl += "/";
+        if (baseUrl?.EndsWith('/') == false) baseUrl += "/";
         if (baseUrl.StartsWithIgnoreCase("ftp://")) return ParseFTP(html, baseUrl, filter);
 
         // 分析所有链接
@@ -218,7 +218,7 @@ public class Link
         if (Time.Year < 2000)
         {
             var fi = file.AsFile();
-            if (fi != null && fi.Exists) Time = fi.LastWriteTime;
+            if (fi?.Exists == true) Time = fi.LastWriteTime;
         }
 
         return this;

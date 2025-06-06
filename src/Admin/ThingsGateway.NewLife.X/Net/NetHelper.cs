@@ -180,7 +180,7 @@ public static class NetHelper
     {
         // 如果不是任意地址，直接返回
         var addr = address;
-        if (addr == null || !addr.IsAny()) return addr;
+        if (addr?.IsAny() != true) return addr;
 
         // 如果是本地环回地址，返回环回地址
         if (IPAddress.IsLoopback(remote)) return addr.IsIPv4() ? IPAddress.Loopback : IPAddress.IPv6Loopback;
@@ -300,7 +300,7 @@ public static class NetHelper
                 }
             }
 #else
-            if (item != null && item.DhcpServerAddresses.Count > 0)
+            if (item?.DhcpServerAddresses.Count > 0)
             {
                 foreach (var elm in item.DhcpServerAddresses)
                 {
@@ -321,7 +321,7 @@ public static class NetHelper
         var list = new List<IPAddress>();
         foreach (var item in GetActiveInterfaces())
         {
-            if (item != null && item.DnsAddresses.Count > 0)
+            if (item?.DnsAddresses.Count > 0)
             {
                 foreach (var elm in item.DnsAddresses)
                 {
@@ -341,7 +341,7 @@ public static class NetHelper
         var list = new List<IPAddress>();
         foreach (var item in GetActiveInterfaces())
         {
-            if (item != null && item.GatewayAddresses.Count > 0)
+            if (item?.GatewayAddresses.Count > 0)
             {
                 foreach (var elm in item.GatewayAddresses)
                 {
@@ -365,7 +365,7 @@ public static class NetHelper
             if (item.NetworkInterfaceType is NetworkInterfaceType.Loopback or NetworkInterfaceType.Tunnel or NetworkInterfaceType.Unknown) continue;
 
             var ipp = item.GetIPProperties();
-            if (ipp != null && ipp.UnicastAddresses.Count > 0)
+            if (ipp?.UnicastAddresses.Count > 0)
             {
                 var gw = 0;
 
@@ -446,7 +446,7 @@ public static class NetHelper
         var list = new List<IPAddress>();
         foreach (var item in GetActiveInterfaces())
         {
-            if (item != null && item.MulticastAddresses.Count > 0)
+            if (item?.MulticastAddresses.Count > 0)
             {
                 foreach (var elm in item.MulticastAddresses)
                 {
@@ -480,7 +480,7 @@ public static class NetHelper
             if (addrs.Length > 0 && addrs.All(e => IPAddress.IsLoopback(e))) continue;
 
             var mac = item.GetPhysicalAddress()?.GetAddressBytes();
-            if (mac != null && mac.Length == 6) yield return mac;
+            if (mac?.Length == 6) yield return mac;
         }
     }
 
@@ -508,7 +508,7 @@ public static class NetHelper
             if (addrs.Length == 0) continue;
 
             var mac = item.GetPhysicalAddress()?.GetAddressBytes();
-            if (mac != null && mac.Length == 6) return mac;
+            if (mac?.Length == 6) return mac;
         }
 
         return null;
@@ -604,7 +604,7 @@ public static class NetHelper
                     buf = item.GetPhysicalAddress()?.GetAddressBytes();
                 }
 
-                if (buf != null && buf.Length == 6) return buf;
+                if (buf?.Length == 6) return buf;
             }
         }
 

@@ -15,7 +15,7 @@ namespace ThingsGateway.Foundation.OpcUa;
 /// <summary>
 /// 辅助类
 /// </summary>
-public class OpcUaUtils
+public static class OpcUaUtils
 {
 
     /// <summary>
@@ -407,7 +407,7 @@ public class OpcUaUtils
 
             ReferenceDescriptionCollection references = await BrowseAsync(session, nodeToBrowse, throwOnError).ConfigureAwait(false);
 
-            while (references != null && references.Count > 0)
+            while (references?.Count > 0)
             {
                 // should never be more than one supertype.
                 supertypes.Add(references[0]);

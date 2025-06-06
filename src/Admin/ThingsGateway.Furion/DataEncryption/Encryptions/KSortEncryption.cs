@@ -18,7 +18,7 @@ namespace ThingsGateway.DataEncryption;
 /// KSort 加密（数据签名）
 /// </summary>
 [SuppressSniffer]
-public class KSortEncryption
+public static class KSortEncryption
 {
     private static DateTime _timeStampStartTime = new(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 

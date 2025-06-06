@@ -17,7 +17,7 @@ namespace ThingsGateway.Foundation.OpcDa.Rcw;
 #pragma warning disable CS1591 // 缺少对公共可见类型或成员的 XML 注释
 #pragma warning disable CS8605 // 取消装箱可能为 null 的值。
 
-public class Interop
+public static class Interop
 {
     public static PropertyID GetPropertyID(int input)
     {
@@ -523,7 +523,7 @@ public class Interop
 
     internal static int GetResultID(ResultID input)
     {
-        if (input.Name != null && input.Name.Namespace == "http://opcfoundation.org/DataAccess/")
+        if (input.Name?.Namespace == "http://opcfoundation.org/DataAccess/")
         {
             if (input == ResultID.S_OK)
                 return 0;
@@ -568,7 +568,7 @@ public class Interop
             if (input == ResultID.Da.S_DATAQUEUEOVERFLOW)
                 return 263172;
         }
-        else if (input.Name != null && input.Name.Namespace == "http://opcfoundation.org/ComplexData/")
+        else if (input.Name?.Namespace == "http://opcfoundation.org/ComplexData/")
         {
             if (input == ResultID.Cpx.E_TYPE_CHANGED)
                 return -1073478649;
@@ -581,7 +581,7 @@ public class Interop
             if (input == ResultID.Cpx.S_FILTER_NO_DATA)
                 return 263179;
         }
-        else if (input.Name != null && input.Name.Namespace == "http://opcfoundation.org/HistoricalDataAccess/")
+        else if (input.Name?.Namespace == "http://opcfoundation.org/HistoricalDataAccess/")
         {
             if (input == ResultID.Hda.E_MAXEXCEEDED)
                 return -1073475583;
@@ -612,7 +612,7 @@ public class Interop
             if (input == ResultID.Hda.S_REPLACED)
                 return 1074008079;
         }
-        if (input.Name != null && input.Name.Namespace == "http://opcfoundation.org/DataExchange/")
+        if (input.Name?.Namespace == "http://opcfoundation.org/DataExchange/")
         {
             if (input == ResultID.Dx.E_PERSISTING)
                 return -1073477888;

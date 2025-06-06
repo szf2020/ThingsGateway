@@ -51,7 +51,6 @@ internal sealed class OpcServer : IDisposable
         return AddGroup(groupName, true, 1000, 0);
     }
 
-    /// <returns></returns>
     internal OpcGroup AddGroup(string groupName, bool active, int reqUpdateRate, float deadBand)
     {
         if (null == m_OpcServer || IsConnected == false)

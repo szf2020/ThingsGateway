@@ -305,7 +305,7 @@ public class ScriptEngine
             if (FinalCode == null) GenerateCode();
 
             var rs = Compile(FinalCode, null);
-            if (rs.Errors == null || !rs.Errors.HasErrors)
+            if (rs.Errors?.HasErrors != true)
             {
                 // 加载外部程序集
                 foreach (var item in ReferencedAssemblies)

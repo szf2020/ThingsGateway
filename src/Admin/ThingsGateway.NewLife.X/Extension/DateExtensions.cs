@@ -65,7 +65,7 @@ public static class DateExtensions
     /// <param name="beginTime">开始时间</param>
     /// <param name="endTime">结束时间</param>
     /// <returns>时间差</returns>
-    public static string GetDiffTime(this in DateTime beginTime, in DateTime endTime)
+    public static string GetDiffTime(this DateTime beginTime, DateTime endTime)
     {
         TimeSpan timeDifference = endTime - beginTime;
         if (timeDifference.TotalDays >= 1)
@@ -88,7 +88,7 @@ public static class DateExtensions
     /// <param name="beginTime">开始时间</param>
     /// <param name="endTime">结束时间</param>
     /// <returns>时间差</returns>
-    public static string GetDiffTime(this in DateTimeOffset beginTime, in DateTimeOffset endTime)
+    public static string GetDiffTime(this DateTimeOffset beginTime, DateTimeOffset endTime)
     {
         TimeSpan timeDifference = endTime - beginTime;
         if (timeDifference.TotalDays >= 1)
@@ -108,7 +108,7 @@ public static class DateExtensions
     /// <summary>
     /// 返回yyyy-MM-ddTHH:mm:ss.fffffffzzz时间格式字符串
     /// </summary>
-    public static string ToDefaultDateTimeFormat(this in DateTime dt, TimeSpan offset)
+    public static string ToDefaultDateTimeFormat(this DateTime dt, TimeSpan offset)
     {
         if (dt.Kind == DateTimeKind.Utc)
             return new DateTimeOffset(dt.ToLocalTime(), offset).ToString("yyyy-MM-ddTHH:mm:ss.fffffffzzz");
@@ -129,7 +129,7 @@ public static class DateExtensions
     /// <summary>
     /// 返回yyyy-MM-ddTHH:mm:ss.fffffffzzz时间格式字符串
     /// </summary>
-    public static string ToDefaultDateTimeFormat(this in DateTime dt)
+    public static string ToDefaultDateTimeFormat(this DateTime dt)
     {
         return dt.ToString("yyyy-MM-ddTHH:mm:ss.fffffffzzz");
     }
@@ -137,7 +137,7 @@ public static class DateExtensions
     /// <summary>
     /// 返回yyyy-MM-dd HH-mm-ss-fff zz时间格式字符串
     /// </summary>
-    public static string ToFileDateTimeFormat(this in DateTime dt)
+    public static string ToFileDateTimeFormat(this DateTime dt)
     {
         return ToDefaultDateTimeFormat(dt).Replace(":", "-");
     }
@@ -145,7 +145,7 @@ public static class DateExtensions
     /// <summary>
     /// 返回yyyy-MM-dd HH-mm-ss-fff zz时间格式字符串
     /// </summary>
-    public static string ToFileDateTimeFormat(this in DateTime dt, TimeSpan offset)
+    public static string ToFileDateTimeFormat(this DateTime dt, TimeSpan offset)
     {
         return ToDefaultDateTimeFormat(dt, offset).Replace(":", "-");
     }

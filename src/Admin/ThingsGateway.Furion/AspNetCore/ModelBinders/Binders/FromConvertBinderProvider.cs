@@ -54,8 +54,7 @@ public class FromConvertBinderProvider : IModelBinderProvider
 
         // 判断是否定义 [FromConvert] 特性
         if (context.Metadata is DefaultModelMetadata actMetadata
-            && actMetadata.Attributes.ParameterAttributes != null
-            && actMetadata.Attributes.ParameterAttributes.Count > 0
+            && actMetadata.Attributes.ParameterAttributes?.Count > 0
             && actMetadata.Attributes.ParameterAttributes.Any(u => u.GetType() == typeof(FromConvertAttribute)))
         {
             return new FromConvertBinder(_modelBinderConverts);

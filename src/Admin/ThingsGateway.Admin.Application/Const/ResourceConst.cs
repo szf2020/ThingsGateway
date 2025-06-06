@@ -14,7 +14,7 @@ namespace ThingsGateway.Admin.Application;
 /// 资源表常量
 /// </summary>
 [ThingsGateway.DependencyInjection.SuppressSniffer]
-public class ResourceConst
+public static class ResourceConst
 {
     /// <summary>
     /// 系统内置编码

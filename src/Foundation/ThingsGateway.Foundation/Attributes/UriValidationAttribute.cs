@@ -15,6 +15,7 @@ using System.Text.RegularExpressions;
 using ThingsGateway.Foundation;
 namespace ThingsGateway;
 
+[AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
 public class UriValidationAttribute : ValidationAttribute
 {
     protected override ValidationResult IsValid(object value, ValidationContext validationContext)

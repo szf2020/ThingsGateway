@@ -278,7 +278,7 @@ public static class XmlHelper
 
         var dic = new Dictionary<String, String>();
 
-        if (root.ChildNodes != null && root.ChildNodes.Count > 0)
+        if (root.ChildNodes?.Count > 0)
         {
             foreach (var item in root.ChildNodes)
             {
@@ -311,7 +311,7 @@ public static class XmlHelper
         var root = doc.CreateElement(rootName);
         doc.AppendChild(root);
 
-        if (dic != null && dic.Count > 0)
+        if (dic?.Count > 0)
         {
             foreach (var item in dic)
             {

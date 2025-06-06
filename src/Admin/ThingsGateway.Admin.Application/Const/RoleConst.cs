@@ -14,7 +14,7 @@ namespace ThingsGateway.Admin.Application;
 /// 角色常量
 /// </summary>
 [ThingsGateway.DependencyInjection.SuppressSniffer]
-public class RoleConst
+public static class RoleConst
 {
     /// <summary>
     /// api角色

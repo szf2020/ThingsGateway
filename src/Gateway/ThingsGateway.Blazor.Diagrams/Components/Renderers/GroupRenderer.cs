@@ -59,7 +59,7 @@ public class GroupRenderer : ComponentBase, IDisposable
         // Update the port positions (and links) when the size of the group changes
         // This will save us some JS trips as well as useless rerenders
 
-        if (_lastSize == null || !_lastSize.Equals(Group.Size))
+        if (_lastSize?.Equals(Group.Size) != true)
         {
             Group.ReinitializePorts();
             Group.RefreshLinks();

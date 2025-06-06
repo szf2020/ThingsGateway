@@ -14,7 +14,7 @@ namespace ThingsGateway.Admin.Application;
 
 /// <inheritdoc/>
 [ThingsGateway.DependencyInjection.SuppressSniffer]
-public class OrgUtil
+public static class OrgUtil
 {
     /// <summary>
     /// 构造选择项，ID/TITLE

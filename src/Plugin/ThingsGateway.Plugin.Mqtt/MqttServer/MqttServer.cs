@@ -79,10 +79,7 @@ public partial class MqttServer : BusinessBaseWithCacheIntervalScript<VariableBa
             _mqttServer.LoadingRetainedMessageAsync -= MqttServer_LoadingRetainedMessageAsync;
             _mqttServer?.SafeDispose();
         }
-        if (_webHost != null)
-        {
-            _webHost.SafeDispose();
-        }
+        _webHost?.SafeDispose();
 
     }
 

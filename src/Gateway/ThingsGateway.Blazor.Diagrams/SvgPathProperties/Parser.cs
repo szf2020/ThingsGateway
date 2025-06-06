@@ -41,7 +41,7 @@ namespace SvgPathProperties
                     command = command == 'm' ? 'l' : 'L';
                 }
 
-                while (args.Count >= 0)
+                while (true)
                 {
                     if (args.Count == _length[type])
                     {

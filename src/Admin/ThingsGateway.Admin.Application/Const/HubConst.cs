@@ -13,7 +13,7 @@ namespace ThingsGateway.Admin.Application;
 /// <summary>
 /// 通讯器常量
 /// </summary>
-public class HubConst
+public static class HubConst
 {
     /// <summary>
     /// 系统HubUrl

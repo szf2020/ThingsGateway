@@ -102,7 +102,7 @@ public sealed class Retry
                 }
 
                 // 如果填写了 exceptionTypes 且异常类型不在 exceptionTypes 之内，则终止重试
-                if (exceptionTypes != null && exceptionTypes.Length > 0 && !exceptionTypes.Any(u => u.IsAssignableFrom(ex.GetType())))
+                if (exceptionTypes?.Length > 0 && !exceptionTypes.Any(u => u.IsAssignableFrom(ex.GetType())))
                 {
                     if (finalThrow)
                     {

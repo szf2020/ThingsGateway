@@ -81,7 +81,7 @@ public class DeviceRuntime : Device, IDisposable
         }
         set
         {
-            lock (this)
+            lock (_lockObject)
             {
                 if (_deviceStatus != value)
                 {
@@ -191,6 +191,7 @@ public class DeviceRuntime : Device, IDisposable
 
 
     public volatile bool CheckEnable;
+    private readonly object _lockObject = new object();
 
     #endregion 采集
 

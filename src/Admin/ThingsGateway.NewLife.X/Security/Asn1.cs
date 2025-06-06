@@ -55,7 +55,7 @@ public class Asn1
             foreach (var item in arr)
             {
                 var ds = item.GetOids();
-                if (ds != null && ds.Length > 0) list.AddRange(ds);
+                if (ds?.Length > 0) list.AddRange(ds);
             }
         }
 

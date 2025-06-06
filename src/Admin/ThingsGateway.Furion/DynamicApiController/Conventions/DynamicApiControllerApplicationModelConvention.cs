@@ -220,8 +220,7 @@ internal sealed class DynamicApiControllerApplicationModelConvention : IApplicat
         // 解决 Gitee 该 Issue：https://gitee.com/dotnetchina/Furion/issues/I59B74
         if (CheckIsForceWithDefaultRoute(controllerApiDescriptionSettings)
             && !string.IsNullOrWhiteSpace(_dynamicApiControllerSettings.DefaultRoutePrefix)
-            && controller.Selectors[0] != null
-            && controller.Selectors[0].AttributeRouteModel != null
+            && controller.Selectors[0]?.AttributeRouteModel != null
             && !ForceWithDefaultPrefixRouteControllerTypes.Contains(controller.ControllerType))
         {
             // 读取模块

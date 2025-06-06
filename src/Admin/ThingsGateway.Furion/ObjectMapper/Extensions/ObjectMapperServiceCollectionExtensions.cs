@@ -47,7 +47,7 @@ public static class ObjectMapperServiceCollectionExtensions
         var config = TypeAdapterConfig.GlobalSettings;
 
         // 扫描所有继承  IRegister 接口的对象映射配置
-        if (assemblies != null && assemblies.Length > 0) config.Scan(assemblies);
+        if (assemblies?.Length > 0) config.Scan(assemblies);
 
         // 配置支持依赖注入
         services.AddSingleton(config);

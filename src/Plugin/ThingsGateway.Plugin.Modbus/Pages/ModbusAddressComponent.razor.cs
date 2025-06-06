@@ -52,8 +52,7 @@ public partial class ModbusAddressComponent : ComponentBase, IAddressUIBase
 
             Model = $"{ConverterConfig.ToString()}{Value?.ToString()}";
 
-            if (ModelChanged != null)
-                ModelChanged.Invoke(Model);
+            ModelChanged?.Invoke(Model);
             if (OnCloseAsync != null)
                 await OnCloseAsync();
         }

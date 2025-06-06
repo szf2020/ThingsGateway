@@ -49,6 +49,14 @@ public class AppFriendlyException : Exception
         ErrorCode = OriginErrorCode = errorCode;
     }
 
+    public AppFriendlyException(string? message) : base(message)
+    {
+    }
+
+    public AppFriendlyException(string? message, Exception? innerException) : base(message, innerException)
+    {
+    }
+
     /// <summary>
     /// 错误码
     /// </summary>

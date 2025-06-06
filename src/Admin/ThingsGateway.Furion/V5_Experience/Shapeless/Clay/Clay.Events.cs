@@ -136,7 +136,7 @@ public partial class Clay
         {
             handler(this, new ClayEventArgs(identifier, Contains(identifier)));
         }
-        catch (Exception)
+        catch
         {
             // ignored
         }

@@ -126,7 +126,7 @@ public static class DynamicApiControllerServiceCollectionExtensions
     {
         var partManager = mvcBuilder.PartManager;
         // 载入程序集部件
-        if (partManager != null && assemblies != null && assemblies.Any())
+        if (partManager != null && assemblies?.Any() == true)
         {
             foreach (var assembly in assemblies)
             {

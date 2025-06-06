@@ -84,7 +84,7 @@ public class AssemblyX
         {
             try
             {
-                return Asm == null || Asm.IsDynamic ? null : Asm.Location;
+                return Asm?.IsDynamic != false ? null : Asm.Location;
             }
             catch { return null; }
         }
@@ -187,7 +187,7 @@ public class AssemblyX
                 if (item == null) continue;
 
                 var ts2 = item.GetNestedTypes(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance);
-                if (ts2 != null && ts2.Length > 0)
+                if (ts2?.Length > 0)
                 {
                     // 从下一个元素开始插入，让内嵌类紧挨着主类
                     //Int32 k = i + 1;
@@ -332,7 +332,7 @@ public class AssemblyX
         {
             foreach (var item in types)
             {
-                if (item != null && !item.IsInterface && !item.IsAbstract && !item.IsGenericType && item != baseType && item.As(baseType)) list.Add(item);
+                if (item?.IsInterface == false && !item.IsAbstract && !item.IsGenericType && item != baseType && item.As(baseType)) list.Add(item);
             }
         }
 
@@ -360,7 +360,7 @@ public class AssemblyX
         foreach (var item in GetAssemblies())
         {
             signs = item.Asm.GetName().GetPublicKey();
-            if (hasNotSign && signs != null && signs.Length > 0) continue;
+            if (hasNotSign && signs?.Length > 0) continue;
 
             //// 如果excludeGlobalTypes为true，则指检查来自非GAC引用的程序集
             //if (excludeGlobalTypes && item.Asm.GlobalAssemblyCache) continue;
@@ -389,7 +389,7 @@ public class AssemblyX
             if (item.IsSystemAssembly || !IsReferencedFrom(item.Asm, baseAssemblyName)) continue;
 
             var ts = item.FindPlugins(baseType);
-            if (ts != null && ts.Count > 0)
+            if (ts?.Count > 0)
             {
                 // 真实加载
                 if (XTrace.Debug)

@@ -61,10 +61,7 @@ public partial class Dlt645_2007Master : ComponentBase, IDisposable
         {
              {nameof(Dlt645_2007AddressComponent.ModelChanged),  (string a) =>
             {
-                if(DeviceComponent!=null)
-                {
-                    DeviceComponent.SetRegisterAddress(a);
-                }
+                DeviceComponent?.SetRegisterAddress(a);
             }},
             {nameof(Dlt645_2007AddressComponent.Model),address },
         });

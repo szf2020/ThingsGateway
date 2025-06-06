@@ -457,7 +457,7 @@ public class ThingsGatewayNodeManager : CustomNodeManager2
 
                 // check if the node is AnalogItem and the values are outside the InstrumentRange.
                 AnalogItemState analogItemState = handle.Node as AnalogItemState;
-                if (analogItemState != null && analogItemState.InstrumentRange != null)
+                if (analogItemState?.InstrumentRange != null)
                 {
                     try
                     {

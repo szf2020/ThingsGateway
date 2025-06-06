@@ -139,8 +139,7 @@ internal static class TypeExtensions
         }
 
         // 类型限定名是否以 <> 开头且以 AnonymousType 结尾
-        return type.FullName is not null
-               && type.FullName.StartsWith("<>")
+        return type.FullName?.StartsWith("<>") == true
                && type.FullName.Contains("AnonymousType");
     }
 
@@ -463,7 +462,7 @@ internal static class TypeExtensions
             var elementType = type.GetElementType();
 
             // 检查元素类型是否是 KeyValuePair<,> 类型
-            if (elementType is null || !elementType.IsKeyValuePair())
+            if (elementType?.IsKeyValuePair() != true)
             {
                 return false;
             }

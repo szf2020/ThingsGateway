@@ -15,7 +15,7 @@ namespace ThingsGateway.NewLife;
 /// <summary>
 /// FileUtil
 /// </summary>
-public class FileUtil
+public static class FileUtil
 {
     /// <summary>
     /// 读取文件

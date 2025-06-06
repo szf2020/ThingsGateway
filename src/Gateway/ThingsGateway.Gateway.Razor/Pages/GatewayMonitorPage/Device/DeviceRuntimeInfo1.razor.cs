@@ -71,8 +71,7 @@ public partial class DeviceRuntimeInfo1 : IDisposable
     }
     private void PauseThread()
     {
-        if (DeviceRuntime.Driver != null)
-            DeviceRuntime.Driver.PauseThread(!DeviceRuntime.Pause);
+        DeviceRuntime.Driver?.PauseThread(!DeviceRuntime.Pause);
     }
 
     protected override void OnInitialized()

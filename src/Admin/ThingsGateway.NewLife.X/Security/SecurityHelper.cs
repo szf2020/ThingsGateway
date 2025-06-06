@@ -141,9 +141,9 @@ public static class SecurityHelper
     {
         if (data == null || data.Length <= 0) throw new ArgumentNullException(nameof(data));
 
-        if (pass != null && pass.Length > 0)
+        if (pass?.Length > 0)
         {
-            if (sa.LegalKeySizes != null && sa.LegalKeySizes.Length > 0)
+            if (sa.LegalKeySizes?.Length > 0)
                 sa.Key = Pad(pass, sa.LegalKeySizes[0]);
             else
                 sa.Key = pass;
@@ -206,9 +206,9 @@ public static class SecurityHelper
     {
         if (data == null || data.Length <= 0) throw new ArgumentNullException(nameof(data));
 
-        if (pass != null && pass.Length > 0)
+        if (pass?.Length > 0)
         {
-            if (sa.LegalKeySizes != null && sa.LegalKeySizes.Length > 0)
+            if (sa.LegalKeySizes?.Length > 0)
                 sa.Key = Pad(pass, sa.LegalKeySizes[0]);
             else
                 sa.Key = pass;

@@ -177,15 +177,6 @@ public partial class Clay
         enumerableClay = this;
     }
 
-    /// <summary>
-    /// </summary>
-    /// <param name="clay">dynamic 类型的 <see cref="Clay" /></param>
-    /// <param name="enumerableClay">
-    ///     <see cref="IEnumerable{T}" />
-    /// </param>
-    /// <param name="rawClay">
-    ///     <see cref="Clay" />
-    /// </param>
     public void Deconstruct(out dynamic clay, out IEnumerable<dynamic?> enumerableClay, out Clay rawClay)
     {
         clay = this;
@@ -888,7 +879,7 @@ public partial class Clay
         foreach (var item in values)
         {
             // 检查值是否为空值或基本类型的值
-            if (item is null || item.GetType().IsBasicType())
+            if (item?.GetType().IsBasicType() != false)
             {
                 throw new InvalidOperationException("Cannot extend a single object with null or basic type values.");
             }

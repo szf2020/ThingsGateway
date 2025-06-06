@@ -47,7 +47,7 @@ public sealed class DependsOnAttribute : Attribute
         var components = new List<Type>();
 
         // 遍历所有依赖组件
-        if (dependComponents != null && dependComponents.Length > 0)
+        if (dependComponents?.Length > 0)
         {
             foreach (var component in dependComponents)
             {
@@ -102,7 +102,7 @@ public sealed class DependsOnAttribute : Attribute
             var components = new List<Type>();
 
             // 遍历所有依赖组件
-            if (value != null && value.Length > 0)
+            if (value?.Length > 0)
             {
                 foreach (var component in value)
                 {

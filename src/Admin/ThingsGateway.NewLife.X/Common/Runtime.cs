@@ -199,7 +199,7 @@ public static class Runtime
         if (processId != ProcessId) gc = false;
 
         var log = XTrace.Log;
-        if (log != null && log.Enable && log.Level <= LogLevel.Debug)
+        if (log?.Enable == true && log.Level <= LogLevel.Debug)
         {
             p ??= Process.GetCurrentProcess();
             var gcm = GC.GetTotalMemory(false) / 1024;
@@ -243,7 +243,7 @@ public static class Runtime
             }
         }
 
-        if (log != null && log.Enable && log.Level <= LogLevel.Debug)
+        if (log?.Enable == true && log.Level <= LogLevel.Debug)
         {
             p ??= Process.GetProcessById(processId);
             p.Refresh();

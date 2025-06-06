@@ -14,7 +14,7 @@ namespace ThingsGateway.Gateway.Application;
 /// Cache常量
 /// </summary>
 [ThingsGateway.DependencyInjection.SuppressSniffer]
-public class ThingsGatewayCacheConst
+public static class ThingsGatewayCacheConst
 {
     /// <summary>
     /// 通道

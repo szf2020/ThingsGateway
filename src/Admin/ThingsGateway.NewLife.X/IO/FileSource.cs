@@ -122,7 +122,7 @@ namespace ThingsGateway.NewLife.IO
             var name = String.Empty;
             if (asm == null) asm = Assembly.GetCallingAssembly();
             var ss = asm.GetManifestResourceNames();
-            if (ss != null && ss.Length > 0)
+            if (ss?.Length > 0)
             {
                 //找到资源名
                 name = ss.FirstOrDefault(e => e == filename);

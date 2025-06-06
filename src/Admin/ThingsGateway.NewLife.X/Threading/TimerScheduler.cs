@@ -129,7 +129,7 @@ public class TimerScheduler : ILogFeature
         if (e != null)
         {
             var swh = e.SafeWaitHandle;
-            if (swh != null && !swh.IsClosed) e.Set();
+            if (swh?.IsClosed == false) e.Set();
         }
     }
 

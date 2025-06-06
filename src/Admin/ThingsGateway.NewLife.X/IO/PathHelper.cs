@@ -278,7 +278,7 @@ public static class PathHelper
     public static Boolean CopyToIfNewer(this FileInfo fi, String destFileName)
     {
         // 源文件必须存在
-        if (fi == null || !fi.Exists) return false;
+        if (fi?.Exists != true) return false;
 
         var dest = destFileName.AsFile();
         // 目标文件必须存在且源文件较新
@@ -425,7 +425,7 @@ public static class PathHelper
     /// <returns></returns>
     public static IEnumerable<FileInfo> GetAllFiles(this DirectoryInfo di, String? exts = null, Boolean allSub = false)
     {
-        if (di == null || !di.Exists) yield break;
+        if (di?.Exists != true) yield break;
 
         if (String.IsNullOrEmpty(exts)) exts = "*";
         var opt = allSub ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly;
@@ -525,7 +525,7 @@ public static class PathHelper
                     Console.WriteLine("\t{1}\t{0}", name, item.CombinePath(name).AsFile().LastWriteTime.ToFullString());
                     Console.ResetColor();
                 });
-                if (rs != null && rs.Length > 0) list.AddRange(rs);
+                if (rs?.Length > 0) list.AddRange(rs);
             }
             catch (Exception ex) { Console.WriteLine(" " + ex.Message); }
         }

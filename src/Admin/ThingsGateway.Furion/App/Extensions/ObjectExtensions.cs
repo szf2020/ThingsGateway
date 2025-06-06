@@ -455,7 +455,7 @@ public static class ObjectExtensions
                 foreach (var property in propertys)
                 {
                     var p = oldType.GetProperty(property.Name);
-                    if (property.CanWrite && p != null && p.CanRead)
+                    if (property.CanWrite && p?.CanRead == true)
                     {
                         property.SetValue(o, ChangeType(p.GetValue(obj, null), property.PropertyType), null);
                     }
@@ -647,7 +647,7 @@ public static class ObjectExtensions
     /// <returns><see cref="bool"/> 实例，true 表示空集合，false 表示非空集合</returns>
     internal static bool IsEmpty<T>(this IEnumerable<T> collection)
     {
-        return collection == null || !collection.Any();
+        return collection?.Any() != true;
     }
 
 

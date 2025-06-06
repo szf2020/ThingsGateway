@@ -32,7 +32,7 @@ public class DragMovablesBehavior : Behavior
                 continue;
 
             // Special case: groups without auto size on
-            if (sm is NodeModel node && node.Group != null && !node.Group.AutoSize)
+            if (sm is NodeModel node && node.Group?.AutoSize == false)
                 continue;
 
             var position = movable.Position;

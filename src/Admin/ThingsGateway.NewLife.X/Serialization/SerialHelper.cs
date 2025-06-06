@@ -22,12 +22,12 @@ public static class SerialHelper
         if (name.IsNullOrEmpty())
         {
             var att = pi.GetCustomAttribute<DataMemberAttribute>();
-            if (att != null && !att.Name.IsNullOrEmpty()) name = att.Name;
+            if (att?.Name.IsNullOrEmpty() == false) name = att.Name;
         }
         if (name.IsNullOrEmpty())
         {
             var att = pi.GetCustomAttribute<XmlElementAttribute>();
-            if (att != null && !att.ElementName.IsNullOrEmpty()) name = att.ElementName;
+            if (att?.ElementName.IsNullOrEmpty() == false) name = att.ElementName;
         }
         if (name.IsNullOrEmpty()) name = pi.Name;
 

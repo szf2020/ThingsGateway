@@ -13,7 +13,7 @@ using Microsoft.Extensions.DependencyInjection;
 namespace ThingsGateway.Admin.Application;
 
 [ThingsGateway.DependencyInjection.SuppressSniffer]
-public class NoticeUtil
+public static class NoticeUtil
 {
     private static INoticeService NoticeService;
 

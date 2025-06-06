@@ -711,7 +711,7 @@ public static class SpecificationDocumentBuilder
             .Union(
                 actions.SelectMany(u => GetActionGroups(u))
             )
-            .Where(u => u != null && u.Visible)
+            .Where(u => u?.Visible == true)
             // 分组后取最大排序
             .GroupBy(u => u.Group)
             .Select(u => new GroupExtraInfo

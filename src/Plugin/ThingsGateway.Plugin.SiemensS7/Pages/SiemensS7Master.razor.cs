@@ -61,10 +61,7 @@ public partial class SiemensS7Master : ComponentBase, IDisposable
         {
              {nameof(SiemensS7AddressComponent.ModelChanged),  (string a) =>
             {
-                if(DeviceComponent!=null)
-                {
-                    DeviceComponent.SetRegisterAddress(a);
-                }
+                DeviceComponent?.SetRegisterAddress(a);
             }},
             {nameof(SiemensS7AddressComponent.Model),address },
         });

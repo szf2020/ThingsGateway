@@ -499,7 +499,7 @@ public struct ResultID : ISerializable
         return string.Format("0x{0,0:X}", Code);
     }
 
-    public class Ae
+    public static class Ae
     {
         public static readonly ResultID E_BUSY = new ResultID("E_BUSY", "http://opcfoundation.org/AlarmAndEvents/");
         public static readonly ResultID E_INVALIDBRANCHNAME = new ResultID("E_INVALIDBRANCHNAME", "http://opcfoundation.org/AlarmAndEvents/");
@@ -513,7 +513,7 @@ public struct ResultID : ISerializable
         public static readonly ResultID S_INVALIDMAXSIZE = new ResultID("S_INVALIDMAXSIZE", "http://opcfoundation.org/AlarmAndEvents/");
     }
 
-    public class Cpx
+    public static class Cpx
     {
         public static readonly ResultID E_FILTER_DUPLICATE = new ResultID("E_FILTER_DUPLICATE", "http://opcfoundation.org/ComplexData/");
         public static readonly ResultID E_FILTER_ERROR = new ResultID("E_FILTER_ERROR", "http://opcfoundation.org/ComplexData/");
@@ -522,7 +522,7 @@ public struct ResultID : ISerializable
         public static readonly ResultID S_FILTER_NO_DATA = new ResultID("S_FILTER_NO_DATA", "http://opcfoundation.org/ComplexData/");
     }
 
-    public class Da
+    public static class Da
     {
         public static readonly ResultID E_BADTYPE = new ResultID("E_BADTYPE", "http://opcfoundation.org/DataAccess/");
         public static readonly ResultID E_INVALID_FILTER = new ResultID("E_INVALID_FILTER", "http://opcfoundation.org/DataAccess/");
@@ -546,7 +546,7 @@ public struct ResultID : ISerializable
         public static readonly ResultID S_UNSUPPORTEDRATE = new ResultID("S_UNSUPPORTEDRATE", "http://opcfoundation.org/DataAccess/");
     }
 
-    public class Dx
+    public static class Dx
     {
         public static readonly ResultID E_CONNECTIONS_EXIST = new ResultID("E_CONNECTIONS_EXIST", "http://opcfoundation.org/DataExchange/");
         public static readonly ResultID E_DUPLICATE_NAME = new ResultID("E_DUPLICATE_NAME", "http://opcfoundation.org/DataExchange/");
@@ -599,7 +599,7 @@ public struct ResultID : ISerializable
         public static readonly ResultID S_TARGET_SUBSTITUTED = new ResultID("S_TARGET_SUBSTITUTED", "http://opcfoundation.org/DataExchange/");
     }
 
-    public class Hda
+    public static class Hda
     {
         public static readonly ResultID E_DATAEXISTS = new ResultID("E_DATAEXISTS", "http://opcfoundation.org/HistoricalDataAccess/");
         public static readonly ResultID E_INVALIDAGGREGATE = new ResultID("E_INVALIDAGGREGATE", "http://opcfoundation.org/HistoricalDataAccess/");
@@ -745,7 +745,7 @@ public class ItemProperty : ICloneable, IResult
     }
 }
 
-public class Property
+public static class Property
 {
     public static readonly PropertyID ACCESSRIGHTS = new PropertyID("accessRights", 5, "http://opcfoundation.org/DataAccess/");
     public static readonly PropertyID ALARM_AREA_LIST = new PropertyID("alarmAreaList", 302, "http://opcfoundation.org/DataAccess/");

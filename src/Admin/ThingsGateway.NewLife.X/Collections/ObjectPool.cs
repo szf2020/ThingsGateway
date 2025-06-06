@@ -402,7 +402,7 @@ public class ObjectPool<T> : DisposeBase, IPool<T> where T : notnull
     /// <param name="args"></param>
     public void WriteLog(String format, params Object?[] args)
     {
-        if (Log == null || !Log.Enable) return;
+        if (Log?.Enable != true) return;
 
         Log.Info(Name + "." + format, args);
     }

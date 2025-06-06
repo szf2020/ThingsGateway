@@ -17,7 +17,7 @@ namespace ThingsGateway.DataEncryption;
 /// PBKDF2 加密
 /// </summary>
 [SuppressSniffer]
-public class PBKDF2Encryption
+public static class PBKDF2Encryption
 {
     private const string SaltHashSeparator = ":";
 

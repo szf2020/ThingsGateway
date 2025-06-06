@@ -20,7 +20,7 @@ namespace ThingsGateway.DataEncryption;
 /// DES 加解密
 /// </summary>
 [SuppressSniffer]
-public class DESEncryption
+public static class DESEncryption
 {
     /// <summary>
     /// 加密

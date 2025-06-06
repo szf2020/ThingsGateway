@@ -135,7 +135,7 @@ internal static class V5_ObjectExtensions
         var runtimeProperty = obj.GetType().GetRuntimeProperty("Count");
 
         // 反射获取 Count 属性值
-        if (runtimeProperty is not null && runtimeProperty.CanRead && runtimeProperty.PropertyType == typeof(int))
+        if (runtimeProperty?.CanRead == true && runtimeProperty.PropertyType == typeof(int))
         {
             count = (int)runtimeProperty.GetValue(obj)!;
             return true;
@@ -332,7 +332,7 @@ internal static class V5_ObjectExtensions
             var property = current.GetType().GetProperty(part, bindingFlags);
 
             // 空检查
-            if (property is null || !property.CanRead)
+            if (property?.CanRead != true)
             {
                 return null;
             }

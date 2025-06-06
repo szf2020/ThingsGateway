@@ -52,8 +52,7 @@ public partial class SiemensS7AddressComponent : ComponentBase, IAddressUIBase
 
             Model = $"{ConverterConfig.ToString()}{Value?.ToString()}";
 
-            if (ModelChanged != null)
-                ModelChanged.Invoke(Model);
+            ModelChanged?.Invoke(Model);
             if (OnCloseAsync != null)
                 await OnCloseAsync();
         }

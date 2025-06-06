@@ -179,10 +179,10 @@ public class TcpConnectionInformation2 : TcpConnectionInformation
 
         // 各个进程底下的/net/tcp，实际上是所有进程的连接
         var rs = ParseTcpsFromFile(processId > 0 ? $"/proc/{processId}/net/tcp" : "/proc/net/tcp");
-        if (rs != null && rs.Count > 0) list.AddRange(rs);
+        if (rs?.Count > 0) list.AddRange(rs);
 
         var rs2 = ParseTcpsFromFile(processId > 0 ? $"/proc/{processId}/net/tcp6" : "/proc/net/tcp6");
-        if (rs2 != null && rs2.Count > 0) list.AddRange(rs2);
+        if (rs2?.Count > 0) list.AddRange(rs2);
         //XTrace.WriteLine("tcps: {0} nodes: {1}", list.Count, nodes?.Length);
 
         // 过滤指定进程的连接

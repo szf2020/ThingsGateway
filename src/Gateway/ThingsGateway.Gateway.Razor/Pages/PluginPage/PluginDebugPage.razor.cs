@@ -10,8 +10,6 @@
 
 using Mapster;
 
-using Newtonsoft.Json.Linq;
-
 using ThingsGateway.Gateway.Application;
 using ThingsGateway.NewLife.Extension;
 

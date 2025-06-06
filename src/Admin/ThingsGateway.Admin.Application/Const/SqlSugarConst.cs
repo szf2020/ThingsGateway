@@ -14,7 +14,7 @@ namespace ThingsGateway.Admin.Application;
 /// SqlSugar系统常量
 /// </summary>
 [ThingsGateway.DependencyInjection.SuppressSniffer]
-public class SqlSugarConst
+public static class SqlSugarConst
 {
     /// <summary>
     /// DB_Admin

@@ -343,7 +343,7 @@ public partial class Crontab
 
             // 如果存在且唯一，则进入下一轮判断
             // 接下来的判断是处理 SUN + L 的情况，如 SUNL == 0L == SUNDAY，它们都是合法的 Cron 值
-            if (replaceVal != null && replaceVal.Count == 1)
+            if (replaceVal?.Count == 1)
             {
                 var missingParser = "";
 

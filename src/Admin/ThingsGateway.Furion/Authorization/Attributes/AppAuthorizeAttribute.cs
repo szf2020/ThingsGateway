@@ -25,7 +25,7 @@ public sealed class AppAuthorizeAttribute : AuthorizeAttribute
     /// <param name="policies">多个策略</param>
     public AppAuthorizeAttribute(params string[] policies)
     {
-        if (policies != null && policies.Length > 0) Policies = policies;
+        if (policies?.Length > 0) Policies = policies;
     }
 
     /// <summary>

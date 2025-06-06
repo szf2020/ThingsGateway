@@ -149,7 +149,7 @@ public class OtherChannel : SetupConfigObject, IClientChannel
     public async Task SendAsync(IList<ArraySegment<byte>> transferBytes)
     {
         // 检查数据处理适配器是否存在且支持拼接发送
-        if (m_dataHandlingAdapter == null || !m_dataHandlingAdapter.CanSplicingSend)
+        if (m_dataHandlingAdapter?.CanSplicingSend != true)
         {
             // 如果不支持拼接发送，则计算所有字节片段的总长度
             var length = 0;
@@ -208,7 +208,7 @@ public class OtherChannel : SetupConfigObject, IClientChannel
     }
     private void ThrowIfCannotSendRequestInfo()
     {
-        if (m_dataHandlingAdapter == null || !m_dataHandlingAdapter.CanSendRequestInfo)
+        if (m_dataHandlingAdapter?.CanSendRequestInfo != true)
         {
             throw new NotSupportedException($"当前适配器为空或者不支持对象发送。");
         }

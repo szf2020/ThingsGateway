@@ -18,7 +18,7 @@ namespace ThingsGateway.DataEncryption;
 /// SHA1 加密
 /// </summary>
 [SuppressSniffer]
-public class SHA1Encryption
+public static class SHA1Encryption
 {
     /// <summary>
     /// SHA1 加密

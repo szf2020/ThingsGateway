@@ -137,7 +137,7 @@ public static class StringHelper
     public static IDictionary<String, String> SplitAsDictionary(this String? value, String nameValueSeparator = "=", String separator = ";", Boolean trimQuotation = false)
     {
         var dic = new NullableDictionary<String, String>(StringComparer.OrdinalIgnoreCase);
-        if (value == null || value.IsNullOrWhiteSpace()) return dic;
+        if (value?.IsNullOrWhiteSpace() != false) return dic;
 
         if (nameValueSeparator.IsNullOrEmpty()) nameValueSeparator = "=";
         //if (separator == null || separator.Length <= 0) separator = new String[] { ",", ";" };
@@ -515,7 +515,7 @@ public static class StringHelper
             p += after.Length;
 
             // 记录位置
-            if (positions != null && positions.Length > 0) positions[0] = p;
+            if (positions?.Length > 0) positions[0] = p;
         }
 
         if (String.IsNullOrEmpty(before)) return str[p..];
@@ -524,7 +524,7 @@ public static class StringHelper
         if (f < 0) return String.Empty;
 
         // 记录位置
-        if (positions != null && positions.Length > 1) positions[1] = f;
+        if (positions?.Length > 1) positions[1] = f;
 
         if (p >= 0)
             return str[p..f];
@@ -770,7 +770,7 @@ public static class StringHelper
     {
         var rs = new List<KeyValuePair<T, Double>>();
 
-        if (list == null || !list.Any()) return rs;
+        if (list?.Any() != true) return rs;
         if (keys.IsNullOrWhiteSpace()) return rs;
         if (keySelector == null) throw new ArgumentNullException(nameof(keySelector));
 
@@ -825,7 +825,7 @@ public static class StringHelper
     {
         var rs = new List<KeyValuePair<T, Double>>();
 
-        if (list == null || !list.Any()) return rs;
+        if (list?.Any() != true) return rs;
         if (keys.IsNullOrWhiteSpace()) return rs;
         if (keySelector == null) throw new ArgumentNullException(nameof(keySelector));
 

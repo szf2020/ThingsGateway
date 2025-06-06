@@ -62,7 +62,7 @@ public static class DSAHelper
         var xmlDoc = new XmlDocument();
         xmlDoc.LoadXml(xmlString);
 
-        if (xmlDoc.DocumentElement == null || !xmlDoc.DocumentElement.Name.Equals("DSAKeyValue"))
+        if (xmlDoc.DocumentElement?.Name.Equals("DSAKeyValue") != true)
         {
             throw new Exception("Invalid XML DSA key.");
         }

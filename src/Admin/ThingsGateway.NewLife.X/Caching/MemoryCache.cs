@@ -120,7 +120,7 @@ public class MemoryCache : Cache
     /// <summary>是否包含缓存项</summary>
     /// <param name="key"></param>
     /// <returns></returns>
-    public override Boolean ContainsKey(String key) => _cache.TryGetValue(key, out var item) && item != null && !item.Expired;
+    public override Boolean ContainsKey(String key) => _cache.TryGetValue(key, out var item) && item?.Expired == false;
 
     /// <summary>添加缓存项，已存在时更新</summary>
     /// <typeparam name="T">值类型</typeparam>
@@ -166,7 +166,7 @@ public class MemoryCache : Cache
     [return: MaybeNull]
     public override T Get<T>(String key)
     {
-        if (!_cache.TryGetValue(key, out var item) || item == null || item.Expired) return default;
+        if (!_cache.TryGetValue(key, out var item) || item?.Expired != false) return default;
 
         return item.Visit<T>();
     }
@@ -712,7 +712,7 @@ public class MemoryCache : Cache
             for (var i = 0; i < slist.Count && over > 0; i++)
             {
                 var ss = slist.Values[i];
-                if (ss != null && ss.Count > 0)
+                if (ss?.Count > 0)
                 {
                     foreach (var item in ss)
                     {

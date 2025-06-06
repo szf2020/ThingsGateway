@@ -715,7 +715,7 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
                         propertys.Item3 = properties;
                         propertysDict.TryAdd(driverPluginType.FullName, propertys);
                     }
-                    catch (Exception)
+                    catch
                     {
 
                     }

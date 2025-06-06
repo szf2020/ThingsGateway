@@ -13,14 +13,16 @@ namespace ThingsGateway.Admin.Application;
 /// <summary>
 /// 需要角色授权权限
 /// </summary>
-[AttributeUsage(AttributeTargets.Class)]
+[AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
 public sealed class RolePermissionAttribute : Attribute
 {
 }
 
+
 /// <summary>
 /// 忽略角色授权权限
 /// </summary>
+[AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = false)]
 public sealed class IgnoreRolePermissionAttribute : Attribute
 {
 }

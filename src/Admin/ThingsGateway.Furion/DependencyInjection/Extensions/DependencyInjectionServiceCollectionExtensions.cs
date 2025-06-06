@@ -215,7 +215,7 @@ public static class DependencyInjectionServiceCollectionExtensions
     private static void AddDispatchProxy(IServiceCollection services, Type dependencyType, Type type, Type proxyType, Type inter, bool hasTarget = true)
     {
         proxyType ??= GlobalServiceProxyType;
-        if (proxyType == null || (type != null && type.IsDefined(typeof(SuppressProxyAttribute), true))) return;
+        if (proxyType == null || (type?.IsDefined(typeof(SuppressProxyAttribute), true) == true)) return;
 
         var lifetime = TryGetServiceLifetime(dependencyType);
 

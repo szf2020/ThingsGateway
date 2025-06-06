@@ -36,7 +36,7 @@ public class TimerX : ITimer, IDisposable
     /// <summary>获取/设置 用户数据</summary>
     public Object? State
     {
-        get => _state != null && _state.IsAlive ? _state.Target : null;
+        get => _state?.IsAlive == true ? _state.Target : null;
         set
         {
             if (_state == null)
@@ -105,7 +105,7 @@ public class TimerX : ITimer, IDisposable
         _nextTick = Runtime.TickCount64;
         //_baseTime = DateTime.Now.AddMilliseconds(-_nextTick);
 
-        Scheduler = (scheduler == null || scheduler.IsNullOrEmpty()) ? TimerScheduler.Default : TimerScheduler.Create(scheduler);
+        Scheduler = (scheduler?.IsNullOrEmpty() != false) ? TimerScheduler.Default : TimerScheduler.Create(scheduler);
         //Scheduler.Add(this);
         _baseTime = Scheduler.GetNow().AddMilliseconds(-_nextTick);
 
@@ -384,7 +384,7 @@ public class TimerX : ITimer, IDisposable
     public Boolean Change(TimeSpan dueTime, TimeSpan period)
     {
         if (Absolutely) return false;
-        if (Crons != null && Crons.Length > 0) return false;
+        if (Crons?.Length > 0) return false;
 
         if (period.TotalMilliseconds <= 0)
         {

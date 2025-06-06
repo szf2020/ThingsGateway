@@ -36,7 +36,7 @@ public static class AttributeX
     public static String? GetDisplayName(this MemberInfo member, Boolean inherit = true)
     {
         var att = member.GetCustomAttribute<DisplayNameAttribute>(inherit);
-        if (att != null && !att.DisplayName.IsNullOrWhiteSpace()) return att.DisplayName;
+        if (att?.DisplayName.IsNullOrWhiteSpace() == false) return att.DisplayName;
 
         return null;
     }
@@ -48,7 +48,7 @@ public static class AttributeX
     public static String? GetDescription(this MemberInfo member, Boolean inherit = true)
     {
         var att2 = member.GetCustomAttribute<DescriptionAttribute>(inherit);
-        if (att2 != null && !att2.Description.IsNullOrWhiteSpace()) return att2.Description;
+        if (att2?.Description.IsNullOrWhiteSpace() == false) return att2.Description;
 
         return null;
     }
@@ -72,7 +72,7 @@ public static class AttributeX
                 if (typeof(TAttribute) != item.Constructor.DeclaringType) continue;
 
                 var args = item.ConstructorArguments;
-                if (args != null && args.Count > 0) return (TResult?)args[0].Value;
+                if (args?.Count > 0) return (TResult?)args[0].Value;
             }
         }
         catch { }
@@ -93,14 +93,14 @@ public static class AttributeX
         try
         {
             var list = CustomAttributeData.GetCustomAttributes(target);
-            if (list != null && list.Count > 0)
+            if (list?.Count > 0)
             {
                 foreach (var item in list)
                 {
                     if (typeof(TAttribute).FullName != item.Constructor.DeclaringType?.FullName) continue;
 
                     var args = item.ConstructorArguments;
-                    if (args != null && args.Count > 0) return (TResult?)args[0].Value;
+                    if (args?.Count > 0) return (TResult?)args[0].Value;
                 }
             }
             if (inherit && target is Type type && type.BaseType != null)

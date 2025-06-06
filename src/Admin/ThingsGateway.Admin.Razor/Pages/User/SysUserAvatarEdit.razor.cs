@@ -48,7 +48,7 @@ public partial class SysUserAvatarEdit : IDisposable
 
     private async Task OnAvatarUpload(UploadFile file)
     {
-        if (file != null && file.File != null)
+        if (file?.File != null)
         {
             var format = file.File.ContentType;
             ReadAvatarToken ??= new CancellationTokenSource();

@@ -75,7 +75,7 @@ public class InIConfigProvider : FileConfigProvider
         var sb = new StringBuilder();
         foreach (var item in section.Childs.ToArray())
         {
-            if (item.Childs != null && item.Childs.Count > 0)
+            if (item.Childs?.Count > 0)
             {
                 // 段前空一行
                 sb.AppendLine();

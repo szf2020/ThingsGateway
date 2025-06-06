@@ -261,4 +261,17 @@ public class AdminOAuthHandler<TOptions>(
 }
 
 /// <summary>自定义 Token 异常</summary>
-public class OAuthTokenException(string message) : Exception(message);
+public class OAuthTokenException : Exception
+{
+    public OAuthTokenException() : base()
+    {
+    }
+
+    public OAuthTokenException(string? message, Exception? innerException) : base(message, innerException)
+    {
+    }
+
+    public OAuthTokenException(string? message) : base(message)
+    {
+    }
+}

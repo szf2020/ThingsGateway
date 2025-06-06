@@ -11,7 +11,7 @@
 namespace ThingsGateway.Admin.Application;
 
 [ThingsGateway.DependencyInjection.SuppressSniffer]
-public class CacheConst
+public static class CacheConst
 {
     /// <summary>
     /// Token表缓存Key

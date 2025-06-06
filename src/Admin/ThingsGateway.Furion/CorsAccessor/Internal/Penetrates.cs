@@ -65,7 +65,7 @@ internal static class Penetrates
         IEnumerable<string> exposedHeaders = corsAccessorSettings.FixedClientToken == true
             ? _defaultExposedHeaders
             : Array.Empty<string>();
-        if (corsAccessorSettings.WithExposedHeaders != null && corsAccessorSettings.WithExposedHeaders.Length > 0)
+        if (corsAccessorSettings.WithExposedHeaders?.Length > 0)
         {
             exposedHeaders = exposedHeaders.Concat(corsAccessorSettings.WithExposedHeaders).Distinct(StringComparer.OrdinalIgnoreCase);
         }

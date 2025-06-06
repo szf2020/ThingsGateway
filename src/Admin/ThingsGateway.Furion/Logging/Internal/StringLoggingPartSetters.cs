@@ -47,7 +47,7 @@ public sealed partial class StringLoggingPart
     /// <param name="args"></param>
     public StringLoggingPart SetArgs(params object[] args)
     {
-        if (args != null && args.Length > 0) Args = args;
+        if (args?.Length > 0) Args = args;
         return this;
     }
 

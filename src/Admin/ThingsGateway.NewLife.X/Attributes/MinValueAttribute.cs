@@ -12,9 +12,11 @@ using System.ComponentModel.DataAnnotations;
 
 namespace ThingsGateway;
 
+
 /// <summary>
 /// 最小值校验
 /// </summary>
+[AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
 public sealed class MinValueAttribute : ValidationAttribute
 {
     /// <summary>

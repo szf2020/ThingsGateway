@@ -48,7 +48,7 @@ internal sealed class DynamicApiRuntimeChangeProvider : IDynamicApiRuntimeChange
     /// <param name="assemblies">程序集</param>
     public void AddAssemblies(params Assembly[] assemblies)
     {
-        if (assemblies != null && assemblies.Length > 0)
+        if (assemblies?.Length > 0)
         {
             foreach (var assembly in assemblies)
             {
@@ -63,7 +63,7 @@ internal sealed class DynamicApiRuntimeChangeProvider : IDynamicApiRuntimeChange
     /// <param name="assemblies">程序集</param>
     public void AddAssembliesWithNotifyChanges(params Assembly[] assemblies)
     {
-        if (assemblies != null && assemblies.Length > 0)
+        if (assemblies?.Length > 0)
         {
             AddAssemblies(assemblies);
             NotifyChanges();
@@ -76,7 +76,7 @@ internal sealed class DynamicApiRuntimeChangeProvider : IDynamicApiRuntimeChange
     /// <param name="assemblyNames">程序集名称</param>
     public void RemoveAssemblies(params string[] assemblyNames)
     {
-        if (assemblyNames != null && assemblyNames.Length > 0)
+        if (assemblyNames?.Length > 0)
         {
             foreach (var assemblyName in assemblyNames)
             {
@@ -93,7 +93,7 @@ internal sealed class DynamicApiRuntimeChangeProvider : IDynamicApiRuntimeChange
     /// <param name="assemblies">程序集</param>
     public void RemoveAssemblies(params Assembly[] assemblies)
     {
-        if (assemblies != null && assemblies.Length > 0)
+        if (assemblies?.Length > 0)
         {
             RemoveAssemblies(assemblies.Select(ass => ass.GetName().Name).ToArray());
         }
@@ -105,7 +105,7 @@ internal sealed class DynamicApiRuntimeChangeProvider : IDynamicApiRuntimeChange
     /// <param name="assemblyNames">程序集名称</param>
     public void RemoveAssembliesWithNotifyChanges(params string[] assemblyNames)
     {
-        if (assemblyNames != null && assemblyNames.Length > 0)
+        if (assemblyNames?.Length > 0)
         {
             RemoveAssemblies(assemblyNames);
             NotifyChanges();
@@ -118,7 +118,7 @@ internal sealed class DynamicApiRuntimeChangeProvider : IDynamicApiRuntimeChange
     /// <param name="assemblies">程序集</param>
     public void RemoveAssembliesWithNotifyChanges(params Assembly[] assemblies)
     {
-        if (assemblies != null && assemblies.Length > 0)
+        if (assemblies?.Length > 0)
         {
             RemoveAssemblies(assemblies);
             NotifyChanges();

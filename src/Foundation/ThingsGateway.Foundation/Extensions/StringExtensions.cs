@@ -180,7 +180,11 @@ public static class StringExtensions
         return true;
     }
 
-    /// <see cref="DataTransUtil.HexStringToBytes(string)"/>
+    /// <summary>
+    /// <see cref="DataTransUtil.HexStringToBytes(string)"></see>
+    /// </summary>
+    /// <param name="str"></param>
+    /// <returns></returns>
     public static byte[] HexStringToBytes(this string str) => DataTransUtil.HexStringToBytes(str);
     private static readonly char[] DotSeparator = new char[] { '.' };
     private static readonly char[] SlashSeparator = new char[] { '/' };

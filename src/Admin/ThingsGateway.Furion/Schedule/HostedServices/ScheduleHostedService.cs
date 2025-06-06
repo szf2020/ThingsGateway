@@ -327,7 +327,7 @@ internal sealed class ScheduleHostedService : BackgroundService
                                 };
 
                                 // 是否定义 FallbackAsync 方法
-                                var isDefinedFallbackAsyncMethod = jobHandler != null && jobHandler.GetType().GetMethod(nameof(IJob.FallbackAsync)
+                                var isDefinedFallbackAsyncMethod = jobHandler?.GetType().GetMethod(nameof(IJob.FallbackAsync)
                                     , BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly
                                     , null
                                     , new[] { typeof(JobExecutedContext), typeof(CancellationToken) }

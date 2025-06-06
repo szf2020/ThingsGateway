@@ -13,7 +13,7 @@ using Microsoft.Extensions.DependencyInjection;
 namespace ThingsGateway.Admin.Application;
 
 [ThingsGateway.DependencyInjection.SuppressSniffer]
-public class ClearTokenUtil
+public static class ClearTokenUtil
 {
     private static IRelationService RelationService;
     private static ISysUserService SysUserService;

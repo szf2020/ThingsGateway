@@ -56,7 +56,7 @@ public static class RSAHelper
         ms.WriteArray(p.Modulus);
         ms.WriteArray(p.Exponent);
 
-        if (p.D != null && p.D.Length > 0)
+        if (p.D?.Length > 0)
         {
             if (p.D == null || p.P == null || p.Q == null ||
                 p.DP == null || p.DQ == null || p.InverseQ == null) throw new ArgumentNullException(nameof(p));

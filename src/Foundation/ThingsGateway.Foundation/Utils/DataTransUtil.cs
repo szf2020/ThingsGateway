@@ -15,7 +15,7 @@ namespace ThingsGateway.Foundation;
 /// <summary>
 /// 常用转换
 /// </summary>
-public class DataTransUtil
+public static class DataTransUtil
 {
     /// <summary>
     /// 字节数据转化成16进制表示的字符串

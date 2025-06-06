@@ -13,7 +13,7 @@ namespace ThingsGateway.Foundation;
 /// <summary>
 /// CRC16验证
 /// </summary>
-public class CRC16Utils
+public static class CRC16Utils
 {
     /// <summary>
     /// 通过指定多项式码来获取对应的数据的CRC校验码

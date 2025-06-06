@@ -108,7 +108,7 @@ public static class ConfigHelper
 
                 dic[cfg.Key] = cfg.Value;
 
-                if (cfg.Childs != null && cfg.Childs.Count > 0)
+                if (cfg.Childs?.Count > 0)
                     dic[cfg.Key] = cfg.Childs;
             }
 

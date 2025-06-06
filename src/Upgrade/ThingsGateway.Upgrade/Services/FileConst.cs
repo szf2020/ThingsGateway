@@ -1,6 +1,6 @@
 ﻿namespace ThingsGateway.Upgrade;
 
-public class FileConst
+public static class FileConst
 {
     public const string FilePathKey = "Path";
     public static string UpgradePath = Path.Combine(AppContext.BaseDirectory, "Upgrade.zip");

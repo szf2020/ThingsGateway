@@ -334,7 +334,7 @@ internal sealed class SysResourceService : BaseService<SysResource>, ISysResourc
             flatList.Add(node);
 
             // 如果当前节点有子节点，则递归处理每个子节点
-            if (node.Children != null && node.Children.Count > 0)
+            if (node.Children?.Count > 0)
             {
                 foreach (var child in node.Children)
                 {

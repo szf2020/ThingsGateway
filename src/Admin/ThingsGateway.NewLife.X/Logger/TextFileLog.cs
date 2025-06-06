@@ -229,7 +229,7 @@ public class TextFileLog : Logger, IDisposable
                 try
                 {
                     var dels = di.GetFiles("*.del");
-                    if (dels != null && dels.Length > 0)
+                    if (dels?.Length > 0)
                     {
                         foreach (var item in dels)
                         {
@@ -304,7 +304,7 @@ public class TextFileLog : Logger, IDisposable
 
         var e = WriteLogEventArgs.Current.Set(level);
         // 特殊处理异常对象
-        if (args != null && args.Length == 1 && args[0] is Exception ex && (format.IsNullOrEmpty() || format == "{0}"))
+        if (args?.Length == 1 && args[0] is Exception ex && (format.IsNullOrEmpty() || format == "{0}"))
             e = e.Set(null, ex);
         else
             e = e.Set(Format(format, args), null);

@@ -19,7 +19,7 @@ namespace ThingsGateway.DataEncryption;
 /// AES 加解密
 /// </summary>
 [SuppressSniffer]
-public class AESEncryption
+public static class AESEncryption
 {
     /// <summary>
     /// 加密

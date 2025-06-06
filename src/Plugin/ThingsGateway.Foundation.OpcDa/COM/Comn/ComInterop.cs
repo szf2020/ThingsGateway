@@ -176,7 +176,7 @@ internal sealed class ComInterop
             // 检查是否在本地或远程连接。
             uint clsctx = 0x01 | 0x04;
 
-            if (hostName != null && hostName.Length > 0 && !hostName.Equals("localhost", StringComparison.OrdinalIgnoreCase) && !hostName.Equals("127.0.0.1", StringComparison.OrdinalIgnoreCase))
+            if (hostName?.Length > 0 && !hostName.Equals("localhost", StringComparison.OrdinalIgnoreCase) && !hostName.Equals("127.0.0.1", StringComparison.OrdinalIgnoreCase))
             {
                 clsctx = 0x04 | 0x10;
             }
@@ -365,7 +365,7 @@ internal sealed class ComInterop
     /// <param name="m_server"></param>
     internal static void RealseComServer(object m_server)
     {
-        if (m_server != null && m_server.GetType().IsCOMObject)
+        if (m_server?.GetType().IsCOMObject == true)
         {
             Marshal.ReleaseComObject(m_server);
         }

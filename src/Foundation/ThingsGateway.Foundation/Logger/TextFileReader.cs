@@ -51,7 +51,7 @@ public class LogDataCache
 }
 
 /// <summary>高性能日志文件读取器（支持倒序读取）</summary>
-public class TextFileReader
+public static class TextFileReader
 {
     private static readonly MemoryCache _cache = new() { Expire = 30 };
     private static readonly MemoryCache _fileLocks = new();

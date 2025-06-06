@@ -166,7 +166,7 @@ public static class PluginServiceUtil
             if (classAttribute == null) continue;
             string propertyName = property.Name;
             // 如果属性存在且可写
-            if (property != null && property.CanWrite)
+            if (property?.CanWrite == true)
             {
                 // 进行类型转换
                 var value = ThingsGatewayStringConverter.Default.Serialize(null, property.GetValue(model));
@@ -194,7 +194,7 @@ public static class PluginServiceUtil
             string propertyName = property.Name;
 
             // 如果属性存在且可写
-            if (property != null && property.CanWrite)
+            if (property?.CanWrite == true)
             {
                 if (dict.TryGetValue(propertyName, out var dictValue))
                 {

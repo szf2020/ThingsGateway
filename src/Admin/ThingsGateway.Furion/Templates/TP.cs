@@ -47,7 +47,7 @@ public static class TP
         }
 
         // 添加项
-        if (items != null && items.Length > 0)
+        if (items?.Length > 0)
         {
             var propMaxLength = items.Where(u => _lazyRegex.Value.IsMatch(u))
                 .DefaultIfEmpty(string.Empty)

@@ -110,7 +110,7 @@ public class ExcelReader : DisposeBase
 
         // 加快样式判断速度
         var styles = _styles;
-        if (styles != null && styles.Length == 0) styles = null;
+        if (styles?.Length == 0) styles = null;
 
         foreach (var row in data.Elements())
         {
@@ -139,7 +139,7 @@ public class ExcelReader : DisposeBase
 
                 // t=DataType, s=SharedString, b=Boolean, n=Number, d=Date
                 var t = col.Attribute("t");
-                if (t != null && t.Value == "s")
+                if (t?.Value == "s")
                 {
                     val = _sharedStrings?[val.ToInt()];
                 }
@@ -153,7 +153,7 @@ public class ExcelReader : DisposeBase
                         if (si < styles.Length)
                         {
                             var st = styles[si];
-                            if (st != null && st.StartsWith("yy"))
+                            if (st?.StartsWith("yy") == true)
                             {
                                 if (val.Contains('.'))
                                 {

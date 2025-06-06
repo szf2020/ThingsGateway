@@ -6,7 +6,7 @@ namespace ThingsGateway.NewLife.Common;
 /// <remarks>
 /// 文档 https://newlifex.com/core/pinyin
 /// </remarks>
-public class PinYin
+public static class PinYin
 {
     #region 数组信息
     private static readonly Int32[] pyValue = new[] {

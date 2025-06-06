@@ -7,7 +7,7 @@ namespace ThingsGateway.NewLife.Security
 {
     /// <summary>证书</summary>
     /// <remarks>http://blogs.msdn.com/b/dcook/archive/2008/11/25/creating-a-self-signed-certificate-in-c.aspx</remarks>
-    public class Certificate
+    public static class Certificate
     {
         /// <summary>建立自签名证书</summary>
         /// <param name="x500"></param>
@@ -52,7 +52,7 @@ namespace ThingsGateway.NewLife.Security
             }
             finally
             {
-                if (password != null) password.Dispose();
+                password?.Dispose();
             }
         }
 

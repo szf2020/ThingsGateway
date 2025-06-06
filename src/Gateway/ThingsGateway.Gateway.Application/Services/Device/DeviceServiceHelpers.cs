@@ -30,7 +30,7 @@ public static class DeviceServiceHelpers
 
     public static async Task<Dictionary<string, object>> ExportCoreAsync(IEnumerable<Device>? data, string channelName = null, string plugin = null)
     {
-        if (data == null || !data.Any())
+        if (data?.Any() != true)
         {
             data = new List<Device>();
         }
@@ -112,7 +112,7 @@ public static class DeviceServiceHelpers
                     propertysDict.TryAdd(channel?.PluginName ?? plugin, propertys);
 
                 }
-                catch (Exception)
+                catch
                 {
 
                 }

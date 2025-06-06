@@ -235,7 +235,7 @@ public sealed class SchedulerBuilder
         var schedulerBuilder = new SchedulerBuilder(jobBuilder);
 
         // 批量添加触发器
-        if (triggerBuilders != null && triggerBuilders.Length > 0)
+        if (triggerBuilders?.Length > 0)
         {
             schedulerBuilder.TriggerBuilders.AddRange(triggerBuilders);
         }

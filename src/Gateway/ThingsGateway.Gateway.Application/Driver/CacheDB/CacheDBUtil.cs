@@ -14,7 +14,7 @@ using ThingsGateway.NewLife;
 
 namespace ThingsGateway.Gateway.Application;
 
-public class CacheDBUtil
+public static class CacheDBUtil
 {
     public const string EX = ".db";
 

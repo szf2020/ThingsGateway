@@ -375,10 +375,10 @@ public abstract class DeviceBase : DisposableObject, IDevice
             if (AutoConnect && !Channel.Online)
                 await Channel.ConnectAsync(Channel.ChannelOptions.ConnectTimeout, token).ConfigureAwait(false);
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             await Task.Delay(1000, token).ConfigureAwait(false);
-            throw ex;
+            throw;
         }
 
         if (token.IsCancellationRequested)

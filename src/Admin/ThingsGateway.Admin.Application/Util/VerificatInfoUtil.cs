@@ -14,7 +14,7 @@ using ThingsGateway.Extension.Generic;
 
 namespace ThingsGateway.Admin.Application;
 
-public class VerificatInfoUtil
+public static class VerificatInfoUtil
 {
     private static IVerificatInfoService VerificatInfoService { get; set; }
     static VerificatInfoUtil()

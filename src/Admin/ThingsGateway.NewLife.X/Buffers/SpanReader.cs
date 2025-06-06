@@ -244,7 +244,6 @@ public ref struct SpanReader
         while (true)
         {
             var bt = ReadByte();
-            if (bt < 0) throw new Exception($"The data stream is out of range! The integer read is {rs: n0}");
             b = (Byte)bt;
 
             // 必须转为Int32，否则可能溢出

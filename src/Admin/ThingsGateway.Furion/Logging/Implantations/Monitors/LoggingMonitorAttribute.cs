@@ -604,7 +604,7 @@ public sealed class LoggingMonitorAttribute : Attribute, IAsyncActionFilter, IAs
     private string TrySerializeObject(object obj, LoggingMonitorMethod monitorMethod, out bool succeed)
     {
         // 排除 IQueryable<> 泛型
-        if (obj != null && obj.GetType().HasImplementedRawGeneric(typeof(IQueryable<>)))
+        if (obj?.GetType().HasImplementedRawGeneric(typeof(IQueryable<>)) == true)
         {
             succeed = true;
             return "{}";
@@ -961,8 +961,7 @@ public sealed class LoggingMonitorAttribute : Attribute, IAsyncActionFilter, IAs
         // token 信息
         // 判断是否是授权访问
         var isAuth = actionMethod.GetFoundAttribute<AllowAnonymousAttribute>(true) == null
-            && resultHttpContext.User != null
-            && resultHttpContext.User.Identity.IsAuthenticated;
+            && resultHttpContext.User?.Identity.IsAuthenticated == true;
         // 获取响应头信息
         var accessToken = resultHttpContext.Response.Headers["access-token"].ToString();
         var authorization = string.IsNullOrWhiteSpace(accessToken)

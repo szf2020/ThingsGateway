@@ -118,7 +118,7 @@ public class Binary : FormatterBase, IBinary
             type = value.GetType();
 
             // 一般类型为空是顶级调用
-            if (Hosts.Count == 0 && Log != null && Log.Enable) WriteLog("BinaryWrite {0} {1}", type.Name, value);
+            if (Hosts.Count == 0 && Log?.Enable == true) WriteLog("BinaryWrite {0} {1}", type.Name, value);
         }
 
         // 优先 IAccessor 接口
@@ -236,7 +236,7 @@ public class Binary : FormatterBase, IBinary
     /// <returns></returns>
     public virtual Boolean TryRead(Type type, ref Object? value)
     {
-        if (Hosts.Count == 0 && Log != null && Log.Enable) WriteLog("BinaryRead {0} {1}", type.Name, value);
+        if (Hosts.Count == 0 && Log?.Enable == true) WriteLog("BinaryRead {0} {1}", type.Name, value);
 
         // 优先 IAccessor 接口
         if (value is IAccessor acc)

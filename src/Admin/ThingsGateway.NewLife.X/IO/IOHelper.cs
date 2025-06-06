@@ -155,7 +155,7 @@ public static class IOHelper
     /// <returns></returns>
     public static Stream Write(this Stream des, params Byte[] src)
     {
-        if (src != null && src.Length > 0) des.Write(src, 0, src.Length);
+        if (src?.Length > 0) des.Write(src, 0, src.Length);
         return des;
     }
 
@@ -343,7 +343,7 @@ public static class IOHelper
         // 可能数据流前面有编码字节序列，需要先去掉
         var idx = 0;
         var preamble = encoding.GetPreamble();
-        if (preamble != null && preamble.Length > 0)
+        if (preamble?.Length > 0)
         {
             if (buf.Take(preamble.Length).SequenceEqual(preamble)) idx = preamble.Length;
         }
@@ -368,7 +368,7 @@ public static class IOHelper
         // 可能数据流前面有编码字节序列，需要先去掉
         var idx = 0;
         var preamble = encoding.GetPreamble();
-        if (preamble != null && preamble.Length > 0 && buf.Length >= offset + preamble.Length)
+        if (preamble?.Length > 0 && buf.Length >= offset + preamble.Length)
         {
             if (buf.Skip(offset).Take(preamble.Length).SequenceEqual(preamble)) idx = preamble.Length;
         }

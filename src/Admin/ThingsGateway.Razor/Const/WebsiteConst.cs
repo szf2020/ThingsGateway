@@ -14,7 +14,7 @@ namespace ThingsGateway.Razor;
 /// 网站常量
 /// </summary>
 [ThingsGateway.DependencyInjection.SuppressSniffer]
-public class WebsiteConst
+public static class WebsiteConst
 {
     /// <summary>
     /// 默认的资源项目名称

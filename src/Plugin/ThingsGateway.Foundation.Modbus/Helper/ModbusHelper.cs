@@ -10,7 +10,7 @@
 
 namespace ThingsGateway.Foundation.Modbus;
 
-public class ModbusHelper
+public static class ModbusHelper
 {
     #region 解析
 

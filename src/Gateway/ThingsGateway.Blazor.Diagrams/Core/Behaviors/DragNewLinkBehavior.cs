@@ -99,7 +99,7 @@ public class DragNewLinkBehavior : Behavior
             return;
         }
 
-        if (model is ILinkable linkable && (OngoingLink.Source.Model == null || OngoingLink.Source.Model.CanAttachTo(linkable)))
+        if (model is ILinkable linkable && (OngoingLink.Source.Model?.CanAttachTo(linkable) != false))
         {
             var targetAnchor = Diagram.Options.Links.TargetAnchorFactory(Diagram, OngoingLink, linkable);
             if (targetAnchor is SinglePortAnchor singlePortAnchor && singlePortAnchor.Model is PortModel portModel && portModel.Alignment == PortAlignment.Top)

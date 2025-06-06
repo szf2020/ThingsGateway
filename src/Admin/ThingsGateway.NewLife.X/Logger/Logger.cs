@@ -62,7 +62,7 @@ public abstract class Logger : ILog
     protected virtual String Format(String format, Object?[]? args)
     {
         //处理时间的格式化
-        if (args != null && args.Length > 0)
+        if (args?.Length > 0)
         {
             // 特殊处理异常
             if (args.Length == 1 && args[0] is Exception ex && (format.IsNullOrEmpty() || format == "{0}"))

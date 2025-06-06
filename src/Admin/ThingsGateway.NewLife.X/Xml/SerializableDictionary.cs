@@ -11,11 +11,8 @@ namespace ThingsGateway.NewLife.Xml
     [Serializable]
     public class SerializableDictionary<TKey, TValue> : Dictionary<TKey, TValue>, IXmlSerializable
     {
-        /// <summary></summary>
         public SerializableDictionary() : base() { }
 
-        /// <summary></summary>
-        /// <param name="dictionary"></param>
         public SerializableDictionary(IDictionary<TKey, TValue> dictionary) : base(dictionary) { }
 
         #region IXmlSerializable 成员

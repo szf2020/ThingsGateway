@@ -11,7 +11,7 @@
 namespace ThingsGateway.Admin.Razor;
 
 [ThingsGateway.DependencyInjection.SuppressSniffer]
-public class AdminOperConst
+public static class AdminOperConst
 {
     public const string Add = "新增";
     public const string Delete = "删除";

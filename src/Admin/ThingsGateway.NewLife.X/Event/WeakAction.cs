@@ -41,7 +41,7 @@ public class WeakAction<TArgs>
             var target = Target;
             if (target == null && Method.IsStatic) return true;
 
-            return target != null && target.IsAlive;
+            return target?.IsAlive == true;
         }
     }
     #endregion

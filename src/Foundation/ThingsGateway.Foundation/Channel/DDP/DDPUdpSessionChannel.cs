@@ -160,7 +160,7 @@ public class DDPUdpSessionChannel : UdpSessionChannel, IClientChannel, IDtuUdpSe
 
                         //发送成功
                         await DDPAdapter.SendInputAsync(endPoint, new DDPSend(ReadOnlyMemory<byte>.Empty, id, false, 0x81)).ConfigureAwait(false);
-                        if(log)
+                        if (log)
                             Logger?.Info(DefaultResource.Localizer["DtuConnected", id]);
                     }
                     else if (message.Type == 0x02)
@@ -185,7 +185,7 @@ public class DDPUdpSessionChannel : UdpSessionChannel, IClientChannel, IDtuUdpSe
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private void ThrowIfCannotSendRequestInfo()
     {
-        if (DataHandlingAdapter == null || !DataHandlingAdapter.CanSendRequestInfo)
+        if (DataHandlingAdapter?.CanSendRequestInfo != true)
         {
             throw new NotSupportedException(TouchSocketResource.CannotSendRequestInfo);
         }

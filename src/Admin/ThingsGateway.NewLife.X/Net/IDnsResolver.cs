@@ -54,7 +54,7 @@ public class DnsResolver : IDnsResolver
             if (!task.Wait(5000)) throw new TaskCanceledException();
             var addrs = task.ConfigureAwait(false).GetAwaiter().GetResult();
 #endif
-            if (addrs != null && addrs.Length > 0)
+            if (addrs?.Length > 0)
             {
 
                 // 更新缓存数据
@@ -76,9 +76,9 @@ public class DnsResolver : IDnsResolver
                 }
             }
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-            if (throwError) throw ex;
+            if (throwError) throw;
         }
 
         return item;

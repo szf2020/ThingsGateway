@@ -50,7 +50,7 @@ public class DataMemberResolver : DefaultJsonTypeInfoResolver
             else
             {
                 var attr = provider.GetCustomAttributes(typeof(DataMemberAttribute), false)?.FirstOrDefault() as DataMemberAttribute;
-                if (attr != null && !attr.Name.IsNullOrEmpty())
+                if (attr?.Name.IsNullOrEmpty() == false)
                     propertyInfo.Name = attr.Name;
             }
         }

@@ -14,7 +14,7 @@ namespace ThingsGateway.Admin.Application;
 
 /// <inheritdoc/>
 [ThingsGateway.DependencyInjection.SuppressSniffer]
-public class RoleUtil
+public static class RoleUtil
 {
 
 

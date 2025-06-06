@@ -295,7 +295,7 @@ public class DefaultReflect : IReflect
         while (type2 != null && type2 != typeof(Object))
         {
             var fs = type2.GetMember(name, ignoreCase ? bfic : bf);
-            if (fs != null && fs.Length > 0)
+            if (fs?.Length > 0)
             {
                 // 得到多个的时候，优先返回精确匹配
                 if (ignoreCase && fs.Length > 1)
@@ -566,7 +566,7 @@ public class DefaultReflect : IReflect
             foreach (var pi in targetType.GetProperties(true))
             {
                 if (!pi.CanWrite) continue;
-                if (excludes != null && excludes.Contains(pi.Name)) continue;
+                if (excludes?.Contains(pi.Name) == true) continue;
 
                 if (sourceProperties.TryGetValue(pi.Name, out var pi2) && pi2.CanRead)
                     SetValue(target, pi, GetValue(source, pi2));
@@ -579,7 +579,7 @@ public class DefaultReflect : IReflect
         foreach (var pi in sourceProperties.Values)
         {
             if (!pi.CanRead) continue;
-            if (excludes != null && excludes.Contains(pi.Name)) continue;
+            if (excludes?.Contains(pi.Name) == true) continue;
 
             dic[pi.Name] = GetValue(source, pi);
         }

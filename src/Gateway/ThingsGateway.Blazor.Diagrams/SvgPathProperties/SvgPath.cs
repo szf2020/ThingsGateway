@@ -336,7 +336,7 @@ namespace SvgPathProperties
 
             if (abs)
             {
-                if (_lastCurve != null && _lastCurve.IsQuadratic == false)
+                if (_lastCurve?.IsQuadratic == false)
                 {
                     var c = _lastCurve.Cp2OrEnd;
                     _lastCurve = new BezierCommand(
@@ -374,7 +374,7 @@ namespace SvgPathProperties
             }
             else
             {
-                if (_lastCurve != null && _lastCurve.IsQuadratic == false)
+                if (_lastCurve?.IsQuadratic == false)
                 {
                     var c = _lastCurve.Cp2OrEnd;
                     var d = _lastCurve.End;

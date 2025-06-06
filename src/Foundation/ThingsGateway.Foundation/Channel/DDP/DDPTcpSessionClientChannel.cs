@@ -99,7 +99,29 @@ public class DDPTcpSessionClientChannel : TcpSessionClientChannel
                     {
                         bool log = false;
                         if (id != Id) log = true;
+
                         //注册ID
+                        if (Service is ITcpService tcpService && tcpService.TryGetClient(id, out var oldClient) && oldClient != this)
+                        {
+                            try
+                            {
+                                await oldClient.ShutdownAsync(System.Net.Sockets.SocketShutdown.Both).ConfigureAwait(false);
+                                await oldClient.CloseAsync().ConfigureAwait(false);
+                                oldClient.Dispose();
+                            }
+                            catch
+                            {
+                            }
+                            try
+                            {
+                                oldClient.Dispose();
+                            }
+                            catch
+                            {
+
+                            }
+                        }
+
                         await ResetIdAsync(id).ConfigureAwait(false);
 
                         //发送成功
@@ -132,7 +154,7 @@ public class DDPTcpSessionClientChannel : TcpSessionClientChannel
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private void ThrowIfCannotSendRequestInfo()
     {
-        if (DataHandlingAdapter == null || !DataHandlingAdapter.CanSendRequestInfo)
+        if (DataHandlingAdapter?.CanSendRequestInfo != true)
         {
             throw new NotSupportedException(TouchSocketResource.CannotSendRequestInfo);
         }

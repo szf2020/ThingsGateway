@@ -489,12 +489,12 @@ public static class Reflect
     /// <summary>是否泛型列表</summary>
     /// <param name="type"></param>
     /// <returns></returns>
-    public static Boolean IsList(this Type type) => type != null && type.IsGenericType && type.As(typeof(IList<>));
+    public static Boolean IsList(this Type type) => type?.IsGenericType == true && type.As(typeof(IList<>));
 
     /// <summary>是否泛型字典</summary>
     /// <param name="type"></param>
     /// <returns></returns>
-    public static Boolean IsDictionary(this Type type) => type != null && type.IsGenericType && type.As(typeof(IDictionary<,>));
+    public static Boolean IsDictionary(this Type type) => type?.IsGenericType == true && type.As(typeof(IDictionary<,>));
     #endregion
 
     #region 插件

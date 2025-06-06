@@ -24,7 +24,7 @@ public partial class ChannelRuntimeInfo1 : IDisposable
     private async Task RestartChannelAsync()
     {
         if (ChannelRuntime.DeviceThreadManage?.ChannelThreadManage != null)
-            await Task.Run(() => ChannelRuntime.DeviceThreadManage?.ChannelThreadManage.RestartChannelAsync(ChannelRuntime));
+            await Task.Run(() => ChannelRuntime.DeviceThreadManage.ChannelThreadManage.RestartChannelAsync(ChannelRuntime));
         else
             await Task.Run(() => GlobalData.ChannelThreadManage.RestartChannelAsync(ChannelRuntime));
     }

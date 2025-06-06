@@ -192,7 +192,7 @@ public static class ScheduleExtensions
             var underScoreCasePropertyName = Penetrates.GetNaming(propertyName, NamingConventions.UnderScoreCase);
 
             // 处理忽略属性问题
-            if (ignorePropertyNames != null && ignorePropertyNames.Length > 0)
+            if (ignorePropertyNames?.Length > 0)
             {
                 if (ignorePropertyNames.Contains(propertyName, StringComparer.OrdinalIgnoreCase)
                     || ignorePropertyNames.Contains(camelCasePropertyName, StringComparer.OrdinalIgnoreCase)

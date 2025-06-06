@@ -24,7 +24,7 @@ public static class ProcessHelper
         if (pname == "dotnet" || "*/dotnet".IsMatch(pname))
         {
             var args = GetCommandLineArgs(process.Id);
-            if (args != null && args.Length >= 2 && args[0].Contains("dotnet"))
+            if (args?.Length >= 2 && args[0].Contains("dotnet"))
             {
                 return Path.GetFileNameWithoutExtension(args[1]);
             }
@@ -32,7 +32,7 @@ public static class ProcessHelper
         if (pname == "java" || "*/java".IsMatch(pname))
         {
             var args = GetCommandLineArgs(process.Id);
-            if (args != null && args.Length >= 3 && args[0].Contains("java") && args[1] == "-jar")
+            if (args?.Length >= 3 && args[0].Contains("java") && args[1] == "-jar")
             {
                 return Path.GetFileNameWithoutExtension(args[2]);
             }
@@ -210,7 +210,7 @@ public static class ProcessHelper
     /// <returns></returns>
     public static Process? SafetyKill(this Process process, Int32 msWait = 5_000, Int32 times = 50, Int32 interval = 200)
     {
-        if (process == null || process.GetHasExited()) return process;
+        if (process?.GetHasExited() != false) return process;
 
         //XTrace.WriteLine("安全，温柔一刀！PID={0}/{1}", process.Id, process.ProcessName);
 
@@ -248,7 +248,7 @@ public static class ProcessHelper
     /// <returns></returns>
     public static Process? ForceKill(this Process process, Int32 msWait = 5_000)
     {
-        if (process == null || process.GetHasExited()) return process;
+        if (process?.GetHasExited() != false) return process;
 
         //XTrace.WriteLine("强杀，大力出奇迹！PID={0}/{1}", process.Id, process.ProcessName);
 

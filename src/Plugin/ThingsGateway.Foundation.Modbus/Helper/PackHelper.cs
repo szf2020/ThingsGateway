@@ -16,7 +16,7 @@ namespace ThingsGateway.Foundation.Modbus;
 /// <summary>
 /// PackHelper
 /// </summary>
-public class PackHelper
+public static class PackHelper
 {
     /// <summary>
     /// 打包变量，添加到<see cref="List{T}"/>

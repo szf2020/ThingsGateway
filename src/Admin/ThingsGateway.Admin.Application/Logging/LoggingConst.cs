@@ -13,7 +13,7 @@ namespace ThingsGateway.Admin.Application;
 /// <summary>
 /// 日志常量
 /// </summary>
-public class LoggingConst
+public static class LoggingConst
 {
     /// <summary>
     /// 分类
