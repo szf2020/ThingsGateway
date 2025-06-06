@@ -11,13 +11,13 @@ namespace SqlSugar
         public virtual SqlSugarProvider Context { get; set; }
         protected bool IsBackupTable { get; set; }
         protected int MaxBackupDataRows { get; set; }
-        protected virtual int DefultLength { get; set; }
+        protected virtual int DefaultLength { get; set; }
         protected Dictionary<Type, string> MappingTables = new Dictionary<Type, string>();
         public CodeFirstProvider()
         {
-            if (DefultLength == 0)
+            if (DefaultLength == 0)
             {
-                DefultLength = 255;
+                DefaultLength = 255;
             }
         }
         #endregion
@@ -27,7 +27,7 @@ namespace SqlSugar
         {
             var result = new SplitCodeFirstProvider();
             result.Context = this.Context;
-            result.DefaultLength = this.DefultLength;
+            result.DefaultLength = this.DefaultLength;
             return result;
         }
 
@@ -40,7 +40,7 @@ namespace SqlSugar
 
         public virtual ICodeFirst SetStringDefaultLength(int length)
         {
-            DefultLength = length;
+            DefaultLength = length;
             return this;
         }
         public void InitTablesWithAttr(params Type[] entityTypes)
@@ -77,7 +77,7 @@ namespace SqlSugar
             //Prevent concurrent requests if used in your program
             lock (CodeFirstProvider.LockObject)
             {
-                MappingTableList oldTableList = CopyMappingTalbe();
+                MappingTableList oldTableList = CopyMappingTable();
                 //this.Context.Utilities.RemoveCacheAll();
                 var entityInfo = this.Context.GetEntityNoCacheInitMappingInfo(entityType);
                 if (!this.Context.DbMaintenance.IsAnySystemTablePermissions())
@@ -203,7 +203,7 @@ namespace SqlSugar
             {
 
                 var codeFirst = db.CodeFirst;
-                codeFirst.SetStringDefaultLength(this.DefultLength);
+                codeFirst.SetStringDefaultLength(this.DefaultLength);
                 codeFirst.InitTables(type);
                 var tables = db.DbMaintenance.GetTableInfoList(false);
                 var oldTableInfo = tables.FirstOrDefault(it => it.Name.EqualCase(oldTableName));
@@ -251,13 +251,13 @@ namespace SqlSugar
                 entityInfo.DbTableName = v;
                 this.Context.MappingTables.Add(entityInfo.EntityName, entityInfo.DbTableName);
             }
-            if (this.DefultLength > 0)
+            if (this.DefaultLength > 0)
             {
                 foreach (var item in entityInfo.Columns)
                 {
                     if (item.PropertyInfo.PropertyType == UtilConstants.StringType && item.DataType.IsNullOrEmpty() && item.Length == 0)
                     {
-                        item.Length = DefultLength;
+                        item.Length = DefaultLength;
                     }
                     if (item.DataType?.Contains(',') == true && !Regex.IsMatch(item.DataType, @"\d\,\d"))
                     {
@@ -417,7 +417,7 @@ namespace SqlSugar
                                                                && ((ec.Length != dc.Length && !UtilMethods.GetUnderType(ec.PropertyInfo).IsEnum() && UtilMethods.GetUnderType(ec.PropertyInfo).IsIn(UtilConstants.StringType)) ||
                                                                     ec.IsNullable != dc.IsNullable ||
                                                                     IsNoSamePrecision(ec, dc) ||
-                                                                    IsNoSamgeType(ec, dc)))).ToList();
+                                                                    IsNotSameType(ec, dc)))).ToList();
 
                 alterColumns.RemoveAll(entityColumnInfo =>
                 {
@@ -578,7 +578,7 @@ namespace SqlSugar
                 this.Context.MappingTables.Add(table.EntityName, table.DbTableName);
             }
         }
-        private MappingTableList CopyMappingTalbe()
+        private MappingTableList CopyMappingTable()
         {
             MappingTableList oldTableList = new MappingTableList();
             if (this.Context.MappingTables == null)
@@ -646,21 +646,19 @@ namespace SqlSugar
             }
         }
 
-        protected virtual bool IsNoSamgeType(EntityColumnInfo ec, DbColumnInfo dc)
+        protected virtual bool IsNotSameType(EntityColumnInfo ec, DbColumnInfo dc)
         {
             if (!string.IsNullOrEmpty(ec.DataType))
             {
                 if (ec.IsIdentity && dc.IsIdentity)
-                {
                     return false;
-                }
                 else
-                {
-                    return ec.DataType != dc.DataType;
-                }
+                    return !ec.DataType.Equals(dc.DataType, StringComparison.OrdinalIgnoreCase);
             }
+
             var propertyType = UtilMethods.GetUnderType(ec.PropertyInfo);
-            var properyTypeName = string.Empty;
+            string properyTypeName;
+
             if (propertyType.IsEnum())
             {
                 properyTypeName = this.Context.Ado.DbBind.GetDbTypeName(ec.Length > 9 ? UtilConstants.LongType.Name : UtilConstants.IntType.Name);
@@ -670,87 +668,82 @@ namespace SqlSugar
                 var name = GetType(propertyType.Name);
                 properyTypeName = this.Context.Ado.DbBind.GetDbTypeName(name);
             }
+
             var dataType = dc.DataType;
-            if (properyTypeName == "boolean" && dataType == "bool")
-            {
+
+            if (properyTypeName.Equals("boolean", StringComparison.OrdinalIgnoreCase) && dataType.Equals("bool", StringComparison.OrdinalIgnoreCase))
                 return false;
-            }
-            if (properyTypeName?.ToLower() == "varchar" && dataType?.ToLower() == "string")
-            {
+
+            if (properyTypeName.Equals("varchar", StringComparison.OrdinalIgnoreCase) &&
+                (dataType.Equals("string", StringComparison.OrdinalIgnoreCase) || dataType.Equals("nvarchar", StringComparison.OrdinalIgnoreCase)))
                 return false;
-            }
-            if (properyTypeName?.ToLower() == "varchar" && dataType?.ToLower() == "nvarchar")
-            {
+
+            if (properyTypeName.Equals("number", StringComparison.OrdinalIgnoreCase) && dataType.Equals("decimal", StringComparison.OrdinalIgnoreCase))
                 return false;
-            }
-            if (properyTypeName?.ToLower() == "number" && dataType?.ToLower() == "decimal")
-            {
+
+            if (this.Context.CurrentConnectionConfig?.MoreSettings?.EnableOracleIdentity == true &&
+                properyTypeName.Equals("int", StringComparison.OrdinalIgnoreCase) && dataType.Equals("decimal", StringComparison.OrdinalIgnoreCase))
                 return false;
-            }
-            if (this.Context.CurrentConnectionConfig?.MoreSettings?.EnableOracleIdentity == true && properyTypeName?.ToLower() == "int" && dataType?.ToLower() == "decimal")
-            {
+
+            if (properyTypeName.Equals("int", StringComparison.OrdinalIgnoreCase) &&
+                dataType.Equals("decimal", StringComparison.OrdinalIgnoreCase) &&
+                dc.Length == 22 && dc.Scale == 0 &&
+                this.Context.CurrentConnectionConfig.DbType == DbType.Oracle)
                 return false;
-            }
-            if (properyTypeName?.ToLower() == "int" && dataType?.ToLower() == "decimal" && dc.Length == 22 && dc.Scale == 0 && this.Context.CurrentConnectionConfig.DbType == DbType.Oracle)
-            {
+
+            if (properyTypeName.Equals("int", StringComparison.OrdinalIgnoreCase) && dataType.Equals("int32", StringComparison.OrdinalIgnoreCase))
                 return false;
-            }
-            if (properyTypeName?.ToLower() == "int" && dataType?.ToLower() == "int32")
-            {
+
+            if (properyTypeName.Equals("date", StringComparison.OrdinalIgnoreCase) && dataType.Equals("datetime", StringComparison.OrdinalIgnoreCase))
                 return false;
-            }
-            if (properyTypeName?.ToLower() == "date" && dataType?.ToLower() == "datetime")
-            {
+
+            if (properyTypeName.Equals("bigint", StringComparison.OrdinalIgnoreCase) && dataType.Equals("int64", StringComparison.OrdinalIgnoreCase))
                 return false;
-            }
-            if (properyTypeName?.ToLower() == "bigint" && dataType?.ToLower() == "int64")
-            {
+
+            if (properyTypeName.Equals("blob", StringComparison.OrdinalIgnoreCase) && dataType.Equals("byte[]", StringComparison.OrdinalIgnoreCase))
                 return false;
-            }
-            if (properyTypeName?.ToLower() == "blob" && dataType?.ToLower() == "byte[]")
-            {
-                return false;
-            }
+
             if (properyTypeName == null || dataType == null)
             {
                 return properyTypeName != dataType;
             }
-            else if (this.Context.CurrentConnectionConfig.DbType == DbType.SqlServer && dataType.EqualCase("timestamp") && properyTypeName.EqualCase("varbinary"))
-            {
+
+            if (this.Context.CurrentConnectionConfig.DbType == DbType.SqlServer &&
+                dataType.Equals("timestamp", StringComparison.OrdinalIgnoreCase) &&
+                properyTypeName.Equals("varbinary", StringComparison.OrdinalIgnoreCase))
                 return false;
-            }
-            else if (properyTypeName.IsIn("int", "long") && dataType.EqualCase("decimal") && dc.Length == 38 && dc.DecimalDigits == 127)
-            {
+
+            if (properyTypeName.IsIn("int", "long") && dataType.Equals("decimal", StringComparison.OrdinalIgnoreCase) &&
+                dc.Length == 38 && dc.DecimalDigits == 127)
                 return false;
-            }
-            else if (dataType.EqualCase("numeric") && properyTypeName.EqualCase("decimal"))
-            {
+
+            if (dataType.Equals("numeric", StringComparison.OrdinalIgnoreCase) && properyTypeName.Equals("decimal", StringComparison.OrdinalIgnoreCase))
                 return false;
-            }
-            else if (ec.UnderType == UtilConstants.BoolType && dc.OracleDataType?.EqualCase("number") == true)
-            {
+
+            if (ec.UnderType == UtilConstants.BoolType && dc.OracleDataType?.Equals("number", StringComparison.OrdinalIgnoreCase) == true)
                 return false;
-            }
-            else if (ec.UnderType == UtilConstants.LongType && dc.Length == 19 && dc.DecimalDigits == 0 && dc.OracleDataType?.EqualCase("number") == true)
-            {
+
+            if (ec.UnderType == UtilConstants.LongType && dc.Length == 19 && dc.DecimalDigits == 0 &&
+                dc.OracleDataType?.Equals("number", StringComparison.OrdinalIgnoreCase) == true)
                 return false;
-            }
-            else
-            {
-                return !properyTypeName.Equals(dataType, StringComparison.CurrentCultureIgnoreCase);
-            }
+
+            return !properyTypeName.Equals(dataType, StringComparison.OrdinalIgnoreCase);
         }
+
         protected string GetType(string name)
         {
-            if (name.IsContainsIn("UInt32", "UInt16", "UInt64"))
+            switch (name)
             {
-                name = name.TrimStart('U');
+                case "UInt32":
+                case "UInt16":
+                case "UInt64":
+                    return name.TrimStart('U');
+                case "char":
+                    return "string";
+                default:
+                    return name;
             }
-            if (name == "char")
-            {
-                name = "string";
-            }
-            return name;
+
         }
 
         #endregion

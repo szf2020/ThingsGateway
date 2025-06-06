@@ -138,7 +138,7 @@ namespace SqlSugar.TDengine
 
             foreach (DataRow row in table.Rows)
             {
-                var values = row.ItemArray.Select(item => FormatValue(item)).ToList();
+                var values = row.ItemArray.Select(item => FormatValue(item));
                 var valuePart = $"({string.Join(", ", values)})";
                 valuesList.Add(valuePart);
             }

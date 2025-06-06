@@ -110,7 +110,7 @@ namespace SqlSugar
                 if (diffColumns.Count > 0)
                 {
                     var pks = EntityInfo.Columns
-                        .Where(it => it.IsPrimarykey).Select(it => it.PropertyName).ToList();
+                        .Where(it => it.IsPrimarykey).Select(it => it.PropertyName).ToHashSet();
                     diffColumns = diffColumns.Where(it => !pks.Contains(it)).ToList();
                     if (diffColumns.Count > 0)
                     {
@@ -234,7 +234,7 @@ namespace SqlSugar
                 if (diffColumns.Count > 0)
                 {
                     var pks = EntityInfo.Columns
-                        .Where(it => it.IsPrimarykey).Select(it => it.PropertyName).ToList();
+                        .Where(it => it.IsPrimarykey).Select(it => it.PropertyName).ToHashSet();
                     diffColumns = diffColumns.Where(it => !pks.Contains(it)).ToList();
                     if (diffColumns.Count > 0)
                     {

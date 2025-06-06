@@ -18,26 +18,26 @@ namespace SqlSugar
                 foreach (var item in diffTables)
                 {
                     sb.AppendLine($"----Table:{item.TableName}----");
-                    if (item.AddColums.HasValue())
+                    if (item.AddColumns.HasValue())
                     {
                         sb.AppendLine($"Add column: ");
-                        foreach (var addItem in item.AddColums)
+                        foreach (var addItem in item.AddColumns)
                         {
                             sb.AppendLine($"{addItem.Message} ");
                         }
                     }
-                    if (item.UpdateColums.HasValue())
+                    if (item.UpdateColumns.HasValue())
                     {
                         sb.AppendLine($"Update column: ");
-                        foreach (var addItem in item.UpdateColums)
+                        foreach (var addItem in item.UpdateColumns)
                         {
                             sb.AppendLine($"{addItem.Message} ");
                         }
                     }
-                    if (item.DeleteColums.HasValue())
+                    if (item.DeleteColumns.HasValue())
                     {
                         sb.AppendLine($"Delete column: ");
-                        foreach (var addItem in item.DeleteColums)
+                        foreach (var addItem in item.DeleteColumns)
                         {
                             sb.AppendLine($"{addItem.Message} ");
                         }
@@ -58,46 +58,49 @@ namespace SqlSugar
                 if (tableInfo.OldTableInfo == null)
                     tableInfo.OldTableInfo = new DbTableInfo();
                 addItem.TableName = tableInfo.OldTableInfo.Name;
-                addItem.AddColums = GetAddColumn(tableInfo);
-                addItem.UpdateColums = GetUpdateColumn(tableInfo);
-                addItem.DeleteColums = GetDeleteColumn(tableInfo);
+                addItem.AddColumns = GetAddColumn(tableInfo);
+                addItem.UpdateColumns = GetUpdateColumn(tableInfo);
+                addItem.DeleteColumns = GetDeleteColumn(tableInfo);
                 if (addItem.IsDiff)
                     result.Add(addItem);
             }
             return result;
         }
 
-        private static List<DiffColumsInfo> GetDeleteColumn(DiffTableInfo tableInfo)
+        private static List<DiffColumnsInfo> GetDeleteColumn(DiffTableInfo tableInfo)
         {
-            List<DiffColumsInfo> result = new List<DiffColumsInfo>();
+            List<DiffColumnsInfo> result = new List<DiffColumnsInfo>();
             var columns = tableInfo.OldColumnInfos.Where(z => !tableInfo.NewColumnInfos.Any(y => y.DbColumnName.EqualCase(z.DbColumnName)));
-            return columns.Select(it => new DiffColumsInfo() { Message = GetColumnString(it) }).ToList();
+            return columns.Select(it => new DiffColumnsInfo() { Message = GetColumnString(it) }).ToList();
         }
 
-        private List<DiffColumsInfo> GetUpdateColumn(DiffTableInfo tableInfo)
+        private List<DiffColumnsInfo> GetUpdateColumn(DiffTableInfo tableInfo)
         {
-            List<DiffColumsInfo> result = new List<DiffColumsInfo>();
-            result = tableInfo.NewColumnInfos
-                 .Where(z => tableInfo.OldColumnInfos.Any(y => y.DbColumnName.EqualCase(z.DbColumnName) && (
-                     z.Length != y.Length ||
-                     z.ColumnDescription != y.ColumnDescription ||
-                     z.DataType != y.DataType ||
-                     z.DecimalDigits != y.DecimalDigits ||
-                     z.IsPrimarykey != y.IsPrimarykey ||
-                     z.IsIdentity != y.IsIdentity ||
-                     z.IsNullable != y.IsNullable
-                  ))).Select(it => new DiffColumsInfo()
-                  {
-                      Message = GetUpdateColumnString(it, tableInfo.OldColumnInfos.FirstOrDefault(y => y.DbColumnName.EqualCase(it.DbColumnName)))
-                  }).ToList();
-            return result;
+            var oldColumnDict = tableInfo.OldColumnInfos.ToDictionary(c => c.DbColumnName, StringComparer.OrdinalIgnoreCase);
+            return tableInfo.NewColumnInfos
+                .Where(newCol => oldColumnDict.TryGetValue(newCol.DbColumnName, out var oldCol) && (
+                    newCol.Length != oldCol.Length ||
+                    newCol.ColumnDescription != oldCol.ColumnDescription ||
+                    newCol.DataType != oldCol.DataType ||
+                    newCol.DecimalDigits != oldCol.DecimalDigits ||
+                    newCol.IsPrimarykey != oldCol.IsPrimarykey ||
+                    newCol.IsIdentity != oldCol.IsIdentity ||
+                    newCol.IsNullable != oldCol.IsNullable))
+                .Select(newCol =>
+                {
+                    var oldCol = oldColumnDict[newCol.DbColumnName];
+                    return new DiffColumnsInfo
+                    {
+                        Message = GetUpdateColumnString(newCol, oldCol)
+                    };
+                }).ToList();
         }
 
-        private static List<DiffColumsInfo> GetAddColumn(DiffTableInfo tableInfo)
+        private static List<DiffColumnsInfo> GetAddColumn(DiffTableInfo tableInfo)
         {
-            List<DiffColumsInfo> result = new List<DiffColumsInfo>();
+            List<DiffColumnsInfo> result = new List<DiffColumnsInfo>();
             var columns = tableInfo.NewColumnInfos.Where(z => !tableInfo.OldColumnInfos.Any(y => y.DbColumnName.EqualCase(z.DbColumnName)));
-            return columns.Select(it => new DiffColumsInfo() { Message = GetColumnString(it) }).ToList();
+            return columns.Select(it => new DiffColumnsInfo() { Message = GetColumnString(it) }).ToList();
         }
 
         private static string GetColumnString(DbColumnInfo it)
@@ -141,18 +144,18 @@ namespace SqlSugar
     }
     public class TableDifferenceInfo
     {
-        public List<DiffColumsInfo> DeleteColums { get; set; } = new List<DiffColumsInfo>();
-        public List<DiffColumsInfo> UpdateColums { get; set; } = new List<DiffColumsInfo>();
-        public List<DiffColumsInfo> AddColums { get; set; } = new List<DiffColumsInfo>();
-        public List<DiffColumsInfo> UpdateRemark { get; set; } = new List<DiffColumsInfo>();
+        public List<DiffColumnsInfo> DeleteColumns { get; set; } = new List<DiffColumnsInfo>();
+        public List<DiffColumnsInfo> UpdateColumns { get; set; } = new List<DiffColumnsInfo>();
+        public List<DiffColumnsInfo> AddColumns { get; set; } = new List<DiffColumnsInfo>();
+        public List<DiffColumnsInfo> UpdateRemark { get; set; } = new List<DiffColumnsInfo>();
         public bool IsDiff
         {
             get
             {
                 return
-                    (DeleteColums.Count > 0 ||
-                     UpdateColums.Count > 0 ||
-                     AddColums.Count > 0 ||
+                    (DeleteColumns.Count > 0 ||
+                     UpdateColumns.Count > 0 ||
+                     AddColumns.Count > 0 ||
                      UpdateRemark.Count > 0);
             }
         }
@@ -160,7 +163,7 @@ namespace SqlSugar
         public string TableName { get; set; }
     }
 
-    public class DiffColumsInfo
+    public class DiffColumnsInfo
     {
         public string SqlTemplate { get; set; }
         public string Message { get; set; }

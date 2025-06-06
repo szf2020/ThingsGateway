@@ -51,7 +51,8 @@ namespace SqlSugar
         public virtual string GetConvertString(string dbTypeName)
         {
             string result = string.Empty;
-            switch (dbTypeName.ToLower())
+            dbTypeName = dbTypeName.ToLower();
+            switch (dbTypeName)
             {
                 #region Int
                 case "int":
@@ -202,7 +203,7 @@ namespace SqlSugar
                 {
                     return GetKeyValueList<T>(type, dataReader);
                 }
-                else if (type.IsValueType() || type == UtilConstants.StringType || type == UtilConstants.ByteArrayType)
+                else if (type.IsValueType || type == UtilConstants.StringType || type == UtilConstants.ByteArrayType)
                 {
                     return GetValueTypeList<T>(type, dataReader);
                 }
@@ -230,7 +231,7 @@ namespace SqlSugar
                 {
                     return await GetKeyValueListAsync<T>(type, dataReader).ConfigureAwait(false);
                 }
-                else if (type.IsValueType() || type == UtilConstants.StringType || type == UtilConstants.ByteArrayType)
+                else if (type.IsValueType || type == UtilConstants.StringType || type == UtilConstants.ByteArrayType)
                 {
                     return await GetValueTypeListAsync<T>(type, dataReader).ConfigureAwait(false);
                 }
@@ -255,7 +256,7 @@ namespace SqlSugar
             {
                 return GetKeyValueList<T>(type, dataReader);
             }
-            else if (type.IsValueType() || type == UtilConstants.StringType || type == UtilConstants.ByteArrayType)
+            else if (type.IsValueType || type == UtilConstants.StringType || type == UtilConstants.ByteArrayType)
             {
                 return GetValueTypeList<T>(type, dataReader);
             }
@@ -274,7 +275,7 @@ namespace SqlSugar
             {
                 return GetKeyValueListAsync<T>(type, dataReader);
             }
-            else if (type.IsValueType() || type == UtilConstants.StringType || type == UtilConstants.ByteArrayType)
+            else if (type.IsValueType || type == UtilConstants.StringType || type == UtilConstants.ByteArrayType)
             {
                 return GetValueTypeListAsync<T>(type, dataReader);
             }

@@ -18,9 +18,8 @@
             var mappingB = mappingEntity.Columns.FirstOrDefault(x => x.PropertyName == parentNavigateProperty.Navigat.MappingBId);
             Check.ExceptionEasy(mappingA == null || mappingB == null, $"Navigate property {name} error ", $"导航属性{name}配置错误");
             var mappingPk = mappingEntity.Columns
-                   .Where(it => it.PropertyName != mappingA.PropertyName)
-                   .Where(it => it.PropertyName != mappingB.PropertyName)
-                   .Where(it => it.IsPrimarykey && !it.IsIdentity && it.OracleSequenceName.IsNullOrEmpty()).FirstOrDefault();
+                   .Where(it => it.PropertyName != mappingA.PropertyName && it.PropertyName != mappingB.PropertyName)
+                   .FirstOrDefault(it => it.IsPrimarykey && !it.IsIdentity && it.OracleSequenceName.IsNullOrEmpty());
 
             if (IsDeleteA())
             {

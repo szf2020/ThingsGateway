@@ -255,7 +255,6 @@ namespace SqlSugar
 
         internal string GetClassString(DbTableInfo tableInfo, ref string className)
         {
-            string classText;
             var columns = this.Context.DbMaintenance.GetColumnInfosByTableName(tableInfo.Name, false);
             if (this.Context.IgnoreColumns.HasValue())
             {
@@ -264,7 +263,7 @@ namespace SqlSugar
                                          !this.Context.IgnoreColumns.Any(ig => ig.EntityName.Equals(entityName, StringComparison.CurrentCultureIgnoreCase) && c.DbColumnName == ig.PropertyName)
                                         ).ToList();
             }
-            classText = this.ClassTemplate;
+            var classText = new StringBuilder(this.ClassTemplate);
             string ConstructorText = IsDefaultValue ? this.ConstructorTemplate : null;
             if (this.Context.MappingTables.HasValue())
             {
@@ -347,12 +346,12 @@ namespace SqlSugar
             }
             classText = classText.Replace(DbFirstTemplate.KeyConstructor, ConstructorText);
             classText = classText.Replace(DbFirstTemplate.KeyPropertyName, null);
-            return classText;
+            return classText.ToString();
         }
 
         internal string GetClassString(List<DbColumnInfo> columns, ref string className)
         {
-            string classText = this.ClassTemplate;
+            var classText = new StringBuilder(this.ClassTemplate);
             string ConstructorText = IsDefaultValue ? this.ConstructorTemplate : null;
             classText = classText.Replace(DbFirstTemplate.KeyClassName, className);
             classText = classText.Replace(DbFirstTemplate.KeyNamespace, this.Namespace);
@@ -387,7 +386,7 @@ namespace SqlSugar
             }
             classText = classText.Replace(DbFirstTemplate.KeyConstructor, ConstructorText);
             classText = classText.Replace(DbFirstTemplate.KeyPropertyName, null);
-            return classText;
+            return classText.ToString();
         }
         public void CreateClassFile(string directoryPath, string nameSpace = "Models")
         {
@@ -427,19 +426,11 @@ namespace SqlSugar
             {
                 result = Regex.Match(result, @"^\((.+)\)$").Groups[1].Value;
             }
-            if (result.Equals(this.SqlBuilder.SqlDateNow, StringComparison.CurrentCultureIgnoreCase))
-            {
-                result = "DateTime.Now";
-            }
-            if (result.Equals("getdate()", StringComparison.CurrentCultureIgnoreCase))
-            {
-                result = "DateTime.Now";
-            }
-            if (result.Equals("getutcdate()", StringComparison.CurrentCultureIgnoreCase))
-            {
-                result = "DateTime.Now";
-            }
-            if (result.Equals("NOW()", StringComparison.CurrentCultureIgnoreCase))
+            var lowerResult = result.ToLower();
+            if (lowerResult.Equals(this.SqlBuilder.SqlDateNow, StringComparison.OrdinalIgnoreCase) ||
+                lowerResult == "getdate()" ||
+                lowerResult == "getutcdate()" ||
+                lowerResult == "now()")
             {
                 result = "DateTime.Now";
             }

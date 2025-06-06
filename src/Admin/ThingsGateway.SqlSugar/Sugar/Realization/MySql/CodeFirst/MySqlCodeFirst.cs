@@ -120,7 +120,7 @@
         }
 
 
-        protected override bool IsNoSamgeType(EntityColumnInfo ec, DbColumnInfo dc)
+        protected override bool IsNotSameType(EntityColumnInfo ec, DbColumnInfo dc)
         {
             if (ec.UnderType == UtilConstants.BoolType && dc.DataType == "tinyint" && dc.Length == 1)
             {
@@ -134,7 +134,7 @@
             {
                 return false;
             }
-            return base.IsNoSamgeType(ec, dc);
+            return base.IsNotSameType(ec, dc);
         }
     }
 }

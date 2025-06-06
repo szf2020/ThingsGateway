@@ -582,9 +582,9 @@ WHERE EVENT_OBJECT_TABLE = '" + tableName + "'");
             this.Context.Ado.ExecuteCommand(sql);
             if (isAddNotNUll)
             {
-                var dtColums = this.Context.Queryable<object>().AS(columnInfo.TableName).Where("1=2")
+                var dtColumns = this.Context.Queryable<object>().AS(columnInfo.TableName).Where("1=2")
                     .Select(this.SqlBuilder.GetTranslationColumnName(columnInfo.DbColumnName)).ToDataTable().Columns.Cast<System.Data.DataColumn>();
-                var dtColumInfo = dtColums.First(it => it.ColumnName.EqualCase(columnInfo.DbColumnName));
+                var dtColumInfo = dtColumns.First(it => it.ColumnName.EqualCase(columnInfo.DbColumnName));
                 var type = UtilMethods.GetUnderType(dtColumInfo.DataType);
                 var value = type == UtilConstants.StringType ? (object)"" : Activator.CreateInstance(type);
                 //if (this.Context.CurrentConnectionConfig.DbType == DbType.Oracle)

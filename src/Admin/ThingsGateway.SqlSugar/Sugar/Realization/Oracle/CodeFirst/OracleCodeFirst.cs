@@ -4,10 +4,10 @@
     {
         public OracleCodeFirst()
         {
-            if (DefultLength == 0)
-                DefultLength = 40;
+            if (DefaultLength == 0)
+                DefaultLength = 40;
         }
-        protected override int DefultLength { get; set; }
+        protected override int DefaultLength { get; set; }
 
         protected override void GetDbType(EntityColumnInfo item, Type propertyType, DbColumnInfo result)
         {

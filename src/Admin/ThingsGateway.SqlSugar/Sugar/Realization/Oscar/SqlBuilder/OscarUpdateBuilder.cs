@@ -80,14 +80,14 @@ namespace SqlSugar
             sb.AppendLine(string.Join("\r\n", groupList.Select(t =>
             {
                 var updateTable = string.Format("UPDATE {0} SET", base.GetTableNameStringNoWith);
-                var setValues = string.Join(",", t.Where(s => !s.IsPrimarykey).Select(m => GetOracleUpdateColums(i, m)).ToArray());
+                var setValues = string.Join(",", t.Where(s => !s.IsPrimarykey).Select(m => GetOracleUpdateColumns(i, m)).ToArray());
                 var pkList = t.Where(s => s.IsPrimarykey).ToList();
                 List<string> whereList = new List<string>();
                 foreach (var item in pkList)
                 {
                     var isFirst = pkList.First() == item;
                     var whereString = "";
-                    whereString += GetOracleUpdateColums(i, item);
+                    whereString += GetOracleUpdateColumns(i, item);
                     whereList.Add(whereString);
                 }
                 i++;
@@ -95,7 +95,7 @@ namespace SqlSugar
             }).ToArray()));
             return sb.ToString();
         }
-        private string GetOracleUpdateColums(int i, DbColumnInfo m)
+        private string GetOracleUpdateColumns(int i, DbColumnInfo m)
         {
             return string.Format("\"{0}\"={1}", m.DbColumnName.ToUpper(), base.GetDbColumn(m, FormatValue(m.Value)));
         }

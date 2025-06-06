@@ -14,7 +14,7 @@ namespace SqlSugar
     public partial class IDataReaderEntityBuilder<T>
     {
         #region Properies
-        private List<string> ReaderKeys { get; set; }
+        private HashSet<string> ReaderKeys { get; set; }
         #endregion
 
         #region Fields
@@ -81,7 +81,7 @@ namespace SqlSugar
             this.Context = context;
             this.DataRecord = dataRecord;
             this.DynamicBuilder = new IDataReaderEntityBuilder<T>();
-            this.ReaderKeys = fieldNames;
+            this.ReaderKeys = fieldNames.ToHashSet(StringComparer.OrdinalIgnoreCase);
         }
         #endregion
 
@@ -105,7 +105,7 @@ namespace SqlSugar
             foreach (var columnInfo in columnInfos)
             {
                 string fileName = columnInfo.DbColumnName ?? columnInfo.PropertyName;
-                if (columnInfo.IsIgnore && !this.ReaderKeys.Any(it => it.Equals(fileName, StringComparison.CurrentCultureIgnoreCase)))
+                if (columnInfo.IsIgnore && !this.ReaderKeys.Contains(fileName))
                 {
                     continue;
                 }
@@ -122,7 +122,7 @@ namespace SqlSugar
                     }
                     if (!isGemo && columnInfo.PropertyInfo.PropertyType.IsClass() && columnInfo.PropertyInfo.PropertyType != UtilConstants.ByteArrayType && columnInfo.PropertyInfo.PropertyType != UtilConstants.ObjType)
                     {
-                        if (this.ReaderKeys.Any(it => it.Equals(fileName, StringComparison.CurrentCultureIgnoreCase)))
+                        if (this.ReaderKeys.Contains(fileName))
                         {
                             BindClass(generator, result, columnInfo, ReaderKeys.First(it => it.Equals(fileName, StringComparison.CurrentCultureIgnoreCase)));
                         }
@@ -133,14 +133,14 @@ namespace SqlSugar
                     }
                     else if (!isGemo && columnInfo.IsJson && columnInfo.PropertyInfo.PropertyType != UtilConstants.StringType)
                     {   //json is struct
-                        if (this.ReaderKeys.Any(it => it.Equals(fileName, StringComparison.CurrentCultureIgnoreCase)))
+                        if (this.ReaderKeys.Contains(fileName))
                         {
                             BindClass(generator, result, columnInfo, ReaderKeys.First(it => it.Equals(fileName, StringComparison.CurrentCultureIgnoreCase)));
                         }
                     }
                     else
                     {
-                        if (this.ReaderKeys.Any(it => it.Equals(fileName, StringComparison.CurrentCultureIgnoreCase)))
+                        if (this.ReaderKeys.Contains(fileName))
                         {
                             BindField(generator, result, columnInfo, ReaderKeys.First(it => it.Equals(fileName, StringComparison.CurrentCultureIgnoreCase)));
                         }

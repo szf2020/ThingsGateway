@@ -39,7 +39,7 @@ namespace SqlSugar
                 {
                     var tableName = GetTableName(item.FieldName + "");
                     var columnName = GetColumnName(item.FieldName + "");
-                    if (IsMyColums(tableName, columnName))
+                    if (IsMyColumns(tableName, columnName))
                     {
                         result.Add(item);
                     }
@@ -52,7 +52,7 @@ namespace SqlSugar
             return result;
         }
 
-        private bool IsMyColums(string tableName, string columnName)
+        private bool IsMyColumns(string tableName, string columnName)
         {
             return this.jsonTableConfigs.Any(it => it.TableName.EqualCase(tableName)
                                 && it.Columns.Any(z => z.Name.EqualCase(columnName)));

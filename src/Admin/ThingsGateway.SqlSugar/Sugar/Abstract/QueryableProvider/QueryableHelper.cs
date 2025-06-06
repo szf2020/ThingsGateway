@@ -1724,7 +1724,7 @@ namespace SqlSugar
         protected ISugarQueryable<T> _GroupBy(Expression expression)
         {
             var oldParameterNames = this.QueryBuilder.Parameters?.Select(it => it.ParameterName)
-                ?.ToList();
+                ?.ToHashSet();
             QueryBuilder.CheckExpression(expression, "GroupBy");
             LambdaExpression lambda = expression as LambdaExpression;
             expression = lambda.Body;

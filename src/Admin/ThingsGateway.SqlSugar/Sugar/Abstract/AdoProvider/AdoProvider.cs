@@ -159,10 +159,7 @@ namespace SqlSugar
                 this.Transaction.Rollback();
                 this.Transaction = null;
             }
-            //if (this.Connection != null && this.Connection.State != ConnectionState.Open)
-            //{
-            //    this.Connection.Close();
-            //}
+
             this.Connection?.Dispose();
             this.Connection = null;
 
@@ -410,10 +407,10 @@ namespace SqlSugar
             var result = new DbResult<T>();
             try
             {
-                this.BeginTran();
+                await BeginTranAsync().ConfigureAwait(false);
                 if (action != null)
                     result.Data = await action().ConfigureAwait(false);
-                this.CommitTran();
+                await CommitTranAsync().ConfigureAwait(false);
                 result.IsSuccess = true;
             }
             catch (Exception ex)
@@ -421,7 +418,7 @@ namespace SqlSugar
                 result.ErrorException = ex;
                 result.ErrorMessage = ex.Message;
                 result.IsSuccess = false;
-                this.RollbackTran();
+                await RollbackTranAsync().ConfigureAwait(false);
                 if (errorCallBack != null)
                 {
                     errorCallBack(ex);

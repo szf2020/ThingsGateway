@@ -392,8 +392,9 @@ namespace SqlSugar
         public IUpdateable<T> IgnoreColumns(Expression<Func<T, object>> columns)
         {
             var ignoreColumns = UpdateBuilder.GetExpressionValue(columns, ResolveExpressType.ArraySingle).GetResultArray().Select(it => this.SqlBuilder.GetNoTranslationColumnName(it).ToLower()).ToList();
-            this.UpdateBuilder.DbColumnInfoList = this.UpdateBuilder.DbColumnInfoList.Where(it => !ignoreColumns.Contains(it.PropertyName.ToLower())).ToList();
-            this.UpdateBuilder.DbColumnInfoList = this.UpdateBuilder.DbColumnInfoList.Where(it => !ignoreColumns.Contains(it.DbColumnName.ToLower())).ToList();
+            var ids = ignoreColumns.ToHashSet(StringComparer.OrdinalIgnoreCase);
+            this.UpdateBuilder.DbColumnInfoList = this.UpdateBuilder.DbColumnInfoList.Where(it => !ids.Contains(it.PropertyName)).ToList();
+            this.UpdateBuilder.DbColumnInfoList = this.UpdateBuilder.DbColumnInfoList.Where(it => !ids.Contains(it.DbColumnName)).ToList();
             this.UpdateBuilder.IgnoreColumns = ignoreColumns;
             return this;
         }
@@ -419,8 +420,9 @@ namespace SqlSugar
             {
                 var ignoreColumns = columns.Select(it => it.ToLower()).ToList();
                 this.UpdateBuilder.IgnoreColumns = ignoreColumns;
-                this.UpdateBuilder.DbColumnInfoList = this.UpdateBuilder.DbColumnInfoList.Where(it => !ignoreColumns.Contains(it.PropertyName.ToLower())).ToList();
-                this.UpdateBuilder.DbColumnInfoList = this.UpdateBuilder.DbColumnInfoList.Where(it => !ignoreColumns.Contains(it.DbColumnName.ToLower())).ToList();
+                var ids = ignoreColumns.ToHashSet(StringComparer.OrdinalIgnoreCase);
+                this.UpdateBuilder.DbColumnInfoList = this.UpdateBuilder.DbColumnInfoList.Where(it => !ids.Contains(it.PropertyName)).ToList();
+                this.UpdateBuilder.DbColumnInfoList = this.UpdateBuilder.DbColumnInfoList.Where(it => !ids.Contains(it.DbColumnName)).ToList();
             }
             return this;
         }
@@ -432,13 +434,14 @@ namespace SqlSugar
             if (this.UpdateObjs.HasValue())
             {
                 var oldColumns = this.UpdateBuilder.DbColumnInfoList.Select(it => it.PropertyName).ToList();
+                var ids = oldColumns.ToHashSet();
                 foreach (var item in UpdateObjs)
                 {
                     setValueExpression(item);
                 }
                 this.UpdateBuilder.DbColumnInfoList = new List<DbColumnInfo>();
                 Init();
-                this.UpdateBuilder.DbColumnInfoList = this.UpdateBuilder.DbColumnInfoList.Where(it => oldColumns.Contains(it.PropertyName)).ToList();
+                this.UpdateBuilder.DbColumnInfoList = this.UpdateBuilder.DbColumnInfoList.Where(it => ids.Contains(it.PropertyName)).ToList();
             }
             return this;
         }

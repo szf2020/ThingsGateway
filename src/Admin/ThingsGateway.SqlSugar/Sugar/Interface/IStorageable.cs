@@ -134,8 +134,8 @@ namespace SqlSugar
 
         public int BulkUpdate()
         {
-            var isWhereColums = _WhereColumnList != null && _WhereColumnList.Count != 0;
-            if (isWhereColums)
+            var isWhereColumns = _WhereColumnList != null && _WhereColumnList.Count != 0;
+            if (isWhereColumns)
             {
                 var updateColumns = this._Context.EntityMaintenance.GetEntityInfo<T>().Columns.Where(it => !it.IsPrimarykey && !it.IsIdentity && !it.IsOnlyIgnoreUpdate && !it.IsIgnore).Select(it => it.DbColumnName ?? it.PropertyName).ToArray();
                 return BulkUpdate(updateColumns);
@@ -147,8 +147,8 @@ namespace SqlSugar
         }
         public Task<int> BulkUpdateAsync()
         {
-            var isWhereColums = _WhereColumnList != null && _WhereColumnList.Count != 0;
-            if (isWhereColums)
+            var isWhereColumns = _WhereColumnList != null && _WhereColumnList.Count != 0;
+            if (isWhereColumns)
             {
                 var updateColumns = this._Context.EntityMaintenance.GetEntityInfo<T>().Columns.Where(it => !it.IsPrimarykey && !it.IsIdentity && !it.IsOnlyIgnoreUpdate && !it.IsIgnore).Select(it => it.DbColumnName ?? it.PropertyName).ToArray();
                 return BulkUpdateAsync(updateColumns);

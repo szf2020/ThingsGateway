@@ -174,7 +174,7 @@ namespace SqlSugar
             Check.Exception(!isAny, string.Format("Table {0} does not exist", tableName));
             var columns = GetColumnInfosByTableName(tableName);
             if (columns.IsNullOrEmpty()) return false;
-            var result = columns.Any(it => it.IsPrimarykey == true && it.DbColumnName.Equals(columnName, StringComparison.CurrentCultureIgnoreCase));
+            var result = columns.Any(it => it.IsPrimarykey && it.DbColumnName.Equals(columnName, StringComparison.CurrentCultureIgnoreCase));
             return result;
         }
         public virtual bool IsPrimaryKey(string tableName, string columnName, bool isCache = true)
@@ -184,7 +184,7 @@ namespace SqlSugar
             Check.Exception(!isAny, string.Format("Table {0} does not exist", tableName));
             var columns = GetColumnInfosByTableName(tableName, isCache);
             if (columns.IsNullOrEmpty()) return false;
-            var result = columns.Any(it => it.IsPrimarykey == true && it.DbColumnName.Equals(columnName, StringComparison.CurrentCultureIgnoreCase));
+            var result = columns.Any(it => it.IsPrimarykey && it.DbColumnName.Equals(columnName, StringComparison.CurrentCultureIgnoreCase));
             return result;
         }
         public virtual bool IsIdentity(string tableName, string columnName)
@@ -194,7 +194,7 @@ namespace SqlSugar
             Check.Exception(!isAny, string.Format("Table {0} does not exist", tableName));
             var columns = GetColumnInfosByTableName(tableName);
             if (columns.IsNullOrEmpty()) return false;
-            return columns.Any(it => it.IsIdentity = true && it.DbColumnName.Equals(columnName, StringComparison.CurrentCultureIgnoreCase));
+            return columns.Any(it => it.IsIdentity && it.DbColumnName.Equals(columnName, StringComparison.CurrentCultureIgnoreCase));
         }
         public virtual bool IsAnyConstraint(string constraintName)
         {
@@ -346,9 +346,9 @@ namespace SqlSugar
                 {
                     columnInfo.TableName = tableName;
                 }
-                var dtColums = this.Context.Queryable<object>().AS(columnInfo.TableName).Where("1=2")
+                var dtColumns = this.Context.Queryable<object>().AS(columnInfo.TableName).Where("1=2")
                     .Select(this.SqlBuilder.GetTranslationColumnName(columnInfo.DbColumnName)).ToDataTable().Columns.Cast<System.Data.DataColumn>();
-                var dtColumInfo = dtColums.First(it => it.ColumnName.EqualCase(columnInfo.DbColumnName));
+                var dtColumInfo = dtColumns.First(it => it.ColumnName.EqualCase(columnInfo.DbColumnName));
                 var type = UtilMethods.GetUnderType(dtColumInfo.DataType);
                 var value = type == UtilConstants.StringType ? (object)"" : Activator.CreateInstance(type);
                 if (this.Context.CurrentConnectionConfig.DbType == DbType.Oracle)

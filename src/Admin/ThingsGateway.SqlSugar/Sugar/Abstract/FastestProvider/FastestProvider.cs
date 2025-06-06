@@ -360,7 +360,7 @@ namespace SqlSugar
                 this.context.Ado.IsDisableMasterSlaveSeparation = true;
                 DataTable dt = ToDdateTable(datas);
                 IFastBuilder buider = GetBuider();
-                ActionIgnoreColums(whereColumns, updateColumns, dt, buider.IsActionUpdateColumns);
+                ActionIgnoreColumns(whereColumns, updateColumns, dt, buider.IsActionUpdateColumns);
                 buider.Context = context;
                 await buider.CreateTempAsync<T>(dt).ConfigureAwait(false);
                 await buider.ExecuteBulkCopyAsync(dt).ConfigureAwait(false);
@@ -383,16 +383,16 @@ namespace SqlSugar
             }
         }
 
-        private void ActionIgnoreColums(string[] whereColumns, string[] updateColumns, DataTable dt, bool IsActionUpdateColumns)
+        private void ActionIgnoreColumns(string[] whereColumns, string[] updateColumns, DataTable dt, bool IsActionUpdateColumns)
         {
             if (entityInfo.Columns.Where(it => it.IsIgnore == false).Count() > whereColumns.Length + updateColumns.Length && IsActionUpdateColumns)
             {
-                var ignoreColums = dt.Columns.Cast<DataColumn>()
+                var ignoreColumns = dt.Columns.Cast<DataColumn>()
                 .Where(it => !whereColumns.Any(y => y.EqualCase(it.ColumnName)))
                 .Where(it => !updateColumns.Any(y => y.EqualCase(it.ColumnName))).ToList();
                 foreach (DataRow item in dt.Rows)
                 {
-                    foreach (var col in ignoreColums)
+                    foreach (var col in ignoreColumns)
                     {
                         if (item[col.ColumnName].IsNullOrEmpty())
                         {
@@ -434,7 +434,7 @@ namespace SqlSugar
             IFastBuilder buider = GetBuider();
             if (dt.Columns.Count != dataTable.Columns.Count)
             {
-                ActionIgnoreColums(whereColumns, updateColumns, dt, buider.IsActionUpdateColumns);
+                ActionIgnoreColumns(whereColumns, updateColumns, dt, buider.IsActionUpdateColumns);
             }
             buider.Context = context;
             if (buider.DbFastestProperties == null)

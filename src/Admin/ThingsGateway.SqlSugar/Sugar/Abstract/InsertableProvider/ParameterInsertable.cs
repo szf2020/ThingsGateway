@@ -32,7 +32,7 @@ namespace SqlSugar
         {
             int result = 0;
             var inserable = Inserable as InsertableProvider<T>;
-            var columns = inserable.InsertBuilder.DbColumnInfoList.GroupBy(it => it.DbColumnName).Select(it => it.Key).Distinct().ToList();
+            var columns = inserable.InsertBuilder.DbColumnInfoList.GroupBy(it => it.DbColumnName).Select(it => it.Key).ToHashSet();
             var tableWithString = inserable.InsertBuilder.TableWithString;
             var removeCacheFunc = inserable.RemoveCacheFunc;
             var objects = inserable.InsertObjs;
@@ -65,7 +65,7 @@ namespace SqlSugar
         {
             int result = 0;
             var inserable = Inserable as InsertableProvider<T>;
-            var columns = inserable.InsertBuilder.DbColumnInfoList.GroupBy(it => it.DbColumnName).Select(it => it.Key).Distinct().ToList();
+            var columns = inserable.InsertBuilder.DbColumnInfoList.GroupBy(it => it.DbColumnName).Select(it => it.Key).ToHashSet();
             var tableWithString = inserable.InsertBuilder.TableWithString;
             var removeCacheFunc = inserable.RemoveCacheFunc;
             var objects = inserable.InsertObjs;

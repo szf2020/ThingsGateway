@@ -107,7 +107,7 @@ namespace SqlSugar
             }
             return i;
         }
-        private async Task<int> _BulkUpdate(DataTable dt, List<Dictionary<string, object>> dictionary, int i, string[] whereColums, string[] updateColums, SqliteConnection cn)
+        private async Task<int> _BulkUpdate(DataTable dt, List<Dictionary<string, object>> dictionary, int i, string[] whereColumns, string[] updateColumns, SqliteConnection cn)
         {
             using (var cmd = cn.CreateCommand())
             {
@@ -116,8 +116,8 @@ namespace SqlSugar
                     foreach (DataRow item in dt.Rows)
                     {
                         cmd.CommandText = this.Context.Updateable(UtilMethods.DataRowToDictionary(item))
-                         .WhereColumns(whereColums)
-                         .UpdateColumns(updateColums)
+                         .WhereColumns(whereColumns)
+                         .UpdateColumns(updateColumns)
                          .AS(dt.TableName).ToSqlString();
                         i += await cmd.ExecuteNonQueryAsync().ConfigureAwait(false);
                     }
@@ -125,8 +125,8 @@ namespace SqlSugar
                 else
                 {
                     cmd.CommandText = this.Context.Updateable(dictionary.First())
-                        .WhereColumns(whereColums)
-                        .UpdateColumns(updateColums)
+                        .WhereColumns(whereColumns)
+                        .UpdateColumns(updateColumns)
                         .AS(dt.TableName).ToSql().Key;
 
                     foreach (DataRow dataRow in dt.Rows)

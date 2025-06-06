@@ -32,7 +32,7 @@ namespace SqlSugar
         {
             this.Columns = names;
             var queryable = this.Context.Queryable<object>();
-            Check.Exception(Columns == null || Columns.Length == 0, "need WhereColums");
+            Check.Exception(Columns == null || Columns.Length == 0, "need WhereColumns");
             var tableName = queryable.SqlBuilder.GetTranslationTableName(DataTable.TableName);
             this.Context.Utilities.PageEach(DataTable.Rows.Cast<DataRow>(), 200, itemList =>
             {

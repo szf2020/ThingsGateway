@@ -31,18 +31,18 @@ namespace SqlSugar.TDengine
                 entityInfo.DbTableName = v;
                 this.Context.MappingTables.Add(entityInfo.EntityName, entityInfo.DbTableName);
             }
-            if (this.DefultLength > 0)
+            if (this.DefaultLength > 0)
             {
                 foreach (var item in entityInfo.Columns)
                 {
                     if (item.PropertyInfo.PropertyType == UtilConstants.StringType && item.DataType.IsNullOrEmpty() && item.Length == 0)
                     {
-                        item.Length = DefultLength;
+                        item.Length = DefaultLength;
                     }
                     if (item.DataType?.Contains(',') == true && !Regex.IsMatch(item.DataType, @"\d\,\d"))
                     {
-                        var types = item.DataType.Split(',').Select(it => it.ToLower()).ToList();
-                        var mapingTypes = this.Context.Ado.DbBind.MappingTypes.Select(it => it.Key.ToLower()).ToList();
+                        var types = item.DataType.Split(',').Select(it => it.ToLower()).ToHashSet();
+                        var mapingTypes = this.Context.Ado.DbBind.MappingTypes.Select(it => it.Key.ToLower()).ToHashSet();
                         var mappingType = types.FirstOrDefault(it => mapingTypes.Contains(it));
                         if (mappingType != null)
                         {
