@@ -13,7 +13,7 @@ using Microsoft.Extensions.Logging;
 
 using System.Collections.Concurrent;
 
-using ThingsGateway.Extension.Generic;
+using ThingsGateway.NewLife.Caching;
 
 namespace ThingsGateway.Logging;
 
@@ -27,7 +27,7 @@ public sealed class FileLoggerProvider : ILoggerProvider, ISupportExternalScope
     /// <summary>
     /// 存储多日志分类日志记录器
     /// </summary>
-    private readonly ConcurrentDictionary<string, FileLogger> _fileLoggers = new();
+    private readonly MemoryCache _fileLoggers = new();
 
     /// <summary>
     /// 日志消息队列（线程安全）

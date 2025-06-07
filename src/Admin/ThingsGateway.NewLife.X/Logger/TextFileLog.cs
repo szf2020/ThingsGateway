@@ -92,6 +92,11 @@ public class TextFileLog : Logger, IDisposable
 
         // 销毁前把队列日志输出
         if (Interlocked.CompareExchange(ref _writing, 1, 0) == 0) WriteAndClose(DateTime.MinValue);
+
+        LogWriter?.TryDispose();
+#if NET6_0_OR_GREATER
+        _Logs?.Clear();
+#endif
     }
     #endregion
 

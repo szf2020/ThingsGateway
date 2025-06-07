@@ -886,6 +886,7 @@ internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
         Disposed = true;
         try
         {
+            GlobalData.DeviceStatusChangeEvent -= GlobalData_DeviceStatusChangeEvent;
             await NewDeviceLock.WaitAsync().ConfigureAwait(false);
             _logger?.TryDispose();
             await PrivateRemoveDevicesAsync(Drivers.Keys).ConfigureAwait(false);
@@ -893,6 +894,8 @@ internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
                 Channel?.SafeDispose();
 
             LogMessage?.LogInformation(Localizer["ChannelDispose", CurrentChannel?.Name ?? string.Empty]);
+
+            LogMessage?.Logs?.ForEach(a => a.TryDispose());
 
         }
         finally

@@ -64,7 +64,7 @@ public sealed class OperDescAttribute : MoAttribute
 
     public override void OnException(MethodContext context)
     {
-        if (App.HttpContext.Request.Path.StartsWithSegments("/_blazor"))
+        if (App.HttpContext?.Request.Path.StartsWithSegments("/_blazor") == true)
         {
             //插入异常日志
             SysOperateLog log = GetOperLog(LocalizerType, context);
@@ -82,7 +82,7 @@ public sealed class OperDescAttribute : MoAttribute
 
     public override void OnSuccess(MethodContext context)
     {
-        if (App.HttpContext.Request.Path.StartsWithSegments("/_blazor"))
+        if (App.HttpContext?.Request.Path.StartsWithSegments("/_blazor") == true)
         {
 
             //插入操作日志

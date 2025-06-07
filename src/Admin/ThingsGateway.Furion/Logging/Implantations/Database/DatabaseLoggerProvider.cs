@@ -14,7 +14,7 @@ using Microsoft.Extensions.Logging;
 
 using System.Collections.Concurrent;
 
-using ThingsGateway.Extension.Generic;
+using ThingsGateway.NewLife.Caching;
 
 namespace ThingsGateway.Logging;
 
@@ -28,7 +28,7 @@ public sealed class DatabaseLoggerProvider : ILoggerProvider, ISupportExternalSc
     /// <summary>
     /// 存储多日志分类日志记录器
     /// </summary>
-    private readonly ConcurrentDictionary<string, DatabaseLogger> _databaseLoggers = new();
+    private readonly MemoryCache _databaseLoggers = new();
 
     /// <summary>
     /// 日志消息队列（线程安全）

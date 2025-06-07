@@ -39,10 +39,32 @@ public partial class DeviceTable : IDisposable
 
     protected override void OnInitialized()
     {
+        scheduler = new SmartTriggerScheduler(Notify, TimeSpan.FromMilliseconds(1000));
         _ = RunTimerAsync();
         base.OnInitialized();
     }
 
+    private SmartTriggerScheduler scheduler;
+    private IEnumerable<DeviceRuntime>? _previousItemsRef;
+    protected override void OnParametersSet()
+    {
+        if (!ReferenceEquals(_previousItemsRef, Items))
+        {
+            _previousItemsRef = Items;
+            Refresh();
+        }
+        base.OnParametersSet();
+    }
+    private void Refresh()
+    {
+        scheduler.Trigger();
+    }
+    private async Task Notify()
+    {
+        if (Disposed) return;
+        if (table != null)
+            await InvokeAsync(table.QueryAsync);
+    }
 
     private async Task RunTimerAsync()
     {
@@ -50,8 +72,7 @@ public partial class DeviceTable : IDisposable
         {
             try
             {
-                if (table != null)
-                    await InvokeAsync(table.QueryAsync);
+                await InvokeAsync(StateHasChanged);
             }
             catch (Exception ex)
             {

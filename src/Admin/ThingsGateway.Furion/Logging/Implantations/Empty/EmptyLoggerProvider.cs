@@ -11,9 +11,7 @@
 
 using Microsoft.Extensions.Logging;
 
-using System.Collections.Concurrent;
-
-using ThingsGateway.Extension.Generic;
+using ThingsGateway.NewLife.Caching;
 
 namespace ThingsGateway.Logging;
 
@@ -27,7 +25,7 @@ public sealed class EmptyLoggerProvider : ILoggerProvider
     /// <summary>
     /// 存储多日志分类日志记录器
     /// </summary>
-    private readonly ConcurrentDictionary<string, EmptyLogger> _emptyLoggers = new();
+    private readonly MemoryCache _emptyLoggers = new();
 
     /// <summary>
     /// 创建空日志记录器
