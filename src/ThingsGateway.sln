@@ -103,6 +103,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ThingsGateway.Plugin.Synchr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ThingsGateway.SqlSugar", "Admin\ThingsGateway.SqlSugar\ThingsGateway.SqlSugar.csproj", "{544EDA9F-978F-84F7-48BF-FA5888F52FFB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ThingsGateway.DB", "Admin\ThingsGateway.DB\ThingsGateway.DB.csproj", "{317B8159-28B1-49B1-1884-97D1BBDED982}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -273,6 +275,10 @@ Global
 		{544EDA9F-978F-84F7-48BF-FA5888F52FFB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{544EDA9F-978F-84F7-48BF-FA5888F52FFB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{544EDA9F-978F-84F7-48BF-FA5888F52FFB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{317B8159-28B1-49B1-1884-97D1BBDED982}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{317B8159-28B1-49B1-1884-97D1BBDED982}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{317B8159-28B1-49B1-1884-97D1BBDED982}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{317B8159-28B1-49B1-1884-97D1BBDED982}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -317,10 +323,11 @@ Global
 		{29DCAC9C-2D0F-E251-E907-F07D804CA117} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{438B86D4-0CAE-DCC3-E952-90CE77BB8661} = {36510D70-161F-4241-B8D0-781E21032816}
 		{544EDA9F-978F-84F7-48BF-FA5888F52FFB} = {72C65578-92A5-4E99-9779-27835B12B32F}
+		{317B8159-28B1-49B1-1884-97D1BBDED982} = {72C65578-92A5-4E99-9779-27835B12B32F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {199B1B96-4F56-4828-9531-813BA02DB282}
-		RESX_NeutralResourcesLanguage = zh-Hans
 		RESX_Rules = {"EnabledRules":[]}
+		RESX_NeutralResourcesLanguage = zh-Hans
+		SolutionGuid = {199B1B96-4F56-4828-9531-813BA02DB282}
 	EndGlobalSection
 EndGlobal
