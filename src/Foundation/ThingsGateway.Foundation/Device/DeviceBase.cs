@@ -556,12 +556,11 @@ public abstract class DeviceBase : DisposableObject, IDevice
             var result = waitData.Check();
             if (result.IsSuccess)
             {
-                var response = waitData.WaitResult;
-                return response;
+                return waitData.WaitResult;
             }
             else
             {
-                throw result.Exception ?? new(result.ErrorMessage);
+                throw new(result.ErrorMessage ?? "unknown error");
             }
 
         }

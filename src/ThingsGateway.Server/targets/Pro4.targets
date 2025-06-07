@@ -2,6 +2,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="ThingsGateway.Plugin.ModbusC1" Version="$(ProPluginVersion)" GeneratePathProperty="true" Private="false"  IncludeAssets="native;" />
+		<PackageReference Include="ThingsGateway.Plugin.ModbusGY" Version="$(ProPluginVersion)" GeneratePathProperty="true" Private="false"  IncludeAssets="native;" />
 
 	</ItemGroup>
 
@@ -12,6 +13,7 @@
 		<ItemGroup>
 			<!-- setting up the variable for convenience -->
 			<PkgThingsGateway_Plugin_ModbusC1PackageFiles Include="$(PkgThingsGateway_Plugin_ModbusC1)\Content\$(PluginTargetFramework)\**\*.*" />
+			<PkgThingsGateway_Plugin_ModbusGYPackageFiles Include="$(PkgThingsGateway_Plugin_ModbusGY)\Content\$(PluginTargetFramework)\**\*.*" />
 		</ItemGroup>
 		<PropertyGroup>
 			<PluginFolder>$(TargetDir)Plugins\</PluginFolder>
@@ -19,6 +21,7 @@
 		<Message Text="将插件复制到插件目录 $(PluginFolder)" Importance="high" />
 
 		<Copy SourceFiles="@(PkgThingsGateway_Plugin_ModbusC1PackageFiles)" DestinationFolder="$(PluginFolder)%(RecursiveDir)" />
+		<Copy SourceFiles="@(PkgThingsGateway_Plugin_ModbusGYPackageFiles)" DestinationFolder="$(PluginFolder)%(RecursiveDir)" />
 
 	</Target>
 

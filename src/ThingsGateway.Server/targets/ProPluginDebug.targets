@@ -28,6 +28,8 @@
 		<ProjectReference Include="..\PluginPro\ThingsGateway.Plugin.TIANXIN\ThingsGateway.Plugin.TIANXIN.csproj" />
 		<ProjectReference Include="..\PluginPro\ThingsGateway.Plugin.Inovance\ThingsGateway.Plugin.Inovance.csproj" />
 		
+		<ProjectReference Include="..\PluginPro\ThingsGateway.Plugin.ModbusGY\ThingsGateway.Plugin.ModbusGY.csproj" />
+		
 	</ItemGroup>
 
 

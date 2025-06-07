@@ -212,7 +212,7 @@ public partial class ModbusMaster : DtuServiceDeviceBase, IModbusAddress
         }
     }
 
-    private ISendMessage GetSendMessage(ModbusAddress modbusAddress, bool read)
+    protected ISendMessage GetSendMessage(ModbusAddress modbusAddress, bool read)
     {
         if (ModbusType == ModbusTypeEnum.ModbusRtu)
         {

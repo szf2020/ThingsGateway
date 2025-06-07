@@ -20,6 +20,10 @@
           {
             "Url": "/ModbusSlave",
             "Text": "ModbusSlave"
+          },
+          {
+            "Url": "/ModbusGYMaster",
+            "Text": "ModbusGYMaster"
           }
         ]
       },
