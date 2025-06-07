@@ -101,13 +101,13 @@ public class DDPTcpSessionClientChannel : TcpSessionClientChannel
                         if (id != Id) log = true;
 
                         //注册ID
-                        if (Service is ITcpService tcpService && tcpService.TryGetClient(id, out var oldClient) && oldClient != this)
+                        if (Service is ITcpServiceChannel tcpService && tcpService.TryGetClient(id, out var oldClient) && oldClient != this)
                         {
+                            Logger?.Debug($"Old socket connections with the same ID {id} will be closed");
                             try
                             {
                                 await oldClient.ShutdownAsync(System.Net.Sockets.SocketShutdown.Both).ConfigureAwait(false);
                                 await oldClient.CloseAsync().ConfigureAwait(false);
-                                oldClient.Dispose();
                             }
                             catch
                             {
