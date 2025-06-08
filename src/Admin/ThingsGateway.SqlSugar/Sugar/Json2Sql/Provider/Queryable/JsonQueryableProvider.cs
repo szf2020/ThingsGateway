@@ -63,7 +63,7 @@ namespace SqlSugar
         private void AppendQueryableAll(JsonQueryParameter jsonQueryParameter, JToken item)
         {
             SetQueryableParameterIndex();
-            var name = item.Path.ToLower();
+            var name = item.Path;
             if (IsForm(name))
             {
                 AppendFrom(item);

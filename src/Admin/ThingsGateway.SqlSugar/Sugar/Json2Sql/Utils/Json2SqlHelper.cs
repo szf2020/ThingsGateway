@@ -22,11 +22,11 @@ namespace SqlSugar
         {
             List<string> result = new List<string>();
             var mainTable = JObject.Parse(json).AsJEnumerable().Where(it =>
-              it.Path.ToLower().IsIn(
-                  JsonProviderConfig.KeyInsertable.Get().ToLower(),
-                  JsonProviderConfig.KeyUpdateable.Get().ToLower(),
-                  JsonProviderConfig.KeyDeleteable.Get().ToLower(),
-                  JsonProviderConfig.KeyQueryable.Get().ToLower()
+              it.Path.IsInCase(
+                  JsonProviderConfig.KeyInsertable.Get(),
+                  JsonProviderConfig.KeyUpdateable.Get(),
+                  JsonProviderConfig.KeyDeleteable.Get(),
+                  JsonProviderConfig.KeyQueryable.Get()
               )).FirstOrDefault();
             if (mainTable != null)
                 result.Add(mainTable.First().ToString());

@@ -265,7 +265,7 @@ namespace SqlSugar
             else
             {
                 var bid = InstanceFactory.GetQueryBuilderWithContext(abDb).Builder.GetTranslationColumnName(bPkColumn.DbColumnName);
-                if (!sql.SelectString.Contains(bid?.ToLower(), StringComparison.CurrentCultureIgnoreCase) && !sql.SelectString.Contains('*'))
+                if (!sql.SelectString.Contains(bid, StringComparison.CurrentCultureIgnoreCase) && !sql.SelectString.Contains('*'))
                 {
                     sql.SelectString += ("," + bid + " AS " + bid);
                 }
@@ -949,7 +949,7 @@ namespace SqlSugar
             var selectPkName = queryable.SqlBuilder.GetTranslationColumnName(columnName);
             if (result.IsSelectNav)
             {
-                if (result.SelectString?.Contains($" {selectPkName.ToLower()} AS {selectPkName.ToLower()}", StringComparison.CurrentCultureIgnoreCase) == false)
+                if (result.SelectString?.Contains($" {selectPkName} AS {selectPkName}", StringComparison.CurrentCultureIgnoreCase) == false)
                 {
                     result.SelectString = result.SelectString + "," + (selectPkName + " AS " + selectPkName);
                 }

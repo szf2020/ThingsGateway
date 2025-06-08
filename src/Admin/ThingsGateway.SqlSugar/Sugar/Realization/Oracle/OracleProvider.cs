@@ -120,7 +120,7 @@ namespace SqlSugar
         public override DbCommand GetCommand(string sql, SugarParameter[] parameters)
         {
             sql = ReplaceKeyWordParameterName(sql, parameters);
-            if (sql?.EndsWith(';') == true && sql?.TrimStart()?.ToLower().StartsWith("begin", StringComparison.CurrentCultureIgnoreCase) != true && sql?.TrimStart()?.ToLower().Contains("begin", StringComparison.CurrentCultureIgnoreCase) != true)
+            if (sql?.EndsWith(';') == true && sql?.TrimStart()?.StartsWith("begin", StringComparison.CurrentCultureIgnoreCase) != true && sql?.TrimStart()?.Contains("begin", StringComparison.CurrentCultureIgnoreCase) != true)
             {
                 sql = sql.TrimEnd(';');
             }
@@ -149,7 +149,7 @@ namespace SqlSugar
             {
                 foreach (var Parameter in parameters.OrderByDescending(x => x.ParameterName?.Length))
                 {
-                    if (Parameter.ParameterName?.ToLower().IsContainsStartWithIn(KeyWord) == true)
+                    if (Parameter.ParameterName?.IsContainsStartWithInCase(KeyWord) == true)
                     {
                         if (parameters.Count(it => it.ParameterName.StartsWith(Parameter.ParameterName)) == 1)
                         {
@@ -158,7 +158,7 @@ namespace SqlSugar
                             sql = Regex.Replace(sql, Parameter.ParameterName, newName, RegexOptions.IgnoreCase);
                             Parameter.ParameterName = newName;
                         }
-                        else if (Parameter.ParameterName.ToLower().IsContainsIn(KeyWord))
+                        else if (Parameter.ParameterName.IsContainsInCase(KeyWord))
                         {
                             Check.ExceptionEasy($" {Parameter.ParameterName} is key word", $"{Parameter.ParameterName}ÊÇ¹Ø¼ü´Ê");
                         }

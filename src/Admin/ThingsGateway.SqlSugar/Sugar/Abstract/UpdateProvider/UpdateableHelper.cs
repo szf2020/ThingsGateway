@@ -128,9 +128,9 @@ namespace SqlSugar
         {
             if (SetColumnsIndex > 0)
             {
-                var keys = UpdateBuilder.SetValues.Select(it => SqlBuilder.GetNoTranslationColumnName(it.Key.ToLower())).ToList();
+                var keys = UpdateBuilder.SetValues.Select(it => SqlBuilder.GetNoTranslationColumnName(it.Key)).ToList();
                 var addKeys = keys.Where(k => !this.UpdateBuilder.DbColumnInfoList.Any(it => it.PropertyName.Equals(k, StringComparison.CurrentCultureIgnoreCase) || it.DbColumnName.Equals(k, StringComparison.CurrentCultureIgnoreCase))).ToList();
-                var addItems = this.EntityInfo.Columns.Where(it => !GetPrimaryKeys().Any(p => p.Equals(it.PropertyName?.ToLower(), StringComparison.CurrentCultureIgnoreCase) || p.Equals(it.DbColumnName?.ToLower(), StringComparison.CurrentCultureIgnoreCase)) && addKeys.Any(k => it.PropertyName?.ToLower() == k || it.DbColumnName?.ToLower() == k)).ToList();
+                var addItems = this.EntityInfo.Columns.Where(it => !GetPrimaryKeys().Any(p => p.Equals(it.PropertyName, StringComparison.CurrentCultureIgnoreCase) || p.Equals(it.DbColumnName, StringComparison.CurrentCultureIgnoreCase)) && addKeys.Any(k => it.PropertyName?.Equals(k, StringComparison.OrdinalIgnoreCase) == true || it.DbColumnName?.Equals(k, StringComparison.OrdinalIgnoreCase) == true)).ToList();
                 this.UpdateBuilder.DbColumnInfoList.AddRange(addItems.Select(it => new DbColumnInfo() { PropertyName = it.PropertyName, DbColumnName = it.DbColumnName }));
             }
             SetColumnsIndex++;
@@ -456,8 +456,7 @@ namespace SqlSugar
             if (this.UpdateBuilder.UpdateColumns.HasValue())
             {
                 var columns = this.UpdateBuilder.UpdateColumns;
-                this.UpdateBuilder.DbColumnInfoList = this.UpdateBuilder.DbColumnInfoList.Where(it => GetPrimaryKeys().Select(
-                iit => iit.ToLower()).Contains(it.DbColumnName.ToLower())
+                this.UpdateBuilder.DbColumnInfoList = this.UpdateBuilder.DbColumnInfoList.Where(it => GetPrimaryKeys().Contains(it.DbColumnName, StringComparer.OrdinalIgnoreCase)
                 || columns.Contains(it.PropertyName, StringComparer.OrdinalIgnoreCase)
                 || columns.Contains(it.DbColumnName, StringComparer.OrdinalIgnoreCase)).ToList();
             }
@@ -471,7 +470,7 @@ namespace SqlSugar
                     {
                         continue;
                     }
-                    var isContains = this.UpdateBuilder.DbColumnInfoList.Select(it => it.DbColumnName.ToLower()).Contains(pkName.ToLower());
+                    var isContains = this.UpdateBuilder.DbColumnInfoList.Select(it => it.DbColumnName).Contains(pkName, StringComparer.OrdinalIgnoreCase);
                     Check.Exception(isContains == false, "Use UpdateColumns().WhereColumn() ,UpdateColumns need {0}", pkName);
                 }
             }

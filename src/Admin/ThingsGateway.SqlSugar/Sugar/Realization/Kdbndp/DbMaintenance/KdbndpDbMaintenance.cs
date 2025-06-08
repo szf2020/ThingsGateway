@@ -648,7 +648,7 @@ WHERE tgrelid = '" + tableName + "'::regclass");
                 {
                     foreach (var item in result)
                     {
-                        if (pkList.Select(it => it.ToUpper()).Contains(item.DbColumnName.ToUpper()))
+                        if (pkList.Contains(item.DbColumnName, StringComparer.OrdinalIgnoreCase))
                         {
                             item.IsPrimarykey = true;
                         }
@@ -679,7 +679,7 @@ WHERE tgrelid = '" + tableName + "'::regclass");
         {
             string[] array = new string[] { "int4", "text", "int2", "int8", "date", "bit", "text", "timestamp" };
 
-            if (array.Contains(x.DataType?.ToLower()))
+            if (array.Contains(x.DataType, StringComparer.OrdinalIgnoreCase))
             {
                 x.Length = 0;
                 x.DecimalDigits = 0;

@@ -41,9 +41,9 @@ namespace SqlSugar.TDengine
                     }
                     if (item.DataType?.Contains(',') == true && !Regex.IsMatch(item.DataType, @"\d\,\d"))
                     {
-                        var types = item.DataType.Split(',').Select(it => it.ToLower()).ToHashSet();
-                        var mapingTypes = this.Context.Ado.DbBind.MappingTypes.Select(it => it.Key.ToLower()).ToHashSet();
-                        var mappingType = types.FirstOrDefault(it => mapingTypes.Contains(it));
+                        var types = item.DataType.Split(',').ToHashSet(StringComparer.OrdinalIgnoreCase);
+                        var mapingTypes = this.Context.Ado.DbBind.MappingTypes.Select(it => it.Key).ToHashSet(StringComparer.OrdinalIgnoreCase);
+                        var mappingType = types.FirstOrDefault(it => mapingTypes.Contains(it)).ToLower();
                         if (mappingType != null)
                         {
                             item.DataType = mappingType;
@@ -100,10 +100,10 @@ namespace SqlSugar.TDengine
                 if (attr?.Tag1 != null)
                 {
                     entityColumns = entityInfo.Columns.Where(it => it.IsIgnore == false
-                    || it.DbColumnName?.ToLower() == attr.Tag1?.ToLower()
-                     || it.DbColumnName?.ToLower() == attr.Tag2?.ToLower()
-                      || it.DbColumnName?.ToLower() == attr.Tag3?.ToLower()
-                       || it.DbColumnName?.ToLower() == attr.Tag4?.ToLower()
+                    || it.DbColumnName?.EqualCase(attr.Tag1) == true
+                     || it.DbColumnName?.EqualCase(attr.Tag2) == true
+                      || it.DbColumnName?.EqualCase(attr.Tag3) == true
+                       || it.DbColumnName?.EqualCase(attr.Tag4) == true
                   ).ToList();
                     foreach (var item in entityColumns)
                     {
@@ -228,10 +228,10 @@ namespace SqlSugar.TDengine
             if (attr?.Tag1 != null)
             {
                 dbColumns = dbColumns.Where(it =>
-                 it.DbColumnName?.ToLower() != attr.Tag1?.ToLower()
-                   && it.DbColumnName?.ToLower() != attr.Tag2?.ToLower()
-                   && it.DbColumnName?.ToLower() != attr.Tag3?.ToLower()
-                   && it.DbColumnName?.ToLower() != attr.Tag4?.ToLower()
+                 it.DbColumnName?.EqualCase(attr.Tag1) == true
+                   && it.DbColumnName?.EqualCase(attr.Tag2) == true
+                   && it.DbColumnName?.EqualCase(attr.Tag3) == true
+                   && it.DbColumnName?.EqualCase(attr.Tag4) == true
                 ).ToList();
             }
             var dbMain = (TDengineDbMaintenance)this.Context.DbMaintenance;

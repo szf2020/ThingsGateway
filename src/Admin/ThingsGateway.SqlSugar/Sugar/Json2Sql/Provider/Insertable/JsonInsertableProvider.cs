@@ -37,7 +37,7 @@ namespace SqlSugar
 
         private void AppendAll(JsonQueryParameter jsonQueryParameter, JToken item)
         {
-            var name = item.Path.ToLower();
+            var name = item.Path;
             if (IsName(name))
             {
                 AppendName(item);

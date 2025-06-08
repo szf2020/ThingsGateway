@@ -92,12 +92,12 @@ namespace SqlSugar
             if (this._Result == null) return null;
             if (this._ResolveExpressType.IsIn(ResolveExpressType.SelectMultiple, ResolveExpressType.SelectSingle))
             {
-                return this.Result.ToString().Replace(UtilConstants.ReplaceCommaKey, ",").TrimEnd(',');
+                return this.Result.Replace(UtilConstants.ReplaceCommaKey, ",").ToString().TrimEnd(',');
             }
             if (IsUpper)
-                return this.Result.ToString().Replace(UtilConstants.ReplaceCommaKey, ",").ToUpper();
+                return this.Result.Replace(UtilConstants.ReplaceCommaKey, ",").ToString().ToUpper();
             else
-                return this.Result.ToString().Replace(UtilConstants.ReplaceCommaKey, ",");
+                return this.Result.Replace(UtilConstants.ReplaceCommaKey, ",").ToString();
         }
 
         public void TrimEnd()
@@ -109,7 +109,7 @@ namespace SqlSugar
         public bool Contains(string value)
         {
             if (this.Result.Equals(value)) return true;
-            return (Result.ToString().Contains(value?.ToLower(), StringComparison.CurrentCultureIgnoreCase));
+            return (Result.ToString().Contains(value, StringComparison.CurrentCultureIgnoreCase));
         }
 
         internal void Insert(int index, string value)

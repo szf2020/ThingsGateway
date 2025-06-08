@@ -499,7 +499,7 @@
         }
         public override string GetStringJoinSelector(string result, string separator)
         {
-            if (result?.ToLower()?.Contains("distinct") == true)
+            if (result?.Contains("distinct", StringComparison.OrdinalIgnoreCase) == true)
             {
                 return $"string_agg({result},'{separator}') ";
             }

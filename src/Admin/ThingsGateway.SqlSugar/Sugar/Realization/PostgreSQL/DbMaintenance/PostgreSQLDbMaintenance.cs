@@ -315,12 +315,12 @@ WHERE tgrelid = '" + tableName + "'::regclass");
                 string sql = string.Format(AddDefaultValueSql, this.SqlBuilder.GetTranslationColumnName(tableName), this.SqlBuilder.GetTranslationColumnName(columnName), "'" + defaultValue + "'");
                 return this.Context.Ado.ExecuteCommand(sql) > 0;
             }
-            else if (defaultValue?.ToLower()?.Contains("cast(") == true && defaultValue?.StartsWith('\'') == true && defaultValue?.EndsWith('\'') == true)
+            else if (defaultValue?.Contains("cast(", StringComparison.OrdinalIgnoreCase) == true && defaultValue?.StartsWith('\'') == true && defaultValue?.EndsWith('\'') == true)
             {
                 string sql = string.Format(AddDefaultValueSql, this.SqlBuilder.GetTranslationColumnName(tableName), this.SqlBuilder.GetTranslationColumnName(columnName), defaultValue.Replace("''", "'").TrimEnd('\'').TrimStart('\''));
                 return this.Context.Ado.ExecuteCommand(sql) > 0;
             }
-            else if (defaultValue?.ToLower()?.Contains("now()") == true)
+            else if (defaultValue?.Contains("now()", StringComparison.OrdinalIgnoreCase) == true)
             {
                 string sql = string.Format(AddDefaultValueSql, this.SqlBuilder.GetTranslationColumnName(tableName), this.SqlBuilder.GetTranslationColumnName(columnName), defaultValue.TrimEnd('\'').TrimStart('\''));
                 return this.Context.Ado.ExecuteCommand(sql) > 0;
@@ -451,7 +451,7 @@ WHERE tgrelid = '" + tableName + "'::regclass");
                     ConvertCreateColumnInfo(item);
                     if (item.DbColumnName.Equals("GUID", StringComparison.CurrentCultureIgnoreCase) && item.Length == 0)
                     {
-                        if (item.DataType?.ToLower() != "uuid")
+                        if (item.DataType.EqualCase("uuid"))
                         {
                             item.Length = 10;
                         }
@@ -485,7 +485,7 @@ WHERE tgrelid = '" + tableName + "'::regclass");
             foreach (var item in columns)
             {
                 string columnName = item.DbColumnName;
-                string dataType = item.DataType;
+                string dataType = item.DataType?.ToLower();
                 if (dataType == "varchar" && item.Length == 0)
                 {
                     item.Length = 1;
@@ -505,11 +505,11 @@ WHERE tgrelid = '" + tableName + "'::regclass");
                 string addItem = string.Format(this.CreateTableColumn, this.SqlBuilder.GetTranslationColumnName(columnName.ToLower(isAutoToLowerCodeFirst)), dataType, dataSize, nullType, primaryKey, "");
                 if (item.IsIdentity)
                 {
-                    if (dataType?.ToLower() == "int")
+                    if (dataType == "int")
                     {
                         dataSize = "int4";
                     }
-                    else if (dataType?.ToLower() == "long")
+                    else if (dataType == "long")
                     {
                         dataSize = "int8";
                     }
@@ -564,7 +564,7 @@ WHERE tgrelid = '" + tableName + "'::regclass");
                 {
                     foreach (var item in result)
                     {
-                        if (pkList.Select(it => it.ToUpper()).Contains(item.DbColumnName.ToUpper()))
+                        if (pkList.Contains(item.DbColumnName, StringComparer.OrdinalIgnoreCase))
                         {
                             item.IsPrimarykey = true;
                         }
@@ -645,7 +645,7 @@ WHERE tgrelid = '" + tableName + "'::regclass");
         {
             string[] array = new string[] { "uuid", "int4", "text", "int2", "int8", "date", "bit", "text", "timestamp" };
 
-            if (array.Contains(x.DataType?.ToLower()))
+            if (array.Contains(x.DataType, StringComparer.OrdinalIgnoreCase))
             {
                 x.Length = 0;
                 x.DecimalDigits = 0;

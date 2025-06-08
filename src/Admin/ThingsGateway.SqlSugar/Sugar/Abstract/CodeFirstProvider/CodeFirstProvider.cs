@@ -261,8 +261,8 @@ namespace SqlSugar
                     }
                     if (item.DataType?.Contains(',') == true && !Regex.IsMatch(item.DataType, @"\d\,\d"))
                     {
-                        var types = item.DataType.Split(',').Select(it => it.ToLower()).ToHashSet();
-                        var mapingTypes = this.Context.Ado.DbBind.MappingTypes.Select(it => it.Key.ToLower()).ToHashSet();
+                        var types = item.DataType.Split(',').ToHashSet(StringComparer.OrdinalIgnoreCase);
+                        var mapingTypes = this.Context.Ado.DbBind.MappingTypes.Select(it => it.Key.ToLower()).ToHashSet(StringComparer.OrdinalIgnoreCase);
                         var mappingType = types.FirstOrDefault(it => mapingTypes.Contains(it));
                         if (mappingType != null)
                         {

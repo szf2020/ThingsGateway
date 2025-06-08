@@ -13,7 +13,7 @@ namespace SqlSugar
         }
         private static bool IsJoinLastAfter(string name)
         {
-            return name == "joinlastafter";
+            return name.Equals("joinlastafter", StringComparison.CurrentCultureIgnoreCase);
         }
 
         private static bool IsPageSize(string name)
@@ -58,11 +58,11 @@ namespace SqlSugar
 
         private static bool IsAnySelect(List<JToken> appendTypeNames)
         {
-            return appendTypeNames.Any(it => IsSelect(it.Path.ToLower()));
+            return appendTypeNames.Any(it => IsSelect(it.Path));
         }
         private static bool IsAnyJoin(List<JToken> appendTypeNames)
         {
-            return appendTypeNames.Any(it => IsJoin(it.Path.ToLower()));
+            return appendTypeNames.Any(it => IsJoin(it.Path));
         }
         private int GetSort(string name)
         {

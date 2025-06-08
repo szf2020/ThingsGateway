@@ -12,7 +12,7 @@
                 csharpTypeName = "short";
             if (string.Equals(csharpTypeName, "int64", StringComparison.OrdinalIgnoreCase))
                 csharpTypeName = "long";
-            if (csharpTypeName.ToLower().IsIn("boolean", "bool"))
+            if (csharpTypeName.IsInCase("boolean", "bool"))
                 csharpTypeName = "bool";
             if (csharpTypeName == "DateTimeOffset")
                 csharpTypeName = "DateTime";

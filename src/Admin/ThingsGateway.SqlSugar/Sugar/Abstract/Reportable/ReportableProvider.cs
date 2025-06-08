@@ -130,7 +130,7 @@ namespace SqlSugar
         {
             get
             {
-                var isDual = queryBuilder.Builder.FullSqlDateNow?.ToLower()?.Contains(" dual") == true;
+                var isDual = queryBuilder.Builder.FullSqlDateNow?.Contains(" dual", StringComparison.OrdinalIgnoreCase) == true;
                 if (isDual)
                 {
                     return " from dual ";

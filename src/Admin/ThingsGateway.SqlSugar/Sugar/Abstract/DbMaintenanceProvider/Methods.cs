@@ -397,11 +397,11 @@ namespace SqlSugar
         }
         public virtual object GetDefaultValue(DbColumnInfo columnInfo, object value)
         {
-            if (columnInfo.DataType.ObjToString().ToLower().IsIn("varchar", "nvarchar", "varchar2", "nvarchar2") && !string.IsNullOrEmpty(columnInfo.DefaultValue) && Regex.IsMatch(columnInfo.DefaultValue, @"^\w+$"))
+            if (columnInfo.DataType.ObjToString().IsInCase("varchar", "nvarchar", "varchar2", "nvarchar2") && !string.IsNullOrEmpty(columnInfo.DefaultValue) && Regex.IsMatch(columnInfo.DefaultValue, @"^\w+$"))
             {
                 value = columnInfo.DefaultValue;
             }
-            else if (columnInfo.DataType.ObjToString().ToLower().IsIn("float", "double", "decimal", "int", "int4", "bigint", "int8", "int2") && columnInfo.DefaultValue.IsInt())
+            else if (columnInfo.DataType.ObjToString().IsInCase("float", "double", "decimal", "int", "int4", "bigint", "int8", "int2") && columnInfo.DefaultValue.IsInt())
             {
                 value = Convert.ToInt32(columnInfo.DefaultValue);
             }

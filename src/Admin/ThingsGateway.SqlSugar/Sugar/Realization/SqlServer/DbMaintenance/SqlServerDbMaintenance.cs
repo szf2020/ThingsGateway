@@ -364,7 +364,7 @@ namespace SqlSugar
                 var checks = this.Context.Ado.SqlQuery<string>(sql);
                 foreach (var checkName in checks)
                 {
-                    if (checkName?.ToUpper()?.StartsWith("DF__") == true)
+                    if (checkName?.StartsWith("DF__", StringComparison.OrdinalIgnoreCase) == true)
                     {
                         this.Context.Ado.ExecuteCommand($"ALTER TABLE {SqlBuilder.GetTranslationColumnName(tableName)} DROP CONSTRAINT {checkName}");
                     }
@@ -759,7 +759,7 @@ AND syscomments.text LIKE '%" + tableName + "%'");
                     x.DataType = $"{x.DataType}(max)";
                 }
             }
-            else if (array.Contains(x.DataType?.ToLower()))
+            else if (array.Contains(x.DataType, StringComparer.OrdinalIgnoreCase))
             {
                 x.Length = 0;
                 x.DecimalDigits = 0;

@@ -82,7 +82,7 @@ namespace SqlSugar
                 foreach (DataColumn column in result.Columns)
                 {
 
-                    if (dt.Columns.Cast<DataColumn>().Select(it => it.ColumnName.ToLower()).Contains(column.ColumnName.ToLower()))
+                    if (dt.Columns.Cast<DataColumn>().Select(it => it.ColumnName).Contains(column.ColumnName, StringComparer.OrdinalIgnoreCase))
                     {
                         dr[column.ColumnName] = item[column.ColumnName];
                         if (dr[column.ColumnName] == null)

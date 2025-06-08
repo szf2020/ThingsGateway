@@ -341,7 +341,7 @@ WHERE table_name = '" + tableName + "'");
             {
                 defaultValue = "";
             }
-            if (defaultValue.ToLower().IsIn("sysdate"))
+            if (defaultValue.IsInCase("sysdate"))
             {
                 var template = AddDefaultValueSql.Replace("'", "");
                 string sql = string.Format(template, tableName, columnName, defaultValue);
@@ -613,7 +613,7 @@ WHERE table_name = '" + tableName + "'");
         }
         public override bool IsAnyTable(string tableName, bool isCache = true)
         {
-            var isSchema = this.Context.CurrentConnectionConfig?.ConnectionString?.Replace(" ", "")?.ToLower()?.Contains("schema=") == true;
+            var isSchema = this.Context.CurrentConnectionConfig?.ConnectionString?.Replace(" ", "")?.Contains("schema=", StringComparison.OrdinalIgnoreCase) == true;
             if (isSchema)
             {
                 var schema = ExtractSchema(this.Context.CurrentConnectionConfig?.ConnectionString);
@@ -654,12 +654,12 @@ WHERE upper(t.TABLE_NAME) = upper('{tableName}')
             {
                 x.DataType = x.OracleDataType;
             }
-            if (array.Contains(x.DataType?.ToLower()))
+            if (array.Contains(x.DataType, StringComparer.OrdinalIgnoreCase))
             {
                 x.Length = 0;
                 x.DecimalDigits = 0;
             }
-            if (x.DecimalDigits > 0 && x.DataType?.ToLower()?.IsIn("varchar", "clob", "varchar2", "nvarchar2", "nvarchar") == true)
+            if (x.DecimalDigits > 0 && x.DataType?.IsInCase("varchar", "clob", "varchar2", "nvarchar2", "nvarchar") == true)
             {
                 x.DecimalDigits = 0;
             }

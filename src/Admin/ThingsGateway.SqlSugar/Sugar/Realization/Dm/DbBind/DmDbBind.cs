@@ -18,7 +18,7 @@
                 csharpTypeName = "short";
             if (csharpTypeName.Equals("uint64", StringComparison.CurrentCultureIgnoreCase))
                 csharpTypeName = "long";
-            if (csharpTypeName.ToLower().IsIn("boolean", "bool"))
+            if (csharpTypeName.IsInCase("boolean", "bool"))
                 csharpTypeName = "bool";
             if (csharpTypeName == "Guid")
                 csharpTypeName = "string";

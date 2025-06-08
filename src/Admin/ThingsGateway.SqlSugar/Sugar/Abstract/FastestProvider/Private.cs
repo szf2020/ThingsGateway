@@ -294,8 +294,8 @@ namespace SqlSugar
                     uInt64TypeName.Add(item.ColumnName);
                 }
             }
-            var temColumnsList = tempDataTable.Columns.Cast<DataColumn>().Select(it => it.ColumnName.ToLower()).ToList();
-            var columns = dt.Columns.Cast<DataColumn>().Where(it => temColumnsList.Contains(it.ColumnName.ToLower())).ToList();
+            var temColumnsList = tempDataTable.Columns.Cast<DataColumn>().Select(it => it.ColumnName).ToHashSet(StringComparer.OrdinalIgnoreCase);
+            var columns = dt.Columns.Cast<DataColumn>().Where(it => temColumnsList.Contains(it.ColumnName, StringComparer.OrdinalIgnoreCase)).ToList();
             foreach (DataRow item in dt.Rows)
             {
                 DataRow dr = tempDataTable.NewRow();

@@ -95,7 +95,7 @@ namespace SqlSugar
             var parvalue = Regex.Match(valueString, @"\@s\:(.+)").Groups[1].Value;
             if (parvalue == null) parvalue = "";
             parvalue = parvalue.Trim();
-            if (parvalue.ToLower().IsIn(SqlSplicingOperator))
+            if (parvalue.IsInCase(SqlSplicingOperator))
             {
                 return parvalue;
             }

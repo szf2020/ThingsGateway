@@ -1578,7 +1578,7 @@ namespace SqlSugar
                             parameter.DbType = itemParameter.DbType;
                             if (repeatCount > 500 || (isParameterNameRepeat && repeatList.Any(it => it.Key.EqualCase(itemParameter.ParameterName))))
                             {
-                                if (newName.StartsWith(':') && itemSql.Contains(itemParameter.ParameterName.ToLower().Replace(":", "@"), StringComparison.CurrentCultureIgnoreCase))
+                                if (newName.StartsWith(':') && itemSql.Contains(itemParameter.ParameterName.Replace(":", "@"), StringComparison.CurrentCultureIgnoreCase))
                                 {
                                     itemParameter.ParameterName = itemParameter.ParameterName.Replace(":", "@");
                                 }
@@ -1657,7 +1657,7 @@ namespace SqlSugar
                             parameter.DbType = itemParameter.DbType;
                             if (repeatCount > 500 || (isParameterNameRepeat && repeatList.Any(it => it.Key.EqualCase(itemParameter.ParameterName))))
                             {
-                                if (newName.StartsWith(':') && itemSql.Contains(itemParameter.ParameterName.ToLower().Replace(":", "@"), StringComparison.CurrentCultureIgnoreCase))
+                                if (newName.StartsWith(':') && itemSql.Contains(itemParameter.ParameterName.Replace(":", "@"), StringComparison.CurrentCultureIgnoreCase))
                                 {
                                     itemParameter.ParameterName = itemParameter.ParameterName.Replace(":", "@");
                                 }

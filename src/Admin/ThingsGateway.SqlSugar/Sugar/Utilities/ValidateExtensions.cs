@@ -17,7 +17,10 @@ namespace SqlSugar
         {
             return values.Contains(thisValue);
         }
-
+        public static bool IsInCase(this string thisValue, params string[] values)
+        {
+            return values.Contains(thisValue, StringComparer.OrdinalIgnoreCase);
+        }
         public static bool IsContainsIn(this string thisValue, params char[] inValues)
         {
             return inValues.Any(it => thisValue.Contains(it));
@@ -26,9 +29,13 @@ namespace SqlSugar
         {
             return inValues.Any(it => thisValue.Contains(it));
         }
-        public static bool IsContainsStartWithIn(this string thisValue, params string[] inValues)
+        public static bool IsContainsInCase(this string thisValue, params string[] inValues)
         {
-            return inValues.Any(it => thisValue.StartsWith(it));
+            return inValues.Any(it => thisValue.Contains(it, StringComparison.OrdinalIgnoreCase));
+        }
+        public static bool IsContainsStartWithInCase(this string thisValue, params string[] inValues)
+        {
+            return inValues.Any(it => thisValue.StartsWith(it, StringComparison.OrdinalIgnoreCase));
         }
 
         public static bool IsNullOrEmpty(this object thisValue)

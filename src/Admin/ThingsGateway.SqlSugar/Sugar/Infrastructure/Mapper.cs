@@ -46,7 +46,7 @@ namespace SqlSugar
                          };
                         return new { it, array };
                     }).ToList();
-                    var columnInfo = list.FirstOrDefault(y => y.array.Select(z => z.ToLower()).Contains(viewColumns.PropertyName.ToLower()));
+                    var columnInfo = list.FirstOrDefault(y => y.array.Contains(viewColumns.PropertyName, StringComparer.OrdinalIgnoreCase));
                     if (columnInfo != null)
                     {
                         JoinMapper joinMapper = new JoinMapper()

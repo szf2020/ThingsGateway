@@ -718,7 +718,7 @@ namespace SqlSugar
                         info = readerValues.Select(it => it.Key).FirstOrDefault(it => it.Equals(key, StringComparison.CurrentCultureIgnoreCase));
                         if (info == null)
                         {
-                            info = readerValues.Select(it => it.Key).FirstOrDefault(it => it.ToLower().EndsWith("." + key.ToLower()));
+                            info = readerValues.Select(it => it.Key).FirstOrDefault(it => it.EndsWith($".{key}", StringComparison.OrdinalIgnoreCase));
                         }
                     }
                     var oldInfo = info;
@@ -787,7 +787,7 @@ namespace SqlSugar
 
         private void Json(Dictionary<string, object> readerValues, Dictionary<string, object> result, string name, string typeName, string shortName = null, PropertyInfo item = null)
         {
-            var key = (typeName + "." + name).ToLower();
+            var key = (typeName + "." + name);
             if (readerValues.Any(it => it.Key.EqualCase(key)))
             {
                 var jsonString = readerValues.First(it => it.Key.EqualCase(key)).Value;
@@ -795,7 +795,7 @@ namespace SqlSugar
             }
             else
             {
-                key = (shortName + "." + typeName + "." + name).ToLower();
+                key = (shortName + "." + typeName + "." + name);
                 if (readerValues.Any(it => it.Key.EqualCase(key)))
                 {
                     var jsonString = readerValues.First(it => it.Key.EqualCase(key)).Value;
@@ -814,7 +814,7 @@ namespace SqlSugar
         }
         private void Json(Dictionary<string, object> readerValues, Dictionary<string, object> result, string name, string typeName, PropertyInfo item)
         {
-            var key = (typeName + "." + name).ToLower();
+            var key = (typeName + "." + name);
             if (readerValues.Any(it => it.Key.EqualCase(key)))
             {
                 var jsonString = readerValues.First(it => it.Key.EqualCase(key)).Value;
@@ -822,7 +822,7 @@ namespace SqlSugar
             }
             else
             {
-                key = (item.Name + "." + name).ToLower();
+                key = (item.Name + "." + name);
                 if (readerValues.Any(it => it.Key.EqualCase(key)))
                 {
                     var jsonString = readerValues.First(it => it.Key.EqualCase(key)).Value;

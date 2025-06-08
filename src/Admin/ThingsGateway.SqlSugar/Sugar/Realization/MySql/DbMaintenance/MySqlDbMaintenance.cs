@@ -402,7 +402,7 @@ WHERE EVENT_OBJECT_TABLE = '" + tableName + "'");
         public override bool CreateDatabase(string databaseName, string databaseDirectory = null)
         {
 
-            if (this.Context.Ado.IsValidConnection() && this.Context.Ado.Connection.Database?.ToLower() == databaseName?.ToLower())
+            if (this.Context.Ado.IsValidConnection() && this.Context.Ado.Connection.Database.EqualCase(databaseName))
             {
                 return true;
             }
@@ -679,7 +679,7 @@ WHERE EVENT_OBJECT_TABLE = '" + tableName + "'");
             {
                 defaultValue = "";
             }
-            if (defaultValue.ToLower().IsIn("null", "now()", "current_timestamp") || defaultValue.Contains("current_timestamp", StringComparison.CurrentCultureIgnoreCase) || defaultValue.Contains("()"))
+            if (defaultValue.IsInCase("null", "now()", "current_timestamp") || defaultValue.Contains("current_timestamp", StringComparison.CurrentCultureIgnoreCase) || defaultValue.Contains("()"))
             {
                 defaultValue = "(" + defaultValue + ")";
                 string sql = string.Format(AddDefaultValueSql.Replace("'", ""), tableName, columnName, defaultValue);
@@ -799,7 +799,7 @@ WHERE EVENT_OBJECT_TABLE = '" + tableName + "'");
                     x.DataType = $"{x.DataType}(255)"; // 设置默认长度为 255，你可以根据需要修改
                 }
             }
-            else if (array.Contains(x.DataType?.ToLower()))
+            else if (array.Contains(x.DataType, StringComparer.OrdinalIgnoreCase))
             {
                 x.Length = 0;
                 x.DecimalDigits = 0;

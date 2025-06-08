@@ -162,7 +162,7 @@ namespace SqlSugar
 
 
 
-                    if (dt.Columns.Cast<DataColumn>().Select(it => it.ColumnName.ToLower()).Contains(column.ColumnName.ToLower()))
+                    if (dt.Columns.Cast<DataColumn>().Select(it => it.ColumnName).Contains(column.ColumnName, StringComparer.OrdinalIgnoreCase))
 
                     {
 

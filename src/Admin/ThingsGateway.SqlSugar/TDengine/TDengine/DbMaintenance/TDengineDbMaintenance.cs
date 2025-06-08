@@ -385,11 +385,11 @@ namespace SqlSugar.TDengine
                 //{
                 //    dataType = $"DOUBLE(18,4)";
                 //}
-                if (item.Length == 0 && dataType?.ToLower()?.IsIn("nchar", "varchar") == true)
+                if (item.Length == 0 && dataType?.IsInCase("nchar", "varchar") == true)
                 {
                     dataType = "VARCHAR(200)";
                 }
-                if (dataType?.ToLower()?.IsIn("float", "double") == true)
+                if (dataType?.IsInCase("float", "double") == true)
                 {
                     dataSize = null;
                 }

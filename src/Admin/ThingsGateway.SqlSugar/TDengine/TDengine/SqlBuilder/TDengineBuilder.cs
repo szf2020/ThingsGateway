@@ -116,7 +116,7 @@
         {
             if (tableName != null)
                 tableName = tableName.Trim();
-            var columnInfo = this.Context.DbMaintenance.GetColumnInfosByTableName(tableName).FirstOrDefault(z => z.DbColumnName?.ToLower() == columnName?.ToLower());
+            var columnInfo = this.Context.DbMaintenance.GetColumnInfosByTableName(tableName).FirstOrDefault(z => z.DbColumnName?.EqualCase(columnName) == true);
             if (columnInfo != null)
             {
                 var cTypeName = this.Context.Ado.DbBind.GetCsharpTypeNameByDbTypeName(columnInfo.DataType);

@@ -198,12 +198,12 @@ namespace SqlSugar
         private static string ReplaceKeyWordParameterName(string sql, SugarParameter[] parameters)
         {
             sql = ReplaceKeyWordWithAd(sql, parameters);
-            if (parameters.HasValue() && parameters.Any(it => it.ParameterName.ToLower().IsIn(KeyWord)))
+            if (parameters.HasValue() && parameters.Any(it => it.ParameterName.IsInCase(KeyWord)))
             {
                 int i = 0;
                 foreach (var Parameter in parameters.OrderByDescending(it => it.ParameterName.Length))
                 {
-                    if (Parameter.ParameterName?.ToLower().IsContainsIn(KeyWord) == true)
+                    if (Parameter.ParameterName?.IsContainsInCase(KeyWord) == true)
                     {
                         var newName = ":p" + i + 100;
                         sql = Regex.Replace(sql, Parameter.ParameterName, newName, RegexOptions.IgnoreCase);

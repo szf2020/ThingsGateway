@@ -1598,7 +1598,7 @@ namespace SqlSugar
                     }
                 }
                 var selects = this.QueryBuilder.GetSelectValueByString();
-                if (selects.ObjToString().ToLower().IsContainsIn(".", "(", " as "))
+                if (selects.ObjToString().IsContainsInCase(".", "(", " as "))
                 {
                     return this.Select<TResult>(selects);
                 }

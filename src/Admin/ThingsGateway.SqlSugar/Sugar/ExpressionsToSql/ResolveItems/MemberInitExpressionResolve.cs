@@ -297,9 +297,7 @@ namespace SqlSugar
                         else
                         {
                             var p = (base.BaseParameter?.BaseParameter?.CurrentExpression as LambdaExpression)?.Parameters[0].Name;
-                            subSql = subSql.Replace(this.Context.SqlTranslationLeft + p + this.Context.SqlTranslationRight + ".", name + ".");
-                            subSql = subSql.Replace(this.Context.SqlTranslationLeft + p.ToUpper() + this.Context.SqlTranslationRight + ".", name + ".");
-                            subSql = subSql.Replace(this.Context.SqlTranslationLeft + p.ToLower() + this.Context.SqlTranslationRight + ".", name + ".");
+                            subSql = subSql.Replace(this.Context.SqlTranslationLeft + p + this.Context.SqlTranslationRight + ".", name + ".", StringComparison.OrdinalIgnoreCase);
                         }
                     }
                     parameter.Context.Result.Append(subSql);

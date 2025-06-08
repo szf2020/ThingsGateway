@@ -42,14 +42,25 @@ namespace SqlSugar
 
         private string GetOracleUpdateColumns(DbColumnInfo m, bool isWhere = false)
         {
+            var sb = new StringBuilder();
 
-            var result = string.Format("\"{0}\"={1} ", m.DbColumnName.ToUpper(IsUppper), base.GetDbColumn(m, FormatValue(m.Value, m.IsPrimarykey, m.PropertyName)));
+            sb.Append('"');
+            sb.Append(IsUppper ? m.DbColumnName.ToUpper() : m.DbColumnName);
+            sb.Append('"');
+            sb.Append('=');
+
+            sb.Append(base.GetDbColumn(m, FormatValue(m.Value, m.IsPrimarykey, m.PropertyName)));
+            sb.Append(' ');
+
+
             if (isWhere && m.Value == null)
             {
-                result = result.Replace("=NULL ", " is NULL ");
+                sb.Replace("=NULL ", " is NULL ");
             }
-            return result;
+
+            return sb.ToString();
         }
+
         int i = 0;
         public object FormatValue(object value, bool isPrimaryKey, string name)
         {

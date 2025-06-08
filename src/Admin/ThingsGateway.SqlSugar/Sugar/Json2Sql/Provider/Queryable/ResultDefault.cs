@@ -26,7 +26,7 @@ namespace SqlSugar
         {
             var result = this.jobject.AsJEnumerable().ToList();
             result.Add(JToken.Parse("{JoinLastAfter:null}").First());
-            result = result.OrderBy(it => GetSort(it.Path.ToLower())).ToList();
+            result = result.OrderBy(it => GetSort(it.Path)).ToList();
             return result;
         }
 
