@@ -7,7 +7,6 @@ namespace SqlSugar
     /// </summary>
     public partial class SqlSugarScope : ISqlSugarClient, ITenant
     {
-
         private List<ConnectionConfig> _configs;
         private Action<SqlSugarClient> _configAction;
 
@@ -15,25 +14,25 @@ namespace SqlSugar
         {
             SqlSugarClient result = null;
             var key = _configs.GetHashCode().ToString();
-            StackTrace st = new StackTrace(true);
+            StackTrace st = new StackTrace(false);
             var methods = st.GetFrames();
             var isAsync = UtilMethods.IsAnyAsyncMethod(methods);
-            if (methods?.Length >= 0)
-            {
-                foreach (var method in methods.Take(35))
-                {
-                    var refType = method.GetMethod()?.ReflectedType;
-                    if (refType != null)
-                    {
-                        var getInterfaces = refType.Name.StartsWith('<') ? refType?.ReflectedType?.GetInterfaces() : refType?.GetInterfaces();
-                        if (getInterfaces?.Any(it => it.Name.IsIn("IJob")) == true)
-                        {
-                            key = $"{key}IJob";
-                            break;
-                        }
-                    }
-                }
-            }
+            //if (methods?.Length >= 0)
+            //{
+            //    foreach (var method in methods.Take(35))
+            //    {
+            //        var refType = method.GetMethod()?.ReflectedType;
+            //        if (refType != null)
+            //        {
+            //            var getInterfaces = refType.Name.StartsWith('<') ? refType?.ReflectedType?.GetInterfaces() : refType?.GetInterfaces();
+            //            if (getInterfaces?.Any(it => it.Name.IsIn("IJob")) == true)
+            //            {
+            //                key = $"{key}IJob";
+            //                break;
+            //            }
+            //        }
+            //    }
+            //}
             if (isAsync)
             {
                 result = GetAsyncContext(key);

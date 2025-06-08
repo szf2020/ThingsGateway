@@ -8,7 +8,7 @@ namespace SqlSugar
     public class SqlSugarScopeProvider : ISqlSugarClient
     {
         internal SqlSugarProvider conn;
-        internal string initThreadMainId;
+        internal int initThreadMainId;
         internal string initkey = null;
         StackFrame[] frames;
 
@@ -21,9 +21,9 @@ namespace SqlSugar
             this.GetContext(true);
         }
 
-        private static string GetCurrentThreadId()
+        private static int GetCurrentThreadId()
         {
-            return Environment.CurrentManagedThreadId + "";
+            return Environment.CurrentManagedThreadId;
         }
 
         public SqlSugarProvider ScopedContext { get { return GetContext(); } }
@@ -79,7 +79,7 @@ namespace SqlSugar
         {
             SqlSugarProvider result = null;
             var key = GetKey(); ;
-            StackTrace st = new StackTrace(true);
+            StackTrace st = new StackTrace(false);
             var methods = st.GetFrames();
             var isAsync = UtilMethods.IsAnyAsyncMethod(methods);
             if (isAsync)
@@ -101,24 +101,24 @@ namespace SqlSugar
             var key = "SqlSugarProviderScope_" + conn.CurrentConnectionConfig.ConfigId;
             if (frames == null)
             {
-                frames = new StackTrace(true).GetFrames();
+                frames = new StackTrace(false).GetFrames();
             }
-            if (true)
-            {
-                foreach (var method in frames.Take(35))
-                {
-                    var refType = method.GetMethod()?.ReflectedType;
-                    if (refType != null)
-                    {
-                        var getInterfaces = refType.Name.StartsWith('<') ? refType?.ReflectedType?.GetInterfaces() : refType?.GetInterfaces();
-                        if (getInterfaces?.Any(it => it.Name.IsIn("IJob")) == true)
-                        {
-                            key = $"{key}IJob";
-                            break;
-                        }
-                    }
-                }
-            }
+            //if (true)
+            //{
+            //    foreach (var method in frames.Take(35))
+            //    {
+            //        var refType = method.GetMethod()?.ReflectedType;
+            //        if (refType != null)
+            //        {
+            //            var getInterfaces = refType.Name.StartsWith('<') ? refType?.ReflectedType?.GetInterfaces() : refType?.GetInterfaces();
+            //            if (getInterfaces?.Any(it => it.Name.IsIn("IJob")) == true)
+            //            {
+            //                key = $"{key}IJob";
+            //                break;
+            //            }
+            //        }
+            //    }
+            //}
             return key;
         }
 
