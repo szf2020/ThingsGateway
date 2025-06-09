@@ -76,9 +76,9 @@ namespace SqlSugar
             {
                 // 支持标准 SQL LIKE 转义，通常使用中括号 [] 或反斜杠 \ 进行转义
                 case DbType.SqlServer:
-                case DbType.Access:
-                case DbType.Odbc:
-                case DbType.TDSQLForPGODBC:
+                    //case DbType.Access:
+                    //case DbType.Odbc:
+                    //case DbType.TDSQLForPGODBC:
                     // SQL Server 使用中括号转义 %, _ 等
                     var keyLeft = "[[]";
                     var keyRight = "[]]";
@@ -98,7 +98,7 @@ namespace SqlSugar
                 case DbType.OpenGauss:
                 case DbType.TDSQL:
                 case DbType.GaussDB:
-                case DbType.GaussDBNative:
+                //case DbType.GaussDBNative:
                 // MySQL 和兼容库，使用反斜杠进行转义
                 case DbType.MySql:
                 case DbType.MySqlConnector:
@@ -106,18 +106,18 @@ namespace SqlSugar
                 case DbType.PolarDB:
                 case DbType.OceanBase:
                 case DbType.Oracle:
-                case DbType.OceanBaseForOracle:
-                case DbType.HG:
+                //case DbType.OceanBaseForOracle:
+                //case DbType.HG:
                 case DbType.Dm:
-                case DbType.GBase:
-                case DbType.DB2:
-                case DbType.HANA:
+                //case DbType.GBase:
+                //case DbType.DB2:
+                //case DbType.HANA:
                 case DbType.GoldenDB:
                 case DbType.Sqlite:
-                case DbType.DuckDB:
+                //case DbType.DuckDB:
                 case DbType.QuestDB:
                 case DbType.Doris:
-                case DbType.Xugu:
+                //case DbType.Xugu:
                 case DbType.Vastbase:
                 default:
                     value = value

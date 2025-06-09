@@ -31,10 +31,10 @@ namespace SqlSugar
                     var result3 = new DmFastBuilder();
                     result3.DbFastestProperties.IsOffIdentity = this.IsOffIdentity;
                     return result3;
-                case DbType.ClickHouse:
-                    var resultConnectorClickHouse = InstanceFactory.CreateInstance<IFastBuilder>("SqlSugar.ClickHouse.ClickHouseFastBuilder");
-                    resultConnectorClickHouse.CharacterSet = this.CharacterSet;
-                    return resultConnectorClickHouse;
+                //case DbType.ClickHouse:
+                //    var resultConnectorClickHouse = InstanceFactory.CreateInstance<IFastBuilder>("SqlSugar.ClickHouse.ClickHouseFastBuilder");
+                //    resultConnectorClickHouse.CharacterSet = this.CharacterSet;
+                //    return resultConnectorClickHouse;
                 //case DbType.Kdbndp:
                 //    break;
                 //case DbType.Oscar:
@@ -44,9 +44,9 @@ namespace SqlSugar
                 case DbType.Custom:
                     className = InstanceFactory.CustomNamespace + "." + InstanceFactory.CustomDbName + "FastBuilder";
                     break;
-                case DbType.GaussDBNative:
-                    className = "SqlSugar.GaussDB.GaussDBFastBuilder";
-                    break;
+                //case DbType.GaussDBNative:
+                //    className = "SqlSugar.GaussDB.GaussDBFastBuilder";
+                //    break;
                 default:
                     className = $"SqlSugar.{this.context.CurrentConnectionConfig.DbType.ToString().Replace("Native", "")}FastBuilder";
                     break;

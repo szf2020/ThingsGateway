@@ -373,13 +373,13 @@ namespace SqlSugar
             return currentConnectionConfig.DbType != DbType.SqlServer &&
                             currentConnectionConfig.DbType != DbType.Dm &&
                             currentConnectionConfig.DbType != DbType.Oscar &&
-                            currentConnectionConfig.DbType != DbType.Access &&
+                            //currentConnectionConfig.DbType != DbType.Access &&
                             currentConnectionConfig.DbType != DbType.QuestDB &&
                             currentConnectionConfig.DbType != DbType.MySql &&
                             currentConnectionConfig.DbType != DbType.Oracle &&
                             currentConnectionConfig.DbType != DbType.PostgreSQL &&
-                            currentConnectionConfig.DbType != DbType.ClickHouse &&
-                            currentConnectionConfig.DbType != DbType.GBase &&
+                            //currentConnectionConfig.DbType != DbType.ClickHouse &&
+                            //currentConnectionConfig.DbType != DbType.GBase &&
                             currentConnectionConfig.DbType != DbType.Sqlite &&
                             GetCustomTypeByClass("SqlSugar." + currentConnectionConfig.DbType + "." + currentConnectionConfig.DbType + "Provider") != null;
 
@@ -724,6 +724,11 @@ namespace SqlSugar
                     break;
                 }
             }
+            if (type == null)
+            {
+                type = assembly.GetType(className);
+            }
+
             return type;
         }
         internal static Type GetCustomTypeByClass(string className, string customDllName)

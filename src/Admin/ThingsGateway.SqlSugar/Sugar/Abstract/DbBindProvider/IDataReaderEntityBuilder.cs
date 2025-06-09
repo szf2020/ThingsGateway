@@ -376,8 +376,8 @@ namespace SqlSugar
                         method = isNullableType ? getConvertInt16 : getInt16;
                     if (bindProperyTypeName == "uint32" && this.Context.CurrentConnectionConfig.DbType.IsIn(DbType.MySql, DbType.MySqlConnector))
                         method = null;
-                    if (bindPropertyType == UtilConstants.IntType && this.Context.CurrentConnectionConfig.DbType == DbType.OceanBaseForOracle)
-                        method = isNullableType ? getMyIntNull : getMyInt;
+                    //if (bindPropertyType == UtilConstants.IntType && this.Context.CurrentConnectionConfig.DbType == DbType.OceanBaseForOracle)
+                    //    method = isNullableType ? getMyIntNull : getMyInt;
                     if (bindProperyTypeName == "int16")
                         method = null;
                     break;

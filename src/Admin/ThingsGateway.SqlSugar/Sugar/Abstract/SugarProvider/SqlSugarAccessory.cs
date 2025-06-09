@@ -445,9 +445,9 @@ namespace SqlSugar
                         this.CurrentConnectionConfig.MoreSettings = new ConnMoreSettings();
                     this.CurrentConnectionConfig.MoreSettings.DatabaseModel = DbType.OpenGauss;
                     break;
-                case DbType.HG:
-                    InstanceFactory.CustomDllName = SugarCompatible.IsFramework ? throw new Exception("Only.NET CORE is supported") : "SqlSugar.HGCore";
-                    break;
+                //case DbType.HG:
+                //    InstanceFactory.CustomDllName = SugarCompatible.IsFramework ? throw new Exception("Only.NET CORE is supported") : "SqlSugar.HGCore";
+                //    break;
                 case DbType.Kdbndp:
                     DependencyManagement.TryKdbndb();
                     break;
@@ -457,17 +457,17 @@ namespace SqlSugar
                 case DbType.Oscar:
                     DependencyManagement.TryOscar();
                     break;
-                case DbType.MySqlConnector:
-                    InstanceFactory.CustomDllName = SugarCompatible.IsFramework ? "SqlSugar.MySqlConnector" : "SqlSugar.MySqlConnectorCore";
-                    if (SugarCompatible.IsFramework.ObjToBool() == false)
-                    {
-                        config.DbType = DbType.MySql;
-                        InstanceFactory.CustomDllName = null;
-                    }
-                    break;
-                case DbType.Access:
-                    InstanceFactory.CustomDllName = SugarCompatible.IsFramework ? "SqlSugar.Access" : "SqlSugar.AccessCore";
-                    break;
+                //case DbType.MySqlConnector:
+                //    InstanceFactory.CustomDllName = SugarCompatible.IsFramework ? "SqlSugar.MySqlConnector" : "SqlSugar.MySqlConnectorCore";
+                //    if (SugarCompatible.IsFramework.ObjToBool() == false)
+                //    {
+                //        config.DbType = DbType.MySql;
+                //        InstanceFactory.CustomDllName = null;
+                //    }
+                //    break;
+                //case DbType.Access:
+                //    InstanceFactory.CustomDllName = SugarCompatible.IsFramework ? "SqlSugar.Access" : "SqlSugar.AccessCore";
+                //    break;
                 case DbType.Custom:
                     Check.Exception(InstanceFactory.CustomDbName.IsNullOrEmpty(), "DbType.Custom: InstanceFactory.CustomDbName is not null  ");
                     Check.Exception(InstanceFactory.CustomNamespace.IsNullOrEmpty(), "DbType.Custom: InstanceFactory.CustomNamespace is not null  ");
@@ -476,25 +476,25 @@ namespace SqlSugar
                 case DbType.QuestDB:
                     DependencyManagement.TryPostgreSQL();
                     break;
-                case DbType.ClickHouse:
-                    Check.Exception(SugarCompatible.IsFramework, "ClickHouse only support .net core");
-                    InstanceFactory.CustomDllName = SugarCompatible.IsFramework ? "SqlSugar.ClickHouse" : "SqlSugar.ClickHouseCore";
-                    break;
-                case DbType.GBase:
-                    Check.Exception(SugarCompatible.IsFramework, "GBase only support .net core");
-                    InstanceFactory.CustomDllName = SugarCompatible.IsFramework ? "SqlSugar.GBase" : "SqlSugar.GBaseCore";
-                    break;
-                case DbType.Odbc:
-                    InstanceFactory.CustomDllName = SugarCompatible.IsFramework ? "SqlSugar.Odbc" : "SqlSugar.OdbcCore";
-                    break;
-                case DbType.OceanBaseForOracle:
-                    Check.Exception(SugarCompatible.IsFramework, "OceanBaseForOracle only support .net core");
-                    InstanceFactory.CustomDllName = SugarCompatible.IsFramework ? "SqlSugar.OceanBaseForOracle" : "SqlSugar.OceanBaseForOracleCore";
-                    break;
-                case DbType.TDSQLForPGODBC:
-                    Check.Exception(SugarCompatible.IsFramework, "TDSQLForPGODBC only support .net core");
-                    InstanceFactory.CustomDllName = SugarCompatible.IsFramework ? "SqlSugar.TDSQLForPGODBC" : "SqlSugar.TDSQLForPGODBC";
-                    break;
+                //case DbType.ClickHouse:
+                //    Check.Exception(SugarCompatible.IsFramework, "ClickHouse only support .net core");
+                //    InstanceFactory.CustomDllName = SugarCompatible.IsFramework ? "SqlSugar.ClickHouse" : "SqlSugar.ClickHouseCore";
+                //    break;
+                //case DbType.GBase:
+                //    Check.Exception(SugarCompatible.IsFramework, "GBase only support .net core");
+                //    InstanceFactory.CustomDllName = SugarCompatible.IsFramework ? "SqlSugar.GBase" : "SqlSugar.GBaseCore";
+                //    break;
+                //case DbType.Odbc:
+                //    InstanceFactory.CustomDllName = SugarCompatible.IsFramework ? "SqlSugar.Odbc" : "SqlSugar.OdbcCore";
+                //    break;
+                //case DbType.OceanBaseForOracle:
+                //    Check.Exception(SugarCompatible.IsFramework, "OceanBaseForOracle only support .net core");
+                //    InstanceFactory.CustomDllName = SugarCompatible.IsFramework ? "SqlSugar.OceanBaseForOracle" : "SqlSugar.OceanBaseForOracleCore";
+                //    break;
+                //case DbType.TDSQLForPGODBC:
+                //    Check.Exception(SugarCompatible.IsFramework, "TDSQLForPGODBC only support .net core");
+                //    InstanceFactory.CustomDllName = SugarCompatible.IsFramework ? "SqlSugar.TDSQLForPGODBC" : "SqlSugar.TDSQLForPGODBC";
+                //    break;
                 case DbType.GaussDB:
                     config.DbType = DbType.PostgreSQL;
                     if (this.CurrentConnectionConfig.MoreSettings == null)
@@ -530,36 +530,37 @@ namespace SqlSugar
                     this.CurrentConnectionConfig.MoreSettings.DisableNvarchar = true;
                     break;
                 case DbType.TDengine:
-                    Check.Exception(SugarCompatible.IsFramework, "TDengine only support .net core");
-                    InstanceFactory.CustomDllName = SugarCompatible.IsFramework ? "SqlSugar.TDengine" : "SqlSugar.TDengineCore";
+                    config.DbType = DbType.TDengine;
+                    //Check.Exception(SugarCompatible.IsFramework, "TDengine only support .net core");
+                    //InstanceFactory.CustomDllName = SugarCompatible.IsFramework ? "SqlSugar.TDengine" : "SqlSugar.TDengineCore";
                     break;
-                case DbType.HANA:
-                    Check.Exception(SugarCompatible.IsFramework, "NANA only support .net core");
-                    InstanceFactory.CustomDllName = "SqlSugar.HANAConnector";
-                    break;
-                case DbType.Xugu:
-                    Check.Exception(SugarCompatible.IsFramework, "Xugu only support .net core");
-                    //InstanceFactory.CustomDbName = "Xugu"; 
-                    InstanceFactory.CustomDllName = "SqlSugar.XuguCore";
-                    //InstanceFactory.CustomNamespace = "SqlSugar.Xugu"; 
-                    break;
+                //case DbType.HANA:
+                //    Check.Exception(SugarCompatible.IsFramework, "NANA only support .net core");
+                //    InstanceFactory.CustomDllName = "SqlSugar.HANAConnector";
+                //    break;
+                //case DbType.Xugu:
+                //    Check.Exception(SugarCompatible.IsFramework, "Xugu only support .net core");
+                //    //InstanceFactory.CustomDbName = "Xugu"; 
+                //    InstanceFactory.CustomDllName = "SqlSugar.XuguCore";
+                //    //InstanceFactory.CustomNamespace = "SqlSugar.Xugu"; 
+                //    break;
                 case DbType.GoldenDB:
                     config.DbType = DbType.MySql;
                     break;
-                case DbType.DB2:
-                    Check.Exception(SugarCompatible.IsFramework, "Db2 only support .net core");
-                    InstanceFactory.CustomDllName = "SqlSugar.Db2Core";
-                    break;
-                case DbType.GaussDBNative:
-                    Check.Exception(SugarCompatible.IsFramework, "GaussDBNative only support .net core");
-                    InstanceFactory.CustomDllName = "SqlSugar.GaussDBCore";
-                    break;
-                case DbType.DuckDB:
-                    InstanceFactory.CustomDllName = SugarCompatible.IsFramework ? throw new Exception("Only.NET CORE is supported") : "SqlSugar.DuckDBCore";
-                    break;
-                case DbType.MongoDb:
-                    InstanceFactory.CustomDllName = SugarCompatible.IsFramework ? throw new Exception("Only.NET CORE is supported") : "SqlSugar.MongoDbCore";
-                    break;
+                //case DbType.DB2:
+                //    Check.Exception(SugarCompatible.IsFramework, "Db2 only support .net core");
+                //    InstanceFactory.CustomDllName = "SqlSugar.Db2Core";
+                //    break;
+                //case DbType.GaussDBNative:
+                //    Check.Exception(SugarCompatible.IsFramework, "GaussDBNative only support .net core");
+                //    InstanceFactory.CustomDllName = "SqlSugar.GaussDBCore";
+                //    break;
+                //case DbType.DuckDB:
+                //    InstanceFactory.CustomDllName = SugarCompatible.IsFramework ? throw new Exception("Only.NET CORE is supported") : "SqlSugar.DuckDBCore";
+                //    break;
+                //case DbType.MongoDb:
+                //    InstanceFactory.CustomDllName = SugarCompatible.IsFramework ? throw new Exception("Only.NET CORE is supported") : "SqlSugar.MongoDbCore";
+                //    break;
                 default:
                     throw new Exception("ConnectionConfig.DbType is null");
             }

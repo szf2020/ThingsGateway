@@ -51,7 +51,6 @@ public class SingleFilePublish : ISingleFilePublish
             "ThingsGateway.Foundation.Razor",
             "ThingsGateway.Gateway.Application",
             "ThingsGateway.Gateway.Razor"   ,
-            "SqlSugar.TDengineCore",
         ];
     }
 }
