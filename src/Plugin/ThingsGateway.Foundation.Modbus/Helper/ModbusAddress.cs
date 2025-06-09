@@ -50,7 +50,7 @@ public class ModbusAddress : ModbusRequest
     /// <summary>
     /// 读取终止，只用于打包
     /// </summary>
-    public int AddressEnd => (ushort)(StartAddress + Math.Max(Math.Ceiling(Length / 2.0), 1));
+    public int AddressEnd => (ushort)(StartAddress + (IsBitFunction ? Length : Math.Max(Math.Ceiling(Length / 2.0), 1)));
 
     /// <summary>
     /// BitIndex
