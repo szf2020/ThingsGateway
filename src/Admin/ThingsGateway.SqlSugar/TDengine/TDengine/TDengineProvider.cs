@@ -1,8 +1,5 @@
-﻿using SqlSugar.TDengineAdo;
-
-using System.Data;
+﻿using System.Data;
 using System.Data.Common;
-using System.Text.RegularExpressions;
 namespace SqlSugar.TDengine
 {
     public partial class TDengineProvider : AdoProvider
@@ -21,7 +18,7 @@ namespace SqlSugar.TDengine
                     try
                     {
                         var TDengineConnectionString = base.Context.CurrentConnectionConfig.ConnectionString;
-                        TDengineConnectionString = Regex.Replace(TDengineConnectionString, @"\;db\=", ";Database=", RegexOptions.IgnoreCase);
+                        //TDengineConnectionString = Regex.Replace(TDengineConnectionString, @"\;db\=", ";Database=", RegexOptions.IgnoreCase);
                         base._DbConnection = new TDengineConnection(TDengineConnectionString);
                     }
                     catch (Exception)

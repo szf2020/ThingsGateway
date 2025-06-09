@@ -1,6 +1,4 @@
-﻿using SqlSugar.TDengineAdo;
-
-using System.Data;
+﻿using System.Data;
 using System.Data.Common;
 using System.Text;
 

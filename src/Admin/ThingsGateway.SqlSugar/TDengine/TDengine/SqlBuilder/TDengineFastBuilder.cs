@@ -1,7 +1,4 @@
-﻿
-using SqlSugar.TDengineAdo;
-
-using System.Data;
+﻿using System.Data;
 using System.Globalization;
 using System.Text;
 

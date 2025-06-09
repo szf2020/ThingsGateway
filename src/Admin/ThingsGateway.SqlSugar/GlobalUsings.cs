@@ -8,4 +8,6 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
+global using SqlSugar.TDengineAdo;
+
 global using ThingsGateway.NewLife.Extension;

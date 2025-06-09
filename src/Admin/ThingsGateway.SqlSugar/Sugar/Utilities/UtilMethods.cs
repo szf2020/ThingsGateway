@@ -1470,6 +1470,10 @@ namespace SqlSugar
                 CSharpTypeName = ctypename,
                 FieldValue = value
             };
+            if (ctypename == "DateOnly")
+            {
+                return Convert.ToDateTime(value);
+            }
             if (string.IsNullOrEmpty(item.FieldValue) && item.CSharpTypeName.HasValue() && !item.CSharpTypeName.EqualCase("string"))
             {
                 return null;

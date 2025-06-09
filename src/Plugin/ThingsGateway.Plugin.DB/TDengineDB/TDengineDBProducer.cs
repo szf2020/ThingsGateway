@@ -33,7 +33,7 @@ public partial class TDengineDBProducer : BusinessBaseWithCacheIntervalVariableM
     internal readonly RealDBProducerProperty _driverPropertys = new()
     {
         DbType = DbType.TDengine,
-        BigTextConnectStr = "Host=localhost;Port=6030;Username=root;Password=taosdata;Database=power"
+        BigTextConnectStr = "protocol=WebSocket;host=localhost;port=6041;useSSL=false;username=root;password=taosdata;db=power"
     };
     private readonly TDengineDBProducerVariableProperty _variablePropertys = new();
     /// <inheritdoc/>
