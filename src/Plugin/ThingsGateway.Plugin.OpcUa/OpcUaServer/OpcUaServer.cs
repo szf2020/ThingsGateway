@@ -21,6 +21,7 @@ using System.Collections.Concurrent;
 using ThingsGateway.Extension;
 using ThingsGateway.Extension.Generic;
 using ThingsGateway.Gateway.Application;
+using ThingsGateway.NewLife.Extension;
 using ThingsGateway.NewLife.Threading;
 
 using TouchSocket.Core;
@@ -47,7 +48,7 @@ public partial class OpcUaServer : BusinessBase
     protected override BusinessPropertyBase _businessPropertyBase => _driverPropertys;
 
     protected IStringLocalizer Localizer { get; private set; }
-    private ConcurrentQueue<VariableBasicData> CollectVariableRuntimes { get; set; } = new();
+    private ConcurrentDictionary<long, VariableBasicData> CollectVariableRuntimes { get; set; } = new();
 
     private static readonly string[] separator = new string[] { ";" };
 
@@ -183,13 +184,9 @@ public partial class OpcUaServer : BusinessBase
                     await Task.Delay(10000, cancellationToken).ConfigureAwait(false);
                 }
             }
-            var data = CollectVariableRuntimes.ToListWithDequeue();
-            if (data.Count > 0)
+            var varList = CollectVariableRuntimes.ToListWithDequeue();
+            if (varList.Count > 0)
             {
-                data.Reverse();
-                ////变化推送
-                var varList = data.DistinctBy(a => a.Id).ToList();
-
                 if (varList?.Count > 0)
                 {
                     foreach (var item in varList)
@@ -411,17 +408,36 @@ public partial class OpcUaServer : BusinessBase
 
         return config;
     }
-
     private void VariableValueChange(VariableRuntime variableRuntime, VariableBasicData variableData)
     {
         if (CurrentDevice.Pause)
             return;
         if (DisposedValue) return;
         if (IdVariableRuntimes.ContainsKey(variableData.Id))
-            CollectVariableRuntimes.Enqueue(variableData);
+            CollectVariableRuntimes.AddOrUpdate(variableData.Id, id => variableData, (id, addValue) => variableData);
         else
         {
 
+        }
+    }
+
+    /// <summary>
+    /// 暂停
+    /// </summary>
+    /// <param name="pause">暂停</param>
+    public override void PauseThread(bool pause)
+    {
+        lock (this)
+        {
+            var oldV = CurrentDevice.Pause;
+            base.PauseThread(pause);
+            if (!pause && oldV != pause)
+            {
+                IdVariableRuntimes.ForEach(a =>
+                {
+                    VariableValueChange(a.Value, a.Value.Adapt<VariableBasicData>());
+                });
+            }
         }
     }
 }

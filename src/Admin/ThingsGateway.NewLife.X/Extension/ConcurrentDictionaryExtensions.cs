@@ -40,6 +40,61 @@ public static class ConcurrentDictionaryExtensions
         // 返回成功移除的项目数量
         return count;
     }
+    /// <summary>
+    /// 批量出队
+    /// </summary>
+    public static List<T> ToListWithDequeue<TKEY, T>(this ConcurrentDictionary<TKEY, T> values, int maxCount = 0)
+    {
+        if (maxCount <= 0)
+        {
+            maxCount = values.Count;
+        }
+        else
+        {
+            maxCount = Math.Min(maxCount, values.Count);
+        }
 
+        var list = new List<T>(maxCount);
+        if (maxCount == 0) return list;
+        var keys = values.Keys;
+        foreach (var key in keys)
+        {
+            if (maxCount-- <= 0) break;
+            if (values.TryRemove(key, out var result))
+            {
+                list.Add(result);
+            }
+        }
+        return list;
+    }
+    /// <summary>
+    /// 批量出队
+    /// </summary>
+    public static Dictionary<TKEY, T> ToDictWithDequeue<TKEY, T>(this ConcurrentDictionary<TKEY, T> values, int maxCount = 0)
+    {
+        if (maxCount <= 0)
+        {
+            maxCount = values.Count;
+        }
+        else
+        {
+            maxCount = Math.Min(maxCount, values.Count);
+        }
+
+        var dict = new Dictionary<TKEY, T>(maxCount);
+
+        if (maxCount == 0) return dict;
+
+        var keys = values.Keys;
+        foreach (var key in keys)
+        {
+            if (maxCount-- <= 0) break;
+            if (values.TryRemove(key, out var result))
+            {
+                dict.Add(key, result);
+            }
+        }
+        return dict;
+    }
 
 }

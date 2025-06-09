@@ -16,7 +16,6 @@ using SqlSugar;
 
 using System.Collections.Concurrent;
 
-using ThingsGateway.Extension;
 using ThingsGateway.Foundation.Modbus;
 using ThingsGateway.Gateway.Application;
 using ThingsGateway.NewLife;
@@ -33,7 +32,7 @@ public class ModbusSlave : BusinessBase
 {
     private readonly ModbusSlaveProperty _driverPropertys = new();
 
-    private readonly ConcurrentQueue<(string, VariableRuntime)> _modbusVariableQueue = new();
+    private readonly ConcurrentDictionary<string, VariableRuntime> ModbusVariableQueue = new();
 
     private readonly ModbusSlaveVariableProperty _variablePropertys = new();
 
@@ -124,7 +123,7 @@ public class ModbusSlave : BusinessBase
     public override async Task AfterVariablesChangedAsync(CancellationToken cancellationToken)
     {
         await base.AfterVariablesChangedAsync(cancellationToken).ConfigureAwait(false);
-        _modbusVariableQueue?.Clear();
+        ModbusVariableQueue?.Clear();
         IdVariableRuntimes.ForEach(a =>
         {
             VariableValueChange(a.Value, default);
@@ -145,7 +144,7 @@ public class ModbusSlave : BusinessBase
     protected override void Dispose(bool disposing)
     {
         ModbusVariables?.Clear();
-        _modbusVariableQueue?.Clear();
+        ModbusVariableQueue?.Clear();
         GlobalData.VariableValueChangeEvent -= VariableValueChange;
         _plc?.SafeDispose();
         base.Dispose(disposing);
@@ -180,19 +179,19 @@ public class ModbusSlave : BusinessBase
                 await Task.Delay(10000, cancellationToken).ConfigureAwait(false);
             }
         }
-        var list = _modbusVariableQueue.ToListWithDequeue();
+        var list = ModbusVariableQueue.ToDictWithDequeue();
         foreach (var item in list)
         {
             if (cancellationToken.IsCancellationRequested)
                 break;
-            var type = item.Item2.GetPropertyValue(CurrentDevice.Id, nameof(ModbusSlaveVariableProperty.DataType));
+            var type = item.Value.GetPropertyValue(CurrentDevice.Id, nameof(ModbusSlaveVariableProperty.DataType));
             if (Enum.TryParse(type, out DataTypeEnum result))
             {
-                await _plc.WriteAsync(item.Item1, JToken.FromObject(item.Item2.Value), result, cancellationToken).ConfigureAwait(false);
+                await _plc.WriteAsync(item.Key, JToken.FromObject(item.Value.Value), result, cancellationToken).ConfigureAwait(false);
             }
             else
             {
-                await _plc.WriteAsync(item.Item1, JToken.FromObject(item.Item2.Value), item.Item2.DataType, cancellationToken).ConfigureAwait(false);
+                await _plc.WriteAsync(item.Key, JToken.FromObject(item.Value.Value), item.Value.DataType, cancellationToken).ConfigureAwait(false);
             }
         }
 
@@ -259,7 +258,25 @@ public class ModbusSlave : BusinessBase
         var address = variableRuntime.GetPropertyValue(DeviceId, nameof(_variablePropertys.ServiceAddress));
         if (address != null && variableRuntime.Value != null)
         {
-            _modbusVariableQueue?.Enqueue((address, variableRuntime));
+            ModbusVariableQueue?.AddOrUpdate(address, address => variableRuntime, (address, addvalue) => variableRuntime);
         }
     }
+
+    public override void PauseThread(bool pause)
+    {
+        lock (this)
+        {
+            var oldV = CurrentDevice.Pause;
+            base.PauseThread(pause);
+            if (!pause && oldV != pause)
+            {
+                IdVariableRuntimes.ForEach(a =>
+                {
+                    VariableValueChange(a.Value, null);
+                });
+            }
+        }
+    }
+
+
 }

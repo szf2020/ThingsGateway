@@ -257,4 +257,27 @@ public abstract class BusinessBaseWithCacheIntervalDeviceModel<VarModel, DevMode
                 VariableChange(variableRuntime, variable);
         }
     }
+
+    public override void PauseThread(bool pause)
+    {
+        lock (this)
+        {
+            var oldV = CurrentDevice.Pause;
+            base.PauseThread(pause);
+            if (!pause && oldV != pause)
+            {
+                CollectDevices?.ForEach(a =>
+                {
+                    if (a.Value.DeviceStatus == DeviceStatusEnum.OnLine && _businessPropertyWithCacheInterval.BusinessUpdateEnum != BusinessUpdateEnum.Interval)
+                        DeviceStatusChange(a.Value, a.Value.Adapt<DeviceBasicData>());
+                });
+                IdVariableRuntimes.ForEach(a =>
+                {
+                    if (a.Value.IsOnline && _businessPropertyWithCacheInterval.BusinessUpdateEnum != BusinessUpdateEnum.Interval)
+                        VariableValueChange(a.Value, a.Value.Adapt<VariableBasicData>());
+                });
+            }
+        }
+    }
+
 }

@@ -40,6 +40,21 @@ public partial class SqlHistoryAlarm : BusinessBaseWithCacheVariableModel<Histor
             return;
         AddQueueVarModel(new CacheDBItem<HistoryAlarm>(alarmVariable.Adapt<HistoryAlarm>(_config)));
     }
+    public override void PauseThread(bool pause)
+    {
+        lock (this)
+        {
+            var oldV = CurrentDevice.Pause;
+            base.PauseThread(pause);
+            if (!pause && oldV != pause)
+            {
+                GlobalData.ReadOnlyRealAlarmIdVariables?.ForEach(a =>
+                {
+                    AlarmWorker_OnAlarmChanged(a.Value);
+                });
+            }
+        }
+    }
 
     private async ValueTask<OperResult> InserableAsync(List<HistoryAlarm> dbInserts, CancellationToken cancellationToken)
     {

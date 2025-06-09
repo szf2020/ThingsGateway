@@ -117,7 +117,7 @@ public abstract class DriverBase : DisposableObject, IDriver
     /// 暂停
     /// </summary>
     /// <param name="pause">暂停</param>
-    public void PauseThread(bool pause)
+    public virtual void PauseThread(bool pause)
     {
         lock (this)
         {

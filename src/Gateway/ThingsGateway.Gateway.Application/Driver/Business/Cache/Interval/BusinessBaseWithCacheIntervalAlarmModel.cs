@@ -244,6 +244,31 @@ public abstract class BusinessBaseWithCacheIntervalAlarmModel<VarModel, DevModel
                 AlarmChange(alarmVariable);
         }
     }
+    public override void PauseThread(bool pause)
+    {
+        lock (this)
+        {
+            var oldV = CurrentDevice.Pause;
+            base.PauseThread(pause);
+            if (!pause && oldV != pause)
+            {
+                GlobalData.ReadOnlyRealAlarmIdVariables?.ForEach(a =>
+                {
+                    AlarmChange(a.Value);
+                });
+                CollectDevices?.ForEach(a =>
+                {
+                    if (a.Value.DeviceStatus == DeviceStatusEnum.OnLine && _businessPropertyWithCacheInterval.BusinessUpdateEnum != BusinessUpdateEnum.Interval)
+                        DeviceStatusChange(a.Value, a.Value.Adapt<DeviceBasicData>());
+                });
+                IdVariableRuntimes.ForEach(a =>
+                {
+                    if (a.Value.IsOnline && _businessPropertyWithCacheInterval.BusinessUpdateEnum != BusinessUpdateEnum.Interval)
+                        VariableValueChange(a.Value, a.Value.Adapt<VariableBasicData>());
+                });
+            }
+        }
+    }
 
     /// <summary>
     /// 当设备状态发生变化时触发此事件处理方法。该方法内部会检查是否需要进行设备上传，如果需要，则调用 <see cref="DeviceChange(DeviceRuntime, DeviceBasicData)"/> 方法。
