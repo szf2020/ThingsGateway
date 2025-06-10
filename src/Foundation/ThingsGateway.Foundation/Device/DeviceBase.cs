@@ -256,7 +256,7 @@ public abstract class DeviceBase : DisposableObject, IDevice
     /// <inheritdoc/>
     public virtual string GetAddressDescription()
     {
-        return DefaultResource.Localizer["DefaultAddressDes"];
+        return AppResource.DefaultAddressDes;
     }
     /// <summary>
     /// 获取bit偏移量
@@ -441,7 +441,7 @@ public abstract class DeviceBase : DisposableObject, IDevice
                 {
                     return new OperResult<IClientChannel>() { Content = client1 };
                 }
-                return (new OperResult<IClientChannel>(DefaultResource.Localizer["DtuNoConnectedWaining", socketId]));
+                return (new OperResult<IClientChannel>(string.Format(AppResource.DtuNoConnectedWaining, socketId)));
             }
         }
         else
@@ -468,7 +468,7 @@ public abstract class DeviceBase : DisposableObject, IDevice
                     {
                         return endPoint1;
                     }
-                    throw new Exception(DefaultResource.Localizer["DtuNoConnectedWaining", socketId]);
+                    throw new Exception(string.Format(AppResource.DtuNoConnectedWaining, socketId));
                 }
             }
 
@@ -602,7 +602,7 @@ public abstract class DeviceBase : DisposableObject, IDevice
             DataTypeEnum.UInt64 => await ReadUInt64Async(address, length, cancellationToken: cancellationToken).ConfigureAwait(false),
             DataTypeEnum.Single => await ReadSingleAsync(address, length, cancellationToken: cancellationToken).ConfigureAwait(false),
             DataTypeEnum.Double => await ReadDoubleAsync(address, length, cancellationToken: cancellationToken).ConfigureAwait(false),
-            _ => new OperResult<Array>(DefaultResource.Localizer["DataTypeNotSupported", dataType]),
+            _ => new OperResult<Array>(string.Format(AppResource.DataTypeNotSupported, dataType)),
         };
     }
 
@@ -627,7 +627,7 @@ public abstract class DeviceBase : DisposableObject, IDevice
                     DataTypeEnum.UInt64 => await WriteAsync(address, jArray.ToObject<UInt64[]>(), cancellationToken: cancellationToken).ConfigureAwait(false),
                     DataTypeEnum.Single => await WriteAsync(address, jArray.ToObject<Single[]>(), cancellationToken: cancellationToken).ConfigureAwait(false),
                     DataTypeEnum.Double => await WriteAsync(address, jArray.ToObject<Double[]>(), cancellationToken: cancellationToken).ConfigureAwait(false),
-                    _ => new OperResult(DefaultResource.Localizer["DataTypeNotSupported", dataType]),
+                    _ => new OperResult(string.Format(AppResource.DataTypeNotSupported, dataType)),
                 };
             }
             else
@@ -645,7 +645,7 @@ public abstract class DeviceBase : DisposableObject, IDevice
                     DataTypeEnum.UInt64 => await WriteAsync(address, value.ToObject<UInt64>(), bitConverter, cancellationToken).ConfigureAwait(false),
                     DataTypeEnum.Single => await WriteAsync(address, value.ToObject<Single>(), bitConverter, cancellationToken).ConfigureAwait(false),
                     DataTypeEnum.Double => await WriteAsync(address, value.ToObject<Double>(), bitConverter, cancellationToken).ConfigureAwait(false),
-                    _ => new OperResult(DefaultResource.Localizer["DataTypeNotSupported", dataType]),
+                    _ => new OperResult(string.Format(AppResource.DataTypeNotSupported, dataType)),
                 };
             }
         }
@@ -740,7 +740,7 @@ public abstract class DeviceBase : DisposableObject, IDevice
     public virtual async ValueTask<OperResult<String[]>> ReadStringAsync(string address, int length, IThingsGatewayBitConverter bitConverter = null, CancellationToken cancellationToken = default)
     {
         bitConverter ??= ThingsGatewayBitConverter.GetTransByAddress(address);
-        if (bitConverter.StringLength == null) return new OperResult<String[]>(DefaultResource.Localizer["StringAddressError"]);
+        if (bitConverter.StringLength == null) return new OperResult<String[]>(AppResource.StringAddressError);
         var len = bitConverter.StringLength * length;
 
         var result = await ReadAsync(address, GetLength(address, len.Value, 1), cancellationToken).ConfigureAwait(false);
@@ -908,7 +908,7 @@ public abstract class DeviceBase : DisposableObject, IDevice
     public virtual async ValueTask<OperResult> WriteAsync(string address, string[] value, IThingsGatewayBitConverter bitConverter = null, CancellationToken cancellationToken = default)
     {
         bitConverter ??= ThingsGatewayBitConverter.GetTransByAddress(address);
-        if (bitConverter.StringLength == null) return new OperResult(DefaultResource.Localizer["StringAddressError"]);
+        if (bitConverter.StringLength == null) return new OperResult(AppResource.StringAddressError);
         List<byte> bytes = new();
         foreach (var a in value)
         {

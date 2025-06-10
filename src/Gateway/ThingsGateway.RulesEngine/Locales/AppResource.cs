@@ -8,31 +8,22 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-using Microsoft.Extensions.Localization;
+using ThingsGateway.Foundation;
 
-namespace ThingsGateway.Foundation;
+namespace ThingsGateway.RulesEngine;
 
-/// <summary>
-/// 语言资源
-/// </summary>
-public class DefaultResource
+public static class AppResource
 {
-    private static IStringLocalizer localizer;
+    public static string RulesEngineTaskStart => ThingsGateway.Foundation.AppResource.Lang == Language.Chinese ? ChineseResource.RulesEngineTaskStart : EnglishResource.RulesEngineTaskStart;
+}
 
-    /// <summary>
-    /// Localizer
-    /// </summary>
-    public static IStringLocalizer Localizer
-    {
-        get
-        {
-            if (localizer == null)
-            {
-                localizer = LocalizerUtil.GetLocalizer.Invoke(typeof(DefaultResource));
-            }
-            return localizer;
-        }
-    }
+public static class ChineseResource
+{
 
-    //使用频率高的多语言应初始化构建
+    public const string RulesEngineTaskStart = "规则引擎线程启动";
+}
+public static class EnglishResource
+{
+    public const string RulesEngineTaskStart = "Rules engine service started";
+
 }

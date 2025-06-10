@@ -1,74 +1,73 @@
 ﻿{
-  "ThingsGateway.Admin.Razor.LoginConnectionHub": {
-    "Jump": "Jump"
-  },
-  "ThingsGateway.Admin.Razor.UserLogin": {
-    "Account": "Username",
-    "Password": "Password",
-    "Login": "Login"
-  },
   "ThingsGateway.Admin.Razor._Imports": {
-    "Org": "Org",
-    "Position": "Position",
-    "Role": "Role",
-    "RoleList": "Role List",
-    "PositionList": "Position List",
-    "OrgList": "Org List",
-    "MaxCount": "Exceeding the quantity limit",
     "All": "All",
-    "Copy": "Copy",
     "Choice": "Choice",
-    "Picture": "Picture",
-    "Root": "Root",
-    "Save": "Save",
+    "Copy": "Copy",
     "CurrentVerificat": "CurrentVerificat",
     "EmptyText": "Empty",
-    "SelectPlaceHolder": "Please select ...",
-    "ExportButtonText": "Export/Import"
+    "ExportButtonText": "Export/Import",
+    "MaxCount": "Exceeding the quantity limit",
+    "Org": "Org",
+    "OrgList": "Org List",
+    "Picture": "Picture",
+    "Position": "Position",
+    "PositionList": "Position List",
+    "Role": "Role",
+    "RoleList": "Role List",
+    "Root": "Root",
+    "Save": "Save",
+    "SelectPlaceHolder": "Please select ..."
   },
   "ThingsGateway.Admin.Razor.ChoiceModuleComponent": {
     "SetDefaultModule": "Set as default module"
   },
-
   "ThingsGateway.Admin.Razor.HardwareInfoPage": {
-    "SystemInfo": "System Information",
+    "AvailableDisk": "Available Disk",
+    "AvailableMemory": "Available Memory",
+    "CpuUsage": "CPU Usage",
+    "Data": "Data",
+    "DateTime": "Date Time",
+    "DiskUsage": "Disk Usage",
     "HardwareInfo": "Hardware Resources",
     "HardwareInfoChart": "Hardware Resources History Chart",
-    "CpuUsage": "CPU Usage",
-    "AvailableMemory": "Available Memory",
-    "TotalMemory": "Total Memory",
-    "WorkingSet": "WorkingSet",
-    "MemoryUsage": "Memory",
-    "AvailableDisk": "Available Disk",
-    "TotalDisk": "Total Disk",
-    "DiskUsage": "Disk Usage",
     "HistoryHardwareInfo": "Historical Trends",
-    "DateTime": "Date Time",
-    "Data": "Data",
+    "MemoryUsage": "Memory",
     "OSName": "OS Name",
-    "OSVersion": "OS Version"
+    "OSVersion": "OS Version",
+    "SystemInfo": "System Information",
+    "TotalDisk": "Total Disk",
+    "TotalMemory": "Total Memory",
+    "WorkingSet": "WorkingSet"
+  },
+  "ThingsGateway.Admin.Razor.LoginConnectionHub": {
+    "Jump": "Jump"
   },
   "ThingsGateway.Admin.Razor.OperLogPage": {
-    "Date": "Date",
     "Count": "Count",
-    "Operate": "Succeed",
+    "Date": "Date",
     "Exception": "Failed",
     "Login": "Login",
     "Logout": "Logout",
+    "Operate": "Succeed",
     "SysOperateLog": "Operation Log"
   },
   "ThingsGateway.Admin.Razor.SessionPage": {
-    "VerificatInfo": "Token List",
-    "ExitSession": "Force Logout"
+    "ExitSession": "Force Logout",
+    "VerificatInfo": "Token List"
+  },
+  "ThingsGateway.Admin.Razor.UserCenterPage": {
+    "UpdatePasswordInfo": "Change Password",
+    "UpdateUserInfo": "Update Personal Information",
+    "UpdateWorkbenchInfo": "Update Personal Workbench",
+    "UserInfo": "Personal Information",
+    "WorkbenchInfo": "Personal Workbench"
+  },
+  "ThingsGateway.Admin.Razor.UserLogin": {
+    "Account": "Username",
+    "Login": "Login",
+    "Password": "Password"
   },
   "ThingsGateway.Admin.Razor.VerificatListDialog": {
     "ExitVerificat": "Force Logout Token"
-  },
-  "ThingsGateway.Admin.Razor.UserCenterPage": {
-    "UpdateUserInfo": "Update Personal Information",
-    "UserInfo": "Personal Information",
-    "UpdatePasswordInfo": "Change Password",
-    "UpdateWorkbenchInfo": "Update Personal Workbench",
-    "WorkbenchInfo": "Personal Workbench"
   }
 }

@@ -8,8 +8,6 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-using TouchSocket.Resources;
-
 namespace ThingsGateway.Foundation;
 
 /// <summary>
@@ -148,7 +146,7 @@ public static partial class DeviceExtension
             case WaitDataStatus.Default:
             default:
                 {
-                    return waitDataAsync.WaitResult == null ? new(new Exception(TouchSocketCoreResource.UnknownError)) : new(waitDataAsync.WaitResult);
+                    return waitDataAsync.WaitResult == null ? new(new Exception(AppResource.UnknownError)) : new(waitDataAsync.WaitResult);
                 }
         }
     }

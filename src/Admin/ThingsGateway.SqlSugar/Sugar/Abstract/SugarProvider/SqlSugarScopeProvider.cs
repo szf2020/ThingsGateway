@@ -99,10 +99,10 @@ namespace SqlSugar
                 return this.initkey;
             }
             var key = "SqlSugarProviderScope_" + conn.CurrentConnectionConfig.ConfigId;
-            if (frames == null)
-            {
-                frames = new StackTrace(false).GetFrames();
-            }
+            //if (frames == null)
+            //{
+            //    frames = new StackTrace(false).GetFrames();
+            //}
             //if (true)
             //{
             //    foreach (var method in frames.Take(35))

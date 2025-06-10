@@ -76,7 +76,7 @@ public class ModbusTcpMessage : MessageBase, IResultMessage
         else
         {
             OperCode = 999;
-            ErrorMessage = ModbusResource.Localizer["ModbusError1"];
+            ErrorMessage = AppResource.ModbusError1;
         }
         return FilterResult.GoOn;
     }

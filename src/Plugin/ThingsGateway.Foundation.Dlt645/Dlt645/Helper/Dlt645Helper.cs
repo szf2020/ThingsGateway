@@ -7,7 +7,6 @@
 //  使用文档：https://thingsgateway.cn/
 //  QQ群：605534569
 //------------------------------------------------------------------------------
-
 namespace ThingsGateway.Foundation.Dlt645;
 
 /// <summary>
@@ -37,14 +36,14 @@ internal static class Dlt645Helper
     {
         string error = buffer switch
         {
-            0x80 => DltResource.Localizer["Error1"],
-            0x40 => DltResource.Localizer["Error2"],
-            0x20 => DltResource.Localizer["Error3"],
-            0x10 => DltResource.Localizer["Error4"],
-            0x08 => DltResource.Localizer["Error5"],
-            0x04 => DltResource.Localizer["Error6"],
-            0x02 => DltResource.Localizer["Error7"],
-            _ => DltResource.Localizer["Error8"],
+            0x80 => AppResource.Error1,
+            0x40 => AppResource.Error2,
+            0x20 => AppResource.Error3,
+            0x10 => AppResource.Error4,
+            0x08 => AppResource.Error5,
+            0x04 => AppResource.Error6,
+            0x02 => AppResource.Error7,
+            _ => AppResource.Error8,
         };
         return error;
     }

@@ -147,7 +147,7 @@ public partial class Synchronization : BusinessBase, IRpcDriver
         catch (OperationCanceledException) { }
         catch (Exception ex)
         {
-            LogMessage.LogWarning(ex);
+            LogMessage?.LogWarning(ex);
         }
     }
     private TcpDmtpClient? _tcpDmtpClient;

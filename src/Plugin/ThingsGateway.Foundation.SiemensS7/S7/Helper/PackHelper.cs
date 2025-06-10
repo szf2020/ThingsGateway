@@ -59,7 +59,7 @@ internal static class PackHelper
                         case DataTypeEnum.String:
                             if (it.ThingsGatewayBitConverter.StringLength == null)
                             {
-                                throw new Exception(DefaultResource.Localizer["StringTypePackError"]);
+                                throw new Exception(ThingsGateway.Foundation.AppResource.StringTypePackError);
                             }
                             else
                             {

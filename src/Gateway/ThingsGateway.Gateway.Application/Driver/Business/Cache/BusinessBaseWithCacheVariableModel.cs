@@ -70,7 +70,7 @@ public abstract class BusinessBaseWithCacheVariableModel<VarModel> : BusinessBas
                 }
                 catch (Exception ex)
                 {
-                    LogMessage.LogWarning(ex, "Add cache fail");
+                    LogMessage?.LogWarning(ex, "Add cache fail");
                 }
             }
         }
@@ -115,7 +115,7 @@ public abstract class BusinessBaseWithCacheVariableModel<VarModel> : BusinessBas
                 }
                 catch (Exception ex)
                 {
-                    LogMessage.LogWarning(ex, "Add cache fail");
+                    LogMessage?.LogWarning(ex, "Add cache fail");
                 }
             }
         }

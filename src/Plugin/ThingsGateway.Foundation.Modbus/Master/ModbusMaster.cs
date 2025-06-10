@@ -155,7 +155,7 @@ public partial class ModbusMaster : DtuServiceDeviceBase, IModbusAddress
             }
             else
             {
-                return new OperResult(ModbusResource.Localizer["ValueOverlimit", nameof(mAddress.BitIndex), 2]);
+                return new OperResult(string.Format(AppResource.ValueOverlimit, nameof(mAddress.BitIndex), 2));
             }
         }
         catch (Exception ex)
@@ -202,7 +202,7 @@ public partial class ModbusMaster : DtuServiceDeviceBase, IModbusAddress
                 }
                 else
                 {
-                    return new OperResult(ModbusResource.Localizer["ValueOverlimit", nameof(mAddress.BitIndex), 16]);
+                    return new OperResult(string.Format(AppResource.ValueOverlimit, nameof(mAddress.BitIndex), 16));
                 }
             }
         }

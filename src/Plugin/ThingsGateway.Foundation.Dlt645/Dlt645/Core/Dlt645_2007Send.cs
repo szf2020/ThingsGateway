@@ -109,7 +109,7 @@ public class Dlt645_2007Send : ISendMessage
     {
         if (Dlt645_2007Address?.DataId.Length < 4)
         {
-            throw new(DltResource.Localizer["DataIdError"]);
+            throw new(AppResource.DataIdError);
         }
         if (Fehead.Length > 0)
         {
@@ -132,7 +132,7 @@ public class Dlt645_2007Send : ISendMessage
             var dataInfos = Dlt645Helper.GetDataInfos(Dlt645_2007Address.DataId);
             if (Datas.Length != dataInfos.Count)
             {
-                throw new(DltResource.Localizer["CountError"]);
+                throw new(AppResource.CountError);
             }
             for (int i = 0; i < Datas.Length; i++)
             {

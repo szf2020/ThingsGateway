@@ -174,7 +174,7 @@ public class ModbusSlave : BusinessBase
             catch (Exception ex)
             {
                 if (success)
-                    LogMessage.LogWarning(ex, Localizer["CanStartService"]);
+                    LogMessage?.LogWarning(ex, "Failed to start service");
                 success = false;
                 await Task.Delay(10000, cancellationToken).ConfigureAwait(false);
             }
@@ -207,7 +207,7 @@ public class ModbusSlave : BusinessBase
             var tag = ModbusVariables.Where(a => a.Key?.StartAddress == modbusRequest.StartAddress && a.Key?.Station == modbusRequest.Station && a.Key?.FunctionCode == modbusRequest.FunctionCode);
             if (!tag.Any()) return OperResult.Success;
             if (!(tag.All(a => a.Value.GetPropertyValue(DeviceId, nameof(_variablePropertys.VariableRpcEnable)).ToBoolean(false) && _driverPropertys.DeviceRpcEnable)))
-                return new OperResult(Localizer["NotWriteEnable"]);
+                return new OperResult("Not Permitted to Write");
 
             foreach (var item in tag)
             {

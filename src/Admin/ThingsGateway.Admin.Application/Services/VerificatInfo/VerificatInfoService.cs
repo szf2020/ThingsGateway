@@ -37,6 +37,8 @@ internal sealed class VerificatInfoService : BaseService<VerificatInfo>, IVerifi
 
     private VerificatInfo? GetFromDb(long id)
     {
+        if (id == 0)
+            return null;
         using var db = GetDB();
         var verificatInfo = db.Queryable<VerificatInfo>().First(u => u.Id == id);
         if (verificatInfo != null)

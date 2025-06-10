@@ -2,28 +2,19 @@
   "ThingsGateway.Plugin.Modbus.ModbusMasterProperty": {
     "ModbusType": "ProtocolType",
     "Station": "DefaultStation"
-
   },
-  "ThingsGateway.Plugin.Modbus.ModbusSlave": {
-    "CanStartService": "Unable to Start Service",
-    "NotWriteEnable": "Not Permitted to Write"
-  },
-
   "ThingsGateway.Plugin.Modbus.ModbusSlaveProperty": {
-    "ModbusType": "ModbusType",
-    "Station": "DefaultStation",
     "DataFormat": "DataFormat",
-    "IsStringReverseByteWord": "IsStringReverseByteWord",
     "DeviceRpcEnable": "DeviceRpcEnable",
+    "IsStringReverseByteWord": "IsStringReverseByteWord",
     "IsWriteMemory": "IsWriteMemory",
-    "MulStation": "MultipleStations"
-
-   
+    "ModbusType": "ModbusType",
+    "MulStation": "MultipleStations",
+    "Station": "DefaultStation"
   },
-
   "ThingsGateway.Plugin.Modbus.ModbusSlaveVariableProperty": {
-    "ServiceAddress": "SlaveRegisterAddress",
     "DataType": "DataType",
+    "ServiceAddress": "SlaveRegisterAddress",
     "VariableRpcEnable": "VariableRpcEnable"
   }
 }

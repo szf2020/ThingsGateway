@@ -92,7 +92,7 @@ public partial class QuestDBProducer : BusinessBaseWithCacheIntervalVariableMode
         if (success != result.IsSuccess)
         {
             if (!result.IsSuccess)
-                LogMessage.LogWarning(result.ToString());
+                LogMessage?.LogWarning(result.ToString());
             success = result.IsSuccess;
         }
 
@@ -126,7 +126,7 @@ public partial class QuestDBProducer : BusinessBaseWithCacheIntervalVariableMode
                 //var result = await db.Insertable(dbInserts).SplitTable().ExecuteCommandAsync().ConfigureAwait(false);
                 if (result > 0)
                 {
-                    LogMessage.Trace($"TableName：{_driverPropertys.TableName}，Count：{result}，watchTime:  {stopwatch.ElapsedMilliseconds} ms");
+                    LogMessage?.Trace($"TableName：{_driverPropertys.TableName}，Count：{result}，watchTime:  {stopwatch.ElapsedMilliseconds} ms");
                 }
             }
 

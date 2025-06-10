@@ -137,7 +137,7 @@ public partial class KafkaProducer : BusinessBaseWithCacheIntervalScript<Variabl
             {
                 if (!result.IsSuccess)
                 {
-                    LogMessage.LogWarning(result.ToString());
+                    LogMessage?.LogWarning(result.ToString());
                 }
                 success = result.IsSuccess;
             }
@@ -219,15 +219,15 @@ public partial class KafkaProducer : BusinessBaseWithCacheIntervalScript<Variabl
             {
                 if (_driverPropertys.DetailLog)
                 {
-                    if (LogMessage.LogLevel <= TouchSocket.Core.LogLevel.Trace)
-                        LogMessage.LogTrace(GetDetailLogString(topicArray, _memoryVarModelQueue.Count));
-                    else if (LogMessage.LogLevel <= TouchSocket.Core.LogLevel.Debug)
-                        LogMessage.LogDebug(GetCountLogString(topicArray, _memoryVarModelQueue.Count));
+                    if (LogMessage?.LogLevel <= TouchSocket.Core.LogLevel.Trace)
+                        LogMessage?.LogTrace(GetDetailLogString(topicArray, _memoryVarModelQueue.Count));
+                    else if (LogMessage?.LogLevel <= TouchSocket.Core.LogLevel.Debug)
+                        LogMessage?.LogDebug(GetCountLogString(topicArray, _memoryVarModelQueue.Count));
                 }
                 else
                 {
-                    if (LogMessage.LogLevel <= TouchSocket.Core.LogLevel.Debug)
-                        LogMessage.LogDebug(GetCountLogString(topicArray, _memoryVarModelQueue.Count));
+                    if (LogMessage?.LogLevel <= TouchSocket.Core.LogLevel.Debug)
+                        LogMessage?.LogDebug(GetCountLogString(topicArray, _memoryVarModelQueue.Count));
                 }
                 return OperResult.Success;
             }

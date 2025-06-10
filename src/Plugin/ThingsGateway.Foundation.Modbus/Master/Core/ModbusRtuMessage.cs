@@ -70,7 +70,7 @@ public class ModbusRtuMessage : MessageBase, IResultMessage
         else
         {
             OperCode = 999;
-            ErrorMessage = ModbusResource.Localizer["ModbusError1"];
+            ErrorMessage = AppResource.ModbusError1;
             return FilterResult.GoOn;
         }
         if (crcLen > 0)
@@ -89,14 +89,14 @@ public class ModbusRtuMessage : MessageBase, IResultMessage
                     {
                         OperCode = 999;
                         Response.ErrorCode = 1;
-                        ErrorMessage = ModbusResource.Localizer["StationNotSame", Request.Station, Response.Station];
+                        ErrorMessage = string.Format(AppResource.StationNotSame, Request.Station, Response.Station);
                         return FilterResult.GoOn;
                     }
                     if (f > 4 ? Request.WriteFunctionCode != Response.FunctionCode : Request.FunctionCode != Response.FunctionCode)
                     {
                         OperCode = 999;
                         Response.ErrorCode = 1;
-                        ErrorMessage = ModbusResource.Localizer["FunctionNotSame", Request.FunctionCode, Response.FunctionCode];
+                        ErrorMessage = string.Format(AppResource.FunctionNotSame, Request.FunctionCode, Response.FunctionCode);
                         return FilterResult.GoOn;
                     }
                 }

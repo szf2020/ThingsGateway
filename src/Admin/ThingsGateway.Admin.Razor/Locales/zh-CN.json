@@ -1,74 +1,73 @@
 ﻿{
-  "ThingsGateway.Admin.Razor.LoginConnectionHub": {
-    "Jump": "跳转"
-  },
-  "ThingsGateway.Admin.Razor.UserLogin": {
-    "Account": "登录账号",
-    "Password": "登录密码",
-    "Login": "登录"
-  },
   "ThingsGateway.Admin.Razor._Imports": {
+    "All": "全部",
+    "Choice": "选择",
+    "Copy": "复制",
+    "CurrentVerificat": "当前令牌",
+    "EmptyText": "空",
+    "ExportButtonText": "导出/导入",
+    "MaxCount": "超过数量限制",
     "Org": "机构",
+    "OrgList": "机构列表",
+    "Picture": "头像",
     "Position": "岗位",
+    "PositionList": "岗位列表",
     "Role": "角色",
     "RoleList": "角色列表",
-    "PositionList": "岗位列表",
-    "OrgList": "机构列表",
-    "MaxCount": "超过数量限制",
-    "All": "全部",
-    "Copy": "复制",
-    "Choice": "选择",
-    "Picture": "头像",
     "Root": "根目录",
     "Save": "保存",
-    "CurrentVerificat": "当前令牌",
-    "SelectPlaceHolder": "请选择 ...",
-    "EmptyText": "空",
-    "ExportButtonText": "导出/导入"
+    "SelectPlaceHolder": "请选择 ..."
   },
   "ThingsGateway.Admin.Razor.ChoiceModuleComponent": {
     "SetDefaultModule": "设置为默认模块"
   },
-
   "ThingsGateway.Admin.Razor.HardwareInfoPage": {
-    "SystemInfo": "系统信息",
+    "AvailableDisk": "可用磁盘",
+    "AvailableMemory": "可用内存",
+    "CpuUsage": "CPU使用率",
+    "Data": "数据",
+    "DateTime": "时间",
+    "DiskUsage": "磁盘使用率",
     "HardwareInfo": "硬件资源",
     "HardwareInfoChart": "硬件资源历史曲线",
-    "CpuUsage": "CPU使用率",
-    "AvailableMemory": "可用内存",
-    "TotalMemory": "总内存",
-    "WorkingSet": "进程内存",
-    "MemoryUsage": "内存",
-    "AvailableDisk": "可用磁盘",
-    "TotalDisk": "总磁盘",
-    "DiskUsage": "磁盘使用率",
     "HistoryHardwareInfo": "历史曲线",
-    "DateTime": "时间",
-    "Data": "数据",
+    "MemoryUsage": "内存",
     "OSName": "系统名称",
-    "OSVersion": "系统版本"
+    "OSVersion": "系统版本",
+    "SystemInfo": "系统信息",
+    "TotalDisk": "总磁盘",
+    "TotalMemory": "总内存",
+    "WorkingSet": "进程内存"
+  },
+  "ThingsGateway.Admin.Razor.LoginConnectionHub": {
+    "Jump": "跳转"
   },
   "ThingsGateway.Admin.Razor.OperLogPage": {
-    "Date": "日期",
     "Count": "数量",
-    "Operate": "成功",
+    "Date": "日期",
     "Exception": "失败",
     "Login": "登录",
     "Logout": "注销",
+    "Operate": "成功",
     "SysOperateLog": "操作日志"
   },
   "ThingsGateway.Admin.Razor.SessionPage": {
-    "VerificatInfo": "令牌列表",
-    "ExitSession": "强退会话"
+    "ExitSession": "强退会话",
+    "VerificatInfo": "令牌列表"
+  },
+  "ThingsGateway.Admin.Razor.UserCenterPage": {
+    "UpdatePasswordInfo": "修改密码",
+    "UpdateUserInfo": "更新个人信息",
+    "UpdateWorkbenchInfo": "更新个人工作台",
+    "UserInfo": "个人信息",
+    "WorkbenchInfo": "个人工作台"
+  },
+  "ThingsGateway.Admin.Razor.UserLogin": {
+    "Account": "登录账号",
+    "Login": "登录",
+    "Password": "登录密码"
   },
   "ThingsGateway.Admin.Razor.VerificatListDialog": {
     "ExitVerificat": "强退令牌"
-  },
-  "ThingsGateway.Admin.Razor.UserCenterPage": {
-    "UpdateUserInfo": "更新个人信息",
-    "UserInfo": "个人信息",
-    "UpdatePasswordInfo": "修改密码",
-    "UpdateWorkbenchInfo": "更新个人工作台",
-    "WorkbenchInfo": "个人工作台"
   }
 }

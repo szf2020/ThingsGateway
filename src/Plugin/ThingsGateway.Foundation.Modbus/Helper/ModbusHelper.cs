@@ -20,7 +20,7 @@ public static class ModbusHelper
     /// <returns></returns>
     public static string GetAddressDescription()
     {
-        return ModbusResource.Localizer["AddressDes"];
+        return AppResource.AddressDes;
     }
 
     /// <summary>
@@ -30,16 +30,16 @@ public static class ModbusHelper
     {
         return code switch
         {
-            1 => ModbusResource.Localizer["ModbusError1"],
-            2 => ModbusResource.Localizer["ModbusError2"],
-            3 => ModbusResource.Localizer["ModbusError3"],
-            4 => ModbusResource.Localizer["ModbusError4"],
-            5 => ModbusResource.Localizer["ModbusError5"],
-            6 => ModbusResource.Localizer["ModbusError6"],
-            8 => ModbusResource.Localizer["ModbusError8"],
-            10 => ModbusResource.Localizer["ModbusError10"],
-            11 => ModbusResource.Localizer["ModbusError11"],
-            _ => DefaultResource.Localizer["UnknownError", code],
+            1 => AppResource.ModbusError1,
+            2 => AppResource.ModbusError2,
+            3 => AppResource.ModbusError3,
+            4 => AppResource.ModbusError4,
+            5 => AppResource.ModbusError5,
+            6 => AppResource.ModbusError6,
+            8 => AppResource.ModbusError8,
+            10 => AppResource.ModbusError10,
+            11 => AppResource.ModbusError11,
+            _ => string.Format(ThingsGateway.Foundation.AppResource.UnknownError, code),
         };
     }
 

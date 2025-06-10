@@ -224,7 +224,7 @@ public class ModbusSlave : DeviceBase, IModbusAddress
             {
                 if (Station != mAddress.Station)
                 {
-                    return new(ModbusResource.Localizer["StationNotSame", mAddress.Station, Station]);
+                    return new(string.Format(AppResource.StationNotSame, mAddress.Station, Station));
                 }
                 Init(mAddress);
             }
@@ -287,7 +287,7 @@ public class ModbusSlave : DeviceBase, IModbusAddress
                 }
             }
 
-            return new(ModbusResource.Localizer["FunctionError"]);
+            return new(AppResource.FunctionError);
         }
         catch (Exception ex)
         {
@@ -362,7 +362,7 @@ public class ModbusSlave : DeviceBase, IModbusAddress
                 }
                 else
                 {
-                    return new OperResult(ModbusResource.Localizer["ValueOverlimit", nameof(mAddress.BitIndex), 16]);
+                    return new OperResult(string.Format(AppResource.ValueOverlimit, nameof(mAddress.BitIndex), 16));
                 }
             }
         }

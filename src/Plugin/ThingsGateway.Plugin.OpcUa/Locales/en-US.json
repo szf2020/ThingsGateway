@@ -3,34 +3,31 @@
     "NoVariablesAvailable": "No variables available",
     "Success": "Success"
   },
-  "ThingsGateway.Foundation.OpcUa.OpcUaProperty": {
-    "OpcUrl": "OpcUrl",
-    "UserName": "UserName",
-    "Password": "Password",
-    "CheckDomain": "CheckDomain",
-    "UpdateRate": "UpdateRate",
+  "ThingsGateway.Plugin.OpcUa.OpcUaMasterProperty": {
     "ActiveSubscribe": "ActiveSubscribe",
-    "GroupSize": "GroupSize",
-    "DeadBand": "DeadBand",
-    "KeepAliveInterval": "KeepAliveInterval(ms)",
-    "UseSecurity": "UseSecurity",
-    "LoadType": "LoadType",
     "AutoAcceptUntrustedCertificates": "AutoAcceptUntrustedCertificates",
+    "CheckDomain": "CheckDomain",
+    "DeadBand": "DeadBand",
     "ExportC": "ExportCertificate",
-    "SourceTimestampEnable": "SourceTimestampEnable"
+    "GroupSize": "GroupSize",
+    "KeepAliveInterval": "KeepAliveInterval(ms)",
+    "LoadType": "LoadType",
+    "OpcUrl": "OpcUrl",
+    "Password": "Password",
+    "SourceTimestampEnable": "SourceTimestampEnable",
+    "UpdateRate": "UpdateRate",
+    "UserName": "UserName",
+    "UseSecurity": "UseSecurity"
   },
   "ThingsGateway.Plugin.OpcUa.OpcUaServerProperty": {
+    "AutoAcceptUntrustedCertificates": "AutoAcceptUntrustedCertificates",
+    "BigTextApplicationUri": "ApplicationUri",
+    "BigTextSubjectName": "SubjectName",
     "IsAllVariable": "IsAllVariable",
     "OpcUaStringUrl": "OpcUaStringUrl",
-    "BigTextSubjectName": "SubjectName",
-    "BigTextApplicationUri": "ApplicationUri",
-    "SecurityPolicy": "SecurityPolicy",
-    "AutoAcceptUntrustedCertificates": "AutoAcceptUntrustedCertificates"
+    "SecurityPolicy": "SecurityPolicy"
   },
   "ThingsGateway.Plugin.OpcUa.OpcUaServerVariableProperty": {
     "DataType": "DataType"
-  },
-  "ThingsGateway.Plugin.OpcUa.OpcUaServer": {
-    "CanStartService": "Can start service"
   }
 }

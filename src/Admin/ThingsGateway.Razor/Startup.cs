@@ -35,6 +35,9 @@ public class Startup : AppStartup
                 jsonLocalizationOptions.UseKeyWhenValueIsNull = true;
             }
             );
+
+        services.AddJsonLocalization();
+
         services.AddConfigurableOptions<MenuOptions>();
         services.ConfigureIconThemeOptions(options => options.ThemeKey = "fa");
         services.AddSingleton<IAppVersionService, VersionService>();

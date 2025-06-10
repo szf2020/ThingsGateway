@@ -152,7 +152,7 @@ public abstract class BusinessBaseWithCacheIntervalDeviceModel<VarModel, DevMode
                 {
                     if (_exTTimerTick.IsTickHappen())
                     {
-                        if (LogMessage.LogLevel <= LogLevel.Debug)
+                        if (LogMessage?.LogLevel <= LogLevel.Debug)
                             LogMessage?.LogDebug($"Interval  {typeof(VarModel).Name}  data, count {IdVariableRuntimes.Count}");
                         // 上传所有变量信息
                         var variableRuntimes = IdVariableRuntimes.Select(a => a.Value);
@@ -161,7 +161,7 @@ public abstract class BusinessBaseWithCacheIntervalDeviceModel<VarModel, DevMode
                 }
                 catch (Exception ex)
                 {
-                    LogMessage.LogWarning(ex, BusinessBaseLocalizer["IntervalInsertVariableFail"]);
+                    LogMessage?.LogWarning(ex, AppResource.IntervalInsertVariableFail);
                 }
 
                 try
@@ -170,7 +170,7 @@ public abstract class BusinessBaseWithCacheIntervalDeviceModel<VarModel, DevMode
                     {
                         if (CollectDevices != null)
                         {
-                            if (LogMessage.LogLevel <= LogLevel.Debug)
+                            if (LogMessage?.LogLevel <= LogLevel.Debug)
                                 LogMessage?.LogDebug($"Interval  {typeof(DevModel).Name}  data, count {CollectDevices.Count}");
                             // 上传所有设备信息
                             foreach (var deviceRuntime in CollectDevices.Select(a => a.Value))
@@ -182,7 +182,7 @@ public abstract class BusinessBaseWithCacheIntervalDeviceModel<VarModel, DevMode
                 }
                 catch (Exception ex)
                 {
-                    LogMessage.LogWarning(ex, BusinessBaseLocalizer["IntervalInsertDeviceFail"]);
+                    LogMessage?.LogWarning(ex, AppResource.IntervalInsertDeviceFail);
                 }
             }
 

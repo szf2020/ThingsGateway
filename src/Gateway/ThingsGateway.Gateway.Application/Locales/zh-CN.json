@@ -1,530 +1,424 @@
 ﻿{
-
-  "ThingsGateway.Gateway.Application.CollectFoundationDtuPackPropertyBase": {
-    "DtuId": "Dtu注册包(UTF8)"
-
+  "ThingsGateway.Gateway.Application.AlarmVariable": {
+    "AlarmCode": "报警值",
+    "AlarmDelay": "报警延时",
+    "AlarmEnable": "报警使能",
+    "AlarmLimit": "报警限值",
+    "AlarmText": "报警文本",
+    "AlarmTime": "报警时间",
+    "AlarmType": "报警类型",
+    "ArrayLength": "数组长度",
+    "BoolCloseAlarmEnable": "布尔关报警使能",
+    "BoolCloseAlarmText": "布尔关报警文本",
+    "BoolCloseRestrainExpressions": "布尔关报警约束",
+    "BoolOpenAlarmEnable": "布尔开报警使能",
+    "BoolOpenAlarmText": "布尔开报警文本",
+    "BoolOpenRestrainExpressions": "布尔开报警约束",
+    "BusinessGroup": "业务组",
+    "ChangeTime": "变化时间",
+    "CollectGroup": "采集组",
+    "CollectTime": "采集时间",
+    "CustomAlarmCode": "自定义报警限值",
+    "CustomAlarmEnable": "自定义报警使能",
+    "CustomAlarmText": "自定义报警文本",
+    "CustomRestrainExpressions": "自定义报警约束",
+    "DataType": "数据类型",
+    "Description": "描述",
+    "DeviceId": "采集设备",
+    "DeviceName": "设备名称",
+    "Enable": "变量使能",
+    "EventTime": "事件时间",
+    "EventType": "事件类型",
+    "HAlarmCode": "高限值",
+    "HAlarmEnable": "高报使能",
+    "HAlarmText": "高报文本",
+    "HHAlarmCode": "高高限值",
+    "HHAlarmEnable": "高高报使能",
+    "HHAlarmText": "高高报文本",
+    "HHRestrainExpressions": "高高报约束",
+    "HRestrainExpressions": "高报约束",
+    "IntervalTime": "执行间隔",
+    "IsOnline": "在线",
+    "LAlarmCode": "低限值",
+    "LAlarmEnable": "低报使能",
+    "LAlarmText": "低报文本",
+    "LastErrorMessage": "离线原因",
+    "LastSetValue": "上次值",
+    "LLAlarmCode": "低低限值",
+    "LLAlarmEnable": "低低报使能",
+    "LLAlarmText": "低低报文本",
+    "LLRestrainExpressions": "低低报约束",
+    "LRestrainExpressions": "低报约束",
+    "Name": "名称",
+    "OtherMethod": "特殊方法",
+    "ProtectType": "读写权限",
+    "RawValue": "原始值",
+    "ReadExpressions": "读取表达式",
+    "RecoveryCode": "恢复值",
+    "RegisterAddress": "变量地址",
+    "Remark1": "备用1",
+    "Remark2": "备用2",
+    "Remark3": "备用3",
+    "Remark4": "备用4",
+    "Remark5": "备用5",
+    "RpcWriteEnable": "远程写入",
+    "SaveValue": "保存初始值",
+    "Unit": "单位",
+    "Value": "实时值",
+    "WriteExpressions": "写入表达式"
   },
-  "ThingsGateway.Gateway.Application.CollectFoundationDtuPropertyBase": {
-    "DtuId": "Dtu注册包(UTF8)"
-
+  "ThingsGateway.Gateway.Application.BackendLog": {
+    "DeleteBackendLog": "删除后台日志",
+    "Exception": "异常对象",
+    "LogLevel": "日志级别",
+    "LogMessage": "具体消息",
+    "LogSource": "日志来源",
+    "LogTime": "时间"
+  },
+  "ThingsGateway.Gateway.Application.BackendLogPageInput": {
+    "LogLevel": "日志等级",
+    "LogSource": "日志源",
+    "SearchDate": "时间区间"
   },
 
-  "ThingsGateway.Gateway.Application.CollectFoundationPackPropertyBase": {
-
-    "MaxPack": "最大打包长度"
-
+  "ThingsGateway.Gateway.Application.BusinessPropertyWithCache": {
+    "CacheEnable": "启用缓存",
+    "CacheFileMaxLength": "缓存文件最大长度(mb)",
+    "GroupUpdate": "分组上传",
+    "OnlineFilter": "过滤离线变量",
+    "QueueMaxCount": "内存队列最大数量",
+    "SplitSize": "上传每页条数"
   },
-  "ThingsGateway.Gateway.Application.CollectFoundationPropertyBase": {
-    "DataFormat": "解析规则",
-    "IsStringReverseByteWord": "字符串反转",
-    "Timeout": "读写超时时间",
-    "SendDelayTime": "发送延时"
-  },
-  "ThingsGateway.Gateway.Application.CollectPropertyRetryBase": {
-    "ReIntervalTime": "离线恢复时间",
-    "RetryCount": "失败重试次数"
-  },
-  "ThingsGateway.Gateway.Application.CollectPropertyBase": {
-    "ReIntervalTime": "离线恢复时间",
-    "RetryCount": "失败重试次数",
-    "ConcurrentCount": "最大并发数量"
-
-  },
-  "ThingsGateway.Gateway.Application.BusinessPropertyWithCacheIntervalScript": {
-
-    "DetailLog": "详细日志",
-    "JsonFormattingIndented": "Json缩进格式化",
-
-    "BigTextScriptDeviceModel": "设备上传脚本",
-    "BigTextScriptVariableModel": "变量上传脚本",
-    "BigTextScriptAlarmModel": "报警上传脚本",
-
-    "IsDeviceList": "设备状态列表上传",
-    "IsVariableList": "变量列表上传",
-    "IsAlarmList": "报警列表上传",
-
-    "DeviceTopic": "设备主题",
-    "VariableTopic": "变量主题",
-    "AlarmTopic": "报警主题"
-
-  },
-
   "ThingsGateway.Gateway.Application.BusinessPropertyWithCacheInterval": {
-
-    "BusinessUpdateEnum": "上传模式",
     "BusinessInterval": "定时上传间隔",
+    "BusinessUpdateEnum": "上传模式",
     "IsAllVariable": "选择全部变量"
   },
-  "ThingsGateway.Gateway.Application.BusinessPropertyWithCache": {
-
-    "QueueMaxCount": "内存队列最大数量",
-    "CacheFileMaxLength": "缓存文件最大长度(mb)",
-    "SplitSize": "上传每页条数",
-    "CacheEnable": "启用缓存",
-
-    "GroupUpdate": "分组上传",
-    "OnlineFilter": "过滤离线变量"
+  "ThingsGateway.Gateway.Application.BusinessPropertyWithCacheIntervalScript": {
+    "AlarmTopic": "报警主题",
+    "BigTextScriptAlarmModel": "报警上传脚本",
+    "BigTextScriptDeviceModel": "设备上传脚本",
+    "BigTextScriptVariableModel": "变量上传脚本",
+    "DetailLog": "详细日志",
+    "DeviceTopic": "设备主题",
+    "IsAlarmList": "报警列表上传",
+    "IsDeviceList": "设备状态列表上传",
+    "IsVariableList": "变量列表上传",
+    "JsonFormattingIndented": "Json缩进格式化",
+    "VariableTopic": "变量主题"
   },
   "ThingsGateway.Gateway.Application.BusinessUpdateEnum": {
     "Change": "变化",
     "Interval": "定时",
     "IntervalOrChange": "定时或变化"
   },
+  "ThingsGateway.Gateway.Application.Channel": {
+    "BaudRate": "波特率",
+    "BindUrl": "本地url",
+    "CacheTimeout": "接收缓存超时",
+    "Channel": "通道",
+    "ChannelType": "通道类型",
+    "CheckClearTime": "客户端连接滑动过期时间",
+    "ClearChannel": "清空通道",
+    "Confim": "创建",
+    "Connect": "连接",
+    "ConnectTimeout": "连接超时",
+    "CopyChannel": "复制通道",
+    "CreateTime": "创建时间",
+    "CreateUser": "创建人",
+    "DataBits": "数据位",
+    "DeleteChannel": "删除通道",
+    "Disconnect": "断开",
+    "DtrEnable": "Dtr",
+    "DtuId": "Dtu终端注册包(utf-8)",
+    "DtuSeviceType": "DTU服务类型",
+    "Enable": "启用",
+    "ExportChannel": "导出通道",
+    "Heartbeat": "心跳内容(utf8)",
+    "HeartbeatTime": "心跳间隔",
+    "ImportChannel": "导入通道",
+    "ImportNullError": "无法识别",
+    "LogEnable": "启用调试日志",
+    "LogLevel": "日志等级",
+    "MaxClientCount": "最大连接数",
+    "MaxConcurrentCount": "最大并发数",
+    "Name": "名称",
+    "Name.Required": " {0} 不可为空",
+    "NameDump": "通道名称 {0} 重复",
+    "NotOther": "不支持其他通道类型",
+    "Parity": "校验位",
+    "PluginName": "插件名称",
+    "PluginName.Required": "{0} 插件名称不可为空",
+    "PortName": "COM口",
+    "RemoteUrl": "远程url",
+    "RtsEnable": "Rts",
+    "SaveChannel": "添加/修改通道",
+    "SortCode": "排序",
+    "StopBits": "停止位",
+    "UpdateTime": "更新时间",
+    "UpdateUser": "更新人"
+  },
+  "ThingsGateway.Gateway.Application.ChannelRuntime": {
+    "DeviceRuntimeCount": "设备数量",
+    "MaxConcurrentCount": "最大并发数量",
+    "Name.Required": " {0} 不可为空",
+    "PluginName.Required": "{0} 插件名称不可为空",
+    "PluginType": "插件类型"
+  },
 
+  "ThingsGateway.Gateway.Application.CollectFoundationDtuPackPropertyBase": {
+    "DtuId": "Dtu注册包(UTF8)"
+  },
+  "ThingsGateway.Gateway.Application.CollectFoundationDtuPropertyBase": {
+    "DtuId": "Dtu注册包(UTF8)"
+  },
+  "ThingsGateway.Gateway.Application.CollectFoundationPackPropertyBase": {
+    "MaxPack": "最大打包长度"
+  },
+  "ThingsGateway.Gateway.Application.CollectFoundationPropertyBase": {
+    "DataFormat": "解析规则",
+    "IsStringReverseByteWord": "字符串反转",
+    "SendDelayTime": "发送延时",
+    "Timeout": "读写超时时间"
+  },
+  "ThingsGateway.Gateway.Application.CollectPropertyBase": {
+    "ConcurrentCount": "最大并发数量",
+    "ReIntervalTime": "离线恢复时间",
+    "RetryCount": "失败重试次数"
+  },
+  "ThingsGateway.Gateway.Application.CollectPropertyRetryBase": {
+    "ReIntervalTime": "离线恢复时间",
+    "RetryCount": "失败重试次数"
+  },
   "ThingsGateway.Gateway.Application.ControlController": {
-    "ControlController": "设备控制",
-    "RemoveAllCache": "清空全部缓存",
-    "RemoveCache": "删除通道/设备缓存",
-    "PauseDeviceThreadAsync": "控制设备线程启停",
-    "RestartAllThread": "重启全部线程",
-    "RestartDeviceThreadAsync": "重启设备线程",
-    "WriteVariablesAsync": "写入变量",
     "BatchSaveChannelAsync": "保存通道",
     "BatchSaveDeviceAsync": "保存设备",
     "BatchSaveVariableAsync": "保存变量",
+    "ControlController": "设备控制",
     "DeleteChannelAsync": "删除通道",
     "DeleteDeviceAsync": "删除设备",
     "DeleteVariableAsync": "删除变量",
-    "InsertTestDataAsync": "增加测试数据"
+    "InsertTestDataAsync": "增加测试数据",
+    "PauseDeviceThreadAsync": "控制设备线程启停",
+    "RemoveAllCache": "清空全部缓存",
+    "RemoveCache": "删除通道/设备缓存",
+    "RestartAllThread": "重启全部线程",
+    "RestartDeviceThreadAsync": "重启设备线程",
+    "WriteVariablesAsync": "写入变量"
   },
-  "ThingsGateway.Gateway.Application.RuntimeInfoController": {
-    "RuntimeInfoController": "获取运行态信息",
-    "GetChannelListAsync": "获取通道信息",
-    "GetDeviceListAsync": "获取设备信息",
-    "GetVariableList": "获取变量信息",
-    "GetRealAlarmList": "获取实时报警信息",
-    "CheckRealAlarm": "确认实时报警"
-  },
-
-  "ThingsGateway.Gateway.Application.DeviceRuntime": {
-    "SourceVariableCount": "打包数量",
-    "MethodVariableCount": "方法数量",
-    "ActiveTime": "活跃时间",
-    "DeviceVariableCount": "变量数量",
-    "LastErrorMessage": "离线原因",
-    "DeviceStatus": "设备状态",
-    "RedundantType": "冗余状态",
-    "PluginName": "插件名称",
-    "Name.Required": " {0} 不可为空",
-    "ChannelName": "通道",
+  "ThingsGateway.Gateway.Application.Device": {
+    "ChannelError": "通道错误",
+    "ChannelId": "通道",
     "ChannelId.MinValue": " {0} 不可为空",
     "ChannelId.Required": " {0} 不可为空",
-    "IntervalTime.MinValue": " {0} 值太小",
-    "PluginName.Required": "{0} 插件名称不可为空"
-
-  },
-  "ThingsGateway.Gateway.Application.VariableRuntime": {
-    "ChangeTime": "变化时间",
-    "CollectTime": "采集时间",
-    "DeviceName": "设备名称",
-    "IsOnline": "在线",
-    "LastErrorMessage": "离线原因",
-    "LastSetValue": "上次值",
-    "RawValue": "原始值",
-    "Value": "实时值",
-    "RuntimeType": "动态类型",
-    "AlarmEnable": "报警使能",
-    "SortCode": "排序",
-    "Name.Required": " {0} 不可为空",
-    "DeviceId.MinValue": " {0} 不可为空",
-    "DeviceId.Required": " {0} 不可为空",
-    "IntervalTime.MinValue": " {0} 值太小",
-
-    "DynamicVariable": "动态变量",
-
-    "AlarmCode": "报警值",
-    "RecoveryCode": "恢复值",
-    "AlarmLimit": "报警限值",
-    "AlarmText": "报警文本",
-    "AlarmTime": "报警时间",
-    "AlarmType": "报警类型",
-    "EventTime": "事件时间",
-    "EventType": "事件类型"
-  },
-  "ThingsGateway.Gateway.Application.AlarmVariable": {
-    "ChangeTime": "变化时间",
-    "CollectTime": "采集时间",
-    "DeviceName": "设备名称",
-    "IsOnline": "在线",
-    "LastErrorMessage": "离线原因",
-    "LastSetValue": "上次值",
-    "RawValue": "原始值",
-    "Value": "实时值",
-    "AlarmEnable": "报警使能",
-    "BusinessGroup": "业务组",
-    "CollectGroup": "采集组",
-    "Name": "名称",
+    "ClearDevice": "清空设备",
+    "CopyDevice": "复制设备",
+    "DeleteDevice": "删除设备",
     "Description": "描述",
-    "DeviceId": "采集设备",
-    "IntervalTime": "执行间隔",
-
-    "ArrayLength": "数组长度",
-    "Enable": "变量使能",
-    "ProtectType": "读写权限",
-    "DataType": "数据类型",
-    "ReadExpressions": "读取表达式",
-    "WriteExpressions": "写入表达式",
-    "RpcWriteEnable": "远程写入",
-    "SaveValue": "保存初始值",
-
-    "AlarmDelay": "报警延时",
-    "BoolOpenAlarmEnable": "布尔开报警使能",
-    "BoolOpenRestrainExpressions": "布尔开报警约束",
-    "BoolOpenAlarmText": "布尔开报警文本",
-
-    "BoolCloseAlarmEnable": "布尔关报警使能",
-    "BoolCloseRestrainExpressions": "布尔关报警约束",
-    "BoolCloseAlarmText": "布尔关报警文本",
-
-    "HAlarmEnable": "高报使能",
-    "HRestrainExpressions": "高报约束",
-    "HAlarmText": "高报文本",
-    "HAlarmCode": "高限值",
-
-    "HHAlarmEnable": "高高报使能",
-    "HHRestrainExpressions": "高高报约束",
-    "HHAlarmText": "高高报文本",
-    "HHAlarmCode": "高高限值",
-
-    "LAlarmEnable": "低报使能",
-    "LRestrainExpressions": "低报约束",
-    "LAlarmText": "低报文本",
-    "LAlarmCode": "低限值",
-
-    "LLAlarmEnable": "低低报使能",
-    "LLRestrainExpressions": "低低报约束",
-    "LLAlarmText": "低低报文本",
-    "LLAlarmCode": "低低限值",
-
-    "CustomAlarmEnable": "自定义报警使能",
-    "CustomRestrainExpressions": "自定义报警约束",
-    "CustomAlarmText": "自定义报警文本",
-    "CustomAlarmCode": "自定义报警限值",
-
-    "Unit": "单位",
-    "RegisterAddress": "变量地址",
-    "OtherMethod": "特殊方法",
-
+    "DeviceNotNull": "设备名称不存在",
+    "Enable": "设备使能",
+    "ExportDevice": "导出设备",
+    "ImportDevice": "导入设备",
+    "ImportNullError": "无法识别",
+    "IntervalTime": "默认执行间隔",
+    "IntervalTime.MinValue": " {0} 值太小",
+    "LogEnable": "启用调试日志",
+    "LogLevel": "日志等级",
+    "Name": "名称",
+    "Name.Required": " {0} 不可为空",
+    "NameDump": "设备名称 {0} 重复",
+    "NotNull": " {0} 不存在",
+    "PluginNotNull": "插件不存在",
+    "RedundantDeviceError": "冗余设备错误",
+    "RedundantDeviceId": "冗余设备",
+    "RedundantDeviceNotNull": "启用冗余时，必须选择备用设备",
+    "RedundantEnable": "启用冗余",
+    "RedundantScanIntervalTime": "冗余检测时间",
+    "RedundantScript": "冗余检测脚本",
+    "RedundantSwitchType": "冗余操作模式",
     "Remark1": "备用1",
     "Remark2": "备用2",
     "Remark3": "备用3",
     "Remark4": "备用4",
     "Remark5": "备用5",
-
-    "AlarmCode": "报警值",
-    "RecoveryCode": "恢复值",
-    "AlarmLimit": "报警限值",
-    "AlarmText": "报警文本",
-    "AlarmTime": "报警时间",
-    "AlarmType": "报警类型",
-    "EventTime": "事件时间",
-    "EventType": "事件类型"
+    "SaveDevice": "添加/修改设备"
   },
-
-  "ThingsGateway.Gateway.Application.BusinessBase": {
-    "IntervalInsertVariableFail": "间隔上传变量失败",
-    "IntervalInsertDeviceFail": "间隔上传设备失败",
-    "IntervalInsertAlarmFail": "间隔上传报警失败"
-  },
-  "ThingsGateway.Gateway.Application.CollectBase": {
-    "VariablePackError": "变量打包失败 {0} ",
-    "GetMethodError": "插件方法初始化失败 {0} ",
-    "MethodNotNull": "特殊方法变量 {0} 找不到执行方法 {1}，请检查现有方法列表",
-    "CollectFail": "{0} - 采集[{1} - {2}] 数据失败  {3}",
-    "CollectSuccess": "{0} - 采集[{1} - {2}] 数据成功  {3}",
-    "MethodFail": "{0} - 执行方法[{1}] - 失败  {2}",
-    "MethodSuccess": "{0} - 执行方法[{1}] - 成功  {2}",
-    "WriteExpressionsError": " {0} 转换写入表达式 {1} 失败 {2} "
+  "ThingsGateway.Gateway.Application.DeviceRuntime": {
+    "ActiveTime": "活跃时间",
+    "ChannelId.MinValue": " {0} 不可为空",
+    "ChannelId.Required": " {0} 不可为空",
+    "ChannelName": "通道",
+    "DeviceStatus": "设备状态",
+    "DeviceVariableCount": "变量数量",
+    "IntervalTime.MinValue": " {0} 值太小",
+    "LastErrorMessage": "离线原因",
+    "MethodVariableCount": "方法数量",
+    "Name.Required": " {0} 不可为空",
+    "PluginName": "插件名称",
+    "PluginName.Required": "{0} 插件名称不可为空",
+    "RedundantType": "冗余状态",
+    "SourceVariableCount": "打包数量"
   },
 
   "ThingsGateway.Gateway.Application.DriverBase": {
     "Authorized": "已授权",
-    "Unauthorized": "未授权",
     "ExpireTime": "过期时间",
-    "DeviceTaskStart": "设备 {0} 线程开始",
-    "DeviceTaskStartTimeout": "设备 {0} 线程启动超时 {1} s",
-    "DeviceTaskStop": "设备 {0} 线程停止",
-    "DeviceTaskPause": "设备 {0} 线程暂停",
-    "DeviceTaskContinue": "设备 {0} 线程继续"
+    "Unauthorized": "未授权"
   },
-
-  "ThingsGateway.Gateway.Application.DeviceThreadManage": {
-    "InitFail": "插件 {0} 设备 {1} 初始化失败",
-    "ChannelCreate": "通道 {0} 创建",
-    "ChannelDispose": "通道 {0} 销毁"
-  },
-
-  "ThingsGateway.Gateway.Application.AlarmHostedService": {
-    "RealAlarmTask": "实时报警服务",
-    "RealAlarmTaskStart": "实时报警服务启动"
-  },
-  "ThingsGateway.Gateway.Application.PluginService": {
-    "LoadTypeSuccess": "加载插件 {0} 成功",
-    "LoadTypeFail1": "加载插件 {0} 失败，插件类型不存在",
-    "LoadTypeFail2": "加载插件文件 {0} 失败，文件不存在",
-    "PluginNotFound": "没有发现插件类型",
-    "LoadOtherFileFail": "尝试加载附属程序集 {0} 失败，如果此程序集为DllImport，可以忽略此警告。",
-    "LoadPluginFail": "加载插件 {0} 失败",
-    "AddPluginFile": "添加插件文件 {0}"
-  },
-  "ThingsGateway.Gateway.Application.PluginInfo": {
-    "FullName": "插件全名称",
-    "FileName": "插件文件",
-    "PluginType": "插件类型",
-    "Name": "插件名称",
-    "DeviceCount": "关联设备数量",
-    "Version": "插件版本",
-    "LastWriteTime": "插件编译时间"
+  "ThingsGateway.Gateway.Application.ExportString": {
+    "BusinessDeviceName": "业务设备",
+    "ChannelName": "通道",
+    "DeviceName": "设备",
+    "RedundantDeviceName": "冗余设备",
+    "VariableName": "变量"
   },
   "ThingsGateway.Gateway.Application.PluginAddInput": {
     "MainFile": "主程序集",
     "OtherFiles": "附属程序集，可上传多个",
     "SavePlugin": "添加/修改插件"
   },
-
-  "ThingsGateway.Gateway.Application.BackendLog": {
-    "LogTime": "时间",
-    "LogLevel": "日志级别",
-    "LogSource": "日志来源",
-    "LogMessage": "具体消息",
-    "Exception": "异常对象",
-
-    "DeleteBackendLog": "删除后台日志"
-  },
-
-  "ThingsGateway.Gateway.Application.RpcLog": {
-    "LogTime": "时间",
-    "OperateSource": "操作源",
-    "OperateObject": "操作对象",
-    "OperateDevice": "操作设备",
-    "OperateMethod": "RPC方法",
-    "IsSuccess": "操作结果",
-    "ParamJson": "请求参数",
-    "ResultJson": "返回结果",
-    "OperateMessage": "具体消息",
-
-    "DeleteRpc": "删除RPC日志"
-  },
-
-  "ThingsGateway.Gateway.Application.Device": {
-    "Name": "名称",
-    "Name.Required": " {0} 不可为空",
-    "Description": "描述",
-    "ChannelId": "通道",
-    "ChannelId.MinValue": " {0} 不可为空",
-    "ChannelId.Required": " {0} 不可为空",
-    "IntervalTime": "默认执行间隔",
-    "IntervalTime.MinValue": " {0} 值太小",
-    "LogEnable": "启用调试日志",
-    "LogLevel": "日志等级",
-    "Enable": "设备使能",
-
-    "RedundantEnable": "启用冗余",
-    "RedundantDeviceId": "冗余设备",
-    "RedundantSwitchType": "冗余操作模式",
-    "RedundantScanIntervalTime": "冗余检测时间",
-    "RedundantScript": "冗余检测脚本",
-
-    "Remark1": "备用1",
-    "Remark2": "备用2",
-    "Remark3": "备用3",
-    "Remark4": "备用4",
-    "Remark5": "备用5",
-
-    "RedundantDeviceNotNull": "启用冗余时，必须选择备用设备",
-
-    "SaveDevice": "添加/修改设备",
-    "CopyDevice": "复制设备",
-    "DeleteDevice": "删除设备",
-    "ClearDevice": "清空设备",
-    "ExportDevice": "导出设备",
-    "ImportDevice": "导入设备",
-
-    "ImportNullError": "无法识别",
-    "RedundantDeviceError": "冗余设备错误",
-    "ChannelError": "通道错误",
-    "NotNull": " {0} 不存在",
-    "DeviceNotNull": "设备名称不存在",
-    "PluginNotNull": "插件不存在",
-    "NameDump": "设备名称 {0} 重复"
-  },
-  "ThingsGateway.Gateway.Application.ChannelRuntime": {
-    "Name.Required": " {0} 不可为空",
-    "PluginName.Required": "{0} 插件名称不可为空",
+  "ThingsGateway.Gateway.Application.PluginInfo": {
+    "DeviceCount": "关联设备数量",
+    "FileName": "插件文件",
+    "FullName": "插件全名称",
+    "LastWriteTime": "插件编译时间",
+    "Name": "插件名称",
     "PluginType": "插件类型",
-    "MaxConcurrentCount": "最大并发数量",
-    "DeviceRuntimeCount": "设备数量"
-  },
-
-  "ThingsGateway.Gateway.Application.Channel": {
-    "SortCode": "排序",
-    "CreateTime": "创建时间",
-    "CreateUser": "创建人",
-    "UpdateTime": "更新时间",
-    "UpdateUser": "更新人",
-
-    "Name": "名称",
-    "Name.Required": " {0} 不可为空",
-    "ChannelType": "通道类型",
-    "Enable": "启用",
-    "LogEnable": "启用调试日志",
-    "PluginName": "插件名称",
-    "PluginName.Required": "{0} 插件名称不可为空",
-    "LogLevel": "日志等级",
-
-    "RemoteUrl": "远程url",
-    "BindUrl": "本地url",
-
-    "PortName": "COM口",
-    "BaudRate": "波特率",
-    "DataBits": "数据位",
-    "Parity": "校验位",
-    "StopBits": "停止位",
-    "DtrEnable": "Dtr",
-    "RtsEnable": "Rts",
-    "CacheTimeout": "接收缓存超时",
-    "ConnectTimeout": "连接超时",
-    "MaxConcurrentCount": "最大并发数",
-
-
-    "MaxClientCount": "最大连接数",
-    "CheckClearTime": "客户端连接滑动过期时间",
-    "Heartbeat": "心跳内容(utf8)",
-    "HeartbeatTime": "心跳间隔",
-    "DtuId": "Dtu终端注册包(utf-8)",
-    "DtuSeviceType": "DTU服务类型",
-
-    "SaveChannel": "添加/修改通道",
-    "CopyChannel": "复制通道",
-    "DeleteChannel": "删除通道",
-    "ClearChannel": "清空通道",
-    "ExportChannel": "导出通道",
-    "ImportChannel": "导入通道",
-
-    "ImportNullError": "无法识别",
-
-    "NotOther": "不支持其他通道类型",
-    "Connect": "连接",
-    "Confim": "创建",
-    "Disconnect": "断开",
-    "Channel": "通道",
-    "NameDump": "通道名称 {0} 重复"
-  },
-
-  "ThingsGateway.Gateway.Application.Variable": {
-    "AddressOrOtherMethodNotNull": " 变量地址或特殊方法不能同时为空 ",
-    "SaveVariable": "添加/修改变量",
-    "CopyVariable": "复制变量",
-    "DeleteVariable": "删除变量",
-    "ClearVariable": "清空变量",
-    "ExportVariable": "导出变量",
-    "ImportVariable": "导入变量",
-
-    "NotNull": " {0} 不存在",
-    "DeviceNotNull": "设备名称不存在",
-    "PluginNotNull": "插件不存在",
-    "VariableNotNull": "变量名称不存在",
-
-    "Name": "名称",
-    "Name.Required": " {0} 不可为空",
-    "Description": "描述",
-    "BusinessGroup": "业务组",
-    "CollectGroup": "采集组",
-    "DeviceId": "采集设备",
-    "DeviceId.MinValue": " {0} 不可为空",
-    "DeviceId.Required": " {0} 不可为空",
-    "IntervalTime": "执行间隔",
-    "IntervalTime.MinValue": " {0} 值太小",
-    "ArrayLength": "数组长度",
-
-    "Enable": "变量使能",
-    "ProtectType": "读写权限",
-    "DataType": "数据类型",
-    "ReadExpressions": "读取表达式",
-    "WriteExpressions": "写入表达式",
-    "RpcWriteEnable": "远程写入",
-    "InitValue": "初始值",
-    "SaveValue": "保存初始值",
-    "DynamicVariable": "动态变量",
-
-    "AlarmDelay": "报警延时",
-    "BoolOpenAlarmEnable": "布尔开报警使能",
-    "BoolOpenRestrainExpressions": "布尔开报警约束",
-    "BoolOpenAlarmText": "布尔开报警文本",
-
-    "BoolCloseAlarmEnable": "布尔关报警使能",
-    "BoolCloseRestrainExpressions": "布尔关报警约束",
-    "BoolCloseAlarmText": "布尔关报警文本",
-
-    "HAlarmEnable": "高报使能",
-    "HRestrainExpressions": "高报约束",
-    "HAlarmText": "高报文本",
-    "HAlarmCode": "高限值",
-
-    "HHAlarmEnable": "高高报使能",
-    "HHRestrainExpressions": "高高报约束",
-    "HHAlarmText": "高高报文本",
-    "HHAlarmCode": "高高限值",
-
-    "LAlarmEnable": "低报使能",
-    "LRestrainExpressions": "低报约束",
-    "LAlarmText": "低报文本",
-    "LAlarmCode": "低限值",
-
-    "LLAlarmEnable": "低低报使能",
-    "LLRestrainExpressions": "低低报约束",
-    "LLAlarmText": "低低报文本",
-    "LLAlarmCode": "低低限值",
-
-    "CustomAlarmEnable": "自定义报警使能",
-    "CustomRestrainExpressions": "自定义报警约束",
-    "CustomAlarmText": "自定义报警文本",
-    "CustomAlarmCode": "自定义报警限值",
-
-    "Unit": "单位",
-    "RegisterAddress": "变量地址",
-    "OtherMethod": "特殊方法",
-
-    "Remark1": "备用1",
-    "Remark2": "备用2",
-    "Remark3": "备用3",
-    "Remark4": "备用4",
-    "Remark5": "备用5",
-
-    "NameDump": "变量名称 {0} 重复"
-  },
-
-  "ThingsGateway.Gateway.Application.RpcLogPageInput": {
-    "SearchDate": "时间区间",
-    "OperateObject": "操作对象",
-    "OperateDevice": "操作设备",
-    "OperateSource": "操作源"
-  },
-  "ThingsGateway.Gateway.Application.BackendLogPageInput": {
-    "SearchDate": "时间区间",
-    "LogLevel": "日志等级",
-    "LogSource": "日志源"
-  },
-  "ThingsGateway.Gateway.Application.RpcService": {
-    "DeviceNotNull": "设备名称不存在",
-    "VariableNotNull": " {0} 变量不存在",
-    "VariableReadOnly": " {0} 变量只读",
-    "VariableWriteDisable": " {0} 变量不允许写入",
-    "DriverNotNull": "系统错误，不存在对应采集设备，请稍候重试",
-    "DevicePause": " {0} 设备已暂停",
-    "WriteVariable": "写入变量"
-  },
-  "ThingsGateway.Gateway.Application.ExportString": {
-    "VariableName": "变量",
-    "RedundantDeviceName": "冗余设备",
-    "ChannelName": "通道",
-    "DeviceName": "设备",
-    "BusinessDeviceName": "业务设备"
+    "Version": "插件版本"
   },
 
   "ThingsGateway.Gateway.Application.ProtectTypeEnum": {
     "ReadOnly": "只读",
     "ReadWrite": "读写",
     "WriteOnly": "只写"
+  },
+  "ThingsGateway.Gateway.Application.RpcLog": {
+    "DeleteRpc": "删除RPC日志",
+    "IsSuccess": "操作结果",
+    "LogTime": "时间",
+    "OperateDevice": "操作设备",
+    "OperateMessage": "具体消息",
+    "OperateMethod": "RPC方法",
+    "OperateObject": "操作对象",
+    "OperateSource": "操作源",
+    "ParamJson": "请求参数",
+    "ResultJson": "返回结果"
+  },
+  "ThingsGateway.Gateway.Application.RpcLogPageInput": {
+    "OperateDevice": "操作设备",
+    "OperateObject": "操作对象",
+    "OperateSource": "操作源",
+    "SearchDate": "时间区间"
+  },
+  "ThingsGateway.Gateway.Application.RpcService": {
+    "DeviceNotNull": "设备名称不存在",
+    "DevicePause": " {0} 设备已暂停",
+    "DriverNotNull": "系统错误，不存在对应采集设备，请稍候重试",
+    "VariableNotNull": " {0} 变量不存在",
+    "VariableReadOnly": " {0} 变量只读",
+    "VariableWriteDisable": " {0} 变量不允许写入"
+  },
+  "ThingsGateway.Gateway.Application.RuntimeInfoController": {
+    "CheckRealAlarm": "确认实时报警",
+    "GetChannelListAsync": "获取通道信息",
+    "GetDeviceListAsync": "获取设备信息",
+    "GetRealAlarmList": "获取实时报警信息",
+    "GetVariableList": "获取变量信息",
+    "RuntimeInfoController": "获取运行态信息"
+  },
+  "ThingsGateway.Gateway.Application.Variable": {
+    "AddressOrOtherMethodNotNull": " 变量地址或特殊方法不能同时为空 ",
+    "AlarmDelay": "报警延时",
+    "ArrayLength": "数组长度",
+    "BoolCloseAlarmEnable": "布尔关报警使能",
+    "BoolCloseAlarmText": "布尔关报警文本",
+    "BoolCloseRestrainExpressions": "布尔关报警约束",
+    "BoolOpenAlarmEnable": "布尔开报警使能",
+    "BoolOpenAlarmText": "布尔开报警文本",
+    "BoolOpenRestrainExpressions": "布尔开报警约束",
+    "BusinessGroup": "业务组",
+    "ClearVariable": "清空变量",
+    "CollectGroup": "采集组",
+    "CopyVariable": "复制变量",
+    "CustomAlarmCode": "自定义报警限值",
+    "CustomAlarmEnable": "自定义报警使能",
+    "CustomAlarmText": "自定义报警文本",
+    "CustomRestrainExpressions": "自定义报警约束",
+    "DataType": "数据类型",
+    "DeleteVariable": "删除变量",
+    "Description": "描述",
+    "DeviceId": "采集设备",
+    "DeviceId.MinValue": " {0} 不可为空",
+    "DeviceId.Required": " {0} 不可为空",
+    "DeviceNotNull": "设备名称不存在",
+    "DynamicVariable": "动态变量",
+    "Enable": "变量使能",
+    "ExportVariable": "导出变量",
+    "HAlarmCode": "高限值",
+    "HAlarmEnable": "高报使能",
+    "HAlarmText": "高报文本",
+    "HHAlarmCode": "高高限值",
+    "HHAlarmEnable": "高高报使能",
+    "HHAlarmText": "高高报文本",
+    "HHRestrainExpressions": "高高报约束",
+    "HRestrainExpressions": "高报约束",
+    "ImportVariable": "导入变量",
+    "InitValue": "初始值",
+    "IntervalTime": "执行间隔",
+    "IntervalTime.MinValue": " {0} 值太小",
+    "LAlarmCode": "低限值",
+    "LAlarmEnable": "低报使能",
+    "LAlarmText": "低报文本",
+    "LLAlarmCode": "低低限值",
+    "LLAlarmEnable": "低低报使能",
+    "LLAlarmText": "低低报文本",
+    "LLRestrainExpressions": "低低报约束",
+    "LRestrainExpressions": "低报约束",
+    "Name": "名称",
+    "Name.Required": " {0} 不可为空",
+    "NameDump": "变量名称 {0} 重复",
+    "NotNull": " {0} 不存在",
+    "OtherMethod": "特殊方法",
+    "PluginNotNull": "插件不存在",
+    "ProtectType": "读写权限",
+    "ReadExpressions": "读取表达式",
+    "RegisterAddress": "变量地址",
+    "Remark1": "备用1",
+    "Remark2": "备用2",
+    "Remark3": "备用3",
+    "Remark4": "备用4",
+    "Remark5": "备用5",
+    "RpcWriteEnable": "远程写入",
+    "SaveValue": "保存初始值",
+    "SaveVariable": "添加/修改变量",
+    "Unit": "单位",
+    "VariableNotNull": "变量名称不存在",
+    "WriteExpressions": "写入表达式"
+  },
+  "ThingsGateway.Gateway.Application.VariableRuntime": {
+    "AlarmCode": "报警值",
+    "AlarmEnable": "报警使能",
+    "AlarmLimit": "报警限值",
+    "AlarmText": "报警文本",
+    "AlarmTime": "报警时间",
+    "AlarmType": "报警类型",
+    "ChangeTime": "变化时间",
+    "CollectTime": "采集时间",
+    "DeviceId.MinValue": " {0} 不可为空",
+    "DeviceId.Required": " {0} 不可为空",
+    "DeviceName": "设备名称",
+    "DynamicVariable": "动态变量",
+    "EventTime": "事件时间",
+    "EventType": "事件类型",
+    "IntervalTime.MinValue": " {0} 值太小",
+    "IsOnline": "在线",
+    "LastErrorMessage": "离线原因",
+    "LastSetValue": "上次值",
+    "Name.Required": " {0} 不可为空",
+    "RawValue": "原始值",
+    "RecoveryCode": "恢复值",
+    "RuntimeType": "动态类型",
+    "SortCode": "排序",
+    "Value": "实时值"
   }
 }

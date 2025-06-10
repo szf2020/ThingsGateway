@@ -45,11 +45,8 @@ internal sealed class PluginService : IPluginService
     private readonly WaitLock _locker = new();
     private readonly ILogger _logger;
 
-    private IStringLocalizer Localizer;
-
-    public PluginService(ILogger<PluginService> logger, IStringLocalizer<PluginService> localizer, IDispatchService<PluginInfo> dispatchService)
+    public PluginService(ILogger<PluginService> logger, IDispatchService<PluginInfo> dispatchService)
     {
-        Localizer = localizer;
         _logger = logger;
 
         _dispatchService = dispatchService;
@@ -142,17 +139,17 @@ internal sealed class PluginService : IPluginService
                 if (driverType != null)
                 {
                     var driver = (DriverBase)Activator.CreateInstance(driverType);
-                    _logger?.LogInformation(Localizer[$"LoadTypeSuccess", pluginName]);
+                    _logger?.LogInformation(string.Format(AppResource.LoadTypeSuccess, pluginName));
                     _driverBaseDict.TryAdd(pluginName, driverType);
                     return driver;
                 }
                 // 抛出异常，插件类型不存在
-                throw new(Localizer[$"LoadTypeFail1", pluginName]);
+                throw new(string.Format(AppResource.LoadTypeFail1, pluginName));
             }
             else
             {
                 // 抛出异常，插件文件不存在
-                throw new(Localizer[$"LoadTypeFail2", path]);
+                throw new(string.Format(AppResource.LoadTypeFail2, path));
             }
         }
         finally
@@ -426,7 +423,7 @@ internal sealed class PluginService : IPluginService
                     catch (Exception ex)
                     {
                         // 加载失败时记录警告信息
-                        _logger?.LogWarning(ex, Localizer[$"LoadOtherFileFail", item]);
+                        _logger?.LogWarning(ex, string.Format(AppResource.LoadOtherFileFail, item));
                     }
                 }
                 #endregion
@@ -438,7 +435,7 @@ internal sealed class PluginService : IPluginService
                 // 检查是否存在驱动类型
                 if (!driverTypes.Any())
                 {
-                    throw new(Localizer[$"PluginNotFound"]);
+                    throw new(AppResource.PluginNotFound);
                 }
 
                 assembly = null;
@@ -652,7 +649,7 @@ internal sealed class PluginService : IPluginService
                 }
                 //添加到全局对象
                 _assemblyLoadContextDict.TryAdd(fileName, (assemblyLoadContext, assembly));
-                _logger?.LogInformation(Localizer["AddPluginFile", path]);
+                _logger?.LogInformation(string.Format(AppResource.AddPluginFile, path));
             }
             return assembly;
 
@@ -702,7 +699,7 @@ internal sealed class PluginService : IPluginService
                 }
                 catch (Exception ex)
                 {
-                    _logger?.LogWarning(ex, Localizer[$"LoadOtherFileFail", item]);
+                    _logger?.LogWarning(ex, string.Format(AppResource.LoadOtherFileFail, item));
                 }
             }
         }
@@ -800,7 +797,7 @@ internal sealed class PluginService : IPluginService
                             {
                                 //添加到字典
                                 _driverBaseDict.TryAdd($"{driverMainName}.{type.Name}", type);
-                                _logger?.LogInformation(Localizer[$"LoadTypeSuccess", PluginServiceUtil.GetFullName(driverMainName, type.Name)]);
+                                _logger?.LogInformation(string.Format(AppResource.LoadTypeSuccess, PluginServiceUtil.GetFullName(driverMainName, type.Name)));
                             }
                             var plugin = new PluginInfo()
                             {
@@ -820,7 +817,7 @@ internal sealed class PluginService : IPluginService
                 catch (Exception ex)
                 {
                     // 记录加载插件失败的日志
-                    _logger?.LogWarning(ex, Localizer[$"LoadPluginFail", Path.GetRelativePath(AppContext.BaseDirectory.CombinePathWithOs(DirName), folderPath)]);
+                    _logger?.LogWarning(ex, string.Format(AppResource.LoadPluginFail, Path.GetRelativePath(AppContext.BaseDirectory.CombinePathWithOs(DirName), folderPath)));
                 }
             }
             return plugins.DistinctBy(a => a.FullName).OrderBy(a => a.EducationPlugin);

@@ -271,7 +271,7 @@ public class SiemensS7Address : S7Request
                 }
                 else
                 {
-                    throw new Exception(SiemensS7Resource.Localizer["AddressError", address]);
+                    throw new Exception(string.Format(AppResource.AddressError, address));
                 }
             }
         }

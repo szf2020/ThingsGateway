@@ -179,7 +179,7 @@ public partial class OpcUaServer : BusinessBase
                 catch (Exception ex)
                 {
                     if (connect_success)
-                        LogMessage.LogWarning(ex, Localizer["CanStartService"]);
+                        LogMessage?.LogWarning(ex, "Failed to start service");
                     connect_success = false;
                     await Task.Delay(10000, cancellationToken).ConfigureAwait(false);
                 }
@@ -204,7 +204,7 @@ public partial class OpcUaServer : BusinessBase
                         }
                         catch (Exception ex)
                         {
-                            LogMessage.LogWarning(ex);
+                            LogMessage?.LogWarning(ex);
                         }
                     }
                 }
@@ -215,7 +215,7 @@ public partial class OpcUaServer : BusinessBase
         catch (Exception ex)
         {
             if (success)
-                LogMessage.LogWarning(ex);
+                LogMessage?.LogWarning(ex);
             success = false;
         }
 

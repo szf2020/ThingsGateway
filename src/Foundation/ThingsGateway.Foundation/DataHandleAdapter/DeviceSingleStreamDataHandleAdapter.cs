@@ -15,7 +15,7 @@ namespace ThingsGateway.Foundation;
 /// <summary>
 /// TCP/Serial适配器基类
 /// </summary>
-public class DeviceSingleStreamDataHandleAdapter<TRequest> : CustomDataHandlingAdapter<TRequest> where TRequest : MessageBase, new()
+public class DeviceSingleStreamDataHandleAdapter<TRequest> : TcpCustomDataHandlingAdapter<TRequest> where TRequest : MessageBase, new()
 {
     /// <inheritdoc cref="DeviceSingleStreamDataHandleAdapter{TRequest}"/>
     public DeviceSingleStreamDataHandleAdapter()

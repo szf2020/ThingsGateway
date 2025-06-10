@@ -34,7 +34,7 @@ public class UriValidationAttribute : ValidationAttribute
         {
             if (port <= 0 || port > 65535)
             {
-                return new ValidationResult(DefaultResource.Localizer["InvalidPortRange"]);
+                return new ValidationResult(AppResource.Localizer["InvalidPortRange"]);
             }
         }
         else if (Regex.IsMatch(uriString, ipv4Pattern))
@@ -45,14 +45,14 @@ public class UriValidationAttribute : ValidationAttribute
             {
                 if (int.Parse(segment) > 255)
                 {
-                    return new ValidationResult(DefaultResource.Localizer["InvalidIPv4Segment"]);
+                    return new ValidationResult(AppResource.Localizer["InvalidIPv4Segment"]);
                 }
             }
         }
         else if (!Regex.IsMatch(uriString, ipv6Pattern) && !Regex.IsMatch(uriString, domainPattern))
         {
             // 其他格式验证失败
-            return new ValidationResult(DefaultResource.Localizer["InvalidUriFormat"]);
+            return new ValidationResult(AppResource.Localizer["InvalidUriFormat"]);
         }
 
         // 验证通过

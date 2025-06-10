@@ -103,28 +103,28 @@ namespace ThingsGateway.Foundation
             {
                 if (string.IsNullOrEmpty(RemoteUrl))
                 {
-                    yield return new ValidationResult(DefaultResource.Localizer["RemoteUrlNotNull"], new[] { nameof(RemoteUrl) });
+                    yield return new ValidationResult(AppResource.Localizer["RemoteUrlNotNull"], new[] { nameof(RemoteUrl) });
                 }
             }
             else if (ChannelType == ChannelTypeEnum.TcpService)
             {
                 if (string.IsNullOrEmpty(BindUrl))
                 {
-                    yield return new ValidationResult(DefaultResource.Localizer["BindUrlNotNull"], new[] { nameof(BindUrl) });
+                    yield return new ValidationResult(AppResource.Localizer["BindUrlNotNull"], new[] { nameof(BindUrl) });
                 }
             }
             else if (ChannelType == ChannelTypeEnum.UdpSession)
             {
                 if (string.IsNullOrEmpty(BindUrl) && string.IsNullOrEmpty(RemoteUrl))
                 {
-                    yield return new ValidationResult(DefaultResource.Localizer["BindUrlOrRemoteUrlNotNull"], new[] { nameof(BindUrl), nameof(RemoteUrl) });
+                    yield return new ValidationResult(AppResource.Localizer["BindUrlOrRemoteUrlNotNull"], new[] { nameof(BindUrl), nameof(RemoteUrl) });
                 }
             }
             else if (ChannelType == ChannelTypeEnum.SerialPort)
             {
                 if (string.IsNullOrEmpty(PortName))
                 {
-                    yield return new ValidationResult(DefaultResource.Localizer["PortNameNotNull"], new[] { nameof(PortName) });
+                    yield return new ValidationResult(AppResource.Localizer["PortNameNotNull"], new[] { nameof(PortName) });
                 }
             }
 

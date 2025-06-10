@@ -78,7 +78,7 @@ public partial class SqlHistoryAlarm : BusinessBaseWithCacheVariableModel<Histor
             if (result > 0)
             {
                 CurrentDevice.SetDeviceStatus(TimerX.Now, false);
-                LogMessage.Trace($"Count：{dbInserts.Count}，watchTime:  {stopwatch.ElapsedMilliseconds} ms");
+                LogMessage?.Trace($"Count：{dbInserts.Count}，watchTime:  {stopwatch.ElapsedMilliseconds} ms");
             }
             return OperResult.Success;
         }
@@ -95,7 +95,7 @@ public partial class SqlHistoryAlarm : BusinessBaseWithCacheVariableModel<Histor
         if (success != result.IsSuccess)
         {
             if (!result.IsSuccess)
-                LogMessage.LogWarning(result.ToString());
+                LogMessage?.LogWarning(result.ToString());
             success = result.IsSuccess;
         }
 

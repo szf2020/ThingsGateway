@@ -175,7 +175,7 @@ internal sealed class RedundancyHostedService : BackgroundService, IRedundancyHo
             catch (Exception ex)
             {
                 // 输出警告日志，指示同步数据到从站时发生错误
-                LogMessage?.LogWarning(ex, Localizer["ErrorSynchronizingData"]);
+                LogMessage?.LogWarning(ex, "Synchronize data to standby site error");
             }
             await Task.Delay(syncInterval, stoppingToken).ConfigureAwait(false);
         }
@@ -407,7 +407,7 @@ internal sealed class RedundancyHostedService : BackgroundService, IRedundancyHo
             {
                 // 输出日志，指示主站已恢复，从站将切换到备用状态
                 if (first)
-                    LogMessage?.Warning(Localizer["SwitchSlaveState"]);
+                    LogMessage?.Warning("Master site has recovered, local machine (standby) will switch to standby state");
 
                 // 将 IsStart 设置为 false，表示当前设备为从站，切换到备用状态
                 _gatewayRedundantSerivce.StartCollectChannelEnable = false;
@@ -433,7 +433,7 @@ internal sealed class RedundancyHostedService : BackgroundService, IRedundancyHo
             {
                 // 输出日志，指示无法连接冗余站点，本机将切换到正常状态
                 if (first)
-                    LogMessage?.Warning(Localizer["SwitchMasterState"]);
+                    LogMessage?.Warning("Cannot connect to redundant site, local machine will switch to normal state");
                 _gatewayRedundantSerivce.StartCollectChannelEnable = true;
                 await RestartAsync().ConfigureAwait(false);
             }

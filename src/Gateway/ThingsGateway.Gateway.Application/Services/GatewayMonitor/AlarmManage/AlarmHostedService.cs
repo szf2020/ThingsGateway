@@ -11,7 +11,6 @@
 using Mapster;
 
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 
 using ThingsGateway.Gateway.Application.Extensions;
@@ -26,13 +25,10 @@ internal sealed class AlarmHostedService : BackgroundService, IAlarmHostedServic
 {
     private readonly ILogger _logger;
     /// <inheritdoc cref="AlarmHostedService"/>
-    public AlarmHostedService(ILogger<AlarmHostedService> logger, IStringLocalizer<AlarmHostedService> localizer)
+    public AlarmHostedService(ILogger<AlarmHostedService> logger)
     {
         _logger = logger;
-        Localizer = localizer;
     }
-
-    private IStringLocalizer Localizer { get; }
 
     #region 核心实现
 
@@ -450,7 +446,7 @@ internal sealed class AlarmHostedService : BackgroundService, IAlarmHostedServic
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        _logger.LogInformation(Localizer["RealAlarmTaskStart"]);
+        _logger.LogInformation(AppResource.RealAlarmTaskStart);
         while (!stoppingToken.IsCancellationRequested)
         {
             await DoWork(stoppingToken).ConfigureAwait(false);

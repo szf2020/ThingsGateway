@@ -224,7 +224,7 @@ public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariableModel<
                             if (success != result.IsSuccess)
                             {
                                 if (!result.IsSuccess)
-                                    LogMessage.LogWarning(result.ToString());
+                                    LogMessage?.LogWarning(result.ToString());
                                 success = result.IsSuccess;
                             }
                         }
@@ -235,7 +235,7 @@ public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariableModel<
                         if (success != result.IsSuccess)
                         {
                             if (!result.IsSuccess)
-                                LogMessage.LogWarning(result.ToString());
+                                LogMessage?.LogWarning(result.ToString());
                             success = result.IsSuccess;
                         }
                     }

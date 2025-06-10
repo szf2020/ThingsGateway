@@ -161,12 +161,12 @@ public class DDPUdpSessionChannel : UdpSessionChannel, IClientChannel, IDtuUdpSe
                         //发送成功
                         await DDPAdapter.SendInputAsync(endPoint, new DDPSend(ReadOnlyMemory<byte>.Empty, id, false, 0x81)).ConfigureAwait(false);
                         if (log)
-                            Logger?.Info(DefaultResource.Localizer["DtuConnected", id]);
+                            Logger?.Info(string.Format(AppResource.DtuConnected, id));
                     }
                     else if (message.Type == 0x02)
                     {
                         await DDPAdapter.SendInputAsync(endPoint, new DDPSend(ReadOnlyMemory<byte>.Empty, id, false, 0x82)).ConfigureAwait(false);
-                        Logger?.Info(DefaultResource.Localizer["DtuDisconnecting", id]);
+                        Logger?.Info(string.Format(AppResource.DtuDisconnecting, id));
                         await Task.Delay(100).ConfigureAwait(false);
                         IdDict.TryRemove(endPoint, out _);
                         EndPointDcit.TryRemove(id, out _);

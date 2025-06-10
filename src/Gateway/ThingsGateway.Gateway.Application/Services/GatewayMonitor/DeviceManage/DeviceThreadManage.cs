@@ -13,7 +13,6 @@ using BootstrapBlazor.Components;
 using Mapster;
 
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Localization;
 
 using System.Collections.Concurrent;
 
@@ -93,7 +92,6 @@ internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
     /// <param name="channelRuntime">通道表</param>
     public DeviceThreadManage(ChannelRuntime channelRuntime)
     {
-        Localizer = App.CreateLocalizerByType(typeof(DeviceThreadManage));
 
         var config = new TouchSocketConfig();
         LogMessage = new LoggerGroup() { LogLevel = TouchSocket.Core.LogLevel.Warning };//不显示调试日志
@@ -105,7 +103,7 @@ internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
 
         _logger = App.RootServices.GetService<Microsoft.Extensions.Logging.ILoggerFactory>().CreateLogger($"DeviceThreadManage[{channelRuntime.Name}]");
         // 添加默认日志记录器
-        LogMessage.AddLogger(new EasyLogger(_logger.Log_Out) { LogLevel = TouchSocket.Core.LogLevel.Trace });
+        LogMessage?.AddLogger(new EasyLogger(_logger.Log_Out) { LogLevel = TouchSocket.Core.LogLevel.Trace });
 
         // 根据配置获取通道实例
         Channel = channelRuntime.GetChannel(config);
@@ -118,7 +116,7 @@ internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
 
         GlobalData.DeviceStatusChangeEvent += GlobalData_DeviceStatusChangeEvent;
 
-        LogMessage?.LogInformation(Localizer["ChannelCreate", channelRuntime.Name]);
+        LogMessage?.LogInformation(string.Format(AppResource.ChannelCreate, channelRuntime.Name));
 
         CancellationToken = CancellationTokenSource.Token;
 
@@ -172,7 +170,7 @@ internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
         // 移除旧的文件日志记录器并释放资源
         if (TextLogger != null)
         {
-            LogMessage.RemoveLogger(TextLogger);
+            LogMessage?.RemoveLogger(TextLogger);
             TextLogger?.Dispose();
         }
 
@@ -180,7 +178,7 @@ internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
         TextLogger = TextFileLogger.GetMultipleFileLogger(LogPath);
         TextLogger.LogLevel = logLevel ?? TouchSocket.Core.LogLevel.Trace;
         // 将文件日志记录器添加到日志消息组中
-        LogMessage.AddLogger(TextLogger);
+        LogMessage?.AddLogger(TextLogger);
 
     }
 
@@ -221,7 +219,6 @@ internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
     /// </summary>
     private ConcurrentDictionary<long, DriverBase> Drivers { get; set; } = new();
 
-    private IStringLocalizer Localizer { get; }
     public IChannelThreadManage ChannelThreadManage { get; internal set; }
 
     #endregion
@@ -370,7 +367,7 @@ internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
                     // 如果初始化过程中发生异常，设置初始化状态为失败，并记录警告日志
                     if (driver != null)
                         driver.IsInitSuccess = false;
-                    LogMessage?.LogWarning(ex, Localizer["InitFail", CurrentChannel.PluginName, driver?.DeviceName]);
+                    LogMessage?.LogWarning(ex, string.Format(AppResource.InitFail, CurrentChannel.PluginName, driver?.DeviceName));
                 }
 
                 // 创建令牌并与驱动程序对象的设备ID关联，用于取消操作
@@ -506,7 +503,7 @@ internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
                 }
                 catch (Exception ex)
                 {
-                    LogMessage.LogWarning(ex, "SaveValue");
+                    LogMessage?.LogWarning(ex, "SaveValue");
                 }
             }
         }
@@ -751,7 +748,7 @@ internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
         }
         catch (Exception ex)
         {
-            LogMessage.LogWarning(ex);
+            LogMessage?.LogWarning(ex);
         }
     }
 
@@ -801,7 +798,7 @@ internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
             }
             catch (Exception ex)
             {
-                LogMessage.LogError(ex, nameof(CheckRedundantAsync));
+                LogMessage?.LogError(ex, nameof(CheckRedundantAsync));
             }
         }
     }
@@ -850,7 +847,7 @@ internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
                     }
                     catch (Exception ex)
                     {
-                        LogMessage.LogError(ex, nameof(CheckThreadAsync));
+                        LogMessage?.LogError(ex, nameof(CheckThreadAsync));
                     }
                 }
             }
@@ -862,7 +859,7 @@ internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
             }
             catch (Exception ex)
             {
-                LogMessage.LogError(ex, nameof(CheckThreadAsync));
+                LogMessage?.LogError(ex, nameof(CheckThreadAsync));
             }
         }
     }
@@ -893,7 +890,7 @@ internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
             if (Channel?.Collects.Count == 0)
                 Channel?.SafeDispose();
 
-            LogMessage?.LogInformation(Localizer["ChannelDispose", CurrentChannel?.Name ?? string.Empty]);
+            LogMessage?.LogInformation(string.Format(AppResource.ChannelDispose, CurrentChannel?.Name ?? string.Empty));
 
             LogMessage?.Logs?.ForEach(a => a.TryDispose());
 

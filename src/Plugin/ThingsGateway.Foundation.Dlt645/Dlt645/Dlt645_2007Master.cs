@@ -116,7 +116,7 @@ public class Dlt645_2007Master : DtuServiceDeviceBase
     /// <inheritdoc/>
     public override string GetAddressDescription()
     {
-        return $"{base.GetAddressDescription()}{Environment.NewLine}{DltResource.Localizer["AddressDes"]}";
+        return $"{base.GetAddressDescription()}{Environment.NewLine}{AppResource.AddressDes}";
     }
 
     /// <inheritdoc/>
@@ -313,7 +313,7 @@ public class Dlt645_2007Master : DtuServiceDeviceBase
                 case 4800: baudRateByte = 0x10; break;
                 case 9600: baudRateByte = 0x20; break;
                 case 19200: baudRateByte = 0x40; break;
-                default: return new OperResult<string>(DltResource.Localizer["BaudRateError", baudRate]);
+                default: return new OperResult<string>(string.Format(AppResource.BaudRateError, baudRate));
             }
 
             Dlt645_2007Address dAddress = new();

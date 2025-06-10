@@ -117,8 +117,8 @@ public class OperResultClass : IOperResult
     /// <returns></returns>
     public override string ToString()
     {
-        string messageString = ErrorMessage == null ? string.Empty : $"{DefaultResource.Localizer["ErrorMessage"]}:{ErrorMessage}";
-        string exceptionString = Exception == null ? string.Empty : ErrorMessage == null ? $"{DefaultResource.Localizer["Exception"]}:{Exception}" : $"{Environment.NewLine}{DefaultResource.Localizer["Exception"]}:{Exception}";
+        string messageString = ErrorMessage == null ? string.Empty : $"{AppResource.ErrorMessage}:{ErrorMessage}";
+        string exceptionString = Exception == null ? string.Empty : ErrorMessage == null ? $"{AppResource.Exception}:{Exception}" : $"{Environment.NewLine}{AppResource.Exception}:{Exception}";
 
         return $"{messageString}{exceptionString}";
     }

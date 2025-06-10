@@ -127,12 +127,12 @@ public class DDPTcpSessionClientChannel : TcpSessionClientChannel
                         //发送成功
                         await DDPAdapter.SendInputAsync(new DDPSend(ReadOnlyMemory<byte>.Empty, id, true, 0x81)).ConfigureAwait(false);
                         if (log)
-                            Logger?.Info(DefaultResource.Localizer["DtuConnected", Id]);
+                            Logger?.Info(string.Format(AppResource.DtuConnected, Id));
                     }
                     else if (message.Type == 0x02)
                     {
                         await DDPAdapter.SendInputAsync(new DDPSend(ReadOnlyMemory<byte>.Empty, Id, true, 0x82)).ConfigureAwait(false);
-                        Logger?.Info(DefaultResource.Localizer["DtuDisconnecting", Id]);
+                        Logger?.Info(string.Format(AppResource.DtuDisconnecting, Id));
                         await Task.Delay(100).ConfigureAwait(false);
                         await this.CloseAsync().ConfigureAwait(false);
                         this.SafeDispose();

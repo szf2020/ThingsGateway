@@ -26,7 +26,7 @@ public static class OperResultExtension
         }
         catch (Exception ex)
         {
-            return new OperResult<TResult>(DefaultResource.Localizer["TransBytesError", result.Content?.ToHexString(' '), result.Content?.Length], ex);
+            return new OperResult<TResult>(string.Format(AppResource.TransBytesError, result.Content?.ToHexString(' '), result.Content?.Length), ex);
         }
     }
 

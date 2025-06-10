@@ -152,7 +152,7 @@ internal sealed class RpcService : IRpcService
                                     LogTime = DateTime.Now,
                                     OperateMessage = variableResult.Value.IsSuccess ? null : variableResult.Value.ToString(),
                                     IsSuccess = variableResult.Value.IsSuccess,
-                                    OperateMethod = Localizer["WriteVariable"],
+                                    OperateMethod = AppResource.WriteVariable,
                                     OperateDevice = resultItem.Key,
                                     OperateObject = operObj,
                                     OperateSource = sourceDes,

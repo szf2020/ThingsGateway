@@ -1,185 +1,156 @@
 ﻿{
-  "ThingsGateway.Gateway.Razor.GatewayAbout": {
-    "UUID": "UUID",
-    "RegisterStatus": "RegisterStatus",
-    "Authorized": "Authorized",
-    "Unauthorized": "Unauthorized",
-    "ExpireTime": "ExpireTime",
-    "AuthName": "AuthName",
-    "Register": "Register",
-    "Unregister": "Unregister",
-    "Password": "Password"
+  "ThingsGateway.Gateway.Razor._Imports": {
+    "AddChannel": "Add Channel",
+    "AddDevice": "Add Device",
+    "AddVariable": "Add Variable",
+    "AlarmInformation": "Alarm Information",
+    "AllChannel": "All Channel",
+    "AllDevice": "All Device",
+    "BasicInformation": "Basic Information",
+    "BatchEditChannel": "Batch Edit Channel",
+    "BatchEditDevice": "Batch Edit Device",
+    "Business": "Business",
+    "Check": "Check",
+    "Collect": "Collect",
+    "Connection": "Connection",
+    "CopyChannel": "CopyChannel",
+    "CopyChannelNamePrefix": "CopyChannelNamePrefix",
+    "CopyChannelNameSuffixNumber": "CopyChannelNameSuffixNumber",
+    "CopyCount": "CopyCount",
+    "CopyDevice": "CopyDevice",
+    "CopyDeviceNamePrefix": "CopyDeviceNamePrefix",
+    "CopyDeviceNameSuffixNumber": "CopyDeviceNameSuffixNumber",
+    "CopyVariable": "CopyVariable",
+    "CopyVariableNamePrefix": "CopyVariableNamePrefix",
+    "CopyVariableNameSuffixNumber": "CopyVariableNameSuffixNumber",
+    "DeleteAllChannel": "Delete All Channel",
+    "DeleteAllDevice": "Delete All Device",
+    "DeleteCache": "Delete cache",
+    "DeleteChannel": "Delete Channel",
+    "DeleteConfirmTitle": "Delete Confirm",
+    "DeleteCurrentChannel": "Delete Current Channel",
+    "DeleteCurrentDevice": "Delete Current Device",
+    "DeleteDevice": "Delete Device",
+    "DeviceInformation": "Device Information",
+    "DeviceList": "Device List",
+    "DeviceRedundantThread": "Switching redundancy",
+    "ExcelChannel": "ExcelChannel",
+    "ExcelDevice": "ExcelDevice",
+    "ExcelVariable": "ExcelVariable",
+    "ExportAllChannel": "Export All Channel",
+    "ExportAllDevice": "Export All Device",
+    "ExportChannel": "Export Channel",
+    "ExportCurrentChannel": "Export Current Channel",
+    "ExportCurrentDevice": "Export Current Device",
+    "ExportDevice": "Export Device",
+    "GatewayChannelRestart": "Restart channel",
+    "GatewayDeviceLog": "Channel log",
+    "GatewayDevicePause": "Pause/Run",
+    "GatewayDeviceRestart": "Restart device",
+    "GatewayDeviceShowDriverUI": "Show driverUI",
+    "ImportChannel": "Import Channel",
+    "ImportDevice": "Import Device",
+    "ImportVariable": "ImportVariable",
+    "Input": "Input",
+    "Output": "Output",
+    "PluginInformation": "Plugin Information",
+    "Redundant": "Redundant",
+    "RefreshBusinessProperty": "Add/Refresh Business Property",
+    "RefreshBusinessPropertyError": "Select business equipment and add business attributes",
+    "RelationVariable": "Associated variables",
+    "Remark": "Remark",
+    "Runtime": "Runtime",
+    "Script": "Script",
+    "Unknown": "Unknown",
+    "UpdateChannel": "Edit Channel",
+    "UpdateDevice": "Edit Device",
+    "VariableInformation": "Variable Information"
   },
-
-
-  "ThingsGateway.Gateway.Razor.PluginPage": {
-    "Reload": "Reload"
-  },
-
-  "ThingsGateway.Gateway.Razor.TcpSessionClientDto": {
-    "Id": "Id",
-    "IP": "IP",
-    "Port": "Port",
-    "LastReceivedTime": "LastReceivedTime",
-    "LastSentTime": "LastSentTime"
-  },
-
-
-  "ThingsGateway.Gateway.Razor.Index": {
-    "CollectDevice": "Collect Device",
-    "BusinessDevice": "Business Device",
-    "Variable": "Variable",
-    "Alarm": "Real-time Alarm",
-    "AlarmCount": "Alarm Count",
-    "OnLine": "Online",
-    "OffLine": "Offline",
-    "Shortcuts": "Shortcuts",
-    "OperLog": "Recent Operations",
+  "ThingsGateway.Gateway.Razor.BackendLogPage": {
     "BackendLog": "Gateway Backend Log",
-    "RpcLog": "Gateway RPC Log",
-    "HardwareInfoChart": "Hardware Information Historical Chart",
-    "DateTime": "Date Time",
-    "Data": "Data",
-    "HistoryHardwareInfo": "Historical Chart"
+    "Count": "Count",
+    "Date": "Date"
   },
   "ThingsGateway.Gateway.Razor.ChannelDeviceTree": {
     "ShowType": "ShowType"
   },
-
+  "ThingsGateway.Gateway.Razor.GatewayAbout": {
+    "AuthName": "AuthName",
+    "Authorized": "Authorized",
+    "ExpireTime": "ExpireTime",
+    "Password": "Password",
+    "Register": "Register",
+    "RegisterStatus": "RegisterStatus",
+    "Unauthorized": "Unauthorized",
+    "Unregister": "Unregister",
+    "UUID": "UUID"
+  },
+  "ThingsGateway.Gateway.Razor.Index": {
+    "Alarm": "Real-time Alarm",
+    "AlarmCount": "Alarm Count",
+    "BackendLog": "Gateway Backend Log",
+    "BusinessDevice": "Business Device",
+    "CollectDevice": "Collect Device",
+    "Data": "Data",
+    "DateTime": "Date Time",
+    "HardwareInfoChart": "Hardware Information Historical Chart",
+    "HistoryHardwareInfo": "Historical Chart",
+    "OffLine": "Offline",
+    "OnLine": "Online",
+    "OperLog": "Recent Operations",
+    "RpcLog": "Gateway RPC Log",
+    "Shortcuts": "Shortcuts",
+    "Variable": "Variable"
+  },
+  "ThingsGateway.Gateway.Razor.PluginDebugPage": {
+    "New": "New",
+    "NewWinbox": "NewWinbox",
+    "PluginUINotNull": "This plugin does not implement a debugging page"
+  },
+  "ThingsGateway.Gateway.Razor.PluginPage": {
+    "Reload": "Reload"
+  },
+  "ThingsGateway.Gateway.Razor.QuickActions": {
+    "AutoRestartThread": "AutoRestartThread",
+    "HeaderText": "Quick Operation",
+    "ReloadPluginConfirmText": "Confirm the overloaded plugin?",
+    "ReloadServiceConfirmText": "Confirm when restarting the runtime?",
+    "ReloadServiceText": "Reload Service",
+    "RestartText": "Restart",
+    "TooltipText": "Quick Operation"
+  },
+  "ThingsGateway.Gateway.Razor.RpcLogPage": {
+    "Count": "Count",
+    "Date": "Date",
+    "RpcLog": "Gateway RPC Log"
+  },
   "ThingsGateway.Gateway.Razor.SavePlugin": {
     "SavePlugin": "Note: Plugins with the same file name will be overwritten",
     "SavePlugin1": "Plugin changes may take effect after restarting the software"
-
   },
-  "ThingsGateway.Gateway.Razor.BackendLogPage": {
-    "BackendLog": "Gateway Backend Log",
-    "Date": "Date",
-    "Count": "Count"
-  },
-  "ThingsGateway.Gateway.Razor.RpcLogPage": {
-    "RpcLog": "Gateway RPC Log",
-    "Date": "Date",
-    "Count": "Count"
-  },
-
-
-
-  "ThingsGateway.Gateway.Razor.VariableRuntimeInfo": {
-    "WriteVariable": "WriteVariable",
-    "WriteValue": "WriteValue",
-
-    "TestVariableCount": "TestVariableCount",
-    "TestDeviceCount": "TestDeviceCount",
-    "SlaveUrl": "SlaveUrl",
-    "BusinessEnable": "BusinessEnable",
-    "Test": "Addition of test variables"
-  },
-
-  "ThingsGateway.Gateway.Razor.PluginDebugPage": {
-    "PluginUINotNull": "This plugin does not implement a debugging page",
-    "New": "New",
-    "NewWinbox": "NewWinbox"
-  },
-
-  "ThingsGateway.Gateway.Razor.QuickActions": {
-    "TooltipText": "Quick Operation",
-    "HeaderText": "Quick Operation",
-    "RestartText": "Restart",
-    "ReloadServiceText": "Reload Service",
-    "ReloadPluginConfirmText": "Confirm the overloaded plugin?",
-    "ReloadServiceConfirmText": "Confirm when restarting the runtime?",
-
-    "AutoRestartThread": "AutoRestartThread"
-
-  },
-
   "ThingsGateway.Gateway.Razor.ShowTypeEnum": {
-    "VariableTable": "VariableTable",
-    "LogInfo": "LogInfo",
     "ChannelTable": "ChannelTable",
-    "DeviceTable": "DeviceTable"
+    "DeviceTable": "DeviceTable",
+    "LogInfo": "LogInfo",
+    "VariableTable": "VariableTable"
   },
-
+  "ThingsGateway.Gateway.Razor.TcpSessionClientDto": {
+    "Id": "Id",
+    "IP": "IP",
+    "LastReceivedTime": "LastReceivedTime",
+    "LastSentTime": "LastSentTime",
+    "Port": "Port"
+  },
   "ThingsGateway.Gateway.Razor.VariableEditComponent": {
-
     "ChoiceBusinessDeviceId": "BusinessDevice"
   },
-
-
-  "ThingsGateway.Gateway.Razor._Imports": {
-
-    "ExcelVariable": "ExcelVariable",
-    "ImportVariable": "ImportVariable",
-
-    "CopyVariableNamePrefix": "CopyVariableNamePrefix",
-    "CopyVariableNameSuffixNumber": "CopyVariableNameSuffixNumber",
-    "CopyChannelNamePrefix": "CopyChannelNamePrefix",
-    "CopyChannelNameSuffixNumber": "CopyChannelNameSuffixNumber",
-    "CopyDeviceNamePrefix": "CopyDeviceNamePrefix",
-    "CopyDeviceNameSuffixNumber": "CopyDeviceNameSuffixNumber",
-    "CopyCount": "CopyCount",
-    "CopyChannel": "CopyChannel",
-    "CopyDevice": "CopyDevice",
-    "CopyVariable": "CopyVariable",
-
-    "GatewayDeviceShowDriverUI": "Show driverUI",
-    "DeviceRedundantThread": "Switching redundancy",
-    "DeleteCache": "Delete cache",
-    "GatewayDeviceLog": "Channel log",
-    "RelationVariable": "Associated variables",
-    "GatewayDevicePause": "Pause/Run",
-    "GatewayDeviceRestart": "Restart device",
-    "GatewayChannelRestart": "Restart channel",
-
-    "BasicInformation": "Basic Information",
-    "Connection": "Connection",
-    "DeviceInformation": "Device Information",
-    "PluginInformation": "Plugin Information",
-    "Redundant": "Redundant",
-    "Remark": "Remark",
-    "Check": "Check",
-    "VariableInformation": "Variable Information",
-    "AlarmInformation": "Alarm Information",
-
-    "RefreshBusinessProperty": "Add/Refresh Business Property",
-    "RefreshBusinessPropertyError": "Select business equipment and add business attributes",
-    "Runtime": "Runtime",
-
-    "DeviceList": "Device List",
-    "AddChannel": "Add Channel",
-    "BatchEditChannel": "Batch Edit Channel",
-    "ExcelChannel": "ExcelChannel",
-    "UpdateChannel": "Edit Channel",
-    "DeleteChannel": "Delete Channel",
-    "DeleteCurrentChannel": "Delete Current Channel",
-    "DeleteAllChannel": "Delete All Channel",
-    "ExportChannel": "Export Channel",
-    "ExportCurrentChannel": "Export Current Channel",
-    "ExportAllChannel": "Export All Channel",
-    "ImportChannel": "Import Channel",
-    "AddDevice": "Add Device",
-    "BatchEditDevice": "Batch Edit Device",
-    "ExcelDevice": "ExcelDevice",
-    "UpdateDevice": "Edit Device",
-    "DeleteDevice": "Delete Device",
-    "DeleteCurrentDevice": "Delete Current Device",
-    "DeleteAllDevice": "Delete All Device",
-    "ExportDevice": "Export Device",
-    "ExportCurrentDevice": "Export Current Device",
-    "ExportAllDevice": "Export All Device",
-    "ImportDevice": "Import Device",
-
-    "DeleteConfirmTitle": "Delete Confirm",
-    "AllChannel": "All Channel",
-    "AllDevice": "All Device",
-    "Collect": "Collect",
-    "Business": "Business",
-    "Unknown": "Unknown",
-    "AddVariable": "Add Variable",
-
-    "Script": "Script",
-    "Input": "Input",
-    "Output": "Output"
+  "ThingsGateway.Gateway.Razor.VariableRuntimeInfo": {
+    "BusinessEnable": "BusinessEnable",
+    "SlaveUrl": "SlaveUrl",
+    "Test": "Addition of test variables",
+    "TestDeviceCount": "TestDeviceCount",
+    "TestVariableCount": "TestVariableCount",
+    "WriteValue": "WriteValue",
+    "WriteVariable": "WriteVariable"
   }
-
 }

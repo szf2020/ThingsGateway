@@ -1,96 +1,81 @@
 ﻿{
   "ThingsGateway.Plugin.DB.RealDBProducerProperty": {
     "BigTextConnectStr": "ConnectString",
-    "TableName": "TableName",
     "BigTextScriptHistoryTable": "DynamicScriptHistoryTable",
-    "RealTableBusinessInterval": "RealTableBusinessInterval"
-
-
+    "RealTableBusinessInterval": "RealTableBusinessInterval",
+    "TableName": "TableName"
   },
   "ThingsGateway.Plugin.QuestDB.QuestDBHistoryValue": {
-    "Id": "Id",
-
     "CollectTime": "CollectTime",
     "CreateTime": "CreateTime",
     "DeviceName": "DeviceName",
-    "Name": "Name",
+    "Id": "Id",
     "IsOnline": "IsOnline",
+    "Name": "Name",
     "Value": "Value"
   },
-
   "ThingsGateway.Plugin.SqlDB.SqlDBProducerProperty": {
-    "IsReadDB": "IsReadDB",
-    "IsHistoryDB": "IsHistoryDB",
-    "ReadDBTableName": "ReadDBTableName",
-    "HistoryDBTableName": "HistoryDBTableName",
-    "DbType": "DbType",
     "BigTextConnectStr": "ConnectString",
     "BigTextScriptHistoryTable": "DynamicScriptHistoryTable",
     "BigTextScriptRealTable": "DynamicScriptRealTable",
+    "DbType": "DbType",
+    "HistoryDBTableName": "HistoryDBTableName",
+    "IsHistoryDB": "IsHistoryDB",
+    "IsReadDB": "IsReadDB",
+    "ReadDBTableName": "ReadDBTableName",
     "RealTableBusinessInterval": "RealTableBusinessInterval",
     "SqlDBSplitType": "SplitType"
-
   },
   "ThingsGateway.Plugin.SqlDB.SQLHistoryValue": {
-    "Id": "Id",
-
     "CollectTime": "CollectTime",
     "CreateTime": "CreateTime",
     "DeviceName": "DeviceName",
-    "Name": "Name",
+    "Id": "Id",
     "IsOnline": "IsOnline",
+    "Name": "Name",
     "Value": "Value"
   },
   "ThingsGateway.Plugin.SqlDB.SQLRealValue": {
-    "Id": "Id",
-
     "CollectTime": "CollectTime",
     "CreateTime": "CreateTime",
     "DeviceName": "DeviceName",
-    "Name": "Name",
-    "IsOnline": "IsOnline",
-    "Value": "Value"
-  },
-
-  "ThingsGateway.Plugin.TDengineDB.TDengineDBHistoryValue": {
     "Id": "Id",
-
-    "CollectTime": "CollectTime",
-    "CreateTime": "CreateTime",
-    "DeviceName": "DeviceName",
-    "Name": "Name",
     "IsOnline": "IsOnline",
+    "Name": "Name",
     "Value": "Value"
   },
-
-  "ThingsGateway.Plugin.SqlHistoryAlarm.SQLHistoryAlarmProperty": {
-    "DbType": "DbType",
-    "BigTextConnectStr": "ConnectString",
-    "TableName": "TableName"
-  },
-
   "ThingsGateway.Plugin.SqlHistoryAlarm.HistoryAlarm": {
-
-    "Name": "Name",
-    "Description": "Description",
-    "DeviceName": "DeviceName",
-    "DataType": "DataType",
-    "RegisterAddress": "RegisterAddress",
-
     "AlarmCode": "AlarmCode",
-    "RecoveryCode": "RecoveryCode",
     "AlarmLimit": "AlarmLimit",
     "AlarmText": "AlarmText",
     "AlarmTime": "AlarmTime",
     "AlarmType": "AlarmType",
+    "DataType": "DataType",
+    "Description": "Description",
+    "DeviceName": "DeviceName",
     "EventTime": "EventTime",
     "EventType": "EventType",
-
+    "Name": "Name",
+    "RecoveryCode": "RecoveryCode",
+    "RegisterAddress": "RegisterAddress",
     "Remark1": "Remark1",
     "Remark2": "Remark2",
     "Remark3": "Remark3",
     "Remark4": "Remark4",
     "Remark5": "Remark5"
+  },
+  "ThingsGateway.Plugin.SqlHistoryAlarm.SQLHistoryAlarmProperty": {
+    "BigTextConnectStr": "ConnectString",
+    "DbType": "DbType",
+    "TableName": "TableName"
+  },
+  "ThingsGateway.Plugin.TDengineDB.TDengineDBHistoryValue": {
+    "CollectTime": "CollectTime",
+    "CreateTime": "CreateTime",
+    "DeviceName": "DeviceName",
+    "Id": "Id",
+    "IsOnline": "IsOnline",
+    "Name": "Name",
+    "Value": "Value"
   }
-
 }

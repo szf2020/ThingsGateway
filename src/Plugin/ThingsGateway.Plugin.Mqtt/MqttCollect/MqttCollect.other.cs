@@ -64,12 +64,12 @@ public partial class MqttCollect : CollectBase
 
                 if (_driverPropertys.DetailLog)
                 {
-                    if (LogMessage.LogLevel <= TouchSocket.Core.LogLevel.Trace)
-                        LogMessage.LogTrace($"Topic：{args.ApplicationMessage.Topic}{Environment.NewLine}PayLoad：{payLoad}");
+                    if (LogMessage?.LogLevel <= TouchSocket.Core.LogLevel.Trace)
+                        LogMessage?.LogTrace($"Topic：{args.ApplicationMessage.Topic}{Environment.NewLine}PayLoad：{payLoad}");
                 }
                 else
                 {
-                    LogMessage.LogTrace($"Topic：{args.ApplicationMessage.Topic}");
+                    LogMessage?.LogTrace($"Topic：{args.ApplicationMessage.Topic}");
 
                 }
 
@@ -97,14 +97,14 @@ public partial class MqttCollect : CollectBase
                     }
                     catch (Exception ex)
                     {
-                        LogMessage.LogTrace($"parse error: topic  {Environment.NewLine}{args.ApplicationMessage.Topic}  {Environment.NewLine} json {Environment.NewLine}{json} {Environment.NewLine} select: {item.Item1} {Environment.NewLine} {ex}");
+                        LogMessage?.LogTrace($"parse error: topic  {Environment.NewLine}{args.ApplicationMessage.Topic}  {Environment.NewLine} json {Environment.NewLine}{json} {Environment.NewLine} select: {item.Item1} {Environment.NewLine} {ex}");
                     }
                 }
             }
         }
         catch (Exception ex)
         {
-            LogMessage.LogWarning($"parse error: topic  {Environment.NewLine}{args.ApplicationMessage.Topic} {Environment.NewLine} {ex}");
+            LogMessage?.LogWarning($"parse error: topic  {Environment.NewLine}{args.ApplicationMessage.Topic} {Environment.NewLine} {ex}");
         }
         return Task.CompletedTask;
 

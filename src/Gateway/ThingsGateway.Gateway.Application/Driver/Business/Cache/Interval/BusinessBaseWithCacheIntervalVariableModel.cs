@@ -110,7 +110,7 @@ public abstract class BusinessBaseWithCacheIntervalVariableModel<VarModel> : Bus
                 {
                     if (_exTTimerTick.IsTickHappen())
                     {
-                        if (LogMessage.LogLevel <= LogLevel.Debug)
+                        if (LogMessage?.LogLevel <= LogLevel.Debug)
                             LogMessage?.LogDebug($"Interval  {typeof(VarModel).Name}  data, count {IdVariableRuntimes.Count}");
                         //间隔推送全部变量
                         var variableRuntimes = IdVariableRuntimes.Select(a => a.Value);
@@ -119,7 +119,7 @@ public abstract class BusinessBaseWithCacheIntervalVariableModel<VarModel> : Bus
                 }
                 catch (Exception ex)
                 {
-                    LogMessage.LogWarning(ex, BusinessBaseLocalizer["IntervalInsertVariableFail"]);
+                    LogMessage?.LogWarning(ex, AppResource.IntervalInsertVariableFail);
                 }
             }
 

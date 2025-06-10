@@ -68,7 +68,7 @@ public abstract class BusinessBaseWithCacheDeviceModel<VarModel, DevModel> : Bus
                 }
                 catch (Exception ex)
                 {
-                    LogMessage.LogWarning(ex, "Add cache fail");
+                    LogMessage?.LogWarning(ex, "Add cache fail");
                 }
             }
         }

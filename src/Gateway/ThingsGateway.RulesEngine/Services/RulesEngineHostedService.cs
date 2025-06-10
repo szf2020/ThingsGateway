@@ -231,7 +231,7 @@ internal sealed class RulesEngineHostedService : BackgroundService, IRulesEngine
             await RestartLock.WaitAsync().ConfigureAwait(false); // 等待获取锁，以确保只有一个线程可以执行以下代码
             TokenSource ??= new CancellationTokenSource();
             await StartAll(TokenSource.Token).ConfigureAwait(false);
-            _logger.LogInformation(Localizer["RulesEngineTaskStart"]);
+            _logger.LogInformation(AppResource.RulesEngineTaskStart);
         }
         catch (Exception ex)
         {

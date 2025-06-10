@@ -122,7 +122,7 @@ public partial class ThingsGatewayServer : StandardServer
         // 当用户身份改变时请求。
         server.SessionManager.ImpersonateUser += SessionManager_ImpersonateUser;
         base.OnServerStarted(server);
-        _opcUaServer.LogMessage.LogInformation("OPCUAServer Started");
+        _opcUaServer.LogMessage?.LogInformation("OPCUAServer Started");
     }
 
     /// <inheritdoc/>
@@ -138,7 +138,7 @@ public partial class ThingsGatewayServer : StandardServer
     /// <inheritdoc/>
     protected override void OnServerStopping()
     {
-        _opcUaServer.LogMessage.LogInformation("OPCUAServer Stoping");
+        _opcUaServer.LogMessage?.LogInformation("OPCUAServer Stoping");
         base.OnServerStopping();
     }
 

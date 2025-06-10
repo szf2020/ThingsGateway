@@ -45,7 +45,7 @@ public class S7Message : MessageBase, IResultMessage
             if (byteBlock[pos + 13] + byteBlock[pos + 14] > 0) // 如果错误代码不为0
             {
                 OperCode = 999;
-                ErrorMessage = SiemensS7Resource.Localizer["ReturnError", byteBlock[pos + 13].ToString("X2"), byteBlock[pos + 14].ToString("X2")];
+                ErrorMessage = string.Format(AppResource.ReturnError, byteBlock[pos + 13].ToString("X2"), byteBlock[pos + 14].ToString("X2"));
                 return FilterResult.Success;
             }
             else
@@ -67,7 +67,7 @@ public class S7Message : MessageBase, IResultMessage
             if (byteBlock[pos + 13] + byteBlock[pos + 14] > 0) // 如果错误代码不为0
             {
                 OperCode = 999;
-                ErrorMessage = SiemensS7Resource.Localizer["ReturnError", byteBlock[pos + 13].ToString("X2"), byteBlock[pos + 14].ToString("X2")];
+                ErrorMessage = string.Format(AppResource.ReturnError, byteBlock[pos + 13].ToString("X2"), byteBlock[pos + 14].ToString("X2"));
                 return FilterResult.Success;
             }
             else
@@ -75,13 +75,13 @@ public class S7Message : MessageBase, IResultMessage
                 if (byteBlock.Length < pos + 18)
                 {
                     OperCode = 999;
-                    ErrorMessage = SiemensS7Resource.Localizer["DataLengthError"];
+                    ErrorMessage = AppResource.DataLengthError;
                     return FilterResult.Success;
                 }
                 if (byteBlock[pos + 17] != byte.MaxValue)
                 {
                     OperCode = 999;
-                    ErrorMessage = SiemensS7Resource.Localizer["ValidateDataError", byteBlock[pos + 17], SiemensHelper.GetCpuError(byteBlock[pos + 17])];
+                    ErrorMessage = string.Format(AppResource.ValidateDataError, byteBlock[pos + 17], SiemensHelper.GetCpuError(byteBlock[pos + 17]));
                     return FilterResult.Success;
                 }
 
@@ -92,7 +92,7 @@ public class S7Message : MessageBase, IResultMessage
                     if (byteBlock[dataIndex] != byte.MaxValue)
                     {
                         OperCode = 999;
-                        ErrorMessage = SiemensS7Resource.Localizer["ValidateDataError", byteBlock[dataIndex], SiemensHelper.GetCpuError(byteBlock[dataIndex])];
+                        ErrorMessage = string.Format(AppResource.ValidateDataError, byteBlock[dataIndex], SiemensHelper.GetCpuError(byteBlock[dataIndex]));
                         return FilterResult.Success;
                     }
 
@@ -136,13 +136,13 @@ public class S7Message : MessageBase, IResultMessage
             if (byteBlock[pos + 13] + byteBlock[pos + 14] > 0) // 如果错误代码不为0
             {
                 OperCode = 999;
-                ErrorMessage = SiemensS7Resource.Localizer["ReturnError", byteBlock[pos + 13].ToString("X2"), byteBlock[pos + 14].ToString("X2")];
+                ErrorMessage = string.Format(AppResource.ReturnError, byteBlock[pos + 13].ToString("X2"), byteBlock[pos + 14].ToString("X2"));
                 return FilterResult.Success;
             }
             if (byteBlock.Length < pos + 18)
             {
                 OperCode = 999;
-                ErrorMessage = SiemensS7Resource.Localizer["DataLengthError"];
+                ErrorMessage = AppResource.DataLengthError;
                 return FilterResult.Success;
             }
             for (int i = 0; i < itemLen; i++)
@@ -150,7 +150,7 @@ public class S7Message : MessageBase, IResultMessage
                 if (byteBlock[pos + 17 + i] != byte.MaxValue)
                 {
                     OperCode = 999;
-                    ErrorMessage = SiemensS7Resource.Localizer["ValidateDataError", byteBlock[pos + 17 + i], SiemensHelper.GetCpuError(byteBlock[pos + 17 + i])];
+                    ErrorMessage = string.Format(AppResource.ValidateDataError, byteBlock[pos + 17 + i], SiemensHelper.GetCpuError(byteBlock[pos + 17 + i]));
                     return FilterResult.Success;
                 }
             }

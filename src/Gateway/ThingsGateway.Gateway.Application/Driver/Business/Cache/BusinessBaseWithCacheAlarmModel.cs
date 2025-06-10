@@ -67,7 +67,7 @@ public abstract class BusinessBaseWithCacheAlarmModel<VarModel, DevModel, AlarmM
                 }
                 catch (Exception ex)
                 {
-                    LogMessage.LogWarning(ex, "Add cache fail");
+                    LogMessage?.LogWarning(ex, "Add cache fail");
                 }
             }
         }

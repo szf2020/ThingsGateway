@@ -1,58 +1,51 @@
 ﻿{
+  "ThingsGateway.Plugin.Mqtt.MqttClientProperty": {
+    "CAFile_BrowserFile": "CAFile",
+    "ClientCertificateFile_BrowserFile": "ClientCertificateFile",
+    "ClientKeyFile_BrowserFile": "ClientKeyFile",
+    "ConnectId": "ConnectId",
+    "ConnectTimeout": "ConnectTimeout",
+    "DeviceRpcEnable": "DeviceRpcEnable",
+    "IP": "IP",
+    "IsWebSocket": "WebSocket",
+    "MqttProtocolVersion": "MqttProtocolVersion",
+    "MqttQualityOfServiceLevel": "QoS",
+    "Password": "Password",
+    "Port": "Port",
+    "RpcQuestTopic": "RpcQuestTopic",
+    "RpcWriteTopic": "RpcWriteTopic",
+    "TLS": "TLS",
+    "UserName": "UserName",
+    "WebSocketUrl": "WebSocketUrl"
+  },
   "ThingsGateway.Plugin.Mqtt.MqttClientVariableProperty": {
     "VariableRpcEnable": "VariableRpcEnable"
   },
-  "ThingsGateway.Plugin.Mqtt.MqttClientProperty": {
-    "IP": "IP",
-    "Port": "Port",
-    "MqttQualityOfServiceLevel": "QoS",
-    "MqttProtocolVersion": "MqttProtocolVersion",
-    "TLS": "TLS",
+  "ThingsGateway.Plugin.Mqtt.MqttCollectProperty": {
     "CAFile_BrowserFile": "CAFile",
+    "CheckClearTime": "VariableCheckClearTime(s)",
     "ClientCertificateFile_BrowserFile": "ClientCertificateFile",
     "ClientKeyFile_BrowserFile": "ClientKeyFile",
-
-    "IsWebSocket": "WebSocket",
-    "WebSocketUrl": "WebSocketUrl",
-    "UserName": "UserName",
-    "Password": "Password",
     "ConnectId": "ConnectId",
     "ConnectTimeout": "ConnectTimeout",
-    "DeviceRpcEnable": "DeviceRpcEnable",
-    "RpcWriteTopic": "RpcWriteTopic",
-    "RpcQuestTopic": "RpcQuestTopic"
-    
-
+    "DetailLog": "DetailLog",
+    "IP": "IP",
+    "IsWebSocket": "WebSocket",
+    "MqttProtocolVersion": "MqttProtocolVersion",
+    "Password": "Password",
+    "Port": "Port",
+    "TLS": "TLS",
+    "UserName": "UserName",
+    "WebSocketUrl": "WebSocketUrl"
   },
   "ThingsGateway.Plugin.Mqtt.MqttServerProperty": {
-    "IP": "IP",
-    "Port": "Port",
-    "MqttQualityOfServiceLevel": "QoS",
-    "WebSocketPort": "WebSocketPort",
-    "StartWithId": "StartWithId",
     "AnonymousEnable": "AnonymousEnable",
     "DeviceRpcEnable": "DeviceRpcEnable",
-    "RpcWriteTopic": "RpcWriteTopic"
-   
-  },
-
-  "ThingsGateway.Plugin.Mqtt.MqttCollectProperty": {
     "IP": "IP",
+    "MqttQualityOfServiceLevel": "QoS",
     "Port": "Port",
-    "MqttProtocolVersion": "MqttProtocolVersion",
-    "DetailLog": "DetailLog",
-    "TLS": "TLS",
-    "CAFile_BrowserFile": "CAFile",
-    "ClientCertificateFile_BrowserFile": "ClientCertificateFile",
-    "ClientKeyFile_BrowserFile": "ClientKeyFile",
-    "IsWebSocket": "WebSocket",
-    "WebSocketUrl": "WebSocketUrl",
-    "UserName": "UserName",
-    "Password": "Password",
-    "ConnectId": "ConnectId",
-    "ConnectTimeout": "ConnectTimeout",
-    "CheckClearTime": "VariableCheckClearTime(s)"
-
+    "RpcWriteTopic": "RpcWriteTopic",
+    "StartWithId": "StartWithId",
+    "WebSocketPort": "WebSocketPort"
   }
-
 }

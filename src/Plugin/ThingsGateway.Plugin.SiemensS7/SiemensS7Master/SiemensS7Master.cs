@@ -92,7 +92,7 @@ public class SiemensS7Master : CollectFoundationBase
                 DataTypeEnum.UInt64 => _plc.ThingsGatewayBitConverter.GetBytes(jArray.ToObject<UInt64[]>()),
                 DataTypeEnum.Single => _plc.ThingsGatewayBitConverter.GetBytes(jArray.ToObject<Single[]>()),
                 DataTypeEnum.Double => _plc.ThingsGatewayBitConverter.GetBytes(jArray.ToObject<Double[]>()),
-                _ => throw new(DefaultResource.Localizer["DataTypeNotSupported", dataType]),
+                _ => throw new(string.Format(ThingsGateway.Foundation.AppResource.DataTypeNotSupported, dataType)),
             };
         }
         else
@@ -109,7 +109,7 @@ public class SiemensS7Master : CollectFoundationBase
                 DataTypeEnum.UInt64 => _plc.ThingsGatewayBitConverter.GetBytes(value.ToObject<UInt64>()),
                 DataTypeEnum.Single => _plc.ThingsGatewayBitConverter.GetBytes(value.ToObject<Single>()),
                 DataTypeEnum.Double => _plc.ThingsGatewayBitConverter.GetBytes(value.ToObject<Double>()),
-                _ => throw new(DefaultResource.Localizer["DataTypeNotSupported", dataType]),
+                _ => throw new(string.Format(ThingsGateway.Foundation.AppResource.DataTypeNotSupported, dataType)),
             };
         }
     }

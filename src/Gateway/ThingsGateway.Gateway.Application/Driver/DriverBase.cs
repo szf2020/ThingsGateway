@@ -122,8 +122,7 @@ public abstract class DriverBase : DisposableObject, IDriver
         lock (this)
         {
             if (CurrentDevice == null) return;
-            var str = pause == true ? "DeviceTaskPause" : "DeviceTaskContinue";
-            LogMessage?.LogInformation(Localizer[str, DeviceName]);
+            LogMessage?.LogInformation(pause == true ? string.Format(AppResource.DeviceTaskPause, DeviceName) : string.Format(AppResource.DeviceTaskContinue, DeviceName));
             CurrentDevice.Pause = pause;
         }
     }
@@ -182,7 +181,7 @@ public abstract class DriverBase : DisposableObject, IDriver
         // 移除旧的文件日志记录器并释放资源
         if (TextLogger != null)
         {
-            LogMessage.RemoveLogger(TextLogger);
+            LogMessage?.RemoveLogger(TextLogger);
             TextLogger?.Dispose();
         }
 
@@ -190,7 +189,7 @@ public abstract class DriverBase : DisposableObject, IDriver
         TextLogger = TextFileLogger.GetMultipleFileLogger(LogPath);
         TextLogger.LogLevel = logLevel ?? TouchSocket.Core.LogLevel.Trace;
         // 将文件日志记录器添加到日志消息组中
-        LogMessage.AddLogger(TextLogger);
+        LogMessage?.AddLogger(TextLogger);
     }
 
     private TextFileLogger? TextLogger;
@@ -215,7 +214,7 @@ public abstract class DriverBase : DisposableObject, IDriver
         LogMessage = new LoggerGroup() { LogLevel = TouchSocket.Core.LogLevel.Warning };//不显示调试日志
 
         // 添加默认日志记录器
-        LogMessage.AddLogger(new EasyLogger(Log_Out) { LogLevel = TouchSocket.Core.LogLevel.Trace });
+        LogMessage?.AddLogger(new EasyLogger(Log_Out) { LogLevel = TouchSocket.Core.LogLevel.Trace });
 
         SetLog(CurrentDevice.LogLevel);
 
@@ -255,7 +254,7 @@ public abstract class DriverBase : DisposableObject, IDriver
         {
 
             // 记录设备任务开始信息
-            LogMessage?.LogInformation(Localizer["DeviceTaskStart", DeviceName]);
+            LogMessage?.LogInformation(string.Format(AppResource.DeviceTaskStart, DeviceName));
 
             var timeout = 60; // 设置超时时间为 60 秒
 
@@ -271,7 +270,7 @@ public abstract class DriverBase : DisposableObject, IDriver
             catch (TimeoutException)
             {
                 // 如果初始化操作超时，则记录警告信息
-                LogMessage?.LogInformation(Localizer["DeviceTaskStartTimeout", DeviceName, timeout]);
+                LogMessage?.LogInformation(string.Format(AppResource.DeviceTaskStartTimeout, DeviceName, timeout));
             }
 
             // 设置设备状态为当前时间
@@ -320,7 +319,7 @@ public abstract class DriverBase : DisposableObject, IDriver
                         LogMessage?.LogError(ex, "Dispose");
                     }
                     // 记录设备线程已停止的信息
-                    LogMessage?.LogInformation(Localizer["DeviceTaskStop", DeviceName]);
+                    LogMessage?.LogInformation(string.Format(AppResource.DeviceTaskStop, DeviceName));
                 }
             }
         }

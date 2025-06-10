@@ -53,7 +53,7 @@ public class Dlt645_2007Message : MessageBase, IResultMessage
             if ((byte)sumCheck != byteBlock[endIndex - 2])
             {
                 //校验错误
-                ErrorMessage = DltResource.Localizer["SumError"];
+                ErrorMessage = AppResource.SumError;
                 OperCode = 999;
                 return FilterResult.Success;
             }
@@ -67,7 +67,7 @@ public class Dlt645_2007Message : MessageBase, IResultMessage
             {
                 Response.ErrorCode = (byte)(byteBlock[HeadCodeIndex + 10] - 0x33);
                 var error = Dlt645Helper.Get2007ErrorMessage(Response.ErrorCode.Value);
-                ErrorMessage = DltResource.Localizer["FunctionError", $"0x{controlCode:X2}", error];
+                ErrorMessage = string.Format(AppResource.FunctionError, $"0x{controlCode:X2}", error);
                 OperCode = 999;
                 return FilterResult.Success;
             }
@@ -79,7 +79,7 @@ public class Dlt645_2007Message : MessageBase, IResultMessage
                 {
                     if (!Request.Station.SequenceEqual(ReadStation))//读写通讯地址例外
                     {
-                        ErrorMessage = DltResource.Localizer["StationNotSame"];
+                        ErrorMessage = AppResource.StationNotSame;
                         OperCode = 999;
                         return FilterResult.Success;
                     }
@@ -87,7 +87,7 @@ public class Dlt645_2007Message : MessageBase, IResultMessage
                 if (controlCode != ((byte)Dlt645_2007Send.ControlCode) + 0x80)//控制码不符合时，返回错误
                 {
                     ErrorMessage =
-                         DltResource.Localizer["FunctionNotSame", $"0x{controlCode:X2}", $"0x{(byte)Dlt645_2007Send.ControlCode:X2}"];
+                         string.Format(AppResource.FunctionNotSame, $"0x{controlCode:X2}", $"0x{(byte)Dlt645_2007Send.ControlCode:X2}");
                     OperCode = 999;
                     return FilterResult.Success;
                 }
@@ -97,7 +97,7 @@ public class Dlt645_2007Message : MessageBase, IResultMessage
                     Response.DataId = byteBlock.Span.Slice(HeadCodeIndex + 10, 4).ToArray().BytesAdd(-0x33);
                     if (!Response.DataId.SequenceEqual(Request.DataId))
                     {
-                        ErrorMessage = DltResource.Localizer["DataIdNotSame"];
+                        ErrorMessage = AppResource.DataIdNotSame;
                         OperCode = 999;
                         return FilterResult.Success;
                     }

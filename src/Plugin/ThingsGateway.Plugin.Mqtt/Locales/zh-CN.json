@@ -1,61 +1,51 @@
 ﻿{
+  "ThingsGateway.Plugin.Mqtt.MqttClientProperty": {
+    "CAFile_BrowserFile": "CA文件",
+    "ClientCertificateFile_BrowserFile": "客户端证书",
+    "ClientKeyFile_BrowserFile": "客户端key文件",
+    "ConnectId": "连接ID",
+    "ConnectTimeout": "连接超时时间",
+    "DeviceRpcEnable": "允许Rpc写入",
+    "IP": "IP",
+    "IsWebSocket": "Websocket",
+    "MqttProtocolVersion": "协议版本",
+    "MqttQualityOfServiceLevel": "QoS",
+    "Password": "密码",
+    "Port": "端口",
+    "RpcQuestTopic": "Rpc请求数据主题",
+    "RpcWriteTopic": "Rpc写入主题",
+    "TLS": "TLS",
+    "UserName": "用户名",
+    "WebSocketUrl": "WebSocketUrl"
+  },
   "ThingsGateway.Plugin.Mqtt.MqttClientVariableProperty": {
     "VariableRpcEnable": "启用RPC"
   },
-
-  "ThingsGateway.Plugin.Mqtt.MqttClientProperty": {
-    "IP": "IP",
-    "Port": "端口",
-    "MqttQualityOfServiceLevel": "QoS",
-    "MqttProtocolVersion": "协议版本",
-    "TLS": "TLS",
+  "ThingsGateway.Plugin.Mqtt.MqttCollectProperty": {
     "CAFile_BrowserFile": "CA文件",
+    "CheckClearTime": "变量过期时间(s)",
     "ClientCertificateFile_BrowserFile": "客户端证书",
     "ClientKeyFile_BrowserFile": "客户端key文件",
-
-    "IsWebSocket": "Websocket",
-    "WebSocketUrl": "WebSocketUrl",
-    "UserName": "用户名",
-    "Password": "密码",
     "ConnectId": "连接ID",
     "ConnectTimeout": "连接超时时间",
-    "DeviceRpcEnable": "允许Rpc写入",
-    "RpcWriteTopic": "Rpc写入主题",
-    "RpcQuestTopic": "Rpc请求数据主题"
-
+    "DetailLog": "详细日志",
+    "IP": "IP",
+    "IsWebSocket": "Websocket",
+    "MqttProtocolVersion": "协议版本",
+    "Password": "密码",
+    "Port": "端口",
+    "TLS": "TLS",
+    "UserName": "用户名",
+    "WebSocketUrl": "WebSocketUrl"
   },
   "ThingsGateway.Plugin.Mqtt.MqttServerProperty": {
-    "IP": "IP",
-    "Port": "端口",
-    "MqttQualityOfServiceLevel": "QoS",
-    "WebSocketPort": "Websocket端口",
-    "StartWithId": "允许连接的ID前缀",
-
     "AnonymousEnable": "允许匿名登录",
     "DeviceRpcEnable": "允许Rpc写入",
-    "RpcWriteTopic": "Rpc写入主题"
-
-  },
-
-  "ThingsGateway.Plugin.Mqtt.MqttCollectProperty": {
     "IP": "IP",
+    "MqttQualityOfServiceLevel": "QoS",
     "Port": "端口",
-    "DetailLog": "详细日志",
-    "MqttProtocolVersion": "协议版本",
-    "TLS": "TLS",
-    "CAFile_BrowserFile": "CA文件",
-    "ClientCertificateFile_BrowserFile": "客户端证书",
-    "ClientKeyFile_BrowserFile": "客户端key文件",
-    "IsWebSocket": "Websocket",
-    "WebSocketUrl": "WebSocketUrl",
-    "UserName": "用户名",
-    "Password": "密码",
-    "ConnectId": "连接ID",
-    "ConnectTimeout": "连接超时时间",
-    "CheckClearTime": "变量过期时间(s)"
-
-
-
+    "RpcWriteTopic": "Rpc写入主题",
+    "StartWithId": "允许连接的ID前缀",
+    "WebSocketPort": "Websocket端口"
   }
-
 }

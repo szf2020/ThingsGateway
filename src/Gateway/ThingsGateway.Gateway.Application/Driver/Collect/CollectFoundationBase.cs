@@ -100,7 +100,7 @@ public abstract class CollectFoundationBase : CollectBase
                         if (item.LastErrorMessage != exception.Message)
                         {
                             if (!cancellationToken.IsCancellationRequested)
-                                LogMessage?.LogWarning(exception, Localizer["CollectFail", DeviceName, item?.RegisterAddress, item?.Length, exception.Message]);
+                                LogMessage?.LogWarning(exception, string.Format(AppResource.CollectFail, DeviceName, item?.RegisterAddress, item?.Length, exception.Message));
                         }
                         item.LastErrorMessage = exception.Message;
                         CurrentDevice.SetDeviceStatus(TimerX.Now, true, exception.Message);
@@ -112,7 +112,7 @@ public abstract class CollectFoundationBase : CollectBase
                         if (item.LastErrorMessage != exception.Message)
                         {
                             if (!cancellationToken.IsCancellationRequested)
-                                LogMessage?.LogWarning(exception, Localizer["MethodFail", DeviceName, item.MethodInfo.Name, exception.Message]);
+                                LogMessage?.LogWarning(exception, string.Format(AppResource.MethodFail, DeviceName, item.MethodInfo.Name, exception.Message));
                         }
                         item.LastErrorMessage = exception.Message;
                         CurrentDevice.SetDeviceStatus(TimerX.Now, true, exception.Message);

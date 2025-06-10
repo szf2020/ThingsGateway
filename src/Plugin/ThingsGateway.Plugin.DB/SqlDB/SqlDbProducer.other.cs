@@ -99,7 +99,7 @@ public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariableModel<
         if (success != result.IsSuccess)
         {
             if (!result.IsSuccess)
-                LogMessage.LogWarning(result.ToString());
+                LogMessage?.LogWarning(result.ToString());
             success = result.IsSuccess;
         }
 
@@ -132,7 +132,7 @@ public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariableModel<
                 stopwatch.Stop();
                 if (result > 0)
                 {
-                    LogMessage.Trace($"HistoryTable Data Count：{result}，watchTime:  {stopwatch.ElapsedMilliseconds} ms");
+                    LogMessage?.Trace($"HistoryTable Data Count：{result}，watchTime:  {stopwatch.ElapsedMilliseconds} ms");
                 }
             }
 
@@ -169,7 +169,7 @@ public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariableModel<
                     {
                         var result = await db.Storageable(datas).As(_driverPropertys.ReadDBTableName).PageSize(5000).ExecuteSqlBulkCopyAsync(cancellationToken).ConfigureAwait(false);
                         if (result > 0)
-                            LogMessage.Trace($"RealTable Data Count：{result}");
+                            LogMessage?.Trace($"RealTable Data Count：{result}");
                         _initRealData = true;
                         return OperResult.Success;
                     }
@@ -180,7 +180,7 @@ public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariableModel<
                     if (datas?.Count > 0)
                     {
                         var result = await db.Fastest<SQLRealValue>().AS(_driverPropertys.ReadDBTableName).PageSize(100000).BulkUpdateAsync(datas).ConfigureAwait(false);
-                        LogMessage.Trace($"RealTable Data Count：{result}");
+                        LogMessage?.Trace($"RealTable Data Count：{result}");
                         return OperResult.Success;
                     }
                     return OperResult.Success;

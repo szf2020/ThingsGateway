@@ -58,7 +58,7 @@ public class OpcDaMaster : CollectBase
         {
             _plc = new();
             _plc.DataChangedHandler += DataChangedHandler;
-            _plc.LogEvent = (a, b, c, d) => LogMessage.Log((LogLevel)a, b, c, d);
+            _plc.LogEvent = (a, b, c, d) => LogMessage?.Log((LogLevel)a, b, c, d);
         }
         _plc.Init(opcNode);
         await base.InitChannelAsync(channel, cancellationToken).ConfigureAwait(false);
@@ -211,7 +211,7 @@ public class OpcDaMaster : CollectBase
         }
         catch (Exception ex)
         {
-            LogMessage.LogWarning(ex);
+            LogMessage?.LogWarning(ex);
         }
     }
 
@@ -226,7 +226,7 @@ public class OpcDaMaster : CollectBase
                 return;
             if (DisposedValue)
                 return;
-            LogMessage.Trace($"{ToString()} Change:{Environment.NewLine} {values?.ToSystemTextJsonString()}");
+            LogMessage?.Trace($"{ToString()} Change:{Environment.NewLine} {values?.ToSystemTextJsonString()}");
 
             foreach (var data in values)
             {

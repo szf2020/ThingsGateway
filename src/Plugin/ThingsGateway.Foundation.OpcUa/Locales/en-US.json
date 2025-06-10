@@ -1,37 +1,33 @@
 ﻿{
   "ThingsGateway.Foundation.OpcUa.OpcUaProperty": {
-    "OpcUrl": "OpcUrl",
-    "UserName": "UserName",
-    "Password": "Password",
-    "CheckDomain": "CheckDomain",
-    "UpdateRate": "UpdateRate",
     "ActiveSubscribe": "ActiveSubscribe",
-    "GroupSize": "GroupSize",
-    "DeadBand": "DeadBand",
-    "KeepAliveInterval": "KeepAliveInterval(ms)",
-    "UseSecurity": "IsUseSecurity",
-    "LoadType": "LoadType",
-    "AutoAcceptUntrustedCertificates": "AutoAcceptUntrustedCertificates",
-    "ExportC": "ExportCertificate",
-
-    "Connect": "Connect",
-    "Disconnect": "Disconnect",
     "Add": "Add",
-    "Remove": "Remove",
-    "Read": "Read",
-    "Write": "Write",
-    "ShowImport": "View OPC space",
-    "RegisterAddress": "RegisterAddress",
-    "WriteValue": "WriteValue",
-
-    "NoVariablesAvailable": "No variables available",
-    "Success": "Success",
+    "AutoAcceptUntrustedCertificates": "AutoAcceptUntrustedCertificates",
+    "CheckDomain": "CheckDomain",
     "Close": "Close",
-    "Save": "Import to system",
+    "Connect": "Connect",
+    "DeadBand": "DeadBand",
+    "Disconnect": "Disconnect",
     "Export": "Export",
-    "ShowSubvariable": "ShowSubvariable"
+    "ExportC": "ExportCertificate",
+    "GroupSize": "GroupSize",
+    "KeepAliveInterval": "KeepAliveInterval(ms)",
+    "LoadType": "LoadType",
+    "NoVariablesAvailable": "No variables available",
+    "OpcUrl": "OpcUrl",
+    "Password": "Password",
+    "Read": "Read",
+    "RegisterAddress": "RegisterAddress",
+    "Remove": "Remove",
+    "Save": "Import to system",
+    "ShowImport": "View OPC space",
+    "ShowSubvariable": "ShowSubvariable",
+    "Success": "Success",
+    "UpdateRate": "UpdateRate",
+    "UserName": "UserName",
+    "UseSecurity": "IsUseSecurity",
+    "Write": "Write",
+    "WriteValue": "WriteValue"
   },
-
-  "ThingsGateway.Foundation.OpcUa.OpcUaResource": {
-  }
+  "ThingsGateway.Foundation.OpcUa.OpcUaResource": {}
 }

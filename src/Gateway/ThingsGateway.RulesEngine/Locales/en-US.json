@@ -1,59 +1,51 @@
 ﻿{
   "ThingsGateway.RulesEngine._Imports": {
-    "Start": "Start",
-    "StartNode": "Start",
-    "End": "End",
-    "EndNode": "End",
-    "TimeIntervalTriggerNode": "IntervalExecutionTrigger",
-    "TimeIntervalTriggerNode.Placeholder": "IntervalTime (ms)",
-    "DeviceChangedTriggerNode": "DeviceStateTrigger",
-    "Device.Placeholder": "DeviceName",
+    "Actuator": "Actuator",
     "AlarmChangedTriggerNode": "AlarmStateTrigger",
-    "Variable.Placeholder": "VariableName",
-    "ValueChangedTriggerNode": "VariableStateTrigger",
-    "DelayNode": "Delay",
-    "DelayNode.Placeholder": "Interval Time (ms)",
-    "DataNode": "DataScript",
-    "ConditionNode": "Condition",
-    "ConditionNode.Placeholder": "Calculation returns boolean",
-    "ExecuteScriptNode": "CustomExecution",
     "BusinessNode": "BusinessDeviceExecution",
     "BusinessNode.Placeholder": "BusinessDeviceName",
+    "Cancel": "Cancel",
+    "Check": "Check",
+    "Clear": "Clear",
+    "ConditionNode": "Condition",
+    "ConditionNode.Placeholder": "Calculation returns boolean",
+    "DataNode": "DataScript",
+    "DelayNode": "Delay",
+    "DelayNode.Placeholder": "Interval Time (ms)",
+    "Design": "Design",
+    "Device.Placeholder": "DeviceName",
+    "DeviceChangedTriggerNode": "DeviceStateTrigger",
+    "Download": "Download JSON",
+    "End": "End",
+    "EndNode": "End",
+    "ExecuteScriptNode": "CustomExecution",
+    "Expression": "Script",
+    "Load": "Load JSON",
+    "Other": "Other",
+    "Save": "Save",
+    "Start": "Start",
+    "Start/End": "Start/End",
+    "StartNode": "Start",
+    "TimeIntervalTriggerNode": "IntervalExecutionTrigger",
+    "TimeIntervalTriggerNode.Placeholder": "IntervalTime (ms)",
+    "Trigger": "Trigger",
+    "ValueChangedTriggerNode": "VariableStateTrigger",
+    "Variable.Placeholder": "VariableName",
     "VariableRpcNode": "VariableRpc",
     "VariableRpcNode.Placeholder": "VariableName",
-
-    "Clear": "Clear",
-
-    "Load": "Load JSON",
-    "Download": "Download JSON",
-    "Cancel": "Cancel",
-    "Save": "Save",
-    "Design": "Design",
-
-    "Start/End": "Start/End",
-    "Trigger": "Trigger",
-    "Expression": "Script",
-    "Actuator": "Actuator",
-    "Other": "Other",
-    "ZoomToFit": "ZoomToFit",
-    "Check": "Check"
+    "ZoomToFit": "ZoomToFit"
   },
   "ThingsGateway.RulesEngine.Rules": {
-    "Name": "Name",
-    "Status": "Status",
-    "SortCode": "SortCode",
     "ClearRules": "ClearRules",
     "DeleteRules": "DeleteRules",
-    "SaveRules": "SaveRules"
-  },
-
-  "ThingsGateway.RulesEngine.RulesEngineHostedService": {
-    "RulesEngineTask": "Rules Engine Thread",
-    "RulesEngineTaskStart": "Rules Engine Thread Start"
+    "Name": "Name",
+    "SaveRules": "SaveRules",
+    "SortCode": "SortCode",
+    "Status": "Status"
   },
 
   "ThingsGateway.RulesEngine.RulesStatus": {
-    "RulesId": "Name",
-    "LogConsole": "Log"
+    "LogConsole": "Log",
+    "RulesId": "Name"
   }
 }

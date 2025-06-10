@@ -1,459 +1,402 @@
 ﻿{
+  "ThingsGateway.Admin.Application.AppConfig": {
+    "LoginPolicy": "LoginPolicy",
+    "PagePolicy": "PagePolicy",
+    "PasswordPolicy": "PasswordPolicy",
+    "WebsitePolicy": "WebsitePolicy"
+  },
+  "ThingsGateway.Admin.Application.AuthController": {
+    "AuthController": "Login API",
+    "LoginAsync": "Login",
+    "LogoutAsync": "Logout"
+  },
+  "ThingsGateway.Admin.Application.AuthService": {
+    "AuthErrorMax": "Account password error, will be locked for {1} minutes after exceeding {0} times, error count {2}",
+    "MustDesc": "Password needs to be encrypted with DESC before passing",
+    "OrgDisable": "The affiliated company/department has been deactivated, please contact the administrator",
+    "PasswordError": "Too many password errors, please try again in {0} minutes",
+    "SingleLoginWarn": "Your account is logged in elsewhere",
+    "TenantNull": "The tenant does not exist",
+    "UserDisable": "Account {0} has been disabled",
+    "UserNoModule": "This account has not been assigned a module. Please contact the administrator",
+    "UserNull": "User {0} does not exist"
+  },
   "ThingsGateway.Admin.Application.BaseDataEntity": {
     "CreateOrgId": "CreateOrgId"
   },
   "ThingsGateway.Admin.Application.BaseEntity": {
-    "SortCode": "SortCode",
     "CreateTime": "CreateTime",
     "CreateUser": "CreateUser",
+    "SortCode": "SortCode",
     "UpdateTime": "UpdateTime",
     "UpdateUser": "UpdateUser"
   },
-
   "ThingsGateway.Admin.Application.BlazorAuthenticationHandler": {
     "UserExpire": "User expired, please login again"
   },
-  "ThingsGateway.Admin.Application.SysUser": {
-    "Disable": "Disable",
-    "Enable": "Enable",
-    "GrantRole": "GrantRole",
-    "ExitVerificat": "You have been forcibly logged out",
-    "PasswordEdited": "Password changed, logged out",
-
-    "Avatar": "Avatar",
-    "Account": "Account",
-    "Account.Required": "Account.Required",
-    "Password": "Password",
-    "Status": "Status",
-    "Phone": "Phone",
-    "Email": "Email",
-    "LastLoginIp": "LastLoginIp",
-    "LastLoginDevice": "LastLoginDevice",
-    "LastLoginTime": "LastLoginTime",
-    "LastLoginAddress": "LastLoginAddress",
-    "LatestLoginIp": "LatestLoginIp",
-    "LatestLoginTime": "LatestLoginTime",
-    "LatestLoginDevice": "LatestLoginDevice",
-    "LatestLoginAddress": "LatestLoginAddress",
-    "OrgNames": "OrgNames",
-    "PositionName": "PositionName",
-    "OrgId": "Org",
-    "PositionId": "Position",
-    "DirectorId": "Director",
-
-    "CheckSelf": "Prohibit {0} yourself",
-    "CanotDeleteAdminUser": "Cannot delete built-in super admin user",
-    "CanotEditAdminUser": "Cannot edit super admin user",
-    "CanotGrantAdmin": "Cannot assign admins roles",
-    "EmailDup": "Duplicate email {0} exists",
-    "AccountDup": "Duplicate account {0} exists",
-    "CanotDeleteSelf": "Cannot delete yourself",
-    "EmailError": "Email format error {0}",
-    "PhoneError": "Phone number format error {0}",
-    "NoOrg": "The organization does not exist",
-    "DirectorSelf": "Cannot set oneself as the supervisor",
-
-    "DemoCanotUpdatePassword": "DEMO environment does not allow password modification",
-    "OldPasswordError": "Incorrect old password",
-    "ConfirmPasswordDiff": "Passwords entered twice are inconsistent",
-    "PasswordLengthLess": "Password length cannot be less than {0}",
-    "PasswordMustNum ": "Password must contain numbers",
-    "PasswordMustLow": "Password must contain lowercase letters",
-    "PasswordMustUpp": "Password must contain uppercase letters",
-    "PasswordMustSpecial": "Password must contain special characters"
-  },
-
-  "ThingsGateway.Admin.Application.SysRole": {
-    "Code": "Code",
-    "Name": "Name",
-    "Name.Required": "{0} is required",
-    "Category": "Category",
-    "OrgId": "Org",
-    "Global": "Global",
-    "Status": "Status",
-    "CanotDeleteAdmin": "Cannot delete built-in super admin role",
-    "CanotEditAdmin": "Cannot edit super admin role",
-    "CanotGrantAdmin": "Cannot assign admins roles",
-    "NameDup": "Duplicate role name {0}",
-
-    "OrgNotNull": "Organization cannot be null",
-    "SameOrgNameDup": "Duplicate role name exists: {0}",
-    "CannotRoleScopeAll": "Organization role cannot select global data scope",
-    "CodeDup": "Duplicate code exists: {0}"
-  },
-
-  "ThingsGateway.Admin.Application.RoleCategoryEnum": {
-    "Global": "Global",
-    "Org": "Org"
-  },
   "ThingsGateway.Admin.Application.DataScopeEnum": {
-    "SCOPE_SELF": "Self",
     "SCOPE_ALL": "All",
     "SCOPE_ORG": "OnlyOrg",
     "SCOPE_ORG_CHILD": "OrgChild",
-    "SCOPE_ORG_DEFINE": "Define"
+    "SCOPE_ORG_DEFINE": "Define",
+    "SCOPE_SELF": "Self"
   },
   "ThingsGateway.Admin.Application.DefaultDataScope": {
     "ScopeCategory": "DataScope",
     "ScopeDefineOrgIdList": "DefineOrgList"
   },
-
-
-  "ThingsGateway.Admin.Application.SysResource": {
-    "Title": "Title",
-    "Module": "Module",
-    "Title.Required": "{0} is required",
-    "Href.Required": "{0} is required",
-    "Icon": "Icon",
-    "Href": "Path",
-    "Code": "Code",
-    "Category": "Category",
-    "Target": "Target",
-    "NavLinkMatch": "NavLinkMatch",
-    "ParentId": "Parent",
-    "ResourceDup": "Duplicate name {0} exists",
-    "ResourceParentChoiceSelf": "Parent cannot choose itself",
-    "ResourceParentNull": "Parent does not exist {0}",
-    "NotFoundResource": "System exception, menu not found",
-    "ModuleIdDiff": "Module is inconsistent with parent menu",
-    "CanotDeleteSystemResource": "Cannot delete system resource {0}",
-    "ResourceMenuHrefNotNull": "Menu href cannot null"
+  "ThingsGateway.Admin.Application.DictTypeEnum": {
+    "Define": "Business",
+    "System": "System"
   },
-  "ThingsGateway.Admin.Application.SysOrgCopyInput": {
-    "TargetId": "Target",
-    "ContainsChild": "ContainsChild",
-    "ContainsPosition": "ContainsPosition"
-  },
-
-  "ThingsGateway.Admin.Application.SysPosition": {
-    "Category.Required": "{0} is a required field",
-    "Name.Required": "{0} is a required field",
-    "Code.Required": "{0} is a required field",
-    "OrgId.MinValue": "{0} is a required field",
-    "Category": "Category",
-    "Name": "Name",
-    "Code": "Code",
-    "Status": "Status",
-    "OrgId": "Organization",
-    "Remark": "Remarks",
-    "Dup": "Duplicate position exists with Category {0} and Name {1}",
-    "CodeDup": "Duplicate code {0} exists",
-    "NameDup": "Duplicate name {0} exists",
-    "CanotContainsSelf": "Cannot contain itself",
-    "TargetNameDup": "Target node has duplicate name {0}",
-    "ParentChoiceSelf": "Parent cannot be itself",
-    "ParentNull": "Parent does not exist {0}",
-    "DeleteUserFirst": "Please remove the users under the position first"
-  },
-
-  "ThingsGateway.Admin.Application.SysOrg": {
-    "Category.Required": "{0} is a required field",
-    "Name.Required": "{0} is a required field",
-    "Code.Required": "{0} is a required field",
-    "Category": "Category",
-    "Name": "Name",
-    "Code": "Code",
-    "Status": "Status",
-    "ParentId": "ParentOrg",
-    "Names": "Names",
-    "Remark": "Remarks",
-    "DirectorId": "Director",
-    "Dup": "Duplicate organization exists with Category {0} and Name {1}",
-    "CodeDup": "Duplicate code {0} exists",
-    "NameDup": "Duplicate name {0} exists",
-    "CanotContainsSelf": "Cannot contain itself",
-    "TargetNameDup": "Target node has duplicate name {0}",
-    "ParentChoiceSelf": "Parent cannot be itself",
-    "ParentNull": "Parent does not exist {0}",
-    "DeleteUserFirst": "Please remove the users under the organization first",
-    "DeleteRoleFirst": "Please remove the roles under the organization first",
-    "DeletePositionFirst": "Please remove the positions under the organization first",
-    "RootOrg": "Unable to create top-level organization"
-  },
-
-  "ThingsGateway.Admin.Application.OrgEnum": {
-    "COMPANY": "Company",
-    "DEPT": "Dept"
-  },
-  "ThingsGateway.Admin.Application.PositionCategoryEnum": {
-    "HIGH": "High",
-    "MIDDLE": "Middle",
-    "LOW": "Low"
-  },
-  //controller
-  "ThingsGateway.Admin.Application.AuthController": {
-    //auth
-    "AuthController": "Login API",
-    "LoginAsync": "Login",
-    "LogoutAsync": "Logout"
-  },
-  "ThingsGateway.Admin.Application.TestController": {
-    //auth
-    "TestController": "Test API",
-    "Test": "Test"
-  },
-  "ThingsGateway.Admin.Application.OpenApiAuthController": {
-    //auth
-    "OpenApiAuthController": "Login API",
-    "LoginAsync": "Login",
-    "LogoutAsync": "Logout"
-  },
-
   "ThingsGateway.Admin.Application.FileService": {
-    "FileNullError": "File cannot be empty",
     "FileLengthError": "File size cannot exceed {0} M",
+    "FileNullError": "File cannot be empty",
     "FileTypeError": "Not supported format {0}"
   },
-
-  "ThingsGateway.Admin.Application.UnifyResultProvider": {
-    "TokenOver": "Login has expired, please login again",
-    "NoPermission": "Access denied, no permission"
-  },
-
-  "ThingsGateway.Admin.Application.AuthService": {
-
-    "TenantNull": "The tenant does not exist",
-    "OrgDisable": "The affiliated company/department has been deactivated, please contact the administrator",
-
-    "SingleLoginWarn": "Your account is logged in elsewhere",
-    "UserNull": "User {0} does not exist",
-    "MustDesc": "Password needs to be encrypted with DESC before passing",
-    "PasswordError": "Too many password errors, please try again in {0} minutes",
-    "UserDisable": "Account {0} has been disabled",
-    "UserNoModule": "This account has not been assigned a module. Please contact the administrator",
-    "AuthErrorMax": "Account password error, will be locked for {1} minutes after exceeding {0} times, error count {2}"
-  },
-
   "ThingsGateway.Admin.Application.HardwareInfo": {
     "Environment": "HostEnvironment",
     "FrameworkDescription": ".NETFramework",
     "OsArchitecture": "System Architecture",
-    "UUID": "UUID",
-    "UpdateTime": "UpdateTime"
+    "UpdateTime": "UpdateTime",
+    "UUID": "UUID"
   },
-  "ThingsGateway.Admin.Application.HistoryHardwareInfo": {
-    "DriveUsage": "Disk Usage",
-    "MemoryUsage": "Memory",
-    "CpuUsage": "CPU Usage",
-    "Temperature": "Temperature",
-    "Battery": "Battery"
-  },
-
-
-  //oper
-  "ThingsGateway.Admin.Application.OperDescAttribute": {
-    //dict
-    "SaveDict": "Modify dictionary",
-    "DeleteDict": "Delete dictionary",
-    "EditLoginPolicy": "Modify login policy",
-    "EditPasswordPolicy": "Modify password policy",
-    "EditPagePolicy": "Modify page policy",
-    "EditWebsitePolicy": "Modify website settings",
-    //operlog
-    "DeleteOperLog": "Delete operation log",
-    "ExportOperLog": "Export operation log",
-
-    //resource
-    "SaveResource": "Modify resource",
-    "DeleteResource": "Delete resource",
-
-    //role
-    "SaveRole": "Modify role",
-    "DeleteRole": "Delete role",
-    "RoleGrantResource": "Role grant resource",
-    "RoleGrantUser": "Role grant user",
-    "RoleGrantApiPermission": "Role grant OpenApi",
-    "GrantApi": "GrantApi",
-    "GrantUser": "GrantUser",
-    "GrantRole": "GrantRole",
-    "GrantResource": "GrantResource",
-    //user
-    "SaveUser": "Modify user",
-    "DeleteuSER": "Delete user",
-    "ResetPassword": "Reset pw",
-    "UserGrantRole": "User grant role",
-    "UserGrantResource": "User grant resource",
-    "UserGrantApiPermission": "User grant OpenApi",
-
-    //usercenter
-    "UpdateUserInfo": "Update personal information",
-    "WorkbenchInfo": "Update personal workbench",
-    "UpdatePassword": "Update personal password",
-
-    //session
-    "ExitVerificat": "Force token off",
-    "ExitSession": "Force session off",
-
-
-    "CopyOrg": "Copy Organization",
-    "DeleteOrg": "Delete Organization",
-    "SaveOrg": "Save Organization",
-
-    "DeletePosition": "Delete Position",
-    "SavePosition": "Save Position",
-
-    "NoPermission": "No Permission",
-
-
-    "CopyResource": "CopyResource",
-    "ChangeParentResource": "ChangeParentResource"
-  },
-
-
-  //service
-
   "ThingsGateway.Admin.Application.HardwareJob": {
     "GetHardwareInfoFail": "Get Hardwareinfo Fail"
   },
-
-  //dto
-  "ThingsGateway.Admin.Application.UserSelectorOutput": {
+  "ThingsGateway.Admin.Application.HistoryHardwareInfo": {
+    "Battery": "Battery",
+    "CpuUsage": "CPU Usage",
+    "DriveUsage": "Disk Usage",
+    "MemoryUsage": "Memory",
+    "Temperature": "Temperature"
+  },
+  "ThingsGateway.Admin.Application.LogCateGoryEnum": {
+    "Exception": "Exception",
+    "Login": "Login",
+    "Logout": "Logout",
+    "Operate": "Operation"
+  },
+  "ThingsGateway.Admin.Application.LogEnum": {
+    "FAIL": "Fail",
+    "SUCCESS": "Success"
+  },
+  "ThingsGateway.Admin.Application.LoginInput": {
     "Account": "Account",
-    "OrgId": "Org"
+    "Account.Required": "{0} is required",
+    "Password": "Password",
+    "Password.Required": "{0} is required"
+  },
+  "ThingsGateway.Admin.Application.LoginPolicy": {
+    "ErrorCount": "Login error count lock threshold",
+    "ErrorCount.MinValue": "{0} value is too small",
+    "ErrorLockTime": "Login error lock duration (min)",
+    "ErrorLockTime.MinValue": "{0} value is too small",
+    "ErrorResetTime": "Login error count expiration duration (min)",
+    "ErrorResetTime.MinValue": "{0} value is too small",
+    "SingleOpen": "Single user login switch",
+    "VerificatExpireTime": "Login expiration time (min)",
+    "VerificatExpireTime.MinValue": "{0} value is too small"
+  },
+  "ThingsGateway.Admin.Application.LogoutInput": {
+    "VerificatId.Required": "{0} is required"
+  },
+  "ThingsGateway.Admin.Application.OpenApiAuthController": {
+    "LoginAsync": "Login",
+    "LogoutAsync": "Logout",
+    "OpenApiAuthController": "Login API"
+  },
+  "ThingsGateway.Admin.Application.OperateLogPageInput": {
+    "Account": "Account",
+    "Category": "Category",
+    "SearchDate": "SearchDate"
+  },
+  "ThingsGateway.Admin.Application.OperDescAttribute": {
+    "ChangeParentResource": "ChangeParentResource",
+    "CopyOrg": "Copy Organization",
+    "CopyResource": "CopyResource",
+    "DeleteDict": "Delete dictionary",
+    "DeleteOperLog": "Delete operation log",
+    "DeleteOrg": "Delete Organization",
+    "DeletePosition": "Delete Position",
+    "DeleteResource": "Delete resource",
+    "DeleteRole": "Delete role",
+    "DeleteuSER": "Delete user",
+    "EditLoginPolicy": "Modify login policy",
+    "EditPagePolicy": "Modify page policy",
+    "EditPasswordPolicy": "Modify password policy",
+    "EditWebsitePolicy": "Modify website settings",
+    "ExitSession": "Force session off",
+    "ExitVerificat": "Force token off",
+    "ExportOperLog": "Export operation log",
+    "GrantApi": "GrantApi",
+    "GrantResource": "GrantResource",
+    "GrantRole": "GrantRole",
+    "GrantUser": "GrantUser",
+    "NoPermission": "No Permission",
+    "ResetPassword": "Reset pw",
+    "RoleGrantApiPermission": "Role grant OpenApi",
+    "RoleGrantResource": "Role grant resource",
+    "RoleGrantUser": "Role grant user",
+    "SaveDict": "Modify dictionary",
+    "SaveOrg": "Save Organization",
+    "SavePosition": "Save Position",
+    "SaveResource": "Modify resource",
+    "SaveRole": "Modify role",
+    "SaveUser": "Modify user",
+    "UpdatePassword": "Update personal password",
+    "UpdateUserInfo": "Update personal information",
+    "UserGrantApiPermission": "User grant OpenApi",
+    "UserGrantResource": "User grant resource",
+    "UserGrantRole": "User grant role",
+    "WorkbenchInfo": "Update personal workbench"
+  },
+  "ThingsGateway.Admin.Application.OrgEnum": {
+    "COMPANY": "Company",
+    "DEPT": "Dept"
+  },
+  "ThingsGateway.Admin.Application.PagePolicy": {
+    "Razor": "Default homepage",
+    "Shortcuts": "Default shortcuts"
+  },
+  "ThingsGateway.Admin.Application.PasswordPolicy": {
+    "DefaultPassword": "Default user password",
+    "DefaultPassword.Required": "{0} is required",
+    "PasswordContainChar": "Contain special characters",
+    "PasswordContainLower": "Contain lowercase letters",
+    "PasswordContainNum": "Contain numbers",
+    "PasswordContainUpper": "Contain uppercase letters",
+    "PasswordMinLen": "Minimum password length",
+    "PasswordMinLen.MinValue": "{0} value is too small"
+  },
+  "ThingsGateway.Admin.Application.PositionCategoryEnum": {
+    "HIGH": "High",
+    "LOW": "Low",
+    "MIDDLE": "Middle"
+  },
+  "ThingsGateway.Admin.Application.ResourceCategoryEnum": {
+    "Button": "Button",
+    "Menu": "Menu",
+    "Module": "Module"
   },
   "ThingsGateway.Admin.Application.ResourceTableSearchModel": {
-    "Module": "Module",
     "Href": "Path",
+    "Module": "Module",
     "Title": "Title"
   },
-  "ThingsGateway.Admin.Application.WorkbenchInfo": {
-    "Razor": "Homepage",
-    "Shortcuts": "Shortcuts"
+  "ThingsGateway.Admin.Application.RoleCategoryEnum": {
+    "Global": "Global",
+    "Org": "Org"
   },
-  "ThingsGateway.Admin.Application.UpdatePasswordInput": {
-    "Password": "Password",
-    "NewPassword": "New password",
-    "ConfirmPassword": "Confirm password",
-    "Password.Required": "{0} is required",
-    "NewPassword.Required": "{0} is required",
-    "ConfirmPassword.Required": "{0} is required"
-  },
-
-  "ThingsGateway.Admin.Application.VerificatInfo": {
-    "Expire": "Expire(min)",
-    "Online": "Online",
-    "VerificatTimeout": "VerificatTimeout",
-    "Device": "Device",
-    "LoginIp": "LoginIp",
-    "LoginTime": "LoginTime"
-  },
-
   "ThingsGateway.Admin.Application.SessionOutput": {
     "Account": "Account",
-    "Online": "Online status",
     "LatestLoginIp": "Latest login IP",
     "LatestLoginTime": "Latest login time",
+    "Online": "Online status",
     "VerificatCount": "Token count"
   },
-
   "ThingsGateway.Admin.Application.SysDict": {
-    "Category.Required": "{0} is required",
-    "Name.Required": "{0} is required",
-    "Code.Required": "{0} is required",
     "Category": "Category",
-    "Name": "Name",
+    "Category.Required": "{0} is required",
     "Code": "Code",
-    "Remark": "Remark",
+    "Code.Required": "{0} is required",
     "DemoCanotUpdateWebsitePolicy": "DEMO environment does not allow modifying website settings",
-    "DictDup": "Duplicate configuration exists, category {0}, name {1}"
+    "DictDup": "Duplicate configuration exists, category {0}, name {1}",
+    "Name": "Name",
+    "Name.Required": "{0} is required",
+    "Remark": "Remark"
   },
-
   "ThingsGateway.Admin.Application.SysOperateLog": {
+    "Category": "Category",
     "ClassName": "ClassName",
     "ExeMessage": "ExeMessage",
-    "MethodName": "MethodName",
-    "ParamJson": "ParamJson",
-    "ReqMethod": "RequestMethod",
-    "ReqUrl": "RequestUrl",
-    "ResultJson": "ResultJson",
-    "Category": "Category",
     "ExeStatus": "ExeStatus",
+    "MethodName": "MethodName",
     "Name": "Name",
     "OpAccount": "OpAccount",
     "OpBrowser": "OpBrowser",
     "OpIp": "OpIp",
     "OpOs": "OpOs",
     "OpTime": "OpTime",
+    "ParamJson": "ParamJson",
+    "ReqMethod": "RequestMethod",
+    "ReqUrl": "RequestUrl",
+    "ResultJson": "ResultJson",
     "VerificatId": "VerificatId"
-
   },
-  "ThingsGateway.Admin.Application.OperateLogPageInput": {
-    "SearchDate": "SearchDate",
-    "Account": "Account",
-    "Category": "Category"
+  "ThingsGateway.Admin.Application.SysOrg": {
+    "CanotContainsSelf": "Cannot contain itself",
+    "Category": "Category",
+    "Category.Required": "{0} is a required field",
+    "Code": "Code",
+    "Code.Required": "{0} is a required field",
+    "CodeDup": "Duplicate code {0} exists",
+    "DeletePositionFirst": "Please remove the positions under the organization first",
+    "DeleteRoleFirst": "Please remove the roles under the organization first",
+    "DeleteUserFirst": "Please remove the users under the organization first",
+    "DirectorId": "Director",
+    "Dup": "Duplicate organization exists with Category {0} and Name {1}",
+    "Name": "Name",
+    "Name.Required": "{0} is a required field",
+    "NameDup": "Duplicate name {0} exists",
+    "Names": "Names",
+    "ParentChoiceSelf": "Parent cannot be itself",
+    "ParentId": "ParentOrg",
+    "ParentNull": "Parent does not exist {0}",
+    "Remark": "Remarks",
+    "RootOrg": "Unable to create top-level organization",
+    "Status": "Status",
+    "TargetNameDup": "Target node has duplicate name {0}"
   },
-  "ThingsGateway.Admin.Application.LoginInput": {
-    "Account": "Account",
-    "Password": "Password",
-    "Account.Required": "{0} is required",
-    "Password.Required": "{0} is required"
+  "ThingsGateway.Admin.Application.SysOrgCopyInput": {
+    "ContainsChild": "ContainsChild",
+    "ContainsPosition": "ContainsPosition",
+    "TargetId": "Target"
   },
-  "ThingsGateway.Admin.Application.LogoutInput": {
-    "VerificatId.Required": "{0} is required"
+  "ThingsGateway.Admin.Application.SysPosition": {
+    "CanotContainsSelf": "Cannot contain itself",
+    "Category": "Category",
+    "Category.Required": "{0} is a required field",
+    "Code": "Code",
+    "Code.Required": "{0} is a required field",
+    "CodeDup": "Duplicate code {0} exists",
+    "DeleteUserFirst": "Please remove the users under the position first",
+    "Dup": "Duplicate position exists with Category {0} and Name {1}",
+    "Name": "Name",
+    "Name.Required": "{0} is a required field",
+    "NameDup": "Duplicate name {0} exists",
+    "OrgId": "Organization",
+    "OrgId.MinValue": "{0} is a required field",
+    "ParentChoiceSelf": "Parent cannot be itself",
+    "ParentNull": "Parent does not exist {0}",
+    "Remark": "Remarks",
+    "Status": "Status",
+    "TargetNameDup": "Target node has duplicate name {0}"
   },
-  "ThingsGateway.Admin.Application.AppConfig": {
-    "LoginPolicy": "LoginPolicy",
-    "PasswordPolicy": "PasswordPolicy",
-    "PagePolicy": "PagePolicy",
-    "WebsitePolicy": "WebsitePolicy"
-  },
-  "ThingsGateway.Admin.Application.LoginPolicy": {
-    "SingleOpen": "Single user login switch",
-    "ErrorLockTime": "Login error lock duration (min)",
-    "ErrorResetTime": "Login error count expiration duration (min)",
-    "ErrorCount": "Login error count lock threshold",
-    "VerificatExpireTime": "Login expiration time (min)",
-    "ErrorLockTime.MinValue": "{0} value is too small",
-    "ErrorResetTime.MinValue": "{0} value is too small",
-    "ErrorCount.MinValue": "{0} value is too small",
-    "VerificatExpireTime.MinValue": "{0} value is too small"
-  },
-  "ThingsGateway.Admin.Application.PagePolicy": {
-    "Shortcuts": "Default shortcuts",
-    "Razor": "Default homepage"
-  },
-  "ThingsGateway.Admin.Application.PasswordPolicy": {
-    "DefaultPassword": "Default user password",
-    "DefaultPassword.Required": "{0} is required",
-    "PasswordMinLen": "Minimum password length",
-    "PasswordMinLen.MinValue": "{0} value is too small",
-    "PasswordContainNum": "Contain numbers",
-    "PasswordContainLower": "Contain lowercase letters",
-    "PasswordContainUpper": "Contain uppercase letters",
-    "PasswordContainChar": "Contain special characters"
-  },
-  "ThingsGateway.Admin.Application.WebsitePolicy": {
-    "WebStatus": "WebStatus",
-    "CloseTip": "CloseTip",
-    "CloseTip.Required": "{0} is required"
-  },
-  //enum
-  "ThingsGateway.Admin.Application.ResourceCategoryEnum": {
+  "ThingsGateway.Admin.Application.SysResource": {
+    "CanotDeleteSystemResource": "Cannot delete system resource {0}",
+    "Category": "Category",
+    "Code": "Code",
+    "Href": "Path",
+    "Href.Required": "{0} is required",
+    "Icon": "Icon",
     "Module": "Module",
-    "Menu": "Menu",
-    "Button": "Button"
+    "ModuleIdDiff": "Module is inconsistent with parent menu",
+    "NavLinkMatch": "NavLinkMatch",
+    "NotFoundResource": "System exception, menu not found",
+    "ParentId": "Parent",
+    "ResourceDup": "Duplicate name {0} exists",
+    "ResourceMenuHrefNotNull": "Menu href cannot null",
+    "ResourceParentChoiceSelf": "Parent cannot choose itself",
+    "ResourceParentNull": "Parent does not exist {0}",
+    "Target": "Target",
+    "Title": "Title",
+    "Title.Required": "{0} is required"
   },
-
+  "ThingsGateway.Admin.Application.SysRole": {
+    "CannotRoleScopeAll": "Organization role cannot select global data scope",
+    "CanotDeleteAdmin": "Cannot delete built-in super admin role",
+    "CanotEditAdmin": "Cannot edit super admin role",
+    "CanotGrantAdmin": "Cannot assign admins roles",
+    "Category": "Category",
+    "Code": "Code",
+    "CodeDup": "Duplicate code exists: {0}",
+    "Global": "Global",
+    "Name": "Name",
+    "Name.Required": "{0} is required",
+    "NameDup": "Duplicate role name {0}",
+    "OrgId": "Org",
+    "OrgNotNull": "Organization cannot be null",
+    "SameOrgNameDup": "Duplicate role name exists: {0}",
+    "Status": "Status"
+  },
+  "ThingsGateway.Admin.Application.SysUser": {
+    "Account": "Account",
+    "Account.Required": "Account.Required",
+    "AccountDup": "Duplicate account {0} exists",
+    "Avatar": "Avatar",
+    "CanotDeleteAdminUser": "Cannot delete built-in super admin user",
+    "CanotDeleteSelf": "Cannot delete yourself",
+    "CanotEditAdminUser": "Cannot edit super admin user",
+    "CanotGrantAdmin": "Cannot assign admins roles",
+    "CheckSelf": "Prohibit {0} yourself",
+    "ConfirmPasswordDiff": "Passwords entered twice are inconsistent",
+    "DemoCanotUpdatePassword": "DEMO environment does not allow password modification",
+    "DirectorId": "Director",
+    "DirectorSelf": "Cannot set oneself as the supervisor",
+    "Disable": "Disable",
+    "Email": "Email",
+    "EmailDup": "Duplicate email {0} exists",
+    "EmailError": "Email format error {0}",
+    "Enable": "Enable",
+    "ExitVerificat": "You have been forcibly logged out",
+    "GrantRole": "GrantRole",
+    "LastLoginAddress": "LastLoginAddress",
+    "LastLoginDevice": "LastLoginDevice",
+    "LastLoginIp": "LastLoginIp",
+    "LastLoginTime": "LastLoginTime",
+    "LatestLoginAddress": "LatestLoginAddress",
+    "LatestLoginDevice": "LatestLoginDevice",
+    "LatestLoginIp": "LatestLoginIp",
+    "LatestLoginTime": "LatestLoginTime",
+    "NoOrg": "The organization does not exist",
+    "OldPasswordError": "Incorrect old password",
+    "OrgId": "Org",
+    "OrgNames": "OrgNames",
+    "Password": "Password",
+    "PasswordEdited": "Password changed, logged out",
+    "PasswordLengthLess": "Password length cannot be less than {0}",
+    "PasswordMustLow": "Password must contain lowercase letters",
+    "PasswordMustNum": "Password must contain numbers",
+    "PasswordMustSpecial": "Password must contain special characters",
+    "PasswordMustUpp": "Password must contain uppercase letters",
+    "Phone": "Phone",
+    "PhoneError": "Phone number format error {0}",
+    "PositionId": "Position",
+    "PositionName": "PositionName",
+    "Status": "Status"
+  },
   "ThingsGateway.Admin.Application.TargetEnum": {
-    "_self": "Current window",
     "_blank": "New window",
     "_parent": "Parent window",
+    "_self": "Current window",
     "_top": "Top window"
   },
-  "ThingsGateway.Admin.Application.DictTypeEnum": {
-    "System": "System",
-    "Define": "Business"
+  "ThingsGateway.Admin.Application.TestController": {
+    "Test": "Test",
+    "TestController": "Test API"
   },
-
-  "ThingsGateway.Admin.Application.LogCateGoryEnum": {
-    "Login": "Login",
-    "Logout": "Logout",
-    "Operate": "Operation",
-    "Exception": "Exception"
+  "ThingsGateway.Admin.Application.UnifyResultProvider": {
+    "NoPermission": "Access denied, no permission",
+    "TokenOver": "Login has expired, please login again"
   },
-
-  "ThingsGateway.Admin.Application.LogEnum": {
-    "SUCCESS": "Success",
-    "FAIL": "Fail"
+  "ThingsGateway.Admin.Application.UpdatePasswordInput": {
+    "ConfirmPassword": "Confirm password",
+    "ConfirmPassword.Required": "{0} is required",
+    "NewPassword": "New password",
+    "NewPassword.Required": "{0} is required",
+    "Password": "Password",
+    "Password.Required": "{0} is required"
+  },
+  "ThingsGateway.Admin.Application.UserSelectorOutput": {
+    "Account": "Account",
+    "OrgId": "Org"
+  },
+  "ThingsGateway.Admin.Application.VerificatInfo": {
+    "Device": "Device",
+    "Expire": "Expire(min)",
+    "LoginIp": "LoginIp",
+    "LoginTime": "LoginTime",
+    "Online": "Online",
+    "VerificatTimeout": "VerificatTimeout"
+  },
+  "ThingsGateway.Admin.Application.WebsitePolicy": {
+    "CloseTip": "CloseTip",
+    "CloseTip.Required": "{0} is required",
+    "WebStatus": "WebStatus"
+  },
+  "ThingsGateway.Admin.Application.WorkbenchInfo": {
+    "Razor": "Homepage",
+    "Shortcuts": "Shortcuts"
   }
 }

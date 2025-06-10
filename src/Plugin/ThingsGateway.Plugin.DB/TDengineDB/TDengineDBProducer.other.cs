@@ -95,7 +95,7 @@ public partial class TDengineDBProducer : BusinessBaseWithCacheIntervalVariableM
         if (success != result.IsSuccess)
         {
             if (!result.IsSuccess)
-                LogMessage.LogWarning(result.ToString());
+                LogMessage?.LogWarning(result.ToString());
             success = result.IsSuccess;
         }
 
@@ -156,7 +156,7 @@ public partial class TDengineDBProducer : BusinessBaseWithCacheIntervalVariableM
                 //var result = await db.Insertable(dbInserts).SplitTable().ExecuteCommandAsync().ConfigureAwait(false);
                 //if (result > 0)
                 {
-                    LogMessage.Trace($"TableName：{_driverPropertys.TableNameLow}，Count：{dbInserts.Count}，watchTime:  {stopwatch.ElapsedMilliseconds} ms");
+                    LogMessage?.Trace($"TableName：{_driverPropertys.TableNameLow}，Count：{dbInserts.Count}，watchTime:  {stopwatch.ElapsedMilliseconds} ms");
                 }
             }
             return OperResult.Success;

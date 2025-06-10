@@ -1,21 +1,20 @@
 ﻿{
-
-  "ThingsGateway.Upgrade.UpdateZipFile": {
-    "AppName": "AppName",
-    "Version": "Version",
-    "FileSize": "FileSize",
-    "MinimumCompatibleVersion": "MinimumCompatibleVersion",
-    "DotNetVersion": "DotNetVersion",
-    "OSPlatform": "OSPlatform",
-    "Architecture": "Architecture",
-    "FilePath": "FilePath"
+  "ThingsGateway.Upgrade._Imports": {
+    "Restart": "Restart",
+    "Upgrade": "Upgrade"
   },
   "ThingsGateway.Upgrade.SaveUpdateZipFile": {
     "DownTemplate": "Download Template",
     "SaveUpdateZipFile": "Upload Version Package"
   },
-  "ThingsGateway.Upgrade._Imports": {
-    "Upgrade": "Upgrade",
-    "Restart": "Restart"
+  "ThingsGateway.Upgrade.UpdateZipFile": {
+    "AppName": "AppName",
+    "Architecture": "Architecture",
+    "DotNetVersion": "DotNetVersion",
+    "FilePath": "FilePath",
+    "FileSize": "FileSize",
+    "MinimumCompatibleVersion": "MinimumCompatibleVersion",
+    "OSPlatform": "OSPlatform",
+    "Version": "Version"
   }
 }

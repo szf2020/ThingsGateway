@@ -2,28 +2,19 @@
   "ThingsGateway.Plugin.Modbus.ModbusMasterProperty": {
     "ModbusType": "协议类型",
     "Station": "默认站号"
-   
   },
-
-  "ThingsGateway.Plugin.Modbus.ModbusSlave": {
-    "CanStartService": "无法启动服务",
-    "NotWriteEnable": "不允许写入"
-  },
-
   "ThingsGateway.Plugin.Modbus.ModbusSlaveProperty": {
-    "ModbusType": "协议类型",
-    "Station": "默认站号",
     "DataFormat": "解析规则",
-    "IsStringReverseByteWord": "字符串反转",
     "DeviceRpcEnable": "允许写入",
+    "IsStringReverseByteWord": "字符串反转",
     "IsWriteMemory": "立即写入内存",
-    "MulStation": "多站点"
-
+    "ModbusType": "协议类型",
+    "MulStation": "多站点",
+    "Station": "默认站号"
   },
-
   "ThingsGateway.Plugin.Modbus.ModbusSlaveVariableProperty": {
-    "ServiceAddress": "从站寄存器地址",
     "DataType": "数据类型",
+    "ServiceAddress": "从站寄存器地址",
     "VariableRpcEnable": "允许写入"
   }
 }

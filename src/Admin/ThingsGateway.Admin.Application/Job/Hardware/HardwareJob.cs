@@ -110,7 +110,7 @@ public class HardwareJob : IJob, IHardwareJob
             catch (Exception ex)
             {
                 if (!error)
-                    _logger.LogWarning(ex, _localizer["GetHardwareInfoFail"]);
+                    _logger.LogWarning(ex, "Get Hardwareinfo Fail");
                 error = true;
             }
 
@@ -152,7 +152,7 @@ public class HardwareJob : IJob, IHardwareJob
             catch (Exception ex)
             {
                 if (!error)
-                    _logger.LogWarning(ex, _localizer["GetHardwareInfoFail"]);
+                    _logger.LogWarning(ex, "Get Hardwareinfo Fail");
                 error = true;
             }
         }

@@ -71,7 +71,7 @@ public static class PackHelper
                     {
                         case DataTypeEnum.String:
                             // 字符串类型需特殊处理
-                            lastLen = (it.ThingsGatewayBitConverter.StringLength == null ? throw new(DefaultResource.Localizer["StringTypePackError"]) : it.ThingsGatewayBitConverter.StringLength.Value);
+                            lastLen = (it.ThingsGatewayBitConverter.StringLength == null ? throw new(ThingsGateway.Foundation.AppResource.StringTypePackError) : it.ThingsGatewayBitConverter.StringLength.Value);
                             break;
 
                         default:

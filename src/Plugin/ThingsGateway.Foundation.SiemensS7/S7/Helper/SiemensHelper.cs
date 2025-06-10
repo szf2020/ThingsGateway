@@ -55,15 +55,14 @@ internal sealed partial class SiemensHelper
     {
         return Error switch
         {
-            0x01 => SiemensS7Resource.Localizer["ERROR1"],
-            0x03 => SiemensS7Resource.Localizer["ERROR3"],
-            0x05 => SiemensS7Resource.Localizer["ERROR5"],
-            0x06 => SiemensS7Resource.Localizer["ERROR6"],
-            0x07 => SiemensS7Resource.Localizer["ERROR7"],
-            0x0a => SiemensS7Resource.Localizer["ERROR10"],
+            0x01 => AppResource.ERROR1,
+            0x03 => AppResource.ERROR3,
+            0x05 => AppResource.ERROR5,
+            0x06 => AppResource.ERROR6,
+            0x07 => AppResource.ERROR7,
+            0x0a => AppResource.ERROR10,
             _ => "Unknown",
         };
-        ;
     }
 
     internal static async ValueTask<OperResult<string>> ReadStringAsync(SiemensS7Master plc, string address, Encoding encoding, CancellationToken cancellationToken)
@@ -78,7 +77,7 @@ internal sealed partial class SiemensHelper
             }
             if (result1.Content[0] == 0 || result1.Content[0] == byte.MaxValue)
             {
-                return new OperResult<string>(SiemensS7Resource.Localizer["NotString"]);
+                return new OperResult<string>(AppResource.NotString);
             }
             var result2 = await plc.ReadAsync(address, 2 + result1.Content[1], cancellationToken).ConfigureAwait(false);
             if (!result2.IsSuccess)
@@ -115,9 +114,9 @@ internal sealed partial class SiemensHelper
         {
             var result = await plc.ReadAsync(address, 2, cancellationToken).ConfigureAwait(false);
             if (!result.IsSuccess) return result;
-            if (result.Content[0] == byte.MaxValue) return new OperResult<string>(SiemensS7Resource.Localizer["NotString"]);
+            if (result.Content[0] == byte.MaxValue) return new OperResult<string>(AppResource.NotString);
             if (result.Content[0] == 0) result.Content[0] = 254;
-            if (value.Length > result.Content[0]) return new OperResult<string>(SiemensS7Resource.Localizer["WriteDataLengthMore"]);
+            if (value.Length > result.Content[0]) return new OperResult<string>(AppResource.WriteDataLengthMore);
             return await plc.WriteAsync(
                 address,
                 DataTransUtil.SpliceArray([result.Content[0], (byte)value.Length],

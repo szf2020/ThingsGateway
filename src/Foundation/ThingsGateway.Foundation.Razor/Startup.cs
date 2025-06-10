@@ -10,6 +10,10 @@
 
 using Microsoft.Extensions.DependencyInjection;
 
+using System.Globalization;
+
+using ThingsGateway.Foundation;
+
 namespace ThingsGateway.Debug;
 
 [AppStartup(100000000)]
@@ -18,6 +22,16 @@ public class Startup : AppStartup
     public void Configure(IServiceCollection services)
     {
         Foundation.LocalizerUtil.SetLocalizerFactory((a) => App.CreateLocalizerByType(a));
+
+        if (CultureInfo.CurrentUICulture.Name.StartsWith("zh", StringComparison.OrdinalIgnoreCase))
+        {
+            AppResource.Lang = Language.Chinese;
+        }
+        else
+        {
+            AppResource.Lang = Language.English;
+        }
+
         services.AddScoped<IPlatformService, PlatformService>();
     }
 }

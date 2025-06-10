@@ -76,7 +76,7 @@ public class ModbusRtuSend : ISendMessage
         }
         else
         {
-            throw new System.InvalidOperationException(ModbusResource.Localizer["ModbusError1"]);
+            throw new System.InvalidOperationException(AppResource.ModbusError1);
         }
         byteBlock.Write(CRC16Utils.Crc16Only(byteBlock.Span));
     }

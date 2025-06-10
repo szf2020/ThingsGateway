@@ -48,7 +48,7 @@ public partial class ChannelComponent : ComponentBase
         {
             if (Channel != null)
             {
-                await Channel.CloseAsync(DefaultResource.Localizer["ProactivelyDisconnect", nameof(DisconnectClick)]);
+                await Channel.CloseAsync(AppResource.Localizer["ProactivelyDisconnect", nameof(DisconnectClick)]);
                 if (OnDisConnectClick.HasDelegate)
                     await OnDisConnectClick.InvokeAsync();
             }

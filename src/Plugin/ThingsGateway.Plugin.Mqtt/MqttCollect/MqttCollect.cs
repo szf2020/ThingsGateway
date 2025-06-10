@@ -270,7 +270,7 @@ public partial class MqttCollect : CollectBase
             if (success != clientResult.IsSuccess)
             {
                 if (!clientResult.IsSuccess)
-                    LogMessage.LogWarning(clientResult.Exception, clientResult.ErrorMessage);
+                    LogMessage?.LogWarning(clientResult.Exception, clientResult.ErrorMessage);
                 success = clientResult.IsSuccess;
             }
             await Task.Delay(10000, cancellationToken).ConfigureAwait(false);

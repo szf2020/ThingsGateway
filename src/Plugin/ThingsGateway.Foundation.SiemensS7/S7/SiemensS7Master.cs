@@ -66,9 +66,7 @@ public partial class SiemensS7Master : DeviceBase
     /// <inheritdoc/>
     public override string GetAddressDescription()
     {
-        var str = SiemensS7Resource.Localizer["AddressDes"];
-
-        return $"{base.GetAddressDescription()}{Environment.NewLine}{str}";
+        return $"{base.GetAddressDescription()}{Environment.NewLine}{AppResource.S7_AddressDes}";
     }
 
     /// <inheritdoc/>
@@ -410,7 +408,7 @@ public partial class SiemensS7Master : DeviceBase
                     if (result2.Exception is OperationCanceledException)
                         return true;
 
-                    Logger?.LogWarning(SiemensS7Resource.Localizer["HandshakeError1", channel.ToString(), result2]);
+                    Logger?.LogWarning(string.Format(AppResource.HandshakeError1, channel.ToString(), result2));
                     await channel.CloseAsync().ConfigureAwait(false);
                     return true;
                 }
@@ -418,7 +416,7 @@ public partial class SiemensS7Master : DeviceBase
             catch (OperationCanceledException) { }
             catch (Exception ex)
             {
-                Logger?.LogWarning(SiemensS7Resource.Localizer["HandshakeError1", channel.ToString(), ex]);
+                Logger?.LogWarning(string.Format(AppResource.HandshakeError1, channel.ToString(), ex));
                 await channel.CloseAsync().ConfigureAwait(false);
                 return true;
             }
@@ -430,7 +428,7 @@ public partial class SiemensS7Master : DeviceBase
                     if (result2.Exception is OperationCanceledException)
                         return true;
 
-                    Logger?.LogWarning(SiemensS7Resource.Localizer["HandshakeError2", channel.ToString(), result2]);
+                    Logger?.LogWarning(string.Format(AppResource.HandshakeError2, channel.ToString(), result2));
                     await channel.CloseAsync().ConfigureAwait(false);
                     return true;
                 }
@@ -446,7 +444,7 @@ public partial class SiemensS7Master : DeviceBase
             catch (OperationCanceledException) { }
             catch (Exception ex)
             {
-                Logger?.LogWarning(SiemensS7Resource.Localizer["HandshakeError2", channel.ToString(), ex]);
+                Logger?.LogWarning(string.Format(AppResource.HandshakeError2, channel.ToString(), ex));
                 await channel.CloseAsync().ConfigureAwait(false);
                 return true;
             }
@@ -519,7 +517,7 @@ public partial class SiemensS7Master : DeviceBase
         {
             if (length > 1)
             {
-                return new OperResult<string[]>(SiemensS7Resource.Localizer["StringLengthReadError"]);
+                return new OperResult<string[]>(AppResource.StringLengthReadError);
             }
             var result = await SiemensHelper.ReadStringAsync(this, address, bitConverter.Encoding, cancellationToken).ConfigureAwait(false);
             if (result.IsSuccess)

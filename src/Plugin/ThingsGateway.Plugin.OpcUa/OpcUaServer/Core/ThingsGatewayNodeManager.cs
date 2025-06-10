@@ -309,7 +309,7 @@ public class ThingsGatewayNodeManager : CustomNodeManager2
         catch (Exception ex)
         {
             if (success)
-                _businessBase.LogMessage.LogWarning(ex, "Conversion value error");
+                _businessBase.LogMessage?.LogWarning(ex, "Conversion value error");
             success = false;
             newValue = value;
         }

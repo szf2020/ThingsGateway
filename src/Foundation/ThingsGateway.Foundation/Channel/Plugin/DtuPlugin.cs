@@ -57,7 +57,7 @@ public class DtuPlugin : PluginBase, ITcpReceivingPlugin
                     }
                 }
                 await socket.ResetIdAsync(id).ConfigureAwait(false);
-                client.Logger?.Info(DefaultResource.Localizer["DtuConnected", id]);
+                client.Logger?.Info(string.Format(AppResource.DtuConnected, id));
                 e.Handled = true;
             }
 

@@ -64,10 +64,10 @@ public partial class OpcDaMaster : IDisposable
         LogMessage = new TouchSocket.Core.LoggerGroup() { LogLevel = TouchSocket.Core.LogLevel.Trace };
         var logger = TextFileLogger.GetMultipleFileLogger(_plc.GetHashCode().ToLong().GetDebugLogPath());
         logger.LogLevel = LogLevel.Trace;
-        LogMessage.AddLogger(logger);
+        LogMessage?.AddLogger(logger);
 
-        _plc.LogEvent = (a, b, c, d) => LogMessage.Log((LogLevel)a, b, c, d);
-        _plc.DataChangedHandler += (a, b, c) => LogMessage.Trace(c.ToSystemTextJsonString());
+        _plc.LogEvent = (a, b, c, d) => LogMessage?.Log((LogLevel)a, b, c, d);
+        _plc.DataChangedHandler += (a, b, c) => LogMessage?.Trace(c.ToSystemTextJsonString());
         base.OnInitialized();
     }
 

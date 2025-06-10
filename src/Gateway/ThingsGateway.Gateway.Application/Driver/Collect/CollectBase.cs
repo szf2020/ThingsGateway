@@ -10,7 +10,6 @@
 
 using Mapster;
 
-using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 
 using Newtonsoft.Json.Linq;
@@ -44,8 +43,6 @@ public abstract class CollectBase : DriverBase, IRpcDriver
     public List<DriverMethodInfo>? DriverMethodInfos { get; private set; }
 
     public sealed override object DriverProperties => CollectProperties;
-
-    protected IStringLocalizer Localizer { get; set; }
 
     public override async Task AfterVariablesChangedAsync(CancellationToken cancellationToken)
     {
@@ -103,7 +100,7 @@ public abstract class CollectBase : DriverBase, IRpcDriver
         {
             // 如果出现异常，记录日志并初始化 VariableSourceReads 属性为新实例
             currentDevice.VariableSourceReads = new();
-            LogMessage.LogWarning(ex, Localizer["VariablePackError", ex.Message]);
+            LogMessage?.LogWarning(ex, string.Format(AppResource.VariablePackError, ex.Message));
         }
         try
         {
@@ -127,7 +124,7 @@ public abstract class CollectBase : DriverBase, IRpcDriver
         {
             // 如果出现异常，记录日志并初始化 ReadVariableMethods 和 VariableMethods 属性为新实例
             currentDevice.ReadVariableMethods ??= new();
-            LogMessage.LogWarning(ex, Localizer["GetMethodError", ex.Message]);
+            LogMessage?.LogWarning(ex, string.Format(AppResource.GetMethodError, ex.Message));
         }
 
         // 根据标签获取方法信息的局部函数
@@ -147,7 +144,7 @@ public abstract class CollectBase : DriverBase, IRpcDriver
                 else
                 {
                     // 如果找不到对应方法，抛出异常
-                    throw new(Localizer["MethodNotNull", item.Name, item.OtherMethod]);
+                    throw new(string.Format(AppResource.MethodNotNull, item.Name, item.OtherMethod));
                 }
             }
             return variablesMethodResult;
@@ -158,7 +155,6 @@ public abstract class CollectBase : DriverBase, IRpcDriver
     {
         // 调用基类的初始化方法
         base.ProtectedInitDevice(device);
-        Localizer = App.CreateLocalizerByType(typeof(CollectBase))!;
 
         // 从插件服务中获取当前设备关联的驱动方法信息列表
         DriverMethodInfos = GlobalData.PluginService.GetDriverMethodInfos(device.PluginName, this);
@@ -345,7 +341,7 @@ public abstract class CollectBase : DriverBase, IRpcDriver
                 if (await TestOnline(cancellationToken).ConfigureAwait(false))
                     return true;
                 readErrorCount++;
-                if (LogMessage.LogLevel <= TouchSocket.Core.LogLevel.Trace)
+                if (LogMessage?.LogLevel <= TouchSocket.Core.LogLevel.Trace)
                     LogMessage?.Trace(string.Format("{0} - Execute method[{1}] - failed - {2}", DeviceName, readVariableMethods.MethodInfo.Name, readResult.ErrorMessage));
 
                 LogMessage?.Trace(string.Format("{0} - Executing method[{1}]", DeviceName, readVariableMethods.MethodInfo.Name));
@@ -355,7 +351,7 @@ public abstract class CollectBase : DriverBase, IRpcDriver
             if (readResult.IsSuccess)
             {
                 // 方法调用成功时记录日志并增加成功计数器
-                if (LogMessage.LogLevel <= TouchSocket.Core.LogLevel.Trace)
+                if (LogMessage?.LogLevel <= TouchSocket.Core.LogLevel.Trace)
                     LogMessage?.Trace(string.Format("{0} - Execute method[{1}] - Succeeded {2}", DeviceName, readVariableMethods.MethodInfo.Name, readResult.Content?.ToSystemTextJsonString()));
                 readResultCount.deviceMethodsVariableSuccessNum++;
                 CurrentDevice.SetDeviceStatus(TimerX.Now, false);
@@ -369,12 +365,12 @@ public abstract class CollectBase : DriverBase, IRpcDriver
                 if (readVariableMethods.LastErrorMessage != readResult.ErrorMessage)
                 {
                     if (!cancellationToken.IsCancellationRequested)
-                        LogMessage?.LogWarning(readResult.Exception, Localizer["MethodFail", DeviceName, readVariableMethods.MethodInfo.Name, readResult.ErrorMessage]);
+                        LogMessage?.LogWarning(readResult.Exception, string.Format(AppResource.MethodFail, DeviceName, readVariableMethods.MethodInfo.Name, readResult.ErrorMessage));
                 }
                 else
                 {
                     if (!cancellationToken.IsCancellationRequested)
-                        if (LogMessage.LogLevel <= TouchSocket.Core.LogLevel.Trace)
+                        if (LogMessage?.LogLevel <= TouchSocket.Core.LogLevel.Trace)
                             LogMessage?.Trace(string.Format("{0} - Execute method[{1}] - failed - {2}", DeviceName, readVariableMethods.MethodInfo.Name, readResult.ErrorMessage));
                 }
 
@@ -422,7 +418,7 @@ public abstract class CollectBase : DriverBase, IRpcDriver
                 if (await TestOnline(cancellationToken).ConfigureAwait(false))
                     return true;
                 readErrorCount++;
-                if (LogMessage.LogLevel <= TouchSocket.Core.LogLevel.Trace)
+                if (LogMessage?.LogLevel <= TouchSocket.Core.LogLevel.Trace)
                     LogMessage?.Trace(string.Format("{0} - Collection[{1} - {2}] failed - {3}", DeviceName, variableSourceRead?.RegisterAddress, variableSourceRead?.Length, readResult.ErrorMessage));
 
 
@@ -433,7 +429,7 @@ public abstract class CollectBase : DriverBase, IRpcDriver
             if (readResult.IsSuccess)
             {
                 // 读取成功时记录日志并增加成功计数器
-                if (LogMessage.LogLevel <= TouchSocket.Core.LogLevel.Trace)
+                if (LogMessage?.LogLevel <= TouchSocket.Core.LogLevel.Trace)
                     LogMessage?.Trace(string.Format("{0} - Collection[{1} - {2}] data succeeded {3}", DeviceName, variableSourceRead?.RegisterAddress, variableSourceRead?.Length, readResult.Content?.ToHexString(' ')));
                 readResultCount.deviceSourceVariableSuccessNum++;
                 CurrentDevice.SetDeviceStatus(TimerX.Now, false);
@@ -448,12 +444,12 @@ public abstract class CollectBase : DriverBase, IRpcDriver
                     if (variableSourceRead.LastErrorMessage != readResult.ErrorMessage)
                     {
                         if (!cancellationToken.IsCancellationRequested)
-                            LogMessage?.LogWarning(readResult.Exception, Localizer["CollectFail", DeviceName, variableSourceRead?.RegisterAddress, variableSourceRead?.Length, readResult.ErrorMessage]);
+                            LogMessage?.LogWarning(readResult.Exception, string.Format(AppResource.CollectFail, DeviceName, variableSourceRead?.RegisterAddress, variableSourceRead?.Length, readResult.ErrorMessage));
                     }
                     else
                     {
                         if (!cancellationToken.IsCancellationRequested)
-                            if (LogMessage.LogLevel <= TouchSocket.Core.LogLevel.Trace)
+                            if (LogMessage?.LogLevel <= TouchSocket.Core.LogLevel.Trace)
                                 LogMessage?.Trace(string.Format("{0} - Collection[{1} - {2}] data failed - {3}", DeviceName, variableSourceRead?.RegisterAddress, variableSourceRead?.Length, readResult.ErrorMessage));
                     }
 
@@ -573,7 +569,7 @@ public abstract class CollectBase : DriverBase, IRpcDriver
                 catch (Exception ex)
                 {
                     // 如果转换失败，则记录错误信息
-                    results.Add(deviceVariable.Name, new OperResult<object>(Localizer["WriteExpressionsError", deviceVariable.Name, deviceVariable.WriteExpressions, ex.Message], ex));
+                    results.Add(deviceVariable.Name, new OperResult<object>(string.Format(AppResource.WriteExpressionsError, deviceVariable.Name, deviceVariable.WriteExpressions, ex.Message), ex));
                 }
             }
         }
@@ -649,7 +645,7 @@ public abstract class CollectBase : DriverBase, IRpcDriver
                 catch (Exception ex)
                 {
                     // 如果转换失败，则记录错误信息
-                    results.Add(deviceVariable.Name, new OperResult(Localizer["WriteExpressionsError", deviceVariable.Name, deviceVariable.WriteExpressions, ex.Message], ex));
+                    results.Add(deviceVariable.Name, new OperResult(string.Format(AppResource.WriteExpressionsError, deviceVariable.Name, deviceVariable.WriteExpressions, ex.Message), ex));
                 }
             }
         }
@@ -702,7 +698,7 @@ public abstract class CollectBase : DriverBase, IRpcDriver
             if (method == null)
             {
                 result.OperCode = 999;
-                result.ErrorMessage = Localizer["MethodNotNull", variableMethod.Variable.Name, variableMethod.Variable.OtherMethod];
+                result.ErrorMessage = string.Format(AppResource.MethodNotNull, variableMethod.Variable.Name, variableMethod.Variable.OtherMethod);
                 return result;
             }
             else

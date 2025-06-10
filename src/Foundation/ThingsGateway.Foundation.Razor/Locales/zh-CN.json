@@ -1,88 +1,30 @@
 ﻿{
   "ThingsGateway.Debug.ChannelComponent": {
-    "Name": "名称",
-    "Name.Required": " {0} 不可为空",
-    "ChannelType": "通道类型",
-    "Enable": "启用",
-    "LogEnable": "启用调试日志",
-
-    "RemoteUrl": "远程url",
-    "BindUrl": "本地url",
-
-    "PortName": "COM口",
     "BaudRate": "波特率",
-    "DataBits": "数据位",
-    "Parity": "校验位",
-    "StopBits": "停止位",
-    "DtrEnable": "Dtr",
-    "RtsEnable": "Rts",
-
-
-    "SaveChannel": "添加/修改通道",
-    "DeleteChannel": "删除通道",
+    "BindUrl": "本地url",
+    "Channel": "通道",
+    "ChannelType": "通道类型",
     "ClearChannel": "清空通道",
+    "Confim": "创建",
+    "Connect": "连接",
+    "DataBits": "数据位",
+    "DeleteChannel": "删除通道",
+    "Disconnect": "断开",
+    "DtrEnable": "Dtr",
+    "Enable": "启用",
     "ExportChannel": "导出通道",
     "ImportChannel": "导入通道",
-
     "ImportNullError": "无法识别",
-
-    "NotOther": "不支持其他通道类型",
-    "Connect": "连接",
-    "Confim": "创建",
-    "Disconnect": "断开",
-    "Channel": "通道"
-  },
-  "ThingsGateway.Foundation.ChannelOptionsDefault": {
+    "LogEnable": "启用调试日志",
     "Name": "名称",
     "Name.Required": " {0} 不可为空",
-    "ChannelType": "通道类型",
-
-    "RemoteUrl": "远程url",
-    "BindUrl": "本地url",
-
-    "PortName": "COM口",
-    "BaudRate": "波特率",
-    "DataBits": "数据位",
+    "NotOther": "不支持其他通道类型",
     "Parity": "校验位",
-    "StopBits": "停止位",
-    "DtrEnable": "Dtr",
+    "PortName": "COM口",
+    "RemoteUrl": "远程url",
     "RtsEnable": "Rts",
-    "CacheTimeout": "接收缓存超时",
-    "ConnectTimeout": "连接超时",
-    "MaxConcurrentCount": "最大并发数",
-
-    "MaxClientCount": "最大连接数",
-    "CheckClearTime": "客户端连接滑动过期时间",
-    "Heartbeat": "心跳内容(utf8)",
-    "HeartbeatTime": "心跳间隔",
-    "DtuId": "Dtu终端注册包(utf-8)",
-    "DtuSeviceType": "DTU服务类型"
-  },
-  "ThingsGateway.Debug.DeviceComponentBase": {
-    "WriteSuccess": "写入成功",
-    "DefaultSend": "直接发送",
-    "Send": "发送",
-    "DataType": "数据类型",
-    "RegisterAddress": "寄存器地址",
-    "ArrayLength": "数组长度",
-    "WriteValue": "写入值",
-    "SendValue": "发送原始报文"
-  },
-  "ThingsGateway.Debug.DeviceComponent": {
-    "HeaderText": "通道日志",
-    "WriteSuccess": "写入成功",
-    "DefaultSend": "直接发送",
-    "Send": "发送",
-    "DataType": "数据类型",
-    "RegisterAddress": "寄存器地址",
-    "ArrayLength": "数组长度",
-    "WriteValue": "写入值",
-    "SendValue": "发送原始报文",
-    "CommonFunctions": "常用功能",
-    "SpecialFunctions": "特殊功能",
-    "Read": "读取",
-    "Write": "写入",
-    "MulRead": "多读"
+    "SaveChannel": "添加/修改通道",
+    "StopBits": "停止位"
   },
   "ThingsGateway.Debug.ChannelEditComponent": {
     "BasicInformation": "基础信息",
@@ -90,5 +32,54 @@
   },
   "ThingsGateway.Debug.ConverterConfigComponent": {
     "Converter": "内置数据转换"
+  },
+  "ThingsGateway.Debug.DeviceComponent": {
+    "ArrayLength": "数组长度",
+    "CommonFunctions": "常用功能",
+    "DataType": "数据类型",
+    "DefaultSend": "直接发送",
+    "HeaderText": "通道日志",
+    "MulRead": "多读",
+    "Read": "读取",
+    "RegisterAddress": "寄存器地址",
+    "Send": "发送",
+    "SendValue": "发送原始报文",
+    "SpecialFunctions": "特殊功能",
+    "Write": "写入",
+    "WriteSuccess": "写入成功",
+    "WriteValue": "写入值"
+  },
+  "ThingsGateway.Debug.DeviceComponentBase": {
+    "ArrayLength": "数组长度",
+    "DataType": "数据类型",
+    "DefaultSend": "直接发送",
+    "RegisterAddress": "寄存器地址",
+    "Send": "发送",
+    "SendValue": "发送原始报文",
+    "WriteSuccess": "写入成功",
+    "WriteValue": "写入值"
+  },
+  "ThingsGateway.Foundation.ChannelOptionsDefault": {
+    "BaudRate": "波特率",
+    "BindUrl": "本地url",
+    "CacheTimeout": "接收缓存超时",
+    "ChannelType": "通道类型",
+    "CheckClearTime": "客户端连接滑动过期时间",
+    "ConnectTimeout": "连接超时",
+    "DataBits": "数据位",
+    "DtrEnable": "Dtr",
+    "DtuId": "Dtu终端注册包(utf-8)",
+    "DtuSeviceType": "DTU服务类型",
+    "Heartbeat": "心跳内容(utf8)",
+    "HeartbeatTime": "心跳间隔",
+    "MaxClientCount": "最大连接数",
+    "MaxConcurrentCount": "最大并发数",
+    "Name": "名称",
+    "Name.Required": " {0} 不可为空",
+    "Parity": "校验位",
+    "PortName": "COM口",
+    "RemoteUrl": "远程url",
+    "RtsEnable": "Rts",
+    "StopBits": "停止位"
   }
 }

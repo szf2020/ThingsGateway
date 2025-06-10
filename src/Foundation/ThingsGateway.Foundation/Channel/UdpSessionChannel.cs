@@ -113,7 +113,7 @@ public class UdpSessionChannel : UdpSession, IClientChannel
                     await base.StartAsync().ConfigureAwait(false);
                     if (ServerState == ServerState.Running)
                     {
-                        Logger?.Info($"{Monitor.IPHost}{DefaultResource.Localizer["ServiceStarted"]}");
+                        Logger?.Info($"{Monitor.IPHost}{AppResource.ServiceStarted}");
                         await this.OnChannelEvent(Started).ConfigureAwait(false);
                     }
                 }
@@ -141,7 +141,7 @@ public class UdpSessionChannel : UdpSession, IClientChannel
                     if (Monitor == null)
                     {
                         await this.OnChannelEvent(Stoped).ConfigureAwait(false);
-                        Logger?.Info($"{DefaultResource.Localizer["ServiceStoped"]}");
+                        Logger?.Info($"{AppResource.ServiceStoped}");
                     }
                     return result;
                 }

@@ -112,7 +112,7 @@ public class ModbusAddress : ModbusRequest
         {
             var readF = ushort.Parse(address.Substring(0, 1));
             if (readF > 4)
-                throw new(ModbusResource.Localizer["FunctionError"]);
+                throw new(AppResource.FunctionError);
             switch (readF)
             {
                 case 0:
