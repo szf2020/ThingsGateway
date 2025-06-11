@@ -104,9 +104,10 @@ public partial class PluginDebugPage
                 {
                     Title = pluginInfo.Name,
                     ContentTemplate = debugRender,
-                    Width = "1200px",
-                    Height = "800px",
-                    Top = "100px",
+                    Max = false,
+                    Width = "1440px",
+                    Height = "810px",
+                    Top = "70px",
                     Left = "220px",
                     Background = "var(--bb-primary-color)",
                 };

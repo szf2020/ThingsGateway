@@ -46,6 +46,7 @@
     "Welcome": "欢迎使用"
   },
   "ThingsGateway.Server.MainLayout": {
+    "WindowRestore": "浮动小窗",
     "变量管理": "变量管理",
     "采集设备": "采集设备",
     "菜单管理": "菜单管理",

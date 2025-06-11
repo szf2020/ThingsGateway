@@ -46,6 +46,7 @@
     "Welcome": "Welcome"
   },
   "ThingsGateway.Server.MainLayout": {
+    "WindowRestore": "FloatingWindow",
     "变量管理": "Variable",
     "采集设备": "CollectionDevices",
     "菜单管理": "Menu",

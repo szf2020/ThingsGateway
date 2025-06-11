@@ -26,6 +26,10 @@
     height: var(--line-chart-table-height);
 }
 
+.wb-control .wb-full {
+    display: none;
+}
+
 .dialog-table {
     height: calc(100vh - 200px);
 }
