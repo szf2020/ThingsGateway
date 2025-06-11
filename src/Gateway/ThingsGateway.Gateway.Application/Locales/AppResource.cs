@@ -54,7 +54,7 @@ public static class ChineseResource
     public const string VariablePackError = "变量打包失败 {0} ";
     public const string GetMethodError = "插件方法初始化失败 {0} ";
     public const string MethodNotNull = "特殊方法变量 {0} 找不到执行方法 {1}，请检查现有方法列表";
-    public const string MethodFail = "{0} - 执行方法[{1}] - 失败  {2}";
+    public const string MethodFail = "{0} - 执行方法 [{1}] - 失败  {2}";
     public const string CollectFail = "{0} - 采集[{1} - {2}] 数据失败  {3}";
     public const string CollectSuccess = "{0} - 采集[{1} - {2}] 数据成功  {3}";
     public const string WriteExpressionsError = " {0} 转换写入表达式 {1} 失败 {2} ";

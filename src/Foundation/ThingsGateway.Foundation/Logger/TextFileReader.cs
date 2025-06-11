@@ -121,12 +121,12 @@ public static class TextFileReader
                 }
 
                 using var fs = new FileStream(file, FileMode.Open, FileAccess.Read, FileShare.ReadWrite, 4096, FileOptions.SequentialScan);
-                var result = ReadLogsInverse(fs, lineCount, fileInfo.Length);
+                var result = ReadLogsInverse(fs, lineCount, length);
 
                 _cache.Set(cacheKey, new LogDataCache
                 {
                     LogDatas = result,
-                    Length = fileInfo.Length,
+                    Length = length,
                 });
 
                 return new OperResult<List<LogData>>() { Content = result };
@@ -140,7 +140,6 @@ public static class TextFileReader
 
     private static List<LogData> ReadLogsInverse(FileStream fs, int lineCount, long length)
     {
-        length = fs.Length;
         long ps = 0; // 保存起始位置
         List<string> txt = new(); // 存储读取的文本内容
 

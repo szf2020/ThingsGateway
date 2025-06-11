@@ -183,9 +183,22 @@ public abstract class CollectFoundationBase : CollectBase
             {
                 try
                 {
+
+                    if (LogMessage?.LogLevel <= TouchSocket.Core.LogLevel.Debug)
+                        LogMessage?.Debug(string.Format("{0} - Writing [{1} - {2} - {3}]", DeviceName, writeInfo.Key.RegisterAddress, writeInfo.Value, writeInfo.Key.DataType));
+
                     // 调用协议的写入方法，将写入信息中的数据写入到对应的寄存器地址，并获取操作结果
                     var result = await FoundationDevice.WriteAsync(writeInfo.Key.RegisterAddress, writeInfo.Value, writeInfo.Key.DataType, cancellationToken).ConfigureAwait(false);
 
+                    if (result.IsSuccess)
+                    {
+                        if (LogMessage?.LogLevel <= TouchSocket.Core.LogLevel.Debug)
+                            LogMessage?.Debug(string.Format("{0} - Write [{1} - {2} - {3}] data succeeded", DeviceName, writeInfo.Key.RegisterAddress, writeInfo.Value, writeInfo.Key.DataType));
+                    }
+                    else
+                    {
+                        LogMessage?.Warning(string.Format("{0} - Write [{1} - {2} - {3}] data failed {4}", DeviceName, writeInfo.Key.RegisterAddress, writeInfo.Value, writeInfo.Key.DataType, result.ToString()));
+                    }
                     // 将操作结果添加到结果字典中，使用变量名称作为键
                     operResults.TryAdd(writeInfo.Key.Name, result);
                 }

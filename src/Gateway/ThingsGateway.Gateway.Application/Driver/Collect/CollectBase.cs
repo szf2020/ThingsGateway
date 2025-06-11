@@ -328,7 +328,9 @@ public abstract class CollectBase : DriverBase, IRpcDriver
             if (await TestOnline(cancellationToken).ConfigureAwait(false))
                 return true;
             var readErrorCount = 0;
-            LogMessage?.Trace(string.Format("{0} - Executing method[{1}]", DeviceName, readVariableMethods.MethodInfo.Name));
+
+            if (LogMessage?.LogLevel <= TouchSocket.Core.LogLevel.Trace)
+                LogMessage?.Trace(string.Format("{0} - Executing method [{1}]", DeviceName, readVariableMethods.MethodInfo.Name));
             var readResult = await InvokeMethodAsync(readVariableMethods, cancellationToken: cancellationToken).ConfigureAwait(false);
 
             // 方法调用失败时重试一定次数
@@ -342,9 +344,10 @@ public abstract class CollectBase : DriverBase, IRpcDriver
                     return true;
                 readErrorCount++;
                 if (LogMessage?.LogLevel <= TouchSocket.Core.LogLevel.Trace)
-                    LogMessage?.Trace(string.Format("{0} - Execute method[{1}] - failed - {2}", DeviceName, readVariableMethods.MethodInfo.Name, readResult.ErrorMessage));
+                    LogMessage?.Trace(string.Format("{0} - Execute method [{1}] - failed - {2}", DeviceName, readVariableMethods.MethodInfo.Name, readResult.ErrorMessage));
 
-                LogMessage?.Trace(string.Format("{0} - Executing method[{1}]", DeviceName, readVariableMethods.MethodInfo.Name));
+                if (LogMessage?.LogLevel <= TouchSocket.Core.LogLevel.Trace)
+                    LogMessage?.Trace(string.Format("{0} - Executing method [{1}]", DeviceName, readVariableMethods.MethodInfo.Name));
                 readResult = await InvokeMethodAsync(readVariableMethods, cancellationToken: cancellationToken).ConfigureAwait(false);
             }
 
@@ -352,7 +355,7 @@ public abstract class CollectBase : DriverBase, IRpcDriver
             {
                 // 方法调用成功时记录日志并增加成功计数器
                 if (LogMessage?.LogLevel <= TouchSocket.Core.LogLevel.Trace)
-                    LogMessage?.Trace(string.Format("{0} - Execute method[{1}] - Succeeded {2}", DeviceName, readVariableMethods.MethodInfo.Name, readResult.Content?.ToSystemTextJsonString()));
+                    LogMessage?.Trace(string.Format("{0} - Execute method [{1}] - Succeeded {2}", DeviceName, readVariableMethods.MethodInfo.Name, readResult.Content?.ToSystemTextJsonString()));
                 readResultCount.deviceMethodsVariableSuccessNum++;
                 CurrentDevice.SetDeviceStatus(TimerX.Now, false);
             }
@@ -370,8 +373,10 @@ public abstract class CollectBase : DriverBase, IRpcDriver
                 else
                 {
                     if (!cancellationToken.IsCancellationRequested)
+                    {
                         if (LogMessage?.LogLevel <= TouchSocket.Core.LogLevel.Trace)
-                            LogMessage?.Trace(string.Format("{0} - Execute method[{1}] - failed - {2}", DeviceName, readVariableMethods.MethodInfo.Name, readResult.ErrorMessage));
+                            LogMessage?.Trace(string.Format("{0} - Execute method [{1}] - failed - {2}", DeviceName, readVariableMethods.MethodInfo.Name, readResult.ErrorMessage));
+                    }
                 }
 
                 readResultCount.deviceMethodsVariableFailedNum++;
@@ -405,7 +410,8 @@ public abstract class CollectBase : DriverBase, IRpcDriver
 
             var readErrorCount = 0;
 
-            LogMessage?.Trace(string.Format("{0} - Collecting [{1} - {2}]", DeviceName, variableSourceRead?.RegisterAddress, variableSourceRead?.Length));
+            if (LogMessage?.LogLevel <= TouchSocket.Core.LogLevel.Trace)
+                LogMessage?.Trace(string.Format("{0} - Collecting [{1} - {2}]", DeviceName, variableSourceRead?.RegisterAddress, variableSourceRead?.Length));
             var readResult = await ReadSourceAsync(variableSourceRead, cancellationToken).ConfigureAwait(false);
 
             // 读取失败时重试一定次数
@@ -419,10 +425,11 @@ public abstract class CollectBase : DriverBase, IRpcDriver
                     return true;
                 readErrorCount++;
                 if (LogMessage?.LogLevel <= TouchSocket.Core.LogLevel.Trace)
-                    LogMessage?.Trace(string.Format("{0} - Collection[{1} - {2}] failed - {3}", DeviceName, variableSourceRead?.RegisterAddress, variableSourceRead?.Length, readResult.ErrorMessage));
+                    LogMessage?.Trace(string.Format("{0} - Collection [{1} - {2}] failed - {3}", DeviceName, variableSourceRead?.RegisterAddress, variableSourceRead?.Length, readResult.ErrorMessage));
 
 
-                LogMessage?.Trace(string.Format("{0} - Collecting [{1} - {2}]", DeviceName, variableSourceRead?.RegisterAddress, variableSourceRead?.Length));
+                if (LogMessage?.LogLevel <= TouchSocket.Core.LogLevel.Trace)
+                    LogMessage?.Trace(string.Format("{0} - Collecting [{1} - {2}]", DeviceName, variableSourceRead?.RegisterAddress, variableSourceRead?.Length));
                 readResult = await ReadSourceAsync(variableSourceRead, cancellationToken).ConfigureAwait(false);
             }
 
@@ -430,7 +437,7 @@ public abstract class CollectBase : DriverBase, IRpcDriver
             {
                 // 读取成功时记录日志并增加成功计数器
                 if (LogMessage?.LogLevel <= TouchSocket.Core.LogLevel.Trace)
-                    LogMessage?.Trace(string.Format("{0} - Collection[{1} - {2}] data succeeded {3}", DeviceName, variableSourceRead?.RegisterAddress, variableSourceRead?.Length, readResult.Content?.ToHexString(' ')));
+                    LogMessage?.Trace(string.Format("{0} - Collection [{1} - {2}] data succeeded {3}", DeviceName, variableSourceRead?.RegisterAddress, variableSourceRead?.Length, readResult.Content?.ToHexString(' ')));
                 readResultCount.deviceSourceVariableSuccessNum++;
                 CurrentDevice.SetDeviceStatus(TimerX.Now, false);
             }
@@ -449,8 +456,10 @@ public abstract class CollectBase : DriverBase, IRpcDriver
                     else
                     {
                         if (!cancellationToken.IsCancellationRequested)
+                        {
                             if (LogMessage?.LogLevel <= TouchSocket.Core.LogLevel.Trace)
-                                LogMessage?.Trace(string.Format("{0} - Collection[{1} - {2}] data failed - {3}", DeviceName, variableSourceRead?.RegisterAddress, variableSourceRead?.Length, readResult.ErrorMessage));
+                                LogMessage?.Trace(string.Format("{0} - Collection [{1} - {2}] data failed - {3}", DeviceName, variableSourceRead?.RegisterAddress, variableSourceRead?.Length, readResult.ErrorMessage));
+                        }
                     }
 
                     readResultCount.deviceSourceVariableFailedNum++;
