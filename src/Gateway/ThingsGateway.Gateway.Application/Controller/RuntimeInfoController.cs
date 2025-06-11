@@ -34,7 +34,7 @@ public class RuntimeInfoController : ControllerBase
     /// <returns></returns>
     [HttpGet("channelList")]
     [DisplayName("获取通道信息")]
-    public async Task<SqlSugarPagedList<ChannelRuntime>> GetChannelListAsync(ChannelPageInput input)
+    public async Task<SqlSugarPagedList<ChannelRuntime>> GetChannelListAsync([FromQuery] ChannelPageInput input)
     {
 
         var channelRuntimes = await GlobalData.GetCurrentUserChannels().ConfigureAwait(false);
@@ -54,7 +54,7 @@ public class RuntimeInfoController : ControllerBase
     /// <returns></returns>
     [HttpGet("deviceList")]
     [DisplayName("获取设备信息")]
-    public async Task<SqlSugarPagedList<DeviceRuntime>> GetDeviceListAsync(DevicePageInput input)
+    public async Task<SqlSugarPagedList<DeviceRuntime>> GetDeviceListAsync([FromQuery] DevicePageInput input)
     {
         var deviceRuntimes = await GlobalData.GetCurrentUserDevices().ConfigureAwait(false);
         var data = deviceRuntimes
@@ -72,7 +72,7 @@ public class RuntimeInfoController : ControllerBase
     /// <returns></returns>
     [HttpGet("realAlarmList")]
     [DisplayName("获取实时报警变量信息")]
-    public async Task<SqlSugarPagedList<AlarmVariable>> GetRealAlarmList(AlarmVariablePageInput input)
+    public async Task<SqlSugarPagedList<AlarmVariable>> GetRealAlarmList([FromQuery] AlarmVariablePageInput input)
     {
         var realAlarmVariables = await GlobalData.GetCurrentUserRealAlarmVariables().ConfigureAwait(false);
 
@@ -85,28 +85,12 @@ public class RuntimeInfoController : ControllerBase
     }
 
     /// <summary>
-    /// 确认实时报警
-    /// </summary>
-    /// <returns></returns>
-    [HttpPost("checkRealAlarm")]
-    [RequestAudit]
-    [DisplayName("确认实时报警")]
-    public async Task CheckRealAlarm(long variableId)
-    {
-        if (GlobalData.ReadOnlyRealAlarmIdVariables.TryGetValue(variableId, out var variable))
-        {
-            await GlobalData.SysUserService.CheckApiDataScopeAsync(variable.CreateOrgId, variable.CreateUserId).ConfigureAwait(false);
-            GlobalData.AlarmHostedService.ConfirmAlarm(variableId);
-        }
-    }
-
-    /// <summary>
     /// 获取变量信息
     /// </summary>
     /// <returns></returns>
     [HttpGet("variableList")]
     [DisplayName("获取变量信息")]
-    public async Task<SqlSugarPagedList<VariableRuntime>> GetVariableList(VariablePageInput input)
+    public async Task<SqlSugarPagedList<VariableRuntime>> GetVariableList([FromQuery] VariablePageInput input)
     {
         var variables = await GlobalData.GetCurrentUserIdVariables().ConfigureAwait(false);
         var data = variables
@@ -144,7 +128,7 @@ public class RuntimeInfoController : ControllerBase
     /// </summary>
     [HttpGet("getPluginInfos")]
     [DisplayName("获取插件")]
-    public SqlSugarPagedList<PluginInfo> GetPluginInfos(PluginInfoPageInput input)
+    public SqlSugarPagedList<PluginInfo> GetPluginInfos([FromQuery] PluginInfoPageInput input)
     {
         //指定关键词搜索为插件FullName
         return GlobalData.PluginService.GetList().WhereIF(!input.Name.IsNullOrWhiteSpace(), a => a.Name == input.Name)

@@ -220,6 +220,23 @@ public class ControlController : ControllerBase
     {
         return GlobalData.VariableRuntimeService.InsertTestDataAsync(testVariableCount, testDeviceCount, slaveUrl, businessEnable, restart, default);
     }
+
+
+    /// <summary>
+    /// 确认实时报警
+    /// </summary>
+    /// <returns></returns>
+    [HttpPost("checkRealAlarm")]
+    [RequestAudit]
+    [DisplayName("确认实时报警")]
+    public async Task CheckRealAlarm(long variableId)
+    {
+        if (GlobalData.ReadOnlyRealAlarmIdVariables.TryGetValue(variableId, out var variable))
+        {
+            await GlobalData.SysUserService.CheckApiDataScopeAsync(variable.CreateOrgId, variable.CreateUserId).ConfigureAwait(false);
+            GlobalData.AlarmHostedService.ConfirmAlarm(variableId);
+        }
+    }
 }
 public class ChannelInput
 {
