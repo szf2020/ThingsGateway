@@ -28,6 +28,7 @@ public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariableModel<
 {
     private TypeAdapterConfig _config;
     private volatile bool _initRealData;
+    private ConcurrentDictionary<long, VariableBasicData> RealTimeVariables { get; } = new ConcurrentDictionary<long, VariableBasicData>();
 
     protected override ValueTask<OperResult> UpdateVarModel(IEnumerable<CacheDBItem<SQLHistoryValue>> item, CancellationToken cancellationToken)
     {
@@ -77,7 +78,6 @@ public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariableModel<
         }
     }
 
-    private ConcurrentDictionary<long,VariableBasicData> RealTimeVariables { get; } = new ConcurrentDictionary<long, VariableBasicData>();
     private void UpdateVariable(VariableRuntime variableRuntime, VariableBasicData variable)
     {
         if (_driverPropertys.IsHistoryDB)
@@ -96,7 +96,7 @@ public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariableModel<
 
         if (_driverPropertys.IsReadDB)
         {
-            RealTimeVariables.AddOrUpdate(variable.Id, variable, (key, oldValue) => oldValue);
+            RealTimeVariables.AddOrUpdate(variable.Id, variable, (key, oldValue) => variable);
         }
     }
 
