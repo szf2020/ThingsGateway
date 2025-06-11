@@ -3,7 +3,7 @@ using System.Data;
 using System.Dynamic;
 using System.Linq.Expressions;
 using System.Text;
-namespace SqlSugar
+namespace ThingsGateway.SqlSugar
 {
     ///<summary>
     /// ** description：Create datathis.access object

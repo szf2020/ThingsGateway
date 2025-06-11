@@ -12,13 +12,12 @@ using BootstrapBlazor.Components;
 
 using Mapster;
 
-using SqlSugar;
-
 using ThingsGateway.Admin.Application;
 using ThingsGateway.Debug;
 using ThingsGateway.Foundation;
 using ThingsGateway.NewLife.Extension;
 using ThingsGateway.Plugin.DB;
+using ThingsGateway.SqlSugar;
 
 namespace ThingsGateway.Plugin.SqlDB;
 

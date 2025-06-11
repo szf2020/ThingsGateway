@@ -11,7 +11,7 @@
 
 using Microsoft.Extensions.Hosting;
 
-using SqlSugar;
+using ThingsGateway.SqlSugar;
 
 namespace ThingsGateway.Admin.Application;
 

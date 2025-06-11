@@ -1,10 +1,9 @@
 ﻿using Newtonsoft.Json.Linq;
 
-using SqlSugar;
-
 using System.ComponentModel.DataAnnotations;
 
 using ThingsGateway.Admin.Application;
+using ThingsGateway.SqlSugar;
 
 namespace ThingsGateway.RulesEngine;
 

@@ -1,6 +1,6 @@
 ﻿using System.Reflection;
 
-namespace SqlSugar
+namespace ThingsGateway.SqlSugar
 {
     public interface ISugarUnitOfWork<T> where T : SugarUnitOfWork, new()
     {

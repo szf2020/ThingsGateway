@@ -1,4 +1,4 @@
-﻿namespace SqlSugar.TDengine
+﻿namespace ThingsGateway.SqlSugar.TDengine
 {
     /// <summary>
     ///Common Extensions for external users

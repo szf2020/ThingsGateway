@@ -8,10 +8,10 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-using SqlSugar;
-
 using System.Linq.Expressions;
 using System.Reflection;
+
+using ThingsGateway.SqlSugar;
 
 namespace ThingsGateway.Admin.Application;
 

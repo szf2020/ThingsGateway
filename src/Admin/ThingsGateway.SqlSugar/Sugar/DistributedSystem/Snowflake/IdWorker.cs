@@ -7,7 +7,7 @@
  * per process
  */
 
-namespace SqlSugar.DistributedSystem.Snowflake
+namespace ThingsGateway.SqlSugar.DistributedSystem.Snowflake
 {
     public class IdWorker
     {

@@ -10,9 +10,9 @@
 
 using Mapster;
 
-using SqlSugar;
-
 using System.Reflection;
+
+using ThingsGateway.SqlSugar;
 
 namespace ThingsGateway.Gateway.Application;
 

@@ -2,7 +2,7 @@
 using System.Globalization;
 using System.Text;
 
-namespace SqlSugar.TDengine
+namespace ThingsGateway.SqlSugar.TDengine
 {
     public class TDengineFastBuilder : FastBuilder, IFastBuilder
     {

@@ -4,7 +4,7 @@ using System.Reflection;
 
 using static System.Linq.Expressions.Expression;
 
-namespace SqlSugar
+namespace ThingsGateway.SqlSugar
 {
     internal static class FastCopy
     {
@@ -54,7 +54,7 @@ namespace SqlSugar
             sProp.PropertyType == tProp.PropertyType// 属性类型一致 或
             || sProp.PropertyType.IsAssignableFrom(tProp.PropertyType) // 源属性类型 为 目标属性类型 的 子类；eg：object target = string source;   或
             || (tProp.PropertyType.IsValueType && sProp.PropertyType.IsValueType && // 属性为值类型且基础类型一致，但目标属性为可空类型 eg：int? num = int num;
-            ((tProp.PropertyType.GenericTypeArguments.Length > 0 ? tProp.PropertyType.GenericTypeArguments[0] : tProp.PropertyType) == sProp.PropertyType))
+            ((tProp.PropertyType.GenericTypeArguments?.Length > 0 ? tProp.PropertyType.GenericTypeArguments[0] : tProp.PropertyType) == sProp.PropertyType))
             )).Any());
 
             List<Expression> expressionList = new List<Expression>();
@@ -69,7 +69,7 @@ namespace SqlSugar
                         var assign = Assign(Property(target, prop.Name), Property(source, prop.Name));
                         expressionList.Add(assign);
                     }
-                    else if (sProp.PropertyType.GenericTypeArguments.Length <= 0 && tProp.PropertyType.GenericTypeArguments.Length > 0)// 属性类型不一致且目标属性类型为可空类型 eg：int? num = int num;
+                    else if (sProp.PropertyType.GenericTypeArguments.Length <= 0 && tProp.PropertyType.GenericTypeArguments?.Length > 0)// 属性类型不一致且目标属性类型为可空类型 eg：int? num = int num;
                     {
                         var convert = Convert(Expression.Property(source, prop.Name), tProp.PropertyType);
                         var cvAssign = Assign(Expression.Property(target, prop.Name), convert);

@@ -12,12 +12,11 @@ using Mapster;
 
 using Microsoft.Extensions.DependencyInjection;
 
-using SqlSugar;
-
 using System.ComponentModel.DataAnnotations;
 using System.Reflection;
 
 using ThingsGateway.Admin.Application;
+using ThingsGateway.SqlSugar;
 
 
 namespace ThingsGateway.Gateway.Application;

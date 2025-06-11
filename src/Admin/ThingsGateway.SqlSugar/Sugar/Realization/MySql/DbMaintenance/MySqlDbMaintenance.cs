@@ -2,7 +2,7 @@
 using System.Reflection;
 using System.Text.RegularExpressions;
 
-namespace SqlSugar
+namespace ThingsGateway.SqlSugar
 {
     public class MySqlDbMaintenance : DbMaintenanceProvider
     {
@@ -626,18 +626,18 @@ WHERE EVENT_OBJECT_TABLE = '" + tableName + "'");
                 dataSize = "";
                 item.DataType = "longtext";
             }
-            else if (item.Length > 0 && item.DecimalDigits == 0)
+            else if (item?.Length > 0 && item.DecimalDigits == 0)
             {
-                dataSize = item.Length > 0 ? string.Format("({0})", item.Length) : null;
+                dataSize = item?.Length > 0 ? string.Format("({0})", item.Length) : null;
             }
             else if (item.Length == 0 && item.DecimalDigits > 0)
             {
                 item.Length = 10;
                 dataSize = string.Format("({0},{1})", item.Length, item.DecimalDigits);
             }
-            else if (item.Length > 0 && item.DecimalDigits > 0)
+            else if (item?.Length > 0 && item.DecimalDigits > 0)
             {
-                dataSize = item.Length > 0 ? string.Format("({0},{1})", item.Length, item.DecimalDigits) : null;
+                dataSize = item?.Length > 0 ? string.Format("({0},{1})", item.Length, item.DecimalDigits) : null;
             }
             return dataSize;
         }
@@ -649,11 +649,11 @@ WHERE EVENT_OBJECT_TABLE = '" + tableName + "'");
             {
                 var column = columns.First();
                 var appendSql = " " + column.DataType;
-                if (column.Length > 0 && column.Scale == 0)
+                if (column?.Length > 0 && column.Scale == 0)
                 {
                     appendSql += string.Format("({0}) ", column.Length);
                 }
-                else if (column.Scale > 0 && column.Length > 0)
+                else if (column.Scale > 0 && column?.Length > 0)
                 {
                     appendSql += string.Format("({0},{1}) ", column.Length, column.Scale);
                 }
@@ -726,7 +726,7 @@ WHERE EVENT_OBJECT_TABLE = '" + tableName + "'");
                     else
                     {
                         Assembly currentAssembly = Assembly.GetExecutingAssembly();
-                        string exePath = currentAssembly.Location.Replace("SqlSugar.dll", "MySqlBackupNet.MySqlConnector.dll");
+                        string exePath = currentAssembly.Location.Replace($"{SugarConst.StartName}SqlSugar.dll", "MySqlBackupNet.MySqlConnector.dll");
                         assembly = Assembly.LoadFrom(exePath);
                     }
                 }

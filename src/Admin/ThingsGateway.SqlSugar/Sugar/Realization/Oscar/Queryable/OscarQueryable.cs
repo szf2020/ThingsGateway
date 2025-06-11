@@ -1,4 +1,4 @@
-﻿namespace SqlSugar
+﻿namespace ThingsGateway.SqlSugar
 {
     public class OscarQueryable<T> : QueryableProvider<T>
     {

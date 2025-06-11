@@ -1,4 +1,4 @@
-﻿namespace SqlSugar
+﻿namespace ThingsGateway.SqlSugar
 {
     public class QuestDBQueryable<T> : QueryableProvider<T>
     {

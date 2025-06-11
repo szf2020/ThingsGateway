@@ -4,7 +4,7 @@ using NpgsqlTypes;
 
 using System.Data;
 
-namespace SqlSugar
+namespace ThingsGateway.SqlSugar
 {
     public class PostgreSQLFastBuilder : FastBuilder, IFastBuilder
     {

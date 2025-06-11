@@ -1,5 +1,5 @@
 ﻿using System.Linq.Expressions;
-namespace SqlSugar
+namespace ThingsGateway.SqlSugar
 {
     public interface IStorageable<T> where T : class, new()
     {

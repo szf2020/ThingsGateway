@@ -1,8 +1,8 @@
-﻿using SqlSugar;
+﻿using System.Linq.Expressions;
 
-using System.Linq.Expressions;
+using ThingsGateway.SqlSugar;
 
-namespace SqlSugar
+namespace ThingsGateway.SqlSugar
 {
     public partial class MethodCallExpressionResolve : BaseResolve
     {

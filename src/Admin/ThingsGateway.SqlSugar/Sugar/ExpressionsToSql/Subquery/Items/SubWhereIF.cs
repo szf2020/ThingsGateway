@@ -1,7 +1,7 @@
 ﻿using System.Linq.Expressions;
 using System.Text.RegularExpressions;
 
-namespace SqlSugar
+namespace ThingsGateway.SqlSugar
 {
     public class SubWhereIF : ISubOperation
     {

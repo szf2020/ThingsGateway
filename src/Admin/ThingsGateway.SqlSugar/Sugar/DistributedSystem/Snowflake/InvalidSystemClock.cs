@@ -1,4 +1,4 @@
-﻿namespace SqlSugar.DistributedSystem.Snowflake
+﻿namespace ThingsGateway.SqlSugar.DistributedSystem.Snowflake
 {
     public class InvalidSystemClock : Exception
     {

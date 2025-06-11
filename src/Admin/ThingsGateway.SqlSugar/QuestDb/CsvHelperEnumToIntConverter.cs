@@ -2,7 +2,7 @@
 using CsvHelper.Configuration;
 using CsvHelper.TypeConversion;
 
-namespace SqlSugar
+namespace ThingsGateway.SqlSugar
 {
     public class CsvHelperEnumToIntConverter : ITypeConverter
     {

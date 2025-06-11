@@ -12,11 +12,10 @@ using BootstrapBlazor.Components;
 
 using Mapster;
 
-using SqlSugar;
-
 using ThingsGateway.Admin.Application;
 using ThingsGateway.Extension.Generic;
 using ThingsGateway.Foundation;
+using ThingsGateway.SqlSugar;
 
 using TouchSocket.Core;
 

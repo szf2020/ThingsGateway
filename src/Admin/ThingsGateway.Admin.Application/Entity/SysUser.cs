@@ -12,10 +12,10 @@ using BootstrapBlazor.Components;
 
 using Mapster;
 
-using SqlSugar;
-
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
+
+using ThingsGateway.SqlSugar;
 
 namespace ThingsGateway.Admin.Application;
 

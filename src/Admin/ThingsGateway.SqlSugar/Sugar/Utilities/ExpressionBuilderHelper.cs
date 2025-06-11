@@ -2,7 +2,7 @@
 using System.Reflection;
 using System.Reflection.Emit;
 
-namespace SqlSugar
+namespace ThingsGateway.SqlSugar
 {
     public static class ExpressionBuilderHelper
     {

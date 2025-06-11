@@ -14,7 +14,7 @@ using Oracle.ManagedDataAccess.Client;
 using System.Data;
 using System.Data.OscarClient;
 
-namespace SqlSugar
+namespace ThingsGateway.SqlSugar
 {
 
     /// <summary>

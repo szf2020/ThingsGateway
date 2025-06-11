@@ -1,4 +1,4 @@
-﻿namespace SqlSugar
+﻿namespace ThingsGateway.SqlSugar
 {
     internal class QueryableAppendColumn
     {

@@ -14,9 +14,9 @@ using Microsoft.AspNetCore.Components.Routing;
 
 using Newtonsoft.Json;
 
-using SqlSugar;
-
 using System.ComponentModel.DataAnnotations;
+
+using ThingsGateway.SqlSugar;
 
 namespace ThingsGateway.Admin.Application;
 

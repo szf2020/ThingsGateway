@@ -1,6 +1,6 @@
 ﻿using System.Reflection;
 
-namespace SqlSugar
+namespace ThingsGateway.SqlSugar
 {
     public class SplitTableDeleteByObjectProvider<T> where T : class, new()
     {

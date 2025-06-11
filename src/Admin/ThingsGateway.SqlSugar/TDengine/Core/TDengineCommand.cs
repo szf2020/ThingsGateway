@@ -5,7 +5,7 @@ using System.Text.RegularExpressions;
 using TDengine.Data.Client;
 using TDengine.Driver;
 
-namespace SqlSugar.TDengineAdo;
+namespace ThingsGateway.SqlSugar.TDengineAdo;
 
 public class TDengineCommand : DbCommand
 {

@@ -2,7 +2,7 @@
 
 using System.Text;
 
-namespace SqlSugar
+namespace ThingsGateway.SqlSugar
 {
     /// <summary>
     /// SqlFunc to model

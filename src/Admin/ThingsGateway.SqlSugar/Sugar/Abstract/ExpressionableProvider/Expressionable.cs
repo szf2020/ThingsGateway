@@ -1,6 +1,6 @@
 ﻿using System.Linq.Expressions;
 
-namespace SqlSugar
+namespace ThingsGateway.SqlSugar
 {
     public class Expressionable<T> where T : class, new()
     {

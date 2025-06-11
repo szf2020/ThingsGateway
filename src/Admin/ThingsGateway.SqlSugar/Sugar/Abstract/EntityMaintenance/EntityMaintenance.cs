@@ -1,9 +1,9 @@
-﻿using SqlSugar.DbConvert;
-
-using System.Reflection;
+﻿using System.Reflection;
 using System.Xml.Linq;
 
-namespace SqlSugar
+using ThingsGateway.SqlSugar.DbConvert;
+
+namespace ThingsGateway.SqlSugar
 {
     public class EntityMaintenance
     {
@@ -374,7 +374,7 @@ namespace SqlSugar
                             {
                                 column.DataType = "json";
                             }
-                            else if (column.Length > 0)
+                            else if (column?.Length > 0)
                             {
                                 column.DataType = "varchar";
                             }

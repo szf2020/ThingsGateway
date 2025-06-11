@@ -1,5 +1,5 @@
 ﻿using System.Reflection;
-namespace SqlSugar
+namespace ThingsGateway.SqlSugar
 {
 
     public static class InstanceFactory
@@ -253,9 +253,7 @@ namespace SqlSugar
             else if (IsCustomDb(currentConnectionConfig))
             {
                 var name =
-                    "SqlSugar." + currentConnectionConfig.DbType +
-                    "." + currentConnectionConfig.DbType
-                    + "Updateable`1";
+                    $"{SugarConst.StartName}SqlSugar.{currentConnectionConfig.DbType}.{currentConnectionConfig.DbType}Updateable`1";
                 var type = GetCustomTypeByClass<T>(name);
                 if (type == null)
                 {
@@ -289,9 +287,7 @@ namespace SqlSugar
             else if (IsCustomDb(currentConnectionConfig))
             {
                 var name =
-                    "SqlSugar." + currentConnectionConfig.DbType +
-                    "." + currentConnectionConfig.DbType
-                    + "Deleteable`1";
+                    $"{SugarConst.StartName}SqlSugar.{currentConnectionConfig.DbType}.{currentConnectionConfig.DbType}Deleteable`1";
                 var type = GetCustomTypeByClass<T>(name);
                 if (type == null)
                 {
@@ -337,9 +333,7 @@ namespace SqlSugar
             else if (IsCustomDb(currentConnectionConfig))
             {
                 var name =
-                    "SqlSugar." + currentConnectionConfig.DbType +
-                    "." + currentConnectionConfig.DbType
-                    + "Insertable`1";
+                    $"{SugarConst.StartName}SqlSugar.{currentConnectionConfig.DbType}.{currentConnectionConfig.DbType}Insertable`1";
                 var type = GetCustomTypeByClass<T>(name);
                 if (type == null)
                 {
@@ -381,7 +375,7 @@ namespace SqlSugar
                             //currentConnectionConfig.DbType != DbType.ClickHouse &&
                             //currentConnectionConfig.DbType != DbType.GBase &&
                             currentConnectionConfig.DbType != DbType.Sqlite &&
-                            GetCustomTypeByClass("SqlSugar." + currentConnectionConfig.DbType + "." + currentConnectionConfig.DbType + "Provider") != null;
+                            GetCustomTypeByClass($"{SugarConst.StartName}SqlSugar.{currentConnectionConfig.DbType}.{currentConnectionConfig.DbType}Provider") != null;
 
         }
 
@@ -437,39 +431,39 @@ namespace SqlSugar
         {
             if (type == "MySqlConnector")
             {
-                return "SqlSugar.MySqlConnector.MySql" + name;
+                return $"{SugarConst.StartName}SqlSugar.MySqlConnector.MySql{name}";
             }
             else if (type == "Access")
             {
-                return "SqlSugar.Access.Access" + name;
+                return $"{SugarConst.StartName}SqlSugar.Access.Access{name}";
             }
             else if (type == "ClickHouse")
             {
-                return "SqlSugar.ClickHouse.ClickHouse" + name;
+                return $"{SugarConst.StartName}SqlSugar.ClickHouse.ClickHouse{name}";
             }
             else if (type == "GBase")
             {
-                return "SqlSugar.GBase.GBase" + name;
+                return $"{SugarConst.StartName}SqlSugar.GBase.GBase{name}";
             }
             else if (type == "Odbc")
             {
-                return "SqlSugar.Odbc.Odbc" + name;
+                return $"{SugarConst.StartName}SqlSugar.Odbc.Odbc{name}";
             }
             else if (type == "Custom")
             {
-                return CustomNamespace + "." + CustomDbName + name;
+                return $"{CustomNamespace}.{CustomDbName}{name}";
             }
             else if (type == "HANA")
             {
-                return InstanceFactory.CustomDllName + "." + type + name;
+                return $"{InstanceFactory.CustomDllName}.{type}{name}";
             }
             else if (type == "DB2")
             {
-                return "SqlSugar.DB2." + type + name;
+                return $"{SugarConst.StartName}SqlSugar.DB2.{type}{name}";
             }
             else if (type == "GaussDBNative")
             {
-                return "SqlSugar.GaussDB.GaussDB" + name;
+                return $"{SugarConst.StartName}SqlSugar.GaussDB.GaussDB{name}";
             }
             else
             {

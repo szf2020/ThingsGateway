@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json.Linq;
 
 using System.Text.RegularExpressions;
-namespace SqlSugar
+namespace ThingsGateway.SqlSugar
 {
     internal static class Json2SqlHelper
     {

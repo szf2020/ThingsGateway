@@ -1,7 +1,7 @@
 ﻿using System.Data.SqlTypes;
 using System.Linq.Expressions;
 
-namespace SqlSugar
+namespace ThingsGateway.SqlSugar
 {
     public class SubInsertable<T> : ISubInsertable<T> where T : class, new()
     {

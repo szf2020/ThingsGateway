@@ -2,7 +2,7 @@
 using System.Data;
 using System.Reflection;
 
-namespace SqlSugar
+namespace ThingsGateway.SqlSugar
 {
     public abstract partial class DbBindProvider : DbBindAccessory, IDbBind
     {

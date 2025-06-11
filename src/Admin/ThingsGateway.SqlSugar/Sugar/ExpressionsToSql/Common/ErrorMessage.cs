@@ -1,4 +1,4 @@
-﻿namespace SqlSugar
+﻿namespace ThingsGateway.SqlSugar
 {
     internal static partial class ErrorMessage
     {

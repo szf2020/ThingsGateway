@@ -1,4 +1,4 @@
-﻿namespace SqlSugar
+﻿namespace ThingsGateway.SqlSugar
 {
     public partial class InsertNavProvider<Root, T> where T : class, new() where Root : class, new()
     {

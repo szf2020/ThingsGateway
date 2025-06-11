@@ -2,7 +2,7 @@
 using System.Data.Common;
 using System.Reflection;
 
-namespace SqlSugar
+namespace ThingsGateway.SqlSugar
 {
     public partial interface IAdo
     {

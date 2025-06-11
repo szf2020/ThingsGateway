@@ -1,6 +1,6 @@
 ﻿using System.Data;
 
-namespace SqlSugar
+namespace ThingsGateway.SqlSugar
 {
     public interface ITenant
     {

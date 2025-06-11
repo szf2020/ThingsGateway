@@ -2,7 +2,7 @@
 using System.Dynamic;
 using System.Linq.Expressions;
 
-namespace SqlSugar
+namespace ThingsGateway.SqlSugar
 {
     public partial class SqlSugarScope : ISqlSugarClient, ITenant
     {

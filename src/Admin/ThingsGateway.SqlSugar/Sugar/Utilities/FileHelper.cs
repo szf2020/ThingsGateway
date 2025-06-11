@@ -1,6 +1,6 @@
 ﻿using System.Text;
 
-namespace SqlSugar
+namespace ThingsGateway.SqlSugar
 {
     internal static class FileHelper
     {

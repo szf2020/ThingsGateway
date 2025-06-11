@@ -1,7 +1,7 @@
 ﻿using System.Data;
 using System.Data.Common;
 
-namespace SqlSugar
+namespace ThingsGateway.SqlSugar
 {
     public class OracleDbMaintenance : DbMaintenanceProvider
     {

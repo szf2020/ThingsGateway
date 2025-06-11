@@ -1,6 +1,6 @@
 ﻿using System.Collections;
 
-namespace SqlSugar
+namespace ThingsGateway.SqlSugar
 {
     public partial class OracleExpressionContext : ExpressionContext, ILambdaExpressions
     {

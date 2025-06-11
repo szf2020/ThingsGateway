@@ -1,7 +1,7 @@
 ﻿using System.Data;
 using System.Linq.Expressions;
 
-namespace SqlSugar
+namespace ThingsGateway.SqlSugar
 {
 
     public partial class QueryableProvider<T> : QueryableAccessory, ISugarQueryable<T>

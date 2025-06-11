@@ -1,4 +1,4 @@
-﻿namespace SqlSugar
+﻿namespace ThingsGateway.SqlSugar
 {
     internal static class DependencyManagement
     {
@@ -22,8 +22,8 @@
                 catch
                 {
                     var message = ErrorMessage.GetThrowMessage(
-                        " SqlSugar Some functions are used in newtonsoft ,Nuget references Newtonsoft.Json 9.0.0.1 + .",
-                        " SqlSugar 部分功能用到Newtonsoft.Json.dll，需要在Nuget上安装 Newtonsoft.Json 9.0.0.1及以上版本，如果有版本兼容问题请先删除原有引用");
+                        " need to refer to newtonsoft ,Nuget references Newtonsoft.Json 9.0.0.1 + .",
+                        " 需要引用Newtonsoft.Json.dll，需要在Nuget上安装 Newtonsoft.Json 9.0.0.1及以上版本，如果有版本兼容问题请先删除原有引用");
                     throw new Exception(message);
                 }
             }

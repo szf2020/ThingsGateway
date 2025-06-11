@@ -1,7 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using System.Linq.Expressions;
 using System.Reflection;
-namespace SqlSugar
+namespace ThingsGateway.SqlSugar
 {
     public static class ExpressionTool
     {

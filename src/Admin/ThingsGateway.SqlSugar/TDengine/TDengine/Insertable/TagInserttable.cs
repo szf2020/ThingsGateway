@@ -1,8 +1,8 @@
-﻿using SqlSugar.TDengine;
+﻿using System.Reflection;
 
-using System.Reflection;
+using ThingsGateway.SqlSugar.TDengine;
 
-namespace SqlSugar
+namespace ThingsGateway.SqlSugar
 {
     public class TagInserttable<T> where T : class, new()
     {

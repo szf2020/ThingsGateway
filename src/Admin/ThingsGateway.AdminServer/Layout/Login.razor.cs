@@ -20,6 +20,7 @@ using Microsoft.Extensions.Options;
 
 using System.Diagnostics.CodeAnalysis;
 
+using ThingsGateway.Admin.Application;
 using ThingsGateway.DataEncryption;
 using ThingsGateway.NewLife.Extension;
 using ThingsGateway.Razor;

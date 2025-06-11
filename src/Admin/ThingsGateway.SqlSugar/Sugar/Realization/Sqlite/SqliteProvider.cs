@@ -2,7 +2,7 @@
 
 using System.Data;
 using System.Data.Common;
-namespace SqlSugar
+namespace ThingsGateway.SqlSugar
 {
     public partial class SqliteProvider : AdoProvider
     {

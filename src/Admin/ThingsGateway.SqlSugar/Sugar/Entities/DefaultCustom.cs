@@ -1,14 +1,14 @@
 ﻿using System.Data;
 using System.Text;
 
-namespace SqlSugar.DbConvert
+namespace ThingsGateway.SqlSugar.DbConvert
 {
     public class EnumToStringConvert : ISugarDataConverter
     {
         public SugarParameter ParameterConverter<T>(object columnValue, int columnIndex)
         {
             var name = "@MyEnum" + columnIndex;
-            Type undertype = SqlSugar.UtilMethods.GetUnderType(typeof(T));//获取没有nullable的枚举类型
+            Type undertype = UtilMethods.GetUnderType(typeof(T));//获取没有nullable的枚举类型
             if (columnValue == null)
             {
                 return new SugarParameter(name, null);
@@ -24,7 +24,7 @@ namespace SqlSugar.DbConvert
         {
 
             var str = dr.GetString(i);
-            Type undertype = SqlSugar.UtilMethods.GetUnderType(typeof(T));//获取没有nullable的枚举类型
+            Type undertype = UtilMethods.GetUnderType(typeof(T));//获取没有nullable的枚举类型
             return (T)Enum.Parse(undertype, str);
         }
     }
@@ -52,7 +52,7 @@ namespace SqlSugar.DbConvert
         public SugarParameter ParameterConverter<T>(object columnValue, int columnIndex)
         {
             var name = "@Common" + columnIndex;
-            Type undertype = SqlSugar.UtilMethods.GetUnderType(typeof(T));//获取没有nullable的枚举类型
+            Type undertype = UtilMethods.GetUnderType(typeof(T));//获取没有nullable的枚举类型
             return new SugarParameter(name, columnValue, undertype);
         }
 
@@ -76,7 +76,7 @@ namespace SqlSugar.DbConvert
         public SugarParameter ParameterConverter<T>(object columnValue, int columnIndex)
         {
             var name = "@Common" + columnIndex;
-            Type undertype = SqlSugar.UtilMethods.GetUnderType(typeof(T));//获取没有nullable的枚举类型
+            Type undertype = UtilMethods.GetUnderType(typeof(T));//获取没有nullable的枚举类型
             return new SugarParameter(name, columnValue, undertype) { IsNvarchar2 = true };
         }
 
@@ -93,7 +93,7 @@ namespace SqlSugar.DbConvert
         public SugarParameter ParameterConverter<T>(object columnValue, int columnIndex)
         {
             var name = "@Common" + columnIndex;
-            Type undertype = SqlSugar.UtilMethods.GetUnderType(typeof(T));//获取没有nullable的枚举类型
+            Type undertype = UtilMethods.GetUnderType(typeof(T));//获取没有nullable的枚举类型
             return new SugarParameter(name, columnValue, undertype) { IsNClob = true };
         }
 

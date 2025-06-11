@@ -8,8 +8,6 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-using SqlSugar;
-
 using System.Collections.Concurrent;
 using System.Reflection;
 
@@ -18,6 +16,7 @@ using ThingsGateway.FriendlyException;
 using ThingsGateway.Logging;
 using ThingsGateway.NewLife.Json.Extension;
 using ThingsGateway.Razor;
+using ThingsGateway.SqlSugar;
 
 namespace ThingsGateway.Admin.Application;
 

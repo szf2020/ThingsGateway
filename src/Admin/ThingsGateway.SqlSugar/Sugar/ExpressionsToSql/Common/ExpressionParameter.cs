@@ -1,5 +1,5 @@
 ﻿using System.Linq.Expressions;
-namespace SqlSugar
+namespace ThingsGateway.SqlSugar
 {
     public class ExpressionParameter
     {

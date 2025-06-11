@@ -1,5 +1,5 @@
 ﻿using System.Text;
-namespace SqlSugar
+namespace ThingsGateway.SqlSugar
 {
     public static class Check
     {

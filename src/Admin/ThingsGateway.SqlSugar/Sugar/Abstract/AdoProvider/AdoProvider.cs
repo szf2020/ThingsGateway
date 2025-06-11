@@ -3,7 +3,7 @@ using System.Data;
 using System.Data.Common;
 using System.Reflection;
 using System.Text.RegularExpressions;
-namespace SqlSugar
+namespace ThingsGateway.SqlSugar
 {
     ///<summary>
     /// ** description：ActiveX Data Objects

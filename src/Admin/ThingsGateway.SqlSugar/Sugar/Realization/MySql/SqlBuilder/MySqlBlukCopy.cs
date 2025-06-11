@@ -3,7 +3,7 @@
 using System.Data;
 using System.Reflection;
 using System.Text;
-namespace SqlSugar
+namespace ThingsGateway.SqlSugar
 {
     public partial class MySqlBlukCopy<T>
     {

@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace SqlSugar
+namespace ThingsGateway.SqlSugar
 {
     public class ModelContext
     {

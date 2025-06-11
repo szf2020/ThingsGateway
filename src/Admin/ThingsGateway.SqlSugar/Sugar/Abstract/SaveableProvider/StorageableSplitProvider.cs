@@ -1,7 +1,7 @@
 ﻿using System.Linq.Expressions;
 using System.Reflection;
 
-namespace SqlSugar
+namespace ThingsGateway.SqlSugar
 {
     public class StorageableSplitProvider<T> where T : class, new()
     {

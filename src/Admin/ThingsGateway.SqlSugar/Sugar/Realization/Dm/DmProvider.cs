@@ -5,7 +5,7 @@ using System.Data.Common;
 using System.Text.RegularExpressions;
 
 
-namespace SqlSugar
+namespace ThingsGateway.SqlSugar
 {
     public partial class DmProvider : AdoProvider
     {

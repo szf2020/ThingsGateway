@@ -1,4 +1,4 @@
-﻿namespace SqlSugar.SplitTableExtensions
+﻿namespace ThingsGateway.SqlSugar.SplitTableExtensions
 {
     public static class Extensions
     {

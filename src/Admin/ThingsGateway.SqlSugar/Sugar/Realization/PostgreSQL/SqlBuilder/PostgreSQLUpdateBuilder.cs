@@ -1,7 +1,7 @@
 ﻿using System.Globalization;
 using System.Text;
 
-namespace SqlSugar
+namespace ThingsGateway.SqlSugar
 {
     public class PostgreSQLUpdateBuilder : UpdateBuilder
     {

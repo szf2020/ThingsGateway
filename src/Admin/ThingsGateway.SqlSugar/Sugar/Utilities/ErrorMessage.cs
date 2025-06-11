@@ -1,5 +1,5 @@
 ﻿using System.Text;
-namespace SqlSugar
+namespace ThingsGateway.SqlSugar
 {
     internal static partial class ErrorMessage
     {

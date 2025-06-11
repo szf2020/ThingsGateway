@@ -3,14 +3,13 @@ using System.Diagnostics;
 using System.Dynamic;
 using System.Linq.Expressions;
 
-namespace SqlSugar
+namespace ThingsGateway.SqlSugar
 {
     public class SqlSugarScopeProvider : ISqlSugarClient
     {
         internal SqlSugarProvider conn;
         internal int initThreadMainId;
         internal string initkey = null;
-        StackFrame[] frames;
 
         public SqlSugarScopeProvider(SqlSugarProvider conn)
         {

@@ -1,6 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 
-namespace SqlSugar
+namespace ThingsGateway.SqlSugar
 {
     public class SplitTableDeleteProvider<T> where T : class, new()
     {

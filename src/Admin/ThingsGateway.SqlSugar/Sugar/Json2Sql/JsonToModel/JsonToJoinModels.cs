@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json.Linq;
 
-namespace SqlSugar
+namespace ThingsGateway.SqlSugar
 {
     /// <summary>
     /// Json to model

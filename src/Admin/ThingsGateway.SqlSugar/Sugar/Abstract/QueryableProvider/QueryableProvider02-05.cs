@@ -1,6 +1,6 @@
 ﻿using System.Linq.Expressions;
 
-namespace SqlSugar
+namespace ThingsGateway.SqlSugar
 {
     #region T2
     public partial class QueryableProvider<T, T2> : QueryableProvider<T>, ISugarQueryable<T, T2>

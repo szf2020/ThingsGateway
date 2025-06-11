@@ -1,7 +1,7 @@
 ﻿using System.Linq.Expressions;
 using System.Text;
 
-namespace SqlSugar
+namespace ThingsGateway.SqlSugar
 {
     public class ReportableProvider<T> : IReportable<T>
     {

@@ -12,11 +12,10 @@ using BootstrapBlazor.Components;
 
 using Microsoft.Extensions.DependencyInjection;
 
-using SqlSugar;
-
 using System.Globalization;
 
 using ThingsGateway.FriendlyException;
+using ThingsGateway.SqlSugar;
 
 namespace ThingsGateway.Admin.Application;
 

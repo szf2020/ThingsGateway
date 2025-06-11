@@ -1,7 +1,7 @@
 ﻿using System.Data;
 using System.Reflection;
 
-namespace SqlSugar.TDengine
+namespace ThingsGateway.SqlSugar.TDengine
 {
     public class TDengineDbMaintenance : DbMaintenanceProvider
     {
@@ -362,18 +362,18 @@ namespace SqlSugar.TDengine
                 //    item.Length = 50;
                 //    dataType = "varchar";
                 //}
-                string dataSize = item.Length > 0 ? string.Format("({0})", item.Length) : null;
+                string dataSize = item?.Length > 0 ? string.Format("({0})", item.Length) : null;
                 //if (item.DecimalDigits > 0&&item.Length>0 && dataType?.ToLower()== "float") 
                 //{
                 //    item.Length = 0;
                 //    dataSize = $"({item.Length},{item.DecimalDigits})";
                 //}
-                //if (item.DecimalDigits > 0 && item.Length > 0 && dataType?.ToLower() ==  "double")
+                //if (item.DecimalDigits > 0 && item?.Length > 0 && dataType?.ToLower() ==  "double")
                 //{
 
                 //    dataSize = $"({item.Length},{item.DecimalDigits})";
                 //}
-                //if (item.DecimalDigits > 0 && item.Length > 0 && dataType?.ToLower() == "decimal")
+                //if (item.DecimalDigits > 0 && item?.Length > 0 && dataType?.ToLower() == "decimal")
                 //{ 
                 //    dataSize = $"({item.Length},{item.DecimalDigits})";
                 //}
@@ -438,7 +438,7 @@ namespace SqlSugar.TDengine
                             var tagType = new TDengineDbBind() { Context = this.Context }.GetDbTypeName(tagColumn.UnderType.Name);
                             tableString = tableString.Replace($"{SqlBuilder.GetTranslationColumnName(tagColumn.DbColumnName)}  VARCHAR(100)", $"{SqlBuilder.GetTranslationColumnName(tagColumn.DbColumnName)} {tagType} ");
                         }
-                        else if (tagColumn != null && tagColumn.UnderType == UtilConstants.StringType && tagColumn.Length < 100 && tagColumn.Length > 0)
+                        else if (tagColumn != null && tagColumn.UnderType == UtilConstants.StringType && tagColumn.Length < 100 && tagColumn?.Length > 0)
                         {
                             tableString = tableString.Replace($"{SqlBuilder.GetTranslationColumnName(tagColumn.DbColumnName)}  VARCHAR(100)", $"{SqlBuilder.GetTranslationColumnName(tagColumn.DbColumnName)}  VARCHAR({tagColumn.Length}) ");
                         }

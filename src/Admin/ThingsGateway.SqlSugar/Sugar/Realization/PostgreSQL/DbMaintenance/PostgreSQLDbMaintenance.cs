@@ -1,6 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 
-namespace SqlSugar
+namespace ThingsGateway.SqlSugar
 {
     public class PostgreSQLDbMaintenance : DbMaintenanceProvider
     {
@@ -495,8 +495,8 @@ WHERE tgrelid = '" + tableName + "'::regclass");
                 //    item.Length = 50;
                 //    dataType = "varchar";
                 //}
-                string dataSize = item.Length > 0 ? string.Format("({0})", item.Length) : null;
-                if (item.DecimalDigits > 0 && item.Length > 0 && dataType == "numeric")
+                string dataSize = item?.Length > 0 ? string.Format("({0})", item.Length) : null;
+                if (item.DecimalDigits > 0 && item?.Length > 0 && dataType == "numeric")
                 {
                     dataSize = $"({item.Length},{item.DecimalDigits})";
                 }

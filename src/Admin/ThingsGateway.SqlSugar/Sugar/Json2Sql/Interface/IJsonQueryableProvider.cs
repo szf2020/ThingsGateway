@@ -1,4 +1,4 @@
-﻿namespace SqlSugar
+﻿namespace ThingsGateway.SqlSugar
 {
     public interface IJsonQueryableProvider<JsonQueryResult> : IJsonProvider<JsonQueryResult>
     {

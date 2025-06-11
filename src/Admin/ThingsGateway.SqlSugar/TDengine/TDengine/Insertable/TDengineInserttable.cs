@@ -1,4 +1,4 @@
-﻿namespace SqlSugar.TDengine
+﻿namespace ThingsGateway.SqlSugar.TDengine
 {
     public class TDengineInsertable<T> : InsertableProvider<T> where T : class, new()
     {

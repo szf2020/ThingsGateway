@@ -1,6 +1,6 @@
 ﻿using System.Text;
 
-namespace SqlSugar
+namespace ThingsGateway.SqlSugar
 {
     public class SqliteUpdateBuilder : UpdateBuilder
     {
@@ -9,10 +9,10 @@ namespace SqlSugar
         {
             StringBuilder sb = new StringBuilder();
             int i = 0;
-            sb.AppendLine(string.Join("\r\n", groupList.Select(t =>
+            sb.AppendJoin("\r\n", groupList.Select(t =>
             {
                 var updateTable = string.Format("UPDATE {0} SET", base.GetTableNameStringNoWith);
-                var setValues = string.Join(",", t.Where(s => !s.IsPrimarykey).Where(s => OldPrimaryKeys?.Contains(s.DbColumnName) != true).Select(m => GetOracleUpdateColumns(i, m, false)).ToArray());
+                var setValues = string.Join(",", t.Where(s => !s.IsPrimarykey && OldPrimaryKeys?.Contains(s.DbColumnName) != true).Select(m => GetOracleUpdateColumns(i, m, false)).ToArray());
                 var pkList = t.Where(s => s.IsPrimarykey).ToList();
                 if (this.IsWhereColumns && this.PrimaryKeys?.Count > 0)
                 {
@@ -25,14 +25,13 @@ namespace SqlSugar
                 List<string> whereList = new List<string>();
                 foreach (var item in pkList)
                 {
-                    var isFirst = pkList.First() == item;
-                    var whereString = "";
-                    whereString += GetOracleUpdateColumns(i, item, true);
+                    var isFirst = pkList[0] == item;
+                    var whereString = GetOracleUpdateColumns(i, item, true);
                     whereList.Add(whereString);
                 }
                 i++;
                 return string.Format("{0} {1} WHERE {2};", updateTable, setValues, string.Join(" AND", whereList));
-            }).ToArray()));
+            }).ToArray()).AppendLine();
             return sb.ToString();
         }
 
@@ -45,7 +44,6 @@ namespace SqlSugar
             sb.Append('"');
             sb.Append('=');
             sb.Append(base.GetDbColumn(m, FormatValue(i, m.DbColumnName, m.Value, iswhere)));
-
 
             if (iswhere && m.Value == null)
             {

@@ -2,7 +2,7 @@ using System.Data;
 using System.Linq.Expressions;
 using System.Text.RegularExpressions;
 
-namespace SqlSugar
+namespace ThingsGateway.SqlSugar
 {
     public partial class UpdateableProvider<T> : IUpdateable<T> where T : class, new()
     {

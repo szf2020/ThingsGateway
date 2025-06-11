@@ -1,6 +1,6 @@
 ﻿using System.Linq.Expressions;
 
-namespace SqlSugar
+namespace ThingsGateway.SqlSugar
 {
     public partial class UpdateNavProvider<Root, T> where T : class, new() where Root : class, new()
     {

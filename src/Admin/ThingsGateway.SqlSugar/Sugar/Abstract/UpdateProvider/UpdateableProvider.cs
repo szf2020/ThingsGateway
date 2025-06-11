@@ -2,7 +2,7 @@
 using System.Linq.Expressions;
 using System.Text.RegularExpressions;
 
-namespace SqlSugar
+namespace ThingsGateway.SqlSugar
 {
     public partial class UpdateableProvider<T> : IUpdateable<T> where T : class, new()
     {
@@ -744,7 +744,7 @@ namespace SqlSugar
                     DbColumnName = UpdateBuilder.Builder.GetNoTranslationColumnName(name),
                     Value = value,
                     PropertyName = name,
-                    SqlParameterDbType = typeof(SqlSugar.DbConvert.NoParameterCommonPropertyConvert)
+                    SqlParameterDbType = typeof(DbConvert.NoParameterCommonPropertyConvert)
                 });
             }
             return this;

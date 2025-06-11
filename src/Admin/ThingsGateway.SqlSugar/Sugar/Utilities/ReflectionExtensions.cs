@@ -1,6 +1,6 @@
 ﻿using System.Reflection;
 
-namespace SqlSugar
+namespace ThingsGateway.SqlSugar
 {
 
     public static class ReflectionExtensions

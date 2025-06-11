@@ -1,6 +1,6 @@
 ﻿using System.Dynamic;
 using System.Linq.Expressions;
-namespace SqlSugar
+namespace ThingsGateway.SqlSugar
 {
     internal static class UtilConstants
     {
@@ -8,7 +8,7 @@ namespace SqlSugar
         public const char DotChar = '.';
         internal const string Space = " ";
         internal const char SpaceChar = ' ';
-        internal const string AssemblyName = "SqlSugar";
+        internal const string AssemblyName = "ThingsGateway.SqlSugar";
         internal static string ReplaceKey = "{" + Guid.NewGuid() + "}";
         internal const string ReplaceCommaKey = "{112A689B-17A1-4A06-9D27-A39EAB8BC3D5}";
         internal const string GroupReplaceKey = "{GroupReplaceKey_l33asdysaas1231s}";
@@ -44,7 +44,7 @@ namespace SqlSugar
         internal static Type DicArraySS = typeof(Dictionary<string, string>);
         internal static Type DicArraySO = typeof(Dictionary<string, object>);
 
-        public static Type SqlConvertType = typeof(SqlSugar.DbConvert.NoParameterCommonPropertyConvert);
+        public static Type SqlConvertType = typeof(DbConvert.NoParameterCommonPropertyConvert);
 
         public static Type SugarType = typeof(SqlSugarProvider);
 

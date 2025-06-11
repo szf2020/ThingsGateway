@@ -1,4 +1,4 @@
-﻿namespace SqlSugar.TDengineAdo;
+﻿namespace ThingsGateway.SqlSugar.TDengineAdo;
 
 internal static class Helper
 {

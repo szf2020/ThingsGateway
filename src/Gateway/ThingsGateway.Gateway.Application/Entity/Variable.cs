@@ -12,13 +12,12 @@ using BootstrapBlazor.Components;
 
 using Mapster;
 
-using SqlSugar;
-
 using System.Collections.Concurrent;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
 
 using ThingsGateway.Razor;
+using ThingsGateway.SqlSugar;
 
 namespace ThingsGateway.Gateway.Application;
 

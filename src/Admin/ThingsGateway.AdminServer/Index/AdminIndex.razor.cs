@@ -18,6 +18,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Localization;
 
+using ThingsGateway.Admin.Application;
 using ThingsGateway.Admin.Razor;
 using ThingsGateway.Extension;
 

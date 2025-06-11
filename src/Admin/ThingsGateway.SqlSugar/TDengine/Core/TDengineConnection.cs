@@ -4,7 +4,7 @@ using System.Data.Common;
 using TDengine.Driver;
 using TDengine.Driver.Client;
 
-namespace SqlSugar.TDengineAdo;
+namespace ThingsGateway.SqlSugar.TDengineAdo;
 
 public class TDengineConnection : DbConnection
 {

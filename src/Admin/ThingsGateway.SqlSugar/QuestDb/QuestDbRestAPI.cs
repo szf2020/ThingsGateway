@@ -10,7 +10,7 @@ using System.Globalization;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Web;
-namespace SqlSugar
+namespace ThingsGateway.SqlSugar
 {
     /// <summary>
     /// QuestDb RestAPI

@@ -1,4 +1,4 @@
-﻿namespace SqlSugar
+﻿namespace ThingsGateway.SqlSugar
 {
     [AttributeUsage(AttributeTargets.Class, Inherited = true)]
     public class SplitTableAttribute : Attribute

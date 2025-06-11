@@ -1,4 +1,4 @@
-﻿namespace SqlSugar
+﻿namespace ThingsGateway.SqlSugar
 {
     public interface IJsonDeleteableProvider<T> : IJsonProvider<T>
     {

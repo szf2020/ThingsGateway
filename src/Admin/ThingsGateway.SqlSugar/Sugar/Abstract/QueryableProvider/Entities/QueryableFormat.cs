@@ -1,6 +1,6 @@
 ﻿using System.Reflection;
 
-namespace SqlSugar
+namespace ThingsGateway.SqlSugar
 {
     internal class QueryableFormat
     {

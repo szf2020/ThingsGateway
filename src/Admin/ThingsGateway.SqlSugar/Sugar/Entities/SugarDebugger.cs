@@ -1,4 +1,4 @@
-﻿namespace SqlSugar
+﻿namespace ThingsGateway.SqlSugar
 {
     /// <summary>
     /// Used for debugging errors or BUG,Used for debugging, which has an impact on Performance

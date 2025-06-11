@@ -3,7 +3,7 @@
 using System.Data;
 
 
-namespace SqlSugar
+namespace ThingsGateway.SqlSugar
 {
 
     public partial class OracleBlukCopy

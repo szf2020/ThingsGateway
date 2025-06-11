@@ -8,11 +8,11 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-using SqlSugar;
-
 using System.Collections;
 using System.Data;
 using System.Reflection;
+
+using ThingsGateway.SqlSugar;
 
 namespace ThingsGateway.Admin.Application;
 

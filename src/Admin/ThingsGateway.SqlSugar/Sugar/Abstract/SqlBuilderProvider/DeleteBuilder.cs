@@ -1,6 +1,6 @@
 ﻿using System.Linq.Expressions;
 using System.Text;
-namespace SqlSugar
+namespace ThingsGateway.SqlSugar
 {
     public class DeleteBuilder : IDMLBuilder
     {

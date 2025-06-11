@@ -2,7 +2,7 @@
 using System.Data.Common;
 using System.Text;
 using System.Text.RegularExpressions;
-namespace SqlSugar
+namespace ThingsGateway.SqlSugar
 {
     public abstract partial class SqlBuilderProvider : SqlBuilderAccessory, ISqlBuilder
     {

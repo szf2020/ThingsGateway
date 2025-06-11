@@ -1,5 +1,5 @@
 ﻿using System.Linq.Expressions;
-namespace SqlSugar
+namespace ThingsGateway.SqlSugar
 {
     public class UpdateableProvider<T, T2> : IUpdateable<T, T2> where T : class, new()
     {

@@ -3,7 +3,7 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace SqlSugar
+namespace ThingsGateway.SqlSugar
 {
     public class UpdateBuilder : IDMLBuilder
     {

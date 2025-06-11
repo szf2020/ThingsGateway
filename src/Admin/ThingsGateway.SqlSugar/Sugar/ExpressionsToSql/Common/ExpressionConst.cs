@@ -1,4 +1,4 @@
-﻿namespace SqlSugar
+﻿namespace ThingsGateway.SqlSugar
 {
     internal static class ExpressionConst
     {
@@ -7,7 +7,7 @@
         public const string RightParenthesis = ")";
         public const string LeftParenthesis = "(";
         public const string MethodConst = "MethodConst";
-        public const string SqlFuncFullName = "SqlSugar.SqlFunc";
+        public const string SqlFuncFullName = $"{SugarConst.StartName}SqlSugar.SqlFunc";
         public const string BinaryFormatString = " ( {0} {1} {2} ) ";
         public const string ExpressionReplace = "46450BDC-77B7-4025-B2A6-3F048CA85AD0";
     }

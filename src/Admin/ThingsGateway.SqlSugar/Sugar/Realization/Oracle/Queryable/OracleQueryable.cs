@@ -1,6 +1,6 @@
-﻿using SqlSugar;
+﻿using ThingsGateway.SqlSugar;
 
-namespace SqlSugar
+namespace ThingsGateway.SqlSugar
 {
     public class OracleQueryable<T> : QueryableProvider<T>
     {

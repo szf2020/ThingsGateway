@@ -10,10 +10,10 @@
 
 using Mapster;
 
-using SqlSugar;
-
 using System.ComponentModel.DataAnnotations;
 using System.Reflection;
+
+using ThingsGateway.SqlSugar;
 
 namespace ThingsGateway.Gateway.Application;
 

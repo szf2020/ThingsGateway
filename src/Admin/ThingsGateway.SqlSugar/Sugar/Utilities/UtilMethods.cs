@@ -13,7 +13,7 @@ using System.Text.RegularExpressions;
 
 using ThingsGateway.NewLife;
 
-namespace SqlSugar
+namespace ThingsGateway.SqlSugar
 {
     public static class UtilMethods
     {

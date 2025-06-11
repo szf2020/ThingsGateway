@@ -1,4 +1,4 @@
-﻿namespace SqlSugar.DistributedSystem.Snowflake
+﻿namespace ThingsGateway.SqlSugar.DistributedSystem.Snowflake
 {
     public static class System
     {

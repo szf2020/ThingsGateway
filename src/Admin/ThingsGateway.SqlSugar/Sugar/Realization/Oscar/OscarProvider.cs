@@ -2,7 +2,7 @@
 using System.Data.Common;
 using System.Data.OscarClient;
 
-namespace SqlSugar
+namespace ThingsGateway.SqlSugar
 {
     public partial class OscarProvider : AdoProvider
     {

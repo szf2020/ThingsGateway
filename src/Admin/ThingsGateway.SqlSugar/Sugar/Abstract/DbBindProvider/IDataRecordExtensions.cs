@@ -1,7 +1,7 @@
 ﻿using System.Data;
 using System.Xml.Linq;
 
-namespace SqlSugar
+namespace ThingsGateway.SqlSugar
 {
     public static partial class IDataRecordExtensions
     {

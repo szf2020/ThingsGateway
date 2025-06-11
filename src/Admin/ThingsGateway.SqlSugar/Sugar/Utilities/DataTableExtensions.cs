@@ -2,7 +2,7 @@
 using System.Dynamic;
 using System.Linq.Expressions;
 
-namespace SqlSugar
+namespace ThingsGateway.SqlSugar
 {
     internal static class DataTableExtensions
     {

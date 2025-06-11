@@ -1,7 +1,7 @@
 ﻿using Dm;
 
 using System.Data;
-namespace SqlSugar
+namespace ThingsGateway.SqlSugar
 {
     public class DmBlukCopy
     {

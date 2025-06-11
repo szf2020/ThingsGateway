@@ -1,5 +1,5 @@
 ﻿using Dm.util;
-namespace SqlSugar.TDengine
+namespace ThingsGateway.SqlSugar.TDengine
 {
     public class TDengineExpressionContext : ExpressionContext, ILambdaExpressions
     {

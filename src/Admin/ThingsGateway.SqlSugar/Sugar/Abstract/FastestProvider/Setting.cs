@@ -1,4 +1,4 @@
-﻿namespace SqlSugar
+﻿namespace ThingsGateway.SqlSugar
 {
     public partial class FastestProvider<T> : IFastest<T> where T : class, new()
     {

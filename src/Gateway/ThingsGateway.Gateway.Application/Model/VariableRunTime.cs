@@ -14,11 +14,10 @@ using Mapster;
 
 using Newtonsoft.Json.Linq;
 
-using SqlSugar;
-
 using ThingsGateway.Gateway.Application.Extensions;
 using ThingsGateway.NewLife.Extension;
 using ThingsGateway.NewLife.Json.Extension;
+using ThingsGateway.SqlSugar;
 
 namespace ThingsGateway.Gateway.Application;
 

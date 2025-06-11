@@ -1,6 +1,6 @@
 ﻿using System.Linq.Expressions;
 
-namespace SqlSugar
+namespace ThingsGateway.SqlSugar
 {
     public class SubFirst : ISubOperation
     {
@@ -44,7 +44,7 @@ namespace SqlSugar
             InitType(exp);
             var type = expression.Type;
             if (type.FullName.IsCollectionsList()
-                && exp.Arguments.Count == 0 && type.GenericTypeArguments.Length > 0
+                && exp.Arguments.Count == 0 && type.GenericTypeArguments?.Length > 0
                 && this.Context.SugarContext?.QueryBuilder.IsSelectNoAll == true)
             {
                 var entity = type.GenericTypeArguments[0];

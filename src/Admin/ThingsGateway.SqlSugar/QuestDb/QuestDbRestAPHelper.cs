@@ -1,7 +1,7 @@
 ﻿using System.Data.Common;
 using System.Text;
 
-namespace SqlSugar
+namespace ThingsGateway.SqlSugar
 {
     internal static class QuestDbRestAPHelper
     {

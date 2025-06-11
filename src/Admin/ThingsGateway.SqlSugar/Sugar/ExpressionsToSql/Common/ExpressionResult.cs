@@ -1,5 +1,5 @@
 ﻿using System.Text;
-namespace SqlSugar
+namespace ThingsGateway.SqlSugar
 {
     public class ExpressionResult
     {
@@ -145,7 +145,7 @@ namespace SqlSugar
                 default:
                     break;
             }
-            if (this.Result.Length > 0 && this.Result[this.Result.Length - 1] == ',')
+            if (this.Result?.Length > 0 && this.Result[this.Result.Length - 1] == ',')
             {
                 if (parameter?.ToString()?.StartsWith("  AS ") == true && parameter?.ToString()?.EndsWith(" ,") == true)
                 {

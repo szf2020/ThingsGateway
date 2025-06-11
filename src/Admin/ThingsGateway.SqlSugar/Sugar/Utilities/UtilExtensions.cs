@@ -1,4 +1,4 @@
-﻿namespace SqlSugar.Extensions
+﻿namespace ThingsGateway.SqlSugar.Extensions
 {
     /// <summary>
     ///Common Extensions for external users

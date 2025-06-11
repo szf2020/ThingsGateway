@@ -1,4 +1,4 @@
-﻿namespace SqlSugar
+﻿namespace ThingsGateway.SqlSugar
 {
     public class OscarInserttable<T> : InsertableProvider<T> where T : class, new()
     {

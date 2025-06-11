@@ -1,6 +1,6 @@
 ﻿using System.Data;
 using System.Text;
-namespace SqlSugar
+namespace ThingsGateway.SqlSugar
 {
     public partial interface ISqlBuilder
     {

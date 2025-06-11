@@ -1,4 +1,4 @@
-﻿namespace SqlSugar
+﻿namespace ThingsGateway.SqlSugar
 {
     public class DmDbBind : DbBindProvider
     {
@@ -116,8 +116,8 @@
                   new KeyValuePair<string, CSharpDataType>("number",CSharpDataType.Single),
                   new KeyValuePair<string, CSharpDataType>("decimal",CSharpDataType.Single),
                   new KeyValuePair<string, CSharpDataType>("dec",CSharpDataType.@decimal),
-                  new KeyValuePair<string, SqlSugar.CSharpDataType>("double precision",CSharpDataType.@double),
-                  new KeyValuePair<string, SqlSugar.CSharpDataType>("binary", CSharpDataType.@byteArray),
+                  new KeyValuePair<string, CSharpDataType>("double precision",CSharpDataType.@double),
+                  new KeyValuePair<string, CSharpDataType>("binary", CSharpDataType.@byteArray),
 
                   new KeyValuePair<string, CSharpDataType>("varchar",CSharpDataType.@string),
                   new KeyValuePair<string, CSharpDataType>("nvarchar",CSharpDataType.@string),

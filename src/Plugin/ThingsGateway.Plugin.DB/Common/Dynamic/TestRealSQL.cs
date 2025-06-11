@@ -9,7 +9,7 @@
 //// ------------------------------------------------------------------------------
 
 
-//using SqlSugar;
+//using ThingsGateway.SqlSugar;
 
 //using ThingsGateway;
 //using ThingsGateway.Foundation;

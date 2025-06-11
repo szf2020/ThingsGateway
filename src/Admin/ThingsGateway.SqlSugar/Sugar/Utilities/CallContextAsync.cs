@@ -1,6 +1,6 @@
 ﻿using System.Collections.Concurrent;
 
-namespace SqlSugar
+namespace ThingsGateway.SqlSugar
 {
     public static class CallContextAsync<T>
     {

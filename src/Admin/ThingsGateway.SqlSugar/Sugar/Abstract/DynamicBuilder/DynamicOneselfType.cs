@@ -1,4 +1,4 @@
-﻿namespace SqlSugar
+﻿namespace ThingsGateway.SqlSugar
 {
     /// <summary>
     /// Dynamically construct Type, the property is self, with this type

@@ -11,11 +11,10 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-using SqlSugar;
-
 using System.ComponentModel;
 
 using ThingsGateway.NewLife.Extension;
+using ThingsGateway.SqlSugar;
 namespace ThingsGateway.Gateway.Application;
 
 /// <summary>

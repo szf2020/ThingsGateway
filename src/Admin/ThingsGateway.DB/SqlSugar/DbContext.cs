@@ -10,10 +10,9 @@
 
 using Microsoft.Extensions.DependencyInjection;
 
-using SqlSugar;
-
 using ThingsGateway.Extension;
 using ThingsGateway.NewLife.Log;
+using ThingsGateway.SqlSugar;
 
 namespace ThingsGateway.Admin.Application;
 

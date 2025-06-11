@@ -8,9 +8,9 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-using SqlSugar;
-
 using System.Text.RegularExpressions;
+
+using ThingsGateway.SqlSugar;
 
 namespace ThingsGateway.Plugin.SqlDB;
 

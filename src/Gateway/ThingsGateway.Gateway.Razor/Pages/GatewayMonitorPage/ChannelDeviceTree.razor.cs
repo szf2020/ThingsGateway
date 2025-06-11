@@ -13,12 +13,11 @@ using Mapster;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Components.Web;
 
-using SqlSugar;
-
 using ThingsGateway.Admin.Razor;
 using ThingsGateway.Gateway.Application;
 using ThingsGateway.NewLife.Extension;
 using ThingsGateway.NewLife.Json.Extension;
+using ThingsGateway.SqlSugar;
 
 namespace ThingsGateway.Gateway.Razor;
 

@@ -1,6 +1,6 @@
 ﻿using System.Text;
 
-namespace SqlSugar
+namespace ThingsGateway.SqlSugar
 {
     public class RazorFirst
     {
@@ -11,7 +11,7 @@ namespace SqlSugar
 @"using System;
 using System.Linq;
 using System.Text;
-using SqlSugar;
+using ThingsGateway.SqlSugar;
 namespace @Model.Namespace 
 {
     ///<summary>
@@ -31,7 +31,7 @@ namespace @Model.Namespace
          @:/// Default:@item.DefaultValue
          @:/// Nullable:@item.IsNullable
          @:/// </summary>     
-         @:[SqlSugar.SugarColumn(IsPrimaryKey = true, IsIdentity = true)]      
+         @:[ThingsGateway.SqlSugar.SugarColumn(IsPrimaryKey = true, IsIdentity = true)]      
          @:public @item.DataType @item.DbColumnName {get;set;}
          }
         else if(item.IsPrimarykey)
@@ -41,7 +41,7 @@ namespace @Model.Namespace
          @:/// Default:@item.DefaultValue
          @:/// Nullable:@item.IsNullable
          @:/// </summary>    
-         @:[SqlSugar.SugarColumn(IsPrimaryKey = true)]       
+         @:[ThingsGateway.SqlSugar.SugarColumn(IsPrimaryKey = true)]       
          @:public @item.DataType @item.DbColumnName {get;set;}
          } 
         else if(item.IsIdentity)
@@ -51,7 +51,7 @@ namespace @Model.Namespace
          @:/// Default:@item.DefaultValue
          @:/// Nullable:@item.IsNullable
          @:/// </summary>       
-         @:[SqlSugar.SugarColumn(IsIdentity = true)]    
+         @:[ThingsGateway.SqlSugar.SugarColumn(IsIdentity = true)]    
          @:public @item.DataType @item.DbColumnName {get;set;}
          }
          else

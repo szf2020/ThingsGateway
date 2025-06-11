@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Text;
 using System.Text.RegularExpressions;
-namespace SqlSugar
+namespace ThingsGateway.SqlSugar
 {
     public partial class DefaultDbMethod : IDbMethods
     {
@@ -918,7 +918,7 @@ namespace SqlSugar
                                 {
                                     newValue = Convert.ToInt64(value) + "";
                                 }
-                                else if (columnInfo.UnderType == SqlSugar.UtilConstants.GuidType)
+                                else if (columnInfo.UnderType == UtilConstants.GuidType)
                                 {
                                     newValue = ToGuid(new MethodCallExpressionModel()
                                     {
@@ -931,7 +931,7 @@ namespace SqlSugar
                                        }
                                     });
                                 }
-                                else if (columnInfo.UnderType == SqlSugar.UtilConstants.DateType)
+                                else if (columnInfo.UnderType == UtilConstants.DateType)
                                 {
                                     newValue = ToDate(new MethodCallExpressionModel()
                                     {
@@ -1011,7 +1011,7 @@ namespace SqlSugar
                                 {
                                     newValue = value.ToString();
                                 }
-                                else if (columnInfo.UnderType == SqlSugar.UtilConstants.GuidType)
+                                else if (columnInfo.UnderType == UtilConstants.GuidType)
                                 {
                                     newValue = ToGuid(new MethodCallExpressionModel()
                                     {
@@ -1024,7 +1024,7 @@ namespace SqlSugar
                                        }
                                     });
                                 }
-                                else if (columnInfo.UnderType == SqlSugar.UtilConstants.DateType)
+                                else if (columnInfo.UnderType == UtilConstants.DateType)
                                 {
                                     newValue = ToDate(new MethodCallExpressionModel()
                                     {
@@ -1099,7 +1099,7 @@ namespace SqlSugar
                             {
                                 newValue = value.ToString();
                             }
-                            else if (columnInfo.UnderType == SqlSugar.UtilConstants.GuidType)
+                            else if (columnInfo.UnderType == UtilConstants.GuidType)
                             {
                                 newValue = ToGuid(new MethodCallExpressionModel()
                                 {
@@ -1112,7 +1112,7 @@ namespace SqlSugar
                                        }
                                 });
                             }
-                            else if (columnInfo.UnderType == SqlSugar.UtilConstants.DateType)
+                            else if (columnInfo.UnderType == UtilConstants.DateType)
                             {
                                 newValue = ToDate(new MethodCallExpressionModel()
                                 {
@@ -1203,7 +1203,7 @@ namespace SqlSugar
                             {
                                 newValue = value.ToString();
                             }
-                            else if (columnInfo.UnderType == SqlSugar.UtilConstants.GuidType)
+                            else if (columnInfo.UnderType == UtilConstants.GuidType)
                             {
                                 newValue = ToGuid(new MethodCallExpressionModel()
                                 {
@@ -1216,7 +1216,7 @@ namespace SqlSugar
                                        }
                                 });
                             }
-                            else if (columnInfo.UnderType == SqlSugar.UtilConstants.DateType)
+                            else if (columnInfo.UnderType == UtilConstants.DateType)
                             {
                                 newValue = ToDate(new MethodCallExpressionModel()
                                 {

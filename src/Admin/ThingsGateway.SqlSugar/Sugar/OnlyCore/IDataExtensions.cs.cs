@@ -1,7 +1,7 @@
 ﻿using System.Data;
 using System.Text.RegularExpressions;
 
-namespace SqlSugar
+namespace ThingsGateway.SqlSugar
 {
     public interface IDataAdapter
     {

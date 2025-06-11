@@ -1,4 +1,4 @@
-﻿namespace SqlSugar
+﻿namespace ThingsGateway.SqlSugar
 {
     public class OracleUpdateable<T> : UpdateableProvider<T> where T : class, new()
     {

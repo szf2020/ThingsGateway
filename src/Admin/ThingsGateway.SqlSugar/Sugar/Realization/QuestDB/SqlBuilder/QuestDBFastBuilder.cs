@@ -4,7 +4,7 @@ using NpgsqlTypes;
 
 using System.Data;
 
-namespace SqlSugar
+namespace ThingsGateway.SqlSugar
 {
     public class QuestDBFastBuilder : FastBuilder, IFastBuilder
     {
@@ -28,12 +28,9 @@ namespace SqlSugar
         //    string sql = string.Format(UpdateSql, sets, tableName, tempName, wheres);
         //    return await this.Context.Ado.ExecuteCommandAsync(sql);
         //}
-        public async Task<int> ExecuteBulkCopyAsync(DataTable dt)
+        public Task<int> ExecuteBulkCopyAsync(DataTable dt)
         {
-            Check.ExceptionEasy(
-                "Nuget install: SqlSugar.QuestDb.RestAPI, use: await db.RestApi().BulkCopyAsync(list)",
-                "Nuget安装：SqlSugar.QuestDb.RestAPI ，QuestDb中请使用：await db.RestApi().BulkCopyAsync(list) 注意是db.RestApi()不是db.Fastest");
-            return await Task.FromResult(0).ConfigureAwait(false);
+            throw new NotImplementedException("QuestDB does not support bulk copy operation directly. You may need to implement a custom solution for bulk insert.");
         }
 
         private void BulkCopy(DataTable dt, string copyString, NpgsqlConnection conn, List<DbColumnInfo> columns)

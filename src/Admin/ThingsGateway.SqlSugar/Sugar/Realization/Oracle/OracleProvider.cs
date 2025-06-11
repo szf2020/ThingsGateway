@@ -3,7 +3,7 @@ using Oracle.ManagedDataAccess.Client;
 using System.Data;
 using System.Data.Common;
 using System.Text.RegularExpressions;
-namespace SqlSugar
+namespace ThingsGateway.SqlSugar
 {
     public class OracleProvider : AdoProvider
     {

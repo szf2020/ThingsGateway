@@ -1,7 +1,7 @@
 ﻿using System.Linq.Expressions;
 using System.Reflection;
 
-namespace SqlSugar
+namespace ThingsGateway.SqlSugar
 {
     public class Storageable<T> : IStorageable<T> where T : class, new()
     {
@@ -542,7 +542,7 @@ namespace SqlSugar
             {
                 var condition = new ConditionalCollections()
                 {
-                    ConditionalList = new List<KeyValuePair<WhereType, SqlSugar.ConditionalModel>>()
+                    ConditionalList = new List<KeyValuePair<WhereType, ConditionalModel>>()
                 };
                 conditList.Add(condition);
                 int i = 0;

@@ -13,7 +13,7 @@ using BootstrapBlazor.Components;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 
-using SqlSugar;
+using ThingsGateway.SqlSugar;
 
 namespace ThingsGateway.Admin.Application;
 

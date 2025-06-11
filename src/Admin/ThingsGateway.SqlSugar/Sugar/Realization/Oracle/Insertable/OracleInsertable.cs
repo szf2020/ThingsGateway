@@ -1,6 +1,6 @@
 ﻿using System.Text;
 
-namespace SqlSugar
+namespace ThingsGateway.SqlSugar
 {
     public class OracleInsertable<T> : InsertableProvider<T> where T : class, new()
     {

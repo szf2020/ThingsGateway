@@ -1,4 +1,4 @@
-﻿namespace SqlSugar
+﻿namespace ThingsGateway.SqlSugar
 {
     public class PostgreSQLInserttable<T> : InsertableProvider<T> where T : class, new()
     {

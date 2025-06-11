@@ -1,6 +1,6 @@
 ﻿using System.Data;
 
-namespace SqlSugar
+namespace ThingsGateway.SqlSugar
 {
     public partial class FastestProvider<T> : IFastest<T> where T : class, new()
     {
@@ -24,7 +24,7 @@ namespace SqlSugar
                 case DbType.PostgreSQL:
                     return new PostgreSQLFastBuilder(this.entityInfo);
                 case DbType.MySqlConnector:
-                    var resultConnector = InstanceFactory.CreateInstance<IFastBuilder>("SqlSugar.MySqlConnector.MySqlFastBuilder");
+                    var resultConnector = InstanceFactory.CreateInstance<IFastBuilder>($"{SugarConst.StartName}SqlSugar.MySqlConnector.MySqlFastBuilder");
                     resultConnector.CharacterSet = this.CharacterSet;
                     return resultConnector;
                 case DbType.Dm:
@@ -48,7 +48,7 @@ namespace SqlSugar
                 //    className = "SqlSugar.GaussDB.GaussDBFastBuilder";
                 //    break;
                 default:
-                    className = $"SqlSugar.{this.context.CurrentConnectionConfig.DbType.ToString().Replace("Native", "")}FastBuilder";
+                    className = $"{SugarConst.StartName}SqlSugar.{this.context.CurrentConnectionConfig.DbType.ToString().Replace("Native", "")}FastBuilder";
                     break;
             }
             var reslut = InstanceFactory.CreateInstance<IFastBuilder>(className);

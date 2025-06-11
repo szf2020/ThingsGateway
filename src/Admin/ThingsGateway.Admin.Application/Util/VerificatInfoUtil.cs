@@ -8,9 +8,8 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-using SqlSugar;
-
 using ThingsGateway.Extension.Generic;
+using ThingsGateway.SqlSugar;
 
 namespace ThingsGateway.Admin.Application;
 

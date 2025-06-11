@@ -1,6 +1,6 @@
 ﻿using System.Reflection.Emit;
 
-namespace SqlSugar
+namespace ThingsGateway.SqlSugar
 {
     public class PropertyMetadata
     {

@@ -1,4 +1,4 @@
-﻿namespace SqlSugar
+﻿namespace ThingsGateway.SqlSugar
 {
     public class OracleDeleteable<T> : DeleteableProvider<T> where T : class, new()
     {

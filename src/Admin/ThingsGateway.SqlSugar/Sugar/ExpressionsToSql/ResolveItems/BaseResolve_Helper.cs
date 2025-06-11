@@ -1,6 +1,6 @@
 ﻿using System.Linq.Expressions;
 using System.Reflection;
-namespace SqlSugar
+namespace ThingsGateway.SqlSugar
 {
     /// <summary>
     /// BaseResolve-Helper

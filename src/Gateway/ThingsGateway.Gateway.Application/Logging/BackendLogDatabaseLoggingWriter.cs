@@ -10,12 +10,11 @@
 
 using Microsoft.Extensions.Configuration;
 
-using SqlSugar;
-
 using System.Collections.Concurrent;
 
 using ThingsGateway.Extension;
 using ThingsGateway.Logging;
+using ThingsGateway.SqlSugar;
 
 using LogLevel = Microsoft.Extensions.Logging.LogLevel;
 

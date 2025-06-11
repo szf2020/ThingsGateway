@@ -7,7 +7,7 @@ using System.Dynamic;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text.RegularExpressions;
-namespace SqlSugar
+namespace ThingsGateway.SqlSugar
 {
     public partial class ContextMethods : IContextMethods
     {

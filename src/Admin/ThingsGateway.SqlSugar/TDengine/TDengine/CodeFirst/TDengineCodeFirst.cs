@@ -2,7 +2,7 @@ using System.Data;
 using System.Reflection;
 using System.Text.RegularExpressions;
 
-namespace SqlSugar.TDengine
+namespace ThingsGateway.SqlSugar.TDengine
 {
     public class TDengineCodeFirst : CodeFirstProvider
     {

@@ -8,9 +8,8 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-using SqlSugar;
-
 using ThingsGateway.NewLife;
+using ThingsGateway.SqlSugar;
 
 using TouchSocket.Core;
 

@@ -13,12 +13,11 @@ using BootstrapBlazor.Components;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-using SqlSugar;
-
 using System.Reflection;
 using System.Text.RegularExpressions;
 
 using ThingsGateway.NewLife;
+using ThingsGateway.SqlSugar;
 
 namespace ThingsGateway.Admin.Application;
 /// <summary>

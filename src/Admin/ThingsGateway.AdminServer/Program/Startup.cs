@@ -25,6 +25,7 @@ using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.Unicode;
 
+using ThingsGateway.Admin.Application;
 using ThingsGateway.Admin.Razor;
 using ThingsGateway.Extension;
 using ThingsGateway.NewLife.Caching;

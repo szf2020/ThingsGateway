@@ -1,6 +1,6 @@
 ﻿using System.Data.Common;
 
-namespace SqlSugar
+namespace ThingsGateway.SqlSugar
 {
     public class OscarDbMaintenance : DbMaintenanceProvider
     {
@@ -355,8 +355,8 @@ namespace SqlSugar
                     item.Length = 50;
                     dataType = "varchar";
                 }
-                string dataSize = item.Length > 0 ? string.Format("({0})", item.Length) : null;
-                if (item.DecimalDigits > 0 && item.Length > 0 && dataType == "numeric")
+                string dataSize = item?.Length > 0 ? string.Format("({0})", item.Length) : null;
+                if (item.DecimalDigits > 0 && item?.Length > 0 && dataType == "numeric")
                 {
                     dataSize = $"({item.Length},{item.DecimalDigits})";
                 }

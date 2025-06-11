@@ -1,7 +1,7 @@
 ﻿using System.Globalization;
 using System.Text;
 
-namespace SqlSugar
+namespace ThingsGateway.SqlSugar
 {
     public class PostgreSQLInsertBuilder : InsertBuilder
     {
@@ -257,7 +257,7 @@ namespace SqlSugar
 
         private string GetIgnoreSql(string sql)
         {
-            if (this.ConflictNothing.Length > 0)
+            if (this.ConflictNothing?.Length > 0)
             {
                 sql = sql.Replace(";", $"  ON CONFLICT ({string.Join(",", this.ConflictNothing)}) DO NOTHING;");
             }

@@ -10,15 +10,14 @@
 
 using Mapster;
 
-using SqlSugar;
-using SqlSugar.TDengine;
-
 using System.Diagnostics;
 using System.Text;
 
 using ThingsGateway.Extension.Generic;
 using ThingsGateway.Foundation;
 using ThingsGateway.Plugin.DB;
+using ThingsGateway.SqlSugar;
+using ThingsGateway.SqlSugar.TDengine;
 
 using TouchSocket.Core;
 

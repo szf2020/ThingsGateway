@@ -14,11 +14,10 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-using SqlSugar;
-
 using System.Reflection;
 
 using ThingsGateway.Authentication;
+using ThingsGateway.SqlSugar;
 
 namespace ThingsGateway.Gateway.Application;
 

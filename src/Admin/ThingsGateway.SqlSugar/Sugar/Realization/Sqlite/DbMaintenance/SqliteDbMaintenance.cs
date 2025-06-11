@@ -4,7 +4,7 @@ using System.Data;
 using System.Data.Common;
 using System.Text.RegularExpressions;
 
-namespace SqlSugar
+namespace ThingsGateway.SqlSugar
 {
     public class SqliteDbMaintenance : DbMaintenanceProvider
     {
@@ -560,7 +560,7 @@ AND sql LIKE '%" + tableName + "%'");
                 {
                     item.Length = 1;
                 }
-                string dataSize = item.Length > 0 ? string.Format("({0})", item.Length) : null;
+                string dataSize = item?.Length > 0 ? string.Format("({0})", item.Length) : null;
                 string nullType = item.IsNullable ? this.CreateTableNull : CreateTableNotNull;
                 string primaryKey = item.IsPrimarykey ? this.CreateTablePirmaryKey : null;
                 string identity = item.IsIdentity ? this.CreateTableIdentity : null;

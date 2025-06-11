@@ -1,5 +1,5 @@
 ﻿using System.Text.RegularExpressions;
-namespace SqlSugar.TDengine
+namespace ThingsGateway.SqlSugar.TDengine
 {
     internal static class ValidateExtensions
     {

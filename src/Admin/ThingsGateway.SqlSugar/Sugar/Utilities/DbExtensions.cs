@@ -1,5 +1,5 @@
 ﻿using System.Text.RegularExpressions;
-namespace SqlSugar
+namespace ThingsGateway.SqlSugar
 {
     public static class DbExtensions
     {

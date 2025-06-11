@@ -10,7 +10,7 @@
 
 using BootstrapBlazor.Components;
 
-using SqlSugar;
+using ThingsGateway.SqlSugar;
 
 using LogLevel = Microsoft.Extensions.Logging.LogLevel;
 

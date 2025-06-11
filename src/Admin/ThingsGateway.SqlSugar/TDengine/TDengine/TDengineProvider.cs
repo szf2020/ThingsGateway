@@ -1,6 +1,6 @@
 ﻿using System.Data;
 using System.Data.Common;
-namespace SqlSugar.TDengine
+namespace ThingsGateway.SqlSugar.TDengine
 {
     public partial class TDengineProvider : AdoProvider
     {

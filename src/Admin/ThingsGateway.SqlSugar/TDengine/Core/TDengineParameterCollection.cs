@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Data.Common;
 
-namespace SqlSugar.TDengineAdo;
+namespace ThingsGateway.SqlSugar.TDengineAdo;
 
 public class TDengineParameterCollection : DbParameterCollection
 {

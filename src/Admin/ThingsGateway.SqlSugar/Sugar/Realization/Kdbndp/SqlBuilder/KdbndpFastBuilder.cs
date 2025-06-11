@@ -2,7 +2,7 @@
 
 using System.Data;
 
-namespace SqlSugar
+namespace ThingsGateway.SqlSugar
 {
     public class KdbndpFastBuilder : FastBuilder, IFastBuilder
     {

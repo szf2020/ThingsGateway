@@ -5,7 +5,7 @@ using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace SqlSugar
+namespace ThingsGateway.SqlSugar
 {
 
     public partial class QueryableProvider<T> : QueryableAccessory, ISugarQueryable<T>

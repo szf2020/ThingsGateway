@@ -1,6 +1,6 @@
 ﻿using System.Data;
 
-namespace SqlSugar
+namespace ThingsGateway.SqlSugar
 {
     public class StorageableDataTable
     {
@@ -171,7 +171,7 @@ namespace SqlSugar
             {
                 var condition = new ConditionalCollections()
                 {
-                    ConditionalList = new List<KeyValuePair<WhereType, SqlSugar.ConditionalModel>>()
+                    ConditionalList = new List<KeyValuePair<WhereType, ConditionalModel>>()
                 };
                 conditList.Add(condition);
                 int i = 0;

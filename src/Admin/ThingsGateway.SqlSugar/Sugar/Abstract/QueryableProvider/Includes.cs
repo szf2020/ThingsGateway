@@ -2,7 +2,7 @@
 using System.Linq.Expressions;
 using System.Reflection;
 
-namespace SqlSugar
+namespace ThingsGateway.SqlSugar
 {
     public partial class QueryableProvider<T> : QueryableAccessory, ISugarQueryable<T>
     {

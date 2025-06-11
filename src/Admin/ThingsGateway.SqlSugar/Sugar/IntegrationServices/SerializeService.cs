@@ -2,7 +2,7 @@
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
 
-namespace SqlSugar
+namespace ThingsGateway.SqlSugar
 {
     public class SerializeService : ISerializeService
     {
@@ -63,7 +63,7 @@ namespace SqlSugar
 
         protected override IList<JsonProperty> CreateProperties(Type type, MemberSerialization memberSerialization)
         {
-            if (type.IsAnonymousType() || type == UtilConstants.ObjType || type.Namespace == "SqlSugar" || type.IsClass() == false)
+            if (type.IsAnonymousType() || type == UtilConstants.ObjType || type.Namespace == $"{SugarConst.StartName}SqlSugar" || type.IsClass() == false)
             {
                 return base.CreateProperties(type, memberSerialization);
             }

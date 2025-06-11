@@ -2,7 +2,7 @@
 
 using System.Data;
 using System.Reflection;
-namespace SqlSugar
+namespace ThingsGateway.SqlSugar
 {
     public class ConnectionConfig
     {

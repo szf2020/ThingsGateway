@@ -3,7 +3,7 @@ using System.Reflection;
 using System.Reflection.Emit;
 using System.Xml.Linq;
 
-namespace SqlSugar
+namespace ThingsGateway.SqlSugar
 {
     ///<summary>
     /// ** description：IDataReader Entity Builder

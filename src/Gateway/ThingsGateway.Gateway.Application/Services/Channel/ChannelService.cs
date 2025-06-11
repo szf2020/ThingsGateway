@@ -16,8 +16,6 @@ using Microsoft.AspNetCore.Components.Forms;
 
 using MiniExcelLibs;
 
-using SqlSugar;
-
 using System.ComponentModel.DataAnnotations;
 using System.Data;
 using System.Reflection;
@@ -26,6 +24,7 @@ using System.Text;
 using ThingsGateway.Extension.Generic;
 using ThingsGateway.Foundation.Extension.Dynamic;
 using ThingsGateway.FriendlyException;
+using ThingsGateway.SqlSugar;
 
 using TouchSocket.Core;
 
