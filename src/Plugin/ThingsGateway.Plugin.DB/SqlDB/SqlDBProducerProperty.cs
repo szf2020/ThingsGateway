@@ -58,13 +58,6 @@ public class SqlDBProducerProperty : BusinessPropertyWithCacheInterval
     [AutoGenerateColumn(ComponentType = typeof(Textarea), Rows = 1)]
     public string BigTextConnectStr { get; set; } = "server=.;uid=sa;pwd=111111;database=test;";
 
-
-    /// <summary>
-    /// 实时表间隔上传时间
-    /// </summary>
-    [DynamicProperty]
-    public virtual string RealTableBusinessInterval { get; set; } = "3000";
-
     /// <summary>
     /// 实时表脚本
     /// </summary>

@@ -164,12 +164,15 @@ public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariableModel<
     .Map(dest => dest.Value, src => src.Value == null ? string.Empty : src.Value.ToString() ?? string.Empty)
     .Map(dest => dest.CreateTime, (src) => DateTime.Now);
 
-        _exRealTimerTick = new(_driverPropertys.RealTableBusinessInterval);
-
         await base.InitChannelAsync(channel, cancellationToken).ConfigureAwait(false);
 
     }
-
+    public override Task AfterVariablesChangedAsync(CancellationToken cancellationToken)
+    {
+        RealTimeVariables.Clear();
+        _initRealData = false;
+        return base.AfterVariablesChangedAsync(cancellationToken);
+    }
 
     protected override async Task ProtectedStartAsync(CancellationToken cancellationToken)
     {
@@ -215,42 +218,25 @@ public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariableModel<
     {
         if (_driverPropertys.IsReadDB)
         {
-            if (_exRealTimerTick.IsTickHappen())
+            try
             {
-                try
+                var varList = RealTimeVariables.ToListWithDequeue();
+                if (varList.Count > 0)
                 {
-                    var varList = IdVariableRuntimes.Select(a => a.Value);
-                    if (_driverPropertys.GroupUpdate)
+                    var result = await UpdateAsync(varList.Adapt<List<SQLRealValue>>(), cancellationToken).ConfigureAwait(false);
+                    if (success != result.IsSuccess)
                     {
-                        var groups = varList.GroupBy(a => a.BusinessGroup);
-                        foreach (var item in groups)
-                        {
-                            var result = await UpdateAsync(item.Adapt<List<SQLRealValue>>(), cancellationToken).ConfigureAwait(false);
-                            if (success != result.IsSuccess)
-                            {
-                                if (!result.IsSuccess)
-                                    LogMessage?.LogWarning(result.ToString());
-                                success = result.IsSuccess;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        var result = await UpdateAsync(varList.Adapt<List<SQLRealValue>>(), cancellationToken).ConfigureAwait(false);
-                        if (success != result.IsSuccess)
-                        {
-                            if (!result.IsSuccess)
-                                LogMessage?.LogWarning(result.ToString());
-                            success = result.IsSuccess;
-                        }
+                        if (!result.IsSuccess)
+                            LogMessage?.LogWarning(result.ToString());
+                        success = result.IsSuccess;
                     }
                 }
-                catch (Exception ex)
-                {
-                    if (success)
-                        LogMessage?.LogWarning(ex);
-                    success = false;
-                }
+            }
+            catch (Exception ex)
+            {
+                if (success)
+                    LogMessage?.LogWarning(ex);
+                success = false;
             }
         }
 

@@ -10,11 +10,11 @@
 
 using Mapster;
 
+using System.Collections.Concurrent;
 using System.Diagnostics;
 
 using ThingsGateway.Extension.Generic;
 using ThingsGateway.Foundation;
-using ThingsGateway.NewLife;
 using ThingsGateway.Plugin.DB;
 
 using TouchSocket.Core;
@@ -27,7 +27,6 @@ namespace ThingsGateway.Plugin.SqlDB;
 public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariableModel<SQLHistoryValue>
 {
     private TypeAdapterConfig _config;
-    private TimeTick _exRealTimerTick;
     private volatile bool _initRealData;
 
     protected override ValueTask<OperResult> UpdateVarModel(IEnumerable<CacheDBItem<SQLHistoryValue>> item, CancellationToken cancellationToken)
@@ -78,6 +77,7 @@ public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariableModel<
         }
     }
 
+    private ConcurrentDictionary<long,VariableBasicData> RealTimeVariables { get; } = new ConcurrentDictionary<long, VariableBasicData>();
     private void UpdateVariable(VariableRuntime variableRuntime, VariableBasicData variable)
     {
         if (_driverPropertys.IsHistoryDB)
@@ -92,6 +92,11 @@ public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariableModel<
             {
                 AddQueueVarModel(new CacheDBItem<SQLHistoryValue>(variableRuntime.Adapt<SQLHistoryValue>(_config)));
             }
+        }
+
+        if (_driverPropertys.IsReadDB)
+        {
+            RealTimeVariables.AddOrUpdate(variable.Id, variable, (key, oldValue) => oldValue);
         }
     }
 
@@ -169,25 +174,18 @@ public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariableModel<
 
                 if (!_initRealData)
                 {
-                    if (datas?.Count > 0)
-                    {
                         Stopwatch stopwatch = new();
                         stopwatch.Start();
                         var ids = (await db.Queryable<SQLRealValue>().AS(_driverPropertys.ReadDBTableName).Select(a => a.Id).ToListAsync(cancellationToken).ConfigureAwait(false)).ToHashSet();
-                        var InsertData = datas.Where(a => !ids.Contains(a.Id)).ToList();
+                        var InsertData = IdVariableRuntimes.Where(a => !ids.Contains(a.Key)).Select(a=>a.Value).Adapt<List<SQLRealValue>>();
                         var result = await db.Fastest<SQLRealValue>().AS(_driverPropertys.ReadDBTableName).PageSize(100000).BulkCopyAsync(InsertData).ConfigureAwait(false);
-                        //var result = await db.Storageable(datas).As(_driverPropertys.ReadDBTableName).PageSize(5000).ExecuteSqlBulkCopyAsync(cancellationToken).ConfigureAwait(false);
                         _initRealData = true;
                         stopwatch.Stop();
                         if (result > 0)
                         {
                             LogMessage?.Trace($"RealTable Insert Data Count：{result}，watchTime:  {stopwatch.ElapsedMilliseconds} ms");
                         }
-                        return OperResult.Success;
-                    }
-                    return OperResult.Success;
                 }
-                else
                 {
                     if (datas?.Count > 0)
                     {
