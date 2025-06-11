@@ -4,10 +4,10 @@
 <ValidateForm Model="Model" OnValidSubmit="OnSave">
     <div class="row g-2 mx-1 form-inline">
         <div class="col-12">
-            <ButtonUpload @bind-Value="@Model.ZipFile" Accept=".zip" IsSingle ShowLabelTooltip="true" />
+            <ButtonUpload @bind-Value="@Model.ZipFile" Accept=".zip" IsMultiple=false ShowLabelTooltip="true" />
         </div>
         <div class="col-12">
-            <ButtonUpload @bind-Value="@Model.JsonFile" Accept=".json" IsSingle ShowLabelTooltip="true" />
+            <ButtonUpload @bind-Value="@Model.JsonFile" Accept=".json" IsMultiple=false ShowLabelTooltip="true" />
             <Button Color="Color.Link" class="mx-2" Size="Size.ExtraSmall" Text="@Localizer["DownTemplate"]" OnClick="DownTemplate" />
         </div>
     </div>

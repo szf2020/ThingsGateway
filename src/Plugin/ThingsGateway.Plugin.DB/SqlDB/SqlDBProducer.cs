@@ -158,6 +158,12 @@ public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariableModel<
             .Map(dest => dest.Value, src => src.Value == null ? string.Empty : src.Value.ToString() ?? string.Empty)
             .Map(dest => dest.CreateTime, (src) => DateTime.Now);
 
+        _config.ForType<VariableBasicData, SQLHistoryValue>()
+    //.Map(dest => dest.Id, (src) =>CommonUtils.GetSingleId())
+    .Map(dest => dest.Id, src => src.Id)//Id更改为变量Id
+    .Map(dest => dest.Value, src => src.Value == null ? string.Empty : src.Value.ToString() ?? string.Empty)
+    .Map(dest => dest.CreateTime, (src) => DateTime.Now);
+
         _exRealTimerTick = new(_driverPropertys.RealTableBusinessInterval);
 
         await base.InitChannelAsync(channel, cancellationToken).ConfigureAwait(false);

@@ -8,6 +8,8 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
+using Microsoft.AspNetCore.Components.Forms;
+
 using ThingsGateway.Admin.Application;
 using ThingsGateway.NewLife.Extension;
 
@@ -45,4 +47,55 @@ public partial class SysUserEdit
         Model.OrgId = items.LastOrDefault()?.Parent?.Value?.ToLong() ?? 0;
         return Task.CompletedTask;
     }
+    [Inject]
+    ToastService ToastService { get; set; }
+
+    #region 头像
+
+    private List<UploadFile> PreviewFileList;
+
+    [FileValidation(Extensions = [".png", ".jpg", ".jpeg"], FileSize = 200 * 1024)]
+    public IBrowserFile? Picture { get; set; }
+
+
+    private CancellationTokenSource? ReadAvatarToken { get; set; }
+
+    public void Dispose()
+    {
+        ReadAvatarToken?.Cancel();
+        GC.SuppressFinalize(this);
+    }
+
+    protected override void OnInitialized()
+    {
+        PreviewFileList = new(new[] { new UploadFile { PrevUrl = Model.Avatar } });
+        base.OnInitialized();
+    }
+
+    private async Task OnAvatarUpload(UploadFile file)
+    {
+        if (file?.File != null)
+        {
+            var format = file.File.ContentType;
+            ReadAvatarToken ??= new CancellationTokenSource();
+            if (ReadAvatarToken.IsCancellationRequested)
+            {
+                ReadAvatarToken.Dispose();
+                ReadAvatarToken = new CancellationTokenSource();
+            }
+
+            await file.RequestBase64ImageFileAsync(format, 640, 480, 1024 * 200, token: ReadAvatarToken.Token);
+
+            if (file.Code != 0)
+            {
+                await ToastService.Error($"{file.Error} ");
+            }
+            else
+            {
+                Model.Avatar = file.PrevUrl;
+            }
+        }
+    }
+
+    #endregion 头像
 }

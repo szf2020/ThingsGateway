@@ -142,7 +142,7 @@ namespace ThingsGateway.SqlSugar.TDengine
             for (int i = 0; i < st.FrameCount; i++)
             {
                 var frame = st.GetFrame(i);
-                if (!string.Equals(frame.GetMethod().Module.Name, "sqlsugar.dll", StringComparison.OrdinalIgnoreCase) && frame.GetMethod().Name.First() != '<')
+                if (!string.Equals(frame.GetMethod().Module.Name, "thingsgateway.sqlsugar.dll", StringComparison.OrdinalIgnoreCase) && frame.GetMethod().Name.First() != '<')
                 {
                     info.MyStackTraceList.Add(new StackTraceInfoItem()
                     {

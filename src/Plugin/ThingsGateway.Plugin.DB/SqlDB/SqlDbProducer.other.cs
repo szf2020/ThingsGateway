@@ -36,7 +36,10 @@ public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariableModel<
     }
     protected override void VariableTimeInterval(IEnumerable<VariableRuntime> variableRuntimes, List<VariableBasicData> variables)
     {
-        TimeIntervalUpdateVariable(variables);
+        if (_driverPropertys.IsHistoryDB)
+        {
+            TimeIntervalUpdateVariable(variables);
+        }
 
         base.VariableTimeInterval(variableRuntimes, variables);
     }
@@ -163,14 +166,23 @@ public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariableModel<
             }
             else
             {
+
                 if (!_initRealData)
                 {
                     if (datas?.Count > 0)
                     {
-                        var result = await db.Storageable(datas).As(_driverPropertys.ReadDBTableName).PageSize(5000).ExecuteSqlBulkCopyAsync(cancellationToken).ConfigureAwait(false);
-                        if (result > 0)
-                            LogMessage?.Trace($"RealTable Data Count：{result}");
+                        Stopwatch stopwatch = new();
+                        stopwatch.Start();
+                        var ids = (await db.Queryable<SQLRealValue>().AS(_driverPropertys.ReadDBTableName).Select(a => a.Id).ToListAsync(cancellationToken).ConfigureAwait(false)).ToHashSet();
+                        var InsertData = datas.Where(a => !ids.Contains(a.Id)).ToList();
+                        var result = await db.Fastest<SQLRealValue>().AS(_driverPropertys.ReadDBTableName).PageSize(100000).BulkCopyAsync(InsertData).ConfigureAwait(false);
+                        //var result = await db.Storageable(datas).As(_driverPropertys.ReadDBTableName).PageSize(5000).ExecuteSqlBulkCopyAsync(cancellationToken).ConfigureAwait(false);
                         _initRealData = true;
+                        stopwatch.Stop();
+                        if (result > 0)
+                        {
+                            LogMessage?.Trace($"RealTable Insert Data Count：{result}，watchTime:  {stopwatch.ElapsedMilliseconds} ms");
+                        }
                         return OperResult.Success;
                     }
                     return OperResult.Success;
@@ -179,12 +191,21 @@ public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariableModel<
                 {
                     if (datas?.Count > 0)
                     {
+                        Stopwatch stopwatch = new();
+                        stopwatch.Start();
+
                         var result = await db.Fastest<SQLRealValue>().AS(_driverPropertys.ReadDBTableName).PageSize(100000).BulkUpdateAsync(datas).ConfigureAwait(false);
-                        LogMessage?.Trace($"RealTable Data Count：{result}");
+
+                        stopwatch.Stop();
+                        if (result > 0)
+                        {
+                            LogMessage?.Trace($"RealTable Data Count：{result}，watchTime:  {stopwatch.ElapsedMilliseconds} ms");
+                        }
                         return OperResult.Success;
                     }
                     return OperResult.Success;
                 }
+
             }
         }
         catch (Exception ex)

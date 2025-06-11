@@ -11,7 +11,7 @@
             <h6 class="mt-4 " style="color:var(--bs-red);">   @Localizer["SavePlugin"] </h6>
         </div>
         <div class="col-12">
-            <ButtonUpload @ref=ButtonUpload @bind-Value="@Model.MainFile" Accept=".dll" IsSingle ShowLabelTooltip="true" />
+            <ButtonUpload @ref=ButtonUpload @bind-Value="@Model.MainFile" Accept=".dll" IsMultiple=false ShowLabelTooltip="true" />
         </div>
         <div class="col-12">
             <ButtonUpload @bind-Value="@Model.OtherFiles" IsMultiple  ShowLabelTooltip="true"/>

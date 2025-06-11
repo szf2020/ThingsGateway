@@ -939,7 +939,7 @@ namespace ThingsGateway.SqlSugar
             for (int i = 0; i < st.FrameCount; i++)
             {
                 var frame = st.GetFrame(i);
-                if (!frame.GetMethod().Module.Name.Equals("sqlsugar.dll", StringComparison.CurrentCultureIgnoreCase) && frame.GetMethod().Name.First() != '<')
+                if (!frame.GetMethod().Module.Name.Equals("thingsgateway.sqlsugar.dll", StringComparison.CurrentCultureIgnoreCase) && frame.GetMethod().Name.First() != '<')
                 {
                     info.MyStackTraceList.Add(new StackTraceInfoItem()
                     {

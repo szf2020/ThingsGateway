@@ -3,7 +3,7 @@
 <div class="row g-2 mx-1 form-inline">
 
     <div class="col-12  col-md-12">
-        <SysUserAvatarEdit Model="Model"></SysUserAvatarEdit>
+        <AvatarUpload @bind-Value="@Picture" DisplayText=@AdminLocalizer["Picture"] IsMultiple=false Accept="image/*" OnChange="OnAvatarUpload" DefaultFileList=PreviewFileList></AvatarUpload>
     </div>
 
     <div class="col-12  col-md-6">

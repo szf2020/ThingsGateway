@@ -22,7 +22,7 @@
 
                     <EditTemplate Context="caFile">
                         <div class="col-12  col-md-12">
-                            <ButtonUpload @bind-Value=@(((MqttClientProperty)caFile).CAFile_BrowserFile) OnChange="OnCAFileChange" IsSingle ShowLabelTooltip="true" IsMultiple=false IsDisabled=@(mqttClientProperty.TLS == false) />
+                            <ButtonUpload @bind-Value=@(((MqttClientProperty)caFile).CAFile_BrowserFile) OnChange="OnCAFileChange" ShowLabelTooltip="true" IsMultiple=false IsDisabled=@(mqttClientProperty.TLS == false) />
                         </div>
                     </EditTemplate>
                 </EditorItem>
@@ -31,7 +31,7 @@
 
                     <EditTemplate Context="caFile">
                         <div class="col-12  col-md-12">
-                            <ButtonUpload @bind-Value=@(((MqttClientProperty)caFile).ClientCertificateFile_BrowserFile) OnChange="OnClientCertificateFileChange" IsSingle ShowLabelTooltip="true" IsMultiple=false IsDisabled=@(mqttClientProperty.TLS == false) />
+                            <ButtonUpload @bind-Value=@(((MqttClientProperty)caFile).ClientCertificateFile_BrowserFile) OnChange="OnClientCertificateFileChange" ShowLabelTooltip="true" IsMultiple=false IsDisabled=@(mqttClientProperty.TLS == false) />
                         </div>
                     </EditTemplate>
                 </EditorItem>
@@ -40,7 +40,7 @@
 
                     <EditTemplate Context="caFile">
                         <div class="col-12  col-md-12">
-                            <ButtonUpload @bind-Value=@(((MqttClientProperty)caFile).ClientKeyFile_BrowserFile) OnChange="OnClientKeyFileChange" IsSingle ShowLabelTooltip="true" IsMultiple=false IsDisabled=@(mqttClientProperty.TLS == false) />
+                            <ButtonUpload @bind-Value=@(((MqttClientProperty)caFile).ClientKeyFile_BrowserFile) OnChange="OnClientKeyFileChange" ShowLabelTooltip="true" IsMultiple=false IsDisabled=@(mqttClientProperty.TLS == false) />
                         </div>
                     </EditTemplate>
                 </EditorItem>

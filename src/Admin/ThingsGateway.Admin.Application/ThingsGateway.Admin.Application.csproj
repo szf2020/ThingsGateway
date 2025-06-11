@@ -27,9 +27,9 @@
 
 	</ItemGroup>
 	<ItemGroup Condition=" '$(TargetFramework)' == 'net9.0' ">
-		<PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="9.0.5" />
-		<PackageReference Include="System.Formats.Asn1" Version="9.0.5" />
-		<PackageReference Include="System.Threading.RateLimiting" Version="9.0.5" />
+		<PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="$(NET9Version)" />
+		<PackageReference Include="System.Formats.Asn1" Version="$(NET9Version)" />
+		<PackageReference Include="System.Threading.RateLimiting" Version="$(NET9Version)" />
 	</ItemGroup>
 	<ItemGroup>
 		<Content Remove="SeedData\Admin\*.json" />

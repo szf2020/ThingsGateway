@@ -13,10 +13,10 @@
 
 	
 	<ItemGroup Condition=" '$(TargetFramework)' == 'net8.0' ">
-		<PackageReference Include="Microsoft.AspNetCore.Components.WebView" Version="8.0.16" />
+		<PackageReference Include="Microsoft.AspNetCore.Components.WebView" Version="$(NET8Version)" />
 	</ItemGroup>
 	<ItemGroup Condition=" '$(TargetFramework)' == 'net9.0' ">
-		<PackageReference Include="Microsoft.AspNetCore.Components.WebView" Version="9.0.5" />
+		<PackageReference Include="Microsoft.AspNetCore.Components.WebView" Version="$(NET9Version)" />
 	</ItemGroup>
 
 </Project>

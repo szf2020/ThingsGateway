@@ -84,7 +84,11 @@ public partial class TDengineDBProducer : BusinessBaseWithCacheIntervalVariableM
             //.Map(dest => dest.Id, src => CommonUtils.GetSingleId())
             .Map(dest => dest.Id, src => src.Id)//Id更改为变量Id
             ;//注意sqlsugar插入时无时区，直接utc时间
-
+        _config.ForType<VariableBasicData, TDengineDBHistoryValue>()
+    .Map(dest => dest.Value, src => src.Value != null ? src.Value.GetType() == typeof(string) ? src.Value.ToString() : JToken.FromObject(src.Value).ToString() : string.Empty)
+    //.Map(dest => dest.Id, src => CommonUtils.GetSingleId())
+    .Map(dest => dest.Id, src => src.Id)//Id更改为变量Id
+    ;//注意sqlsugar插入时无时区，直接utc时间
         await base.InitChannelAsync(channel, cancellationToken).ConfigureAwait(false);
     }
 

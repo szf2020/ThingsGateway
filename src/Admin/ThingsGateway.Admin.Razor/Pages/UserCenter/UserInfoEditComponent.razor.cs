@@ -40,10 +40,10 @@ public partial class UserInfoEditComponent
         GC.SuppressFinalize(this);
     }
 
-    protected override Task OnParametersSetAsync()
+    protected override void OnInitialized()
     {
         PreviewFileList = new(new[] { new UploadFile { PrevUrl = Model.Avatar } });
-        return base.OnParametersSetAsync();
+        base.OnInitialized();
     }
 
     private async Task OnAvatarUpload(UploadFile file)
@@ -58,7 +58,7 @@ public partial class UserInfoEditComponent
                 ReadAvatarToken = new CancellationTokenSource();
             }
 
-            await file.RequestBase64ImageFileAsync(format, 640, 480, 1024 * 200, ReadAvatarToken.Token);
+            await file.RequestBase64ImageFileAsync(format, 640, 480, 1024 * 200, token: ReadAvatarToken.Token);
 
             if (file.Code != 0)
             {

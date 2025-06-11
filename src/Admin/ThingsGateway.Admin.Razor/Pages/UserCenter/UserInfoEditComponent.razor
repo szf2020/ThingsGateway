@@ -4,7 +4,7 @@
 
 <ValidateForm class="p-4" Model="@Model" OnValidSubmit="OnSave">
 
-    <AvatarUpload @bind-Value="@Picture" DisplayText=@AdminLocalizer["Picture"] IsSingle Accept="image/*" OnChange="OnAvatarUpload" DefaultFileList=PreviewFileList></AvatarUpload>
+    <AvatarUpload @bind-Value="@Picture" DisplayText=@AdminLocalizer["Picture"] IsMultiple=false Accept="image/*" OnChange="OnAvatarUpload" DefaultFileList=PreviewFileList></AvatarUpload>
 
     <BootstrapInput @bind-Value=@Model.Phone></BootstrapInput>
     <BootstrapInput @bind-Value=@Model.Email></BootstrapInput>
