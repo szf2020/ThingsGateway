@@ -185,7 +185,8 @@ public static class TextFileReader
         if (fs.Length == 0) return 0;
 
         var newPos = position;
-        byte[] buffer = _bytePool.Rent(maxRead); // 从池中租借字节数组
+        var len = (int)Math.Min(fs.Length, maxRead);
+        byte[] buffer = _bytePool.Rent(len); // 从池中租借字节数组
         int index = 0;
 
         try
@@ -200,7 +201,7 @@ public static class TextFileReader
 
                 if (byteRead == -1) break;
 
-                if (index >= maxRead)
+                if (index >= len)
                 {
                     newPos = -1;
                     return newPos;

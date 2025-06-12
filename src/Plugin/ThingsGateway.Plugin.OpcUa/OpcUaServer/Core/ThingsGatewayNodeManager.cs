@@ -388,7 +388,7 @@ public class ThingsGatewayNodeManager : CustomNodeManager2
         variable.Value = Opc.Ua.TypeInfo.GetDefaultValue(variable.DataType, ValueRanks.Any, Server.TypeTree);
         var code = variableRuntime.IsOnline ? StatusCodes.Good : StatusCodes.Bad;
         variable.StatusCode = code;
-        variable.Timestamp = variableRuntime.CollectTime ?? DateTime.MinValue;
+        variable.Timestamp = variableRuntime.CollectTime;
         variable.OnWriteValue = OnWriteDataValue;
         parent?.AddChild(variable);
         NodeIdTags.AddOrUpdate($"{variableRuntime.DeviceName}.{variableRuntime.Name}", variable);

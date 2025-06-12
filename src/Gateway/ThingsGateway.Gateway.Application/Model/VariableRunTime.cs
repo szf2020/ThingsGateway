@@ -30,15 +30,16 @@ public class VariableRuntime : Variable, IVariable, IDisposable
     [AutoGenerateColumn(Visible = false, DefaultSort = false, Sortable = true)]
     [IgnoreExcel]
     public override int? SortCode { get; set; }
+
     private bool _isOnline;
-    private bool? _isOnlineChanged;
-    protected object? _value;
+    private bool _isOnlineChanged;
+    protected object _value;
 
     /// <summary>
     /// 变化时间
     /// </summary>
     [AutoGenerateColumn(Visible = true, Filterable = true, Sortable = true, Order = 5)]
-    public DateTime? ChangeTime { get; private set; } = DateTime.UnixEpoch.ToLocalTime();
+    public DateTime ChangeTime { get; private set; } = DateTime.UnixEpoch.ToLocalTime();
 
     /// <summary>
     /// 所在采集设备
@@ -46,7 +47,7 @@ public class VariableRuntime : Variable, IVariable, IDisposable
     [Newtonsoft.Json.JsonIgnore]
     [System.Text.Json.Serialization.JsonIgnore]
     [AutoGenerateColumn(Ignore = true)]
-    public DeviceRuntime? DeviceRuntime { get; set; }
+    public DeviceRuntime DeviceRuntime { get; set; }
 
     /// <summary>
     /// VariableSource
@@ -70,13 +71,13 @@ public class VariableRuntime : Variable, IVariable, IDisposable
     /// 采集时间
     /// </summary>
     [AutoGenerateColumn(Visible = true, Filterable = true, Sortable = true, Order = 5)]
-    public DateTime? CollectTime { get; private set; } = DateTime.UnixEpoch.ToLocalTime();
+    public DateTime CollectTime { get; private set; } = DateTime.UnixEpoch.ToLocalTime();
 
     /// <summary>
     /// 设备名称
     /// </summary>
     [AutoGenerateColumn(Visible = true, Filterable = true, Sortable = true, Order = 4)]
-    public string? DeviceName => DeviceRuntime?.Name;
+    public string DeviceName => DeviceRuntime?.Name;
 
     /// <summary>
     /// 是否在线
@@ -108,7 +109,7 @@ public class VariableRuntime : Variable, IVariable, IDisposable
     /// <inheritdoc/>
     /// </summary>
     [AutoGenerateColumn(Visible = true, Filterable = true, Sortable = true, Order = 5)]
-    public string? LastErrorMessage
+    public string LastErrorMessage
     {
         get
         {
@@ -123,24 +124,24 @@ public class VariableRuntime : Variable, IVariable, IDisposable
     /// 上次值
     /// </summary>
     [AutoGenerateColumn(Visible = false, Order = 6)]
-    public object? LastSetValue { get; internal set; }
+    public object LastSetValue { get; internal set; }
 
     /// <summary>
     /// 原始值
     /// </summary>
     [AutoGenerateColumn(Visible = false, Order = 6)]
-    public object? RawValue { get; internal set; }
+    public object RawValue { get; internal set; }
 
     /// <summary>
     /// 实时值
     /// </summary>
     [AutoGenerateColumn(Visible = true, Order = 6)]
-    public object? Value { get => _value; set => _value = value; }
+    public object Value { get => _value; set => _value = value; }
     /// <summary>
     /// 实时值
     /// </summary>
     [AutoGenerateColumn(Visible = true, Order = 6)]
-    public string? RuntimeType => Value?.GetType()?.ToString();
+    public string RuntimeType => Value?.GetType()?.ToString();
 
     /// <summary>
     /// 设置变量值与时间/质量戳
@@ -148,7 +149,7 @@ public class VariableRuntime : Variable, IVariable, IDisposable
     /// <param name="value"></param>
     /// <param name="dateTime"></param>
     /// <param name="isOnline"></param>
-    public OperResult SetValue(object? value, DateTime dateTime, bool isOnline = true)
+    public OperResult SetValue(object value, DateTime dateTime, bool isOnline = true)
     {
         IsOnline = isOnline;
         RawValue = value;
@@ -275,12 +276,12 @@ public class VariableRuntime : Variable, IVariable, IDisposable
     /// 报警值
     /// </summary>
     [AutoGenerateColumn(Visible = false)]
-    public string? AlarmCode { get; set; }
+    public string AlarmCode { get; set; }
     /// <summary>
     /// 恢复值
     /// </summary>
     [AutoGenerateColumn(Visible = false)]
-    public string? RecoveryCode { get; set; }
+    public string RecoveryCode { get; set; }
 
     /// <summary>
     /// 报警使能
@@ -298,19 +299,19 @@ public class VariableRuntime : Variable, IVariable, IDisposable
     /// 报警限值
     /// </summary>
     [AutoGenerateColumn(Visible = false)]
-    public string? AlarmLimit { get; set; }
+    public string AlarmLimit { get; set; }
 
     /// <summary>
     /// 报警文本
     /// </summary>
     [AutoGenerateColumn(Visible = false)]
-    public string? AlarmText { get; set; }
+    public string AlarmText { get; set; }
 
     /// <summary>
     /// 报警时间
     /// </summary>
     [AutoGenerateColumn(Visible = false)]
-    public DateTime? AlarmTime { get; set; }
+    public DateTime AlarmTime { get; set; }
 
     /// <summary>
     /// 报警类型
@@ -322,7 +323,7 @@ public class VariableRuntime : Variable, IVariable, IDisposable
     /// 事件时间
     /// </summary>
     [AutoGenerateColumn(Visible = false)]
-    public DateTime? EventTime { get; set; }
+    public DateTime EventTime { get; set; }
     /// <summary>
     /// 事件时间
     /// </summary>
@@ -336,6 +337,7 @@ public class VariableRuntime : Variable, IVariable, IDisposable
     public EventTypeEnum? EventType { get; set; }
 
     #endregion 报警
+
     public void Init(DeviceRuntime deviceRuntime)
     {
 
@@ -381,7 +383,7 @@ public class VariableRuntime : Variable, IVariable, IDisposable
     }
 
     /// <inheritdoc/>
-    public async ValueTask<IOperResult> RpcAsync(string value, string? executive = "brower", CancellationToken cancellationToken = default)
+    public async ValueTask<IOperResult> RpcAsync(string value, string executive = "brower", CancellationToken cancellationToken = default)
     {
         var data = await GlobalData.RpcService.InvokeDeviceMethodAsync(executive, new Dictionary<string, Dictionary<string, string>>()
         {
@@ -390,7 +392,7 @@ public class VariableRuntime : Variable, IVariable, IDisposable
         return data.FirstOrDefault().Value.FirstOrDefault().Value;
     }
 
-    public void SetErrorMessage(string? lastErrorMessage)
+    public void SetErrorMessage(string lastErrorMessage)
     {
         _lastErrorMessage = lastErrorMessage;
     }
