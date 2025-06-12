@@ -26,6 +26,9 @@
 
 	</ItemGroup>
 	<ItemGroup>
+	  <ProjectReference Include="..\ThingsGateway.Blazor.Diagrams.Core\ThingsGateway.Blazor.Diagrams.Core.csproj" />
+	</ItemGroup>
+	<ItemGroup>
 
 		<Content Update="wwwroot\**">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>

@@ -59,7 +59,7 @@ public class Startup : AppStartup
     }
 
     /// <inheritdoc/>
-    public void Use(IApplicationBuilder applicationBuilder)
+    public void Use(IServiceProvider serviceProvider)
     {
     }
 }

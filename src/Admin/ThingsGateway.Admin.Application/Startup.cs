@@ -67,7 +67,7 @@ public class Startup : AppStartup
 
     }
 
-    public void Use(IApplicationBuilder applicationBuilder)
+    public void Use(IServiceProvider serviceProvider)
     {
         //检查ConfigId
         var configIdGroup = DbContext.DbConfigs.GroupBy(it => it.ConfigId);

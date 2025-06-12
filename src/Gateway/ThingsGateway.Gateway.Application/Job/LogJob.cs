@@ -63,6 +63,17 @@ public class LogJob : IJob
         Delete(deviceBaseDir, deviceNames, stoppingToken);
 
 
+
+        //网关通道日志以通道id命名
+        var rulesService = App.RootServices.GetService<IRulesService>();
+        var ruleNames = (await rulesService.GetAllAsync().ConfigureAwait(false)).Select(a => a.Name.ToString()).ToHashSet();
+        var ruleBaseDir = RulesEngineHostedService.LogDir;
+        Directory.CreateDirectory(ruleBaseDir);
+
+        Delete(ruleBaseDir, ruleNames, stoppingToken);
+
+
+
         //底层调试
         var debugDir = LoggerExtensions.GetDebugLogBasePath();
         Directory.CreateDirectory(debugDir);

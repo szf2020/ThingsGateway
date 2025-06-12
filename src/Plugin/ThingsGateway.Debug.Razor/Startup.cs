@@ -23,7 +23,7 @@ public class Startup : AppStartup
    .AddScoped<IMenuService, DefaultMenuService>();
     }
 
-    public void Use(IApplicationBuilder applicationBuilder)
+    public void Use(IServiceProvider serviceProvider)
     {
     }
 }

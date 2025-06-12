@@ -67,13 +67,13 @@ internal static class Penetrates
             ["patch"] = "PATCH"
         };
 
-        IsApiControllerCached = new ConcurrentDictionary<Type, bool>();
+        //IsApiControllerCached = new ConcurrentDictionary<Type, bool>();
     }
 
-    /// <summary>
-    /// <see cref="IsApiController(Type)"/> 缓存集合
-    /// </summary>
-    private static readonly ConcurrentDictionary<Type, bool> IsApiControllerCached;
+    ///// <summary>
+    ///// <see cref="IsApiController(Type)"/> 缓存集合
+    ///// </summary>
+    //private static readonly ConcurrentDictionary<Type, bool> IsApiControllerCached;
 
     /// <summary>
     /// 是否是Api控制器
@@ -82,8 +82,8 @@ internal static class Penetrates
     /// <returns></returns>
     internal static bool IsApiController(Type type)
     {
-        return IsApiControllerCached.GetOrAdd(type, Function);
-
+        //return IsApiControllerCached.GetOrAdd(type, Function);
+        return Function(type);
         // 本地静态方法
         static bool Function(Type type)
         {

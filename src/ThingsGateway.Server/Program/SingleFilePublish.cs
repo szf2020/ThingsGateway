@@ -40,6 +40,7 @@ public class SingleFilePublish : ISingleFilePublish
             "ThingsGateway.NewLife.X",
             "ThingsGateway.Razor",
             "ThingsGateway.Admin.Razor"   ,
+             "ThingsGateway.DB",
             "ThingsGateway.Admin.Application",
             "ThingsGateway.SqlSugar",
 

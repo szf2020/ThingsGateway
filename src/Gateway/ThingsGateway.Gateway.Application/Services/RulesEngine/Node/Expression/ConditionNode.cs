@@ -1,0 +1,34 @@
+﻿
+using ThingsGateway.Blazor.Diagrams.Core.Geometry;
+using ThingsGateway.Blazor.Diagrams.Core.Models;
+using ThingsGateway.Gateway.Application;
+using ThingsGateway.Gateway.Application.Extensions;
+using ThingsGateway.NewLife.Extension;
+
+using TouchSocket.Core;
+
+
+
+namespace ThingsGateway.Gateway.Application;
+
+[CategoryNode(Category = "Expression", ImgUrl = "_content/ThingsGateway.Gateway.Razor/img/CSharpScript.svg", Desc = nameof(ConditionNode), LocalizerType = typeof(ThingsGateway.Gateway.Application.DefaultDiagram), WidgetType = "ThingsGateway.Gateway.Razor.CSharpScriptWidget,ThingsGateway.Gateway.Razor")]
+public class ConditionNode : TextNode, IConditionNode
+{
+    public ConditionNode(string id, Point? position = null) : base(id, position)
+    {
+        Title = "ConditionNode"; Placeholder = "ConditionNode.Placeholder";
+        Text = "return true;";
+    }
+
+
+
+
+    Task<bool> IConditionNode.ExecuteAsync(NodeInput input, CancellationToken cancellationToken)
+    {
+        var value = Text.GetExpressionsResult(input.Value, Logger);
+        var next = value.ToBoolean(false);
+        Logger?.Trace($"Condition result: {next}");
+        return Task.FromResult(next);
+    }
+
+}

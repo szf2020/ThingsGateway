@@ -29,9 +29,8 @@ public class Startup : AppStartup
         services.TryAddEnumerable(ServiceDescriptor.Singleton<IHostedService, IFileHostService>(seriveProvider => seriveProvider.GetService<IFileHostService>()));
         services.AddConfigurableOptions<UpgradeServerOptions>();
     }
-    public void Use(IApplicationBuilder applicationBuilder)
+    public void Use(IServiceProvider serviceProvider)
     {
-        var serviceProvider = applicationBuilder.ApplicationServices;
         //检查ConfigId
         var configIdGroup = DbContext.DbConfigs.GroupBy(it => it.ConfigId);
         foreach (var configId in configIdGroup)

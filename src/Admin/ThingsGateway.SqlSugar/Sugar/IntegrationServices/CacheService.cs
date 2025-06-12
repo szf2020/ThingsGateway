@@ -117,7 +117,7 @@
             }
         }
     }
-    internal static class ReflectionInoHelper
+    public static class ReflectionInoHelper
     {
         private static List<Action> removeActions = new List<Action>();
         internal static void AddRemoveFunc(Action removeAction)

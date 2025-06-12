@@ -1,4 +1,118 @@
 ﻿{
+
+  "ThingsGateway.Gateway.Application.DefaultDiagram": {
+
+    "Actuator": "Actuator",
+    "AlarmChangedTriggerNode": "AlarmStateTrigger",
+    "BusinessNode": "BusinessDeviceExecution",
+    "BusinessNode.Placeholder": "BusinessDeviceName",
+    "Cancel": "Cancel",
+    "Clear": "Clear",
+    "ConditionNode": "Condition",
+    "ConditionNode.Placeholder": "Calculation returns boolean",
+    "DataNode": "DataScript",
+    "DelayNode": "Delay",
+    "DelayNode.Placeholder": "Interval Time (ms)",
+    "Design": "Design",
+    "Device.Placeholder": "DeviceName",
+    "DeviceChangedTriggerNode": "DeviceStateTrigger",
+    "Download": "Download JSON",
+    "End": "End",
+    "EndNode": "End",
+    "ExecuteScriptNode": "CustomExecution",
+    "Expression": "Script",
+    "Load": "Load JSON",
+    "Other": "Other",
+    "Save": "Save",
+    "Start": "Start",
+    "Start/End": "Start/End",
+    "StartNode": "Start",
+    "TimeIntervalTriggerNode": "IntervalExecutionTrigger",
+    "TimeIntervalTriggerNode.Placeholder": "IntervalTime (ms)",
+    "Trigger": "Trigger",
+    "ValueChangedTriggerNode": "VariableStateTrigger",
+    "Variable.Placeholder": "VariableName",
+    "VariableRpcNode": "VariableRpc",
+    "VariableRpcNode.Placeholder": "VariableName",
+    "ZoomToFit": "ZoomToFit"
+
+  },
+
+  "ThingsGateway.Gateway.Application.Rules": {
+    "ClearRules": "ClearRules",
+    "DeleteRules": "DeleteRules",
+    "Name": "Name",
+    "SaveRules": "SaveRules",
+    "SortCode": "SortCode",
+    "Status": "Status"
+  },
+
+  "ThingsGateway.Gateway.Application.RulesStatus": {
+    "LogConsole": "Log",
+    "RulesId": "Name"
+  },
+
+  "ThingsGateway.Management.Authentication": {
+    "AuthName": "AuthName",
+    "Authorized": "Authorized",
+    "ExpireTime": "ExpireTime",
+    "Password": "Password",
+    "Register": "Register",
+    "RegisterStatus": "RegisterStatus",
+    "Unauthorized": "Unauthorized",
+    "Unregister": "Unregister",
+    "UUID": "UUID"
+  },
+  "ThingsGateway.Management.AutoUpdateController": {
+    "AutoUpdateController": "AutoUpdate",
+    "Update": "Update"
+  },
+  "ThingsGateway.Management.RedundancyHostedService": {
+    "ErrorSynchronizingData": "Synchronize data to standby site error",
+    "RedundancyDisable": "Redundant gateway site not enabled",
+    "RedundancyDup": "Redundant station settings duplicated",
+    "Start": "Gateway management service started",
+    "Stop": "Gateway management service stopped",
+    "SwitchMasterState": "Cannot connect to redundant site, local machine will switch to normal state",
+    "SwitchNormalState": "Local machine (primary site) will switch to normal state",
+    "SwitchSlaveState": "Master site has recovered, local machine (standby) will switch to standby state"
+  },
+  "ThingsGateway.Management.RedundancyOptions": {
+    "Confirm": "Confirm switching to redundant state",
+    "Enable": "Enable Dual-Machine Redundancy",
+    "ForcedSync": "Forced Synchronous",
+    "ForcedSyncWarning": "Forcing synchronization will generate database configuration information.Are you sure you want to continue?",
+    "HeartbeatInterval": "Heartbeat Interval",
+    "IsMaster": "IsMaster",
+    "IsStartBusinessDevice": "Enable Business Device in Slave Site",
+    "Master": "Active Node",
+    "MasterUri": "Master Node URL",
+    "MaxErrorCount": "Maximum Error Count",
+    "RedundancyOptions": "Dual-Machine Redundancy",
+    "Restart": "The redundant service will be restarted soon",
+    "Slave": "Slave Node",
+    "Status": "Current Site Status",
+    "Switch": "Switch",
+    "SyncInterval": "Data Synchronization Interval",
+    "VerifyToken": "Verification Token"
+  },
+  "ThingsGateway.Management.RedundancyService": {
+    "EditRedundancyOption": "EditRedundancyOption"
+  },
+  "ThingsGateway.Management.UpdateZipFileHostedService": {
+    "Update": "New version detected"
+  },
+  "ThingsGateway.Upgrade.UpdateZipFile": {
+    "AppName": "AppName",
+    "Architecture": "Architecture",
+    "DotNetVersion": "DotNetVersion",
+    "FilePath": "FilePath",
+    "FileSize": "FileSize",
+    "MinimumCompatibleVersion": "MinimumCompatibleVersion",
+    "OSPlatform": "OSPlatform",
+    "Version": "Version"
+  },
+
   "ThingsGateway.Gateway.Application.AlarmVariable": {
     "AlarmCode": "AlarmCode",
     "AlarmDelay": "AlarmDelay",

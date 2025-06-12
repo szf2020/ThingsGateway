@@ -32,11 +32,10 @@ public class Startup : AppStartup
 
         StaticConfig.EnableAllWhereIF = true;
 
-        services.AddSingleton<ISugarAopService, SugarAopService>();
 
     }
 
-    public void Use(IApplicationBuilder applicationBuilder)
+    public void Use(IServiceProvider serviceProvider)
     {
 
 

@@ -17,5 +17,6 @@ global using System.Diagnostics.CodeAnalysis;
 
 global using ThingsGateway.Razor;
 
+global using ThingsGateway.Gateway.Application;
 
 [assembly: SuppressMessage("Reliability", "CA2007", Justification = "<挂起>", Scope = "module")]

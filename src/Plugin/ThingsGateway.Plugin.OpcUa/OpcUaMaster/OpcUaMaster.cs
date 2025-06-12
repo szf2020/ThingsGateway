@@ -321,7 +321,7 @@ public class OpcUaMaster : CollectBase
 
     private Dictionary<string, List<VariableRuntime>> VariableAddresDicts { get; set; } = new();
 
-    private void DataChangedHandler((VariableNode variableNode, MonitoredItem monitoredItem, DataValue dataValue, JToken jToken) data)
+    private void DataChangedHandler((Opc.Ua.VariableNode variableNode, MonitoredItem monitoredItem, DataValue dataValue, JToken jToken) data)
     {
         DateTime time = DateTime.Now;
         try

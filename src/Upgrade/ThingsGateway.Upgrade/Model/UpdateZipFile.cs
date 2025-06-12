@@ -1,4 +1,6 @@
-﻿using System.Runtime.InteropServices;
+﻿using BootstrapBlazor.Components;
+
+using System.Runtime.InteropServices;
 
 namespace ThingsGateway.Upgrade;
 

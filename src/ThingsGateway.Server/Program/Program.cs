@@ -14,6 +14,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 
 using ThingsGateway.NewLife.Log;
+using ThingsGateway.SqlSugar;
 
 namespace ThingsGateway.Server;
 
@@ -88,7 +89,6 @@ public class Program
                    u.Limits.MaxRequestBodySize = null;
                });
 
-               //builder.Services.AddSingleton<ThingsGateway.Razor.IRegisterService, ThingsGateway.Razor.RegisterService>();
            })
             .Configure(app =>
             {
@@ -103,6 +103,8 @@ public class Program
 
 #endif
 
+                ReflectionInoHelper.RemoveAllCache();
+                InstanceFactory.RemoveCache();
             })
             ).ConfigureAwait(false);
 

@@ -17,7 +17,10 @@ using Microsoft.Extensions.Logging;
 using System.Reflection;
 
 using ThingsGateway.Authentication;
+using ThingsGateway.Management;
+using ThingsGateway.Gateway.Application;
 using ThingsGateway.SqlSugar;
+using ThingsGateway.Upgrade;
 
 namespace ThingsGateway.Gateway.Application;
 
@@ -26,6 +29,23 @@ public class Startup : AppStartup
 {
     public void Configure(IServiceCollection services)
     {
+        #region R
+
+        services.AddSingleton<IRulesService, RulesService>();
+        services.AddGatewayHostedService<IRulesEngineHostedService, RulesEngineHostedService>();
+
+        #endregion
+
+        #region M
+
+        services.AddSingleton<IRedundancyService, RedundancyService>();
+        services.AddGatewayHostedService<IRedundancyHostedService, RedundancyHostedService>();
+        services.AddGatewayHostedService<IUpdateZipFileHostedService, UpdateZipFileHostedService>();
+        services.AddSingleton<GatewayRedundantSerivce>();
+        services.AddSingleton<IGatewayRedundantSerivce>(provider => provider.GetRequiredService<GatewayRedundantSerivce>());
+        services.AddConfigurableOptions<UpgradeServerOptions>();
+
+        #endregion
 
         ProAuthentication.TryGetAuthorizeInfo(out var authorizeInfo);
 
@@ -72,9 +92,8 @@ public class Startup : AppStartup
         services.AddGatewayHostedService<IGatewayMonitorHostedService, GatewayMonitorHostedService>();
     }
 
-    public void Use(IApplicationBuilder applicationBuilder)
+    public void Use(IServiceProvider serviceProvider)
     {
-        var serviceProvider = applicationBuilder.ApplicationServices;
         //检查ConfigId
         var configIdGroup = DbContext.DbConfigs.GroupBy(it => it.ConfigId);
         foreach (var configId in configIdGroup)

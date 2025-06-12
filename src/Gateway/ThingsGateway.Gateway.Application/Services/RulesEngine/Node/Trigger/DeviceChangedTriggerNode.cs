@@ -1,0 +1,100 @@
+﻿
+using ThingsGateway.Blazor.Diagrams.Core.Geometry;
+using ThingsGateway.Blazor.Diagrams.Core.Models;
+using System.Collections.Concurrent;
+
+using ThingsGateway.Foundation;
+using ThingsGateway.Gateway.Application;
+
+using TouchSocket.Core;
+
+namespace ThingsGateway.Gateway.Application;
+
+[CategoryNode(Category = "Trigger", ImgUrl = "_content/ThingsGateway.Gateway.Razor/img/ValueChanged.svg", Desc = nameof(DeviceChangedTriggerNode), LocalizerType = typeof(ThingsGateway.Gateway.Application.DefaultDiagram), WidgetType = "ThingsGateway.Gateway.Razor.DeviceWidget,ThingsGateway.Gateway.Razor")]
+public class DeviceChangedTriggerNode : TextNode, ITriggerNode, IDisposable
+{
+    public DeviceChangedTriggerNode(string id, Point? position = null) : base(id, position) { Title = "DeviceChangedTriggerNode"; Placeholder = "Device.Placeholder"; }
+
+
+    private Func<NodeOutput, Task> Func { get; set; }
+    Task ITriggerNode.StartAsync(Func<NodeOutput, Task> func)
+    {
+        Func = func;
+        FuncDict.Add(this, func);
+        if (!DeviceChangedTriggerNodeDict.TryGetValue(Text ?? string.Empty, out var list))
+        {
+            var deviceChangedTriggerNodes = new ConcurrentList<DeviceChangedTriggerNode>();
+            deviceChangedTriggerNodes.Add(this);
+            DeviceChangedTriggerNodeDict.Add(Text, deviceChangedTriggerNodes);
+        }
+        else
+        {
+            list.Add(this);
+        }
+        return Task.CompletedTask;
+    }
+    public static Dictionary<string, ConcurrentList<DeviceChangedTriggerNode>> DeviceChangedTriggerNodeDict = new();
+    public static Dictionary<DeviceChangedTriggerNode, Func<NodeOutput, Task>> FuncDict = new();
+
+    public static BlockingCollection<DeviceBasicData> DeviceDatas = new();
+
+    static DeviceChangedTriggerNode()
+    {
+        _ = RunAsync();
+        GlobalData.DeviceStatusChangeEvent += GlobalData_DeviceStatusChangeEvent;
+    }
+
+    private static void GlobalData_DeviceStatusChangeEvent(DeviceRuntime deviceRunTime, DeviceBasicData deviceData)
+    {
+        if (DeviceChangedTriggerNodeDict.TryGetValue(deviceData.Name ?? string.Empty, out var deviceChangedTriggerNodes) && deviceChangedTriggerNodes?.Count > 0)
+        {
+            if (!DeviceDatas.IsAddingCompleted)
+            {
+                try
+                {
+                    DeviceDatas.Add(deviceData);
+                    return;
+                }
+                catch (InvalidOperationException) { }
+                catch { }
+            }
+        }
+    }
+    static Task RunAsync()
+    {
+        return DeviceDatas.GetConsumingEnumerable().ParallelForEachAsync((async (deviceDatas, token) =>
+            {
+
+                if (DeviceChangedTriggerNodeDict.TryGetValue(deviceDatas.Name ?? string.Empty, out var valueChangedTriggerNodes))
+                {
+                    await valueChangedTriggerNodes.ParallelForEachAsync(async (item, token) =>
+                     {
+                         try
+                         {
+                             if (FuncDict.TryGetValue(item, out var func))
+                             {
+                                 item.Logger?.Trace($"Device changed: {item.Text}");
+                                 await func.Invoke(new NodeOutput() { Value = deviceDatas }).ConfigureAwait(false);
+
+                             }
+                         }
+                         catch (Exception ex)
+                         {
+                             item.Logger?.LogWarning(ex);
+                         }
+                     }, token).ConfigureAwait(false);
+                }
+            }), default);
+    }
+
+
+    public void Dispose()
+    {
+        FuncDict.Remove(this);
+        if (DeviceChangedTriggerNodeDict.TryGetValue(Text ?? string.Empty, out var list))
+        {
+            list.Remove(this);
+        }
+    }
+}
+

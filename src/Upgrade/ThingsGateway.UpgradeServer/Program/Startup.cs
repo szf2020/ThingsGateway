@@ -45,11 +45,11 @@ public class Startup : AppStartup
             options.ServicesStopConcurrently = true;
         });
 
-        // 事件总线
-        services.AddEventBus(options =>
-        {
+        //// 事件总线
+        //services.AddEventBus(options =>
+        //{
 
-        });
+        //});
 
         // 任务调度
         services.AddSchedule(options =>
@@ -145,8 +145,6 @@ public class Startup : AppStartup
             options.KnownProxies.Clear();
         });
 
-
-        services.AddHealthChecks();
 
 
         #region 控制台美化

@@ -1,43 +1,51 @@
 <Project>
 
-<!--Gateway-->
+	<!--Gateway-->
 
-  <ItemGroup>
-    <PackageReference Include="ThingsGateway.Gateway.Razor" Version="$(Version)" />
-    <PackageReference Include="ThingsGateway.Gateway.Application" Version="$(Version)" GeneratePathProperty="true"/>
-  </ItemGroup>
-  
-  <Target Name="_ResolveCopyGatewayLocalNuGetPkgXmls" AfterTargets="ResolveReferences">
-    <ItemGroup>
-      <ReferenceCopyLocalPaths Include="@(ReferenceCopyLocalPaths->'%(RootDir)%(Directory)%(Filename).xml')" Condition="'%(ReferenceCopyLocalPaths.NuGetPackageId)'=='ThingsGateway.Gateway.Application' and Exists('%(RootDir)%(Directory)%(Filename).xml')" />
-    </ItemGroup>
-  </Target>
-  
-  <Target Name="CopyGatewayNugetPackages" AfterTargets="Build">
-    <ItemGroup>
-      <!-- setting up the variable for convenience -->
-      <GatewayApplicationPackageFiles Include="$(PkgThingsGateway_Gateway_Application)\Content\SeedData\Gateway\*.*" />
-    </ItemGroup>
-    <PropertyGroup>
-      <GatewayApplicationFolder>$(TargetDir)SeedData\Gateway\</GatewayApplicationFolder>
-    </PropertyGroup>
-    <RemoveDir Directories="$(GatewayApplicationFolder)" />
-    <Copy SourceFiles="@(GatewayApplicationPackageFiles)" DestinationFolder="$(GatewayApplicationFolder)%(RecursiveDir)" />
+	<ItemGroup>
+		<PackageReference Include="ThingsGateway.Gateway.Razor" Version="$(Version)" />
+		<PackageReference Include="ThingsGateway.Gateway.Application" Version="$(Version)" GeneratePathProperty="true"/>
+	</ItemGroup>
 
-  </Target>
-  
-  <Target Name="GatewayPostPublish" AfterTargets="Publish">
-    <ItemGroup>
-      <!-- setting up the variable for convenience -->
-      <GatewayFiles Include="bin\$(Configuration)\$(TargetFramework)\SeedData\**" />
-    </ItemGroup>
-    <PropertyGroup>
-    </PropertyGroup>
-    <Copy SourceFiles="@(GatewayFiles)" DestinationFolder="$(PublishDir)SeedData\%(RecursiveDir)" />
+	<Target Name="_ResolveCopyGatewayLocalNuGetPkgXmls" AfterTargets="ResolveReferences">
+		<ItemGroup>
+			<ReferenceCopyLocalPaths Include="@(ReferenceCopyLocalPaths->'%(RootDir)%(Directory)%(Filename).xml')" Condition="'%(ReferenceCopyLocalPaths.NuGetPackageId)'=='ThingsGateway.Gateway.Application' and Exists('%(RootDir)%(Directory)%(Filename).xml')" />
+		</ItemGroup>
+	</Target>
 
-  </Target>
+	<Target Name="CopyGatewayNugetPackages" AfterTargets="Build">
+		<ItemGroup>
+			<!-- setting up the variable for convenience -->
+			<RulesEngineApplicationPackageFiles Include="$(PkgThingsGateway_Gateway_Application)\Content\SeedData\RulesEngine\*.*" />
+			<ManagementApplicationPackageFiles Include="$(PkgThingsGateway_Gateway_Application)\Content\SeedData\Management\*.*" />
+			<GatewayApplicationPackageFiles Include="$(PkgThingsGateway_Gateway_Application)\Content\SeedData\Gateway\*.*" />
+		</ItemGroup>
+		<PropertyGroup>
+			<RulesEngineApplicationFolder>$(TargetDir)SeedData\RulesEngine\</RulesEngineApplicationFolder>
+			<ManagementApplicationFolder>$(TargetDir)SeedData\SeedData\</ManagementApplicationFolder>
+			<GatewayApplicationFolder>$(TargetDir)SeedData\Gateway\</GatewayApplicationFolder>
+		</PropertyGroup>
+		<RemoveDir Directories="$(RulesEngineApplicationFolder)" />
+		<RemoveDir Directories="$(ManagementApplicationFolder)" />
+		<RemoveDir Directories="$(GatewayApplicationFolder)" />
+		<Copy SourceFiles="@(RulesEngineApplicationPackageFiles)" DestinationFolder="$(RulesEngineApplicationFolder)%(RecursiveDir)" />
+		<Copy SourceFiles="@(ManagementApplicationPackageFiles)" DestinationFolder="$(ManagementApplicationFolder)%(RecursiveDir)" />
+		<Copy SourceFiles="@(GatewayApplicationPackageFiles)" DestinationFolder="$(GatewayApplicationFolder)%(RecursiveDir)" />
 
-  <!--Gateway-->
+	</Target>
 
-  
+	<Target Name="GatewayPostPublish" AfterTargets="Publish">
+		<ItemGroup>
+			<!-- setting up the variable for convenience -->
+			<GatewayFiles Include="bin\$(Configuration)\$(TargetFramework)\SeedData\**" />
+		</ItemGroup>
+		<PropertyGroup>
+		</PropertyGroup>
+		<Copy SourceFiles="@(GatewayFiles)" DestinationFolder="$(PublishDir)SeedData\%(RecursiveDir)" />
+
+	</Target>
+
+	<!--Gateway-->
+
+
 </Project>

@@ -12,6 +12,9 @@ namespace ThingsGateway.Gateway.Application;
 
 public static class AppResource
 {
+
+    public static string RulesEngineTaskStart => ThingsGateway.Foundation.AppResource.Lang == Language.Chinese ? ChineseResource.RulesEngineTaskStart : EnglishResource.RulesEngineTaskStart;
+
     public static string RealAlarmTaskStart => ThingsGateway.Foundation.AppResource.Lang == Language.Chinese ? ChineseResource.RealAlarmTaskStart : EnglishResource.RealAlarmTaskStart;
     public static string IntervalInsertAlarmFail => ThingsGateway.Foundation.AppResource.Lang == Language.Chinese ? ChineseResource.IntervalInsertAlarmFail : EnglishResource.IntervalInsertAlarmFail;
     public static string IntervalInsertDeviceFail => ThingsGateway.Foundation.AppResource.Lang == Language.Chinese ? ChineseResource.IntervalInsertDeviceFail : EnglishResource.IntervalInsertDeviceFail;
@@ -44,6 +47,7 @@ public static class AppResource
 
 public static class ChineseResource
 {
+    public const string RulesEngineTaskStart = "规则引擎线程启动";
 
     public const string RealAlarmTaskStart = "实时报警服务启动";
     public const string IntervalInsertAlarmFail = "间隔上传报警失败";
@@ -80,6 +84,8 @@ public static class ChineseResource
 
 public static class EnglishResource
 {
+    public const string RulesEngineTaskStart = "Rules engine service started";
+
     public const string RealAlarmTaskStart = "Real-time alarm service started";
     public const string IntervalInsertAlarmFail = "Failed to upload alarms periodically";
     public const string IntervalInsertDeviceFail = "Failed to upload device data periodically";
