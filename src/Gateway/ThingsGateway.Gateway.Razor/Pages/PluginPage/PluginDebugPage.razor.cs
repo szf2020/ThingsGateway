@@ -105,11 +105,12 @@ public partial class PluginDebugPage
                     Title = pluginInfo.Name,
                     ContentTemplate = debugRender,
                     Max = false,
-                    Width = "1440px",
-                    Height = "810px",
-                    Top = "70px",
-                    Left = "220px",
+                    Width = "80%",
+                    Height = "80%",
+                    Top = "0%",
+                    Left = "10%",
                     Background = "var(--bb-primary-color)",
+                    Overflow = true
                 };
                 await WinBoxService.Show(option);
             }
