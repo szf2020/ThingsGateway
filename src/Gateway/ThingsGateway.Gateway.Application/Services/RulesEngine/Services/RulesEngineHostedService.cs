@@ -16,7 +16,6 @@ using Microsoft.Extensions.Logging;
 
 using ThingsGateway.Blazor.Diagrams.Core;
 using ThingsGateway.Blazor.Diagrams.Core.Models;
-using ThingsGateway.Gateway.Application;
 using ThingsGateway.NewLife;
 
 using TouchSocket.Core;

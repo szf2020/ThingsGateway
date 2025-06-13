@@ -10,7 +10,6 @@
 
 using Mapster;
 
-using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
@@ -18,7 +17,6 @@ using System.Reflection;
 
 using ThingsGateway.Authentication;
 using ThingsGateway.Management;
-using ThingsGateway.Gateway.Application;
 using ThingsGateway.SqlSugar;
 using ThingsGateway.Upgrade;
 

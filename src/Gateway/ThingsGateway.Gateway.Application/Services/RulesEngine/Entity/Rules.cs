@@ -4,7 +4,6 @@ using Newtonsoft.Json.Linq;
 
 using System.ComponentModel.DataAnnotations;
 
-using ThingsGateway.Admin.Application;
 using ThingsGateway.Blazor.Diagrams.Core.Geometry;
 using ThingsGateway.Blazor.Diagrams.Core.Models;
 using ThingsGateway.SqlSugar;

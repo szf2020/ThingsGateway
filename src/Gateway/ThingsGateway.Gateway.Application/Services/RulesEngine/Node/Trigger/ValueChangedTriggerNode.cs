@@ -1,10 +1,7 @@
 ﻿
-using ThingsGateway.Blazor.Diagrams.Core.Geometry;
-using ThingsGateway.Blazor.Diagrams.Core.Models;
 using System.Collections.Concurrent;
 
-using ThingsGateway.Foundation;
-using ThingsGateway.Gateway.Application;
+using ThingsGateway.Blazor.Diagrams.Core.Geometry;
 
 using TouchSocket.Core;
 

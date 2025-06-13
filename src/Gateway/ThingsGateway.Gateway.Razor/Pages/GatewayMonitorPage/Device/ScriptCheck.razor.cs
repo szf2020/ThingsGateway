@@ -8,7 +8,6 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-using ThingsGateway.Gateway.Application;
 using ThingsGateway.NewLife.Json.Extension;
 
 namespace ThingsGateway.Gateway.Razor;

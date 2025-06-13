@@ -1,6 +1,5 @@
 ﻿
 using ThingsGateway.Blazor.Diagrams.Core.Geometry;
-using ThingsGateway.Blazor.Diagrams.Core.Models;
 
 using TouchSocket.Core;
 

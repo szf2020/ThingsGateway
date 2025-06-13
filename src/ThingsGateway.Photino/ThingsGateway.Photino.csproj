@@ -14,8 +14,6 @@
 	<!--发布版-->
 	<Import Project="..\ThingsGateway.Server\targets\Gateway.targets" Condition=" '$(SolutionName)' == 'ThingsGatewayRelease' " />
 	<Import Project="..\ThingsGateway.Server\targets\Admin.targets" Condition=" '$(SolutionName)' == 'ThingsGatewayRelease' " />
-	<!--nuget包解压复制文件，上下文动态加载，网关管理和网关冗余-->
-	<Import Project="..\ThingsGateway.Server\targets\GatewayOther.targets" Condition=" '$(SolutionName)' == 'ThingsGatewayRelease' " />
 	
 	<ItemGroup Condition=" '$(SolutionName)' == 'ThingsGatewayRelease' ">
 		<PackageReference Include="ThingsGateway.Photino.Blazor" Version="$(Version)" />

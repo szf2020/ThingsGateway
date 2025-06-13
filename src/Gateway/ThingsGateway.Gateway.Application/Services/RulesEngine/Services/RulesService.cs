@@ -12,9 +12,7 @@ using BootstrapBlazor.Components;
 
 using System.Data;
 
-using ThingsGateway.Admin.Application;
 using ThingsGateway.Extension.Generic;
-using ThingsGateway.Gateway.Application;
 using ThingsGateway.SqlSugar;
 
 using TouchSocket.Core;

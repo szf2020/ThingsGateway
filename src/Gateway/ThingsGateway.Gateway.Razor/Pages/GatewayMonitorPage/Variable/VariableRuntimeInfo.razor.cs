@@ -15,7 +15,6 @@ using Microsoft.Extensions.Options;
 
 using ThingsGateway.Admin.Application;
 using ThingsGateway.Extension.Generic;
-using ThingsGateway.Gateway.Application;
 using ThingsGateway.NewLife.Extension;
 using ThingsGateway.NewLife.Json.Extension;
 

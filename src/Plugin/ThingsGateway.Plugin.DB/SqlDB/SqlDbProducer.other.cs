@@ -174,17 +174,17 @@ public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariableModel<
 
                 if (!_initRealData)
                 {
-                        Stopwatch stopwatch = new();
-                        stopwatch.Start();
-                        var ids = (await db.Queryable<SQLRealValue>().AS(_driverPropertys.ReadDBTableName).Select(a => a.Id).ToListAsync(cancellationToken).ConfigureAwait(false)).ToHashSet();
-                        var InsertData = IdVariableRuntimes.Where(a => !ids.Contains(a.Key)).Select(a=>a.Value).Adapt<List<SQLRealValue>>();
-                        var result = await db.Fastest<SQLRealValue>().AS(_driverPropertys.ReadDBTableName).PageSize(100000).BulkCopyAsync(InsertData).ConfigureAwait(false);
-                        _initRealData = true;
-                        stopwatch.Stop();
-                        if (result > 0)
-                        {
-                            LogMessage?.Trace($"RealTable Insert Data Count：{result}，watchTime:  {stopwatch.ElapsedMilliseconds} ms");
-                        }
+                    Stopwatch stopwatch = new();
+                    stopwatch.Start();
+                    var ids = (await db.Queryable<SQLRealValue>().AS(_driverPropertys.ReadDBTableName).Select(a => a.Id).ToListAsync(cancellationToken).ConfigureAwait(false)).ToHashSet();
+                    var InsertData = IdVariableRuntimes.Where(a => !ids.Contains(a.Key)).Select(a => a.Value).Adapt<List<SQLRealValue>>();
+                    var result = await db.Fastest<SQLRealValue>().AS(_driverPropertys.ReadDBTableName).PageSize(100000).BulkCopyAsync(InsertData).ConfigureAwait(false);
+                    _initRealData = true;
+                    stopwatch.Stop();
+                    if (result > 0)
+                    {
+                        LogMessage?.Trace($"RealTable Insert Data Count：{result}，watchTime:  {stopwatch.ElapsedMilliseconds} ms");
+                    }
                 }
                 {
                     if (datas?.Count > 0)

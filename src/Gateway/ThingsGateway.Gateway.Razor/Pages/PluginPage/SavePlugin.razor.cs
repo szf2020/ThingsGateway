@@ -10,8 +10,6 @@
 
 using Microsoft.AspNetCore.Components.Forms;
 
-using ThingsGateway.Gateway.Application;
-
 namespace ThingsGateway.Gateway.Razor;
 
 public partial class SavePlugin

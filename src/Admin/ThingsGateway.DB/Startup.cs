@@ -10,7 +10,6 @@
 
 using BootstrapBlazor.Components;
 
-using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 
 using ThingsGateway.SqlSugar;

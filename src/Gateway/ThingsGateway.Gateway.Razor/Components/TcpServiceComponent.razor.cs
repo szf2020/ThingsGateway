@@ -12,7 +12,6 @@ using Mapster;
 
 using ThingsGateway.Admin.Application;
 using ThingsGateway.Foundation;
-using ThingsGateway.Gateway.Application;
 using ThingsGateway.NewLife.Json.Extension;
 
 using TouchSocket.Core;

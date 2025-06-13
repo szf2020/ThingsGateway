@@ -9,7 +9,6 @@
 // ------------------------------------------------------------------------------
 
 using ThingsGateway.Extension.Generic;
-using ThingsGateway.Gateway.Application;
 using ThingsGateway.NewLife.Extension;
 
 namespace ThingsGateway.Gateway.Razor

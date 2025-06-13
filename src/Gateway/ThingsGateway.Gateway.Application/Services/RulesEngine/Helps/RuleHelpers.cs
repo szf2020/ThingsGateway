@@ -19,8 +19,6 @@ using ThingsGateway.Blazor.Diagrams.Core.Anchors;
 using ThingsGateway.Blazor.Diagrams.Core.Geometry;
 using ThingsGateway.Blazor.Diagrams.Core.Models;
 
-using static Dm.net.buffer.ByteArrayBuffer;
-
 namespace ThingsGateway.Gateway.Application;
 
 public static class RuleHelpers

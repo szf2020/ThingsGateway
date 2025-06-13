@@ -11,7 +11,6 @@
 using Mapster;
 
 using ThingsGateway.Admin.Application;
-using ThingsGateway.Gateway.Application;
 
 namespace ThingsGateway.Gateway.Razor;
 

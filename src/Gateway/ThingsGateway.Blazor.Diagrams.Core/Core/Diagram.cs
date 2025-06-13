@@ -1,6 +1,4 @@
-﻿using System.Runtime.CompilerServices;
-
-using ThingsGateway.Blazor.Diagrams.Core.Behaviors;
+﻿using ThingsGateway.Blazor.Diagrams.Core.Behaviors;
 using ThingsGateway.Blazor.Diagrams.Core.Controls;
 using ThingsGateway.Blazor.Diagrams.Core.Events;
 using ThingsGateway.Blazor.Diagrams.Core.Extensions;

@@ -13,7 +13,6 @@ using Microsoft.AspNetCore.Components.Web;
 
 using System.Collections.Concurrent;
 
-using ThingsGateway.Gateway.Application;
 using ThingsGateway.NewLife.Extension;
 using ThingsGateway.NewLife.Json.Extension;
 
