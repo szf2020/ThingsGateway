@@ -33,7 +33,7 @@
             </PopConfirmButton>
             <PopConfirmButton Color=Color.Warning IsDisabled="SelectedRows.Count!=1||!AuthorizeButton(AdminOperConst.Edit)" Text=@OperDescLocalizer["ChangeParentResource"] Icon="fa fa-copy" OnConfirm="OnChangeParent">
                 <BodyTemplate>
-                    <div class="min-height-500 overflow-y-auto">
+                    <div class="overflow-y-auto" style="height:500px">
                         <TreeView Items="MenuTreeItems" IsVirtualize="true" OnTreeItemClick="a=>{ChangeParentId=a.Value.Id;return Task.CompletedTask;}" />
                     </div>
                 </BodyTemplate>
