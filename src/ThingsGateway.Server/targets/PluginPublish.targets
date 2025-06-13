@@ -16,4 +16,12 @@
 	</Target>
 
 
+	<Target Name="RemoveXmlDocs" AfterTargets="Build">
+		<ItemGroup>
+			<XmlFilesToDelete Include="$(OutputPath)*.xml" />
+		</ItemGroup>
+		<Delete Files="@(XmlFilesToDelete)" />
+	</Target>
+	
+
 </Project>

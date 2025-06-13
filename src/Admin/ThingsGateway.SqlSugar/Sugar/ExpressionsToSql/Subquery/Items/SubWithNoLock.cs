@@ -43,7 +43,7 @@ namespace ThingsGateway.SqlSugar
             }
             else
             {
-                return "";
+                return string.Empty;
             }
         }
     }

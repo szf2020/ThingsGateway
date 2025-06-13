@@ -245,7 +245,7 @@ namespace ThingsGateway.SqlSugar
 
         public string GetMemberName(MemberExpression memberExpression)
         {
-            return "";
+            return string.Empty;
         }
 
         private void ExtMapper(MapperExpressionInfo fillInfo, MapperExpressionInfo mappingFild1Info, MapperExpressionInfo mappingFild1Info2, MapperExpressionInfo selectInfo)

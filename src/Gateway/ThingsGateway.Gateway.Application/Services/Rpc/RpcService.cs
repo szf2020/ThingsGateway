@@ -18,6 +18,7 @@ using System.Collections.Concurrent;
 using ThingsGateway.Extension;
 using ThingsGateway.Extension.Generic;
 using ThingsGateway.NewLife.Json.Extension;
+using ThingsGateway.SqlSugar;
 
 using TouchSocket.Core;
 
@@ -249,12 +250,13 @@ internal sealed class RpcService : IRpcService
         return new(results);
     }
 
+    private SqlSugarClient _db = DbContext.Db.GetConnectionScopeWithAttr<RpcLog>().CopyNew(); // 创建一个新的数据库上下文实例
+
     /// <summary>
     /// 异步执行RPC日志插入操作的方法。
     /// </summary>
     private async Task RpcLogInsertAsync()
     {
-        var db = DbContext.Db.GetConnectionScopeWithAttr<RpcLog>().CopyNew(); // 创建一个新的数据库上下文实例
         var appLifetime = App.RootServices!.GetService<IHostApplicationLifetime>()!;
         while (!appLifetime.ApplicationStopping.IsCancellationRequested)
         {
@@ -264,7 +266,7 @@ internal sealed class RpcService : IRpcService
                 if (data.Count > 0)
                 {
                     // 将数据插入到数据库中
-                    await db.InsertableWithAttr(data).ExecuteCommandAsync(appLifetime.ApplicationStopping).ConfigureAwait(false);
+                    await _db.InsertableWithAttr(data).ExecuteCommandAsync(appLifetime.ApplicationStopping).ConfigureAwait(false);
                 }
             }
             catch (Exception ex)

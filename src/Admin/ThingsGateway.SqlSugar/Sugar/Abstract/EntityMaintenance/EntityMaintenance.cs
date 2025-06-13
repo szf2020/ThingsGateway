@@ -201,9 +201,9 @@ namespace ThingsGateway.SqlSugar
             try
             {
 
-                if (this.Context.CurrentConnectionConfig?.MoreSettings?.IsNoReadXmlDescription == true)
+                if (this.Context.CurrentConnectionConfig?.MoreSettings?.IsNoReadXmlDescription ?? true == true)
                 {
-                    return "";
+                    return string.Empty;
                 }
                 if (entityType.Assembly.IsDynamic && entityType.Assembly.FullName.StartsWith("Dynamic"))
                 {

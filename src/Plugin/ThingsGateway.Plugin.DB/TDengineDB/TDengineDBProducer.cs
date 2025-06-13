@@ -18,6 +18,7 @@ using System.Reflection;
 
 using ThingsGateway.Admin.Application;
 using ThingsGateway.Foundation;
+using ThingsGateway.NewLife;
 using ThingsGateway.NewLife.Extension;
 using ThingsGateway.Plugin.DB;
 using ThingsGateway.SqlSugar;
@@ -58,7 +59,11 @@ public partial class TDengineDBProducer : BusinessBaseWithCacheIntervalVariableM
         var data = await Query(input).ToPagedListAsync<TDengineDBHistoryValue, IDBHistoryValue>(input.Current, input.Size).ConfigureAwait(false);//分页
         return data;
     }
-
+    protected override void Dispose(bool disposing)
+    {
+        _db?.TryDispose();
+        base.Dispose(disposing);
+    }
     public async Task<List<IDBHistoryValue>> GetDBHistoryValuesAsync(DBHistoryValuePageInput input)
     {
         var data = await Query(input).ToListAsync().ConfigureAwait(false);
@@ -67,6 +72,7 @@ public partial class TDengineDBProducer : BusinessBaseWithCacheIntervalVariableM
     protected override async Task InitChannelAsync(IChannel? channel, CancellationToken cancellationToken)
     {
         InstanceFactory.RemoveCache();
+        _db = TDengineDBUtil.GetDb(_driverPropertys.DbType, _driverPropertys.BigTextConnectStr, _driverPropertys.TableNameLow);
         List<Assembly> assemblies = new();
         foreach (var item in InstanceFactory.CustomAssemblies)
         {
@@ -160,11 +166,11 @@ public partial class TDengineDBProducer : BusinessBaseWithCacheIntervalVariableM
         }
         return ret;
     }
+    private SqlSugarClient _db;
 
     protected override async Task ProtectedStartAsync(CancellationToken cancellationToken)
     {
-        var db = TDengineDBUtil.GetDb(_driverPropertys.DbType, _driverPropertys.BigTextConnectStr, _driverPropertys.TableNameLow);
-        db.DbMaintenance.CreateDatabase();
+        _db.DbMaintenance.CreateDatabase();
 
 
         //必须为间隔上传
@@ -172,7 +178,7 @@ public partial class TDengineDBProducer : BusinessBaseWithCacheIntervalVariableM
         {
             var hisModel = CSharpScriptEngineExtension.Do<DynamicSQLBase>(_driverPropertys.BigTextScriptHistoryTable);
             {
-                await hisModel.DBInit(db, cancellationToken).ConfigureAwait(false);
+                await hisModel.DBInit(_db, cancellationToken).ConfigureAwait(false);
             }
 
         }
@@ -187,7 +193,7 @@ public partial class TDengineDBProducer : BusinessBaseWithCacheIntervalVariableM
                 `isonline` BOOL   ,
                 `value` VARCHAR(255)    ) TAGS(`devicename`  VARCHAR(100) ,`name`  VARCHAR(100))
                 """;
-            await db.Ado.ExecuteCommandAsync(sql, default, cancellationToken: cancellationToken).ConfigureAwait(false);
+            await _db.Ado.ExecuteCommandAsync(sql, default, cancellationToken: cancellationToken).ConfigureAwait(false);
         }
         await base.ProtectedStartAsync(cancellationToken).ConfigureAwait(false);
     }

@@ -15,6 +15,7 @@ using Mapster;
 using ThingsGateway.Admin.Application;
 using ThingsGateway.Extension.Generic;
 using ThingsGateway.Foundation;
+using ThingsGateway.NewLife;
 using ThingsGateway.SqlSugar;
 
 using TouchSocket.Core;
@@ -36,8 +37,13 @@ public partial class SqlHistoryAlarm : BusinessBaseWithCacheVariableModel<Histor
 
     protected override BusinessPropertyWithCache _businessPropertyWithCache => _driverPropertys;
 
+
+    private SqlSugarClient _db;
+
+
     protected override async Task InitChannelAsync(IChannel? channel, CancellationToken cancellationToken)
     {
+        _db = BusinessDatabaseUtil.GetDb(_driverPropertys.DbType, _driverPropertys.BigTextConnectStr);
 
         _config.ForType<AlarmVariable, HistoryAlarm>().Map(dest => dest.Id, (src) => CommonUtils.GetSingleId());
         GlobalData.AlarmChangedEvent -= AlarmWorker_OnAlarmChanged;
@@ -73,15 +79,15 @@ public partial class SqlHistoryAlarm : BusinessBaseWithCacheVariableModel<Histor
 
     protected override void Dispose(bool disposing)
     {
+        _db?.TryDispose();
         GlobalData.AlarmChangedEvent -= AlarmWorker_OnAlarmChanged;
         base.Dispose(disposing);
     }
 
     protected override Task ProtectedStartAsync(CancellationToken cancellationToken)
     {
-        using var db = BusinessDatabaseUtil.GetDb(_driverPropertys.DbType, _driverPropertys.BigTextConnectStr);
-        db.DbMaintenance.CreateDatabase();
-        db.CodeFirst.As<HistoryAlarm>(_driverPropertys.TableName).InitTables<HistoryAlarm>();
+        _db.DbMaintenance.CreateDatabase();
+        _db.CodeFirst.As<HistoryAlarm>(_driverPropertys.TableName).InitTables<HistoryAlarm>();
         return base.ProtectedStartAsync(cancellationToken);
     }
 

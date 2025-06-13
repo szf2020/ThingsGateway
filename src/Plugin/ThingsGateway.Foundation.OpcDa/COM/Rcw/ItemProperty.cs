@@ -188,7 +188,7 @@ public struct PropertyID : ISerializable
             return $"{Code}";
         }
 
-        return "";
+        return string.Empty;
     }
 
     private sealed class Names

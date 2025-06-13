@@ -105,14 +105,13 @@ public partial class QuestDBProducer : BusinessBaseWithCacheIntervalVariableMode
     {
         try
         {
-            var db = BusinessDatabaseUtil.GetDb(_driverPropertys.DbType, _driverPropertys.BigTextConnectStr);
-            db.Ado.CancellationToken = cancellationToken;
+            _db.Ado.CancellationToken = cancellationToken;
             if (!_driverPropertys.BigTextScriptHistoryTable.IsNullOrEmpty())
             {
                 var getDeviceModel = CSharpScriptEngineExtension.Do<DynamicSQLBase>(_driverPropertys.BigTextScriptHistoryTable);
                 getDeviceModel.Logger = LogMessage;
 
-                await getDeviceModel.DBInsertable(db, dbInserts, cancellationToken).ConfigureAwait(false);
+                await getDeviceModel.DBInsertable(_db, dbInserts, cancellationToken).ConfigureAwait(false);
 
             }
             else
@@ -120,7 +119,7 @@ public partial class QuestDBProducer : BusinessBaseWithCacheIntervalVariableMode
                 Stopwatch stopwatch = new();
                 stopwatch.Start();
 
-                var result = await db.Insertable(dbInserts).AS(_driverPropertys.TableName).ExecuteCommandAsync(cancellationToken).ConfigureAwait(false);//不要加分表
+                var result = await _db.Insertable(dbInserts).AS(_driverPropertys.TableName).ExecuteCommandAsync(cancellationToken).ConfigureAwait(false);//不要加分表
                 stopwatch.Stop();
 
                 //var result = await db.Insertable(dbInserts).SplitTable().ExecuteCommandAsync().ConfigureAwait(false);

@@ -29,7 +29,7 @@ namespace ThingsGateway.SqlSugar.TDengine
         {
             get
             {
-                return "";
+                return string.Empty;
             }
         }
 

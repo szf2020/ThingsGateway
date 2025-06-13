@@ -14,6 +14,7 @@ using Mapster;
 
 using ThingsGateway.Admin.Application;
 using ThingsGateway.Foundation;
+using ThingsGateway.NewLife;
 using ThingsGateway.NewLife.Extension;
 using ThingsGateway.Plugin.DB;
 using ThingsGateway.SqlSugar;
@@ -45,6 +46,13 @@ public partial class QuestDBProducer : BusinessBaseWithCacheIntervalVariableMode
     public override VariablePropertyBase VariablePropertys => _variablePropertys;
 
     protected override BusinessPropertyWithCacheInterval _businessPropertyWithCacheInterval => _driverPropertys;
+    private SqlSugarClient _db;
+
+    protected override void Dispose(bool disposing)
+    {
+        _db?.TryDispose();
+        base.Dispose(disposing);
+    }
 
     public async Task<SqlSugarPagedList<IDBHistoryValue>> GetDBHistoryValuePagesAsync(DBHistoryValuePageInput input)
     {
@@ -60,7 +68,7 @@ public partial class QuestDBProducer : BusinessBaseWithCacheIntervalVariableMode
 
     protected override async Task InitChannelAsync(IChannel? channel, CancellationToken cancellationToken)
     {
-
+        _db = BusinessDatabaseUtil.GetDb(_driverPropertys.DbType, _driverPropertys.BigTextConnectStr);
         _config = new TypeAdapterConfig();
         DateTime utcTime = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
         _config.ForType<VariableRuntime, QuestDBHistoryValue>()
@@ -153,20 +161,19 @@ public partial class QuestDBProducer : BusinessBaseWithCacheIntervalVariableMode
     protected override async Task ProtectedStartAsync(CancellationToken cancellationToken)
     {
 
-        var db = BusinessDatabaseUtil.GetDb(_driverPropertys.DbType, _driverPropertys.BigTextConnectStr);
-        db.DbMaintenance.CreateDatabase();
+        _db.DbMaintenance.CreateDatabase();
 
         //必须为间隔上传
         if (!_driverPropertys.BigTextScriptHistoryTable.IsNullOrEmpty())
         {
             DynamicSQLBase? hisModel = CSharpScriptEngineExtension.Do<DynamicSQLBase>(_driverPropertys.BigTextScriptHistoryTable);
             hisModel.Logger = LogMessage;
-            await hisModel.DBInit(db, cancellationToken).ConfigureAwait(false);
+            await hisModel.DBInit(_db, cancellationToken).ConfigureAwait(false);
 
         }
         else
         {
-            db.CodeFirst.As<QuestDBHistoryValue>(_driverPropertys.TableName).InitTables(typeof(QuestDBHistoryValue));
+            _db.CodeFirst.As<QuestDBHistoryValue>(_driverPropertys.TableName).InitTables(typeof(QuestDBHistoryValue));
         }
 
         await base.ProtectedStartAsync(cancellationToken).ConfigureAwait(false);

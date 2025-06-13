@@ -17,7 +17,7 @@
         public int DefaultCacheDurationInSeconds { get; set; }
         public bool? TableEnumIsString { get; set; }
         public DateTime? DbMinDate { get; set; } = DateTime.MinValue.Date.AddYears(1900 - 1);
-        public bool IsNoReadXmlDescription { get; set; }
+        public bool IsNoReadXmlDescription { get; set; } = true;
         public bool SqlServerCodeFirstNvarchar { get; set; }
         public bool OracleCodeFirstNvarchar2 { get; set; }
         public bool SqliteCodeFirstEnableDefaultValue { get; set; }

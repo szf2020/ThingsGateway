@@ -501,7 +501,7 @@ namespace ThingsGateway.SqlSugar
             {
                 return GetFirstTypeNameFromExpression(methodCall.Arguments.FirstOrDefault());
             }
-            return "";
+            return string.Empty;
         }
 
         public static string GetMethodName(Expression expression)

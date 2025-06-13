@@ -20,6 +20,7 @@ using System.Collections.Concurrent;
 using ThingsGateway.Extension;
 using ThingsGateway.FriendlyException;
 using ThingsGateway.NewLife.Json.Extension;
+using ThingsGateway.SqlSugar;
 
 namespace ThingsGateway.Admin.Application;
 
@@ -90,13 +91,12 @@ public sealed class OperDescAttribute : MoAttribute
             OperDescAttribute.WriteToQueue(log);
         }
     }
-
+    private static SqlSugarClient _db = DbContext.Db.GetConnectionScopeWithAttr<SysOperateLog>().CopyNew();
     /// <summary>
     /// 将日志消息写入数据库中
     /// </summary>
     private static async Task ProcessQueue()
     {
-        var db = DbContext.Db.GetConnectionScopeWithAttr<SysOperateLog>().CopyNew();
         var appLifetime = App.RootServices!.GetService<IHostApplicationLifetime>()!;
         while (!appLifetime.ApplicationStopping.IsCancellationRequested)
         {
@@ -105,7 +105,7 @@ public sealed class OperDescAttribute : MoAttribute
                 var data = _logMessageQueue.ToListWithDequeue(); // 从日志队列中获取数据
                 if (data.Count > 0)
                 {
-                    await db.InsertableWithAttr(data).ExecuteCommandAsync(appLifetime.ApplicationStopping).ConfigureAwait(false);//入库
+                    await _db.InsertableWithAttr(data).ExecuteCommandAsync(appLifetime.ApplicationStopping).ConfigureAwait(false);//入库
                 }
             }
             catch (Exception ex)

@@ -20,6 +20,7 @@ using ThingsGateway.NewLife;
 using ThingsGateway.NewLife.Caching;
 using ThingsGateway.NewLife.Threading;
 using ThingsGateway.Schedule;
+using ThingsGateway.SqlSugar;
 
 namespace ThingsGateway.Admin.Application;
 
@@ -60,7 +61,7 @@ public class HardwareJob : IJob, IHardwareJob
         var historyHardwareInfos = MemoryCache.Get<List<HistoryHardwareInfo>>(CacheKey);
         if (historyHardwareInfos == null)
         {
-            using var db = DbContext.Db.GetConnectionScopeWithAttr<HistoryHardwareInfo>().CopyNew();
+            using var db = _db.CopyNew();
             historyHardwareInfos = await db.Queryable<HistoryHardwareInfo>().Where(a => a.Date > DateTime.Now.AddDays(-3)).ToListAsync().ConfigureAwait(false);
 
             MemoryCache.Set(CacheKey, historyHardwareInfos);
@@ -70,6 +71,7 @@ public class HardwareJob : IJob, IHardwareJob
 
     private bool error = false;
     private DateTime hisInsertTime = default;
+    private SqlSugarClient _db = DbContext.Db.GetConnectionScopeWithAttr<HistoryHardwareInfo>().CopyNew();
 
     public async Task ExecuteAsync(JobExecutingContext context, CancellationToken stoppingToken)
     {
@@ -121,7 +123,6 @@ public class HardwareJob : IJob, IHardwareJob
                     if (DateTime.Now > hisInsertTime.Add(TimeSpan.FromMilliseconds(HardwareInfoOptions.HistoryInterval)))
                     {
                         hisInsertTime = DateTime.Now;
-                        using var db = DbContext.Db.GetConnectionScopeWithAttr<HistoryHardwareInfo>().CopyNew();
                         {
                             var his = new HistoryHardwareInfo()
                             {
@@ -132,12 +133,12 @@ public class HardwareJob : IJob, IHardwareJob
                                 CpuUsage = (HardwareInfo.MachineInfo.CpuRate * 100).ToInt(),
                                 Temperature = (HardwareInfo.MachineInfo.Temperature).ToInt(),
                             };
-                            await db.Insertable(his).ExecuteCommandAsync(stoppingToken).ConfigureAwait(false);
+                            await _db.Insertable(his).ExecuteCommandAsync(stoppingToken).ConfigureAwait(false);
                             MemoryCache.Remove(CacheKey);
                         }
                         var sevenDaysAgo = TimerX.Now.AddDays(-HardwareInfoOptions.DaysAgo);
                         //删除特定信息
-                        var result = await db.Deleteable<HistoryHardwareInfo>(a => a.Date <= sevenDaysAgo).ExecuteCommandAsync(stoppingToken).ConfigureAwait(false);
+                        var result = await _db.Deleteable<HistoryHardwareInfo>(a => a.Date <= sevenDaysAgo).ExecuteCommandAsync(stoppingToken).ConfigureAwait(false);
                         if (result > 0)
                         {
                             MemoryCache.Remove(CacheKey);

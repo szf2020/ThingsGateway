@@ -144,7 +144,7 @@ namespace ThingsGateway.SqlSugar
         public string DataTableToCsvString(DataTable table)
         {
             if (table.Rows.Count == 0)
-                return "";
+                return string.Empty;
             StringBuilder sb = new StringBuilder();
             DataColumn colum;
             foreach (DataRow row in table.Rows)

@@ -57,7 +57,7 @@
         public static string ObjToString(this object thisValue)
         {
             if (thisValue != null) return thisValue.ToString().Trim();
-            return "";
+            return string.Empty;
         }
 
         public static string ObjToString(this object thisValue, string errorValue)

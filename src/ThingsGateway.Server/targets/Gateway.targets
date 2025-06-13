@@ -22,7 +22,7 @@
 		</ItemGroup>
 		<PropertyGroup>
 			<RulesEngineApplicationFolder>$(TargetDir)SeedData\RulesEngine\</RulesEngineApplicationFolder>
-			<ManagementApplicationFolder>$(TargetDir)SeedData\SeedData\</ManagementApplicationFolder>
+			<ManagementApplicationFolder>$(TargetDir)SeedData\Management\</ManagementApplicationFolder>
 			<GatewayApplicationFolder>$(TargetDir)SeedData\Gateway\</GatewayApplicationFolder>
 		</PropertyGroup>
 		<RemoveDir Directories="$(RulesEngineApplicationFolder)" />
@@ -46,6 +46,10 @@
 	</Target>
 
 	<!--Gateway-->
+
+
+
+
 
 
 </Project>

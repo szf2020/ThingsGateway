@@ -25,6 +25,16 @@ public abstract class BusinessBaseWithCacheVariableModel<VarModel> : BusinessBas
     protected volatile bool success = true;
     private volatile bool LocalDBCacheVarModelInited;
     private volatile bool LocalDBCacheVarModelsInited;
+    private CacheDB DBCacheVar;
+    private CacheDB DBCacheVars;
+    protected internal override Task InitChannelAsync(IChannel? channel, CancellationToken cancellationToken)
+    {
+        DBCacheVar = LocalDBCacheVarModel();
+        DBCacheVars = LocalDBCacheVarModels();
+        return base.InitChannelAsync(channel, cancellationToken);
+    }
+
+
     protected sealed override BusinessPropertyBase _businessPropertyBase => _businessPropertyWithCache;
 
     protected abstract BusinessPropertyWithCache _businessPropertyWithCache { get; }
@@ -264,8 +274,8 @@ public abstract class BusinessBaseWithCacheVariableModel<VarModel> : BusinessBas
                     while (!cancellationToken.IsCancellationRequested)
                     {
                         //循环获取
-                        using var cache = LocalDBCacheVarModel();
-                        var varList = await cache.DBProvider.Queryable<CacheDBItem<VarModel>>().Take(_businessPropertyWithCache.SplitSize).ToListAsync(cancellationToken).ConfigureAwait(false);
+
+                        var varList = await DBCacheVar.DBProvider.Queryable<CacheDBItem<VarModel>>().Take(_businessPropertyWithCache.SplitSize).ToListAsync(cancellationToken).ConfigureAwait(false);
                         if (varList.Count > 0)
                         {
                             try
@@ -276,7 +286,7 @@ public abstract class BusinessBaseWithCacheVariableModel<VarModel> : BusinessBas
                                     if (result.IsSuccess)
                                     {
                                         //删除缓存
-                                        await cache.DBProvider.Deleteable<CacheDBItem<VarModel>>(varList).ExecuteCommandAsync(cancellationToken).ConfigureAwait(false);
+                                        await DBCacheVar.DBProvider.Deleteable<CacheDBItem<VarModel>>(varList).ExecuteCommandAsync(cancellationToken).ConfigureAwait(false);
                                     }
                                     else
                                         break;
@@ -325,8 +335,8 @@ public abstract class BusinessBaseWithCacheVariableModel<VarModel> : BusinessBas
                     while (!cancellationToken.IsCancellationRequested)
                     {
                         //循环获取
-                        using var cache = LocalDBCacheVarModels();
-                        var varList = await cache.DBProvider.Queryable<CacheDBItem<List<VarModel>>>().FirstAsync(cancellationToken).ConfigureAwait(false);
+
+                        var varList = await DBCacheVars.DBProvider.Queryable<CacheDBItem<List<VarModel>>>().FirstAsync(cancellationToken).ConfigureAwait(false);
                         if (varList?.Value?.Count > 0)
                         {
                             try
@@ -337,7 +347,7 @@ public abstract class BusinessBaseWithCacheVariableModel<VarModel> : BusinessBas
                                     if (result.IsSuccess)
                                     {
                                         //删除缓存
-                                        await cache.DBProvider.Deleteable<CacheDBItem<List<VarModel>>>(varList).ExecuteCommandAsync(cancellationToken).ConfigureAwait(false);
+                                        await DBCacheVars.DBProvider.Deleteable<CacheDBItem<List<VarModel>>>(varList).ExecuteCommandAsync(cancellationToken).ConfigureAwait(false);
                                     }
                                     else
                                         break;

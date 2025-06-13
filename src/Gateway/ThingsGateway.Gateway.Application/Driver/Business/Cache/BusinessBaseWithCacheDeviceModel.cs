@@ -24,6 +24,14 @@ public abstract class BusinessBaseWithCacheDeviceModel<VarModel, DevModel> : Bus
 
     private volatile bool LocalDBCacheDevModelInited;
 
+    private CacheDB DBCacheDev;
+    protected internal override Task InitChannelAsync(IChannel? channel, CancellationToken cancellationToken)
+    {
+        DBCacheDev = LocalDBCacheDevModel();
+        return base.InitChannelAsync(channel, cancellationToken);
+    }
+
+
     /// <summary>
     /// 入缓存
     /// </summary>
@@ -159,10 +167,9 @@ public abstract class BusinessBaseWithCacheDeviceModel<VarModel, DevModel> : Bus
                 {
                     while (!cancellationToken.IsCancellationRequested)
                     {
-                        using var cache = LocalDBCacheDevModel();
 
                         //循环获取
-                        var varList = await cache.DBProvider.Queryable<CacheDBItem<DevModel>>().Take(_businessPropertyWithCache.SplitSize).ToListAsync(cancellationToken).ConfigureAwait(false);
+                        var varList = await DBCacheDev.DBProvider.Queryable<CacheDBItem<DevModel>>().Take(_businessPropertyWithCache.SplitSize).ToListAsync(cancellationToken).ConfigureAwait(false);
                         if (varList.Count > 0)
                         {
                             try
@@ -173,7 +180,7 @@ public abstract class BusinessBaseWithCacheDeviceModel<VarModel, DevModel> : Bus
                                     if (result.IsSuccess)
                                     {
                                         //删除缓存
-                                        await cache.DBProvider.Deleteable<CacheDBItem<DevModel>>(varList).ExecuteCommandAsync(cancellationToken).ConfigureAwait(false);
+                                        await DBCacheDev.DBProvider.Deleteable<CacheDBItem<DevModel>>(varList).ExecuteCommandAsync(cancellationToken).ConfigureAwait(false);
                                     }
                                     else
                                         break;

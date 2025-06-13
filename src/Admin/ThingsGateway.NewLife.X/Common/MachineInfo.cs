@@ -1160,7 +1160,7 @@ public class MachineInfo
     public static String GetInfo(String path, String property, String? nameSpace = null)
     {
         // Linux Mono不支持WMI
-        if (Runtime.Mono) return "";
+        if (Runtime.Mono) return string.Empty;
 
         var bbs = new List<String>();
         try
@@ -1181,7 +1181,7 @@ public class MachineInfo
         catch (Exception ex)
         {
             if (XTrace.Log.Level <= LogLevel.Debug) XTrace.WriteLine("WMI.GetInfo({0})失败！{1}", path, ex.Message);
-            return "";
+            return string.Empty;
         }
 
         bbs.Sort();

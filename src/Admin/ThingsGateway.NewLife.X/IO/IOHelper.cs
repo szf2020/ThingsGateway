@@ -854,13 +854,13 @@ public static class IOHelper
     /// <returns></returns>
     public static String ToHex(this Byte[]? data, Int32 offset = 0, Int32 count = -1)
     {
-        if (data == null || data.Length <= 0) return "";
+        if (data == null || data.Length <= 0) return string.Empty;
 
         if (count < 0)
             count = data.Length - offset;
         else if (offset + count > data.Length)
             count = data.Length - offset;
-        if (count == 0) return "";
+        if (count == 0) return string.Empty;
 
         //return BitConverter.ToString(data).Replace("-", null);
         // 上面的方法要替换-，效率太低
@@ -883,7 +883,7 @@ public static class IOHelper
     /// <returns></returns>
     public static String ToHex(this Byte[]? data, String? separate, Int32 groupSize = 0, Int32 maxLength = -1)
     {
-        if (data == null || data.Length <= 0) return "";
+        if (data == null || data.Length <= 0) return string.Empty;
 
         if (groupSize < 0) groupSize = 0;
 

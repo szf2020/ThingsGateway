@@ -47,7 +47,7 @@ namespace ThingsGateway.SqlSugar
             var isWhere = Convert.ToBoolean(value);
             if (!Convert.ToBoolean(isWhere))
             {
-                return "";
+                return string.Empty;
             }
             var argExp = exp.Arguments[1];
             var copyContext = this.Context;

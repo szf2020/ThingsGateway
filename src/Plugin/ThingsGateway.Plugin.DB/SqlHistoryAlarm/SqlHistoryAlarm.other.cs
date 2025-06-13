@@ -60,17 +60,16 @@ public partial class SqlHistoryAlarm : BusinessBaseWithCacheVariableModel<Histor
     {
         try
         {
-            using var db = BusinessDatabaseUtil.GetDb(_driverPropertys.DbType, _driverPropertys.BigTextConnectStr);
 
             int result = 0;
             //.SplitTable()
             Stopwatch stopwatch = new();
             stopwatch.Start();
 
-            if (db.CurrentConnectionConfig.DbType == SqlSugar.DbType.QuestDB)
-                result = await db.Insertable(dbInserts).AS(_driverPropertys.TableName).ExecuteCommandAsync(cancellationToken).ConfigureAwait(false);//不要加分表
+            if (_db.CurrentConnectionConfig.DbType == SqlSugar.DbType.QuestDB)
+                result = await _db.Insertable(dbInserts).AS(_driverPropertys.TableName).ExecuteCommandAsync(cancellationToken).ConfigureAwait(false);//不要加分表
             else
-                result = await db.Fastest<HistoryAlarm>().AS(_driverPropertys.TableName).PageSize(50000).BulkCopyAsync(dbInserts).ConfigureAwait(false);
+                result = await _db.Fastest<HistoryAlarm>().AS(_driverPropertys.TableName).PageSize(50000).BulkCopyAsync(dbInserts).ConfigureAwait(false);
 
 
             stopwatch.Stop();

@@ -23,6 +23,12 @@ public abstract class BusinessBaseWithCacheAlarmModel<VarModel, DevModel, AlarmM
     protected ConcurrentQueue<CacheDBItem<AlarmModel>> _memoryAlarmModelQueue = new();
 
     private volatile bool LocalDBCacheAlarmModelInited;
+    private CacheDB DBCacheAlarm;
+    protected internal override Task InitChannelAsync(IChannel? channel, CancellationToken cancellationToken)
+    {
+        DBCacheAlarm = LocalDBCacheAlarmModel();
+        return base.InitChannelAsync(channel, cancellationToken);
+    }
 
     /// <summary>
     /// 入缓存
@@ -161,10 +167,8 @@ public abstract class BusinessBaseWithCacheAlarmModel<VarModel, DevModel, AlarmM
                 {
                     while (!cancellationToken.IsCancellationRequested)
                     {
-                        using var cache = LocalDBCacheAlarmModel();
-
                         //循环获取，固定读最大行数量，执行完成需删除行
-                        var varList = await cache.DBProvider.Queryable<CacheDBItem<AlarmModel>>().Take(_businessPropertyWithCache.SplitSize).ToListAsync(cancellationToken).ConfigureAwait(false);
+                        var varList = await DBCacheAlarm.DBProvider.Queryable<CacheDBItem<AlarmModel>>().Take(_businessPropertyWithCache.SplitSize).ToListAsync(cancellationToken).ConfigureAwait(false);
                         if (varList.Count > 0)
                         {
                             try
@@ -175,7 +179,7 @@ public abstract class BusinessBaseWithCacheAlarmModel<VarModel, DevModel, AlarmM
                                     if (result.IsSuccess)
                                     {
                                         //删除缓存
-                                        await cache.DBProvider.Deleteable<CacheDBItem<AlarmModel>>(varList).ExecuteCommandAsync(cancellationToken).ConfigureAwait(false);
+                                        await DBCacheAlarm.DBProvider.Deleteable<CacheDBItem<AlarmModel>>(varList).ExecuteCommandAsync(cancellationToken).ConfigureAwait(false);
                                     }
                                     else
                                         break;

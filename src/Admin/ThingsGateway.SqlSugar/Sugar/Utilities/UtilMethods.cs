@@ -893,41 +893,24 @@ namespace ThingsGateway.SqlSugar
                 return Guid.NewGuid() + "";
             }
         }
+        static Type IAsyncStateMachineType = typeof(IAsyncStateMachine);
 
         public static bool IsAsyncMethod(MethodBase method)
         {
-            if (method == null)
-            {
-                return false;
-            }
-            if (method.DeclaringType != null)
-            {
-                if (method.DeclaringType.GetInterfaces().Contains(typeof(IAsyncStateMachine)))
-                {
-                    return true;
-                }
-            }
+            if (method == null) return false;
+
+            if (method.GetCustomAttribute<AsyncStateMachineAttribute>() != null)
+                return true;
+
+            if (method.DeclaringType?.GetInterfaces().Contains(IAsyncStateMachineType) == true)
+                return true;
+
+            // 补救方案：有些 async 方法是动态生成的，名字惯例判断
             var name = method.Name;
-            if (name.Contains("OutputAsyncCausalityEvents"))
-            {
-                return true;
-            }
-            if (name.Contains("OutputWaitEtwEvents"))
-            {
-                return true;
-            }
-            if (name.Contains("ExecuteAsync"))
-            {
-                return true;
-            }
-            //if (method?.DeclaringType?.FullName?.Contains("Furion.InternalApp")==true)
-            //{
-            //    return false;
-            //}
-            Type attType = typeof(AsyncStateMachineAttribute);
-            var attrib = (AsyncStateMachineAttribute)method.GetCustomAttribute(attType);
-            return (attrib != null);
+            return name.EndsWith("ExecuteAsync") || name.Contains("OutputAsyncCausalityEvents") || name.Contains("OutputWaitEtwEvents");
         }
+
+
 
         public static StackTraceInfo GetStackTrace()
         {

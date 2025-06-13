@@ -107,14 +107,13 @@ public partial class TDengineDBProducer : BusinessBaseWithCacheIntervalVariableM
     {
         try
         {
-            var db = TDengineDBUtil.GetDb(_driverPropertys.DbType, _driverPropertys.BigTextConnectStr, _driverPropertys.TableNameLow);
-            db.Ado.CancellationToken = cancellationToken;
+            _db.Ado.CancellationToken = cancellationToken;
 
             if (!_driverPropertys.BigTextScriptHistoryTable.IsNullOrEmpty())
             {
                 var getDeviceModel = CSharpScriptEngineExtension.Do<DynamicSQLBase>(_driverPropertys.BigTextScriptHistoryTable);
                 getDeviceModel.Logger = LogMessage;
-                await getDeviceModel.DBInsertable(db, dbInserts, cancellationToken).ConfigureAwait(false);
+                await getDeviceModel.DBInsertable(_db, dbInserts, cancellationToken).ConfigureAwait(false);
 
             }
             else
@@ -149,7 +148,7 @@ public partial class TDengineDBProducer : BusinessBaseWithCacheIntervalVariableM
                 stringBuilder.Append(';');
                 stringBuilder.AppendLine();
 
-                await db.Ado.ExecuteCommandAsync(stringBuilder.ToString(), default, cancellationToken: cancellationToken).ConfigureAwait(false);
+                await _db.Ado.ExecuteCommandAsync(stringBuilder.ToString(), default, cancellationToken: cancellationToken).ConfigureAwait(false);
 
                 stopwatch.Stop();
                 //var result = await db.Insertable(dbInserts).SplitTable().ExecuteCommandAsync().ConfigureAwait(false);

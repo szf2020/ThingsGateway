@@ -92,12 +92,12 @@ namespace ThingsGateway.SqlSugar
         public static string ObjToString(this object thisValue)
         {
             if (thisValue != null) return thisValue.ToString().Trim();
-            return "";
+            return string.Empty;
         }
         public static string ObjToStringNoTrim(this object thisValue)
         {
             if (thisValue != null) return thisValue.ToString();
-            return "";
+            return string.Empty;
         }
         public static string ObjToStringNew(this object thisValue)
         {
@@ -110,7 +110,7 @@ namespace ThingsGateway.SqlSugar
                 return Convert.ToDateTime(thisValue.ToString()).ToString("yyyy-MM-dd");
             }
             if (thisValue != null) return thisValue.ToString().Trim();
-            return "";
+            return string.Empty;
         }
 
         public static string ObjToString(this object thisValue, string errorValue)

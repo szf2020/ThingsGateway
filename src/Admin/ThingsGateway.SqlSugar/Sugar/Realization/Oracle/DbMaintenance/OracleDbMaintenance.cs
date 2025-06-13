@@ -262,7 +262,7 @@ namespace ThingsGateway.SqlSugar
         {
             get
             {
-                return "";
+                return string.Empty;
             }
         }
         #endregion

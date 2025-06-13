@@ -576,7 +576,7 @@ WHERE table_name = '" + tableName + "'");
             }
             else
             {
-                return "";
+                return string.Empty;
             }
 
         }

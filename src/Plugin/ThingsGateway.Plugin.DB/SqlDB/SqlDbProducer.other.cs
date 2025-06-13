@@ -120,22 +120,21 @@ public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariableModel<
     {
         try
         {
-            var db = SqlDBBusinessDatabaseUtil.GetDb(_driverPropertys);
-            db.Ado.CancellationToken = cancellationToken;
+            _db.Ado.CancellationToken = cancellationToken;
             if (!_driverPropertys.BigTextScriptHistoryTable.IsNullOrEmpty())
             {
                 var getDeviceModel = CSharpScriptEngineExtension.Do<DynamicSQLBase>(_driverPropertys.BigTextScriptHistoryTable);
 
                 getDeviceModel.Logger = LogMessage;
 
-                await getDeviceModel.DBInsertable(db, dbInserts, cancellationToken).ConfigureAwait(false);
+                await getDeviceModel.DBInsertable(_db, dbInserts, cancellationToken).ConfigureAwait(false);
 
             }
             else
             {
                 Stopwatch stopwatch = new();
                 stopwatch.Start();
-                var result = await db.Fastest<SQLHistoryValue>().PageSize(50000).SplitTable().BulkCopyAsync(dbInserts).ConfigureAwait(false);
+                var result = await _db.Fastest<SQLHistoryValue>().PageSize(50000).SplitTable().BulkCopyAsync(dbInserts).ConfigureAwait(false);
                 //var result = await db.Insertable(dbInserts).SplitTable().ExecuteCommandAsync().ConfigureAwait(false);
                 stopwatch.Stop();
                 if (result > 0)
@@ -157,15 +156,14 @@ public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariableModel<
     {
         try
         {
-            var db = SqlDBBusinessDatabaseUtil.GetDb(_driverPropertys);
-            db.Ado.CancellationToken = cancellationToken;
+            _db.Ado.CancellationToken = cancellationToken;
 
             if (!_driverPropertys.BigTextScriptRealTable.IsNullOrEmpty())
             {
                 var getDeviceModel = CSharpScriptEngineExtension.Do<DynamicSQLBase>(_driverPropertys.BigTextScriptRealTable);
                 getDeviceModel.Logger = LogMessage;
 
-                await getDeviceModel.DBInsertable(db, datas, cancellationToken).ConfigureAwait(false);
+                await getDeviceModel.DBInsertable(_db, datas, cancellationToken).ConfigureAwait(false);
                 return OperResult.Success;
 
             }
@@ -176,9 +174,9 @@ public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariableModel<
                 {
                     Stopwatch stopwatch = new();
                     stopwatch.Start();
-                    var ids = (await db.Queryable<SQLRealValue>().AS(_driverPropertys.ReadDBTableName).Select(a => a.Id).ToListAsync(cancellationToken).ConfigureAwait(false)).ToHashSet();
+                    var ids = (await _db.Queryable<SQLRealValue>().AS(_driverPropertys.ReadDBTableName).Select(a => a.Id).ToListAsync(cancellationToken).ConfigureAwait(false)).ToHashSet();
                     var InsertData = IdVariableRuntimes.Where(a => !ids.Contains(a.Key)).Select(a => a.Value).Adapt<List<SQLRealValue>>();
-                    var result = await db.Fastest<SQLRealValue>().AS(_driverPropertys.ReadDBTableName).PageSize(100000).BulkCopyAsync(InsertData).ConfigureAwait(false);
+                    var result = await _db.Fastest<SQLRealValue>().AS(_driverPropertys.ReadDBTableName).PageSize(100000).BulkCopyAsync(InsertData).ConfigureAwait(false);
                     _initRealData = true;
                     stopwatch.Stop();
                     if (result > 0)
@@ -192,7 +190,7 @@ public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariableModel<
                         Stopwatch stopwatch = new();
                         stopwatch.Start();
 
-                        var result = await db.Fastest<SQLRealValue>().AS(_driverPropertys.ReadDBTableName).PageSize(100000).BulkUpdateAsync(datas).ConfigureAwait(false);
+                        var result = await _db.Fastest<SQLRealValue>().AS(_driverPropertys.ReadDBTableName).PageSize(100000).BulkUpdateAsync(datas).ConfigureAwait(false);
 
                         stopwatch.Stop();
                         if (result > 0)

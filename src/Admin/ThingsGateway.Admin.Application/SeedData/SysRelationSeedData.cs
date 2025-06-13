@@ -18,7 +18,7 @@ public class SysRelationSeedData : ISqlSugarEntitySeedData<SysRelation>
     /// <inheritdoc/>
     public IEnumerable<SysRelation> SeedData()
     {
-        var db = DbContext.Db.GetConnectionScopeWithAttr<SysRelation>().CopyNew();
+        using var db = DbContext.Db.GetConnectionScopeWithAttr<SysRelation>().CopyNew();
         if (db.Queryable<SysRelation>().Any(a => a.ObjectId == RoleConst.SuperAdminId))
             return Enumerable.Empty<SysRelation>();
         var data = SeedDataUtil.GetSeedData<SysRelation>(PathExtensions.CombinePathWithOs("SeedData", "Admin", "seed_sys_relation.json"));

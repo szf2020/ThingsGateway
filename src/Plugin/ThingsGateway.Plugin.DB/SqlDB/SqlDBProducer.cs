@@ -15,6 +15,7 @@ using Mapster;
 using ThingsGateway.Admin.Application;
 using ThingsGateway.Debug;
 using ThingsGateway.Foundation;
+using ThingsGateway.NewLife;
 using ThingsGateway.NewLife.Extension;
 using ThingsGateway.Plugin.DB;
 using ThingsGateway.SqlSugar;
@@ -46,7 +47,12 @@ public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariableModel<
     public override VariablePropertyBase VariablePropertys => _variablePropertys;
 
     protected override BusinessPropertyWithCacheInterval _businessPropertyWithCacheInterval => _driverPropertys;
-
+    private SqlSugarClient _db;
+    protected override void Dispose(bool disposing)
+    {
+        _db?.TryDispose();
+        base.Dispose(disposing);
+    }
     public async Task<SqlSugarPagedList<IDBHistoryValue>> GetDBHistoryValuePagesAsync(DBHistoryValuePageInput input)
     {
         var data = await Query(input).ToPagedListAsync<SQLHistoryValue, IDBHistoryValue>(input.Current, input.Size).ConfigureAwait(false);//分页
@@ -151,6 +157,8 @@ public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariableModel<
 
     protected override async Task InitChannelAsync(IChannel? channel, CancellationToken cancellationToken)
     {
+        _db = SqlDBBusinessDatabaseUtil.GetDb(_driverPropertys);
+
         _config = new TypeAdapterConfig();
         _config.ForType<VariableRuntime, SQLHistoryValue>()
             //.Map(dest => dest.Id, (src) =>CommonUtils.GetSingleId())
@@ -173,11 +181,9 @@ public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariableModel<
         _initRealData = false;
         return base.AfterVariablesChangedAsync(cancellationToken);
     }
-
     protected override async Task ProtectedStartAsync(CancellationToken cancellationToken)
     {
-        var db = SqlDBBusinessDatabaseUtil.GetDb(_driverPropertys);
-        db.DbMaintenance.CreateDatabase();
+        _db.DbMaintenance.CreateDatabase();
 
         //必须为间隔上传
         if (!_driverPropertys.BigTextScriptHistoryTable.IsNullOrEmpty())
@@ -186,14 +192,14 @@ public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariableModel<
 
             if (_driverPropertys.IsHistoryDB)
             {
-                await hisModel.DBInit(db, cancellationToken).ConfigureAwait(false);
+                await hisModel.DBInit(_db, cancellationToken).ConfigureAwait(false);
             }
 
         }
         else
         {
             if (_driverPropertys.IsHistoryDB)
-                db.CodeFirst.InitTables(typeof(SQLHistoryValue));
+                _db.CodeFirst.InitTables(typeof(SQLHistoryValue));
         }
         if (!_driverPropertys.BigTextScriptRealTable.IsNullOrEmpty())
         {
@@ -201,14 +207,14 @@ public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariableModel<
 
             if (_driverPropertys.IsReadDB)
             {
-                await realModel.DBInit(db, cancellationToken).ConfigureAwait(false);
+                await realModel.DBInit(_db, cancellationToken).ConfigureAwait(false);
             }
 
         }
         else
         {
             if (_driverPropertys.IsReadDB)
-                db.CodeFirst.As<SQLRealValue>(_driverPropertys.ReadDBTableName).InitTables<SQLRealValue>();
+                _db.CodeFirst.As<SQLRealValue>(_driverPropertys.ReadDBTableName).InitTables<SQLRealValue>();
         }
 
         await base.ProtectedStartAsync(cancellationToken).ConfigureAwait(false);

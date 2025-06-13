@@ -47,7 +47,7 @@ namespace ThingsGateway.Gateway.Razor
           return  (await expressionNode.ExecuteAsync(new NodeInput(){Value=a==null?a:JToken.Parse(a??string.Empty) },default).ConfigureAwait(false)).JToken?.ToString();
              if(Node is IActuatorNode actuatorNode)
           return  (await actuatorNode.ExecuteAsync(new NodeInput(){Value=a==null?a:JToken.Parse(a??string.Empty) },default).ConfigureAwait(false)).JToken?.ToString();
-        return "";
+        return string.Empty;
         }) },
         {nameof(ScriptEdit.Script),Node.Text },
         {nameof(ScriptEdit.ScriptChanged),EventCallback.Factory.Create<string>(this, v =>

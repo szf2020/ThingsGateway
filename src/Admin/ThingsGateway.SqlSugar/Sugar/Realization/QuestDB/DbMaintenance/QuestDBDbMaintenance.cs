@@ -51,7 +51,7 @@ namespace ThingsGateway.SqlSugar
         {
             get
             {
-                return "";
+                return string.Empty;
             }
         }
         protected override string AddColumnToTableSql
