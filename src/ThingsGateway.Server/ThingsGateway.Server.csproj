@@ -51,6 +51,9 @@
 		<!--动态适用GC-->
 		<GarbageCollectionAdaptationMode>1</GarbageCollectionAdaptationMode>
 
+
+		<CETCompat>false</CETCompat>
+		
 		<!--<TieredCompilation>false</TieredCompilation>-->
 		
 		<!--使用自托管线程池-->

@@ -5,6 +5,7 @@
 @using ThingsGateway.Admin.Application
 @using ThingsGateway.Admin.Razor
 @using ThingsGateway.Gateway.Application
+@using ThingsGateway.Plugin.DB
 @using ThingsGateway.Plugin.SqlDB
 @namespace ThingsGateway.Debug
 
@@ -23,7 +24,7 @@
 
                     <EditTemplate Context="value">
                         <div class="col-12  col-md-12">
-                            <BootstrapLabel Value=@SqlDBProducerPropertyLocalizer["BigTextScriptHistoryTable"] ShowLabelTooltip="true" />
+                            <BootstrapLabel Value=@ProducerPropertyLocalizer["BigTextScriptHistoryTable"] ShowLabelTooltip="true" />
                             <CodeEditor @bind-Value=@businessProperty.BigTextScriptHistoryTable Language="csharp" Theme="vs-dark" />
                             <div class="ms-2 d-flex justify-content-center align-items-center">
                                 <Button IsDisabled=@(!CanWrite) OnClick="()=>CheckScript(businessProperty,nameof(businessProperty.BigTextScriptHistoryTable))">
@@ -32,7 +33,7 @@
                             </div>
                         </div>
                         <div class="col-12  col-md-12">
-                            <BootstrapLabel Value=@SqlDBProducerPropertyLocalizer["BigTextScriptRealTable"] ShowLabelTooltip="true" />
+                            <BootstrapLabel Value=@ProducerPropertyLocalizer["BigTextScriptRealTable"] ShowLabelTooltip="true" />
                             <CodeEditor @bind-Value=@businessProperty.BigTextScriptRealTable Language="csharp" Theme="vs-dark" />
                             <div class="ms-2 d-flex justify-content-center align-items-center">
                                 <Button IsDisabled=@(!CanWrite) OnClick="()=>CheckScript(businessProperty,nameof(businessProperty.BigTextScriptRealTable))">
@@ -40,6 +41,24 @@
                                 </Button>
                             </div>
                         </div>
+                    </EditTemplate>
+                </EditorItem>
+            }
+            else if (Model.Value is RealDBProducerProperty realDBProducerProperty)
+            {
+                <EditorItem FieldExpression=@(() => context) Field=@(context)>
+
+                    <EditTemplate Context="value">
+                        <div class="col-12  col-md-12">
+                            <BootstrapLabel Value=@ProducerPropertyLocalizer["BigTextScriptHistoryTable"] ShowLabelTooltip="true" />
+                            <CodeEditor @bind-Value=@realDBProducerProperty.BigTextScriptHistoryTable Language="csharp" Theme="vs-dark" />
+                            <div class="ms-2 d-flex justify-content-center align-items-center">
+                                <Button IsDisabled=@(!CanWrite) OnClick="() => CheckScript(realDBProducerProperty, nameof(realDBProducerProperty.BigTextScriptHistoryTable))">
+                                    @RazorLocalizer["Check"]
+                                </Button>
+                            </div>
+                        </div>
+
                     </EditTemplate>
                 </EditorItem>
             }

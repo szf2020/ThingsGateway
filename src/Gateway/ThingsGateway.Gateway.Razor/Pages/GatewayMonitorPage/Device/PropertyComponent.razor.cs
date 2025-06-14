@@ -8,6 +8,8 @@
 // QQ群：605534569
 // ------------------------------------------------------------------------------
 
+using ThingsGateway.NewLife.Json.Extension;
+
 namespace ThingsGateway.Gateway.Razor;
 public partial class PropertyComponent : IPropertyUIBase
 {
@@ -32,7 +34,7 @@ public partial class PropertyComponent : IPropertyUIBase
     [Inject]
     private IStringLocalizer<DeviceEditComponent> Localizer { get; set; }
 
-    private async Task CheckScript(BusinessPropertyWithCacheIntervalScript businessProperty, string pname)
+    public static async Task CheckScript(BusinessPropertyWithCacheIntervalScript businessProperty, string pname, string title, object receiver, DialogService dialogService)
     {
         string script = null;
         if (pname == nameof(BusinessPropertyWithCacheIntervalScript.BigTextScriptAlarmModel))
@@ -56,7 +58,7 @@ public partial class PropertyComponent : IPropertyUIBase
         var op = new DialogOption()
         {
             IsScrolling = true,
-            Title = Localizer["Check"],
+            Title = title,
             ShowFooter = false,
             ShowCloseButton = false,
             Size = Size.ExtraExtraLarge,
@@ -65,8 +67,16 @@ public partial class PropertyComponent : IPropertyUIBase
 
         op.Component = BootstrapDynamicComponent.CreateComponent<ScriptCheck>(new Dictionary<string, object?>
     {
-        {nameof(ScriptCheck.Data),Array.Empty<object>() },
         {nameof(ScriptCheck.Script),script },
+        {nameof(ScriptCheck.GetResult), (string input,string script)=>
+        {
+                var type=  script == businessProperty.BigTextScriptDeviceModel?typeof(List<DeviceBasicData>):script ==businessProperty.BigTextScriptAlarmModel?typeof(List<AlarmVariable>):typeof(List<VariableBasicData>);
+
+                var  data = (IEnumerable<object>)Newtonsoft.Json.JsonConvert.DeserializeObject(input, type);
+                var value = data.GetDynamicModel(script);
+              return Task.FromResult( value.ToSystemTextJsonString());
+        }},
+
         {nameof(ScriptCheck.OnGetDemo),()=>
                 {
                     return
@@ -208,7 +218,7 @@ public partial class PropertyComponent : IPropertyUIBase
                     ;
                 }
             },
-        {nameof(ScriptCheck.ScriptChanged),EventCallback.Factory.Create<string>(this, v =>
+        {nameof(ScriptCheck.ScriptChanged),EventCallback.Factory.Create<string>(receiver, v =>
         {
                  if (pname == nameof(BusinessPropertyWithCacheIntervalScript.BigTextScriptAlarmModel))
     {
@@ -227,7 +237,7 @@ public partial class PropertyComponent : IPropertyUIBase
         }) },
 
     });
-        await DialogService.Show(op);
+        await dialogService.Show(op);
 
     }
 

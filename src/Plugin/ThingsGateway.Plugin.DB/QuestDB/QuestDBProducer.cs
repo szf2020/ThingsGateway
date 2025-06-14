@@ -13,6 +13,7 @@ using BootstrapBlazor.Components;
 using Mapster;
 
 using ThingsGateway.Admin.Application;
+using ThingsGateway.Debug;
 using ThingsGateway.Foundation;
 using ThingsGateway.NewLife;
 using ThingsGateway.NewLife.Extension;
@@ -30,7 +31,7 @@ public partial class QuestDBProducer : BusinessBaseWithCacheIntervalVariableMode
     private readonly QuestDBProducerVariableProperty _variablePropertys = new();
 
     /// <inheritdoc/>
-    public override Type DriverPropertyUIType => typeof(RealDBProducerPropertyRazor);
+    public override Type DriverPropertyUIType => typeof(SqlDBProducerPropertyRazor);
 
     /// <inheritdoc/>
     public override Type DriverUIType

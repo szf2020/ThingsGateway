@@ -50,6 +50,7 @@
 		<PublishReadyToRunComposite>true</PublishReadyToRunComposite>
 		<ApplicationIcon>favicon.ico</ApplicationIcon>
 		<!--<PublishAot>true</PublishAot>-->
+		<CETCompat>false</CETCompat>
 
 		<!--动态适用GC-->
 		<GarbageCollectionAdaptationMode>1</GarbageCollectionAdaptationMode>

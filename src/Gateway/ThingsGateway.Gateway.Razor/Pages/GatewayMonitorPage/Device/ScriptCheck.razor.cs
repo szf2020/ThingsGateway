@@ -8,17 +8,14 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-using ThingsGateway.NewLife.Json.Extension;
-
 namespace ThingsGateway.Gateway.Razor;
 
 public partial class ScriptCheck
 {
-    private string Input { get; set; }
+    [Parameter, EditorRequired]
+    public string Input { get; set; } = string.Empty;
     private string Output { get; set; }
 
-    [Parameter, EditorRequired]
-    public IEnumerable<object> Data { get; set; }
     [Parameter, EditorRequired]
     public string Script { get; set; }
     [Parameter, EditorRequired]
@@ -30,21 +27,20 @@ public partial class ScriptCheck
             await ScriptChanged.InvokeAsync(script);
 
     }
-    private Type type;
-    protected override void OnInitialized()
-    {
-        Input = Data.ToSystemTextJsonString();
-        type = Data.GetType();
-        base.OnInitialized();
-    }
 
-    private void CheckScript()
+    [Parameter]
+    public Func<string, string, Task<string>> GetResult { get; set; }
+
+    private async Task CheckScript()
     {
         try
         {
-            Data = (IEnumerable<object>)Newtonsoft.Json.JsonConvert.DeserializeObject(Input, type);
-            var value = Data.GetDynamicModel(Script);
-            Output = value.ToSystemTextJsonString();
+
+            if (GetResult != null)
+            {
+                Output = await GetResult(Input, Script).ConfigureAwait(false);
+            }
+
         }
 
         catch (Exception ex)

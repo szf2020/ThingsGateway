@@ -16,6 +16,7 @@
 
 		<!--动态适用GC-->
 		<GarbageCollectionAdaptationMode>1</GarbageCollectionAdaptationMode>
+		<CETCompat>false</CETCompat>
 		<!--使用自托管线程池-->
 		<!--<UseWindowsThreadPool>false</UseWindowsThreadPool> -->
 

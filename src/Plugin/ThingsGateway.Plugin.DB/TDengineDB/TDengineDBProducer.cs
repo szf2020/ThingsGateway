@@ -17,6 +17,7 @@ using Newtonsoft.Json.Linq;
 using System.Reflection;
 
 using ThingsGateway.Admin.Application;
+using ThingsGateway.Debug;
 using ThingsGateway.Foundation;
 using ThingsGateway.NewLife;
 using ThingsGateway.NewLife.Extension;
@@ -37,7 +38,7 @@ public partial class TDengineDBProducer : BusinessBaseWithCacheIntervalVariableM
     };
     private readonly TDengineDBProducerVariableProperty _variablePropertys = new();
     /// <inheritdoc/>
-    public override Type DriverPropertyUIType => typeof(RealDBProducerPropertyRazor);
+    public override Type DriverPropertyUIType => typeof(SqlDBProducerPropertyRazor);
 
     /// <inheritdoc/>
     public override Type DriverUIType

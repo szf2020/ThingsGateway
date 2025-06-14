@@ -14,9 +14,16 @@ using BootstrapBlazor.Components;
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Localization;
 
+using System.Text;
+
 using ThingsGateway.Gateway.Razor;
+using ThingsGateway.Plugin.DB;
 using ThingsGateway.Plugin.SqlDB;
+using ThingsGateway.Plugin.TDengineDB;
 using ThingsGateway.Razor;
+using ThingsGateway.SqlSugar;
+
+using TouchSocket.Core;
 
 namespace ThingsGateway.Debug
 {
@@ -35,11 +42,11 @@ namespace ThingsGateway.Debug
         [Parameter, EditorRequired]
         public ModelValueValidateForm Model { get; set; }
 
-        IStringLocalizer SqlDBProducerPropertyLocalizer { get; set; }
+        IStringLocalizer ProducerPropertyLocalizer { get; set; }
 
         protected override Task OnParametersSetAsync()
         {
-            SqlDBProducerPropertyLocalizer = App.CreateLocalizerByType(Model.Value.GetType());
+            ProducerPropertyLocalizer = App.CreateLocalizerByType(Model.Value.GetType());
 
             return base.OnParametersSetAsync();
         }
@@ -65,9 +72,24 @@ namespace ThingsGateway.Debug
 
             op.Component = BootstrapDynamicComponent.CreateComponent<ScriptCheck>(new Dictionary<string, object?>
     {
-        {nameof(ScriptCheck.Data),Array.Empty < object >() },
         {nameof(ScriptCheck.Script),script },
-        {nameof(ScriptCheck.OnGetDemo),()=>
+                {nameof(ScriptCheck.GetResult),  async (string input,string script)=>
+        {
+                var type=  typeof(List<VariableBasicData>);
+
+                var  data = (IEnumerable<object>)Newtonsoft.Json.JsonConvert.DeserializeObject(input, type);
+               var getDeviceModel = CSharpScriptEngineExtension.Do<DynamicSQLBase>(script);
+            StringBuilder stringBuilder=new($"Compilation successful{Environment.NewLine}");
+
+            getDeviceModel.Logger=new EasyLogger(a=>stringBuilder.AppendLine(a));
+                    using    var db = SqlDBBusinessDatabaseUtil.GetDb(businessProperty);
+                await getDeviceModel.DBInit(db,default);
+              await getDeviceModel.DBInsertable(db,data,default);
+              return stringBuilder.ToString();
+
+        }},
+
+               {nameof(ScriptCheck.OnGetDemo),()=>
                 {
                     return
                     pname == nameof(SqlDBProducerProperty.BigTextScriptHistoryTable)?
@@ -153,6 +175,134 @@ namespace ThingsGateway.Debug
             await DialogService.Show(op);
 
         }
+
+
+
+        private async Task CheckScript(RealDBProducerProperty businessProperty, string pname)
+        {
+            string script = businessProperty.BigTextScriptHistoryTable;
+
+            var op = new DialogOption()
+            {
+                IsScrolling = true,
+                Title = RazorLocalizer["Check"],
+                ShowFooter = false,
+                ShowCloseButton = false,
+                Size = Size.ExtraExtraLarge,
+                FullScreenSize = FullScreenSize.None
+            };
+
+            op.Component = BootstrapDynamicComponent.CreateComponent<ScriptCheck>(new Dictionary<string, object?>
+    {
+        {nameof(ScriptCheck.Script),script },
+                {nameof(ScriptCheck.GetResult), async (string input,string script)=>
+        {
+                var type=  typeof(List<VariableBasicData>);
+
+                var  data = (IEnumerable<object>)Newtonsoft.Json.JsonConvert.DeserializeObject(input, type);
+               var getDeviceModel = CSharpScriptEngineExtension.Do<DynamicSQLBase>(script);
+            StringBuilder stringBuilder=new($"Compilation successful{Environment.NewLine}");
+
+            getDeviceModel.Logger=new EasyLogger(a=>stringBuilder.AppendLine(a));
+             SqlSugarClient db=null;
+
+                 if(businessProperty.DbType==SqlSugar.DbType.TDengine)
+        db = TDengineDBUtil.GetDb(businessProperty.DbType, businessProperty.BigTextConnectStr, businessProperty.TableNameLow);
+            else
+        db = BusinessDatabaseUtil.GetDb(businessProperty.DbType, businessProperty.BigTextConnectStr);
+
+                await getDeviceModel.DBInit(db,default);
+              await getDeviceModel.DBInsertable(db,data,default);
+              return stringBuilder.ToString();
+
+        }},
+
+               {nameof(ScriptCheck.OnGetDemo),()=>
+                {
+                    return
+                    pname == nameof(SqlDBProducerProperty.BigTextScriptHistoryTable)?
+                    """"
+                    using ThingsGateway.Foundation;
+                    
+                    using System.Dynamic;
+                    using ThingsGateway.SqlSugar;
+                    using ThingsGateway.Gateway.Application;
+                    using ThingsGateway.Plugin.DB;
+                    using System.Dynamic;
+                    
+                    using TouchSocket.Core;
+                    public class S1 : DynamicSQLBase
+                    {
+
+                        public override async Task DBInit(ISqlSugarClient db, CancellationToken cancellationToken)
+                        {
+
+                            var sql = $"""
+                                        111
+                                    """;
+                            await db.Ado.ExecuteCommandAsync(sql, default, cancellationToken: cancellationToken).ConfigureAwait(false);
+                        }
+                        public override async Task DBInsertable(ISqlSugarClient db, IEnumerable<object> datas, CancellationToken cancellationToken)
+                        {
+                            var sql = $"""
+                                        111
+                                    """;
+                            await db.Ado.ExecuteCommandAsync(sql, default, cancellationToken: cancellationToken).ConfigureAwait(false);
+                        }
+                    }
+                    
+                    """"
+                    :
+
+                    pname == nameof(SqlDBProducerProperty.BigTextScriptRealTable)?
+
+                    """"
+
+                    using System.Dynamic;
+                    using ThingsGateway.Foundation;
+                    using ThingsGateway.SqlSugar;
+                    using ThingsGateway.Gateway.Application;
+                    using ThingsGateway.Plugin.DB;
+
+                    using TouchSocket.Core;
+                    public class S1 : DynamicSQLBase
+                    {
+
+                        public override async Task DBInit(ISqlSugarClient db, CancellationToken cancellationToken)
+                        {
+
+                            var sql = $"""
+                                        111
+                                    """;
+                            await db.Ado.ExecuteCommandAsync(sql, default, cancellationToken: cancellationToken).ConfigureAwait(false);
+                        }
+                        public override async Task DBInsertable(ISqlSugarClient db, IEnumerable<object> datas, CancellationToken cancellationToken)
+                        {
+                            var sql = $"""
+                                            111
+                                    """;
+                            await db.Ado.ExecuteCommandAsync(sql, default, cancellationToken: cancellationToken).ConfigureAwait(false);
+                        }
+                    }
+
+                    """"
+                    :
+                    ""
+                    ;
+                }
+            },
+        {nameof(ScriptCheck.ScriptChanged),EventCallback.Factory.Create<string>(this, v =>
+        {
+businessProperty.BigTextScriptHistoryTable=v;
+
+        }) },
+
+    });
+            await DialogService.Show(op);
+
+        }
+
+
         [Inject]
         DialogService DialogService { get; set; }
     }

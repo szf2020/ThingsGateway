@@ -5,6 +5,7 @@
 @using ThingsGateway.Admin.Application
 @using ThingsGateway.Admin.Razor
 @using ThingsGateway.Gateway.Application
+@using ThingsGateway.Gateway.Razor
 @namespace ThingsGateway.Plugin.Mqtt
 
 
@@ -55,7 +56,7 @@
                             <BootstrapLabel Value=@Localizer["BigTextScriptDeviceModel"] ShowLabelTooltip="true" />
                             <CodeEditor ShowLineNo @bind-Value=@businessProperty.BigTextScriptDeviceModel Language="csharp" Theme="vs-dark" IsReadonly=@(!CanWrite) />
                             <div class="ms-2 d-flex justify-content-center align-items-center">
-                                <Button IsDisabled=@(!CanWrite) OnClick="()=>CheckScript(businessProperty,nameof(businessProperty.BigTextScriptDeviceModel))">
+                                <Button IsDisabled=@(!CanWrite) OnClick=@(()=>PropertyComponent.CheckScript(businessProperty,nameof(businessProperty.BigTextScriptDeviceModel), Localizer["check"], this, DialogService))>
                                     @Localizer["Check"]
                                 </Button>
                             </div>
@@ -65,7 +66,7 @@
                             <CodeEditor IsReadonly=@(!CanWrite) ShowLineNo @bind-Value=@businessProperty.BigTextScriptVariableModel Language="csharp" Theme="vs-dark" />
 
                             <div class="ms-2 d-flex justify-content-center align-items-center">
-                                <Button IsDisabled=@(!CanWrite) OnClick="()=>CheckScript(businessProperty,nameof(businessProperty.BigTextScriptVariableModel))">
+                                <Button IsDisabled=@(!CanWrite) OnClick=@(()=>PropertyComponent.CheckScript(businessProperty,nameof(businessProperty.BigTextScriptVariableModel), Localizer["check"], this, DialogService))>
                                     @Localizer["Check"]
                                 </Button>
                             </div>
@@ -75,7 +76,7 @@
                             <CodeEditor IsReadonly=@(!CanWrite) ShowLineNo @bind-Value=@businessProperty.BigTextScriptAlarmModel Language="csharp" Theme="vs-dark" />
 
                             <div class="ms-2 d-flex justify-content-center align-items-center">
-                                <Button IsDisabled=@(!CanWrite) OnClick="()=>CheckScript(businessProperty,nameof(businessProperty.BigTextScriptAlarmModel))">
+                                <Button IsDisabled=@(!CanWrite) OnClick=@(()=>PropertyComponent.CheckScript(businessProperty,nameof(businessProperty.BigTextScriptAlarmModel), Localizer["check"], this, DialogService))>
                                     @Localizer["Check"]
                                 </Button>
                             </div>
