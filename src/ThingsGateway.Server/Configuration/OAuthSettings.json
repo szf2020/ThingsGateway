@@ -1,0 +1,10 @@
+{
+  "GiteeOAuthSettings": {
+    "ClientId": "237adcc9fd39a71d53691d96642e1c2432db90ad93c02f72604897a348f347c6",
+    "ClientSecret": "4650577daf4cb02b325f3ae163e6706e87c4dc2ad615b035821b21116b279bca"
+  },
+  "GithubOAuthSettings": {
+    "ClientId": "Ov23lijDvpmRPawSDyWN",
+    "ClientSecret": "1f4aab562651dbe5d6a637afc57a5ca9a397ac07"
+  }
+}

@@ -3,16 +3,20 @@ using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.AspNetCore.WebUtilities;
 
 using System.Net.Http.Headers;
-using System.Text;
 using System.Text.Json;
+
+using ThingsGateway.NewLife.Log;
 
 namespace ThingsGateway.Admin.Application;
 
 public class GiteeOAuthOptions : AdminOAuthOptions
 {
-
+    INoticeService _noticeService;
+    IVerificatInfoService _verificatInfoService;
     public GiteeOAuthOptions() : base()
     {
+        _noticeService = App.GetService<INoticeService>();
+        _verificatInfoService = App.GetService<IVerificatInfoService>();
         this.SignInScheme = ClaimConst.Scheme;
         this.AuthorizationEndpoint = "https://gitee.com/oauth/authorize";
         this.TokenEndpoint = "https://gitee.com/oauth/token";
@@ -29,11 +33,14 @@ public class GiteeOAuthOptions : AdminOAuthOptions
 
         Events.OnRedirectToAuthorizationEndpoint = context =>
         {
-            //context.RedirectUri = context.RedirectUri.Replace("http%3A%2F%2F", "https%3A%2F%2F"); // 强制替换
             context.Response.Redirect(context.RedirectUri);
             return Task.CompletedTask;
         };
-
+        Events.OnRemoteFailure = context =>
+        {
+            XTrace.WriteException(context.Failure);
+            return Task.CompletedTask;
+        };
     }
 
     /// <summary>刷新 Token 方法</summary>
@@ -60,16 +67,7 @@ public class GiteeOAuthOptions : AdminOAuthOptions
         return OAuthTokenResponse.Failed(new OAuthTokenException($"OAuth token endpoint failure: {await Display(response).ConfigureAwait(false)}"));
     }
 
-    /// <summary>生成错误信息方法</summary>
-    protected static async Task<string> Display(HttpResponseMessage response)
-    {
-        var output = new StringBuilder();
-        output.Append($"Status: {response.StatusCode}; ");
-        output.Append($"Headers: {response.Headers}; ");
-        output.Append($"Body: {await response.Content.ReadAsStringAsync().ConfigureAwait(false)};");
 
-        return output.ToString();
-    }
 
     public override string GetName(JsonElement element)
     {
@@ -77,7 +75,7 @@ public class GiteeOAuthOptions : AdminOAuthOptions
         return target.TryGetValue("name");
     }
 
-    private static async Task HandlerGiteeStarredUrl(OAuthCreatingTicketContext context, string repoFullName = "ThingsGateway/ThingsGateway")
+    private async Task HandlerGiteeStarredUrl(OAuthCreatingTicketContext context, string repoFullName = "ThingsGateway/ThingsGateway")
     {
         if (string.IsNullOrWhiteSpace(context.AccessToken))
             throw new InvalidOperationException("Access token is missing.");
@@ -89,7 +87,7 @@ public class GiteeOAuthOptions : AdminOAuthOptions
             { "access_token", context.AccessToken }
         };
 
-        var request = new HttpRequestMessage(HttpMethod.Put, QueryHelpers.AddQueryString(uri, queryString))
+        var request = new HttpRequestMessage(HttpMethod.Get, QueryHelpers.AddQueryString(uri, queryString))
         {
             Headers = { Accept = { new MediaTypeWithQualityHeaderValue("application/json") } }
         };
@@ -99,7 +97,17 @@ public class GiteeOAuthOptions : AdminOAuthOptions
         if (!response.IsSuccessStatusCode)
         {
             var content = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-            throw new Exception($"Failed to star repository: {response.StatusCode}, {content}");
+
+            var id = context.Identity.Claims.FirstOrDefault(a => a.Type == ClaimConst.VerificatId).Value;
+
+            var verificatInfoIds = _verificatInfoService.GetOne(id.ToLong());
+
+            _ = Task.Run(async () =>
+             {
+                 await Task.Delay(5000).ConfigureAwait(false);
+                 await _noticeService.NavigationMesage(verificatInfoIds.ClientIds, "https://gitee.com/ThingsGateway/ThingsGateway", "创作不易，如有帮助请star仓库").ConfigureAwait(false);
+             });
+            //throw new Exception($"Failed to star repository: {response.StatusCode}, {content}");
         }
 
 

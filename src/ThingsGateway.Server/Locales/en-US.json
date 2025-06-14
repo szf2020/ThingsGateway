@@ -35,6 +35,7 @@
   },
   "ThingsGateway.Server.Login": {
     "GiteeLogin": "Gitee OAuth",
+    "GithubLogin": "Github OAuth",
     "LoginErrorc2": "Please contact the administrator!",
     "LoginErrorh1": "Login Error",
     "LoginErrorh2": "Login Failed",

@@ -48,7 +48,8 @@
                     <h5 class="mt-2 mb-12 ">@Localizer["Welcome"] 👋</h5>
                     @if(WebsiteOption.Value.Demo)
                     {
-                        <Button Class="btn-block mt-5" IsAsync OnClick=GiteeLogin>@Localizer["GiteeLogin"]</Button>
+                        <Button class="btn-block mt-5" IsAsync OnClick=GithubLogin>@Localizer["GithubLogin"]</Button>
+                        <Button class="btn-block mt-5" IsAsync OnClick=GiteeLogin>@Localizer["GiteeLogin"]</Button>
                     }
                     else
                     {

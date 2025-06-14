@@ -296,6 +296,14 @@ public class Startup : AppStartup
             options.ClientSecret = data.ClientSecret;
 
         });
+
+            authenticationBuilder.AddOAuth<GitHubOAuthOptions, AdminOAuthHandler<GitHubOAuthOptions>>("Github", "Github", options =>
+            {
+                var data = App.GetConfig<GithubOAuthSettings>("GithubOAuthSettings");
+                options.ClientId = data.ClientId;
+                options.ClientSecret = data.ClientSecret;
+
+            });
         }
 
         // 添加jwt授权

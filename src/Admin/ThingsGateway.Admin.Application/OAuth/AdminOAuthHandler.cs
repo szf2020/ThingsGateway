@@ -1,18 +1,14 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 using System.Collections.Concurrent;
-using System.Net.Http.Headers;
 using System.Security.Claims;
-using System.Text;
 using System.Text.Encodings.Web;
-using System.Text.Json;
 
 using ThingsGateway.Extension;
 
@@ -80,6 +76,7 @@ public class AdminOAuthHandler<TOptions>(
         AuthenticationProperties properties,
         OAuthTokenResponse tokens)
     {
+        Backchannel.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", tokens.AccessToken);
         properties.RedirectUri = Options.HomePath;
         properties.IsPersistent = true;
         var appConfig = await configService.GetAppConfigAsync().ConfigureAwait(false);
@@ -90,7 +87,7 @@ public class AdminOAuthHandler<TOptions>(
             properties.ExpiresUtc = TimeProvider.System.GetUtcNow().AddSeconds(result);
             expire = (int)(result / 60.0);
         }
-        var user = await HandleUserInfoAsync(tokens).ConfigureAwait(false);
+        var user = await Options.HandleUserInfoAsync(Context, tokens).ConfigureAwait(false);
 
         var loginEvent = await GetLogin(expire).ConfigureAwait(false);
         await UpdateUser(loginEvent).ConfigureAwait(false);
@@ -148,43 +145,8 @@ public class AdminOAuthHandler<TOptions>(
     }
 
 
-    /// <summary>处理用户信息方法</summary>
-    protected virtual async Task<JsonElement> HandleUserInfoAsync(OAuthTokenResponse tokens)
-    {
-        var request = new HttpRequestMessage(HttpMethod.Get, BuildUserInfoUrl(tokens));
-        request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-        var response = await Backchannel.SendAsync(request, Context.RequestAborted).ConfigureAwait(false);
 
-        var content = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-
-        if (response.IsSuccessStatusCode)
-        {
-            return JsonDocument.Parse(content).RootElement;
-        }
-
-        throw new OAuthTokenException($"OAuth user info endpoint failure: {await Display(response).ConfigureAwait(false)}");
-    }
-
-    /// <summary>生成用户信息请求地址方法</summary>
-    protected virtual string BuildUserInfoUrl(OAuthTokenResponse tokens)
-    {
-        return QueryHelpers.AddQueryString(Options.UserInformationEndpoint, new Dictionary<string, string>
-        {
-            { "access_token", tokens.AccessToken }
-        });
-    }
-
-    /// <summary>生成错误信息方法</summary>
-    protected static async Task<string> Display(HttpResponseMessage response)
-    {
-        var output = new StringBuilder();
-        output.Append($"Status: {response.StatusCode}; ");
-        output.Append($"Headers: {response.Headers}; ");
-        output.Append($"Body: {await response.Content.ReadAsStringAsync().ConfigureAwait(false)};");
-
-        return output.ToString();
-    }
 
     private async Task<LoginEvent> GetLogin(int expire)
     {

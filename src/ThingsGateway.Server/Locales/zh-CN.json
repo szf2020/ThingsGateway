@@ -35,6 +35,7 @@
   },
   "ThingsGateway.Server.Login": {
     "GiteeLogin": "Gitee授权登录",
+    "GithubLogin": "Github授权登录",
     "LoginErrorc2": "请联系管理员!",
     "LoginErrorh1": "登录异常",
     "LoginErrorh2": "登录失败",
