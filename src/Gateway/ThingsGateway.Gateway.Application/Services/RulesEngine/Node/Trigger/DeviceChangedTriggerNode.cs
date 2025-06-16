@@ -59,7 +59,7 @@ public class DeviceChangedTriggerNode : TextNode, ITriggerNode, IDisposable
     }
     static Task RunAsync()
     {
-        return DeviceDatas.GetConsumingEnumerable().ParallelForEachAsync((async (deviceDatas, token) =>
+        return DeviceDatas.GetConsumingEnumerable().ParallelForEachStreamedAsync((async (deviceDatas, token) =>
             {
 
                 if (DeviceChangedTriggerNodeDict.TryGetValue(deviceDatas.Name ?? string.Empty, out var valueChangedTriggerNodes))

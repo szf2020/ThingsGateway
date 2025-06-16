@@ -41,14 +41,16 @@
 
             }
 
+            <PopConfirmButton IsAsync IsDisabled=@_importPreviews.Any(it => it.Value.HasError) Color=Color.Warning class="mt-2" OnConfirm=@(SaveDeviceImport)>@Localizer["Import"]</PopConfirmButton>
 
-            <Button IsAsync class="mt-2" IsDisabled=@_importPreviews.Any(it => it.Value.HasError) OnClick="() => step.Next()">@Localizer["Next"]</Button>
+@* 
+            <Button IsAsync class="mt-2" IsDisabled=@_importPreviews.Any(it => it.Value.HasError) OnClick="() => step.Next()">@Localizer["Next"]</Button> *@
 
         </div>
     </StepItem>
-    <StepItem Text=@Localizer["Third"] Title=@Localizer["Import"]>
+@*     <StepItem Text=@Localizer["Third"] Title=@Localizer["Import"]>
         <PopConfirmButton IsAsync Color=Color.Warning class="mt-2" OnConfirm=@(SaveDeviceImport)>@Localizer["Import"]</PopConfirmButton>
-    </StepItem>
+    </StepItem> *@
 </Step>
 @code {
     [NotNull]

@@ -55,7 +55,7 @@ public static class CodeFirstUtils
             var entityType = seedType.GetInterfaces().First().GetGenericArguments().First();//获取实体类型
             var tenantAtt = entityType.GetCustomAttribute<TenantAttribute>();//获取sqlSugar多库特性
             if (tenantAtt == null) continue;//如果没有多库特性就下一个
-            using var db = DbContext.Db.GetConnectionScope(tenantAtt.configId.ToString()).CopyNew();//获取数据库对象
+            using var db = DbContext.GetDB(tenantAtt.configId.ToString());//获取数据库对象
             var config = DbContext.DbConfigs.FirstOrDefault(u => u.ConfigId.ToString() == tenantAtt.configId.ToString());//获取数据库配置
             if (config?.InitSeedData != true) continue;
             var entityInfo = db.EntityMaintenance.GetEntityInfo(entityType);
@@ -99,7 +99,7 @@ public static class CodeFirstUtils
             var ignoreInit = entityType.GetCustomAttribute<IgnoreInitTableAttribute>();//获取忽略初始化特性
             if (ignoreInit != null) continue;//如果有忽略初始化特性
             if (tenantAtt == null) continue;//如果没有多库特性就下一个
-            using var db = DbContext.Db.GetConnectionScope(tenantAtt.configId.ToString()).CopyNew();//获取数据库对象
+            using var db = DbContext.GetDB(tenantAtt.configId.ToString());//获取数据库对象
             var splitTable = entityType.GetCustomAttribute<SplitTableAttribute>();//获取自动分表特性
             if (splitTable == null)//如果特性是空
                 db.CodeFirst.InitTables(entityType);//普通创建

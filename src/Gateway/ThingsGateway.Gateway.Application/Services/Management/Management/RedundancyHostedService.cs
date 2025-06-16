@@ -136,8 +136,9 @@ internal sealed class RedundancyHostedService : BackgroundService, IRedundancyHo
     /// </summary>
     /// <param name="tcpDmtpService">服务</param>
     /// <param name="syncInterval">同步间隔</param>
+    /// <param name="log">log</param>
     /// <param name="stoppingToken">取消任务的 CancellationToken</param>
-    private async ValueTask DoMasterWork(TcpDmtpService tcpDmtpService, int syncInterval, CancellationToken stoppingToken)
+    private static async ValueTask DoMasterWork(TcpDmtpService tcpDmtpService, int syncInterval, ILog log, CancellationToken stoppingToken)
     {
         // 延迟一段时间，避免过于频繁地执行任务
         await Task.Delay(500, stoppingToken).ConfigureAwait(false);
@@ -168,7 +169,7 @@ internal sealed class RedundancyHostedService : BackgroundService, IRedundancyHo
                         // 将 GlobalData.CollectDevices 和 GlobalData.Variables 同步到从站
                         await item.GetDmtpRpcActor().InvokeAsync(
                                          nameof(ReverseCallbackServer.UpData), null, waitInvoke, deviceRunTimes).ConfigureAwait(false);
-                        LogMessage?.LogTrace($"{item.GetIPPort()} Update StandbyStation data success");
+                        log?.LogTrace($"{item.GetIPPort()} Update StandbyStation data success");
                     }
 
                 }
@@ -176,7 +177,7 @@ internal sealed class RedundancyHostedService : BackgroundService, IRedundancyHo
             catch (Exception ex)
             {
                 // 输出警告日志，指示同步数据到从站时发生错误
-                LogMessage?.LogWarning(ex, "Synchronize data to standby site error");
+                log?.LogWarning(ex, "Synchronize data to standby site error");
             }
             await Task.Delay(syncInterval, stoppingToken).ConfigureAwait(false);
         }
@@ -188,7 +189,7 @@ internal sealed class RedundancyHostedService : BackgroundService, IRedundancyHo
         }
         catch (Exception ex)
         {
-            LogMessage?.LogWarning(ex, "Execute");
+            log?.LogWarning(ex, "Execute");
         }
     }
 
@@ -328,9 +329,10 @@ internal sealed class RedundancyHostedService : BackgroundService, IRedundancyHo
     private WaitLock _switchLock = new();
 
     /// <inheritdoc/>
-    protected override Task ExecuteAsync(CancellationToken stoppingToken)
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        return StartRedundancyTaskAsync();
+        await Task.Yield();
+        await StartRedundancyTaskAsync().ConfigureAwait(false);
     }
 
     public async Task<OperResult> StartRedundancyTaskAsync()
@@ -348,7 +350,7 @@ internal sealed class RedundancyHostedService : BackgroundService, IRedundancyHo
             {
                 if (RedundancyOptions.IsMaster)
                 {
-                    RedundancyTask = new DoTask(a => DoMasterWork(TcpDmtpService, RedundancyOptions.SyncInterval, a), LogMessage); // 创建新的任务
+                    RedundancyTask = new DoTask(a => DoMasterWork(TcpDmtpService, RedundancyOptions.SyncInterval, LogMessage, a), LogMessage); // 创建新的任务
                 }
                 else
                 {

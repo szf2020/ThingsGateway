@@ -17,8 +17,8 @@ public interface IChannelThreadManage
     ConcurrentDictionary<long, IDeviceThreadManage> DeviceThreadManages { get; }
 
     Task RestartChannelAsync(ChannelRuntime channelRuntime);
-    Task RestartChannelAsync(IEnumerable<ChannelRuntime> channelRuntimes);
+    Task RestartChannelAsync(IList<ChannelRuntime> channelRuntimes);
 
-    Task RemoveChannelAsync(IEnumerable<long> channelIds);
+    Task RemoveChannelAsync(IList<long> channelIds);
     Task RemoveChannelAsync(long channelId);
 }

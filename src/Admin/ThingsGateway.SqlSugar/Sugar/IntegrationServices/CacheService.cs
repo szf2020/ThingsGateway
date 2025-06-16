@@ -1,4 +1,6 @@
-﻿namespace ThingsGateway.SqlSugar
+﻿using ThingsGateway.NewLife.Caching;
+
+namespace ThingsGateway.SqlSugar
 {
     public class ReflectionInoCacheService : ICacheService
     {
@@ -6,6 +8,7 @@
         {
             ReflectionInoCore<V>.GetInstance().Add(key, value);
         }
+
         public void Add<V>(string key, V value, int cacheDurationInSeconds)
         {
             ReflectionInoCore<V>.GetInstance().Add(key, value, cacheDurationInSeconds);
@@ -38,7 +41,7 @@
     }
     public class ReflectionInoCore<V>
     {
-        readonly System.Collections.Concurrent.ConcurrentDictionary<string, V> InstanceCache = new System.Collections.Concurrent.ConcurrentDictionary<string, V>();
+        readonly MemoryCache InstanceCache = new() { Expire = 1800 };
         private static ReflectionInoCore<V> _instance = null;
         private static readonly object _instanceLock = new object();
         private ReflectionInoCore() { }
@@ -58,10 +61,7 @@
 
         public V Get(string key)
         {
-            if (this.ContainsKey(key))
-                return this.InstanceCache[key];
-            else
-                return default(V);
+            return this.InstanceCache.Get<V>(key);
         }
 
         public static ReflectionInoCore<V> GetInstance()
@@ -89,8 +89,7 @@
 
         public void Remove(string key)
         {
-            V val;
-            this.InstanceCache.TryRemove(key, out val);
+            this.InstanceCache.Remove(key);
         }
 
         public void RemoveAllCache()
@@ -108,13 +107,7 @@
 
         public V GetOrCreate(string cacheKey, Func<V> create)
         {
-            if (this.ContainsKey(cacheKey)) return Get(cacheKey);
-            else
-            {
-                var reval = create();
-                this.Add(cacheKey, reval);
-                return reval;
-            }
+            return InstanceCache.GetOrAdd<V>(cacheKey, (a) => create());
         }
     }
     public static class ReflectionInoHelper

@@ -73,6 +73,10 @@ public interface IChannelOptions
     /// </summary>
     bool RtsEnable { get; set; }
 
+    /// <summary>
+    /// StreamAsync
+    /// </summary>
+    bool StreamAsync { get; set; }
 
     #endregion
     /// <summary>

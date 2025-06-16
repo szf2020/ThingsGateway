@@ -27,7 +27,7 @@ public class LogJob : IJob
 
     private static async Task DeleteSysOperateLog(int daysAgo, CancellationToken stoppingToken)
     {
-        using var db = DbContext.Db.GetConnectionScopeWithAttr<SysOperateLog>().CopyNew();
+        using var db = DbContext.GetDB<SysOperateLog>();
         var time = DateTime.Now.AddDays(-daysAgo);
         await db.DeleteableWithAttr<SysOperateLog>().Where(u => u.OpTime < time).ExecuteCommandAsync(stoppingToken).ConfigureAwait(false); // 删除操作日志
     }

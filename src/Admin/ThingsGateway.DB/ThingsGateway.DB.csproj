@@ -22,7 +22,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\ThingsGateway.Razor\ThingsGateway.Razor.csproj" />
+		<PackageReference Include="ThingsGateway.Razor" Version="$(SourceGeneratorVersion)" />
+		<!--<ProjectReference Include="..\ThingsGateway.Razor\ThingsGateway.Razor.csproj" />-->
 		<ProjectReference Include="..\ThingsGateway.SqlSugar\ThingsGateway.SqlSugar.csproj" />
 		<!--<PackageReference Include="SqlSugarCore" Version="5.1.4.195" />-->
 	</ItemGroup>

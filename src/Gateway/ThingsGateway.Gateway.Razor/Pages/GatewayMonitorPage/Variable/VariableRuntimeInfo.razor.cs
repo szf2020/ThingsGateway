@@ -345,8 +345,8 @@ public partial class VariableRuntimeInfo : IDisposable
             ShowCloseButton = false,
         };
         var models = Items
-                .WhereIf(!_option.SearchText.IsNullOrWhiteSpace(), a => a.Name.Contains(_option.SearchText)).GetData(_option, out var total).ToList();
-        if (models.Count > 50000)
+                .WhereIf(!_option.SearchText.IsNullOrWhiteSpace(), a => a.Name.Contains(_option.SearchText)).GetData(_option, out var total);
+        if (models.Count() > 50000)
         {
             await ToastService.Warning("online Excel max data count 50000");
             return;

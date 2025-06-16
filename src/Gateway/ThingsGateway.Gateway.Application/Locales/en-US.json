@@ -266,6 +266,7 @@
     "PortName": "PortName",
     "RemoteUrl": "RemoteUrl",
     "RtsEnable": "RtsEnable",
+    "StreamAsync": "StreamAsync",
     "SaveChannel": "Add/Modify Channel",
     "SortCode": "SortCode",
     "StopBits": "StopBits",

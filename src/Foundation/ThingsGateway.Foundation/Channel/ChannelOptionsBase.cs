@@ -69,6 +69,11 @@ namespace ThingsGateway.Foundation
         public virtual bool DtrEnable { get; set; } = true;
 
         /// <summary>
+        /// StreamAsync
+        /// </summary>
+        public virtual bool StreamAsync { get; set; } = false;
+
+        /// <summary>
         /// RtsEnable
         /// </summary>
         public virtual bool RtsEnable { get; set; } = true;

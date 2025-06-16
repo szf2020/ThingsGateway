@@ -25,7 +25,7 @@ public abstract class AdminOAuthOptions : OAuthOptions
 
         Backchannel = new HttpClient(new HttpClientHandler
         {
-            ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator // 若测试用
+            ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
         });
         Backchannel.DefaultRequestHeaders.UserAgent.Add(
             new ProductInfoHeaderValue("ThingsGateway", "1.0"));

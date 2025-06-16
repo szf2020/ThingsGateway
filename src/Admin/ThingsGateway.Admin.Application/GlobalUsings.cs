@@ -8,5 +8,4 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-global using ThingsGateway;
 global using ThingsGateway.NewLife.Extension;

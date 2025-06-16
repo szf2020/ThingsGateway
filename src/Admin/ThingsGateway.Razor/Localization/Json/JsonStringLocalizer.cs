@@ -5,9 +5,10 @@
 
 using Microsoft.Extensions.Logging;
 
-using System.Collections.Concurrent;
 using System.Reflection;
 using System.Resources;
+
+using ThingsGateway.NewLife.Collections;
 
 namespace ThingsGateway;
 
@@ -107,14 +108,14 @@ internal class JsonStringLocalizer(Assembly assembly, string typeName, string ba
         return ret;
     }
 
-    private readonly ConcurrentDictionary<string, object?> _missingManifestCache = [];
+    private readonly ConcurrentHashSet<string> _missingManifestCache = [];
     private string? GetStringFromJson(string name)
     {
         // get string from json localization file
         var localizerStrings = MegerResolveLocalizers(CacheManager.GetAllStringsByTypeName(Assembly, typeName));
         var cacheKey = $"name={name}&culture={CultureInfo.CurrentUICulture.Name}";
         string? ret = null;
-        if (!_missingManifestCache.ContainsKey(cacheKey))
+        if (!_missingManifestCache.Contain(cacheKey))
         {
             var l = localizerStrings.Find(i => i.Name == name);
             if (l is { ResourceNotFound: false })
@@ -161,6 +162,7 @@ internal class JsonStringLocalizer(Assembly assembly, string typeName, string ba
     private List<LocalizedString> MegerResolveLocalizers(IEnumerable<LocalizedString>? localizerStrings)
     {
         var localizers = new List<LocalizedString>(CacheManager.GetTypeStringsFromResolve(typeName));
+
         if (localizerStrings != null)
         {
             localizers.AddRange(localizerStrings);
@@ -175,7 +177,7 @@ internal class JsonStringLocalizer(Assembly assembly, string typeName, string ba
         {
             Logger.LogInformation("{JsonStringLocalizerName} searched for '{Name}' in '{TypeName}' with culture '{CultureName}' not found.", nameof(JsonStringLocalizer), name, typeName, CultureInfo.CurrentUICulture.Name);
         }
-        _missingManifestCache.TryAdd($"name={name}&culture={CultureInfo.CurrentUICulture.Name}", null);
+        _missingManifestCache.TryAdd($"name={name}&culture={CultureInfo.CurrentUICulture.Name}");
     }
 
     private List<LocalizedString>? _allLocalizerdStrings;

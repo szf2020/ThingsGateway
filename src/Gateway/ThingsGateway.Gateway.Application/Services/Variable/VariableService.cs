@@ -586,7 +586,7 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
             var dbVariableDicts = await GetVariableImportData().ConfigureAwait(false);
 
             // 并行处理每一行数据
-            rows.ParallelForEach((item, state, index) =>
+            rows.ParallelForEachStreamed((item, state, index) =>
             {
                 try
                 {
@@ -720,7 +720,7 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
                     }
                 }
 
-                rows.ParallelForEach(item =>
+                rows.ParallelForEachStreamed(item =>
                 {
                     try
                     {

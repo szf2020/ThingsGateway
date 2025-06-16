@@ -23,6 +23,7 @@
     "PortName": "COM Port",
     "RemoteUrl": "Remote IP Address",
     "RtsEnable": "Rts",
+    "StreamAsync": "StreamAsync",
     "SaveChannel": "Add/Modify Channel",
     "StopBits": "Stop Bits"
   },
@@ -80,6 +81,7 @@
     "PortName": "PortName",
     "RemoteUrl": "RemoteUrl",
     "RtsEnable": "RtsEnable",
+    "StreamAsync": "StreamAsync",
     "StopBits": "StopBits"
   }
 }

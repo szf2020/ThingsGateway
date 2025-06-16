@@ -129,7 +129,8 @@ internal static class RuntimeServiceHelper
             }
             if (deviceRuntime != null)
             {
-                deviceRuntime.VariableRuntimes.ParallelForEach(a => a.Value.Init(newDeviceRuntime));
+                var list = deviceRuntime.VariableRuntimes.Select(a => a.Value).ToArray();
+                list.ParallelForEach(a => a.Init(newDeviceRuntime));
             }
         }
 
@@ -156,9 +157,10 @@ internal static class RuntimeServiceHelper
 
     public static void RemoveOldChannelRuntimes(IEnumerable<ChannelRuntime> oldChannelRuntimes)
     {
-        oldChannelRuntimes.SelectMany(a => a.DeviceRuntimes.SelectMany(a => a.Value.VariableRuntimes)).ParallelForEach(a => a.Value.Dispose());
-        oldChannelRuntimes.SelectMany(a => a.DeviceRuntimes).ParallelForEach(a => a.Value.Dispose());
-        oldChannelRuntimes.ParallelForEach(a => a.Dispose());
+        var devs = oldChannelRuntimes.SelectMany(a => a.DeviceRuntimes).Select(a => a.Value).ToArray();
+        devs.SelectMany(a => a.VariableRuntimes).Select(a => a.Value).ToArray().ParallelForEach(a => a.Dispose());
+        devs.ParallelForEach(a => a.Dispose());
+        oldChannelRuntimes.ToArray().ParallelForEach(a => a.Dispose());
 
         GlobalData.ChannelDeviceRuntimeDispatchService.Dispatch(null);
         GlobalData.VariableRuntimeDispatchService.Dispatch(null);
@@ -184,11 +186,12 @@ internal static class RuntimeServiceHelper
         foreach (var deviceRuntime in deviceRuntimes)
         {
             //也需要删除变量
-            deviceRuntime.VariableRuntimes.ParallelForEach(v =>
+            var vars = deviceRuntime.VariableRuntimes.Select(a => a.Value).ToArray();
+            vars.ParallelForEach(v =>
             {
 
                 //需要重启业务线程
-                var deviceRuntimes = GlobalData.IdDevices.Where(a => GlobalData.ContainsVariable(a.Key, v.Value)).Select(a => a.Value);
+                var deviceRuntimes = GlobalData.IdDevices.Where(a => GlobalData.ContainsVariable(a.Key, v)).Select(a => a.Value);
                 foreach (var deviceRuntime in deviceRuntimes)
                 {
                     if (deviceRuntime.Driver != null)
@@ -197,7 +200,7 @@ internal static class RuntimeServiceHelper
                     }
                 }
 
-                v.Value.Dispose();
+                v.Dispose();
             });
             deviceRuntime.Dispose();
         }
@@ -216,15 +219,16 @@ internal static class RuntimeServiceHelper
             if (GlobalData.Channels.TryGetValue(id, out var channelRuntime))
             {
                 channelRuntime.Dispose();
+                var devs = channelRuntime.DeviceRuntimes.Select(a => a.Value).ToArray();
 
                 //也需要删除设备和变量
-                channelRuntime.DeviceRuntimes.ParallelForEach((a =>
+                devs.ParallelForEach((a =>
                 {
-
-                    ParallelExtensions.ParallelForEach(a.Value.VariableRuntimes, (v =>
+                    var vars = a.VariableRuntimes.Select(b => b.Value).ToArray();
+                    ParallelExtensions.ParallelForEach(vars, (v =>
                     {
                         //需要重启业务线程
-                        var deviceRuntimes = GlobalData.IdDevices.Where(a => GlobalData.ContainsVariable(a.Key, v.Value)).Select(a => a.Value);
+                        var deviceRuntimes = GlobalData.IdDevices.Where(a => GlobalData.ContainsVariable(a.Key, v)).Select(a => a.Value);
                         foreach (var deviceRuntime in deviceRuntimes)
                         {
                             if (deviceRuntime.Driver != null)
@@ -234,12 +238,12 @@ internal static class RuntimeServiceHelper
                         }
 
 
-                        v.Value.Dispose();
+                        v.Dispose();
 
 
                     }
                     ));
-                    a.Value.Dispose();
+                    a.Dispose();
 
                 }));
             }
@@ -274,20 +278,20 @@ internal static class RuntimeServiceHelper
         foreach (var group in groups)
         {
             if (group.Key != null)
-                await group.Key.RemoveDeviceAsync(group.Value.Select(a => a.Id)).ConfigureAwait(false);
+                await group.Key.RemoveDeviceAsync(group.Value.Select(a => a.Id).ToArray()).ConfigureAwait(false);
         }
     }
 
 
     public static async Task ChangedDriverAsync(ILogger logger, CancellationToken cancellationToken)
     {
-        var channelDevice = GlobalData.IdDevices.Where(a => a.Value.Driver?.DriverProperties is IBusinessPropertyAllVariableBase property && property.IsAllVariable);
+        var channelDevice = GlobalData.IdDevices.Where(a => a.Value.Driver?.DriverProperties is IBusinessPropertyAllVariableBase property && property.IsAllVariable).Select(a => a.Value).ToArray();
 
         await channelDevice.ParallelForEachAsync(async (item, token) =>
          {
              try
              {
-                 await item.Value.Driver.AfterVariablesChangedAsync(token).ConfigureAwait(false);
+                 await item.Driver.AfterVariablesChangedAsync(token).ConfigureAwait(false);
              }
              catch (Exception ex)
              {
@@ -299,7 +303,7 @@ internal static class RuntimeServiceHelper
     {
         var drivers = GlobalData.IdDevices.Where(a => a.Value.Driver?.DriverProperties is IBusinessPropertyAllVariableBase property && property.IsAllVariable).Select(a => a.Value.Driver);
 
-        var changedDrivers = drivers.Concat(changedDriver).Where(a => a.DisposedValue == false).ToHashSet();
+        var changedDrivers = drivers.Concat(changedDriver).Where(a => a.DisposedValue == false).Distinct().ToArray();
         await changedDrivers.ParallelForEachAsync(async (driver, token) =>
          {
              try

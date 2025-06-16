@@ -21,3 +21,4 @@ global using System.Globalization;
 
 
 [assembly: SuppressMessage("Reliability", "CA2007", Justification = "<挂起>", Scope = "module")]
+[assembly: BlazorSetParametersAsyncGenerator.GlobalGenerateSetParametersAsync(true)]

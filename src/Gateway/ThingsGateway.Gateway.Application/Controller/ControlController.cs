@@ -318,6 +318,11 @@ public class ChannelInput
     public virtual bool RtsEnable { get; set; }
 
     /// <summary>
+    /// StreamAsync
+    /// </summary>
+    public virtual bool StreamAsync { get; set; } = false;
+
+    /// <summary>
     /// 缓存超时
     /// </summary>
     [MinValue(100)]

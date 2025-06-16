@@ -41,19 +41,19 @@ public abstract class PrimaryKeyEntity : PrimaryIdEntity
     [SugarColumn(ColumnDescription = "扩展信息", ColumnDataType = StaticConfig.CodeFirst_BigString, IsNullable = true)]
     [IgnoreExcel]
     [AutoGenerateColumn(Ignore = true)]
-    public virtual string? ExtJson { get; set; }
+    public virtual string ExtJson { get; set; }
 }
 
 public interface IBaseEntity
 {
-    DateTime? CreateTime { get; set; }
-    string? CreateUser { get; set; }
+    DateTime CreateTime { get; set; }
+    string CreateUser { get; set; }
     long CreateUserId { get; set; }
     bool IsDelete { get; set; }
-    int? SortCode { get; set; }
-    DateTime? UpdateTime { get; set; }
-    string? UpdateUser { get; set; }
-    long? UpdateUserId { get; set; }
+    int SortCode { get; set; }
+    DateTime UpdateTime { get; set; }
+    string UpdateUser { get; set; }
+    long UpdateUserId { get; set; }
 }
 
 /// <summary>
@@ -61,13 +61,22 @@ public interface IBaseEntity
 /// </summary>
 public abstract class BaseEntity : PrimaryKeyEntity, IBaseEntity
 {
+    private long createUserId;
+    private long updateUserId;
+    private DateTime createTime;
+    private DateTime updateTime;
+    private int sortCode;
+    private bool isDelete = false;
+    private string createUser;
+    private string updateUser;
+
     /// <summary>
     /// 创建时间
     /// </summary>
     [SugarColumn(ColumnDescription = "创建时间", IsOnlyIgnoreUpdate = true, IsNullable = true)]
     [IgnoreExcel]
     [AutoGenerateColumn(Visible = false, IsVisibleWhenAdd = false, IsVisibleWhenEdit = false)]
-    public virtual DateTime? CreateTime { get; set; }
+    public virtual DateTime CreateTime { get => createTime; set => createTime = value; }
 
     /// <summary>
     /// 创建人
@@ -76,7 +85,7 @@ public abstract class BaseEntity : PrimaryKeyEntity, IBaseEntity
     [IgnoreExcel]
     [NotNull]
     [AutoGenerateColumn(Ignore = true)]
-    public virtual string? CreateUser { get; set; }
+    public virtual string CreateUser { get => createUser; set => createUser = value; }
 
     /// <summary>
     /// 创建者Id
@@ -84,7 +93,7 @@ public abstract class BaseEntity : PrimaryKeyEntity, IBaseEntity
     [SugarColumn(ColumnDescription = "创建者Id", IsOnlyIgnoreUpdate = true, IsNullable = true)]
     [IgnoreExcel]
     [AutoGenerateColumn(Ignore = true)]
-    public virtual long CreateUserId { get; set; }
+    public virtual long CreateUserId { get => createUserId; set => createUserId = value; }
 
     /// <summary>
     /// 软删除
@@ -92,8 +101,7 @@ public abstract class BaseEntity : PrimaryKeyEntity, IBaseEntity
     [SugarColumn(ColumnDescription = "软删除", IsNullable = true)]
     [IgnoreExcel]
     [AutoGenerateColumn(Ignore = true)]
-    public virtual bool IsDelete { get; set; } = false;
-
+    public virtual bool IsDelete { get => isDelete; set => isDelete = value; }
 
     /// <summary>
     /// 更新时间
@@ -101,7 +109,7 @@ public abstract class BaseEntity : PrimaryKeyEntity, IBaseEntity
     [SugarColumn(ColumnDescription = "更新时间", IsOnlyIgnoreInsert = true, IsNullable = true)]
     [IgnoreExcel]
     [AutoGenerateColumn(Visible = false, IsVisibleWhenAdd = false, IsVisibleWhenEdit = false)]
-    public virtual DateTime? UpdateTime { get; set; }
+    public virtual DateTime UpdateTime { get => updateTime; set => updateTime = value; }
 
     /// <summary>
     /// 更新人
@@ -109,7 +117,7 @@ public abstract class BaseEntity : PrimaryKeyEntity, IBaseEntity
     [SugarColumn(ColumnDescription = "更新人", IsOnlyIgnoreInsert = true, IsNullable = true)]
     [IgnoreExcel]
     [AutoGenerateColumn(Ignore = true)]
-    public virtual string? UpdateUser { get; set; }
+    public virtual string UpdateUser { get => updateUser; set => updateUser = value; }
 
     /// <summary>
     /// 修改者Id
@@ -117,7 +125,7 @@ public abstract class BaseEntity : PrimaryKeyEntity, IBaseEntity
     [SugarColumn(ColumnDescription = "修改者Id", IsOnlyIgnoreInsert = true, IsNullable = true)]
     [IgnoreExcel]
     [AutoGenerateColumn(Ignore = true)]
-    public virtual long? UpdateUserId { get; set; }
+    public virtual long UpdateUserId { get => updateUserId; set => updateUserId = value; }
 
     /// <summary>
     /// 排序码
@@ -125,7 +133,7 @@ public abstract class BaseEntity : PrimaryKeyEntity, IBaseEntity
     [SugarColumn(ColumnDescription = "排序码", IsNullable = true)]
     [AutoGenerateColumn(Visible = false, DefaultSort = true, Sortable = true, DefaultSortOrder = SortOrder.Asc)]
     [IgnoreExcel]
-    public virtual int? SortCode { get; set; }
+    public virtual int SortCode { get => sortCode; set => sortCode = value; }
 }
 
 public interface IBaseDataEntity

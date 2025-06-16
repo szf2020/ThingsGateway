@@ -28,7 +28,8 @@ namespace ThingsGateway.SqlSugar
             _configs = configs;
             this._configAction = configAction;
         }
-        public SqlSugarClient ScopedContext { get { return GetContext(); } }
+        public ISqlSugarClient Context => ScopedContext.Context;
+        protected SqlSugarClient ScopedContext { get { return GetContext(); } }
         public SugarActionType SugarActionType { get => ScopedContext.SugarActionType; set => ScopedContext.SugarActionType = value; }
         public MappingTableList MappingTables { get => ScopedContext.MappingTables; set => ScopedContext.MappingTables = value; }
         public MappingColumnList MappingColumns { get => ScopedContext.MappingColumns; set => ScopedContext.MappingColumns = value; }

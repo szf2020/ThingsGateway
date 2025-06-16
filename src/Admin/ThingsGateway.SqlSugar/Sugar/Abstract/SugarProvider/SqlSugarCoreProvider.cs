@@ -7,8 +7,8 @@ namespace ThingsGateway.SqlSugar
     /// </summary>
     public partial class SqlSugarScope : ISqlSugarClient, ITenant
     {
-        private List<ConnectionConfig> _configs;
-        private Action<SqlSugarClient> _configAction;
+        protected List<ConnectionConfig> _configs;
+        protected Action<SqlSugarClient> _configAction;
 
         protected virtual SqlSugarClient GetContext()
         {

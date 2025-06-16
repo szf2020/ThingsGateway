@@ -47,6 +47,7 @@ internal sealed class UpdateZipFileHostedService : BackgroundService, IUpdateZip
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
+        await Task.Yield();
 
         TcpDmtpClient = await GetTcpDmtpClient().ConfigureAwait(false);
         var upgradeServerOptions = App.GetOptions<UpgradeServerOptions>();

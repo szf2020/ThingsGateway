@@ -24,7 +24,7 @@ public static class DbContext
     /// <summary>
     /// SqlSugar 数据库实例
     /// </summary>
-    public static readonly SqlSugarScope Db;
+    private static readonly SqlSugarClient Db;
 
     /// <summary>
     /// 读取配置文件中的 ConnectionStrings:Sqlsugar 配置节点
@@ -37,8 +37,27 @@ public static class DbContext
     /// <returns></returns>
     public static SqlSugarClient GetDB<T>()
     {
-        return Db.GetConnectionScopeWithAttr<T>().CopyNew();
+        return Db.GetConnectionWithAttr<T>().CopyNew();
     }
+
+    /// <summary>
+    /// 获取数据库连接
+    /// </summary>
+    /// <returns></returns>
+    public static SqlSugarClient GetDB()
+    {
+        return Db;
+    }
+
+    /// <summary>
+    /// 获取数据库连接
+    /// </summary>
+    /// <returns></returns>
+    public static SqlSugarClient GetDB(string tenant)
+    {
+        return Db.GetConnection(tenant).CopyNew();//获取数据库对象
+    }
+
 
     private static ISugarAopService sugarAopService;
     private static ISugarAopService SugarAopService
@@ -62,7 +81,7 @@ public static class DbContext
         {
             DbConfigs.ForEach(it =>
             {
-                var sqlsugarScope = db.GetConnectionScope(it.ConfigId);//获取当前库
+                var sqlsugarScope = db.GetConnection(it.ConfigId);//获取当前库
                 MoreSetting(sqlsugarScope);//更多设置
                 SugarAopService.AopSetting(sqlsugarScope, it.IsShowSql);//aop配置
             }
@@ -75,7 +94,7 @@ public static class DbContext
     /// 实体更多配置
     /// </summary>
     /// <param name="db"></param>
-    private static void MoreSetting(SqlSugarScopeProvider db)
+    private static void MoreSetting(SqlSugarProvider db)
     {
         db.CurrentConnectionConfig.MoreSettings = new ConnMoreSettings
         {

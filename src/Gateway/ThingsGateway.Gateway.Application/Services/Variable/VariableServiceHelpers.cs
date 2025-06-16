@@ -68,7 +68,7 @@ public static class VariableServiceHelpers
 
         #endregion 列名称
         var varName = nameof(Variable.Name);
-        data.ParallelForEach((variable, state, index) =>
+        data.ParallelForEachStreamed((variable, state, index) =>
         {
             Dictionary<string, object> varExport = new();
             deviceDicts.TryGetValue(variable.DeviceId, out var device);

@@ -61,7 +61,7 @@ public class HardwareJob : IJob, IHardwareJob
         var historyHardwareInfos = MemoryCache.Get<List<HistoryHardwareInfo>>(CacheKey);
         if (historyHardwareInfos == null)
         {
-            using var db = _db.CopyNew();
+            using var db = _db;
             historyHardwareInfos = await db.Queryable<HistoryHardwareInfo>().Where(a => a.Date > DateTime.Now.AddDays(-3)).ToListAsync().ConfigureAwait(false);
 
             MemoryCache.Set(CacheKey, historyHardwareInfos);
@@ -71,7 +71,7 @@ public class HardwareJob : IJob, IHardwareJob
 
     private bool error = false;
     private DateTime hisInsertTime = default;
-    private SqlSugarClient _db = DbContext.Db.GetConnectionScopeWithAttr<HistoryHardwareInfo>().CopyNew();
+    private SqlSugarClient _db = DbContext.GetDB<HistoryHardwareInfo>();
 
     public async Task ExecuteAsync(JobExecutingContext context, CancellationToken stoppingToken)
     {

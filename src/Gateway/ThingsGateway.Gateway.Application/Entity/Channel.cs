@@ -138,6 +138,13 @@ public class Channel : ChannelOptionsBase, IPrimaryIdEntity, IBaseDataEntity, IB
     public override bool RtsEnable { get; set; }
 
     /// <summary>
+    /// StreamAsync
+    /// </summary>
+    [SugarColumn(ColumnDescription = "StreamAsync", IsNullable = true)]
+    [AutoGenerateColumn(Visible = false, Filterable = true, Sortable = true)]
+    public override bool StreamAsync { get; set; } = false;
+
+    /// <summary>
     /// 缓存超时
     /// </summary>
     [SugarColumn(ColumnDescription = "缓存超时", IsNullable = true)]
@@ -203,7 +210,7 @@ public class Channel : ChannelOptionsBase, IPrimaryIdEntity, IBaseDataEntity, IB
     [SugarColumn(ColumnDescription = "创建时间", IsOnlyIgnoreUpdate = true, IsNullable = true)]
     [IgnoreExcel]
     [AutoGenerateColumn(Visible = false, IsVisibleWhenAdd = false, IsVisibleWhenEdit = false)]
-    public virtual DateTime? CreateTime { get; set; }
+    public virtual DateTime CreateTime { get; set; }
 
     /// <summary>
     /// 创建人
@@ -237,7 +244,7 @@ public class Channel : ChannelOptionsBase, IPrimaryIdEntity, IBaseDataEntity, IB
     [SugarColumn(ColumnDescription = "更新时间", IsOnlyIgnoreInsert = true, IsNullable = true)]
     [IgnoreExcel]
     [AutoGenerateColumn(Visible = false, IsVisibleWhenAdd = false, IsVisibleWhenEdit = false)]
-    public virtual DateTime? UpdateTime { get; set; }
+    public virtual DateTime UpdateTime { get; set; }
 
     /// <summary>
     /// 更新人
@@ -245,7 +252,7 @@ public class Channel : ChannelOptionsBase, IPrimaryIdEntity, IBaseDataEntity, IB
     [SugarColumn(ColumnDescription = "更新人", IsOnlyIgnoreInsert = true, IsNullable = true)]
     [IgnoreExcel]
     [AutoGenerateColumn(Ignore = true)]
-    public virtual string? UpdateUser { get; set; }
+    public virtual string UpdateUser { get; set; }
 
     /// <summary>
     /// 修改者Id
@@ -253,7 +260,7 @@ public class Channel : ChannelOptionsBase, IPrimaryIdEntity, IBaseDataEntity, IB
     [SugarColumn(ColumnDescription = "修改者Id", IsOnlyIgnoreInsert = true, IsNullable = true)]
     [IgnoreExcel]
     [AutoGenerateColumn(Ignore = true)]
-    public virtual long? UpdateUserId { get; set; }
+    public virtual long UpdateUserId { get; set; }
 
     /// <summary>
     /// 排序码
@@ -261,7 +268,7 @@ public class Channel : ChannelOptionsBase, IPrimaryIdEntity, IBaseDataEntity, IB
     [SugarColumn(ColumnDescription = "排序码", IsNullable = true)]
     [AutoGenerateColumn(Visible = false, DefaultSort = true, Sortable = true, DefaultSortOrder = SortOrder.Asc)]
     [IgnoreExcel]
-    public int? SortCode { get; set; }
+    public int SortCode { get; set; }
 
     /// <summary>
     /// 导入验证专用

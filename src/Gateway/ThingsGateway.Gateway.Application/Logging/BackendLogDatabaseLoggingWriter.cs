@@ -65,7 +65,7 @@ public class BackendLogDatabaseLoggingWriter : IDatabaseLoggingWriter
             if (flush)
             {
                 // 如果SqlSugar客户端未初始化，则进行初始化
-                SqlSugarClient ??= DbContext.Db.GetConnectionScopeWithAttr<BackendLog>().CopyNew();
+                SqlSugarClient ??= DbContext.GetDB<BackendLog>();
 
                 // 异步执行入库操作
                 await SqlSugarClient.InsertableWithAttr(_logQueues.ToListWithDequeue()).ExecuteCommandAsync().ConfigureAwait(false);

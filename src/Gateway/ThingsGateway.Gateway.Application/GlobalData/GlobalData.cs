@@ -171,7 +171,7 @@ public static class GlobalData
 
     public static IEnumerable<VariableRuntime> GetEnableVariables()
     {
-        return IdDevices.SelectMany(a => a.Value.VariableRuntimes).Where(a => a.Value.Enable).Select(a => a.Value);
+        return IdDevices.SelectMany(a => a.Value.VariableRuntimes).Where(a => a.Value?.Enable == true).Select(a => a.Value);
     }
 
 

@@ -89,23 +89,3 @@ public partial class TcpServiceComponent : IDriverUIBase
     public ITcpServiceChannel? TcpServiceChannel => (((DriverBase)Driver)?.Channel as ITcpServiceChannel);
 }
 
-public class TcpSessionClientDto
-{
-    [AutoGenerateColumn(Searchable = true, Filterable = true, Sortable = true)]
-    public string Id { get; set; }
-
-    [AutoGenerateColumn(Searchable = true, Filterable = true, Sortable = true)]
-    public string IP { get; set; }
-
-    [AutoGenerateColumn(Searchable = true, Filterable = true, Sortable = true)]
-    public int Port { get; set; }
-
-    [AutoGenerateColumn(Searchable = true, Filterable = true, Sortable = true, ShowTips = true)]
-    public string PluginInfos { get; set; }
-
-    [AutoGenerateColumn(Searchable = true, Filterable = true, Sortable = true)]
-    public DateTimeOffset LastReceivedTime { get; set; }
-
-    [AutoGenerateColumn(Searchable = true, Filterable = true, Sortable = true)]
-    public DateTimeOffset LastSentTime { get; set; }
-}

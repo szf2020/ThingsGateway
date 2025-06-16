@@ -91,7 +91,7 @@ public sealed class OperDescAttribute : MoAttribute
             OperDescAttribute.WriteToQueue(log);
         }
     }
-    private static SqlSugarClient _db = DbContext.Db.GetConnectionScopeWithAttr<SysOperateLog>().CopyNew();
+    private static SqlSugarClient _db = DbContext.GetDB<SysOperateLog>();
     /// <summary>
     /// 将日志消息写入数据库中
     /// </summary>

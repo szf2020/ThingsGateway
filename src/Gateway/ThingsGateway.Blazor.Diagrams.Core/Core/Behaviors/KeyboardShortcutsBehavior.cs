@@ -24,7 +24,7 @@ public class KeyboardShortcutsBehavior : Behavior
 
     public KeyboardShortcutsBehavior(Diagram diagram) : base(diagram)
     {
-        _shortcuts = new Dictionary<string, Func<Diagram, ValueTask>>(10000, new CaseInsensitiveComparer());
+        _shortcuts = new Dictionary<string, Func<Diagram, ValueTask>>(10, new CaseInsensitiveComparer());
         SetShortcut("Delete", false, false, false, KeyboardShortcutsDefaults.DeleteSelection);
         SetShortcut("g", true, false, true, KeyboardShortcutsDefaults.Grouping);
 

@@ -102,6 +102,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ThingsGateway.DB", "Admin\T
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ThingsGateway.Blazor.Diagrams.Core", "Gateway\ThingsGateway.Blazor.Diagrams.Core\ThingsGateway.Blazor.Diagrams.Core.csproj", "{AFC0BEE4-E682-BCED-F631-99707421015A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorSetParametersAsyncGenerator", "Admin\BlazorSetParametersAsyncGenerator\BlazorSetParametersAsyncGenerator.csproj", "{4C412EC1-8501-8211-5A57-3CEEE7EEA6B3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -272,6 +274,10 @@ Global
 		{AFC0BEE4-E682-BCED-F631-99707421015A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AFC0BEE4-E682-BCED-F631-99707421015A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AFC0BEE4-E682-BCED-F631-99707421015A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4C412EC1-8501-8211-5A57-3CEEE7EEA6B3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4C412EC1-8501-8211-5A57-3CEEE7EEA6B3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4C412EC1-8501-8211-5A57-3CEEE7EEA6B3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4C412EC1-8501-8211-5A57-3CEEE7EEA6B3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -316,6 +322,7 @@ Global
 		{544EDA9F-978F-84F7-48BF-FA5888F52FFB} = {72C65578-92A5-4E99-9779-27835B12B32F}
 		{317B8159-28B1-49B1-1884-97D1BBDED982} = {72C65578-92A5-4E99-9779-27835B12B32F}
 		{AFC0BEE4-E682-BCED-F631-99707421015A} = {5948EA23-4B42-4C22-A266-2E0AE5FA575F}
+		{4C412EC1-8501-8211-5A57-3CEEE7EEA6B3} = {72C65578-92A5-4E99-9779-27835B12B32F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		RESX_Rules = {"EnabledRules":[]}

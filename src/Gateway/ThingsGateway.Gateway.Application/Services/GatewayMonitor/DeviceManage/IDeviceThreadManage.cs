@@ -24,9 +24,9 @@ public interface IDeviceThreadManage : IAsyncDisposable
 
     Task SetLogAsync(LogLevel? logLevel = null, bool upDataBase = true);
     Task RestartDeviceAsync(DeviceRuntime deviceRuntime, bool deleteCache);
-    Task RestartDeviceAsync(IEnumerable<DeviceRuntime> deviceRuntimes, bool deleteCache);
+    Task RestartDeviceAsync(IList<DeviceRuntime> deviceRuntimes, bool deleteCache);
 
-    Task RemoveDeviceAsync(IEnumerable<long> deviceIds);
+    Task RemoveDeviceAsync(IList<long> deviceIds);
     Task RemoveDeviceAsync(long deviceId);
     Task DeviceRedundantThreadAsync(long deviceId, CancellationToken cancellationToken);
 }

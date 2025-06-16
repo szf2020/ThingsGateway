@@ -101,12 +101,12 @@ public class DeviceRuntimeService : IDeviceRuntimeService
             await WaitLock.WaitAsync(cancellationToken).ConfigureAwait(false);
 
 
-            ids = ids.ToHashSet();
+            var devids = ids.ToHashSet();
 
-            var result = await GlobalData.DeviceService.DeleteDeviceAsync(ids).ConfigureAwait(false);
+            var result = await GlobalData.DeviceService.DeleteDeviceAsync(devids).ConfigureAwait(false);
 
             //根据条件重启通道线程
-            var deviceRuntimes = GlobalData.IdDevices.Where(a => ids.Contains(a.Key)).Select(a => a.Value).ToList();
+            var deviceRuntimes = GlobalData.IdDevices.Where(a => devids.Contains(a.Key)).Select(a => a.Value).ToList();
 
             ConcurrentHashSet<IDriver> changedDriver = RuntimeServiceHelper.DeleteDeviceRuntime(deviceRuntimes);
 

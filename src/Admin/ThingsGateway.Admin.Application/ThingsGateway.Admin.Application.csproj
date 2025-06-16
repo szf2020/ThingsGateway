@@ -46,7 +46,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\ThingsGateway.Razor\ThingsGateway.Razor.csproj" />
 		<ProjectReference Include="..\ThingsGateway.DB\ThingsGateway.DB.csproj" />
 	</ItemGroup>
 

@@ -324,7 +324,7 @@ public class AuthService : IAuthService
 
         #endregion 重新赋值属性,设置本次登录信息为最新的信息
 
-        using var db = DbContext.Db.GetConnectionScopeWithAttr<SysUser>().CopyNew();
+        using var db = DbContext.GetDB<SysUser>();
         //更新用户登录信息
         if (await db.Updateable(sysUser).UpdateColumns(it => new
         {

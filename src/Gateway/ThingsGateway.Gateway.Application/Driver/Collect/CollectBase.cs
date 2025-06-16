@@ -53,7 +53,7 @@ public abstract class CollectBase : DriverBase, IRpcDriver
 
         //预热脚本，加速编译
         IdVariableRuntimes.Where(a => !string.IsNullOrWhiteSpace(a.Value.ReadExpressions))
-         .Select(b => b.Value.ReadExpressions).ToHashSet().ParallelForEach(script =>
+         .Select(b => b.Value.ReadExpressions).Distinct().ToArray().ParallelForEach(script =>
          {
              try
              {
@@ -590,11 +590,11 @@ public abstract class CollectBase : DriverBase, IRpcDriver
 
         try
         {
-
-            // 使用并发方式遍历写入信息列表，并进行异步写入操作
-            await writeInfoLists
+            var list = writeInfoLists
             .Where(a => !results.Any(b => b.Key == a.Key.Name))
-            .ToDictionary(item => item.Key, item => item.Value).ParallelForEachAsync(async (writeInfo, cancellationToken) =>
+            .ToDictionary(item => item.Key, item => item.Value).ToArray();
+            // 使用并发方式遍历写入信息列表，并进行异步写入操作
+            await list.ParallelForEachAsync(async (writeInfo, cancellationToken) =>
         {
             try
             {

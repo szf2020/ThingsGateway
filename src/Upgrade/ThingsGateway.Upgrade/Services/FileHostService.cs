@@ -140,6 +140,7 @@ public class FileHostService : BackgroundService, IFileHostService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
+        await Task.Yield();
         TcpDmtpService = await GetTcpDmtpService().ConfigureAwait(false);
         while (!stoppingToken.IsCancellationRequested)
         {

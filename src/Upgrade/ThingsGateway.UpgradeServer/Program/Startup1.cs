@@ -28,7 +28,7 @@ public class Startup1 : AppStartup
         //遍历配置
         DbContext.DbConfigs?.ForEach(it =>
         {
-            var connection = DbContext.Db.GetConnection(it.ConfigId);//获取数据库连接对象
+            var connection = DbContext.GetDB().GetConnection(it.ConfigId);//获取数据库连接对象
             if (it.InitDatabase == true)
                 connection.DbMaintenance.CreateDatabase();//创建数据库,如果存在则不创建
         });

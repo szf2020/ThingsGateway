@@ -34,7 +34,7 @@ internal sealed class ChannelThreadManage : IChannelThreadManage
     /// 移除指定通道
     /// </summary>
     /// <param name="channelIds">要移除的通道ID</param>
-    private async Task PrivateRemoveChannelsAsync(IEnumerable<long> channelIds)
+    private async Task PrivateRemoveChannelsAsync(IList<long> channelIds)
     {
 
         await channelIds.ParallelForEachAsync(async (channelId, token) =>
@@ -64,7 +64,7 @@ internal sealed class ChannelThreadManage : IChannelThreadManage
         {
             await NewChannelLock.WaitAsync().ConfigureAwait(false);
 
-            await PrivateRemoveChannelsAsync(Enumerable.Repeat(channelId, 1)).ConfigureAwait(false);
+            await PrivateRemoveChannelsAsync([channelId]).ConfigureAwait(false);
         }
         finally
         {
@@ -77,7 +77,7 @@ internal sealed class ChannelThreadManage : IChannelThreadManage
     /// 移除指定通道
     /// </summary>
     /// <param name="channelIds">要移除的通道ID</param>
-    public async Task RemoveChannelAsync(IEnumerable<long> channelIds)
+    public async Task RemoveChannelAsync(IList<long> channelIds)
     {
         try
         {
@@ -94,9 +94,9 @@ internal sealed class ChannelThreadManage : IChannelThreadManage
 
 
 
-    private async Task PrivateRestartChannelAsync(IEnumerable<ChannelRuntime> channelRuntimes)
+    private async Task PrivateRestartChannelAsync(IList<ChannelRuntime> channelRuntimes)
     {
-        await PrivateRemoveChannelsAsync(channelRuntimes.Select(a => a.Id)).ConfigureAwait(false);
+        await PrivateRemoveChannelsAsync(channelRuntimes.Select(a => a.Id).ToArray()).ConfigureAwait(false);
 
         await channelRuntimes.ParallelForEachAsync(async (channelRuntime, token) =>
         {
@@ -128,7 +128,7 @@ internal sealed class ChannelThreadManage : IChannelThreadManage
 
                 deviceThreadManage.ChannelThreadManage = this;
 
-                await deviceThreadManage.RestartDeviceAsync(channelRuntime.DeviceRuntimes.Select(a => a.Value), false).ConfigureAwait(false);
+                await deviceThreadManage.RestartDeviceAsync(channelRuntime.DeviceRuntimes.Select(a => a.Value).ToList(), false).ConfigureAwait(false);
 
             }
             catch (Exception ex)
@@ -149,7 +149,7 @@ internal sealed class ChannelThreadManage : IChannelThreadManage
         try
         {
             await NewChannelLock.WaitAsync().ConfigureAwait(false);
-            await PrivateRestartChannelAsync(Enumerable.Repeat(channelRuntime, 1)).ConfigureAwait(false);
+            await PrivateRestartChannelAsync([channelRuntime]).ConfigureAwait(false);
         }
         finally
         {
@@ -160,7 +160,7 @@ internal sealed class ChannelThreadManage : IChannelThreadManage
     /// <summary>
     /// 向当前通道添加设备
     /// </summary>
-    public async Task RestartChannelAsync(IEnumerable<ChannelRuntime> channelRuntimes)
+    public async Task RestartChannelAsync(IList<ChannelRuntime> channelRuntimes)
     {
 
         try

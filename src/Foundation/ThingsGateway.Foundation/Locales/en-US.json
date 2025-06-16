@@ -20,6 +20,7 @@
     "PortName": "PortName",
     "RemoteUrl": "RemoteUrl",
     "RtsEnable": "RtsEnable",
+    "StreamAsync": "StreamAsync",
     "StopBits": "StopBits"
   },
   "ThingsGateway.Foundation.ConverterConfig": {

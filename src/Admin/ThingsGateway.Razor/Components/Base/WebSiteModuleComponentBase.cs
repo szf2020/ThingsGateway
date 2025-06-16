@@ -11,7 +11,7 @@
 namespace ThingsGateway.Razor;
 
 /// <inheritdoc/>
-public abstract class WebSiteModuleComponentBase : BootstrapModuleComponentBase
+public abstract partial class WebSiteModuleComponentBase : BootstrapModuleComponentBase
 {
     /// <inheritdoc/>
     protected override void OnLoadJSModule()

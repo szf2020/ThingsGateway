@@ -163,7 +163,7 @@ public class SiemensS7Master : CollectFoundationBase
             }
 
             // 使用并发方式遍历写入信息列表，并进行异步写入操作
-            await w2.ParallelForEachAsync(async (writeInfo, cancellationToken) =>
+            await w2.ForEachAsync(async (writeInfo) =>
             {
                 try
                 {
@@ -177,7 +177,7 @@ public class SiemensS7Master : CollectFoundationBase
                 {
                     operResults.TryAdd(writeInfo.Key.Name, new(ex));
                 }
-            }, cancellationToken).ConfigureAwait(false);
+            }).ConfigureAwait(false);
 
 
             // 返回包含操作结果的字典

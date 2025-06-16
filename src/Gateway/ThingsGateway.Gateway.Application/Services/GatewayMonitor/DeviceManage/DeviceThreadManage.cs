@@ -235,7 +235,7 @@ internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
         try
         {
             await NewDeviceLock.WaitAsync().ConfigureAwait(false);
-            await PrivateRestartDeviceAsync(Enumerable.Repeat(deviceRuntime, 1), deleteCache).ConfigureAwait(false);
+            await PrivateRestartDeviceAsync([deviceRuntime], deleteCache).ConfigureAwait(false);
         }
         finally
         {
@@ -246,7 +246,7 @@ internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
     /// <summary>
     /// 向当前通道添加设备
     /// </summary>
-    public async Task RestartDeviceAsync(IEnumerable<DeviceRuntime> deviceRuntimes, bool deleteCache)
+    public async Task RestartDeviceAsync(IList<DeviceRuntime> deviceRuntimes, bool deleteCache)
     {
 
         try
@@ -260,12 +260,12 @@ internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
         }
     }
 
-    private async Task PrivateRestartDeviceAsync(IEnumerable<DeviceRuntime> deviceRuntimes, bool deleteCache)
+    private async Task PrivateRestartDeviceAsync(IList<DeviceRuntime> deviceRuntimes, bool deleteCache)
     {
         try
         {
 
-            await PrivateRemoveDevicesAsync(deviceRuntimes.Select(a => a.Id)).ConfigureAwait(false);
+            await PrivateRemoveDevicesAsync(deviceRuntimes.Select(a => a.Id).ToArray()).ConfigureAwait(false);
 
             if (Disposed)
             {
@@ -307,7 +307,7 @@ internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
                         }
                         else
                         {
-                            await PrivateRemoveDevicesAsync(Enumerable.Repeat(redundantDeviceRuntime.Id, 1)).ConfigureAwait(false);
+                            await PrivateRemoveDevicesAsync([redundantDeviceRuntime.Id]).ConfigureAwait(false);
                         }
                         redundantDeviceThreadManage.LogMessage?.LogInformation($"The device {redundantDeviceRuntime.Name} is standby and no communication tasks are created");
 
@@ -386,7 +386,7 @@ internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
                 }
 
                 // 初始化业务线程
-                var driverTask = new DoTask(t => DoWork(driver, t), driver.LogMessage, null);
+                var driverTask = new DoTask(t => DoWork(driver, IsCollectChannel, t), driver.LogMessage, null);
                 DriverTasks.TryAdd(driver.DeviceId, driverTask);
 
                 token.Register(driver.Stop);
@@ -423,7 +423,7 @@ internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
         {
             await NewDeviceLock.WaitAsync().ConfigureAwait(false);
 
-            await PrivateRemoveDevicesAsync(Enumerable.Repeat(deviceId, 1)).ConfigureAwait(false);
+            await PrivateRemoveDevicesAsync([deviceId]).ConfigureAwait(false);
         }
         finally
         {
@@ -436,7 +436,7 @@ internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
     /// 移除指定设备
     /// </summary>
     /// <param name="deviceIds">要移除的设备ID</param>
-    public async Task RemoveDeviceAsync(IEnumerable<long> deviceIds)
+    public async Task RemoveDeviceAsync(IList<long> deviceIds)
     {
         try
         {
@@ -455,7 +455,7 @@ internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
     /// 移除指定设备
     /// </summary>
     /// <param name="deviceIds">要移除的设备ID</param>
-    private async Task PrivateRemoveDevicesAsync(IEnumerable<long> deviceIds)
+    private async Task PrivateRemoveDevicesAsync(IList<long> deviceIds)
     {
         try
         {
@@ -533,7 +533,7 @@ internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
     }
 
 
-    private async ValueTask DoWork(DriverBase driver, CancellationToken token)
+    private static async ValueTask DoWork(DriverBase driver, bool? isCollectChannel, CancellationToken token)
     {
         try
         {
@@ -549,7 +549,7 @@ internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
                 if (result == ThreadRunReturnTypeEnum.None)
                 {
                     // 如果驱动处于离线状态且为采集驱动，则根据配置的间隔时间进行延迟
-                    if (driver.CurrentDevice.DeviceStatus == DeviceStatusEnum.OffLine && IsCollectChannel == true)
+                    if (driver.CurrentDevice.DeviceStatus == DeviceStatusEnum.OffLine && isCollectChannel == true)
                     {
                         var collectBase = (CollectBase)driver;
                         if (collectBase.CollectProperties.ReIntervalTime > 0)
@@ -643,7 +643,8 @@ internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
     {
         //传入变量
         //newDeviceRuntime.VariableRuntimes.ParallelForEach(a => a.Value.SafeDispose());
-        deviceRuntime.VariableRuntimes.ParallelForEach(a => a.Value.Init(newDeviceRuntime));
+        var list = deviceRuntime.VariableRuntimes.Select(a => a.Value).ToArray();
+        list.ParallelForEach(a => a.Init(newDeviceRuntime));
         GlobalData.VariableRuntimeDispatchService.Dispatch(null);
     }
 
@@ -729,7 +730,7 @@ internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
             channelRuntime.DeviceThreadManage.LogMessage?.LogInformation($"Device {newDeviceRuntime.Name} switched to primary channel");
 
             //需要重启业务线程
-            var businessDeviceRuntimes = GlobalData.IdDevices.Where(a => a.Value.Driver is BusinessBase).Where(a => ((BusinessBase)a.Value.Driver).CollectDevices.ContainsKey(a.Key) == true).Select(a => a.Value);
+            var businessDeviceRuntimes = GlobalData.IdDevices.Where(a => a.Value.Driver is BusinessBase).Where(a => ((BusinessBase)a.Value.Driver).CollectDevices.ContainsKey(a.Key) == true).Select(a => a.Value).ToArray();
             await businessDeviceRuntimes.ParallelForEachAsync(async (businessDeviceRuntime, token) =>
               {
                   if (businessDeviceRuntime.Driver != null)
@@ -886,7 +887,7 @@ internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
             GlobalData.DeviceStatusChangeEvent -= GlobalData_DeviceStatusChangeEvent;
             await NewDeviceLock.WaitAsync().ConfigureAwait(false);
             _logger?.TryDispose();
-            await PrivateRemoveDevicesAsync(Drivers.Keys).ConfigureAwait(false);
+            await PrivateRemoveDevicesAsync(Drivers.Select(a => a.Key).ToArray()).ConfigureAwait(false);
             if (Channel?.Collects.Count == 0)
                 Channel?.SafeDispose();
 

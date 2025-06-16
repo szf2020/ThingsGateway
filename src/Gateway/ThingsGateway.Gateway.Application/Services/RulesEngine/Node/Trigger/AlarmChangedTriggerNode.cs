@@ -76,7 +76,7 @@ public class AlarmChangedTriggerNode : VariableNode, ITriggerNode, IDisposable
     }
     static Task RunAsync()
     {
-        return AlarmVariables.GetConsumingEnumerable().ParallelForEachAsync((async (alarmVariable, token) =>
+        return AlarmVariables.GetConsumingEnumerable().ParallelForEachStreamedAsync((async (alarmVariable, token) =>
             {
                 if (AlarmChangedTriggerNodeDict.TryGetValue(alarmVariable.DeviceName, out var alarmNodeDict) &&
             alarmNodeDict.TryGetValue(alarmVariable.Name, out var alarmChangedTriggerNodes))

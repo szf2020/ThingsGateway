@@ -228,15 +228,3 @@ public partial class LogConsole : IDisposable
         }
     }
 }
-
-public class LogMessage
-{
-    public LogMessage(int level, string message)
-    {
-        Level = level;
-        Message = message;
-    }
-
-    public int Level { get; set; }
-    public string Message { get; set; }
-}

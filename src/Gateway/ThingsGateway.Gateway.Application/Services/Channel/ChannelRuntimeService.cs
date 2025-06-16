@@ -93,15 +93,15 @@ public class ChannelRuntimeService : IChannelRuntimeService
         {
             await WaitLock.WaitAsync(cancellationToken).ConfigureAwait(false);
 
-            ids = ids.ToHashSet();
-            var result = await GlobalData.ChannelService.DeleteChannelAsync(ids).ConfigureAwait(false);
+            var array = ids.ToArray();
+            var result = await GlobalData.ChannelService.DeleteChannelAsync(array).ConfigureAwait(false);
 
-            var changedDriver = RuntimeServiceHelper.DeleteChannelRuntime(ids);
+            var changedDriver = RuntimeServiceHelper.DeleteChannelRuntime(array);
 
             //根据条件重启通道线程
             if (restart)
             {
-                await GlobalData.ChannelThreadManage.RemoveChannelAsync(ids).ConfigureAwait(false);
+                await GlobalData.ChannelThreadManage.RemoveChannelAsync(array).ConfigureAwait(false);
 
                 await RuntimeServiceHelper.ChangedDriverAsync(changedDriver, _logger, cancellationToken).ConfigureAwait(false);
             }

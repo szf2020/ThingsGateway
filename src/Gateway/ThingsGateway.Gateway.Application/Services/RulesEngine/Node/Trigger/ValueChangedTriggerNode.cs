@@ -68,7 +68,7 @@ public class ValueChangedTriggerNode : VariableNode, ITriggerNode, IDisposable
     }
     static Task RunAsync()
     {
-        return VariableBasicDatas.GetConsumingEnumerable().ParallelForEachAsync((async (variableBasicData, token) =>
+        return VariableBasicDatas.GetConsumingEnumerable().ParallelForEachStreamedAsync((async (variableBasicData, token) =>
         {
 
             if (ValueChangedTriggerNodeDict.TryGetValue(variableBasicData.DeviceName, out var valueNodeDict) &&

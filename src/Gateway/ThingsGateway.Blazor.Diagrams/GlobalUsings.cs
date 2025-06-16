@@ -11,3 +11,4 @@
 
 global using Microsoft.AspNetCore.Components;
 
+[assembly: BlazorSetParametersAsyncGenerator.GlobalGenerateSetParametersAsync(true)]

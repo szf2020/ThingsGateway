@@ -396,50 +396,60 @@ internal sealed class AlarmHostedService : BackgroundService, IAlarmHostedServic
     /// <param name="cancellation">取消任务的 CancellationToken</param>
     private async Task DoWork(CancellationToken cancellation)
     {
-        try
+        while (!cancellation.IsCancellationRequested)
         {
-            if (!GlobalData.StartBusinessChannelEnable)
-                return;
 
-            //Stopwatch stopwatch = Stopwatch.StartNew();
-            // 遍历设备变量列表
-
-            GlobalData.AlarmEnableIdVariables.ParallelForEach((kv, state, index) =>
+            try
             {
+                if (!GlobalData.StartBusinessChannelEnable)
+                    return;
+
+                //Stopwatch stopwatch = Stopwatch.StartNew();
+                // 遍历设备变量列表
+
+                if (!GlobalData.AlarmEnableIdVariables.IsEmpty)
                 {
-                    // 如果取消请求已经被触发，则结束任务
-                    if (cancellation.IsCancellationRequested)
-                        return;
+                    var list = GlobalData.AlarmEnableIdVariables.Select(a => a.Value).ToArray();
+                    list.ParallelForEach((item, state, index) =>
+                {
+                    {
+                        // 如果取消请求已经被触发，则结束任务
+                        if (cancellation.IsCancellationRequested)
+                            return;
 
-                    var item = kv.Value;
+                        // 如果该变量的报警功能未启用，则跳过该变量
+                        if (!item.AlarmEnable)
+                            return;
 
-                    // 如果该变量的报警功能未启用，则跳过该变量
-                    if (!item.AlarmEnable)
-                        return;
+                        // 如果该变量离线，则跳过该变量
+                        if (!item.IsOnline)
+                            return;
 
-                    // 如果该变量离线，则跳过该变量
-                    if (!item.IsOnline)
-                        return;
-
-                    // 对该变量进行报警分析
-                    AlarmAnalysis(item);
+                        // 对该变量进行报警分析
+                        AlarmAnalysis(item);
 
 
+                    }
+                });
                 }
-            });
+                else
+                {
+                    await Task.Delay(5000, cancellation).ConfigureAwait(false);
+                }
 
 
-            //stopwatch.Stop();
-            //_logger.LogInformation("报警分析耗时：" + stopwatch.ElapsedMilliseconds + "ms");
-        }
-        catch (Exception ex)
-        {
-            _logger.LogWarning(ex, "Alarm analysis fail");
-        }
-        finally
-        {
-            // 延迟一段时间，避免过于频繁地执行任务
-            await Task.Delay(50, cancellation).ConfigureAwait(false);
+                //stopwatch.Stop();
+                //_logger.LogInformation("报警分析耗时：" + stopwatch.ElapsedMilliseconds + "ms");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Alarm analysis fail");
+            }
+            finally
+            {
+                // 延迟一段时间，避免过于频繁地执行任务
+                await Task.Delay(50, cancellation).ConfigureAwait(false);
+            }
         }
     }
 
@@ -447,10 +457,9 @@ internal sealed class AlarmHostedService : BackgroundService, IAlarmHostedServic
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         _logger.LogInformation(AppResource.RealAlarmTaskStart);
-        while (!stoppingToken.IsCancellationRequested)
-        {
-            await DoWork(stoppingToken).ConfigureAwait(false);
-        }
+
+        await DoWork(stoppingToken).ConfigureAwait(false);
+
     }
 
 }

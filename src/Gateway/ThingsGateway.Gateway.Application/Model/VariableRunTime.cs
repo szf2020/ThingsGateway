@@ -8,8 +8,6 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-using BootstrapBlazor.Components;
-
 using Mapster;
 
 using Newtonsoft.Json.Linq;
@@ -17,131 +15,41 @@ using Newtonsoft.Json.Linq;
 using ThingsGateway.Gateway.Application.Extensions;
 using ThingsGateway.NewLife.Extension;
 using ThingsGateway.NewLife.Json.Extension;
-using ThingsGateway.SqlSugar;
 
 namespace ThingsGateway.Gateway.Application;
 
 /// <summary>
 /// 变量运行态
 /// </summary>
-public class VariableRuntime : Variable, IVariable, IDisposable
+public partial class VariableRuntime : Variable, IVariable, IDisposable
 {
-    [SugarColumn(ColumnDescription = "排序码", IsNullable = true)]
-    [AutoGenerateColumn(Visible = false, DefaultSort = false, Sortable = true)]
-    [IgnoreExcel]
-    public override int? SortCode { get; set; }
+    private DateTime? prepareEventTime;
+    private EventTypeEnum? eventType;
+
+    private AlarmTypeEnum? alarmType { get; set; }
+
+    private int index;
+    private int sortCode;
+    private DateTime changeTime = DateTime.UnixEpoch.ToLocalTime();
+    private DateTime alarmTime;
+    private DateTime eventTime;
+    private DateTime collectTime = DateTime.UnixEpoch.ToLocalTime();
 
     private bool _isOnline;
     private bool _isOnlineChanged;
-    protected object _value;
 
-    /// <summary>
-    /// 变化时间
-    /// </summary>
-    [AutoGenerateColumn(Visible = true, Filterable = true, Sortable = true, Order = 5)]
-    public DateTime ChangeTime { get; private set; } = DateTime.UnixEpoch.ToLocalTime();
-
-    /// <summary>
-    /// 所在采集设备
-    /// </summary>
-    [Newtonsoft.Json.JsonIgnore]
-    [System.Text.Json.Serialization.JsonIgnore]
-    [AutoGenerateColumn(Ignore = true)]
-    public DeviceRuntime DeviceRuntime { get; set; }
-
-    /// <summary>
-    /// VariableSource
-    /// </summary>
-    [Newtonsoft.Json.JsonIgnore]
-    [System.Text.Json.Serialization.JsonIgnore]
-    [AdaptIgnore]
-    [AutoGenerateColumn(Ignore = true)]
-    public IVariableSource VariableSource { get; set; }
-
-    /// <summary>
-    /// VariableMethod
-    /// </summary>
-    [Newtonsoft.Json.JsonIgnore]
-    [System.Text.Json.Serialization.JsonIgnore]
-    [AdaptIgnore]
-    [AutoGenerateColumn(Ignore = true)]
-    public VariableMethod VariableMethod { get; set; }
-
-    /// <summary>
-    /// 采集时间
-    /// </summary>
-    [AutoGenerateColumn(Visible = true, Filterable = true, Sortable = true, Order = 5)]
-    public DateTime CollectTime { get; private set; } = DateTime.UnixEpoch.ToLocalTime();
-
-    /// <summary>
-    /// 设备名称
-    /// </summary>
-    [AutoGenerateColumn(Visible = true, Filterable = true, Sortable = true, Order = 4)]
-    public string DeviceName => DeviceRuntime?.Name;
-
-    /// <summary>
-    /// 是否在线
-    /// </summary>
-    [AutoGenerateColumn(Visible = true, Filterable = true, Sortable = true, Order = 5)]
-    public bool IsOnline
-    {
-        get
-        {
-            return _isOnline;
-        }
-        private set
-        {
-            if (IsOnline != value)
-            {
-                _isOnlineChanged = true;
-            }
-            else
-            {
-                _isOnlineChanged = false;
-            }
-            _isOnline = value;
-        }
-    }
-
+    private string alarmLimit;
+    private string alarmText;
+    private string alarmCode;
     private string _lastErrorMessage;
-
-    /// <summary>
-    /// <inheritdoc/>
-    /// </summary>
-    [AutoGenerateColumn(Visible = true, Filterable = true, Sortable = true, Order = 5)]
-    public string LastErrorMessage
-    {
-        get
-        {
-            if (_isOnline == false)
-                return _lastErrorMessage ?? VariableSource?.LastErrorMessage ?? VariableMethod?.LastErrorMessage;
-            else
-                return null;
-        }
-    }
-
-    /// <summary>
-    /// 上次值
-    /// </summary>
-    [AutoGenerateColumn(Visible = false, Order = 6)]
-    public object LastSetValue { get; internal set; }
-
-    /// <summary>
-    /// 原始值
-    /// </summary>
-    [AutoGenerateColumn(Visible = false, Order = 6)]
-    public object RawValue { get; internal set; }
-
-    /// <summary>
-    /// 实时值
-    /// </summary>
-    [AutoGenerateColumn(Visible = true, Order = 6)]
-    public object Value { get => _value; set => _value = value; }
-    /// <summary>
-    /// 实时值
-    /// </summary>
-    [AutoGenerateColumn(Visible = true, Order = 6)]
-    public string RuntimeType => Value?.GetType()?.ToString();
+    private string recoveryCode;
+    private object _value;
+    private object lastSetValue;
+    private object rawValue;
+    private DeviceRuntime deviceRuntime;
+    private IVariableSource variableSource;
+    private VariableMethod variableMethod;
+    private IThingsGatewayBitConverter thingsGatewayBitConverter;
 
     /// <summary>
     /// 设置变量值与时间/质量戳
@@ -251,92 +159,6 @@ public class VariableRuntime : Variable, IVariable, IDisposable
         GlobalData.VariableCollectChange(this);
     }
 
-
-    #region LoadSourceRead
-
-    /// <summary>
-    /// 这个参数值由自动打包方法写入<see cref="IDevice.LoadSourceRead{T}(IEnumerable{IVariable}, int, string)"/>
-    /// </summary>
-    [AutoGenerateColumn(Visible = false)]
-    public int Index { get; set; }
-
-    /// <summary>
-    /// 这个参数值由自动打包方法写入<see cref="IDevice.LoadSourceRead{T}(IEnumerable{IVariable}, int, string)"/>
-    /// </summary>
-    [Newtonsoft.Json.JsonIgnore]
-    [System.Text.Json.Serialization.JsonIgnore]
-    [AutoGenerateColumn(Ignore = true)]
-    public IThingsGatewayBitConverter ThingsGatewayBitConverter { get; set; }
-
-    #endregion LoadSourceRead
-
-    #region 报警
-
-    /// <summary>
-    /// 报警值
-    /// </summary>
-    [AutoGenerateColumn(Visible = false)]
-    public string AlarmCode { get; set; }
-    /// <summary>
-    /// 恢复值
-    /// </summary>
-    [AutoGenerateColumn(Visible = false)]
-    public string RecoveryCode { get; set; }
-
-    /// <summary>
-    /// 报警使能
-    /// </summary>
-    [AutoGenerateColumn(Visible = false, Filterable = true, Sortable = true)]
-    public bool AlarmEnable
-    {
-        get
-        {
-            return LAlarmEnable || LLAlarmEnable || HAlarmEnable || HHAlarmEnable || BoolOpenAlarmEnable || BoolCloseAlarmEnable || CustomAlarmEnable;
-        }
-    }
-
-    /// <summary>
-    /// 报警限值
-    /// </summary>
-    [AutoGenerateColumn(Visible = false)]
-    public string AlarmLimit { get; set; }
-
-    /// <summary>
-    /// 报警文本
-    /// </summary>
-    [AutoGenerateColumn(Visible = false)]
-    public string AlarmText { get; set; }
-
-    /// <summary>
-    /// 报警时间
-    /// </summary>
-    [AutoGenerateColumn(Visible = false)]
-    public DateTime AlarmTime { get; set; }
-
-    /// <summary>
-    /// 报警类型
-    /// </summary>
-    [AutoGenerateColumn(Visible = false)]
-    public AlarmTypeEnum? AlarmType { get; set; }
-
-    /// <summary>
-    /// 事件时间
-    /// </summary>
-    [AutoGenerateColumn(Visible = false)]
-    public DateTime EventTime { get; set; }
-    /// <summary>
-    /// 事件时间
-    /// </summary>
-    [AutoGenerateColumn(Ignore = true)]
-    internal DateTime? PrepareEventTime { get; set; }
-
-    /// <summary>
-    /// 事件类型
-    /// </summary>
-    [AutoGenerateColumn(Visible = false)]
-    public EventTypeEnum? EventType { get; set; }
-
-    #endregion 报警
 
     public void Init(DeviceRuntime deviceRuntime)
     {

@@ -23,6 +23,7 @@
     "PortName": "COM口",
     "RemoteUrl": "远程url",
     "RtsEnable": "Rts",
+    "StreamAsync": "串口流读写",
     "SaveChannel": "添加/修改通道",
     "StopBits": "停止位"
   },
@@ -80,6 +81,7 @@
     "PortName": "COM口",
     "RemoteUrl": "远程url",
     "RtsEnable": "Rts",
+    "StreamAsync": "串口流读写",
     "StopBits": "停止位"
   }
 }

@@ -161,7 +161,7 @@ namespace ThingsGateway.SqlSugar
             }
             else if (db is SqlSugarScope)
             {
-                db = (db as SqlSugarScope).ScopedContext.Context;
+                db = (db as SqlSugarScope).Context;
             }
             if (!(db is SqlSugarProvider))
             {

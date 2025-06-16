@@ -125,9 +125,9 @@ internal sealed class RpcService : IRpcService
             }
 
         }
-
+        var writeVariableArrays = writeVariables.ToArray();
         // 使用并行方式写入变量
-        await writeVariables.ParallelForEachAsync(async (driverData, cancellationToken) =>
+        await writeVariableArrays.ParallelForEachAsync(async (driverData, cancellationToken) =>
         {
             try
             {
@@ -184,9 +184,10 @@ internal sealed class RpcService : IRpcService
                 }
             }
         }, cancellationToken).ConfigureAwait(false);
+        var writeMethodArrays = writeMethods.ToArray();
 
         // 使用并行方式执行方法
-        await writeMethods.ParallelForEachAsync(async (driverData, cancellationToken) =>
+        await writeMethodArrays.ParallelForEachAsync(async (driverData, cancellationToken) =>
         {
             try
             {
@@ -250,7 +251,7 @@ internal sealed class RpcService : IRpcService
         return new(results);
     }
 
-    private SqlSugarClient _db = DbContext.Db.GetConnectionScopeWithAttr<RpcLog>().CopyNew(); // 创建一个新的数据库上下文实例
+    private SqlSugarClient _db = DbContext.GetDB<RpcLog>(); // 创建一个新的数据库上下文实例
 
     /// <summary>
     /// 异步执行RPC日志插入操作的方法。

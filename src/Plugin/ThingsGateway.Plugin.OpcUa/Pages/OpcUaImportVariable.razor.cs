@@ -232,7 +232,7 @@ public partial class OpcUaImportVariable
         try
         {
             if (Nodes == null) return;
-            var data = await GetImportVariableList((await GetAllTag(Nodes)).DistinctBy(a => a.NodeId));
+            var data = await GetImportVariableList((await GetAllTag(Nodes)).DistinctBy(a => a.NodeId).ToArray());
             if (data.Item3 == null || data.Item3?.Count == 0)
             {
                 await ToastService.Warning(OpcUaPropertyLocalizer["NoVariablesAvailable"], OpcUaPropertyLocalizer["NoVariablesAvailable"]);
@@ -255,7 +255,7 @@ public partial class OpcUaImportVariable
         try
         {
             if (Nodes == null) return;
-            var data = await GetImportVariableList((await GetAllTag(Nodes)).DistinctBy(a => a.NodeId));
+            var data = await GetImportVariableList((await GetAllTag(Nodes)).DistinctBy(a => a.NodeId).ToArray());
             if (data.Item3 == null || data.Item3?.Count == 0)
             {
                 await ToastService.Warning(OpcUaPropertyLocalizer["NoVariablesAvailable"], OpcUaPropertyLocalizer["NoVariablesAvailable"]);
@@ -276,7 +276,7 @@ public partial class OpcUaImportVariable
     /// 获取设备与变量列表
     /// </summary>
     /// <returns></returns>
-    private async Task<(Channel, Device, IList<Variable>)> GetImportVariableList(IEnumerable<OpcUaTagModel> opcUaTagModels)
+    private async Task<(Channel, Device, IList<Variable>)> GetImportVariableList(IList<OpcUaTagModel> opcUaTagModels)
     {
         var channel = GetImportChannel();
         var device = GetImportDevice(channel.Id);

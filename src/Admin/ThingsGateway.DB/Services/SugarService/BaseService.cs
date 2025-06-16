@@ -161,7 +161,7 @@ public class BaseService<T> : IDataService<T>, IDisposable where T : class, new(
     /// <returns></returns>
     protected SqlSugarClient GetDB()
     {
-        return DbContext.Db.GetConnectionScopeWithAttr<T>().CopyNew();
+        return DbContext.GetDB<T>();
     }
 
 

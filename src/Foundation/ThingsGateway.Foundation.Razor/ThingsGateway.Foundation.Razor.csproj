@@ -4,9 +4,11 @@
 	<Import Project="$(SolutionDir)PackNuget.props" />
 	<PropertyGroup>
 		<TargetFrameworks>net8.0;</TargetFrameworks>
+		<!--<UseRazorSourceGenerator>false</UseRazorSourceGenerator>-->
 	</PropertyGroup>
 	<ItemGroup>
-		<ProjectReference Include="..\..\Admin\ThingsGateway.Razor\ThingsGateway.Razor.csproj" />
+		<PackageReference Include="ThingsGateway.Razor" Version="$(SourceGeneratorVersion)" />
+		<!--<ProjectReference Include="..\..\Admin\ThingsGateway.Razor\ThingsGateway.Razor.csproj" />-->
 		<ProjectReference Include="..\ThingsGateway.Foundation\ThingsGateway.Foundation.csproj" />
 	</ItemGroup>
 

@@ -24,7 +24,7 @@ namespace ThingsGateway.Admin.Application;
 /// 种子数据工具类
 /// </summary>
 [ThingsGateway.DependencyInjection.SuppressSniffer]
-public static class SeedDataUtil
+public static partial class SeedDataUtil
 {
     /// <summary>
     /// 获取List列表
@@ -53,9 +53,7 @@ public static class SeedDataUtil
         if (!string.IsNullOrEmpty(json))//如果有内容
         {
             //字段没有数据的替换成null
-            json = Regex.Replace(json, "\\\"[^\"]+?\\\": \\\"\\\"", match => match.Value.Replace("\"\"", "null"));
-
-
+            json = SeedDataRegex().Replace(json, match => match.Value.Replace("\"\"", "null"));
 
             var jtoken = JToken.Parse(json);
             jtoken = jtoken.SelectToken("Records") ?? jtoken.SelectToken("RECORDS");
@@ -96,6 +94,9 @@ public static class SeedDataUtil
 
         return seedData;
     }
+
+    [GeneratedRegex("\\\"[^\"]+?\\\": \\\"\\\"")]
+    private static partial Regex SeedDataRegex();
 }
 
 /// <summary>
