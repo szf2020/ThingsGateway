@@ -61,7 +61,7 @@ public class HardwareJob : IJob, IHardwareJob
         var historyHardwareInfos = MemoryCache.Get<List<HistoryHardwareInfo>>(CacheKey);
         if (historyHardwareInfos == null)
         {
-            using var db = _db;
+            using var db = DbContext.GetDB<HistoryHardwareInfo>(); ;
             historyHardwareInfos = await db.Queryable<HistoryHardwareInfo>().Where(a => a.Date > DateTime.Now.AddDays(-3)).ToListAsync().ConfigureAwait(false);
 
             MemoryCache.Set(CacheKey, historyHardwareInfos);
