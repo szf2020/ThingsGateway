@@ -172,7 +172,14 @@ public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariableModel<
     .Map(dest => dest.Value, src => src.Value == null ? string.Empty : src.Value.ToString() ?? string.Empty)
     .Map(dest => dest.CreateTime, (src) => DateTime.Now);
 
+
+        if (_businessPropertyWithCacheInterval.BusinessUpdateEnum == BusinessUpdateEnum.Interval && _driverPropertys.IsReadDB)
+        {
+            GlobalData.VariableValueChangeEvent += VariableValueChange;
+        }
+
         await base.InitChannelAsync(channel, cancellationToken).ConfigureAwait(false);
+
 
     }
     public override Task AfterVariablesChangedAsync(CancellationToken cancellationToken)
@@ -220,7 +227,7 @@ public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariableModel<
         await base.ProtectedStartAsync(cancellationToken).ConfigureAwait(false);
     }
 
-    protected override async ValueTask ProtectedExecuteAsync(CancellationToken cancellationToken)
+    protected override async Task ProtectedExecuteAsync(CancellationToken cancellationToken)
     {
         if (_driverPropertys.IsReadDB)
         {

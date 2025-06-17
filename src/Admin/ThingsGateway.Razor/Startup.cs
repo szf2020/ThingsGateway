@@ -47,7 +47,7 @@ public class Startup : AppStartup
         // 缓存
         services.AddSingleton<ICache, MemoryCache>();
 
-        MachineInfo.RegisterAsync();
+        MachineInfo.Register();
 
         // 配置雪花Id算法机器码
         YitIdHelper.SetIdGenerator(new IdGeneratorOptions

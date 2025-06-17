@@ -205,11 +205,15 @@ internal sealed class RulesEngineHostedService : BackgroundService, IRulesEngine
         dispatchService.Dispatch(null);
 
 
-        _ = Task.Factory.StartNew(async () =>
+        _ = Task.Factory.StartNew(async (state) =>
         {
+            if (state is not Dictionary<RulesLog, Diagram> diagrams)
+            {
+                return;
+            }
             while (!cancellationToken.IsCancellationRequested)
             {
-                foreach (var item in Diagrams?.Values?.SelectMany(a => a.Nodes) ?? new List<NodeModel>())
+                foreach (var item in diagrams?.Values?.SelectMany(a => a.Nodes) ?? new List<NodeModel>())
                 {
                     if (item is IExexcuteExpressionsBase)
                     {
@@ -218,7 +222,7 @@ internal sealed class RulesEngineHostedService : BackgroundService, IRulesEngine
                 }
                 await Task.Delay(60000, cancellationToken).ConfigureAwait(false);
             }
-        }, cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Default).ConfigureAwait(false);
+        }, Diagrams, cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Default).ConfigureAwait(false);
 
     }
 

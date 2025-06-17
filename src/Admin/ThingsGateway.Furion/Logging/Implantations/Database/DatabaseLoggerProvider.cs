@@ -160,8 +160,8 @@ public sealed class DatabaseLoggerProvider : ILoggerProvider, ISupportExternalSc
         _databaseLoggingWriter = _serviceScope.ServiceProvider.GetRequiredService(databaseLoggingWriterType) as IDatabaseLoggingWriter;
 
         // 创建长时间运行的后台任务，并将日志消息队列中数据写入存储中
-        _processQueueTask = Task.Factory.StartNew(async state => await ((DatabaseLoggerProvider)state).ProcessQueueAsync().ConfigureAwait(false)
-            , this, TaskCreationOptions.LongRunning);
+        _processQueueTask = Task.Factory.StartNew(ProcessQueueAsync
+            , TaskCreationOptions.LongRunning);
     }
 
     /// <summary>

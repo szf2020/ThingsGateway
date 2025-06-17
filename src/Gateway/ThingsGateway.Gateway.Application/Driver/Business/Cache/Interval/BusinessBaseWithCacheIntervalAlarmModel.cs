@@ -49,8 +49,7 @@ public abstract class BusinessBaseWithCacheIntervalAlarmModel<VarModel, DevModel
 
         GlobalData.AlarmChangedEvent += AlarmValueChange;
         // 解绑全局数据的事件
-        GlobalData.VariableValueChangeEvent -= VariableValueChange;
-        GlobalData.DeviceStatusChangeEvent -= DeviceStatusChange;
+
 
         // 根据业务属性的缓存是否为间隔上传来决定事件绑定
         if (_businessPropertyWithCacheInterval.BusinessUpdateEnum != BusinessUpdateEnum.Interval)
@@ -129,6 +128,7 @@ public abstract class BusinessBaseWithCacheIntervalAlarmModel<VarModel, DevModel
     /// </summary>
     protected override void Dispose(bool disposing)
     {
+
         // 解绑事件
         GlobalData.AlarmChangedEvent -= AlarmValueChange;
         GlobalData.VariableValueChangeEvent -= VariableValueChange;

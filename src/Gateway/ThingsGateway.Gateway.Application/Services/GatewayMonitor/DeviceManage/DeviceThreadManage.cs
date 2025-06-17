@@ -39,7 +39,7 @@ internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
 
     static DeviceThreadManage()
     {
-        Task.Factory.StartNew(async () => await SetCycleInterval().ConfigureAwait(false), TaskCreationOptions.LongRunning);
+        Task.Factory.StartNew(SetCycleInterval, TaskCreationOptions.LongRunning);
     }
 
     private static async Task SetCycleInterval()
@@ -385,14 +385,20 @@ internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
                     }
                 }
 
-                // 初始化业务线程
-                var driverTask = new DoTask(t => DoWork(driver, IsCollectChannel, t), driver.LogMessage, null);
-                DriverTasks.TryAdd(driver.DeviceId, driverTask);
-
                 token.Register(driver.Stop);
 
-                driverTask.Start(token);
 
+                if (driver.IsInitSuccess)
+                {
+
+                    // 初始化业务线程
+                    var driverTask = new DoTask(DoWork, driver.LogMessage, driver);
+                    DriverTasks.TryAdd(driver.DeviceId, driverTask);
+
+
+                    driverTask.Start(token);
+
+                }
 
             }).ConfigureAwait(false);
 
@@ -463,12 +469,12 @@ internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
             await deviceIds.ParallelForEachAsync(async (deviceId, cancellationToken) =>
             {
                 // 查找具有指定设备ID的驱动程序对象
-                if (!Drivers.TryRemove(deviceId, out var driver)) return;
-                if (!DriverTasks.TryRemove(deviceId, out var task)) return;
-
-                if (IsCollectChannel == true)
+                if (Drivers.TryRemove(deviceId, out var driver))
                 {
-                    saveVariableRuntimes.AddRange(driver.IdVariableRuntimes.Where(a => a.Value.SaveValue && !a.Value.DynamicVariable).Select(a => a.Value));
+                    if (IsCollectChannel == true)
+                    {
+                        saveVariableRuntimes.AddRange(driver.IdVariableRuntimes.Where(a => a.Value.SaveValue && !a.Value.DynamicVariable).Select(a => a.Value));
+                    }
                 }
 
                 // 取消驱动程序的操作
@@ -480,7 +486,12 @@ internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
                         token.Dispose();
                     }
                 }
-                await task.StopAsync().ConfigureAwait(false);
+
+                if (DriverTasks.TryRemove(deviceId, out var task))
+                {
+                    await task.StopAsync().ConfigureAwait(false);
+                }
+
             }).ConfigureAwait(false);
 
 
@@ -532,16 +543,16 @@ internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
         return driver;
     }
 
-
-    private static async ValueTask DoWork(DriverBase driver, bool? isCollectChannel, CancellationToken token)
+    private static async Task DoWork(object? state, CancellationToken token)
     {
         try
         {
+            if (state is not DriverBase driver) return;
             // 只有当驱动成功初始化后才执行操作
             if (driver.IsInitSuccess)
             {
                 if (!driver.IsStarted)
-                    await driver.StartAsync(token).ConfigureAwait(false); // 调用驱动的启动前异步方法，如果已经执行，会直接返回
+                    await driver.StartAsync(token).ConfigureAwait(false);
 
                 var result = await driver.ExecuteAsync(token).ConfigureAwait(false); // 执行驱动的异步执行操作
 
@@ -549,7 +560,7 @@ internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
                 if (result == ThreadRunReturnTypeEnum.None)
                 {
                     // 如果驱动处于离线状态且为采集驱动，则根据配置的间隔时间进行延迟
-                    if (driver.CurrentDevice.DeviceStatus == DeviceStatusEnum.OffLine && isCollectChannel == true)
+                    if (driver.CurrentDevice.DeviceStatus == DeviceStatusEnum.OffLine && driver.IsCollectDevice == true)
                     {
                         var collectBase = (CollectBase)driver;
                         if (collectBase.CollectProperties.ReIntervalTime > 0)

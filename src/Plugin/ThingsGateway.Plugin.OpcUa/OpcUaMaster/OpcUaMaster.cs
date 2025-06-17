@@ -104,7 +104,7 @@ public class OpcUaMaster : CollectBase
     }
 
     private TimeTick checkTimeTick = new("60000");
-    protected override async ValueTask ProtectedExecuteAsync(CancellationToken cancellationToken)
+    protected override async Task ProtectedExecuteAsync(CancellationToken cancellationToken)
     {
         if (_plc.Session == null)
         {

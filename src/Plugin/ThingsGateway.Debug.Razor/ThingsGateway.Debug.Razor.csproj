@@ -45,6 +45,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<ProjectReference Include="..\..\Admin\BlazorSetParametersAsyncGenerator\BlazorSetParametersAsyncGenerator.csproj" PrivateAssets="all" OutputItemType="Analyzer" />
 	</ItemGroup>
 
 

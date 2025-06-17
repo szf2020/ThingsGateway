@@ -50,10 +50,6 @@ public abstract class BusinessBaseWithCacheIntervalDeviceModel<VarModel, DevMode
 
 
 
-        // 注销全局变量值改变事件和设备状态改变事件的订阅，以防止重复订阅
-        GlobalData.VariableValueChangeEvent -= VariableValueChange;
-        GlobalData.DeviceStatusChangeEvent -= DeviceStatusChange;
-
         // 如果不是间隔上传，则订阅全局变量值改变事件和设备状态改变事件，并触发一次事件处理
         if (_businessPropertyWithCacheInterval.BusinessUpdateEnum != BusinessUpdateEnum.Interval)
         {

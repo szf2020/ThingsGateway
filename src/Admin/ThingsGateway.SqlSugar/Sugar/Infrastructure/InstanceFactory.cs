@@ -685,17 +685,20 @@ namespace ThingsGateway.SqlSugar
 
         private static Type GetCustomDbType(string className, Type type)
         {
-            if (className.Replace(".", "").Length + 1 == className.Length)
+            //命名空间相关
+            if (className.Replace(".", "").Length + 2 == className.Length)
             {
                 var array = className.Split('.');
-                foreach (var item in UtilMethods.EnumToDictionary<DbType>())
+                if (array.Length >= 3)
                 {
-                    if (array.Last().StartsWith(item.Value.ToString()))
+                    foreach (var item in UtilMethods.EnumToDictionary<DbType>())
                     {
-
-                        var newName = array.First() + "." + item.Value.ToString() + "." + array.Last();
-                        type = GetCustomTypeByClass(newName);
-                        break;
+                        if (array.Last().StartsWith(item.Value.ToString()))
+                        {
+                            var newName = $"{array[0]}.{array[1]}.{item.Value}.{array.Last()}";
+                            type = GetCustomTypeByClass(newName);
+                            break;
+                        }
                     }
                 }
 

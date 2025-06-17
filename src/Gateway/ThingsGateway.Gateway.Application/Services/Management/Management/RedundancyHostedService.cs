@@ -134,11 +134,7 @@ internal sealed class RedundancyHostedService : BackgroundService, IRedundancyHo
     /// <summary>
     /// 主站
     /// </summary>
-    /// <param name="tcpDmtpService">服务</param>
-    /// <param name="syncInterval">同步间隔</param>
-    /// <param name="log">log</param>
-    /// <param name="stoppingToken">取消任务的 CancellationToken</param>
-    private static async ValueTask DoMasterWork(TcpDmtpService tcpDmtpService, int syncInterval, ILog log, CancellationToken stoppingToken)
+    private async Task DoMasterWork(object? state, CancellationToken stoppingToken)
     {
         // 延迟一段时间，避免过于频繁地执行任务
         await Task.Delay(500, stoppingToken).ConfigureAwait(false);
@@ -155,7 +151,7 @@ internal sealed class RedundancyHostedService : BackgroundService, IRedundancyHo
 
             try
             {
-                if (tcpDmtpService.Clients.Count != 0)
+                if (TcpDmtpService.Clients.Count != 0)
                 {
                     online = true;
                 }
@@ -164,12 +160,12 @@ internal sealed class RedundancyHostedService : BackgroundService, IRedundancyHo
                 {
                     var deviceRunTimes = GlobalData.ReadOnlyIdDevices.Where(a => a.Value.IsCollect == true).Select(a => a.Value).Adapt<List<DeviceDataWithValue>>();
 
-                    foreach (var item in tcpDmtpService.Clients)
+                    foreach (var item in TcpDmtpService.Clients)
                     {
                         // 将 GlobalData.CollectDevices 和 GlobalData.Variables 同步到从站
                         await item.GetDmtpRpcActor().InvokeAsync(
                                          nameof(ReverseCallbackServer.UpData), null, waitInvoke, deviceRunTimes).ConfigureAwait(false);
-                        log?.LogTrace($"{item.GetIPPort()} Update StandbyStation data success");
+                        LogMessage?.LogTrace($"{item.GetIPPort()} Update StandbyStation data success");
                     }
 
                 }
@@ -177,9 +173,9 @@ internal sealed class RedundancyHostedService : BackgroundService, IRedundancyHo
             catch (Exception ex)
             {
                 // 输出警告日志，指示同步数据到从站时发生错误
-                log?.LogWarning(ex, "Synchronize data to standby site error");
+                LogMessage?.LogWarning(ex, "Synchronize data to standby site error");
             }
-            await Task.Delay(syncInterval, stoppingToken).ConfigureAwait(false);
+            await Task.Delay(RedundancyOptions.SyncInterval, stoppingToken).ConfigureAwait(false);
         }
         catch (OperationCanceledException)
         {
@@ -189,17 +185,14 @@ internal sealed class RedundancyHostedService : BackgroundService, IRedundancyHo
         }
         catch (Exception ex)
         {
-            log?.LogWarning(ex, "Execute");
+            LogMessage?.LogWarning(ex, "Execute");
         }
     }
 
     /// <summary>
     /// 从站
     /// </summary>
-    /// <param name="tcpDmtpClient">服务</param>
-    /// <param name="redundancy">冗余配置</param>
-    /// <param name="stoppingToken">取消任务的 CancellationToken</param>
-    private async ValueTask DoSlaveWork(TcpDmtpClient tcpDmtpClient, RedundancyOptions redundancy, CancellationToken stoppingToken)
+    private async Task DoSlaveWork(object? state, CancellationToken stoppingToken)
     {
         // 延迟一段时间，避免过于频繁地执行任务
         await Task.Delay(5000, stoppingToken).ConfigureAwait(false);
@@ -216,31 +209,31 @@ internal sealed class RedundancyHostedService : BackgroundService, IRedundancyHo
 
             try
             {
-                await tcpDmtpClient.TryConnectAsync().ConfigureAwait(false);
+                await TcpDmtpClient.TryConnectAsync().ConfigureAwait(false);
 
                 {
                     // 初始化读取错误计数器
                     var readErrorCount = 0;
                     // 当读取错误次数小于最大错误计数时循环执行
-                    while (readErrorCount < redundancy.MaxErrorCount)
+                    while (readErrorCount < RedundancyOptions.MaxErrorCount)
                     {
                         try
                         {
                             // 发送 Ping 请求以检查设备是否在线，超时时间为 10000 毫秒
-                            online = await tcpDmtpClient.PingAsync(10000).ConfigureAwait(false);
+                            online = await TcpDmtpClient.PingAsync(10000).ConfigureAwait(false);
                             if (online)
                                 break;
                             else
                             {
                                 readErrorCount++;
-                                await Task.Delay(redundancy.SyncInterval, stoppingToken).ConfigureAwait(false);
+                                await Task.Delay(RedundancyOptions.SyncInterval, stoppingToken).ConfigureAwait(false);
                             }
                         }
                         catch
                         {
                             // 捕获异常，增加读取错误计数器
                             readErrorCount++;
-                            await Task.Delay(redundancy.SyncInterval, stoppingToken).ConfigureAwait(false);
+                            await Task.Delay(RedundancyOptions.SyncInterval, stoppingToken).ConfigureAwait(false);
                         }
                     }
                 }
@@ -255,7 +248,7 @@ internal sealed class RedundancyHostedService : BackgroundService, IRedundancyHo
                 else
                 {
                     // 如果设备在线
-                    LogMessage?.LogTrace($"Ping ActiveStation {redundancy.MasterUri} success");
+                    LogMessage?.LogTrace($"Ping ActiveStation {RedundancyOptions.MasterUri} success");
                     await StandbyAsync().ConfigureAwait(false);
                 }
             }
@@ -350,12 +343,11 @@ internal sealed class RedundancyHostedService : BackgroundService, IRedundancyHo
             {
                 if (RedundancyOptions.IsMaster)
                 {
-                    RedundancyTask = new DoTask(a => DoMasterWork(TcpDmtpService, RedundancyOptions.SyncInterval, LogMessage, a), LogMessage); // 创建新的任务
+                    RedundancyTask = new DoTask(DoMasterWork, LogMessage); // 创建新的任务
                 }
                 else
                 {
-
-                    RedundancyTask = new DoTask(a => DoSlaveWork(TcpDmtpClient, RedundancyOptions, a), LogMessage); // 创建新的任务
+                    RedundancyTask = new DoTask(DoSlaveWork, LogMessage); // 创建新的任务
                 }
 
                 RedundancyTask?.Start(default); // 启动任务

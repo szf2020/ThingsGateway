@@ -23,16 +23,17 @@ public class DoTask
     /// 取消令牌
     /// </summary>
     private CancellationTokenSource? _cancelTokenSource;
+    private object? _state;
 
-    public DoTask(Func<CancellationToken, ValueTask> doWork, ILog logger, string taskName = null)
+    public DoTask(Func<object?, CancellationToken, Task> doWork, ILog logger, object? state = null, string taskName = null)
     {
-        DoWork = doWork; Logger = logger; TaskName = taskName;
+        DoWork = doWork; Logger = logger; TaskName = taskName; _state = state;
     }
 
     /// <summary>
     /// 执行任务方法
     /// </summary>
-    public Func<CancellationToken, ValueTask> DoWork { get; }
+    public Func<object?, CancellationToken, Task> DoWork { get; }
     private ILog Logger { get; }
     private Task PrivateTask { get; set; }
     private string TaskName { get; }
@@ -74,7 +75,7 @@ public class DoTask
             {
                 if (_cancelTokenSource.IsCancellationRequested)
                     return;
-                await DoWork(_cancelTokenSource.Token).ConfigureAwait(false);
+                await DoWork(_state, _cancelTokenSource.Token).ConfigureAwait(false);
             }
             catch (OperationCanceledException)
             {

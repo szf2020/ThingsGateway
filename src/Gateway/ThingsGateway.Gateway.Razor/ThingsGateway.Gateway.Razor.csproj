@@ -27,7 +27,9 @@
 	<PropertyGroup>
 		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
 	</PropertyGroup>
-
+	<ItemGroup>
+		<ProjectReference Include="..\..\Admin\BlazorSetParametersAsyncGenerator\BlazorSetParametersAsyncGenerator.csproj" PrivateAssets="all" OutputItemType="Analyzer" />
+	</ItemGroup>
 </Project>
 
 

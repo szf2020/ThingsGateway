@@ -33,6 +33,12 @@
 		<None Remove="$(SolutionDir)..\README.md" Pack="false" PackagePath="\" />
 		<None Remove="$(SolutionDir)..\README.zh-CN.md" Pack="false" PackagePath="\" />
 	</ItemGroup>
+
+
+	<ItemGroup>
+		<ProjectReference Include="..\BlazorSetParametersAsyncGenerator\BlazorSetParametersAsyncGenerator.csproj" PrivateAssets="all" OutputItemType="Analyzer" />
+	</ItemGroup>
+	
 </Project>
 
 

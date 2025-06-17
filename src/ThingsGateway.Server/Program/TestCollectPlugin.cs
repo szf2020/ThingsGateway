@@ -70,7 +70,7 @@
 //    /// 通讯失败时，更新设备状态，调用<see cref="DeviceRuntime.SetDeviceStatus(DateTime?, int?, string)"/>
 //    /// <br></br>
 //    /// </summary>
-//    protected override ValueTask ProtectedExecuteAsync(CancellationToken cancellationToken)
+//    protected override Task ProtectedExecuteAsync(CancellationToken cancellationToken)
 //    {
 //        return base.ProtectedExecuteAsync(cancellationToken);
 //    }

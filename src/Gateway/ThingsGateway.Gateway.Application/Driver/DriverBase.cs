@@ -237,7 +237,7 @@ public abstract class DriverBase : DisposableObject, IDriver
     /// </summary>
     /// <param name="cancellationToken">取消操作的令牌。</param>
     /// <returns>表示异步操作的任务。</returns>
-    internal virtual async ValueTask StartAsync(CancellationToken cancellationToken)
+    internal virtual async Task StartAsync(CancellationToken cancellationToken)
     {
         // 如果已经执行过初始化，则直接返回
         if (IsStarted)
@@ -426,7 +426,7 @@ public abstract class DriverBase : DisposableObject, IDriver
     /// <summary>
     /// 间隔执行
     /// </summary>
-    protected abstract ValueTask ProtectedExecuteAsync(CancellationToken cancellationToken);
+    protected abstract Task ProtectedExecuteAsync(CancellationToken cancellationToken);
 
 
 

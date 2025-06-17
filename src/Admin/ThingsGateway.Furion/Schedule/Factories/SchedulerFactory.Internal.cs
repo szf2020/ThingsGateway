@@ -110,8 +110,7 @@ internal sealed partial class SchedulerFactory : ISchedulerFactory
         if (Persistence is not null)
         {
             // 创建长时间运行的后台任务，并将作业运行消息写入持久化中
-            _processQueueTask = Task.Factory.StartNew(async state => await ((SchedulerFactory)state).ProcessQueueAsync().ConfigureAwait(false)
-                , this, TaskCreationOptions.LongRunning);
+            _processQueueTask = Task.Factory.StartNew(ProcessQueueAsync, TaskCreationOptions.LongRunning);
         }
     }
 

@@ -22,12 +22,11 @@ public partial class SessionPage
 
     #region 查询
 
-    private async Task<QueryData<SessionOutput>> OnQueryAsync(QueryPageOptions options)
+    private Task<QueryData<SessionOutput>> OnQueryAsync(QueryPageOptions options)
     {
-        return await Task.Run(async () =>
+        return Task.Run(() =>
          {
-             var data = await SessionService.PageAsync(options);
-             return data;
+             return SessionService.PageAsync(options);
          });
     }
 

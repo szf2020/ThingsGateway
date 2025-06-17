@@ -44,7 +44,6 @@ public abstract class BusinessBaseWithCacheIntervalVariableModel<VarModel> : Bus
         _exTTimerTick = new TimeTick(_businessPropertyWithCacheInterval.BusinessInterval);
 
         // 注册变量值变化事件处理程序
-        GlobalData.VariableValueChangeEvent -= VariableValueChange;
         if (_businessPropertyWithCacheInterval.BusinessUpdateEnum != BusinessUpdateEnum.Interval)
         {
             GlobalData.VariableValueChangeEvent += VariableValueChange;
@@ -164,7 +163,7 @@ public abstract class BusinessBaseWithCacheIntervalVariableModel<VarModel> : Bus
     /// </summary>
     /// <param name="variableRuntime">变量运行时对象</param>
     /// <param name="variable">变量数据</param>
-    private void VariableValueChange(VariableRuntime variableRuntime, VariableBasicData variable)
+    protected void VariableValueChange(VariableRuntime variableRuntime, VariableBasicData variable)
     {
         if (CurrentDevice.Pause == true)
             return;

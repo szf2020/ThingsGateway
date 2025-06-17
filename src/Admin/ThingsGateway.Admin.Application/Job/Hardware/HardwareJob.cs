@@ -81,7 +81,7 @@ public class HardwareJob : IJob, IHardwareJob
             {
                 if (HardwareInfo.MachineInfo == null)
                 {
-                    await MachineInfo.RegisterAsync().ConfigureAwait(false);
+                    MachineInfo.Register();
                     HardwareInfo.MachineInfo = MachineInfo.Current;
 
                     string currentPath = Directory.GetCurrentDirectory();

@@ -127,63 +127,57 @@ public class MachineInfo
 
     //static MachineInfo() => RegisterAsync().Wait(100);
 
-    private static Task<MachineInfo>? _task;
     /// <summary>异步注册一个初始化后的机器信息实例</summary>
     /// <returns></returns>
-    public static Task<MachineInfo> RegisterAsync()
+    public static MachineInfo Register()
     {
-
-        if (_task != null) return _task;
-
-        return _task = Task.Factory.StartNew(() =>
+        if (Current != null) return Current;
+        // 文件缓存，加快机器信息获取。在Linux下，可能StarAgent以root权限写入缓存文件，其它应用以普通用户访问
+        var file = Path.GetTempPath().CombinePath("machine_info.json");
+        var json = "";
+        if (Current == null)
         {
-            // 文件缓存，加快机器信息获取。在Linux下，可能StarAgent以root权限写入缓存文件，其它应用以普通用户访问
-            var file = Path.GetTempPath().CombinePath("machine_info.json");
-            var json = "";
-            if (Current == null)
+            var f = file;
+            if (File.Exists(f))
             {
-                var f = file;
-                if (File.Exists(f))
+                try
                 {
-                    try
-                    {
-                        //XTrace.WriteLine("Load MachineInfo {0}", f);
-                        json = File.ReadAllText(f);
-                        Current = json.FromJsonNetString<MachineInfo>();
-                    }
-                    catch (Exception ex)
-                    {
-                        if (XTrace.Log.Level <= LogLevel.Debug) NewLife.Log.XTrace.WriteException(ex);
-                    }
+                    //XTrace.WriteLine("Load MachineInfo {0}", f);
+                    json = File.ReadAllText(f);
+                    Current = json.FromJsonNetString<MachineInfo>();
+                }
+                catch (Exception ex)
+                {
+                    if (XTrace.Log.Level <= LogLevel.Debug) NewLife.Log.XTrace.WriteException(ex);
                 }
             }
+        }
 
-            var mi = Current ?? new MachineInfo();
+        var mi = Current ?? new MachineInfo();
 
-            mi.Init();
-            Current = mi;
+        mi.Init();
+        Current = mi;
 
-            try
+        try
+        {
+            var json2 = mi.ToJsonNetString();
+            if (json != json2)
             {
-                var json2 = mi.ToJsonNetString();
-                if (json != json2)
-                {
-                    File.WriteAllText(file.EnsureDirectory(true), json2);
-                }
+                File.WriteAllText(file.EnsureDirectory(true), json2);
             }
-            catch (Exception ex)
-            {
-                if (XTrace.Log.Level <= LogLevel.Debug) NewLife.Log.XTrace.WriteException(ex);
-            }
+        }
+        catch (Exception ex)
+        {
+            if (XTrace.Log.Level <= LogLevel.Debug) NewLife.Log.XTrace.WriteException(ex);
+        }
 
-            return mi;
-        });
+        return mi;
 
     }
 
     /// <summary>获取当前信息，如果未设置则等待异步注册结果</summary>
     /// <returns></returns>
-    public static MachineInfo GetCurrent() => Current ?? RegisterAsync().ConfigureAwait(false).GetAwaiter().GetResult();
+    public static MachineInfo GetCurrent() => Current ?? Register();
 
     #endregion
 

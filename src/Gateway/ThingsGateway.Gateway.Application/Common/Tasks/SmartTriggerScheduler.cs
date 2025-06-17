@@ -41,7 +41,7 @@ public class SmartTriggerScheduler
 
             // 否则启动执行任务
             _isRunning = true;
-            _ = Task.Run(ExecuteLoop); // 开启异步执行循环（非阻塞）
+            _ = Task.Run(ExecuteLoop);
         }
     }
 

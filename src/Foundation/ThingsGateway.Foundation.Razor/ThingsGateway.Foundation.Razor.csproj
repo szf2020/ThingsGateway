@@ -7,8 +7,8 @@
 		<!--<UseRazorSourceGenerator>false</UseRazorSourceGenerator>-->
 	</PropertyGroup>
 	<ItemGroup>
-		<PackageReference Include="ThingsGateway.Razor" Version="$(SourceGeneratorVersion)" />
-		<!--<ProjectReference Include="..\..\Admin\ThingsGateway.Razor\ThingsGateway.Razor.csproj" />-->
+		<!--<PackageReference Include="ThingsGateway.Razor" Version="$(SourceGeneratorVersion)" />-->
+		<ProjectReference Include="..\..\Admin\ThingsGateway.Razor\ThingsGateway.Razor.csproj" />
 		<ProjectReference Include="..\ThingsGateway.Foundation\ThingsGateway.Foundation.csproj" />
 	</ItemGroup>
 
@@ -22,8 +22,10 @@
 			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
 		</EmbeddedResource>
 	</ItemGroup>
-	
 
+	<ItemGroup>
+		<ProjectReference Include="..\..\Admin\BlazorSetParametersAsyncGenerator\BlazorSetParametersAsyncGenerator.csproj" PrivateAssets="all" OutputItemType="Analyzer" />
+	</ItemGroup>
 </Project>
 
 

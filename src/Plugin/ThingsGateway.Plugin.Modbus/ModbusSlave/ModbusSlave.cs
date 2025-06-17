@@ -150,7 +150,7 @@ public class ModbusSlave : BusinessBase
     }
 
 
-    protected override async ValueTask ProtectedExecuteAsync(CancellationToken cancellationToken)
+    protected override async Task ProtectedExecuteAsync(CancellationToken cancellationToken)
     {
         //获取设备连接状态
         if (IsConnected())

@@ -171,7 +171,7 @@ public abstract class BusinessBase : DriverBase
         }
     }
 
-    internal override ValueTask StartAsync(CancellationToken cancellationToken)
+    internal override Task StartAsync(CancellationToken cancellationToken)
     {
         TimeTick = new TimeTick(CurrentDevice.IntervalTime);
         return base.StartAsync(cancellationToken);

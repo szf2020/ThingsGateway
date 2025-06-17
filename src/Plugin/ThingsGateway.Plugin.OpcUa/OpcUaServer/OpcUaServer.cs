@@ -153,7 +153,7 @@ public partial class OpcUaServer : BusinessBase
         await base.ProtectedStartAsync(cancellationToken).ConfigureAwait(false);
     }
 
-    protected override async ValueTask ProtectedExecuteAsync(CancellationToken cancellationToken)
+    protected override async Task ProtectedExecuteAsync(CancellationToken cancellationToken)
     {
         try
         {

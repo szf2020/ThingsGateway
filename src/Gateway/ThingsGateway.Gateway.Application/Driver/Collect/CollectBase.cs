@@ -234,16 +234,17 @@ public abstract class CollectBase : DriverBase, IRpcDriver
             return ThreadRunReturnTypeEnum.None;
         }
     }
+    ReadResultCount readResultCount = new();
     /// <summary>
     /// 执行读取等方法，如果插件不支持读取，而是自更新值的话，需重写此方法
     /// </summary>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    protected override async ValueTask ProtectedExecuteAsync(CancellationToken cancellationToken)
+    protected override async Task ProtectedExecuteAsync(CancellationToken cancellationToken)
     {
         try
         {
-            ReadResultCount readResultCount = new();
+            readResultCount.Reset();
             if (cancellationToken.IsCancellationRequested)
                 return;
 
@@ -545,6 +546,13 @@ public abstract class CollectBase : DriverBase, IRpcDriver
         public int deviceMethodsVariableSuccessNum = 0;
         public int deviceSourceVariableFailedNum = 0;
         public int deviceSourceVariableSuccessNum = 0;
+        public void Reset()
+        {
+            deviceMethodsVariableFailedNum = 0;
+            deviceMethodsVariableSuccessNum = 0;
+            deviceSourceVariableFailedNum = 0;
+            deviceSourceVariableSuccessNum = 0;
+        }
     }
 
     #region 写入方法
