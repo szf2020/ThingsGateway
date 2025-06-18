@@ -241,87 +241,292 @@ public static class ThingsGatewayBitConverterExtension
     /// <summary>
     /// 根据数据类型获取实际值
     /// </summary>
-    public static object GetDataFormBytes(this IThingsGatewayBitConverter byteConverter, IDevice device, string address, byte[] buffer, int index, DataTypeEnum dataType, int arrayLength)
+    public static bool GetChangedDataFormBytes(
+        this IThingsGatewayBitConverter byteConverter,
+        IDevice device,
+        string address,
+        byte[] buffer,
+        int index,
+        DataTypeEnum dataType,
+        int arrayLength,
+        object? oldValue,
+        out object? result)
     {
         switch (dataType)
         {
             case DataTypeEnum.Boolean:
-                return arrayLength > 1 ?
-                byteConverter.ToBoolean(buffer, index, arrayLength, device.BitReverse(address)) :
-                byteConverter.ToBoolean(buffer, index, device.BitReverse(address));
+                if (arrayLength > 1)
+                {
+                    var newVal = byteConverter.ToBoolean(buffer, index, arrayLength, device.BitReverse(address));
+                    if (oldValue is bool[] oldArr && newVal.SequenceEqual(oldArr))
+                    {
+                        result = oldValue;
+                        return false;
+                    }
+                    result = newVal;
+                    return true;
+                }
+                else
+                {
+                    var newVal = byteConverter.ToBoolean(buffer, index, device.BitReverse(address));
+                    if (oldValue is bool oldVal && oldVal == newVal)
+                    {
+                        result = oldValue;
+                        return false;
+                    }
+                    result = newVal;
+                    return true;
+                }
 
             case DataTypeEnum.Byte:
-                return
-                arrayLength > 1 ?
-                byteConverter.ToByte(buffer, index, arrayLength) :
-                byteConverter.ToByte(buffer, index);
+                if (arrayLength > 1)
+                {
+                    var newVal = byteConverter.ToByte(buffer, index, arrayLength);
+                    if (oldValue is byte[] oldArr && newVal.SequenceEqual(oldArr))
+                    {
+                        result = oldValue;
+                        return false;
+                    }
+                    result = newVal;
+                    return true;
+                }
+                else
+                {
+                    var newVal = byteConverter.ToByte(buffer, index);
+                    if (oldValue is byte oldVal && oldVal == newVal)
+                    {
+                        result = oldValue;
+                        return false;
+                    }
+                    result = newVal;
+                    return true;
+                }
 
             case DataTypeEnum.Int16:
-                return
-                 arrayLength > 1 ?
-                byteConverter.ToInt16(buffer, index, arrayLength) :
-                byteConverter.ToInt16(buffer, index);
+                if (arrayLength > 1)
+                {
+                    var newVal = byteConverter.ToInt16(buffer, index, arrayLength);
+                    if (oldValue is short[] oldArr && newVal.SequenceEqual(oldArr))
+                    {
+                        result = oldValue;
+                        return false;
+                    }
+                    result = newVal;
+                    return true;
+                }
+                else
+                {
+                    var newVal = byteConverter.ToInt16(buffer, index);
+                    if (oldValue is short oldVal && oldVal == newVal)
+                    {
+                        result = oldValue;
+                        return false;
+                    }
+                    result = newVal;
+                    return true;
+                }
 
             case DataTypeEnum.UInt16:
-                return
-                 arrayLength > 1 ?
-                byteConverter.ToUInt16(buffer, index, arrayLength) :
-                byteConverter.ToUInt16(buffer, index);
+                if (arrayLength > 1)
+                {
+                    var newVal = byteConverter.ToUInt16(buffer, index, arrayLength);
+                    if (oldValue is ushort[] oldArr && newVal.SequenceEqual(oldArr))
+                    {
+                        result = oldValue;
+                        return false;
+                    }
+                    result = newVal;
+                    return true;
+                }
+                else
+                {
+                    var newVal = byteConverter.ToUInt16(buffer, index);
+                    if (oldValue is ushort oldVal && oldVal == newVal)
+                    {
+                        result = oldValue;
+                        return false;
+                    }
+                    result = newVal;
+                    return true;
+                }
 
             case DataTypeEnum.Int32:
-                return
-                 arrayLength > 1 ?
-                byteConverter.ToInt32(buffer, index, arrayLength) :
-                byteConverter.ToInt32(buffer, index);
+                if (arrayLength > 1)
+                {
+                    var newVal = byteConverter.ToInt32(buffer, index, arrayLength);
+                    if (oldValue is int[] oldArr && newVal.SequenceEqual(oldArr))
+                    {
+                        result = oldValue;
+                        return false;
+                    }
+                    result = newVal;
+                    return true;
+                }
+                else
+                {
+                    var newVal = byteConverter.ToInt32(buffer, index);
+                    if (oldValue is int oldVal && oldVal == newVal)
+                    {
+                        result = oldValue;
+                        return false;
+                    }
+                    result = newVal;
+                    return true;
+                }
 
             case DataTypeEnum.UInt32:
-                return
-                 arrayLength > 1 ?
-                byteConverter.ToUInt32(buffer, index, arrayLength) :
-                byteConverter.ToUInt32(buffer, index);
+                if (arrayLength > 1)
+                {
+                    var newVal = byteConverter.ToUInt32(buffer, index, arrayLength);
+                    if (oldValue is uint[] oldArr && newVal.SequenceEqual(oldArr))
+                    {
+                        result = oldValue;
+                        return false;
+                    }
+                    result = newVal;
+                    return true;
+                }
+                else
+                {
+                    var newVal = byteConverter.ToUInt32(buffer, index);
+                    if (oldValue is uint oldVal && oldVal == newVal)
+                    {
+                        result = oldValue;
+                        return false;
+                    }
+                    result = newVal;
+                    return true;
+                }
 
             case DataTypeEnum.Int64:
-                return
-                 arrayLength > 1 ?
-                byteConverter.ToInt64(buffer, index, arrayLength) :
-                byteConverter.ToInt64(buffer, index);
+                if (arrayLength > 1)
+                {
+                    var newVal = byteConverter.ToInt64(buffer, index, arrayLength);
+                    if (oldValue is long[] oldArr && newVal.SequenceEqual(oldArr))
+                    {
+                        result = oldValue;
+                        return false;
+                    }
+                    result = newVal;
+                    return true;
+                }
+                else
+                {
+                    var newVal = byteConverter.ToInt64(buffer, index);
+                    if (oldValue is long oldVal && oldVal == newVal)
+                    {
+                        result = oldValue;
+                        return false;
+                    }
+                    result = newVal;
+                    return true;
+                }
 
             case DataTypeEnum.UInt64:
-                return
-                arrayLength > 1 ?
-                byteConverter.ToUInt64(buffer, index, arrayLength) :
-                byteConverter.ToUInt64(buffer, index);
+                if (arrayLength > 1)
+                {
+                    var newVal = byteConverter.ToUInt64(buffer, index, arrayLength);
+                    if (oldValue is ulong[] oldArr && newVal.SequenceEqual(oldArr))
+                    {
+                        result = oldValue;
+                        return false;
+                    }
+                    result = newVal;
+                    return true;
+                }
+                else
+                {
+                    var newVal = byteConverter.ToUInt64(buffer, index);
+                    if (oldValue is ulong oldVal && oldVal == newVal)
+                    {
+                        result = oldValue;
+                        return false;
+                    }
+                    result = newVal;
+                    return true;
+                }
 
             case DataTypeEnum.Single:
-                return
-                 arrayLength > 1 ?
-                byteConverter.ToSingle(buffer, index, arrayLength) :
-                byteConverter.ToSingle(buffer, index);
+                if (arrayLength > 1)
+                {
+                    var newVal = byteConverter.ToSingle(buffer, index, arrayLength);
+                    if (oldValue is float[] oldArr && newVal.SequenceEqual(oldArr))
+                    {
+                        result = oldValue;
+                        return false;
+                    }
+                    result = newVal;
+                    return true;
+                }
+                else
+                {
+                    var newVal = byteConverter.ToSingle(buffer, index);
+                    if (oldValue is float oldVal && oldVal == newVal)
+                    {
+                        result = oldValue;
+                        return false;
+                    }
+                    result = newVal;
+                    return true;
+                }
 
             case DataTypeEnum.Double:
-                return
-                 arrayLength > 1 ?
-                byteConverter.ToDouble(buffer, index, arrayLength) :
-                byteConverter.ToDouble(buffer, index);
+                if (arrayLength > 1)
+                {
+                    var newVal = byteConverter.ToDouble(buffer, index, arrayLength);
+                    if (oldValue is double[] oldArr && newVal.SequenceEqual(oldArr))
+                    {
+                        result = oldValue;
+                        return false;
+                    }
+                    result = newVal;
+                    return true;
+                }
+                else
+                {
+                    var newVal = byteConverter.ToDouble(buffer, index);
+                    if (oldValue is double oldVal && oldVal == newVal)
+                    {
+                        result = oldValue;
+                        return false;
+                    }
+                    result = newVal;
+                    return true;
+                }
 
             case DataTypeEnum.String:
             default:
                 if (arrayLength > 1)
                 {
-                    List<String> strings = new();
+                    var newArr = new string[arrayLength];
                     for (int i = 0; i < arrayLength; i++)
                     {
-                        var data = byteConverter.ToString(buffer, index + i * byteConverter.StringLength ?? 1, byteConverter.StringLength ?? 1);
-                        strings.Add(data);
+                        newArr[i] = byteConverter.ToString(buffer, index + i * (byteConverter.StringLength ?? 1), byteConverter.StringLength ?? 1);
                     }
-                    return strings.ToArray();
+
+                    if (oldValue is string[] oldArr && newArr.SequenceEqual(oldArr))
+                    {
+                        result = oldValue;
+                        return false;
+                    }
+                    result = newArr;
+                    return true;
                 }
                 else
                 {
-                    return byteConverter.ToString(buffer, index, byteConverter.StringLength ?? 1);
+                    var str = byteConverter.ToString(buffer, index, byteConverter.StringLength ?? 1);
+                    if (oldValue is string oldStr && oldStr == str)
+                    {
+                        result = oldStr;
+                        return false;
+                    }
+                    result = str;
+                    return true;
                 }
         }
     }
+
+
 
     #endregion 获取对应数据类型的数据
 }

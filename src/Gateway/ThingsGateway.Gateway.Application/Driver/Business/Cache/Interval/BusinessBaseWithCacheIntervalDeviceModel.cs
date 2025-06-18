@@ -11,7 +11,6 @@
 using Mapster;
 
 using ThingsGateway.Extension.Generic;
-using ThingsGateway.NewLife;
 
 using TouchSocket.Core;
 
@@ -24,12 +23,6 @@ namespace ThingsGateway.Gateway.Application;
 /// <typeparam name="DevModel">设备数据类型</typeparam>
 public abstract class BusinessBaseWithCacheIntervalDeviceModel<VarModel, DevModel> : BusinessBaseWithCacheDeviceModel<VarModel, DevModel>
 {
-    // 用于控制设备上传的定时器
-    protected TimeTick _exT2TimerTick;
-
-    // 用于控制变量上传的定时器
-    protected TimeTick _exTTimerTick;
-
     /// <summary>
     /// 获取具体业务属性的缓存设置。
     /// </summary>
@@ -44,12 +37,6 @@ public abstract class BusinessBaseWithCacheIntervalDeviceModel<VarModel, DevMode
 
     protected internal override async Task InitChannelAsync(IChannel? channel, CancellationToken cancellationToken)
     {
-        // 初始化设备和变量上传的定时器
-        _exTTimerTick = new(_businessPropertyWithCacheInterval.BusinessInterval);
-        _exT2TimerTick = new(_businessPropertyWithCacheInterval.BusinessInterval);
-
-
-
         // 如果不是间隔上传，则订阅全局变量值改变事件和设备状态改变事件，并触发一次事件处理
         if (_businessPropertyWithCacheInterval.BusinessUpdateEnum != BusinessUpdateEnum.Interval)
         {
@@ -126,77 +113,59 @@ public abstract class BusinessBaseWithCacheIntervalDeviceModel<VarModel, DevMode
         base.Dispose(disposing);
     }
 
-    /// <summary>
-    /// 执行间隔插入任务的方法，用于定期上传设备和变量信息。
-    /// </summary>
-    /// <returns>异步任务</returns>
-    protected virtual async Task IntervalInsert(CancellationToken cancellationToken)
-    {
 
-        while (!cancellationToken.IsCancellationRequested)
+    /// <summary>
+    /// 间隔上传数据的方法
+    /// </summary>
+    protected void IntervalInsert(object? state, CancellationToken cancellationToken)
+    {
+        if (CurrentDevice.Pause == true)
         {
-            if (CurrentDevice.Pause == true)
-            {
-                await Task.Delay(1000, cancellationToken).ConfigureAwait(false);
-                continue;
-            }
-
-            // 如果是间隔上传，根据定时器触发事件上传设备和变量信息
-            if (_businessPropertyWithCacheInterval.BusinessUpdateEnum != BusinessUpdateEnum.Change)
-            {
-                try
-                {
-                    if (_exTTimerTick.IsTickHappen())
-                    {
-                        if (LogMessage?.LogLevel <= LogLevel.Debug)
-                            LogMessage?.LogDebug($"Interval  {typeof(VarModel).Name}  data, count {IdVariableRuntimes.Count}");
-                        // 上传所有变量信息
-                        var variableRuntimes = IdVariableRuntimes.Select(a => a.Value);
-                        VariableTimeInterval(variableRuntimes, variableRuntimes.Adapt<List<VariableBasicData>>());
-                    }
-                }
-                catch (Exception ex)
-                {
-                    LogMessage?.LogWarning(ex, AppResource.IntervalInsertVariableFail);
-                }
-
-                try
-                {
-                    if (_exT2TimerTick.IsTickHappen())
-                    {
-                        if (CollectDevices != null)
-                        {
-                            if (LogMessage?.LogLevel <= LogLevel.Debug)
-                                LogMessage?.LogDebug($"Interval  {typeof(DevModel).Name}  data, count {CollectDevices.Count}");
-                            // 上传所有设备信息
-                            foreach (var deviceRuntime in CollectDevices.Select(a => a.Value))
-                            {
-                                DeviceTimeInterval(deviceRuntime, deviceRuntime.Adapt<DeviceBasicData>());
-                            }
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    LogMessage?.LogWarning(ex, AppResource.IntervalInsertDeviceFail);
-                }
-            }
-
-            await Task.Delay(100, cancellationToken).ConfigureAwait(false);
+            return;
         }
+
+        // 如果业务属性的缓存为间隔上传，则根据定时器间隔执行相应操作
+        if (_businessPropertyWithCacheInterval.BusinessUpdateEnum != BusinessUpdateEnum.Change)
+        {
+            try
+            {
+                if (LogMessage?.LogLevel <= LogLevel.Debug)
+                    LogMessage?.LogDebug($"Interval  {typeof(VarModel).Name}  data, count {IdVariableRuntimes.Count}");
+                // 上传所有变量信息
+                var variableRuntimes = IdVariableRuntimes.Select(a => a.Value);
+                VariableTimeInterval(variableRuntimes, variableRuntimes.Adapt<List<VariableBasicData>>());
+            }
+            catch (Exception ex)
+            {
+                LogMessage?.LogWarning(ex, AppResource.IntervalInsertVariableFail);
+            }
+            try
+            {
+                if (CollectDevices != null)
+                {
+                    if (LogMessage?.LogLevel <= LogLevel.Debug)
+                        LogMessage?.LogDebug($"Interval  {typeof(DevModel).Name}  data, count {CollectDevices.Count}");
+                    // 上传所有设备信息
+                    foreach (var deviceRuntime in CollectDevices.Select(a => a.Value))
+                    {
+                        DeviceTimeInterval(deviceRuntime, deviceRuntime.Adapt<DeviceBasicData>());
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                LogMessage?.LogWarning(ex, AppResource.IntervalInsertDeviceFail);
+            }
+        }
+
     }
 
-    /// <summary>
-    /// 在开始前的保护方法，异步执行间隔插入任务。
-    /// </summary>
-    /// <param name="cancellationToken">取消令牌</param>
-    /// <returns>异步任务</returns>
-    protected override Task ProtectedStartAsync(CancellationToken cancellationToken)
+    protected override List<IScheduledTask> ProtectedGetTasks(CancellationToken cancellationToken)
     {
-        _ = IntervalInsert(cancellationToken);
-        return base.ProtectedStartAsync(cancellationToken);
+        var list = base.ProtectedGetTasks(cancellationToken);
+        list.Add(ScheduledTaskHelper.GetTask(_businessPropertyWithCacheInterval.BusinessInterval, IntervalInsert, null, LogMessage, cancellationToken));
+        return list;
     }
-
     /// <summary>
     /// 变量状态变化时发生的虚拟方法，用于处理变量状态变化事件。
     /// </summary>

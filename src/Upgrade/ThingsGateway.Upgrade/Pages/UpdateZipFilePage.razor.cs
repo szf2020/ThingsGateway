@@ -66,6 +66,7 @@ public partial class UpdateZipFilePage
 
     private Task<bool> OnDeleteAsync(IEnumerable<UpdateZipFile> updateZipFiles)
     {
-        return UpdateZipFileHostedService.DeleteAsync(updateZipFiles);
+        UpdateZipFileHostedService.Delete(updateZipFiles);
+        return Task.FromResult(true);
     }
 }

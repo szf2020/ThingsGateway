@@ -21,11 +21,11 @@ namespace ThingsGateway.Gateway.Application;
 /// </summary>
 internal sealed class GatewayMonitorHostedService : BackgroundService, IGatewayMonitorHostedService
 {
-    private readonly ILogger _logger;
+    public ILogger Logger { get; }
     /// <inheritdoc cref="AlarmHostedService"/>
     public GatewayMonitorHostedService(ILogger<GatewayMonitorHostedService> logger, IStringLocalizer<GatewayMonitorHostedService> localizer, IChannelThreadManage channelThreadManage)
     {
-        _logger = logger;
+        Logger = logger;
         Localizer = localizer;
         ChannelThreadManage = channelThreadManage;
     }
@@ -67,7 +67,7 @@ internal sealed class GatewayMonitorHostedService : BackgroundService, IGatewayM
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogWarning(ex, "Init Channel");
+                    Logger.LogWarning(ex, "Init Channel");
                 }
             }
 
@@ -80,7 +80,7 @@ internal sealed class GatewayMonitorHostedService : BackgroundService, IGatewayM
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(ex, "Start error");
+            Logger.LogWarning(ex, "Start error");
         }
 
 

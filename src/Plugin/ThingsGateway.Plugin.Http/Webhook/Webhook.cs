@@ -23,9 +23,9 @@ public partial class Webhook : BusinessBaseWithCacheIntervalScript<VariableBasic
     /// <inheritdoc/>
     public override bool IsConnected() => success;
 
-    protected override async Task ProtectedExecuteAsync(CancellationToken cancellationToken)
+    protected override Task ProtectedExecuteAsync(object? state, CancellationToken cancellationToken)
     {
-        await Update(cancellationToken).ConfigureAwait(false);
+        return Update(cancellationToken);
     }
 
 

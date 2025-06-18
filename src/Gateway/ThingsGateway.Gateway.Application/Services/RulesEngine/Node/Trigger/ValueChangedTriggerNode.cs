@@ -12,8 +12,8 @@ public class ValueChangedTriggerNode : VariableNode, ITriggerNode, IDisposable
 {
     public ValueChangedTriggerNode(string id, Point? position = null) : base(id, position) { Title = "ValueChangedTriggerNode"; }
 
-    private Func<NodeOutput, Task> Func { get; set; }
-    Task ITriggerNode.StartAsync(Func<NodeOutput, Task> func)
+    private Func<NodeOutput, CancellationToken, Task> Func { get; set; }
+    Task ITriggerNode.StartAsync(Func<NodeOutput, CancellationToken, Task> func, CancellationToken cancellationToken)
     {
         Func = func;
         FuncDict.TryAdd(this, func);
@@ -40,12 +40,12 @@ public class ValueChangedTriggerNode : VariableNode, ITriggerNode, IDisposable
         return Task.CompletedTask;
     }
     public static ConcurrentDictionary<string, ConcurrentDictionary<string, ConcurrentList<ValueChangedTriggerNode>>> ValueChangedTriggerNodeDict = new();
-    public static ConcurrentDictionary<ValueChangedTriggerNode, Func<NodeOutput, Task>> FuncDict = new();
+    public static ConcurrentDictionary<ValueChangedTriggerNode, Func<NodeOutput, CancellationToken, Task>> FuncDict = new();
 
     public static BlockingCollection<VariableBasicData> VariableBasicDatas = new();
     static ValueChangedTriggerNode()
     {
-        _ = RunAsync();
+        Task.Factory.StartNew(RunAsync);
         GlobalData.VariableValueChangeEvent += GlobalData_VariableValueChangeEvent;
     }
     private static void GlobalData_VariableValueChangeEvent(VariableRuntime variableRuntime, VariableBasicData variableData)
@@ -81,7 +81,7 @@ public class ValueChangedTriggerNode : VariableNode, ITriggerNode, IDisposable
                     if (FuncDict.TryGetValue(item, out var func))
                     {
                         item.Logger?.Trace($"Variable changed: {item.Text}");
-                        await func.Invoke(new NodeOutput() { Value = variableBasicData }).ConfigureAwait(false);
+                        await func.Invoke(new NodeOutput() { Value = variableBasicData }, token).ConfigureAwait(false);
 
                     }
                 }

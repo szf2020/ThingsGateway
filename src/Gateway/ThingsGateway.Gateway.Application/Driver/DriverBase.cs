@@ -11,6 +11,7 @@
 using BootstrapBlazor.Components;
 
 using Microsoft.Extensions.Localization;
+using Microsoft.Extensions.Logging;
 
 using System.Text;
 
@@ -19,6 +20,8 @@ using ThingsGateway.NewLife.Threading;
 using ThingsGateway.Razor;
 
 using TouchSocket.Core;
+
+using LogLevel = TouchSocket.Core.LogLevel;
 
 namespace ThingsGateway.Gateway.Application;
 
@@ -124,6 +127,11 @@ public abstract class DriverBase : DisposableObject, IDriver
             if (CurrentDevice == null) return;
             LogMessage?.LogInformation(pause == true ? string.Format(AppResource.DeviceTaskPause, DeviceName) : string.Format(AppResource.DeviceTaskContinue, DeviceName));
             CurrentDevice.Pause = pause;
+
+            if (CurrentDevice.Pause)
+                TaskSchedulerLoop.Stop();
+            else
+                TaskSchedulerLoop.Start();
         }
     }
 
@@ -233,7 +241,7 @@ public abstract class DriverBase : DisposableObject, IDriver
     }
 
     /// <summary>
-    /// 在循环任务开始之前
+    /// 在任务开始之前
     /// </summary>
     /// <param name="cancellationToken">取消操作的令牌。</param>
     /// <returns>表示异步操作的任务。</returns>
@@ -289,15 +297,36 @@ public abstract class DriverBase : DisposableObject, IDriver
         }
     }
 
+    protected internal TaskSchedulerLoop TaskSchedulerLoop;
+
+
     /// <summary>
-    /// 循环任务
+    /// 获取任务
     /// </summary>
     /// <param name="cancellationToken">取消操作的令牌。</param>
     /// <returns>表示异步操作结果的枚举。</returns>
-    internal abstract ValueTask<ThreadRunReturnTypeEnum> ExecuteAsync(CancellationToken cancellationToken);
+    internal virtual TaskSchedulerLoop GetTasks(CancellationToken cancellationToken)
+    {
+        TaskSchedulerLoop = new(ProtectedGetTasks(cancellationToken));
+
+
+        //var count = GlobalData.ChannelThreadManage.DeviceThreadManages.Select(a => a.Value.TaskCount).Sum();
+        //ThreadPool.GetMinThreads(out var wt, out var io);
+        //if (wt < count + 128)
+        //{
+        //    wt = count + 256;
+        //    ThreadPool.SetMinThreads(wt, io);
+        //    GlobalData.GatewayMonitorHostedService.Logger.LogInformation($"set min threads count {wt}, device tasks count {count}");
+        //}
+
+
+        return TaskSchedulerLoop;
+    }
+
+    protected abstract List<IScheduledTask> ProtectedGetTasks(CancellationToken cancellationToken);
 
     /// <summary>
-    /// 已停止循环任务，释放插件
+    /// 已停止任务，释放插件
     /// </summary>
     internal virtual void Stop()
     {
@@ -422,13 +451,6 @@ public abstract class DriverBase : DisposableObject, IDriver
     /// 变量更改后， 重新初始化变量列表，获取设备变量打包列表/特殊方法列表等
     /// </summary>
     public abstract Task AfterVariablesChangedAsync(CancellationToken cancellationToken);
-
-    /// <summary>
-    /// 间隔执行
-    /// </summary>
-    protected abstract Task ProtectedExecuteAsync(CancellationToken cancellationToken);
-
-
 
     #endregion 插件重写
 }

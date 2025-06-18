@@ -8,8 +8,6 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-using ThingsGateway.NewLife;
-
 namespace ThingsGateway.Gateway.Application;
 
 /// <summary>
@@ -17,10 +15,6 @@ namespace ThingsGateway.Gateway.Application;
 /// </summary>
 public class VariableSourceRead : IVariableSource
 {
-    /// <summary>
-    /// 读取次数
-    /// </summary>
-    public ulong ReadCount;
 
     private List<IVariable> _variableRuntimes = new List<IVariable>();
 
@@ -39,10 +33,7 @@ public class VariableSourceRead : IVariableSource
     /// </summary>
     public string RegisterAddress { get; set; }
 
-    /// <summary>
-    /// 间隔时间实现
-    /// </summary>
-    public TimeTick TimeTick { get; set; }
+    public string IntervalTime { get; set; }
 
     /// <summary>
     /// 需分配的变量列表
@@ -66,17 +57,4 @@ public class VariableSourceRead : IVariableSource
     }
 
 
-    /// <summary>
-    /// 检测是否达到读取间隔
-    /// </summary>
-    /// <returns></returns>
-    public bool CheckIfRequestAndUpdateTime()
-    {
-        var result = TimeTick.IsTickHappen();
-        if (result)
-        {
-            ReadCount++;
-        }
-        return result;
-    }
 }

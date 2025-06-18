@@ -11,7 +11,6 @@
 using Mapster;
 
 using ThingsGateway.Extension.Generic;
-using ThingsGateway.NewLife;
 
 using TouchSocket.Core;
 
@@ -22,9 +21,6 @@ namespace ThingsGateway.Gateway.Application;
 /// </summary>
 public abstract class BusinessBaseWithCacheIntervalAlarmModel<VarModel, DevModel, AlarmModel> : BusinessBaseWithCacheAlarmModel<VarModel, DevModel, AlarmModel>
 {
-    protected TimeTick _exT2TimerTick;  // 用于设备上传的时间间隔定时器
-    protected TimeTick _exTTimerTick;   // 用于变量上传的时间间隔定时器
-
     /// <summary>
     /// 业务属性
     /// </summary>
@@ -37,10 +33,6 @@ public abstract class BusinessBaseWithCacheIntervalAlarmModel<VarModel, DevModel
 
     protected internal override async Task InitChannelAsync(IChannel? channel, CancellationToken cancellationToken)
     {
-        // 初始化
-        _exTTimerTick = new(_businessPropertyWithCacheInterval.BusinessInterval);
-        _exT2TimerTick = new(_businessPropertyWithCacheInterval.BusinessInterval);
-
         GlobalData.AlarmChangedEvent -= AlarmValueChange;
         GlobalData.ReadOnlyRealAlarmIdVariables?.ForEach(a =>
         {
@@ -145,69 +137,55 @@ public abstract class BusinessBaseWithCacheIntervalAlarmModel<VarModel, DevModel
     /// <summary>
     /// 间隔上传数据的方法
     /// </summary>
-    protected virtual async Task IntervalInsert(CancellationToken cancellationToken)
+    protected void IntervalInsert(object? state, CancellationToken cancellationToken)
     {
-        while (!DisposedValue)
+        if (CurrentDevice.Pause == true)
         {
-            if (CurrentDevice.Pause == true)
-            {
-                await Task.Delay(1000, cancellationToken).ConfigureAwait(false);
-                continue;
-            }
-
-            // 如果业务属性的缓存为间隔上传，则根据定时器间隔执行相应操作
-            if (_businessPropertyWithCacheInterval.BusinessUpdateEnum != BusinessUpdateEnum.Change)
-            {
-                try
-                {
-                    if (_exTTimerTick.IsTickHappen())
-                    {
-                        if (LogMessage?.LogLevel <= LogLevel.Debug)
-                            LogMessage?.LogDebug($"Interval {typeof(VarModel).Name} data, count {IdVariableRuntimes.Count}");
-                        // 间隔推送全部变量
-                        var variableRuntimes = IdVariableRuntimes.Select(a => a.Value);
-                        VariableTimeInterval(variableRuntimes, variableRuntimes.Adapt<List<VariableBasicData>>());
-                    }
-                }
-                catch (Exception ex)
-                {
-                    LogMessage?.LogWarning(ex, AppResource.IntervalInsertVariableFail);
-                }
-                try
-                {
-                    if (_exT2TimerTick.IsTickHappen())
-                    {
-                        if (CollectDevices != null)
-                        {
-                            if (LogMessage?.LogLevel <= LogLevel.Debug)
-                                LogMessage?.LogDebug($"Interval {typeof(DevModel).Name} data, count {CollectDevices.Count}");
-
-                            // 间隔推送全部设备
-                            foreach (var deviceRuntime in CollectDevices.Select(a => a.Value))
-                            {
-                                DeviceTimeInterval(deviceRuntime, deviceRuntime.Adapt<DeviceBasicData>());
-                            }
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    LogMessage?.LogWarning(ex, AppResource.IntervalInsertDeviceFail);
-                }
-            }
-
-            await Task.Delay(100, cancellationToken).ConfigureAwait(false);
+            return;
         }
+
+        // 如果业务属性的缓存为间隔上传，则根据定时器间隔执行相应操作
+        if (_businessPropertyWithCacheInterval.BusinessUpdateEnum != BusinessUpdateEnum.Change)
+        {
+            try
+            {
+                if (LogMessage?.LogLevel <= LogLevel.Debug)
+                    LogMessage?.LogDebug($"Interval {typeof(VarModel).Name} data, count {IdVariableRuntimes.Count}");
+                // 间隔推送全部变量
+                var variableRuntimes = IdVariableRuntimes.Select(a => a.Value);
+                VariableTimeInterval(variableRuntimes, variableRuntimes.Adapt<List<VariableBasicData>>());
+            }
+            catch (Exception ex)
+            {
+                LogMessage?.LogWarning(ex, AppResource.IntervalInsertVariableFail);
+            }
+            try
+            {
+                if (CollectDevices != null)
+                {
+                    if (LogMessage?.LogLevel <= LogLevel.Debug)
+                        LogMessage?.LogDebug($"Interval {typeof(DevModel).Name} data, count {CollectDevices.Count}");
+
+                    // 间隔推送全部设备
+                    foreach (var deviceRuntime in CollectDevices.Select(a => a.Value))
+                    {
+                        DeviceTimeInterval(deviceRuntime, deviceRuntime.Adapt<DeviceBasicData>());
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                LogMessage?.LogWarning(ex, AppResource.IntervalInsertDeviceFail);
+            }
+        }
+
     }
 
-    /// <summary>
-    /// 启动前异步方法
-    /// </summary>
-    protected override Task ProtectedStartAsync(CancellationToken cancellationToken)
+    protected override List<IScheduledTask> ProtectedGetTasks(CancellationToken cancellationToken)
     {
-        // 启动间隔上传的数据获取线程
-        _ = IntervalInsert(cancellationToken);
-        return base.ProtectedStartAsync(cancellationToken);
+        var list = base.ProtectedGetTasks(cancellationToken);
+        list.Add(ScheduledTaskHelper.GetTask(_businessPropertyWithCacheInterval.BusinessInterval, IntervalInsert, null, LogMessage, cancellationToken));
+        return list;
     }
 
     /// <summary>

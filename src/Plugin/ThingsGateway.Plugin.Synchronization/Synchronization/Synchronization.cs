@@ -59,7 +59,7 @@ public partial class Synchronization : BusinessBase, IRpcDriver
 
 
 
-    protected override async Task ProtectedExecuteAsync(CancellationToken cancellationToken)
+    protected override async Task ProtectedExecuteAsync(object? state, CancellationToken cancellationToken)
     {
         try
         {

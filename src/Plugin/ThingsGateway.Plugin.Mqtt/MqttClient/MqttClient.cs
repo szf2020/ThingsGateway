@@ -176,7 +176,7 @@ public partial class MqttClient : BusinessBaseWithCacheIntervalScript<VariableBa
         }
     }
 
-    protected override async Task ProtectedExecuteAsync(CancellationToken cancellationToken)
+    protected override async Task ProtectedExecuteAsync(object? state, CancellationToken cancellationToken)
     {
         var clientResult = await TryMqttClientAsync(cancellationToken).ConfigureAwait(false);
         if (!clientResult.IsSuccess)

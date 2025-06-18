@@ -112,11 +112,18 @@ public static partial class DeviceExtension
             int index = variable.Index;
             try
             {
-                var data = byteConverter.GetDataFormBytes(device, variable.RegisterAddress, buffer, index, dataType, variable.ArrayLength ?? 1);
-                result = Set(variable, data);
-                if (exWhenAny)
-                    if (!result.IsSuccess)
-                        return result;
+                var changed = byteConverter.GetChangedDataFormBytes(device, variable.RegisterAddress, buffer, index, dataType, variable.ArrayLength ?? 1, variable.Value, out var data);
+                if (changed)
+                {
+                    result = variable.SetValue(data, time);
+                    if (exWhenAny)
+                        if (!result.IsSuccess)
+                            return result;
+                }
+                else
+                {
+                    variable.SetNoChangedValue(time);
+                }
             }
             catch (Exception ex)
             {
@@ -124,10 +131,7 @@ public static partial class DeviceExtension
             }
         }
         return result;
-        OperResult Set(IVariable organizedVariable, object num)
-        {
-            return organizedVariable.SetValue(num, time);
-        }
+
     }
 
     /// <summary>

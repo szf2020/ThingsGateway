@@ -20,15 +20,14 @@ public class UpdateZipFileHostedService : IUpdateZipFileHostedService
         var data = files.Select(a => Encoding.UTF8.GetString(a.ReadBytes()).FromJsonNetString<UpdateZipFile>());
         return data.Where(a => a.Version > input.Version && a.MinimumCompatibleVersion <= input.Version && a.AppName == input.AppName && a.DotNetVersion.Major == input.DotNetVersion.Major && a.OSPlatform.EqualIgnoreCase(input.OSPlatform) && a.Architecture == input.Architecture).ToList();
     }
-    public async Task<QueryData<UpdateZipFile>>? Page(QueryPageOptions options)
+    public Task<QueryData<UpdateZipFile>>? Page(QueryPageOptions options)
     {
         var path = Path.Combine(AppContext.BaseDirectory, FileConst.ServerDir);
 
         var files = path.AsDirectory().GetAllFiles("*.json", true);
         var data = files.Select(a => Encoding.UTF8.GetString(a.ReadBytes()).FromJsonNetString<UpdateZipFile>()).GetQueryData(options);
 
-        await Task.CompletedTask.ConfigureAwait(false);
-        return data;
+        return Task.FromResult(data);
     }
     public async Task SaveUpdateZipFile(UpdateZipFileAddInput input)
     {
@@ -126,9 +125,8 @@ public class UpdateZipFileHostedService : IUpdateZipFileHostedService
         using var fs1 = new FileStream(Path.Combine(path, $"{model.AppName}.json"), FileMode.Create);
         await stream1.CopyToAsync(fs1).ConfigureAwait(false);
     }
-    public async Task<bool> DeleteAsync(IEnumerable<UpdateZipFile> updateZipFiles)
+    public void Delete(IEnumerable<UpdateZipFile> updateZipFiles)
     {
-        await Task.CompletedTask.ConfigureAwait(false);
         var path = Path.Combine(AppContext.BaseDirectory, FileConst.ServerDir);
         foreach (var item in updateZipFiles)
         {
@@ -138,6 +136,5 @@ public class UpdateZipFileHostedService : IUpdateZipFileHostedService
                 filePath.AsDirectory().Delete(true);
             }
         }
-        return true;
     }
 }

@@ -227,7 +227,7 @@ public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariableModel<
         await base.ProtectedStartAsync(cancellationToken).ConfigureAwait(false);
     }
 
-    protected override async Task ProtectedExecuteAsync(CancellationToken cancellationToken)
+    protected override async Task ProtectedExecuteAsync(object? state, CancellationToken cancellationToken)
     {
         if (_driverPropertys.IsReadDB)
         {

@@ -43,7 +43,7 @@ internal static class PackHelper
             {
                 RegisterAddress = item.Key!,
                 Length = 1,
-                TimeTick = new(string.IsNullOrWhiteSpace(item.FirstOrDefault().IntervalTime) ? defaultIntervalTime : item.FirstOrDefault().IntervalTime),
+                IntervalTime = string.IsNullOrWhiteSpace(item.FirstOrDefault().IntervalTime) ? defaultIntervalTime : item.FirstOrDefault().IntervalTime,
             };
             r.AddVariableRange(item);
             result.Add(r);

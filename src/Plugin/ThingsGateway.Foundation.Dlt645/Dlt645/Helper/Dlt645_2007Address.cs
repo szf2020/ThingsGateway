@@ -11,7 +11,6 @@
 using System.Text;
 
 using ThingsGateway.Foundation.Extension.String;
-using ThingsGateway.NewLife.Caching;
 using ThingsGateway.NewLife.Extension;
 
 namespace ThingsGateway.Foundation.Dlt645;
@@ -40,10 +39,10 @@ public class Dlt645_2007Address : Dlt645_2007Request
     /// </summary>
     public static Dlt645_2007Address ParseFrom(string address, string defaultStation = null, bool isCache = true)
     {
-        var cacheKey = $"{nameof(ParseFrom)}_{typeof(Dlt645_2007Address).FullName}_{typeof(Dlt645_2007Address).TypeHandle.Value}_{address}_{defaultStation}";
-        if (isCache)
-            if (MemoryCache.Instance.TryGetValue(cacheKey, out Dlt645_2007Address dAddress))
-                return new(dAddress);
+        //var cacheKey = $"{nameof(ParseFrom)}_{typeof(Dlt645_2007Address).FullName}_{typeof(Dlt645_2007Address).TypeHandle.Value}_{address}_{defaultStation}";
+        //if (isCache)
+        //    if (MemoryCache.Instance.TryGetValue(cacheKey, out Dlt645_2007Address dAddress))
+        //        return new(dAddress);
 
         Dlt645_2007Address dlt645_2007Address = new();
         if (!string.IsNullOrEmpty(defaultStation))
@@ -78,10 +77,11 @@ public class Dlt645_2007Address : Dlt645_2007Request
             }
         }
 
-        if (isCache)
-            MemoryCache.Instance.Set(cacheKey, dlt645_2007Address, 3600);
+        //if (isCache)
+        //    MemoryCache.Instance.Set(cacheKey, dlt645_2007Address, 3600);
 
-        return new(dlt645_2007Address);
+        return dlt645_2007Address;
+        //return new(dlt645_2007Address);
     }
 
     public void SetDataId(string dataId)

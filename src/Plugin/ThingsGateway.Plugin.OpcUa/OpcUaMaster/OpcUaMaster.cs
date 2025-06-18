@@ -16,7 +16,6 @@ using Opc.Ua.Client;
 using ThingsGateway.Foundation.Extension.Generic;
 using ThingsGateway.Foundation.OpcUa;
 using ThingsGateway.Gateway.Application;
-using ThingsGateway.NewLife;
 using ThingsGateway.NewLife.Json.Extension;
 using ThingsGateway.NewLife.Threading;
 
@@ -102,9 +101,18 @@ public class OpcUaMaster : CollectBase
     {
         return _plc?.GetAddressDescription();
     }
+    protected override bool VariableSourceReadsEnable => !_driverProperties.ActiveSubscribe;
+    protected override List<IScheduledTask> ProtectedGetTasks(CancellationToken cancellationToken)
+    {
+        var list = base.ProtectedGetTasks(cancellationToken);
 
-    private TimeTick checkTimeTick = new("60000");
-    protected override async Task ProtectedExecuteAsync(CancellationToken cancellationToken)
+        var check = ScheduledTaskHelper.GetTask("3000", CheckAsync, null, LogMessage, cancellationToken);
+        list.Add(check);
+        var checkConnec = ScheduledTaskHelper.GetTask("3000", CheckConnectAsync, null, LogMessage, cancellationToken);
+        list.Add(checkConnec);
+        return list;
+    }
+    private async Task CheckConnectAsync(object? state, CancellationToken cancellationToken)
     {
         if (_plc.Session == null)
         {
@@ -124,65 +132,58 @@ public class OpcUaMaster : CollectBase
                 await Task.Delay(10000, cancellationToken).ConfigureAwait(false);
             }
         }
-        if (_driverProperties.ActiveSubscribe)
+    }
+    private async Task CheckAsync(object? state, CancellationToken cancellationToken)
+    {
+        if (_plc.Session == null)
         {
-
-            //获取设备连接状态
-            if (IsConnected())
+            if (_driverProperties.ActiveSubscribe)
             {
 
-
-                //更新设备活动时间
-                CurrentDevice.SetDeviceStatus(TimerX.Now, false);
-                if (checkTimeTick.IsTickHappen())
+                //获取设备连接状态
+                if (IsConnected())
                 {
 
-                    //如果是订阅模式，连接时添加订阅组
-                    if (_plc.OpcUaProperty?.ActiveSubscribe == true && CurrentDevice.VariableSourceReads.Count > 0 && _plc.Session.SubscriptionCount < CurrentDevice.VariableSourceReads.Count)
+                    //更新设备活动时间
                     {
-                        try
-                        {
 
-                            foreach (var variableSourceRead in CurrentDevice.VariableSourceReads)
+                        //如果是订阅模式，连接时添加订阅组
+                        if (_plc.OpcUaProperty?.ActiveSubscribe == true && CurrentDevice.VariableSourceReads.Count > 0 && _plc.Session.SubscriptionCount < CurrentDevice.VariableSourceReads.Count)
+                        {
+                            try
                             {
-                                if (_plc.Session.Subscriptions.FirstOrDefault(a => a.DisplayName == variableSourceRead.RegisterAddress) == null)
+
+                                foreach (var variableSourceRead in CurrentDevice.VariableSourceReads)
                                 {
-                                    await _plc.AddSubscriptionAsync(variableSourceRead.RegisterAddress, variableSourceRead.VariableRuntimes.Where(a => !a.RegisterAddress.IsNullOrEmpty()).Select(a => a.RegisterAddress!).ToHashSet().ToArray(), _plc.OpcUaProperty.LoadType, cancellationToken).ConfigureAwait(false);
+                                    if (_plc.Session.Subscriptions.FirstOrDefault(a => a.DisplayName == variableSourceRead.RegisterAddress) == null)
+                                    {
+                                        await _plc.AddSubscriptionAsync(variableSourceRead.RegisterAddress, variableSourceRead.VariableRuntimes.Where(a => !a.RegisterAddress.IsNullOrEmpty()).Select(a => a.RegisterAddress!).ToHashSet().ToArray(), _plc.OpcUaProperty.LoadType, cancellationToken).ConfigureAwait(false);
 
-                                    LogMessage?.LogInformation($"AddSubscription index  {CurrentDevice.VariableSourceReads.IndexOf(variableSourceRead)}  done");
+                                        LogMessage?.LogInformation($"AddSubscription index  {CurrentDevice.VariableSourceReads.IndexOf(variableSourceRead)}  done");
 
+                                    }
                                 }
+                                LogMessage?.LogInformation("AddSubscriptions done");
                             }
-                            LogMessage?.LogInformation("AddSubscriptions done");
-                        }
-                        catch (Exception ex)
-                        {
-                            LogMessage?.LogWarning(ex, "AddSubscriptions");
-                        }
-                        finally
-                        {
+                            catch (Exception ex)
+                            {
+                                LogMessage?.LogWarning(ex, "AddSubscriptions");
+                            }
+                            finally
+                            {
+                            }
                         }
                     }
                 }
 
             }
-            else
-            {
-                CurrentDevice.SetDeviceStatus(TimerX.Now, true);
-            }
 
-            ScriptVariableRun(cancellationToken);
-        }
-        else
-        {
-            await base.ProtectedExecuteAsync(cancellationToken).ConfigureAwait(false);
         }
     }
 
     /// <inheritdoc/>
-    protected override async Task<List<VariableSourceRead>> ProtectedLoadSourceReadAsync(List<VariableRuntime> deviceVariables)
+    protected override Task<List<VariableSourceRead>> ProtectedLoadSourceReadAsync(List<VariableRuntime> deviceVariables)
     {
-        await Task.CompletedTask.ConfigureAwait(false);
         if (deviceVariables.Count > 0)
         {
             List<VariableSourceRead> variableSourceReads = new List<VariableSourceRead>();
@@ -194,7 +195,7 @@ public class OpcUaMaster : CollectBase
                 {
                     var sourVars = new VariableSourceRead()
                     {
-                        TimeTick = new(_driverProperties.UpdateRate.ToString()),
+                        IntervalTime = _driverProperties.UpdateRate.ToString(),
                         RegisterAddress = Guid.NewGuid().ToString(),
                     };
                     foreach (var item in variable)
@@ -205,11 +206,11 @@ public class OpcUaMaster : CollectBase
                 }
 
             }
-            return variableSourceReads;
+            return Task.FromResult(variableSourceReads);
         }
         else
         {
-            return new();
+            return Task.FromResult(new List<VariableSourceRead>());
         }
 
     }

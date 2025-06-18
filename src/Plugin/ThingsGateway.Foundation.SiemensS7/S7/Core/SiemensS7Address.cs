@@ -11,7 +11,6 @@
 using System.Text;
 
 using ThingsGateway.Foundation.Extension.String;
-using ThingsGateway.NewLife.Caching;
 using ThingsGateway.NewLife.Collections;
 using ThingsGateway.NewLife.Extension;
 
@@ -144,10 +143,10 @@ public class SiemensS7Address : S7Request
     public static SiemensS7Address ParseFrom(string address, bool isCache = true)
     {
         if (string.IsNullOrWhiteSpace(address)) { return null; }
-        var cacheKey = $"{nameof(ParseFrom)}_{typeof(SiemensS7Address).FullName}_{typeof(SiemensS7Address).TypeHandle.Value}_{address}";
-        if (isCache)
-            if (MemoryCache.Instance.TryGetValue(cacheKey, out SiemensS7Address sAddress))
-                return new(sAddress);
+        //var cacheKey = $"{nameof(ParseFrom)}_{typeof(SiemensS7Address).FullName}_{typeof(SiemensS7Address).TypeHandle.Value}_{address}";
+        //if (isCache)
+        //    if (MemoryCache.Instance.TryGetValue(cacheKey, out SiemensS7Address sAddress))
+        //        return new(sAddress);
 
         SiemensS7Address s7AddressData = new();
         address = address.ToUpper();
@@ -276,8 +275,8 @@ public class SiemensS7Address : S7Request
             }
         }
 
-        if (isCache)
-            MemoryCache.Instance.Set(cacheKey, new SiemensS7Address(s7AddressData), 3600);
+        //if (isCache)
+        //    MemoryCache.Instance.Set(cacheKey, new SiemensS7Address(s7AddressData), 3600);
 
         return s7AddressData;
     }

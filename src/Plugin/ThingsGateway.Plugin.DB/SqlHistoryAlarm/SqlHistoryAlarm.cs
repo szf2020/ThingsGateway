@@ -91,9 +91,9 @@ public partial class SqlHistoryAlarm : BusinessBaseWithCacheVariableModel<Histor
         return base.ProtectedStartAsync(cancellationToken);
     }
 
-    protected override async Task ProtectedExecuteAsync(CancellationToken cancellationToken)
+    protected override Task ProtectedExecuteAsync(object? state, CancellationToken cancellationToken)
     {
-        await Update(cancellationToken).ConfigureAwait(false);
+        return Update(cancellationToken);
     }
 
     #region 数据查询

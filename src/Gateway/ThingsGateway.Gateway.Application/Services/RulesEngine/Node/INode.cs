@@ -22,7 +22,7 @@ public interface IActuatorNode : INode
 
 public interface ITriggerNode : INode
 {
-    public Task StartAsync(Func<NodeOutput, Task> func);
+    public Task StartAsync(Func<NodeOutput, CancellationToken, Task> func, CancellationToken cancellationToken);
 }
 public interface IExexcuteExpressionsBase
 {

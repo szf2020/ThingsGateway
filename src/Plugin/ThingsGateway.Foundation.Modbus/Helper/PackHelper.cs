@@ -8,7 +8,6 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-using ThingsGateway.NewLife;
 using ThingsGateway.NewLife.Extension;
 
 namespace ThingsGateway.Foundation.Modbus;
@@ -165,7 +164,7 @@ public static class PackHelper
             // 创建一个新的变量源读取对象
             T sourceRead = new()
             {
-                TimeTick = new TimeTick(intervalTime),
+                IntervalTime = intervalTime,
                 // 将当前组打包地址中的起始地址作为实际打包报文中的起始地址
                 RegisterAddress = startAddress.ToString(),
                 Length = sourceLen.ToInt()

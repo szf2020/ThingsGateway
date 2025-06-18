@@ -172,7 +172,6 @@ public class TimerScheduler : ILogFeature
                         else if (!timer.Async)
                             Execute(timer);
                         else
-                            //Task.Factory.StartNew(() => ProcessItem(timer));
                             // 不需要上下文流动，捕获所有异常
                             ThreadPool.UnsafeQueueUserWorkItem(s =>
                             {
@@ -231,8 +230,6 @@ public class TimerScheduler : ILogFeature
     {
         if (state is not TimerX timer) return;
 
-        TimerX.Current = timer;
-
         // 控制日志显示
         WriteLogEventArgs.CurrentThreadName = Name == "Default" ? "T" : Name;
 
@@ -274,7 +271,6 @@ public class TimerScheduler : ILogFeature
     {
         if (state is not TimerX timer) return;
 
-        TimerX.Current = timer;
 
         // 控制日志显示
         WriteLogEventArgs.CurrentThreadName = Name == "Default" ? "T" : Name;
@@ -321,8 +317,6 @@ public class TimerScheduler : ILogFeature
         OnFinish(timer);
 
         timer.Calling = false;
-
-        TimerX.Current = null;
 
         // 控制日志显示
         WriteLogEventArgs.CurrentThreadName = null;

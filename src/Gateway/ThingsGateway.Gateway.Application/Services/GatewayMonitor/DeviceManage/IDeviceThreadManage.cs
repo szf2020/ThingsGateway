@@ -21,6 +21,7 @@ public interface IDeviceThreadManage : IAsyncDisposable
     string LogPath { get; }
     IChannelThreadManage ChannelThreadManage { get; }
     IChannel? Channel { get; }
+    int TaskCount { get; }
 
     Task SetLogAsync(LogLevel? logLevel = null, bool upDataBase = true);
     Task RestartDeviceAsync(DeviceRuntime deviceRuntime, bool deleteCache);

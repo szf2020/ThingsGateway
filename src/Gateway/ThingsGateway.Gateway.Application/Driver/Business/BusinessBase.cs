@@ -11,7 +11,6 @@
 using BootstrapBlazor.Components;
 
 using ThingsGateway.Extension.Generic;
-using ThingsGateway.NewLife;
 using ThingsGateway.NewLife.Extension;
 using ThingsGateway.NewLife.Threading;
 
@@ -96,87 +95,42 @@ public abstract class BusinessBase : DriverBase
         return Task.CompletedTask;
     }
 
-
     /// <summary>
-    /// 循环任务
+    /// 获取任务
     /// </summary>
     /// <param name="cancellationToken">取消操作的令牌。</param>
     /// <returns>表示异步操作结果的枚举。</returns>
-    internal override async ValueTask<ThreadRunReturnTypeEnum> ExecuteAsync(CancellationToken cancellationToken)
+    protected override List<IScheduledTask> ProtectedGetTasks(CancellationToken cancellationToken)
     {
-        try
+
+        var setDeviceStatusTask = new ScheduledSyncTask(3000, SetDeviceStatus, null, LogMessage, cancellationToken);
+
+        var executeTask = ScheduledTaskHelper.GetTask(CurrentDevice.IntervalTime, ProtectedExecuteAsync, null, LogMessage, cancellationToken);
+
+        return new List<IScheduledTask>()
+            {
+                setDeviceStatusTask,
+                executeTask
+            };
+    }
+
+    /// <summary>
+    /// 间隔执行
+    /// </summary>
+    protected abstract Task ProtectedExecuteAsync(object? state, CancellationToken cancellationToken);
+
+    private void SetDeviceStatus(object? state, CancellationToken cancellationToken)
+    {
+        // 获取设备连接状态并更新设备活动时间
+        if (IsConnected())
         {
-            // 如果取消操作被请求，则返回中断状态
-            if (cancellationToken.IsCancellationRequested)
-            {
-                return ThreadRunReturnTypeEnum.Break;
-            }
-
-            // 如果标志为停止，则暂停执行
-            if (Pause)
-            {
-                // 暂停
-                return ThreadRunReturnTypeEnum.Continue;
-            }
-
-            // 再次检查取消操作是否被请求
-            if (cancellationToken.IsCancellationRequested)
-            {
-                return ThreadRunReturnTypeEnum.Break;
-            }
-
-            // 获取设备连接状态并更新设备活动时间
-            if (IsConnected())
-            {
-                CurrentDevice.SetDeviceStatus(TimerX.Now, false);
-            }
-            else
-            {
-                CurrentDevice.SetDeviceStatus(TimerX.Now, true);
-            }
-
-            // 再次检查取消操作是否被请求
-            if (cancellationToken.IsCancellationRequested)
-            {
-                return ThreadRunReturnTypeEnum.Break;
-            }
-
-            // 执行任务操作
-            if (TimeTick.IsTickHappen())
-                await ProtectedExecuteAsync(cancellationToken).ConfigureAwait(false);
-
-            // 再次检查取消操作是否被请求
-            if (cancellationToken.IsCancellationRequested)
-            {
-                return ThreadRunReturnTypeEnum.Break;
-            }
-
-            // 正常返回None状态
-            return ThreadRunReturnTypeEnum.None;
+            CurrentDevice.SetDeviceStatus(TimerX.Now, false);
         }
-        catch (OperationCanceledException)
+        else
         {
-            return ThreadRunReturnTypeEnum.Break;
-        }
-        catch (ObjectDisposedException)
-        {
-            return ThreadRunReturnTypeEnum.Break;
-        }
-        catch (Exception ex)
-        {
-            // 记录异常信息，并更新设备状态为异常
-            LogMessage?.LogError(ex, "Execute");
-            CurrentDevice.SetDeviceStatus(TimerX.Now, true, ex.Message);
-            return ThreadRunReturnTypeEnum.None;
+            CurrentDevice.SetDeviceStatus(TimerX.Now, true);
         }
     }
 
-    internal override Task StartAsync(CancellationToken cancellationToken)
-    {
-        TimeTick = new TimeTick(CurrentDevice.IntervalTime);
-        return base.StartAsync(cancellationToken);
-    }
-
-    private TimeTick TimeTick;
 
 }

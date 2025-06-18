@@ -7,7 +7,7 @@ namespace ThingsGateway.Upgrade;
 
 public interface IUpdateZipFileHostedService
 {
-    Task<bool> DeleteAsync(IEnumerable<UpdateZipFile> updateZipFiles);
+    void Delete(IEnumerable<UpdateZipFile> updateZipFiles);
     List<UpdateZipFile>? GetList(UpdateZipFileInput input);
     Task<QueryData<UpdateZipFile>>? Page(QueryPageOptions options);
     Task SaveUpdateZipFile(UpdateZipFileAddInput input);

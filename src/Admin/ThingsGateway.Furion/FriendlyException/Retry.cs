@@ -37,15 +37,15 @@ public sealed class Retry
     {
         if (action == null) throw new ArgumentNullException(nameof(action));
 
-        InvokeAsync(async () =>
+        InvokeAsync(() =>
         {
             action();
-            await Task.CompletedTask.ConfigureAwait(false);
+            return Task.CompletedTask;
         }, numRetries, retryTimeout, finalThrow, exceptionTypes, fallbackPolicy == null ? null
-        : async (ex) =>
+        : (ex) =>
         {
             fallbackPolicy?.Invoke(ex);
-            await Task.CompletedTask.ConfigureAwait(false);
+            return Task.CompletedTask;
         }, retryAction).GetAwaiter().GetResult();
     }
 

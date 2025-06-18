@@ -77,14 +77,13 @@ public class ModbusMaster : CollectFoundationBase
     }
 
     /// <inheritdoc/>
-    protected override async Task<List<VariableSourceRead>> ProtectedLoadSourceReadAsync(List<VariableRuntime> deviceVariables)
+    protected override Task<List<VariableSourceRead>> ProtectedLoadSourceReadAsync(List<VariableRuntime> deviceVariables)
     {
-        await Task.CompletedTask.ConfigureAwait(false);
         List<VariableSourceRead> variableSourceReads = new();
         foreach (var deviceVariable in deviceVariables.GroupBy(a => a.CollectGroup))
         {
             variableSourceReads.AddRange(_plc.LoadSourceRead<VariableSourceRead>(deviceVariable, _driverPropertys.MaxPack, CurrentDevice.IntervalTime));
         }
-        return variableSourceReads;
+        return Task.FromResult(variableSourceReads);
     }
 }

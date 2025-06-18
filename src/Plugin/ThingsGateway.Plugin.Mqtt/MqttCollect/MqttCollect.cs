@@ -98,9 +98,8 @@ public partial class MqttCollect : CollectBase
         }
     }
 
-    protected override async Task<List<VariableSourceRead>> ProtectedLoadSourceReadAsync(List<VariableRuntime> deviceVariables)
+    protected override Task<List<VariableSourceRead>> ProtectedLoadSourceReadAsync(List<VariableRuntime> deviceVariables)
     {
-        await Task.CompletedTask.ConfigureAwait(false);
         TopicItemDict.Clear();
         if (deviceVariables.Count > 0)
         {
@@ -128,7 +127,7 @@ public partial class MqttCollect : CollectBase
                 TopicItemDict[group.Key] = new();
                 var sourVars = new VariableSourceRead()
                 {
-                    TimeTick = new("1000"),
+                    IntervalTime = "1000",
                     RegisterAddress = group.Key,
                 };
                 foreach (var item in group)
@@ -170,11 +169,11 @@ public partial class MqttCollect : CollectBase
                     _mqttSubscribeOptions = mqttClientSubscribeOptions;
             }
 
-            return dataResult;
+            return Task.FromResult(dataResult);
         }
         else
         {
-            return new();
+            return Task.FromResult(new List<VariableSourceRead>());
         }
 
     }
@@ -230,11 +229,12 @@ public partial class MqttCollect : CollectBase
             {
                 try
                 {
+                    var now = DateTime.Now;
                     foreach (var item in IdVariableRuntimes)
                     {
-                        if (DateTime.Now - item.Value.CollectTime > ETime)
+                        if (now - item.Value.CollectTime > ETime)
                         {
-                            item.Value.SetValue(null, DateTime.Now, false);
+                            item.Value.SetValue(null, now, false);
                         }
                     }
                 }
@@ -260,7 +260,18 @@ public partial class MqttCollect : CollectBase
 
 
     private volatile bool success;
-    protected override async Task ProtectedExecuteAsync(CancellationToken cancellationToken)
+
+    protected override bool VariableSourceReadsEnable => false;
+    protected override List<IScheduledTask> ProtectedGetTasks(CancellationToken cancellationToken)
+    {
+        var list = base.ProtectedGetTasks(cancellationToken);
+
+        var check = ScheduledTaskHelper.GetTask("3000", CheckAsync, null, LogMessage, cancellationToken);
+        list.Add(check);
+
+        return list;
+    }
+    private async Task CheckAsync(object? state, CancellationToken cancellationToken)
     {
         var clientResult = await TryMqttClientAsync(cancellationToken).ConfigureAwait(false);
         if (!clientResult.IsSuccess)
@@ -287,7 +298,6 @@ public partial class MqttCollect : CollectBase
             CurrentDevice.SetDeviceStatus(TimerX.Now, true);
         }
 
-        ScriptVariableRun(cancellationToken);
 
     }
 

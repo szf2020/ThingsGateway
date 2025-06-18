@@ -8,8 +8,6 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-using ThingsGateway.NewLife;
-
 namespace ThingsGateway.Foundation;
 
 /// <summary>
@@ -33,9 +31,9 @@ public interface IVariableSource
     string RegisterAddress { get; set; }
 
     /// <summary>
-    /// TimeTick
+    /// IntervalTime
     /// </summary>
-    TimeTick TimeTick { get; set; }
+    string IntervalTime { get; set; }
 
     /// <summary>
     /// 添加变量

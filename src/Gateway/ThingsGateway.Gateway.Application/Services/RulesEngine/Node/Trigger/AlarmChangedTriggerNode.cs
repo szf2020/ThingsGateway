@@ -13,8 +13,8 @@ public class AlarmChangedTriggerNode : VariableNode, ITriggerNode, IDisposable
     public AlarmChangedTriggerNode(string id, Point? position = null) : base(id, position) { Title = "AlarmChangedTriggerNode"; }
 
 
-    private Func<NodeOutput, Task> Func { get; set; }
-    Task ITriggerNode.StartAsync(Func<NodeOutput, Task> func)
+    private Func<NodeOutput, CancellationToken, Task> Func { get; set; }
+    Task ITriggerNode.StartAsync(Func<NodeOutput, CancellationToken, Task> func, CancellationToken cancellationToken)
     {
         Func = func;
         FuncDict.TryAdd(this, func);
@@ -43,12 +43,12 @@ public class AlarmChangedTriggerNode : VariableNode, ITriggerNode, IDisposable
 
     public static ConcurrentDictionary<string, ConcurrentDictionary<string, ConcurrentList<AlarmChangedTriggerNode>>> AlarmChangedTriggerNodeDict = new();
 
-    public static ConcurrentDictionary<AlarmChangedTriggerNode, Func<NodeOutput, Task>> FuncDict = new();
+    public static ConcurrentDictionary<AlarmChangedTriggerNode, Func<NodeOutput, CancellationToken, Task>> FuncDict = new();
 
     public static BlockingCollection<AlarmVariable> AlarmVariables = new();
     static AlarmChangedTriggerNode()
     {
-        _ = RunAsync();
+        Task.Factory.StartNew(RunAsync);
         GlobalData.AlarmChangedEvent -= AlarmHostedService_OnAlarmChanged;
         GlobalData.ReadOnlyRealAlarmIdVariables?.ForEach(a =>
         {
@@ -88,7 +88,7 @@ public class AlarmChangedTriggerNode : VariableNode, ITriggerNode, IDisposable
                                if (FuncDict.TryGetValue(item, out var func))
                                {
                                    item.Logger?.Trace($"Alarm changed: {item.Text}");
-                                   await func.Invoke(new NodeOutput() { Value = alarmVariable }).ConfigureAwait(false);
+                                   await func.Invoke(new NodeOutput() { Value = alarmVariable }, token).ConfigureAwait(false);
                                }
                            }
                            catch (Exception ex)

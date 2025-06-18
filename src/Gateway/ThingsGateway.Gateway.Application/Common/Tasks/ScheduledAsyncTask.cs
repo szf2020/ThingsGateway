@@ -1,26 +1,27 @@
-﻿using TouchSocket.Core;
+﻿using ThingsGateway.NewLife;
+using ThingsGateway.NewLife.Threading;
+
+using TouchSocket.Core;
 
 namespace ThingsGateway.Gateway.Application;
 
-public class ScheduledTask
+public class ScheduledAsyncTask : DisposeBase, IScheduledTask
 {
-    private TimeSpan _interval { get; }
-    private TimeSpan _interval10 = TimeSpan.FromMilliseconds(10);
-    private double _intervalMS { get; }
+    private int _interval10MS = 10;
+    private int _intervalMS;
     private readonly Func<object?, CancellationToken, Task> _taskFunc;
     private readonly CancellationToken _token;
-    private Timer? _timer;
+    private TimerX? _timer;
     private object? _state;
     private ILog LogMessage;
     private volatile int _isRunning = 0;
     private volatile int _pendingTriggers = 0;
 
-    public ScheduledTask(TimeSpan interval, Func<object?, CancellationToken, Task> taskFunc, object? state, ILog log, CancellationToken token)
+    public ScheduledAsyncTask(int interval, Func<object?, CancellationToken, Task> taskFunc, object? state, ILog log, CancellationToken token)
     {
+        _intervalMS = interval;
         LogMessage = log;
         _state = state;
-        _interval = interval;
-        _intervalMS = interval.TotalMilliseconds;
         _taskFunc = taskFunc;
         _token = token;
     }
@@ -28,23 +29,22 @@ public class ScheduledTask
     public void Start()
     {
         _timer?.Dispose();
-        _timer = new Timer(TimerCallback, _state, TimeSpan.Zero, _interval);
+        if (!_token.IsCancellationRequested)
+            _timer = new TimerX(DoAsync, _state, _intervalMS, _intervalMS, nameof(IScheduledTask)) { Async = true };
     }
 
-    private void TimerCallback(object? state)
-    {
-        _ = Do(state);
-    }
-
-    private async Task Do(object? state)
+    private async Task DoAsync(object? state)
     {
         if (_token.IsCancellationRequested)
             return;
 
-        Interlocked.Exchange(ref _pendingTriggers, 1);
+        Interlocked.Increment(ref _pendingTriggers);
 
         if (Interlocked.Exchange(ref _isRunning, 1) == 1)
             return;
+
+        // 减少一个触发次数
+        Interlocked.Decrement(ref _pendingTriggers);
 
         try
         {
@@ -62,7 +62,7 @@ public class ScheduledTask
             Interlocked.Exchange(ref _isRunning, 0);
         }
 
-        if (Interlocked.Exchange(ref _pendingTriggers, 0) == 1)
+        if (Interlocked.Exchange(ref _pendingTriggers, 0) >= 1)
         {
             if (!_token.IsCancellationRequested)
             {
@@ -74,12 +74,8 @@ public class ScheduledTask
     private void DelayDo()
     {
         // 延迟触发下一次
-        _timer?.Change(_interval10, _interval);
-    }
-
-    public void Change(int dueTime, int period)
-    {
-        _timer?.Change(dueTime, period);
+        if (!_token.IsCancellationRequested)
+            _timer?.SetNext(_interval10MS);
     }
 
     public void Stop()
@@ -88,4 +84,9 @@ public class ScheduledTask
         _timer = null;
     }
 
+    protected override void Dispose(bool disposing)
+    {
+        Stop();
+        base.Dispose(disposing);
+    }
 }

@@ -228,7 +228,7 @@ internal static class PackHelper
 
             T sourceRead = new() // 创建一个新的源读取对象
             {
-                TimeTick = new(intervalTime), // 设置时间戳
+                IntervalTime = intervalTime, // 设置时间戳
                 RegisterAddress = tempAddresses.OrderBy(it => it.AddressStart).First().ToString(), // 获取地址并按地址排序
                 Length = sourceLen // 设置源长度
             };

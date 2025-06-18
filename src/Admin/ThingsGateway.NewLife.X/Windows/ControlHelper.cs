@@ -280,43 +280,6 @@ public static class ControlHelper
         }
     }
 
-    private static void ProcessBell(ref String m)
-    {
-        var ch = (Char)7;
-        var p = 0;
-        while (true)
-        {
-            p = m.IndexOf(ch, p);
-            if (p < 0) break;
-
-            if (p > 0)
-            {
-                var str = m[..p];
-                if (p + 1 < m.Length) str += m[(p + 1)..];
-                m = str;
-            }
-
-            //Console.Beep();
-            // 用定时器来控制Beep，避免被堵塞
-            _timer ??= new TimerX(Bell, null, 100, 100);
-            _Beep = true;
-            //SystemSounds.Beep.Play();
-            p++;
-        }
-    }
-
-    private static TimerX? _timer;
-    private static Boolean _Beep;
-
-    private static void Bell(Object? state)
-    {
-        if (_Beep)
-        {
-            _Beep = false;
-            Console.Beep();
-        }
-    }
-
     [DllImport("user32.dll")]
     private static extern Int32 SendMessage(IntPtr hwnd, Int32 wMsg, Int32 wParam, Int32 lParam);
     private const Int32 SB_TOP = 6;

@@ -168,14 +168,14 @@ internal sealed class RulesEngineHostedService : BackgroundService, IRulesEngine
             else if (targetNode is ITriggerNode triggerNode)
             {
 
-                Func<NodeOutput, Task> func = (async a =>
+                Func<NodeOutput, CancellationToken, Task> func = (async (a, token) =>
                 {
                     foreach (var link in targetNode.PortLinks.Where(a => ((a.Target.Model as PortModel)?.Parent) != targetNode))
                     {
-                        await Analysis((link.Target.Model as PortModel)?.Parent, new NodeInput() { Value = a.Value }, rulesLog, cancellationToken).ConfigureAwait(false);
+                        await Analysis((link.Target.Model as PortModel)?.Parent, new NodeInput() { Value = a.Value }, rulesLog, token).ConfigureAwait(false);
                     }
                 });
-                await triggerNode.StartAsync(func).ConfigureAwait(false);
+                await triggerNode.StartAsync(func, cancellationToken).ConfigureAwait(false);
 
             }
 

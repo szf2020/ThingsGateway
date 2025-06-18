@@ -150,7 +150,7 @@ public class ModbusSlave : BusinessBase
     }
 
 
-    protected override async Task ProtectedExecuteAsync(CancellationToken cancellationToken)
+    protected override async Task ProtectedExecuteAsync(object? state, CancellationToken cancellationToken)
     {
         //获取设备连接状态
         if (IsConnected())
@@ -233,7 +233,7 @@ public class ModbusSlave : BusinessBase
                 }
                 else
                 {
-                    var data = thingsGatewayBitConverter.GetDataFormBytes(_plc, addressStr, writeData, 0, dType, item.Value.ArrayLength ?? 1);
+                    _ = thingsGatewayBitConverter.GetChangedDataFormBytes(_plc, addressStr, writeData, 0, dType, item.Value.ArrayLength ?? 1, null, out var data);
 
                     var result = await item.Value.RpcAsync(data.ToSystemTextJsonString(), $"{nameof(ModbusSlave)}-{CurrentDevice.Name}-{$"{channel}"}").ConfigureAwait(false);
 

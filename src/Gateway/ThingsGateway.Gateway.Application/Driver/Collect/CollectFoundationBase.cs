@@ -68,10 +68,8 @@ public abstract class CollectFoundationBase : CollectBase
     }
 
 
-    protected override async ValueTask<bool> TestOnline(CancellationToken cancellationToken)
+    protected override async Task TestOnline(object? state, CancellationToken cancellationToken)
     {
-        //设备无法连接时
-        // 检查协议是否为空，如果为空则抛出异常
         if (FoundationDevice != null)
         {
             if (FoundationDevice.OnLine == false)
@@ -79,7 +77,6 @@ public abstract class CollectFoundationBase : CollectBase
                 Exception exception = null;
                 try
                 {
-                    await Task.Delay(1000, cancellationToken).ConfigureAwait(false);
                     if (!cancellationToken.IsCancellationRequested)
                     {
                         await FoundationDevice.Channel.ConnectAsync(FoundationDevice.Channel.ChannelOptions.ConnectTimeout, cancellationToken).ConfigureAwait(false);
@@ -91,7 +88,7 @@ public abstract class CollectFoundationBase : CollectBase
                 }
                 if (cancellationToken.IsCancellationRequested)
                 {
-                    return true;
+                    return;
                 }
                 if (FoundationDevice.OnLine == false && exception != null)
                 {
@@ -120,13 +117,12 @@ public abstract class CollectFoundationBase : CollectBase
                         item.Variable.SetValue(null, time, isOnline: false);
                     }
 
-                    await Task.Delay(3000, cancellationToken).ConfigureAwait(false);
-                    return true;
+                    return;
                 }
             }
         }
 
-        return false;
+        return;
     }
 
 
@@ -143,9 +139,6 @@ public abstract class CollectFoundationBase : CollectBase
                 return new(new OperationCanceledException());
             // 从协议读取数据
             var read = await FoundationDevice.ReadAsync(variableSourceRead.RegisterAddress, variableSourceRead.Length, cancellationToken).ConfigureAwait(false);
-
-            // 增加变量源的读取次数
-            Interlocked.Increment(ref variableSourceRead.ReadCount);
 
             // 如果读取成功且有有效内容，则解析结构化内容
             if (read.IsSuccess)
@@ -214,14 +207,6 @@ public abstract class CollectFoundationBase : CollectBase
         finally
         {
         }
-    }
-
-    private sealed class ReadResultCount
-    {
-        public int deviceMethodsVariableFailedNum = 0;
-        public int deviceMethodsVariableSuccessNum = 0;
-        public int deviceSourceVariableFailedNum = 0;
-        public int deviceSourceVariableSuccessNum = 0;
     }
 
 }

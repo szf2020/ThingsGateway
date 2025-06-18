@@ -11,7 +11,6 @@
 using Mapster;
 
 using ThingsGateway.Extension.Generic;
-using ThingsGateway.NewLife;
 
 using TouchSocket.Core;
 
@@ -23,10 +22,6 @@ namespace ThingsGateway.Gateway.Application;
 /// <typeparam name="VarModel">变量模型类型</typeparam>
 public abstract class BusinessBaseWithCacheIntervalVariableModel<VarModel> : BusinessBaseWithCacheVariableModel<VarModel>
 {
-    /// <summary>
-    /// 用于定时触发的时间间隔。
-    /// </summary>
-    protected TimeTick _exTTimerTick;
 
     /// <summary>
     /// 获取具体业务属性的缓存设置。
@@ -40,9 +35,6 @@ public abstract class BusinessBaseWithCacheIntervalVariableModel<VarModel> : Bus
 
     protected internal override async Task InitChannelAsync(IChannel? channel, CancellationToken cancellationToken)
     {
-        // 初始化定时器
-        _exTTimerTick = new TimeTick(_businessPropertyWithCacheInterval.BusinessInterval);
-
         // 注册变量值变化事件处理程序
         if (_businessPropertyWithCacheInterval.BusinessUpdateEnum != BusinessUpdateEnum.Interval)
         {
@@ -90,54 +82,39 @@ public abstract class BusinessBaseWithCacheIntervalVariableModel<VarModel> : Bus
     }
 
     /// <summary>
-    /// 间隔插入操作，用于周期性地插入变量。
+    /// 间隔上传数据的方法
     /// </summary>
-    /// <returns>表示异步操作的任务</returns>
-    protected virtual async Task IntervalInsert(CancellationToken cancellationToken)
+    protected void IntervalInsert(object? state, CancellationToken cancellationToken)
     {
-        while (!cancellationToken.IsCancellationRequested)
+        if (CurrentDevice.Pause == true)
         {
-            if (CurrentDevice.Pause == true)
-            {
-                await Task.Delay(1000, cancellationToken).ConfigureAwait(false);
-                continue;
-            }
-            //间隔上传
-            if (_businessPropertyWithCacheInterval.BusinessUpdateEnum != BusinessUpdateEnum.Change)
-            {
-                try
-                {
-                    if (_exTTimerTick.IsTickHappen())
-                    {
-                        if (LogMessage?.LogLevel <= LogLevel.Debug)
-                            LogMessage?.LogDebug($"Interval  {typeof(VarModel).Name}  data, count {IdVariableRuntimes.Count}");
-                        //间隔推送全部变量
-                        var variableRuntimes = IdVariableRuntimes.Select(a => a.Value);
-                        VariableTimeInterval(variableRuntimes, variableRuntimes.Adapt<List<VariableBasicData>>());
-                    }
-                }
-                catch (Exception ex)
-                {
-                    LogMessage?.LogWarning(ex, AppResource.IntervalInsertVariableFail);
-                }
-            }
-
-            await Task.Delay(100, cancellationToken).ConfigureAwait(false);
+            return;
         }
+
+        // 如果业务属性的缓存为间隔上传，则根据定时器间隔执行相应操作
+        if (_businessPropertyWithCacheInterval.BusinessUpdateEnum != BusinessUpdateEnum.Change)
+        {
+            try
+            {
+                if (LogMessage?.LogLevel <= LogLevel.Debug)
+                    LogMessage?.LogDebug($"Interval  {typeof(VarModel).Name}  data, count {IdVariableRuntimes.Count}");
+                // 上传所有变量信息
+                var variableRuntimes = IdVariableRuntimes.Select(a => a.Value);
+                VariableTimeInterval(variableRuntimes, variableRuntimes.Adapt<List<VariableBasicData>>());
+            }
+            catch (Exception ex)
+            {
+                LogMessage?.LogWarning(ex, AppResource.IntervalInsertVariableFail);
+            }
+        }
+
     }
 
-
-
-    /// <summary>
-    /// 在启动前执行的异步操作。
-    /// </summary>
-    /// <param name="cancellationToken">取消令牌</param>
-    /// <returns>表示异步操作的任务</returns>
-    protected override Task ProtectedStartAsync(CancellationToken cancellationToken)
+    protected override List<IScheduledTask> ProtectedGetTasks(CancellationToken cancellationToken)
     {
-        // 启动间隔插入操作
-        _ = IntervalInsert(cancellationToken);
-        return base.ProtectedStartAsync(cancellationToken);
+        var list = base.ProtectedGetTasks(cancellationToken);
+        list.Add(ScheduledTaskHelper.GetTask(_businessPropertyWithCacheInterval.BusinessInterval, IntervalInsert, null, LogMessage, cancellationToken));
+        return list;
     }
 
     /// <summary>

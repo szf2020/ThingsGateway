@@ -8,8 +8,6 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-using ThingsGateway.NewLife;
-
 namespace ThingsGateway.Foundation;
 
 /// <summary>
@@ -28,8 +26,10 @@ public class VariableSourceClass : IVariableSource
     /// <inheritdoc/>
     public string RegisterAddress { get; set; }
 
-    /// <inheritdoc/>
-    public TimeTick TimeTick { get; set; }
+    /// <summary>
+    /// IntervalTime
+    /// </summary>
+    public string IntervalTime { get; set; }
 
     /// <summary>
     /// 已打包变量

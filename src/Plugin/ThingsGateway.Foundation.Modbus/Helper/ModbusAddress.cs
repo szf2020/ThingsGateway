@@ -11,7 +11,6 @@
 using System.Text;
 
 using ThingsGateway.Foundation.Extension.String;
-using ThingsGateway.NewLife.Caching;
 using ThingsGateway.NewLife.Extension;
 
 namespace ThingsGateway.Foundation.Modbus;
@@ -68,10 +67,10 @@ public class ModbusAddress : ModbusRequest
     public static ModbusAddress? ParseFrom(string address, byte? station = null, bool isCache = true)
     {
         if (string.IsNullOrWhiteSpace(address)) { return null; }
-        var cacheKey = $"{nameof(ParseFrom)}_{typeof(ModbusAddress).FullName}_{typeof(ModbusAddress).TypeHandle.Value}_{station}_{address}";
-        if (isCache)
-            if (MemoryCache.Instance.TryGetValue(cacheKey, out ModbusAddress mAddress))
-                return new(mAddress);
+        //var cacheKey = $"{nameof(ParseFrom)}_{typeof(ModbusAddress).FullName}_{typeof(ModbusAddress).TypeHandle.Value}_{station}_{address}";
+        //if (isCache)
+        //    if (MemoryCache.Instance.TryGetValue(cacheKey, out ModbusAddress mAddress))
+        //        return new(mAddress);
 
         var modbusAddress = new ModbusAddress();
         if (station != null)
@@ -103,10 +102,11 @@ public class ModbusAddress : ModbusRequest
             }
         }
 
-        if (isCache)
-            MemoryCache.Instance.Set(cacheKey, modbusAddress, 3600);
+        //if (isCache)
+        //    MemoryCache.Instance.Set(cacheKey, modbusAddress, 3600);
 
-        return new(modbusAddress);
+        //return new(modbusAddress);
+        return modbusAddress;
 
         void Address(string address)
         {

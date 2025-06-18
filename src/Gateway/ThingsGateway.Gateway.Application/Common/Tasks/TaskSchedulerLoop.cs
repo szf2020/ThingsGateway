@@ -2,13 +2,16 @@
 
 public class TaskSchedulerLoop
 {
-    public readonly List<ScheduledTask> Tasks;
+    private readonly List<IScheduledTask> Tasks;
 
-    public TaskSchedulerLoop(List<ScheduledTask> tasks)
+    public TaskSchedulerLoop(List<IScheduledTask> tasks)
     {
         Tasks = tasks;
     }
-
+    public int Count()
+    {
+        return Tasks.Count;
+    }
     public void Start()
     {
         foreach (var task in Tasks)
@@ -24,11 +27,5 @@ public class TaskSchedulerLoop
             task.Stop();
         }
     }
-    public void Change(int dueTime, int period)
-    {
-        foreach (var task in Tasks)
-        {
-            task.Change(dueTime, period);
-        }
-    }
+
 }

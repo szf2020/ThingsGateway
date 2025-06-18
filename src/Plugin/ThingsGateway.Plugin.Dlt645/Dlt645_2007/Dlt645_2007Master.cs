@@ -63,9 +63,8 @@ public class Dlt645_2007Master : CollectFoundationBase
     }
 
     /// <inheritdoc/>
-    protected override async Task<List<VariableSourceRead>> ProtectedLoadSourceReadAsync(List<VariableRuntime> deviceVariables)
+    protected override Task<List<VariableSourceRead>> ProtectedLoadSourceReadAsync(List<VariableRuntime> deviceVariables)
     {
-        await Task.CompletedTask.ConfigureAwait(false);
-        return _plc.LoadSourceRead<VariableSourceRead>(deviceVariables, 0, CurrentDevice.IntervalTime);
+        return Task.FromResult(_plc.LoadSourceRead<VariableSourceRead>(deviceVariables, 0, CurrentDevice.IntervalTime));
     }
 }

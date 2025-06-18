@@ -9,9 +9,11 @@
 // ------------------------------------------------------------------------------
 
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 namespace ThingsGateway.Gateway.Application;
 
 public interface IGatewayMonitorHostedService : IHostedService
 {
+    public ILogger Logger { get; }
 }

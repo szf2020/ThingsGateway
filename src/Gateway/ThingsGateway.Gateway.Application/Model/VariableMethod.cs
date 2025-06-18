@@ -8,8 +8,6 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-using ThingsGateway.NewLife;
-
 using TouchSocket.Core;
 
 namespace ThingsGateway.Gateway.Application;
@@ -19,16 +17,14 @@ namespace ThingsGateway.Gateway.Application;
 /// </summary>
 public class VariableMethod
 {
-    /// <summary>
-    /// 间隔时间实现
-    /// </summary>
-    private readonly TimeTick _timeTick;
+
+    public readonly string IntervalTime;
 
     private object?[]? OS;
 
     public VariableMethod(Method method, VariableRuntime variable, string delay)
     {
-        _timeTick = new TimeTick(delay);
+        IntervalTime = delay;
         MethodInfo = method;
         Variable = variable;
         variable.VariableMethod = this;
@@ -48,12 +44,6 @@ public class VariableMethod
     /// 需分配的变量
     /// </summary>
     public VariableRuntime Variable { get; }
-
-    /// <summary>
-    /// 检测是否达到读取间隔
-    /// </summary>
-    /// <returns></returns>
-    public bool CheckIfRequestAndUpdateTime() => _timeTick.IsTickHappen();
 
     /// <summary>
     /// 执行方法

@@ -156,7 +156,7 @@ public class BlazorAppContext
             CurrentUser = (await SysUserService.GetUserByIdAsync(UserManager.UserId))!;
         }
     }
-    TimeTick timeTick = new("50000");
+    TimeTick timeTick = new("60000");
     /// <summary>
     /// 是否拥有按钮授权
     /// </summary>

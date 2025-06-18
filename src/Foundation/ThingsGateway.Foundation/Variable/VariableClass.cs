@@ -62,6 +62,10 @@ public class VariableClass : IVariable
     /// </summary>
     public IVariableSource VariableSource { get; set; }
 
+    public void SetNoChangedValue(DateTime dateTime)
+    {
+    }
+
     /// <summary>
     /// 赋值变量
     /// </summary>

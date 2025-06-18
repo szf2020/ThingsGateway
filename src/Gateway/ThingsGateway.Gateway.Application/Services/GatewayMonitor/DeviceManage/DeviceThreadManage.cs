@@ -207,8 +207,9 @@ internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
     /// <summary>
     /// 任务
     /// </summary>
-    internal ConcurrentDictionary<long, DoTask> DriverTasks { get; set; } = new();
+    internal ConcurrentDictionary<long, TaskSchedulerLoop> DriverTasks { get; } = new();
 
+    public int TaskCount => DriverTasks.Count;
     /// <summary>
     /// 取消令箭列表
     /// </summary>
@@ -388,17 +389,7 @@ internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
                 token.Register(driver.Stop);
 
 
-                if (driver.IsInitSuccess)
-                {
-
-                    // 初始化业务线程
-                    var driverTask = new DoTask(DoWork, driver.LogMessage, driver);
-                    DriverTasks.TryAdd(driver.DeviceId, driverTask);
-
-
-                    driverTask.Start(token);
-
-                }
+                _ = Task.Factory.StartNew((state) => DriverStart(state, token), driver, token);
 
             }).ConfigureAwait(false);
 
@@ -466,33 +457,33 @@ internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
         try
         {
             ConcurrentList<VariableRuntime> saveVariableRuntimes = new();
-            await deviceIds.ParallelForEachAsync(async (deviceId, cancellationToken) =>
-            {
-                // 查找具有指定设备ID的驱动程序对象
-                if (Drivers.TryRemove(deviceId, out var driver))
-                {
-                    if (IsCollectChannel == true)
-                    {
-                        saveVariableRuntimes.AddRange(driver.IdVariableRuntimes.Where(a => a.Value.SaveValue && !a.Value.DynamicVariable).Select(a => a.Value));
-                    }
-                }
+            deviceIds.ParallelForEach((deviceId) =>
+           {
+               // 查找具有指定设备ID的驱动程序对象
+               if (Drivers.TryRemove(deviceId, out var driver))
+               {
+                   if (IsCollectChannel == true)
+                   {
+                       saveVariableRuntimes.AddRange(driver.IdVariableRuntimes.Where(a => a.Value.SaveValue && !a.Value.DynamicVariable).Select(a => a.Value));
+                   }
+               }
 
-                // 取消驱动程序的操作
-                if (CancellationTokenSources.TryRemove(deviceId, out var token))
-                {
-                    if (token != null)
-                    {
-                        token.Cancel();
-                        token.Dispose();
-                    }
-                }
+               // 取消驱动程序的操作
+               if (CancellationTokenSources.TryRemove(deviceId, out var token))
+               {
+                   if (token != null)
+                   {
+                       token.Cancel();
+                       token.Dispose();
+                   }
+               }
 
-                if (DriverTasks.TryRemove(deviceId, out var task))
-                {
-                    await task.StopAsync().ConfigureAwait(false);
-                }
+               if (DriverTasks.TryRemove(deviceId, out var task))
+               {
+                   task.Stop();
+               }
 
-            }).ConfigureAwait(false);
+           });
 
 
             await Task.Delay(100).ConfigureAwait(false);
@@ -543,7 +534,7 @@ internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
         return driver;
     }
 
-    private static async Task DoWork(object? state, CancellationToken token)
+    private async Task DriverStart(object? state, CancellationToken token)
     {
         try
         {
@@ -554,41 +545,12 @@ internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
                 if (!driver.IsStarted)
                     await driver.StartAsync(token).ConfigureAwait(false);
 
-                var result = await driver.ExecuteAsync(token).ConfigureAwait(false); // 执行驱动的异步执行操作
+                var driverTask = driver.GetTasks(token); // 执行驱动的异步执行操作
 
-                // 根据执行结果进行不同的处理
-                if (result == ThreadRunReturnTypeEnum.None)
-                {
-                    // 如果驱动处于离线状态且为采集驱动，则根据配置的间隔时间进行延迟
-                    if (driver.CurrentDevice.DeviceStatus == DeviceStatusEnum.OffLine && driver.IsCollectDevice == true)
-                    {
-                        var collectBase = (CollectBase)driver;
-                        if (collectBase.CollectProperties.ReIntervalTime > 0)
-                        {
-                            await Task.Delay(Math.Max(Math.Min(collectBase.CollectProperties.ReIntervalTime, ManageHelper.ChannelThreadOptions.CheckInterval / 2) - CycleInterval, 3000), token).ConfigureAwait(false);
-                        }
-                        else
-                        {
-                            await Task.Delay(CycleInterval, token).ConfigureAwait(false);
-                        }
-                    }
-                    else
-                    {
-                        await Task.Delay(CycleInterval, token).ConfigureAwait(false);
-                    }
-                }
-                else if (result == ThreadRunReturnTypeEnum.Continue)
-                {
-                    await Task.Delay(1000, token).ConfigureAwait(false); // 如果执行结果为继续，则延迟一段较短的时间后再继续执行
-                }
-                else if (result == ThreadRunReturnTypeEnum.Break && token.IsCancellationRequested)
-                {
-                    return;
-                }
-            }
-            else
-            {
-                await Task.Delay(60000, token).ConfigureAwait(false);
+                DriverTasks.TryAdd(driver.DeviceId, driverTask);
+
+                driverTask.Start();
+
             }
         }
         catch (OperationCanceledException)
@@ -826,9 +788,13 @@ internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
         {
             try
             {
+
+
                 //检测设备线程假死
                 await Task.Delay(ManageHelper.ChannelThreadOptions.CheckInterval, cancellationToken).ConfigureAwait(false);
                 if (Disposed) return;
+
+
 
                 var num = Drivers.Count;
                 foreach (var driver in Drivers.Select(a => a.Value).ToList())

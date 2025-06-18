@@ -62,7 +62,7 @@ public partial class RabbitMQProducer : BusinessBaseWithCacheIntervalScript<Vari
         base.Dispose(disposing);
     }
 
-    protected override async Task ProtectedExecuteAsync(CancellationToken cancellationToken)
+    protected override async Task ProtectedExecuteAsync(object? state, CancellationToken cancellationToken)
     {
         if (_channel == null)
         {

@@ -267,7 +267,7 @@ public class RequestAuditFilter : IAsyncActionFilter, IOrderedFilter
         }
         else
         {
-            logger.Log(LogLevel.Warning, $"{logData.Method}:{logData.Path}-{logData.Operation}{Environment.NewLine}{logData.Exception.ToSystemTextJsonString()}");
+            logger.Log(LogLevel.Warning, $"{logData.Method}:{logData.Path}-{logData.Operation}{Environment.NewLine}{logData.Exception?.ToSystemTextJsonString()}{Environment.NewLine}{logData.Validation?.ToSystemTextJsonString()}");
         }
     }
 

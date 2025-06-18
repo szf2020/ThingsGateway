@@ -13,8 +13,8 @@ public class DeviceChangedTriggerNode : TextNode, ITriggerNode, IDisposable
     public DeviceChangedTriggerNode(string id, Point? position = null) : base(id, position) { Title = "DeviceChangedTriggerNode"; Placeholder = "Device.Placeholder"; }
 
 
-    private Func<NodeOutput, Task> Func { get; set; }
-    Task ITriggerNode.StartAsync(Func<NodeOutput, Task> func)
+    private Func<NodeOutput, CancellationToken, Task> Func { get; set; }
+    Task ITriggerNode.StartAsync(Func<NodeOutput, CancellationToken, Task> func, CancellationToken cancellationToken)
     {
         Func = func;
         FuncDict.Add(this, func);
@@ -31,13 +31,13 @@ public class DeviceChangedTriggerNode : TextNode, ITriggerNode, IDisposable
         return Task.CompletedTask;
     }
     public static Dictionary<string, ConcurrentList<DeviceChangedTriggerNode>> DeviceChangedTriggerNodeDict = new();
-    public static Dictionary<DeviceChangedTriggerNode, Func<NodeOutput, Task>> FuncDict = new();
+    public static Dictionary<DeviceChangedTriggerNode, Func<NodeOutput, CancellationToken, Task>> FuncDict = new();
 
     public static BlockingCollection<DeviceBasicData> DeviceDatas = new();
 
     static DeviceChangedTriggerNode()
     {
-        _ = RunAsync();
+        Task.Factory.StartNew(RunAsync);
         GlobalData.DeviceStatusChangeEvent += GlobalData_DeviceStatusChangeEvent;
     }
 
@@ -71,7 +71,7 @@ public class DeviceChangedTriggerNode : TextNode, ITriggerNode, IDisposable
                              if (FuncDict.TryGetValue(item, out var func))
                              {
                                  item.Logger?.Trace($"Device changed: {item.Text}");
-                                 await func.Invoke(new NodeOutput() { Value = deviceDatas }).ConfigureAwait(false);
+                                 await func.Invoke(new NodeOutput() { Value = deviceDatas }, token).ConfigureAwait(false);
 
                              }
                          }

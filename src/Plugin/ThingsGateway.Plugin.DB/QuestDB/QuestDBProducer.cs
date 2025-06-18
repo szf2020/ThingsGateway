@@ -180,7 +180,8 @@ public partial class QuestDBProducer : BusinessBaseWithCacheIntervalVariableMode
         await base.ProtectedStartAsync(cancellationToken).ConfigureAwait(false);
     }
 
-    protected override async Task ProtectedExecuteAsync(CancellationToken cancellationToken)
+
+    protected override async Task ProtectedExecuteAsync(object? state, CancellationToken cancellationToken)
     {
         await UpdateVarModelMemory(cancellationToken).ConfigureAwait(false);
         await UpdateVarModelsMemory(cancellationToken).ConfigureAwait(false);

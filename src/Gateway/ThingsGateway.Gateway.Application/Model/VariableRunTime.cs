@@ -102,6 +102,17 @@ public partial class VariableRuntime : Variable, IVariable, IDisposable
         return new();
     }
 
+    /// <summary>
+    /// 设置变量值与时间/质量戳
+    /// </summary>
+    /// <param name="dateTime"></param>
+    public void SetNoChangedValue(DateTime dateTime)
+    {
+        DateTime time = dateTime != default ? dateTime : DateTime.Now;
+        CollectTime = time;
+        GlobalData.VariableCollectChange(this);
+    }
+
     private void Set(object data, DateTime dateTime)
     {
         DateTime time = dateTime != default ? dateTime : DateTime.Now;
@@ -158,7 +169,6 @@ public partial class VariableRuntime : Variable, IVariable, IDisposable
         }
         GlobalData.VariableCollectChange(this);
     }
-
 
     public void Init(DeviceRuntime deviceRuntime)
     {

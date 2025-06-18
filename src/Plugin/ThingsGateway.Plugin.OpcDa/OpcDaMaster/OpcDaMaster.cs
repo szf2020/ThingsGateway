@@ -14,7 +14,6 @@ using ThingsGateway.Foundation.OpcDa;
 using ThingsGateway.Foundation.OpcDa.Da;
 using ThingsGateway.Gateway.Application;
 using ThingsGateway.NewLife.Json.Extension;
-using ThingsGateway.NewLife.Threading;
 
 using TouchSocket.Core;
 
@@ -90,34 +89,11 @@ public class OpcDaMaster : CollectBase
     }
 
 
-    protected override async Task ProtectedExecuteAsync(CancellationToken cancellationToken)
-    {
-        if (_driverProperties.ActiveSubscribe)
-        {
-            //获取设备连接状态
-            if (IsConnected())
-            {
-                //更新设备活动时间
-                CurrentDevice.SetDeviceStatus(TimerX.Now, false);
-            }
-            else
-            {
-                CurrentDevice.SetDeviceStatus(TimerX.Now, true);
-            }
-
-            ScriptVariableRun(cancellationToken);
-
-        }
-        else
-        {
-            await base.ProtectedExecuteAsync(cancellationToken).ConfigureAwait(false);
-        }
-    }
+    protected override bool VariableSourceReadsEnable => !_driverProperties.ActiveSubscribe;
 
     /// <inheritdoc/>
-    protected override async Task<List<VariableSourceRead>> ProtectedLoadSourceReadAsync(List<VariableRuntime> deviceVariables)
+    protected override Task<List<VariableSourceRead>> ProtectedLoadSourceReadAsync(List<VariableRuntime> deviceVariables)
     {
-        await Task.CompletedTask.ConfigureAwait(false);
         try
         {
             if (deviceVariables.Count > 0)
@@ -132,7 +108,7 @@ public class OpcDaMaster : CollectBase
               {
                   var read = new VariableSourceRead()
                   {
-                      TimeTick = new(_driverProperties.UpdateRate.ToString()),
+                      IntervalTime = _driverProperties.UpdateRate.ToString(),
                       RegisterAddress = it.Key,
                   };
                   HashSet<string> ids = new(it.Value.Select(b => b.ItemID));
@@ -146,11 +122,11 @@ public class OpcDaMaster : CollectBase
               }).ToList();
                     variableSourceReads.AddRange(sourVars);
                 }
-                return variableSourceReads;
+                return Task.FromResult(variableSourceReads);
             }
             else
             {
-                return new();
+                return Task.FromResult(new List<VariableSourceRead>());
             }
         }
         finally

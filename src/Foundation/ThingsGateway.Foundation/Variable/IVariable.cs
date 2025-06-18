@@ -55,6 +55,8 @@ public interface IVariable
     /// </summary>
     IVariableSource VariableSource { get; set; }
 
+    void SetNoChangedValue(DateTime dateTime);
+
     /// <summary>
     /// 赋值变量，返回是否成功，一般在实体内部需要做异常保存
     /// </summary>

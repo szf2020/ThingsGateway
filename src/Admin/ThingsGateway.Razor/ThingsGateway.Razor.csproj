@@ -6,7 +6,7 @@
 	</PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="BootstrapBlazor.FontAwesome" Version="9.0.2" />
-		<PackageReference Include="BootstrapBlazor" Version="9.7.3" />
+		<PackageReference Include="BootstrapBlazor" Version="9.7.4-beta07" />
 		<PackageReference Include="Yitter.IdGenerator" Version="1.0.14" />
 	</ItemGroup>
 
