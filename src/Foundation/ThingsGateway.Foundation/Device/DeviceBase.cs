@@ -549,7 +549,7 @@ public abstract class DeviceBase : DisposableObject, IDevice
             Channel.ChannelReceivedWaitDict.TryAdd(sign, ChannelReceived);
             var sendOperResult = await SendAsync(command, clientChannel, endPoint, cancellationToken).ConfigureAwait(false);
             if (!sendOperResult.IsSuccess)
-                throw sendOperResult.Exception ?? new(sendOperResult.ErrorMessage);
+                throw sendOperResult.Exception ?? new(sendOperResult.ErrorMessage ?? "unknown error");
 
             await waitData.WaitAsync(timeout).ConfigureAwait(false);
 

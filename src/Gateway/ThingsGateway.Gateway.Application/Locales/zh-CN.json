@@ -297,11 +297,9 @@
   },
   "ThingsGateway.Gateway.Application.CollectPropertyBase": {
     "ConcurrentCount": "最大并发数量",
-    "ReIntervalTime": "离线恢复时间",
     "RetryCount": "失败重试次数"
   },
   "ThingsGateway.Gateway.Application.CollectPropertyRetryBase": {
-    "ReIntervalTime": "离线恢复时间",
     "RetryCount": "失败重试次数"
   },
   "ThingsGateway.Gateway.Application.ControlController": {

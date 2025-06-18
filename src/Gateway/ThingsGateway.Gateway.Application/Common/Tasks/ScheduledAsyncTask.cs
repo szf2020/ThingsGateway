@@ -5,10 +5,10 @@ using TouchSocket.Core;
 
 namespace ThingsGateway.Gateway.Application;
 
-public class ScheduledAsyncTask : DisposeBase, IScheduledTask
+public class ScheduledAsyncTask : DisposeBase, IScheduledTask, IScheduledIntIntervalTask
 {
     private int _interval10MS = 10;
-    private int _intervalMS;
+    public int IntervalMS { get; }
     private readonly Func<object?, CancellationToken, Task> _taskFunc;
     private readonly CancellationToken _token;
     private TimerX? _timer;
@@ -19,7 +19,7 @@ public class ScheduledAsyncTask : DisposeBase, IScheduledTask
 
     public ScheduledAsyncTask(int interval, Func<object?, CancellationToken, Task> taskFunc, object? state, ILog log, CancellationToken token)
     {
-        _intervalMS = interval;
+        IntervalMS = interval;
         LogMessage = log;
         _state = state;
         _taskFunc = taskFunc;
@@ -30,7 +30,7 @@ public class ScheduledAsyncTask : DisposeBase, IScheduledTask
     {
         _timer?.Dispose();
         if (!_token.IsCancellationRequested)
-            _timer = new TimerX(DoAsync, _state, _intervalMS, _intervalMS, nameof(IScheduledTask)) { Async = true };
+            _timer = new TimerX(DoAsync, _state, IntervalMS, IntervalMS, nameof(IScheduledTask)) { Async = true };
     }
 
     private async Task DoAsync(object? state)
@@ -77,6 +77,7 @@ public class ScheduledAsyncTask : DisposeBase, IScheduledTask
         if (!_token.IsCancellationRequested)
             _timer?.SetNext(_interval10MS);
     }
+
 
     public void Stop()
     {

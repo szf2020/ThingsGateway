@@ -5,10 +5,10 @@ using TouchSocket.Core;
 
 namespace ThingsGateway.Gateway.Application;
 
-public class ScheduledSyncTask : DisposeBase, IScheduledTask
+public class ScheduledSyncTask : DisposeBase, IScheduledTask, IScheduledIntIntervalTask
 {
     private int _interval10MS = 10;
-    private int _intervalMS;
+    public int IntervalMS { get; }
     private readonly Action<object?, CancellationToken> _taskAction;
     private readonly CancellationToken _token;
     private TimerX? _timer;
@@ -19,7 +19,7 @@ public class ScheduledSyncTask : DisposeBase, IScheduledTask
 
     public ScheduledSyncTask(int interval, Action<object?, CancellationToken> taskFunc, object? state, ILog log, CancellationToken token)
     {
-        _intervalMS = interval;
+        IntervalMS = interval;
         LogMessage = log;
         _state = state;
         _taskAction = taskFunc;
@@ -30,7 +30,7 @@ public class ScheduledSyncTask : DisposeBase, IScheduledTask
     {
         _timer?.Dispose();
         if (!_token.IsCancellationRequested)
-            _timer = new TimerX(TimerCallback, _state, _intervalMS, _intervalMS, nameof(IScheduledTask)) { Async = true };
+            _timer = new TimerX(TimerCallback, _state, IntervalMS, IntervalMS, nameof(IScheduledTask)) { Async = true };
     }
 
     private void TimerCallback(object? state)
@@ -80,13 +80,6 @@ public class ScheduledSyncTask : DisposeBase, IScheduledTask
         // 延迟触发下一次
         if (!_token.IsCancellationRequested)
             _timer?.SetNext(_interval10MS);
-    }
-
-    public void Change(int dueTime, int period)
-    {
-        _intervalMS = period;
-        if (!_token.IsCancellationRequested)
-            _timer?.Change(dueTime, period);
     }
 
     public void Stop()

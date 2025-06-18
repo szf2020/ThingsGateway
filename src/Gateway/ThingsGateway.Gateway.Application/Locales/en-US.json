@@ -298,11 +298,9 @@
   },
   "ThingsGateway.Gateway.Application.CollectPropertyBase": {
     "ConcurrentCount": "ConcurrentCount",
-    "ReIntervalTime": "ReIntervalTime",
     "RetryCount": "RetryCount"
   },
   "ThingsGateway.Gateway.Application.CollectPropertyRetryBase": {
-    "ReIntervalTime": "ReIntervalTime",
     "RetryCount": "RetryCount"
   },
   "ThingsGateway.Gateway.Application.ControlController": {

@@ -41,12 +41,6 @@ public abstract class CollectPropertyBase : DriverPropertyBase
 public abstract class CollectPropertyRetryBase : CollectPropertyBase
 {
     /// <summary>
-    /// 离线后恢复运行的间隔时间
-    /// </summary>
-    [DynamicProperty]
-    public override int ReIntervalTime { get; set; } = 0;
-
-    /// <summary>
     /// 失败重试次数，默认3
     /// </summary>
     [DynamicProperty]
