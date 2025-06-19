@@ -108,17 +108,23 @@ public class OpcUaMaster : CollectBase
 
         var check = ScheduledTaskHelper.GetTask("3000", CheckAsync, null, LogMessage, cancellationToken);
         list.Add(check);
-        var checkConnec = ScheduledTaskHelper.GetTask("3000", CheckConnectAsync, null, LogMessage, cancellationToken);
+        var checkConnec = ScheduledTaskHelper.GetTask("10000", CheckConnectAsync, null, LogMessage, cancellationToken);
         list.Add(checkConnec);
         return list;
     }
+
+    protected override async Task ProtectedStartAsync(CancellationToken cancellationToken)
+    {
+        await CheckConnectAsync(null, cancellationToken).ConfigureAwait(false);
+        await base.ProtectedStartAsync(cancellationToken).ConfigureAwait(false);
+    }
+
     private async Task CheckConnectAsync(object? state, CancellationToken cancellationToken)
     {
         if (_plc.Session == null)
         {
             try
             {
-                await Task.Delay(100, cancellationToken).ConfigureAwait(false);
                 if (_plc.Session == null)
                     await _plc.ConnectAsync(cancellationToken).ConfigureAwait(false);
             }
@@ -129,13 +135,12 @@ public class OpcUaMaster : CollectBase
 
                 connectFirstFailLoged = true;
                 CurrentDevice.SetDeviceStatus(TimerX.Now, true, ex.Message);
-                await Task.Delay(10000, cancellationToken).ConfigureAwait(false);
             }
         }
     }
     private async Task CheckAsync(object? state, CancellationToken cancellationToken)
     {
-        if (_plc.Session == null)
+        if (_plc.Session != null)
         {
             if (_driverProperties.ActiveSubscribe)
             {
