@@ -100,7 +100,7 @@ public abstract class CollectFoundationBase : CollectBase
                                 LogMessage?.LogWarning(exception, string.Format(AppResource.CollectFail, DeviceName, item?.RegisterAddress, item?.Length, exception.Message));
                         }
                         item.LastErrorMessage = exception.Message;
-                        CurrentDevice.SetDeviceStatus(TimerX.Now, true, exception.Message);
+                        CurrentDevice.SetDeviceStatus(TimerX.Now, null, exception.Message);
                         var time = DateTime.Now;
                         item.VariableRuntimes.ForEach(a => a.SetValue(null, time, isOnline: false));
                     }
@@ -112,7 +112,7 @@ public abstract class CollectFoundationBase : CollectBase
                                 LogMessage?.LogWarning(exception, string.Format(AppResource.MethodFail, DeviceName, item.MethodInfo.Name, exception.Message));
                         }
                         item.LastErrorMessage = exception.Message;
-                        CurrentDevice.SetDeviceStatus(TimerX.Now, true, exception.Message);
+                        CurrentDevice.SetDeviceStatus(TimerX.Now, null, exception.Message);
                         var time = DateTime.Now;
                         item.Variable.SetValue(null, time, isOnline: false);
                     }

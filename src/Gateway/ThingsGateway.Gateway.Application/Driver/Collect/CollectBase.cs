@@ -213,7 +213,19 @@ public abstract class CollectBase : DriverBase, IRpcDriver
     {
         if (IsConnected())
         {
-            CurrentDevice.SetDeviceStatus(TimerX.Now);
+            if (CurrentDevice.DeviceStatus == DeviceStatusEnum.OffLine)
+            {
+                if (IdVariableRuntimes.Any(a => a.Value.IsOnline))
+                    CurrentDevice.SetDeviceStatus(TimerX.Now, false);
+            }
+            else
+            {
+                CurrentDevice.SetDeviceStatus(TimerX.Now);
+            }
+        }
+        else if (IsStarted)
+        {
+            CurrentDevice.SetDeviceStatus(TimerX.Now, true);
         }
     }
 
@@ -258,7 +270,7 @@ public abstract class CollectBase : DriverBase, IRpcDriver
             // 方法调用成功时记录日志并增加成功计数器
             if (LogMessage?.LogLevel <= TouchSocket.Core.LogLevel.Trace)
                 LogMessage?.Trace(string.Format("{0} - Execute method [{1}] - Succeeded {2}", DeviceName, readVariableMethods.MethodInfo.Name, readResult.Content?.ToSystemTextJsonString()));
-            CurrentDevice.SetDeviceStatus(TimerX.Now, false);
+            CurrentDevice.SetDeviceStatus(TimerX.Now, null);
         }
         else
         {
@@ -281,7 +293,7 @@ public abstract class CollectBase : DriverBase, IRpcDriver
             }
 
             readVariableMethods.LastErrorMessage = readResult.ErrorMessage;
-            CurrentDevice.SetDeviceStatus(TimerX.Now, false);
+            CurrentDevice.SetDeviceStatus(TimerX.Now, null);
         }
 
         return;
@@ -329,7 +341,7 @@ public abstract class CollectBase : DriverBase, IRpcDriver
             // 读取成功时记录日志并增加成功计数器
             if (LogMessage?.LogLevel <= TouchSocket.Core.LogLevel.Trace)
                 LogMessage?.Trace(string.Format("{0} - Collection [{1} - {2}] data succeeded {3}", DeviceName, variableSourceRead?.RegisterAddress, variableSourceRead?.Length, readResult.Content?.ToHexString(' ')));
-            CurrentDevice.SetDeviceStatus(TimerX.Now, false);
+            CurrentDevice.SetDeviceStatus(TimerX.Now, null);
         }
         else
         {
@@ -352,7 +364,7 @@ public abstract class CollectBase : DriverBase, IRpcDriver
             }
 
             variableSourceRead.LastErrorMessage = readResult.ErrorMessage;
-            CurrentDevice.SetDeviceStatus(TimerX.Now, true, readResult.ErrorMessage);
+            CurrentDevice.SetDeviceStatus(TimerX.Now, null, readResult.ErrorMessage);
             var time = DateTime.Now;
             variableSourceRead.VariableRuntimes.ForEach(a => a.SetValue(null, time, isOnline: false));
         }

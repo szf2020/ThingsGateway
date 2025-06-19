@@ -282,7 +282,7 @@ public abstract class DriverBase : DisposableObject, IDriver
             }
 
             // 设置设备状态为当前时间
-            CurrentDevice.SetDeviceStatus(TimerX.Now);
+            CurrentDevice.SetDeviceStatus(TimerX.Now, false);
         }
         catch (Exception ex)
         {

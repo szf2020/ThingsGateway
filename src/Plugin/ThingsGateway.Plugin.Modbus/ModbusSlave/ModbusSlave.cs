@@ -153,14 +153,8 @@ public class ModbusSlave : BusinessBase
     protected override async Task ProtectedExecuteAsync(object? state, CancellationToken cancellationToken)
     {
         //获取设备连接状态
-        if (IsConnected())
+        if (!IsConnected())
         {
-            //更新设备活动时间
-            CurrentDevice.SetDeviceStatus(TimerX.Now, false);
-        }
-        else
-        {
-            CurrentDevice.SetDeviceStatus(TimerX.Now, true);
             try
             {
                 if (cancellationToken.IsCancellationRequested)

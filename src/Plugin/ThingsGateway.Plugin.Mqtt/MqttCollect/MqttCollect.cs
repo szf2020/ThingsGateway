@@ -287,17 +287,6 @@ public partial class MqttCollect : CollectBase
             await Task.Delay(10000, cancellationToken).ConfigureAwait(false);
             //return;
         }
-        //获取设备连接状态
-        if (IsConnected())
-        {
-            //更新设备活动时间
-            CurrentDevice.SetDeviceStatus(TimerX.Now, false);
-        }
-        else
-        {
-            CurrentDevice.SetDeviceStatus(TimerX.Now, true);
-        }
-
 
     }
 

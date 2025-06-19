@@ -157,14 +157,8 @@ public partial class OpcUaServer : BusinessBase
     {
         try
         {
-            if (IsConnected())
+            if (!IsConnected())
             {
-                //更新设备活动时间
-                CurrentDevice.SetDeviceStatus(TimerX.Now, false);
-            }
-            else
-            {
-                CurrentDevice.SetDeviceStatus(TimerX.Now, true);
                 try
                 {
                     await Task.Delay(3000, cancellationToken).ConfigureAwait(false);
