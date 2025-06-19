@@ -7,10 +7,6 @@
         "Text": "首页"
       },
       {
-        "Url": "/des",
-        "Text": "DES"
-      },
-      {
         "Text": "Modbus",
         "Items": [
           {

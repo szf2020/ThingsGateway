@@ -134,7 +134,7 @@ public class OpcUaMaster : CollectBase
                     LogMessage?.LogWarning(ex, "Connect Fail");
 
                 connectFirstFailLoged = true;
-                CurrentDevice.SetDeviceStatus(TimerX.Now, true, ex.Message);
+                CurrentDevice.SetDeviceStatus(TimerX.Now, null, ex.Message);
             }
         }
     }

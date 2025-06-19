@@ -1469,27 +1469,22 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
 
     private static bool ModelEqualityComparer(ChannelDeviceTreeItem x, ChannelDeviceTreeItem y)
     {
-        if (x.ChannelDevicePluginType == y.ChannelDevicePluginType)
-        {
-            if (x.ChannelDevicePluginType == ChannelDevicePluginTypeEnum.Device)
-            {
-                return x.DeviceRuntime.Id == y.DeviceRuntime.Id; ;
-            }
-            else if (x.ChannelDevicePluginType == ChannelDevicePluginTypeEnum.PluginType)
-            {
-                return x.PluginType == y.PluginType;
+        if (x.ChannelDevicePluginType != y.ChannelDevicePluginType)
+            return false;
 
-            }
-            else if (x.ChannelDevicePluginType == ChannelDevicePluginTypeEnum.Channel)
-            {
+        switch (x.ChannelDevicePluginType)
+        {
+            case ChannelDevicePluginTypeEnum.Device:
+                return x.DeviceRuntime.Id == y.DeviceRuntime.Id;
+            case ChannelDevicePluginTypeEnum.PluginType:
+                return x.PluginType == y.PluginType;
+            case ChannelDevicePluginTypeEnum.Channel:
                 return x.ChannelRuntime.Id == y.ChannelRuntime.Id;
-            }
-            else if (x.ChannelDevicePluginType == ChannelDevicePluginTypeEnum.PluginName)
-            {
+            case ChannelDevicePluginTypeEnum.PluginName:
                 return x.PluginName == y.PluginName;
-            }
+            default:
+                return false;
         }
-        return false;
     }
     private bool Disposed;
     protected override ValueTask DisposeAsync(bool disposing)

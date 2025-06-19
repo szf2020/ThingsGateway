@@ -76,14 +76,12 @@ public partial class SqlHistoryAlarm : BusinessBaseWithCacheVariableModel<Histor
             //var result = await db.Insertable(dbInserts).SplitTable().ExecuteCommandAsync().ConfigureAwait(false);
             if (result > 0)
             {
-                CurrentDevice.SetDeviceStatus(TimerX.Now, false);
                 LogMessage?.Trace($"Count：{dbInserts.Count}，watchTime:  {stopwatch.ElapsedMilliseconds} ms");
             }
             return OperResult.Success;
         }
         catch (Exception ex)
         {
-            CurrentDevice.SetDeviceStatus(TimerX.Now, true);
             return new OperResult(ex);
         }
     }

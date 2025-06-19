@@ -30,60 +30,6 @@ namespace ThingsGateway.Gateway.Application;
 internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
 {
 
-    #region 动态配置
-
-    /// <summary>
-    /// 线程等待间隔时间
-    /// </summary>
-    public static volatile int CycleInterval = ManageHelper.ChannelThreadOptions.MaxCycleInterval;
-
-    static DeviceThreadManage()
-    {
-        Task.Factory.StartNew(SetCycleInterval, TaskCreationOptions.LongRunning);
-    }
-
-    private static async Task SetCycleInterval()
-    {
-        var appLifetime = App.RootServices!.GetService<IHostApplicationLifetime>()!;
-        var hardwareJob = GlobalData.HardwareJob;
-
-        List<float> cpus = new();
-        while (!appLifetime.ApplicationStopping.IsCancellationRequested)
-        {
-            try
-            {
-                if (hardwareJob?.HardwareInfo?.MachineInfo?.CpuRate == null) continue;
-                cpus.Add((float)(hardwareJob.HardwareInfo.MachineInfo.CpuRate * 100));
-                if (cpus.Count == 1 || cpus.Count > 5)
-                {
-                    var avg = cpus.Average();
-                    cpus.RemoveAt(0);
-                    //Console.WriteLine($"CPU平均值：{avg}");
-                    if (avg > 80)
-                    {
-                        CycleInterval = Math.Max(CycleInterval, (int)(ManageHelper.ChannelThreadOptions.MaxCycleInterval * avg / 100));
-                    }
-                    else if (avg < 50)
-                    {
-                        CycleInterval = Math.Min(CycleInterval, ManageHelper.ChannelThreadOptions.MinCycleInterval);
-                    }
-                }
-            }
-            catch (OperationCanceledException)
-            {
-            }
-            catch (Exception ex)
-            {
-                NewLife.Log.XTrace.WriteException(ex);
-            }
-            finally
-            {
-                await Task.Delay(30000, appLifetime?.ApplicationStopping ?? default).ConfigureAwait(false);
-            }
-        }
-    }
-
-    #endregion 动态配置
     Microsoft.Extensions.Logging.ILogger? _logger;
 
     /// <summary>

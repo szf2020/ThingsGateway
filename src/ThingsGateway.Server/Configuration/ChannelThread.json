@@ -1,10 +1,8 @@
 ﻿{
   "ChannelThread": {
-    "MinCycleInterval": 10, //最小循环间隔
-    "MaxCycleInterval": 200, //最大循环间隔
     "CheckInterval": 1800000, //检查间隔
-    "MaxChannelCount": 5000, //最大通道数量
-    "MaxDeviceCount": 5000, //最大设备数量
-    "MaxVariableCount": 2000000 //最大变量数量
+    "MaxChannelCount": 50000, //最大通道数量
+    "MaxDeviceCount": 50000, //最大设备数量
+    "MaxVariableCount": 10000000 //最大变量数量
   }
 }

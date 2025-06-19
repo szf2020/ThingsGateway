@@ -31,27 +31,22 @@ public class ChannelDeviceTreeItem : IEqualityComparer<ChannelDeviceTreeItem>
     {
         if (obj is ChannelDeviceTreeItem item)
         {
-            if (ChannelDevicePluginType == item.ChannelDevicePluginType)
+            if (ChannelDevicePluginType != item.ChannelDevicePluginType)
+                return false;
+
+            switch (ChannelDevicePluginType)
             {
-                if (ChannelDevicePluginType == ChannelDevicePluginTypeEnum.Device)
-                {
+                case ChannelDevicePluginTypeEnum.Device:
                     return DeviceRuntime == item.DeviceRuntime;
-                }
-                else if (ChannelDevicePluginType == ChannelDevicePluginTypeEnum.PluginType)
-                {
+                case ChannelDevicePluginTypeEnum.PluginType:
                     return PluginType == item.PluginType;
-
-                }
-                else if (ChannelDevicePluginType == ChannelDevicePluginTypeEnum.Channel)
-                {
+                case ChannelDevicePluginTypeEnum.Channel:
                     return ChannelRuntime == item.ChannelRuntime;
-                }
-                else if (ChannelDevicePluginType == ChannelDevicePluginTypeEnum.PluginName)
-                {
+                case ChannelDevicePluginTypeEnum.PluginName:
                     return PluginName == item.PluginName;
-                }
+                default:
+                    return false;
             }
-
         }
         return false;
 
