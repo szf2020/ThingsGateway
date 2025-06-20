@@ -162,7 +162,7 @@ public class Dlt645_2007Master : DtuServiceDeviceBase
         }
         else
         {
-            throw new ArgumentException("State must be of type Dlt645_2007Address", nameof(state));
+            return EasyValueTask.FromResult(new OperResult<byte[]>(new ArgumentException("State must be of type Dlt645_2007Address", nameof(state))));
         }
 
     }

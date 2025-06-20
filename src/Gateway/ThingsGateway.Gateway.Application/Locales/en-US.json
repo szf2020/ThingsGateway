@@ -55,7 +55,7 @@
   "ThingsGateway.Management.Authentication": {
     "AuthName": "AuthName",
     "Authorized": "Authorized",
-    "ExpireTime": "ExpireTime",
+    "ExpireTime": "ExpireTime {0}",
     "Password": "Password",
     "Register": "Register",
     "RegisterStatus": "RegisterStatus",
@@ -373,7 +373,7 @@
 
   "ThingsGateway.Gateway.Application.DriverBase": {
     "Authorized": "Authorized",
-    "ExpireTime": "ExpireTime",
+    "ExpireTime": "ExpireTime {0}",
     "Unauthorized": "Unauthorized"
   },
   "ThingsGateway.Gateway.Application.ExportString": {

@@ -308,7 +308,7 @@ public partial class SiemensS7Master : DeviceBase
             }
             else
             {
-                throw new ArgumentException("State must be of type SiemensS7Address", nameof(state));
+                return EasyValueTask.FromResult(new OperResult<byte[]>(new ArgumentException("State must be of type SiemensS7Address", nameof(state))));
             }
         }
         catch (Exception ex)

@@ -509,18 +509,11 @@ public abstract class DeviceBase : DisposableObject, IDevice
     }
 
     /// <inheritdoc/>
-    protected virtual async ValueTask<MessageBase> SendThenReturnMessageBaseAsync(ISendMessage command, IClientChannel clientChannel = default, CancellationToken cancellationToken = default)
+    protected virtual ValueTask<MessageBase> SendThenReturnMessageBaseAsync(ISendMessage command, IClientChannel clientChannel = default, CancellationToken cancellationToken = default)
     {
-        try
-        {
 
-            return await GetResponsedDataAsync(command, clientChannel, Timeout, cancellationToken).ConfigureAwait(false);
+        return GetResponsedDataAsync(command, clientChannel, Timeout, cancellationToken);
 
-        }
-        catch (Exception ex)
-        {
-            return new(ex);
-        }
     }
 
     /// <summary>

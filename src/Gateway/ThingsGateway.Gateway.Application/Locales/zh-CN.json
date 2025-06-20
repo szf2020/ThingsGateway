@@ -53,7 +53,7 @@
   "ThingsGateway.Management.Authentication": {
     "AuthName": "公司名称",
     "Authorized": "已授权",
-    "ExpireTime": "过期时间",
+    "ExpireTime": "过期时间 {0}",
     "Password": "注册码",
     "Register": "注册",
     "RegisterStatus": "注册状态",
@@ -374,7 +374,7 @@
 
   "ThingsGateway.Gateway.Application.DriverBase": {
     "Authorized": "已授权",
-    "ExpireTime": "过期时间",
+    "ExpireTime": "过期时间 {0}",
     "Unauthorized": "未授权"
   },
   "ThingsGateway.Gateway.Application.ExportString": {

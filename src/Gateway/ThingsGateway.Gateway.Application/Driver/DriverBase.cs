@@ -399,6 +399,7 @@ public abstract class DriverBase : DisposableObject, IDriver
             stringBuilder.Append("   ");
             if (expireTime.HasValue && (DateTime.Now - expireTime.Value).TotalHours > -72)
             {
+                stringBuilder.Append(',');
                 stringBuilder.Append(Localizer["ExpireTime", expireTime.Value.ToString("yyyy-MM-dd HH")]);
             }
 

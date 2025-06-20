@@ -329,7 +329,7 @@ public class ModbusSlave : DeviceBase, IModbusAddress
             }
             else
             {
-                throw new ArgumentException("State must be of type ModbusAddress", nameof(state));
+                return EasyValueTask.FromResult(new OperResult<byte[]>(new ArgumentException("State must be of type ModbusAddress", nameof(state))));
             }
         }
         catch (Exception ex)
