@@ -127,6 +127,24 @@ public abstract class CollectBase : DriverBase, IRpcDriver
             LogMessage?.LogWarning(ex, string.Format(AppResource.GetMethodError, ex.Message));
         }
 
+
+        if (VariableTasks.Count > 0)
+        {
+            foreach (var item in VariableTasks)
+            {
+                item.Stop();
+                TaskSchedulerLoop.Remove(item);
+            }
+
+            VariableTasks = AddVariableTask(cancellationToken);
+
+            foreach (var item in VariableTasks)
+            {
+                TaskSchedulerLoop.Add(item);
+                item.Start();
+            }
+        }
+
         // 根据标签获取方法信息的局部函数
         List<VariableMethod> GetMethod(IEnumerable<VariableRuntime> tag)
         {
@@ -165,16 +183,28 @@ public abstract class CollectBase : DriverBase, IRpcDriver
         return string.Empty;
     }
     protected virtual bool VariableSourceReadsEnable => true;
+
+    protected List<IScheduledTask> VariableTasks = new List<IScheduledTask>();
     protected override List<IScheduledTask> ProtectedGetTasks(CancellationToken cancellationToken)
     {
         var tasks = new List<IScheduledTask>();
 
-        var setDeviceStatusTask = new ScheduledSyncTask(3000, SetDeviceStatus, null, LogMessage, cancellationToken);
+        var setDeviceStatusTask = new ScheduledSyncTask(10000, SetDeviceStatus, null, LogMessage, cancellationToken);
         tasks.Add(setDeviceStatusTask);
 
         var testOnline = new ScheduledAsyncTask(30000, TestOnline, null, LogMessage, cancellationToken);
         tasks.Add(testOnline);
 
+        VariableTasks = AddVariableTask(cancellationToken);
+
+        tasks.AddRange(VariableTasks);
+        return tasks;
+
+    }
+
+    protected List<IScheduledTask> AddVariableTask(CancellationToken cancellationToken)
+    {
+        List<IScheduledTask> variableTasks = new();
         if (VariableSourceReadsEnable)
         {
             for (int i = 0; i < CurrentDevice.VariableSourceReads.Count; i++)
@@ -182,7 +212,7 @@ public abstract class CollectBase : DriverBase, IRpcDriver
                 var variableSourceRead = CurrentDevice.VariableSourceReads[i];
 
                 var executeTask = ScheduledTaskHelper.GetTask(variableSourceRead.IntervalTime, ReadVariableSource, variableSourceRead, LogMessage, cancellationToken);
-                tasks.Add(executeTask);
+                variableTasks.Add(executeTask);
 
             }
         }
@@ -192,7 +222,7 @@ public abstract class CollectBase : DriverBase, IRpcDriver
             var variableMethod = CurrentDevice.ReadVariableMethods[i];
 
             var executeTask = ScheduledTaskHelper.GetTask(variableMethod.IntervalTime, ReadVariableMed, variableMethod, LogMessage, cancellationToken);
-            tasks.Add(executeTask);
+            variableTasks.Add(executeTask);
 
         }
 
@@ -201,12 +231,11 @@ public abstract class CollectBase : DriverBase, IRpcDriver
             var variableScriptRead = CurrentDevice.VariableScriptReads[i];
 
             var executeTask = ScheduledTaskHelper.GetTask(variableScriptRead.IntervalTime, ScriptVariableRun, variableScriptRead, LogMessage, cancellationToken);
-            tasks.Add(executeTask);
+            variableTasks.Add(executeTask);
 
         }
 
-        return tasks;
-
+        return variableTasks;
     }
 
     private void SetDeviceStatus(object? state, CancellationToken cancellationToken)
@@ -220,7 +249,8 @@ public abstract class CollectBase : DriverBase, IRpcDriver
             }
             else
             {
-                CurrentDevice.SetDeviceStatus(TimerX.Now);
+                if (IdVariableRuntimes.All(a => !a.Value.IsOnline))
+                    CurrentDevice.SetDeviceStatus(TimerX.Now, true);
             }
         }
         else if (IsStarted)

@@ -29,4 +29,13 @@ public class TaskSchedulerLoop
         }
     }
 
+    public void Add(IScheduledTask task)
+    {
+        Tasks.Add(task);
+    }
+    public void Remove(IScheduledTask task)
+    {
+        Tasks.Remove(task);
+    }
+
 }
