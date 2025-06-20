@@ -13,7 +13,7 @@ using Mapster;
 using System.Diagnostics;
 
 using ThingsGateway.Foundation;
-using ThingsGateway.NewLife.Threading;
+using ThingsGateway.Plugin.DB;
 
 using TouchSocket.Core;
 
@@ -56,36 +56,6 @@ public partial class SqlHistoryAlarm : BusinessBaseWithCacheVariableModel<Histor
         }
     }
 
-    private async ValueTask<OperResult> InserableAsync(List<HistoryAlarm> dbInserts, CancellationToken cancellationToken)
-    {
-        try
-        {
-
-            int result = 0;
-            //.SplitTable()
-            Stopwatch stopwatch = new();
-            stopwatch.Start();
-
-            if (_db.CurrentConnectionConfig.DbType == SqlSugar.DbType.QuestDB)
-                result = await _db.Insertable(dbInserts).AS(_driverPropertys.TableName).ExecuteCommandAsync(cancellationToken).ConfigureAwait(false);//不要加分表
-            else
-                result = await _db.Fastest<HistoryAlarm>().AS(_driverPropertys.TableName).PageSize(50000).BulkCopyAsync(dbInserts).ConfigureAwait(false);
-
-
-            stopwatch.Stop();
-            //var result = await db.Insertable(dbInserts).SplitTable().ExecuteCommandAsync().ConfigureAwait(false);
-            if (result > 0)
-            {
-                LogMessage?.Trace($"Count：{dbInserts.Count}，watchTime:  {stopwatch.ElapsedMilliseconds} ms");
-            }
-            return OperResult.Success;
-        }
-        catch (Exception ex)
-        {
-            return new OperResult(ex);
-        }
-    }
-
     private async ValueTask<OperResult> UpdateT(IEnumerable<HistoryAlarm> item, CancellationToken cancellationToken)
     {
         var result = await InserableAsync(item.ToList(), cancellationToken).ConfigureAwait(false);
@@ -98,4 +68,51 @@ public partial class SqlHistoryAlarm : BusinessBaseWithCacheVariableModel<Histor
 
         return result;
     }
+
+    private async ValueTask<OperResult> InserableAsync(List<HistoryAlarm> dbInserts, CancellationToken cancellationToken)
+    {
+        try
+        {
+            _db.Ado.CancellationToken = cancellationToken;
+            if (!_driverPropertys.BigTextScriptHistoryTable.IsNullOrEmpty())
+            {
+                var getDeviceModel = CSharpScriptEngineExtension.Do<DynamicSQLBase>(_driverPropertys.BigTextScriptHistoryTable);
+
+                getDeviceModel.Logger = LogMessage;
+
+                await getDeviceModel.DBInsertable(_db, dbInserts, cancellationToken).ConfigureAwait(false);
+
+            }
+            else
+            {
+                int result = 0;
+                //.SplitTable()
+                Stopwatch stopwatch = new();
+                stopwatch.Start();
+
+                if (_db.CurrentConnectionConfig.DbType == SqlSugar.DbType.QuestDB)
+                    result = await _db.Insertable(dbInserts).AS(_driverPropertys.TableName).ExecuteCommandAsync(cancellationToken).ConfigureAwait(false);
+                else
+                    result = await _db.Fastest<HistoryAlarm>().AS(_driverPropertys.TableName).PageSize(50000).BulkCopyAsync(dbInserts).ConfigureAwait(false);
+
+                stopwatch.Stop();
+                //var result = await db.Insertable(dbInserts).SplitTable().ExecuteCommandAsync().ConfigureAwait(false);
+                if (result > 0)
+                {
+                    LogMessage?.Trace($"Count：{dbInserts.Count}，watchTime:  {stopwatch.ElapsedMilliseconds} ms");
+                }
+                return OperResult.Success;
+            }
+
+
+            return OperResult.Success;
+        }
+        catch (Exception ex)
+        {
+            return new OperResult(ex);
+        }
+
+    }
+
+
 }

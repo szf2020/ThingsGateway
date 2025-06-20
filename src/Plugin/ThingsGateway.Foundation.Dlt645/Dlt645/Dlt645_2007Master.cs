@@ -44,7 +44,7 @@ public class Dlt645_2007Master : DtuServiceDeviceBase
     /// <param name="dateTime">时间</param>
     /// <param name="cancellationToken">取消令箭</param>
     /// <returns></returns>
-    public async ValueTask<OperResult> BroadcastTimeAsync(DateTime dateTime, CancellationToken cancellationToken = default)
+    public ValueTask<OperResult> BroadcastTimeAsync(DateTime dateTime, CancellationToken cancellationToken = default)
     {
         try
         {
@@ -53,40 +53,30 @@ public class Dlt645_2007Master : DtuServiceDeviceBase
             dAddress.Station = str.HexStringToBytes();
             dAddress.DataId = "999999999999".HexStringToBytes();
 
-            return await Dlt645SendAsync(dAddress, ControlCode.BroadcastTime, FEHead, cancellationToken: cancellationToken).ConfigureAwait(false);
+            return Dlt645SendAsync(dAddress, ControlCode.BroadcastTime, FEHead, cancellationToken: cancellationToken);
         }
         catch (Exception ex)
         {
-            return new OperResult(ex);
+            return EasyValueTask.FromResult(new OperResult(ex));
         }
     }
 
     /// <inheritdoc/>
-    public async ValueTask<OperResult<byte[]>> Dlt645RequestAsync(Dlt645_2007Address dAddress, ControlCode controlCode, string feHead, byte[] codes = default, string[] datas = default, CancellationToken cancellationToken = default)
+    public ValueTask<OperResult<byte[]>> Dlt645RequestAsync(Dlt645_2007Address dAddress, ControlCode controlCode, string feHead, byte[] codes = default, string[] datas = default, CancellationToken cancellationToken = default)
     {
-        try
-        {
-            return await SendThenReturnAsync(GetSendMessage(dAddress, controlCode, feHead, codes, datas), cancellationToken).ConfigureAwait(false);
-        }
-        catch (Exception ex)
-        {
-            return new OperResult<byte[]>(ex);
-        }
+
+        return SendThenReturnAsync(GetSendMessage(dAddress, controlCode, feHead, codes, datas), cancellationToken);
+
     }
 
     /// <inheritdoc/>
-    public async ValueTask<OperResult> Dlt645SendAsync(Dlt645_2007Address dAddress, ControlCode controlCode, string feHead, byte[] codes = default, string[] datas = default, CancellationToken cancellationToken = default)
+    public ValueTask<OperResult> Dlt645SendAsync(Dlt645_2007Address dAddress, ControlCode controlCode, string feHead, byte[] codes = default, string[] datas = default, CancellationToken cancellationToken = default)
     {
-        try
-        {
 
-            return await SendAsync(GetSendMessage(dAddress, controlCode, feHead, codes, datas), cancellationToken).ConfigureAwait(false);
 
-        }
-        catch (Exception ex)
-        {
-            return new OperResult<byte[]>(ex);
-        }
+        return SendAsync(GetSendMessage(dAddress, controlCode, feHead, codes, datas), cancellationToken);
+
+
     }
 
     /// <summary>
@@ -147,7 +137,7 @@ public class Dlt645_2007Master : DtuServiceDeviceBase
     /// <inheritdoc/>
     public override List<T> LoadSourceRead<T>(IEnumerable<IVariable> deviceVariables, int maxPack, string defaultIntervalTime)
     {
-        return PackHelper.LoadSourceRead<T>(this, deviceVariables, maxPack, defaultIntervalTime);
+        return PackHelper.LoadSourceRead<T>(this, deviceVariables, maxPack, Station, defaultIntervalTime);
     }
 
     /// <inheritdoc/>
@@ -163,7 +153,19 @@ public class Dlt645_2007Master : DtuServiceDeviceBase
             return EasyValueTask.FromResult(new OperResult<byte[]>(ex));
         }
     }
+    public override ValueTask<OperResult<byte[]>> ReadAsync(object state, CancellationToken cancellationToken = default)
+    {
 
+        if (state is Dlt645_2007Address dlt645_2007Address)
+        {
+            return Dlt645RequestAsync(dlt645_2007Address, ControlCode.Read, FEHead, cancellationToken: cancellationToken);
+        }
+        else
+        {
+            throw new ArgumentException("State must be of type Dlt645_2007Address", nameof(state));
+        }
+
+    }
     /// <summary>
     /// 读取通信地址
     /// </summary>
@@ -231,16 +233,16 @@ public class Dlt645_2007Master : DtuServiceDeviceBase
     }
 
     /// <inheritdoc/>
-    public override async ValueTask<OperResult> WriteAsync(string address, string value, IThingsGatewayBitConverter bitConverter = null, CancellationToken cancellationToken = default)
+    public override ValueTask<OperResult> WriteAsync(string address, string value, IThingsGatewayBitConverter bitConverter = null, CancellationToken cancellationToken = default)
     {
         try
         {
             string[] strArray = value.SplitStringBySemicolon();
-            return await WriteAsync(address, value, bitConverter, cancellationToken).ConfigureAwait(false);
+            return WriteAsync(address, value, bitConverter, cancellationToken);
         }
         catch (Exception ex)
         {
-            return new OperResult<byte[]>(ex);
+            return EasyValueTask.FromResult(new OperResult(ex));
         }
     }
 

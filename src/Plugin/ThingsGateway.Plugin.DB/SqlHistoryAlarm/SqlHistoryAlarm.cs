@@ -43,7 +43,7 @@ public partial class SqlHistoryAlarm : BusinessBaseWithCacheVariableModel<Histor
 
     protected override async Task InitChannelAsync(IChannel? channel, CancellationToken cancellationToken)
     {
-        _db = BusinessDatabaseUtil.GetDb(_driverPropertys.DbType, _driverPropertys.BigTextConnectStr);
+        _db = BusinessDatabaseUtil.GetDb((DbType)_driverPropertys.DbType, _driverPropertys.BigTextConnectStr);
 
         _config.ForType<AlarmVariable, HistoryAlarm>().Map(dest => dest.Id, (src) => CommonUtils.GetSingleId());
         GlobalData.AlarmChangedEvent -= AlarmWorker_OnAlarmChanged;
@@ -112,7 +112,7 @@ public partial class SqlHistoryAlarm : BusinessBaseWithCacheVariableModel<Histor
 
     internal ISugarQueryable<HistoryAlarm> Query(DBHistoryAlarmPageInput input)
     {
-        using var db = BusinessDatabaseUtil.GetDb(_driverPropertys.DbType, _driverPropertys.BigTextConnectStr);
+        using var db = BusinessDatabaseUtil.GetDb((DbType)_driverPropertys.DbType, _driverPropertys.BigTextConnectStr);
         var query = db.Queryable<HistoryAlarm>().AS(_driverPropertys.TableName)
                              .WhereIF(input.StartTime != null, a => a.EventTime >= input.StartTime)
                            .WhereIF(input.EndTime != null, a => a.EventTime <= input.EndTime)
@@ -132,7 +132,7 @@ public partial class SqlHistoryAlarm : BusinessBaseWithCacheVariableModel<Histor
 
     internal async Task<QueryData<HistoryAlarm>> QueryData(QueryPageOptions option)
     {
-        using var db = BusinessDatabaseUtil.GetDb(_driverPropertys.DbType, _driverPropertys.BigTextConnectStr);
+        using var db = BusinessDatabaseUtil.GetDb((DbType)_driverPropertys.DbType, _driverPropertys.BigTextConnectStr);
         var ret = new QueryData<HistoryAlarm>()
         {
             IsSorted = option.SortOrder != SortOrder.Unset,

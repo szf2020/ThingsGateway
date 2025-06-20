@@ -167,6 +167,7 @@ public static class PackHelper
                 IntervalTime = intervalTime,
                 // 将当前组打包地址中的起始地址作为实际打包报文中的起始地址
                 RegisterAddress = startAddress.ToString(),
+                AddressObject = new ModbusAddress(startAddress) { Length = (ushort)sourceLen },
                 Length = sourceLen.ToInt()
             };
 

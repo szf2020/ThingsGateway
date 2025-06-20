@@ -298,6 +298,26 @@ public partial class SiemensS7Master : DeviceBase
         }
     }
 
+    public override ValueTask<OperResult<byte[]>> ReadAsync(object state, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            if (state is SiemensS7Address sAddress)
+            {
+                return S7ReadAsync([sAddress], cancellationToken);
+            }
+            else
+            {
+                throw new ArgumentException("State must be of type SiemensS7Address", nameof(state));
+            }
+        }
+        catch (Exception ex)
+        {
+            return EasyValueTask.FromResult(new OperResult<byte[]>(ex));
+        }
+    }
+
+
     /// <inheritdoc/>
     public override async ValueTask<OperResult> WriteAsync(string address, byte[] value, DataTypeEnum dataType, CancellationToken cancellationToken = default)
     {

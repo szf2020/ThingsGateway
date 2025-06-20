@@ -36,6 +36,8 @@ public class VariableSourceClass : IVariableSource
     /// </summary>
     public IEnumerable<IVariable> VariableRuntimes => _variableRuntimes;
 
+    public object AddressObject { get; set; }
+
     /// <inheritdoc/>
     public virtual void AddVariable(IVariable variable)
     {

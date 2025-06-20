@@ -14,7 +14,6 @@ using ThingsGateway.Foundation.OpcDa;
 using ThingsGateway.Foundation.OpcDa.Da;
 using ThingsGateway.Gateway.Application;
 using ThingsGateway.NewLife.Json.Extension;
-using ThingsGateway.NewLife.Threading;
 
 using TouchSocket.Core;
 

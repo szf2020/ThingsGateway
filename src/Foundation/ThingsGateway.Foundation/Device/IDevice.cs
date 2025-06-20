@@ -466,4 +466,5 @@ public interface IDevice : IDisposable
     /// <param name="channel">通道</param>
     /// <param name="deviceLog">单独设备日志</param>
     void InitChannel(IChannel channel, ILog? deviceLog = null);
+    ValueTask<OperResult<byte[]>> ReadAsync(object state, CancellationToken cancellationToken = default);
 }

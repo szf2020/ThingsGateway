@@ -32,6 +32,7 @@ public class VariableSourceRead : IVariableSource
     /// 读取地址
     /// </summary>
     public string RegisterAddress { get; set; }
+    public object AddressObject { get; set; }
 
     public string IntervalTime { get; set; }
 

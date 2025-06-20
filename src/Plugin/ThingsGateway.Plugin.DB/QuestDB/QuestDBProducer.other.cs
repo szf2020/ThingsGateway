@@ -23,11 +23,11 @@ namespace ThingsGateway.Plugin.QuestDB;
 /// <summary>
 /// RabbitMQProducer
 /// </summary>
-public partial class QuestDBProducer : BusinessBaseWithCacheIntervalVariableModel<QuestDBHistoryValue>
+public partial class QuestDBProducer : BusinessBaseWithCacheIntervalVariableModel<VariableBasicData>
 {
     private TypeAdapterConfig _config;
 
-    protected override ValueTask<OperResult> UpdateVarModel(IEnumerable<CacheDBItem<QuestDBHistoryValue>> item, CancellationToken cancellationToken)
+    protected override ValueTask<OperResult> UpdateVarModel(IEnumerable<CacheDBItem<VariableBasicData>> item, CancellationToken cancellationToken)
     {
         return UpdateVarModel(item.Select(a => a.Value).OrderBy(a => a.Id), cancellationToken);
     }
@@ -41,7 +41,7 @@ public partial class QuestDBProducer : BusinessBaseWithCacheIntervalVariableMode
         UpdateVariable(variableRuntime, variable);
         base.VariableChange(variableRuntime, variable);
     }
-    protected override ValueTask<OperResult> UpdateVarModels(IEnumerable<QuestDBHistoryValue> item, CancellationToken cancellationToken)
+    protected override ValueTask<OperResult> UpdateVarModels(IEnumerable<VariableBasicData> item, CancellationToken cancellationToken)
     {
         return UpdateVarModel(item, cancellationToken);
     }
@@ -56,18 +56,18 @@ public partial class QuestDBProducer : BusinessBaseWithCacheIntervalVariableMode
 
             foreach (var group in varGroup)
             {
-                AddQueueVarModel(new CacheDBItem<List<QuestDBHistoryValue>>(group.Adapt<List<QuestDBHistoryValue>>(_config)));
+                AddQueueVarModel(new CacheDBItem<List<VariableBasicData>>(group.ToList()));
             }
             foreach (var variable in varList)
             {
-                AddQueueVarModel(new CacheDBItem<QuestDBHistoryValue>(variable.Adapt<QuestDBHistoryValue>(_config)));
+                AddQueueVarModel(new CacheDBItem<VariableBasicData>(variable));
             }
         }
         else
         {
             foreach (var variable in variables)
             {
-                AddQueueVarModel(new CacheDBItem<QuestDBHistoryValue>(variable.Adapt<QuestDBHistoryValue>(_config)));
+                AddQueueVarModel(new CacheDBItem<VariableBasicData>(variable));
             }
         }
     }
@@ -78,15 +78,15 @@ public partial class QuestDBProducer : BusinessBaseWithCacheIntervalVariableMode
         if (_driverPropertys.GroupUpdate && !variable.BusinessGroup.IsNullOrEmpty() && VariableRuntimeGroups.TryGetValue(variable.BusinessGroup, out var variableRuntimeGroup))
         {
 
-            AddQueueVarModel(new CacheDBItem<List<QuestDBHistoryValue>>(variableRuntimeGroup.Adapt<List<QuestDBHistoryValue>>(_config)));
+            AddQueueVarModel(new CacheDBItem<List<VariableBasicData>>(variableRuntimeGroup.Adapt<List<VariableBasicData>>(_config)));
 
         }
         else
         {
-            AddQueueVarModel(new CacheDBItem<QuestDBHistoryValue>(variableRuntime.Adapt<QuestDBHistoryValue>(_config)));
+            AddQueueVarModel(new CacheDBItem<VariableBasicData>(variable));
         }
     }
-    private async ValueTask<OperResult> UpdateVarModel(IEnumerable<QuestDBHistoryValue> item, CancellationToken cancellationToken)
+    private async ValueTask<OperResult> UpdateVarModel(IEnumerable<VariableBasicData> item, CancellationToken cancellationToken)
     {
         var result = await InserableAsync(item.WhereIf(_driverPropertys.OnlineFilter, a => a.IsOnline == true).ToList(), cancellationToken).ConfigureAwait(false);
         if (success != result.IsSuccess)
@@ -101,7 +101,7 @@ public partial class QuestDBProducer : BusinessBaseWithCacheIntervalVariableMode
 
     #region 方法
 
-    private async ValueTask<OperResult> InserableAsync(List<QuestDBHistoryValue> dbInserts, CancellationToken cancellationToken)
+    private async ValueTask<OperResult> InserableAsync(List<VariableBasicData> dbInserts, CancellationToken cancellationToken)
     {
         try
         {
@@ -118,8 +118,8 @@ public partial class QuestDBProducer : BusinessBaseWithCacheIntervalVariableMode
             {
                 Stopwatch stopwatch = new();
                 stopwatch.Start();
-
-                var result = await _db.Insertable(dbInserts).AS(_driverPropertys.TableName).ExecuteCommandAsync(cancellationToken).ConfigureAwait(false);//不要加分表
+                var data = dbInserts.Adapt<List<QuestDBHistoryValue>>();
+                var result = await _db.Insertable(data).AS(_driverPropertys.TableName).ExecuteCommandAsync(cancellationToken).ConfigureAwait(false);//不要加分表
                 stopwatch.Stop();
 
                 //var result = await db.Insertable(dbInserts).SplitTable().ExecuteCommandAsync().ConfigureAwait(false);

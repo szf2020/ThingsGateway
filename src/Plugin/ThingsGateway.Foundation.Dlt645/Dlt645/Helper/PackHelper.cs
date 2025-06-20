@@ -18,9 +18,10 @@ internal static class PackHelper
     /// <param name="device"></param>
     /// <param name="deviceVariables"></param>
     /// <param name="maxPack">最大打包长度</param>
+    /// <param name="station">station</param>
     /// <param name="defaultIntervalTime">默认间隔时间</param>
     /// <returns></returns>
-    public static List<T> LoadSourceRead<T>(IDevice device, IEnumerable<IVariable> deviceVariables, int maxPack, string defaultIntervalTime) where T : IVariableSource, new()
+    public static List<T> LoadSourceRead<T>(IDevice device, IEnumerable<IVariable> deviceVariables, int maxPack, string station, string defaultIntervalTime) where T : IVariableSource, new()
     {
         var byteConverter = device.ThingsGatewayBitConverter;
         var result = new List<T>();
@@ -42,6 +43,7 @@ internal static class PackHelper
             var r = new T()
             {
                 RegisterAddress = item.Key!,
+                AddressObject = Dlt645_2007Address.ParseFrom(item.Key, station),
                 Length = 1,
                 IntervalTime = string.IsNullOrWhiteSpace(item.FirstOrDefault().IntervalTime) ? defaultIntervalTime : item.FirstOrDefault().IntervalTime,
             };

@@ -98,31 +98,64 @@ public partial class ModbusMaster : DtuServiceDeviceBase, IModbusAddress
         return PackHelper.LoadSourceRead<T>(this, deviceVariables, maxPack, defaultIntervalTime, Station);
     }
 
-    public async ValueTask<OperResult<byte[]>> ModbusRequestAsync(ModbusAddress mAddress, bool read, CancellationToken cancellationToken = default)
+    public override ValueTask<OperResult<byte[]>> ReadAsync(object state, CancellationToken cancellationToken = default)
     {
         try
         {
-            return await SendThenReturnAsync(GetSendMessage(mAddress, read),
-             cancellationToken).ConfigureAwait(false);
+            if (state is ModbusAddress mAddress)
+            {
+                return ModbusReadAsync(mAddress, cancellationToken);
+            }
+            else
+            {
+                throw new ArgumentException("State must be of type ModbusAddress", nameof(state));
+            }
         }
         catch (Exception ex)
         {
-            return new OperResult<byte[]>(ex);
+            return EasyValueTask.FromResult(new OperResult<byte[]>(ex));
+        }
+    }
+
+    public ValueTask<OperResult<byte[]>> ModbusReadAsync(ModbusAddress mAddress, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            return SendThenReturnAsync(GetSendMessage(mAddress, true),
+             cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            return EasyValueTask.FromResult(new OperResult<byte[]>(ex));
+        }
+    }
+
+
+    public ValueTask<OperResult<byte[]>> ModbusRequestAsync(ModbusAddress mAddress, bool read, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            return SendThenReturnAsync(GetSendMessage(mAddress, read),
+             cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            return EasyValueTask.FromResult(new OperResult<byte[]>(ex));
         }
     }
 
     /// <inheritdoc/>
-    public override async ValueTask<OperResult<byte[]>> ReadAsync(string address, int length, CancellationToken cancellationToken = default)
+    public override ValueTask<OperResult<byte[]>> ReadAsync(string address, int length, CancellationToken cancellationToken = default)
     {
         try
         {
             var mAddress = GetModbusAddress(address, Station);
             mAddress.Length = (ushort)length;
-            return await ModbusRequestAsync(mAddress, true, cancellationToken).ConfigureAwait(false);
+            return ModbusRequestAsync(mAddress, true, cancellationToken);
         }
         catch (Exception ex)
         {
-            return new OperResult<byte[]>(ex);
+            return EasyValueTask.FromResult(new OperResult<byte[]>(ex));
         }
     }
 

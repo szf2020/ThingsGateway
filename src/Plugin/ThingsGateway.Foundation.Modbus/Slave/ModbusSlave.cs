@@ -310,6 +310,34 @@ public class ModbusSlave : DeviceBase, IModbusAddress
             return EasyValueTask.FromResult(new OperResult<byte[]>(result));
         }
     }
+
+    public override ValueTask<OperResult<byte[]>> ReadAsync(object state, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            if (state is ModbusAddress mAddress)
+            {
+                var result = ModbusRequest(mAddress, true, cancellationToken);
+                if (result.IsSuccess)
+                {
+                    return EasyValueTask.FromResult(new OperResult<byte[]>() { Content = result.Content.ToArray() });
+                }
+                else
+                {
+                    return EasyValueTask.FromResult(new OperResult<byte[]>(result));
+                }
+            }
+            else
+            {
+                throw new ArgumentException("State must be of type ModbusAddress", nameof(state));
+            }
+        }
+        catch (Exception ex)
+        {
+            return EasyValueTask.FromResult(new OperResult<byte[]>(ex));
+        }
+    }
+
     public virtual ModbusAddress GetModbusAddress(string address, byte? station, bool isCache = true)
     {
         var mAddress = ModbusAddress.ParseFrom(address, station, isCache);

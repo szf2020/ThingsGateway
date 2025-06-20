@@ -996,4 +996,6 @@ public abstract class DeviceBase : DisposableObject, IDevice
         }
         return a => { };
     }
+    public abstract ValueTask<OperResult<byte[]>> ReadAsync(object state, CancellationToken cancellationToken = default);
+
 }

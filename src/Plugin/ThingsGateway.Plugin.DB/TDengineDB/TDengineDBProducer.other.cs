@@ -26,11 +26,11 @@ namespace ThingsGateway.Plugin.TDengineDB;
 /// <summary>
 /// RabbitMQProducer
 /// </summary>
-public partial class TDengineDBProducer : BusinessBaseWithCacheIntervalVariableModel<TDengineDBHistoryValue>
+public partial class TDengineDBProducer : BusinessBaseWithCacheIntervalVariableModel<VariableBasicData>
 {
     private TypeAdapterConfig _config;
 
-    protected override ValueTask<OperResult> UpdateVarModel(IEnumerable<CacheDBItem<TDengineDBHistoryValue>> item, CancellationToken cancellationToken)
+    protected override ValueTask<OperResult> UpdateVarModel(IEnumerable<CacheDBItem<VariableBasicData>> item, CancellationToken cancellationToken)
     {
         return UpdateVarModel(item.Select(a => a.Value).OrderBy(a => a.Id), cancellationToken);
     }
@@ -46,7 +46,7 @@ public partial class TDengineDBProducer : BusinessBaseWithCacheIntervalVariableM
         UpdateVariable(variableRuntime, variable);
         base.VariableChange(variableRuntime, variable);
     }
-    protected override ValueTask<OperResult> UpdateVarModels(IEnumerable<TDengineDBHistoryValue> item, CancellationToken cancellationToken)
+    protected override ValueTask<OperResult> UpdateVarModels(IEnumerable<VariableBasicData> item, CancellationToken cancellationToken)
     {
         return UpdateVarModel(item, cancellationToken);
     }
@@ -59,18 +59,18 @@ public partial class TDengineDBProducer : BusinessBaseWithCacheIntervalVariableM
 
             foreach (var group in varGroup)
             {
-                AddQueueVarModel(new CacheDBItem<List<TDengineDBHistoryValue>>(group.Adapt<List<TDengineDBHistoryValue>>(_config)));
+                AddQueueVarModel(new CacheDBItem<List<VariableBasicData>>(group.ToList()));
             }
             foreach (var variable in varList)
             {
-                AddQueueVarModel(new CacheDBItem<TDengineDBHistoryValue>(variable.Adapt<TDengineDBHistoryValue>(_config)));
+                AddQueueVarModel(new CacheDBItem<VariableBasicData>(variable));
             }
         }
         else
         {
             foreach (var variable in variables)
             {
-                AddQueueVarModel(new CacheDBItem<TDengineDBHistoryValue>(variable.Adapt<TDengineDBHistoryValue>(_config)));
+                AddQueueVarModel(new CacheDBItem<VariableBasicData>(variable));
             }
         }
     }
@@ -80,15 +80,15 @@ public partial class TDengineDBProducer : BusinessBaseWithCacheIntervalVariableM
         if (_driverPropertys.GroupUpdate && !variable.BusinessGroup.IsNullOrEmpty() && VariableRuntimeGroups.TryGetValue(variable.BusinessGroup, out var variableRuntimeGroup))
         {
 
-            AddQueueVarModel(new CacheDBItem<List<TDengineDBHistoryValue>>(variableRuntimeGroup.Adapt<List<TDengineDBHistoryValue>>(_config)));
+            AddQueueVarModel(new CacheDBItem<List<VariableBasicData>>(variableRuntimeGroup.Adapt<List<VariableBasicData>>(_config)));
 
         }
         else
         {
-            AddQueueVarModel(new CacheDBItem<TDengineDBHistoryValue>(variableRuntime.Adapt<TDengineDBHistoryValue>(_config)));
+            AddQueueVarModel(new CacheDBItem<VariableBasicData>(variable));
         }
     }
-    private async ValueTask<OperResult> UpdateVarModel(IEnumerable<TDengineDBHistoryValue> item, CancellationToken cancellationToken)
+    private async ValueTask<OperResult> UpdateVarModel(IEnumerable<VariableBasicData> item, CancellationToken cancellationToken)
     {
         var result = await InserableAsync(item.WhereIf(_driverPropertys.OnlineFilter, a => a.IsOnline == true).ToList(), cancellationToken).ConfigureAwait(false);
         if (success != result.IsSuccess)
@@ -103,7 +103,7 @@ public partial class TDengineDBProducer : BusinessBaseWithCacheIntervalVariableM
 
     #region 方法
 
-    private async ValueTask<OperResult> InserableAsync(List<TDengineDBHistoryValue> dbInserts, CancellationToken cancellationToken)
+    private async ValueTask<OperResult> InserableAsync(List<VariableBasicData> dbInserts, CancellationToken cancellationToken)
     {
         try
         {

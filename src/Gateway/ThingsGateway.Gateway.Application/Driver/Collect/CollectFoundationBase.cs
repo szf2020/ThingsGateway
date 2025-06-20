@@ -137,8 +137,9 @@ public abstract class CollectFoundationBase : CollectBase
 
             if (cancellationToken.IsCancellationRequested)
                 return new(new OperationCanceledException());
+
             // 从协议读取数据
-            var read = await FoundationDevice.ReadAsync(variableSourceRead.RegisterAddress, variableSourceRead.Length, cancellationToken).ConfigureAwait(false);
+            var read = await FoundationDevice.ReadAsync(variableSourceRead.AddressObject, cancellationToken).ConfigureAwait(false);
 
             // 如果读取成功且有有效内容，则解析结构化内容
             if (read.IsSuccess)

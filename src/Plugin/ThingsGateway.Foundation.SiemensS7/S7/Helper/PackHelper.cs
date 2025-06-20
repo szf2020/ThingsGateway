@@ -230,6 +230,7 @@ internal static class PackHelper
             {
                 IntervalTime = intervalTime, // 设置时间戳
                 RegisterAddress = tempAddresses.OrderBy(it => it.AddressStart).First().ToString(), // 获取地址并按地址排序
+                AddressObject = new SiemensS7Address(tempAddresses.OrderBy(it => it.AddressStart).First()) { Length = sourceLen },
                 Length = sourceLen // 设置源长度
             };
 

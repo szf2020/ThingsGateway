@@ -19,7 +19,6 @@ using ThingsGateway.Gateway.Application;
 using ThingsGateway.NewLife;
 using ThingsGateway.NewLife.Extension;
 using ThingsGateway.NewLife.Json.Extension;
-using ThingsGateway.NewLife.Threading;
 using ThingsGateway.SqlSugar;
 
 using TouchSocket.Core;

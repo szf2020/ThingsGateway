@@ -25,7 +25,7 @@ namespace ThingsGateway.Plugin.QuestDB;
 /// <summary>
 /// QuestDBProducer
 /// </summary>
-public partial class QuestDBProducer : BusinessBaseWithCacheIntervalVariableModel<QuestDBHistoryValue>, IDBHistoryValueService
+public partial class QuestDBProducer : BusinessBaseWithCacheIntervalVariableModel<VariableBasicData>, IDBHistoryValueService
 {
     internal readonly RealDBProducerProperty _driverPropertys = new();
     private readonly QuestDBProducerVariableProperty _variablePropertys = new();

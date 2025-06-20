@@ -31,6 +31,11 @@ public interface IVariableSource
     string RegisterAddress { get; set; }
 
     /// <summary>
+    /// 变量地址
+    /// </summary>
+    object AddressObject { get; set; }
+
+    /// <summary>
     /// IntervalTime
     /// </summary>
     string IntervalTime { get; set; }

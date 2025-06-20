@@ -12,7 +12,8 @@ using BootstrapBlazor.Components;
 
 using System.ComponentModel.DataAnnotations;
 
-using ThingsGateway.SqlSugar;
+using ThingsGateway.Plugin.SqlDB;
+
 
 namespace ThingsGateway.Plugin.SqlHistoryAlarm;
 
@@ -23,15 +24,21 @@ public class SqlHistoryAlarmProperty : BusinessPropertyWithCache
 {
     [DynamicProperty]
     public DbType DbType { get; set; } = DbType.SqlServer;
-
+    [DynamicProperty]
+    [Required]
+    public string TableName { get; set; } = "historyAlarm";
     [DynamicProperty]
     [Required]
     [AutoGenerateColumn(ComponentType = typeof(Textarea), Rows = 1)]
     public string BigTextConnectStr { get; set; } = "server=.;uid=sa;pwd=111111;database=test;";
 
+    /// <summary>
+    /// 历史表脚本
+    /// </summary>
     [DynamicProperty]
-    [Required]
-    public string TableName { get; set; } = "historyAlarm";
+    [AutoGenerateColumn(Visible = true, IsVisibleWhenEdit = false, IsVisibleWhenAdd = false)]
+    public string? BigTextScriptHistoryTable { get; set; }
+
 
     public override bool OnlineFilter { get; set; } = false;
 }

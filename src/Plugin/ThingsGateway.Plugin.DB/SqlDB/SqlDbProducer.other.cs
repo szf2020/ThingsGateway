@@ -24,13 +24,13 @@ namespace ThingsGateway.Plugin.SqlDB;
 /// <summary>
 /// SqlDBProducer
 /// </summary>
-public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariableModel<SQLHistoryValue>
+public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariableModel<VariableBasicData>
 {
     private TypeAdapterConfig _config;
     private volatile bool _initRealData;
     private ConcurrentDictionary<long, VariableBasicData> RealTimeVariables { get; } = new ConcurrentDictionary<long, VariableBasicData>();
 
-    protected override ValueTask<OperResult> UpdateVarModel(IEnumerable<CacheDBItem<SQLHistoryValue>> item, CancellationToken cancellationToken)
+    protected override ValueTask<OperResult> UpdateVarModel(IEnumerable<CacheDBItem<VariableBasicData>> item, CancellationToken cancellationToken)
     {
         return UpdateVarModel(item.Select(a => a.Value).OrderBy(a => a.Id), cancellationToken);
     }
@@ -48,7 +48,7 @@ public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariableModel<
         UpdateVariable(variableRuntime, variable);
         base.VariableChange(variableRuntime, variable);
     }
-    protected override ValueTask<OperResult> UpdateVarModels(IEnumerable<SQLHistoryValue> item, CancellationToken cancellationToken)
+    protected override ValueTask<OperResult> UpdateVarModels(IEnumerable<VariableBasicData> item, CancellationToken cancellationToken)
     {
         return UpdateVarModel(item, cancellationToken);
     }
@@ -62,18 +62,18 @@ public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariableModel<
 
             foreach (var group in varGroup)
             {
-                AddQueueVarModel(new CacheDBItem<List<SQLHistoryValue>>(group.Adapt<List<SQLHistoryValue>>(_config)));
+                AddQueueVarModel(new CacheDBItem<List<VariableBasicData>>(group.ToList()));
             }
             foreach (var variable in varList)
             {
-                AddQueueVarModel(new CacheDBItem<SQLHistoryValue>(variable.Adapt<SQLHistoryValue>(_config)));
+                AddQueueVarModel(new CacheDBItem<VariableBasicData>(variable));
             }
         }
         else
         {
             foreach (var variable in variables)
             {
-                AddQueueVarModel(new CacheDBItem<SQLHistoryValue>(variable.Adapt<SQLHistoryValue>(_config)));
+                AddQueueVarModel(new CacheDBItem<VariableBasicData>(variable));
             }
         }
     }
@@ -85,12 +85,12 @@ public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariableModel<
             if (_driverPropertys.GroupUpdate && !variable.BusinessGroup.IsNullOrEmpty() && VariableRuntimeGroups.TryGetValue(variable.BusinessGroup, out var variableRuntimeGroup))
             {
 
-                AddQueueVarModel(new CacheDBItem<List<SQLHistoryValue>>(variableRuntimeGroup.Adapt<List<SQLHistoryValue>>(_config)));
+                AddQueueVarModel(new CacheDBItem<List<VariableBasicData>>(variableRuntimeGroup.Adapt<List<VariableBasicData>>(_config)));
 
             }
             else
             {
-                AddQueueVarModel(new CacheDBItem<SQLHistoryValue>(variableRuntime.Adapt<SQLHistoryValue>(_config)));
+                AddQueueVarModel(new CacheDBItem<VariableBasicData>(variable));
             }
         }
 
@@ -101,7 +101,7 @@ public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariableModel<
     }
 
 
-    private async ValueTask<OperResult> UpdateVarModel(IEnumerable<SQLHistoryValue> item, CancellationToken cancellationToken)
+    private async ValueTask<OperResult> UpdateVarModel(IEnumerable<VariableBasicData> item, CancellationToken cancellationToken)
     {
         var result = await InserableAsync(item.WhereIf(_driverPropertys.OnlineFilter, a => a.IsOnline == true).ToList(), cancellationToken).ConfigureAwait(false);
         if (success != result.IsSuccess)
@@ -116,7 +116,7 @@ public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariableModel<
 
     #region 方法
 
-    private async ValueTask<OperResult> InserableAsync(List<SQLHistoryValue> dbInserts, CancellationToken cancellationToken)
+    private async ValueTask<OperResult> InserableAsync(List<VariableBasicData> dbInserts, CancellationToken cancellationToken)
     {
         try
         {
@@ -134,8 +134,8 @@ public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariableModel<
             {
                 Stopwatch stopwatch = new();
                 stopwatch.Start();
-                var result = await _db.Fastest<SQLHistoryValue>().PageSize(50000).SplitTable().BulkCopyAsync(dbInserts).ConfigureAwait(false);
-                //var result = await db.Insertable(dbInserts).SplitTable().ExecuteCommandAsync().ConfigureAwait(false);
+                var data = dbInserts.Adapt<List<SQLHistoryValue>>(_config);
+                var result = await _db.Fastest<SQLHistoryValue>().PageSize(50000).SplitTable().BulkCopyAsync(data).ConfigureAwait(false);
                 stopwatch.Stop();
                 if (result > 0)
                 {
@@ -152,7 +152,7 @@ public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariableModel<
         }
     }
 
-    private async ValueTask<OperResult> UpdateAsync(List<SQLRealValue> datas, CancellationToken cancellationToken)
+    private async ValueTask<OperResult> UpdateAsync(List<VariableBasicData> datas, CancellationToken cancellationToken)
     {
         try
         {
@@ -190,7 +190,8 @@ public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariableModel<
                         Stopwatch stopwatch = new();
                         stopwatch.Start();
 
-                        var result = await _db.Fastest<SQLRealValue>().AS(_driverPropertys.ReadDBTableName).PageSize(100000).BulkUpdateAsync(datas).ConfigureAwait(false);
+                        var data = datas.Adapt<List<SQLRealValue>>(_config);
+                        var result = await _db.Fastest<SQLRealValue>().AS(_driverPropertys.ReadDBTableName).PageSize(100000).BulkUpdateAsync(data).ConfigureAwait(false);
 
                         stopwatch.Stop();
                         if (result > 0)

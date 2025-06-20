@@ -25,7 +25,7 @@ namespace ThingsGateway.Plugin.SqlDB;
 /// <summary>
 /// SqlDBProducer
 /// </summary>
-public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariableModel<SQLHistoryValue>, IDBHistoryValueService
+public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariableModel<VariableBasicData>, IDBHistoryValueService
 {
     internal readonly SqlDBProducerProperty _driverPropertys = new();
     private readonly SqlDBProducerVariableProperty _variablePropertys = new();
@@ -236,7 +236,7 @@ public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariableModel<
                 var varList = RealTimeVariables.ToListWithDequeue();
                 if (varList.Count > 0)
                 {
-                    var result = await UpdateAsync(varList.Adapt<List<SQLRealValue>>(), cancellationToken).ConfigureAwait(false);
+                    var result = await UpdateAsync(varList, cancellationToken).ConfigureAwait(false);
                     if (success != result.IsSuccess)
                     {
                         if (!result.IsSuccess)
