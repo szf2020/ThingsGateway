@@ -3,7 +3,7 @@
 	<PropertyGroup>
 
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
-		<PackageOutputPath>$(SolutionDir)..\..\nupkgs</PackageOutputPath>
+		<PackageOutputPath>$(MSBuildThisFileDirectory)..\..\nupkgs</PackageOutputPath>
 		<PackageVersion>$(Version)</PackageVersion>
 		<PackageTags>ThingsGateway;Diego;Blazor;IOT;设备采集;边缘网关;物联网</PackageTags>
 		<PackageProjectUrl>https://gitee.com/diego2098/ThingsGateway</PackageProjectUrl>
@@ -19,13 +19,13 @@
 
 
 	<ItemGroup>
-		<None Include="$(SolutionDir)PackNuget.props" Pack="true" PackagePath="\" />
+		<None Include="$(MSBuildThisFileDirectory)PackNuget.props" Pack="true" PackagePath="\" />
 	</ItemGroup>
 
 	<ItemGroup>
-		<None Include="$(SolutionDir)..\README.md" Pack="true" PackagePath="\" />
-		<None Include="$(SolutionDir)..\README.zh-CN.md" Pack="true" PackagePath="\" />
-		<None Include="$(SolutionDir)..\LICENSE" Pack="true" PackagePath="\" />
-		<None Include="$(SolutionDir)..\icon.png" Pack="true" PackagePath="\" />
+		<None Include="$(MSBuildThisFileDirectory)..\README.md" Pack="true" PackagePath="\" />
+		<None Include="$(MSBuildThisFileDirectory)..\README.zh-CN.md" Pack="true" PackagePath="\" />
+		<None Include="$(MSBuildThisFileDirectory)..\LICENSE" Pack="true" PackagePath="\" />
+		<None Include="$(MSBuildThisFileDirectory)..\icon.png" Pack="true" PackagePath="\" />
 	</ItemGroup>
 </Project>

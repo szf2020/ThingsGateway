@@ -46,6 +46,8 @@ public static class ObjectMapperServiceCollectionExtensions
         // 获取全局映射配置
         var config = TypeAdapterConfig.GlobalSettings;
 
+        //config.Compiler = exp => exp.CompileFast();
+
         // 扫描所有继承  IRegister 接口的对象映射配置
         if (assemblies?.Length > 0) config.Scan(assemblies);
 

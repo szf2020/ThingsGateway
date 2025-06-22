@@ -13,7 +13,7 @@ namespace ThingsGateway.Razor;
 /// <summary>
 /// 母版页基类
 /// </summary>
-[BlazorSetParametersAsyncGenerator.DoNotGenerateSetParametersAsync]
+[DoNotGenerateSetParametersAsync]
 public partial class BaseLayout
 {
 }

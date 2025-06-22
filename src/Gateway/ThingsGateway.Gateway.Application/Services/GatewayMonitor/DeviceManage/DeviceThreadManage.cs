@@ -414,6 +414,12 @@ internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
                    }
                }
 
+
+               if (DriverTasks.TryRemove(deviceId, out var task))
+               {
+                   task.Stop();
+               }
+
                // 取消驱动程序的操作
                if (CancellationTokenSources.TryRemove(deviceId, out var token))
                {
@@ -424,10 +430,6 @@ internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
                    }
                }
 
-               if (DriverTasks.TryRemove(deviceId, out var task))
-               {
-                   task.Stop();
-               }
 
            });
 

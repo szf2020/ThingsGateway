@@ -3,7 +3,7 @@ using Microsoft.CodeAnalysis.Text;
 
 using System.Text;
 
-namespace BlazorSetParametersAsyncGenerator
+namespace Microsoft.AspNetCore.Components
 {
     internal static class SourceGeneratorContextExtension
     {

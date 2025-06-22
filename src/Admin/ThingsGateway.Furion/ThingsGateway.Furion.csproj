@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-	<Import Project="$(SolutionDir)Version.props" />
-	<Import Project="$(SolutionDir)PackNuget.props" />
+	<Import Project="..\..\Version.props" />
+	<Import Project="..\..\PackNuget.props" />
 
 	<PropertyGroup>
 		<TargetFrameworks>net8.0;net9.0;</TargetFrameworks>
@@ -36,6 +36,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="Ben.Demystifier" Version="0.4.1" />
+		<!--<PackageReference Include="FastExpressionCompiler" Version="5.3.0" />-->
 		<PackageReference Include="System.Text.RegularExpressions" Version="4.3.1" />
 		<PackageReference Include="Mapster" Version="7.4.0" />
 		<PackageReference Include="MiniProfiler.AspNetCore.Mvc" Version="4.5.4" />
@@ -61,8 +62,8 @@
 	<ItemGroup>
 		<None Include="README.md" Pack="true" PackagePath="\" />
 		<None Include="README.zh-CN.md" Pack="true" PackagePath="\" />
-		<None Remove="$(SolutionDir)..\README.md" Pack="false" PackagePath="\" />
-		<None Remove="$(SolutionDir)..\README.zh-CN.md" Pack="false" PackagePath="\" />
+		<None Remove="..\..\..\README.md" Pack="false" PackagePath="\" />
+		<None Remove="..\..\..\README.zh-CN.md" Pack="false" PackagePath="\" />
 	</ItemGroup>
 	
 </Project>

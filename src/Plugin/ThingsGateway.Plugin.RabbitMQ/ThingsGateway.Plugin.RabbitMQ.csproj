@@ -1,13 +1,11 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
-	<Import Project="$(SolutionDir)Version.props" />
-	<Import Project="$(SolutionDir)PackNuget.props" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<Import Project="..\..\Version.props" />
+	<Import Project="..\..\PackNuget.props" />
 	<PropertyGroup>
 		<TargetFrameworks>net8.0;</TargetFrameworks>
 	</PropertyGroup>
 	<ItemGroup>
-		<ProjectReference Include="..\..\Foundation\ThingsGateway.Foundation.Razor\ThingsGateway.Foundation.Razor.csproj">
-		</ProjectReference>
-		<ProjectReference Include="..\..\Gateway\ThingsGateway.Gateway.Razor\ThingsGateway.Gateway.Razor.csproj">
+		<ProjectReference Include="..\..\Gateway\ThingsGateway.Gateway.Application\ThingsGateway.Gateway.Application.csproj">
 		</ProjectReference>
 
 	</ItemGroup>

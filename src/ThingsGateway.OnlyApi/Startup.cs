@@ -15,7 +15,6 @@ using Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption;
 using Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption.ConfigurationModel;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.StaticFiles;
-using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
 
 using Newtonsoft.Json;

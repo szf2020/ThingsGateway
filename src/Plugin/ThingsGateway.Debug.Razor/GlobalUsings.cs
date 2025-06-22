@@ -12,4 +12,4 @@ global using Microsoft.AspNetCore.Components;
 
 global using ThingsGateway.Razor;
 
-[assembly: BlazorSetParametersAsyncGenerator.GlobalGenerateSetParametersAsync(true)]
+[assembly: GlobalGenerateSetParametersAsync(true)]

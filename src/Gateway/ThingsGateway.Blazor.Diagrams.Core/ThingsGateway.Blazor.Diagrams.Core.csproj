@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-	<Import Project="$(SolutionDir)Version.props" />
-	<Import Project="$(SolutionDir)PackNuget.props" />
+	<Import Project="..\..\Version.props" />
+	<Import Project="..\..\PackNuget.props" />
 
 	<PropertyGroup>
 		<TargetFrameworks>net8.0;net9.0</TargetFrameworks>
@@ -8,8 +8,8 @@
 
 	<ItemGroup>
 
-		<None Remove="$(SolutionDir)..\README.md" />
-		<None Remove="$(SolutionDir)..\README.zh-CN.md" />
+		<None Remove="..\..\..\README.md" />
+		<None Remove="..\..\..\README.zh-CN.md" />
 
 		<None Include="README.md" Pack="true" PackagePath="\" />
 		<None Include="README.zh-CN.md" Pack="true" PackagePath="\" />

@@ -1,5 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-	<Import Project="$(SolutionDir)PackNuget.props" />
+	<Import Project="..\..\PackNuget.props" />
 	<PropertyGroup>
 		<TargetFrameworks>netstandard2.0;</TargetFrameworks>
 		<Version>$(SourceGeneratorVersion)</Version>

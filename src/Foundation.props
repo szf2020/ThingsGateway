@@ -4,6 +4,6 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<None Include="$(SolutionDir)Foundation.props" Pack="true" PackagePath="\" />
+		<None Include="$(MSBuildThisFileDirectory)Foundation.props" Pack="true" PackagePath="\" />
 	</ItemGroup>
 </Project>

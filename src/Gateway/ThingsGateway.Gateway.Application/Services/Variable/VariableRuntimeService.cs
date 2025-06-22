@@ -176,20 +176,20 @@ public class VariableRuntimeService : IVariableRuntimeService
             var datas = await GlobalData.VariableService.InsertTestDataAsync(testVariableCount, testDeviceCount, slaveUrl, businessEnable).ConfigureAwait(false);
 
             {
-                var newChannelRuntimes = (datas.Item1).Adapt<List<ChannelRuntime>>();
+                var newChannelRuntimes = datas.Item1.Adapt<List<ChannelRuntime>>();
 
                 //批量修改之后，需要重新加载通道
                 RuntimeServiceHelper.Init(newChannelRuntimes);
 
                 {
 
-                    var newDeviceRuntimes = (datas.Item2).Adapt<List<DeviceRuntime>>();
+                    var newDeviceRuntimes = datas.Item2.Adapt<List<DeviceRuntime>>();
 
                     RuntimeServiceHelper.Init(newDeviceRuntimes);
 
                 }
                 {
-                    var newVariableRuntimes = (datas.Item3).Adapt<List<VariableRuntime>>();
+                    var newVariableRuntimes = datas.Item3.Adapt<List<VariableRuntime>>();
                     RuntimeServiceHelper.Init(newVariableRuntimes);
 
                 }

@@ -1,7 +1,7 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 
-namespace BlazorSetParametersAsyncGenerator
+namespace Microsoft.AspNetCore.Components
 {
     internal static class StringExtension
     {

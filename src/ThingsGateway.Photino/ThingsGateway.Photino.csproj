@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk.Razor">
 
-	<Import Project="$(SolutionDir)Version.props" />
+	<Import Project="..\Version.props" />
 
 
 	<ItemGroup Condition=" '$(SolutionName)' != 'ThingsGatewayRelease' ">

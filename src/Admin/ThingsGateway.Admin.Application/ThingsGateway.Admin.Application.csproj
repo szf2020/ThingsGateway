@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-	<Import Project="$(SolutionDir)Version.props" />
-	<Import Project="$(SolutionDir)PackNuget.props" />
+	<Import Project="..\..\Version.props" />
+	<Import Project="..\..\PackNuget.props" />
 
 	<PropertyGroup>
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
@@ -18,7 +18,7 @@
 	</ItemGroup>
 	
 	<ItemGroup>
-		<PackageReference Include="Rougamo.Fody" Version="5.0.0" />
+		<PackageReference Include="Rougamo.Fody" Version="5.0.1" />
 	</ItemGroup>
 	<ItemGroup Condition=" '$(TargetFramework)' == 'net8.0' ">
 		<PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="8.0.1" />
@@ -41,12 +41,20 @@
 	<ItemGroup>
 		<None Include="..\README.md" Pack="true" PackagePath="\" />
 		<None Include="..\README.zh-CN.md" Pack="true" PackagePath="\" />
-		<None Remove="$(SolutionDir)..\README.md" Pack="false" PackagePath="\" />
-		<None Remove="$(SolutionDir)..\README.zh-CN.md" Pack="false" PackagePath="\" />
+		<None Remove="..\..\..\README.md" Pack="false" PackagePath="\" />
+		<None Remove="..\..\..\README.zh-CN.md" Pack="false" PackagePath="\" />
 	</ItemGroup>
 
 	<ItemGroup>
 		<ProjectReference Include="..\ThingsGateway.DB\ThingsGateway.DB.csproj" />
 	</ItemGroup>
 
+
+	<!--<Target Name="Mapster" AfterTargets="AfterBuild">
+		<Exec WorkingDirectory="$(ProjectDir)" Command="dotnet tool restore" />
+		<Exec WorkingDirectory="$(ProjectDir)" Command="dotnet mapster extension -o MapsterGenerator -a &quot;$(TargetDir)$(ProjectName).dll&quot;" />
+		<Exec WorkingDirectory="$(ProjectDir)" Command="dotnet mapster mapper -o MapsterGenerator -a &quot;$(TargetDir)$(ProjectName).dll&quot;" />
+	</Target>-->
+
+	
 </Project>

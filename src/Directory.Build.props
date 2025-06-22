@@ -1,12 +1,13 @@
 <Project>
 
 	<PropertyGroup>
-		<PluginVersion>10.8.14</PluginVersion>
-		<ProPluginVersion>10.8.14</ProPluginVersion>
-		<AuthenticationVersion>2.8.0</AuthenticationVersion>
-		<SourceGeneratorVersion>10.8.2</SourceGeneratorVersion>
+		<PluginVersion>10.8.17</PluginVersion>
+		<ProPluginVersion>10.8.17</ProPluginVersion>
+		<AuthenticationVersion>2.8.2</AuthenticationVersion>
+		<SourceGeneratorVersion>10.8.4</SourceGeneratorVersion>
 		<NET8Version>8.0.17</NET8Version>
 		<NET9Version>9.0.6</NET9Version>
+		<SatelliteResourceLanguages>zh-Hans;en-US</SatelliteResourceLanguages>
 	</PropertyGroup>
 
 	<PropertyGroup>
@@ -41,7 +42,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<None Include="$(SolutionDir)Directory.Build.props" Pack="true" PackagePath="\" />
+		<None Include="$(MSBuildThisFileDirectory)Directory.Build.props" Pack="true" PackagePath="\" />
 	</ItemGroup>
 
 	<PropertyGroup>

@@ -1,13 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-	<Import Project="$(SolutionDir)Version.props" />
-	<Import Project="$(SolutionDir)PackNuget.props" />
+	<Import Project="..\..\Version.props" />
+	<Import Project="..\..\PackNuget.props" />
 	<PropertyGroup>
 		<TargetFrameworks>net8.0;</TargetFrameworks>
 	</PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="Portable.BouncyCastle" Version="1.9.0" />
-		<PackageReference Include="Rougamo.Fody" Version="5.0.0" />
+		<PackageReference Include="Rougamo.Fody" Version="5.0.1" />
 		<PackageReference Include="TouchSocket.Dmtp" Version="3.1.8" />
 		<PackageReference Include="TouchSocket.WebApi.Swagger" Version="3.1.8" />
 		<PackageReference Include="ThingsGateway.Authentication" Version="$(AuthenticationVersion)" />

@@ -92,7 +92,7 @@ public class Program
 
 
         })
-        .Configure(app=>
+        .Configure(app =>
         {
             ReflectionInoHelper.RemoveAllCache();
             InstanceFactory.RemoveCache();

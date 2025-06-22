@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
-	<Import Project="$(SolutionDir)Version.props" />
-	<Import Project="$(SolutionDir)PackNuget.props" />
+	<Import Project="..\..\Version.props" />
+	<Import Project="..\..\PackNuget.props" />
 
 	<PropertyGroup>
 		<TargetFrameworks>net8.0;net9.0;</TargetFrameworks>

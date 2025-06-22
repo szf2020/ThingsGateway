@@ -1,6 +1,6 @@
 ﻿using Microsoft.CodeAnalysis;
 
-namespace BlazorSetParametersAsyncGenerator
+namespace Microsoft.AspNetCore.Components
 {
     public static class TypeSymbolExtension
     {

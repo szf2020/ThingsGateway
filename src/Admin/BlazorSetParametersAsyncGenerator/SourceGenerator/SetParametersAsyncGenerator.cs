@@ -2,7 +2,7 @@
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace BlazorSetParametersAsyncGenerator;
+namespace Microsoft.AspNetCore.Components;
 
 [Generator]
 public partial class SetParametersAsyncGenerator : ISourceGenerator
@@ -11,7 +11,7 @@ public partial class SetParametersAsyncGenerator : ISourceGenerator
     private string m_DoNotGenerateSetParametersAsyncAttribute = """
         
         using System;
-        namespace BlazorSetParametersAsyncGenerator
+        namespace Microsoft.AspNetCore.Components
         {
             [AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = true)]
             internal sealed class DoNotGenerateSetParametersAsyncAttribute : Attribute
@@ -25,7 +25,7 @@ public partial class SetParametersAsyncGenerator : ISourceGenerator
     private string m_GenerateSetParametersAsyncAttribute = """
         
         using System;
-        namespace BlazorSetParametersAsyncGenerator
+        namespace Microsoft.AspNetCore.Components
         {
             [AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = true)]
             internal sealed class GenerateSetParametersAsyncAttribute : Attribute
@@ -40,7 +40,7 @@ public partial class SetParametersAsyncGenerator : ISourceGenerator
     private string m_GlobalGenerateSetParametersAsyncAttribute = """
         
         using System;
-        namespace BlazorSetParametersAsyncGenerator
+        namespace Microsoft.AspNetCore.Components
         {
             [AttributeUsage(AttributeTargets.Assembly, AllowMultiple = false)]
             internal sealed class GlobalGenerateSetParametersAsyncAttribute : Attribute
@@ -445,8 +445,8 @@ namespace {namespaceName}
     private static IEnumerable<INamedTypeSymbol> GetCandidateClasses(SyntaxReceiver receiver, GeneratorExecutionContext context)
     {
         var compilation = context.Compilation;
-        var positiveAttributeSymbol = compilation.GetTypeByMetadataName("BlazorSetParametersAsyncGenerator.GenerateSetParametersAsyncAttribute");
-        var negativeAttributeSymbol = compilation.GetTypeByMetadataName("BlazorSetParametersAsyncGenerator.DoNotGenerateSetParametersAsyncAttribute");
+        var positiveAttributeSymbol = compilation.GetTypeByMetadataName("Microsoft.AspNetCore.Components.GenerateSetParametersAsyncAttribute");
+        var negativeAttributeSymbol = compilation.GetTypeByMetadataName("Microsoft.AspNetCore.Components.DoNotGenerateSetParametersAsyncAttribute");
 
         // loop over the candidate methods, and keep the ones that are actually annotated
 
@@ -454,7 +454,7 @@ namespace {namespaceName}
         var assemblyAttributes = compilation.Assembly.GetAttributes();
 
         var enableAttr = assemblyAttributes.FirstOrDefault(attr =>
-            attr.AttributeClass?.ToDisplayString() == "BlazorSetParametersAsyncGenerator.GlobalGenerateSetParametersAsyncAttribute");
+            attr.AttributeClass?.ToDisplayString() == "Microsoft.AspNetCore.Components.GlobalGenerateSetParametersAsyncAttribute");
 
         var globalEnable = false;
         if (enableAttr != null)
