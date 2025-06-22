@@ -113,7 +113,7 @@ public partial class RabbitMQProducer : BusinessBaseWithCacheIntervalScript<Vari
     {
         if (!_businessPropertyWithCacheIntervalScript.VariableTopic.IsNullOrWhiteSpace())
         {
-            if (_driverPropertys.GroupUpdate && !variable.BusinessGroup.IsNullOrEmpty() && VariableRuntimeGroups.TryGetValue(variable.BusinessGroup, out var variableRuntimeGroup))
+            if (_driverPropertys.GroupUpdate && variable.BusinessGroupUpdateTrigger && !variable.BusinessGroup.IsNullOrEmpty() && VariableRuntimeGroups.TryGetValue(variable.BusinessGroup, out var variableRuntimeGroup))
 
             {
                 //获取组内全部变量

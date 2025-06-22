@@ -30,9 +30,6 @@ namespace ThingsGateway.Gateway.Application;
 [SugarIndex("unique_deviceid_variable_name", nameof(Variable.Name), OrderByType.Asc, nameof(Variable.DeviceId), OrderByType.Asc, true)]
 public class Variable : BaseDataEntity, IValidatableObject
 {
-
-
-
     /// <summary>
     /// 导入验证专用
     /// </summary>
@@ -68,6 +65,7 @@ public class Variable : BaseDataEntity, IValidatableObject
     private bool lLAlarmEnable;
     private bool lAlarmEnable;
     private bool customAlarmEnable;
+    private bool businessGroupUpdateTrigger = true;
 
     private object _value;
     private string name;
@@ -142,6 +140,13 @@ public class Variable : BaseDataEntity, IValidatableObject
     [SugarColumn(ColumnDescription = "分组名称", IsNullable = true)]
     [AutoGenerateColumn(Visible = true, Filterable = true, Sortable = true, Order = 1)]
     public virtual string BusinessGroup { get => businessGroup; set => businessGroup = value; }
+
+    /// <summary>
+    /// 分组上传触发变量
+    /// </summary>
+    [SugarColumn(ColumnDescription = "分组上传触发变量", IsNullable = true)]
+    [AutoGenerateColumn(Visible = true, Filterable = true, Sortable = true, Order = 1)]
+    public virtual bool BusinessGroupUpdateTrigger { get => businessGroupUpdateTrigger; set => businessGroupUpdateTrigger = value; }
 
     /// <summary>
     /// 描述

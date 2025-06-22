@@ -50,17 +50,7 @@
     "LogConsole": "日志",
     "RulesId": "名称"
   },
-  "ThingsGateway.Management.Authentication": {
-    "AuthName": "公司名称",
-    "Authorized": "已授权",
-    "ExpireTime": "过期时间 {0}",
-    "Password": "注册码",
-    "Register": "注册",
-    "RegisterStatus": "注册状态",
-    "Unauthorized": "未授权",
-    "Unregister": "取消注册",
-    "UUID": "唯一编码"
-  },
+
   "ThingsGateway.Management.AutoUpdateController": {
     "AutoUpdateController": "程序更新",
     "Update": "更新"
@@ -449,6 +439,7 @@
     "BoolOpenAlarmText": "布尔开报警文本",
     "BoolOpenRestrainExpressions": "布尔开报警约束",
     "BusinessGroup": "业务组",
+    "BusinessGroupUpdateTrigger": "分组上传触发",
     "ClearVariable": "清空变量",
     "CollectGroup": "采集组",
     "CopyVariable": "复制变量",

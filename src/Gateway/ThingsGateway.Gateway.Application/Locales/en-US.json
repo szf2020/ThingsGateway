@@ -52,17 +52,7 @@
     "RulesId": "Name"
   },
 
-  "ThingsGateway.Management.Authentication": {
-    "AuthName": "AuthName",
-    "Authorized": "Authorized",
-    "ExpireTime": "ExpireTime {0}",
-    "Password": "Password",
-    "Register": "Register",
-    "RegisterStatus": "RegisterStatus",
-    "Unauthorized": "Unauthorized",
-    "Unregister": "Unregister",
-    "UUID": "UUID"
-  },
+
   "ThingsGateway.Management.AutoUpdateController": {
     "AutoUpdateController": "AutoUpdate",
     "Update": "Update"
@@ -448,6 +438,7 @@
     "BoolOpenAlarmText": "BoolOpenAlarmText",
     "BoolOpenRestrainExpressions": "BoolOpenRestrainExpressions",
     "BusinessGroup": "BusinessGroup",
+    "BusinessGroupUpdateTrigger": "BusinessGroupUpdateTrigger",
     "ClearVariable": "Clear Variable",
     "CollectGroup": "CollectGroup",
     "CopyVariable": "Copy Variable",
@@ -456,7 +447,7 @@
     "CustomAlarmText": "CustomAlarmText",
     "CustomRestrainExpressions": "CustomRestrainExpressions",
     "DataType": "DataType",
-    "DeleteVariable": "Copy Variable",
+    "DeleteVariable": "Delete Variable",
     "Description": "Description",
     "DeviceId": "CollectionDevice",
     "DeviceId.MinValue": "{0} cannot be empty",

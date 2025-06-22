@@ -101,6 +101,9 @@ public class VariableBasicData
     [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
     public string BusinessGroup => VariableRuntime.BusinessGroup;
 
+    /// <inheritdoc cref="Variable.BusinessGroupUpdateTrigger"/>
+    public bool BusinessGroupUpdateTrigger => VariableRuntime.BusinessGroupUpdateTrigger;
+
     /// <inheritdoc cref="VariableRuntime.DeviceName"/>
     public string DeviceName => VariableRuntime.DeviceName;
 

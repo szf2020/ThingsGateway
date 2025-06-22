@@ -1,4 +1,16 @@
 ﻿{
+  "ThingsGateway.Management.Authentication": {
+    "AuthName": "公司名称",
+    "Authorized": "已授权",
+    "ExpireTime": "过期时间",
+    "Password": "注册码",
+    "Register": "注册",
+    "RegisterStatus": "注册状态",
+    "Unauthorized": "未授权",
+    "Unregister": "取消注册",
+    "UUID": "唯一编码"
+  },
+
   "ThingsGateway.Gateway.Razor._Imports": {
 
     "Actuator": "执行",

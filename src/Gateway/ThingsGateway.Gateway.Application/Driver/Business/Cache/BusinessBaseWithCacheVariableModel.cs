@@ -435,9 +435,11 @@ public abstract class BusinessBaseWithCacheVariableModel<VarModel> : BusinessBas
 
         try
         {
-            if (_memoryVarModelsQueue.TryDequeue(out var cacheDBItem))
+            while (_memoryVarModelsQueue.TryDequeue(out var cacheDBItem))
             {
-                var list = cacheDBItem.Value;
+                if (cancellationToken.IsCancellationRequested)
+                    break;
+                    var list = cacheDBItem.Value;
                 var data = list.ChunkBetter(_businessPropertyWithCache.SplitSize);
                 foreach (var item in data)
                 {

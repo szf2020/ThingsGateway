@@ -1,4 +1,16 @@
 ﻿{
+  "ThingsGateway.Management.Authentication": {
+    "AuthName": "AuthName",
+    "Authorized": "Authorized",
+    "ExpireTime": "ExpireTime",
+    "Password": "Password",
+    "Register": "Register",
+    "RegisterStatus": "RegisterStatus",
+    "Unauthorized": "Unauthorized",
+    "Unregister": "Unregister",
+    "UUID": "UUID"
+  },
+
   "ThingsGateway.Gateway.Razor._Imports": {
 
     "Actuator": "Actuator",
