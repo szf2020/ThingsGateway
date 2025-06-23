@@ -15,6 +15,7 @@ using Microsoft.Extensions.Logging;
 using System.Collections.Concurrent;
 
 using ThingsGateway.NewLife.Caching;
+using ThingsGateway.NewLife.Log;
 
 namespace ThingsGateway.Logging;
 
@@ -33,7 +34,7 @@ public sealed class DatabaseLoggerProvider : ILoggerProvider, ISupportExternalSc
     /// <summary>
     /// 日志消息队列（线程安全）
     /// </summary>
-    private readonly BlockingCollection<LogMessage> _logMessageQueue = new(12000);
+    private readonly BlockingCollection<LogMessage> _logMessageQueue = new(20000);
 
     /// <summary>
     /// 日志作用域提供器
@@ -135,7 +136,10 @@ public sealed class DatabaseLoggerProvider : ILoggerProvider, ISupportExternalSc
         {
             try
             {
-                _logMessageQueue.Add(logMsg);
+                if (!_logMessageQueue.TryAdd(logMsg,5000))
+                {
+                    XTrace.Log.Warn($"{nameof(DatabaseLoggerProvider)} queue add fail");
+                }
                 return;
             }
             catch (InvalidOperationException) { }
