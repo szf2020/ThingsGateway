@@ -65,7 +65,7 @@ internal sealed class RulesEngineHostedService : BackgroundService, IRulesEngine
             if (rules.Status)
             {
                 var data = Init(rules);
-                await Start(data.rulesLog, data.blazorDiagram, TokenSource.Token).ConfigureAwait(false);
+                Start(data.rulesLog, data.blazorDiagram, TokenSource.Token);
                 dispatchService.Dispatch(null);
             }
 
@@ -115,7 +115,7 @@ internal sealed class RulesEngineHostedService : BackgroundService, IRulesEngine
 
         return result;
     }
-    private static Task Start(RulesLog rulesLog, DefaultDiagram item, CancellationToken cancellationToken)
+    private static void Start(RulesLog rulesLog, DefaultDiagram item, CancellationToken cancellationToken)
     {
         rulesLog.Log.Trace("Start");
         var startNodes = item.Nodes.Where(a => a is IStartNode);
@@ -123,7 +123,6 @@ internal sealed class RulesEngineHostedService : BackgroundService, IRulesEngine
         {
             _ = Analysis((link.Target.Model as PortModel)?.Parent, new NodeInput(), rulesLog, cancellationToken);
         }
-        return Task.CompletedTask;
     }
 
     private static async Task Analysis(NodeModel targetNode, NodeInput input, RulesLog rulesLog, CancellationToken cancellationToken)
@@ -152,17 +151,24 @@ internal sealed class RulesEngineHostedService : BackgroundService, IRulesEngine
             else if (targetNode is IExpressionNode expressionNode)
             {
                 var nodeOutput = await expressionNode.ExecuteAsync(input, cancellationToken).ConfigureAwait(false);
-                foreach (var link in targetNode.PortLinks.Where(a => ((a.Target.Model as PortModel)?.Parent) != targetNode))
+                if (nodeOutput.IsSuccess)
                 {
-                    await Analysis((link.Target.Model as PortModel)?.Parent, new NodeInput() { Value = nodeOutput.Value, }, rulesLog, cancellationToken).ConfigureAwait(false);
+                    foreach (var link in targetNode.PortLinks.Where(a => ((a.Target.Model as PortModel)?.Parent) != targetNode))
+                    {
+                        await Analysis((link.Target.Model as PortModel)?.Parent, new NodeInput() { Value = nodeOutput.Content.Value, }, rulesLog, cancellationToken).ConfigureAwait(false);
+                    }
                 }
+
             }
             else if (targetNode is IActuatorNode actuatorNode)
             {
                 var nodeOutput = await actuatorNode.ExecuteAsync(input, cancellationToken).ConfigureAwait(false);
-                foreach (var link in targetNode.PortLinks.Where(a => ((a.Target.Model as PortModel)?.Parent) != targetNode))
+                if (nodeOutput.IsSuccess)
                 {
-                    await Analysis((link.Target.Model as PortModel)?.Parent, new NodeInput() { Value = nodeOutput.Value }, rulesLog, cancellationToken).ConfigureAwait(false);
+                    foreach (var link in targetNode.PortLinks.Where(a => ((a.Target.Model as PortModel)?.Parent) != targetNode))
+                    {
+                        await Analysis((link.Target.Model as PortModel)?.Parent, new NodeInput() { Value = nodeOutput.Content.Value }, rulesLog, cancellationToken).ConfigureAwait(false);
+                    }
                 }
             }
             else if (targetNode is ITriggerNode triggerNode)
@@ -200,10 +206,9 @@ internal sealed class RulesEngineHostedService : BackgroundService, IRulesEngine
         foreach (var rules in Rules.Where(a => a.Status))
         {
             var item = Init(rules);
-            await Start(item.rulesLog, item.blazorDiagram, cancellationToken).ConfigureAwait(false);
+            Start(item.rulesLog, item.blazorDiagram, cancellationToken);
         }
         dispatchService.Dispatch(null);
-
 
         _ = Task.Factory.StartNew(async (state) =>
         {

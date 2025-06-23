@@ -12,22 +12,32 @@ public class VariableRpcNode : VariableNode, IActuatorNode
     public VariableRpcNode(string id, Point? position = null) : base(id, position)
     { Title = "VariableRpcNode"; }
 
-    async Task<NodeOutput> IActuatorNode.ExecuteAsync(NodeInput input, CancellationToken cancellationToken)
+    async Task<OperResult<NodeOutput>> IActuatorNode.ExecuteAsync(NodeInput input, CancellationToken cancellationToken)
     {
-        if ((!DeviceText.IsNullOrWhiteSpace()) && GlobalData.ReadOnlyDevices.TryGetValue(DeviceText, out var device))
+        try
         {
-            if (device.ReadOnlyVariableRuntimes.TryGetValue(Text, out var value))
+
+            if ((!DeviceText.IsNullOrWhiteSpace()) && GlobalData.ReadOnlyDevices.TryGetValue(DeviceText, out var device))
             {
-                var data = await value.RpcAsync(input.JToken.ToString(), $"RulesEngine: {RulesEngineName}", cancellationToken).ConfigureAwait(false);
-                if (data.IsSuccess)
-                    Logger?.Trace($" VariableRpcNode - VariableName {Text} : execute success");
-                else
-                    Logger?.Warning($" VariableRpcNode - VariableName {Text} : {data.ErrorMessage}");
-                return new NodeOutput() { Value = data };
+                if (device.ReadOnlyVariableRuntimes.TryGetValue(Text, out var value))
+                {
+                    var data = await value.RpcAsync(input.JToken.ToString(), $"RulesEngine: {RulesEngineName}", cancellationToken).ConfigureAwait(false);
+                    if (data.IsSuccess)
+                        Logger?.Trace($" VariableRpcNode - VariableName {Text} : execute success");
+                    else
+                        Logger?.Warning($" VariableRpcNode - VariableName {Text} : {data.ErrorMessage}");
+                    return new OperResult<NodeOutput>() { Content = new NodeOutput() { Value = data } };
+                }
             }
+            Logger?.Warning($" VariableRpcNode - VariableName {Text} : not found");
+
+            return new OperResult<NodeOutput>() { Content = new NodeOutput() { } };
         }
-        Logger?.Warning($" VariableRpcNode - VariableName {Text} : not found");
-        return new NodeOutput() { };
+        catch (Exception ex)
+        {
+            Logger?.LogWarning(ex);
+            return new OperResult<NodeOutput>(ex);
+        }
     }
 
 

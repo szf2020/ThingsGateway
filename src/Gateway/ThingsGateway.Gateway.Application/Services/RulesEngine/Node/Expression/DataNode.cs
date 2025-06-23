@@ -16,12 +16,21 @@ public class DataNode : TextNode, IExpressionNode
 
     }
 
-    Task<NodeOutput> IExpressionNode.ExecuteAsync(NodeInput input, CancellationToken cancellationToken)
+    Task<OperResult<NodeOutput>> IExpressionNode.ExecuteAsync(NodeInput input, CancellationToken cancellationToken)
     {
-        var value = Text.GetExpressionsResult(input.Value, Logger);
-        NodeOutput nodeOutput = new();
-        nodeOutput.Value = value;
-        Logger?.Trace($"Data result: {nodeOutput.JToken?.ToString(Newtonsoft.Json.Formatting.Indented)}");
-        return Task.FromResult(nodeOutput);
+        try
+        {
+            var value = Text.GetExpressionsResult(input.Value, Logger);
+            NodeOutput nodeOutput = new();
+            nodeOutput.Value = value;
+            Logger?.Trace($"Data result: {nodeOutput.JToken?.ToString(Newtonsoft.Json.Formatting.Indented)}");
+            return Task.FromResult(new OperResult<NodeOutput>() { Content = nodeOutput });
+        }
+        catch (Exception ex)
+        {
+            Logger?.LogWarning(ex);
+            return Task.FromResult(new OperResult<NodeOutput>(ex));
+        }
+
     }
 }

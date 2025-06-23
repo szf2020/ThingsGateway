@@ -440,6 +440,7 @@
     "BoolOpenRestrainExpressions": "布尔开报警约束",
     "BusinessGroup": "业务组",
     "BusinessGroupUpdateTrigger": "分组上传触发",
+    "RpcWriteCheck": "写入后再次读取检查值是否一致",
     "ClearVariable": "清空变量",
     "CollectGroup": "采集组",
     "CopyVariable": "复制变量",

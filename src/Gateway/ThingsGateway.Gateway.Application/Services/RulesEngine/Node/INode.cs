@@ -13,11 +13,11 @@ public interface IConditionNode : INode
 
 public interface IExpressionNode : INode
 {
-    public Task<NodeOutput> ExecuteAsync(NodeInput input, CancellationToken cancellationToken);
+    public Task<OperResult<NodeOutput>> ExecuteAsync(NodeInput input, CancellationToken cancellationToken);
 }
 public interface IActuatorNode : INode
 {
-    public Task<NodeOutput> ExecuteAsync(NodeInput input, CancellationToken cancellationToken);
+    public Task<OperResult<NodeOutput>> ExecuteAsync(NodeInput input, CancellationToken cancellationToken);
 }
 
 public interface ITriggerNode : INode
@@ -30,6 +30,6 @@ public interface IExexcuteExpressionsBase
 public interface IExexcuteExpressions : IExexcuteExpressionsBase
 {
     public TouchSocket.Core.ILog Logger { get; set; }
-    Task<NodeOutput> ExecuteAsync(NodeInput input, CancellationToken cancellationToken);
+    Task<OperResult<NodeOutput>> ExecuteAsync(NodeInput input, CancellationToken cancellationToken);
 }
 

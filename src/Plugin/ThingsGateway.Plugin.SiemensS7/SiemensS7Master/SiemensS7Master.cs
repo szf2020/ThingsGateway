@@ -179,6 +179,7 @@ public class SiemensS7Master : CollectFoundationBase
                 }
             }).ConfigureAwait(false);
 
+            await Check(writeInfoLists, operResults, cancellationToken).ConfigureAwait(false);
 
             // 返回包含操作结果的字典
             return new Dictionary<string, OperResult>(operResults);

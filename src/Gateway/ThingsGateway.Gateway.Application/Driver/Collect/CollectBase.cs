@@ -344,6 +344,8 @@ public abstract class CollectBase : DriverBase, IRpcDriver
 
         var readErrorCount = 0;
 
+        await ReadWriteLock.ReaderLockAsync(cancellationToken).ConfigureAwait(false);
+
         //if (LogMessage?.LogLevel <= TouchSocket.Core.LogLevel.Trace)
         //    LogMessage?.Trace(string.Format("{0} - Collecting [{1} - {2}]", DeviceName, variableSourceRead?.RegisterAddress, variableSourceRead?.Length));
         var readResult = await ReadSourceAsync(variableSourceRead, cancellationToken).ConfigureAwait(false);
@@ -460,7 +462,40 @@ public abstract class CollectBase : DriverBase, IRpcDriver
     {
         throw new NotImplementedException();
     }
+    protected async Task Check(Dictionary<VariableRuntime, JToken> writeInfoLists, ConcurrentDictionary<string, OperResult> operResults, CancellationToken cancellationToken)
+    {
+        if (VariableSourceReadsEnable)
+        {
+            // 如果成功，每个变量都读取一次最新值，再次比较写入值
+            var successfulWriteNames = operResults.Where(a => a.Value.IsSuccess).Select(a => a.Key).ToHashSet();
 
+            var groups = writeInfoLists.Select(a => a.Key).Where(a => a.RpcWriteCheck && a.ProtectType != ProtectTypeEnum.WriteOnly && successfulWriteNames.Contains(a.Name) && a.VariableSource != null).GroupBy(a => a.VariableSource as VariableSourceRead).Where(a => a.Key != null).ToList();
+
+            await groups.ParallelForEachAsync(async (varRead, token) =>
+            {
+                var result = await ReadSourceAsync(varRead.Key, token).ConfigureAwait(false);
+                if (result.IsSuccess)
+                {
+                    foreach (var item in varRead)
+                    {
+                        if (!item.Value.Equals(writeInfoLists[item].ToObject(item.Value?.GetType())))
+                        {
+                            // 如果写入值与读取值不同，则更新操作结果为失败
+                            operResults[item.Name] = new OperResult($"The write value is inconsistent with the read value,  Write value: {writeInfoLists[item].ToObject(item.Value?.GetType())}, read value: {item.Value}");
+                        }
+                    }
+                }
+                else
+                {
+                    foreach (var item in varRead)
+                    {
+                        // 如果写入值与读取值不同，则更新操作结果为失败
+                        operResults[item.Name] = new OperResult($"Reading and rechecking resulted in an error: {result.ErrorMessage}", result.Exception);
+                    }
+                }
+            }, cancellationToken).ConfigureAwait(false);
+        }
+    }
 
     #region 写入方法
 

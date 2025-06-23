@@ -10,11 +10,20 @@ public class DelayNode : NumberNode, IExpressionNode
 {
     public DelayNode(string id, Point? position = null) : base(id, position) { Title = "DelayNode"; Placeholder = "DelayNode.Placeholder"; }
 
-    async Task<NodeOutput> IExpressionNode.ExecuteAsync(NodeInput input, CancellationToken cancellationToken)
+    async Task<OperResult<NodeOutput>> IExpressionNode.ExecuteAsync(NodeInput input, CancellationToken cancellationToken)
     {
-        Logger?.Trace($"Delay {Number} ms");
-        await Task.Delay(Number ?? 0, cancellationToken).ConfigureAwait(false);
-        return new NodeOutput();
+        try
+        {
+            Logger?.Trace($"Delay {Number} ms");
+            await Task.Delay(Number ?? 0, cancellationToken).ConfigureAwait(false);
+            return new OperResult<NodeOutput>() { Content = new NodeOutput() };
+        }
+        catch (Exception ex)
+        {
+            Logger?.LogWarning(ex);
+            return new OperResult<NodeOutput>(ex);
+        }
+
     }
 
 }

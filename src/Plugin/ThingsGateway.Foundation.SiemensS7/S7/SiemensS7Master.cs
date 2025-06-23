@@ -139,26 +139,35 @@ public partial class SiemensS7Master : DeviceBase
                 {
                     int num = 0;
                     var addressLen = sAddress.Length == 0 ? 1 : sAddress.Length;
-                    while (num < addressLen)
+                    var start = sAddress.AddressStart;
+                    try
                     {
-                        //pdu长度，重复生成报文，直至全部生成
-                        int len = Math.Min(addressLen - num, PduLength);
-                        sAddress.Length = len;
 
-                        var result = await SendThenReturnAsync(new S7Send([sAddress], true), cancellationToken: cancellationToken).ConfigureAwait(false);
-                        if (!result.IsSuccess) return result;
-
-                        byteBlock.Write(result.Content);
-                        num += len;
-
-                        if (sAddress.DataCode == S7Area.TM || sAddress.DataCode == S7Area.CT)
+                        while (num < addressLen)
                         {
-                            sAddress.AddressStart += len / 2;
+                            //pdu长度，重复生成报文，直至全部生成
+                            int len = Math.Min(addressLen - num, PduLength);
+                            sAddress.Length = len;
+                            var result = await SendThenReturnAsync(new S7Send([sAddress], true), cancellationToken: cancellationToken).ConfigureAwait(false);
+                            if (!result.IsSuccess) return result;
+
+                            byteBlock.Write(result.Content);
+                            num += len;
+
+                            if (sAddress.DataCode == S7Area.TM || sAddress.DataCode == S7Area.CT)
+                            {
+                                sAddress.AddressStart += len / 2;
+                            }
+                            else
+                            {
+                                sAddress.AddressStart += len * 8;
+                            }
+
                         }
-                        else
-                        {
-                            sAddress.AddressStart += len * 8;
-                        }
+                    }
+                    finally
+                    {
+                        sAddress.AddressStart = start;
                     }
                 }
 
@@ -361,6 +370,7 @@ public partial class SiemensS7Master : DeviceBase
     {
         try
         {
+            SetDataAdapter(channel);
             AutoConnect = false;
             var ISO_CR = SiemensHelper.ISO_CR;
 

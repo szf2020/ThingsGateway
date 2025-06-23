@@ -133,7 +133,6 @@ public abstract class CollectFoundationBase : CollectBase
     {
         try
         {
-            await ReadWriteLock.ReaderLockAsync(cancellationToken).ConfigureAwait(false);
 
             if (cancellationToken.IsCancellationRequested)
                 return new(new OperationCanceledException());
@@ -202,6 +201,8 @@ public abstract class CollectFoundationBase : CollectBase
                 }
             }, CollectProperties.MaxConcurrentCount, cancellationToken).ConfigureAwait(false);
 
+            await Check(writeInfoLists, operResults, cancellationToken).ConfigureAwait(false);
+
             // 返回包含操作结果的字典
             return new Dictionary<string, OperResult>(operResults);
         }
@@ -209,5 +210,6 @@ public abstract class CollectFoundationBase : CollectBase
         {
         }
     }
+
 
 }

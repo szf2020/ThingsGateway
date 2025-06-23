@@ -13,6 +13,8 @@ using Newtonsoft.Json.Linq;
 using Opc.Ua;
 using Opc.Ua.Client;
 
+using System.Collections.Concurrent;
+
 using ThingsGateway.Foundation.Extension.Generic;
 using ThingsGateway.Foundation.OpcUa;
 using ThingsGateway.Gateway.Application;
@@ -281,7 +283,7 @@ public class OpcUaMaster : CollectBase
         try
         {
             var result = await _plc.WriteNodeAsync(writeInfoLists.ToDictionary(a => a.Key.RegisterAddress!, a => a.Value), cancellationToken).ConfigureAwait(false);
-            return result.ToDictionary<KeyValuePair<string, Tuple<bool, string>>, string, OperResult>(a =>
+            var results = new ConcurrentDictionary<string, OperResult>(result.ToDictionary<KeyValuePair<string, Tuple<bool, string>>, string, OperResult>(a =>
             {
                 return writeInfoLists.Keys.FirstOrDefault(b => b.RegisterAddress == a.Key)?.Name!;
             }
@@ -291,7 +293,12 @@ public class OpcUaMaster : CollectBase
                     return new OperResult(a.Value.Item2);
                 else
                     return OperResult.Success;
-            })!;
+            }));
+
+            await Check(writeInfoLists, results, cancellationToken).ConfigureAwait(false);
+
+            return new(results);
+
         }
         finally
         {

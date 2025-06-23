@@ -66,6 +66,7 @@ public class Variable : BaseDataEntity, IValidatableObject
     private bool lAlarmEnable;
     private bool customAlarmEnable;
     private bool businessGroupUpdateTrigger = true;
+    private bool rpcWriteCheck;
 
     private object _value;
     private string name;
@@ -147,6 +148,13 @@ public class Variable : BaseDataEntity, IValidatableObject
     [SugarColumn(ColumnDescription = "分组上传触发变量", IsNullable = true)]
     [AutoGenerateColumn(Visible = true, Filterable = true, Sortable = true, Order = 1)]
     public virtual bool BusinessGroupUpdateTrigger { get => businessGroupUpdateTrigger; set => businessGroupUpdateTrigger = value; }
+
+    /// <summary>
+    /// 写入后再次读取检查值是否一致
+    /// </summary>
+    [SugarColumn(ColumnDescription = "写入后再次读取检查值是否一致", IsNullable = true)]
+    [AutoGenerateColumn(Visible = true, Filterable = true, Sortable = true, Order = 1)]
+    public virtual bool RpcWriteCheck { get => rpcWriteCheck; set => rpcWriteCheck = value; }
 
     /// <summary>
     /// 描述

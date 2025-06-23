@@ -11,7 +11,7 @@
 	</PropertyGroup>
 	
 	<ItemGroup>
-		<PackageReference Include="BootstrapBlazor.TableExport" Version="9.2.5" />
+		<PackageReference Include="BootstrapBlazor.TableExport" Version="9.2.6" />
 	</ItemGroup>
 
 	<ItemGroup>

@@ -44,9 +44,17 @@ namespace ThingsGateway.Gateway.Razor
             if(Node is IConditionNode conditionNode)
           return  (await conditionNode.ExecuteAsync(new NodeInput(){Value=a==null?a:JToken.Parse(a??string.Empty) },default).ConfigureAwait(false)).ToString();
              if(Node is IExpressionNode expressionNode)
-          return  (await expressionNode.ExecuteAsync(new NodeInput(){Value=a==null?a:JToken.Parse(a??string.Empty) },default).ConfigureAwait(false)).JToken?.ToString();
+            {
+                var data=await expressionNode.ExecuteAsync(new NodeInput(){Value=a==null?a:JToken.Parse(a??string.Empty) },default).ConfigureAwait(false);
+
+               return  data.IsSuccess? data.Content.JToken?.ToString()??string.Empty: data.ToString();
+            }
              if(Node is IActuatorNode actuatorNode)
-          return  (await actuatorNode.ExecuteAsync(new NodeInput(){Value=a==null?a:JToken.Parse(a??string.Empty) },default).ConfigureAwait(false)).JToken?.ToString();
+            {
+                                var data=await actuatorNode.ExecuteAsync(new NodeInput(){Value=a==null?a:JToken.Parse(a??string.Empty) },default).ConfigureAwait(false);
+
+               return  data.IsSuccess? data.Content.JToken?.ToString()??string.Empty: data.ToString();
+            }
         return string.Empty;
         }) },
         {nameof(ScriptEdit.Script),Node.Text },

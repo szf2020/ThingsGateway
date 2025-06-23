@@ -35,8 +35,9 @@
         <TableColumn @bind-Field="@context.Name" ShowTips=true Filterable=true Sortable=true Visible=true />
         <TableColumn @bind-Field="@context.Description" ShowTips=true Filterable=true Sortable=true Visible=true />
         <TableColumn @bind-Field="@context.BusinessGroup" ShowTips=true Filterable=true Sortable=true Visible=true />
-        <TableColumn @bind-Field="@context.BusinessGroupUpdateTrigger" ShowTips=true Filterable=true Sortable=true Visible=true />
-        
+        <TableColumn @bind-Field="@context.BusinessGroupUpdateTrigger" ShowTips=true Filterable=true Sortable=true Visible=false />
+        <TableColumn @bind-Field="@context.RpcWriteCheck" ShowTips=true Filterable=true Sortable=true Visible=false />
+
         <TableColumn @bind-Field="@context.Enable" Filterable=true Sortable=true Visible="false" />
         <TableColumn Field="@context.ChangeTime" ShowTips=true FieldExpression=@(()=>context.ChangeTime) Filterable=true Sortable=true Visible=false />
         <TableColumn Field="@context.CollectTime" ShowTips=true FieldExpression=@(()=>context.CollectTime) Filterable=true Sortable=true Visible=true />

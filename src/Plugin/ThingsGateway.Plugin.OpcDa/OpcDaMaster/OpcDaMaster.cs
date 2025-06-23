@@ -10,6 +10,8 @@
 
 using Newtonsoft.Json.Linq;
 
+using System.Collections.Concurrent;
+
 using ThingsGateway.Foundation.OpcDa;
 using ThingsGateway.Foundation.OpcDa.Da;
 using ThingsGateway.Gateway.Application;
@@ -159,7 +161,7 @@ public class OpcDaMaster : CollectBase
         try
         {
             var result = _plc.WriteItem(writeInfoLists.ToDictionary(a => a.Key.RegisterAddress!, a => a.Value.GetObjectFromJToken()!));
-            return result.ToDictionary<KeyValuePair<string, Tuple<bool, string>>, string, OperResult>(a =>
+            var results = new ConcurrentDictionary<string, OperResult>(result.ToDictionary<KeyValuePair<string, Tuple<bool, string>>, string, OperResult>(a =>
             {
                 return writeInfoLists.Keys.FirstOrDefault(b => b.RegisterAddress == a.Key).Name;
             }, a =>
@@ -169,7 +171,11 @@ public class OpcDaMaster : CollectBase
                 else
                     return OperResult.Success;
             }
-                 );
+                 ));
+
+            await Check(writeInfoLists, results, cancellationToken).ConfigureAwait(false);
+
+            return new(results);
         }
         finally
         {

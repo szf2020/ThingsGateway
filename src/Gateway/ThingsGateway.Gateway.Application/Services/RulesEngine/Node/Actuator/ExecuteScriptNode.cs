@@ -104,12 +104,21 @@ public class ExecuteScriptNode : TextNode, IActuatorNode, IExexcuteExpressionsBa
         }
     }
 
-    Task<NodeOutput> IActuatorNode.ExecuteAsync(NodeInput input, CancellationToken cancellationToken)
+    Task<OperResult<NodeOutput>> IActuatorNode.ExecuteAsync(NodeInput input, CancellationToken cancellationToken)
     {
-        Logger?.Trace($"Execute script");
-        var exexcuteExpressions = CSharpScriptEngineExtension.Do<IExexcuteExpressions>(Text);
-        exexcuteExpressions.Logger = Logger;
-        return exexcuteExpressions.ExecuteAsync(input, cancellationToken);
+        try
+        {
+            Logger?.Trace($"Execute script");
+            var exexcuteExpressions = CSharpScriptEngineExtension.Do<IExexcuteExpressions>(Text);
+            exexcuteExpressions.Logger = Logger;
+            return exexcuteExpressions.ExecuteAsync(input, cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            Logger?.LogWarning(ex);
+            return Task.FromResult(new OperResult<NodeOutput>(ex));
+        }
+
 
     }
 

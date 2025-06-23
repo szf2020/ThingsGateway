@@ -439,7 +439,7 @@ public abstract class BusinessBaseWithCacheVariableModel<VarModel> : BusinessBas
             {
                 if (cancellationToken.IsCancellationRequested)
                     break;
-                    var list = cacheDBItem.Value;
+                var list = cacheDBItem.Value;
                 var data = list.ChunkBetter(_businessPropertyWithCache.SplitSize);
                 foreach (var item in data)
                 {
