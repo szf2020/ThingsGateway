@@ -18,8 +18,6 @@ namespace ThingsGateway.Extension.Generic;
 [ThingsGateway.DependencyInjection.SuppressSniffer]
 public static class GenericExtensions
 {
-    private static MemoryCache Instance { get; set; } = new MemoryCache();
-
     /// <summary>
     /// 把已修改的属性赋值到列表中，并返回字典
     /// </summary>
