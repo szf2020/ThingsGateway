@@ -30,6 +30,6 @@ public interface IExexcuteExpressionsBase
 public interface IExexcuteExpressions : IExexcuteExpressionsBase
 {
     public TouchSocket.Core.ILog Logger { get; set; }
-    Task<OperResult<NodeOutput>> ExecuteAsync(NodeInput input, CancellationToken cancellationToken);
+    Task<NodeOutput> ExecuteAsync(NodeInput input, CancellationToken cancellationToken);
 }
 
