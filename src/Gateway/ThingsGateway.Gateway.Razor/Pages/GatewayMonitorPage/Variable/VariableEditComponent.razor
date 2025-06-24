@@ -113,8 +113,28 @@
                 </EditorItem>
                 <EditorItem @bind-Field="@context.ArrayLength" />
 
-                <EditorItem @bind-Field="@context.ReadExpressions" Rows="1" />
-                <EditorItem @bind-Field="@context.WriteExpressions" Rows="1" />
+                <EditorItem @bind-Field="@context.ReadExpressions">
+                    <EditTemplate Context="value">
+                        <div class="col-12">
+                            <BootstrapInputGroup>
+
+                                <Textarea rows="1" @bind-Value="value.ReadExpressions" ShowLabel="true"></Textarea>
+                                <Button Icon="fa-solid fa-bars" OnClick="() => ShowExpressionsUI(true)"></Button>
+                            </BootstrapInputGroup>
+                        </div>
+                    </EditTemplate>
+                </EditorItem>
+                <EditorItem @bind-Field="@context.WriteExpressions">
+                    <EditTemplate Context="value">
+                        <div class="col-12">
+                            <BootstrapInputGroup>
+
+                                <Textarea rows="1" @bind-Value="value.WriteExpressions" ShowLabel="true"></Textarea>
+                                <Button Icon="fa-solid fa-bars" OnClick="() => ShowExpressionsUI(false)"></Button>
+                            </BootstrapInputGroup>
+                        </div>
+                    </EditTemplate>
+                </EditorItem>
 
 
                 <EditorItem TValue="string" TModel="Variable" @bind-Field="@context.Description">

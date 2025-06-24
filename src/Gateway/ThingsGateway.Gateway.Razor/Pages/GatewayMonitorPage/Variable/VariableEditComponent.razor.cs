@@ -163,7 +163,37 @@ public partial class VariableEditComponent
         op.Component = AddressDynamicComponent;
         await DialogService.Show(op);
     }
-
+    [Inject]
+    IStringLocalizer<Variable> VariableLocalizer { get; set; }
+    private async Task ShowExpressionsUI(bool read)
+    {
+        var op = new DialogOption()
+        {
+            IsScrolling = false,
+            ShowMaximizeButton = true,
+            Size = Size.Large,
+            Title = $"{Model.Name} {(read ? VariableLocalizer[nameof(Variable.ReadExpressions)] : VariableLocalizer[nameof(Variable.WriteExpressions)])}",
+            ShowFooter = false,
+            ShowCloseButton = false,
+            BodyTemplate = BootstrapDynamicComponent.CreateComponent<ValueTransformConfigPage>(new Dictionary<string, object?>
+        {
+             {nameof(ValueTransformConfigPage.ExpressionsChanged),  EventCallback.Factory.Create<string>(this,a =>
+             {
+                  if(read)
+                 {
+                     Model.ReadExpressions = a;
+                 }
+                else
+                 {
+                     Model.WriteExpressions=a;
+                 }
+            })
+},
+            {nameof(ValueTransformConfigPage.Expressions),read?Model.ReadExpressions:Model.WriteExpressions },
+        }).Render(),
+        };
+        await DialogService.Show(op);
+    }
 
     [Inject]
     private IStringLocalizer<Device> DeviceLocalizer { get; set; }

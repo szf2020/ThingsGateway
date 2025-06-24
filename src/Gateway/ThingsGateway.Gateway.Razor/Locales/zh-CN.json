@@ -1,4 +1,20 @@
 ﻿{
+  "ThingsGateway.Gateway.Razor.ValueTransformType": {
+    "None": "无",
+    "Linear": "线性",
+    "Sqrt": "开方"
+  },
+  "ThingsGateway.Gateway.Razor.ValueTransformConfig": {
+    "TransformType": "转换方式",
+    "MinMax": "最小最大值",
+    "ClampToRawRange": "限制范围",
+    "DecimalPlaces": "保留小数位",
+    "RawMin": "原始最小值",
+    "RawMax": "原始最大值",
+    "ActualMin": "实际最小值",
+    "ActualMax": "实际最大值"
+  },
+
   "ThingsGateway.Management.Authentication": {
     "AuthName": "公司名称",
     "Authorized": "已授权",
