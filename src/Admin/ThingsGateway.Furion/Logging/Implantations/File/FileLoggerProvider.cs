@@ -171,7 +171,7 @@ public sealed class FileLoggerProvider : ILoggerProvider, ISupportExternalScope
         {
             try
             {
-                if (!_logMessageQueue.TryAdd(logMsg,5000))
+                if (!_logMessageQueue.TryAdd(logMsg, 5000))
                 {
                     XTrace.Log.Warn($"{nameof(DatabaseLoggerProvider)} queue add fail");
                 }
