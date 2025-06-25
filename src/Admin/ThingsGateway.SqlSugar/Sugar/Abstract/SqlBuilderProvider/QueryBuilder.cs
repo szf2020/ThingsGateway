@@ -13,7 +13,7 @@ namespace ThingsGateway.SqlSugar
             this.Parameters = new List<SugarParameter>();
         }
 
-        #region Private Fileds
+        #region Private Fields
         protected List<JoinQueryInfo> _JoinQueryInfos;
         protected Dictionary<string, string> _EasyJoinInfos;
         private List<string> _WhereInfos;
@@ -42,8 +42,8 @@ namespace ThingsGateway.SqlSugar
         internal List<List<QueryableAppendColumn>> AppendValues { get; set; }
         public bool IsCrossQueryWithAttr { get; set; }
         public Dictionary<string, string> CrossQueryItems { get; set; }
-        public bool IsSelectSingleFiledJson { get; set; }
-        public bool IsSelectSingleFiledArray { get; set; }
+        public bool IsSelectSingleFieldJson { get; set; }
+        public bool IsSelectSingleFieldArray { get; set; }
         public string TranLock { get; set; }
         public bool IsDisableMasterSlaveSeparation { get; set; }
         public bool IsEnableMasterSlaveSeparation { get; set; }

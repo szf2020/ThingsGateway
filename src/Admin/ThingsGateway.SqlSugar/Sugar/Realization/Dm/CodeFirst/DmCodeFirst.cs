@@ -14,7 +14,7 @@
                     DbColumnInfo dbColumnInfo = this.EntityColumnToDbColumn(entityInfo, tableName, item);
                     columns.Add(dbColumnInfo);
                 }
-                if (entityInfo.IsCreateTableFiledSort)
+                if (entityInfo.IsCreateTableFieldSort)
                 {
                     columns = columns.OrderBy(c => c.CreateTableFieldSort).ToList();
                     columns = columns.OrderBy(it => it.IsPrimarykey ? 0 : 1).ToList();

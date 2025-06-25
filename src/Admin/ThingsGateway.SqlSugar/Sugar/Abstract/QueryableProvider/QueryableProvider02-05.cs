@@ -435,9 +435,9 @@ namespace ThingsGateway.SqlSugar
             QueryBuilder.DisableTop = true;
             return this;
         }
-        public new ISugarQueryable<T, T2> PartitionBy(string groupFileds)
+        public new ISugarQueryable<T, T2> PartitionBy(string groupFields)
         {
-            base.PartitionBy(groupFileds);
+            base.PartitionBy(groupFields);
             return this;
         }
         public new virtual ISugarQueryable<T, T2> GroupByIF(bool isGroupBy, Expression<Func<T, object>> expression)
@@ -1010,9 +1010,9 @@ namespace ThingsGateway.SqlSugar
             QueryBuilder.DisableTop = true;
             return this;
         }
-        public new ISugarQueryable<T, T2, T3> PartitionBy(string groupFileds)
+        public new ISugarQueryable<T, T2, T3> PartitionBy(string groupFields)
         {
-            base.PartitionBy(groupFileds);
+            base.PartitionBy(groupFields);
             return this;
         }
         public new virtual ISugarQueryable<T, T2, T3> GroupByIF(bool isGroupBy, Expression<Func<T, object>> expression)

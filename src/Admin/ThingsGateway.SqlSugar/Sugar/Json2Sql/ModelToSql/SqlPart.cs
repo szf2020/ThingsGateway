@@ -10,7 +10,7 @@ namespace ThingsGateway.SqlSugar
         #region Root
         private string GetSqlPart(object value, List<SugarParameter> pars)
         {
-            Check.Exception(value == null, $" FiledName is error ");
+            Check.Exception(value == null, $" FieldName is error ");
             if (IsSqlSplicingOperator(value))
             {
                 return GetSqlSplicingOperator(value);

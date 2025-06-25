@@ -22,7 +22,6 @@ using ThingsGateway.NewLife.Json.Extension;
 using ThingsGateway.SqlSugar;
 
 using TouchSocket.Core;
-using TouchSocket.Sockets;
 
 namespace ThingsGateway.Plugin.Modbus;
 
@@ -83,14 +82,16 @@ public class ModbusSlave : BusinessBase
     /// <returns></returns>
     protected override async Task ProtectedStartAsync(CancellationToken cancellationToken)
     {
-        if (_plc?.Channel != null)
-            await _plc.Channel.ConnectAsync(_plc.Channel.ChannelOptions.ConnectTimeout, cancellationToken).ConfigureAwait(false);
+        await _plc.ConnectAsync(cancellationToken).ConfigureAwait(false);
     }
 
     /// <inheritdoc/>
     protected override async Task InitChannelAsync(IChannel? channel, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(channel);
+        var plc = _plc;
+        _plc = new();
+        plc?.SafeDispose();
         //载入配置
         _plc.DataFormat = _driverPropertys.DataFormat;
         _plc.IsStringReverseByteWord = _driverPropertys.IsStringReverseByteWord;
@@ -106,7 +107,7 @@ public class ModbusSlave : BusinessBase
 
         try
         {
-            await _plc.Channel.ConnectAsync(_plc.Channel.ChannelOptions.ConnectTimeout, CancellationToken.None).ConfigureAwait(false);
+            await _plc.ConnectAsync(cancellationToken).ConfigureAwait(false);
         }
         catch
         {
@@ -158,8 +159,7 @@ public class ModbusSlave : BusinessBase
             {
                 if (cancellationToken.IsCancellationRequested)
                     return;
-                await _plc.Channel.CloseAsync().ConfigureAwait(false);
-                await _plc.Channel.ConnectAsync(3000, cancellationToken).ConfigureAwait(false);
+                await _plc.ConnectAsync(cancellationToken).ConfigureAwait(false);
                 success = true;
             }
             catch (ObjectDisposedException) { }

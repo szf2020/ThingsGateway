@@ -58,8 +58,11 @@ public abstract class CollectFoundationBase : CollectBase
     /// <returns></returns>
     protected override async Task ProtectedStartAsync(CancellationToken cancellationToken)
     {
-        if (FoundationDevice?.Channel != null)
-            await FoundationDevice.Channel.ConnectAsync(FoundationDevice.Channel.ChannelOptions.ConnectTimeout, cancellationToken).ConfigureAwait(false);
+        if (FoundationDevice != null)
+        {
+            await FoundationDevice.ConnectAsync(cancellationToken).ConfigureAwait(false);
+        }
+
     }
 
     public override string GetAddressDescription()
@@ -72,15 +75,27 @@ public abstract class CollectFoundationBase : CollectBase
     {
         if (FoundationDevice != null)
         {
-            if (FoundationDevice.OnLine == false)
+            if (!FoundationDevice.OnLine)
             {
+                if (!FoundationDevice.DisposedValue || FoundationDevice.Channel?.DisposedValue != false) return;
                 Exception exception = null;
                 try
                 {
                     if (!cancellationToken.IsCancellationRequested)
                     {
-                        await FoundationDevice.Channel.ConnectAsync(FoundationDevice.Channel.ChannelOptions.ConnectTimeout, cancellationToken).ConfigureAwait(false);
+                        if (!FoundationDevice.DisposedValue || FoundationDevice.Channel?.DisposedValue != false) return;
+
+                        await FoundationDevice.ConnectAsync(cancellationToken).ConfigureAwait(false);
+
+                        if (CurrentDevice.DeviceStatusChangeTime < TimerX.Now.AddMinutes(-1))
+                        {
+                            await Task.Delay(30000, cancellationToken).ConfigureAwait(false);
+                        }
+
                     }
+                }
+                catch (OperationCanceledException)
+                {
                 }
                 catch (Exception ex)
                 {

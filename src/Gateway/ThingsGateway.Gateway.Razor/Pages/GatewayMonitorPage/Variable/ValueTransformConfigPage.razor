@@ -15,10 +15,10 @@
             <EditorItem @bind-Field="@context.DecimalPlaces" GroupName=@(ValueTransformConfigLocalizer["TransformType"]) Cols="4" />
 
 
-            <EditorItem @bind-Field="@context.RawMin" GroupName=@(ValueTransformConfigLocalizer["MinMax"]) GroupOrder=2 Cols="6" /> 
-            <EditorItem @bind-Field="@context.RawMax" GroupName=@(ValueTransformConfigLocalizer["MinMax"]) GroupOrder=2 Cols="6" />
-            <EditorItem @bind-Field="@context.ActualMin" GroupName=@(ValueTransformConfigLocalizer["MinMax"]) GroupOrder=2 Cols="6" />
-            <EditorItem @bind-Field="@context.ActualMax" GroupName=@(ValueTransformConfigLocalizer["MinMax"]) GroupOrder=2 Cols="6" />
+            <EditorItem @bind-Field="@context.RawMin" Readonly=@(context.TransformType != ValueTransformType.Linear) GroupName=@(ValueTransformConfigLocalizer["MinMax"]) GroupOrder=2 Cols="6" />
+            <EditorItem @bind-Field="@context.RawMax" Readonly=@(context.TransformType != ValueTransformType.Linear) GroupName=@(ValueTransformConfigLocalizer["MinMax"]) GroupOrder=2 Cols="6" />
+            <EditorItem @bind-Field="@context.ActualMin" Readonly=@(context.ClampToRawRange == false && context.TransformType != ValueTransformType.Linear) GroupName=@(ValueTransformConfigLocalizer["MinMax"]) GroupOrder=2 Cols="6" />
+            <EditorItem @bind-Field="@context.ActualMax" Readonly=@(context.ClampToRawRange == false && context.TransformType != ValueTransformType.Linear) GroupName=@(ValueTransformConfigLocalizer["MinMax"]) GroupOrder=2 Cols="6" />
 
 
         </FieldItems>

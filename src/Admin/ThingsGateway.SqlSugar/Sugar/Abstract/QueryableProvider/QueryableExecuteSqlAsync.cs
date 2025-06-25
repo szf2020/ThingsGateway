@@ -502,8 +502,8 @@ namespace ThingsGateway.SqlSugar
             totalNumber.Value = count;
         }
 
-        public async Task<List<T>> SetContextAsync<ParameterT>(Expression<Func<T, object>> thisFiled1, Expression<Func<object>> mappingFiled1,
-Expression<Func<T, object>> thisFiled2, Expression<Func<object>> mappingFiled2,
+        public async Task<List<T>> SetContextAsync<ParameterT>(Expression<Func<T, object>> thisField1, Expression<Func<object>> mappingField1,
+Expression<Func<T, object>> thisField2, Expression<Func<object>> mappingField2,
 ParameterT parameter)
         {
             if (parameter == null)
@@ -515,22 +515,22 @@ ParameterT parameter)
             List<T> result = new List<T>();
             var queryableContext = this.Context.TempItems["Queryable_To_Context"] as MapperContext<ParameterT>;
             var list = queryableContext.list;
-            var key = thisFiled1.ToString() + mappingFiled1.ToString() +
-                      thisFiled2.ToString() + mappingFiled2.ToString() +
+            var key = thisField1.ToString() + mappingField1.ToString() +
+                      thisField2.ToString() + mappingField2.ToString() +
                        typeof(ParameterT).FullName + typeof(T).FullName;
             MappingFieldsHelper<ParameterT> fieldsHelper = new MappingFieldsHelper<ParameterT>();
             var mappings = new List<MappingFieldsExpression>() {
                new MappingFieldsExpression(){
-               LeftColumnExpression=thisFiled1,
-               LeftEntityColumn=leftEntity.Columns.First(it=>it.PropertyName==ExpressionTool.GetMemberName(thisFiled1)),
-               RightColumnExpression=mappingFiled1,
-               RightEntityColumn=rightEntity.Columns.First(it=>it.PropertyName==ExpressionTool.GetMemberName(mappingFiled1))
+               LeftColumnExpression=thisField1,
+               LeftEntityColumn=leftEntity.Columns.First(it=>it.PropertyName==ExpressionTool.GetMemberName(thisField1)),
+               RightColumnExpression=mappingField1,
+               RightEntityColumn=rightEntity.Columns.First(it=>it.PropertyName==ExpressionTool.GetMemberName(mappingField1))
              },
                new MappingFieldsExpression(){
-               LeftColumnExpression=thisFiled2,
-               LeftEntityColumn=leftEntity.Columns.First(it=>it.PropertyName==ExpressionTool.GetMemberName(thisFiled2)),
-               RightColumnExpression=mappingFiled2,
-               RightEntityColumn=rightEntity.Columns.First(it=>it.PropertyName==ExpressionTool.GetMemberName(mappingFiled2))
+               LeftColumnExpression=thisField2,
+               LeftEntityColumn=leftEntity.Columns.First(it=>it.PropertyName==ExpressionTool.GetMemberName(thisField2)),
+               RightColumnExpression=mappingField2,
+               RightEntityColumn=rightEntity.Columns.First(it=>it.PropertyName==ExpressionTool.GetMemberName(mappingField2))
              }
             };
             var conditionals = fieldsHelper.GetMppingSql(list.Cast<object>().ToList(), mappings);
@@ -550,22 +550,22 @@ ParameterT parameter)
             var newResult = fieldsHelper.GetSetList(obj, listObj, mappings).Select(it => (T)it).ToList();
             return newResult;
         }
-        public async Task<List<T>> SetContextAsync<ParameterT>(Expression<Func<T, object>> thisFiled, Expression<Func<object>> mappingFiled, ParameterT parameter)
+        public async Task<List<T>> SetContextAsync<ParameterT>(Expression<Func<T, object>> thisField, Expression<Func<object>> mappingField, ParameterT parameter)
         {
             List<T> result = new List<T>();
             var entity = this.Context.EntityMaintenance.GetEntityInfo<ParameterT>();
             var queryableContext = this.Context.TempItems["Queryable_To_Context"] as MapperContext<ParameterT>;
             var list = queryableContext.list;
             var pkName = "";
-            if ((mappingFiled as LambdaExpression).Body is UnaryExpression)
+            if ((mappingField as LambdaExpression).Body is UnaryExpression)
             {
-                pkName = (((mappingFiled as LambdaExpression).Body as UnaryExpression).Operand as MemberExpression).Member.Name;
+                pkName = (((mappingField as LambdaExpression).Body as UnaryExpression).Operand as MemberExpression).Member.Name;
             }
             else
             {
-                pkName = ((mappingFiled as LambdaExpression).Body as MemberExpression).Member.Name;
+                pkName = ((mappingField as LambdaExpression).Body as MemberExpression).Member.Name;
             }
-            var key = thisFiled.ToString() + mappingFiled.ToString() + typeof(ParameterT).FullName + typeof(T).FullName;
+            var key = thisField.ToString() + mappingField.ToString() + typeof(ParameterT).FullName + typeof(T).FullName;
             var ids = list.Select(it => it.GetType().GetProperty(pkName).GetValue(it)).ToArray();
             if (queryableContext.TempChildLists == null)
                 queryableContext.TempChildLists = new Dictionary<string, object>();
@@ -579,18 +579,18 @@ ParameterT parameter)
                     queryableContext.TempChildLists = new Dictionary<string, object>();
                 await Context.Utilities.PageEachAsync(ids, 200, async pageIds =>
                 {
-                    result.AddRange(await Clone().In(thisFiled, pageIds).ToListAsync().ConfigureAwait(false));
+                    result.AddRange(await Clone().In(thisField, pageIds).ToListAsync().ConfigureAwait(false));
                 }).ConfigureAwait(false);
                 queryableContext.TempChildLists[key] = result;
             }
             var name = "";
-            if ((thisFiled as LambdaExpression).Body is UnaryExpression)
+            if ((thisField as LambdaExpression).Body is UnaryExpression)
             {
-                name = (((thisFiled as LambdaExpression).Body as UnaryExpression).Operand as MemberExpression).Member.Name;
+                name = (((thisField as LambdaExpression).Body as UnaryExpression).Operand as MemberExpression).Member.Name;
             }
             else
             {
-                name = ((thisFiled as LambdaExpression).Body as MemberExpression).Member.Name;
+                name = ((thisField as LambdaExpression).Body as MemberExpression).Member.Name;
             }
             var pkValue = parameter.GetType().GetProperty(pkName).GetValue(parameter);
             result = result.Where(it => it.GetType().GetProperty(name).GetValue(it).ObjToString() == pkValue.ObjToString()).ToList();

@@ -11,6 +11,8 @@
 using ThingsGateway.Debug;
 using ThingsGateway.Gateway.Application;
 
+using TouchSocket.Core;
+
 namespace ThingsGateway.Plugin.Modbus;
 
 /// <summary>
@@ -63,6 +65,9 @@ public class ModbusMaster : CollectFoundationBase
 
 
         ArgumentNullException.ThrowIfNull(channel);
+        var plc = _plc;
+        _plc = new();
+        plc?.SafeDispose();
         //载入配置
         _plc.DataFormat = _driverPropertys.DataFormat;
         _plc.DtuId = _driverPropertys.DtuId;

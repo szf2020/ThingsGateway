@@ -9,17 +9,17 @@ namespace ThingsGateway.SqlSugar
         public EntityInfo NavEntity { get; set; }
         public EntityInfo RootEntity { get; set; }
 
-        public MappingFieldsInfo GetMappings(Expression thisFiled, Expression mappingFiled)
+        public MappingFieldsInfo GetMappings(Expression thisField, Expression mappingField)
         {
             MappingFieldsInfo mappingFields = new MappingFieldsInfo();
             var pkName = "";
-            if ((mappingFiled as LambdaExpression).Body is UnaryExpression)
+            if ((mappingField as LambdaExpression).Body is UnaryExpression)
             {
-                pkName = (((mappingFiled as LambdaExpression).Body as UnaryExpression).Operand as MemberExpression).Member.Name;
+                pkName = (((mappingField as LambdaExpression).Body as UnaryExpression).Operand as MemberExpression).Member.Name;
             }
             else
             {
-                pkName = ((mappingFiled as LambdaExpression).Body as MemberExpression).Member.Name;
+                pkName = ((mappingField as LambdaExpression).Body as MemberExpression).Member.Name;
             }
             return mappingFields;
         }

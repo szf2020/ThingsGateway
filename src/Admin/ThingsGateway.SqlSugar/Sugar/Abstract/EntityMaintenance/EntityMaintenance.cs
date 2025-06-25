@@ -63,7 +63,7 @@ namespace ThingsGateway.SqlSugar
                 result.TableDescription = sugarTable.TableDescription.ToSqlFilter();
                 result.IsDisabledUpdateAll = sugarTable.IsDisabledUpdateAll;
                 result.IsDisabledDelete = sugarTable.IsDisabledDelete;
-                result.IsCreateTableFiledSort = sugarTable.IsCreateTableFiledSort;
+                result.IsCreateTableFieldSort = sugarTable.IsCreateTableFieldSort;
                 result.Discrimator = sugarTable.Discrimator;
             }
             var indexs = type.GetCustomAttributes(typeof(SugarIndexAttribute));

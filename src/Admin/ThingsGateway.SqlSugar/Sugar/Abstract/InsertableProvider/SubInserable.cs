@@ -73,11 +73,6 @@ namespace ThingsGateway.SqlSugar
             return resul;
         }
 
-        [Obsolete("use ExecuteCommand")]
-        public object ExecuteReturnPrimaryKey()
-        {
-            return ExecuteCommand();
-        }
 
         public async Task<object> ExecuteCommandAsync()
         {
@@ -137,11 +132,7 @@ namespace ThingsGateway.SqlSugar
                 return 0;
             }
         }
-        [Obsolete("use ExecuteCommandAsync")]
-        public Task<object> ExecuteReturnPrimaryKeyAsync()
-        {
-            return Task.FromResult(ExecuteReturnPrimaryKey());
-        }
+
 
         private bool IsIdEntity(EntityInfo entity)
         {

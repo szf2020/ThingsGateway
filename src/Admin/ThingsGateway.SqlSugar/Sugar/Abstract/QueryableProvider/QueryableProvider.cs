@@ -474,7 +474,7 @@ namespace ThingsGateway.SqlSugar
             var bEntity = this.Context.EntityMaintenance.GetEntityInfo(bType);
             var bProperty = bEntity.Columns.FirstOrDefault(it => it.IsPrimarykey == true)?.PropertyName;
             Check.Exception(bProperty == null, bEntity.EntityName + " no primary key");
-            var bDbFiled = bEntity.Columns.FirstOrDefault(it => it.IsPrimarykey == true).DbColumnName;
+            var bDbField = bEntity.Columns.FirstOrDefault(it => it.IsPrimarykey == true).DbColumnName;
             this.Mapper((it, cache) =>
             {
                 var list = cache.Get<Dictionary<object, List<BType>>>(oldList =>
@@ -496,7 +496,7 @@ namespace ThingsGateway.SqlSugar
                     cons = new List<IConditionalModel>() {
                      new ConditionalModel(){
                                                    ConditionalType=ConditionalType.In,
-                                                   FieldName= bDbFiled,
+                                                   FieldName= bDbField,
                                                    FieldValue=string.Join(",",mappingList.Select(z=>UtilMethods.GetPropertyValue(z,m_bPropertyName)).Distinct())
                                                   }
                    };
@@ -1139,12 +1139,12 @@ namespace ThingsGateway.SqlSugar
             }
             var pks = GetPrimaryKeys().Select(it => SqlBuilder.GetTranslationTableName(it)).ToList();
             Check.Exception(pks == null || pks.Count != 1, "Queryable.In(params object[] pkValues): Only one primary key");
-            string filed = pks.FirstOrDefault();
+            string field = pks.FirstOrDefault();
             string shortName = QueryBuilder.TableShortName == null ? null : (QueryBuilder.TableShortName + ".");
-            filed = shortName + filed;
-            return In(filed, pkValues);
+            field = shortName + field;
+            return In(field, pkValues);
         }
-        public virtual ISugarQueryable<T> In<FieldType>(string filed, params FieldType[] inValues)
+        public virtual ISugarQueryable<T> In<FieldType>(string field, params FieldType[] inValues)
         {
             if (inValues.Length == 1)
             {
@@ -1153,7 +1153,7 @@ namespace ThingsGateway.SqlSugar
                     var whereIndex = QueryBuilder.WhereIndex;
                     string parameterName = this.SqlBuilder.SqlParameterKeyWord + "InPara" + whereIndex;
                     this.AddParameters(new SugarParameter(parameterName, inValues[0]));
-                    this.Where(string.Format(QueryBuilder.EqualTemplate, SqlBuilder.GetTranslationColumnName(filed), parameterName));
+                    this.Where(string.Format(QueryBuilder.EqualTemplate, SqlBuilder.GetTranslationColumnName(field), parameterName));
                     QueryBuilder.WhereIndex++;
                 }
                 else
@@ -1166,7 +1166,7 @@ namespace ThingsGateway.SqlSugar
                             values.Add(item.ToString().ToSqlValue());
                         }
                     }
-                    this.Where(string.Format(QueryBuilder.InTemplate, SqlBuilder.GetTranslationColumnName(filed), string.Join(",", values)));
+                    this.Where(string.Format(QueryBuilder.InTemplate, SqlBuilder.GetTranslationColumnName(field), string.Join(",", values)));
                 }
             }
             else
@@ -1186,7 +1186,7 @@ namespace ThingsGateway.SqlSugar
                         }
                     }
                 }
-                this.Where(string.Format(QueryBuilder.InTemplate, SqlBuilder.GetTranslationColumnName(filed), string.Join(",", values)));
+                this.Where(string.Format(QueryBuilder.InTemplate, SqlBuilder.GetTranslationColumnName(field), string.Join(",", values)));
 
             }
             return this;
@@ -1395,15 +1395,15 @@ namespace ThingsGateway.SqlSugar
                 return this;
         }
 
-        public virtual ISugarQueryable<T> GroupBy(string groupFileds)
+        public virtual ISugarQueryable<T> GroupBy(string groupFields)
         {
-            groupFileds = groupFileds.ToCheckField();
+            groupFields = groupFields.ToCheckField();
             var croupByValue = QueryBuilder.GroupByValue;
             if (QueryBuilder.GroupByValue.IsNullOrEmpty())
             {
                 QueryBuilder.GroupByValue = QueryBuilder.GroupByTemplate;
             }
-            QueryBuilder.GroupByValue += string.IsNullOrEmpty(croupByValue) ? groupFileds : ("," + groupFileds);
+            QueryBuilder.GroupByValue += string.IsNullOrEmpty(croupByValue) ? groupFields : ("," + groupFields);
             return this;
         }
 
@@ -1415,14 +1415,14 @@ namespace ThingsGateway.SqlSugar
             QueryBuilder.DisableTop = true;
             return this;
         }
-        public virtual ISugarQueryable<T> PartitionBy(string groupFileds)
+        public virtual ISugarQueryable<T> PartitionBy(string groupFields)
         {
             var partitionByValue = QueryBuilder.PartitionByValue;
             if (QueryBuilder.PartitionByValue.IsNullOrEmpty())
             {
                 QueryBuilder.PartitionByValue = QueryBuilder.PartitionByTemplate;
             }
-            QueryBuilder.PartitionByValue += string.IsNullOrEmpty(partitionByValue) ? groupFileds : ("," + groupFileds);
+            QueryBuilder.PartitionByValue += string.IsNullOrEmpty(partitionByValue) ? groupFields : ("," + groupFields);
             return this;
         }
 

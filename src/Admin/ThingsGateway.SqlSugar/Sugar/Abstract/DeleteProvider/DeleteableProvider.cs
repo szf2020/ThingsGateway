@@ -154,7 +154,7 @@ namespace ThingsGateway.SqlSugar
                     if (DeleteBuilder.BigDataInValues == null)
                         DeleteBuilder.BigDataInValues = new List<object>();
                     DeleteBuilder.BigDataInValues.AddRange(primaryKeyValues);
-                    DeleteBuilder.BigDataFiled = primaryField;
+                    DeleteBuilder.BigDataField = primaryField;
                 }
             }
             else
@@ -520,7 +520,7 @@ namespace ThingsGateway.SqlSugar
                 if (DeleteBuilder.BigDataInValues == null)
                     DeleteBuilder.BigDataInValues = new List<object>();
                 DeleteBuilder.BigDataInValues.AddRange(primaryKeyValues.Select(it => (object)it));
-                DeleteBuilder.BigDataFiled = primaryField;
+                DeleteBuilder.BigDataField = primaryField;
             }
             return this;
         }

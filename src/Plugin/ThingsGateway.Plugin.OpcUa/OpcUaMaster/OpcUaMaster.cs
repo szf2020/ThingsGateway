@@ -65,12 +65,18 @@ public class OpcUaMaster : CollectBase
             LoadType = _driverProperties.LoadType,
             AutoAcceptUntrustedCertificates = _driverProperties.AutoAcceptUntrustedCertificates,
         };
-        if (_plc == null)
+
+        var plc = _plc;
+        _plc = new();
+        if (plc != null)
         {
-            _plc = new();
-            _plc.LogEvent += _plc_LogEvent;
-            _plc.DataChangedHandler += DataChangedHandler;
+            plc.DataChangedHandler -= DataChangedHandler;
+            plc.LogEvent -= _plc_LogEvent;
+            plc.SafeDispose();
         }
+
+        _plc.LogEvent += _plc_LogEvent;
+        _plc.DataChangedHandler += DataChangedHandler;
         _plc.OpcUaProperty = config;
         await base.InitChannelAsync(channel, cancellationToken).ConfigureAwait(false);
     }
@@ -330,6 +336,22 @@ public class OpcUaMaster : CollectBase
             }
         }
 
+        if (VariableTasks.Count > 0)
+        {
+            foreach (var item in VariableTasks)
+            {
+                item.Stop();
+                TaskSchedulerLoop.Remove(item);
+            }
+
+            VariableTasks = AddVariableTask(cancellationToken);
+
+            foreach (var item in VariableTasks)
+            {
+                TaskSchedulerLoop.Add(item);
+                item.Start();
+            }
+        }
     }
 
     private Dictionary<string, List<VariableRuntime>> VariableAddresDicts { get; set; } = new();

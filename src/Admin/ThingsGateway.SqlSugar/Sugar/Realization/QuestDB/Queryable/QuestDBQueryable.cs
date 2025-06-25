@@ -7,13 +7,13 @@
             return this;
         }
 
-        public override ISugarQueryable<T> PartitionBy(string groupFileds)
+        public override ISugarQueryable<T> PartitionBy(string groupFields)
         {
             if (this.QueryBuilder.Take == 1)
             {
                 this.QueryBuilder.Take = null;
             }
-            this.QueryBuilder.PartitionByValue = groupFileds;
+            this.QueryBuilder.PartitionByValue = groupFields;
             return this;
         }
     }

@@ -445,7 +445,7 @@ namespace ThingsGateway.SqlSugar
             }
             return this;
         }
-        public IUpdateable<T> PublicSetColumns(Expression<Func<T, object>> filedNameExpression, string computationalSymbol)
+        public IUpdateable<T> PublicSetColumns(Expression<Func<T, object>> fieldNameExpression, string computationalSymbol)
         {
             if (UpdateParameterIsNull == true)
             {
@@ -453,10 +453,10 @@ namespace ThingsGateway.SqlSugar
             }
             else
             {
-                var name = ExpressionTool.GetMemberName(filedNameExpression);
+                var name = ExpressionTool.GetMemberName(fieldNameExpression);
                 if (name == null)
                 {
-                    Check.ExceptionEasy(filedNameExpression + " format error ", filedNameExpression + "参数格式错误");
+                    Check.ExceptionEasy(fieldNameExpression + " format error ", fieldNameExpression + "参数格式错误");
                 }
                 //var value = this.UpdateBuilder.GetExpressionValue(ValueExpExpression, ResolveExpressType.WhereSingle).GetResultString();
                 if (this.UpdateBuilder.ReSetValueBySqlExpList == null)
@@ -476,18 +476,18 @@ namespace ThingsGateway.SqlSugar
             return this;
         }
 
-        public IUpdateable<T> PublicSetColumns(Expression<Func<T, object>> filedNameExpression, Expression<Func<T, object>> ValueExpExpression)
+        public IUpdateable<T> PublicSetColumns(Expression<Func<T, object>> fieldNameExpression, Expression<Func<T, object>> ValueExpExpression)
         {
             if (UpdateParameterIsNull == true)
             {
-                return SetColumns(filedNameExpression, ValueExpExpression);
+                return SetColumns(fieldNameExpression, ValueExpExpression);
             }
             else
             {
-                var name = ExpressionTool.GetMemberName(filedNameExpression);
+                var name = ExpressionTool.GetMemberName(fieldNameExpression);
                 if (name == null)
                 {
-                    Check.ExceptionEasy(filedNameExpression + " format error ", filedNameExpression + "参数格式错误");
+                    Check.ExceptionEasy(fieldNameExpression + " format error ", fieldNameExpression + "参数格式错误");
                 }
                 var value = this.UpdateBuilder.GetExpressionValue(ValueExpExpression, ResolveExpressType.WhereSingle).GetResultString();
                 if (this.UpdateBuilder.ReSetValueBySqlExpList == null)
@@ -712,24 +712,24 @@ namespace ThingsGateway.SqlSugar
             AppendSets();
             return this;
         }
-        public IUpdateable<T> SetColumnsIF(bool isUpdateColumns, Expression<Func<T, object>> filedNameExpression, object fieldValue)
+        public IUpdateable<T> SetColumnsIF(bool isUpdateColumns, Expression<Func<T, object>> fieldNameExpression, object fieldValue)
         {
             if (isUpdateColumns)
             {
-                return SetColumns(filedNameExpression, fieldValue);
+                return SetColumns(fieldNameExpression, fieldValue);
             }
             else
             {
                 return this;
             }
         }
-        public virtual IUpdateable<T> SetColumns(Expression<Func<T, object>> filedNameExpression, Expression<Func<T, object>> valueExpression)
+        public virtual IUpdateable<T> SetColumns(Expression<Func<T, object>> fieldNameExpression, Expression<Func<T, object>> valueExpression)
         {
             if (valueExpression == null)
             {
-                return SetColumns(filedNameExpression, (object)null);
+                return SetColumns(fieldNameExpression, (object)null);
             }
-            var name = UpdateBuilder.GetExpressionValue(filedNameExpression, ResolveExpressType.FieldSingle).GetString();
+            var name = UpdateBuilder.GetExpressionValue(fieldNameExpression, ResolveExpressType.FieldSingle).GetString();
             name = UpdateBuilder.Builder.GetTranslationColumnName(name);
             var exp = ExpressionTool.RemoveConvert((valueExpression as LambdaExpression).Body);
             var value = UpdateBuilder.GetExpressionValue(exp, ResolveExpressType.WhereSingle).GetString();
@@ -749,9 +749,9 @@ namespace ThingsGateway.SqlSugar
             }
             return this;
         }
-        public virtual IUpdateable<T> SetColumns(Expression<Func<T, object>> filedNameExpression, object fieldValue)
+        public virtual IUpdateable<T> SetColumns(Expression<Func<T, object>> fieldNameExpression, object fieldValue)
         {
-            var name = UpdateBuilder.GetExpressionValue(filedNameExpression, ResolveExpressType.FieldSingle).GetString();
+            var name = UpdateBuilder.GetExpressionValue(fieldNameExpression, ResolveExpressType.FieldSingle).GetString();
             name = UpdateBuilder.Builder.GetNoTranslationColumnName(name);
             return SetColumns(name, fieldValue);
         }

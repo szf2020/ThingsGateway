@@ -236,25 +236,6 @@ public static class StringHelper
         return sb.Return(true);
     }
 
-    ///// <summary>把一个列表组合成为一个字符串，默认逗号分隔</summary>
-    ///// <param name="value"></param>
-    ///// <param name="separator">组合分隔符，默认逗号</param>
-    ///// <param name="func">把对象转为字符串的委托</param>
-    ///// <returns></returns>
-    //[Obsolete]
-    //public static String Join<T>(this IEnumerable<T> value, String separator, Func<T, String>? func)
-    //{
-    //    var sb = Pool.StringBuilder.Get();
-    //    if (value != null)
-    //    {
-    //        if (func == null) func = obj => obj + "";
-    //        foreach (var item in value)
-    //        {
-    //            sb.Separate(separator).Append(func(item));
-    //        }
-    //    }
-    //    return sb.Put(true);
-    //}
 
     /// <summary>把一个列表组合成为一个字符串，默认逗号分隔</summary>
     /// <param name="value"></param>
@@ -299,28 +280,6 @@ public static class StringHelper
 
         encoding ??= Encoding.UTF8;
         return encoding.GetBytes(value);
-    }
-
-    /// <summary>格式化字符串。特别支持无格式化字符串的时间参数</summary>
-    /// <param name="value">格式字符串</param>
-    /// <param name="args">参数</param>
-    /// <returns></returns>
-    [Obsolete("建议使用插值字符串")]
-    public static String F(this String value, params Object?[] args)
-    {
-        if (String.IsNullOrEmpty(value)) return value;
-
-        // 特殊处理时间格式化。这些年，无数项目实施因为时间格式问题让人发狂
-        for (var i = 0; i < args.Length; i++)
-        {
-            if (args[i] is DateTime dt)
-            {
-                // 没有写格式化字符串的时间参数，一律转为标准时间字符串
-                if (value.Contains("{" + i + "}")) args[i] = dt.ToFullString();
-            }
-        }
-
-        return String.Format(value, args);
     }
 
     /// <summary>指定输入是否匹配目标表达式，支持*匹配</summary>

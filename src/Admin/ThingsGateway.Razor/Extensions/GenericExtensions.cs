@@ -10,8 +10,6 @@
 
 using System.Reflection;
 
-using ThingsGateway.NewLife.Caching;
-
 namespace ThingsGateway.Extension.Generic;
 
 /// <inheritdoc/>

@@ -7,7 +7,7 @@
             return this;
         }
 
-        //public override ISugarQueryable<T> PartitionBy(string groupFileds)
+        //public override ISugarQueryable<T> PartitionBy(string groupFields)
         //{
         //    this.QueryBuilder.
         //    return this;

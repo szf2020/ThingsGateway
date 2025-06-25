@@ -7,9 +7,9 @@
             return this;
         }
 
-        //public override ISugarQueryable<T> PartitionBy(string groupFileds)
+        //public override ISugarQueryable<T> PartitionBy(string groupFields)
         //{
-        //    this.GroupBy(groupFileds);
+        //    this.GroupBy(groupFields);
         //    return this;
         //}
     }

@@ -556,7 +556,7 @@ WHERE table_name = '" + tableName + "'");
             return comments.HasValue() ? comments.First() : "";
         }
 
-        public string GetFieldComment(string tableName, string filedName)
+        public string GetFieldComment(string tableName, string fieldName)
         {
             string cacheKey = "DbMaintenanceProvider.GetFieldComment." + tableName;
             var comments = this.Context.Utilities.GetReflectionInoCacheInstance().GetOrCreate(cacheKey,
@@ -571,7 +571,7 @@ WHERE table_name = '" + tableName + "'");
                 });
             if (comments.HasValue())
             {
-                var comment = comments.FirstOrDefault(it => it.DbColumnName.Equals(filedName, StringComparison.CurrentCultureIgnoreCase));
+                var comment = comments.FirstOrDefault(it => it.DbColumnName.Equals(fieldName, StringComparison.CurrentCultureIgnoreCase));
                 return comment?.ColumnDescription;
             }
             else

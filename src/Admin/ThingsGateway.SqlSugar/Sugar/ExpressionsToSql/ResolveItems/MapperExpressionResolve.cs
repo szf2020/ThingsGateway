@@ -208,12 +208,12 @@ namespace ThingsGateway.SqlSugar
             var fieldName = entity.Columns.First(it => it.PropertyName == name).DbColumnName;
             var array = (field as MemberExpression).ToString().Split('.').ToList();
             array[array.Count - 1] = fieldName;
-            var filedString = string.Join(".", array);
+            var fieldString = string.Join(".", array);
             return new MapperExpressionInfo()
             {
                 Type = type,
                 FieldName = fieldName,
-                FieldString = filedString,
+                FieldString = fieldString,
                 EntityInfo = entity
             };
         }
@@ -303,7 +303,7 @@ namespace ThingsGateway.SqlSugar
             var fieldName = entity.Columns.First(it => it.PropertyName == name).DbColumnName;
             //var array = (field as MemberExpression).ToString().Split('.').ToList();
             //array[array.Count() - 1] = fieldName;
-            //var filedString = string.Join(".", array);
+            //var fieldString = string.Join(".", array);
             return new MapperExpressionInfo()
             {
                 Type = type,

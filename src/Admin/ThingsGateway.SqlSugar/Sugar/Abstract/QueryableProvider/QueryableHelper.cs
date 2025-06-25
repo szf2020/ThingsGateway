@@ -952,17 +952,17 @@ namespace ThingsGateway.SqlSugar
             var mapperFieldExp = mapperField as MemberExpression;
             Check.Exception(mapperFieldExp.Type.IsClass(), ".Mapper() parameter error");
             var objType = mapperObjectExp.Type;
-            var filedType = mapperFieldExp.Expression.Type;
+            var fieldType = mapperFieldExp.Expression.Type;
             Check.Exception(objType != typeof(TObject) && objType != typeof(List<TObject>), ".Mapper() parameter error");
             if (objType == typeof(List<TObject>))
             {
                 objType = typeof(TObject);
             }
-            var filedName = mapperFieldExp.Member.Name;
+            var fieldName = mapperFieldExp.Member.Name;
             var objName = mapperObjectExp.Member.Name;
-            var filedEntity = this.Context.EntityMaintenance.GetEntityInfo(objType);
-            var objEntity = this.Context.EntityMaintenance.GetEntityInfo(filedType);
-            var isSelf = filedType == typeof(T);
+            var fieldEntity = this.Context.EntityMaintenance.GetEntityInfo(objType);
+            var objEntity = this.Context.EntityMaintenance.GetEntityInfo(fieldType);
+            var isSelf = fieldType == typeof(T);
             if (Mappers == null)
                 Mappers = new List<Action<List<T>>>();
             if (isSelf)
@@ -971,29 +971,29 @@ namespace ThingsGateway.SqlSugar
                 {
                     if (entitys.IsNullOrEmpty() || entitys.Count == 0) return;
                     var entity = entitys.First();
-                    var whereCol = filedEntity.Columns.FirstOrDefault(it => it.PropertyName.Equals(filedName, StringComparison.CurrentCultureIgnoreCase));
+                    var whereCol = fieldEntity.Columns.FirstOrDefault(it => it.PropertyName.Equals(fieldName, StringComparison.CurrentCultureIgnoreCase));
                     if (whereCol == null)
                     {
-                        whereCol = filedEntity.Columns.FirstOrDefault(it => it.IsPrimarykey == true);
+                        whereCol = fieldEntity.Columns.FirstOrDefault(it => it.IsPrimarykey == true);
                     }
                     if (whereCol == null)
                     {
-                        whereCol = filedEntity.Columns.FirstOrDefault(it => GetPrimaryKeys().Any(pk => pk.Equals(it.DbColumnName, StringComparison.CurrentCultureIgnoreCase)));
+                        whereCol = fieldEntity.Columns.FirstOrDefault(it => GetPrimaryKeys().Any(pk => pk.Equals(it.DbColumnName, StringComparison.CurrentCultureIgnoreCase)));
                     }
                     if (whereCol == null)
                     {
-                        whereCol = filedEntity.Columns.FirstOrDefault(it => it.PropertyName.Equals("id", StringComparison.CurrentCultureIgnoreCase));
+                        whereCol = fieldEntity.Columns.FirstOrDefault(it => it.PropertyName.Equals("id", StringComparison.CurrentCultureIgnoreCase));
                     }
                     if (whereCol == null)
                     {
-                        whereCol = filedEntity.Columns.FirstOrDefault(it => (it.PropertyName).Equals(it.EntityName + "id", StringComparison.CurrentCultureIgnoreCase));
+                        whereCol = fieldEntity.Columns.FirstOrDefault(it => (it.PropertyName).Equals(it.EntityName + "id", StringComparison.CurrentCultureIgnoreCase));
                     }
                     if (whereCol == null)
                     {
                         Check.Exception(true, ".Mapper() parameter error");
                     }
-                    List<string> inValues = entitys.Select(it => it.GetType().GetProperty(filedName).GetValue(it, null).ObjToString()).ToList();
-                    if (inValues != null && inValues.Count != 0 && UtilMethods.GetUnderType(entitys.First().GetType().GetProperty(filedName).PropertyType) == UtilConstants.GuidType)
+                    List<string> inValues = entitys.Select(it => it.GetType().GetProperty(fieldName).GetValue(it, null).ObjToString()).ToList();
+                    if (inValues != null && inValues.Count != 0 && UtilMethods.GetUnderType(entitys.First().GetType().GetProperty(fieldName).PropertyType) == UtilConstants.GuidType)
                     {
                         inValues = inValues.Select(x => string.IsNullOrEmpty(x) ? "null" : x).Distinct().ToList();
                     }
@@ -1010,7 +1010,7 @@ namespace ThingsGateway.SqlSugar
                     var list = this.Context.Queryable<TObject>().Where(wheres).ToList();
                     foreach (var item in entitys)
                     {
-                        var whereValue = item.GetType().GetProperty(filedName).GetValue(item, null);
+                        var whereValue = item.GetType().GetProperty(fieldName).GetValue(item, null);
                         var setValue = list.Where(x => x.GetType().GetProperty(whereCol.PropertyName).GetValue(x, null).ObjToString() == whereValue.ObjToString()).ToList();
                         var setObject = item.GetType().GetProperty(objName);
                         if (setObject.PropertyType.FullName.IsCollectionsList())
@@ -1032,7 +1032,7 @@ namespace ThingsGateway.SqlSugar
                     if (entitys.IsNullOrEmpty() || entitys.Count == 0) return;
                     var entity = entitys.First();
                     var tEntity = this.Context.EntityMaintenance.GetEntityInfo<T>();
-                    var whereCol = tEntity.Columns.FirstOrDefault(it => it.PropertyName.Equals(filedName, StringComparison.CurrentCultureIgnoreCase));
+                    var whereCol = tEntity.Columns.FirstOrDefault(it => it.PropertyName.Equals(fieldName, StringComparison.CurrentCultureIgnoreCase));
                     if (whereCol == null)
                     {
                         whereCol = tEntity.Columns.FirstOrDefault(it => it.IsPrimarykey == true);
@@ -1054,7 +1054,7 @@ namespace ThingsGateway.SqlSugar
                         Check.Exception(true, ".Mapper() parameter error");
                     }
                     List<string> inValues = entitys.Select(it => it.GetType().GetProperty(whereCol.PropertyName).GetValue(it, null).ObjToString()).ToList();
-                    var dbColumnName = filedEntity.Columns.FirstOrDefault(it => it.PropertyName == filedName).DbColumnName;
+                    var dbColumnName = fieldEntity.Columns.FirstOrDefault(it => it.PropertyName == fieldName).DbColumnName;
                     List<IConditionalModel> wheres = new List<IConditionalModel>()
                     {
                        new ConditionalModel()
@@ -1068,7 +1068,7 @@ namespace ThingsGateway.SqlSugar
                     foreach (var item in entitys)
                     {
                         var whereValue = item.GetType().GetProperty(whereCol.PropertyName).GetValue(item, null);
-                        var setValue = list.Where(x => x.GetType().GetProperty(filedName).GetValue(x, null).ObjToString() == whereValue.ObjToString()).ToList();
+                        var setValue = list.Where(x => x.GetType().GetProperty(fieldName).GetValue(x, null).ObjToString() == whereValue.ObjToString()).ToList();
                         var setObject = item.GetType().GetProperty(objName);
                         if (setObject.PropertyType.FullName.IsCollectionsList())
                         {
@@ -1118,18 +1118,18 @@ namespace ThingsGateway.SqlSugar
             Check.Exception(mainFieldExp.Type.IsClass(), ".Mapper() parameter error");
             Check.Exception(childFieldExp.Type.IsClass(), ".Mapper() parameter error");
             var objType = mapperObjectExp.Type;
-            var filedType = mainFieldExp.Expression.Type;
+            var fieldType = mainFieldExp.Expression.Type;
             Check.Exception(objType != typeof(TObject) && objType != typeof(List<TObject>), ".Mapper() parameter error");
             if (objType == typeof(List<TObject>))
             {
                 objType = typeof(TObject);
             }
-            var mainFiledName = mainFieldExp.Member.Name;
-            var childFiledName = childFieldExp.Member.Name;
+            var mainFieldName = mainFieldExp.Member.Name;
+            var childFieldName = childFieldExp.Member.Name;
             var objName = mapperObjectExp.Member.Name;
-            var filedEntity = this.Context.EntityMaintenance.GetEntityInfo(objType);
-            var objEntity = this.Context.EntityMaintenance.GetEntityInfo(filedType);
-            var isSelf = filedType == typeof(T);
+            var fieldEntity = this.Context.EntityMaintenance.GetEntityInfo(objType);
+            var objEntity = this.Context.EntityMaintenance.GetEntityInfo(fieldType);
+            var isSelf = fieldType == typeof(T);
             if (Mappers == null)
                 Mappers = new List<Action<List<T>>>();
             if (isSelf)
@@ -1138,28 +1138,28 @@ namespace ThingsGateway.SqlSugar
                 {
                     if (entitys.IsNullOrEmpty() || entitys.Count == 0) return;
                     var entity = entitys.First();
-                    var whereCol = filedEntity.Columns.FirstOrDefault(it => it.PropertyName.Equals(childFiledName, StringComparison.CurrentCultureIgnoreCase));
+                    var whereCol = fieldEntity.Columns.FirstOrDefault(it => it.PropertyName.Equals(childFieldName, StringComparison.CurrentCultureIgnoreCase));
                     if (whereCol == null)
                     {
-                        whereCol = filedEntity.Columns.FirstOrDefault(it => it.IsPrimarykey == true);
+                        whereCol = fieldEntity.Columns.FirstOrDefault(it => it.IsPrimarykey == true);
                     }
                     if (whereCol == null)
                     {
-                        whereCol = filedEntity.Columns.FirstOrDefault(it => GetPrimaryKeys().Any(pk => pk.Equals(it.DbColumnName, StringComparison.CurrentCultureIgnoreCase)));
+                        whereCol = fieldEntity.Columns.FirstOrDefault(it => GetPrimaryKeys().Any(pk => pk.Equals(it.DbColumnName, StringComparison.CurrentCultureIgnoreCase)));
                     }
                     if (whereCol == null)
                     {
-                        whereCol = filedEntity.Columns.FirstOrDefault(it => it.PropertyName.Equals("id", StringComparison.CurrentCultureIgnoreCase));
+                        whereCol = fieldEntity.Columns.FirstOrDefault(it => it.PropertyName.Equals("id", StringComparison.CurrentCultureIgnoreCase));
                     }
                     if (whereCol == null)
                     {
-                        whereCol = filedEntity.Columns.FirstOrDefault(it => (it.PropertyName).Equals(it.EntityName + "id", StringComparison.CurrentCultureIgnoreCase));
+                        whereCol = fieldEntity.Columns.FirstOrDefault(it => (it.PropertyName).Equals(it.EntityName + "id", StringComparison.CurrentCultureIgnoreCase));
                     }
                     if (whereCol == null)
                     {
                         Check.Exception(true, ".Mapper() parameter error");
                     }
-                    List<string> inValues = entitys.Select(it => it.GetType().GetProperty(mainFiledName).GetValue(it, null).ObjToString()).ToList();
+                    List<string> inValues = entitys.Select(it => it.GetType().GetProperty(mainFieldName).GetValue(it, null).ObjToString()).ToList();
                     List<IConditionalModel> wheres = new List<IConditionalModel>()
                     {
                        new ConditionalModel()
@@ -1172,7 +1172,7 @@ namespace ThingsGateway.SqlSugar
                     var list = this.Context.Queryable<TObject>().Where(wheres).ToList();
                     foreach (var item in entitys)
                     {
-                        var whereValue = item.GetType().GetProperty(mainFiledName).GetValue(item, null);
+                        var whereValue = item.GetType().GetProperty(mainFieldName).GetValue(item, null);
                         var setValue = list.Where(x => x.GetType().GetProperty(whereCol.PropertyName).GetValue(x, null).ObjToString() == whereValue.ObjToString()).ToList();
                         var setObject = item.GetType().GetProperty(objName);
                         if (setObject.PropertyType.FullName.IsCollectionsList())
@@ -1194,7 +1194,7 @@ namespace ThingsGateway.SqlSugar
                     if (entitys.IsNullOrEmpty() || entitys.Count == 0) return;
                     var entity = entitys.First();
                     var tEntity = this.Context.EntityMaintenance.GetEntityInfo<T>();
-                    var whereCol = tEntity.Columns.FirstOrDefault(it => it.PropertyName.Equals(childFiledName, StringComparison.CurrentCultureIgnoreCase));
+                    var whereCol = tEntity.Columns.FirstOrDefault(it => it.PropertyName.Equals(childFieldName, StringComparison.CurrentCultureIgnoreCase));
                     if (whereCol == null)
                     {
                         whereCol = tEntity.Columns.FirstOrDefault(it => it.IsPrimarykey == true);
@@ -1216,7 +1216,7 @@ namespace ThingsGateway.SqlSugar
                         Check.Exception(true, ".Mapper() parameter error");
                     }
                     List<string> inValues = entitys.Select(it => it.GetType().GetProperty(whereCol.PropertyName).GetValue(it, null).ObjToString()).ToList();
-                    var dbColumnName = filedEntity.Columns.FirstOrDefault(it => it.PropertyName == mainFiledName).DbColumnName;
+                    var dbColumnName = fieldEntity.Columns.FirstOrDefault(it => it.PropertyName == mainFieldName).DbColumnName;
                     List<IConditionalModel> wheres = new List<IConditionalModel>()
                     {
                        new ConditionalModel()
@@ -1230,7 +1230,7 @@ namespace ThingsGateway.SqlSugar
                     foreach (var item in entitys)
                     {
                         var whereValue = item.GetType().GetProperty(whereCol.PropertyName).GetValue(item, null);
-                        var setValue = list.Where(x => x.GetType().GetProperty(mainFiledName).GetValue(x, null).ObjToString() == whereValue.ObjToString()).ToList();
+                        var setValue = list.Where(x => x.GetType().GetProperty(mainFieldName).GetValue(x, null).ObjToString() == whereValue.ObjToString()).ToList();
                         var setObject = item.GetType().GetProperty(objName);
                         if (setObject.PropertyType.FullName.IsCollectionsList())
                         {
@@ -1612,8 +1612,8 @@ namespace ThingsGateway.SqlSugar
             result.SqlBuilder = this.SqlBuilder;
             result.SqlBuilder.QueryBuilder.Parameters = QueryBuilder.Parameters;
             result.SqlBuilder.QueryBuilder.SelectValue = expression;
-            result.SqlBuilder.QueryBuilder.IsSelectSingleFiledJson = UtilMethods.IsJsonMember(expression, this.Context);
-            result.SqlBuilder.QueryBuilder.IsSelectSingleFiledArray = UtilMethods.IsArrayMember(expression, this.Context);
+            result.SqlBuilder.QueryBuilder.IsSelectSingleFieldJson = UtilMethods.IsJsonMember(expression, this.Context);
+            result.SqlBuilder.QueryBuilder.IsSelectSingleFieldArray = UtilMethods.IsArrayMember(expression, this.Context);
             if (this.IsCache)
             {
                 result.WithCache(this.CacheTime);
@@ -1949,11 +1949,11 @@ namespace ThingsGateway.SqlSugar
             {
                 result = this.Context.Utilities.DataReaderToExpandoObjectList(dataReader).Select(it => ((TResult)(object)it)).ToList();
             }
-            else if (QueryBuilder.IsSelectSingleFiledJson)
+            else if (QueryBuilder.IsSelectSingleFieldJson)
             {
                 result = this.Context.Utilities.DataReaderToSelectJsonList<TResult>(dataReader);
             }
-            else if (QueryBuilder.IsSelectSingleFiledArray)
+            else if (QueryBuilder.IsSelectSingleFieldArray)
             {
                 result = this.Context.Utilities.DataReaderToSelectArrayList<TResult>(dataReader);
             }
@@ -1995,11 +1995,11 @@ namespace ThingsGateway.SqlSugar
                 var expObj = await Context.Utilities.DataReaderToExpandoObjectListAsync(dataReader).ConfigureAwait(false);
                 result = expObj.Select(it => ((TResult)(object)it)).ToList();
             }
-            else if (QueryBuilder.IsSelectSingleFiledJson)
+            else if (QueryBuilder.IsSelectSingleFieldJson)
             {
                 result = await Context.Utilities.DataReaderToSelectJsonListAsync<TResult>(dataReader).ConfigureAwait(false);
             }
-            else if (QueryBuilder.IsSelectSingleFiledArray)
+            else if (QueryBuilder.IsSelectSingleFieldArray)
             {
                 result = await Context.Utilities.DataReaderToSelectArrayListAsync<TResult>(dataReader).ConfigureAwait(false);
             }

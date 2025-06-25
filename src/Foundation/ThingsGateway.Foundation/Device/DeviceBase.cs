@@ -335,7 +335,7 @@ public abstract class DeviceBase : DisposableObject, IDevice
 
         return EasyTask.CompletedTask;
     }
-    protected volatile bool AutoConnect = true;
+    public bool AutoConnect { get; protected set; } = true;
     /// <inheritdoc/>
     private async ValueTask<OperResult> SendAsync(ISendMessage sendMessage, IClientChannel channel = default, EndPoint endPoint = default, CancellationToken token = default)
     {
@@ -372,8 +372,7 @@ public abstract class DeviceBase : DisposableObject, IDevice
         SetDataAdapter(channel);
         try
         {
-            if (AutoConnect && !Channel.Online)
-                await Channel.ConnectAsync(Channel.ChannelOptions.ConnectTimeout, token).ConfigureAwait(false);
+            await ConnectAsync(token).ConfigureAwait(false);
         }
         catch (Exception)
         {
@@ -385,6 +384,30 @@ public abstract class DeviceBase : DisposableObject, IDevice
             throw new OperationCanceledException();
 
 
+    }
+
+    private WaitLock connectWaitLock = new();
+
+    public async Task ConnectAsync(CancellationToken token)
+    {
+        if (AutoConnect && Channel != null && Channel?.Online != true)
+        {
+            try
+            {
+                await connectWaitLock.WaitAsync(token).ConfigureAwait(false);
+                if (AutoConnect && Channel != null && Channel?.Online != true)
+                {
+                    await Channel.CloseAsync().ConfigureAwait(false);
+                    await Task.Delay(500, token).ConfigureAwait(false);
+                    await Channel.ConnectAsync(Channel.ChannelOptions.ConnectTimeout, token).ConfigureAwait(false);
+                }
+            }
+            finally
+            {
+                await Task.Delay(500, token).ConfigureAwait(false);
+                connectWaitLock.Release();
+            }
+        }
     }
 
     /// <inheritdoc/>
@@ -553,7 +576,7 @@ public abstract class DeviceBase : DisposableObject, IDevice
             }
             else
             {
-                throw new(result.ErrorMessage ?? "unknown error");
+                return new MessageBase(result);
             }
 
         }

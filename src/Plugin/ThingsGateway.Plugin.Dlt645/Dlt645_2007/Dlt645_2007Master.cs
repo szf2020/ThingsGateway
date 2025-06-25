@@ -10,6 +10,8 @@
 
 using ThingsGateway.Gateway.Application;
 
+using TouchSocket.Core;
+
 namespace ThingsGateway.Plugin.Dlt645;
 
 /// <summary>
@@ -49,6 +51,11 @@ public class Dlt645_2007Master : CollectFoundationBase
     {
 
         ArgumentNullException.ThrowIfNull(channel);
+
+        var plc = _plc;
+        _plc = new();
+        plc?.SafeDispose();
+
         //载入配置
         _plc.DtuId = _driverPropertys.DtuId;
         _plc.SendDelayTime = _driverPropertys.SendDelayTime;

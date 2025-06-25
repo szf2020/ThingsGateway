@@ -67,6 +67,11 @@ public class DeviceRuntime : Device, IDisposable
     [AutoGenerateColumn(Ignore = true)]
     public string LogPath => Name.GetDeviceLogPath();
 
+    [System.Text.Json.Serialization.JsonIgnore]
+    [Newtonsoft.Json.JsonIgnore]
+    [AdaptIgnore]
+    public DateTime DeviceStatusChangeTime = DateTime.UnixEpoch.ToLocalTime();
+
     /// <summary>
     /// 设备状态
     /// </summary>
@@ -86,6 +91,7 @@ public class DeviceRuntime : Device, IDisposable
                 if (_deviceStatus != value)
                 {
                     _deviceStatus = value;
+                    DeviceStatusChangeTime = TimerX.Now;
                     GlobalData.DeviceStatusChange(this);
                 }
             }

@@ -109,8 +109,15 @@ public partial class VariableRuntime : Variable, IVariable, IDisposable
     public void SetNoChangedValue(DateTime dateTime)
     {
         DateTime time = dateTime != default ? dateTime : DateTime.Now;
-        CollectTime = time;
-        GlobalData.VariableCollectChange(this);
+        if (!IsOnline)
+        {
+            SetValue(RawValue, time, true);
+        }
+        else
+        {
+            CollectTime = time;
+            GlobalData.VariableCollectChange(this);
+        }
     }
 
     private void Set(object data, DateTime dateTime)

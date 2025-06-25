@@ -15,7 +15,7 @@ namespace ThingsGateway.Foundation;
 /// <summary>
 /// 协议设备接口
 /// </summary>
-public interface IDevice : IDisposable
+public interface IDevice : IDisposable, IDisposableObject
 {
     #region 属性
 
@@ -61,6 +61,7 @@ public interface IDevice : IDisposable
     /// 字符串翻转
     /// </summary>
     bool IsStringReverseByteWord { get; set; }
+    bool AutoConnect { get; }
 
     #endregion 属性
 
@@ -467,4 +468,5 @@ public interface IDevice : IDisposable
     /// <param name="deviceLog">单独设备日志</param>
     void InitChannel(IChannel channel, ILog? deviceLog = null);
     ValueTask<OperResult<byte[]>> ReadAsync(object state, CancellationToken cancellationToken = default);
+    Task ConnectAsync(CancellationToken token);
 }

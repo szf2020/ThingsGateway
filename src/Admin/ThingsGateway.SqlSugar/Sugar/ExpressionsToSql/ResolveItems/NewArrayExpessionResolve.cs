@@ -15,7 +15,7 @@ namespace ThingsGateway.SqlSugar
                 case ResolveExpressType.SelectMultiple:
                 case ResolveExpressType.FieldSingle:
                 case ResolveExpressType.FieldMultiple:
-                    #region Filed
+                    #region Field
                     try
                     {
                         var value = ExpressionTool.DynamicInvoke(expression);

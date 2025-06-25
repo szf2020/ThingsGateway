@@ -585,7 +585,7 @@ namespace ThingsGateway.SqlSugar
                     }
                     else if (isField)
                     {
-                        reval = GetFiledValue(memberExpr);
+                        reval = GetFieldValue(memberExpr);
                     }
                 }
                 if (memberExpr.Expression == null)
@@ -706,7 +706,7 @@ namespace ThingsGateway.SqlSugar
             }
         }
 
-        public static object GetFiledValue(MemberExpression memberExpr)
+        public static object GetFieldValue(MemberExpression memberExpr)
         {
             if (!(memberExpr.Member is FieldInfo))
             {

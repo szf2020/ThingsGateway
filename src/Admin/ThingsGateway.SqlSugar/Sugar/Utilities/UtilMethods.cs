@@ -1812,11 +1812,6 @@ namespace ThingsGateway.SqlSugar
             }
         }
 
-        [Obsolete("请使用新名字：FieldNameSql")]
-        public static string FiledNameSql()
-        {
-            return $"[value=sql{UtilConstants.ReplaceKey}]";
-        }
         public static string FieldNameSql()
         {
             if (StaticConfig.TableQuerySqlKey != Guid.Empty)

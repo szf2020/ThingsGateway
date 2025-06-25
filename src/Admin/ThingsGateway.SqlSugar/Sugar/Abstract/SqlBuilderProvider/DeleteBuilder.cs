@@ -27,7 +27,7 @@ namespace ThingsGateway.SqlSugar
             set { _WhereInfos = value; }
         }
         public virtual List<object> BigDataInValues { get; set; }
-        public virtual string BigDataFiled { get; set; }
+        public virtual string BigDataField { get; set; }
         #endregion
 
         #region Sql Template
@@ -136,7 +136,7 @@ namespace ThingsGateway.SqlSugar
                 while (pageCount >= pageIndex)
                 {
                     var inValues = this.BigDataInValues.Skip((pageIndex - 1) * pageSize).Take(pageSize).ToList();
-                    batchDeleteSql.Append(sql + string.Format(WhereInTemplate, BigDataFiled, inValues.ToArray().ToJoinSqlInVals()));
+                    batchDeleteSql.Append(sql + string.Format(WhereInTemplate, BigDataField, inValues.ToArray().ToJoinSqlInVals()));
                     batchDeleteSql.Append(';');
                     pageIndex++;
                 }

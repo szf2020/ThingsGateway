@@ -56,7 +56,13 @@ public class SiemensS7Master : CollectFoundationBase
 
     protected override async Task InitChannelAsync(IChannel? channel = null, CancellationToken cancellationToken = default)
     {
+
         ArgumentNullException.ThrowIfNull(channel);
+
+        var plc = _plc;
+        _plc = new();
+        plc?.SafeDispose();
+
         //载入配置
         _plc.DataFormat = _driverPropertys.DataFormat;
         _plc.SendDelayTime = _driverPropertys.SendDelayTime;

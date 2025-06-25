@@ -58,20 +58,20 @@ namespace ThingsGateway.SqlSugar
                                 && it.Columns.Any(z => z.Name.EqualCase(columnName)));
         }
 
-        private string GetColumnName(string filedName)
+        private string GetColumnName(string fieldName)
         {
-            return filedName.Split('.').Last();
+            return fieldName.Split('.').Last();
         }
 
-        private string GetTableName(string filedName)
+        private string GetTableName(string fieldName)
         {
-            if (!filedName.Contains('.'))
+            if (!fieldName.Contains('.'))
             {
                 return TableInfos.First(it => it.IsMaster).Table;
             }
             else
             {
-                var shortName = filedName.Split('.').First();
+                var shortName = fieldName.Split('.').First();
                 return TableInfos.First(it => it.ShortName == shortName).Table;
             }
         }

@@ -14,7 +14,7 @@ namespace ThingsGateway.SqlSugar
                     var orderByModel = item as SelectModel;
                     orderByModel.AsName = GetAsName(orderByModel);
                     orderByModel.FieldName = GetSqlPart(orderByModel.FieldName, pars).ObjToString();
-                    AppendFiledName(sql, orderByModel);
+                    AppendFieldName(sql, orderByModel);
                 }
                 else
                 {
@@ -46,7 +46,7 @@ namespace ThingsGateway.SqlSugar
             return this.SqlTranslationLeft + orderByModel.AsName + this.SqlTranslationRight;
         }
 
-        private void AppendFiledName(StringBuilder sql, SelectModel orderByModel)
+        private void AppendFieldName(StringBuilder sql, SelectModel orderByModel)
         {
             sql.Append($" {orderByModel.FieldName} AS {orderByModel.AsName} ,");
         }

@@ -499,17 +499,6 @@ namespace ThingsGateway.SqlSugar
             return ScopedContext.RollbackTranAsync();
         }
 
-        [Obsolete("use Storageable")]
-        public ISaveable<T> Saveable<T>(List<T> saveObjects) where T : class, new()
-        {
-            return ScopedContext.Saveable(saveObjects);
-        }
-        [Obsolete("use Storageable")]
-        public ISaveable<T> Saveable<T>(T saveObject) where T : class, new()
-        {
-            return ScopedContext.Saveable(saveObject);
-        }
-
         public int SaveQueues(bool isTran = true)
         {
             return ScopedContext.SaveQueues(isTran);

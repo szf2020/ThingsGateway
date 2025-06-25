@@ -54,12 +54,7 @@ namespace ThingsGateway.SqlSugar
         #endregion
 
         #region Util Methods
-        [Obsolete("Use SqlSugarClient.Utilities")]
-        public virtual IContextMethods RewritableMethods
-        {
-            get { return this.Context.Utilities; }
-            set { this.Context.Utilities = value; }
-        }
+
         public virtual IContextMethods Utilities
         {
             get
@@ -1376,16 +1371,7 @@ namespace ThingsGateway.SqlSugar
             Check.ExceptionEasy(" var childDb=Db.GetConnection(configId);  use Db.CreateContext ", " 例如 var childDb=Db.GetConnection(configId);其中Db才能使用CreateContext，childDb不能使用");
             return null;
         }
-        //[Obsolete("Use SqlSugarClient.GetSimpleClient() Or SqlSugarClient.GetSimpleClient<T>() ")]
-        //public virtual SimpleClient SimpleClient
-        //{
-        //    get
-        //    {
-        //        if (this._SimpleClient == null)
-        //            this._SimpleClient = new SimpleClient(this);
-        //        return this._SimpleClient;
-        //    }
-        //}
+
         public virtual SimpleClient<T> GetSimpleClient<T>() where T : class, new()
         {
             return new SimpleClient<T>(this);

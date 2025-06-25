@@ -47,7 +47,7 @@ namespace ThingsGateway.SqlSugar
             object value = null;
             if (isField)
             {
-                value = ExpressionTool.GetFiledValue(expression);
+                value = ExpressionTool.GetFieldValue(expression);
             }
             else if (isProperty)
             {

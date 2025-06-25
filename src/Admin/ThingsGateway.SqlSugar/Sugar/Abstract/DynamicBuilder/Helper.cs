@@ -35,7 +35,7 @@ namespace ThingsGateway.SqlSugar
                   attributeType.GetProperty(nameof(SugarTable.TableDescription)) ,
                   attributeType.GetProperty(nameof(SugarTable.IsDisabledUpdateAll)) ,
                   attributeType.GetProperty(nameof(SugarTable.IsDisabledDelete)),
-                  attributeType.GetProperty(nameof(SugarTable.IsCreateTableFiledSort)),
+                  attributeType.GetProperty(nameof(SugarTable.IsCreateTableFieldSort)),
                   attributeType.GetProperty(nameof(SugarTable.Discrimator))
             }
             , new object[] {
@@ -43,7 +43,7 @@ namespace ThingsGateway.SqlSugar
                     sugarTable.TableDescription ,
                     sugarTable.IsDisabledUpdateAll,
                     sugarTable.IsDisabledDelete,
-                    sugarTable.IsCreateTableFiledSort,
+                    sugarTable.IsCreateTableFieldSort,
                     sugarTable.Discrimator
              });
             return attributeBuilder;

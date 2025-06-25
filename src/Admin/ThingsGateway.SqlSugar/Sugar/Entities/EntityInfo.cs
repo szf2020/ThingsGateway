@@ -11,7 +11,7 @@
         public bool IsDisabledDelete { get; set; }
         public bool IsDisabledUpdateAll { get; set; }
         public List<SugarIndexAttribute> Indexs { get; set; }
-        public bool IsCreateTableFiledSort { get; set; }
+        public bool IsCreateTableFieldSort { get; set; }
         public string Discrimator { get; set; }
     }
 }

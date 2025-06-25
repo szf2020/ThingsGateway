@@ -54,6 +54,7 @@ public interface IVariable
     /// 打包变量
     /// </summary>
     IVariableSource VariableSource { get; set; }
+    object? RawValue { get; }
 
     void SetNoChangedValue(DateTime dateTime);
 

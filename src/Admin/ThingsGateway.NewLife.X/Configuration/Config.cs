@@ -95,7 +95,6 @@ public class Config<TConfig> where TConfig : Config<TConfig>, new()
     #region 属性
     /// <summary>是否新的配置文件</summary>
     [XmlIgnore, IgnoreDataMember]
-    //[Obsolete("=>_Provider.IsNew")]
     public Boolean IsNew => Provider?.IsNew ?? false;
     #endregion
 
@@ -104,7 +103,6 @@ public class Config<TConfig> where TConfig : Config<TConfig>, new()
     protected virtual void OnLoaded() { }
 
     /// <summary>保存到配置文件中去</summary>
-    //[Obsolete("=>Provider.Save")]
     public virtual void Save() => Provider?.Save(this);
     #endregion
 }

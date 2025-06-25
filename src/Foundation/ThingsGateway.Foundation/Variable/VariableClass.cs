@@ -61,9 +61,11 @@ public class VariableClass : IVariable
     /// IVariableSource
     /// </summary>
     public IVariableSource VariableSource { get; set; }
+    public object? RawValue { get; private set; }
 
     public void SetNoChangedValue(DateTime dateTime)
     {
+        SetValue(RawValue, dateTime, true);
     }
 
     /// <summary>
@@ -76,6 +78,7 @@ public class VariableClass : IVariable
     public virtual OperResult SetValue(object? value, DateTime dateTime = default, bool isOnline = true)
     {
         IsOnline = isOnline;
+        RawValue = value;
         _value = value;
         return new();
     }

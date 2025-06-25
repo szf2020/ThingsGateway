@@ -124,13 +124,13 @@ namespace ThingsGateway.SqlSugar
 
 
         ISugarQueryable<T> GroupBy(Expression<Func<T, object>> expression);
-        ISugarQueryable<T> GroupBy(string groupFileds);
+        ISugarQueryable<T> GroupBy(string groupFields);
         ISugarQueryable<T> GroupByIF(bool isGroupBy, Expression<Func<T, object>> expression);
 
         ISugarQueryable<T> GroupByIF(bool isGroupBy, string groupFields);
 
         ISugarQueryable<T> PartitionBy(Expression<Func<T, object>> expression);
-        ISugarQueryable<T> PartitionBy(string groupFileds);
+        ISugarQueryable<T> PartitionBy(string groupFields);
 
         ISugarQueryable<T> Skip(int index);
         ISugarQueryable<T> Take(int num);
@@ -213,10 +213,10 @@ namespace ThingsGateway.SqlSugar
         //bool IntoTable(Type TableEntityType, params string[] columnNameList);
         //bool IntoTable<TableEntityType>(params string[] columnNameList);
         List<T> SetContext<ParameterT>(Expression<Func<T, bool>> whereExpression, ParameterT parameter);
-        List<T> SetContext<ParameterT>(Expression<Func<T, object>> thisFiled, Expression<Func<object>> mappingFiled, ParameterT parameter);
-        List<T> SetContext<ParameterT>(Expression<Func<T, object>> thisFiled1, Expression<Func<object>> mappingFiled1, Expression<Func<T, object>> thisFiled2, Expression<Func<object>> mappingFiled2, ParameterT parameter);
-        Task<List<T>> SetContextAsync<ParameterT>(Expression<Func<T, object>> thisFiled, Expression<Func<object>> mappingFiled, ParameterT parameter);
-        Task<List<T>> SetContextAsync<ParameterT>(Expression<Func<T, object>> thisFiled1, Expression<Func<object>> mappingFiled1, Expression<Func<T, object>> thisFiled2, Expression<Func<object>> mappingFiled2, ParameterT parameter);
+        List<T> SetContext<ParameterT>(Expression<Func<T, object>> thisField, Expression<Func<object>> mappingField, ParameterT parameter);
+        List<T> SetContext<ParameterT>(Expression<Func<T, object>> thisField1, Expression<Func<object>> mappingField1, Expression<Func<T, object>> thisField2, Expression<Func<object>> mappingField2, ParameterT parameter);
+        Task<List<T>> SetContextAsync<ParameterT>(Expression<Func<T, object>> thisField, Expression<Func<object>> mappingField, ParameterT parameter);
+        Task<List<T>> SetContextAsync<ParameterT>(Expression<Func<T, object>> thisField1, Expression<Func<object>> mappingField1, Expression<Func<T, object>> thisField2, Expression<Func<object>> mappingField2, ParameterT parameter);
         Dictionary<string, ValueType> ToDictionary<ValueType>(Expression<Func<T, object>> key, Expression<Func<T, object>> value);
         Dictionary<string, object> ToDictionary(Expression<Func<T, object>> key, Expression<Func<T, object>> value);
         Task<Dictionary<string, object>> ToDictionaryAsync(Expression<Func<T, object>> key, Expression<Func<T, object>> value);
@@ -410,7 +410,7 @@ namespace ThingsGateway.SqlSugar
         #region GroupBy
         new ISugarQueryable<T, T2> PartitionBy(Expression<Func<T, object>> expression);
         ISugarQueryable<T, T2> PartitionBy(Expression<Func<T, T2, object>> expression);
-        new ISugarQueryable<T, T2> PartitionBy(string groupFileds);
+        new ISugarQueryable<T, T2> PartitionBy(string groupFields);
         new ISugarQueryable<T, T2> GroupBy(Expression<Func<T, object>> expression);
         ISugarQueryable<T, T2> GroupBy(Expression<Func<T, T2, object>> expression);
         new ISugarQueryable<T, T2> GroupByIF(bool isGroupBy, Expression<Func<T, object>> expression);
@@ -555,7 +555,7 @@ namespace ThingsGateway.SqlSugar
         new ISugarQueryable<T, T2, T3> PartitionBy(Expression<Func<T, object>> expression);
         ISugarQueryable<T, T2, T3> PartitionBy(Expression<Func<T, T2, object>> expression);
         ISugarQueryable<T, T2, T3> PartitionBy(Expression<Func<T, T2, T3, object>> expression);
-        new ISugarQueryable<T, T2, T3> PartitionBy(string groupFileds);
+        new ISugarQueryable<T, T2, T3> PartitionBy(string groupFields);
         new ISugarQueryable<T, T2, T3> GroupBy(Expression<Func<T, object>> expression);
         ISugarQueryable<T, T2, T3> GroupBy(Expression<Func<T, T2, object>> expression);
         ISugarQueryable<T, T2, T3> GroupBy(Expression<Func<T, T2, T3, object>> expression);

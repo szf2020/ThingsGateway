@@ -112,7 +112,7 @@ public static partial class DeviceExtension
             int index = variable.Index;
             try
             {
-                var changed = byteConverter.GetChangedDataFormBytes(device, variable.RegisterAddress, buffer, index, dataType, variable.ArrayLength ?? 1, variable.Value, out var data);
+                var changed = byteConverter.GetChangedDataFormBytes(device, variable.RegisterAddress, buffer, index, dataType, variable.ArrayLength ?? 1, variable.RawValue, out var data);
                 if (changed)
                 {
                     result = variable.SetValue(data, time);

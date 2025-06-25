@@ -55,14 +55,25 @@ public class OpcDaMaster : CollectBase
             ActiveSubscribe = _driverProperties.ActiveSubscribe,
             CheckRate = _driverProperties.CheckRate
         };
-        if (_plc == null)
+
+        var plc = _plc;
+        _plc = new();
+        if (plc != null)
         {
-            _plc = new();
-            _plc.DataChangedHandler += DataChangedHandler;
-            _plc.LogEvent = (a, b, c, d) => LogMessage?.Log((LogLevel)a, b, c, d);
+            plc.DataChangedHandler -= DataChangedHandler;
+            plc.LogEvent = null;
+            plc.SafeDispose();
         }
+
+        _plc.DataChangedHandler += DataChangedHandler;
+        _plc.LogEvent = Log;
         _plc.Init(opcNode);
         await base.InitChannelAsync(channel, cancellationToken).ConfigureAwait(false);
+    }
+
+    private void Log(byte level, object sender, string message, Exception ex)
+    {
+        LogMessage?.Log((LogLevel)level, sender, message, ex);
     }
 
     /// <inheritdoc/>
@@ -194,6 +205,22 @@ public class OpcDaMaster : CollectBase
         catch (Exception ex)
         {
             LogMessage?.LogWarning(ex);
+        }
+        if (VariableTasks.Count > 0)
+        {
+            foreach (var item in VariableTasks)
+            {
+                item.Stop();
+                TaskSchedulerLoop.Remove(item);
+            }
+
+            VariableTasks = AddVariableTask(cancellationToken);
+
+            foreach (var item in VariableTasks)
+            {
+                TaskSchedulerLoop.Add(item);
+                item.Start();
+            }
         }
     }
 

@@ -355,7 +355,7 @@ namespace ThingsGateway.SqlSugar
                     {
                         var querybulder = InstanceFactory.GetSqlbuilder(this.Context.CurrentConnectionConfig);
                         querybulder.Context = this.Context;
-                        var fileds = item.IndexFields
+                        var fields = item.IndexFields
                             .Select(it =>
                             {
                                 var dbColumn = entityInfo.Columns.FirstOrDefault(z => z.PropertyName == it.Key);
@@ -366,7 +366,7 @@ namespace ThingsGateway.SqlSugar
                                 return new KeyValuePair<string, OrderByType>(dbColumn.DbColumnName, it.Value);
                             })
                             .Select(it => querybulder.GetTranslationColumnName(it.Key) + " " + it.Value).ToArray();
-                        this.Context.DbMaintenance.CreateIndex(entityInfo.DbTableName, fileds, item.IndexName + include, item.IsUnique);
+                        this.Context.DbMaintenance.CreateIndex(entityInfo.DbTableName, fields, item.IndexName + include, item.IsUnique);
                     }
                 }
             }
@@ -384,7 +384,7 @@ namespace ThingsGateway.SqlSugar
                     DbColumnInfo dbColumnInfo = EntityColumnToDbColumn(entityInfo, tableName, item);
                     columns.Add(dbColumnInfo);
                 }
-                if (entityInfo.IsCreateTableFiledSort)
+                if (entityInfo.IsCreateTableFieldSort)
                 {
                     columns = columns.OrderBy(c => c.CreateTableFieldSort).ToList();
                     columns = columns.OrderBy(it => it.IsPrimarykey ? 0 : 1).ToList();

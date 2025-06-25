@@ -67,9 +67,9 @@ namespace ThingsGateway.SqlSugar
         IUpdateable<T> SetColumns(Expression<Func<T, T>> columns, bool appendColumnsByDataFilter);
         IUpdateable<T> SetColumns(string fieldName, object fieldValue);
 
-        IUpdateable<T> SetColumns(Expression<Func<T, object>> filedNameExpression, object fieldValue);
-        IUpdateable<T> SetColumns(Expression<Func<T, object>> filedNameExpression, Expression<Func<T, object>> valueExpression);
-        IUpdateable<T> SetColumnsIF(bool isUpdateColumns, Expression<Func<T, object>> filedNameExpression, object fieldValue);
+        IUpdateable<T> SetColumns(Expression<Func<T, object>> fieldNameExpression, object fieldValue);
+        IUpdateable<T> SetColumns(Expression<Func<T, object>> fieldNameExpression, Expression<Func<T, object>> valueExpression);
+        IUpdateable<T> SetColumnsIF(bool isUpdateColumns, Expression<Func<T, object>> fieldNameExpression, object fieldValue);
         IUpdateable<T> UpdateColumnsIF(bool isUpdateColumns, Expression<Func<T, object>> columns);
         IUpdateable<T> UpdateColumnsIF(bool isUpdateColumns, params string[] columns);
 
@@ -91,8 +91,8 @@ namespace ThingsGateway.SqlSugar
         IUpdateable<T> EnableDiffLogEvent(object businessData = null);
         IUpdateable<T> EnableDiffLogEventIF(bool isEnableDiffLog, object businessData = null);
         IUpdateable<T> ReSetValue(Action<T> setValueExpression);
-        IUpdateable<T> PublicSetColumns(Expression<Func<T, object>> filedNameExpression, string computationalSymbol);
-        IUpdateable<T> PublicSetColumns(Expression<Func<T, object>> filedNameExpression, Expression<Func<T, object>> ValueExpExpression);
+        IUpdateable<T> PublicSetColumns(Expression<Func<T, object>> fieldNameExpression, string computationalSymbol);
+        IUpdateable<T> PublicSetColumns(Expression<Func<T, object>> fieldNameExpression, Expression<Func<T, object>> ValueExpExpression);
         IUpdateable<T> RemoveDataCache();
         IUpdateable<T> RemoveDataCache(string likeString);
         IUpdateable<T> CallEntityMethod(Expression<Action<T>> method);

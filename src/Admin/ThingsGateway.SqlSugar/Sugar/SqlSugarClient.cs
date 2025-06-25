@@ -580,16 +580,6 @@ namespace ThingsGateway.SqlSugar
             return this.Context.Storageable(new List<T> { data });
         }
 
-        [Obsolete("use Storageable")]
-        public ISaveable<T> Saveable<T>(List<T> saveObjects) where T : class, new()
-        {
-            return this.Context.Saveable<T>(saveObjects);
-        }
-        [Obsolete("use Storageable")]
-        public ISaveable<T> Saveable<T>(T saveObject) where T : class, new()
-        {
-            return this.Context.Saveable(saveObject);
-        }
         public StorageableMethodInfo StorageableByObject(object singleEntityObjectOrListObject)
         {
             return this.Context.StorageableByObject(singleEntityObjectOrListObject);

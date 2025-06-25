@@ -435,19 +435,17 @@ public partial class SiemensS7Master : DeviceBase
                 var result2 = await SendThenReturnMessageBaseAsync(new S7Send(ISO_CR), channel).ConfigureAwait(false);
                 if (!result2.IsSuccess)
                 {
-                    if (result2.Exception is OperationCanceledException)
-                        return true;
-
-                    Logger?.LogWarning(string.Format(AppResource.HandshakeError1, channel.ToString(), result2));
                     await channel.CloseAsync().ConfigureAwait(false);
+
+                    if (result2.Exception is not OperationCanceledException)
+                        Logger?.LogWarning(string.Format(AppResource.HandshakeError1, channel.ToString(), result2));
                     return true;
                 }
             }
-            catch (OperationCanceledException) { }
             catch (Exception ex)
             {
-                Logger?.LogWarning(string.Format(AppResource.HandshakeError1, channel.ToString(), ex));
-                await channel.CloseAsync().ConfigureAwait(false);
+                if (ex is not OperationCanceledException)
+                    Logger?.LogWarning(string.Format(AppResource.HandshakeError1, channel.ToString(), ex));
                 return true;
             }
             try
@@ -455,11 +453,9 @@ public partial class SiemensS7Master : DeviceBase
                 var result2 = await SendThenReturnMessageBaseAsync(new S7Send(S7_PN), channel).ConfigureAwait(false);
                 if (!result2.IsSuccess)
                 {
-                    if (result2.Exception is OperationCanceledException)
-                        return true;
-
-                    Logger?.LogWarning(string.Format(AppResource.HandshakeError2, channel.ToString(), result2));
                     await channel.CloseAsync().ConfigureAwait(false);
+                    if (result2.Exception is not OperationCanceledException)
+                        Logger?.LogWarning(string.Format(AppResource.HandshakeError2, channel.ToString(), result2));
                     return true;
                 }
                 if (result2.Content == null)
@@ -471,10 +467,10 @@ public partial class SiemensS7Master : DeviceBase
                 Logger?.LogInformation($"PduLength：{PduLength}");
                 PduLength = PduLength < 200 ? 200 : PduLength;
             }
-            catch (OperationCanceledException) { }
             catch (Exception ex)
             {
-                Logger?.LogWarning(string.Format(AppResource.HandshakeError2, channel.ToString(), ex));
+                if (ex is not OperationCanceledException)
+                    Logger?.LogWarning(string.Format(AppResource.HandshakeError2, channel.ToString(), ex));
                 await channel.CloseAsync().ConfigureAwait(false);
                 return true;
             }
@@ -482,7 +478,8 @@ public partial class SiemensS7Master : DeviceBase
         catch (Exception ex)
         {
             await channel.CloseAsync().ConfigureAwait(false);
-            Logger?.Exception(ex);
+            if (ex is not OperationCanceledException)
+                Logger?.Exception(ex);
         }
         finally
         {

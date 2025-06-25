@@ -10,7 +10,6 @@
 
 using Microsoft.AspNetCore.Components.Forms;
 
-using System.Globalization;
 using System.Text.RegularExpressions;
 
 using ThingsGateway.NewLife.Extension;
@@ -66,7 +65,7 @@ public partial class ValueTransformConfigPage
 
             // Linear + clamp actual
 
-             m = Regex.Match(formula, $@"^Math\.Round\(\s*
+            m = Regex.Match(formula, $@"^Math\.Round\(\s*
     Math\.Min\(\s*
         Math\.Max\(\s*
             \(\(raw\.ToDecimal\(\)\s*-\s*({dec})\)\s*/\s*

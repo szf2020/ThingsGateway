@@ -91,7 +91,7 @@ namespace ThingsGateway.SqlSugar
             throw new NotSupportedException("Can only be used in expressions");
         }
 
-        public static int RowCount(object countFiledName, object orderByField, object partitionBy)
+        public static int RowCount(object countFieldName, object orderByField, object partitionBy)
         {
             throw new NotSupportedException("Can only be used in expressions");
         }
@@ -99,35 +99,35 @@ namespace ThingsGateway.SqlSugar
         {
             throw new NotSupportedException("Can only be used in expressions");
         }
-        public static TRestult RowSum<TRestult>(TRestult filedName)
+        public static TRestult RowSum<TRestult>(TRestult fieldName)
         {
             throw new NotSupportedException("Can only be used in expressions");
         }
-        public static TRestult RowSum<TRestult>(TRestult filedName, object orderByField, object partitionBy)
+        public static TRestult RowSum<TRestult>(TRestult fieldName, object orderByField, object partitionBy)
         {
             throw new NotSupportedException("Can only be used in expressions");
         }
-        public static TRestult RowMax<TRestult>(TRestult filedName)
+        public static TRestult RowMax<TRestult>(TRestult fieldName)
         {
             throw new NotSupportedException("Can only be used in expressions");
         }
-        public static TRestult RowMax<TRestult>(TRestult filedNameobject, object orderByField, object partitionBy)
+        public static TRestult RowMax<TRestult>(TRestult fieldNameobject, object orderByField, object partitionBy)
         {
             throw new NotSupportedException("Can only be used in expressions");
         }
-        public static TRestult RowMin<TRestult>(TRestult filedName)
+        public static TRestult RowMin<TRestult>(TRestult fieldName)
         {
             throw new NotSupportedException("Can only be used in expressions");
         }
-        public static TRestult RowMin<TRestult>(TRestult filedName, object orderByField, object partitionBy)
+        public static TRestult RowMin<TRestult>(TRestult fieldName, object orderByField, object partitionBy)
         {
             throw new NotSupportedException("Can only be used in expressions");
         }
-        public static TRestult RowAvg<TRestult>(TRestult filedName)
+        public static TRestult RowAvg<TRestult>(TRestult fieldName)
         {
             throw new NotSupportedException("Can only be used in expressions");
         }
-        public static TRestult RowAvg<TRestult>(TRestult filedName, object orderByField, object partitionBy)
+        public static TRestult RowAvg<TRestult>(TRestult fieldName, object orderByField, object partitionBy)
         {
             throw new NotSupportedException("Can only be used in expressions");
         }
@@ -387,9 +387,9 @@ namespace ThingsGateway.SqlSugar
         /// <returns></returns>
         public static Subqueryable<T> Subqueryable<T>() where T : class, new() { throw new NotSupportedException("Can only be used in expressions"); }
         public static CaseThen IF(bool condition) { throw new NotSupportedException("Can only be used in expressions"); }
-        [Obsolete("多库下参数顺序不一至，为了保证多库下更好体验请使用 SqlFunc.CharIndexNew")]
-        public static int CharIndex(string findChar, string searchValue) { throw new NotSupportedException("Can only be used in expressions"); }
+
         public static int CharIndexNew(string stringValue, string charValue) { throw new NotSupportedException("Can only be used in expressions"); }
+
         public static int BitwiseAnd(int left, int right) { throw new NotSupportedException("Can only be used in expressions"); }
         public static int BitwiseInclusiveOR(int left, int right) { throw new NotSupportedException("Can only be used in expressions"); }
         public static int BitwiseAnd(long left, long right) { throw new NotSupportedException("Can only be used in expressions"); }
