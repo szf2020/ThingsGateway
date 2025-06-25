@@ -404,7 +404,7 @@ public abstract class DeviceBase : DisposableObject, IDevice
             }
             finally
             {
-                await Task.Delay(500, token).ConfigureAwait(false);
+                try { await Task.Delay(500, token).ConfigureAwait(false); } catch { }
                 connectWaitLock.Release();
             }
         }
