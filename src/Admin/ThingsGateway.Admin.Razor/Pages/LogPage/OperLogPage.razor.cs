@@ -26,6 +26,7 @@ public partial class OperLogPage
 
     private async Task<ChartDataSource> OnInit()
     {
+        if (App.HostApplicationLifetime.ApplicationStopping.IsCancellationRequested) return (new ChartDataSource());
         if (ChartDataSource == null)
         {
             var dayStatisticsOutputs = await SysOperateLogService.StatisticsByDayAsync(7);

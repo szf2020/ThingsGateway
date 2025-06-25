@@ -34,7 +34,7 @@ public static class XTrace
 
     /// <summary>日志提供者，默认使用文本文件日志</summary>
     public static ILog Log { get { InitLog(); return _Log; } set { _Log = value; } }
-
+    public static Func<bool> UnhandledExceptionLogEnable { get; set; } = () => true;
     /// <summary>输出日志</summary>
     /// <param name="msg">信息</param>
     public static void WriteLine(String msg)
@@ -96,6 +96,7 @@ public static class XTrace
 
     private static void CurrentDomain_UnhandledException(Object sender, UnhandledExceptionEventArgs e)
     {
+        if (!UnhandledExceptionLogEnable()) return;
         if (e.ExceptionObject is Exception ex)
         {
             WriteException(ex);
@@ -110,6 +111,8 @@ public static class XTrace
 
     private static void TaskScheduler_UnobservedTaskException(Object? sender, UnobservedTaskExceptionEventArgs e)
     {
+        if (!UnhandledExceptionLogEnable()) return;
+
         if (!e.Observed && e.Exception != null)
         {
             //WriteException(e.Exception);

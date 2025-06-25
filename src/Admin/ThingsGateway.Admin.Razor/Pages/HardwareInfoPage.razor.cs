@@ -64,6 +64,7 @@ public partial class HardwareInfoPage : IDisposable
 
     private async Task<ChartDataSource> OnInit()
     {
+        if (App.HostApplicationLifetime.ApplicationStopping.IsCancellationRequested) return (new ChartDataSource());
         if (ChartDataSource == null)
         {
             var hisHardwareInfos = await HardwareJob.GetHistoryHardwareInfos();

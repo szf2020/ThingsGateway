@@ -86,6 +86,7 @@ public partial class GatewayIndexComponent : IDisposable
 
     private Task<ChartDataSource> OnInitAlarmPie()
     {
+        if (App.HostApplicationLifetime.ApplicationStopping.IsCancellationRequested) return Task.FromResult(new ChartDataSource());
         var data = new List<bool>() { true };
         if (AlarmChartDataSource == null)
         {
@@ -107,6 +108,7 @@ public partial class GatewayIndexComponent : IDisposable
 
     private Task<ChartDataSource> OnInitBusinessDevicePie()
     {
+        if (App.HostApplicationLifetime.ApplicationStopping.IsCancellationRequested) return Task.FromResult(new ChartDataSource());
         var data = typeof(DeviceStatusEnum).ToSelectList();
         if (BusinessDeviceChartDataSource == null)
         {
@@ -128,6 +130,7 @@ public partial class GatewayIndexComponent : IDisposable
 
     private Task<ChartDataSource> OnInitCollectDevicePie()
     {
+        if (App.HostApplicationLifetime.ApplicationStopping.IsCancellationRequested) return Task.FromResult(new ChartDataSource());
         var data = typeof(DeviceStatusEnum).ToSelectList();
         if (CollectDeviceChartDataSource == null)
         {
@@ -149,6 +152,7 @@ public partial class GatewayIndexComponent : IDisposable
 
     private Task<ChartDataSource> OnInitVariablePie()
     {
+        if (App.HostApplicationLifetime.ApplicationStopping.IsCancellationRequested) return Task.FromResult(new ChartDataSource());
         var data = new List<bool>() { true, false };
         if (VariableChartDataSource == null)
         {

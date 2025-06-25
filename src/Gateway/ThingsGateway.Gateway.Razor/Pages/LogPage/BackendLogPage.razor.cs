@@ -23,6 +23,7 @@ public partial class BackendLogPage
 
     private async Task<ChartDataSource> OnInit()
     {
+        if (App.HostApplicationLifetime.ApplicationStopping.IsCancellationRequested) return (new ChartDataSource());
         if (ChartDataSource == null)
         {
             var dayStatisticsOutputs = await BackendLogService.StatisticsByDayAsync(7);

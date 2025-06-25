@@ -14,6 +14,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 using System.Reflection;
 
+using ThingsGateway.NewLife.Log;
 using ThingsGateway.UnifyResult;
 
 namespace ThingsGateway.Admin.Application;
@@ -68,6 +69,8 @@ public class Startup : AppStartup
 
     public void Use(IServiceProvider serviceProvider)
     {
+        XTrace.UnhandledExceptionLogEnable = () => !App.HostApplicationLifetime.ApplicationStopping.IsCancellationRequested;
+
         //检查ConfigId
         var configIdGroup = DbContext.DbConfigs.GroupBy(it => it.ConfigId);
         foreach (var configId in configIdGroup)
