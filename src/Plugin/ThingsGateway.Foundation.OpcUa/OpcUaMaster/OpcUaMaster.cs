@@ -1091,14 +1091,13 @@ public class OpcUaMaster : IDisposable
         {
 
             VariableNode variableNode = new VariableNode();
-            DataValue value;
+            DataValue value = values[1 + 2 * i];
 
-            if (!DataValue.IsGood(values[1 + 2 * i]))
-            {
-                //throw ServiceResultException.Create(values[1+2 * i].StatusCode, 1+2 * i, diagnosticInfos, responseHeader.StringTable);
-            }
+            //if (!DataValue.IsGood(value))
+            //{
+            //    //throw ServiceResultException.Create(values[1+2 * i].StatusCode, 1+2 * i, diagnosticInfos, responseHeader.StringTable);
+            //}
             // DataType Attribute
-            value = values[1 + 2 * i];
 
             if (value == null)
             {
@@ -1109,13 +1108,13 @@ public class OpcUaMaster : IDisposable
             {
                 variableNode.DataType = (NodeId)value.GetValue(typeof(NodeId));
             }
+            value = values[0 + 2 * i];
 
             // NodeId Attribute
-            if (!DataValue.IsGood(values[0 + 2 * i]))
+            if (!DataValue.IsGood(value))
             {
-                throw ServiceResultException.Create(values[0 + 2 * i].StatusCode, 0 + 2 * i, diagnosticInfos, responseHeader.StringTable);
+                throw ServiceResultException.Create(value.StatusCode, 0 + 2 * i, diagnosticInfos, responseHeader.StringTable);
             }
-            value = values[0 + 2 * i];
             if (value == null)
             {
                 throw ServiceResultException.Create(StatusCodes.BadUnexpectedError, "Node does not support the NodeId attribute.");

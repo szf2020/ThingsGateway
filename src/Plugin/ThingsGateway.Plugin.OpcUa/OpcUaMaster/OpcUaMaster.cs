@@ -146,6 +146,8 @@ public class OpcUaMaster : CollectBase
             }
         }
     }
+
+    private volatile bool checkLog;
     private async Task CheckAsync(object? state, CancellationToken cancellationToken)
     {
         if (_plc.Session != null)
@@ -177,10 +179,13 @@ public class OpcUaMaster : CollectBase
                                     }
                                 }
                                 LogMessage?.LogInformation("AddSubscriptions done");
+                                checkLog = true;
                             }
                             catch (Exception ex)
                             {
-                                LogMessage?.LogWarning(ex, "AddSubscriptions");
+                                if (!checkLog)
+                                    LogMessage?.LogWarning(ex, "AddSubscriptions");
+                                checkLog = false;
                             }
                             finally
                             {

@@ -441,6 +441,9 @@ internal sealed class AlarmHostedService : BackgroundService, IAlarmHostedServic
                 //stopwatch.Stop();
                 //_logger.LogInformation("报警分析耗时：" + stopwatch.ElapsedMilliseconds + "ms");
             }
+            catch (OperationCanceledException)
+            {
+            }
             catch (Exception ex)
             {
                 _logger.LogWarning(ex, "Alarm analysis fail");

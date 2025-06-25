@@ -238,7 +238,7 @@ public abstract class CollectBase : DriverBase, IRpcDriver
         return variableTasks;
     }
 
-    private void SetDeviceStatus(object? state, CancellationToken cancellationToken)
+    protected virtual void SetDeviceStatus(object? state, CancellationToken cancellationToken)
     {
         if (IsConnected())
         {
