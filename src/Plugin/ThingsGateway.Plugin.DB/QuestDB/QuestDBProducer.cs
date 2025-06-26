@@ -57,7 +57,7 @@ public partial class QuestDBProducer : BusinessBaseWithCacheIntervalVariableMode
 
     public async Task<SqlSugarPagedList<IDBHistoryValue>> GetDBHistoryValuePagesAsync(DBHistoryValuePageInput input)
     {
-        var data = await Query(input).ToPagedListAsync<QuestDBHistoryValue, IDBHistoryValue>(input.Current, input.Size).ConfigureAwait(false);//分页
+        var data = await Query(input).ToPagedListAsync<QuestDBNumberHistoryValue, IDBHistoryValue>(input.Current, input.Size).ConfigureAwait(false);//分页
         return data;
     }
 
@@ -76,16 +76,34 @@ public partial class QuestDBProducer : BusinessBaseWithCacheIntervalVariableMode
             //.Map(dest => dest.Id, src => CommonUtils.GetSingleId())
             .Map(dest => dest.Id, src => src.Id)//Id更改为变量Id
             .Map(dest => dest.Value, src => src.Value == null ? string.Empty : src.Value.ToString() ?? string.Empty)
-            .Map(dest => dest.CollectTime, (src) => src.CollectTime < DateTime.MinValue ? utcTime : src.CollectTime.ToUniversalTime())//注意sqlsugar插入时无时区，直接utc时间
+            .Map(dest => dest.CollectTime, (src) => src.CollectTime < DateTime.MinValue ? utcTime : src.CollectTime)//注意sqlsugar插入时无时区，直接utc时间
             .Map(dest => dest.CreateTime, (src) => DateTime.UtcNow)
             ;//注意sqlsugar插入时无时区，直接utc时间
         _config.ForType<VariableBasicData, QuestDBHistoryValue>()
     //.Map(dest => dest.Id, src => CommonUtils.GetSingleId())
     .Map(dest => dest.Id, src => src.Id)//Id更改为变量Id
     .Map(dest => dest.Value, src => src.Value == null ? string.Empty : src.Value.ToString() ?? string.Empty)
-    .Map(dest => dest.CollectTime, (src) => src.CollectTime < DateTime.MinValue ? utcTime : src.CollectTime.ToUniversalTime())//注意sqlsugar插入时无时区，直接utc时间
+    .Map(dest => dest.CollectTime, (src) => src.CollectTime < DateTime.MinValue ? utcTime : src.CollectTime)//注意sqlsugar插入时无时区，直接utc时间
     .Map(dest => dest.CreateTime, (src) => DateTime.UtcNow)
     ;//注意sqlsugar插入时无时区，直接utc时间
+
+
+
+        _config.ForType<VariableRuntime, QuestDBNumberHistoryValue>()
+          //.Map(dest => dest.Id, src => CommonUtils.GetSingleId())
+          .Map(dest => dest.Id, src => src.Id)//Id更改为变量Id
+          .Map(dest => dest.Value, src => ConvertUtility.Convert.ToDecimal(src.Value, 0))
+          .Map(dest => dest.CollectTime, (src) => src.CollectTime < DateTime.MinValue ? utcTime : src.CollectTime)//注意sqlsugar插入时无时区，直接utc时间
+          .Map(dest => dest.CreateTime, (src) => DateTime.UtcNow)
+          ;//注意sqlsugar插入时无时区，直接utc时间
+        _config.ForType<VariableBasicData, QuestDBNumberHistoryValue>()
+    //.Map(dest => dest.Id, src => CommonUtils.GetSingleId())
+    .Map(dest => dest.Id, src => src.Id)//Id更改为变量Id
+    .Map(dest => dest.Value, src => ConvertUtility.Convert.ToDecimal(src.Value, 0))
+    .Map(dest => dest.CollectTime, (src) => src.CollectTime < DateTime.MinValue ? utcTime : src.CollectTime)//注意sqlsugar插入时无时区，直接utc时间
+    .Map(dest => dest.CreateTime, (src) => DateTime.UtcNow)
+    ;//注意sqlsugar插入时无时区，直接utc时间
+
         await base.InitChannelAsync(channel, cancellationToken).ConfigureAwait(false);
     }
 
@@ -98,10 +116,10 @@ public partial class QuestDBProducer : BusinessBaseWithCacheIntervalVariableMode
         return $" {nameof(QuestDBProducer)}";
     }
 
-    internal ISugarQueryable<QuestDBHistoryValue> Query(DBHistoryValuePageInput input)
+    internal ISugarQueryable<QuestDBNumberHistoryValue> Query(DBHistoryValuePageInput input)
     {
         var db = BusinessDatabaseUtil.GetDb(_driverPropertys.DbType, _driverPropertys.BigTextConnectStr);
-        var query = db.Queryable<QuestDBHistoryValue>().AS(_driverPropertys.TableName)
+        var query = db.Queryable<QuestDBNumberHistoryValue>().AS(_driverPropertys.NumberTableName)
                              .WhereIF(input.StartTime != null, a => a.CreateTime >= input.StartTime)
                            .WhereIF(input.EndTime != null, a => a.CreateTime <= input.EndTime)
                            .WhereIF(!string.IsNullOrEmpty(input.VariableName), it => it.Name.Contains(input.VariableName))
@@ -117,20 +135,20 @@ public partial class QuestDBProducer : BusinessBaseWithCacheIntervalVariableMode
         return query;
     }
 
-    internal async Task<QueryData<QuestDBHistoryValue>> QueryData(QueryPageOptions option)
+    internal async Task<QueryData<QuestDBNumberHistoryValue>> QueryData(QueryPageOptions option)
     {
         using var db = BusinessDatabaseUtil.GetDb(_driverPropertys.DbType, _driverPropertys.BigTextConnectStr);
-        var ret = new QueryData<QuestDBHistoryValue>()
+        var ret = new QueryData<QuestDBNumberHistoryValue>()
         {
             IsSorted = option.SortOrder != SortOrder.Unset,
             IsFiltered = option.Filters.Count > 0,
             IsAdvanceSearch = option.AdvanceSearches.Count > 0 || option.CustomerSearches.Count > 0,
             IsSearch = option.Searches.Count > 0
         };
-        var query = db.Queryable<QuestDBHistoryValue>()
-            .AS(_driverPropertys.TableName);
+        var query = db.Queryable<QuestDBNumberHistoryValue>()
+            .AS(_driverPropertys.NumberTableName);
 
-        query = db.GetQuery<QuestDBHistoryValue>(option, query);
+        query = db.GetQuery<QuestDBNumberHistoryValue>(option, query);
 
         if (option.IsPage)
         {
@@ -174,7 +192,8 @@ public partial class QuestDBProducer : BusinessBaseWithCacheIntervalVariableMode
         }
         else
         {
-            _db.CodeFirst.As<QuestDBHistoryValue>(_driverPropertys.TableName).InitTables(typeof(QuestDBHistoryValue));
+            _db.CodeFirst.As<QuestDBNumberHistoryValue>(_driverPropertys.NumberTableName).InitTables(typeof(QuestDBNumberHistoryValue));
+            _db.CodeFirst.As<QuestDBHistoryValue>(_driverPropertys.StringTableName).InitTables(typeof(QuestDBHistoryValue));
         }
 
         await base.ProtectedStartAsync(cancellationToken).ConfigureAwait(false);

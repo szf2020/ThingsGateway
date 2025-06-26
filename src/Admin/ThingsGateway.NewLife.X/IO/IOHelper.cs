@@ -256,6 +256,28 @@ public static class IOHelper
     #endregion
 
     #region 数据流转换
+
+    /// <summary>从一个数据流复制特定长度数据到另一个数据流</summary>
+    /// <param name="source">源数据流</param>
+    /// <param name="destination">目标数据流</param>
+    /// <param name="length">要复制的数据长度</param>
+    /// <param name="bufferSize">缓冲区大小</param>
+    public static void CopyTo(this Stream source, Stream destination, Int64 length, Int32 bufferSize)
+    {
+        if (length <= 0) return;
+
+        var buffer = ArrayPool<Byte>.Shared.Rent(bufferSize);
+        while (length > 0)
+        {
+            var bytesRead = source.Read(buffer, 0, (Int32)Math.Min(buffer.Length, length));
+            if (bytesRead == 0) break;
+
+            destination.Write(buffer, 0, bytesRead);
+            length -= bytesRead;
+        }
+        ArrayPool<Byte>.Shared.Return(buffer);
+    }
+
 #if !NET7_0_OR_GREATER
     /// <summary>从流中完全读取数据，直到指定大小或者到达流结束</summary>
     /// <remarks>

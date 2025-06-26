@@ -2,12 +2,29 @@
 
 namespace ThingsGateway.SqlSugar
 {
+    /// <summary>
+    /// 分表删除提供者(按对象删除)
+    /// </summary>
+    /// <typeparam name="T">实体类型</typeparam>
     public class SplitTableDeleteByObjectProvider<T> where T : class, new()
     {
+        /// <summary>
+        /// SqlSugar上下文
+        /// </summary>
         public ISqlSugarClient Context;
+        /// <summary>
+        /// 可删除提供者
+        /// </summary>
         public DeleteableProvider<T> deleteobj;
+        /// <summary>
+        /// 待删除对象数组
+        /// </summary>
         public T[] deleteObjects { get; set; }
 
+        /// <summary>
+        /// 执行删除命令
+        /// </summary>
+        /// <returns>影响的行数</returns>
         public int ExecuteCommand()
         {
             List<GroupModel> groupModels;
@@ -20,6 +37,11 @@ namespace ThingsGateway.SqlSugar
             }
             return result;
         }
+
+        /// <summary>
+        /// 异步执行删除命令
+        /// </summary>
+        /// <returns>影响的行数任务</returns>
         public async Task<int> ExecuteCommandAsync()
         {
             List<GroupModel> groupModels;
@@ -33,6 +55,12 @@ namespace ThingsGateway.SqlSugar
             return result;
         }
 
+        /// <summary>
+        /// 分组数据列表
+        /// </summary>
+        /// <param name="datas">数据数组</param>
+        /// <param name="groupModels">分组模型列表</param>
+        /// <param name="result">结果值</param>
         private void GroupDataList(T[] datas, out List<GroupModel> groupModels, out int result)
         {
             var attribute = typeof(T).GetCustomAttribute<SplitTableAttribute>() as SplitTableAttribute;
@@ -47,9 +75,19 @@ namespace ThingsGateway.SqlSugar
             }
             result = 0;
         }
+
+        /// <summary>
+        /// 分组模型
+        /// </summary>
         internal class GroupModel
         {
+            /// <summary>
+            /// 分组名称(表名)
+            /// </summary>
             public string GroupName { get; set; }
+            /// <summary>
+            /// 数据项
+            /// </summary>
             public T Item { get; set; }
         }
     }

@@ -25,7 +25,7 @@ public partial class QuestDBPage : IDriverUIBase
     public QuestDBProducer QuestDBProducer => (QuestDBProducer)Driver;
     private SqlDBPageInput CustomerSearchModel { get; set; } = new();
 
-    private async Task<QueryData<QuestDBHistoryValue>> OnQueryAsync(QueryPageOptions options)
+    private async Task<QueryData<QuestDBNumberHistoryValue>> OnQueryAsync(QueryPageOptions options)
     {
         var query = await QuestDBProducer.QueryData(options).ConfigureAwait(false);
         return query;

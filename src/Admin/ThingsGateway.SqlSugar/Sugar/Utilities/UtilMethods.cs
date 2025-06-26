@@ -1,6 +1,4 @@
-﻿using Dm.util;
-
-using System.Collections;
+﻿using System.Collections;
 using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
@@ -17,6 +15,10 @@ namespace ThingsGateway.SqlSugar
 {
     public static class UtilMethods
     {
+        public static bool IsKeyValuePairType(Type type)
+        {
+            return type.IsGenericType && type.GetGenericTypeDefinition() == typeof(KeyValuePair<,>);
+        }
         public static DataTable ConvertDateTimeOffsetToDateTime(DataTable table)
         {
             if (!table.Columns.Cast<DataColumn>().Any(it => it.DataType == typeof(DateTimeOffset)))
@@ -82,8 +84,8 @@ namespace ThingsGateway.SqlSugar
                     // SQL Server 使用中括号转义 %, _ 等
                     var keyLeft = "[[]";
                     var keyRight = "[]]";
-                    var leftGuid = Guid.NewGuid().toString();
-                    var rightGuid = Guid.NewGuid().toString();
+                    var leftGuid = Guid.NewGuid().ToString();
+                    var rightGuid = Guid.NewGuid().ToString();
                     value = value.Replace("[", leftGuid)
                                  .Replace("]", rightGuid);
 
@@ -851,7 +853,8 @@ namespace ThingsGateway.SqlSugar
                     DatabaseModel = it.MoreSettings.DatabaseModel,
                     EnableILike = it.MoreSettings.EnableILike,
                     ClickHouseEnableFinal = it.MoreSettings.ClickHouseEnableFinal,
-                    PgSqlIsAutoToLowerSchema = it.MoreSettings.PgSqlIsAutoToLowerSchema
+                    PgSqlIsAutoToLowerSchema = it.MoreSettings.PgSqlIsAutoToLowerSchema,
+                    EnableJsonb = it.MoreSettings.EnableJsonb
 
                 },
                 SqlMiddle = it.SqlMiddle == null ? null : new SqlMiddle

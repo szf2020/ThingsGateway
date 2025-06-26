@@ -27,7 +27,7 @@ public partial class SqlDBPage : IDriverUIBase
 
     public SqlDBProducer SqlDBProducer => (SqlDBProducer)Driver;
 
-    private async Task<QueryData<SQLHistoryValue>> OnQueryHistoryAsync(QueryPageOptions options)
+    private async Task<QueryData<SQLNumberHistoryValue>> OnQueryHistoryAsync(QueryPageOptions options)
     {
         var query = await SqlDBProducer.QueryHistoryData(options).ConfigureAwait(false);
         return query;

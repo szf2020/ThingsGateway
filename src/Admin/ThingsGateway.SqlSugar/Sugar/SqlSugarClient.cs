@@ -85,7 +85,7 @@ namespace ThingsGateway.SqlSugar
             var type = typeof(T);
             var ps = type.GetProperties();
             var cacheKey = "SugarUnitOfWork" + typeof(T).FullName + typeof(T).GetHashCode();
-            var properies = new ReflectionInoCacheService().GetOrCreate(cacheKey,
+            var properies = ReflectionInoCacheService.Instance.GetOrCreate(cacheKey,
                 () =>
                 ps.Where(it =>
 

@@ -3,15 +3,40 @@ using System.Linq.Expressions;
 
 namespace ThingsGateway.SqlSugar
 {
+    /// <summary>
+    /// 子表插入操作类
+    /// </summary>
+    /// <typeparam name="T">主表实体类型</typeparam>
     public class SubInsertable<T> : ISubInsertable<T> where T : class, new()
     {
+        /// <summary>
+        /// 实体信息
+        /// </summary>
         internal EntityInfo Entity { get; set; }
+        /// <summary>
+        /// 子表插入表达式列表
+        /// </summary>
         internal List<SubInsertTreeExpression> SubList { get; set; }
+        /// <summary>
+        /// SqlSugar上下文
+        /// </summary>
         internal SqlSugarProvider Context { get; set; }
+        /// <summary>
+        /// 待插入对象数组
+        /// </summary>
         internal T[] InsertObjects { get; set; }
+        /// <summary>
+        /// 插入构建器
+        /// </summary>
         internal InsertBuilder InsertBuilder { get; set; }
+        /// <summary>
+        /// 主键名称
+        /// </summary>
         internal string Pk { get; set; }
 
+        /// <summary>
+        /// 添加子表列表
+        /// </summary>
         public ISubInsertable<T> AddSubList(Expression<Func<T, object>> items)
         {
             if (this.SubList == null)
@@ -19,6 +44,9 @@ namespace ThingsGateway.SqlSugar
             this.SubList.Add(new SubInsertTreeExpression() { Expression = items });
             return this;
         }
+        /// <summary>
+        /// 添加子表树形结构
+        /// </summary>
         public ISubInsertable<T> AddSubList(Expression<Func<T, SubInsertTree>> tree)
         {
             try
@@ -43,6 +71,9 @@ namespace ThingsGateway.SqlSugar
             return this;
         }
 
+        /// <summary>
+        /// 获取子表插入树
+        /// </summary>
         private List<SubInsertTreeExpression> GetSubInsertTree(Expression expression)
         {
             List<SubInsertTreeExpression> resul = new List<SubInsertTreeExpression>();
@@ -73,7 +104,9 @@ namespace ThingsGateway.SqlSugar
             return resul;
         }
 
-
+        /// <summary>
+        /// 异步执行插入命令
+        /// </summary>
         public async Task<object> ExecuteCommandAsync()
         {
             object resut = 0;
@@ -83,6 +116,9 @@ namespace ThingsGateway.SqlSugar
             }).ConfigureAwait(false);
             return resut;
         }
+        /// <summary>
+        /// 执行插入命令
+        /// </summary>
         public object ExecuteCommand()
         {
             var isNoTrean = this.Context.Ado.Transaction == null;
@@ -105,6 +141,9 @@ namespace ThingsGateway.SqlSugar
             }
         }
 
+        /// <summary>
+        /// 执行插入操作
+        /// </summary>
         private int Execute()
         {
             if (InsertObjects?.Length > 0)
@@ -133,12 +172,17 @@ namespace ThingsGateway.SqlSugar
             }
         }
 
-
+        /// <summary>
+        /// 检查是否是自增实体
+        /// </summary>
         private bool IsIdEntity(EntityInfo entity)
         {
             return entity.Columns.Where(it => it.IsIdentity || it.OracleSequenceName.HasValue()).Any();
         }
 
+        /// <summary>
+        /// 添加子表列表数据
+        /// </summary>
         private void AddChildList(List<SubInsertTreeExpression> items, object insertObject, object pkValue)
         {
             if (items != null)
@@ -217,6 +261,9 @@ namespace ThingsGateway.SqlSugar
                 }
             }
         }
+        /// <summary>
+        /// 获取插入字典
+        /// </summary>
         private Dictionary<string, object> GetInsertDictionary(object insetObject, EntityInfo subEntity)
         {
             Dictionary<string, object> insertDictionary = new Dictionary<string, object>();
@@ -248,6 +295,9 @@ namespace ThingsGateway.SqlSugar
             }
             return insertDictionary;
         }
+        /// <summary>
+        /// 获取子表名称
+        /// </summary>
         private static string GetChildName(SubInsertTreeExpression item, MemberExpression subMemberException)
         {
             string childName;
@@ -273,6 +323,9 @@ namespace ThingsGateway.SqlSugar
             return childName;
         }
 
+        /// <summary>
+        /// 获取成员名称
+        /// </summary>
         private static string GetMemberName(SubInsertTreeExpression item, out MemberExpression subMemberException)
         {
             string subMemberName = null;
@@ -294,6 +347,9 @@ namespace ThingsGateway.SqlSugar
             return subMemberName;
         }
 
+        /// <summary>
+        /// 获取主键值
+        /// </summary>
         private object GetPrimaryKey(EntityInfo entityInfo, object InsertObject, int id)
         {
             object pkValue;

@@ -4,7 +4,7 @@ namespace ThingsGateway.SqlSugar
     public class ConfigQuery
     {
         public SqlSugarProvider Context { get; set; }
-        public void SetTable<T>(Expression<Func<T, object>> keyExpression, Expression<Func<T, object>> valueTextExpression, string uniqueCode = null, Expression<Func<T, object>> whereExpression = null)
+        public void SetTable<T>(Expression<Func<T, object>> keyExpression, Expression<Func<T, object>> valueTextExpression, string uniqueCode = null, Expression<Func<T, object>> whereExpression = null, string asTableName = null)
         {
             lock (SqlFuncExtendsion.TableInfos)
             {
@@ -24,7 +24,7 @@ namespace ThingsGateway.SqlSugar
                     SqlFuncExtendsion.TableInfos.Add(new ConfigTableInfo()
                     {
                         Type = typeof(T),
-                        TableName = entity.DbTableName,
+                        TableName = asTableName ?? entity.DbTableName,
                         Key = keyValue,
                         Value = ValueValue,
                         Where = where,

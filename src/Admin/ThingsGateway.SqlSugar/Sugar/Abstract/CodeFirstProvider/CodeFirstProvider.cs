@@ -4,15 +4,39 @@ using System.Text.RegularExpressions;
 
 namespace ThingsGateway.SqlSugar
 {
+    /// <summary>
+    /// 提供代码优先的数据库操作实现
+    /// </summary>
     public partial class CodeFirstProvider : ICodeFirst
     {
         #region Properties
+        /// <summary>
+        /// 用于同步操作的锁对象
+        /// </summary>
         internal static object LockObject = new object();
+        /// <summary>
+        /// SqlSugar提供者实例
+        /// </summary>
         public virtual SqlSugarProvider Context { get; set; }
+        /// <summary>
+        /// 是否备份表
+        /// </summary>
         protected bool IsBackupTable { get; set; }
+        /// <summary>
+        /// 最大备份数据行数
+        /// </summary>
         protected int MaxBackupDataRows { get; set; }
+        /// <summary>
+        /// 默认字符串长度
+        /// </summary>
         protected virtual int DefaultLength { get; set; }
+        /// <summary>
+        /// 类型与表名的映射字典
+        /// </summary>
         protected Dictionary<Type, string> MappingTables = new Dictionary<Type, string>();
+        /// <summary>
+        /// 构造函数
+        /// </summary>
         public CodeFirstProvider()
         {
             if (DefaultLength == 0)
@@ -23,6 +47,10 @@ namespace ThingsGateway.SqlSugar
         #endregion
 
         #region Public methods
+        /// <summary>
+        /// 分表操作
+        /// </summary>
+        /// <returns>分表代码优先提供者</returns>
         public SplitCodeFirstProvider SplitTables()
         {
             var result = new SplitCodeFirstProvider();
@@ -31,6 +59,11 @@ namespace ThingsGateway.SqlSugar
             return result;
         }
 
+        /// <summary>
+        /// 设置备份表
+        /// </summary>
+        /// <param name="maxBackupDataRows">最大备份数据行数</param>
+        /// <returns>代码优先接口</returns>
         public virtual ICodeFirst BackupTable(int maxBackupDataRows = int.MaxValue)
         {
             this.IsBackupTable = true;
@@ -38,11 +71,20 @@ namespace ThingsGateway.SqlSugar
             return this;
         }
 
+        /// <summary>
+        /// 设置字符串默认长度
+        /// </summary>
+        /// <param name="length">长度值</param>
+        /// <returns>代码优先接口</returns>
         public virtual ICodeFirst SetStringDefaultLength(int length)
         {
             DefaultLength = length;
             return this;
         }
+        /// <summary>
+        /// 初始化带有租户属性的表
+        /// </summary>
+        /// <param name="entityTypes">实体类型数组</param>
         public void InitTablesWithAttr(params Type[] entityTypes)
         {
             foreach (var item in entityTypes)
@@ -59,6 +101,10 @@ namespace ThingsGateway.SqlSugar
                 }
             }
         }
+        /// <summary>
+        /// 初始化表
+        /// </summary>
+        /// <param name="entityType">实体类型</param>
         public virtual void InitTables(Type entityType)
         {
             var splitTableAttribute = entityType.GetCustomAttribute<SplitTableAttribute>();
@@ -74,7 +120,7 @@ namespace ThingsGateway.SqlSugar
                     return;
                 }
             }
-            //Prevent concurrent requests if used in your program
+            // 防止程序中使用时并发请求
             lock (CodeFirstProvider.LockObject)
             {
                 MappingTableList oldTableList = CopyMappingTable();
@@ -103,26 +149,60 @@ namespace ThingsGateway.SqlSugar
 
         }
 
+        /// <summary>
+        /// 初始化表
+        /// </summary>
+        /// <typeparam name="T">实体类型</typeparam>
         public void InitTables<T>()
         {
             InitTables(typeof(T));
         }
+        /// <summary>
+        /// 初始化表
+        /// </summary>
+        /// <typeparam name="T">实体类型1</typeparam>
+        /// <typeparam name="T2">实体类型2</typeparam>
         public void InitTables<T, T2>()
         {
             InitTables(typeof(T), typeof(T2));
         }
+        /// <summary>
+        /// 初始化表
+        /// </summary>
+        /// <typeparam name="T">实体类型1</typeparam>
+        /// <typeparam name="T2">实体类型2</typeparam>
+        /// <typeparam name="T3">实体类型3</typeparam>
         public void InitTables<T, T2, T3>()
         {
             InitTables(typeof(T), typeof(T2), typeof(T3));
         }
+        /// <summary>
+        /// 初始化表
+        /// </summary>
+        /// <typeparam name="T">实体类型1</typeparam>
+        /// <typeparam name="T2">实体类型2</typeparam>
+        /// <typeparam name="T3">实体类型3</typeparam>
+        /// <typeparam name="T4">实体类型4</typeparam>
         public void InitTables<T, T2, T3, T4>()
         {
             InitTables(typeof(T), typeof(T2), typeof(T3), typeof(T4));
         }
+        /// <summary>
+        /// 初始化表
+        /// </summary>
+        /// <typeparam name="T">实体类型1</typeparam>
+        /// <typeparam name="T2">实体类型2</typeparam>
+        /// <typeparam name="T3">实体类型3</typeparam>
+        /// <typeparam name="T4">实体类型4</typeparam>
+        /// <typeparam name="T5">实体类型5</typeparam>
         public void InitTables<T, T2, T3, T4, T5>()
         {
             InitTables(typeof(T), typeof(T2), typeof(T3), typeof(T4), typeof(T5));
         }
+        /// <summary>
+        /// 初始化表
+        /// </summary>
+        /// <param name="entityTypes">实体类型数组</param>
         public virtual void InitTables(params Type[] entityTypes)
         {
             if (entityTypes.HasValue())
@@ -141,6 +221,12 @@ namespace ThingsGateway.SqlSugar
                 }
             }
         }
+        /// <summary>
+        /// 设置类型与表名的映射
+        /// </summary>
+        /// <param name="type">实体类型</param>
+        /// <param name="newTableName">新表名</param>
+        /// <returns>代码优先接口</returns>
         public ICodeFirst As(Type type, string newTableName)
         {
             if (!MappingTables.TryAdd(type, newTableName))
@@ -149,16 +235,30 @@ namespace ThingsGateway.SqlSugar
             }
             return this;
         }
+        /// <summary>
+        /// 设置类型与表名的映射
+        /// </summary>
+        /// <typeparam name="T">实体类型</typeparam>
+        /// <param name="newTableName">新表名</param>
+        /// <returns>代码优先接口</returns>
         public ICodeFirst As<T>(string newTableName)
         {
             return As(typeof(T), newTableName);
         }
 
+        /// <summary>
+        /// 初始化命名空间下的所有表
+        /// </summary>
+        /// <param name="entitiesNamespace">实体命名空间</param>
         public virtual void InitTables(string entitiesNamespace)
         {
             var types = Assembly.Load(entitiesNamespace).GetTypes();
             InitTables(types);
         }
+        /// <summary>
+        /// 初始化多个命名空间下的所有表
+        /// </summary>
+        /// <param name="entitiesNamespaces">实体命名空间数组</param>
         public virtual void InitTables(params string[] entitiesNamespaces)
         {
             if (entitiesNamespaces.HasValue())
@@ -169,12 +269,22 @@ namespace ThingsGateway.SqlSugar
                 }
             }
         }
+        /// <summary>
+        /// 获取表差异
+        /// </summary>
+        /// <typeparam name="T">实体类型</typeparam>
+        /// <returns>表差异提供者</returns>
         public TableDifferenceProvider GetDifferenceTables<T>()
         {
             var type = typeof(T);
             return GetDifferenceTables(type);
         }
 
+        /// <summary>
+        /// 获取表差异
+        /// </summary>
+        /// <param name="types">实体类型数组</param>
+        /// <returns>表差异提供者</returns>
         public TableDifferenceProvider GetDifferenceTables(params Type[] types)
         {
             TableDifferenceProvider result = new TableDifferenceProvider();
@@ -187,6 +297,11 @@ namespace ThingsGateway.SqlSugar
         #endregion
 
         #region Core Logic
+        /// <summary>
+        /// 获取表差异
+        /// </summary>
+        /// <param name="result">表差异提供者</param>
+        /// <param name="type">实体类型</param>
         private void GetDifferenceTables(TableDifferenceProvider result, Type type)
         {
             var tempTableName = "TempDiff" + DateTime.Now.ToString("yyMMssHHmmssfff");
@@ -195,7 +310,7 @@ namespace ThingsGateway.SqlSugar
             db.CurrentConnectionConfig.ConfigureExternalServices = UtilMethods.IsNullReturnNew(db.CurrentConnectionConfig.ConfigureExternalServices);
             db.CurrentConnectionConfig.ConfigureExternalServices.EntityNameService += (x, p) =>
             {
-                p.IsDisabledUpdateAll = true;//Disabled update
+                p.IsDisabledUpdateAll = true;//禁用更新
             };
             db.MappingTables = new MappingTableList();
             db.MappingTables.Add(type.Name, tempTableName);
@@ -232,6 +347,11 @@ namespace ThingsGateway.SqlSugar
                 db.DbMaintenance.DropTable(tempTableName);
             }
         }
+        /// <summary>
+        /// 执行表初始化
+        /// </summary>
+        /// <param name="entityType">实体类型</param>
+        /// <param name="entityInfo">实体信息</param>
         protected virtual void Execute(Type entityType, EntityInfo entityInfo)
         {
             //var entityInfo = this.Context.EntityMaintenance.GetEntityInfoNoCache(entityType);
@@ -306,6 +426,10 @@ namespace ThingsGateway.SqlSugar
             this.Context.DbMaintenance.AddDefaultValue(entityInfo);
         }
 
+        /// <summary>
+        /// 创建索引
+        /// </summary>
+        /// <param name="entityInfo">实体信息</param>
         private void CreateIndex(EntityInfo entityInfo)
         {
             if (entityInfo.Indexs.HasValue())
@@ -372,6 +496,10 @@ namespace ThingsGateway.SqlSugar
             }
         }
 
+        /// <summary>
+        /// 表不存在时的逻辑
+        /// </summary>
+        /// <param name="entityInfo">实体信息</param>
         public virtual void NoExistLogic(EntityInfo entityInfo)
         {
             var tableName = GetTableName(entityInfo);
@@ -392,6 +520,10 @@ namespace ThingsGateway.SqlSugar
             }
             this.Context.DbMaintenance.CreateTable(tableName, columns, true);
         }
+        /// <summary>
+        /// 表存在时的逻辑
+        /// </summary>
+        /// <param name="entityInfo">实体信息</param>
         public virtual void ExistLogic(EntityInfo entityInfo)
         {
             if (entityInfo.Columns.HasValue() && entityInfo.IsDisabledUpdateAll == false)
@@ -533,6 +665,12 @@ namespace ThingsGateway.SqlSugar
             }
         }
 
+        /// <summary>
+        /// 检查精度是否相同
+        /// </summary>
+        /// <param name="ec">实体列信息</param>
+        /// <param name="dc">数据库列信息</param>
+        /// <returns>是否不同</returns>
         private bool IsNoSamePrecision(EntityColumnInfo ec, DbColumnInfo dc)
         {
             if (this.Context.CurrentConnectionConfig.MoreSettings?.EnableCodeFirstUpdatePrecision == true)
@@ -542,12 +680,25 @@ namespace ThingsGateway.SqlSugar
             return false;
         }
 
+        /// <summary>
+        /// 主键操作
+        /// </summary>
+        /// <param name="item">实体列信息</param>
+        /// <param name="dbColumn">数据库列信息</param>
+        /// <param name="pkDiff">主键差异</param>
+        /// <param name="idEntityDiff">自增差异</param>
         protected virtual void KeyAction(EntityColumnInfo item, DbColumnInfo dbColumn, out bool pkDiff, out bool idEntityDiff)
         {
             pkDiff = item.IsPrimarykey != dbColumn.IsPrimarykey;
             idEntityDiff = item.IsIdentity != dbColumn.IsIdentity;
         }
 
+        /// <summary>
+        /// 修改键
+        /// </summary>
+        /// <param name="entityInfo">实体信息</param>
+        /// <param name="tableName">表名</param>
+        /// <param name="item">实体列信息</param>
         protected virtual void ChangeKey(EntityInfo entityInfo, string tableName, EntityColumnInfo item)
         {
             string constraintName = string.Format("PK_{0}_{1}", tableName, item.DbColumnName);
@@ -559,10 +710,18 @@ namespace ThingsGateway.SqlSugar
                 this.Context.DbMaintenance.AddPrimaryKey(tableName, item.DbColumnName);
         }
 
+        /// <summary>
+        /// 表存在逻辑结束
+        /// </summary>
+        /// <param name="dbColumns">数据库列集合</param>
         protected virtual void ExistLogicEnd(List<EntityColumnInfo> dbColumns)
         {
 
         }
+        /// <summary>
+        /// 转换列
+        /// </summary>
+        /// <param name="dbColumns">数据库列集合</param>
         protected virtual void ConvertColumns(List<DbColumnInfo> dbColumns)
         {
 
@@ -570,6 +729,10 @@ namespace ThingsGateway.SqlSugar
         #endregion
 
         #region Helper methods
+        /// <summary>
+        /// 恢复映射表
+        /// </summary>
+        /// <param name="oldTableList">旧表列表</param>
         private void RestMappingTables(MappingTableList oldTableList)
         {
             this.Context.MappingTables.Clear();
@@ -578,6 +741,10 @@ namespace ThingsGateway.SqlSugar
                 this.Context.MappingTables.Add(table.EntityName, table.DbTableName);
             }
         }
+        /// <summary>
+        /// 复制映射表
+        /// </summary>
+        /// <returns>映射表列表</returns>
         private MappingTableList CopyMappingTable()
         {
             MappingTableList oldTableList = new MappingTableList();
@@ -592,22 +759,44 @@ namespace ThingsGateway.SqlSugar
             return oldTableList;
         }
 
+        /// <summary>
+        /// 获取创建表SQL字符串
+        /// </summary>
+        /// <param name="entityInfo">实体信息</param>
+        /// <returns>SQL字符串</returns>
         public virtual string GetCreateTableString(EntityInfo entityInfo)
         {
             StringBuilder result = new StringBuilder();
             var tableName = GetTableName(entityInfo);
             return result.ToString();
         }
+        /// <summary>
+        /// 获取创建列SQL字符串
+        /// </summary>
+        /// <param name="entityInfo">实体信息</param>
+        /// <returns>SQL字符串</returns>
         public virtual string GetCreateColumnsString(EntityInfo entityInfo)
         {
             StringBuilder result = new StringBuilder();
             var tableName = GetTableName(entityInfo);
             return result.ToString();
         }
+        /// <summary>
+        /// 获取表名
+        /// </summary>
+        /// <param name="entityInfo">实体信息</param>
+        /// <returns>表名</returns>
         protected virtual string GetTableName(EntityInfo entityInfo)
         {
             return this.Context.EntityMaintenance.GetTableName(entityInfo.EntityName);
         }
+        /// <summary>
+        /// 实体列转换为数据库列
+        /// </summary>
+        /// <param name="entityInfo">实体信息</param>
+        /// <param name="tableName">表名</param>
+        /// <param name="item">实体列信息</param>
+        /// <returns>数据库列信息</returns>
         protected virtual DbColumnInfo EntityColumnToDbColumn(EntityInfo entityInfo, string tableName, EntityColumnInfo item)
         {
             var propertyType = UtilMethods.GetUnderType(item.PropertyInfo);
@@ -629,6 +818,12 @@ namespace ThingsGateway.SqlSugar
             return result;
         }
 
+        /// <summary>
+        /// 获取数据库类型
+        /// </summary>
+        /// <param name="item">实体列信息</param>
+        /// <param name="propertyType">属性类型</param>
+        /// <param name="result">数据库列信息</param>
         protected virtual void GetDbType(EntityColumnInfo item, Type propertyType, DbColumnInfo result)
         {
             if (!string.IsNullOrEmpty(item.DataType))
@@ -646,6 +841,12 @@ namespace ThingsGateway.SqlSugar
             }
         }
 
+        /// <summary>
+        /// 检查类型是否相同
+        /// </summary>
+        /// <param name="ec">实体列信息</param>
+        /// <param name="dc">数据库列信息</param>
+        /// <returns>是否不同</returns>
         protected virtual bool IsNotSameType(EntityColumnInfo ec, DbColumnInfo dc)
         {
             if (!string.IsNullOrEmpty(ec.DataType))
@@ -727,9 +928,19 @@ namespace ThingsGateway.SqlSugar
                 dc.OracleDataType?.Equals("number", StringComparison.OrdinalIgnoreCase) == true)
                 return false;
 
+            if (dataType.EqualCase("timestamp") && properyTypeName.EqualCase("timestamptz"))
+            {
+                return false;
+            }
+
             return !properyTypeName.Equals(dataType, StringComparison.OrdinalIgnoreCase);
         }
 
+        /// <summary>
+        /// 获取类型名称
+        /// </summary>
+        /// <param name="name">类型名称</param>
+        /// <returns>处理后的类型名称</returns>
         protected string GetType(string name)
         {
             switch (name)

@@ -13,6 +13,22 @@ namespace ThingsGateway.NewLife;
 /// </remarks>
 public static class Runtime
 {
+    #region 静态构造
+    static Runtime()
+    {
+        try
+        {
+            Mono = Type.GetType("Mono.Runtime") != null;
+        }
+        catch { }
+        try
+        {
+            Unity = Type.GetType("UnityEngine.Application, UnityEngine") != null;
+        }
+        catch { }
+    }
+    #endregion
+
     #region 控制台
     private static Boolean? _IsConsole;
     /// <summary>是否控制台。用于判断是否可以执行一些控制台操作。</summary>
@@ -50,7 +66,8 @@ public static class Runtime
     #region 系统特性
     /// <summary>是否Mono环境</summary>
     public static Boolean Mono { get; } = Type.GetType("Mono.Runtime") != null;
-
+    /// <summary>是否Unity环境</summary>
+    public static Boolean Unity { get; }
 #if !NETFRAMEWORK
     private static Boolean? _IsWeb;
     /// <summary>是否Web环境</summary>

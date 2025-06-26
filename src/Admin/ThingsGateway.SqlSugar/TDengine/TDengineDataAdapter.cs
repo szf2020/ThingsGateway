@@ -2,7 +2,9 @@
 using System.Data.Common;
 using System.Text;
 
-namespace ThingsGateway.SqlSugar.TDengineCore
+using TDengineAdo;
+
+namespace ThingsGateway.SqlSugar
 {
     /// <summary>
     /// 数据填充器

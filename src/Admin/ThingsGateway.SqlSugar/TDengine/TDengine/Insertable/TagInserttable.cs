@@ -1,16 +1,32 @@
 ﻿using System.Reflection;
 
-using ThingsGateway.SqlSugar.TDengine;
-
 namespace ThingsGateway.SqlSugar
 {
+    /// <summary>
+    /// 标签插入表操作类
+    /// </summary>
+    /// <typeparam name="T">实体类型</typeparam>
     public class TagInserttable<T> where T : class, new()
     {
+        /// <summary>
+        /// 可插入对象
+        /// </summary>
         internal IInsertable<T> thisValue;
+
+        /// <summary>
+        /// 获取子表名称的委托
+        /// </summary>
         internal Func<string, T, string> getChildTableNamefunc;
 
+        /// <summary>
+        /// SqlSugar上下文
+        /// </summary>
         internal SqlSugarProvider Context;
 
+        /// <summary>
+        /// 执行插入命令
+        /// </summary>
+        /// <returns>影响的行数</returns>
         public int ExecuteCommand()
         {
             var provider = (InsertableProvider<T>)thisValue;
@@ -36,6 +52,10 @@ namespace ThingsGateway.SqlSugar
             return inserObjects.Length;
         }
 
+        /// <summary>
+        /// 异步执行插入命令
+        /// </summary>
+        /// <returns>影响的行数</returns>
         public async Task<int> ExecuteCommandAsync()
         {
             var provider = (InsertableProvider<T>)thisValue;
@@ -61,6 +81,12 @@ namespace ThingsGateway.SqlSugar
             return inserObjects.Length;
         }
 
+        /// <summary>
+        /// 获取标签值列表
+        /// </summary>
+        /// <param name="pageItems">当前页数据</param>
+        /// <param name="attr">STable特性</param>
+        /// <returns>标签值列表</returns>
         private static List<string> GetTagValues(List<T> pageItems, STableAttribute attr)
         {
             var tagValues = new List<string>();
@@ -79,6 +105,12 @@ namespace ThingsGateway.SqlSugar
             return tagValues;
         }
 
+        /// <summary>
+        /// 获取标签名称列表
+        /// </summary>
+        /// <param name="obj">实体对象</param>
+        /// <param name="attr">STable特性</param>
+        /// <returns>标签名称列表</returns>
         private static List<string> GetTagNames(T obj, STableAttribute attr)
         {
             var tagValues = new List<string>();
@@ -96,6 +128,12 @@ namespace ThingsGateway.SqlSugar
             return tagValues;
         }
 
+        /// <summary>
+        /// 获取分组信息
+        /// </summary>
+        /// <param name="inserObjects">插入对象数组</param>
+        /// <param name="attr">STable特性</param>
+        /// <returns>分组结果</returns>
         private static IEnumerable<IGrouping<string, T>> GetGroupInfos(T[] inserObjects, STableAttribute? attr)
         {
             var groups = inserObjects.GroupBy(it =>
@@ -120,10 +158,15 @@ namespace ThingsGateway.SqlSugar
             });
             return groups;
         }
+
+        /// <summary>
+        /// 获取通用STable特性
+        /// </summary>
+        /// <param name="sTableAttribute">STable特性</param>
+        /// <returns>STable特性</returns>
         private STableAttribute GetCommonSTableAttribute(STableAttribute sTableAttribute)
         {
-            return SqlSugar.TDengine.UtilMethods.GetCommonSTableAttribute(this.Context, sTableAttribute);
+            return TaosUtilMethods.GetCommonSTableAttribute(this.Context, sTableAttribute);
         }
-
     }
 }

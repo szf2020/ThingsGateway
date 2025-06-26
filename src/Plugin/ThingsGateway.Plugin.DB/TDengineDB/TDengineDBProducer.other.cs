@@ -10,6 +10,8 @@
 
 using Mapster;
 
+using Newtonsoft.Json.Linq;
+
 using System.Diagnostics;
 using System.Text;
 
@@ -118,44 +120,37 @@ public partial class TDengineDBProducer : BusinessBaseWithCacheIntervalVariableM
             }
             else
             {
+                var stringData = dbInserts.Where(a => (!a.IsNumber && a.Value is not bool));
+                var numberData = dbInserts.Where(a => (a.IsNumber || a.Value is bool));
+
                 Stopwatch stopwatch = new();
                 stopwatch.Start();
                 //var result = await db.Insertable(dbInserts).SetTDengineChildTableName((stableName, it) => $"{stableName}_{it.DeviceName}_{it.Name}").ExecuteCommandAsync().ConfigureAwait(false);//不要加分表
 
-                StringBuilder stringBuilder = new();
-                stringBuilder.Append($"INSERT INTO");
-                //(`id`,`createtime`,`collecttime`,`isonline`,`value`) 
-                foreach (var deviceGroup in dbInserts.GroupBy(a => a.DeviceName))
-                {
-                    foreach (var variableGroup in deviceGroup.GroupBy(a => a.Name))
-                    {
-                        stringBuilder.Append($"""
-
-                     `{_driverPropertys.TableNameLow}_{deviceGroup.Key}_{variableGroup.Key}` 
-                     USING `{_driverPropertys.TableNameLow}` TAGS ("{deviceGroup.Key}", "{variableGroup.Key}") 
-                    VALUES 
-
-                    """);
-
-                        foreach (var item in variableGroup)
-                        {
-                            stringBuilder.Append($"""(NOW,"{item.CollectTime.ToString("yyyy-MM-dd HH:mm:ss.fff")}",{item.Id},{item.IsOnline},"{item.Value}"),""");
-                        }
-                        stringBuilder.Remove(stringBuilder.Length - 1, 1);
-                    }
-
-                }
-                stringBuilder.Append(';');
-                stringBuilder.AppendLine();
-
-                await _db.Ado.ExecuteCommandAsync(stringBuilder.ToString(), default, cancellationToken: cancellationToken).ConfigureAwait(false);
+                await InserableAsync(numberData, _driverPropertys.NumberTableNameLow, cancellationToken).ConfigureAwait(false);
 
                 stopwatch.Stop();
                 //var result = await db.Insertable(dbInserts).SplitTable().ExecuteCommandAsync().ConfigureAwait(false);
                 //if (result > 0)
                 {
-                    LogMessage?.Trace($"TableName：{_driverPropertys.TableNameLow}，Count：{dbInserts.Count}，watchTime:  {stopwatch.ElapsedMilliseconds} ms");
+                    LogMessage?.Trace($"TableName：{_driverPropertys.NumberTableNameLow}，Count：{dbInserts.Count}，watchTime:  {stopwatch.ElapsedMilliseconds} ms");
                 }
+
+
+                stopwatch.Restart();
+                //var result = await db.Insertable(dbInserts).SetTDengineChildTableName((stableName, it) => $"{stableName}_{it.DeviceName}_{it.Name}").ExecuteCommandAsync().ConfigureAwait(false);//不要加分表
+
+                await InserableAsync(stringData, _driverPropertys.StringTableNameLow, cancellationToken).ConfigureAwait(false);
+
+                stopwatch.Stop();
+                //var result = await db.Insertable(dbInserts).SplitTable().ExecuteCommandAsync().ConfigureAwait(false);
+                //if (result > 0)
+                {
+                    LogMessage?.Trace($"TableName：{_driverPropertys.StringTableNameLow}，Count：{dbInserts.Count}，watchTime:  {stopwatch.ElapsedMilliseconds} ms");
+                }
+
+
+
             }
             return OperResult.Success;
         }
@@ -165,5 +160,57 @@ public partial class TDengineDBProducer : BusinessBaseWithCacheIntervalVariableM
         }
     }
 
+    private async Task InserableAsync(IEnumerable<VariableBasicData> dbInserts, string tableName, CancellationToken cancellationToken)
+    {
+        StringBuilder stringBuilder = new();
+        stringBuilder.Append($"INSERT INTO");
+        //(`id`,`createtime`,`collecttime`,`isonline`,`value`) 
+        foreach (var deviceGroup in dbInserts.GroupBy(a => a.DeviceName))
+        {
+            foreach (var variableGroup in deviceGroup.GroupBy(a => a.Name))
+            {
+                stringBuilder.Append($"""
+
+                     `{tableName}_{deviceGroup.Key}_{variableGroup.Key}` 
+                     USING `{tableName}` TAGS ("{deviceGroup.Key}", "{variableGroup.Key}") 
+                    VALUES 
+
+                    """);
+
+                foreach (var item in variableGroup)
+                {
+                    stringBuilder.Append($"""(NOW,"{item.CollectTime.ToString("yyyy-MM-dd HH:mm:ss.fff")}",{item.Id},{item.IsOnline},"{GetValue(item)}"),""");
+                }
+                stringBuilder.Remove(stringBuilder.Length - 1, 1);
+            }
+
+        }
+        stringBuilder.Append(';');
+        stringBuilder.AppendLine();
+
+        await _db.Ado.ExecuteCommandAsync(stringBuilder.ToString(), default, cancellationToken: cancellationToken).ConfigureAwait(false);
+    }
+    private string GetValue(VariableBasicData src)
+    {
+        if (src.Value != null)
+        {
+            if (src.Value is string strValue)
+            {
+                return strValue;
+            }
+            else if (src.Value is bool boolValue)
+            {
+                return boolValue ? "1" : "0";
+            }
+            else
+            {
+                return JToken.FromObject(src.Value).ToString();
+            }
+        }
+        else
+        {
+            return string.Empty;
+        }
+    }
     #endregion 方法
 }

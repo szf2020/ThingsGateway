@@ -1,11 +1,17 @@
 ﻿using System.Text;
 using System.Text.RegularExpressions;
 
-namespace ThingsGateway.SqlSugar.TDengine
+namespace ThingsGateway.SqlSugar
 {
+    /// <summary>
+    /// TDengine 查询构建器
+    /// </summary>
     public partial class TDengineQueryBuilder : QueryBuilder
     {
         #region Sql Template
+        /// <summary>
+        /// 获取分页模板
+        /// </summary>
         public override string PageTempalte
         {
             get
@@ -17,6 +23,10 @@ namespace ThingsGateway.SqlSugar.TDengine
                 return template;
             }
         }
+
+        /// <summary>
+        /// 获取默认排序模板
+        /// </summary>
         public override string DefaultOrderByTemplate
         {
             get
@@ -24,10 +34,12 @@ namespace ThingsGateway.SqlSugar.TDengine
                 return "ORDER BY NOW() ";
             }
         }
-
         #endregion
 
         #region Common Methods
+        /// <summary>
+        /// 获取表名字符串
+        /// </summary>
         public override string GetTableNameString
         {
             get
@@ -39,10 +51,21 @@ namespace ThingsGateway.SqlSugar.TDengine
                 return base.GetTableNameString;
             }
         }
+
+        /// <summary>
+        /// 判断是否为复杂模型
+        /// </summary>
+        /// <param name="sql">SQL语句</param>
+        /// <returns>是否为复杂模型</returns>
         public override bool IsComplexModel(string sql)
         {
             return Regex.IsMatch(sql, @"AS ""\w+\.\w+""") || Regex.IsMatch(sql, @"AS ""\w+\.\w+\.\w+""");
         }
+
+        /// <summary>
+        /// 转换为SQL字符串
+        /// </summary>
+        /// <returns>SQL字符串</returns>
         public override string ToSqlString()
         {
             base.AppendFilter();
@@ -82,10 +105,12 @@ namespace ThingsGateway.SqlSugar.TDengine
             }
             return result;
         }
-
         #endregion
 
         #region Get SQL Partial
+        /// <summary>
+        /// 获取选择值
+        /// </summary>
         public override string GetSelectValue
         {
             get
@@ -114,7 +139,6 @@ namespace ThingsGateway.SqlSugar.TDengine
                 return result;
             }
         }
-
         #endregion
     }
 }

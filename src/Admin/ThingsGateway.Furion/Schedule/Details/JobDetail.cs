@@ -75,7 +75,11 @@ public partial class JobDetail
     /// </summary>
     [JsonInclude]
     public DateTime? UpdatedTime { get; internal set; }
-
+    /// <summary>
+    /// 是否是临时作业
+    /// </summary>
+    [JsonInclude]
+    internal bool Temporary { get; set; } = false;
     /// <summary>
     /// 标记其他作业正在执行
     /// </summary>

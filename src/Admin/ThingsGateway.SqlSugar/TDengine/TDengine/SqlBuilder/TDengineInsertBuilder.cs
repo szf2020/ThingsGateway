@@ -1,9 +1,15 @@
 ﻿using System.Text;
 
-namespace ThingsGateway.SqlSugar.TDengine
+namespace ThingsGateway.SqlSugar
 {
+    /// <summary>
+    /// TDengine 插入构建器
+    /// </summary>
     public class TDengineInsertBuilder : InsertBuilder
     {
+        /// <summary>
+        /// 获取插入SQL模板
+        /// </summary>
         public override string SqlTemplate
         {
             get
@@ -21,19 +27,37 @@ namespace ThingsGateway.SqlSugar.TDengine
            ({1})
      VALUES
            ({2})";
-
                 }
             }
         }
+
+        /// <summary>
+        /// 获取批量插入SQL模板
+        /// </summary>
         public override string SqlTemplateBatch => "INSERT INTO {0} ({1})";
+
+        /// <summary>
+        /// 获取批量插入联合SQL模板
+        /// </summary>
         public override string SqlTemplateBatchUnion => " VALUES ";
 
+        /// <summary>
+        /// 获取批量插入选择SQL模板
+        /// </summary>
         public override string SqlTemplateBatchSelect => " {0} ";
 
+        /// <summary>
+        /// 转换插入返回ID的函数
+        /// </summary>
         public override Func<string, string, string> ConvertInsertReturnIdFunc { get; set; } = (name, sql) =>
         {
             return sql.Trim().TrimEnd(';') + $"returning {name} ";
         };
+
+        /// <summary>
+        /// 生成SQL字符串
+        /// </summary>
+        /// <returns>SQL字符串</returns>
         public override string ToSqlString()
         {
             if (IsNoInsertNull)
@@ -117,6 +141,14 @@ namespace ThingsGateway.SqlSugar.TDengine
             }
         }
 
+        /// <summary>
+        /// 格式化值
+        /// </summary>
+        /// <param name="value">值</param>
+        /// <param name="name">名称</param>
+        /// <param name="i">索引</param>
+        /// <param name="columnInfo">列信息</param>
+        /// <returns>格式化后的值</returns>
         public object FormatValue(object value, string name, int i, DbColumnInfo columnInfo)
         {
             if (value == null)
@@ -143,7 +175,7 @@ namespace ThingsGateway.SqlSugar.TDengine
                 }
                 else if (type == UtilConstants.ByteArrayType)
                 {
-                    string bytesString = "0x" + BitConverter.ToString((byte[])value);
+                    string bytesString = $"0x{BitConverter.ToString((byte[])value)}";
                     return bytesString;
                 }
                 else if (type.IsEnum())
@@ -167,18 +199,23 @@ namespace ThingsGateway.SqlSugar.TDengine
                 }
                 else if (type == UtilConstants.StringType || type == UtilConstants.ObjType)
                 {
-                    return "'" + value.ToString().ToSqlFilter() + "'";
+                    return $"'{value.ToString().ToSqlFilter()}'";
                 }
                 else
                 {
-                    return "'" + value.ToString() + "'";
+                    return $"'{value}'";
                 }
             }
         }
+
+        /// <summary>
+        /// 格式化DateTimeOffset值
+        /// </summary>
+        /// <param name="value">DateTimeOffset值</param>
+        /// <returns>格式化后的字符串</returns>
         public override string FormatDateTimeOffset(object value)
         {
-            return "'" + ((DateTimeOffset)value).ToString("o") + "'";
+            return $"'{((DateTimeOffset)value).ToString("o")}'";
         }
-
     }
 }

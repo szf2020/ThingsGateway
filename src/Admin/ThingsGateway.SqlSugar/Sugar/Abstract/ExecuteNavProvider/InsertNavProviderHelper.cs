@@ -1,12 +1,25 @@
 ﻿namespace ThingsGateway.SqlSugar
 {
+    /// <summary>
+    /// 插入导航数据提供者(用于处理级联插入操作)
+    /// </summary>
+    /// <typeparam name="Root">根实体类型</typeparam>
+    /// <typeparam name="T">当前实体类型</typeparam>
     public partial class InsertNavProvider<Root, T> where T : class, new() where Root : class, new()
     {
-
+        /// <summary>
+        /// 检查是否是默认值
+        /// </summary>
+        /// <param name="pvValue">要检查的值</param>
+        /// <returns>是否是默认值</returns>
         private static bool IsDefaultValue(object pvValue)
         {
             return pvValue?.Equals(UtilMethods.GetDefaultValue(pvValue.GetType())) != false;
         }
+
+        /// <summary>
+        /// 初始化父实体列表
+        /// </summary>
         private void InitParentList()
         {
             if (_RootList == null)
@@ -22,6 +35,11 @@
             IsFirst = false;
         }
 
+        /// <summary>
+        /// 获取处理结果
+        /// </summary>
+        /// <typeparam name="TChild">子实体类型</typeparam>
+        /// <returns>插入导航提供者实例</returns>
         private InsertNavProvider<Root, TChild> GetResult<TChild>() where TChild : class, new()
         {
             return new InsertNavProvider<Root, TChild>()
@@ -35,6 +53,12 @@
             };
         }
 
+        /// <summary>
+        /// 获取根实体列表
+        /// </summary>
+        /// <typeparam name="Type">实体类型</typeparam>
+        /// <param name="datas">实体数据列表</param>
+        /// <returns>处理后的实体列表</returns>
         private List<Type> GetRootList<Type>(List<Type> datas) where Type : class, new()
         {
             List<Type> result = new List<Type>();
@@ -47,6 +71,11 @@
             return result;
         }
 
+        /// <summary>
+        /// 插入数据并获取自增ID
+        /// </summary>
+        /// <typeparam name="Type">实体类型</typeparam>
+        /// <param name="datas">要插入的数据列表</param>
         private void InsertIdentity<Type>(List<Type> datas) where Type : class, new()
         {
             foreach (var item in datas)
@@ -66,6 +95,12 @@
             }
         }
 
+        /// <summary>
+        /// 根据导航属性获取主键列
+        /// </summary>
+        /// <param name="entity">实体信息</param>
+        /// <param name="nav">导航属性信息</param>
+        /// <returns>主键列信息</returns>
         private EntityColumnInfo GetPkColumnByNav(EntityInfo entity, EntityColumnInfo nav)
         {
             var pkColumn = entity.Columns.FirstOrDefault(it => it.IsPrimarykey == true);
@@ -75,16 +110,38 @@
             }
             return pkColumn;
         }
+
+        /// <summary>
+        /// 获取主键列(不带导航配置)
+        /// </summary>
+        /// <param name="entity">实体信息</param>
+        /// <param name="nav">导航属性信息</param>
+        /// <returns>主键列信息</returns>
         private EntityColumnInfo GetPkColumnByNav2(EntityInfo entity, EntityColumnInfo nav)
         {
             var pkColumn = entity.Columns.FirstOrDefault(it => it.IsPrimarykey == true);
             return pkColumn;
         }
+
+        /// <summary>
+        /// 根据导航属性获取外键列
+        /// </summary>
+        /// <param name="entity">实体信息</param>
+        /// <param name="nav">导航属性信息</param>
+        /// <returns>外键列信息</returns>
         private EntityColumnInfo GetFKColumnByNav(EntityInfo entity, EntityColumnInfo nav)
         {
             var fkColumn = entity.Columns.FirstOrDefault(it => it.PropertyName == nav.Navigat.Name);
             return fkColumn;
         }
+
+        /// <summary>
+        /// 插入数据
+        /// </summary>
+        /// <typeparam name="TChild">子实体类型</typeparam>
+        /// <param name="children">子实体列表</param>
+        /// <param name="pkColumn">主键列信息</param>
+        /// <param name="NavColumn">导航列信息</param>
         private void InsertDatas<TChild>(List<TChild> children, EntityColumnInfo pkColumn, EntityColumnInfo NavColumn = null) where TChild : class, new()
         {
             children = children.Distinct().ToList();
@@ -113,6 +170,12 @@
             this._ParentList = children.Cast<object>().ToList();
         }
 
+        /// <summary>
+        /// 清空主键值
+        /// </summary>
+        /// <typeparam name="TChild">子实体类型</typeparam>
+        /// <param name="updateData">要更新的数据列表</param>
+        /// <param name="pkColumn">主键列信息</param>
         private void ClearPk<TChild>(List<TChild> updateData, EntityColumnInfo pkColumn) where TChild : class, new()
         {
             foreach (var child in updateData)
@@ -122,6 +185,12 @@
             }
         }
 
+        /// <summary>
+        /// 初始化数据(处理主键值)
+        /// </summary>
+        /// <typeparam name="TChild">子实体类型</typeparam>
+        /// <param name="pkColumn">主键列信息</param>
+        /// <param name="insertData">要插入的数据列表</param>
         private void InitData<TChild>(EntityColumnInfo pkColumn, List<TChild> insertData) where TChild : class, new()
         {
             if (pkColumn.IsIdentity || pkColumn.OracleSequenceName.HasValue())
@@ -146,6 +215,13 @@
             }
         }
 
+        /// <summary>
+        /// 设置主键值并插入数据
+        /// </summary>
+        /// <typeparam name="TChild">子实体类型</typeparam>
+        /// <param name="pkColumn">主键列信息</param>
+        /// <param name="insertData">要插入的数据列表</param>
+        /// <param name="value">主键值生成函数</param>
         private void SetValue<TChild>(EntityColumnInfo pkColumn, List<TChild> insertData, Func<object> value) where TChild : class, new()
         {
             foreach (var child in insertData)
@@ -168,6 +244,13 @@
                 this._Context.Insertable(insertData).ExecuteCommand();
             }
         }
+
+        /// <summary>
+        /// 处理不支持自动生成主键的情况
+        /// </summary>
+        /// <typeparam name="TChild">子实体类型</typeparam>
+        /// <param name="pkColumn">主键列信息</param>
+        /// <param name="insertData">要插入的数据列表</param>
         private void SetError<TChild>(EntityColumnInfo pkColumn, List<TChild> insertData) where TChild : class, new()
         {
             foreach (var child in insertData)

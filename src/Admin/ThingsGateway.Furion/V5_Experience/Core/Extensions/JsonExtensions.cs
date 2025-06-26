@@ -9,10 +9,12 @@
 // 许可证的完整文本可以在源代码树根目录中的 LICENSE-APACHE 和 LICENSE-MIT 文件中找到。
 // ------------------------------------------------------------------------
 
+using System.Globalization;
 using System.Runtime.Serialization.Json;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using System.Text.RegularExpressions;
 using System.Xml;
 using System.Xml.Linq;
 
@@ -21,8 +23,11 @@ namespace ThingsGateway.Extensions;
 /// <summary>
 ///     System.Text.Json 拓展类
 /// </summary>
-internal static class JsonExtensions
+internal static partial class JsonExtensions
 {
+    private static readonly DateTime s_epoch = new(1970, 1, 1, 0, 0, 0);
+    private static readonly Regex s_regex = Regex();
+
     /// <summary>
     ///     将 <see cref="JsonNode" /> 转换为目标类型
     /// </summary>
@@ -233,4 +238,44 @@ internal static class JsonExtensions
                 return jsonNode?.DeepClone();
         }
     }
+
+    /// <summary>
+    ///     尝试获取日期值
+    /// </summary>
+    /// <param name="jsonNode">
+    ///     <see cref="JsonNode" />
+    /// </param>
+    /// <param name="dateTime">
+    ///     <see cref="DateTime" />
+    /// </param>
+    /// <returns>
+    ///     <see cref="bool" />
+    /// </returns>
+    internal static bool TryGetDateValue(this JsonNode? jsonNode, out DateTime dateTime)
+    {
+        // 检查 JsonNode 是否是字符串类型
+        if (jsonNode?.GetValueKind() is not JsonValueKind.String)
+        {
+            dateTime = default;
+            return false;
+        }
+
+        var formatted = jsonNode?.GetValue<string>() ?? string.Empty;
+        var match = s_regex.Match(formatted);
+
+        // 尝试获取 Unix epoch 日期格式
+        // 参考文献：https://learn.microsoft.com/zh-cn/dotnet/standard/datetime/system-text-json-support#use-unix-epoch-date-format
+        if (match.Success && long.TryParse(match.Groups[1].Value, NumberStyles.Integer, CultureInfo.InvariantCulture,
+                out var unixTime))
+        {
+            dateTime = s_epoch.AddMilliseconds(unixTime);
+            return true;
+        }
+
+        // 尝试获取 ISO 8601-1:2019 日期格式
+        return DateTime.TryParse(formatted, out dateTime);
+    }
+
+    [GeneratedRegex(@"^/Date\(([+-]*\d+)\)/$", RegexOptions.CultureInvariant)]
+    private static partial Regex Regex();
 }

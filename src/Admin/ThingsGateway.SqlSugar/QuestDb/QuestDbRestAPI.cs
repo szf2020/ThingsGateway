@@ -10,38 +10,45 @@ using System.Globalization;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Web;
+
 namespace ThingsGateway.SqlSugar
 {
     /// <summary>
-    /// QuestDb RestAPI
+    /// QuestDB REST API 客户端
     /// </summary>
     public class QuestDbRestAPI
     {
         internal string url = string.Empty;
         internal string authorization = string.Empty;
         internal static Random random = new Random();
-        //can be modified
+        // 可修改的数据库客户端
         ISqlSugarClient db;
+
+        /// <summary>
+        /// 初始化 QuestDbRestAPI 实例
+        /// </summary>
+        /// <param name="db">SqlSugar 数据库客户端</param>
         public QuestDbRestAPI(ISqlSugarClient db)
         {
-
             var builder = new DbConnectionStringBuilder();
             builder.ConnectionString = db.CurrentConnectionConfig.ConnectionString;
             this.db = db;
+            string httpPort = String.Empty;
             string host = String.Empty;
             string username = String.Empty;
             string password = String.Empty;
-            QuestDbRestAPHelper.SetRestApiInfo(builder, ref host, ref username, ref password);
-            BindHost(host, username, password);
+            QuestDbRestAPHelper.SetRestApiInfo(builder, ref host, ref httpPort, ref username, ref password);
+            BindHost(host, httpPort, username, password);
         }
+
         /// <summary>
-        /// 执行SQL异步
+        /// 异步执行SQL命令
         /// </summary>
-        /// <param name="sql"></param>
-        /// <returns></returns>
+        /// <param name="sql">要执行的SQL语句</param>
+        /// <returns>执行结果</returns>
         public async Task<string> ExecuteCommandAsync(string sql)
         {
-            //HTTP GET 执行SQL
+            // HTTP GET 请求执行SQL
             var result = string.Empty;
             var url = $"{this.url}/exec?query={HttpUtility.UrlEncode(sql)}";
             if (!string.IsNullOrWhiteSpace(authorization))
@@ -50,16 +57,24 @@ namespace ThingsGateway.SqlSugar
             result = await httpResponseMessage.Content.ReadAsStringAsync().ConfigureAwait(false);
             return result;
         }
+
         /// <summary>
-        /// 执行SQL
+        /// 同步执行SQL命令
         /// </summary>
-        /// <param name="sql"></param>
-        /// <returns></returns>
+        /// <param name="sql">要执行的SQL语句</param>
+        /// <returns>执行结果</returns>
         public string ExecuteCommand(string sql)
         {
             return ExecuteCommandAsync(sql).GetAwaiter().GetResult();
         }
 
+        /// <summary>
+        /// 异步批量插入单条数据
+        /// </summary>
+        /// <typeparam name="T">数据类型</typeparam>
+        /// <param name="insertData">要插入的数据</param>
+        /// <param name="dateFormat">日期格式字符串</param>
+        /// <returns>影响的行数</returns>
         public async Task<int> BulkCopyAsync<T>(T insertData, string dateFormat = "yyyy/M/d H:mm:ss") where T : class, new()
         {
             if (db.CurrentConnectionConfig.MoreSettings == null)
@@ -70,24 +85,38 @@ namespace ThingsGateway.SqlSugar
             return result.Contains("OK", StringComparison.OrdinalIgnoreCase) ? 1 : 0;
         }
 
+        /// <summary>
+        /// 同步批量插入单条数据
+        /// </summary>
+        /// <typeparam name="T">数据类型</typeparam>
+        /// <param name="insertData">要插入的数据</param>
+        /// <param name="dateFormat">日期格式字符串</param>
+        /// <returns>影响的行数</returns>
         public int BulkCopy<T>(T insertData, string dateFormat = "yyyy/M/d H:mm:ss") where T : class, new()
         {
             return BulkCopyAsync(insertData, dateFormat).GetAwaiter().GetResult();
         }
 
+        /// <summary>
+        /// 创建分页批量插入器
+        /// </summary>
+        /// <param name="pageSize">每页大小</param>
+        /// <returns>分页批量插入器实例</returns>
         public QuestDbPageSizeBulkCopy PageSize(int pageSize)
         {
             QuestDbPageSizeBulkCopy result = new QuestDbPageSizeBulkCopy(this, pageSize, db);
             return result;
         }
+
         private static readonly HttpClient client = new HttpClient();
+
         /// <summary>
-        /// 批量快速插入异步
+        /// 异步批量快速插入数据
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="insertList"></param>
-        /// <param name="dateFormat">导入时，时间格式 默认:yyyy/M/d H:mm:ss</param>
-        /// <returns></returns>
+        /// <typeparam name="T">数据类型</typeparam>
+        /// <param name="insertList">要插入的数据列表</param>
+        /// <param name="dateFormat">日期格式字符串</param>
+        /// <returns>插入的记录数</returns>
         public async Task<int> BulkCopyAsync<T>(List<T> insertList, string dateFormat = "yyyy/M/d H:mm:ss") where T : class, new()
         {
             var result = 0;
@@ -95,35 +124,40 @@ namespace ThingsGateway.SqlSugar
             var filePath = Path.Combine(AppContext.BaseDirectory, fileName);
             try
             {
+                // 准备多部分表单数据
                 var boundary = "---------------" + DateTime.Now.Ticks.ToString("x");
                 var list = new List<Hashtable>();
                 var name = db.EntityMaintenance.GetEntityInfo<T>().DbTableName;
 
+                // 获取或创建列信息缓存
                 var key = "QuestDbBulkCopy" + typeof(T).FullName + typeof(T).GetHashCode();
-                var columns = new ReflectionInoCacheService().GetOrCreate(key, () =>
+                var columns = ReflectionInoCacheService.Instance.GetOrCreate(key, () =>
                  db.CopyNew().DbMaintenance.GetColumnInfosByTableName(name));
+
+                // 构建schema信息
                 columns.ForEach(d =>
                 {
                     if (d.DataType == "TIMESTAMP")
                     {
                         list.Add(new Hashtable()
-                    {
-                        { "name", d.DbColumnName },
-                        { "type", d.DataType },
-                        { "pattern", dateFormat}
-                    });
+                        {
+                            { "name", d.DbColumnName },
+                            { "type", d.DataType },
+                            { "pattern", dateFormat}
+                        });
                     }
                     else
                     {
                         list.Add(new Hashtable()
-                    {
-                        { "name", d.DbColumnName },
-                        { "type", d.DataType }
-                    });
+                        {
+                            { "name", d.DbColumnName },
+                            { "type", d.DataType }
+                        });
                     }
                 });
                 var schema = JsonConvert.SerializeObject(list);
-                //写入CSV文件
+
+                // 写入CSV文件
                 using (var writer = new StreamWriter(filePath))
                 using (var csv = new CsvWriter(writer, CultureInfo.CurrentCulture))
                 {
@@ -133,6 +167,7 @@ namespace ThingsGateway.SqlSugar
                     await csv.WriteRecordsAsync(insertList).ConfigureAwait(false);
                 }
 
+                // 准备HTTP请求内容
                 using var httpContent = new MultipartFormDataContent(boundary);
                 using var fileStream = File.OpenRead(filePath);
                 if (!string.IsNullOrWhiteSpace(this.authorization))
@@ -142,14 +177,18 @@ namespace ThingsGateway.SqlSugar
                 streamContent.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
                 httpContent.Add(streamContent, "data", Path.GetFileName(filePath));
 
-                //boundary带双引号 可能导致服务器错误情况
+                // 处理boundary带双引号可能导致服务器错误的情况
                 httpContent.Headers.Remove("Content-Type");
                 httpContent.Headers.TryAddWithoutValidation("Content-Type",
                     "multipart/form-data; boundary=" + boundary);
+
+                // 发送请求并处理响应
                 var httpResponseMessage =
                     await Post(client, name, httpContent).ConfigureAwait(false);
                 var readAsStringAsync = await httpResponseMessage.Content.ReadAsStringAsync().ConfigureAwait(false);
                 var splitByLine = QuestDbRestAPHelper.SplitByLine(readAsStringAsync);
+
+                // 解析响应结果
                 foreach (var s in splitByLine)
                 {
                     if (s.Contains("Rows"))
@@ -162,10 +201,6 @@ namespace ThingsGateway.SqlSugar
                     }
                 }
             }
-            catch (Exception)
-            {
-                throw;
-            }
             finally
             {
                 try
@@ -174,12 +209,17 @@ namespace ThingsGateway.SqlSugar
                 }
                 catch
                 {
-                    // ignored
+                    // 忽略删除文件时的异常
                 }
             }
             return result;
         }
 
+        /// <summary>
+        /// 配置CSV写入器
+        /// </summary>
+        /// <typeparam name="T">数据类型</typeparam>
+        /// <param name="csv">CSV写入器</param>
         private void CsvCreating<T>(CsvWriter csv) where T : class, new()
         {
             var entityColumns = db.EntityMaintenance.GetEntityInfo<T>().Columns;
@@ -200,28 +240,47 @@ namespace ThingsGateway.SqlSugar
             }
         }
 
+        /// <summary>
+        /// 获取默认日期格式
+        /// </summary>
+        /// <returns>日期格式字符串</returns>
         private static string GetDefaultFormat()
         {
             return "yyyy-MM-ddTHH:mm:ss.fffffff";
         }
 
+        /// <summary>
+        /// 发送POST请求
+        /// </summary>
+        /// <param name="client">HTTP客户端</param>
+        /// <param name="name">表名</param>
+        /// <param name="httpContent">请求内容</param>
+        /// <returns>HTTP响应消息</returns>
         private Task<HttpResponseMessage> Post(HttpClient client, string name, MultipartFormDataContent httpContent)
         {
             return client.PostAsync($"{this.url}/imp?name={name}", httpContent);
         }
 
         /// <summary>
-        /// 批量快速插入
+        /// 同步批量快速插入数据
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="insertList"></param>
-        /// <param name="dateFormat">导入时，时间格式 默认:yyyy/M/d H:mm:ss</param>
-        /// <returns></returns>
+        /// <typeparam name="T">数据类型</typeparam>
+        /// <param name="insertList">要插入的数据列表</param>
+        /// <param name="dateFormat">日期格式字符串</param>
+        /// <returns>插入的记录数</returns>
         public int BulkCopy<T>(List<T> insertList, string dateFormat = "yyyy/M/d H:mm:ss") where T : class, new()
         {
             return BulkCopyAsync(insertList, dateFormat).GetAwaiter().GetResult();
         }
-        private void BindHost(string host, string username, string password)
+
+        /// <summary>
+        /// 绑定主机信息
+        /// </summary>
+        /// <param name="host">主机地址</param>
+        /// <param name="httpPort">HTTP端口</param>
+        /// <param name="username">用户名</param>
+        /// <param name="password">密码</param>
+        private void BindHost(string host, string httpPort, string username, string password)
         {
             url = host;
             if (url.EndsWith('/'))
@@ -229,7 +288,10 @@ namespace ThingsGateway.SqlSugar
 
             if (!url.StartsWith("http", StringComparison.OrdinalIgnoreCase))
                 url = $"http://{url}";
-            //生成TOKEN
+
+            url = $"{url}:{httpPort}";
+
+            // 生成Basic Auth Token
             if (!string.IsNullOrWhiteSpace(username) && !string.IsNullOrWhiteSpace(password))
             {
                 var base64 = Convert.ToBase64String(Encoding.UTF8.GetBytes($"{username}:{password}"));

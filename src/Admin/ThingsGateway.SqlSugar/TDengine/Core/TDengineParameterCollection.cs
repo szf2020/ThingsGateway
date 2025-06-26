@@ -1,102 +1,134 @@
 ﻿using System.Collections;
 using System.Data.Common;
 
-namespace ThingsGateway.SqlSugar.TDengineAdo;
-
-public class TDengineParameterCollection : DbParameterCollection
+namespace TDengineAdo
 {
-    private List<TDengineParameter> parameters = new List<TDengineParameter>();
-
-    public override int Count => this.parameters.Count;
-
-    public override object SyncRoot => ((ICollection)this.parameters).SyncRoot;
-
-    public override int Add(object value)
+    public class TDengineParameterCollection : DbParameterCollection
     {
-        this.parameters.Add((TDengineParameter)value);
-        return this.parameters.Count - 1;
-    }
+        private List<TDengineParameter> parameters = new List<TDengineParameter>();
 
-    public override void AddRange(Array values)
-    {
-        foreach (TDengineParameter tdengineParameter in values)
-            this.parameters.Add(tdengineParameter);
-    }
+        public override int Count => parameters.Count;
 
-    public override void Clear() => this.parameters.Clear();
+        public override object SyncRoot => ((ICollection)parameters).SyncRoot;
 
-    public override bool Contains(string value)
-    {
-        foreach (DbParameter parameter in this.parameters)
+        public override int Add(object value)
         {
-            if (parameter.ParameterName.Equals(value, StringComparison.OrdinalIgnoreCase))
-                return true;
+            parameters.Add((TDengineParameter)value);
+            return parameters.Count - 1;
         }
-        return false;
-    }
 
-    public override bool Contains(object value)
-    {
-        return this.parameters.Contains((TDengineParameter)value);
-    }
-
-    public override void CopyTo(Array array, int index)
-    {
-        for (int index1 = 0; index1 < this.parameters.Count; ++index1)
-            array.SetValue((object)this.parameters[index1], index + index1);
-    }
-
-    public override IEnumerator GetEnumerator() => (IEnumerator)this.parameters.GetEnumerator();
-
-    public override int IndexOf(string parameterName)
-    {
-        for (int index = 0; index < this.parameters.Count; ++index)
+        public override void AddRange(Array values)
         {
-            if (this.parameters[index].ParameterName.Equals(parameterName, StringComparison.OrdinalIgnoreCase))
-                return index;
+            foreach (var value in values)
+            {
+                parameters.Add((TDengineParameter)value);
+            }
         }
-        return -1;
+
+        public override void Clear()
+        {
+            parameters.Clear();
+        }
+
+        public override bool Contains(string value)
+        {
+            foreach (var param in parameters)
+            {
+                if (param.ParameterName.Equals(value, StringComparison.OrdinalIgnoreCase))
+                    return true;
+            }
+            return false;
+        }
+
+        public override bool Contains(object value)
+        {
+            return parameters.Contains((TDengineParameter)value);
+        }
+
+        public override void CopyTo(Array array, int index)
+        {
+            for (int i = 0; i < parameters.Count; i++)
+            {
+                array.SetValue(parameters[i], index + i);
+            }
+        }
+
+        public override IEnumerator GetEnumerator()
+        {
+            return parameters.GetEnumerator();
+        }
+
+        public override int IndexOf(string parameterName)
+        {
+            for (int i = 0; i < parameters.Count; i++)
+            {
+                if (parameters[i].ParameterName.Equals(parameterName, StringComparison.OrdinalIgnoreCase))
+                    return i;
+            }
+            return -1;
+        }
+
+        public override int IndexOf(object value)
+        {
+            return parameters.IndexOf((TDengineParameter)value);
+        }
+
+        public override void Insert(int index, object value)
+        {
+            parameters.Insert(index, (TDengineParameter)value);
+        }
+
+        public override void Remove(object value)
+        {
+            parameters.Remove((TDengineParameter)value);
+        }
+
+        public override void RemoveAt(int index)
+        {
+            parameters.RemoveAt(index);
+        }
+
+        public override void RemoveAt(string parameterName)
+        {
+            int index = IndexOf(parameterName);
+            if (index >= 0)
+                parameters.RemoveAt(index);
+        }
+
+        protected override DbParameter GetParameter(int index)
+        {
+            return parameters[index];
+        }
+
+        protected override DbParameter GetParameter(string parameterName)
+        {
+            int index = IndexOf(parameterName);
+            if (index >= 0)
+                return parameters[index];
+            return null;
+        }
+        protected override void SetParameter(int index, DbParameter value)
+        {
+            if (index < 0 || index >= parameters.Count)
+                throw new IndexOutOfRangeException("Index is out of range.");
+
+            if (value == null)
+                throw new ArgumentNullException(nameof(value), "Parameter cannot be null.");
+
+            parameters[index] = (TDengineParameter)value;
+        }
+
+        protected override void SetParameter(string parameterName, DbParameter value)
+        {
+            int index = IndexOf(parameterName);
+            if (index == -1)
+                throw new IndexOutOfRangeException("Parameter not found.");
+
+            if (value == null)
+                throw new ArgumentNullException(nameof(value), "Parameter cannot be null.");
+
+            parameters[index] = (TDengineParameter)value;
+        }
     }
 
-    public override int IndexOf(object value) => this.parameters.IndexOf((TDengineParameter)value);
-
-    public override void Insert(int index, object value)
-    {
-        this.parameters.Insert(index, (TDengineParameter)value);
-    }
-
-    public override void Remove(object value) => this.parameters.Remove((TDengineParameter)value);
-
-    public override void RemoveAt(int index) => this.parameters.RemoveAt(index);
-
-    public override void RemoveAt(string parameterName)
-    {
-        int index = this.IndexOf(parameterName);
-        if (index < 0)
-            return;
-        this.parameters.RemoveAt(index);
-    }
-
-    protected override DbParameter GetParameter(int index) => (DbParameter)this.parameters[index];
-
-    protected override DbParameter GetParameter(string parameterName)
-    {
-        int index = this.IndexOf(parameterName);
-        return index >= 0 ? (DbParameter)this.parameters[index] : (DbParameter)null;
-    }
-
-    protected override void SetParameter(int index, DbParameter value)
-    {
-        if (index < 0 || index >= this.parameters.Count)
-            throw new IndexOutOfRangeException("Index is out of range.");
-        this.parameters[index] = value != null ? (TDengineParameter)value : throw new ArgumentNullException(nameof(value), "Parameter cannot be null.");
-    }
-
-    protected override void SetParameter(string parameterName, DbParameter value)
-    {
-        int index = this.IndexOf(parameterName);
-        if (index == -1)
-            throw new IndexOutOfRangeException("Parameter not found.");
-        this.parameters[index] = value != null ? (TDengineParameter)value : throw new ArgumentNullException(nameof(value), "Parameter cannot be null.");
-    }
 }

@@ -1,35 +1,119 @@
-﻿namespace ThingsGateway.SqlSugar.TDengineAdo;
-
-internal static class Helper
+﻿namespace TDengineAdo
 {
-    public static long DateTimeToLong19(DateTime dateTime)
+    internal static class Helper
     {
-        DateTimeOffset dateTimeOffset = dateTime.Kind != DateTimeKind.Utc ? new DateTimeOffset(dateTime.ToUniversalTime()) : new DateTimeOffset(dateTime, TimeSpan.Zero);
-        return dateTimeOffset.ToUnixTimeSeconds() * 1000000000L + dateTimeOffset.Ticks % 10000000L * 100L;
-    }
 
-    public static DateTime Long16ToDateTime(long timestampInMicroseconds)
-    {
-        long seconds = timestampInMicroseconds / 1000000L;
-        long num = timestampInMicroseconds % 1000000L;
-        return DateTimeOffset.FromUnixTimeSeconds(seconds).AddTicks(num * 10L).LocalDateTime;
-    }
+        //public static bool HasMicrosecondPrecision(DateTime dateTime)
+        //{
+        //    const long ticksPerMicrosecond = TimeSpan.TicksPerMillisecond / 1000;
 
-    public static DateTime Long19ToDateTime(long timestampInNanoseconds)
-    {
-        long seconds = timestampInNanoseconds / 1000000000L;
-        long num = timestampInNanoseconds % 1000000000L;
-        return DateTimeOffset.FromUnixTimeSeconds(seconds).AddTicks(num / 100L).LocalDateTime;
-    }
+        //    // Extract the microseconds by shifting and masking the ticks value
+        //    int microseconds = (int)((dateTime.Ticks / ticksPerMicrosecond) % 1000000);
 
-    public static long DateTimeToLong16(DateTime dateTime)
-    {
-        DateTimeOffset dateTimeOffset = dateTime.Kind != DateTimeKind.Utc ? new DateTimeOffset(dateTime.ToUniversalTime()) : new DateTimeOffset(dateTime, TimeSpan.Zero);
-        return dateTimeOffset.ToUnixTimeSeconds() * 1000000L + dateTimeOffset.Ticks % 10000000L / 10L;
-    }
+        //    return microseconds>0; 
+        //}
+        /// <summary>
+        /// 将时间转为19位纳秒
+        /// </summary>
+        /// <param name="dateTime"></param>
+        /// <returns></returns>
+        public static long DateTimeToLong19(DateTime dateTime)
+        {
+            DateTimeOffset dateTimeOffset;
 
-    public static long ToUnixTimestamp(DateTime dateTime)
-    {
-        return dateTime.Kind == DateTimeKind.Utc ? new DateTimeOffset(dateTime).ToUnixTimeMilliseconds() : new DateTimeOffset(dateTime.ToUniversalTime()).ToUnixTimeMilliseconds();
+            if (dateTime.Kind == DateTimeKind.Utc)
+            {
+                dateTimeOffset = new DateTimeOffset(dateTime, TimeSpan.Zero);
+            }
+            else
+            {
+                dateTimeOffset = new DateTimeOffset(dateTime.ToUniversalTime());
+            }
+
+            long unixTimeSeconds = dateTimeOffset.ToUnixTimeSeconds();
+            long nanoseconds = dateTimeOffset.Ticks % TimeSpan.TicksPerSecond * 100;
+
+            return unixTimeSeconds * 1000000000 + nanoseconds;
+        }
+        /// <summary>
+        /// 获取时间根据16位Long
+        /// </summary>
+        /// <param name="timestampInMicroseconds"></param>
+        /// <returns></returns>
+        public static DateTime Long16ToDateTime(long timestampInMicroseconds)
+        {
+            // 计算秒和微秒部分
+            long seconds = timestampInMicroseconds / 1000000;
+            long microseconds = timestampInMicroseconds % 1000000;
+
+            // 创建 DateTimeOffset 对象，设置秒和微秒部分
+            DateTimeOffset dateTimeOffset = DateTimeOffset.FromUnixTimeSeconds(seconds).AddTicks(microseconds * 10);
+
+            // 转换为本地时间
+            DateTime localDateTime = dateTimeOffset.LocalDateTime;
+
+            return localDateTime;
+        }
+
+        /// <summary>
+        /// 获取时间根据19位Long
+        /// </summary>
+        /// <param name="timestampInNanoseconds"></param>
+        /// <returns></returns>
+        public static DateTime Long19ToDateTime(long timestampInNanoseconds)
+        {
+            // 计算秒和纳秒部分
+            long seconds = timestampInNanoseconds / 1000000000;
+            long nanoseconds = timestampInNanoseconds % 1000000000;
+
+            // 创建 DateTimeOffset 对象，设置秒和纳秒部分
+            DateTimeOffset dateTimeOffset = DateTimeOffset.FromUnixTimeSeconds(seconds).AddTicks(nanoseconds / 100);
+
+            // 转换为本地时间
+            DateTime localDateTime = dateTimeOffset.LocalDateTime;
+
+            return localDateTime;
+        }
+
+        /// <summary>
+        /// 将时间转为16位
+        /// </summary>
+        /// <param name="dateTime"></param>
+        /// <returns></returns>
+        public static long DateTimeToLong16(DateTime dateTime)
+        {
+            DateTimeOffset dateTimeOffset;
+
+            if (dateTime.Kind == DateTimeKind.Utc)
+            {
+                dateTimeOffset = new DateTimeOffset(dateTime, TimeSpan.Zero);
+            }
+            else
+            {
+                dateTimeOffset = new DateTimeOffset(dateTime.ToUniversalTime());
+            }
+
+            long unixTimeSeconds = dateTimeOffset.ToUnixTimeSeconds();
+            long microseconds = dateTimeOffset.Ticks % TimeSpan.TicksPerSecond / (TimeSpan.TicksPerMillisecond / 1000);
+
+            return unixTimeSeconds * 1000000 + microseconds;
+        }
+
+
+
+        // Method to convert a local DateTime to Unix timestamp (long)
+        public static long ToUnixTimestamp(DateTime dateTime)
+        {
+            // If the DateTime is Utc, use ToUnixTimeMilliseconds directly
+            if (dateTime.Kind == DateTimeKind.Utc)
+            {
+                return new DateTimeOffset(dateTime).ToUnixTimeMilliseconds();
+            }
+            else
+            {
+                // Convert local DateTime to Utc before converting to Unix timestamp
+                return new DateTimeOffset(dateTime.ToUniversalTime()).ToUnixTimeMilliseconds();
+            }
+        }
     }
 }

@@ -82,9 +82,54 @@ public abstract class JobExecutionContext
     /// <summary>
     /// 触发模式
     /// </summary>
-    /// <remarks>默认为定时触发</remarks>
+    /// <remarks>默认为定时触发，0:定时，1：手动</remarks>
     public int Mode { get; internal set; }
 
+    /// <summary>
+    /// 存储作业执行过程中需要传递的数据
+    /// </summary>
+    public IDictionary<string, object> Items { get; internal set; }
+
+    /// <summary>
+    /// 获取作业执行过程中传递的数据
+    /// </summary>
+    /// <param name="key">键</param>
+    /// <returns><see cref="object"/></returns>
+    public object GetItem(string key)
+    {
+        return Items[key];
+    }
+
+    /// <summary>
+    /// 获取作业执行过程中传递的数据
+    /// </summary>
+    /// <typeparam name="T">目标类型</typeparam>
+    /// <param name="key">键</param>
+    /// <returns><typeparamref name="T"/></returns>
+    public T GetItem<T>(string key)
+    {
+        return Items.TryGetValue(key, out var value) ? (T)value : default;
+    }
+
+    /// <summary>
+    /// 获取作业执行过程中传递的数据
+    /// </summary>
+    /// <typeparam name="T">目标类型</typeparam>
+    /// <returns><see cref="IEnumerable{T}"/></returns>
+    public IEnumerable<T> GetItems<T>()
+    {
+        return Items.Values.OfType<T>();
+    }
+
+    /// <summary>
+    /// 获取作业执行过程中传递的数据
+    /// </summary>
+    /// <typeparam name="T">目标类型</typeparam>
+    /// <returns><typeparamref name="T"/></returns>
+    public T GetItem<T>()
+    {
+        return GetItems<T>().FirstOrDefault();
+    }
     /// <summary>
     /// 转换成 JSON 字符串
     /// </summary>

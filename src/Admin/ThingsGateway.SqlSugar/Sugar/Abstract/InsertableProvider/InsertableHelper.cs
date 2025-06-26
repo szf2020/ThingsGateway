@@ -4,9 +4,15 @@ using System.Text.RegularExpressions;
 
 namespace ThingsGateway.SqlSugar
 {
+    /// <summary>
+    /// 可插入数据提供者
+    /// </summary>
     public partial class InsertableProvider<T> : IInsertable<T> where T : class, new()
     {
         #region Protected Methods
+        /// <summary>
+        /// 执行返回大标识
+        /// </summary>
         private string _ExecuteReturnBigIdentity()
         {
             InsertBuilder.IsReturnIdentity = true;
@@ -17,6 +23,9 @@ namespace ThingsGateway.SqlSugar
             Before(sql);
             return sql;
         }
+        /// <summary>
+        /// 执行返回标识
+        /// </summary>
         private string _ExecuteReturnIdentity()
         {
             InsertBuilder.IsReturnIdentity = true;
@@ -28,6 +37,9 @@ namespace ThingsGateway.SqlSugar
             return sql;
         }
 
+        /// <summary>
+        /// 执行命令
+        /// </summary>
         private string _ExecuteCommand()
         {
             if (InsertBuilder.DbColumnInfoList.HasValue())
@@ -63,6 +75,9 @@ namespace ThingsGateway.SqlSugar
             Before(sql);
             return sql;
         }
+        /// <summary>
+        /// 自动移除数据缓存
+        /// </summary>
         protected void AutoRemoveDataCache()
         {
             var moreSetts = this.Context.CurrentConnectionConfig.MoreSettings;
@@ -72,6 +87,9 @@ namespace ThingsGateway.SqlSugar
                 this.RemoveDataCache();
             }
         }
+        /// <summary>
+        /// 预处理SQL
+        /// </summary>
         protected virtual void PreToSql()
         {
             #region Identities
@@ -150,6 +168,9 @@ namespace ThingsGateway.SqlSugar
             }
         }
 
+        /// <summary>
+        /// 数组为空处理
+        /// </summary>
         private static void ArrayNull(DbColumnInfo item, SugarParameter parameter)
         {
             if (item.PropertyType.IsIn(typeof(Guid[]), typeof(Guid?[])))
@@ -169,6 +190,9 @@ namespace ThingsGateway.SqlSugar
                 parameter.DbType = System.Data.DbType.Int16;
             }
         }
+        /// <summary>
+        /// 初始化
+        /// </summary>
         internal void Init()
         {
             InsertBuilder.EntityInfo = this.EntityInfo;
@@ -195,6 +219,9 @@ namespace ThingsGateway.SqlSugar
             }
         }
 
+        /// <summary>
+        /// 数据AOP处理
+        /// </summary>
         private void DataAop(T item)
         {
             var dataEvent = this.Context.CurrentConnectionConfig.AopEvents?.DataExecuting;
@@ -222,6 +249,9 @@ namespace ThingsGateway.SqlSugar
             }
         }
 
+        /// <summary>
+        /// 数据变更AOP处理
+        /// </summary>
         private void DataChangeAop(T[] items)
         {
 
@@ -256,6 +286,9 @@ namespace ThingsGateway.SqlSugar
             }
         }
 
+        /// <summary>
+        /// 通过字典设置插入项
+        /// </summary>
         private void SetInsertItemByDic(int i, T item, List<DbColumnInfo> insertItem)
         {
             foreach (var column in (item as Dictionary<string, object>).OrderBy(it => it.Key))
@@ -287,6 +320,9 @@ namespace ThingsGateway.SqlSugar
                 insertItem.Add(columnInfo);
             }
         }
+        /// <summary>
+        /// 通过实体设置插入项
+        /// </summary>
         private void SetInsertItemByEntity(int i, T item, List<DbColumnInfo> insertItem)
         {
             if (item == null)
@@ -341,8 +377,14 @@ namespace ThingsGateway.SqlSugar
                 }
                 if (column.IsJson && columnInfo.Value != null)
                 {
-                    if (columnInfo.Value != null)
+                    if (this.InsertBuilder.SerializeObjectFunc != null && columnInfo.Value != null)
+                    {
+                        columnInfo.Value = this.InsertBuilder.SerializeObjectFunc(columnInfo.Value);
+                    }
+                    else if (columnInfo.Value != null)
+                    {
                         columnInfo.Value = this.Context.Utilities.SerializeObject(columnInfo.Value);
+                    }
                 }
                 //var tranColumn=EntityInfo.Columns.FirstOrDefault(it => it.IsTranscoding && it.DbColumnName.Equals(column.DbColumnName, StringComparison.CurrentCultureIgnoreCase));
                 if (column.IsTranscoding && columnInfo.Value.HasValue())
@@ -363,6 +405,9 @@ namespace ThingsGateway.SqlSugar
                 }
             }
         }
+        /// <summary>
+        /// 获取属性值
+        /// </summary>
         private static object GetValue(T item, EntityColumnInfo column)
         {
             if (column.ForOwnsOnePropertyInfo != null)
@@ -380,6 +425,9 @@ namespace ThingsGateway.SqlSugar
             }
         }
 
+        /// <summary>
+        /// 获取数据库列名
+        /// </summary>
         private string GetDbColumnName(string propertyName)
         {
             if (!IsMappingColumns)
@@ -401,10 +449,16 @@ namespace ThingsGateway.SqlSugar
             }
         }
 
+        /// <summary>
+        /// 获取主键列表
+        /// </summary>
         protected virtual List<string> GetPrimaryKeys()
         {
             return this.EntityInfo.Columns.Where(it => it.IsPrimarykey).Select(it => it.DbColumnName).ToList();
         }
+        /// <summary>
+        /// 获取标识键列表
+        /// </summary>
         protected virtual List<string> GetIdentityKeys()
         {
             return this.EntityInfo.Columns.Where(it =>
@@ -426,6 +480,9 @@ namespace ThingsGateway.SqlSugar
         //    }
         //    result.Start();
         //}
+        /// <summary>
+        /// 恢复映射
+        /// </summary>
         protected void RestoreMapping()
         {
             if (IsAs)
@@ -455,6 +512,9 @@ namespace ThingsGateway.SqlSugar
         //    return asyncInsertable;
         //}
 
+        /// <summary>
+        /// 执行后处理
+        /// </summary>
         protected void After(string sql, long? result)
         {
             if (this.IsEnableDiffLogEvent)
@@ -476,6 +536,9 @@ namespace ThingsGateway.SqlSugar
             }
             DataChangeAop(this.InsertObjs);
         }
+        /// <summary>
+        /// 执行前处理
+        /// </summary>
         protected void Before(string sql)
         {
             if (this.IsEnableDiffLogEvent)
@@ -491,6 +554,9 @@ namespace ThingsGateway.SqlSugar
                 this.Ado.IsDisableMasterSlaveSeparation = isDisableMasterSlaveSeparation;
             }
         }
+        /// <summary>
+        /// 获取差异表
+        /// </summary>
         private List<DiffLogTableInfo> GetDiffTable(string sql, long? identity)
         {
 
@@ -509,6 +575,9 @@ namespace ThingsGateway.SqlSugar
 
         }
 
+        /// <summary>
+        /// 通过实体获取差异表
+        /// </summary>
         private List<DiffLogTableInfo> GetDiffTableByEntity()
         {
             List<SugarParameter> parameters = new List<SugarParameter>();
@@ -536,6 +605,9 @@ namespace ThingsGateway.SqlSugar
             return result;
         }
 
+        /// <summary>
+        /// 通过SQL获取差异表
+        /// </summary>
         private List<DiffLogTableInfo> GetDiffTableBySql(long? identity)
         {
             List<SugarParameter> parameters = new List<SugarParameter>();
@@ -622,6 +694,9 @@ namespace ThingsGateway.SqlSugar
             }
         }
 
+        /// <summary>
+        /// 调用实体方法
+        /// </summary>
         public IInsertable<T> CallEntityMethod(Expression<Action<T>> method)
         {
             if (this.InsertObjs.HasValue())
@@ -642,6 +717,9 @@ namespace ThingsGateway.SqlSugar
 
         #region Insert PkList
 
+        /// <summary>
+        /// 插入主键列表(有函数)
+        /// </summary>
         private List<Type> InsertPkListWithFunc<Type>(EntityColumnInfo pkInfo)
         {
             InsertBuilder.IsReturnPkList = true;
@@ -653,6 +731,9 @@ namespace ThingsGateway.SqlSugar
             return result;
         }
 
+        /// <summary>
+        /// 插入主键列表(无函数)
+        /// </summary>
         private List<Type> InsertPkListNoFunc<Type>(EntityColumnInfo pkInfo)
         {
             if (this.Ado.Transaction != null)
@@ -676,6 +757,9 @@ namespace ThingsGateway.SqlSugar
             }
         }
 
+        /// <summary>
+        /// 插入主键列表(标识计数为1)
+        /// </summary>
         private List<Type> InsertPkListIdentityCount1<Type>(EntityColumnInfo pkInfo)
         {
             if (pkInfo.UnderType == UtilConstants.IntType)
@@ -688,6 +772,9 @@ namespace ThingsGateway.SqlSugar
             }
         }
 
+        /// <summary>
+        /// 插入主键列表(长整型)
+        /// </summary>
         private List<Type> InsertPkListLong<Type>()
         {
             var list = this.ExecuteReturnSnowflakeIdList();
@@ -702,6 +789,9 @@ namespace ThingsGateway.SqlSugar
             }
         }
 
+        /// <summary>
+        /// 插入主键列表(GUID)
+        /// </summary>
         private List<Type> InsertPkListGuid<Type>(EntityColumnInfo pkInfo)
         {
             Check.ExceptionEasy(pkInfo.UnderType.Name != typeof(Type).Name, $"{pkInfo.UnderType.Name} to ExecuteReturnPkList<{typeof(Type).Name}> error ", $" {pkInfo.UnderType.Name} 转换成ExecuteReturnPkList<{typeof(Type).Name}>失败");
@@ -720,6 +810,9 @@ namespace ThingsGateway.SqlSugar
             }
             return result;
         }
+        /// <summary>
+        /// 返回默认标识
+        /// </summary>
         private List<Type> ReturnDefaultIdentity<Type>(EntityColumnInfo pkInfo)
         {
             List<Type> result = new List<Type>();

@@ -44,8 +44,18 @@ public class SqlDBProducerProperty : BusinessPropertyWithCacheInterval
     [DynamicProperty]
     public string ReadDBTableName { get; set; } = "ReadDBTableName";
 
+
     [DynamicProperty]
-    public string HistoryDBTableName { get; set; } = "HistoryDBTableName";
+    [Required]
+    public string NumberTableName { get; set; } = "historyNumberValue";
+
+    [DynamicProperty]
+    [Required]
+    public string StringTableName { get; set; } = "historyStringValue";
+
+    public string NumberTableNameLow => NumberTableName.ToLower();
+    public string StringTableNameLow => StringTableName.ToLower();
+
 
     [DynamicProperty]
     public DbType DbType { get; set; } = DbType.SqlServer;
@@ -56,7 +66,7 @@ public class SqlDBProducerProperty : BusinessPropertyWithCacheInterval
     [DynamicProperty]
     [Required]
     [AutoGenerateColumn(ComponentType = typeof(Textarea), Rows = 1)]
-    public string BigTextConnectStr { get; set; } = "server=.;uid=sa;pwd=111111;database=test;";
+    public string BigTextConnectStr { get; set; } = "server=.;uid=sa;pwd=111111;database=test;Encrypt=True;TrustServerCertificate=True;";
 
     /// <summary>
     /// 实时表脚本

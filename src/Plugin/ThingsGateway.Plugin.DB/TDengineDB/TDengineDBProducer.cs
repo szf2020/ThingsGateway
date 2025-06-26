@@ -12,8 +12,6 @@ using BootstrapBlazor.Components;
 
 using Mapster;
 
-using Newtonsoft.Json.Linq;
-
 using System.Reflection;
 
 using ThingsGateway.Admin.Application;
@@ -57,42 +55,45 @@ public partial class TDengineDBProducer : BusinessBaseWithCacheIntervalVariableM
 
     public async Task<SqlSugarPagedList<IDBHistoryValue>> GetDBHistoryValuePagesAsync(DBHistoryValuePageInput input)
     {
-        var data = await Query(input).ToPagedListAsync<TDengineDBHistoryValue, IDBHistoryValue>(input.Current, input.Size).ConfigureAwait(false);//分页
+        var data = await Query(input, _driverPropertys.NumberTableNameLow).ToPagedListAsync<TDengineDBNumberHistoryValue, IDBHistoryValue>(input.Current, input.Size).ConfigureAwait(false);//分页
         return data;
     }
+
+    public async Task<List<IDBHistoryValue>> GetDBHistoryValuesAsync(DBHistoryValuePageInput input)
+    {
+        var data = await Query(input, _driverPropertys.NumberTableNameLow).ToListAsync().ConfigureAwait(false);
+        return data.Cast<IDBHistoryValue>().ToList(); ;
+    }
+
     protected override void Dispose(bool disposing)
     {
         _db?.TryDispose();
         base.Dispose(disposing);
     }
-    public async Task<List<IDBHistoryValue>> GetDBHistoryValuesAsync(DBHistoryValuePageInput input)
-    {
-        var data = await Query(input).ToListAsync().ConfigureAwait(false);
-        return data.Cast<IDBHistoryValue>().ToList(); ;
-    }
+
     protected override async Task InitChannelAsync(IChannel? channel, CancellationToken cancellationToken)
     {
         InstanceFactory.RemoveCache();
-        _db = TDengineDBUtil.GetDb(_driverPropertys.DbType, _driverPropertys.BigTextConnectStr, _driverPropertys.TableNameLow);
+        _db = TDengineDBUtil.GetDb(_driverPropertys.DbType, _driverPropertys.BigTextConnectStr, _driverPropertys.NumberTableNameLow);
         List<Assembly> assemblies = new();
         foreach (var item in InstanceFactory.CustomAssemblies)
         {
-            if (item.FullName != typeof(SqlSugar.TDengine.TDengineProvider).Assembly.FullName)
+            if (item.FullName != typeof(TDengineProvider).Assembly.FullName)
             {
                 assemblies.Add(item);
             }
         }
-        assemblies.Add(typeof(SqlSugar.TDengine.TDengineProvider).Assembly);
+        assemblies.Add(typeof(TDengineProvider).Assembly);
         InstanceFactory.CustomAssemblies = assemblies.ToArray();
 
         _config = new TypeAdapterConfig();
-        _config.ForType<VariableRuntime, TDengineDBHistoryValue>()
-            .Map(dest => dest.Value, src => src.Value != null ? src.Value.GetType() == typeof(string) ? src.Value.ToString() : JToken.FromObject(src.Value).ToString() : string.Empty)
+        _config.ForType<VariableRuntime, TDengineDBNumberHistoryValue>()
+            .Map(dest => dest.Value, src => ConvertUtility.Convert.ToDecimal(src.Value, 0))
             //.Map(dest => dest.Id, src => CommonUtils.GetSingleId())
             .Map(dest => dest.Id, src => src.Id)//Id更改为变量Id
             ;//注意sqlsugar插入时无时区，直接utc时间
-        _config.ForType<VariableBasicData, TDengineDBHistoryValue>()
-    .Map(dest => dest.Value, src => src.Value != null ? src.Value.GetType() == typeof(string) ? src.Value.ToString() : JToken.FromObject(src.Value).ToString() : string.Empty)
+        _config.ForType<VariableBasicData, TDengineDBNumberHistoryValue>()
+    .Map(dest => dest.Value, src => ConvertUtility.Convert.ToDecimal(src.Value, 0))
     //.Map(dest => dest.Id, src => CommonUtils.GetSingleId())
     .Map(dest => dest.Id, src => src.Id)//Id更改为变量Id
     ;//注意sqlsugar插入时无时区，直接utc时间
@@ -108,10 +109,10 @@ public partial class TDengineDBProducer : BusinessBaseWithCacheIntervalVariableM
         return $" {nameof(TDengineDBProducer)}";
     }
 
-    internal ISugarQueryable<TDengineDBHistoryValue> Query(DBHistoryValuePageInput input)
+    internal ISugarQueryable<TDengineDBNumberHistoryValue> Query(DBHistoryValuePageInput input, string tableName)
     {
-        var db = TDengineDBUtil.GetDb(_driverPropertys.DbType, _driverPropertys.BigTextConnectStr, _driverPropertys.TableNameLow);
-        var query = db.Queryable<TDengineDBHistoryValue>().AsTDengineSTable()
+        var db = TDengineDBUtil.GetDb(_driverPropertys.DbType, _driverPropertys.BigTextConnectStr, tableName);
+        var query = db.Queryable<TDengineDBNumberHistoryValue>().AsTDengineSTable()
                              .WhereIF(input.StartTime != null, a => a.CreateTime >= input.StartTime)
                            .WhereIF(input.EndTime != null, a => a.CreateTime <= input.EndTime)
                            .WhereIF(!string.IsNullOrEmpty(input.VariableName), it => it.Name.Contains(input.VariableName))
@@ -127,19 +128,19 @@ public partial class TDengineDBProducer : BusinessBaseWithCacheIntervalVariableM
         return query;
     }
 
-    internal async Task<QueryData<TDengineDBHistoryValue>> QueryData(QueryPageOptions option)
+    internal async Task<QueryData<TDengineDBNumberHistoryValue>> QueryData(QueryPageOptions option)
     {
-        var db = TDengineDBUtil.GetDb(_driverPropertys.DbType, _driverPropertys.BigTextConnectStr, _driverPropertys.TableNameLow);
-        var ret = new QueryData<TDengineDBHistoryValue>()
+        var db = TDengineDBUtil.GetDb(_driverPropertys.DbType, _driverPropertys.BigTextConnectStr, _driverPropertys.NumberTableNameLow);
+        var ret = new QueryData<TDengineDBNumberHistoryValue>()
         {
             IsSorted = option.SortOrder != SortOrder.Unset,
             IsFiltered = option.Filters.Count > 0,
             IsAdvanceSearch = option.AdvanceSearches.Count > 0 || option.CustomerSearches.Count > 0,
             IsSearch = option.Searches.Count > 0
         };
-        var query = db.Queryable<TDengineDBHistoryValue>().AsTDengineSTable();
+        var query = db.Queryable<TDengineDBNumberHistoryValue>().AsTDengineSTable();
 
-        query = db.GetQuery<TDengineDBHistoryValue>(option, query);
+        query = db.GetQuery<TDengineDBNumberHistoryValue>(option, query);
 
         if (option.IsPage)
         {
@@ -187,7 +188,7 @@ public partial class TDengineDBProducer : BusinessBaseWithCacheIntervalVariableM
         {
 
             var sql = $"""
-                CREATE STABLE IF NOT EXISTS  `{_driverPropertys.TableNameLow}`(
+                CREATE STABLE IF NOT EXISTS  `{_driverPropertys.StringTableNameLow}`(
                 `createtime` TIMESTAMP   ,
                 `collecttime` TIMESTAMP   ,
                 `id` BIGINT   ,
@@ -195,6 +196,18 @@ public partial class TDengineDBProducer : BusinessBaseWithCacheIntervalVariableM
                 `value` VARCHAR(255)    ) TAGS(`devicename`  VARCHAR(100) ,`name`  VARCHAR(100))
                 """;
             await _db.Ado.ExecuteCommandAsync(sql, default, cancellationToken: cancellationToken).ConfigureAwait(false);
+
+
+            sql = $"""
+                CREATE STABLE IF NOT EXISTS  `{_driverPropertys.NumberTableNameLow}`(
+                `createtime` TIMESTAMP   ,
+                `collecttime` TIMESTAMP   ,
+                `id` BIGINT   ,
+                `isonline` BOOL   ,
+                `value` DOUBLE    ) TAGS(`devicename`  VARCHAR(100) ,`name`  VARCHAR(100))
+                """;
+            await _db.Ado.ExecuteCommandAsync(sql, default, cancellationToken: cancellationToken).ConfigureAwait(false);
+
         }
         await base.ProtectedStartAsync(cancellationToken).ConfigureAwait(false);
     }

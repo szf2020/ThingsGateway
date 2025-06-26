@@ -4,6 +4,8 @@ namespace ThingsGateway.SqlSugar
 {
     public class ReflectionInoCacheService : ICacheService
     {
+        public static ReflectionInoCacheService Instance { get; } = new ReflectionInoCacheService();
+
         public void Add<V>(string key, V value)
         {
             ReflectionInoCore<V>.GetInstance().Add(key, value);

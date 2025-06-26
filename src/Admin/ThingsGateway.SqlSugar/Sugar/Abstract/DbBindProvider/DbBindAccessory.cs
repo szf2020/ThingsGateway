@@ -4,10 +4,23 @@ using System.Text;
 
 namespace ThingsGateway.SqlSugar
 {
+    /// <summary>
+    /// 数据库绑定辅助类
+    /// </summary>
     public partial class DbBindAccessory
     {
+        /// <summary>
+        /// 查询构建器
+        /// </summary>
         public QueryBuilder QueryBuilder { get; set; }
 
+        /// <summary>
+        /// 获取实体列表
+        /// </summary>
+        /// <typeparam name="T">实体类型</typeparam>
+        /// <param name="context">SqlSugar提供者</param>
+        /// <param name="dataReader">数据读取器</param>
+        /// <returns>实体列表</returns>
         protected List<T> GetEntityList<T>(SqlSugarProvider context, IDataReader dataReader)
         {
             Type type = typeof(T);
@@ -28,19 +41,12 @@ namespace ThingsGateway.SqlSugar
                 if (dataReader == null) return result;
                 while (dataReader.Read())
                 {
-                    //try
-                    //{
                     var addItem = entytyList.Build(dataReader);
                     if (this.QueryBuilder?.QueryableFormats?.Count > 0)
                     {
                         FormatT(addItem);
                     }
                     result.Add(addItem);
-                    //}
-                    //catch (Exception ex)
-                    //{
-                    //    Check.Exception(true, ErrorMessage.EntityMappingErrorCompositeFormat, ex.Message);
-                    //}
                     SetAppendColumns(dataReader);
                     SetOwnsOne(addItem, isOwnsOne, entityInfo, dataReader);
                 }
@@ -60,6 +66,13 @@ namespace ThingsGateway.SqlSugar
             return result;
         }
 
+        /// <summary>
+        /// 异步获取实体列表
+        /// </summary>
+        /// <typeparam name="T">实体类型</typeparam>
+        /// <param name="context">SqlSugar提供者</param>
+        /// <param name="dataReader">数据读取器</param>
+        /// <returns>实体列表</returns>
         protected async Task<List<T>> GetEntityListAsync<T>(SqlSugarProvider context, IDataReader dataReader)
         {
             Type type = typeof(T);
@@ -80,19 +93,12 @@ namespace ThingsGateway.SqlSugar
                 if (dataReader == null) return result;
                 while (await GetReadAsync(dataReader, context).ConfigureAwait(false))
                 {
-                    //try
-                    //{
                     var addItem = entytyList.Build(dataReader);
                     if (this.QueryBuilder?.QueryableFormats?.Count > 0)
                     {
                         FormatT(addItem);
                     }
                     result.Add(addItem);
-                    //}
-                    //catch (Exception ex)
-                    //{
-                    //    Check.Exception(true, ErrorMessage.EntityMappingErrorCompositeFormat, ex.Message);
-                    //}
                     SetAppendColumns(dataReader);
                     SetOwnsOne(addItem, isOwnsOne, entityInfo, dataReader);
                 }
@@ -112,6 +118,12 @@ namespace ThingsGateway.SqlSugar
             return result;
         }
 
+        /// <summary>
+        /// 异步读取数据
+        /// </summary>
+        /// <param name="dataReader">数据读取器</param>
+        /// <param name="context">SqlSugar提供者</param>
+        /// <returns>是否读取成功</returns>
         private Task<bool> GetReadAsync(IDataReader dataReader, SqlSugarProvider context)
         {
             if (this.QueryBuilder?.Builder?.SupportReadToken == true && context.Ado.CancellationToken != null)
@@ -124,6 +136,13 @@ namespace ThingsGateway.SqlSugar
             }
         }
 
+        /// <summary>
+        /// 设置OwnsOne属性
+        /// </summary>
+        /// <param name="addItem">实体对象</param>
+        /// <param name="isOwnsOne">是否包含OwnsOne属性</param>
+        /// <param name="entityInfo">实体信息</param>
+        /// <param name="dataReader">数据读取器</param>
         private void SetOwnsOne(object addItem, bool isOwnsOne, EntityInfo entityInfo, IDataReader dataReader)
         {
             if (isOwnsOne)
@@ -182,6 +201,11 @@ namespace ThingsGateway.SqlSugar
             }
         }
 
+        /// <summary>
+        /// 格式化实体对象
+        /// </summary>
+        /// <typeparam name="T">实体类型</typeparam>
+        /// <param name="addItem">实体对象</param>
         private void FormatT<T>(T addItem)
         {
             var formats = this.QueryBuilder.QueryableFormats;
@@ -199,6 +223,13 @@ namespace ThingsGateway.SqlSugar
             }
         }
 
+        /// <summary>
+        /// 执行数据后处理函数
+        /// </summary>
+        /// <typeparam name="T">实体类型</typeparam>
+        /// <param name="context">SqlSugar提供者</param>
+        /// <param name="dataAfterFunc">数据后处理函数</param>
+        /// <param name="result">结果列表</param>
         private static void ExecuteDataAfterFun<T>(SqlSugarProvider context, Action<object, DataAfterModel> dataAfterFunc, List<T> result)
         {
             if (dataAfterFunc != null)
@@ -217,6 +248,12 @@ namespace ThingsGateway.SqlSugar
             }
         }
 
+        /// <summary>
+        /// 获取缓存键
+        /// </summary>
+        /// <param name="type">类型</param>
+        /// <param name="keys">键列表</param>
+        /// <returns>缓存键</returns>
         private string GetCacheKey(Type type, List<string> keys)
         {
             StringBuilder sb = new StringBuilder("DataReaderToList.");
@@ -229,6 +266,10 @@ namespace ThingsGateway.SqlSugar
             return sb.ToString();
         }
 
+        /// <summary>
+        /// 设置附加列
+        /// </summary>
+        /// <param name="dataReader">数据读取器</param>
         private void SetAppendColumns(IDataReader dataReader)
         {
             if (QueryBuilder?.AppendColumns != null && QueryBuilder.AppendColumns.Count != 0)
@@ -262,6 +303,12 @@ namespace ThingsGateway.SqlSugar
             }
         }
 
+        /// <summary>
+        /// 获取数据读取器字段名
+        /// </summary>
+        /// <param name="dataReader">数据读取器</param>
+        /// <param name="types">类型字符串</param>
+        /// <returns>字段名列表</returns>
         private List<string> GetDataReaderNames(IDataReader dataReader, ref string types)
         {
             List<string> keys = new List<string>();
@@ -287,6 +334,13 @@ namespace ThingsGateway.SqlSugar
             return keys;
         }
 
+        /// <summary>
+        /// 获取键值对列表
+        /// </summary>
+        /// <typeparam name="T">键值对类型</typeparam>
+        /// <param name="type">类型</param>
+        /// <param name="dataReader">数据读取器</param>
+        /// <returns>键值对列表</returns>
         protected List<T> GetKeyValueList<T>(Type type, IDataReader dataReader)
         {
             List<T> result = new List<T>();
@@ -297,6 +351,13 @@ namespace ThingsGateway.SqlSugar
             return result;
         }
 
+        /// <summary>
+        /// 异步获取键值对列表
+        /// </summary>
+        /// <typeparam name="T">键值对类型</typeparam>
+        /// <param name="type">类型</param>
+        /// <param name="dataReader">数据读取器</param>
+        /// <returns>键值对列表</returns>
         protected async Task<List<T>> GetKeyValueListAsync<T>(Type type, IDataReader dataReader)
         {
             List<T> result = new List<T>();
@@ -307,6 +368,13 @@ namespace ThingsGateway.SqlSugar
             return result;
         }
 
+        /// <summary>
+        /// 获取键值对列表
+        /// </summary>
+        /// <typeparam name="T">键值对类型</typeparam>
+        /// <param name="type">类型</param>
+        /// <param name="dataReader">数据读取器</param>
+        /// <param name="result">结果列表</param>
         private static void GetKeyValueList<T>(Type type, IDataReader dataReader, List<T> result)
         {
             if (UtilConstants.DicOO == type)
@@ -345,7 +413,13 @@ namespace ThingsGateway.SqlSugar
             }
         }
 
-
+        /// <summary>
+        /// 异步获取数组列表
+        /// </summary>
+        /// <typeparam name="T">数组类型</typeparam>
+        /// <param name="type">类型</param>
+        /// <param name="dataReader">数据读取器</param>
+        /// <returns>数组列表</returns>
         protected async Task<List<T>> GetArrayListAsync<T>(Type type, IDataReader dataReader)
         {
             List<T> result = new List<T>();
@@ -358,6 +432,13 @@ namespace ThingsGateway.SqlSugar
             return result;
         }
 
+        /// <summary>
+        /// 获取数组列表
+        /// </summary>
+        /// <typeparam name="T">数组类型</typeparam>
+        /// <param name="type">类型</param>
+        /// <param name="dataReader">数据读取器</param>
+        /// <returns>数组列表</returns>
         protected List<T> GetArrayList<T>(Type type, IDataReader dataReader)
         {
             List<T> result = new List<T>();
@@ -370,8 +451,15 @@ namespace ThingsGateway.SqlSugar
             return result;
         }
 
-
-
+        /// <summary>
+        /// 获取数组列表
+        /// </summary>
+        /// <typeparam name="T">数组类型</typeparam>
+        /// <param name="type">类型</param>
+        /// <param name="dataReader">数据读取器</param>
+        /// <param name="result">结果列表</param>
+        /// <param name="count">字段数量</param>
+        /// <param name="childType">子元素类型</param>
         private static void GetArrayList<T>(Type type, IDataReader dataReader, List<T> result, int count, Type childType)
         {
             object[] array = new object[count];
@@ -399,6 +487,13 @@ namespace ThingsGateway.SqlSugar
                 Check.Exception(true, ErrorMessage.NotSupportedArrayCompositeFormat);
         }
 
+        /// <summary>
+        /// 获取值类型列表
+        /// </summary>
+        /// <typeparam name="T">值类型</typeparam>
+        /// <param name="type">类型</param>
+        /// <param name="dataReader">数据读取器</param>
+        /// <returns>值类型列表</returns>
         protected List<T> GetValueTypeList<T>(Type type, IDataReader dataReader)
         {
             List<T> result = new List<T>();
@@ -408,6 +503,14 @@ namespace ThingsGateway.SqlSugar
             }
             return result;
         }
+
+        /// <summary>
+        /// 异步获取值类型列表
+        /// </summary>
+        /// <typeparam name="T">值类型</typeparam>
+        /// <param name="type">类型</param>
+        /// <param name="dataReader">数据读取器</param>
+        /// <returns>值类型列表</returns>
         protected async Task<List<T>> GetValueTypeListAsync<T>(Type type, IDataReader dataReader)
         {
             List<T> result = new List<T>();
@@ -418,6 +521,13 @@ namespace ThingsGateway.SqlSugar
             return result;
         }
 
+        /// <summary>
+        /// 获取值类型列表
+        /// </summary>
+        /// <typeparam name="T">值类型</typeparam>
+        /// <param name="type">类型</param>
+        /// <param name="dataReader">数据读取器</param>
+        /// <param name="result">结果列表</param>
         private static void GetValueTypeList<T>(Type type, IDataReader dataReader, List<T> result)
         {
             var value = dataReader.GetValue(0);

@@ -1,4 +1,4 @@
-﻿namespace ThingsGateway.SqlSugar.TDengine
+﻿namespace ThingsGateway.SqlSugar
 {
     public class TDengineUpdateBuilder : UpdateBuilder
     {

@@ -207,7 +207,7 @@ namespace ThingsGateway.Debug
              SqlSugarClient db=null;
 
                  if(businessProperty.DbType==SqlSugar.DbType.TDengine)
-        db = TDengineDBUtil.GetDb(businessProperty.DbType, businessProperty.BigTextConnectStr, businessProperty.TableNameLow);
+        db = TDengineDBUtil.GetDb(businessProperty.DbType, businessProperty.BigTextConnectStr, businessProperty.NumberTableNameLow);
             else
         db = BusinessDatabaseUtil.GetDb(businessProperty.DbType, businessProperty.BigTextConnectStr);
 

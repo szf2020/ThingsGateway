@@ -73,6 +73,7 @@ public static class HttpRemoteClient
         // 空检查
         ArgumentNullException.ThrowIfNull(configure);
 
+        // 线程安全执行
         lock (_lock)
         {
             _configure = configure;
@@ -88,6 +89,7 @@ public static class HttpRemoteClient
     /// <remarks>通常在应用程序关闭或不再需要 HTTP 远程请求服务时调用。</remarks>
     public static void Dispose()
     {
+        // 线程安全执行
         lock (_lock)
         {
             if (_isDisposed)
@@ -112,6 +114,7 @@ public static class HttpRemoteClient
     /// <exception cref="InvalidOperationException"></exception>
     internal static IHttpRemoteService CreateService()
     {
+        // 线程安全执行
         lock (_lock)
         {
             if (_isDisposed)
@@ -154,6 +157,7 @@ public static class HttpRemoteClient
     /// <exception cref="ObjectDisposedException"></exception>
     internal static void Reinitialize()
     {
+        // 线程安全执行
         lock (_lock)
         {
             if (_isDisposed)

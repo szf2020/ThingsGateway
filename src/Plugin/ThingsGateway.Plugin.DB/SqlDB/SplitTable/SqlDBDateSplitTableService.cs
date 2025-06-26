@@ -28,7 +28,7 @@ public class SqlDBDateSplitTableService : DateSplitTableService
     public override List<SplitTableInfo> GetAllTables(ISqlSugarClient db, EntityInfo EntityInfo, List<DbTableInfo> tableInfos)
     {
         CheckTableName(EntityInfo.DbTableName);
-        string regex = "^" + EntityInfo.DbTableName.Replace("{year}", "([0-9]{2,4})").Replace("{day}", "([0-9]{1,2})").Replace("{month}", "([0-9]{1,2})").Replace("{name}", _sqlDBProducerProperty.HistoryDBTableName);
+        string regex = "^" + EntityInfo.DbTableName.Replace("{year}", "([0-9]{2,4})").Replace("{day}", "([0-9]{1,2})").Replace("{month}", "([0-9]{1,2})").Replace("{name}", EntityInfo.EntityName.Contains("Number", StringComparison.OrdinalIgnoreCase) ? _sqlDBProducerProperty.NumberTableName : _sqlDBProducerProperty.StringTableName);
         List<string> list = (from it in tableInfos
                              where Regex.IsMatch(it.Name, regex, RegexOptions.IgnoreCase)
                              select it.Name).Reverse().ToList();
@@ -148,7 +148,7 @@ public class SqlDBDateSplitTableService : DateSplitTableService
     {
         var type = (SplitType)_sqlDBProducerProperty.SqlDBSplitType;
         date = ConvertDateBySplitType(date, type);
-        return EntityInfo.DbTableName.Replace("{year}", date.Year + "").Replace("{day}", SqlDBDateSplitTableService.PadLeft2(date.Day + "")).Replace("{month}", SqlDBDateSplitTableService.PadLeft2(date.Month + "")).Replace("{name}", _sqlDBProducerProperty.HistoryDBTableName);
+        return EntityInfo.DbTableName.Replace("{year}", date.Year + "").Replace("{day}", SqlDBDateSplitTableService.PadLeft2(date.Day + "")).Replace("{month}", SqlDBDateSplitTableService.PadLeft2(date.Month + "")).Replace("{name}", EntityInfo.EntityName.Contains("Number", StringComparison.OrdinalIgnoreCase) ? _sqlDBProducerProperty.NumberTableName : _sqlDBProducerProperty.StringTableName);
     }
 
     private static string PadLeft2(string str)

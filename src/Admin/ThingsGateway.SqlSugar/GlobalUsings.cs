@@ -9,4 +9,3 @@
 //------------------------------------------------------------------------------
 
 global using ThingsGateway.NewLife.Extension;
-global using ThingsGateway.SqlSugar.TDengineAdo;

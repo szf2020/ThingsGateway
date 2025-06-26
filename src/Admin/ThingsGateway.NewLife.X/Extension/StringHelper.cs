@@ -142,13 +142,14 @@ public static class StringHelper
         if (nameValueSeparator.IsNullOrEmpty()) nameValueSeparator = "=";
         //if (separator == null || separator.Length <= 0) separator = new String[] { ",", ";" };
 
-        var ss = value.Split(new[] { separator }, StringSplitOptions.RemoveEmptyEntries);
+        var ss = value.Split([separator], StringSplitOptions.RemoveEmptyEntries);
         if (ss == null || ss.Length <= 0) return dic;
 
         var k = 0;
         foreach (var item in ss)
         {
-            var p = item.IndexOf(nameValueSeparator);
+            // 如果分隔符是 \u0001，则必须使用Ordinal，否则无法分割直接返回0。在RocketMQ中有这种情况
+            var p = item.IndexOf(nameValueSeparator, StringComparison.Ordinal);
             if (p <= 0)
             {
                 dic[$"[{k}]"] = item;
@@ -178,46 +179,6 @@ public static class StringHelper
         return dic;
     }
 
-    ///// <summary>
-    ///// 在.netCore需要区分该部分内容
-    ///// </summary>
-    ///// <param name="value"></param>
-    ///// <param name="nameValueSeparator"></param>
-    ///// <param name="separator"></param>
-    ///// <param name="trimQuotation"></param>
-    ///// <returns></returns>
-    //public static IDictionary<String, String> SplitAsDictionaryT(this String? value, Char nameValueSeparator = '=', Char separator = ';', Boolean trimQuotation = false)
-    //{
-    //    var dic = new NullableDictionary<String, String>(StringComparer.OrdinalIgnoreCase);
-    //    if (value == null || value.IsNullOrWhiteSpace()) return dic;
-
-    //    //if (nameValueSeparator == null) nameValueSeparator = '=';
-    //    //if (separator == null || separator.Length <= 0) separator = new String[] { ",", ";" };
-
-    //    var ss = value.Split(new[] { separator }, StringSplitOptions.RemoveEmptyEntries);
-    //    if (ss == null || ss.Length <= 0) return dic;
-
-    //    foreach (var item in ss)
-    //    {
-    //        var p = item.IndexOf(nameValueSeparator);
-    //        if (p <= 0) continue;
-
-    //        var key = item[..p].Trim();
-    //        var val = item[(p + 1)..].Trim();
-
-
-    //        // 处理单引号双引号
-    //        if (trimQuotation && !val.IsNullOrEmpty())
-    //        {
-    //            if (val[0] == '\'' && val[^1] == '\'') val = val.Trim('\'');
-    //            if (val[0] == '"' && val[^1] == '"') val = val.Trim('"');
-    //        }
-
-    //        dic[key] = val;
-    //    }
-
-    //    return dic;
-    //}
 
     /// <summary>把一个列表组合成为一个字符串，默认逗号分隔</summary>
     /// <param name="value"></param>
@@ -519,7 +480,7 @@ public static class StringHelper
 
         for (var i = 0; i < starts.Length; i++)
         {
-            var p = str.IndexOf(starts[i]);
+            var p = str.IndexOf(starts[i], StringComparison.Ordinal);
             if (p >= 0)
             {
                 str = str[(p + starts[i].Length)..];
@@ -540,7 +501,7 @@ public static class StringHelper
 
         for (var i = 0; i < ends.Length; i++)
         {
-            var p = str.LastIndexOf(ends[i]);
+            var p = str.LastIndexOf(ends[i], StringComparison.Ordinal);
             if (p >= 0)
             {
                 str = str[..p];

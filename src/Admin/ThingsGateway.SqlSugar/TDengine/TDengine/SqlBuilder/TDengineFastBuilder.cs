@@ -2,16 +2,33 @@
 using System.Globalization;
 using System.Text;
 
-namespace ThingsGateway.SqlSugar.TDengine
+using TDengineAdo;
+
+namespace ThingsGateway.SqlSugar
 {
+    /// <summary>
+    /// TDengine 快速构建器
+    /// </summary>
     public class TDengineFastBuilder : FastBuilder, IFastBuilder
     {
+        /// <summary>
+        /// 标签键常量
+        /// </summary>
         public const string TagKey = "TDengineFastBuilderTagNames";
+
+        /// <summary>
+        /// 数据库快速属性设置
+        /// </summary>
         public override DbFastestProperties DbFastestProperties { get; set; } = new DbFastestProperties()
         {
             NoPage = true
         };
 
+        /// <summary>
+        /// 异步执行批量复制
+        /// </summary>
+        /// <param name="dt">数据表</param>
+        /// <returns>影响的行数</returns>
         public async Task<int> ExecuteBulkCopyAsync(DataTable dt)
         {
             // 移除自增列  
@@ -33,13 +50,19 @@ namespace ThingsGateway.SqlSugar.TDengine
             return dt.Rows.Count;
         }
 
-        public async Task BulkInsertToTDengine(TDengineConnection conn, string tableName, DataTable table, bool isTran, string[] tagColumns)
+        /// <summary>
+        /// 批量插入数据到TDengine
+        /// </summary>
+        /// <param name="conn">TDengine连接</param>
+        /// <param name="tableName">表名</param>
+        /// <param name="table">数据表</param>
+        /// <param name="isTran">是否启用事务</param>
+        /// <param name="tagColumns">标签列数组</param>
+        private async Task BulkInsertToTDengine(TDengineConnection conn, string tableName, DataTable table, bool isTran, string[] tagColumns)
         {
-
             string insertSql = string.Empty;
             try
             {
-
                 if (tagColumns?.Length > 0)
                 {
                     StringBuilder sb = new StringBuilder();
@@ -106,6 +129,15 @@ namespace ThingsGateway.SqlSugar.TDengine
             }
         }
 
+        /// <summary>
+        /// 插入子表数据
+        /// </summary>
+        /// <param name="tableName">表名</param>
+        /// <param name="table">数据表</param>
+        /// <param name="tagColumns">标签列数组</param>
+        /// <param name="sb">StringBuilder对象</param>
+        /// <param name="sbtables">表结构StringBuilder</param>
+        /// <returns>构建的SQL StringBuilder</returns>
         private StringBuilder InsertChildTable(string tableName, DataTable table, string[] tagColumns, StringBuilder sb, StringBuilder sbtables)
         {
             var builder = InstanceFactory.GetSqlBuilderWithContext(this.Context);
@@ -128,8 +160,6 @@ namespace ThingsGateway.SqlSugar.TDengine
             var action = this.Context.TempItems[TagKey + "action"] as Func<string, string, string>;
             var subTableName = builder.GetTranslationColumnName(action(tagsValues, tableName.Replace("`", "")));
 
-            // sbtables.AppendLine($"CREATE TABLE {subTableName} USING {tableName} TAGS({tags});");
-
             var sqlBuilder = sb;
             var valuesList = new List<string>();
 
@@ -149,7 +179,12 @@ namespace ThingsGateway.SqlSugar.TDengine
             return sqlBuilder;
         }
 
-
+        /// <summary>
+        /// 设置标签
+        /// </summary>
+        /// <param name="db">数据库上下文</param>
+        /// <param name="action">标签处理函数</param>
+        /// <param name="tagNames">标签名数组</param>
         public static void SetTags(ISqlSugarClient db, Func<string, string, string> action, params string[] tagNames)
         {
             if (db.TempItems == null)
@@ -163,6 +198,11 @@ namespace ThingsGateway.SqlSugar.TDengine
             db.TempItems.Add(TagKey + "action", action);
         }
 
+        /// <summary>
+        /// 格式化值
+        /// </summary>
+        /// <param name="value">要格式化的值</param>
+        /// <returns>格式化后的字符串</returns>
         public object FormatValue(object value)
         {
             if (value == null || value == DBNull.Value)
@@ -178,7 +218,7 @@ namespace ThingsGateway.SqlSugar.TDengine
                 }
                 else if (type == UtilConstants.ByteArrayType)
                 {
-                    string bytesString = "0x" + BitConverter.ToString((byte[])value);
+                    string bytesString = $"0x{BitConverter.ToString((byte[])value)}";
                     return bytesString;
                 }
                 else if (type.IsEnum())
@@ -198,7 +238,7 @@ namespace ThingsGateway.SqlSugar.TDengine
                 }
                 else if (type == UtilConstants.StringType || type == UtilConstants.ObjType)
                 {
-                    return "'" + value.ToString().ToSqlFilter() + "'";
+                    return $"'{value.ToString().ToSqlFilter()}'";
                 }
                 else if (value is decimal v)
                 {
@@ -206,10 +246,9 @@ namespace ThingsGateway.SqlSugar.TDengine
                 }
                 else
                 {
-                    return "'" + value.ToString() + "'";
+                    return $"'{value}'";
                 }
             }
         }
-
     }
 }

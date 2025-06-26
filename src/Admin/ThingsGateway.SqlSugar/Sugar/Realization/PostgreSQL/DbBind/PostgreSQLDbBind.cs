@@ -16,7 +16,7 @@
             if (csharpTypeName.IsInCase("boolean", "bool"))
                 csharpTypeName = "bool";
             if (csharpTypeName == "DateTimeOffset")
-                csharpTypeName = "DateTime";
+                return "timestamptz";
             var mappings = this.MappingTypes.Where(it => it.Value.ToString().Equals(csharpTypeName, StringComparison.CurrentCultureIgnoreCase)).ToList();
             if (mappings?.Count > 0)
                 return mappings.First().Key;

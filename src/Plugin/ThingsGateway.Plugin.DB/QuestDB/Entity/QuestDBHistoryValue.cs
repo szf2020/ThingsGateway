@@ -15,7 +15,7 @@ using ThingsGateway.SqlSugar;
 namespace ThingsGateway.Plugin.QuestDB;
 
 [SugarTable("historyValue")]
-public class QuestDBHistoryValue : IPrimaryIdEntity, IDBHistoryValue
+public class QuestDBHistoryValue : IPrimaryIdEntity
 {
     [SugarColumn(ColumnDescription = "变量Id")]
     [AutoGenerateColumn(Visible = true, Filterable = true, Sortable = true)]
@@ -57,4 +57,50 @@ public class QuestDBHistoryValue : IPrimaryIdEntity, IDBHistoryValue
     /// </summary>
     [AutoGenerateColumn(Visible = true, Filterable = true, Sortable = true)]
     public string Value { get; set; }
+}
+
+
+[SugarTable("historyNumberValue")]
+public class QuestDBNumberHistoryValue : IPrimaryIdEntity, IDBHistoryValue
+{
+    [SugarColumn(ColumnDescription = "变量Id")]
+    [AutoGenerateColumn(Visible = true, Filterable = true, Sortable = true)]
+    public long Id { get; set; }
+
+    /// <summary>
+    /// 采集时间
+    /// </summary>
+    [TimeDbSplitField(DateType.Month)]
+    [AutoGenerateColumn(Visible = true, Filterable = true, Sortable = true)]
+    public DateTime CollectTime { get; set; }
+
+    /// <summary>
+    /// 上传时间
+    /// </summary>
+    [AutoGenerateColumn(Visible = true, Filterable = true, Sortable = true)]
+    public DateTime CreateTime { get; set; }
+
+    /// <summary>
+    /// 设备名称
+    /// </summary>
+    [AutoGenerateColumn(Visible = true, Filterable = true, Sortable = true)]
+    public string DeviceName { get; set; }
+
+    /// <summary>
+    /// 变量名称
+    /// </summary>
+    [AutoGenerateColumn(Visible = true, Filterable = true, Sortable = true)]
+    public string Name { get; set; }
+
+    /// <summary>
+    /// 是否在线
+    /// </summary>
+    [AutoGenerateColumn(Visible = true, Filterable = true, Sortable = true)]
+    public bool IsOnline { get; set; }
+
+    /// <summary>
+    /// 变量值
+    /// </summary>
+    [AutoGenerateColumn(Visible = true, Filterable = true, Sortable = true)]
+    public decimal Value { get; set; }
 }

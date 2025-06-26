@@ -5,50 +5,113 @@ using System.Reflection;
 using System.Text.RegularExpressions;
 namespace ThingsGateway.SqlSugar
 {
-    ///<summary>
-    /// ** description：ActiveX Data Objects
-    /// ** author：sunkaixuan
-    /// ** date：2017/1/2
-    /// ** email:610262374@qq.com
-    /// </summary>
     public abstract partial class AdoProvider : AdoAccessory, IAdo
     {
         #region Constructor
+        /// <summary>
+        /// 初始化 ADO.NET 数据访问提供程序
+        /// </summary>
         public AdoProvider()
         {
-            this.IsEnableLogEvent = false;
-            this.CommandType = CommandType.Text;
-            this.IsClearParameters = true;
-            this.CommandTimeOut = 300;
+            this.IsEnableLogEvent = false; // 默认禁用日志事件
+            this.CommandType = CommandType.Text; // 默认命令类型为文本
+            this.IsClearParameters = true; // 默认清除参数
+            this.CommandTimeOut = 300; // 默认命令超时时间为300秒
         }
         #endregion
 
         #region Properties
-        public virtual bool IsNoSql { get; set; }
-        internal bool IsOpenAsync { get; set; }
-        protected List<IDataParameter> OutputParameters { get; set; }
-        public virtual string SqlParameterKeyWord { get { return "@"; } }
-        public IDbTransaction Transaction { get; set; }
-        public virtual SqlSugarProvider Context { get; set; }
-        internal CommandType OldCommandType { get; set; }
-        internal bool OldClearParameters { get; set; }
-        public IDataParameterCollection DataReaderParameters { get; set; }
-        public TimeSpan SqlExecutionTime { get { return AfterTime - BeforeTime; } }
-        public TimeSpan ConnectionExecutionTime { get { return CheckConnectionAfterTime - CheckConnectionBeforeTime; } }
-        public TimeSpan GetDataExecutionTime { get { return GetDataAfterTime - GetDataBeforeTime; } }
         /// <summary>
-        /// Add, delete and modify: the number of affected items;
+        /// 是否是非关系型数据库
+        /// </summary>
+        public virtual bool IsNoSql { get; set; }
+
+        /// <summary>
+        /// 是否异步打开连接
+        /// </summary>
+        internal bool IsOpenAsync { get; set; }
+
+        /// <summary>
+        /// 输出参数集合
+        /// </summary>
+        protected List<IDataParameter> OutputParameters { get; set; }
+
+        /// <summary>
+        /// SQL参数关键字(默认为@)
+        /// </summary>
+        public virtual string SqlParameterKeyWord { get { return "@"; } }
+
+        /// <summary>
+        /// 当前数据库事务
+        /// </summary>
+        public IDbTransaction Transaction { get; set; }
+
+        /// <summary>
+        /// SqlSugar上下文
+        /// </summary>
+        public virtual SqlSugarProvider Context { get; set; }
+
+        /// <summary>
+        /// 旧的命令类型
+        /// </summary>
+        internal CommandType OldCommandType { get; set; }
+
+        /// <summary>
+        /// 旧的清除参数标志
+        /// </summary>
+        internal bool OldClearParameters { get; set; }
+
+        /// <summary>
+        /// 数据读取器参数集合
+        /// </summary>
+        public IDataParameterCollection DataReaderParameters { get; set; }
+
+        /// <summary>
+        /// SQL执行时间
+        /// </summary>
+        public TimeSpan SqlExecutionTime { get { return AfterTime - BeforeTime; } }
+
+        /// <summary>
+        /// 连接执行时间
+        /// </summary>
+        public TimeSpan ConnectionExecutionTime { get { return CheckConnectionAfterTime - CheckConnectionBeforeTime; } }
+
+        /// <summary>
+        /// 获取数据执行时间
+        /// </summary>
+        public TimeSpan GetDataExecutionTime { get { return GetDataAfterTime - GetDataBeforeTime; } }
+
+        /// <summary>
+        /// 增删改操作影响的行数
         /// </summary>
         public int SqlExecuteCount { get; protected set; } = 0;
+
+        /// <summary>
+        /// SQL执行类型
+        /// </summary>
         public SugarActionType SqlExecuteType { get => this.Context.SugarActionType; }
+
+        /// <summary>
+        /// SQL堆栈跟踪信息
+        /// </summary>
         public StackTraceInfo SqlStackTrace { get { return UtilMethods.GetStackTrace(); } }
+
+        /// <summary>
+        /// 是否禁用主从分离
+        /// </summary>
         public bool IsDisableMasterSlaveSeparation { get; set; }
+
+        // 时间记录字段
         internal DateTime BeforeTime = DateTime.MinValue;
         internal DateTime AfterTime = DateTime.MinValue;
         internal DateTime GetDataBeforeTime = DateTime.MinValue;
         internal DateTime GetDataAfterTime = DateTime.MinValue;
         internal DateTime CheckConnectionBeforeTime = DateTime.MinValue;
         internal DateTime CheckConnectionAfterTime = DateTime.MinValue;
+
+        /// <summary>
+        /// 数据库绑定对象
+        /// </summary>
         public virtual IDbBind DbBind
         {
             get
@@ -62,27 +125,102 @@ namespace ThingsGateway.SqlSugar
                 return base._DbBind;
             }
         }
+
+        /// <summary>
+        /// 命令超时时间(秒)
+        /// </summary>
         public virtual int CommandTimeOut { get; set; }
+
+        /// <summary>
+        /// 命令类型
+        /// </summary>
         public virtual CommandType CommandType { get; set; }
+
+        /// <summary>
+        /// 是否启用日志事件
+        /// </summary>
         public virtual bool IsEnableLogEvent { get; set; }
+
+        /// <summary>
+        /// 是否清除参数
+        /// </summary>
         public virtual bool IsClearParameters { get; set; }
+
+        /// <summary>
+        /// 日志开始事件
+        /// </summary>
         public virtual Action<string, SugarParameter[]> LogEventStarting => this.Context.CurrentConnectionConfig.AopEvents?.OnLogExecuting;
+
+        /// <summary>
+        /// 日志完成事件
+        /// </summary>
         public virtual Action<string, SugarParameter[]> LogEventCompleted => this.Context.CurrentConnectionConfig.AopEvents?.OnLogExecuted;
+
+        /// <summary>
+        /// 检查连接执行前事件
+        /// </summary>
         public virtual Action<IDbConnection> CheckConnectionExecuting => this.Context.CurrentConnectionConfig.AopEvents?.CheckConnectionExecuting;
+
+        /// <summary>
+        /// 检查连接执行后事件
+        /// </summary>
         public virtual Action<IDbConnection, TimeSpan> CheckConnectionExecuted => this.Context.CurrentConnectionConfig.AopEvents?.CheckConnectionExecuted;
+
+        /// <summary>
+        /// 获取数据读取前事件
+        /// </summary>
         public virtual Action<string, SugarParameter[]> OnGetDataReadering => this.Context.CurrentConnectionConfig.AopEvents?.OnGetDataReadering;
+
+        /// <summary>
+        /// 获取数据读取后事件
+        /// </summary>
         public virtual Action<string, SugarParameter[], TimeSpan> OnGetDataReadered => this.Context.CurrentConnectionConfig.AopEvents?.OnGetDataReadered;
+
+        /// <summary>
+        /// 处理SQL执行前事件
+        /// </summary>
         public virtual Func<string, SugarParameter[], KeyValuePair<string, SugarParameter[]>> ProcessingEventStartingSQL => this.Context.CurrentConnectionConfig.AopEvents?.OnExecutingChangeSql;
+
+        /// <summary>
+        /// SQL格式化函数
+        /// </summary>
         protected virtual Func<string, string> FormatSql { get; set; }
+
+        /// <summary>
+        /// 错误事件
+        /// </summary>
         public virtual Action<SqlSugarException> ErrorEvent => this.Context.CurrentConnectionConfig.AopEvents?.OnError;
+
+        /// <summary>
+        /// 差异日志事件
+        /// </summary>
         public virtual Action<DiffLogModel> DiffLogEvent => this.Context.CurrentConnectionConfig.AopEvents?.OnDiffLogEvent;
+
+        /// <summary>
+        /// 从库连接集合
+        /// </summary>
         public virtual List<IDbConnection> SlaveConnections { get; set; }
+
+        /// <summary>
+        /// 主库连接
+        /// </summary>
         public virtual IDbConnection MasterConnection { get; set; }
+
+        /// <summary>
+        /// 主库连接字符串
+        /// </summary>
         public virtual string MasterConnectionString { get; set; }
+
+        /// <summary>
+        /// 取消令牌
+        /// </summary>
         public virtual CancellationToken? CancellationToken { get; set; }
         #endregion
 
         #region Connection
+        /// <summary>
+        /// 检查连接是否有效(会自动关闭连接)
+        /// </summary>
         public virtual bool IsValidConnection()
         {
             try
@@ -101,6 +239,10 @@ namespace ThingsGateway.SqlSugar
                 return false;
             }
         }
+
+        /// <summary>
+        /// 检查连接是否有效(不会自动关闭连接)
+        /// </summary>
         public virtual bool IsValidConnectionNoClose()
         {
             try
@@ -113,14 +255,26 @@ namespace ThingsGateway.SqlSugar
                 return false;
             }
         }
+
+        /// <summary>
+        /// 打开连接
+        /// </summary>
         public virtual void Open()
         {
             CheckConnection();
         }
+
+        /// <summary>
+        /// 异步打开连接
+        /// </summary>
         public virtual async Task OpenAsync()
         {
             await CheckConnectionAsync().ConfigureAwait(false);
         }
+
+        /// <summary>
+        /// 获取一个始终打开的连接对象
+        /// </summary>
         public SugarConnection OpenAlways()
         {
             SugarConnection result = new SugarConnection();
@@ -131,6 +285,10 @@ namespace ThingsGateway.SqlSugar
             this.Open();
             return result;
         }
+
+        /// <summary>
+        /// 关闭连接
+        /// </summary>
         public virtual void Close()
         {
             if (this.Transaction != null)
@@ -152,6 +310,10 @@ namespace ThingsGateway.SqlSugar
                 }
             }
         }
+
+        /// <summary>
+        /// 释放资源
+        /// </summary>
         public virtual void Dispose()
         {
             if (this.Transaction != null)
@@ -177,6 +339,10 @@ namespace ThingsGateway.SqlSugar
                 }
             }
         }
+
+        /// <summary>
+        /// 检查连接状态
+        /// </summary>
         public virtual void CheckConnection()
         {
             this.CheckConnectionBefore(this.Connection);
@@ -198,6 +364,9 @@ namespace ThingsGateway.SqlSugar
             this.CheckConnectionAfter(this.Connection);
         }
 
+        /// <summary>
+        /// 异步检查连接状态
+        /// </summary>
         public virtual async Task CheckConnectionAsync()
         {
             this.CheckConnectionBefore(this.Connection);
@@ -214,6 +383,10 @@ namespace ThingsGateway.SqlSugar
             }
             this.CheckConnectionAfter(this.Connection);
         }
+
+        /// <summary>
+        /// 连接检查前的操作
+        /// </summary>
         public virtual void CheckConnectionBefore(IDbConnection Connection)
         {
             this.CheckConnectionBeforeTime = DateTime.Now;
@@ -226,6 +399,10 @@ namespace ThingsGateway.SqlSugar
                 }
             }
         }
+
+        /// <summary>
+        /// 连接检查后的操作
+        /// </summary>
         public virtual void CheckConnectionAfter(IDbConnection Connection)
         {
             this.CheckConnectionAfterTime = DateTime.Now;
@@ -241,38 +418,65 @@ namespace ThingsGateway.SqlSugar
         #endregion
 
         #region Transaction
+        /// <summary>
+        /// 检查是否存在事务
+        /// </summary>
         public virtual bool IsAnyTran()
         {
             return this.Transaction != null;
         }
+
+        /// <summary>
+        /// 检查是否没有事务
+        /// </summary>
         public virtual bool IsNoTran()
         {
             return this.Transaction == null;
         }
+
+        /// <summary>
+        /// 开始事务
+        /// </summary>
         public virtual void BeginTran()
         {
             CheckConnection();
             if (this.Transaction == null)
                 this.Transaction = this.Connection.BeginTransaction();
         }
+
+        /// <summary>
+        /// 异步开始事务
+        /// </summary>
         public virtual async Task BeginTranAsync()
         {
             await CheckConnectionAsync().ConfigureAwait(false);
             if (this.Transaction == null)
                 this.Transaction = await (Connection as DbConnection).BeginTransactionAsync().ConfigureAwait(false);
         }
+
+        /// <summary>
+        /// 使用指定隔离级别开始事务
+        /// </summary>
         public virtual void BeginTran(IsolationLevel iso)
         {
             CheckConnection();
             if (this.Transaction == null)
                 this.Transaction = this.Connection.BeginTransaction(iso);
         }
+
+        /// <summary>
+        /// 异步使用指定隔离级别开始事务
+        /// </summary>
         public virtual async Task BeginTranAsync(IsolationLevel iso)
         {
             await CheckConnectionAsync().ConfigureAwait(false);
             if (this.Transaction == null)
                 this.Transaction = await (Connection as DbConnection).BeginTransactionAsync(iso).ConfigureAwait(false);
         }
+
+        /// <summary>
+        /// 回滚事务
+        /// </summary>
         public virtual void RollbackTran()
         {
             if (this.Transaction != null)
@@ -283,6 +487,9 @@ namespace ThingsGateway.SqlSugar
             }
         }
 
+        /// <summary>
+        /// 异步回滚事务
+        /// </summary>
         public virtual async Task RollbackTranAsync()
         {
             if (this.Transaction != null)
@@ -292,6 +499,10 @@ namespace ThingsGateway.SqlSugar
                 if (this.Context.CurrentConnectionConfig.IsAutoCloseConnection) await CloseAsync().ConfigureAwait(false);
             }
         }
+
+        /// <summary>
+        /// 提交事务
+        /// </summary>
         public virtual void CommitTran()
         {
             if (this.Transaction != null)
@@ -301,6 +512,10 @@ namespace ThingsGateway.SqlSugar
                 if (this.Context.CurrentConnectionConfig.IsAutoCloseConnection) this.Close();
             }
         }
+
+        /// <summary>
+        /// 异步提交事务
+        /// </summary>
         public virtual async Task CommitTranAsync()
         {
             if (this.Transaction != null)
@@ -312,21 +527,55 @@ namespace ThingsGateway.SqlSugar
         }
         #endregion
 
-        #region abstract
+        #region Abstract Methods
+        /// <summary>
+        /// 将SugarParameter数组转换为IDataParameter数组
+        /// </summary>
         public abstract IDataParameter[] ToIDbDataParameter(params SugarParameter[] pars);
+
+        /// <summary>
+        /// 设置命令到数据适配器
+        /// </summary>
         public abstract void SetCommandToAdapter(IDataAdapter adapter, DbCommand command);
+
+        /// <summary>
+        /// 获取数据适配器
+        /// </summary>
         public abstract IDataAdapter GetAdapter();
+
+        /// <summary>
+        /// 获取数据库命令对象
+        /// </summary>
         public abstract DbCommand GetCommand(string sql, SugarParameter[] pars);
+
+        /// <summary>
+        /// 数据库连接对象
+        /// </summary>
         public abstract IDbConnection Connection { get; set; }
-        public abstract void BeginTran(string transactionName);//Only SqlServer
-        public abstract void BeginTran(IsolationLevel iso, string transactionName);//Only SqlServer 
+
+        /// <summary>
+        /// 使用指定事务名称开始事务(仅SQL Server支持)
+        /// </summary>
+        public abstract void BeginTran(string transactionName);
+
+        /// <summary>
+        /// 使用指定隔离级别和事务名称开始事务(仅SQL Server支持)
+        /// </summary>
+        public abstract void BeginTran(IsolationLevel iso, string transactionName);
         #endregion
 
-        #region Use
+        #region Transaction Usage
+        /// <summary>
+        /// 获取事务对象
+        /// </summary>
         public SqlSugarTransactionAdo UseTran()
         {
             return new SqlSugarTransactionAdo(this.Context);
         }
+
+        /// <summary>
+        /// 使用事务执行操作
+        /// </summary>
         public DbResult<bool> UseTran(Action action, Action<Exception> errorCallBack = null)
         {
             var result = new DbResult<bool>();
@@ -352,6 +601,9 @@ namespace ThingsGateway.SqlSugar
             return result;
         }
 
+        /// <summary>
+        /// 异步使用事务执行操作
+        /// </summary>
         public async Task<DbResult<bool>> UseTranAsync(Func<Task> action, Action<Exception> errorCallBack = null)
         {
             var result = new DbResult<bool>();
@@ -377,6 +629,9 @@ namespace ThingsGateway.SqlSugar
             return result;
         }
 
+        /// <summary>
+        /// 使用事务执行操作并返回结果
+        /// </summary>
         public DbResult<T> UseTran<T>(Func<T> action, Action<Exception> errorCallBack = null)
         {
             var result = new DbResult<T>();
@@ -402,6 +657,9 @@ namespace ThingsGateway.SqlSugar
             return result;
         }
 
+        /// <summary>
+        /// 异步使用事务执行操作并返回结果
+        /// </summary>
         public async Task<DbResult<T>> UseTranAsync<T>(Func<Task<T>> action, Action<Exception> errorCallBack = null)
         {
             var result = new DbResult<T>();
@@ -427,6 +685,9 @@ namespace ThingsGateway.SqlSugar
             return result;
         }
 
+        /// <summary>
+        /// 使用存储过程
+        /// </summary>
         public IAdo UseStoredProcedure()
         {
             this.OldCommandType = this.CommandType;
@@ -437,7 +698,10 @@ namespace ThingsGateway.SqlSugar
         }
         #endregion
 
-        #region Core
+        #region Core Methods
+        /// <summary>
+        /// 执行包含GO语句的SQL命令
+        /// </summary>
         public virtual int ExecuteCommandWithGo(string sql, params SugarParameter[] parameters)
         {
             if (string.IsNullOrEmpty(sql))
@@ -446,8 +710,16 @@ namespace ThingsGateway.SqlSugar
             {
                 return ExecuteCommand(sql);
             }
+
+            // 使用正则表达式分割包含GO的SQL语句
             System.Collections.ArrayList al = new System.Collections.ArrayList();
-            System.Text.RegularExpressions.Regex reg = new System.Text.RegularExpressions.Regex(@"^(\s*)go(\s*)$", System.Text.RegularExpressions.RegexOptions.IgnoreCase | System.Text.RegularExpressions.RegexOptions.Multiline | System.Text.RegularExpressions.RegexOptions.Compiled | System.Text.RegularExpressions.RegexOptions.ExplicitCapture);
+            System.Text.RegularExpressions.Regex reg = new System.Text.RegularExpressions.Regex(
+                @"^(\s*)go(\s*)$",
+                System.Text.RegularExpressions.RegexOptions.IgnoreCase |
+                System.Text.RegularExpressions.RegexOptions.Multiline |
+                System.Text.RegularExpressions.RegexOptions.Compiled |
+                System.Text.RegularExpressions.RegexOptions.ExplicitCapture);
+
             al.AddRange(reg.Split(sql));
             int count = 0;
             foreach (string item in al)
@@ -459,6 +731,10 @@ namespace ThingsGateway.SqlSugar
             }
             return count;
         }
+
+        /// <summary>
+        /// 执行SQL命令
+        /// </summary>
         public virtual int ExecuteCommand(string sql, params SugarParameter[] parameters)
         {
             try
@@ -466,17 +742,23 @@ namespace ThingsGateway.SqlSugar
                 InitParameters(ref sql, parameters);
                 if (IsFormat(parameters))
                     sql = FormatSql(sql);
+
+                // 检查是否使用了SQL中间件
                 if (this.Context.CurrentConnectionConfig?.SqlMiddle?.IsSqlMiddle == true)
                     return this.Context.CurrentConnectionConfig.SqlMiddle.ExecuteCommand(sql, parameters);
+
                 SetConnectionStart(sql);
                 if (this.ProcessingEventStartingSQL != null)
                     ExecuteProcessingSQL(ref sql, ref parameters);
+
                 ExecuteBefore(sql, parameters);
                 IDbCommand sqlCommand = GetCommand(sql, parameters);
                 int count = sqlCommand.ExecuteNonQuery();
+
                 if (this.IsClearParameters)
                     sqlCommand.Parameters.Clear();
-                // 影响条数
+
+                // 记录影响条数
                 this.SqlExecuteCount = count;
                 ExecuteAfter(sql, parameters);
                 sqlCommand.Dispose();
@@ -496,6 +778,10 @@ namespace ThingsGateway.SqlSugar
                 SetConnectionEnd(sql);
             }
         }
+
+        /// <summary>
+        /// 获取数据读取器
+        /// </summary>
         public virtual IDataReader GetDataReader(string sql, params SugarParameter[] parameters)
         {
             try
@@ -503,23 +789,32 @@ namespace ThingsGateway.SqlSugar
                 InitParameters(ref sql, parameters);
                 if (IsFormat(parameters))
                     sql = FormatSql(sql);
+
                 if (this.Context.CurrentConnectionConfig?.SqlMiddle?.IsSqlMiddle == true)
                     return this.Context.CurrentConnectionConfig.SqlMiddle.GetDataReader(sql, parameters);
+
                 SetConnectionStart(sql);
                 var isSp = this.CommandType == CommandType.StoredProcedure;
+
                 if (this.ProcessingEventStartingSQL != null)
                     ExecuteProcessingSQL(ref sql, ref parameters);
+
                 ExecuteBefore(sql, parameters);
                 IDbCommand sqlCommand = GetCommand(sql, parameters);
                 IDataReader sqlDataReader = sqlCommand.ExecuteReader(this.IsAutoClose() ? CommandBehavior.CloseConnection : CommandBehavior.Default);
+
                 if (isSp)
                     DataReaderParameters = sqlCommand.Parameters;
+
                 if (this.IsClearParameters)
                     sqlCommand.Parameters.Clear();
+
                 ExecuteAfter(sql, parameters);
                 SetConnectionEnd(sql);
+
                 if (SugarCompatible.IsFramework || this.Context.CurrentConnectionConfig.DbType != DbType.Sqlite)
                     sqlCommand.Dispose();
+
                 return sqlDataReader;
             }
             catch (Exception ex)
@@ -531,6 +826,10 @@ namespace ThingsGateway.SqlSugar
                 throw;
             }
         }
+
+        /// <summary>
+        /// 获取数据集
+        /// </summary>
         public virtual DataSet GetDataSetAll(string sql, params SugarParameter[] parameters)
         {
             try
@@ -538,19 +837,25 @@ namespace ThingsGateway.SqlSugar
                 InitParameters(ref sql, parameters);
                 if (IsFormat(parameters))
                     sql = FormatSql(sql);
+
                 if (this.Context.CurrentConnectionConfig?.SqlMiddle?.IsSqlMiddle == true)
                     return this.Context.CurrentConnectionConfig.SqlMiddle.GetDataSetAll(sql, parameters);
+
                 SetConnectionStart(sql);
                 if (this.ProcessingEventStartingSQL != null)
                     ExecuteProcessingSQL(ref sql, ref parameters);
+
                 ExecuteBefore(sql, parameters);
                 IDataAdapter dataAdapter = this.GetAdapter();
                 DbCommand sqlCommand = GetCommand(sql, parameters);
                 this.SetCommandToAdapter(dataAdapter, sqlCommand);
+
                 DataSet ds = new DataSet();
                 dataAdapter.Fill(ds);
+
                 if (this.IsClearParameters)
                     sqlCommand.Parameters.Clear();
+
                 ExecuteAfter(sql, parameters);
                 sqlCommand.Dispose();
                 return ds;
@@ -569,6 +874,10 @@ namespace ThingsGateway.SqlSugar
                 SetConnectionEnd(sql);
             }
         }
+
+        /// <summary>
+        /// 获取单个值
+        /// </summary>
         public virtual object GetScalar(string sql, params SugarParameter[] parameters)
         {
             try
@@ -576,17 +885,21 @@ namespace ThingsGateway.SqlSugar
                 InitParameters(ref sql, parameters);
                 if (IsFormat(parameters))
                     sql = FormatSql(sql);
+
                 if (this.Context.CurrentConnectionConfig?.SqlMiddle?.IsSqlMiddle == true)
                     return this.Context.CurrentConnectionConfig.SqlMiddle.GetScalar(sql, parameters);
+
                 SetConnectionStart(sql);
                 if (this.ProcessingEventStartingSQL != null)
                     ExecuteProcessingSQL(ref sql, ref parameters);
+
                 ExecuteBefore(sql, parameters);
                 IDbCommand sqlCommand = GetCommand(sql, parameters);
                 object scalar = sqlCommand.ExecuteScalar();
-                //scalar = (scalar == null ? 0 : scalar);
+
                 if (this.IsClearParameters)
                     sqlCommand.Parameters.Clear();
+
                 ExecuteAfter(sql, parameters);
                 sqlCommand.Dispose();
                 return scalar;
@@ -606,6 +919,9 @@ namespace ThingsGateway.SqlSugar
             }
         }
 
+        /// <summary>
+        /// 异步执行SQL命令
+        /// </summary>
         public virtual async Task<int> ExecuteCommandAsync(string sql, params SugarParameter[] parameters)
         {
             try
@@ -614,20 +930,26 @@ namespace ThingsGateway.SqlSugar
                 InitParameters(ref sql, parameters);
                 if (IsFormat(parameters))
                     sql = FormatSql(sql);
+
                 if (this.Context.CurrentConnectionConfig?.SqlMiddle?.IsSqlMiddle == true)
                     return await Context.CurrentConnectionConfig.SqlMiddle.ExecuteCommandAsync(sql, parameters).ConfigureAwait(false);
+
                 SetConnectionStart(sql);
                 if (this.ProcessingEventStartingSQL != null)
                     ExecuteProcessingSQL(ref sql, ref parameters);
+
                 ExecuteBefore(sql, parameters);
                 var sqlCommand = IsOpenAsync ? await GetCommandAsync(sql, parameters).ConfigureAwait(false) : GetCommand(sql, parameters);
+
                 int count;
                 if (this.CancellationToken == null)
                     count = await sqlCommand.ExecuteNonQueryAsync().ConfigureAwait(false);
                 else
                     count = await sqlCommand.ExecuteNonQueryAsync(CancellationToken.Value).ConfigureAwait(false);
+
                 if (this.IsClearParameters)
                     sqlCommand.Parameters.Clear();
+
                 this.SqlExecuteCount = count;
                 ExecuteAfter(sql, parameters);
                 sqlCommand.Dispose();
@@ -647,6 +969,10 @@ namespace ThingsGateway.SqlSugar
                 SetConnectionEnd(sql);
             }
         }
+
+        /// <summary>
+        /// 异步获取数据读取器
+        /// </summary>
         public virtual async Task<IDataReader> GetDataReaderAsync(string sql, params SugarParameter[] parameters)
         {
             try
@@ -655,27 +981,37 @@ namespace ThingsGateway.SqlSugar
                 InitParameters(ref sql, parameters);
                 if (IsFormat(parameters))
                     sql = FormatSql(sql);
+
                 if (this.Context.CurrentConnectionConfig?.SqlMiddle?.IsSqlMiddle == true)
                     return await Context.CurrentConnectionConfig.SqlMiddle.GetDataReaderAsync(sql, parameters).ConfigureAwait(false);
+
                 SetConnectionStart(sql);
                 var isSp = this.CommandType == CommandType.StoredProcedure;
+
                 if (this.ProcessingEventStartingSQL != null)
                     ExecuteProcessingSQL(ref sql, ref parameters);
+
                 ExecuteBefore(sql, parameters);
                 var sqlCommand = IsOpenAsync ? await GetCommandAsync(sql, parameters).ConfigureAwait(false) : GetCommand(sql, parameters);
+
                 DbDataReader sqlDataReader;
                 if (this.CancellationToken == null)
                     sqlDataReader = await sqlCommand.ExecuteReaderAsync(IsAutoClose() ? CommandBehavior.CloseConnection : CommandBehavior.Default).ConfigureAwait(false);
                 else
                     sqlDataReader = await sqlCommand.ExecuteReaderAsync(IsAutoClose() ? CommandBehavior.CloseConnection : CommandBehavior.Default, CancellationToken.Value).ConfigureAwait(false);
+
                 if (isSp)
                     DataReaderParameters = sqlCommand.Parameters;
+
                 if (this.IsClearParameters)
                     sqlCommand.Parameters.Clear();
+
                 ExecuteAfter(sql, parameters);
                 SetConnectionEnd(sql);
+
                 if (SugarCompatible.IsFramework || this.Context.CurrentConnectionConfig.DbType != DbType.Sqlite)
                     sqlCommand.Dispose();
+
                 return sqlDataReader;
             }
             catch (Exception ex)
@@ -687,6 +1023,10 @@ namespace ThingsGateway.SqlSugar
                 throw;
             }
         }
+
+        /// <summary>
+        /// 异步获取单个值
+        /// </summary>
         public virtual async Task<object> GetScalarAsync(string sql, params SugarParameter[] parameters)
         {
             try
@@ -695,21 +1035,26 @@ namespace ThingsGateway.SqlSugar
                 InitParameters(ref sql, parameters);
                 if (IsFormat(parameters))
                     sql = FormatSql(sql);
+
                 if (this.Context.CurrentConnectionConfig?.SqlMiddle?.IsSqlMiddle == true)
                     return await Context.CurrentConnectionConfig.SqlMiddle.GetScalarAsync(sql, parameters).ConfigureAwait(false);
+
                 SetConnectionStart(sql);
                 if (this.ProcessingEventStartingSQL != null)
                     ExecuteProcessingSQL(ref sql, ref parameters);
+
                 ExecuteBefore(sql, parameters);
                 var sqlCommand = IsOpenAsync ? await GetCommandAsync(sql, parameters).ConfigureAwait(false) : GetCommand(sql, parameters);
+
                 object scalar;
                 if (CancellationToken == null)
                     scalar = await sqlCommand.ExecuteScalarAsync().ConfigureAwait(false);
                 else
                     scalar = await sqlCommand.ExecuteScalarAsync(CancellationToken.Value).ConfigureAwait(false);
-                //scalar = (scalar == null ? 0 : scalar);
+
                 if (this.IsClearParameters)
                     sqlCommand.Parameters.Clear();
+
                 ExecuteAfter(sql, parameters);
                 sqlCommand.Dispose();
                 return scalar;
@@ -728,11 +1073,15 @@ namespace ThingsGateway.SqlSugar
                 SetConnectionEnd(sql);
             }
         }
+
+        /// <summary>
+        /// 异步获取数据集(伪异步实现)
+        /// </summary>
         public virtual Task<DataSet> GetDataSetAllAsync(string sql, params SugarParameter[] parameters)
         {
             Async();
 
-            //False asynchrony . No Support DataSet
+            // 由于DataSet不支持真正的异步操作，这里使用Task.Run模拟异步
             if (CancellationToken == null)
             {
                 return Task.Run(() =>
@@ -752,14 +1101,25 @@ namespace ThingsGateway.SqlSugar
 
         #region Methods
 
+        /// <summary>
+        /// 获取字符串结果(使用对象参数)
+        /// </summary>
         public virtual string GetString(string sql, object parameters)
         {
             return GetString(sql, this.GetParameters(parameters));
         }
+
+        /// <summary>
+        /// 获取字符串结果(使用参数数组)
+        /// </summary>
         public virtual string GetString(string sql, params SugarParameter[] parameters)
         {
             return Convert.ToString(GetScalar(sql, parameters));
         }
+
+        /// <summary>
+        /// 获取字符串结果(使用参数列表)
+        /// </summary>
         public virtual string GetString(string sql, List<SugarParameter> parameters)
         {
             if (parameters == null)
@@ -772,15 +1132,25 @@ namespace ThingsGateway.SqlSugar
             }
         }
 
-
+        /// <summary>
+        /// 异步获取字符串结果(使用对象参数)
+        /// </summary>
         public virtual Task<string> GetStringAsync(string sql, object parameters)
         {
             return GetStringAsync(sql, this.GetParameters(parameters));
         }
+
+        /// <summary>
+        /// 异步获取字符串结果(使用参数数组)
+        /// </summary>
         public virtual async Task<string> GetStringAsync(string sql, params SugarParameter[] parameters)
         {
             return Convert.ToString(await GetScalarAsync(sql, parameters).ConfigureAwait(false));
         }
+
+        /// <summary>
+        /// 异步获取字符串结果(使用参数列表)
+        /// </summary>
         public virtual Task<string> GetStringAsync(string sql, List<SugarParameter> parameters)
         {
             if (parameters == null)
@@ -793,22 +1163,33 @@ namespace ThingsGateway.SqlSugar
             }
         }
 
-
-
+        /// <summary>
+        /// 获取长整型结果(使用对象参数)
+        /// </summary>
         public virtual long GetLong(string sql, object parameters = null)
         {
             return Convert.ToInt64(GetScalar(sql, GetParameters(parameters)));
         }
+
+        /// <summary>
+        /// 异步获取长整型结果(使用对象参数)
+        /// </summary>
         public virtual async Task<long> GetLongAsync(string sql, object parameters = null)
         {
             return Convert.ToInt64(await GetScalarAsync(sql, GetParameters(parameters)).ConfigureAwait(false));
         }
 
-
+        /// <summary>
+        /// 获取整型结果(使用对象参数)
+        /// </summary>
         public virtual int GetInt(string sql, object parameters)
         {
             return GetInt(sql, this.GetParameters(parameters));
         }
+
+        /// <summary>
+        /// 获取整型结果(使用参数列表)
+        /// </summary>
         public virtual int GetInt(string sql, List<SugarParameter> parameters)
         {
             if (parameters == null)
@@ -820,15 +1201,26 @@ namespace ThingsGateway.SqlSugar
                 return GetInt(sql, parameters.ToArray());
             }
         }
+
+        /// <summary>
+        /// 获取整型结果(使用参数数组)
+        /// </summary>
         public virtual int GetInt(string sql, params SugarParameter[] parameters)
         {
             return GetScalar(sql, parameters).ObjToInt();
         }
 
+        /// <summary>
+        /// 异步获取整型结果(使用对象参数)
+        /// </summary>
         public virtual Task<int> GetIntAsync(string sql, object parameters)
         {
             return GetIntAsync(sql, this.GetParameters(parameters));
         }
+
+        /// <summary>
+        /// 异步获取整型结果(使用参数列表)
+        /// </summary>
         public virtual Task<int> GetIntAsync(string sql, List<SugarParameter> parameters)
         {
             if (parameters == null)
@@ -840,20 +1232,35 @@ namespace ThingsGateway.SqlSugar
                 return GetIntAsync(sql, parameters.ToArray());
             }
         }
+
+        /// <summary>
+        /// 异步获取整型结果(使用参数数组)
+        /// </summary>
         public virtual async Task<int> GetIntAsync(string sql, params SugarParameter[] parameters)
         {
             var list = await GetScalarAsync(sql, parameters).ConfigureAwait(false);
             return list.ObjToInt();
         }
 
+        /// <summary>
+        /// 获取双精度浮点数结果(使用对象参数)
+        /// </summary>
         public virtual Double GetDouble(string sql, object parameters)
         {
             return GetDouble(sql, this.GetParameters(parameters));
         }
+
+        /// <summary>
+        /// 获取双精度浮点数结果(使用参数数组)
+        /// </summary>
         public virtual Double GetDouble(string sql, params SugarParameter[] parameters)
         {
             return GetScalar(sql, parameters).ObjToMoney();
         }
+
+        /// <summary>
+        /// 获取双精度浮点数结果(使用参数列表)
+        /// </summary>
         public virtual Double GetDouble(string sql, List<SugarParameter> parameters)
         {
             if (parameters == null)
@@ -866,15 +1273,26 @@ namespace ThingsGateway.SqlSugar
             }
         }
 
+        /// <summary>
+        /// 异步获取双精度浮点数结果(使用对象参数)
+        /// </summary>
         public virtual Task<Double> GetDoubleAsync(string sql, object parameters)
         {
             return GetDoubleAsync(sql, this.GetParameters(parameters));
         }
+
+        /// <summary>
+        /// 异步获取双精度浮点数结果(使用参数数组)
+        /// </summary>
         public virtual async Task<Double> GetDoubleAsync(string sql, params SugarParameter[] parameters)
         {
             var result = await GetScalarAsync(sql, parameters).ConfigureAwait(false);
             return result.ObjToMoney();
         }
+
+        /// <summary>
+        /// 异步获取双精度浮点数结果(使用参数列表)
+        /// </summary>
         public virtual Task<Double> GetDoubleAsync(string sql, List<SugarParameter> parameters)
         {
             if (parameters == null)
@@ -887,15 +1305,25 @@ namespace ThingsGateway.SqlSugar
             }
         }
 
-
+        /// <summary>
+        /// 获取十进制数结果(使用对象参数)
+        /// </summary>
         public virtual decimal GetDecimal(string sql, object parameters)
         {
             return GetDecimal(sql, this.GetParameters(parameters));
         }
+
+        /// <summary>
+        /// 获取十进制数结果(使用参数数组)
+        /// </summary>
         public virtual decimal GetDecimal(string sql, params SugarParameter[] parameters)
         {
             return GetScalar(sql, parameters).ObjToDecimal();
         }
+
+        /// <summary>
+        /// 获取十进制数结果(使用参数列表)
+        /// </summary>
         public virtual decimal GetDecimal(string sql, List<SugarParameter> parameters)
         {
             if (parameters == null)
@@ -908,16 +1336,26 @@ namespace ThingsGateway.SqlSugar
             }
         }
 
-
+        /// <summary>
+        /// 异步获取十进制数结果(使用对象参数)
+        /// </summary>
         public virtual Task<decimal> GetDecimalAsync(string sql, object parameters)
         {
             return GetDecimalAsync(sql, this.GetParameters(parameters));
         }
+
+        /// <summary>
+        /// 异步获取十进制数结果(使用参数数组)
+        /// </summary>
         public virtual async Task<decimal> GetDecimalAsync(string sql, params SugarParameter[] parameters)
         {
             var result = await GetScalarAsync(sql, parameters).ConfigureAwait(false);
             return result.ObjToDecimal();
         }
+
+        /// <summary>
+        /// 异步获取十进制数结果(使用参数列表)
+        /// </summary>
         public virtual Task<decimal> GetDecimalAsync(string sql, List<SugarParameter> parameters)
         {
             if (parameters == null)
@@ -930,16 +1368,25 @@ namespace ThingsGateway.SqlSugar
             }
         }
 
-
-
+        /// <summary>
+        /// 获取日期时间结果(使用对象参数)
+        /// </summary>
         public virtual DateTime GetDateTime(string sql, object parameters)
         {
             return GetDateTime(sql, this.GetParameters(parameters));
         }
+
+        /// <summary>
+        /// 获取日期时间结果(使用参数数组)
+        /// </summary>
         public virtual DateTime GetDateTime(string sql, params SugarParameter[] parameters)
         {
             return GetScalar(sql, parameters).ObjToDate();
         }
+
+        /// <summary>
+        /// 获取日期时间结果(使用参数列表)
+        /// </summary>
         public virtual DateTime GetDateTime(string sql, List<SugarParameter> parameters)
         {
             if (parameters == null)
@@ -952,18 +1399,26 @@ namespace ThingsGateway.SqlSugar
             }
         }
 
-
-
-
+        /// <summary>
+        /// 异步获取日期时间结果(使用对象参数)
+        /// </summary>
         public virtual Task<DateTime> GetDateTimeAsync(string sql, object parameters)
         {
             return GetDateTimeAsync(sql, this.GetParameters(parameters));
         }
+
+        /// <summary>
+        /// 异步获取日期时间结果(使用参数数组)
+        /// </summary>
         public virtual async Task<DateTime> GetDateTimeAsync(string sql, params SugarParameter[] parameters)
         {
             var list = await GetScalarAsync(sql, parameters).ConfigureAwait(false);
             return list.ObjToDate();
         }
+
+        /// <summary>
+        /// 异步获取日期时间结果(使用参数列表)
+        /// </summary>
         public virtual Task<DateTime> GetDateTimeAsync(string sql, List<SugarParameter> parameters)
         {
             if (parameters == null)
@@ -976,17 +1431,31 @@ namespace ThingsGateway.SqlSugar
             }
         }
 
+        #endregion
 
+        #region Query Methods
+
+        /// <summary>
+        /// 执行SQL查询并返回对象列表(使用对象参数)
+        /// </summary>
         public virtual List<T> SqlQuery<T>(string sql, object parameters = null)
         {
             var sugarParameters = this.GetParameters(parameters);
             return SqlQuery<T>(sql, sugarParameters);
         }
+
+        /// <summary>
+        /// 执行SQL查询并返回对象列表(使用参数数组)
+        /// </summary>
         public virtual List<T> SqlQuery<T>(string sql, params SugarParameter[] parameters)
         {
             var result = SqlQuery<T, object, object, object, object, object, object>(sql, parameters);
             return result.Item1;
         }
+
+        /// <summary>
+        /// 强制使用主库执行SQL查询
+        /// </summary>
         public List<T> MasterSqlQuery<T>(string sql, object parameters = null)
         {
             var oldValue = this.Context.Ado.IsDisableMasterSlaveSeparation;
@@ -995,6 +1464,10 @@ namespace ThingsGateway.SqlSugar
             this.Context.Ado.IsDisableMasterSlaveSeparation = oldValue;
             return result;
         }
+
+        /// <summary>
+        /// 异步强制使用主库执行SQL查询
+        /// </summary>
         public async Task<List<T>> MasterSqlQueryAasync<T>(string sql, object parameters = null)
         {
             var oldValue = this.Context.Ado.IsDisableMasterSlaveSeparation;
@@ -1003,6 +1476,10 @@ namespace ThingsGateway.SqlSugar
             this.Context.Ado.IsDisableMasterSlaveSeparation = oldValue;
             return result;
         }
+
+        /// <summary>
+        /// 执行SQL查询并返回对象列表(使用参数列表)
+        /// </summary>
         public virtual List<T> SqlQuery<T>(string sql, List<SugarParameter> parameters)
         {
             if (parameters != null)
@@ -1014,31 +1491,55 @@ namespace ThingsGateway.SqlSugar
                 return SqlQuery<T>(sql);
             }
         }
+
+        /// <summary>
+        /// 执行SQL查询并返回两个结果集
+        /// </summary>
         public Tuple<List<T>, List<T2>> SqlQuery<T, T2>(string sql, object parameters = null)
         {
             var result = SqlQuery<T, T2, object, object, object, object, object>(sql, parameters);
             return new Tuple<List<T>, List<T2>>(result.Item1, result.Item2);
         }
+
+        /// <summary>
+        /// 执行SQL查询并返回三个结果集
+        /// </summary>
         public Tuple<List<T>, List<T2>, List<T3>> SqlQuery<T, T2, T3>(string sql, object parameters = null)
         {
             var result = SqlQuery<T, T2, T3, object, object, object, object>(sql, parameters);
             return new Tuple<List<T>, List<T2>, List<T3>>(result.Item1, result.Item2, result.Item3);
         }
+
+        /// <summary>
+        /// 执行SQL查询并返回四个结果集
+        /// </summary>
         public Tuple<List<T>, List<T2>, List<T3>, List<T4>> SqlQuery<T, T2, T3, T4>(string sql, object parameters = null)
         {
             var result = SqlQuery<T, T2, T3, T4, object, object, object>(sql, parameters);
             return new Tuple<List<T>, List<T2>, List<T3>, List<T4>>(result.Item1, result.Item2, result.Item3, result.Item4);
         }
+
+        /// <summary>
+        /// 执行SQL查询并返回五个结果集
+        /// </summary>
         public Tuple<List<T>, List<T2>, List<T3>, List<T4>, List<T5>> SqlQuery<T, T2, T3, T4, T5>(string sql, object parameters = null)
         {
             var result = SqlQuery<T, T2, T3, T4, T5, object, object>(sql, parameters);
             return new Tuple<List<T>, List<T2>, List<T3>, List<T4>, List<T5>>(result.Item1, result.Item2, result.Item3, result.Item4, result.Item5);
         }
+
+        /// <summary>
+        /// 执行SQL查询并返回六个结果集
+        /// </summary>
         public Tuple<List<T>, List<T2>, List<T3>, List<T4>, List<T5>, List<T6>> SqlQuery<T, T2, T3, T4, T5, T6>(string sql, object parameters = null)
         {
             var result = SqlQuery<T, T2, T3, T4, T5, T6, object>(sql, parameters);
             return new Tuple<List<T>, List<T2>, List<T3>, List<T4>, List<T5>, List<T6>>(result.Item1, result.Item2, result.Item3, result.Item4, result.Item5, result.Item6);
         }
+
+        /// <summary>
+        /// 执行SQL查询并返回七个结果集
+        /// </summary>
         public Tuple<List<T>, List<T2>, List<T3>, List<T4>, List<T5>, List<T6>, List<T7>> SqlQuery<T, T2, T3, T4, T5, T6, T7>(string sql, object parameters = null)
         {
             var parsmeterArray = this.GetParameters(parameters);
@@ -1115,23 +1616,38 @@ namespace ThingsGateway.SqlSugar
                 return Tuple.Create<List<T>, List<T2>, List<T3>, List<T4>, List<T5>, List<T6>, List<T7>>(result, result2, result3, result4, result5, result6, result7);
             }
         }
+        #region Async Query Methods
 
+        /// <summary>
+        /// 异步执行SQL查询并返回对象列表(带取消令牌)
+        /// </summary>
         public Task<List<T>> SqlQueryAsync<T>(string sql, object parameters, CancellationToken token)
         {
             this.CancellationToken = token;
             return SqlQueryAsync<T>(sql, parameters);
         }
 
+        /// <summary>
+        /// 异步执行SQL查询并返回对象列表(使用对象参数)
+        /// </summary>
         public virtual Task<List<T>> SqlQueryAsync<T>(string sql, object parameters = null)
         {
             var sugarParameters = this.GetParameters(parameters);
             return SqlQueryAsync<T>(sql, sugarParameters);
         }
+
+        /// <summary>
+        /// 异步执行SQL查询并返回对象列表(使用参数数组)
+        /// </summary>
         public virtual async Task<List<T>> SqlQueryAsync<T>(string sql, params SugarParameter[] parameters)
         {
             var result = await SqlQueryAsync<T, object, object, object, object, object, object>(sql, parameters).ConfigureAwait(false);
             return result.Item1;
         }
+
+        /// <summary>
+        /// 异步执行SQL查询并返回对象列表(使用参数列表)
+        /// </summary>
         public virtual Task<List<T>> SqlQueryAsync<T>(string sql, List<SugarParameter> parameters)
         {
             if (parameters != null)
@@ -1143,31 +1659,55 @@ namespace ThingsGateway.SqlSugar
                 return SqlQueryAsync<T>(sql);
             }
         }
+
+        /// <summary>
+        /// 异步执行SQL查询并返回两个结果集
+        /// </summary>
         public async Task<Tuple<List<T>, List<T2>>> SqlQueryAsync<T, T2>(string sql, object parameters = null)
         {
             var result = await SqlQueryAsync<T, T2, object, object, object, object, object>(sql, parameters).ConfigureAwait(false);
             return new Tuple<List<T>, List<T2>>(result.Item1, result.Item2);
         }
+
+        /// <summary>
+        /// 异步执行SQL查询并返回三个结果集
+        /// </summary>
         public async Task<Tuple<List<T>, List<T2>, List<T3>>> SqlQueryAsync<T, T2, T3>(string sql, object parameters = null)
         {
             var result = await SqlQueryAsync<T, T2, T3, object, object, object, object>(sql, parameters).ConfigureAwait(false);
             return new Tuple<List<T>, List<T2>, List<T3>>(result.Item1, result.Item2, result.Item3);
         }
+
+        /// <summary>
+        /// 异步执行SQL查询并返回四个结果集
+        /// </summary>
         public async Task<Tuple<List<T>, List<T2>, List<T3>, List<T4>>> SqlQueryAsync<T, T2, T3, T4>(string sql, object parameters = null)
         {
             var result = await SqlQueryAsync<T, T2, T3, T4, object, object, object>(sql, parameters).ConfigureAwait(false);
             return new Tuple<List<T>, List<T2>, List<T3>, List<T4>>(result.Item1, result.Item2, result.Item3, result.Item4);
         }
+
+        /// <summary>
+        /// 异步执行SQL查询并返回五个结果集
+        /// </summary>
         public async Task<Tuple<List<T>, List<T2>, List<T3>, List<T4>, List<T5>>> SqlQueryAsync<T, T2, T3, T4, T5>(string sql, object parameters = null)
         {
             var result = await SqlQueryAsync<T, T2, T3, T4, T5, object, object>(sql, parameters).ConfigureAwait(false);
             return new Tuple<List<T>, List<T2>, List<T3>, List<T4>, List<T5>>(result.Item1, result.Item2, result.Item3, result.Item4, result.Item5);
         }
+
+        /// <summary>
+        /// 异步执行SQL查询并返回六个结果集
+        /// </summary>
         public async Task<Tuple<List<T>, List<T2>, List<T3>, List<T4>, List<T5>, List<T6>>> SqlQueryAsync<T, T2, T3, T4, T5, T6>(string sql, object parameters = null)
         {
             var result = await SqlQueryAsync<T, T2, T3, T4, T5, T6, object>(sql, parameters).ConfigureAwait(false);
             return new Tuple<List<T>, List<T2>, List<T3>, List<T4>, List<T5>, List<T6>>(result.Item1, result.Item2, result.Item3, result.Item4, result.Item5, result.Item6);
         }
+
+        /// <summary>
+        /// 异步执行SQL查询并返回七个结果集
+        /// </summary>
         public async Task<Tuple<List<T>, List<T2>, List<T3>, List<T4>, List<T5>, List<T6>, List<T7>>> SqlQueryAsync<T, T2, T3, T4, T5, T6, T7>(string sql, object parameters = null)
         {
             var parsmeterArray = this.GetParameters(parameters);
@@ -1241,51 +1781,87 @@ namespace ThingsGateway.SqlSugar
             }
         }
 
+        #endregion
+
+        /// <summary>
+        /// 执行SQL查询并返回单个对象(使用对象参数)
+        /// </summary>
         public virtual T SqlQuerySingle<T>(string sql, object parameters = null)
         {
             var result = SqlQuery<T>(sql, parameters);
             return result == null ? default(T) : result.FirstOrDefault();
         }
+
+        /// <summary>
+        /// 执行SQL查询并返回单个对象(使用参数数组)
+        /// </summary>
         public virtual T SqlQuerySingle<T>(string sql, params SugarParameter[] parameters)
         {
             var result = SqlQuery<T>(sql, parameters);
             return result == null ? default(T) : result.FirstOrDefault();
         }
+
+        /// <summary>
+        /// 执行SQL查询并返回单个对象(使用参数列表)
+        /// </summary>
         public virtual T SqlQuerySingle<T>(string sql, List<SugarParameter> parameters)
         {
             var result = SqlQuery<T>(sql, parameters);
             return result == null ? default(T) : result.FirstOrDefault();
         }
 
-
+        /// <summary>
+        /// 异步执行SQL查询并返回单个对象(使用对象参数)
+        /// </summary>
         public virtual async Task<T> SqlQuerySingleAsync<T>(string sql, object parameters = null)
         {
             var result = await SqlQueryAsync<T>(sql, parameters).ConfigureAwait(false);
             return result == null ? default(T) : result.FirstOrDefault();
         }
+
+        /// <summary>
+        /// 异步执行SQL查询并返回单个对象(使用参数数组)
+        /// </summary>
         public virtual async Task<T> SqlQuerySingleAsync<T>(string sql, params SugarParameter[] parameters)
         {
             var result = await SqlQueryAsync<T>(sql, parameters).ConfigureAwait(false);
             return result == null ? default(T) : result.FirstOrDefault();
         }
+
+        /// <summary>
+        /// 异步执行SQL查询并返回单个对象(使用参数列表)
+        /// </summary>
         public virtual async Task<T> SqlQuerySingleAsync<T>(string sql, List<SugarParameter> parameters)
         {
             var result = await SqlQueryAsync<T>(sql, parameters).ConfigureAwait(false);
             return result == null ? default(T) : result.FirstOrDefault();
         }
 
+        #endregion
 
+        #region DataTable Methods
 
+        /// <summary>
+        /// 获取DataTable(使用参数数组)
+        /// </summary>
         public virtual DataTable GetDataTable(string sql, params SugarParameter[] parameters)
         {
             var ds = GetDataSetAll(sql, parameters);
             if (ds.Tables.Count != 0 && ds.Tables.Count > 0) return ds.Tables[0];
             return new DataTable();
         }
+
+        /// <summary>
+        /// 获取DataTable(使用对象参数)
+        /// </summary>
         public virtual DataTable GetDataTable(string sql, object parameters)
         {
             return GetDataTable(sql, this.GetParameters(parameters));
         }
+
+        /// <summary>
+        /// 获取DataTable(使用参数列表)
+        /// </summary>
         public virtual DataTable GetDataTable(string sql, List<SugarParameter> parameters)
         {
             if (parameters == null)
@@ -1298,17 +1874,27 @@ namespace ThingsGateway.SqlSugar
             }
         }
 
-
+        /// <summary>
+        /// 异步获取DataTable(使用参数数组)
+        /// </summary>
         public virtual async Task<DataTable> GetDataTableAsync(string sql, params SugarParameter[] parameters)
         {
             var ds = await GetDataSetAllAsync(sql, parameters).ConfigureAwait(false);
             if (ds.Tables.Count != 0 && ds.Tables.Count > 0) return ds.Tables[0];
             return new DataTable();
         }
+
+        /// <summary>
+        /// 异步获取DataTable(使用对象参数)
+        /// </summary>
         public virtual Task<DataTable> GetDataTableAsync(string sql, object parameters)
         {
             return GetDataTableAsync(sql, this.GetParameters(parameters));
         }
+
+        /// <summary>
+        /// 异步获取DataTable(使用参数列表)
+        /// </summary>
         public virtual Task<DataTable> GetDataTableAsync(string sql, List<SugarParameter> parameters)
         {
             if (parameters == null)
@@ -1321,11 +1907,21 @@ namespace ThingsGateway.SqlSugar
             }
         }
 
+        #endregion
 
+        #region DataSet Methods
+
+        /// <summary>
+        /// 获取DataSet(使用对象参数)
+        /// </summary>
         public virtual DataSet GetDataSetAll(string sql, object parameters)
         {
             return GetDataSetAll(sql, this.GetParameters(parameters));
         }
+
+        /// <summary>
+        /// 获取DataSet(使用参数列表)
+        /// </summary>
         public virtual DataSet GetDataSetAll(string sql, List<SugarParameter> parameters)
         {
             if (parameters == null)
@@ -1338,10 +1934,17 @@ namespace ThingsGateway.SqlSugar
             }
         }
 
+        /// <summary>
+        /// 异步获取DataSet(使用对象参数)
+        /// </summary>
         public virtual Task<DataSet> GetDataSetAllAsync(string sql, object parameters)
         {
             return GetDataSetAllAsync(sql, this.GetParameters(parameters));
         }
+
+        /// <summary>
+        /// 异步获取DataSet(使用参数列表)
+        /// </summary>
         public virtual Task<DataSet> GetDataSetAllAsync(string sql, List<SugarParameter> parameters)
         {
             if (parameters == null)
@@ -1354,13 +1957,21 @@ namespace ThingsGateway.SqlSugar
             }
         }
 
+        #endregion
 
+        #region DataReader Methods
 
-
+        /// <summary>
+        /// 获取DataReader(使用对象参数)
+        /// </summary>
         public virtual IDataReader GetDataReader(string sql, object parameters)
         {
             return GetDataReader(sql, this.GetParameters(parameters));
         }
+
+        /// <summary>
+        /// 获取DataReader(使用参数列表)
+        /// </summary>
         public virtual IDataReader GetDataReader(string sql, List<SugarParameter> parameters)
         {
             if (parameters == null)
@@ -1372,10 +1983,18 @@ namespace ThingsGateway.SqlSugar
                 return GetDataReader(sql, parameters.ToArray());
             }
         }
+
+        /// <summary>
+        /// 异步获取DataReader(使用对象参数)
+        /// </summary>
         public virtual Task<IDataReader> GetDataReaderAsync(string sql, object parameters)
         {
             return GetDataReaderAsync(sql, this.GetParameters(parameters));
         }
+
+        /// <summary>
+        /// 异步获取DataReader(使用参数列表)
+        /// </summary>
         public virtual Task<IDataReader> GetDataReaderAsync(string sql, List<SugarParameter> parameters)
         {
             if (parameters == null)
@@ -1387,10 +2006,22 @@ namespace ThingsGateway.SqlSugar
                 return GetDataReaderAsync(sql, parameters.ToArray());
             }
         }
+
+        #endregion
+
+        #region Scalar Methods
+
+        /// <summary>
+        /// 获取标量值(使用对象参数)
+        /// </summary>
         public virtual object GetScalar(string sql, object parameters)
         {
             return GetScalar(sql, this.GetParameters(parameters));
         }
+
+        /// <summary>
+        /// 获取标量值(使用参数列表)
+        /// </summary>
         public virtual object GetScalar(string sql, List<SugarParameter> parameters)
         {
             if (parameters == null)
@@ -1402,10 +2033,18 @@ namespace ThingsGateway.SqlSugar
                 return GetScalar(sql, parameters.ToArray());
             }
         }
+
+        /// <summary>
+        /// 异步获取标量值(使用对象参数)
+        /// </summary>
         public virtual Task<object> GetScalarAsync(string sql, object parameters)
         {
             return GetScalarAsync(sql, this.GetParameters(parameters));
         }
+
+        /// <summary>
+        /// 异步获取标量值(使用参数列表)
+        /// </summary>
         public virtual Task<object> GetScalarAsync(string sql, List<SugarParameter> parameters)
         {
             if (parameters == null)
@@ -1417,10 +2056,22 @@ namespace ThingsGateway.SqlSugar
                 return GetScalarAsync(sql, parameters.ToArray());
             }
         }
+
+        #endregion
+
+        #region Execute Command Methods
+
+        /// <summary>
+        /// 执行命令(使用对象参数)
+        /// </summary>
         public virtual int ExecuteCommand(string sql, object parameters)
         {
             return ExecuteCommand(sql, GetParameters(parameters));
         }
+
+        /// <summary>
+        /// 执行命令(使用参数列表)
+        /// </summary>
         public virtual int ExecuteCommand(string sql, List<SugarParameter> parameters)
         {
             if (parameters == null)
@@ -1432,15 +2083,27 @@ namespace ThingsGateway.SqlSugar
                 return ExecuteCommand(sql, parameters.ToArray());
             }
         }
+
+        /// <summary>
+        /// 异步执行命令(带取消令牌)
+        /// </summary>
         public Task<int> ExecuteCommandAsync(string sql, object parameters, CancellationToken cancellationToken)
         {
             this.CancellationToken = CancellationToken;
             return ExecuteCommandAsync(sql, parameters);
         }
+
+        /// <summary>
+        /// 异步执行命令(使用对象参数)
+        /// </summary>
         public virtual Task<int> ExecuteCommandAsync(string sql, object parameters)
         {
             return ExecuteCommandAsync(sql, GetParameters(parameters));
         }
+
+        /// <summary>
+        /// 异步执行命令(使用参数列表)
+        /// </summary>
         public virtual Task<int> ExecuteCommandAsync(string sql, List<SugarParameter> parameters)
         {
             if (parameters == null)
@@ -1452,14 +2115,23 @@ namespace ThingsGateway.SqlSugar
                 return ExecuteCommandAsync(sql, parameters.ToArray());
             }
         }
+
         #endregion
 
-        #region  Helper
+        #region Helper Methods
+
+        /// <summary>
+        /// 异步获取命令对象(需要子类实现)
+        /// </summary>
         public virtual async Task<DbCommand> GetCommandAsync(string sql, SugarParameter[] parameters)
         {
             await Task.FromResult(0).ConfigureAwait(false);
             throw new NotImplementedException();
         }
+
+        /// <summary>
+        /// 异步关闭连接
+        /// </summary>
         public async Task CloseAsync()
         {
             if (this.Transaction != null)
@@ -1482,6 +2154,9 @@ namespace ThingsGateway.SqlSugar
             }
         }
 
+        /// <summary>
+        /// 异常处理
+        /// </summary>
         protected virtual void SugarCatch(Exception ex, string sql, SugarParameter[] parameters)
         {
             if (sql?.Contains("{year}{month}{day}") == true)
@@ -1489,10 +2164,18 @@ namespace ThingsGateway.SqlSugar
                 Check.ExceptionEasy("need .SplitTable() message:" + ex.Message, "当前代码是否缺少 .SplitTable() ,可以看文档 [分表]  , 详细错误:" + ex.Message);
             }
         }
+
+        /// <summary>
+        /// 移除取消令牌
+        /// </summary>
         public virtual void RemoveCancellationToken()
         {
             this.CancellationToken = null;
         }
+
+        /// <summary>
+        /// 设置异步上下文ID
+        /// </summary>
         protected void Async()
         {
             if (this.Context.Root != null && this.Context.Root.AsyncId == null)
@@ -1500,6 +2183,10 @@ namespace ThingsGateway.SqlSugar
                 this.Context.Root.AsyncId = Guid.NewGuid(); ;
             }
         }
+
+        /// <summary>
+        /// 安全地移动到下一个结果集
+        /// </summary>
         private static bool NextResult(IDataReader dataReader)
         {
             try
@@ -1512,33 +2199,21 @@ namespace ThingsGateway.SqlSugar
             }
         }
 
+        /// <summary>
+        /// 处理执行前的SQL
+        /// </summary>
         protected void ExecuteProcessingSQL(ref string sql, ref SugarParameter[] parameters)
         {
             var result = this.ProcessingEventStartingSQL(sql, parameters);
             sql = result.Key;
             parameters = result.Value;
         }
+
+        /// <summary>
+        /// 执行前的操作
+        /// </summary>
         public virtual void ExecuteBefore(string sql, SugarParameter[] parameters)
         {
-            //if (this.Context.CurrentConnectionConfig.Debugger != null && this.Context.CurrentConnectionConfig.Debugger.EnableThreadSecurityValidation == true)
-            //{
-
-            //    var contextId = this.Context.ContextID.ToString();
-            //    var processId = Thread.CurrentThread.ManagedThreadId.ToString();
-            //    var cache = new ReflectionInoCacheService();
-            //    if (!cache.ContainsKey<string>(contextId))
-            //    {
-            //        cache.Add(contextId, processId);
-            //    }
-            //    else
-            //    {
-            //        var cacheValue = cache.Get<string>(contextId);
-            //        if (processId != cacheValue)
-            //        {
-            //            throw new SqlSugarException(this.Context, ErrorMessage.GetThrowMessage("Detection of SqlSugarClient cross-threading usage,a thread needs a new one", "检测到声名的SqlSugarClient跨线程使用，请检查是否静态、是否单例、或者IOC配置错误引起的，保证一个线程new出一个对象 ，具本Sql:") + sql, parameters);
-            //        }
-            //    }
-            //}
             this.BeforeTime = DateTime.Now;
             if (this.IsEnableLogEvent)
             {
@@ -1556,6 +2231,10 @@ namespace ThingsGateway.SqlSugar
                 }
             }
         }
+
+        /// <summary>
+        /// 执行后的操作
+        /// </summary>
         public virtual void ExecuteAfter(string sql, SugarParameter[] parameters)
         {
             this.AfterTime = DateTime.Now;
@@ -1596,6 +2275,13 @@ namespace ThingsGateway.SqlSugar
                 this.OldClearParameters = false;
             }
         }
+        #region Data Access Event Methods
+
+        /// <summary>
+        /// 数据获取前事件处理
+        /// </summary>
+        /// <param name="sql">SQL语句</param>
+        /// <param name="parameters">参数数组</param>
         public virtual void GetDataBefore(string sql, SugarParameter[] parameters)
         {
             this.GetDataBeforeTime = DateTime.Now;
@@ -1615,6 +2301,12 @@ namespace ThingsGateway.SqlSugar
                 }
             }
         }
+
+        /// <summary>
+        /// 数据获取后事件处理
+        /// </summary>
+        /// <param name="sql">SQL语句</param>
+        /// <param name="parameters">参数数组</param>
         public virtual void GetDataAfter(string sql, SugarParameter[] parameters)
         {
             this.GetDataAfterTime = DateTime.Now;
@@ -1634,22 +2326,50 @@ namespace ThingsGateway.SqlSugar
                 }
             }
         }
+
+        #endregion
+
+        /// <summary>
+        /// 获取参数数组
+        /// </summary>
+        /// <param name="parameters">参数对象</param>
+        /// <param name="propertyInfo">属性信息数组</param>
+        /// <returns>SugarParameter数组</returns>
         public virtual SugarParameter[] GetParameters(object parameters, PropertyInfo[] propertyInfo = null)
         {
             if (parameters == null) return null;
             return base.GetParameters(parameters, propertyInfo, this.SqlParameterKeyWord);
         }
+
+        #endregion
+
+        #region Connection Management
+
+        /// <summary>
+        /// 检查是否自动关闭连接
+        /// </summary>
+        /// <returns>是否自动关闭</returns>
         protected bool IsAutoClose()
         {
             return this.Context.CurrentConnectionConfig.IsAutoCloseConnection && this.Transaction == null;
         }
+
+        /// <summary>
+        /// 检查是否启用主从分离
+        /// </summary>
         protected bool IsMasterSlaveSeparation
         {
             get
             {
-                return this.Context.CurrentConnectionConfig.SlaveConnectionConfigs.HasValue() && this.IsDisableMasterSlaveSeparation == false;
+                return this.Context.CurrentConnectionConfig.SlaveConnectionConfigs.HasValue() &&
+                       this.IsDisableMasterSlaveSeparation == false;
             }
         }
+
+        /// <summary>
+        /// 设置连接开始(主从分离处理)
+        /// </summary>
+        /// <param name="sql">SQL语句</param>
         protected void SetConnectionStart(string sql)
         {
             if (this.Transaction == null && this.IsMasterSlaveSeparation && IsRead(sql))
@@ -1659,13 +2379,17 @@ namespace ThingsGateway.SqlSugar
                     this.MasterConnection = this.Connection;
                     this.MasterConnectionString = this.MasterConnection.ConnectionString;
                 }
-                var saves = this.Context.CurrentConnectionConfig.SlaveConnectionConfigs.Where(it => it.HitRate > 0).ToList();
-                var currentIndex = UtilRandom.GetRandomIndex(saves.ToDictionary(it => saves.IndexOf(it), it => it.HitRate));
+                var saves = this.Context.CurrentConnectionConfig.SlaveConnectionConfigs
+                    .Where(it => it.HitRate > 0).ToList();
+                var currentIndex = UtilRandom.GetRandomIndex(saves.ToDictionary(
+                    it => saves.IndexOf(it),
+                    it => it.HitRate));
                 var currentSaveConnection = saves[currentIndex];
                 this.Connection = null;
                 this.Context.CurrentConnectionConfig.ConnectionString = currentSaveConnection.ConnectionString;
                 this.Connection = this.Connection;
-                if (this.SlaveConnections.IsNullOrEmpty() || !this.SlaveConnections.Any(it => EqualsConnectionString(it.ConnectionString, this.Connection.ConnectionString)))
+                if (this.SlaveConnections.IsNullOrEmpty() ||
+                    !this.SlaveConnections.Any(it => EqualsConnectionString(it.ConnectionString, this.Connection.ConnectionString)))
                 {
                     if (this.SlaveConnections == null) this.SlaveConnections = new List<IDbConnection>();
                     this.SlaveConnections.Add(this.Connection);
@@ -1678,6 +2402,9 @@ namespace ThingsGateway.SqlSugar
             }
         }
 
+        /// <summary>
+        /// 比较两个连接字符串是否相等
+        /// </summary>
         private bool EqualsConnectionString(string connectionString1, string connectionString2)
         {
             var connectionString1Array = connectionString1.Split(';');
@@ -1685,11 +2412,19 @@ namespace ThingsGateway.SqlSugar
             var result = connectionString1Array.Except(connectionString2Array);
             return !result.Any();
         }
+
+        /// <summary>
+        /// 检查是否需要格式化SQL
+        /// </summary>
         private bool IsFormat(SugarParameter[] parameters)
         {
             return FormatSql != null && parameters?.Length > 0;
         }
 
+        /// <summary>
+        /// 设置连接结束(主从分离处理)
+        /// </summary>
+        /// <param name="sql">SQL语句</param>
         protected void SetConnectionEnd(string sql)
         {
             if (this.IsMasterSlaveSeparation && IsRead(sql) && this.Transaction == null)
@@ -1700,23 +2435,48 @@ namespace ThingsGateway.SqlSugar
             this.Context.SugarActionType = SugarActionType.UnKnown;
         }
 
+        /// <summary>
+        /// 检查是否为只读SQL
+        /// </summary>
         private bool IsRead(string sql)
         {
             var sqlLower = sql.ToLower();
-            var result = Regex.IsMatch(sqlLower, "[ ]*select[ ]") && !Regex.IsMatch(sqlLower, "[ ]*insert[ ]|[ ]*update[ ]|[ ]*delete[ ]");
+            var result = Regex.IsMatch(sqlLower, "[ ]*select[ ]") &&
+                        !Regex.IsMatch(sqlLower, "[ ]*insert[ ]|[ ]*update[ ]|[ ]*delete[ ]");
             return result;
         }
 
+        #endregion
+
+        #region Error Handling
+
+        /// <summary>
+        /// 执行错误事件
+        /// </summary>
+        /// <param name="sql">SQL语句</param>
+        /// <param name="parameters">参数数组</param>
+        /// <param name="ex">异常对象</param>
         protected void ExecuteErrorEvent(string sql, SugarParameter[] parameters, Exception ex)
         {
             this.AfterTime = DateTime.Now;
             ErrorEvent(new SqlSugarException(this.Context, ex, sql, parameters));
         }
+
+        #endregion
+
+        #region Parameter Initialization
+
+        /// <summary>
+        /// 初始化参数
+        /// </summary>
+        /// <param name="sql">SQL语句引用</param>
+        /// <param name="parameters">参数数组</param>
         protected void InitParameters(ref string sql, SugarParameter[] parameters)
         {
             this.SqlExecuteCount = 0;
             this.BeforeTime = DateTime.MinValue;
             this.AfterTime = DateTime.MinValue;
+
             if (parameters.HasValue())
             {
                 foreach (var item in parameters)
@@ -1724,7 +2484,9 @@ namespace ThingsGateway.SqlSugar
                     if (item.Value != null)
                     {
                         var type = item.Value.GetType();
-                        if ((type != UtilConstants.ByteArrayType && type.IsArray && item.IsArray == false) || type.FullName.IsCollectionsList() || type.IsIterator())
+                        // 处理数组参数
+                        if ((type != UtilConstants.ByteArrayType && type.IsArray && item.IsArray == false) ||
+                            type.FullName.IsCollectionsList() || type.IsIterator())
                         {
                             var newValues = new List<string>();
                             foreach (var inValute in item.Value as IEnumerable)
@@ -1735,13 +2497,18 @@ namespace ThingsGateway.SqlSugar
                             {
                                 newValues.Add("-1");
                             }
+
+                            // 处理不同格式的参数名
                             if (item.ParameterName.Substring(0, 1) == ":")
                             {
-                                sql = sql.Replace(string.Concat("@", item.ParameterName.AsSpan(1)), newValues.ToArray().ToJoinSqlInVals());
+                                sql = sql.Replace(string.Concat("@", item.ParameterName.AsSpan(1)),
+                                    newValues.ToArray().ToJoinSqlInVals());
                             }
-                            if (item.ParameterName.Substring(0, 1) != this.SqlParameterKeyWord && sql.ObjToString().Contains(this.SqlParameterKeyWord + item.ParameterName))
+                            if (item.ParameterName.Substring(0, 1) != this.SqlParameterKeyWord &&
+                                sql.ObjToString().Contains(this.SqlParameterKeyWord + item.ParameterName))
                             {
-                                sql = sql.Replace(this.SqlParameterKeyWord + item.ParameterName, newValues.ToArray().ToJoinSqlInVals());
+                                sql = sql.Replace(this.SqlParameterKeyWord + item.ParameterName,
+                                    newValues.ToArray().ToJoinSqlInVals());
                             }
                             else if (item.Value != null && UtilMethods.IsNumberArray(item.Value.GetType()))
                             {
@@ -1759,6 +2526,8 @@ namespace ThingsGateway.SqlSugar
                             item.Value = DBNull.Value;
                         }
                     }
+
+                    // 处理参数名中的空格
                     if (item.ParameterName?.Contains(' ') == true)
                     {
                         var oldName = item.ParameterName;
@@ -1769,8 +2538,17 @@ namespace ThingsGateway.SqlSugar
             }
         }
 
+        #endregion
 
+        #region Data Conversion
 
+        /// <summary>
+        /// 将DataReader转换为指定类型列表
+        /// </summary>
+        /// <typeparam name="TResult">结果类型</typeparam>
+        /// <param name="entityType">实体类型</param>
+        /// <param name="dataReader">数据读取器</param>
+        /// <returns>结果列表</returns>
         private List<TResult> GetData<TResult>(Type entityType, IDataReader dataReader)
         {
             List<TResult> result;
@@ -1780,7 +2558,8 @@ namespace ThingsGateway.SqlSugar
             }
             else if (entityType == UtilConstants.ObjType)
             {
-                result = this.Context.Utilities.DataReaderToExpandoObjectListNoUsing(dataReader).Select(it => ((TResult)(object)it)).ToList();
+                result = this.Context.Utilities.DataReaderToExpandoObjectListNoUsing(dataReader)
+                    .Select(it => ((TResult)(object)it)).ToList();
             }
             else if (entityType.IsAnonymousType() || StaticConfig.EnableAot)
             {
@@ -1799,35 +2578,49 @@ namespace ThingsGateway.SqlSugar
             }
             return result;
         }
+
+        /// <summary>
+        /// 异步将DataReader转换为指定类型列表
+        /// </summary>
+        /// <typeparam name="TResult">结果类型</typeparam>
+        /// <param name="entityType">实体类型</param>
+        /// <param name="dataReader">数据读取器</param>
+        /// <returns>结果列表任务</returns>
         private async Task<List<TResult>> GetDataAsync<TResult>(Type entityType, IDataReader dataReader)
         {
             List<TResult> result;
             if (entityType == UtilConstants.DynamicType)
             {
-                result = await Context.Utilities.DataReaderToExpandoObjectListAsyncNoUsing(dataReader).ConfigureAwait(false) as List<TResult>;
+                result = await Context.Utilities.DataReaderToExpandoObjectListAsyncNoUsing(dataReader)
+                    .ConfigureAwait(false) as List<TResult>;
             }
             else if (entityType == UtilConstants.ObjType)
             {
-                var list = await Context.Utilities.DataReaderToExpandoObjectListAsyncNoUsing(dataReader).ConfigureAwait(false);
+                var list = await Context.Utilities.DataReaderToExpandoObjectListAsyncNoUsing(dataReader)
+                    .ConfigureAwait(false);
                 result = list.Select(it => ((TResult)(object)it)).ToList();
             }
             else if (entityType.IsAnonymousType() || StaticConfig.EnableAot)
             {
                 if (StaticConfig.EnableAot && entityType == UtilConstants.StringType)
                 {
-                    result = await Context.Ado.DbBind.DataReaderToListNoUsingAsync<TResult>(entityType, dataReader).ConfigureAwait(false);
+                    result = await Context.Ado.DbBind.DataReaderToListNoUsingAsync<TResult>(entityType, dataReader)
+                        .ConfigureAwait(false);
                 }
                 else
                 {
-                    result = await Context.Utilities.DataReaderToListAsyncNoUsing<TResult>(dataReader).ConfigureAwait(false);
+                    result = await Context.Utilities.DataReaderToListAsyncNoUsing<TResult>(dataReader)
+                        .ConfigureAwait(false);
                 }
             }
             else
             {
-                result = await Context.Ado.DbBind.DataReaderToListNoUsingAsync<TResult>(entityType, dataReader).ConfigureAwait(false);
+                result = await Context.Ado.DbBind.DataReaderToListNoUsingAsync<TResult>(entityType, dataReader)
+                    .ConfigureAwait(false);
             }
             return result;
         }
+
         #endregion
     }
 }

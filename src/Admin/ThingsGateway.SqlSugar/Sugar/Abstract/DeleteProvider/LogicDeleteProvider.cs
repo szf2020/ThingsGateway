@@ -1,9 +1,27 @@
 ﻿namespace ThingsGateway.SqlSugar
 {
+    /// <summary>
+    /// 逻辑删除提供者
+    /// </summary>
+    /// <typeparam name="T">实体类型</typeparam>
     public class LogicDeleteProvider<T> where T : class, new()
     {
+        /// <summary>
+        /// 可删除提供者
+        /// </summary>
         public DeleteableProvider<T> Deleteable { get; set; }
+        /// <summary>
+        /// 删除构建器
+        /// </summary>
         public DeleteBuilder DeleteBuilder { get; set; }
+
+        /// <summary>
+        /// 执行逻辑删除命令
+        /// </summary>
+        /// <param name="LogicFieldName">逻辑字段名</param>
+        /// <param name="deleteValue">删除值</param>
+        /// <param name="deleteTimeFieldName">删除时间字段名</param>
+        /// <returns>影响的行数</returns>
         public int ExecuteCommand(string LogicFieldName = null, object deleteValue = null, string deleteTimeFieldName = null)
         {
             ISqlSugarClient db;
@@ -36,6 +54,16 @@
             }
             return result;
         }
+
+        /// <summary>
+        /// 执行逻辑删除命令(带用户名)
+        /// </summary>
+        /// <param name="LogicFieldName">逻辑字段名</param>
+        /// <param name="deleteValue">删除值</param>
+        /// <param name="deleteTimeFieldName">删除时间字段名</param>
+        /// <param name="userNameFieldName">用户名字段名</param>
+        /// <param name="userNameValue">用户名值</param>
+        /// <returns>影响的行数</returns>
         public int ExecuteCommand(string LogicFieldName, object deleteValue, string deleteTimeFieldName, string userNameFieldName, object userNameValue)
         {
             ISqlSugarClient db;
@@ -60,6 +88,16 @@
             var result = updateable.Where(where).ExecuteCommand();
             return result;
         }
+
+        /// <summary>
+        /// 异步执行逻辑删除命令(带用户名)
+        /// </summary>
+        /// <param name="LogicFieldName">逻辑字段名</param>
+        /// <param name="deleteValue">删除值</param>
+        /// <param name="deleteTimeFieldName">删除时间字段名</param>
+        /// <param name="userNameFieldName">用户名字段名</param>
+        /// <param name="userNameValue">用户名值</param>
+        /// <returns>影响的行数任务</returns>
         public async Task<int> ExecuteCommandAsync(string LogicFieldName, object deleteValue, string deleteTimeFieldName, string userNameFieldName, object userNameValue)
         {
             ISqlSugarClient db;
@@ -84,6 +122,14 @@
             var result = await updateable.Where(where).ExecuteCommandAsync().ConfigureAwait(false);
             return result;
         }
+
+        /// <summary>
+        /// 异步执行逻辑删除命令
+        /// </summary>
+        /// <param name="LogicFieldName">逻辑字段名</param>
+        /// <param name="deleteValue">删除值</param>
+        /// <param name="deleteTimeFieldName">删除时间字段名</param>
+        /// <returns>影响的行数任务</returns>
         public async Task<int> ExecuteCommandAsync(string LogicFieldName = null, object deleteValue = null, string deleteTimeFieldName = null)
         {
             ISqlSugarClient db;
@@ -117,6 +163,10 @@
             return result;
         }
 
+        /// <summary>
+        /// 转换更新属性
+        /// </summary>
+        /// <param name="updateable">可更新提供者</param>
         private void Convert(UpdateableProvider<T> updateable)
         {
             updateable.IsEnableDiffLogEvent = Deleteable.IsEnableDiffLogEvent;
@@ -125,6 +175,14 @@
             updateable.RemoveCacheFunc = Deleteable.RemoveCacheFunc;
         }
 
+        /// <summary>
+        /// 执行逻辑删除命令的内部方法
+        /// </summary>
+        /// <param name="LogicFieldName">逻辑字段名</param>
+        /// <param name="db">数据库客户端</param>
+        /// <param name="where">条件语句</param>
+        /// <param name="pars">参数列表</param>
+        /// <returns>逻辑字段名</returns>
         private string _ExecuteCommand(string LogicFieldName, out ISqlSugarClient db, out string where, out List<SugarParameter> pars)
         {
             var entityInfo = Deleteable.EntityInfo;

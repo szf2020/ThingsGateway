@@ -4,10 +4,15 @@ namespace ThingsGateway.SqlSugar
 {
     public partial class FastestProvider<T> : IFastest<T> where T : class, new()
     {
+        /// <summary>SqlSugar上下文实例</summary>
         internal SqlSugarProvider context;
+        /// <summary>可查询对象</summary>
         private ISugarQueryable<T> queryable;
+        /// <summary>实体信息</summary>
         private EntityInfo entityInfo { get; set; }
+        /// <summary>是否记录日志</summary>
         public bool isLog;
+        /// <summary>构造函数</summary>
         public FastestProvider(SqlSugarProvider sqlSugarProvider)
         {
             this.context = sqlSugarProvider;
@@ -16,20 +21,24 @@ namespace ThingsGateway.SqlSugar
         }
 
         #region BulkCopy
+        /// <summary>批量插入DataTable数据</summary>
         public int BulkCopy(string tableName, DataTable dt)
         {
             return BulkCopyAsync(tableName, dt).ConfigureAwait(true).GetAwaiter().GetResult();
         }
+        /// <summary>批量插入DataTable数据</summary>
         public int BulkCopy(DataTable dt)
         {
             Check.ExceptionEasy(this.AsName.IsNullOrEmpty(), "need .AS(tablaeName) ", "需要 .AS(tablaeName) 设置表名");
             return BulkCopyAsync(this.AsName, dt).ConfigureAwait(true).GetAwaiter().GetResult();
         }
+        /// <summary>异步批量插入DataTable数据</summary>
         public Task<int> BulkCopyAsync(DataTable dt)
         {
             Check.ExceptionEasy(this.AsName.IsNullOrEmpty(), "need .AS(tablaeName) ", "需要 .AS(tablaeName) 设置表名");
             return BulkCopyAsync(this.AsName, dt);
         }
+        /// <summary>异步批量插入DataTable数据</summary>
         public async Task<int> BulkCopyAsync(string tableName, DataTable dt)
         {
             if (Size > 0)
@@ -46,10 +55,12 @@ namespace ThingsGateway.SqlSugar
                 return await _BulkCopy(tableName, dt).ConfigureAwait(false);
             }
         }
+        /// <summary>批量插入实体列表</summary>
         public int BulkCopy(List<T> datas)
         {
             return BulkCopyAsync(datas).ConfigureAwait(true).GetAwaiter().GetResult();
         }
+        /// <summary>异步批量插入实体列表</summary>
         public async Task<int> BulkCopyAsync(List<T> datas)
         {
             if (Size > 0)
@@ -60,9 +71,9 @@ namespace ThingsGateway.SqlSugar
                 }
                 int resul = 0;
                 await context.Utilities.PageEachAsync(datas, Size, async item =>
-               {
-                   resul += await _BulkCopy(item).ConfigureAwait(false);
-               }).ConfigureAwait(false);
+                {
+                    resul += await _BulkCopy(item).ConfigureAwait(false);
+                }).ConfigureAwait(false);
                 return resul;
             }
             else
@@ -73,16 +84,19 @@ namespace ThingsGateway.SqlSugar
         #endregion
 
         #region BulkUpdate
+        /// <summary>批量更新实体列表</summary>
         public int BulkUpdate(List<T> datas)
         {
             return BulkUpdateAsync(datas).ConfigureAwait(true).GetAwaiter().GetResult();
         }
+        /// <summary>异步批量更新实体列表</summary>
         public async Task<int> BulkUpdateAsync(List<T> datas)
         {
             var whereColumns = entityInfo.Columns.Where(it => it.IsPrimarykey).Select(it => it.DbColumnName ?? it.PropertyName).ToArray();
             var updateColumns = entityInfo.Columns.Where(it => !it.IsPrimarykey && !it.IsIdentity && !it.IsOnlyIgnoreUpdate && !it.IsIgnore).Select(it => it.DbColumnName ?? it.PropertyName).ToArray();
             return await BulkUpdateAsync(datas, whereColumns, updateColumns).ConfigureAwait(false);
         }
+        /// <summary>批量更新实体列表</summary>
         public int BulkUpdate(List<T> datas, string[] whereColumns, string[] updateColumns)
         {
             whereColumns = whereColumns.Select(x => this.entityInfo.Columns.FirstOrDefault(it => it.PropertyName.EqualCase(x) || it.DbColumnName.EqualCase(x))?.DbColumnName ?? x).ToArray();
@@ -90,11 +104,13 @@ namespace ThingsGateway.SqlSugar
             return BulkUpdateAsync(datas, whereColumns, updateColumns).ConfigureAwait(true).GetAwaiter().GetResult();
         }
 
+        /// <summary>批量更新实体列表</summary>
         public int BulkUpdate(List<T> datas, string[] whereColumns)
         {
             return BulkUpdateAsync(datas, whereColumns).GetAwaiter().GetResult();
         }
 
+        /// <summary>异步批量更新实体列表</summary>
         public async Task<int> BulkUpdateAsync(List<T> datas, string[] whereColumns)
         {
             whereColumns = whereColumns.Select(x => this.entityInfo.Columns.FirstOrDefault(it => it.PropertyName.EqualCase(x) || it.DbColumnName.EqualCase(x))?.DbColumnName ?? x).ToArray();
@@ -108,6 +124,7 @@ namespace ThingsGateway.SqlSugar
                 .ToArray();
             return await BulkUpdateAsync(datas, whereColumns, updateColumns).ConfigureAwait(true);
         }
+        /// <summary>异步批量更新实体列表</summary>
         public async Task<int> BulkUpdateAsync(List<T> datas, string[] whereColumns, string[] updateColumns)
         {
 
@@ -126,15 +143,18 @@ namespace ThingsGateway.SqlSugar
             }
         }
 
+        /// <summary>批量更新DataTable数据</summary>
         public int BulkUpdate(string tableName, DataTable dataTable, string[] whereColumns, string[] updateColumns)
         {
             return BulkUpdateAsync(tableName, dataTable, whereColumns, updateColumns).ConfigureAwait(true).GetAwaiter().GetResult();
         }
+        /// <summary>批量更新DataTable数据</summary>
         public int BulkUpdate(DataTable dataTable, string[] whereColumns, string[] updateColumns)
         {
             Check.ExceptionEasy(this.AsName.IsNullOrEmpty(), "need .AS(tablaeName) ", "需要 .AS(tablaeName) 设置表名");
             return BulkUpdateAsync(this.AsName, dataTable, whereColumns, updateColumns).ConfigureAwait(true).GetAwaiter().GetResult();
         }
+        /// <summary>批量更新DataTable数据</summary>
         public int BulkUpdate(DataTable dataTable, string[] whereColumns)
         {
             string[] updateColumns = dataTable.Columns.Cast<DataColumn>().Select(it => it.ColumnName).Where(it => !whereColumns.Any(z => z.EqualCase(it))).ToArray();
@@ -142,6 +162,7 @@ namespace ThingsGateway.SqlSugar
             Check.ExceptionEasy(this.AsName.IsNullOrEmpty(), "need .AS(tablaeName) ", "需要 .AS(tablaeName) 设置表名");
             return BulkUpdateAsync(this.AsName, dataTable, whereColumns, updateColumns).ConfigureAwait(true).GetAwaiter().GetResult();
         }
+        /// <summary>异步批量更新DataTable数据</summary>
         public Task<int> BulkUpdateAsync(DataTable dataTable, string[] whereColumns)
         {
             string[] updateColumns = dataTable.Columns.Cast<DataColumn>().Select(it => it.ColumnName).Where(it => !whereColumns.Any(z => z.EqualCase(it))).ToArray();
@@ -149,6 +170,7 @@ namespace ThingsGateway.SqlSugar
             Check.ExceptionEasy(this.AsName.IsNullOrEmpty(), "need .AS(tablaeName) ", "需要 .AS(tablaeName) 设置表名");
             return BulkUpdateAsync(this.AsName, dataTable, whereColumns, updateColumns);
         }
+        /// <summary>异步批量更新DataTable数据</summary>
         public async Task<int> BulkUpdateAsync(string tableName, DataTable dataTable, string[] whereColumns, string[] updateColumns)
         {
 
@@ -169,16 +191,19 @@ namespace ThingsGateway.SqlSugar
         #endregion
 
         #region BulkMerge
+        /// <summary>异步批量合并实体列表</summary>
         public Task<int> BulkMergeAsync(List<T> datas)
         {
             var updateColumns = entityInfo.Columns.Where(it => !it.IsPrimarykey && !it.IsIdentity && !it.IsOnlyIgnoreUpdate && !it.IsIgnore).Select(it => it.DbColumnName ?? it.PropertyName).ToArray();
             var whereColumns = entityInfo.Columns.Where(it => it.IsPrimarykey).Select(it => it.DbColumnName ?? it.PropertyName).ToArray(); ;
             return BulkMergeAsync(datas, whereColumns, updateColumns);
         }
+        /// <summary>批量合并实体列表</summary>
         public int BulkMerge(List<T> datas)
         {
             return BulkMergeAsync(datas).GetAwaiter().GetResult();
         }
+        /// <summary>批量合并DataTable数据</summary>
         public int BulkMerge(DataTable dataTable, string[] whereColumns, bool isIdentity)
         {
             object newValue, fastestMethod;
@@ -187,6 +212,7 @@ namespace ThingsGateway.SqlSugar
             var result = (int)bulkCopyMethod.Invoke(fastestMethod, new object[] { newValue });
             return result;
         }
+        /// <summary>异步批量合并DataTable数据</summary>
         public Task<int> BulkMergeAsync(DataTable dataTable, string[] whereColumns, bool isIdentity)
         {
             object newValue, fastestMethod;
@@ -195,10 +221,12 @@ namespace ThingsGateway.SqlSugar
             var result = (Task<int>)bulkCopyMethod.Invoke(fastestMethod, new object[] { newValue });
             return result;
         }
+        /// <summary>批量合并DataTable数据</summary>
         public int BulkMerge(DataTable dataTable, string[] whereColumns, string[] updateColumns, bool isIdentity)
         {
             return BulkMergeAsync(dataTable, whereColumns, updateColumns, isIdentity).GetAwaiter().GetResult();
         }
+        /// <summary>异步批量合并DataTable数据</summary>
         public Task<int> BulkMergeAsync(DataTable dataTable, string[] whereColumns, string[] updateColumns, bool isIdentity)
         {
             object newValue, fastestMethod;
@@ -207,15 +235,18 @@ namespace ThingsGateway.SqlSugar
             var result = (Task<int>)bulkCopyMethod.Invoke(fastestMethod, new object[] { newValue, whereColumns, updateColumns });
             return result;
         }
+        /// <summary>异步批量合并实体列表</summary>
         public Task<int> BulkMergeAsync(List<T> datas, string[] whereColumns)
         {
             var updateColumns = entityInfo.Columns.Where(it => !it.IsPrimarykey && !it.IsIdentity && !it.IsOnlyIgnoreUpdate && !it.IsIgnore).Select(it => it.DbColumnName ?? it.PropertyName).ToArray();
             return BulkMergeAsync(datas, whereColumns, updateColumns);
         }
+        /// <summary>批量合并实体列表</summary>
         public int BulkMerge(List<T> datas, string[] whereColumns)
         {
             return BulkMergeAsync(datas, whereColumns).GetAwaiter().GetResult();
         }
+        /// <summary>异步批量合并实体列表</summary>
         public async Task<int> BulkMergeAsync(List<T> datas, string[] whereColumns, string[] updateColumns)
         {
             if (Size > 0)
@@ -232,11 +263,13 @@ namespace ThingsGateway.SqlSugar
                 return await _BulkMerge(datas, updateColumns, whereColumns).ConfigureAwait(false);
             }
         }
+        /// <summary>批量合并实体列表</summary>
         public int BulkMerge(List<T> datas, string[] whereColumns, string[] updateColumns)
         {
             return BulkMergeAsync(datas, whereColumns, updateColumns).GetAwaiter().GetResult();
         }
 
+        /// <summary>执行批量合并操作</summary>
         private async Task<int> _BulkMerge(List<T> datas, string[] updateColumns, string[] whereColumns)
         {
             try
@@ -278,6 +311,7 @@ namespace ThingsGateway.SqlSugar
         #endregion
 
         #region Core
+        /// <summary>准备批量合并操作</summary>
         private void _BulkMerge(DataTable dataTable, string[] whereColumns, out object newValue, out object fastestMethod, out MethodInfo bulkCopyMethod, bool isAsync, bool isIdentity)
         {
             Check.ExceptionEasy(this.AsName.IsNullOrEmpty(), "need .AS(tablaeName) ", "需要 .AS(tablaeName) 设置表名");
@@ -312,6 +346,7 @@ namespace ThingsGateway.SqlSugar
                                   .Invoke(this.context, null);
             bulkCopyMethod = fastestMethod.GetType().GetMyMethod(isAsync ? "BulkMergeAsync" : "BulkMerge", 1);
         }
+        /// <summary>准备批量合并操作</summary>
         private void _BulkMerge(DataTable dataTable, string[] whereColumns, string[] updateColumns, out object newValue, out object fastestMethod, out MethodInfo bulkCopyMethod, bool isAsync, bool isIdentity)
         {
             Check.ExceptionEasy(this.AsName.IsNullOrEmpty(), "need .AS(tablaeName) ", "需要 .AS(tablaeName) 设置表名");
@@ -347,16 +382,19 @@ namespace ThingsGateway.SqlSugar
             bulkCopyMethod = fastestMethod.GetType().GetMyMethod(isAsync ? "BulkMergeAsync" : "BulkMerge", 3, newValue.GetType(), typeof(string[]), typeof(string[]));
         }
 
+        /// <summary>执行批量更新操作</summary>
         private async Task<int> _BulkUpdate(List<T> datas, string[] whereColumns, string[] updateColumns)
         {
+            var isAuto = this.context.CurrentConnectionConfig.IsAutoCloseConnection;
+            var isAutoOk = false;
+            var old = this.context.Ado.IsDisableMasterSlaveSeparation;
+            var oldOk = false;
             try
             {
                 Begin(datas, false);
                 Check.Exception(whereColumns == null || whereColumns.Length == 0, "where columns count=0 or need primary key");
                 Check.Exception(updateColumns == null || updateColumns.Length == 0, "set columns count=0");
-                var isAuto = this.context.CurrentConnectionConfig.IsAutoCloseConnection;
                 this.context.CurrentConnectionConfig.IsAutoCloseConnection = false;
-                var old = this.context.Ado.IsDisableMasterSlaveSeparation;
                 this.context.Ado.IsDisableMasterSlaveSeparation = true;
                 DataTable dt = ToDdateTable(datas);
                 IFastBuilder buider = GetBuider();
@@ -371,8 +409,10 @@ namespace ThingsGateway.SqlSugar
                     this.context.DbMaintenance.DropTable(dt.TableName);
                 }
                 this.context.CurrentConnectionConfig.IsAutoCloseConnection = isAuto;
+                isAutoOk = true;
                 buider.CloseDb();
                 this.context.Ado.IsDisableMasterSlaveSeparation = old;
+                oldOk = true;
                 End(datas, false);
                 return result;
             }
@@ -381,8 +421,16 @@ namespace ThingsGateway.SqlSugar
                 this.context.Close();
                 throw;
             }
+            finally
+            {
+                if (!isAutoOk)
+                    this.context.CurrentConnectionConfig.IsAutoCloseConnection = isAuto;
+                if (!oldOk)
+                    this.context.Ado.IsDisableMasterSlaveSeparation = old;
+            }
         }
 
+        /// <summary>处理忽略列</summary>
         private void ActionIgnoreColumns(string[] whereColumns, string[] updateColumns, DataTable dt, bool IsActionUpdateColumns)
         {
             if (entityInfo.Columns.Where(it => it.IsIgnore == false).Count() > whereColumns.Length + updateColumns.Length && IsActionUpdateColumns)
@@ -419,6 +467,7 @@ namespace ThingsGateway.SqlSugar
             }
         }
 
+        /// <summary>执行批量更新操作</summary>
         private async Task<int> _BulkUpdate(string tableName, DataTable dataTable, string[] whereColumns, string[] updateColumns)
         {
             var datas = new string[dataTable.Rows.Count].ToList();
@@ -456,6 +505,7 @@ namespace ThingsGateway.SqlSugar
             End(datas, false);
             return result;
         }
+        /// <summary>执行批量插入操作</summary>
         private async Task<int> _BulkCopy(List<T> datas)
         {
             Begin(datas, true);
@@ -466,6 +516,7 @@ namespace ThingsGateway.SqlSugar
             End(datas, true);
             return result;
         }
+        /// <summary>执行批量插入操作</summary>
         private async Task<int> _BulkCopy(string tableName, DataTable dataTable)
         {
             var datas = new string[dataTable.Rows.Count].ToList();
@@ -482,6 +533,7 @@ namespace ThingsGateway.SqlSugar
         #endregion
 
         #region AOP
+        /// <summary>结束操作</summary>
         private void End<Type>(List<Type> datas, bool isAdd, bool isMerge = false)
         {
             var title = isAdd ? "BulkCopy" : "BulkUpdate";
@@ -496,6 +548,7 @@ namespace ThingsGateway.SqlSugar
             }
             RemoveCache();
         }
+        /// <summary>开始操作</summary>
         private void Begin<Type>(List<Type> datas, bool isAdd, bool isMerge = false)
         {
             var title = isAdd ? "BulkCopy" : "BulkUpdate";
@@ -523,6 +576,7 @@ namespace ThingsGateway.SqlSugar
                 }
             }
         }
+        /// <summary>数据AOP处理</summary>
         private void DataAop<Type>(Type item, DataFilterType type, EntityInfo entity)
         {
             var dataEvent = this.context.CurrentConnectionConfig.AopEvents?.DataExecuting;

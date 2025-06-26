@@ -25,17 +25,25 @@ public class ScheduledSyncTask : DisposeBase, IScheduledTask, IScheduledIntInter
         _taskAction = taskFunc;
         _token = token;
     }
-
+    private bool Check()
+    {
+        if (_token.IsCancellationRequested)
+        {
+            Dispose();
+            return true;
+        }
+        return false;
+    }
     public void Start()
     {
         _timer?.Dispose();
-        if (!_token.IsCancellationRequested)
+        if (!Check())
             _timer = new TimerX(TimerCallback, _state, IntervalMS, IntervalMS, nameof(IScheduledTask)) { Async = true };
     }
 
     private void TimerCallback(object? state)
     {
-        if (_token.IsCancellationRequested)
+        if (Check())
             return;
 
         Interlocked.Increment(ref _pendingTriggers);
@@ -68,7 +76,7 @@ public class ScheduledSyncTask : DisposeBase, IScheduledTask, IScheduledIntInter
 
         if (Interlocked.Exchange(ref _pendingTriggers, 0) >= 1)
         {
-            if (!_token.IsCancellationRequested)
+            if (!Check())
             {
                 DelayDo();
             }
@@ -78,13 +86,13 @@ public class ScheduledSyncTask : DisposeBase, IScheduledTask, IScheduledIntInter
     private void DelayDo()
     {
         // 延迟触发下一次
-        if (!_token.IsCancellationRequested)
+        if (!Check())
             _timer?.SetNext(_interval10MS);
     }
 
     public void Stop()
     {
-        _timer?.Dispose();
+        _timer?.SafeDispose();
         _timer = null;
     }
 

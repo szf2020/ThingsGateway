@@ -3,9 +3,19 @@
     "BigTextConnectStr": "ConnectString",
     "BigTextScriptHistoryTable": "DynamicScriptHistoryTable",
     "RealTableBusinessInterval": "RealTableBusinessInterval",
-    "TableName": "TableName"
+    "StringTableName": "StringTableName",
+    "NumberTableName": "NumberTableName"
   },
   "ThingsGateway.Plugin.QuestDB.QuestDBHistoryValue": {
+    "CollectTime": "CollectTime",
+    "CreateTime": "CreateTime",
+    "DeviceName": "DeviceName",
+    "Id": "Id",
+    "IsOnline": "IsOnline",
+    "Name": "Name",
+    "Value": "Value"
+  },
+  "ThingsGateway.Plugin.QuestDB.QuestDBNumberHistoryValue": {
     "CollectTime": "CollectTime",
     "CreateTime": "CreateTime",
     "DeviceName": "DeviceName",
@@ -19,7 +29,8 @@
     "BigTextScriptHistoryTable": "DynamicScriptHistoryTable",
     "BigTextScriptRealTable": "DynamicScriptRealTable",
     "DbType": "DbType",
-    "HistoryDBTableName": "HistoryDBTableName",
+    "NumberTableName": "NumberTableName",
+    "StringTableName": "StringTableName",
     "IsHistoryDB": "IsHistoryDB",
     "IsReadDB": "IsReadDB",
     "ReadDBTableName": "ReadDBTableName",
@@ -27,6 +38,15 @@
     "SqlDBSplitType": "SplitType"
   },
   "ThingsGateway.Plugin.SqlDB.SQLHistoryValue": {
+    "CollectTime": "CollectTime",
+    "CreateTime": "CreateTime",
+    "DeviceName": "DeviceName",
+    "Id": "Id",
+    "IsOnline": "IsOnline",
+    "Name": "Name",
+    "Value": "Value"
+  },
+  "ThingsGateway.Plugin.SqlDB.SQLNumberHistoryValue": {
     "CollectTime": "CollectTime",
     "CreateTime": "CreateTime",
     "DeviceName": "DeviceName",
@@ -69,7 +89,7 @@
     "DbType": "DbType",
     "TableName": "TableName"
   },
-  "ThingsGateway.Plugin.TDengineDB.TDengineDBHistoryValue": {
+  "ThingsGateway.Plugin.TDengineDB.TDengineDBNumberHistoryValue": {
     "CollectTime": "CollectTime",
     "CreateTime": "CreateTime",
     "DeviceName": "DeviceName",

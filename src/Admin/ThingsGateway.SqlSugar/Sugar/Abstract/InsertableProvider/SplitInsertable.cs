@@ -1,16 +1,46 @@
 ﻿namespace ThingsGateway.SqlSugar
 {
+    /// <summary>
+    /// 分表插入类
+    /// </summary>
     public class SplitInsertable<T> where T : class, new()
     {
+        /// <summary>
+        /// 分表锁对象
+        /// </summary>
         private static readonly object SplitLockObj = new object();
+        /// <summary>
+        /// SqlSugar提供者上下文
+        /// </summary>
         public SqlSugarProvider Context;
+        /// <summary>
+        /// 分表上下文
+        /// </summary>
         internal SplitTableContext Helper;
+        /// <summary>
+        /// 实体信息
+        /// </summary>
         public EntityInfo EntityInfo;
+        /// <summary>
+        /// 分表类型
+        /// </summary>
         public SplitType SplitType;
+        /// <summary>
+        /// 可插入对象
+        /// </summary>
         internal IInsertable<T> Inserable { get; set; }
+        /// <summary>
+        /// 表名集合
+        /// </summary>
         internal List<KeyValuePair<string, object>> TableNames { get; set; }
+        /// <summary>
+        /// MySQL忽略标识
+        /// </summary>
         internal bool MySqlIgnore { get; set; }
 
+        /// <summary>
+        /// 执行插入命令
+        /// </summary>
         public int ExecuteCommand()
         {
             if (this.Context.Ado.Transaction == null)
@@ -33,6 +63,10 @@
                 return _ExecuteCommand();
             }
         }
+
+        /// <summary>
+        /// 异步执行插入命令
+        /// </summary>
         public async Task<int> ExecuteCommandAsync()
         {
             if (this.Context.Ado.Transaction == null)
@@ -56,7 +90,9 @@
             }
         }
 
-
+        /// <summary>
+        /// 执行插入并返回雪花ID列表
+        /// </summary>
         public List<long> ExecuteReturnSnowflakeIdList()
         {
             if (this.Context.Ado.Transaction == null)
@@ -79,6 +115,10 @@
                 return _ExecuteReturnSnowflakeIdList();
             }
         }
+
+        /// <summary>
+        /// 异步执行插入并返回雪花ID列表
+        /// </summary>
         public async Task<List<long>> ExecuteReturnSnowflakeIdListAsync()
         {
             if (this.Context.Ado.Transaction == null)
@@ -102,18 +142,26 @@
             }
         }
 
-
+        /// <summary>
+        /// 执行插入并返回雪花ID
+        /// </summary>
         public long ExecuteReturnSnowflakeId()
         {
             return ExecuteReturnSnowflakeIdList().FirstOrDefault();
         }
+
+        /// <summary>
+        /// 异步执行插入并返回雪花ID
+        /// </summary>
         public async Task<long> ExecuteReturnSnowflakeIdAsync()
         {
             var list = await ExecuteReturnSnowflakeIdListAsync().ConfigureAwait(false);
             return list.FirstOrDefault();
         }
 
-
+        /// <summary>
+        /// 实际执行插入命令
+        /// </summary>
         internal int _ExecuteCommand()
         {
             CreateTable();
@@ -139,6 +187,10 @@
             }
             return result;
         }
+
+        /// <summary>
+        /// 异步实际执行插入命令
+        /// </summary>
         internal async Task<int> _ExecuteCommandAsync()
         {
             CreateTable();
@@ -165,6 +217,9 @@
             return result;
         }
 
+        /// <summary>
+        /// 实际执行插入并返回雪花ID列表
+        /// </summary>
         internal List<long> _ExecuteReturnSnowflakeIdList()
         {
             CreateTable();
@@ -188,6 +243,10 @@
             }
             return result;
         }
+
+        /// <summary>
+        /// 异步实际执行插入并返回雪花ID列表
+        /// </summary>
         internal async Task<List<long>> _ExecuteReturnSnowflakeIdListAsync()
         {
             CreateTable();
@@ -212,7 +271,9 @@
             return result;
         }
 
-
+        /// <summary>
+        /// 创建分表
+        /// </summary>
         private void CreateTable()
         {
             var isLog = this.Context.Ado.IsEnableLogEvent;

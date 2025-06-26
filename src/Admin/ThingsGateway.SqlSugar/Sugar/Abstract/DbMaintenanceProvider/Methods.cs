@@ -3,25 +3,43 @@ using System.Text.RegularExpressions;
 
 namespace ThingsGateway.SqlSugar
 {
+    /// <summary>
+    /// 数据库维护提供者基类
+    /// </summary>
     public abstract partial class DbMaintenanceProvider : IDbMaintenance
     {
         #region DML
+        /// <summary>
+        /// 获取存储过程列表
+        /// </summary>
         public List<string> GetProcList()
         {
             return GetProcList(this.Context.Ado.Connection.Database);
         }
+        /// <summary>
+        /// 获取指定数据库的存储过程列表
+        /// </summary>
         public virtual List<string> GetProcList(string dbName)
         {
             return new List<string>();
         }
+        /// <summary>
+        /// 获取数据库列表
+        /// </summary>
         public virtual List<string> GetDataBaseList(SqlSugarClient db)
         {
             return db.Ado.SqlQuery<string>(this.GetDataBaseSql);
         }
+        /// <summary>
+        /// 获取当前连接的数据库列表
+        /// </summary>
         public virtual List<string> GetDataBaseList()
         {
             return this.Context.Ado.SqlQuery<string>(this.GetDataBaseSql);
         }
+        /// <summary>
+        /// 获取视图信息列表
+        /// </summary>
         public virtual List<DbTableInfo> GetViewInfoList(bool isCache = true)
         {
             string cacheKey = "DbMaintenanceProvider.GetViewInfoList" + this.Context.CurrentConnectionConfig.ConfigId;
@@ -37,6 +55,9 @@ namespace ThingsGateway.SqlSugar
             }
             return result;
         }
+        /// <summary>
+        /// 获取表信息列表(可自定义SQL转换)
+        /// </summary>
         public List<DbTableInfo> GetTableInfoList(Func<DbType, string, string> getChangeSqlFunc)
         {
             var db = this.Context.CopyNew();
@@ -49,6 +70,9 @@ namespace ThingsGateway.SqlSugar
             var result = db.DbMaintenance.GetTableInfoList(false);
             return result;
         }
+        /// <summary>
+        /// 获取表信息列表
+        /// </summary>
         public virtual List<DbTableInfo> GetTableInfoList(bool isCache = true)
         {
             string cacheKey = "DbMaintenanceProvider.GetTableInfoList" + this.Context.CurrentConnectionConfig.ConfigId;
@@ -64,6 +88,9 @@ namespace ThingsGateway.SqlSugar
             }
             return result;
         }
+        /// <summary>
+        /// 根据表名获取列信息(可自定义SQL转换)
+        /// </summary>
         public List<DbColumnInfo> GetColumnInfosByTableName(string tableName, Func<DbType, string, string> getChangeSqlFunc)
         {
             var db = this.Context.CopyNew();
@@ -76,6 +103,9 @@ namespace ThingsGateway.SqlSugar
             var result = db.DbMaintenance.GetColumnInfosByTableName(tableName, false);
             return result;
         }
+        /// <summary>
+        /// 根据表名获取列信息
+        /// </summary>
         public virtual List<DbColumnInfo> GetColumnInfosByTableName(string tableName, bool isCache = true)
         {
             if (string.IsNullOrEmpty(tableName)) return new List<DbColumnInfo>();
@@ -88,38 +118,56 @@ namespace ThingsGateway.SqlSugar
                 return this.Context.Ado.SqlQuery<DbColumnInfo>(sql).GroupBy(it => it.DbColumnName).Select(it => it.First()).ToList();
 
         }
+        /// <summary>
+        /// 获取自增列列表
+        /// </summary>
         public virtual List<string> GetIsIdentities(string tableName)
         {
             string cacheKey = "DbMaintenanceProvider.GetIsIdentities" + this.SqlBuilder.GetNoTranslationColumnName(tableName).ToLower() + this.Context.CurrentConnectionConfig.ConfigId;
             cacheKey = GetCacheKey(cacheKey);
             return this.Context.Utilities.GetReflectionInoCacheInstance().GetOrCreate(cacheKey, () =>
-                     {
-                         var result = GetColumnInfosByTableName(tableName).Where(it => it.IsIdentity).ToList();
-                         return result.Select(it => it.DbColumnName).ToList();
-                     });
+            {
+                var result = GetColumnInfosByTableName(tableName).Where(it => it.IsIdentity).ToList();
+                return result.Select(it => it.DbColumnName).ToList();
+            });
         }
+        /// <summary>
+        /// 获取主键列列表
+        /// </summary>
         public virtual List<string> GetPrimaries(string tableName)
         {
             string cacheKey = "DbMaintenanceProvider.GetPrimaries" + this.SqlBuilder.GetNoTranslationColumnName(tableName).ToLower() + this.Context.CurrentConnectionConfig.ConfigId;
             cacheKey = GetCacheKey(cacheKey);
             return this.Context.Utilities.GetReflectionInoCacheInstance().GetOrCreate(cacheKey, () =>
-             {
-                 var result = GetColumnInfosByTableName(tableName).Where(it => it.IsPrimarykey).ToList();
-                 return result.Select(it => it.DbColumnName).ToList();
-             });
+            {
+                var result = GetColumnInfosByTableName(tableName).Where(it => it.IsPrimarykey).ToList();
+                return result.Select(it => it.DbColumnName).ToList();
+            });
         }
+        /// <summary>
+        /// 获取索引列表
+        /// </summary>
         public virtual List<string> GetIndexList(string tableName)
         {
             return new List<string>();
         }
+        /// <summary>
+        /// 获取函数列表
+        /// </summary>
         public virtual List<string> GetFuncList()
         {
             return new List<string>();
         }
+        /// <summary>
+        /// 获取触发器名称列表
+        /// </summary>
         public virtual List<string> GetTriggerNames(string tableName)
         {
             return new List<string>();
         }
+        /// <summary>
+        /// 获取数据库类型列表
+        /// </summary>
         public virtual List<string> GetDbTypes()
         {
             return new List<string>();
@@ -127,6 +175,9 @@ namespace ThingsGateway.SqlSugar
         #endregion
 
         #region Check
+        /// <summary>
+        /// 检查表是否存在
+        /// </summary>
         public virtual bool IsAnyTable<T>()
         {
             if (typeof(T).GetCustomAttribute<SplitTableAttribute>() != null)
@@ -149,6 +200,9 @@ namespace ThingsGateway.SqlSugar
                 return this.IsAnyTable(this.Context.EntityMaintenance.GetEntityInfo<T>().DbTableName, false);
             }
         }
+        /// <summary>
+        /// 检查表是否存在
+        /// </summary>
         public virtual bool IsAnyTable(string tableName, bool isCache = true)
         {
             Check.Exception(string.IsNullOrEmpty(tableName), "IsAnyTable tableName is not null");
@@ -157,6 +211,9 @@ namespace ThingsGateway.SqlSugar
             if (tables == null) return false;
             else return tables.Any(it => it.Name.Equals(tableName, StringComparison.CurrentCultureIgnoreCase));
         }
+        /// <summary>
+        /// 检查列是否存在
+        /// </summary>
         public virtual bool IsAnyColumn(string tableName, string columnName, bool isCache = true)
         {
             columnName = this.SqlBuilder.GetNoTranslationColumnName(columnName);
@@ -167,6 +224,9 @@ namespace ThingsGateway.SqlSugar
             if (columns.IsNullOrEmpty()) return false;
             return columns.Any(it => it.DbColumnName.Equals(columnName, StringComparison.CurrentCultureIgnoreCase));
         }
+        /// <summary>
+        /// 检查是否是主键
+        /// </summary>
         public virtual bool IsPrimaryKey(string tableName, string columnName)
         {
             columnName = this.SqlBuilder.GetNoTranslationColumnName(columnName);
@@ -177,6 +237,9 @@ namespace ThingsGateway.SqlSugar
             var result = columns.Any(it => it.IsPrimarykey && it.DbColumnName.Equals(columnName, StringComparison.CurrentCultureIgnoreCase));
             return result;
         }
+        /// <summary>
+        /// 检查是否是主键(带缓存)
+        /// </summary>
         public virtual bool IsPrimaryKey(string tableName, string columnName, bool isCache = true)
         {
             columnName = this.SqlBuilder.GetNoTranslationColumnName(columnName);
@@ -187,6 +250,9 @@ namespace ThingsGateway.SqlSugar
             var result = columns.Any(it => it.IsPrimarykey && it.DbColumnName.Equals(columnName, StringComparison.CurrentCultureIgnoreCase));
             return result;
         }
+        /// <summary>
+        /// 检查是否是自增列
+        /// </summary>
         public virtual bool IsIdentity(string tableName, string columnName)
         {
             columnName = this.SqlBuilder.GetNoTranslationColumnName(columnName);
@@ -196,10 +262,16 @@ namespace ThingsGateway.SqlSugar
             if (columns.IsNullOrEmpty()) return false;
             return columns.Any(it => it.IsIdentity && it.DbColumnName.Equals(columnName, StringComparison.CurrentCultureIgnoreCase));
         }
+        /// <summary>
+        /// 检查约束是否存在
+        /// </summary>
         public virtual bool IsAnyConstraint(string constraintName)
         {
             return this.Context.Ado.GetInt("select  object_id('" + constraintName + "')") > 0;
         }
+        /// <summary>
+        /// 检查是否有系统表权限
+        /// </summary>
         public virtual bool IsAnySystemTablePermissions()
         {
             this.Context.Ado.CheckConnection();
@@ -220,22 +292,34 @@ namespace ThingsGateway.SqlSugar
         #endregion
 
         #region DDL
+        /// <summary>
+        /// 设置自增初始值
+        /// </summary>
         public virtual bool SetAutoIncrementInitialValue(string tableName, int initialValue)
         {
             Console.WriteLine("no support");
             return true;
         }
+        /// <summary>
+        /// 设置自增初始值
+        /// </summary>
         public virtual bool SetAutoIncrementInitialValue(Type entityType, int initialValue)
         {
             Console.WriteLine("no support");
             return true;
         }
+        /// <summary>
+        /// 删除索引
+        /// </summary>
         public virtual bool DropIndex(string indexName)
         {
             indexName = this.SqlBuilder.GetNoTranslationColumnName(indexName);
             this.Context.Ado.ExecuteCommand($" DROP INDEX  {indexName} ");
             return true;
         }
+        /// <summary>
+        /// 删除索引(指定表名)
+        /// </summary>
         public virtual bool DropIndex(string indexName, string tableName)
         {
             indexName = this.SqlBuilder.GetNoTranslationColumnName(indexName);
@@ -243,18 +327,27 @@ namespace ThingsGateway.SqlSugar
             this.Context.Ado.ExecuteCommand($" DROP INDEX  {indexName} ");
             return true;
         }
+        /// <summary>
+        /// 删除视图
+        /// </summary>
         public virtual bool DropView(string viewName)
         {
             viewName = this.SqlBuilder.GetNoTranslationColumnName(viewName);
             this.Context.Ado.ExecuteCommand($" DROP VIEW {viewName} ");
             return true;
         }
+        /// <summary>
+        /// 删除函数
+        /// </summary>
         public virtual bool DropFunction(string funcName)
         {
             funcName = this.SqlBuilder.GetNoTranslationColumnName(funcName);
             this.Context.Ado.ExecuteCommand($" DROP FUNCTION  {funcName} ");
             return true;
         }
+        /// <summary>
+        /// 删除存储过程
+        /// </summary>
         public virtual bool DropProc(string procName)
         {
             procName = this.SqlBuilder.GetNoTranslationColumnName(procName);
@@ -262,10 +355,8 @@ namespace ThingsGateway.SqlSugar
             return true;
         }
         /// <summary>
-        ///by current connection string
+        /// 创建数据库(当前连接字符串)
         /// </summary>
-        /// <param name="databaseDirectory"></param>
-        /// <returns></returns>
         public virtual bool CreateDatabase(string databaseDirectory = null)
         {
             var seChar = Path.DirectorySeparatorChar.ToString();
@@ -277,17 +368,17 @@ namespace ThingsGateway.SqlSugar
             return CreateDatabase(databaseName, databaseDirectory);
         }
         /// <summary>
-        /// by databaseName
+        /// 创建数据库(指定数据库名)
         /// </summary>
-        /// <param name="databaseName"></param>
-        /// <param name="databaseDirectory"></param>
-        /// <returns></returns>
         public virtual bool CreateDatabase(string databaseName, string databaseDirectory = null)
         {
             this.Context.Ado.ExecuteCommand(string.Format(CreateDataBaseSql, databaseName, databaseDirectory));
             return true;
         }
 
+        /// <summary>
+        /// 添加主键
+        /// </summary>
         public virtual bool AddPrimaryKey(string tableName, string columnName)
         {
             tableName = this.SqlBuilder.GetTranslationTableName(tableName);
@@ -306,6 +397,9 @@ namespace ThingsGateway.SqlSugar
             return true;
         }
 
+        /// <summary>
+        /// 添加复合主键
+        /// </summary>
         public bool AddPrimaryKeys(string tableName, string[] columnNames)
         {
             tableName = this.SqlBuilder.GetTranslationTableName(tableName);
@@ -320,15 +414,20 @@ namespace ThingsGateway.SqlSugar
             this.Context.Ado.ExecuteCommand(sql);
             return true;
         }
+        /// <summary>
+        /// 添加复合主键(指定主键名)
+        /// </summary>
         public bool AddPrimaryKeys(string tableName, string[] columnNames, string pkName)
         {
             tableName = this.SqlBuilder.GetTranslationTableName(tableName);
             var columnName = string.Join(",", columnNames);
-            //var pkName = string.Format("PK_{0}_{1}", this.SqlBuilder.GetNoTranslationColumnName(tableName), columnName.Replace(",", "_"));
             string sql = string.Format(this.AddPrimaryKeySql, tableName, pkName, columnName);
             this.Context.Ado.ExecuteCommand(sql);
             return true;
         }
+        /// <summary>
+        /// 添加列
+        /// </summary>
         public virtual bool AddColumn(string tableName, DbColumnInfo columnInfo)
         {
             tableName = this.SqlBuilder.GetTranslationTableName(tableName);
@@ -395,6 +494,9 @@ namespace ThingsGateway.SqlSugar
             }
             return true;
         }
+        /// <summary>
+        /// 获取默认值
+        /// </summary>
         public virtual object GetDefaultValue(DbColumnInfo columnInfo, object value)
         {
             if (columnInfo.DataType.ObjToString().IsInCase("varchar", "nvarchar", "varchar2", "nvarchar2") && !string.IsNullOrEmpty(columnInfo.DefaultValue) && Regex.IsMatch(columnInfo.DefaultValue, @"^\w+$"))
@@ -407,6 +509,9 @@ namespace ThingsGateway.SqlSugar
             }
             return value;
         }
+        /// <summary>
+        /// 更新列
+        /// </summary>
         public virtual bool UpdateColumn(string tableName, DbColumnInfo column)
         {
             tableName = this.SqlBuilder.GetTranslationTableName(tableName);
@@ -414,13 +519,22 @@ namespace ThingsGateway.SqlSugar
             this.Context.Ado.ExecuteCommand(sql);
             return true;
         }
+        /// <summary>
+        /// 创建表
+        /// </summary>
         public abstract bool CreateTable(string tableName, List<DbColumnInfo> columns, bool isCreatePrimaryKey = true);
+        /// <summary>
+        /// 删除表
+        /// </summary>
         public virtual bool DropTable(string tableName)
         {
             tableName = this.SqlBuilder.GetTranslationTableName(tableName);
             this.Context.Ado.ExecuteCommand(string.Format(this.DropTableSql, tableName));
             return true;
         }
+        /// <summary>
+        /// 批量删除表
+        /// </summary>
         public virtual bool DropTable(string[] tableName)
         {
             foreach (var item in tableName)
@@ -429,6 +543,9 @@ namespace ThingsGateway.SqlSugar
             }
             return true;
         }
+        /// <summary>
+        /// 根据实体类型删除表
+        /// </summary>
         public virtual bool DropTable(Type[] tableEnittyTypes)
         {
             foreach (var item in tableEnittyTypes)
@@ -438,6 +555,9 @@ namespace ThingsGateway.SqlSugar
             }
             return true;
         }
+        /// <summary>
+        /// 删除表(泛型)
+        /// </summary>
         public virtual bool DropTable<T>()
         {
             if (typeof(T).GetCustomAttribute<SplitTableAttribute>() != null)
@@ -455,12 +575,18 @@ namespace ThingsGateway.SqlSugar
                 return DropTable(tableName);
             }
         }
+        /// <summary>
+        /// 删除多个表(泛型)
+        /// </summary>
         public virtual bool DropTable<T, T2>()
         {
             DropTable<T>();
             DropTable<T2>();
             return true;
         }
+        /// <summary>
+        /// 删除多个表(泛型)
+        /// </summary>
         public virtual bool DropTable<T, T2, T3>()
         {
             DropTable<T>();
@@ -468,6 +594,9 @@ namespace ThingsGateway.SqlSugar
             DropTable<T3>();
             return true;
         }
+        /// <summary>
+        /// 删除多个表(泛型)
+        /// </summary>
         public virtual bool DropTable<T, T2, T3, T4>()
         {
             DropTable<T>();
@@ -476,6 +605,9 @@ namespace ThingsGateway.SqlSugar
             DropTable<T4>();
             return true;
         }
+        /// <summary>
+        /// 清空表(泛型)
+        /// </summary>
         public virtual bool TruncateTable<T>()
         {
             if (typeof(T).GetCustomAttribute<SplitTableAttribute>() != null)
@@ -493,12 +625,18 @@ namespace ThingsGateway.SqlSugar
                 return this.TruncateTable(this.Context.EntityMaintenance.GetEntityInfo<T>().DbTableName);
             }
         }
+        /// <summary>
+        /// 清空多个表(泛型)
+        /// </summary>
         public virtual bool TruncateTable<T, T2>()
         {
             TruncateTable<T>();
             TruncateTable<T2>();
             return true;
         }
+        /// <summary>
+        /// 清空多个表(泛型)
+        /// </summary>
         public virtual bool TruncateTable<T, T2, T3>()
         {
             TruncateTable<T>();
@@ -506,6 +644,9 @@ namespace ThingsGateway.SqlSugar
             TruncateTable<T3>();
             return true;
         }
+        /// <summary>
+        /// 清空多个表(泛型)
+        /// </summary>
         public virtual bool TruncateTable<T, T2, T3, T4>()
         {
             TruncateTable<T>();
@@ -514,6 +655,9 @@ namespace ThingsGateway.SqlSugar
             TruncateTable<T4>();
             return true;
         }
+        /// <summary>
+        /// 清空多个表(泛型)
+        /// </summary>
         public virtual bool TruncateTable<T, T2, T3, T4, T5>()
         {
             TruncateTable<T>();
@@ -523,6 +667,9 @@ namespace ThingsGateway.SqlSugar
             TruncateTable<T5>();
             return true;
         }
+        /// <summary>
+        /// 删除列
+        /// </summary>
         public virtual bool DropColumn(string tableName, string columnName)
         {
             columnName = this.SqlBuilder.GetTranslationColumnName(columnName);
@@ -530,6 +677,9 @@ namespace ThingsGateway.SqlSugar
             this.Context.Ado.ExecuteCommand(string.Format(this.DropColumnToTableSql, tableName, columnName));
             return true;
         }
+        /// <summary>
+        /// 删除约束
+        /// </summary>
         public virtual bool DropConstraint(string tableName, string constraintName)
         {
             tableName = this.SqlBuilder.GetTranslationTableName(tableName);
@@ -537,12 +687,18 @@ namespace ThingsGateway.SqlSugar
             this.Context.Ado.ExecuteCommand(sql);
             return true;
         }
+        /// <summary>
+        /// 清空表
+        /// </summary>
         public virtual bool TruncateTable(string tableName)
         {
             tableName = this.SqlBuilder.GetTranslationTableName(tableName);
             this.Context.Ado.ExecuteCommand(string.Format(this.TruncateTableSql, tableName));
             return true;
         }
+        /// <summary>
+        /// 批量清空表
+        /// </summary>
         public bool TruncateTable(params string[] tableNames)
         {
             foreach (var item in tableNames)
@@ -551,6 +707,9 @@ namespace ThingsGateway.SqlSugar
             }
             return true;
         }
+        /// <summary>
+        /// 根据实体类型清空表
+        /// </summary>
         public bool TruncateTable(params Type[] tableEnittyTypes)
         {
             foreach (var item in tableEnittyTypes)
@@ -560,6 +719,9 @@ namespace ThingsGateway.SqlSugar
             }
             return true;
         }
+        /// <summary>
+        /// 备份数据库
+        /// </summary>
         public virtual bool BackupDataBase(string databaseName, string fullFileName)
         {
             var directory = FileHelper.GetDirectoryFromFilePath(fullFileName);
@@ -570,6 +732,9 @@ namespace ThingsGateway.SqlSugar
             this.Context.Ado.ExecuteCommand(string.Format(this.BackupDataBaseSql, databaseName, fullFileName));
             return true;
         }
+        /// <summary>
+        /// 备份表
+        /// </summary>
         public virtual bool BackupTable(string oldTableName, string newTableName, int maxBackupDataRows = int.MaxValue)
         {
             oldTableName = this.SqlBuilder.GetTranslationTableName(oldTableName);
@@ -578,6 +743,9 @@ namespace ThingsGateway.SqlSugar
             this.Context.Ado.ExecuteCommand(sql);
             return true;
         }
+        /// <summary>
+        /// 重命名列
+        /// </summary>
         public virtual bool RenameColumn(string tableName, string oldColumnName, string newColumnName)
         {
             tableName = this.SqlBuilder.GetTranslationTableName(tableName);
@@ -587,42 +755,63 @@ namespace ThingsGateway.SqlSugar
             this.Context.Ado.ExecuteCommand(sql);
             return true;
         }
+        /// <summary>
+        /// 添加列注释
+        /// </summary>
         public virtual bool AddColumnRemark(string columnName, string tableName, string description)
         {
             string sql = string.Format(this.AddColumnRemarkSql, columnName, tableName, description);
             this.Context.Ado.ExecuteCommand(sql);
             return true;
         }
+        /// <summary>
+        /// 删除列注释
+        /// </summary>
         public virtual bool DeleteColumnRemark(string columnName, string tableName)
         {
             string sql = string.Format(this.DeleteColumnRemarkSql, columnName, tableName);
             this.Context.Ado.ExecuteCommand(sql);
             return true;
         }
+        /// <summary>
+        /// 检查列注释是否存在
+        /// </summary>
         public virtual bool IsAnyColumnRemark(string columnName, string tableName)
         {
             string sql = string.Format(this.IsAnyColumnRemarkSql, columnName, tableName);
             var dt = this.Context.Ado.GetDataTable(sql);
             return dt.Rows?.Count > 0;
         }
+        /// <summary>
+        /// 添加表注释
+        /// </summary>
         public virtual bool AddTableRemark(string tableName, string description)
         {
             string sql = string.Format(this.AddTableRemarkSql, tableName, description);
             this.Context.Ado.ExecuteCommand(sql);
             return true;
         }
+        /// <summary>
+        /// 删除表注释
+        /// </summary>
         public virtual bool DeleteTableRemark(string tableName)
         {
             string sql = string.Format(this.DeleteTableRemarkSql, tableName);
             this.Context.Ado.ExecuteCommand(sql);
             return true;
         }
+        /// <summary>
+        /// 检查表注释是否存在
+        /// </summary>
         public virtual bool IsAnyTableRemark(string tableName)
         {
             string sql = string.Format(this.IsAnyTableRemarkSql, tableName);
             var dt = this.Context.Ado.GetDataTable(sql);
             return dt.Rows?.Count > 0;
         }
+        /// <summary>
+        /// 添加默认值
+        /// </summary>
         public virtual bool AddDefaultValue(string tableName, string columnName, string defaultValue)
         {
             if (defaultValue == "''")
@@ -645,6 +834,9 @@ namespace ThingsGateway.SqlSugar
             this.Context.Ado.ExecuteCommand(sql);
             return true;
         }
+        /// <summary>
+        /// 创建索引
+        /// </summary>
         public virtual bool CreateIndex(string tableName, string[] columnNames, bool isUnique = false)
         {
             string sql = string.Format(CreateIndexSql, this.SqlBuilder.GetTranslationTableName(tableName), string.Join(",", columnNames.Select(it => this.SqlBuilder.GetTranslationColumnName(it))), string.Join("_", columnNames) + this.Context.CurrentConnectionConfig.IndexSuffix, isUnique ? "UNIQUE" : "");
@@ -655,6 +847,9 @@ namespace ThingsGateway.SqlSugar
             this.Context.Ado.ExecuteCommand(sql);
             return true;
         }
+        /// <summary>
+        /// 创建唯一索引
+        /// </summary>
         public virtual bool CreateUniqueIndex(string tableName, string[] columnNames)
         {
             string sql = string.Format(CreateIndexSql, this.SqlBuilder.GetTranslationTableName(tableName), string.Join(",", columnNames.Select(it => this.SqlBuilder.GetTranslationColumnName(it))), string.Join("_", columnNames) + this.Context.CurrentConnectionConfig.IndexSuffix + "_Unique", "UNIQUE");
@@ -665,6 +860,9 @@ namespace ThingsGateway.SqlSugar
             this.Context.Ado.ExecuteCommand(sql);
             return true;
         }
+        /// <summary>
+        /// 创建索引(指定索引名)
+        /// </summary>
         public virtual bool CreateIndex(string tableName, string[] columnNames, string IndexName, bool isUnique = false)
         {
             var include = "";
@@ -683,12 +881,17 @@ namespace ThingsGateway.SqlSugar
             this.Context.Ado.ExecuteCommand(sql);
             return true;
         }
+        /// <summary>
+        /// 检查索引是否存在
+        /// </summary>
         public virtual bool IsAnyIndex(string indexName)
         {
-            //string sql = string.Format(this.IsAnyIndexSql, indexName);
             string sql = string.Format(this.IsAnyIndexSql, indexName, this.Context.Ado.Connection.Database);
             return this.Context.Ado.GetInt(sql) > 0;
         }
+        /// <summary>
+        /// 添加注释
+        /// </summary>
         public virtual bool AddRemark(EntityInfo entity)
         {
             var db = this.Context;
@@ -734,6 +937,9 @@ namespace ThingsGateway.SqlSugar
             return true;
         }
 
+        /// <summary>
+        /// 添加索引
+        /// </summary>
         public virtual void AddIndex(EntityInfo entityInfo)
         {
             var db = this.Context;
@@ -770,17 +976,26 @@ namespace ThingsGateway.SqlSugar
             }
         }
 
+        /// <summary>
+        /// 检查是否有默认值
+        /// </summary>
         protected virtual bool IsAnyDefaultValue(string tableName, string columnName, List<DbColumnInfo> columns)
         {
             var defaultValue = columns.Where(it => it.DbColumnName.Equals(columnName, StringComparison.CurrentCultureIgnoreCase)).First().DefaultValue;
             return defaultValue.HasValue();
         }
 
+        /// <summary>
+        /// 检查是否有默认值
+        /// </summary>
         public virtual bool IsAnyDefaultValue(string tableName, string columnName)
         {
             return IsAnyDefaultValue(tableName, columnName, this.GetColumnInfosByTableName(tableName, false));
         }
 
+        /// <summary>
+        /// 添加默认值
+        /// </summary>
         public virtual void AddDefaultValue(EntityInfo entityInfo)
         {
             var dbColumns = this.GetColumnInfosByTableName(entityInfo.DbTableName, false);
@@ -798,12 +1013,18 @@ namespace ThingsGateway.SqlSugar
             }
         }
 
+        /// <summary>
+        /// 重命名表
+        /// </summary>
         public virtual bool RenameTable(string oldTableName, string newTableName)
         {
             string sql = string.Format(this.RenameTableSql, oldTableName, newTableName);
             this.Context.Ado.ExecuteCommand(sql);
             return true;
         }
+        /// <summary>
+        /// 检查存储过程是否存在
+        /// </summary>
         public virtual bool IsAnyProcedure(string procName)
         {
             string sql = string.Format(this.IsAnyProcedureSql, procName);
@@ -812,10 +1033,16 @@ namespace ThingsGateway.SqlSugar
         #endregion
 
         #region Private
+        /// <summary>
+        /// 获取架构表信息
+        /// </summary>
         public virtual List<DbTableInfo> GetSchemaTables(EntityInfo entityInfo)
         {
             return null;
         }
+        /// <summary>
+        /// 获取列表或缓存
+        /// </summary>
         protected List<T> GetListOrCache<T>(string cacheKey, string sql)
         {
             return this.Context.Utilities.GetReflectionInoCacheInstance().GetOrCreate(cacheKey,
@@ -828,6 +1055,9 @@ namespace ThingsGateway.SqlSugar
                  return result;
              });
         }
+        /// <summary>
+        /// 获取创建表SQL
+        /// </summary>
         protected virtual string GetCreateTableSql(string tableName, List<DbColumnInfo> columns)
         {
             List<string> columnArray = new List<string>();
@@ -846,6 +1076,9 @@ namespace ThingsGateway.SqlSugar
             string tableString = string.Format(this.CreateTableSql, this.SqlBuilder.GetTranslationTableName(tableName), string.Join(",\r\n", columnArray));
             return tableString;
         }
+        /// <summary>
+        /// 获取添加列SQL
+        /// </summary>
         protected virtual string GetAddColumnSql(string tableName, DbColumnInfo columnInfo)
         {
             string columnName = this.SqlBuilder.GetTranslationColumnName(columnInfo.DbColumnName);
@@ -864,6 +1097,9 @@ namespace ThingsGateway.SqlSugar
             string result = string.Format(this.AddColumnToTableSql, tableName, columnName, dataType, dataSize, nullType, primaryKey, identity);
             return result;
         }
+        /// <summary>
+        /// 获取更新列SQL
+        /// </summary>
         protected virtual string GetUpdateColumnSql(string tableName, DbColumnInfo columnInfo)
         {
             string columnName = this.SqlBuilder.GetTranslationColumnName(columnInfo.DbColumnName);
@@ -876,10 +1112,16 @@ namespace ThingsGateway.SqlSugar
             string result = string.Format(this.AlterColumnToTableSql, tableName, columnName, dataType, dataSize, nullType, primaryKey, identity);
             return result;
         }
+        /// <summary>
+        /// 获取缓存键
+        /// </summary>
         protected virtual string GetCacheKey(string cacheKey)
         {
             return this.Context.CurrentConnectionConfig.DbType + "." + this.Context.Ado.Connection.Database + "." + cacheKey;
         }
+        /// <summary>
+        /// 获取列大小
+        /// </summary>
         protected virtual string GetSize(DbColumnInfo item)
         {
             string dataSize = null;

@@ -359,7 +359,6 @@ namespace ThingsGateway.SqlSugar
                 builder.IsAnyParameterExpression = true;
             }
         }
-
         private static bool IsNullable(Type memtype)
         {
             return memtype.Name == "Nullable`1";

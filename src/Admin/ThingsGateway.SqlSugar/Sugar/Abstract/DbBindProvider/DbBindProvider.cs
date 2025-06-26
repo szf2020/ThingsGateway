@@ -4,14 +4,28 @@ using System.Reflection;
 
 namespace ThingsGateway.SqlSugar
 {
+    /// <summary>
+    /// 数据库绑定提供者抽象类
+    /// </summary>
     public abstract partial class DbBindProvider : DbBindAccessory, IDbBind
     {
         #region Properties
+        /// <summary>
+        /// SqlSugar提供者实例
+        /// </summary>
         public virtual SqlSugarProvider Context { get; set; }
+        /// <summary>
+        /// 数据库类型与C#类型映射列表
+        /// </summary>
         public abstract List<KeyValuePair<string, CSharpDataType>> MappingTypes { get; }
         #endregion
 
         #region Public methods
+        /// <summary>
+        /// 获取数据库类型名称
+        /// </summary>
+        /// <param name="csharpTypeName">C#类型名称</param>
+        /// <returns>数据库类型名称</returns>
         public virtual string GetDbTypeName(string csharpTypeName)
         {
             if (csharpTypeName == UtilConstants.ByteArrayType.Name)
@@ -32,12 +46,23 @@ namespace ThingsGateway.SqlSugar
             else
                 return "varchar";
         }
+
+        /// <summary>
+        /// 获取C#类型名称
+        /// </summary>
+        /// <param name="dbTypeName">数据库类型名称</param>
+        /// <returns>C#类型名称</returns>
         public string GetCsharpTypeName(string dbTypeName)
         {
             var mappings = this.MappingTypes.Where(it => it.Key == dbTypeName);
             return mappings.HasValue() ? mappings.First().Key : "string";
         }
 
+        /// <summary>
+        /// 根据数据库类型名称获取C#类型名称
+        /// </summary>
+        /// <param name="dbTypeName">数据库类型名称</param>
+        /// <returns>C#类型名称</returns>
         public string GetCsharpTypeNameByDbTypeName(string dbTypeName)
         {
             var mappings = this.MappingTypes.Where(it => it.Key == dbTypeName);
@@ -48,6 +73,12 @@ namespace ThingsGateway.SqlSugar
             var result = mappings.First().Value.ObjToString();
             return result;
         }
+
+        /// <summary>
+        /// 获取类型转换字符串
+        /// </summary>
+        /// <param name="dbTypeName">数据库类型名称</param>
+        /// <returns>转换字符串</returns>
         public virtual string GetConvertString(string dbTypeName)
         {
             string result = string.Empty;
@@ -154,6 +185,12 @@ namespace ThingsGateway.SqlSugar
             }
             return result;
         }
+
+        /// <summary>
+        /// 获取属性类型名称
+        /// </summary>
+        /// <param name="dbTypeName">数据库类型名称</param>
+        /// <returns>属性类型名称</returns>
         public virtual string GetPropertyTypeName(string dbTypeName)
         {
             dbTypeName = dbTypeName.ToLower();
@@ -195,11 +232,19 @@ namespace ThingsGateway.SqlSugar
                 return propertyTypes.First().Value.ToString();
             }
         }
+
+        /// <summary>
+        /// 将数据读取器转换为列表
+        /// </summary>
+        /// <typeparam name="T">返回类型</typeparam>
+        /// <param name="type">实际类型</param>
+        /// <param name="dataReader">数据读取器</param>
+        /// <returns>实体列表</returns>
         public virtual List<T> DataReaderToList<T>(Type type, IDataReader dataReader)
         {
             using (dataReader)
             {
-                if (type.Name.StartsWith("KeyValuePair"))
+                if (UtilMethods.IsKeyValuePairType(type))
                 {
                     return GetKeyValueList<T>(type, dataReader);
                 }
@@ -223,11 +268,18 @@ namespace ThingsGateway.SqlSugar
             }
         }
 
+        /// <summary>
+        /// 异步将数据读取器转换为列表
+        /// </summary>
+        /// <typeparam name="T">返回类型</typeparam>
+        /// <param name="type">实际类型</param>
+        /// <param name="dataReader">数据读取器</param>
+        /// <returns>实体列表</returns>
         public virtual async Task<List<T>> DataReaderToListAsync<T>(Type type, IDataReader dataReader)
         {
             using (dataReader)
             {
-                if (type.Name.StartsWith("KeyValuePair"))
+                if (UtilMethods.IsKeyValuePairType(type))
                 {
                     return await GetKeyValueListAsync<T>(type, dataReader).ConfigureAwait(false);
                 }
@@ -250,9 +302,17 @@ namespace ThingsGateway.SqlSugar
                 }
             }
         }
+
+        /// <summary>
+        /// 将数据读取器转换为列表(不使用using)
+        /// </summary>
+        /// <typeparam name="T">返回类型</typeparam>
+        /// <param name="type">实际类型</param>
+        /// <param name="dataReader">数据读取器</param>
+        /// <returns>实体列表</returns>
         public virtual List<T> DataReaderToListNoUsing<T>(Type type, IDataReader dataReader)
         {
-            if (type.Name.StartsWith("KeyValuePair"))
+            if (UtilMethods.IsKeyValuePairType(type))
             {
                 return GetKeyValueList<T>(type, dataReader);
             }
@@ -269,9 +329,17 @@ namespace ThingsGateway.SqlSugar
                 return GetEntityList<T>(Context, dataReader);
             }
         }
+
+        /// <summary>
+        /// 异步将数据读取器转换为列表(不使用using)
+        /// </summary>
+        /// <typeparam name="T">返回类型</typeparam>
+        /// <param name="type">实际类型</param>
+        /// <param name="dataReader">数据读取器</param>
+        /// <returns>实体列表</returns>
         public virtual Task<List<T>> DataReaderToListNoUsingAsync<T>(Type type, IDataReader dataReader)
         {
-            if (type.Name.StartsWith("KeyValuePair"))
+            if (UtilMethods.IsKeyValuePairType(type))
             {
                 return GetKeyValueListAsync<T>(type, dataReader);
             }
@@ -288,6 +356,15 @@ namespace ThingsGateway.SqlSugar
                 return GetEntityListAsync<T>(Context, dataReader);
             }
         }
+
+        /// <summary>
+        /// 根据类型获取实体列表
+        /// </summary>
+        /// <typeparam name="T">返回类型</typeparam>
+        /// <param name="entityType">实体类型</param>
+        /// <param name="context">SqlSugar提供者</param>
+        /// <param name="dataReader">数据读取器</param>
+        /// <returns>实体列表</returns>
         public virtual List<T> GetEntityListByType<T>(Type entityType, SqlSugarProvider context, IDataReader dataReader)
         {
             var method = typeof(DbBindProvider).GetMethod("GetEntityList", BindingFlags.Instance | BindingFlags.NonPublic);
@@ -300,6 +377,15 @@ namespace ThingsGateway.SqlSugar
             }
             return result;
         }
+
+        /// <summary>
+        /// 异步根据类型获取实体列表
+        /// </summary>
+        /// <typeparam name="T">返回类型</typeparam>
+        /// <param name="entityType">实体类型</param>
+        /// <param name="context">SqlSugar提供者</param>
+        /// <param name="dataReader">数据读取器</param>
+        /// <returns>实体列表</returns>
         public virtual async Task<List<T>> GetEntityListByTypeAsync<T>(Type entityType, SqlSugarProvider context, IDataReader dataReader)
         {
             var method = typeof(DbBindProvider).GetMethod("GetEntityListAsync", BindingFlags.Instance | BindingFlags.NonPublic);
@@ -307,6 +393,13 @@ namespace ThingsGateway.SqlSugar
             Task task = (Task)genericMethod.Invoke(this, new object[] { context, dataReader });
             return await GetTask<T>(task).ConfigureAwait(false);
         }
+
+        /// <summary>
+        /// 获取任务结果
+        /// </summary>
+        /// <typeparam name="T">返回类型</typeparam>
+        /// <param name="task">任务</param>
+        /// <returns>结果列表</returns>
         private static async Task<List<T>> GetTask<T>(Task task)
         {
             await task.ConfigureAwait(false); // 等待任务完成
@@ -322,7 +415,9 @@ namespace ThingsGateway.SqlSugar
         #endregion
 
         #region Throw rule
-
+        /// <summary>
+        /// Int类型转换异常规则
+        /// </summary>
         public virtual List<string> IntThrow
         {
             get
@@ -330,6 +425,10 @@ namespace ThingsGateway.SqlSugar
                 return new List<string>() { "datetime", "byte" };
             }
         }
+
+        /// <summary>
+        /// Short类型转换异常规则
+        /// </summary>
         public virtual List<string> ShortThrow
         {
             get
@@ -337,6 +436,10 @@ namespace ThingsGateway.SqlSugar
                 return new List<string>() { "datetime", "guid" };
             }
         }
+
+        /// <summary>
+        /// Decimal类型转换异常规则
+        /// </summary>
         public virtual List<string> DecimalThrow
         {
             get
@@ -344,6 +447,10 @@ namespace ThingsGateway.SqlSugar
                 return new List<string>() { "datetime", "byte", "guid" };
             }
         }
+
+        /// <summary>
+        /// Double类型转换异常规则
+        /// </summary>
         public virtual List<string> DoubleThrow
         {
             get
@@ -351,6 +458,10 @@ namespace ThingsGateway.SqlSugar
                 return new List<string>() { "datetime", "byte", "guid" };
             }
         }
+
+        /// <summary>
+        /// Date类型转换异常规则
+        /// </summary>
         public virtual List<string> DateThrow
         {
             get
@@ -358,6 +469,10 @@ namespace ThingsGateway.SqlSugar
                 return new List<string>() { "int32", "decimal", "double", "byte", "guid" };
             }
         }
+
+        /// <summary>
+        /// Guid类型转换异常规则
+        /// </summary>
         public virtual List<string> GuidThrow
         {
             get
@@ -365,6 +480,10 @@ namespace ThingsGateway.SqlSugar
                 return new List<string>() { "int32", "datetime", "decimal", "double", "byte" };
             }
         }
+
+        /// <summary>
+        /// String类型转换异常规则
+        /// </summary>
         public virtual List<string> StringThrow
         {
             get

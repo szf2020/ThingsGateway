@@ -78,7 +78,7 @@ namespace ThingsGateway.SqlSugar
         }
         private static List<string> GetAllMethods(IDbMethods dbMethods)
         {
-            return new ReflectionInoCacheService().GetOrCreate("Json2SqlGetFuncSql", () =>
+            return ReflectionInoCacheService.Instance.GetOrCreate("Json2SqlGetFuncSql", () =>
                             dbMethods.GetType()
                             .GetMethods().Where(it => it.Name != "GetHashCode").Select(it => it.Name).ToList());
         }

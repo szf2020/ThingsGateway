@@ -115,7 +115,7 @@
                 if (value != null)
                 {
                     var key = "GetNullType_" + tableName + columnName;
-                    return new ReflectionInoCacheService().GetOrCreate(key, () => value);
+                    return ReflectionInoCacheService.Instance.GetOrCreate(key, () => value);
                 }
             }
             return null;

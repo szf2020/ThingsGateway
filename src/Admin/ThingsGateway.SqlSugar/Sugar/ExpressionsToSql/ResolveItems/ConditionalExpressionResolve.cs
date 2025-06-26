@@ -13,6 +13,7 @@ namespace ThingsGateway.SqlSugar
                 express.IfTrue,
                 express.IfFalse
             };
+            SetSingleTableNameSubqueryShortName(express);
             if (ExpressionTool.GetParameters(express.Test).Count == 0)
             {
                 while (express != null)
@@ -82,6 +83,44 @@ namespace ThingsGateway.SqlSugar
                     break;
                 default:
                     break;
+            }
+        }
+        private void SetSingleTableNameSubqueryShortName(ConditionalExpression express)
+        {
+            if (this.Context.IsSingle && express.Test is MethodCallExpression callExpression)
+            {
+                var list = callExpression.Arguments.ToList();
+                list.Add(callExpression);
+                if (express.IfTrue is MethodCallExpression callExpressionLeft)
+                {
+                    list.Add(callExpressionLeft);
+                    list.AddRange(callExpressionLeft.Arguments);
+                }
+                if (express.IfFalse is MethodCallExpression callExpressionRight)
+                {
+                    list.Add(callExpressionRight);
+                    list.AddRange(callExpressionRight.Arguments);
+                }
+                foreach (var item in list)
+                {
+                    if (item is MethodCallExpression itemObj)
+                    {
+                        if (ExpressionTool.IsSubQuery(itemObj))
+                        {
+                            if (this.Context.SingleTableNameSubqueryShortName == null)
+                            {
+                                if (this.Context.SugarContext?.QueryBuilder?.SelectValue is LambdaExpression lambda)
+                                {
+                                    if (lambda?.Parameters?.Count == 1)
+                                    {
+                                        this.Context.SingleTableNameSubqueryShortName = lambda.Parameters.FirstOrDefault()?.Name;
+                                        continue;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
 

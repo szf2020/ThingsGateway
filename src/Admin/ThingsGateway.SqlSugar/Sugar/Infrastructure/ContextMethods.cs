@@ -273,7 +273,7 @@ namespace ThingsGateway.SqlSugar
                                 var memberNames = memberInit.Bindings
                                     .OfType<MemberAssignment>()
                                     .Select(b => b.Member.Name)
-                                    .ToHashSet();
+                                    .ToList();
 
                                 // 过滤掉不在memberInit中的属性
                                 classProperties = classProperties

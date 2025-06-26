@@ -26,6 +26,7 @@ using System.Text.Encodings.Web;
 using System.Text.Unicode;
 
 using ThingsGateway.Extension;
+using ThingsGateway.VirtualFileServer;
 
 namespace ThingsGateway.UpgradeServer;
 
@@ -364,7 +365,7 @@ public class Startup : AppStartup
 
 
         // 特定文件类型（文件后缀）处理
-        var contentTypeProvider = GetFileExtensionContentTypeProvider();
+        var contentTypeProvider = FS.GetFileExtensionContentTypeProvider();
         // contentTypeProvider.Mappings[".文件后缀"] = "MIME 类型";
         app.UseStaticFiles(new StaticFileOptions
         {
@@ -411,32 +412,5 @@ public class Startup : AppStartup
 
     }
 
-    /// <summary>
-    /// 初始化文件 ContentType 提供器
-    /// </summary>
-    /// <returns></returns>
-    private static FileExtensionContentTypeProvider GetFileExtensionContentTypeProvider()
-    {
-        var fileExtensionProvider = new FileExtensionContentTypeProvider();
-        fileExtensionProvider.Mappings[".iec"] = "application/octet-stream";
-        fileExtensionProvider.Mappings[".patch"] = "application/octet-stream";
-        fileExtensionProvider.Mappings[".apk"] = "application/vnd.android.package-archive";
-        fileExtensionProvider.Mappings[".pem"] = "application/x-x509-user-cert";
-        fileExtensionProvider.Mappings[".gzip"] = "application/x-gzip";
-        fileExtensionProvider.Mappings[".7zip"] = "application/zip";
-        fileExtensionProvider.Mappings[".jpg2"] = "image/jp2";
-        fileExtensionProvider.Mappings[".et"] = "application/kset";
-        fileExtensionProvider.Mappings[".dps"] = "application/ksdps";
-        fileExtensionProvider.Mappings[".cdr"] = "application/x-coreldraw";
-        fileExtensionProvider.Mappings[".shtml"] = "text/html";
-        fileExtensionProvider.Mappings[".php"] = "application/x-httpd-php";
-        fileExtensionProvider.Mappings[".php3"] = "application/x-httpd-php";
-        fileExtensionProvider.Mappings[".php4"] = "application/x-httpd-php";
-        fileExtensionProvider.Mappings[".phtml"] = "application/x-httpd-php";
-        fileExtensionProvider.Mappings[".pcd"] = "image/x-photo-cd";
-        fileExtensionProvider.Mappings[".bcmap"] = "application/octet-stream";
-        fileExtensionProvider.Mappings[".properties"] = "application/octet-stream";
-        fileExtensionProvider.Mappings[".m3u8"] = "application/x-mpegURL";
-        return fileExtensionProvider;
-    }
+
 }

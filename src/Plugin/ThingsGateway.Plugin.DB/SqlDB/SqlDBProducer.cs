@@ -55,7 +55,7 @@ public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariableModel<
     }
     public async Task<SqlSugarPagedList<IDBHistoryValue>> GetDBHistoryValuePagesAsync(DBHistoryValuePageInput input)
     {
-        var data = await Query(input).ToPagedListAsync<SQLHistoryValue, IDBHistoryValue>(input.Current, input.Size).ConfigureAwait(false);//分页
+        var data = await Query(input).ToPagedListAsync<SQLNumberHistoryValue, IDBHistoryValue>(input.Current, input.Size).ConfigureAwait(false);//分页
         return data;
     }
 
@@ -74,10 +74,10 @@ public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariableModel<
         return $" {nameof(SqlDBProducer)}";
     }
 
-    internal async Task<QueryData<SQLHistoryValue>> QueryHistoryData(QueryPageOptions option)
+    internal async Task<QueryData<SQLNumberHistoryValue>> QueryHistoryData(QueryPageOptions option)
     {
         var db = SqlDBBusinessDatabaseUtil.GetDb(_driverPropertys);
-        var ret = new QueryData<SQLHistoryValue>()
+        var ret = new QueryData<SQLNumberHistoryValue>()
         {
             IsSorted = option.SortOrder != SortOrder.Unset,
             IsFiltered = option.Filters.Count > 0,
@@ -85,8 +85,8 @@ public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariableModel<
             IsSearch = option.Searches.Count > 0
         };
 
-        var query = db.Queryable<SQLHistoryValue>().SplitTable();
-        query = db.GetQuery<SQLHistoryValue>(option, query);
+        var query = db.Queryable<SQLNumberHistoryValue>().SplitTable();
+        query = db.GetQuery<SQLNumberHistoryValue>(option, query);
         if (option.IsPage)
         {
             RefAsync<int> totalCount = 0;
@@ -172,6 +172,17 @@ public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariableModel<
     .Map(dest => dest.Value, src => src.Value == null ? string.Empty : src.Value.ToString() ?? string.Empty)
     .Map(dest => dest.CreateTime, (src) => DateTime.Now);
 
+        _config.ForType<VariableRuntime, SQLNumberHistoryValue>()
+           //.Map(dest => dest.Id, (src) =>CommonUtils.GetSingleId())
+           .Map(dest => dest.Id, src => src.Id)//Id更改为变量Id
+           .Map(dest => dest.Value, src => ConvertUtility.Convert.ToDecimal(src.Value, 0))
+           .Map(dest => dest.CreateTime, (src) => DateTime.Now);
+
+        _config.ForType<VariableBasicData, SQLNumberHistoryValue>()
+    //.Map(dest => dest.Id, (src) =>CommonUtils.GetSingleId())
+    .Map(dest => dest.Id, src => src.Id)//Id更改为变量Id
+    .Map(dest => dest.Value, src => ConvertUtility.Convert.ToDecimal(src.Value, 0))
+    .Map(dest => dest.CreateTime, (src) => DateTime.Now);
 
         if (_businessPropertyWithCacheInterval.BusinessUpdateEnum == BusinessUpdateEnum.Interval && _driverPropertys.IsReadDB)
         {
@@ -206,7 +217,11 @@ public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariableModel<
         else
         {
             if (_driverPropertys.IsHistoryDB)
+            {
                 _db.CodeFirst.InitTables(typeof(SQLHistoryValue));
+                _db.CodeFirst.InitTables(typeof(SQLNumberHistoryValue));
+
+            }
         }
         if (!_driverPropertys.BigTextScriptRealTable.IsNullOrEmpty())
         {
@@ -262,11 +277,11 @@ public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariableModel<
         }
     }
 
-    private ISugarQueryable<SQLHistoryValue> Query(DBHistoryValuePageInput input)
+    private ISugarQueryable<SQLNumberHistoryValue> Query(DBHistoryValuePageInput input)
     {
         var db = SqlDBBusinessDatabaseUtil.GetDb(_driverPropertys);
 
-        var query = db.Queryable<SQLHistoryValue>().SplitTable()
+        var query = db.Queryable<SQLNumberHistoryValue>().SplitTable()
                            .WhereIF(input.StartTime != null, a => a.CreateTime >= input.StartTime)
                            .WhereIF(input.EndTime != null, a => a.CreateTime <= input.EndTime)
                            .WhereIF(!string.IsNullOrEmpty(input.VariableName), it => it.Name.Contains(input.VariableName))

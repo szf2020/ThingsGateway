@@ -1697,10 +1697,10 @@ namespace ThingsGateway.SqlSugar
             {
                 var services = this.CurrentConnectionConfig.ConfigureExternalServices;
                 if (services == null)
-                    return new SugarCacheProvider();
+                    return SugarCacheProvider.Instance;
                 if (services.DataInfoCacheService == null)
-                    return new SugarCacheProvider();
-                SugarCacheProvider cache = new SugarCacheProvider();
+                    return SugarCacheProvider.Instance;
+                SugarCacheProvider cache = SugarCacheProvider.Instance;
                 cache.Servie = services.DataInfoCacheService;
                 return cache;
             }

@@ -25,7 +25,7 @@ public partial class TDengineDBPage : IDriverUIBase
     public TDengineDBProducer TDengineDBProducer => (TDengineDBProducer)Driver;
     private SqlDBPageInput CustomerSearchModel { get; set; } = new();
 
-    private async Task<QueryData<TDengineDBHistoryValue>> OnQueryAsync(QueryPageOptions options)
+    private async Task<QueryData<TDengineDBNumberHistoryValue>> OnQueryAsync(QueryPageOptions options)
     {
         var query = await TDengineDBProducer.QueryData(options).ConfigureAwait(false);
         return query;

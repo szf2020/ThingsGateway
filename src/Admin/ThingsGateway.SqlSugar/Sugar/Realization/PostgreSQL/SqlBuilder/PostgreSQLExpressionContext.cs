@@ -450,6 +450,7 @@
             {
                 result = GetJson(result, model.Args[5].MemberName, model.Args.Count == 6);
             }
+            result = ConvertToJsonbIfEnabled(model, result);
             return result;
         }
 
@@ -476,14 +477,14 @@
         {
             var parameter = model.Args[0];
             //var parameter1 = model.Args[1];
-            return $" json_array_length({parameter.MemberName}::json) ";
+            return ConvertToJsonbIfEnabled(model, $" json_array_length({parameter.MemberName}::json) ");
         }
 
         public override string JsonParse(MethodCallExpressionModel model)
         {
             var parameter = model.Args[0];
             //var parameter1 = model.Args[1];
-            return $" ({parameter.MemberName}::json) ";
+            return ConvertToJsonbIfEnabled(model, $" ({parameter.MemberName}::json) ");
         }
 
         public override string JsonArrayAny(MethodCallExpressionModel model)
@@ -517,5 +518,18 @@
                 return $" {model.Args[0].MemberName}::jsonb @> '[{{\"{model.Args[1].MemberValue}\":\"{model.Args[2].MemberValue.ObjToStringNoTrim().ToSqlFilter()}\"}}]'::jsonb ";
             }
         }
+        private static string ConvertToJsonbIfEnabled(MethodCallExpressionModel model, string result)
+        {
+            if (model?.Conext?.SugarContext?.Context is ISqlSugarClient db)
+            {
+                if (db.CurrentConnectionConfig?.MoreSettings?.EnableJsonb == true)
+                {
+                    result = result.Replace("::json", "::jsonb");
+                }
+            }
+
+            return result;
+        }
+
     }
 }

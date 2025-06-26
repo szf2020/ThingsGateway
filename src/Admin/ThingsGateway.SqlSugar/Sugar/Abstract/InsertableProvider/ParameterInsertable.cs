@@ -2,10 +2,24 @@
 
 namespace ThingsGateway.SqlSugar
 {
+    /// <summary>
+    /// 参数化可插入实体类
+    /// </summary>
+    /// <typeparam name="T">实体类型</typeparam>
     public class ParameterInsertable<T> : IParameterInsertable<T> where T : class, new()
     {
+        /// <summary>
+        /// 内部可插入对象
+        /// </summary>
         internal IInsertable<T> Inserable { get; set; }
+        /// <summary>
+        /// SqlSugar上下文
+        /// </summary>
         internal SqlSugarProvider Context { get; set; }
+        /// <summary>
+        /// 执行插入命令
+        /// </summary>
+        /// <returns>影响行数</returns>
         public int ExecuteCommand()
         {
             if (this.Context.CurrentConnectionConfig.DbType.IsIn(DbType.Oracle, DbType.Dm))
@@ -17,6 +31,10 @@ namespace ThingsGateway.SqlSugar
                 return ValuesExecuteCommand();
             }
         }
+        /// <summary>
+        /// 异步执行插入命令
+        /// </summary>
+        /// <returns>影响行数</returns>
         public async Task<int> ExecuteCommandAsync()
         {
             if (this.Context.CurrentConnectionConfig.DbType.IsIn(DbType.Oracle, DbType.Dm))
@@ -28,6 +46,10 @@ namespace ThingsGateway.SqlSugar
                 return await ValuesExecuteCommandAsync().ConfigureAwait(false);
             }
         }
+        /// <summary>
+        /// 默认执行插入命令
+        /// </summary>
+        /// <returns>影响行数</returns>
         public int DefaultExecuteCommand()
         {
             int result = 0;
@@ -61,6 +83,10 @@ namespace ThingsGateway.SqlSugar
             }
             return result;
         }
+        /// <summary>
+        /// 异步默认执行插入命令
+        /// </summary>
+        /// <returns>影响行数</returns>
         public async Task<int> DefaultExecuteCommandAsync()
         {
             int result = 0;
@@ -91,6 +117,10 @@ namespace ThingsGateway.SqlSugar
             }).ConfigureAwait(false);
             return result;
         }
+        /// <summary>
+        /// 值执行插入命令
+        /// </summary>
+        /// <returns>影响行数</returns>
         public int ValuesExecuteCommand()
         {
 
@@ -125,6 +155,10 @@ namespace ThingsGateway.SqlSugar
 
         }
 
+        /// <summary>
+        /// 异步值执行插入命令
+        /// </summary>
+        /// <returns>影响行数</returns>
         public async Task<int> ValuesExecuteCommandAsync()
         {
             int result = 0;
@@ -151,6 +185,9 @@ namespace ThingsGateway.SqlSugar
         }
         #region Values Helper
 
+        /// <summary>
+        /// 获取分页大小
+        /// </summary>
         private static int GetPageSize(int pageSize, int count)
         {
             if (pageSize * count > 2100)
@@ -168,6 +205,9 @@ namespace ThingsGateway.SqlSugar
 
             return pageSize;
         }
+        /// <summary>
+        /// 获取插入值
+        /// </summary>
         private void GetInsertValues(string[] identitys, List<string> columns, string tableWithString, Action removeCacheFunc, List<T> items, out StringBuilder batchInsetrSql, List<SugarParameter> allParamter)
         {
             var itemable = this.Context.Insertable(items);
@@ -197,6 +237,9 @@ namespace ThingsGateway.SqlSugar
                 }
             }
         }
+        /// <summary>
+        /// 格式化值
+        /// </summary>
         private string FormatValue(Type type, string name, object value, List<SugarParameter> allParamter, string keyword)
         {
             var result = keyword + name + allParamter.Count;

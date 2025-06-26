@@ -44,6 +44,13 @@ public static class HttpRemoteUtility
         (_, _, _, _) => true;
 
     /// <summary>
+    ///     忽略（Socket） SSL 证书验证
+    /// </summary>
+#pragma warning disable CA5359 // 请勿禁用证书验证
+    public static RemoteCertificateValidationCallback IgnoreSocketSslErrors => (_, _, _, _) => true;
+#pragma warning restore CA5359 // 请勿禁用证书验证
+
+    /// <summary>
     ///     获取使用 IPv4 连接到服务器的回调
     /// </summary>
     /// <param name="context">

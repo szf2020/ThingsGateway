@@ -1,7 +1,15 @@
-﻿namespace ThingsGateway.SqlSugar.TDengine
+﻿namespace ThingsGateway.SqlSugar
 {
+    /// <summary>
+    /// TDengine 数据库类型绑定提供程序
+    /// </summary>
     public class TDengineDbBind : DbBindProvider
     {
+        /// <summary>
+        /// 根据C#类型名称获取数据库类型名称
+        /// </summary>
+        /// <param name="csharpTypeName">C#类型名称</param>
+        /// <returns>数据库类型名称</returns>
         public override string GetDbTypeName(string csharpTypeName)
         {
             if (csharpTypeName == UtilConstants.ByteArrayType.Name)
@@ -22,6 +30,12 @@
             else
                 return "varchar";
         }
+
+        /// <summary>
+        /// 根据数据库类型名称获取C#属性类型名称
+        /// </summary>
+        /// <param name="dbTypeName">数据库类型名称</param>
+        /// <returns>C#属性类型名称</returns>
         public override string GetPropertyTypeName(string dbTypeName)
         {
             dbTypeName = dbTypeName.ToLower();
@@ -99,6 +113,10 @@
             }
             return dbTypeName;
         }
+
+        /// <summary>
+        /// 获取数据库类型与C#类型的映射关系
+        /// </summary>
         public override List<KeyValuePair<string, CSharpDataType>> MappingTypes
         {
             get
@@ -114,6 +132,10 @@
                 }
             }
         }
+
+        /// <summary>
+        /// TDengine 数据库类型与C#类型的常量映射关系
+        /// </summary>
         public static List<KeyValuePair<string, CSharpDataType>> MappingTypesConst = new List<KeyValuePair<string, CSharpDataType>>(){
 
                     new KeyValuePair<string, CSharpDataType>("BOOL",CSharpDataType.@bool),
@@ -135,6 +157,10 @@
                     new KeyValuePair<string, CSharpDataType>("NCHAR",CSharpDataType.@string),
                     new KeyValuePair<string, CSharpDataType>("JSON",CSharpDataType.@string)
                 };
+
+        /// <summary>
+        /// 获取需要特殊处理的字符串类型列表
+        /// </summary>
         public override List<string> StringThrow
         {
             get

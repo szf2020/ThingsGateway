@@ -26,7 +26,7 @@ public static class TDengineDBUtil
             //PgSqlIsAutoToLower = false,
             //PgSqlIsAutoToLowerCodeFirst = false,
         };
-        db.MappingSTableName<TDengineDBHistoryValue>(stableName);
+        db.MappingSTableName<TDengineDBNumberHistoryValue>(stableName);
         return db;
     }
 

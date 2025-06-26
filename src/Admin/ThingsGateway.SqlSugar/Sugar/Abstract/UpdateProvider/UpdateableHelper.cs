@@ -385,7 +385,8 @@ namespace ThingsGateway.SqlSugar
                     TableId = i,
                     UpdateSql = column.UpdateSql,
                     UpdateServerTime = column.UpdateServerTime,
-                    IsPrimarykey = column.IsPrimarykey
+                    IsPrimarykey = column.IsPrimarykey,
+                    DataType = column.DataType
                 };
                 if (column.ForOwnsOnePropertyInfo != null)
                 {
@@ -406,7 +407,12 @@ namespace ThingsGateway.SqlSugar
                 if (column.IsJson)
                 {
                     columnInfo.IsJson = true;
-                    if (columnInfo.Value != null)
+                    var insertBuilder = InstanceFactory.GetInsertBuilder(this.Context?.CurrentConnectionConfig);
+                    if (insertBuilder?.SerializeObjectFunc != null && columnInfo.Value != null)
+                    {
+                        columnInfo.Value = insertBuilder?.SerializeObjectFunc(columnInfo.Value);
+                    }
+                    else if (columnInfo.Value != null)
                         columnInfo.Value = this.Context.Utilities.SerializeObject(columnInfo.Value);
                 }
                 if (column.IsArray)

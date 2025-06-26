@@ -3,9 +3,19 @@
     "BigTextConnectStr": "连接字符串",
     "BigTextScriptHistoryTable": "历史表动态脚本",
     "RealTableBusinessInterval": "实时表定时上传间隔",
-    "TableName": "表名称"
+    "NumberTableName": "数值变量历史表名称",
+    "StringTableName": "字符变量历史表名称"
   },
   "ThingsGateway.Plugin.QuestDB.QuestDBHistoryValue": {
+    "CollectTime": "采集时间",
+    "CreateTime": "上传时间",
+    "DeviceName": "设备名称",
+    "Id": "变量Id",
+    "IsOnline": "是否在线",
+    "Name": "变量名称",
+    "Value": "变量值"
+  },
+  "ThingsGateway.Plugin.QuestDB.QuestDBNumberHistoryValue": {
     "CollectTime": "采集时间",
     "CreateTime": "上传时间",
     "DeviceName": "设备名称",
@@ -19,7 +29,8 @@
     "BigTextScriptHistoryTable": "历史表动态脚本",
     "BigTextScriptRealTable": "实时表动态脚本",
     "DbType": "数据库类型",
-    "HistoryDBTableName": "历史表名称",
+    "NumberTableName": "数值变量历史表名称",
+    "StringTableName": "字符变量历史表名称",
     "IsHistoryDB": "启用历史表",
     "IsReadDB": "启用实时表",
     "ReadDBTableName": "实时表名称",
@@ -27,6 +38,15 @@
     "SqlDBSplitType": "分表模式"
   },
   "ThingsGateway.Plugin.SqlDB.SQLHistoryValue": {
+    "CollectTime": "采集时间",
+    "CreateTime": "上传时间",
+    "DeviceName": "设备名称",
+    "Id": "变量Id",
+    "IsOnline": "是否在线",
+    "Name": "变量名称",
+    "Value": "变量值"
+  },
+  "ThingsGateway.Plugin.SqlDB.SQLNumberHistoryValue": {
     "CollectTime": "采集时间",
     "CreateTime": "上传时间",
     "DeviceName": "设备名称",
@@ -69,7 +89,7 @@
     "DbType": "数据库类型",
     "TableName": "表名称"
   },
-  "ThingsGateway.Plugin.TDengineDB.TDengineDBHistoryValue": {
+  "ThingsGateway.Plugin.TDengineDB.TDengineDBNumberHistoryValue": {
     "CollectTime": "采集时间",
     "CreateTime": "上传时间",
     "DeviceName": "设备名称",

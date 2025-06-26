@@ -177,6 +177,15 @@ public partial class Clay
         enumerableClay = this;
     }
 
+    /// <summary>
+    /// </summary>
+    /// <param name="clay">dynamic 类型的 <see cref="Clay" /></param>
+    /// <param name="enumerableClay">
+    ///     <see cref="IEnumerable{T}" />
+    /// </param>
+    /// <param name="rawClay">
+    ///     <see cref="Clay" />
+    /// </param>
     public void Deconstruct(out dynamic clay, out IEnumerable<dynamic?> enumerableClay, out Clay rawClay)
     {
         clay = this;
@@ -475,7 +484,7 @@ public partial class Clay
 
         return IsClay(resultType)
             ? new Clay(jsonNode, Options)
-            : Helpers.DeserializeNode(jsonNode, resultType, jsonSerializerOptions ?? Options.JsonSerializerOptions);
+            : jsonNode.As(resultType, jsonSerializerOptions ?? Options.JsonSerializerOptions);
     }
 
     /// <summary>
@@ -562,7 +571,7 @@ public partial class Clay
 
         return IsClay(resultType)
             ? new Clay(currentNode, Options)
-            : Helpers.DeserializeNode(currentNode, resultType, jsonSerializerOptions ?? Options.JsonSerializerOptions);
+            : currentNode.As(resultType, jsonSerializerOptions ?? Options.JsonSerializerOptions);
     }
 
     /// <summary>
@@ -1002,9 +1011,14 @@ public partial class Clay
             return Activator.CreateInstance(_jsonResultType.Value, this);
         }
 
+        // 检查是否是 string 类型
+        if (resultType == typeof(string))
+        {
+            return ToJsonString(jsonSerializerOptions);
+        }
+
         // 将 JsonNode 转换为目标类型
-        var result = Helpers.DeserializeNode(JsonCanvas, resultType,
-            jsonSerializerOptions ?? Options.JsonSerializerOptions);
+        var result = JsonCanvas.As(resultType, jsonSerializerOptions ?? Options.JsonSerializerOptions);
 
         // 检查是否启用转换后执行模型验证
         if (result is not null && Options.ValidateAfterConversion)

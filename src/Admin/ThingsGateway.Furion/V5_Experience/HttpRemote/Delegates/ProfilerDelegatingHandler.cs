@@ -264,8 +264,15 @@ public sealed class ProfilerDelegatingHandler(ILogger<Logging> logger, IOptions<
     /// <returns>
     ///     <see cref="CookieContainer" />
     /// </returns>
-    internal CookieContainer? ExtractCookieContainer() =>
-        InnerHandler switch
+    internal CookieContainer? ExtractCookieContainer()
+    {
+        // 检查是否是 WebAssembly 应用，如果是则跳过
+        if (OperatingSystem.IsBrowser())
+        {
+            return null;
+        }
+
+        return InnerHandler switch
         {
             LoggingHttpMessageHandler loggingHttpMessageHandler => loggingHttpMessageHandler.InnerHandler switch
             {
@@ -284,4 +291,5 @@ public sealed class ProfilerDelegatingHandler(ILogger<Logging> logger, IOptions<
             HttpClientHandler httpClientHandler => httpClientHandler.CookieContainer,
             _ => null
         };
+    }
 }

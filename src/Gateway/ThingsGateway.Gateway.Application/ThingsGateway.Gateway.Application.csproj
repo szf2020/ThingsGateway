@@ -43,7 +43,6 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\..\Admin\ThingsGateway.Admin.Application\ThingsGateway.Admin.Application.csproj" />
-		<ProjectReference Include="..\..\Admin\ThingsGateway.Furion\ThingsGateway.Furion.csproj" />
 		<ProjectReference Include="..\..\Foundation\ThingsGateway.CSScript\ThingsGateway.CSScript.csproj" />
 		<ProjectReference Include="..\..\Foundation\ThingsGateway.Foundation\ThingsGateway.Foundation.csproj" />
 		<ProjectReference Include="..\ThingsGateway.Blazor.Diagrams.Core\ThingsGateway.Blazor.Diagrams.Core.csproj" />

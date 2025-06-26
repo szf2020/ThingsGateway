@@ -6,7 +6,7 @@ namespace ThingsGateway.SqlSugar
 
     public partial class QueryableProvider<T> : QueryableAccessory, ISugarQueryable<T>
     {
-        public async virtual Task<T[]> ToArrayAsync()
+        public virtual async Task<T[]> ToArrayAsync()
         {
 
             var result = await ToListAsync().ConfigureAwait(false);
@@ -27,7 +27,7 @@ namespace ThingsGateway.SqlSugar
             if (list == null) return default(T);
             else return list.SingleOrDefault();
         }
-        public async Task<T> SingleAsync()
+        public virtual async Task<T> SingleAsync()
         {
             if (QueryBuilder.OrderByValue.IsNullOrEmpty())
             {
@@ -57,7 +57,7 @@ namespace ThingsGateway.SqlSugar
                 return result.SingleOrDefault();
             }
         }
-        public async Task<T> SingleAsync(Expression<Func<T, bool>> expression)
+        public virtual async Task<T> SingleAsync(Expression<Func<T, bool>> expression)
         {
             _Where(expression);
             var result = await SingleAsync().ConfigureAwait(false);
@@ -69,7 +69,7 @@ namespace ThingsGateway.SqlSugar
             this.Context.Ado.CancellationToken = token;
             return FirstAsync();
         }
-        public async Task<T> FirstAsync()
+        public virtual async Task<T> FirstAsync()
         {
             if (QueryBuilder.OrderByValue.IsNullOrEmpty())
             {
@@ -97,7 +97,7 @@ namespace ThingsGateway.SqlSugar
             this.Context.Ado.CancellationToken = token;
             return FirstAsync(expression);
         }
-        public async Task<T> FirstAsync(Expression<Func<T, bool>> expression)
+        public virtual async Task<T> FirstAsync(Expression<Func<T, bool>> expression)
         {
             _Where(expression);
             var result = await FirstAsync().ConfigureAwait(false);
@@ -105,7 +105,7 @@ namespace ThingsGateway.SqlSugar
             return result;
         }
 
-        public async Task<bool> AnyAsync(Expression<Func<T, bool>> expression)
+        public virtual async Task<bool> AnyAsync(Expression<Func<T, bool>> expression)
         {
             _Where(expression);
             var result = await AnyAsync().ConfigureAwait(false);
@@ -119,7 +119,7 @@ namespace ThingsGateway.SqlSugar
             return AnyAsync(expression);
         }
 
-        public async Task<bool> AnyAsync()
+        public virtual async Task<bool> AnyAsync()
         {
             return (await Clone().Take(1).Select("1").ToListAsync().ConfigureAwait(false)).Count > 0; ;
         }
@@ -129,7 +129,7 @@ namespace ThingsGateway.SqlSugar
             this.Context.Ado.CancellationToken = token;
             return CountAsync();
         }
-        public async Task<int> CountAsync()
+        public virtual async Task<int> CountAsync()
         {
             if (this.QueryBuilder.Skip == null &&
              this.QueryBuilder.Take == null &&
@@ -157,7 +157,7 @@ namespace ThingsGateway.SqlSugar
             _CountEnd(expMapping);
             return result;
         }
-        public async Task<int> CountAsync(Expression<Func<T, bool>> expression)
+        public virtual async Task<int> CountAsync(Expression<Func<T, bool>> expression)
         {
             _Where(expression);
             var result = await CountAsync().ConfigureAwait(false);
@@ -171,7 +171,7 @@ namespace ThingsGateway.SqlSugar
             return CountAsync(expression);
         }
 
-        public async Task<TResult> MaxAsync<TResult>(string maxField)
+        public virtual async Task<TResult> MaxAsync<TResult>(string maxField)
         {
             this.Select(string.Format(QueryBuilder.MaxTemplate, maxField));
             var list = await _ToListAsync<TResult>().ConfigureAwait(false);
@@ -196,7 +196,7 @@ namespace ThingsGateway.SqlSugar
             return MaxAsync(expression);
         }
 
-        public async Task<TResult> MinAsync<TResult>(string minField)
+        public virtual async Task<TResult> MinAsync<TResult>(string minField)
         {
             this.Select(string.Format(QueryBuilder.MinTemplate, minField));
             var list = await _ToListAsync<TResult>().ConfigureAwait(false);
@@ -208,7 +208,7 @@ namespace ThingsGateway.SqlSugar
             return _MinAsync<TResult>(expression);
         }
 
-        public async Task<TResult> SumAsync<TResult>(string sumField)
+        public virtual async Task<TResult> SumAsync<TResult>(string sumField)
         {
             this.Select(string.Format(QueryBuilder.SumTemplate, sumField));
             var list = await _ToListAsync<TResult>().ConfigureAwait(false);
@@ -220,7 +220,7 @@ namespace ThingsGateway.SqlSugar
             return _SumAsync<TResult>(expression);
         }
 
-        public async Task<TResult> AvgAsync<TResult>(string avgField)
+        public virtual async Task<TResult> AvgAsync<TResult>(string avgField)
         {
             this.Select(string.Format(QueryBuilder.AvgTemplate, avgField));
             var list = await _ToListAsync<TResult>().ConfigureAwait(false);
@@ -232,7 +232,7 @@ namespace ThingsGateway.SqlSugar
             return _AvgAsync<TResult>(expression);
         }
 
-        public async virtual Task<List<TResult>> ToListAsync<TResult>(Expression<Func<T, TResult>> expression)
+        public virtual async Task<List<TResult>> ToListAsync<TResult>(Expression<Func<T, TResult>> expression)
         {
             if (this.QueryBuilder.Includes?.Count > 0)
             {
@@ -265,7 +265,7 @@ namespace ThingsGateway.SqlSugar
             pageIndex = _PageList(pageIndex, pageSize);
             return ToListAsync();
         }
-        public async virtual Task<List<TResult>> ToPageListAsync<TResult>(int pageIndex, int pageSize, RefAsync<int> totalNumber, Expression<Func<T, TResult>> expression)
+        public virtual async Task<List<TResult>> ToPageListAsync<TResult>(int pageIndex, int pageSize, RefAsync<int> totalNumber, Expression<Func<T, TResult>> expression)
         {
             if (this.QueryBuilder.Includes?.Count > 0)
             {
@@ -288,7 +288,7 @@ namespace ThingsGateway.SqlSugar
             this.Context.Ado.CancellationToken = token;
             return ToPageListAsync(pageNumber, pageSize, totalNumber);
         }
-        public async Task<List<T>> ToPageListAsync(int pageIndex, int pageSize, RefAsync<int> totalNumber)
+        public virtual async Task<List<T>> ToPageListAsync(int pageIndex, int pageSize, RefAsync<int> totalNumber)
         {
             var oldMapping = this.Context.MappingTables;
             var countQueryable = this.Clone();
@@ -300,7 +300,7 @@ namespace ThingsGateway.SqlSugar
             this.Context.MappingTables = oldMapping;
             return await Clone().ToPageListAsync(pageIndex, pageSize).ConfigureAwait(false);
         }
-        public async Task<List<T>> ToPageListAsync(int pageNumber, int pageSize, RefAsync<int> totalNumber, RefAsync<int> totalPage)
+        public virtual async Task<List<T>> ToPageListAsync(int pageNumber, int pageSize, RefAsync<int> totalNumber, RefAsync<int> totalPage)
         {
             var result = await ToPageListAsync(pageNumber, pageSize, totalNumber).ConfigureAwait(false);
             totalPage.Value = (totalNumber.Value + pageSize - 1) / pageSize;
@@ -313,7 +313,7 @@ namespace ThingsGateway.SqlSugar
             return ToPageListAsync(pageNumber, pageSize, totalNumber, totalPage);
         }
 
-        public async Task<string> ToJsonAsync()
+        public virtual async Task<string> ToJsonAsync()
         {
             if (IsCache)
             {
@@ -329,18 +329,18 @@ namespace ThingsGateway.SqlSugar
                 return this.Context.Utilities.SerializeObject(await ToListAsync().ConfigureAwait(false), typeof(T));
             }
         }
-        public async Task<string> ToJsonPageAsync(int pageIndex, int pageSize)
+        public virtual async Task<string> ToJsonPageAsync(int pageIndex, int pageSize)
         {
             return this.Context.Utilities.SerializeObject(await ToPageListAsync(pageIndex, pageSize).ConfigureAwait(false), typeof(T));
         }
-        public async Task<string> ToJsonPageAsync(int pageIndex, int pageSize, RefAsync<int> totalNumber)
+        public virtual async Task<string> ToJsonPageAsync(int pageIndex, int pageSize, RefAsync<int> totalNumber)
         {
             var oldMapping = this.Context.MappingTables;
             totalNumber.Value = await Clone().CountAsync().ConfigureAwait(false);
             this.Context.MappingTables = oldMapping;
             return await Clone().ToJsonPageAsync(pageIndex, pageSize).ConfigureAwait(false);
         }
-        public async virtual Task<DataTable> ToDataTableByEntityAsync()
+        public virtual async Task<DataTable> ToDataTableByEntityAsync()
         {
             var list = await ToListAsync().ConfigureAwait(false);
             return this.Context.Utilities.ListToDataTable(list);
@@ -359,7 +359,7 @@ namespace ThingsGateway.SqlSugar
                 return this.ToDataTableAsync();
             }
         }
-        public async Task<DataTable> ToOffsetDataTablePageAsync(int pageNumber, int pageSize, RefAsync<int> totalNumber)
+        public virtual async Task<DataTable> ToOffsetDataTablePageAsync(int pageNumber, int pageSize, RefAsync<int> totalNumber)
         {
             if (this.Context.CurrentConnectionConfig.DbType != DbType.SqlServer)
             {
@@ -373,12 +373,12 @@ namespace ThingsGateway.SqlSugar
                 return await Clone().ToDataTableAsync().ConfigureAwait(false);
             }
         }
-        public async Task<DataTable> ToOffsetDataTableByEntityPageAsync(int pageNumber, int pageSize, RefAsync<int> totalNumber)
+        public virtual async Task<DataTable> ToOffsetDataTableByEntityPageAsync(int pageNumber, int pageSize, RefAsync<int> totalNumber)
         {
             return this.Context.Utilities.ListToDataTable(await ToOffsetPageAsync(pageNumber, pageSize, totalNumber).ConfigureAwait(false));
         }
 
-        public async Task<DataTable> ToDataTableAsync()
+        public virtual async Task<DataTable> ToDataTableAsync()
         {
             QueryBuilder.ResultType = typeof(SugarCacheDataTable);
             InitMapping();
@@ -401,14 +401,14 @@ namespace ThingsGateway.SqlSugar
             pageIndex = _PageList(pageIndex, pageSize);
             return ToDataTableAsync();
         }
-        public async Task<DataTable> ToDataTablePageAsync(int pageIndex, int pageSize, RefAsync<int> totalNumber)
+        public virtual async Task<DataTable> ToDataTablePageAsync(int pageIndex, int pageSize, RefAsync<int> totalNumber)
         {
             var oldMapping = this.Context.MappingTables;
             totalNumber.Value = await Clone().CountAsync().ConfigureAwait(false);
             this.Context.MappingTables = oldMapping;
             return await Clone().ToDataTablePageAsync(pageIndex, pageSize).ConfigureAwait(false);
         }
-        public async Task<DataTable> ToDataTableByEntityPageAsync(int pageNumber, int pageSize, RefAsync<int> totalNumber)
+        public virtual async Task<DataTable> ToDataTableByEntityPageAsync(int pageNumber, int pageSize, RefAsync<int> totalNumber)
         {
             var list = await ToPageListAsync(pageNumber, pageSize, totalNumber).ConfigureAwait(false);
             return this.Context.Utilities.ListToDataTable(list);
@@ -423,13 +423,13 @@ namespace ThingsGateway.SqlSugar
             this.Context.Ado.CancellationToken = token;
             return ToOffsetPageAsync(pageNumber, pageSize, totalNumber, totalPage);
         }
-        public async Task<List<T>> ToOffsetPageAsync(int pageNumber, int pageSize, RefAsync<int> totalNumber, RefAsync<int> totalPage)
+        public virtual async Task<List<T>> ToOffsetPageAsync(int pageNumber, int pageSize, RefAsync<int> totalNumber, RefAsync<int> totalPage)
         {
             var result = await ToOffsetPageAsync(pageNumber, pageSize, totalNumber).ConfigureAwait(false);
             totalPage.Value = (totalNumber.Value + pageSize - 1) / pageSize;
             return result;
         }
-        public async Task<List<T>> ToOffsetPageAsync(int pageIndex, int pageSize, RefAsync<int> totalNumber)
+        public virtual async Task<List<T>> ToOffsetPageAsync(int pageIndex, int pageSize, RefAsync<int> totalNumber)
         {
             if (this.Context.CurrentConnectionConfig.DbType != DbType.SqlServer)
             {
@@ -502,7 +502,7 @@ namespace ThingsGateway.SqlSugar
             totalNumber.Value = count;
         }
 
-        public async Task<List<T>> SetContextAsync<ParameterT>(Expression<Func<T, object>> thisField1, Expression<Func<object>> mappingField1,
+        public virtual async Task<List<T>> SetContextAsync<ParameterT>(Expression<Func<T, object>> thisField1, Expression<Func<object>> mappingField1,
 Expression<Func<T, object>> thisField2, Expression<Func<object>> mappingField2,
 ParameterT parameter)
         {
@@ -550,7 +550,7 @@ ParameterT parameter)
             var newResult = fieldsHelper.GetSetList(obj, listObj, mappings).Select(it => (T)it).ToList();
             return newResult;
         }
-        public async Task<List<T>> SetContextAsync<ParameterT>(Expression<Func<T, object>> thisField, Expression<Func<object>> mappingField, ParameterT parameter)
+        public virtual async Task<List<T>> SetContextAsync<ParameterT>(Expression<Func<T, object>> thisField, Expression<Func<object>> mappingField, ParameterT parameter)
         {
             List<T> result = new List<T>();
             var entity = this.Context.EntityMaintenance.GetEntityInfo<ParameterT>();
@@ -596,11 +596,11 @@ ParameterT parameter)
             result = result.Where(it => it.GetType().GetProperty(name).GetValue(it).ObjToString() == pkValue.ObjToString()).ToList();
             return result;
         }
-        public async Task<Dictionary<string, ValueType>> ToDictionaryAsync<ValueType>(Expression<Func<T, object>> key, Expression<Func<T, object>> value)
+        public virtual async Task<Dictionary<string, ValueType>> ToDictionaryAsync<ValueType>(Expression<Func<T, object>> key, Expression<Func<T, object>> value)
         {
             return (await ToDictionaryAsync(key, value).ConfigureAwait(false)).ToDictionary(it => it.Key, it => (ValueType)UtilMethods.ChangeType2(it.Value, typeof(ValueType)));
         }
-        public async Task<Dictionary<string, object>> ToDictionaryAsync(Expression<Func<T, object>> key, Expression<Func<T, object>> value)
+        public virtual async Task<Dictionary<string, object>> ToDictionaryAsync(Expression<Func<T, object>> key, Expression<Func<T, object>> value)
         {
             if (this.QueryBuilder.IsSingle() == false && (this.QueryBuilder.AsTables == null || this.QueryBuilder.AsTables.Count == 0))
             {
@@ -622,7 +622,7 @@ ParameterT parameter)
                 return result;
             }
         }
-        public async Task<List<T>> ToTreeAsync(string childPropertyName, string parentIdPropertyName, object rootValue, string primaryKeyPropertyName)
+        public virtual async Task<List<T>> ToTreeAsync(string childPropertyName, string parentIdPropertyName, object rootValue, string primaryKeyPropertyName)
         {
             var entity = this.Context.EntityMaintenance.GetEntityInfo<T>();
             var pk = primaryKeyPropertyName;
@@ -631,31 +631,31 @@ ParameterT parameter)
             Expression<Func<T, object>> parentIdExpression = (Expression<Func<T, object>>)ExpressionBuilderHelper.CreateExpressionSelectFieldObject(typeof(T), parentIdPropertyName);
             return GetTreeRoot(childListExpression, parentIdExpression, pk, list, rootValue) ?? new List<T>();
         }
-        public async Task<List<T>> ToTreeAsync(Expression<Func<T, IEnumerable<object>>> childListExpression, Expression<Func<T, object>> parentIdExpression, object rootValue, object[] childIds)
+        public virtual async Task<List<T>> ToTreeAsync(Expression<Func<T, IEnumerable<object>>> childListExpression, Expression<Func<T, object>> parentIdExpression, object rootValue, object[] childIds)
         {
             var list = await ToListAsync().ConfigureAwait(false);
             return TreeAndFilterIds(childListExpression, parentIdExpression, rootValue, childIds, ref list) ?? new List<T>();
         }
-        public async Task<List<T>> ToTreeAsync(Expression<Func<T, IEnumerable<object>>> childListExpression, Expression<Func<T, object>> parentIdExpression, object rootValue, object[] childIds, Expression<Func<T, object>> primaryKeyExpression)
+        public virtual async Task<List<T>> ToTreeAsync(Expression<Func<T, IEnumerable<object>>> childListExpression, Expression<Func<T, object>> parentIdExpression, object rootValue, object[] childIds, Expression<Func<T, object>> primaryKeyExpression)
         {
             var list = await ToListAsync().ConfigureAwait(false);
             return TreeAndFilterIds(childListExpression, parentIdExpression, primaryKeyExpression, rootValue, childIds, ref list) ?? new List<T>();
         }
-        public async Task<List<T>> ToTreeAsync(Expression<Func<T, IEnumerable<object>>> childListExpression, Expression<Func<T, object>> parentIdExpression, object rootValue)
+        public virtual async Task<List<T>> ToTreeAsync(Expression<Func<T, IEnumerable<object>>> childListExpression, Expression<Func<T, object>> parentIdExpression, object rootValue)
         {
             var entity = this.Context.EntityMaintenance.GetEntityInfo<T>();
             var pk = GetTreeKey(entity); ;
             var list = await ToListAsync().ConfigureAwait(false);
             return GetTreeRoot(childListExpression, parentIdExpression, pk, list, rootValue) ?? new List<T>();
         }
-        public async Task<List<T>> ToTreeAsync(Expression<Func<T, IEnumerable<object>>> childListExpression, Expression<Func<T, object>> parentIdExpression, object rootValue, Expression<Func<T, object>> primaryKeyExpression)
+        public virtual async Task<List<T>> ToTreeAsync(Expression<Func<T, IEnumerable<object>>> childListExpression, Expression<Func<T, object>> parentIdExpression, object rootValue, Expression<Func<T, object>> primaryKeyExpression)
         {
             var entity = this.Context.EntityMaintenance.GetEntityInfo<T>();
             var pk = ExpressionTool.GetMemberName(primaryKeyExpression); ;
             var list = await ToListAsync().ConfigureAwait(false);
             return GetTreeRoot(childListExpression, parentIdExpression, pk, list, rootValue) ?? new List<T>();
         }
-        public async Task<List<T>> ToParentListAsync(Expression<Func<T, object>> parentIdExpression, object primaryKeyValue)
+        public virtual async Task<List<T>> ToParentListAsync(Expression<Func<T, object>> parentIdExpression, object primaryKeyValue)
         {
             List<T> result = new List<T>() { };
             var entity = this.Context.EntityMaintenance.GetEntityInfo<T>();
@@ -697,7 +697,7 @@ ParameterT parameter)
             }
             return result;
         }
-        public async Task<List<T>> ToParentListAsync(Expression<Func<T, object>> parentIdExpression, object primaryKeyValue, Expression<Func<T, bool>> parentWhereExpression)
+        public virtual async Task<List<T>> ToParentListAsync(Expression<Func<T, object>> parentIdExpression, object primaryKeyValue, Expression<Func<T, bool>> parentWhereExpression)
         {
             List<T> result = new List<T>() { };
             var entity = this.Context.EntityMaintenance.GetEntityInfo<T>();
@@ -739,7 +739,7 @@ ParameterT parameter)
             }
             return result;
         }
-        public async Task<List<T>> ToChildListAsync(Expression<Func<T, object>> parentIdExpression, object primaryKeyValue, bool isContainOneself = true)
+        public virtual async Task<List<T>> ToChildListAsync(Expression<Func<T, object>> parentIdExpression, object primaryKeyValue, bool isContainOneself = true)
         {
             var entity = this.Context.EntityMaintenance.GetEntityInfo<T>();
             var pk = GetTreeKey(entity);
@@ -747,7 +747,7 @@ ParameterT parameter)
             return GetChildList(parentIdExpression, pk, list, primaryKeyValue, isContainOneself);
         }
 
-        public async Task<List<T>> ToChildListAsync(Expression<Func<T, object>> parentIdExpression, object[] primaryKeyValues, bool isContainOneself = true)
+        public virtual async Task<List<T>> ToChildListAsync(Expression<Func<T, object>> parentIdExpression, object[] primaryKeyValues, bool isContainOneself = true)
         {
             var entity = this.Context.EntityMaintenance.GetEntityInfo<T>();
             var pk = GetTreeKey(entity);
@@ -773,7 +773,7 @@ ParameterT parameter)
             var name = this.SqlBuilder.GetTranslationTableName(entityInfo.DbTableName);
             return IntoTableAsync(TableEntityType, name, cancellationToken);
         }
-        public async Task<int> IntoTableAsync(Type TableEntityType, string TableName, CancellationToken cancellationToken = default)
+        public virtual async Task<int> IntoTableAsync(Type TableEntityType, string TableName, CancellationToken cancellationToken = default)
         {
             this.Context.Ado.CancellationToken = cancellationToken;
             KeyValuePair<string, List<SugarParameter>> sqlInfo;

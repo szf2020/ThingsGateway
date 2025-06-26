@@ -1,14 +1,25 @@
 ﻿using System.Data;
 using System.Data.Common;
-namespace ThingsGateway.SqlSugar.TDengine
+
+using TDengineAdo;
+
+namespace ThingsGateway.SqlSugar
 {
+    /// <summary>
+    /// TDengine 数据提供程序
+    /// </summary>
     public partial class TDengineProvider : AdoProvider
     {
+        /// <summary>
+        /// 构造函数
+        /// </summary>
         public TDengineProvider()
         {
-
-
         }
+
+        /// <summary>
+        /// 获取或设置数据库连接
+        /// </summary>
         public override IDbConnection Connection
         {
             get
@@ -18,13 +29,11 @@ namespace ThingsGateway.SqlSugar.TDengine
                     try
                     {
                         var TDengineConnectionString = base.Context.CurrentConnectionConfig.ConnectionString;
-                        //TDengineConnectionString = Regex.Replace(TDengineConnectionString, @"\;db\=", ";Database=", RegexOptions.IgnoreCase);
                         base._DbConnection = new TDengineConnection(TDengineConnectionString);
                     }
                     catch (Exception)
                     {
                         throw;
-
                     }
                 }
                 return base._DbConnection;
@@ -34,37 +43,51 @@ namespace ThingsGateway.SqlSugar.TDengine
                 base._DbConnection = value;
             }
         }
+
+        /// <summary>
+        /// 开始事务
+        /// </summary>
         public override void BeginTran()
         {
-
         }
 
+        /// <summary>
+        /// 使用指定事务名称开始事务
+        /// </summary>
+        /// <param name="transactionName">事务名称</param>
         public override void BeginTran(string transactionName)
         {
-
         }
+
         /// <summary>
-        /// Only SqlServer
+        /// 使用指定隔离级别和事务名称开始事务
         /// </summary>
-        /// <param name="iso"></param>
-        /// <param name="transactionName"></param>
+        /// <param name="iso">隔离级别</param>
+        /// <param name="transactionName">事务名称</param>
         public override void BeginTran(IsolationLevel iso, string transactionName)
         {
-
         }
+
+        /// <summary>
+        /// 获取数据适配器
+        /// </summary>
+        /// <returns>数据适配器</returns>
         public override IDataAdapter GetAdapter()
         {
-            return new SqlSugar.TDengineCore.TDengineDataAdapter();
+            return new TDengineDataAdapter();
         }
+
+        /// <summary>
+        /// 获取数据库命令
+        /// </summary>
+        /// <param name="sql">SQL语句</param>
+        /// <param name="parameters">参数数组</param>
+        /// <returns>数据库命令</returns>
         public override DbCommand GetCommand(string sql, SugarParameter[] parameters)
         {
             TDengineCommand sqlCommand = new TDengineCommand(sql, (TDengineConnection)this.Connection);
             sqlCommand.CommandType = this.CommandType;
             sqlCommand.CommandTimeout = this.CommandTimeOut;
-            //if (this.Transaction != null)
-            //{
-            //    sqlCommand.Transaction = (TDengineTransaction)this.Transaction;
-            //}
             if (parameters.HasValue())
             {
                 IDataParameter[] ipars = ToIDbDataParameter(parameters);
@@ -73,18 +96,32 @@ namespace ThingsGateway.SqlSugar.TDengine
             CheckConnection();
             return sqlCommand;
         }
+
+        /// <summary>
+        /// 设置命令到适配器
+        /// </summary>
+        /// <param name="dataAdapter">数据适配器</param>
+        /// <param name="command">数据库命令</param>
         public override void SetCommandToAdapter(IDataAdapter dataAdapter, DbCommand command)
         {
-            ((SqlSugar.TDengineCore.TDengineDataAdapter)dataAdapter).SelectCommand = (TDengineCommand)command;
+            ((TDengineDataAdapter)dataAdapter).SelectCommand = (TDengineCommand)command;
         }
-        public static bool _IsIsNanosecond { get; set; }
-        public static bool _IsMicrosecond { get; set; }
+
         /// <summary>
-        /// if mysql return MySqlParameter[] pars
-        /// if sqlerver return SqlParameter[] pars ...
+        /// 是否使用纳秒精度
         /// </summary>
-        /// <param name="parameters"></param>
-        /// <returns></returns>
+        public static bool _IsIsNanosecond { get; set; }
+
+        /// <summary>
+        /// 是否使用微秒精度
+        /// </summary>
+        public static bool _IsMicrosecond { get; set; }
+
+        /// <summary>
+        /// 将SugarParameter数组转换为IDataParameter数组
+        /// </summary>
+        /// <param name="parameters">SugarParameter参数数组</param>
+        /// <returns>IDataParameter参数数组</returns>
         public override IDataParameter[] ToIDbDataParameter(params SugarParameter[] parameters)
         {
             if (parameters == null || parameters.Length == 0) return null;
@@ -116,6 +153,5 @@ namespace ThingsGateway.SqlSugar.TDengine
             }
             return result;
         }
-
     }
 }

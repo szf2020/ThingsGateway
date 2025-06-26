@@ -5,18 +5,35 @@ using ThingsGateway.SqlSugar.DbConvert;
 
 namespace ThingsGateway.SqlSugar
 {
+    /// <summary>
+    /// 实体维护类，用于管理实体信息和数据库表结构的映射关系
+    /// </summary>
     public class EntityMaintenance
     {
+        /// <summary>
+        /// SqlSugar提供者实例
+        /// </summary>
         public SqlSugarProvider Context { get; set; }
 
+        /// <summary>
+        /// 获取泛型类型的实体信息
+        /// </summary>
         public EntityInfo GetEntityInfo<T>()
         {
             return GetEntityInfo(typeof(T));
         }
+
+        /// <summary>
+        /// 获取带有特性的类型实体信息
+        /// </summary>
         public EntityInfo GetEntityInfoWithAttr(Type type)
         {
             return GetEntityInfo(type);
         }
+
+        /// <summary>
+        /// 获取类型的实体信息
+        /// </summary>
         public EntityInfo GetEntityInfo(Type type)
         {
             var attr = type?.GetCustomAttribute<TenantAttribute>();
@@ -42,6 +59,9 @@ namespace ThingsGateway.SqlSugar
             }
         }
 
+        /// <summary>
+        /// 私有方法：获取实体信息（带缓存）
+        /// </summary>
         private EntityInfo _GetEntityInfo(Type type)
         {
             string cacheKey = "GetEntityInfo" + type.GetHashCode() + type.FullName + this.Context?.CurrentConnectionConfig?.ConfigId;
@@ -52,6 +72,9 @@ namespace ThingsGateway.SqlSugar
             });
         }
 
+        /// <summary>
+        /// 获取无缓存的实体信息
+        /// </summary>
         public EntityInfo GetEntityInfoNoCache(Type type)
         {
             EntityInfo result = new EntityInfo();
@@ -87,10 +110,17 @@ namespace ThingsGateway.SqlSugar
             return result;
         }
 
+        /// <summary>
+        /// 获取泛型类型的表名
+        /// </summary>
         public string GetTableName<T>()
         {
             return GetTableName(typeof(T));
         }
+
+        /// <summary>
+        /// 获取实体类型的表名
+        /// </summary>
         public string GetTableName(Type entityType)
         {
             var typeName = entityType.Name;
@@ -106,6 +136,10 @@ namespace ThingsGateway.SqlSugar
                 return mappingInfo == null ? typeName : mappingInfo.DbTableName;
             }
         }
+
+        /// <summary>
+        /// 通过实体名称获取表名
+        /// </summary>
         public string GetTableName(string entityName)
         {
             var typeName = entityName;
@@ -116,6 +150,10 @@ namespace ThingsGateway.SqlSugar
                 return mappingInfo == null ? typeName : mappingInfo.DbTableName;
             }
         }
+
+        /// <summary>
+        /// 通过表名获取实体名称
+        /// </summary>
         public string GetEntityName(string tableName)
         {
             if (this.Context.MappingTables == null || this.Context.MappingTables.Count == 0) return tableName;
@@ -125,18 +163,34 @@ namespace ThingsGateway.SqlSugar
                 return mappingInfo == null ? tableName : mappingInfo.EntityName;
             }
         }
+
+        /// <summary>
+        /// 获取泛型类型的实体名称
+        /// </summary>
         public string GetEntityName<T>()
         {
             return this.Context.EntityMaintenance.GetEntityInfo<T>().EntityName;
         }
+
+        /// <summary>
+        /// 获取类型的实体名称
+        /// </summary>
         public string GetEntityName(Type type)
         {
             return this.Context.EntityMaintenance.GetEntityInfo(type).EntityName;
         }
+
+        /// <summary>
+        /// 获取泛型类型属性的数据库列名
+        /// </summary>
         public string GetDbColumnName<T>(string propertyName)
         {
             return GetDbColumnName(propertyName, typeof(T));
         }
+
+        /// <summary>
+        /// 获取类型属性的数据库列名
+        /// </summary>
         public string GetDbColumnName(string propertyName, Type entityType)
         {
             var isAny = this.GetEntityInfo(entityType).Columns.Any(it => it.PropertyName.Equals(propertyName, StringComparison.CurrentCultureIgnoreCase));
@@ -154,6 +208,10 @@ namespace ThingsGateway.SqlSugar
                 return mappingInfo == null ? propertyName : mappingInfo.DbColumnName;
             }
         }
+
+        /// <summary>
+        /// 获取泛型类型数据库列名对应的属性名
+        /// </summary>
         public string GetPropertyName<T>(string dbColumnName)
         {
             var columnInfo = this.Context.EntityMaintenance.GetEntityInfo<T>().Columns.FirstOrDefault(it => it.DbColumnName.EqualCase(dbColumnName));
@@ -169,6 +227,10 @@ namespace ThingsGateway.SqlSugar
                 return mappingInfo == null ? dbColumnName : mappingInfo.PropertyName;
             }
         }
+
+        /// <summary>
+        /// 获取类型数据库列名对应的属性名
+        /// </summary>
         public string GetPropertyName(string dbColumnName, Type entityType)
         {
             var columnInfo = this.Context.EntityMaintenance.GetEntityInfo(entityType).Columns.FirstOrDefault(it => it.DbColumnName.EqualCase(dbColumnName));
@@ -184,23 +246,23 @@ namespace ThingsGateway.SqlSugar
                 return mappingInfo == null ? dbColumnName : mappingInfo.PropertyName;
             }
         }
+
+        /// <summary>
+        /// 获取泛型类型数据库列名对应的属性信息
+        /// </summary>
         public PropertyInfo GetProperty<T>(string dbColumnName)
         {
             var propertyName = GetPropertyName<T>(dbColumnName);
             return typeof(T).GetProperties().First(it => it.Name == propertyName);
         }
+
         /// <summary>
-        /// Gets the text contents of this XML element node
+        /// 获取XML元素节点的文本内容
         /// </summary>
-        /// <param name="entityType">entity type</param>
-        /// <param name="nodeAttributeName">The value of the name attribute of the XML node</param>
-        /// <returns>the text contents of this XML element node</returns>
         public string GetXElementNodeValue(Type entityType, string nodeAttributeName)
         {
-
             try
             {
-
                 if (this.Context.CurrentConnectionConfig?.MoreSettings?.IsNoReadXmlDescription ?? true == true)
                 {
                     return string.Empty;
@@ -224,7 +286,7 @@ namespace ThingsGateway.SqlSugar
                 {
                     return string.Empty;
                 }
-                XElement xe = new ReflectionInoCacheService().GetOrCreate("EntityXml_" + xmlPath, () => XElement.Load(xmlPath));
+                XElement xe = ReflectionInoCacheService.Instance.GetOrCreate("EntityXml_" + xmlPath, () => XElement.Load(xmlPath));
                 if (xe == null)
                 {
                     return string.Empty;
@@ -247,7 +309,6 @@ namespace ThingsGateway.SqlSugar
                     else
                         return summaryValue.ToSqlFilter().Trim() ?? "";
                 }
-
             }
             catch
             {
@@ -255,11 +316,10 @@ namespace ThingsGateway.SqlSugar
                 throw;
             }
         }
+
         /// <summary>
-        /// Gets the code annotation for the database table
+        /// 获取数据库表的代码注释
         /// </summary>
-        /// <param name="entityType">entity type</param>
-        /// <returns>the code annotation for the database table</returns>
         public string GetTableAnnotation(Type entityType)
         {
             if (entityType.IsClass() == false)
@@ -276,12 +336,10 @@ namespace ThingsGateway.SqlSugar
                 return result;
             }
         }
+
         /// <summary>
-        /// Gets the code annotation for the field
+        /// 获取字段的代码注释
         /// </summary>
-        /// <param name="entityType">entity type</param>
-        /// <param name="dbColumnName">column name</param>
-        /// <returns>the code annotation for the field</returns>
         public string GetPropertyAnnotation(Type entityType, string dbColumnName)
         {
             if (entityType.IsClass() == false || entityType == typeof(object))
@@ -300,14 +358,15 @@ namespace ThingsGateway.SqlSugar
             }
         }
 
-        #region Primary key
+        #region 主键相关
+        /// <summary>
+        /// 设置实体列信息
+        /// </summary>
         private void SetColumns(EntityInfo result)
         {
             foreach (var property in result.Type.GetProperties())
             {
                 EntityColumnInfo column = new EntityColumnInfo();
-                //var isVirtual = property.GetGetMethod().IsVirtual;
-                //if (isVirtual) continue;
                 var navigat = property.GetCustomAttribute(typeof(Navigate));
                 if (navigat != null)
                 {
@@ -334,7 +393,6 @@ namespace ThingsGateway.SqlSugar
                 }
                 else
                 {
-
                     if (sugarColumn.IsIgnore == false)
                     {
                         column.DbColumnName = sugarColumn.ColumnName.IsNullOrEmpty() ? property.Name : sugarColumn.ColumnName;
@@ -461,6 +519,9 @@ namespace ThingsGateway.SqlSugar
             }
         }
 
+        /// <summary>
+        /// 设置值对象列信息
+        /// </summary>
         private void SetValueObjectColumns(EntityInfo result, PropertyInfo property, EntityColumnInfo column)
         {
             column.IsIgnore = true;

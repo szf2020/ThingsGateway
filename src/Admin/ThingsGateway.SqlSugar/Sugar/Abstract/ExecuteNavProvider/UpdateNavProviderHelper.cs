@@ -4,11 +4,19 @@ namespace ThingsGateway.SqlSugar
 {
     public partial class UpdateNavProvider<Root, T> where T : class, new() where Root : class, new()
     {
-
+        /// <summary>
+        /// 检查是否为默认值
+        /// </summary>
+        /// <param name="pvValue">要检查的值</param>
+        /// <returns>是否为默认值</returns>
         private static bool IsDefaultValue(object pvValue)
         {
             return pvValue?.Equals(UtilMethods.GetDefaultValue(pvValue.GetType())) != false;
         }
+
+        /// <summary>
+        /// 初始化父实体列表
+        /// </summary>
         private void InitParentList()
         {
             if (_RootList == null)
@@ -24,6 +32,11 @@ namespace ThingsGateway.SqlSugar
             }
         }
 
+        /// <summary>
+        /// 获取结果提供者
+        /// </summary>
+        /// <typeparam name="TChild">子实体类型</typeparam>
+        /// <returns>更新导航提供者</returns>
         private UpdateNavProvider<Root, TChild> GetResult<TChild>() where TChild : class, new()
         {
             return new UpdateNavProvider<Root, TChild>()
@@ -37,7 +50,11 @@ namespace ThingsGateway.SqlSugar
             };
         }
 
-
+        /// <summary>
+        /// 插入带自增主键的实体
+        /// </summary>
+        /// <typeparam name="Type">实体类型</typeparam>
+        /// <param name="datas">实体列表</param>
         private void InsertIdentity<Type>(List<Type> datas) where Type : class, new()
         {
             foreach (var item in datas)
@@ -46,6 +63,12 @@ namespace ThingsGateway.SqlSugar
             }
         }
 
+        /// <summary>
+        /// 根据导航属性获取主键列
+        /// </summary>
+        /// <param name="entity">实体信息</param>
+        /// <param name="nav">导航列信息</param>
+        /// <returns>主键列信息</returns>
         private EntityColumnInfo GetPkColumnByNav(EntityInfo entity, EntityColumnInfo nav)
         {
             var pkColumn = entity.Columns.FirstOrDefault(it => it.IsPrimarykey == true);
@@ -55,16 +78,38 @@ namespace ThingsGateway.SqlSugar
             }
             return pkColumn;
         }
+
+        /// <summary>
+        /// 根据导航属性获取主键列(简化版)
+        /// </summary>
+        /// <param name="entity">实体信息</param>
+        /// <param name="nav">导航列信息</param>
+        /// <returns>主键列信息</returns>
         private EntityColumnInfo GetPkColumnByNav2(EntityInfo entity, EntityColumnInfo nav)
         {
             var pkColumn = entity.Columns.FirstOrDefault(it => it.IsPrimarykey == true);
             return pkColumn;
         }
+
+        /// <summary>
+        /// 根据导航属性获取外键列
+        /// </summary>
+        /// <param name="entity">实体信息</param>
+        /// <param name="nav">导航列信息</param>
+        /// <returns>外键列信息</returns>
         private EntityColumnInfo GetFKColumnByNav(EntityInfo entity, EntityColumnInfo nav)
         {
             var fkColumn = entity.Columns.FirstOrDefault(it => it.PropertyName == nav.Navigat.Name);
             return fkColumn;
         }
+
+        /// <summary>
+        /// 插入数据
+        /// </summary>
+        /// <typeparam name="TChild">子实体类型</typeparam>
+        /// <param name="children">子实体列表</param>
+        /// <param name="pkColumn">主键列信息</param>
+        /// <param name="NavColumn">导航列信息</param>
         private void InsertDatas<TChild>(List<TChild> children, EntityColumnInfo pkColumn, EntityColumnInfo NavColumn = null) where TChild : class, new()
         {
             children = children.Distinct().ToList();
@@ -78,7 +123,7 @@ namespace ThingsGateway.SqlSugar
                     whereName = newPkColumn.PropertyName;
                 }
             }
-; var x = this._Context.Storageable(children).WhereColumns(new string[] { whereName }).ToStorage();
+            var x = this._Context.Storageable(children).WhereColumns(new string[] { whereName }).ToStorage();
             var insertData = x.InsertList.Select(it => it.Item).ToList();
             var updateData = x.UpdateList.Select(it => it.Item).ToList();
             Check.ExceptionEasy(pkColumn == null && NavColumn == null, $"The entity is invalid", $"实体错误无法使用导航");
@@ -147,6 +192,12 @@ namespace ThingsGateway.SqlSugar
             }
         }
 
+        /// <summary>
+        /// 初始化数据
+        /// </summary>
+        /// <typeparam name="TChild">子实体类型</typeparam>
+        /// <param name="pkColumn">主键列信息</param>
+        /// <param name="UpdateData">要更新的数据列表</param>
         private void InitData<TChild>(EntityColumnInfo pkColumn, List<TChild> UpdateData) where TChild : class, new()
         {
             if (pkColumn.IsIdentity || pkColumn.OracleSequenceName.HasValue())
@@ -171,6 +222,13 @@ namespace ThingsGateway.SqlSugar
             }
         }
 
+        /// <summary>
+        /// 设置属性值
+        /// </summary>
+        /// <typeparam name="TChild">子实体类型</typeparam>
+        /// <param name="pkColumn">主键列信息</param>
+        /// <param name="UpdateData">要更新的数据列表</param>
+        /// <param name="value">值生成函数</param>
         private void SetValue<TChild>(EntityColumnInfo pkColumn, List<TChild> UpdateData, Func<object> value) where TChild : class, new()
         {
             foreach (var child in UpdateData)
@@ -182,6 +240,13 @@ namespace ThingsGateway.SqlSugar
             }
             this._Context.Insertable(UpdateData).ExecuteCommand();
         }
+
+        /// <summary>
+        /// 设置错误提示
+        /// </summary>
+        /// <typeparam name="TChild">子实体类型</typeparam>
+        /// <param name="pkColumn">主键列信息</param>
+        /// <param name="UpdateData">要更新的数据列表</param>
         private void SetError<TChild>(EntityColumnInfo pkColumn, List<TChild> UpdateData) where TChild : class, new()
         {
             foreach (var child in UpdateData)

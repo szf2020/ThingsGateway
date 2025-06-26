@@ -12,6 +12,8 @@
 using System.Reflection;
 using System.Text.Json;
 
+using ThingsGateway.Shapeless;
+
 namespace ThingsGateway.EventBus;
 
 /// <summary>
@@ -79,6 +81,10 @@ public abstract class EventHandlerContext
         else if (rawPayload is JsonElement jsonElement)
         {
             return JsonSerializer.Deserialize<T>(jsonElement.GetRawText(), JsonSerializerOptions);
+        }
+        else if (typeof(T) == typeof(Clay))
+        {
+            return (T)(object)Clay.Parse(Source.Payload);
         }
         else
         {

@@ -58,8 +58,6 @@ public sealed class HeaderAttribute : Attribute
     /// <remarks>该属性优先级低于 <see cref="AliasAs" /> 属性设置的值。</remarks>
     public string? Name { get; set; }
 
-
-
     /// <summary>
     ///     请求标头的值
     /// </summary>

@@ -5,77 +5,230 @@ using System.Xml.Linq;
 
 namespace ThingsGateway.SqlSugar
 {
-    ///<summary>
-    /// ** description：IDataReader Entity Builder
-    /// ** author：sunkaixuan
-    /// ** date：2017/4/2
-    /// ** qq:610262374
+    /// <summary>
+    /// IDataReader实体构建器
     /// </summary>
+    /// <typeparam name="T">实体类型</typeparam>
     public partial class IDataReaderEntityBuilder<T>
     {
         #region Properies
+        /// <summary>
+        /// 读取器字段名集合
+        /// </summary>
         private HashSet<string> ReaderKeys { get; set; }
         #endregion
 
         #region Fields
+        /// <summary>
+        /// SqlSugar提供者实例
+        /// </summary>
         private SqlSugarProvider Context = null;
+        /// <summary>
+        /// 动态构建器实例
+        /// </summary>
         private IDataReaderEntityBuilder<T> DynamicBuilder;
+        /// <summary>
+        /// 数据记录器
+        /// </summary>
         private IDataRecord DataRecord;
+        /// <summary>
+        /// IsDBNull方法
+        /// </summary>
         private static readonly MethodInfo isDBNullMethod = typeof(IDataRecord).GetMethod("IsDBNull", new Type[] { typeof(int) });
+        /// <summary>
+        /// GetBoolean方法
+        /// </summary>
         private static readonly MethodInfo getBoolean = typeof(IDataRecord).GetMethod("GetBoolean", new Type[] { typeof(int) });
+        /// <summary>
+        /// GetByte方法
+        /// </summary>
         private static readonly MethodInfo getByte = typeof(IDataRecord).GetMethod("GetByte", new Type[] { typeof(int) });
+        /// <summary>
+        /// GetDateTime方法
+        /// </summary>
         private static readonly MethodInfo getDateTime = typeof(IDataRecord).GetMethod("GetDateTime", new Type[] { typeof(int) });
+        /// <summary>
+        /// GetDecimal方法
+        /// </summary>
         private static readonly MethodInfo getDecimal = typeof(IDataRecord).GetMethod("GetDecimal", new Type[] { typeof(int) });
+        /// <summary>
+        /// GetDouble方法
+        /// </summary>
         private static readonly MethodInfo getDouble = typeof(IDataRecord).GetMethod("GetDouble", new Type[] { typeof(int) });
+        /// <summary>
+        /// GetFloat方法
+        /// </summary>
         private static readonly MethodInfo getFloat = typeof(IDataRecord).GetMethod("GetFloat", new Type[] { typeof(int) });
+        /// <summary>
+        /// GetGuid方法
+        /// </summary>
         private static readonly MethodInfo getGuid = typeof(IDataRecord).GetMethod("GetGuid", new Type[] { typeof(int) });
+        /// <summary>
+        /// GetInt16方法
+        /// </summary>
         private static readonly MethodInfo getInt16 = typeof(IDataRecord).GetMethod("GetInt16", new Type[] { typeof(int) });
+        /// <summary>
+        /// GetInt32方法
+        /// </summary>
         private static readonly MethodInfo getInt32 = typeof(IDataRecord).GetMethod("GetInt32", new Type[] { typeof(int) });
+        /// <summary>
+        /// GetInt64方法
+        /// </summary>
         private static readonly MethodInfo getInt64 = typeof(IDataRecord).GetMethod("GetInt64", new Type[] { typeof(int) });
+        /// <summary>
+        /// GetString方法
+        /// </summary>
         private static readonly MethodInfo getString = typeof(IDataRecord).GetMethod("GetString", new Type[] { typeof(int) });
-        //private static readonly MethodInfo getConvertValueMethod = typeof(IDataRecordExtensions).GetMethod("GetConvertValue");
+        /// <summary>
+        /// Getdatetimeoffset方法
+        /// </summary>
         private static readonly MethodInfo getdatetimeoffset = typeof(IDataRecordExtensions).GetMethod("Getdatetimeoffset");
+        /// <summary>
+        /// GetdatetimeoffsetDate方法
+        /// </summary>
         private static readonly MethodInfo getdatetimeoffsetDate = typeof(IDataRecordExtensions).GetMethod("GetdatetimeoffsetDate");
+        /// <summary>
+        /// GetStringGuid方法
+        /// </summary>
         private static readonly MethodInfo getStringGuid = typeof(IDataRecordExtensions).GetMethod("GetStringGuid");
+        /// <summary>
+        /// GetXelement方法
+        /// </summary>
         private static readonly MethodInfo getXelement = typeof(IDataRecordExtensions).GetMethod("GetXelement");
+        /// <summary>
+        /// GetConvertStringGuid方法
+        /// </summary>
         private static readonly MethodInfo getConvertStringGuid = typeof(IDataRecordExtensions).GetMethod("GetConvertStringGuid");
+        /// <summary>
+        /// GetEnum方法
+        /// </summary>
         private static readonly MethodInfo getEnum = typeof(IDataRecordExtensions).GetMethod("GetEnum");
+        /// <summary>
+        /// GetConvertString方法
+        /// </summary>
         private static readonly MethodInfo getConvertString = typeof(IDataRecordExtensions).GetMethod("GetConvertString");
+        /// <summary>
+        /// GetConvertFloat方法
+        /// </summary>
         private static readonly MethodInfo getConvertFloat = typeof(IDataRecordExtensions).GetMethod("GetConvertFloat");
+        /// <summary>
+        /// GetConvertBoolean方法
+        /// </summary>
         private static readonly MethodInfo getConvertBoolean = typeof(IDataRecordExtensions).GetMethod("GetConvertBoolean");
+        /// <summary>
+        /// GetConvertByte方法
+        /// </summary>
         private static readonly MethodInfo getConvertByte = typeof(IDataRecordExtensions).GetMethod("GetConvertByte");
+        /// <summary>
+        /// GetConvertChar方法
+        /// </summary>
         private static readonly MethodInfo getConvertChar = typeof(IDataRecordExtensions).GetMethod("GetConvertChar");
+        /// <summary>
+        /// GetConvertDateTime方法
+        /// </summary>
         private static readonly MethodInfo getConvertDateTime = typeof(IDataRecordExtensions).GetMethod("GetConvertDateTime");
+        /// <summary>
+        /// GetConvertTime方法
+        /// </summary>
         private static readonly MethodInfo getConvertTime = typeof(IDataRecordExtensions).GetMethod("GetConvertTime");
+        /// <summary>
+        /// GetTime方法
+        /// </summary>
         private static readonly MethodInfo getTime = typeof(IDataRecordExtensions).GetMethod("GetTime");
+        /// <summary>
+        /// GetConvertDecimal方法
+        /// </summary>
         private static readonly MethodInfo getConvertDecimal = typeof(IDataRecordExtensions).GetMethod("GetConvertDecimal");
+        /// <summary>
+        /// GetConvertDouble方法
+        /// </summary>
         private static readonly MethodInfo getConvertDouble = typeof(IDataRecordExtensions).GetMethod("GetConvertDouble");
+        /// <summary>
+        /// GetConvertDoubleToFloat方法
+        /// </summary>
         private static readonly MethodInfo getConvertDoubleToFloat = typeof(IDataRecordExtensions).GetMethod("GetConvertDoubleToFloat");
+        /// <summary>
+        /// GetConvertGuid方法
+        /// </summary>
         private static readonly MethodInfo getConvertGuid = typeof(IDataRecordExtensions).GetMethod("GetConvertGuid");
+        /// <summary>
+        /// GetConvertInt16方法
+        /// </summary>
         private static readonly MethodInfo getConvertInt16 = typeof(IDataRecordExtensions).GetMethod("GetConvertInt16");
+        /// <summary>
+        /// GetConvertInt32方法
+        /// </summary>
         private static readonly MethodInfo getConvertInt32 = typeof(IDataRecordExtensions).GetMethod("GetConvertInt32");
+        /// <summary>
+        /// GetConvetInt64方法
+        /// </summary>
         private static readonly MethodInfo getConvertInt64 = typeof(IDataRecordExtensions).GetMethod("GetConvetInt64");
+        /// <summary>
+        /// GetConvertEnum_Null方法
+        /// </summary>
         private static readonly MethodInfo getConvertEnum_Null = typeof(IDataRecordExtensions).GetMethod("GetConvertEnum_Null");
+        /// <summary>
+        /// GetConvertdatetimeoffset方法
+        /// </summary>
         private static readonly MethodInfo getConvertdatetimeoffset = typeof(IDataRecordExtensions).GetMethod("GetConvertdatetimeoffset");
+        /// <summary>
+        /// GetConvertdatetimeoffsetDate方法
+        /// </summary>
         private static readonly MethodInfo getConvertdatetimeoffsetDate = typeof(IDataRecordExtensions).GetMethod("GetConvertdatetimeoffsetDate");
+        /// <summary>
+        /// GetOtherNull方法
+        /// </summary>
         private static readonly MethodInfo getOtherNull = typeof(IDataRecordExtensions).GetMethod("GetOtherNull");
+        /// <summary>
+        /// GetOther方法
+        /// </summary>
         private static readonly MethodInfo getOther = typeof(IDataRecordExtensions).GetMethod("GetOther");
+        /// <summary>
+        /// GetJson方法
+        /// </summary>
         private static readonly MethodInfo getJson = typeof(IDataRecordExtensions).GetMethod("GetJson");
+        /// <summary>
+        /// GetArray方法
+        /// </summary>
         private static readonly MethodInfo getArray = typeof(IDataRecordExtensions).GetMethod("GetArray");
+        /// <summary>
+        /// GetEntity方法
+        /// </summary>
         private static readonly MethodInfo getEntity = typeof(IDataRecordExtensions).GetMethod("GetEntity", new Type[] { typeof(SqlSugarProvider) });
+        /// <summary>
+        /// GetMyIntNull方法
+        /// </summary>
         private static readonly MethodInfo getMyIntNull = typeof(IDataRecordExtensions).GetMethod("GetMyIntNull");
+        /// <summary>
+        /// GetMyInt方法
+        /// </summary>
         private static readonly MethodInfo getMyInt = typeof(IDataRecordExtensions).GetMethod("GetMyInt");
 
+        /// <summary>
+        /// 加载委托
+        /// </summary>
         private delegate T Load(IDataRecord dataRecord);
+        /// <summary>
+        /// 处理程序
+        /// </summary>
         private Load handler;
         #endregion
 
         #region Constructor
+        /// <summary>
+        /// 私有构造函数
+        /// </summary>
         private IDataReaderEntityBuilder()
         {
 
         }
 
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        /// <param name="context">SqlSugar提供者</param>
+        /// <param name="dataRecord">数据记录器</param>
+        /// <param name="fieldNames">字段名列表</param>
         public IDataReaderEntityBuilder(SqlSugarProvider context, IDataRecord dataRecord, List<string> fieldNames)
         {
             this.Context = context;
@@ -86,11 +239,21 @@ namespace ThingsGateway.SqlSugar
         #endregion
 
         #region Public methods
+        /// <summary>
+        /// 构建实体
+        /// </summary>
+        /// <param name="dataRecord">数据记录器</param>
+        /// <returns>实体对象</returns>
         public T Build(IDataRecord dataRecord)
         {
             return handler(dataRecord);
         }
 
+        /// <summary>
+        /// 创建构建器
+        /// </summary>
+        /// <param name="type">实体类型</param>
+        /// <returns>构建器实例</returns>
         public IDataReaderEntityBuilder<T> CreateBuilder(Type type)
         {
             DynamicMethod method = new DynamicMethod("SqlSugarEntity", type,
@@ -160,6 +323,13 @@ namespace ThingsGateway.SqlSugar
         #endregion
 
         #region Private methods
+        /// <summary>
+        /// 绑定自定义函数
+        /// </summary>
+        /// <param name="generator">IL生成器</param>
+        /// <param name="result">本地变量</param>
+        /// <param name="columnInfo">列信息</param>
+        /// <param name="fieldName">字段名</param>
         private void BindCustomFunc(ILGenerator generator, LocalBuilder result, EntityColumnInfo columnInfo, string fieldName)
         {
             int i = DataRecord.GetOrdinal(fieldName);
@@ -169,18 +339,12 @@ namespace ThingsGateway.SqlSugar
             generator.Emit(OpCodes.Callvirt, isDBNullMethod);
             generator.Emit(OpCodes.Brtrue, endIfLabel);
             generator.Emit(OpCodes.Ldloc, result);
-            //generator.Emit(OpCodes.Ldarg_0);
-            //generator.Emit(OpCodes.Ldc_I4, i);
             var method = (columnInfo.SqlParameterDbType as Type).GetMethod("QueryConverter");
             method = method.MakeGenericMethod(new Type[] { columnInfo.PropertyInfo.PropertyType });
             Type type = (columnInfo.SqlParameterDbType as Type);
-            //ConstructorInfo info = type.GetConstructor(Type.EmptyTypes);
-            //il.Emit(OpCodes.Newobj, info);
             generator.Emit(OpCodes.Newobj, type.GetConstructor(Type.EmptyTypes));
             generator.Emit(OpCodes.Ldarg_0);
             generator.Emit(OpCodes.Ldc_I4, i);
-            //method = (columnInfo.SqlParameterDbType as Type).GetMethod("QueryConverter");
-            //method = method.MakeGenericMethod(new Type[] { columnInfo.PropertyInfo.PropertyType });
             if (method.IsVirtual)
                 generator.Emit(OpCodes.Callvirt, method);
             else
@@ -188,6 +352,14 @@ namespace ThingsGateway.SqlSugar
             generator.Emit(OpCodes.Callvirt, columnInfo.PropertyInfo.GetSetMethod(true));
             generator.MarkLabel(endIfLabel);
         }
+
+        /// <summary>
+        /// 绑定类类型
+        /// </summary>
+        /// <param name="generator">IL生成器</param>
+        /// <param name="result">本地变量</param>
+        /// <param name="columnInfo">列信息</param>
+        /// <param name="fieldName">字段名</param>
         private void BindClass(ILGenerator generator, LocalBuilder result, EntityColumnInfo columnInfo, string fieldName)
         {
 
@@ -209,6 +381,15 @@ namespace ThingsGateway.SqlSugar
                 generator.Emit(OpCodes.Ldloc, result);
                 generator.Emit(OpCodes.Ldarg_0);
                 generator.Emit(OpCodes.Ldc_I4, i);
+                var insertBuilder = InstanceFactory.GetInsertBuilder(this.Context?.CurrentConnectionConfig);
+                if (insertBuilder?.DeserializeObjectFunc != null)
+                {
+                    if (IDataRecordExtensions.DeserializeObjectFunc == null)
+                    {
+                        IDataRecordExtensions.DeserializeObjectFunc = insertBuilder.DeserializeObjectFunc;
+                    }
+                    jsonMethod = typeof(IDataRecordExtensions).GetMethod("GetDeserializeObject").MakeGenericMethod(columnInfo.PropertyInfo.PropertyType);
+                }
                 generator.Emit(OpCodes.Call, jsonMethod);
                 generator.Emit(OpCodes.Callvirt, columnInfo.PropertyInfo.GetSetMethod(true));
                 generator.MarkLabel(endIfLabel);
@@ -245,6 +426,14 @@ namespace ThingsGateway.SqlSugar
                 generator.MarkLabel(endIfLabel);
             }
         }
+
+        /// <summary>
+        /// 绑定字段
+        /// </summary>
+        /// <param name="generator">IL生成器</param>
+        /// <param name="result">本地变量</param>
+        /// <param name="columnInfo">列信息</param>
+        /// <param name="fieldName">字段名</param>
         private void BindField(ILGenerator generator, LocalBuilder result, EntityColumnInfo columnInfo, string fieldName)
         {
             if (columnInfo.SqlParameterDbType is Type)
@@ -279,6 +468,13 @@ namespace ThingsGateway.SqlSugar
             generator.EndExceptionBlock();
             //2023-3-8
         }
+
+        /// <summary>
+        /// 绑定方法
+        /// </summary>
+        /// <param name="generator">IL生成器</param>
+        /// <param name="columnInfo">列信息</param>
+        /// <param name="ordinal">序号</param>
         private void BindMethod(ILGenerator generator, EntityColumnInfo columnInfo, int ordinal)
         {
             IDbBind bind = Context.Ado.DbBind;
@@ -376,8 +572,6 @@ namespace ThingsGateway.SqlSugar
                         method = isNullableType ? getConvertInt16 : getInt16;
                     if (bindProperyTypeName == "uint32" && this.Context.CurrentConnectionConfig.DbType.IsIn(DbType.MySql, DbType.MySqlConnector))
                         method = null;
-                    //if (bindPropertyType == UtilConstants.IntType && this.Context.CurrentConnectionConfig.DbType == DbType.OceanBaseForOracle)
-                    //    method = isNullableType ? getMyIntNull : getMyInt;
                     if (bindProperyTypeName == "int16")
                         method = null;
                     break;
@@ -498,6 +692,13 @@ namespace ThingsGateway.SqlSugar
         }
 
 
+        /// <summary>
+        /// 检查类型
+        /// </summary>
+        /// <param name="invalidTypes">无效类型列表</param>
+        /// <param name="bindProperyTypeName">绑定属性类型名称</param>
+        /// <param name="validPropertyType">有效属性类型</param>
+        /// <param name="propertyName">属性名</param>
         private void CheckType(List<string> invalidTypes, string bindProperyTypeName, string validPropertyType, string propertyName)
         {
             var isAny = invalidTypes.Contains(bindProperyTypeName);

@@ -96,6 +96,10 @@ namespace ThingsGateway.SqlSugar
                     {
                         result.Type = NpgsqlDbType.Array | NpgsqlDbType.Bigint;
                     }
+                    else if (key == "_float8")
+                    {
+                        result.Type = NpgsqlDbType.Array | NpgsqlDbType.Double;
+                    }
                     else
                     {
                         var type = PgSqlType[key.Substring(1)];

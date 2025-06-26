@@ -3,25 +3,82 @@ using System.Text.RegularExpressions;
 
 namespace ThingsGateway.SqlSugar
 {
+    /// <summary>
+    /// 数据库优先提供者基类
+    /// </summary>
     public abstract partial class DbFirstProvider : IDbFirst
     {
+        /// <summary>
+        /// SqlSugar客户端实例
+        /// </summary>
         public virtual ISqlSugarClient Context { get; set; }
+        /// <summary>
+        /// 类模板
+        /// </summary>
         private string ClassTemplate { get; set; }
+        /// <summary>
+        /// 类描述模板
+        /// </summary>
         private string ClassDescriptionTemplate { get; set; }
+        /// <summary>
+        /// 属性模板
+        /// </summary>
         private string PropertyTemplate { get; set; }
+        /// <summary>
+        /// 属性描述模板
+        /// </summary>
         private string PropertyDescriptionTemplate { get; set; }
+        /// <summary>
+        /// 构造函数模板
+        /// </summary>
         private string ConstructorTemplate { get; set; }
+        /// <summary>
+        /// 命名空间模板
+        /// </summary>
         private string UsingTemplate { get; set; }
+        /// <summary>
+        /// 命名空间名称
+        /// </summary>
         private string Namespace { get; set; }
+        /// <summary>
+        /// 是否创建属性
+        /// </summary>
         private bool IsAttribute { get; set; }
+        /// <summary>
+        /// 是否创建默认值
+        /// </summary>
         private bool IsDefaultValue { get; set; }
+        /// <summary>
+        /// 列过滤条件函数
+        /// </summary>
         private Func<string, bool> WhereColumnsfunc;
+        /// <summary>
+        /// 文件名格式化函数
+        /// </summary>
         private Func<string, string> FormatFileNameFunc { get; set; }
+        /// <summary>
+        /// 类名格式化函数
+        /// </summary>
         private Func<string, string> FormatClassNameFunc { get; set; }
+        /// <summary>
+        /// 属性名格式化函数
+        /// </summary>
         private Func<string, string> FormatPropertyNameFunc { get; set; }
+        /// <summary>
+        /// 字符串是否可为空
+        /// </summary>
         private bool IsStringNullable { get; set; }
+        /// <summary>
+        /// 属性文本模板函数
+        /// </summary>
         private Func<DbColumnInfo, string, string, string> PropertyTextTemplateFunc { get; set; }
+        /// <summary>
+        /// 替换类字符串函数
+        /// </summary>
         private Func<string, string> ReplaceClassStringFunc { get; set; }
+        /// <summary>
+        /// SQL构建器
+        /// </summary>
         private ISqlBuilder SqlBuilder
         {
             get
@@ -29,8 +86,14 @@ namespace ThingsGateway.SqlSugar
                 return InstanceFactory.GetSqlbuilder(this.Context.CurrentConnectionConfig);
             }
         }
+        /// <summary>
+        /// 表信息列表
+        /// </summary>
         private List<DbTableInfo> TableInfoList { get; set; }
 
+        /// <summary>
+        /// 构造函数
+        /// </summary>
         public DbFirstProvider()
         {
             this.ClassTemplate = DbFirstTemplate.ClassTemplate;
@@ -41,6 +104,9 @@ namespace ThingsGateway.SqlSugar
             this.UsingTemplate = DbFirstTemplate.UsingTemplate;
         }
 
+        /// <summary>
+        /// 初始化方法
+        /// </summary>
         public void Init()
         {
             this.Context.Utilities.RemoveCacheAll();
@@ -57,51 +123,78 @@ namespace ThingsGateway.SqlSugar
         }
 
         #region Setting Template
+        /// <summary>
+        /// 设置字符串可为空
+        /// </summary>
         public IDbFirst StringNullable()
         {
             IsStringNullable = true;
             return this;
         }
+        /// <summary>
+        /// 设置类描述模板
+        /// </summary>
         public IDbFirst SettingClassDescriptionTemplate(Func<string, string> func)
         {
             this.ClassDescriptionTemplate = func(this.ClassDescriptionTemplate);
             return this;
         }
 
+        /// <summary>
+        /// 设置类模板
+        /// </summary>
         public IDbFirst SettingClassTemplate(Func<string, string> func)
         {
             this.ClassTemplate = func(this.ClassTemplate);
             return this;
         }
 
+        /// <summary>
+        /// 设置构造函数模板
+        /// </summary>
         public IDbFirst SettingConstructorTemplate(Func<string, string> func)
         {
             this.ConstructorTemplate = func(this.ConstructorTemplate);
             return this;
         }
 
+        /// <summary>
+        /// 设置属性描述模板
+        /// </summary>
         public IDbFirst SettingPropertyDescriptionTemplate(Func<string, string> func)
         {
             this.PropertyDescriptionTemplate = func(this.PropertyDescriptionTemplate);
             return this;
         }
 
+        /// <summary>
+        /// 设置命名空间模板
+        /// </summary>
         public IDbFirst SettingNamespaceTemplate(Func<string, string> func)
         {
             this.UsingTemplate = func(this.UsingTemplate);
             return this;
         }
 
+        /// <summary>
+        /// 设置属性模板
+        /// </summary>
         public IDbFirst SettingPropertyTemplate(Func<string, string> func)
         {
             this.PropertyTemplate = func(this.PropertyTemplate);
             return this;
         }
+        /// <summary>
+        /// 设置属性模板
+        /// </summary>
         public IDbFirst SettingPropertyTemplate(Func<DbColumnInfo, string, string, string> func)
         {
             this.PropertyTextTemplateFunc = func;
             return this;
         }
+        /// <summary>
+        /// 使用Razor分析
+        /// </summary>
         public RazorFirst UseRazorAnalysis(string razorClassTemplate, string classNamespace = "Models")
         {
             if (razorClassTemplate == null)
@@ -155,31 +248,49 @@ namespace ThingsGateway.SqlSugar
         #endregion
 
         #region Setting Content
+        /// <summary>
+        /// 设置是否创建属性
+        /// </summary>
         public IDbFirst IsCreateAttribute(bool isCreateAttribute = true)
         {
             this.IsAttribute = isCreateAttribute;
             return this;
         }
+        /// <summary>
+        /// 设置文件名格式化函数
+        /// </summary>
         public IDbFirst FormatFileName(Func<string, string> formatFileNameFunc)
         {
             this.FormatFileNameFunc = formatFileNameFunc;
             return this;
         }
+        /// <summary>
+        /// 设置类名格式化函数
+        /// </summary>
         public IDbFirst FormatClassName(Func<string, string> formatClassNameFunc)
         {
             this.FormatClassNameFunc = formatClassNameFunc;
             return this;
         }
+        /// <summary>
+        /// 设置属性名格式化函数
+        /// </summary>
         public IDbFirst FormatPropertyName(Func<string, string> formatPropertyNameFunc)
         {
             this.FormatPropertyNameFunc = formatPropertyNameFunc;
             return this;
         }
+        /// <summary>
+        /// 设置创建替换类字符串函数
+        /// </summary>
         public IDbFirst CreatedReplaceClassString(Func<string, string> replaceClassStringFunc)
         {
             this.ReplaceClassStringFunc = replaceClassStringFunc;
             return this;
         }
+        /// <summary>
+        /// 设置是否创建默认值
+        /// </summary>
         public IDbFirst IsCreateDefaultValue(bool isCreateDefaultValue = true)
         {
             this.IsDefaultValue = isCreateDefaultValue;
@@ -188,6 +299,9 @@ namespace ThingsGateway.SqlSugar
         #endregion
 
         #region Where
+        /// <summary>
+        /// 设置数据库对象类型过滤条件
+        /// </summary>
         public IDbFirst Where(DbObjectType dbObjectType)
         {
             if (dbObjectType != DbObjectType.All)
@@ -195,19 +309,27 @@ namespace ThingsGateway.SqlSugar
             return this;
         }
 
+        /// <summary>
+        /// 设置表名过滤条件
+        /// </summary>
         public IDbFirst Where(Func<string, bool> func)
         {
             this.TableInfoList = this.TableInfoList.Where(it => func(it.Name)).ToList();
             return this;
         }
 
+        /// <summary>
+        /// 设置列名过滤条件
+        /// </summary>
         public IDbFirst WhereColumns(Func<string, bool> func)
         {
             WhereColumnsfunc = func;
             return this;
         }
 
-
+        /// <summary>
+        /// 设置对象名过滤条件
+        /// </summary>
         public IDbFirst Where(params string[] objectNames)
         {
             if (objectNames.HasValue())
@@ -219,6 +341,9 @@ namespace ThingsGateway.SqlSugar
         #endregion
 
         #region Core
+        /// <summary>
+        /// 生成类字符串列表
+        /// </summary>
         public Dictionary<string, string> ToClassStringList(string nameSpace = "Models")
         {
             this.Namespace = nameSpace;
@@ -253,6 +378,9 @@ namespace ThingsGateway.SqlSugar
             return result;
         }
 
+        /// <summary>
+        /// 获取类字符串
+        /// </summary>
         internal string GetClassString(DbTableInfo tableInfo, ref string className)
         {
             var columns = this.Context.DbMaintenance.GetColumnInfosByTableName(tableInfo.Name, false);
@@ -349,6 +477,9 @@ namespace ThingsGateway.SqlSugar
             return classText.ToString();
         }
 
+        /// <summary>
+        /// 获取类字符串
+        /// </summary>
         internal string GetClassString(List<DbColumnInfo> columns, ref string className)
         {
             var classText = new StringBuilder(this.ClassTemplate);
@@ -388,6 +519,9 @@ namespace ThingsGateway.SqlSugar
             classText = classText.Replace(DbFirstTemplate.KeyPropertyName, null);
             return classText.ToString();
         }
+        /// <summary>
+        /// 创建类文件
+        /// </summary>
         public void CreateClassFile(string directoryPath, string nameSpace = "Models")
         {
             var seChar = Path.DirectorySeparatorChar.ToString();
@@ -410,6 +544,9 @@ namespace ThingsGateway.SqlSugar
         #endregion
 
         #region Private methods
+        /// <summary>
+        /// 获取属性类型默认值
+        /// </summary>
         private string GetProertypeDefaultValue(DbColumnInfo item)
         {
             var result = item.DefaultValue;
@@ -438,6 +575,9 @@ namespace ThingsGateway.SqlSugar
             result = result.IsIn("''", "\"\"") ? string.Empty : result;
             return result;
         }
+        /// <summary>
+        /// 获取属性文本
+        /// </summary>
         private string GetPropertyText(DbColumnInfo item, string PropertyText)
         {
             string SugarColumnText = "\r\n           [SugarColumn({0})]";
@@ -475,11 +615,17 @@ namespace ThingsGateway.SqlSugar
             }
             return PropertyText;
         }
+        /// <summary>
+        /// 获取实体名称
+        /// </summary>
         private string GetEnityName(DbColumnInfo item)
         {
             var mappingInfo = this.Context.MappingTables.FirstOrDefault(it => it.DbTableName.Equals(item.TableName, StringComparison.CurrentCultureIgnoreCase));
             return mappingInfo == null ? item.TableName : mappingInfo.EntityName;
         }
+        /// <summary>
+        /// 获取属性名称
+        /// </summary>
         private string GetPropertyName(DbColumnInfo item)
         {
             if (this.Context.MappingColumns.HasValue())
@@ -492,6 +638,9 @@ namespace ThingsGateway.SqlSugar
                 return item.DbColumnName;
             }
         }
+        /// <summary>
+        /// 获取属性类型名称
+        /// </summary>
         protected virtual string GetPropertyTypeName(DbColumnInfo item)
         {
             string result = item.PropertyType != null ? item.PropertyType.Name : this.Context.Ado.DbBind.GetPropertyTypeName(item.DataType);
@@ -549,6 +698,9 @@ namespace ThingsGateway.SqlSugar
             }
             return result;
         }
+        /// <summary>
+        /// 获取属性类型转换
+        /// </summary>
         private string GetPropertyTypeConvert(DbColumnInfo item)
         {
             var convertString = GetProertypeDefaultValue(item);
@@ -575,6 +727,9 @@ namespace ThingsGateway.SqlSugar
             }
             return result;
         }
+        /// <summary>
+        /// 获取属性描述文本
+        /// </summary>
         private string GetPropertyDescriptionText(DbColumnInfo item, string propertyDescriptionText)
         {
             propertyDescriptionText = propertyDescriptionText.Replace(DbFirstTemplate.KeyPropertyDescription, GetColumnDescription(item.ColumnDescription));
@@ -582,6 +737,9 @@ namespace ThingsGateway.SqlSugar
             propertyDescriptionText = propertyDescriptionText.Replace(DbFirstTemplate.KeyIsNullable, item.IsNullable.ObjToString());
             return propertyDescriptionText;
         }
+        /// <summary>
+        /// 获取列描述
+        /// </summary>
         private string GetColumnDescription(string columnDescription)
         {
             if (columnDescription == null) return columnDescription;

@@ -41,26 +41,7 @@ public static class ProcessHelper
         return pname;
     }
 
-    ///// <summary>根据名称获取进程。支持dotnet/java</summary>
-    ///// <param name="name"></param>
-    ///// <returns></returns>
-    //public static IEnumerable<Process> GetProcessByName(String name)
-    //{
-    //    // 跳过自己
-    //    var sid = Process.GetCurrentProcess().Id;
-    //    foreach (var p in Process.GetProcesses())
-    //    {
-    //        if (p.Id == sid) continue;
 
-    //        var pname = p.ProcessName;
-    //        if (pname == name)
-    //            yield return p;
-    //        else
-    //        {
-    //            if (GetProcessName2(p) == name) yield return p;
-    //        }
-    //    }
-    //}
 
     /// <summary>获取指定进程的命令行参数</summary>
     /// <param name="processId"></param>
@@ -206,13 +187,13 @@ public static class ProcessHelper
     {
         if (process?.GetHasExited() != false) return process;
 
-        //XTrace.WriteLine("安全，温柔一刀！PID={0}/{1}", process.Id, process.ProcessName);
-
+        // 杀进程，如果命令未成功则马上退出（后续强杀），否则循环检测并等待
         try
         {
             if (Runtime.Linux)
             {
-                Process.Start("kill", process.Id.ToString()).WaitForExit(msWait);
+                var p = Process.Start("kill", process.Id.ToString());
+                if (p.WaitForExit(msWait) && p.ExitCode != 0) return process;
 
                 for (var i = 0; i < times && !process.GetHasExited(); i++)
                 {
@@ -221,7 +202,8 @@ public static class ProcessHelper
             }
             else if (Runtime.Windows)
             {
-                Process.Start("taskkill", $"-pid {process.Id}").WaitForExit(msWait);
+                var p = Process.Start("taskkill", $"-pid {process.Id}");
+                if (p.WaitForExit(msWait) && p.ExitCode != 0) return process;
 
                 for (var i = 0; i < times && !process.GetHasExited(); i++)
                 {
@@ -229,7 +211,9 @@ public static class ProcessHelper
                 }
             }
         }
-        catch { }
+        catch
+        {
+        }
 
         //if (!process.GetHasExited()) process.Kill();
 
@@ -244,16 +228,22 @@ public static class ProcessHelper
     {
         if (process?.GetHasExited() != false) return process;
 
-        //XTrace.WriteLine("强杀，大力出奇迹！PID={0}/{1}", process.Id, process.ProcessName);
 
         // 终止指定的进程及启动的子进程,如nginx等
         // 在Core 3.0, Core 3.1, 5, 6, 7, 8, 9 中支持此重载
         // https://learn.microsoft.com/zh-cn/dotnet/api/system.diagnostics.process.kill?view=net-8.0#system-diagnostics-process-kill(system-boolean)
+        try
+        {
 #if NETCOREAPP
-        process.Kill(true);
+            process.Kill(true);
 #else
-        process.Kill();
+            process.Kill();
 #endif
+        }
+        catch
+        {
+        }
+
         if (process.GetHasExited()) return process;
 
         try
@@ -270,10 +260,26 @@ public static class ProcessHelper
                 Process.Start("taskkill", $"/t /f /pid {process.Id}").WaitForExit(msWait);
             }
         }
-        catch { }
+        catch
+        {
+
+        }
 
         // 兜底再来一次
-        if (!process.GetHasExited()) process.Kill();
+        if (!process.GetHasExited())
+        {
+            try
+            {
+#if NETCOREAPP
+                process.Kill(true);
+#else
+                process.Kill();
+#endif
+            }
+            catch
+            {
+            }
+        }
 
         return process;
     }
@@ -303,19 +309,30 @@ public static class ProcessHelper
     /// <param name="arguments">命令参数</param>
     /// <param name="msWait">等待毫秒数</param>
     /// <param name="output">进程输出内容。默认为空时输出到日志</param>
-    /// <param name="error">进程输出内容。默认为空时输出到日志</param>
+    /// <param name="onExit">进程退出时执行</param>
+    /// <param name="working">工作目录</param>
+    /// <returns>进程退出代码</returns>
+    public static Int32 Run(this String cmd, String? arguments = null, Int32 msWait = 0, Action<String?>? output = null, Action<Process>? onExit = null, String? working = null) => RunNew(cmd, arguments, msWait, output, Encoding.UTF8, onExit, working);
+
+    /// <summary>以隐藏窗口执行命令行</summary>
+    /// <param name="cmd">文件名</param>
+    /// <param name="arguments">命令参数</param>
+    /// <param name="msWait">等待毫秒数</param>
+    /// <param name="output">进程输出内容。默认为空时输出到日志</param>
     /// <param name="encoding">输出内容编码</param>
     /// <param name="onExit">进程退出时执行</param>
     /// <param name="working">工作目录</param>
     /// <returns>进程退出代码</returns>
-    public static Int32 RunNew(this String cmd, String? arguments = null, Int32 msWait = 0, Action<String?>? output = null, Action<String?>? error = null, Encoding? encoding = null, Action<Process>? onExit = null, String? working = null)
+    public static Int32 RunNew(this String cmd, String? arguments = null, Int32 msWait = 0, Action<String?>? output = null, Encoding? encoding = null, Action<Process>? onExit = null, String? working = null)
     {
         if (XTrace.Log.Level <= LogLevel.Debug) XTrace.WriteLine("Run {0} {1} {2}", cmd, arguments, msWait);
 
         // 修正文件路径
         var fileName = cmd;
         //if (!Path.IsPathRooted(fileName) && !working.IsNullOrEmpty()) fileName = working.CombinePath(fileName);
+
         encoding ??= Encoding.UTF8;
+
         using var p = new Process();
         var si = p.StartInfo;
         si.FileName = fileName;
@@ -334,17 +351,11 @@ public static class ProcessHelper
             if (output != null)
             {
                 p.OutputDataReceived += (s, e) => output(e.Data);
+                p.ErrorDataReceived += (s, e) => output(e.Data);
             }
             else
             {
                 p.OutputDataReceived += (s, e) => { if (e.Data != null) XTrace.WriteLine(e.Data); };
-            }
-            if (error != null)
-            {
-                p.ErrorDataReceived += (s, e) => error(e.Data);
-            }
-            else
-            {
                 p.ErrorDataReceived += (s, e) => { if (e.Data != null) XTrace.Log.Error(e.Data); };
             }
         }
@@ -453,16 +464,20 @@ public static class ProcessHelper
 
             return rs;
         }
-        catch { return null; }
+        catch (Exception ex)
+        {
+            if (XTrace.Log.Level <= LogLevel.Debug) XTrace.Log.Error(ex.Message);
+            return null;
+        }
     }
     #endregion
 
     #region 原生方法
     [DllImport("kernel32.dll", SetLastError = true)]
-    private static extern IntPtr OpenProcess(UInt32 processAccess, Boolean bInheritHandle, Int32 processId);
+    static extern IntPtr OpenProcess(UInt32 processAccess, Boolean bInheritHandle, Int32 processId);
 
     [DllImport("kernel32.dll", SetLastError = true)]
-    private static extern Boolean CloseHandle(IntPtr hObject);
+    static extern Boolean CloseHandle(IntPtr hObject);
 
     [DllImport("ntdll.dll")]
     private static extern Int32 NtQueryInformationProcess(IntPtr processHandle, Int32 processInformationClass, ref PROCESS_BASIC_INFORMATION processInformation, UInt32 processInformationLength, out UInt32 returnLength);
@@ -473,8 +488,8 @@ public static class ProcessHelper
     [DllImport("kernel32.dll")]
     private static extern Boolean ReadProcessMemory(IntPtr hProcess, IntPtr lpBaseAddress, IntPtr lpBuffer, UInt32 nSize, out UInt32 lpNumberOfBytesRead);
 
-    private const UInt32 PROCESS_QUERY_INFORMATION = 0x0400;
-    private const UInt32 PROCESS_VM_READ = 0x0010;
+    const UInt32 PROCESS_QUERY_INFORMATION = 0x0400;
+    const UInt32 PROCESS_VM_READ = 0x0010;
 
     [StructLayout(LayoutKind.Sequential)]
     private struct PROCESS_BASIC_INFORMATION

@@ -137,7 +137,7 @@ public sealed class HttpContextForwardBuilder
     internal HttpRequestBuilder Build(Action<HttpRequestBuilder>? configure = null)
     {
         // 初始化 HttpRequestBuilder 实例
-        var httpRequestBuilder = HttpRequestBuilder.Create(HttpMethod, RequestUri, configure)
+        var httpRequestBuilder = HttpRequestBuilder.Create(HttpMethod, RequestUri)
             .AddHttpContentConverters(() => [_actionResultContentConverterInstance.Value]).DisableCache();
 
         // 复制查询参数和路由参数
@@ -148,6 +148,9 @@ public sealed class HttpContextForwardBuilder
 
         // 复制请求内容
         CopyBodyAsync(httpRequestBuilder).Wait(HttpContext.RequestAborted);
+
+        // 调用自定义配置委托
+        configure?.Invoke(httpRequestBuilder);
 
         return httpRequestBuilder;
     }
@@ -162,7 +165,7 @@ public sealed class HttpContextForwardBuilder
     internal async Task<HttpRequestBuilder> BuildAsync(Action<HttpRequestBuilder>? configure = null)
     {
         // 初始化 HttpRequestBuilder 实例
-        var httpRequestBuilder = HttpRequestBuilder.Create(HttpMethod, RequestUri, configure)
+        var httpRequestBuilder = HttpRequestBuilder.Create(HttpMethod, RequestUri)
             .AddHttpContentConverters(() => [new IActionResultContentConverter()]).DisableCache();
 
         // 复制查询参数和路由参数
@@ -173,6 +176,9 @@ public sealed class HttpContextForwardBuilder
 
         // 复制请求内容
         await CopyBodyAsync(httpRequestBuilder).ConfigureAwait(false);
+
+        // 调用自定义配置委托
+        configure?.Invoke(httpRequestBuilder);
 
         return httpRequestBuilder;
     }

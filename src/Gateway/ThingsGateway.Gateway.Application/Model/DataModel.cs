@@ -8,9 +8,9 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-using BootstrapBlazor.Components;
-
 using Newtonsoft.Json;
+
+using ThingsGateway.NewLife.Reflection;
 
 namespace ThingsGateway.Gateway.Application;
 
@@ -112,6 +112,10 @@ public class VariableBasicData
     [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
     public string RuntimeType { get; set; }
 
+    [JsonIgnore]
+    [System.Text.Json.Serialization.JsonIgnore]
+    public bool IsNumber => Value?.GetType()?.IsNumber() == true;
+
     /// <inheritdoc cref="VariableRuntime.Value"/>
     public object Value { get; set; }
     /// <inheritdoc cref="VariableRuntime.RawValue"/>
@@ -131,7 +135,6 @@ public class VariableBasicData
     /// <inheritdoc cref="VariableRuntime.DeviceRuntime"/>
     [System.Text.Json.Serialization.JsonIgnore]
     [Newtonsoft.Json.JsonIgnore]
-    [AutoGenerateColumn(Ignore = true)]
     public DeviceBasicData DeviceRuntime { get; set; }
 
     /// <inheritdoc cref="VariableRuntime.LastErrorMessage"/>

@@ -2,11 +2,23 @@
 
 namespace ThingsGateway.SqlSugar
 {
+    /// <summary>
+    /// Razor优先代码生成类
+    /// </summary>
     public class RazorFirst
     {
+        /// <summary>
+        /// 类字符串列表
+        /// </summary>
         internal List<KeyValuePair<string, string>> ClassStringList { get; set; }
+        /// <summary>
+        /// 文件名格式化函数
+        /// </summary>
         internal Func<string, string> FormatFileNameFunc { get; set; }
 
+        /// <summary>
+        /// 默认Razor类模板
+        /// </summary>
         public static string DefaultRazorClassTemplate =
 @"using System;
 using System.Linq;
@@ -68,6 +80,9 @@ namespace @Model.Namespace
     }
 }";
 
+        /// <summary>
+        /// 创建类文件
+        /// </summary>
         public void CreateClassFile(string directoryPath)
         {
             var seChar = Path.DirectorySeparatorChar.ToString();
@@ -85,6 +100,10 @@ namespace @Model.Namespace
                 }
             }
         }
+
+        /// <summary>
+        /// 获取类字符串列表
+        /// </summary>
         public List<KeyValuePair<string, string>> GetClassStringList()
         {
             return ClassStringList;

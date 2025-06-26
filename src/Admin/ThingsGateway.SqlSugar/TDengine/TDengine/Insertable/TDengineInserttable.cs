@@ -1,7 +1,15 @@
-﻿namespace ThingsGateway.SqlSugar.TDengine
+﻿namespace ThingsGateway.SqlSugar
 {
+    /// <summary>
+    /// TDengine 可插入数据提供类
+    /// </summary>
+    /// <typeparam name="T">实体类型</typeparam>
     public class TDengineInsertable<T> : InsertableProvider<T> where T : class, new()
     {
+        /// <summary>
+        /// 执行插入并返回自增ID
+        /// </summary>
+        /// <returns>自增ID</returns>
         public override int ExecuteReturnIdentity()
         {
             InsertBuilder.IsReturnIdentity = true;
@@ -13,6 +21,11 @@
             After(sql, result);
             return result;
         }
+
+        /// <summary>
+        /// 异步执行插入并返回自增ID
+        /// </summary>
+        /// <returns>自增ID</returns>
         public override async Task<int> ExecuteReturnIdentityAsync()
         {
             InsertBuilder.IsReturnIdentity = true;
@@ -25,6 +38,11 @@
             After(sql, result);
             return result;
         }
+
+        /// <summary>
+        /// 生成SQL语句和参数
+        /// </summary>
+        /// <returns>SQL语句和参数</returns>
         public override KeyValuePair<string, List<SugarParameter>> ToSql()
         {
             var result = base.ToSql();
@@ -36,6 +54,10 @@
             return new KeyValuePair<string, List<SugarParameter>>(result.Key.Replace("$PrimaryKey", primaryKey), result.Value);
         }
 
+        /// <summary>
+        /// 执行插入并返回大整数自增ID
+        /// </summary>
+        /// <returns>自增ID</returns>
         public override long ExecuteReturnBigIdentity()
         {
             InsertBuilder.IsReturnIdentity = true;
@@ -46,6 +68,11 @@
             After(sql, result);
             return result;
         }
+
+        /// <summary>
+        /// 异步执行插入并返回大整数自增ID
+        /// </summary>
+        /// <returns>自增ID</returns>
         public override async Task<long> ExecuteReturnBigIdentityAsync()
         {
             InsertBuilder.IsReturnIdentity = true;
@@ -57,6 +84,10 @@
             return result;
         }
 
+        /// <summary>
+        /// 执行插入并将自增ID设置到实体中
+        /// </summary>
+        /// <returns>是否成功</returns>
         public override bool ExecuteCommandIdentityIntoEntity()
         {
             var result = InsertObjs.First();
@@ -75,6 +106,10 @@
             return idValue > 0;
         }
 
+        /// <summary>
+        /// 获取标识列名称
+        /// </summary>
+        /// <returns>标识列名称</returns>
         private string GetIdentityColumn()
         {
             var identityColumn = GetIdentityKeys().FirstOrDefault();
@@ -85,6 +120,5 @@
             }
             return identityColumn;
         }
-
     }
 }

@@ -3,63 +3,97 @@ using System.Reflection.Emit;
 
 namespace ThingsGateway.SqlSugar
 {
-
+    /// <summary>
+    /// 动态属性构建器
+    /// </summary>
     public class DynamicProperyBuilder
     {
         private bool IsCache = false;
+        public DynamicBuilder baseBuilder;
+
+        /// <summary>
+        /// 创建新的构建器副本
+        /// </summary>
         public static DynamicProperyBuilder CopyNew()
         {
             return new DynamicProperyBuilder();
         }
-        public DynamicBuilder baseBuilder;
+
+        /// <summary>
+        /// 创建属性
+        /// </summary>
+        /// <param name="propertyName">属性名</param>
+        /// <param name="properyType">属性类型</param>
+        /// <param name="column">列配置</param>
+        /// <param name="isSplitField">是否分表字段</param>
+        /// <param name="navigate">导航属性配置</param>
         public DynamicProperyBuilder CreateProperty(string propertyName, Type properyType, SugarColumn column = null, bool isSplitField = false, Navigate navigate = null)
         {
-            if (column == null)
+            column ??= new SugarColumn() { ColumnName = propertyName };
+
+            var addItem = new PropertyMetadata
             {
-                column = new SugarColumn()
-                {
-                    ColumnName = propertyName
-                };
-            }
-            PropertyMetadata addItem = new PropertyMetadata();
-            addItem.Name = propertyName;
-            addItem.Type = properyType;
-            addItem.CustomAttributes = new List<CustomAttributeBuilder>() { baseBuilder.GetProperty(column) };
+                Name = propertyName,
+                Type = properyType,
+                CustomAttributes = new List<CustomAttributeBuilder>() { baseBuilder.GetProperty(column) }
+            };
+
             if (navigate != null)
             {
                 addItem.CustomAttributes.Add(BuildNavigateAttribute(navigate));
             }
+
             baseBuilder.propertyAttr.Add(addItem);
+
             if (isSplitField)
             {
                 addItem.CustomAttributes.Add(baseBuilder.GetSplitFieldAttr(new SplitFieldAttribute()));
             }
+
             return this;
         }
+
+        /// <summary>
+        /// 设置是否缓存
+        /// </summary>
         public DynamicProperyBuilder WithCache(bool isCache = true)
         {
             IsCache = isCache;
             return this;
         }
+
+        /// <summary>
+        /// 构建类型
+        /// </summary>
         public Type BuilderType()
         {
             if (IsCache)
             {
                 var key = baseBuilder.entityName + string.Join("_", baseBuilder.propertyAttr.Select(it => it.Name + it.Type.Name));
-                return new ReflectionInoCacheService().GetOrCreate(key, () =>
+                return ReflectionInoCacheService.Instance.GetOrCreate(key, () =>
                 {
-                    var result = DynamicBuilderHelper.CreateDynamicClass(baseBuilder.entityName, baseBuilder.propertyAttr, TypeAttributes.Public, baseBuilder.entityAttr, baseBuilder.baseType, baseBuilder.interfaces);
-                    return result;
+                    return DynamicBuilderHelper.CreateDynamicClass(
+                        baseBuilder.entityName,
+                        baseBuilder.propertyAttr,
+                        TypeAttributes.Public,
+                        baseBuilder.entityAttr,
+                        baseBuilder.baseType,
+                        baseBuilder.interfaces);
                 });
             }
-            else
-            {
-                var result = DynamicBuilderHelper.CreateDynamicClass(baseBuilder.entityName, baseBuilder.propertyAttr, TypeAttributes.Public, baseBuilder.entityAttr, baseBuilder.baseType, baseBuilder.interfaces);
-                return result;
-            }
+
+            return DynamicBuilderHelper.CreateDynamicClass(
+                baseBuilder.entityName,
+                baseBuilder.propertyAttr,
+                TypeAttributes.Public,
+                baseBuilder.entityAttr,
+                baseBuilder.baseType,
+                baseBuilder.interfaces);
         }
 
-        #region BuilderTypes
+        /// <summary>
+        /// 构建关联类型
+        /// </summary>
         public Tuple<Type, Type> BuilderTypes(DynamicProperyBuilder dynamicBuilderB)
         {
             if (IsCache)
@@ -78,17 +112,41 @@ namespace ThingsGateway.SqlSugar
                 return result;
             }
         }
+
         private Tuple<Type, Type> GetBuilderTypes(DynamicProperyBuilder dynamicBuilderB)
         {
-            DynamicProperyBuilder dynamicBuilderA = this;
-            TypeBuilder typeBuilderA = EmitTool.CreateTypeBuilder(dynamicBuilderA.baseBuilder.entityName, TypeAttributes.Public, dynamicBuilderA.baseBuilder.baseType, dynamicBuilderA.baseBuilder.interfaces);
-            TypeBuilder typeBuilderB = EmitTool.CreateTypeBuilder(dynamicBuilderB.baseBuilder.entityName, TypeAttributes.Public, dynamicBuilderB.baseBuilder.baseType, dynamicBuilderB.baseBuilder.interfaces);
-            DynamicBuilderHelper.CreateDynamicClass(typeBuilderA, typeBuilderB, dynamicBuilderA.baseBuilder.propertyAttr, dynamicBuilderA.baseBuilder.entityAttr);
-            DynamicBuilderHelper.CreateDynamicClass(typeBuilderB, typeBuilderA, dynamicBuilderB.baseBuilder.propertyAttr, dynamicBuilderB.baseBuilder.entityAttr);
-            return new Tuple<Type, Type>(typeBuilderB.CreateTypeInfo().AsType(), typeBuilderA.CreateTypeInfo().AsType());
-        }
-        #endregion
+            var typeBuilderA = EmitTool.CreateTypeBuilder(
+                baseBuilder.entityName,
+                TypeAttributes.Public,
+                baseBuilder.baseType,
+                baseBuilder.interfaces);
 
+            var typeBuilderB = EmitTool.CreateTypeBuilder(
+                dynamicBuilderB.baseBuilder.entityName,
+                TypeAttributes.Public,
+                dynamicBuilderB.baseBuilder.baseType,
+                dynamicBuilderB.baseBuilder.interfaces);
+
+            DynamicBuilderHelper.CreateDynamicClass(
+                typeBuilderA,
+                typeBuilderB,
+                baseBuilder.propertyAttr,
+                baseBuilder.entityAttr);
+
+            DynamicBuilderHelper.CreateDynamicClass(
+                typeBuilderB,
+                typeBuilderA,
+                dynamicBuilderB.baseBuilder.propertyAttr,
+                dynamicBuilderB.baseBuilder.entityAttr);
+
+            return Tuple.Create(
+                typeBuilderB.CreateTypeInfo().AsType(),
+                typeBuilderA.CreateTypeInfo().AsType());
+        }
+
+        /// <summary>
+        /// 构建导航属性特性
+        /// </summary>
         public CustomAttributeBuilder BuildNavigateAttribute(Navigate navigate)
         {
             NavigateType navigatType = navigate.NavigatType;
@@ -124,6 +182,5 @@ namespace ThingsGateway.SqlSugar
 
             return new CustomAttributeBuilder(constructor, constructorArgs);
         }
-
     }
 }

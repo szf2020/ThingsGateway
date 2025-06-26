@@ -11,13 +11,12 @@
 using BootstrapBlazor.Components;
 
 using ThingsGateway.SqlSugar;
-using ThingsGateway.SqlSugar.TDengine;
 
 namespace ThingsGateway.Plugin.TDengineDB;
 
 [SugarTable("historyValue")]
 [STableAttribute(STableName = "historyValue", Tag1 = nameof(DeviceName), Tag2 = nameof(Name))]
-public class TDengineDBHistoryValue : STable, IPrimaryIdEntity, IDBHistoryValue
+public class TDengineDBNumberHistoryValue : STable, IPrimaryIdEntity, IDBHistoryValue
 {
     public long Id { get; set; }
 
@@ -34,7 +33,7 @@ public class TDengineDBHistoryValue : STable, IPrimaryIdEntity, IDBHistoryValue
     public bool IsOnline { get; set; }
 
     [AutoGenerateColumn(Order = 1, Visible = true, Sortable = true, Filterable = false)]
-    public string Value { get; set; }
+    public decimal Value { get; set; }
 
 
 

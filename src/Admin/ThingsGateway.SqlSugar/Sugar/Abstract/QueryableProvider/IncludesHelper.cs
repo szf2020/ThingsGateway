@@ -4,6 +4,9 @@ namespace ThingsGateway.SqlSugar
 {
     public partial class QueryableProvider<T> : QueryableAccessory, ISugarQueryable<T>
     {
+        /// <summary>
+        /// 包含单个关联属性的查询方法
+        /// </summary>
         private void _Includes<T1, TReturn1>(SqlSugarProvider context, params Expression[] expressions)
         {
             Func<ISugarQueryable<object>, List<object>> SelectR1 = it => it.Select<TReturn1>().ToList().Select(x => x as object).ToList();
@@ -17,6 +20,10 @@ namespace ThingsGateway.SqlSugar
             if (this.QueryBuilder.Includes == null) this.QueryBuilder.Includes = new List<object>();
             this.QueryBuilder.Includes.Add(navigat);
         }
+
+        /// <summary>
+        /// 包含两个关联属性的查询方法
+        /// </summary>
         private void _Includes<T1, TReturn1, TReturn2>(SqlSugarProvider context, params Expression[] expressions)
         {
             Func<ISugarQueryable<object>, List<object>> SelectR1 = it => it.Select<TReturn1>().ToList().Select(x => x as object).ToList();
@@ -32,6 +39,10 @@ namespace ThingsGateway.SqlSugar
             if (this.QueryBuilder.Includes == null) this.QueryBuilder.Includes = new List<object>();
             this.QueryBuilder.Includes.Add(navigat);
         }
+
+        /// <summary>
+        /// 包含三个关联属性的查询方法
+        /// </summary>
         private void _Includes<T1, TReturn1, TReturn2, TReturn3>(SqlSugarProvider context, params Expression[] expressions)
         {
             Func<ISugarQueryable<object>, List<object>> SelectR1 = it => it.Select<TReturn1>().ToList().Select(x => x as object).ToList();
@@ -49,6 +60,10 @@ namespace ThingsGateway.SqlSugar
             if (this.QueryBuilder.Includes == null) this.QueryBuilder.Includes = new List<object>();
             this.QueryBuilder.Includes.Add(navigat);
         }
+
+        /// <summary>
+        /// 包含四个关联属性的查询方法
+        /// </summary>
         private void _Includes<T1, TReturn1, TReturn2, TReturn3, TReturn4>(SqlSugarProvider context, params Expression[] expressions)
         {
             Func<ISugarQueryable<object>, List<object>> SelectR1 = it => it.Select<TReturn1>().ToList().Select(x => x as object).ToList();
@@ -68,6 +83,10 @@ namespace ThingsGateway.SqlSugar
             if (this.QueryBuilder.Includes == null) this.QueryBuilder.Includes = new List<object>();
             this.QueryBuilder.Includes.Add(navigat);
         }
+
+        /// <summary>
+        /// 包含五个关联属性的查询方法
+        /// </summary>
         private void _Includes<T1, TReturn1, TReturn2, TReturn3, TReturn4, TReturn5>(SqlSugarProvider context, params Expression[] expressions)
         {
             Func<ISugarQueryable<object>, List<object>> SelectR1 = it => it.Select<TReturn1>().ToList().Select(x => x as object).ToList();
@@ -89,10 +108,18 @@ namespace ThingsGateway.SqlSugar
             if (this.QueryBuilder.Includes == null) this.QueryBuilder.Includes = new List<object>();
             this.QueryBuilder.Includes.Add(navigat);
         }
+
+        /// <summary>
+        /// 转换为导航查询对象
+        /// </summary>
         public NavISugarQueryable<T> AsNavQueryable()
         {
             return GetNavSugarQueryable();
         }
+
+        /// <summary>
+        /// 获取导航查询对象
+        /// </summary>
         private NavQueryableProvider<T> GetNavSugarQueryable()
         {
             var result = new NavQueryableProvider<T>();
@@ -102,6 +129,10 @@ namespace ThingsGateway.SqlSugar
             result.QueryBuilder = clone.QueryBuilder;
             return result;
         }
+
+        /// <summary>
+        /// 获取多级关联查询对象
+        /// </summary>
         private ISugarQueryable<T> GetManyQueryable<TReturn1>(Expression<Func<T, TReturn1>> include1)
         {
             ISugarQueryable<T> result = null;
@@ -136,6 +167,10 @@ namespace ThingsGateway.SqlSugar
             }
             return result;
         }
+
+        /// <summary>
+        /// 检查是否是多级成员表达式
+        /// </summary>
         private static bool IsMembers<TReturn1>(Expression<Func<T, TReturn1>> include1)
         {
             var isManyMembers = false;
@@ -150,10 +185,13 @@ namespace ThingsGateway.SqlSugar
             }
             return isManyMembers;
         }
-
     }
+
     public partial class NavQueryableProvider<T> : QueryableProvider<T>, NavISugarQueryable<T>
     {
+        /// <summary>
+        /// 包含单个关联属性的导航查询方法
+        /// </summary>
         private void _Includes<T1, TReturn1>(SqlSugarProvider context, params Expression[] expressions)
         {
             Func<ISugarQueryable<object>, List<object>> SelectR1 = it => it.Select<TReturn1>().ToList().Select(x => x as object).ToList();
@@ -167,6 +205,10 @@ namespace ThingsGateway.SqlSugar
             if (this.QueryBuilder.Includes == null) this.QueryBuilder.Includes = new List<object>();
             this.QueryBuilder.Includes.Add(navigat);
         }
+
+        /// <summary>
+        /// 包含两个关联属性的导航查询方法
+        /// </summary>
         private void _Includes<T1, TReturn1, TReturn2>(SqlSugarProvider context, params Expression[] expressions)
         {
             Func<ISugarQueryable<object>, List<object>> SelectR1 = it => it.Select<TReturn1>().ToList().Select(x => x as object).ToList();
@@ -182,6 +224,10 @@ namespace ThingsGateway.SqlSugar
             if (this.QueryBuilder.Includes == null) this.QueryBuilder.Includes = new List<object>();
             this.QueryBuilder.Includes.Add(navigat);
         }
+
+        /// <summary>
+        /// 包含三个关联属性的导航查询方法
+        /// </summary>
         private void _Includes<T1, TReturn1, TReturn2, TReturn3>(SqlSugarProvider context, params Expression[] expressions)
         {
             Func<ISugarQueryable<object>, List<object>> SelectR1 = it => it.Select<TReturn1>().ToList().Select(x => x as object).ToList();
@@ -199,6 +245,10 @@ namespace ThingsGateway.SqlSugar
             if (this.QueryBuilder.Includes == null) this.QueryBuilder.Includes = new List<object>();
             this.QueryBuilder.Includes.Add(navigat);
         }
+
+        /// <summary>
+        /// 包含四个关联属性的导航查询方法
+        /// </summary>
         private void _Includes<T1, TReturn1, TReturn2, TReturn3, TReturn4>(SqlSugarProvider context, params Expression[] expressions)
         {
             Func<ISugarQueryable<object>, List<object>> SelectR1 = it => it.Select<TReturn1>().ToList().Select(x => x as object).ToList();
@@ -218,6 +268,10 @@ namespace ThingsGateway.SqlSugar
             if (this.QueryBuilder.Includes == null) this.QueryBuilder.Includes = new List<object>();
             this.QueryBuilder.Includes.Add(navigat);
         }
+
+        /// <summary>
+        /// 包含五个关联属性的导航查询方法
+        /// </summary>
         private void _Includes<T1, TReturn1, TReturn2, TReturn3, TReturn4, TReturn5>(SqlSugarProvider context, params Expression[] expressions)
         {
             Func<ISugarQueryable<object>, List<object>> SelectR1 = it => it.Select<TReturn1>().ToList().Select(x => x as object).ToList();
@@ -239,6 +293,10 @@ namespace ThingsGateway.SqlSugar
             if (this.QueryBuilder.Includes == null) this.QueryBuilder.Includes = new List<object>();
             this.QueryBuilder.Includes.Add(navigat);
         }
+
+        /// <summary>
+        /// 包含六个关联属性的导航查询方法
+        /// </summary>
         private void _Includes<T1, TReturn1, TReturn2, TReturn3, TReturn4, TReturn5, TReturn6>(SqlSugarProvider context, params Expression[] expressions)
         {
             Func<ISugarQueryable<object>, List<object>> SelectR1 = it => it.Select<TReturn1>().ToList().Select(x => x as object).ToList();
@@ -262,6 +320,10 @@ namespace ThingsGateway.SqlSugar
             if (this.QueryBuilder.Includes == null) this.QueryBuilder.Includes = new List<object>();
             this.QueryBuilder.Includes.Add(navigat);
         }
+
+        /// <summary>
+        /// 包含七个关联属性的导航查询方法
+        /// </summary>
         private void _Includes<T1, TReturn1, TReturn2, TReturn3, TReturn4, TReturn5, TReturn6, TReturn7>(SqlSugarProvider context, params Expression[] expressions)
         {
             Func<ISugarQueryable<object>, List<object>> SelectR1 = it => it.Select<TReturn1>().ToList().Select(x => x as object).ToList();
@@ -287,7 +349,5 @@ namespace ThingsGateway.SqlSugar
             if (this.QueryBuilder.Includes == null) this.QueryBuilder.Includes = new List<object>();
             this.QueryBuilder.Includes.Add(navigat);
         }
-
-
     }
 }

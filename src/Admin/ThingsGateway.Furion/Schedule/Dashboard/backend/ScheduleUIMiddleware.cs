@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Http;
 using System.Collections.Concurrent;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace ThingsGateway.Schedule;
 
@@ -106,7 +107,11 @@ public sealed class ScheduleUIMiddleware
                              .Replace("%(DisplayEmptyTriggerJobs)", Options.DisplayEmptyTriggerJobs ? "true" : "false")
                              .Replace("%(DisplayHead)", Options.DisplayHead ? "true" : "false")
                              .Replace("%(DefaultExpandAllJobs)", Options.DefaultExpandAllJobs ? "true" : "false")
-                             .Replace("%(UseUtcTimestamp)", ScheduleOptionsBuilder.UseUtcTimestampProperty ? "true" : "false");
+                             .Replace("%(UseUtcTimestamp)", ScheduleOptionsBuilder.UseUtcTimestampProperty ? "true" : "false")
+                              .Replace("%(Title)", Options.Title ?? string.Empty)
+                             .Replace("%(Login.SessionKey)", Options.LoginConfig?.SessionKey ?? "schedule_session_key")
+                             .Replace("%(Login.DefaultUsername)", Options.LoginConfig?.DefaultUsername ?? string.Empty)
+                             .Replace("%(Login.DefaultPassword)", Options.LoginConfig?.DefaultPassword ?? string.Empty);
             }
 
             // 输出到客户端
@@ -114,7 +119,12 @@ public sealed class ScheduleUIMiddleware
             await context.Response.WriteAsync(content).ConfigureAwait(false);
             return;
         }
-
+        // 处理刷新登录页面出现 404 情况
+        if (context.Request.Path.Equals(staticFilePath + "login", StringComparison.OrdinalIgnoreCase))
+        {
+            context.Response.Redirect(staticFilePath);
+            return;
+        }
         // ================================ 处理 API 请求 ================================
 
         // 如果不是以 API_REQUEST_PATH 开头，则跳过
@@ -136,18 +146,28 @@ public sealed class ScheduleUIMiddleware
 
         // 允许跨域，设置返回 json
         context.Response.ContentType = "application/json; charset=utf-8";
-        context.Response.Headers["Access-Control-Allow-Origin"] = "*";
-        context.Response.Headers["Access-Control-Allow-Headers"] = "*";
+        context.Response.Headers.AccessControlAllowOrigin = "*";
+        context.Response.Headers.AccessControlAllowHeaders = "*";
 
         // 路由匹配
         switch (action)
         {
             // 获取所有作业
             case "/get-jobs":
-                var jobs = _schedulerFactory.GetJobsOfModels().OrderBy(u => u.JobDetail.GroupName);
+                var jobs = _schedulerFactory.GetJobsOfModels().OrderBy(u => u.JobDetail.GroupName).ThenBy(u => u.JobDetail.JobId);
 
                 // 输出 JSON
                 await context.Response.WriteAsync(SerializeToJson(jobs)).ConfigureAwait(false);
+                break;
+            // 获取所有运行记录
+            case "/timelines-log":
+                var allTimelines = _schedulerFactory.GetJobs()
+                    .SelectMany(u => u.GetTriggers().SelectMany(s => s.GetTimelines()))
+                    .OrderByDescending(u => u.CreatedTime)
+                    .Take(20);  // 默认取 20 条
+
+                // 输出 JSON
+                await context.Response.WriteAsync(SerializeToJson(allTimelines)).ConfigureAwait(false);
                 break;
             // 操作作业
             case "/operate-job":
@@ -270,7 +290,7 @@ public sealed class ScheduleUIMiddleware
             // 推送更新
             case "/check-change":
                 // 检查请求类型，是否为 text/event-stream 格式
-                if (!context.WebSockets.IsWebSocketRequest && context.Request.Headers["Accept"].ToString().Contains("text/event-stream"))
+                if (!context.WebSockets.IsWebSocketRequest && context.Request.Headers.Accept.ToString().Contains("text/event-stream"))
                 {
                     // 设置响应头的 content-type 为 text/event-stream
                     context.Response.ContentType = "text/event-stream";
@@ -311,6 +331,37 @@ public sealed class ScheduleUIMiddleware
                     _schedulerFactory.OnChanged -= Subscribe;
                 }
                 break;
+            // 登录验证
+            case "/login":
+                var username = context.Request.Form["username"];
+                var password = context.Request.Form["password"];
+
+                try
+                {
+                    // 调用自定义验证逻辑
+                    if (Options.LoginConfig?.OnLoging is not null && await Options.LoginConfig.OnLoging(username, password, context).ConfigureAwait(false))
+                    {
+                        context.Response.StatusCode = StatusCodes.Status200OK;
+                        await context.Response.WriteAsync("OK").ConfigureAwait(false);
+                    }
+                    else
+                    {
+                        context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                        await context.Response.WriteAsync("username or password error").ConfigureAwait(false);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+                    await context.Response.WriteAsync(ex.Message).ConfigureAwait(false);
+                }
+
+                break;
+            // 未处理接口
+            default:
+                context.Response.StatusCode = StatusCodes.Status404NotFound;
+                await context.Response.WriteAsync("Not Found").ConfigureAwait(false);
+                return;
         }
     }
 
@@ -324,7 +375,8 @@ public sealed class ScheduleUIMiddleware
         // 初始化默认序列化选项
         var jsonSerializerOptions = Penetrates.GetDefaultJsonSerializerOptions();
         jsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
-
+        jsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+        jsonSerializerOptions.WriteIndented = false;
         return JsonSerializer.Serialize(obj, jsonSerializerOptions);
     }
 }

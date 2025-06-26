@@ -6,31 +6,49 @@ namespace ThingsGateway.SqlSugar
 {
     public partial class QueryableProvider<T> : QueryableAccessory, ISugarQueryable<T>
     {
+        /// <summary>
+        /// 通过表达式包含两个关联实体
+        /// </summary>
         public ISugarQueryable<T> IncludesByExpression2<TReturn1, TReturn2>(Expression include1, Expression include2)
         {
             _Includes<T, TReturn1, TReturn2>(this.Context, include1, include2);
             return this;
         }
+        /// <summary>
+        /// 通过表达式包含三个关联实体
+        /// </summary>
         public ISugarQueryable<T> IncludesByExpression3<TReturn1, TReturn2, TReturn3>(Expression include1, Expression include2, Expression include3)
         {
             _Includes<T, TReturn1, TReturn2, TReturn3>(this.Context, include1, include2, include3);
             return this;
         }
+        /// <summary>
+        /// 通过表达式包含四个关联实体
+        /// </summary>
         public ISugarQueryable<T> IncludesByExpression4<TReturn1, TReturn2, TReturn3, TReturn4>(Expression include1, Expression include2, Expression include3, Expression include4)
         {
             _Includes<T, TReturn1, TReturn2, TReturn3, TReturn4>(this.Context, include1, include2, include3, include4);
             return this;
         }
+        /// <summary>
+        /// 通过表达式包含五个关联实体
+        /// </summary>
         public ISugarQueryable<T> IncludesByExpression5<TReturn1, TReturn2, TReturn3, TReturn4, TReturn5>(Expression include1, Expression include2, Expression include3, Expression include4, Expression include5)
         {
             _Includes<T, TReturn1, TReturn2, TReturn3, TReturn4, TReturn5>(this.Context, include1, include2, include3, include4, include5);
             return this;
         }
+        /// <summary>
+        /// 通过表达式包含单个关联实体
+        /// </summary>
         public ISugarQueryable<T> IncludesByExpression<TReturn1>(Expression include1)
         {
             _Includes<T, TReturn1>(this.Context, include1);
             return this;
         }
+        /// <summary>
+        /// 通过字符串名称包含两个关联实体
+        /// </summary>
         public ISugarQueryable<T> IncludesByNameString(string navMemberName, string thenNavMemberName2)
         {
             var method = this.GetType().GetMethods().Where(it => it.Name == "IncludesByExpression2")
@@ -45,6 +63,9 @@ namespace ThingsGateway.SqlSugar
             method.MakeGenericMethod(types.ToArray()).Invoke(this, parametres.Cast<object>().ToArray());
             return this;
         }
+        /// <summary>
+        /// 通过字符串名称包含三个关联实体
+        /// </summary>
         public ISugarQueryable<T> IncludesByNameString(string navMemberName, string thenNavMemberName2, string thenNavMemberName3)
         {
             var method = this.GetType().GetMethods().Where(it => it.Name == "IncludesByExpression3")
@@ -61,6 +82,9 @@ namespace ThingsGateway.SqlSugar
             method.MakeGenericMethod(types.ToArray()).Invoke(this, parametres.Cast<object>().ToArray());
             return this;
         }
+        /// <summary>
+        /// 通过字符串名称包含四个关联实体
+        /// </summary>
         public ISugarQueryable<T> IncludesByNameString(string navMemberName, string thenNavMemberName2, string thenNavMemberName3, string thenNavMemberName4)
         {
             var method = this.GetType().GetMethods().Where(it => it.Name == "IncludesByExpression4")
@@ -79,6 +103,9 @@ namespace ThingsGateway.SqlSugar
             method.MakeGenericMethod(types.ToArray()).Invoke(this, parametres.Cast<object>().ToArray());
             return this;
         }
+        /// <summary>
+        /// 通过字符串名称包含五个关联实体
+        /// </summary>
         public ISugarQueryable<T> IncludesByNameString(string navMemberName, string thenNavMemberName2, string thenNavMemberName3, string thenNavMemberName4, string thenNavMemberName5)
         {
             var method = this.GetType().GetMethods().Where(it => it.Name == "IncludesByExpression5")
@@ -99,6 +126,9 @@ namespace ThingsGateway.SqlSugar
             method.MakeGenericMethod(types.ToArray()).Invoke(this, parametres.Cast<object>().ToArray());
             return this;
         }
+        /// <summary>
+        /// 获取通过字符串名称包含关联实体的方法信息
+        /// </summary>
         private static MethodInfo GetIncludesByNameStringMethod(List<Type> types, string navMemberName, MethodInfo method, List<Expression> parametres, EntityInfo entityInfo)
         {
             var navFirst = GetNavColumnInfo(navMemberName, entityInfo);
@@ -114,11 +144,17 @@ namespace ThingsGateway.SqlSugar
             return method;
         }
 
+        /// <summary>
+        /// 获取导航列信息
+        /// </summary>
         private static EntityColumnInfo GetNavColumnInfo(string navMemberName, EntityInfo entityInfo)
         {
             return entityInfo.Columns.Where(it => it.Navigat != null && it.PropertyName.EqualCase(navMemberName)).FirstOrDefault();
         }
 
+        /// <summary>
+        /// 获取通过字符串名称包含关联实体的参数列表
+        /// </summary>
         private static List<Expression> GetIncludesByNameStringParameters(Type type, EntityColumnInfo item)
         {
             var parametres = new List<Expression> { };
@@ -134,6 +170,9 @@ namespace ThingsGateway.SqlSugar
             return parametres;
         }
 
+        /// <summary>
+        /// 通过字符串名称包含单个关联实体
+        /// </summary>
         public ISugarQueryable<T> IncludesByNameString(string navMemberName)
         {
             var navs = this.EntityInfo.Columns.Where(it => it.Navigat != null && it.PropertyName.EqualCase(navMemberName)).ToList();
@@ -153,6 +192,9 @@ namespace ThingsGateway.SqlSugar
             }
             return this;
         }
+        /// <summary>
+        /// 包含所有第一层关联实体（可忽略指定属性）
+        /// </summary>
         public ISugarQueryable<T> IncludesAllFirstLayer(params string[] ignoreProperyNameList)
         {
             var navs = this.EntityInfo.Columns.Where(it => it.Navigat != null).ToList();
@@ -184,6 +226,9 @@ namespace ThingsGateway.SqlSugar
             }
             return this;
         }
+        /// <summary>
+        /// 包含所有第二层关联实体（可忽略指定属性）
+        /// </summary>
         public ISugarQueryable<T> IncludesAllSecondLayer<TReturn1>(Expression<Func<T, TReturn1>> expression, params string[] ignoreProperyNameList)
         {
             this.Includes(expression);
@@ -216,6 +261,9 @@ namespace ThingsGateway.SqlSugar
             }
             return this;
         }
+        /// <summary>
+        /// 包含List类型的关联实体
+        /// </summary>
         public ISugarQueryable<T> Includes<TReturn1>(Expression<Func<T, List<TReturn1>>> include1)
         {
             var result = GetManyQueryable(include1);
@@ -226,6 +274,9 @@ namespace ThingsGateway.SqlSugar
             _Includes<T, TReturn1>(this.Context, include1);
             return this;
         }
+        /// <summary>
+        /// 包含单个关联实体
+        /// </summary>
         public ISugarQueryable<T> Includes<TReturn1>(Expression<Func<T, TReturn1>> include1)
         {
             var result = GetManyQueryable(include1);
@@ -236,20 +287,54 @@ namespace ThingsGateway.SqlSugar
             _Includes<T, TReturn1>(this.Context, include1);
             return this;
         }
+        /// <summary>
+        /// 包含两个关联实体（List到List）
+        /// </summary>
         public ISugarQueryable<T> Includes<TReturn1, TReturn2>(Expression<Func<T, TReturn1>> include1, Expression<Func<TReturn1, List<TReturn2>>> include2) { _Includes<T, TReturn1, TReturn2>(this.Context, include1, include2); return this; }
+        /// <summary>
+        /// 包含两个关联实体（单个到单个）
+        /// </summary>
         public ISugarQueryable<T> Includes<TReturn1, TReturn2>(Expression<Func<T, TReturn1>> include1, Expression<Func<TReturn1, TReturn2>> include2) { _Includes<T, TReturn1, TReturn2>(this.Context, include1, include2); return this; }
+        /// <summary>
+        /// 包含两个关联实体（List到List）
+        /// </summary>
         public ISugarQueryable<T> Includes<TReturn1, TReturn2>(Expression<Func<T, List<TReturn1>>> include1, Expression<Func<TReturn1, List<TReturn2>>> include2) { _Includes<T, TReturn1, TReturn2>(this.Context, include1, include2); return this; }
+        /// <summary>
+        /// 包含两个关联实体（List到单个）
+        /// </summary>
         public ISugarQueryable<T> Includes<TReturn1, TReturn2>(Expression<Func<T, List<TReturn1>>> include1, Expression<Func<TReturn1, TReturn2>> include2) { _Includes<T, TReturn1, TReturn2>(this.Context, include1, include2); return this; }
+        /// <summary>
+        /// 包含三个关联实体（List到List到List）
+        /// </summary>
         public NavISugarQueryable<T> Includes<TReturn1, TReturn2, TReturn3>(Expression<Func<T, List<TReturn1>>> include1, Expression<Func<TReturn1, List<TReturn2>>> include2, Expression<Func<TReturn2, List<TReturn3>>> include3) { _Includes<T, TReturn1, TReturn2, TReturn3>(this.Context, include1, include2, include3); return GetNavSugarQueryable(); }
+        /// <summary>
+        /// 包含三个关联实体（List到单个到List）
+        /// </summary>
         public NavISugarQueryable<T> Includes<TReturn1, TReturn2, TReturn3>(Expression<Func<T, List<TReturn1>>> include1, Expression<Func<TReturn1, TReturn2>> include2, Expression<Func<TReturn2, List<TReturn3>>> include3) { _Includes<T, TReturn1, TReturn2, TReturn3>(this.Context, include1, include2, include3); return GetNavSugarQueryable(); }
+        /// <summary>
+        /// 包含三个关联实体（List到List到单个）
+        /// </summary>
         public NavISugarQueryable<T> Includes<TReturn1, TReturn2, TReturn3>(Expression<Func<T, List<TReturn1>>> include1, Expression<Func<TReturn1, List<TReturn2>>> include2, Expression<Func<TReturn2, TReturn3>> include3) { _Includes<T, TReturn1, TReturn2, TReturn3>(this.Context, include1, include2, include3); return GetNavSugarQueryable(); }
+        /// <summary>
+        /// 包含三个关联实体（单个到List到List）
+        /// </summary>
         public NavISugarQueryable<T> Includes<TReturn1, TReturn2, TReturn3>(Expression<Func<T, TReturn1>> include1, Expression<Func<TReturn1, List<TReturn2>>> include2, Expression<Func<TReturn2, List<TReturn3>>> include3) { _Includes<T, TReturn1, TReturn2, TReturn3>(this.Context, include1, include2, include3); return GetNavSugarQueryable(); }
+        /// <summary>
+        /// 包含三个关联实体（单个到单个到单个）
+        /// </summary>
         public NavISugarQueryable<T> Includes<TReturn1, TReturn2, TReturn3>(Expression<Func<T, TReturn1>> include1, Expression<Func<TReturn1, TReturn2>> include2, Expression<Func<TReturn2, TReturn3>> include3) { _Includes<T, TReturn1, TReturn2, TReturn3>(this.Context, include1, include2, include3); return GetNavSugarQueryable(); }
+        /// <summary>
+        /// 包含三个关联实体（单个到单个到List）
+        /// </summary>
         public NavISugarQueryable<T> Includes<TReturn1, TReturn2, TReturn3>(Expression<Func<T, TReturn1>> include1, Expression<Func<TReturn1, TReturn2>> include2, Expression<Func<TReturn2, List<TReturn3>>> include3) { _Includes<T, TReturn1, TReturn2, TReturn3>(this.Context, include1, include2, include3); return GetNavSugarQueryable(); }
+        /// <summary>
+        /// 包含三个关联实体（单个到List到单个）
+        /// </summary>
         public NavISugarQueryable<T> Includes<TReturn1, TReturn2, TReturn3>(Expression<Func<T, TReturn1>> include1, Expression<Func<TReturn1, List<TReturn2>>> include2, Expression<Func<TReturn2, TReturn3>> include3) { _Includes<T, TReturn1, TReturn2, TReturn3>(this.Context, include1, include2, include3); return GetNavSugarQueryable(); }
+        /// <summary>
+        /// 包含三个关联实体（List到单个到单个）
+        /// </summary>
         public NavISugarQueryable<T> Includes<TReturn1, TReturn2, TReturn3>(Expression<Func<T, List<TReturn1>>> include1, Expression<Func<TReturn1, TReturn2>> include2, Expression<Func<TReturn2, TReturn3>> include3) { _Includes<T, TReturn1, TReturn2, TReturn3>(this.Context, include1, include2, include3); return GetNavSugarQueryable(); }
-
-
     }
 
     public partial class NavQueryableProvider<T> : QueryableProvider<T>, NavISugarQueryable<T>

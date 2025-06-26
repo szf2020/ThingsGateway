@@ -133,7 +133,7 @@ internal static class InternalApp
     }
 
     /// <summary>
-    /// 配置 Furion 框架（非 Web）
+    /// 配置框架（非 Web）
     /// </summary>
     /// <param name="hostApplicationBuilder"></param>
     /// <param name="autoRegisterBackgroundService"></param>

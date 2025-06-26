@@ -731,7 +731,7 @@ namespace ThingsGateway.SqlSugar
         internal static Type GetCustomTypeByClass(string className, string customDllName)
         {
             var key = "Assembly_" + customDllName + assembly.GetHashCode();
-            var newAssembly = new ReflectionInoCacheService().GetOrCreate<Assembly>(key, () =>
+            var newAssembly = ReflectionInoCacheService.Instance.GetOrCreate<Assembly>(key, () =>
             {
                 try
                 {
@@ -786,7 +786,7 @@ namespace ThingsGateway.SqlSugar
         internal static Type GetCustomTypeByClass<T>(string className, string customDllName)
         {
             var key = "Assembly_" + customDllName + assembly.GetHashCode();
-            var newAssembly = new ReflectionInoCacheService().GetOrCreate<Assembly>(key, () =>
+            var newAssembly = ReflectionInoCacheService.Instance.GetOrCreate<Assembly>(key, () =>
             {
                 try
                 {

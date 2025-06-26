@@ -3,140 +3,202 @@ using System.Data.Common;
 using System.Text.RegularExpressions;
 
 using TDengine.Data.Client;
-using TDengine.Driver;
-
-namespace ThingsGateway.SqlSugar.TDengineAdo;
-
-public class TDengineCommand : DbCommand
+namespace TDengineAdo
 {
-    private string commandText;
-    private TDengineConnection connection;
-    private TDengineParameterCollection _DbParameterCollection;
-
-    public TDengineCommand()
+    public class TDengineCommand : DbCommand
     {
-    }
-
-    public TDengineCommand(string commandText, TDengineConnection connection)
-    {
-        this.CommandText = commandText;
-        this.Connection = connection;
-    }
-
-    public override string CommandText
-    {
-        get => this.commandText;
-        set => this.commandText = value;
-    }
-
-    public override int CommandTimeout { get; set; }
-
-    public override CommandType CommandType { get; set; }
-
-    public override bool DesignTimeVisible { get; set; }
-
-    public override UpdateRowSource UpdatedRowSource { get; set; }
-
-    protected override DbConnection DbConnection
-    {
-        get => (DbConnection)this.connection;
-        set => this.connection = (TDengineConnection)value;
-    }
-
-    protected override DbParameterCollection DbParameterCollection
-    {
-        get
+        private string commandText;
+        private TDengineConnection connection;
+        public TDengineCommand()
         {
-            if (this._DbParameterCollection == null)
-                this._DbParameterCollection = new TDengineParameterCollection();
-            return (DbParameterCollection)this._DbParameterCollection;
+            // Add any required initialization logic here.
         }
-    }
 
-    protected override DbTransaction DbTransaction { get; set; }
-
-    public override void Cancel() => throw new NotImplementedException();
-
-    public override int ExecuteNonQuery()
-    {
-        try
+        public TDengineCommand(string commandText, TDengineConnection connection)
         {
-            this.connection.Open();
-            long num = this.connection.connection.Exec(this.GetNoParameterSql(this.commandText));
-            this.connection.Close();
-            return num > (long)int.MaxValue ? int.MaxValue : Convert.ToInt32(num);
+            this.CommandText = commandText;
+            this.Connection = connection;
         }
-        catch
-        {
-            this.connection.Close();
-            throw;
-        }
-    }
 
-    public override object ExecuteScalar()
-    {
-        try
+        public override string CommandText
         {
-            this.connection.Open();
-            IRows irows = this.connection.connection.Query(this.GetNoParameterSql(this.commandText));
-            using (irows)
+            get => commandText;
+            set => commandText = value;
+        }
+
+        public override int CommandTimeout { get; set; }
+
+        public override CommandType CommandType { get; set; }
+
+        public override bool DesignTimeVisible { get; set; }
+
+        public override UpdateRowSource UpdatedRowSource { get; set; }
+
+        protected override DbConnection DbConnection
+        {
+            get => connection;
+            set => connection = (TDengineConnection)value;
+        }
+        private TDengineParameterCollection _DbParameterCollection;
+        protected override DbParameterCollection DbParameterCollection
+        {
+            get
             {
-                irows.Read();
-                this.connection.Close();
-                return irows.GetValue(0);
+                if (_DbParameterCollection == null)
+                {
+                    _DbParameterCollection = new TDengineParameterCollection();
+                }
+                return _DbParameterCollection;
             }
         }
-        catch
+
+        protected override DbTransaction DbTransaction { get; set; }
+
+        public override void Cancel()
         {
-            this.connection.Close();
-            throw;
+            // Implement if needed
+            throw new NotImplementedException();
         }
-    }
 
-    public new DbDataReader ExecuteReader()
-    {
-        try
+        public override int ExecuteNonQuery()
         {
-            this.connection.Open();
-            TDengineDataReader tdengineDataReader = new TDengineDataReader(this.connection.connection.Query(this.GetNoParameterSql(this.commandText)));
-            this.connection.Close();
-            return (DbDataReader)tdengineDataReader;
-        }
-        catch
-        {
-            this.connection.Close();
-            throw;
-        }
-    }
-
-    public override void Prepare() => throw new NotImplementedException();
-
-    protected override void Dispose(bool disposing) => base.Dispose(disposing);
-
-    protected override DbParameter CreateDbParameter() => throw new NotImplementedException();
-
-    protected override DbDataReader ExecuteDbDataReader(CommandBehavior behavior)
-    {
-        return this.ExecuteReader();
-    }
-
-    private string GetNoParameterSql(string sql)
-    {
-        foreach (TDengineParameter tdengineParameter in (IEnumerable<TDengineParameter>)this.Parameters.Cast<TDengineParameter>().OrderByDescending<TDengineParameter, int>((Func<TDengineParameter, int>)(it => it.parameterName.Length)))
-        {
-            if (!tdengineParameter.parameterName.Contains('@'))
-                tdengineParameter.parameterName = "@" + tdengineParameter.parameterName;
-            object obj = tdengineParameter.value;
-            if (tdengineParameter.value == null || tdengineParameter.value == DBNull.Value)
-                sql = Regex.Replace(sql, tdengineParameter.parameterName, "null", RegexOptions.IgnoreCase);
-            else if (tdengineParameter.value is DateTime)
+            try
             {
-                DateTime dateTime = (DateTime)tdengineParameter.value;
-                sql = !tdengineParameter.IsMicrosecond ? (!tdengineParameter.IsNanosecond ? Regex.Replace(sql, tdengineParameter.parameterName, Helper.ToUnixTimestamp(dateTime).ToString() ?? "", RegexOptions.IgnoreCase) : Regex.Replace(sql, tdengineParameter.parameterName, Helper.DateTimeToLong19(dateTime).ToString() ?? "", RegexOptions.IgnoreCase)) : Regex.Replace(sql, tdengineParameter.parameterName, Helper.DateTimeToLong16(dateTime).ToString() ?? "", RegexOptions.IgnoreCase);
+                connection.Open();
+
+                var sql = GetNoParameterSql(commandText);
+                long res = connection.connection.Exec(sql);
+
+
+                connection.Close();
+                return res > int.MaxValue ? int.MaxValue : Convert.ToInt32(res);
             }
-            else
-                sql = tdengineParameter.value is string || tdengineParameter.value != null ? Regex.Replace(sql, tdengineParameter.parameterName, "'" + tdengineParameter.value.ToString().Replace("'", "''") + "'", RegexOptions.IgnoreCase) : Regex.Replace(sql, tdengineParameter.parameterName, "'" + tdengineParameter.value?.ToString() + "'", RegexOptions.IgnoreCase);
+            catch (Exception)
+            {
+
+                connection.Close();
+                throw;
+            }
         }
-        return sql;
+
+        public override object ExecuteScalar()
+        {
+            try
+            {
+                connection.Open();
+
+                var sql = GetNoParameterSql(commandText);
+
+                var res = connection.connection.Query(sql);
+                using (res)
+                {
+                    res.Read();
+
+                    connection.Close();
+                    return res.GetValue(0);
+                }
+            }
+            catch (Exception)
+            {
+
+                connection.Close();
+                throw;
+            }
+        }
+
+        public new DbDataReader ExecuteReader()
+        {
+            try
+            {
+                connection.Open();
+
+                var sql = GetNoParameterSql(commandText);
+
+                var res = connection.connection.Query(sql);
+                TDengineDataReader reader = new TDengineDataReader(res);
+
+
+                connection.Close();
+                return reader;
+            }
+            catch (Exception)
+            {
+                connection.Close();
+                throw;
+            }
+        }
+
+
+        public override void Prepare()
+        {
+            // Implement if needed
+            throw new NotImplementedException();
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            //// Release the result pointer if it exists
+            //if (currentRes != IntPtr.Zero)
+            //{
+            //    TDengine.FreeResult(connection.connection);
+            //    currentRes = IntPtr.Zero;
+            //}
+
+            base.Dispose(disposing);
+        }
+
+        protected override DbParameter CreateDbParameter()
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override DbDataReader ExecuteDbDataReader(CommandBehavior behavior)
+        {
+            return ExecuteReader();
+        }
+
+        #region Helper 
+        string GetNoParameterSql(string sql)
+        {
+            foreach (TDengineParameter item in this.Parameters.Cast<TDengineParameter>().OrderByDescending(it => it.parameterName.Length))
+            {
+                if (!item.parameterName.Contains('@'))
+                {
+                    item.parameterName = "@" + item.parameterName;
+                }
+                var value = item.value;
+                if (item.value == null || item.value == DBNull.Value)
+                {
+                    sql = Regex.Replace(sql, item.parameterName, "null", RegexOptions.IgnoreCase);
+                }
+                else if (item.value is DateTime)
+                {
+                    var dt = (DateTime)item.value;
+                    if (item.IsMicrosecond)//有微妙
+                    {
+                        sql = Regex.Replace(sql, item.parameterName, Helper.DateTimeToLong16(dt) + "", RegexOptions.IgnoreCase);
+                    }
+                    else if (item.IsNanosecond)//有纳妙
+                    {
+                        sql = Regex.Replace(sql, item.parameterName, Helper.DateTimeToLong19(dt) + "", RegexOptions.IgnoreCase);
+                    }
+                    else
+                    {
+                        sql = Regex.Replace(sql, item.parameterName, Helper.ToUnixTimestamp(dt) + "", RegexOptions.IgnoreCase);
+                    }
+                }
+                else if (!(item.value is string || item.value is object))
+                {
+                    sql = Regex.Replace(sql, item.parameterName, "'" + item.value + "'", RegexOptions.IgnoreCase);
+                }
+                else
+                {
+                    sql = Regex.Replace(sql, item.parameterName, "'" + item.value.ToString().Replace("'", "''") + "'", RegexOptions.IgnoreCase);
+                }
+            }
+            return sql;
+        }
+
+        #endregion
     }
 }

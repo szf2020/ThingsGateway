@@ -44,7 +44,7 @@ internal sealed class CookieDeclarativeExtractor : IHttpDeclarativeExtractor
                 // 设置 Cookies
                 if (cookieAttribute.HasSetValue)
                 {
-                    httpRequestBuilder.WithCookie(cookieName, cookieAttribute.Value, cookieAttribute.Escape);
+                    httpRequestBuilder.WithCookie(cookieName, cookieAttribute.Value);
                 }
                 // 移除 Cookies
                 else
@@ -89,8 +89,7 @@ internal sealed class CookieDeclarativeExtractor : IHttpDeclarativeExtractor
                 // 检查类型是否是基本类型或枚举类型或由它们组成的数组或集合类型
                 if (parameter.ParameterType.IsBaseTypeOrEnumOrCollection())
                 {
-                    httpRequestBuilder.WithCookie(parameterName, value ?? cookieAttribute.Value,
-                        cookieAttribute.Escape);
+                    httpRequestBuilder.WithCookie(parameterName, value ?? cookieAttribute.Value);
 
                     continue;
                 }
@@ -98,7 +97,7 @@ internal sealed class CookieDeclarativeExtractor : IHttpDeclarativeExtractor
                 // 空检查
                 if (value is not null)
                 {
-                    httpRequestBuilder.WithCookies(value, cookieAttribute.Escape);
+                    httpRequestBuilder.WithCookies(value);
                 }
             }
         }

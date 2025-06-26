@@ -280,7 +280,25 @@ public sealed class JobBuilder : JobDetail
 
         return this;
     }
+    /// <summary>
+    /// 设置为临时作业
+    /// </summary>
+    /// <returns><see cref="JobBuilder"/></returns>
+    public JobBuilder SetTemporary()
+    {
+        return SetTemporary(true);
+    }
 
+    /// <summary>
+    /// 设置是否是临时作业
+    /// </summary>
+    /// <param name="isTemporary"><see cref="bool"/></param>
+    /// <returns><see cref="JobBuilder"/></returns>
+    public JobBuilder SetTemporary(bool isTemporary)
+    {
+        Temporary = isTemporary;
+        return this;
+    }
     /// <summary>
     /// 设置作业信息额外数据
     /// </summary>
@@ -363,6 +381,14 @@ public sealed class JobBuilder : JobDetail
     public new JobBuilder ClearProperties()
     {
         return base.ClearProperties() as JobBuilder;
+    }
+    /// <summary>
+    /// 检查是否是临时作业
+    /// </summary>
+    /// <returns><see cref="bool"/></returns>
+    public bool CheckIsTemporary()
+    {
+        return Temporary;
     }
 
     /// <summary>

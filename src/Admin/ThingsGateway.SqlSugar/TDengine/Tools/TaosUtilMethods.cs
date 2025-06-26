@@ -8,10 +8,16 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace ThingsGateway.SqlSugar.TDengine
+namespace ThingsGateway.SqlSugar
 {
-    public static class UtilMethods
+    /// <summary>
+    /// 实用工具方法类
+    /// </summary>
+    public static class TaosUtilMethods
     {
+        /// <summary>
+        /// 获取通用STable特性
+        /// </summary>
         public static STableAttribute GetCommonSTableAttribute(ISqlSugarClient db, STableAttribute sTableAttribute)
         {
             var key = "GetCommonSTableAttribute_" + sTableAttribute?.STableName;
@@ -21,19 +27,27 @@ namespace ThingsGateway.SqlSugar.TDengine
             }
             return sTableAttribute!;
         }
+
+        /// <summary>
+        /// 将DateTime转换为Unix时间戳
+        /// </summary>
         public static long ToUnixTimestamp(DateTime dateTime)
         {
-            // If the DateTime is Utc, use ToUnixTimeMilliseconds directly
+            // 如果DateTime是UTC时间，直接使用ToUnixTimeMilliseconds
             if (dateTime.Kind == DateTimeKind.Utc)
             {
                 return new DateTimeOffset(dateTime).ToUnixTimeMilliseconds();
             }
             else
             {
-                // Convert local DateTime to Utc before converting to Unix timestamp
+                // 将本地DateTime转换为UTC时间后再转换为Unix时间戳
                 return new DateTimeOffset(dateTime.ToUniversalTime()).ToUnixTimeMilliseconds();
             }
         }
+
+        /// <summary>
+        /// 获取最小日期
+        /// </summary>
         internal static DateTime GetMinDate(ConnectionConfig currentConnectionConfig)
         {
             if (currentConnectionConfig.MoreSettings == null)
@@ -49,6 +63,10 @@ namespace ThingsGateway.SqlSugar.TDengine
                 return currentConnectionConfig.MoreSettings.DbMinDate.Value;
             }
         }
+
+        /// <summary>
+        /// 从DateTimeOffset转换为DateTime
+        /// </summary>
         internal static DateTime ConvertFromDateTimeOffset(DateTimeOffset dateTime)
         {
             if (dateTime.Offset.Equals(TimeSpan.Zero))
@@ -59,16 +77,22 @@ namespace ThingsGateway.SqlSugar.TDengine
                 return dateTime.DateTime;
         }
 
+        /// <summary>
+        /// 将对象转换为指定类型
+        /// </summary>
         internal static object To(object value, Type destinationType)
         {
             return To(value, destinationType, CultureInfo.InvariantCulture);
         }
 
+        /// <summary>
+        /// 将对象转换为指定类型(使用特定文化信息)
+        /// </summary>
         internal static object To(object value, Type destinationType, CultureInfo culture)
         {
             if (value != null)
             {
-                destinationType = UtilMethods.GetUnderType(destinationType);
+                destinationType = GetUnderType(destinationType);
                 var sourceType = value.GetType();
 
                 var destinationConverter = TypeDescriptor.GetConverter(destinationType);
@@ -87,12 +111,16 @@ namespace ThingsGateway.SqlSugar.TDengine
             }
             return value;
         }
+
+        /// <summary>
+        /// 检查堆栈帧中是否有异步方法
+        /// </summary>
         public static bool IsAnyAsyncMethod(StackFrame[] methods)
         {
             bool isAsync = false;
             foreach (var item in methods)
             {
-                if (UtilMethods.IsAsyncMethod(item.GetMethod()))
+                if (IsAsyncMethod(item.GetMethod()))
                 {
                     isAsync = true;
                     break;
@@ -101,6 +129,9 @@ namespace ThingsGateway.SqlSugar.TDengine
             return isAsync;
         }
 
+        /// <summary>
+        /// 检查方法是否是异步方法
+        /// </summary>
         public static bool IsAsyncMethod(MethodBase method)
         {
             if (method == null)
@@ -132,9 +163,11 @@ namespace ThingsGateway.SqlSugar.TDengine
             return (attrib != null);
         }
 
+        /// <summary>
+        /// 获取堆栈跟踪信息
+        /// </summary>
         public static StackTraceInfo GetStackTrace()
         {
-
             StackTrace st = new StackTrace(true);
             StackTraceInfo info = new StackTraceInfo();
             info.MyStackTraceList = new List<StackTraceInfoItem>();
@@ -164,15 +197,26 @@ namespace ThingsGateway.SqlSugar.TDengine
             return info;
         }
 
+        /// <summary>
+        /// 将对象转换为泛型类型
+        /// </summary>
         internal static T To<T>(object value)
         {
             return (T)To(value, typeof(T));
         }
+
+        /// <summary>
+        /// 获取基础类型(如果是Nullable类型则返回其基础类型)
+        /// </summary>
         internal static Type GetUnderType(Type oldType)
         {
             Type type = Nullable.GetUnderlyingType(oldType);
             return type == null ? oldType : type;
         }
+
+        /// <summary>
+        /// 替换SQL参数名
+        /// </summary>
         public static string ReplaceSqlParameter(string itemSql, SugarParameter itemParameter, string newName)
         {
             itemSql = Regex.Replace(itemSql, string.Format(@"{0} ", "\\" + itemParameter.ParameterName), newName + " ", RegexOptions.IgnoreCase);
@@ -187,6 +231,10 @@ namespace ThingsGateway.SqlSugar.TDengine
             itemSql = Regex.Replace(itemSql, string.Format(@"{0}\|\|", "\\" + itemParameter.ParameterName), newName + "||", RegexOptions.IgnoreCase);
             return itemSql;
         }
+
+        /// <summary>
+        /// 获取根基础类型
+        /// </summary>
         internal static Type GetRootBaseType(Type entityType)
         {
             var baseType = entityType.BaseType;
@@ -197,7 +245,9 @@ namespace ThingsGateway.SqlSugar.TDengine
             return baseType;
         }
 
-
+        /// <summary>
+        /// 获取属性基础类型(并返回是否可空)
+        /// </summary>
         internal static Type GetUnderType(PropertyInfo propertyInfo, ref bool isNullable)
         {
             Type unType = Nullable.GetUnderlyingType(propertyInfo.PropertyType);
@@ -206,6 +256,9 @@ namespace ThingsGateway.SqlSugar.TDengine
             return unType;
         }
 
+        /// <summary>
+        /// 获取属性基础类型
+        /// </summary>
         internal static Type GetUnderType(PropertyInfo propertyInfo)
         {
             Type unType = Nullable.GetUnderlyingType(propertyInfo.PropertyType);
@@ -213,25 +266,27 @@ namespace ThingsGateway.SqlSugar.TDengine
             return unType;
         }
 
+        /// <summary>
+        /// 检查属性是否可空
+        /// </summary>
         internal static bool IsNullable(PropertyInfo propertyInfo)
         {
             Type unType = Nullable.GetUnderlyingType(propertyInfo.PropertyType);
             return unType != null;
         }
 
+        /// <summary>
+        /// 检查类型是否可空
+        /// </summary>
         internal static bool IsNullable(Type type)
         {
             Type unType = Nullable.GetUnderlyingType(type);
             return unType != null;
         }
-        //internal static T IsNullReturnNew<T>(T returnObj) where T : new()
-        //{
-        //    if (returnObj.IsNullOrEmpty())
-        //    {
-        //        returnObj = new T();
-        //    }
-        //    return returnObj;
-        //}
+
+        /// <summary>
+        /// 类型转换方法
+        /// </summary>
         public static object ChangeType2(object value, Type type)
         {
             if (value == null && type.IsGenericType) return Activator.CreateInstance(type);
@@ -256,16 +311,25 @@ namespace ThingsGateway.SqlSugar.TDengine
             return Convert.ChangeType(value, type);
         }
 
+        /// <summary>
+        /// 将对象转换为指定类型
+        /// </summary>
         internal static T ChangeType<T>(T obj, Type type)
         {
             return (T)Convert.ChangeType(obj, type);
         }
 
+        /// <summary>
+        /// 将对象转换为泛型类型
+        /// </summary>
         internal static T ChangeType<T>(T obj)
         {
             return (T)Convert.ChangeType(obj, typeof(T));
         }
 
+        /// <summary>
+        /// 将DateTime转换为DateTimeOffset
+        /// </summary>
         internal static DateTimeOffset GetDateTimeOffsetByDateTime(DateTime date)
         {
             date = DateTime.SpecifyKind(date, DateTimeKind.Utc);
@@ -273,26 +337,17 @@ namespace ThingsGateway.SqlSugar.TDengine
             return utcTime2;
         }
 
-        //internal static void RepairReplicationParameters(ref string appendSql, SugarParameter[] parameters, int addIndex, string append = null)
-        //{
-        //    if (appendSql.HasValue() && parameters.HasValue())
-        //    {
-        //        foreach (var parameter in parameters.OrderByDescending(it => it.ParameterName.Length))
-        //        {
-        //            //Compatible with.NET CORE parameters case
-        //            var name = parameter.ParameterName;
-        //            string newName = name + append + addIndex;
-        //            appendSql = ReplaceSqlParameter(appendSql, parameter, newName);
-        //            parameter.ParameterName = newName;
-        //        }
-        //    }
-        //}
-
+        /// <summary>
+        /// 获取包装表SQL
+        /// </summary>
         internal static string GetPackTable(string sql, string shortName)
         {
             return string.Format(" ({0}) {1} ", sql, shortName);
         }
 
+        /// <summary>
+        /// 根据值类型获取类型转换函数
+        /// </summary>
         public static Func<string, object> GetTypeConvert(object value)
         {
             if (value is int || value is uint || value is int? || value is uint?)
@@ -318,6 +373,9 @@ namespace ThingsGateway.SqlSugar.TDengine
             return null;
         }
 
+        /// <summary>
+        /// 获取值的类型名称
+        /// </summary>
         internal static string GetTypeName(object value)
         {
             if (value == null)
@@ -330,6 +388,9 @@ namespace ThingsGateway.SqlSugar.TDengine
             }
         }
 
+        /// <summary>
+        /// 获取括号内的值
+        /// </summary>
         internal static string GetParenthesesValue(string dbTypeName)
         {
             if (Regex.IsMatch(dbTypeName, @"\(.+\)"))
@@ -340,21 +401,34 @@ namespace ThingsGateway.SqlSugar.TDengine
             return dbTypeName;
         }
 
+        /// <summary>
+        /// 获取操作前的旧值
+        /// </summary>
         internal static T GetOldValue<T>(T value, Action action)
         {
             action();
             return value;
         }
 
+        /// <summary>
+        /// 获取类型的默认值
+        /// </summary>
         internal static object DefaultForType(Type targetType)
         {
             return targetType.IsValueType ? Activator.CreateInstance(targetType) : null;
         }
 
+        /// <summary>
+        /// 将字节数组转换为长整型
+        /// </summary>
         internal static Int64 GetLong(byte[] bytes)
         {
             return Convert.ToInt64(string.Join("", bytes).PadRight(20, '0'));
         }
+
+        /// <summary>
+        /// 获取对象的属性值
+        /// </summary>
         public static object GetPropertyValue<T>(T t, string PropertyName)
         {
             return t.GetType().GetProperty(PropertyName).GetValue(t, null);
@@ -362,21 +436,9 @@ namespace ThingsGateway.SqlSugar.TDengine
 
         private static readonly char[] separator = new char[] { '9' };
 
-        //public static string EncodeBase64(string code)
-        //{
-        //    if (code.IsNullOrEmpty()) return code;
-        //    string encode = "";
-        //    byte[] bytes = Encoding.GetEncoding("utf-8").GetBytes(code);
-        //    try
-        //    {
-        //        encode = Convert.ToBase64String(bytes);
-        //    }
-        //    catch
-        //    {
-        //        encode = code;
-        //    }
-        //    return encode;
-        //}
+        /// <summary>
+        /// 将数字字符串转换为实际字符串
+        /// </summary>
         public static string ConvertNumbersToString(string value)
         {
             string[] splitInt = value.Split(separator, StringSplitOptions.RemoveEmptyEntries);
@@ -387,6 +449,10 @@ namespace ThingsGateway.SqlSugar.TDengine
 
             return string.Join("", splitChars);
         }
+
+        /// <summary>
+        /// 将字符串转换为数字字符串
+        /// </summary>
         public static string ConvertStringToNumbers(string value)
         {
             StringBuilder sb = new StringBuilder();
@@ -400,29 +466,9 @@ namespace ThingsGateway.SqlSugar.TDengine
             return sb.ToString();
         }
 
-        //public static string DecodeBase64(string code)
-        //{
-        //    try
-        //    {
-        //        if (code.IsNullOrEmpty()) return code;
-        //        string decode = "";
-        //        byte[] bytes = Convert.FromBase64String(code);
-        //        try
-        //        {
-        //            decode = Encoding.GetEncoding("utf-8").GetString(bytes);
-        //        }
-        //        catch
-        //        {
-        //            decode = code;
-        //        }
-        //        return decode;
-        //    }
-        //    catch
-        //    {
-        //        return code;
-        //    }
-        //}
-
+        /// <summary>
+        /// 通过表达式调用方法操作数据
+        /// </summary>
         public static void DataInoveByExpresson<Type>(Type[] datas, MethodCallExpression callExpresion)
         {
             var methodInfo = callExpresion.Method;
@@ -454,6 +500,9 @@ namespace ThingsGateway.SqlSugar.TDengine
             }
         }
 
+        /// <summary>
+        /// 将枚举转换为字典
+        /// </summary>
         public static Dictionary<string, T> EnumToDictionary<T>()
         {
             Dictionary<string, T> dic = new Dictionary<string, T>();
@@ -470,44 +519,5 @@ namespace ThingsGateway.SqlSugar.TDengine
             }
             return dic;
         }
-        //public static object ConvertDataByTypeName(string ctypename,string value)
-        //{
-        //    var item = new ConditionalModel() {
-        //        CSharpTypeName = ctypename,
-        //        FieldValue = value
-        //    };
-        //    if (item.CSharpTypeName.EqualCase(UtilConstants.DecType.Name))
-        //    {
-        //        return Convert.ToDecimal(item.FieldValue);
-        //    }
-        //    else if (item.CSharpTypeName.EqualCase(UtilConstants.DobType.Name))
-        //    {
-        //        return Convert.ToDouble(item.FieldValue);
-        //    }
-        //    else if (item.CSharpTypeName.EqualCase(UtilConstants.DateType.Name))
-        //    {
-        //        return Convert.ToDateTime(item.FieldValue);
-        //    }
-        //    else if (item.CSharpTypeName.EqualCase(UtilConstants.IntType.Name))
-        //    {
-        //        return Convert.ToInt32(item.FieldValue);
-        //    }
-        //    else if (item.CSharpTypeName.EqualCase(UtilConstants.LongType.Name))
-        //    {
-        //        return Convert.ToInt64(item.FieldValue);
-        //    }
-        //    else if (item.CSharpTypeName.EqualCase(UtilConstants.ShortType.Name))
-        //    {
-        //        return Convert.ToInt16(item.FieldValue);
-        //    }
-        //    else if (item.CSharpTypeName.EqualCase(UtilConstants.DateTimeOffsetType.Name))
-        //    {
-        //        return UtilMethods.GetDateTimeOffsetByDateTime(Convert.ToDateTime(item.FieldValue));
-        //    }
-        //    else
-        //    {
-        //        return item.FieldValue;
-        //    }
-        //}
     }
 }

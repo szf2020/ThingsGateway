@@ -42,7 +42,7 @@ internal sealed class PathSegmentDeclarativeExtractor : IHttpDeclarativeExtracto
                 // 设置路径片段
                 if (!pathSegmentAttribute.Remove)
                 {
-                    httpRequestBuilder.WithPathSegment(segment, pathSegmentAttribute.Escape);
+                    httpRequestBuilder.WithPathSegment(segment);
                 }
                 // 移除路径片段
                 else
@@ -92,7 +92,7 @@ internal sealed class PathSegmentDeclarativeExtractor : IHttpDeclarativeExtracto
                 // 设置路径片段
                 if (!pathSegmentAttribute.Remove)
                 {
-                    httpRequestBuilder.WithPathSegment(segment, pathSegmentAttribute.Escape);
+                    httpRequestBuilder.WithPathSegment(segment);
                 }
                 // 移除路径片段
                 else

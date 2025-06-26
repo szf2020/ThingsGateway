@@ -493,7 +493,7 @@ AND syscomments.text LIKE '%" + tableName + "%'");
             ConvertCreateColumnInfo(column);
             if (column.DataType != null && this.Context.CurrentConnectionConfig?.MoreSettings?.SqlServerCodeFirstNvarchar == true)
             {
-                if (!column.DataType.Contains("nvarchar", StringComparison.CurrentCultureIgnoreCase))
+                if (!column.DataType.Contains("nvarchar", StringComparison.CurrentCultureIgnoreCase) && !column.DataType.EndsWith(')'))
                 {
                     column.DataType = column.DataType.ToLower().Replace("varchar", "nvarchar");
                 }
@@ -722,7 +722,7 @@ AND syscomments.text LIKE '%" + tableName + "%'");
                 }
                 else if (item.DataType != null && this.Context.CurrentConnectionConfig?.MoreSettings?.SqlServerCodeFirstNvarchar == true)
                 {
-                    if (!item.DataType.Contains("nvarchar", StringComparison.CurrentCultureIgnoreCase))
+                    if (!item.DataType.Contains("nvarchar", StringComparison.CurrentCultureIgnoreCase) && !item.DataType.EndsWith(')'))
                     {
                         item.DataType = item.DataType.ToLower().Replace("varchar", "nvarchar");
                     }

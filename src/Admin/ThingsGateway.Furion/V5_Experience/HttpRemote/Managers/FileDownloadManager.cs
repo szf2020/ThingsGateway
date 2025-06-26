@@ -264,7 +264,7 @@ internal sealed class FileDownloadManager
                 bufferSize, true);
 
             // 获取 HTTP 响应体中的内容流
-            using var contentStream = await httpResponseMessage.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
+            using var contentStream = (await httpResponseMessage.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false));
 
             // 循环读取数据直到取消请求或读取完毕
             int numBytesRead;

@@ -1,14 +1,44 @@
 ﻿namespace ThingsGateway.SqlSugar
 {
+    /// <summary>
+    /// 可分页删除操作类
+    /// </summary>
+    /// <typeparam name="T">实体类型</typeparam>
     public class DeleteablePage<T> where T : class, new()
     {
+        /// <summary>
+        /// 要删除的数据列表
+        /// </summary>
         public T[] DataList { get; set; }
+        /// <summary>
+        /// SqlSugar客户端实例
+        /// </summary>
         public ISqlSugarClient Context { get; set; }
+        /// <summary>
+        /// 每页大小
+        /// </summary>
         public int PageSize { get; internal set; }
+        /// <summary>
+        /// 表名
+        /// </summary>
         public string TableName { get; internal set; }
+        /// <summary>
+        /// 是否启用差异日志事件
+        /// </summary>
         public bool IsEnableDiffLogEvent { get; internal set; }
+        /// <summary>
+        /// 差异日志模型
+        /// </summary>
         public DiffLogModel DiffModel { get; internal set; }
+        /// <summary>
+        /// 更新列集合
+        /// </summary>
         public List<string> UpdateColumns { get; internal set; }
+
+        /// <summary>
+        /// 执行删除命令
+        /// </summary>
+        /// <returns>受影响的行数</returns>
         public int ExecuteCommand()
         {
             if (DataList.Length == 1 && DataList.First() == null)
@@ -43,6 +73,11 @@
             }
             return result;
         }
+
+        /// <summary>
+        /// 异步执行删除命令
+        /// </summary>
+        /// <returns>受影响的行数</returns>
         public async Task<int> ExecuteCommandAsync()
         {
             if (DataList.Length == 1 && DataList.First() == null)

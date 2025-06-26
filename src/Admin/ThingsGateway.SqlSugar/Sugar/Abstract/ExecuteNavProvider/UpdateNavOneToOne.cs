@@ -2,7 +2,17 @@
 {
     public partial class UpdateNavProvider<Root, T> where T : class, new() where Root : class, new()
     {
+        /// <summary>
+        /// 是否已删除标记
+        /// </summary>
         protected bool IsDeleted { get; set; }
+
+        /// <summary>
+        /// 更新一对一关系
+        /// </summary>
+        /// <typeparam name="TChild">子实体类型</typeparam>
+        /// <param name="name">导航属性名称</param>
+        /// <param name="nav">导航列信息</param>
         private void UpdateOneToOne<TChild>(string name, EntityColumnInfo nav) where TChild : class, new()
         {
             var parentEntity = _ParentEntity;
@@ -63,6 +73,5 @@
             this._ParentList = childList.Cast<object>().ToList();
             SetNewParent<TChild>(thisEntity, thisPkColumn);
         }
-
     }
 }

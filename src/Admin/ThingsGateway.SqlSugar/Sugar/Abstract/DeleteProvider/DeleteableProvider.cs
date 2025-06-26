@@ -6,19 +6,59 @@ using System.Text.RegularExpressions;
 
 namespace ThingsGateway.SqlSugar
 {
+    /// <summary>
+    /// 删除操作提供者
+    /// </summary>
+    /// <typeparam name="T">实体类型</typeparam>
     public class DeleteableProvider<T> : IDeleteable<T> where T : class, new()
     {
+        /// <summary>
+        /// SqlSugar客户端
+        /// </summary>
         public ISqlSugarClient Context { get; set; }
+        /// <summary>
+        /// 数据库访问对象
+        /// </summary>
         public IAdo Db { get { return Context.Ado; } }
+        /// <summary>
+        /// SQL构建器
+        /// </summary>
         public ISqlBuilder SqlBuilder { get; set; }
+        /// <summary>
+        /// 删除构建器
+        /// </summary>
         public DeleteBuilder DeleteBuilder { get; set; }
+        /// <summary>
+        /// 旧映射表列表
+        /// </summary>
         public MappingTableList OldMappingTableList { get; set; }
+        /// <summary>
+        /// 是否使用AS语法
+        /// </summary>
         public bool IsAs { get; set; }
+        /// <summary>
+        /// 是否启用差异日志
+        /// </summary>
         public bool IsEnableDiffLogEvent { get; set; }
+        /// <summary>
+        /// 差异日志模型
+        /// </summary>
         public DiffLogModel diffModel { get; set; }
+        /// <summary>
+        /// 临时主键列表
+        /// </summary>
         public List<string> tempPrimaryKeys { get; set; }
+        /// <summary>
+        /// 移除缓存函数
+        /// </summary>
         internal Action RemoveCacheFunc { get; set; }
+        /// <summary>
+        /// 删除对象列表
+        /// </summary>
         public List<T> DeleteObjects { get; set; }
+        /// <summary>
+        /// 实体信息
+        /// </summary>
         public EntityInfo EntityInfo
         {
             get
@@ -26,11 +66,19 @@ namespace ThingsGateway.SqlSugar
                 return this.Context.EntityMaintenance.GetEntityInfo<T>();
             }
         }
+
+        /// <summary>
+        /// 添加到队列
+        /// </summary>
         public void AddQueue()
         {
             var sqlObj = this.ToSql();
             this.Context.Queues.Add(sqlObj.Key, sqlObj.Value);
         }
+
+        /// <summary>
+        /// 执行删除命令
+        /// </summary>
         public int ExecuteCommand()
         {
             string sql;
@@ -40,15 +88,27 @@ namespace ThingsGateway.SqlSugar
             After(sql);
             return result;
         }
+
+        /// <summary>
+        /// 检查是否有数据变更
+        /// </summary>
         public bool ExecuteCommandHasChange()
         {
             return ExecuteCommand() > 0;
         }
+
+        /// <summary>
+        /// 异步执行删除命令
+        /// </summary>
         public Task<int> ExecuteCommandAsync(CancellationToken token)
         {
             this.Context.Ado.CancellationToken = token;
             return ExecuteCommandAsync();
         }
+
+        /// <summary>
+        /// 异步执行删除命令
+        /// </summary>
         public async Task<int> ExecuteCommandAsync()
         {
             string sql;
@@ -58,29 +118,36 @@ namespace ThingsGateway.SqlSugar
             After(sql);
             return result;
         }
+
+        /// <summary>
+        /// 异步检查是否有数据变更
+        /// </summary>
         public async Task<bool> ExecuteCommandHasChangeAsync()
         {
             return await ExecuteCommandAsync().ConfigureAwait(false) > 0;
         }
+
+        /// <summary>
+        /// 指定表名类型
+        /// </summary>
         public IDeleteable<T> AsType(Type tableNameType)
         {
             return AS(this.Context.EntityMaintenance.GetEntityInfo(tableNameType).DbTableName);
         }
+
+        /// <summary>
+        /// 指定表名
+        /// </summary>
         public IDeleteable<T> AS(string tableName)
         {
             if (tableName == null) return this;
-            //var entityName = typeof(T).Name;
-            //IsAs = true;
-            //OldMappingTableList = this.Context.MappingTables;
-            //this.Context.MappingTables = this.Context.Utilities.TranslateCopy(this.Context.MappingTables);
-            //if (this.Context.MappingTables.Any(it => it.EntityName == entityName))
-            //{
-            //    this.Context.MappingTables.Add(this.Context.MappingTables.First(it => it.EntityName == entityName).DbTableName, tableName);
-            //}
-            //this.Context.MappingTables.Add(entityName, tableName);
             this.DeleteBuilder.AsName = tableName;
-            return this; ;
+            return this;
         }
+
+        /// <summary>
+        /// 条件启用差异日志
+        /// </summary>
         public IDeleteable<T> EnableDiffLogEventIF(bool isEnableDiffLogEvent, object businessData = null)
         {
             if (isEnableDiffLogEvent)
@@ -92,9 +159,12 @@ namespace ThingsGateway.SqlSugar
                 return this;
             }
         }
+
+        /// <summary>
+        /// 启用差异日志
+        /// </summary>
         public IDeleteable<T> EnableDiffLogEvent(object businessData = null)
         {
-
             diffModel = new DiffLogModel();
             this.IsEnableDiffLogEvent = true;
             diffModel.BusinessData = businessData;
@@ -102,6 +172,9 @@ namespace ThingsGateway.SqlSugar
             return this;
         }
 
+        /// <summary>
+        /// 根据对象列表设置删除条件
+        /// </summary>
         public IDeleteable<T> Where(List<T> deleteObjs)
         {
             this.DeleteObjects = deleteObjs;
@@ -174,7 +247,6 @@ namespace ThingsGateway.SqlSugar
                     {
                         if (i != 0)
                             andString.Append(DeleteBuilder.WhereInAndTemplate + UtilConstants.Space);
-                        //var entityPropertyName = this.EntityInfo.Columns.Single(it=>it.PropertyName.EqualCase(primaryField)||it.DbColumnName.EqualCase(primaryField)).PropertyName;
                         var columnInfo = EntityInfo.Columns.Single(t => t.PropertyName.EqualCase(primaryField) || t.DbColumnName.EqualCase(primaryField));
                         var entityValue = columnInfo.PropertyInfo.GetValue(deleteObj, null);
                         if (this.Context.CurrentConnectionConfig?.MoreSettings?.TableEnumIsString != true &&
@@ -244,6 +316,10 @@ namespace ThingsGateway.SqlSugar
             }
             return this;
         }
+
+        /// <summary>
+        /// 条件Where
+        /// </summary>
         public IDeleteable<T> WhereIF(bool isWhere, Expression<Func<T, bool>> expression)
         {
             if (DeleteBuilder.WhereInfos.Count != 0 != true)
@@ -256,6 +332,10 @@ namespace ThingsGateway.SqlSugar
             }
             return this;
         }
+
+        /// <summary>
+        /// 设置Where条件
+        /// </summary>
         public IDeleteable<T> Where(Expression<Func<T, bool>> expression)
         {
             var expResult = DeleteBuilder.GetExpressionValue(expression, ResolveExpressType.WhereSingle);
@@ -289,6 +369,9 @@ namespace ThingsGateway.SqlSugar
             return this;
         }
 
+        /// <summary>
+        /// 根据对象设置删除条件
+        /// </summary>
         public IDeleteable<T> Where(T deleteObj)
         {
             Check.Exception(GetPrimaryKeys().IsNullOrEmpty(), "Where(entity) Primary key required");
@@ -296,6 +379,9 @@ namespace ThingsGateway.SqlSugar
             return this;
         }
 
+        /// <summary>
+        /// 设置Where条件
+        /// </summary>
         public IDeleteable<T> Where(string whereString, object parameters = null)
         {
             DeleteBuilder.WhereInfos.Add(whereString);
@@ -310,6 +396,9 @@ namespace ThingsGateway.SqlSugar
             return this;
         }
 
+        /// <summary>
+        /// 设置Where条件
+        /// </summary>
         public IDeleteable<T> Where(string whereString, SugarParameter parameter)
         {
             DeleteBuilder.WhereInfos.Add(whereString);
@@ -320,6 +409,10 @@ namespace ThingsGateway.SqlSugar
             DeleteBuilder.Parameters.Add(parameter);
             return this;
         }
+
+        /// <summary>
+        /// 设置Where条件
+        /// </summary>
         public IDeleteable<T> Where(string whereString, SugarParameter[] parameters)
         {
             DeleteBuilder.WhereInfos.Add(whereString);
@@ -330,6 +423,10 @@ namespace ThingsGateway.SqlSugar
             DeleteBuilder.Parameters.AddRange(parameters);
             return this;
         }
+
+        /// <summary>
+        /// 设置Where条件
+        /// </summary>
         public IDeleteable<T> Where(string whereString, List<SugarParameter> parameters)
         {
             DeleteBuilder.WhereInfos.Add(whereString);
@@ -340,6 +437,10 @@ namespace ThingsGateway.SqlSugar
             DeleteBuilder.Parameters.AddRange(parameters);
             return this;
         }
+
+        /// <summary>
+        /// 设置条件模型
+        /// </summary>
         public IDeleteable<T> Where(List<IConditionalModel> conditionalModels, bool isWrap)
         {
             if (conditionalModels.Count == 0)
@@ -358,6 +459,10 @@ namespace ThingsGateway.SqlSugar
             }
             return result;
         }
+
+        /// <summary>
+        /// 设置条件模型
+        /// </summary>
         public IDeleteable<T> Where(List<IConditionalModel> conditionalModels)
         {
             if (conditionalModels.Count == 0)
@@ -369,24 +474,31 @@ namespace ThingsGateway.SqlSugar
             result.Where(sql.Key, sql.Value);
             return result;
         }
+
+        /// <summary>
+        /// 设置条件列
+        /// </summary>
         public IDeleteable<T> WhereColumns(T data, Expression<Func<T, object>> columns)
         {
             return WhereColumns(new List<T>() { data }, columns);
         }
+
+        /// <summary>
+        /// 设置条件列
+        /// </summary>
         public IDeleteable<T> WhereColumns(List<T> list, Expression<Func<T, object>> columns)
         {
             if (columns != null)
             {
                 tempPrimaryKeys = DeleteBuilder.GetExpressionValue(columns, ResolveExpressType.ArraySingle).GetResultArray().Select(it => this.SqlBuilder.GetNoTranslationColumnName(it)).ToList();
             }
-            //else if (columns != null && tempPrimaryKeys.IsNullOrEmpty())
-            //{
-            //    tempPrimaryKeys = DeleteBuilder.GetExpressionValue(columns, ResolveExpressType.ArraySingle).GetResultArray().Select(it => this.SqlBuilder.GetNoTranslationColumnName(it)).ToList();
-            //}
             this.Where(list);
-
             return this;
         }
+
+        /// <summary>
+        /// 设置条件列
+        /// </summary>
         public IDeleteable<T> WhereColumns(List<Dictionary<string, object>> list)
         {
             List<IConditionalModel> conditionalModels = new List<IConditionalModel>();
@@ -412,6 +524,10 @@ namespace ThingsGateway.SqlSugar
             }
             return this.Where(conditionalModels);
         }
+
+        /// <summary>
+        /// 移除数据缓存
+        /// </summary>
         public IDeleteable<T> RemoveDataCache()
         {
             this.RemoveCacheFunc = () =>
@@ -421,6 +537,10 @@ namespace ThingsGateway.SqlSugar
             };
             return this;
         }
+
+        /// <summary>
+        /// 启用查询过滤器
+        /// </summary>
         public IDeleteable<T> EnableQueryFilter()
         {
             var queryable = this.Context.Queryable<T>();
@@ -433,6 +553,10 @@ namespace ThingsGateway.SqlSugar
             }
             return this;
         }
+
+        /// <summary>
+        /// 启用指定类型的查询过滤器
+        /// </summary>
         public IDeleteable<T> EnableQueryFilter(Type type)
         {
             var queryable = this.Context.Queryable<T>().Filter(type);
@@ -445,6 +569,10 @@ namespace ThingsGateway.SqlSugar
             }
             return this;
         }
+
+        /// <summary>
+        /// 分表删除
+        /// </summary>
         public SplitTableDeleteProvider<T> SplitTable(Func<List<SplitTableInfo>, IEnumerable<SplitTableInfo>> getTableNamesFunc)
         {
             UtilMethods.StartCustomSplitTable(this.Context, typeof(T));
@@ -460,6 +588,10 @@ namespace ThingsGateway.SqlSugar
             result.deleteobj = this;
             return result;
         }
+
+        /// <summary>
+        /// 分表删除
+        /// </summary>
         public SplitTableDeleteByObjectProvider<T> SplitTable()
         {
             UtilMethods.StartCustomSplitTable(this.Context, typeof(T));
@@ -474,6 +606,10 @@ namespace ThingsGateway.SqlSugar
             result.deleteobj = this;
             return result;
         }
+
+        /// <summary>
+        /// 逻辑删除
+        /// </summary>
         public LogicDeleteProvider<T> IsLogic()
         {
             LogicDeleteProvider<T> result = new LogicDeleteProvider<T>();
@@ -481,6 +617,10 @@ namespace ThingsGateway.SqlSugar
             result.Deleteable = this;
             return result;
         }
+
+        /// <summary>
+        /// 按条件移除数据缓存
+        /// </summary>
         public IDeleteable<T> RemoveDataCache(string likeString)
         {
             this.RemoveCacheFunc = () =>
@@ -490,6 +630,10 @@ namespace ThingsGateway.SqlSugar
             };
             return this;
         }
+
+        /// <summary>
+        /// IN条件
+        /// </summary>
         public IDeleteable<T> In<PkType>(List<PkType> primaryKeyValues)
         {
             if (primaryKeyValues == null || primaryKeyValues.Count == 0)
@@ -500,6 +644,9 @@ namespace ThingsGateway.SqlSugar
             return In<PkType>(primaryKeyValues.ToArray());
         }
 
+        /// <summary>
+        /// IN条件
+        /// </summary>
         public IDeleteable<T> In<PkType>(PkType[] primaryKeyValues)
         {
             if (primaryKeyValues == null || primaryKeyValues.Length == 0)
@@ -525,6 +672,9 @@ namespace ThingsGateway.SqlSugar
             return this;
         }
 
+        /// <summary>
+        /// IN条件
+        /// </summary>
         public IDeleteable<T> In<PkType>(PkType primaryKeyValue)
         {
             if (typeof(PkType).FullName.IsCollectionsList())
@@ -537,11 +687,13 @@ namespace ThingsGateway.SqlSugar
                 return In(newValues);
             }
 
-
             In(new PkType[] { primaryKeyValue });
             return this;
         }
 
+        /// <summary>
+        /// IN条件
+        /// </summary>
         public IDeleteable<T> In<PkType>(Expression<Func<T, object>> inField, PkType primaryKeyValue)
         {
             var lamResult = DeleteBuilder.GetExpressionValue(inField, ResolveExpressType.FieldSingle);
@@ -551,6 +703,10 @@ namespace ThingsGateway.SqlSugar
             tempPrimaryKeys = null;
             return this;
         }
+
+        /// <summary>
+        /// IN条件
+        /// </summary>
         public IDeleteable<T> In<PkType>(Expression<Func<T, object>> inField, PkType[] primaryKeyValues)
         {
             var lamResult = DeleteBuilder.GetExpressionValue(inField, ResolveExpressType.FieldSingle);
@@ -560,6 +716,10 @@ namespace ThingsGateway.SqlSugar
             tempPrimaryKeys = null;
             return this;
         }
+
+        /// <summary>
+        /// IN条件
+        /// </summary>
         public IDeleteable<T> In<PkType>(Expression<Func<T, object>> inField, List<PkType> primaryKeyValues)
         {
             var lamResult = DeleteBuilder.GetExpressionValue(inField, ResolveExpressType.FieldSingle);
@@ -570,6 +730,9 @@ namespace ThingsGateway.SqlSugar
             return this;
         }
 
+        /// <summary>
+        /// IN条件(子查询)
+        /// </summary>
         public IDeleteable<T> In<PkType>(Expression<Func<T, object>> inField, ISugarQueryable<PkType> childQueryExpression)
         {
             var lamResult = DeleteBuilder.GetExpressionValue(inField, ResolveExpressType.FieldSingle);
@@ -578,6 +741,10 @@ namespace ThingsGateway.SqlSugar
             Where($" {fieldName} IN ( SELECT {fieldName} FROM ( {sql.Key} ) SUBDEL) ", sql.Value);
             return this;
         }
+
+        /// <summary>
+        /// IN条件
+        /// </summary>
         public IDeleteable<T> In<PkType>(string inField, List<PkType> primaryKeyValues)
         {
             tempPrimaryKeys = new List<string>() { inField };
@@ -586,6 +753,9 @@ namespace ThingsGateway.SqlSugar
             return this;
         }
 
+        /// <summary>
+        /// 分页删除
+        /// </summary>
         public DeleteablePage<T> PageSize(int pageSize)
         {
             Check.ExceptionEasy(this.DeleteObjects == null, "PageSize can only be deleted as a List<Class> entity collection", "Deleteable.PageSize()只能是List<Class>实体集合方式删除,并且集合不能为null");
@@ -598,12 +768,20 @@ namespace ThingsGateway.SqlSugar
             result.PageSize = pageSize;
             return result;
         }
+
+        /// <summary>
+        /// 设置锁
+        /// </summary>
         public IDeleteable<T> With(string lockString)
         {
             if (this.Context.CurrentConnectionConfig.DbType == DbType.SqlServer)
                 DeleteBuilder.TableWithString = lockString;
             return this;
         }
+
+        /// <summary>
+        /// 获取SQL语句
+        /// </summary>
         public virtual string ToSqlString()
         {
             var sqlObj = this.ToSql();
@@ -612,6 +790,10 @@ namespace ThingsGateway.SqlSugar
             result = UtilMethods.GetSqlString(this.Context.CurrentConnectionConfig, sqlObj);
             return result;
         }
+
+        /// <summary>
+        /// 获取SQL和参数
+        /// </summary>
         public KeyValuePair<string, List<SugarParameter>> ToSql()
         {
             DeleteBuilder.EntityInfo = this.Context.EntityMaintenance.GetEntityInfo<T>();
@@ -621,6 +803,9 @@ namespace ThingsGateway.SqlSugar
             return new KeyValuePair<string, List<SugarParameter>>(sql, paramters);
         }
 
+        /// <summary>
+        /// 获取主键列表
+        /// </summary>
         private List<string> GetPrimaryKeys()
         {
             if (tempPrimaryKeys.HasValue())
@@ -632,6 +817,10 @@ namespace ThingsGateway.SqlSugar
                 return this.EntityInfo.Columns.Where(it => it.IsPrimarykey).Select(it => it.DbColumnName).ToList();
             }
         }
+
+        /// <summary>
+        /// 执行删除命令
+        /// </summary>
         private void _ExecuteCommand(out string sql, out SugarParameter[] paramters)
         {
             DeleteBuilder.EntityInfo = this.Context.EntityMaintenance.GetEntityInfo<T>();
@@ -642,12 +831,17 @@ namespace ThingsGateway.SqlSugar
             Before(sql);
         }
 
+        /// <summary>
+        /// 获取自增键列表
+        /// </summary>
         protected virtual List<string> GetIdentityKeys()
         {
-
             return this.EntityInfo.Columns.Where(it => it.IsIdentity).Select(it => it.DbColumnName).ToList();
         }
 
+        /// <summary>
+        /// 恢复映射
+        /// </summary>
         private void RestoreMapping()
         {
             if (IsAs)
@@ -656,15 +850,9 @@ namespace ThingsGateway.SqlSugar
             }
         }
 
-        //private void TaskStart<Type>(Task<Type> result)
-        //{
-        //    if (this.Context.CurrentConnectionConfig.IsShardSameThread)
-        //    {
-        //        Check.Exception(true, "IsShardSameThread=true can't be used async method");
-        //    }
-        //    result.Start();
-        //}
-
+        /// <summary>
+        /// 自动移除数据缓存
+        /// </summary>
         private void AutoRemoveDataCache()
         {
             var moreSetts = this.Context.CurrentConnectionConfig.MoreSettings;
@@ -675,7 +863,9 @@ namespace ThingsGateway.SqlSugar
             }
         }
 
-
+        /// <summary>
+        /// 执行后操作
+        /// </summary>
         protected virtual void After(string sql)
         {
             if (this.IsEnableDiffLogEvent)
@@ -698,6 +888,9 @@ namespace ThingsGateway.SqlSugar
             DataChangesAop(this.DeleteObjects);
         }
 
+        /// <summary>
+        /// 执行前操作
+        /// </summary>
         protected virtual void Before(string sql)
         {
             if (this.IsEnableDiffLogEvent)
@@ -714,6 +907,9 @@ namespace ThingsGateway.SqlSugar
             }
         }
 
+        /// <summary>
+        /// 获取差异表
+        /// </summary>
         protected virtual List<DiffLogTableInfo> GetDiffTable(string sql, List<SugarParameter> parameters)
         {
             List<DiffLogTableInfo> result = new List<DiffLogTableInfo>();
@@ -743,6 +939,10 @@ namespace ThingsGateway.SqlSugar
             }
             return result;
         }
+
+        /// <summary>
+        /// 数据AOP
+        /// </summary>
         protected virtual void DataAop(object deleteObj)
         {
             var dataEvent = this.Context.CurrentConnectionConfig.AopEvents?.DataExecuting;
@@ -757,6 +957,10 @@ namespace ThingsGateway.SqlSugar
                 dataEvent(deleteObj, model);
             }
         }
+
+        /// <summary>
+        /// 数据变更AOP
+        /// </summary>
         protected virtual void DataChangesAop(List<T> deleteObjs)
         {
             var dataEvent = this.Context.CurrentConnectionConfig.AopEvents?.DataChangesExecuted;

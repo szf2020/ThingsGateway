@@ -2,10 +2,18 @@ using System.Data;
 using System.Reflection;
 using System.Text.RegularExpressions;
 
-namespace ThingsGateway.SqlSugar.TDengine
+namespace ThingsGateway.SqlSugar
 {
+    /// <summary>
+    /// TDengine 代码优先(CodeFirst)实现
+    /// </summary>
     public class TDengineCodeFirst : CodeFirstProvider
     {
+        /// <summary>
+        /// 执行代码优先逻辑
+        /// </summary>
+        /// <param name="entityType">实体类型</param>
+        /// <param name="entityInfo">实体信息</param>
         protected override void Execute(Type entityType, EntityInfo entityInfo)
         {
             var attr = GetCommonSTableAttribute(entityInfo.Type.GetCustomAttribute<STableAttribute>());
@@ -86,6 +94,10 @@ namespace ThingsGateway.SqlSugar.TDengine
             this.Context.DbMaintenance.AddDefaultValue(entityInfo);
         }
 
+        /// <summary>
+        /// 表存在时的处理逻辑
+        /// </summary>
+        /// <param name="entityInfo">实体信息</param>
         public override void ExistLogic(EntityInfo entityInfo)
         {
             if (entityInfo.Columns.HasValue() && entityInfo.IsDisabledUpdateAll == false)
@@ -211,6 +223,11 @@ namespace ThingsGateway.SqlSugar.TDengine
                 ExistLogicEnd(entityColumns);
             }
         }
+
+        /// <summary>
+        /// 表不存在时的处理逻辑
+        /// </summary>
+        /// <param name="entityInfo">实体信息</param>
         public override void NoExistLogic(EntityInfo entityInfo)
         {
             List<DbColumnInfo> dbColumns = new List<DbColumnInfo>();
@@ -239,6 +256,14 @@ namespace ThingsGateway.SqlSugar.TDengine
             dbMain.CreateTable(entityInfo.DbTableName, dbColumns);
             entityInfo.DbTableName = oldTableName;
         }
+
+        /// <summary>
+        /// 将实体列信息转换为数据库列信息
+        /// </summary>
+        /// <param name="entityInfo">实体信息</param>
+        /// <param name="tableName">表名</param>
+        /// <param name="item">实体列信息</param>
+        /// <returns>数据库列信息</returns>
         protected override DbColumnInfo EntityColumnToDbColumn(EntityInfo entityInfo, string tableName, EntityColumnInfo item)
         {
             DbColumnInfo result = new DbColumnInfo() { Length = item.Length, DecimalDigits = item.DecimalDigits, Scale = item.DecimalDigits, TableName = tableName, DbColumnName = item.DbColumnName, DataType = item.DataType };
@@ -249,10 +274,21 @@ namespace ThingsGateway.SqlSugar.TDengine
             return result;
         }
 
+        /// <summary>
+        /// 获取通用STable特性
+        /// </summary>
+        /// <param name="sTableAttribute">STable特性</param>
+        /// <returns>处理后的STable特性</returns>
         private STableAttribute GetCommonSTableAttribute(STableAttribute sTableAttribute)
         {
-            return SqlSugar.TDengine.UtilMethods.GetCommonSTableAttribute(this.Context, sTableAttribute);
+            return TaosUtilMethods.GetCommonSTableAttribute(this.Context, sTableAttribute);
         }
+
+        /// <summary>
+        /// 根据类型名称获取数据库类型名称
+        /// </summary>
+        /// <param name="typeName">类型名称</param>
+        /// <returns>数据库类型名称</returns>
         public string GetDatabaseTypeName(string typeName)
         {
             switch (typeName.ToLower())

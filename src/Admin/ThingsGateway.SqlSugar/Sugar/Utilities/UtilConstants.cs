@@ -8,8 +8,12 @@ namespace ThingsGateway.SqlSugar
         public const char DotChar = '.';
         internal const string Space = " ";
         internal const char SpaceChar = ' ';
-        internal const string AssemblyName = "ThingsGateway.SqlSugar";
-        internal static string ReplaceKey = "{" + Guid.NewGuid() + "}";
+        /// <summary>
+        /// 程序集名称常量
+        /// </summary>
+        internal const string AssemblyName = $"{SugarConst.StartName}SqlSugar";
+
+        internal const string ReplaceKey = "{662E689B-17A1-4D06-9D27-F29EAB8BC3D6}";
         internal const string ReplaceCommaKey = "{112A689B-17A1-4A06-9D27-A39EAB8BC3D5}";
         internal const string GroupReplaceKey = "{GroupReplaceKey_l33asdysaas1231s}";
 

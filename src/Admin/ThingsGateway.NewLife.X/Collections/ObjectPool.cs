@@ -350,12 +350,20 @@ public class ObjectPool<T> : DisposeBase, IPool<T> where T : notnull
             while (_free.TryPeek(out var pi) && pi.LastTime < exp)
             {
                 // 取出来销毁
-                if (_free.TryPop(out pi))
+                if (_free.TryPop(out var pi2))
                 {
-                    pi.Value.TryDispose();
+                    if (pi2.LastTime < exp)
+                    {
+                        pi2.Value.TryDispose();
 
-                    count++;
-                    Interlocked.Decrement(ref _FreeCount);
+                        count++;
+                        Interlocked.Decrement(ref _FreeCount);
+                    }
+                    else
+                    {
+                        // 可能是另一个对象，放回去
+                        _free.Push(pi2);
+                    }
                 }
             }
         }

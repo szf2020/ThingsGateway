@@ -40,8 +40,8 @@ public sealed class HttpRemoteOptions
         AllowTrailingCommas = true,
         Converters =
         {
-            new DateTimeConverterUsingDateTimeParseAsFallback(),
-            new DateTimeOffsetConverterUsingDateTimeOffsetParseAsFallback(),
+            new FlexibleDateTimeConverter(),
+            new FlexibleDateTimeOffsetConverter(),
             // 允许 Number 或 Boolean 转 String
             new StringJsonConverter()
         }
@@ -91,6 +91,11 @@ public sealed class HttpRemoteOptions
     /// </summary>
     /// <remarks>支持作为替换 URL 地址中配置模板参数的提供源。</remarks>
     public IConfiguration? Configuration { get; set; }
+
+    /// <summary>
+    ///     URL 参数格式化程序
+    /// </summary>
+    public IUrlParameterFormatter? UrlParameterFormatter { get; set; } = new UrlParameterFormatter();
 
     /// <summary>
     ///     自定义 HTTP 声明式 <see cref="IHttpDeclarativeExtractor" /> 集合提供器

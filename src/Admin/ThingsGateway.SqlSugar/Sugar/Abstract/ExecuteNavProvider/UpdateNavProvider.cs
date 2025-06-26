@@ -4,19 +4,65 @@ namespace ThingsGateway.SqlSugar
 {
     public partial class UpdateNavProvider<Root, T> where T : class, new() where Root : class, new()
     {
+        /// <summary>
+        /// 根节点更新选项
+        /// </summary>
         internal UpdateNavRootOptions _RootOptions { get; set; }
+
+        /// <summary>
+        /// 根实体列表
+        /// </summary>
         public List<Root> _Roots { get; set; }
+
+        /// <summary>
+        /// 父实体列表
+        /// </summary>
         public List<object> _ParentList { get; set; }
+
+        /// <summary>
+        /// 根实体列表(对象形式)
+        /// </summary>
         public List<object> _RootList { get; set; }
+
+        /// <summary>
+        /// 父实体信息
+        /// </summary>
         public EntityInfo _ParentEntity { get; set; }
+
+        /// <summary>
+        /// 父实体主键列信息
+        /// </summary>
         public EntityColumnInfo _ParentPkColumn { get; set; }
+
+        /// <summary>
+        /// SqlSugar上下文
+        /// </summary>
         public SqlSugarProvider _Context { get; set; }
 
+        /// <summary>
+        /// 更新选项
+        /// </summary>
         public UpdateNavOptions _Options { get; set; }
+
+        /// <summary>
+        /// 是否首次操作
+        /// </summary>
         public bool IsFirst { get; set; }
+
+        /// <summary>
+        /// 是否作为导航属性操作
+        /// </summary>
         public bool IsAsNav { get; set; }
+
+        /// <summary>
+        /// 导航上下文
+        /// </summary>
         internal NavContext NavContext { get; set; }
 
+        /// <summary>
+        /// 作为导航属性操作
+        /// </summary>
+        /// <returns>更新导航提供者</returns>
         public UpdateNavProvider<Root, Root> AsNav()
         {
             return new UpdateNavProvider<Root, Root>
@@ -28,28 +74,61 @@ namespace ThingsGateway.SqlSugar
                 _ParentPkColumn = this._Context.EntityMaintenance.GetEntityInfo<Root>().Columns.First(it => it.IsPrimarykey)
             };
         }
+
+        /// <summary>
+        /// 包含子实体(单个)
+        /// </summary>
+        /// <typeparam name="TChild">子实体类型</typeparam>
+        /// <param name="expression">导航属性表达式</param>
+        /// <returns>更新导航提供者</returns>
         public UpdateNavProvider<Root, TChild> ThenInclude<TChild>(Expression<Func<T, TChild>> expression) where TChild : class, new()
         {
             return _ThenInclude(expression);
         }
 
+        /// <summary>
+        /// 包含子实体(列表)
+        /// </summary>
+        /// <typeparam name="TChild">子实体类型</typeparam>
+        /// <param name="expression">导航属性表达式</param>
+        /// <returns>更新导航提供者</returns>
         public UpdateNavProvider<Root, TChild> ThenInclude<TChild>(Expression<Func<T, List<TChild>>> expression) where TChild : class, new()
         {
             return _ThenInclude(expression);
         }
 
+        /// <summary>
+        /// 包含子实体(单个)并指定选项
+        /// </summary>
+        /// <typeparam name="TChild">子实体类型</typeparam>
+        /// <param name="expression">导航属性表达式</param>
+        /// <param name="options">更新选项</param>
+        /// <returns>更新导航提供者</returns>
         public UpdateNavProvider<Root, TChild> ThenInclude<TChild>(Expression<Func<T, TChild>> expression, UpdateNavOptions options) where TChild : class, new()
         {
             _Options = options;
             return _ThenInclude(expression);
         }
 
+        /// <summary>
+        /// 包含子实体(列表)并指定选项
+        /// </summary>
+        /// <typeparam name="TChild">子实体类型</typeparam>
+        /// <param name="expression">导航属性表达式</param>
+        /// <param name="options">更新选项</param>
+        /// <returns>更新导航提供者</returns>
         public UpdateNavProvider<Root, TChild> ThenInclude<TChild>(Expression<Func<T, List<TChild>>> expression, UpdateNavOptions options) where TChild : class, new()
         {
             _Options = options;
             return _ThenInclude(expression);
         }
 
+        /// <summary>
+        /// 内部方法-包含子实体(单个)
+        /// </summary>
+        /// <typeparam name="TChild">子实体类型</typeparam>
+        /// <param name="expression">导航属性表达式</param>
+        /// <returns>更新导航提供者</returns>
         private UpdateNavProvider<Root, TChild> _ThenInclude<TChild>(Expression<Func<T, TChild>> expression) where TChild : class, new()
         {
             var isRoot = _RootList == null;
@@ -67,7 +146,6 @@ namespace ThingsGateway.SqlSugar
             }
             else
             {
-
                 UpdateRoot(isRoot, nav);
             }
             IsFirst = false;
@@ -86,6 +164,13 @@ namespace ThingsGateway.SqlSugar
             AddContextInfo(name, isRoot);
             return GetResult<TChild>();
         }
+
+        /// <summary>
+        /// 内部方法-包含子实体(列表)
+        /// </summary>
+        /// <typeparam name="TChild">子实体类型</typeparam>
+        /// <param name="expression">导航属性表达式</param>
+        /// <returns>更新导航提供者</returns>
         private UpdateNavProvider<Root, TChild> _ThenInclude<TChild>(Expression<Func<T, List<TChild>>> expression) where TChild : class, new()
         {
             var isRoot = _RootList == null;
@@ -118,6 +203,12 @@ namespace ThingsGateway.SqlSugar
             AddContextInfo(name, isRoot);
             return GetResult<TChild>();
         }
+
+        /// <summary>
+        /// 更新根实体
+        /// </summary>
+        /// <param name="isRoot">是否根实体</param>
+        /// <param name="nav">导航列信息</param>
         private void UpdateRoot(bool isRoot, EntityColumnInfo nav)
         {
             if (isRoot && nav.Navigat.NavigatType != NavigateType.ManyToMany && _RootOptions?.IsDisableUpdateRoot != true)
@@ -137,6 +228,9 @@ namespace ThingsGateway.SqlSugar
             }
         }
 
+        /// <summary>
+        /// 更新根实体
+        /// </summary>
         private void UpdateRoot()
         {
             if (IsAsNav)
@@ -210,6 +304,11 @@ namespace ThingsGateway.SqlSugar
             }
         }
 
+        /// <summary>
+        /// 添加上下文信息
+        /// </summary>
+        /// <param name="name">导航属性名称</param>
+        /// <param name="isRoot">是否根实体</param>
         private void AddContextInfo(string name, bool isRoot)
         {
             if (IsAsNav || isRoot)
@@ -220,6 +319,12 @@ namespace ThingsGateway.SqlSugar
                 }
             }
         }
+
+        /// <summary>
+        /// 检查是否不存在指定名称的导航属性
+        /// </summary>
+        /// <param name="name">导航属性名称</param>
+        /// <returns>是否不存在</returns>
         private bool NotAny(string name)
         {
             if (IsFirst) return true;

@@ -4,6 +4,7 @@ namespace ThingsGateway.SqlSugar
 {
     public partial class FastestProvider<T> : IFastest<T> where T : class, new()
     {
+        /// <summary>获取对应数据库类型的快速构建器</summary>
         private IFastBuilder GetBuider()
         {
             var className = string.Empty;
@@ -31,22 +32,11 @@ namespace ThingsGateway.SqlSugar
                     var result3 = new DmFastBuilder();
                     result3.DbFastestProperties.IsOffIdentity = this.IsOffIdentity;
                     return result3;
-                //case DbType.ClickHouse:
-                //    var resultConnectorClickHouse = InstanceFactory.CreateInstance<IFastBuilder>("SqlSugar.ClickHouse.ClickHouseFastBuilder");
-                //    resultConnectorClickHouse.CharacterSet = this.CharacterSet;
-                //    return resultConnectorClickHouse;
-                //case DbType.Kdbndp:
-                //    break;
-                //case DbType.Oscar:
-                //    break;
                 case DbType.QuestDB:
                     return new QuestDBFastBuilder(this.entityInfo);
                 case DbType.Custom:
                     className = InstanceFactory.CustomNamespace + "." + InstanceFactory.CustomDbName + "FastBuilder";
                     break;
-                //case DbType.GaussDBNative:
-                //    className = "SqlSugar.GaussDB.GaussDBFastBuilder";
-                //    break;
                 default:
                     className = $"{SugarConst.StartName}SqlSugar.{this.context.CurrentConnectionConfig.DbType.ToString().Replace("Native", "")}FastBuilder";
                     break;
@@ -56,6 +46,8 @@ namespace ThingsGateway.SqlSugar
             reslut.FastEntityInfo = this.entityInfo;
             return reslut;
         }
+
+        /// <summary>将实体列表转换为DataTable</summary>
         private DataTable ToDdateTable(List<T> datas)
         {
             var builder = GetBuider();
@@ -164,6 +156,8 @@ namespace ThingsGateway.SqlSugar
 
             return dt;
         }
+
+        /// <summary>获取实体属性值</summary>
         private static object GetValue(T item, EntityColumnInfo column)
         {
             if (StaticConfig.EnableAot)
@@ -176,6 +170,7 @@ namespace ThingsGateway.SqlSugar
             }
         }
 
+        /// <summary>获取表名</summary>
         private string GetTableName()
         {
             if (this.AsName.HasValue())
@@ -187,6 +182,8 @@ namespace ThingsGateway.SqlSugar
                 return queryable.SqlBuilder.GetTranslationTableName(this.context.EntityMaintenance.GetTableName<T>());
             }
         }
+
+        /// <summary>值转换器</summary>
         private object ValueConverter(EntityColumnInfo columnInfo, object value)
         {
             if (value == null)
@@ -195,14 +192,6 @@ namespace ThingsGateway.SqlSugar
             {
                 value = Convert.ToDateTime("1900-01-01");
             }
-            //else if (columnInfo.IsJson)
-            //{
-            //    columnInfo.IsJson = true;
-            //}
-            //else if (columnInfo.IsArray)
-            //{
-            //    columnInfo.IsArray = true;
-            //}
             else if (columnInfo.UnderType.IsEnum())
             {
                 value = Convert.ToInt64(value);
@@ -217,6 +206,8 @@ namespace ThingsGateway.SqlSugar
             }
             return value;
         }
+
+        /// <summary>获取可写入的DataTable</summary>
         private DataTable GetCopyWriteDataTable(DataTable dt)
         {
             var builder = GetBuider();
@@ -272,6 +263,8 @@ namespace ThingsGateway.SqlSugar
             tempDataTable.TableName = dt.TableName;
             return tempDataTable;
         }
+
+        /// <summary>获取可更新的DataTable</summary>
         private DataTable GetCopyWriteDataTableUpdate(DataTable dt)
         {
             var sqlBuilder = this.context.Queryable<object>().SqlBuilder;
@@ -321,6 +314,7 @@ namespace ThingsGateway.SqlSugar
             return tempDataTable;
         }
 
+        /// <summary>移除缓存</summary>
         private void RemoveCache()
         {
             if (!string.IsNullOrEmpty(CacheKey) || !string.IsNullOrEmpty(CacheKeyLike))
@@ -345,6 +339,5 @@ namespace ThingsGateway.SqlSugar
                 }
             }
         }
-
     }
 }

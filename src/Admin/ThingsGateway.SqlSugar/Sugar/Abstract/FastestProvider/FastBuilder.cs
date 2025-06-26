@@ -2,19 +2,47 @@
 
 namespace ThingsGateway.SqlSugar
 {
+    /// <summary>
+    /// 快速构建器类
+    /// </summary>
     public class FastBuilder
     {
+        /// <summary>
+        /// 快速实体信息
+        /// </summary>
         public EntityInfo FastEntityInfo { get; set; }
+
+        /// <summary>
+        /// 是否操作更新列
+        /// </summary>
         public virtual bool IsActionUpdateColumns { get; set; }
+
+        /// <summary>
+        /// 快速操作属性配置
+        /// </summary>
         public virtual DbFastestProperties DbFastestProperties { get; set; }
+
+        /// <summary>
+        /// SqlSugar上下文
+        /// </summary>
         public SqlSugarProvider Context { get; set; }
+
+        /// <summary>
+        /// 字符集
+        /// </summary>
         public virtual string CharacterSet { get; set; }
+
+        /// <summary>
+        /// 更新SQL模板
+        /// </summary>
         public virtual string UpdateSql { get; set; } = @"UPDATE TM
                                                     SET  {0}
                                                     FROM {1} TM
                                                     INNER JOIN {2} TE ON {3} ";
 
-
+        /// <summary>
+        /// 关闭数据库连接
+        /// </summary>
         public virtual void CloseDb()
         {
             if (this.Context.CurrentConnectionConfig.IsAutoCloseConnection && this.Context.Ado.Transaction == null)
@@ -23,6 +51,14 @@ namespace ThingsGateway.SqlSugar
             }
         }
 
+        /// <summary>
+        /// 通过临时表异步更新数据
+        /// </summary>
+        /// <param name="tableName">表名</param>
+        /// <param name="tempName">临时表名</param>
+        /// <param name="updateColumns">更新列</param>
+        /// <param name="whereColumns">条件列</param>
+        /// <returns>影响行数</returns>
         public virtual async Task<int> UpdateByTempAsync(string tableName, string tempName, string[] updateColumns, string[] whereColumns)
         {
             var sqlbuilder = this.Context.Queryable<object>().SqlBuilder;
@@ -34,6 +70,11 @@ namespace ThingsGateway.SqlSugar
             return await Context.Ado.ExecuteCommandAsync(sql).ConfigureAwait(false);
         }
 
+        /// <summary>
+        /// 创建临时表(异步)
+        /// </summary>
+        /// <typeparam name="T">实体类型</typeparam>
+        /// <param name="dt">数据表</param>
         public virtual async Task CreateTempAsync<T>(DataTable dt) where T : class, new()
         {
             var sqlbuilder = this.Context.Queryable<object>().SqlBuilder;
@@ -43,6 +84,17 @@ namespace ThingsGateway.SqlSugar
             dt.TableName = "#temp";
         }
 
+        /// <summary>
+        /// 合并数据(异步)
+        /// </summary>
+        /// <typeparam name="T">实体类型</typeparam>
+        /// <param name="tableName">表名</param>
+        /// <param name="dt">数据表</param>
+        /// <param name="entityInfo">实体信息</param>
+        /// <param name="whereColumns">条件列</param>
+        /// <param name="updateColumns">更新列</param>
+        /// <param name="datas">数据列表</param>
+        /// <returns>影响行数</returns>
         public async virtual Task<int> Merge<T>(string tableName, DataTable dt, EntityInfo entityInfo, string[] whereColumns, string[] updateColumns, List<T> datas) where T : class, new()
         {
             var result = 0;
