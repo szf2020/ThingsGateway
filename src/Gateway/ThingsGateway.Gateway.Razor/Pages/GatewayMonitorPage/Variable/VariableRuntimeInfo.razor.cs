@@ -8,8 +8,6 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-using Mapster;
-
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.Extensions.Options;
 
@@ -25,7 +23,7 @@ public partial class VariableRuntimeInfo : IDisposable
 
     private static void BeforeShowEditDialogCallback(ITableEditDialogOption<VariableRuntime> tableEditDialogOption)
     {
-        tableEditDialogOption.Model = tableEditDialogOption.Model.Adapt<VariableRuntime>();
+        tableEditDialogOption.Model = tableEditDialogOption.Model.AdaptVariableRuntime();
     }
 
     [Inject]
@@ -217,9 +215,9 @@ public partial class VariableRuntimeInfo : IDisposable
             await ToastService.Warning(null, RazorLocalizer["PleaseSelect"]);
             return;
         }
-        variables = variables.Where(a => !a.DynamicVariable).Adapt<List<Variable>>();
-        oldModel = oldModel.Adapt<Variable>();
-        var model = oldModel.Adapt<Variable>();//默认值显示第一个
+        variables = variables.Where(a => !a.DynamicVariable).AdaptListVariable();
+        oldModel = oldModel.AdaptVariable();
+        var model = oldModel.AdaptVariable();//默认值显示第一个
         op.Component = BootstrapDynamicComponent.CreateComponent<VariableEditComponent>(new Dictionary<string, object?>
         {
              {nameof(VariableEditComponent.OnValidSubmit), async () =>
@@ -272,7 +270,7 @@ public partial class VariableRuntimeInfo : IDisposable
             }
 
             variable.VariablePropertys = PluginServiceUtil.SetDict(variable.VariablePropertyModels);
-            variable = variable.Adapt<Variable>();
+            variable = variable.AdaptVariable();
             return await Task.Run(() => GlobalData.VariableRuntimeService.SaveVariableAsync(variable, itemChangedType, AutoRestartThread, default));
         }
         catch (Exception ex)

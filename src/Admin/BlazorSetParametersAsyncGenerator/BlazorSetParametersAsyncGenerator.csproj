@@ -17,8 +17,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<None Include="$(OutputPath)\$(TargetFileName)" Pack="true"
-			  PackagePath="analyzers/dotnet/cs" Visible="false" />
+		<None Include="$(OutputPath)\$(TargetFileName)" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
 	</ItemGroup>
 	
 
@@ -27,6 +26,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.9.0" PrivateAssets="all" />
+		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.13.0" PrivateAssets="all" Private="false" />
 	</ItemGroup>
 </Project>

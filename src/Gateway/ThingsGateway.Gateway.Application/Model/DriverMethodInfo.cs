@@ -8,7 +8,7 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-using Mapster;
+using Riok.Mapperly.Abstractions;
 
 using System.Reflection;
 
@@ -48,6 +48,6 @@ public class DriverMethodInfo
     [SugarColumn(IsIgnore = true)]
     [System.Text.Json.Serialization.JsonIgnore]
     [Newtonsoft.Json.JsonIgnore]
-    [AdaptIgnore]
+    [MapperIgnore]
     public MethodInfo? MethodInfo { get; set; }
 }

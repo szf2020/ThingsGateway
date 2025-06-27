@@ -8,8 +8,6 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-using Mapster;
-
 using ThingsGateway.Admin.Application;
 
 namespace ThingsGateway.Admin.Razor;
@@ -56,7 +54,7 @@ public partial class UserChoiceDialog
             OrgId = OrgId,
             PositionId = PositionId,
         });
-        QueryData<UserSelectorOutput> queryData = data.Adapt<QueryData<UserSelectorOutput>>();
+        QueryData<UserSelectorOutput> queryData = data.AdaptQueryDataUserSelectorOutput();
 
         return queryData;
     }

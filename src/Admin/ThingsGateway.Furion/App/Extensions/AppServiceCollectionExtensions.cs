@@ -210,7 +210,7 @@ public static class AppServiceCollectionExtensions
         services.AddStartups();
 
         // 添加对象映射
-        services.AddObjectMapper();
+        //services.AddObjectMapper();
 
         // 默认内置 GBK，Windows-1252, Shift-JIS, GB2312 编码支持
         Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);

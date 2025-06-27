@@ -8,8 +8,6 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-using Mapster;
-
 using Microsoft.AspNetCore.Components.Forms;
 
 using ThingsGateway.Admin.Application;
@@ -37,9 +35,9 @@ public partial class UserCenterPage
 
     protected override async Task OnParametersSetAsync()
     {
-        SysUser = AppContext.CurrentUser.Adapt<SysUser>();
+        SysUser = AppContext.CurrentUser.AdaptSysUser();
         SysUser.Avatar = AppContext.Avatar;
-        WorkbenchInfo = (await UserCenterService.GetLoginWorkbenchAsync(SysUser.Id)).Adapt<WorkbenchInfo>();
+        WorkbenchInfo = (await UserCenterService.GetLoginWorkbenchAsync(SysUser.Id)).AdaptWorkbenchInfo();
 
         await base.OnParametersSetAsync();
     }

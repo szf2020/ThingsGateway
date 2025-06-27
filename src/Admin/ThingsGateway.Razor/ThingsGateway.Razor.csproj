@@ -35,7 +35,10 @@
 	</ItemGroup>-->
 
 	<ItemGroup>
-		<ProjectReference Include="..\BlazorSetParametersAsyncGenerator\BlazorSetParametersAsyncGenerator.csproj" PrivateAssets="all" OutputItemType="Analyzer" />
+		<ProjectReference Include="..\BlazorSetParametersAsyncGenerator\BlazorSetParametersAsyncGenerator.csproj" PrivateAssets="all" OutputItemType="Analyzer">
+			<ExcludeAssets>all</ExcludeAssets>
+			<IncludeAssets>Analyzer</IncludeAssets>
+		</ProjectReference>
 	</ItemGroup>
 
 </Project>

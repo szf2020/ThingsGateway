@@ -8,8 +8,6 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-using Mapster;
-
 using Newtonsoft.Json.Linq;
 
 using ThingsGateway.Gateway.Application.Extensions;
@@ -185,7 +183,7 @@ public partial class VariableRuntime : Variable, IVariable, IDisposable
         {
             oldAlarm.EventType = EventTypeEnum.Finish;
             oldAlarm.EventTime = DateTime.Now;
-            GlobalData.AlarmChange(this.Adapt<AlarmVariable>());
+            GlobalData.AlarmChange(this.AdaptAlarmVariable());
         }
 
 
@@ -215,7 +213,7 @@ public partial class VariableRuntime : Variable, IVariable, IDisposable
         {
             oldAlarm.EventType = EventTypeEnum.Finish;
             oldAlarm.EventTime = DateTime.Now;
-            GlobalData.AlarmChange(this.Adapt<AlarmVariable>());
+            GlobalData.AlarmChange(this.AdaptAlarmVariable());
         }
 
         GC.SuppressFinalize(this);

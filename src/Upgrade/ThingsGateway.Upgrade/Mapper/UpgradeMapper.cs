@@ -8,26 +8,15 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-using Mapster;
+using Riok.Mapperly.Abstractions;
 
-namespace ThingsGateway.Gateway.Application;
+using TouchSocket.Dmtp;
 
-public class VariableMapper : IRegister
+namespace ThingsGateway.Upgrade;
+[Mapper(UseDeepCloning = true, EnumMappingStrategy = EnumMappingStrategy.ByName, RequiredMappingStrategy = RequiredMappingStrategy.None)]
+public static partial class UpgradeMapper
 {
-    /// <inheritdoc/>
-    public void Register(TypeAdapterConfig config)
-    {
-        config.ForType<Variable, VariableRuntime>()
-        .Map(dest => dest.Value, src => src.InitValue);
+    public static partial List<TcpSessionClientDto> AdaptListTcpSessionClientDto(this List<TcpDmtpSessionClient> src);
 
-        config.ForType<VariableRuntime, VariableRuntime>()
-.Ignore(dest => dest.DeviceRuntime);
-
-        config.ForType<VariableRuntime, VariableBasicData>()
-            .BeforeMapping((a, b) => b.VariableRuntime = a);
-        config.ForType<DeviceRuntime, DeviceBasicData>()
-            .BeforeMapping((a, b) => b.DeviceRuntime = a);
-
-
-    }
 }
+

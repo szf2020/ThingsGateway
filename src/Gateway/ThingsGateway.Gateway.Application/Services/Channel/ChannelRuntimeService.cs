@@ -10,8 +10,6 @@
 
 using BootstrapBlazor.Components;
 
-using Mapster;
-
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.Extensions.Logging;
 
@@ -204,10 +202,10 @@ public class ChannelRuntimeService : IChannelRuntimeService
             await WaitLock.WaitAsync().ConfigureAwait(false);
 
             //网关启动时，获取所有通道
-            var newChannelRuntimes = (await GlobalData.ChannelService.GetAllAsync().ConfigureAwait(false)).Where(a => ids.Contains(a.Id) || !GlobalData.Channels.ContainsKey(a.Id)).Adapt<List<ChannelRuntime>>();
+            var newChannelRuntimes = (await GlobalData.ChannelService.GetAllAsync().ConfigureAwait(false)).Where(a => ids.Contains(a.Id) || !GlobalData.Channels.ContainsKey(a.Id)).AdaptListChannelRuntime();
 
             var chanelIds = newChannelRuntimes.Select(a => a.Id).ToHashSet();
-            var newDeviceRuntimes = (await GlobalData.DeviceService.GetAllAsync().ConfigureAwait(false)).Where(a => chanelIds.Contains(a.ChannelId)).Adapt<List<DeviceRuntime>>();
+            var newDeviceRuntimes = (await GlobalData.DeviceService.GetAllAsync().ConfigureAwait(false)).Where(a => chanelIds.Contains(a.ChannelId)).AdaptListDeviceRuntime();
 
             await RuntimeServiceHelper.InitAsync(newChannelRuntimes, newDeviceRuntimes, _logger).ConfigureAwait(false);
 

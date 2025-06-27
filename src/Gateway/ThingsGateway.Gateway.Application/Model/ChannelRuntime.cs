@@ -10,7 +10,7 @@
 
 using BootstrapBlazor.Components;
 
-using Mapster;
+using Riok.Mapperly.Abstractions;
 
 using System.Collections.Concurrent;
 
@@ -30,7 +30,7 @@ public class ChannelRuntime : Channel, IChannelOptions, IDisposable
     /// </summary>
     [System.Text.Json.Serialization.JsonIgnore]
     [Newtonsoft.Json.JsonIgnore]
-    [AdaptIgnore]
+    [MapperIgnore]
     [AutoGenerateColumn(Ignore = true)]
     public PluginInfo? PluginInfo { get; set; }
 
@@ -47,7 +47,7 @@ public class ChannelRuntime : Channel, IChannelOptions, IDisposable
 
     [System.Text.Json.Serialization.JsonIgnore]
     [Newtonsoft.Json.JsonIgnore]
-    [AdaptIgnore]
+    [MapperIgnore]
     [AutoGenerateColumn(Ignore = true)]
     public WaitLock WaitLock { get; private set; } = new WaitLock();
 
@@ -79,13 +79,13 @@ public class ChannelRuntime : Channel, IChannelOptions, IDisposable
 
     [System.Text.Json.Serialization.JsonIgnore]
     [Newtonsoft.Json.JsonIgnore]
-    [AdaptIgnore]
+    [MapperIgnore]
     [AutoGenerateColumn(Ignore = true)]
     public TouchSocketConfig Config { get; set; } = new();
 
     [System.Text.Json.Serialization.JsonIgnore]
     [Newtonsoft.Json.JsonIgnore]
-    [AdaptIgnore]
+    [MapperIgnore]
     [AutoGenerateColumn(Ignore = true)]
     public IReadOnlyDictionary<long, DeviceRuntime>? ReadDeviceRuntimes => DeviceRuntimes;
 
@@ -94,7 +94,7 @@ public class ChannelRuntime : Channel, IChannelOptions, IDisposable
     /// </summary>
     [System.Text.Json.Serialization.JsonIgnore]
     [Newtonsoft.Json.JsonIgnore]
-    [AdaptIgnore]
+    [MapperIgnore]
     [AutoGenerateColumn(Ignore = true)]
     internal ConcurrentDictionary<long, DeviceRuntime>? DeviceRuntimes { get; } = new(Environment.ProcessorCount, 1000);
 
@@ -107,7 +107,7 @@ public class ChannelRuntime : Channel, IChannelOptions, IDisposable
 
     [System.Text.Json.Serialization.JsonIgnore]
     [Newtonsoft.Json.JsonIgnore]
-    [AdaptIgnore]
+    [MapperIgnore]
     [AutoGenerateColumn(Ignore = true)]
     public IDeviceThreadManage? DeviceThreadManage { get; internal set; }
 

@@ -10,8 +10,6 @@
 
 using BootstrapBlazor.Components;
 
-using Mapster;
-
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.Extensions.Logging;
 
@@ -38,7 +36,7 @@ public class VariableRuntimeService : IVariableRuntimeService
 
             var result = await GlobalData.VariableService.BatchSaveVariableAsync(input.Where(a => !a.DynamicVariable).ToList(), type).ConfigureAwait(false);
 
-            var newVariableRuntimes = input.Adapt<List<VariableRuntime>>();
+            var newVariableRuntimes = input.AdaptListVariableRuntime();
             var variableIds = newVariableRuntimes.Select(a => a.Id).ToHashSet();
             //获取变量，先找到原插件线程，然后修改插件线程内的字典，再改动全局字典，最后刷新插件
 
@@ -73,7 +71,7 @@ public class VariableRuntimeService : IVariableRuntimeService
             using var db = DbContext.GetDB<Variable>();
             var ids = models.Select(a => a.Id).ToHashSet();
 
-            var newVariableRuntimes = (await db.Queryable<Variable>().Where(a => ids.Contains(a.Id)).ToListAsync(cancellationToken).ConfigureAwait(false)).Adapt<List<VariableRuntime>>();
+            var newVariableRuntimes = (await db.Queryable<Variable>().Where(a => ids.Contains(a.Id)).ToListAsync(cancellationToken).ConfigureAwait(false)).AdaptListVariableRuntime();
 
             var variableIds = newVariableRuntimes.Select(a => a.Id).ToHashSet();
 
@@ -140,7 +138,7 @@ public class VariableRuntimeService : IVariableRuntimeService
 
 
             using var db = DbContext.GetDB<Variable>();
-            var newVariableRuntimes = (await db.Queryable<Variable>().Where(a => result.Contains(a.Id)).ToListAsync(cancellationToken).ConfigureAwait(false)).Adapt<List<VariableRuntime>>();
+            var newVariableRuntimes = (await db.Queryable<Variable>().Where(a => result.Contains(a.Id)).ToListAsync(cancellationToken).ConfigureAwait(false)).AdaptListVariableRuntime();
 
             var variableIds = newVariableRuntimes.Select(a => a.Id).ToHashSet();
 
@@ -176,20 +174,20 @@ public class VariableRuntimeService : IVariableRuntimeService
             var datas = await GlobalData.VariableService.InsertTestDataAsync(testVariableCount, testDeviceCount, slaveUrl, businessEnable).ConfigureAwait(false);
 
             {
-                var newChannelRuntimes = datas.Item1.Adapt<List<ChannelRuntime>>();
+                var newChannelRuntimes = datas.Item1.AdaptListChannelRuntime();
 
                 //批量修改之后，需要重新加载通道
                 RuntimeServiceHelper.Init(newChannelRuntimes);
 
                 {
 
-                    var newDeviceRuntimes = datas.Item2.Adapt<List<DeviceRuntime>>();
+                    var newDeviceRuntimes = datas.Item2.AdaptListDeviceRuntime();
 
                     RuntimeServiceHelper.Init(newDeviceRuntimes);
 
                 }
                 {
-                    var newVariableRuntimes = datas.Item3.Adapt<List<VariableRuntime>>();
+                    var newVariableRuntimes = datas.Item3.AdaptListVariableRuntime();
                     RuntimeServiceHelper.Init(newVariableRuntimes);
 
                 }
@@ -230,7 +228,7 @@ public class VariableRuntimeService : IVariableRuntimeService
 
 
             using var db = DbContext.GetDB<Variable>();
-            var newVariableRuntimes = (await db.Queryable<Variable>().Where(a => a.Id == input.Id).ToListAsync(cancellationToken).ConfigureAwait(false)).Adapt<List<VariableRuntime>>();
+            var newVariableRuntimes = (await db.Queryable<Variable>().Where(a => a.Id == input.Id).ToListAsync(cancellationToken).ConfigureAwait(false)).AdaptListVariableRuntime();
 
             var variableIds = newVariableRuntimes.Select(a => a.Id).ToHashSet();
 

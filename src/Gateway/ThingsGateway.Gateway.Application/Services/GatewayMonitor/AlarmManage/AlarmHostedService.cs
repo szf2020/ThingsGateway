@@ -8,8 +8,6 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-using Mapster;
-
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
@@ -363,16 +361,16 @@ internal sealed class AlarmHostedService : BackgroundService, IAlarmHostedServic
                 //lock (GlobalData. RealAlarmVariables)
                 {
                     // 从实时报警列表中移除旧的报警信息，并添加新的报警信息
-                    GlobalData.RealAlarmIdVariables.AddOrUpdate(item.Id, a => item.Adapt<AlarmVariable>(), (a, b) => item.Adapt<AlarmVariable>());
+                    GlobalData.RealAlarmIdVariables.AddOrUpdate(item.Id, a => item.AdaptAlarmVariable(), (a, b) => item.AdaptAlarmVariable());
                 }
             }
             else if (item.EventType == EventTypeEnum.Finish)
             {
                 // 如果是需恢复报警事件，则从实时报警列表中移除该变量
                 GlobalData.RealAlarmIdVariables.TryRemove(item.Id, out _);
-                //GlobalData.RealAlarmIdVariables.AddOrUpdate(item.Id, a => item.Adapt<AlarmVariable>(), (a, b) => item.Adapt<AlarmVariable>());
+                //GlobalData.RealAlarmIdVariables.AddOrUpdate(item.Id, a => item.AdaptAlarmVariable(), (a, b) => item.AdaptAlarmVariable());
             }
-            GlobalData.AlarmChange(item.Adapt<AlarmVariable>());
+            GlobalData.AlarmChange(item.AdaptAlarmVariable());
         }
 
     }
@@ -380,11 +378,14 @@ internal sealed class AlarmHostedService : BackgroundService, IAlarmHostedServic
     public void ConfirmAlarm(long variableId)
     {
         // 如果是确认报警事件
-        if (GlobalData.RealAlarmIdVariables.TryGetValue(variableId, out var variableRuntime))
+        if (GlobalData.AlarmEnableIdVariables.TryGetValue(variableId, out var variableRuntime))
         {
             variableRuntime.EventType = EventTypeEnum.Confirm;
             variableRuntime.EventTime = DateTime.Now;
-            GlobalData.AlarmChange(variableRuntime.Adapt<AlarmVariable>());
+            var data = variableRuntime.AdaptAlarmVariable();
+            GlobalData.RealAlarmIdVariables.AddOrUpdate(variableId, a => data, (a, b) => data);
+
+            GlobalData.AlarmChange(data);
         }
     }
 

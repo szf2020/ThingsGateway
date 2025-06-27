@@ -67,7 +67,7 @@ public partial class Login
 
     private async Task LoginAsync(EditContext context)
     {
-        var model = loginModel.Adapt<LoginInput>();
+        var model = loginModel.AdaptLoginInput();
         model.Password = DESEncryption.Encrypt(model.Password);
 
         try

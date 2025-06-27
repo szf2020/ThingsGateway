@@ -8,8 +8,6 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-using Mapster;
-
 using ThingsGateway.Admin.Application;
 
 namespace ThingsGateway.Admin.Razor;
@@ -106,33 +104,6 @@ public static class ResourceUtil
         foreach (var node in roots)
         {
             var item = new TreeViewItem<SysResource>(node)
-            {
-                Text = node.Title,
-                Icon = node.Icon,
-                IsDisabled = disableFunc == null ? false : disableFunc(node),
-                IsActive = selectedItems.Any(v => node.Id == v),
-                IsExpand = true,
-                Parent = parent,
-                Template = render,
-                CheckedState = selectedItems.Any(i => i == node.Id) ? CheckboxState.Checked : CheckboxState.UnChecked
-            };
-            item.Items = BuildTreeItemList(sysresources, selectedItems, render, node.Id, item, disableFunc) ?? new();
-            trees.Add(item);
-        }
-        return trees;
-    }
-
-    /// <summary>
-    /// 构建树节点
-    /// </summary>
-    public static List<TreeViewItem<T>> BuildTreeItemList<T>(IEnumerable<SysResource> sysresources, List<long> selectedItems, Microsoft.AspNetCore.Components.RenderFragment<T> render, long parentId = 0, TreeViewItem<T>? parent = null, Func<SysResource, bool> disableFunc = null) where T : class
-    {
-        if (sysresources == null) return null;
-        var trees = new List<TreeViewItem<T>>();
-        var roots = sysresources.Where(i => i.ParentId == parentId).OrderBy(i => i.SortCode);
-        foreach (var node in roots)
-        {
-            var item = new TreeViewItem<T>(node.Adapt<T>())
             {
                 Text = node.Title,
                 Icon = node.Icon,

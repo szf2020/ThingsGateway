@@ -10,7 +10,7 @@
 
 using BootstrapBlazor.Components;
 
-using Mapster;
+using Riok.Mapperly.Abstractions;
 
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
@@ -31,7 +31,7 @@ public class SysUser : BaseEntity
     ///</summary>
     [SugarColumn(ColumnDescription = "头像", ColumnDataType = StaticConfig.CodeFirst_BigString, IsNullable = true)]
     [AutoGenerateColumn(Visible = true, Sortable = false, Filterable = false)]
-    [AdaptIgnore]
+    [MapperIgnore]
     public virtual string? Avatar { get; set; }
 
     /// <summary>

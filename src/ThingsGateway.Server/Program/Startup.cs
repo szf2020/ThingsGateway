@@ -39,7 +39,6 @@ public class Startup : AppStartup
 {
     public void ConfigBlazorServer(IServiceCollection services)
     {
-
         // 增加中文编码支持网页源码显示汉字
         services.AddSingleton(HtmlEncoder.Create(UnicodeRanges.All));
         //并发启动/停止host

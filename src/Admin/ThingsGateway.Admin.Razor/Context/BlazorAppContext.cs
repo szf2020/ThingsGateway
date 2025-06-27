@@ -8,8 +8,6 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-using Mapster;
-
 using ThingsGateway.Admin.Application;
 using ThingsGateway.NewLife;
 using ThingsGateway.NewLife.Extension;
@@ -88,7 +86,7 @@ public class BlazorAppContext
         if (UserManager.UserId > 0)
         {
             url = url.StartsWith('/') ? url : $"/{url}";
-            var sysResources = (await ResourceService.GetAllAsync()).Adapt<List<SysResource>>();
+            var sysResources = (await ResourceService.GetAllAsync()).AdaptListSysResource();
             if (TitleLocalizer != null)
             {
                 sysResources.ForEach(a =>
@@ -121,7 +119,7 @@ public class BlazorAppContext
                 CurrentModuleId = moduleId.Value;
             }
             UserWorkBench = await UserCenterService.GetLoginWorkbenchAsync(UserManager.UserId);
-            OwnMenus = (await UserCenterService.GetOwnMenuAsync(UserManager.UserId, 0)).Adapt<List<SysResource>>();
+            OwnMenus = (await UserCenterService.GetOwnMenuAsync(UserManager.UserId, 0)).AdaptListSysResource();
 
             if (TitleLocalizer != null)
             {

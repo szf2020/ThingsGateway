@@ -8,8 +8,6 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-using Mapster;
-
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
@@ -42,9 +40,9 @@ internal sealed class GatewayMonitorHostedService : BackgroundService, IGatewayM
         {
 
             //网关启动时，获取所有通道
-            var channelRuntimes = (await GlobalData.ChannelService.GetAllAsync().ConfigureAwait(false)).Adapt<List<ChannelRuntime>>();
-            var deviceRuntimes = (await GlobalData.DeviceService.GetAllAsync().ConfigureAwait(false)).Adapt<List<DeviceRuntime>>();
-            var variableRuntimes = (await GlobalData.VariableService.GetAllAsync().ConfigureAwait(false)).Adapt<List<VariableRuntime>>();
+            var channelRuntimes = (await GlobalData.ChannelService.GetAllAsync().ConfigureAwait(false)).AdaptListChannelRuntime();
+            var deviceRuntimes = (await GlobalData.DeviceService.GetAllAsync().ConfigureAwait(false)).AdaptListDeviceRuntime();
+            var variableRuntimes = (await GlobalData.VariableService.GetAllAsync().ConfigureAwait(false)).AdaptListVariableRuntime();
             foreach (var channelRuntime in channelRuntimes)
             {
                 try

@@ -11,8 +11,6 @@
 
 using BootstrapBlazor.Components;
 
-using Mapster;
-
 using Microsoft.Extensions.Logging;
 
 using ThingsGateway.Extension.Generic;
@@ -38,7 +36,7 @@ internal static class RuntimeServiceHelper
                 {
                     newDeviceRuntime.Init(newChannelRuntime);
 
-                    var newVariableRuntimes = (await GlobalData.VariableService.GetAllAsync(newDeviceRuntime.Id).ConfigureAwait(false)).Adapt<List<VariableRuntime>>();
+                    var newVariableRuntimes = (await GlobalData.VariableService.GetAllAsync(newDeviceRuntime.Id).ConfigureAwait(false)).AdaptListVariableRuntime();
 
                     newVariableRuntimes.ParallelForEach(item =>
                     {
@@ -91,7 +89,7 @@ internal static class RuntimeServiceHelper
                 {
                     newDeviceRuntime.Init(newChannelRuntime);
 
-                    var newVariableRuntimes = (await GlobalData.VariableService.GetAllAsync(newDeviceRuntime.Id).ConfigureAwait(false)).Adapt<List<VariableRuntime>>();
+                    var newVariableRuntimes = (await GlobalData.VariableService.GetAllAsync(newDeviceRuntime.Id).ConfigureAwait(false)).AdaptListVariableRuntime();
 
                     newVariableRuntimes.ParallelForEach(item =>
                     {
@@ -169,13 +167,13 @@ internal static class RuntimeServiceHelper
 
     public static async Task<List<ChannelRuntime>> GetNewChannelRuntimesAsync(HashSet<long> ids)
     {
-        var newChannelRuntimes = (await GlobalData.ChannelService.GetAllAsync().ConfigureAwait(false)).Where(a => ids.Contains(a.Id)).Adapt<List<ChannelRuntime>>();
+        var newChannelRuntimes = (await GlobalData.ChannelService.GetAllAsync().ConfigureAwait(false)).Where(a => ids.Contains(a.Id)).AdaptListChannelRuntime();
         return newChannelRuntimes;
     }
 
     public static async Task<List<DeviceRuntime>> GetNewDeviceRuntimesAsync(HashSet<long> deviceids)
     {
-        var newDeviceRuntimes = (await GlobalData.DeviceService.GetAllAsync().ConfigureAwait(false)).Where(a => deviceids.Contains(a.Id)).Adapt<List<DeviceRuntime>>();
+        var newDeviceRuntimes = (await GlobalData.DeviceService.GetAllAsync().ConfigureAwait(false)).Where(a => deviceids.Contains(a.Id)).AdaptListDeviceRuntime();
         return newDeviceRuntimes;
     }
 
@@ -269,10 +267,10 @@ internal static class RuntimeServiceHelper
     public static async Task RemoveDeviceAsync(HashSet<long> newDeciceIds)
     {
         //先找出线程管理器，停止
-        var deviceRuntimes = GlobalData.IdDevices.Where(a => newDeciceIds.Contains(a.Key)).Select(a => a.Value).ToList();
+        var deviceRuntimes = GlobalData.IdDevices.Where(a => newDeciceIds.Contains(a.Key)).Select(a => a.Value);
         await RemoveDeviceAsync(deviceRuntimes).ConfigureAwait(false);
     }
-    public static async Task RemoveDeviceAsync(List<DeviceRuntime> deviceRuntimes)
+    public static async Task RemoveDeviceAsync(IEnumerable<DeviceRuntime> deviceRuntimes)
     {
         var groups = GlobalData.GetDeviceThreadManages(deviceRuntimes);
         foreach (var group in groups)

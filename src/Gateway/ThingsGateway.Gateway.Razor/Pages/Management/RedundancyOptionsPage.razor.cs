@@ -9,8 +9,6 @@
 //------------------------------------------------------------------------------
 
 #pragma warning disable CA2007 // 考虑对等待的任务调用 ConfigureAwait
-using Mapster;
-
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Components.Web;
 
@@ -47,7 +45,7 @@ public partial class RedundancyOptionsPage
     {
         await base.OnInitializedAsync();
         HeaderText = GatewayLocalizer[nameof(HeaderText)];
-        Model = (await RedundancyService.GetRedundancyAsync()).Adapt<RedundancyOptions>();
+        Model = (await RedundancyService.GetRedundancyAsync()).AdaptRedundancyOptions();
     }
 
     [Inject]

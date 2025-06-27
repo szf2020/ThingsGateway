@@ -8,8 +8,6 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-using Mapster;
-
 using ThingsGateway.NewLife.Extension;
 
 namespace ThingsGateway.Gateway.Razor;
@@ -28,7 +26,7 @@ public partial class PluginDebugPage
     /// <inheritdoc/>
     protected override void OnParametersSet()
     {
-        var pluginInfos = PluginService.GetList().Adapt<List<PluginInfo>>();
+        var pluginInfos = PluginService.GetList().AdaptListPluginInfo();
 
         foreach (var pluginInfo in pluginInfos.ToList())
         {

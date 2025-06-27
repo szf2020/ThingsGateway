@@ -8,8 +8,6 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-using Mapster;
-
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 
@@ -82,7 +80,7 @@ public partial class OpcUaServer : BusinessBase
 
         IdVariableRuntimes.ForEach(a =>
         {
-            VariableValueChange(a.Value, a.Value.Adapt<VariableBasicData>());
+            VariableValueChange(a.Value, a.Value.AdaptVariableBasicData());
         });
 
 
@@ -166,7 +164,7 @@ public partial class OpcUaServer : BusinessBase
                     connect_success = true;
                     IdVariableRuntimes.ForEach(a =>
                     {
-                        VariableValueChange(a.Value, a.Value.Adapt<VariableBasicData>());
+                        VariableValueChange(a.Value, a.Value.AdaptVariableBasicData());
                     });
                 }
                 catch (Exception ex)
@@ -428,7 +426,7 @@ public partial class OpcUaServer : BusinessBase
             {
                 IdVariableRuntimes.ForEach(a =>
                 {
-                    VariableValueChange(a.Value, a.Value.Adapt<VariableBasicData>());
+                    VariableValueChange(a.Value, a.Value.AdaptVariableBasicData());
                 });
             }
         }

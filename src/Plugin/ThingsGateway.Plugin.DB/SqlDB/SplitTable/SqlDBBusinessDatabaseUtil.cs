@@ -8,8 +8,6 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-using Mapster;
-
 using Microsoft.Extensions.DependencyInjection;
 
 using System.ComponentModel.DataAnnotations;

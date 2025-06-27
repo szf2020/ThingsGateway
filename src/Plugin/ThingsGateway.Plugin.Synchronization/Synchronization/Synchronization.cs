@@ -8,8 +8,6 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-using Mapster;
-
 using Newtonsoft.Json.Linq;
 
 using ThingsGateway.Admin.Application;
@@ -92,7 +90,7 @@ public partial class Synchronization : BusinessBase, IRpcDriver
                     // 如果 online 为 true，表示设备在线
                     if (online)
                     {
-                        var deviceRunTimes = CollectDevices.Where(a => a.Value.IsCollect == true).Select(a => a.Value).Adapt<List<DeviceDataWithValue>>();
+                        var deviceRunTimes = CollectDevices.Where(a => a.Value.IsCollect == true).Select(a => a.Value).AdaptDeviceDataWithValue();
 
                         foreach (var item in _tcpDmtpService.Clients)
                         {
@@ -129,7 +127,7 @@ public partial class Synchronization : BusinessBase, IRpcDriver
                     // 如果 online 为 true，表示设备在线
                     if (online)
                     {
-                        var deviceRunTimes = CollectDevices.Where(a => a.Value.IsCollect == true).Select(a => a.Value).Adapt<List<DeviceDataWithValue>>();
+                        var deviceRunTimes = CollectDevices.Where(a => a.Value.IsCollect == true).Select(a => a.Value).AdaptDeviceDataWithValue();
 
                         // 将 GlobalData.CollectDevices 和 GlobalData.Variables 同步到从站
                         await _tcpDmtpClient.GetDmtpRpcActor().InvokeAsync(

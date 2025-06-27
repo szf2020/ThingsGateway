@@ -8,8 +8,6 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-using Mapster;
-
 using System.Collections.Concurrent;
 using System.Diagnostics;
 
@@ -26,7 +24,6 @@ namespace ThingsGateway.Plugin.SqlDB;
 /// </summary>
 public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariableModel<VariableBasicData>
 {
-    private TypeAdapterConfig _config;
     private volatile bool _initRealData;
     private ConcurrentDictionary<long, VariableBasicData> RealTimeVariables { get; } = new ConcurrentDictionary<long, VariableBasicData>();
 
@@ -34,7 +31,7 @@ public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariableModel<
     {
         return UpdateVarModel(item.Select(a => a.Value).OrderBy(a => a.Id), cancellationToken);
     }
-    protected override void VariableTimeInterval(IEnumerable<VariableRuntime> variableRuntimes, List<VariableBasicData> variables)
+    protected override void VariableTimeInterval(IEnumerable<VariableRuntime> variableRuntimes, IEnumerable<VariableBasicData> variables)
     {
         if (_driverPropertys.IsHistoryDB)
         {
@@ -53,7 +50,7 @@ public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariableModel<
         return UpdateVarModel(item, cancellationToken);
     }
 
-    private void TimeIntervalUpdateVariable(List<VariableBasicData> variables)
+    private void TimeIntervalUpdateVariable(IEnumerable<VariableBasicData> variables)
     {
         if (_driverPropertys.GroupUpdate)
         {
@@ -85,7 +82,7 @@ public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariableModel<
             if (_driverPropertys.GroupUpdate && variable.BusinessGroupUpdateTrigger && !variable.BusinessGroup.IsNullOrEmpty() && VariableRuntimeGroups.TryGetValue(variable.BusinessGroup, out var variableRuntimeGroup))
             {
 
-                AddQueueVarModel(new CacheDBItem<List<VariableBasicData>>(variableRuntimeGroup.Adapt<List<VariableBasicData>>(_config)));
+                AddQueueVarModel(new CacheDBItem<List<VariableBasicData>>(variableRuntimeGroup.AdaptListVariableBasicData()));
 
             }
             else
@@ -140,7 +137,7 @@ public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariableModel<
                 {
                     Stopwatch stopwatch = new();
                     stopwatch.Start();
-                    var data = numberData.Adapt<List<SQLNumberHistoryValue>>(_config);
+                    var data = numberData.AdaptListSQLNumberHistoryValue();
                     var result = await _db.Fastest<SQLNumberHistoryValue>().PageSize(50000).SplitTable().BulkCopyAsync(data).ConfigureAwait(false);
                     stopwatch.Stop();
 
@@ -156,7 +153,7 @@ public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariableModel<
                 {
                     Stopwatch stopwatch = new();
                     stopwatch.Start();
-                    var data = stringData.Adapt<List<SQLHistoryValue>>(_config);
+                    var data = stringData.AdaptListSQLHistoryValue();
                     var result = await _db.Fastest<SQLHistoryValue>().PageSize(50000).SplitTable().BulkCopyAsync(data).ConfigureAwait(false);
                     stopwatch.Stop();
 
@@ -202,7 +199,7 @@ public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariableModel<
                     Stopwatch stopwatch = new();
                     stopwatch.Start();
                     var ids = (await _db.Queryable<SQLRealValue>().AS(_driverPropertys.ReadDBTableName).Select(a => a.Id).ToListAsync(cancellationToken).ConfigureAwait(false)).ToHashSet();
-                    var InsertData = IdVariableRuntimes.Where(a => !ids.Contains(a.Key)).Select(a => a.Value).Adapt<List<SQLRealValue>>();
+                    var InsertData = IdVariableRuntimes.Where(a => !ids.Contains(a.Key)).Select(a => a.Value).AdaptListSQLRealValue();
                     var result = await _db.Fastest<SQLRealValue>().AS(_driverPropertys.ReadDBTableName).PageSize(100000).BulkCopyAsync(InsertData).ConfigureAwait(false);
                     _initRealData = true;
                     stopwatch.Stop();
@@ -217,7 +214,7 @@ public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariableModel<
                         Stopwatch stopwatch = new();
                         stopwatch.Start();
 
-                        var data = datas.Adapt<List<SQLRealValue>>(_config);
+                        var data = datas.AdaptListSQLRealValue();
                         var result = await _db.Fastest<SQLRealValue>().AS(_driverPropertys.ReadDBTableName).PageSize(100000).BulkUpdateAsync(data).ConfigureAwait(false);
 
                         stopwatch.Stop();

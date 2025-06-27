@@ -8,8 +8,6 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-using Mapster;
-
 using ThingsGateway.Extension.Generic;
 
 using TouchSocket.Core;
@@ -65,7 +63,7 @@ public abstract class BusinessBaseWithCacheIntervalVariableModel<VarModel> : Bus
         IdVariableRuntimes.ForEach(a =>
         {
             if (a.Value.IsOnline && _businessPropertyWithCacheInterval.BusinessUpdateEnum != BusinessUpdateEnum.Interval)
-                VariableValueChange(a.Value, a.Value.Adapt<VariableBasicData>());
+                VariableValueChange(a.Value, a.Value.AdaptVariableBasicData());
         });
     }
 
@@ -100,7 +98,7 @@ public abstract class BusinessBaseWithCacheIntervalVariableModel<VarModel> : Bus
                     LogMessage?.LogDebug($"Interval  {typeof(VarModel).Name}  data, count {IdVariableRuntimes.Count}");
                 // 上传所有变量信息
                 var variableRuntimes = IdVariableRuntimes.Select(a => a.Value);
-                VariableTimeInterval(variableRuntimes, variableRuntimes.Adapt<List<VariableBasicData>>());
+                VariableTimeInterval(variableRuntimes, variableRuntimes.AdaptIEnumerableVariableBasicData());
             }
             catch (Exception ex)
             {
@@ -131,7 +129,7 @@ public abstract class BusinessBaseWithCacheIntervalVariableModel<VarModel> : Bus
     /// </summary>
     /// <param name="variableRuntimes">变量运行时信息</param>
     /// <param name="variables">变量数据</param>
-    protected virtual void VariableTimeInterval(IEnumerable<VariableRuntime> variableRuntimes, List<VariableBasicData> variables)
+    protected virtual void VariableTimeInterval(IEnumerable<VariableRuntime> variableRuntimes, IEnumerable<VariableBasicData> variables)
     {
         // 在变量状态变化时执行的自定义逻辑
     }
@@ -162,7 +160,7 @@ public abstract class BusinessBaseWithCacheIntervalVariableModel<VarModel> : Bus
                 IdVariableRuntimes.ForEach(a =>
                 {
                     if (a.Value.IsOnline && _businessPropertyWithCacheInterval.BusinessUpdateEnum != BusinessUpdateEnum.Interval)
-                        VariableValueChange(a.Value, a.Value.Adapt<VariableBasicData>());
+                        VariableValueChange(a.Value, a.Value.AdaptVariableBasicData());
                 });
             }
         }

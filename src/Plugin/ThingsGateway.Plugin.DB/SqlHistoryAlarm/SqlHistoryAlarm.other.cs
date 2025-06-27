@@ -8,8 +8,6 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-using Mapster;
-
 using System.Diagnostics;
 
 using ThingsGateway.Foundation;
@@ -38,7 +36,7 @@ public partial class SqlHistoryAlarm : BusinessBaseWithCacheVariableModel<Histor
     {
         if (CurrentDevice.Pause)
             return;
-        AddQueueVarModel(new CacheDBItem<HistoryAlarm>(alarmVariable.Adapt<HistoryAlarm>(_config)));
+        AddQueueVarModel(new CacheDBItem<HistoryAlarm>(AdaptHistoryAlarm(alarmVariable)));
     }
     public override void PauseThread(bool pause)
     {

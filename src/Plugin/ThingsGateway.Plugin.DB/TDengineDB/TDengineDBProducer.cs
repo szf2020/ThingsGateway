@@ -10,8 +10,6 @@
 
 using BootstrapBlazor.Components;
 
-using Mapster;
-
 using System.Reflection;
 
 using ThingsGateway.Admin.Application;
@@ -86,17 +84,7 @@ public partial class TDengineDBProducer : BusinessBaseWithCacheIntervalVariableM
         assemblies.Add(typeof(TDengineProvider).Assembly);
         InstanceFactory.CustomAssemblies = assemblies.ToArray();
 
-        _config = new TypeAdapterConfig();
-        _config.ForType<VariableRuntime, TDengineDBNumberHistoryValue>()
-            .Map(dest => dest.Value, src => ConvertUtility.Convert.ToDecimal(src.Value, 0))
-            //.Map(dest => dest.Id, src => CommonUtils.GetSingleId())
-            .Map(dest => dest.Id, src => src.Id)//Id更改为变量Id
-            ;//注意sqlsugar插入时无时区，直接utc时间
-        _config.ForType<VariableBasicData, TDengineDBNumberHistoryValue>()
-    .Map(dest => dest.Value, src => ConvertUtility.Convert.ToDecimal(src.Value, 0))
-    //.Map(dest => dest.Id, src => CommonUtils.GetSingleId())
-    .Map(dest => dest.Id, src => src.Id)//Id更改为变量Id
-    ;//注意sqlsugar插入时无时区，直接utc时间
+
         await base.InitChannelAsync(channel, cancellationToken).ConfigureAwait(false);
     }
 

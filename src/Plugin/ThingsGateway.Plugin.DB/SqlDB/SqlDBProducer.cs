@@ -10,8 +10,6 @@
 
 using BootstrapBlazor.Components;
 
-using Mapster;
-
 using ThingsGateway.Admin.Application;
 using ThingsGateway.Debug;
 using ThingsGateway.Foundation;
@@ -159,31 +157,6 @@ public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariableModel<
     {
         _db = SqlDBBusinessDatabaseUtil.GetDb(_driverPropertys);
 
-        _config = new TypeAdapterConfig();
-        _config.ForType<VariableRuntime, SQLHistoryValue>()
-            //.Map(dest => dest.Id, (src) =>CommonUtils.GetSingleId())
-            .Map(dest => dest.Id, src => src.Id)//Id更改为变量Id
-            .Map(dest => dest.Value, src => src.Value == null ? string.Empty : src.Value.ToString() ?? string.Empty)
-            .Map(dest => dest.CreateTime, (src) => DateTime.Now);
-
-        _config.ForType<VariableBasicData, SQLHistoryValue>()
-    //.Map(dest => dest.Id, (src) =>CommonUtils.GetSingleId())
-    .Map(dest => dest.Id, src => src.Id)//Id更改为变量Id
-    .Map(dest => dest.Value, src => src.Value == null ? string.Empty : src.Value.ToString() ?? string.Empty)
-    .Map(dest => dest.CreateTime, (src) => DateTime.Now);
-
-        _config.ForType<VariableRuntime, SQLNumberHistoryValue>()
-           //.Map(dest => dest.Id, (src) =>CommonUtils.GetSingleId())
-           .Map(dest => dest.Id, src => src.Id)//Id更改为变量Id
-    .Map(dest => dest.Value, src => src.Value.GetType() == typeof(bool) ? ConvertUtility.Convert.ToBoolean(src.Value, false) ? 1 : 0 : ConvertUtility.Convert.ToDecimal(src.Value, 0))
-           .Map(dest => dest.CreateTime, (src) => DateTime.Now);
-
-        _config.ForType<VariableBasicData, SQLNumberHistoryValue>()
-    //.Map(dest => dest.Id, (src) =>CommonUtils.GetSingleId())
-    .Map(dest => dest.Id, src => src.Id)//Id更改为变量Id
-    .Map(dest => dest.Value, src => src.Value.GetType() == typeof(bool) ? ConvertUtility.Convert.ToBoolean(src.Value, false) ? 1 : 0 : ConvertUtility.Convert.ToDecimal(src.Value, 0))
-    .Map(dest => dest.CreateTime, (src) => DateTime.Now);
-
         if (_businessPropertyWithCacheInterval.BusinessUpdateEnum == BusinessUpdateEnum.Interval && _driverPropertys.IsReadDB)
         {
             GlobalData.VariableValueChangeEvent += VariableValueChange;
@@ -193,6 +166,7 @@ public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariableModel<
 
 
     }
+
     public override Task AfterVariablesChangedAsync(CancellationToken cancellationToken)
     {
         RealTimeVariables.Clear();

@@ -8,8 +8,6 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-using Mapster;
-
 using ThingsGateway.Admin.Application;
 
 namespace ThingsGateway.Gateway.Razor;
@@ -51,14 +49,14 @@ public partial class ChannelCopyComponent
             Dictionary<Device, List<Variable>> devices = new();
             for (int i = 0; i < CopyCount; i++)
             {
-                Channel channel = Model.Adapt<Channel>();
+                Channel channel = Model.AdaptChannel();
                 channel.Id = CommonUtils.GetSingleId();
                 channel.Name = $"{CopyChannelNamePrefix}{CopyChannelNameSuffixNumber + i}";
 
                 int index = 0;
                 foreach (var item in Devices)
                 {
-                    Device device = item.Key.Adapt<Device>();
+                    Device device = item.Key.AdaptDevice();
                     device.Id = CommonUtils.GetSingleId();
                     device.Name = $"{channel.Name}_{CopyDeviceNamePrefix}{CopyDeviceNameSuffixNumber + (index++)}";
                     device.ChannelId = channel.Id;
@@ -66,7 +64,7 @@ public partial class ChannelCopyComponent
 
                     foreach (var variable in item.Value)
                     {
-                        Variable v = variable.Adapt<Variable>();
+                        Variable v = variable.AdaptVariable();
                         v.Id = CommonUtils.GetSingleId();
                         v.DeviceId = device.Id;
                         variables.Add(v);

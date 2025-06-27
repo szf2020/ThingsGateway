@@ -8,32 +8,23 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-//------------------------------------------------------------------------------
-//  此代码版权（除特别声明或在XREF结尾的命名空间的代码）归作者本人若汝棋茗所有
-//  源代码使用协议遵循本仓库的开源协议及附加协议，若本仓库没有设置，则按MIT开源协议授权
-//  CSDN博客：https://blog.csdn.net/qq_40374647
-//  哔哩哔哩视频：https://space.bilibili.com/94253567
-//  Gitee源代码仓库：https://gitee.com/RRQM_Home
-//  Github源代码仓库：https://github.com/RRQM
-//  API首页：http://rrqm_home.gitee.io/touchsocket/
-//  交流QQ群：234762506
-//  感谢您的下载和使用
-//------------------------------------------------------------------------------
-
 #if !NET45_OR_GREATER
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.Text;
+
+using System.Text;
 
 namespace ThingsGateway.Foundation;
 
 /// <summary>
-/// 源生成
+/// 增量源生成器：VariableObject
 /// </summary>
 [Generator]
-public class VariableObjectSourceGenerator : ISourceGenerator
+public sealed class VariableObjectSourceGenerator : IIncrementalGenerator
 {
-    private string m_generatorVariableAttribute = @"
+    private const string AttributeSource = @"
 using System;
 
 namespace ThingsGateway.Foundation
@@ -42,47 +33,49 @@ namespace ThingsGateway.Foundation
     /// 使用源生成变量写入方法的调用。
     /// </summary>
     [AttributeUsage(AttributeTargets.Class)]
-    internal class GeneratorVariableAttribute:Attribute
+    internal class GeneratorVariableAttribute : Attribute
     {
     }
 }
-
 ";
 
-    /// <inheritdoc/>
-    public void Initialize(GeneratorInitializationContext context)
+    public void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        //Debugger.Launch();
-        context.RegisterForPostInitialization(a =>
+        context.RegisterPostInitializationOutput(ctx =>
         {
-            a.AddSource(nameof(m_generatorVariableAttribute), m_generatorVariableAttribute);
+            ctx.AddSource("GeneratorVariableAttribute.g.cs", SourceText.From(AttributeSource, Encoding.UTF8));
         });
-        context.RegisterForSyntaxNotifications(() => new VariableSyntaxReceiver());
-    }
 
-    /// <inheritdoc/>
-    public void Execute(GeneratorExecutionContext context)
-    {
-        var s = context.Compilation.GetMetadataReference(context.Compilation.Assembly);
+        var variableObjectTypes = context.SyntaxProvider
+            .CreateSyntaxProvider(
+                predicate: VariableObjectSyntaxFilter.IsCandidate,
+                transform: VariableObjectSyntaxFilter.GetVariableObjectType)
+            .Where(static t => t is not null)
+            .Select(static (t, _) => (INamedTypeSymbol)t!)  // 明确转成 INamedTypeSymbol
+            .Collect();
 
-        if (context.SyntaxReceiver is VariableSyntaxReceiver receiver)
+
+        var compilationAndTypes = context.CompilationProvider.Combine(variableObjectTypes);
+
+        context.RegisterSourceOutput(compilationAndTypes, (spc, source) =>
         {
-            var builders = receiver
-                .GetVariableObjectTypes(context.Compilation)
-                .Select(i => new VariableCodeBuilder(i))
-                .Distinct();
-            foreach (var builder in builders)
+            var (compilation, types) = source;
+
+            foreach (var typeSymbol in types.ToList().Distinct(SymbolEqualityComparer.Default).OfType<INamedTypeSymbol>())
             {
+                var builder = new VariableCodeBuilder(typeSymbol);
                 if (builder.TryToSourceText(out var sourceText))
                 {
                     var tree = CSharpSyntaxTree.ParseText(sourceText);
                     var root = tree.GetRoot().NormalizeWhitespace();
                     var ret = root.ToFullString();
-                    context.AddSource($"{builder.GetFileName()}.g.cs", ret);
+                    spc.AddSource($"{builder.GetFileName()}.g.cs", SourceText.From(ret, Encoding.UTF8));
                 }
             }
-        }
+
+        });
     }
+
 }
 
 #endif

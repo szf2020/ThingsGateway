@@ -8,8 +8,6 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-using Mapster;
-
 using Microsoft.AspNetCore.Components.Forms;
 
 using ThingsGateway.Admin.Application;
@@ -22,7 +20,7 @@ public partial class ChannelTable : IDisposable
 {
     private static void BeforeShowEditDialogCallback(ITableEditDialogOption<ChannelRuntime> tableEditDialogOption)
     {
-        tableEditDialogOption.Model = tableEditDialogOption.Model.Adapt<ChannelRuntime>();
+        tableEditDialogOption.Model = tableEditDialogOption.Model.AdaptChannelRuntime();
     }
 
     public bool Disposed { get; set; }
@@ -113,10 +111,10 @@ public partial class ChannelTable : IDisposable
         Channel oneModel = null;
         Dictionary<Device, List<Variable>> deviceDict = new();
         var channelRuntime = channels.FirstOrDefault();
-        oneModel = channelRuntime.Adapt<Channel>();
+        oneModel = channelRuntime.AdaptChannel();
         oneModel.Id = 0;
 
-        deviceDict = channelRuntime.ReadDeviceRuntimes.ToDictionary(a => a.Value.Adapt<Device>(), a => a.Value.ReadOnlyVariableRuntimes.Select(a => a.Value).Adapt<List<Variable>>());
+        deviceDict = channelRuntime.ReadDeviceRuntimes.ToDictionary(a => a.Value.AdaptDevice(), a => a.Value.ReadOnlyVariableRuntimes.Select(a => a.Value).AdaptListVariable());
 
 
         var op = new DialogOption()
@@ -157,9 +155,9 @@ public partial class ChannelTable : IDisposable
             await ToastService.Warning(null, RazorLocalizer["PleaseSelect"]);
             return;
         }
-        changedModels = changedModels.Adapt<List<Channel>>();
-        oldModel = oldModel.Adapt<Channel>();
-        var oneModel = oldModel.Adapt<Channel>();//默认值显示第一个
+        changedModels = changedModels.AdaptListChannel();
+        oldModel = oldModel.AdaptChannel();
+        var oneModel = oldModel.AdaptChannel();//默认值显示第一个
 
         var op = new DialogOption()
         {
@@ -215,7 +213,7 @@ public partial class ChannelTable : IDisposable
     {
         try
         {
-            channel = channel.Adapt<Channel>();
+            channel = channel.AdaptChannel();
             return await Task.Run(() => GlobalData.ChannelRuntimeService.SaveChannelAsync(channel, itemChangedType, AutoRestartThread));
         }
         catch (Exception ex)
@@ -229,7 +227,7 @@ public partial class ChannelTable : IDisposable
 
     private Task<ChannelRuntime> OnAdd()
     {
-        return Task.FromResult(ChannelDeviceHelpers.GetChannelModel(ItemChangedType.Add, SelectModel).Adapt<ChannelRuntime>());
+        return Task.FromResult(ChannelDeviceHelpers.GetChannelModel(ItemChangedType.Add, SelectModel).AdaptChannelRuntime());
     }
 
     #region 导出

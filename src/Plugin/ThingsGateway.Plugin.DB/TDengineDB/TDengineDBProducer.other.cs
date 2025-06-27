@@ -8,8 +8,6 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-using Mapster;
-
 using Newtonsoft.Json.Linq;
 
 using System.Diagnostics;
@@ -30,14 +28,13 @@ namespace ThingsGateway.Plugin.TDengineDB;
 /// </summary>
 public partial class TDengineDBProducer : BusinessBaseWithCacheIntervalVariableModel<VariableBasicData>
 {
-    private TypeAdapterConfig _config;
 
     protected override ValueTask<OperResult> UpdateVarModel(IEnumerable<CacheDBItem<VariableBasicData>> item, CancellationToken cancellationToken)
     {
         return UpdateVarModel(item.Select(a => a.Value).OrderBy(a => a.Id), cancellationToken);
     }
 
-    protected override void VariableTimeInterval(IEnumerable<VariableRuntime> variableRuntimes, List<VariableBasicData> variables)
+    protected override void VariableTimeInterval(IEnumerable<VariableRuntime> variableRuntimes, IEnumerable<VariableBasicData> variables)
     {
         TimeIntervalUpdateVariable(variables);
         base.VariableTimeInterval(variableRuntimes, variables);
@@ -52,7 +49,7 @@ public partial class TDengineDBProducer : BusinessBaseWithCacheIntervalVariableM
     {
         return UpdateVarModel(item, cancellationToken);
     }
-    private void TimeIntervalUpdateVariable(List<VariableBasicData> variables)
+    private void TimeIntervalUpdateVariable(IEnumerable<VariableBasicData> variables)
     {
         if (_driverPropertys.GroupUpdate)
         {
@@ -82,7 +79,7 @@ public partial class TDengineDBProducer : BusinessBaseWithCacheIntervalVariableM
         if (_driverPropertys.GroupUpdate && variable.BusinessGroupUpdateTrigger && !variable.BusinessGroup.IsNullOrEmpty() && VariableRuntimeGroups.TryGetValue(variable.BusinessGroup, out var variableRuntimeGroup))
         {
 
-            AddQueueVarModel(new CacheDBItem<List<VariableBasicData>>(variableRuntimeGroup.Adapt<List<VariableBasicData>>(_config)));
+            AddQueueVarModel(new CacheDBItem<List<VariableBasicData>>(variableRuntimeGroup.AdaptListVariableBasicData()));
 
         }
         else

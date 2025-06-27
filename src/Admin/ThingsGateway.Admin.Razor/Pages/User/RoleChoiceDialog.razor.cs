@@ -8,8 +8,6 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-using Mapster;
-
 using ThingsGateway.Admin.Application;
 
 namespace ThingsGateway.Admin.Razor;
@@ -47,10 +45,7 @@ public partial class RoleChoiceDialog
     private ISysRoleService? SysRoleService { get; set; }
     private async Task<QueryData<SysRole>> OnQueryAsync(QueryPageOptions options)
     {
-        var data = await SysRoleService.PageAsync(options, a => a.Where(b => b.OrgId == OrgId));
-        QueryData<SysRole> queryData = data.Adapt<QueryData<SysRole>>();
-
-        return queryData;
+        return await SysRoleService.PageAsync(options, a => a.Where(b => b.OrgId == OrgId));
     }
     #region 查询
     private long OrgId { get; set; }

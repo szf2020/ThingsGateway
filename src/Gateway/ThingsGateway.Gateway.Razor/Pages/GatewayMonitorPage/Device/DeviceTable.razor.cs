@@ -8,8 +8,6 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-using Mapster;
-
 using Microsoft.AspNetCore.Components.Forms;
 
 using ThingsGateway.Admin.Application;
@@ -22,7 +20,7 @@ public partial class DeviceTable : IDisposable
 {
     private static void BeforeShowEditDialogCallback(ITableEditDialogOption<DeviceRuntime> tableEditDialogOption)
     {
-        tableEditDialogOption.Model = tableEditDialogOption.Model.Adapt<DeviceRuntime>();
+        tableEditDialogOption.Model = tableEditDialogOption.Model.AdaptDeviceRuntime();
     }
 
     public bool Disposed { get; set; }
@@ -113,10 +111,10 @@ public partial class DeviceTable : IDisposable
         Device oneModel = null;
         List<Variable> variables = new();
         var deviceRuntime = devices.FirstOrDefault();
-        oneModel = deviceRuntime.Adapt<Device>();
+        oneModel = deviceRuntime.AdaptDevice();
         oneModel.Id = 0;
 
-        variables = deviceRuntime.ReadOnlyVariableRuntimes.Select(a => a.Value).Adapt<List<Variable>>();
+        variables = deviceRuntime.ReadOnlyVariableRuntimes.Select(a => a.Value).AdaptListVariable();
 
 
         var op = new DialogOption()
@@ -156,9 +154,9 @@ public partial class DeviceTable : IDisposable
             await ToastService.Warning(null, RazorLocalizer["PleaseSelect"]);
             return;
         }
-        changedModels = changedModels.Adapt<List<Device>>();
-        oldModel = oldModel.Adapt<Device>();
-        var oneModel = oldModel.Adapt<Device>();//默认值显示第一个
+        changedModels = changedModels.AdaptListDevice();
+        oldModel = oldModel.AdaptDevice();
+        var oneModel = oldModel.AdaptDevice();//默认值显示第一个
 
         var op = new DialogOption()
         {
@@ -215,7 +213,7 @@ public partial class DeviceTable : IDisposable
         try
         {
             device.DevicePropertys = PluginServiceUtil.SetDict(device.ModelValueValidateForm.Value);
-            device = device.Adapt<Device>();
+            device = device.AdaptDevice();
             return await Task.Run(() => GlobalData.DeviceRuntimeService.SaveDeviceAsync(device, itemChangedType, AutoRestartThread));
         }
         catch (Exception ex)
@@ -229,7 +227,7 @@ public partial class DeviceTable : IDisposable
 
     private Task<DeviceRuntime> OnAdd()
     {
-        return Task.FromResult(ChannelDeviceHelpers.GetDeviceModel(ItemChangedType.Add, SelectModel).Adapt<DeviceRuntime>());
+        return Task.FromResult(ChannelDeviceHelpers.GetDeviceModel(ItemChangedType.Add, SelectModel).AdaptDeviceRuntime());
     }
 
 

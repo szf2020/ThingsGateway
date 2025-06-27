@@ -10,8 +10,6 @@
 
 using BootstrapBlazor.Components;
 
-using Mapster;
-
 using System.Collections.Concurrent;
 
 using ThingsGateway.Extension.Generic;
@@ -498,7 +496,7 @@ public static class GlobalData
 
 
         // 触发设备状态变化事件，并将设备运行时对象转换为设备数据对象进行传递
-        DeviceStatusChangeEvent?.Invoke(deviceRuntime, deviceRuntime.Adapt<DeviceBasicData>());
+        DeviceStatusChangeEvent?.Invoke(deviceRuntime, deviceRuntime.AdaptDeviceBasicData());
 
     }
 
@@ -511,7 +509,7 @@ public static class GlobalData
 
 
         // 触发变量值变化事件，并将变量运行时对象转换为变量数据对象进行传递
-        VariableValueChangeEvent?.Invoke(variableRuntime, variableRuntime.Adapt<VariableBasicData>());
+        VariableValueChangeEvent?.Invoke(variableRuntime, variableRuntime.AdaptVariableBasicData());
 
     }
     /// <summary>

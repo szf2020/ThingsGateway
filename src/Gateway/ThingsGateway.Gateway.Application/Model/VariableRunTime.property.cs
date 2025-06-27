@@ -10,7 +10,7 @@
 
 using BootstrapBlazor.Components;
 
-using Mapster;
+using Riok.Mapperly.Abstractions;
 
 using ThingsGateway.SqlSugar;
 
@@ -123,7 +123,7 @@ public partial class VariableRuntime : Variable, IVariable, IDisposable
     /// </summary>
     [Newtonsoft.Json.JsonIgnore]
     [System.Text.Json.Serialization.JsonIgnore]
-    [AdaptIgnore]
+    [MapperIgnore]
     [AutoGenerateColumn(Ignore = true)]
     public IVariableSource VariableSource { get => variableSource; set => variableSource = value; }
 
@@ -132,7 +132,7 @@ public partial class VariableRuntime : Variable, IVariable, IDisposable
     /// </summary>
     [Newtonsoft.Json.JsonIgnore]
     [System.Text.Json.Serialization.JsonIgnore]
-    [AdaptIgnore]
+    [MapperIgnore]
     [AutoGenerateColumn(Ignore = true)]
     public VariableMethod VariableMethod { get => variableMethod; set => variableMethod = value; }
 

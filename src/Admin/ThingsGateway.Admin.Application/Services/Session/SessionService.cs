@@ -10,8 +10,6 @@
 
 using BootstrapBlazor.Components;
 
-using Mapster;
-
 using ThingsGateway.SqlSugar;
 
 namespace ThingsGateway.Admin.Application;
@@ -69,7 +67,7 @@ internal sealed class SessionService : BaseService<SysUser>, ISessionService
 
             var r = items.Select((it) =>
             {
-                var reuslt = it.Adapt<SessionOutput>();
+                var reuslt = it.AdaptSessionOutput();
                 if (verificatInfoDicts.TryGetValue(it.Id, out var verificatInfos))
                 {
                     reuslt.VerificatCount = verificatInfos.Count;//令牌数量
@@ -94,7 +92,7 @@ internal sealed class SessionService : BaseService<SysUser>, ISessionService
 
             var r = items.Select((it) =>
             {
-                var reuslt = it.Adapt<SessionOutput>();
+                var reuslt = it.AdaptSessionOutput();
                 if (verificatInfoDicts.TryGetValue(it.Id, out var verificatInfos))
                 {
                     reuslt.VerificatCount = verificatInfos.Count;//令牌数量
@@ -117,7 +115,7 @@ internal sealed class SessionService : BaseService<SysUser>, ISessionService
 
             var r = items.Select((it) =>
             {
-                var reuslt = it.Adapt<SessionOutput>();
+                var reuslt = it.AdaptSessionOutput();
                 if (verificatInfoDicts.TryGetValue(it.Id, out var verificatInfos))
                 {
                     reuslt.VerificatCount = verificatInfos.Count;//令牌数量

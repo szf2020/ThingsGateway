@@ -10,8 +10,6 @@
 
 using Confluent.Kafka;
 
-using Mapster;
-
 using ThingsGateway.Extension.Generic;
 using ThingsGateway.Foundation;
 using ThingsGateway.Foundation.Extension.Generic;
@@ -70,7 +68,7 @@ public partial class KafkaProducer : BusinessBaseWithCacheIntervalScript<Variabl
         return UpdateVarModel(item, cancellationToken);
     }
 
-    protected override void VariableTimeInterval(IEnumerable<VariableRuntime> variableRuntimes, List<VariableBasicData> variables)
+    protected override void VariableTimeInterval(IEnumerable<VariableRuntime> variableRuntimes, IEnumerable<VariableBasicData> variables)
     {
         TimeIntervalUpdateVariable(variables);
         base.VariableTimeInterval(variableRuntimes, variables);
@@ -80,7 +78,7 @@ public partial class KafkaProducer : BusinessBaseWithCacheIntervalScript<Variabl
         UpdateVariable(variableRuntime, variable);
         base.VariableChange(variableRuntime, variable);
     }
-    private void TimeIntervalUpdateVariable(List<VariableBasicData> variables)
+    private void TimeIntervalUpdateVariable(IEnumerable<VariableBasicData> variables)
     {
         if (!_businessPropertyWithCacheIntervalScript.VariableTopic.IsNullOrWhiteSpace())
         {
@@ -91,7 +89,7 @@ public partial class KafkaProducer : BusinessBaseWithCacheIntervalScript<Variabl
 
                 foreach (var group in varGroup)
                 {
-                    AddQueueVarModel(new CacheDBItem<List<VariableBasicData>>(group.Adapt<List<VariableBasicData>>()));
+                    AddQueueVarModel(new CacheDBItem<List<VariableBasicData>>(group.AdaptIEnumerableVariableBasicData()));
                 }
                 foreach (var variable in varList)
                 {
@@ -115,7 +113,7 @@ public partial class KafkaProducer : BusinessBaseWithCacheIntervalScript<Variabl
             if (_driverPropertys.GroupUpdate && variable.BusinessGroupUpdateTrigger && !variable.BusinessGroup.IsNullOrEmpty() && VariableRuntimeGroups.TryGetValue(variable.BusinessGroup, out var variableRuntimeGroup))
             {
 
-                AddQueueVarModel(new CacheDBItem<List<VariableBasicData>>(variableRuntimeGroup.Adapt<List<VariableBasicData>>()));
+                AddQueueVarModel(new CacheDBItem<List<VariableBasicData>>(variableRuntimeGroup.AdaptListVariableBasicData()));
 
             }
             else
@@ -175,9 +173,9 @@ public partial class KafkaProducer : BusinessBaseWithCacheIntervalScript<Variabl
     {
         //保留消息
         //分解List，避免超出字节大小限制
-        var varData = IdVariableRuntimes.Select(a => a.Value).Adapt<List<VariableBasicData>>().ChunkBetter(_driverPropertys.SplitSize);
-        var devData = CollectDevices?.Select(a => a.Value).Adapt<List<DeviceBasicData>>().ChunkBetter(_driverPropertys.SplitSize);
-        var alramData = GlobalData.ReadOnlyRealAlarmIdVariables.Select(a => a.Value).Adapt<List<AlarmVariable>>().ChunkBetter(_driverPropertys.SplitSize);
+        var varData = IdVariableRuntimes.Select(a => a.Value).AdaptIEnumerableVariableBasicData().ChunkBetter(_driverPropertys.SplitSize);
+        var devData = CollectDevices?.Select(a => a.Value).AdaptListDeviceBasicData().ChunkBetter(_driverPropertys.SplitSize);
+        var alramData = GlobalData.ReadOnlyRealAlarmIdVariables.Select(a => a.Value).ChunkBetter(_driverPropertys.SplitSize);
         foreach (var item in varData)
         {
             if (!success)

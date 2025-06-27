@@ -17,12 +17,13 @@
 
 	<ItemGroup>
 	  <PackageReference Include="TouchSocket.Dmtp" Version="3.1.11" />
+		<PackageReference Include="Riok.Mapperly" Version="4.2.1" ExcludeAssets="runtime" PrivateAssets="all" />
 	</ItemGroup>
 
 
 	<ItemGroup>
-	  <ProjectReference Include="..\..\Admin\ThingsGateway.Admin.Razor\ThingsGateway.Admin.Razor.csproj" />
-	  <ProjectReference Include="..\..\Foundation\ThingsGateway.Foundation.Razor\ThingsGateway.Foundation.Razor.csproj" />
+		<ProjectReference Include="..\..\Admin\ThingsGateway.Admin.Razor\ThingsGateway.Admin.Razor.csproj" />
+		<ProjectReference Include="..\..\Foundation\ThingsGateway.Foundation.Razor\ThingsGateway.Foundation.Razor.csproj" />
 	</ItemGroup>
 
 

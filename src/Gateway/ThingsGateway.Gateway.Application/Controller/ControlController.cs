@@ -10,8 +10,6 @@
 
 using BootstrapBlazor.Components;
 
-using Mapster;
-
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -153,7 +151,7 @@ public class ControlController : ControllerBase
     [DisplayName("保存通道")]
     public Task<bool> BatchSaveChannelAsync([FromBody] List<ChannelInput> channels, ItemChangedType type, bool restart)
     {
-        return GlobalData.ChannelRuntimeService.BatchSaveChannelAsync(channels.Adapt<List<Channel>>(), type, restart);
+        return GlobalData.ChannelRuntimeService.BatchSaveChannelAsync(channels.AdaptListChannel(), type, restart);
     }
 
     /// <summary>
@@ -163,7 +161,7 @@ public class ControlController : ControllerBase
     [DisplayName("保存设备")]
     public Task<bool> BatchSaveDeviceAsync([FromBody] List<DeviceInput> devices, ItemChangedType type, bool restart)
     {
-        return GlobalData.DeviceRuntimeService.BatchSaveDeviceAsync(devices.Adapt<List<Device>>(), type, restart);
+        return GlobalData.DeviceRuntimeService.BatchSaveDeviceAsync(devices.AdaptListDevice(), type, restart);
     }
 
     /// <summary>
@@ -173,7 +171,7 @@ public class ControlController : ControllerBase
     [DisplayName("保存变量")]
     public Task<bool> BatchSaveVariableAsync([FromBody] List<VariableInput> variables, ItemChangedType type, bool restart)
     {
-        return GlobalData.VariableRuntimeService.BatchSaveVariableAsync(variables.Adapt<List<Variable>>(), type, restart, default);
+        return GlobalData.VariableRuntimeService.BatchSaveVariableAsync(variables.AdaptListVariable(), type, restart, default);
     }
 
     /// <summary>

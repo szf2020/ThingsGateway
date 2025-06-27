@@ -10,7 +10,7 @@
 
 using BootstrapBlazor.Components;
 
-using Mapster;
+using Riok.Mapperly.Abstractions;
 
 using System.Collections.Concurrent;
 
@@ -56,7 +56,7 @@ public class DeviceRuntime : Device, IDisposable
     /// </summary>
     [System.Text.Json.Serialization.JsonIgnore]
     [Newtonsoft.Json.JsonIgnore]
-    [AdaptIgnore]
+    [MapperIgnore]
     [AutoGenerateColumn(Ignore = true)]
     public ChannelRuntime? ChannelRuntime { get; set; }
 
@@ -69,7 +69,7 @@ public class DeviceRuntime : Device, IDisposable
 
     [System.Text.Json.Serialization.JsonIgnore]
     [Newtonsoft.Json.JsonIgnore]
-    [AdaptIgnore]
+    [MapperIgnore]
     public DateTime DeviceStatusChangeTime = DateTime.UnixEpoch.ToLocalTime();
 
     /// <summary>
@@ -154,7 +154,7 @@ public class DeviceRuntime : Device, IDisposable
     /// </summary>
     [System.Text.Json.Serialization.JsonIgnore]
     [Newtonsoft.Json.JsonIgnore]
-    [AdaptIgnore]
+    [MapperIgnore]
     [AutoGenerateColumn(Ignore = true)]
     internal ConcurrentDictionary<string, VariableRuntime>? VariableRuntimes { get; } = new(Environment.ProcessorCount, 1000);
 
@@ -168,7 +168,7 @@ public class DeviceRuntime : Device, IDisposable
     /// </summary>
     [System.Text.Json.Serialization.JsonIgnore]
     [Newtonsoft.Json.JsonIgnore]
-    [AdaptIgnore]
+    [MapperIgnore]
     [AutoGenerateColumn(Ignore = true)]
     public List<VariableMethod>? ReadVariableMethods { get; set; }
 
@@ -182,7 +182,7 @@ public class DeviceRuntime : Device, IDisposable
     /// </summary>
     [System.Text.Json.Serialization.JsonIgnore]
     [Newtonsoft.Json.JsonIgnore]
-    [AdaptIgnore]
+    [MapperIgnore]
     [AutoGenerateColumn(Ignore = true)]
     public List<VariableSourceRead>? VariableSourceReads { get; set; }
 
@@ -191,7 +191,7 @@ public class DeviceRuntime : Device, IDisposable
     /// </summary>
     [System.Text.Json.Serialization.JsonIgnore]
     [Newtonsoft.Json.JsonIgnore]
-    [AdaptIgnore]
+    [MapperIgnore]
     [AutoGenerateColumn(Ignore = true)]
     public List<VariableScriptRead>? VariableScriptReads { get; set; }
 
@@ -227,13 +227,13 @@ public class DeviceRuntime : Device, IDisposable
 
     [System.Text.Json.Serialization.JsonIgnore]
     [Newtonsoft.Json.JsonIgnore]
-    [AdaptIgnore]
+    [MapperIgnore]
     [AutoGenerateColumn(Ignore = true)]
     public IDriver? Driver { get; internal set; }
 
     [System.Text.Json.Serialization.JsonIgnore]
     [Newtonsoft.Json.JsonIgnore]
-    [AdaptIgnore]
+    [MapperIgnore]
     [AutoGenerateColumn(Ignore = true)]
     public IRpcDriver? RpcDriver { get; set; }
 

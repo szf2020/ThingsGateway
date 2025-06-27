@@ -8,8 +8,6 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-using Mapster;
-
 using Microsoft.Extensions.Logging;
 
 using Newtonsoft.Json.Linq;
@@ -668,7 +666,20 @@ public abstract class CollectBase : DriverBase, IRpcDriver
             {
                 // 调用方法并获取结果
                 var data = await variableMethod.InvokeMethodAsync(this, value, cancellationToken).ConfigureAwait(false);
-                result = data.Adapt<OperResult<object>>();
+                result = new(data);
+                var operResultType = typeof(IOperResult<>);
+                var interfaceType = data.GetType().GetInterfaces()
+                    .FirstOrDefault(x => x.IsGenericType && x.GetGenericTypeDefinition() == operResultType);
+
+                if (interfaceType != null)
+                {
+                    var contentProperty = interfaceType.GetProperty("Content");
+                    if (contentProperty != null)
+                    {
+                        result.Content = contentProperty.GetValue(data);
+                    }
+                }
+
 
                 // 如果方法有返回值，并且是读取操作
                 if (method.HasReturn && isRead)

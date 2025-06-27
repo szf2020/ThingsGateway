@@ -10,8 +10,6 @@
 
 using CSScripting;
 
-using Mapster;
-
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -84,7 +82,7 @@ public partial class MqttServer : BusinessBaseWithCacheIntervalScript<VariableBa
     {
         return UpdateVarModel(item, cancellationToken);
     }
-    protected override void VariableTimeInterval(IEnumerable<VariableRuntime> variableRuntimes, List<VariableBasicData> variables)
+    protected override void VariableTimeInterval(IEnumerable<VariableRuntime> variableRuntimes, IEnumerable<VariableBasicData> variables)
     {
         TimeIntervalUpdateVariable(variables);
         base.VariableTimeInterval(variableRuntimes, variables);
@@ -94,7 +92,7 @@ public partial class MqttServer : BusinessBaseWithCacheIntervalScript<VariableBa
         UpdateVariable(variableRuntime, variable);
         base.VariableChange(variableRuntime, variable);
     }
-    private void TimeIntervalUpdateVariable(List<VariableBasicData> variables)
+    private void TimeIntervalUpdateVariable(IEnumerable<VariableBasicData> variables)
     {
         if (!_businessPropertyWithCacheIntervalScript.VariableTopic.IsNullOrWhiteSpace())
         {
@@ -105,7 +103,7 @@ public partial class MqttServer : BusinessBaseWithCacheIntervalScript<VariableBa
 
                 foreach (var group in varGroup)
                 {
-                    AddQueueVarModel(new CacheDBItem<List<VariableBasicData>>(group.Adapt<List<VariableBasicData>>()));
+                    AddQueueVarModel(new CacheDBItem<List<VariableBasicData>>(group.AdaptIEnumerableVariableBasicData()));
                 }
                 foreach (var variable in varList)
                 {
@@ -131,7 +129,7 @@ public partial class MqttServer : BusinessBaseWithCacheIntervalScript<VariableBa
 
 
                 //获取组内全部变量
-                AddQueueVarModel(new CacheDBItem<List<VariableBasicData>>(variableRuntimeGroup.Adapt<List<VariableBasicData>>()));
+                AddQueueVarModel(new CacheDBItem<List<VariableBasicData>>(variableRuntimeGroup.AdaptListVariableBasicData()));
 
             }
             else
@@ -253,9 +251,9 @@ public partial class MqttServer : BusinessBaseWithCacheIntervalScript<VariableBa
     {
         //首次连接时的保留消息
         //分解List，避免超出mqtt字节大小限制
-        var varData = IdVariableRuntimes.Select(a => a.Value).Adapt<List<VariableBasicData>>().ChunkBetter(_driverPropertys.SplitSize);
-        var devData = CollectDevices?.Select(a => a.Value).Adapt<List<DeviceBasicData>>().ChunkBetter(_driverPropertys.SplitSize);
-        var alramData = GlobalData.ReadOnlyRealAlarmIdVariables.Select(a => a.Value).Adapt<List<AlarmVariable>>().ChunkBetter(_driverPropertys.SplitSize);
+        var varData = IdVariableRuntimes.Select(a => a.Value).AdaptIEnumerableVariableBasicData().ChunkBetter(_driverPropertys.SplitSize);
+        var devData = CollectDevices?.Select(a => a.Value).AdaptListDeviceBasicData().ChunkBetter(_driverPropertys.SplitSize);
+        var alramData = GlobalData.ReadOnlyRealAlarmIdVariables.Select(a => a.Value).ChunkBetter(_driverPropertys.SplitSize);
         List<MqttApplicationMessage> Messages = new();
 
         if (!_businessPropertyWithCacheIntervalScript.VariableTopic.IsNullOrEmpty())

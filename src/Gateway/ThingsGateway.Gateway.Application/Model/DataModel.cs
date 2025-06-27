@@ -19,15 +19,12 @@ namespace ThingsGateway.Gateway.Application;
 /// </summary>
 public class DeviceBasicData
 {
-    [Newtonsoft.Json.JsonIgnore]
-    [System.Text.Json.Serialization.JsonIgnore]
-    public DeviceRuntime DeviceRuntime { get; set; }
 
     /// <inheritdoc cref="PrimaryIdEntity.Id"/>
     public long Id { get; set; }
 
     /// <inheritdoc cref="Device.Name"/>
-    public string Name => DeviceRuntime?.Name;
+    public string Name { get; set; }
 
     /// <inheritdoc cref="DeviceRuntime.ActiveTime"/>
     public DateTime ActiveTime { get; set; }
@@ -41,37 +38,37 @@ public class DeviceBasicData
     public string LastErrorMessage { get; set; }
 
     /// <inheritdoc cref="DeviceRuntime.PluginName"/>
-    public string PluginName => DeviceRuntime?.PluginName;
+    public string PluginName { get; set; }
 
     /// <inheritdoc cref="Device.Description"/>
     [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
     [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
-    public string? Description => DeviceRuntime?.Description;
+    public string? Description { get; set; }
 
     /// <inheritdoc cref="Device.Remark1"/>
     [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
     [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
-    public string Remark1 => DeviceRuntime?.Remark1;
+    public string Remark1 { get; set; }
 
     /// <inheritdoc cref="Device.Remark2"/>
     [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
     [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
-    public string Remark2 => DeviceRuntime?.Remark2;
+    public string Remark2 { get; set; }
 
     /// <inheritdoc cref="Device.Remark3"/>
     [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
     [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
-    public string Remark3 => DeviceRuntime?.Remark3;
+    public string Remark3 { get; set; }
 
     /// <inheritdoc cref="Device.Remark4"/>
     [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
     [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
-    public string Remark4 => DeviceRuntime?.Remark4;
+    public string Remark4 { get; set; }
 
     /// <inheritdoc cref="Device.Remark5"/>
     [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
     [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
-    public string Remark5 => DeviceRuntime?.Remark5;
+    public string Remark5 { get; set; }
 
 
 }
@@ -81,31 +78,28 @@ public class DeviceBasicData
 /// </summary>
 public class VariableBasicData
 {
-    [Newtonsoft.Json.JsonIgnore]
-    [System.Text.Json.Serialization.JsonIgnore]
-    public VariableRuntime VariableRuntime { get; set; }
 
     /// <inheritdoc cref="PrimaryIdEntity.Id"/>
-    public long Id => VariableRuntime.Id;
+    public long Id { get; set; }
 
     /// <inheritdoc cref="Variable.Name"/>
-    public string Name => VariableRuntime.Name;
+    public string Name { get; set; }
 
     /// <inheritdoc cref="Variable.CollectGroup"/>
     [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
     [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
-    public string CollectGroup => VariableRuntime.CollectGroup;
+    public string CollectGroup { get; set; }
 
     /// <inheritdoc cref="Variable.BusinessGroup"/>
     [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
     [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
-    public string BusinessGroup => VariableRuntime.BusinessGroup;
+    public string BusinessGroup { get; set; }
 
     /// <inheritdoc cref="Variable.BusinessGroupUpdateTrigger"/>
-    public bool BusinessGroupUpdateTrigger => VariableRuntime.BusinessGroupUpdateTrigger;
+    public bool BusinessGroupUpdateTrigger { get; set; }
 
     /// <inheritdoc cref="VariableRuntime.DeviceName"/>
-    public string DeviceName => VariableRuntime.DeviceName;
+    public string DeviceName { get; set; }
 
     /// <inheritdoc cref="VariableRuntime.RuntimeType"/>
     [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
@@ -144,48 +138,48 @@ public class VariableBasicData
     /// <inheritdoc cref="Variable.RegisterAddress"/>
     [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
     [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
-    public string? RegisterAddress => VariableRuntime.RegisterAddress;
+    public string? RegisterAddress { get; set; }
 
     /// <inheritdoc cref="Variable.Unit"/>
     [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
     [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
-    public string? Unit => VariableRuntime.Unit;
+    public string? Unit { get; set; }
 
     /// <inheritdoc cref="Variable.Description"/>
     [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
     [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
-    public string? Description => VariableRuntime.Description;
+    public string? Description { get; set; }
 
     /// <inheritdoc cref="Variable.ProtectType"/>
-    public ProtectTypeEnum ProtectType => VariableRuntime.ProtectType;
+    public ProtectTypeEnum ProtectType { get; set; }
 
     /// <inheritdoc cref="Variable.DataType"/>
-    public DataTypeEnum DataType => VariableRuntime.DataType;
+    public DataTypeEnum DataType { get; set; }
 
     /// <inheritdoc cref="Device.Remark1"/>
     [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
     [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
-    public string Remark1 => VariableRuntime.Remark1;
+    public string Remark1 { get; set; }
 
     /// <inheritdoc cref="Device.Remark2"/>
     [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
     [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
-    public string Remark2 => VariableRuntime.Remark2;
+    public string Remark2 { get; set; }
 
     /// <inheritdoc cref="Device.Remark3"/>
     [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
     [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
-    public string Remark3 => VariableRuntime.Remark3;
+    public string Remark3 { get; set; }
 
     /// <inheritdoc cref="Device.Remark4"/>
     [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
     [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
-    public string Remark4 => VariableRuntime.Remark4;
+    public string Remark4 { get; set; }
 
     /// <inheritdoc cref="Device.Remark5"/>
     [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
     [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
-    public string Remark5 => VariableRuntime.Remark5;
+    public string Remark5 { get; set; }
 }
 
 

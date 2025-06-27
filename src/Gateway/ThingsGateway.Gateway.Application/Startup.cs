@@ -8,8 +8,6 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-using Mapster;
-
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
@@ -53,11 +51,6 @@ public class Startup : AppStartup
 
         //底层多语言配置
         Foundation.LocalizerUtil.SetLocalizerFactory((a) => App.CreateLocalizerByType(a));
-
-        TypeAdapterConfig.GlobalSettings.Scan(App.Assemblies.ToArray());
-        // 配置默认全局映射（支持覆盖）
-        TypeAdapterConfig.GlobalSettings.Default
-              .PreserveReference(true);
 
         //运行日志写入数据库配置
         services.AddDatabaseLogging<BackendLogDatabaseLoggingWriter>(options =>

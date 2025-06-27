@@ -9,8 +9,6 @@
 //------------------------------------------------------------------------------
 #pragma warning disable CA2007 // 考虑对等待的任务调用 ConfigureAwait
 
-using Mapster;
-
 using ThingsGateway.Admin.Application;
 
 using TouchSocket.Dmtp;
@@ -65,7 +63,7 @@ public partial class GatewayOnlinePage
         if (TcpDmtpService != null)
         {
             var clients = TcpDmtpService.Clients.ToList();
-            var data = clients.Adapt<List<TcpSessionClientDto>>();
+            var data = clients.AdaptListTcpSessionClientDto();
 
             var query = data.GetQueryData(options);
 

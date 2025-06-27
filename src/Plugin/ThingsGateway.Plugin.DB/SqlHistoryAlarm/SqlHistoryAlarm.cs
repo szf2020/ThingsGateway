@@ -10,8 +10,6 @@
 
 using BootstrapBlazor.Components;
 
-using Mapster;
-
 using ThingsGateway.Admin.Application;
 using ThingsGateway.Extension.Generic;
 using ThingsGateway.Foundation;
@@ -29,7 +27,6 @@ public partial class SqlHistoryAlarm : BusinessBaseWithCacheVariableModel<Histor
 {
     internal readonly SqlHistoryAlarmProperty _driverPropertys = new();
     private readonly SqlHistoryAlarmVariableProperty _variablePropertys = new();
-    private TypeAdapterConfig _config = new();
     public override Type DriverUIType => typeof(HistoryAlarmPage);
 
     /// <inheritdoc/>
@@ -40,12 +37,39 @@ public partial class SqlHistoryAlarm : BusinessBaseWithCacheVariableModel<Histor
 
     private SqlSugarClient _db;
 
+    public static HistoryAlarm AdaptHistoryAlarm(AlarmVariable src)
+    {
+        var target = new HistoryAlarm();
+        target.Name = src.Name;
+        target.Description = src.Description;
+        target.CreateOrgId = src.CreateOrgId;
+        target.CreateUserId = src.CreateUserId;
+        target.DeviceId = src.DeviceId;
+        target.DeviceName = src.DeviceName;
+        target.RegisterAddress = src.RegisterAddress;
+        target.DataType = src.DataType;
+        target.AlarmCode = src.AlarmCode;
+        target.AlarmLimit = src.AlarmLimit;
+        target.AlarmText = src.AlarmText;
+        target.RecoveryCode = src.RecoveryCode;
+        target.AlarmTime = src.AlarmTime;
+        target.EventTime = src.EventTime;
+        target.AlarmType = src.AlarmType;
+        target.EventType = src.EventType;
+        target.Remark1 = src.Remark1;
+        target.Remark2 = src.Remark2;
+        target.Remark3 = src.Remark3;
+        target.Remark4 = src.Remark4;
+        target.Remark5 = src.Remark5;
+        target.Id = CommonUtils.GetSingleId();
+        return target;
+    }
+
 
     protected override async Task InitChannelAsync(IChannel? channel, CancellationToken cancellationToken)
     {
         _db = BusinessDatabaseUtil.GetDb((DbType)_driverPropertys.DbType, _driverPropertys.BigTextConnectStr);
 
-        _config.ForType<AlarmVariable, HistoryAlarm>().Map(dest => dest.Id, (src) => CommonUtils.GetSingleId());
         GlobalData.AlarmChangedEvent -= AlarmWorker_OnAlarmChanged;
         GlobalData.ReadOnlyRealAlarmIdVariables?.ForEach(a =>
         {

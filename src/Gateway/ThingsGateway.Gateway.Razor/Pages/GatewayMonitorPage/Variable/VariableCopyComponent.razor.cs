@@ -8,8 +8,6 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-using Mapster;
-
 using ThingsGateway.Admin.Application;
 
 namespace ThingsGateway.Gateway.Razor;
@@ -42,7 +40,7 @@ public partial class VariableCopyComponent
             List<Variable> variables = new();
             for (int i = 0; i < CopyCount; i++)
             {
-                var variable = Model.Adapt<List<Variable>>();
+                var variable = Model.AdaptListVariable();
                 foreach (var item in variable)
                 {
                     item.Id = CommonUtils.GetSingleId();

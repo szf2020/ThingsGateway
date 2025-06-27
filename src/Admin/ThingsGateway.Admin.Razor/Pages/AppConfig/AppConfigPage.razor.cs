@@ -8,8 +8,6 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-using Mapster;
-
 using Microsoft.AspNetCore.Components.Forms;
 
 using ThingsGateway.Admin.Application;
@@ -30,7 +28,7 @@ public partial class AppConfigPage
 
     protected override async Task OnParametersSetAsync()
     {
-        AppConfig = (await SysDictService.GetAppConfigAsync()).Adapt<AppConfig>();
+        AppConfig = (await SysDictService.GetAppConfigAsync()).AdaptAppConfig();
         await base.OnParametersSetAsync();
     }
 

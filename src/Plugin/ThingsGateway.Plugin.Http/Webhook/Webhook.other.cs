@@ -10,8 +10,6 @@
 
 using BootstrapBlazor.Components;
 
-using Mapster;
-
 using ThingsGateway.Extension.Generic;
 using ThingsGateway.Foundation;
 
@@ -74,7 +72,7 @@ public partial class Webhook : BusinessBaseWithCacheIntervalScript<VariableBasic
         return UpdateVarModel(item, cancellationToken);
     }
 
-    protected override void VariableTimeInterval(IEnumerable<VariableRuntime> variableRuntimes, List<VariableBasicData> variables)
+    protected override void VariableTimeInterval(IEnumerable<VariableRuntime> variableRuntimes, IEnumerable<VariableBasicData> variables)
     {
         TimeIntervalUpdateVariable(variables);
         base.VariableTimeInterval(variableRuntimes, variables);
@@ -85,7 +83,7 @@ public partial class Webhook : BusinessBaseWithCacheIntervalScript<VariableBasic
         base.VariableChange(variableRuntime, variable);
     }
 
-    private void TimeIntervalUpdateVariable(List<VariableBasicData> variables)
+    private void TimeIntervalUpdateVariable(IEnumerable<VariableBasicData> variables)
     {
         if (!_businessPropertyWithCacheIntervalScript.VariableTopic.IsNullOrWhiteSpace())
         {
@@ -121,7 +119,7 @@ public partial class Webhook : BusinessBaseWithCacheIntervalScript<VariableBasic
             if (_driverPropertys.GroupUpdate && variable.BusinessGroupUpdateTrigger && !variable.BusinessGroup.IsNullOrEmpty() && VariableRuntimeGroups.TryGetValue(variable.BusinessGroup, out var variableRuntimeGroup))
             {
 
-                AddQueueVarModel(new CacheDBItem<List<VariableBasicData>>(variableRuntimeGroup.Adapt<List<VariableBasicData>>()));
+                AddQueueVarModel(new CacheDBItem<List<VariableBasicData>>(variableRuntimeGroup.AdaptListVariableBasicData()));
 
             }
             else

@@ -8,8 +8,6 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-using Mapster;
-
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Components.Web;
 
@@ -145,10 +143,10 @@ public partial class ChannelDeviceTree
 
         if (channelDeviceTreeItem.TryGetChannelRuntime(out var channelRuntime))
         {
-            oneModel = channelRuntime.Adapt<Channel>();
+            oneModel = channelRuntime.AdaptChannel();
             oneModel.Id = 0;
 
-            deviceDict = channelRuntime.ReadDeviceRuntimes.ToDictionary(a => a.Value.Adapt<Device>(), a => a.Value.ReadOnlyVariableRuntimes.Select(a => a.Value).Adapt<List<Variable>>());
+            deviceDict = channelRuntime.ReadDeviceRuntimes.ToDictionary(a => a.Value.AdaptDevice(), a => a.Value.ReadOnlyVariableRuntimes.Select(a => a.Value).AdaptListVariable());
         }
         else
         {
@@ -210,7 +208,7 @@ public partial class ChannelDeviceTree
             models = data.Where(a => a.PluginName == pluginName);
             oldModel = models.FirstOrDefault();
             changedModels = models;
-            oneModel = oldModel.Adapt<Channel>();
+            oneModel = oldModel.AdaptChannel();
 
         }
         else if (channelDeviceTreeItem.TryGetPluginType(out var pluginType))
@@ -221,7 +219,7 @@ public partial class ChannelDeviceTree
             models = data.Where(a => a.PluginType == pluginType);
             oldModel = models.FirstOrDefault();
             changedModels = models;
-            oneModel = oldModel.Adapt<Channel>();
+            oneModel = oldModel.AdaptChannel();
 
 
         }
@@ -230,8 +228,8 @@ public partial class ChannelDeviceTree
             return;
         }
 
-        changedModels = changedModels.Adapt<List<Channel>>();
-        oldModel = oldModel.Adapt<Channel>();
+        changedModels = changedModels.AdaptListChannel();
+        oldModel = oldModel.AdaptChannel();
         var op = new DialogOption()
         {
             IsScrolling = false,
@@ -628,10 +626,10 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
 
         if (channelDeviceTreeItem.TryGetDeviceRuntime(out var deviceRuntime))
         {
-            oneModel = deviceRuntime.Adapt<Device>();
+            oneModel = deviceRuntime.AdaptDevice();
             oneModel.Id = 0;
 
-            variables = deviceRuntime.ReadOnlyVariableRuntimes.Select(a => a.Value).Adapt<List<Variable>>();
+            variables = deviceRuntime.ReadOnlyVariableRuntimes.Select(a => a.Value).AdaptListVariable();
         }
         else
         {
@@ -672,7 +670,7 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
 
         if (channelDeviceTreeItem.TryGetDeviceRuntime(out var deviceRuntime))
         {
-            oneModel = deviceRuntime.Adapt<Device>();
+            oneModel = deviceRuntime.AdaptDevice();
             if (itemChangedType == ItemChangedType.Add)
             {
                 oneModel.Id = 0;
@@ -738,7 +736,7 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
             models = data.Where(a => a.ChannelId == channelRuntime.Id);
             oldModel = models.FirstOrDefault();
             changedModels = models;
-            oneModel = oldModel.Adapt<Device>();
+            oneModel = oldModel.AdaptDevice();
         }
         //批量编辑只有分类和插件名称节点
         else if (channelDeviceTreeItem.TryGetPluginName(out var pluginName))
@@ -748,7 +746,7 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
             models = data.Where(a => a.PluginName == pluginName); ;
             oldModel = models.FirstOrDefault();
             changedModels = models;
-            oneModel = oldModel.Adapt<Device>();
+            oneModel = oldModel.AdaptDevice();
 
         }
         else if (channelDeviceTreeItem.TryGetPluginType(out var pluginType))
@@ -759,7 +757,7 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
             models = data.Where(a => a.PluginType == pluginType); ;
             oldModel = models.FirstOrDefault();
             changedModels = models;
-            oneModel = oldModel.Adapt<Device>();
+            oneModel = oldModel.AdaptDevice();
 
 
         }
@@ -768,8 +766,8 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
             return;
         }
 
-        changedModels = changedModels.Adapt<List<Device>>();
-        oldModel = oldModel.Adapt<Device>();
+        changedModels = changedModels.AdaptListDevice();
+        oldModel = oldModel.AdaptDevice();
         op.Component = BootstrapDynamicComponent.CreateComponent<DeviceEditComponent>(new Dictionary<string, object?>
         {
              {nameof(DeviceEditComponent.OnValidSubmit), async () =>

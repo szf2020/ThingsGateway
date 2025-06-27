@@ -8,8 +8,6 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-using Mapster;
-
 using ThingsGateway.Admin.Application;
 using ThingsGateway.Foundation;
 using ThingsGateway.NewLife.Json.Extension;
@@ -50,7 +48,7 @@ public partial class TcpServiceComponent : IDriverUIBase
         if (TcpServiceChannel != null)
         {
             var clients = TcpServiceChannel.Clients.ToList();
-            var data = clients.Adapt<List<TcpSessionClientDto>>();
+            var data = clients.AdaptListTcpSessionClientDto();
             for (int i = 0; i < clients.Count; i++)
             {
                 var client = clients[i];

@@ -10,7 +10,7 @@
 
 using BootstrapBlazor.Components;
 
-using Mapster;
+using Riok.Mapperly.Abstractions;
 
 using System.ComponentModel.DataAnnotations;
 
@@ -183,7 +183,7 @@ public class Device : BaseDataEntity, IValidatableObject
     /// </summary>
     [System.Text.Json.Serialization.JsonIgnore]
     [Newtonsoft.Json.JsonIgnore]
-    [AdaptIgnore]
+    [MapperIgnore]
     public ModelValueValidateForm? ModelValueValidateForm;
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {

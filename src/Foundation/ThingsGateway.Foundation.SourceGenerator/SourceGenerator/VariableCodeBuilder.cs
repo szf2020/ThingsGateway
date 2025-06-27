@@ -104,7 +104,7 @@ internal sealed class VariableCodeBuilder
 
     private void BuildMethod(StringBuilder stringBuilder, IPropertySymbol propertySymbol)
     {
-        var attributeData = propertySymbol.GetAttributes().FirstOrDefault(a => a.AttributeClass.ToDisplayString() == VariableSyntaxReceiver.VariableRuntimeAttributeTypeName);
+        var attributeData = propertySymbol.GetAttributes().FirstOrDefault(a => a.AttributeClass.ToDisplayString() == VariableObjectSyntaxFilter.VariableRuntimeAttributeTypeName);
         stringBuilder.AppendLine();
         stringBuilder.AppendLine($"public ValueTask<OperResult> Write{propertySymbol.Name}Async({propertySymbol.Type} value,CancellationToken cancellationToken=default)");
         stringBuilder.AppendLine("{");
@@ -120,7 +120,7 @@ internal sealed class VariableCodeBuilder
             .OfType<IPropertySymbol>()
             .Where(m =>
             {
-                return m.GetAttributes().Any(a => a.AttributeClass.ToDisplayString() == VariableSyntaxReceiver.VariableRuntimeAttributeTypeName);
+                return m.GetAttributes().Any(a => a.AttributeClass.ToDisplayString() == VariableObjectSyntaxFilter.VariableRuntimeAttributeTypeName);
             });
     }
 }

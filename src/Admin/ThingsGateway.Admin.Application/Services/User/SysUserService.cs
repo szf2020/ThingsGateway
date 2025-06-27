@@ -10,8 +10,6 @@
 
 using BootstrapBlazor.Components;
 
-using Mapster;
-
 using ThingsGateway.DataEncryption;
 using ThingsGateway.Extension;
 using ThingsGateway.Extension.Generic;
@@ -452,7 +450,7 @@ internal sealed class SysUserService : BaseService<SysUser>, ISysUserService
 
         if (changedType == ItemChangedType.Add)
         {
-            var sysUser = input.Adapt<SysUser>();
+            var sysUser = input.AdaptSysUser();
             //获取默认密码
             sysUser.Avatar = input.Avatar;
             sysUser.Password = await GetDefaultPassWord(true).ConfigureAwait(false);//设置密码
@@ -872,7 +870,7 @@ internal sealed class SysUserService : BaseService<SysUser>, ISysUserService
             sysUser.OrgAndPosIdList.AddRange(sysUser.OrgId, sysUser.PositionId ?? 0);//添加组织和职位Id
             if (sysUser.DirectorId != null)
             {
-                sysUser.DirectorInfo = (await GetUserByIdAsync(sysUser.DirectorId.Value).ConfigureAwait(false)).Adapt<UserSelectorOutput>();//获取主管信息
+                sysUser.DirectorInfo = (await GetUserByIdAsync(sysUser.DirectorId.Value).ConfigureAwait(false)).AdaptUserSelectorOutput();//获取主管信息
             }
 
             //获取按钮码

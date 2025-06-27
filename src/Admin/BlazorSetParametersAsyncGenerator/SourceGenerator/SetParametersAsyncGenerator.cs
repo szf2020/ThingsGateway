@@ -1,63 +1,48 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Text;
+
+using System.Text;
 
 namespace Microsoft.AspNetCore.Components;
 
 [Generator]
-public partial class SetParametersAsyncGenerator : ISourceGenerator
+public sealed partial class SetParametersAsyncGenerator : IIncrementalGenerator
 {
+    private const string m_DoNotGenerateSetParametersAsyncAttribute = """ 
+    using System;
+    namespace Microsoft.AspNetCore.Components
+    {
+        [AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = true)]
+        internal sealed class DoNotGenerateSetParametersAsyncAttribute : Attribute { }
+    }
+""";
 
-    private string m_DoNotGenerateSetParametersAsyncAttribute = """
-        
-        using System;
-        namespace Microsoft.AspNetCore.Components
+    private const string m_GenerateSetParametersAsyncAttribute = """ 
+    using System;
+    namespace Microsoft.AspNetCore.Components
+    {
+        [AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = true)]
+        internal sealed class GenerateSetParametersAsyncAttribute : Attribute
         {
-            [AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = true)]
-            internal sealed class DoNotGenerateSetParametersAsyncAttribute : Attribute
-            {
-            }
+            public bool RequireExactMatch { get; set; }
         }
+    }
+""";
 
-
-        """
-        ;
-    private string m_GenerateSetParametersAsyncAttribute = """
-        
-        using System;
-        namespace Microsoft.AspNetCore.Components
+    private const string m_GlobalGenerateSetParametersAsyncAttribute = """ 
+    using System;
+    namespace Microsoft.AspNetCore.Components
+    {
+        [AttributeUsage(AttributeTargets.Assembly, AllowMultiple = false)]
+        internal sealed class GlobalGenerateSetParametersAsyncAttribute : Attribute
         {
-            [AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = true)]
-            internal sealed class GenerateSetParametersAsyncAttribute : Attribute
-            {
-                public bool RequireExactMatch { get; set; }
-            }
+            public bool Enable { get; }
+            public GlobalGenerateSetParametersAsyncAttribute(bool enable = true) { Enable = enable; }
         }
-
-
-        """
-        ;
-    private string m_GlobalGenerateSetParametersAsyncAttribute = """
-        
-        using System;
-        namespace Microsoft.AspNetCore.Components
-        {
-            [AttributeUsage(AttributeTargets.Assembly, AllowMultiple = false)]
-            internal sealed class GlobalGenerateSetParametersAsyncAttribute : Attribute
-            {
-                public bool Enable { get; }
-
-                public GlobalGenerateSetParametersAsyncAttribute(bool enable = true)
-                {
-                    Enable = enable;
-                }
-            }
-
-        }
-
-
-        """
-        ;
+    }
+""";
 
     private static readonly DiagnosticDescriptor ParameterNameConflict = new DiagnosticDescriptor(
         id: "TG0001",
@@ -68,36 +53,64 @@ public partial class SetParametersAsyncGenerator : ISourceGenerator
         isEnabledByDefault: true,
         description: "Parameter names must be case insensitive to be usable in routes. Rename the parameter to not be in conflict with other parameters.");
 
-    public void Initialize(GeneratorInitializationContext context)
+    public void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        context.RegisterForPostInitialization(a =>
+        // 注入 attribute 源码
+        context.RegisterPostInitializationOutput(ctx =>
         {
-            a.AddSource(nameof(m_DoNotGenerateSetParametersAsyncAttribute), m_DoNotGenerateSetParametersAsyncAttribute);
-            a.AddSource(nameof(m_GenerateSetParametersAsyncAttribute), m_GenerateSetParametersAsyncAttribute);
-            a.AddSource(nameof(m_GlobalGenerateSetParametersAsyncAttribute), m_GlobalGenerateSetParametersAsyncAttribute);
+            ctx.AddSource("DoNotGenerateSetParametersAsyncAttribute.g.cs", SourceText.From(m_DoNotGenerateSetParametersAsyncAttribute, Encoding.UTF8));
+            ctx.AddSource("GenerateSetParametersAsyncAttribute.g.cs", SourceText.From(m_GenerateSetParametersAsyncAttribute, Encoding.UTF8));
+            ctx.AddSource("GlobalGenerateSetParametersAsyncAttribute.g.cs", SourceText.From(m_GlobalGenerateSetParametersAsyncAttribute, Encoding.UTF8));
         });
 
-        // Register a syntax receiver that will be created for each generation pass
-        context.RegisterForSyntaxNotifications(() => new SyntaxReceiver());
+        // 筛选 ClassDeclarationSyntax
+        var classDeclarations = context.SyntaxProvider
+            .CreateSyntaxProvider(
+                predicate: static (node, _) => node is ClassDeclarationSyntax,
+                transform: static (ctx, _) => (ClassDeclarationSyntax)ctx.Node)
+            .Where(static c => c is not null);
+
+        // 合并 Compilation
+        var compilationProvider = context.CompilationProvider;
+
+        var candidateClasses = classDeclarations.Combine(compilationProvider);
+
+        context.RegisterSourceOutput(candidateClasses, static (spc, tuple) =>
+        {
+            var (classDeclaration, compilation) = tuple;
+            Execute(spc, compilation, classDeclaration);
+        });
     }
 
-    public void Execute(GeneratorExecutionContext context)
+    private static void Execute(SourceProductionContext context, Compilation compilation, ClassDeclarationSyntax classDeclaration)
     {
-        // https://github.com/dotnet/AspNetCore.Docs/blob/1e199f340780f407a685695e6c4d953f173fa891/aspnetcore/blazor/webassembly-performance-best-practices.md#implement-setparametersasync-manually
-        if (context.SyntaxReceiver is not SyntaxReceiver receiver)
-        {
+        var model = compilation.GetSemanticModel(classDeclaration.SyntaxTree);
+        var classSymbol = model.GetDeclaredSymbol(classDeclaration);
+        if (classSymbol is null || classSymbol.Name == "_Imports")
             return;
-        }
 
-        var candidate_classes = GetCandidateClasses(receiver, context);
+        var positiveAttr = compilation.GetTypeByMetadataName("Microsoft.AspNetCore.Components.GenerateSetParametersAsyncAttribute");
+        var negativeAttr = compilation.GetTypeByMetadataName("Microsoft.AspNetCore.Components.DoNotGenerateSetParametersAsyncAttribute");
 
-        foreach (var class_symbol in candidate_classes.Distinct(SymbolEqualityComparer.Default).Cast<INamedTypeSymbol>())
-        {
-            GenerateSetParametersAsyncMethod(context, class_symbol);
-        }
+        if (classSymbol.GetAttributes().Any(a => SymbolEqualityComparer.Default.Equals(a.AttributeClass, negativeAttr)))
+            return;
+
+        if (!IsPartial(classSymbol) || !IsComponent(classDeclaration, classSymbol, compilation))
+            return;
+
+        var globalEnable = compilation.Assembly.GetAttributes()
+            .FirstOrDefault(a => a.AttributeClass?.ToDisplayString() == "Microsoft.AspNetCore.Components.GlobalGenerateSetParametersAsyncAttribute")
+            ?.ConstructorArguments.FirstOrDefault().Value as bool? ?? false;
+
+        var hasPositive = classSymbol.GetAttributes().Any(a => SymbolEqualityComparer.Default.Equals(a.AttributeClass, positiveAttr));
+
+        if (!globalEnable && !hasPositive)
+            return;
+
+        GenerateSetParametersAsyncMethod(context, classSymbol);
     }
 
-    private static void GenerateSetParametersAsyncMethod(GeneratorExecutionContext context, INamedTypeSymbol class_symbol)
+    private static void GenerateSetParametersAsyncMethod(SourceProductionContext context, INamedTypeSymbol class_symbol)
     {
         var force_exact_match = class_symbol.GetAttributes().Any(a => a.NamedArguments.Any(na => na.Key == "RequireExactMatch" && na.Value.Value is bool v && v));
         var namespaceName = class_symbol.ContainingNamespace.ToDisplayString();
@@ -386,6 +399,31 @@ namespace {namespaceName}
 #pragma warning restore CS0162");
     }
 
+    private static bool IsPartial(INamedTypeSymbol symbol)
+    {
+        return symbol.DeclaringSyntaxReferences
+            .Select(r => r.GetSyntax())
+            .OfType<ClassDeclarationSyntax>()
+            .Any(c => c.Modifiers.Any(m => m.IsKind(SyntaxKind.PartialKeyword)));
+    }
+
+    private static bool IsComponent(ClassDeclarationSyntax classDeclaration, INamedTypeSymbol symbol, Compilation compilation)
+    {
+        if (HasUserDefinedSetParametersAsync(symbol))
+            return false;
+
+        if (classDeclaration.SyntaxTree.FilePath.EndsWith(".razor") || classDeclaration.SyntaxTree.FilePath.EndsWith(".razor.cs"))
+            return true;
+
+        var iComponent = compilation.GetTypeByMetadataName("Microsoft.AspNetCore.Components.IComponent");
+        var componentBase = compilation.GetTypeByMetadataName("Microsoft.AspNetCore.Components.ComponentBase");
+
+        if (iComponent == null || componentBase == null)
+            return false;
+
+        return symbol.AllInterfaces.Contains(iComponent) || SymbolEqualityComparer.Default.Equals(symbol.BaseType, componentBase);
+    }
+
     private static bool HasUserDefinedSetParametersAsync(INamedTypeSymbol classSymbol)
     {
         return classSymbol
@@ -398,137 +436,4 @@ namespace {namespaceName}
                 !m.IsStatic);
     }
 
-
-    private static bool IsPartial(INamedTypeSymbol symbol)
-    {
-        return symbol.DeclaringSyntaxReferences
-            .Select(r => r.GetSyntax())
-            .OfType<ClassDeclarationSyntax>()
-            .Any(c => c.Modifiers.Any(m => m.IsKind(SyntaxKind.PartialKeyword)));
-    }
-    private static bool IsComponent(ClassDeclarationSyntax classDeclarationSyntax, INamedTypeSymbol symbol, Compilation compilation)
-    {
-        if (HasUserDefinedSetParametersAsync(symbol))
-        {
-            // 用户自己写了方法，不生成
-            return false;
-        }
-
-        if (!IsPartial(symbol))
-        {
-            return false;
-        }
-
-        if (classDeclarationSyntax.SyntaxTree.FilePath.EndsWith(".razor") || classDeclarationSyntax.SyntaxTree.FilePath.EndsWith(".razor.cs"))
-        {
-            return true;
-        }
-
-
-
-        var iComponent = compilation.GetTypeByMetadataName("Microsoft.AspNetCore.Components.IComponent");
-        var componentBase = compilation.GetTypeByMetadataName("Microsoft.AspNetCore.Components.ComponentBase");
-        if (iComponent == null || componentBase == null)
-            return false;
-
-        if (SymbolEqualityComparer.Default.Equals(symbol, iComponent))
-            return true;
-        if (SymbolEqualityComparer.Default.Equals(symbol, componentBase))
-            return true;
-
-        return false;
-    }
-
-    /// <summary>
-    /// Enumerate methods with at least one Group attribute
-    /// </summary>
-    private static IEnumerable<INamedTypeSymbol> GetCandidateClasses(SyntaxReceiver receiver, GeneratorExecutionContext context)
-    {
-        var compilation = context.Compilation;
-        var positiveAttributeSymbol = compilation.GetTypeByMetadataName("Microsoft.AspNetCore.Components.GenerateSetParametersAsyncAttribute");
-        var negativeAttributeSymbol = compilation.GetTypeByMetadataName("Microsoft.AspNetCore.Components.DoNotGenerateSetParametersAsyncAttribute");
-
-        // loop over the candidate methods, and keep the ones that are actually annotated
-
-        // 找特性
-        var assemblyAttributes = compilation.Assembly.GetAttributes();
-
-        var enableAttr = assemblyAttributes.FirstOrDefault(attr =>
-            attr.AttributeClass?.ToDisplayString() == "Microsoft.AspNetCore.Components.GlobalGenerateSetParametersAsyncAttribute");
-
-        var globalEnable = false;
-        if (enableAttr != null)
-        {
-            var arg = enableAttr.ConstructorArguments.FirstOrDefault();
-            if (arg.Value is bool b)
-                globalEnable = b;
-        }
-
-        foreach (ClassDeclarationSyntax class_declaration in receiver.CandidateClasses)
-        {
-            var model = compilation.GetSemanticModel(class_declaration.SyntaxTree);
-            var class_symbol = model.GetDeclaredSymbol(class_declaration);
-            if (class_symbol is null)
-            {
-                continue;
-            }
-            if (class_symbol.Name == "_Imports")
-            {
-                continue;
-            }
-
-            // 是否拒绝生成
-            var hasNegative = class_symbol.GetAttributes().Any(ad =>
-                ad.AttributeClass?.Equals(negativeAttributeSymbol, SymbolEqualityComparer.Default) == true);
-
-            if (hasNegative)
-                continue;
-
-
-            if (IsComponent(class_declaration, class_symbol, compilation))
-            {
-                if (globalEnable)
-                {
-                    yield return class_symbol;
-                }
-                else
-                {
-                    // 必须显式标注 Positive Attribute
-                    var hasPositive = class_symbol.GetAttributes().Any(ad =>
-                        ad.AttributeClass?.Equals(positiveAttributeSymbol, SymbolEqualityComparer.Default) == true);
-
-                    if (hasPositive)
-                        yield return class_symbol;
-                }
-            }
-            else
-            {
-
-            }
-        }
-    }
-
-    /// <summary>
-    /// Created on demand before each generation pass
-    /// </summary>
-    internal class SyntaxReceiver : ISyntaxReceiver
-    {
-        public List<ClassDeclarationSyntax> CandidateClasses { get; } = new List<ClassDeclarationSyntax>();
-
-        /// <summary>
-        /// Called for every syntax node in the compilation, we can inspect the nodes and save any information useful for generation
-        /// </summary>
-        public void OnVisitSyntaxNode(SyntaxNode syntax_node)
-        {
-            // any class with at least one attribute is a candidate for property generation
-            if (syntax_node is ClassDeclarationSyntax classDeclarationSyntax)
-            {
-                CandidateClasses.Add(classDeclarationSyntax);
-            }
-            else
-            {
-
-            }
-        }
-    }
 }

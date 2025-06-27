@@ -11,8 +11,6 @@
 #pragma warning disable CA2007 // 考虑对等待的任务调用 ConfigureAwait
 using BootstrapBlazor.Components;
 
-using Mapster;
-
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.Extensions.Localization;
@@ -95,7 +93,7 @@ public partial class Login
         }
         else
         {
-            var model = loginModel.Adapt<LoginInput>();
+            var model = loginModel.AdaptLoginInput();
             model.Password = DESEncryption.Encrypt(model.Password);
 
             try

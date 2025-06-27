@@ -8,8 +8,6 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-using Mapster;
-
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
@@ -158,7 +156,7 @@ internal sealed class RedundancyHostedService : BackgroundService, IRedundancyHo
                 // 如果 online 为 true，表示设备在线
                 if (online)
                 {
-                    var deviceRunTimes = GlobalData.ReadOnlyIdDevices.Where(a => a.Value.IsCollect == true).Select(a => a.Value).Adapt<List<DeviceDataWithValue>>();
+                    var deviceRunTimes = GlobalData.ReadOnlyIdDevices.Where(a => a.Value.IsCollect == true).Select(a => a.Value).AdaptListDeviceDataWithValue();
 
                     foreach (var item in TcpDmtpService.Clients)
                     {
@@ -370,7 +368,7 @@ internal sealed class RedundancyHostedService : BackgroundService, IRedundancyHo
 
     private async Task BeforeStartAsync()
     {
-        RedundancyOptions = (await _redundancyService.GetRedundancyAsync().ConfigureAwait(false)).Adapt<RedundancyOptions>();
+        RedundancyOptions = (await _redundancyService.GetRedundancyAsync().ConfigureAwait(false)).AdaptRedundancyOptions();
 
         if (RedundancyOptions?.Enable == true)
         {

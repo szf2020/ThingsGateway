@@ -8,8 +8,6 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-using Mapster;
-
 using System.Diagnostics;
 
 using ThingsGateway.Extension.Generic;
@@ -25,13 +23,12 @@ namespace ThingsGateway.Plugin.QuestDB;
 /// </summary>
 public partial class QuestDBProducer : BusinessBaseWithCacheIntervalVariableModel<VariableBasicData>
 {
-    private TypeAdapterConfig _config;
 
     protected override ValueTask<OperResult> UpdateVarModel(IEnumerable<CacheDBItem<VariableBasicData>> item, CancellationToken cancellationToken)
     {
         return UpdateVarModel(item.Select(a => a.Value).OrderBy(a => a.Id), cancellationToken);
     }
-    protected override void VariableTimeInterval(IEnumerable<VariableRuntime> variableRuntimes, List<VariableBasicData> variables)
+    protected override void VariableTimeInterval(IEnumerable<VariableRuntime> variableRuntimes, IEnumerable<VariableBasicData> variables)
     {
         TimeIntervalUpdateVariable(variables);
         base.VariableTimeInterval(variableRuntimes, variables);
@@ -47,7 +44,7 @@ public partial class QuestDBProducer : BusinessBaseWithCacheIntervalVariableMode
     }
 
 
-    private void TimeIntervalUpdateVariable(List<VariableBasicData> variables)
+    private void TimeIntervalUpdateVariable(IEnumerable<VariableBasicData> variables)
     {
         if (_driverPropertys.GroupUpdate)
         {
@@ -78,7 +75,7 @@ public partial class QuestDBProducer : BusinessBaseWithCacheIntervalVariableMode
         if (_driverPropertys.GroupUpdate && variable.BusinessGroupUpdateTrigger && !variable.BusinessGroup.IsNullOrEmpty() && VariableRuntimeGroups.TryGetValue(variable.BusinessGroup, out var variableRuntimeGroup))
         {
 
-            AddQueueVarModel(new CacheDBItem<List<VariableBasicData>>(variableRuntimeGroup.Adapt<List<VariableBasicData>>(_config)));
+            AddQueueVarModel(new CacheDBItem<List<VariableBasicData>>(variableRuntimeGroup.AdaptListVariableBasicData()));
 
         }
         else
@@ -125,7 +122,7 @@ public partial class QuestDBProducer : BusinessBaseWithCacheIntervalVariableMode
 
                     Stopwatch stopwatch = new();
                     stopwatch.Start();
-                    var data = numberData.Adapt<List<QuestDBNumberHistoryValue>>(_config);
+                    var data = numberData.AdaptListQuestDBNumberHistoryValue();
                     var result = await _db.Insertable(data).AS(_driverPropertys.NumberTableName).ExecuteCommandAsync(cancellationToken).ConfigureAwait(false);//不要加分表
                     stopwatch.Stop();
 
@@ -141,7 +138,7 @@ public partial class QuestDBProducer : BusinessBaseWithCacheIntervalVariableMode
                 {
                     Stopwatch stopwatch = new();
                     stopwatch.Start();
-                    var data = stringData.Adapt<List<QuestDBHistoryValue>>(_config);
+                    var data = stringData.AdaptListQuestDBHistoryValue();
                     var result = await _db.Insertable(data).AS(_driverPropertys.StringTableName).ExecuteCommandAsync(cancellationToken).ConfigureAwait(false);//不要加分表
                     stopwatch.Stop();
 

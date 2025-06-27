@@ -10,8 +10,6 @@
 
 using BootstrapBlazor.Components;
 
-using Mapster;
-
 using Microsoft.Extensions.Hosting;
 
 using System.Collections.Concurrent;
@@ -445,7 +443,7 @@ internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
                     var saveVariables = new List<Variable>();
                     foreach (var item in saveVariableRuntimes)
                     {
-                        var data = item.Adapt<Variable>();
+                        var data = item.AdaptVariable();
                         data.InitValue = item.Value;
                         saveVariables.Add(data);
                     }
@@ -599,7 +597,7 @@ internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
                     }
                     else
                     {
-                        newDeviceRuntime = newDev.Adapt<DeviceRuntime>();
+                        newDeviceRuntime = newDev.AdaptDeviceRuntime();
                         SetRedundantDevice(deviceRuntime, newDeviceRuntime);
                     }
                 }
@@ -620,7 +618,7 @@ internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
                     }
                     else
                     {
-                        newDeviceRuntime = newDev.Adapt<DeviceRuntime>();
+                        newDeviceRuntime = newDev.AdaptDeviceRuntime();
                         SetRedundantDevice(deviceRuntime, newDeviceRuntime);
                     }
                 }

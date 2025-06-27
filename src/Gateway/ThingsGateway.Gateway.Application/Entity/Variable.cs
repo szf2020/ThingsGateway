@@ -10,7 +10,7 @@
 
 using BootstrapBlazor.Components;
 
-using Mapster;
+using Riok.Mapperly.Abstractions;
 
 using System.Collections.Concurrent;
 using System.ComponentModel.DataAnnotations;
@@ -107,7 +107,7 @@ public class Variable : BaseDataEntity, IValidatableObject
     /// </summary>
     [System.Text.Json.Serialization.JsonIgnore]
     [Newtonsoft.Json.JsonIgnore]
-    [AdaptIgnore]
+    [MapperIgnore]
     public ConcurrentDictionary<long, ModelValueValidateForm>? VariablePropertyModels;
 
 

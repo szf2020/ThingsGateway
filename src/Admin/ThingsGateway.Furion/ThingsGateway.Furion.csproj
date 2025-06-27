@@ -36,7 +36,7 @@
 		<PackageReference Include="Ben.Demystifier" Version="0.4.1" />
 		<!--<PackageReference Include="FastExpressionCompiler" Version="5.3.0" />-->
 		<PackageReference Include="System.Text.RegularExpressions" Version="4.3.1" />
-		<PackageReference Include="Mapster" Version="7.4.0" />
+		<!--<PackageReference Include="Mapster" Version="7.4.0" />-->
 		<PackageReference Include="MiniProfiler.AspNetCore.Mvc" Version="4.5.4" />
 		<PackageReference Include="Swashbuckle.AspNetCore" Version="9.0.1" />
 	</ItemGroup>

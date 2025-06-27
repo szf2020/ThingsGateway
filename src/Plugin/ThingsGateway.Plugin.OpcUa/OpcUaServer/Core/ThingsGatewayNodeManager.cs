@@ -8,8 +8,6 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-using Mapster;
-
 using Newtonsoft.Json.Linq;
 
 using Opc.Ua;
@@ -32,7 +30,6 @@ public class ThingsGatewayNodeManager : CustomNodeManager2
 {
     private const string ReferenceServer = "https://thingsgateway.cn/";
 
-    private readonly TypeAdapterConfig _config;
     /// <summary>
     /// OPC和网关对应表
     /// </summary>
@@ -45,14 +42,25 @@ public class ThingsGatewayNodeManager : CustomNodeManager2
     public ThingsGatewayNodeManager(BusinessBase businessBase, IServerInternal server, ApplicationConfiguration configuration) : base(server, configuration, ReferenceServer)
     {
         _businessBase = businessBase;
-        _config = new TypeAdapterConfig();
-        _config.ForType<IDBHistoryValue, DataValue>()
-        .Map(dest => dest.WrappedValue, (src) => new Variant(src.Value))
-        .Map(dest => dest.SourceTimestamp, src => DateTime.SpecifyKind(src.CollectTime, DateTimeKind.Local))
-        .Map(dest => dest.ServerTimestamp, src => DateTime.SpecifyKind(src.CreateTime, DateTimeKind.Local))
-        .Map(dest => dest.StatusCode, (src) =>
-        src.IsOnline ? StatusCodes.Good : StatusCodes.Bad);
     }
+
+    public DataValue AdaptDataValue(IDBHistoryValue src)
+    {
+        var dest = new DataValue();
+        dest.WrappedValue = new Variant(src.Value);
+        dest.SourceTimestamp = DateTime.SpecifyKind(src.CollectTime, DateTimeKind.Local);
+        dest.ServerTimestamp = DateTime.SpecifyKind(src.CreateTime, DateTimeKind.Local);
+        dest.StatusCode = src.IsOnline ? StatusCodes.Good : StatusCodes.Bad;
+        dest.Value = src.Value;
+        return dest;
+    }
+    public List<DataValue> AdaptListDataValue(IEnumerable<IDBHistoryValue> src)
+    {
+        return Enumerable.ToList(
+                Enumerable.Select(src, x => AdaptDataValue(x))
+            );
+    }
+
     ConcurrentList<IDriver>? dbDrivers;
     internal FolderState rootFolder;
 
@@ -182,7 +190,7 @@ public class ThingsGatewayNodeManager : CustomNodeManager2
 
                 if (data.Count > 0)
                 {
-                    var hisDataValue = data.Adapt<List<DataValue>>(_config);
+                    var hisDataValue = AdaptListDataValue(data);
                     HistoryData hisData = new();
                     hisData.DataValues.AddRange(hisDataValue);
                     errors[i] = StatusCodes.Good;
