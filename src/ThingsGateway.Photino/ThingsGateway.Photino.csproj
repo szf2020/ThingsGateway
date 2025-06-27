@@ -63,9 +63,7 @@
 		<FrameworkReference Include="Microsoft.AspNetCore.App" />
 	</ItemGroup>
 
-	<ItemGroup>
-		<PackageReference Include="Microsoft.Data.Sqlite" Version="$(NET9Version)" />
-	</ItemGroup>
+
 
 	<ItemGroup>
 		<Content Include="..\ThingsGateway.Server\Index\GatewayIndex.razor" Link="Index\GatewayIndex.razor" />
