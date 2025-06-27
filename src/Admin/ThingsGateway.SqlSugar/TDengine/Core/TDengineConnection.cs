@@ -73,7 +73,7 @@ namespace TDengineAdo
 
         protected override void Dispose(bool disposing)
         {
-            connection.Dispose();
+            connection?.Dispose();
         }
 
 

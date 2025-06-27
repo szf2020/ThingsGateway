@@ -175,13 +175,13 @@ public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariableModel<
         _config.ForType<VariableRuntime, SQLNumberHistoryValue>()
            //.Map(dest => dest.Id, (src) =>CommonUtils.GetSingleId())
            .Map(dest => dest.Id, src => src.Id)//Id更改为变量Id
-           .Map(dest => dest.Value, src => ConvertUtility.Convert.ToDecimal(src.Value, 0))
+    .Map(dest => dest.Value, src => src.Value.GetType() == typeof(bool) ? ConvertUtility.Convert.ToBoolean(src.Value, false) ? 1 : 0 : ConvertUtility.Convert.ToDecimal(src.Value, 0))
            .Map(dest => dest.CreateTime, (src) => DateTime.Now);
 
         _config.ForType<VariableBasicData, SQLNumberHistoryValue>()
     //.Map(dest => dest.Id, (src) =>CommonUtils.GetSingleId())
     .Map(dest => dest.Id, src => src.Id)//Id更改为变量Id
-    .Map(dest => dest.Value, src => ConvertUtility.Convert.ToDecimal(src.Value, 0))
+    .Map(dest => dest.Value, src => src.Value.GetType() == typeof(bool) ? ConvertUtility.Convert.ToBoolean(src.Value, false) ? 1 : 0 : ConvertUtility.Convert.ToDecimal(src.Value, 0))
     .Map(dest => dest.CreateTime, (src) => DateTime.Now);
 
         if (_businessPropertyWithCacheInterval.BusinessUpdateEnum == BusinessUpdateEnum.Interval && _driverPropertys.IsReadDB)

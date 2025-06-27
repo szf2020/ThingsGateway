@@ -120,30 +120,36 @@ public partial class QuestDBProducer : BusinessBaseWithCacheIntervalVariableMode
                 var stringData = dbInserts.Where(a => (!a.IsNumber && a.Value is not bool));
                 var numberData = dbInserts.Where(a => (a.IsNumber || a.Value is bool));
 
-
-                Stopwatch stopwatch = new();
-                stopwatch.Start();
-                var data = numberData.Adapt<List<QuestDBNumberHistoryValue>>(_config);
-                var result = await _db.Insertable(data).AS(_driverPropertys.NumberTableName).ExecuteCommandAsync(cancellationToken).ConfigureAwait(false);//不要加分表
-                stopwatch.Stop();
-
-                //var result = await db.Insertable(dbInserts).SplitTable().ExecuteCommandAsync().ConfigureAwait(false);
-                if (result > 0)
+                if (numberData.Any())
                 {
-                    LogMessage?.Trace($"TableName：{_driverPropertys.NumberTableName}，Count：{result}，watchTime:  {stopwatch.ElapsedMilliseconds} ms");
+
+                    Stopwatch stopwatch = new();
+                    stopwatch.Start();
+                    var data = numberData.Adapt<List<QuestDBNumberHistoryValue>>(_config);
+                    var result = await _db.Insertable(data).AS(_driverPropertys.NumberTableName).ExecuteCommandAsync(cancellationToken).ConfigureAwait(false);//不要加分表
+                    stopwatch.Stop();
+
+                    //var result = await db.Insertable(dbInserts).SplitTable().ExecuteCommandAsync().ConfigureAwait(false);
+                    if (result > 0)
+                    {
+                        LogMessage?.Trace($"TableName：{_driverPropertys.NumberTableName}，Count：{result}，watchTime:  {stopwatch.ElapsedMilliseconds} ms");
+                    }
                 }
 
 
-
-                stopwatch.Restart();
-                var strdata = stringData.Adapt<List<QuestDBHistoryValue>>(_config);
-                result = await _db.Insertable(strdata).AS(_driverPropertys.StringTableName).ExecuteCommandAsync(cancellationToken).ConfigureAwait(false);//不要加分表
-                stopwatch.Stop();
-
-                //var result = await db.Insertable(dbInserts).SplitTable().ExecuteCommandAsync().ConfigureAwait(false);
-                if (result > 0)
+                if (stringData.Any())
                 {
-                    LogMessage?.Trace($"TableName：{_driverPropertys.StringTableName}，Count：{result}，watchTime:  {stopwatch.ElapsedMilliseconds} ms");
+                    Stopwatch stopwatch = new();
+                    stopwatch.Start();
+                    var data = stringData.Adapt<List<QuestDBHistoryValue>>(_config);
+                    var result = await _db.Insertable(data).AS(_driverPropertys.StringTableName).ExecuteCommandAsync(cancellationToken).ConfigureAwait(false);//不要加分表
+                    stopwatch.Stop();
+
+                    //var result = await db.Insertable(dbInserts).SplitTable().ExecuteCommandAsync().ConfigureAwait(false);
+                    if (result > 0)
+                    {
+                        LogMessage?.Trace($"TableName：{_driverPropertys.StringTableName}，Count：{result}，watchTime:  {stopwatch.ElapsedMilliseconds} ms");
+                    }
                 }
             }
 

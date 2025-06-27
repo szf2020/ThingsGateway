@@ -206,22 +206,8 @@ public class OpcDaMaster : CollectBase
         {
             LogMessage?.LogWarning(ex);
         }
-        if (VariableTasks.Count > 0)
-        {
-            foreach (var item in VariableTasks)
-            {
-                item.Stop();
-                TaskSchedulerLoop.Remove(item);
-            }
 
-            VariableTasks = AddVariableTask(cancellationToken);
-
-            foreach (var item in VariableTasks)
-            {
-                TaskSchedulerLoop.Add(item);
-                item.Start();
-            }
-        }
+        RefreshVariableTasks(cancellationToken);
     }
 
     private Dictionary<string, List<VariableRuntime>> VariableAddresDicts { get; set; } = new();

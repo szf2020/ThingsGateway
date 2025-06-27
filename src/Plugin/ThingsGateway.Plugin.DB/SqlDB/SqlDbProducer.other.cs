@@ -136,30 +136,35 @@ public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariableModel<
                 var stringData = dbInserts.Where(a => (!a.IsNumber && a.Value is not bool));
                 var numberData = dbInserts.Where(a => (a.IsNumber || a.Value is bool));
 
-
-                Stopwatch stopwatch = new();
-                stopwatch.Start();
-                var data = numberData.Adapt<List<SQLNumberHistoryValue>>(_config);
-                var result = await _db.Fastest<SQLNumberHistoryValue>().PageSize(50000).SplitTable().BulkCopyAsync(data).ConfigureAwait(false);
-                stopwatch.Stop();
-
-                //var result = await db.Insertable(dbInserts).SplitTable().ExecuteCommandAsync().ConfigureAwait(false);
-                if (result > 0)
+                if (numberData.Any())
                 {
-                    LogMessage?.Trace($"TableName：{_driverPropertys.NumberTableName}，Count：{result}，watchTime:  {stopwatch.ElapsedMilliseconds} ms");
+                    Stopwatch stopwatch = new();
+                    stopwatch.Start();
+                    var data = numberData.Adapt<List<SQLNumberHistoryValue>>(_config);
+                    var result = await _db.Fastest<SQLNumberHistoryValue>().PageSize(50000).SplitTable().BulkCopyAsync(data).ConfigureAwait(false);
+                    stopwatch.Stop();
+
+                    //var result = await db.Insertable(dbInserts).SplitTable().ExecuteCommandAsync().ConfigureAwait(false);
+                    if (result > 0)
+                    {
+                        LogMessage?.Trace($"TableName：{_driverPropertys.NumberTableName}，Count：{result}，watchTime:  {stopwatch.ElapsedMilliseconds} ms");
+                    }
+
                 }
 
-
-
-                stopwatch.Restart();
-                var strdata = stringData.Adapt<List<SQLHistoryValue>>(_config);
-                result = await _db.Fastest<SQLHistoryValue>().PageSize(50000).SplitTable().BulkCopyAsync(strdata).ConfigureAwait(false);
-                stopwatch.Stop();
-
-                //var result = await db.Insertable(dbInserts).SplitTable().ExecuteCommandAsync().ConfigureAwait(false);
-                if (result > 0)
+                if (stringData.Any())
                 {
-                    LogMessage?.Trace($"TableName：{_driverPropertys.StringTableName}，Count：{result}，watchTime:  {stopwatch.ElapsedMilliseconds} ms");
+                    Stopwatch stopwatch = new();
+                    stopwatch.Start();
+                    var data = stringData.Adapt<List<SQLHistoryValue>>(_config);
+                    var result = await _db.Fastest<SQLHistoryValue>().PageSize(50000).SplitTable().BulkCopyAsync(data).ConfigureAwait(false);
+                    stopwatch.Stop();
+
+                    //var result = await db.Insertable(dbInserts).SplitTable().ExecuteCommandAsync().ConfigureAwait(false);
+                    if (result > 0)
+                    {
+                        LogMessage?.Trace($"TableName：{_driverPropertys.StringTableName}，Count：{result}，watchTime:  {stopwatch.ElapsedMilliseconds} ms");
+                    }
                 }
 
 

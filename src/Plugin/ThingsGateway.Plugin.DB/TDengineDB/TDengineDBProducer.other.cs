@@ -123,33 +123,9 @@ public partial class TDengineDBProducer : BusinessBaseWithCacheIntervalVariableM
                 var stringData = dbInserts.Where(a => (!a.IsNumber && a.Value is not bool));
                 var numberData = dbInserts.Where(a => (a.IsNumber || a.Value is bool));
 
-                Stopwatch stopwatch = new();
-                stopwatch.Start();
-                //var result = await db.Insertable(dbInserts).SetTDengineChildTableName((stableName, it) => $"{stableName}_{it.DeviceName}_{it.Name}").ExecuteCommandAsync().ConfigureAwait(false);//不要加分表
-
                 await InserableAsync(numberData, _driverPropertys.NumberTableNameLow, cancellationToken).ConfigureAwait(false);
 
-                stopwatch.Stop();
-                //var result = await db.Insertable(dbInserts).SplitTable().ExecuteCommandAsync().ConfigureAwait(false);
-                //if (result > 0)
-                {
-                    LogMessage?.Trace($"TableName：{_driverPropertys.NumberTableNameLow}，Count：{dbInserts.Count}，watchTime:  {stopwatch.ElapsedMilliseconds} ms");
-                }
-
-
-                stopwatch.Restart();
-                //var result = await db.Insertable(dbInserts).SetTDengineChildTableName((stableName, it) => $"{stableName}_{it.DeviceName}_{it.Name}").ExecuteCommandAsync().ConfigureAwait(false);//不要加分表
-
                 await InserableAsync(stringData, _driverPropertys.StringTableNameLow, cancellationToken).ConfigureAwait(false);
-
-                stopwatch.Stop();
-                //var result = await db.Insertable(dbInserts).SplitTable().ExecuteCommandAsync().ConfigureAwait(false);
-                //if (result > 0)
-                {
-                    LogMessage?.Trace($"TableName：{_driverPropertys.StringTableNameLow}，Count：{dbInserts.Count}，watchTime:  {stopwatch.ElapsedMilliseconds} ms");
-                }
-
-
 
             }
             return OperResult.Success;
@@ -162,6 +138,13 @@ public partial class TDengineDBProducer : BusinessBaseWithCacheIntervalVariableM
 
     private async Task InserableAsync(IEnumerable<VariableBasicData> dbInserts, string tableName, CancellationToken cancellationToken)
     {
+        if (!dbInserts.Any())
+        {
+            return;
+        }
+        Stopwatch stopwatch = new();
+        stopwatch.Start();
+
         StringBuilder stringBuilder = new();
         stringBuilder.Append($"INSERT INTO");
         //(`id`,`createtime`,`collecttime`,`isonline`,`value`) 
@@ -188,7 +171,15 @@ public partial class TDengineDBProducer : BusinessBaseWithCacheIntervalVariableM
         stringBuilder.Append(';');
         stringBuilder.AppendLine();
 
-        await _db.Ado.ExecuteCommandAsync(stringBuilder.ToString(), default, cancellationToken: cancellationToken).ConfigureAwait(false);
+        var result = await _db.Ado.ExecuteCommandAsync(stringBuilder.ToString(), default, cancellationToken: cancellationToken).ConfigureAwait(false);
+
+
+        stopwatch.Stop();
+        //if (result > 0)
+        {
+            LogMessage?.Trace($"TableName：{tableName}，Count：{result}，watchTime:  {stopwatch.ElapsedMilliseconds} ms");
+        }
+
     }
     private string GetValue(VariableBasicData src)
     {

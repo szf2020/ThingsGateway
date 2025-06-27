@@ -127,23 +127,7 @@ public abstract class CollectBase : DriverBase, IRpcDriver
             LogMessage?.LogWarning(ex, string.Format(AppResource.GetMethodError, ex.Message));
         }
 
-
-        if (VariableTasks.Count > 0)
-        {
-            foreach (var item in VariableTasks)
-            {
-                item.Stop();
-                TaskSchedulerLoop.Remove(item);
-            }
-
-            VariableTasks = AddVariableTask(cancellationToken);
-
-            foreach (var item in VariableTasks)
-            {
-                TaskSchedulerLoop.Add(item);
-                item.Start();
-            }
-        }
+        RefreshVariableTasks(cancellationToken);
 
         // 根据标签获取方法信息的局部函数
         List<VariableMethod> GetMethod(IEnumerable<VariableRuntime> tag)
@@ -166,6 +150,26 @@ public abstract class CollectBase : DriverBase, IRpcDriver
                 }
             }
             return variablesMethodResult;
+        }
+    }
+
+    protected void RefreshVariableTasks(CancellationToken cancellationToken)
+    {
+        if (VariableTasks.Count > 0)
+        {
+            foreach (var item in VariableTasks)
+            {
+                item.Stop();
+                TaskSchedulerLoop.Remove(item);
+            }
+
+            VariableTasks = AddVariableTask(cancellationToken);
+
+            foreach (var item in VariableTasks)
+            {
+                TaskSchedulerLoop.Add(item);
+                item.Start();
+            }
         }
     }
 

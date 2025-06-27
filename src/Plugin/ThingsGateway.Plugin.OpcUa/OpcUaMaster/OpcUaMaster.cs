@@ -177,6 +177,9 @@ public class OpcUaMaster : CollectBase
                                         LogMessage?.LogInformation($"AddSubscription index  {CurrentDevice.VariableSourceReads.IndexOf(variableSourceRead)}  done");
 
                                     }
+
+                                    await Task.Delay(100, cancellationToken).ConfigureAwait(false); // allow for subscription to be finished on server?
+
                                 }
                                 LogMessage?.LogInformation("AddSubscriptions done");
                                 checkLog = true;
@@ -184,7 +187,7 @@ public class OpcUaMaster : CollectBase
                             catch (Exception ex)
                             {
                                 if (!checkLog)
-                                    LogMessage?.LogWarning(ex, "AddSubscriptions");
+                                    LogMessage?.LogWarning(ex, "AddSubscriptions error");
                                 checkLog = false;
                             }
                             finally
@@ -341,22 +344,8 @@ public class OpcUaMaster : CollectBase
             }
         }
 
-        if (VariableTasks.Count > 0)
-        {
-            foreach (var item in VariableTasks)
-            {
-                item.Stop();
-                TaskSchedulerLoop.Remove(item);
-            }
+        RefreshVariableTasks(cancellationToken);
 
-            VariableTasks = AddVariableTask(cancellationToken);
-
-            foreach (var item in VariableTasks)
-            {
-                TaskSchedulerLoop.Add(item);
-                item.Start();
-            }
-        }
     }
 
     private Dictionary<string, List<VariableRuntime>> VariableAddresDicts { get; set; } = new();

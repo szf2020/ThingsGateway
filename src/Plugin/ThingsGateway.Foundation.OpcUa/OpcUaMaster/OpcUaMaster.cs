@@ -274,7 +274,24 @@ public class OpcUaMaster : IDisposable
         }
 
         m_session.AddSubscription(m_subscription);
-        await m_subscription.CreateAsync(cancellationToken).ConfigureAwait(false);
+        try
+        {
+            await m_subscription.CreateAsync(cancellationToken).ConfigureAwait(false);
+            await Task.Delay(100, cancellationToken).ConfigureAwait(false); // allow for subscription to be finished on server?
+        }
+        catch (Exception)
+        {
+            try
+            {
+                await m_subscription.CreateAsync(cancellationToken).ConfigureAwait(false);
+                await Task.Delay(100, cancellationToken).ConfigureAwait(false); // allow for subscription to be finished on server?
+            }
+            catch (Exception)
+            {
+                m_session.RemoveSubscription(m_subscription);
+                throw;
+            }
+        }
 
         m_subscription.AddItems(monitoredItems);
         foreach (var item in m_subscription.MonitoredItems.Where(a => a.Status.Error != null && StatusCode.IsBad(a.Status.Error.StatusCode)))

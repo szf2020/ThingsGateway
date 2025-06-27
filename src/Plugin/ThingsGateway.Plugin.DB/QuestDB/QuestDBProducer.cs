@@ -92,14 +92,14 @@ public partial class QuestDBProducer : BusinessBaseWithCacheIntervalVariableMode
         _config.ForType<VariableRuntime, QuestDBNumberHistoryValue>()
           //.Map(dest => dest.Id, src => CommonUtils.GetSingleId())
           .Map(dest => dest.Id, src => src.Id)//Id更改为变量Id
-          .Map(dest => dest.Value, src => ConvertUtility.Convert.ToDecimal(src.Value, 0))
+    .Map(dest => dest.Value, src => src.Value.GetType() == typeof(bool) ? ConvertUtility.Convert.ToBoolean(src.Value, false) ? 1 : 0 : ConvertUtility.Convert.ToDecimal(src.Value, 0))
           .Map(dest => dest.CollectTime, (src) => src.CollectTime < DateTime.MinValue ? utcTime : src.CollectTime)//注意sqlsugar插入时无时区，直接utc时间
           .Map(dest => dest.CreateTime, (src) => DateTime.UtcNow)
           ;//注意sqlsugar插入时无时区，直接utc时间
         _config.ForType<VariableBasicData, QuestDBNumberHistoryValue>()
     //.Map(dest => dest.Id, src => CommonUtils.GetSingleId())
     .Map(dest => dest.Id, src => src.Id)//Id更改为变量Id
-    .Map(dest => dest.Value, src => ConvertUtility.Convert.ToDecimal(src.Value, 0))
+    .Map(dest => dest.Value, src => src.Value.GetType() == typeof(bool) ? ConvertUtility.Convert.ToBoolean(src.Value, false) ? 1 : 0 : ConvertUtility.Convert.ToDecimal(src.Value, 0))
     .Map(dest => dest.CollectTime, (src) => src.CollectTime < DateTime.MinValue ? utcTime : src.CollectTime)//注意sqlsugar插入时无时区，直接utc时间
     .Map(dest => dest.CreateTime, (src) => DateTime.UtcNow)
     ;//注意sqlsugar插入时无时区，直接utc时间
