@@ -36,7 +36,7 @@ public static class ChannelServiceHelpers
         #region 列名称
 
         var type = typeof(Channel);
-        var propertyInfos = type.GetRuntimeProperties().Where(a => a.GetCustomAttribute<IgnoreExcelAttribute>() == null)
+        var propertyInfos = type.GetRuntimeProperties().Where(a => a.GetCustomAttribute<IgnoreExcelAttribute>(false) == null)
              .OrderBy(
             a =>
             {

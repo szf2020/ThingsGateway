@@ -43,7 +43,7 @@ public static class ExportExcelExtensions
         #region 列名称
 
         var type = typeof(T);
-        var propertyInfos = type.GetRuntimeProperties().Where(a => a.GetCustomAttribute<IgnoreExcelAttribute>() == null)
+        var propertyInfos = type.GetRuntimeProperties().Where(a => a.GetCustomAttribute<IgnoreExcelAttribute>(false) == null)
              .OrderBy(
             a =>
             {
@@ -102,7 +102,7 @@ public static class ExportExcelExtensions
             int index = 0;
             foreach (var item in data)
             {
-                var ignore = item.GetCustomAttribute<IgnoreExcelAttribute>() != null;
+                var ignore = item.GetCustomAttribute<IgnoreExcelAttribute>(false) != null;
                 //描述
                 var desc = type.GetPropertyDisplayName(item.Name);
                 //数据源增加

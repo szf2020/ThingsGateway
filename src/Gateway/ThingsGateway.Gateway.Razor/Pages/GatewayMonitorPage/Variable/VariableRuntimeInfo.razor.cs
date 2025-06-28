@@ -301,7 +301,7 @@ public partial class VariableRuntimeInfo : IDisposable
         bool ret;
         if (all)
         {
-            ret = await GatewayExportService.OnVariableExport(new() { QueryPageOptions = new() });
+            ret = await GatewayExportService.OnVariableExport(new() { QueryPageOptions = new() { SortName = _option.SortName, SortOrder = _option.SortOrder } });
         }
         else
         {
@@ -309,16 +309,16 @@ public partial class VariableRuntimeInfo : IDisposable
             {
 
                 case ChannelDevicePluginTypeEnum.PluginName:
-                    ret = await GatewayExportService.OnVariableExport(new() { QueryPageOptions = new(), PluginName = SelectModel.PluginName });
+                    ret = await GatewayExportService.OnVariableExport(new() { QueryPageOptions = new() { SortName = _option.SortName, SortOrder = _option.SortOrder }, PluginName = SelectModel.PluginName });
                     break;
                 case ChannelDevicePluginTypeEnum.Channel:
-                    ret = await GatewayExportService.OnVariableExport(new() { QueryPageOptions = new(), ChannelId = SelectModel.ChannelRuntime.Id });
+                    ret = await GatewayExportService.OnVariableExport(new() { QueryPageOptions = new() { SortName = _option.SortName, SortOrder = _option.SortOrder }, ChannelId = SelectModel.ChannelRuntime.Id });
                     break;
                 case ChannelDevicePluginTypeEnum.Device:
-                    ret = await GatewayExportService.OnVariableExport(new() { QueryPageOptions = new(), DeviceId = SelectModel.DeviceRuntime.Id, PluginType = SelectModel.DeviceRuntime.PluginType });
+                    ret = await GatewayExportService.OnVariableExport(new() { QueryPageOptions = new() { SortName = _option.SortName, SortOrder = _option.SortOrder }, DeviceId = SelectModel.DeviceRuntime.Id, PluginType = SelectModel.DeviceRuntime.PluginType });
                     break;
                 default:
-                    ret = await GatewayExportService.OnVariableExport(new() { QueryPageOptions = new() });
+                    ret = await GatewayExportService.OnVariableExport(new() { QueryPageOptions = new() { SortName = _option.SortName, SortOrder = _option.SortOrder } });
 
                     break;
             }
@@ -349,7 +349,7 @@ public partial class VariableRuntimeInfo : IDisposable
             await ToastService.Warning("online Excel max data count 50000");
             return;
         }
-        var uSheetDatas = await VariableServiceHelpers.ExportVariableAsync(models);
+        var uSheetDatas = await VariableServiceHelpers.ExportVariableAsync(models, _option.SortName, _option.SortOrder);
 
         op.Component = BootstrapDynamicComponent.CreateComponent<USheet>(new Dictionary<string, object?>
         {

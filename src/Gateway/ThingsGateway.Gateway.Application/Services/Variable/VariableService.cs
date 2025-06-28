@@ -447,7 +447,7 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
     public async Task<Dictionary<string, object>> ExportVariableAsync(ExportFilter exportFilter)
     {
         var data = (await PageAsync(exportFilter).ConfigureAwait(false));
-        var sheets = await VariableServiceHelpers.ExportCoreAsync(data.Items).ConfigureAwait(false);
+        var sheets = await VariableServiceHelpers.ExportCoreAsync(data.Items, sortName: exportFilter.QueryPageOptions.SortName, sortOrder: exportFilter.QueryPageOptions.SortOrder).ConfigureAwait(false);
         return sheets;
     }
 
@@ -661,7 +661,7 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
             });
 
             // 为未成功上传的变量生成新的ID
-            foreach (var item in variables.OrderBy(a => a.Row))
+            foreach (var item in variables)
             {
                 if (!item.IsUp)
                     item.Id = CommonUtils.GetSingleId();

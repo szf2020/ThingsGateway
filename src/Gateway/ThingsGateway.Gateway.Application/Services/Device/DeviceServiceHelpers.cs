@@ -47,7 +47,7 @@ public static class DeviceServiceHelpers
         #region 列名称
 
         var type = typeof(Device);
-        var propertyInfos = type.GetRuntimeProperties().Where(a => a.GetCustomAttribute<IgnoreExcelAttribute>() == null)
+        var propertyInfos = type.GetRuntimeProperties().Where(a => a.GetCustomAttribute<IgnoreExcelAttribute>(false) == null)
              .OrderBy(
             a =>
             {

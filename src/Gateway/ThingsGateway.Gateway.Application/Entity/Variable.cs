@@ -31,6 +31,13 @@ namespace ThingsGateway.Gateway.Application;
 public class Variable : BaseDataEntity, IValidatableObject
 {
     /// <summary>
+    /// 主键Id
+    /// </summary>
+    [SugarColumn(ColumnDescription = "Id", IsPrimaryKey = true)]
+    [AutoGenerateColumn(Visible = false, IsVisibleWhenEdit = false, IsVisibleWhenAdd = false, Sortable = true, DefaultSort = true, DefaultSortOrder = SortOrder.Asc)]
+    public override long Id { get; set; }
+
+    /// <summary>
     /// 导入验证专用
     /// </summary>
     [System.Text.Json.Serialization.JsonIgnore]
@@ -101,6 +108,8 @@ public class Variable : BaseDataEntity, IValidatableObject
     private string remark3;
     private string remark4;
     private string remark5;
+
+
 
     /// <summary>
     /// 变量额外属性Json

@@ -242,7 +242,7 @@ public partial class DeviceTable : IDisposable
         bool ret;
         if (all)
         {
-            ret = await GatewayExportService.OnDeviceExport(new() { QueryPageOptions = new() });
+            ret = await GatewayExportService.OnDeviceExport(new() { QueryPageOptions = new() { SortName = _option.SortName, SortOrder = _option.SortOrder } });
         }
         else
         {
@@ -250,16 +250,16 @@ public partial class DeviceTable : IDisposable
             {
 
                 case ChannelDevicePluginTypeEnum.PluginName:
-                    ret = await GatewayExportService.OnDeviceExport(new() { QueryPageOptions = new(), PluginName = SelectModel.PluginName });
+                    ret = await GatewayExportService.OnDeviceExport(new() { QueryPageOptions = new() { SortName = _option.SortName, SortOrder = _option.SortOrder }, PluginName = SelectModel.PluginName });
                     break;
                 case ChannelDevicePluginTypeEnum.Channel:
-                    ret = await GatewayExportService.OnDeviceExport(new() { QueryPageOptions = new(), ChannelId = SelectModel.ChannelRuntime.Id });
+                    ret = await GatewayExportService.OnDeviceExport(new() { QueryPageOptions = new() { SortName = _option.SortName, SortOrder = _option.SortOrder }, ChannelId = SelectModel.ChannelRuntime.Id });
                     break;
                 case ChannelDevicePluginTypeEnum.Device:
-                    ret = await GatewayExportService.OnDeviceExport(new() { QueryPageOptions = new(), DeviceId = SelectModel.DeviceRuntime.Id, PluginType = SelectModel.DeviceRuntime.PluginType });
+                    ret = await GatewayExportService.OnDeviceExport(new() { QueryPageOptions = new() { SortName = _option.SortName, SortOrder = _option.SortOrder }, DeviceId = SelectModel.DeviceRuntime.Id, PluginType = SelectModel.DeviceRuntime.PluginType });
                     break;
                 default:
-                    ret = await GatewayExportService.OnDeviceExport(new() { QueryPageOptions = new() });
+                    ret = await GatewayExportService.OnDeviceExport(new() { QueryPageOptions = new() { SortName = _option.SortName, SortOrder = _option.SortOrder } });
 
                     break;
             }

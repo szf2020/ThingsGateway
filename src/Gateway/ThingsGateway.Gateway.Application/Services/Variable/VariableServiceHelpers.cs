@@ -21,14 +21,14 @@ namespace ThingsGateway.Gateway.Application;
 public static class VariableServiceHelpers
 {
 
-    public static async Task<USheetDatas> ExportVariableAsync(IEnumerable<Variable> models)
+    public static async Task<USheetDatas> ExportVariableAsync(IEnumerable<Variable> models, string sortName = nameof(Variable.Id), SortOrder sortOrder = SortOrder.Asc)
     {
-        var data = await ExportCoreAsync(models).ConfigureAwait(false);
+        var data = await ExportCoreAsync(models, sortName: sortName, sortOrder: sortOrder).ConfigureAwait(false);
 
         return USheetDataHelpers.GetUSheetDatas(data);
     }
 
-    public static async Task<Dictionary<string, object>> ExportCoreAsync(IEnumerable<Variable> data, string deviceName = null)
+    public static async Task<Dictionary<string, object>> ExportCoreAsync(IEnumerable<Variable> data, string deviceName = null, string sortName = nameof(Variable.Id), SortOrder sortOrder = SortOrder.Asc)
     {
         if (data?.Any() != true)
         {
@@ -48,7 +48,7 @@ public static class VariableServiceHelpers
         #region 列名称
 
         var type = typeof(Variable);
-        var propertyInfos = type.GetRuntimeProperties().Where(a => a.GetCustomAttribute<IgnoreExcelAttribute>() == null)
+        var propertyInfos = type.GetRuntimeProperties().Where(a => a.GetCustomAttribute<IgnoreExcelAttribute>(false) == null)
              .OrderBy(
             a =>
             {
@@ -76,6 +76,11 @@ public static class VariableServiceHelpers
             varExport.TryAdd(ExportString.DeviceName, device?.Name ?? deviceName);
             foreach (var item in propertyInfos)
             {
+                if (item.Name == nameof(Variable.Id))
+                {
+                    if (sortName != nameof(Variable.Id))
+                        continue;
+                }
                 //描述
                 var desc = type.GetPropertyDisplayName(item.Name);
                 if (item.Name == varName)
@@ -185,9 +190,21 @@ public static class VariableServiceHelpers
             #endregion 插件sheet
         });
 
+        var sort = type.GetPropertyDisplayName(sortName);
+        if(variableExports.FirstOrDefault()?.ContainsKey(sort)==false)
+            sort = nameof(Variable.Id);
+        if (variableExports.FirstOrDefault()?.ContainsKey(sort) == false)
+            sort = type.GetPropertyDisplayName(nameof(Variable.Name));
 
+        variableExports = new(
+            sortOrder==SortOrder.Desc?
+            variableExports.OrderByDescending(a => a[sort])
+            :
+            variableExports.OrderBy(a => a[sort])
+            );
 
-        //variableExports = new(variableExports.OrderBy(a => a[ExportString.DeviceName]).ThenBy(a => a[varName]));
+        if (sortName == nameof(Variable.Id))
+            variableExports.ForEach(a => a.Remove("Id"));
 
         //添加设备页
         sheets.Add(ExportString.VariableName, variableExports);
@@ -196,19 +213,7 @@ public static class VariableServiceHelpers
         foreach (var item in devicePropertys.Keys)
         {
             devicePropertys[item] = new(devicePropertys[item].OrderBy(a => a[ExportString.DeviceName]).ThenBy(a => a[ExportString.VariableName]));
-            //HashSet<string> allKeys = item.Value.SelectMany(a => a.Keys).ToHashSet();
 
-            //foreach (var dict in item.Value)
-            //{
-            //    foreach (var key in allKeys)
-            //    {
-            //        if (!dict.ContainsKey(key))
-            //        {
-            //            // 添加缺失的键，并设置默认值
-            //            dict.TryAdd(key, null);
-            //        }
-            //    }
-            //}
             sheets.Add(item, devicePropertys[item]);
         }
 
