@@ -191,13 +191,13 @@ public static class VariableServiceHelpers
         });
 
         var sort = type.GetPropertyDisplayName(sortName);
-        if(variableExports.FirstOrDefault()?.ContainsKey(sort)==false)
+        if (variableExports.FirstOrDefault()?.ContainsKey(sort) == false)
             sort = nameof(Variable.Id);
         if (variableExports.FirstOrDefault()?.ContainsKey(sort) == false)
             sort = type.GetPropertyDisplayName(nameof(Variable.Name));
 
         variableExports = new(
-            sortOrder==SortOrder.Desc?
+            sortOrder == SortOrder.Desc ?
             variableExports.OrderByDescending(a => a[sort])
             :
             variableExports.OrderBy(a => a[sort])

@@ -33,7 +33,10 @@ public class S7Message : MessageBase, IResultMessage
     }
     public override FilterResult CheckBody<TByteBlock>(ref TByteBlock byteBlock)
     {
+
         var pos = byteBlock.Position;
+
+
         if (byteBlock[pos + 1] == 0xD0) // 首次握手0XD0连接确认
         {
             OperCode = 0;
@@ -59,6 +62,11 @@ public class S7Message : MessageBase, IResultMessage
         //分bit/byte解析
         else if (byteBlock[pos + 15] == 0x04) // Read
         {
+            byteBlock.Position = pos + 7;
+            var sign = byteBlock.ReadUInt16(EndianType.Big);//数据ID标识
+            Sign = sign;
+            byteBlock.Position = pos;
+
             int length = byteBlock[pos + 17];
             int itemLen = byteBlock[pos + 16];
 
@@ -132,6 +140,10 @@ public class S7Message : MessageBase, IResultMessage
         }
         else if (byteBlock[pos + 15] == 0x05) // Write
         {
+            byteBlock.Position = pos + 7;
+            var sign = byteBlock.ReadUInt16(EndianType.Big);//数据ID标识
+            Sign = sign;
+            byteBlock.Position = pos;
             int itemLen = byteBlock[pos + 16];
             if (byteBlock[pos + 13] + byteBlock[pos + 14] > 0) // 如果错误代码不为0
             {

@@ -9,6 +9,7 @@
 //------------------------------------------------------------------------------
 
 using ThingsGateway.Foundation.Extension.String;
+using ThingsGateway.NewLife;
 using ThingsGateway.NewLife.Extension;
 
 using TouchSocket.Core;
@@ -364,14 +365,19 @@ public partial class SiemensS7Master : DeviceBase
     #endregion 读写
 
     #region 初始握手
-
+    private WaitLock ChannelStartedWaitLock = new();
     /// <inheritdoc/>
     protected override async ValueTask<bool> ChannelStarted(IClientChannel channel, bool last)
     {
         try
         {
+            await ChannelStartedWaitLock.WaitAsync().ConfigureAwait(false);
             SetDataAdapter(channel);
             AutoConnect = false;
+            if (channel?.Online != true)
+            {
+                return true;
+            }
             var ISO_CR = SiemensHelper.ISO_CR;
 
             var S7_PN = SiemensHelper.S7_PN;
@@ -484,8 +490,10 @@ public partial class SiemensS7Master : DeviceBase
         finally
         {
             AutoConnect = true;
+            ChannelStartedWaitLock.Release();
             await base.ChannelStarted(channel, last).ConfigureAwait(false);
         }
+
         return true;
     }
 
