@@ -15,7 +15,7 @@ namespace ThingsGateway.Foundation;
 /// <summary>
 /// 通道管理
 /// </summary>
-public interface IChannel : ISetupConfigObject, IDisposable, IClosableClient, IConnectableClient
+public interface IChannel : ISetupConfigObject, IDisposable, IClosableClient, IConnectableClient, IOnlineClient
 {
     /// <summary>
     /// 接收数据事件
@@ -37,10 +37,6 @@ public interface IChannel : ISetupConfigObject, IDisposable, IClosableClient, IC
     /// </summary>
     public ConcurrentList<IDevice> Collects { get; }
 
-    /// <summary>
-    /// Online
-    /// </summary>
-    public bool Online { get; }
 
     /// <summary>
     /// MaxSign
