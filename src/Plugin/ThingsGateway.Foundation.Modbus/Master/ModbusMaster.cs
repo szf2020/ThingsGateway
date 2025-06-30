@@ -21,6 +21,15 @@ public partial class ModbusMaster : DtuServiceDeviceBase, IModbusAddress
         RegisterByteLength = 2;
         channel.MaxSign = ushort.MaxValue;
     }
+
+    protected override void SetChannel()
+    {
+        if (ModbusType != ModbusTypeEnum.ModbusTcp)
+        {
+            Channel.ChannelOptions.MaxConcurrentCount = 1;
+        }
+    }
+
     public override IThingsGatewayBitConverter ThingsGatewayBitConverter { get; protected set; } = new ThingsGatewayBitConverter(EndianType.Big) { };
 
     /// <summary>

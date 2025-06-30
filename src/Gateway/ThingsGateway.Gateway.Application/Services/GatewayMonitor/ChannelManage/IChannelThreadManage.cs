@@ -12,7 +12,7 @@ using System.Collections.Concurrent;
 
 namespace ThingsGateway.Gateway.Application;
 
-public interface IChannelThreadManage
+public interface IChannelThreadManage : IAsyncDisposable
 {
     ConcurrentDictionary<long, IDeviceThreadManage> DeviceThreadManages { get; }
 

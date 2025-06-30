@@ -11,10 +11,12 @@
 using BootstrapBlazor.Components;
 
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 using System.Reflection;
+using System.Text;
 
-using ThingsGateway.NewLife.Log;
+using ThingsGateway.Extension;
 using ThingsGateway.UnifyResult;
 
 namespace ThingsGateway.Admin.Application;
@@ -65,11 +67,76 @@ public class Startup : AppStartup
 
         services.AddSingleton(typeof(IEventService<>), typeof(EventService<>));
 
+
+        #region 控制台美化
+
+        services.AddConsoleFormatter(options =>
+        {
+            options.WriteFilter = (logMsg) =>
+            {
+                if (App.HostApplicationLifetime.ApplicationStopping.IsCancellationRequested && logMsg.LogLevel >= LogLevel.Warning) return false;
+                if (string.IsNullOrEmpty(logMsg.Message)) return false;
+                else return true;
+            };
+
+            options.MessageFormat = (logMsg) =>
+            {
+                //如果不是LoggingMonitor日志才格式化
+                if (logMsg.LogName != "System.Logging.LoggingMonitor")
+                {
+                    var stringBuilder = new StringBuilder();
+                    stringBuilder.AppendLine("【日志级别】：" + logMsg.LogLevel);
+                    stringBuilder.AppendLine("【日志类名】：" + logMsg.LogName);
+                    stringBuilder.AppendLine("【日志时间】：" + DateTime.Now.ToDefaultDateTimeFormat());
+                    stringBuilder.AppendLine("【日志内容】：" + logMsg.Message);
+                    if (logMsg.Exception != null)
+                    {
+                        stringBuilder.AppendLine("【异常信息】：" + logMsg.Exception);
+                    }
+                    return stringBuilder.ToString();
+                }
+                else
+                {
+                    return logMsg.Message;
+                }
+            };
+            options.WriteHandler = (logMsg, scopeProvider, writer, fmtMsg, opt) =>
+            {
+                ConsoleColor consoleColor = ConsoleColor.White;
+                switch (logMsg.LogLevel)
+                {
+                    case LogLevel.Information:
+                        consoleColor = ConsoleColor.DarkGreen;
+                        break;
+
+                    case LogLevel.Warning:
+                        consoleColor = ConsoleColor.DarkYellow;
+                        break;
+
+                    case LogLevel.Error:
+                        consoleColor = ConsoleColor.DarkRed;
+                        break;
+                }
+                writer.WriteWithColor(fmtMsg, ConsoleColor.Black, consoleColor);
+            };
+        });
+
+        #endregion 控制台美化
+        //日志写入数据库配置
+        services.AddDatabaseLogging<DatabaseLoggingWriter>(options =>
+        {
+            options.NameFilter = (name) =>
+            {
+                return (
+                name == "System.Logging.RequestAudit"
+                );
+            };
+        });
     }
 
     public void Use(IServiceProvider serviceProvider)
     {
-        XTrace.UnhandledExceptionLogEnable = () => !App.HostApplicationLifetime.ApplicationStopping.IsCancellationRequested;
+        NewLife.Log.XTrace.UnhandledExceptionLogEnable = () => !App.HostApplicationLifetime.ApplicationStopping.IsCancellationRequested;
 
         //检查ConfigId
         var configIdGroup = DbContext.DbConfigs.GroupBy(it => it.ConfigId);

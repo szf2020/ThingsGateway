@@ -27,6 +27,11 @@ public partial class SiemensS7Master : DeviceBase
         RegisterByteLength = 1;
 
     }
+
+    protected override void SetChannel()
+    {
+    }
+
     public override IThingsGatewayBitConverter ThingsGatewayBitConverter { get; protected set; } = new S7BitConverter(EndianType.Big) { };
 
     /// <summary>

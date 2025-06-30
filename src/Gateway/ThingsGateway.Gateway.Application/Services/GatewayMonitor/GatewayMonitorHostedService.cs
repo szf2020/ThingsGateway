@@ -84,4 +84,9 @@ internal sealed class GatewayMonitorHostedService : BackgroundService, IGatewayM
 
     }
 
+    public override async Task StopAsync(CancellationToken cancellationToken)
+    {
+        await ChannelThreadManage.DisposeAsync().ConfigureAwait(false);
+        await base.StopAsync(cancellationToken).ConfigureAwait(false);
+    }
 }

@@ -51,7 +51,10 @@ public sealed class DatabaseLoggerOptions
     /// 是否使用 UTC 时间戳，默认 false
     /// </summary>
     public bool UseUtcTimestamp { get; set; }
-
+    /// <summary>
+    /// 名称筛选
+    /// </summary>
+    public Func<string, bool> NameFilter { get; set; }
     /// <summary>
     /// 日期格式化
     /// </summary>

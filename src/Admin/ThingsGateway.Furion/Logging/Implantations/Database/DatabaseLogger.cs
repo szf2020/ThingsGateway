@@ -93,6 +93,10 @@ public sealed class DatabaseLogger : ILogger, IDisposable
     {
         // 判断日志级别是否有效
         if (!IsEnabled(logLevel)) return;
+        if (_options.NameFilter?.Invoke(_logName) == false)
+        {
+            return;
+        }
 
         // 检查日志格式化器
         if (formatter == null) throw new ArgumentNullException(nameof(formatter));

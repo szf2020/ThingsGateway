@@ -20,13 +20,11 @@ using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 
 using System.Security.Cryptography.X509Certificates;
-using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.Unicode;
 
 using ThingsGateway.Admin.Application;
 using ThingsGateway.Admin.Razor;
-using ThingsGateway.Extension;
 using ThingsGateway.NewLife.Caching;
 using ThingsGateway.Razor;
 using ThingsGateway.VirtualFileServer;
@@ -152,60 +150,6 @@ public class Startup : AppStartup
         });
 
 
-        #region 控制台美化
-
-        services.AddConsoleFormatter(options =>
-        {
-            options.WriteFilter = (logMsg) =>
-            {
-                if (App.HostApplicationLifetime.ApplicationStopping.IsCancellationRequested && logMsg.LogLevel >= LogLevel.Warning) return false;
-                if (string.IsNullOrEmpty(logMsg.Message)) return false;
-                else return true;
-            };
-
-            options.MessageFormat = (logMsg) =>
-            {
-                //如果不是LoggingMonitor日志才格式化
-                if (logMsg.LogName != "System.Logging.LoggingMonitor")
-                {
-                    var stringBuilder = new StringBuilder();
-                    stringBuilder.AppendLine("【日志级别】：" + logMsg.LogLevel);
-                    stringBuilder.AppendLine("【日志类名】：" + logMsg.LogName);
-                    stringBuilder.AppendLine("【日志时间】：" + DateTime.Now.ToDefaultDateTimeFormat());
-                    stringBuilder.AppendLine("【日志内容】：" + logMsg.Message);
-                    if (logMsg.Exception != null)
-                    {
-                        stringBuilder.AppendLine("【异常信息】：" + logMsg.Exception);
-                    }
-                    return stringBuilder.ToString();
-                }
-                else
-                {
-                    return logMsg.Message;
-                }
-            };
-            options.WriteHandler = (logMsg, scopeProvider, writer, fmtMsg, opt) =>
-            {
-                ConsoleColor consoleColor = ConsoleColor.White;
-                switch (logMsg.LogLevel)
-                {
-                    case LogLevel.Information:
-                        consoleColor = ConsoleColor.DarkGreen;
-                        break;
-
-                    case LogLevel.Warning:
-                        consoleColor = ConsoleColor.DarkYellow;
-                        break;
-
-                    case LogLevel.Error:
-                        consoleColor = ConsoleColor.DarkRed;
-                        break;
-                }
-                writer.WriteWithColor(fmtMsg, ConsoleColor.Black, consoleColor);
-            };
-        });
-
-        #endregion 控制台美化
 
         #region api日志
 
@@ -237,14 +181,7 @@ public class Startup : AppStartup
         //    });
         //});
 
-        //日志写入数据库配置
-        services.AddDatabaseLogging<DatabaseLoggingWriter>(options =>
-        {
-            options.WriteFilter = (logMsg) =>
-            {
-                return logMsg.LogName == "System.Logging.RequestAudit";
-            };
-        });
+
 
         #endregion api日志
 

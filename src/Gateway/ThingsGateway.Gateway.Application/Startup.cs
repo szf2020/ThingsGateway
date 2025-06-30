@@ -55,13 +55,13 @@ public class Startup : AppStartup
         //运行日志写入数据库配置
         services.AddDatabaseLogging<BackendLogDatabaseLoggingWriter>(options =>
         {
-            options.WriteFilter = (logMsg) =>
+            options.NameFilter = (name) =>
             {
                 return (
-                !logMsg.LogName.StartsWith("System") &&
-                !logMsg.LogName.StartsWith("Microsoft") &&
-                !logMsg.LogName.StartsWith("Blazor") &&
-                !logMsg.LogName.StartsWith("BootstrapBlazor")
+                !name.StartsWith("System") &&
+                !name.StartsWith("Microsoft") &&
+                !name.StartsWith("Blazor") &&
+                !name.StartsWith("BootstrapBlazor")
                 );
             };
         });

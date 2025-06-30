@@ -179,7 +179,7 @@ internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
     {
         try
         {
-            await NewDeviceLock.WaitAsync().ConfigureAwait(false);
+            await NewDeviceLock.WaitAsync(App.HostApplicationLifetime.ApplicationStopping).ConfigureAwait(false);
             await PrivateRestartDeviceAsync([deviceRuntime], deleteCache).ConfigureAwait(false);
         }
         finally
@@ -196,7 +196,7 @@ internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
 
         try
         {
-            await NewDeviceLock.WaitAsync().ConfigureAwait(false);
+            await NewDeviceLock.WaitAsync(App.HostApplicationLifetime.ApplicationStopping).ConfigureAwait(false);
             await PrivateRestartDeviceAsync(deviceRuntimes, deleteCache).ConfigureAwait(false);
         }
         finally
@@ -216,7 +216,10 @@ internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
             {
                 return;
             }
-
+            if (App.HostApplicationLifetime.ApplicationStopping.IsCancellationRequested)
+            {
+                return;
+            }
             if (deleteCache)
             {
                 var basePath = CacheDBUtil.GetCacheFileBasePath();
@@ -240,6 +243,15 @@ internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
 
             await deviceRuntimes.ParallelForEachAsync(async (deviceRuntime, cancellationToken) =>
             {
+                if (App.HostApplicationLifetime.ApplicationStopping.IsCancellationRequested)
+                {
+                    return;
+                }
+                if (Disposed)
+                {
+                    return;
+                }
+
                 //备用设备实时取消
                 var redundantDeviceId = deviceRuntime.RedundantDeviceId;
                 if (GlobalData.ReadOnlyIdDevices.TryGetValue(redundantDeviceId ?? 0, out var redundantDeviceRuntime))
@@ -288,6 +300,10 @@ internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
                     }
                 }
                 DriverBase driver = null;
+
+                // 创建令牌并与驱动程序对象的设备ID关联，用于取消操作
+                var cts = new CancellationTokenSource();
+                var token = cts.Token;
                 try
                 {
                     driver = CreateDriver(deviceRuntime);
@@ -304,7 +320,7 @@ internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
                     driver.DeviceThreadManage = this;
 
                     // 初始化驱动程序对象，并加载源读取
-                    await driver.InitChannelAsync(Channel, cancellationToken).ConfigureAwait(false);
+                    await driver.InitChannelAsync(Channel, token).ConfigureAwait(false);
 
                 }
                 catch (Exception ex)
@@ -315,37 +331,26 @@ internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
                     LogMessage?.LogWarning(ex, string.Format(AppResource.InitFail, CurrentChannel.PluginName, driver?.DeviceName));
                 }
 
-                // 创建令牌并与驱动程序对象的设备ID关联，用于取消操作
-                var cts = new CancellationTokenSource();
-                var token = cts.Token;
-                if (!CancellationTokenSources.TryAdd(driver.DeviceId, cts))
+                if (CancellationTokenSources.TryGetValue(driver.DeviceId, out var oldCts))
                 {
                     try
                     {
-                        cts.Cancel();
-                        cts.SafeDispose();
+                        oldCts.Cancel();
+                        oldCts.SafeDispose();
                     }
                     catch
                     {
                     }
                 }
 
-                token.Register(driver.Stop);
+                CancellationTokenSources.TryAdd(driver.DeviceId, cts);
 
+                token.Register(driver.Stop);
 
                 _ = Task.Factory.StartNew((state) => DriverStart(state, token), driver, token);
 
             }).ConfigureAwait(false);
 
-
-
-
-            ThreadPool.GetMaxThreads(out int maxWorkerThreads, out int maxCompletionPortThreads);
-            var taskCount = GlobalData.IdDevices.Count * Environment.ProcessorCount;
-            if (taskCount > maxWorkerThreads)
-            {
-                var result = ThreadPool.SetMaxThreads(taskCount + maxWorkerThreads, taskCount + maxCompletionPortThreads);
-            }
 
         }
         catch (Exception ex)
@@ -807,6 +812,8 @@ internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
         Disposed = true;
         try
         {
+            CancellationTokenSource.Cancel();
+            CancellationTokenSource.SafeDispose();
             GlobalData.DeviceStatusChangeEvent -= GlobalData_DeviceStatusChangeEvent;
             await NewDeviceLock.WaitAsync().ConfigureAwait(false);
             _logger?.TryDispose();
@@ -821,8 +828,6 @@ internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
         }
         finally
         {
-            CancellationTokenSource.Cancel();
-            CancellationTokenSource.SafeDispose();
             NewDeviceLock.Release();
         }
     }

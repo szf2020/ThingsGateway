@@ -102,6 +102,11 @@ internal sealed class ChannelThreadManage : IChannelThreadManage
         {
             try
             {
+                if (App.HostApplicationLifetime.ApplicationStopping.IsCancellationRequested)
+                {
+                    return;
+                }
+
                 if (channelRuntime.IsCollect == true)
                 {
                     if (!GlobalData.StartCollectChannelEnable)
@@ -148,7 +153,7 @@ internal sealed class ChannelThreadManage : IChannelThreadManage
     {
         try
         {
-            await NewChannelLock.WaitAsync().ConfigureAwait(false);
+            await NewChannelLock.WaitAsync(App.HostApplicationLifetime.ApplicationStopping).ConfigureAwait(false);
             await PrivateRestartChannelAsync([channelRuntime]).ConfigureAwait(false);
         }
         finally
@@ -165,13 +170,18 @@ internal sealed class ChannelThreadManage : IChannelThreadManage
 
         try
         {
-            await NewChannelLock.WaitAsync().ConfigureAwait(false);
+            await NewChannelLock.WaitAsync(App.HostApplicationLifetime.ApplicationStopping).ConfigureAwait(false);
             await PrivateRestartChannelAsync(channelRuntimes).ConfigureAwait(false);
         }
         finally
         {
             NewChannelLock.Release();
         }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        await RemoveChannelAsync(DeviceThreadManages.Keys.ToList()).ConfigureAwait(false);
     }
 
     #endregion

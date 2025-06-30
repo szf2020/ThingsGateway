@@ -21,13 +21,11 @@ using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 
 using System.Security.Cryptography.X509Certificates;
-using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.Unicode;
 
 using ThingsGateway.Admin.Application;
 using ThingsGateway.Admin.Razor;
-using ThingsGateway.Extension;
 using ThingsGateway.NewLife.Caching;
 using ThingsGateway.Razor;
 using ThingsGateway.VirtualFileServer;
@@ -154,101 +152,9 @@ public class Startup : AppStartup
 
 
 
-        #region 控制台美化
 
-        services.AddConsoleFormatter(options =>
-        {
-            options.WriteFilter = (logMsg) =>
-            {
-                if (App.HostApplicationLifetime.ApplicationStopping.IsCancellationRequested && logMsg.LogLevel >= LogLevel.Warning) return false;
-                if (string.IsNullOrEmpty(logMsg.Message)) return false;
-                else return true;
-            };
 
-            options.MessageFormat = (logMsg) =>
-            {
-                //如果不是LoggingMonitor日志才格式化
-                if (logMsg.LogName != "System.Logging.LoggingMonitor")
-                {
-                    var stringBuilder = new StringBuilder();
-                    stringBuilder.AppendLine("【日志级别】：" + logMsg.LogLevel);
-                    stringBuilder.AppendLine("【日志类名】：" + logMsg.LogName);
-                    stringBuilder.AppendLine("【日志时间】：" + DateTime.Now.ToDefaultDateTimeFormat());
-                    stringBuilder.AppendLine("【日志内容】：" + logMsg.Message);
-                    if (logMsg.Exception != null)
-                    {
-                        stringBuilder.AppendLine("【异常信息】：" + logMsg.Exception);
-                    }
-                    return stringBuilder.ToString();
-                }
-                else
-                {
-                    return logMsg.Message;
-                }
-            };
-            options.WriteHandler = (logMsg, scopeProvider, writer, fmtMsg, opt) =>
-            {
-                ConsoleColor consoleColor = ConsoleColor.White;
-                switch (logMsg.LogLevel)
-                {
-                    case LogLevel.Information:
-                        consoleColor = ConsoleColor.DarkGreen;
-                        break;
 
-                    case LogLevel.Warning:
-                        consoleColor = ConsoleColor.DarkYellow;
-                        break;
-
-                    case LogLevel.Error:
-                        consoleColor = ConsoleColor.DarkRed;
-                        break;
-                }
-                writer.WriteWithColor(fmtMsg, ConsoleColor.Black, consoleColor);
-            };
-        });
-
-        #endregion 控制台美化
-
-        #region api日志
-
-        //Monitor日志配置
-        //services.AddMonitorLogging(options =>
-        //{
-        //    options.JsonIndented = true;// 是否美化 JSON
-        //    options.GlobalEnabled = false;//全局启用
-        //    options.ConfigureLogger((logger, logContext, context) =>
-        //    {
-        //        var httpContext = context.HttpContext;//获取httpContext
-
-        //        //获取客户端信息
-        //        var userAgent = App.GetService<IAppService>().UserAgent;
-        //        // 获取控制器/操作描述器
-        //        var controllerActionDescriptor = context.ActionDescriptor as ControllerActionDescriptor;
-        //        //操作名称默认是控制器名加方法名,自定义操作名称要在action上加Description特性
-        //        var option = $"{controllerActionDescriptor.ControllerName}/{controllerActionDescriptor.ActionName}";
-
-        //        var desc = App.CreateLocalizerByType(controllerActionDescriptor.ControllerTypeInfo.AsType())[controllerActionDescriptor.MethodInfo.Name];
-        //        //获取特性
-        //        option = desc.Value;//则将操作名称赋值为控制器上写的title
-
-        //        logContext.Set(LoggingConst.CateGory, option);//传操作名称
-        //        logContext.Set(LoggingConst.Operation, option);//传操作名称
-        //        logContext.Set(LoggingConst.Client, userAgent);//客户端信息
-        //        logContext.Set(LoggingConst.Path, httpContext.Request.Path.Value);//请求地址
-        //        logContext.Set(LoggingConst.Method, httpContext.Request.Method);//请求方法
-        //    });
-        //});
-
-        //日志写入数据库配置
-        services.AddDatabaseLogging<DatabaseLoggingWriter>(options =>
-        {
-            options.WriteFilter = (logMsg) =>
-            {
-                return logMsg.LogName == "System.Logging.RequestAudit";
-            };
-        });
-
-        #endregion api日志
 
         //已添加AddOptions
         // 增加多语言支持配置信息
