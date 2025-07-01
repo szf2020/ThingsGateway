@@ -53,8 +53,8 @@ public class HardwareJob : IJob, IHardwareJob
 
     #endregion 属性
 
-    private MemoryCache MemoryCache = new() { };
-    private const string CacheKey = "HistoryHardwareInfo";
+    private ICache MemoryCache => App.CacheService;
+    private const string CacheKey = $"{CacheConst.Cache_HardwareInfo}HistoryHardwareInfo";
     /// <inheritdoc/>
     public async Task<List<HistoryHardwareInfo>> GetHistoryHardwareInfos()
     {
@@ -81,8 +81,7 @@ public class HardwareJob : IJob, IHardwareJob
             {
                 if (HardwareInfo.MachineInfo == null)
                 {
-                    MachineInfo.Register();
-                    HardwareInfo.MachineInfo = MachineInfo.Current;
+                    HardwareInfo.MachineInfo = MachineInfo.GetCurrent();
 
                     string currentPath = Directory.GetCurrentDirectory();
                     DriveInfo drive = new(Path.GetPathRoot(currentPath));

@@ -33,22 +33,22 @@ public static class CacheConst
     /// <summary>
     /// 资源表缓存Key
     /// </summary>
-    public const string Cache_SysResource = $"{CacheConst.Cache_Prefix_Admin}SysResource:";
+    public const string Cache_SysResource = $"{CacheConst.Cache_Prefix_Admin}SysResource:List";
 
     /// <summary>
     /// 角色表缓存Key
     /// </summary>
-    public const string Cache_SysRole = $"{CacheConst.Cache_Prefix_Admin}SysRole:";
+    public const string Cache_SysRole = $"{CacheConst.Cache_Prefix_Admin}SysRole:List";
 
     /// <summary>
     /// 用户表缓存Key
     /// </summary>
-    public const string Cache_SysUser = $"{CacheConst.Cache_Prefix_Admin}SysUser:";
+    public const string Cache_SysUser = $"{CacheConst.Cache_Prefix_Admin}SysUser:Hash";
 
     /// <summary>
     /// 用户账号关系缓存Key
     /// </summary>
-    public const string Cache_SysUserAccount = $"{CacheConst.Cache_Prefix_Admin}SysUserAccount:";
+    public const string Cache_SysUserAccount = $"{CacheConst.Cache_Prefix_Admin}SysUserAccount:Hash";
 
     /// <summary>
     /// 职位表缓存Key
@@ -58,7 +58,7 @@ public static class CacheConst
     /// <summary>
     /// 机构表缓存Key
     /// </summary>
-    public const string Cache_SysOrg = $"{CacheConst.Cache_Prefix_Admin}SysOrg:";
+    public const string Cache_SysOrg = $"{CacheConst.Cache_Prefix_Admin}SysOrg:List";
 
     /// <summary>
     /// 公司表缓存Key
@@ -67,12 +67,12 @@ public static class CacheConst
     /// <summary>
     /// 公司表缓存Key
     /// </summary>
-    public const string Cache_SysOrgTenant = $"{CacheConst.Cache_Prefix_Admin}OrgTenant:";
+    public const string Cache_SysOrgTenant = $"{CacheConst.Cache_Prefix_Admin}OrgTenant:Hash";
 
     /// <summary>
     /// Token表缓存Key
     /// </summary>
-    public const string Cache_Token = $"{CacheConst.Cache_Prefix_Admin}Token:";
+    public const string Cache_Token = $"{CacheConst.Cache_Prefix_Admin}Token:Hash";
 
     #region 登录错误次数
 

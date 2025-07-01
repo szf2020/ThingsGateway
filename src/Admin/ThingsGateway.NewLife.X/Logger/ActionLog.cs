@@ -18,5 +18,5 @@ public class ActionLog : Logger
 
     /// <summary>已重载</summary>
     /// <returns></returns>
-    public override String ToString() => Method + "";
+    public override String ToString() => Method + string.Empty;
 }

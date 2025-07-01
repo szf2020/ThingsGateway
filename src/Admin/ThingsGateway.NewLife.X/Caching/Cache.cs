@@ -1,5 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 
+using ThingsGateway.NewLife.Messaging;
+
 namespace ThingsGateway.NewLife.Caching;
 
 /// <summary>缓存</summary>
@@ -100,9 +102,9 @@ public abstract class Cache : DisposeBase, ICache
     /// <typeparam name="T"></typeparam>
     /// <param name="keys"></param>
     /// <returns></returns>
-    public virtual IDictionary<String, T?> GetAll<T>(IEnumerable<String> keys)
+    public virtual IDictionary<String, T> GetAll<T>(IEnumerable<String> keys)
     {
-        var dic = new Dictionary<String, T?>();
+        var dic = new Dictionary<String, T>();
         foreach (var key in keys)
         {
             dic[key] = Get<T>(key);
@@ -152,6 +154,14 @@ public abstract class Cache : DisposeBase, ICache
     /// <param name="key"></param>
     /// <returns></returns>
     public virtual ICollection<T> GetSet<T>(String key) => throw new NotSupportedException();
+
+    /// <summary>获取事件总线，可发布消息或订阅消息</summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="topic">事件主题</param>
+    /// <param name="clientId">客户标识/消息分组</param>
+    /// <returns></returns>
+    /// <exception cref="NotSupportedException"></exception>
+    public virtual IEventBus<T> GetEventBus<T>(String topic, String clientId = "") => throw new NotSupportedException();
     #endregion
 
     #region 高级操作
@@ -310,7 +320,7 @@ public abstract class Cache : DisposeBase, ICache
         if (!rlock.Acquire(msTimeout, msExpire))
         {
             if (throwOnFailure) throw new InvalidOperationException($"Lock [{key}] failed! msTimeout={msTimeout}");
-            rlock.Dispose();
+
             return null;
         }
 
@@ -322,101 +332,14 @@ public abstract class Cache : DisposeBase, ICache
     /// <summary>已重载。</summary>
     /// <returns></returns>
     public override String ToString() => Name;
-    #endregion
-#if NET6_0_OR_GREATER
-    #region 集合
-    /// <inheritdoc/>
-    public virtual void HashAdd<T>(string key, string hashKey, T value)
-    {
-        lock (this)
-        {
-            //获取字典
-            var exist = GetDictionary<T>(key);
-            if (exist.ContainsKey(hashKey))//如果包含Key
-                exist[hashKey] = value;//重新赋值
-            else exist.TryAdd(hashKey, value);//加上新的值
-            Set(key, exist);
-        }
-    }
 
-    /// <inheritdoc/>
-    public virtual bool HashSet<T>(string key, Dictionary<string, T> dic)
-    {
-        lock (this)
-        {
-            //获取字典
-            var exist = GetDictionary<T>(key);
-            foreach (var it in dic)
-            {
-                if (exist.ContainsKey(it.Key))//如果包含Key
-                    exist[it.Key] = it.Value;//重新赋值
-                else exist.Add(it.Key, it.Value);//加上新的值
-            }
-            return true;
-        }
-    }
-
-    /// <inheritdoc/>
-    public virtual int HashDel<T>(string key, params string[] fields)
-    {
-        var result = 0;
-        //获取字典
-        var exist = GetDictionary<T>(key);
-        foreach (var field in fields)
-        {
-            if (field != null && exist.ContainsKey(field))//如果包含Key
-            {
-                exist.Remove(field);//删除
-                result++;
-            }
-        }
-        return result;
-    }
-
-    /// <inheritdoc/>
-    public virtual List<T> HashGet<T>(string key, params string[] fields)
-    {
-        var list = new List<T>();
-        //获取字典
-        var exist = GetDictionary<T>(key);
-        foreach (var field in fields)
-        {
-            if (exist.TryGetValue(field, out var data))//如果包含Key
-            {
-                list.Add(data);
-            }
-            else { list.Add(default); }
-        }
-        return list;
-    }
-
-    /// <inheritdoc/>
-    public virtual T HashGetOne<T>(string key, string field)
-    {
-        //获取字典
-        var exist = GetDictionary<T>(key);
-        exist.TryGetValue(field, out var result);
-        return result;
-    }
-
-    /// <inheritdoc/>
-    public virtual IDictionary<string, T> HashGetAll<T>(string key)
-    {
-        var data = GetDictionary<T>(key);
-        return data;
-    }
-    /// <inheritdoc/>
-    public void DelByPattern(string pattern)
-    {
-        var keys = Keys;//获取所有key
-        foreach (var item in keys.ToList())
-        {
-            if (item.StartsWith(pattern))//如果匹配
-                Remove(item);
-        }
-    }
     #endregion
 
-#endif
-
+    public abstract void HashAdd<T>(string key, string hashKey, T value);
+    public abstract bool HashSet<T>(string key, Dictionary<string, T> dic);
+    public abstract int HashDel<T>(string key, params string[] fields);
+    public abstract List<T> HashGet<T>(string key, params string[] fields);
+    public abstract T HashGetOne<T>(string key, string field);
+    public abstract IDictionary<string, T> HashGetAll<T>(string key);
+    public abstract long DelByPattern(string v);
 }

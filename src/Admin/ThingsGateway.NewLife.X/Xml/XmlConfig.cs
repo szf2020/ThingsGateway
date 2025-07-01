@@ -83,7 +83,7 @@ public class XmlConfig<TConfig> : DisposeBase where TConfig : XmlConfig<TConfig>
                     }
                     catch (Exception ex)
                     {
-                        NewLife.Log.XTrace.WriteException(ex);
+                        XTrace.WriteException(ex);
                     }
                 }
             }
@@ -102,6 +102,8 @@ public class XmlConfig<TConfig> : DisposeBase where TConfig : XmlConfig<TConfig>
         /// <summary>配置文件路径</summary>
         public static String ConfigFile { get; set; }
 
+
+        public static String DataPath { get; set; } = "Configuration";
         /// <summary>重新加载时间。单位：毫秒</summary>
         public static Int32 ReloadTime { get; set; }
 
@@ -116,7 +118,7 @@ public class XmlConfig<TConfig> : DisposeBase where TConfig : XmlConfig<TConfig>
             {
                 // 这里不能着急，派生类可能通过静态构造函数指定配置文件路径
                 //throw new XException("编码错误！请为配置类{0}设置{1}特性，指定配置文件！", typeof(TConfig), typeof(XmlConfigFileAttribute).Name);
-                _.ConfigFile = $"Config\\{typeof(TConfig).Name}.config";
+                _.ConfigFile = $"{DataPath}\\{typeof(TConfig).Name}.config";
                 _.ReloadTime = 10000;
             }
             else
@@ -242,7 +244,7 @@ public class XmlConfig<TConfig> : DisposeBase where TConfig : XmlConfig<TConfig>
         }
         catch (Exception ex)
         {
-            NewLife.Log.XTrace.WriteException(ex);
+            XTrace.WriteException(ex);
             return false;
         }
         finally
@@ -280,7 +282,7 @@ public class XmlConfig<TConfig> : DisposeBase where TConfig : XmlConfig<TConfig>
         }
         catch (Exception ex)
         {
-            if (_.Debug) NewLife.Log.XTrace.WriteException(ex);
+            if (_.Debug) XTrace.WriteException(ex);
         }
     }
 

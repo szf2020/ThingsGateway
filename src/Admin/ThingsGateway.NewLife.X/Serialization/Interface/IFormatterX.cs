@@ -2,6 +2,7 @@
 using System.Reflection;
 using System.Text;
 
+using ThingsGateway.NewLife.Data;
 using ThingsGateway.NewLife.Log;
 
 namespace ThingsGateway.NewLife.Serialization;
@@ -125,6 +126,15 @@ public abstract class FormatterBase //: IFormatterX
         return buf;
     }
 
+    /// <summary>获取流里面的数据包</summary>
+    /// <returns></returns>
+    public IPacket GetPacket()
+    {
+        Stream.Position = 0;
+
+        // 包装为数据包，直接窃取内存流内部的缓冲区
+        return new ArrayPacket(Stream);
+    }
     #endregion
 
     #region 跟踪日志

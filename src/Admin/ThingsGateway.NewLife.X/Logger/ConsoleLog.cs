@@ -43,8 +43,8 @@ public class ConsoleLog : Logger
         catch { }
     }
 
-    private static readonly ConcurrentDictionary<Int32, ConsoleColor> dic = new();
-    private static readonly ConsoleColor[] colors = [
+    static readonly ConcurrentDictionary<Int32, ConsoleColor> dic = new();
+    static readonly ConsoleColor[] colors = [
         ConsoleColor.Green, ConsoleColor.Cyan, ConsoleColor.Magenta, ConsoleColor.White, ConsoleColor.Yellow,
         ConsoleColor.DarkGreen, ConsoleColor.DarkCyan, ConsoleColor.DarkMagenta, ConsoleColor.DarkRed, ConsoleColor.DarkYellow ];
     private static ConsoleColor GetColor(Int32 threadid)

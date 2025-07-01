@@ -32,12 +32,20 @@ public class TextFileLog : Logger, IDisposable
 
     /// <summary>是否当前进程的第一次写日志</summary>
     private Boolean _isFirst = false;
-
     /// <summary>头部信息写入</summary>
     protected Boolean _headEnable = true;
+
     #endregion
 
     #region 构造
+    /// <summary>该构造函数没有作用，为了继承而设置</summary>
+    private TextFileLog()
+    {
+        LogPath = String.Empty;
+
+        var set = Setting.Current;
+        FileFormat = set.LogFileFormat;
+    }
 
     internal protected TextFileLog(String path, Boolean isfile, String? fileFormat = null)
     {
@@ -56,8 +64,7 @@ public class TextFileLog : Logger, IDisposable
         _Timer = new TimerX(DoWriteAndClose, null, 0_000, 5_000) { Async = true };
     }
 
-    private static readonly Caching.MemoryCache cache = new Caching.MemoryCache();
-
+    private static readonly ConcurrentDictionary<String, TextFileLog> cache = new(StringComparer.OrdinalIgnoreCase);
     /// <summary>每个目录的日志实例应该只有一个，所以采用静态创建</summary>
     /// <param name="path">日志目录或日志文件路径</param>
     /// <param name="fileFormat"></param>
@@ -179,7 +186,7 @@ public class TextFileLog : Logger, IDisposable
     {
         var writer = LogWriter;
 
-        var now = TimerX.Now;
+        var now = TimerX.Now.AddHours(Setting.Current.UtcIntervalHours);
         var logFile = GetLogFile();
         if (logFile.IsNullOrEmpty()) return;
 
@@ -207,13 +214,14 @@ public class TextFileLog : Logger, IDisposable
             // 写日志。TextWriter.WriteLine内需要拷贝，浪费资源
             //writer.WriteLine(str);
             writer.Write(str);
+            writer.WriteLine();
         }
 
         // 写完一批后，刷一次磁盘
         writer?.Flush();
 
         // 连续5秒没日志，就关闭
-        _NextClose = now;
+        _NextClose = now.AddSeconds(5);
     }
 
     /// <summary>关闭文件</summary>
@@ -284,7 +292,7 @@ public class TextFileLog : Logger, IDisposable
             if (!_Logs.IsEmpty) WriteFile();
 
             // 连续5秒没日志，就关闭
-            if (writer != null && closeTime < TimerX.Now)
+            if (writer != null && closeTime < TimerX.Now.AddHours(Setting.Current.UtcIntervalHours))
             {
                 writer.TryDispose();
                 LogWriter = null;
@@ -314,7 +322,7 @@ public class TextFileLog : Logger, IDisposable
             e = e.Set(Format(format, args), null);
 
         // 推入队列
-        Enqueue($"{e.GetAndReset()}{Environment.NewLine}");
+        Enqueue($"{e.GetAndReset()}");
 
         WriteLog();
     }
@@ -333,6 +341,7 @@ public class TextFileLog : Logger, IDisposable
     }
     protected void WriteLog()
     {
+
         // 异步写日志，实时。即使这里错误，定时器那边仍然会补上
         if (Interlocked.CompareExchange(ref _writing, 1, 0) == 0)
         {

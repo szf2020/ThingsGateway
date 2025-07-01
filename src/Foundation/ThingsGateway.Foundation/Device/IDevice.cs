@@ -428,7 +428,7 @@ public interface IDevice : IDisposable, IDisposableObject
     /// </summary>
     /// <param name="socketId"></param>
     /// <returns></returns>
-    ValueTask<OperResult<IClientChannel>> GetChannelAsync(string socketId);
+    OperResult<IClientChannel> GetChannel(string socketId);
 
     /// <summary>
     /// 发送，会经过适配器，可传入socketId，如果为空，则默认通道必须为<see cref="IClientChannel"/>类型

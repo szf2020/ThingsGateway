@@ -16,7 +16,7 @@ namespace ThingsGateway.NewLife.Serialization;
 /// 例如JT/T808协议，2011/2019版的相同字段使用不同长度。
 /// </remarks>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Enum, AllowMultiple = true)]
-public sealed class FieldSizeAttribute : Attribute
+public class FieldSizeAttribute : Attribute
 {
     /// <summary>大小。使用<see cref="ReferenceName"/>时，作为偏移量；0表示自动计算大小</summary>
     public Int32 Size { get; set; }

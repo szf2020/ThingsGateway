@@ -253,9 +253,6 @@ public static class IOHelper
         Buffer.BlockCopy(src, srcOffset, dst, dstOffset, count);
         return count;
     }
-    #endregion
-
-    #region 数据流转换
 
     /// <summary>从一个数据流复制特定长度数据到另一个数据流</summary>
     /// <param name="source">源数据流</param>
@@ -277,8 +274,9 @@ public static class IOHelper
         }
         ArrayPool<Byte>.Shared.Return(buffer);
     }
+    #endregion
 
-#if !NET7_0_OR_GREATER
+    #region 数据流转换
     /// <summary>从流中完全读取数据，直到指定大小或者到达流结束</summary>
     /// <remarks>
     /// 主要为了对抗net6开始对Stream.Read的微调。
@@ -298,12 +296,12 @@ public static class IOHelper
         {
             var bytesRead = stream.Read(buffer, offset + totalRead, count - totalRead);
             if (bytesRead == 0) break;
+
             totalRead += bytesRead;
         }
 
         return totalRead;
     }
-#endif
 
     /// <summary>数据流转为字节数组</summary>
     /// <remarks>

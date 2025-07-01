@@ -6,6 +6,8 @@ using System.Runtime.Serialization;
 using System.Web.Script.Serialization;
 using System.Xml.Serialization;
 
+using ThingsGateway.NewLife.Data;
+
 namespace ThingsGateway.NewLife.Reflection;
 
 /// <summary>反射接口</summary>
@@ -563,13 +565,28 @@ public class DefaultReflect : IReflect
         // 不是深度拷贝时，直接复制引用
         if (!deep)
         {
-            foreach (var pi in targetType.GetProperties(true))
+            // 借助 IModel 优化取值赋值，有 IExtend 扩展属性的实体类过于复杂而不支持，例如IEntity就有脏数据问题
+            if (target is IModel dst && target is not IExtend)
             {
-                if (!pi.CanWrite) continue;
-                if (excludes?.Contains(pi.Name) == true) continue;
+                foreach (var pi in targetType.GetProperties(true))
+                {
+                    if (!pi.CanWrite) continue;
+                    if (excludes?.Contains(pi.Name) == true) continue;
 
-                if (sourceProperties.TryGetValue(pi.Name, out var pi2) && pi2.CanRead)
-                    SetValue(target, pi, GetValue(source, pi2));
+                    if (sourceProperties.TryGetValue(pi.Name, out var pi2) && pi2.CanRead)
+                        dst[pi.Name] = source is IModel src ? src[pi2.Name] : GetValue(source, pi2);
+                }
+            }
+            else
+            {
+                foreach (var pi in targetType.GetProperties(true))
+                {
+                    if (!pi.CanWrite) continue;
+                    if (excludes?.Contains(pi.Name) == true) continue;
+
+                    if (sourceProperties.TryGetValue(pi.Name, out var pi2) && pi2.CanRead)
+                        SetValue(target, pi, source is IModel src ? src[pi2.Name] : GetValue(source, pi2));
+                }
             }
             return;
         }
@@ -627,8 +644,6 @@ public class DefaultReflect : IReflect
     /// <returns></returns>
     public virtual Type? GetElementType(Type type)
     {
-        if (type == null) return null;
-
         if (type.HasElementType) return type.GetElementType();
 
         if (type.As<IEnumerable>())

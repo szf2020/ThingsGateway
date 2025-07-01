@@ -2,6 +2,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 
+using ThingsGateway.NewLife.Data;
 using ThingsGateway.NewLife.Reflection;
 using ThingsGateway.NewLife.Serialization.Interface;
 
@@ -67,7 +68,7 @@ public class BinaryComposite : BinaryHandlerBase
             var mtype = GetMemberType(member);
             context.Member = Host.Member = member;
 
-            var v = value.GetValue(member);
+            var v = value is IModel src ? src[member.Name] : value.GetValue(member);
             WriteLog("    {0}.{1} {2}", type.Name, member.Name, v);
 
             // 成员访问器优先
@@ -170,14 +171,18 @@ public class BinaryComposite : BinaryHandlerBase
             var hs = Host.Stream;
             if (hs.CanSeek && hs.Position >= hs.Length) break;
 
-            var v = value.GetValue(member);
+            Object? v = null;
+            v = value is IModel src ? src[member.Name] : value.GetValue(member);
             if (!Host.TryRead(mtype, ref v))
             {
                 Host.Hosts.Pop();
                 return false;
             }
 
-            value.SetValue(member, v);
+            if (value is IModel dst)
+                dst[member.Name] = v;
+            else
+                value.SetValue(member, v);
         }
         Host.Hosts.Pop();
 

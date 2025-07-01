@@ -17,19 +17,19 @@ public class WeakAction<TArgs>
 {
     #region 属性
     /// <summary>目标对象。弱引用，使得调用方对象可以被GC回收</summary>
-    private readonly WeakReference? Target;
+    readonly WeakReference? Target;
 
     /// <summary>委托方法</summary>
-    private readonly MethodBase Method;
+    readonly MethodBase Method;
 
     /// <summary>经过包装的新的委托</summary>
-    private readonly Action<TArgs> Handler;
+    readonly Action<TArgs> Handler;
 
     /// <summary>取消注册的委托</summary>
-    private Action<Action<TArgs>>? UnHandler;
+    Action<Action<TArgs>>? UnHandler;
 
     /// <summary>是否只使用一次，如果只使用一次，执行委托后马上取消注册</summary>
-    private readonly Boolean Once;
+    readonly Boolean Once;
     #endregion
 
     #region 扩展属性

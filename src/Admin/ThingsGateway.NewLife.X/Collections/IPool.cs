@@ -94,7 +94,7 @@ public static class Pool
     {
         //if (ms == null) return null;
 
-        var buf = returnResult ? ms.ToArray() : Array.Empty<byte>();
+        var buf = returnResult ? ms.ToArray() : Empty;
 
         Pool.MemoryStream.Return(ms);
 
@@ -132,5 +132,11 @@ public static class Pool
     }
     #endregion
 
+    #region ByteArray
+    /// <summary>字节数组共享存储</summary>
+    public static ArrayPool<Byte> Shared { get; set; } = ArrayPool<Byte>.Shared;
 
+    /// <summary>空数组</summary>
+    public static Byte[] Empty { get; } = [];
+    #endregion
 }

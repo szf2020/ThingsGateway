@@ -1,5 +1,8 @@
 ﻿using System.Net;
 
+using ThingsGateway.NewLife.Data;
+using ThingsGateway.NewLife.Reflection;
+
 namespace ThingsGateway.NewLife.Serialization;
 
 /// <summary>常用类型编码</summary>
@@ -27,6 +30,20 @@ public class BinaryNormal : BinaryHandlerBase
             {
                 var bc = bn.GetHandler<BinaryGeneral>();
                 bc?.Write(buf);
+            }
+
+            return true;
+        }
+        else if (type == typeof(IPacket) || type.As<IPacket>())
+        {
+            if (value is IPacket pk)
+            {
+                Host.WriteSize(pk.Total);
+                pk.CopyTo(Host.Stream);
+            }
+            else
+            {
+                Host.WriteSize(0);
             }
 
             return true;
@@ -101,6 +118,18 @@ public class BinaryNormal : BinaryHandlerBase
         else if (type == typeof(Byte[]))
         {
             value = ReadBytes(-1);
+            return true;
+        }
+        else if (type == typeof(IPacket))
+        {
+            var buf = ReadBytes(-1);
+            value = new ArrayPacket(buf);
+            return true;
+        }
+        else if (type == typeof(Packet))
+        {
+            var buf = ReadBytes(-1);
+            value = new Packet(buf);
             return true;
         }
         else if (type == typeof(Char[]))

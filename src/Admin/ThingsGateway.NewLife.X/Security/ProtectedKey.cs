@@ -1,5 +1,6 @@
 ﻿using System.Security.Cryptography;
 
+using ThingsGateway.NewLife.Configuration;
 
 namespace ThingsGateway.NewLife.Security;
 
@@ -20,13 +21,43 @@ public class ProtectedKey
     public String[] Names { get; set; } = ["password", "pass", "pwd"];
     #endregion
 
+    #region 静态实例
+    /// <summary>全局实例。从环境变量和配置文件读取ProtectedKey密钥</summary>
+    public static ProtectedKey Instance { get; set; }
+
+    static ProtectedKey()
+    {
+        var pd = new ProtectedKey();
+
+        var key = Runtime.GetEnvironmentVariable("ProtectedKey");
+        if (key.IsNullOrEmpty())
+        {
+            var config = JsonConfigProvider.LoadAppSettings();
+            key = config["ProtectedKey"];
+        }
+
+        if (!key.IsNullOrEmpty())
+        {
+            // 支持Base64格式和Hex格式的密码，默认文本
+            if (key.StartsWithIgnoreCase("$Base64$"))
+                pd.Secret = key.Substring("$Base64$".Length).ToBase64();
+            else if (key.StartsWithIgnoreCase("$Hex$"))
+                pd.Secret = key.Substring("$Hex$".Length).ToBase64();
+            else
+                pd.Secret = key.GetBytes();
+        }
+
+        Instance = pd;
+    }
+    #endregion
+
     #region 方法
     /// <summary>保护连接字符串中的密码</summary>
     /// <param name="value"></param>
     /// <returns></returns>
     public String Protect(String value)
     {
-        using var alg = Create(Algorithm);
+        var alg = Create(Algorithm);
 
         // 单纯待加密数据
         var p = value.IndexOf('=');
@@ -68,7 +99,7 @@ public class ProtectedKey
             var ss = value.Split('$');
             if (ss == null || ss.Length < 3) return value;
 
-            using var alg = Create(ss[1]);
+            var alg = Create(ss[1]);
 
             return alg.Decrypt(ss[2].ToBase64(), Secret).ToStr();
         }
@@ -85,7 +116,7 @@ public class ProtectedKey
                 var ss = pass.Split('$');
                 if (ss == null || ss.Length < 3) continue;
 
-                using var alg = Create(ss[1]);
+                var alg = Create(ss[1]);
 
                 dic[item] = alg.Decrypt(ss[2].ToBase64(), Secret).ToStr();
 
@@ -115,7 +146,7 @@ public class ProtectedKey
         return value;
     }
 
-    private static SymmetricAlgorithm Create(String name)
+    static SymmetricAlgorithm Create(String name)
     {
         return name.ToLowerInvariant() switch
         {

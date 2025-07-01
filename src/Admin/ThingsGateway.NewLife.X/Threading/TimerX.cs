@@ -1,5 +1,7 @@
 ﻿using System.Reflection;
 
+using ThingsGateway.NewLife.Log;
+
 namespace ThingsGateway.NewLife.Threading;
 
 /// <summary>不可重入的定时器，支持Cron</summary>
@@ -74,8 +76,12 @@ public class TimerX : ITimer, IDisposable
     /// <summary>平均耗时。毫秒</summary>
     public Int32 Cost { get; internal set; }
 
+
     /// <summary>Cron表达式，实现复杂的定时逻辑</summary>
     public Cron[]? Crons => _crons;
+
+    /// <summary>链路追踪。追踪每一次定时事件</summary>
+    public ITracer? Tracer { get; set; }
 
     /// <summary>链路追踪名称。默认使用方法名</summary>
     public String TracerName { get; set; }
@@ -84,7 +90,15 @@ public class TimerX : ITimer, IDisposable
     private readonly Cron[]? _crons;
     #endregion
 
-
+    //    #region 静态
+    //#if NET452
+    //    private static readonly ThreadLocal<TimerX?> _Current = new();
+    //#else
+    //    private static readonly AsyncLocal<TimerX?> _Current = new();
+    //#endif
+    //    /// <summary>当前定时器</summary>
+    //    public static TimerX? Current { get => _Current.Value; set => _Current.Value = value; }
+    //    #endregion
 
     #region 构造
     private TimerX(Object? target, MethodInfo method, Object? state, String? scheduler = null)
@@ -375,26 +389,18 @@ public class TimerX : ITimer, IDisposable
     /// <returns></returns>
     public Boolean Change(TimeSpan dueTime, TimeSpan period)
     {
-        return Change((int)dueTime.TotalMilliseconds, (int)period.TotalMilliseconds);
-    }
-    /// <summary>更改计时器的启动时间和方法调用之间的时间间隔，使用 TimeSpan 值度量时间间隔。</summary>
-    /// <param name="dueTime">一个 TimeSpan，表示在调用构造 ITimer 时指定的回调方法之前的延迟时间量。 指定 InfiniteTimeSpan 可防止重新启动计时器。 指定 Zero 可立即重新启动计时器。</param>
-    /// <param name="period">构造 Timer 时指定的回调方法调用之间的时间间隔。 指定 InfiniteTimeSpan 可以禁用定期终止。</param>
-    /// <returns></returns>
-    public Boolean Change(int dueTime, int period)
-    {
         if (Absolutely) return false;
         if (Crons?.Length > 0) return false;
 
-        if (period <= 0)
+        if (period.TotalMilliseconds <= 0)
         {
             Dispose();
             return true;
         }
 
-        Period = period;
+        Period = (Int32)period.TotalMilliseconds;
 
-        if (dueTime >= 0) SetNext(dueTime);
+        if (dueTime.TotalMilliseconds >= 0) SetNext((Int32)dueTime.TotalMilliseconds);
 
         return true;
     }

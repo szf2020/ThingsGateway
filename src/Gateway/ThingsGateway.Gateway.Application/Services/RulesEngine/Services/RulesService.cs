@@ -68,11 +68,11 @@ internal sealed class RulesService : BaseService<Rules>, IRulesService
         return true;
 
     }
-    private const string Cache_Rules = "ThingsGateway:Cache_Rules:";
+    private const string cacheKey = "ThingsGateway:Cache_RulesEngines:List";
     /// <inheritdoc />
     public void DeleteRulesFromCache()
     {
-        App.CacheService.Remove(Cache_Rules);//删除通道缓存
+        App.CacheService.Remove(cacheKey);//删除通道缓存
     }
 
     /// <summary>
@@ -81,13 +81,12 @@ internal sealed class RulesService : BaseService<Rules>, IRulesService
     /// <returns>列表</returns>
     public async Task<List<Rules>> GetAllAsync()
     {
-        var key = Cache_Rules;
-        var channels = App.CacheService.Get<List<Rules>>(key);
+        var channels = App.CacheService.Get<List<Rules>>(cacheKey);
         if (channels == null)
         {
             using var db = GetDB();
             channels = await db.Queryable<Rules>().ToListAsync().ConfigureAwait(false);
-            App.CacheService.Set(key, channels);
+            App.CacheService.Set(cacheKey, channels);
         }
         return channels;
     }

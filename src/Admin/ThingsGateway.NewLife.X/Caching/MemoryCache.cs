@@ -2,8 +2,11 @@
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 
+using ThingsGateway.NewLife.Data;
 using ThingsGateway.NewLife.Log;
+using ThingsGateway.NewLife.Messaging;
 using ThingsGateway.NewLife.Reflection;
+using ThingsGateway.NewLife.Serialization;
 using ThingsGateway.NewLife.Threading;
 
 namespace ThingsGateway.NewLife.Caching;
@@ -34,7 +37,7 @@ public class MemoryCache : Cache
 
     #region 静态默认实现
     /// <summary>默认缓存</summary>
-    public static ICache Instance { get; set; } = new MemoryCache();
+    public static MemoryCache Instance { get; set; } = new MemoryCache();
     #endregion
 
     #region 构造
@@ -52,9 +55,10 @@ public class MemoryCache : Cache
     {
         base.Dispose(disposing);
 
-        _clearTimer.TryDispose();
+        _clearTimer?.TryDispose();
         _clearTimer = null;
     }
+
     #endregion
 
     #region 缓存属性
@@ -67,7 +71,6 @@ public class MemoryCache : Cache
     #endregion
 
     #region 方法
-
 
 #if !NET452
 
@@ -85,35 +88,6 @@ public class MemoryCache : Cache
         }
     }
 
-    /// <summary>获取或添加缓存项</summary>
-    /// <typeparam name="T">值类型</typeparam>
-    /// <param name="key">键</param>
-    /// <param name="value">值</param>
-    /// <param name="expire">过期时间，秒</param>
-    /// <returns></returns>
-    public virtual T? GetOrAdd<T>(String key, T value, Int32 expire = -1)
-    {
-        if (expire < 0) expire = Expire;
-
-        CacheItem? item = null;
-        do
-        {
-            if (_cache.TryGetValue(key, out item) && item != null)
-            {
-                if (!item.Expired) return item.Visit<T>();
-
-                item.Set(value, expire);
-
-                return value;
-            }
-
-            item ??= new CacheItem(value, expire);
-        } while (!_cache.TryAdd(key, item));
-
-        Interlocked.Increment(ref _count);
-
-        return item.Visit<T>();
-    }
     #endregion
 
     #region 基本操作
@@ -444,6 +418,19 @@ public class MemoryCache : Cache
             throw new InvalidCastException($"Unable to convert the value of [{key}] from {item.TypeCode} to {typeof(ICollection<T>)}");
     }
 
+    /// <summary>获取事件总线，可发布消息或订阅消息</summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="topic">事件主题</param>
+    /// <param name="clientId">客户标识/消息分组</param>
+    /// <returns></returns>
+    public override IEventBus<T> GetEventBus<T>(String topic, String clientId = "")
+    {
+        var key = $"eventbus:{topic}";
+        var item = GetOrAddItem(key, k => new QueueEventBus<T>(this, topic));
+        return item.Visit<IEventBus<T>>() ??
+            throw new InvalidCastException($"Unable to convert the value of [{topic}] from {item.TypeCode} to {typeof(IEventBus<T>)}");
+    }
+
     /// <summary>获取 或 添加 缓存项</summary>
     /// <param name="key"></param>
     /// <param name="valueFactory"></param>
@@ -750,6 +737,224 @@ public class MemoryCache : Cache
     }
     #endregion
 
+    #region 持久化
+    private const String MAGIC = "NewLifeCache";
+    private const Byte _Ver = 1;
+    /// <summary>保存到数据流</summary>
+    /// <param name="stream"></param>
+    /// <returns></returns>
+    public void Save(Stream stream)
+    {
+        var bn = new Binary
+        {
+            Stream = stream,
+            EncodeInt = true,
+        };
+
+        // 头部，幻数、版本和标记
+        bn.Write(MAGIC.GetBytes(), 0, MAGIC.Length);
+        bn.Write(_Ver);
+        bn.Write(0);
+
+        bn.WriteSize(_cache.Count);
+        foreach (var item in _cache)
+        {
+            var ci = item.Value;
+
+            // Key+Expire+Empty
+            // Key+Expire+TypeCode+Value
+            // Key+Expire+TypeCode+Type+Length+Value
+            bn.Write(item.Key);
+            bn.Write((Int32)(ci.ExpiredTime / 1000));
+
+            var value = ci.Value;
+            var type = value?.GetType();
+            if (type == null)
+            {
+                bn.Write((Byte)TypeCode.Empty);
+            }
+            else
+            {
+                var code = type.GetTypeCode();
+                bn.Write((Byte)code);
+
+                if (code != TypeCode.Object)
+                    bn.Write(value);
+                else
+                {
+                    bn.Write(type.FullName);
+                    if (value != null) bn.Write(Binary.FastWrite(value));
+                }
+            }
+        }
+    }
+
+    /// <summary>从数据流加载</summary>
+    /// <param name="stream"></param>
+    /// <returns></returns>
+    public void Load(Stream stream)
+    {
+        var bn = new Binary
+        {
+            Stream = stream,
+            EncodeInt = true,
+        };
+
+        // 头部，幻数、版本和标记
+        var magic = bn.ReadBytes(MAGIC.Length).ToStr();
+        if (magic != MAGIC) throw new InvalidDataException();
+
+        var ver = bn.Read<Byte>();
+        _ = bn.Read<Byte>();
+
+        // 版本兼容
+        if (ver > _Ver) throw new InvalidDataException($"MemoryCache[ver={_Ver}] Unable to support newer versions [{ver}]");
+
+        var count = bn.ReadSize();
+        while (count-- > 0)
+        {
+            // Key+Expire+Empty
+            // Key+Expire+TypeCode+Value
+            // Key+Expire+TypeCode+Type+Length+Value
+            var key = bn.Read<String>();
+            var exp = bn.Read<Int32>();
+            var code = (TypeCode)bn.ReadByte();
+
+            Object? value = null;
+            if (code == TypeCode.Empty)
+            {
+            }
+            else if (code != TypeCode.Object)
+            {
+                var type = Type.GetType("System." + code);
+                if (type != null) value = bn.Read(type);
+            }
+            else
+            {
+                var typeName = bn.Read<String>();
+                //var type = Type.GetType(typeName);
+                var type = typeName?.GetTypeEx();
+
+                var pk = bn.Read<IPacket>();
+                value = pk;
+                if (type != null && pk != null)
+                {
+                    var bn2 = new Binary() { Stream = pk.GetStream(), EncodeInt = true };
+                    value = bn2.Read(type);
+                }
+            }
+
+            if (key != null) Set(key, value, exp - (Int32)(Runtime.TickCount64 / 1000));
+        }
+    }
+
+    /// <summary>保存到文件</summary>
+    /// <param name="file"></param>
+    /// <param name="compressed"></param>
+    /// <returns></returns>
+    public Int64 Save(String file, Boolean compressed) => file.AsFile().OpenWrite(compressed, s => Save(s));
+
+    /// <summary>从文件加载</summary>
+    /// <param name="file"></param>
+    /// <param name="compressed"></param>
+    /// <returns></returns>
+    public Int64 Load(String file, Boolean compressed) => file.AsFile().OpenRead(compressed, s => Load(s));
+    #endregion
+
+    #region 集合
+    /// <inheritdoc/>
+    public override void HashAdd<T>(string key, string hashKey, T value)
+    {
+        lock (this)
+        {
+            //获取字典
+            var exist = GetDictionary<T>(key);
+            if (exist.ContainsKey(hashKey))//如果包含Key
+                exist[hashKey] = value;//重新赋值
+            else exist.TryAdd(hashKey, value);//加上新的值
+            Set(key, exist);
+        }
+    }
+
+    /// <inheritdoc/>
+    public override bool HashSet<T>(string key, Dictionary<string, T> dic)
+    {
+        lock (this)
+        {
+            //获取字典
+            var exist = GetDictionary<T>(key);
+            foreach (var it in dic)
+            {
+                if (exist.ContainsKey(it.Key))//如果包含Key
+                    exist[it.Key] = it.Value;//重新赋值
+                else exist.Add(it.Key, it.Value);//加上新的值
+            }
+            return true;
+        }
+    }
+
+    /// <inheritdoc/>
+    public override int HashDel<T>(string key, params string[] fields)
+    {
+        var result = 0;
+        //获取字典
+        var exist = GetDictionary<T>(key);
+        foreach (var field in fields)
+        {
+            if (field != null && exist.ContainsKey(field))//如果包含Key
+            {
+                exist.Remove(field);//删除
+                result++;
+            }
+        }
+        return result;
+    }
+
+    /// <inheritdoc/>
+    public override List<T> HashGet<T>(string key, params string[] fields)
+    {
+        var list = new List<T>();
+        //获取字典
+        var exist = GetDictionary<T>(key);
+        foreach (var field in fields)
+        {
+            if (exist.TryGetValue(field, out var data))//如果包含Key
+            {
+                list.Add(data);
+            }
+            else { list.Add(default); }
+        }
+        return list;
+    }
+
+    /// <inheritdoc/>
+    public override T HashGetOne<T>(string key, string field)
+    {
+        //获取字典
+        var exist = GetDictionary<T>(key);
+        exist.TryGetValue(field, out var result);
+        return result;
+    }
+
+    /// <inheritdoc/>
+    public override IDictionary<string, T> HashGetAll<T>(string key)
+    {
+        var data = GetDictionary<T>(key);
+        return data;
+    }
+    /// <inheritdoc/>
+    public override long DelByPattern(string pattern)
+    {
+        var keys = Keys;//获取所有key
+        long count = 0;
+        foreach (var item in keys.ToList())
+        {
+            if (item.StartsWith(pattern))//如果匹配
+                count += Remove(item);
+        }
+        return count;
+    }
+    #endregion
 }
 
 /// <summary>生产者消费者</summary>

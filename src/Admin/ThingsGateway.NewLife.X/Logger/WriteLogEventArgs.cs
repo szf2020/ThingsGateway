@@ -1,4 +1,6 @@
-﻿namespace ThingsGateway.NewLife.Log;
+﻿using ThingsGateway.NewLife.Collections;
+
+namespace ThingsGateway.NewLife.Log;
 
 /// <summary>写日志事件参数</summary>
 public class WriteLogEventArgs : EventArgs
@@ -73,14 +75,15 @@ public class WriteLogEventArgs : EventArgs
         return this;
     }
 
-    private void Init()
+    void Init()
     {
         // todo: 如果系统使用utc时间，可以把日志时间转换为本地时间
         Time = DateTime.Now.AddHours(Setting.Current.UtcIntervalHours);
         var thread = Thread.CurrentThread;
         ThreadID = thread.ManagedThreadId;
         IsPool = thread.IsThreadPoolThread;
-        ThreadName = CurrentThreadName ?? thread.Name;
+        //ThreadName = CurrentThreadName ?? thread.Name;
+        ThreadName = thread.Name;
 
         var tid = Task.CurrentId;
         TaskID = tid != null ? tid.Value : -1;
@@ -112,6 +115,7 @@ public class WriteLogEventArgs : EventArgs
         return msg;
     }
 
+    private static String[]? _lines;
     /// <summary>已重载。</summary>
     /// <returns></returns>
     public override String ToString()
@@ -125,14 +129,56 @@ public class WriteLogEventArgs : EventArgs
         if (name.EqualIgnoreCase(".NET Long Running Task")) name = "LongTask";
         if (name.EqualIgnoreCase(".NET TP Worker")) name = "TP";
 
-        return $"{Time:HH:mm:ss.fff} {ThreadID,2} {(IsPool ? (IsWeb ? 'W' : 'Y') : 'N')} {name} {Message}";
+        //return $"{Time:HH:mm:ss.fff} {ThreadID,2} {(IsPool ? (IsWeb ? 'W' : 'Y') : 'N')} {name} {Message}";
+
+        var lines = _lines;
+        if (lines == null || lines.Length == 0)
+        {
+            var format = Setting.Current.LogLineFormat;
+            if (format.IsNullOrEmpty()) format = "Time|ThreadId|Kind|Name|Message";
+            lines = _lines = format.Split("|");
+        }
+
+        var sb = Pool.StringBuilder.Get();
+
+        for (var i = 0; i < lines.Length; i++)
+        {
+            if (i > 0) sb.Append(' ');
+            switch (lines[i])
+            {
+                case "Time":
+                    sb.Append(Time.ToString("HH:mm:ss.fff"));
+                    break;
+                case "ThreadId":
+                    sb.Append(ThreadID.ToString("00"));
+                    break;
+                case "Kind":
+                    sb.Append(IsPool ? (IsWeb ? 'W' : 'Y') : 'N');
+                    break;
+                case "Name":
+                    sb.Append(name);
+                    break;
+                case "Level":
+                    sb.Append('[');
+                    sb.Append(Level);
+                    sb.Append(']');
+                    break;
+                case "Message":
+                    if (!Message.IsNullOrEmpty()) sb.Append(Message);
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        return sb.Return(true);
     }
     #endregion
 
-    #region 日志线程名
-    [ThreadStatic]
-    private static String? _threadName;
-    /// <summary>设置当前线程输出日志时的线程名</summary>
-    public static String? CurrentThreadName { get => _threadName; set => _threadName = value; }
-    #endregion
+    //#region 日志线程名
+    //[ThreadStatic]
+    //private static String? _threadName;
+    ///// <summary>设置当前线程输出日志时的线程名</summary>
+    //public static String? CurrentThreadName { get => _threadName; set => _threadName = value; }
+    //#endregion
 }

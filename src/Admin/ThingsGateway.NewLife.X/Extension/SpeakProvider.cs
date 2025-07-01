@@ -5,7 +5,7 @@ using ThingsGateway.NewLife.Reflection;
 
 namespace ThingsGateway.NewLife.Extension;
 
-internal sealed class SpeakProvider
+class SpeakProvider
 {
     private const String typeName = "System.Speech.Synthesis.SpeechSynthesizer";
     private Type? _type;
@@ -38,15 +38,14 @@ internal sealed class SpeakProvider
         }
         catch (Exception ex)
         {
-            NewLife.Log.XTrace.WriteException(ex);
+            XTrace.WriteException(ex);
         }
 
         if (_type == null) XTrace.WriteLine("找不到语音库System.Speech，需要从nuget引用");
     }
 
     private Object? synth;
-
-    private void EnsureSynth()
+    void EnsureSynth()
     {
         if (synth == null && _type != null)
         {
@@ -57,7 +56,7 @@ internal sealed class SpeakProvider
             }
             catch (Exception ex)
             {
-                NewLife.Log.XTrace.WriteException(ex);
+                XTrace.WriteException(ex);
                 _type = null;
             }
         }

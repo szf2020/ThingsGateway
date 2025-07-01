@@ -115,7 +115,7 @@ public abstract class Logger : ILog
     /// <summary>空日志实现</summary>
     public static ILog Null { get; } = new NullLogger();
 
-    private sealed class NullLogger : Logger
+    class NullLogger : Logger
     {
         public override Boolean Enable { get => false; set { } }
 
@@ -129,8 +129,8 @@ public abstract class Logger : ILog
     {
         var process = System.Diagnostics.Process.GetCurrentProcess();
         var name = String.Empty;
-        var ver = Environment.Version + "";
-        var target = "";
+        var ver = Environment.Version + string.Empty;
+        var target = string.Empty;
         var asm = Assembly.GetEntryAssembly();
         if (asm != null)
         {
@@ -212,7 +212,7 @@ public abstract class Logger : ILog
         if (!line.IsNullOrEmpty())
             sb.AppendFormat("#CommandLine: {0}\r\n", line);
 
-        var apptype = "";
+        var apptype = string.Empty;
         if (Runtime.IsWeb)
             apptype = "Web";
         else if (!Environment.UserInteractive)
@@ -227,7 +227,7 @@ public abstract class Logger : ILog
         sb.AppendFormat("#ApplicationType: {0}\r\n", apptype);
         sb.AppendFormat("#CLR: {0}, {1}\r\n", ver, target);
 
-        var os = "";
+        var os = string.Empty;
         // 获取丰富的机器信息，需要提注册 MachineInfo.RegisterAsync
         var mi = MachineInfo.Current;
         if (mi != null)
@@ -237,7 +237,7 @@ public abstract class Logger : ILog
         else
         {
             // 特别识别Linux发行版
-            os = Environment.OSVersion + "";
+            os = Environment.OSVersion + string.Empty;
             if (Runtime.Linux) os = MachineInfo.GetLinuxName();
         }
 
@@ -257,9 +257,16 @@ public abstract class Logger : ILog
         ThreadPool.GetAvailableThreads(out var avaWorker, out var avaIO);
         sb.AppendFormat("#ThreadPool: Min={0}/{1}, Max={2}/{3}, Available={4}/{5}\r\n", minWorker, minIO, maxWorker, maxIO, avaWorker, avaIO);
 
+        var set = Setting.Current;
         sb.AppendFormat("#SystemStarted: {0}\r\n", TimeSpan.FromMilliseconds(Runtime.TickCount64));
-        sb.AppendFormat("#Date: {0:yyyy-MM-dd}\r\n", DateTime.Now.AddHours(Setting.Current.UtcIntervalHours));
-        sb.AppendFormat("#Fields: Time ThreadID Kind Name Message\r\n");
+        sb.AppendFormat("#Date: {0:yyyy-MM-dd}\r\n", DateTime.Now.AddHours(set.UtcIntervalHours));
+        sb.AppendFormat("#详解：{0}\r\n", "https://newlifex.com/core/log");
+        sb.AppendFormat("#字段: 时间 线程ID 线程池Y/网页W/普通N/定时T 线程名/任务ID 消息内容\r\n");
+        //sb.AppendFormat("#Fields: Time ThreadID Kind Name Message\r\n");
+
+        var format = set.LogLineFormat;
+        if (format.IsNullOrEmpty()) format = "Time|ThreadId|Kind|Name|Message";
+        sb.AppendFormat("#Fields: {0}\r\n", format.Replace('|', ' '));
 
         return sb.ToString();
     }

@@ -43,7 +43,7 @@ namespace ThingsGateway.SqlSugar
     }
     public class ReflectionInoCore<V>
     {
-        readonly MemoryCache InstanceCache = new() { Expire = 1800 };
+        private MemoryCache InstanceCache => MemoryCache.Instance;
         private static ReflectionInoCore<V> _instance = null;
         private static readonly object _instanceLock = new object();
         private ReflectionInoCore() { }
@@ -81,7 +81,7 @@ namespace ThingsGateway.SqlSugar
 
         public void Add(string key, V value)
         {
-            this.InstanceCache.GetOrAdd(key, value);
+            this.InstanceCache.GetOrAdd<V>(key, (s) => value);
         }
 
         public void Add(string key, V value, int cacheDurationInSeconds)

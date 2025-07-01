@@ -17,6 +17,7 @@ using System.Collections.Concurrent;
 using ThingsGateway.Foundation.Modbus;
 using ThingsGateway.Gateway.Application;
 using ThingsGateway.NewLife;
+using ThingsGateway.NewLife.DictionaryExtensions;
 using ThingsGateway.NewLife.Extension;
 using ThingsGateway.NewLife.Json.Extension;
 using ThingsGateway.SqlSugar;

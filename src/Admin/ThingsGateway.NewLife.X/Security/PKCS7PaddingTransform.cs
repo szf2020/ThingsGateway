@@ -115,7 +115,7 @@ public sealed class PKCS7PaddingTransform : ICryptoTransform
     {
         if (_encryptMode)
         {
-            if (inputCount == 0) return Array.Empty<byte>();
+            if (inputCount == 0) return [];
 
             var paddingLength = InputBlockSize - (inputCount % InputBlockSize);
             var paddingValue = _mode switch
@@ -150,6 +150,7 @@ public sealed class PKCS7PaddingTransform : ICryptoTransform
         else
         {
             if (inputCount == 0 && !_hasWithheldBlock) return [];
+
             var data = _transform.TransformFinalBlock(inputBuffer, inputOffset, inputCount);
             if (_hasWithheldBlock)
             {

@@ -1,6 +1,6 @@
 ﻿namespace ThingsGateway.NewLife.Security
 {
-    internal enum AlgorithmKeyBlob
+    enum AlgorithmKeyBlob
     {
         ECDH_PUBLIC_P256 = 0x314B4345,
         ECDH_PRIVATE_P256 = 0x324B4345,

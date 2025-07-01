@@ -1,4 +1,4 @@
-﻿#if WIN
+﻿#if __WIN__
 using System;
 using System.CodeDom.Compiler;
 using System.Collections.Concurrent;
@@ -111,7 +111,7 @@ public class ScriptEngine
         IsExpression = isExpression;
     }
 
-    private static readonly ConcurrentDictionary<String, ScriptEngine> _cache = new(StringComparer.OrdinalIgnoreCase);
+    static readonly ConcurrentDictionary<String, ScriptEngine> _cache = new(StringComparer.OrdinalIgnoreCase);
     /// <summary>为指定代码片段创建脚本引擎实例。采用缓存，避免同一脚本重复创建引擎。</summary>
     /// <param name="code">代码片段</param>
     /// <param name="isExpression">是否表达式，表达式将编译成为一个Main方法</param>
@@ -342,7 +342,7 @@ public class ScriptEngine
                 var err = rs.Errors[0];
 
                 // 异常中输出错误代码行
-                var code = "";
+                var code = string.Empty;
                 if (!err.FileName.IsNullOrEmpty() && File.Exists(err.FileName))
                 {
                     code = File.ReadAllLines(err.FileName)[err.Line - 1];
@@ -431,7 +431,7 @@ public class ScriptEngine
             var msbuild = pro.CombinePath(@"MSBuild\14.0\bin");
             if (File.Exists(msbuild.CombinePath("csc.exe"))) opts["CompilerDirectoryPath"] = msbuild;
         }
-        using var provider = CodeDomProvider.CreateProvider("CSharp", opts);
+        var provider = CodeDomProvider.CreateProvider("CSharp", opts);
         //var provider = CodeDomProvider.CreateProvider("CSharp");
         return provider.CompileAssemblyFromSource(options, classCode);
     }
@@ -485,7 +485,7 @@ public class ScriptEngine
     /// <summary>分析命名空间</summary>
     /// <param name="code"></param>
     /// <returns></returns>
-    private String ParseNameSpace(String code)
+    String ParseNameSpace(String code)
     {
         var sb = new StringBuilder();
 
@@ -513,12 +513,12 @@ public class ScriptEngine
         return sb.ToString().Trim();
     }
 
-    private void WriteLog(String format, params Object?[] args)
+    void WriteLog(String format, params Object?[] args)
     {
         Log?.Info(format, args);
     }
 
-    private static Assembly? CurrentDomain_AssemblyResolve(Object? sender, ResolveEventArgs args)
+    static Assembly? CurrentDomain_AssemblyResolve(Object? sender, ResolveEventArgs args)
     {
         var name = args.Name;
         if (String.IsNullOrEmpty(name)) return null;

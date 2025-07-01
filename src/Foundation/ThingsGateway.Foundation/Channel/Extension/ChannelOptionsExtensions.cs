@@ -85,7 +85,9 @@ public static class ChannelOptionsExtensions
         channelOptions.ThrowIfNull(nameof(IChannelOptions));
         var channelType = channelOptions.ChannelType;
         channelType.ThrowIfNull(nameof(ChannelTypeEnum));
-        config.SetMaxCount(channelOptions.MaxClientCount);
+
+        if (channelOptions.MaxClientCount > 0)
+            config.SetMaxCount(channelOptions.MaxClientCount);
         switch (channelType)
         {
             case ChannelTypeEnum.TcpClient:

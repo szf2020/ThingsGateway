@@ -15,6 +15,8 @@ using System.Reflection;
 using System.Text;
 
 using ThingsGateway;
+using ThingsGateway.NewLife.Caching;
+using ThingsGateway.NewLife.Redis.Extensions;
 using ThingsGateway.UnifyResult;
 
 namespace Microsoft.Extensions.DependencyInjection;
@@ -198,10 +200,43 @@ public static class AppServiceCollectionExtensions
     {
         // 注册全局配置选项
         services.AddConfigurableOptions<AppSettingsOptions>();
+        services.AddConfigurableOptions<CacheOptions>();
 
         // 注册内存和分布式内存
         services.AddMemoryCache();
         services.AddDistributedMemoryCache();
+
+        var cacheOptions = App.GetConfig<CacheOptions>("Cache", true);
+        // 缓存
+        if (cacheOptions.CacheType == CacheType.Memory)
+        {
+            services.AddSingleton<ICache, MemoryCache>(a => new()
+            {
+                Capacity = cacheOptions.MemoryCacheOptions.Capacity,
+                Expire = cacheOptions.MemoryCacheOptions.Expire,
+                Period = cacheOptions.MemoryCacheOptions.Period
+            });
+
+        }
+        else if (cacheOptions.CacheType == CacheType.Redis)
+        {
+            services.AddDistributedRedisCache(options =>
+            {
+                options.Db = cacheOptions.RedisCacheOptions.Db;
+                options.Configuration = cacheOptions.RedisCacheOptions.Configuration;
+                options.UserName = cacheOptions.RedisCacheOptions.UserName;
+                options.Password = cacheOptions.RedisCacheOptions.Password;
+                options.Server = cacheOptions.RedisCacheOptions.Server;
+                options.Timeout = cacheOptions.RedisCacheOptions.Timeout;
+                options.Prefix = cacheOptions.RedisCacheOptions.Prefix;
+                options.InstanceName = cacheOptions.RedisCacheOptions.InstanceName;
+                options.Expire = cacheOptions.RedisCacheOptions.Expire;
+
+            });
+        }
+
+
+
 
         // 注册全局依赖注入
         services.AddDependencyInjection();

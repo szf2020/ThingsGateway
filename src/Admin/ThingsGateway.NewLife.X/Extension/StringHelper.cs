@@ -321,8 +321,8 @@ public static class StringHelper
     /// <returns></returns>
     public static String EnsureStart(this String? str, String start)
     {
-        if (String.IsNullOrEmpty(start)) return str + "";
-        if (String.IsNullOrEmpty(str) || str == null) return start + "";
+        if (String.IsNullOrEmpty(start)) return str + string.Empty;
+        if (String.IsNullOrEmpty(str) || str == null) return start + string.Empty;
 
         if (str.StartsWith(start, StringComparison.OrdinalIgnoreCase)) return str;
 
@@ -335,8 +335,8 @@ public static class StringHelper
     /// <returns></returns>
     public static String EnsureEnd(this String? str, String end)
     {
-        if (String.IsNullOrEmpty(end)) return str + "";
-        if (String.IsNullOrEmpty(str) || str == null) return end + "";
+        if (String.IsNullOrEmpty(end)) return str + string.Empty;
+        if (String.IsNullOrEmpty(str) || str == null) return end + string.Empty;
 
         if (str.EndsWith(end, StringComparison.OrdinalIgnoreCase)) return str;
 
@@ -846,14 +846,14 @@ public static class StringHelper
     #endregion
 
     #region 文字转语音
-    private static ThingsGateway.NewLife.Extension.SpeakProvider? _provider;
+    private static NewLife.Extension.SpeakProvider? _provider;
     //private static System.Speech.Synthesis.SpeechSynthesizer _provider;
     [MemberNotNull(nameof(_provider))]
-    private static void Init()
+    static void Init()
     {
         //_provider = new Speech.Synthesis.SpeechSynthesizer();
         //_provider.SetOutputToDefaultAudioDevice();
-        _provider ??= new ThingsGateway.NewLife.Extension.SpeakProvider();
+        _provider ??= new NewLife.Extension.SpeakProvider();
     }
 
     /// <summary>调用语音引擎说出指定话</summary>

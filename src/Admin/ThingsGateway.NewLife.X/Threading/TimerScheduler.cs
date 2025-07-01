@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 
+using ThingsGateway.NewLife.Collections;
 using ThingsGateway.NewLife.Log;
 using ThingsGateway.NewLife.Reflection;
 
@@ -33,10 +34,10 @@ public class TimerScheduler : ILogFeature
     /// <summary>默认调度器</summary>
     public static TimerScheduler Default { get; } = Create("Default");
 
-    [ThreadStatic]
-    private static TimerScheduler? _Current;
-    /// <summary>当前调度器</summary>
-    public static TimerScheduler? Current { get => _Current; private set => _Current = value; }
+    //[ThreadStatic]
+    //private static TimerScheduler? _Current;
+    ///// <summary>当前调度器</summary>
+    //public static TimerScheduler? Current { get => _Current; private set => _Current = value; }
 
     /// <summary>全局时间提供者。影响所有调度器</summary>
     public static TimeProvider GlobalTimeProvider { get; set; } = TimeProvider.System;
@@ -66,6 +67,8 @@ public class TimerScheduler : ILogFeature
     public void Add(TimerX timer)
     {
         if (timer == null) throw new ArgumentNullException(nameof(timer));
+
+        using var span = DefaultTracer.Instance?.NewSpan("timer:Add", timer.ToString());
 
         timer.Id = Interlocked.Increment(ref _tid);
         WriteLog("Timer.Add {0}", timer);
@@ -103,6 +106,7 @@ public class TimerScheduler : ILogFeature
     {
         if (timer == null || timer.Id == 0) return;
 
+        using var span = DefaultTracer.Instance?.NewSpan("timer:Remove", reason + " " + timer);
         WriteLog("Timer.Remove {0} reason:{1}", timer, reason);
 
         lock (this)
@@ -137,7 +141,7 @@ public class TimerScheduler : ILogFeature
     /// <param name="state"></param>
     private void Process(Object? state)
     {
-        Current = this;
+        //Current = this;
         while (true)
         {
             // 准备好定时器列表
@@ -172,6 +176,7 @@ public class TimerScheduler : ILogFeature
                         else if (!timer.Async)
                             Execute(timer);
                         else
+                            //Task.Factory.StartNew(() => ProcessItem(timer));
                             // 不需要上下文流动，捕获所有异常
                             ThreadPool.UnsafeQueueUserWorkItem(s =>
                             {
@@ -181,7 +186,7 @@ public class TimerScheduler : ILogFeature
                                 }
                                 catch (Exception ex)
                                 {
-                                    NewLife.Log.XTrace.WriteException(ex);
+                                    XTrace.WriteException(ex);
                                 }
                             }, timer);
                     }
@@ -230,12 +235,16 @@ public class TimerScheduler : ILogFeature
     {
         if (state is not TimerX timer) return;
 
-        // 控制日志显示
-        WriteLogEventArgs.CurrentThreadName = Name == "Default" ? "T" : Name;
+        //TimerX.Current = timer;
+
+        //// 控制日志显示
+        //WriteLogEventArgs.CurrentThreadName = Name == "Default" ? "T" : Name;
 
         timer.hasSetNext = false;
 
-        var sw = Stopwatch.StartNew();
+        using var span = timer.Tracer?.NewSpan(timer.TracerName ?? $"timer:Execute", timer.Timers + "");
+        var sw = _stopwatchPool.Get();
+        sw.Restart();
         try
         {
             // 弱引用判断
@@ -255,15 +264,19 @@ public class TimerScheduler : ILogFeature
         // 如果用户代码没有拦截错误，则这里拦截，避免出错了都不知道怎么回事
         catch (Exception ex)
         {
-            NewLife.Log.XTrace.WriteException(ex);
+            span?.SetError(ex, null);
+            XTrace.WriteException(ex);
         }
         finally
         {
             sw.Stop();
 
             OnExecuted(timer, (Int32)sw.ElapsedMilliseconds);
+
+            _stopwatchPool.Return(sw);
         }
     }
+    private static ObjectPool<Stopwatch> _stopwatchPool { get; } = new ObjectPool<Stopwatch>();
 
     /// <summary>处理每一个定时器</summary>
     /// <param name="state"></param>
@@ -271,13 +284,16 @@ public class TimerScheduler : ILogFeature
     {
         if (state is not TimerX timer) return;
 
+        //TimerX.Current = timer;
 
         // 控制日志显示
-        WriteLogEventArgs.CurrentThreadName = Name == "Default" ? "T" : Name;
+        //WriteLogEventArgs.CurrentThreadName = Name == "Default" ? "T" : Name;
 
         timer.hasSetNext = false;
 
-        var sw = Stopwatch.StartNew();
+        using var span = timer.Tracer?.NewSpan(timer.TracerName ?? $"timer:ExecuteAsync", timer.Timers + "");
+        var sw = _stopwatchPool.Get();
+        sw.Restart();
         try
         {
             // 弱引用判断
@@ -297,13 +313,16 @@ public class TimerScheduler : ILogFeature
         // 如果用户代码没有拦截错误，则这里拦截，避免出错了都不知道怎么回事
         catch (Exception ex)
         {
-            NewLife.Log.XTrace.WriteException(ex);
+            span?.SetError(ex, null);
+            XTrace.WriteException(ex);
         }
         finally
         {
             sw.Stop();
 
             OnExecuted(timer, (Int32)sw.ElapsedMilliseconds);
+
+            _stopwatchPool.Return(sw);
         }
     }
 
@@ -318,8 +337,10 @@ public class TimerScheduler : ILogFeature
 
         timer.Calling = false;
 
+        //TimerX.Current = null;
+
         // 控制日志显示
-        WriteLogEventArgs.CurrentThreadName = null;
+        //WriteLogEventArgs.CurrentThreadName = null;
 
         // 调度线程可能在等待，需要唤醒
         Wake();

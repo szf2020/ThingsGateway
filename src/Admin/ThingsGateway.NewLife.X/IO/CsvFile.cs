@@ -9,7 +9,7 @@ namespace ThingsGateway.NewLife.IO;
 /// 文档 https://newlifex.com/core/csv_file
 /// 支持整体读写以及增量式读写，目标是读写超大Csv文件
 /// </remarks>
-#if NET5_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+#if NET6_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
 public class CsvFile : IDisposable, IAsyncDisposable
 #else
 public class CsvFile : IDisposable
@@ -80,7 +80,7 @@ public class CsvFile : IDisposable
         }
     }
 
-#if NET5_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+#if NET6_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
     /// <summary>异步销毁</summary>
     /// <returns></returns>
     public virtual async ValueTask DisposeAsync()
@@ -234,7 +234,7 @@ public class CsvFile : IDisposable
             }
             else
             {
-                if (item is not String str) str = item + "";
+                if (item is not String str) str = item + string.Empty;
 
                 // 避免出现科学计数问题 数据前增加制表符"\t"
                 // 不同软件显示不太一样 wps超过9位就自动转为科学计数，有的软件是超过11位，所以采用最小范围9

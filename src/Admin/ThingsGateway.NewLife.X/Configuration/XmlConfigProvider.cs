@@ -45,11 +45,11 @@ public class XmlConfigProvider : FileConfigProvider
         if (reader.NodeType == XmlNodeType.EndElement) reader.ReadEndElement();
     }
 
-    private static void ReadNode(XmlReader reader, IConfigSection section)
+    private void ReadNode(XmlReader reader, IConfigSection section)
     {
         while (true)
         {
-            var remark = "";
+            var remark = string.Empty;
             if (reader.NodeType == XmlNodeType.Comment) remark = reader.Value;
             while (reader.NodeType is XmlNodeType.Comment or XmlNodeType.Whitespace) reader.Skip();
             if (reader.NodeType != XmlNodeType.Element) break;
@@ -126,7 +126,7 @@ public class XmlConfigProvider : FileConfigProvider
         return ms.ToStr();
     }
 
-    private static void WriteNode(XmlWriter writer, String name, IConfigSection section)
+    private void WriteNode(XmlWriter writer, String name, IConfigSection section)
     {
         if (section.Childs == null) return;
 
@@ -169,7 +169,7 @@ public class XmlConfigProvider : FileConfigProvider
         writer.WriteEndElement();
     }
 
-    private static void WriteAttributeNode(XmlWriter writer, String name, IConfigSection section)
+    private void WriteAttributeNode(XmlWriter writer, String name, IConfigSection section)
     {
         writer.WriteStartElement(name);
         //writer.WriteStartAttribute(name);

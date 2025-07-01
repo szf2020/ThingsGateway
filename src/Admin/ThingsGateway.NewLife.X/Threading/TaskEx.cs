@@ -1,4 +1,4 @@
-﻿namespace ThingsGateway.NewLife.Extension;
+﻿namespace System.Threading.Tasks;
 
 #if NET452
 /// <summary>任务扩展</summary>

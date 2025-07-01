@@ -10,4 +10,5 @@
 
 global using System.Buffers;
 
+global using ThingsGateway.NewLife.DictionaryExtensions;
 global using ThingsGateway.NewLife.Extension;

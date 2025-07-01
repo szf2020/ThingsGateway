@@ -3,8 +3,11 @@ using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
+using System.Security.Authentication;
 
 using ThingsGateway.NewLife.Caching;
+using ThingsGateway.NewLife.Collections;
+using ThingsGateway.NewLife.Log;
 using ThingsGateway.NewLife.Net;
 
 namespace ThingsGateway.NewLife;
@@ -13,7 +16,7 @@ namespace ThingsGateway.NewLife;
 public static class NetHelper
 {
     #region 属性
-    private static readonly ICache _Cache = MemoryCache.Instance;
+    private static readonly MemoryCache _Cache = MemoryCache.Instance;
     #endregion
 
     #region 构造
@@ -54,7 +57,7 @@ public static class NetHelper
 #endif
         {
             UInt32 dummy = 0;
-            var inOptionValues = ArrayPool<Byte>.Shared.Rent(Marshal.SizeOf(dummy) * 3);
+            var inOptionValues = Pool.Shared.Rent(Marshal.SizeOf(dummy) * 3);
 
             // 是否启用Keep-Alive
             BitConverter.GetBytes((UInt32)(isKeepAlive ? 1 : 0)).CopyTo(inOptionValues, 0);
@@ -65,7 +68,7 @@ public static class NetHelper
 
             socket.IOControl(IOControlCode.KeepAliveValues, inOptionValues, null);
 
-            ArrayPool<Byte>.Shared.Return(inOptionValues);
+            Pool.Shared.Return(inOptionValues);
 
             return;
         }
@@ -216,7 +219,7 @@ public static class NetHelper
     /// <returns></returns>
     public static Boolean CheckPort(this IPAddress address, NetType protocol, Int32 port)
     {
-        //if (ThingsGateway.NewLife.Runtime.Mono) return false;
+        //if (NewLife.Runtime.Mono) return false;
         if (!Runtime.Windows) return false;
 
         try
@@ -243,7 +246,7 @@ public static class NetHelper
         }
         catch (Exception ex)
         {
-            NewLife.Log.XTrace.WriteException(ex);
+            XTrace.WriteException(ex);
         }
 
         return false;
@@ -291,7 +294,7 @@ public static class NetHelper
         var list = new List<IPAddress>();
         foreach (var item in GetActiveInterfaces())
         {
-#if NET5_0_OR_GREATER
+#if NET6_0_OR_GREATER
             if (item != null && !OperatingSystem.IsMacOS() && item.DhcpServerAddresses.Count > 0)
             {
                 foreach (var elm in item.DhcpServerAddresses)
@@ -372,7 +375,7 @@ public static class NetHelper
             {
                 var gw = 0;
 
-#if NET5_0_OR_GREATER
+#if NET6_0_OR_GREATER
                 if (!OperatingSystem.IsAndroid())
                 {
                     gw = ipp.GatewayAddresses.Count;
@@ -404,7 +407,7 @@ public static class NetHelper
 #endif
                     }
 
-#if NET5_0_OR_GREATER
+#if NET6_0_OR_GREATER
                     try
                     {
                         if (OperatingSystem.IsWindows() &&
@@ -421,9 +424,22 @@ public static class NetHelper
 
         // 带网关的接口地址很重要，优先返回
         // Linux下不支持PrefixOrigin
-        var ips = dic.OrderByDescending(e => e.Value)
-            //.ThenByDescending(e => e.Key.PrefixOrigin == PrefixOrigin.Dhcp || e.Key.PrefixOrigin == PrefixOrigin.Manual)
-            .Select(e => e.Key.Address).ToList();
+        //var ips = dic.OrderByDescending(e => e.Value)
+        //    //.ThenByDescending(e => e.Key.PrefixOrigin == PrefixOrigin.Dhcp || e.Key.PrefixOrigin == PrefixOrigin.Manual)
+        //    .Select(e => e.Key.Address).ToList();
+
+        // 去除重复IP地址
+        var ips = new List<IPAddress>();
+        var hash = new List<String>();
+        foreach (var item in dic.OrderByDescending(e => e.Value))
+        {
+            var address = item.Key.Address + string.Empty;
+            if (!hash.Contains(address))
+            {
+                ips.Add(item.Key.Address);
+                hash.Add(address);
+            }
+        }
 
         return ips;
     }
@@ -463,7 +479,6 @@ public static class NetHelper
     }
 
     private static readonly String[] _Excludes = ["Loopback", "VMware", "VBox", "Virtual", "Teredo", "Tunnel", "VPN", "VNIC", "IEEE", "Filter", "Npcap", "QoS", "Miniport", "Kernel Debug"];
-
     /// <summary>获取所有物理网卡MAC地址。包括未启用网卡，剔除本地和隧道</summary>
     /// <returns></returns>
     public static IEnumerable<Byte[]> GetMacs()
@@ -541,11 +556,11 @@ public static class NetHelper
     private static void Wake(String mac)
     {
         mac = mac.Replace("-", null).Replace(":", null);
-        var buffer = ArrayPool<Byte>.Shared.Rent(mac.Length / 2);
+        var buffer = Pool.Shared.Rent(mac.Length / 2);
         for (var i = 0; i < buffer.Length; i++)
             buffer[i] = Byte.Parse(mac.Substring(i * 2, 2), NumberStyles.HexNumber);
 
-        var bts = ArrayPool<Byte>.Shared.Rent(6 + 16 * buffer.Length);
+        var bts = Pool.Shared.Rent(6 + 16 * buffer.Length);
         for (var i = 0; i < 6; i++)
             bts[i] = 0xFF;
         for (Int32 i = 6, k = 0; i < bts.Length; i++, k++)
@@ -563,8 +578,8 @@ public static class NetHelper
         client.Close();
         //client.SendAsync(bts, bts.Length, new IPEndPoint(IPAddress.Broadcast, 7));
 
-        ArrayPool<Byte>.Shared.Return(bts);
-        ArrayPool<Byte>.Shared.Return(buffer);
+        Pool.Shared.Return(bts);
+        Pool.Shared.Return(buffer);
     }
     #endregion
 
@@ -656,5 +671,61 @@ public static class NetHelper
     }
     #endregion
 
+    #region 创建客户端和会话
+    /// <summary>根据本地网络标识创建客户端</summary>
+    /// <param name="local"></param>
+    /// <returns></returns>
+    public static ISocketClient CreateClient(this NetUri local)
+    {
+        return local == null
+            ? throw new ArgumentNullException(nameof(local))
+            : local.Type switch
+            {
+                NetType.Tcp => new TcpSession { Local = local },
+                NetType.Udp => new UdpServer { Local = local },
+                _ => throw new NotSupportedException($"The {local.Type} protocol is not supported"),
+            };
+    }
 
+    /// <summary>根据远程网络标识创建客户端</summary>
+    /// <param name="remote"></param>
+    /// <returns></returns>
+    public static ISocketClient CreateRemote(this NetUri remote)
+    {
+#pragma warning disable CA5398 // 避免硬编码的 SslProtocols 值
+#pragma warning disable CA5397 // 请勿使用已弃用的 SslProtocols 值
+        return remote == null
+            ? throw new ArgumentNullException(nameof(remote))
+            : remote.Type switch
+            {
+                NetType.Tcp => new TcpSession { Remote = remote },
+                NetType.Udp => new UdpServer { Remote = remote },
+                NetType.Http => new TcpSession { Remote = remote, SslProtocol = remote.Port == 443 ? SslProtocols.Tls12 : SslProtocols.None },
+                NetType.WebSocket => new WebSocketClient { Remote = remote, SslProtocol = remote.Port == 443 ? SslProtocols.Tls12 : SslProtocols.None },
+                _ => throw new NotSupportedException($"The {remote.Type} protocol is not supported"),
+            };
+#pragma warning restore CA5397 // 请勿使用已弃用的 SslProtocols 值
+#pragma warning restore CA5398 // 避免硬编码的 SslProtocols 值
+    }
+
+    /// <summary>根据Uri创建客户端，主要支持Http/WebSocket</summary>
+    /// <param name="uri"></param>
+    /// <returns></returns>
+    /// <exception cref="NotSupportedException"></exception>
+    public static ISocketClient CreateRemote(this Uri uri)
+    {
+#pragma warning disable CA5398 // 避免硬编码的 SslProtocols 值
+        return uri.Scheme switch
+        {
+            "wss" => new WebSocketClient(uri) { SslProtocol = SslProtocols.Tls12 },
+            "ws" => new WebSocketClient(uri),
+            _ => throw new NotSupportedException($"The {uri.Scheme} protocol is not supported"),
+        };
+#pragma warning restore CA5398 // 避免硬编码的 SslProtocols 值
+    }
+
+    internal static Socket CreateTcp(Boolean ipv4 = true) => new(ipv4 ? AddressFamily.InterNetwork : AddressFamily.InterNetworkV6, SocketType.Stream, ProtocolType.Tcp);
+
+    internal static Socket CreateUdp(Boolean ipv4 = true) => new(ipv4 ? AddressFamily.InterNetwork : AddressFamily.InterNetworkV6, SocketType.Dgram, ProtocolType.Udp);
+    #endregion
 }

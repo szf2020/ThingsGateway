@@ -2,7 +2,7 @@
 using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 
-#if WIN
+#if __WIN__
 
 using System.Windows.Forms;
 
@@ -11,8 +11,6 @@ using System.Windows.Forms;
 using ThingsGateway.NewLife.Reflection;
 using ThingsGateway.NewLife.Threading;
 using ThingsGateway.NewLife.Windows;
-
-#nullable enable
 
 namespace ThingsGateway.NewLife.Log;
 
@@ -92,6 +90,13 @@ public static class XTrace
 
         ThreadPoolX.Init();
 
+        try
+        {
+            var set = Setting.Current;
+            Debug = set.Debug;
+            LogPath = set.LogPath;
+        }
+        catch { }
     }
 
     private static void CurrentDomain_UnhandledException(Object sender, UnhandledExceptionEventArgs e)
@@ -99,6 +104,8 @@ public static class XTrace
         if (!UnhandledExceptionLogEnable()) return;
         if (e.ExceptionObject is Exception ex)
         {
+            // 全局异常埋点
+            DefaultTracer.Instance?.NewError(ex.GetType().Name, ex);
             WriteException(ex);
         }
         if (e.IsTerminating)
@@ -112,13 +119,13 @@ public static class XTrace
     private static void TaskScheduler_UnobservedTaskException(Object? sender, UnobservedTaskExceptionEventArgs e)
     {
         if (!UnhandledExceptionLogEnable()) return;
-
         if (!e.Observed && e.Exception != null)
         {
             //WriteException(e.Exception);
             foreach (var ex in e.Exception.Flatten().InnerExceptions)
             {
                 // 全局异常埋点
+                DefaultTracer.Instance?.NewError(ex.GetType().Name, ex);
                 WriteException(ex);
             }
             e.SetObserved();
@@ -166,11 +173,17 @@ public static class XTrace
             _initing = Environment.CurrentManagedThreadId;
 
             var set = Setting.Current;
+            if (LogPath.IsNullOrEmpty() || LogPath == "Log") LogPath = set.LogPath;
             if (set.LogFileFormat.Contains("{1}"))
-                _Log = new LevelLog(set.LogPath, set.LogFileFormat);
+                _Log = new LevelLog(LogPath, set.LogFileFormat);
             else
-                _Log = TextFileLog.Create(set.LogPath);
+                _Log = TextFileLog.Create(LogPath);
 
+            if (!set.NetworkLog.IsNullOrEmpty())
+            {
+                var nlog = new NetworkLog(set.NetworkLog);
+                _Log = new CompositeLog(_Log, nlog);
+            }
 
             _initing = 0;
         }
@@ -260,7 +273,7 @@ public static class XTrace
 
     #region 拦截WinForm异常
 
-#if WIN
+#if __WIN__
     private static Int32 initWF = 0;
     private static Boolean _ShowErrorMessage;
     //private static String _Title;
@@ -297,6 +310,55 @@ public static class XTrace
         if (show) MessageBox.Show(e.Exception == null ? "" : e.Exception.Message, "出错", MessageBoxButtons.OK, MessageBoxIcon.Error);
     }
 
+    /// <summary>在WinForm控件上输出日志，主要考虑非UI线程操作</summary>
+    /// <remarks>不是常用功能，为了避免干扰常用功能，保持UseWinForm开头</remarks>
+    /// <param name="control">要绑定日志输出的WinForm控件</param>
+    /// <param name="useFileLog">是否同时使用文件日志，默认使用</param>
+    /// <param name="maxLines">最大行数</param>
+    public static void UseWinFormControl(this Control control, Boolean useFileLog = true, Int32 maxLines = 1000)
+    {
+        var clg = _Log as TextControlLog;
+        var ftl = _Log as TextFileLog;
+        if (_Log is CompositeLog cmp)
+        {
+            ftl = cmp.Get<TextFileLog>();
+            clg = cmp.Get<TextControlLog>();
+        }
+
+        // 控制控制台日志
+        clg ??= new TextControlLog();
+        clg.Control = control;
+        clg.MaxLines = maxLines;
+
+        if (!useFileLog)
+        {
+            Log = clg;
+            ftl?.Dispose();
+        }
+        else
+        {
+            ftl ??= TextFileLog.Create(String.Empty);
+            Log = new CompositeLog(clg, ftl);
+        }
+    }
+
+    /// <summary>控件绑定到日志，生成混合日志</summary>
+    /// <param name="control"></param>
+    /// <param name="log"></param>
+    /// <param name="maxLines"></param>
+    /// <returns></returns>
+    public static ILog Combine(this Control control, ILog log, Int32 maxLines = 1000)
+    {
+        //if (control == null || log == null) return log;
+
+        var clg = new TextControlLog
+        {
+            Control = control,
+            MaxLines = maxLines
+        };
+
+        return new CompositeLog(log, clg);
+    }
 
 #endif
 
@@ -305,7 +367,10 @@ public static class XTrace
     #region 属性
 
     /// <summary>是否调试。</summary>
-    public static Boolean Debug => Setting.Current.Debug;
+    public static Boolean Debug { get; set; }
+
+    /// <summary>文本日志目录</summary>
+    public static String? LogPath { get; set; }
 
     ///// <summary>临时目录</summary>
     //public static String TempPath { get; set; } = Setting.Current.TempPath;
@@ -337,7 +402,7 @@ public static class XTrace
         var asmx = AssemblyX.Create(asm);
         if (asmx != null)
         {
-            var ver = "";
+            var ver = string.Empty;
             var tar = asm.GetCustomAttribute<TargetFrameworkAttribute>();
             if (tar != null)
             {
@@ -353,5 +418,3 @@ public static class XTrace
 
     #endregion 版本信息
 }
-
-#nullable restore

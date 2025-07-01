@@ -1,5 +1,7 @@
 ﻿using System.Diagnostics;
 
+using ThingsGateway.NewLife.Log;
+
 namespace ThingsGateway.NewLife.Threading;
 
 /// <summary>线程池助手</summary>
@@ -17,7 +19,7 @@ public class ThreadPoolX : DisposeBase
             ThreadPool.SetMinThreads(wt, io);
         }
 
-#if NET7_0_OR_GREATER
+#if NET8_0_OR_GREATER
         // 线程池最大延迟，超过这个延迟后，线程池会增加线程数。@一线码农
         AppContext.SetData("System.Threading.ThreadPool.Blocking.MaxDelayMs", 50);
 #endif
@@ -42,7 +44,7 @@ public class ThreadPoolX : DisposeBase
             }
             catch (Exception ex)
             {
-                NewLife.Log.XTrace.WriteException(ex);
+                XTrace.WriteException(ex);
             }
         }, null);
 
@@ -65,7 +67,7 @@ public class ThreadPoolX : DisposeBase
             }
             catch (Exception ex)
             {
-                NewLife.Log.XTrace.WriteException(ex);
+                XTrace.WriteException(ex);
             }
         }, null);
 

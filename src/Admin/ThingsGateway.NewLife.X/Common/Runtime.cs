@@ -4,6 +4,7 @@ using System.Runtime;
 using System.Runtime.InteropServices;
 
 using ThingsGateway.NewLife.Log;
+using ThingsGateway.NewLife.Threading;
 
 namespace ThingsGateway.NewLife;
 
@@ -65,9 +66,11 @@ public static class Runtime
 
     #region 系统特性
     /// <summary>是否Mono环境</summary>
-    public static Boolean Mono { get; } = Type.GetType("Mono.Runtime") != null;
+    public static Boolean Mono { get; }
+
     /// <summary>是否Unity环境</summary>
     public static Boolean Unity { get; }
+
 #if !NETFRAMEWORK
     private static Boolean? _IsWeb;
     /// <summary>是否Web环境</summary>
@@ -132,13 +135,17 @@ public static class Runtime
     }
 #endif
 
+    /// <summary>获取当前UTC时间。基于全局时间提供者，在星尘应用中会屏蔽服务器时间差</summary>
+    /// <returns></returns>
+    public static DateTimeOffset UtcNow => TimerScheduler.GlobalTimeProvider.GetUtcNow();
+
     private static Int32 _ProcessId;
 #if NET6_0_OR_GREATER
     /// <summary>当前进程Id</summary>
     public static Int32 ProcessId => _ProcessId > 0 ? _ProcessId : _ProcessId = Environment.ProcessId;
 #else
     /// <summary>当前进程Id</summary>
-    public static Int32 ProcessId => _ProcessId > 0 ? _ProcessId : _ProcessId = Process.GetCurrentProcess().Id;
+    public static Int32 ProcessId => _ProcessId > 0 ? _ProcessId : _ProcessId = ProcessHelper.GetProcessId();
 #endif
 
     /// <summary>

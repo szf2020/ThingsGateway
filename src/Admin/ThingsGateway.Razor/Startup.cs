@@ -11,7 +11,6 @@
 using Microsoft.Extensions.DependencyInjection;
 
 using ThingsGateway.NewLife;
-using ThingsGateway.NewLife.Caching;
 
 using Yitter.IdGenerator;
 
@@ -44,10 +43,7 @@ public class Startup : AppStartup
 
         services.AddConfigurableOptions<WebsiteOptions>();
 
-        // 缓存
-        services.AddSingleton<ICache, MemoryCache>();
-
-        MachineInfo.Register();
+        _ = MachineInfo.RegisterAsync();
 
         // 配置雪花Id算法机器码
         YitIdHelper.SetIdGenerator(new IdGeneratorOptions

@@ -26,7 +26,7 @@ public class InIConfigProvider : FileConfigProvider
         var lines = File.ReadAllLines(fileName);
 
         var currentSection = section;
-        var remark = "";
+        var remark = string.Empty;
         foreach (var item in lines)
         {
             var str = item.Trim();

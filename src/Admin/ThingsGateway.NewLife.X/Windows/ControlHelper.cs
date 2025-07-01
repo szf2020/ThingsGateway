@@ -1,16 +1,15 @@
-﻿#if WIN
+﻿#if __WIN__
 using System.Drawing;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
-using System.Windows.Forms;
 
 using ThingsGateway.NewLife;
 using ThingsGateway.NewLife.Log;
 using ThingsGateway.NewLife.Reflection;
 using ThingsGateway.NewLife.Threading;
 
-namespace ThingsGateway.NewLife.Windows;
+namespace System.Windows.Forms;
 
 /// <summary>控件助手</summary>
 public static class ControlHelper
@@ -200,7 +199,7 @@ public static class ControlHelper
         return txt;
     }
 
-    private static void ProcessBackspace(TextBoxBase txt, ref String? m)
+    static void ProcessBackspace(TextBoxBase txt, ref String? m)
     {
         while (!m.IsNullOrEmpty())
         {
@@ -242,7 +241,7 @@ public static class ControlHelper
     /// <summary>处理回车，移到行首</summary>
     /// <param name="txt"></param>
     /// <param name="m"></param>
-    private static void ProcessReturn(TextBoxBase txt, ref String? m)
+    static void ProcessReturn(TextBoxBase txt, ref String? m)
     {
         while (!m.IsNullOrEmpty())
         {
@@ -280,8 +279,44 @@ public static class ControlHelper
         }
     }
 
+    static void ProcessBell(ref String m)
+    {
+        var ch = (Char)7;
+        var p = 0;
+        while (true)
+        {
+            p = m.IndexOf(ch, p);
+            if (p < 0) break;
+
+            if (p > 0)
+            {
+                var str = m[..p];
+                if (p + 1 < m.Length) str += m[(p + 1)..];
+                m = str;
+            }
+
+            //Console.Beep();
+            // 用定时器来控制Beep，避免被堵塞
+            _timer ??= new TimerX(Bell, null, 100, 100);
+            _Beep = true;
+            //SystemSounds.Beep.Play();
+            p++;
+        }
+    }
+
+    static TimerX? _timer;
+    static Boolean _Beep;
+    static void Bell(Object? state)
+    {
+        if (_Beep)
+        {
+            _Beep = false;
+            Console.Beep();
+        }
+    }
+
     [DllImport("user32.dll")]
-    private static extern Int32 SendMessage(IntPtr hwnd, Int32 wMsg, Int32 wParam, Int32 lParam);
+    static extern Int32 SendMessage(IntPtr hwnd, Int32 wMsg, Int32 wParam, Int32 lParam);
     private const Int32 SB_TOP = 6;
     private const Int32 SB_BOTTOM = 7;
     private const Int32 WM_VSCROLL = 0x115;
@@ -313,10 +348,11 @@ public static class ControlHelper
 
     #region 文本控件着色
     //Int32 _pColor = 0;
-    private static readonly Color _Key = Color.FromArgb(255, 170, 0);
-    private static readonly Color _Num = Color.FromArgb(255, 58, 131);
-    private static readonly Color _KeyName = Color.FromArgb(0, 255, 255);
-    private static readonly String[] _Keys = [
+    static readonly Color _Key = Color.FromArgb(255, 170, 0);
+    static readonly Color _Num = Color.FromArgb(255, 58, 131);
+    static readonly Color _KeyName = Color.FromArgb(0, 255, 255);
+
+    static readonly String[] _Keys = [
         "(", ")", "{", "}", "[", "]", "*", "->", "+", "-", "*", "/", "\\", "%", "&", "|", "!", "=", ";", ",", ">", "<",
         "void", "new", "delete", "true", "false"
     ];
@@ -351,7 +387,7 @@ public static class ControlHelper
         return start;
     }
 
-    private static void ChangeColor(RichTextBox rtb, Int32 start, String text, Color color)
+    static void ChangeColor(RichTextBox rtb, Int32 start, String text, Color color)
     {
         var s = start;
         //while ((-1 + text.Length - 1) != (s = text.Length - 1 + rtx.Find(text, s, -1, RichTextBoxFinds.WholeWord)))
@@ -371,9 +407,8 @@ public static class ControlHelper
     }
 
     // 正则匹配，数字开头的词。支持0x开头的十六进制
-    private static readonly Regex _reg = new(@"(?i)\b(0x|[0-9])([0-9a-fA-F\-]*)(.*?)\b", RegexOptions.Compiled);
-
-    private static void ChangeNumColor(RichTextBox rtb, Int32 start)
+    static readonly Regex _reg = new(@"(?i)\b(0x|[0-9])([0-9a-fA-F\-]*)(.*?)\b", RegexOptions.Compiled);
+    static void ChangeNumColor(RichTextBox rtb, Int32 start)
     {
         //var ms = _reg.Matches(rtb.Text, start);
         //foreach (Match item in ms)
@@ -392,10 +427,9 @@ public static class ControlHelper
         rtb.Colour(_reg, start, _Num, _Num, _Key);
     }
 
-    private static readonly Regex _reg2 = new(@"(?i)(\b\w+\b)(\s*::\s*)(\b\w+\b)", RegexOptions.Compiled);
-
+    static readonly Regex _reg2 = new(@"(?i)(\b\w+\b)(\s*::\s*)(\b\w+\b)", RegexOptions.Compiled);
     /// <summary>改变C++类名方法名颜色</summary>
-    private static void ChangeCppColor(RichTextBox rtb, Int32 start)
+    static void ChangeCppColor(RichTextBox rtb, Int32 start)
     {
         var color = Color.FromArgb(30, 154, 224);
         var color3 = Color.FromArgb(85, 228, 57);
@@ -417,9 +451,8 @@ public static class ControlHelper
         rtb.Colour(_reg2, start, color, _Key, color3);
     }
 
-    private static readonly Regex _reg3 = new(@"(?i)(\b\w+\b)(\s*[=:])[^:]\s*", RegexOptions.Compiled);
-
-    private static void ChangeKeyNameColor(RichTextBox rtb, Int32 start)
+    static readonly Regex _reg3 = new(@"(?i)(\b\w+\b)(\s*[=:])[^:]\s*", RegexOptions.Compiled);
+    static void ChangeKeyNameColor(RichTextBox rtb, Int32 start)
     {
         //var ms = _reg3.Matches(rtx.Text, _pColor);
         //foreach (Match item in ms)

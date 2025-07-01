@@ -2,6 +2,8 @@
 using System.Globalization;
 using System.Reflection;
 
+using ThingsGateway.NewLife.Collections;
+
 namespace ThingsGateway.NewLife.Extension;
 
 /// <summary>工具类</summary>
@@ -175,7 +177,7 @@ public static class ConvertUtility
 public class DefaultConvert
 {
     private static readonly DateTime _dt1970 = new(1970, 1, 1);
-    private static readonly DateTimeOffset _dto1970 = new(new DateTime(1970, 1, 1));
+    private static readonly DateTimeOffset _dto1970 = new(new DateTime(1970, 1, 1), TimeSpan.Zero);
     private static readonly Int64 _maxSeconds = (Int64)(DateTime.MaxValue - DateTime.MinValue).TotalSeconds;
     private static readonly Int64 _maxMilliseconds = (Int64)(DateTime.MaxValue - DateTime.MinValue).TotalMilliseconds;
 
@@ -338,7 +340,6 @@ public class DefaultConvert
             }
         }
 
-        //暂时不做处理  先处理异常转换
         try
         {
             // 转换接口
@@ -450,12 +451,12 @@ public class DefaultConvert
                     // 凑够8字节
                     if (buf.Length < 8)
                     {
-                        var bts = ArrayPool<Byte>.Shared.Rent(8);
+                        var bts = Pool.Shared.Rent(8);
                         Buffer.BlockCopy(buf, 0, bts, 0, buf.Length);
 
                         var dec = BitConverter.ToDouble(bts, 0).ToDecimal();
 
-                        ArrayPool<Byte>.Shared.Return(bts);
+                        Pool.Shared.Return(bts);
 
                         return dec;
                     }
@@ -500,16 +501,35 @@ public class DefaultConvert
         }
 
         // 特殊处理字符串，也是最常见的
-        var str = value.ToString().Trim();
-        if (str.IsNullOrEmpty()) return defaultValue;
+        if (value is String str)
+        {
+            str = str.Trim();
+            if (str.IsNullOrEmpty()) return defaultValue;
 
-        if (Boolean.TryParse(str, out var b)) return b;
+            if (Boolean.TryParse(str, out var b)) return b;
 
-        if (String.Equals(str, Boolean.TrueString, StringComparison.OrdinalIgnoreCase)) return true;
-        if (String.Equals(str, Boolean.FalseString, StringComparison.OrdinalIgnoreCase)) return false;
+            if (String.Equals(str, Boolean.TrueString, StringComparison.OrdinalIgnoreCase)) return true;
+            if (String.Equals(str, Boolean.FalseString, StringComparison.OrdinalIgnoreCase)) return false;
 
-        if (Int32.TryParse(str, out var n)) return n != 0;
+            return Int32.TryParse(str, out var n) ? n != 0 : defaultValue;
+        }
+        else
+        {
+            var str2 = value.ToString()?.Trim();
+            if (!str2.IsNullOrEmpty() && Boolean.TryParse(str2, out var n2))
+            {
+                return n2;
+            }
 
+            if (String.Equals(str2, Boolean.TrueString, StringComparison.OrdinalIgnoreCase)) return true;
+            if (String.Equals(str2, Boolean.FalseString, StringComparison.OrdinalIgnoreCase)) return false;
+
+            if (!str2.IsNullOrEmpty() && Int32.TryParse(str2, out var n3))
+            {
+                return n3 != 0;
+            }
+
+        }
         try
         {
             // 转换接口
@@ -519,9 +539,7 @@ public class DefaultConvert
         }
         catch { }
 
-        // 转字符串再转整数，作为兜底方案
-        var str2 = value.ToString();
-        return !str2.IsNullOrEmpty() && Boolean.TryParse(str2.Trim(), out var n2) ? n2 : defaultValue;
+        return defaultValue;
     }
 
     /// <summary>转为时间日期，转换失败时返回最小时间。支持字符串、整数（Unix秒）</summary>
@@ -672,12 +690,14 @@ public class DefaultConvert
             // 去掉逗号分隔符
             var ch = input[i];
             if (ch == ',' || ch == '_' || ch == ' ') continue;
+
             // 支持前缀正号。Redis响应中就会返回带正号的整数
             if (ch == '+')
             {
                 if (idx == 0) continue;
                 return 0;
             }
+
             // 支持负数
             if (ch == '-' && idx > 0) return 0;
 
@@ -696,7 +716,7 @@ public class DefaultConvert
         return idx;
     }
 
-    /// <summary>去掉时间日期指定位置后面部分，可指定毫秒ms、秒s、分m、小时h</summary>
+    /// <summary>去掉时间日期指定位置后面部分，可指定毫秒ms、秒s、分m、小时h、纳秒ns</summary>
     /// <param name="value">时间日期</param>
     /// <param name="format">格式字符串，默认s格式化到秒，ms格式化到毫秒</param>
     /// <returns></returns>
@@ -706,6 +726,7 @@ public class DefaultConvert
         {
 #if NET8_0_OR_GREATER
             "us" => new DateTime(value.Year, value.Month, value.Day, value.Hour, value.Minute, value.Second, value.Millisecond, value.Microsecond, value.Kind),
+            "ns" => new DateTime(value.Year, value.Month, value.Day, value.Hour, value.Minute, value.Second, value.Millisecond, value.Microsecond / 100 * 100, value.Kind),
 #endif
             "ms" => new DateTime(value.Year, value.Month, value.Day, value.Hour, value.Minute, value.Second, value.Millisecond, value.Kind),
             "s" => new DateTime(value.Year, value.Month, value.Day, value.Hour, value.Minute, value.Second, value.Kind),
@@ -907,9 +928,10 @@ public class DefaultConvert
     /// <returns></returns>
     public virtual String GetMessage(Exception ex)
     {
+        // 部分异常ToString可能报错，例如System.Data.SqlClient.SqlException
         try
         {
-            var msg = ex + "";
+            var msg = ex + string.Empty;
             if (msg.IsNullOrEmpty()) return ex.Message;
 
             var ss = msg.Split(Environment.NewLine);

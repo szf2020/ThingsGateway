@@ -1,0 +1,22 @@
+{
+  "Cache": {
+    "CacheType": "Memory", // 可选：Memory 或 Redis
+
+    "MemoryCacheOptions": {
+      "Expire": 3600,
+      "Capacity": 100000,
+      "Period": 60
+    },
+
+    "RedisCacheOptions": {
+      "InstanceName": "ThingsGateway",
+      "Configuration": "server=127.0.0.1:6379;password=123456;db=3;timeout=3000",
+      "Server": "127.0.0.1:6379",
+      "Db": 3,
+      "UserName": "",
+      "Password": "123456",
+      "Timeout": 3000,
+      "Prefix": "ThingsGateway:"
+    }
+  }
+}

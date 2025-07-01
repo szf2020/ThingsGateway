@@ -21,7 +21,7 @@ namespace ThingsGateway.Admin.Application
             Settings = new UserAgentSettings();
         }
 
-        private MemoryCache MemoryCache { get; set; } = new();
+        private ICache MemoryCache => App.CacheService;
 
         /// <summary>
         /// Parses the specified user agent string.

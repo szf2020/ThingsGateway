@@ -4,7 +4,7 @@ namespace ThingsGateway.NewLife.Serialization;
 
 /// <summary>定长字符串序列化特性</summary>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field)]
-public sealed class FixedStringAttribute : AccessorAttribute
+public class FixedStringAttribute : AccessorAttribute
 {
     /// <summary>长度</summary>
     public Int32 Length { get; set; }

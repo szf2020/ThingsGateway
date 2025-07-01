@@ -3,7 +3,8 @@ using System.ComponentModel;
 using System.Runtime.Serialization;
 using System.Xml.Serialization;
 
-#nullable enable
+using ThingsGateway.NewLife.Log;
+
 namespace ThingsGateway.NewLife;
 
 /// <summary>具有是否已释放和释放后事件的接口</summary>
@@ -94,7 +95,7 @@ public abstract class DisposeBase : IDisposable2
         }
         catch (Exception ex)
         {
-            NewLife.Log.XTrace.WriteException(ex);
+            XTrace.WriteException(ex);
         }
     }
     #endregion
@@ -151,4 +152,3 @@ public static class DisposeHelper
         return obj;
     }
 }
-#nullable restore

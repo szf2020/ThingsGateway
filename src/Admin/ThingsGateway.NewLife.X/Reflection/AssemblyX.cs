@@ -46,7 +46,7 @@ public class AssemblyX
 
             _FileVersion ??= Asm.GetCustomAttributeValue<AssemblyFileVersionAttribute, String>();
 
-            _FileVersion ??= "";
+            _FileVersion ??= string.Empty;
 
             return _FileVersion;
         }
@@ -130,14 +130,14 @@ public class AssemblyX
                 file = Path.GetDirectoryName(file).CombinePath(name + ".dll");
                 if (File.Exists(file)) return Assembly.LoadFrom(file);
             }
-            //取消 Diego
-            //// 辅助解析程序集。程序集加载过程中，被依赖程序集未能解析时，是否协助解析，默认false
-            //if (Setting.Current.AssemblyResolve && !args.Name.IsNullOrEmpty())
-            //    return OnResolve(args.Name);
+
+            // 辅助解析程序集。程序集加载过程中，被依赖程序集未能解析时，是否协助解析，默认false
+            if (Setting.Current.AssemblyResolve && !args.Name.IsNullOrEmpty())
+                return OnResolve(args.Name);
         }
         catch (Exception ex)
         {
-            NewLife.Log.XTrace.WriteException(ex);
+            XTrace.WriteException(ex);
         }
 
         return null;
@@ -256,38 +256,7 @@ public class AssemblyX
         // 如果没有包含圆点，说明其不是FullName
         if (!typeName.Contains('.'))
         {
-            //try
-            //{
-            //    var types = Asm.GetTypes();
-            //    if (types != null && types.Length > 0)
-            //    {
-            //        foreach (var item in types)
-            //        {
-            //            if (item.Name == typeName) return item;
-            //        }
-            //    }
-            //}
-            //catch (ReflectionTypeLoadException ex)
-            //{
-            //    if (XTrace.Debug)
-            //    {
-            //        //NewLife.Log.XTrace.WriteException(ex);
-            //        XTrace.WriteLine("加载[{0}]{1}的类型时发生个{2}错误！", this, Location, ex.LoaderExceptions.Length);
 
-            //        foreach (var item in ex.LoaderExceptions)
-            //        {
-            //            XTrace.WriteException(item);
-            //        }
-            //    }
-
-            //    return null;
-            //}
-            //catch (Exception ex)
-            //{
-            //    if (XTrace.Debug) NewLife.Log.XTrace.WriteException(ex);
-
-            //    return null;
-            //}
 
             // 遍历所有类型，包括内嵌类型
             foreach (var item in Types)
@@ -321,11 +290,11 @@ public class AssemblyX
         {
             // 即使抛出加载异常，也有一部分类型可以用
             types = ex.Types;
-            NewLife.Log.XTrace.WriteException(ex);
+            XTrace.WriteException(ex);
         }
         catch (Exception ex)
         {
-            NewLife.Log.XTrace.WriteException(ex);
+            XTrace.WriteException(ex);
         }
 
         if (types != null)
@@ -512,7 +481,7 @@ public class AssemblyX
                 }
                 catch (Exception ex)
                 {
-                    if (XTrace.Debug) NewLife.Log.XTrace.WriteException(ex);
+                    if (XTrace.Debug) XTrace.WriteException(ex);
                 }
 
                 return type;
@@ -556,17 +525,15 @@ public class AssemblyX
                 var basedir = AppDomain.CurrentDomain.BaseDirectory;
                 if (!basedir.IsNullOrEmpty()) set.Add(basedir);
 
-                //取消 Diego
+                var cfg = Setting.Current;
+                if (!cfg.PluginPath.IsNullOrEmpty())
+                {
+                    var plugin = cfg.PluginPath.GetFullPath();
+                    set.Add(plugin);
 
-                //var cfg = Setting.Current;
-                //if (!cfg.PluginPath.IsNullOrEmpty())
-                //{
-                //    var plugin = cfg.PluginPath.GetFullPath();
-                //    if (!set.Contains(plugin)) set.Add(plugin);
-
-                //    plugin = cfg.PluginPath.GetBasePath();
-                //    if (!set.Contains(plugin)) set.Add(plugin);
-                //}
+                    plugin = cfg.PluginPath.GetBasePath();
+                    set.Add(plugin);
+                }
 
                 _AssemblyPaths = set;
             }
@@ -678,8 +645,7 @@ public class AssemblyX
             {
                 //if (asmx.FileVersion.IsNullOrEmpty()) continue;
 
-                var file = "";
-
+                var file = string.Empty;
 #if NETFRAMEWORK
                 file = asmx.Asm.CodeBase;
 #endif
@@ -741,7 +707,7 @@ public class AssemblyX
                     }
                     catch (Exception ex)
                     {
-                        NewLife.Log.XTrace.WriteException(ex);
+                        XTrace.WriteException(ex);
                     }
                 }
             }

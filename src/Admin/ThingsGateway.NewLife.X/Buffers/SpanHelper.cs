@@ -38,7 +38,7 @@ public static class SpanHelper
     {
         if (bytes.IsEmpty) return String.Empty;
 
-#if NET45
+#if NET452
         return encoding.GetString(bytes.ToArray());
 #else
         fixed (Byte* bytes2 = &MemoryMarshal.GetReference(bytes))

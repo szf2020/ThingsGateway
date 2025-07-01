@@ -1,5 +1,4 @@
-﻿
-using ThingsGateway.NewLife.Log;
+﻿using ThingsGateway.NewLife.Log;
 using ThingsGateway.NewLife.Threading;
 
 namespace ThingsGateway.NewLife.Configuration;
@@ -13,7 +12,7 @@ public abstract class FileConfigProvider : ConfigProvider
     #region 属性
     /// <summary>文件名。最高优先级，优先于模型特性指定的文件名</summary>
     public String? FileName { get; set; }
-
+    public static String DataPath { get; set; } = "Configuration";
     /// <summary>更新周期。默认5秒</summary>
     public Int32 Period { get; set; } = 5;
     #endregion
@@ -34,6 +33,8 @@ public abstract class FileConfigProvider : ConfigProvider
     #endregion
 
     #region 方法
+
+
     /// <summary>初始化</summary>
     /// <param name="value"></param>
     public override void Init(String value)
@@ -45,7 +46,7 @@ public abstract class FileConfigProvider : ConfigProvider
         {
             // 加上配置目录
             var str = value;
-            if (!str.StartsWithIgnoreCase("Config/", "Config\\")) str = "Config".CombinePath(str);
+            if (!str.StartsWithIgnoreCase($"{DataPath}/", $"{DataPath}\\")) str = $"{DataPath}".CombinePath(str);
 
             FileName = str;
         }
@@ -126,8 +127,8 @@ public abstract class FileConfigProvider : ConfigProvider
     protected virtual void OnWrite(String fileName, IConfigSection section)
     {
         var str = GetString(section);
-        var old = "";
-        if (File.Exists(fileName)) old = File.ReadAllText(fileName)?.Trim() ?? "";
+        var old = string.Empty;
+        if (File.Exists(fileName)) old = File.ReadAllText(fileName)?.Trim() ?? string.Empty;
 
         if (str != null && str != old)
         {
@@ -206,7 +207,7 @@ public abstract class FileConfigProvider : ConfigProvider
         }
         catch (Exception ex)
         {
-            NewLife.Log.XTrace.WriteException(ex);
+            XTrace.WriteException(ex);
         }
         finally
         {

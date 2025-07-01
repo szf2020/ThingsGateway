@@ -28,7 +28,6 @@ public class LocalTimeConverter : JsonConverter<DateTime>
         if (reader.TokenType == JsonTokenType.Number && reader.TryGetInt64(out var unixTime))
             return unixTime.ToDateTime().ToLocalTime();
 
-
         var str = reader.GetString();
         if (DateTimeOffset.TryParse(str, out var dto)) return dto.LocalDateTime;
 

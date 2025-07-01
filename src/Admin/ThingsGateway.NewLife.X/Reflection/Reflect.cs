@@ -97,14 +97,14 @@ public static class Reflect
     }
 
     /// <summary>获取用于序列化的字段</summary>
-    /// <remarks>过滤<seealso cref="System. NonSerializedAttribute"/>特性的字段</remarks>
+    /// <remarks>过滤<seealso cref="System.NonSerializedAttribute"/>特性的字段</remarks>
     /// <param name="type"></param>
     /// <param name="baseFirst"></param>
     /// <returns></returns>
     public static IList<FieldInfo> GetFields(this Type type, Boolean baseFirst) => Provider.GetFields(type, baseFirst);
 
     /// <summary>获取用于序列化的属性</summary>
-    /// <remarks>过滤<seealso cref="System.Xml.Serialization. XmlIgnoreAttribute"/>特性的属性和索引器</remarks>
+    /// <remarks>过滤<seealso cref="System.Xml.Serialization.XmlIgnoreAttribute"/>特性的属性和索引器</remarks>
     /// <param name="type"></param>
     /// <param name="baseFirst"></param>
     /// <returns></returns>
@@ -415,7 +415,7 @@ public static class Reflect
     /// <summary>获取类型代码，支持可空类型</summary>
     /// <param name="type"></param>
     /// <returns></returns>
-    public static TypeCode GetTypeCode(this Type type) => Type.GetTypeCode(Nullable.GetUnderlyingType(type) ?? type);
+    public static TypeCode GetTypeCode(this Type type) => type == null ? TypeCode.Empty : Type.GetTypeCode(Nullable.GetUnderlyingType(type) ?? type);
 
     /// <summary>是否基础类型。识别常见基元类型和String，支持可空类型</summary>
     /// <remarks>
@@ -528,7 +528,7 @@ public static class Reflect
     /// <summary>获取类型，如果target是Type类型，则表示要反射的是静态成员</summary>
     /// <param name="target">目标对象</param>
     /// <returns></returns>
-    private static Type GetType(Object target)
+    static Type GetType(Object target)
     {
         if (target == null) throw new ArgumentNullException(nameof(target));
 

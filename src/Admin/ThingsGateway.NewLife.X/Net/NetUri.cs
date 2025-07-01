@@ -130,7 +130,7 @@ public class NetUri
     #endregion
 
     #region 方法
-    private const String Sep = "://";
+    const String Sep = "://";
 
     /// <summary>分析</summary>
     /// <param name="uri"></param>
@@ -139,13 +139,13 @@ public class NetUri
         if (uri.IsNullOrWhiteSpace()) return this;
 
         // 分析协议
-        var protocol = "";
+        var protocol = string.Empty;
         var array = uri.Split(Sep);
         if (array.Length >= 2)
         {
-            protocol = array[0]?.Trim() + "";
+            protocol = array[0]?.Trim() + string.Empty;
             Type = ParseType(protocol);
-            uri = array[1]?.Trim() + "";
+            uri = array[1]?.Trim() + string.Empty;
         }
 
         if (uri.IsNullOrWhiteSpace()) return this;
@@ -170,7 +170,7 @@ public class NetUri
         var p = uri.IndexOf('/');
         if (p < 0) p = uri.IndexOf('\\');
         if (p < 0) p = uri.IndexOf('?');
-        if (p >= 0) uri = uri[..p]?.Trim() + "";
+        if (p >= 0) uri = uri[..p]?.Trim() + string.Empty;
 
         // 分析端口，冒号前一个不能是冒号
         p = uri.LastIndexOf(':');
@@ -180,7 +180,7 @@ public class NetUri
             if (Int32.TryParse(pt, out var port))
             {
                 Port = port;
-                uri = uri[..p]?.Trim() + "";
+                uri = uri[..p]?.Trim() + string.Empty;
             }
         }
 
@@ -213,7 +213,6 @@ public class NetUri
     /// <summary>获取该域名下所有IP节点（含端口）</summary>
     /// <returns></returns>
     public IPEndPoint[] GetEndPoints() => GetAddresses().Select(e => new IPEndPoint(e, Port)).ToArray();
-
 
     /// <summary>克隆</summary>
     /// <returns></returns>
@@ -252,7 +251,7 @@ public class NetUri
         switch (Type)
         {
             case NetType.Unknown:
-                protocol = "";
+                protocol = string.Empty;
                 break;
             case NetType.WebSocket:
                 protocol = Port == 443 ? "wss" : "ws";
@@ -264,7 +263,7 @@ public class NetUri
             if (Address.AddressFamily == AddressFamily.InterNetworkV6 && Port > 0)
                 host = $"[{Address}]";
             else
-                host = Address + "";
+                host = Address + string.Empty;
         }
 
         if (Port > 0)

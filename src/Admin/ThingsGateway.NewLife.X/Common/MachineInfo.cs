@@ -1,6 +1,4 @@
-﻿using Newtonsoft.Json.Linq;
-
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Net.NetworkInformation;
 using System.Reflection;
@@ -9,9 +7,11 @@ using System.Runtime.Versioning;
 using System.Security;
 
 using ThingsGateway.NewLife.Collections;
-using ThingsGateway.NewLife.Json.Extension;
+using ThingsGateway.NewLife.Data;
 using ThingsGateway.NewLife.Log;
+using ThingsGateway.NewLife.Model;
 using ThingsGateway.NewLife.Reflection;
+using ThingsGateway.NewLife.Serialization;
 using ThingsGateway.NewLife.Windows;
 
 #if NETFRAMEWORK
@@ -42,7 +42,7 @@ public interface IMachineInfo
 /// 
 /// 刷新信息成本较高，建议采用单例模式
 /// </remarks>
-public class MachineInfo
+public class MachineInfo : IExtend
 {
     #region 属性
     /// <summary>系统名称</summary>
@@ -116,6 +116,13 @@ public class MachineInfo
     [DisplayName("电池剩余")]
     public Double Battery { get; set; }
 
+    private readonly Dictionary<String, Object?> _items = [];
+    IDictionary<String, Object?> IExtend.Items => _items;
+
+    /// <summary>获取 或 设置 扩展属性数据</summary>
+    /// <param name="key"></param>
+    /// <returns></returns>
+    public Object? this[String key] { get => _items.TryGetValue(key, out var obj) ? obj : null; set => _items[key] = value; }
     #endregion
 
     #region 全局静态
@@ -127,28 +134,44 @@ public class MachineInfo
 
     //static MachineInfo() => RegisterAsync().Wait(100);
 
+    private static Task<MachineInfo>? _task;
     /// <summary>异步注册一个初始化后的机器信息实例</summary>
     /// <returns></returns>
-    public static MachineInfo Register()
+    public static Task<MachineInfo> RegisterAsync()
     {
-        if (Current != null) return Current;
+        if (_task != null) return _task;
+
+        return _task = Task.Factory.StartNew(() =>
+        {
+            return Register();
+        });
+    }
+
+    private static MachineInfo Register()
+    {
+        var set = Setting.Current;
+        var dataPath = set.DataPath;
+        if (dataPath.IsNullOrEmpty()) dataPath = "Data";
+
         // 文件缓存，加快机器信息获取。在Linux下，可能StarAgent以root权限写入缓存文件，其它应用以普通用户访问
         var file = Path.GetTempPath().CombinePath("machine_info.json");
-        var json = "";
+        var file2 = dataPath.CombinePath("machine_info.json").GetBasePath();
+        var json = string.Empty;
         if (Current == null)
         {
             var f = file;
+            if (!File.Exists(f)) f = file2;
             if (File.Exists(f))
             {
                 try
                 {
                     //XTrace.WriteLine("Load MachineInfo {0}", f);
                     json = File.ReadAllText(f);
-                    Current = json.FromJsonNetString<MachineInfo>();
+                    Current = json.ToJsonEntity<MachineInfo>();
                 }
                 catch (Exception ex)
                 {
-                    if (XTrace.Log.Level <= LogLevel.Debug) NewLife.Log.XTrace.WriteException(ex);
+                    if (XTrace.Log.Level <= LogLevel.Debug) XTrace.WriteException(ex);
                 }
             }
         }
@@ -158,27 +181,33 @@ public class MachineInfo
         mi.Init();
         Current = mi;
 
+        // 注册到对象容器
+        ObjectContainer.Current.AddSingleton(mi);
+
         try
         {
-            var json2 = mi.ToJsonNetString();
+            var json2 = mi.ToJson(true);
             if (json != json2)
             {
+                File.WriteAllText(file2.EnsureDirectory(true), json2);
                 File.WriteAllText(file.EnsureDirectory(true), json2);
             }
         }
         catch (Exception ex)
         {
-            if (XTrace.Log.Level <= LogLevel.Debug) NewLife.Log.XTrace.WriteException(ex);
+            if (XTrace.Log.Level <= LogLevel.Debug) XTrace.WriteException(ex);
         }
 
         return mi;
-
     }
 
     /// <summary>获取当前信息，如果未设置则等待异步注册结果</summary>
     /// <returns></returns>
     public static MachineInfo GetCurrent() => Current ?? Register();
 
+    /// <summary>从对象容器中获取一个已注册机器信息实例</summary>
+    /// <returns></returns>
+    public static MachineInfo? Resolve() => ObjectContainer.Current.Resolve<MachineInfo>();
     #endregion
 
     #region 方法
@@ -186,9 +215,9 @@ public class MachineInfo
     public void Init()
     {
         var osv = Environment.OSVersion;
-        if (OSVersion.IsNullOrEmpty()) OSVersion = osv.Version + "";
+        if (OSVersion.IsNullOrEmpty()) OSVersion = osv.Version + string.Empty;
         if (OSName.IsNullOrEmpty()) OSName = (osv + "").TrimStart("Microsoft").TrimEnd(OSVersion).Trim();
-        if (Guid.IsNullOrEmpty()) Guid = "";
+        if (Guid.IsNullOrEmpty()) Guid = string.Empty;
 
         try
         {
@@ -210,7 +239,7 @@ public class MachineInfo
         }
         catch (Exception ex)
         {
-            if (XTrace.Log.Level <= LogLevel.Debug) NewLife.Log.XTrace.WriteException(ex);
+            if (XTrace.Log.Level <= LogLevel.Debug) XTrace.WriteException(ex);
         }
 
         // 裁剪不可见字符，顺带去掉两头空白
@@ -234,7 +263,7 @@ public class MachineInfo
         }
         catch (Exception ex)
         {
-            if (XTrace.Log.Level <= LogLevel.Debug) NewLife.Log.XTrace.WriteException(ex);
+            if (XTrace.Log.Level <= LogLevel.Debug) XTrace.WriteException(ex);
         }
     }
 
@@ -243,43 +272,43 @@ public class MachineInfo
 #endif
     private void LoadWindowsInfo()
     {
-        var str = "";
+        var str = string.Empty;
 
         // 从注册表读取 MachineGuid
 #if NETFRAMEWORK || NET6_0_OR_GREATER
-        using var Cryptography = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Cryptography");
-        if (Cryptography != null) str = Cryptography.GetValue("MachineGuid") + "";
+        var reg = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Cryptography");
+        if (reg != null) str = reg.GetValue("MachineGuid") + string.Empty;
         if (str.IsNullOrEmpty())
         {
-            using var Registry64 = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64);
-            using var Registry64Cryptography = Registry64?.OpenSubKey(@"SOFTWARE\Microsoft\Cryptography");
-            if (Registry64Cryptography != null) str = Registry64Cryptography.GetValue("MachineGuid") + "";
+            reg = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64);
+            reg = reg?.OpenSubKey(@"SOFTWARE\Microsoft\Cryptography");
+            if (reg != null) str = reg.GetValue("MachineGuid") + string.Empty;
         }
 
         if (!str.IsNullOrEmpty()) Guid = str;
 
-        using var HardwareConfig = Registry.LocalMachine.OpenSubKey(@"SYSTEM\HardwareConfig");
-        if (HardwareConfig != null)
+        reg = Registry.LocalMachine.OpenSubKey(@"SYSTEM\HardwareConfig");
+        if (reg != null)
         {
-            str = (HardwareConfig.GetValue("LastConfig") + "")?.Trim('{', '}').ToUpper();
+            str = (reg.GetValue("LastConfig") + "")?.Trim('{', '}').ToUpper();
 
             // UUID取不到时返回 FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF
             if (!str.IsNullOrEmpty() && !str.EqualIgnoreCase("FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF")) UUID = str;
         }
 
-        using var BIOS = Registry.LocalMachine.OpenSubKey(@"HARDWARE\DESCRIPTION\System\BIOS") ?? Registry.LocalMachine.OpenSubKey(@"SYSTEM\HardwareConfig\Current");
-
-        if (BIOS != null)
+        reg = Registry.LocalMachine.OpenSubKey(@"HARDWARE\DESCRIPTION\System\BIOS");
+        reg ??= Registry.LocalMachine.OpenSubKey(@"SYSTEM\HardwareConfig\Current");
+        if (reg != null)
         {
-            Product = (BIOS.GetValue("SystemProductName") + "").Replace("System Product Name", null);
-            if (Product.IsNullOrEmpty()) Product = BIOS.GetValue("BaseBoardProduct") + "";
+            Product = (reg.GetValue("SystemProductName") + "").Replace("System Product Name", null);
+            if (Product.IsNullOrEmpty()) Product = reg.GetValue("BaseBoardProduct") + string.Empty;
 
-            Vendor = BIOS.GetValue("SystemManufacturer") + "";
-            if (Vendor.IsNullOrEmpty()) Vendor = BIOS.GetValue("ASUSTeK COMPUTER INC.") + "";
+            Vendor = reg.GetValue("SystemManufacturer") + string.Empty;
+            if (Vendor.IsNullOrEmpty()) Vendor = reg.GetValue("ASUSTeK COMPUTER INC.") + string.Empty;
         }
 
-        using var CentralProcessor = Registry.LocalMachine.OpenSubKey(@"HARDWARE\DESCRIPTION\System\CentralProcessor\0");
-        if (CentralProcessor != null) Processor = CentralProcessor.GetValue("ProcessorNameString") + "";
+        reg = Registry.LocalMachine.OpenSubKey(@"HARDWARE\DESCRIPTION\System\CentralProcessor\0");
+        if (reg != null) Processor = reg.GetValue("ProcessorNameString") + string.Empty;
 
         // 旧版系统（如win2008）没有UUID的注册表项，需要用wmic查询。也可能因为过去的某个BUG，导致GUID跟UUID相等
         if (UUID.IsNullOrEmpty() || UUID == Guid || Vendor.IsNullOrEmpty())
@@ -329,13 +358,13 @@ public class MachineInfo
                 var reg2 = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion");
                 if (reg2 != null)
                 {
-                    OSName = reg2.GetValue("ProductName") + "";
-                    OSVersion = reg2.GetValue("ReleaseId") + "";
+                    OSName = reg2.GetValue("ProductName") + string.Empty;
+                    OSVersion = reg2.GetValue("ReleaseId") + string.Empty;
                 }
             }
             catch (Exception ex)
             {
-                if (XTrace.Log.Level <= LogLevel.Debug) NewLife.Log.XTrace.WriteException(ex);
+                if (XTrace.Log.Level <= LogLevel.Debug) XTrace.WriteException(ex);
             }
         }
         //#elif NET6_0_OR_GREATER
@@ -446,7 +475,7 @@ public class MachineInfo
         //    Guid = str;
 
         // DMI信息位于 /sys/class/dmi/id/ 目录，可以直接读取，不需要执行dmidecode命令
-        var uuid = "";
+        var uuid = string.Empty;
         var file = "/sys/class/dmi/id/product_uuid";
         if (!File.Exists(file)) file = "/etc/uuid";
         if (!File.Exists(file)) file = "/proc/serial_num";  // miui12支持/proc/serial_num
@@ -906,7 +935,7 @@ public class MachineInfo
         var str = "powershell.exe".Execute(args, 3_000) ?? String.Empty;
         if (!String.IsNullOrWhiteSpace(str))
         {
-            foreach (var item in JObject.Parse(str)!)
+            foreach (var item in str.DecodeJson()!)
             {
                 dic[item.Key] = item.Value?.ToString() ?? String.Empty;
             }
@@ -971,7 +1000,7 @@ public class MachineInfo
                 {
                     try
                     {
-                        dic[item.Name] = item.GetValue(null) + "";
+                        dic[item.Name] = item.GetValue(null) + string.Empty;
                     }
                     catch { }
                 }
@@ -985,7 +1014,7 @@ public class MachineInfo
                 {
                     try
                     {
-                        dic[item.Name] = item.GetValue(null) + "";
+                        dic[item.Name] = item.GetValue(null) + string.Empty;
                     }
                     catch { }
                 }
@@ -1137,7 +1166,7 @@ public class MachineInfo
         public Int64 ToLong() => (Int64)(((UInt64)High << 32) | Low);
     }
 
-    private sealed class SystemTime
+    private class SystemTime
     {
         public Int64 IdleTime;
         public Int64 TotalTime;

@@ -4,7 +4,7 @@ namespace ThingsGateway.NewLife.Serialization;
 
 /// <summary>完全字符串序列化特性。指示数据流剩下部分全部作为字符串读写</summary>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field)]
-public sealed class FullStringAttribute : AccessorAttribute
+public class FullStringAttribute : AccessorAttribute
 {
     /// <summary>从数据流中读取消息</summary>
     /// <param name="formatter">序列化</param>

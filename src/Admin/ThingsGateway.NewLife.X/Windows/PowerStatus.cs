@@ -90,9 +90,9 @@ public class PowerStatus
     private void UpdateSystemPowerStatus() => GetSystemPowerStatus(ref systemPowerStatus);
 
     [DllImport("kernel32.dll", CharSet = CharSet.Auto, ExactSpelling = true)]
-    private static extern Boolean GetSystemPowerStatus([In][Out] ref SYSTEM_POWER_STATUS systemPowerStatus);
+    static extern Boolean GetSystemPowerStatus([In][Out] ref SYSTEM_POWER_STATUS systemPowerStatus);
 
-    private struct SYSTEM_POWER_STATUS
+    struct SYSTEM_POWER_STATUS
     {
         public Byte ACLineStatus;
 

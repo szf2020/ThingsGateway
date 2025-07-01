@@ -11,7 +11,7 @@
 using Newtonsoft.Json.Linq;
 
 using ThingsGateway.Gateway.Application.Extensions;
-using ThingsGateway.NewLife.Extension;
+using ThingsGateway.NewLife.DictionaryExtensions;
 using ThingsGateway.NewLife.Json.Extension;
 
 namespace ThingsGateway.Gateway.Application;

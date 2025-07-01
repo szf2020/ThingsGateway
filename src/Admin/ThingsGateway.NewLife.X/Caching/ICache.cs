@@ -202,7 +202,6 @@ public interface ICache
     IDisposable? AcquireLock(String key, Int32 msTimeout, Int32 msExpire, Boolean throwOnFailure);
     #endregion
 
-#if NET6_0_OR_GREATER
     #region 集合
     /// <inheritdoc/>
     public void HashAdd<T>(string key, string hashKey, T value);
@@ -226,9 +225,8 @@ public interface ICache
     /// 按前缀删除
     /// </summary>
     /// <param name="v"></param>
-    void DelByPattern(string v);
+    long DelByPattern(string v);
 
     #endregion
 
-#endif
 }

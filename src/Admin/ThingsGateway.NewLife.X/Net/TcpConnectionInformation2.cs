@@ -22,6 +22,7 @@ public class TcpConnectionInformation2 : TcpConnectionInformation
 
     /// <summary>inode标识</summary>
     public String? Node { get; set; }
+    private static readonly char[] separator = new Char[] { ' ' };
 
     /// <summary>实例化Tcp连接信息</summary>
     /// <param name="local"></param>
@@ -100,6 +101,7 @@ public class TcpConnectionInformation2 : TcpConnectionInformation
         TCP_TABLE_CLASS tblClass,
         Int32 reserved);
 
+
     /// <summary>获取所有Tcp连接</summary>
     /// <returns></returns>
     public static TcpConnectionInformation2[] GetWindowsTcpConnections()
@@ -136,8 +138,10 @@ public class TcpConnectionInformation2 : TcpConnectionInformation
                 (MIB_TCPTABLE_OWNER_PID)Marshal.PtrToStructure(
                     buffTable,
                     typeof(MIB_TCPTABLE_OWNER_PID))!;
-            var rowPtr = (nint)((Int64)buffTable +
+#pragma warning disable CA2020 // 防止行为变更
+            var rowPtr = (IntPtr)((Int64)buffTable +
                 Marshal.SizeOf(tab.dwNumEntries));
+#pragma warning restore CA2020 // 防止行为变更
             //tTable = new MIB_TCPROW_OWNER_PID[tab.dwNumEntries];
 
             for (var i = 0; i < tab.dwNumEntries; i++)
@@ -148,7 +152,9 @@ public class TcpConnectionInformation2 : TcpConnectionInformation
                 list.Add(new TcpConnectionInformation2(tcpRow));
 
                 // next entry
-                rowPtr = (nint)((Int64)rowPtr + Marshal.SizeOf(tcpRow));
+#pragma warning disable CA2020 // 防止行为变更
+                rowPtr = (IntPtr)((Int64)rowPtr + Marshal.SizeOf(tcpRow));
+#pragma warning restore CA2020 // 防止行为变更
             }
         }
         finally
@@ -215,7 +221,7 @@ public class TcpConnectionInformation2 : TcpConnectionInformation
 
         return ParseTcps(text);
     }
-    private static readonly char[] SpaceChars = new Char[] { ' ' };
+
     /// <summary>分析Tcp连接信息</summary>
     /// <param name="text"></param>
     /// <returns></returns>
@@ -228,7 +234,7 @@ public class TcpConnectionInformation2 : TcpConnectionInformation
         // 逐行读取TCP连接信息
         foreach (var line in text.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries))
         {
-            var parts = line.Split(SpaceChars, StringSplitOptions.RemoveEmptyEntries);
+            var parts = line.Split(separator, StringSplitOptions.RemoveEmptyEntries);
             if (parts.Length < 4 || parts[1].IndexOf(':') < 0) continue;
 
             //// 提取连接信息

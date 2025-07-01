@@ -6,7 +6,6 @@ using ThingsGateway.NewLife.Reflection;
 
 namespace ThingsGateway.NewLife.Security;
 
-
 /// <summary>随机数</summary>
 public static class Rand
 {

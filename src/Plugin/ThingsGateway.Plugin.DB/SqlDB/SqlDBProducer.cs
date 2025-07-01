@@ -14,6 +14,7 @@ using ThingsGateway.Admin.Application;
 using ThingsGateway.Debug;
 using ThingsGateway.Foundation;
 using ThingsGateway.NewLife;
+using ThingsGateway.NewLife.DictionaryExtensions;
 using ThingsGateway.NewLife.Extension;
 using ThingsGateway.Plugin.DB;
 using ThingsGateway.SqlSugar;

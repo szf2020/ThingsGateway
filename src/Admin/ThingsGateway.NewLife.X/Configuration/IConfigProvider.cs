@@ -304,7 +304,7 @@ public abstract class ConfigProvider : DisposeBase, IConfigProvider
         }
     }
 
-    private sealed record ModelWrap(String Path, Action<IConfigSection> OnChange);
+    private record ModelWrap(String Path, Action<IConfigSection> OnChange);
 
     /// <summary>通知绑定对象，配置数据有改变</summary>
     protected virtual void NotifyChange()
@@ -340,7 +340,7 @@ public abstract class ConfigProvider : DisposeBase, IConfigProvider
     static ConfigProvider()
     {
         // 支持从命令行参数和环境变量设定默认配置提供者
-        var str = "";
+        var str = string.Empty;
         var args = Environment.GetCommandLineArgs();
         for (var i = 0; i < args.Length; i++)
         {
@@ -350,11 +350,12 @@ public abstract class ConfigProvider : DisposeBase, IConfigProvider
                 break;
             }
         }
-        if (str.IsNullOrEmpty()) str = ThingsGateway.NewLife.Runtime.GetEnvironmentVariable("DefaultConfig");
+        if (str.IsNullOrEmpty()) str = NewLife.Runtime.GetEnvironmentVariable("DefaultConfig");
         if (!str.IsNullOrEmpty()) DefaultProvider = str;
 
         Register<InIConfigProvider>("ini");
         Register<XmlConfigProvider>("xml");
+        Register<JsonConfigProvider>("json");
         Register<XmlConfigProvider>("config");
     }
 

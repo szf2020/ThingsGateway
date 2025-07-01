@@ -12,8 +12,6 @@ using BootstrapBlazor.Components;
 
 using Microsoft.Extensions.DependencyInjection;
 
-using System.Globalization;
-
 using ThingsGateway.FriendlyException;
 using ThingsGateway.SqlSugar;
 
@@ -23,7 +21,7 @@ internal sealed class SysResourceService : BaseService<SysResource>, ISysResourc
 {
     private readonly IRelationService _relationService;
 
-    private string CacheKey = $"{CacheConst.Cache_SysResource}-{CultureInfo.CurrentUICulture.Name}";
+    private string CacheKey = $"{CacheConst.Cache_SysResource}";
 
     public SysResourceService(IRelationService relationService)
     {
@@ -31,7 +29,6 @@ internal sealed class SysResourceService : BaseService<SysResource>, ISysResourc
     }
 
     #region 增删改查
-
 
     [OperDesc("CopyResource")]
     public async Task CopyAsync(IEnumerable<long> ids, long moduleId)
@@ -143,12 +140,12 @@ internal sealed class SysResourceService : BaseService<SysResource>, ISysResourc
     /// <returns>全部资源列表</returns>
     public async Task<List<SysResource>> GetAllAsync()
     {
-        var sysResources = App.CacheService.Get<List<SysResource>>(CacheKey);
+        var sysResources = App.CacheService.Get<List<SysResource>>(CacheConst.Cache_SysResource);
         if (sysResources == null)
         {
             using var db = GetDB();
             sysResources = await db.Queryable<SysResource>().ToListAsync().ConfigureAwait(false);
-            App.CacheService.Set(CacheKey, sysResources);
+            App.CacheService.Set(CacheConst.Cache_SysResource, sysResources);
         }
         return sysResources;
     }
@@ -258,7 +255,7 @@ internal sealed class SysResourceService : BaseService<SysResource>, ISysResourc
     /// </summary>
     public void RefreshCache()
     {
-        App.CacheService.Remove(CacheKey);
+        App.CacheService.Remove(CacheConst.Cache_SysResource);
         //删除超级管理员的缓存
         App.RootServices.GetRequiredService<ISysUserService>().DeleteUserFromCache(RoleConst.SuperAdminId);
     }

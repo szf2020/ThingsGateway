@@ -19,7 +19,7 @@ using System.Collections.Concurrent;
 using ThingsGateway.Extension;
 using ThingsGateway.Extension.Generic;
 using ThingsGateway.Gateway.Application;
-using ThingsGateway.NewLife.Extension;
+using ThingsGateway.NewLife.DictionaryExtensions;
 
 using TouchSocket.Core;
 

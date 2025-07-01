@@ -1,6 +1,8 @@
 ﻿using System.Reflection;
 using System.Runtime.InteropServices;
 
+using ThingsGateway.NewLife.Collections;
+using ThingsGateway.NewLife.Data;
 using ThingsGateway.NewLife.Reflection;
 
 namespace ThingsGateway.NewLife.Serialization;
@@ -493,7 +495,7 @@ public class Binary : FormatterBase, IBinary
     /// <param name="max"></param>
     public void WriteBCD(String value, Int32 max)
     {
-        var buf = ArrayPool<Byte>.Shared.Rent(max);
+        var buf = Pool.Shared.Rent(max);
         for (Int32 i = 0, j = 0; i < max && j + 1 < value.Length; i++, j += 2)
         {
             var a = (Byte)(value[j] - '0');
@@ -502,7 +504,7 @@ public class Binary : FormatterBase, IBinary
         }
 
         Write(buf, 0, max);
-        ArrayPool<Byte>.Shared.Return(buf);
+        Pool.Shared.Return(buf);
     }
 
     /// <summary>写入定长字符串。多余截取，少则补零</summary>
@@ -511,7 +513,7 @@ public class Binary : FormatterBase, IBinary
     public void WriteFixedString(String? value, Int32 max)
     {
         var len = 0;
-        var buf = ArrayPool<Byte>.Shared.Rent(max);
+        var buf = Pool.Shared.Rent(max);
         if (!value.IsNullOrEmpty()) len = Encoding.GetBytes(value, 0, value.Length, buf, 0);
 
         // 清空空白部分，避免出现脏数据
@@ -519,7 +521,7 @@ public class Binary : FormatterBase, IBinary
 
         Write(buf, 0, max);
 
-        ArrayPool<Byte>.Shared.Return(buf);
+        Pool.Shared.Return(buf);
     }
 
     /// <summary>读取定长字符串。多余截取，少则补零</summary>
@@ -567,6 +569,26 @@ public class Binary : FormatterBase, IBinary
     {
         var bn = new Binary() { Stream = stream, EncodeInt = encodeInt };
         return bn.Read<T>();
+    }
+
+    /// <summary>快速写入</summary>
+    /// <param name="value">对象</param>
+    /// <param name="encodeInt">使用7位编码整数</param>
+    /// <returns></returns>
+    public static IPacket FastWrite(Object value, Boolean encodeInt = true)
+    {
+        // 头部预留8字节，方便加协议头
+        var bn = new Binary { EncodeInt = encodeInt };
+        bn.Stream.Seek(8, SeekOrigin.Current);
+        bn.Write(value);
+
+        //var buf = bn.GetBytes();
+        //return new ArrayPacket(buf, 8, buf.Length - 8);
+
+        bn.Stream.Position = 8;
+
+        // 包装为数据包，直接窃取内存流内部的缓冲区
+        return new ArrayPacket(bn.Stream);
     }
 
     /// <summary>快速写入</summary>

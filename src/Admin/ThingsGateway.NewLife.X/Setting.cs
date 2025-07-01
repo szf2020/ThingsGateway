@@ -1,15 +1,7 @@
-﻿// ------------------------------------------------------------------------------
-// 此代码版权声明为全文件覆盖，如有原作者特别声明，会在下方手动补充
-// 此代码版权（除特别声明外的代码）归作者本人Diego所有
-// 源代码使用协议遵循本仓库的开源协议及附加协议
-// Gitee源代码仓库：https://gitee.com/diego2098/ThingsGateway
-// Github源代码仓库：https://github.com/kimdiego2098/ThingsGateway
-// 使用文档：https://thingsgateway.cn/
-// QQ群：605534569
-// ------------------------------------------------------------------------------
+﻿using System.ComponentModel;
 
-using System.ComponentModel;
-
+using ThingsGateway.NewLife.Common;
+using ThingsGateway.NewLife.Configuration;
 using ThingsGateway.NewLife.Log;
 
 //[assembly: InternalsVisibleTo("XUnitTest.Core")]
@@ -21,11 +13,9 @@ namespace ThingsGateway.NewLife;
 /// 文档 https://newlifex.com/core/setting
 /// </remarks>
 [DisplayName("核心设置")]
-public class Setting
+[Config("Core")]
+public class Setting : Config<Setting>
 {
-    /// <summary>当前实例。</summary>
-    public static Setting Current = new();
-
     #region 属性
     /// <summary>是否启用全局调试。默认启用</summary>
     [Description("全局调试。XTrace.Debug")]
@@ -51,10 +41,75 @@ public class Setting
     [Description("日志文件格式。默认{0:yyyy_MM_dd}.log，支持日志等级如 {1}_{0:yyyy_MM_dd}.log")]
     public String LogFileFormat { get; set; } = "{0:yyyy_MM_dd}.log";
 
+    /// <summary>日志行格式。默认Time|ThreadId|Kind|Name|Message，还支持Level</summary>
+    [Description("日志行格式。默认Time|ThreadId|Kind|Name|Message，还支持Level")]
+    public String LogLineFormat { get; set; } = "Time|ThreadId|Kind|Name|Message";
+
+    /// <summary>网络日志。本地子网日志广播udp://255.255.255.255:514，或者http://xxx:80/log</summary>
+    [Description("网络日志。本地子网日志广播udp://255.255.255.255:514，或者http://xxx:80/log")]
+    public String NetworkLog { get; set; } = string.Empty;
+
     /// <summary>日志记录时间UTC校正，单位：小时。默认0表示使用的是本地时间，使用UTC时间的系统转换成本地时间则相差8小时</summary>
     [Description("日志记录时间UTC校正，小时")]
     public Int32 UtcIntervalHours { get; set; } = 0;
 
+    /// <summary>数据目录。本地数据库目录，默认Data子目录</summary>
+    [Description("数据目录。本地数据库目录，默认Data子目录")]
+    public String DataPath { get; set; } = string.Empty;
+
+    /// <summary>备份目录。备份数据库时存放的目录，默认Backup子目录</summary>
+    [Description("备份目录。备份数据库时存放的目录，默认Backup子目录")]
+    public String BackupPath { get; set; } = string.Empty;
+
+    /// <summary>插件目录</summary>
+    [Description("插件目录")]
+    public String PluginPath { get; set; } = string.Empty;
+
+    /// <summary>辅助解析程序集。程序集加载过程中，被依赖程序集未能解析时，是否协助解析，默认false</summary>
+    [Description("辅助解析程序集。程序集加载过程中，被依赖程序集未能解析时，是否协助解析，默认false")]
+    public Boolean AssemblyResolve { get; set; }
+
+
     #endregion
 
+    #region 方法
+    /// <summary>加载完成后</summary>
+    protected override void OnLoaded()
+    {
+        // 多应用项目，需要把基础目录向上提升一级
+        var root = "../";
+        var di = ".".AsDirectory();
+        //if (di.Name.StartsWithIgnoreCase("netcoreapp", "net2", "net4", "net5", "net6", "net7", "net8", "net9", "net10") && di.Parent != null)
+        //{
+        //    root = "../../";
+        //    di = di.Parent;
+        //}
+        var name = SysConfig.GetSysName() ?? SysConfig.SysAssembly?.Name;
+        if (name.IsNullOrEmpty()) name = di.Name;
+        if (name.EndsWithIgnoreCase("Web", "Api", "Server", "Service", "Job"))
+        {
+            // 日志目录分开，其它目录共用
+            if (LogPath.IsNullOrEmpty()) LogPath = $"{root}{di.Name}Log";
+            if (DataPath.IsNullOrEmpty()) DataPath = $"{root}Data";
+            if (BackupPath.IsNullOrEmpty()) BackupPath = $"{root}Backup";
+            if (PluginPath.IsNullOrEmpty()) PluginPath = $"{root}Plugins";
+        }
+        else
+        {
+            if (LogPath.IsNullOrEmpty()) LogPath = "Log";
+            if (DataPath.IsNullOrEmpty()) DataPath = "Data";
+            if (BackupPath.IsNullOrEmpty()) BackupPath = "Backup";
+            if (PluginPath.IsNullOrEmpty()) PluginPath = "Plugins";
+        }
+        if (LogFileFormat.IsNullOrEmpty()) LogFileFormat = "{0:yyyy_MM_dd}.log";
+
+        //if (PluginServer.IsNullOrWhiteSpace()) PluginServer = "http://x.newlifex.com/";
+
+        base.OnLoaded();
+    }
+
+    /// <summary>获取插件目录</summary>
+    /// <returns></returns>
+    public String GetPluginPath() => PluginPath.GetBasePath();
+    #endregion
 }

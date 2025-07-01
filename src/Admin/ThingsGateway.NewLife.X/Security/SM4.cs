@@ -1,11 +1,11 @@
 ﻿using System.Numerics;
 using System.Security.Cryptography;
 
-using ThingsGateway.NewLife.Security;
-
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER
 using System.Buffers.Binary;
 #endif
+
+namespace ThingsGateway.NewLife.Security;
 
 /// <summary>SM4（国密4）</summary>
 public class SM4 : SymmetricAlgorithm
@@ -147,12 +147,12 @@ public class SM4Transform : ICryptoTransform
     private static UInt32 L_ap(UInt32 B) => B ^ RotateLeft(B, 13) ^ RotateLeft(B, 23);
 
 #if NETCOREAPP3_0_OR_GREATER
-    private static UInt32 RotateLeft(UInt32 i, Int32 distance) => BitOperations.RotateLeft(i, distance);
+    static UInt32 RotateLeft(UInt32 i, Int32 distance) => BitOperations.RotateLeft(i, distance);
 #else
-    private static UInt32 RotateLeft(UInt32 i, Int32 distance) => (i << distance) | (i >> -distance);
+    static UInt32 RotateLeft(UInt32 i, Int32 distance) => (i << distance) | (i >> -distance);
 #endif
 
-    private static UInt32 T_ap(UInt32 Z) => L_ap(tau(Z));
+    private UInt32 T_ap(UInt32 Z) => L_ap(tau(Z));
 
     // Key expansion
     private void ExpandKey(Boolean forEncryption, Byte[] key)
@@ -244,7 +244,7 @@ public class SM4Transform : ICryptoTransform
     }
 
     /// <summary>销毁</summary>
-    public void Dispose() { }
+    void IDisposable.Dispose() { }
     #endregion
 
     /// <summary>块加密数据，传入缓冲区必须是整块数据</summary>
@@ -309,7 +309,7 @@ public class SM4Transform : ICryptoTransform
     /// <exception cref="ArgumentException"></exception>
     public Byte[] TransformFinalBlock(Byte[] inputBuffer, Int32 inputOffset, Int32 inputCount)
     {
-        if (inputCount == 0) return Array.Empty<byte>();
+        if (inputCount == 0) return [];
 
         var blocks = inputCount / InputBlockSize;
         var output = new Byte[blocks * OutputBlockSize];

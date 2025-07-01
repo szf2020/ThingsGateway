@@ -1,4 +1,4 @@
-﻿namespace ThingsGateway.NewLife.Extension;
+﻿namespace System.Collections.Generic;
 
 /// <summary>扩展List，支持遍历中修改元素</summary>
 public static class ListExtension

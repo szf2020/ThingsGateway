@@ -32,7 +32,6 @@ using ThingsGateway.Admin.Application;
 using ThingsGateway.Admin.Razor;
 using ThingsGateway.Debug;
 using ThingsGateway.Gateway.Application;
-using ThingsGateway.NewLife.Caching;
 using ThingsGateway.VirtualFileServer;
 
 namespace ThingsGateway.Server;
@@ -82,8 +81,6 @@ public class Startup : AppStartup
             options.AddPersistence<JobPersistence>();
         });
 
-        // 缓存
-        services.AddSingleton<ICache, MemoryCache>();
 
         // 允许跨域
         services.AddCorsAccessor();
@@ -189,7 +186,7 @@ public class Startup : AppStartup
         var certificate = new X509Certificate2("ThingsGateway.pfx", "ThingsGateway", X509KeyStorageFlags.EphemeralKeySet);
 #endif
         services.AddDataProtection()
-            .PersistKeysToFileSystem(new DirectoryInfo("keys"))
+            .PersistKeysToFileSystem(new DirectoryInfo("Keys"))
             .ProtectKeysWithCertificate(certificate)
             .UseCryptographicAlgorithms(new AuthenticatedEncryptorConfiguration
             {

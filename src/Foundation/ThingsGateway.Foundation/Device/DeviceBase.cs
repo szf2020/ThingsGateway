@@ -416,7 +416,7 @@ public abstract class DeviceBase : DisposableObject, IDevice
         try
         {
             var dtuId = this is IDtu dtu1 ? dtu1.DtuId : null;
-            var channelResult = await GetChannelAsync(dtuId).ConfigureAwait(false);
+            var channelResult = GetChannel(dtuId);
             if (!channelResult.IsSuccess) return new OperResult<byte[]>(channelResult);
             WaitLock? waitLock = null;
             EndPoint? endPoint = GetUdpEndpoint(dtuId);
@@ -446,7 +446,7 @@ public abstract class DeviceBase : DisposableObject, IDevice
     }
 
     /// <inheritdoc/>
-    public virtual async ValueTask<OperResult<IClientChannel>> GetChannelAsync(string socketId)
+    public virtual OperResult<IClientChannel> GetChannel(string socketId)
     {
         if (string.IsNullOrWhiteSpace(socketId))
             return new OperResult<IClientChannel>() { Content = (IClientChannel)Channel };
@@ -459,7 +459,6 @@ public abstract class DeviceBase : DisposableObject, IDevice
             }
             else
             {
-                await Task.Delay(1000).ConfigureAwait(false);
                 if (serviceChannel.TryGetClient($"ID={socketId}", out var client1))
                 {
                     return new OperResult<IClientChannel>() { Content = client1 };
@@ -502,17 +501,17 @@ public abstract class DeviceBase : DisposableObject, IDevice
 
 
     /// <inheritdoc/>
-    public virtual async ValueTask<OperResult<byte[]>> SendThenReturnAsync(ISendMessage sendMessage, CancellationToken cancellationToken = default)
+    public virtual ValueTask<OperResult<byte[]>> SendThenReturnAsync(ISendMessage sendMessage, CancellationToken cancellationToken = default)
     {
-        var channelResult = await GetChannelAsync(this is IDtu dtu ? dtu.DtuId : null).ConfigureAwait(false);
-        if (!channelResult.IsSuccess) return new OperResult<byte[]>(channelResult);
-        return await SendThenReturnAsync(sendMessage, channelResult.Content, cancellationToken).ConfigureAwait(false);
+        var channelResult = GetChannel(this is IDtu dtu ? dtu.DtuId : null);
+        if (!channelResult.IsSuccess) return EasyValueTask.FromResult(new OperResult<byte[]>(channelResult));
+        return SendThenReturnAsync(sendMessage, channelResult.Content, cancellationToken);
     }
 
     /// <inheritdoc/>
     protected virtual async ValueTask<MessageBase> SendThenReturnMessageAsync(ISendMessage sendMessage, CancellationToken cancellationToken = default)
     {
-        var channelResult = await GetChannelAsync(this is IDtu dtu ? dtu.DtuId : null).ConfigureAwait(false);
+        var channelResult = GetChannel(this is IDtu dtu ? dtu.DtuId : null);
         if (!channelResult.IsSuccess) return new MessageBase(channelResult);
         return await SendThenReturnMessageBaseAsync(sendMessage, channelResult.Content, cancellationToken).ConfigureAwait(false);
     }
@@ -534,9 +533,7 @@ public abstract class DeviceBase : DisposableObject, IDevice
     /// <inheritdoc/>
     protected virtual ValueTask<MessageBase> SendThenReturnMessageBaseAsync(ISendMessage command, IClientChannel clientChannel = default, CancellationToken cancellationToken = default)
     {
-
         return GetResponsedDataAsync(command, clientChannel, Timeout, cancellationToken);
-
     }
 
     /// <summary>

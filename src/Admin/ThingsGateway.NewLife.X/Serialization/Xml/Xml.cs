@@ -172,7 +172,7 @@ public class Xml : FormatterBase, IXml
         // 写入注释。写特性时忽略注释
         if (UseComment && !att)
         {
-            var des = "";
+            var des = string.Empty;
             if (Member != null) des = Member.GetDisplayName() ?? Member.GetDescription();
             if (des.IsNullOrEmpty() && type != null) des = type.GetDisplayName() ?? type.GetDescription();
 
@@ -332,9 +332,9 @@ public class Xml : FormatterBase, IXml
         }
 
         var name = type.GetName();
-        name = name.Replace("<", "_");
-        //name = name.Replace(">", "_");
-        name = name.Replace(",", "_");
+        name = name.Replace('<', '_');
+        //name = name.Replace(">", '_');
+        name = name.Replace(',', '_');
         name = name.Replace(">", "");
         return name;
     }

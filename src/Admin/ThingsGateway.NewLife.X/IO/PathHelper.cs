@@ -3,7 +3,7 @@
 using ThingsGateway.NewLife;
 using ThingsGateway.NewLife.Compression;
 
-#if NET7_0_OR_GREATER
+#if NET8_0_OR_GREATER
 using System.Formats.Tar;
 #endif
 
@@ -39,7 +39,7 @@ public static class PathHelper
     #region 静态构造
     static PathHelper()
     {
-        var dir = "";
+        var dir = string.Empty;
         // 命令参数
         var args = Environment.GetCommandLineArgs();
         for (var i = 0; i < args.Length; i++)
@@ -341,6 +341,7 @@ public static class PathHelper
 
         fs.SetLength(fs.Position);
         fs.Flush();
+
         return fs.Position;
     }
 
@@ -389,7 +390,7 @@ public static class PathHelper
         }
         else if (fi.Name.EndsWithIgnoreCase(".tar", ".tar.gz", ".tgz"))
         {
-#if NET7_0_OR_GREATER
+#if NET8_0_OR_GREATER
             destDir.EnsureDirectory(false);
             if (fi.Name.EndsWithIgnoreCase(".tar"))
                 System.Formats.Tar.TarFile.ExtractToDirectory(fi.FullName, destDir, overwrite);
@@ -406,7 +407,10 @@ public static class PathHelper
         }
         else
         {
-            throw new NotSupportedException();
+            if (ThingsGateway.NewLife.Runtime.Windows)
+                new SevenZip().Extract(fi.FullName, destDir);
+            else
+                throw new NotSupportedException();
         }
     }
 
@@ -427,7 +431,7 @@ public static class PathHelper
         }
         else if (destFile.EndsWithIgnoreCase(".tar", ".tar.gz", ".tgz"))
         {
-#if NET7_0_OR_GREATER
+#if NET8_0_OR_GREATER
             if (destFile.EndsWithIgnoreCase(".tar"))
             {
                 using var fs = new FileStream(destFile, FileMode.OpenOrCreate, FileAccess.Write);
@@ -451,7 +455,10 @@ public static class PathHelper
         }
         else
         {
-            throw new NotSupportedException();
+            if (ThingsGateway.NewLife.Runtime.Windows)
+                new SevenZip().Compress(fi.FullName, destFile);
+            else
+                throw new NotSupportedException();
         }
     }
     #endregion
@@ -580,7 +587,7 @@ public static class PathHelper
     /// <summary>压缩</summary>
     /// <param name="di"></param>
     /// <param name="destFile"></param>
-    public static void Compress(this DirectoryInfo di, String? destFile = null) => Compress(di, destFile, true);
+    public static void Compress(this DirectoryInfo di, String? destFile = null) => Compress(di, destFile, false);
 
     /// <summary>压缩</summary>
     /// <param name="di"></param>
@@ -596,7 +603,7 @@ public static class PathHelper
             ZipFile.CreateFromDirectory(di.FullName, destFile, CompressionLevel.Optimal, includeBaseDirectory);
         else if (destFile.EndsWithIgnoreCase(".tar", ".tar.gz", ".tgz"))
         {
-#if NET7_0_OR_GREATER
+#if NET8_0_OR_GREATER
             if (destFile.EndsWithIgnoreCase(".tar"))
                 System.Formats.Tar.TarFile.CreateFromDirectory(di.FullName, destFile, includeBaseDirectory);
             else
@@ -613,7 +620,10 @@ public static class PathHelper
         }
         else
         {
-            throw new NotSupportedException();
+            if (ThingsGateway.NewLife.Runtime.Windows)
+                new SevenZip().Compress(di.FullName, destFile);
+            else
+                throw new NotSupportedException();
         }
     }
     #endregion
