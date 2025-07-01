@@ -484,6 +484,10 @@ public class ModbusSlave : DeviceBase, IModbusAddress
                         await ReturnData(client, valueByteBlock.Memory, e).ConfigureAwait(false);
                     }
                 }
+                catch
+                {
+                    await WriteError(modbusRtu, client, Bytes, e).ConfigureAwait(false);
+                }
                 finally
                 {
                     valueByteBlock.SafeDispose();
