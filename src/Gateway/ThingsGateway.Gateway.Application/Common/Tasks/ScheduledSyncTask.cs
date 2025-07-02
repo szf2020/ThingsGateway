@@ -67,7 +67,7 @@ public class ScheduledSyncTask : DisposeBase, IScheduledTask, IScheduledIntInter
         }
         catch (Exception ex)
         {
-            LogMessage.LogWarning(ex);
+            LogMessage?.LogWarning(ex);
         }
         finally
         {
@@ -78,18 +78,17 @@ public class ScheduledSyncTask : DisposeBase, IScheduledTask, IScheduledIntInter
         {
             if (!Check())
             {
-                DelayDo();
+                SetNext(_interval10MS);
             }
         }
     }
 
-    private void DelayDo()
-    {
-        // 延迟触发下一次
-        if (!Check())
-            _timer?.SetNext(_interval10MS);
-    }
 
+    public void SetNext(int interval)
+    {
+        if (!Check())
+            _timer?.SetNext(interval);
+    }
     public void Stop()
     {
         _timer?.SafeDispose();

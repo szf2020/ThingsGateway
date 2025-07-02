@@ -26,8 +26,8 @@ public class ObjectPool<T> : DisposeBase, IPool<T> where T : notnull
     /// <summary>繁忙个数</summary>
     public Int32 BusyCount => _BusyCount;
 
-    /// <summary>最大个数。默认100，0表示无上限</summary>
-    public Int32 Max { get; set; } = 100;
+    /// <summary>最大个数。默认0，0表示无上限</summary>
+    public Int32 Max { get; set; } = 0;
 
     /// <summary>最小个数。默认1</summary>
     public Int32 Min { get; set; } = 1;

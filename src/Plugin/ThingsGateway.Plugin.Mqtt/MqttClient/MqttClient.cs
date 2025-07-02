@@ -33,7 +33,7 @@ public partial class MqttClient : BusinessBaseWithCacheIntervalScript<VariableBa
     public override VariablePropertyBase VariablePropertys => _variablePropertys;
     protected override BusinessPropertyWithCacheIntervalScript _businessPropertyWithCacheIntervalScript => _driverPropertys;
 
-    public override Type DriverPropertyUIType => typeof(MqttClientPropertyRazor);
+    public override Type DriverPropertyUIType => typeof(MqttPropertyRazor);
 
     /// <summary>
     /// 加载 PEM 证书和私钥

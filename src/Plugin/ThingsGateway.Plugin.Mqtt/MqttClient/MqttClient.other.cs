@@ -15,6 +15,7 @@ using CSScripting;
 using MQTTnet;
 
 
+
 #if NET6_0
 using MQTTnet.Client;
 #endif
@@ -280,7 +281,7 @@ public partial class MqttClient : BusinessBaseWithCacheIntervalScript<VariableBa
         }
     }
 
-    private async ValueTask<Dictionary<string, Dictionary<string, IOperResult>>> GetResult(MqttApplicationMessageReceivedEventArgs args, Dictionary<string, Dictionary<string, JToken>> rpcDatas)
+    private async ValueTask<Dictionary<string, Dictionary<string, IOperResult>>> GetRpcResult(string clientId, Dictionary<string, Dictionary<string, JToken>> rpcDatas)
     {
         var mqttRpcResult = new Dictionary<string, Dictionary<string, IOperResult>>();
         rpcDatas.ForEach(a => mqttRpcResult.Add(a.Key, new()));
@@ -325,7 +326,7 @@ public partial class MqttClient : BusinessBaseWithCacheIntervalScript<VariableBa
             }
 
 
-            var result = await GlobalData.RpcService.InvokeDeviceMethodAsync(ToString() + "-" + args.ClientId,
+            var result = await GlobalData.RpcService.InvokeDeviceMethodAsync(ToString() + "-" + clientId,
                 writeData).ConfigureAwait(false);
 
             foreach (var dictKv in result)
@@ -347,10 +348,13 @@ public partial class MqttClient : BusinessBaseWithCacheIntervalScript<VariableBa
 
     private async Task MqttClient_ApplicationMessageReceivedAsync(MqttApplicationMessageReceivedEventArgs args)
     {
+        try
+        {
+
 #if NET8_0_OR_GREATER
 
-        var payload = args.ApplicationMessage.Payload;
-        var payloadCount = payload.Length;
+            var payload = args.ApplicationMessage.Payload;
+            var payloadCount = payload.Length;
 #else
 
         var payload = args.ApplicationMessage.PayloadSegment;
@@ -359,82 +363,97 @@ public partial class MqttClient : BusinessBaseWithCacheIntervalScript<VariableBa
 #endif
 
 
-        if (args.ApplicationMessage.Topic == _driverPropertys.RpcQuestTopic && payloadCount > 0)
-        {
-            await AllPublishAsync(CancellationToken.None).ConfigureAwait(false);
-            return;
-        }
-
-        if (!_driverPropertys.DeviceRpcEnable)
-            return;
-
-        Dictionary<string, Dictionary<string, JToken>> rpcDatas = new();
-
-        //适配 ThingsBoardRp
-        if (args.ApplicationMessage.Topic == ThingsBoardRpcTopic)
-        {
-            var thingsBoardRpcData = Encoding.UTF8.GetString(payload).FromJsonNetString<ThingsBoardRpcData>();
-            if (thingsBoardRpcData == null)
-                return;
-            rpcDatas.Add(thingsBoardRpcData.device, thingsBoardRpcData.data.@params.ToDictionary(a => a.Key, a => JToken.Parse(a.Value)));
-
-            if (rpcDatas == null)
-                return;
-
-            var mqttRpcResult = await GetResult(args, rpcDatas).ConfigureAwait(false);
-            try
+            if (args.ApplicationMessage.Topic == _driverPropertys.RpcQuestTopic && payloadCount > 0)
             {
-                var isConnect = await TryMqttClientAsync(CancellationToken.None).ConfigureAwait(false);
-                if (isConnect.IsSuccess)
+                await AllPublishAsync(CancellationToken.None).ConfigureAwait(false);
+                return;
+            }
+
+            if (!_driverPropertys.DeviceRpcEnable)
+                return;
+
+            if (!_driverPropertys.BigTextScriptRpc.IsNullOrEmpty())
+            {
+                var rpcBase = CSharpScriptEngineExtension.Do<DynamicMqttClientRpcBase>(_driverPropertys.BigTextScriptRpc);
+
+                await rpcBase.RPCInvokeAsync(LogMessage, args, _driverPropertys, _mqttClient, GetRpcResult, TryMqttClientAsync, CancellationToken.None).ConfigureAwait(false);
+
+            }
+            else
+            {
+                Dictionary<string, Dictionary<string, JToken>> rpcDatas = new();
+
+                //适配 ThingsBoardRp
+                if (args.ApplicationMessage.Topic == ThingsBoardRpcTopic)
                 {
-                    ThingsBoardRpcResponseData thingsBoardRpcResponseData = new();
-                    thingsBoardRpcResponseData.device = thingsBoardRpcData.device;
-                    thingsBoardRpcResponseData.id = thingsBoardRpcData.data.id;
-                    thingsBoardRpcResponseData.data.success = mqttRpcResult[thingsBoardRpcResponseData.device].All(b => b.Value.IsSuccess);
-                    thingsBoardRpcResponseData.data.message = mqttRpcResult[thingsBoardRpcResponseData.device].Select(a => a.Value.ErrorMessage).ToSystemTextJsonString(_driverPropertys.JsonFormattingIndented);
+                    var thingsBoardRpcData = Encoding.UTF8.GetString(payload).FromJsonNetString<ThingsBoardRpcData>();
+                    if (thingsBoardRpcData == null)
+                        return;
+                    rpcDatas.Add(thingsBoardRpcData.device, thingsBoardRpcData.data.@params.ToDictionary(a => a.Key, a => JToken.Parse(a.Value)));
 
-                    var variableMessage = new MqttApplicationMessageBuilder()
-.WithTopic($"{args.ApplicationMessage.Topic}")
-.WithPayload(thingsBoardRpcResponseData.ToSystemTextJsonString(_driverPropertys.JsonFormattingIndented)).Build();
-                    await _mqttClient.PublishAsync(variableMessage).ConfigureAwait(false);
+                    if (rpcDatas == null)
+                        return;
+
+                    var mqttRpcResult = await GetRpcResult(args.ClientId, rpcDatas).ConfigureAwait(false);
+                    try
+                    {
+                        var isConnect = await TryMqttClientAsync(CancellationToken.None).ConfigureAwait(false);
+                        if (isConnect.IsSuccess)
+                        {
+                            ThingsBoardRpcResponseData thingsBoardRpcResponseData = new();
+                            thingsBoardRpcResponseData.device = thingsBoardRpcData.device;
+                            thingsBoardRpcResponseData.id = thingsBoardRpcData.data.id;
+                            thingsBoardRpcResponseData.data.success = mqttRpcResult[thingsBoardRpcResponseData.device].All(b => b.Value.IsSuccess);
+                            thingsBoardRpcResponseData.data.message = mqttRpcResult[thingsBoardRpcResponseData.device].Select(a => a.Value.ErrorMessage).ToSystemTextJsonString(_driverPropertys.JsonFormattingIndented);
+
+                            var variableMessage = new MqttApplicationMessageBuilder()
+        .WithTopic($"{args.ApplicationMessage.Topic}")
+        .WithPayload(thingsBoardRpcResponseData.ToSystemTextJsonString(_driverPropertys.JsonFormattingIndented)).Build();
+                            await _mqttClient.PublishAsync(variableMessage).ConfigureAwait(false);
 
 
+                        }
+                    }
+                    catch
+                    {
+                    }
                 }
-            }
-            catch
-            {
-            }
-        }
-        else
-        {
-            var t = string.Format(null, RpcTopic, _driverPropertys.RpcWriteTopic);
-            if (MqttTopicFilterComparer.Compare(args.ApplicationMessage.Topic, t) != MqttTopicFilterCompareResult.IsMatch)
-                return;
-            rpcDatas = Encoding.UTF8.GetString(payload).FromJsonNetString<Dictionary<string, Dictionary<string, JToken>>>();
-            if (rpcDatas == null)
-                return;
-
-            var mqttRpcResult = await GetResult(args, rpcDatas).ConfigureAwait(false);
-            try
-            {
-                var isConnect = await TryMqttClientAsync(CancellationToken.None).ConfigureAwait(false);
-                if (isConnect.IsSuccess)
+                else
                 {
+                    var t = string.Format(null, RpcTopic, _driverPropertys.RpcWriteTopic);
+                    if (MqttTopicFilterComparer.Compare(args.ApplicationMessage.Topic, t) != MqttTopicFilterCompareResult.IsMatch)
+                        return;
+                    rpcDatas = Encoding.UTF8.GetString(payload).FromJsonNetString<Dictionary<string, Dictionary<string, JToken>>>();
+                    if (rpcDatas == null)
+                        return;
 
-                    var variableMessage = new MqttApplicationMessageBuilder()
-.WithTopic($"{args.ApplicationMessage.Topic}/Response")
-.WithPayload(mqttRpcResult.ToSystemTextJsonString(_driverPropertys.JsonFormattingIndented)).Build();
-                    await _mqttClient.PublishAsync(variableMessage).ConfigureAwait(false);
+                    var mqttRpcResult = await GetRpcResult(args.ClientId, rpcDatas).ConfigureAwait(false);
+                    try
+                    {
+                        var isConnect = await TryMqttClientAsync(CancellationToken.None).ConfigureAwait(false);
+                        if (isConnect.IsSuccess)
+                        {
+
+                            var variableMessage = new MqttApplicationMessageBuilder()
+        .WithTopic($"{args.ApplicationMessage.Topic}/Response")
+        .WithPayload(mqttRpcResult.ToSystemTextJsonString(_driverPropertys.JsonFormattingIndented)).Build();
+                            await _mqttClient.PublishAsync(variableMessage).ConfigureAwait(false);
 
 
+                        }
+                    }
+                    catch
+                    {
+                    }
                 }
+
             }
-            catch
-            {
-            }
+
         }
-
-
+        catch (Exception ex)
+        {
+            LogMessage?.LogWarning(ex, $"MqttClient_ApplicationMessageReceivedAsync error");
+        }
     }
 
     private async Task MqttClient_ConnectedAsync(MqttClientConnectedEventArgs args)

@@ -16,7 +16,8 @@
     "RpcWriteTopic": "Rpc写入主题",
     "TLS": "TLS",
     "UserName": "用户名",
-    "WebSocketUrl": "WebSocketUrl"
+    "WebSocketUrl": "WebSocketUrl",
+    "BigTextScriptRpc": "RPC脚本"
   },
   "ThingsGateway.Plugin.Mqtt.MqttClientVariableProperty": {
     "VariableRpcEnable": "启用RPC"
@@ -45,7 +46,9 @@
     "MqttQualityOfServiceLevel": "QoS",
     "Port": "端口",
     "RpcWriteTopic": "Rpc写入主题",
+    "RpcQuestTopic": "Rpc请求数据主题",
     "StartWithId": "允许连接的ID前缀",
-    "WebSocketPort": "Websocket端口"
+    "WebSocketPort": "Websocket端口",
+    "BigTextScriptRpc": "RPC脚本"
   }
 }

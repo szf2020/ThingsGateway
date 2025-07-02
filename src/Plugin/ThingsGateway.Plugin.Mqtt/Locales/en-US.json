@@ -16,7 +16,8 @@
     "RpcWriteTopic": "RpcWriteTopic",
     "TLS": "TLS",
     "UserName": "UserName",
-    "WebSocketUrl": "WebSocketUrl"
+    "WebSocketUrl": "WebSocketUrl",
+    "BigTextScriptRpc": "BigTextScriptRpc"
   },
   "ThingsGateway.Plugin.Mqtt.MqttClientVariableProperty": {
     "VariableRpcEnable": "VariableRpcEnable"
@@ -45,7 +46,9 @@
     "MqttQualityOfServiceLevel": "QoS",
     "Port": "Port",
     "RpcWriteTopic": "RpcWriteTopic",
+    "RpcQuestTopic": "RpcQuestTopic",
     "StartWithId": "StartWithId",
-    "WebSocketPort": "WebSocketPort"
+    "WebSocketPort": "WebSocketPort",
+    "BigTextScriptRpc": "BigTextScriptRpc"
   }
 }

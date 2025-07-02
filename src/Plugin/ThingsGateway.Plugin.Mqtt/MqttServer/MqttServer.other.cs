@@ -126,8 +126,6 @@ public partial class MqttServer : BusinessBaseWithCacheIntervalScript<VariableBa
         {
             if (_driverPropertys.GroupUpdate && variable.BusinessGroupUpdateTrigger && !variable.BusinessGroup.IsNullOrEmpty() && VariableRuntimeGroups.TryGetValue(variable.BusinessGroup, out var variableRuntimeGroup))
             {
-
-
                 //获取组内全部变量
                 AddQueueVarModel(new CacheDBItem<List<VariableBasicData>>(variableRuntimeGroup.AdaptListVariableBasicData()));
 
@@ -182,7 +180,7 @@ public partial class MqttServer : BusinessBaseWithCacheIntervalScript<VariableBa
 
     #endregion private
 
-    private async ValueTask<Dictionary<string, Dictionary<string, IOperResult>>> GetResult(InterceptingPublishEventArgs args, Dictionary<string, Dictionary<string, JToken>> rpcDatas)
+    private async ValueTask<Dictionary<string, Dictionary<string, IOperResult>>> GetRpcResult(string clientId, Dictionary<string, Dictionary<string, JToken>> rpcDatas)
     {
         var mqttRpcResult = new Dictionary<string, Dictionary<string, IOperResult>>();
         rpcDatas.ForEach(a => mqttRpcResult.Add(a.Key, new()));
@@ -226,9 +224,9 @@ public partial class MqttServer : BusinessBaseWithCacheIntervalScript<VariableBa
                 }
             }
 
-            var result = await GlobalData.RpcService.InvokeDeviceMethodAsync(ToString() + "-" + args.ClientId,
-            writeData).ConfigureAwait(false);
 
+            var result = await GlobalData.RpcService.InvokeDeviceMethodAsync(ToString() + "-" + clientId,
+                writeData).ConfigureAwait(false);
 
             foreach (var dictKv in result)
             {
@@ -309,37 +307,72 @@ public partial class MqttServer : BusinessBaseWithCacheIntervalScript<VariableBa
 
     private async Task MqttServer_InterceptingPublishAsync(InterceptingPublishEventArgs args)
     {
+        try
+        {
+
+
 #if NET8_0_OR_GREATER
 
-        var payload = args.ApplicationMessage.Payload;
+            var payload = args.ApplicationMessage.Payload;
+            var payloadCount = payload.Length;
 #else
 
         var payload = args.ApplicationMessage.PayloadSegment;
+        var payloadCount = payload.Count;
 
 #endif
-        if (!_driverPropertys.DeviceRpcEnable || string.IsNullOrEmpty(args.ClientId))
-            return;
 
-        if (_driverPropertys.RpcWriteTopic.IsNullOrWhiteSpace()) return;
+            if (args.ApplicationMessage.Topic == _driverPropertys.RpcQuestTopic && payloadCount > 0)
+            {
+                var data = GetRetainedMessages();
 
-        var t = string.Format(null, RpcTopic, _driverPropertys.RpcWriteTopic);
-        if (MqttTopicFilterComparer.Compare(args.ApplicationMessage.Topic, t) != MqttTopicFilterCompareResult.IsMatch)
-            return;
-        var rpcDatas = Encoding.UTF8.GetString(payload).FromJsonNetString<Dictionary<string, Dictionary<string, JToken>>>();
-        if (rpcDatas == null)
-            return;
-        var mqttRpcResult = await GetResult(args, rpcDatas).ConfigureAwait(false);
+                foreach (var item in data)
+                {
+                    await _mqttServer.InjectApplicationMessage(new InjectedMqttApplicationMessage(item)).ConfigureAwait(false);
+                }
+                return;
+            }
 
-        try
-        {
-            var variableMessage = new MqttApplicationMessageBuilder()
-.WithTopic($"{args.ApplicationMessage.Topic}/Response")
-.WithPayload(mqttRpcResult.ToSystemTextJsonString(_driverPropertys.JsonFormattingIndented)).Build();
-            await _mqttServer.InjectApplicationMessage(
-                     new InjectedMqttApplicationMessage(variableMessage)).ConfigureAwait(false);
+            if (!_driverPropertys.DeviceRpcEnable || string.IsNullOrEmpty(args.ClientId))
+                return;
+
+            if (!_driverPropertys.BigTextScriptRpc.IsNullOrEmpty())
+            {
+                var rpcBase = CSharpScriptEngineExtension.Do<DynamicMqttServerRpcBase>(_driverPropertys.BigTextScriptRpc);
+
+                await rpcBase.RPCInvokeAsync(LogMessage, args, _driverPropertys, _mqttServer, GetRpcResult, CancellationToken.None).ConfigureAwait(false);
+
+            }
+            else
+            {
+
+                if (_driverPropertys.RpcWriteTopic.IsNullOrWhiteSpace()) return;
+
+                var t = string.Format(null, RpcTopic, _driverPropertys.RpcWriteTopic);
+                if (MqttTopicFilterComparer.Compare(args.ApplicationMessage.Topic, t) != MqttTopicFilterCompareResult.IsMatch)
+                    return;
+                var rpcDatas = Encoding.UTF8.GetString(payload).FromJsonNetString<Dictionary<string, Dictionary<string, JToken>>>();
+                if (rpcDatas == null)
+                    return;
+                var mqttRpcResult = await GetRpcResult(args.ClientId, rpcDatas).ConfigureAwait(false);
+
+                try
+                {
+                    var variableMessage = new MqttApplicationMessageBuilder()
+        .WithTopic($"{args.ApplicationMessage.Topic}/Response")
+        .WithPayload(mqttRpcResult.ToSystemTextJsonString(_driverPropertys.JsonFormattingIndented)).Build();
+                    await _mqttServer.InjectApplicationMessage(new InjectedMqttApplicationMessage(variableMessage)).ConfigureAwait(false);
+                }
+                catch
+                {
+                }
+            }
+
+
         }
-        catch
+        catch (Exception ex)
         {
+            LogMessage?.LogWarning(ex, $"MqttServer_InterceptingPublishAsync error");
         }
     }
 
@@ -377,17 +410,6 @@ public partial class MqttServer : BusinessBaseWithCacheIntervalScript<VariableBa
             return;
         }
         LogMessage?.LogInformation($"{ToString()}-{arg.ClientId}-Client Connected");
-        //   _ = Task.Run(async () =>
-        //   {
-        //       //延时发送
-        //       await Task.Delay(1000).ConfigureAwait(false);
-        //       List<MqttApplicationMessage> data = GetRetainedMessages();
-        //       foreach (var item in data)
-        //       {
-        //           await _mqttServer.InjectApplicationMessage(
-        //new InjectedMqttApplicationMessage(item)).ConfigureAwait(false);
-        //       }
-        //   });
     }
 
     /// <summary>

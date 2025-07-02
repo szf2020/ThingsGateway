@@ -180,7 +180,7 @@ internal sealed class AlarmHostedService : BackgroundService, IAlarmHostedServic
         int delay = item.AlarmDelay; // 获取报警延迟时间
 
         // 检查变量的数据类型
-        if (item.DataType.GetSystemType() == typeof(bool))
+        if (item.Value?.GetType() == typeof(bool))
         {
             // 如果数据类型为布尔型，则调用GetBoolAlarmCode方法获取布尔型报警类型及相关信息
             alarmEnum = GetBoolAlarmCode(item, out limit, out ex, out text);
@@ -394,8 +394,9 @@ internal sealed class AlarmHostedService : BackgroundService, IAlarmHostedServic
     /// <summary>
     /// 执行工作任务，对设备变量进行报警分析。
     /// </summary>
+    /// <param name="state"></param>
     /// <param name="cancellation">取消任务的 CancellationToken</param>
-    private async Task DoWork(CancellationToken cancellation)
+    private void DoWork(object? state, CancellationToken cancellation)
     {
         while (!cancellation.IsCancellationRequested)
         {
@@ -435,9 +436,8 @@ internal sealed class AlarmHostedService : BackgroundService, IAlarmHostedServic
                 }
                 else
                 {
-                    await Task.Delay(5000, cancellation).ConfigureAwait(false);
+                    scheduledTask.SetNext(5000); // 如果没有启用报警的变量，则设置下次执行时间为5秒后
                 }
-
 
                 //stopwatch.Stop();
                 //_logger.LogInformation("报警分析耗时：" + stopwatch.ElapsedMilliseconds + "ms");
@@ -449,21 +449,16 @@ internal sealed class AlarmHostedService : BackgroundService, IAlarmHostedServic
             {
                 _logger.LogWarning(ex, "Alarm analysis fail");
             }
-            finally
-            {
-                // 延迟一段时间，避免过于频繁地执行任务
-                await Task.Delay(50, cancellation).ConfigureAwait(false);
-            }
         }
     }
 
-
-    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    private IScheduledTask scheduledTask;
+    protected override Task ExecuteAsync(CancellationToken stoppingToken)
     {
         _logger.LogInformation(AppResource.RealAlarmTaskStart);
-
-        await DoWork(stoppingToken).ConfigureAwait(false);
-
+        scheduledTask = ScheduledTaskHelper.GetTask("10", DoWork, null, null, stoppingToken);
+        scheduledTask.Start();
+        return Task.CompletedTask;
     }
 
 }

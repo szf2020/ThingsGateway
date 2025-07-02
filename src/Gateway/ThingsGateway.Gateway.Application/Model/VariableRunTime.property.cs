@@ -197,7 +197,7 @@ public partial class VariableRuntime : Variable, IVariable, IDisposable
 
 
     /// <summary>
-    /// 实时值
+    /// 实时值类型
     /// </summary>
     [AutoGenerateColumn(Visible = true, Order = 6)]
     public string RuntimeType => Value?.GetType()?.ToString();

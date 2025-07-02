@@ -14,11 +14,13 @@ using BootstrapBlazor.Components;
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Localization;
 
+using ThingsGateway.Gateway.Razor;
+using ThingsGateway.NewLife.Json.Extension;
 using ThingsGateway.Razor;
 
 namespace ThingsGateway.Plugin.Mqtt
 {
-    public partial class MqttClientPropertyRazor : IPropertyUIBase
+    public partial class MqttPropertyRazor : IPropertyUIBase
     {
         [Parameter, EditorRequired]
         public string Id { get; set; }
@@ -135,5 +137,7 @@ namespace ThingsGateway.Plugin.Mqtt
 
         [Inject]
         private DialogService DialogService { get; set; }
+
+
     }
 }

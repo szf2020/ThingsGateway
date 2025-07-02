@@ -30,6 +30,7 @@ public partial class MqttServer : BusinessBaseWithCacheIntervalScript<VariableBa
     public override VariablePropertyBase VariablePropertys => _variablePropertys;
 
     protected override BusinessPropertyWithCacheIntervalScript _businessPropertyWithCacheIntervalScript => _driverPropertys;
+    public override Type DriverPropertyUIType => typeof(MqttPropertyRazor);
 
     protected override async Task InitChannelAsync(IChannel? channel, CancellationToken cancellationToken)
     {

@@ -120,4 +120,10 @@ public class MqttClientProperty : BusinessPropertyWithCacheIntervalScript
     [DynamicProperty(Remark = "这个主题接收到任何数据都会把全部的信息发送到变量/设备/报警主题中")]
     public string RpcQuestTopic { get; set; }
 
+    /// <summary>
+    /// RPC脚本
+    /// </summary>
+    [DynamicProperty]
+    [AutoGenerateColumn(Visible = true, IsVisibleWhenEdit = false, IsVisibleWhenAdd = false)]
+    public string? BigTextScriptRpc { get; set; }
 }

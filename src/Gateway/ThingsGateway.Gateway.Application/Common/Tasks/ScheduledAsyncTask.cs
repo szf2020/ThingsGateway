@@ -63,7 +63,7 @@ public class ScheduledAsyncTask : DisposeBase, IScheduledTask, IScheduledIntInte
         }
         catch (Exception ex)
         {
-            LogMessage.LogWarning(ex);
+            LogMessage?.LogWarning(ex);
         }
         finally
         {
@@ -74,16 +74,16 @@ public class ScheduledAsyncTask : DisposeBase, IScheduledTask, IScheduledIntInte
         {
             if (!Check())
             {
-                DelayDo();
+                SetNext(_interval10MS);
             }
         }
     }
 
-    private void DelayDo()
+    public void SetNext(int interval)
     {
         // 延迟触发下一次
         if (!Check())
-            _timer?.SetNext(_interval10MS);
+            _timer?.SetNext(interval);
     }
 
 
