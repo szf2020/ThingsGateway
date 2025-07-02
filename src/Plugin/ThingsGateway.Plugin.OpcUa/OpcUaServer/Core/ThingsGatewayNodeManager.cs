@@ -70,6 +70,8 @@ public class ThingsGatewayNodeManager : CustomNodeManager2
         {
             if (rootFolder == null) return;
 
+            NodeIdTags?.Clear();
+            RemoveRootNotifier(rootFolder);
             rootFolder?.SafeDispose();
             rootFolder = null;
             rootFolder = CreateFolder(null, "ThingsGateway", "ThingsGateway");
@@ -100,7 +102,6 @@ public class ThingsGatewayNodeManager : CustomNodeManager2
                 }
             }
             AddPredefinedNode(SystemContext, rootFolder);
-
             rootFolder.ClearChangeMasks(SystemContext, true);
 
         }
@@ -526,7 +527,7 @@ public class ThingsGatewayNodeManager : CustomNodeManager2
                 a.ToDictionary(a => a.Item1.Name, a => a.Item2)
             );
             var result = GlobalData.RpcService.InvokeDeviceMethodAsync("OpcUaServer - " + context?.Session?.Identity?.DisplayName, writeDatas
-            ).GetAwaiter().GetResult(); ;
+            ).GetAwaiter().GetResult();
 
             for (int ii = 0; ii < nodesToWrite.Count; ii++)
             {

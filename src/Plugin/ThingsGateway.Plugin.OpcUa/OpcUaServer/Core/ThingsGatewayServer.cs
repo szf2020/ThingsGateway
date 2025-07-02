@@ -44,19 +44,6 @@ public partial class ThingsGatewayServer : StandardServer
     }
 
 
-    //public void AfterVariablesChanged()
-    //{
-    //    if(masterNodeManager!=null)
-    //    {
-    //        masterNodeManager?.Dispose();
-    //        masterNodeManager = CreateMasterNodeManager((ServerInternalData)NodeManager.Server, _opcUaServer.m_configuration);
-    //        ((ServerInternalData)NodeManager.Server).SetNodeManager(masterNodeManager);
-    //        // put the node manager into a state that allows it to be used by other objects.
-    //        masterNodeManager.Startup();
-    //    }
-
-    //}
-
     /// <inheritdoc/>
     protected override MasterNodeManager CreateMasterNodeManager(IServerInternal server, ApplicationConfiguration configuration)
     {

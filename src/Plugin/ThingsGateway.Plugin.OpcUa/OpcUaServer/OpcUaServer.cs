@@ -78,14 +78,14 @@ public partial class OpcUaServer : BusinessBase
 
         CollectVariableRuntimes.Clear();
 
-        IdVariableRuntimes.ForEach(a =>
-        {
-            VariableValueChange(a.Value, a.Value.AdaptVariableBasicData());
-        });
+        //IdVariableRuntimes.ForEach(a =>
+        //{
+        //    VariableValueChange(a.Value, a.Value.AdaptVariableBasicData());
+        //});
 
-
-        m_server?.NodeManager?.RefreshVariable();
-
+        //动态更新UA库节点暂时取消
+        //m_server?.NodeManager?.RefreshVariable();
+        m_server?.Stop();
     }
 
 
@@ -112,6 +112,7 @@ public partial class OpcUaServer : BusinessBase
         GlobalData.VariableValueChangeEvent += VariableValueChange;
 
         Localizer = App.CreateLocalizerByType(typeof(OpcUaServer))!;
+
         await base.InitChannelAsync(channel, cancellationToken).ConfigureAwait(false);
 
 
