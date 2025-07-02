@@ -165,10 +165,11 @@ public class OpcUaMaster : CollectBase
                         //如果是订阅模式，连接时添加订阅组
                         if (_plc.OpcUaProperty?.ActiveSubscribe == true && CurrentDevice.VariableSourceReads.Count > 0 && _plc.Session.SubscriptionCount < CurrentDevice.VariableSourceReads.Count)
                         {
-                            try
-                            {
 
-                                foreach (var variableSourceRead in CurrentDevice.VariableSourceReads)
+
+                            foreach (var variableSourceRead in CurrentDevice.VariableSourceReads)
+                            {
+                                try
                                 {
                                     if (_plc.Session.Subscriptions.FirstOrDefault(a => a.DisplayName == variableSourceRead.RegisterAddress) == null)
                                     {
@@ -180,19 +181,22 @@ public class OpcUaMaster : CollectBase
 
                                     await Task.Delay(100, cancellationToken).ConfigureAwait(false); // allow for subscription to be finished on server?
 
+                                    checkLog = true;
                                 }
+                                catch (Exception ex)
+                                {
+                                    if (!checkLog)
+                                        LogMessage?.LogWarning(ex, "AddSubscriptions error");
+                                    checkLog = false;
+                                }
+                                finally
+                                {
+                                }
+
                                 LogMessage?.LogInformation("AddSubscriptions done");
-                                checkLog = true;
+
                             }
-                            catch (Exception ex)
-                            {
-                                if (!checkLog)
-                                    LogMessage?.LogWarning(ex, "AddSubscriptions error");
-                                checkLog = false;
-                            }
-                            finally
-                            {
-                            }
+
                         }
                     }
                 }

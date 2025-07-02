@@ -1099,7 +1099,7 @@ public class OpcUaMaster : IDisposable
     }
 
 
-    private static List<VariableNode> GetVariableNodes(ReadValueIdCollection itemsToRead, DataValueCollection values, DiagnosticInfoCollection diagnosticInfos, ResponseHeader responseHeader, int count = 1)
+    private List<VariableNode> GetVariableNodes(ReadValueIdCollection itemsToRead, DataValueCollection values, DiagnosticInfoCollection diagnosticInfos, ResponseHeader responseHeader, int count = 1)
     {
         ClientBase.ValidateResponse(values, itemsToRead);
         ClientBase.ValidateDiagnosticInfos(diagnosticInfos, itemsToRead);
@@ -1130,11 +1130,11 @@ public class OpcUaMaster : IDisposable
             // NodeId Attribute
             if (!DataValue.IsGood(value))
             {
-                throw ServiceResultException.Create(value.StatusCode, 0 + 2 * i, diagnosticInfos, responseHeader.StringTable);
+                Log(3, ServiceResultException.Create(value.StatusCode, 0 + 2 * i, diagnosticInfos, responseHeader.StringTable), $"Get nodeid {itemsToRead[0 + 2 * i].NodeId} fail");
             }
             if (value == null)
             {
-                throw ServiceResultException.Create(StatusCodes.BadUnexpectedError, "Node does not support the NodeId attribute.");
+                Log(3, ServiceResultException.Create(StatusCodes.BadUnexpectedError, "Node does not support the NodeId attribute."), $"Get nodeid {itemsToRead[0 + 2 * i].NodeId} fail");
             }
 
             variableNode.NodeId = (NodeId)value.GetValue(typeof(NodeId));
