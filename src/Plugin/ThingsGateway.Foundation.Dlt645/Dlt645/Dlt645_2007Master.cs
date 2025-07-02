@@ -24,7 +24,7 @@ public class Dlt645_2007Master : DtuServiceDeviceBase
         RegisterByteLength = 2;
         channel.MaxSign = ushort.MaxValue;
     }
-    public override IThingsGatewayBitConverter ThingsGatewayBitConverter { get; protected set; } = new Dlt645_2007BitConverter(EndianType.Big) { };
+    public override IThingsGatewayBitConverter ThingsGatewayBitConverter { get; } = new Dlt645_2007BitConverter(EndianType.Big) { };
 
     /// <inheritdoc/>
     public string FEHead { get; set; } = "FEFEFEFE";

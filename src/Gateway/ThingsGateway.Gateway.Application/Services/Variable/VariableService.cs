@@ -335,8 +335,8 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
     {
         using var db = GetDB();
         var dataScope = await GlobalData.SysUserService.GetCurrentUserDataScopeAsync().ConfigureAwait(false);
-        var ids = input.ToList();
-        var result = (await db.Deleteable<Variable>().Where(a => ids.Contains(a.Id))
+        var ids = input?.ToList();
+        var result = (await db.Deleteable<Variable>().WhereIF(input != null, a => ids.Contains(a.Id))
                           .WhereIF(dataScope != null && dataScope?.Count > 0, u => dataScope.Contains(u.CreateOrgId))//在指定机构列表查询
              .WhereIF(dataScope?.Count == 0, u => u.CreateUserId == UserManager.UserId)
              .ExecuteCommandAsync().ConfigureAwait(false)) > 0;

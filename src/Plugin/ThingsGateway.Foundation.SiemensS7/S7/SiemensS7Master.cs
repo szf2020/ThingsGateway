@@ -32,8 +32,8 @@ public partial class SiemensS7Master : DeviceBase
     {
     }
 
-    public override IThingsGatewayBitConverter ThingsGatewayBitConverter { get; protected set; } = new S7BitConverter(EndianType.Big) { };
-
+    public override IThingsGatewayBitConverter ThingsGatewayBitConverter => s7BitConverter;
+    private S7BitConverter s7BitConverter = new S7BitConverter(EndianType.Big) { };
     /// <summary>
     /// PduLength
     /// </summary>
@@ -54,7 +54,14 @@ public partial class SiemensS7Master : DeviceBase
     /// <summary>
     /// S7类型
     /// </summary>
-    public SiemensTypeEnum SiemensS7Type { get; set; }
+    public SiemensTypeEnum SiemensS7Type
+    {
+        get => siemensS7Type; set
+        {
+            siemensS7Type = value;
+            s7BitConverter.SMART200 = value == SiemensTypeEnum.S200Smart;
+        }
+    }
 
     /// <summary>
     /// 槽号，需重新连接
@@ -371,6 +378,8 @@ public partial class SiemensS7Master : DeviceBase
 
     #region 初始握手
     private WaitLock ChannelStartedWaitLock = new();
+    private SiemensTypeEnum siemensS7Type;
+
     /// <inheritdoc/>
     protected override async ValueTask<bool> ChannelStarted(IClientChannel channel, bool last)
     {
@@ -553,7 +562,24 @@ public partial class SiemensS7Master : DeviceBase
     public override async ValueTask<OperResult<string[]>> ReadStringAsync(string address, int length, IThingsGatewayBitConverter bitConverter = null, CancellationToken cancellationToken = default)
     {
         bitConverter ??= ThingsGatewayBitConverter.GetTransByAddress(address);
-        if (bitConverter.IsVariableStringLength)
+
+        if (((S7BitConverter)bitConverter)?.WStringEnable == true)
+        {
+            if (length > 1)
+            {
+                return new OperResult<string[]>(AppResource.StringLengthReadError);
+            }
+            var result = await SiemensHelper.ReadWStringAsync(this, address, cancellationToken).ConfigureAwait(false);
+            if (result.IsSuccess)
+            {
+                return OperResult.CreateSuccessResult(new string[] { result.Content });
+            }
+            else
+            {
+                return new OperResult<string[]>(result);
+            }
+        }
+        else if (bitConverter.IsVariableStringLength)
         {
             if (length > 1)
             {
@@ -579,9 +605,14 @@ public partial class SiemensS7Master : DeviceBase
     public override ValueTask<OperResult> WriteAsync(string address, string value, IThingsGatewayBitConverter bitConverter = null, CancellationToken cancellationToken = default)
     {
         bitConverter ??= ThingsGatewayBitConverter.GetTransByAddress(address);
+
+        if (((S7BitConverter)bitConverter)?.WStringEnable == true)
+        {
+            return SiemensHelper.WriteWStringAsync(this, address, value, cancellationToken);
+        }
         if (bitConverter.IsVariableStringLength)
         {
-            return SiemensHelper.WriteAsync(this, address, value, bitConverter.Encoding, cancellationToken);
+            return SiemensHelper.WriteStringAsync(this, address, value, bitConverter.Encoding, cancellationToken);
         }
         else
         {

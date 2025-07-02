@@ -51,7 +51,7 @@ public class ModbusSlave : DeviceBase, IModbusAddress
         RegisterByteLength = 2;
         channel.MaxSign = ushort.MaxValue;
     }
-    public override IThingsGatewayBitConverter ThingsGatewayBitConverter { get; protected set; } = new ThingsGatewayBitConverter(EndianType.Big) { };
+    public override IThingsGatewayBitConverter ThingsGatewayBitConverter { get; } = new ThingsGatewayBitConverter(EndianType.Big) { };
 
     public override bool SupportMultipleDevice()
     {

@@ -106,13 +106,14 @@ public class VariableRuntimeService : IVariableRuntimeService
 
             var result = await GlobalData.VariableService.DeleteVariableAsync(variableIds).ConfigureAwait(false);
 
-            ConcurrentHashSet<IDriver> changedDriver = new();
-
-            RuntimeServiceHelper.AddBusinessChangedDriver(variableIds, changedDriver);
-            RuntimeServiceHelper.VariableRuntimesDispose(variableIds);
 
             if (restart)
             {
+
+                ConcurrentHashSet<IDriver> changedDriver = new();
+
+                RuntimeServiceHelper.AddBusinessChangedDriver(variableIds, changedDriver);
+                RuntimeServiceHelper.VariableRuntimesDispose(variableIds);
                 await RuntimeServiceHelper.ChangedDriverAsync(changedDriver, _logger, cancellationToken).ConfigureAwait(false);
             }
 
@@ -125,6 +126,38 @@ public class VariableRuntimeService : IVariableRuntimeService
 
 
     }
+
+    public async Task<bool> ClearVariableAsync(bool restart, CancellationToken cancellationToken)
+    {
+        try
+        {
+            // await WaitLock.WaitAsync().ConfigureAwait(false);
+
+
+            var result = await GlobalData.VariableService.DeleteVariableAsync(null).ConfigureAwait(false);
+
+
+
+            if (restart)
+            {
+                ConcurrentHashSet<IDriver> changedDriver = new();
+                var variableIds = GlobalData.IdVariables.Select(a => a.Key).ToHashSet();
+                RuntimeServiceHelper.AddBusinessChangedDriver(variableIds, changedDriver);
+                RuntimeServiceHelper.VariableRuntimesDispose(variableIds);
+                await RuntimeServiceHelper.ChangedDriverAsync(changedDriver, _logger, cancellationToken).ConfigureAwait(false);
+            }
+
+            return true;
+        }
+        finally
+        {
+            //WaitLock.Release();
+        }
+
+
+    }
+
+
     public Task<Dictionary<string, object>> ExportVariableAsync(ExportFilter exportFilter) => GlobalData.VariableService.ExportVariableAsync(exportFilter);
 
     public async Task ImportVariableAsync(Dictionary<string, ImportPreviewOutputBase> input, bool restart, CancellationToken cancellationToken)

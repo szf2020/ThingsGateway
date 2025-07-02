@@ -95,11 +95,11 @@
                         <div class="col-12  col-md-12 min-height-500">
                             <BootstrapLabel Value=@Localizer["BigTextScriptRpc"] ShowLabelTooltip="true" />
                             <CodeEditor ShowLineNo @bind-Value=@clientProperty.BigTextScriptRpc Language="csharp" Theme="vs-dark" IsReadonly=@(!CanWrite) />
-                            <div class="ms-2 d-flex justify-content-center align-items-center">
+@*                             <div class="ms-2 d-flex justify-content-center align-items-center">
                                 <Button IsDisabled=@(!CanWrite) OnClick=@(() => PropertyComponent.CheckScript(clientProperty, nameof(clientProperty.BigTextScriptRpc), Localizer["check"], this, DialogService))>
                                     @Localizer["Check"]
                                 </Button>
-                            </div>
+                            </div> *@
                         </div>
 
                     </EditTemplate>

@@ -24,18 +24,44 @@ public class S7BitConverter : ThingsGatewayBitConverter
     public S7BitConverter(EndianType endianType) : base(endianType)
     {
     }
+
+    public bool SMART200 { get; set; } = false;
+    public bool WStringEnable { get; set; } = false;
     public override int? StringLength { get; set; } = 100;
     /// <inheritdoc/>
     public override string ToString(byte[] buffer, int offset, int length)
     {
-        if (!IsVariableStringLength)
+        if (WStringEnable)
         {
-            return base.ToString(buffer, offset, length);
+            if (!SMART200)
+                return base.ToString(buffer, offset, this.ToUInt16(buffer, offset - 2) * 2);
+            else
+                return base.ToString(buffer, offset, buffer[offset - 1] * 2);
+        }
+        else if (IsVariableStringLength)
+        {
+            if (!SMART200)
+                return base.ToString(buffer, offset, buffer[offset - 1]);
+            else
+                return base.ToString(buffer, offset, buffer[offset - 1]);
         }
         else
         {
-            return base.ToString(buffer, offset, buffer[offset - 1]);
+            return base.ToString(buffer, offset, length);
         }
+
+    }
+
+    public override void OtherPropertySet(IThingsGatewayBitConverter thingsGatewayBitConverter, string registerAddress)
+    {
+        if (thingsGatewayBitConverter is not S7BitConverter s7BitConverter)
+        {
+            return;
+        }
+        var sAddress = SiemensS7Address.ParseFrom(registerAddress);
+        s7BitConverter.WStringEnable = sAddress.WStringEnable;
+
+        base.OtherPropertySet(thingsGatewayBitConverter, registerAddress);
     }
 
 }

@@ -3,7 +3,8 @@
     "AddressStart": "起始地址",
     "BitCode": "Bit地址",
     "DataCode": "寄存器区",
-    "DbBlock": "DB块"
+    "DbBlock": "DB块",
+    "WStringEnable": "WString"
   },
   "ThingsGateway.Foundation.SiemensS7.SiemensS7Master": {
     "LocalTSAP": "本地TSAP",

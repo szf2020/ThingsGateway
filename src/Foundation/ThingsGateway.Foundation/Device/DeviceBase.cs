@@ -131,7 +131,7 @@ public abstract class DeviceBase : DisposableObject, IDevice
     public virtual int RegisterByteLength { get; protected set; } = 1;
 
     /// <inheritdoc/>
-    public virtual IThingsGatewayBitConverter ThingsGatewayBitConverter { get; protected set; } = new ThingsGatewayBitConverter();
+    public virtual IThingsGatewayBitConverter ThingsGatewayBitConverter { get; } = new ThingsGatewayBitConverter();
 
     /// <inheritdoc/>
     public bool OnLine => Channel.Online;

@@ -128,6 +128,7 @@ public class Variable : BaseDataEntity, IValidatableObject
     [IgnoreExcel]
     [Required]
     [NotNull]
+    [MinValue(1)]
     public virtual long DeviceId { get => deviceId; set => deviceId = value; }
 
     /// <summary>

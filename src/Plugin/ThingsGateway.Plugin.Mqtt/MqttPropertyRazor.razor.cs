@@ -14,8 +14,6 @@ using BootstrapBlazor.Components;
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Localization;
 
-using ThingsGateway.Gateway.Razor;
-using ThingsGateway.NewLife.Json.Extension;
 using ThingsGateway.Razor;
 
 namespace ThingsGateway.Plugin.Mqtt

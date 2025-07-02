@@ -3,7 +3,8 @@
     "AddressStart": "AddressStart",
     "BitCode": "BitBitCode",
     "DataCode": "DataCode",
-    "DbBlock": "DbBlock"
+    "DbBlock": "DbBlock",
+    "WStringEnable": "WString"
   },
   "ThingsGateway.Foundation.SiemensS7.SiemensS7Master": {
     "LocalTSAP": "LocalTSAP",

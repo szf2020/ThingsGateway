@@ -10,10 +10,6 @@
 
 using Newtonsoft.Json.Linq;
 
-using System.Text;
-
-using ThingsGateway.Foundation.Extension.String;
-
 namespace ThingsGateway.Foundation;
 
 /// <summary>
@@ -23,126 +19,6 @@ public static class ThingsGatewayBitConverterExtension
 {
 
     //private static MemoryCache MemoryCache = new() { Capacity = 10000000 };
-    /// <summary>
-    /// 从设备地址中解析附加信息
-    /// 这个方法获取<see cref="IThingsGatewayBitConverter"/>
-    /// 解析步骤将被缓存。
-    /// </summary>
-    /// <param name="registerAddress">设备地址</param>
-    /// <param name="defaultBitConverter">默认的数据转换器</param>
-    /// <returns><see cref="IThingsGatewayBitConverter"/> 实例</returns>
-    public static IThingsGatewayBitConverter GetTransByAddress(this IThingsGatewayBitConverter defaultBitConverter, string? registerAddress)
-    {
-        if (registerAddress.IsNullOrEmpty()) return defaultBitConverter;
-
-        var type = defaultBitConverter.GetType();
-        // 尝试从缓存中获取解析结果
-        //var cacheKey = $"{nameof(ThingsGatewayBitConverterExtension)}_{nameof(GetTransByAddress)}_{type.FullName}_{type.TypeHandle.Value}_{defaultBitConverter.ToJsonString()}_{registerAddress}_{defaultBitConverter.GetHashCode()}";
-        //if (MemoryCache.TryGetValue(cacheKey, out IThingsGatewayBitConverter cachedConverter))
-        //{
-        //    if (cachedConverter.Equals(defaultBitConverter))
-        //    {
-        //        return defaultBitConverter;
-        //    }
-        //    else
-        //    {
-        //        return (IThingsGatewayBitConverter)cachedConverter.Map(type);
-        //    }
-        //}
-
-        // 去除设备地址两端的空格
-        registerAddress = registerAddress.Trim();
-
-        // 根据分号拆分附加信息
-        var strs = registerAddress.SplitStringBySemicolon();
-
-        DataFormatEnum? dataFormat = null;
-        Encoding? encoding = null;
-        bool? wstring = null;
-        int? stringlength = null;
-        BcdFormatEnum? bcdFormat = null;
-        StringBuilder sb = new();
-        foreach (var str in strs)
-        {
-            // 解析 dataFormat
-            if (str.StartsWith("data=", StringComparison.OrdinalIgnoreCase))
-            {
-                var dataFormatName = str.Substring(5);
-                try { if (Enum.TryParse<DataFormatEnum>(dataFormatName, true, out var dataFormat1)) dataFormat = dataFormat1; } catch { }
-            }
-            else if (str.StartsWith("vsl=", StringComparison.OrdinalIgnoreCase))
-            {
-                var wstringName = str.Substring(4);
-                try { if (bool.TryParse(wstringName, out var wstring1)) wstring = wstring1; } catch { }
-            }
-            // 解析 encoding
-            else if (str.StartsWith("encoding=", StringComparison.OrdinalIgnoreCase))
-            {
-                var encodingName = str.Substring(9);
-                try { encoding = Encoding.GetEncoding(encodingName); } catch { }
-            }
-            // 解析 length
-            else if (str.StartsWith("len=", StringComparison.OrdinalIgnoreCase))
-            {
-                var lenStr = str.Substring(4);
-                stringlength = lenStr.IsNullOrEmpty() ? null : Convert.ToUInt16(lenStr);
-            }
-            // 解析 bcdFormat
-            else if (str.StartsWith("bcd=", StringComparison.OrdinalIgnoreCase))
-            {
-                var bcdName = str.Substring(4);
-                try { if (Enum.TryParse<BcdFormatEnum>(bcdName, true, out var bcdFormat1)) bcdFormat = bcdFormat1; } catch { }
-            }
-
-            // 处理其他情况，将未识别的部分拼接回去
-            else
-            {
-                if (sb.Length > 0)
-                    sb.Append($";{str}");
-                else
-                    sb.Append($"{str}");
-            }
-        }
-
-        // 更新设备地址为去除附加信息后的地址
-        registerAddress = sb.ToString();
-
-        // 如果没有解析出任何附加信息，则直接返回默认的数据转换器
-        if (bcdFormat == null && stringlength == null && encoding == null && dataFormat == null && wstring == null)
-        {
-            //MemoryCache.Set(cacheKey, defaultBitConverter!, 3600);
-            return defaultBitConverter;
-        }
-
-        // 根据默认的数据转换器创建新的数据转换器实例
-        var converter = (IThingsGatewayBitConverter)defaultBitConverter!.Map(type);
-
-        // 更新新的数据转换器实例的属性值
-        if (encoding != null)
-        {
-            converter.Encoding = encoding;
-        }
-        if (bcdFormat != null)
-        {
-            converter.BcdFormat = bcdFormat.Value;
-        }
-        if (wstring != null)
-        {
-            converter.IsVariableStringLength = wstring.Value;
-        }
-        if (stringlength != null)
-        {
-            converter.StringLength = stringlength.Value;
-        }
-        if (dataFormat != null)
-        {
-            converter.DataFormat = dataFormat.Value;
-        }
-
-        // 将解析结果添加到缓存中，缓存有效期为3600秒
-        //MemoryCache.Set(cacheKey, converter!, 3600);
-        return converter;
-    }
 
     #region 获取对应数据类型的数据
 

@@ -30,7 +30,7 @@ public partial class ModbusMaster : DtuServiceDeviceBase, IModbusAddress
         }
     }
 
-    public override IThingsGatewayBitConverter ThingsGatewayBitConverter { get; protected set; } = new ThingsGatewayBitConverter(EndianType.Big) { };
+    public override IThingsGatewayBitConverter ThingsGatewayBitConverter { get; } = new ThingsGatewayBitConverter(EndianType.Big) { };
 
     /// <summary>
     /// Modbus类型，在initChannelAsync之前设置

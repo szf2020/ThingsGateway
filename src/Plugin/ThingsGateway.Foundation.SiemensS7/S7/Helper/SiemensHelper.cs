@@ -106,7 +106,7 @@ internal sealed partial class SiemensHelper
         }
     }
 
-    internal static async ValueTask<OperResult> WriteAsync(SiemensS7Master plc, string address, string value, Encoding encoding, CancellationToken cancellationToken = default)
+    internal static async ValueTask<OperResult> WriteStringAsync(SiemensS7Master plc, string address, string value, Encoding encoding, CancellationToken cancellationToken = default)
     {
         value ??= string.Empty;
         byte[] inBytes = encoding.GetBytes(value);
@@ -124,5 +124,72 @@ internal sealed partial class SiemensHelper
                 ), DataTypeEnum.String, cancellationToken).ConfigureAwait(false);
         }
         return await plc.WriteAsync(address, DataTransUtil.SpliceArray([(byte)value.Length], inBytes), DataTypeEnum.String, cancellationToken).ConfigureAwait(false);
+    }
+
+
+
+    internal static async ValueTask<OperResult<string>> ReadWStringAsync(SiemensS7Master plc, string address, CancellationToken cancellationToken)
+    {
+        //先读取一次获取长度，再读取实际值
+        if (plc.SiemensS7Type != SiemensTypeEnum.S200Smart)
+        {
+            var encoding = Encoding.BigEndianUnicode;
+            var result1 = await plc.ReadAsync(address, 4, cancellationToken).ConfigureAwait(false);
+            if (!result1.IsSuccess)
+            {
+                return new OperResult<string>(result1);
+            }
+            if (result1.Content[0] == 0 || result1.Content[0] == byte.MaxValue)
+            {
+                return new OperResult<string>(AppResource.NotString);
+            }
+            var result2 = await plc.ReadAsync(address, 4 + (plc.ThingsGatewayBitConverter.ToUInt16(result1.Content, 2) * 2), cancellationToken).ConfigureAwait(false);
+            if (!result2.IsSuccess)
+            {
+                return new OperResult<string>(result2);
+            }
+            else
+            {
+                return OperResult.CreateSuccessResult(encoding.GetString(result2.Content, 4, result2.Content.Length - 4));
+            }
+        }
+        else
+        {
+            var encoding = Encoding.Unicode;
+            var result1 = await plc.ReadAsync(address, 1, cancellationToken).ConfigureAwait(false);
+            if (!result1.IsSuccess)
+                return new OperResult<string>(result1);
+            var result2 = await plc.ReadAsync(address, 1 + (result1.Content[0] * 2), cancellationToken).ConfigureAwait(false);
+            if (!result2.IsSuccess)
+            {
+                return new OperResult<string>(result2);
+            }
+            else
+            {
+                return OperResult.CreateSuccessResult(encoding.GetString(result2.Content, 1, result2.Content.Length - 1));
+            }
+        }
+    }
+
+    internal static async ValueTask<OperResult> WriteWStringAsync(SiemensS7Master plc, string address, string value, CancellationToken cancellationToken = default)
+    {
+        value ??= string.Empty;
+        if (plc.SiemensS7Type != SiemensTypeEnum.S200Smart)
+        {
+            byte[] inBytes1 = Encoding.BigEndianUnicode.GetBytes(value);
+            var result = await plc.ReadAsync(address, 4, cancellationToken).ConfigureAwait(false);
+            if (!result.IsSuccess) return result;
+            var num = plc.ThingsGatewayBitConverter.ToUInt16(result.Content, 0);
+            if (num == 0)
+                num = 254;
+            if (value.Length > num) return new OperResult<string>(AppResource.WriteDataLengthMore);
+            return await plc.WriteAsync(
+                address,
+                DataTransUtil.SpliceArray(plc.ThingsGatewayBitConverter.GetBytes(num), plc.ThingsGatewayBitConverter.GetBytes((ushort)value.Length),
+                inBytes1
+                ), DataTypeEnum.String, cancellationToken).ConfigureAwait(false);
+        }
+        byte[] inBytes2 = Encoding.Unicode.GetBytes(value);
+        return await plc.WriteAsync(address, DataTransUtil.SpliceArray([(byte)value.Length], inBytes2), DataTypeEnum.String, cancellationToken).ConfigureAwait(false);
     }
 }

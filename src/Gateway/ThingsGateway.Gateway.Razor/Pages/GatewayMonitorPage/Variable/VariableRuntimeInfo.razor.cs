@@ -424,7 +424,7 @@ finally
             await Task.Run(async () =>
             {
 
-                await GlobalData.VariableRuntimeService.DeleteVariableAsync(Items.Select(a => a.Id), AutoRestartThread, default);
+                await GlobalData.VariableRuntimeService.ClearVariableAsync(AutoRestartThread, default);
                 await InvokeAsync(async () =>
                 {
                     await ToastService.Default();

@@ -325,6 +325,7 @@ public interface IThingsGatewayBitConverter
     /// <param name="length">length</param>
     /// <returns>decimal对象</returns>
     decimal[] ToDecimal(byte[] buffer, int offset, int length);
+    IThingsGatewayBitConverter GetTransByAddress(string? registerAddress);
 
     #endregion ToValue
 }

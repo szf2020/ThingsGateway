@@ -8,6 +8,8 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
+using System.Text;
+
 namespace ThingsGateway.Foundation.SiemensS7;
 
 internal static class PackHelper
@@ -49,6 +51,13 @@ internal static class PackHelper
             {
                 // 解析SiemensS7Address对象
                 var s7Address = SiemensS7Address.ParseFrom(it.RegisterAddress);
+                // 根据地址获取转换参数
+                if (it.ThingsGatewayBitConverter is S7BitConverter s7BitConverter)
+                {
+                    s7BitConverter.WStringEnable = s7Address.WStringEnable;
+                }
+
+
                 int lastLen = it.DataType.GetByteLength();
 
                 // 处理特殊情况下的长度
@@ -76,10 +85,23 @@ internal static class PackHelper
                                     {
                                         lastLen = it.ThingsGatewayBitConverter.StringLength.Value;
                                     }
+
+                                    if (s7Address.WStringEnable)
+                                    {
+                                        it.ThingsGatewayBitConverter.Encoding = Encoding.Unicode;
+                                    }
                                 }
                                 else
                                 {
-                                    if (it.ThingsGatewayBitConverter.IsVariableStringLength)
+                                    if (s7Address.WStringEnable)
+                                    {
+                                        // 字符串在S7中，前四个字节不属于实际内容
+                                        it.Index += 4;
+                                        lastLen = it.ThingsGatewayBitConverter.StringLength.Value + 4;
+                                        it.ThingsGatewayBitConverter.Encoding = Encoding.BigEndianUnicode;
+
+                                    }
+                                    else if (it.ThingsGatewayBitConverter.IsVariableStringLength)
                                     {
                                         // 字符串在S7中，前两个字节不属于实际内容
                                         it.Index += 2;

@@ -21,6 +21,8 @@ namespace ThingsGateway.Foundation.SiemensS7;
 /// </summary>
 public class SiemensS7Address : S7Request
 {
+
+    public bool WStringEnable { get; set; }
     public SiemensS7Address()
     {
     }
@@ -42,6 +44,7 @@ public class SiemensS7Address : S7Request
     public override string ToString()
     {
         StringBuilder stringBuilder = Pool.StringBuilder.Get();
+        stringBuilder.Append($"W={WStringEnable};");
         if (DataCode == S7Area.TM)
         {
             stringBuilder.Append($"T{AddressStart}");
@@ -272,6 +275,10 @@ public class SiemensS7Address : S7Request
                 {
                     throw new Exception(string.Format(AppResource.AddressError, address));
                 }
+            }
+            else if (strArr[index].StartsWith("W=", StringComparison.OrdinalIgnoreCase))
+            {
+                s7AddressData.WStringEnable = strArr[index].Substring(2).ToBoolean(false);
             }
         }
 
