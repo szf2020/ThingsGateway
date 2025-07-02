@@ -107,13 +107,13 @@ public class VariableRuntimeService : IVariableRuntimeService
             var result = await GlobalData.VariableService.DeleteVariableAsync(variableIds).ConfigureAwait(false);
 
 
+            ConcurrentHashSet<IDriver> changedDriver = new();
+
+            RuntimeServiceHelper.AddBusinessChangedDriver(variableIds, changedDriver);
+            RuntimeServiceHelper.VariableRuntimesDispose(variableIds);
+
             if (restart)
             {
-
-                ConcurrentHashSet<IDriver> changedDriver = new();
-
-                RuntimeServiceHelper.AddBusinessChangedDriver(variableIds, changedDriver);
-                RuntimeServiceHelper.VariableRuntimesDispose(variableIds);
                 await RuntimeServiceHelper.ChangedDriverAsync(changedDriver, _logger, cancellationToken).ConfigureAwait(false);
             }
 
@@ -136,14 +136,14 @@ public class VariableRuntimeService : IVariableRuntimeService
 
             var result = await GlobalData.VariableService.DeleteVariableAsync(null).ConfigureAwait(false);
 
-
+            ConcurrentHashSet<IDriver> changedDriver = new();
+            var variableIds = GlobalData.IdVariables.Select(a => a.Key).ToHashSet();
+            RuntimeServiceHelper.AddBusinessChangedDriver(variableIds, changedDriver);
+            RuntimeServiceHelper.VariableRuntimesDispose(variableIds);
 
             if (restart)
             {
-                ConcurrentHashSet<IDriver> changedDriver = new();
-                var variableIds = GlobalData.IdVariables.Select(a => a.Key).ToHashSet();
-                RuntimeServiceHelper.AddBusinessChangedDriver(variableIds, changedDriver);
-                RuntimeServiceHelper.VariableRuntimesDispose(variableIds);
+
                 await RuntimeServiceHelper.ChangedDriverAsync(changedDriver, _logger, cancellationToken).ConfigureAwait(false);
             }
 

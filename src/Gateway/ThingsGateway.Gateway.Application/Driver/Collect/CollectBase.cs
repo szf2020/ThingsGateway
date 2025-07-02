@@ -150,23 +150,26 @@ public abstract class CollectBase : DriverBase, IRpcDriver
             return variablesMethodResult;
         }
     }
-
+    private volatile bool _addVariableTasks;
     protected void RefreshVariableTasks(CancellationToken cancellationToken)
     {
-        if (VariableTasks.Count > 0)
+        if (_addVariableTasks)
         {
-            foreach (var item in VariableTasks)
+            if (VariableTasks != null)
             {
-                item.Stop();
-                TaskSchedulerLoop.Remove(item);
-            }
+                foreach (var item in VariableTasks)
+                {
+                    item.Stop();
+                    TaskSchedulerLoop?.Remove(item);
+                }
 
-            VariableTasks = AddVariableTask(cancellationToken);
+                VariableTasks = AddVariableTask(cancellationToken);
 
-            foreach (var item in VariableTasks)
-            {
-                TaskSchedulerLoop.Add(item);
-                item.Start();
+                foreach (var item in VariableTasks)
+                {
+                    TaskSchedulerLoop?.Add(item);
+                    item.Start();
+                }
             }
         }
     }
@@ -198,7 +201,7 @@ public abstract class CollectBase : DriverBase, IRpcDriver
         tasks.Add(testOnline);
 
         VariableTasks = AddVariableTask(cancellationToken);
-
+        _addVariableTasks = true;
         tasks.AddRange(VariableTasks);
         return tasks;
 
@@ -242,6 +245,7 @@ public abstract class CollectBase : DriverBase, IRpcDriver
 
     protected virtual void SetDeviceStatus(object? state, CancellationToken cancellationToken)
     {
+        CurrentDevice.SetDeviceStatus(TimerX.Now);
         if (IsConnected())
         {
             if (CurrentDevice.DeviceStatus == DeviceStatusEnum.OffLine)

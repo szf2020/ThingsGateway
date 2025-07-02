@@ -11,9 +11,6 @@
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-using System;
-using System.Threading;
-
 using ThingsGateway.Gateway.Application.Extensions;
 using ThingsGateway.NewLife.Extension;
 

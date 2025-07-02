@@ -1,9 +1,12 @@
+
+#docker run -d --name tg  --restart always -p 127.0.0.1:5000:5000 -e ASPNETCORE_ENVIRONMENT=Demo -v /thingsgateway/Keys:/app/Keys -v /thingsgateway/DB:/app/DB  --memory="512m" registry.cn-shenzhen.aliyuncs.com/thingsgateway/thingsgateway:latest
+
 version: "latest"    # Docker Compose 配置版本
 
 services:         # 定义所有要跑的容器（服务）
   thingsgateway: #服务名称
     image: registry.cn-shenzhen.aliyuncs.com/thingsgateway/thingsgateway:latest  #镜像名:tag
-    container_name: thingsgateway  #容器名字
+    container_name: tg  #容器名字
     ports:
       - "127.0.0.1:5000:5000"    #"主机端口:容器端口"
     environment:
@@ -16,3 +19,4 @@ services:         # 定义所有要跑的容器（服务）
         limits:
           memory: 512M
     restart: always   # 容器异常退出自动重启
+

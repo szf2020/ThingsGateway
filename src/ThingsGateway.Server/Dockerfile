@@ -19,3 +19,6 @@ ENV ASPNETCORE_FORWARDEDHEADERS_ENABLED=true
 RUN ln -snf /usr/share/zoneinfo/$TimeZone /etc/localtime && echo $TimeZone > /etc/timezone
 
 ENTRYPOINT ["dotnet", "ThingsGateway.Server.dll","--urls","http://*:5000"]
+
+
+ 

@@ -27,7 +27,7 @@ public interface IThingsGatewayBitConverter
     /// <summary>
     /// 指定大小端。
     /// </summary>
-    EndianType EndianType { get; }
+    EndianType EndianType { get; set; }
 
     /// <summary>
     /// 当前的字符串编码类型

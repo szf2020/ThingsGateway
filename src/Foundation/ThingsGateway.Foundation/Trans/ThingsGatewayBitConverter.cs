@@ -62,7 +62,14 @@ public partial class ThingsGatewayBitConverter : IThingsGatewayBitConverter
     }
 
     /// <inheritdoc/>
-    public virtual EndianType EndianType { get; }
+    public virtual EndianType EndianType
+    {
+        get => endianType; set
+        {
+            endianType = value;
+            TouchSocketBitConverter = new TouchSocketBitConverter(endianType);
+        }
+    }
 
     /// <inheritdoc/>
     public virtual bool IsStringReverseByteWord { get; set; }
@@ -70,7 +77,7 @@ public partial class ThingsGatewayBitConverter : IThingsGatewayBitConverter
     /// <inheritdoc/>
     public virtual bool IsVariableStringLength { get; set; }
 
-    internal protected TouchSocketBitConverter TouchSocketBitConverter => TouchSocketBitConverter.GetBitConverter(EndianType);
+    internal protected TouchSocketBitConverter TouchSocketBitConverter { get; set; }
 
     static ThingsGatewayBitConverter()
     {
@@ -87,7 +94,7 @@ public partial class ThingsGatewayBitConverter : IThingsGatewayBitConverter
     /// 以小端
     /// </summary>
     public static readonly ThingsGatewayBitConverter LittleEndian;
-
+    private EndianType endianType;
 
     public virtual void OtherPropertySet(IThingsGatewayBitConverter thingsGatewayBitConverter, string registerAddress)
     {

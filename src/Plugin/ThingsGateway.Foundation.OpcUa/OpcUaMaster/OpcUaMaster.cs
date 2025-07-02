@@ -1376,7 +1376,7 @@ public class OpcUaMaster : IDisposable
             {
                 if (m_reConnectHandler == null)
                 {
-                    Log(3, null, "Reconnecting in {0}s", 1);
+                    Log(3, null, "Reconnecting : {0}", e.Status.ToString());
                     m_ReconnectStarting?.Invoke(this, e);
 
                     m_reConnectHandler = new SessionReconnectHandler(true, 10000);

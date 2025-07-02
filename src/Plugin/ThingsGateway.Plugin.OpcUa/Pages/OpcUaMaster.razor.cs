@@ -100,7 +100,7 @@ public partial class OpcUaMaster : IDisposable
         LogMessage?.AddLogger(logger);
 
         _plc.LogEvent = (a, b, c, d) => LogMessage?.Log((LogLevel)a, b, c, d);
-        _plc.DataChangedHandler += (a) => LogMessage?.Trace(a.ToSystemTextJsonString());
+        _plc.DataChangedHandler += (a) => LogMessage?.Trace($"id:{a.monitoredItem?.StartNodeId};stateCode:{a.dataValue?.StatusCode};value:{a.jToken?.ToString()}");
         base.OnInitialized();
     }
 
