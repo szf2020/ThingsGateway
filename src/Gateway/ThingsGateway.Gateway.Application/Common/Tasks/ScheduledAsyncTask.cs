@@ -16,6 +16,7 @@ public class ScheduledAsyncTask : DisposeBase, IScheduledTask, IScheduledIntInte
     private ILog LogMessage;
     private volatile int _isRunning = 0;
     private volatile int _pendingTriggers = 0;
+    public Int32 Period => _timer?.Period??0;
 
     public ScheduledAsyncTask(int interval, Func<object?, CancellationToken, Task> taskFunc, object? state, ILog log, CancellationToken token)
     {
@@ -86,7 +87,14 @@ public class ScheduledAsyncTask : DisposeBase, IScheduledTask, IScheduledIntInte
             _timer?.SetNext(interval);
     }
 
+    public bool Change(int dueTime, int period)
+    {
+        // 延迟触发下一次
+        if (!Check())
+            return _timer?.Change(dueTime, period) == true;
 
+        return false;
+    }
     public void Stop()
     {
         _timer?.SafeDispose();

@@ -16,6 +16,7 @@ public class ScheduledSyncTask : DisposeBase, IScheduledTask, IScheduledIntInter
     private ILog LogMessage;
     private volatile int _isRunning = 0;
     private volatile int _pendingTriggers = 0;
+    public Int32 Period => _timer?.Period ?? 0;
 
     public ScheduledSyncTask(int interval, Action<object?, CancellationToken> taskFunc, object? state, ILog log, CancellationToken token)
     {
@@ -88,6 +89,14 @@ public class ScheduledSyncTask : DisposeBase, IScheduledTask, IScheduledIntInter
     {
         if (!Check())
             _timer?.SetNext(interval);
+    }
+    public bool Change(int dueTime, int period)
+    {
+        // 延迟触发下一次
+        if (!Check())
+            return _timer?.Change(dueTime, period) == true;
+
+        return false;
     }
     public void Stop()
     {

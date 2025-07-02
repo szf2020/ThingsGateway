@@ -17,7 +17,7 @@ namespace ThingsGateway.NewLife.Threading;
 /// 
 /// TimerX必须维持对象，否则Scheduler也没有维持对象时，大家很容易一起被GC回收。
 /// </remarks>
-public class TimerX : ITimer, IDisposable
+public class TimerX : ITimer, ITimerx, IDisposable
 {
     #region 属性
     /// <summary>编号</summary>
@@ -382,25 +382,32 @@ public class TimerX : ITimer, IDisposable
             return period;
         }
     }
-
-    /// <summary>更改计时器的启动时间和方法调用之间的时间间隔，使用 TimeSpan 值度量时间间隔。</summary>
+    /// <summary>更改计时器的启动时间和方法调用之间的时间间隔。</summary>
     /// <param name="dueTime">一个 TimeSpan，表示在调用构造 ITimer 时指定的回调方法之前的延迟时间量。 指定 InfiniteTimeSpan 可防止重新启动计时器。 指定 Zero 可立即重新启动计时器。</param>
     /// <param name="period">构造 Timer 时指定的回调方法调用之间的时间间隔。 指定 InfiniteTimeSpan 可以禁用定期终止。</param>
     /// <returns></returns>
     public Boolean Change(TimeSpan dueTime, TimeSpan period)
     {
+        return Change(dueTime.Milliseconds, period.Milliseconds);
+    }
+    /// <summary>更改计时器的启动时间和方法调用之间的时间间隔。</summary>
+    /// <param name="dueTime">一个 TimeSpan，表示在调用构造 ITimer 时指定的回调方法之前的延迟时间量。 指定 InfiniteTimeSpan 可防止重新启动计时器。 指定 Zero 可立即重新启动计时器。</param>
+    /// <param name="period">构造 Timer 时指定的回调方法调用之间的时间间隔。 指定 InfiniteTimeSpan 可以禁用定期终止。</param>
+    /// <returns></returns>
+    public Boolean Change(int dueTime, int period)
+    {
         if (Absolutely) return false;
         if (Crons?.Length > 0) return false;
 
-        if (period.TotalMilliseconds <= 0)
+        if (period <= 0)
         {
             Dispose();
             return true;
         }
 
-        Period = (Int32)period.TotalMilliseconds;
+        Period = period;
 
-        if (dueTime.TotalMilliseconds >= 0) SetNext((Int32)dueTime.TotalMilliseconds);
+        if (dueTime >= 0) SetNext(dueTime);
 
         return true;
     }

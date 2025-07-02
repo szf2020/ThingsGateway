@@ -11,6 +11,9 @@
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
+using System;
+using System.Threading;
+
 using ThingsGateway.Gateway.Application.Extensions;
 using ThingsGateway.NewLife.Extension;
 
@@ -398,65 +401,64 @@ internal sealed class AlarmHostedService : BackgroundService, IAlarmHostedServic
     /// <param name="cancellation">取消任务的 CancellationToken</param>
     private void DoWork(object? state, CancellationToken cancellation)
     {
-        while (!cancellation.IsCancellationRequested)
+
+        try
         {
+            if (!GlobalData.StartBusinessChannelEnable)
+                return;
 
-            try
+            //Stopwatch stopwatch = Stopwatch.StartNew();
+            // 遍历设备变量列表
+
+            if (!GlobalData.AlarmEnableIdVariables.IsEmpty)
             {
-                if (!GlobalData.StartBusinessChannelEnable)
-                    return;
-
-                //Stopwatch stopwatch = Stopwatch.StartNew();
-                // 遍历设备变量列表
-
-                if (!GlobalData.AlarmEnableIdVariables.IsEmpty)
+                var list = GlobalData.AlarmEnableIdVariables.Select(a => a.Value).ToArray();
+                list.ParallelForEach((item, state, index) =>
+            {
                 {
-                    var list = GlobalData.AlarmEnableIdVariables.Select(a => a.Value).ToArray();
-                    list.ParallelForEach((item, state, index) =>
-                {
-                    {
-                        // 如果取消请求已经被触发，则结束任务
-                        if (cancellation.IsCancellationRequested)
-                            return;
+                    // 如果取消请求已经被触发，则结束任务
+                    if (cancellation.IsCancellationRequested)
+                        return;
 
-                        // 如果该变量的报警功能未启用，则跳过该变量
-                        if (!item.AlarmEnable)
-                            return;
+                    // 如果该变量的报警功能未启用，则跳过该变量
+                    if (!item.AlarmEnable)
+                        return;
 
-                        // 如果该变量离线，则跳过该变量
-                        if (!item.IsOnline)
-                            return;
+                    // 如果该变量离线，则跳过该变量
+                    if (!item.IsOnline)
+                        return;
 
-                        // 对该变量进行报警分析
-                        AlarmAnalysis(item);
+                    // 对该变量进行报警分析
+                    AlarmAnalysis(item);
 
 
-                    }
-                });
                 }
-                else
-                {
-                    scheduledTask.SetNext(5000); // 如果没有启用报警的变量，则设置下次执行时间为5秒后
-                }
+            });
+            }
+            else
+            {
+                //if (scheduledTask.Period != 5000)
+                //    scheduledTask.Change(0, 5000); // 如果没有启用报警的变量，则设置下次执行时间为5秒后
+                scheduledTask.SetNext(5000); // 如果没有启用报警的变量，则设置下次执行时间为5秒后
+            }
 
-                //stopwatch.Stop();
-                //_logger.LogInformation("报警分析耗时：" + stopwatch.ElapsedMilliseconds + "ms");
-            }
-            catch (OperationCanceledException)
-            {
-            }
-            catch (Exception ex)
-            {
-                _logger.LogWarning(ex, "Alarm analysis fail");
-            }
+            //stopwatch.Stop();
+            //_logger.LogInformation("报警分析耗时：" + stopwatch.ElapsedMilliseconds + "ms");
+        }
+        catch (OperationCanceledException)
+        {
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Alarm analysis fail");
         }
     }
 
-    private IScheduledTask scheduledTask;
+    private ScheduledSyncTask scheduledTask;
     protected override Task ExecuteAsync(CancellationToken stoppingToken)
     {
         _logger.LogInformation(AppResource.RealAlarmTaskStart);
-        scheduledTask = ScheduledTaskHelper.GetTask("10", DoWork, null, null, stoppingToken);
+        scheduledTask = new ScheduledSyncTask(10, DoWork, null, null, stoppingToken);
         scheduledTask.Start();
         return Task.CompletedTask;
     }
