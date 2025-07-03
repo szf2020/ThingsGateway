@@ -42,7 +42,9 @@ internal sealed class GatewayMonitorHostedService : BackgroundService, IGatewayM
             //网关启动时，获取所有通道
             var channelRuntimes = (await GlobalData.ChannelService.GetAllAsync().ConfigureAwait(false)).AdaptListChannelRuntime();
             var deviceRuntimes = (await GlobalData.DeviceService.GetAllAsync().ConfigureAwait(false)).AdaptListDeviceRuntime();
-            var variableRuntimes = (await GlobalData.VariableService.GetAllAsync().ConfigureAwait(false)).AdaptListVariableRuntime();
+
+            var variableRuntimes = GlobalData.VariableService.GetAllVariableRuntime();
+
             foreach (var channelRuntime in channelRuntimes)
             {
                 try

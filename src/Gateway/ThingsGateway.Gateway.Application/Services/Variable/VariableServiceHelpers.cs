@@ -21,11 +21,294 @@ namespace ThingsGateway.Gateway.Application;
 public static class VariableServiceHelpers
 {
 
-    public static async Task<USheetDatas> ExportVariableAsync(IEnumerable<Variable> models, string sortName = nameof(Variable.Id), SortOrder sortOrder = SortOrder.Asc)
+    public static async Task<USheetDatas> ExportVariableAsync(IEnumerable<Variable> variables, string sortName = nameof(Variable.Id), SortOrder sortOrder = SortOrder.Asc)
     {
-        var data = await ExportCoreAsync(models, sortName: sortName, sortOrder: sortOrder).ConfigureAwait(false);
-
+        var deviceDicts = (await GlobalData.DeviceService.GetAllAsync().ConfigureAwait(false)).ToDictionary(a => a.Id);
+        var channelDicts = (await GlobalData.ChannelService.GetAllAsync().ConfigureAwait(false)).ToDictionary(a => a.Id);
+        var pluginSheetNames = variables.Where(a => a.VariablePropertys?.Count > 0).SelectMany(a => a.VariablePropertys).Select(a =>
+        {
+            if (deviceDicts.TryGetValue(a.Key, out var device) && channelDicts.TryGetValue(device.ChannelId, out var channel))
+            {
+                var pluginKey = channel?.PluginName;
+                using var businessBase = (BusinessBase)GlobalData.PluginService.GetDriver(pluginKey);
+                return new KeyValuePair<string, VariablePropertyBase>(pluginKey, businessBase.VariablePropertys);
+            }
+            return new KeyValuePair<string, VariablePropertyBase>(string.Empty, null);
+        }).Where(a => a.Value != null).DistinctBy(a => a.Key).ToDictionary();
+        var data = ExportSheets(variables, deviceDicts, channelDicts, pluginSheetNames); // IEnumerable 延迟执行
         return USheetDataHelpers.GetUSheetDatas(data);
+    }
+    static IAsyncEnumerable<Variable> FilterPluginDevices(
+    IAsyncEnumerable<Variable> data,
+    string pluginName,
+Dictionary<long, Device> deviceDicts,
+    Dictionary<long, Channel> channelDicts)
+    {
+        return data.Where(variable =>
+        {
+            if (variable.VariablePropertys == null)
+                return false;
+
+            foreach (var a in variable.VariablePropertys)
+            {
+                if (deviceDicts.TryGetValue(a.Key, out var device) && channelDicts.TryGetValue(device.ChannelId, out var channel))
+
+                {
+                    if (channel.PluginName == pluginName)
+                        return true;
+                }
+            }
+
+            return false;
+        });
+    }
+    static IEnumerable<Variable> FilterPluginDevices(
+IEnumerable<Variable> data,
+string pluginName,
+Dictionary<long, Device> deviceDicts,
+Dictionary<long, Channel> channelDicts)
+    {
+        return data.Where(variable =>
+        {
+            if (variable.VariablePropertys == null)
+                return false;
+
+            foreach (var a in variable.VariablePropertys)
+            {
+                if (deviceDicts.TryGetValue(a.Key, out var device) && channelDicts.TryGetValue(device.ChannelId, out var channel))
+                {
+                    if (channel.PluginName == pluginName)
+                        return true;
+                }
+            }
+
+            return false;
+        });
+    }
+
+
+    public static Dictionary<string, object> ExportSheets(
+    IEnumerable<Variable> data,
+    Dictionary<long, Device> deviceDicts,
+    Dictionary<long, Channel> channelDicts,
+    Dictionary<string, VariablePropertyBase> pluginDrivers,
+    string? deviceName = null)
+    {
+        var sheets = new Dictionary<string, object>();
+        var propertysDict = new ConcurrentDictionary<string, (VariablePropertyBase, Dictionary<string, PropertyInfo>)>();
+
+        // 主变量页
+        sheets.Add(ExportString.VariableName, GetVariableSheets(data, deviceDicts, deviceName));
+
+        // 插件页（动态推导）
+        foreach (var plugin in pluginDrivers.Keys.Distinct())
+        {
+            var filtered = FilterPluginDevices(data, plugin, deviceDicts, channelDicts);
+            var pluginName = PluginServiceUtil.GetFileNameAndTypeName(plugin).Item2;
+            sheets.Add(pluginName, GetPluginSheets(filtered, deviceDicts, channelDicts, plugin, pluginDrivers, propertysDict));
+        }
+
+        return sheets;
+    }
+
+    static IEnumerable<Dictionary<string, object>> GetVariableSheets(
+    IEnumerable<Variable> data,
+    Dictionary<long, Device> deviceDicts,
+    string? deviceName)
+    {
+        var type = typeof(Variable);
+        var propertyInfos = type.GetRuntimeProperties()
+            .Where(a => a.GetCustomAttribute<IgnoreExcelAttribute>(false) == null)
+            .OrderBy(a =>
+            {
+                var order = a.GetCustomAttribute<AutoGenerateColumnAttribute>()?.Order ?? int.MaxValue;
+                if (order < 0) order += 10000000;
+                else if (order == 0) order = 10000000;
+                return order;
+            });
+
+        foreach (var variable in data)
+        {
+            yield return GetVariable(deviceDicts, deviceName, type, propertyInfos, variable);
+        }
+    }
+
+    private static Dictionary<string, object> GetVariable(Dictionary<long, Device> deviceDicts, string? deviceName, Type type, IOrderedEnumerable<PropertyInfo> propertyInfos, Variable variable)
+    {
+        var row = new Dictionary<string, object>();
+        deviceDicts.TryGetValue(variable.DeviceId, out var device);
+        row.TryAdd(ExportString.DeviceName, device?.Name ?? deviceName);
+
+        foreach (var item in propertyInfos)
+        {
+            var desc = type.GetPropertyDisplayName(item.Name);
+            row.TryAdd(desc ?? item.Name, item.GetValue(variable)?.ToString());
+        }
+
+        return row;
+    }
+
+    static IEnumerable<Dictionary<string, object>> GetPluginSheets(
+    IEnumerable<Variable> data,
+    Dictionary<long, Device> deviceDicts,
+    Dictionary<long, Channel> channelDicts,
+    string plugin,
+    Dictionary<string, VariablePropertyBase> pluginDrivers,
+    ConcurrentDictionary<string, (VariablePropertyBase, Dictionary<string, PropertyInfo>)> propertysDict)
+    {
+        if (!pluginDrivers.TryGetValue(plugin, out var variablePropertyBase))
+            yield break;
+
+        if (!propertysDict.TryGetValue(plugin, out var propertys))
+        {
+            var driverProperties = variablePropertyBase;
+            var driverPropertyType = driverProperties.GetType();
+            propertys.Item1 = driverProperties;
+            propertys.Item2 = driverPropertyType.GetRuntimeProperties()
+                .Where(a => a.GetCustomAttribute<DynamicPropertyAttribute>() != null)
+                .ToDictionary(
+                    a => driverPropertyType.GetPropertyDisplayName(a.Name, a => a.GetCustomAttribute<DynamicPropertyAttribute>(true)?.Description));
+            propertysDict.TryAdd(plugin, propertys);
+        }
+        if (propertys.Item2?.Count == null || propertys.Item2?.Count == 0)
+        {
+            yield break;
+        }
+        foreach (var variable in data)
+        {
+            if (variable.VariablePropertys == null)
+                continue;
+
+            foreach (var item in variable.VariablePropertys)
+            {
+                if (!(deviceDicts.TryGetValue(item.Key, out var businessDevice) &&
+                      deviceDicts.TryGetValue(variable.DeviceId, out var collectDevice)))
+                    continue;
+
+                channelDicts.TryGetValue(businessDevice.ChannelId, out var channel);
+                if (channel?.PluginName != plugin)
+                    continue;
+
+                yield return GetPlugin(propertys, variable, item, businessDevice, collectDevice);
+            }
+        }
+    }
+
+    private static Dictionary<string, object> GetPlugin((VariablePropertyBase, Dictionary<string, PropertyInfo>) propertys, Variable variable, KeyValuePair<long, Dictionary<string, string>> item, Device businessDevice, Device collectDevice)
+    {
+        var row = new Dictionary<string, object>
+            {
+                { ExportString.DeviceName, collectDevice.Name },
+                { ExportString.BusinessDeviceName, businessDevice.Name },
+                { ExportString.VariableName, variable.Name }
+            };
+
+        foreach (var kv in propertys.Item2)
+        {
+            var propDict = item.Value;
+            if (propDict.TryGetValue(kv.Value.Name, out var dependencyProperty))
+            {
+                row.TryAdd(kv.Key, dependencyProperty);
+            }
+            else
+            {
+                row.TryAdd(kv.Key, ThingsGatewayStringConverter.Default.Serialize(null, kv.Value.GetValue(propertys.Item1)));
+            }
+        }
+
+        return row;
+    }
+
+    public static Dictionary<string, object> ExportSheets(
+    IAsyncEnumerable<Variable> data,
+    Dictionary<long, Device> deviceDicts,
+    Dictionary<long, Channel> channelDicts,
+    Dictionary<string, VariablePropertyBase> pluginDrivers,
+    string? deviceName = null)
+    {
+        var sheets = new Dictionary<string, object>();
+        var propertysDict = new ConcurrentDictionary<string, (VariablePropertyBase, Dictionary<string, PropertyInfo>)>();
+
+        // 主变量页
+        sheets.Add(ExportString.VariableName, GetVariableSheets(data, deviceDicts, deviceName));
+
+        // 插件页（动态推导）
+        foreach (var plugin in pluginDrivers.Keys.Distinct())
+        {
+            var filtered = FilterPluginDevices(data, plugin, deviceDicts, channelDicts);
+            var pluginName = PluginServiceUtil.GetFileNameAndTypeName(plugin).Item2;
+            sheets.Add(pluginName, GetPluginSheets(filtered, deviceDicts, channelDicts, plugin, pluginDrivers, propertysDict));
+        }
+
+        return sheets;
+    }
+
+    static async IAsyncEnumerable<Dictionary<string, object>> GetVariableSheets(
+    IAsyncEnumerable<Variable> data,
+    Dictionary<long, Device> deviceDicts,
+    string? deviceName)
+    {
+        var type = typeof(Variable);
+        var propertyInfos = type.GetRuntimeProperties()
+            .Where(a => a.GetCustomAttribute<IgnoreExcelAttribute>(false) == null)
+            .OrderBy(a =>
+            {
+                var order = a.GetCustomAttribute<AutoGenerateColumnAttribute>()?.Order ?? int.MaxValue;
+                if (order < 0) order += 10000000;
+                else if (order == 0) order = 10000000;
+                return order;
+            });
+
+        await foreach (var variable in data.ConfigureAwait(false))
+        {
+            yield return GetVariable(deviceDicts, deviceName, type, propertyInfos, variable);
+        }
+    }
+
+    static async IAsyncEnumerable<Dictionary<string, object>> GetPluginSheets(
+    IAsyncEnumerable<Variable> data,
+    Dictionary<long, Device> deviceDicts,
+    Dictionary<long, Channel> channelDicts,
+    string plugin,
+    Dictionary<string, VariablePropertyBase> pluginDrivers,
+    ConcurrentDictionary<string, (VariablePropertyBase, Dictionary<string, PropertyInfo>)> propertysDict)
+    {
+        if (!pluginDrivers.TryGetValue(plugin, out var variablePropertyBase))
+            yield break;
+
+        if (!propertysDict.TryGetValue(plugin, out var propertys))
+        {
+            var driverProperties = variablePropertyBase;
+            var driverPropertyType = driverProperties.GetType();
+            propertys.Item1 = driverProperties;
+            propertys.Item2 = driverPropertyType.GetRuntimeProperties()
+                .Where(a => a.GetCustomAttribute<DynamicPropertyAttribute>() != null)
+                .ToDictionary(
+                    a => driverPropertyType.GetPropertyDisplayName(a.Name, a => a.GetCustomAttribute<DynamicPropertyAttribute>(true)?.Description));
+            propertysDict.TryAdd(plugin, propertys);
+        }
+        if (propertys.Item2?.Count == null || propertys.Item2?.Count == 0)
+        {
+            yield break;
+        }
+        await foreach (var variable in data.ConfigureAwait(false))
+        {
+            if (variable.VariablePropertys == null)
+                continue;
+
+            foreach (var item in variable.VariablePropertys)
+            {
+                if (!(deviceDicts.TryGetValue(item.Key, out var businessDevice) &&
+                      deviceDicts.TryGetValue(variable.DeviceId, out var collectDevice)))
+                    continue;
+
+                channelDicts.TryGetValue(businessDevice.ChannelId, out var channel);
+                if (channel?.PluginName != plugin)
+                    continue;
+
+                yield return GetPlugin(propertys, variable, item, businessDevice, collectDevice);
+            }
+        }
     }
 
     public static async Task<Dictionary<string, object>> ExportCoreAsync(IEnumerable<Variable> data, string deviceName = null, string sortName = nameof(Variable.Id), SortOrder sortOrder = SortOrder.Asc)
@@ -67,7 +350,6 @@ public static class VariableServiceHelpers
             ;
 
         #endregion 列名称
-        var varName = nameof(Variable.Name);
         data.ParallelForEachStreamed((variable, state, index) =>
         {
             Dictionary<string, object> varExport = new();
@@ -83,10 +365,6 @@ public static class VariableServiceHelpers
                 }
                 //描述
                 var desc = type.GetPropertyDisplayName(item.Name);
-                if (item.Name == varName)
-                {
-                    varName = desc;
-                }
                 //数据源增加
                 varExport.TryAdd(desc ?? item.Name, item.GetValue(variable)?.ToString());
             }
@@ -128,7 +406,8 @@ public static class VariableServiceHelpers
                             var variablePropertyType = variableProperty.GetType();
                             propertys.Item2 = variablePropertyType.GetRuntimeProperties()
                .Where(a => a.GetCustomAttribute<DynamicPropertyAttribute>() != null)
-               .ToDictionary(a => variablePropertyType.GetPropertyDisplayName(a.Name, a => a.GetCustomAttribute<DynamicPropertyAttribute>(true)?.Description));
+               .ToDictionary(a => variablePropertyType.GetPropertyDisplayName(a.Name, a =>
+               a.GetCustomAttribute<DynamicPropertyAttribute>(true)?.Description));
                             propertysDict.TryAdd(channel.PluginName, propertys);
 
                         }
@@ -263,7 +542,7 @@ public static class VariableServiceHelpers
                     rows.Add(expando);
                 }
 
-                deviceImportPreview = await GlobalData.VariableService.SetVariableData(dataScope, deviceDicts, ImportPreviews, deviceImportPreview, driverPluginNameDict, propertysDict, sheetName, rows).ConfigureAwait(false);
+                deviceImportPreview = GlobalData.VariableService.SetVariableData(dataScope, deviceDicts, ImportPreviews, deviceImportPreview, driverPluginNameDict, propertysDict, sheetName, rows);
                 if (ImportPreviews.Any(a => a.Value.HasError))
                 {
                     throw new(ImportPreviews.FirstOrDefault(a => a.Value.HasError).Value.Results.FirstOrDefault(a => !a.Success).ErrorMessage ?? "error");

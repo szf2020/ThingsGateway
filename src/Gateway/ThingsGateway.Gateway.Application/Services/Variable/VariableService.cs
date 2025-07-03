@@ -21,7 +21,6 @@ using System.Text;
 
 using ThingsGateway.Extension.Generic;
 using ThingsGateway.Foundation.Extension.Dynamic;
-using ThingsGateway.NewLife;
 using ThingsGateway.SqlSugar;
 
 using TouchSocket.Core;
@@ -212,9 +211,19 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
 
         var result = await db.UseTranAsync(async () =>
         {
-            await db.BulkCopyAsync(newChannels, 100000).ConfigureAwait(false);
-            await db.BulkCopyAsync(newDevices, 100000).ConfigureAwait(false);
-            await db.BulkCopyAsync(newVariables, 100000).ConfigureAwait(false);
+            if (GlobalData.HardwareJob.HardwareInfo.MachineInfo.AvailableMemory > 2 * 1024 * 1024)
+            {
+                await db.BulkCopyAsync(newChannels, 200000).ConfigureAwait(false);
+                await db.BulkCopyAsync(newDevices, 200000).ConfigureAwait(false);
+                await db.BulkCopyAsync(newVariables, 200000).ConfigureAwait(false);
+            }
+            else
+            {
+                await db.BulkCopyAsync(newChannels, 10000).ConfigureAwait(false);
+                await db.BulkCopyAsync(newDevices, 10000).ConfigureAwait(false);
+                await db.BulkCopyAsync(newVariables, 10000).ConfigureAwait(false);
+            }
+
         }).ConfigureAwait(false);
         if (result.IsSuccess)//如果成功了
         {
@@ -373,6 +382,12 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
     /// <param name="exportFilter">查询条件</param>
     public async Task<QueryData<Variable>> PageAsync(ExportFilter exportFilter)
     {
+        var whereQuery = await GetWhereQueryFunc(exportFilter).ConfigureAwait(false);
+
+        return await QueryAsync(exportFilter.QueryPageOptions, whereQuery).ConfigureAwait(false);
+    }
+    private async Task<Func<ISugarQueryable<Variable>, ISugarQueryable<Variable>>> GetWhereQueryFunc(ExportFilter exportFilter)
+    {
         var dataScope = await GlobalData.SysUserService.GetCurrentUserDataScopeAsync().ConfigureAwait(false);
         HashSet<long>? deviceId = null;
         if (!exportFilter.PluginName.IsNullOrWhiteSpace())
@@ -384,7 +399,7 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
         {
             deviceId = (await _deviceService.GetAllAsync().ConfigureAwait(false)).Where(a => a.ChannelId == exportFilter.ChannelId).Select(a => a.Id).ToHashSet();
         }
-        return await QueryAsync(exportFilter.QueryPageOptions, a => a
+        var whereQuery = (ISugarQueryable<Variable> a) => a
         .WhereIF(!exportFilter.QueryPageOptions.SearchText.IsNullOrWhiteSpace(), a => a.Name.Contains(exportFilter.QueryPageOptions.SearchText!))
         .WhereIF(exportFilter.PluginType == PluginTypeEnum.Collect, a => a.DeviceId == exportFilter.DeviceId)
         .WhereIF(deviceId != null, a => deviceId.Contains(a.DeviceId))
@@ -393,9 +408,34 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
         .WhereIF(dataScope?.Count == 0, u => u.CreateUserId == UserManager.UserId)
 
 
-        .WhereIF(exportFilter.PluginType == PluginTypeEnum.Business, u => SqlFunc.JsonLike(u.VariablePropertys, exportFilter.DeviceId.ToString()))
+        .WhereIF(exportFilter.PluginType == PluginTypeEnum.Business, u => SqlFunc.JsonLike(u.VariablePropertys, exportFilter.DeviceId.ToString()));
+        return whereQuery;
+    }
 
-        ).ConfigureAwait(false);
+    private async Task<Func<IEnumerable<Variable>, IEnumerable<Variable>>> GetWhereEnumerableFunc(ExportFilter exportFilter)
+    {
+        var dataScope = await GlobalData.SysUserService.GetCurrentUserDataScopeAsync().ConfigureAwait(false);
+        HashSet<long>? deviceId = null;
+        if (!exportFilter.PluginName.IsNullOrWhiteSpace())
+        {
+            var channel = (await _channelService.GetAllAsync().ConfigureAwait(false)).Where(a => a.PluginName == exportFilter.PluginName).Select(a => a.Id).ToHashSet();
+            deviceId = (await _deviceService.GetAllAsync().ConfigureAwait(false)).Where(a => channel.Contains(a.ChannelId)).Select(a => a.Id).ToHashSet();
+        }
+        else if (exportFilter.ChannelId != null)
+        {
+            deviceId = (await _deviceService.GetAllAsync().ConfigureAwait(false)).Where(a => a.ChannelId == exportFilter.ChannelId).Select(a => a.Id).ToHashSet();
+        }
+        var whereQuery = (IEnumerable<Variable> a) => a
+        .WhereIF(!exportFilter.QueryPageOptions.SearchText.IsNullOrWhiteSpace(), a => a.Name.Contains(exportFilter.QueryPageOptions.SearchText!))
+        .WhereIF(exportFilter.PluginType == PluginTypeEnum.Collect, a => a.DeviceId == exportFilter.DeviceId)
+        .WhereIF(deviceId != null, a => deviceId.Contains(a.DeviceId))
+
+                .WhereIF(dataScope != null && dataScope?.Count > 0, u => dataScope.Contains(u.CreateOrgId))//在指定机构列表查询
+        .WhereIF(dataScope?.Count == 0, u => u.CreateUserId == UserManager.UserId)
+
+
+        .WhereIF(exportFilter.PluginType == PluginTypeEnum.Business, u => SqlFunc.JsonLike(u.VariablePropertys, exportFilter.DeviceId.ToString()));
+        return whereQuery;
     }
 
     /// <summary>
@@ -424,15 +464,36 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
         App.CacheService.Remove(ThingsGatewayCacheConst.Cache_Variable);
     }
 
+
+    public List<VariableRuntime> GetAllVariableRuntime()
+    {
+        using (var db = DbContext.GetDB<Variable>())
+        {
+            var deviceVariables = db.Queryable<Variable>().OrderBy(a => a.Id).GetEnumerable();
+            return deviceVariables.AdaptListVariableRuntime();
+        }
+    }
     #region 导出
 
     /// <summary>
     /// 导出文件
     /// </summary>
     [OperDesc("ExportVariable", isRecordPar: false, localizerType: typeof(Variable))]
-    public async Task<MemoryStream> ExportMemoryStream(List<Variable> data, string deviceName = null)
+    public async Task<MemoryStream> ExportMemoryStream(List<Variable> variables, string deviceName = null)
     {
-        var sheets = await VariableServiceHelpers.ExportCoreAsync(data, deviceName).ConfigureAwait(false);
+        var deviceDicts = (await GlobalData.DeviceService.GetAllAsync().ConfigureAwait(false)).ToDictionary(a => a.Id);
+        var channelDicts = (await GlobalData.ChannelService.GetAllAsync().ConfigureAwait(false)).ToDictionary(a => a.Id);
+        var pluginSheetNames = variables.Where(a => a.VariablePropertys?.Count > 0).SelectMany(a => a.VariablePropertys).Select(a =>
+        {
+            if (deviceDicts.TryGetValue(a.Key, out var device) && channelDicts.TryGetValue(device.ChannelId, out var channel))
+            {
+                var pluginKey = channel?.PluginName;
+                using var businessBase = (BusinessBase)GlobalData.PluginService.GetDriver(pluginKey);
+                return new KeyValuePair<string, VariablePropertyBase>(pluginKey, businessBase.VariablePropertys);
+            }
+            return new KeyValuePair<string, VariablePropertyBase>(string.Empty, null);
+        }).Where(a => a.Value != null).DistinctBy(a => a.Key).ToDictionary();
+        var sheets = VariableServiceHelpers.ExportSheets(variables, deviceDicts, channelDicts, pluginSheetNames); // IEnumerable 延迟执行
 
         var memoryStream = new MemoryStream();
         await memoryStream.SaveAsAsync(sheets).ConfigureAwait(false);
@@ -446,11 +507,52 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
     [OperDesc("ExportVariable", isRecordPar: false, localizerType: typeof(Variable))]
     public async Task<Dictionary<string, object>> ExportVariableAsync(ExportFilter exportFilter)
     {
-        var data = (await PageAsync(exportFilter).ConfigureAwait(false));
-        var sheets = await VariableServiceHelpers.ExportCoreAsync(data.Items, sortName: exportFilter.QueryPageOptions.SortName, sortOrder: exportFilter.QueryPageOptions.SortOrder).ConfigureAwait(false);
-        return sheets;
-    }
+        if (GlobalData.HardwareJob.HardwareInfo.MachineInfo.AvailableMemory < 4 * 1024 * 1024)
+        {
 
+            var whereQuery = await GetWhereEnumerableFunc(exportFilter).ConfigureAwait(false);
+            //导出
+            var variables = GlobalData.IdVariables.Select(a => a.Value).GetQuery(exportFilter.QueryPageOptions, whereQuery, exportFilter.FilterKeyValueAction);
+
+            var deviceDicts = (await GlobalData.DeviceService.GetAllAsync().ConfigureAwait(false)).ToDictionary(a => a.Id);
+            var channelDicts = (await GlobalData.ChannelService.GetAllAsync().ConfigureAwait(false)).ToDictionary(a => a.Id);
+            var pluginSheetNames = variables.Where(a => a.VariablePropertys?.Count > 0).SelectMany(a => a.VariablePropertys).Select(a =>
+            {
+                if (deviceDicts.TryGetValue(a.Key, out var device) && channelDicts.TryGetValue(device.ChannelId, out var channel))
+                {
+                    var pluginKey = channel?.PluginName;
+                    using var businessBase = (BusinessBase)GlobalData.PluginService.GetDriver(pluginKey);
+                    return new KeyValuePair<string, VariablePropertyBase>(pluginKey, businessBase.VariablePropertys);
+                }
+                return new KeyValuePair<string, VariablePropertyBase>(string.Empty, null);
+            }).Where(a => a.Value != null).DistinctBy(a => a.Key).ToDictionary();
+
+            var sheets = VariableServiceHelpers.ExportSheets(variables, deviceDicts, channelDicts, pluginSheetNames); // IEnumerable 延迟执行
+
+            return sheets;
+
+        }
+        else
+        {
+            var data = (await PageAsync(exportFilter).ConfigureAwait(false));
+            var sheets = await VariableServiceHelpers.ExportCoreAsync(data.Items, sortName: exportFilter.QueryPageOptions.SortName, sortOrder: exportFilter.QueryPageOptions.SortOrder).ConfigureAwait(false);
+            return sheets;
+        }
+
+    }
+    private async Task<IAsyncEnumerable<Variable>> GetAsyncEnumerableData(ExportFilter exportFilter)
+    {
+        var whereQuery = await GetEnumerableData(exportFilter).ConfigureAwait(false);
+        return whereQuery.GetAsyncEnumerable();
+    }
+    private async Task<ISugarQueryable<Variable>> GetEnumerableData(ExportFilter exportFilter)
+    {
+        var db = GetDB();
+        var whereQuery = await GetWhereQueryFunc(exportFilter).ConfigureAwait(false);
+
+        return GetQuery(db, exportFilter.QueryPageOptions, whereQuery, exportFilter.FilterKeyValueAction);
+
+    }
 
 
     #endregion 导出
@@ -475,53 +577,21 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
         var insertData = variables.Where(a => !a.IsUp).ToList();
         ManageHelper.CheckVariableCount(insertData.Count);
         using var db = GetDB();
-        await db.BulkCopyAsync(insertData, 100000).ConfigureAwait(false);
-        await db.BulkUpdateAsync(upData, 100000).ConfigureAwait(false);
+        if (GlobalData.HardwareJob.HardwareInfo.MachineInfo.AvailableMemory > 2 * 1024 * 1024)
+        {
+            await db.BulkCopyAsync(insertData, 200000).ConfigureAwait(false);
+            await db.BulkUpdateAsync(upData, 200000).ConfigureAwait(false);
+        }
+        else
+        {
+            await db.BulkCopyAsync(insertData, 10000).ConfigureAwait(false);
+            await db.BulkUpdateAsync(upData, 10000).ConfigureAwait(false);
+        }
         DeleteVariableCache();
         return variables.Select(a => a.Id).ToHashSet();
     }
 
-    private static readonly WaitLock _cacheLock = new();
 
-    private async Task<Dictionary<long, Dictionary<string, DeviecIdVariableImportData>>> GetVariableImportData()
-    {
-        var key = ThingsGatewayCacheConst.Cache_Variable;
-        var datas = App.CacheService.Get<Dictionary<long, Dictionary<string, DeviecIdVariableImportData>>>(key);
-
-        if (datas == null)
-        {
-            try
-            {
-                await _cacheLock.WaitAsync().ConfigureAwait(false);
-                datas = App.CacheService.Get<Dictionary<long, Dictionary<string, DeviecIdVariableImportData>>>(key);
-                if (datas == null)
-                {
-                    using var db = GetDB();
-                    datas = (await db.Queryable<Variable>().Select<DeviecIdVariableImportData>().ToListAsync().ConfigureAwait(false)).GroupBy(a => a.DeviceId).ToDictionary(a => a.Key, a => a.ToDictionary(a => a.Name));
-
-                    App.CacheService.Set(key, datas);
-                }
-            }
-            finally
-            {
-                _cacheLock.Release();
-            }
-        }
-        return datas;
-    }
-
-    public Task PreheatCache()
-    {
-        return GetVariableImportData();
-    }
-    private sealed class DeviecIdVariableImportData
-    {
-        public long Id { get; set; }
-        public string Name { get; set; }
-        public long DeviceId { get; set; }
-        public long CreateOrgId { get; set; }
-        public long CreateUserId { get; set; }
-    }
 
     public async Task<Dictionary<string, ImportPreviewOutputBase>> PreviewAsync(IBrowserFile browserFile)
     {
@@ -552,7 +622,7 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
                 // 获取当前工作表的所有行数据
                 var rows = MiniExcel.Query(path, useHeaderRow: true, sheetName: sheetName).Cast<IDictionary<string, object>>();
 
-                deviceImportPreview = await SetVariableData(dataScope, deviceDicts, ImportPreviews, deviceImportPreview, driverPluginNameDict, propertysDict, sheetName, rows).ConfigureAwait(false);
+                deviceImportPreview = SetVariableData(dataScope, deviceDicts, ImportPreviews, deviceImportPreview, driverPluginNameDict, propertysDict, sheetName, rows);
             }
 
             return ImportPreviews;
@@ -564,7 +634,7 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
         }
     }
 
-    public async Task<ImportPreviewOutput<Dictionary<string, Variable>>> SetVariableData(HashSet<long>? dataScope, Dictionary<string, Device> deviceDicts, Dictionary<string, ImportPreviewOutputBase> ImportPreviews, ImportPreviewOutput<Dictionary<string, Variable>> deviceImportPreview, Dictionary<string, PluginInfo> driverPluginNameDict, ConcurrentDictionary<string, (Type, Dictionary<string, PropertyInfo>, Dictionary<string, PropertyInfo>)> propertysDict, string sheetName, IEnumerable<IDictionary<string, object>> rows)
+    public ImportPreviewOutput<Dictionary<string, Variable>> SetVariableData(HashSet<long>? dataScope, Dictionary<string, Device> deviceDicts, Dictionary<string, ImportPreviewOutputBase> ImportPreviews, ImportPreviewOutput<Dictionary<string, Variable>> deviceImportPreview, Dictionary<string, PluginInfo> driverPluginNameDict, ConcurrentDictionary<string, (Type, Dictionary<string, PropertyInfo>, Dictionary<string, PropertyInfo>)> propertysDict, string sheetName, IEnumerable<IDictionary<string, object>> rows)
     {
         // 变量页处理
         if (sheetName == ExportString.VariableName)
@@ -580,8 +650,6 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
             // 获取目标类型的所有属性，并根据是否需要过滤 IgnoreExcelAttribute 进行筛选
             var variableProperties = type.GetRuntimeProperties().Where(a => (a.GetCustomAttribute<IgnoreExcelAttribute>() == null) && a.CanWrite)
                                         .ToDictionary(a => type.GetPropertyDisplayName(a.Name), a => (a, a.IsNullableType()));
-
-            var dbVariableDicts = await GetVariableImportData().ConfigureAwait(false);
 
             // 并行处理每一行数据
             rows.ParallelForEachStreamed((item, state, index) =>
@@ -629,7 +697,7 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
                         return;
                     }
 
-                    if (dbVariableDicts.TryGetValue(variable.DeviceId, out var dbvar1s) && dbvar1s.TryGetValue(variable.Name, out var dbvar1))
+                    if (GlobalData.IdDevices.TryGetValue(variable.DeviceId, out var dbvar1s) && dbvar1s.VariableRuntimes.TryGetValue(variable.Name, out var dbvar1))
                     {
                         variable.Id = dbvar1.Id;
                         variable.CreateOrgId = dbvar1.CreateOrgId;

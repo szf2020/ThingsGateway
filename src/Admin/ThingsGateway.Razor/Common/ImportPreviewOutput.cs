@@ -44,3 +44,14 @@ public class ImportPreviewOutput<T> : ImportPreviewOutputBase where T : class
     /// </summary>
     public Dictionary<string, T> Data { get; set; } = new();
 }
+/// <summary>
+/// 导入预览
+/// </summary>
+/// <typeparam name="T"></typeparam>
+public class ImportPreviewListOutput<T> : ImportPreviewOutputBase where T : class
+{
+    /// <summary>
+    /// 数据
+    /// </summary>
+    public List<T> Data { get; set; } = new();
+}

@@ -28,7 +28,6 @@ public static partial class GatewayMapper
 
     [MapProperty(nameof(Variable.InitValue), nameof(VariableRuntime.Value))]
     public static partial VariableRuntime AdaptVariableRuntime(this Variable src);
-
     public static partial List<Variable> AdaptListVariable(this IEnumerable<Variable> src);
 
     public static partial DeviceRuntime AdaptDeviceRuntime(this Device src);

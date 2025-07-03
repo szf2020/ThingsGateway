@@ -133,7 +133,6 @@ public static class ChannelServiceHelpers
             //导入检验结果
             Dictionary<string, ImportPreviewOutputBase> ImportPreviews = new();
             //设备页
-            ImportPreviewOutput<Channel> channelImportPreview = new();
 
             var sheetNames = uSheetDatas.sheets.Keys.ToList();
             foreach (var sheetName in sheetNames)
@@ -156,10 +155,11 @@ public static class ChannelServiceHelpers
                     rows.Add(expando);
                 }
 
-                GlobalData.ChannelService.SetChannelData(dataScope, channelDicts, ImportPreviews, channelImportPreview, sheetName, rows);
-                if (channelImportPreview.HasError)
+                GlobalData.ChannelService.SetChannelData(dataScope, channelDicts, ImportPreviews, sheetName, rows);
+                var data = ImportPreviews?.FirstOrDefault().Value;
+                if (data?.HasError == true)
                 {
-                    throw new(channelImportPreview.Results.FirstOrDefault(a => !a.Success).ErrorMessage ?? "error");
+                    throw new(data.Results.FirstOrDefault(a => !a.Success).ErrorMessage ?? "error");
                 }
             }
 

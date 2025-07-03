@@ -88,11 +88,11 @@ public class MachineInfo : IExtend
     [DisplayName("磁盘序列号")]
     public String? DiskID { get; set; }
 
-    /// <summary>内存总量。单位Byte</summary>
+    /// <summary>内存总量。单位KB</summary>
     [DisplayName("内存总量")]
     public UInt64 Memory { get; set; }
 
-    /// <summary>可用内存。单位Byte</summary>
+    /// <summary>可用内存。单位KB</summary>
     [DisplayName("可用内存")]
     public UInt64 AvailableMemory { get; set; }
 
@@ -337,7 +337,7 @@ public class MachineInfo : IExtend
 #if NETFRAMEWORK || WINDOWS
         {
             var ci = new Microsoft.VisualBasic.Devices.ComputerInfo();
-            Memory = ci.TotalPhysicalMemory;
+            Memory = (ulong)(ci.TotalPhysicalMemory / 1024.0);
         }
 #endif
 
@@ -557,7 +557,7 @@ public class MachineInfo : IExtend
             //if (dic2.TryGetValue("Model Name", out str)) Product = str;
             if (dic.TryGetValue("Model Identifier", out var str)) Product = str;
             if (dic.TryGetValue("Processor Name", out str)) Processor = str;
-            if (dic.TryGetValue("Memory", out str)) Memory = (UInt64)str.TrimEnd("GB").Trim().ToLong() * 1024 * 1024 * 1024;
+            if (dic.TryGetValue("Memory", out str)) Memory = (UInt64)str.TrimEnd("GB").Trim().ToLong() * 1024 * 1024;
             if (dic.TryGetValue("Serial Number (system)", out str)) Serial = str;
             if (dic.TryGetValue("Hardware UUID", out str)) UUID = str;
             if (dic.TryGetValue("Processor Name", out str)) Processor = str;
@@ -594,8 +594,8 @@ public class MachineInfo : IExtend
         ms.Init();
         if (GlobalMemoryStatusEx(ref ms))
         {
-            Memory = ms.ullTotalPhys;
-            AvailableMemory = ms.ullAvailPhys;
+            Memory = (ulong)(ms.ullTotalPhys / 1024.0);
+            AvailableMemory = (ulong)(ms.ullAvailPhys / 1024.0);
         }
 
         GetSystemTimes(out var idleTime, out var kernelTime, out var userTime);
@@ -695,15 +695,15 @@ public class MachineInfo : IExtend
         if (dic != null)
         {
             if (dic.TryGetValue("MemTotal", out var str) && !str.IsNullOrEmpty())
-                Memory = (UInt64)str.TrimEnd(" kB").ToInt() * 1024;
+                Memory = (UInt64)str.TrimEnd(" kB").ToLong();
 
             if (dic.TryGetValue("MemAvailable", out str) && !str.IsNullOrEmpty())
-                AvailableMemory = (UInt64)str.TrimEnd(" kB").ToInt() * 1024;
+                AvailableMemory = (UInt64)str.TrimEnd(" kB").ToLong();
             else if (dic.TryGetValue("MemFree", out str) && !str.IsNullOrEmpty())
                 AvailableMemory =
-                    (UInt64)(str.TrimEnd(" kB").ToInt() +
-                    dic["Buffers"]?.TrimEnd(" kB").ToInt() ?? 0 +
-                    dic["Cached"]?.TrimEnd(" kB").ToInt() ?? 0) * 1024;
+                    (UInt64)(str.TrimEnd(" kB").ToLong() +
+                    dic["Buffers"]?.TrimEnd(" kB").ToLong() ?? 0 +
+                    dic["Cached"]?.TrimEnd(" kB").ToLong() ?? 0);
         }
 
         // A2/A4温度获取，Buildroot，CPU温度和主板温度

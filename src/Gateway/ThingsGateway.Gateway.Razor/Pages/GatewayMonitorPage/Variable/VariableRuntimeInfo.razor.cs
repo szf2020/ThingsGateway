@@ -410,7 +410,6 @@ finally
         });
         await DialogService.Show(op);
 
-        _ = Task.Run(GlobalData.VariableRuntimeService.PreheatCache);
     }
 
     #endregion 导出

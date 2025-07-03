@@ -28,10 +28,10 @@
             IsPagination=true>
     <TableColumns>
 
-        <TableColumn Field="@context.Name" FieldExpression=@(()=>context.Name) ShowTips=true Filterable=true Sortable=true Visible=true />
-        <TableColumn Field="@context.Description" FieldExpression=@(()=>context.Description) ShowTips=true Filterable=true Sortable=true Visible=true />
-        <TableColumn Field="@context.IntervalTime" FieldExpression=@(()=>context.IntervalTime) ShowTips=true Filterable=true Sortable=true Visible=false />
-        <TableColumn Field="@context.ChannelName" FieldExpression=@(()=>context.ChannelName) ShowTips=true Filterable=true Sortable=true Visible=true />
+        <TableColumn Field="@context.Name" FieldExpression=@(() => context.Name) ShowTips=true Filterable=true Sortable=true Visible=true />
+        <TableColumn Field="@context.Description" FieldExpression=@(() => context.Description) ShowTips=true Filterable=true Sortable=true Visible=true />
+        <TableColumn Field="@context.IntervalTime" FieldExpression=@(() => context.IntervalTime) ShowTips=true Filterable=true Sortable=true Visible=false />
+        <TableColumn Field="@context.ChannelName" FieldExpression=@(() => context.ChannelName) ShowTips=true Filterable=true Sortable=true Visible=true />
         <TableColumn @bind-Field="@context.Enable" Filterable=true Sortable=true Visible="true" />
         <TableColumn @bind-Field="@context.LogLevel" Filterable=true Sortable=true Visible="false" />
         <TableColumn @bind-Field="@context.Remark1" Filterable=true Sortable=true Visible="false" />
@@ -40,25 +40,25 @@
         <TableColumn @bind-Field="@context.Remark4" Filterable=true Sortable=true Visible="false" />
         <TableColumn @bind-Field="@context.Remark5" Filterable=true Sortable=true Visible="false" />
 
-        <TableColumn Field="@context.ActiveTime" FieldExpression=@(()=>context.ActiveTime) ShowTips=true Filterable=true Sortable=true Visible=true />
-        <TableColumn Field="@context.DeviceStatus" FieldExpression=@(()=>context.DeviceStatus) ShowTips=true Filterable=true Sortable=true Visible=true />
+        <TableColumn Field="@context.ActiveTime" FieldExpression=@(() => context.ActiveTime) ShowTips=true Filterable=true Sortable=true Visible=true />
+        <TableColumn Field="@context.DeviceStatus" FieldExpression=@(() => context.DeviceStatus) ShowTips=true Filterable=true Sortable=true Visible=true />
 
-        <TableColumn Field="@context.Pause" FieldExpression=@(()=>context.Pause) ShowTips=true Filterable=true Sortable=true Visible=false />
-        <TableColumn Field="@context.LastErrorMessage" FieldExpression=@(()=>context.LastErrorMessage) ShowTips=true Filterable=true Sortable=true Visible=true />
+        <TableColumn Field="@context.Pause" FieldExpression=@(() => context.Pause) ShowTips=true Filterable=true Sortable=true Visible=false />
+        <TableColumn Field="@context.LastErrorMessage" FieldExpression=@(() => context.LastErrorMessage) ShowTips=true Filterable=true Sortable=true Visible=true />
 
-        <TableColumn Field="@context.PluginName" FieldExpression=@(()=>context.PluginName) ShowTips=true Filterable=true Sortable=true Visible=false />
+        <TableColumn Field="@context.PluginName" FieldExpression=@(() => context.PluginName) ShowTips=true Filterable=true Sortable=true Visible=false />
 
-        <TableColumn Field="@context.DeviceVariableCount" FieldExpression=@(()=>context.DeviceVariableCount) ShowTips=true Filterable=true Sortable=true Visible=true />
-        <TableColumn Field="@context.MethodVariableCount" FieldExpression=@(()=>context.MethodVariableCount) ShowTips=true Filterable=true Sortable=true Visible=true />
-        <TableColumn Field="@context.SourceVariableCount" FieldExpression=@(()=>context.SourceVariableCount) ShowTips=true Filterable=true Sortable=true Visible=true />
+        <TableColumn Field="@context.DeviceVariableCount" FieldExpression=@(() => context.DeviceVariableCount) ShowTips=true Filterable=true Sortable=true Visible=true />
+        <TableColumn Field="@context.MethodVariableCount" FieldExpression=@(() => context.MethodVariableCount) ShowTips=true Filterable=true Sortable=true Visible=true />
+        <TableColumn Field="@context.SourceVariableCount" FieldExpression=@(() => context.SourceVariableCount) ShowTips=true Filterable=true Sortable=true Visible=true />
 
-        <TableColumn Field="@context.ChannelId" FieldExpression=@(()=>context.ChannelId) ShowTips=true Filterable=true Sortable=true Visible=false />
-        <TableColumn Field="@context.RedundantEnable" FieldExpression=@(()=>context.RedundantEnable) Ignore="true" ShowTips=true Filterable=true Sortable=true Visible=false />
-        <TableColumn Field="@context.RedundantType" FieldExpression=@(()=>context.RedundantType) Ignore="true" ShowTips=true Filterable=true Sortable=true Visible=false />
-        <TableColumn Field="@context.RedundantDeviceId" FieldExpression=@(()=>context.RedundantDeviceId) Ignore="true" ShowTips=true Filterable=true Sortable=true Visible=false />
-        <TableColumn Field="@context.RedundantScanIntervalTime" FieldExpression=@(()=>context.RedundantScanIntervalTime) Ignore="true" ShowTips=true Filterable=true Sortable=true Visible=false />
-        <TableColumn Field="@context.RedundantScript" FieldExpression=@(()=>context.RedundantScript) Ignore="true" ShowTips=true Filterable=true Sortable=true Visible=false />
-        <TableColumn Field="@context.RedundantSwitchType" FieldExpression=@(()=>context.RedundantSwitchType) Ignore="true" ShowTips=true Filterable=true Sortable=true Visible=false />
+        <TableColumn Field="@context.ChannelId" FieldExpression=@(() => context.ChannelId) ShowTips=true Filterable=true Sortable=true Visible=false />
+        <TableColumn Field="@context.RedundantEnable" FieldExpression=@(() => context.RedundantEnable) Ignore="true" ShowTips=true Filterable=true Sortable=true Visible=false />
+        <TableColumn Field="@context.RedundantType" FieldExpression=@(() => context.RedundantType) Ignore="true" ShowTips=true Filterable=true Sortable=true Visible=false />
+        <TableColumn Field="@context.RedundantDeviceId" FieldExpression=@(() => context.RedundantDeviceId) Ignore="true" ShowTips=true Filterable=true Sortable=true Visible=false />
+        <TableColumn Field="@context.RedundantScanIntervalTime" FieldExpression=@(() => context.RedundantScanIntervalTime) Ignore="true" ShowTips=true Filterable=true Sortable=true Visible=false />
+        <TableColumn Field="@context.RedundantScript" FieldExpression=@(() => context.RedundantScript) Ignore="true" ShowTips=true Filterable=true Sortable=true Visible=false />
+        <TableColumn Field="@context.RedundantSwitchType" FieldExpression=@(() => context.RedundantSwitchType) Ignore="true" ShowTips=true Filterable=true Sortable=true Visible=false />
 
 
         <TableColumn @bind-Field="@context.Id" Filterable=true Sortable=true Visible="false" DefaultSort=true DefaultSortOrder="SortOrder.Asc" />
@@ -66,28 +66,35 @@
     </TableColumns>
 
     <EditTemplate Context="context">
-        <DeviceEditComponent Model=@(context) ValidateEnable=false BatchEditEnable=false AutoRestartThread=AutoRestartThread ></DeviceEditComponent>
+        <DeviceEditComponent Model=@(context) ValidateEnable=false BatchEditEnable=false AutoRestartThread=AutoRestartThread></DeviceEditComponent>
     </EditTemplate>
 
 
 
     <ExportButtonDropdownTemplate Context="ExportContext">
-        <Button class="dropdown-item" OnClick="() => ExcelExportAsync(ExportContext,true)" IsDisabled=@(!AuthorizeButton("导出"))>
-            <i class="fas fa-file-export"></i>
-            <span>@RazorLocalizer["ExportAll"]</span>
-        </Button>
-        <Button class="dropdown-item" OnClick="() => ExcelExportAsync(ExportContext)" IsDisabled=@(!AuthorizeButton("导出"))>
-            <i class="fas fa-file-export"></i>
-            <span>@RazorLocalizer["TablesExportButtonExcelText"]</span>
-        </Button>
-        <Button class="dropdown-item" OnClick="() => ExcelImportAsync(ExportContext)" IsDisabled=@(!AuthorizeButton("导入"))>
-            <i class="fas fa-file-import"></i>
-            <span>@RazorLocalizer["TablesImportButtonExcelText"]</span>
-        </Button>
-        <Button class="dropdown-item" OnClick="() => ExcelDeviceAsync(ExportContext)" IsDisabled=@(!AuthorizeButton("导入"))>
-            <i class="fas fa-file-import"></i>
-            <span>@GatewayLocalizer["ExcelDevice"]</span>
-        </Button>
+
+        @if ((AuthorizeButton("导出")))
+        {
+            <Button class="dropdown-item" OnClick="() => ExcelExportAsync(ExportContext, true)" IsKeepDisabled=@(!AuthorizeButton("导出"))>
+                <i class="fas fa-file-export"></i>
+                <span>@RazorLocalizer["ExportAll"]</span>
+            </Button>
+            <Button class="dropdown-item" OnClick="() => ExcelExportAsync(ExportContext)" IsKeepDisabled=@(!AuthorizeButton("导出"))>
+                <i class="fas fa-file-export"></i>
+                <span>@RazorLocalizer["TablesExportButtonExcelText"]</span>
+            </Button>
+        }
+        @if ((AuthorizeButton("导入")))
+        {
+            <Button class="dropdown-item" OnClick="() => ExcelImportAsync(ExportContext)" IsKeepDisabled=@(!AuthorizeButton("导入"))>
+                <i class="fas fa-file-import"></i>
+                <span>@RazorLocalizer["TablesImportButtonExcelText"]</span>
+            </Button>
+            <Button class="dropdown-item" OnClick="() => ExcelDeviceAsync(ExportContext)" IsKeepDisabled=@(!AuthorizeButton("导入"))>
+                <i class="fas fa-file-import"></i>
+                <span>@GatewayLocalizer["ExcelDevice"]</span>
+            </Button>
+        }
     </ExportButtonDropdownTemplate>
     <TableToolbarTemplate>
 

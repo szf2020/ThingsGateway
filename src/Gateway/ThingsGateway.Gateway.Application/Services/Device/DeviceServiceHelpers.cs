@@ -27,8 +27,8 @@ public static class DeviceServiceHelpers
         {
             channelDicts.TryGetValue(a, out var channel);
             var pluginKey = channel?.PluginName;
-            return (a, pluginKey);
-        }).ToList();
+            return pluginKey;
+        }).ToHashSet();
         var data = ExportSheets(models, deviceDicts, channelDicts, pluginSheetNames); // IEnumerable 延迟执行
         return USheetDataHelpers.GetUSheetDatas(data);
 
@@ -39,7 +39,7 @@ public static class DeviceServiceHelpers
         IEnumerable<Device>? data,
         Dictionary<long, Device>? deviceDicts,
     Dictionary<long, Channel> channelDicts,
-IEnumerable<(long, string)>? pluginSheetNames,
+HashSet<string> pluginSheetNames,
         string? channelName = null)
     {
         if (data?.Any() != true)
@@ -51,14 +51,13 @@ IEnumerable<(long, string)>? pluginSheetNames,
         ConcurrentDictionary<string, (object, Dictionary<string, PropertyInfo>)> propertysDict = new();
 
 
-        foreach (var dName in pluginSheetNames.DistinctBy(a => a.Item2))
+        foreach (var plugin in pluginSheetNames)
         {
-            var filtResult = PluginServiceUtil.GetFileNameAndTypeName(dName.Item2);
-            var ids = pluginSheetNames.Where(a => a.Item2 == dName.Item2).Select(a => a.Item1).ToHashSet();
-            var pluginSheets = GetPluginSheets(data.Where(a => ids.Contains(a.ChannelId)), propertysDict, dName.Item2);
+            var filtered = FilterPluginDevices(data, plugin, channelDicts);
+            var filtResult = PluginServiceUtil.GetFileNameAndTypeName(plugin);
+            var pluginSheets = GetPluginSheets(filtered, propertysDict, plugin);
             result.Add(filtResult.TypeName, pluginSheets);
         }
-
         return result;
     }
 
@@ -68,7 +67,7 @@ IAsyncEnumerable<Device>? data1,
 IAsyncEnumerable<Device>? data2,
 Dictionary<long, Device>? deviceDicts,
     Dictionary<long, Channel> channelDicts,
-IEnumerable<(long, string)>? pluginSheetNames,
+HashSet<string> pluginSheetNames,
 string? channelName = null)
     {
         if (data1 == null || data2 == null)
@@ -78,19 +77,51 @@ string? channelName = null)
         result.Add(ExportString.DeviceName, GetDeviceSheets(data1, deviceDicts, channelDicts, channelName));
         ConcurrentDictionary<string, (object, Dictionary<string, PropertyInfo>)> propertysDict = new();
 
-        foreach (var dName in pluginSheetNames.DistinctBy(a => a.Item2))
+
+        foreach (var plugin in pluginSheetNames)
         {
-            var filtResult = PluginServiceUtil.GetFileNameAndTypeName(dName.Item2);
-            var ids = pluginSheetNames.Where(a => a.Item2 == dName.Item2).Select(a => a.Item1).ToHashSet();
-            var pluginSheets = GetPluginSheets(data2.Where(a => ids.Contains(a.ChannelId)), propertysDict, dName.Item2);
+            var filtered = FilterPluginDevices(data2, plugin, channelDicts);
+            var filtResult = PluginServiceUtil.GetFileNameAndTypeName(plugin);
+            var pluginSheets = GetPluginSheets(filtered, propertysDict, plugin);
             result.Add(filtResult.TypeName, pluginSheets);
         }
 
         return result;
     }
-
-
-
+    static IAsyncEnumerable<Device> FilterPluginDevices(IAsyncEnumerable<Device> data, string plugin, Dictionary<long, Channel> channelDicts)
+    {
+        return data.Where(device =>
+        {
+            if (channelDicts.TryGetValue(device.ChannelId, out var channel))
+            {
+                if (channel.PluginName == plugin)
+                    return true;
+                else
+                    return false;
+            }
+            else
+            {
+                return true;
+            }
+        });
+    }
+    static IEnumerable<Device> FilterPluginDevices(IEnumerable<Device> data, string plugin, Dictionary<long, Channel> channelDicts)
+    {
+        return data.Where(device =>
+        {
+            if (channelDicts.TryGetValue(device.ChannelId, out var channel))
+            {
+                if (channel.PluginName == plugin)
+                    return true;
+                else
+                    return false;
+            }
+            else
+            {
+                return true;
+            }
+        });
+    }
 
     static IEnumerable<Dictionary<string, object>> GetDeviceSheets(
     IEnumerable<Device> data,

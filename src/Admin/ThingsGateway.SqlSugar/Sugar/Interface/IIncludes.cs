@@ -33,7 +33,7 @@ namespace ThingsGateway.SqlSugar
         NavISugarQueryable<T> Includes<TReturn1, TReturn2, TReturn3>(Expression<Func<T, List<TReturn1>>> include1, Expression<Func<TReturn1, TReturn2>> include2, Expression<Func<TReturn2, TReturn3>> include3);
         NavISugarQueryable<T> Includes<TReturn1, TReturn2, TReturn3>(Expression<Func<T, TReturn1>> include1, Expression<Func<TReturn1, List<TReturn2>>> include2, Expression<Func<TReturn2, List<TReturn3>>> include3);
         IAsyncEnumerable<T> GetAsyncEnumerable();
-        IEnumerable<T> ForEachDataReader();
+        IEnumerable<T> GetEnumerable();
     }
 
     /// <summary>

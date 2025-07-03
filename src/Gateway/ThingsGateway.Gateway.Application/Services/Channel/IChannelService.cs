@@ -95,7 +95,7 @@ internal interface IChannelService
     Task<bool> BatchSaveAsync(List<Channel> input, ItemChangedType type);
 
 
-    void SetChannelData(HashSet<long>? dataScope, Dictionary<string, Channel> channelDicts, Dictionary<string, ImportPreviewOutputBase> ImportPreviews, ImportPreviewOutput<Channel> channelImportPreview, string sheetName, IEnumerable<IDictionary<string, object>> rows);
+    void SetChannelData(HashSet<long>? dataScope, Dictionary<string, Channel> channelDicts, Dictionary<string, ImportPreviewOutputBase> ImportPreviews, string sheetName, IEnumerable<IDictionary<string, object>> rows);
 
     /// <summary>
     /// 保存是否输出日志和日志等级

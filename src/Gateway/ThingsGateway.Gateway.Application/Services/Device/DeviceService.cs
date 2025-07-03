@@ -337,8 +337,8 @@ internal sealed class DeviceService : BaseService<Device>, IDeviceService
         {
             channelDicts.TryGetValue(a, out var channel);
             var pluginKey = channel?.PluginName;
-            return (a, pluginKey);
-        }).ToList();
+            return pluginKey;
+        }).ToHashSet();
 
         var sheets = DeviceServiceHelpers.ExportSheets(devices, plugins, deviceDicts, channelDicts, pluginSheetNames); // IEnumerable 延迟执行
 
@@ -362,18 +362,18 @@ internal sealed class DeviceService : BaseService<Device>, IDeviceService
     /// 导出文件
     /// </summary>
     [OperDesc("ExportDevice", isRecordPar: false, localizerType: typeof(Device))]
-    public async Task<MemoryStream> ExportMemoryStream(List<Device>? data, string channelName = null, string plugin = null)
+    public async Task<MemoryStream> ExportMemoryStream(List<Device>? models, string channelName = null, string plugin = null)
     {
         var deviceDicts = (await GlobalData.DeviceService.GetAllAsync().ConfigureAwait(false)).ToDictionary(a => a.Id);
         var channelDicts = (await GlobalData.ChannelService.GetAllAsync().ConfigureAwait(false)).ToDictionary(a => a.Id);
-        var pluginSheetNames = data.Select(a => a.ChannelId).Select(a =>
+        var pluginSheetNames = models.Select(a => a.ChannelId).Select(a =>
         {
             channelDicts.TryGetValue(a, out var channel);
-            var pluginKey = channel?.PluginName ?? plugin;
-            return (a, pluginKey);
-        }).ToList();
+            var pluginKey = channel?.PluginName;
+            return pluginKey;
+        }).ToHashSet();
 
-        var sheets = DeviceServiceHelpers.ExportSheets(data, deviceDicts, channelDicts, pluginSheetNames, channelName);
+        var sheets = DeviceServiceHelpers.ExportSheets(models, deviceDicts, channelDicts, pluginSheetNames, channelName);
         var memoryStream = new MemoryStream();
         await memoryStream.SaveAsAsync(sheets).ConfigureAwait(false);
         memoryStream.Seek(0, SeekOrigin.Begin);
@@ -407,8 +407,16 @@ internal sealed class DeviceService : BaseService<Device>, IDeviceService
         ManageHelper.CheckDeviceCount(insertData.Count);
 
         using var db = GetDB();
-        await db.BulkCopyAsync(insertData, 100000).ConfigureAwait(false);
-        await db.BulkUpdateAsync(upData, 100000).ConfigureAwait(false);
+        if (GlobalData.HardwareJob.HardwareInfo.MachineInfo.AvailableMemory > 2 * 1024 * 1024)
+        {
+            await db.BulkCopyAsync(insertData, 200000).ConfigureAwait(false);
+            await db.BulkUpdateAsync(upData, 200000).ConfigureAwait(false);
+        }
+        else
+        {
+            await db.BulkCopyAsync(insertData, 10000).ConfigureAwait(false);
+            await db.BulkUpdateAsync(upData, 10000).ConfigureAwait(false);
+        }
         DeleteDeviceFromCache();
         return devices.Select(a => a.Id).ToHashSet();
     }

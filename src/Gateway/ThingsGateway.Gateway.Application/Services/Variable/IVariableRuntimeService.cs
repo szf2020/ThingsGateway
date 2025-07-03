@@ -30,7 +30,6 @@ namespace ThingsGateway.Gateway.Application
         Task<Dictionary<string, ImportPreviewOutputBase>> PreviewAsync(IBrowserFile browserFile);
 
         Task<bool> SaveVariableAsync(Variable input, ItemChangedType type, bool restart, CancellationToken cancellationToken);
-        void PreheatCache();
 
         Task<MemoryStream> ExportMemoryStream(List<Variable> data, string devName);
     }

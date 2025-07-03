@@ -323,8 +323,8 @@ internal sealed class ChannelService : BaseService<Channel>, IChannelService
         {
             if (item.Key == ExportString.ChannelName)
             {
-                var channelImports = ((ImportPreviewOutput<Channel>)item.Value).Data;
-                channels = channelImports.Select(a => a.Value).ToList();
+                var channelImports = ((ImportPreviewListOutput<Channel>)item.Value).Data;
+                channels = channelImports;
                 break;
             }
         }
@@ -334,8 +334,16 @@ internal sealed class ChannelService : BaseService<Channel>, IChannelService
         ManageHelper.CheckChannelCount(insertData.Count);
 
         using var db = GetDB();
-        await db.BulkCopyAsync(insertData, 100000).ConfigureAwait(false);
-        await db.BulkUpdateAsync(upData, 100000).ConfigureAwait(false);
+        if (GlobalData.HardwareJob.HardwareInfo.MachineInfo.AvailableMemory > 2 * 1024 * 1024)
+        {
+            await db.BulkCopyAsync(insertData, 200000).ConfigureAwait(false);
+            await db.BulkUpdateAsync(upData, 200000).ConfigureAwait(false);
+        }
+        else
+        {
+            await db.BulkCopyAsync(insertData, 10000).ConfigureAwait(false);
+            await db.BulkUpdateAsync(upData, 10000).ConfigureAwait(false);
+        }
         DeleteChannelFromCache();
         return channels.Select(a => a.Id).ToHashSet();
     }
@@ -352,11 +360,10 @@ internal sealed class ChannelService : BaseService<Channel>, IChannelService
             //导入检验结果
             Dictionary<string, ImportPreviewOutputBase> ImportPreviews = new();
             //设备页
-            ImportPreviewOutput<Channel> channelImportPreview = new();
             foreach (var sheetName in sheetNames)
             {
                 var rows = MiniExcel.Query(path, useHeaderRow: true, sheetName: sheetName).Cast<IDictionary<string, object>>();
-                SetChannelData(dataScope, channelDicts, ImportPreviews, channelImportPreview, sheetName, rows);
+                SetChannelData(dataScope, channelDicts, ImportPreviews, sheetName, rows);
             }
 
             return ImportPreviews;
@@ -367,16 +374,15 @@ internal sealed class ChannelService : BaseService<Channel>, IChannelService
         }
     }
 
-    public void SetChannelData(HashSet<long>? dataScope, Dictionary<string, Channel> channelDicts, Dictionary<string, ImportPreviewOutputBase> ImportPreviews, ImportPreviewOutput<Channel> channelImportPreview, string sheetName, IEnumerable<IDictionary<string, object>> rows)
+    public void SetChannelData(HashSet<long>? dataScope, Dictionary<string, Channel> channelDicts, Dictionary<string, ImportPreviewOutputBase> ImportPreviews, string sheetName, IEnumerable<IDictionary<string, object>> rows)
     {
         #region sheet
 
         if (sheetName == ExportString.ChannelName)
         {
             int row = 1;
-            ImportPreviewOutput<Channel> importPreviewOutput = new();
+            ImportPreviewListOutput<Channel> importPreviewOutput = new();
             ImportPreviews.Add(sheetName, importPreviewOutput);
-            channelImportPreview = importPreviewOutput;
             List<Channel> channels = new();
             var type = typeof(Channel);
             // 获取目标类型的所有属性，并根据是否需要过滤 IgnoreExcelAttribute 进行筛选
@@ -451,7 +457,7 @@ internal sealed class ChannelService : BaseService<Channel>, IChannelService
                     return;
                 }
             });
-            importPreviewOutput.Data = channels.ToDictionary(a => a.Name);
+            importPreviewOutput.Data = channels.DistinctBy(a => a.Name).ToList();
         }
 
         #endregion sheet

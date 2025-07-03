@@ -286,8 +286,6 @@ public class VariableRuntimeService : IVariableRuntimeService
         }
     }
 
-    public void PreheatCache() => GlobalData.VariableService.PreheatCache();
-
 
     public Task<MemoryStream> ExportMemoryStream(List<Variable> data, string deviceName) => GlobalData.VariableService.ExportMemoryStream(data, deviceName);
 

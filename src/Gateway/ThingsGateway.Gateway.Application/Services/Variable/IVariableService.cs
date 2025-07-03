@@ -88,8 +88,6 @@ internal interface IVariableService
     /// <param name="exportFilter">查询分页选项</param>
     Task<QueryData<Variable>> PageAsync(ExportFilter exportFilter);
 
-    Task PreheatCache();
-
     /// <summary>
     /// 异步预览导入的数据。
     /// </summary>
@@ -113,5 +111,6 @@ internal interface IVariableService
 
     Task<List<Variable>> GetByDeviceIdAsync(List<long> deviceIds);
     void DeleteVariableCache();
-    Task<ImportPreviewOutput<Dictionary<string, Variable>>> SetVariableData(HashSet<long>? dataScope, Dictionary<string, Device> deviceDicts, Dictionary<string, ImportPreviewOutputBase> ImportPreviews, ImportPreviewOutput<Dictionary<string, Variable>> deviceImportPreview, Dictionary<string, PluginInfo> driverPluginNameDict, ConcurrentDictionary<string, (Type, Dictionary<string, PropertyInfo>, Dictionary<string, PropertyInfo>)> propertysDict, string sheetName, IEnumerable<IDictionary<string, object>> rows);
+    ImportPreviewOutput<Dictionary<string, Variable>> SetVariableData(HashSet<long>? dataScope, Dictionary<string, Device> deviceDicts, Dictionary<string, ImportPreviewOutputBase> ImportPreviews, ImportPreviewOutput<Dictionary<string, Variable>> deviceImportPreview, Dictionary<string, PluginInfo> driverPluginNameDict, ConcurrentDictionary<string, (Type, Dictionary<string, PropertyInfo>, Dictionary<string, PropertyInfo>)> propertysDict, string sheetName, IEnumerable<IDictionary<string, object>> rows);
+    List<VariableRuntime> GetAllVariableRuntime();
 }
