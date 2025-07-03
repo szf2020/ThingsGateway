@@ -118,11 +118,22 @@ public partial class MqttClient : BusinessBaseWithCacheIntervalScript<VariableBa
             }
             else
             {
-                mqttClientSubscribeOptionsBuilder = mqttClientSubscribeOptionsBuilder.WithTopicFilter(
-                    f =>
-                    {
-                        f.WithTopic(string.Format(null, RpcTopic, _driverPropertys.RpcWriteTopic));
-                    });
+                if(!_driverPropertys.BigTextScriptRpc.IsNullOrEmpty())
+                {
+                    mqttClientSubscribeOptionsBuilder = mqttClientSubscribeOptionsBuilder.WithTopicFilter(
+                          f =>
+                          {
+                                f.WithTopic(_driverPropertys.RpcWriteTopic);
+                          });
+                }
+                else
+                {
+                    mqttClientSubscribeOptionsBuilder = mqttClientSubscribeOptionsBuilder.WithTopicFilter(
+                        f =>
+                        {
+                            f.WithTopic(string.Format(null, RpcTopic, _driverPropertys.RpcWriteTopic));
+                        });
+                }
             }
         }
         if (!_driverPropertys.RpcQuestTopic.IsNullOrWhiteSpace())

@@ -10,6 +10,8 @@
 
 using ThingsGateway.Foundation.Extension.String;
 using ThingsGateway.Foundation.SiemensS7;
+using ThingsGateway.NewLife.Extension;
+using ThingsGateway.NewLife.Reflection;
 
 using TouchSocket.Core;
 
@@ -20,7 +22,7 @@ public class SiemensS7Test
 
     [Theory]
     [InlineData("M100", true, "03 00 00 1B 02 F0 80 32 03 00 00 00 03 00 02 00 06 00 00 04 01 FF 04 00 10 00 00")]
-    [InlineData("M100", false, "03 00 00 16 02 F0 80 32 03 00 00 00 04 00 02 00 01 00 00 05 01 FF", "1", DataTypeEnum.UInt16)]
+    [InlineData("M100", false, "03 00 00 16 02 F0 80 32 03 00 00 00 03 00 02 00 01 00 00 05 01 FF", "1", DataTypeEnum.UInt16)]
     public async Task SiemensS7_ReadWrite_OK(string address, bool read, string data, string writeData = null, DataTypeEnum dataTypeEnum = DataTypeEnum.UInt16)
     {
         byte[] bytes = data.HexStringToBytes();
@@ -32,7 +34,7 @@ public class SiemensS7Test
         siemensS7Master.InitChannel(siemensS7Channel);
         await siemensS7Channel.SetupAsync(siemensS7Channel.Config);
         var adapter = siemensS7Channel.ReadOnlyDataHandlingAdapter as SingleStreamDataHandlingAdapter;
-
+        await siemensS7Master.ConnectAsync(CancellationToken.None);
         var task1 = Task.Run(async () =>
         {
             if (read)
@@ -47,9 +49,11 @@ public class SiemensS7Test
             }
 
         });
-        await Task.Delay(500);
+        await Task.Delay(100);
+        bytes[12] = (byte)(((IClientChannel)(siemensS7Master.Channel)).WaitHandlePool.GetValue("m_currentSign").ToInt()-1);
         var task2 = Task.Run(async () =>
         {
+            await Task.Delay(100).ConfigureAwait(false);
             foreach (var item in bytes)
             {
                 var data = new ByteBlock([item]);
