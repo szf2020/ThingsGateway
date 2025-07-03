@@ -79,6 +79,13 @@ public class BaseService<T> : IDataService<T>, IDisposable where T : class, new(
     /// <inheritdoc/>
     public virtual async Task<QueryData<T>> QueryAsync(QueryPageOptions option, Func<ISugarQueryable<T>, ISugarQueryable<T>>? queryFunc = null, FilterKeyValueAction where = null)
     {
+        using var db = GetDB();
+        ISugarQueryable<T> query = GetQuery(db, option, queryFunc, where);
+        return await GetQueryData(option, query).ConfigureAwait(false);
+    }
+
+    public static async Task<QueryData<T>> GetQueryData(QueryPageOptions option, ISugarQueryable<T> query)
+    {
         var ret = new QueryData<T>()
         {
             IsSorted = option.SortOrder != SortOrder.Unset,
@@ -86,12 +93,6 @@ public class BaseService<T> : IDataService<T>, IDisposable where T : class, new(
             IsAdvanceSearch = option.AdvanceSearches.Count > 0 || option.CustomerSearches.Count > 0,
             IsSearch = option.Searches.Count > 0
         };
-
-        using var db = GetDB();
-        var query = db.Queryable<T>();
-        if (queryFunc != null)
-            query = queryFunc(query);
-        query = db.GetQuery<T>(option, query, where);
 
         if (option.IsPage)
         {
@@ -117,7 +118,17 @@ public class BaseService<T> : IDataService<T>, IDisposable where T : class, new(
             ret.TotalCount = items.Count;
             ret.Items = items;
         }
+
         return ret;
+    }
+
+    public static ISugarQueryable<T> GetQuery(SqlSugarClient db, QueryPageOptions option, Func<ISugarQueryable<T>, ISugarQueryable<T>>? queryFunc, FilterKeyValueAction where)
+    {
+        var query = db.Queryable<T>();
+        if (queryFunc != null)
+            query = queryFunc(query);
+        query = db.GetQuery<T>(option, query, where);
+        return query;
     }
 
     /// <inheritdoc/>

@@ -430,7 +430,7 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
     /// 导出文件
     /// </summary>
     [OperDesc("ExportVariable", isRecordPar: false, localizerType: typeof(Variable))]
-    public async Task<MemoryStream> ExportMemoryStream(IEnumerable<Variable> data, string deviceName = null)
+    public async Task<MemoryStream> ExportMemoryStream(List<Variable> data, string deviceName = null)
     {
         var sheets = await VariableServiceHelpers.ExportCoreAsync(data, deviceName).ConfigureAwait(false);
 

@@ -219,6 +219,14 @@ internal sealed class DeviceService : BaseService<Device>, IDeviceService
     /// <param name="exportFilter">查询条件</param>
     public async Task<QueryData<Device>> PageAsync(ExportFilter exportFilter)
     {
+        var whereQuery = await GetWhereQueryFunc(exportFilter).ConfigureAwait(false);
+
+        return await QueryAsync(exportFilter.QueryPageOptions, whereQuery
+       , exportFilter.FilterKeyValueAction).ConfigureAwait(false);
+
+    }
+    private async Task<Func<ISugarQueryable<Device>, ISugarQueryable<Device>>> GetWhereQueryFunc(ExportFilter exportFilter)
+    {
         HashSet<long>? channel = null;
         if (!exportFilter.PluginName.IsNullOrWhiteSpace())
         {
@@ -230,15 +238,37 @@ internal sealed class DeviceService : BaseService<Device>, IDeviceService
             channel = (await _channelService.GetAllAsync().ConfigureAwait(false)).Where(a => pluginInfo.Contains(a.PluginName)).Select(a => a.Id).ToHashSet();
         }
         var dataScope = await GlobalData.SysUserService.GetCurrentUserDataScopeAsync().ConfigureAwait(false);
-        return await QueryAsync(exportFilter.QueryPageOptions, a => a
+        var whereQuery = (ISugarQueryable<Device> a) => a
      .WhereIF(channel != null, a => channel.Contains(a.ChannelId))
      .WhereIF(exportFilter.DeviceId != null, a => a.Id == exportFilter.DeviceId)
      .WhereIF(!exportFilter.QueryPageOptions.SearchText.IsNullOrWhiteSpace(), a => a.Name.Contains(exportFilter.QueryPageOptions.SearchText!))
               .WhereIF(dataScope != null && dataScope?.Count > 0, u => dataScope.Contains(u.CreateOrgId))//在指定机构列表查询
-         .WhereIF(dataScope?.Count == 0, u => u.CreateUserId == UserManager.UserId)
-   , exportFilter.FilterKeyValueAction).ConfigureAwait(false);
-
+         .WhereIF(dataScope?.Count == 0, u => u.CreateUserId == UserManager.UserId);
+        return whereQuery;
     }
+
+    private async Task<Func<IEnumerable<Device>, IEnumerable<Device>>> GetWhereEnumerableFunc(ExportFilter exportFilter)
+    {
+        HashSet<long>? channel = null;
+        if (!exportFilter.PluginName.IsNullOrWhiteSpace())
+        {
+            channel = (await _channelService.GetAllAsync().ConfigureAwait(false)).Where(a => a.PluginName == exportFilter.PluginName).Select(a => a.Id).ToHashSet();
+        }
+        if (exportFilter.PluginType != null)
+        {
+            var pluginInfo = GlobalData.PluginService.GetList(exportFilter.PluginType).Select(a => a.FullName).ToHashSet();
+            channel = (await _channelService.GetAllAsync().ConfigureAwait(false)).Where(a => pluginInfo.Contains(a.PluginName)).Select(a => a.Id).ToHashSet();
+        }
+        var dataScope = await GlobalData.SysUserService.GetCurrentUserDataScopeAsync().ConfigureAwait(false);
+        var whereQuery = (IEnumerable<Device> a) => a
+     .WhereIF(channel != null, a => channel.Contains(a.ChannelId))
+     .WhereIF(exportFilter.DeviceId != null, a => a.Id == exportFilter.DeviceId)
+     .WhereIF(!exportFilter.QueryPageOptions.SearchText.IsNullOrWhiteSpace(), a => a.Name.Contains(exportFilter.QueryPageOptions.SearchText!))
+              .WhereIF(dataScope != null && dataScope?.Count > 0, u => dataScope.Contains(u.CreateOrgId))//在指定机构列表查询
+         .WhereIF(dataScope?.Count == 0, u => u.CreateUserId == UserManager.UserId);
+        return whereQuery;
+    }
+
 
     /// <summary>
     /// 保存设备
@@ -298,18 +328,52 @@ internal sealed class DeviceService : BaseService<Device>, IDeviceService
     public async Task<Dictionary<string, object>> ExportDeviceAsync(ExportFilter exportFilter)
     {
         //导出
-        var data = await PageAsync(exportFilter).ConfigureAwait(false);
-        var sheets = await DeviceServiceHelpers.ExportCoreAsync(data.Items).ConfigureAwait(false);
+        var devices = await GetAsyncEnumerableData(exportFilter).ConfigureAwait(false);
+        var plugins = await GetAsyncEnumerableData(exportFilter).ConfigureAwait(false);
+        var devicesSql = await GetEnumerableData(exportFilter).ConfigureAwait(false);
+        var deviceDicts = (await GlobalData.DeviceService.GetAllAsync().ConfigureAwait(false)).ToDictionary(a => a.Id);
+        var channelDicts = (await GlobalData.ChannelService.GetAllAsync().ConfigureAwait(false)).ToDictionary(a => a.Id);
+        var pluginSheetNames = devicesSql.Select(a => a.ChannelId).ToList().Select(a =>
+        {
+            channelDicts.TryGetValue(a, out var channel);
+            var pluginKey = channel?.PluginName;
+            return (a, pluginKey);
+        }).ToList();
+
+        var sheets = DeviceServiceHelpers.ExportSheets(devices, plugins, deviceDicts, channelDicts, pluginSheetNames); // IEnumerable 延迟执行
+
         return sheets;
+    }
+    private async Task<IAsyncEnumerable<Device>> GetAsyncEnumerableData(ExportFilter exportFilter)
+    {
+        var whereQuery = await GetEnumerableData(exportFilter).ConfigureAwait(false);
+        return whereQuery.GetAsyncEnumerable();
+    }
+    private async Task<ISugarQueryable<Device>> GetEnumerableData(ExportFilter exportFilter)
+    {
+        var db = GetDB();
+        var whereQuery = await GetWhereQueryFunc(exportFilter).ConfigureAwait(false);
+
+        return GetQuery(db, exportFilter.QueryPageOptions, whereQuery, exportFilter.FilterKeyValueAction);
+
     }
 
     /// <summary>
     /// 导出文件
     /// </summary>
     [OperDesc("ExportDevice", isRecordPar: false, localizerType: typeof(Device))]
-    public async Task<MemoryStream> ExportMemoryStream(IEnumerable<Device>? data, string channelName = null, string plugin = null)
+    public async Task<MemoryStream> ExportMemoryStream(List<Device>? data, string channelName = null, string plugin = null)
     {
-        var sheets = await DeviceServiceHelpers.ExportCoreAsync(data, channelName, plugin).ConfigureAwait(false);
+        var deviceDicts = (await GlobalData.DeviceService.GetAllAsync().ConfigureAwait(false)).ToDictionary(a => a.Id);
+        var channelDicts = (await GlobalData.ChannelService.GetAllAsync().ConfigureAwait(false)).ToDictionary(a => a.Id);
+        var pluginSheetNames = data.Select(a => a.ChannelId).Select(a =>
+        {
+            channelDicts.TryGetValue(a, out var channel);
+            var pluginKey = channel?.PluginName ?? plugin;
+            return (a, pluginKey);
+        }).ToList();
+
+        var sheets = DeviceServiceHelpers.ExportSheets(data, deviceDicts, channelDicts, pluginSheetNames, channelName);
         var memoryStream = new MemoryStream();
         await memoryStream.SaveAsAsync(sheets).ConfigureAwait(false);
         memoryStream.Seek(0, SeekOrigin.Begin);

@@ -20,7 +20,7 @@ namespace ThingsGateway.Gateway.Application
 
             foreach (var a in data)
             {
-                var value = a.Value as IList<Dictionary<string, object>>;
+                var value = (a.Value as IEnumerable<Dictionary<string, object>>).ToList();
 
                 var uSheetData = new USheetData();
                 uSheetData.id = a.Key;

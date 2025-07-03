@@ -21,106 +21,224 @@ public static class DeviceServiceHelpers
 
     public static async Task<USheetDatas> ExportDeviceAsync(IEnumerable<Device> models)
     {
-
-        var data = await ExportCoreAsync(models).ConfigureAwait(false);
+        var deviceDicts = (await GlobalData.DeviceService.GetAllAsync().ConfigureAwait(false)).ToDictionary(a => a.Id);
+        var channelDicts = (await GlobalData.ChannelService.GetAllAsync().ConfigureAwait(false)).ToDictionary(a => a.Id);
+        var pluginSheetNames = models.Select(a => a.ChannelId).Select(a =>
+        {
+            channelDicts.TryGetValue(a, out var channel);
+            var pluginKey = channel?.PluginName;
+            return (a, pluginKey);
+        }).ToList();
+        var data = ExportSheets(models, deviceDicts, channelDicts, pluginSheetNames); // IEnumerable 延迟执行
         return USheetDataHelpers.GetUSheetDatas(data);
 
     }
 
 
-    public static async Task<Dictionary<string, object>> ExportCoreAsync(IEnumerable<Device>? data, string channelName = null, string plugin = null)
+    public static Dictionary<string, object> ExportSheets(
+        IEnumerable<Device>? data,
+        Dictionary<long, Device>? deviceDicts,
+    Dictionary<long, Channel> channelDicts,
+IEnumerable<(long, string)>? pluginSheetNames,
+        string? channelName = null)
     {
         if (data?.Any() != true)
-        {
             data = new List<Device>();
-        }
-        var deviceDicts = (await GlobalData.DeviceService.GetAllAsync().ConfigureAwait(false)).ToDictionary(a => a.Id);
-        var channelDicts = (await GlobalData.ChannelService.GetAllAsync().ConfigureAwait(false)).ToDictionary(a => a.Id);
-        //总数据
-        Dictionary<string, object> sheets = new();
-        //设备页
-        List<Dictionary<string, object>> deviceExports = new();
-        //设备附加属性，转成Dict<表名,List<Dict<列名，列数据>>>的形式
-        Dictionary<string, List<Dictionary<string, object>>> devicePropertys = new();
+
+
+        var result = new Dictionary<string, object>();
+        result.Add(ExportString.DeviceName, GetDeviceSheets(data, deviceDicts, channelDicts, channelName));
         ConcurrentDictionary<string, (object, Dictionary<string, PropertyInfo>)> propertysDict = new();
 
-        #region 列名称
 
+        foreach (var dName in pluginSheetNames.DistinctBy(a => a.Item2))
+        {
+            var filtResult = PluginServiceUtil.GetFileNameAndTypeName(dName.Item2);
+            var ids = pluginSheetNames.Where(a => a.Item2 == dName.Item2).Select(a => a.Item1).ToHashSet();
+            var pluginSheets = GetPluginSheets(data.Where(a => ids.Contains(a.ChannelId)), propertysDict, dName.Item2);
+            result.Add(filtResult.TypeName, pluginSheets);
+        }
+
+        return result;
+    }
+
+
+    public static Dictionary<string, object> ExportSheets(
+IAsyncEnumerable<Device>? data1,
+IAsyncEnumerable<Device>? data2,
+Dictionary<long, Device>? deviceDicts,
+    Dictionary<long, Channel> channelDicts,
+IEnumerable<(long, string)>? pluginSheetNames,
+string? channelName = null)
+    {
+        if (data1 == null || data2 == null)
+            return new();
+
+        var result = new Dictionary<string, object>();
+        result.Add(ExportString.DeviceName, GetDeviceSheets(data1, deviceDicts, channelDicts, channelName));
+        ConcurrentDictionary<string, (object, Dictionary<string, PropertyInfo>)> propertysDict = new();
+
+        foreach (var dName in pluginSheetNames.DistinctBy(a => a.Item2))
+        {
+            var filtResult = PluginServiceUtil.GetFileNameAndTypeName(dName.Item2);
+            var ids = pluginSheetNames.Where(a => a.Item2 == dName.Item2).Select(a => a.Item1).ToHashSet();
+            var pluginSheets = GetPluginSheets(data2.Where(a => ids.Contains(a.ChannelId)), propertysDict, dName.Item2);
+            result.Add(filtResult.TypeName, pluginSheets);
+        }
+
+        return result;
+    }
+
+
+
+
+    static IEnumerable<Dictionary<string, object>> GetDeviceSheets(
+    IEnumerable<Device> data,
+Dictionary<long, Device>? deviceDicts,
+    Dictionary<long, Channel> channelDicts,
+    string? channelName)
+    {
         var type = typeof(Device);
-        var propertyInfos = type.GetRuntimeProperties().Where(a => a.GetCustomAttribute<IgnoreExcelAttribute>(false) == null)
-             .OrderBy(
-            a =>
+        var propertyInfos = type.GetRuntimeProperties()
+            .Where(a => a.GetCustomAttribute<IgnoreExcelAttribute>(false) == null)
+            .OrderBy(a =>
             {
-                var order = a.GetCustomAttribute<AutoGenerateColumnAttribute>()?.Order ?? int.MaxValue; ;
-                if (order < 0)
-                {
-                    order = order + 10000000;
-                }
-                else if (order == 0)
-                {
-                    order = 10000000;
-                }
+                var order = a.GetCustomAttribute<AutoGenerateColumnAttribute>()?.Order ?? int.MaxValue;
+                if (order < 0) order += 10000000;
+                else if (order == 0) order = 10000000;
                 return order;
-            }
-            )
-            ;
-
-        #endregion 列名称
+            });
 
         foreach (var device in data)
         {
-            Dictionary<string, object> devExport = new();
-            deviceDicts.TryGetValue(device.RedundantDeviceId ?? 0, out var redundantDevice);
-            channelDicts.TryGetValue(device.ChannelId, out var channel);
+            yield return GetDeviceRows(device, propertyInfos, type, deviceDicts, channelDicts, channelName);
 
-            devExport.Add(ExportString.ChannelName, channel?.Name ?? channelName);
+        }
+    }
 
-            foreach (var item in propertyInfos)
+
+    static IEnumerable<Dictionary<string, object>> GetPluginSheets(
+    IEnumerable<Device> data,
+    ConcurrentDictionary<string, (object, Dictionary<string, PropertyInfo>)> propertysDict,
+    string? plugin)
+    {
+
+        foreach (var device in data)
+        {
+            var row = GetPluginRows(device, plugin, propertysDict);
+            if (row != null)
             {
-                //描述
-                var desc = type.GetPropertyDisplayName(item.Name);
-                //数据源增加
-                devExport.Add(desc ?? item.Name, item.GetValue(device)?.ToString());
+                yield return row;
             }
 
-            //设备实体没有包含冗余设备名称，手动插入
-            devExport.Add(ExportString.RedundantDeviceName, redundantDevice?.Name);
+        }
+    }
 
-            //添加完整设备信息
-            deviceExports.Add(devExport);
 
-            #region 插件sheet
 
-            //插件属性
-            //单个设备的行数据
-            Dictionary<string, object> driverInfo = new();
-
-            var propDict = device.DevicePropertys;
-            if (propertysDict.TryGetValue(channel?.PluginName ?? plugin, out var propertys))
+    static async IAsyncEnumerable<Dictionary<string, object>> GetDeviceSheets(
+    IAsyncEnumerable<Device> data,
+Dictionary<long, Device>? deviceDicts,
+    Dictionary<long, Channel> channelDicts,
+    string? channelName)
+    {
+        var type = typeof(Device);
+        var propertyInfos = type.GetRuntimeProperties()
+            .Where(a => a.GetCustomAttribute<IgnoreExcelAttribute>(false) == null)
+            .OrderBy(a =>
             {
-            }
-            else
+                var order = a.GetCustomAttribute<AutoGenerateColumnAttribute>()?.Order ?? int.MaxValue;
+                if (order < 0) order += 10000000;
+                else if (order == 0) order = 10000000;
+                return order;
+            });
+
+        var enumerator = data.GetAsyncEnumerator();
+        while (await enumerator.MoveNextAsync().ConfigureAwait(false))
+        {
+            var device = enumerator.Current;
+            yield return GetDeviceRows(device, propertyInfos, type, deviceDicts, channelDicts, channelName);
+
+
+        }
+    }
+
+
+    static async IAsyncEnumerable<Dictionary<string, object>> GetPluginSheets(
+    IAsyncEnumerable<Device> data,
+    ConcurrentDictionary<string, (object, Dictionary<string, PropertyInfo>)> propertysDict,
+    string? plugin)
+    {
+
+        var enumerator = data.GetAsyncEnumerator();
+        while (await enumerator.MoveNextAsync().ConfigureAwait(false))
+        {
+
+            var device = enumerator.Current;
+            var row = GetPluginRows(device, plugin, propertysDict);
+            if (row != null)
             {
-                try
-                {
-                    var driverProperties = GlobalData.PluginService.GetDriver(channel?.PluginName ?? plugin).DriverProperties;
-                    propertys.Item1 = driverProperties;
-                    var driverPropertyType = driverProperties.GetType();
-                    propertys.Item2 = driverPropertyType.GetRuntimeProperties()
-    .Where(a => a.GetCustomAttribute<DynamicPropertyAttribute>() != null)
-    .ToDictionary(a => driverPropertyType.GetPropertyDisplayName(a.Name, a => a.GetCustomAttribute<DynamicPropertyAttribute>(true)?.Description), a => a);
-                    propertysDict.TryAdd(channel?.PluginName ?? plugin, propertys);
+                yield return row;
+            }
+        }
+    }
 
-                }
-                catch
-                {
+    static Dictionary<string, object> GetDeviceRows(
+Device device,
+ IEnumerable<PropertyInfo>? propertyInfos,
+ Type type,
+Dictionary<long, Device>? deviceDicts,
+ Dictionary<long, Channel>? channelDicts,
+string? channelName)
+    {
 
-                }
+        Dictionary<string, object> devExport = new();
+        deviceDicts.TryGetValue(device.RedundantDeviceId ?? 0, out var redundantDevice);
+        channelDicts.TryGetValue(device.ChannelId, out var channel);
+
+        devExport.Add(ExportString.ChannelName, channel?.Name ?? channelName);
+
+        foreach (var item in propertyInfos)
+        {
+            //描述
+            var desc = type.GetPropertyDisplayName(item.Name);
+            //数据源增加
+            devExport.Add(desc ?? item.Name, item.GetValue(device)?.ToString());
+        }
+
+        //设备实体没有包含冗余设备名称，手动插入
+        devExport.Add(ExportString.RedundantDeviceName, redundantDevice?.Name);
+        return devExport;
+    }
+
+    static Dictionary<string, object> GetPluginRows(Device device, string? plugin, ConcurrentDictionary<string, (object, Dictionary<string, PropertyInfo>)> propertysDict)
+    {
+
+        Dictionary<string, object> driverInfo = new();
+        var propDict = device.DevicePropertys;
+        if (!propertysDict.TryGetValue(plugin, out var propertys))
+        {
+            try
+            {
+                var driverProperties = GlobalData.PluginService.GetDriver(plugin).DriverProperties;
+                propertys.Item1 = driverProperties;
+                var driverPropertyType = driverProperties.GetType();
+                propertys.Item2 = driverPropertyType.GetRuntimeProperties()
+.Where(a => a.GetCustomAttribute<DynamicPropertyAttribute>() != null)
+.ToDictionary(a => driverPropertyType.GetPropertyDisplayName(a.Name, a => a.GetCustomAttribute<DynamicPropertyAttribute>(true)?.Description), a => a);
+                propertysDict.TryAdd(plugin, propertys);
+
+            }
+            catch
+            {
 
             }
 
-            if (propertys.Item2 == null)
-                continue;
+        }
+
+        if (propertys.Item2 != null)
+        {
+
 
             if (propertys.Item2.Count > 0)
             {
@@ -141,51 +259,13 @@ public static class DeviceServiceHelpers
                 }
             }
 
-            var pluginName = PluginServiceUtil.GetFileNameAndTypeName(channel?.PluginName ?? plugin);
-            if (devicePropertys.ContainsKey(pluginName.TypeName))
-            {
-                if (driverInfo.Count > 0)
-                    devicePropertys[pluginName.TypeName].Add(driverInfo);
-            }
-            else
-            {
-                if (driverInfo.Count > 0)
-                    devicePropertys.Add(pluginName.TypeName, new() { driverInfo });
-            }
 
-            #endregion 插件sheet
+
+            if (driverInfo.Count > 0)
+                return driverInfo;
+
         }
-        //添加设备页
-        sheets.Add(ExportString.DeviceName, deviceExports);
-
-        //HASH
-        foreach (var item in devicePropertys)
-        {
-            HashSet<string> allKeys = new();
-
-            foreach (var dict in item.Value)
-            {
-                foreach (var key in dict.Keys)
-                {
-                    allKeys.Add(key);
-                }
-            }
-            foreach (var dict in item.Value)
-            {
-                foreach (var key in allKeys)
-                {
-                    if (!dict.ContainsKey(key))
-                    {
-                        // 添加缺失的键，并设置默认值
-                        dict.Add(key, null);
-                    }
-                }
-            }
-
-            sheets.Add(item.Key, item.Value);
-        }
-
-        return sheets;
+        return null;
     }
 
     public static async Task<Dictionary<string, ImportPreviewOutputBase>> ImportAsync(USheetDatas uSheetDatas)

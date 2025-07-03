@@ -193,6 +193,14 @@ internal sealed class ChannelService : BaseService<Channel>, IChannelService
     /// <param name="exportFilter">查询条件</param>
     public async Task<QueryData<Channel>> PageAsync(ExportFilter exportFilter)
     {
+        var whereQuery = await GetWhereQueryFunc(exportFilter).ConfigureAwait(false);
+
+        return await QueryAsync(exportFilter.QueryPageOptions, whereQuery
+       , exportFilter.FilterKeyValueAction).ConfigureAwait(false);
+    }
+
+    private async Task<Func<ISugarQueryable<Channel>, ISugarQueryable<Channel>>> GetWhereQueryFunc(ExportFilter exportFilter)
+    {
         HashSet<long>? channel = null;
         if (exportFilter.PluginType != null)
         {
@@ -200,16 +208,15 @@ internal sealed class ChannelService : BaseService<Channel>, IChannelService
             channel = (await GetAllAsync().ConfigureAwait(false)).Where(a => pluginInfo.Contains(a.PluginName)).Select(a => a.Id).ToHashSet();
         }
         var dataScope = await GlobalData.SysUserService.GetCurrentUserDataScopeAsync().ConfigureAwait(false);
-        return await QueryAsync(exportFilter.QueryPageOptions, a => a
+        var whereQuery = (ISugarQueryable<Channel> a) => a
         .WhereIF(!exportFilter.QueryPageOptions.SearchText.IsNullOrWhiteSpace(), a => a.Name.Contains(exportFilter.QueryPageOptions.SearchText!))
                 .WhereIF(!exportFilter.PluginName.IsNullOrWhiteSpace(), a => a.PluginName == exportFilter.PluginName)
                         .WhereIF(channel != null, a => channel.Contains(a.Id))
                         .WhereIF(exportFilter.ChannelId != null, a => a.Id == exportFilter.ChannelId)
 
                           .WhereIF(dataScope != null && dataScope?.Count > 0, u => dataScope.Contains(u.CreateOrgId))//在指定机构列表查询
-         .WhereIF(dataScope?.Count == 0, u => u.CreateUserId == UserManager.UserId)
-
-       , exportFilter.FilterKeyValueAction).ConfigureAwait(false);
+         .WhereIF(dataScope?.Count == 0, u => u.CreateUserId == UserManager.UserId);
+        return whereQuery;
     }
 
     /// <summary>
@@ -273,19 +280,31 @@ internal sealed class ChannelService : BaseService<Channel>, IChannelService
     [OperDesc("ExportChannel", isRecordPar: false, localizerType: typeof(Channel))]
     public async Task<Dictionary<string, object>> ExportChannelAsync(ExportFilter exportFilter)
     {
-        var data = await PageAsync(exportFilter).ConfigureAwait(false);
-        return ChannelServiceHelpers.ExportChannelCore(data.Items);
+        var channels = await GetEnumerableData(exportFilter).ConfigureAwait(false);
+        var rows = ChannelServiceHelpers.ExportRows(channels); // IEnumerable 延迟执行
+        var sheets = ChannelServiceHelpers.WrapAsSheet(ExportString.ChannelName, rows);
+        return sheets;
+    }
+
+    private async Task<IAsyncEnumerable<Channel>> GetEnumerableData(ExportFilter exportFilter)
+    {
+        var db = GetDB();
+        var whereQuery = await GetWhereQueryFunc(exportFilter).ConfigureAwait(false);
+
+        var query = GetQuery(db, exportFilter.QueryPageOptions, whereQuery, exportFilter.FilterKeyValueAction);
+
+        return query.GetAsyncEnumerable();
     }
 
     /// <inheritdoc/>
     [OperDesc("ExportChannel", isRecordPar: false, localizerType: typeof(Channel))]
-    public async Task<MemoryStream> ExportMemoryStream(List<Channel> data)
+    public async Task<MemoryStream> ExportMemoryStream(IEnumerable<Channel> channels)
     {
-        var sheets = ChannelServiceHelpers.ExportChannelCore(data);
+        var rows = ChannelServiceHelpers.ExportRows(channels); // IEnumerable 延迟执行
+        var sheets = ChannelServiceHelpers.WrapAsSheet(ExportString.ChannelName, rows);
         var memoryStream = new MemoryStream();
         await memoryStream.SaveAsAsync(sheets).ConfigureAwait(false);
         memoryStream.Seek(0, SeekOrigin.Begin);
-
         return memoryStream;
     }
 

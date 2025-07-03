@@ -53,7 +53,7 @@ internal interface IChannelService
     /// </summary>
     /// <param name="data">通道数据</param>
     /// <returns>内存流</returns>
-    Task<MemoryStream> ExportMemoryStream(List<Channel> data);
+    Task<MemoryStream> ExportMemoryStream(IEnumerable<Channel> data);
 
     /// <summary>
     /// 从缓存/数据库获取全部信息

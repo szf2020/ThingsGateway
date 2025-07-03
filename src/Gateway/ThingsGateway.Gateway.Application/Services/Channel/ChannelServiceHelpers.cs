@@ -18,20 +18,17 @@ namespace ThingsGateway.Gateway.Application;
 public static class ChannelServiceHelpers
 {
 
-    public static USheetDatas ExportChannel(IEnumerable<Channel> models)
+    public static USheetDatas ExportChannel(IEnumerable<Channel> channels)
     {
-        var data = ExportChannelCore(models);
-        return USheetDataHelpers.GetUSheetDatas(data);
-
+        var rows = ExportRows(channels); // IEnumerable 延迟执行
+        var sheets = WrapAsSheet(ExportString.ChannelName, rows);
+        return USheetDataHelpers.GetUSheetDatas(sheets);
     }
 
-
-    internal static Dictionary<string, object> ExportChannelCore(IEnumerable<Channel>? data)
+    internal static IEnumerable<Dictionary<string, object>> ExportRows(IEnumerable<Channel>? data)
     {
-        //总数据
-        Dictionary<string, object> sheets = new();
-        //通道页
-        List<Dictionary<string, object>> channelExports = new();
+        if (data == null)
+            yield break;
 
         #region 列名称
 
@@ -58,23 +55,74 @@ public static class ChannelServiceHelpers
 
         foreach (var device in data)
         {
-            Dictionary<string, object> channelExport = new();
-            foreach (var item in propertyInfos)
+            Dictionary<string, object> row = new();
+            foreach (var prop in propertyInfos)
             {
-                //描述
-                var desc = type.GetPropertyDisplayName(item.Name);
-                //数据源增加
-                channelExport.Add(desc ?? item.Name, item.GetValue(device)?.ToString());
+                var desc = type.GetPropertyDisplayName(prop.Name);
+                row.Add(desc ?? prop.Name, prop.GetValue(device)?.ToString());
             }
-
-            //添加完整设备信息
-            channelExports.Add(channelExport);
+            yield return row;
         }
-        //添加设备页
-        sheets.Add(ExportString.ChannelName, channelExports);
-        return sheets;
     }
 
+    internal static async IAsyncEnumerable<Dictionary<string, object>> ExportRows(IAsyncEnumerable<Channel>? data)
+    {
+        if (data == null)
+            yield break;
+
+        #region 列名称
+
+        var type = typeof(Channel);
+        var propertyInfos = type.GetRuntimeProperties().Where(a => a.GetCustomAttribute<IgnoreExcelAttribute>(false) == null)
+             .OrderBy(
+            a =>
+            {
+                var order = a.GetCustomAttribute<AutoGenerateColumnAttribute>()?.Order ?? int.MaxValue; ;
+                if (order < 0)
+                {
+                    order = order + 10000000;
+                }
+                else if (order == 0)
+                {
+                    order = 10000000;
+                }
+                return order;
+            }
+            )
+            ;
+
+        #endregion 列名称
+        var enumerator = data.GetAsyncEnumerator();
+        while (await enumerator.MoveNextAsync().ConfigureAwait(false))
+        {
+            var device = enumerator.Current;
+            {
+                Dictionary<string, object> row = new();
+                foreach (var prop in propertyInfos)
+                {
+                    var desc = type.GetPropertyDisplayName(prop.Name);
+                    row.Add(desc ?? prop.Name, prop.GetValue(device)?.ToString());
+                }
+                yield return row;
+            }
+        }
+    }
+
+    internal static Dictionary<string, object> WrapAsSheet(string sheetName, IEnumerable<IDictionary<string, object>> rows)
+    {
+        return new Dictionary<string, object>
+        {
+            [sheetName] = rows
+        };
+    }
+
+    internal static Dictionary<string, object> WrapAsSheet(string sheetName, IAsyncEnumerable<IDictionary<string, object>> rows)
+    {
+        return new Dictionary<string, object>
+        {
+            [sheetName] = rows
+        };
+    }
 
     public static async Task<Dictionary<string, ImportPreviewOutputBase>> ImportAsync(USheetDatas uSheetDatas)
     {

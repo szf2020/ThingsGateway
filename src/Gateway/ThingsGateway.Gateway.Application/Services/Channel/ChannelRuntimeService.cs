@@ -113,11 +113,11 @@ public class ChannelRuntimeService : IChannelRuntimeService
         }
     }
 
-
     public Task<Dictionary<string, ImportPreviewOutputBase>> PreviewAsync(IBrowserFile browserFile) => GlobalData.ChannelService.PreviewAsync(browserFile);
 
     public Task<Dictionary<string, object>> ExportChannelAsync(ExportFilter exportFilter) => GlobalData.ChannelService.ExportChannelAsync(exportFilter);
-    public Task<MemoryStream> ExportMemoryStream(List<Channel> data) =>
+
+    public Task<MemoryStream> ExportMemoryStream(IEnumerable<Channel> data) =>
       GlobalData.ChannelService.ExportMemoryStream(data);
 
     public async Task ImportChannelAsync(Dictionary<string, ImportPreviewOutputBase> input, bool restart = true)

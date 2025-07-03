@@ -703,6 +703,38 @@ namespace ThingsGateway.SqlSugar
                 this.Context.Ado.Close();
             }
         }
+        public IEnumerable<T> ForEachDataReader()
+        {
+            var queryable = this.Clone();
+            var sql = queryable.ToSql();
+            var dr = this.Context.Ado.GetDataReader(sql.Key, sql.Value);
+            var entityInfo = this.Context.EntityMaintenance.GetEntityInfo<T>();
+            var columns = UtilMethods.GetColumnInfo(dr);
+            var cacheKey = "ForEachDataReader" + typeof(T).GetHashCode() + string.Join(",", columns.Select(it => it.Item1 + it.Item2.Name + "_"));
+            IDataReaderEntityBuilder<T> entytyList = this.Context.Utilities.GetReflectionInoCacheInstance().GetOrCreate("cacheKey", () =>
+            {
+                var cacheResult = new IDataReaderEntityBuilder<T>(this.Context, dr,
+                    columns.Select(it => it.Item1).ToList()).CreateBuilder(typeof(T));
+                return cacheResult;
+            });
+
+
+            using (dr)
+            {
+                while (dr.Read())
+                {
+
+                    var order = entytyList.Build(dr);
+                    yield return order;
+                }
+            }
+
+
+            if (this.Context.CurrentConnectionConfig.IsAutoCloseConnection)
+            {
+                this.Context.Ado.Close();
+            }
+        }
         public async Task ForEachDataReaderAsync(Action<T> action)
         {
             var queryable = this.Clone();
@@ -730,6 +762,43 @@ namespace ThingsGateway.SqlSugar
             {
                 this.Context.Ado.Close();
             }
+        }
+
+        /// <summary>
+        /// Diego 新增一个延迟返回
+        /// </summary>
+        /// <returns></returns>
+        public async IAsyncEnumerable<T> GetAsyncEnumerable()
+        {
+            var queryable = this.Clone();
+            var sql = queryable.ToSql();
+            var dr = await Context.Ado.GetDataReaderAsync(sql.Key, sql.Value).ConfigureAwait(false);
+            var entityInfo = this.Context.EntityMaintenance.GetEntityInfo<T>();
+            var columns = UtilMethods.GetColumnInfo(dr);
+            var cacheKey = "ForEachDataReader" + typeof(T).GetHashCode() + string.Join(",", columns.Select(it => it.Item1 + it.Item2.Name + "_"));
+            IDataReaderEntityBuilder<T> entytyList = this.Context.Utilities.GetReflectionInoCacheInstance().GetOrCreate("cacheKey", () =>
+            {
+                var cacheResult = new IDataReaderEntityBuilder<T>(this.Context, dr,
+                    columns.Select(it => it.Item1).ToList()).CreateBuilder(typeof(T));
+                return cacheResult;
+            });
+
+
+
+            using (dr)
+            {
+                while (dr.Read())
+                {
+
+                    var order = entytyList.Build(dr);
+                    yield return order;
+                }
+            }
+            if (this.Context.CurrentConnectionConfig.IsAutoCloseConnection)
+            {
+                this.Context.Ado.Close();
+            }
+
         }
         public virtual void ForEach(Action<T> action, int singleMaxReads = 300, System.Threading.CancellationTokenSource cancellationTokenSource = null)
         {

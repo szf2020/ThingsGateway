@@ -69,7 +69,7 @@ internal interface IDeviceService
     /// <param name="channelName">通道名称（可选）</param>
     /// <param name="plugin">插件名称（可选）</param>
     /// <returns>导出的内存流</returns>
-    Task<MemoryStream> ExportMemoryStream(IEnumerable<Device>? data, string channelName = null, string plugin = null);
+    Task<MemoryStream> ExportMemoryStream(List<Device>? data, string channelName = null, string plugin = null);
 
     /// <summary>
     /// 获取所有设备信息。

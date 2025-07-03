@@ -56,6 +56,35 @@ public static class QueryPageOptionsExtensions
         return datas;
     }
 
+    public static IEnumerable<T> GetQuery<T>(this IEnumerable<T> query, QueryPageOptions option, Func<IEnumerable<T>, IEnumerable<T>>? queryFunc = null, FilterKeyValueAction where = null)
+    {
+        if (queryFunc != null)
+            query = queryFunc(query);
+        where ??= option.ToFilter();
+
+        if (where.HasFilters())
+        {
+            query = query.Where(where.GetFilterFunc<T>());//name asc模式
+        }
+
+        if (option.SortOrder != SortOrder.Unset && !string.IsNullOrEmpty(option.SortName))
+        {
+            var invoker = Utility.GetSortFunc<T>();
+            query = invoker(query, option.SortName, option.SortOrder);
+        }
+        else if (option.SortList.Count > 0)
+        {
+            var invoker = Utility.GetSortListFunc<T>();
+            query = invoker(query, option.SortList);
+        }
+        else if (option.AdvancedSortList.Count > 0)
+        {
+            var invoker = Utility.GetSortListFunc<T>();
+            query = invoker(query, option.AdvancedSortList);
+        }
+        return query;
+    }
+
     /// <summary>
     /// 根据查询条件返回sqlsugar ISugarQueryable
     /// </summary>

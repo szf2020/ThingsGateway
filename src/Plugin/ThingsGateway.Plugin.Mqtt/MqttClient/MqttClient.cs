@@ -118,12 +118,12 @@ public partial class MqttClient : BusinessBaseWithCacheIntervalScript<VariableBa
             }
             else
             {
-                if(!_driverPropertys.BigTextScriptRpc.IsNullOrEmpty())
+                if (!_driverPropertys.BigTextScriptRpc.IsNullOrEmpty())
                 {
                     mqttClientSubscribeOptionsBuilder = mqttClientSubscribeOptionsBuilder.WithTopicFilter(
                           f =>
                           {
-                                f.WithTopic(_driverPropertys.RpcWriteTopic);
+                              f.WithTopic(_driverPropertys.RpcWriteTopic);
                           });
                 }
                 else
