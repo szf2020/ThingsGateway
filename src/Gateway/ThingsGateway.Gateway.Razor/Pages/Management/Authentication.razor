@@ -40,7 +40,7 @@
                         </label>
 
                         <label class="form-control">
-                            @(AuthorizeInfo?.Auth==true ? Localizer["Authorized"] : Localizer["Unauthorized"])
+                            @(AuthorizeInfo?.Auth == true ? Localizer["Authorized"] : Localizer["Unauthorized"])
                         </label>
                     </div>
                 </div>
@@ -75,6 +75,41 @@
                             </label>
                         </div>
 
+                        <div class="col-12 col-sm-12">
+
+                            <label class="form-label">
+
+                                @Localizer["MaxChannelCount"]
+                            </label>
+
+                            <label class="form-control">
+                                @AuthorizeInfo?.MaxChannelCount
+                            </label>
+                        </div>
+
+                        <div class="col-12 col-sm-12">
+
+                            <label class="form-label">
+
+                                @Localizer["MaxDeviceCount"]
+                            </label>
+
+                            <label class="form-control">
+                                @AuthorizeInfo?.MaxDeviceCount
+                            </label>
+                        </div>
+
+                        <div class="col-12 col-sm-12">
+
+                            <label class="form-label">
+
+                                @Localizer["MaxVariableCount"]
+                            </label>
+
+                            <label class="form-control">
+                                @AuthorizeInfo?.MaxVariableCount
+                            </label>
+                        </div>
                     </div>
                 }
 

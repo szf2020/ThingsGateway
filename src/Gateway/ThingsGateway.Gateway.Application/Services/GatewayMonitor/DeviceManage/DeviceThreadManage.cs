@@ -748,7 +748,7 @@ internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
 
 
                 var num = Drivers.Count;
-                foreach (var driver in Drivers.Select(a => a.Value).ToList())
+                foreach (var driver in Drivers.Select(a => a.Value).Where(a => a != null).ToList())
                 {
                     try
                     {

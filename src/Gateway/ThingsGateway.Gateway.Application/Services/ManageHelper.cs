@@ -8,6 +8,8 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
+using ThingsGateway.Authentication;
+
 namespace ThingsGateway.Gateway.Application;
 
 internal static class ManageHelper
@@ -21,26 +23,31 @@ internal static class ManageHelper
 
     public static void CheckChannelCount(int addCount)
     {
-        if (GlobalData.Channels.Count + addCount > ManageHelper.ChannelThreadOptions.MaxChannelCount)
+        var data = GlobalData.Channels.Count + addCount;
+        ProAuthentication.TryGetAuthorizeInfo(out var authorizeInfo);
+        if (data > ManageHelper.ChannelThreadOptions.MaxChannelCount || data > authorizeInfo?.MaxChannelCount)
         {
-            throw new Exception($"The number of channels exceeds the limit {ManageHelper.ChannelThreadOptions.MaxChannelCount}");
+            throw new Exception($"The number of channels exceeds the limit {Math.Min(ManageHelper.ChannelThreadOptions.MaxChannelCount, authorizeInfo?.MaxChannelCount ?? 0)}");
         }
     }
 
     public static void CheckDeviceCount(int addCount)
     {
-        if (GlobalData.Devices.Count + addCount > ManageHelper.ChannelThreadOptions.MaxDeviceCount)
+        var data = GlobalData.Devices.Count + addCount;
+        ProAuthentication.TryGetAuthorizeInfo(out var authorizeInfo);
+        if (data > ManageHelper.ChannelThreadOptions.MaxDeviceCount || data > authorizeInfo?.MaxDeviceCount)
         {
-            throw new Exception($"The number of devices exceeds the limit {ManageHelper.ChannelThreadOptions.MaxDeviceCount}");
+            throw new Exception($"The number of devices exceeds the limit {Math.Min(ManageHelper.ChannelThreadOptions.MaxDeviceCount, authorizeInfo?.MaxDeviceCount ?? 0)}");
         }
     }
 
-
     public static void CheckVariableCount(int addCount)
     {
-        if (GlobalData.IdVariables.Count + addCount > ManageHelper.ChannelThreadOptions.MaxVariableCount)
+        var data = GlobalData.IdVariables.Count + addCount;
+        ProAuthentication.TryGetAuthorizeInfo(out var authorizeInfo);
+        if (data > ManageHelper.ChannelThreadOptions.MaxVariableCount || data > authorizeInfo?.MaxVariableCount)
         {
-            throw new Exception($"The number of variables exceeds the limit {ManageHelper.ChannelThreadOptions.MaxVariableCount}");
+            throw new Exception($"The number of variables exceeds the limit {Math.Min(ManageHelper.ChannelThreadOptions.MaxVariableCount, authorizeInfo?.MaxVariableCount ?? 0)}");
         }
     }
 

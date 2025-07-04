@@ -26,7 +26,10 @@
     "RegisterStatus": "RegisterStatus",
     "Unauthorized": "Unauthorized",
     "Unregister": "Unregister",
-    "UUID": "UUID"
+    "UUID": "UUID",
+    "MaxChannelCount": "MaxChannelCount",
+    "MaxDeviceCount": "MaxDeviceCount",
+    "MaxVariableCount": "MaxVariableCount"
   },
 
   "ThingsGateway.Gateway.Razor._Imports": {

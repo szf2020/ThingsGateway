@@ -1259,7 +1259,7 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
             }
         }
 
-        Items = ZItem;
+        Items = ZItem.AdaptListTreeViewItemChannelDeviceTreeItem();
         ChannelRuntimeDispatchService.Subscribe(Refresh);
 
         scheduler = new SmartTriggerScheduler(Notify, TimeSpan.FromMilliseconds(3000));
@@ -1375,7 +1375,7 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
                 {
                 }
             }
-            Items = ZItem;
+            Items = ZItem.AdaptListTreeViewItemChannelDeviceTreeItem();
             return Items;
         }
         else
@@ -1459,7 +1459,7 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
                 }
             }
 
-            Items = ZItem;
+            Items = ZItem.AdaptListTreeViewItemChannelDeviceTreeItem();
             return Items;
         }
 
