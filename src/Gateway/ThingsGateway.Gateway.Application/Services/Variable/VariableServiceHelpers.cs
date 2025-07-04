@@ -13,6 +13,7 @@ using BootstrapBlazor.Components;
 
 using System.Collections.Concurrent;
 using System.Reflection;
+using System.Security.Cryptography.X509Certificates;
 
 using TouchSocket.Core;
 
@@ -141,6 +142,10 @@ Dictionary<long, Channel> channelDicts)
 
         foreach (var item in propertyInfos)
         {
+            if (item.Name == nameof(Variable.Id))
+            {
+                continue;
+            }
             var desc = type.GetPropertyDisplayName(item.Name);
             row.TryAdd(desc ?? item.Name, item.GetValue(variable)?.ToString());
         }
