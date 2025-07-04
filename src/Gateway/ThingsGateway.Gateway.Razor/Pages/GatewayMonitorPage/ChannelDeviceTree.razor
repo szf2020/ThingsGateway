@@ -13,10 +13,66 @@
         <SpinnerComponent @ref=Spinner></SpinnerComponent>
     </div>
 
-    <span style="color:var(--bs-body-color)" class="text-h6 mb-2">@GatewayLocalizer["DeviceList"]</span>
+    <span style="color:var(--bs-body-color);opacity: 0.5;" class="text-h6 mb-2">@GatewayLocalizer["DeviceList"]</span>
 
-    <ContextMenuZone title="Right click operation">
-        <TreeView TItem="ChannelDeviceTreeItem" Items="Items" ShowIcon="false" ShowSearch IsAccordion=false IsVirtualize="true" OnTreeItemClick="OnTreeItemClick" OnSearchAsync="OnClickSearch" ModelEqualityComparer=ModelEqualityComparer>
+    <ContextMenuZone>
+        <TreeView TItem="ChannelDeviceTreeItem" Items="Items" ShowIcon="false" ShowSearch IsAccordion=false IsVirtualize="true" OnTreeItemClick="OnTreeItemClick" OnSearchAsync="OnClickSearch" ModelEqualityComparer=ModelEqualityComparer ShowToolbar="true">
+            <ToolbarTemplate>
+
+                <div class="tree-node-toolbar-edit" @onclick:preventDefault @onclick:stopPropagation>
+
+                    @if (context.ChannelDevicePluginType < ChannelDevicePluginTypeEnum.Channel)
+                    {
+                        @* <Tooltip Title=@(GatewayLocalizer["AddChannel"]) Placement="Placement.Bottom"> *@
+                            <Button Size=Size.ExtraSmall Icon="fa-solid fa-plus" Color=Color.None OnClickWithoutRender=@(() => EditChannel(GatewayLocalizer["AddChannel"], context, ItemChangedType.Add))>
+                            </Button>
+                        @* </Tooltip> *@
+
+                        @* <Tooltip Title=@(GatewayLocalizer["DeleteChannel"]) Placement="Placement.Bottom"> *@
+                            <Button Size=Size.ExtraSmall Icon="fa-solid fa-xmark" Color=Color.None OnClickWithoutRender=@(() => DeleteCurrentChannel(context))>
+                            </Button>
+                        @* </Tooltip> *@
+
+                    }
+
+                    @* //更新通道 *@
+                    @if (context.ChannelDevicePluginType == ChannelDevicePluginTypeEnum.Channel)
+                    {
+                        @* <Tooltip Title=@(GatewayLocalizer["AddDevice"]) Placement="Placement.Bottom"> *@
+                            <Button Size=Size.ExtraSmall Icon="fa-solid fa-plus" Color=Color.None OnClickWithoutRender=@(() => EditDevice(GatewayLocalizer["AddDevice"], context, ItemChangedType.Add))>
+                            </Button>
+                        @* </Tooltip> *@
+
+                        @* <Tooltip Title=@(GatewayLocalizer["UpdateChannel"]) Placement="Placement.Bottom"> *@
+                            <Button Size=Size.ExtraSmall Icon="fa-regular fa-pen-to-square" Color=Color.None OnClickWithoutRender=@(() => EditChannel(GatewayLocalizer["UpdateChannel"], context, ItemChangedType.Update))>
+                            </Button>
+                        @* </Tooltip> *@
+
+                        @* <Tooltip Title=@(GatewayLocalizer["DeleteChannel"]) Placement="Placement.Bottom"> *@
+                            <Button Size=Size.ExtraSmall Icon="fa-solid fa-xmark" Color=Color.None OnClickWithoutRender=@(() => DeleteCurrentChannel(context))>
+                            </Button>
+                        @* </Tooltip> *@
+
+                    }
+
+
+
+                    @* //更新设备 *@
+                    @if (context.ChannelDevicePluginType == ChannelDevicePluginTypeEnum.Device)
+                    {
+                        @* <Tooltip Title=@(GatewayLocalizer["UpdateDevice"]) Placement="Placement.Bottom"> *@
+                            <Button Size=Size.ExtraSmall Icon="fa-regular fa-pen-to-square" Color=Color.None OnClickWithoutRender=@(() => EditDevice(GatewayLocalizer["UpdateDevice"], context, ItemChangedType.Update))>
+                            </Button>
+                        @* </Tooltip> *@
+
+                        @* <Tooltip Title=@(GatewayLocalizer["DeleteDevice"]) Placement="Placement.Bottom"> *@
+                            <Button Size=Size.ExtraSmall Icon="fa-solid fa-xmark" Color=Color.None OnClickWithoutRender=@(() => DeleteCurrentDevice(context))>
+                            </Button>
+                        @* </Tooltip> *@
+                    }
+
+                </div>
+            </ToolbarTemplate>
 
         </TreeView>
 

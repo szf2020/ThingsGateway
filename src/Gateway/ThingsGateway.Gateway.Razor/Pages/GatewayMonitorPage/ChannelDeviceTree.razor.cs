@@ -101,19 +101,22 @@ public partial class ChannelDeviceTree
 
     #region 通道
 
-    async Task EditChannel(ContextMenuItem item, object value, ItemChangedType itemChangedType)
+    Task EditChannel(ContextMenuItem item, object value, ItemChangedType itemChangedType)
+    {
+        return EditChannel(item.Text, value as ChannelDeviceTreeItem, itemChangedType);
+    }
+    async Task EditChannel(string text, ChannelDeviceTreeItem channelDeviceTreeItem, ItemChangedType itemChangedType)
     {
         var op = new DialogOption()
         {
             IsScrolling = false,
             ShowMaximizeButton = true,
             Size = Size.ExtraLarge,
-            Title = item.Text,
+            Title = text,
             ShowFooter = false,
             ShowCloseButton = false,
         };
 
-        if (value is not ChannelDeviceTreeItem channelDeviceTreeItem) return;
         PluginTypeEnum? pluginTypeEnum = ChannelDeviceHelpers.GetPluginType(channelDeviceTreeItem);
         var oneModel = ChannelDeviceHelpers.GetChannelModel(itemChangedType, channelDeviceTreeItem);
 
@@ -134,12 +137,16 @@ public partial class ChannelDeviceTree
 
     }
 
-    async Task CopyChannel(ContextMenuItem item, object value)
+    Task CopyChannel(ContextMenuItem item, object value)
+    {
+        return CopyChannel(item.Text, value as ChannelDeviceTreeItem);
+    }
+
+    async Task CopyChannel(string text, ChannelDeviceTreeItem channelDeviceTreeItem)
     {
 
         Channel oneModel = null;
         Dictionary<Device, List<Variable>> deviceDict = new();
-        if (value is not ChannelDeviceTreeItem channelDeviceTreeItem) return;
 
         if (channelDeviceTreeItem.TryGetChannelRuntime(out var channelRuntime))
         {
@@ -159,7 +166,7 @@ public partial class ChannelDeviceTree
             IsScrolling = false,
             ShowMaximizeButton = true,
             Size = Size.ExtraLarge,
-            Title = item.Text,
+            Title = text,
             ShowFooter = false,
             ShowCloseButton = false,
         };
@@ -182,22 +189,21 @@ public partial class ChannelDeviceTree
 
     }
 
-
-    async Task BatchEditChannel(ContextMenuItem item, object value)
+    Task BatchEditChannel(ContextMenuItem item, object value)
     {
+        return BatchEditChannel(item.Text, value as ChannelDeviceTreeItem);
+    }
 
-
-
+    async Task BatchEditChannel(string text, ChannelDeviceTreeItem channelDeviceTreeItem)
+    {
         Channel oldModel = null;
         Channel oneModel = null;
         IEnumerable<Channel>? changedModels = null;
         IEnumerable<Channel>? models = null;
 
-        if (value is not ChannelDeviceTreeItem channelDeviceTreeItem) return;
-
         if (channelDeviceTreeItem.TryGetChannelRuntime(out var channelRuntime))
         {
-            await EditChannel(item, value, ItemChangedType.Update);
+            await EditChannel(text, channelDeviceTreeItem, ItemChangedType.Update);
             return;
         }
         //批量编辑只有分类和插件名称节点
@@ -235,7 +241,7 @@ public partial class ChannelDeviceTree
             IsScrolling = false,
             ShowMaximizeButton = true,
             Size = Size.ExtraLarge,
-            Title = item.Text,
+            Title = text,
             ShowFooter = false,
             ShowCloseButton = false,
         };
@@ -265,8 +271,11 @@ public partial class ChannelDeviceTree
 
     }
 
-
-    async Task ExcelChannel(ContextMenuItem item, object value)
+    Task ExcelChannel(ContextMenuItem item, object value)
+    {
+        return ExcelChannel(item.Text);
+    }
+    async Task ExcelChannel(string text)
     {
 
         var op = new DialogOption()
@@ -274,7 +283,7 @@ public partial class ChannelDeviceTree
             IsScrolling = false,
             ShowMaximizeButton = true,
             Size = Size.ExtraExtraLarge,
-            Title = item.Text,
+            Title = text,
             ShowFooter = false,
             ShowCloseButton = false,
         };
@@ -316,8 +325,11 @@ finally
 
     }
 
-
-    async Task DeleteChannel(ContextMenuItem item, object value)
+    Task DeleteChannel(ContextMenuItem item, object value)
+    {
+        return DeleteChannel(value as ChannelDeviceTreeItem);
+    }
+    async Task DeleteChannel(ChannelDeviceTreeItem channelDeviceTreeItem)
     {
         var op = new DialogOption();
         {
@@ -336,7 +348,7 @@ finally
  EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
  {
      await op.CloseDialogAsync();
-     await DeleteCurrentChannel(item, value);
+     await DeleteCurrentChannel(channelDeviceTreeItem);
  }));
                  builder.AddComponentParameter(5, nameof(Button.Text), GatewayLocalizer["DeleteCurrentChannel"].Value);
 
@@ -348,7 +360,7 @@ finally
                  builder.AddComponentParameter(15, nameof(Button.OnClick), EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
                  {
                      await op.CloseDialogAsync();
-                     await DeleteAllChannel(item, value);
+                     await DeleteAllChannel();
                  }));
                  builder.AddComponentParameter(16, nameof(Button.Text), GatewayLocalizer["DeleteAllChannel"].Value);
 
@@ -361,10 +373,9 @@ finally
         ;
         await DialogService.Show(op);
     }
-    async Task DeleteCurrentChannel(ContextMenuItem item, object value)
+    async Task DeleteCurrentChannel(ChannelDeviceTreeItem channelDeviceTreeItem)
     {
         IEnumerable<ChannelRuntime> modelIds = null;
-        if (value is not ChannelDeviceTreeItem channelDeviceTreeItem) return;
 
         if (channelDeviceTreeItem.TryGetChannelRuntime(out var channelRuntime))
         {
@@ -395,6 +406,7 @@ finally
         {
             var op = new SwalOption()
             {
+
                 Title = GatewayLocalizer["DeleteConfirmTitle"],
                 BodyTemplate = (__builder) =>
                 {
@@ -434,7 +446,7 @@ finally
         }
 
     }
-    async Task DeleteAllChannel(ContextMenuItem item, object value)
+    async Task DeleteAllChannel()
     {
         try
         {
@@ -479,7 +491,11 @@ finally
 
     }
 
-    async Task ExportChannel(ContextMenuItem item, object value)
+    Task ExportChannel(ContextMenuItem item, object value)
+    {
+        return ExportChannel(value as ChannelDeviceTreeItem);
+    }
+    async Task ExportChannel(ChannelDeviceTreeItem channelDeviceTreeItem)
     {
         var op = new DialogOption();
         {
@@ -498,7 +514,7 @@ finally
 EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
 {
     await op.CloseDialogAsync();
-    await ExportCurrentChannel(item, value);
+    await ExportCurrentChannel(channelDeviceTreeItem);
 }));
                 builder.AddComponentParameter(5, nameof(Button.Text), GatewayLocalizer["ExportCurrentChannel"].Value);
 
@@ -510,7 +526,7 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
                 builder.AddComponentParameter(15, nameof(Button.OnClick), EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
                 {
                     await op.CloseDialogAsync();
-                    await ExportAllChannel(item, value);
+                    await ExportAllChannel();
                 }));
                 builder.AddComponentParameter(16, nameof(Button.Text), GatewayLocalizer["ExportAllChannel"].Value);
 
@@ -523,10 +539,9 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
     ;
         await DialogService.Show(op);
     }
-    async Task ExportCurrentChannel(ContextMenuItem item, object value)
+    async Task ExportCurrentChannel(ChannelDeviceTreeItem channelDeviceTreeItem)
     {
         bool ret;
-        if (value is not ChannelDeviceTreeItem channelDeviceTreeItem) return;
 
         if (channelDeviceTreeItem.TryGetChannelRuntime(out var channelRuntime))
         {
@@ -550,7 +565,7 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
         if (ret)
             await ToastService.Default();
     }
-    async Task ExportAllChannel(ContextMenuItem item, object value)
+    async Task ExportAllChannel()
     {
         bool ret;
         ret = await GatewayExportService.OnChannelExport(new() { QueryPageOptions = new() });
@@ -561,14 +576,18 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
     }
 
 
-    async Task ImportChannel(ContextMenuItem item, object value)
+    Task ImportChannel(ContextMenuItem item, object value)
+    {
+        return ImportChannel(item.Text);
+    }
+    async Task ImportChannel(string text)
     {
         var op = new DialogOption()
         {
             IsScrolling = true,
             ShowMaximizeButton = true,
             Size = Size.ExtraLarge,
-            Title = item.Text,
+            Title = text,
             ShowFooter = false,
             ShowCloseButton = false,
             OnCloseAsync = async () =>
@@ -654,19 +673,22 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
     }
 
 
-    async Task EditDevice(ContextMenuItem item, object value, ItemChangedType itemChangedType)
+    Task EditDevice(ContextMenuItem item, object value, ItemChangedType itemChangedType)
+    {
+        return EditDevice(item.Text, value as ChannelDeviceTreeItem, itemChangedType);
+    }
+    async Task EditDevice(string text, ChannelDeviceTreeItem channelDeviceTreeItem, ItemChangedType itemChangedType)
     {
         var op = new DialogOption()
         {
             IsScrolling = true,
             ShowMaximizeButton = true,
             Size = Size.ExtraLarge,
-            Title = item.Text,
+            Title = text,
             ShowFooter = false,
             ShowCloseButton = false,
         };
         Device oneModel = null;
-        if (value is not ChannelDeviceTreeItem channelDeviceTreeItem) return;
 
         if (channelDeviceTreeItem.TryGetDeviceRuntime(out var deviceRuntime))
         {
@@ -845,7 +867,12 @@ finally
     }
 
 
-    async Task DeleteDevice(ContextMenuItem item, object value)
+    Task DeleteDevice(ContextMenuItem item, object value)
+    {
+        return DeleteDevice(value as ChannelDeviceTreeItem);
+    }
+
+    async Task DeleteDevice(ChannelDeviceTreeItem channelDeviceTreeItem)
     {
         var op = new DialogOption();
         {
@@ -864,7 +891,7 @@ finally
 EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
 {
     await op.CloseDialogAsync();
-    await DeleteCurrentDevice(item, value);
+    await DeleteCurrentDevice(channelDeviceTreeItem);
 }));
                 builder.AddComponentParameter(5, nameof(Button.Text), GatewayLocalizer["DeleteCurrentDevice"].Value);
 
@@ -876,7 +903,7 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
                 builder.AddComponentParameter(15, nameof(Button.OnClick), EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
                 {
                     await op.CloseDialogAsync();
-                    await DeleteAllDevice(item, value);
+                    await DeleteAllDevice();
                 }));
                 builder.AddComponentParameter(16, nameof(Button.Text), GatewayLocalizer["DeleteAllDevice"].Value);
 
@@ -886,15 +913,14 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
             });
 
         }
-        ;
+    ;
         await DialogService.Show(op);
     }
 
 
-    async Task DeleteCurrentDevice(ContextMenuItem item, object value)
+    async Task DeleteCurrentDevice(ChannelDeviceTreeItem channelDeviceTreeItem)
     {
         IEnumerable<DeviceRuntime> modelIds = null;
-        if (value is not ChannelDeviceTreeItem channelDeviceTreeItem) return;
 
         if (channelDeviceTreeItem.TryGetDeviceRuntime(out var deviceRuntime))
         {
@@ -968,7 +994,7 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
 
     }
 
-    async Task DeleteAllDevice(ContextMenuItem item, object value)
+    async Task DeleteAllDevice()
     {
         try
         {
@@ -1511,4 +1537,8 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
         base.OnAfterRender(firstRender);
     }
 
+    private void OnUpdateCallbackAsync()
+    {
+        throw new NotImplementedException();
+    }
 }
