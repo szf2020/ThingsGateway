@@ -22,7 +22,7 @@ namespace ThingsGateway.Plugin.SqlDB;
 /// <summary>
 /// SqlDBProducer
 /// </summary>
-public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariableModel<VariableBasicData>
+public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariable
 {
     private volatile bool _initRealData;
     private ConcurrentDictionary<long, VariableBasicData> RealTimeVariables { get; } = new ConcurrentDictionary<long, VariableBasicData>();
@@ -77,7 +77,7 @@ public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariableModel<
 
     private void UpdateVariable(VariableRuntime variableRuntime, VariableBasicData variable)
     {
-        if (_driverPropertys.IsHistoryDB)
+        if (_driverPropertys.IsHistoryDB && _businessPropertyWithCacheInterval.BusinessUpdateEnum != BusinessUpdateEnum.Interval)
         {
             if (_driverPropertys.GroupUpdate && variable.BusinessGroupUpdateTrigger && !variable.BusinessGroup.IsNullOrEmpty() && VariableRuntimeGroups.TryGetValue(variable.BusinessGroup, out var variableRuntimeGroup))
             {
@@ -200,7 +200,7 @@ public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariableModel<
                     stopwatch.Start();
                     var ids = (await _db.Queryable<SQLRealValue>().AS(_driverPropertys.ReadDBTableName).Select(a => a.Id).ToListAsync(cancellationToken).ConfigureAwait(false)).ToHashSet();
                     var InsertData = IdVariableRuntimes.Where(a => !ids.Contains(a.Key)).Select(a => a.Value).AdaptListSQLRealValue();
-                    var result = await _db.Fastest<SQLRealValue>().AS(_driverPropertys.ReadDBTableName).PageSize(100000).BulkCopyAsync(InsertData).ConfigureAwait(false);
+                    var result = await _db.Fastest<SQLRealValue>().AS(_driverPropertys.ReadDBTableName).BulkCopyAsync(InsertData).ConfigureAwait(false);
                     _initRealData = true;
                     stopwatch.Stop();
                     if (result > 0)

@@ -74,12 +74,10 @@ public partial class RedundancyOptionsPage
                 await RedundancyService.EditRedundancyOptionAsync(Model);
                 await ToastService.Success(RedundancyLocalizer[nameof(RedundancyOptions)], $"{RazorLocalizer["Save"]}{RazorLocalizer["Success"]}");
 
-                await RedundancyHostedService.StopRedundancyTaskAsync();
-                var result = await RedundancyHostedService.StartRedundancyTaskAsync();
-                if (result.IsSuccess)
-                    await ToastService.Success(RedundancyLocalizer[nameof(RedundancyOptions)], $"{RazorLocalizer["Success"]}");
-                else
-                    await ToastService.Warning(RedundancyLocalizer[nameof(RedundancyOptions)], $"{RazorLocalizer["Fail", result.ToString()]}");
+                await RedundancyHostedService.StopTaskAsync();
+                await RedundancyHostedService.StartTaskAsync(CancellationToken.None);
+                await ToastService.Success(RedundancyLocalizer[nameof(RedundancyOptions)], $"{RazorLocalizer["Success"]}");
+
 
 
                 await InvokeAsync(StateHasChanged);

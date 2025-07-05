@@ -15,9 +15,9 @@ namespace ThingsGateway.Management;
 
 public interface IRedundancyHostedService : IHostedService
 {
-    Task<OperResult> StartRedundancyTaskAsync();
-    Task StopRedundancyTaskAsync();
-    ValueTask ForcedSync(CancellationToken cancellationToken = default);
+    Task StartTaskAsync(CancellationToken cancellationToken);
+    Task StopTaskAsync();
+    Task ForcedSync(CancellationToken cancellationToken = default);
 
     public TextFileLogger TextLogger { get; }
     public string LogPath { get; }

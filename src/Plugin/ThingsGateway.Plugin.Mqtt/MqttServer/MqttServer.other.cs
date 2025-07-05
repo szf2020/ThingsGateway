@@ -34,7 +34,7 @@ namespace ThingsGateway.Plugin.Mqtt;
 /// <summary>
 /// MqttServer
 /// </summary>
-public partial class MqttServer : BusinessBaseWithCacheIntervalScript<VariableBasicData, DeviceBasicData, AlarmVariable>
+public partial class MqttServer : BusinessBaseWithCacheIntervalScriptAll
 {
     private static readonly CompositeFormat RpcTopic = CompositeFormat.Parse("{0}/+");
     private MQTTnet.Server.MqttServer _mqttServer;
@@ -103,7 +103,7 @@ public partial class MqttServer : BusinessBaseWithCacheIntervalScript<VariableBa
 
                 foreach (var group in varGroup)
                 {
-                    AddQueueVarModel(new CacheDBItem<List<VariableBasicData>>(group.AdaptIEnumerableVariableBasicData()));
+                    AddQueueVarModel(new CacheDBItem<List<VariableBasicData>>(group.ToList()));
                 }
                 foreach (var variable in varList)
                 {
@@ -138,7 +138,7 @@ public partial class MqttServer : BusinessBaseWithCacheIntervalScript<VariableBa
     }
     #region private
 
-    private async ValueTask<OperResult> Update(List<TopicArray> topicArrayList, CancellationToken cancellationToken)
+    private async ValueTask<OperResult> Update(IEnumerable<TopicArray> topicArrayList, CancellationToken cancellationToken)
     {
         foreach (var topicArray in topicArrayList)
         {
@@ -250,7 +250,7 @@ public partial class MqttServer : BusinessBaseWithCacheIntervalScript<VariableBa
         //首次连接时的保留消息
         //分解List，避免超出mqtt字节大小限制
         var varData = IdVariableRuntimes.Select(a => a.Value).AdaptIEnumerableVariableBasicData().ChunkBetter(_driverPropertys.SplitSize);
-        var devData = CollectDevices?.Select(a => a.Value).AdaptListDeviceBasicData().ChunkBetter(_driverPropertys.SplitSize);
+        var devData = CollectDevices?.Select(a => a.Value).AdaptIEnumerableDeviceBasicData().ChunkBetter(_driverPropertys.SplitSize);
         var alramData = GlobalData.ReadOnlyRealAlarmIdVariables.Select(a => a.Value).ChunkBetter(_driverPropertys.SplitSize);
         List<MqttApplicationMessage> Messages = new();
 

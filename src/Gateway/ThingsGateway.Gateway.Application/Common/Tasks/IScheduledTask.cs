@@ -7,6 +7,7 @@
         void Start();
         void Stop();
         public Int32 Period { get; }
+        bool Enable { get; }
     }
 
 

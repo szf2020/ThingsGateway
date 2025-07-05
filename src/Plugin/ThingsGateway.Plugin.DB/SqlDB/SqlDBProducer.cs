@@ -12,6 +12,7 @@ using BootstrapBlazor.Components;
 
 using ThingsGateway.Admin.Application;
 using ThingsGateway.Debug;
+using ThingsGateway.Extension.Generic;
 using ThingsGateway.Foundation;
 using ThingsGateway.NewLife;
 using ThingsGateway.NewLife.DictionaryExtensions;
@@ -24,8 +25,12 @@ namespace ThingsGateway.Plugin.SqlDB;
 /// <summary>
 /// SqlDBProducer
 /// </summary>
-public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariableModel<VariableBasicData>, IDBHistoryValueService
+public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariable, IDBHistoryValueService
 {
+
+
+
+
     internal readonly SqlDBProducerProperty _driverPropertys = new();
     private readonly SqlDBProducerVariableProperty _variablePropertys = new();
 
@@ -71,6 +76,123 @@ public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariableModel<
     public override string ToString()
     {
         return $" {nameof(SqlDBProducer)}";
+    }
+
+
+    protected override async Task InitChannelAsync(IChannel? channel, CancellationToken cancellationToken)
+    {
+        _db = SqlDBBusinessDatabaseUtil.GetDb(_driverPropertys);
+
+        if (_businessPropertyWithCacheInterval.BusinessUpdateEnum == BusinessUpdateEnum.Interval && _driverPropertys.IsReadDB)
+        {
+            GlobalData.VariableValueChangeEvent += VariableValueChange;
+        }
+
+        await base.InitChannelAsync(channel, cancellationToken).ConfigureAwait(false);
+
+
+    }
+
+    public override Task AfterVariablesChangedAsync(CancellationToken cancellationToken)
+    {
+        RealTimeVariables.Clear();
+        _initRealData = false;
+        return base.AfterVariablesChangedAsync(cancellationToken);
+    }
+
+    protected override async Task ProtectedStartAsync(CancellationToken cancellationToken)
+    {
+        _db.DbMaintenance.CreateDatabase();
+
+        //必须为间隔上传
+        if (!_driverPropertys.BigTextScriptHistoryTable.IsNullOrEmpty())
+        {
+            var hisModel = CSharpScriptEngineExtension.Do<DynamicSQLBase>(_driverPropertys.BigTextScriptHistoryTable);
+
+            if (_driverPropertys.IsHistoryDB)
+            {
+                await hisModel.DBInit(_db, cancellationToken).ConfigureAwait(false);
+            }
+
+        }
+        else
+        {
+            if (_driverPropertys.IsHistoryDB)
+            {
+                _db.CodeFirst.InitTables(typeof(SQLHistoryValue));
+                _db.CodeFirst.InitTables(typeof(SQLNumberHistoryValue));
+
+            }
+        }
+        if (!_driverPropertys.BigTextScriptRealTable.IsNullOrEmpty())
+        {
+            var realModel = CSharpScriptEngineExtension.Do<DynamicSQLBase>(_driverPropertys.BigTextScriptRealTable);
+
+            if (_driverPropertys.IsReadDB)
+            {
+                await realModel.DBInit(_db, cancellationToken).ConfigureAwait(false);
+            }
+
+        }
+        else
+        {
+            if (_driverPropertys.IsReadDB)
+                _db.CodeFirst.As<SQLRealValue>(_driverPropertys.ReadDBTableName).InitTables<SQLRealValue>();
+        }
+
+        await base.ProtectedStartAsync(cancellationToken).ConfigureAwait(false);
+    }
+
+    protected override async Task ProtectedExecuteAsync(object? state, CancellationToken cancellationToken)
+    {
+        if (_driverPropertys.IsReadDB)
+        {
+            try
+            {
+                var varLists = RealTimeVariables.ToIEnumerableWithDequeue().Batch(100000);
+                foreach (var varList in varLists)
+                {
+                    var result = await UpdateAsync(varList, cancellationToken).ConfigureAwait(false);
+                    if (success != result.IsSuccess)
+                    {
+                        if (!result.IsSuccess)
+                            LogMessage?.LogWarning(result.ToString());
+                        success = result.IsSuccess;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                if (success)
+                    LogMessage?.LogWarning(ex);
+                success = false;
+            }
+        }
+
+        if (_driverPropertys.IsHistoryDB)
+        {
+            await Update(cancellationToken).ConfigureAwait(false);
+        }
+    }
+
+    private ISugarQueryable<SQLNumberHistoryValue> Query(DBHistoryValuePageInput input)
+    {
+        var db = SqlDBBusinessDatabaseUtil.GetDb(_driverPropertys);
+
+        var query = db.Queryable<SQLNumberHistoryValue>().SplitTable()
+                           .WhereIF(input.StartTime != null, a => a.CreateTime >= input.StartTime)
+                           .WhereIF(input.EndTime != null, a => a.CreateTime <= input.EndTime)
+                           .WhereIF(!string.IsNullOrEmpty(input.VariableName), it => it.Name.Contains(input.VariableName))
+                           .WhereIF(input.VariableNames != null, it => input.VariableNames.Contains(it.Name))
+                           ;
+
+        for (int i = input.SortField.Count - 1; i >= 0; i--)
+        {
+            query = query.OrderByIF(!string.IsNullOrEmpty(input.SortField[i]), $"{input.SortField[i]} {(input.SortDesc[i] ? "desc" : "asc")}");
+        }
+        query = query.OrderBy(it => it.Id, OrderByType.Desc);//排序
+
+        return query;
     }
 
     internal async Task<QueryData<SQLNumberHistoryValue>> QueryHistoryData(QueryPageOptions option)
@@ -154,121 +276,4 @@ public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariableModel<
         return ret;
     }
 
-    protected override async Task InitChannelAsync(IChannel? channel, CancellationToken cancellationToken)
-    {
-        _db = SqlDBBusinessDatabaseUtil.GetDb(_driverPropertys);
-
-        if (_businessPropertyWithCacheInterval.BusinessUpdateEnum == BusinessUpdateEnum.Interval && _driverPropertys.IsReadDB)
-        {
-            GlobalData.VariableValueChangeEvent += VariableValueChange;
-        }
-
-        await base.InitChannelAsync(channel, cancellationToken).ConfigureAwait(false);
-
-
-    }
-
-    public override Task AfterVariablesChangedAsync(CancellationToken cancellationToken)
-    {
-        RealTimeVariables.Clear();
-        _initRealData = false;
-        return base.AfterVariablesChangedAsync(cancellationToken);
-    }
-    protected override async Task ProtectedStartAsync(CancellationToken cancellationToken)
-    {
-        _db.DbMaintenance.CreateDatabase();
-
-        //必须为间隔上传
-        if (!_driverPropertys.BigTextScriptHistoryTable.IsNullOrEmpty())
-        {
-            var hisModel = CSharpScriptEngineExtension.Do<DynamicSQLBase>(_driverPropertys.BigTextScriptHistoryTable);
-
-            if (_driverPropertys.IsHistoryDB)
-            {
-                await hisModel.DBInit(_db, cancellationToken).ConfigureAwait(false);
-            }
-
-        }
-        else
-        {
-            if (_driverPropertys.IsHistoryDB)
-            {
-                _db.CodeFirst.InitTables(typeof(SQLHistoryValue));
-                _db.CodeFirst.InitTables(typeof(SQLNumberHistoryValue));
-
-            }
-        }
-        if (!_driverPropertys.BigTextScriptRealTable.IsNullOrEmpty())
-        {
-            var realModel = CSharpScriptEngineExtension.Do<DynamicSQLBase>(_driverPropertys.BigTextScriptRealTable);
-
-            if (_driverPropertys.IsReadDB)
-            {
-                await realModel.DBInit(_db, cancellationToken).ConfigureAwait(false);
-            }
-
-        }
-        else
-        {
-            if (_driverPropertys.IsReadDB)
-                _db.CodeFirst.As<SQLRealValue>(_driverPropertys.ReadDBTableName).InitTables<SQLRealValue>();
-        }
-
-        await base.ProtectedStartAsync(cancellationToken).ConfigureAwait(false);
-    }
-
-    protected override async Task ProtectedExecuteAsync(object? state, CancellationToken cancellationToken)
-    {
-        if (_driverPropertys.IsReadDB)
-        {
-            try
-            {
-                var varList = RealTimeVariables.ToListWithDequeue();
-                if (varList.Count > 0)
-                {
-                    var result = await UpdateAsync(varList, cancellationToken).ConfigureAwait(false);
-                    if (success != result.IsSuccess)
-                    {
-                        if (!result.IsSuccess)
-                            LogMessage?.LogWarning(result.ToString());
-                        success = result.IsSuccess;
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                if (success)
-                    LogMessage?.LogWarning(ex);
-                success = false;
-            }
-        }
-
-        if (_driverPropertys.IsHistoryDB)
-        {
-            await UpdateVarModelMemory(cancellationToken).ConfigureAwait(false);
-            await UpdateVarModelsMemory(cancellationToken).ConfigureAwait(false);
-            await UpdateVarModelCache(cancellationToken).ConfigureAwait(false);
-            await UpdateVarModelsCache(cancellationToken).ConfigureAwait(false);
-        }
-    }
-
-    private ISugarQueryable<SQLNumberHistoryValue> Query(DBHistoryValuePageInput input)
-    {
-        var db = SqlDBBusinessDatabaseUtil.GetDb(_driverPropertys);
-
-        var query = db.Queryable<SQLNumberHistoryValue>().SplitTable()
-                           .WhereIF(input.StartTime != null, a => a.CreateTime >= input.StartTime)
-                           .WhereIF(input.EndTime != null, a => a.CreateTime <= input.EndTime)
-                           .WhereIF(!string.IsNullOrEmpty(input.VariableName), it => it.Name.Contains(input.VariableName))
-                           .WhereIF(input.VariableNames != null, it => input.VariableNames.Contains(it.Name))
-                           ;
-
-        for (int i = input.SortField.Count - 1; i >= 0; i--)
-        {
-            query = query.OrderByIF(!string.IsNullOrEmpty(input.SortField[i]), $"{input.SortField[i]} {(input.SortDesc[i] ? "desc" : "asc")}");
-        }
-        query = query.OrderBy(it => it.Id, OrderByType.Desc);//排序
-
-        return query;
-    }
 }

@@ -13,21 +13,21 @@ namespace ThingsGateway.Gateway.Application;
 public class SmartTriggerScheduler
 {
     private readonly object _lock = new();          // 锁对象，保证线程安全
-    private readonly Func<Task> _action;                // 实际要执行的操作
+    private readonly Func<CancellationToken, Task> _action;                // 实际要执行的操作
     private readonly TimeSpan _delay;               // 执行间隔（冷却时间）
 
     private bool _isRunning = false;                // 当前是否有调度任务在运行
     private bool _hasPending = false;               // 在等待期间是否有新的触发
 
     // 构造函数，传入要执行的方法和最小执行间隔
-    public SmartTriggerScheduler(Func<Task> action, TimeSpan minimumInterval)
+    public SmartTriggerScheduler(Func<CancellationToken, Task> action, TimeSpan minimumInterval)
     {
         _action = action ?? throw new ArgumentNullException(nameof(action));
         _delay = minimumInterval;
     }
 
     // 外部调用的触发方法（高频调用的地方调用这个）
-    public void Trigger()
+    public void Trigger(CancellationToken cancellationToken = default)
     {
         lock (_lock)
         {
@@ -41,16 +41,16 @@ public class SmartTriggerScheduler
 
             // 否则启动执行任务
             _isRunning = true;
-            _ = Task.Run(ExecuteLoop);
+            _ = Task.Run(() => ExecuteLoop(cancellationToken), cancellationToken);
         }
     }
 
     // 实际执行动作的循环逻辑
-    private async Task ExecuteLoop()
+    private async Task ExecuteLoop(CancellationToken cancellationToken)
     {
         while (true)
         {
-            Func<Task> actionToRun = null;
+            Func<CancellationToken, Task> actionToRun = null;
 
             // 拷贝 _action，并清除等待标记
             lock (_lock)
@@ -60,10 +60,10 @@ public class SmartTriggerScheduler
             }
 
             // 执行外部提供的方法
-            await actionToRun().ConfigureAwait(false);
+            await actionToRun(cancellationToken).ConfigureAwait(false);
 
             // 等待 delay 时间，进入冷却期
-            await Task.Delay(_delay).ConfigureAwait(false);
+            await Task.Delay(_delay, cancellationToken).ConfigureAwait(false);
 
             lock (_lock)
             {

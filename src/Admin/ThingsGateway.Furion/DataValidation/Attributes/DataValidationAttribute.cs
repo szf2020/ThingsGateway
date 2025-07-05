@@ -68,7 +68,6 @@ public sealed class DataValidationAttribute : ValidationAttribute
             // 进行多语言处理
             var errorMessage = !string.IsNullOrWhiteSpace(ErrorMessage) ? ErrorMessage : resultMessage;
 
-            //TODO: 修改为类型本地化
             return new ValidationResult(string.Format(App.StringLocalizerFactory == null ? errorMessage : App.CreateLocalizerByType(validationContext.ObjectType)[errorMessage], validationContext.DisplayName ?? validationContext.MemberName));
         }
 

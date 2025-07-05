@@ -84,8 +84,9 @@ public partial class VariableRuntimeInfo : IDisposable
         return Task.CompletedTask;
     }
 
-    private async Task Notify()
+    private async Task Notify(CancellationToken cancellationToken)
     {
+        if (cancellationToken.IsCancellationRequested) return;
         if (Disposed) return;
         if (table != null)
             await InvokeAsync(table.QueryAsync);

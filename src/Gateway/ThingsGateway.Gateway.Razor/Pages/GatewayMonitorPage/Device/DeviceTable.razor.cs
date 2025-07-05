@@ -56,8 +56,9 @@ public partial class DeviceTable : IDisposable
     {
         scheduler.Trigger();
     }
-    private async Task Notify()
+    private async Task Notify(CancellationToken cancellationToken)
     {
+        if (cancellationToken.IsCancellationRequested) return;
         if (Disposed) return;
         if (table != null)
             await InvokeAsync(table.QueryAsync);

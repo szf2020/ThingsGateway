@@ -19,10 +19,10 @@ namespace ThingsGateway.Management;
 
 internal sealed partial class ReverseCallbackServer : SingletonRpcServer
 {
-    RedundancyHostedService RedundancyHostedService;
-    public ReverseCallbackServer(RedundancyHostedService redundancyHostedService)
+    RedundancyTask RedundancyTask;
+    public ReverseCallbackServer(RedundancyTask redundancyTask)
     {
-        RedundancyHostedService = redundancyHostedService;
+        RedundancyTask = redundancyTask;
     }
 
     [DmtpRpc(MethodInvoke = true)]
@@ -33,7 +33,7 @@ internal sealed partial class ReverseCallbackServer : SingletonRpcServer
         {
             if (GlobalData.ReadOnlyDevices.TryGetValue(deviceData.Name, out var device))
             {
-                device.RpcDriver = RedundancyHostedService;
+                device.RpcDriver = RedundancyTask;
                 device.Tag = callContext.Caller is IIdClient idClient ? idClient.Id : string.Empty;
 
 
@@ -50,35 +50,106 @@ internal sealed partial class ReverseCallbackServer : SingletonRpcServer
 
             }
         }
-        RedundancyHostedService.LogMessage?.Trace("Update data success");
+        RedundancyTask.LogMessage?.Trace("RpcServer Update data success");
     }
 
-
-
     [DmtpRpc(MethodInvoke = true)]
-    public List<DataWithDatabase> GetData()
+    public async Task SyncData(List<Channel> channels, List<Device> devices, List<Variable> variables)
     {
-        List<DataWithDatabase> dataWithDatabases = new();
-        foreach (var channels in GlobalData.ReadOnlyChannels)
+
+        List<Channel> addChannels = new();
+        List<Device> addDevices = new();
+        List<Variable> addVariables = new();
+        List<Channel> upChannels = new();
+        List<Device> upDevices = new();
+        List<Variable> upVariables = new();
+
+        Dictionary<long, long> channelNewId = new();
+        Dictionary<long, long> deviceNewId = new();
+
+        foreach (var channel in channels)
         {
-            DataWithDatabase dataWithDatabase = new();
-            dataWithDatabase.Channel = channels.Value;
-            dataWithDatabase.DeviceVariables = new();
-            foreach (var devices in channels.Value.ReadDeviceRuntimes)
+            if (GlobalData.ReadOnlyChannels.TryGetValue(channel.Name, out var channelRuntime))
             {
-                DeviceDataWithDatabase deviceDataWithDatabase = new();
-
-                deviceDataWithDatabase.Device = devices.Value;
-                deviceDataWithDatabase.Variables = devices.Value.ReadOnlyVariableRuntimes.Select(a => a.Value).Cast<Variable>().ToList();
-
-
-                dataWithDatabase.DeviceVariables.Add(deviceDataWithDatabase);
+                channelNewId.TryAdd(channel.Id, channelRuntime.Id);
+                channel.Id = channelRuntime.Id;
+                channel.Enable = false;
+                upChannels.Add(channel);
             }
-
-            dataWithDatabases.Add(dataWithDatabase);
+            else
+            {
+                var id = CommonUtils.GetSingleId();
+                channelNewId.TryAdd(channel.Id, id);
+                channel.Id = id;
+                channel.Enable = false;
+                addChannels.Add(channel);
+            }
         }
-        return dataWithDatabases;
 
+        foreach (var device in devices)
+        {
+            if (GlobalData.ReadOnlyDevices.TryGetValue(device.Name, out var deviceRuntime))
+            {
+
+                deviceNewId.TryAdd(device.Id, deviceRuntime.Id);
+                device.Id = deviceRuntime.Id;
+
+                channelNewId.TryGetValue(device.ChannelId, out var newid);
+                device.ChannelId = newid;
+
+                device.Enable = false;
+                upDevices.Add(device);
+            }
+            else
+            {
+                var id = CommonUtils.GetSingleId();
+                deviceNewId.TryAdd(device.Id, id);
+                device.Id = id;
+
+                channelNewId.TryGetValue(device.ChannelId, out var newid);
+                device.ChannelId = newid;
+                device.Enable = false;
+                addDevices.Add(device);
+            }
+        }
+
+        foreach (var variable in variables)
+        {
+            deviceNewId.TryGetValue(variable.DeviceId, out var newid);
+            if (GlobalData.ReadOnlyIdDevices.TryGetValue(newid, out var deviceRuntime))
+            {
+                if (deviceRuntime.ReadOnlyVariableRuntimes.TryGetValue(variable.Name, out var variableRuntime))
+                {
+                    variable.Id = variableRuntime.Id;
+
+                    variable.DeviceId = newid;
+
+                    upVariables.Add(variable);
+                }
+                else
+                {
+                    var id = CommonUtils.GetSingleId();
+                    variable.Id = id;
+
+                    variable.DeviceId = newid;
+                    addVariables.Add(variable);
+                }
+            }
+            else
+            {
+                var id = CommonUtils.GetSingleId();
+                variable.Id = id;
+
+                variable.DeviceId = newid;
+                addVariables.Add(variable);
+            }
+        }
+
+
+        await GlobalData.ChannelRuntimeService.InsertAsync(addChannels, addDevices, addVariables, true, default).ConfigureAwait(false);
+        await GlobalData.ChannelRuntimeService.UpdateAsync(upChannels, upDevices, upVariables, true, default).ConfigureAwait(false);
+
+        RedundancyTask.LogMessage?.LogTrace($"Sync data success");
 
     }
 

@@ -20,41 +20,19 @@ namespace ThingsGateway.Plugin.SqlHistoryAlarm;
 /// <summary>
 /// SqlHistoryAlarm
 /// </summary>
-public partial class SqlHistoryAlarm : BusinessBaseWithCacheVariableModel<HistoryAlarm>
+public partial class SqlHistoryAlarm : BusinessBaseWithCacheAlarm
 {
-    protected override ValueTask<OperResult> UpdateVarModel(IEnumerable<CacheDBItem<HistoryAlarm>> item, CancellationToken cancellationToken)
+
+    protected override void AlarmChange(AlarmVariable alarmVariable)
     {
-        return UpdateT(item.Select(a => a.Value).OrderBy(a => a.Id), cancellationToken);
+        AddQueueAlarmModel(new CacheDBItem<AlarmVariable>(alarmVariable));
     }
 
-    protected override ValueTask<OperResult> UpdateVarModels(IEnumerable<HistoryAlarm> item, CancellationToken cancellationToken)
+    protected override ValueTask<OperResult> UpdateAlarmModel(IEnumerable<CacheDBItem<AlarmVariable>> item, CancellationToken cancellationToken)
     {
-        return UpdateT(item, cancellationToken);
+        return UpdateAlarmModel(item.Select(a => a.Value).OrderBy(a => a.Id), cancellationToken);
     }
-
-    private void AlarmWorker_OnAlarmChanged(AlarmVariable alarmVariable)
-    {
-        if (CurrentDevice.Pause)
-            return;
-        AddQueueVarModel(new CacheDBItem<HistoryAlarm>(AdaptHistoryAlarm(alarmVariable)));
-    }
-    public override void PauseThread(bool pause)
-    {
-        lock (this)
-        {
-            var oldV = CurrentDevice.Pause;
-            base.PauseThread(pause);
-            if (!pause && oldV != pause)
-            {
-                GlobalData.ReadOnlyRealAlarmIdVariables?.ForEach(a =>
-                {
-                    AlarmWorker_OnAlarmChanged(a.Value);
-                });
-            }
-        }
-    }
-
-    private async ValueTask<OperResult> UpdateT(IEnumerable<HistoryAlarm> item, CancellationToken cancellationToken)
+    private async ValueTask<OperResult> UpdateAlarmModel(IEnumerable<AlarmVariable> item, CancellationToken cancellationToken)
     {
         var result = await InserableAsync(item.ToList(), cancellationToken).ConfigureAwait(false);
         if (success != result.IsSuccess)
@@ -67,7 +45,7 @@ public partial class SqlHistoryAlarm : BusinessBaseWithCacheVariableModel<Histor
         return result;
     }
 
-    private async ValueTask<OperResult> InserableAsync(List<HistoryAlarm> dbInserts, CancellationToken cancellationToken)
+    private async ValueTask<OperResult> InserableAsync(List<AlarmVariable> dbInserts, CancellationToken cancellationToken)
     {
         try
         {
@@ -91,7 +69,7 @@ public partial class SqlHistoryAlarm : BusinessBaseWithCacheVariableModel<Histor
                 if (_db.CurrentConnectionConfig.DbType == SqlSugar.DbType.QuestDB)
                     result = await _db.Insertable(dbInserts).AS(_driverPropertys.TableName).ExecuteCommandAsync(cancellationToken).ConfigureAwait(false);
                 else
-                    result = await _db.Fastest<HistoryAlarm>().AS(_driverPropertys.TableName).PageSize(50000).BulkCopyAsync(dbInserts).ConfigureAwait(false);
+                    result = await _db.Fastest<HistoryAlarm>().AS(_driverPropertys.TableName).PageSize(50000).BulkCopyAsync(dbInserts.AdaptListHistoryAlarm()).ConfigureAwait(false);
 
                 stopwatch.Stop();
                 //var result = await db.Insertable(dbInserts).SplitTable().ExecuteCommandAsync().ConfigureAwait(false);

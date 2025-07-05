@@ -61,7 +61,7 @@
                         <EditTemplate Context="value">
                             <div class="col-12  col-md-6 ">
                                 <BootstrapInputGroup>
-                                    <Select IsVirtualize DefaultVirtualizeItemText=@(GlobalData.ReadOnlyChannels.TryGetValue(value.ChannelId,out var channelRuntime)?channelRuntime.Name:string.Empty) @bind-Value="@value.ChannelId" IsDisabled=BatchEditEnable Items="@_channelItems" OnSelectedItemChanged=OnChannelChanged ShowSearch="true" ShowLabel="true" />
+                                    <Select IsVirtualize DefaultVirtualizeItemText=@(GlobalData.ReadOnlyIdChannels.TryGetValue(value.ChannelId,out var channelRuntime)?channelRuntime.Name:string.Empty) @bind-Value="@value.ChannelId" IsDisabled=BatchEditEnable Items="@_channelItems" OnSelectedItemChanged=OnChannelChanged ShowSearch="true" ShowLabel="true" />
                                     <Button IsDisabled=BatchEditEnable class="text-end" Icon="fa-solid fa-plus" OnClick="AddChannel"></Button>
                                 </BootstrapInputGroup>
                             </div>

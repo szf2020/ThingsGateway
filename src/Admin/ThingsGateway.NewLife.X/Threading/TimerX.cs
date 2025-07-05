@@ -275,9 +275,11 @@ public class TimerX : ITimer, ITimerx, IDisposable
         //Init(_AbsolutelyNext = _cron.GetNext(DateTime.Now));
     }
 
+    public bool Disposed { get; private set; }
     /// <summary>销毁定时器</summary>
     public void Dispose()
     {
+        Disposed = true;
         Dispose(true);
 
         // 告诉GC，不要调用析构函数

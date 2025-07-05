@@ -26,7 +26,7 @@ namespace ThingsGateway.Plugin.Mqtt;
 /// <summary>
 /// MqttClient,RPC方法适配mqttNet
 /// </summary>
-public partial class MqttClient : BusinessBaseWithCacheIntervalScript<VariableBasicData, DeviceBasicData, AlarmVariable>
+public partial class MqttClient : BusinessBaseWithCacheIntervalScriptAll
 {
     private readonly MqttClientProperty _driverPropertys = new();
     private readonly MqttClientVariableProperty _variablePropertys = new();
@@ -206,12 +206,9 @@ public partial class MqttClient : BusinessBaseWithCacheIntervalScript<VariableBa
         //TD设备上线
 
         var data = ThingsBoardDeviceConnectQueue.ToListWithDequeue();
-        if (data?.Count > 0)
+        foreach (var item in data)
         {
-            foreach (var item in data)
-            {
-                await UpdateThingsBoardDeviceConnect(item).ConfigureAwait(false);
-            }
+            await UpdateThingsBoardDeviceConnect(item).ConfigureAwait(false);
         }
 
 

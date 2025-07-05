@@ -26,7 +26,7 @@ namespace ThingsGateway.Plugin.TDengineDB;
 /// <summary>
 /// RabbitMQProducer
 /// </summary>
-public partial class TDengineDBProducer : BusinessBaseWithCacheIntervalVariableModel<VariableBasicData>
+public partial class TDengineDBProducer : BusinessBaseWithCacheIntervalVariable
 {
 
     protected override ValueTask<OperResult> UpdateVarModel(IEnumerable<CacheDBItem<VariableBasicData>> item, CancellationToken cancellationToken)

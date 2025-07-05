@@ -55,7 +55,6 @@ public static partial class GatewayMapper
     public static partial Device AdaptDevice(this Device src);
     public static partial Variable AdaptVariable(this Variable src);
     public static partial List<PluginInfo> AdaptListPluginInfo(this List<PluginInfo> src);
-    public static partial List<VariableBasicData> AdaptIEnumerableVariableBasicData(this IGrouping<string, VariableBasicData> src);
 }
 
 

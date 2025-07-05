@@ -15,6 +15,30 @@ namespace ThingsGateway.Extension.Generic;
 /// <inheritdoc/>
 public static class LinqExtensions
 {
+    /// <summary>
+    /// 将序列分批，每批固定数量
+    /// </summary>
+    public static IEnumerable<List<T>> Batch<T>(this IEnumerable<T> source, int batchSize)
+    {
+        if (source == null) throw new ArgumentNullException(nameof(source));
+        if (batchSize <= 0) throw new ArgumentOutOfRangeException(nameof(batchSize));
+
+        List<T> batch = new List<T>(batchSize);
+        foreach (var item in source)
+        {
+            batch.Add(item);
+            if (batch.Count >= batchSize)
+            {
+                yield return batch;
+                batch = new List<T>(batchSize);
+            }
+        }
+
+        // 剩余不足 batchSize 的最后一批
+        if (batch.Count > 0)
+            yield return batch;
+    }
+
     /// <inheritdoc/>
     public static ICollection<T> AddIF<T>(this ICollection<T> thisValue, bool isOk, Func<T> predicate)
     {

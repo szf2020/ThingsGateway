@@ -10,6 +10,8 @@
 		<ProjectReference Include="..\..\Gateway\ThingsGateway.Gateway.Razor\ThingsGateway.Gateway.Razor.csproj">
 		</ProjectReference>
 		
+		<PackageReference Include="Riok.Mapperly" Version="4.2.1" ExcludeAssets="runtime" PrivateAssets="all" />
+
 		<!--<PackageReference Include="SqlSugar.QuestDb.RestAPI" Version="4.1.17" GeneratePathProperty="true">
 			<PrivateAssets>contentFiles;compile;build;buildMultitargeting;buildTransitive;analyzers;</PrivateAssets>
 		</PackageReference>

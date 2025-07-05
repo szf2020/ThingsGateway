@@ -31,7 +31,10 @@ public class RedundancyOptions
     /// 获取或设置是否为主设备。
     /// </summary>
     public bool IsMaster { get; set; }
-
+    //主站只建议是服务端
+    //[DynamicProperty]
+    //public bool IsServer { get; set; } = true;
+    internal bool IsServer => IsMaster;
     /// <summary>
     /// 获取或设置用于验证的令牌。
     /// </summary>

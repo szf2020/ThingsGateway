@@ -15,6 +15,7 @@ using Microsoft.Extensions.Logging;
 
 using ThingsGateway.NewLife;
 using ThingsGateway.NewLife.Collections;
+using ThingsGateway.NewLife.DictionaryExtensions;
 
 namespace ThingsGateway.Gateway.Application;
 
@@ -106,7 +107,7 @@ public class DeviceRuntimeService : IDeviceRuntimeService
             var result = await GlobalData.DeviceService.DeleteDeviceAsync(devids).ConfigureAwait(false);
 
             //根据条件重启通道线程
-            var deviceRuntimes = GlobalData.IdDevices.Where(a => devids.Contains(a.Key)).Select(a => a.Value).ToList();
+            var deviceRuntimes = GlobalData.IdDevices.FilterByKeys(devids).Select(a => a.Value).ToList();
 
             ConcurrentHashSet<IDriver> changedDriver = RuntimeServiceHelper.DeleteDeviceRuntime(deviceRuntimes);
 

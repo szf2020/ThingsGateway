@@ -17,7 +17,7 @@ public class ScheduledAsyncTask : DisposeBase, IScheduledTask, IScheduledIntInte
     private volatile int _isRunning = 0;
     private volatile int _pendingTriggers = 0;
     public Int32 Period => _timer?.Period ?? 0;
-
+    public bool Enable => _timer?.Disposed != false ? false : true;
     public ScheduledAsyncTask(int interval, Func<object?, CancellationToken, Task> taskFunc, object? state, ILog log, CancellationToken token)
     {
         IntervalMS = interval;

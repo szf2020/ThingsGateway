@@ -228,6 +228,8 @@
     "Connect": "Connect",
     "ConnectTimeout": "ConnectTimeout",
     "CopyChannel": "Copy Channel",
+    "UpdateGatewayData": "UpdateGatewayData",
+    "InsertGatewayData": "InsertGatewayData",
     "CreateTime": "CreateTime",
     "CreateUser": "CreateUser",
     "DataBits": "DataBits",

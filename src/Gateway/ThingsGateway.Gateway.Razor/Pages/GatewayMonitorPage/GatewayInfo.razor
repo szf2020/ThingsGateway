@@ -15,7 +15,7 @@ else if (ShowType == ShowTypeEnum.LogInfo)
     {
         <DeviceRuntimeInfo DeviceRuntime="device" />
     }
-    if (GlobalData.ReadOnlyChannels.TryGetValue(ShowChannelRuntime, out var channel))
+    if (GlobalData.ReadOnlyIdChannels.TryGetValue(ShowChannelRuntime, out var channel))
     {
         <ChannelRuntimeInfo ChannelRuntime="channel" />
     }

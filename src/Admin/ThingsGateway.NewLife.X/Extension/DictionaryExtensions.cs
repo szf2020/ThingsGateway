@@ -52,6 +52,29 @@ public static class DictionaryExtensions
         // 返回成功移除的项目数量
         return count;
     }
+
+
+    /// <summary>
+    /// 根据指定的一组 key，批量从字典中筛选对应的键值对。
+    /// </summary>
+    /// <typeparam name="TKey">字典键类型</typeparam>
+    /// <typeparam name="TValue">字典值类型</typeparam>
+    /// <param name="dictionary">源字典</param>
+    /// <param name="keys">要筛选的 key 集合</param>
+    /// <returns>匹配到的键值对序列</returns>
+    public static IEnumerable<KeyValuePair<TKey, TValue>> FilterByKeys<TKey, TValue>(
+        this IDictionary<TKey, TValue> dictionary,
+        IEnumerable<TKey> keys)
+    {
+        foreach (var key in keys)
+        {
+            if (dictionary.TryGetValue(key, out var value))
+            {
+                yield return new KeyValuePair<TKey, TValue>(key, value);
+            }
+        }
+    }
+
     /// <summary>
     /// 批量出队
     /// </summary>
@@ -79,6 +102,33 @@ public static class DictionaryExtensions
         }
         return list;
     }
+
+    /// <summary>
+    /// 批量出队
+    /// </summary>
+    public static IEnumerable<T> ToIEnumerableWithDequeue<TKEY, T>(this ConcurrentDictionary<TKEY, T> values, int maxCount = 0)
+    {
+        if (values.IsEmpty) yield break;
+        if (maxCount <= 0)
+        {
+            maxCount = values.Count;
+        }
+        else
+        {
+            maxCount = Math.Min(maxCount, values.Count);
+        }
+
+        var keys = values.Keys;
+        foreach (var key in keys)
+        {
+            if (maxCount-- <= 0) break;
+            if (values.TryRemove(key, out var result))
+            {
+                yield return result;
+            }
+        }
+    }
+
     /// <summary>
     /// 批量出队
     /// </summary>
@@ -107,6 +157,32 @@ public static class DictionaryExtensions
             }
         }
         return dict;
+    }
+    /// <summary>
+    /// 批量出队
+    /// </summary>
+    public static IEnumerable<KeyValuePair<TKEY, T>> ToIEnumerableKVWithDequeue<TKEY, T>(this ConcurrentDictionary<TKEY, T> values, int maxCount = 0)
+    {
+        if (values.IsEmpty) yield break;
+
+        if (maxCount <= 0)
+        {
+            maxCount = values.Count;
+        }
+        else
+        {
+            maxCount = Math.Min(maxCount, values.Count);
+        }
+
+        var keys = values.Keys;
+        foreach (var key in keys)
+        {
+            if (maxCount-- <= 0) break;
+            if (values.TryRemove(key, out var result))
+            {
+                yield return new(key, result);
+            }
+        }
     }
 
 }

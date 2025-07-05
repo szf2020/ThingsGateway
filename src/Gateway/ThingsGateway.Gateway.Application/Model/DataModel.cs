@@ -126,11 +126,12 @@ public class VariableBasicData
     /// <inheritdoc cref="VariableRuntime.IsOnline"/>
     public bool IsOnline { get; set; }
 
-    /// <inheritdoc cref="VariableRuntime.DeviceRuntime"/>
-    [System.Text.Json.Serialization.JsonIgnore]
-    [Newtonsoft.Json.JsonIgnore]
-    public DeviceBasicData DeviceRuntime { get; set; }
-
+    ///// <inheritdoc cref="VariableRuntime.DeviceRuntime"/>
+    //[System.Text.Json.Serialization.JsonIgnore]
+    //[Newtonsoft.Json.JsonIgnore]
+    //public DeviceBasicData DeviceRuntime { get; set; }
+    /// <inheritdoc cref="Variable.DeviceId"/>
+    public long DeviceId { get; set; }
     /// <inheritdoc cref="VariableRuntime.LastErrorMessage"/>
     [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
     [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]

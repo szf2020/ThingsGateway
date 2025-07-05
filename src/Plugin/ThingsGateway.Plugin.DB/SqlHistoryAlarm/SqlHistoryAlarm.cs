@@ -11,20 +11,18 @@
 using BootstrapBlazor.Components;
 
 using ThingsGateway.Admin.Application;
-using ThingsGateway.Extension.Generic;
 using ThingsGateway.Foundation;
 using ThingsGateway.NewLife;
 using ThingsGateway.SqlSugar;
-
-using TouchSocket.Core;
 
 namespace ThingsGateway.Plugin.SqlHistoryAlarm;
 
 /// <summary>
 /// SqlHistoryAlarm
 /// </summary>
-public partial class SqlHistoryAlarm : BusinessBaseWithCacheVariableModel<HistoryAlarm>, IDBHistoryAlarmService
+public partial class SqlHistoryAlarm : BusinessBaseWithCacheAlarm, IDBHistoryAlarmService
 {
+
     internal readonly SqlHistoryAlarmProperty _driverPropertys = new();
     private readonly SqlHistoryAlarmVariableProperty _variablePropertys = new();
     public override Type DriverUIType => typeof(HistoryAlarmPage);
@@ -34,66 +32,14 @@ public partial class SqlHistoryAlarm : BusinessBaseWithCacheVariableModel<Histor
 
     protected override BusinessPropertyWithCache _businessPropertyWithCache => _driverPropertys;
 
-
     private SqlSugarClient _db;
-
-    public static HistoryAlarm AdaptHistoryAlarm(AlarmVariable src)
-    {
-        var target = new HistoryAlarm();
-        target.Name = src.Name;
-        target.Description = src.Description;
-        target.CreateOrgId = src.CreateOrgId;
-        target.CreateUserId = src.CreateUserId;
-        target.DeviceId = src.DeviceId;
-        target.DeviceName = src.DeviceName;
-        target.RegisterAddress = src.RegisterAddress;
-        target.DataType = src.DataType;
-        target.AlarmCode = src.AlarmCode;
-        target.AlarmLimit = src.AlarmLimit;
-        target.AlarmText = src.AlarmText;
-        target.RecoveryCode = src.RecoveryCode;
-        target.AlarmTime = src.AlarmTime;
-        target.EventTime = src.EventTime;
-        target.AlarmType = src.AlarmType;
-        target.EventType = src.EventType;
-        target.Remark1 = src.Remark1;
-        target.Remark2 = src.Remark2;
-        target.Remark3 = src.Remark3;
-        target.Remark4 = src.Remark4;
-        target.Remark5 = src.Remark5;
-        target.Id = CommonUtils.GetSingleId();
-        return target;
-    }
-
 
     protected override async Task InitChannelAsync(IChannel? channel, CancellationToken cancellationToken)
     {
         _db = BusinessDatabaseUtil.GetDb((DbType)_driverPropertys.DbType, _driverPropertys.BigTextConnectStr);
 
-        GlobalData.AlarmChangedEvent -= AlarmWorker_OnAlarmChanged;
-        GlobalData.ReadOnlyRealAlarmIdVariables?.ForEach(a =>
-        {
-            AlarmWorker_OnAlarmChanged(a.Value);
-        });
-        GlobalData.AlarmChangedEvent += AlarmWorker_OnAlarmChanged;
-
         await base.InitChannelAsync(channel, cancellationToken).ConfigureAwait(false);
     }
-    public override async Task AfterVariablesChangedAsync(CancellationToken cancellationToken)
-    {
-        await base.AfterVariablesChangedAsync(cancellationToken).ConfigureAwait(false);
-        IdVariableRuntimes.Clear();
-        IdVariableRuntimes.AddRange(GlobalData.ReadOnlyIdVariables.Where(a => a.Value.AlarmEnable));
-
-
-        var ids = IdVariableRuntimes.Select(b => b.Value.DeviceId).ToHashSet();
-
-        CollectDevices = GlobalData.ReadOnlyIdDevices
-                                .Where(a => IdVariableRuntimes.Select(b => b.Value.DeviceId).Contains(a.Value.Id))
-                                .ToDictionary(a => a.Key, a => a.Value);
-    }
-
-
 
     /// <summary>
     /// <inheritdoc/>
@@ -104,7 +50,6 @@ public partial class SqlHistoryAlarm : BusinessBaseWithCacheVariableModel<Histor
     protected override void Dispose(bool disposing)
     {
         _db?.TryDispose();
-        GlobalData.AlarmChangedEvent -= AlarmWorker_OnAlarmChanged;
         base.Dispose(disposing);
     }
 
@@ -113,11 +58,6 @@ public partial class SqlHistoryAlarm : BusinessBaseWithCacheVariableModel<Histor
         _db.DbMaintenance.CreateDatabase();
         _db.CodeFirst.As<HistoryAlarm>(_driverPropertys.TableName).InitTables<HistoryAlarm>();
         return base.ProtectedStartAsync(cancellationToken);
-    }
-
-    protected override Task ProtectedExecuteAsync(object? state, CancellationToken cancellationToken)
-    {
-        return Update(cancellationToken);
     }
 
     #region 数据查询

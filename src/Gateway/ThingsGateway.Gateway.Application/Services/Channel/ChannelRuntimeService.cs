@@ -59,6 +59,72 @@ public class ChannelRuntimeService : IChannelRuntimeService
         }
     }
 
+    public async Task<bool> InsertAsync(List<Channel> models, List<Device> devices, List<Variable> variables, bool restart, CancellationToken cancellationToken)
+    {
+        try
+        {
+            await WaitLock.WaitAsync(cancellationToken).ConfigureAwait(false);
+
+            var result = await GlobalData.ChannelService.InsertAsync(models, devices, variables).ConfigureAwait(false);
+            var ids = models.Select(a => a.Id).ToHashSet();
+
+            var newChannelRuntimes = await RuntimeServiceHelper.GetNewChannelRuntimesAsync(ids).ConfigureAwait(false);
+
+            var deviceids = devices.Select(a => a.Id).ToHashSet();
+            var newDeviceRuntimes = await RuntimeServiceHelper.GetNewDeviceRuntimesAsync(deviceids).ConfigureAwait(false);
+
+            await RuntimeServiceHelper.InitAsync(newChannelRuntimes, newDeviceRuntimes, _logger).ConfigureAwait(false);
+
+            //根据条件重启通道线程
+            if (restart)
+            {
+                await GlobalData.ChannelThreadManage.RestartChannelAsync(newChannelRuntimes).ConfigureAwait(false);
+
+                await RuntimeServiceHelper.ChangedDriverAsync(_logger, cancellationToken).ConfigureAwait(false);
+
+            }
+
+            return true;
+        }
+        finally
+        {
+            WaitLock.Release();
+        }
+    }
+
+    public async Task<bool> UpdateAsync(List<Channel> models, List<Device> devices, List<Variable> variables, bool restart, CancellationToken cancellationToken)
+    {
+        try
+        {
+            await WaitLock.WaitAsync(cancellationToken).ConfigureAwait(false);
+
+            var result = await GlobalData.ChannelService.UpdateAsync(models, devices, variables).ConfigureAwait(false);
+            var ids = models.Select(a => a.Id).ToHashSet();
+
+            var newChannelRuntimes = await RuntimeServiceHelper.GetNewChannelRuntimesAsync(ids).ConfigureAwait(false);
+
+            var deviceids = devices.Select(a => a.Id).ToHashSet();
+            var newDeviceRuntimes = await RuntimeServiceHelper.GetNewDeviceRuntimesAsync(deviceids).ConfigureAwait(false);
+
+            await RuntimeServiceHelper.InitAsync(newChannelRuntimes, newDeviceRuntimes, _logger).ConfigureAwait(false);
+
+            //根据条件重启通道线程
+            if (restart)
+            {
+                await GlobalData.ChannelThreadManage.RestartChannelAsync(newChannelRuntimes).ConfigureAwait(false);
+
+                await RuntimeServiceHelper.ChangedDriverAsync(_logger, cancellationToken).ConfigureAwait(false);
+
+            }
+
+            return true;
+        }
+        finally
+        {
+            WaitLock.Release();
+        }
+    }
+
     public async Task<bool> BatchEditAsync(IEnumerable<Channel> models, Channel oldModel, Channel model, bool restart = true)
     {
         try
@@ -202,7 +268,7 @@ public class ChannelRuntimeService : IChannelRuntimeService
             await WaitLock.WaitAsync().ConfigureAwait(false);
 
             //网关启动时，获取所有通道
-            var newChannelRuntimes = (await GlobalData.ChannelService.GetAllAsync().ConfigureAwait(false)).Where(a => ids.Contains(a.Id) || !GlobalData.Channels.ContainsKey(a.Id)).AdaptListChannelRuntime();
+            var newChannelRuntimes = (await GlobalData.ChannelService.GetAllAsync().ConfigureAwait(false)).Where(a => ids.Contains(a.Id) || !GlobalData.IdChannels.ContainsKey(a.Id)).AdaptListChannelRuntime();
 
             var chanelIds = newChannelRuntimes.Select(a => a.Id).ToHashSet();
             var newDeviceRuntimes = (await GlobalData.DeviceService.GetAllAsync().ConfigureAwait(false)).Where(a => chanelIds.Contains(a.ChannelId)).AdaptListDeviceRuntime();

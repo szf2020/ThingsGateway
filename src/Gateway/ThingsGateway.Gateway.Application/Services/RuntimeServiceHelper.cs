@@ -15,6 +15,7 @@ using Microsoft.Extensions.Logging;
 
 using ThingsGateway.Extension.Generic;
 using ThingsGateway.NewLife.Collections;
+using ThingsGateway.NewLife.DictionaryExtensions;
 
 using TouchSocket.Core;
 
@@ -59,7 +60,7 @@ internal static class RuntimeServiceHelper
         //批量修改之后，需要重新加载通道
         foreach (var newChannelRuntime in newChannelRuntimes)
         {
-            if (GlobalData.Channels.TryGetValue(newChannelRuntime.Id, out var channelRuntime))
+            if (GlobalData.IdChannels.TryGetValue(newChannelRuntime.Id, out var channelRuntime))
             {
                 channelRuntime.Dispose();
                 newChannelRuntime.Init();
@@ -85,7 +86,7 @@ internal static class RuntimeServiceHelper
             {
 
 
-                if (GlobalData.Channels.TryGetValue(newDeviceRuntime.ChannelId, out var newChannelRuntime))
+                if (GlobalData.IdChannels.TryGetValue(newDeviceRuntime.ChannelId, out var newChannelRuntime))
                 {
                     newDeviceRuntime.Init(newChannelRuntime);
 
@@ -121,7 +122,7 @@ internal static class RuntimeServiceHelper
             {
                 deviceRuntime.Dispose();
             }
-            if (GlobalData.Channels.TryGetValue(newDeviceRuntime.ChannelId, out var channelRuntime))
+            if (GlobalData.IdChannels.TryGetValue(newDeviceRuntime.ChannelId, out var channelRuntime))
             {
                 newDeviceRuntime.Init(channelRuntime);
             }
@@ -214,7 +215,7 @@ internal static class RuntimeServiceHelper
         //批量修改之后，需要重新加载通道
         foreach (var id in ids)
         {
-            if (GlobalData.Channels.TryGetValue(id, out var channelRuntime))
+            if (GlobalData.IdChannels.TryGetValue(id, out var channelRuntime))
             {
                 channelRuntime.Dispose();
                 var devs = channelRuntime.DeviceRuntimes.Select(a => a.Value).ToArray();
@@ -267,7 +268,7 @@ internal static class RuntimeServiceHelper
     public static async Task RemoveDeviceAsync(HashSet<long> newDeciceIds)
     {
         //先找出线程管理器，停止
-        var deviceRuntimes = GlobalData.IdDevices.Where(a => newDeciceIds.Contains(a.Key)).Select(a => a.Value);
+        var deviceRuntimes = GlobalData.IdDevices.FilterByKeys(newDeciceIds).Select(a => a.Value);
         await RemoveDeviceAsync(deviceRuntimes).ConfigureAwait(false);
     }
     public static async Task RemoveDeviceAsync(IEnumerable<DeviceRuntime> deviceRuntimes)
@@ -317,7 +318,7 @@ internal static class RuntimeServiceHelper
 
     public static void AddBusinessChangedDriver(HashSet<long> variableIds, ConcurrentHashSet<IDriver> changedDriver)
     {
-        var data = GlobalData.IdVariables.Where(a => variableIds.Contains(a.Key)).GroupBy(a => a.Value.DeviceRuntime);
+        var data = GlobalData.IdVariables.FilterByKeys(variableIds).GroupBy(a => a.Value.DeviceRuntime);
 
         foreach (var group in data)
         {

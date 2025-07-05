@@ -21,7 +21,7 @@ namespace ThingsGateway.Plugin.QuestDB;
 /// <summary>
 /// RabbitMQProducer
 /// </summary>
-public partial class QuestDBProducer : BusinessBaseWithCacheIntervalVariableModel<VariableBasicData>
+public partial class QuestDBProducer : BusinessBaseWithCacheIntervalVariable
 {
 
     protected override ValueTask<OperResult> UpdateVarModel(IEnumerable<CacheDBItem<VariableBasicData>> item, CancellationToken cancellationToken)

@@ -644,7 +644,7 @@ internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
 
             //找出新的通道，添加设备线程
 
-            if (!GlobalData.Channels.TryGetValue(newDeviceRuntime.ChannelId, out var channelRuntime))
+            if (!GlobalData.IdChannels.TryGetValue(newDeviceRuntime.ChannelId, out var channelRuntime))
                 LogMessage?.LogWarning($"device {newDeviceRuntime.Name} cannot found channel with id{newDeviceRuntime.ChannelId}");
 
             newDeviceRuntime.Init(channelRuntime);

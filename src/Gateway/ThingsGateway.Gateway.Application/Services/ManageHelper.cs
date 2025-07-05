@@ -23,7 +23,7 @@ internal static class ManageHelper
 
     public static void CheckChannelCount(int addCount)
     {
-        var data = GlobalData.Channels.Count + addCount;
+        var data = GlobalData.IdChannels.Count + addCount;
         ProAuthentication.TryGetAuthorizeInfo(out var authorizeInfo);
         if (data > ManageHelper.ChannelThreadOptions.MaxChannelCount || data > authorizeInfo?.MaxChannelCount)
         {

@@ -131,7 +131,7 @@ namespace ThingsGateway.SqlSugar
             //TODO: optimize the type caching -- if fields are simply reordered, that doesn't mean that they're actually different types, so this needs to be smarter
             string key = string.Empty;
             foreach (var prop in properties)
-                key += prop.Key + ";" + prop.Value.Name + ";";
+                key += $"{prop.Key};{prop.Value.Name};";
 
             return key;
         }

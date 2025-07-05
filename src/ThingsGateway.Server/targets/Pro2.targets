@@ -1,6 +1,10 @@
 <Project>
 
 	<ItemGroup>
+		<PackageReference Include="ThingsGateway.Plugin.Synchronization" Version="$(ProPluginVersion)" GeneratePathProperty="true">
+			<Private>false</Private>
+			<IncludeAssets> native;</IncludeAssets>
+		</PackageReference>
 		<PackageReference Include="ThingsGateway.Plugin.Inovance" Version="$(ProPluginVersion)" GeneratePathProperty="true" Private="false"  IncludeAssets=" native;" />
 		<PackageReference Include="ThingsGateway.Plugin.TIANXIN" Version="$(ProPluginVersion)" GeneratePathProperty="true" Private="false"  IncludeAssets=" native;" />
 		<PackageReference Include="ThingsGateway.Plugin.HJ212" Version="$(ProPluginVersion)" GeneratePathProperty="true" Private="false"  IncludeAssets=" native;" />
@@ -60,6 +64,7 @@
 			<PkgThingsGateway_Plugin_SECSPackageFiles Include="$(PkgThingsGateway_Plugin_SECS)\Content\$(PluginTargetFramework)\**\*.*" />
 			<PkgThingsGateway_Plugin_TS550PackageFiles Include="$(PkgThingsGateway_Plugin_TS550)\Content\$(PluginTargetFramework)\**\*.*" />
 			<PkgThingsGateway_Plugin_VigorPackageFiles Include="$(PkgThingsGateway_Plugin_Vigor)\Content\$(PluginTargetFramework)\**\*.*" />
+			<PkgThingsGateway_Plugin_SynchronizationPackageFiles Include="$(PkgThingsGateway_Plugin_Synchronization)\Content\$(PluginTargetFramework)\**\*.*" />
 
 		</ItemGroup>
 		<PropertyGroup>
@@ -86,6 +91,7 @@
 		<Copy SourceFiles="@(PkgThingsGateway_Plugin_TS550PackageFiles)" DestinationFolder="$(PluginFolder)ThingsGateway.Plugin.TS550%(RecursiveDir)" />
 		<Copy SourceFiles="@(PkgThingsGateway_Plugin_VigorPackageFiles)" DestinationFolder="$(PluginFolder)ThingsGateway.Plugin.Vigor%(RecursiveDir)" />
 
+		<Copy SourceFiles="@(PkgThingsGateway_Plugin_SynchronizationPackageFiles)" DestinationFolder="$(PluginFolder)%(RecursiveDir)" />
 	</Target>
 
 </Project>

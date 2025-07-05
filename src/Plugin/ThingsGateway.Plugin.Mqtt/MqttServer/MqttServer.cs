@@ -23,7 +23,7 @@ namespace ThingsGateway.Plugin.Mqtt;
 /// <summary>
 /// MqttServer,RPC方法适配mqttNet
 /// </summary>
-public partial class MqttServer : BusinessBaseWithCacheIntervalScript<VariableBasicData, DeviceBasicData, AlarmVariable>
+public partial class MqttServer : BusinessBaseWithCacheIntervalScriptAll
 {
     private readonly MqttServerProperty _driverPropertys = new();
     private readonly MqttClientVariableProperty _variablePropertys = new();

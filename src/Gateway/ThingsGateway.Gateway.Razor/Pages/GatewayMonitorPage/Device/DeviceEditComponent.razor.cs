@@ -111,7 +111,7 @@ public partial class DeviceEditComponent
         };
 
         var devices = await GlobalData.GetCurrentUserDevices().ConfigureAwait(false);
-        var pluginName = GlobalData.ReadOnlyChannels.TryGetValue(device.ChannelId, out var channel) ? channel.PluginName : string.Empty;
+        var pluginName = GlobalData.ReadOnlyIdChannels.TryGetValue(device.ChannelId, out var channel) ? channel.PluginName : string.Empty;
         var items = new List<SelectedItem>() { new SelectedItem(string.Empty, "none") }.Concat(devices.WhereIf(!option.SearchText.IsNullOrWhiteSpace(), a => a.Name.Contains(option.SearchText))
             .Where(a => a.PluginName == pluginName && a.Id != device.Id).Take(20).BuildDeviceSelectList()
             );
@@ -128,7 +128,7 @@ public partial class DeviceEditComponent
     {
         try
         {
-            var pluginName = GlobalData.ReadOnlyChannels.TryGetValue(selectedItem.Value.ToLong(), out var channel) ? channel.PluginName : string.Empty;
+            var pluginName = GlobalData.ReadOnlyIdChannels.TryGetValue(selectedItem.Value.ToLong(), out var channel) ? channel.PluginName : string.Empty;
             if (pluginName.IsNullOrEmpty()) return;
             var data = GlobalData.PluginService.GetDriverPropertyTypes(pluginName);
             Model.ModelValueValidateForm = new ModelValueValidateForm() { Value = data.Model };

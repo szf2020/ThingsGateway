@@ -17,6 +17,7 @@ public class ScheduledSyncTask : DisposeBase, IScheduledTask, IScheduledIntInter
     private volatile int _isRunning = 0;
     private volatile int _pendingTriggers = 0;
     public Int32 Period => _timer?.Period ?? 0;
+    public bool Enable => _timer?.Disposed != false ? false : true;
 
     public ScheduledSyncTask(int interval, Action<object?, CancellationToken> taskFunc, object? state, ILog log, CancellationToken token)
     {

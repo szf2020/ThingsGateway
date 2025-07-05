@@ -197,81 +197,7 @@ internal sealed class RulesEngineHostedService : BackgroundService, IRulesEngine
 
     #region worker服务
 
-    private async Task StartAll(CancellationToken cancellationToken)
-    {
-        Clear();
-
-        Rules = await App.GetService<IRulesService>().GetAllAsync().ConfigureAwait(false);
-        Diagrams = new();
-        foreach (var rules in Rules.Where(a => a.Status))
-        {
-            var item = Init(rules);
-            Start(item.rulesLog, item.blazorDiagram, cancellationToken);
-        }
-        dispatchService.Dispatch(null);
-
-        _ = Task.Factory.StartNew(async (state) =>
-        {
-            if (state is not Dictionary<RulesLog, Diagram> diagrams)
-            {
-                return;
-            }
-            while (!cancellationToken.IsCancellationRequested)
-            {
-                foreach (var item in diagrams?.Values?.SelectMany(a => a.Nodes) ?? new List<NodeModel>())
-                {
-                    if (item is IExexcuteExpressionsBase)
-                    {
-                        CSharpScriptEngineExtension.SetExpire((item as TextNode).Text);
-                    }
-                }
-                await Task.Delay(60000, cancellationToken).ConfigureAwait(false);
-            }
-        }, Diagrams, cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Default).ConfigureAwait(false);
-
-    }
-
-
     private CancellationTokenSource? TokenSource { get; set; }
-
-
-
-    internal async Task StartAsync()
-    {
-        try
-        {
-            await RestartLock.WaitAsync().ConfigureAwait(false); // 等待获取锁，以确保只有一个线程可以执行以下代码
-            TokenSource ??= new CancellationTokenSource();
-            await StartAll(TokenSource.Token).ConfigureAwait(false);
-            _logger.LogInformation(ThingsGateway.Gateway.Application.AppResource.RulesEngineTaskStart);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Start"); // 记录错误日志
-        }
-        finally
-        {
-            RestartLock.Release(); // 释放锁
-        }
-    }
-
-    internal async Task StopAsync()
-    {
-        try
-        {
-            await RestartLock.WaitAsync().ConfigureAwait(false); // 等待获取锁，以确保只有一个线程可以执行以下代码
-            Cancel();
-            Clear();
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Stop"); // 记录错误日志
-        }
-        finally
-        {
-            RestartLock.Release(); // 释放锁
-        }
-    }
 
     private void Cancel()
     {
@@ -295,18 +221,65 @@ internal sealed class RulesEngineHostedService : BackgroundService, IRulesEngine
         Diagrams.Clear();
     }
 
-    protected override Task ExecuteAsync(CancellationToken stoppingToken)
+    protected override async Task ExecuteAsync(CancellationToken cancellationToken)
     {
-        return Task.CompletedTask;
-    }
-    public override Task StartAsync(CancellationToken cancellationToken)
-    {
-        return StartAsync();
+        await Task.Yield();
+
+        try
+        {
+            await RestartLock.WaitAsync(cancellationToken).ConfigureAwait(false); // 等待获取锁，以确保只有一个线程可以执行以下代码
+            TokenSource ??= new CancellationTokenSource();
+            Clear();
+
+            Rules = await App.GetService<IRulesService>().GetAllAsync().ConfigureAwait(false);
+            Diagrams = new();
+            foreach (var rules in Rules.Where(a => a.Status))
+            {
+                var item = Init(rules);
+                Start(item.rulesLog, item.blazorDiagram, TokenSource.Token);
+            }
+            dispatchService.Dispatch(null);
+
+            _logger.LogInformation(ThingsGateway.Gateway.Application.AppResource.RulesEngineTaskStart);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Start"); // 记录错误日志
+        }
+        finally
+        {
+            RestartLock.Release(); // 释放锁
+        }
+
+        while (!cancellationToken.IsCancellationRequested)
+        {
+            foreach (var item in Diagrams?.Values?.SelectMany(a => a.Nodes) ?? new List<NodeModel>())
+            {
+                if (item is IExexcuteExpressionsBase)
+                {
+                    CSharpScriptEngineExtension.SetExpire((item as TextNode).Text);
+                }
+            }
+            await Task.Delay(60000, cancellationToken).ConfigureAwait(false);
+        }
     }
 
-    public override Task StopAsync(CancellationToken cancellationToken)
+    public override async Task StopAsync(CancellationToken cancellationToken)
     {
-        return StopAsync();
+        try
+        {
+            await RestartLock.WaitAsync(cancellationToken).ConfigureAwait(false); // 等待获取锁，以确保只有一个线程可以执行以下代码
+            Cancel();
+            Clear();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Stop"); // 记录错误日志
+        }
+        finally
+        {
+            RestartLock.Release(); // 释放锁
+        }
     }
 
 

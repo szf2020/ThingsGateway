@@ -102,7 +102,7 @@ public class ControlController : ControllerBase
     [DisplayName("重启全部线程")]
     public async Task RestartAllThread()
     {
-        await GlobalData.ChannelRuntimeService.RestartChannelAsync(GlobalData.Channels.Values).ConfigureAwait(false);
+        await GlobalData.ChannelRuntimeService.RestartChannelAsync(GlobalData.IdChannels.Values).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -181,7 +181,7 @@ public class ControlController : ControllerBase
     [DisplayName("删除通道")]
     public Task<bool> DeleteChannelAsync([FromBody] List<long> ids, bool restart)
     {
-        if (ids == null || ids.Count == 0) ids = GlobalData.Channels.Keys.ToList();
+        if (ids == null || ids.Count == 0) ids = GlobalData.IdChannels.Keys.ToList();
         return GlobalData.ChannelRuntimeService.DeleteChannelAsync(ids, restart, default);
     }
 

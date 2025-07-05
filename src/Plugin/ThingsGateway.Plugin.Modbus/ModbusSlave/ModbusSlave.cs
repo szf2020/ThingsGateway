@@ -172,7 +172,7 @@ public class ModbusSlave : BusinessBase
                 await Task.Delay(10000, cancellationToken).ConfigureAwait(false);
             }
         }
-        var list = ModbusVariableQueue.ToDictWithDequeue();
+        var list = ModbusVariableQueue.ToIEnumerableKVWithDequeue();
         foreach (var item in list)
         {
             if (cancellationToken.IsCancellationRequested)
@@ -246,7 +246,7 @@ public class ModbusSlave : BusinessBase
     /// <inheritdoc/>
     private void VariableValueChange(VariableRuntime variableRuntime, VariableBasicData variableData)
     {
-        if (CurrentDevice.Pause == true)
+        if (CurrentDevice?.Pause != false)
             return;
         var address = variableRuntime.GetPropertyValue(DeviceId, nameof(_variablePropertys.ServiceAddress));
         if (address != null && variableRuntime.Value != null)

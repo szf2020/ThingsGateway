@@ -129,7 +129,7 @@ internal sealed class UpdateZipFileHostedService : BackgroundService, IUpdateZip
     {
         var upgradeServerOptions = App.GetOptions<UpgradeServerOptions>();
         if (!upgradeServerOptions.Enable)
-            throw new Exception("未启用更新服务");
+            throw new Exception("Update service not enabled");
 
         //设置调用配置
         var tokenSource = new CancellationTokenSource();//可取消令箭源，可用于取消Rpc的调用
@@ -156,16 +156,19 @@ internal sealed class UpdateZipFileHostedService : BackgroundService, IUpdateZip
     }
 
     private readonly WaitLock WaitLock = new();
+    private readonly WaitLock UpdateWaitLock = new();
     public async Task Update(UpdateZipFile updateZipFile, Func<Task<bool>> check = null)
     {
         try
         {
+            await UpdateWaitLock.WaitAsync().ConfigureAwait(false);
+
             var upgradeServerOptions = App.GetOptions<UpgradeServerOptions>();
             if (!upgradeServerOptions.Enable)
                 return;
             if (WaitLock.Waited)
             {
-                _log.LogWarning("正在更新中，请稍后再试");
+                _log.LogWarning("Updating, please try again later");
                 return;
             }
             try
@@ -197,6 +200,10 @@ internal sealed class UpdateZipFileHostedService : BackgroundService, IUpdateZip
         {
             _log.LogWarning(ex);
 
+        }
+        finally
+        {
+            UpdateWaitLock.Release();
         }
     }
 

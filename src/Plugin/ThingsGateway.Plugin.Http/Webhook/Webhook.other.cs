@@ -20,7 +20,7 @@ namespace ThingsGateway.Plugin.Webhook;
 /// <summary>
 /// WebhookClient
 /// </summary>
-public partial class Webhook : BusinessBaseWithCacheIntervalScript<VariableBasicData, DeviceBasicData, AlarmVariable>
+public partial class Webhook : BusinessBaseWithCacheIntervalScriptAll
 {
 
     protected override void AlarmChange(AlarmVariable alarmVariable)
@@ -116,6 +116,7 @@ public partial class Webhook : BusinessBaseWithCacheIntervalScript<VariableBasic
     {
         if (!_businessPropertyWithCacheIntervalScript.VariableTopic.IsNullOrWhiteSpace())
         {
+
             if (_driverPropertys.GroupUpdate && variable.BusinessGroupUpdateTrigger && !variable.BusinessGroup.IsNullOrEmpty() && VariableRuntimeGroups.TryGetValue(variable.BusinessGroup, out var variableRuntimeGroup))
             {
 
@@ -177,7 +178,7 @@ public partial class Webhook : BusinessBaseWithCacheIntervalScript<VariableBasic
 
     #region private
 
-    private async ValueTask<OperResult> Update(List<TopicArray> topicArrayList, CancellationToken cancellationToken)
+    private async ValueTask<OperResult> Update(IEnumerable<TopicArray> topicArrayList, CancellationToken cancellationToken)
     {
         foreach (var topicArray in topicArrayList)
         {

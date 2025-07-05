@@ -13,7 +13,7 @@ namespace ThingsGateway.Plugin.Webhook;
 /// <summary>
 /// WebhookClient,RPC方法适配mqttNet
 /// </summary>
-public partial class Webhook : BusinessBaseWithCacheIntervalScript<VariableBasicData, DeviceBasicData, AlarmVariable>
+public partial class Webhook : BusinessBaseWithCacheIntervalScriptAll
 {
     private readonly WebhookProperty _driverPropertys = new();
     private readonly WebhookVariableProperty _variablePropertys = new();
@@ -22,11 +22,5 @@ public partial class Webhook : BusinessBaseWithCacheIntervalScript<VariableBasic
 
     /// <inheritdoc/>
     public override bool IsConnected() => success;
-
-    protected override Task ProtectedExecuteAsync(object? state, CancellationToken cancellationToken)
-    {
-        return Update(cancellationToken);
-    }
-
 
 }

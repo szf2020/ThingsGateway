@@ -23,8 +23,10 @@ namespace ThingsGateway.Plugin.QuestDB;
 /// <summary>
 /// QuestDBProducer
 /// </summary>
-public partial class QuestDBProducer : BusinessBaseWithCacheIntervalVariableModel<VariableBasicData>, IDBHistoryValueService
+public partial class QuestDBProducer : BusinessBaseWithCacheIntervalVariable, IDBHistoryValueService
 {
+
+
     internal readonly RealDBProducerProperty _driverPropertys = new();
     private readonly QuestDBProducerVariableProperty _variablePropertys = new();
 
@@ -45,6 +47,9 @@ public partial class QuestDBProducer : BusinessBaseWithCacheIntervalVariableMode
     public override VariablePropertyBase VariablePropertys => _variablePropertys;
 
     protected override BusinessPropertyWithCacheInterval _businessPropertyWithCacheInterval => _driverPropertys;
+
+
+
     private SqlSugarClient _db;
 
     protected override void Dispose(bool disposing)
@@ -53,17 +58,6 @@ public partial class QuestDBProducer : BusinessBaseWithCacheIntervalVariableMode
         base.Dispose(disposing);
     }
 
-    public async Task<SqlSugarPagedList<IDBHistoryValue>> GetDBHistoryValuePagesAsync(DBHistoryValuePageInput input)
-    {
-        var data = await Query(input).ToPagedListAsync<QuestDBNumberHistoryValue, IDBHistoryValue>(input.Current, input.Size).ConfigureAwait(false);//分页
-        return data;
-    }
-
-    public async Task<List<IDBHistoryValue>> GetDBHistoryValuesAsync(DBHistoryValuePageInput input)
-    {
-        var data = await Query(input).ToListAsync().ConfigureAwait(false);
-        return data.Cast<IDBHistoryValue>().ToList();
-    }
 
     protected override async Task InitChannelAsync(IChannel? channel, CancellationToken cancellationToken)
     {
@@ -81,6 +75,40 @@ public partial class QuestDBProducer : BusinessBaseWithCacheIntervalVariableMode
         return $" {nameof(QuestDBProducer)}";
     }
 
+    protected override async Task ProtectedStartAsync(CancellationToken cancellationToken)
+    {
+
+        _db.DbMaintenance.CreateDatabase();
+
+        //必须为间隔上传
+        if (!_driverPropertys.BigTextScriptHistoryTable.IsNullOrEmpty())
+        {
+            DynamicSQLBase? hisModel = CSharpScriptEngineExtension.Do<DynamicSQLBase>(_driverPropertys.BigTextScriptHistoryTable);
+            hisModel.Logger = LogMessage;
+            await hisModel.DBInit(_db, cancellationToken).ConfigureAwait(false);
+
+        }
+        else
+        {
+            _db.CodeFirst.As<QuestDBNumberHistoryValue>(_driverPropertys.NumberTableName).InitTables(typeof(QuestDBNumberHistoryValue));
+            _db.CodeFirst.As<QuestDBHistoryValue>(_driverPropertys.StringTableName).InitTables(typeof(QuestDBHistoryValue));
+        }
+
+        await base.ProtectedStartAsync(cancellationToken).ConfigureAwait(false);
+    }
+
+
+    public async Task<SqlSugarPagedList<IDBHistoryValue>> GetDBHistoryValuePagesAsync(DBHistoryValuePageInput input)
+    {
+        var data = await Query(input).ToPagedListAsync<QuestDBNumberHistoryValue, IDBHistoryValue>(input.Current, input.Size).ConfigureAwait(false);//分页
+        return data;
+    }
+
+    public async Task<List<IDBHistoryValue>> GetDBHistoryValuesAsync(DBHistoryValuePageInput input)
+    {
+        var data = await Query(input).ToListAsync().ConfigureAwait(false);
+        return data.Cast<IDBHistoryValue>().ToList();
+    }
     internal ISugarQueryable<QuestDBNumberHistoryValue> Query(DBHistoryValuePageInput input)
     {
         var db = BusinessDatabaseUtil.GetDb(_driverPropertys.DbType, _driverPropertys.BigTextConnectStr);
@@ -142,36 +170,4 @@ public partial class QuestDBProducer : BusinessBaseWithCacheIntervalVariableMode
         return ret;
     }
 
-    protected override async Task ProtectedStartAsync(CancellationToken cancellationToken)
-    {
-
-        _db.DbMaintenance.CreateDatabase();
-
-        //必须为间隔上传
-        if (!_driverPropertys.BigTextScriptHistoryTable.IsNullOrEmpty())
-        {
-            DynamicSQLBase? hisModel = CSharpScriptEngineExtension.Do<DynamicSQLBase>(_driverPropertys.BigTextScriptHistoryTable);
-            hisModel.Logger = LogMessage;
-            await hisModel.DBInit(_db, cancellationToken).ConfigureAwait(false);
-
-        }
-        else
-        {
-            _db.CodeFirst.As<QuestDBNumberHistoryValue>(_driverPropertys.NumberTableName).InitTables(typeof(QuestDBNumberHistoryValue));
-            _db.CodeFirst.As<QuestDBHistoryValue>(_driverPropertys.StringTableName).InitTables(typeof(QuestDBHistoryValue));
-        }
-
-        await base.ProtectedStartAsync(cancellationToken).ConfigureAwait(false);
-    }
-
-
-    protected override async Task ProtectedExecuteAsync(object? state, CancellationToken cancellationToken)
-    {
-        await UpdateVarModelMemory(cancellationToken).ConfigureAwait(false);
-        await UpdateVarModelsMemory(cancellationToken).ConfigureAwait(false);
-
-        await UpdateVarModelCache(cancellationToken).ConfigureAwait(false);
-        await UpdateVarModelsCache(cancellationToken).ConfigureAwait(false);
-
-    }
 }

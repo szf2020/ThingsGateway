@@ -68,7 +68,7 @@ public static class GlobalData
     public static async Task<IEnumerable<ChannelRuntime>> GetCurrentUserChannels()
     {
         var dataScope = await GlobalData.SysUserService.GetCurrentUserDataScopeAsync().ConfigureAwait(false);
-        return ReadOnlyChannels.WhereIf(dataScope != null && dataScope?.Count > 0, u => dataScope.Contains(u.Value.CreateOrgId))//在指定机构列表查询
+        return ReadOnlyIdChannels.WhereIf(dataScope != null && dataScope?.Count > 0, u => dataScope.Contains(u.Value.CreateOrgId))//在指定机构列表查询
           .WhereIf(dataScope?.Count == 0, u => u.Value.CreateUserId == UserManager.UserId).Select(a => a.Value);
     }
     public static async Task<IEnumerable<DeviceRuntime>> GetCurrentUserDevices()
@@ -126,7 +126,7 @@ public static class GlobalData
     /// </summary>
     public static IEnumerable<ChannelRuntime> GetEnableChannels()
     {
-        return Channels.Where(a => a.Value.Enable).Select(a => a.Value);
+        return IdChannels.Where(a => a.Value.Enable).Select(a => a.Value);
     }
 
     public static VariableRuntime GetVariable(string deviceName, string variableName)
@@ -414,12 +414,20 @@ public static class GlobalData
     /// <summary>
     /// 只读的通道字典，提供对通道的只读访问
     /// </summary>
-    public static IReadOnlyDictionary<long, ChannelRuntime> ReadOnlyChannels => Channels;
+    public static IReadOnlyDictionary<long, ChannelRuntime> ReadOnlyIdChannels => IdChannels;
+    /// <summary>
+    /// 只读的通道字典，提供对通道的只读访问
+    /// </summary>
+    public static IReadOnlyDictionary<string, ChannelRuntime> ReadOnlyChannels => Channels;
 
     /// <summary>
     /// 内部使用的通道字典，用于存储通道对象
     /// </summary>
-    internal static ConcurrentDictionary<long, ChannelRuntime> Channels { get; } = new();
+    internal static ConcurrentDictionary<long, ChannelRuntime> IdChannels { get; } = new();
+    /// <summary>
+    /// 内部使用的通道字典，用于存储通道对象
+    /// </summary>
+    internal static ConcurrentDictionary<string, ChannelRuntime> Channels { get; } = new();
 
 
 

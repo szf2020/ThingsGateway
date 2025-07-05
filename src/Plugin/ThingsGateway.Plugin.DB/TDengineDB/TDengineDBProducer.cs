@@ -25,8 +25,11 @@ namespace ThingsGateway.Plugin.TDengineDB;
 /// <summary>
 /// TDengineDBProducer
 /// </summary>
-public partial class TDengineDBProducer : BusinessBaseWithCacheIntervalVariableModel<VariableBasicData>, IDBHistoryValueService
+public partial class TDengineDBProducer : BusinessBaseWithCacheIntervalVariable, IDBHistoryValueService
 {
+
+
+
     internal readonly RealDBProducerProperty _driverPropertys = new()
     {
         DbType = DbType.TDengine,
@@ -51,17 +54,7 @@ public partial class TDengineDBProducer : BusinessBaseWithCacheIntervalVariableM
 
     protected override BusinessPropertyWithCacheInterval _businessPropertyWithCacheInterval => _driverPropertys;
 
-    public async Task<SqlSugarPagedList<IDBHistoryValue>> GetDBHistoryValuePagesAsync(DBHistoryValuePageInput input)
-    {
-        var data = await Query(input, _driverPropertys.NumberTableNameLow).ToPagedListAsync<TDengineDBNumberHistoryValue, IDBHistoryValue>(input.Current, input.Size).ConfigureAwait(false);//分页
-        return data;
-    }
 
-    public async Task<List<IDBHistoryValue>> GetDBHistoryValuesAsync(DBHistoryValuePageInput input)
-    {
-        var data = await Query(input, _driverPropertys.NumberTableNameLow).ToListAsync().ConfigureAwait(false);
-        return data.Cast<IDBHistoryValue>().ToList(); ;
-    }
 
     protected override void Dispose(bool disposing)
     {
@@ -97,6 +90,60 @@ public partial class TDengineDBProducer : BusinessBaseWithCacheIntervalVariableM
         return $" {nameof(TDengineDBProducer)}";
     }
 
+    private SqlSugarClient _db;
+
+    protected override async Task ProtectedStartAsync(CancellationToken cancellationToken)
+    {
+        _db.DbMaintenance.CreateDatabase();
+
+
+        //必须为间隔上传
+        if (!_driverPropertys.BigTextScriptHistoryTable.IsNullOrEmpty())
+        {
+            var hisModel = CSharpScriptEngineExtension.Do<DynamicSQLBase>(_driverPropertys.BigTextScriptHistoryTable);
+            {
+                await hisModel.DBInit(_db, cancellationToken).ConfigureAwait(false);
+            }
+
+        }
+        else
+        {
+
+            var sql = $"""
+                CREATE STABLE IF NOT EXISTS  `{_driverPropertys.StringTableNameLow}`(
+                `createtime` TIMESTAMP   ,
+                `collecttime` TIMESTAMP   ,
+                `id` BIGINT   ,
+                `isonline` BOOL   ,
+                `value` VARCHAR(255)    ) TAGS(`devicename`  VARCHAR(100) ,`name`  VARCHAR(100))
+                """;
+            await _db.Ado.ExecuteCommandAsync(sql, default, cancellationToken: cancellationToken).ConfigureAwait(false);
+
+
+            sql = $"""
+                CREATE STABLE IF NOT EXISTS  `{_driverPropertys.NumberTableNameLow}`(
+                `createtime` TIMESTAMP   ,
+                `collecttime` TIMESTAMP   ,
+                `id` BIGINT   ,
+                `isonline` BOOL   ,
+                `value` DOUBLE    ) TAGS(`devicename`  VARCHAR(100) ,`name`  VARCHAR(100))
+                """;
+            await _db.Ado.ExecuteCommandAsync(sql, default, cancellationToken: cancellationToken).ConfigureAwait(false);
+
+        }
+        await base.ProtectedStartAsync(cancellationToken).ConfigureAwait(false);
+    }
+    public async Task<SqlSugarPagedList<IDBHistoryValue>> GetDBHistoryValuePagesAsync(DBHistoryValuePageInput input)
+    {
+        var data = await Query(input, _driverPropertys.NumberTableNameLow).ToPagedListAsync<TDengineDBNumberHistoryValue, IDBHistoryValue>(input.Current, input.Size).ConfigureAwait(false);//分页
+        return data;
+    }
+
+    public async Task<List<IDBHistoryValue>> GetDBHistoryValuesAsync(DBHistoryValuePageInput input)
+    {
+        var data = await Query(input, _driverPropertys.NumberTableNameLow).ToListAsync().ConfigureAwait(false);
+        return data.Cast<IDBHistoryValue>().ToList(); ;
+    }
     internal ISugarQueryable<TDengineDBNumberHistoryValue> Query(DBHistoryValuePageInput input, string tableName)
     {
         var db = TDengineDBUtil.GetDb(_driverPropertys.DbType, _driverPropertys.BigTextConnectStr, tableName);
@@ -155,57 +202,5 @@ public partial class TDengineDBProducer : BusinessBaseWithCacheIntervalVariableM
             ret.Items = items;
         }
         return ret;
-    }
-    private SqlSugarClient _db;
-
-    protected override async Task ProtectedStartAsync(CancellationToken cancellationToken)
-    {
-        _db.DbMaintenance.CreateDatabase();
-
-
-        //必须为间隔上传
-        if (!_driverPropertys.BigTextScriptHistoryTable.IsNullOrEmpty())
-        {
-            var hisModel = CSharpScriptEngineExtension.Do<DynamicSQLBase>(_driverPropertys.BigTextScriptHistoryTable);
-            {
-                await hisModel.DBInit(_db, cancellationToken).ConfigureAwait(false);
-            }
-
-        }
-        else
-        {
-
-            var sql = $"""
-                CREATE STABLE IF NOT EXISTS  `{_driverPropertys.StringTableNameLow}`(
-                `createtime` TIMESTAMP   ,
-                `collecttime` TIMESTAMP   ,
-                `id` BIGINT   ,
-                `isonline` BOOL   ,
-                `value` VARCHAR(255)    ) TAGS(`devicename`  VARCHAR(100) ,`name`  VARCHAR(100))
-                """;
-            await _db.Ado.ExecuteCommandAsync(sql, default, cancellationToken: cancellationToken).ConfigureAwait(false);
-
-
-            sql = $"""
-                CREATE STABLE IF NOT EXISTS  `{_driverPropertys.NumberTableNameLow}`(
-                `createtime` TIMESTAMP   ,
-                `collecttime` TIMESTAMP   ,
-                `id` BIGINT   ,
-                `isonline` BOOL   ,
-                `value` DOUBLE    ) TAGS(`devicename`  VARCHAR(100) ,`name`  VARCHAR(100))
-                """;
-            await _db.Ado.ExecuteCommandAsync(sql, default, cancellationToken: cancellationToken).ConfigureAwait(false);
-
-        }
-        await base.ProtectedStartAsync(cancellationToken).ConfigureAwait(false);
-    }
-
-    protected override async Task ProtectedExecuteAsync(object? state, CancellationToken cancellationToken)
-    {
-        await UpdateVarModelMemory(cancellationToken).ConfigureAwait(false);
-        await UpdateVarModelsMemory(cancellationToken).ConfigureAwait(false);
-        await UpdateVarModelCache(cancellationToken).ConfigureAwait(false);
-        await UpdateVarModelsCache(cancellationToken).ConfigureAwait(false);
-
     }
 }

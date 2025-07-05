@@ -16,7 +16,6 @@ using Opc.Ua.Configuration;
 
 using System.Collections.Concurrent;
 
-using ThingsGateway.Extension;
 using ThingsGateway.Extension.Generic;
 using ThingsGateway.Gateway.Application;
 using ThingsGateway.NewLife.DictionaryExtensions;
@@ -176,32 +175,26 @@ public partial class OpcUaServer : BusinessBase
                     await Task.Delay(10000, cancellationToken).ConfigureAwait(false);
                 }
             }
-            var varList = CollectVariableRuntimes.ToListWithDequeue();
-            if (varList.Count > 0)
+            var varList = CollectVariableRuntimes.ToIEnumerableWithDequeue();
+            foreach (var item in varList)
             {
-                if (varList?.Count > 0)
+                try
                 {
-                    foreach (var item in varList)
+                    if (!cancellationToken.IsCancellationRequested)
                     {
-                        try
-                        {
-                            if (!cancellationToken.IsCancellationRequested)
-                            {
-                                m_server?.NodeManager?.UpVariable(item);
-                            }
-                            else
-                            {
-                                break;
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            LogMessage?.LogWarning(ex);
-                        }
+                        m_server?.NodeManager?.UpVariable(item);
+                    }
+                    else
+                    {
+                        break;
                     }
                 }
-                success = true;
+                catch (Exception ex)
+                {
+                    LogMessage?.LogWarning(ex);
+                }
             }
+            success = true;
         }
         catch (OperationCanceledException) { }
         catch (Exception ex)

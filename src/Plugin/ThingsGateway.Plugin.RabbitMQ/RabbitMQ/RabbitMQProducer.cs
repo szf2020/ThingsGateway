@@ -19,7 +19,7 @@ namespace ThingsGateway.Plugin.RabbitMQ;
 /// <summary>
 /// RabbitMQProducer
 /// </summary>
-public partial class RabbitMQProducer : BusinessBaseWithCacheIntervalScript<VariableBasicData, DeviceBasicData, AlarmVariable>
+public partial class RabbitMQProducer : BusinessBaseWithCacheIntervalScriptAll
 {
     private readonly RabbitMQProducerProperty _driverPropertys = new();
     private readonly RabbitMQProducerVariableProperty _variablePropertys = new();

@@ -1313,8 +1313,9 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
     }
 
 
-    private async Task Notify()
+    private async Task Notify(CancellationToken cancellationToken)
     {
+        if (cancellationToken.IsCancellationRequested) return;
         if (Disposed) return;
         await OnClickSearch(SearchText);
 
@@ -1339,7 +1340,7 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
             case ChannelDevicePluginTypeEnum.Channel:
                 return new ChannelDeviceTreeItem()
                 {
-                    ChannelRuntime = GlobalData.ReadOnlyChannels.TryGetValue(channelDeviceTreeItem.ChannelRuntime?.Id ?? 0, out var channel) ? channel : channelDeviceTreeItem.ChannelRuntime,
+                    ChannelRuntime = GlobalData.ReadOnlyIdChannels.TryGetValue(channelDeviceTreeItem.ChannelRuntime?.Id ?? 0, out var channel) ? channel : channelDeviceTreeItem.ChannelRuntime,
                     ChannelDevicePluginType = ChannelDevicePluginTypeEnum.Channel
                 };
 

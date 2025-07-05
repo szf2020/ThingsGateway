@@ -227,6 +227,8 @@
     "Connect": "连接",
     "ConnectTimeout": "连接超时",
     "CopyChannel": "复制通道",
+    "UpdateGatewayData": "更新网关点位配置",
+    "InsertGatewayData": "添加网关点位配置",
     "CreateTime": "创建时间",
     "CreateUser": "创建人",
     "DataBits": "数据位",

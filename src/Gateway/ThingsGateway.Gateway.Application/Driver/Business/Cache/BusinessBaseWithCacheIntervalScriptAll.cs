@@ -8,12 +8,16 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-namespace ThingsGateway.Plugin.Synchronization;
+namespace ThingsGateway.Gateway.Application;
 
 /// <summary>
-/// <inheritdoc/>
+/// 业务插件，额外实现脚本切换实体
 /// </summary>
-public class SynchronizationVariableProperty : VariablePropertyBase
+public abstract partial class BusinessBaseWithCacheIntervalScriptAll : BusinessBaseWithCacheIntervalScript
 {
-    public override bool Enable { get; set; } = true;
+    protected override bool AlarmModelEnable => true;
+
+    protected override bool DevModelEnable => true;
+
+    protected override bool VarModelEnable => true;
 }

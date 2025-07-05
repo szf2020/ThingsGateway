@@ -33,6 +33,81 @@ internal sealed class ChannelService : BaseService<Channel>, IChannelService
     #region CURD
 
     /// <inheritdoc/>
+    [OperDesc("InsertGatewayData", localizerType: typeof(Channel), isRecordPar: false)]
+    public async Task<bool> InsertAsync(List<Channel> models, List<Device> devices, List<Variable> variables)
+    {
+        using var db = GetDB();
+
+        //事务
+        var result = await db.UseTranAsync(async () =>
+        {
+            ManageHelper.CheckChannelCount(models.Count);
+
+            await db.Insertable(models).ExecuteCommandAsync().ConfigureAwait(false);
+
+            ManageHelper.CheckDeviceCount(devices.Count);
+
+            await db.Insertable(devices).ExecuteCommandAsync().ConfigureAwait(false);
+
+            ManageHelper.CheckVariableCount(variables.Count);
+
+            await db.Insertable(variables).ExecuteCommandAsync().ConfigureAwait(false);
+
+
+        }).ConfigureAwait(false);
+        if (result.IsSuccess)//如果成功了
+        {
+            DeleteChannelFromCache();
+            App.GetService<IDeviceService>().DeleteDeviceFromCache();
+            App.GetService<IVariableService>().DeleteVariableCache();
+            return true;
+        }
+        else
+        {
+            //写日志
+            throw new(result.ErrorMessage, result.ErrorException);
+        }
+
+    }
+
+
+    /// <inheritdoc/>
+    [OperDesc("UpdateGatewayData", localizerType: typeof(Channel), isRecordPar: false)]
+    public async Task<bool> UpdateAsync(List<Channel> models, List<Device> devices, List<Variable> variables)
+    {
+        using var db = GetDB();
+
+        //事务
+        var result = await db.UseTranAsync(async () =>
+        {
+
+            await db.Updateable(models).ExecuteCommandAsync().ConfigureAwait(false);
+
+
+            await db.Updateable(devices).ExecuteCommandAsync().ConfigureAwait(false);
+
+
+            await db.Updateable(variables).ExecuteCommandAsync().ConfigureAwait(false);
+
+
+        }).ConfigureAwait(false);
+        if (result.IsSuccess)//如果成功了
+        {
+            DeleteChannelFromCache();
+            App.GetService<IDeviceService>().DeleteDeviceFromCache();
+            App.GetService<IVariableService>().DeleteVariableCache();
+            return true;
+        }
+        else
+        {
+            //写日志
+            throw new(result.ErrorMessage, result.ErrorException);
+        }
+
+    }
+
+
+    /// <inheritdoc/>
     [OperDesc("CopyChannel", localizerType: typeof(Channel), isRecordPar: false)]
     public async Task<bool> CopyAsync(List<Channel> models, Dictionary<Device, List<Variable>> devices)
     {

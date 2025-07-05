@@ -23,7 +23,7 @@ namespace ThingsGateway.Plugin.RabbitMQ;
 /// <summary>
 /// RabbitMQProducer
 /// </summary>
-public partial class RabbitMQProducer : BusinessBaseWithCacheIntervalScript<VariableBasicData, DeviceBasicData, AlarmVariable>
+public partial class RabbitMQProducer : BusinessBaseWithCacheIntervalScriptAll
 {
     private IConnection _connection;
     private ConnectionFactory _connectionFactory;
@@ -90,7 +90,7 @@ public partial class RabbitMQProducer : BusinessBaseWithCacheIntervalScript<Vari
 
                 foreach (var group in varGroup)
                 {
-                    AddQueueVarModel(new CacheDBItem<List<VariableBasicData>>(group.AdaptIEnumerableVariableBasicData()));
+                    AddQueueVarModel(new CacheDBItem<List<VariableBasicData>>(group.ToList()));
                 }
                 foreach (var variable in varList)
                 {
@@ -127,7 +127,7 @@ public partial class RabbitMQProducer : BusinessBaseWithCacheIntervalScript<Vari
 
     #region private
 
-    private async ValueTask<OperResult> Update(List<TopicArray> topicArrayList, CancellationToken cancellationToken)
+    private async ValueTask<OperResult> Update(IEnumerable<TopicArray> topicArrayList, CancellationToken cancellationToken)
     {
         foreach (var topicArray in topicArrayList)
         {
@@ -176,7 +176,7 @@ public partial class RabbitMQProducer : BusinessBaseWithCacheIntervalScript<Vari
         //保留消息
         //分解List，避免超出字节大小限制
         var varData = IdVariableRuntimes.Select(a => a.Value).AdaptIEnumerableVariableBasicData().ChunkBetter(_driverPropertys.SplitSize);
-        var devData = CollectDevices?.Select(a => a.Value).AdaptListDeviceBasicData().ChunkBetter(_driverPropertys.SplitSize);
+        var devData = CollectDevices?.Select(a => a.Value).AdaptIEnumerableDeviceBasicData().ChunkBetter(_driverPropertys.SplitSize);
         var alramData = GlobalData.ReadOnlyRealAlarmIdVariables.Select(a => a.Value).ChunkBetter(_driverPropertys.SplitSize);
         foreach (var item in varData)
         {

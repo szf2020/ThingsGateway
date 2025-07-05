@@ -120,9 +120,11 @@ public class ChannelRuntime : Channel, IChannelOptions, IDisposable
         // 通过插件名称获取插件信息
         PluginInfo = GlobalData.PluginService.GetList().FirstOrDefault(A => A.FullName == PluginName);
 
-        GlobalData.Channels.TryRemove(Id, out _);
+        GlobalData.IdChannels.TryRemove(Id, out _);
+        GlobalData.Channels.TryRemove(Name, out _);
 
-        GlobalData.Channels.TryAdd(Id, this);
+        GlobalData.IdChannels.TryAdd(Id, this);
+        GlobalData.Channels.TryAdd(Name, this);
 
     }
 
@@ -130,7 +132,8 @@ public class ChannelRuntime : Channel, IChannelOptions, IDisposable
     {
         //Config?.SafeDispose();
 
-        GlobalData.Channels.TryRemove(Id, out _);
+        GlobalData.IdChannels.TryRemove(Id, out _);
+        GlobalData.Channels.TryRemove(Name, out _);
         DeviceThreadManage = null;
         GC.SuppressFinalize(this);
     }
@@ -146,7 +149,7 @@ public class ChannelRuntime : Channel, IChannelOptions, IDisposable
 
     public IChannel GetChannel(TouchSocketConfig config)
     {
-        lock (GlobalData.Channels)
+        lock (GlobalData.IdChannels)
         {
 
             if (DeviceThreadManage?.Channel?.DisposedValue == false)
@@ -159,7 +162,7 @@ public class ChannelRuntime : Channel, IChannelOptions, IDisposable
                 )
             {
                 //获取相同配置的Tcp服务或Udp服务或COM
-                var same = GlobalData.Channels.FirstOrDefault(a =>
+                var same = GlobalData.IdChannels.FirstOrDefault(a =>
                  {
                      if (a.Value == this)
                          return false;

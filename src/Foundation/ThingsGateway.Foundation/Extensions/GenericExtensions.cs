@@ -114,7 +114,7 @@ public static class GenericExtensions
     public static IEnumerable<IEnumerable<T>> ChunkBetter<T>(this IEnumerable<T> source, int chunkSize, bool isToList = false)
     {
         if (chunkSize <= 0)
-            chunkSize = source.Count();
+            yield break;
         var pos = 0;
         while (source.Skip(pos).Any())
         {

@@ -19,7 +19,7 @@ namespace ThingsGateway.Plugin.Kafka;
 /// <summary>
 /// Kafka消息生产
 /// </summary>
-public partial class KafkaProducer : BusinessBaseWithCacheIntervalScript<VariableBasicData, DeviceBasicData, AlarmVariable>
+public partial class KafkaProducer : BusinessBaseWithCacheIntervalScriptAll
 {
     private readonly KafkaProducerProperty _driverPropertys = new();
     private readonly KafkaProducerVariableProperty _variablePropertys = new();
