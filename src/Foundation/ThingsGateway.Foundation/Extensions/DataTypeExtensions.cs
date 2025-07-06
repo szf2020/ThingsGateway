@@ -34,7 +34,6 @@ public static class DataTypeExtensions
             DataTypeEnum.UInt64 => 8,
             DataTypeEnum.Single => 4,
             DataTypeEnum.Double => 8,
-            DataTypeEnum.Decimal => 16,
             _ => 0,
         };
     }

@@ -199,7 +199,7 @@ public static class Runtime
             if (_createConfigOnMissing == null)
             {
                 var val = Environment.GetEnvironmentVariable("CreateConfigOnMissing");
-                _createConfigOnMissing = !val.IsNullOrEmpty() ? val.ToBoolean(true) : true;
+                _createConfigOnMissing = !val.IsNullOrEmpty() ? val.ToBoolean(false) : false;
             }
 
             return _createConfigOnMissing.Value;

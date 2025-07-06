@@ -565,38 +565,55 @@ internal sealed class RedundancyTask : IRpcDriver, IAsyncDisposable
         Dictionary<string, Dictionary<string, OperResult<object>>> dataResult,
         DmtpInvokeOption invokeOption)
     {
-        foreach (var item in deviceDatas)
+        var w1 = new Dictionary<TcpDmtpSessionClient, Dictionary<string, Dictionary<string, string>>>();
+
+        foreach (var (key, value) in deviceDatas)
         {
-            if (GlobalData.ReadOnlyDevices.TryGetValue(item.Key, out var device))
+            if (!GlobalData.ReadOnlyDevices.TryGetValue(key, out var device))
             {
-                var key = device.Tag;
-                if (_tcpDmtpService.TryGetClient(key, out var client))
-                {
-                    try
-                    {
-                        var data = await client.GetDmtpRpcActor().InvokeTAsync<Dictionary<string, Dictionary<string, OperResult<object>>>>(
-                            nameof(ReverseCallbackServer.Rpc), invokeOption, new Dictionary<string, Dictionary<string, string>> { { item.Key, item.Value } })
-                            .ConfigureAwait(false);
-
-                        dataResult.AddRange(data);
-                        continue;
-                    }
-                    catch (Exception ex)
-                    {
-                        dataResult.TryAdd(item.Key, new Dictionary<string, OperResult<object>>());
-
-                        foreach (var vItem in item.Value)
-                        {
-                            dataResult[item.Key].TryAdd(vItem.Key, new OperResult<object>(ex));
-                        }
-                        continue;
-                    }
-                }
+                continue;
             }
 
-            // 没找到设备 或 客户端未在线
-            dataResult.TryAdd(item.Key, item.Value.ToDictionary(v => v.Key, v => new OperResult<object>("No online")));
+            if (!_tcpDmtpService.TryGetClient(device.Tag, out var client))
+            {
+                // 客户端未在线
+                dataResult.TryAdd(key, value.ToDictionary(v => v.Key, _ => new OperResult<object>("No online")));
+                continue;
+            }
+
+            // 去除 endpoint 前缀
+            var deviceName = key;
+
+            if (!w1.TryGetValue(client, out var variableDatas))
+            {
+                variableDatas = new Dictionary<string, Dictionary<string, string>>();
+                w1.Add(client, variableDatas);
+            }
+
+            variableDatas[deviceName] = value;
         }
+
+        foreach (var (client, variableDatas) in w1)
+        {
+            try
+            {
+                var data = await client.GetDmtpRpcActor().InvokeTAsync<Dictionary<string, Dictionary<string, OperResult<object>>>>(
+                    nameof(ReverseCallbackServer.Rpc), invokeOption, variableDatas)
+                    .ConfigureAwait(false);
+
+                dataResult.AddRange(data);
+            }
+            catch (Exception ex)
+            {
+                foreach (var (deviceName, vars) in variableDatas)
+                {
+                    var errorDict = vars.ToDictionary(v => v.Key, _ => new OperResult<object>(ex));
+                    dataResult[deviceName] = errorDict;
+                }
+            }
+        }
+
+
     }
 
 

@@ -36,14 +36,3 @@ public class DeviceDataWithValue
 
 
 
-public class DataWithDatabase
-{
-    public Channel Channel { get; set; }
-    public List<DeviceDataWithDatabase> DeviceVariables { get; set; }
-}
-
-public class DeviceDataWithDatabase
-{
-    public Device Device { get; set; }
-    public List<Variable> Variables { get; set; }
-}

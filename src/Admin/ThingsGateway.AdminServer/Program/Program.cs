@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.ResponseCompression;
 using System.Runtime.InteropServices;
 using System.Text;
 
+using ThingsGateway.Admin.Application;
 using ThingsGateway.NewLife.Log;
 
 namespace ThingsGateway.AdminServer;
@@ -28,6 +29,8 @@ public class Program
         System.IO.Directory.SetCurrentDirectory(AppContext.BaseDirectory);
         // 增加中文编码支持
         Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+
+        ThingsGateway.Admin.Application.ClaimConst.Scheme = $"{typeof(Program).Assembly.GetName().Name}{SchemeHelper.GetOrCreate()}";
 
         #region 控制台输出Logo
 

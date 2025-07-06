@@ -16,6 +16,7 @@ namespace ThingsGateway.Gateway.Application;
 [Mapper(UseDeepCloning = true, EnumMappingStrategy = EnumMappingStrategy.ByName, RequiredMappingStrategy = RequiredMappingStrategy.None)]
 public static partial class GatewayMapper
 {
+    public static partial VariableDataWithValue AdaptVariableDataWithValue(this VariableBasicData src);
     public static partial AlarmVariable AdaptAlarmVariable(this VariableRuntime src);
     public static partial DeviceBasicData AdaptDeviceBasicData(this DeviceRuntime src);
     public static partial IEnumerable<DeviceBasicData> AdaptIEnumerableDeviceBasicData(this IEnumerable<DeviceRuntime> src);

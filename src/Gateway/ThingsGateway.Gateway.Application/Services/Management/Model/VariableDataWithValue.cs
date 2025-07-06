@@ -19,15 +19,17 @@ public class VariableDataWithValue
     /// <inheritdoc cref="Variable.Name"/>
     public string Name { get; set; }
 
-    /// <inheritdoc cref="VariableRuntime.Value"/>
+    /// <inheritdoc cref="VariableRuntime.RawValue"/>
     public object RawValue { get; set; }
-
+    /// <inheritdoc cref="VariableRuntime.Value"/>
+    public object Value { get; set; }
     /// <inheritdoc cref="VariableRuntime.CollectTime"/>
     public DateTime CollectTime { get; set; }
 
     /// <inheritdoc cref="VariableRuntime.IsOnline"/>
     public bool IsOnline { get; set; }
-
+    /// <inheritdoc cref="VariableRuntime.RuntimeType"/>
+    public string RuntimeType { get; set; }
     /// <inheritdoc cref="VariableRuntime.LastErrorMessage"/>
     [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
     [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]

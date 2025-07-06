@@ -29,6 +29,17 @@ namespace ThingsGateway.Gateway.Application;
 public class RuntimeInfoController : ControllerBase
 {
     /// <summary>
+    /// 获取冗余状态
+    /// </summary>
+    /// <returns></returns>
+    [HttpGet("redundancyStatus")]
+    [DisplayName("获取冗余状态")]
+    public bool GetRedundancyStatus()
+    {
+        return GlobalData.StartCollectChannelEnable;
+    }
+
+    /// <summary>
     /// 获取通道信息
     /// </summary>
     /// <returns></returns>

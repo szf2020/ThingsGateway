@@ -424,6 +424,7 @@
   "ThingsGateway.Gateway.Application.RuntimeInfoController": {
     "CheckRealAlarm": "Confirm real-time alarm",
     "GetChannelListAsync": "Get channel information",
+    "GetRedundancyStatus": "Get redundancy status",
     "GetDeviceListAsync": "Get device information",
     "GetRealAlarmList": "Get real-time alarm information",
     "GetVariableList": "Get variable information",

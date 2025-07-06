@@ -154,8 +154,8 @@ internal sealed partial class ReverseCallbackServer : SingletonRpcServer
     }
 
     [DmtpRpc(MethodInvoke = true)]
-    public Task<Dictionary<string, Dictionary<string, IOperResult>>> Rpc(Dictionary<string, Dictionary<string, string>> deviceDatas, CancellationToken cancellationToken)
+    public Task<Dictionary<string, Dictionary<string, IOperResult>>> Rpc(ICallContext callContext, Dictionary<string, Dictionary<string, string>> deviceDatas, CancellationToken cancellationToken)
     {
-        return GlobalData.RpcService.InvokeDeviceMethodAsync("Management", deviceDatas, cancellationToken);
+        return GlobalData.RpcService.InvokeDeviceMethodAsync("Management" + $"[{(callContext.Caller is ITcpSession tcpSession ? tcpSession.GetIPPort() : string.Empty)}]", deviceDatas, cancellationToken);
     }
 }

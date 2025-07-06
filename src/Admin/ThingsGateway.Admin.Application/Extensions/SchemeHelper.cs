@@ -8,47 +8,29 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-namespace ThingsGateway.Foundation;
+using ThingsGateway.Extension;
 
-/// <summary>
-/// 数据类型
-/// </summary>
-public enum DataTypeEnum
+namespace ThingsGateway.Admin.Application;
+
+/// <inheritdoc/>
+[ThingsGateway.DependencyInjection.SuppressSniffer]
+public static class SchemeHelper
 {
-    /// <inheritdoc/>
-    Object,
 
-    /// <inheritdoc/>
-    String,
-
-    /// <inheritdoc/>
-    Boolean,
-
-    /// <inheritdoc/>
-    Byte,
-
-    /// <inheritdoc/>
-    Int16,
-
-    /// <inheritdoc/>
-    UInt16,
-
-    /// <inheritdoc/>
-    Int32,
-
-    /// <inheritdoc/>
-    UInt32,
-
-    /// <inheritdoc/>
-    Int64,
-
-    /// <inheritdoc/>
-    UInt64,
-
-    /// <inheritdoc/>
-    Single,
-
-    /// <inheritdoc/>
-    Double,
+    public static string GetOrCreate()
+    {
+        var path = "SchemeKey";
+        if (File.Exists(path))
+        {
+            var data = File.ReadAllText(path);
+            return data;
+        }
+        else
+        {
+            var data = DateTime.UtcNow.ToDefaultDateTimeFormat();
+            File.WriteAllText(path, data);
+            return data;
+        }
+    }
 
 }
