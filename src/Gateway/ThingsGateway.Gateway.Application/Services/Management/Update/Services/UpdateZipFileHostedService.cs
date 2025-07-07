@@ -304,6 +304,7 @@ internal sealed class UpdateZipFileHostedService : BackgroundService, IUpdateZip
         var upgradeServerOptions = App.GetOptions<UpgradeServerOptions>();
         var config = new TouchSocketConfig()
                .SetRemoteIPHost(new IPHost($"{upgradeServerOptions.UpgradeServerIP}:{upgradeServerOptions.UpgradeServerPort}"))
+               .SetAdapterOption(new AdapterOption() { MaxPackageSize = 0x20000000 })
                .SetDmtpOption(new DmtpOption()
                {
                    VerifyToken = upgradeServerOptions.VerifyToken
@@ -326,7 +327,7 @@ internal sealed class UpdateZipFileHostedService : BackgroundService, IUpdateZip
 
                    //使用重连
                    a.UseDmtpReconnection<TcpDmtpClient>()
-                   .UsePolling(TimeSpan.FromSeconds(5))//使用轮询，每3秒检测一次
+                   .UsePolling(TimeSpan.FromSeconds(3))//使用轮询，每3秒检测一次
                    .SetActionForCheck(async (c, i) =>//重新定义检活策略
                    {
                        if (!upgradeServerOptions.Enable) return true;

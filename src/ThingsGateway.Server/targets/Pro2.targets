@@ -91,7 +91,7 @@
 		<Copy SourceFiles="@(PkgThingsGateway_Plugin_TS550PackageFiles)" DestinationFolder="$(PluginFolder)ThingsGateway.Plugin.TS550%(RecursiveDir)" />
 		<Copy SourceFiles="@(PkgThingsGateway_Plugin_VigorPackageFiles)" DestinationFolder="$(PluginFolder)ThingsGateway.Plugin.Vigor%(RecursiveDir)" />
 
-		<Copy SourceFiles="@(PkgThingsGateway_Plugin_SynchronizationPackageFiles)" DestinationFolder="$(PluginFolder)%(RecursiveDir)" />
+		<Copy SourceFiles="@(PkgThingsGateway_Plugin_VigorPackageFiles)" DestinationFolder="$(PluginFolder)ThingsGateway.Plugin.Synchronization%(RecursiveDir)" />
 	</Target>
 
 </Project>

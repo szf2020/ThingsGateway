@@ -33,6 +33,7 @@ public class FileHostService : BackgroundService, IFileHostService
         var upgradeServerOptions = App.GetOptions<UpgradeServerOptions>();
         var service = new TcpDmtpService();
         var config = new TouchSocketConfig()//配置
+               .SetAdapterOption(new AdapterOption() { MaxPackageSize = 0x20000000 })
                .SetListenIPHosts(new IPHost[] { new IPHost(upgradeServerOptions.UpgradeServerPort) })
                .ConfigureContainer(a =>
                {

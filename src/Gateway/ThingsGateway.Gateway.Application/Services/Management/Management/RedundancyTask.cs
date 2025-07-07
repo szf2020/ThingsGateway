@@ -56,7 +56,17 @@ internal sealed class RedundancyTask : IRpcDriver, IAsyncDisposable
 
     private ScheduledAsyncTask scheduledTask;
 
+    private int GetBatchSize()
+    {
+        // 默认批量数量
+        const int defaultSize = 10000;
+        const int highMemorySize = 50000;
+        const long memoryThreshold = 2L * 1024 * 1024; // 2GB，单位KB
 
+        return GlobalData.HardwareJob.HardwareInfo.MachineInfo.AvailableMemory > memoryThreshold
+            ? highMemorySize
+            : defaultSize;
+    }
     /// <summary>
     /// 主站
     /// </summary>
@@ -80,11 +90,8 @@ internal sealed class RedundancyTask : IRpcDriver, IAsyncDisposable
                 if (online)
                 {
 
-                    int batchSize = 10000;
-                    if (GlobalData.HardwareJob.HardwareInfo.MachineInfo.AvailableMemory > 2 * 1024 * 1024)
-                    {
-                        batchSize = 200000;
-                    }
+                    int batchSize = GetBatchSize();
+
                     var deviceRunTimes = GlobalData.ReadOnlyIdDevices.Where(a => a.Value.IsCollect == true).Select(a => a.Value).Batch(batchSize);
 
 
@@ -347,7 +354,7 @@ internal sealed class RedundancyTask : IRpcDriver, IAsyncDisposable
         var tcpDmtpClient = new TcpDmtpClient();
         var config = new TouchSocketConfig()
                .SetRemoteIPHost(redundancy.MasterUri)
-               .SetAdapterOption(new AdapterOption() { MaxPackageSize = 1024 * 1024 * 1024 })
+               .SetAdapterOption(new AdapterOption() { MaxPackageSize = 0x20000000 })
                .SetDmtpOption(new DmtpOption() { VerifyToken = redundancy.VerifyToken })
                .ConfigureContainer(a =>
                {
@@ -363,6 +370,30 @@ internal sealed class RedundancyTask : IRpcDriver, IAsyncDisposable
                    a.UseDmtpHeartbeat()//使用Dmtp心跳
                    .SetTick(TimeSpan.FromMilliseconds(redundancy.HeartbeatInterval))
                    .SetMaxFailCount(redundancy.MaxErrorCount);
+
+                   //使用重连
+                   a.UseDmtpReconnection<TcpDmtpClient>()
+                   .UsePolling(TimeSpan.FromSeconds(3))//使用轮询，每3秒检测一次
+                   .SetActionForCheck(async (c, i) =>//重新定义检活策略
+                   {
+
+                       //方法2，直接ping，如果true，则客户端必在线。如果false，则客户端不一定不在线，原因是可能当前传输正在忙
+                       if (await c.PingAsync().ConfigureAwait(false))
+                       {
+                           return true;
+                       }
+                       //返回false时可以判断，如果最近活动时间不超过3秒，则猜测客户端确实在忙，所以跳过本次重连
+                       else if (DateTime.Now - c.GetLastActiveTime() < TimeSpan.FromSeconds(3))
+                       {
+                           return null;
+                       }
+                       //否则，直接重连。
+                       else
+                       {
+                           return false;
+                       }
+                   });
+
                });
 
         await tcpDmtpClient.SetupAsync(config).ConfigureAwait(false);
@@ -378,7 +409,7 @@ internal sealed class RedundancyTask : IRpcDriver, IAsyncDisposable
         var tcpDmtpService = new TcpDmtpService();
         var config = new TouchSocketConfig()
                .SetListenIPHosts(redundancy.MasterUri)
-               .SetAdapterOption(new AdapterOption() { MaxPackageSize = 1024 * 1024 * 1024 })
+               .SetAdapterOption(new AdapterOption() { MaxPackageSize = 0x20000000 })
                .SetDmtpOption(new DmtpOption() { VerifyToken = redundancy.VerifyToken })
                .ConfigureContainer(a =>
                {
@@ -471,9 +502,45 @@ internal sealed class RedundancyTask : IRpcDriver, IAsyncDisposable
 
     private async Task InvokeSyncDataAsync(IDmtpActorObject client, DmtpInvokeOption invokeOption, CancellationToken cancellationToken)
     {
+        int maxBatchSize = GetBatchSize() / 10;
 
-        await client.GetDmtpRpcActor().InvokeAsync(nameof(ReverseCallbackServer.SyncData), null, invokeOption, GlobalData.Channels.Select(a => a.Value).ToList(), GlobalData.Devices.Select(a => a.Value).ToList(), GlobalData.IdVariables.Select(a => a.Value).ToList())
-            .ConfigureAwait(false);
+        var groups = GlobalData.IdVariables.Select(a => a.Value).GroupBy(a => a.DeviceRuntime);
+
+        var channelBatch = new HashSet<Channel>();
+        var deviceBatch = new HashSet<Device>();
+        var variableBatch = new List<Variable>();
+        foreach (var group in groups)
+        {
+            var channel = group.Key.ChannelRuntime.AdaptChannel();
+            var device = group.Key.AdaptDevice();
+            channelBatch.Add(channel);
+            deviceBatch.Add(device);
+
+            foreach (var variable in group)
+            {
+                channelBatch.Add(channel);
+                deviceBatch.Add(device);
+                variableBatch.Add(variable.AdaptVariable());
+
+                if (variableBatch.Count >= maxBatchSize)
+                {
+                    // 发送一批
+                    await client.GetDmtpRpcActor().InvokeAsync(nameof(ReverseCallbackServer.SyncData), null, invokeOption, channelBatch.ToList(), deviceBatch.ToList(), variableBatch).ConfigureAwait(false);
+
+                    variableBatch.Clear();
+                    channelBatch.Remove(channel);
+                    deviceBatch.Remove(device);
+                }
+            }
+
+        }
+
+        // 发送最后剩余的一批
+        if (variableBatch.Count > 0)
+        {
+            await client.GetDmtpRpcActor().InvokeAsync(nameof(ReverseCallbackServer.SyncData), null, invokeOption, channelBatch.ToList(), deviceBatch.ToList(), variableBatch).ConfigureAwait(false);
+        }
+
         LogMessage?.LogTrace($"ForcedSync data success");
 
     }
