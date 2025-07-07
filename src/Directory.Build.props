@@ -57,4 +57,13 @@
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
 	</ItemGroup>
+
+
+
+	<Target Name="EnsureLocalNugetFolderExists" BeforeTargets="CollectPackageReferences">
+		<MakeDir Directories="$(SolutionDir)..\..\nupkgs" />
+	</Target>
+
+
+
 </Project>
