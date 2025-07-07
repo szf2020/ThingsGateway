@@ -78,6 +78,7 @@ public abstract class BusinessBaseWithCacheAlarm : BusinessBaseWithCache
     {
         if (CurrentDevice?.Pause != false)
             return;
+        if (TaskSchedulerLoop.Stoped) return;
 
         if (AlarmModelEnable) return;
         // 如果业务属性的缓存为间隔上传，则不执行后续操作

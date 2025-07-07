@@ -20,7 +20,7 @@ public class TaskSchedulerLoop
             task.Start();
         }
     }
-
+    public bool Stoped => Tasks.All(a => !a.Enable);
     public void Stop()
     {
         foreach (var task in Tasks)

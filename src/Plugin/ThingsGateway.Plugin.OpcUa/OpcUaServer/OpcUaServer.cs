@@ -397,6 +397,7 @@ public partial class OpcUaServer : BusinessBase
     {
         if (CurrentDevice.Pause)
             return;
+        if (TaskSchedulerLoop.Stoped) return;
         if (DisposedValue) return;
         if (IdVariableRuntimes.ContainsKey(variableData.Id))
             CollectVariableRuntimes.AddOrUpdate(variableData.Id, id => variableData, (id, addValue) => variableData);

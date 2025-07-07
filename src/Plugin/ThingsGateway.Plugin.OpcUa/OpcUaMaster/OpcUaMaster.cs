@@ -363,12 +363,9 @@ public class OpcUaMaster : CollectBase
                 return;
             if (DisposedValue)
                 return;
+            if (TaskSchedulerLoop.Stoped) return;
 
 
-            if (CurrentDevice.Pause)
-            {
-                return;
-            }
 
             LogMessage?.Trace($"Change: {Environment.NewLine} {data.monitoredItem.StartNodeId} : {data.jToken?.ToString()}");
 
@@ -390,6 +387,7 @@ public class OpcUaMaster : CollectBase
                     return;
                 if (DisposedValue)
                     return;
+                if (TaskSchedulerLoop.Stoped) return;
 
                 if (isGood)
                 {

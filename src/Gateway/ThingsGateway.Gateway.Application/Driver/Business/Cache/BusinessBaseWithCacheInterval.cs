@@ -248,6 +248,7 @@ public abstract class BusinessBaseWithCacheInterval : BusinessBaseWithCache
     {
         if (CurrentDevice?.Pause != false)
             return;
+        if (TaskSchedulerLoop.Stoped) return;
 
         if (!AlarmModelEnable) return;
         // 如果业务属性的缓存为间隔上传，则不执行后续操作
@@ -304,6 +305,7 @@ public abstract class BusinessBaseWithCacheInterval : BusinessBaseWithCache
     {
         if (CurrentDevice?.Pause != false)
             return;
+        if (TaskSchedulerLoop.Stoped) return;
         if (!DevModelEnable) return;
         // 如果业务属性的缓存为间隔上传，则不执行后续操作
         //if (_businessPropertyWithCacheInterval?.IsInterval != true)
@@ -324,6 +326,8 @@ public abstract class BusinessBaseWithCacheInterval : BusinessBaseWithCache
         if (CurrentDevice?.Pause != false)
             return;
         if (!VarModelEnable) return;
+        if (TaskSchedulerLoop.Stoped) return;
+
         // 如果业务属性的缓存为间隔上传，则不执行后续操作
         //if (_businessPropertyWithCacheInterval?.IsInterval != true)
         {
