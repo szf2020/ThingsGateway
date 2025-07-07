@@ -219,7 +219,7 @@ public class OpcDaMaster : CollectBase
         {
             if (CurrentDevice.Pause)
                 return;
-            if (TaskSchedulerLoop?.Stoped==true) return;
+            if (TaskSchedulerLoop?.Stoped == true) return;
             if (DisposedValue)
                 return;
             LogMessage?.Trace($"{ToString()} Change:{Environment.NewLine} {values?.ToSystemTextJsonString()}");
@@ -228,7 +228,7 @@ public class OpcDaMaster : CollectBase
             {
                 if (CurrentDevice.Pause)
                     return;
-                if (TaskSchedulerLoop?.Stoped==true) return;
+                if (TaskSchedulerLoop?.Stoped == true) return;
                 if (DisposedValue)
                     return;
                 var type = data.Value.GetType();
@@ -242,7 +242,7 @@ public class OpcDaMaster : CollectBase
                 {
                     if (CurrentDevice.Pause)
                         return;
-                    if (TaskSchedulerLoop?.Stoped==true) return;
+                    if (TaskSchedulerLoop?.Stoped == true) return;
                     if (DisposedValue)
                         return;
                     var value = data.Value;

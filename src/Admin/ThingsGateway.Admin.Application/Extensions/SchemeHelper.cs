@@ -19,7 +19,7 @@ public static class SchemeHelper
 
     public static string GetOrCreate()
     {
-        var path = "SchemeKey";
+        var path = "Keys/SchemeKey.txt";
         if (File.Exists(path))
         {
             var data = File.ReadAllText(path);
@@ -28,6 +28,7 @@ public static class SchemeHelper
         else
         {
             var data = DateTime.UtcNow.ToDefaultDateTimeFormat();
+            Directory.CreateDirectory("Keys");
             File.WriteAllText(path, data);
             return data;
         }

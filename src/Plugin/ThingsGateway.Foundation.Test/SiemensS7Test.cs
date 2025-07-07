@@ -49,11 +49,10 @@ public class SiemensS7Test
             }
 
         });
-        await Task.Delay(100);
-        bytes[12] = (byte)(((IClientChannel)(siemensS7Master.Channel)).WaitHandlePool.GetValue("m_currentSign").ToInt() - 1);
         var task2 = Task.Run(async () =>
         {
             await Task.Delay(100).ConfigureAwait(false);
+            bytes[12] = (byte)(((IClientChannel)(siemensS7Master.Channel)).WaitHandlePool.GetValue("m_currentSign").ToInt() - 1);
             foreach (var item in bytes)
             {
                 var data = new ByteBlock([item]);

@@ -363,7 +363,7 @@ public class OpcUaMaster : CollectBase
                 return;
             if (DisposedValue)
                 return;
-            if (TaskSchedulerLoop?.Stoped==true) return;
+            if (TaskSchedulerLoop?.Stoped == true) return;
 
 
 
@@ -387,7 +387,7 @@ public class OpcUaMaster : CollectBase
                     return;
                 if (DisposedValue)
                     return;
-                if (TaskSchedulerLoop?.Stoped==true) return;
+                if (TaskSchedulerLoop?.Stoped == true) return;
 
                 if (isGood)
                 {

@@ -248,7 +248,7 @@ public class ModbusSlave : BusinessBase
     {
         if (CurrentDevice?.Pause != false)
             return;
-        if (TaskSchedulerLoop?.Stoped==true) return;
+        if (TaskSchedulerLoop?.Stoped == true) return;
         var address = variableRuntime.GetPropertyValue(DeviceId, nameof(_variablePropertys.ServiceAddress));
         if (address != null && variableRuntime.Value != null)
         {
