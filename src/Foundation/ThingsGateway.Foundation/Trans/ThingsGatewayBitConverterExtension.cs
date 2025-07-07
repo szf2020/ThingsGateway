@@ -10,6 +10,8 @@
 
 using Newtonsoft.Json.Linq;
 
+using ThingsGateway.Foundation.Extension.Generic;
+
 namespace ThingsGateway.Foundation;
 
 /// <summary>
@@ -68,7 +70,7 @@ public static class ThingsGatewayBitConverterExtension
                     for (int i = 0; i < arrayLength; i++)
                     {
                         var data = byteConverter.GetBytes(strings[i]);
-                        bytes.AddRange(data);
+                        bytes.AddRange(data.ArrayExpandToLength(byteConverter.StringLength ?? data.Length));
                     }
                     return bytes.ToArray();
             }
