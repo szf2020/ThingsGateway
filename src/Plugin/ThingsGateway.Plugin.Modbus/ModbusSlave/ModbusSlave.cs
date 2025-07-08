@@ -30,7 +30,7 @@ public class ModbusSlave : BusinessBase
 {
     private readonly ModbusSlaveProperty _driverPropertys = new();
 
-    private readonly ConcurrentDictionary<string, VariableRuntime> ModbusVariableQueue = new();
+    private readonly ConcurrentDictionary<string, long> ModbusVariableQueue = new();
 
     private readonly ModbusSlaveVariableProperty _variablePropertys = new();
 
@@ -177,14 +177,17 @@ public class ModbusSlave : BusinessBase
         {
             if (cancellationToken.IsCancellationRequested)
                 break;
-            var type = item.Value.GetPropertyValue(CurrentDevice.Id, nameof(ModbusSlaveVariableProperty.DataType));
+            if (!IdVariableRuntimes.TryGetValue(item.Value, out var variableRuntime))
+                break;
+
+            var type = variableRuntime.GetPropertyValue(CurrentDevice.Id, nameof(ModbusSlaveVariableProperty.DataType));
             if (Enum.TryParse(type, out DataTypeEnum result))
             {
-                await _plc.WriteAsync(item.Key, JToken.FromObject(item.Value.Value), result, cancellationToken).ConfigureAwait(false);
+                await _plc.WriteAsync(item.Key, JToken.FromObject(variableRuntime.Value), result, cancellationToken).ConfigureAwait(false);
             }
             else
             {
-                await _plc.WriteAsync(item.Key, JToken.FromObject(item.Value.Value), item.Value.DataType, cancellationToken).ConfigureAwait(false);
+                await _plc.WriteAsync(item.Key, JToken.FromObject(variableRuntime.Value), variableRuntime.DataType, cancellationToken).ConfigureAwait(false);
             }
         }
 
@@ -252,7 +255,7 @@ public class ModbusSlave : BusinessBase
         var address = variableRuntime.GetPropertyValue(DeviceId, nameof(_variablePropertys.ServiceAddress));
         if (address != null && variableRuntime.Value != null)
         {
-            ModbusVariableQueue?.AddOrUpdate(address, address => variableRuntime, (address, addvalue) => variableRuntime);
+            ModbusVariableQueue?.AddOrUpdate(address, address => variableRuntime.Id, (address, addvalue) => variableRuntime.Id);
         }
     }
 

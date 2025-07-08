@@ -466,7 +466,14 @@ public class DefaultConvert
 
         if (value is Double d)
         {
-            return Double.IsNaN(d) ? defaultValue : (Decimal)d;
+            try
+            {
+                return Double.IsNaN(d) ? defaultValue : (Decimal)d;
+            }
+            catch
+            {
+                return defaultValue;
+            }
         }
 
         try
