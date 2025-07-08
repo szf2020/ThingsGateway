@@ -287,6 +287,8 @@ public class ThingsGatewayNodeManager : CustomNodeManager2
             return DataTypeIds.String;
         if (tp == typeof(DateTime))
             return DataTypeIds.DateTime;
+        if (tp == typeof(decimal))
+            return DataTypeIds.Decimal;
         return DataTypeIds.String;
     }
 

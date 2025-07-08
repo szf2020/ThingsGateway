@@ -116,7 +116,8 @@ public static class JsonUtils
                     case BuiltInType.Int64: { return decoder.ReadInt64(fieldName); }
                     case BuiltInType.UInt64: { return decoder.ReadUInt64(fieldName); }
                     case BuiltInType.Float: { return decoder.ReadFloat(fieldName); }
-                    case BuiltInType.Double: { return decoder.ReadDouble(fieldName); }
+                    case BuiltInType.Double:
+                    case BuiltInType.Number: { return decoder.ReadDouble(fieldName); }
                     case BuiltInType.String:
                         {
                             if (decoder.ReadField(fieldName, out var value))
@@ -288,7 +289,7 @@ public static class JsonUtils
                     }
                 case BuiltInType.Number:
                     {
-                        encoder.WriteInt64(fieldName, Convert.ToInt64(value));
+                        encoder.WriteDouble(fieldName, Convert.ToInt64(value));
                         return;
                     }
                 case BuiltInType.UInteger:
