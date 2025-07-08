@@ -1419,7 +1419,7 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
             {
                 if (item.PluginType == PluginTypeEnum.Collect)
                     collectChannelDevices.Add(item, new());
-                else if (item.PluginType == PluginTypeEnum.Collect)
+                else if (item.PluginType == PluginTypeEnum.Business)
                     businessChannelDevices.Add(item, new());
                 else
                     otherChannelDevices.Add(item, new());

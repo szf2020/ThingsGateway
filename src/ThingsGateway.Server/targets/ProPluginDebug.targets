@@ -1,7 +1,7 @@
 <Project>
 
 	<ItemGroup>
-		<ProjectReference Include="..\PluginPro\ThingsGateway.Plugin.Synchronization\ThingsGateway.Plugin.Synchronization.csproj" />
+		<ProjectReference Include="..\PluginPro\ThingsGateway.Plugin.SyncBridge\ThingsGateway.Plugin.SyncBridge.csproj" />
 
 		<ProjectReference Include="..\PluginPro\ThingsGateway.Plugin.AllenBradleyCip\ThingsGateway.Plugin.AllenBradleyCip.csproj" />
 		<ProjectReference Include="..\PluginPro\ThingsGateway.Plugin.BACnet\ThingsGateway.Plugin.BACnet.csproj" />
