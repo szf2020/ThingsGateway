@@ -229,7 +229,7 @@ public class ThingsGatewayNodeManager : CustomNodeManager2
     /// 更新变量
     /// </summary>
     /// <param name="variable"></param>
-    public void UpVariable(VariableBasicData variable)
+    public void UpVariable(VariableRuntime variable)
     {
         if (!NodeIdTags.TryGetValue($"{variable.DeviceName}.{variable.Name}", out var uaTag))
             return;

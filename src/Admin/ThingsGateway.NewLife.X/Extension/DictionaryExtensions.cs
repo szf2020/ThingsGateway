@@ -1,5 +1,7 @@
 ﻿using System.Collections.Concurrent;
 
+using ThingsGateway.NewLife.Collections;
+
 namespace ThingsGateway.NewLife.DictionaryExtensions;
 
 /// <summary>并发字典扩展</summary>
@@ -128,6 +130,33 @@ public static class DictionaryExtensions
             }
         }
     }
+
+    /// <summary>
+    /// 批量出队
+    /// </summary>
+    public static IEnumerable<TKEY> ToIEnumerableWithDequeue<TKEY>(this ConcurrentHashSet<TKEY> values, int maxCount = 0)
+    {
+        if (values.IsEmpty) yield break;
+        if (maxCount <= 0)
+        {
+            maxCount = values.Count;
+        }
+        else
+        {
+            maxCount = Math.Min(maxCount, values.Count);
+        }
+
+        var keys = values.Keys;
+        foreach (var key in keys)
+        {
+            if (maxCount-- <= 0) break;
+            if (values.TryRemove(key))
+            {
+                yield return key;
+            }
+        }
+    }
+
 
     /// <summary>
     /// 批量出队

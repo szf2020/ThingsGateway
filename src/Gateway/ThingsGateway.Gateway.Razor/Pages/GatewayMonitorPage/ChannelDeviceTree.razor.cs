@@ -1340,14 +1340,14 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
             case ChannelDevicePluginTypeEnum.Channel:
                 return new ChannelDeviceTreeItem()
                 {
-                    ChannelRuntime = GlobalData.ReadOnlyIdChannels.TryGetValue(channelDeviceTreeItem.ChannelRuntime?.Id ?? 0, out var channel) ? channel : channelDeviceTreeItem.ChannelRuntime,
+                    ChannelRuntimeId = channelDeviceTreeItem.ChannelRuntimeId,
                     ChannelDevicePluginType = ChannelDevicePluginTypeEnum.Channel
                 };
 
             case ChannelDevicePluginTypeEnum.Device:
                 return new ChannelDeviceTreeItem()
                 {
-                    DeviceRuntime = GlobalData.ReadOnlyIdDevices.TryGetValue(channelDeviceTreeItem.DeviceRuntime?.Id ?? 0, out var device) ? device : channelDeviceTreeItem.DeviceRuntime,
+                    DeviceRuntimeId = channelDeviceTreeItem.DeviceRuntimeId,
                     ChannelDevicePluginType = ChannelDevicePluginTypeEnum.Device
                 };
         }
@@ -1500,11 +1500,11 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
         switch (x.ChannelDevicePluginType)
         {
             case ChannelDevicePluginTypeEnum.Device:
-                return x.DeviceRuntime.Id == y.DeviceRuntime.Id;
+                return x.DeviceRuntimeId == y.DeviceRuntimeId;
             case ChannelDevicePluginTypeEnum.PluginType:
                 return x.PluginType == y.PluginType;
             case ChannelDevicePluginTypeEnum.Channel:
-                return x.ChannelRuntime.Id == y.ChannelRuntime.Id;
+                return x.ChannelRuntimeId == y.ChannelRuntimeId;
             case ChannelDevicePluginTypeEnum.PluginName:
                 return x.PluginName == y.PluginName;
             default:

@@ -118,7 +118,7 @@ public static class ResourceUtil
             {
 
 
-                var channelRuntimeTreeItem = new ChannelDeviceTreeItem() { ChannelDevicePluginType = ChannelDevicePluginTypeEnum.Channel, ChannelRuntime = channelRuntime, Id = channelRuntime.Id };
+                var channelRuntimeTreeItem = new ChannelDeviceTreeItem() { ChannelDevicePluginType = ChannelDevicePluginTypeEnum.Channel, ChannelRuntimeId = channelRuntime.Id, Id = channelRuntime.Id };
 
                 var channelTreeItemItem = channelOldItems.FirstOrDefault(a => a.Value.Equals(channelRuntimeTreeItem));
 
@@ -142,7 +142,7 @@ public static class ResourceUtil
                 foreach (var keyValue in channelRuntime.ReadDeviceRuntimes.OrderBy(a => a.Value.DeviceStatus))
                 {
                     var deviceRuntime = keyValue.Value;
-                    var deviceRuntimeTreeItem = new ChannelDeviceTreeItem() { ChannelDevicePluginType = ChannelDevicePluginTypeEnum.Device, DeviceRuntime = deviceRuntime, Id = deviceRuntime.Id };
+                    var deviceRuntimeTreeItem = new ChannelDeviceTreeItem() { ChannelDevicePluginType = ChannelDevicePluginTypeEnum.Device, DeviceRuntimeId = deviceRuntime.Id, Id = deviceRuntime.Id };
 
                     var deviceTreeItemItem = deviceOldItems.FirstOrDefault(a => a.Value.Equals(deviceRuntimeTreeItem));
 
@@ -204,7 +204,7 @@ public static class ResourceUtil
 
             foreach (var channelRuntime in dict.Where(a => a.Key.PluginName == pluginName))
             {
-                var channelRuntimeTreeItem = new ChannelDeviceTreeItem() { ChannelDevicePluginType = ChannelDevicePluginTypeEnum.Channel, ChannelRuntime = channelRuntime.Key, Id = channelRuntime.Key.Id };
+                var channelRuntimeTreeItem = new ChannelDeviceTreeItem() { ChannelDevicePluginType = ChannelDevicePluginTypeEnum.Channel, ChannelRuntimeId = channelRuntime.Key.Id, Id = channelRuntime.Key.Id };
 
 
                 var channelTreeItemItem = channelOldItems.FirstOrDefault(a => a.Value.Equals(channelRuntimeTreeItem));
@@ -226,7 +226,7 @@ public static class ResourceUtil
 
                 foreach (var deviceRuntime in channelRuntime.Value.OrderBy(a => a.DeviceStatus))
                 {
-                    var deviceRuntimeTreeItem = new ChannelDeviceTreeItem() { ChannelDevicePluginType = ChannelDevicePluginTypeEnum.Device, DeviceRuntime = deviceRuntime, Id = deviceRuntime.Id };
+                    var deviceRuntimeTreeItem = new ChannelDeviceTreeItem() { ChannelDevicePluginType = ChannelDevicePluginTypeEnum.Device, DeviceRuntimeId = deviceRuntime.Id, Id = deviceRuntime.Id };
 
 
 

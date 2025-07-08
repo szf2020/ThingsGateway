@@ -32,6 +32,10 @@ public class ConcurrentHashSet<T> : IEnumerable<T> where T : notnull
     /// <returns></returns>
     public Boolean TryRemove(T item) => _dic.TryRemove(item, out _);
 
+    public ICollection<T> Keys => _dic.Keys;
+
+    public void Clear() => _dic.Clear();
+
     #region IEnumerable<T> 成员
     IEnumerator<T> IEnumerable<T>.GetEnumerator() => _dic.Keys.GetEnumerator();
     #endregion

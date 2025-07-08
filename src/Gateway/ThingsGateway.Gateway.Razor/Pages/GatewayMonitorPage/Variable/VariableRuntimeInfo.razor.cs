@@ -287,7 +287,7 @@ public partial class VariableRuntimeInfo : IDisposable
     {
         return Task.FromResult(new VariableRuntime()
         {
-            DeviceId = SelectModel?.DeviceRuntime?.IsCollect == true ? SelectModel?.DeviceRuntime?.Id ?? 0 : 0
+            DeviceId = SelectModel?.TryGetDeviceRuntime(out var deviceRuntime) == true ? deviceRuntime?.IsCollect == true ? deviceRuntime?.Id ?? 0 : 0 : 0
         });
     }
 
@@ -313,10 +313,10 @@ public partial class VariableRuntimeInfo : IDisposable
                     ret = await GatewayExportService.OnVariableExport(new() { QueryPageOptions = new() { SortName = _option.SortName, SortOrder = _option.SortOrder }, PluginName = SelectModel.PluginName });
                     break;
                 case ChannelDevicePluginTypeEnum.Channel:
-                    ret = await GatewayExportService.OnVariableExport(new() { QueryPageOptions = new() { SortName = _option.SortName, SortOrder = _option.SortOrder }, ChannelId = SelectModel.ChannelRuntime.Id });
+                    ret = await GatewayExportService.OnVariableExport(new() { QueryPageOptions = new() { SortName = _option.SortName, SortOrder = _option.SortOrder }, ChannelId = SelectModel.ChannelRuntimeId });
                     break;
                 case ChannelDevicePluginTypeEnum.Device:
-                    ret = await GatewayExportService.OnVariableExport(new() { QueryPageOptions = new() { SortName = _option.SortName, SortOrder = _option.SortOrder }, DeviceId = SelectModel.DeviceRuntime.Id, PluginType = SelectModel.DeviceRuntime.PluginType });
+                    ret = await GatewayExportService.OnVariableExport(new() { QueryPageOptions = new() { SortName = _option.SortName, SortOrder = _option.SortOrder }, DeviceId = SelectModel.DeviceRuntimeId, PluginType = SelectModel.TryGetDeviceRuntime(out var deviceRuntime) ? deviceRuntime?.PluginType : null });
                     break;
                 default:
                     ret = await GatewayExportService.OnVariableExport(new() { QueryPageOptions = new() { SortName = _option.SortName, SortOrder = _option.SortOrder } });

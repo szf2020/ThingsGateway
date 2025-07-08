@@ -22,8 +22,12 @@ public class ChannelDeviceTreeItem : IEqualityComparer<ChannelDeviceTreeItem>
     public long Id { get; set; }
     public ChannelDevicePluginTypeEnum ChannelDevicePluginType { get; set; }
 
-    public DeviceRuntime DeviceRuntime { get; set; }
-    public ChannelRuntime ChannelRuntime { get; set; }
+
+
+    public long DeviceRuntimeId { get; set; }
+
+
+    public long ChannelRuntimeId { get; set; }
     public string PluginName { get; set; }
     public PluginTypeEnum? PluginType { get; set; }
 
@@ -37,11 +41,11 @@ public class ChannelDeviceTreeItem : IEqualityComparer<ChannelDeviceTreeItem>
             switch (ChannelDevicePluginType)
             {
                 case ChannelDevicePluginTypeEnum.Device:
-                    return DeviceRuntime == item.DeviceRuntime;
+                    return DeviceRuntimeId == item.DeviceRuntimeId;
                 case ChannelDevicePluginTypeEnum.PluginType:
                     return PluginType == item.PluginType;
                 case ChannelDevicePluginTypeEnum.Channel:
-                    return ChannelRuntime == item.ChannelRuntime;
+                    return ChannelRuntimeId == item.ChannelRuntimeId;
                 case ChannelDevicePluginTypeEnum.PluginName:
                     return PluginName == item.PluginName;
                 default:
@@ -54,21 +58,22 @@ public class ChannelDeviceTreeItem : IEqualityComparer<ChannelDeviceTreeItem>
 
     public override int GetHashCode()
     {
-        return HashCode.Combine(ChannelDevicePluginType, DeviceRuntime, ChannelRuntime, PluginName, PluginType);
+        return HashCode.Combine(ChannelDevicePluginType, DeviceRuntimeId, ChannelRuntimeId, PluginName, PluginType);
     }
+
     public bool TryGetDeviceRuntime(out DeviceRuntime deviceRuntime)
     {
-        if (ChannelDevicePluginType == ChannelDevicePluginTypeEnum.Device && DeviceRuntime?.Id > 0)
+        if (ChannelDevicePluginType == ChannelDevicePluginTypeEnum.Device && DeviceRuntimeId > 0)
         {
-            deviceRuntime = DeviceRuntime;
-            return true;
+            if (GlobalData.ReadOnlyIdDevices.TryGetValue(DeviceRuntimeId, out deviceRuntime))
+            {
+                return true;
+            }
         }
-        else
-        {
-            deviceRuntime = null;
-            return false;
-        }
+        deviceRuntime = null;
+        return false;
     }
+
     public bool TryGetPluginName(out string pluginName)
     {
         if (ChannelDevicePluginType == ChannelDevicePluginTypeEnum.PluginName)
@@ -98,16 +103,15 @@ public class ChannelDeviceTreeItem : IEqualityComparer<ChannelDeviceTreeItem>
     }
     public bool TryGetChannelRuntime(out ChannelRuntime channelRuntime)
     {
-        if (ChannelDevicePluginType == ChannelDevicePluginTypeEnum.Channel && ChannelRuntime?.Id > 0)
+        if (ChannelDevicePluginType == ChannelDevicePluginTypeEnum.Channel && ChannelRuntimeId > 0)
         {
-            channelRuntime = ChannelRuntime;
-            return true;
+            if (GlobalData.ReadOnlyIdChannels.TryGetValue(ChannelRuntimeId, out channelRuntime))
+            {
+                return true;
+            }
         }
-        else
-        {
-            channelRuntime = null;
-            return false;
-        }
+        channelRuntime = null;
+        return false;
     }
 
 
@@ -115,11 +119,11 @@ public class ChannelDeviceTreeItem : IEqualityComparer<ChannelDeviceTreeItem>
     {
         if (ChannelDevicePluginType == ChannelDevicePluginTypeEnum.Device)
         {
-            return DeviceRuntime?.ToString();
+            return TryGetDeviceRuntime(out var deviceRuntime) ? deviceRuntime?.ToString() : string.Empty;
         }
         else if (ChannelDevicePluginType == ChannelDevicePluginTypeEnum.Channel)
         {
-            return ChannelRuntime?.ToString();
+            return TryGetChannelRuntime(out var channelRuntime) ? channelRuntime?.ToString() : string.Empty;
         }
         else if (ChannelDevicePluginType == ChannelDevicePluginTypeEnum.PluginName)
         {
@@ -139,6 +143,6 @@ public class ChannelDeviceTreeItem : IEqualityComparer<ChannelDeviceTreeItem>
 
     public int GetHashCode([DisallowNull] ChannelDeviceTreeItem obj)
     {
-        return HashCode.Combine(obj.ChannelDevicePluginType, obj.DeviceRuntime, obj.ChannelRuntime, obj.PluginName, obj.PluginType);
+        return HashCode.Combine(obj.ChannelDevicePluginType, obj.DeviceRuntimeId, obj.ChannelRuntimeId, obj.PluginName, obj.PluginType);
     }
 }

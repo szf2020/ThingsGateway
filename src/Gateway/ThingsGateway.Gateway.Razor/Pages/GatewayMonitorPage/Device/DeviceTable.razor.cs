@@ -254,10 +254,10 @@ public partial class DeviceTable : IDisposable
                     ret = await GatewayExportService.OnDeviceExport(new() { QueryPageOptions = new() { SortName = _option.SortName, SortOrder = _option.SortOrder }, PluginName = SelectModel.PluginName });
                     break;
                 case ChannelDevicePluginTypeEnum.Channel:
-                    ret = await GatewayExportService.OnDeviceExport(new() { QueryPageOptions = new() { SortName = _option.SortName, SortOrder = _option.SortOrder }, ChannelId = SelectModel.ChannelRuntime.Id });
+                    ret = await GatewayExportService.OnDeviceExport(new() { QueryPageOptions = new() { SortName = _option.SortName, SortOrder = _option.SortOrder }, ChannelId = SelectModel.ChannelRuntimeId });
                     break;
                 case ChannelDevicePluginTypeEnum.Device:
-                    ret = await GatewayExportService.OnDeviceExport(new() { QueryPageOptions = new() { SortName = _option.SortName, SortOrder = _option.SortOrder }, DeviceId = SelectModel.DeviceRuntime.Id, PluginType = SelectModel.DeviceRuntime.PluginType });
+                    ret = await GatewayExportService.OnDeviceExport(new() { QueryPageOptions = new() { SortName = _option.SortName, SortOrder = _option.SortOrder }, DeviceId = SelectModel.DeviceRuntimeId, PluginType = SelectModel.TryGetDeviceRuntime(out var deviceRuntime) ? deviceRuntime?.PluginType : null });
                     break;
                 default:
                     ret = await GatewayExportService.OnDeviceExport(new() { QueryPageOptions = new() { SortName = _option.SortName, SortOrder = _option.SortOrder } });

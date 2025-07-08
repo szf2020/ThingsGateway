@@ -89,7 +89,7 @@ internal sealed class RedundancyTask : IRpcDriver, IAsyncDisposable
                 if (online)
                 {
 
-                    int batchSize = GetBatchSize();
+                    int batchSize = 50;
 
                     var deviceRunTimes = GlobalData.ReadOnlyIdDevices.Where(a => a.Value.IsCollect == true).Select(a => a.Value).Batch(batchSize);
 

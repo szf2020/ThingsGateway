@@ -14,10 +14,9 @@ using Microsoft.Extensions.Logging;
 using Opc.Ua;
 using Opc.Ua.Configuration;
 
-using System.Collections.Concurrent;
-
 using ThingsGateway.Extension.Generic;
 using ThingsGateway.Gateway.Application;
+using ThingsGateway.NewLife.Collections;
 using ThingsGateway.NewLife.DictionaryExtensions;
 
 using TouchSocket.Core;
@@ -44,7 +43,7 @@ public partial class OpcUaServer : BusinessBase
     protected override BusinessPropertyBase _businessPropertyBase => _driverPropertys;
 
     protected IStringLocalizer Localizer { get; private set; }
-    private ConcurrentDictionary<long, VariableBasicData> CollectVariableRuntimes { get; set; } = new();
+    private ConcurrentHashSet<long> CollectVariableRuntimes { get; set; } = new();
 
     private static readonly string[] separator = new string[] { ";" };
 
@@ -182,7 +181,10 @@ public partial class OpcUaServer : BusinessBase
                 {
                     if (!cancellationToken.IsCancellationRequested)
                     {
-                        m_server?.NodeManager?.UpVariable(item);
+                        if (IdVariableRuntimes.TryGetValue(item, out var variableRuntime) && variableRuntime != null)
+                        {
+                            m_server?.NodeManager?.UpVariable(variableRuntime);
+                        }
                     }
                     else
                     {
@@ -400,7 +402,7 @@ public partial class OpcUaServer : BusinessBase
         if (TaskSchedulerLoop?.Stoped == true) return;
         if (DisposedValue) return;
         if (IdVariableRuntimes.ContainsKey(variableData.Id))
-            CollectVariableRuntimes.AddOrUpdate(variableData.Id, id => variableData, (id, addValue) => variableData);
+            CollectVariableRuntimes.TryAdd(variableData.Id);
         else
         {
 
