@@ -105,6 +105,7 @@ public static class DictionaryExtensions
         return list;
     }
 
+
     /// <summary>
     /// 批量出队
     /// </summary>
@@ -131,6 +132,7 @@ public static class DictionaryExtensions
         }
     }
 
+
     /// <summary>
     /// 批量出队
     /// </summary>
@@ -156,7 +158,6 @@ public static class DictionaryExtensions
             }
         }
     }
-
 
     /// <summary>
     /// 批量出队
@@ -187,6 +188,7 @@ public static class DictionaryExtensions
         }
         return dict;
     }
+
     /// <summary>
     /// 批量出队
     /// </summary>
@@ -213,5 +215,36 @@ public static class DictionaryExtensions
             }
         }
     }
+
+    /// <summary>
+    /// 批量出队
+    /// </summary>
+    public static List<TKEY> ToListWithDequeue<TKEY>(this ConcurrentHashSet<TKEY> values, int maxCount = 0)
+    {
+        List<TKEY> result = new();
+        if (values.IsEmpty) return result;
+        if (maxCount <= 0)
+        {
+            maxCount = values.Count;
+        }
+        else
+        {
+            maxCount = Math.Min(maxCount, values.Count);
+        }
+        var keys = values.Keys;
+        foreach (var key in keys)
+        {
+            if (maxCount-- <= 0) break;
+            if (values.TryRemove(key))
+            {
+                result.Add(key);
+            }
+        }
+        return result;
+    }
+
+
+   
+
 
 }

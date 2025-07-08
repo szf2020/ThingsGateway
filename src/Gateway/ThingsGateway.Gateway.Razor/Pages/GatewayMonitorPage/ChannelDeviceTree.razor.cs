@@ -1240,19 +1240,19 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
         UnknownTreeViewItem = new TreeViewItem<ChannelDeviceTreeItem>(UnknownItem)
         {
             Text = GatewayLocalizer["Unknown"],
-            IsActive = Value == UnknownItem,
+            IsActive = false,
             IsExpand = true,
         };
         ZItem = new List<TreeViewItem<ChannelDeviceTreeItem>>() {new TreeViewItem<ChannelDeviceTreeItem>(CollectItem)
         {
             Text = GatewayLocalizer["Collect"],
-            IsActive = Value == CollectItem,
+            IsActive = false,
             IsExpand = true,
         },
         new TreeViewItem<ChannelDeviceTreeItem>(BusinessItem)
         {
             Text = GatewayLocalizer["Business"],
-            IsActive = Value == BusinessItem,
+            IsActive = false,
             IsExpand = true,
         }};
 
@@ -1533,13 +1533,5 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
         }
         return Task.CompletedTask;
     }
-    protected override void OnAfterRender(bool firstRender)
-    {
-        base.OnAfterRender(firstRender);
-    }
 
-    private void OnUpdateCallbackAsync()
-    {
-        throw new NotImplementedException();
-    }
 }

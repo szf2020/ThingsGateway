@@ -4,50 +4,66 @@ namespace ThingsGateway.Gateway.Razor
 {
     public static class TreeViewItemMapper
     {
-
-        public static global::System.Collections.Generic.List<global::BootstrapBlazor.Components.TreeViewItem<global::ThingsGateway.Gateway.Razor.ChannelDeviceTreeItem>> AdaptListTreeViewItemChannelDeviceTreeItem(this global::System.Collections.Generic.List<global::BootstrapBlazor.Components.TreeViewItem<global::ThingsGateway.Gateway.Razor.ChannelDeviceTreeItem>> src, global::BootstrapBlazor.Components.TreeViewItem<global::ThingsGateway.Gateway.Razor.ChannelDeviceTreeItem> parent = null)
+        public static global::System.Collections.Generic.List<global::BootstrapBlazor.Components.TreeViewItem<global::ThingsGateway.Gateway.Razor.ChannelDeviceTreeItem>> AdaptListTreeViewItemChannelDeviceTreeItem(this global::System.Collections.Generic.List<global::BootstrapBlazor.Components.TreeViewItem<global::ThingsGateway.Gateway.Razor.ChannelDeviceTreeItem>> src)
         {
-            var target = new global::System.Collections.Generic.List<global::BootstrapBlazor.Components.TreeViewItem<global::ThingsGateway.Gateway.Razor.ChannelDeviceTreeItem>>(src.Count);
-            foreach (var item in src)
+            NormalizeItems(src);
+            return src.ToList();
+        }
+        static void NormalizeItems<T>(List<TreeViewItem<T>> nodes)
+        {
+            foreach (var node in nodes)
             {
-                target.Add(MapToTreeViewItemOfChannelDeviceTreeItem(item, parent));
+                if (node.Items.Count > 0)
+                {
+                    node.Items = node.Items.ToList();
+                    NormalizeItems(node.Items);
+                }
             }
-            return target;
         }
 
+        //public static global::System.Collections.Generic.List<global::BootstrapBlazor.Components.TreeViewItem<global::ThingsGateway.Gateway.Razor.ChannelDeviceTreeItem>> AdaptListTreeViewItemChannelDeviceTreeItem(this global::System.Collections.Generic.List<global::BootstrapBlazor.Components.TreeViewItem<global::ThingsGateway.Gateway.Razor.ChannelDeviceTreeItem>> src, global::BootstrapBlazor.Components.TreeViewItem<global::ThingsGateway.Gateway.Razor.ChannelDeviceTreeItem> parent = null)
+        //{
+        //    var target = new global::System.Collections.Generic.List<global::BootstrapBlazor.Components.TreeViewItem<global::ThingsGateway.Gateway.Razor.ChannelDeviceTreeItem>>(src.Count);
+        //    foreach (var item in src)
+        //    {
+        //        target.Add(MapToTreeViewItemOfChannelDeviceTreeItem(item, parent));
+        //    }
+        //    return target;
+        //}
 
-        private static global::BootstrapBlazor.Components.TreeViewItem<global::ThingsGateway.Gateway.Razor.ChannelDeviceTreeItem> MapToTreeViewItemOfChannelDeviceTreeItem(global::BootstrapBlazor.Components.TreeViewItem<global::ThingsGateway.Gateway.Razor.ChannelDeviceTreeItem> source, global::BootstrapBlazor.Components.TreeViewItem<global::ThingsGateway.Gateway.Razor.ChannelDeviceTreeItem> parent)
-        {
-            var target = new global::BootstrapBlazor.Components.TreeViewItem<global::ThingsGateway.Gateway.Razor.ChannelDeviceTreeItem>(source.Value);
-            target.CheckedState = source.CheckedState;
-            target.Items = AdaptListTreeViewItemChannelDeviceTreeItem(source.Items.ToList(), target);
-            if (source.Parent != null && parent != null)
-            {
-                target.Parent = parent;
-            }
-            else
-            {
-                target.Parent = null;
-            }
-            target.Text = source.Text;
-            target.Icon = source.Icon;
-            target.ExpandIcon = source.ExpandIcon;
-            target.CssClass = source.CssClass;
-            target.IsDisabled = source.IsDisabled;
-            target.IsActive = source.IsActive;
-            target.Template = source.Template;
-            if (source.Value != null)
-            {
-                target.Value = source.Value;
-            }
-            else
-            {
-                target.Value = null;
-            }
-            target.IsExpand = source.IsExpand;
-            target.HasChildren = source.HasChildren;
-            return target;
-        }
+
+        //private static global::BootstrapBlazor.Components.TreeViewItem<global::ThingsGateway.Gateway.Razor.ChannelDeviceTreeItem> MapToTreeViewItemOfChannelDeviceTreeItem(global::BootstrapBlazor.Components.TreeViewItem<global::ThingsGateway.Gateway.Razor.ChannelDeviceTreeItem> source, global::BootstrapBlazor.Components.TreeViewItem<global::ThingsGateway.Gateway.Razor.ChannelDeviceTreeItem> parent)
+        //{
+        //    var target = new global::BootstrapBlazor.Components.TreeViewItem<global::ThingsGateway.Gateway.Razor.ChannelDeviceTreeItem>(source.Value);
+        //    target.CheckedState = source.CheckedState;
+        //    target.Items = AdaptListTreeViewItemChannelDeviceTreeItem(source.Items.ToList(), target);
+        //    if (source.Parent != null && parent != null)
+        //    {
+        //        target.Parent = parent;
+        //    }
+        //    else
+        //    {
+        //        target.Parent = null;
+        //    }
+        //    target.Text = source.Text;
+        //    target.Icon = source.Icon;
+        //    target.ExpandIcon = source.ExpandIcon;
+        //    target.CssClass = source.CssClass;
+        //    target.IsDisabled = source.IsDisabled;
+        //    target.IsActive = source.IsActive;
+        //    target.Template = source.Template;
+        //    if (source.Value != null)
+        //    {
+        //        target.Value = source.Value;
+        //    }
+        //    else
+        //    {
+        //        target.Value = null;
+        //    }
+        //    target.IsExpand = source.IsExpand;
+        //    target.HasChildren = source.HasChildren;
+        //    return target;
+        //}
 
 
     }

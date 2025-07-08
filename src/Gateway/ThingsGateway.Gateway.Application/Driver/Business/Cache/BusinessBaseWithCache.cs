@@ -173,7 +173,7 @@ public abstract class BusinessBaseWithCache : BusinessBase
             {
                 if (_memoryAlarmModelQueue.Count > _businessPropertyWithCache.QueueMaxCount)
                 {
-                    LogMessage?.LogWarning($"{typeof(AlarmVariable).Name} Queue exceeds limit, clear old data. If it doesn't work as expected, increase [QueueMaxCount] or Enable cache");
+                    LogMessage?.LogWarning($"{typeof(AlarmVariable).Name} Queue exceeds limit, clear old data. If it doesn't work as expected, increase {_businessPropertyWithCache.QueueMaxCount} or Enable cache");
                     _memoryAlarmModelQueue.Clear();
                     _memoryAlarmModelQueue.Enqueue(data);
                     return;
@@ -405,7 +405,7 @@ public abstract class BusinessBaseWithCache : BusinessBase
             {
                 if (_memoryDevModelQueue.Count > _businessPropertyWithCache.QueueMaxCount)
                 {
-                    LogMessage?.LogWarning($"{typeof(DeviceBasicData).Name} Queue exceeds limit, clear old data. If it doesn't work as expected, increase [QueueMaxCount] or Enable cache");
+                    LogMessage?.LogWarning($"{typeof(DeviceBasicData).Name} Queue exceeds limit, clear old data. If it doesn't work as expected, increase {_businessPropertyWithCache.QueueMaxCount} or Enable cache");
                     _memoryDevModelQueue.Clear();
                     _memoryDevModelQueue.Enqueue(data);
                     return;
@@ -685,7 +685,7 @@ public abstract class BusinessBaseWithCache : BusinessBase
             {
                 if (_memoryVarModelQueue.Count > _businessPropertyWithCache.QueueMaxCount)
                 {
-                    LogMessage?.LogWarning($"{typeof(VariableBasicData).Name} Queue exceeds limit, clear old data. If it doesn't work as expected, increase [QueueMaxCount] or Enable cache");
+                    LogMessage?.LogWarning($"{typeof(VariableBasicData).Name} Queue exceeds limit, clear old data. If it doesn't work as expected, increase {_businessPropertyWithCache.QueueMaxCount} or Enable cache");
                     _memoryVarModelQueue.Clear();
                     _memoryVarModelQueue.Enqueue(data);
                     return;

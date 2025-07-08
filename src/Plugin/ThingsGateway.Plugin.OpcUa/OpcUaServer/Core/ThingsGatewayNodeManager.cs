@@ -395,78 +395,78 @@ public class ThingsGatewayNodeManager : CustomNodeManager2
             };
 
             // 添加自定义属性
-            {
-                var property = new PropertyState<string>(folder)
-                {
-                    NodeId = new NodeId($"{deviceRuntime.Name}.PluginName", NamespaceIndex),
-                    BrowseName = new QualifiedName("PluginName", NamespaceIndex),
-                    DisplayName = "PluginName",
-                    DataType = DataTypeIds.String,
-                    ValueRank = ValueRanks.Scalar,
-                    Value = deviceRuntime.PluginName ?? string.Empty
-                };
-                AddProperty(folder, property);
-            }
-            {
-                var property = new PropertyState<string>(folder)
-                {
-                    NodeId = new NodeId($"{deviceRuntime.Name}.Remark1", NamespaceIndex),
-                    BrowseName = new QualifiedName("Remark1", NamespaceIndex),
-                    DisplayName = "Remark1",
-                    DataType = DataTypeIds.String,
-                    ValueRank = ValueRanks.Scalar,
-                    Value = deviceRuntime.Remark1 ?? string.Empty
-                };
-                AddProperty(folder, property);
-            }
-            {
-                var property = new PropertyState<string>(folder)
-                {
-                    NodeId = new NodeId($"{deviceRuntime.Name}.Remark2", NamespaceIndex),
-                    BrowseName = new QualifiedName("Remark2", NamespaceIndex),
-                    DisplayName = "Remark2",
-                    DataType = DataTypeIds.String,
-                    ValueRank = ValueRanks.Scalar,
-                    Value = deviceRuntime.Remark2 ?? string.Empty
-                };
-                AddProperty(folder, property);
-            }
-            {
-                var property = new PropertyState<string>(folder)
-                {
-                    NodeId = new NodeId($"{deviceRuntime.Name}.Remark3", NamespaceIndex),
-                    BrowseName = new QualifiedName("Remark3", NamespaceIndex),
-                    DisplayName = "Remark3",
-                    DataType = DataTypeIds.String,
-                    ValueRank = ValueRanks.Scalar,
-                    Value = deviceRuntime.Remark3 ?? string.Empty
-                };
-                AddProperty(folder, property);
-            }
-            {
-                var property = new PropertyState<string>(folder)
-                {
-                    NodeId = new NodeId($"{deviceRuntime.Name}.Remark4", NamespaceIndex),
-                    BrowseName = new QualifiedName("Remark4", NamespaceIndex),
-                    DisplayName = "Remark4",
-                    DataType = DataTypeIds.String,
-                    ValueRank = ValueRanks.Scalar,
-                    Value = deviceRuntime.Remark4 ?? string.Empty
-                };
-                AddProperty(folder, property);
-            }
-            {
-                var property = new PropertyState<string>(folder)
-                {
-                    NodeId = new NodeId($"{deviceRuntime.Name}.Remark5", NamespaceIndex),
-                    BrowseName = new QualifiedName("Remark5", NamespaceIndex),
-                    DisplayName = "Remark5",
-                    DataType = DataTypeIds.String,
-                    ValueRank = ValueRanks.Scalar,
-                    Value = deviceRuntime.Remark5 ?? string.Empty
-                };
-                AddProperty(folder, property);
-            }
+            //{
+            //    var property = new PropertyState<string>(folder)
+            //    {
+            //        NodeId = new NodeId($"{deviceRuntime.Name}.PluginName", NamespaceIndex),
+            //        BrowseName = new QualifiedName("PluginName", NamespaceIndex),
+            //        DisplayName = "PluginName",
+            //        DataType = DataTypeIds.String,
+            //        ValueRank = ValueRanks.Scalar,
+            //        Value = deviceRuntime.PluginName ?? string.Empty
+            //    };
+            //    AddProperty(folder, property);
+            //}
+            //{
+            //    var property = new PropertyState<string>(folder)
+            //    {
+            //        NodeId = new NodeId($"{deviceRuntime.Name}.Remark1", NamespaceIndex),
+            //        BrowseName = new QualifiedName("Remark1", NamespaceIndex),
+            //        DisplayName = "Remark1",
+            //        DataType = DataTypeIds.String,
+            //        ValueRank = ValueRanks.Scalar,
+            //        Value = deviceRuntime.Remark1 ?? string.Empty
+            //    };
+            //    AddProperty(folder, property);
+            //}
+            //{
+            //    var property = new PropertyState<string>(folder)
+            //    {
+            //        NodeId = new NodeId($"{deviceRuntime.Name}.Remark2", NamespaceIndex),
+            //        BrowseName = new QualifiedName("Remark2", NamespaceIndex),
+            //        DisplayName = "Remark2",
+            //        DataType = DataTypeIds.String,
+            //        ValueRank = ValueRanks.Scalar,
+            //        Value = deviceRuntime.Remark2 ?? string.Empty
+            //    };
+            //    AddProperty(folder, property);
+            //}
+            //{
+            //    var property = new PropertyState<string>(folder)
+            //    {
+            //        NodeId = new NodeId($"{deviceRuntime.Name}.Remark3", NamespaceIndex),
+            //        BrowseName = new QualifiedName("Remark3", NamespaceIndex),
+            //        DisplayName = "Remark3",
+            //        DataType = DataTypeIds.String,
+            //        ValueRank = ValueRanks.Scalar,
+            //        Value = deviceRuntime.Remark3 ?? string.Empty
+            //    };
+            //    AddProperty(folder, property);
+            //}
+            //{
+            //    var property = new PropertyState<string>(folder)
+            //    {
+            //        NodeId = new NodeId($"{deviceRuntime.Name}.Remark4", NamespaceIndex),
+            //        BrowseName = new QualifiedName("Remark4", NamespaceIndex),
+            //        DisplayName = "Remark4",
+            //        DataType = DataTypeIds.String,
+            //        ValueRank = ValueRanks.Scalar,
+            //        Value = deviceRuntime.Remark4 ?? string.Empty
+            //    };
+            //    AddProperty(folder, property);
+            //}
+            //{
+            //    var property = new PropertyState<string>(folder)
+            //    {
+            //        NodeId = new NodeId($"{deviceRuntime.Name}.Remark5", NamespaceIndex),
+            //        BrowseName = new QualifiedName("Remark5", NamespaceIndex),
+            //        DisplayName = "Remark5",
+            //        DataType = DataTypeIds.String,
+            //        ValueRank = ValueRanks.Scalar,
+            //        Value = deviceRuntime.Remark5 ?? string.Empty
+            //    };
+            //    AddProperty(folder, property);
+            //}
 
 
             parent?.AddChild(folder);
@@ -507,101 +507,101 @@ public class ThingsGatewayNodeManager : CustomNodeManager2
         variable.StatusCode = code;
         variable.Timestamp = variableRuntime.CollectTime;
         variable.OnWriteValue = OnWriteDataValue;
-        parent?.AddChild(variable);
 
-        // 添加自定义属性
-        {
-            var property = new PropertyState<string>(variable)
-            {
-                NodeId = new NodeId($"{variableRuntime.DeviceName}.{variableRuntime.Name}.Unit", NamespaceIndex),
-                BrowseName = new QualifiedName("Unit", NamespaceIndex),
-                DisplayName = "Unit",
-                DataType = DataTypeIds.String,
-                ValueRank = ValueRanks.Scalar,
-                Value = variableRuntime.Unit ?? string.Empty
-            };
-            AddProperty(variable, property);
+        //// 添加自定义属性
+        //{
+        //    var property = new PropertyState<string>(variable)
+        //    {
+        //        NodeId = new NodeId($"{variableRuntime.DeviceName}.{variableRuntime.Name}.Unit", NamespaceIndex),
+        //        BrowseName = new QualifiedName("Unit", NamespaceIndex),
+        //        DisplayName = "Unit",
+        //        DataType = DataTypeIds.String,
+        //        ValueRank = ValueRanks.Scalar,
+        //        Value = variableRuntime.Unit ?? string.Empty
+        //    };
+        //    AddProperty(variable, property);
 
-        }
-        if (!variableRuntime.CollectGroup.IsNullOrEmpty())
-        {
+        //}
+        //if (!variableRuntime.CollectGroup.IsNullOrEmpty())
+        //{
 
-            var property = new PropertyState<string>(variable)
-            {
-                NodeId = new NodeId($"{variableRuntime.DeviceName}.{variableRuntime.Name}.CollectGroup", NamespaceIndex),
-                BrowseName = new QualifiedName("CollectGroup", NamespaceIndex),
-                DisplayName = "CollectGroup",
-                DataType = DataTypeIds.String,
-                ValueRank = ValueRanks.Scalar,
-                Value = variableRuntime.CollectGroup,
-            };
-            AddProperty(variable, property);
-        }
-        {
-            var property = new PropertyState<string>(variable)
-            {
-                NodeId = new NodeId($"{variableRuntime.DeviceName}.{variableRuntime.Name}.Remark1", NamespaceIndex),
-                BrowseName = new QualifiedName("Remark1", NamespaceIndex),
-                DisplayName = "Remark1",
-                DataType = DataTypeIds.String,
-                ValueRank = ValueRanks.Scalar,
-                Value = variableRuntime.Remark1 ?? string.Empty
-            };
-            AddProperty(variable, property);
-        }
+        //    var property = new PropertyState<string>(variable)
+        //    {
+        //        NodeId = new NodeId($"{variableRuntime.DeviceName}.{variableRuntime.Name}.CollectGroup", NamespaceIndex),
+        //        BrowseName = new QualifiedName("CollectGroup", NamespaceIndex),
+        //        DisplayName = "CollectGroup",
+        //        DataType = DataTypeIds.String,
+        //        ValueRank = ValueRanks.Scalar,
+        //        Value = variableRuntime.CollectGroup,
+        //    };
+        //    AddProperty(variable, property);
+        //}
+        //{
+        //    var property = new PropertyState<string>(variable)
+        //    {
+        //        NodeId = new NodeId($"{variableRuntime.DeviceName}.{variableRuntime.Name}.Remark1", NamespaceIndex),
+        //        BrowseName = new QualifiedName("Remark1", NamespaceIndex),
+        //        DisplayName = "Remark1",
+        //        DataType = DataTypeIds.String,
+        //        ValueRank = ValueRanks.Scalar,
+        //        Value = variableRuntime.Remark1 ?? string.Empty
+        //    };
+        //    AddProperty(variable, property);
+        //}
 
-        {
-            var property = new PropertyState<string>(variable)
-            {
-                NodeId = new NodeId($"{variableRuntime.DeviceName}.{variableRuntime.Name}.Remark2", NamespaceIndex),
-                BrowseName = new QualifiedName("Remark2", NamespaceIndex),
-                DisplayName = "Remark2",
-                DataType = DataTypeIds.String,
-                ValueRank = ValueRanks.Scalar,
-                Value = variableRuntime.Remark2 ?? string.Empty
-            };
-            AddProperty(variable, property);
-        }
+        //{
+        //    var property = new PropertyState<string>(variable)
+        //    {
+        //        NodeId = new NodeId($"{variableRuntime.DeviceName}.{variableRuntime.Name}.Remark2", NamespaceIndex),
+        //        BrowseName = new QualifiedName("Remark2", NamespaceIndex),
+        //        DisplayName = "Remark2",
+        //        DataType = DataTypeIds.String,
+        //        ValueRank = ValueRanks.Scalar,
+        //        Value = variableRuntime.Remark2 ?? string.Empty
+        //    };
+        //    AddProperty(variable, property);
+        //}
 
-        {
-            var property = new PropertyState<string>(variable)
-            {
-                NodeId = new NodeId($"{variableRuntime.DeviceName}.{variableRuntime.Name}.Remark3", NamespaceIndex),
-                BrowseName = new QualifiedName("Remark3", NamespaceIndex),
-                DisplayName = "Remark3",
-                DataType = DataTypeIds.String,
-                ValueRank = ValueRanks.Scalar,
-                Value = variableRuntime.Remark3 ?? string.Empty
-            };
-            AddProperty(variable, property);
-        }
+        //{
+        //    var property = new PropertyState<string>(variable)
+        //    {
+        //        NodeId = new NodeId($"{variableRuntime.DeviceName}.{variableRuntime.Name}.Remark3", NamespaceIndex),
+        //        BrowseName = new QualifiedName("Remark3", NamespaceIndex),
+        //        DisplayName = "Remark3",
+        //        DataType = DataTypeIds.String,
+        //        ValueRank = ValueRanks.Scalar,
+        //        Value = variableRuntime.Remark3 ?? string.Empty
+        //    };
+        //    AddProperty(variable, property);
+        //}
 
-        {
-            var property = new PropertyState<string>(variable)
-            {
-                NodeId = new NodeId($"{variableRuntime.DeviceName}.{variableRuntime.Name}.Remark4", NamespaceIndex),
-                BrowseName = new QualifiedName("Remark4", NamespaceIndex),
-                DisplayName = "Remark4",
-                DataType = DataTypeIds.String,
-                ValueRank = ValueRanks.Scalar,
-                Value = variableRuntime.Remark4 ?? string.Empty
-            };
-            AddProperty(variable, property);
-        }
-        {
-            var property = new PropertyState<string>(variable)
-            {
-                NodeId = new NodeId($"{variableRuntime.DeviceName}.{variableRuntime.Name}.Remark5", NamespaceIndex),
-                BrowseName = new QualifiedName("Remark5", NamespaceIndex),
-                DisplayName = "Remark5",
-                DataType = DataTypeIds.String,
-                ValueRank = ValueRanks.Scalar,
-                Value = variableRuntime.Remark5 ?? string.Empty
-            };
-            AddProperty(variable, property);
-        }
+        //{
+        //    var property = new PropertyState<string>(variable)
+        //    {
+        //        NodeId = new NodeId($"{variableRuntime.DeviceName}.{variableRuntime.Name}.Remark4", NamespaceIndex),
+        //        BrowseName = new QualifiedName("Remark4", NamespaceIndex),
+        //        DisplayName = "Remark4",
+        //        DataType = DataTypeIds.String,
+        //        ValueRank = ValueRanks.Scalar,
+        //        Value = variableRuntime.Remark4 ?? string.Empty
+        //    };
+        //    AddProperty(variable, property);
+        //}
+        //{
+        //    var property = new PropertyState<string>(variable)
+        //    {
+        //        NodeId = new NodeId($"{variableRuntime.DeviceName}.{variableRuntime.Name}.Remark5", NamespaceIndex),
+        //        BrowseName = new QualifiedName("Remark5", NamespaceIndex),
+        //        DisplayName = "Remark5",
+        //        DataType = DataTypeIds.String,
+        //        ValueRank = ValueRanks.Scalar,
+        //        Value = variableRuntime.Remark5 ?? string.Empty
+        //    };
+        //    AddProperty(variable, property);
+        //}
 
         NodeIdTags.AddOrUpdate($"{variableRuntime.DeviceName}.{variableRuntime.Name}", variable);
+        parent?.AddChild(variable);
         return variable;
     }
 

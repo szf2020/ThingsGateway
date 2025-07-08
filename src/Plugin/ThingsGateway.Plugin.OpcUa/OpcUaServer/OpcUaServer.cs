@@ -89,6 +89,19 @@ public partial class OpcUaServer : BusinessBase
 
     protected override async Task InitChannelAsync(IChannel? channel, CancellationToken cancellationToken)
     {
+        await UaInit().ConfigureAwait(false);
+
+        GlobalData.VariableValueChangeEvent += VariableValueChange;
+
+        Localizer = App.CreateLocalizerByType(typeof(OpcUaServer))!;
+
+        await base.InitChannelAsync(channel, cancellationToken).ConfigureAwait(false);
+
+
+    }
+
+    private async Task UaInit()
+    {
         ApplicationInstance.MessageDlg = new ApplicationMessageDlg(LogMessage);//默认返回true
 
         //Utils.SetLogger(new OpcUaLogger(LogMessage)); //调试用途
@@ -105,17 +118,13 @@ public partial class OpcUaServer : BusinessBase
         }
 
         m_server = new(this);
-
-
-        GlobalData.VariableValueChangeEvent += VariableValueChange;
-
-        Localizer = App.CreateLocalizerByType(typeof(OpcUaServer))!;
-
-        await base.InitChannelAsync(channel, cancellationToken).ConfigureAwait(false);
-
-
     }
-
+    private void UaDispose()
+    {
+        m_server?.Stop();
+        m_server?.NodeManager?.SafeDispose();
+        m_server?.SafeDispose();
+    }
     /// <inheritdoc/>
     public override bool IsConnected()
     {
@@ -134,12 +143,13 @@ public partial class OpcUaServer : BusinessBase
     protected override void Dispose(bool disposing)
     {
         GlobalData.VariableValueChangeEvent -= VariableValueChange;
-        m_server?.Stop();
-        m_server?.SafeDispose();
+        UaDispose();
         CollectVariableRuntimes?.Clear();
         IdVariableRuntimes?.Clear();
         base.Dispose(disposing);
     }
+
+
 
     protected override async Task ProtectedStartAsync(CancellationToken cancellationToken)
     {
@@ -174,7 +184,7 @@ public partial class OpcUaServer : BusinessBase
                     await Task.Delay(10000, cancellationToken).ConfigureAwait(false);
                 }
             }
-            var varList = CollectVariableRuntimes.ToIEnumerableWithDequeue();
+            var varList = CollectVariableRuntimes.ToListWithDequeue();
             foreach (var item in varList)
             {
                 try
