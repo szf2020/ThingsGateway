@@ -95,12 +95,9 @@ public class ThingsGatewayNodeManager : CustomNodeManager2
                 fs.EventNotifier = EventNotifiers.SubscribeToEvents;
                 if (item?.Any() == true)
                 {
-                    FolderState varFolder = CreateFolder(fs, "Variables", "Variables");
-                    varFolder.AddReference(ReferenceTypes.Organizes, true, ObjectIds.ObjectsFolder);
-                    varFolder.EventNotifier = EventNotifiers.SubscribeToEvents;
                     foreach (var item2 in item)
                     {
-                        CreateVariable(varFolder, item2);
+                        CreateVariable(fs, item2);
                     }
                 }
             }
