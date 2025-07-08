@@ -172,7 +172,7 @@ public class ModbusSlave : BusinessBase
                 await Task.Delay(10000, cancellationToken).ConfigureAwait(false);
             }
         }
-        var list = ModbusVariableQueue.ToIEnumerableKVWithDequeue();
+        var list = ModbusVariableQueue.ToDictWithDequeue();
         foreach (var item in list)
         {
             if (cancellationToken.IsCancellationRequested)

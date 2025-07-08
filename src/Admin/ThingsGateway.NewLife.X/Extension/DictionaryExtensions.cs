@@ -106,58 +106,6 @@ public static class DictionaryExtensions
     }
 
 
-    /// <summary>
-    /// 批量出队
-    /// </summary>
-    public static IEnumerable<T> ToIEnumerableWithDequeue<TKEY, T>(this ConcurrentDictionary<TKEY, T> values, int maxCount = 0)
-    {
-        if (values.IsEmpty) yield break;
-        if (maxCount <= 0)
-        {
-            maxCount = values.Count;
-        }
-        else
-        {
-            maxCount = Math.Min(maxCount, values.Count);
-        }
-
-        var keys = values.Keys;
-        foreach (var key in keys)
-        {
-            if (maxCount-- <= 0) break;
-            if (values.TryRemove(key, out var result))
-            {
-                yield return result;
-            }
-        }
-    }
-
-
-    /// <summary>
-    /// 批量出队
-    /// </summary>
-    public static IEnumerable<TKEY> ToIEnumerableWithDequeue<TKEY>(this ConcurrentHashSet<TKEY> values, int maxCount = 0)
-    {
-        if (values.IsEmpty) yield break;
-        if (maxCount <= 0)
-        {
-            maxCount = values.Count;
-        }
-        else
-        {
-            maxCount = Math.Min(maxCount, values.Count);
-        }
-
-        var keys = values.Keys;
-        foreach (var key in keys)
-        {
-            if (maxCount-- <= 0) break;
-            if (values.TryRemove(key))
-            {
-                yield return key;
-            }
-        }
-    }
 
     /// <summary>
     /// 批量出队
@@ -216,35 +164,9 @@ public static class DictionaryExtensions
         }
     }
 
-    /// <summary>
-    /// 批量出队
-    /// </summary>
-    public static List<TKEY> ToListWithDequeue<TKEY>(this ConcurrentHashSet<TKEY> values, int maxCount = 0)
-    {
-        List<TKEY> result = new();
-        if (values.IsEmpty) return result;
-        if (maxCount <= 0)
-        {
-            maxCount = values.Count;
-        }
-        else
-        {
-            maxCount = Math.Min(maxCount, values.Count);
-        }
-        var keys = values.Keys;
-        foreach (var key in keys)
-        {
-            if (maxCount-- <= 0) break;
-            if (values.TryRemove(key))
-            {
-                result.Add(key);
-            }
-        }
-        return result;
-    }
 
 
-   
+
 
 
 }

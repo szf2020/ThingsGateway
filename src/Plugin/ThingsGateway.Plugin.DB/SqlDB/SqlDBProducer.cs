@@ -147,9 +147,10 @@ public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariable, IDBH
     {
         if (_driverPropertys.IsReadDB)
         {
+            var list = RealTimeVariables.ToListWithDequeue();
             try
             {
-                var varLists = RealTimeVariables.ToIEnumerableWithDequeue().Batch(100000);
+                var varLists = list.Batch(100000);
                 foreach (var varList in varLists)
                 {
                     var result = await UpdateAsync(varList, cancellationToken).ConfigureAwait(false);
@@ -166,6 +167,11 @@ public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariable, IDBH
                 if (success)
                     LogMessage?.LogWarning(ex);
                 success = false;
+
+                list.ForEach(variable =>
+                {
+                    RealTimeVariables.AddOrUpdate(variable.Id, variable, (key, oldValue) => variable);
+                });
             }
         }
 

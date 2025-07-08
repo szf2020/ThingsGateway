@@ -14,9 +14,10 @@ using Microsoft.Extensions.Logging;
 using Opc.Ua;
 using Opc.Ua.Configuration;
 
+using System.Collections.Concurrent;
+
 using ThingsGateway.Extension.Generic;
 using ThingsGateway.Gateway.Application;
-using ThingsGateway.NewLife.Collections;
 using ThingsGateway.NewLife.DictionaryExtensions;
 
 using TouchSocket.Core;
@@ -43,7 +44,7 @@ public partial class OpcUaServer : BusinessBase
     protected override BusinessPropertyBase _businessPropertyBase => _driverPropertys;
 
     protected IStringLocalizer Localizer { get; private set; }
-    private ConcurrentHashSet<long> CollectVariableRuntimes { get; set; } = new();
+    private ConcurrentDictionary<long, VariableBasicData> CollectVariableRuntimes { get; set; } = new();
 
     private static readonly string[] separator = new string[] { ";" };
 
@@ -167,10 +168,11 @@ public partial class OpcUaServer : BusinessBase
             {
                 try
                 {
-                    await Task.Delay(3000, cancellationToken).ConfigureAwait(false);
+                    await Task.Delay(2000, cancellationToken).ConfigureAwait(false);
                     await m_application.CheckApplicationInstanceCertificates(true, 1200, cancellationToken).ConfigureAwait(false);
                     await m_application.Start(m_server).ConfigureAwait(false);
                     connect_success = true;
+                    await Task.Delay(2000, cancellationToken).ConfigureAwait(false);
                     IdVariableRuntimes.ForEach(a =>
                     {
                         VariableValueChange(a.Value, a.Value.AdaptVariableBasicData());
@@ -191,10 +193,7 @@ public partial class OpcUaServer : BusinessBase
                 {
                     if (!cancellationToken.IsCancellationRequested)
                     {
-                        if (IdVariableRuntimes.TryGetValue(item, out var variableRuntime) && variableRuntime != null)
-                        {
-                            m_server?.NodeManager?.UpVariable(variableRuntime);
-                        }
+                        m_server?.NodeManager?.UpVariable(item);
                     }
                     else
                     {
@@ -407,12 +406,12 @@ public partial class OpcUaServer : BusinessBase
     }
     private void VariableValueChange(VariableRuntime variableRuntime, VariableBasicData variableData)
     {
-        if (CurrentDevice.Pause)
-            return;
+        //if (CurrentDevice.Pause)
+        //    return;
         if (TaskSchedulerLoop?.Stoped == true) return;
         if (DisposedValue) return;
         if (IdVariableRuntimes.ContainsKey(variableData.Id))
-            CollectVariableRuntimes.TryAdd(variableData.Id);
+            CollectVariableRuntimes.AddOrUpdate(variableData.Id, variableData, (a, b) => variableData);
         else
         {
 
