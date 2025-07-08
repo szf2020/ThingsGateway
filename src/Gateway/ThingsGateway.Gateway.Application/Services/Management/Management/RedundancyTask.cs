@@ -60,7 +60,7 @@ internal sealed class RedundancyTask : IRpcDriver, IAsyncDisposable
     {
         // 默认批量数量
         const int defaultSize = 10000;
-        const int highMemorySize = 50000;
+        const int highMemorySize = 100000;
         const long memoryThreshold = 2L * 1024 * 1024; // 2GB，单位KB
 
         return GlobalData.HardwareJob.HardwareInfo.MachineInfo.AvailableMemory > memoryThreshold
@@ -72,8 +72,7 @@ internal sealed class RedundancyTask : IRpcDriver, IAsyncDisposable
     /// </summary>
     private async Task DoMasterWork(object? state, CancellationToken stoppingToken)
     {
-        // 延迟一段时间，避免过于频繁地执行任务
-        await Task.Delay(500, stoppingToken).ConfigureAwait(false);
+
         try
         {
             bool online = false;
@@ -132,8 +131,6 @@ internal sealed class RedundancyTask : IRpcDriver, IAsyncDisposable
     /// </summary>
     private async Task DoSlaveWork(object? state, CancellationToken stoppingToken)
     {
-        // 延迟一段时间，避免过于频繁地执行任务
-        await Task.Delay(5000, stoppingToken).ConfigureAwait(false);
         try
         {
             bool online = false;
@@ -288,11 +285,11 @@ internal sealed class RedundancyTask : IRpcDriver, IAsyncDisposable
             LogMessage?.LogInformation($"Redundancy task started");
             if (RedundancyOptions.IsMaster)
             {
-                scheduledTask = new ScheduledAsyncTask(10, DoMasterWork, null, null, cancellationToken);
+                scheduledTask = new ScheduledAsyncTask(RedundancyOptions.SyncInterval, DoMasterWork, null, null, cancellationToken);
             }
             else
             {
-                scheduledTask = new ScheduledAsyncTask(10, DoSlaveWork, null, null, cancellationToken);
+                scheduledTask = new ScheduledAsyncTask(5000, DoSlaveWork, null, null, cancellationToken);
             }
 
             scheduledTask.Start();
@@ -371,28 +368,7 @@ internal sealed class RedundancyTask : IRpcDriver, IAsyncDisposable
                    .SetTick(TimeSpan.FromMilliseconds(redundancy.HeartbeatInterval))
                    .SetMaxFailCount(redundancy.MaxErrorCount);
 
-                   //使用重连
-                   a.UseDmtpReconnection<TcpDmtpClient>()
-                   .UsePolling(TimeSpan.FromSeconds(3))//使用轮询，每3秒检测一次
-                   .SetActionForCheck(async (c, i) =>//重新定义检活策略
-                   {
 
-                       //方法2，直接ping，如果true，则客户端必在线。如果false，则客户端不一定不在线，原因是可能当前传输正在忙
-                       if (await c.PingAsync().ConfigureAwait(false))
-                       {
-                           return true;
-                       }
-                       //返回false时可以判断，如果最近活动时间不超过3秒，则猜测客户端确实在忙，所以跳过本次重连
-                       else if (DateTime.Now - c.GetLastActiveTime() < TimeSpan.FromSeconds(3))
-                       {
-                           return null;
-                       }
-                       //否则，直接重连。
-                       else
-                       {
-                           return false;
-                       }
-                   });
 
                });
 
@@ -437,7 +413,7 @@ internal sealed class RedundancyTask : IRpcDriver, IAsyncDisposable
         {
             FeedbackType = FeedbackType.WaitInvoke,
             Token = cancellationToken,
-            Timeout = 30000,
+            Timeout = 1800000,
             SerializationType = SerializationType.Json,
         };
     }
