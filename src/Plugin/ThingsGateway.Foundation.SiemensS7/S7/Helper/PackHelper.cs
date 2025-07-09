@@ -8,8 +8,6 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-using System.Text;
-
 namespace ThingsGateway.Foundation.SiemensS7;
 
 internal static class PackHelper
@@ -88,7 +86,7 @@ internal static class PackHelper
 
                                     if (s7Address.WStringEnable)
                                     {
-                                        it.ThingsGatewayBitConverter.Encoding = Encoding.Unicode;
+                                        //it.ThingsGatewayBitConverter.Encoding = Encoding.Unicode;
                                     }
                                 }
                                 else
@@ -98,7 +96,7 @@ internal static class PackHelper
                                         // 字符串在S7中，前四个字节不属于实际内容
                                         it.Index += 4;
                                         lastLen = it.ThingsGatewayBitConverter.StringLength.Value + 4;
-                                        it.ThingsGatewayBitConverter.Encoding = Encoding.BigEndianUnicode;
+                                        //it.ThingsGatewayBitConverter.Encoding = Encoding.BigEndianUnicode;
 
                                     }
                                     else if (it.ThingsGatewayBitConverter.IsVariableStringLength)

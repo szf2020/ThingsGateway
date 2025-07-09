@@ -39,7 +39,8 @@ public interface IThingsGatewayBitConverter
 
     [JsonProperty(ItemConverterType = typeof(NewtonsoftEncodingConverter))]
 #endif
-    Encoding Encoding { get; set; }
+    public Encoding? Encoding { get; set; }
+    public Encoding EncodingValue { get; }
 
     /// <summary>
     /// 当前的Bcd编码类型

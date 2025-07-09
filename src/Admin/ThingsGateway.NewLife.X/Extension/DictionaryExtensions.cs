@@ -1,7 +1,5 @@
 ﻿using System.Collections.Concurrent;
 
-using ThingsGateway.NewLife.Collections;
-
 namespace ThingsGateway.NewLife.DictionaryExtensions;
 
 /// <summary>并发字典扩展</summary>

@@ -569,7 +569,7 @@ public partial class SiemensS7Master : DeviceBase
             {
                 return new OperResult<string[]>(AppResource.StringLengthReadError);
             }
-            var result = await SiemensHelper.ReadWStringAsync(this, address, cancellationToken).ConfigureAwait(false);
+            var result = await SiemensHelper.ReadWStringAsync(this, address, bitConverter.Encoding, cancellationToken).ConfigureAwait(false);
             if (result.IsSuccess)
             {
                 return OperResult.CreateSuccessResult(new string[] { result.Content });
@@ -585,7 +585,7 @@ public partial class SiemensS7Master : DeviceBase
             {
                 return new OperResult<string[]>(AppResource.StringLengthReadError);
             }
-            var result = await SiemensHelper.ReadStringAsync(this, address, bitConverter.Encoding, cancellationToken).ConfigureAwait(false);
+            var result = await SiemensHelper.ReadStringAsync(this, address, bitConverter.EncodingValue, cancellationToken).ConfigureAwait(false);
             if (result.IsSuccess)
             {
                 return OperResult.CreateSuccessResult(new string[] { result.Content });
@@ -608,11 +608,11 @@ public partial class SiemensS7Master : DeviceBase
 
         if (((S7BitConverter)bitConverter)?.WStringEnable == true)
         {
-            return SiemensHelper.WriteWStringAsync(this, address, value, cancellationToken);
+            return SiemensHelper.WriteWStringAsync(this, address, value, bitConverter.Encoding, cancellationToken);
         }
         if (bitConverter.IsVariableStringLength)
         {
-            return SiemensHelper.WriteStringAsync(this, address, value, bitConverter.Encoding, cancellationToken);
+            return SiemensHelper.WriteStringAsync(this, address, value, bitConverter.EncodingValue, cancellationToken);
         }
         else
         {

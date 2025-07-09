@@ -29,13 +29,16 @@ public partial class ThingsGatewayBitConverter : IThingsGatewayBitConverter
 
     [System.Text.Json.Serialization.JsonConverter(typeof(EncodingConverter))]
     [JsonConverter(typeof(NewtonsoftEncodingConverter))]
-    public Encoding Encoding { get; set; } = Encoding.UTF8;
+    public Encoding? Encoding { get; set; }
 #else
 
     [JsonConverter(typeof(NewtonsoftEncodingConverter))]
-    public Encoding Encoding { get; set; } = Encoding.UTF8;
+    public Encoding? Encoding { get; set; }
 
 #endif
+
+    public Encoding EncodingValue => Encoding ?? Encoding.UTF8;
+
     /// <inheritdoc/>
     public DataFormatEnum DataFormat { get; set; }
 
@@ -239,7 +242,7 @@ public partial class ThingsGatewayBitConverter : IThingsGatewayBitConverter
             }
             else
             {
-                byte[] bytes = Encoding.GetBytes(value);
+                byte[] bytes = EncodingValue.GetBytes(value);
                 return IsStringReverseByteWord ? bytes.BytesReverseByWord().ArrayExpandToLength(StringLength.Value) : bytes.ArrayExpandToLength(StringLength.Value);
             }
         }
@@ -252,7 +255,7 @@ public partial class ThingsGatewayBitConverter : IThingsGatewayBitConverter
             }
             else
             {
-                byte[] bytes = Encoding.GetBytes(value);
+                byte[] bytes = EncodingValue.GetBytes(value);
                 return IsStringReverseByteWord ? bytes.BytesReverseByWord() : bytes;
             }
         }
@@ -366,8 +369,8 @@ public partial class ThingsGatewayBitConverter : IThingsGatewayBitConverter
         else
         {
             return IsStringReverseByteWord ?
-                Encoding.GetString(new ReadOnlySpan<byte>(buffer, offset, len).ToArray().BytesReverseByWord()).TrimEnd().Replace($"\0", "") :
-                Encoding.GetString(buffer, offset, len).TrimEnd().Replace($"\0", "");
+                EncodingValue.GetString(new ReadOnlySpan<byte>(buffer, offset, len).ToArray().BytesReverseByWord()).TrimEnd().Replace($"\0", "") :
+                EncodingValue.GetString(buffer, offset, len).TrimEnd().Replace($"\0", "");
         }
     }
 

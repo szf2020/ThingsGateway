@@ -8,6 +8,8 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
+using BootstrapBlazor.Components;
+
 using Newtonsoft.Json.Linq;
 
 using Opc.Ua;
@@ -314,6 +316,14 @@ public class ThingsGatewayNodeManager : CustomNodeManager2
                 jToken.CalculateActualValueRank(),
                 jToken
                 );
+            if (dataValue == null)
+            {
+                _businessBase.LogMessage?.LogWarning($"{tag.NodeId} value is null , jToken: {jToken}");
+            }
+            else
+            {
+                _businessBase.LogMessage?.LogTrace($"{tag.NodeId} value {dataValue} , jToken: {jToken}");
+            }
             newValue = dataValue;
             success = true;
         }
@@ -336,7 +346,6 @@ public class ThingsGatewayNodeManager : CustomNodeManager2
                 tag.ValueRank = ValueRanks.OneOrMoreDimensions;
             else
                 tag.ValueRank = ValueRanks.Scalar;
-
 
             var tp = elementType ?? value?.GetType() ?? typeof(string);
 
@@ -493,8 +502,18 @@ public class ThingsGatewayNodeManager : CustomNodeManager2
             UserWriteMask = AttributeWriteMask.DisplayName | AttributeWriteMask.Description,
             ValueRank = ValueRanks.Scalar,
             Id = variableRuntime.Id,
-            DataType = DataNodeType(variableRuntime),
         };
+        var type = DataNodeType(variableRuntime);
+        if (type != null)
+        {
+            variable.DataType = type;
+            variable.IsDataTypeInit = true;
+            var elementType = variableRuntime.Value?.GetType()?.GetElementTypeEx();
+            if (elementType != null)
+                variable.ValueRank = ValueRanks.OneOrMoreDimensions;
+            else
+                variable.ValueRank = ValueRanks.Scalar;
+        }
         var service = dbDrivers.FirstOrDefault(a => GlobalData.ContainsVariable(a.DeviceId, variableRuntime));
         var level = ThingsGatewayNodeManager.ProtectTypeTrans(variableRuntime, service != null);
         variable.AccessLevel = level;
@@ -940,20 +959,24 @@ public class ThingsGatewayNodeManager : CustomNodeManager2
     /// </summary>
     /// <param name="variableRuntime"></param>
     /// <returns></returns>
-    private NodeId DataNodeType(VariableRuntime variableRuntime)
+    private NodeId? DataNodeType(VariableRuntime variableRuntime)
     {
         var str = variableRuntime.GetPropertyValue(_businessBase.DeviceId, nameof(OpcUaServerVariableProperty.DataType)) ?? "";
         Type tp;
         if (Enum.TryParse(str, out DataTypeEnum result))
         {
             tp = result.GetSystemType();
+            return DataNodeType(tp);
         }
         else
         {
-            tp = variableRuntime.Value?.GetType() ?? variableRuntime.DataType.GetSystemType(); ;
+            tp = variableRuntime.Value?.GetType();
+            if (tp != null)
+            {
+                return DataNodeType(tp);
+            }
         }
-
-        return DataNodeType(tp);
+        return null;
     }
 
 

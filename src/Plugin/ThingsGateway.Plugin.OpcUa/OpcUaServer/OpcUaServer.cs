@@ -156,7 +156,12 @@ public partial class OpcUaServer : BusinessBase
     {
         // 启动服务器。
         await m_application.CheckApplicationInstanceCertificates(true, 1200, cancellationToken).ConfigureAwait(false);
+
         await m_application.Start(m_server).ConfigureAwait(false);
+        IdVariableRuntimes.ForEach(a =>
+        {
+            VariableValueChange(a.Value, a.Value.AdaptVariableBasicData());
+        });
         await base.ProtectedStartAsync(cancellationToken).ConfigureAwait(false);
     }
 

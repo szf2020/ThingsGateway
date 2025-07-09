@@ -128,12 +128,12 @@ internal sealed partial class SiemensHelper
 
 
 
-    internal static async ValueTask<OperResult<string>> ReadWStringAsync(SiemensS7Master plc, string address, CancellationToken cancellationToken)
+    internal static async ValueTask<OperResult<string>> ReadWStringAsync(SiemensS7Master plc, string address, Encoding encoding, CancellationToken cancellationToken)
     {
         //先读取一次获取长度，再读取实际值
         if (plc.SiemensS7Type != SiemensTypeEnum.S200Smart)
         {
-            var encoding = Encoding.BigEndianUnicode;
+            encoding ??= Encoding.BigEndianUnicode;
             var result1 = await plc.ReadAsync(address, 4, cancellationToken).ConfigureAwait(false);
             if (!result1.IsSuccess)
             {
@@ -155,7 +155,7 @@ internal sealed partial class SiemensHelper
         }
         else
         {
-            var encoding = Encoding.Unicode;
+            encoding ??= Encoding.Unicode;
             var result1 = await plc.ReadAsync(address, 1, cancellationToken).ConfigureAwait(false);
             if (!result1.IsSuccess)
                 return new OperResult<string>(result1);
@@ -171,12 +171,12 @@ internal sealed partial class SiemensHelper
         }
     }
 
-    internal static async ValueTask<OperResult> WriteWStringAsync(SiemensS7Master plc, string address, string value, CancellationToken cancellationToken = default)
+    internal static async ValueTask<OperResult> WriteWStringAsync(SiemensS7Master plc, string address, string value, Encoding encoding, CancellationToken cancellationToken = default)
     {
         value ??= string.Empty;
         if (plc.SiemensS7Type != SiemensTypeEnum.S200Smart)
         {
-            byte[] inBytes1 = Encoding.BigEndianUnicode.GetBytes(value);
+            byte[] inBytes1 = (encoding ?? Encoding.BigEndianUnicode).GetBytes(value);
             var result = await plc.ReadAsync(address, 4, cancellationToken).ConfigureAwait(false);
             if (!result.IsSuccess) return result;
             var num = plc.ThingsGatewayBitConverter.ToUInt16(result.Content, 0);
@@ -189,7 +189,7 @@ internal sealed partial class SiemensHelper
                 inBytes1
                 ), DataTypeEnum.String, cancellationToken).ConfigureAwait(false);
         }
-        byte[] inBytes2 = Encoding.Unicode.GetBytes(value);
+        byte[] inBytes2 = (encoding ?? Encoding.Unicode).GetBytes(value);
         return await plc.WriteAsync(address, DataTransUtil.SpliceArray([(byte)value.Length], inBytes2), DataTypeEnum.String, cancellationToken).ConfigureAwait(false);
     }
 }
