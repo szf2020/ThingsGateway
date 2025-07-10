@@ -91,7 +91,7 @@ public class ExecuteScriptNode : TextNode, IActuatorNode, IExexcuteExpressionsBa
                 try
                 {
                     var exexcuteExpressions = CSharpScriptEngineExtension.Do<IExexcuteExpressions>(text);
-                    exexcuteExpressions.TryDispose();
+                    exexcuteExpressions?.TryDispose();
                 }
                 catch
                 {
@@ -110,6 +110,10 @@ public class ExecuteScriptNode : TextNode, IActuatorNode, IExexcuteExpressionsBa
         {
             Logger?.Trace($"Execute script");
             var exexcuteExpressions = CSharpScriptEngineExtension.Do<IExexcuteExpressions>(Text);
+            if (exexcuteExpressions == null)
+            {
+                return new OperResult<NodeOutput>("exexcuteExpressions is null");
+            }
             exexcuteExpressions.Logger = Logger;
             var data = await exexcuteExpressions.ExecuteAsync(input, cancellationToken).ConfigureAwait(false);
             return new OperResult<NodeOutput>() { Content = data };
@@ -125,18 +129,19 @@ public class ExecuteScriptNode : TextNode, IActuatorNode, IExexcuteExpressionsBa
 
     public void Dispose()
     {
-        if (text.IsNullOrWhiteSpace())
-            return;
-        try
+        if (!text.IsNullOrWhiteSpace())
         {
-            var exexcuteExpressions = CSharpScriptEngineExtension.Do<IExexcuteExpressions>(text);
-            exexcuteExpressions.TryDispose();
-        }
-        catch
-        {
+            try
+            {
+                var exexcuteExpressions = CSharpScriptEngineExtension.Do<IExexcuteExpressions>(text);
+                exexcuteExpressions.TryDispose();
+            }
+            catch
+            {
 
+            }
+            CSharpScriptEngineExtension.Remove(text);
         }
-        CSharpScriptEngineExtension.Remove(text);
         GC.SuppressFinalize(this);
     }
 }

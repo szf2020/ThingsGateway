@@ -81,6 +81,7 @@ public static class CSharpScriptEngineExtension
     /// </summary>
     public static T Do<T>(string source, params Assembly[] assemblies) where T : class
     {
+        if (source.IsNullOrEmpty()) return null;
         var field = $"{CacheKey}-{source}";
         var runScript = Instance.Get<T>(field);
         if (runScript == null)

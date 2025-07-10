@@ -54,9 +54,11 @@ public partial class OpcUaServer : BusinessBase
         //opcua类库内部有大量缓存，如果刷新变量次数大于一定数量，应该重启服务以防止OOM
         if (Interlocked.Increment(ref VariableChangedCount) > 100)
         {
+            await Task.Delay(1000, cancellationToken).ConfigureAwait(false);
             _ = Task.Run(async () =>
             {
-                await DeviceThreadManage.RestartDeviceAsync(CurrentDevice, false).ConfigureAwait(false);
+                if (!cancellationToken.IsCancellationRequested)
+                    await DeviceThreadManage.RestartDeviceAsync(CurrentDevice, false).ConfigureAwait(false);
             }
             , cancellationToken);
             return;
@@ -122,6 +124,7 @@ public partial class OpcUaServer : BusinessBase
     }
     private void UaDispose()
     {
+        ApplicationInstance.MessageDlg = null;
         m_server?.Stop();
         m_server?.NodeManager?.SafeDispose();
         m_server?.SafeDispose();
