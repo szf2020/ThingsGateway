@@ -13,6 +13,7 @@ using BootstrapBlazor.Components;
 
 using Microsoft.Extensions.Logging;
 
+using ThingsGateway.Common.Extension;
 using ThingsGateway.Extension.Generic;
 using ThingsGateway.NewLife.Collections;
 using ThingsGateway.NewLife.DictionaryExtensions;

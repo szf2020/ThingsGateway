@@ -10,9 +10,7 @@
 
 using BootstrapBlazor.Components;
 
-using ThingsGateway.SqlSugar;
-
-namespace ThingsGateway.Admin.Application;
+namespace ThingsGateway.DB;
 
 /// <inheritdoc/>
 [ThingsGateway.DependencyInjection.SuppressSniffer]

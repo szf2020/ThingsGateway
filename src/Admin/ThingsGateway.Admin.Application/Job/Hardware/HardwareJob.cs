@@ -9,9 +9,7 @@
 // ------------------------------------------------------------------------------
 
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 
 using System.Runtime.InteropServices;
 
@@ -20,7 +18,6 @@ using ThingsGateway.NewLife;
 using ThingsGateway.NewLife.Caching;
 using ThingsGateway.NewLife.Threading;
 using ThingsGateway.Schedule;
-using ThingsGateway.SqlSugar;
 
 namespace ThingsGateway.Admin.Application;
 

@@ -9,6 +9,13 @@
 //------------------------------------------------------------------------------
 
 global using Microsoft.Extensions.DependencyInjection;
+global using Microsoft.Extensions.Localization;
+
+global using System.Diagnostics.CodeAnalysis;
+global using System.Globalization;
 
 global using ThingsGateway.Admin.Application;
+global using ThingsGateway.Common;
+global using ThingsGateway.DB;
 global using ThingsGateway.Foundation;
+global using ThingsGateway.SqlSugar;

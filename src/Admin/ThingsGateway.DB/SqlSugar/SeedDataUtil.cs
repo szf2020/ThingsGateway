@@ -17,9 +17,8 @@ using System.Reflection;
 using System.Text.RegularExpressions;
 
 using ThingsGateway.NewLife;
-using ThingsGateway.SqlSugar;
 
-namespace ThingsGateway.Admin.Application;
+namespace ThingsGateway.DB;
 /// <summary>
 /// 种子数据工具类
 /// </summary>

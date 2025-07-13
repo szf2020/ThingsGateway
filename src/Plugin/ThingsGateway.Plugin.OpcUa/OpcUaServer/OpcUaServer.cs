@@ -12,13 +12,17 @@ using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 
 using Opc.Ua;
+using Opc.Ua.Bindings;
 using Opc.Ua.Configuration;
 
 using System.Collections.Concurrent;
+using System.Reflection;
 
 using ThingsGateway.Extension.Generic;
 using ThingsGateway.Gateway.Application;
+using ThingsGateway.NewLife;
 using ThingsGateway.NewLife.DictionaryExtensions;
+using ThingsGateway.NewLife.Reflection;
 
 using TouchSocket.Core;
 
@@ -125,6 +129,39 @@ public partial class OpcUaServer : BusinessBase
     private void UaDispose()
     {
         ApplicationInstance.MessageDlg = null;
+
+        try
+        {
+
+
+            //https://github.com/OPCFoundation/UA-.NETStandard/pull/3113
+
+
+            var typeDict = m_server.MessageContext.Factory.GetValue("m_encodeableTypes") as Dictionary<ExpandedNodeId, Type>;
+            typeDict.Clear();
+            m_server.MessageContext.Factory.TryDispose();
+
+            typeof(EncodeableFactory).GetField("s_globalFactory", BindingFlags.NonPublic | BindingFlags.Static)?.SetValue(null, new EncodeableFactory());
+            typeof(ServiceMessageContext).GetField("s_globalContext", BindingFlags.NonPublic | BindingFlags.Static)?.SetValue(null, typeof(ServiceMessageContext).GetConstructor(BindingFlags.NonPublic | BindingFlags.Instance, null, new Type[] { typeof(bool) }, null).Invoke(new object[] { true }));
+
+
+            var listeners = m_server.GetValue("m_listeners") as List<ITransportListener>;
+            if (listeners != null)
+            {
+                foreach (var item in listeners)
+                {
+                    if (item is TcpTransportListener transportListener)
+                    {
+                        var timer = transportListener.GetValue("m_inactivityDetectionTimer") as IDisposable;
+                        timer?.Dispose();
+                    }
+                }
+            }
+        }
+        catch
+        {
+
+        }
         m_server?.Stop();
         m_server?.NodeManager?.SafeDispose();
         m_server?.SafeDispose();

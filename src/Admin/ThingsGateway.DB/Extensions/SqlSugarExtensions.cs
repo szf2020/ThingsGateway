@@ -11,9 +11,7 @@
 using System.Linq.Expressions;
 using System.Reflection;
 
-using ThingsGateway.SqlSugar;
-
-namespace ThingsGateway.Admin.Application;
+namespace ThingsGateway.DB;
 
 /// <inheritdoc/>
 [ThingsGateway.DependencyInjection.SuppressSniffer]

@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.Localization;
-
-namespace ThingsGateway.Gateway.Application;
+﻿namespace ThingsGateway.Gateway.Application;
 
 public sealed class CategoryNode : Attribute
 {

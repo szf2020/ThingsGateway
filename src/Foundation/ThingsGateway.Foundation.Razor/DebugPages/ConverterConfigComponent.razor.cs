@@ -14,7 +14,7 @@ using System.Text;
 
 using ThingsGateway.Foundation;
 
-using LocalizerUtil = ThingsGateway.Razor.LocalizerUtil;
+using LocalizerUtil = ThingsGateway.Common.LocalizerUtil;
 
 namespace ThingsGateway.Debug;
 

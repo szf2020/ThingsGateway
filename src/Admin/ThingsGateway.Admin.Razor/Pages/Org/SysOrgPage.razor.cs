@@ -9,7 +9,6 @@
 //------------------------------------------------------------------------------
 
 using ThingsGateway.Admin.Application;
-using ThingsGateway.SqlSugar;
 
 namespace ThingsGateway.Admin.Razor;
 

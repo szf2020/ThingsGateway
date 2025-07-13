@@ -8,16 +8,13 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-using BootstrapBlazor.Components;
-
 using System.Text.RegularExpressions;
 
+using ThingsGateway.Common.Extension;
 using ThingsGateway.DataEncryption;
-using ThingsGateway.Extension;
 using ThingsGateway.Extension.Generic;
 using ThingsGateway.FriendlyException;
 using ThingsGateway.NewLife.Json.Extension;
-using ThingsGateway.Razor;
 
 namespace ThingsGateway.Admin.Application;
 

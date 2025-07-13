@@ -13,6 +13,8 @@ using BootstrapBlazor.Components;
 
 using System.Reflection;
 
+using ThingsGateway.Common.Extension;
+
 namespace ThingsGateway.Gateway.Application;
 
 public static class ChannelServiceHelpers

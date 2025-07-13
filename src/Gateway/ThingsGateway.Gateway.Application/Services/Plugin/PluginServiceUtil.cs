@@ -17,7 +17,6 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 
 using ThingsGateway.NewLife.Extension;
-using ThingsGateway.Razor;
 
 namespace ThingsGateway.Gateway.Application;
 

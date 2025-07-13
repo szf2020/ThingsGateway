@@ -10,7 +10,6 @@
 
 using ThingsGateway.Admin.Application;
 using ThingsGateway.Extension.Generic;
-using ThingsGateway.NewLife.Extension;
 
 namespace ThingsGateway.Admin.Razor;
 

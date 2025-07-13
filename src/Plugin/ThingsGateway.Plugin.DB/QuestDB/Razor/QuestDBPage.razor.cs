@@ -12,8 +12,8 @@ using BootstrapBlazor.Components;
 
 using Microsoft.AspNetCore.Components;
 
+using ThingsGateway.Common;
 using ThingsGateway.Plugin.DB;
-using ThingsGateway.Razor;
 
 namespace ThingsGateway.Plugin.QuestDB;
 

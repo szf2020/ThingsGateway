@@ -10,7 +10,6 @@
 
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Http;
 
 using System.Security.Claims;
@@ -116,7 +115,7 @@ public class BlazorAuthenticationHandler : AppAuthorizeHandler
                 {
                     // 路由名称
                     var routeName = routeData.PageType.CustomAttributes.FirstOrDefault(x =>
-                        x.AttributeType == typeof(RouteAttribute))?.ConstructorArguments?[0].Value as string;
+                        x.AttributeType == typeof(Microsoft.AspNetCore.Components.RouteAttribute))?.ConstructorArguments?[0].Value as string;
                     if (routeName == null) return true;
 
                     if ((!user.PermissionCodeList.Contains(routeName.CutStart("/")) && !user.PermissionCodeList.Contains(routeName))) //如果当前路由信息不包含在角色授权路由列表中则认证失败

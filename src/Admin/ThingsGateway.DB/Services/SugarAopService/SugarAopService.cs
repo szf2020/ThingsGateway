@@ -11,9 +11,7 @@
 
 using Microsoft.Extensions.Hosting;
 
-using ThingsGateway.SqlSugar;
-
-namespace ThingsGateway.Admin.Application;
+namespace ThingsGateway.DB;
 
 public class SugarAopService : ISugarAopService
 {

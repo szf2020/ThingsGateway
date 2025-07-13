@@ -14,7 +14,7 @@ using Microsoft.Extensions.Hosting;
 
 using System.Reflection;
 
-using ThingsGateway.Admin.Application;
+using ThingsGateway.DB;
 
 namespace ThingsGateway.Upgrade;
 

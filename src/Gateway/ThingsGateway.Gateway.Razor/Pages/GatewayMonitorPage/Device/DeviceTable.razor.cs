@@ -10,7 +10,7 @@
 
 using Microsoft.AspNetCore.Components.Forms;
 
-using ThingsGateway.Admin.Application;
+using ThingsGateway.DB;
 using ThingsGateway.Extension.Generic;
 using ThingsGateway.NewLife.Extension;
 

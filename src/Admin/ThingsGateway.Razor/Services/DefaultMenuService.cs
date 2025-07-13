@@ -8,8 +8,6 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-using ThingsGateway.NewLife.Extension;
-
 namespace ThingsGateway.Razor;
 
 public class DefaultMenuService : IMenuService

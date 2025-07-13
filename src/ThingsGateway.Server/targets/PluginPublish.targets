@@ -16,14 +16,14 @@
 	</Target>
 
 
-	<Target Name="RemoveXmlDocs1" AfterTargets="Build">
+	<Target Name="RemoveXmlDocs1" AfterTargets="Build" Condition=" '$(Configuration)' != 'Debug' ">
 		<ItemGroup>
 			<XmlFilesToDelete Include="$(TargetDir)*.xml" />
 		</ItemGroup>
 		<Delete Files="@(XmlFilesToDelete)" />
 	</Target>
 
-	<Target Name="RemoveXmlDocs2" AfterTargets="Publish">
+	<Target Name="RemoveXmlDocs2" AfterTargets="Publish" Condition=" '$(Configuration)' != 'Debug' ">
 		<ItemGroup>
 			<XmlFilesToDelete Include="$(PublishDir)*.xml" />
 		</ItemGroup>

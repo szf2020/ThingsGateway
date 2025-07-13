@@ -30,8 +30,9 @@ using System.Text.Unicode;
 
 using ThingsGateway.Admin.Application;
 using ThingsGateway.Admin.Razor;
+using ThingsGateway.DB;
 using ThingsGateway.Debug;
-using ThingsGateway.Gateway.Application;
+using ThingsGateway.Gateway.Razor;
 using ThingsGateway.VirtualFileServer;
 
 namespace ThingsGateway.Server;

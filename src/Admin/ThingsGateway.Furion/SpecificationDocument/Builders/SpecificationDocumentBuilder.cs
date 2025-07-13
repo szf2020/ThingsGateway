@@ -628,7 +628,7 @@ public static class SpecificationDocumentBuilder
         var thisAssembly = thisType.Assembly;
 
         // 判断是否启用 MiniProfile
-        var customIndex = $"{Reflect.GetAssemblyName(thisAssembly)}{thisType.Namespace.Replace(nameof(ThingsGateway), string.Empty)}.Assets.{(_appSettings.InjectMiniProfiler != true ? "index" : "index-mini-profiler")}.html";
+        var customIndex = $"{Reflect.GetAssemblyName(thisAssembly)}{thisType.Namespace.Replace(nameof(ThingsGateway), string.Empty)}.Assets.index.html";
         swaggerUIOptions.IndexStream = () =>
         {
             StringBuilder htmlBuilder;

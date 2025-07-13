@@ -11,10 +11,7 @@
 using BootstrapBlazor.Components;
 
 using System.ComponentModel.DataAnnotations;
-using System.Diagnostics.CodeAnalysis;
 using System.IO.Ports;
-
-using ThingsGateway.SqlSugar;
 
 using TouchSocket.Core;
 using TouchSocket.Sockets;

@@ -10,10 +10,6 @@
 
 using Microsoft.Extensions.DependencyInjection;
 
-using ThingsGateway.NewLife;
-
-using Yitter.IdGenerator;
-
 namespace ThingsGateway.Razor;
 
 /// <inheritdoc/>
@@ -36,20 +32,9 @@ public class Startup : AppStartup
 
         services.AddJsonLocalization();
 
-        services.AddConfigurableOptions<MenuOptions>();
         services.ConfigureIconThemeOptions(options => options.ThemeKey = "fa");
         services.AddSingleton<IAppVersionService, VersionService>();
         services.AddScoped<IMenuService, DefaultMenuService>();
-
-        services.AddConfigurableOptions<WebsiteOptions>();
-
-        _ = MachineInfo.RegisterAsync();
-
-        // 配置雪花Id算法机器码
-        YitIdHelper.SetIdGenerator(new IdGeneratorOptions
-        {
-            WorkerId = 1// 取值范围0~63
-        });
 
     }
 

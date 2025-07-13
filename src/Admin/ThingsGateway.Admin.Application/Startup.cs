@@ -8,8 +8,6 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-using BootstrapBlazor.Components;
-
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
@@ -43,7 +41,6 @@ public class Startup : AppStartup
 
         services.AddSingleton<IVerificatInfoService, VerificatInfoService>();
 
-        services.AddScoped<IAuthRazorService, AuthRazorService>();
         services.AddSingleton<IApiPermissionService, ApiPermissionService>();
         services.AddSingleton<IFileService, FileService>();
         services.AddSingleton<IImportExportService, ImportExportService>();

@@ -15,6 +15,7 @@ global using Microsoft.Extensions.Localization;
 
 global using System.Diagnostics.CodeAnalysis;
 
+global using ThingsGateway.Common;
 global using ThingsGateway.Gateway.Application;
 global using ThingsGateway.Razor;
 

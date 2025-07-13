@@ -14,6 +14,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 
 using ThingsGateway.Admin.Application;
+using ThingsGateway.DB;
 using ThingsGateway.NewLife.Log;
 using ThingsGateway.SqlSugar;
 
@@ -31,7 +32,7 @@ public class Program
         // 增加中文编码支持
         Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
-        ThingsGateway.Admin.Application.ClaimConst.Scheme = $"{typeof(Program).Assembly.GetName().Name}{SchemeHelper.GetOrCreate()}";
+        ClaimConst.Scheme = $"{typeof(Program).Assembly.GetName().Name}{SchemeHelper.GetOrCreate()}";
 
         #region 控制台输出Logo
 

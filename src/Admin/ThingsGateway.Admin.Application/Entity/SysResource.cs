@@ -8,15 +8,11 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-using BootstrapBlazor.Components;
-
 using Microsoft.AspNetCore.Components.Routing;
 
 using Newtonsoft.Json;
 
 using System.ComponentModel.DataAnnotations;
-
-using ThingsGateway.SqlSugar;
 
 namespace ThingsGateway.Admin.Application;
 

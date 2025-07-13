@@ -9,7 +9,6 @@
 //------------------------------------------------------------------------------
 
 using ThingsGateway.Extension.Generic;
-using ThingsGateway.SqlSugar;
 
 namespace ThingsGateway.Admin.Application;
 

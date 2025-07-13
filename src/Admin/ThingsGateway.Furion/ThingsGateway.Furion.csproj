@@ -22,13 +22,8 @@
 
 	<ItemGroup>
 		<None Remove="FriendlyException\Assets\error.html" />
-		<None Remove="SpecificationDocument\Assets\index-mini-profiler.html" />
 		<None Remove="SpecificationDocument\Assets\index.html" />
-	</ItemGroup>
-
-	<ItemGroup>
 		<EmbeddedResource Include="FriendlyException\Assets\error.html" />
-		<EmbeddedResource Include="SpecificationDocument\Assets\index-mini-profiler.html" />
 		<EmbeddedResource Include="SpecificationDocument\Assets\index.html" />
 	</ItemGroup>
 
@@ -37,7 +32,6 @@
 		<!--<PackageReference Include="FastExpressionCompiler" Version="5.3.0" />-->
 		<PackageReference Include="System.Text.RegularExpressions" Version="4.3.1" />
 		<!--<PackageReference Include="Mapster" Version="7.4.0" />-->
-		<PackageReference Include="MiniProfiler.AspNetCore.Mvc" Version="4.5.4" />
 		<PackageReference Include="Swashbuckle.AspNetCore" Version="9.0.3" />
 	</ItemGroup>
 

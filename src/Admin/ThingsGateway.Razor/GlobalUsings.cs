@@ -8,7 +8,6 @@
 // QQ群：605534569
 // ------------------------------------------------------------------------------
 
-
 global using BootstrapBlazor.Components;
 
 global using Microsoft.AspNetCore.Components;
@@ -17,6 +16,9 @@ global using Microsoft.Extensions.Options;
 
 global using System.Diagnostics.CodeAnalysis;
 global using System.Globalization;
+
+global using ThingsGateway.Common;
+global using ThingsGateway.NewLife.Extension;
 
 
 

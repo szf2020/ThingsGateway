@@ -10,8 +10,6 @@
 
 using BootstrapBlazor.Components;
 
-using ThingsGateway.SqlSugar;
-
 namespace ThingsGateway.Gateway.Application;
 
 /// <summary>

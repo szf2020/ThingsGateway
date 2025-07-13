@@ -10,11 +10,7 @@
 
 using BootstrapBlazor.Components;
 
-using System.Diagnostics.CodeAnalysis;
-
-using ThingsGateway.SqlSugar;
-
-namespace ThingsGateway.Admin.Application;
+namespace ThingsGateway.DB;
 
 /// <summary>
 /// 主键id基类

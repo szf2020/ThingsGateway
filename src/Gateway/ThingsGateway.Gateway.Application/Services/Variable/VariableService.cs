@@ -19,9 +19,10 @@ using System.ComponentModel.DataAnnotations;
 using System.Reflection;
 using System.Text;
 
+using ThingsGateway.Common.Extension;
+using ThingsGateway.Common.Extension.Generic;
 using ThingsGateway.Extension.Generic;
 using ThingsGateway.Foundation.Extension.Dynamic;
-using ThingsGateway.SqlSugar;
 
 using TouchSocket.Core;
 

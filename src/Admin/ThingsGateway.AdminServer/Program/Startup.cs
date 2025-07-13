@@ -26,6 +26,7 @@ using System.Text.Unicode;
 
 using ThingsGateway.Admin.Application;
 using ThingsGateway.Admin.Razor;
+using ThingsGateway.DB;
 using ThingsGateway.VirtualFileServer;
 
 namespace ThingsGateway.AdminServer;

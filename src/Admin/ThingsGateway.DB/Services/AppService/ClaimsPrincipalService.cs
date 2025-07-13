@@ -10,7 +10,7 @@
 
 using System.Security.Claims;
 
-namespace ThingsGateway.Admin.Application;
+namespace ThingsGateway.DB;
 
 public class ClaimsPrincipalService : IClaimsPrincipalService
 {

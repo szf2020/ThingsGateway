@@ -14,6 +14,7 @@ using Newtonsoft.Json.Linq;
 
 using System.Collections.Concurrent;
 
+using ThingsGateway.Common.Extension;
 using ThingsGateway.NewLife.Threading;
 
 using TouchSocket.Core;

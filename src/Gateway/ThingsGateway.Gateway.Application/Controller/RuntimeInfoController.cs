@@ -14,7 +14,6 @@ using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel;
 
 using ThingsGateway.NewLife.Extension;
-using ThingsGateway.SqlSugar;
 namespace ThingsGateway.Gateway.Application;
 
 /// <summary>

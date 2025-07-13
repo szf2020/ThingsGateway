@@ -12,8 +12,6 @@ using BootstrapBlazor.Components;
 
 using Riok.Mapperly.Abstractions;
 
-using ThingsGateway.SqlSugar;
-
 namespace ThingsGateway.Gateway.Application;
 
 /// <summary>

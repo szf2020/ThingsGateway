@@ -10,7 +10,7 @@
 
 using System.Reflection;
 
-using ThingsGateway.Extension.Generic;
+using ThingsGateway.Common.Extension.Generic;
 using ThingsGateway.NewLife.Extension;
 using ThingsGateway.NewLife.Reflection;
 

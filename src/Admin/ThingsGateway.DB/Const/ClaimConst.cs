@@ -8,7 +8,7 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-namespace ThingsGateway.Admin.Application;
+namespace ThingsGateway.DB;
 
 /// <summary>
 /// 授权用户常量

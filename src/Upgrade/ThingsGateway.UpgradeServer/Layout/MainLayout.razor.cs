@@ -17,6 +17,8 @@ using Microsoft.Extensions.Options;
 
 using System.Diagnostics.CodeAnalysis;
 
+using ThingsGateway.Common;
+
 namespace ThingsGateway.UpgradeServer;
 
 public partial class MainLayout : IDisposable

@@ -10,7 +10,7 @@
 
 using Yitter.IdGenerator;
 
-namespace ThingsGateway.Admin.Application;
+namespace ThingsGateway.DB;
 
 /// <summary>
 /// 公共功能

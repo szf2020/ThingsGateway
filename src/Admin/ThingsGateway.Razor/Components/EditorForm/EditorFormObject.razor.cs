@@ -5,8 +5,6 @@
 
 using Microsoft.AspNetCore.Components.Forms;
 
-using ThingsGateway.Razor;
-
 namespace BootstrapBlazor.Components;
 
 /// <summary>

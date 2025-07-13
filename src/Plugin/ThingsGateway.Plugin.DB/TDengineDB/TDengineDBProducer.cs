@@ -12,7 +12,8 @@ using BootstrapBlazor.Components;
 
 using System.Reflection;
 
-using ThingsGateway.Admin.Application;
+using ThingsGateway.Common;
+using ThingsGateway.DB;
 using ThingsGateway.Debug;
 using ThingsGateway.Foundation;
 using ThingsGateway.NewLife;

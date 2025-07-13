@@ -16,10 +16,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-using System.Diagnostics;
 using System.Logging;
 
-using ThingsGateway;
 using ThingsGateway.DataValidation;
 using ThingsGateway.DynamicApiController;
 using ThingsGateway.FriendlyException;
@@ -153,37 +151,6 @@ public sealed class FriendlyExceptionFilter : IAsyncExceptionFilter
             logger.LogError(context.Exception, context.Exception.Message);
         }
 
-        // 打印错误消息
-        PrintToMiniProfiler(context.Exception);
     }
 
-    /// <summary>
-    /// 打印错误到 MiniProfiler 中
-    /// </summary>
-    /// <param name="exception"></param>
-    internal static void PrintToMiniProfiler(Exception exception)
-    {
-        // 判断是否注入 MiniProfiler 组件
-        if (App.Settings.InjectMiniProfiler != true || exception == null) return;
-
-        // 获取异常堆栈
-        var stackTrace = new StackTrace(exception, true);
-        if (stackTrace.FrameCount == 0) return;
-        var traceFrame = stackTrace.GetFrame(0);
-
-        // 获取出错的文件名
-        var exceptionFileName = traceFrame.GetFileName();
-
-        // 获取出错的行号
-        var exceptionFileLineNumber = traceFrame.GetFileLineNumber();
-
-        // 打印错误文件名和行号
-        if (!string.IsNullOrWhiteSpace(exceptionFileName) && exceptionFileLineNumber > 0)
-        {
-            App.PrintToMiniProfiler("errors", "Locator", $"{exceptionFileName}:line {exceptionFileLineNumber}", true);
-        }
-
-        // 打印完整的堆栈信息
-        App.PrintToMiniProfiler("errors", "StackTrace", exception.ToString(), true);
-    }
 }

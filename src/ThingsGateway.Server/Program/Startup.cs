@@ -26,7 +26,8 @@ using System.Text.Unicode;
 
 using ThingsGateway.Admin.Application;
 using ThingsGateway.Admin.Razor;
-using ThingsGateway.Razor;
+using ThingsGateway.Common;
+using ThingsGateway.DB;
 using ThingsGateway.VirtualFileServer;
 
 namespace ThingsGateway.Server;
@@ -333,6 +334,25 @@ public class Startup : AppStartup
 #if NET8_0_OR_GREATER
         app.UseAntiforgery();
 #endif
+        var options = App.GetConfig<WebsiteOptions>("Website");
+        if (!options.WebPageEnable)
+        {
+            // 中间件拦截，返回 403
+            app.Use((context, next) =>
+            {
+                var path = context.Request.Path.Value;
+                if (path?.StartsWith("/_blazor", StringComparison.OrdinalIgnoreCase) == true)
+                {
+                    context.Response.StatusCode = 500;
+                    return Task.CompletedTask;
+                }
+                else
+                {
+                    return next();
+                }
+            });
+        }
+
         app.MapControllers();
         app.MapHubs();
 

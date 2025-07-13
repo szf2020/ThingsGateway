@@ -10,8 +10,6 @@
 
 using Microsoft.AspNetCore.Components;
 
-using System.Diagnostics.CodeAnalysis;
-
 namespace BootstrapBlazor.Components;
 
 /// <summary>

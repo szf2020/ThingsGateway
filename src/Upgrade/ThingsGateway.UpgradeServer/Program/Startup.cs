@@ -24,6 +24,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Text.Encodings.Web;
 using System.Text.Unicode;
 
+using ThingsGateway.DB;
 using ThingsGateway.VirtualFileServer;
 
 namespace ThingsGateway.UpgradeServer;

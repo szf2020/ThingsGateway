@@ -9,8 +9,9 @@
 //------------------------------------------------------------------------------
 
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
+
+using ThingsGateway.Common.Extension;
 
 namespace ThingsGateway.Gateway.Application;
 

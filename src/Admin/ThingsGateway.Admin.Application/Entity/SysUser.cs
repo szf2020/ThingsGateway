@@ -8,14 +8,9 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-using BootstrapBlazor.Components;
-
 using Riok.Mapperly.Abstractions;
 
 using System.ComponentModel.DataAnnotations;
-using System.Diagnostics.CodeAnalysis;
-
-using ThingsGateway.SqlSugar;
 
 namespace ThingsGateway.Admin.Application;
 

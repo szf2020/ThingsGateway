@@ -10,7 +10,7 @@
 
 using Riok.Mapperly.Abstractions;
 
-using ThingsGateway.Admin.Application;
+using ThingsGateway.DB;
 using ThingsGateway.Plugin.SqlHistoryAlarm;
 
 namespace ThingsGateway.Plugin.DB;

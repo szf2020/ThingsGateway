@@ -16,7 +16,10 @@ global using Microsoft.Extensions.Options;
 
 global using System.Diagnostics.CodeAnalysis;
 
+global using ThingsGateway.Common;
+global using ThingsGateway.DB;
+global using ThingsGateway.NewLife.Extension;
 global using ThingsGateway.Razor;
-
+global using ThingsGateway.SqlSugar;
 [assembly: SuppressMessage("Reliability", "CA2007", Justification = "<挂起>", Scope = "module")]
 [assembly: GlobalGenerateSetParametersAsync(true)]

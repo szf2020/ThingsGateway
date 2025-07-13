@@ -8,11 +8,8 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-using BootstrapBlazor.Components;
-
 using ThingsGateway.Extension.Generic;
 using ThingsGateway.FriendlyException;
-using ThingsGateway.SqlSugar;
 
 namespace ThingsGateway.Admin.Application;
 

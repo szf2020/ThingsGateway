@@ -8,8 +8,6 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-using System.Diagnostics.CodeAnalysis;
-
 namespace ThingsGateway.Gateway.Application;
 
 public sealed class StringOrdinalIgnoreCaseEqualityComparer : EqualityComparer<string>

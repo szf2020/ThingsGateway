@@ -14,6 +14,7 @@
       "ThingsGateway.SqlSugar",
       "ThingsGateway.Admin.Application",
       "ThingsGateway.Admin.Razor",
+      "ThingsGateway.Common",
       "ThingsGateway.DB",
       "ThingsGateway.Razor"
     ]

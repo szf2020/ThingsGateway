@@ -8,4 +8,10 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
+global using Microsoft.Extensions.Localization;
+
+global using System.Diagnostics.CodeAnalysis;
+
+global using ThingsGateway.Common;
 global using ThingsGateway.NewLife.Extension;
+global using ThingsGateway.SqlSugar;

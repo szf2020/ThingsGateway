@@ -15,7 +15,6 @@ using System.Reflection;
 
 using ThingsGateway.Authentication;
 using ThingsGateway.Management;
-using ThingsGateway.SqlSugar;
 using ThingsGateway.Upgrade;
 
 namespace ThingsGateway.Gateway.Application;
@@ -77,7 +76,6 @@ public class Startup : AppStartup
         services.AddSingleton<IBackendLogService, BackendLogService>();
         services.AddSingleton<IRpcLogService, RpcLogService>();
         services.AddSingleton<IRpcService, RpcService>();
-        services.AddScoped<IGatewayExportService, GatewayExportService>();
 
         services.AddGatewayHostedService<IAlarmHostedService, AlarmHostedService>();
         services.AddGatewayHostedService<IGatewayMonitorHostedService, GatewayMonitorHostedService>();

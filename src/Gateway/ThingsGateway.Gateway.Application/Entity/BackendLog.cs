@@ -10,8 +10,6 @@
 
 using BootstrapBlazor.Components;
 
-using ThingsGateway.SqlSugar;
-
 using LogLevel = Microsoft.Extensions.Logging.LogLevel;
 
 namespace ThingsGateway.Gateway.Application;

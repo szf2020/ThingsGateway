@@ -9,7 +9,6 @@
 //------------------------------------------------------------------------------
 
 using ThingsGateway.Admin.Application;
-using ThingsGateway.NewLife.Extension;
 
 namespace ThingsGateway.Admin.Razor;
 

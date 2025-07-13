@@ -10,7 +10,7 @@
 
 using Microsoft.Extensions.DependencyInjection;
 
-namespace ThingsGateway.Admin.Application;
+namespace ThingsGateway.DB;
 
 /// <summary>
 /// 当前登录用户信息

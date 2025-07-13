@@ -12,9 +12,8 @@ using Microsoft.Extensions.DependencyInjection;
 
 using ThingsGateway.Extension;
 using ThingsGateway.NewLife.Log;
-using ThingsGateway.SqlSugar;
 
-namespace ThingsGateway.Admin.Application;
+namespace ThingsGateway.DB;
 
 /// <summary>
 /// 数据库上下文对象

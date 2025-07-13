@@ -11,7 +11,6 @@
 using BootstrapBlazor.Components;
 
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 
 using ThingsGateway.Blazor.Diagrams.Core;

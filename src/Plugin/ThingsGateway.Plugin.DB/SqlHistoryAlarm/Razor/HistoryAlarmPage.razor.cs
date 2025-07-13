@@ -12,7 +12,7 @@ using BootstrapBlazor.Components;
 
 using Microsoft.AspNetCore.Components;
 
-using ThingsGateway.Razor;
+using ThingsGateway.Common;
 
 namespace ThingsGateway.Plugin.SqlHistoryAlarm;
 

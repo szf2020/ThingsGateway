@@ -10,6 +10,7 @@
 
 using BootstrapBlazor.Components;
 
+using ThingsGateway.Common;
 using ThingsGateway.SqlSugar;
 
 namespace ThingsGateway.Plugin.TDengineDB;

@@ -10,14 +10,12 @@
 
 using BootstrapBlazor.Components;
 
-using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 
 using System.Text;
 
 using ThingsGateway.NewLife;
 using ThingsGateway.NewLife.Threading;
-using ThingsGateway.Razor;
 
 using TouchSocket.Core;
 

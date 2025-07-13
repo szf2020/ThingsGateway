@@ -8,7 +8,7 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-using ThingsGateway.Admin.Application;
+using ThingsGateway.DB;
 using ThingsGateway.Foundation;
 using ThingsGateway.NewLife.Json.Extension;
 

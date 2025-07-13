@@ -12,8 +12,6 @@ using BootstrapBlazor.Components;
 
 using System.Data;
 
-using ThingsGateway.SqlSugar;
-
 namespace ThingsGateway.Gateway.Application;
 
 internal sealed class RpcLogService : BaseService<RpcLog>, IRpcLogService

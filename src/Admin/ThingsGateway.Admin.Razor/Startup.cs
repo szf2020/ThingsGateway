@@ -18,6 +18,7 @@ public class Startup : AppStartup
     public void Configure(IServiceCollection services)
     {
         services.AddScoped<IMenuService, MenuService>();
+        services.AddScoped<IAuthRazorService, AuthRazorService>();
         services.AddBootstrapBlazorTableExportService();
     }
 }

@@ -10,7 +10,8 @@
 
 using BootstrapBlazor.Components;
 
-using ThingsGateway.Admin.Application;
+using ThingsGateway.Common;
+using ThingsGateway.DB;
 using ThingsGateway.Foundation;
 using ThingsGateway.NewLife;
 using ThingsGateway.SqlSugar;

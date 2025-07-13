@@ -10,7 +10,6 @@
 // ------------------------------------------------------------------------
 
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Hosting;
 
 using ThingsGateway.ConfigurableOptions;
 
@@ -21,11 +20,6 @@ namespace ThingsGateway;
 /// </summary>
 public sealed class AppSettingsOptions : IConfigurableOptions<AppSettingsOptions>
 {
-    /// <summary>
-    /// 集成 MiniProfiler 组件
-    /// </summary>
-    public bool? InjectMiniProfiler { get; set; }
-
     /// <summary>
     /// 是否启用规范化文档
     /// </summary>
@@ -64,11 +58,6 @@ public sealed class AppSettingsOptions : IConfigurableOptions<AppSettingsOptions
     /// <param name="configuration"></param>
     public void PostConfigure(AppSettingsOptions options, IConfiguration configuration)
     {
-        // 非 Web 环境总是 false，如果是生产环境且不配置 InjectMiniProfiler，默认总是false，MiniProfiler 生产环境耗内存
-        if (App.WebHostEnvironment == default
-            || (App.HostEnvironment.IsProduction() && options.InjectMiniProfiler == null)) options.InjectMiniProfiler = false;
-        else options.InjectMiniProfiler ??= true;
-
         options.InjectSpecificationDocument ??= true;
         options.EnabledReferenceAssemblyScan ??= false;
         options.ExternalAssemblies ??= Array.Empty<string>();

@@ -16,8 +16,7 @@ using System.Text;
 
 using ThingsGateway.NewLife;
 using ThingsGateway.NewLife.Caching;
-
-using TouchSocket.Core;
+using ThingsGateway.NewLife.Extension;
 
 namespace ThingsGateway.Gateway.Application.Extensions;
 
@@ -162,7 +161,7 @@ public static class ExpressionEvaluatorExtension
     /// <summary>
     /// 计算表达式：例如：(int)raw*100，raw为原始值
     /// </summary>
-    public static object GetExpressionsResult(this string expressions, object rawvalue, ILog logger)
+    public static object GetExpressionsResult(this string expressions, object rawvalue, TouchSocket.Core.ILog logger)
     {
         if (string.IsNullOrWhiteSpace(expressions))
         {

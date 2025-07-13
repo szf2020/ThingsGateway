@@ -19,7 +19,6 @@ using System.ComponentModel.DataAnnotations;
 using System.IO.Ports;
 
 using ThingsGateway.FriendlyException;
-using ThingsGateway.SqlSugar;
 
 using TouchSocket.Core;
 using TouchSocket.Sockets;

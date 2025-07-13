@@ -25,6 +25,7 @@ using ThingsGateway.Foundation.OpcDa.Rcw;
 
 using ThingsGateway.Gateway.Application;
 using ThingsGateway.Plugin.OpcDa;
+using ThingsGateway.DB;
 
 #endif
 
@@ -271,7 +272,7 @@ public partial class OpcDaImportVariable
             {
             }
 
-            var id = Admin.Application.CommonUtils.GetSingleId();
+            var id = CommonUtils.GetSingleId();
             return new Variable()
             {
                 Name = a.Name,
@@ -289,7 +290,7 @@ public partial class OpcDaImportVariable
 
     private Device GetImportDevice(long channelId)
     {
-        var id = Admin.Application.CommonUtils.GetSingleId();
+        var id = CommonUtils.GetSingleId();
         var data = new Device()
         {
             Name = Plc.OpcDaProperty.OpcName + "-" + id,
@@ -310,7 +311,7 @@ public partial class OpcDaImportVariable
 
     private Channel GetImportChannel()
     {
-        var id = Admin.Application.CommonUtils.GetSingleId();
+        var id = CommonUtils.GetSingleId();
         var data = new Channel()
         {
             Name = Plc.OpcDaProperty.OpcName + "-" + id,

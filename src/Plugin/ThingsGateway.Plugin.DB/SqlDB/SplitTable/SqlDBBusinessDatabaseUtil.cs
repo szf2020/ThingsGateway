@@ -13,7 +13,7 @@ using Microsoft.Extensions.DependencyInjection;
 using System.ComponentModel.DataAnnotations;
 using System.Reflection;
 
-using ThingsGateway.Admin.Application;
+using ThingsGateway.DB;
 using ThingsGateway.SqlSugar;
 
 

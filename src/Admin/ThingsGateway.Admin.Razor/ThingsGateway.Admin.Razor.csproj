@@ -37,6 +37,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\BlazorSetParametersAsyncGenerator\BlazorSetParametersAsyncGenerator.csproj" PrivateAssets="all" OutputItemType="Analyzer" />
+		<ProjectReference Include="..\ThingsGateway.Razor\ThingsGateway.Razor.csproj" />
 	</ItemGroup>
 	
 </Project>

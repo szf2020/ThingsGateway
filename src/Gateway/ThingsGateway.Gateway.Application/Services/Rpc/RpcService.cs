@@ -9,16 +9,15 @@
 // ------------------------------------------------------------------------------
 
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Localization;
 
 using Newtonsoft.Json.Linq;
 
 using System.Collections.Concurrent;
 
+using ThingsGateway.Common.Extension;
 using ThingsGateway.Extension;
 using ThingsGateway.Extension.Generic;
 using ThingsGateway.NewLife.Json.Extension;
-using ThingsGateway.SqlSugar;
 
 using TouchSocket.Core;
 

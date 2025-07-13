@@ -15,8 +15,6 @@ using Microsoft.AspNetCore.Components.Forms;
 using System.Collections.Concurrent;
 using System.Reflection;
 
-using ThingsGateway.SqlSugar;
-
 namespace ThingsGateway.Gateway.Application;
 
 /// <summary>

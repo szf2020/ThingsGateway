@@ -11,12 +11,10 @@
 using BootstrapBlazor.Components;
 
 using Microsoft.CodeAnalysis;
-using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 
 using System.Collections.Concurrent;
 using System.Data;
-using System.Globalization;
 using System.Reflection;
 using System.Runtime.Loader;
 

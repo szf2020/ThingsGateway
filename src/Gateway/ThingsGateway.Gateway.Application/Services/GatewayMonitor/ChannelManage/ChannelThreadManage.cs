@@ -12,6 +12,7 @@ using Microsoft.Extensions.Logging;
 
 using System.Collections.Concurrent;
 
+using ThingsGateway.Common.Extension;
 using ThingsGateway.NewLife;
 
 namespace ThingsGateway.Gateway.Application;

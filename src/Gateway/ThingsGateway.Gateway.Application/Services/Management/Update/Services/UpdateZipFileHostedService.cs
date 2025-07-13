@@ -9,7 +9,6 @@
 //------------------------------------------------------------------------------
 
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 
 using System.Reflection;

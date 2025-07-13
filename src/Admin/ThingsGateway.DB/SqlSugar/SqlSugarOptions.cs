@@ -9,9 +9,8 @@
 //------------------------------------------------------------------------------
 
 using ThingsGateway.ConfigurableOptions;
-using ThingsGateway.SqlSugar;
 
-namespace ThingsGateway.Admin.Application;
+namespace ThingsGateway.DB;
 
 /// <summary>
 /// SqlSugar配置

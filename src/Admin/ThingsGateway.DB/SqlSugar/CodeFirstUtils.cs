@@ -12,9 +12,9 @@ using System.Collections;
 using System.Data;
 using System.Reflection;
 
-using ThingsGateway.SqlSugar;
+using ThingsGateway.Common.Extension;
 
-namespace ThingsGateway.Admin.Application;
+namespace ThingsGateway.DB;
 
 /// <summary>
 /// CodeFirst功能类

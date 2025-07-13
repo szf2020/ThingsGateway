@@ -8,8 +8,6 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-using Microsoft.Extensions.Localization;
-
 namespace ThingsGateway.Gateway.Application;
 
 public static class ExportString

@@ -15,8 +15,6 @@ using Riok.Mapperly.Abstractions;
 using System.ComponentModel.DataAnnotations;
 
 using ThingsGateway.NewLife.Extension;
-using ThingsGateway.Razor;
-using ThingsGateway.SqlSugar;
 
 namespace ThingsGateway.Gateway.Application;
 

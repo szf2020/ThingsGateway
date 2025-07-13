@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 
 using ThingsGateway.Blazor.Diagrams.Core.Geometry;
+using ThingsGateway.Common.Extension;
 
 using TouchSocket.Core;
 

@@ -6,7 +6,6 @@ using System.ComponentModel.DataAnnotations;
 
 using ThingsGateway.Blazor.Diagrams.Core.Geometry;
 using ThingsGateway.Blazor.Diagrams.Core.Models;
-using ThingsGateway.SqlSugar;
 
 namespace ThingsGateway.Gateway.Application;
 

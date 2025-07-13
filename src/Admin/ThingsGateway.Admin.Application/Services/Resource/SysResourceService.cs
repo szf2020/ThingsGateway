@@ -8,12 +8,9 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-using BootstrapBlazor.Components;
-
 using Microsoft.Extensions.DependencyInjection;
 
 using ThingsGateway.FriendlyException;
-using ThingsGateway.SqlSugar;
 
 namespace ThingsGateway.Admin.Application;
 

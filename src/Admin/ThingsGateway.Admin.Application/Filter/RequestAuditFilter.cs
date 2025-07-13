@@ -79,7 +79,7 @@ public class RequestAuditFilter : IAsyncActionFilter, IOrderedFilter
 
         logData.TimeOperationElapsedMilliseconds = timeOperation.ElapsedMilliseconds;
 
-        var resultHttpContext = (resultContext as FilterContext).HttpContext;
+        var resultHttpContext = (resultContext as Microsoft.AspNetCore.Mvc.Filters.FilterContext).HttpContext;
 
         // 获取 HttpContext 和 HttpRequest 对象
         var httpContext = context.HttpContext;

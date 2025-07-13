@@ -19,6 +19,7 @@ using Opc.Ua;
 
 using System.Diagnostics.CodeAnalysis;
 
+using ThingsGateway.Common.Extension;
 using ThingsGateway.Extension;
 using ThingsGateway.Foundation.OpcUa;
 
@@ -26,6 +27,7 @@ using ThingsGateway.Foundation.OpcUa;
 
 using ThingsGateway.Gateway.Application;
 using ThingsGateway.Plugin.OpcUa;
+using ThingsGateway.DB;
 
 #endif
 
@@ -308,7 +310,7 @@ public partial class OpcUaImportVariable
                  {
                  }
 
-                 var id = Admin.Application.CommonUtils.GetSingleId();
+                 var id = CommonUtils.GetSingleId();
 
                  variables.Add(new Variable()
                  {
@@ -330,7 +332,7 @@ public partial class OpcUaImportVariable
 
     private Device GetImportDevice(long channelId)
     {
-        var id = Admin.Application.CommonUtils.GetSingleId();
+        var id = CommonUtils.GetSingleId();
         var data = new Device()
         {
             Name = Plc.OpcUaProperty.OpcUrl + "-" + id,
@@ -355,7 +357,7 @@ public partial class OpcUaImportVariable
 
     private Channel GetImportChannel()
     {
-        var id = Admin.Application.CommonUtils.GetSingleId();
+        var id = CommonUtils.GetSingleId();
         var data = new Channel()
         {
             Name = Plc.OpcUaProperty.OpcUrl + "-" + id,

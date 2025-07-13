@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.Extensions.Localization;
 
+using ThingsGateway.Common;
 using ThingsGateway.Foundation;
 using ThingsGateway.Foundation.SiemensS7;
 using ThingsGateway.Razor;

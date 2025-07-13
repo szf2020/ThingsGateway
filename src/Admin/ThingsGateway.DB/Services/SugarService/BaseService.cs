@@ -10,11 +10,7 @@
 
 using BootstrapBlazor.Components;
 
-using Microsoft.Extensions.Localization;
-
-using ThingsGateway.SqlSugar;
-
-namespace ThingsGateway.Admin.Application;
+namespace ThingsGateway.DB;
 
 /// <summary>
 /// 通用服务

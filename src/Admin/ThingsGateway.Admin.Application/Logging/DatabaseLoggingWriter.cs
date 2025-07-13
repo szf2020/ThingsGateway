@@ -15,8 +15,6 @@ using ThingsGateway.Extension;
 using ThingsGateway.FriendlyException;
 using ThingsGateway.Logging;
 using ThingsGateway.NewLife.Json.Extension;
-using ThingsGateway.Razor;
-using ThingsGateway.SqlSugar;
 
 namespace ThingsGateway.Admin.Application;
 

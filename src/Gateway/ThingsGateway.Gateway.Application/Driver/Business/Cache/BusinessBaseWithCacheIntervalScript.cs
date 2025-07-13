@@ -8,7 +8,6 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
 

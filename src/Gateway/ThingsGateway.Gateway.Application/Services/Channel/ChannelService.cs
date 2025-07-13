@@ -19,10 +19,11 @@ using System.Data;
 using System.Reflection;
 using System.Text;
 
+using ThingsGateway.Common.Extension;
+using ThingsGateway.Common.Extension.Generic;
 using ThingsGateway.Extension.Generic;
 using ThingsGateway.Foundation.Extension.Dynamic;
 using ThingsGateway.FriendlyException;
-using ThingsGateway.SqlSugar;
 
 using TouchSocket.Core;
 

@@ -14,6 +14,7 @@ using Microsoft.Extensions.Hosting;
 
 using System.Collections.Concurrent;
 
+using ThingsGateway.Common.Extension;
 using ThingsGateway.Gateway.Application.Extensions;
 using ThingsGateway.NewLife;
 using ThingsGateway.NewLife.Extension;
@@ -684,13 +685,12 @@ internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
         {
             try
             {
-                //检测设备线程假死
                 await Task.Delay(1000, cancellationToken).ConfigureAwait(false);
                 foreach (var kv in Drivers)
                 {
                     if (Disposed) return;
                     var deviceRuntime = kv.Value.CurrentDevice;
-                    if (GlobalData.IsRedundant(deviceRuntime.Id) && deviceRuntime.Driver != null && deviceRuntime.RedundantSwitchType == RedundantSwitchTypeEnum.Script)
+                    if (deviceRuntime != null && GlobalData.IsRedundant(deviceRuntime.Id) && deviceRuntime.Driver != null && deviceRuntime.RedundantSwitchType == RedundantSwitchTypeEnum.Script)
                     {
                         _ = Task.Run(async () =>
                         {

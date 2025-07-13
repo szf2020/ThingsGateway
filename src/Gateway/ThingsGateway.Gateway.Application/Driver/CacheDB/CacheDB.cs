@@ -9,7 +9,6 @@
 //------------------------------------------------------------------------------
 
 using ThingsGateway.NewLife;
-using ThingsGateway.SqlSugar;
 
 using TouchSocket.Core;
 

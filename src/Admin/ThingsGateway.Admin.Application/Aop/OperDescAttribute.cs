@@ -20,7 +20,6 @@ using System.Collections.Concurrent;
 using ThingsGateway.Extension;
 using ThingsGateway.FriendlyException;
 using ThingsGateway.NewLife.Json.Extension;
-using ThingsGateway.SqlSugar;
 
 namespace ThingsGateway.Admin.Application;
 

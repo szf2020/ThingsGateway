@@ -10,7 +10,7 @@
 
 using Microsoft.AspNetCore.Components.Forms;
 
-namespace ThingsGateway.Admin.Application;
+namespace ThingsGateway.DB;
 
 /// <inheritdoc/>
 [ThingsGateway.DependencyInjection.SuppressSniffer]

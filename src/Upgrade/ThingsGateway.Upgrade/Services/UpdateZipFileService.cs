@@ -2,7 +2,7 @@
 
 using System.Text;
 
-using ThingsGateway.Admin.Application;
+using ThingsGateway.DB;
 using ThingsGateway.NewLife.Extension;
 using ThingsGateway.NewLife.Json.Extension;
 

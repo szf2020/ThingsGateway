@@ -11,8 +11,6 @@
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 
-using System.Diagnostics.CodeAnalysis;
-
 namespace Microsoft.Extensions.DependencyInjection;
 
 /// <summary>

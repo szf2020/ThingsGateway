@@ -12,8 +12,6 @@ using BootstrapBlazor.Components;
 
 using Newtonsoft.Json;
 
-using ThingsGateway.SqlSugar;
-
 namespace ThingsGateway.Gateway.Application;
 
 /// <summary>

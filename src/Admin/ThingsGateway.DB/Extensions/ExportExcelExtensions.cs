@@ -18,7 +18,9 @@ using MiniExcelLibs.OpenXml;
 using System.Data;
 using System.Reflection;
 
-namespace ThingsGateway.Admin.Application;
+using ThingsGateway.Common.Extension;
+
+namespace ThingsGateway.DB;
 
 /// <summary>
 /// 导出excel扩展

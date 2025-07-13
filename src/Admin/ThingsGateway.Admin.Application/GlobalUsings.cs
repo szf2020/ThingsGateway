@@ -8,4 +8,15 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
+global using BootstrapBlazor.Components;
+
+global using Microsoft.Extensions.Localization;
+global using Microsoft.Extensions.Options;
+
+global using System.Diagnostics.CodeAnalysis;
+global using System.Globalization;
+
+global using ThingsGateway.Common;
+global using ThingsGateway.DB;
 global using ThingsGateway.NewLife.Extension;
+global using ThingsGateway.SqlSugar;

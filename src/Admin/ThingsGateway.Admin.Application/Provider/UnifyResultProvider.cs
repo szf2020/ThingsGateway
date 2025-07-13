@@ -11,11 +11,9 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.Extensions.Localization;
 
 using ThingsGateway.DataValidation;
 using ThingsGateway.FriendlyException;
-using ThingsGateway.Razor;
 using ThingsGateway.UnifyResult;
 
 namespace ThingsGateway.Admin.Application;

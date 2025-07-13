@@ -16,11 +16,11 @@ using Microsoft.Extensions.Localization;
 
 using System.Text;
 
+using ThingsGateway.Common;
 using ThingsGateway.Gateway.Razor;
 using ThingsGateway.Plugin.DB;
 using ThingsGateway.Plugin.SqlDB;
 using ThingsGateway.Plugin.TDengineDB;
-using ThingsGateway.Razor;
 using ThingsGateway.SqlSugar;
 
 using TouchSocket.Core;

@@ -12,8 +12,9 @@
 		<PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
 
 	</PropertyGroup>
-
-	<PropertyGroup Condition="'$(Configuration)' == 'Release'">
+	
+	<!--Condition="'$(Configuration)' == 'Release'"-->
+	<PropertyGroup>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 	</PropertyGroup>
 
