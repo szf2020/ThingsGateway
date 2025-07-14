@@ -12,6 +12,7 @@ using System.Reflection;
 
 using ThingsGateway.Common.Extension.Generic;
 using ThingsGateway.NewLife.Extension;
+using ThingsGateway.NewLife.Json.Extension;
 using ThingsGateway.NewLife.Reflection;
 
 namespace ThingsGateway.Gateway.Application;
@@ -92,7 +93,7 @@ public static class DynamicModelExtension
         // 获取动态对象集合的类型
         var type = value.GetType().GetGenericArguments().FirstOrDefault() ?? throw new ArgumentNullException(nameof(value));
 
-        var namesStr = Newtonsoft.Json.JsonConvert.SerializeObject(names);
+        var namesStr = names.ToSystemTextJsonString(false);
         // 构建缓存键，包括属性名和类型信息
         var cacheKey = $"{nameof(GetProperties)}-{namesStr}-{type.FullName}-{type.TypeHandle.Value}";
 
@@ -100,18 +101,19 @@ public static class DynamicModelExtension
         var result = App.CacheService.GetOrAdd(cacheKey, a =>
         {
             // 获取动态对象类型中指定名称的属性信息
-            var properties = type.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.GetProperty)
-                  .Where(pi => names.Contains(pi.Name)) // 筛选出指定属性名的属性信息
-                  .Where(pi => pi != null) // 过滤空属性信息
-                  .AsEnumerable();
+            var allProperties = type.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.GetProperty)
+                                           .ToDictionary(pi => pi.Name, pi => pi);
 
             // 检查是否找到了所有指定名称的属性，如果没有找到，则抛出异常
-            if (names.Length != properties.Count())
+            var properties = names.Select(name =>
             {
-                throw new InvalidOperationException($"Couldn't find properties on type：{type.Name}，{Environment.NewLine}names：{namesStr}");
-            }
+                if (!allProperties.TryGetValue(name, out var pi))
+                    throw new InvalidOperationException($"Couldn't find property '{name}' on type: {type.Name}");
 
-            return properties.ToArray(); // 返回属性信息集合
+                return pi;
+            }).ToArray();
+
+            return properties; // 返回属性信息集合
         }, 3600); // 缓存有效期为3600秒
 
         return result; // 返回属性信息集合
