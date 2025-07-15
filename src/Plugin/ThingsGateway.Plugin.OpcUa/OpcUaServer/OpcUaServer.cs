@@ -130,37 +130,42 @@ public partial class OpcUaServer : BusinessBase
     {
         ApplicationInstance.MessageDlg = null;
 
-        try
+        if (m_server != null)
         {
-
-
-            //https://github.com/OPCFoundation/UA-.NETStandard/pull/3113
-
-
-            var typeDict = m_server.MessageContext.Factory.GetValue("m_encodeableTypes") as Dictionary<ExpandedNodeId, Type>;
-            typeDict.Clear();
-            m_server.MessageContext.Factory.TryDispose();
-
-            typeof(EncodeableFactory).GetField("s_globalFactory", BindingFlags.NonPublic | BindingFlags.Static)?.SetValue(null, new EncodeableFactory());
-            typeof(ServiceMessageContext).GetField("s_globalContext", BindingFlags.NonPublic | BindingFlags.Static)?.SetValue(null, typeof(ServiceMessageContext).GetConstructor(BindingFlags.NonPublic | BindingFlags.Instance, null, new Type[] { typeof(bool) }, null).Invoke(new object[] { true }));
-
-
-            var listeners = m_server.GetValue("m_listeners") as List<ITransportListener>;
-            if (listeners != null)
+            try
             {
-                foreach (var item in listeners)
+
+
+                //https://github.com/OPCFoundation/UA-.NETStandard/pull/3113
+
+                if (m_server?.MessageContext?.Factory != null)
                 {
-                    if (item is TcpTransportListener transportListener)
+                    var typeDict = m_server.MessageContext.Factory.GetValue("m_encodeableTypes") as Dictionary<ExpandedNodeId, Type>;
+                    typeDict.Clear();
+                    m_server.MessageContext.Factory.TryDispose();
+                }
+
+                typeof(EncodeableFactory).GetField("s_globalFactory", BindingFlags.NonPublic | BindingFlags.Static)?.SetValue(null, new EncodeableFactory());
+                typeof(ServiceMessageContext).GetField("s_globalContext", BindingFlags.NonPublic | BindingFlags.Static)?.SetValue(null, typeof(ServiceMessageContext).GetConstructor(BindingFlags.NonPublic | BindingFlags.Instance, null, new Type[] { typeof(bool) }, null).Invoke(new object[] { true }));
+
+
+                var listeners = m_server.GetValue("m_listeners") as List<ITransportListener>;
+                if (listeners != null)
+                {
+                    foreach (var item in listeners)
                     {
-                        var timer = transportListener.GetValue("m_inactivityDetectionTimer") as IDisposable;
-                        timer?.Dispose();
+                        if (item is TcpTransportListener transportListener)
+                        {
+                            var timer = transportListener.GetValue("m_inactivityDetectionTimer") as IDisposable;
+                            timer?.Dispose();
+                        }
                     }
                 }
             }
-        }
-        catch
-        {
+            catch
+            {
 
+            }
         }
         m_server?.Stop();
         m_server?.NodeManager?.SafeDispose();

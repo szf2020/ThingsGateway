@@ -86,7 +86,6 @@ public partial class QuickActions
 
     protected override async Task InvokeInitAsync()
     {
-        await base.InvokeInitAsync();
         var autoRestartThread = await Module!.InvokeAsync<bool>("getAutoRestartThread");
         await OnAutoRestartThreadChanged(autoRestartThread);
     }

@@ -51,7 +51,6 @@ public partial class ChannelDeviceTree
     }
     protected override async Task InvokeInitAsync()
     {
-        await base.InvokeInitAsync();
         var showType = await Module!.InvokeAsync<ShowTypeEnum>("getShowType");
         await OnShowTypeChanged(showType);
     }

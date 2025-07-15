@@ -9,12 +9,7 @@
 	<PropertyGroup>
 		<TargetFrameworks>net8.0;net9.0;</TargetFrameworks>
 	</PropertyGroup>
-	
-	<ItemGroup>
-		<PackageReference Include="BootstrapBlazor.TableExport" Version="9.2.6" />
-		<PackageReference Include="Yitter.IdGenerator" Version="1.0.14" />
-		<PackageReference Include="BootstrapBlazor" Version="9.8.0" />
-	</ItemGroup>
+
 
 	<ItemGroup>
 		<None Include="..\README.md" Pack="true" PackagePath="\" />
