@@ -408,18 +408,26 @@ internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
         {
             ConcurrentList<VariableRuntime> saveVariableRuntimes = new();
             deviceIds.ParallelForEach((deviceId) =>
-           {
-               // 查找具有指定设备ID的驱动程序对象
-               if (Drivers.TryRemove(deviceId, out var driver))
-               {
-                   if (IsCollectChannel == true)
-                   {
-                       saveVariableRuntimes.AddRange(driver.IdVariableRuntimes.Where(a => a.Value.SaveValue && !a.Value.DynamicVariable).Select(a => a.Value));
-                   }
-               }
+            {
+                var now = DateTime.Now;
+                // 查找具有指定设备ID的驱动程序对象
+                if (Drivers.TryRemove(deviceId, out var driver))
+                {
+                    if (IsCollectChannel == true)
+                    {
+                        foreach (var a in driver.IdVariableRuntimes)
+                        {
+                            a.Value.SetValue(a.Value.Value, now, false);
+                            if (a.Value.SaveValue && !a.Value.DynamicVariable)
+                            {
+                                saveVariableRuntimes.Add(a.Value);
+                            }
+                        }
+                    }
+                }
 
 
-               if (DriverTasks.TryRemove(deviceId, out var task))
+                if (DriverTasks.TryRemove(deviceId, out var task))
                {
                    task.Stop();
                }
