@@ -104,6 +104,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorSetParametersAsyncGen
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ThingsGateway.Common", "Admin\ThingsGateway.Common\ThingsGateway.Common.csproj", "{28579DA6-6976-A674-9011-EA681BE9E1AF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ThingsGateway.RemoteWebApp", "ThingsGateway.RemoteWebApp\ThingsGateway.RemoteWebApp.csproj", "{EAEE6A03-D2E7-7283-0F7A-F15B6261EE96}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -278,6 +280,10 @@ Global
 		{28579DA6-6976-A674-9011-EA681BE9E1AF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{28579DA6-6976-A674-9011-EA681BE9E1AF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{28579DA6-6976-A674-9011-EA681BE9E1AF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EAEE6A03-D2E7-7283-0F7A-F15B6261EE96}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EAEE6A03-D2E7-7283-0F7A-F15B6261EE96}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EAEE6A03-D2E7-7283-0F7A-F15B6261EE96}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EAEE6A03-D2E7-7283-0F7A-F15B6261EE96}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -325,8 +331,8 @@ Global
 		{28579DA6-6976-A674-9011-EA681BE9E1AF} = {72C65578-92A5-4E99-9779-27835B12B32F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {199B1B96-4F56-4828-9531-813BA02DB282}
-		RESX_NeutralResourcesLanguage = zh-Hans
 		RESX_Rules = {"EnabledRules":[]}
+		RESX_NeutralResourcesLanguage = zh-Hans
+		SolutionGuid = {199B1B96-4F56-4828-9531-813BA02DB282}
 	EndGlobalSection
 EndGlobal
