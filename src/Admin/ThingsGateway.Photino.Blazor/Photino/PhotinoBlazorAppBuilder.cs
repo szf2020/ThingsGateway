@@ -51,7 +51,7 @@ namespace Photino.Blazor
             app.Initialize(sp, RootComponents);
             return app;
         }
-        public PhotinoBlazorApp Build(IServiceProvider serviceProvider = null)
+        public PhotinoBlazorApp Build(IServiceProvider serviceProvider)
         {
             // register root components with DI container
             // Services.AddSingleton(RootComponents);

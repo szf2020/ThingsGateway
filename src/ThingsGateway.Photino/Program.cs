@@ -103,12 +103,12 @@ internal sealed class Program
         var hybridApp = builder.Build(app.Services);
 
         hybridApp.MainWindow.ContextMenuEnabled = false;
-        hybridApp.MainWindow.DevToolsEnabled = true;
+        hybridApp.MainWindow.DevToolsEnabled = false;
         hybridApp.MainWindow.GrantBrowserPermissions = true;
         hybridApp.MainWindow.SetUseOsDefaultLocation(false);
         hybridApp.MainWindow.SetUseOsDefaultSize(false);
         hybridApp.MainWindow.SetSize(new System.Drawing.Size(1920, 1080));
-        hybridApp.MainWindow.SetTitle("ThingsGateway.Hybrid");
+        hybridApp.MainWindow.SetTitle("ThingsGateway.Photino");
         hybridApp.MainWindow.SetIconFile("favicon.ico");
 
         AppDomain.CurrentDomain.UnhandledException += (sender, error) =>

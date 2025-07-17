@@ -77,7 +77,7 @@ internal sealed class Program
         hybridApp.MainWindow.SetUseOsDefaultLocation(false);
         hybridApp.MainWindow.SetUseOsDefaultSize(false);
         hybridApp.MainWindow.SetSize(new System.Drawing.Size(1920, 1080));
-        hybridApp.MainWindow.SetTitle("ThingsGateway.Hybrid");
+        hybridApp.MainWindow.SetTitle("ThingsGateway.Debug.Photino");
         hybridApp.MainWindow.SetIconFile("favicon.ico");
 
 
