@@ -28,6 +28,8 @@ public partial class DeviceEditComponent
     [EditorRequired]
     public Device Model { get; set; }
 
+    [Parameter]
+    public bool AutoRestartThread { get; set; }
 
     [Parameter]
     public Func<Task> OnValidSubmit { get; set; }
@@ -86,7 +88,7 @@ public partial class DeviceEditComponent
         {
              {nameof(ChannelEditComponent.OnValidSubmit), async () =>
              {
-                await Task.Run(() =>GlobalData.ChannelRuntimeService.SaveChannelAsync(oneModel,ItemChangedType.Add));
+                await Task.Run(() =>GlobalData.ChannelRuntimeService.SaveChannelAsync(oneModel,ItemChangedType.Add,AutoRestartThread));
                  OnParametersSet();
             }},
             {nameof(ChannelEditComponent.Model),oneModel },

@@ -234,8 +234,8 @@ public partial class OpcDaImportVariable
                 await ToastService.Warning(OpcDaPropertyLocalizer["NoVariablesAvailable"], OpcDaPropertyLocalizer["NoVariablesAvailable"]);
                 return;
             }
-            await App.RootServices.GetRequiredService<IChannelRuntimeService>().SaveChannelAsync(data.Item1, ItemChangedType.Add);
-            await App.RootServices.GetRequiredService<IDeviceRuntimeService>().SaveDeviceAsync(data.Item2, ItemChangedType.Add);
+            await App.RootServices.GetRequiredService<IChannelRuntimeService>().SaveChannelAsync(data.Item1, ItemChangedType.Add, true);
+            await App.RootServices.GetRequiredService<IDeviceRuntimeService>().SaveDeviceAsync(data.Item2, ItemChangedType.Add, true);
             await App.RootServices.GetRequiredService<IVariableRuntimeService>().BatchSaveVariableAsync(data.Item3, ItemChangedType.Add, true, default);
             await ToastService.Default();
         }

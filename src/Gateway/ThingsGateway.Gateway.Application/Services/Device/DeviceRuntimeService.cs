@@ -30,7 +30,7 @@ public class DeviceRuntimeService : IDeviceRuntimeService
     private WaitLock WaitLock { get; set; } = new WaitLock();
 
 
-    public async Task<bool> CopyAsync(Dictionary<Device, List<Variable>> devices, CancellationToken cancellationToken)
+    public async Task<bool> CopyAsync(Dictionary<Device, List<Variable>> devices, bool restart, CancellationToken cancellationToken)
     {
         try
         {
@@ -45,7 +45,7 @@ public class DeviceRuntimeService : IDeviceRuntimeService
 
 
             //根据条件重启通道线程
-            //if (restart)
+            if (restart)
             {
                 await RuntimeServiceHelper.RestartDeviceAsync(newDeviceRuntimes).ConfigureAwait(false);
                 await RuntimeServiceHelper.ChangedDriverAsync(_logger, cancellationToken).ConfigureAwait(false);
@@ -60,7 +60,7 @@ public class DeviceRuntimeService : IDeviceRuntimeService
         }
     }
 
-    public async Task<bool> BatchEditAsync(IEnumerable<Device> models, Device oldModel, Device model)
+    public async Task<bool> BatchEditAsync(IEnumerable<Device> models, Device oldModel, Device model, bool restart = true)
     {
         try
         {
@@ -71,7 +71,7 @@ public class DeviceRuntimeService : IDeviceRuntimeService
 
             var newDeviceRuntimes = await RuntimeServiceHelper.GetNewDeviceRuntimesAsync(deviceids).ConfigureAwait(false);
 
-            //if (restart)
+            if (restart)
             {
                 var newDeciceIds = newDeviceRuntimes.Select(a => a.Id).ToHashSet();
 
@@ -82,7 +82,7 @@ public class DeviceRuntimeService : IDeviceRuntimeService
 
             //根据条件重启通道线程
 
-            //if (restart)
+            if (restart)
             {
                 await RuntimeServiceHelper.RestartDeviceAsync(newDeviceRuntimes).ConfigureAwait(false);
             }
@@ -95,7 +95,7 @@ public class DeviceRuntimeService : IDeviceRuntimeService
         }
     }
 
-    public async Task<bool> DeleteDeviceAsync(IEnumerable<long> ids, CancellationToken cancellationToken)
+    public async Task<bool> DeleteDeviceAsync(IEnumerable<long> ids, bool restart, CancellationToken cancellationToken)
     {
         try
         {
@@ -111,7 +111,7 @@ public class DeviceRuntimeService : IDeviceRuntimeService
 
             ConcurrentHashSet<IDriver> changedDriver = RuntimeServiceHelper.DeleteDeviceRuntime(deviceRuntimes);
 
-            //if (restart)
+            if (restart)
             {
                 await RuntimeServiceHelper.RemoveDeviceAsync(deviceRuntimes).ConfigureAwait(false);
 
@@ -136,7 +136,7 @@ public class DeviceRuntimeService : IDeviceRuntimeService
           GlobalData.DeviceService.ExportMemoryStream(data, channelName, plugin);
 
 
-    public async Task ImportDeviceAsync(Dictionary<string, ImportPreviewOutputBase> input)
+    public async Task ImportDeviceAsync(Dictionary<string, ImportPreviewOutputBase> input, bool restart = true)
     {
         try
         {
@@ -146,7 +146,7 @@ public class DeviceRuntimeService : IDeviceRuntimeService
 
             var newDeviceRuntimes = await RuntimeServiceHelper.GetNewDeviceRuntimesAsync(deviceids).ConfigureAwait(false);
 
-            //if (restart)
+            if (restart)
             {
 
                 var newDeciceIds = newDeviceRuntimes.Select(a => a.Id).ToHashSet();
@@ -158,7 +158,7 @@ public class DeviceRuntimeService : IDeviceRuntimeService
             RuntimeServiceHelper.Init(newDeviceRuntimes);
 
             //根据条件重启通道线程
-            //if (restart)
+            if (restart)
             {
 
                 await RuntimeServiceHelper.RestartDeviceAsync(newDeviceRuntimes).ConfigureAwait(false);
@@ -174,7 +174,7 @@ public class DeviceRuntimeService : IDeviceRuntimeService
 
     }
 
-    public async Task<bool> SaveDeviceAsync(Device input, ItemChangedType type)
+    public async Task<bool> SaveDeviceAsync(Device input, ItemChangedType type, bool restart = true)
     {
         try
         {
@@ -190,7 +190,7 @@ public class DeviceRuntimeService : IDeviceRuntimeService
             RuntimeServiceHelper.Init(newDeviceRuntimes);
 
 
-            //if (restart)
+            if (restart)
             {
                 //根据条件重启通道线程
                 await RuntimeServiceHelper.RestartDeviceAsync(newDeviceRuntimes).ConfigureAwait(false);
@@ -205,7 +205,7 @@ public class DeviceRuntimeService : IDeviceRuntimeService
     }
 
 
-    public async Task<bool> BatchSaveDeviceAsync(List<Device> input, ItemChangedType type)
+    public async Task<bool> BatchSaveDeviceAsync(List<Device> input, ItemChangedType type, bool restart)
     {
 
         try
@@ -219,7 +219,7 @@ public class DeviceRuntimeService : IDeviceRuntimeService
 
             RuntimeServiceHelper.Init(newDeviceRuntimes);
 
-            //if (restart)
+            if (restart)
             {
                 //根据条件重启通道线程
                 await RuntimeServiceHelper.RestartDeviceAsync(newDeviceRuntimes).ConfigureAwait(false);

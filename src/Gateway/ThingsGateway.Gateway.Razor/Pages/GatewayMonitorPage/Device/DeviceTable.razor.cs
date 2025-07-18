@@ -133,7 +133,7 @@ public partial class DeviceTable : IDisposable
              {nameof(DeviceCopyComponent.OnSave), async (Dictionary<Device,List<Variable>> devices) =>
             {
 
-                await Task.Run(() =>GlobalData.DeviceRuntimeService.CopyAsync(devices, default));
+                await Task.Run(() =>GlobalData.DeviceRuntimeService.CopyAsync(devices,AutoRestartThread, default));
                     await InvokeAsync(table.QueryAsync);
 
             }},
@@ -173,7 +173,7 @@ public partial class DeviceTable : IDisposable
         {
              {nameof(DeviceEditComponent.OnValidSubmit), async () =>
             {
-                await Task.Run(() => GlobalData.DeviceRuntimeService.BatchEditAsync(changedModels, oldModel, oneModel));
+                await Task.Run(() => GlobalData.DeviceRuntimeService.BatchEditAsync(changedModels, oldModel, oneModel,AutoRestartThread));
 
                    await InvokeAsync(table.QueryAsync);
 
@@ -196,7 +196,7 @@ public partial class DeviceTable : IDisposable
         {
             return await Task.Run(async () =>
             {
-                return await GlobalData.DeviceRuntimeService.DeleteDeviceAsync(devices.Select(a => a.Id), default);
+                return await GlobalData.DeviceRuntimeService.DeleteDeviceAsync(devices.Select(a => a.Id), AutoRestartThread, default);
             });
         }
         catch (Exception ex)
@@ -215,7 +215,7 @@ public partial class DeviceTable : IDisposable
         {
             device.DevicePropertys = PluginServiceUtil.SetDict(device.ModelValueValidateForm.Value);
             device = device.AdaptDevice();
-            return await Task.Run(() => GlobalData.DeviceRuntimeService.SaveDeviceAsync(device, itemChangedType));
+            return await Task.Run(() => GlobalData.DeviceRuntimeService.SaveDeviceAsync(device, itemChangedType, AutoRestartThread));
         }
         catch (Exception ex)
         {
@@ -305,7 +305,7 @@ public partial class DeviceTable : IDisposable
                 await Task.Run(async ()=>
                 {
               var importData=await  DeviceServiceHelpers.ImportAsync(data);
-                await    GlobalData.DeviceRuntimeService.ImportDeviceAsync(importData);
+                await    GlobalData.DeviceRuntimeService.ImportDeviceAsync(importData,AutoRestartThread);
                 })
                     ;
     }
@@ -347,7 +347,7 @@ finally
         };
 
         Func<IBrowserFile, Task<Dictionary<string, ImportPreviewOutputBase>>> preview = (a => GlobalData.DeviceRuntimeService.PreviewAsync(a));
-        Func<Dictionary<string, ImportPreviewOutputBase>, Task> import = (value => GlobalData.DeviceRuntimeService.ImportDeviceAsync(value));
+        Func<Dictionary<string, ImportPreviewOutputBase>, Task> import = (value => GlobalData.DeviceRuntimeService.ImportDeviceAsync(value, AutoRestartThread));
         op.Component = BootstrapDynamicComponent.CreateComponent<ImportExcel>(new Dictionary<string, object?>
         {
              {nameof(ImportExcel.Import),import },
@@ -368,7 +368,7 @@ finally
             await Task.Run(async () =>
             {
 
-                await GlobalData.DeviceRuntimeService.DeleteDeviceAsync(Items.Select(a => a.Id), default);
+                await GlobalData.DeviceRuntimeService.DeleteDeviceAsync(Items.Select(a => a.Id), AutoRestartThread, default);
                 await InvokeAsync(async () =>
                 {
                     await ToastService.Default();
@@ -387,7 +387,8 @@ finally
     }
     #endregion
 
-
+    [Parameter]
+    public bool AutoRestartThread { get; set; }
     [Parameter]
     public ChannelDeviceTreeItem SelectModel { get; set; }
     [Inject]

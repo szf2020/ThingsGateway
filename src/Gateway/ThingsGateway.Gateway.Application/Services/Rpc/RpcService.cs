@@ -130,10 +130,9 @@ internal sealed class RpcService : IRpcService
         {
             try
             {
-                var start = DateTime.Now;
                 // 调用设备的写入方法
                 var result = await driverData.Key.InVokeWriteAsync(driverData.Value, cancellationToken).ConfigureAwait(false);
-                var end = DateTime.Now;
+
                 // 写入日志
                 foreach (var resultItem in result)
                 {
@@ -150,8 +149,7 @@ internal sealed class RpcService : IRpcService
                             _logQueues.Enqueue(
                                 new RpcLog()
                                 {
-                                    LogTime = start,
-                                    ExecutionTime = (int)(end - start).TotalMilliseconds,
+                                    LogTime = DateTime.Now,
                                     OperateMessage = variableResult.Value.IsSuccess ? null : variableResult.Value.ToString(),
                                     IsSuccess = variableResult.Value.IsSuccess,
                                     OperateMethod = AppResource.WriteVariable,
@@ -192,12 +190,10 @@ internal sealed class RpcService : IRpcService
         {
             try
             {
-                var start = DateTime.Now;
                 // 调用设备的写入方法
                 var result = await driverData.Key.InvokeMethodAsync(driverData.Value, cancellationToken).ConfigureAwait(false);
 
                 Dictionary<string, string> operateMethods = driverData.Value.Select(a => a.Key).ToDictionary(a => a.Name, a => a.OtherMethod!);
-                var end = DateTime.Now;
 
                 // 写入日志
                 foreach (var resultItem in result)
@@ -214,8 +210,7 @@ internal sealed class RpcService : IRpcService
                             _logQueues.Enqueue(
                                 new RpcLog()
                                 {
-                                    LogTime = start,
-                                    ExecutionTime = (int)(end - start).TotalMilliseconds,
+                                    LogTime = DateTime.Now,
                                     OperateMessage = variableResult.Value.IsSuccess ? null : variableResult.Value.ToString(),
                                     IsSuccess = variableResult.Value.IsSuccess,
                                     OperateMethod = operateMethods[variableResult.Key],

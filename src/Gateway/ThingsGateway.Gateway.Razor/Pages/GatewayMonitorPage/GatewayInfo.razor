@@ -22,10 +22,10 @@ else if (ShowType == ShowTypeEnum.LogInfo)
 }
 else if (ShowType == ShowTypeEnum.ChannelTable)
 {
-    <ChannelTable SelectModel="SelectModel" Items="ChannelRuntimes"/>
+    <ChannelTable SelectModel="SelectModel" Items="ChannelRuntimes" AutoRestartThread=AutoRestartThread />
 }
 
 else if (ShowType == ShowTypeEnum.DeviceTable)
 {
-    <DeviceTable SelectModel="SelectModel" Items="DeviceRuntimes"/>
+    <DeviceTable SelectModel="SelectModel" Items="DeviceRuntimes" AutoRestartThread=AutoRestartThread />
 }

@@ -214,10 +214,11 @@ public partial class VariableEditComponent
         {
              {nameof(DeviceEditComponent.OnValidSubmit), async () =>
              {
-                await Task.Run(() =>GlobalData.DeviceRuntimeService.SaveDeviceAsync(oneModel,ItemChangedType.Add));
+                await Task.Run(() =>GlobalData.DeviceRuntimeService.SaveDeviceAsync(oneModel,ItemChangedType.Add,AutoRestartThread));
                  OnParametersSet();
             }},
             {nameof(DeviceEditComponent.Model),oneModel },
+            {nameof(DeviceEditComponent.AutoRestartThread),AutoRestartThread },
             {nameof(DeviceEditComponent.ValidateEnable),true },
             {nameof(DeviceEditComponent.BatchEditEnable),false },
         });

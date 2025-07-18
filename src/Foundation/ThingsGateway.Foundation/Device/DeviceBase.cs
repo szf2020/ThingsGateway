@@ -350,9 +350,6 @@ public abstract class DeviceBase : DisposableObject, IDevice
             if (SendDelayTime != 0)
                 await Task.Delay(SendDelayTime, token).ConfigureAwait(false);
 
-            if (token.IsCancellationRequested)
-                return new OperResult(new OperationCanceledException());
-
             if (channel is IDtuUdpSessionChannel udpSession)
             {
                 await udpSession.SendAsync(endPoint, sendMessage).ConfigureAwait(false);
@@ -560,9 +557,6 @@ public abstract class DeviceBase : DisposableObject, IDevice
             if (clientChannel.ReadOnlyDataHandlingAdapter != null)
                 clientChannel.ReadOnlyDataHandlingAdapter.Logger = Logger;
 
-            if (cancellationToken.IsCancellationRequested)
-                return new MessageBase(new OperationCanceledException());
-
             waitData.SetCancellationToken(cancellationToken);
 
             Channel.ChannelReceivedWaitDict.TryAdd(sign, ChannelReceived);
@@ -571,14 +565,6 @@ public abstract class DeviceBase : DisposableObject, IDevice
                 throw sendOperResult.Exception ?? new(sendOperResult.ErrorMessage ?? "unknown error");
 
             await waitData.WaitAsync(timeout).ConfigureAwait(false);
-
-            if (cancellationToken.IsCancellationRequested)
-            {
-                if (!this.DisposedValue)
-                {
-                    await Task.Delay(timeout, CancellationToken.None).ConfigureAwait(false);
-                }
-            }
 
             var result = waitData.Check();
             if (result.IsSuccess)

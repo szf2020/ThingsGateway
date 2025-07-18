@@ -25,12 +25,7 @@ public class RpcLog : PrimaryIdEntity
     [SugarColumn(ColumnDescription = "日志时间", IsNullable = false)]
     [AutoGenerateColumn(Visible = true, DefaultSort = true, Sortable = true, DefaultSortOrder = SortOrder.Desc)]
     public DateTime LogTime { get; set; }
-    /// <summary>
-    /// 执行时间
-    /// </summary>
-    [SugarColumn(ColumnDescription = "执行时间", IsNullable = true)]
-    [AutoGenerateColumn(Visible = true, DefaultSort = true, Sortable = true, DefaultSortOrder = SortOrder.Desc)]
-    public int ExecutionTime { get; set; }
+
     /// <summary>
     /// 操作源
     ///</summary>

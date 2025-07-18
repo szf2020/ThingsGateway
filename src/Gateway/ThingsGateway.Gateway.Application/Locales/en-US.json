@@ -404,7 +404,6 @@
     "OperateMethod": "RPCMethod",
     "OperateObject": "OperationObject",
     "OperateSource": "OperationSource",
-    "ExecutionTime": "ExecutionTime",
     "ParamJson": "RequestParameters",
     "ResultJson": "ReturnResults"
   },

@@ -148,9 +148,9 @@ public class ControlController : ControllerBase
     /// </summary>
     [HttpPost("batchSaveChannel")]
     [DisplayName("保存通道")]
-    public Task<bool> BatchSaveChannelAsync([FromBody] List<ChannelInput> channels, ItemChangedType type)
+    public Task<bool> BatchSaveChannelAsync([FromBody] List<ChannelInput> channels, ItemChangedType type, bool restart)
     {
-        return GlobalData.ChannelRuntimeService.BatchSaveChannelAsync(channels.AdaptListChannel(), type);
+        return GlobalData.ChannelRuntimeService.BatchSaveChannelAsync(channels.AdaptListChannel(), type, restart);
     }
 
     /// <summary>
@@ -158,9 +158,9 @@ public class ControlController : ControllerBase
     /// </summary>
     [HttpPost("batchSaveDevice")]
     [DisplayName("保存设备")]
-    public Task<bool> BatchSaveDeviceAsync([FromBody] List<DeviceInput> devices, ItemChangedType type)
+    public Task<bool> BatchSaveDeviceAsync([FromBody] List<DeviceInput> devices, ItemChangedType type, bool restart)
     {
-        return GlobalData.DeviceRuntimeService.BatchSaveDeviceAsync(devices.AdaptListDevice(), type);
+        return GlobalData.DeviceRuntimeService.BatchSaveDeviceAsync(devices.AdaptListDevice(), type, restart);
     }
 
     /// <summary>
@@ -178,10 +178,10 @@ public class ControlController : ControllerBase
     /// </summary>
     [HttpPost("deleteChannel")]
     [DisplayName("删除通道")]
-    public Task<bool> DeleteChannelAsync([FromBody] List<long> ids)
+    public Task<bool> DeleteChannelAsync([FromBody] List<long> ids, bool restart)
     {
         if (ids == null || ids.Count == 0) ids = GlobalData.IdChannels.Keys.ToList();
-        return GlobalData.ChannelRuntimeService.DeleteChannelAsync(ids, default);
+        return GlobalData.ChannelRuntimeService.DeleteChannelAsync(ids, restart, default);
     }
 
 
@@ -190,10 +190,10 @@ public class ControlController : ControllerBase
     /// </summary>
     [HttpPost("deleteDevice")]
     [DisplayName("删除设备")]
-    public Task<bool> DeleteDeviceAsync([FromBody] List<long> ids)
+    public Task<bool> DeleteDeviceAsync([FromBody] List<long> ids, bool restart)
     {
         if (ids == null || ids.Count == 0) ids = GlobalData.IdDevices.Keys.ToList();
-        return GlobalData.DeviceRuntimeService.DeleteDeviceAsync(ids, default);
+        return GlobalData.DeviceRuntimeService.DeleteDeviceAsync(ids, restart, default);
     }
 
     /// <summary>
