@@ -17,6 +17,7 @@ using System.Diagnostics;
 using System.Net;
 
 using ThingsGateway.HttpRemote.Extensions;
+using ThingsGateway.NewLife.Log;
 using ThingsGateway.Utilities;
 
 namespace ThingsGateway.HttpRemote;
@@ -254,7 +255,7 @@ public sealed class ProfilerDelegatingHandler(ILogger<Logging> logger, IOptions<
         }
         else
         {
-            Console.WriteLine(message);
+            XTrace.WriteLine(message);
         }
     }
 

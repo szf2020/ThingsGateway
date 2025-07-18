@@ -40,7 +40,7 @@ internal sealed class PluginService : IPluginService
     private const string DelEx = ".del";
 
     private readonly IDispatchService<PluginInfo> _dispatchService;
-    private readonly WaitLock _locker = new();
+    private readonly WaitLock _locker = new(nameof(PluginService));
     private readonly ILogger _logger;
 
     public PluginService(ILogger<PluginService> logger, IDispatchService<PluginInfo> dispatchService)

@@ -199,7 +199,7 @@ internal sealed class RedundancyTask : IRpcDriver, IAsyncDisposable
     }
 
 
-    private WaitLock _switchLock = new();
+    private WaitLock _switchLock = new(nameof(RedundancyTask));
 
 
 
@@ -424,7 +424,7 @@ internal sealed class RedundancyTask : IRpcDriver, IAsyncDisposable
 
     #region ForcedSync
 
-    WaitLock ForcedSyncWaitLock = new WaitLock();
+    WaitLock ForcedSyncWaitLock = new WaitLock(nameof(RedundancyTask));
     public async Task ForcedSync(CancellationToken cancellationToken = default)
     {
         await ForcedSyncWaitLock.WaitAsync(cancellationToken).ConfigureAwait(false);

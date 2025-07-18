@@ -19,7 +19,7 @@ namespace ThingsGateway.Foundation;
 /// </summary>
 public class UdpSessionChannel : UdpSession, IClientChannel
 {
-    private readonly WaitLock _connectLock = new WaitLock();
+    private readonly WaitLock _connectLock = new WaitLock(nameof(UdpSessionChannel));
 
     /// <inheritdoc/>
     public UdpSessionChannel(IChannelOptions channelOptions)

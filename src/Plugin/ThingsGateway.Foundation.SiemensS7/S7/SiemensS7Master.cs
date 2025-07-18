@@ -377,7 +377,7 @@ public partial class SiemensS7Master : DeviceBase
     #endregion 读写
 
     #region 初始握手
-    private WaitLock ChannelStartedWaitLock = new();
+    private WaitLock ChannelStartedWaitLock = new(nameof(SiemensS7Master));
     private SiemensTypeEnum siemensS7Type;
 
     /// <inheritdoc/>

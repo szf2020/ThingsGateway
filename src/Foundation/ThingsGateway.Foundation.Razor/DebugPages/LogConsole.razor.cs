@@ -84,7 +84,7 @@ public partial class LogConsole : IDisposable
         Disposed = true;
         GC.SuppressFinalize(this);
     }
-    private WaitLock WaitLock = new();
+    private WaitLock WaitLock = new(nameof(LogConsole));
     protected async Task ExecuteAsync()
     {
         if (WaitLock.Waited) return;

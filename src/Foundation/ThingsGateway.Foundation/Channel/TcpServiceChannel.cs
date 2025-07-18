@@ -61,7 +61,7 @@ public abstract class TcpServiceChannelBase<TClient> : TcpService<TClient>, ITcp
         }
     }
 
-    private readonly WaitLock _connectLock = new WaitLock();
+    private readonly WaitLock _connectLock = new WaitLock(nameof(TcpServiceChannelBase<TClient>));
     /// <inheritdoc/>
     public override async Task StartAsync()
     {
@@ -280,7 +280,7 @@ public class TcpServiceChannel<TClient> : TcpServiceChannelBase<TClient>, IChann
     {
         client.ChannelOptions = ChannelOptions;
 
-        client.WaitLock = new NewLife.WaitLock(ChannelOptions.WaitLock.MaxCount);
+        client.WaitLock = new NewLife.WaitLock(nameof(TcpServiceChannelBase<TClient>), ChannelOptions.WaitLock.MaxCount);
 
 
         base.ClientInitialized(client);

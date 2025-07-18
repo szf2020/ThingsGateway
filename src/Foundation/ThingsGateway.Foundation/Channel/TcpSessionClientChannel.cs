@@ -60,7 +60,7 @@ public class TcpSessionClientChannel : TcpSessionClient, IClientChannel
     public WaitHandlePool<MessageBase> WaitHandlePool { get; private set; } = new();
 
     /// <inheritdoc/>
-    public WaitLock WaitLock { get; internal set; } = new();
+    public WaitLock WaitLock { get; internal set; } = new(nameof(TcpSessionClientChannel));
     public virtual WaitLock GetLock(string key) => WaitLock;
 
     /// <inheritdoc/>

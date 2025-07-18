@@ -35,7 +35,7 @@ public partial class MqttCollect : CollectBase
 
     private MqttClientSubscribeOptions _mqttSubscribeOptions;
 
-    private WaitLock ConnectLock = new();
+    private WaitLock ConnectLock = new(nameof(MqttCollect));
 
 
     #region mqtt方法

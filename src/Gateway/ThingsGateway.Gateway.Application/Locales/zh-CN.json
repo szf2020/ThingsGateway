@@ -405,6 +405,7 @@
     "OperateMethod": "RPC方法",
     "OperateObject": "操作对象",
     "OperateSource": "操作源",
+    "ExecutionTime": "执行时间",
     "ParamJson": "请求参数",
     "ResultJson": "返回结果"
   },

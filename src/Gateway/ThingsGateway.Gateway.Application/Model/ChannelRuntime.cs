@@ -49,7 +49,7 @@ public class ChannelRuntime : Channel, IChannelOptions, IDisposable
     [Newtonsoft.Json.JsonIgnore]
     [MapperIgnore]
     [AutoGenerateColumn(Ignore = true)]
-    public WaitLock WaitLock { get; private set; } = new WaitLock();
+    public WaitLock WaitLock { get; private set; } = new WaitLock(nameof(ChannelRuntime));
 
     /// <inheritdoc/>
     [MinValue(1)]
@@ -68,7 +68,7 @@ public class ChannelRuntime : Channel, IChannelOptions, IDisposable
                 if (WaitLock?.MaxCount != MaxConcurrentCount)
                 {
                     var _lock = WaitLock;
-                    WaitLock = new WaitLock(_maxConcurrentCount);
+                    WaitLock = new WaitLock(nameof(ChannelRuntime), _maxConcurrentCount);
                     _lock?.SafeDispose();
                 }
             }

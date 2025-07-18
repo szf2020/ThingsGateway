@@ -52,7 +52,7 @@ internal sealed class RulesEngineHostedService : BackgroundService, IRulesEngine
     /// <summary>
     /// 重启锁
     /// </summary>
-    private WaitLock RestartLock { get; } = new();
+    private WaitLock RestartLock { get; } = new(nameof(RulesEngineHostedService));
     private List<Rules> Rules { get; set; } = new();
     public Dictionary<RulesLog, Diagram> Diagrams { get; private set; } = new();
 

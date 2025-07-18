@@ -16,14 +16,16 @@ namespace ThingsGateway.NewLife;
 public sealed class WaitLock : IDisposable
 {
     private readonly SemaphoreSlim _waiterLock;
-
+    private readonly string _name;
     /// <summary>
     /// 构造方法
     /// </summary>
+    /// <param name="name">名称</param>
     /// <param name="maxCount">最大并发数</param>
     /// <param name="initialZeroState">初始无信号量</param>
-    public WaitLock(int maxCount = 1, bool initialZeroState = false)
+    public WaitLock(string name, int maxCount = 1, bool initialZeroState = false)
     {
+        _name = name;
         if (initialZeroState)
             _waiterLock = new SemaphoreSlim(0, maxCount);
         else
@@ -48,19 +50,27 @@ public sealed class WaitLock : IDisposable
     public int CurrentCount => _waiterLock.CurrentCount;
     public bool Waitting => _waiterLock.CurrentCount < MaxCount;
 
+    private object m_lockObj = new();
     /// <summary>
     /// 离开锁
     /// </summary>
     public void Release()
     {
         if (DisposedValue) return;
-        try
+        lock (m_lockObj)
         {
-            _waiterLock.Release();
+            if (Waitting)
+            {
+                try
+                {
+                    _waiterLock.Release();
+                }
+                catch (SemaphoreFullException)
+                {
+                }
+            }
         }
-        catch (SemaphoreFullException)
-        {
-        }
+
     }
 
     /// <summary>

@@ -350,6 +350,9 @@ public abstract class DeviceBase : DisposableObject, IDevice
             if (SendDelayTime != 0)
                 await Task.Delay(SendDelayTime, token).ConfigureAwait(false);
 
+            if (token.IsCancellationRequested)
+                return new OperResult(new OperationCanceledException());
+
             if (channel is IDtuUdpSessionChannel udpSession)
             {
                 await udpSession.SendAsync(endPoint, sendMessage).ConfigureAwait(false);
@@ -386,7 +389,7 @@ public abstract class DeviceBase : DisposableObject, IDevice
 
     }
 
-    private WaitLock connectWaitLock = new();
+    private WaitLock connectWaitLock = new(nameof(DeviceBase));
 
     public async Task ConnectAsync(CancellationToken token)
     {
@@ -418,9 +421,7 @@ public abstract class DeviceBase : DisposableObject, IDevice
             var dtuId = this is IDtu dtu1 ? dtu1.DtuId : null;
             var channelResult = GetChannel(dtuId);
             if (!channelResult.IsSuccess) return new OperResult<byte[]>(channelResult);
-            WaitLock? waitLock = null;
-            EndPoint? endPoint = GetUdpEndpoint(dtuId);
-            waitLock = GetWaitLock(channelResult.Content, waitLock, dtuId);
+            WaitLock? waitLock = GetWaitLock(channelResult.Content, dtuId);
 
             try
             {
@@ -430,6 +431,8 @@ public abstract class DeviceBase : DisposableObject, IDevice
                 await waitLock.WaitAsync(cancellationToken).ConfigureAwait(false);
                 if (channelResult.Content.ReadOnlyDataHandlingAdapter != null)
                     channelResult.Content.ReadOnlyDataHandlingAdapter.Logger = Logger;
+
+                EndPoint? endPoint = GetUdpEndpoint(dtuId);
 
                 return await SendAsync(sendMessage, channelResult.Content, endPoint, cancellationToken).ConfigureAwait(false);
             }
@@ -545,24 +548,36 @@ public abstract class DeviceBase : DisposableObject, IDevice
         var waitData = clientChannel.WaitHandlePool.GetWaitDataAsync(out var sign);
         command.Sign = sign;
         WaitLock? waitLock = null;
-        var dtuId = this is IDtu dtu1 ? dtu1.DtuId : null;
-        EndPoint? endPoint = GetUdpEndpoint(dtuId);
         try
         {
-            waitLock = GetWaitLock(clientChannel, waitLock, dtuId);
+
+            var dtuId = this is IDtu dtu1 ? dtu1.DtuId : null;
+            waitLock = GetWaitLock(clientChannel, dtuId);
 
             await BefortSendAsync(clientChannel, cancellationToken).ConfigureAwait(false);
 
             await waitLock.WaitAsync(cancellationToken).ConfigureAwait(false);
+
+
+            EndPoint? endPoint = GetUdpEndpoint(dtuId);
+
+            if (cancellationToken.IsCancellationRequested)
+                return new MessageBase(new OperationCanceledException());
+
             if (clientChannel.ReadOnlyDataHandlingAdapter != null)
                 clientChannel.ReadOnlyDataHandlingAdapter.Logger = Logger;
 
-            waitData.SetCancellationToken(cancellationToken);
 
             Channel.ChannelReceivedWaitDict.TryAdd(sign, ChannelReceived);
+
+            if (cancellationToken.IsCancellationRequested)
+                return new MessageBase(new OperationCanceledException());
+
             var sendOperResult = await SendAsync(command, clientChannel, endPoint, cancellationToken).ConfigureAwait(false);
             if (!sendOperResult.IsSuccess)
                 throw sendOperResult.Exception ?? new(sendOperResult.ErrorMessage ?? "unknown error");
+
+            waitData.SetCancellationToken(cancellationToken);
 
             await waitData.WaitAsync(timeout).ConfigureAwait(false);
 
@@ -573,20 +588,39 @@ public abstract class DeviceBase : DisposableObject, IDevice
             }
             else
             {
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    if (!this.DisposedValue)
+                    {
+                        await Task.Delay(timeout, CancellationToken.None).ConfigureAwait(false);
+                    }
+                }
                 return new MessageBase(result);
             }
 
         }
+        catch (Exception ex)
+        {
+            if (cancellationToken.IsCancellationRequested)
+            {
+                if (!this.DisposedValue)
+                {
+                    await Task.Delay(timeout, CancellationToken.None).ConfigureAwait(false);
+                }
+            }
+            return new MessageBase(ex);
+        }
         finally
         {
-            waitLock.Release();
-            clientChannel.WaitHandlePool.Destroy(sign);
             Channel.ChannelReceivedWaitDict.TryRemove(sign, out _);
+            waitLock?.Release();
+            clientChannel.WaitHandlePool.Destroy(sign);
         }
     }
 
-    private static WaitLock GetWaitLock(IClientChannel clientChannel, WaitLock? waitLock, string dtuId)
+    private static WaitLock GetWaitLock(IClientChannel clientChannel, string dtuId)
     {
+        WaitLock? waitLock = null;
         if (clientChannel is IDtuUdpSessionChannel udpSessionChannel)
         {
             waitLock = udpSessionChannel.GetLock(dtuId);

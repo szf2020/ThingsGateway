@@ -27,7 +27,7 @@ public class DeviceRuntimeService : IDeviceRuntimeService
         _logger = logger;
     }
 
-    private WaitLock WaitLock { get; set; } = new WaitLock();
+    private WaitLock WaitLock { get; set; } = new WaitLock(nameof(DeviceRuntimeService));
 
 
     public async Task<bool> CopyAsync(Dictionary<Device, List<Variable>> devices, bool restart, CancellationToken cancellationToken)
@@ -60,7 +60,7 @@ public class DeviceRuntimeService : IDeviceRuntimeService
         }
     }
 
-    public async Task<bool> BatchEditAsync(IEnumerable<Device> models, Device oldModel, Device model, bool restart = true)
+    public async Task<bool> BatchEditAsync(IEnumerable<Device> models, Device oldModel, Device model, bool restart)
     {
         try
         {
@@ -136,7 +136,7 @@ public class DeviceRuntimeService : IDeviceRuntimeService
           GlobalData.DeviceService.ExportMemoryStream(data, channelName, plugin);
 
 
-    public async Task ImportDeviceAsync(Dictionary<string, ImportPreviewOutputBase> input, bool restart = true)
+    public async Task ImportDeviceAsync(Dictionary<string, ImportPreviewOutputBase> input, bool restart)
     {
         try
         {
@@ -174,7 +174,7 @@ public class DeviceRuntimeService : IDeviceRuntimeService
 
     }
 
-    public async Task<bool> SaveDeviceAsync(Device input, ItemChangedType type, bool restart = true)
+    public async Task<bool> SaveDeviceAsync(Device input, ItemChangedType type, bool restart)
     {
         try
         {

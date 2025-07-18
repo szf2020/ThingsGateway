@@ -24,7 +24,7 @@ public class ChannelRuntimeService : IChannelRuntimeService
     {
         _logger = logger;
     }
-    private WaitLock WaitLock { get; set; } = new WaitLock();
+    private WaitLock WaitLock { get; set; } = new WaitLock(nameof(ChannelRuntimeService));
 
     public async Task<bool> CopyAsync(List<Channel> models, Dictionary<Device, List<Variable>> devices, bool restart, CancellationToken cancellationToken)
     {
@@ -125,7 +125,7 @@ public class ChannelRuntimeService : IChannelRuntimeService
         }
     }
 
-    public async Task<bool> BatchEditAsync(IEnumerable<Channel> models, Channel oldModel, Channel model, bool restart = true)
+    public async Task<bool> BatchEditAsync(IEnumerable<Channel> models, Channel oldModel, Channel model, bool restart)
     {
         try
         {
@@ -186,7 +186,7 @@ public class ChannelRuntimeService : IChannelRuntimeService
     public Task<MemoryStream> ExportMemoryStream(IEnumerable<Channel> data) =>
       GlobalData.ChannelService.ExportMemoryStream(data);
 
-    public async Task ImportChannelAsync(Dictionary<string, ImportPreviewOutputBase> input, bool restart = true)
+    public async Task ImportChannelAsync(Dictionary<string, ImportPreviewOutputBase> input, bool restart)
     {
         try
         {
@@ -209,7 +209,7 @@ public class ChannelRuntimeService : IChannelRuntimeService
             WaitLock.Release();
         }
     }
-    public async Task<bool> SaveChannelAsync(Channel input, ItemChangedType type, bool restart = true)
+    public async Task<bool> SaveChannelAsync(Channel input, ItemChangedType type, bool restart)
     {
         try
         {

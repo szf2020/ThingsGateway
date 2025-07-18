@@ -65,7 +65,7 @@ public class DDPTcpSessionClientChannel : TcpSessionClientChannel
 
 
     private DeviceSingleStreamDataHandleAdapter<DDPTcpMessage> DDPAdapter = new();
-    private WaitLock _waitLock = new();
+    private WaitLock _waitLock = new(nameof(DDPTcpSessionClientChannel));
     protected override async ValueTask<bool> OnTcpReceiving(ByteBlock byteBlock)
     {
         DDPMessage? message = null;

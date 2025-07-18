@@ -2,6 +2,7 @@
 
 using ThingsGateway.NewLife;
 using ThingsGateway.NewLife.Compression;
+using ThingsGateway.NewLife.Log;
 
 #if NET8_0_OR_GREATER
 using System.Formats.Tar;
@@ -578,7 +579,7 @@ public static class PathHelper
                 });
                 if (rs?.Length > 0) list.AddRange(rs);
             }
-            catch (Exception ex) { Console.WriteLine(" " + ex.Message); }
+            catch (Exception ex) { XTrace.WriteLine(ex.Message); }
         }
 
         return list.ToArray();

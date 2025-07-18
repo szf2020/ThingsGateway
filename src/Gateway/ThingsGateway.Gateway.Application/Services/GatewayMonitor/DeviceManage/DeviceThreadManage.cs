@@ -76,7 +76,7 @@ internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
 
     #region 日志
 
-    private WaitLock SetLogLock = new();
+    private WaitLock SetLogLock = new(nameof(DeviceThreadManage));
     public async Task SetLogAsync(LogLevel? logLevel = null, bool upDataBase = true)
     {
         try
@@ -171,7 +171,7 @@ internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
 
     #region 设备管理
 
-    private WaitLock NewDeviceLock = new();
+    private WaitLock NewDeviceLock = new(nameof(DeviceThreadManage));
 
     /// <summary>
     /// 向当前通道添加设备
@@ -346,8 +346,6 @@ internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
 
                 CancellationTokenSources.TryAdd(driver.DeviceId, cts);
 
-                token.Register(driver.Stop);
-
                 _ = Task.Factory.StartNew((state) => DriverStart(state, token), driver, token);
 
             }).ConfigureAwait(false);
@@ -427,23 +425,25 @@ internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
                 }
 
 
+
+                // 取消驱动程序的操作
+                if (CancellationTokenSources.TryRemove(deviceId, out var token))
+                {
+                    if (token != null)
+                    {
+                        driver.Stop();
+                        token.Cancel();
+                        token.Dispose();
+                    }
+                }
+
+
                 if (DriverTasks.TryRemove(deviceId, out var task))
-               {
-                   task.Stop();
-               }
+                {
+                    task.Stop();
+                }
 
-               // 取消驱动程序的操作
-               if (CancellationTokenSources.TryRemove(deviceId, out var token))
-               {
-                   if (token != null)
-                   {
-                       token.Cancel();
-                       token.Dispose();
-                   }
-               }
-
-
-           });
+            });
 
 
             await Task.Delay(100).ConfigureAwait(false);

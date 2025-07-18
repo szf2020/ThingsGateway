@@ -148,7 +148,7 @@ public class ControlController : ControllerBase
     /// </summary>
     [HttpPost("batchSaveChannel")]
     [DisplayName("保存通道")]
-    public Task<bool> BatchSaveChannelAsync([FromBody] List<ChannelInput> channels, ItemChangedType type, bool restart)
+    public Task<bool> BatchSaveChannelAsync([FromBody] List<ChannelInput> channels, ItemChangedType type, bool restart = true)
     {
         return GlobalData.ChannelRuntimeService.BatchSaveChannelAsync(channels.AdaptListChannel(), type, restart);
     }
@@ -158,7 +158,7 @@ public class ControlController : ControllerBase
     /// </summary>
     [HttpPost("batchSaveDevice")]
     [DisplayName("保存设备")]
-    public Task<bool> BatchSaveDeviceAsync([FromBody] List<DeviceInput> devices, ItemChangedType type, bool restart)
+    public Task<bool> BatchSaveDeviceAsync([FromBody] List<DeviceInput> devices, ItemChangedType type, bool restart = true)
     {
         return GlobalData.DeviceRuntimeService.BatchSaveDeviceAsync(devices.AdaptListDevice(), type, restart);
     }
@@ -168,7 +168,7 @@ public class ControlController : ControllerBase
     /// </summary>
     [HttpPost("batchSaveVariable")]
     [DisplayName("保存变量")]
-    public Task<bool> BatchSaveVariableAsync([FromBody] List<VariableInput> variables, ItemChangedType type, bool restart)
+    public Task<bool> BatchSaveVariableAsync([FromBody] List<VariableInput> variables, ItemChangedType type, bool restart = true)
     {
         return GlobalData.VariableRuntimeService.BatchSaveVariableAsync(variables.AdaptListVariable(), type, restart, default);
     }
@@ -178,7 +178,7 @@ public class ControlController : ControllerBase
     /// </summary>
     [HttpPost("deleteChannel")]
     [DisplayName("删除通道")]
-    public Task<bool> DeleteChannelAsync([FromBody] List<long> ids, bool restart)
+    public Task<bool> DeleteChannelAsync([FromBody] List<long> ids, bool restart = true)
     {
         if (ids == null || ids.Count == 0) ids = GlobalData.IdChannels.Keys.ToList();
         return GlobalData.ChannelRuntimeService.DeleteChannelAsync(ids, restart, default);
@@ -190,7 +190,7 @@ public class ControlController : ControllerBase
     /// </summary>
     [HttpPost("deleteDevice")]
     [DisplayName("删除设备")]
-    public Task<bool> DeleteDeviceAsync([FromBody] List<long> ids, bool restart)
+    public Task<bool> DeleteDeviceAsync([FromBody] List<long> ids, bool restart = true)
     {
         if (ids == null || ids.Count == 0) ids = GlobalData.IdDevices.Keys.ToList();
         return GlobalData.DeviceRuntimeService.DeleteDeviceAsync(ids, restart, default);
@@ -201,7 +201,7 @@ public class ControlController : ControllerBase
     /// </summary>
     [HttpPost("deleteVariable")]
     [DisplayName("删除变量")]
-    public Task<bool> DeleteVariableAsync([FromBody] List<long> ids, bool restart)
+    public Task<bool> DeleteVariableAsync([FromBody] List<long> ids, bool restart = true)
     {
         if (ids == null || ids.Count == 0) ids = GlobalData.IdVariables.Keys.ToList();
         return GlobalData.VariableRuntimeService.DeleteVariableAsync(ids, restart, default);
@@ -213,7 +213,7 @@ public class ControlController : ControllerBase
     /// </summary>
     [HttpPost("insertTestData")]
     [DisplayName("增加测试数据")]
-    public Task InsertTestDataAsync(int testVariableCount, int testDeviceCount, string slaveUrl, bool businessEnable, bool restart)
+    public Task InsertTestDataAsync(int testVariableCount, int testDeviceCount, string slaveUrl, bool businessEnable, bool restart = true)
     {
         return GlobalData.VariableRuntimeService.InsertTestDataAsync(testVariableCount, testDeviceCount, slaveUrl, businessEnable, restart, default);
     }

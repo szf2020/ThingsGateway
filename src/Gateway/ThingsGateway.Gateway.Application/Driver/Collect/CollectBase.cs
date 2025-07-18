@@ -344,18 +344,25 @@ public abstract class CollectBase : DriverBase, IRpcDriver
     {
         if (state is not VariableSourceRead variableSourceRead) return;
 
-        if (Pause)
-            return;
-        if (cancellationToken.IsCancellationRequested)
-            return;
+        if (Pause) return;
+        if (cancellationToken.IsCancellationRequested) return;
 
         var readErrorCount = 0;
 
-        await ReadWriteLock.ReaderLockAsync(cancellationToken).ConfigureAwait(false);
+        var readToken = await ReadWriteLock.ReaderLockAsync(cancellationToken).ConfigureAwait(false);
+
+        if (readToken.IsCancellationRequested)
+        {
+            await ReadVariableSource(state, cancellationToken).ConfigureAwait(false);
+            return;
+        }
+
+        using var allTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, readToken);
+        var allToken = allTokenSource.Token;
 
         //if (LogMessage?.LogLevel <= TouchSocket.Core.LogLevel.Trace)
         //    LogMessage?.Trace(string.Format("{0} - Collecting [{1} - {2}]", DeviceName, variableSourceRead?.RegisterAddress, variableSourceRead?.Length));
-        var readResult = await ReadSourceAsync(variableSourceRead, cancellationToken).ConfigureAwait(false);
+        var readResult = await ReadSourceAsync(variableSourceRead, allToken).ConfigureAwait(false);
 
         // 读取失败时重试一定次数
         while (!readResult.IsSuccess && readErrorCount < CollectProperties.RetryCount)
@@ -365,6 +372,12 @@ public abstract class CollectBase : DriverBase, IRpcDriver
             if (cancellationToken.IsCancellationRequested)
                 return;
 
+            if (readToken.IsCancellationRequested)
+            {
+                await ReadVariableSource(state, cancellationToken).ConfigureAwait(false);
+                return;
+            }
+
             readErrorCount++;
             if (LogMessage?.LogLevel <= TouchSocket.Core.LogLevel.Trace)
                 LogMessage?.Trace(string.Format("{0} - Collection [{1} - {2}] failed - {3}", DeviceName, variableSourceRead?.RegisterAddress, variableSourceRead?.Length, readResult.ErrorMessage));
@@ -372,7 +385,7 @@ public abstract class CollectBase : DriverBase, IRpcDriver
 
             //if (LogMessage?.LogLevel <= TouchSocket.Core.LogLevel.Trace)
             //    LogMessage?.Trace(string.Format("{0} - Collecting [{1} - {2}]", DeviceName, variableSourceRead?.RegisterAddress, variableSourceRead?.Length));
-            readResult = await ReadSourceAsync(variableSourceRead, cancellationToken).ConfigureAwait(false);
+            readResult = await ReadSourceAsync(variableSourceRead, allToken).ConfigureAwait(false);
         }
 
         if (readResult.IsSuccess)
@@ -386,6 +399,12 @@ public abstract class CollectBase : DriverBase, IRpcDriver
         {
             if (cancellationToken.IsCancellationRequested)
                 return;
+
+            if (readToken.IsCancellationRequested)
+            {
+                await ReadVariableSource(state, cancellationToken).ConfigureAwait(false);
+                return;
+            }
 
             // 读取失败时记录日志并增加失败计数器，更新错误信息并清除变量状态
             if (variableSourceRead.LastErrorMessage != readResult.ErrorMessage)
@@ -552,20 +571,20 @@ public abstract class CollectBase : DriverBase, IRpcDriver
             .ToDictionary(item => item.Key, item => item.Value).ToArray();
             // 使用并发方式遍历写入信息列表，并进行异步写入操作
             await list.ParallelForEachAsync(async (writeInfo, cancellationToken) =>
-        {
-            try
             {
-                // 调用协议的写入方法，将写入信息中的数据写入到对应的寄存器地址，并获取操作结果
-                var result = await InvokeMethodAsync(writeInfo.Key.VariableMethod, writeInfo.Value?.ToString(), false, cancellationToken).ConfigureAwait(false);
+                try
+                {
+                    // 调用协议的写入方法，将写入信息中的数据写入到对应的寄存器地址，并获取操作结果
+                    var result = await InvokeMethodAsync(writeInfo.Key.VariableMethod, writeInfo.Value?.ToString(), false, cancellationToken).ConfigureAwait(false);
 
-                // 将操作结果添加到结果字典中，使用变量名称作为键
-                operResults.TryAdd(writeInfo.Key.Name, result);
-            }
-            catch (Exception ex)
-            {
-                operResults.TryAdd(writeInfo.Key.Name, new(ex));
-            }
-        }, CollectProperties.MaxConcurrentCount, cancellationToken).ConfigureAwait(false);
+                    // 将操作结果添加到结果字典中，使用变量名称作为键
+                    operResults.TryAdd(writeInfo.Key.Name, result);
+                }
+                catch (Exception ex)
+                {
+                    operResults.TryAdd(writeInfo.Key.Name, new(ex));
+                }
+            }, CollectProperties.MaxConcurrentCount, cancellationToken).ConfigureAwait(false);
         }
         finally
         {

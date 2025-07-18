@@ -154,8 +154,8 @@ internal sealed class UpdateZipFileHostedService : BackgroundService, IUpdateZip
         return updateZipFiles.OrderByDescending(a => a.Version).ToList();
     }
 
-    private readonly WaitLock WaitLock = new();
-    private readonly WaitLock UpdateWaitLock = new();
+    private readonly WaitLock WaitLock = new(nameof(UpdateZipFileHostedService));
+    private readonly WaitLock UpdateWaitLock = new(nameof(UpdateZipFileHostedService));
     public async Task Update(UpdateZipFile updateZipFile, Func<Task<bool>> check = null)
     {
         try

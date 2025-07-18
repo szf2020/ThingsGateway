@@ -30,7 +30,7 @@ internal sealed class ChannelThreadManage : IChannelThreadManage
 
     #region 设备管理
 
-    private WaitLock NewChannelLock = new();
+    private WaitLock NewChannelLock = new(nameof(ChannelThreadManage));
     /// <summary>
     /// 移除指定通道
     /// </summary>

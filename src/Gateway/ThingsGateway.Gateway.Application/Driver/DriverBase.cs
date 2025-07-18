@@ -147,7 +147,7 @@ public abstract class DriverBase : DisposableObject, IDriver
 
     #region 日志
 
-    private WaitLock SetLogLock = new();
+    private WaitLock SetLogLock = new(nameof(DriverBase));
     public async Task SetLogAsync(LogLevel? logLevel = null, bool upDataBase = true)
     {
         try
@@ -354,6 +354,7 @@ public abstract class DriverBase : DisposableObject, IDriver
 
     protected override void Dispose(bool disposing)
     {
+        TaskSchedulerLoop?.Stop();
         TextLogger?.Dispose();
         _logger?.TryDispose();
         IdVariableRuntimes?.Clear();
@@ -361,6 +362,7 @@ public abstract class DriverBase : DisposableObject, IDriver
         var device = CurrentDevice;
         if (device != null)
             device.Driver = null;
+
 
         LogMessage?.Logs?.ForEach(a => a.TryDispose());
         LogMessage = null;

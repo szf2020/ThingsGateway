@@ -91,7 +91,7 @@ public class DDPUdpSessionChannel : UdpSessionChannel, IClientChannel, IDtuUdpSe
     public override WaitLock GetLock(string key)
     {
         if (key.IsNullOrEmpty()) return WaitLock;
-        return WaitLocks.GetOrAdd(key, (a) => new WaitLock(WaitLock.MaxCount));
+        return WaitLocks.GetOrAdd(key, (a) => new WaitLock(nameof(DDPUdpSessionChannel), WaitLock.MaxCount));
     }
 
     public override Task<Result> StopAsync(CancellationToken token)
@@ -108,7 +108,7 @@ public class DDPUdpSessionChannel : UdpSessionChannel, IClientChannel, IDtuUdpSe
         var byteBlock = e.ByteBlock;
         var endPoint = e.EndPoint;
         DDPMessage? message = null;
-        var waitLock = _waitLocks.GetOrAdd(endPoint, new WaitLock());
+        var waitLock = _waitLocks.GetOrAdd(endPoint, new WaitLock(nameof(DDPUdpSessionChannel)));
         try
         {
             await waitLock.WaitAsync().ConfigureAwait(false);
