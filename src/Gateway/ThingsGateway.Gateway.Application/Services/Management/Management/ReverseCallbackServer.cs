@@ -146,8 +146,8 @@ internal sealed partial class ReverseCallbackServer : SingletonRpcServer
         }
 
 
-        await GlobalData.ChannelRuntimeService.InsertAsync(addChannels, addDevices, addVariables, true, default).ConfigureAwait(false);
-        await GlobalData.ChannelRuntimeService.UpdateAsync(upChannels, upDevices, upVariables, true, default).ConfigureAwait(false);
+        await GlobalData.ChannelRuntimeService.InsertAsync(addChannels, addDevices, addVariables, default).ConfigureAwait(false);
+        await GlobalData.ChannelRuntimeService.UpdateAsync(upChannels, upDevices, upVariables, default).ConfigureAwait(false);
 
         RedundancyTask.LogMessage?.LogTrace($"Sync data success");
 

@@ -26,7 +26,7 @@ public class ChannelRuntimeService : IChannelRuntimeService
     }
     private WaitLock WaitLock { get; set; } = new WaitLock();
 
-    public async Task<bool> CopyAsync(List<Channel> models, Dictionary<Device, List<Variable>> devices, bool restart, CancellationToken cancellationToken)
+    public async Task<bool> CopyAsync(List<Channel> models, Dictionary<Device, List<Variable>> devices, CancellationToken cancellationToken)
     {
         try
         {
@@ -43,7 +43,7 @@ public class ChannelRuntimeService : IChannelRuntimeService
             await RuntimeServiceHelper.InitAsync(newChannelRuntimes, newDeviceRuntimes, _logger).ConfigureAwait(false);
 
             //根据条件重启通道线程
-            if (restart)
+            //if (restart)
             {
                 await GlobalData.ChannelThreadManage.RestartChannelAsync(newChannelRuntimes).ConfigureAwait(false);
 
@@ -59,7 +59,7 @@ public class ChannelRuntimeService : IChannelRuntimeService
         }
     }
 
-    public async Task<bool> InsertAsync(List<Channel> models, List<Device> devices, List<Variable> variables, bool restart, CancellationToken cancellationToken)
+    public async Task<bool> InsertAsync(List<Channel> models, List<Device> devices, List<Variable> variables, CancellationToken cancellationToken)
     {
         try
         {
@@ -76,7 +76,7 @@ public class ChannelRuntimeService : IChannelRuntimeService
             await RuntimeServiceHelper.InitAsync(newChannelRuntimes, newDeviceRuntimes, _logger).ConfigureAwait(false);
 
             //根据条件重启通道线程
-            if (restart)
+            //if (restart)
             {
                 await GlobalData.ChannelThreadManage.RestartChannelAsync(newChannelRuntimes).ConfigureAwait(false);
 
@@ -92,7 +92,7 @@ public class ChannelRuntimeService : IChannelRuntimeService
         }
     }
 
-    public async Task<bool> UpdateAsync(List<Channel> models, List<Device> devices, List<Variable> variables, bool restart, CancellationToken cancellationToken)
+    public async Task<bool> UpdateAsync(List<Channel> models, List<Device> devices, List<Variable> variables, CancellationToken cancellationToken)
     {
         try
         {
@@ -109,7 +109,7 @@ public class ChannelRuntimeService : IChannelRuntimeService
             await RuntimeServiceHelper.InitAsync(newChannelRuntimes, newDeviceRuntimes, _logger).ConfigureAwait(false);
 
             //根据条件重启通道线程
-            if (restart)
+            //if (restart)
             {
                 await GlobalData.ChannelThreadManage.RestartChannelAsync(newChannelRuntimes).ConfigureAwait(false);
 
@@ -125,7 +125,7 @@ public class ChannelRuntimeService : IChannelRuntimeService
         }
     }
 
-    public async Task<bool> BatchEditAsync(IEnumerable<Channel> models, Channel oldModel, Channel model, bool restart = true)
+    public async Task<bool> BatchEditAsync(IEnumerable<Channel> models, Channel oldModel, Channel model)
     {
         try
         {
@@ -138,7 +138,7 @@ public class ChannelRuntimeService : IChannelRuntimeService
             RuntimeServiceHelper.Init(newChannelRuntimes);
 
             //根据条件重启通道线程
-            if (restart)
+            //if (restart)
             {
                 await GlobalData.ChannelThreadManage.RestartChannelAsync(newChannelRuntimes).ConfigureAwait(false);
             }
@@ -151,7 +151,7 @@ public class ChannelRuntimeService : IChannelRuntimeService
         }
     }
 
-    public async Task<bool> DeleteChannelAsync(IEnumerable<long> ids, bool restart, CancellationToken cancellationToken)
+    public async Task<bool> DeleteChannelAsync(IEnumerable<long> ids, CancellationToken cancellationToken)
     {
         try
         {
@@ -163,7 +163,7 @@ public class ChannelRuntimeService : IChannelRuntimeService
             var changedDriver = RuntimeServiceHelper.DeleteChannelRuntime(array);
 
             //根据条件重启通道线程
-            if (restart)
+            //if (restart)
             {
                 await GlobalData.ChannelThreadManage.RemoveChannelAsync(array).ConfigureAwait(false);
 
@@ -186,7 +186,7 @@ public class ChannelRuntimeService : IChannelRuntimeService
     public Task<MemoryStream> ExportMemoryStream(IEnumerable<Channel> data) =>
       GlobalData.ChannelService.ExportMemoryStream(data);
 
-    public async Task ImportChannelAsync(Dictionary<string, ImportPreviewOutputBase> input, bool restart = true)
+    public async Task ImportChannelAsync(Dictionary<string, ImportPreviewOutputBase> input)
     {
         try
         {
@@ -199,8 +199,8 @@ public class ChannelRuntimeService : IChannelRuntimeService
             RuntimeServiceHelper.Init(newChannelRuntimes);
 
             //根据条件重启通道线程
-            if (restart)
-                await GlobalData.ChannelThreadManage.RestartChannelAsync(newChannelRuntimes).ConfigureAwait(false);
+            //if (restart)
+            await GlobalData.ChannelThreadManage.RestartChannelAsync(newChannelRuntimes).ConfigureAwait(false);
 
         }
 
@@ -209,7 +209,7 @@ public class ChannelRuntimeService : IChannelRuntimeService
             WaitLock.Release();
         }
     }
-    public async Task<bool> SaveChannelAsync(Channel input, ItemChangedType type, bool restart = true)
+    public async Task<bool> SaveChannelAsync(Channel input, ItemChangedType type)
     {
         try
         {
@@ -222,8 +222,8 @@ public class ChannelRuntimeService : IChannelRuntimeService
             RuntimeServiceHelper.Init(newChannelRuntimes);
 
             //根据条件重启通道线程
-            if (restart)
-                await GlobalData.ChannelThreadManage.RestartChannelAsync(newChannelRuntimes).ConfigureAwait(false);
+            //if (restart)
+            await GlobalData.ChannelThreadManage.RestartChannelAsync(newChannelRuntimes).ConfigureAwait(false);
 
             return true;
         }
@@ -234,7 +234,7 @@ public class ChannelRuntimeService : IChannelRuntimeService
     }
 
 
-    public async Task<bool> BatchSaveChannelAsync(List<Channel> input, ItemChangedType type, bool restart)
+    public async Task<bool> BatchSaveChannelAsync(List<Channel> input, ItemChangedType type)
     {
         try
         {
@@ -247,8 +247,8 @@ public class ChannelRuntimeService : IChannelRuntimeService
             RuntimeServiceHelper.Init(newChannelRuntimes);
 
             //根据条件重启通道线程
-            if (restart)
-                await GlobalData.ChannelThreadManage.RestartChannelAsync(newChannelRuntimes).ConfigureAwait(false);
+            //if (restart)
+            await GlobalData.ChannelThreadManage.RestartChannelAsync(newChannelRuntimes).ConfigureAwait(false);
 
             return true;
         }

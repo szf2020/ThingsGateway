@@ -184,7 +184,7 @@
     "Reload": "重载"
   },
   "ThingsGateway.Gateway.Razor.QuickActions": {
-    "AutoRestartThread": "自动重启线程",
+    "AutoRestartThread": "变量修改立即生效",
     "HeaderText": "快捷操作",
     "ReloadPluginConfirmText": "确定重载插件?",
     "ReloadServiceConfirmText": "确定重启运行时?",

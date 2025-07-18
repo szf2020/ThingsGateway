@@ -83,7 +83,7 @@ namespace ThingsGateway.Gateway.Razor
 
 
 
-        internal static async Task ShowCopy(Channel oneModel, Dictionary<Device, List<Variable>> deviceDict, string text, bool autoRestart, Func<Task> onsave, DialogService dialogService)
+        internal static async Task ShowCopy(Channel oneModel, Dictionary<Device, List<Variable>> deviceDict, string text, Func<Task> onsave, DialogService dialogService)
         {
             var op = new DialogOption()
             {
@@ -100,7 +100,7 @@ namespace ThingsGateway.Gateway.Razor
              {nameof(ChannelCopyComponent.OnSave), async (List<Channel> channels,Dictionary<Device,List<Variable>> devices) =>
             {
 
-                await Task.Run(() =>GlobalData.ChannelRuntimeService.CopyAsync(channels,devices,autoRestart, default));
+                await Task.Run(() =>GlobalData.ChannelRuntimeService.CopyAsync(channels,devices, default));
                 if(onsave!=null)
                     await onsave();
 

@@ -247,7 +247,6 @@ public class OpcUaMaster : CollectBase
         var addresss = deviceVariableSourceRead.VariableRuntimes.Where(a => !a.RegisterAddress.IsNullOrEmpty()).Select(a => a.RegisterAddress!).ToArray();
         try
         {
-            await ReadWriteLock.ReaderLockAsync(cancellationToken).ConfigureAwait(false);
 
             var result = await _plc.ReadJTokenValueAsync(addresss, cancellationToken).ConfigureAwait(false);
             foreach (var data in result)

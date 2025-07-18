@@ -133,7 +133,7 @@ public partial class ChannelTable : IDisposable
              {nameof(ChannelCopyComponent.OnSave), async (List<Channel> channels,Dictionary<Device,List<Variable>> devices) =>
             {
 
-                await Task.Run(() =>GlobalData.ChannelRuntimeService.CopyAsync(channels,devices,AutoRestartThread, default));
+                await Task.Run(() =>GlobalData.ChannelRuntimeService.CopyAsync(channels,devices, default));
                     await InvokeAsync(table.QueryAsync);
 
             }},
@@ -174,7 +174,7 @@ public partial class ChannelTable : IDisposable
         {
              {nameof(ChannelEditComponent.OnValidSubmit), async () =>
             {
-                await Task.Run(() => GlobalData.ChannelRuntimeService.BatchEditAsync(changedModels, oldModel, oneModel,AutoRestartThread));
+                await Task.Run(() => GlobalData.ChannelRuntimeService.BatchEditAsync(changedModels, oldModel, oneModel));
 
                    await InvokeAsync(table.QueryAsync);
 
@@ -197,7 +197,7 @@ public partial class ChannelTable : IDisposable
         {
             return await Task.Run(async () =>
             {
-                return await GlobalData.ChannelRuntimeService.DeleteChannelAsync(channels.Select(a => a.Id), AutoRestartThread, default);
+                return await GlobalData.ChannelRuntimeService.DeleteChannelAsync(channels.Select(a => a.Id), default);
             });
         }
         catch (Exception ex)
@@ -215,7 +215,7 @@ public partial class ChannelTable : IDisposable
         try
         {
             channel = channel.AdaptChannel();
-            return await Task.Run(() => GlobalData.ChannelRuntimeService.SaveChannelAsync(channel, itemChangedType, AutoRestartThread));
+            return await Task.Run(() => GlobalData.ChannelRuntimeService.SaveChannelAsync(channel, itemChangedType));
         }
         catch (Exception ex)
         {
@@ -304,7 +304,7 @@ public partial class ChannelTable : IDisposable
                 await Task.Run(async ()=>
                 {
               var importData=await  ChannelServiceHelpers.ImportAsync(data);
-                await    GlobalData.ChannelRuntimeService.ImportChannelAsync(importData,AutoRestartThread);
+                await    GlobalData.ChannelRuntimeService.ImportChannelAsync(importData);
                 })
                     ;
     }
@@ -346,7 +346,7 @@ finally
         };
 
         Func<IBrowserFile, Task<Dictionary<string, ImportPreviewOutputBase>>> preview = (a => GlobalData.ChannelRuntimeService.PreviewAsync(a));
-        Func<Dictionary<string, ImportPreviewOutputBase>, Task> import = (value => GlobalData.ChannelRuntimeService.ImportChannelAsync(value, AutoRestartThread));
+        Func<Dictionary<string, ImportPreviewOutputBase>, Task> import = (value => GlobalData.ChannelRuntimeService.ImportChannelAsync(value));
         op.Component = BootstrapDynamicComponent.CreateComponent<ImportExcel>(new Dictionary<string, object?>
         {
              {nameof(ImportExcel.Import),import },
@@ -367,7 +367,7 @@ finally
             await Task.Run(async () =>
             {
 
-                await GlobalData.ChannelRuntimeService.DeleteChannelAsync(Items.Select(a => a.Id), AutoRestartThread, default);
+                await GlobalData.ChannelRuntimeService.DeleteChannelAsync(Items.Select(a => a.Id), default);
                 await InvokeAsync(async () =>
                 {
                     await ToastService.Default();
@@ -386,8 +386,7 @@ finally
     }
     #endregion
 
-    [Parameter]
-    public bool AutoRestartThread { get; set; }
+
     [Parameter]
     public ChannelDeviceTreeItem SelectModel { get; set; }
     [Inject]

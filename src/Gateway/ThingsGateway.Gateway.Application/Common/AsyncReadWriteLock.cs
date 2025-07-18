@@ -16,17 +16,18 @@ public class AsyncReadWriteLock
 {
     private AsyncAutoResetEvent _readerLock = new AsyncAutoResetEvent(false); // 控制读计数
     private long _writerCount = 0; // 当前活跃的写线程数
-
+    private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
     /// <summary>
     /// 获取读锁，支持多个线程并发读取，但写入时会阻止所有读取。
     /// </summary>
-    public async Task ReaderLockAsync(CancellationToken cancellationToken)
+    public async Task<CancellationToken> ReaderLockAsync(CancellationToken cancellationToken)
     {
         if (Interlocked.Read(ref _writerCount) > 0)
         {
             // 第一个读者需要获取写入锁，防止写操作
             await _readerLock.WaitOneAsync(cancellationToken).ConfigureAwait(false);
         }
+        return _cancellationTokenSource.Token;
     }
 
     /// <summary>
@@ -34,7 +35,14 @@ public class AsyncReadWriteLock
     /// </summary>
     public IDisposable WriterLock()
     {
-        Interlocked.Increment(ref _writerCount);
+        if (Interlocked.Increment(ref _writerCount) == 1)
+        {
+            var cancellationTokenSource = _cancellationTokenSource;
+            _cancellationTokenSource = new();
+            cancellationTokenSource.Cancel();//取消读取
+            cancellationTokenSource.SafeDispose();
+        }
+
         return new Writer(this);
     }
 

@@ -344,18 +344,25 @@ public abstract class CollectBase : DriverBase, IRpcDriver
     {
         if (state is not VariableSourceRead variableSourceRead) return;
 
-        if (Pause)
-            return;
-        if (cancellationToken.IsCancellationRequested)
-            return;
+        if (Pause) return;
+        if (cancellationToken.IsCancellationRequested) return;
 
         var readErrorCount = 0;
 
-        await ReadWriteLock.ReaderLockAsync(cancellationToken).ConfigureAwait(false);
+        var readToken = await ReadWriteLock.ReaderLockAsync(cancellationToken).ConfigureAwait(false);
+
+        if (readToken.IsCancellationRequested)
+        {
+            await ReadVariableSource(state, cancellationToken).ConfigureAwait(false);
+            return;
+        }
+
+        using var allTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, readToken);
+        var allToken = allTokenSource.Token;
 
         //if (LogMessage?.LogLevel <= TouchSocket.Core.LogLevel.Trace)
         //    LogMessage?.Trace(string.Format("{0} - Collecting [{1} - {2}]", DeviceName, variableSourceRead?.RegisterAddress, variableSourceRead?.Length));
-        var readResult = await ReadSourceAsync(variableSourceRead, cancellationToken).ConfigureAwait(false);
+        var readResult = await ReadSourceAsync(variableSourceRead, allToken).ConfigureAwait(false);
 
         // 读取失败时重试一定次数
         while (!readResult.IsSuccess && readErrorCount < CollectProperties.RetryCount)
@@ -364,6 +371,12 @@ public abstract class CollectBase : DriverBase, IRpcDriver
                 return;
             if (cancellationToken.IsCancellationRequested)
                 return;
+
+            if (readToken.IsCancellationRequested)
+            {
+                await ReadVariableSource(state, cancellationToken).ConfigureAwait(false);
+                return;
+            }
 
             readErrorCount++;
             if (LogMessage?.LogLevel <= TouchSocket.Core.LogLevel.Trace)
@@ -386,6 +399,12 @@ public abstract class CollectBase : DriverBase, IRpcDriver
         {
             if (cancellationToken.IsCancellationRequested)
                 return;
+
+            if (readToken.IsCancellationRequested)
+            {
+                await ReadVariableSource(state, cancellationToken).ConfigureAwait(false);
+                return;
+            }
 
             // 读取失败时记录日志并增加失败计数器，更新错误信息并清除变量状态
             if (variableSourceRead.LastErrorMessage != readResult.ErrorMessage)

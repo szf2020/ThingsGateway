@@ -55,9 +55,6 @@ public partial class ChannelDeviceTree
         await OnShowTypeChanged(showType);
     }
 
-    [Parameter]
-    public bool AutoRestartThread { get; set; }
-
     private static string GetClass(ChannelDeviceTreeItem item)
     {
         if (item.TryGetChannelRuntime(out var channelRuntime))
@@ -123,7 +120,7 @@ public partial class ChannelDeviceTree
         {
              {nameof(ChannelEditComponent.OnValidSubmit), async () =>
             {
-                await Task.Run(() =>GlobalData.ChannelRuntimeService.SaveChannelAsync(oneModel,itemChangedType,AutoRestartThread));
+                await Task.Run(() =>GlobalData.ChannelRuntimeService.SaveChannelAsync(oneModel,itemChangedType));
                ////await Notify();
             }},
             {nameof(ChannelEditComponent.Model),oneModel },
@@ -175,7 +172,7 @@ public partial class ChannelDeviceTree
              {nameof(ChannelCopyComponent.OnSave), async (List<Channel> channels,Dictionary<Device,List<Variable>> devices) =>
             {
 
-                await Task.Run(() =>GlobalData.ChannelRuntimeService.CopyAsync(channels,devices,AutoRestartThread, default));
+                await Task.Run(() =>GlobalData.ChannelRuntimeService.CopyAsync(channels,devices, default));
                     //await Notify();
 
             }},
@@ -250,7 +247,7 @@ public partial class ChannelDeviceTree
              {nameof(ChannelEditComponent.OnValidSubmit), async () =>
             {
                 Spinner.SetRun(true);
-                await Task.Run(() => GlobalData.ChannelRuntimeService.BatchEditAsync(changedModels, oldModel, oneModel,AutoRestartThread));
+                await Task.Run(() => GlobalData.ChannelRuntimeService.BatchEditAsync(changedModels, oldModel, oneModel));
 
               //await Notify();
                 await InvokeAsync(() =>
@@ -301,7 +298,7 @@ public partial class ChannelDeviceTree
                 await Task.Run(async ()=>
                 {
               var importData=await  ChannelServiceHelpers.ImportAsync(data);
-                await    GlobalData.ChannelRuntimeService.ImportChannelAsync(importData,AutoRestartThread);
+                await    GlobalData.ChannelRuntimeService.ImportChannelAsync(importData);
                 })
                     ;
     }
@@ -427,7 +424,7 @@ finally
 
                 Spinner.SetRun(true);
 
-                await Task.Run(() => GlobalData.ChannelRuntimeService.DeleteChannelAsync(modelIds.Select(a => a.Id), AutoRestartThread, default));
+                await Task.Run(() => GlobalData.ChannelRuntimeService.DeleteChannelAsync(modelIds.Select(a => a.Id), default));
                 //await Notify();
                 await InvokeAsync(() =>
                 {
@@ -471,7 +468,7 @@ finally
                 Spinner.SetRun(true);
 
                 var key = await GlobalData.GetCurrentUserChannels().ConfigureAwait(false);
-                await Task.Run(() => GlobalData.ChannelRuntimeService.DeleteChannelAsync(key.Select(a => a.Id), AutoRestartThread, default));
+                await Task.Run(() => GlobalData.ChannelRuntimeService.DeleteChannelAsync(key.Select(a => a.Id), default));
                 //await Notify();
                 await InvokeAsync(() =>
                 {
@@ -604,7 +601,7 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
                 Spinner.SetRun(true);
 
             });
-            await Task.Run(() => GlobalData.ChannelRuntimeService.ImportChannelAsync(value, AutoRestartThread));
+            await Task.Run(() => GlobalData.ChannelRuntimeService.ImportChannelAsync(value));
             //await Notify();
             await InvokeAsync(() =>
             {
@@ -659,7 +656,7 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
              {nameof(DeviceCopyComponent.OnSave), async (Dictionary<Device,List<Variable>> devices) =>
             {
 
-                await Task.Run(() =>GlobalData.DeviceRuntimeService.CopyAsync(devices,AutoRestartThread, default));
+                await Task.Run(() =>GlobalData.DeviceRuntimeService.CopyAsync(devices, default));
                //await Notify();
 
             }},
@@ -712,11 +709,10 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
         {
              {nameof(DeviceEditComponent.OnValidSubmit), async () =>
              {
-                 await Task.Run(() =>GlobalData.DeviceRuntimeService.SaveDeviceAsync(oneModel,itemChangedType, AutoRestartThread));
+                 await Task.Run(() =>GlobalData.DeviceRuntimeService.SaveDeviceAsync(oneModel,itemChangedType));
                //await Notify();
             }},
             {nameof(DeviceEditComponent.Model),oneModel },
-            {nameof(DeviceEditComponent.AutoRestartThread),AutoRestartThread },
             {nameof(DeviceEditComponent.ValidateEnable),true },
             {nameof(DeviceEditComponent.BatchEditEnable),false },
         });
@@ -798,7 +794,7 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
                 Spinner.SetRun(true);
 
                 });
-                await Task.Run(() =>GlobalData.DeviceRuntimeService.BatchEditAsync(changedModels,oldModel,oneModel,AutoRestartThread));
+                await Task.Run(() =>GlobalData.DeviceRuntimeService.BatchEditAsync(changedModels,oldModel,oneModel));
                 //await Notify();
                          await InvokeAsync(() =>
             {
@@ -806,7 +802,6 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
                 });
             }},
             {nameof(DeviceEditComponent.Model),oneModel },
-            {nameof(DeviceEditComponent.AutoRestartThread),AutoRestartThread },
             {nameof(DeviceEditComponent.ValidateEnable),true },
             {nameof(DeviceEditComponent.BatchEditEnable),true },
         });
@@ -842,7 +837,7 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
                 await Task.Run(async ()=>
                 {
               var importData=await  DeviceServiceHelpers.ImportAsync(data);
-                await    GlobalData.DeviceRuntimeService.ImportDeviceAsync(importData,AutoRestartThread);
+                await    GlobalData.DeviceRuntimeService.ImportDeviceAsync(importData);
                 })
                     ;
     }
@@ -974,7 +969,7 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
 
                 Spinner.SetRun(true);
 
-                await Task.Run(() => GlobalData.DeviceRuntimeService.DeleteDeviceAsync(modelIds.Select(a => a.Id), AutoRestartThread, default));
+                await Task.Run(() => GlobalData.DeviceRuntimeService.DeleteDeviceAsync(modelIds.Select(a => a.Id), default));
                 //await Notify();
                 await InvokeAsync(() =>
                 {
@@ -1021,7 +1016,7 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
 
                 var data = await GlobalData.GetCurrentUserDevices().ConfigureAwait(false);
 
-                await Task.Run(() => GlobalData.DeviceRuntimeService.DeleteDeviceAsync(data.Select(a => a.Id), AutoRestartThread, default));
+                await Task.Run(() => GlobalData.DeviceRuntimeService.DeleteDeviceAsync(data.Select(a => a.Id), default));
                 //await Notify();
                 await InvokeAsync(() =>
                 {
@@ -1155,7 +1150,7 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
 
             });
 
-            await Task.Run(() => GlobalData.DeviceRuntimeService.ImportDeviceAsync(value, AutoRestartThread));
+            await Task.Run(() => GlobalData.DeviceRuntimeService.ImportDeviceAsync(value));
             //await Notify();
             await InvokeAsync(() =>
             {
