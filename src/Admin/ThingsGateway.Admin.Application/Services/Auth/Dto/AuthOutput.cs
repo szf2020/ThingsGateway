@@ -58,7 +58,7 @@ public class LoginOutput
     /// <summary>
     /// 模块列表
     /// </summary>
-    public IEnumerable<SysResource> ModuleList { get; set; } = Enumerable.Empty<SysResource>();
+    public IEnumerable<SysResource>? ModuleList { get; set; } = Enumerable.Empty<SysResource>();
 
     /// <summary>
     /// 刷新Token

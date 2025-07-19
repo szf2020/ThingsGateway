@@ -80,17 +80,27 @@
 			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
 		</EmbeddedResource>
 	</ItemGroup>
-	
 
+
+	<ItemGroup>
+		<None Include="Layout\BlazorApp.razor" />
+		<None Include="Layout\BlazorAppNet8.razor" />
+	</ItemGroup>
+
+	
 	<!--安装服务守护-->
 	<ItemGroup Condition=" '$(TargetFramework)' == 'net8.0' ">
 
 		<PackageReference Include="Microsoft.Extensions.Hosting.Systemd" Version="8.0.1" />
 		<PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" Version="8.0.1" />
+		<Content Remove="Layout\BlazorApp.razor" />
+		<Content Update="Layout\BlazorAppNet8.razor" />
 	</ItemGroup>
 	<ItemGroup Condition=" '$(TargetFramework)' == 'net9.0' ">
 		<PackageReference Include="Microsoft.Extensions.Hosting.Systemd" Version="$(NET9Version)" />
 		<PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" Version="$(NET9Version)" />
+		<Content Remove="Layout\BlazorAppNet8.razor" />
+		<Content Update="Layout\BlazorApp.razor" />
 	</ItemGroup>
 
 
@@ -140,7 +150,6 @@
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</Content>
 	</ItemGroup>
-
 
 
 

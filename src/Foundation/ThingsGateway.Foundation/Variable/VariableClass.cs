@@ -50,7 +50,7 @@ public class VariableClass : IVariable
     /// <summary>
     /// 数据转换规则
     /// </summary>
-    public virtual IThingsGatewayBitConverter ThingsGatewayBitConverter { get; set; }
+    public virtual IThingsGatewayBitConverter? ThingsGatewayBitConverter { get; set; }
 
     /// <summary>
     /// 实时值
@@ -60,7 +60,7 @@ public class VariableClass : IVariable
     /// <summary>
     /// IVariableSource
     /// </summary>
-    public IVariableSource VariableSource { get; set; }
+    public IVariableSource? VariableSource { get; set; }
     public object? RawValue { get; private set; }
 
     public void SetNoChangedValue(DateTime dateTime)

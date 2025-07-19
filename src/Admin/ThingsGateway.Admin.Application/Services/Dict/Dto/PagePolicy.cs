@@ -15,5 +15,5 @@ public class PagePolicy
     /// <summary>
     /// 系统默认快捷方式菜单ID列表
     /// </summary>
-    public List<long> Shortcuts { get; set; } = new();
+    public List<long>? Shortcuts { get; set; } = new();
 }

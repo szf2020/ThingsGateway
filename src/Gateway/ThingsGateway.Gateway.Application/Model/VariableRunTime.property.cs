@@ -114,7 +114,7 @@ public partial class VariableRuntime : Variable, IVariable, IDisposable
     [Newtonsoft.Json.JsonIgnore]
     [System.Text.Json.Serialization.JsonIgnore]
     [AutoGenerateColumn(Ignore = true)]
-    public DeviceRuntime DeviceRuntime { get => deviceRuntime; set => deviceRuntime = value; }
+    public DeviceRuntime? DeviceRuntime { get => deviceRuntime; set => deviceRuntime = value; }
 
     /// <summary>
     /// VariableSource
@@ -123,7 +123,7 @@ public partial class VariableRuntime : Variable, IVariable, IDisposable
     [System.Text.Json.Serialization.JsonIgnore]
     [MapperIgnore]
     [AutoGenerateColumn(Ignore = true)]
-    public IVariableSource VariableSource { get => variableSource; set => variableSource = value; }
+    public IVariableSource? VariableSource { get => variableSource; set => variableSource = value; }
 
     /// <summary>
     /// VariableMethod
@@ -132,7 +132,7 @@ public partial class VariableRuntime : Variable, IVariable, IDisposable
     [System.Text.Json.Serialization.JsonIgnore]
     [MapperIgnore]
     [AutoGenerateColumn(Ignore = true)]
-    public VariableMethod VariableMethod { get => variableMethod; set => variableMethod = value; }
+    public VariableMethod? VariableMethod { get => variableMethod; set => variableMethod = value; }
 
 
 
@@ -142,7 +142,7 @@ public partial class VariableRuntime : Variable, IVariable, IDisposable
     [Newtonsoft.Json.JsonIgnore]
     [System.Text.Json.Serialization.JsonIgnore]
     [AutoGenerateColumn(Ignore = true)]
-    public IThingsGatewayBitConverter ThingsGatewayBitConverter { get => thingsGatewayBitConverter; set => thingsGatewayBitConverter = value; }
+    public IThingsGatewayBitConverter? ThingsGatewayBitConverter { get => thingsGatewayBitConverter; set => thingsGatewayBitConverter = value; }
 
 
 

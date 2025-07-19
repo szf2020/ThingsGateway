@@ -15,17 +15,17 @@ public class AppConfig
     /// <summary>
     /// 登录策略
     /// </summary>
-    public LoginPolicy LoginPolicy { get; set; }
+    public LoginPolicy? LoginPolicy { get; set; }
 
     /// <summary>
     /// 页面策略
     /// </summary>
-    public PagePolicy PagePolicy { get; set; }
+    public PagePolicy? PagePolicy { get; set; }
 
     /// <summary>
     /// 密码策略
     /// </summary>
-    public PasswordPolicy PasswordPolicy { get; set; }
+    public PasswordPolicy? PasswordPolicy { get; set; }
 
-    public WebsitePolicy WebsitePolicy { get; set; }
+    public WebsitePolicy? WebsitePolicy { get; set; }
 }

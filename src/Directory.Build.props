@@ -3,7 +3,7 @@
 	<PropertyGroup>
 		<PluginVersion>10.9.44</PluginVersion>
 		<ProPluginVersion>10.9.44</ProPluginVersion>
-		<DefaultVersion>10.9.44</DefaultVersion>
+		<DefaultVersion>10.9.45</DefaultVersion>
 		<AuthenticationVersion>2.9.20</AuthenticationVersion>
 		<SourceGeneratorVersion>10.9.20</SourceGeneratorVersion>
 		<NET8Version>8.0.18</NET8Version>

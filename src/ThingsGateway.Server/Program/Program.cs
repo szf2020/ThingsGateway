@@ -94,8 +94,12 @@ public class Program
            })
             .Configure(app =>
             {
-#if NET8_0_OR_GREATER
+#if NET9_0_OR_GREATER
                 app.MapRazorComponents<BlazorApp>()
+                    .AddAdditionalAssemblies(App.RazorAssemblies.Distinct().Where(a => a != typeof(Program).Assembly).ToArray())
+                    .AddInteractiveServerRenderMode();
+#elif NET8_0_OR_GREATER
+                app.MapRazorComponents<BlazorAppNet8>()
                     .AddAdditionalAssemblies(App.RazorAssemblies.Distinct().Where(a => a != typeof(Program).Assembly).ToArray())
                     .AddInteractiveServerRenderMode();
 #else

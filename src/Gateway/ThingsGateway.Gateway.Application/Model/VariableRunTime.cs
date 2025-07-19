@@ -44,10 +44,10 @@ public partial class VariableRuntime : Variable, IVariable, IDisposable
     private object _value;
     private object lastSetValue;
     private object rawValue;
-    private DeviceRuntime deviceRuntime;
-    private IVariableSource variableSource;
-    private VariableMethod variableMethod;
-    private IThingsGatewayBitConverter thingsGatewayBitConverter;
+    private DeviceRuntime? deviceRuntime;
+    private IVariableSource? variableSource;
+    private VariableMethod? variableMethod;
+    private IThingsGatewayBitConverter? thingsGatewayBitConverter;
 
     /// <summary>
     /// 设置变量值与时间/质量戳

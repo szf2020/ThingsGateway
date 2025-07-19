@@ -43,7 +43,7 @@ public interface IVariable
     /// <summary>
     /// 数据转换规则
     /// </summary>
-    IThingsGatewayBitConverter ThingsGatewayBitConverter { get; set; }
+    IThingsGatewayBitConverter? ThingsGatewayBitConverter { get; set; }
 
     /// <summary>
     /// 实时值
@@ -53,7 +53,7 @@ public interface IVariable
     /// <summary>
     /// 打包变量
     /// </summary>
-    IVariableSource VariableSource { get; set; }
+    IVariableSource? VariableSource { get; set; }
     object? RawValue { get; }
 
     void SetNoChangedValue(DateTime dateTime);

@@ -170,14 +170,14 @@ public class SysUser : BaseEntity
     /// </summary>
     [SugarColumn(IsIgnore = true, IsJson = true)]
     [AutoGenerateColumn(Ignore = true)]
-    public List<long> OrgAndPosIdList { get; set; } = new List<long>();
+    public List<long>? OrgAndPosIdList { get; set; } = new List<long>();
 
     /// <summary>
     /// 主管信息
     /// </summary>
     [SugarColumn(IsIgnore = true)]
     [AutoGenerateColumn(Ignore = true)]
-    public UserSelectorOutput DirectorInfo { get; set; }
+    public UserSelectorOutput? DirectorInfo { get; set; }
 
     #endregion
 
@@ -188,35 +188,35 @@ public class SysUser : BaseEntity
     /// </summary>
     [SugarColumn(IsIgnore = true)]
     [AutoGenerateColumn(Ignore = true)]
-    public Dictionary<string, List<string>> ButtonCodeList { get; set; } = new();
+    public Dictionary<string, List<string>>? ButtonCodeList { get; set; } = new();
 
     /// <summary>
     /// 权限码集合
     /// </summary>
     [SugarColumn(IsIgnore = true)]
     [AutoGenerateColumn(Ignore = true)]
-    public HashSet<string> PermissionCodeList { get; set; } = new();
+    public HashSet<string>? PermissionCodeList { get; set; } = new();
 
     /// <summary>
     /// 角色ID集合
     /// </summary>
     [SugarColumn(IsIgnore = true)]
     [AutoGenerateColumn(Ignore = true)]
-    public HashSet<long> RoleIdList { get; set; } = new();
+    public HashSet<long>? RoleIdList { get; set; } = new();
 
     /// <summary>
     /// 机构及以下机构ID集合
     /// </summary>
     [SugarColumn(IsIgnore = true)]
     [AutoGenerateColumn(Ignore = true)]
-    public HashSet<long> ScopeOrgChildList { get; set; }
+    public HashSet<long>? ScopeOrgChildList { get; set; }
 
     /// <summary>
     /// 模块集合
     /// </summary>
     [SugarColumn(IsIgnore = true)]
     [AutoGenerateColumn(Ignore = true)]
-    public List<SysResource> ModuleList { get; set; } = new();
+    public List<SysResource>? ModuleList { get; set; } = new();
 
     /// <summary>
     /// 租户Id

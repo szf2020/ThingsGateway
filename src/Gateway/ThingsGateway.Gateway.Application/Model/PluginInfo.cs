@@ -21,7 +21,7 @@ public class PluginInfo
     /// 插件文件名称.插件类型名称
     /// </summary>
     [AutoGenerateColumn(Ignore = true)]
-    public List<PluginInfo> Children { get; set; } = new();
+    public List<PluginInfo>? Children { get; set; } = new();
 
     /// <summary>
     /// 插件文件名称.插件类型名称
