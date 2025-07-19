@@ -40,7 +40,7 @@ namespace ThingsGateway.SqlSugar
         {
             var exp = expression as MethodCallExpression;
             var argExp = exp.Arguments[0];
-            var parametres = (argExp as LambdaExpression).Parameters;
+            var parameters = (argExp as LambdaExpression).Parameters;
             if ((argExp as LambdaExpression).Body is UnaryExpression)
             {
                 argExp = ((argExp as LambdaExpression).Body as UnaryExpression).Operand;
@@ -55,7 +55,7 @@ namespace ThingsGateway.SqlSugar
                 this.Context.RefreshMapping();
             }
             var result = "AVG(" + SubTools.GetMethodValue(Context, argExp, ResolveExpressType.WhereMultiple) + ")";
-            var selfParameterName = Context.GetTranslationColumnName(parametres.First().Name) + UtilConstants.Dot;
+            var selfParameterName = Context.GetTranslationColumnName(parameters.First().Name) + UtilConstants.Dot;
             if (this.Context.JoinIndex == 0)
                 result = result.Replace(selfParameterName, SubTools.GetSubReplace(this.Context));
             return result;

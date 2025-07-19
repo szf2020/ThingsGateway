@@ -32,12 +32,12 @@ namespace ThingsGateway.SqlSugar
                 }
             }
             columns = columns.OrderBy(it => it.IsPrimarykey ? 0 : 1).ToList();
-            foreach (var propety in entityInfo.Type.GetProperties())
+            foreach (var property in entityInfo.Type.GetProperties())
             {
-                var timeAttr = propety.GetCustomAttribute<TimeDbSplitFieldAttribute>();
+                var timeAttr = property.GetCustomAttribute<TimeDbSplitFieldAttribute>();
                 if (timeAttr != null)
                 {
-                    var colName = columns.FirstOrDefault(it => it.PropertyName == propety.Name)?.DbColumnName;
+                    var colName = columns.FirstOrDefault(it => it.PropertyName == property.Name)?.DbColumnName;
                     tableName += $"_TIMESTAMP({colName}) PARTITION BY {timeAttr.DateType} ";
                 }
             }

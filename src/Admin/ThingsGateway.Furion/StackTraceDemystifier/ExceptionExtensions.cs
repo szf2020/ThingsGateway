@@ -1,7 +1,6 @@
 // Copyright (c) Ben A Adams. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
-using System.Collections.Generic;
 using System.Collections.Generic.Enumerable;
 using System.Reflection;
 using System.Text;
@@ -57,7 +56,7 @@ namespace System.Diagnostics
         /// computes a demystified string representation and then restores the original state of the exception back.
         /// </remarks>
         [Contracts.Pure]
-        public static string ToStringDemystified(this Exception exception) 
+        public static string ToStringDemystified(this Exception exception)
             => new StringBuilder().AppendDemystified(exception).ToString();
     }
 }

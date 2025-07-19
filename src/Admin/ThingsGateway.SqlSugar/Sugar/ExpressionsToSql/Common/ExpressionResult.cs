@@ -70,21 +70,21 @@ namespace ThingsGateway.SqlSugar
         public string[] GetResultArray()
         {
             if (this._Result == null) return null;
-            var reslut = new List<string>();
+            var result = new List<string>();
 
             if (IsUpper)
-                reslut = this.Result.ToString().ToUpper().TrimEnd(',').Split(',').ToList();
+                result = this.Result.ToString().ToUpper().TrimEnd(',').Split(',').ToList();
             else
-                reslut = this.Result.ToString().TrimEnd(',').Split(',').ToList();
+                result = this.Result.ToString().TrimEnd(',').Split(',').ToList();
 
             if (this.Result.ToString().Contains(UtilConstants.ReplaceCommaKey))
             {
-                for (int i = 0; i < reslut.Count; i++)
+                for (int i = 0; i < result.Count; i++)
                 {
-                    reslut[i] = reslut[i].Replace(UtilConstants.ReplaceCommaKey, ",");
+                    result[i] = result[i].Replace(UtilConstants.ReplaceCommaKey, ",");
                 }
             }
-            return reslut.ToArray();
+            return result.ToArray();
         }
 
         public string GetResultString()

@@ -151,10 +151,10 @@ namespace ThingsGateway.SqlSugar
             this.QueryableObj = method.Invoke(QueryableObj, new object[] { getTableNamesFunc });
             return this;
         }
-        public QueryMethodInfo SplitTable(DateTime begintTime, DateTime endTime)
+        public QueryMethodInfo SplitTable(DateTime beginTime, DateTime endTime)
         {
             var method = QueryableObj.GetType().GetMyMethod("SplitTable", 2, typeof(DateTime), typeof(DateTime));
-            this.QueryableObj = method.Invoke(QueryableObj, new object[] { begintTime, endTime });
+            this.QueryableObj = method.Invoke(QueryableObj, new object[] { beginTime, endTime });
             return this;
         }
         public QueryMethodInfo SplitTable()
@@ -218,10 +218,10 @@ namespace ThingsGateway.SqlSugar
             this.QueryableObj = method.Invoke(QueryableObj, new object[] { ignoreNavPropertyNames });
             return this;
         }
-        public QueryMethodInfo Includes(string navProperyName)
+        public QueryMethodInfo Includes(string navPropertyName)
         {
             var method = QueryableObj.GetType().GetMyMethod("IncludesByNameString", 1, typeof(string));
-            this.QueryableObj = method.Invoke(QueryableObj, new object[] { navProperyName });
+            this.QueryableObj = method.Invoke(QueryableObj, new object[] { navPropertyName });
             return this;
         }
         public QueryMethodInfo IgnoreColumns(params string[] ignoreColumns)
@@ -230,16 +230,16 @@ namespace ThingsGateway.SqlSugar
             this.QueryableObj = method.Invoke(QueryableObj, new object[] { ignoreColumns });
             return this;
         }
-        public QueryMethodInfo Includes(string navProperyName, string thenNavProperyName2)
+        public QueryMethodInfo Includes(string navPropertyName, string thenNavPropertyName2)
         {
             var method = QueryableObj.GetType().GetMyMethod("IncludesByNameString", 2, typeof(string), typeof(string));
-            this.QueryableObj = method.Invoke(QueryableObj, new object[] { navProperyName, thenNavProperyName2 });
+            this.QueryableObj = method.Invoke(QueryableObj, new object[] { navPropertyName, thenNavPropertyName2 });
             return this;
         }
-        public QueryMethodInfo Includes(string navProperyName, string thenNavProperyName2, string thenNavProperyName3)
+        public QueryMethodInfo Includes(string navPropertyName, string thenNavPropertyName2, string thenNavPropertyName3)
         {
             var method = QueryableObj.GetType().GetMyMethod("IncludesByNameString", 3, typeof(string), typeof(string), typeof(string));
-            this.QueryableObj = method.Invoke(QueryableObj, new object[] { navProperyName, thenNavProperyName2, thenNavProperyName3 });
+            this.QueryableObj = method.Invoke(QueryableObj, new object[] { navPropertyName, thenNavPropertyName2, thenNavPropertyName3 });
             return this;
         }
         #endregion
@@ -249,66 +249,66 @@ namespace ThingsGateway.SqlSugar
         public void IntoTable(Type type, string tableName)
         {
             var method = QueryableObj.GetType().GetMyMethod("IntoTable", 2, typeof(Type), typeof(string));
-            var reslt = method.Invoke(QueryableObj, new object[] { type, tableName });
+            var result = method.Invoke(QueryableObj, new object[] { type, tableName });
         }
         public object ToPageList(int pageNumber, int pageSize)
         {
             var method = QueryableObj.GetType().GetMyMethod("ToPageList", 2, typeof(int), typeof(int));
-            var reslt = method.Invoke(QueryableObj, new object[] { pageNumber, pageSize });
-            return reslt;
+            var result = method.Invoke(QueryableObj, new object[] { pageNumber, pageSize });
+            return result;
         }
         public object ToPageList(int pageNumber, int pageSize, ref int count)
         {
             var method = QueryableObj.GetType().GetMyMethod("ToPageList", 3, typeof(int), typeof(int), typeof(int).MakeByRefType());
             var parameters = new object[] { pageNumber, pageSize, count };
-            var reslt = method.Invoke(QueryableObj, parameters);
+            var result = method.Invoke(QueryableObj, parameters);
             count = parameters.Last().ObjToInt();
-            return reslt;
+            return result;
         }
         public object ToList()
         {
             var method = QueryableObj.GetType().GetMyMethod("ToList", 0);
-            var reslt = method.Invoke(QueryableObj, Array.Empty<object>());
-            return reslt;
+            var result = method.Invoke(QueryableObj, Array.Empty<object>());
+            return result;
         }
         public DataTable ToDataTablePage(int pageNumber, int pageSize, ref int count)
         {
             var method = QueryableObj.GetType().GetMyMethod("ToDataTablePage", 3, typeof(int), typeof(int), typeof(int).MakeByRefType());
             var parameters = new object[] { pageNumber, pageSize, count };
-            var reslt = (DataTable)method.Invoke(QueryableObj, parameters);
+            var result = (DataTable)method.Invoke(QueryableObj, parameters);
             count = parameters.Last().ObjToInt();
-            return reslt;
+            return result;
         }
         public DataTable ToDataTablePage(int pageNumber, int pageSize)
         {
             var method = QueryableObj.GetType().GetMyMethod("ToDataTablePage", 2, typeof(int), typeof(int));
             var parameters = new object[] { pageNumber, pageSize };
-            var reslt = (DataTable)method.Invoke(QueryableObj, parameters);
-            return reslt;
+            var result = (DataTable)method.Invoke(QueryableObj, parameters);
+            return result;
         }
         public DataTable ToDataTable()
         {
             var method = QueryableObj.GetType().GetMyMethod("ToDataTable", 0);
-            var reslt = (DataTable)method.Invoke(QueryableObj, Array.Empty<object>());
-            return reslt;
+            var result = (DataTable)method.Invoke(QueryableObj, Array.Empty<object>());
+            return result;
         }
         public string ToSqlString()
         {
             var method = QueryableObj.GetType().GetMyMethod("ToSqlString", 0);
-            var reslt = method.Invoke(QueryableObj, Array.Empty<object>());
-            return (string)reslt;
+            var result = method.Invoke(QueryableObj, Array.Empty<object>());
+            return (string)result;
         }
         public KeyValuePair<string, List<SugarParameter>> ToSql()
         {
             var method = QueryableObj.GetType().GetMyMethod("ToSql", 0);
-            var reslt = method.Invoke(QueryableObj, Array.Empty<object>());
-            return (KeyValuePair<string, List<SugarParameter>>)reslt;
+            var result = method.Invoke(QueryableObj, Array.Empty<object>());
+            return (KeyValuePair<string, List<SugarParameter>>)result;
         }
         public object InSingle(object pkValue)
         {
             var method = QueryableObj.GetType().GetMyMethod("InSingle", 1);
-            var reslt = method.Invoke(QueryableObj, new object[] { pkValue });
-            return reslt;
+            var result = method.Invoke(QueryableObj, new object[] { pkValue });
+            return result;
         }
         public bool CreateView(string viewNameFomat)
         {
@@ -321,8 +321,8 @@ namespace ThingsGateway.SqlSugar
             if (!this.Context.DbMaintenance.GetViewInfoList().Any(it => it.Name.EqualCase(viewName)))
             {
                 var method = QueryableObj.GetType().GetMyMethod("ToSqlString", 0);
-                var reslt = (string)method.Invoke(QueryableObj, Array.Empty<object>());
-                var sql = $"CREATE  VIEW  {viewName} AS {Environment.NewLine} {reslt}";
+                var result = (string)method.Invoke(QueryableObj, Array.Empty<object>());
+                var sql = $"CREATE  VIEW  {viewName} AS {Environment.NewLine} {result}";
                 this.Context.Ado.ExecuteCommand(sql);
                 return true;
             }
@@ -334,26 +334,26 @@ namespace ThingsGateway.SqlSugar
         public object First()
         {
             var method = QueryableObj.GetType().GetMyMethod("First", 0);
-            var reslt = method.Invoke(QueryableObj, Array.Empty<object>());
-            return reslt;
+            var result = method.Invoke(QueryableObj, Array.Empty<object>());
+            return result;
         }
         public bool Any()
         {
             var method = QueryableObj.GetType().GetMyMethod("Any", 0);
-            var reslt = method.Invoke(QueryableObj, Array.Empty<object>());
-            return Convert.ToBoolean(reslt);
+            var result = method.Invoke(QueryableObj, Array.Empty<object>());
+            return Convert.ToBoolean(result);
         }
         public int Count()
         {
             var method = QueryableObj.GetType().GetMyMethod("Count", 0);
-            var reslt = method.Invoke(QueryableObj, Array.Empty<object>());
-            return Convert.ToInt32(reslt);
+            var result = method.Invoke(QueryableObj, Array.Empty<object>());
+            return Convert.ToInt32(result);
         }
         public object ToTree(string childPropertyName, string parentIdPropertyName, object rootValue, string primaryKeyPropertyName)
         {
             var method = QueryableObj.GetType().GetMyMethod("ToTree", 4, typeof(string), typeof(string), typeof(object), typeof(string));
-            var reslt = method.Invoke(QueryableObj, new object[] { childPropertyName, parentIdPropertyName, rootValue, primaryKeyPropertyName });
-            return reslt;
+            var result = method.Invoke(QueryableObj, new object[] { childPropertyName, parentIdPropertyName, rootValue, primaryKeyPropertyName });
+            return result;
         }
 
         #endregion
@@ -408,14 +408,14 @@ namespace ThingsGateway.SqlSugar
         public async Task<bool> AnyAsync()
         {
             var method = QueryableObj.GetType().GetMyMethod("AnyAsync", 0);
-            var reslt = method.Invoke(QueryableObj, Array.Empty<object>());
-            return await ((Task<bool>)reslt).ConfigureAwait(false);
+            var result = method.Invoke(QueryableObj, Array.Empty<object>());
+            return await ((Task<bool>)result).ConfigureAwait(false);
         }
         public async Task<int> CountAsync()
         {
             var method = QueryableObj.GetType().GetMyMethod("CountAsync", 0);
-            var reslt = method.Invoke(QueryableObj, Array.Empty<object>());
-            return await ((Task<int>)reslt).ConfigureAwait(false);
+            var result = method.Invoke(QueryableObj, Array.Empty<object>());
+            return await ((Task<int>)result).ConfigureAwait(false);
         }
         public async Task<object> InSingleAsync(object pkValue)
         {

@@ -9,15 +9,16 @@
 // 许可证的完整文本可以在源代码树根目录中的 LICENSE-APACHE 和 LICENSE-MIT 文件中找到。
 // ------------------------------------------------------------------------
 
-using ThingsGateway.Extensions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.Net.Http.Headers;
+
 using System.Diagnostics;
 using System.Net;
-using System.Net.Http.Headers;
 using System.Reflection;
 using System.Text.RegularExpressions;
+
+using ThingsGateway.Extensions;
 
 namespace ThingsGateway.HttpRemote;
 
@@ -345,7 +346,8 @@ internal sealed partial class HttpRemoteService : IHttpRemoteService
         // 初始化 HttpRemoteResult 实例
         var httpRemoteResult = new HttpRemoteResult<TResult>(httpResponseMessage)
         {
-            Result = result, RequestDuration = requestDuration
+            Result = result,
+            RequestDuration = requestDuration
         };
 
         return httpRemoteResult;
@@ -378,7 +380,8 @@ internal sealed partial class HttpRemoteService : IHttpRemoteService
         // 初始化 HttpRemoteResult 实例
         var httpRemoteResult = new HttpRemoteResult<TResult>(httpResponseMessage)
         {
-            Result = result, RequestDuration = requestDuration
+            Result = result,
+            RequestDuration = requestDuration
         };
 
         return httpRemoteResult;

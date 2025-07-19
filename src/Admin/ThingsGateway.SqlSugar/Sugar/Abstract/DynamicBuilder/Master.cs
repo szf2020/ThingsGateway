@@ -56,7 +56,7 @@ namespace ThingsGateway.SqlSugar
         /// <param name="interfaces">接口类型数组</param>
         /// <param name="splitTableAttribute">分表属性</param>
         /// <returns>动态属性构建器</returns>
-        public DynamicProperyBuilder CreateClass(string entityName, SugarTable table = null, Type baseType = null, Type[] interfaces = null, SplitTableAttribute splitTableAttribute = null)
+        public DynamicPropertyBuilder CreateClass(string entityName, SugarTable table = null, Type baseType = null, Type[] interfaces = null, SplitTableAttribute splitTableAttribute = null)
         {
             this.baseType = baseType;
             this.interfaces = interfaces;
@@ -70,7 +70,7 @@ namespace ThingsGateway.SqlSugar
             {
                 this.entityAttr.Add(GetSplitEntityAttr(splitTableAttribute));
             }
-            return new DynamicProperyBuilder() { baseBuilder = this };
+            return new DynamicPropertyBuilder() { baseBuilder = this };
         }
 
         /// <summary>

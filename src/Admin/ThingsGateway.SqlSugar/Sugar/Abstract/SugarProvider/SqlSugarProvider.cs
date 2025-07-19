@@ -960,18 +960,18 @@ namespace ThingsGateway.SqlSugar
         }
         public UpdateExpressionMethodInfo UpdateableByObject(Type entityType)
         {
-            UpdateExpressionMethodInfo reslut = new UpdateExpressionMethodInfo();
+            UpdateExpressionMethodInfo result = new UpdateExpressionMethodInfo();
             var methods = this.Context.GetType().GetMethods()
              .Where(it => it.Name == "Updateable")
              .Where(it => it.GetGenericArguments().Length != 0)
              .Where(it => it.GetParameters().Length == 0)
              .Where(it => it.Name == "Updateable").ToList();
             var method = methods.Single().MakeGenericMethod(entityType);
-            reslut.Context = this.Context;
-            reslut.MethodInfo = method;
-            reslut.Type = entityType;
-            reslut.objectValue = method.Invoke(Context, Array.Empty<object>());
-            return reslut;
+            result.Context = this.Context;
+            result.MethodInfo = method;
+            result.Type = entityType;
+            result.objectValue = method.Invoke(Context, Array.Empty<object>());
+            return result;
         }
         public virtual IUpdateable<T> Updateable<T>(T[] UpdateObjs) where T : class, new()
         {

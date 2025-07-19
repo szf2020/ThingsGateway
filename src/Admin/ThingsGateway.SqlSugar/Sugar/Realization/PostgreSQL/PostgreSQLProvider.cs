@@ -170,7 +170,7 @@ namespace ThingsGateway.SqlSugar
             }
             else if (type == DBNull.Value.GetType())
             {
-                DbNullParametrerArray(parameter, sqlParameter);
+                DbNullParameterrArray(parameter, sqlParameter);
 
             }
             else
@@ -179,7 +179,7 @@ namespace ThingsGateway.SqlSugar
             }
         }
 
-        private static void DbNullParametrerArray(SugarParameter parameter, NpgsqlParameter sqlParameter)
+        private static void DbNullParameterrArray(SugarParameter parameter, NpgsqlParameter sqlParameter)
         {
             if (parameter.DbType.IsIn(System.Data.DbType.Int32))
             {

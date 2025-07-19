@@ -53,14 +53,14 @@ namespace ThingsGateway.SqlSugar
         {
             var method = this.GetType().GetMethods().Where(it => it.Name == "IncludesByExpression2")
             .First();
-            List<Expression> parametres = new List<Expression>();
+            List<Expression> parameters = new List<Expression>();
             List<Type> types = new List<Type>();
             var entityInfo = this.EntityInfo;
-            method = GetIncludesByNameStringMethod(types, navMemberName, method, parametres, entityInfo);
+            method = GetIncludesByNameStringMethod(types, navMemberName, method, parameters, entityInfo);
             //var navFirst = GetNavColumnInfo(navMemberName, entityInfo);
             var entityInfo2 = this.Context.EntityMaintenance.GetEntityInfo(types.Last());
-            method = GetIncludesByNameStringMethod(types, thenNavMemberName2, method, parametres, entityInfo2);
-            method.MakeGenericMethod(types.ToArray()).Invoke(this, parametres.Cast<object>().ToArray());
+            method = GetIncludesByNameStringMethod(types, thenNavMemberName2, method, parameters, entityInfo2);
+            method.MakeGenericMethod(types.ToArray()).Invoke(this, parameters.Cast<object>().ToArray());
             return this;
         }
         /// <summary>
@@ -70,16 +70,16 @@ namespace ThingsGateway.SqlSugar
         {
             var method = this.GetType().GetMethods().Where(it => it.Name == "IncludesByExpression3")
             .First();
-            List<Expression> parametres = new List<Expression>();
+            List<Expression> parameters = new List<Expression>();
             List<Type> types = new List<Type>();
             var entityInfo = this.EntityInfo;
-            method = GetIncludesByNameStringMethod(types, navMemberName, method, parametres, entityInfo);
+            method = GetIncludesByNameStringMethod(types, navMemberName, method, parameters, entityInfo);
             //var navFirst = GetNavColumnInfo(navMemberName, entityInfo);
             var entityInfo2 = this.Context.EntityMaintenance.GetEntityInfo(types.Last());
-            method = GetIncludesByNameStringMethod(types, thenNavMemberName2, method, parametres, entityInfo2);
+            method = GetIncludesByNameStringMethod(types, thenNavMemberName2, method, parameters, entityInfo2);
             var entityInfo3 = this.Context.EntityMaintenance.GetEntityInfo(types.Last());
-            method = GetIncludesByNameStringMethod(types, thenNavMemberName3, method, parametres, entityInfo3);
-            method.MakeGenericMethod(types.ToArray()).Invoke(this, parametres.Cast<object>().ToArray());
+            method = GetIncludesByNameStringMethod(types, thenNavMemberName3, method, parameters, entityInfo3);
+            method.MakeGenericMethod(types.ToArray()).Invoke(this, parameters.Cast<object>().ToArray());
             return this;
         }
         /// <summary>
@@ -89,18 +89,18 @@ namespace ThingsGateway.SqlSugar
         {
             var method = this.GetType().GetMethods().Where(it => it.Name == "IncludesByExpression4")
             .First();
-            List<Expression> parametres = new List<Expression>();
+            List<Expression> parameters = new List<Expression>();
             List<Type> types = new List<Type>();
             var entityInfo = this.EntityInfo;
-            method = GetIncludesByNameStringMethod(types, navMemberName, method, parametres, entityInfo);
+            method = GetIncludesByNameStringMethod(types, navMemberName, method, parameters, entityInfo);
             //var navFirst = GetNavColumnInfo(navMemberName, entityInfo);
             var entityInfo2 = this.Context.EntityMaintenance.GetEntityInfo(types.Last());
-            method = GetIncludesByNameStringMethod(types, thenNavMemberName2, method, parametres, entityInfo2);
+            method = GetIncludesByNameStringMethod(types, thenNavMemberName2, method, parameters, entityInfo2);
             var entityInfo3 = this.Context.EntityMaintenance.GetEntityInfo(types.Last());
-            method = GetIncludesByNameStringMethod(types, thenNavMemberName3, method, parametres, entityInfo3);
+            method = GetIncludesByNameStringMethod(types, thenNavMemberName3, method, parameters, entityInfo3);
             var entityInfo4 = this.Context.EntityMaintenance.GetEntityInfo(types.Last());
-            method = GetIncludesByNameStringMethod(types, thenNavMemberName4, method, parametres, entityInfo4);
-            method.MakeGenericMethod(types.ToArray()).Invoke(this, parametres.Cast<object>().ToArray());
+            method = GetIncludesByNameStringMethod(types, thenNavMemberName4, method, parameters, entityInfo4);
+            method.MakeGenericMethod(types.ToArray()).Invoke(this, parameters.Cast<object>().ToArray());
             return this;
         }
         /// <summary>
@@ -110,29 +110,29 @@ namespace ThingsGateway.SqlSugar
         {
             var method = this.GetType().GetMethods().Where(it => it.Name == "IncludesByExpression5")
         .First();
-            List<Expression> parametres = new List<Expression>();
+            List<Expression> parameters = new List<Expression>();
             List<Type> types = new List<Type>();
             var entityInfo = this.EntityInfo;
-            method = GetIncludesByNameStringMethod(types, navMemberName, method, parametres, entityInfo);
+            method = GetIncludesByNameStringMethod(types, navMemberName, method, parameters, entityInfo);
             //var navFirst = GetNavColumnInfo(navMemberName, entityInfo);
             var entityInfo2 = this.Context.EntityMaintenance.GetEntityInfo(types.Last());
-            method = GetIncludesByNameStringMethod(types, thenNavMemberName2, method, parametres, entityInfo2);
+            method = GetIncludesByNameStringMethod(types, thenNavMemberName2, method, parameters, entityInfo2);
             var entityInfo3 = this.Context.EntityMaintenance.GetEntityInfo(types.Last());
-            method = GetIncludesByNameStringMethod(types, thenNavMemberName3, method, parametres, entityInfo3);
+            method = GetIncludesByNameStringMethod(types, thenNavMemberName3, method, parameters, entityInfo3);
             var entityInfo4 = this.Context.EntityMaintenance.GetEntityInfo(types.Last());
-            method = GetIncludesByNameStringMethod(types, thenNavMemberName4, method, parametres, entityInfo4);
+            method = GetIncludesByNameStringMethod(types, thenNavMemberName4, method, parameters, entityInfo4);
             var entityInfo5 = this.Context.EntityMaintenance.GetEntityInfo(types.Last());
-            method = GetIncludesByNameStringMethod(types, thenNavMemberName5, method, parametres, entityInfo5);
-            method.MakeGenericMethod(types.ToArray()).Invoke(this, parametres.Cast<object>().ToArray());
+            method = GetIncludesByNameStringMethod(types, thenNavMemberName5, method, parameters, entityInfo5);
+            method.MakeGenericMethod(types.ToArray()).Invoke(this, parameters.Cast<object>().ToArray());
             return this;
         }
         /// <summary>
         /// 获取通过字符串名称包含关联实体的方法信息
         /// </summary>
-        private static MethodInfo GetIncludesByNameStringMethod(List<Type> types, string navMemberName, MethodInfo method, List<Expression> parametres, EntityInfo entityInfo)
+        private static MethodInfo GetIncludesByNameStringMethod(List<Type> types, string navMemberName, MethodInfo method, List<Expression> parameters, EntityInfo entityInfo)
         {
             var navFirst = GetNavColumnInfo(navMemberName, entityInfo);
-            parametres.AddRange(GetIncludesByNameStringParameters(entityInfo.Type, navFirst));
+            parameters.AddRange(GetIncludesByNameStringParameters(entityInfo.Type, navFirst));
             if (navFirst.PropertyInfo.PropertyType.FullName.IsCollectionsList())
             {
                 types.Add(navFirst.PropertyInfo.PropertyType.GetGenericArguments()[0]);
@@ -157,17 +157,17 @@ namespace ThingsGateway.SqlSugar
         /// </summary>
         private static List<Expression> GetIncludesByNameStringParameters(Type type, EntityColumnInfo item)
         {
-            var parametres = new List<Expression> { };
+            var parameters = new List<Expression> { };
             Check.ExceptionEasy(item == null, "\r\nThe \"IncludesByNameString\" method encountered an error. The navigation object does not exist. Please check the parameters and navigation configuration.", "IncludesByNameString方法出错，导航对象不存在，请检查参数和导航配置");
-            var properyType = item.PropertyInfo.PropertyType;
-            var properyItemType = properyType;
-            if (properyType.FullName.IsCollectionsList())
+            var propertyType = item.PropertyInfo.PropertyType;
+            var propertyItemType = propertyType;
+            if (propertyType.FullName.IsCollectionsList())
             {
-                properyItemType = properyType.GetGenericArguments()[0];
+                propertyItemType = propertyType.GetGenericArguments()[0];
             }
-            var exp = ExpressionBuilderHelper.CreateExpressionSelectField(type, item.PropertyName, properyType);
-            parametres.Add(exp);
-            return parametres;
+            var exp = ExpressionBuilderHelper.CreateExpressionSelectField(type, item.PropertyName, propertyType);
+            parameters.Add(exp);
+            return parameters;
         }
 
         /// <summary>
@@ -178,16 +178,16 @@ namespace ThingsGateway.SqlSugar
             var navs = this.EntityInfo.Columns.Where(it => it.Navigat != null && it.PropertyName.EqualCase(navMemberName)).ToList();
             foreach (var item in navs)
             {
-                var properyType = item.PropertyInfo.PropertyType;
-                var properyItemType = properyType;
-                if (properyType.FullName.IsCollectionsList())
+                var propertyType = item.PropertyInfo.PropertyType;
+                var propertyItemType = propertyType;
+                if (propertyType.FullName.IsCollectionsList())
                 {
-                    properyItemType = properyType.GetGenericArguments()[0];
+                    propertyItemType = propertyType.GetGenericArguments()[0];
                 }
-                var exp = ExpressionBuilderHelper.CreateExpressionSelectField(typeof(T), item.PropertyName, properyType);
+                var exp = ExpressionBuilderHelper.CreateExpressionSelectField(typeof(T), item.PropertyName, propertyType);
                 var method = this.GetType().GetMethods().Where(it => it.Name == "IncludesByExpression")
                     .First()
-                    .MakeGenericMethod(properyItemType);
+                    .MakeGenericMethod(propertyItemType);
                 method.Invoke(this, new object[] { exp });
             }
             return this;
@@ -195,32 +195,32 @@ namespace ThingsGateway.SqlSugar
         /// <summary>
         /// 包含所有第一层关联实体（可忽略指定属性）
         /// </summary>
-        public ISugarQueryable<T> IncludesAllFirstLayer(params string[] ignoreProperyNameList)
+        public ISugarQueryable<T> IncludesAllFirstLayer(params string[] ignorePropertyNameList)
         {
             var navs = this.EntityInfo.Columns.Where(it => it.Navigat != null).ToList();
             foreach (var item in navs)
             {
-                if (ignoreProperyNameList?.Any(z => z.EqualCase(item.PropertyName)) == true)
+                if (ignorePropertyNameList?.Any(z => z.EqualCase(item.PropertyName)) == true)
                 {
                     //future
                 }
                 else
                 {
-                    var properyType = item.PropertyInfo.PropertyType;
-                    var properyItemType = properyType;
-                    if (properyType.FullName.IsCollectionsList())
+                    var propertyType = item.PropertyInfo.PropertyType;
+                    var propertyItemType = propertyType;
+                    if (propertyType.FullName.IsCollectionsList())
                     {
-                        properyItemType = properyType.GetGenericArguments()[0];
+                        propertyItemType = propertyType.GetGenericArguments()[0];
                     }
                     var shortName = "it";
                     if (this.QueryBuilder.TableShortName.HasValue())
                     {
                         shortName = this.QueryBuilder.TableShortName;
                     }
-                    var exp = ExpressionBuilderHelper.CreateExpressionSelectField(typeof(T), item.PropertyName, properyType, shortName);
+                    var exp = ExpressionBuilderHelper.CreateExpressionSelectField(typeof(T), item.PropertyName, propertyType, shortName);
                     var method = this.GetType().GetMethods().Where(it => it.Name == "IncludesByExpression")
                         .First()
-                        .MakeGenericMethod(properyItemType);
+                        .MakeGenericMethod(propertyItemType);
                     method.Invoke(this, new object[] { exp });
                 }
             }
@@ -229,7 +229,7 @@ namespace ThingsGateway.SqlSugar
         /// <summary>
         /// 包含所有第二层关联实体（可忽略指定属性）
         /// </summary>
-        public ISugarQueryable<T> IncludesAllSecondLayer<TReturn1>(Expression<Func<T, TReturn1>> expression, params string[] ignoreProperyNameList)
+        public ISugarQueryable<T> IncludesAllSecondLayer<TReturn1>(Expression<Func<T, TReturn1>> expression, params string[] ignorePropertyNameList)
         {
             //this.Includes(expression);
             var type = typeof(TReturn1);
@@ -240,22 +240,22 @@ namespace ThingsGateway.SqlSugar
             var navs = this.Context.EntityMaintenance.GetEntityInfo(type).Columns.Where(it => it.Navigat != null).ToList();
             foreach (var item in navs)
             {
-                if (ignoreProperyNameList?.Any(z => z.EqualCase(item.PropertyName)) == true)
+                if (ignorePropertyNameList?.Any(z => z.EqualCase(item.PropertyName)) == true)
                 {
                     //future
                 }
                 else
                 {
-                    var properyType = item.PropertyInfo.PropertyType;
-                    var properyItemType = properyType;
-                    if (properyType.FullName.IsCollectionsList())
+                    var propertyType = item.PropertyInfo.PropertyType;
+                    var propertyItemType = propertyType;
+                    if (propertyType.FullName.IsCollectionsList())
                     {
-                        properyItemType = properyType.GetGenericArguments()[0];
+                        propertyItemType = propertyType.GetGenericArguments()[0];
                     }
-                    var exp = ExpressionBuilderHelper.CreateExpressionSelectField(type, item.PropertyName, properyType);
+                    var exp = ExpressionBuilderHelper.CreateExpressionSelectField(type, item.PropertyName, propertyType);
                     var method = this.GetType().GetMethods().Where(it => it.Name == "IncludesByExpression2")
                         .First()
-                        .MakeGenericMethod(type, properyItemType);
+                        .MakeGenericMethod(type, propertyItemType);
                     method.Invoke(this, new object[] { expression, exp });
                 }
             }

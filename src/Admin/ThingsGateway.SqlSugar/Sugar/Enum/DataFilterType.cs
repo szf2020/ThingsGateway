@@ -50,15 +50,15 @@ namespace ThingsGateway.SqlSugar
         public EntityInfo Entity { get; set; }
         public object GetValue(string propertyName)
         {
-            var propety = EntityColumnInfos.FirstOrDefault(it => it.PropertyName == propertyName);
-            Check.ExceptionEasy(propety == null, $"Aop.DataExecuted error . {Entity.EntityName} no property {propertyName}.", $"Aop.DataExecuted 出错 {Entity.EntityName}不存在属性{propertyName}");
-            return propety.PropertyInfo.GetValue(EntityValue);
+            var property = EntityColumnInfos.FirstOrDefault(it => it.PropertyName == propertyName);
+            Check.ExceptionEasy(property == null, $"Aop.DataExecuted error . {Entity.EntityName} no property {propertyName}.", $"Aop.DataExecuted 出错 {Entity.EntityName}不存在属性{propertyName}");
+            return property.PropertyInfo.GetValue(EntityValue);
         }
         public void SetValue(string propertyName, object value)
         {
-            var propety = EntityColumnInfos.FirstOrDefault(it => it.PropertyName == propertyName);
-            Check.ExceptionEasy(propety == null, $"Aop.DataExecuted error . {Entity.EntityName} no property {propertyName}.", $"Aop.DataExecuted 出错 {Entity.EntityName}不存在属性{propertyName}");
-            propety.PropertyInfo.SetValue(EntityValue, value);
+            var property = EntityColumnInfos.FirstOrDefault(it => it.PropertyName == propertyName);
+            Check.ExceptionEasy(property == null, $"Aop.DataExecuted error . {Entity.EntityName} no property {propertyName}.", $"Aop.DataExecuted 出错 {Entity.EntityName}不存在属性{propertyName}");
+            property.PropertyInfo.SetValue(EntityValue, value);
         }
     }
 }

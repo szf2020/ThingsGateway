@@ -1398,12 +1398,12 @@ namespace ThingsGateway.SqlSugar
         public virtual ISugarQueryable<T> GroupBy(string groupFields)
         {
             groupFields = groupFields.ToCheckField();
-            var croupByValue = QueryBuilder.GroupByValue;
+            var groupByValue = QueryBuilder.GroupByValue;
             if (QueryBuilder.GroupByValue.IsNullOrEmpty())
             {
                 QueryBuilder.GroupByValue = QueryBuilder.GroupByTemplate;
             }
-            QueryBuilder.GroupByValue += string.IsNullOrEmpty(croupByValue) ? groupFields : ("," + groupFields);
+            QueryBuilder.GroupByValue += string.IsNullOrEmpty(groupByValue) ? groupFields : ("," + groupFields);
             return this;
         }
 

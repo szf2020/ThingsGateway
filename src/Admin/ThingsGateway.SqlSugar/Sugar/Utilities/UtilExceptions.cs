@@ -4,7 +4,7 @@ namespace ThingsGateway.SqlSugar
     public class SqlSugarException : Exception
     {
         public string Sql { get; set; }
-        public object Parametres { get; set; }
+        public object Parameters { get; set; }
         public new Exception InnerException;
         public new string StackTrace;
         public new MethodBase TargetSite;
@@ -23,14 +23,14 @@ namespace ThingsGateway.SqlSugar
             : base(message)
         {
             this.Sql = sql;
-            this.Parametres = pars;
+            this.Parameters = pars;
         }
 
         public SqlSugarException(SqlSugarProvider context, Exception ex, string sql, object pars)
             : base(ex.Message)
         {
             this.Sql = sql;
-            this.Parametres = pars;
+            this.Parameters = pars;
             this.InnerException = ex.InnerException;
             this.StackTrace = ex.StackTrace;
             this.TargetSite = ex.TargetSite;
@@ -40,7 +40,7 @@ namespace ThingsGateway.SqlSugar
         public SqlSugarException(SqlSugarProvider context, string message, object pars)
             : base(message)
         {
-            this.Parametres = pars;
+            this.Parameters = pars;
         }
 
         public SqlSugarException() : base()

@@ -73,8 +73,8 @@ namespace ThingsGateway.SqlSugar
                 lastShortName = shortName;
                 formInfo = item;
             }
-            var selectProperyInfo = ExpressionTool.GetMemberName(memberInfo.Expression);
-            var selectColumnInfo = memberInfo.ParentEntityInfo.Columns.First(it => it.PropertyName == selectProperyInfo);
+            var selectPropertyInfo = ExpressionTool.GetMemberName(memberInfo.Expression);
+            var selectColumnInfo = memberInfo.ParentEntityInfo.Columns.First(it => it.PropertyName == selectPropertyInfo);
             if (rootWhereSql?.HasValue() == true)
             {
                 queryable.Where(rootWhereSql);

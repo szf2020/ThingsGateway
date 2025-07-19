@@ -123,10 +123,10 @@ namespace ThingsGateway.SqlSugar
         {
             return (await Clone().Take(1).Select("1").ToListAsync().ConfigureAwait(false)).Count > 0;
         }
-        public virtual  Task<bool> AnyAsync(CancellationToken token)
+        public virtual Task<bool> AnyAsync(CancellationToken token)
         {
             this.Context.Ado.CancellationToken = token;
-            return  this.AnyAsync();
+            return this.AnyAsync();
         }
         public Task<int> CountAsync(CancellationToken token)
         {
@@ -537,7 +537,7 @@ ParameterT parameter)
                RightEntityColumn=rightEntity.Columns.First(it=>it.PropertyName==ExpressionTool.GetMemberName(mappingField2))
              }
             };
-            var conditionals = fieldsHelper.GetMppingSql(list.Cast<object>().ToList(), mappings);
+            var conditionals = fieldsHelper.GetMappingSql(list.Cast<object>().ToList(), mappings);
             if (queryableContext.TempChildLists == null)
                 queryableContext.TempChildLists = new Dictionary<string, object>();
             if (list != null && queryableContext.TempChildLists.TryGetValue(key, out object? value))

@@ -12,7 +12,7 @@ namespace System.Diagnostics
         public MethodBase? MethodBase { get; set; }
 
         public Type? DeclaringType { get; set; }
-        
+
         public bool IsAsync { get; set; }
 
         public bool IsLambda { get; set; }
@@ -38,8 +38,8 @@ namespace System.Diagnostics
 
         internal bool IsSequentialEquivalent(ResolvedMethod obj)
         {
-            return 
-                IsAsync == obj.IsAsync && 
+            return
+                IsAsync == obj.IsAsync &&
                 DeclaringType == obj.DeclaringType &&
                 Name == obj.Name &&
                 IsLambda == obj.IsLambda &&
@@ -98,7 +98,7 @@ namespace System.Diagnostics
             if (MethodBase != null)
             {
                 var isFirst = true;
-                foreach(var param in Parameters)
+                foreach (var param in Parameters)
                 {
                     if (isFirst)
                     {

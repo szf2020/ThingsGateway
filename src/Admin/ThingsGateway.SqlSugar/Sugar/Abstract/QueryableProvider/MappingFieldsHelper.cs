@@ -23,33 +23,12 @@ namespace ThingsGateway.SqlSugar
         public EntityInfo RootEntity { get; set; }
 
         /// <summary>
-        /// 获取映射字段信息
-        /// </summary>
-        /// <param name="thisField">当前字段表达式</param>
-        /// <param name="mappingField">映射字段表达式</param>
-        /// <returns>映射字段信息</returns>
-        public MappingFieldsInfo GetMappings(Expression thisField, Expression mappingField)
-        {
-            MappingFieldsInfo mappingFields = new MappingFieldsInfo();
-            var pkName = "";
-            if ((mappingField as LambdaExpression).Body is UnaryExpression)
-            {
-                pkName = (((mappingField as LambdaExpression).Body as UnaryExpression).Operand as MemberExpression).Member.Name;
-            }
-            else
-            {
-                pkName = ((mappingField as LambdaExpression).Body as MemberExpression).Member.Name;
-            }
-            return mappingFields;
-        }
-
-        /// <summary>
         /// 获取映射SQL条件
         /// </summary>
         /// <param name="list">对象列表</param>
         /// <param name="mappingFieldsExpressions">映射字段表达式列表</param>
         /// <returns>条件模型列表</returns>
-        public List<IConditionalModel> GetMppingSql(List<object> list, List<MappingFieldsExpression> mappingFieldsExpressions)
+        public List<IConditionalModel> GetMappingSql(List<object> list, List<MappingFieldsExpression> mappingFieldsExpressions)
         {
             List<IConditionalModel> conditionalModels = new List<IConditionalModel>();
             foreach (var model in list)
@@ -113,14 +92,7 @@ namespace ThingsGateway.SqlSugar
             {
                 //var expable =Expressionable.Create<object>();
                 List<object> setList = GetSetList(item, list, mappingFieldsExpressions);
-                //navColumnInfo.PropertyInfo.SetValue();
-                var instance = Activator.CreateInstance(navColumnInfo.PropertyInfo.PropertyType, true);
-                var ilist = instance as IList;
-                foreach (var value in setList)
-                {
-                    navColumnInfo.PropertyInfo.SetValue(item, value);
-                }
-
+                navColumnInfo.PropertyInfo.SetValue(item, setList.LastOrDefault());
             }
         }
         /// <summary>

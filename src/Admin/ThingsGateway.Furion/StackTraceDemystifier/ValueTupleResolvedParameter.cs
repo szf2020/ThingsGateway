@@ -1,18 +1,17 @@
 // Copyright (c) Ben A Adams. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
-using System.Collections.Generic;
 using System.Diagnostics.Internal;
 using System.Text;
 
-namespace System.Diagnostics 
+namespace System.Diagnostics
 {
     public class ValueTupleResolvedParameter : ResolvedParameter
     {
         public IList<string> TupleNames { get; }
 
-        public ValueTupleResolvedParameter(Type resolvedType, IList<string> tupleNames) 
-            : base(resolvedType) 
+        public ValueTupleResolvedParameter(Type resolvedType, IList<string> tupleNames)
+            : base(resolvedType)
             => TupleNames = tupleNames;
 
         protected override void AppendTypeName(StringBuilder sb)

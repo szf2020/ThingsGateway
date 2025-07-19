@@ -13,8 +13,8 @@ namespace System.Diagnostics
 
         public StackFrame StackFrame { get; }
 
-        public bool IsRecursive 
-        { 
+        public bool IsRecursive
+        {
             get => MethodInfo.RecurseCount > 0;
             internal set => MethodInfo.RecurseCount++;
         }

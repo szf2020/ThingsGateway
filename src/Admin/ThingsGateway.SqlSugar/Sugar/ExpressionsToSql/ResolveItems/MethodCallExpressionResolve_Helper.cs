@@ -518,10 +518,10 @@ namespace ThingsGateway.SqlSugar
                 else if (!(item is ParameterExpression) && name.IsIn("Contains", "StartsWith", "EndsWith") && item == args.Last() && ExpressionTool.IsSqlParameterDbType(this.Context, args.First()))
                 {
                     var myvalue = ExpressionTool.DynamicInvoke(args.Last());
-                    var parametre = ExpressionTool.GetParameterBySqlParameterDbType(this.Context.ParameterIndex, myvalue, this.Context, args.First());
-                    this.Context.Parameters.Add(parametre);
-                    methodCallExpressionArgs.MemberName = parametre.ParameterName;
-                    methodCallExpressionArgs.MemberValue = parametre.Value;
+                    var parameter1 = ExpressionTool.GetParameterBySqlParameterDbType(this.Context.ParameterIndex, myvalue, this.Context, args.First());
+                    this.Context.Parameters.Add(parameter1);
+                    methodCallExpressionArgs.MemberName = parameter1.ParameterName;
+                    methodCallExpressionArgs.MemberValue = parameter1.Value;
                     methodCallExpressionArgs.IsMember = true;
                     isRemoveParamter = true;
                     this.Context.ParameterIndex++;
@@ -598,8 +598,8 @@ namespace ThingsGateway.SqlSugar
             var member = exp as MemberExpression;
             var it = member.Expression;
             var type = it.Type;
-            var properyName = member.Member.Name;
-            var eqName = string.Format("{0}.{1}", this.Context.GetTranslationColumnName(it.ToString()), this.Context.GetDbColumnName(type.Name, properyName));
+            var propertyName = member.Member.Name;
+            var eqName = string.Format("{0}.{1}", this.Context.GetTranslationColumnName(it.ToString()), this.Context.GetDbColumnName(type.Name, propertyName));
             if (this.Context.IsSingle)
             {
                 this.Context.SingleTableNameSubqueryShortName = it.ToString();

@@ -14,7 +14,6 @@ using Microsoft.Net.Http.Headers;
 
 using System.Globalization;
 using System.Net.Http.Headers;
-using System.Net.Http.Json;
 using System.Net.Mime;
 
 using ThingsGateway.Extensions;
@@ -337,7 +336,9 @@ public sealed partial class HttpRequestBuilder
         {
             httpRequestMessage.Headers.CacheControl = new CacheControlHeaderValue
             {
-                NoCache = true, NoStore = true, MustRevalidate = true
+                NoCache = true,
+                NoStore = true,
+                MustRevalidate = true
             };
         }
 

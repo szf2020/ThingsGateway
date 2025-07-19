@@ -15,7 +15,7 @@
         {
             // 获取父实体信息和父实体列表
             var parentEntity = _ParentEntity;
-            var prentList = _ParentList.Cast<T>().ToList();
+            var parentList = _ParentList.Cast<T>().ToList();
 
             // 获取导航属性信息
             var parentNavigateProperty = parentEntity.Columns.FirstOrDefault(it => it.PropertyName == name);
@@ -37,7 +37,7 @@
 
             // 删除父表数据(如果尚未删除)
             if (!_IsDeletedParant)
-                SetContext(() => this._Context.Deleteable(prentList)
+                SetContext(() => this._Context.Deleteable(parentList)
                 .EnableDiffLogEventIF(_RootOptions?.IsDiffLogEvent == true, _RootOptions?.DiffLogBizData)
                 .ExecuteCommand());
 

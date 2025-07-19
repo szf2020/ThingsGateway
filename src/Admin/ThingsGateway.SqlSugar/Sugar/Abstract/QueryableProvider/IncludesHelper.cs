@@ -9,9 +9,9 @@ namespace ThingsGateway.SqlSugar
         /// </summary>
         private void _Includes<T1, TReturn1>(SqlSugarProvider context, params Expression[] expressions)
         {
-            Func<ISugarQueryable<object>, List<object>> SelectR1 = it => it.Select<TReturn1>().ToList().Select(x => x as object).ToList();
+            Func<ISugarQueryable<object>, List<object>> selectR1 = it => it.Select<TReturn1>().ToList().Cast<object>().ToList();
             var navigat = new NavigatManager<T>();
-            navigat.SelectR1 = SelectR1;
+            navigat.SelectR1 = selectR1;
             navigat.Expressions = expressions;
             navigat.Context = this.Context;
             navigat.IsCrossQueryWithAttr = this.QueryBuilder.IsCrossQueryWithAttr;
@@ -26,11 +26,11 @@ namespace ThingsGateway.SqlSugar
         /// </summary>
         private void _Includes<T1, TReturn1, TReturn2>(SqlSugarProvider context, params Expression[] expressions)
         {
-            Func<ISugarQueryable<object>, List<object>> SelectR1 = it => it.Select<TReturn1>().ToList().Select(x => x as object).ToList();
-            Func<ISugarQueryable<object>, List<object>> SelectR2 = it => it.Select<TReturn2>().ToList().Select(x => x as object).ToList();
+            Func<ISugarQueryable<object>, List<object>> selectR1 = it => it.Select<TReturn1>().ToList().Cast<object>().ToList();
+            Func<ISugarQueryable<object>, List<object>> selectR2 = it => it.Select<TReturn2>().ToList().Cast<object>().ToList();
             var navigat = new NavigatManager<T>();
-            navigat.SelectR1 = SelectR1;
-            navigat.SelectR2 = SelectR2;
+            navigat.SelectR1 = selectR1;
+            navigat.SelectR2 = selectR2;
             navigat.IsCrossQueryWithAttr = this.QueryBuilder.IsCrossQueryWithAttr;
             navigat.CrossQueryItems = this.QueryBuilder.CrossQueryItems;
             navigat.Expressions = expressions;
@@ -45,13 +45,13 @@ namespace ThingsGateway.SqlSugar
         /// </summary>
         private void _Includes<T1, TReturn1, TReturn2, TReturn3>(SqlSugarProvider context, params Expression[] expressions)
         {
-            Func<ISugarQueryable<object>, List<object>> SelectR1 = it => it.Select<TReturn1>().ToList().Select(x => x as object).ToList();
-            Func<ISugarQueryable<object>, List<object>> SelectR2 = it => it.Select<TReturn2>().ToList().Select(x => x as object).ToList();
-            Func<ISugarQueryable<object>, List<object>> SelectR3 = it => it.Select<TReturn3>().ToList().Select(x => x as object).ToList();
+            Func<ISugarQueryable<object>, List<object>> selectR1 = it => it.Select<TReturn1>().ToList().Cast<object>().ToList();
+            Func<ISugarQueryable<object>, List<object>> selectR2 = it => it.Select<TReturn2>().ToList().Cast<object>().ToList();
+            Func<ISugarQueryable<object>, List<object>> selectR3 = it => it.Select<TReturn3>().ToList().Cast<object>().ToList();
             var navigat = new NavigatManager<T>();
-            navigat.SelectR1 = SelectR1;
-            navigat.SelectR2 = SelectR2;
-            navigat.SelectR3 = SelectR3;
+            navigat.SelectR1 = selectR1;
+            navigat.SelectR2 = selectR2;
+            navigat.SelectR3 = selectR3;
             navigat.IsCrossQueryWithAttr = this.QueryBuilder.IsCrossQueryWithAttr;
             navigat.CrossQueryItems = this.QueryBuilder.CrossQueryItems;
             navigat.Expressions = expressions;
@@ -66,15 +66,15 @@ namespace ThingsGateway.SqlSugar
         /// </summary>
         private void _Includes<T1, TReturn1, TReturn2, TReturn3, TReturn4>(SqlSugarProvider context, params Expression[] expressions)
         {
-            Func<ISugarQueryable<object>, List<object>> SelectR1 = it => it.Select<TReturn1>().ToList().Select(x => x as object).ToList();
-            Func<ISugarQueryable<object>, List<object>> SelectR2 = it => it.Select<TReturn2>().ToList().Select(x => x as object).ToList();
-            Func<ISugarQueryable<object>, List<object>> SelectR3 = it => it.Select<TReturn3>().ToList().Select(x => x as object).ToList();
-            Func<ISugarQueryable<object>, List<object>> SelectR4 = it => it.Select<TReturn4>().ToList().Select(x => x as object).ToList();
+            Func<ISugarQueryable<object>, List<object>> selectR1 = it => it.Select<TReturn1>().ToList().Cast<object>().ToList();
+            Func<ISugarQueryable<object>, List<object>> selectR2 = it => it.Select<TReturn2>().ToList().Cast<object>().ToList();
+            Func<ISugarQueryable<object>, List<object>> selectR3 = it => it.Select<TReturn3>().ToList().Cast<object>().ToList();
+            Func<ISugarQueryable<object>, List<object>> selectR4 = it => it.Select<TReturn4>().ToList().Cast<object>().ToList();
             var navigat = new NavigatManager<T>();
-            navigat.SelectR1 = SelectR1;
-            navigat.SelectR2 = SelectR2;
-            navigat.SelectR3 = SelectR3;
-            navigat.SelectR4 = SelectR4;
+            navigat.SelectR1 = selectR1;
+            navigat.SelectR2 = selectR2;
+            navigat.SelectR3 = selectR3;
+            navigat.SelectR4 = selectR4;
             navigat.Expressions = expressions;
             navigat.IsCrossQueryWithAttr = this.QueryBuilder.IsCrossQueryWithAttr;
             navigat.CrossQueryItems = this.QueryBuilder.CrossQueryItems;
@@ -89,17 +89,17 @@ namespace ThingsGateway.SqlSugar
         /// </summary>
         private void _Includes<T1, TReturn1, TReturn2, TReturn3, TReturn4, TReturn5>(SqlSugarProvider context, params Expression[] expressions)
         {
-            Func<ISugarQueryable<object>, List<object>> SelectR1 = it => it.Select<TReturn1>().ToList().Select(x => x as object).ToList();
-            Func<ISugarQueryable<object>, List<object>> SelectR2 = it => it.Select<TReturn2>().ToList().Select(x => x as object).ToList();
-            Func<ISugarQueryable<object>, List<object>> SelectR3 = it => it.Select<TReturn3>().ToList().Select(x => x as object).ToList();
-            Func<ISugarQueryable<object>, List<object>> SelectR4 = it => it.Select<TReturn4>().ToList().Select(x => x as object).ToList();
-            Func<ISugarQueryable<object>, List<object>> SelectR5 = it => it.Select<TReturn5>().ToList().Select(x => x as object).ToList();
+            Func<ISugarQueryable<object>, List<object>> selectR1 = it => it.Select<TReturn1>().ToList().Cast<object>().ToList();
+            Func<ISugarQueryable<object>, List<object>> selectR2 = it => it.Select<TReturn2>().ToList().Cast<object>().ToList();
+            Func<ISugarQueryable<object>, List<object>> selectR3 = it => it.Select<TReturn3>().ToList().Cast<object>().ToList();
+            Func<ISugarQueryable<object>, List<object>> selectR4 = it => it.Select<TReturn4>().ToList().Cast<object>().ToList();
+            Func<ISugarQueryable<object>, List<object>> selectR5 = it => it.Select<TReturn5>().ToList().Cast<object>().ToList();
             var navigat = new NavigatManager<T>();
-            navigat.SelectR1 = SelectR1;
-            navigat.SelectR2 = SelectR2;
-            navigat.SelectR3 = SelectR3;
-            navigat.SelectR4 = SelectR4;
-            navigat.SelectR5 = SelectR5;
+            navigat.SelectR1 = selectR1;
+            navigat.SelectR2 = selectR2;
+            navigat.SelectR3 = selectR3;
+            navigat.SelectR4 = selectR4;
+            navigat.SelectR5 = selectR5;
             navigat.Expressions = expressions;
             navigat.IsCrossQueryWithAttr = this.QueryBuilder.IsCrossQueryWithAttr;
             navigat.CrossQueryItems = this.QueryBuilder.CrossQueryItems;
@@ -194,9 +194,9 @@ namespace ThingsGateway.SqlSugar
         /// </summary>
         private void _Includes<T1, TReturn1>(SqlSugarProvider context, params Expression[] expressions)
         {
-            Func<ISugarQueryable<object>, List<object>> SelectR1 = it => it.Select<TReturn1>().ToList().Select(x => x as object).ToList();
+            Func<ISugarQueryable<object>, List<object>> selectR1 = it => it.Select<TReturn1>().ToList().Cast<object>().ToList();
             var navigat = new NavigatManager<T>();
-            navigat.SelectR1 = SelectR1;
+            navigat.SelectR1 = selectR1;
             navigat.Expressions = expressions;
             navigat.Context = this.Context;
             navigat.IsCrossQueryWithAttr = this.QueryBuilder.IsCrossQueryWithAttr;
@@ -211,11 +211,11 @@ namespace ThingsGateway.SqlSugar
         /// </summary>
         private void _Includes<T1, TReturn1, TReturn2>(SqlSugarProvider context, params Expression[] expressions)
         {
-            Func<ISugarQueryable<object>, List<object>> SelectR1 = it => it.Select<TReturn1>().ToList().Select(x => x as object).ToList();
-            Func<ISugarQueryable<object>, List<object>> SelectR2 = it => it.Select<TReturn2>().ToList().Select(x => x as object).ToList();
+            Func<ISugarQueryable<object>, List<object>> selectR1 = it => it.Select<TReturn1>().ToList().Cast<object>().ToList();
+            Func<ISugarQueryable<object>, List<object>> selectR2 = it => it.Select<TReturn2>().ToList().Cast<object>().ToList();
             var navigat = new NavigatManager<T>();
-            navigat.SelectR1 = SelectR1;
-            navigat.SelectR2 = SelectR2;
+            navigat.SelectR1 = selectR1;
+            navigat.SelectR2 = selectR2;
             navigat.Expressions = expressions;
             navigat.IsCrossQueryWithAttr = this.QueryBuilder.IsCrossQueryWithAttr;
             navigat.CrossQueryItems = this.QueryBuilder.CrossQueryItems;
@@ -230,13 +230,13 @@ namespace ThingsGateway.SqlSugar
         /// </summary>
         private void _Includes<T1, TReturn1, TReturn2, TReturn3>(SqlSugarProvider context, params Expression[] expressions)
         {
-            Func<ISugarQueryable<object>, List<object>> SelectR1 = it => it.Select<TReturn1>().ToList().Select(x => x as object).ToList();
-            Func<ISugarQueryable<object>, List<object>> SelectR2 = it => it.Select<TReturn2>().ToList().Select(x => x as object).ToList();
-            Func<ISugarQueryable<object>, List<object>> SelectR3 = it => it.Select<TReturn3>().ToList().Select(x => x as object).ToList();
+            Func<ISugarQueryable<object>, List<object>> selectR1 = it => it.Select<TReturn1>().ToList().Cast<object>().ToList();
+            Func<ISugarQueryable<object>, List<object>> selectR2 = it => it.Select<TReturn2>().ToList().Cast<object>().ToList();
+            Func<ISugarQueryable<object>, List<object>> selectR3 = it => it.Select<TReturn3>().ToList().Cast<object>().ToList();
             var navigat = new NavigatManager<T>();
-            navigat.SelectR1 = SelectR1;
-            navigat.SelectR2 = SelectR2;
-            navigat.SelectR3 = SelectR3;
+            navigat.SelectR1 = selectR1;
+            navigat.SelectR2 = selectR2;
+            navigat.SelectR3 = selectR3;
             navigat.Expressions = expressions;
             navigat.IsCrossQueryWithAttr = this.QueryBuilder.IsCrossQueryWithAttr;
             navigat.CrossQueryItems = this.QueryBuilder.CrossQueryItems;
@@ -251,15 +251,15 @@ namespace ThingsGateway.SqlSugar
         /// </summary>
         private void _Includes<T1, TReturn1, TReturn2, TReturn3, TReturn4>(SqlSugarProvider context, params Expression[] expressions)
         {
-            Func<ISugarQueryable<object>, List<object>> SelectR1 = it => it.Select<TReturn1>().ToList().Select(x => x as object).ToList();
-            Func<ISugarQueryable<object>, List<object>> SelectR2 = it => it.Select<TReturn2>().ToList().Select(x => x as object).ToList();
-            Func<ISugarQueryable<object>, List<object>> SelectR3 = it => it.Select<TReturn3>().ToList().Select(x => x as object).ToList();
-            Func<ISugarQueryable<object>, List<object>> SelectR4 = it => it.Select<TReturn4>().ToList().Select(x => x as object).ToList();
+            Func<ISugarQueryable<object>, List<object>> selectR1 = it => it.Select<TReturn1>().ToList().Cast<object>().ToList();
+            Func<ISugarQueryable<object>, List<object>> selectR2 = it => it.Select<TReturn2>().ToList().Cast<object>().ToList();
+            Func<ISugarQueryable<object>, List<object>> selectR3 = it => it.Select<TReturn3>().ToList().Cast<object>().ToList();
+            Func<ISugarQueryable<object>, List<object>> selectR4 = it => it.Select<TReturn4>().ToList().Cast<object>().ToList();
             var navigat = new NavigatManager<T>();
-            navigat.SelectR1 = SelectR1;
-            navigat.SelectR2 = SelectR2;
-            navigat.SelectR3 = SelectR3;
-            navigat.SelectR4 = SelectR4;
+            navigat.SelectR1 = selectR1;
+            navigat.SelectR2 = selectR2;
+            navigat.SelectR3 = selectR3;
+            navigat.SelectR4 = selectR4;
             navigat.Expressions = expressions;
             navigat.IsCrossQueryWithAttr = this.QueryBuilder.IsCrossQueryWithAttr;
             navigat.CrossQueryItems = this.QueryBuilder.CrossQueryItems;
@@ -274,17 +274,17 @@ namespace ThingsGateway.SqlSugar
         /// </summary>
         private void _Includes<T1, TReturn1, TReturn2, TReturn3, TReturn4, TReturn5>(SqlSugarProvider context, params Expression[] expressions)
         {
-            Func<ISugarQueryable<object>, List<object>> SelectR1 = it => it.Select<TReturn1>().ToList().Select(x => x as object).ToList();
-            Func<ISugarQueryable<object>, List<object>> SelectR2 = it => it.Select<TReturn2>().ToList().Select(x => x as object).ToList();
-            Func<ISugarQueryable<object>, List<object>> SelectR3 = it => it.Select<TReturn3>().ToList().Select(x => x as object).ToList();
-            Func<ISugarQueryable<object>, List<object>> SelectR4 = it => it.Select<TReturn4>().ToList().Select(x => x as object).ToList();
-            Func<ISugarQueryable<object>, List<object>> SelectR5 = it => it.Select<TReturn5>().ToList().Select(x => x as object).ToList();
+            Func<ISugarQueryable<object>, List<object>> selectR1 = it => it.Select<TReturn1>().ToList().Cast<object>().ToList();
+            Func<ISugarQueryable<object>, List<object>> selectR2 = it => it.Select<TReturn2>().ToList().Cast<object>().ToList();
+            Func<ISugarQueryable<object>, List<object>> selectR3 = it => it.Select<TReturn3>().ToList().Cast<object>().ToList();
+            Func<ISugarQueryable<object>, List<object>> selectR4 = it => it.Select<TReturn4>().ToList().Cast<object>().ToList();
+            Func<ISugarQueryable<object>, List<object>> selectR5 = it => it.Select<TReturn5>().ToList().Cast<object>().ToList();
             var navigat = new NavigatManager<T>();
-            navigat.SelectR1 = SelectR1;
-            navigat.SelectR2 = SelectR2;
-            navigat.SelectR3 = SelectR3;
-            navigat.SelectR4 = SelectR4;
-            navigat.SelectR5 = SelectR5;
+            navigat.SelectR1 = selectR1;
+            navigat.SelectR2 = selectR2;
+            navigat.SelectR3 = selectR3;
+            navigat.SelectR4 = selectR4;
+            navigat.SelectR5 = selectR5;
             navigat.Expressions = expressions;
             navigat.IsCrossQueryWithAttr = this.QueryBuilder.IsCrossQueryWithAttr;
             navigat.CrossQueryItems = this.QueryBuilder.CrossQueryItems;
@@ -299,19 +299,19 @@ namespace ThingsGateway.SqlSugar
         /// </summary>
         private void _Includes<T1, TReturn1, TReturn2, TReturn3, TReturn4, TReturn5, TReturn6>(SqlSugarProvider context, params Expression[] expressions)
         {
-            Func<ISugarQueryable<object>, List<object>> SelectR1 = it => it.Select<TReturn1>().ToList().Select(x => x as object).ToList();
-            Func<ISugarQueryable<object>, List<object>> SelectR2 = it => it.Select<TReturn2>().ToList().Select(x => x as object).ToList();
-            Func<ISugarQueryable<object>, List<object>> SelectR3 = it => it.Select<TReturn3>().ToList().Select(x => x as object).ToList();
-            Func<ISugarQueryable<object>, List<object>> SelectR4 = it => it.Select<TReturn4>().ToList().Select(x => x as object).ToList();
-            Func<ISugarQueryable<object>, List<object>> SelectR5 = it => it.Select<TReturn5>().ToList().Select(x => x as object).ToList();
-            Func<ISugarQueryable<object>, List<object>> SelectR6 = it => it.Select<TReturn6>().ToList().Select(x => x as object).ToList();
+            Func<ISugarQueryable<object>, List<object>> selectR1 = it => it.Select<TReturn1>().ToList().Cast<object>().ToList();
+            Func<ISugarQueryable<object>, List<object>> selectR2 = it => it.Select<TReturn2>().ToList().Cast<object>().ToList();
+            Func<ISugarQueryable<object>, List<object>> selectR3 = it => it.Select<TReturn3>().ToList().Cast<object>().ToList();
+            Func<ISugarQueryable<object>, List<object>> selectR4 = it => it.Select<TReturn4>().ToList().Cast<object>().ToList();
+            Func<ISugarQueryable<object>, List<object>> selectR5 = it => it.Select<TReturn5>().ToList().Cast<object>().ToList();
+            Func<ISugarQueryable<object>, List<object>> selectR6 = it => it.Select<TReturn6>().ToList().Cast<object>().ToList();
             var navigat = new NavigatManager<T>();
-            navigat.SelectR1 = SelectR1;
-            navigat.SelectR2 = SelectR2;
-            navigat.SelectR3 = SelectR3;
-            navigat.SelectR4 = SelectR4;
-            navigat.SelectR5 = SelectR5;
-            navigat.SelectR6 = SelectR6;
+            navigat.SelectR1 = selectR1;
+            navigat.SelectR2 = selectR2;
+            navigat.SelectR3 = selectR3;
+            navigat.SelectR4 = selectR4;
+            navigat.SelectR5 = selectR5;
+            navigat.SelectR6 = selectR6;
             navigat.Expressions = expressions;
             navigat.IsCrossQueryWithAttr = this.QueryBuilder.IsCrossQueryWithAttr;
             navigat.CrossQueryItems = this.QueryBuilder.CrossQueryItems;
@@ -326,21 +326,21 @@ namespace ThingsGateway.SqlSugar
         /// </summary>
         private void _Includes<T1, TReturn1, TReturn2, TReturn3, TReturn4, TReturn5, TReturn6, TReturn7>(SqlSugarProvider context, params Expression[] expressions)
         {
-            Func<ISugarQueryable<object>, List<object>> SelectR1 = it => it.Select<TReturn1>().ToList().Select(x => x as object).ToList();
-            Func<ISugarQueryable<object>, List<object>> SelectR2 = it => it.Select<TReturn2>().ToList().Select(x => x as object).ToList();
-            Func<ISugarQueryable<object>, List<object>> SelectR3 = it => it.Select<TReturn3>().ToList().Select(x => x as object).ToList();
-            Func<ISugarQueryable<object>, List<object>> SelectR4 = it => it.Select<TReturn4>().ToList().Select(x => x as object).ToList();
-            Func<ISugarQueryable<object>, List<object>> SelectR5 = it => it.Select<TReturn5>().ToList().Select(x => x as object).ToList();
-            Func<ISugarQueryable<object>, List<object>> SelectR6 = it => it.Select<TReturn6>().ToList().Select(x => x as object).ToList();
-            Func<ISugarQueryable<object>, List<object>> SelectR7 = it => it.Select<TReturn7>().ToList().Select(x => x as object).ToList();
+            Func<ISugarQueryable<object>, List<object>> selectR1 = it => it.Select<TReturn1>().ToList().Cast<object>().ToList();
+            Func<ISugarQueryable<object>, List<object>> selectR2 = it => it.Select<TReturn2>().ToList().Cast<object>().ToList();
+            Func<ISugarQueryable<object>, List<object>> selectR3 = it => it.Select<TReturn3>().ToList().Cast<object>().ToList();
+            Func<ISugarQueryable<object>, List<object>> selectR4 = it => it.Select<TReturn4>().ToList().Cast<object>().ToList();
+            Func<ISugarQueryable<object>, List<object>> selectR5 = it => it.Select<TReturn5>().ToList().Cast<object>().ToList();
+            Func<ISugarQueryable<object>, List<object>> selectR6 = it => it.Select<TReturn6>().ToList().Cast<object>().ToList();
+            Func<ISugarQueryable<object>, List<object>> selectR7 = it => it.Select<TReturn7>().ToList().Cast<object>().ToList();
             var navigat = new NavigatManager<T>();
-            navigat.SelectR1 = SelectR1;
-            navigat.SelectR2 = SelectR2;
-            navigat.SelectR3 = SelectR3;
-            navigat.SelectR4 = SelectR4;
-            navigat.SelectR5 = SelectR5;
-            navigat.SelectR6 = SelectR6;
-            navigat.SelectR7 = SelectR7;
+            navigat.SelectR1 = selectR1;
+            navigat.SelectR2 = selectR2;
+            navigat.SelectR3 = selectR3;
+            navigat.SelectR4 = selectR4;
+            navigat.SelectR5 = selectR5;
+            navigat.SelectR6 = selectR6;
+            navigat.SelectR7 = selectR7;
             navigat.Expressions = expressions;
             navigat.QueryBuilder = this.QueryBuilder;
             navigat.IsCrossQueryWithAttr = this.QueryBuilder.IsCrossQueryWithAttr;

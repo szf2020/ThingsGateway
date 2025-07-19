@@ -239,7 +239,9 @@ public sealed class HttpMultipartFormDataBuilder
         {
             _partContents.Add(new MultipartFormDataItem(name)
             {
-                ContentType = mediaType, RawContent = rawObject, ContentEncoding = encoding
+                ContentType = mediaType,
+                RawContent = rawObject,
+                ContentEncoding = encoding
             });
 
             return this;
@@ -526,7 +528,10 @@ public sealed class HttpMultipartFormDataBuilder
 
         _partContents.Add(new MultipartFormDataItem(name)
         {
-            ContentType = mimeType, RawContent = stream, ContentEncoding = encoding, FileName = fileName
+            ContentType = mimeType,
+            RawContent = stream,
+            ContentEncoding = encoding,
+            FileName = fileName
         });
 
         // 是否在请求结束后自动释放流
@@ -569,7 +574,10 @@ public sealed class HttpMultipartFormDataBuilder
 
         _partContents.Add(new MultipartFormDataItem(name)
         {
-            ContentType = mimeType, RawContent = byteArray, ContentEncoding = encoding, FileName = fileName
+            ContentType = mimeType,
+            RawContent = byteArray,
+            ContentEncoding = encoding,
+            FileName = fileName
         });
 
         return this;
@@ -692,7 +700,9 @@ public sealed class HttpMultipartFormDataBuilder
 
         _partContents.Add(new MultipartFormDataItem(formName)
         {
-            ContentType = mediaType, RawContent = httpContent, ContentEncoding = encoding
+            ContentType = mediaType,
+            RawContent = httpContent,
+            ContentEncoding = encoding
         });
 
         return this;

@@ -9,12 +9,14 @@
 // 许可证的完整文本可以在源代码树根目录中的 LICENSE-APACHE 和 LICENSE-MIT 文件中找到。
 // ------------------------------------------------------------------------
 
-using ThingsGateway.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using System.Threading.Channels;
+
+using ThingsGateway.Extensions;
 
 namespace ThingsGateway.HttpRemote;
 
@@ -218,7 +220,7 @@ internal sealed class ServerSentEventsManager
             }
 
             // 获取 HTTP 响应体中的内容流
-             using var contentStream = await httpResponseMessage.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
+            using var contentStream = await httpResponseMessage.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
 
             // 初始化 StreamReader 实例
             using var streamReader = new StreamReader(contentStream, Encoding.UTF8);

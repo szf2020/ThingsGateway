@@ -1,8 +1,6 @@
 // Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
-using System.Collections.Generic;
-using System.IO;
 using System.Reflection;
 using System.Reflection.Metadata;
 using System.Reflection.Metadata.Ecma335;
@@ -104,8 +102,8 @@ namespace System.Diagnostics.Internal
                     {
                         var codeViewData = peReader.ReadCodeViewDebugDirectoryData(entry);
                         var peDirectory = Path.GetDirectoryName(assemblyPath);
-                        return peDirectory is null 
-                            ? null 
+                        return peDirectory is null
+                            ? null
                             : Path.Combine(peDirectory, Path.GetFileName(codeViewData.Path));
                     }
                 }

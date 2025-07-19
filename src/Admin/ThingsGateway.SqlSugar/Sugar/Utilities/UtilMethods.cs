@@ -354,21 +354,21 @@ namespace ThingsGateway.SqlSugar
             }
         }
 
-        internal static Expression GetIncludeExpression(string navMemberName, EntityInfo entityInfo, out Type properyItemType, out bool isList)
+        internal static Expression GetIncludeExpression(string navMemberName, EntityInfo entityInfo, out Type propertyItemType, out bool isList)
         {
             var navInfo = entityInfo.Columns.Where(it => it.Navigat != null && it.PropertyName.EqualCase(navMemberName)).FirstOrDefault();
-            var properyType = navInfo.PropertyInfo.PropertyType;
-            properyItemType = properyType;
-            if (properyType.FullName.IsCollectionsList())
+            var propertyType = navInfo.PropertyInfo.PropertyType;
+            propertyItemType = propertyType;
+            if (propertyType.FullName.IsCollectionsList())
             {
-                properyItemType = properyType.GetGenericArguments()[0];
+                propertyItemType = propertyType.GetGenericArguments()[0];
                 isList = true;
             }
             else
             {
                 isList = false;
             }
-            return ExpressionBuilderHelper.CreateExpressionSelectField(entityInfo.Type, navInfo.PropertyName, properyType);
+            return ExpressionBuilderHelper.CreateExpressionSelectField(entityInfo.Type, navInfo.PropertyName, propertyType);
         }
         public static string RemoveEqualOne(string value)
         {
@@ -1687,10 +1687,10 @@ namespace ThingsGateway.SqlSugar
             string FirstDay = datetime.AddDays(daydiff).ToString("yyyy-MM-dd");
             return Convert.ToDateTime(FirstDay);
         }
-        public static string GetSqlString(DbType dbType, string sql, SugarParameter[] parametres, bool DisableNvarchar = false)
+        public static string GetSqlString(DbType dbType, string sql, SugarParameter[] parameters, bool DisableNvarchar = false)
         {
-            if (parametres == null)
-                parametres = Array.Empty<SugarParameter>();
+            if (parameters == null)
+                parameters = Array.Empty<SugarParameter>();
             return GetSqlString(new ConnectionConfig()
             {
                 DbType = dbType,
@@ -1698,7 +1698,7 @@ namespace ThingsGateway.SqlSugar
                 {
                     DisableNvarchar = DisableNvarchar
                 }
-            }, new KeyValuePair<string, List<SugarParameter>>(sql, parametres.ToList()));
+            }, new KeyValuePair<string, List<SugarParameter>>(sql, parameters.ToList()));
         }
         public static string GetSqlString(ConnectionConfig connectionConfig, KeyValuePair<string, List<SugarParameter>> sqlObj)
         {

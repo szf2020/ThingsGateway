@@ -55,7 +55,7 @@ namespace ThingsGateway.SqlSugar
                         "参数格式错误。\n请使用 new{xx=xx, xx2=xx2} 或 \nDictionary<string, object> 或 \nSugarParameter [] ");
 
                     // 反射对象属性转参数
-                    ProperyToParameter(parameters, propertyInfo, sqlParameterKeyWord, result, entityType);
+                    PropertyToParameter(parameters, propertyInfo, sqlParameterKeyWord, result, entityType);
                 }
             }
 
@@ -65,16 +65,16 @@ namespace ThingsGateway.SqlSugar
         /// <summary>
         /// 将对象的属性转换为参数集合
         /// </summary>
-        protected void ProperyToParameter(object parameters, PropertyInfo[] propertyInfo, string sqlParameterKeyWord, List<SugarParameter> listParams, Type entityType)
+        protected void PropertyToParameter(object parameters, PropertyInfo[] propertyInfo, string sqlParameterKeyWord, List<SugarParameter> listParams, Type entityType)
         {
             PropertyInfo[] properties = propertyInfo ?? entityType.GetProperties();
 
-            foreach (PropertyInfo properyty in properties)
+            foreach (PropertyInfo propertyty in properties)
             {
-                var value = properyty.GetValue(parameters, null);
+                var value = propertyty.GetValue(parameters, null);
 
                 // 如果是枚举类型，转成 long
-                if (properyty.PropertyType.IsEnum())
+                if (propertyty.PropertyType.IsEnum())
                     value = Convert.ToInt64(value);
 
                 // DateTime.MinValue 处理为 DBNull
@@ -82,9 +82,9 @@ namespace ThingsGateway.SqlSugar
                     value = DBNull.Value;
 
                 // 特殊处理 HIERARCHYID 类型
-                if (properyty.Name.Contains("hierarchyid", StringComparison.CurrentCultureIgnoreCase))
+                if (propertyty.Name.Contains("hierarchyid", StringComparison.CurrentCultureIgnoreCase))
                 {
-                    var parameter = new SugarParameter(sqlParameterKeyWord + properyty.Name, SqlDbType.Udt)
+                    var parameter = new SugarParameter(sqlParameterKeyWord + propertyty.Name, SqlDbType.Udt)
                     {
                         UdtTypeName = "HIERARCHYID",
                         Value = value
@@ -94,7 +94,7 @@ namespace ThingsGateway.SqlSugar
                 else
                 {
                     // 常规参数
-                    var parameter = new SugarParameter(sqlParameterKeyWord + properyty.Name, value);
+                    var parameter = new SugarParameter(sqlParameterKeyWord + propertyty.Name, value);
                     listParams.Add(parameter);
                 }
             }

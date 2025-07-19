@@ -9,13 +9,15 @@
 // 许可证的完整文本可以在源代码树根目录中的 LICENSE-APACHE 和 LICENSE-MIT 文件中找到。
 // ------------------------------------------------------------------------
 
-using ThingsGateway.Utilities;
 using Microsoft.Net.Http.Headers;
+
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Net.Http.Json;
 using System.Net.Mime;
 using System.Text.RegularExpressions;
+
+using ThingsGateway.Utilities;
 
 namespace ThingsGateway.HttpRemote;
 

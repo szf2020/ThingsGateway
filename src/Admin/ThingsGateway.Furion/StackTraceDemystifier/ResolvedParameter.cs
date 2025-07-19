@@ -22,7 +22,7 @@ namespace System.Diagnostics
         {
             if (ResolvedType.Assembly.ManifestModule.Name == "FSharp.Core.dll" && ResolvedType.Name == "Unit")
                 return sb;
-            
+
             if (!string.IsNullOrEmpty(Prefix))
             {
                 sb.Append(Prefix)
@@ -51,7 +51,7 @@ namespace System.Diagnostics
             return sb;
         }
 
-        protected virtual void AppendTypeName(StringBuilder sb) 
+        protected virtual void AppendTypeName(StringBuilder sb)
         {
             sb.AppendTypeDisplayName(ResolvedType, fullName: false, includeGenericParameterNames: true);
         }

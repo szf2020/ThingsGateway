@@ -297,7 +297,7 @@ namespace ThingsGateway.SqlSugar
 
             return result;
         }
-        private List<object> GetPrentIds(List<T> list, object id, EntityColumnInfo pkName, EntityColumnInfo parentName)
+        private List<object> GetParentIds(List<T> list, object id, EntityColumnInfo pkName, EntityColumnInfo parentName)
         {
             var currentId = id;
             List<object> result = new List<object>();
@@ -320,7 +320,7 @@ namespace ThingsGateway.SqlSugar
             var parentColumn = entity.Columns.FirstOrDefault(z => z.PropertyName == parentIdName);
             foreach (var id in childIds)
             {
-                newIds.AddRange(GetPrentIds(list, id, pkColumn, parentColumn));
+                newIds.AddRange(GetParentIds(list, id, pkColumn, parentColumn));
             }
             list = list.Where(z => newIds.Any(it => it.ObjToString() == pkColumn.PropertyInfo.GetValue(z).ObjToString())).ToList();
             return GetTreeRoot(childListExpression, parentIdExpression, pk, list, rootValue);
@@ -335,7 +335,7 @@ namespace ThingsGateway.SqlSugar
             var parentColumn = entity.Columns.FirstOrDefault(z => z.PropertyName == parentIdName);
             foreach (var id in childIds)
             {
-                newIds.AddRange(GetPrentIds(list, id, pkColumn, parentColumn));
+                newIds.AddRange(GetParentIds(list, id, pkColumn, parentColumn));
             }
             list = list.Where(z => newIds.Any(it => it.ObjToString() == pkColumn.PropertyInfo.GetValue(z).ObjToString())).ToList();
             return GetTreeRoot(childListExpression, parentIdExpression, pk, list, rootValue);
@@ -491,9 +491,9 @@ namespace ThingsGateway.SqlSugar
             QueryBuilder.CheckExpression(expression, "Max");
             var isSingle = QueryBuilder.IsSingle();
             var lamResult = QueryBuilder.GetExpressionValue(expression, isSingle ? ResolveExpressType.FieldSingle : ResolveExpressType.FieldMultiple);
-            var reslut = Max<TResult>(lamResult.GetResultString());
+            var result = Max<TResult>(lamResult.GetResultString());
             QueryBuilder.SelectValue = null;
-            return reslut;
+            return result;
         }
         protected async Task<TResult> _MaxAsync<TResult>(Expression expression)
         {
@@ -504,9 +504,9 @@ namespace ThingsGateway.SqlSugar
             QueryBuilder.CheckExpression(expression, "Max");
             var isSingle = QueryBuilder.IsSingle();
             var lamResult = QueryBuilder.GetExpressionValue(expression, isSingle ? ResolveExpressType.FieldSingle : ResolveExpressType.FieldMultiple);
-            var reslut = await MaxAsync<TResult>(lamResult.GetResultString()).ConfigureAwait(false);
+            var result = await MaxAsync<TResult>(lamResult.GetResultString()).ConfigureAwait(false);
             QueryBuilder.SelectValue = null;
-            return reslut;
+            return result;
         }
         protected TResult _Sum<TResult>(Expression expression)
         {
@@ -517,9 +517,9 @@ namespace ThingsGateway.SqlSugar
             QueryBuilder.CheckExpression(expression, "Sum");
             var isSingle = QueryBuilder.IsSingle();
             var lamResult = QueryBuilder.GetExpressionValue(expression, isSingle ? ResolveExpressType.FieldSingle : ResolveExpressType.FieldMultiple);
-            var reslut = Sum<TResult>(lamResult.GetResultString());
+            var result = Sum<TResult>(lamResult.GetResultString());
             QueryBuilder.SelectValue = null;
-            return reslut;
+            return result;
         }
         protected async Task<TResult> _SumAsync<TResult>(Expression expression)
         {
@@ -530,9 +530,9 @@ namespace ThingsGateway.SqlSugar
             QueryBuilder.CheckExpression(expression, "Sum");
             var isSingle = QueryBuilder.IsSingle();
             var lamResult = QueryBuilder.GetExpressionValue(expression, isSingle ? ResolveExpressType.FieldSingle : ResolveExpressType.FieldMultiple);
-            var reslut = await SumAsync<TResult>(lamResult.GetResultString()).ConfigureAwait(false);
+            var result = await SumAsync<TResult>(lamResult.GetResultString()).ConfigureAwait(false);
             QueryBuilder.SelectValue = null;
-            return reslut;
+            return result;
         }
         #endregion
 
@@ -2430,7 +2430,7 @@ namespace ThingsGateway.SqlSugar
                             var addItem = list[appindex];
                             if (addItem is SubQueryToListDefaultT)
                             {
-                                addItem = (addItem as SubQueryToListDefaultT).id;
+                                addItem = (addItem as SubQueryToListDefaultT).Id;
                             }
                             setValue.Add(addItem);
                         }
@@ -2515,7 +2515,7 @@ namespace ThingsGateway.SqlSugar
                             var addItem = list[appindex];
                             if (addItem is SubQueryToListDefaultT)
                             {
-                                addItem = ((SubQueryToListDefaultT)addItem).id;
+                                addItem = ((SubQueryToListDefaultT)addItem).Id;
                             }
                             if (addItem != null && addItem is string && itemProperty?.PropertyType?.GenericTypeArguments?.FirstOrDefault() == UtilConstants.GuidType)
                             {

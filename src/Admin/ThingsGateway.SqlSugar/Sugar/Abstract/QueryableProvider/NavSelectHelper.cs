@@ -21,7 +21,7 @@ namespace ThingsGateway.SqlSugar
                 includeQueryable.Select(GetGroupSelect(typeof(T), queryableProvider.Context, queryableProvider.QueryBuilder));
                 includeQueryable.QueryBuilder.NoCheckInclude = true;
                 var mappingColumn = GetMappingColumn(expression);
-                MegerList(result, includeQueryable.ToList(), sqlfuncQueryable.Context, mappingColumn);
+                MergeList(result, includeQueryable.ToList(), sqlfuncQueryable.Context, mappingColumn);
             }
             else if (isSqlFunc)
             {
@@ -107,7 +107,7 @@ namespace ThingsGateway.SqlSugar
             var queryable = queryableProvider.Select(selector).Clone();
             queryable.QueryBuilder.NoCheckInclude = true;
             var includeList = queryable.ToList();
-            MegerList(result, includeList, sqlfuncQueryable.Context, mappingColumn);
+            MergeList(result, includeList, sqlfuncQueryable.Context, mappingColumn);
             return result;
         }
 
@@ -178,7 +178,7 @@ namespace ThingsGateway.SqlSugar
             return columns;
         }
 
-        private static void MegerList<TResult, T>(List<TResult> result, List<T> includeList, SqlSugarProvider context, List<NavMappingColumn> navMappingColumns)
+        private static void MergeList<TResult, T>(List<TResult> result, List<T> includeList, SqlSugarProvider context, List<NavMappingColumn> navMappingColumns)
         {
             if (result.Count != includeList.Count) return;
             var columns = context.EntityMaintenance.GetEntityInfo<T>().Columns;
@@ -338,8 +338,8 @@ namespace ThingsGateway.SqlSugar
 
         private static bool isGroup<T, TResult>(Expression<Func<T, TResult>> expression, QueryableProvider<T> queryableProvider)
         {
-            var isGroup = queryableProvider.QueryBuilder.GetGroupByString.HasValue();
-            return isGroup;
+            var group = queryableProvider.QueryBuilder.GetGroupByString.HasValue();
+            return group;
         }
 
         internal class NavMappingColumn

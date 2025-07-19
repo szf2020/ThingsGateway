@@ -16,8 +16,8 @@ namespace ThingsGateway.SqlSugar
         ISugarQueryable<T> IncludesByNameString(string navMemberName, string thenNavMemberName2, string thenNavMemberName3);
         ISugarQueryable<T> IncludesByNameString(string navMemberName, string thenNavMemberName2, string thenNavMemberName3, string thenNavMemberName4);
         ISugarQueryable<T> IncludesByNameString(string navMemberName, string thenNavMemberName2, string thenNavMemberName3, string thenNavMemberName4, string thenNavMemberName5);
-        ISugarQueryable<T> IncludesAllFirstLayer(params string[] ignoreProperyNameList);
-        ISugarQueryable<T> IncludesAllSecondLayer<TReturn1>(Expression<Func<T, TReturn1>> expression, params string[] ignoreProperyNameList);
+        ISugarQueryable<T> IncludesAllFirstLayer(params string[] ignorePropertyNameList);
+        ISugarQueryable<T> IncludesAllSecondLayer<TReturn1>(Expression<Func<T, TReturn1>> expression, params string[] ignorePropertyNameList);
         ISugarQueryable<T> Includes<TReturn1>(Expression<Func<T, List<TReturn1>>> include1);
         ISugarQueryable<T> Includes<TReturn1>(Expression<Func<T, TReturn1>> include1);
         ISugarQueryable<T> Includes<TReturn1, TReturn2>(Expression<Func<T, List<TReturn1>>> include1, Expression<Func<TReturn1, List<TReturn2>>> include2);

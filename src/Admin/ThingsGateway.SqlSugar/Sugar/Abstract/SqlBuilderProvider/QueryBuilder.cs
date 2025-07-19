@@ -1126,16 +1126,16 @@ namespace ThingsGateway.SqlSugar
             if (IsSingle() == false && this.JoinExpression != null)
             {
                 var jsoinParameters = (this.JoinExpression as LambdaExpression).Parameters;
-                var currentParametres = (expression as LambdaExpression).Parameters;
+                var currentParameters = (expression as LambdaExpression).Parameters;
                 if ((expression as LambdaExpression).Body.ToString() == "True")
                 {
                     return;
                 }
-                if (currentParametres?.Count > 0)
+                if (currentParameters?.Count > 0)
                 {
-                    foreach (var item in currentParametres)
+                    foreach (var item in currentParameters)
                     {
-                        var index = currentParametres.IndexOf(item);
+                        var index = currentParameters.IndexOf(item);
                         var name = item.Name;
                         var joinName = jsoinParameters[index].Name;
                         Check.Exception(!name.Equals(joinName, StringComparison.CurrentCultureIgnoreCase), ErrorMessage.ExpressionCheck, joinName, methodName, name);
@@ -1148,22 +1148,22 @@ namespace ThingsGateway.SqlSugar
             if (IsSingle() == false && this.JoinExpression != null)
             {
                 var jsoinParameters = (this.JoinExpression as LambdaExpression).Parameters;
-                var currentParametres = (expression as LambdaExpression).Parameters;
+                var currentParameters = (expression as LambdaExpression).Parameters;
                 if ((expression as LambdaExpression).Body.ToString() == "True")
                 {
                     return;
                 }
-                if (currentParametres?.Count > 0)
+                if (currentParameters?.Count > 0)
                 {
-                    if (jsoinParameters.Count + 1 != currentParametres.Count)
+                    if (jsoinParameters.Count + 1 != currentParameters.Count)
                     {
-                        var str1 = "(" + string.Join(",", currentParametres.Select(it => it.Name)) + ")=>";
-                        var str2 = "(" + string.Join(",", jsoinParameters.Select(it => it.Name)) + "," + currentParametres.Last().Type.Name + " )=>";
-                        throw new Exception(ErrorMessage.GetThrowMessage($"Join {currentParametres.Last().Type.Name} error , Please change {str1} to {str2}.", $"Join {currentParametres.Last().Type.Name} 错误, 请把 {str1} 改成 {str2} "));
+                        var str1 = "(" + string.Join(",", currentParameters.Select(it => it.Name)) + ")=>";
+                        var str2 = "(" + string.Join(",", jsoinParameters.Select(it => it.Name)) + "," + currentParameters.Last().Type.Name + " )=>";
+                        throw new Exception(ErrorMessage.GetThrowMessage($"Join {currentParameters.Last().Type.Name} error , Please change {str1} to {str2}.", $"Join {currentParameters.Last().Type.Name} 错误, 请把 {str1} 改成 {str2} "));
                     }
-                    foreach (var item in currentParametres.Take(jsoinParameters.Count))
+                    foreach (var item in currentParameters.Take(jsoinParameters.Count))
                     {
-                        var index = currentParametres.IndexOf(item);
+                        var index = currentParameters.IndexOf(item);
                         var name = item.Name;
                         var joinName = jsoinParameters[index].Name;
                         Check.Exception(!name.Equals(joinName, StringComparison.CurrentCultureIgnoreCase), ErrorMessage.ExpressionCheck, joinName, methodName, name);

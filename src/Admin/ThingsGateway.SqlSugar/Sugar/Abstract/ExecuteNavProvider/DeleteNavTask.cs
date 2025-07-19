@@ -75,11 +75,11 @@ namespace ThingsGateway.SqlSugar
             DeleteNavMethodInfo result = new DeleteNavMethodInfo();
             result.Context = deleteNavProvider._Context;
             var entityInfo = result.Context.EntityMaintenance.GetEntityInfo<T>();
-            Type properyItemType;
+            Type propertyItemType;
             bool isList;
-            Expression exp = UtilMethods.GetIncludeExpression(navMemberName, entityInfo, out properyItemType, out isList);
+            Expression exp = UtilMethods.GetIncludeExpression(navMemberName, entityInfo, out propertyItemType, out isList);
             var method = this.GetType().GetMyMethod("Include", 2, isList)
-                            .MakeGenericMethod(properyItemType);
+                            .MakeGenericMethod(propertyItemType);
             var obj = method.Invoke(this, new object[] { exp, deleteNavOptions });
             result.MethodInfos = obj;
             return result;

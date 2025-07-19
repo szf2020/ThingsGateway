@@ -60,7 +60,7 @@ namespace ThingsGateway.SqlSugar
                 return "*,@sugarIndex as sugarIndex";
             }
             var argExp = exp.Arguments[0];
-            var parametres = (argExp as LambdaExpression).Parameters;
+            var parameters = (argExp as LambdaExpression).Parameters;
             if ((argExp as LambdaExpression).Body is UnaryExpression)
             {
                 argExp = ((argExp as LambdaExpression).Body as UnaryExpression).Operand;

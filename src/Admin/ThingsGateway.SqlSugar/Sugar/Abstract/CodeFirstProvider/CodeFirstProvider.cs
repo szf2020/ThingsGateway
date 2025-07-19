@@ -858,67 +858,67 @@ namespace ThingsGateway.SqlSugar
             }
 
             var propertyType = UtilMethods.GetUnderType(ec.PropertyInfo);
-            string properyTypeName;
+            string propertyTypeName;
 
             if (propertyType.IsEnum())
             {
-                properyTypeName = this.Context.Ado.DbBind.GetDbTypeName(ec.Length > 9 ? UtilConstants.LongType.Name : UtilConstants.IntType.Name);
+                propertyTypeName = this.Context.Ado.DbBind.GetDbTypeName(ec.Length > 9 ? UtilConstants.LongType.Name : UtilConstants.IntType.Name);
             }
             else
             {
                 var name = GetType(propertyType.Name);
-                properyTypeName = this.Context.Ado.DbBind.GetDbTypeName(name);
+                propertyTypeName = this.Context.Ado.DbBind.GetDbTypeName(name);
             }
 
             var dataType = dc.DataType;
 
-            if (properyTypeName.Equals("boolean", StringComparison.OrdinalIgnoreCase) && dataType.Equals("bool", StringComparison.OrdinalIgnoreCase))
+            if (propertyTypeName.Equals("boolean", StringComparison.OrdinalIgnoreCase) && dataType.Equals("bool", StringComparison.OrdinalIgnoreCase))
                 return false;
 
-            if (properyTypeName.Equals("varchar", StringComparison.OrdinalIgnoreCase) &&
+            if (propertyTypeName.Equals("varchar", StringComparison.OrdinalIgnoreCase) &&
                 (dataType.Equals("string", StringComparison.OrdinalIgnoreCase) || dataType.Equals("nvarchar", StringComparison.OrdinalIgnoreCase)))
                 return false;
 
-            if (properyTypeName.Equals("number", StringComparison.OrdinalIgnoreCase) && dataType.Equals("decimal", StringComparison.OrdinalIgnoreCase))
+            if (propertyTypeName.Equals("number", StringComparison.OrdinalIgnoreCase) && dataType.Equals("decimal", StringComparison.OrdinalIgnoreCase))
                 return false;
 
             if (this.Context.CurrentConnectionConfig?.MoreSettings?.EnableOracleIdentity == true &&
-                properyTypeName.Equals("int", StringComparison.OrdinalIgnoreCase) && dataType.Equals("decimal", StringComparison.OrdinalIgnoreCase))
+                propertyTypeName.Equals("int", StringComparison.OrdinalIgnoreCase) && dataType.Equals("decimal", StringComparison.OrdinalIgnoreCase))
                 return false;
 
-            if (properyTypeName.Equals("int", StringComparison.OrdinalIgnoreCase) &&
+            if (propertyTypeName.Equals("int", StringComparison.OrdinalIgnoreCase) &&
                 dataType.Equals("decimal", StringComparison.OrdinalIgnoreCase) &&
                 dc.Length == 22 && dc.Scale == 0 &&
                 this.Context.CurrentConnectionConfig.DbType == DbType.Oracle)
                 return false;
 
-            if (properyTypeName.Equals("int", StringComparison.OrdinalIgnoreCase) && dataType.Equals("int32", StringComparison.OrdinalIgnoreCase))
+            if (propertyTypeName.Equals("int", StringComparison.OrdinalIgnoreCase) && dataType.Equals("int32", StringComparison.OrdinalIgnoreCase))
                 return false;
 
-            if (properyTypeName.Equals("date", StringComparison.OrdinalIgnoreCase) && dataType.Equals("datetime", StringComparison.OrdinalIgnoreCase))
+            if (propertyTypeName.Equals("date", StringComparison.OrdinalIgnoreCase) && dataType.Equals("datetime", StringComparison.OrdinalIgnoreCase))
                 return false;
 
-            if (properyTypeName.Equals("bigint", StringComparison.OrdinalIgnoreCase) && dataType.Equals("int64", StringComparison.OrdinalIgnoreCase))
+            if (propertyTypeName.Equals("bigint", StringComparison.OrdinalIgnoreCase) && dataType.Equals("int64", StringComparison.OrdinalIgnoreCase))
                 return false;
 
-            if (properyTypeName.Equals("blob", StringComparison.OrdinalIgnoreCase) && dataType.Equals("byte[]", StringComparison.OrdinalIgnoreCase))
+            if (propertyTypeName.Equals("blob", StringComparison.OrdinalIgnoreCase) && dataType.Equals("byte[]", StringComparison.OrdinalIgnoreCase))
                 return false;
 
-            if (properyTypeName == null || dataType == null)
+            if (propertyTypeName == null || dataType == null)
             {
-                return properyTypeName != dataType;
+                return propertyTypeName != dataType;
             }
 
             if (this.Context.CurrentConnectionConfig.DbType == DbType.SqlServer &&
                 dataType.Equals("timestamp", StringComparison.OrdinalIgnoreCase) &&
-                properyTypeName.Equals("varbinary", StringComparison.OrdinalIgnoreCase))
+                propertyTypeName.Equals("varbinary", StringComparison.OrdinalIgnoreCase))
                 return false;
 
-            if (properyTypeName.IsIn("int", "long") && dataType.Equals("decimal", StringComparison.OrdinalIgnoreCase) &&
+            if (propertyTypeName.IsIn("int", "long") && dataType.Equals("decimal", StringComparison.OrdinalIgnoreCase) &&
                 dc.Length == 38 && dc.DecimalDigits == 127)
                 return false;
 
-            if (dataType.Equals("numeric", StringComparison.OrdinalIgnoreCase) && properyTypeName.Equals("decimal", StringComparison.OrdinalIgnoreCase))
+            if (dataType.Equals("numeric", StringComparison.OrdinalIgnoreCase) && propertyTypeName.Equals("decimal", StringComparison.OrdinalIgnoreCase))
                 return false;
 
             if (ec.UnderType == UtilConstants.BoolType && dc.OracleDataType?.Equals("number", StringComparison.OrdinalIgnoreCase) == true)
@@ -928,12 +928,12 @@ namespace ThingsGateway.SqlSugar
                 dc.OracleDataType?.Equals("number", StringComparison.OrdinalIgnoreCase) == true)
                 return false;
 
-            if (dataType.EqualCase("timestamp") && properyTypeName.EqualCase("timestamptz"))
+            if (dataType.EqualCase("timestamp") && propertyTypeName.EqualCase("timestamptz"))
             {
                 return false;
             }
 
-            return !properyTypeName.Equals(dataType, StringComparison.OrdinalIgnoreCase);
+            return !propertyTypeName.Equals(dataType, StringComparison.OrdinalIgnoreCase);
         }
 
         /// <summary>

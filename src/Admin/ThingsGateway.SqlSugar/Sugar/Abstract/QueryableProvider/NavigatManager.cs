@@ -151,7 +151,7 @@ namespace ThingsGateway.SqlSugar
             var listItemEntity = this.Context.EntityMaintenance.GetEntityInfo(listItemType);
             var listPkColumn = listItemEntity.Columns.Where(it => it.IsPrimarykey).FirstOrDefault();
             var navObjectName = memberExpression.Member.Name;
-            var navObjectNamePropety = listItemType.GetProperty(navObjectName);
+            var navObjectNameProperty = listItemType.GetProperty(navObjectName);
             var navObjectNameColumnInfo = listItemEntity.Columns.First(it => it.PropertyName == navObjectName);
             Check.ExceptionEasy(navObjectNameColumnInfo.Navigat == null, $"{navObjectName} not [Navigat(..)] ", $"{navObjectName} 没有导航特性 [Navigat(..)] ");
 
@@ -161,35 +161,35 @@ namespace ThingsGateway.SqlSugar
             {
                 this.Context.Utilities.PageEach(list, 5000, pageList =>
                 {
-                    OneToOne(pageList, selector, listItemEntity, navObjectNamePropety, navObjectNameColumnInfo);
+                    OneToOne(pageList, selector, listItemEntity, navObjectNameProperty, navObjectNameColumnInfo);
                 });
             }
             else if (navObjectNameColumnInfo.Navigat.NavigatType == NavigateType.OneToMany)
             {
                 this.Context.Utilities.PageEach(list, 5000, pageList =>
                 {
-                    OneToMany(pageList, selector, listItemEntity, navObjectNamePropety, navObjectNameColumnInfo);
+                    OneToMany(pageList, selector, listItemEntity, navObjectNameProperty, navObjectNameColumnInfo);
                 });
             }
             else if (navObjectNameColumnInfo.Navigat.NavigatType == NavigateType.ManyToOne)
             {
                 this.Context.Utilities.PageEach(list, 5000, pageList =>
                 {
-                    OneToOne(pageList, selector, listItemEntity, navObjectNamePropety, navObjectNameColumnInfo);
+                    OneToOne(pageList, selector, listItemEntity, navObjectNameProperty, navObjectNameColumnInfo);
                 });
             }
             else if (navObjectNameColumnInfo.Navigat.NavigatType == NavigateType.Dynamic)
             {
                 this.Context.Utilities.PageEach(list, 100, pageList =>
                 {
-                    Dynamic(pageList, selector, listItemEntity, navObjectNamePropety, navObjectNameColumnInfo, expression);
+                    Dynamic(pageList, selector, listItemEntity, navObjectNameProperty, navObjectNameColumnInfo, expression);
                 });
             }
             else
             {
                 this.Context.Utilities.PageEach(list, 100, pageList =>
                 {
-                    ManyToMany(pageList, selector, listItemEntity, navObjectNamePropety, navObjectNameColumnInfo);
+                    ManyToMany(pageList, selector, listItemEntity, navObjectNameProperty, navObjectNameColumnInfo);
                 });
             }
         }
@@ -211,7 +211,7 @@ namespace ThingsGateway.SqlSugar
             return expressions;
         }
 
-        private void ManyToMany(List<object> list, Func<ISugarQueryable<object>, List<object>> selector, EntityInfo listItemEntity, System.Reflection.PropertyInfo navObjectNamePropety, EntityColumnInfo navObjectNameColumnInfo)
+        private void ManyToMany(List<object> list, Func<ISugarQueryable<object>, List<object>> selector, EntityInfo listItemEntity, System.Reflection.PropertyInfo navObjectNameProperty, EntityColumnInfo navObjectNameColumnInfo)
         {
             var bEntity = navObjectNameColumnInfo.PropertyInfo.PropertyType.GetGenericArguments()[0];
             var bEntityInfo = this.Context.EntityMaintenance.GetEntityInfo(bEntity);
@@ -275,9 +275,9 @@ namespace ThingsGateway.SqlSugar
             {
                 foreach (var listItem in list)
                 {
-                    if (navObjectNamePropety.GetValue(listItem) == null)
+                    if (navObjectNameProperty.GetValue(listItem) == null)
                     {
-                        var instance = Activator.CreateInstance(navObjectNamePropety.PropertyType, true);
+                        var instance = Activator.CreateInstance(navObjectNameProperty.PropertyType, true);
                         var ilist = instance as IList;
                         foreach (var bInfo in bList)
                         {
@@ -301,13 +301,13 @@ namespace ThingsGateway.SqlSugar
                             if (sql.Skip != null || sql.Take != null)
                             {
                                 var instanceCast = (instance as IList);
-                                var newinstance = Activator.CreateInstance(navObjectNamePropety.PropertyType, true) as IList;
+                                var newinstance = Activator.CreateInstance(navObjectNameProperty.PropertyType, true) as IList;
                                 SkipTakeIList(sql, instanceCast, newinstance);
-                                navObjectNamePropety.SetValue(listItem, newinstance);
+                                navObjectNameProperty.SetValue(listItem, newinstance);
                             }
                             else
                             {
-                                navObjectNamePropety.SetValue(listItem, instance);
+                                navObjectNameProperty.SetValue(listItem, instance);
                             }
                         }
                     }
@@ -317,10 +317,10 @@ namespace ThingsGateway.SqlSugar
             {
                 foreach (var listItem in list)
                 {
-                    if (navObjectNamePropety.GetValue(listItem) == null)
+                    if (navObjectNameProperty.GetValue(listItem) == null)
                     {
-                        var newinstance = Activator.CreateInstance(navObjectNamePropety.PropertyType, true) as IList;
-                        navObjectNamePropety.SetValue(listItem, newinstance);
+                        var newinstance = Activator.CreateInstance(navObjectNameProperty.PropertyType, true) as IList;
+                        navObjectNameProperty.SetValue(listItem, newinstance);
                     }
                 }
             }
@@ -345,11 +345,11 @@ namespace ThingsGateway.SqlSugar
             }
         }
 
-        private void OneToOne(List<object> list, Func<ISugarQueryable<object>, List<object>> selector, EntityInfo listItemEntity, System.Reflection.PropertyInfo navObjectNamePropety, EntityColumnInfo navObjectNameColumnInfo)
+        private void OneToOne(List<object> list, Func<ISugarQueryable<object>, List<object>> selector, EntityInfo listItemEntity, System.Reflection.PropertyInfo navObjectNameProperty, EntityColumnInfo navObjectNameColumnInfo)
         {
             var navColumn = listItemEntity.Columns.FirstOrDefault(it => it.PropertyName == navObjectNameColumnInfo.Navigat.Name);
             Check.ExceptionEasy(navColumn == null, "OneToOne navigation configuration error", $"OneToOne导航配置错误： 实体{listItemEntity.EntityName} 不存在{navObjectNameColumnInfo.Navigat.Name}");
-            var navType = navObjectNamePropety.PropertyType;
+            var navType = navObjectNameProperty.PropertyType;
             var db = this.Context;
             db = GetCrossDatabase(db, navType);
             var navEntityInfo = db.EntityMaintenance.GetEntityInfo(navType);
@@ -363,7 +363,7 @@ namespace ThingsGateway.SqlSugar
             }
             if (navPkColumn == null && navType.FullName.IsCollectionsList())
             {
-                Check.ExceptionEasy($"{navObjectNamePropety.Name} type error ", $"一对一不能是List对象 {navObjectNamePropety.Name} ");
+                Check.ExceptionEasy($"{navObjectNameProperty.Name} type error ", $"一对一不能是List对象 {navObjectNameProperty.Name} ");
             }
             List<object> ids = null;
             var isOwnsOneProperty = IsOwnsOneProperty(listItemEntity, navObjectNameColumnInfo);
@@ -408,14 +408,14 @@ namespace ThingsGateway.SqlSugar
             {
                 foreach (var item in list)
                 {
-                    var firstObj = navObjectNamePropety.GetValue(item);
+                    var firstObj = navObjectNameProperty.GetValue(item);
                     if (OneToOneGlobalInstanceRegistry.IsNavigationInitializerCreated(firstObj))
                     {
-                        navObjectNamePropety.SetValue(item, null);
+                        navObjectNameProperty.SetValue(item, null);
                     }
                 }
             }
-            if (list.Count != 0 && navObjectNamePropety.GetValue(list.First()) == null)
+            if (list.Count != 0 && navObjectNameProperty.GetValue(list.First()) == null)
             {
                 var sqlObj = GetWhereSql(db, navObjectNameColumnInfo.Navigat.Name);
                 if (sqlObj.SelectString == null)
@@ -451,9 +451,9 @@ namespace ThingsGateway.SqlSugar
 
                                 // var setValue = navList.FirstOrDefault(x => navPkColumn.PropertyInfo.GetValue(x).ObjToString() == navColumn.PropertyInfo.GetValue(item).ObjToString());
 
-                                if (navObjectNamePropety.GetValue(item.l) == null)
+                                if (navObjectNameProperty.GetValue(item.l) == null)
                                 {
-                                    navObjectNamePropety.SetValue(item.l, item.n);
+                                    navObjectNameProperty.SetValue(item.l, item.n);
                                 }
                                 else
                                 {
@@ -483,9 +483,9 @@ namespace ThingsGateway.SqlSugar
 
                                 // var setValue = navList.FirstOrDefault(x => navPkColumn.PropertyInfo.GetValue(x).ObjToString() == navColumn.PropertyInfo.GetValue(item).ObjToString());
 
-                                if (navObjectNamePropety.GetValue(item.l) == null)
+                                if (navObjectNameProperty.GetValue(item.l) == null)
                                 {
-                                    navObjectNamePropety.SetValue(item.l, item.n);
+                                    navObjectNameProperty.SetValue(item.l, item.n);
                                 }
                                 else
                                 {
@@ -512,9 +512,9 @@ namespace ThingsGateway.SqlSugar
 
                         // var setValue = navList.FirstOrDefault(x => navPkColumn.PropertyInfo.GetValue(x).ObjToString() == navColumn.PropertyInfo.GetValue(item).ObjToString());
 
-                        if (navObjectNamePropety.GetValue(item.l) == null)
+                        if (navObjectNameProperty.GetValue(item.l) == null)
                         {
-                            navObjectNamePropety.SetValue(item.l, item.n);
+                            navObjectNameProperty.SetValue(item.l, item.n);
                         }
                         else
                         {
@@ -526,9 +526,9 @@ namespace ThingsGateway.SqlSugar
             }
         }
 
-        private void OneToMany(List<object> list, Func<ISugarQueryable<object>, List<object>> selector, EntityInfo listItemEntity, System.Reflection.PropertyInfo navObjectNamePropety, EntityColumnInfo navObjectNameColumnInfo)
+        private void OneToMany(List<object> list, Func<ISugarQueryable<object>, List<object>> selector, EntityInfo listItemEntity, System.Reflection.PropertyInfo navObjectNameProperty, EntityColumnInfo navObjectNameColumnInfo)
         {
-            Check.ExceptionEasy(navObjectNameColumnInfo.PropertyInfo.PropertyType.GetGenericArguments().Length == 0, navObjectNamePropety?.Name + "Navigation configuration error one to many should be List<T>", navObjectNamePropety?.Name + "导航配置错误一对多应该是List<T>");
+            Check.ExceptionEasy(navObjectNameColumnInfo.PropertyInfo.PropertyType.GetGenericArguments().Length == 0, navObjectNameProperty?.Name + "Navigation configuration error one to many should be List<T>", navObjectNameProperty?.Name + "导航配置错误一对多应该是List<T>");
 
             var navEntity = navObjectNameColumnInfo.PropertyInfo.PropertyType.GetGenericArguments()[0];
             var navEntityInfo = this.Context.EntityMaintenance.GetEntityInfo(navEntity);
@@ -537,7 +537,7 @@ namespace ThingsGateway.SqlSugar
             childDb.InitMappingInfo(navEntityInfo.Type);
             var navColumn = navEntityInfo.Columns.FirstOrDefault(it => it.PropertyName == navObjectNameColumnInfo.Navigat.Name);
             Check.ExceptionEasy(navColumn == null, $"{navEntityInfo.EntityName} not found {navObjectNameColumnInfo.Navigat.Name} ", $"实体 {navEntityInfo.EntityName} 未找到导航配置列 {navObjectNameColumnInfo.Navigat.Name} ");
-            //var navType = navObjectNamePropety.PropertyType;
+            //var navType = navObjectNameProperty.PropertyType;
             var listItemPkColumn = listItemEntity.Columns.Where(it => it.IsPrimarykey).FirstOrDefault();
             Check.ExceptionEasy(listItemPkColumn == null && navObjectNameColumnInfo.Navigat.Name2 == null, listItemEntity.EntityName + " not primary key", listItemEntity.EntityName + "没有主键");
             if (navObjectNameColumnInfo.Navigat.Name2.HasValue())
@@ -564,7 +564,7 @@ namespace ThingsGateway.SqlSugar
             }));
             var sqlObj = GetWhereSql(childDb, navObjectNameColumnInfo.Navigat.Name);
 
-            if (list.Count != 0 && navObjectNamePropety.GetValue(list.First()) == null)
+            if (list.Count != 0 && navObjectNameProperty.GetValue(list.First()) == null)
             {
                 if (sqlObj.SelectString == null)
                 {
@@ -610,21 +610,21 @@ namespace ThingsGateway.SqlSugar
                         else
                         {
 
-                            var instance = Activator.CreateInstance(navObjectNamePropety.PropertyType, true);
+                            var instance = Activator.CreateInstance(navObjectNameProperty.PropertyType, true);
                             var ilist = instance as IList;
                             foreach (var value in itemSelectList.ToList())
                             {
                                 ilist.Add(value);
                             }
-                            navObjectNamePropety.SetValue(item.Key, instance);
+                            navObjectNameProperty.SetValue(item.Key, instance);
                         }
                     }
                     foreach (var item in list)
                     {
-                        if (navObjectNamePropety.GetValue(item) == null)
+                        if (navObjectNameProperty.GetValue(item) == null)
                         {
-                            var instance = Activator.CreateInstance(navObjectNamePropety.PropertyType, true);
-                            navObjectNamePropety.SetValue(item, instance);
+                            var instance = Activator.CreateInstance(navObjectNameProperty.PropertyType, true);
+                            navObjectNameProperty.SetValue(item, instance);
                         }
                     }
                 }
@@ -633,19 +633,19 @@ namespace ThingsGateway.SqlSugar
                     //No navigation data  set new List()
                     foreach (var item in list)
                     {
-                        var instance = Activator.CreateInstance(navObjectNamePropety.PropertyType, true);
-                        navObjectNamePropety.SetValue(item, instance);
+                        var instance = Activator.CreateInstance(navObjectNameProperty.PropertyType, true);
+                        navObjectNameProperty.SetValue(item, instance);
                     }
                 }
             }
         }
 
-        private void Dynamic(List<object> list, Func<ISugarQueryable<object>, List<object>> selector, EntityInfo listItemEntity, System.Reflection.PropertyInfo navObjectNamePropety, EntityColumnInfo navObjectNameColumnInfo, Expression expression)
+        private void Dynamic(List<object> list, Func<ISugarQueryable<object>, List<object>> selector, EntityInfo listItemEntity, System.Reflection.PropertyInfo navObjectNameProperty, EntityColumnInfo navObjectNameColumnInfo, Expression expression)
         {
             var args = navObjectNameColumnInfo.PropertyInfo.PropertyType.GetGenericArguments();
             if (args.Length == 0)
             {
-                DynamicOneToOne(list, selector, listItemEntity, navObjectNamePropety, navObjectNameColumnInfo, expression);
+                DynamicOneToOne(list, selector, listItemEntity, navObjectNameProperty, navObjectNameColumnInfo, expression);
                 return;
             }
             var navEntity = args[0];
@@ -665,13 +665,13 @@ namespace ThingsGateway.SqlSugar
                 }
             }
             Check.ExceptionEasy(sqlObj.MappingExpressions.IsNullOrEmpty(), $"{expression} error,dynamic need MappingField ,Demo: Includes(it => it.Books.MappingField(z=>z.studenId,()=>it.StudentId).ToList())", $"{expression} 解析出错,自定义映射需要 MappingField ,例子: Includes(it => it.Books.MappingField(z=>z.studenId,()=>it.StudentId).ToList())");
-            if (list.Count != 0 && navObjectNamePropety.GetValue(list.First()) == null)
+            if (list.Count != 0 && navObjectNameProperty.GetValue(list.First()) == null)
             {
                 MappingFieldsHelper<T> helper = new MappingFieldsHelper<T>();
                 helper.Context = childDb;
                 helper.NavEntity = navEntityInfo;
                 helper.RootEntity = childDb.EntityMaintenance.GetEntityInfo<T>();
-                var whereSql = helper.GetMppingSql(list, sqlObj.MappingExpressions);
+                var whereSql = helper.GetMappingSql(list, sqlObj.MappingExpressions);
                 var navList = selector(childDb.Queryable<object>().AS(GetDbTableName(navEntityInfo, sqlObj)).AddParameters(sqlObj.Parameters).Where(whereSql, true).WhereIF(sqlObj.WhereString.HasValue(), sqlObj.WhereString).Select(sqlObj.SelectString).OrderByIF(sqlObj.OrderByString.HasValue(), sqlObj.OrderByString));
                 if (navList.HasValue())
                 {
@@ -684,7 +684,7 @@ namespace ThingsGateway.SqlSugar
 
         }
 
-        private void DynamicOneToOne(List<object> list, Func<ISugarQueryable<object>, List<object>> selector, EntityInfo listItemEntity, System.Reflection.PropertyInfo navObjectNamePropety, EntityColumnInfo navObjectNameColumnInfo, Expression expression)
+        private void DynamicOneToOne(List<object> list, Func<ISugarQueryable<object>, List<object>> selector, EntityInfo listItemEntity, System.Reflection.PropertyInfo navObjectNameProperty, EntityColumnInfo navObjectNameColumnInfo, Expression expression)
         {
             var navEntity = navObjectNameColumnInfo.PropertyInfo.PropertyType;
             var navEntityInfo = this.Context.EntityMaintenance.GetEntityInfo(navEntity);
@@ -701,13 +701,13 @@ namespace ThingsGateway.SqlSugar
                 }
             }
             Check.ExceptionEasy(sqlObj.MappingExpressions.IsNullOrEmpty(), $"{expression} error，dynamic need MappingField ,Demo: Includes(it => it.Books.MappingField(z=>z.studenId,()=>it.StudentId).ToList())", $"{expression}解析出错， 自定义映射需要 MappingField ,例子: Includes(it => it.Books.MappingField(z=>z.studenId,()=>it.StudentId).ToList())");
-            if (list.Count != 0 && navObjectNamePropety.GetValue(list.First()) == null)
+            if (list.Count != 0 && navObjectNameProperty.GetValue(list.First()) == null)
             {
                 MappingFieldsHelper<T> helper = new MappingFieldsHelper<T>();
                 helper.Context = this.Context;
                 helper.NavEntity = navEntityInfo;
                 helper.RootEntity = this.Context.EntityMaintenance.GetEntityInfo<T>();
-                var whereSql = helper.GetMppingSql(list, sqlObj.MappingExpressions);
+                var whereSql = helper.GetMappingSql(list, sqlObj.MappingExpressions);
                 var navList = selector(childDb.Queryable<object>().AS(GetDbTableName(navEntityInfo, sqlObj)).AddParameters(sqlObj.Parameters).Where(whereSql, true).WhereIF(sqlObj.WhereString.HasValue(), sqlObj.WhereString).Select(sqlObj.SelectString).OrderByIF(sqlObj.OrderByString.HasValue(), sqlObj.OrderByString));
                 if (navList.HasValue())
                 {
@@ -719,11 +719,11 @@ namespace ThingsGateway.SqlSugar
             }
         }
 
-        private SqlInfo GetWhereSql(SqlSugarProvider db, string properyName = null)
+        private SqlInfo GetWhereSql(SqlSugarProvider db, string propertyName = null)
         {
             if (_ListCallFunc == null || _ListCallFunc.Count == 0) return new SqlInfo();
             List<string> where = new List<string>();
-            List<string> oredrBy = new List<string>();
+            List<string> orderBy = new List<string>();
             _ListCallFunc.Reverse();
             SqlInfo result = new SqlInfo();
             result.Parameters = new List<SugarParameter>();
@@ -752,7 +752,7 @@ namespace ThingsGateway.SqlSugar
                         queryable.QueryBuilder.LambdaExpressions.ParameterIndex = parameterIndex;
                         CheckHasRootShortName(method.Arguments[0], method.Arguments[1]);
                         var exp = method.Arguments[1];
-                        InitMappingtType(exp);
+                        InitMappingType(exp);
                         where.Add(" " + queryable.QueryBuilder.GetExpressionValue(exp, ResolveExpressType.WhereSingle).GetString());
                         SetTableShortName(result, queryable);
                         parameterIndex = queryable.QueryBuilder.LambdaExpressions.ParameterIndex;
@@ -765,7 +765,7 @@ namespace ThingsGateway.SqlSugar
                     {
                         queryable.QueryBuilder.LambdaExpressions.ParameterIndex = parameterIndex;
                         var exp = method.Arguments[2];
-                        InitMappingtType(exp);
+                        InitMappingType(exp);
                         CheckHasRootShortName(method.Arguments[1], method.Arguments[2]);
                         where.Add(" " + queryable.QueryBuilder.GetExpressionValue(exp, ResolveExpressType.WhereSingle).GetString());
                         SetTableShortName(result, queryable);
@@ -775,7 +775,7 @@ namespace ThingsGateway.SqlSugar
                 else if (method.Method.Name.IsIn("OrderBy", "ThenBy"))
                 {
                     var exp = method.Arguments[1];
-                    oredrBy.Add(" " + queryable.QueryBuilder.GetExpressionValue(exp, ResolveExpressType.WhereSingle).GetString());
+                    orderBy.Add(" " + queryable.QueryBuilder.GetExpressionValue(exp, ResolveExpressType.WhereSingle).GetString());
                     SetTableShortName(result, queryable);
                 }
                 else if (method.Method.Name == "MappingField")
@@ -790,12 +790,12 @@ namespace ThingsGateway.SqlSugar
                 }
                 else if (method.Method.Name == "Select")
                 {
-                    Select(properyName, result, method, queryable);
+                    Select(propertyName, result, method, queryable);
                 }
                 else if (method.Method.Name.IsIn("OrderByDescending", "ThenByDescending"))
                 {
                     var exp = method.Arguments[1];
-                    oredrBy.Add(" " + queryable.QueryBuilder.GetExpressionValue(exp, ResolveExpressType.WhereSingle).GetString() + " DESC");
+                    orderBy.Add(" " + queryable.QueryBuilder.GetExpressionValue(exp, ResolveExpressType.WhereSingle).GetString() + " DESC");
                 }
                 else if (method.Method.Name == "Skip")
                 {
@@ -825,7 +825,7 @@ namespace ThingsGateway.SqlSugar
                 {
                     if (method.Arguments.Count > 1)
                     {
-                        Select(properyName, result, method, queryable);
+                        Select(propertyName, result, method, queryable);
                     }
                     isList = true;
                 }
@@ -846,20 +846,20 @@ namespace ThingsGateway.SqlSugar
                 Check.ExceptionEasy(isList == false, $"{_ListCallFunc.First()} need is ToList()", $"{_ListCallFunc.First()} 需要ToList");
                 result.WhereString = String.Join(" AND ", where);
             }
-            if (oredrBy.Count != 0)
+            if (orderBy.Count != 0)
             {
                 Check.ExceptionEasy(isList == false, $"{_ListCallFunc.First()} need is ToList()", $"{_ListCallFunc.First()} 需要ToList");
-                result.OrderByString = String.Join(" , ", oredrBy);
+                result.OrderByString = String.Join(" , ", orderBy);
             }
             if (result.SelectString.HasValue())
             {
                 Check.ExceptionEasy(isList == false, $"{_ListCallFunc.First()} need is ToList()", $"{_ListCallFunc.First()} 需要ToList");
-                result.OrderByString = String.Join(" , ", oredrBy);
+                result.OrderByString = String.Join(" , ", orderBy);
             }
             return result;
         }
 
-        private void Select(string properyName, SqlInfo result, MethodCallExpression method, ISugarQueryable<object> queryable)
+        private void Select(string propertyName, SqlInfo result, MethodCallExpression method, ISugarQueryable<object> queryable)
         {
             var exp = method.Arguments[1];
             var newExp = (exp as LambdaExpression).Body;
@@ -922,9 +922,9 @@ namespace ThingsGateway.SqlSugar
                         result.SelectString = null;
                     }
                 }
-                if (properyName != null)
+                if (propertyName != null)
                 {
-                    var fkColumnsInfo = entityInfo.Columns.FirstOrDefault(x => x.PropertyName == properyName);
+                    var fkColumnsInfo = entityInfo.Columns.FirstOrDefault(x => x.PropertyName == propertyName);
                     var pkColumnsInfo = entityInfo.Columns.FirstOrDefault(x => x.IsPrimarykey);
                     if (fkColumnsInfo != null)
                     {
@@ -1039,7 +1039,7 @@ namespace ThingsGateway.SqlSugar
             }
         }
 
-        private void InitMappingtType(Expression exp)
+        private void InitMappingType(Expression exp)
         {
             if (exp is LambdaExpression)
             {

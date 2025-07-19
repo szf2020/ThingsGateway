@@ -3,17 +3,12 @@
 // Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
-using System.Collections;
-using System.Collections.Generic;
 using System.Collections.Generic.Enumerable;
 using System.Diagnostics.Internal;
-using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.ExceptionServices;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace System.Diagnostics
 {
@@ -615,7 +610,7 @@ namespace System.Diagnostics
                 }
             }
 
-            if (parameterType.IsByRef && parameterType.GetElementType() is {} elementType)
+            if (parameterType.IsByRef && parameterType.GetElementType() is { } elementType)
             {
                 parameterType = elementType;
             }
@@ -771,10 +766,10 @@ namespace System.Diagnostics
                     case "Trampoline":
                         return false;
                     case var typeName when type.IsGenericType:
-                    {
-                        if (typeName == "AsyncResult`1") return false;
-                        else break;
-                    }
+                        {
+                            if (typeName == "AsyncResult`1") return false;
+                            else break;
+                        }
                 }
             }
 

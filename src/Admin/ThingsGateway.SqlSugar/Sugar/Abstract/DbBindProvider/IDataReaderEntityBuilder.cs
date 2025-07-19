@@ -555,41 +555,41 @@ namespace ThingsGateway.SqlSugar
             #endregion
 
             #region Common Database Logic
-            string bindProperyTypeName = bindPropertyType.Name.ToLower();
+            string bindPropertyTypeName = bindPropertyType.Name.ToLower();
             bool isEnum = bindPropertyType.IsEnum();
             if (isEnum) { validPropertyType = CSharpDataType.@enum; }
             switch (validPropertyType)
             {
                 case CSharpDataType.@int:
-                    CheckType(bind.IntThrow, bindProperyTypeName, validPropertyName, propertyName);
-                    if (bindProperyTypeName.IsContainsIn("int", "int32"))
+                    CheckType(bind.IntThrow, bindPropertyTypeName, validPropertyName, propertyName);
+                    if (bindPropertyTypeName.IsContainsIn("int", "int32"))
                         method = isNullableType ? getConvertInt32 : getInt32;
-                    if (bindProperyTypeName.IsContainsIn("int64"))
+                    if (bindPropertyTypeName.IsContainsIn("int64"))
                         method = null;
-                    if (bindProperyTypeName.IsContainsIn("byte"))
+                    if (bindPropertyTypeName.IsContainsIn("byte"))
                         method = isNullableType ? getConvertByte : getByte;
-                    if (bindProperyTypeName.IsContainsIn("int16"))
+                    if (bindPropertyTypeName.IsContainsIn("int16"))
                         method = isNullableType ? getConvertInt16 : getInt16;
-                    if (bindProperyTypeName == "uint32" && this.Context.CurrentConnectionConfig.DbType.IsIn(DbType.MySql, DbType.MySqlConnector))
+                    if (bindPropertyTypeName == "uint32" && this.Context.CurrentConnectionConfig.DbType.IsIn(DbType.MySql, DbType.MySqlConnector))
                         method = null;
-                    if (bindProperyTypeName == "int16")
+                    if (bindPropertyTypeName == "int16")
                         method = null;
                     break;
                 case CSharpDataType.@bool:
-                    if (bindProperyTypeName == "bool" || bindProperyTypeName == "boolean")
+                    if (bindPropertyTypeName == "bool" || bindPropertyTypeName == "boolean")
                         method = isNullableType ? getConvertBoolean : getBoolean;
                     break;
                 case CSharpDataType.@string:
                     if (this.Context.CurrentConnectionConfig.DbType != DbType.Oracle)
                     {
-                        CheckType(bind.StringThrow, bindProperyTypeName, validPropertyName, propertyName);
+                        CheckType(bind.StringThrow, bindPropertyTypeName, validPropertyName, propertyName);
                     }
                     method = getString;
-                    if (bindProperyTypeName == "guid")
+                    if (bindPropertyTypeName == "guid")
                     {
                         method = isNullableType ? getConvertStringGuid : getStringGuid;
                     }
-                    else if (bindProperyTypeName == "xelement")
+                    else if (bindPropertyTypeName == "xelement")
                     {
                         method = getXelement;
                     }
@@ -603,27 +603,27 @@ namespace ThingsGateway.SqlSugar
                     }
                     break;
                 case CSharpDataType.DateTime:
-                    CheckType(bind.DateThrow, bindProperyTypeName, validPropertyName, propertyName);
-                    if (bindProperyTypeName == "datetime")
+                    CheckType(bind.DateThrow, bindPropertyTypeName, validPropertyName, propertyName);
+                    if (bindPropertyTypeName == "datetime")
                         method = isNullableType ? getConvertDateTime : getDateTime;
-                    if (bindProperyTypeName == "datetime" && dbTypeName.Equals("time", StringComparison.CurrentCultureIgnoreCase))
+                    if (bindPropertyTypeName == "datetime" && dbTypeName.Equals("time", StringComparison.CurrentCultureIgnoreCase))
                         method = isNullableType ? getConvertTime : getTime;
-                    if (bindProperyTypeName == "datetimeoffset")
+                    if (bindPropertyTypeName == "datetimeoffset")
                         method = isNullableType ? getConvertdatetimeoffset : getdatetimeoffset;
                     break;
                 case CSharpDataType.@decimal:
-                    CheckType(bind.DecimalThrow, bindProperyTypeName, validPropertyName, propertyName);
-                    if (bindProperyTypeName == "decimal")
+                    CheckType(bind.DecimalThrow, bindPropertyTypeName, validPropertyName, propertyName);
+                    if (bindPropertyTypeName == "decimal")
                         method = isNullableType ? getConvertDecimal : getDecimal;
                     break;
                 case CSharpDataType.@float:
                 case CSharpDataType.@double:
-                    CheckType(bind.DoubleThrow, bindProperyTypeName, validPropertyName, propertyName);
-                    if (bindProperyTypeName.IsIn("double", "single") && dbTypeName != "real")
+                    CheckType(bind.DoubleThrow, bindPropertyTypeName, validPropertyName, propertyName);
+                    if (bindPropertyTypeName.IsIn("double", "single") && dbTypeName != "real")
                         method = isNullableType ? getConvertDouble : getDouble;
                     else
                         method = isNullableType ? getConvertFloat : getFloat;
-                    if (dbTypeName.Equals("float", StringComparison.CurrentCultureIgnoreCase) && isNullableType && bindProperyTypeName.Equals("single", StringComparison.CurrentCultureIgnoreCase))
+                    if (dbTypeName.Equals("float", StringComparison.CurrentCultureIgnoreCase) && isNullableType && bindPropertyTypeName.Equals("single", StringComparison.CurrentCultureIgnoreCase))
                     {
                         method = getConvertDoubleToFloat;
                     }
@@ -635,35 +635,35 @@ namespace ThingsGateway.SqlSugar
                     {
                         method = isNullableType ? getOtherNull.MakeGenericMethod(bindPropertyType) : getOther.MakeGenericMethod(bindPropertyType);
                     }
-                    if (bindProperyTypeName == "string")
+                    if (bindPropertyTypeName == "string")
                     {
                         method = null;
                     }
                     break;
                 case CSharpDataType.Guid:
-                    CheckType(bind.GuidThrow, bindProperyTypeName, validPropertyName, propertyName);
-                    if (bindProperyTypeName == "guid")
+                    CheckType(bind.GuidThrow, bindPropertyTypeName, validPropertyName, propertyName);
+                    if (bindPropertyTypeName == "guid")
                         method = isNullableType ? getConvertGuid : getGuid;
                     break;
                 case CSharpDataType.@byte:
-                    if (bindProperyTypeName == "byte")
+                    if (bindPropertyTypeName == "byte")
                         method = isNullableType ? getConvertByte : getByte;
                     break;
                 case CSharpDataType.@enum:
                     method = isNullableType ? getConvertEnum_Null.MakeGenericMethod(bindPropertyType) : getEnum.MakeGenericMethod(bindPropertyType);
                     break;
                 case CSharpDataType.@short:
-                    CheckType(bind.ShortThrow, bindProperyTypeName, validPropertyName, propertyName);
-                    if (bindProperyTypeName == "int16" || bindProperyTypeName == "short")
+                    CheckType(bind.ShortThrow, bindPropertyTypeName, validPropertyName, propertyName);
+                    if (bindPropertyTypeName == "int16" || bindPropertyTypeName == "short")
                         method = isNullableType ? getConvertInt16 : getInt16;
                     break;
                 case CSharpDataType.@long:
-                    if (bindProperyTypeName == "int64" || bindProperyTypeName == "long")
+                    if (bindPropertyTypeName == "int64" || bindPropertyTypeName == "long")
                         method = isNullableType ? getConvertInt64 : getInt64;
                     break;
                 case CSharpDataType.DateTimeOffset:
                     method = isNullableType ? getConvertdatetimeoffset : getdatetimeoffset;
-                    if (bindProperyTypeName == "datetime")
+                    if (bindPropertyTypeName == "datetime")
                         method = isNullableType ? getConvertdatetimeoffsetDate : getdatetimeoffsetDate;
                     break;
                 case CSharpDataType.Single:
@@ -696,15 +696,15 @@ namespace ThingsGateway.SqlSugar
         /// 检查类型
         /// </summary>
         /// <param name="invalidTypes">无效类型列表</param>
-        /// <param name="bindProperyTypeName">绑定属性类型名称</param>
+        /// <param name="bindPropertyTypeName">绑定属性类型名称</param>
         /// <param name="validPropertyType">有效属性类型</param>
         /// <param name="propertyName">属性名</param>
-        private void CheckType(List<string> invalidTypes, string bindProperyTypeName, string validPropertyType, string propertyName)
+        private void CheckType(List<string> invalidTypes, string bindPropertyTypeName, string validPropertyType, string propertyName)
         {
-            var isAny = invalidTypes.Contains(bindProperyTypeName);
+            var isAny = invalidTypes.Contains(bindPropertyTypeName);
             if (isAny)
             {
-                throw new SqlSugarException(string.Format("{0} can't  convert {1} to {2}", propertyName, validPropertyType, bindProperyTypeName));
+                throw new SqlSugarException(string.Format("{0} can't  convert {1} to {2}", propertyName, validPropertyType, bindPropertyTypeName));
             }
         }
         #endregion

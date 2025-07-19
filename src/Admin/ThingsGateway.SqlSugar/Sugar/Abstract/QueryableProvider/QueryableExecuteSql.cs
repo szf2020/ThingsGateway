@@ -658,7 +658,7 @@ namespace ThingsGateway.SqlSugar
                RightEntityColumn=rightEntity.Columns.First(it=>it.PropertyName==ExpressionTool.GetMemberName(mappingField2))
              }
             };
-            var conditionals = fieldsHelper.GetMppingSql(list.Cast<object>().ToList(), mappings);
+            var conditionals = fieldsHelper.GetMappingSql(list.Cast<object>().ToList(), mappings);
             if (queryableContext.TempChildLists == null)
                 queryableContext.TempChildLists = new Dictionary<string, object>();
             if (list != null && queryableContext.TempChildLists.TryGetValue(key, out object? value))

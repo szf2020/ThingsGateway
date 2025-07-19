@@ -23,11 +23,11 @@ namespace ThingsGateway.SqlSugar
         {
             var type = MethodInfos.GetType().GetGenericArguments()[0];
             var entityInfo = this.Context.EntityMaintenance.GetEntityInfo(type);
-            Type properyItemType;
+            Type propertyItemType;
             bool isList;
-            Expression exp = UtilMethods.GetIncludeExpression(navMemberName, entityInfo, out properyItemType, out isList);
+            Expression exp = UtilMethods.GetIncludeExpression(navMemberName, entityInfo, out propertyItemType, out isList);
             var method = this.MethodInfos.GetType().GetMyMethod("Include", 2, isList)
-                            .MakeGenericMethod(properyItemType);
+                            .MakeGenericMethod(propertyItemType);
             var obj = method.Invoke(this.MethodInfos, new object[] { exp, insertNavOptions });
             this.MethodInfos = obj;
             return this;
@@ -40,11 +40,11 @@ namespace ThingsGateway.SqlSugar
         {
             var type = MethodInfos.GetType().GetGenericArguments()[1];
             var entityInfo = this.Context.EntityMaintenance.GetEntityInfo(type);
-            Type properyItemType;
+            Type propertyItemType;
             bool isList;
-            Expression exp = UtilMethods.GetIncludeExpression(navMemberName, entityInfo, out properyItemType, out isList);
+            Expression exp = UtilMethods.GetIncludeExpression(navMemberName, entityInfo, out propertyItemType, out isList);
             var method = this.MethodInfos.GetType().GetMyMethod("ThenInclude", 2, isList)
-                            .MakeGenericMethod(properyItemType);
+                            .MakeGenericMethod(propertyItemType);
             var obj = method.Invoke(this.MethodInfos, new object[] { exp, insertNavOptions });
             this.MethodInfos = obj;
             return this;

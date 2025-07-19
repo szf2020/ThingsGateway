@@ -154,11 +154,11 @@ namespace ThingsGateway.SqlSugar
             UpdateNavMethodInfo result = new UpdateNavMethodInfo();
             result.Context = UpdateNavProvider._Context;
             var entityInfo = result.Context.EntityMaintenance.GetEntityInfo<T>();
-            Type properyItemType;
+            Type propertyItemType;
             bool isList;
-            Expression exp = UtilMethods.GetIncludeExpression(navMemberName, entityInfo, out properyItemType, out isList);
+            Expression exp = UtilMethods.GetIncludeExpression(navMemberName, entityInfo, out propertyItemType, out isList);
             var method = this.GetType().GetMyMethod("Include", 2, isList)
-                            .MakeGenericMethod(properyItemType);
+                            .MakeGenericMethod(propertyItemType);
             var obj = method.Invoke(this, new object[] { exp, updateNavOptions });
             result.MethodInfos = obj;
             return result;

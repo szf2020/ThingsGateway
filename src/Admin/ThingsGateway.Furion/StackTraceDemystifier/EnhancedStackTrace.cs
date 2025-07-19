@@ -1,10 +1,7 @@
 // Copyright (c) Ben A Adams. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
-using System.Collections;
-using System.Collections.Generic;
 using System.Collections.Generic.Enumerable;
-using System.IO;
 using System.Text;
 
 namespace System.Diagnostics
@@ -101,8 +98,8 @@ namespace System.Diagnostics
 
                 sb.Append("   at ");
                 frame.MethodInfo.Append(sb);
-                
-                if (frame.GetFileName() is {} fileName
+
+                if (frame.GetFileName() is { } fileName
                     // IsNullOrEmpty alone wasn't enough to disable the null warning
                     && !string.IsNullOrEmpty(fileName))
                 {

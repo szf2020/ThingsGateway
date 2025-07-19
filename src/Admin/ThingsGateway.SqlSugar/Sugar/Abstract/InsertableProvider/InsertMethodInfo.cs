@@ -78,16 +78,16 @@ namespace ThingsGateway.SqlSugar
         /// <summary>
         /// 异步执行插入并返回标识
         /// </summary>
-        public  Task<int> ExecuteReturnIdentityAsync()
+        public Task<int> ExecuteReturnIdentityAsync()
         {
-            if (Context == null) return Task.FromResult( 0);
+            if (Context == null) return Task.FromResult(0);
             var inertable = MethodInfo.Invoke(Context, new object[] { objectValue });
             var result = inertable.GetType().GetMyMethod("ExecuteReturnIdentityAsync", 0).Invoke(inertable, Array.Empty<object>());
             return Task.FromResult((int)result);
         }
-        public  Task<long> ExecuteReturnBigIdentityAsync()
+        public Task<long> ExecuteReturnBigIdentityAsync()
         {
-            if (Context == null) return Task.FromResult( (long)0);
+            if (Context == null) return Task.FromResult((long)0);
             var inertable = MethodInfo.Invoke(Context, new object[] { objectValue });
             var result = inertable.GetType().GetMyMethod("ExecuteReturnBigIdentityAsync", 0).Invoke(inertable, Array.Empty<object>());
             return Task.FromResult((long)result);

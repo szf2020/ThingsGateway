@@ -11,9 +11,9 @@ namespace ThingsGateway.SqlSugar
             switch (this.context.CurrentConnectionConfig.DbType)
             {
                 case DbType.MySql:
-                    var result = new MySqlFastBuilder();
-                    result.CharacterSet = this.CharacterSet;
-                    return result;
+                    var result1 = new MySqlFastBuilder();
+                    result1.CharacterSet = this.CharacterSet;
+                    return result1;
                 case DbType.SqlServer:
                     var result2 = new SqlServerFastBuilder();
                     result2.DbFastestProperties.IsOffIdentity = this.IsOffIdentity;
@@ -44,10 +44,10 @@ namespace ThingsGateway.SqlSugar
                     className = $"{SugarConst.StartName}SqlSugar.{this.context.CurrentConnectionConfig.DbType.ToString().Replace("Native", "")}FastBuilder";
                     break;
             }
-            var reslut = InstanceFactory.CreateInstance<IFastBuilder>(className);
-            reslut.CharacterSet = this.CharacterSet;
-            reslut.FastEntityInfo = this.entityInfo;
-            return reslut;
+            var result = InstanceFactory.CreateInstance<IFastBuilder>(className);
+            result.CharacterSet = this.CharacterSet;
+            result.FastEntityInfo = this.entityInfo;
+            return result;
         }
 
         /// <summary>将实体列表转换为DataTable</summary>

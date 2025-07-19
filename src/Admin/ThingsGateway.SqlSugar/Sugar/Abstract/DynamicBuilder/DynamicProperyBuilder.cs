@@ -6,7 +6,7 @@ namespace ThingsGateway.SqlSugar
     /// <summary>
     /// 动态属性构建器
     /// </summary>
-    public class DynamicProperyBuilder
+    public class DynamicPropertyBuilder
     {
         private bool IsCache = false;
         public DynamicBuilder baseBuilder;
@@ -14,27 +14,27 @@ namespace ThingsGateway.SqlSugar
         /// <summary>
         /// 创建新的构建器副本
         /// </summary>
-        public static DynamicProperyBuilder CopyNew()
+        public static DynamicPropertyBuilder CopyNew()
         {
-            return new DynamicProperyBuilder();
+            return new DynamicPropertyBuilder();
         }
 
         /// <summary>
         /// 创建属性
         /// </summary>
         /// <param name="propertyName">属性名</param>
-        /// <param name="properyType">属性类型</param>
+        /// <param name="propertyType">属性类型</param>
         /// <param name="column">列配置</param>
         /// <param name="isSplitField">是否分表字段</param>
         /// <param name="navigate">导航属性配置</param>
-        public DynamicProperyBuilder CreateProperty(string propertyName, Type properyType, SugarColumn column = null, bool isSplitField = false, Navigate navigate = null)
+        public DynamicPropertyBuilder CreateProperty(string propertyName, Type propertyType, SugarColumn column = null, bool isSplitField = false, Navigate navigate = null)
         {
             column ??= new SugarColumn() { ColumnName = propertyName };
 
             var addItem = new PropertyMetadata
             {
                 Name = propertyName,
-                Type = properyType,
+                Type = propertyType,
                 CustomAttributes = new List<CustomAttributeBuilder>() { baseBuilder.GetProperty(column) }
             };
 
@@ -56,7 +56,7 @@ namespace ThingsGateway.SqlSugar
         /// <summary>
         /// 设置是否缓存
         /// </summary>
-        public DynamicProperyBuilder WithCache(bool isCache = true)
+        public DynamicPropertyBuilder WithCache(bool isCache = true)
         {
             IsCache = isCache;
             return this;
@@ -94,7 +94,7 @@ namespace ThingsGateway.SqlSugar
         /// <summary>
         /// 构建关联类型
         /// </summary>
-        public Tuple<Type, Type> BuilderTypes(DynamicProperyBuilder dynamicBuilderB)
+        public Tuple<Type, Type> BuilderTypes(DynamicPropertyBuilder dynamicBuilderB)
         {
             if (IsCache)
             {
@@ -113,7 +113,7 @@ namespace ThingsGateway.SqlSugar
             }
         }
 
-        private Tuple<Type, Type> GetBuilderTypes(DynamicProperyBuilder dynamicBuilderB)
+        private Tuple<Type, Type> GetBuilderTypes(DynamicPropertyBuilder dynamicBuilderB)
         {
             var typeBuilderA = EmitTool.CreateTypeBuilder(
                 baseBuilder.entityName,
