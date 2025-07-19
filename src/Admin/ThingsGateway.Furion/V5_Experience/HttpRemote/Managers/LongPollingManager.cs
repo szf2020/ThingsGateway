@@ -9,12 +9,10 @@
 // 许可证的完整文本可以在源代码树根目录中的 LICENSE-APACHE 和 LICENSE-MIT 文件中找到。
 // ------------------------------------------------------------------------
 
+using ThingsGateway.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-
 using System.Threading.Channels;
-
-using ThingsGateway.Extensions;
 
 namespace ThingsGateway.HttpRemote;
 
@@ -38,9 +36,7 @@ internal sealed class LongPollingManager
     /// <param name="httpLongPollingBuilder">
     ///     <see cref="HttpLongPollingBuilder" />
     /// </param>
-    /// <param name="configure">自定义配置委托</param>
-    internal LongPollingManager(IHttpRemoteService httpRemoteService, HttpLongPollingBuilder httpLongPollingBuilder,
-        Action<HttpRequestBuilder>? configure = null)
+    internal LongPollingManager(IHttpRemoteService httpRemoteService, HttpLongPollingBuilder httpLongPollingBuilder)
     {
         // 空检查
         ArgumentNullException.ThrowIfNull(httpRemoteService);
@@ -56,7 +52,7 @@ internal sealed class LongPollingManager
 
         // 构建 HttpRequestBuilder 实例
         RequestBuilder = httpLongPollingBuilder.Build(httpRemoteService.ServiceProvider
-            .GetRequiredService<IOptions<HttpRemoteOptions>>().Value, configure);
+            .GetRequiredService<IOptions<HttpRemoteOptions>>().Value);
     }
 
     /// <summary>

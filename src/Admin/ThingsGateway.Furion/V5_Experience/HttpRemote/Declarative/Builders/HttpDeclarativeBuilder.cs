@@ -11,10 +11,9 @@
 
 // ReSharper disable ArrangeObjectCreationWhenTypeNotEvident
 
+using ThingsGateway.Extensions;
 using System.Collections.Concurrent;
 using System.Reflection;
-
-using ThingsGateway.Extensions;
 
 namespace ThingsGateway.HttpRemote;
 

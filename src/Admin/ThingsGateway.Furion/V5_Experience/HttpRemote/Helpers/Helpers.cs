@@ -9,13 +9,13 @@
 // 许可证的完整文本可以在源代码树根目录中的 LICENSE-APACHE 和 LICENSE-MIT 文件中找到。
 // ------------------------------------------------------------------------
 
+using ThingsGateway.Utilities;
 using Microsoft.Net.Http.Headers;
-
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
+using System.Net.Http.Json;
+using System.Net.Mime;
 using System.Text.RegularExpressions;
-
-using ThingsGateway.Utilities;
 
 namespace ThingsGateway.HttpRemote;
 
@@ -212,6 +212,27 @@ internal static partial class Helpers
         return new Uri(
             $"{requestUri.Scheme}://{requestUri.Host}{(requestUri.IsDefaultPort ? string.Empty : $":{requestUri.Port}")}");
     }
+
+    /// <summary>
+    ///     根据原始内容推断内容类型，失败时返回默认值
+    /// </summary>
+    /// <param name="rawContent">原始请求内容</param>
+    /// <param name="defaultContentType">默认请求内容类型</param>
+    /// <returns>
+    ///     <see cref="string" />
+    /// </returns>
+    internal static string GetContentTypeOrDefault(object? rawContent, string? defaultContentType) =>
+        rawContent switch
+        {
+            JsonContent => MediaTypeNames.Application.Json,
+            FormUrlEncodedContent => MediaTypeNames.Application.FormUrlEncoded,
+            (byte[] or Stream or ByteArrayContent or StreamContent or ReadOnlyMemoryContent or ReadOnlyMemory<byte>)
+                and not StringContent => MediaTypeNames.Application
+                    .Octet,
+            MultipartContent => MediaTypeNames.Multipart.FormData,
+            MultipartFile => MediaTypeNames.Application.Octet,
+            _ => defaultContentType ?? Constants.TEXT_PLAIN_MIME_TYPE
+        };
 
     /// <summary>
     ///     <c>application/x-www-form-urlencoded</c> 格式正则表达式

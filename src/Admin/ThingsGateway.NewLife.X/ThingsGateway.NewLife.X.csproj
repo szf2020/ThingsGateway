@@ -10,7 +10,8 @@
 		<AssemblyTitle>工具核心库</AssemblyTitle>
 		<Description>ThingsGateway.NewLife.X</Description>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-
+		<SignAssembly>True</SignAssembly>
+		<AssemblyOriginatorKeyFile>newlife.snk</AssemblyOriginatorKeyFile>
 	</PropertyGroup>
 
 	<ItemGroup>

@@ -23,15 +23,13 @@
 	<ItemGroup>
 		<None Remove="FriendlyException\Assets\error.html" />
 		<None Remove="SpecificationDocument\Assets\index.html" />
+		<None Remove="Schedule\Dashboard\frontend\**\*" />
 		<EmbeddedResource Include="FriendlyException\Assets\error.html" />
 		<EmbeddedResource Include="SpecificationDocument\Assets\index.html" />
+		<EmbeddedResource Include="Schedule\Dashboard\frontend\**\*" />
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Ben.Demystifier" Version="0.4.1" />
-		<!--<PackageReference Include="FastExpressionCompiler" Version="5.3.0" />-->
-		<PackageReference Include="System.Text.RegularExpressions" Version="4.3.1" />
-		<!--<PackageReference Include="Mapster" Version="7.4.0" />-->
 		<PackageReference Include="Swashbuckle.AspNetCore" Version="9.0.3" />
 	</ItemGroup>
 
@@ -39,15 +37,12 @@
 		<PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="$(NET8Version)" />
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="$(NET8Version)" />
 		<PackageReference Include="Microsoft.Extensions.DependencyModel" Version="8.0.2" />
-		<PackageReference Include="System.Reflection.MetadataLoadContext" Version="8.0.1" />
-		<PackageReference Include="System.Text.Json" Version="8.0.5" />
 	</ItemGroup>
+	
 	<ItemGroup Condition=" '$(TargetFramework)' == 'net9.0' ">
 		<PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="$(NET9Version)" />
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="$(NET9Version)" />
 		<PackageReference Include="Microsoft.Extensions.DependencyModel" Version="$(NET9Version)" />
-		<PackageReference Include="System.Reflection.MetadataLoadContext" Version="$(NET9Version)" />
-		<PackageReference Include="System.Text.Json" Version="$(NET9Version)" />
 
 	</ItemGroup>
 

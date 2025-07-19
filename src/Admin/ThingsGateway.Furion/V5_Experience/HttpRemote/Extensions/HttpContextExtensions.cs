@@ -9,12 +9,10 @@
 // 许可证的完整文本可以在源代码树根目录中的 LICENSE-APACHE 和 LICENSE-MIT 文件中找到。
 // ------------------------------------------------------------------------
 
+using ThingsGateway.Extensions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
-
 using System.Net.Http.Headers;
-
-using ThingsGateway.Extensions;
 
 namespace ThingsGateway.HttpRemote.Extensions;
 

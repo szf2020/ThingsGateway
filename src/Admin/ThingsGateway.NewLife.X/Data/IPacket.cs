@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -102,10 +103,13 @@ public static class PacketHelper
     {
         // 总是有异常数据，这里屏蔽异常
         if (pk == null) return null!;
+        if (pk.Total == 0) return String.Empty;
 
         if (pk.Next == null)
         {
             if (count < 0) count = pk.Length - offset;
+            if (count == 0) return String.Empty;
+
             var span = pk.GetSpan();
             if (span.Length > count) span = span[..count];
 
@@ -298,6 +302,32 @@ public static class PacketHelper
         }
 
         span = default;
+        return false;
+    }
+
+    /// <summary>尝试扩展头部，用于填充包头，减少内存分配</summary>
+    /// <param name="pk">数据包</param>
+    /// <param name="size">要扩大的头部大小，不包括负载数据</param>
+    /// <param name="newPacket">扩展后的数据包</param>
+    /// <returns></returns>
+    [Obsolete]
+    public static Boolean TryExpandHeader(this IPacket pk, Int32 size, [NotNullWhen(true)] out IPacket? newPacket)
+    {
+        newPacket = null;
+
+        if (pk is ArrayPacket ap && ap.Offset >= size)
+        {
+            newPacket = new ArrayPacket(ap.Buffer, ap.Offset - size, ap.Length + size) { Next = ap.Next };
+
+            return true;
+        }
+        else if (pk is OwnerPacket owner && owner.Offset >= size)
+        {
+            newPacket = new OwnerPacket(owner, size);
+
+            return true;
+        }
+
         return false;
     }
 

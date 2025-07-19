@@ -37,6 +37,9 @@ public static class XTrace
     /// <param name="msg">信息</param>
     public static void WriteLine(String msg)
     {
+        // 只过滤null，保留包含空格的字符串
+        if (msg == null) return;
+
         if (!InitLog()) return;
 
         WriteVersion();
@@ -49,6 +52,9 @@ public static class XTrace
     /// <param name="args"></param>
     public static void WriteLine(String format, params Object?[] args)
     {
+        // 只过滤null，保留包含空格的字符串
+        if (format == null) return;
+
         if (!InitLog()) return;
 
         WriteVersion();

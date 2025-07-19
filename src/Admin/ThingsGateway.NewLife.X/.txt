@@ -1,3 +1,3 @@
-﻿https://gitee.com/NewLifeX/X/commit/bcb90e8bffbfe998c0b6e9167c96c60e3ae6371f
+﻿https://gitee.com/NewLifeX/X/commit/a07810c61ba0e9dc792ab1af13ebf7c8a3a5d2da
 
 修改大部分CA规则，后期优化减少字符串操作

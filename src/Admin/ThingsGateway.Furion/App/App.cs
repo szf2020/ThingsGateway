@@ -486,20 +486,21 @@ public static class App
                 try
                 {
                     if (BakImagePaths.Contains(assemblyFileFullPath)) continue;
-                    // 根据路径加载程序集
-                    //var loadedAssembly = AssemblyLoadContext.Default.LoadFromAssemblyPath(assemblyFileFullPath);
-                    var runtimeAssembliesPath = Path.GetDirectoryName(typeof(object).Assembly.Location);
-                    // 将目标程序集和运行时核心程序集一起提供给 PathAssemblyResolver
-                    var assemblies = Directory.GetFiles(runtimeAssembliesPath, "*.dll");
-                    var resolver = new PathAssemblyResolver(new[] { assemblyFileFullPath }.Concat(assemblies));
-                    // 使用 MetadataLoadContext
-                    using var metadataContext = new MetadataLoadContext(resolver);
+                    //// 根据路径加载程序集
+                    ////var loadedAssembly = AssemblyLoadContext.Default.LoadFromAssemblyPath(assemblyFileFullPath);
+                    //var runtimeAssembliesPath = Path.GetDirectoryName(typeof(object).Assembly.Location);
+                    //// 将目标程序集和运行时核心程序集一起提供给 PathAssemblyResolver
+                    //var assemblies = Directory.GetFiles(runtimeAssembliesPath, "*.dll");
+                    //var resolver = new PathAssemblyResolver(new[] { assemblyFileFullPath }.Concat(assemblies));
+                    //// 使用 MetadataLoadContext
+                    //using var metadataContext = new MetadataLoadContext(resolver);
 
-                    var referencedAssemblies = metadataContext.LoadFromAssemblyPath(assemblyFileFullPath)?.GetReferencedAssemblies();
-                    if ((referencedAssemblies?.Any(a => a.Name.StartsWith("ThingsGateway"))) != true)
-                    {
-                        continue;
-                    }
+                    //var referencedAssemblies = metadataContext.LoadFromAssemblyPath(assemblyFileFullPath)?.GetReferencedAssemblies();
+                    //if ((referencedAssemblies?.Any(a => a.Name.StartsWith("ThingsGateway"))) != true)
+                    //{
+                    //    continue;
+                    //}
+                    
                     var loadedAssembly = Reflect.LoadAssembly(assemblyFileFullPath);
                     if (loadedAssembly == default) continue;
 

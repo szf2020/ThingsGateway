@@ -9,18 +9,15 @@
 // 许可证的完整文本可以在源代码树根目录中的 LICENSE-APACHE 和 LICENSE-MIT 文件中找到。
 // ------------------------------------------------------------------------
 
+using ThingsGateway.Extensions;
+using ThingsGateway.Utilities;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Net.Http.Headers;
-
 using System.Diagnostics.CodeAnalysis;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.RegularExpressions;
-
-using ThingsGateway.Extensions;
-using ThingsGateway.Utilities;
-
 using StringWithQualityHeaderValue = System.Net.Http.Headers.StringWithQualityHeaderValue;
 
 namespace ThingsGateway.HttpRemote.Extensions;
@@ -285,6 +282,11 @@ public static partial class HttpRemoteExtensions
         // 获取内容编码
         var charset = httpContent.Headers.ContentType?.CharSet ?? "utf-8";
         var partialContent = Encoding.GetEncoding(charset).GetString(buffer, 0, bytesToShow);
+
+        // 解决退格导致显示不全问题：保留 \n 和 \r，仅过滤其他 ASCII 控制字符（ASCII < 32 且不是 \n 或 \r）
+        partialContent = new string(partialContent
+            .Where(c => c >= 32 || c == '\n' || c == '\r')
+            .ToArray());
 
         // 检查是否是完整的 Unicode 转义字符串
         if (total == bytesToShow && UnicodeEscapeRegex().IsMatch(partialContent))
