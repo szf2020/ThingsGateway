@@ -9,5 +9,7 @@
         public bool IsNoCopyDataTable { get; set; }
         public bool IsConvertDateTimeOffsetToDateTime { get; set; }
         public bool NoPage { get; set; }
+
+        public bool IsIgnoreInsertError { get; internal set; }
     }
 }

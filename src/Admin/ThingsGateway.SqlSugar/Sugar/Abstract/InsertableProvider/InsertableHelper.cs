@@ -140,6 +140,10 @@ namespace ThingsGateway.SqlSugar
                     {
                         continue;
                     }
+                    else if (item.SqlParameterDbType is System.Data.DbType dbtype)
+                    {
+                        paramters.DbType = dbtype;
+                    }
                     if (item.IsJson)
                     {
                         paramters.IsJson = true;

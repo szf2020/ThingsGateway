@@ -6,7 +6,7 @@ namespace ThingsGateway.SqlSugar
     public abstract partial class SqlBuilderProvider : SqlBuilderAccessory, ISqlBuilder
     {
         #region Core
-        public KeyValuePair<string, SugarParameter[]> ConditionalModelToSql(List<IConditionalModel> models, int beginIndex = 0)
+        public virtual KeyValuePair<string, SugarParameter[]> ConditionalModelToSql(List<IConditionalModel> models, int beginIndex = 0)
         {
             if (models.IsNullOrEmpty()) return new KeyValuePair<string, SugarParameter[]>();
             StringBuilder builder = new StringBuilder();

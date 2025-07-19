@@ -259,6 +259,22 @@ AND a.table_name!='SQLPLUS_PRODUCT_PROFILE'";
         #endregion
 
         #region Methods
+
+        public override bool IsAnyColumn(string tableName, string columnName, bool isCache = true)
+        {
+            if (isCache)
+            {
+                return base.IsAnyColumn(tableName, columnName, isCache);
+            }
+            else
+            {
+                var sql = $@"  SELECT COUNT(1) 
+    FROM ALL_TAB_COLUMNS
+    WHERE Lower(TABLE_NAME) = @table AND Lower(COLUMN_NAME) =@column  AND  OWNER=SF_GET_SCHEMA_NAME_BY_ID(CURRENT_SCHID) ";
+                return this.Context.Ado.GetInt(sql, new { column = columnName.ToLower(), table = tableName.ToLower() }) > 0;
+            }
+        }
+
         public override bool UpdateColumn(string tableName, DbColumnInfo column)
         {
             ConvertCreateColumnInfo(column);
@@ -436,7 +452,7 @@ WHERE table_name = '" + tableName + "'");
         {
             List<DbColumnInfo> columns = GetOracleDbType(tableName);
             string sql = "select * from " + SqlBuilder.GetTranslationTableName(tableName) + " WHERE 1=2 ";
-            if (!this.GetTableInfoList(false).Any(it => it.Name == SqlBuilder.GetTranslationTableName(tableName).TrimStart('\"').TrimEnd('\"')))
+            if (!this.IsAnyTable(SqlBuilder.GetTranslationTableName(tableName).TrimStart('\"').TrimEnd('\"'), false))
             {
                 sql = "select * from \"" + tableName + "\" WHERE 1=2 ";
             }
@@ -513,8 +529,14 @@ WHERE table_name = '" + tableName + "'");
                                          on  t2.table_name = t3.table_name and t2.index_name = t3.index_name
                                         and t3.status = 'valid' and t3.uniqueness = 'unique') t4   --unique:唯一索引
                               on  t1.table_name = t4.table_name and t1.column_name = t4.column_name 
-                            left join user_col_comments t5 on   t1.table_name = t5.table_name and t1.column_name = t5.column_name 
-                            left join user_tab_comments t6 on  t1.table_name = t6.table_name
+                            left join ( select *
+                                from user_col_comments
+                                where upper(table_name) = upper('{tableName}') 
+                                ) t5 on   t1.table_name = t5.table_name and t1.column_name = t5.column_name 
+                            left join ( select *
+                                 from user_tab_comments
+                                where upper(table_name) = upper('{tableName}')
+                              ) t6 on  t1.table_name = t6.table_name
                             where upper(t1.table_name)=upper('{tableName}')
                             order by  t1.table_name, t1.column_id";
 
@@ -613,15 +635,12 @@ WHERE table_name = '" + tableName + "'");
         }
         public override bool IsAnyTable(string tableName, bool isCache = true)
         {
-            var isSchema = this.Context.CurrentConnectionConfig?.ConnectionString?.Replace(" ", "")?.Contains("schema=", StringComparison.OrdinalIgnoreCase) == true;
-            if (isSchema)
+            if (isCache == false)
             {
-                var schema = ExtractSchema(this.Context.CurrentConnectionConfig?.ConnectionString);
-                Check.ExceptionEasy(schema == null, "ConnectionString schema format error, please use schema=(\\w+)", "连接字符串schema格式错误,请用schema=(\\w+)");
                 return this.Context.Ado.GetInt($@"SELECT COUNT(*)
 FROM ALL_TABLES t
 WHERE upper(t.TABLE_NAME) = upper('{tableName}')
-  AND upper(t.OWNER) = upper('{schema}')
+  AND  t.OWNER  = SF_GET_SCHEMA_NAME_BY_ID(CURRENT_SCHID) 
 ") > 0;
 
             }

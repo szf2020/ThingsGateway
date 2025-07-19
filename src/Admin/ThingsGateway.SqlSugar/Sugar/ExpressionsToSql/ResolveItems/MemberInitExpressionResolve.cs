@@ -49,11 +49,10 @@ namespace ThingsGateway.SqlSugar
                 var item = memberAssignment.Expression;
                 item = ExpressionTool.RemoveConvert(item);
                 //Column IsJson Handler
-                if (memberAssignment.Member.CustomAttributes != null)
+                if (entityMaintenance != null)
                 {
-                    var customAttribute = memberAssignment.Member.GetCustomAttribute<SugarColumn>();
-
-                    if (customAttribute?.IsJson ?? false)
+                    EntityColumnInfo columnInfo = entityMaintenance.GetEntityInfo(type).Columns.FirstOrDefault(it => it.PropertyName == memberAssignment.Member.Name);
+                    if (columnInfo?.IsJson ?? false)
                     {
                         var paramterValue = ExpressionTool.DynamicInvoke(item);
                         var parameterName = AppendParameter(new SerializeService().SerializeObject(paramterValue));
@@ -64,6 +63,15 @@ namespace ThingsGateway.SqlSugar
                         }
                         this.Context.Result.Append(base.Context.GetEqString(memberName, parameterName));
 
+                        continue;
+                    }
+                    else if (UtilMethods.IsParameterConverter(columnInfo))
+                    {
+                        var value = ExpressionTool.DynamicInvoke(item);
+                        var p = UtilMethods.GetParameterConverter(this.Context.ParameterIndex, this.Context.SugarContext.Context, value, memberAssignment.Expression, columnInfo);
+                        this.Context.Result.Append(base.Context.GetEqString(memberName, p.ParameterName));
+                        this.Context.ParameterIndex++;
+                        this.Context.Parameters.Add(p);
                         continue;
                     }
                 }

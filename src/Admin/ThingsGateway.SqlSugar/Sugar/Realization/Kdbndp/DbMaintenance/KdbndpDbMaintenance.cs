@@ -64,6 +64,8 @@
                 }
                 else if (IsMySql())
                 {
+                    sql = sql.Replace("UPPER(", "pg_catalog.upper(", StringComparison.OrdinalIgnoreCase);
+                    sql = sql.Replace("lower(", "pg_catalog.lower(", StringComparison.OrdinalIgnoreCase);
                     sql = sql.Replace("pcolumn.udt_name", "pcolumn.data_type");
                 }
                 return sql;
@@ -240,6 +242,11 @@
                 {
                     sql = sql.Replace("sys_", "pg_");
                 }
+                if (IsSqlServerModel() || IsMySql())
+                {
+                    sql = sql.Replace("UPPER(", "pg_catalog.upper(", StringComparison.OrdinalIgnoreCase);
+                    sql = sql.Replace("lower(", "pg_catalog.lower(", StringComparison.OrdinalIgnoreCase);
+                }
                 return sql;
             }
         }
@@ -347,6 +354,11 @@ WHERE tgrelid = '" + tableName + "'::regclass");
             {
                 sql = sql.Replace("sys_", "pg_");
             }
+            if (IsSqlServerModel() || IsMySql())
+            {
+                sql = sql.Replace("UPPER(", "pg_catalog.upper(", StringComparison.OrdinalIgnoreCase);
+                sql = sql.Replace("lower(", "pg_catalog.lower(", StringComparison.OrdinalIgnoreCase);
+            }
             return this.Context.Ado.SqlQuery<string>(sql);
         }
         public override List<string> GetProcList(string dbName)
@@ -355,6 +367,11 @@ WHERE tgrelid = '" + tableName + "'::regclass");
             if (IsPgModel())
             {
                 sql = sql.Replace("sys_", "pg_");
+            }
+            if (IsSqlServerModel() || IsMySql())
+            {
+                sql = sql.Replace("UPPER(", "pg_catalog.upper(", StringComparison.OrdinalIgnoreCase);
+                sql = sql.Replace("lower(", "pg_catalog.lower(", StringComparison.OrdinalIgnoreCase);
             }
             return this.Context.Ado.SqlQuery<string>(sql);
         }
@@ -435,10 +452,11 @@ WHERE tgrelid = '" + tableName + "'::regclass");
         public override bool IsAnyTable(string tableName, bool isCache = true)
         {
             var sql = $"select count(*) from information_schema.tables where UPPER(table_schema)=UPPER('{GetSchema()}') and UPPER(table_type)=UPPER('BASE TABLE') and UPPER(table_name)=UPPER('{tableName.ToUpper(IsUpper)}')";
-            if (IsSqlServerModel())
+            if (IsSqlServerModel() || IsMySql())
             {
                 sql = $"select count(*) from information_schema.tables where  UPPER(table_schema)=UPPER('{GetSchema()}') and  pg_catalog.UPPER(table_name)=pg_catalog.UPPER('{tableName.ToUpper(IsUpper)}')";
             }
+
             return this.Context.Ado.GetInt(sql) > 0;
         }
 

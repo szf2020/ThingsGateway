@@ -434,6 +434,8 @@ namespace ThingsGateway.SqlSugar
             if (column.ForOwnsOnePropertyInfo != null)
             {
                 var owsPropertyValue = column.ForOwnsOnePropertyInfo.GetValue(item, null);
+                if (owsPropertyValue == null)
+                    return null;
                 return column.PropertyInfo.GetValue(owsPropertyValue, null);
             }
             else
@@ -509,6 +511,10 @@ namespace ThingsGateway.SqlSugar
                     {
                         parameter.IsJson = true;
                         SqlBuilder.ChangeJsonType(parameter);
+                    }
+                    if (item.SqlParameterDbType is System.Data.DbType dbtype)
+                    {
+                        parameter.DbType = dbtype;
                     }
                     if (item.IsArray)
                     {

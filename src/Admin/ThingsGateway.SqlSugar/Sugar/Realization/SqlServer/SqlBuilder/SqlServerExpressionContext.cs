@@ -97,6 +97,11 @@
                 var parameter = model.Args[0];
                 return string.Format("( {0} IS NOT NULL )", parameter.MemberName);
             }
+            else if (model.Args[0].Type.IsIn(UtilConstants.DobType, UtilConstants.DecType, UtilConstants.DateTimeOffsetType, UtilConstants.DateType))
+            {
+                var parameter = model.Args[0];
+                return string.Format("( {0} IS NOT NULL )", parameter.MemberName);
+            }
             else
             {
                 var parameter = model.Args[0];

@@ -67,18 +67,31 @@ namespace ThingsGateway.SqlSugar
             var result = inertable.GetType().GetMethod("ExecuteReturnIdentity").Invoke(inertable, Array.Empty<object>());
             return (int)result;
         }
+        public long ExecuteReturnBigIdentity()
+        {
+            if (Context == null) return 0;
+            var inertable = MethodInfo.Invoke(Context, new object[] { objectValue });
+            var result = inertable.GetType().GetMethod("ExecuteReturnBigIdentity").Invoke(inertable, Array.Empty<object>());
+            return (long)result;
+        }
 
         /// <summary>
         /// 异步执行插入并返回标识
         /// </summary>
-        public async Task<int> ExecuteReturnIdentityAsync()
+        public  Task<int> ExecuteReturnIdentityAsync()
         {
-            if (Context == null) return 0;
+            if (Context == null) return Task.FromResult( 0);
             var inertable = MethodInfo.Invoke(Context, new object[] { objectValue });
             var result = inertable.GetType().GetMyMethod("ExecuteReturnIdentityAsync", 0).Invoke(inertable, Array.Empty<object>());
-            return await ((Task<int>)result).ConfigureAwait(false);
+            return Task.FromResult((int)result);
         }
-
+        public  Task<long> ExecuteReturnBigIdentityAsync()
+        {
+            if (Context == null) return Task.FromResult( (long)0);
+            var inertable = MethodInfo.Invoke(Context, new object[] { objectValue });
+            var result = inertable.GetType().GetMyMethod("ExecuteReturnBigIdentityAsync", 0).Invoke(inertable, Array.Empty<object>());
+            return Task.FromResult((long)result);
+        }
         /// <summary>
         /// 指定表名
         /// </summary>

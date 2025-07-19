@@ -77,7 +77,7 @@ namespace ThingsGateway.SqlSugar
                 if (MySqlIgnore)
                 {
                     batchInsetrSql.Remove(0, "INSERT INTO `".Length);
-                    batchInsetrSql.Insert(0, "REPLACE  INTO `");
+                    batchInsetrSql.Insert(0, "INSERT OR IGNORE  INTO  `");
                 }
                 var result = batchInsetrSql.ToString();
                 return result;

@@ -461,6 +461,10 @@ namespace ThingsGateway.SqlSugar
             var obj = dr.GetValue(i);
             if (obj == null)
                 return default(T);
+            if (obj is byte[] bytes)
+            {
+                obj = dr.GetString(i);
+            }
             var value = obj.ObjToString();
             return new SerializeService().DeserializeObject<T>(value);
         }

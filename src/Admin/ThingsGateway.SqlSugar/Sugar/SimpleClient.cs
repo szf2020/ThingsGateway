@@ -586,8 +586,7 @@ namespace ThingsGateway.SqlSugar
         }
         public virtual Task<bool> IsAnyAsync(Expression<Func<T, bool>> whereExpression, CancellationToken cancellationToken)
         {
-            this.Context.Ado.CancellationToken = cancellationToken;
-            return Context.Queryable<T>().Where(whereExpression).AnyAsync();
+            return Context.Queryable<T>().Where(whereExpression).AnyAsync(cancellationToken);
         }
         public virtual Task<int> CountAsync(Expression<Func<T, bool>> whereExpression, CancellationToken cancellationToken)
         {

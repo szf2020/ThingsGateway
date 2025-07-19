@@ -121,9 +121,13 @@ namespace ThingsGateway.SqlSugar
 
         public virtual async Task<bool> AnyAsync()
         {
-            return (await Clone().Take(1).Select("1").ToListAsync().ConfigureAwait(false)).Count > 0; ;
+            return (await Clone().Take(1).Select("1").ToListAsync().ConfigureAwait(false)).Count > 0;
         }
-
+        public virtual  Task<bool> AnyAsync(CancellationToken token)
+        {
+            this.Context.Ado.CancellationToken = token;
+            return  this.AnyAsync();
+        }
         public Task<int> CountAsync(CancellationToken token)
         {
             this.Context.Ado.CancellationToken = token;

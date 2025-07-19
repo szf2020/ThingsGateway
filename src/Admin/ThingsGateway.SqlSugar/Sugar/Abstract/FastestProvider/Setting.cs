@@ -16,6 +16,8 @@
         private bool IsDataAop { get; set; }
         /// <summary>是否关闭自增</summary>
         private bool IsOffIdentity { get; set; }
+        /// <summary>是否忽略插入错误</summary>
+        private bool IsIgnoreInsertError { get; set; }
 
         /// <summary>设置字符集</summary>
         public IFastest<T> SetCharacterSet(string CharacterSet)
@@ -28,6 +30,11 @@
         public IFastest<T> EnableDataAop()
         {
             this.IsDataAop = true;
+            return this;
+        }
+        public IFastest<T> IgnoreInsertError()
+        {
+            this.IsIgnoreInsertError = true;
             return this;
         }
 

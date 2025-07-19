@@ -560,7 +560,7 @@ namespace ThingsGateway.SqlSugar
         /// 异步执行命令并将自增ID设置到实体
         /// </summary>
         /// <returns>是否成功</returns>
-        public async Task<bool> ExecuteCommandIdentityIntoEntityAsync()
+        public virtual async Task<bool> ExecuteCommandIdentityIntoEntityAsync()
         {
             var result = InsertObjs.First();
             var identityKeys = GetIdentityKeys();
@@ -772,6 +772,13 @@ namespace ThingsGateway.SqlSugar
             this.InsertBuilder.MySqlIgnore = true;
             return this;
         }
+
+        public IInsertable<T> IgnoreInsertError()
+        {
+            this.InsertBuilder.MySqlIgnore = true;
+            return this;
+        }
+
         /// <summary>
         /// MySQL忽略错误
         /// </summary>
