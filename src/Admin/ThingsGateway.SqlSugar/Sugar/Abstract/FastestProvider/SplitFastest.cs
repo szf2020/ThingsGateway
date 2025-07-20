@@ -133,14 +133,16 @@ namespace ThingsGateway.SqlSugar
             groupModels = new List<GroupModel>();
             var db = FastestProvider.context;
             var hasSplitField = typeof(T).GetProperties().Any(it => it.GetCustomAttribute<SplitFieldAttribute>() != null);
+
+            var context = db.SplitHelper<T>();
             foreach (var item in datas)
             {
                 if (groupModels.Count > 0 && !hasSplitField)
                     groupModels.Add(new GroupModel() { GroupName = groupModels[0].GroupName, Item = item });
                 else
                 {
-                    var value = db.SplitHelper<T>().GetValue(attribute.SplitType, item);
-                    var tableName = db.SplitHelper<T>().GetTableName(attribute.SplitType, value);
+                    var value = context.GetValue(attribute.SplitType, item);
+                    var tableName = context.GetTableName(attribute.SplitType, value);
                     groupModels.Add(new GroupModel() { GroupName = tableName, Item = item });
                 }
             }

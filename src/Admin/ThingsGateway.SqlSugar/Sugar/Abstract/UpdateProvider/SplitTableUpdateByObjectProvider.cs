@@ -141,10 +141,11 @@ namespace ThingsGateway.SqlSugar
             Check.Exception(attribute == null, $"{typeof(T).Name} need SplitTableAttribute");
             groupModels = new List<GroupModel>();
             var db = this.Context;
+            var context = db.SplitHelper<T>();
             foreach (var item in datas)
             {
-                var value = db.SplitHelper<T>().GetValue(attribute.SplitType, item);
-                var tableName = db.SplitHelper<T>().GetTableName(attribute.SplitType, value);
+                var value = context.GetValue(attribute.SplitType, item);
+                var tableName = context.GetTableName(attribute.SplitType, value);
                 groupModels.Add(new GroupModel() { GroupName = tableName, Item = item });
             }
             result = 0;

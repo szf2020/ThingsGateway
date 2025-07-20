@@ -692,7 +692,7 @@ namespace ThingsGateway.SqlSugar
         {
             return ScopedContext.UpdateableT(UpdateObj);
         }
- 
+
         public SplitTableContext SplitHelper<T>() where T : class, new()
         {
             return ScopedContext.SplitHelper<T>();

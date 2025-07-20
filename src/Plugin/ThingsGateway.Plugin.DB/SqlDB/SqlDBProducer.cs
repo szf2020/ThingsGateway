@@ -151,7 +151,7 @@ public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariable, IDBH
             var list = RealTimeVariables.ToListWithDequeue();
             try
             {
-                var varLists = list.Batch(100000);
+                var varLists = list.Batch(_driverPropertys.SplitSize);
                 foreach (var varList in varLists)
                 {
                     var result = await UpdateAsync(varList, cancellationToken).ConfigureAwait(false);

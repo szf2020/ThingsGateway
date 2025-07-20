@@ -135,10 +135,10 @@ public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariable
 
                 if (numberData.Any())
                 {
+                    var data = numberData.AdaptListSQLNumberHistoryValue();
                     Stopwatch stopwatch = new();
                     stopwatch.Start();
-                    var data = numberData.AdaptListSQLNumberHistoryValue();
-                    var result = await _db.Fastest<SQLNumberHistoryValue>().PageSize(50000).SplitTable().BulkCopyAsync(data).ConfigureAwait(false);
+                    var result = await _db.Fastest<SQLNumberHistoryValue>().SplitTable().BulkCopyAsync(data).ConfigureAwait(false);
                     stopwatch.Stop();
 
                     //var result = await db.Insertable(dbInserts).SplitTable().ExecuteCommandAsync().ConfigureAwait(false);
@@ -154,7 +154,7 @@ public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariable
                     Stopwatch stopwatch = new();
                     stopwatch.Start();
                     var data = stringData.AdaptListSQLHistoryValue();
-                    var result = await _db.Fastest<SQLHistoryValue>().PageSize(50000).SplitTable().BulkCopyAsync(data).ConfigureAwait(false);
+                    var result = await _db.Fastest<SQLHistoryValue>().SplitTable().BulkCopyAsync(data).ConfigureAwait(false);
                     stopwatch.Stop();
 
                     //var result = await db.Insertable(dbInserts).SplitTable().ExecuteCommandAsync().ConfigureAwait(false);
@@ -215,7 +215,7 @@ public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariable
                         stopwatch.Start();
 
                         var data = datas.AdaptListSQLRealValue();
-                        var result = await _db.Fastest<SQLRealValue>().AS(_driverPropertys.ReadDBTableName).PageSize(100000).BulkUpdateAsync(data).ConfigureAwait(false);
+                        var result = await _db.Fastest<SQLRealValue>().AS(_driverPropertys.ReadDBTableName).BulkUpdateAsync(data).ConfigureAwait(false);
 
                         stopwatch.Stop();
                         if (result > 0)

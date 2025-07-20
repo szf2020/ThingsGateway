@@ -69,7 +69,7 @@ public partial class SqlHistoryAlarm : BusinessBaseWithCacheAlarm
                 if (_db.CurrentConnectionConfig.DbType == SqlSugar.DbType.QuestDB)
                     result = await _db.Insertable(dbInserts).AS(_driverPropertys.TableName).ExecuteCommandAsync(cancellationToken).ConfigureAwait(false);
                 else
-                    result = await _db.Fastest<HistoryAlarm>().AS(_driverPropertys.TableName).PageSize(50000).BulkCopyAsync(dbInserts.AdaptListHistoryAlarm()).ConfigureAwait(false);
+                    result = await _db.Fastest<HistoryAlarm>().AS(_driverPropertys.TableName).PageSize(100000).BulkCopyAsync(dbInserts.AdaptListHistoryAlarm()).ConfigureAwait(false);
 
                 stopwatch.Stop();
                 //var result = await db.Insertable(dbInserts).SplitTable().ExecuteCommandAsync().ConfigureAwait(false);
