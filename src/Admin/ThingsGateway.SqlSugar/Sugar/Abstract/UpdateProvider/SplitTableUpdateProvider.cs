@@ -12,7 +12,7 @@ namespace ThingsGateway.SqlSugar
         public int ExecuteCommandWithOptLock(bool isThrowError = false)
         {
             var updates = updateobj.UpdateObjs;
-            var tableName = this.Context.SplitHelper(updates.FirstOrDefault()).GetTableName();
+            var tableName = this.Context.SplitHelper(updates[0]).GetTableName();
             var names = updateobj.UpdateBuilder.DbColumnInfoList.Select(it => it.DbColumnName).Distinct().ToArray();
             return this.Context.Updateable(updates).AS(tableName)
                 .UpdateColumns(names).ExecuteCommandWithOptLock(isThrowError);
@@ -42,7 +42,7 @@ namespace ThingsGateway.SqlSugar
         public async Task<int> ExecuteCommandWithOptLockAsync(bool isThrowError = false)
         {
             var updates = updateobj.UpdateObjs;
-            var tableName = this.Context.SplitHelper(updates.FirstOrDefault()).GetTableName();
+            var tableName = this.Context.SplitHelper(updates[0]).GetTableName();
             var names = updateobj.UpdateBuilder.DbColumnInfoList.Select(it => it.DbColumnName).Distinct().ToArray();
             return await Context.Updateable(updates).AS(tableName)
                 .UpdateColumns(names).ExecuteCommandWithOptLockAsync(isThrowError).ConfigureAwait(false);

@@ -24,7 +24,7 @@ namespace ThingsGateway.SqlSugar
         /// <summary>
         /// 待插入对象数组
         /// </summary>
-        internal T[] InsertObjects { get; set; }
+        internal IReadOnlyList<T> InsertObjects { get; set; }
         /// <summary>
         /// 插入构建器
         /// </summary>
@@ -146,7 +146,7 @@ namespace ThingsGateway.SqlSugar
         /// </summary>
         private int Execute()
         {
-            if (InsertObjects?.Length > 0)
+            if (InsertObjects?.Count > 0)
             {
                 var isIdEntity = IsIdEntity(this.Entity);
                 if (!isIdEntity)
@@ -158,13 +158,13 @@ namespace ThingsGateway.SqlSugar
                     int id = 0;
                     if (isIdEntity)
                     {
-                        id = this.Context.Insertable(InsertObject).ExecuteReturnIdentity();
+                        id = this.Context.InsertableT(InsertObject).ExecuteReturnIdentity();
                         this.Entity.Columns.First(it => it.IsIdentity || it.OracleSequenceName.HasValue()).PropertyInfo.SetValue(InsertObject, id);
                     }
                     var pk = GetPrimaryKey(this.Entity, InsertObject, id);
                     AddChildList(this.SubList, InsertObject, pk);
                 }
-                return InsertObjects.Length;
+                return InsertObjects.Count;
             }
             else
             {
@@ -239,12 +239,12 @@ namespace ThingsGateway.SqlSugar
                             {
                                 if (this.Context.CurrentConnectionConfig.DbType == DbType.PostgreSQL)
                                 {
-                                    var sqlobj = this.Context.Insertable(insert).AS(tableName).ToSql();
+                                    var sqlobj = this.Context.InsertableT(insert).AS(tableName).ToSql();
                                     id = this.Context.Ado.GetInt(sqlobj.Key + " returning " + this.InsertBuilder.Builder.GetTranslationColumnName(entityInfo.Columns.First(it => isIdentity).DbColumnName), sqlobj.Value);
                                 }
                                 else
                                 {
-                                    id = this.Context.Insertable(insert).AS(tableName).ExecuteReturnIdentity();
+                                    id = this.Context.InsertableT(insert).AS(tableName).ExecuteReturnIdentity();
                                 }
                                 if (this.Context.CurrentConnectionConfig.DbType == DbType.Oracle && id == 0)
                                 {

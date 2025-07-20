@@ -6,7 +6,7 @@ namespace ThingsGateway.SqlSugar
     public class ReportableProvider<T> : IReportable<T>
     {
         public SqlSugarProvider Context { get; set; }
-        private List<T> datas = new List<T>();
+        private IReadOnlyList<T> datas = new List<T>();
         private List<DateTime> dates = new List<DateTime>();
         private bool isDates = false;
         internal QueryBuilder queryBuilder;
@@ -14,11 +14,11 @@ namespace ThingsGateway.SqlSugar
 
         public ReportableProvider(T data)
         {
-            datas.Add(data);
+            datas = new List<T>() { data };
             Init();
         }
 
-        public ReportableProvider(List<T> list)
+        public ReportableProvider(IReadOnlyList<T> list)
         {
             datas = list;
             Init();
@@ -51,7 +51,7 @@ namespace ThingsGateway.SqlSugar
                 {
 
                     var result = (T)Activator.CreateInstance(typeof(T), true);
-                    datas.Add(result);
+                    datas = new List<T>() { result };
                     ClassMethod(result, sb, true);
                 }
                 else
@@ -74,7 +74,7 @@ namespace ThingsGateway.SqlSugar
             return ToQueryable<Y>();
         }
 
-        private void Each<Y>(StringBuilder sb, List<Y> list)
+        private void Each<Y>(StringBuilder sb, IReadOnlyList<Y> list)
         {
             int i = 0;
             foreach (var item in list)
@@ -145,7 +145,7 @@ namespace ThingsGateway.SqlSugar
         {
             if (datas.Count == 1)
             {
-                var data = datas.First();
+                var data = datas[0];
                 isDates = data is ReportableDateType;
                 if (data is ReportableDateType)
                 {

@@ -746,10 +746,11 @@ namespace ThingsGateway.SqlSugar
                 {
                     newList.Add(item);
                 }
+                
                 var methods = this.Context.GetType().GetMethods()
                .Where(it => it.Name == "Insertable")
                .Where(it => it.GetGenericArguments().Length != 0)
-               .Where(it => it.GetParameters().Any(z => z.ParameterType.Name.StartsWith("List")))
+               .Where(it => it.GetParameters().Any(z => z.ParameterType.Name.StartsWith("IReadOnlyList")))
                .Where(it => it.Name == "Insertable").ToList();
                 var method = methods.Single().MakeGenericMethod(newList.GetType().GetGenericArguments().First());
                 InsertMethodInfo result = new InsertMethodInfo()
@@ -777,23 +778,20 @@ namespace ThingsGateway.SqlSugar
                 return result;
             }
         }
-        public virtual IInsertable<T> Insertable<T>(T[] insertObjs) where T : class, new()
+
+        public virtual IInsertable<T> Insertable<T>(IReadOnlyList<T> insertObjs) where T : class, new()
         {
-            UtilMethods.CheckArray(insertObjs);
+            if (insertObjs?.IsNullOrEmpty() != false)
+            {
+                var insertObjs1 = new List<T>();
+                insertObjs1.Add(default(T));
+                insertObjs = insertObjs1;
+            }
             InitMappingInfo<T>();
             InsertableProvider<T> result = this.CreateInsertable(insertObjs);
             return result;
         }
-        public virtual IInsertable<T> Insertable<T>(List<T> insertObjs) where T : class, new()
-        {
-            if (insertObjs?.IsNullOrEmpty() != false)
-            {
-                insertObjs = new List<T>();
-                insertObjs.Add(default(T));
-            }
-            return this.Context.Insertable(insertObjs.ToArray());
-        }
-        public virtual IInsertable<T> Insertable<T>(T insertObj) where T : class, new()
+        public virtual IInsertable<T> InsertableT<T>(T insertObj) where T : class, new()
         {
             return this.Context.Insertable(new T[] { insertObj });
         }
@@ -803,21 +801,21 @@ namespace ThingsGateway.SqlSugar
             Check.Exception(columnDictionary == null || columnDictionary.Count == 0, "Insertable.columnDictionary can't be null");
             var insertObject = this.Context.Utilities.DeserializeObject<T>(this.Context.Utilities.SerializeObject(columnDictionary));
             var columns = columnDictionary.Select(it => it.Key).ToList();
-            return this.Context.Insertable(insertObject).InsertColumns(columns.ToArray()); ;
+            return this.Context.InsertableT(insertObject).InsertColumns(columns.ToArray()); ;
         }
         public virtual IInsertable<T> Insertable<T>(dynamic insertDynamicObject) where T : class, new()
         {
             InitMappingInfo<T>();
             if (insertDynamicObject is T)
             {
-                return this.Context.Insertable((T)insertDynamicObject);
+                return this.Context.InsertableT((T)insertDynamicObject);
             }
             else
             {
                 var columns = ((object)insertDynamicObject).GetType().GetProperties().Select(it => it.Name).ToList();
                 Check.Exception(columns.IsNullOrEmpty(), "Insertable.updateDynamicObject can't be null");
                 T insertObject = this.Context.Utilities.DeserializeObject<T>(this.Context.Utilities.SerializeObject(insertDynamicObject));
-                return this.Context.Insertable(insertObject).InsertColumns(columns.ToArray());
+                return this.Context.InsertableT(insertObject).InsertColumns(columns.ToArray());
             }
         }
         #endregion
@@ -841,7 +839,7 @@ namespace ThingsGateway.SqlSugar
                 var methods = this.Context.GetType().GetMethods()
                .Where(it => it.Name == "Deleteable")
                .Where(it => it.GetGenericArguments().Length != 0)
-               .Where(it => it.GetParameters().Any(z => z.Name != "pkValue" && z.ParameterType.Name.StartsWith("List")))
+               .Where(it => it.GetParameters().Any(z => z.Name != "pkValue" && z.ParameterType.Name.StartsWith("IReadOnlyList")))
                .Where(it => it.Name == "Deleteable").ToList();
                 var method = methods.FirstOrDefault().MakeGenericMethod(newList.GetType().GetGenericArguments().FirstOrDefault());
                 DeleteMethodInfo result = new DeleteMethodInfo()
@@ -872,7 +870,7 @@ namespace ThingsGateway.SqlSugar
         public virtual IDeleteable<T> Deleteable<T>() where T : class, new()
         {
             InitMappingInfo<T>();
-            DeleteableProvider<T> result = this.CreateDeleteable<T>();
+            DeleteableProvider<T> result = this.CreateDeleteableT<T>();
             if (this.Context.CurrentConnectionConfig?.MoreSettings?.IsAutoDeleteQueryFilter == true)
             {
                 return result.EnableQueryFilter();
@@ -899,12 +897,12 @@ namespace ThingsGateway.SqlSugar
             InitMappingInfo<T>();
             return this.Context.Deleteable<T>().In(pkValue);
         }
-        public virtual IDeleteable<T> Deleteable<T>(T deleteObj) where T : class, new()
+        public virtual IDeleteable<T> DeleteableT<T>(T deleteObj) where T : class, new()
         {
             InitMappingInfo<T>();
             return this.Context.Deleteable<T>().Where(deleteObj);
         }
-        public virtual IDeleteable<T> Deleteable<T>(List<T> deleteObjs) where T : class, new()
+        public virtual IDeleteable<T> Deleteable<T>(IReadOnlyList<T> deleteObjs) where T : class, new()
         {
             InitMappingInfo<T>();
             return this.Context.Deleteable<T>().Where(deleteObjs);
@@ -930,7 +928,7 @@ namespace ThingsGateway.SqlSugar
                 var methods = this.Context.GetType().GetMethods()
                .Where(it => it.Name == "Updateable")
                .Where(it => it.GetGenericArguments().Length != 0)
-               .Where(it => it.GetParameters().Any(z => z.ParameterType.Name.StartsWith("List")))
+               .Where(it => it.GetParameters().Any(z => z.ParameterType.Name.StartsWith("IReadOnlyList")))
                .Where(it => it.Name == "Updateable").ToList();
                 var method = methods.Single().MakeGenericMethod(newList.GetType().GetGenericArguments().First());
                 UpdateMethodInfo result = new UpdateMethodInfo()
@@ -973,25 +971,21 @@ namespace ThingsGateway.SqlSugar
             result.objectValue = method.Invoke(Context, Array.Empty<object>());
             return result;
         }
-        public virtual IUpdateable<T> Updateable<T>(T[] UpdateObjs) where T : class, new()
-        {
-            InitMappingInfo<T>();
-            Check.ExceptionEasy(UpdateObjs is IList && typeof(T).FullName.IsCollectionsList(), "The methods you encapsulate are loaded incorrectly, so List<T> should be Updateable<T>(List<T> UpdateObjs)where T: class, new()", "你封装的方法进错重载，List<T>应该进Updateable<T>(List<T> UpdateObjs)where T : class, new()重载");
-            UpdateableProvider<T> result = this.CreateUpdateable(UpdateObjs);
-            return result;
-        }
-        public virtual IUpdateable<T> Updateable<T>(List<T> UpdateObjs) where T : class, new()
+
+        public virtual IUpdateable<T> Updateable<T>(IReadOnlyList<T> UpdateObjs) where T : class, new()
         {
             //Check.ArgumentNullException(UpdateObjs, "Updateable.UpdateObjs can't be null");
             if (UpdateObjs == null)
             {
                 UpdateObjs = new List<T>();
             }
-            var result = (UpdateableProvider<T>)Updateable(UpdateObjs.ToArray());
+            InitMappingInfo<T>();
+            UpdateableProvider<T> result = this.CreateUpdateable(UpdateObjs);
+
             result.UpdateBuilder.IsListUpdate = true;
             return result;
         }
-        public virtual IUpdateable<T> Updateable<T>(T UpdateObj) where T : class, new()
+        public virtual IUpdateable<T> UpdateableT<T>(T UpdateObj) where T : class, new()
         {
 
             return this.Context.Updateable(new T[] { UpdateObj });
@@ -1030,21 +1024,21 @@ namespace ThingsGateway.SqlSugar
             Check.Exception(columnDictionary == null || columnDictionary.Count == 0, "Updateable.columnDictionary can't be null");
             var updateObject = this.Context.Utilities.DeserializeObject<T>(this.Context.Utilities.SerializeObject(columnDictionary));
             var columns = columnDictionary.Select(it => it.Key).ToList();
-            return this.Context.Updateable(updateObject).UpdateColumns(columns.ToArray()); ;
+            return this.Context.UpdateableT(updateObject).UpdateColumns(columns.ToArray()); ;
         }
         public virtual IUpdateable<T> Updateable<T>(dynamic updateDynamicObject) where T : class, new()
         {
             InitMappingInfo<T>();
             if (updateDynamicObject is T)
             {
-                return this.Context.Updateable((T)updateDynamicObject);
+                return this.Context.UpdateableT((T)updateDynamicObject);
             }
             else
             {
                 var columns = ((object)updateDynamicObject).GetType().GetProperties().Select(it => it.Name).ToList();
                 Check.Exception(columns.IsNullOrEmpty(), "Updateable.updateDynamicObject can't be null");
                 T updateObject = this.Context.Utilities.DeserializeObject<T>(this.Context.Utilities.SerializeObject(updateDynamicObject));
-                return this.Context.Updateable(updateObject).UpdateColumns(columns.ToArray()); ;
+                return this.Context.UpdateableT(updateObject).UpdateColumns(columns.ToArray()); ;
             }
         }
         #endregion
@@ -1066,10 +1060,7 @@ namespace ThingsGateway.SqlSugar
             result.SaveList = saveList;
             return result;
         }
-        public IStorageable<T> Storageable<T>(T[] dataList) where T : class, new()
-        {
-            return Storageable(dataList?.ToList());
-        }
+
         public ISaveable<T> Saveable<T>(List<T> saveObjects) where T : class, new()
         {
             return new SaveableProvider<T>(this, saveObjects);
@@ -1090,7 +1081,7 @@ namespace ThingsGateway.SqlSugar
             dt.TableName = tableName;
             return this.Context.Storageable(dt);
         }
-        public IStorageable<T> Storageable<T>(List<T> dataList) where T : class, new()
+        public IStorageable<T> Storageable<T>(IReadOnlyList<T> dataList) where T : class, new()
         {
             dataList = dataList.Where(it => it != null).ToList();
             this.InitMappingInfo<T>();
@@ -1099,14 +1090,12 @@ namespace ThingsGateway.SqlSugar
             result.Builder = sqlBuilder;
             return result;
         }
-        public IStorageable<T> Storageable<T>(IList<T> dataList) where T : class, new()
-        {
-            return Storageable(dataList?.ToList());
-        }
-        public IStorageable<T> Storageable<T>(T data) where T : class, new()
+
+        public IStorageable<T> StorageableT<T>(T data) where T : class, new()
         {
             return Storageable(new List<T>() { data });
         }
+
         public StorageableDataTable Storageable(DataTable data)
         {
             var result = new StorageableDataTable();
@@ -1137,7 +1126,7 @@ namespace ThingsGateway.SqlSugar
                 var methods = this.Context.GetType().GetMethods()
                .Where(it => it.Name == "Storageable")
                .Where(it => it.GetGenericArguments().Length != 0)
-               .Where(it => it.GetParameters().Any(z => z.ParameterType.Name.StartsWith("List")))
+               .Where(it => it.GetParameters().Any(z => z.ParameterType.Name.StartsWith("IReadOnlyList")))
                .Where(it => it.Name == "Storageable").ToList();
                 var method = methods.Single().MakeGenericMethod(newList.GetType().GetGenericArguments().First());
                 StorageableMethodInfo result = new StorageableMethodInfo()
@@ -1168,7 +1157,7 @@ namespace ThingsGateway.SqlSugar
         #endregion
 
         #region Reportable
-        public IReportable<T> Reportable<T>(T data)
+        public IReportable<T> ReportableT<T>(T data)
         {
             var result = new ReportableProvider<T>(data);
             result.formatBuilder = InstanceFactory.GetInsertBuilder(this.Context.CurrentConnectionConfig);
@@ -1177,7 +1166,7 @@ namespace ThingsGateway.SqlSugar
             result.queryBuilder = this.Queryable<object>().QueryBuilder;
             return result;
         }
-        public IReportable<T> Reportable<T>(List<T> list)
+        public IReportable<T> Reportable<T>(IReadOnlyList<T> list)
         {
             var result = new ReportableProvider<T>(list);
             result.formatBuilder = InstanceFactory.GetInsertBuilder(this.Context.CurrentConnectionConfig);
@@ -1186,17 +1175,7 @@ namespace ThingsGateway.SqlSugar
             result.queryBuilder = this.Queryable<object>().QueryBuilder;
             return result;
         }
-        public IReportable<T> Reportable<T>(T[] list)
-        {
-            if (list == null)
-                list = Array.Empty<T>();
-            var result = new ReportableProvider<T>(list.ToList());
-            result.formatBuilder = InstanceFactory.GetInsertBuilder(this.Context.CurrentConnectionConfig);
-            result.Context = this;
-            result.formatBuilder.Context = this;
-            result.queryBuilder = this.Queryable<object>().QueryBuilder;
-            return result;
-        }
+
         #endregion
 
         #region  Nav CUD

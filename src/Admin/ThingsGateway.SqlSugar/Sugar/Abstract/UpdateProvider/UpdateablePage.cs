@@ -2,7 +2,7 @@
 {
     public class UpdateablePage<T> where T : class, new()
     {
-        public T[] DataList { get; set; }
+        public IReadOnlyList<T> DataList { get; set; }
         public SqlSugarProvider Context { get; set; }
         public int PageSize { get; internal set; }
         public string TableName { get; internal set; }
@@ -27,7 +27,7 @@
         }
         public int ExecuteCommand()
         {
-            if (DataList.Length == 1 && DataList.First() == null)
+            if (DataList.Count == 1 && DataList[0] == null)
             {
                 return 0;
             }
@@ -63,7 +63,7 @@
         }
         public async Task<int> ExecuteCommandAsync()
         {
-            if (DataList.Length == 1 && DataList.First() == null)
+            if (DataList.Count == 1 && DataList[0] == null)
             {
                 return 0;
             }

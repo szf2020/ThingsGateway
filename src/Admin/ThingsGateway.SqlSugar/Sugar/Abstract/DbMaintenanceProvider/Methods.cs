@@ -465,7 +465,7 @@ namespace ThingsGateway.SqlSugar
                 {
                     {
                         dt[columnInfo.DbColumnName] = "{}";
-                        var sqlobj = this.Context.Updateable(dt)
+                        var sqlobj = this.Context.UpdateableT(dt)
                         .AS(tableName)
                         .Where($"{this.SqlBuilder.GetTranslationColumnName(columnInfo.DbColumnName)} is null ").ToSql();
                         sqlobj.Value[0].IsJson = true;
@@ -476,7 +476,7 @@ namespace ThingsGateway.SqlSugar
                 {
                     {
                         dt[columnInfo.DbColumnName] = "[]";
-                        var sqlobj = this.Context.Updateable(dt)
+                        var sqlobj = this.Context.UpdateableT(dt)
                         .AS(tableName)
                         .Where($"{this.SqlBuilder.GetTranslationColumnName(columnInfo.DbColumnName)} is null ").ToSql();
                         sqlobj.Value[0].IsJson = true;
@@ -485,7 +485,7 @@ namespace ThingsGateway.SqlSugar
                 }
                 else
                 {
-                    this.Context.Updateable(dt)
+                    this.Context.UpdateableT(dt)
                                  .AS(tableName)
                                  .Where($"{this.SqlBuilder.GetTranslationColumnName(columnInfo.DbColumnName)} is null ").ExecuteCommand();
                 }

@@ -1308,7 +1308,7 @@ namespace ThingsGateway.SqlSugar
             }
         }
 
-        public static void DataInoveByExpresson<Type>(Type[] datas, MethodCallExpression callExpresion)
+        public static void DataInoveByExpresson<Type>(IReadOnlyList<Type> datas, MethodCallExpression callExpresion)
         {
             var methodInfo = callExpresion.Method;
             foreach (var item in datas)
@@ -1811,15 +1811,7 @@ namespace ThingsGateway.SqlSugar
             sb.Append("'::bytea");
             return sb.ToString();
         }
-        public static void CheckArray<T>(T[] insertObjs) where T : class, new()
-        {
 
-            if (insertObjs?.Length == 1
-                && insertObjs.FirstOrDefault()?.GetType().FullName.Contains("System.Collections.Generic.List`") == true)
-            {
-                Check.ExceptionEasy("Insertable(T []) is an array and your argument is a List", "二次封装引起的进错重载,当前方法是 Insertable(T []) 参数是一个数组，而你的参数是一个List");
-            }
-        }
 
         public static string FieldNameSql()
         {

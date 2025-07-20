@@ -133,11 +133,11 @@ public class BaseService<T> : IDataService<T>, IDisposable where T : class, new(
         using var db = GetDB();
         if (changedType == ItemChangedType.Add)
         {
-            return (await db.Insertable(model).ExecuteCommandAsync().ConfigureAwait(false)) > 0;
+            return (await db.InsertableT(model).ExecuteCommandAsync().ConfigureAwait(false)) > 0;
         }
         else
         {
-            return (await db.Updateable(model).ExecuteCommandAsync().ConfigureAwait(false)) > 0;
+            return (await db.UpdateableT(model).ExecuteCommandAsync().ConfigureAwait(false)) > 0;
         }
     }
 

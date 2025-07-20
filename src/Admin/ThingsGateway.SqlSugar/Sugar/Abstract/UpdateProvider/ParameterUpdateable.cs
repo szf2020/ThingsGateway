@@ -12,7 +12,7 @@ namespace ThingsGateway.SqlSugar
         {
             var result = 0;
             var list = Updateable.UpdateObjs;
-            var count = list.Length;
+            var count = list.Count;
             var size = GetPageSize(20, count);
             Context.Utilities.PageEach(list.ToList(), size, item =>
             {
@@ -28,7 +28,7 @@ namespace ThingsGateway.SqlSugar
         {
             var result = 0;
             var list = Updateable.UpdateObjs;
-            var count = list.Length;
+            var count = list.Count;
             var size = GetPageSize(20, count);
             await Context.Utilities.PageEachAsync(list.ToList(), size, async item =>
             {

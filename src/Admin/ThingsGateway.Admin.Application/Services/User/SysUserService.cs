@@ -470,7 +470,7 @@ internal sealed class SysUserService : BaseService<SysUser>, ISysUserService
 
                 var sysUser = input;//实体转换
                 using var db = GetDB();
-                var result = await db.Updateable(sysUser).IgnoreColumns(it =>
+                var result = await db.UpdateableT(sysUser).IgnoreColumns(it =>
                         new
                         {
                             //忽略更新字段

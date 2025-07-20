@@ -64,7 +64,7 @@ namespace ThingsGateway.SqlSugar
                     this.Context.AddQueue("begin");
                 foreach (var item in pagelist)
                 {
-                    var itemable = this.Context.Insertable(item);
+                    var itemable = this.Context.InsertableT(item);
                     itemable.InsertBuilder.DbColumnInfoList = itemable.InsertBuilder.DbColumnInfoList.Where(it => columns.Contains(it.DbColumnName)).ToList();
                     itemable.InsertBuilder.TableWithString = tableWithString;
                     itemable.InsertBuilder.AsName = Inserable.InsertBuilder.AsName;
@@ -79,7 +79,7 @@ namespace ThingsGateway.SqlSugar
             //    result=objects.Length;
             if (result == -1)
             {
-                result = objects.Length;
+                result = objects.Count;
             }
             return result;
         }
@@ -101,7 +101,7 @@ namespace ThingsGateway.SqlSugar
                     Context.AddQueue("begin");
                 foreach (var item in pagelist)
                 {
-                    var itemable = Context.Insertable(item);
+                    var itemable = Context.InsertableT(item);
                     itemable.InsertBuilder.DbColumnInfoList = itemable.InsertBuilder.DbColumnInfoList.Where(it => columns.Contains(it.DbColumnName)).ToList();
                     itemable.InsertBuilder.TableWithString = tableWithString;
                     itemable.InsertBuilder.AsName = Inserable.InsertBuilder.AsName;
@@ -112,7 +112,7 @@ namespace ThingsGateway.SqlSugar
                     Context.AddQueue("end");
                 result += await Context.SaveQueuesAsync(false).ConfigureAwait(false);
                 if (Context.CurrentConnectionConfig.DbType == DbType.Oracle)
-                    result = objects.Length;
+                    result = objects.Count;
                 return result;
             }).ConfigureAwait(false);
             return result;
@@ -130,7 +130,7 @@ namespace ThingsGateway.SqlSugar
             var tableWithString = inserable.InsertBuilder.AsName;
             var removeCacheFunc = inserable.RemoveCacheFunc;
             var objects = inserable.InsertObjs;
-            if (objects == null || objects.Length == 0 || (objects.Length == 1 && objects.First() == null))
+            if (objects == null || objects.Count == 0 || (objects.Count == 1 && objects[0] == null))
             {
                 return result;
             }

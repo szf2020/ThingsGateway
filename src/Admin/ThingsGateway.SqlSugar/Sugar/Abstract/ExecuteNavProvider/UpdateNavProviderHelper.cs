@@ -59,7 +59,7 @@ namespace ThingsGateway.SqlSugar
         {
             foreach (var item in datas)
             {
-                this._Context.Insertable(item).ExecuteCommandIdentityIntoEntity();
+                this._Context.InsertableT(item).ExecuteCommandIdentityIntoEntity();
             }
         }
 

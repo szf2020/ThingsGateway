@@ -55,7 +55,7 @@ namespace ThingsGateway.SqlSugar
         /// <summary>
         /// 删除对象列表
         /// </summary>
-        public List<T> DeleteObjects { get; set; }
+        public IReadOnlyList<T> DeleteObjects { get; set; }
         /// <summary>
         /// 实体信息
         /// </summary>
@@ -175,7 +175,7 @@ namespace ThingsGateway.SqlSugar
         /// <summary>
         /// 根据对象列表设置删除条件
         /// </summary>
-        public IDeleteable<T> Where(List<T> deleteObjs)
+        public IDeleteable<T> Where(IReadOnlyList<T> deleteObjs)
         {
             this.DeleteObjects = deleteObjs;
             if (deleteObjs == null || deleteObjs.Count == 0)
@@ -242,11 +242,11 @@ namespace ThingsGateway.SqlSugar
             else
             {
                 StringBuilder whereInSql = new StringBuilder();
-                foreach (var deleteObj in deleteObjs)
+                for (int index = 0; index < deleteObjs.Count; index++)
                 {
+                    var deleteObj = deleteObjs[index];
                     StringBuilder orString = new StringBuilder();
-                    var isFirst = deleteObjs.IndexOf(deleteObj) == 0;
-                    if (!isFirst)
+                    if (index > 0)
                     {
                         orString.Append(DeleteBuilder.WhereInOrTemplate + UtilConstants.Space);
                     }
@@ -769,7 +769,7 @@ namespace ThingsGateway.SqlSugar
         {
             Check.ExceptionEasy(this.DeleteObjects == null, "PageSize can only be deleted as a List<Class> entity collection", "Deleteable.PageSize()只能是List<Class>实体集合方式删除,并且集合不能为null");
             DeleteablePage<T> result = new DeleteablePage<T>();
-            result.DataList = this.DeleteObjects.ToArray();
+            result.DataList = this.DeleteObjects;
             result.Context = this.Context;
             result.DiffModel = this.diffModel;
             result.IsEnableDiffLogEvent = this.IsEnableDiffLogEvent;
@@ -970,7 +970,7 @@ namespace ThingsGateway.SqlSugar
         /// <summary>
         /// 数据变更AOP
         /// </summary>
-        protected virtual void DataChangesAop(List<T> deleteObjs)
+        protected virtual void DataChangesAop(IReadOnlyList<T> deleteObjs)
         {
             var dataEvent = this.Context.CurrentConnectionConfig.AopEvents?.DataChangesExecuted;
             if (dataEvent != null && deleteObjs != null)

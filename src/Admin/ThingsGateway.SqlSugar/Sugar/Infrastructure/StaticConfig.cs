@@ -24,7 +24,7 @@
         public static Action<ISqlSugarClient> CompleteDbFunc;
 
         public static Func<List<SplitTableInfo>> SplitTableGetTablesFunc;
-        public static Action<Type, object[]> SplitTableCreateTableFunc;
+        public static Action<Type, IReadOnlyList<object>> SplitTableCreateTableFunc;
 
         public static bool Check_StringIdentity = true;
         public static bool EnableAllWhereIF = false;

@@ -16,7 +16,7 @@ namespace ThingsGateway.SqlSugar
         DbLockType? lockType;
         private string asname { get; set; }
         private bool isDisableFilters = false;
-        public Storageable(List<T> datas, SqlSugarProvider context)
+        public Storageable(IReadOnlyList<T> datas, SqlSugarProvider context)
         {
             this.Context = context;
             if (datas == null)
@@ -214,8 +214,8 @@ namespace ThingsGateway.SqlSugar
                 return new StorageableResult<T>()
                 {
                     AsDeleteable = this.Context.Deleteable<T>().AS(asname).Where(it => false),
-                    AsInsertable = this.Context.Insertable(new List<T>()).AS(asname),
-                    AsUpdateable = this.Context.Updateable(new List<T>()).AS(asname),
+                    AsInsertable = this.Context.Insertable<T>(new List<T>()).AS(asname),
+                    AsUpdateable = this.Context.Updateable<T>(new List<T>()).AS(asname),
                     InsertList = new List<StorageableMessage<T>>(),
                     UpdateList = new List<StorageableMessage<T>>(),
                     DeleteList = new List<StorageableMessage<T>>(),
@@ -267,8 +267,8 @@ namespace ThingsGateway.SqlSugar
                 _AsName = asname,
                 _Context = this.Context,
                 AsDeleteable = this.Context.Deleteable<T>().AS(asname),
-                AsUpdateable = this.Context.Updateable(update.Select(it => it.Item).ToList()).AS(asname),
-                AsInsertable = this.Context.Insertable(inset.Select(it => it.Item).ToList()).AS(asname),
+                AsUpdateable = this.Context.Updateable<T>(update.Select(it => it.Item).ToList()).AS(asname),
+                AsInsertable = this.Context.Insertable<T>(inset.Select(it => it.Item).ToList()).AS(asname),
                 OtherList = other,
                 InsertList = inset,
                 DeleteList = delete,
@@ -385,8 +385,8 @@ namespace ThingsGateway.SqlSugar
                 return new StorageableResult<T>()
                 {
                     AsDeleteable = this.Context.Deleteable<T>().AS(asname).Where(it => false),
-                    AsInsertable = this.Context.Insertable(new List<T>()).AS(asname),
-                    AsUpdateable = this.Context.Updateable(new List<T>()).AS(asname),
+                    AsInsertable = this.Context.Insertable<T>(new List<T>()).AS(asname),
+                    AsUpdateable = this.Context.Updateable<T>(new List<T>()).AS(asname),
                     InsertList = new List<StorageableMessage<T>>(),
                     UpdateList = new List<StorageableMessage<T>>(),
                     DeleteList = new List<StorageableMessage<T>>(),
@@ -438,8 +438,8 @@ namespace ThingsGateway.SqlSugar
                 _AsName = asname,
                 _Context = this.Context,
                 AsDeleteable = this.Context.Deleteable<T>().AS(asname),
-                AsUpdateable = this.Context.Updateable(update.Select(it => it.Item).ToList()).AS(asname),
-                AsInsertable = this.Context.Insertable(inset.Select(it => it.Item).ToList()).AS(asname),
+                AsUpdateable = this.Context.Updateable<T>(update.Select(it => it.Item).ToList()).AS(asname),
+                AsInsertable = this.Context.Insertable<T>(inset.Select(it => it.Item).ToList()).AS(asname),
                 OtherList = other,
                 InsertList = inset,
                 DeleteList = delete,

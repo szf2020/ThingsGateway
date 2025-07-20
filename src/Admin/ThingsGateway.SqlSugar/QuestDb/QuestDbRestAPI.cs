@@ -80,7 +80,7 @@ namespace ThingsGateway.SqlSugar
             if (db.CurrentConnectionConfig.MoreSettings == null)
                 db.CurrentConnectionConfig.MoreSettings = new ConnMoreSettings();
             db.CurrentConnectionConfig.MoreSettings.DisableNvarchar = true;
-            var sql = db.Insertable(insertData).ToSqlString();
+            var sql = db.InsertableT(insertData).ToSqlString();
             var result = await ExecuteCommandAsync(sql).ConfigureAwait(false);
             return result.Contains("OK", StringComparison.OrdinalIgnoreCase) ? 1 : 0;
         }

@@ -184,7 +184,7 @@ namespace ThingsGateway.SqlSugar
         protected override void PreToSql()
         {
             var identities = GetSeqNames();
-            var insertCount = InsertObjs.Length;
+            var insertCount = InsertObjs.Count;
             InsertBuilder.OracleSeqInfoList = new Dictionary<string, int>();
             if ((identities.HasValue() && insertCount > 1) || InsertBuilder.IsBlukCopy)
             {

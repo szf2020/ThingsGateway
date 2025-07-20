@@ -175,12 +175,12 @@ namespace ThingsGateway.SqlSugar
             return this.Context.Insertable<T>(insertDynamicObject);
         }
 
-        public IInsertable<T> Insertable<T>(List<T> insertObjs) where T : class, new()
+        public IInsertable<T> Insertable<T>(IReadOnlyList<T> insertObjs) where T : class, new()
         {
             return this.Context.Insertable<T>(insertObjs);
         }
 
-        public IInsertable<T> Insertable<T>(T insertObj) where T : class, new()
+        public IInsertable<T> InsertableT<T>(T insertObj) where T : class, new()
         {
             Check.ExceptionEasy(typeof(T).FullName.Contains("System.Collections.Generic.List`"), "  need  where T: class, new() ", "需要Class,new()约束，并且类属性中不能有required修饰符");
             if (typeof(T).Name == "Object")
@@ -188,11 +188,6 @@ namespace ThingsGateway.SqlSugar
                 Check.ExceptionEasy("Object type use db.InsertableByObject(obj).ExecuteCommand()", "检测到T为Object类型，请使用 db.InsertableByObject(obj).ExecuteCommand()，Insertable不支持object，InsertableByObject可以(缺点：功能比较少)");
             }
             return this.Context.Insertable<T>(insertObj);
-        }
-
-        public IInsertable<T> Insertable<T>(T[] insertObjs) where T : class, new()
-        {
-            return this.Context.Insertable<T>(insertObjs);
         }
 
         #endregion
@@ -562,19 +557,12 @@ namespace ThingsGateway.SqlSugar
             return this.Context.Storageable(dt);
         }
 
-        public IStorageable<T> Storageable<T>(List<T> dataList) where T : class, new()
+        public IStorageable<T> Storageable<T>(IReadOnlyList<T> dataList) where T : class, new()
         {
             return this.Context.Storageable(dataList);
         }
-        public IStorageable<T> Storageable<T>(IList<T> dataList) where T : class, new()
-        {
-            return this.Context.Storageable(dataList.ToList());
-        }
-        public IStorageable<T> Storageable<T>(T[] dataList) where T : class, new()
-        {
-            return this.Context.Storageable(dataList?.ToList());
-        }
-        public IStorageable<T> Storageable<T>(T data) where T : class, new()
+
+        public IStorageable<T> StorageableT<T>(T data) where T : class, new()
         {
             Check.Exception(typeof(T).FullName.Contains("System.Collections.Generic.List`"), "  need  where T: class, new() ");
             return this.Context.Storageable(new List<T> { data });
@@ -587,18 +575,15 @@ namespace ThingsGateway.SqlSugar
         #endregion
 
         #region Reportable
-        public IReportable<T> Reportable<T>(T data)
+        public IReportable<T> ReportableT<T>(T data)
         {
-            return this.Context.Reportable(data);
+            return this.Context.ReportableT(data);
         }
-        public IReportable<T> Reportable<T>(List<T> list)
+        public IReportable<T> Reportable<T>(IReadOnlyList<T> list)
         {
             return this.Context.Reportable(list);
         }
-        public IReportable<T> Reportable<T>(T[] array)
-        {
-            return this.Context.Reportable(array);
-        }
+
         #endregion
 
         #region Queue
@@ -740,19 +725,14 @@ namespace ThingsGateway.SqlSugar
             return this.Context.Updateable<T>(columns);
         }
 
-        public IUpdateable<T> Updateable<T>(List<T> UpdateObjs) where T : class, new()
+        public IUpdateable<T> Updateable<T>(IReadOnlyList<T> UpdateObjs) where T : class, new()
         {
             return this.Context.Updateable<T>(UpdateObjs);
         }
 
-        public IUpdateable<T> Updateable<T>(T UpdateObj) where T : class, new()
+        public IUpdateable<T> UpdateableT<T>(T UpdateObj) where T : class, new()
         {
             return this.Context.Updateable<T>(UpdateObj);
-        }
-
-        public IUpdateable<T> Updateable<T>(T[] UpdateObjs) where T : class, new()
-        {
-            return this.Context.Updateable<T>(UpdateObjs);
         }
 
         #endregion
@@ -792,12 +772,12 @@ namespace ThingsGateway.SqlSugar
             return this.Context.Deleteable<T>(pkValue);
         }
 
-        public IDeleteable<T> Deleteable<T>(List<T> deleteObjs) where T : class, new()
+        public IDeleteable<T> Deleteable<T>(IReadOnlyList<T> deleteObjs) where T : class, new()
         {
             return this.Context.Deleteable<T>(deleteObjs);
         }
 
-        public IDeleteable<T> Deleteable<T>(T deleteObj) where T : class, new()
+        public IDeleteable<T> DeleteableT<T>(T deleteObj) where T : class, new()
         {
             return this.Context.Deleteable<T>(deleteObj);
         }
@@ -1569,39 +1549,39 @@ namespace ThingsGateway.SqlSugar
             result.QueryBuilder.IsCrossQueryWithAttr = true;
             return result;
         }
-        public IInsertable<T> InsertableWithAttr<T>(T insertObj) where T : class, new()
+        public IInsertable<T> InsertableWithAttrT<T>(T insertObj) where T : class, new()
         {
-            var result = this.GetConnectionWithAttr<T>().Insertable(insertObj);
+            var result = this.GetConnectionWithAttr<T>().InsertableT(insertObj);
             result.InsertBuilder.IsWithAttr = true;
             return result;
         }
-        public IInsertable<T> InsertableWithAttr<T>(List<T> insertObjs) where T : class, new()
+        public IInsertable<T> InsertableWithAttr<T>(IReadOnlyList<T> insertObjs) where T : class, new()
         {
             var result = this.GetConnectionWithAttr<T>().Insertable(insertObjs);
             result.InsertBuilder.IsWithAttr = true;
             return result;
         }
-        public IUpdateable<T> UpdateableWithAttr<T>(T updateObj) where T : class, new()
+        public IUpdateable<T> UpdateableWithAttrT<T>(T updateObj) where T : class, new()
         {
-            return this.GetConnectionWithAttr<T>().Updateable(updateObj);
+            return this.GetConnectionWithAttr<T>().UpdateableT(updateObj);
         }
         public IUpdateable<T> UpdateableWithAttr<T>() where T : class, new()
         {
             return this.GetConnectionWithAttr<T>().Updateable<T>();
         }
-        public IUpdateable<T> UpdateableWithAttr<T>(List<T> updateObjs) where T : class, new()
+        public IUpdateable<T> UpdateableWithAttr<T>(IReadOnlyList<T> updateObjs) where T : class, new()
         {
             return this.GetConnectionWithAttr<T>().Updateable(updateObjs);
         }
-        public IDeleteable<T> DeleteableWithAttr<T>(T deleteObject) where T : class, new()
+        public IDeleteable<T> DeleteableWithAttrT<T>(T deleteObject) where T : class, new()
         {
-            return this.GetConnectionWithAttr<T>().Deleteable(deleteObject);
+            return this.GetConnectionWithAttr<T>().DeleteableT(deleteObject);
         }
         public IDeleteable<T> DeleteableWithAttr<T>() where T : class, new()
         {
             return this.GetConnectionWithAttr<T>().Deleteable<T>();
         }
-        public IDeleteable<T> DeleteableWithAttr<T>(List<T> deleteObjects) where T : class, new()
+        public IDeleteable<T> DeleteableWithAttr<T>(IReadOnlyList<T> deleteObjects) where T : class, new()
         {
             return this.GetConnectionWithAttr<T>().Deleteable(deleteObjects);
         }

@@ -38,7 +38,7 @@ namespace ThingsGateway.SqlSugar
         /// <summary>
         /// 是否单条数据
         /// </summary>
-        public bool IsSingle { get { return this.InsertObjs.Length == 1; } }
+        public bool IsSingle { get { return this.InsertObjs.Count == 1; } }
 
         /// <summary>
         /// 实体信息
@@ -59,7 +59,7 @@ namespace ThingsGateway.SqlSugar
         /// <summary>
         /// 插入对象数组
         /// </summary>
-        public T[] InsertObjs { get; set; }
+        public IReadOnlyList<T> InsertObjs { get; set; }
 
         /// <summary>
         /// 旧映射表列表
@@ -89,7 +89,7 @@ namespace ThingsGateway.SqlSugar
         /// </summary>
         public void AddQueue()
         {
-            if (this.InsertObjs?.Length > 0 && this.InsertObjs[0] != null)
+            if (this.InsertObjs?.Count > 0 && this.InsertObjs[0] != null)
             {
                 var sqlObj = this.ToSql();
                 this.Context.Queues.Add(sqlObj.Key, sqlObj.Value);
@@ -101,14 +101,14 @@ namespace ThingsGateway.SqlSugar
         /// <returns>影响行数</returns>
         public virtual int ExecuteCommand()
         {
-            if (this.InsertObjs.Length == 1 && this.InsertObjs.First() == null)
+            if (this.InsertObjs.Count == 1 && this.InsertObjs[0] == null)
             {
                 return 0;
             }
             string sql = _ExecuteCommand();
             var result = Ado.ExecuteCommand(sql, InsertBuilder.Parameters == null ? null : InsertBuilder.Parameters.ToArray());
             After(sql, null);
-            if (result == -1) return this.InsertObjs.Length;
+            if (result == -1) return this.InsertObjs.Count;
             return result;
         }
         /// <summary>
@@ -160,7 +160,7 @@ namespace ThingsGateway.SqlSugar
             Check.ExceptionEasy(pkInfo == null, "ExecuteReturnPkList need primary key", "ExecuteReturnPkList需要主键");
             Check.ExceptionEasy(this.EntityInfo.Columns.Count(it => it.IsPrimarykey == true) > 1, "ExecuteReturnPkList ，Only support technology single primary key", "ExecuteReturnPkList只支技单主键");
             var isIdEntity = pkInfo.IsIdentity || (pkInfo.OracleSequenceName.HasValue() && this.Context.CurrentConnectionConfig.DbType == DbType.Oracle);
-            if (isIdEntity && this.InsertObjs.Length == 1)
+            if (isIdEntity && this.InsertObjs.Count == 1)
             {
                 return InsertPkListIdentityCount1<Type>(pkInfo);
             }
@@ -188,7 +188,7 @@ namespace ThingsGateway.SqlSugar
         /// <returns>自增ID</returns>
         public virtual int ExecuteReturnIdentity()
         {
-            if (this.InsertObjs.Length == 1 && this.InsertObjs.First() == null)
+            if (this.InsertObjs.Count == 1 && this.InsertObjs[0] == null)
             {
                 return 0;
             }
@@ -224,7 +224,7 @@ namespace ThingsGateway.SqlSugar
         /// <returns>自增ID</returns>
         public virtual long ExecuteReturnBigIdentity()
         {
-            if (this.InsertObjs.Length == 1 && this.InsertObjs.First() == null)
+            if (this.InsertObjs.Count == 1 && this.InsertObjs[0] == null)
             {
                 return 0;
             }
@@ -260,7 +260,7 @@ namespace ThingsGateway.SqlSugar
         /// <returns>雪花ID</returns>
         public virtual long ExecuteReturnSnowflakeId()
         {
-            if (this.InsertObjs.Length > 1)
+            if (this.InsertObjs.Count > 1)
             {
                 return this.ExecuteReturnSnowflakeIdList().First();
             }
@@ -273,7 +273,7 @@ namespace ThingsGateway.SqlSugar
             foreach (var item in this.InsertBuilder.DbColumnInfoList.Where(it => it.PropertyName == snowProperty.PropertyName))
             {
                 item.Value = id;
-                snowProperty?.PropertyInfo.SetValue(this.InsertObjs.First(), id);
+                snowProperty?.PropertyInfo.SetValue(this.InsertObjs[0], id);
             }
             this.ExecuteCommand();
             return id;
@@ -327,7 +327,7 @@ namespace ThingsGateway.SqlSugar
             foreach (var item in this.InsertBuilder.DbColumnInfoList.Where(it => it.PropertyName == snowProperty.PropertyName))
             {
                 item.Value = id;
-                snowProperty?.PropertyInfo.SetValue(this.InsertObjs.First(), id);
+                snowProperty?.PropertyInfo.SetValue(this.InsertObjs[0], id);
             }
             await ExecuteCommandAsync().ConfigureAwait(false);
             return id;
@@ -376,7 +376,7 @@ namespace ThingsGateway.SqlSugar
         public virtual T ExecuteReturnEntity()
         {
             ExecuteCommandIdentityIntoEntity();
-            return InsertObjs.First();
+            return InsertObjs[0];
         }
         /// <summary>
         /// 执行命令并将自增ID设置到实体
@@ -384,7 +384,7 @@ namespace ThingsGateway.SqlSugar
         /// <returns>是否成功</returns>
         public virtual bool ExecuteCommandIdentityIntoEntity()
         {
-            var result = InsertObjs.First();
+            var result = InsertObjs[0];
             var identityKeys = GetIdentityKeys();
             if (this.Context?.CurrentConnectionConfig?.MoreSettings?.EnableOracleIdentity == true)
             {
@@ -417,7 +417,7 @@ namespace ThingsGateway.SqlSugar
             }
             var idValue = ExecuteReturnBigIdentity();
             Check.Exception(identityKeys.Count > 1, "ExecuteCommandIdentityIntoEntity does not support multiple identity keys");
-            var identityKey = identityKeys.First();
+            var identityKey = identityKeys[0];
             object setValue = 0;
             if (idValue > int.MaxValue)
                 setValue = idValue;
@@ -458,14 +458,14 @@ namespace ThingsGateway.SqlSugar
         /// <returns>影响行数</returns>
         public async Task<int> ExecuteCommandAsync()
         {
-            if (this.InsertObjs.Length == 1 && this.InsertObjs.First() == null)
+            if (this.InsertObjs.Count == 1 && this.InsertObjs[0] == null)
             {
                 return 0;
             }
             string sql = _ExecuteCommand();
             var result = await Ado.ExecuteCommandAsync(sql, InsertBuilder.Parameters == null ? null : InsertBuilder.Parameters.ToArray()).ConfigureAwait(false);
             After(sql, null);
-            if (result == -1) return this.InsertObjs.Length;
+            if (result == -1) return this.InsertObjs.Count;
             return result;
         }
         /// <summary>
@@ -484,7 +484,7 @@ namespace ThingsGateway.SqlSugar
         /// <returns>自增ID</returns>
         public virtual async Task<int> ExecuteReturnIdentityAsync()
         {
-            if (this.InsertObjs.Length == 1 && this.InsertObjs.First() == null)
+            if (this.InsertObjs.Count == 1 && this.InsertObjs[0] == null)
             {
                 return 0;
             }
@@ -537,7 +537,7 @@ namespace ThingsGateway.SqlSugar
         public async Task<T> ExecuteReturnEntityAsync()
         {
             await ExecuteCommandIdentityIntoEntityAsync().ConfigureAwait(false);
-            return InsertObjs.First();
+            return InsertObjs[0];
         }
         /// <summary>
         /// 异步执行并返回包含所有第一层导航属性的实体
@@ -562,7 +562,7 @@ namespace ThingsGateway.SqlSugar
         /// <returns>是否成功</returns>
         public virtual async Task<bool> ExecuteCommandIdentityIntoEntityAsync()
         {
-            var result = InsertObjs.First();
+            var result = InsertObjs[0];
             var identityKeys = GetIdentityKeys();
             if (identityKeys.Count == 0)
             {
@@ -588,7 +588,7 @@ namespace ThingsGateway.SqlSugar
             }
             var idValue = await ExecuteReturnBigIdentityAsync().ConfigureAwait(false);
             Check.Exception(identityKeys.Count > 1, "ExecuteCommandIdentityIntoEntity does not support multiple identity keys");
-            var identityKey = identityKeys.First();
+            var identityKey = identityKeys[0];
             object setValue = 0;
             if (idValue > int.MaxValue)
                 setValue = idValue;
@@ -629,7 +629,7 @@ namespace ThingsGateway.SqlSugar
         /// <returns>自增ID</returns>
         public virtual async Task<long> ExecuteReturnBigIdentityAsync()
         {
-            if (this.InsertObjs.Length == 1 && this.InsertObjs.First() == null)
+            if (this.InsertObjs.Count == 1 && this.InsertObjs[0] == null)
             {
                 return 0;
             }
@@ -748,7 +748,7 @@ namespace ThingsGateway.SqlSugar
         {
             if (isIgnoreNull)
             {
-                Check.Exception(this.InsertObjs.Length > 1, ErrorMessage.GetThrowMessage("ignoreNullColumn NoSupport batch insert, use .PageSize(1).IgnoreColumnsNull().ExecuteCommand()", "ignoreNullColumn 不支持批量操作,你可以用PageSzie(1).IgnoreColumnsNull().ExecuteCommand()"));
+                Check.Exception(this.InsertObjs.Count > 1, ErrorMessage.GetThrowMessage("ignoreNullColumn NoSupport batch insert, use .PageSize(1).IgnoreColumnsNull().ExecuteCommand()", "ignoreNullColumn 不支持批量操作,你可以用PageSzie(1).IgnoreColumnsNull().ExecuteCommand()"));
                 this.InsertBuilder.IsNoInsertNull = true;
             }
             return this;
@@ -865,7 +865,7 @@ namespace ThingsGateway.SqlSugar
         /// <returns>可插入对象</returns>
         public IInsertable<T> IgnoreColumns(bool ignoreNullColumn, bool isOffIdentity = false)
         {
-            Check.Exception(this.InsertObjs.Length > 1 && ignoreNullColumn, ErrorMessage.GetThrowMessage("ignoreNullColumn NoSupport batch insert, use .PageSize(1).IgnoreColumnsNull().ExecuteCommand()", "ignoreNullColumn 不支持批量操作, 你可以使用 .PageSize(1).IgnoreColumnsNull().ExecuteCommand()"));
+            Check.Exception(this.InsertObjs.Count > 1 && ignoreNullColumn, ErrorMessage.GetThrowMessage("ignoreNullColumn NoSupport batch insert, use .PageSize(1).IgnoreColumnsNull().ExecuteCommand()", "ignoreNullColumn 不支持批量操作, 你可以使用 .PageSize(1).IgnoreColumnsNull().ExecuteCommand()"));
             this.IsOffIdentity = isOffIdentity;
             this.InsertBuilder.IsOffIdentity = isOffIdentity;
             if (this.InsertBuilder.LambdaExpressions == null)
@@ -926,6 +926,7 @@ namespace ThingsGateway.SqlSugar
             result.Inserts = this.InsertObjs;
             return result;
         }
+
         /// <summary>
         /// 使用Oracle批量插入
         /// </summary>
@@ -998,7 +999,7 @@ namespace ThingsGateway.SqlSugar
             Check.Exception(GetPrimaryKeys().Count > 1, typeof(T).Name + "Multiple primary keys are not supported");
             //Check.Exception(this.InsertObjs.Count() > 1, "SubInserable No Support Insertable(List<T>)");
             //Check.Exception(items.ToString().Contains(".First().")==false, items.ToString()+ " not supported ");
-            if (this.InsertObjs == null || this.InsertObjs.Length == 0)
+            if (this.InsertObjs == null || this.InsertObjs.Count == 0)
             {
                 return new SubInsertable<T>();
             }
@@ -1023,7 +1024,7 @@ namespace ThingsGateway.SqlSugar
             Check.Exception(GetPrimaryKeys().Count > 1, typeof(T).Name + "Multiple primary keys are not supported");
             //Check.Exception(this.InsertObjs.Count() > 1, "SubInserable No Support Insertable(List<T>)");
             //Check.Exception(items.ToString().Contains(".First().")==false, items.ToString()+ " not supported ");
-            if (this.InsertObjs == null || this.InsertObjs.Length == 0)
+            if (this.InsertObjs == null || this.InsertObjs.Count == 0)
             {
                 return new SubInsertable<T>();
             }

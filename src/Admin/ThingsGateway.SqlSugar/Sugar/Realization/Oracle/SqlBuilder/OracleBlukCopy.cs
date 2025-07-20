@@ -18,7 +18,7 @@ namespace ThingsGateway.SqlSugar
 
         internal InsertBuilder InsertBuilder { get; set; }
 
-        internal object[] Inserts { get; set; }
+        internal IReadOnlyList<object> Inserts { get; set; }
 
 
 
@@ -30,7 +30,7 @@ namespace ThingsGateway.SqlSugar
 
 
 
-            if (Inserts.First().GetType() == typeof(DataTable))
+            if (Inserts[0].GetType() == typeof(DataTable))
 
             {
 
@@ -78,8 +78,7 @@ namespace ThingsGateway.SqlSugar
 
 
 
-            if (Inserts.First().GetType() == typeof(DataTable))
-
+            if (Inserts[0].GetType() == typeof(DataTable))
             {
 
                 return WriteToServer();
@@ -122,7 +121,7 @@ namespace ThingsGateway.SqlSugar
 
         {
 
-            var dt = this.Inserts.First() as DataTable;
+            var dt = this.Inserts[0] as DataTable;
 
             if (dt == null)
 

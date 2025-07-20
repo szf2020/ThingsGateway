@@ -8,7 +8,7 @@ namespace ThingsGateway.SqlSugar
     {
         private bool IsUpdateNullByList()
         {
-            return this.UpdateObjs.Length > 1 && (this.UpdateBuilder.IsNoUpdateNull || this.UpdateBuilder.IsNoUpdateDefaultValue);
+            return this.UpdateObjs.Count > 1 && (this.UpdateBuilder.IsNoUpdateNull || this.UpdateBuilder.IsNoUpdateDefaultValue);
         }
 
         private int DatasTrackingExecommand()
@@ -140,7 +140,7 @@ namespace ThingsGateway.SqlSugar
             CheckWhere();
             PreToSql();
             AutoRemoveDataCache();
-            Check.ExceptionEasy(this.UpdateParameterIsNull && this.UpdateBuilder.DbColumnInfoList.Count == this.UpdateObjs.Length && this.UpdateObjs.Length == this.UpdateBuilder.DbColumnInfoList.Count(it => it.IsPrimarykey), "The primary key cannot be updated", "主键不能更新，更新主键会对代码逻辑存在未知隐患,如果非要更新：建议你删除在插入或者新建一个没主键的类。");
+            Check.ExceptionEasy(this.UpdateParameterIsNull && this.UpdateBuilder.DbColumnInfoList.Count == this.UpdateObjs.Count && this.UpdateObjs.Count == this.UpdateBuilder.DbColumnInfoList.Count(it => it.IsPrimarykey), "The primary key cannot be updated", "主键不能更新，更新主键会对代码逻辑存在未知隐患,如果非要更新：建议你删除在插入或者新建一个没主键的类。");
             Check.Exception(UpdateBuilder.WhereValues.IsNullOrEmpty() && GetPrimaryKeys().IsNullOrEmpty(), "You cannot have no primary key and no conditions");
             string sql = UpdateBuilder.ToSqlString();
             ValidateVersion();
@@ -253,14 +253,14 @@ namespace ThingsGateway.SqlSugar
         {
             return this.UpdateParameterIsNull == false
                                     && this.Context.TempItems?.Any(it => it.Key.StartsWith("Tracking_")) == true
-                                    && this.UpdateObjs.Length == 1;
+                                    && this.UpdateObjs.Count == 1;
         }
 
         private bool IsTrakingDatas()
         {
             return this.UpdateParameterIsNull == false
                                     && this.Context.TempItems?.Any(it => it.Key.StartsWith("Tracking_")) == true
-                                    && this.UpdateObjs.Length > 1;
+                                    && this.UpdateObjs.Count > 1;
         }
         private void DataAop(T item)
         {
@@ -289,7 +289,7 @@ namespace ThingsGateway.SqlSugar
             }
         }
 
-        private void DataChangesAop(T[] items)
+        private void DataChangesAop(IReadOnlyList<T> items)
         {
             if (typeof(T).FullName.StartsWith("System.Collections.Generic.Dictionary`"))
             {
@@ -658,7 +658,7 @@ namespace ThingsGateway.SqlSugar
                 var dbInfo = this.Context.Queryable<T>().Where(conModels).First();
                 if (dbInfo != null)
                 {
-                    var currentVersion = this.EntityInfo.Type.GetProperty(versionColumn.PropertyName).GetValue(UpdateObjs.Last(), null);
+                    var currentVersion = this.EntityInfo.Type.GetProperty(versionColumn.PropertyName).GetValue(UpdateObjs[^1], null);
                     var dbVersion = this.EntityInfo.Type.GetProperty(versionColumn.PropertyName).GetValue(dbInfo, null);
                     Check.Exception(currentVersion == null, "UpdateVersionValidation entity property {0} is not null", versionColumn.PropertyName);
                     Check.Exception(dbVersion == null, "UpdateVersionValidation database column {0} is not null", versionColumn.DbColumnName);
@@ -717,7 +717,7 @@ namespace ThingsGateway.SqlSugar
             Check.ExceptionEasy(UpdateParameterIsNull == true, "Optimistic lock can only be an entity update method", "乐观锁只能是实体更新方式");
             var verColumn = this.EntityInfo.Columns.FirstOrDefault(it => it.IsEnableUpdateVersionValidation);
             Check.ExceptionEasy(verColumn == null, $" {this.EntityInfo.EntityName} need  IsEnableUpdateVersionValidation=true ", $"实体{this.EntityInfo.EntityName}没有找到版本标识特性 IsEnableUpdateVersionValidation");
-            Check.ExceptionEasy(UpdateObjs.Length > 1, $"Optimistic lock can only handle a single update ", $"乐观锁只能处理单条更新");
+            Check.ExceptionEasy(UpdateObjs.Count > 1, $"Optimistic lock can only handle a single update ", $"乐观锁只能处理单条更新");
             Check.ExceptionEasy(!verColumn.UnderType.IsIn(UtilConstants.StringType, UtilConstants.LongType, UtilConstants.GuidType, UtilConstants.DateType), $"Optimistic locks can only be guid, long, and string types", $"乐观锁只能是Guid、Long和字符串类型");
             var oldValue = verColumn.PropertyInfo.GetValue(updateData);
             oldVerValue = oldValue;

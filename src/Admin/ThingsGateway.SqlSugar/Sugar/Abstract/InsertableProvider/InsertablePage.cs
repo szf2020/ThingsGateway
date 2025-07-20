@@ -16,7 +16,7 @@
         /// <summary>
         /// 数据列表
         /// </summary>
-        public T[] DataList { get; set; }
+        public IReadOnlyList<T> DataList { get; set; }
         /// <summary>
         /// 表名
         /// </summary>
@@ -51,7 +51,7 @@
         /// </summary>
         public int ExecuteCommand()
         {
-            if (DataList.Length == 1 && DataList.First() == null)
+            if (DataList.Count == 1 && DataList[0] == null)
             {
                 return 0;
             }
@@ -89,7 +89,7 @@
         /// </summary>
         public async Task<int> ExecuteCommandAsync()
         {
-            if (DataList.Length == 1 && DataList.First() == null)
+            if (DataList.Count == 1 && DataList[0] == null)
             {
                 return 0;
             }
@@ -127,7 +127,7 @@
         /// </summary>
         public List<long> ExecuteReturnSnowflakeIdList()
         {
-            if (DataList.Length == 1 && DataList.First() == null)
+            if (DataList.Count == 1 && DataList[0] == null)
             {
                 return new List<long>();
             }
@@ -165,7 +165,7 @@
         /// </summary>
         public async Task<List<long>> ExecuteReturnSnowflakeIdListAsync()
         {
-            if (DataList.Length == 1 && DataList.First() == null)
+            if (DataList.Count == 1 && DataList[0] == null)
             {
                 return new List<long>();
             }

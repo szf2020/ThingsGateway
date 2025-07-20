@@ -76,14 +76,14 @@ namespace ThingsGateway.SqlSugar
                 {
                     foreach (DataRow item in dt.Rows)
                     {
-                        cmd.CommandText = this.Context.Insertable(UtilMethods.DataRowToDictionary(item)).AS(dt.TableName).ToSqlString().Replace(";SELECT LAST_INSERT_ROWID();", "");
+                        cmd.CommandText = this.Context.InsertableT(UtilMethods.DataRowToDictionary(item)).AS(dt.TableName).ToSqlString().Replace(";SELECT LAST_INSERT_ROWID();", "");
                         TransformInsertCommand(cmd);
                         i += await cmd.ExecuteNonQueryAsync().ConfigureAwait(false);
                     }
                 }
                 else
                 {
-                    cmd.CommandText = this.Context.Insertable(dictionary.First()).AS(dt.TableName).ToSql().Key.Replace(";SELECT LAST_INSERT_ROWID();", "");
+                    cmd.CommandText = this.Context.InsertableT(dictionary.First()).AS(dt.TableName).ToSql().Key.Replace(";SELECT LAST_INSERT_ROWID();", "");
                     TransformInsertCommand(cmd);
                     foreach (DataRow dataRow in dt.Rows)
                     {
@@ -129,7 +129,7 @@ namespace ThingsGateway.SqlSugar
                 {
                     foreach (DataRow item in dt.Rows)
                     {
-                        cmd.CommandText = this.Context.Updateable(UtilMethods.DataRowToDictionary(item))
+                        cmd.CommandText = this.Context.UpdateableT(UtilMethods.DataRowToDictionary(item))
                          .WhereColumns(whereColumns)
                          .UpdateColumns(updateColumns)
                          .AS(dt.TableName).ToSqlString();
@@ -138,7 +138,7 @@ namespace ThingsGateway.SqlSugar
                 }
                 else
                 {
-                    cmd.CommandText = this.Context.Updateable(dictionary.First())
+                    cmd.CommandText = this.Context.UpdateableT(dictionary.First())
                         .WhereColumns(whereColumns)
                         .UpdateColumns(updateColumns)
                         .AS(dt.TableName).ToSql().Key;

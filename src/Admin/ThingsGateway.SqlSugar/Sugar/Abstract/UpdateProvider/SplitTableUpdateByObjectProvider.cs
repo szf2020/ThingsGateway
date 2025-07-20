@@ -6,7 +6,7 @@ namespace ThingsGateway.SqlSugar
     {
         public SqlSugarProvider Context;
         public UpdateableProvider<T> updateobj;
-        public T[] UpdateObjects { get; set; }
+        public IReadOnlyList<T> UpdateObjects { get; set; }
 
         public IEnumerable<SplitTableInfo> Tables { get; set; }
         internal List<string> WhereColumns { get; set; }
@@ -26,7 +26,7 @@ namespace ThingsGateway.SqlSugar
                 if (IsVersion())
                 {
                     Check.ExceptionEasy(addList.Count > 1, "The version number can only be used for single record updates", "版本号只能用于单条记录更新");
-                    result += this.Context.Updateable(addList.First())
+                    result += this.Context.UpdateableT(addList.First())
                     .WhereColumns(this.WhereColumns?.ToArray())
                     .EnableDiffLogEventIF(this.IsEnableDiffLogEvent, this.BusinessData)
                     .UpdateColumns(updateobj.UpdateBuilder.UpdateColumns?.ToArray())
@@ -101,7 +101,7 @@ namespace ThingsGateway.SqlSugar
                 if (IsVersion())
                 {
                     Check.ExceptionEasy(addList.Count > 1, "The version number can only be used for single record updates", "版本号只能用于单条记录更新");
-                    result += await Context.Updateable(addList.First())
+                    result += await Context.UpdateableT(addList.First())
                       .WhereColumns(WhereColumns?.ToArray())
                       .EnableDiffLogEventIF(IsEnableDiffLogEvent, BusinessData)
                       .UpdateColumns(updateobj.UpdateBuilder.UpdateColumns?.ToArray())
@@ -136,7 +136,7 @@ namespace ThingsGateway.SqlSugar
                 return null;
             }
         }
-        private void GroupDataList(T[] datas, out List<GroupModel> groupModels, out int result)
+        private void GroupDataList(IReadOnlyList<T> datas, out List<GroupModel> groupModels, out int result)
         {
             var attribute = typeof(T).GetCustomAttribute<SplitTableAttribute>() as SplitTableAttribute;
             Check.Exception(attribute == null, $"{typeof(T).Name} need SplitTableAttribute");

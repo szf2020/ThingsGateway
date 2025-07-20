@@ -63,7 +63,7 @@ internal sealed class SysResourceService : BaseService<SysResource>, ISysResourc
         var resource = resourceList.First(a => a.Id == id);
         resource.ParentId = parentMenuId;
         using var db = GetDB();
-        var result = await db.Updateable(resource).ExecuteCommandAsync().ConfigureAwait(false);
+        var result = await db.UpdateableT(resource).ExecuteCommandAsync().ConfigureAwait(false);
         RefreshCache();//刷新缓存
         _relationService.RefreshCache(RelationCategoryEnum.RoleHasResource);//关系表刷新缓存
         _relationService.RefreshCache(RelationCategoryEnum.UserHasResource);//关系表刷新缓存
@@ -195,7 +195,7 @@ internal sealed class SysResourceService : BaseService<SysResource>, ISysResourc
 
         if (type == ItemChangedType.Add)
         {
-            var result = await db.Insertable(input).ExecuteCommandAsync().ConfigureAwait(false);
+            var result = await db.InsertableT(input).ExecuteCommandAsync().ConfigureAwait(false);
             RefreshCache();//刷新缓存
             return result > 0;
         }
@@ -220,7 +220,7 @@ internal sealed class SysResourceService : BaseService<SysResource>, ISysResourc
             //事务
             var result = await db.UseTranAsync(async () =>
             {
-                await db.Updateable(input).ExecuteCommandAsync().ConfigureAwait(false);//更新数据
+                await db.UpdateableT(input).ExecuteCommandAsync().ConfigureAwait(false);//更新数据
                 if (permissions.Count > 0)//如果权限列表大于0就更新
                 {
                     await db.Updateable(permissions).ExecuteCommandAsync().ConfigureAwait(false);//更新关系表

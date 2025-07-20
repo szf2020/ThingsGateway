@@ -29,13 +29,13 @@ namespace ThingsGateway.SqlSugar
         SqlSugarProvider GetConnectionWithAttr<T>();
         SqlSugarScopeProvider GetConnectionScopeWithAttr<T>();
         ISugarQueryable<T> QueryableWithAttr<T>();
-        IInsertable<T> InsertableWithAttr<T>(T insertObj) where T : class, new();
-        IInsertable<T> InsertableWithAttr<T>(List<T> insertObjs) where T : class, new();
-        IUpdateable<T> UpdateableWithAttr<T>(T updateObj) where T : class, new();
+        IInsertable<T> InsertableWithAttrT<T>(T insertObj) where T : class, new();
+        IInsertable<T> InsertableWithAttr<T>(IReadOnlyList<T> insertObjs) where T : class, new();
+        IUpdateable<T> UpdateableWithAttrT<T>(T updateObj) where T : class, new();
         IUpdateable<T> UpdateableWithAttr<T>() where T : class, new();
-        IUpdateable<T> UpdateableWithAttr<T>(List<T> updateObjs) where T : class, new();
-        IDeleteable<T> DeleteableWithAttr<T>(T deleteObjs) where T : class, new();
-        IDeleteable<T> DeleteableWithAttr<T>(List<T> deleteObjs) where T : class, new();
+        IUpdateable<T> UpdateableWithAttr<T>(IReadOnlyList<T> updateObjs) where T : class, new();
+        IDeleteable<T> DeleteableWithAttrT<T>(T deleteObjs) where T : class, new();
+        IDeleteable<T> DeleteableWithAttr<T>(IReadOnlyList<T> deleteObjs) where T : class, new();
         IDeleteable<T> DeleteableWithAttr<T>() where T : class, new();
 
         bool IsAnyConnection(object configId);

@@ -278,7 +278,7 @@ namespace ThingsGateway.SqlSugar
             }
             return result;
         }
-        protected InsertableProvider<T> CreateInsertable<T>(T[] insertObjs) where T : class, new()
+        protected InsertableProvider<T> CreateInsertable<T>(IReadOnlyList<T> insertObjs) where T : class, new()
         {
             this.SugarActionType = SugarActionType.Insert;
             var result = InstanceFactory.GetInsertableProvider<T>(this.CurrentConnectionConfig);
@@ -298,7 +298,7 @@ namespace ThingsGateway.SqlSugar
             }
             return result;
         }
-        protected DeleteableProvider<T> CreateDeleteable<T>() where T : class, new()
+        protected DeleteableProvider<T> CreateDeleteableT<T>() where T : class, new()
         {
             this.SugarActionType = SugarActionType.Delete;
             var result = InstanceFactory.GetDeleteableProvider<T>(this.CurrentConnectionConfig);
@@ -315,7 +315,7 @@ namespace ThingsGateway.SqlSugar
             }
             return result;
         }
-        protected UpdateableProvider<T> CreateUpdateable<T>(T[] UpdateObjs) where T : class, new()
+        protected UpdateableProvider<T> CreateUpdateable<T>(IReadOnlyList<T> UpdateObjs) where T : class, new()
         {
             this.SugarActionType = SugarActionType.Update;
             var result = InstanceFactory.GetUpdateableProvider<T>(this.CurrentConnectionConfig);

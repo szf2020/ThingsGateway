@@ -36,8 +36,8 @@ namespace ThingsGateway.SqlSugar
         IDeleteable<T> Deleteable<T>(dynamic[] primaryKeyValues) where T : class, new();
         IDeleteable<T> Deleteable<T>(Expression<Func<T, bool>> expression) where T : class, new();
         IDeleteable<T> Deleteable<T>(List<dynamic> pkValue) where T : class, new();
-        IDeleteable<T> Deleteable<T>(List<T> deleteObjs) where T : class, new();
-        IDeleteable<T> Deleteable<T>(T deleteObj) where T : class, new();
+        IDeleteable<T> Deleteable<T>(IReadOnlyList<T> deleteObjs) where T : class, new();
+        IDeleteable<T> DeleteableT<T>(T deleteObj) where T : class, new();
         #endregion
 
         #region Other methods
@@ -67,9 +67,8 @@ namespace ThingsGateway.SqlSugar
         #region Insertable
         IInsertable<T> Insertable<T>(Dictionary<string, object> columnDictionary) where T : class, new();
         IInsertable<T> Insertable<T>(dynamic insertDynamicObject) where T : class, new();
-        IInsertable<T> Insertable<T>(List<T> insertObjs) where T : class, new();
-        IInsertable<T> Insertable<T>(T insertObj) where T : class, new();
-        IInsertable<T> Insertable<T>(T[] insertObjs) where T : class, new();
+        IInsertable<T> Insertable<T>(IReadOnlyList<T> insertObjs) where T : class, new();
+        IInsertable<T> InsertableT<T>(T insertObj) where T : class, new();
         InsertMethodInfo InsertableByObject(object singleEntityObjectOrListObject);
         IInsertable<Dictionary<string, object>> InsertableByDynamic(object insertDynamicObject);
         #endregion
@@ -145,12 +144,10 @@ namespace ThingsGateway.SqlSugar
         #region Saveable
         GridSaveProvider<T> GridSave<T>(List<T> saveList) where T : class, new();
         GridSaveProvider<T> GridSave<T>(List<T> oldList, List<T> saveList) where T : class, new();
-        IStorageable<T> Storageable<T>(T[] dataList) where T : class, new();
-        IStorageable<T> Storageable<T>(IList<T> dataList) where T : class, new();
+        IStorageable<T> Storageable<T>(IReadOnlyList<T> dataList) where T : class, new();
         StorageableDataTable Storageable(List<Dictionary<string, object>> dictionaryList, string tableName);
         StorageableDataTable Storageable(Dictionary<string, object> dictionary, string tableName);
-        IStorageable<T> Storageable<T>(List<T> dataList) where T : class, new();
-        IStorageable<T> Storageable<T>(T data) where T : class, new();
+        IStorageable<T> StorageableT<T>(T data) where T : class, new();
         StorageableDataTable Storageable(DataTable data);
         StorageableMethodInfo StorageableByObject(object singleEntityObjectOrListObject);
 
@@ -194,16 +191,14 @@ namespace ThingsGateway.SqlSugar
         IUpdateable<T> Updateable<T>(dynamic updateDynamicObject) where T : class, new();
         IUpdateable<T> Updateable<T>(Expression<Func<T, bool>> columns) where T : class, new();
         IUpdateable<T> Updateable<T>(Expression<Func<T, T>> columns) where T : class, new();
-        IUpdateable<T> Updateable<T>(List<T> UpdateObjs) where T : class, new();
-        IUpdateable<T> Updateable<T>(T UpdateObj) where T : class, new();
-        IUpdateable<T> Updateable<T>(T[] UpdateObjs) where T : class, new();
+        IUpdateable<T> Updateable<T>(IReadOnlyList<T> UpdateObjs) where T : class, new();
+        IUpdateable<T> UpdateableT<T>(T UpdateObj) where T : class, new();
         IUpdateable<Dictionary<string, object>> UpdateableByDynamic(object updateDynamicObject);
         #endregion
 
         #region Reportable
-        IReportable<T> Reportable<T>(T data);
-        IReportable<T> Reportable<T>(List<T> list);
-        IReportable<T> Reportable<T>(T[] array);
+        IReportable<T> ReportableT<T>(T data);
+        IReportable<T> Reportable<T>(IReadOnlyList<T> list);
         #endregion
 
         #region Cache

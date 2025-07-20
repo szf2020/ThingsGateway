@@ -2,7 +2,7 @@
 {
     public class UpdateableFilter<T> where T : class, new()
     {
-        public T[] DataList { get; set; }
+        public IReadOnlyList<T> DataList { get; set; }
         public SqlSugarProvider Context { get; set; }
         public int PageSize { get; internal set; }
         public string TableName { get; internal set; }
@@ -11,7 +11,7 @@
         public List<string> UpdateColumns { get; internal set; }
         public int ExecuteCommand()
         {
-            if (DataList.Length == 1 && DataList.First() == null)
+            if (DataList.Count == 1 && DataList[0] == null)
             {
                 return 0;
             }
@@ -26,7 +26,7 @@
                 }
                 this.Context.Utilities.PageEach(DataList, PageSize, pageItem =>
                 {
-                    result += SetFilterSql(this.Context.Updateable(pageItem.First()).AS(TableName).EnableDiffLogEventIF(IsEnableDiffLogEvent, DiffModel).UpdateColumns(UpdateColumns.ToArray())).ExecuteCommand();
+                    result += SetFilterSql(this.Context.UpdateableT(pageItem.First()).AS(TableName).EnableDiffLogEventIF(IsEnableDiffLogEvent, DiffModel).UpdateColumns(UpdateColumns.ToArray())).ExecuteCommand();
                 });
                 if (isNoTran)
                 {
@@ -48,7 +48,7 @@
 
         public async Task<int> ExecuteCommandAsync()
         {
-            if (DataList.Length == 1 && DataList.First() == null)
+            if (DataList.Count == 1 && DataList[0] == null)
             {
                 return 0;
             }
@@ -63,7 +63,7 @@
                 }
                 await Context.Utilities.PageEachAsync(DataList, PageSize, async pageItem =>
                 {
-                    result += await SetFilterSql(Context.Updateable(pageItem.First()).AS(TableName).EnableDiffLogEventIF(IsEnableDiffLogEvent, DiffModel).UpdateColumns(UpdateColumns.ToArray())).ExecuteCommandAsync().ConfigureAwait(false);
+                    result += await SetFilterSql(Context.UpdateableT(pageItem.First()).AS(TableName).EnableDiffLogEventIF(IsEnableDiffLogEvent, DiffModel).UpdateColumns(UpdateColumns.ToArray())).ExecuteCommandAsync().ConfigureAwait(false);
                 }).ConfigureAwait(false);
                 if (isNoTran)
                 {

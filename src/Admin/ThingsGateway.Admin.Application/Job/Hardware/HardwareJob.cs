@@ -129,7 +129,7 @@ public class HardwareJob : IJob, IHardwareJob
                                 CpuUsage = (HardwareInfo.MachineInfo.CpuRate * 100).ToInt(),
                                 Temperature = (HardwareInfo.MachineInfo.Temperature).ToInt(),
                             };
-                            await _db.Insertable(his).ExecuteCommandAsync(stoppingToken).ConfigureAwait(false);
+                            await _db.InsertableT(his).ExecuteCommandAsync(stoppingToken).ConfigureAwait(false);
                             MemoryCache.Remove(CacheKey);
                         }
                         var sevenDaysAgo = TimerX.Now.AddDays(-HardwareInfoOptions.DaysAgo);

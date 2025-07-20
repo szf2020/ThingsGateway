@@ -62,8 +62,8 @@ namespace ThingsGateway.SqlSugar
                         {
                             item.Value = Guid.NewGuid();
                         }
-                        if (InsertObjs.First().GetType().GetProperties().Any(it => it.Name == item.PropertyName))
-                            InsertObjs.First().GetType().GetProperties().First(it => it.Name == item.PropertyName).SetValue(InsertObjs.First(), item.Value, null);
+                        if (InsertObjs[0].GetType().GetProperties().Any(it => it.Name == item.PropertyName))
+                            InsertObjs[0].GetType().GetProperties().First(it => it.Name == item.PropertyName).SetValue(InsertObjs[0], item.Value, null);
                     }
                 }
             }
@@ -200,7 +200,7 @@ namespace ThingsGateway.SqlSugar
         internal void Init()
         {
             InsertBuilder.EntityInfo = this.EntityInfo;
-            Check.Exception(InsertObjs == null || InsertObjs.Length == 0, "InsertObjs is null");
+            Check.Exception(InsertObjs == null || InsertObjs.Count == 0, "InsertObjs is null");
             int i = 0;
             foreach (var item in InsertObjs)
             {
@@ -256,7 +256,7 @@ namespace ThingsGateway.SqlSugar
         /// <summary>
         /// 数据变更AOP处理
         /// </summary>
-        private void DataChangeAop(T[] items)
+        private void DataChangeAop(IReadOnlyList<T> items)
         {
 
             var dataEvent = this.Context.CurrentConnectionConfig.AopEvents?.DataChangesExecuted;
@@ -564,7 +564,7 @@ namespace ThingsGateway.SqlSugar
         private List<DiffLogTableInfo> GetDiffTable(string sql, long? identity)
         {
 
-            if (GetIdentityKeys().HasValue() && this.InsertObjs.Length > 1)
+            if (GetIdentityKeys().HasValue() && this.InsertObjs.Count > 1)
             {
                 return GetDiffTableByEntity();
             }
@@ -642,7 +642,7 @@ namespace ThingsGateway.SqlSugar
                 foreach (var item in this.EntityInfo.Columns.Where(it => it.IsIgnore == false && GetPrimaryKeys().Any(pk => pk.Equals(it.DbColumnName, StringComparison.CurrentCultureIgnoreCase))))
                 {
                     var fielddName = item.DbColumnName;
-                    var fieldObject = this.EntityInfo.Columns.FirstOrDefault(it => it.PropertyName == item.PropertyName).PropertyInfo.GetValue(this.InsertObjs.Last(), null);
+                    var fieldObject = this.EntityInfo.Columns.FirstOrDefault(it => it.PropertyName == item.PropertyName).PropertyInfo.GetValue(this.InsertObjs[^1], null);
                     var fieldValue = fieldObject.ObjToString();
                     if (fieldObject != null && fieldObject.GetType() != typeof(string) && this.Context.CurrentConnectionConfig.DbType == DbType.PostgreSQL)
                     {
@@ -691,7 +691,7 @@ namespace ThingsGateway.SqlSugar
                 {
                     ColumnDescription = it.ColumnDescription,
                     ColumnName = it.DbColumnName,
-                    Value = it.PropertyInfo.GetValue(this.InsertObjs.Last(), null),
+                    Value = it.PropertyInfo.GetValue(this.InsertObjs[^1], null),
                     IsPrimaryKey = it.IsPrimarykey
                 }).ToList();
                 return new List<DiffLogTableInfo>() { diffTable };
@@ -822,7 +822,7 @@ namespace ThingsGateway.SqlSugar
             List<Type> result = new List<Type>();
             foreach (var item in this.InsertObjs)
             {
-                var insertable = this.Context.Insertable(item)
+                var insertable = this.Context.InsertableT(item)
                     .AS(this.InsertBuilder.AsName)
                     .InsertColumns(this.InsertBuilder.DbColumnInfoList.Select(it => it.DbColumnName).Distinct().ToArray());
                 if (pkInfo.UnderType == UtilConstants.IntType)

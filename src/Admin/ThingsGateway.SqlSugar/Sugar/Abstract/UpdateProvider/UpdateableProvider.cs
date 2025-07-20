@@ -12,7 +12,7 @@ namespace ThingsGateway.SqlSugar
         public ISqlBuilder SqlBuilder { get; internal set; }
         public UpdateBuilder UpdateBuilder { get; set; }
         public IAdo Ado { get { return Context.Ado; } }
-        public T[] UpdateObjs { get; set; }
+        public IReadOnlyList<T> UpdateObjs { get; set; }
         /// <summary>
         /// true : by expression  update
         /// false: by object update
@@ -20,7 +20,7 @@ namespace ThingsGateway.SqlSugar
         public bool UpdateParameterIsNull { get; set; }
         public bool IsMappingTable { get { return this.Context.MappingTables?.Any() == true; } }
         public bool IsMappingColumns { get { return this.Context.MappingColumns?.Any() == true; } }
-        public bool IsSingle { get { return this.UpdateObjs.Length == 1; } }
+        public bool IsSingle { get { return this.UpdateObjs.Count == 1; } }
         public List<MappingColumn> MappingColumnList { get; set; }
         private List<string> IgnoreColumnNameList { get; set; }
         internal List<string> WhereColumnList { get; set; }
@@ -71,8 +71,8 @@ namespace ThingsGateway.SqlSugar
         }
         public virtual int ExecuteCommandWithOptLock(bool IsVersionValidation = false)
         {
-            Check.ExceptionEasy(UpdateObjs?.Length > 1, " OptLock can only be used on a single object, and the argument cannot be List", "乐观锁只能用于单个对象,参数不能是List,如果是一对多操作请更新主表统一用主表验证");
-            var updateData = UpdateObjs.FirstOrDefault();
+            Check.ExceptionEasy(UpdateObjs?.Count > 1, " OptLock can only be used on a single object, and the argument cannot be List", "乐观锁只能用于单个对象,参数不能是List,如果是一对多操作请更新主表统一用主表验证");
+            var updateData = UpdateObjs[0];
             if (updateData == null) return 0;
             object oldValue = null;
             var name = _ExecuteCommandWithOptLock(updateData, ref oldValue);
@@ -136,7 +136,7 @@ namespace ThingsGateway.SqlSugar
             var rows = this.ExecuteCommand();
             if (rows > 0 && !this.UpdateParameterIsNull)
             {
-                return this.UpdateObjs.FirstOrDefault();
+                return this.UpdateObjs[0];
             }
             else if (rows > 0 && this.UpdateParameterIsNull)
             {
@@ -159,8 +159,8 @@ namespace ThingsGateway.SqlSugar
 
         public virtual async Task<int> ExecuteCommandWithOptLockAsync(bool IsVersionValidation = false)
         {
-            Check.ExceptionEasy(UpdateObjs?.Length > 1, " OptLock can only be used on a single object, and the argument cannot be List", "乐观锁只能用于单个对象,参数不能是List,如果是一对多操作请更新主表统一用主表验证");
-            var updateData = UpdateObjs.FirstOrDefault();
+            Check.ExceptionEasy(UpdateObjs?.Count > 1, " OptLock can only be used on a single object, and the argument cannot be List", "乐观锁只能用于单个对象,参数不能是List,如果是一对多操作请更新主表统一用主表验证");
+            var updateData = UpdateObjs[0];
             if (updateData == null) return 0;
             object oldValue = null;
             var name = _ExecuteCommandWithOptLock(updateData, ref oldValue);
@@ -178,7 +178,7 @@ namespace ThingsGateway.SqlSugar
             var rows = await ExecuteCommandAsync().ConfigureAwait(false);
             if (rows > 0 && !this.UpdateParameterIsNull)
             {
-                return this.UpdateObjs.FirstOrDefault();
+                return this.UpdateObjs[0];
             }
             else if (rows > 0 && this.UpdateParameterIsNull)
             {
@@ -649,7 +649,7 @@ namespace ThingsGateway.SqlSugar
             {
                 var newData = new T() { };
                 UtilMethods.ClearPublicProperties(newData, this.EntityInfo);
-                var data = ((UpdateableProvider<T>)this.Context.Updateable(newData)).UpdateObjs.First();
+                var data = ((UpdateableProvider<T>)this.Context.UpdateableT(newData)).UpdateObjs[0];
                 foreach (var item in this.EntityInfo.Columns.Where(it => !it.IsPrimarykey && !it.IsIgnore && !it.IsOnlyIgnoreUpdate))
                 {
                     var value = item.PropertyInfo.GetValue(data);
@@ -869,7 +869,7 @@ namespace ThingsGateway.SqlSugar
             {
                 var newData = new T() { };
                 UtilMethods.ClearPublicProperties(newData, this.EntityInfo);
-                var data = ((UpdateableProvider<T>)this.Context.Updateable(newData)).UpdateObjs.First();
+                var data = ((UpdateableProvider<T>)this.Context.UpdateableT(newData)).UpdateObjs[0];
                 foreach (var item in this.EntityInfo.Columns.Where(it => !it.IsPrimarykey && !it.IsIgnore && !it.IsOnlyIgnoreUpdate))
                 {
                     var value = item.PropertyInfo.GetValue(data);
@@ -1000,7 +1000,7 @@ namespace ThingsGateway.SqlSugar
         }
         public IUpdateable<T> Where(Expression<Func<T, bool>> expression)
         {
-            Check.Exception(UpdateObjectNotWhere() && UpdateObjs.Length > 1, ErrorMessage.GetThrowMessage("update List no support where", "集合更新不支持Where请使用WhereColumns"));
+            Check.Exception(UpdateObjectNotWhere() && UpdateObjs.Count > 1, ErrorMessage.GetThrowMessage("update List no support where", "集合更新不支持Where请使用WhereColumns"));
             var expResult = UpdateBuilder.GetExpressionValue(expression, ResolveExpressType.WhereSingle);
             var whereString = expResult.GetResultString();
             if (expression.ToString().Contains("Subqueryable()"))
@@ -1032,7 +1032,7 @@ namespace ThingsGateway.SqlSugar
         }
         public IUpdateable<T> Where(string whereSql, object parameters = null)
         {
-            Check.Exception(UpdateObjectNotWhere() && UpdateObjs.Length > 1, ErrorMessage.GetThrowMessage("update List no support where", "集合更新不支持Where请使用WhereColumns"));
+            Check.Exception(UpdateObjectNotWhere() && UpdateObjs.Count > 1, ErrorMessage.GetThrowMessage("update List no support where", "集合更新不支持Where请使用WhereColumns"));
             if (whereSql.HasValue())
             {
                 UpdateBuilder.WhereValues.Add(whereSql);
@@ -1045,7 +1045,7 @@ namespace ThingsGateway.SqlSugar
         }
         public IUpdateable<T> Where(string fieldName, string conditionalType, object fieldValue)
         {
-            Check.Exception(UpdateObjectNotWhere() && UpdateObjs.Length > 1, ErrorMessage.GetThrowMessage("update List no support where", "集合更新不支持Where请使用WhereColumns"));
+            Check.Exception(UpdateObjectNotWhere() && UpdateObjs.Count > 1, ErrorMessage.GetThrowMessage("update List no support where", "集合更新不支持Where请使用WhereColumns"));
             var whereSql = this.SqlBuilder.GetWhere(fieldName, conditionalType, 0);
             this.Where(whereSql);
             string parameterName = this.SqlBuilder.SqlParameterKeyWord + fieldName + "0";
@@ -1054,7 +1054,7 @@ namespace ThingsGateway.SqlSugar
         }
         public IUpdateable<T> Where(List<IConditionalModel> conditionalModels)
         {
-            Check.Exception(UpdateObjectNotWhere() && UpdateObjs.Length > 1, ErrorMessage.GetThrowMessage("update List no support where", "集合更新不支持Where请使用WhereColumns"));
+            Check.Exception(UpdateObjectNotWhere() && UpdateObjs.Count > 1, ErrorMessage.GetThrowMessage("update List no support where", "集合更新不支持Where请使用WhereColumns"));
             var sql = this.Context.Queryable<T>().SqlBuilder.ConditionalModelToSql(conditionalModels);
             var result = this;
             result.Where(sql.Key, sql.Value);

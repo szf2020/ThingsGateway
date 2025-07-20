@@ -598,7 +598,7 @@ WHERE EVENT_OBJECT_TABLE = '" + tableName + "'");
                 value = GetDefaultValue(columnInfo, value);
                 var dt = new Dictionary<string, object>();
                 dt.Add(columnInfo.DbColumnName, value);
-                this.Context.Updateable(dt)
+                this.Context.UpdateableT(dt)
                              .AS(tableName)
                              .Where($"{columnInfo.DbColumnName} is null ").ExecuteCommand();
                 columnInfo.IsNullable = false;

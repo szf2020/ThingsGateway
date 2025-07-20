@@ -22,9 +22,9 @@ namespace ThingsGateway.SqlSugar
         public bool ExecuteBulkCopy()
         {
             var IsBulkLoad = false;
-            if (Entitys == null || Entitys.Length <= 0)
+            if (Entitys == null || Entitys.Count <= 0)
                 return IsBulkLoad;
-            if (Entitys.First() == null && Entitys.Length == 1)
+            if (Entitys[0] == null && Entitys.Count == 1)
                 return IsBulkLoad;
             DataTable dt = new DataTable();
             Type type = typeof(T);

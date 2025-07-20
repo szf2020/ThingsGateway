@@ -137,7 +137,7 @@ internal sealed class RelationService : BaseService<SysRelation>, IRelationServi
         {
             if (clear)
                 await db.Deleteable<SysRelation>().Where(it => it.ObjectId == objectId && it.Category == category).ExecuteCommandAsync().ConfigureAwait(false);//删除老的
-            await db.Insertable(sysRelation).ExecuteCommandAsync().ConfigureAwait(false);//添加新的
+            await db.InsertableT(sysRelation).ExecuteCommandAsync().ConfigureAwait(false);//添加新的
         }).ConfigureAwait(false);
         if (result.IsSuccess)//如果成功了
         {

@@ -8,7 +8,7 @@
         }
         public override int ExecuteCommand()
         {
-            if (base.UpdateObjs.Length == 1)
+            if (base.UpdateObjs.Count == 1)
             {
                 var resultl = base.ExecuteCommand();
                 if (resultl == -1)
@@ -20,19 +20,19 @@
                     return resultl;
                 }
             }
-            else if (base.UpdateObjs.Length == 0)
+            else if (base.UpdateObjs.Count == 0)
             {
                 return 0;
             }
             else
             {
                 base.ExecuteCommand();
-                return base.UpdateObjs.Length;
+                return base.UpdateObjs.Count;
             }
         }
         public async override Task<int> ExecuteCommandAsync()
         {
-            if (base.UpdateObjs.Length == 1)
+            if (base.UpdateObjs.Count == 1)
             {
                 var result = await base.ExecuteCommandAsync().ConfigureAwait(false);
                 if (result == -1)
@@ -44,14 +44,14 @@
                     return result;
                 }
             }
-            else if (base.UpdateObjs.Length == 0)
+            else if (base.UpdateObjs.Count == 0)
             {
                 return 0;
             }
             else
             {
                 await base.ExecuteCommandAsync().ConfigureAwait(false);
-                return base.UpdateObjs.Length;
+                return base.UpdateObjs.Count;
             }
         }
     }

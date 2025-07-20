@@ -148,8 +148,8 @@ namespace ThingsGateway.SqlSugar
             {
                 DataTableGroups = Groups,
                 AsDeleteable = this.Context.Deleteable<object>().AS(tableName).Where(conditionalModels),
-                AsUpdateable = this.Context.Updateable(updateList).AS(tableName).WhereColumns(Columns),
-                AsInsertable = this.Context.Insertable(inserList).AS(tableName)
+                AsUpdateable = this.Context.Updateable<Dictionary<string, object>>(updateList).AS(tableName).WhereColumns(Columns),
+                AsInsertable = this.Context.Insertable<Dictionary<string, object>>(inserList).AS(tableName)
             };
             return result;
         }

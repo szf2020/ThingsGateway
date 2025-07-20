@@ -49,7 +49,7 @@ namespace ThingsGateway.SqlSugar
                     this.Context.Insertable(pageItems).IgnoreColumns(GetTagNames(pageItems.First(), attr).ToArray()).AS(childTableName).ExecuteCommand();
                 });
             }
-            return inserObjects.Length;
+            return inserObjects.Count;
         }
 
         /// <summary>
@@ -78,7 +78,7 @@ namespace ThingsGateway.SqlSugar
                     await Context.Insertable(pageItems).IgnoreColumns(GetTagNames(pageItems.First(), attr).ToArray()).AS(childTableName).ExecuteCommandAsync().ConfigureAwait(false);
                 }).ConfigureAwait(false);
             }
-            return inserObjects.Length;
+            return inserObjects.Count;
         }
 
         /// <summary>
@@ -134,7 +134,7 @@ namespace ThingsGateway.SqlSugar
         /// <param name="inserObjects">插入对象数组</param>
         /// <param name="attr">STable特性</param>
         /// <returns>分组结果</returns>
-        private static IEnumerable<IGrouping<string, T>> GetGroupInfos(T[] inserObjects, STableAttribute? attr)
+        private static IEnumerable<IGrouping<string, T>> GetGroupInfos(IReadOnlyList<T> inserObjects, STableAttribute? attr)
         {
             var groups = inserObjects.GroupBy(it =>
             {

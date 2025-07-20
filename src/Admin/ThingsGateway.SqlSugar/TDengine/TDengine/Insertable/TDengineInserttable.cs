@@ -90,7 +90,7 @@
         /// <returns>是否成功</returns>
         public override bool ExecuteCommandIdentityIntoEntity()
         {
-            var result = InsertObjs.First();
+            var result = InsertObjs[0];
             var identityKeys = GetIdentityKeys();
             if (identityKeys.Count == 0) { return this.ExecuteCommand() > 0; }
             var idValue = ExecuteReturnBigIdentity();

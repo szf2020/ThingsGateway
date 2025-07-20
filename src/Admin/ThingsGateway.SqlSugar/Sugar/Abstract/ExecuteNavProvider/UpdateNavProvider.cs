@@ -239,7 +239,7 @@ namespace ThingsGateway.SqlSugar
             }
             if (_Options?.RootFunc != null)
             {
-                var updateable = this._Context.Updateable(_Roots);
+                var updateable = this._Context.Updateable<Root>(_Roots);
                 var exp = _Options.RootFunc as Expression<Action<IUpdateable<Root>>>;
                 Check.ExceptionEasy(exp == null, "UpdateOptions.RootFunc is error", "UpdateOptions.RootFunc");
                 var com = exp.Compile();
@@ -254,7 +254,7 @@ namespace ThingsGateway.SqlSugar
                     var newRoots = new List<Root>();
                     foreach (var item in _Roots)
                     {
-                        var x = this._Context.Storageable(item).ToStorage();
+                        var x = this._Context.StorageableT(item).ToStorage();
                         if (x.InsertList.HasValue())
                         {
                             newRoots.Add(x.AsInsertable.IgnoreColumns(_RootOptions.IgnoreInsertColumns).EnableDiffLogEventIF(_RootOptions.IsDiffLogEvent, _RootOptions.DiffLogBizData).ExecuteReturnEntity());
@@ -276,7 +276,7 @@ namespace ThingsGateway.SqlSugar
                 {
                     if (_Roots.Count == 1 && _RootOptions?.IsOptLock == true)
                     {
-                        this._Context.Updateable(_Roots.First())
+                        this._Context.UpdateableT(_Roots.First())
                           .EnableDiffLogEventIF(_RootOptions.IsDiffLogEvent, _RootOptions.DiffLogBizData)
                           .UpdateColumns(_RootOptions.UpdateColumns)
                           .IgnoreColumns(_RootOptions.IgnoreColumns)

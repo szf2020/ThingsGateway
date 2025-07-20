@@ -325,7 +325,7 @@ public class AuthService : IAuthService
 
         using var db = DbContext.GetDB<SysUser>();
         //更新用户登录信息
-        if (await db.Updateable(sysUser).UpdateColumns(it => new
+        if (await db.UpdateableT(sysUser).UpdateColumns(it => new
         {
             it.LastLoginIp,
             it.LastLoginTime,

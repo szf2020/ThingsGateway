@@ -7,7 +7,7 @@ namespace ThingsGateway.SqlSugar
         {
             var value = item.First().ToString();
             var dics = context.Utilities.JsonToColumnsModels(value);
-            sugarInsertable = this.context.Insertable(dics).AS(this.TableName);
+            sugarInsertable = this.context.Insertable<Dictionary<string, object>>(dics).AS(this.TableName);
         }
     }
 }

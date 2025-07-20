@@ -82,7 +82,7 @@
             {
                 if (IsFirst && _RootOptions != null)
                 {
-                    this._Context.Insertable(item)
+                    this._Context.InsertableT(item)
                         .IgnoreColumns(_RootOptions.IgnoreColumns)
                         .InsertColumns(_RootOptions.InsertColumns)
                         .EnableDiffLogEventIF(_RootOptions.IsDiffLogEvent, _RootOptions.DiffLogBizData)
@@ -90,7 +90,7 @@
                 }
                 else
                 {
-                    this._Context.Insertable(item).ExecuteCommandIdentityIntoEntity();
+                    this._Context.InsertableT(item).ExecuteCommandIdentityIntoEntity();
                 }
             }
         }

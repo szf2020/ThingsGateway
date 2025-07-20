@@ -16,7 +16,7 @@ namespace ThingsGateway.SqlSugar
         IDeleteable<T> Where(T deleteObj);
         IDeleteable<T> WhereIF(bool isWhere, Expression<Func<T, bool>> expression);
         IDeleteable<T> Where(Expression<Func<T, bool>> expression);
-        IDeleteable<T> Where(List<T> deleteObjs);
+        IDeleteable<T> Where(IReadOnlyList<T> deleteObjs);
         DeleteablePage<T> PageSize(int pageSize);
         IDeleteable<T> In<PkType>(PkType primaryKeyValue);
         IDeleteable<T> In<PkType>(PkType[] primaryKeyValues);
