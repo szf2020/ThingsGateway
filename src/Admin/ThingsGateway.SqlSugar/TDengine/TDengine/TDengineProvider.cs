@@ -83,7 +83,7 @@ namespace ThingsGateway.SqlSugar
         /// <param name="sql">SQL语句</param>
         /// <param name="parameters">参数数组</param>
         /// <returns>数据库命令</returns>
-        public override DbCommand GetCommand(string sql, SugarParameter[] parameters)
+        public override DbCommand GetCommand(string sql, IReadOnlyList<SugarParameter> parameters)
         {
             TDengineCommand sqlCommand = new TDengineCommand(sql, (TDengineConnection)this.Connection);
             sqlCommand.CommandType = this.CommandType;
@@ -122,10 +122,10 @@ namespace ThingsGateway.SqlSugar
         /// </summary>
         /// <param name="parameters">SugarParameter参数数组</param>
         /// <returns>IDataParameter参数数组</returns>
-        public override IDataParameter[] ToIDbDataParameter(params SugarParameter[] parameters)
+        public override IDataParameter[] ToIDbDataParameter(params IReadOnlyList<SugarParameter> parameters)
         {
-            if (parameters == null || parameters.Length == 0) return null;
-            TDengineParameter[] result = new TDengineParameter[parameters.Length];
+            if (parameters == null || parameters.Count == 0) return null;
+            TDengineParameter[] result = new TDengineParameter[parameters.Count];
             int i = 0;
             foreach (var parameter in parameters)
             {

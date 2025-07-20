@@ -30,7 +30,7 @@ namespace ThingsGateway.SqlSugar
         public MappingTableList OldMappingTableList { get; set; }
         public bool IsAs { get; set; }
         public bool IsEnableDiffLogEvent { get; set; }
-        public DiffLogModel diffModel { get; set; }
+        public DiffLogModel DiffModel { get; set; }
         internal Action RemoveCacheFunc { get; set; }
         private int SetColumnsIndex { get; set; }
         private List<DbColumnInfo> columns { get; set; }
@@ -46,12 +46,12 @@ namespace ThingsGateway.SqlSugar
             return result;
         }
 
-        public KeyValuePair<string, List<SugarParameter>> ToSql()
+        public KeyValuePair<string, IReadOnlyList<SugarParameter>> ToSql()
         {
             PreToSql();
             string sql = UpdateBuilder.ToSqlString();
             RestoreMapping();
-            return new KeyValuePair<string, List<SugarParameter>>(sql, UpdateBuilder.Parameters);
+            return new KeyValuePair<string, IReadOnlyList<SugarParameter>>(sql, UpdateBuilder.Parameters);
         }
         public void AddQueue()
         {
@@ -118,7 +118,7 @@ namespace ThingsGateway.SqlSugar
             }
             if (sql != Environment.NewLine)
             {
-                result = this.Ado.ExecuteCommand(sql, UpdateBuilder.Parameters == null ? null : UpdateBuilder.Parameters.ToArray());
+                result = this.Ado.ExecuteCommand(sql, UpdateBuilder.Parameters == null ? null : UpdateBuilder.Parameters);
             }
             if (oldParas != null && UpdateBuilder.Parameters != null)
             {
@@ -220,7 +220,7 @@ namespace ThingsGateway.SqlSugar
             {
                 return 0;
             }
-            var result = await Ado.ExecuteCommandAsync(sql, UpdateBuilder.Parameters == null ? null : UpdateBuilder.Parameters.ToArray()).ConfigureAwait(false);
+            var result = await Ado.ExecuteCommandAsync(sql, UpdateBuilder.Parameters == null ? null : UpdateBuilder.Parameters).ConfigureAwait(false);
             After(sql);
             return result;
         }
@@ -246,8 +246,8 @@ namespace ThingsGateway.SqlSugar
             result.DataList = this.UpdateObjs;
             result.TableName = this.UpdateBuilder.TableName;
             result.IsEnableDiffLogEvent = this.IsEnableDiffLogEvent;
-            result.WhereColumnList = this.WhereColumnList?.ToArray();
-            result.DiffModel = this.diffModel;
+            result.WhereColumnList = this.WhereColumnList;
+            result.DiffModel = this.DiffModel;
             result.ReSetValueBySqlExpList = this.UpdateBuilder.ReSetValueBySqlExpList;
             if (this.UpdateBuilder.DbColumnInfoList.Count != 0)
                 result.UpdateColumns = this.UpdateBuilder.DbColumnInfoList.GroupBy(it => it.TableId).First().Select(it => it.DbColumnName).ToList();
@@ -266,7 +266,7 @@ namespace ThingsGateway.SqlSugar
         }
         public IUpdateable<T, T2> InnerJoin<T2>(ISugarQueryable<T> queryable, Expression<Func<T, T2, bool>> joinExpress)
         {
-            var tableName = $" ({queryable.Clone().ToSqlString()}) "; ;
+            var tableName = $" ({queryable.Clone().ToSqlString()}) ";
             return this.InnerJoin(joinExpress, tableName);
         }
         public IUpdateable<T, T2> InnerJoin<T2>(Expression<Func<T, T2, bool>> joinExpress, string TableName)
@@ -283,7 +283,7 @@ namespace ThingsGateway.SqlSugar
         {
             this.Context.SugarActionType = SugarActionType.Update;
             var result = InstanceFactory.GetUpdateableProvider<T>(this.Context.CurrentConnectionConfig);
-            var sqlBuilder = InstanceFactory.GetSqlbuilder(this.Context.CurrentConnectionConfig); ;
+            var sqlBuilder = InstanceFactory.GetSqlbuilder(this.Context.CurrentConnectionConfig);
             result.Context = this.Context;
             result.EntityInfo = this.Context.EntityMaintenance.GetEntityInfo<T>();
             result.SqlBuilder = sqlBuilder;
@@ -295,7 +295,7 @@ namespace ThingsGateway.SqlSugar
             result.IsAs = this.IsAs;
             result.IsOffIdentity = this.IsOffIdentity;
             result.IsEnableDiffLogEvent = this.IsEnableDiffLogEvent;
-            result.diffModel = this.diffModel;
+            result.DiffModel = this.DiffModel;
             result.UpdateParameterIsNull = this.UpdateParameterIsNull;
             result.RemoveCacheFunc = this.RemoveCacheFunc;
             result.SetColumnsIndex = this.SetColumnsIndex;
@@ -349,7 +349,7 @@ namespace ThingsGateway.SqlSugar
             result.Context = this.Context;
             result.UpdateObjects = this.UpdateObjs;
             result.IsEnableDiffLogEvent = this.IsEnableDiffLogEvent;
-            result.BusinessData = this.diffModel?.BusinessData;
+            result.BusinessData = this.DiffModel?.BusinessData;
             if (this.IsWhereColumns)
                 result.WhereColumns = this.WhereColumnList;
             SplitTableContext helper = new SplitTableContext(Context)
@@ -401,7 +401,7 @@ namespace ThingsGateway.SqlSugar
             this.UpdateBuilder.TableName = tableName;
             if (tableName.IsNullOrEmpty())
                 this.UpdateBuilder.TableName = this.EntityInfo.DbTableName;
-            return this; ;
+            return this;
         }
         public IUpdateable<T> EnableDiffLogEventIF(bool isEnableDiffLog, object businessData = null)
         {
@@ -414,10 +414,10 @@ namespace ThingsGateway.SqlSugar
         public IUpdateable<T> EnableDiffLogEvent(object businessData = null)
         {
             //Check.Exception(this.UpdateObjs.HasValue() && this.UpdateObjs.Count() > 1, "DiffLog does not support batch operations");
-            diffModel = new DiffLogModel();
+            DiffModel = new DiffLogModel();
             this.IsEnableDiffLogEvent = true;
-            diffModel.BusinessData = businessData;
-            diffModel.DiffType = DiffType.update;
+            DiffModel.BusinessData = businessData;
+            DiffModel.DiffType = DiffType.update;
             return this;
         }
 
@@ -458,7 +458,7 @@ namespace ThingsGateway.SqlSugar
                 return this;
             }
         }
-        public IUpdateable<T> IgnoreColumns(string[] columns)
+        public IUpdateable<T> IgnoreColumns(IReadOnlyList<string> columns)
         {
             if (columns.HasValue())
             {
@@ -477,15 +477,14 @@ namespace ThingsGateway.SqlSugar
             ThrowUpdateByExpression();
             if (this.UpdateObjs.HasValue())
             {
-                var oldColumns = this.UpdateBuilder.DbColumnInfoList.Select(it => it.PropertyName).ToList();
-                var ids = oldColumns.ToHashSet();
+                var oldColumns = this.UpdateBuilder.DbColumnInfoList.Select(it => it.PropertyName).ToHashSet();
                 foreach (var item in UpdateObjs)
                 {
                     setValueExpression(item);
                 }
                 this.UpdateBuilder.DbColumnInfoList = new List<DbColumnInfo>();
                 Init();
-                this.UpdateBuilder.DbColumnInfoList = this.UpdateBuilder.DbColumnInfoList.Where(it => ids.Contains(it.PropertyName)).ToList();
+                this.UpdateBuilder.DbColumnInfoList = this.UpdateBuilder.DbColumnInfoList.Where(it => oldColumns.Contains(it.PropertyName)).ToList();
             }
             return this;
         }
@@ -544,7 +543,7 @@ namespace ThingsGateway.SqlSugar
                     {
                         Sql = value,
                         DbColumnName = this.SqlBuilder.GetTranslationColumnName(this.EntityInfo.Columns.First(it => it.PropertyName == name).DbColumnName)
-                    }); ;
+                    });
                 }
             }
             return this;
@@ -557,7 +556,7 @@ namespace ThingsGateway.SqlSugar
             ThrowUpdateByExpression();
             if (this.UpdateObjs.HasValue())
             {
-                var oldColumns = this.UpdateBuilder.DbColumnInfoList.Select(it => it.PropertyName).ToList();
+                var oldColumns = this.UpdateBuilder.DbColumnInfoList.Select(it => it.PropertyName).ToHashSet();
                 var expression = (LambdaExpression.Lambda(method).Body as LambdaExpression).Body;
                 Check.Exception(!(expression is MethodCallExpression), method.ToString() + " is not method");
                 var callExpresion = expression as MethodCallExpression;
@@ -575,7 +574,7 @@ namespace ThingsGateway.SqlSugar
             this.IsWhereColumns = true;
             UpdateBuilder.IsWhereColumns = true;
             Check.Exception(UpdateParameterIsNull == true, "Updateable<T>().Updateable is error,Use Updateable(obj).WhereColumns");
-            var whereColumns = UpdateBuilder.GetExpressionValue(columns, ResolveExpressType.ArraySingle).GetResultArray().Select(it => this.SqlBuilder.GetNoTranslationColumnName(it)).ToList();
+            var whereColumns = UpdateBuilder.GetExpressionValue(columns, ResolveExpressType.ArraySingle).GetResultArray().Select(it => this.SqlBuilder.GetNoTranslationColumnName(it));
             if (this.WhereColumnList == null) this.WhereColumnList = new List<string>();
             foreach (var item in whereColumns)
             {
@@ -602,7 +601,7 @@ namespace ThingsGateway.SqlSugar
             return this;
         }
 
-        public IUpdateable<T> WhereColumns(string[] columnNames)
+        public IUpdateable<T> WhereColumns(IReadOnlyList<string> columnNames)
         {
             if (columnNames == null) return this;
 
@@ -619,12 +618,12 @@ namespace ThingsGateway.SqlSugar
         {
             ThrowUpdateByExpression();
             var updateColumns = UpdateBuilder.GetExpressionValue(columns, ResolveExpressType.ArraySingle).GetResultArray().Select(it => this.SqlBuilder.GetNoTranslationColumnName(it)).ToList();
-            return UpdateColumns(updateColumns.ToArray(), appendColumnsByDataFilter);
+            return UpdateColumns(updateColumns, appendColumnsByDataFilter);
         }
         public IUpdateable<T> UpdateColumns(Expression<Func<T, object>> columns)
         {
             ThrowUpdateByExpression();
-            var updateColumns = UpdateBuilder.GetExpressionValue(columns, ResolveExpressType.ArraySingle).GetResultArray().Select(it => this.SqlBuilder.GetNoTranslationColumnName(it)).ToList();
+            var updateColumns = UpdateBuilder.GetExpressionValue(columns, ResolveExpressType.ArraySingle).GetResultArray().Select(it => this.SqlBuilder.GetNoTranslationColumnName(it));
             if (this.UpdateBuilder.UpdateColumns == null)
             {
                 this.UpdateBuilder.UpdateColumns = new List<string>();
@@ -642,12 +641,12 @@ namespace ThingsGateway.SqlSugar
             //this.UpdateBuilder.DbColumnInfoList = this.UpdateBuilder.DbColumnInfoList.Where(it => updateColumns.Any(uc => uc.Equals(it.PropertyName, StringComparison.CurrentCultureIgnoreCase) || uc.Equals(it.DbColumnName, StringComparison.CurrentCultureIgnoreCase)) || it.IsPrimarykey || it.IsIdentity).ToList();
             return this;
         }
-        public IUpdateable<T> UpdateColumns(string[] columns, bool appendColumnsByDataFilter)
+        public IUpdateable<T> UpdateColumns(IReadOnlyList<string> columns, bool appendColumnsByDataFilter)
         {
             List<string> updateColumns = new List<string>();
             if (appendColumnsByDataFilter)
             {
-                var newData = new T() { };
+                var newData = new T();
                 UtilMethods.ClearPublicProperties(newData, this.EntityInfo);
                 var data = ((UpdateableProvider<T>)this.Context.UpdateableT(newData)).UpdateObjs[0];
                 foreach (var item in this.EntityInfo.Columns.Where(it => !it.IsPrimarykey && !it.IsIgnore && !it.IsOnlyIgnoreUpdate))
@@ -663,11 +662,11 @@ namespace ThingsGateway.SqlSugar
                 }
             }
             updateColumns.AddRange(columns);
-            return UpdateColumns(updateColumns.ToArray());
+            return UpdateColumns(updateColumns);
         }
-        public IUpdateable<T> UpdateColumns(string[] columns)
+        public IUpdateable<T> UpdateColumns(IReadOnlyList<string> columns)
         {
-            if (columns == null || columns.Length == 0) return this;
+            if (columns == null || columns.Count == 0) return this;
             ThrowUpdateByExpression();
             if (this.UpdateBuilder.UpdateColumns == null)
             {
@@ -867,7 +866,7 @@ namespace ThingsGateway.SqlSugar
             }
             if (appendColumnsByDataFilter)
             {
-                var newData = new T() { };
+                var newData = new T();
                 UtilMethods.ClearPublicProperties(newData, this.EntityInfo);
                 var data = ((UpdateableProvider<T>)this.Context.UpdateableT(newData)).UpdateObjs[0];
                 foreach (var item in this.EntityInfo.Columns.Where(it => !it.IsPrimarykey && !it.IsIgnore && !it.IsOnlyIgnoreUpdate))

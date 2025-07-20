@@ -161,11 +161,11 @@ namespace ThingsGateway.SqlSugar
                 }
                 if (IsDeleted)
                 {
-                    x.AsUpdateable.IgnoreColumns(ignoreColumns.ToArray()).PageSize(1).EnableQueryFilter().ExecuteCommand();
+                    x.AsUpdateable.IgnoreColumns(ignoreColumns).PageSize(1).EnableQueryFilter().ExecuteCommand();
                 }
                 else
                 {
-                    x.AsUpdateable.IgnoreColumns(ignoreColumns.ToArray()).ExecuteCommand();
+                    x.AsUpdateable.IgnoreColumns(ignoreColumns).ExecuteCommand();
                 }
             }
             else
@@ -174,11 +174,11 @@ namespace ThingsGateway.SqlSugar
                 var isIgnoreNull = _Options?.IgnoreNullColumns == true;
                 if (IsDeleted)
                 {
-                    x.AsUpdateable.IgnoreNullColumns(isIgnoreNull).IgnoreColumns(ignoreColumns?.ToArray()).PageSize(1).EnableQueryFilter().ExecuteCommand();
+                    x.AsUpdateable.IgnoreNullColumns(isIgnoreNull).IgnoreColumns(ignoreColumns).PageSize(1).EnableQueryFilter().ExecuteCommand();
                 }
                 else
                 {
-                    x.AsUpdateable.IgnoreNullColumns(isIgnoreNull).IgnoreColumns(ignoreColumns?.ToArray()).ExecuteCommand();
+                    x.AsUpdateable.IgnoreNullColumns(isIgnoreNull).IgnoreColumns(ignoreColumns).ExecuteCommand();
                 }
             }
             InitData(pkColumn, insertData);

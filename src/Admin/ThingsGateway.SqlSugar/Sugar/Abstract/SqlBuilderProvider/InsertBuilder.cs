@@ -189,7 +189,7 @@ namespace ThingsGateway.SqlSugar
                 {
                     batchInsetrSql.AppendFormat(SqlTemplateBatch, GetTableNameString, columnsString);
                     int i = 0;
-                    foreach (var columns in groupList.Skip((pageIndex - 1) * pageSize).Take(pageSize).ToList())
+                    foreach (var columns in groupList.Skip((pageIndex - 1) * pageSize).Take(pageSize))
                     {
                         var isFirst = i == 0;
                         if (!isFirst)

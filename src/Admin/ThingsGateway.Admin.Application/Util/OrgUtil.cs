@@ -24,8 +24,6 @@ public static class OrgUtil
         var data = items
         .Select((item, index) =>
             new SelectedItem(item.Id.ToString(), item.Name)
-            {
-            }
         ).ToList();
         return data;
     }

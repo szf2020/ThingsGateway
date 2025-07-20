@@ -240,14 +240,14 @@ namespace ThingsGateway.SqlSugar
         protected string AppendParameter(object paramterValue)
         {
             string parameterName = this.Context.SqlParameterKeyWord + "constant" + this.Context.ParameterIndex;
-            this.Context.ParameterIndex++; ;
+            this.Context.ParameterIndex++;
             this.Context.Parameters.Add(new SugarParameter(parameterName, paramterValue));
             return parameterName;
         }
         protected string AppendParameter(SugarParameter p)
         {
             p.ParameterName = p.ParameterName + this.Context.ParameterIndex;
-            this.Context.ParameterIndex++; ;
+            this.Context.ParameterIndex++;
             this.Context.Parameters.Add(p);
             return p.ParameterName;
         }

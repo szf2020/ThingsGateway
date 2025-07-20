@@ -23,7 +23,7 @@ namespace ThingsGateway.SqlSugar
                 return default(T);
             }
             Check.Exception(this.QueryBuilder.SelectValue.HasValue(), "'InSingle' and' Select' can't be used together,You can use .Select(it=>...).Single(it.id==1)");
-            var list = await In(pkValue).ToListAsync().ConfigureAwait(false);
+            var list = await In([pkValue]).ToListAsync().ConfigureAwait(false);
             if (list == null) return default(T);
             else return list.SingleOrDefault();
         }
@@ -392,11 +392,11 @@ namespace ThingsGateway.SqlSugar
             if (IsCache)
             {
                 var cacheService = this.Context.CurrentConnectionConfig.ConfigureExternalServices.DataInfoCacheService;
-                result = CacheSchemeMain.GetOrCreate<DataTable>(cacheService, this.QueryBuilder, () => { return this.Db.GetDataTable(sqlObj.Key, sqlObj.Value.ToArray()); }, CacheTime, this.Context, CacheKey);
+                result = CacheSchemeMain.GetOrCreate<DataTable>(cacheService, this.QueryBuilder, () => { return this.Db.GetDataTable(sqlObj.Key, sqlObj.Value); }, CacheTime, this.Context, CacheKey);
             }
             else
             {
-                result = await Db.GetDataTableAsync(sqlObj.Key, sqlObj.Value.ToArray()).ConfigureAwait(false);
+                result = await Db.GetDataTableAsync(sqlObj.Key, sqlObj.Value).ConfigureAwait(false);
             }
             return result;
         }
@@ -570,7 +570,7 @@ ParameterT parameter)
                 pkName = ((mappingField as LambdaExpression).Body as MemberExpression).Member.Name;
             }
             var key = thisField.ToString() + mappingField.ToString() + typeof(ParameterT).FullName + typeof(T).FullName;
-            var ids = list.Select(it => it.GetType().GetProperty(pkName).GetValue(it)).ToArray();
+            var ids = list.Select(it => it.GetType().GetProperty(pkName).GetValue(it)).Distinct();
             if (queryableContext.TempChildLists == null)
                 queryableContext.TempChildLists = new Dictionary<string, object>();
             if (list != null && queryableContext.TempChildLists.TryGetValue(key, out object? value))
@@ -648,20 +648,20 @@ ParameterT parameter)
         public virtual async Task<List<T>> ToTreeAsync(Expression<Func<T, IEnumerable<object>>> childListExpression, Expression<Func<T, object>> parentIdExpression, object rootValue)
         {
             var entity = this.Context.EntityMaintenance.GetEntityInfo<T>();
-            var pk = GetTreeKey(entity); ;
+            var pk = GetTreeKey(entity);
             var list = await ToListAsync().ConfigureAwait(false);
             return GetTreeRoot(childListExpression, parentIdExpression, pk, list, rootValue) ?? new List<T>();
         }
         public virtual async Task<List<T>> ToTreeAsync(Expression<Func<T, IEnumerable<object>>> childListExpression, Expression<Func<T, object>> parentIdExpression, object rootValue, Expression<Func<T, object>> primaryKeyExpression)
         {
             var entity = this.Context.EntityMaintenance.GetEntityInfo<T>();
-            var pk = ExpressionTool.GetMemberName(primaryKeyExpression); ;
+            var pk = ExpressionTool.GetMemberName(primaryKeyExpression);
             var list = await ToListAsync().ConfigureAwait(false);
             return GetTreeRoot(childListExpression, parentIdExpression, pk, list, rootValue) ?? new List<T>();
         }
         public virtual async Task<List<T>> ToParentListAsync(Expression<Func<T, object>> parentIdExpression, object primaryKeyValue)
         {
-            List<T> result = new List<T>() { };
+            List<T> result = new List<T>();
             var entity = this.Context.EntityMaintenance.GetEntityInfo<T>();
             var isTreeKey = entity.Columns.Any(it => it.IsTreeKey);
             if (isTreeKey)
@@ -690,7 +690,7 @@ ParameterT parameter)
                 result.Add(current);
                 object parentId = ParentInfo.PropertyInfo.GetValue(current, null);
                 int i = 0;
-                while (parentId != null && await Context.Queryable<T>().AS(tableName).Filter(null, QueryBuilder.IsDisabledGobalFilter).In(parentId).AnyAsync().ConfigureAwait(false))
+                while (parentId != null && await Context.Queryable<T>().AS(tableName).Filter(null, QueryBuilder.IsDisabledGobalFilter).In([parentId]).AnyAsync().ConfigureAwait(false))
                 {
                     Check.Exception(i > 100, ErrorMessage.GetThrowMessage("Dead cycle", "出现死循环或超出循环上限（100），检查最顶层的ParentId是否是null或者0"));
                     var parent = await Context.Queryable<T>().AS(tableName).WithCacheIF(IsCache, CacheTime).Filter(null, QueryBuilder.IsDisabledGobalFilter).InSingleAsync(parentId).ConfigureAwait(false);
@@ -703,7 +703,7 @@ ParameterT parameter)
         }
         public virtual async Task<List<T>> ToParentListAsync(Expression<Func<T, object>> parentIdExpression, object primaryKeyValue, Expression<Func<T, bool>> parentWhereExpression)
         {
-            List<T> result = new List<T>() { };
+            List<T> result = new List<T>();
             var entity = this.Context.EntityMaintenance.GetEntityInfo<T>();
             var isTreeKey = entity.Columns.Any(it => it.IsTreeKey);
             if (isTreeKey)
@@ -732,7 +732,7 @@ ParameterT parameter)
                 result.Add(current);
                 object parentId = ParentInfo.PropertyInfo.GetValue(current, null);
                 int i = 0;
-                while (parentId != null && await Context.Queryable<T>().AS(tableName).WhereIF(parentWhereExpression != default, parentWhereExpression).Filter(null, QueryBuilder.IsDisabledGobalFilter).In(parentId).AnyAsync().ConfigureAwait(false))
+                while (parentId != null && await Context.Queryable<T>().AS(tableName).WhereIF(parentWhereExpression != default, parentWhereExpression).Filter(null, QueryBuilder.IsDisabledGobalFilter).In([parentId]).AnyAsync().ConfigureAwait(false))
                 {
                     Check.Exception(i > 100, ErrorMessage.GetThrowMessage("Dead cycle", "出现死循环或超出循环上限（100），检查最顶层的ParentId是否是null或者0"));
                     var parent = await Context.Queryable<T>().AS(tableName).WhereIF(parentWhereExpression != default, parentWhereExpression).Filter(null, QueryBuilder.IsDisabledGobalFilter).InSingleAsync(parentId).ConfigureAwait(false);
@@ -780,7 +780,7 @@ ParameterT parameter)
         public virtual async Task<int> IntoTableAsync(Type TableEntityType, string TableName, CancellationToken cancellationToken = default)
         {
             this.Context.Ado.CancellationToken = cancellationToken;
-            KeyValuePair<string, List<SugarParameter>> sqlInfo;
+            KeyValuePair<string, IReadOnlyList<SugarParameter>> sqlInfo;
             string sql;
             OutIntoTableSql(TableName, out sqlInfo, out sql, TableEntityType);
             return await Context.Ado.ExecuteCommandAsync(sql, sqlInfo.Value).ConfigureAwait(false);

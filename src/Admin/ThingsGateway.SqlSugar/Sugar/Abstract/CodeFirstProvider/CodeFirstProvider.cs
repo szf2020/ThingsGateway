@@ -643,7 +643,7 @@ namespace ThingsGateway.SqlSugar
                     {
                         try
                         {
-                            this.Context.DbMaintenance.AddPrimaryKeys(tableName, newPkNames.ToArray());
+                            this.Context.DbMaintenance.AddPrimaryKeys(tableName, newPkNames);
                         }
                         catch (Exception ex)
                         {

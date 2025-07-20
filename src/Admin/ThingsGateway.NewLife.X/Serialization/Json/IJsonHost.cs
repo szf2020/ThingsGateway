@@ -299,9 +299,6 @@ public class SystemJson : IJsonHost
 
     #endregion
 
-    #region 属性
-
-    #endregion
 
     #region 构造
     /// <summary>实例化</summary>

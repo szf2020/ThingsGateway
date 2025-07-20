@@ -170,7 +170,7 @@
         private void Convert(UpdateableProvider<T> updateable)
         {
             updateable.IsEnableDiffLogEvent = Deleteable.IsEnableDiffLogEvent;
-            updateable.diffModel = Deleteable.diffModel;
+            updateable.DiffModel = Deleteable.DiffModel;
             updateable.UpdateBuilder.TableWithString = DeleteBuilder.TableWithString;
             updateable.RemoveCacheFunc = Deleteable.RemoveCacheFunc;
         }
@@ -189,7 +189,7 @@
             db = Deleteable.Context;
             if (DeleteBuilder.BigDataInValues?.Count > 0)
             {
-                var sql = db.Queryable<T>().Select("1").AS(nameof(T)).In(DeleteBuilder.BigDataInValues.ToArray()).ToSqlString();
+                var sql = db.Queryable<T>().Select("1").AS(nameof(T)).In(DeleteBuilder.BigDataInValues).ToSqlString();
                 var whereIndex = sql.IndexOf("  WHERE ");
                 var whereItem = sql.Substring(whereIndex + 7);
                 this.DeleteBuilder.WhereInfos.Add(whereItem);

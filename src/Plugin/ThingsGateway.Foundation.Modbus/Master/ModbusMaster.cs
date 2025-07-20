@@ -30,7 +30,7 @@ public partial class ModbusMaster : DtuServiceDeviceBase, IModbusAddress
         }
     }
 
-    public override IThingsGatewayBitConverter ThingsGatewayBitConverter { get; } = new ThingsGatewayBitConverter(EndianType.Big) { };
+    public override IThingsGatewayBitConverter ThingsGatewayBitConverter { get; } = new ThingsGatewayBitConverter(EndianType.Big);
 
     /// <summary>
     /// Modbus类型，在initChannelAsync之前设置
@@ -65,9 +65,7 @@ public partial class ModbusMaster : DtuServiceDeviceBase, IModbusAddress
                         };
 
                     case ChannelTypeEnum.UdpSession:
-                        return new DeviceUdpDataHandleAdapter<ModbusTcpMessage>()
-                        {
-                        };
+                        return new DeviceUdpDataHandleAdapter<ModbusTcpMessage>();
                 }
                 return new DeviceSingleStreamDataHandleAdapter<ModbusTcpMessage>()
                 {
@@ -86,9 +84,7 @@ public partial class ModbusMaster : DtuServiceDeviceBase, IModbusAddress
                         };
 
                     case ChannelTypeEnum.UdpSession:
-                        return new DeviceUdpDataHandleAdapter<ModbusRtuMessage>()
-                        {
-                        };
+                        return new DeviceUdpDataHandleAdapter<ModbusRtuMessage>();
                 }
                 return new DeviceSingleStreamDataHandleAdapter<ModbusRtuMessage>()
                 {

@@ -50,7 +50,7 @@ namespace ThingsGateway.SqlSugar
                 {
                     bulk.CharacterSet = this.CharacterSet;
                 }
-                bulk.Columns.AddRange(dt.Columns.Cast<DataColumn>().Select(colum => new MySqlBuilder().GetTranslationColumnName(colum.ColumnName)).Distinct().ToArray());
+                bulk.Columns.AddRange(dt.Columns.Cast<DataColumn>().Select(colum => new MySqlBuilder().GetTranslationColumnName(colum.ColumnName)).Distinct());
                 result = await bulk.LoadAsync().ConfigureAwait(false);
                 //执行成功才删除文件
                 if (File.Exists(fileName))

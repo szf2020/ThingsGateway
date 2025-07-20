@@ -161,8 +161,8 @@
             else if (_NavigateType == NavigateType.OneToMany && IsNoExistsNoInsert == true)
             {
                 children = new List<TChild>();
-                children.AddRange(x.InsertList.Select(it => it.Item).ToList());
-                var updateData = x.UpdateList.Select(it => it.Item).ToList();
+                children.AddRange(x.InsertList.Select(it => it.Item));
+                var updateData = x.UpdateList.Select(it => it.Item);
                 children.AddRange(updateData);
             }
             Check.ExceptionEasy(pkColumn == null && NavColumn == null, $"The entity is invalid", $"实体错误无法使用导航");

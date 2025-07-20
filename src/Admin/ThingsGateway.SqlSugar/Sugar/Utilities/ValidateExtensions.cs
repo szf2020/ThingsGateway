@@ -72,6 +72,11 @@ namespace ThingsGateway.SqlSugar
             if (thisValue?.Any() != true) return false;
             return true;
         }
+        public static bool HasValue(this IReadOnlyCollection<object> thisValue)
+        {
+            if (thisValue?.Count > 0) return true;
+            return false;
+        }
 
         public static bool IsValuable(this IEnumerable<KeyValuePair<string, string>> thisValue)
         {

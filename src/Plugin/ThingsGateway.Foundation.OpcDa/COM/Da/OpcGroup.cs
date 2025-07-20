@@ -85,7 +85,7 @@ internal sealed class OpcGroup : IOPCDataCallback, IDisposable
     }
 
     internal string Name { get; private set; } = string.Empty;
-    internal List<OpcItem> OpcItems { get; private set; } = new List<OpcItem> { };
+    internal List<OpcItem> OpcItems { get; private set; } = new List<OpcItem>();
 
     internal GCHandle PercendDeadBand
     {

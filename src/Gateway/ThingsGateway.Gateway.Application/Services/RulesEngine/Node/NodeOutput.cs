@@ -9,7 +9,7 @@ public class NodeOutput
     {
         get
         {
-            return JToken.FromObject(output); ;
+            return JToken.FromObject(output);
         }
     }
 

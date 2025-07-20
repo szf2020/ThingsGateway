@@ -115,7 +115,7 @@ namespace ThingsGateway.SqlSugar
         /// <param name="keyValuePair">原始SQL键值对</param>
         /// <param name="asName">表别名</param>
         /// <returns>处理后的SQL键值对</returns>
-        private KeyValuePair<string, List<SugarParameter>> GetSqlObj(KeyValuePair<string, List<SugarParameter>> keyValuePair, string asName)
+        private KeyValuePair<string, List<SugarParameter>> GetSqlObj(KeyValuePair<string, IReadOnlyList<SugarParameter>> keyValuePair, string asName)
         {
             List<SugarParameter> pars = new List<SugarParameter>();
             string sql = keyValuePair.Key;

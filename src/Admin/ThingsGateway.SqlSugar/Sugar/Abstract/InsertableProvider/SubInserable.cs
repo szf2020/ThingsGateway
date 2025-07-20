@@ -97,10 +97,6 @@ namespace ThingsGateway.SqlSugar
                     resul.Add(tree);
                 }
             }
-            else
-            {
-
-            }
             return resul;
         }
 

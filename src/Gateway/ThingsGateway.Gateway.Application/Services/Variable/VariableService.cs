@@ -258,46 +258,39 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
     [OperDesc("SaveVariable", isRecordPar: false, localizerType: typeof(Variable))]
     public async Task<bool> BatchSaveVariableAsync(List<Variable> input, ItemChangedType type)
     {
-        try
+
+
+        if (type == ItemChangedType.Add)
         {
 
+            ManageHelper.CheckVariableCount(input.Count);
 
-            if (type == ItemChangedType.Add)
+            using var db = GetDB();
+
+
+            var result = await db.Insertable(input).ExecuteCommandAsync().ConfigureAwait(false);
+
+            if (result > 0)
             {
+                DeleteVariableCache();
+                return true;
 
-                ManageHelper.CheckVariableCount(input.Count);
-
-                using var db = GetDB();
-
-
-                var result = await db.Insertable(input).ExecuteCommandAsync().ConfigureAwait(false);
-
-                if (result > 0)
-                {
-                    DeleteVariableCache();
-                    return true;
-
-                }
             }
-            else
-            {
-
-                using var db = GetDB();
-
-                var result = await db.Updateable(input).ExecuteCommandAsync().ConfigureAwait(false);
-
-                if (result > 0)
-                {
-                    DeleteVariableCache();
-                    return true;
-                }
-            }
-            return false;
         }
-        finally
+        else
         {
 
+            using var db = GetDB();
+
+            var result = await db.Updateable(input).ExecuteCommandAsync().ConfigureAwait(false);
+
+            if (result > 0)
+            {
+                DeleteVariableCache();
+                return true;
+            }
         }
+        return false;
     }
 
     /// <inheritdoc/>

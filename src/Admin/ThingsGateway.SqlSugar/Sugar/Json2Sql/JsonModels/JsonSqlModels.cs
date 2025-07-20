@@ -4,7 +4,7 @@
     {
 
 
-        public SqlObjectResult(KeyValuePair<string, List<SugarParameter>> keyValuePair, JsonProviderType jsonSqlType)
+        public SqlObjectResult(KeyValuePair<string, IReadOnlyList<SugarParameter>> keyValuePair, JsonProviderType jsonSqlType)
         {
             this.Sql = keyValuePair.Key;
             this.Parameters = keyValuePair.Value;
@@ -13,6 +13,6 @@
 
         public JsonProviderType JsonSqlType { get; set; }
         public string Sql { get; set; }
-        public List<SugarParameter> Parameters { get; set; }
+        public IReadOnlyList<SugarParameter> Parameters { get; set; }
     }
 }

@@ -125,75 +125,68 @@ public class SiemensS7Master : CollectFoundationBase
     {
 
         using var writeLock = ReadWriteLock.WriterLock();
-        try
+
+        // 检查协议是否为空，如果为空则抛出异常
+        if (FoundationDevice == null)
+            throw new NotSupportedException();
+
+        // 创建用于存储操作结果的并发字典
+        ConcurrentDictionary<string, OperResult> operResults = new();
+
+        //转换
+        Dictionary<VariableRuntime, SiemensS7Address> addresses = new();
+        var w1 = writeInfoLists.Where(a => a.Key.DataType != DataTypeEnum.String);
+        var w2 = writeInfoLists.Where(a => a.Key.DataType == DataTypeEnum.String);
+        foreach (var item in w1)
         {
-
-            // 检查协议是否为空，如果为空则抛出异常
-            if (FoundationDevice == null)
-                throw new NotSupportedException();
-
-            // 创建用于存储操作结果的并发字典
-            ConcurrentDictionary<string, OperResult> operResults = new();
-
-            //转换
-            Dictionary<VariableRuntime, SiemensS7Address> addresses = new();
-            var w1 = writeInfoLists.Where(a => a.Key.DataType != DataTypeEnum.String);
-            var w2 = writeInfoLists.Where(a => a.Key.DataType == DataTypeEnum.String);
-            foreach (var item in w1)
+            SiemensS7Address siemensS7Address = SiemensS7Address.ParseFrom(item.Key.RegisterAddress);
+            siemensS7Address.Data = GetBytes(item.Key.DataType, item.Value);
+            siemensS7Address.Length = siemensS7Address.Data.Length;
+            siemensS7Address.BitLength = 1;
+            siemensS7Address.IsBit = item.Key.DataType == DataTypeEnum.Boolean;
+            if (item.Key.DataType == DataTypeEnum.Boolean)
             {
-                SiemensS7Address siemensS7Address = SiemensS7Address.ParseFrom(item.Key.RegisterAddress);
-                siemensS7Address.Data = GetBytes(item.Key.DataType, item.Value);
-                siemensS7Address.Length = siemensS7Address.Data.Length;
-                siemensS7Address.BitLength = 1;
-                siemensS7Address.IsBit = item.Key.DataType == DataTypeEnum.Boolean;
-                if (item.Key.DataType == DataTypeEnum.Boolean)
+                if (item.Value is JArray jArray)
                 {
-                    if (item.Value is JArray jArray)
-                    {
-                        siemensS7Address.BitLength = jArray.ToObject<Boolean[]>().Length;
-                    }
-                }
-                addresses.Add(item.Key, siemensS7Address);
-            }
-            if (addresses.Count > 0)
-            {
-
-                var result = await _plc.S7WriteAsync(addresses.Select(a => a.Value).ToArray(), cancellationToken).ConfigureAwait(false);
-                foreach (var writeInfo in addresses)
-                {
-                    if (result.TryGetValue(writeInfo.Value, out var r1))
-                    {
-                        operResults.TryAdd(writeInfo.Key.Name, r1);
-                    }
+                    siemensS7Address.BitLength = jArray.ToObject<Boolean[]>().Length;
                 }
             }
-
-            // 使用并发方式遍历写入信息列表，并进行异步写入操作
-            await w2.ForEachAsync(async (writeInfo) =>
-            {
-                try
-                {
-                    // 调用协议的写入方法，将写入信息中的数据写入到对应的寄存器地址，并获取操作结果
-                    var result = await FoundationDevice.WriteAsync(writeInfo.Key.RegisterAddress, writeInfo.Value, writeInfo.Key.DataType, cancellationToken).ConfigureAwait(false);
-
-                    // 将操作结果添加到结果字典中，使用变量名称作为键
-                    operResults.TryAdd(writeInfo.Key.Name, result);
-                }
-                catch (Exception ex)
-                {
-                    operResults.TryAdd(writeInfo.Key.Name, new(ex));
-                }
-            }).ConfigureAwait(false);
-
-            await Check(writeInfoLists, operResults, cancellationToken).ConfigureAwait(false);
-
-            // 返回包含操作结果的字典
-            return new Dictionary<string, OperResult>(operResults);
+            addresses.Add(item.Key, siemensS7Address);
         }
-        finally
+        if (addresses.Count > 0)
         {
 
+            var result = await _plc.S7WriteAsync(addresses.Select(a => a.Value).ToArray(), cancellationToken).ConfigureAwait(false);
+            foreach (var writeInfo in addresses)
+            {
+                if (result.TryGetValue(writeInfo.Value, out var r1))
+                {
+                    operResults.TryAdd(writeInfo.Key.Name, r1);
+                }
+            }
         }
+
+        // 使用并发方式遍历写入信息列表，并进行异步写入操作
+        await w2.ForEachAsync(async (writeInfo) =>
+        {
+            try
+            {
+                // 调用协议的写入方法，将写入信息中的数据写入到对应的寄存器地址，并获取操作结果
+                var result = await FoundationDevice.WriteAsync(writeInfo.Key.RegisterAddress, writeInfo.Value, writeInfo.Key.DataType, cancellationToken).ConfigureAwait(false);
+
+                // 将操作结果添加到结果字典中，使用变量名称作为键
+                operResults.TryAdd(writeInfo.Key.Name, result);
+            }
+            catch (Exception ex)
+            {
+                operResults.TryAdd(writeInfo.Key.Name, new(ex));
+            }
+        }).ConfigureAwait(false);
+
+        await Check(writeInfoLists, operResults, cancellationToken).ConfigureAwait(false);
+
+        // 返回包含操作结果的字典
+        return new Dictionary<string, OperResult>(operResults);
 
     }
 
@@ -220,21 +213,17 @@ public class SiemensS7Master : CollectFoundationBase
     {
         try
         {
-            try
-            {
-                await _plc.Channel.ConnectAsync().ConfigureAwait(false);
-            }
-            catch
-            {
-
-            }
-            List<VariableSourceRead> variableSourceReads = new();
-            foreach (var deviceVariable in deviceVariables.GroupBy(a => a.CollectGroup))
-            {
-                variableSourceReads.AddRange(_plc.LoadSourceRead<VariableSourceRead>(deviceVariable, _driverPropertys.MaxPack, CurrentDevice.IntervalTime));
-            }
-            return variableSourceReads;
+            await _plc.Channel.ConnectAsync().ConfigureAwait(false);
         }
-        finally { }
+        catch
+        {
+
+        }
+        List<VariableSourceRead> variableSourceReads = new();
+        foreach (var deviceVariable in deviceVariables.GroupBy(a => a.CollectGroup))
+        {
+            variableSourceReads.AddRange(_plc.LoadSourceRead<VariableSourceRead>(deviceVariable, _driverPropertys.MaxPack, CurrentDevice.IntervalTime));
+        }
+        return variableSourceReads;
     }
 }

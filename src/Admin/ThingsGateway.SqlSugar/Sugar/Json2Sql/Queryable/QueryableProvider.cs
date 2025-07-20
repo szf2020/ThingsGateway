@@ -43,12 +43,12 @@
                 return this;
             }
             var orderObj = this.SqlBuilder.GroupByModelToSql(models);
-            if (orderObj.Value?.Length > 0 && this.Context.CurrentConnectionConfig?.DbType == DbType.SqlServer)
+            if (orderObj.Value?.Count > 0 && this.Context.CurrentConnectionConfig?.DbType == DbType.SqlServer)
             {
                 var groupBySql = UtilMethods.GetSqlString(DbType.SqlServer, orderObj.Key, orderObj.Value);
                 this.QueryBuilder.GroupBySql = groupBySql;
                 this.QueryBuilder.GroupBySqlOld = orderObj.Key;
-                this.QueryBuilder.GroupParameters = orderObj.Value.ToList();
+                this.QueryBuilder.GroupParameters = orderObj.Value;
                 this.GroupBy(orderObj.Key);
             }
             else
@@ -63,7 +63,7 @@
             var orderObj = this.SqlBuilder.SelectModelToSql(models);
             if (this.QueryBuilder.GroupParameters?.Count > 0 && this.QueryBuilder.GroupBySql.HasValue())
             {
-                var selectSql = UtilMethods.GetSqlString(DbType.SqlServer, orderObj.Key, UtilMethods.CopySugarParameters(orderObj.Value.ToList()).ToArray());
+                var selectSql = UtilMethods.GetSqlString(DbType.SqlServer, orderObj.Key, UtilMethods.CopySugarParameters(orderObj.Value));
                 if (selectSql.Contains(this.QueryBuilder.GroupBySql))
                 {
                     this.Select(UtilConstants.GroupReplaceKey + selectSql);

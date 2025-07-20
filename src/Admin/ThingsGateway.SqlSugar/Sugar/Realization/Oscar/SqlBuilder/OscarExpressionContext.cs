@@ -160,7 +160,7 @@
         {
             var parameter = model.Args[0];
             var parameter2 = model.Args[1];
-            return string.Format(" (date_part('day',{0}-{1})=0) ", parameter.MemberName, parameter2.MemberName); ;
+            return string.Format(" (date_part('day',{0}-{1})=0) ", parameter.MemberName, parameter2.MemberName);
         }
 
         public override string DateIsSameByType(MethodCallExpressionModel model)

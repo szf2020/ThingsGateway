@@ -16,6 +16,4 @@ public class MessageEventArgs : EventArgs
     public Object? UserState { get; set; }
     #endregion
 
-    #region 方法
-    #endregion
 }

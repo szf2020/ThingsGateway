@@ -282,7 +282,7 @@ namespace ThingsGateway.SqlSugar
         {
             this.SugarActionType = SugarActionType.Insert;
             var result = InstanceFactory.GetInsertableProvider<T>(this.CurrentConnectionConfig);
-            var sqlBuilder = InstanceFactory.GetSqlbuilder(this.CurrentConnectionConfig); ;
+            var sqlBuilder = InstanceFactory.GetSqlbuilder(this.CurrentConnectionConfig);
             result.Context = this;
             result.EntityInfo = this.Context.EntityMaintenance.GetEntityInfo<T>();
             result.SqlBuilder = sqlBuilder;
@@ -302,7 +302,7 @@ namespace ThingsGateway.SqlSugar
         {
             this.SugarActionType = SugarActionType.Delete;
             var result = InstanceFactory.GetDeleteableProvider<T>(this.CurrentConnectionConfig);
-            var sqlBuilder = InstanceFactory.GetSqlbuilder(this.CurrentConnectionConfig); ;
+            var sqlBuilder = InstanceFactory.GetSqlbuilder(this.CurrentConnectionConfig);
             result.Context = this;
             result.SqlBuilder = sqlBuilder;
             sqlBuilder.DeleteBuilder = result.DeleteBuilder = InstanceFactory.GetDeleteBuilder(this.CurrentConnectionConfig);
@@ -319,7 +319,7 @@ namespace ThingsGateway.SqlSugar
         {
             this.SugarActionType = SugarActionType.Update;
             var result = InstanceFactory.GetUpdateableProvider<T>(this.CurrentConnectionConfig);
-            var sqlBuilder = InstanceFactory.GetSqlbuilder(this.CurrentConnectionConfig); ;
+            var sqlBuilder = InstanceFactory.GetSqlbuilder(this.CurrentConnectionConfig);
             result.Context = this;
             result.EntityInfo = this.Context.EntityMaintenance.GetEntityInfo<T>();
             result.SqlBuilder = sqlBuilder;
@@ -627,7 +627,7 @@ namespace ThingsGateway.SqlSugar
             return result;
         }
 
-        private string[] MergeJoinArray(string[] joinArray)
+        private string[] MergeJoinArray(IReadOnlyList<string> joinArray)
         {
             List<string> result = new List<string>();
             string joinValue = null;
@@ -636,7 +636,7 @@ namespace ThingsGateway.SqlSugar
             foreach (var item in joinArray)
             {
                 ++i;
-                var isLast = joinArray.Length == i;
+                var isLast = joinArray.Count == i;
                 var isJoinType = item.IsIn(JoinType.Full.ToString(), JoinType.Inner.ToString(), JoinType.Left.ToString(), JoinType.Right.ToString(), JoinType.Cross.ToString());
                 if (isJoinType)
                 {
@@ -655,7 +655,7 @@ namespace ThingsGateway.SqlSugar
                     result.Add(joinValue);
                 }
             }
-            return result.ToArray(); ;
+            return result.ToArray();
         }
 
         protected Dictionary<string, string> GetEasyJoinInfo(Expression joinExpression, ref string shortName, ISqlBuilder builder, params Type[] entityTypeArray)

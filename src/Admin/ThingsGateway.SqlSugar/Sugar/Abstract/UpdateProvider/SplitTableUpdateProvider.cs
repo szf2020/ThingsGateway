@@ -94,7 +94,7 @@ namespace ThingsGateway.SqlSugar
             return result;
         }
 
-        private KeyValuePair<string, List<SugarParameter>> GetSqlObj(KeyValuePair<string, List<SugarParameter>> keyValuePair, string asName)
+        private KeyValuePair<string, List<SugarParameter>> GetSqlObj(KeyValuePair<string, IReadOnlyList<SugarParameter>> keyValuePair, string asName)
         {
             List<SugarParameter> pars = new List<SugarParameter>();
             string sql = keyValuePair.Key;

@@ -357,7 +357,7 @@ namespace ThingsGateway.SqlSugar
                             MemberValue=DateType.Weekday
                       }
                   }
-            }); ;
+            });
             base.AppendMember(parameter, isLeft, result);
         }
 
@@ -396,7 +396,7 @@ namespace ThingsGateway.SqlSugar
                             MemberValue=end
                       }
                   }
-            }); ;
+            });
             base.AppendMember(parameter, isLeft, result);
         }
         private void ResolveDateDateByCall(ExpressionParameter parameter, bool? isLeft, MemberExpression expression)

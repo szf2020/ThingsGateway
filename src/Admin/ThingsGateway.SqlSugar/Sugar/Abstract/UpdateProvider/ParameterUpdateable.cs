@@ -14,13 +14,13 @@ namespace ThingsGateway.SqlSugar
             var list = Updateable.UpdateObjs;
             var count = list.Count;
             var size = GetPageSize(20, count);
-            Context.Utilities.PageEach(list.ToList(), size, item =>
+            Context.Utilities.PageEach(list, size, item =>
             {
-                Before(item.ToList());
+                Before(item);
                 List<SugarParameter> allParamter = new List<SugarParameter>();
                 var sql = GetSql(item);
                 result += Context.Ado.ExecuteCommand(sql.Key, sql.Value);
-                After(item.ToList());
+                After(item);
             });
             return result < 0 ? count : result;
         }
@@ -30,13 +30,13 @@ namespace ThingsGateway.SqlSugar
             var list = Updateable.UpdateObjs;
             var count = list.Count;
             var size = GetPageSize(20, count);
-            await Context.Utilities.PageEachAsync(list.ToList(), size, async item =>
+            await Context.Utilities.PageEachAsync(list, size, async item =>
             {
-                Before(item.ToList());
+                Before(item);
                 List<SugarParameter> allParamter = new List<SugarParameter>();
                 var sql = GetSql(item);
                 result += await Context.Ado.ExecuteCommandAsync(sql.Key, sql.Value).ConfigureAwait(false);
-                After(item.ToList());
+                After(item);
             }).ConfigureAwait(false);
             return result < 0 ? count : result;
         }
@@ -51,9 +51,9 @@ namespace ThingsGateway.SqlSugar
                 var parameters = Updateable.UpdateBuilder.Parameters;
                 if (parameters == null)
                     parameters = new List<SugarParameter>();
-                Updateable.diffModel.BeforeData = GetDiffTable(updateObjects);
-                Updateable.diffModel.Sql = this.Updateable.UpdateBuilder.ToSqlString();
-                Updateable.diffModel.Parameters = parameters.ToArray();
+                Updateable.DiffModel.BeforeData = GetDiffTable(updateObjects);
+                Updateable.DiffModel.Sql = this.Updateable.UpdateBuilder.ToSqlString();
+                Updateable.DiffModel.Parameters = parameters;
                 this.Updateable.Ado.IsDisableMasterSlaveSeparation = isDisableMasterSlaveSeparation;
             }
         }
@@ -64,10 +64,10 @@ namespace ThingsGateway.SqlSugar
             {
                 var isDisableMasterSlaveSeparation = this.Updateable.Ado.IsDisableMasterSlaveSeparation;
                 this.Updateable.Ado.IsDisableMasterSlaveSeparation = true;
-                Updateable.diffModel.AfterData = GetDiffTable(updateObjects);
-                Updateable.diffModel.Time = this.Context.Ado.SqlExecutionTime;
+                Updateable.DiffModel.AfterData = GetDiffTable(updateObjects);
+                Updateable.DiffModel.Time = this.Context.Ado.SqlExecutionTime;
                 if (this.Context.CurrentConnectionConfig.AopEvents.OnDiffLogEvent != null)
-                    this.Context.CurrentConnectionConfig.AopEvents.OnDiffLogEvent(Updateable.diffModel);
+                    this.Context.CurrentConnectionConfig.AopEvents.OnDiffLogEvent(Updateable.DiffModel);
                 this.Updateable.Ado.IsDisableMasterSlaveSeparation = isDisableMasterSlaveSeparation;
             }
             if (this.Updateable.RemoveCacheFunc != null)
@@ -90,7 +90,7 @@ namespace ThingsGateway.SqlSugar
             var dataColumns = sqlDb.Updateable(updateObjects).UpdateBuilder.DbColumnInfoList;
             List<SugarParameter> parameters = new List<SugarParameter>();
             StringBuilder allWhereString = new StringBuilder();
-            string columnStr = string.Join(",", dataColumns.Select(x => x.DbColumnName).Distinct().ToList());
+            string columnStr = string.Join(",", dataColumns.Select(x => x.DbColumnName).Distinct());
             foreach (var item in dataColumns.GroupBy(it => it.TableId))
             {
                 StringBuilder whereString = new StringBuilder();
@@ -110,11 +110,10 @@ namespace ThingsGateway.SqlSugar
 
         #region Values Helper
 
-        public KeyValuePair<string, SugarParameter[]> GetSql(List<T> updateObjects)
+        public KeyValuePair<string, IReadOnlyList<SugarParameter>> GetSql(List<T> updateObjects)
         {
             var inserable = Updateable as UpdateableProvider<T>;
             var builder = inserable.UpdateBuilder.Builder;
-            var columns = inserable.UpdateBuilder.DbColumnInfoList.GroupBy(it => it.DbColumnName).Select(it => it.Key).Distinct().ToList();
             var tableWithString = builder.GetTranslationColumnName(inserable.UpdateBuilder.TableName);
             var wheres = inserable.WhereColumnList ?? inserable.UpdateBuilder.PrimaryKeys;
             if (wheres == null)
@@ -128,10 +127,9 @@ namespace ThingsGateway.SqlSugar
             Check.ExceptionEasy(wheres?.Count == 0, "Updates cannot be without a primary key or condition", "更新不能没有主键或者条件");
             var sqlDb = this.Context.CopyNew();
             sqlDb.Aop.DataExecuting = null;
-            foreach (var item in sqlDb.Updateable(updateObjects).UpdateBuilder.DbColumnInfoList.GroupBy(it => it.TableId))
+            foreach (var list in sqlDb.Updateable(updateObjects).UpdateBuilder.DbColumnInfoList.GroupBy(it => it.TableId))
             {
-                var list = item.ToList();
-                Check.ExceptionEasy(list?.Count == 0, "Set has no columns", "更新Set没有列");
+                Check.ExceptionEasy(list?.Any() != true, "Set has no columns", "更新Set没有列");
                 StringBuilder setString = new StringBuilder();
                 foreach (var setItem in list)
                 {
@@ -164,7 +162,7 @@ namespace ThingsGateway.SqlSugar
                 sbAllSql.Append(builderItem);
             }
             builder.FormatSaveQueueSql(sbAllSql);
-            return new KeyValuePair<string, SugarParameter[]>(sbAllSql.ToString(), parameters.ToArray());
+            return new KeyValuePair<string, IReadOnlyList<SugarParameter>>(sbAllSql.ToString(), parameters);
         }
 
         private int GetPageSize(int pageSize, int count)

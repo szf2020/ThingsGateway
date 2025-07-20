@@ -89,7 +89,4 @@ internal sealed class FileService : IFileService
         if (!allowTypeS.Contains(fileSuffix)) throw Oops.Bah(_localizer["FileTypeError", fileSuffix]);
     }
 
-    #region 方法
-
-    #endregion 方法
 }

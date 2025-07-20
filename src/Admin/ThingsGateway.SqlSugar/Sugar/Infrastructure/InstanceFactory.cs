@@ -1,4 +1,6 @@
 ﻿using System.Reflection;
+
+using ThingsGateway.NewLife.Collections;
 namespace ThingsGateway.SqlSugar
 {
 
@@ -7,17 +9,14 @@ namespace ThingsGateway.SqlSugar
         static Assembly assembly = Assembly.GetExecutingAssembly();
         static Dictionary<string, Type> typeCache = new Dictionary<string, Type>();
         private static string _CustomDllName = "";
-        private static List<string> CustomDlls = new List<string>();
+        private static ConcurrentHashSet<string> CustomDlls = new ConcurrentHashSet<string>();
         public static Assembly[] CustomAssemblies = Array.Empty<Assembly>();
         public static string CustomDllName
         {
             get { return _CustomDllName; }
             set
             {
-                if (!CustomDlls.Contains(value))
-                {
-                    CustomDlls.Add(value);
-                }
+                CustomDlls.TryAdd(value);
                 _CustomDllName = value;
             }
         }
@@ -710,7 +709,7 @@ namespace ThingsGateway.SqlSugar
         internal static Type GetCustomTypeByClass(string className)
         {
             Type type = null;
-            foreach (var item in CustomDlls.ToArray())
+            foreach (var item in CustomDlls)
             {
                 if (type == null)
                 {
@@ -770,7 +769,7 @@ namespace ThingsGateway.SqlSugar
         internal static Type GetCustomTypeByClass<T>(string className)
         {
             Type type = null;
-            foreach (var item in CustomDlls.ToArray())
+            foreach (var item in CustomDlls)
             {
                 if (type == null)
                 {

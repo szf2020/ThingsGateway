@@ -48,7 +48,7 @@
 
     public class QueueList : List<QueueItem>
     {
-        public void Add(string sql, SugarParameter[] parameters)
+        public void Add(string sql, IReadOnlyList<SugarParameter> parameters)
         {
             this.Add(new QueueItem() { Sql = sql, Parameters = parameters });
         }
@@ -56,7 +56,7 @@
         {
             if (parameters == null)
                 parameters = new List<SugarParameter>();
-            this.Add(new QueueItem() { Sql = sql, Parameters = parameters.ToArray() });
+            this.Add(new QueueItem() { Sql = sql, Parameters = parameters });
         }
         public new void Clear()
         {

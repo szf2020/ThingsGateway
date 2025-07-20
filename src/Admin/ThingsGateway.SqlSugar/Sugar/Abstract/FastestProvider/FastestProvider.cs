@@ -44,7 +44,7 @@ namespace ThingsGateway.SqlSugar
             if (Size > 0)
             {
                 int resul = 0;
-                await context.Utilities.PageEachAsync(dt.Rows.Cast<DataRow>().ToList(), Size, async item =>
+                await context.Utilities.PageEachAsync(dt.Rows.Cast<DataRow>(), Size, async item =>
                 {
                     resul += await _BulkCopy(tableName, item.CopyToDataTable()).ConfigureAwait(false);
                 }).ConfigureAwait(false);
@@ -177,7 +177,7 @@ namespace ThingsGateway.SqlSugar
             if (Size > 0)
             {
                 int resul = 0;
-                await context.Utilities.PageEachAsync(dataTable.Rows.Cast<DataRow>().ToList(), Size, async item =>
+                await context.Utilities.PageEachAsync(dataTable.Rows.Cast<DataRow>(), Size, async item =>
                 {
                     resul += await _BulkUpdate(tableName, item.CopyToDataTable(), whereColumns, updateColumns).ConfigureAwait(false);
                 }).ConfigureAwait(false);
@@ -195,7 +195,7 @@ namespace ThingsGateway.SqlSugar
         public Task<int> BulkMergeAsync(List<T> datas)
         {
             var updateColumns = entityInfo.Columns.Where(it => !it.IsPrimarykey && !it.IsIdentity && !it.IsOnlyIgnoreUpdate && !it.IsIgnore).Select(it => it.DbColumnName ?? it.PropertyName).ToArray();
-            var whereColumns = entityInfo.Columns.Where(it => it.IsPrimarykey).Select(it => it.DbColumnName ?? it.PropertyName).ToArray(); ;
+            var whereColumns = entityInfo.Columns.Where(it => it.IsPrimarykey).Select(it => it.DbColumnName ?? it.PropertyName).ToArray();
             return BulkMergeAsync(datas, whereColumns, updateColumns);
         }
         /// <summary>批量合并实体列表</summary>
@@ -451,7 +451,7 @@ namespace ThingsGateway.SqlSugar
                                 {
                                     item[col.ColumnName] = " ";
                                 }
-                                ;
+
                             }
                             else if (col.DataType == UtilConstants.DateType)
                             {

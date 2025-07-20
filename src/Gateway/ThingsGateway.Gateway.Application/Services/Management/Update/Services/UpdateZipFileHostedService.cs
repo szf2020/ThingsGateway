@@ -186,9 +186,6 @@ internal sealed class UpdateZipFileHostedService : BackgroundService, IUpdateZip
                         RestartServerHelper.ExtractUpdate();
                     }
                 }
-                else
-                {
-                }
             }
             finally
             {

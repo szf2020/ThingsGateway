@@ -178,12 +178,12 @@
                 this.Context.Aop.DataExecuting = dataEvent;
                 groupInserable.InsertBuilder.TableWithString = parent.InsertBuilder.TableWithString;
                 groupInserable.RemoveCacheFunc = parent.RemoveCacheFunc;
-                groupInserable.diffModel = parent.diffModel;
+                groupInserable.DiffModel = parent.DiffModel;
                 groupInserable.IsEnableDiffLogEvent = parent.IsEnableDiffLogEvent;
                 groupInserable.InsertBuilder.IsNoInsertNull = parent.InsertBuilder.IsNoInsertNull;
                 groupInserable.IsOffIdentity = parent.IsOffIdentity;
                 groupInserable.InsertBuilder.MySqlIgnore = this.MySqlIgnore;
-                result += groupInserable.AS(item.Key).InsertColumns(names.ToArray()).ExecuteCommand();
+                result += groupInserable.AS(item.Key).InsertColumns(names).ExecuteCommand();
             }
             return result;
         }
@@ -207,12 +207,12 @@
                 this.Context.Aop.DataExecuting = dataEvent;
                 groupInserable.InsertBuilder.TableWithString = parent.InsertBuilder.TableWithString;
                 groupInserable.RemoveCacheFunc = parent.RemoveCacheFunc;
-                groupInserable.diffModel = parent.diffModel;
+                groupInserable.DiffModel = parent.DiffModel;
                 groupInserable.IsEnableDiffLogEvent = parent.IsEnableDiffLogEvent;
                 groupInserable.InsertBuilder.IsNoInsertNull = parent.InsertBuilder.IsNoInsertNull;
                 groupInserable.IsOffIdentity = parent.IsOffIdentity;
                 groupInserable.InsertBuilder.MySqlIgnore = this.MySqlIgnore;
-                result += await groupInserable.AS(item.Key).InsertColumns(names.ToArray()).ExecuteCommandAsync().ConfigureAwait(false);
+                result += await groupInserable.AS(item.Key).InsertColumns(names).ExecuteCommandAsync().ConfigureAwait(false);
             }
             return result;
         }
@@ -233,12 +233,12 @@
                 var groupInserable = (InsertableProvider<T>)this.Context.Insertable<T>(list);
                 groupInserable.InsertBuilder.TableWithString = parent.InsertBuilder.TableWithString;
                 groupInserable.RemoveCacheFunc = parent.RemoveCacheFunc;
-                groupInserable.diffModel = parent.diffModel;
+                groupInserable.DiffModel = parent.DiffModel;
                 groupInserable.IsEnableDiffLogEvent = parent.IsEnableDiffLogEvent;
                 groupInserable.InsertBuilder.IsNoInsertNull = parent.InsertBuilder.IsNoInsertNull;
                 groupInserable.IsOffIdentity = parent.IsOffIdentity;
                 groupInserable.InsertBuilder.MySqlIgnore = this.MySqlIgnore;
-                var idList = groupInserable.AS(item.Key).InsertColumns(names.ToArray()).ExecuteReturnSnowflakeIdList();
+                var idList = groupInserable.AS(item.Key).InsertColumns(names).ExecuteReturnSnowflakeIdList();
                 result.AddRange(idList);
             }
             return result;
@@ -260,12 +260,12 @@
                 var groupInserable = (InsertableProvider<T>)this.Context.Insertable<T>(list);
                 groupInserable.InsertBuilder.TableWithString = parent.InsertBuilder.TableWithString;
                 groupInserable.RemoveCacheFunc = parent.RemoveCacheFunc;
-                groupInserable.diffModel = parent.diffModel;
+                groupInserable.DiffModel = parent.DiffModel;
                 groupInserable.IsEnableDiffLogEvent = parent.IsEnableDiffLogEvent;
                 groupInserable.InsertBuilder.IsNoInsertNull = parent.InsertBuilder.IsNoInsertNull;
                 groupInserable.IsOffIdentity = parent.IsOffIdentity;
                 groupInserable.InsertBuilder.MySqlIgnore = this.MySqlIgnore;
-                var idList = await groupInserable.AS(item.Key).InsertColumns(names.ToArray()).ExecuteReturnSnowflakeIdListAsync().ConfigureAwait(false);
+                var idList = await groupInserable.AS(item.Key).InsertColumns(names).ExecuteReturnSnowflakeIdListAsync().ConfigureAwait(false);
                 result.AddRange(idList);
             }
             return result;

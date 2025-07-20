@@ -3,10 +3,10 @@ namespace ThingsGateway.SqlSugar
 {
     public abstract partial class SqlBuilderProvider : SqlBuilderAccessory, ISqlBuilder
     {
-        public KeyValuePair<string, SugarParameter[]> GroupByModelToSql(List<GroupByModel> models)
+        public KeyValuePair<string, IReadOnlyList<SugarParameter>> GroupByModelToSql(List<GroupByModel> models)
         {
             StringBuilder sql = new StringBuilder("");
-            var pars = new List<SugarParameter> { };
+            var pars = new List<SugarParameter>();
             foreach (var item in models)
             {
                 if (item is GroupByModel && item.FieldName is IFuncModel)
@@ -19,13 +19,9 @@ namespace ThingsGateway.SqlSugar
                     var orderByModel = item as GroupByModel;
                     sql.Append($" {this.GetTranslationColumnName(orderByModel.FieldName.ObjToString().ToSqlFilter())} ,");
                 }
-                else
-                {
-
-                }
 
             }
-            return new KeyValuePair<string, SugarParameter[]>(sql.ToString().TrimEnd(','), pars?.ToArray());
+            return new KeyValuePair<string, IReadOnlyList<SugarParameter>>(sql.ToString().TrimEnd(','), pars);
         }
     }
 }

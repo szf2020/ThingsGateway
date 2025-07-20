@@ -56,7 +56,7 @@ namespace ThingsGateway.SqlSugar
             {
                 parentPkColumn = this._ParentEntity.Columns.FirstOrDefault(it => it.IsPrimarykey);
             }
-            var ids = new List<object>();
+            var ids = new HashSet<object>();
             foreach (var item in parentList)
             {
                 var parentValue = parentPkColumn.PropertyInfo.GetValue(item);
@@ -77,7 +77,7 @@ namespace ThingsGateway.SqlSugar
             }
             if (NotAny(name))
             {
-                DeleteMany(thisEntity, ids, thisFkColumn.DbColumnName);
+                DeleteMany(thisEntity, ids.ToList(), thisFkColumn.DbColumnName);
                 if (this._Options?.OneToManyEnableLogicDelete == true)
                 {
                     var locgicColumn = thisEntity.Columns.FirstOrDefault(it => it.PropertyName.EqualCase("IsDeleted") || it.PropertyName.EqualCase("IsDelete"));
@@ -104,7 +104,7 @@ namespace ThingsGateway.SqlSugar
                 {
                     var list = this._Context.Queryable<TChild>()
                         .AS(thisEntity.DbTableName)
-                        .In(thisFkColumn.DbColumnName, ids.Distinct().ToList())
+                        .In(thisFkColumn.DbColumnName, ids.ToList())
                         .ToList();
                     List<TChild> result = GetNoExistsId(list, children, thisPkColumn.PropertyName);
                     if (result.Count != 0)
@@ -148,7 +148,7 @@ namespace ThingsGateway.SqlSugar
             {
                 parentPkColumn = this._ParentEntity.Columns.FirstOrDefault(it => it.IsPrimarykey);
             }
-            var ids = new List<object>();
+            var ids = new HashSet<object>();
             foreach (var item in parentList)
             {
                 var parentValue = parentPkColumn.PropertyInfo.GetValue(item);
@@ -173,7 +173,7 @@ namespace ThingsGateway.SqlSugar
             }
             if (NotAny(name))
             {
-                DeleteMany(thisEntity, ids, thisFkColumn.DbColumnName);
+                DeleteMany(thisEntity, ids.ToList(), thisFkColumn.DbColumnName);
                 if (this._Options?.OneToManyEnableLogicDelete == true)
                 {
                     var locgicColumn = thisEntity.Columns.FirstOrDefault(it => it.PropertyName.EqualCase("IsDeleted") || it.PropertyName.EqualCase("IsDelete"));
@@ -203,13 +203,13 @@ namespace ThingsGateway.SqlSugar
                         this._Context.Deleteable<object>()
                            .AS(thisEntity.DbTableName)
                            .EnableQueryFilter(thisEntity.Type)
-                           .In(thisFkColumn.DbColumnName, ids.Distinct().ToList()).ExecuteCommand();
+                           .In(thisFkColumn.DbColumnName, ids.ToList()).ExecuteCommand();
                     }
                     else
                     {
                         this._Context.Deleteable<object>()
                             .AS(thisEntity.DbTableName)
-                            .In(thisFkColumn.DbColumnName, ids.Distinct().ToList()).ExecuteCommand();
+                            .In(thisFkColumn.DbColumnName, ids.ToList()).ExecuteCommand();
                     }
                 }
                 _NavigateType = NavigateType.OneToMany;
@@ -267,14 +267,14 @@ namespace ThingsGateway.SqlSugar
             {
                 return;
             }
-            var oneToManys = thisEntity.Columns.Where(it => it.Navigat != null && it.Navigat.NavigatType == NavigateType.OneToMany).ToList();
+            var oneToManys = thisEntity.Columns.Where(it => it.Navigat != null && it.Navigat.NavigatType == NavigateType.OneToMany);
             foreach (var oneToMany in oneToManys)
             {
                 var fkFieldName = oneToMany.Navigat.Name2 ?? thisEntity.Columns.FirstOrDefault(it => it.IsPrimarykey).PropertyName;
                 var fkDbColumnName = thisEntity.Columns.FirstOrDefault(it => it.PropertyName == fkFieldName).DbColumnName;
                 var fks = this._Context.Queryable<object>()
                 .AS(thisEntity.DbTableName)
-                .In(fkName, ids.Distinct().ToList()).Select(fkDbColumnName).ToDataTable().Rows.Cast<System.Data.DataRow>().Select(x => x[0]).ToArray();
+                .In<object>(fkName, ids).Select(fkDbColumnName).ToDataTable().Rows.Cast<System.Data.DataRow>().Select(x => x[0]).Distinct().ToArray();
 
                 var type = oneToMany.PropertyInfo.PropertyType.GenericTypeArguments[0];
                 var entity = this._Context.EntityMaintenance.GetEntityInfo(type);
@@ -285,7 +285,7 @@ namespace ThingsGateway.SqlSugar
 
                 this._Context.Deleteable<object>()
                                                 .AS(entity.DbTableName)
-                                                .In(column, fks.Distinct().ToList()).ExecuteCommand();
+                                                .In(column, fks).ExecuteCommand();
             }
         }
 
@@ -303,7 +303,7 @@ namespace ThingsGateway.SqlSugar
                 var pkColumn = entity.Columns.First(it => it.IsPrimarykey);
                 var pkIds = this._Context.Queryable<object>()
                                          .AS(entity.DbTableName)
-                                         .In(column, fks.Distinct().ToList())
+                                         .In(column, fks)
                                          .Select(pkColumn.DbColumnName).ToDataTable().Rows
                                          .Cast<System.Data.DataRow>().Select(it => it[0]).ToList();
                 DeleteChildChild(pkIds, childs);
@@ -334,7 +334,7 @@ namespace ThingsGateway.SqlSugar
                 var thisEntity = this._Context.EntityMaintenance.GetEntityInfo(type);
                 var fkColumn = thisEntity.Columns.FirstOrDefault(it => navigat.Name.EqualCase(it.PropertyName));
                 var thisPkColumn = thisEntity.Columns.FirstOrDefault(it => it.IsPrimarykey);
-                var childs2 = thisEntity.Columns.Where(it => it.Navigat != null && it.Navigat?.NavigatType == NavigateType.OneToMany).ToList(); ;
+                var childs2 = thisEntity.Columns.Where(it => it.Navigat != null && it.Navigat?.NavigatType == NavigateType.OneToMany).ToList();
                 if (childs2.Count != 0)
                 {
                     var pkIds = _Context.Queryable<object>().AS(thisEntity.DbTableName)
@@ -402,7 +402,7 @@ namespace ThingsGateway.SqlSugar
             List<TChild> result = new List<TChild>();
 
             // 将newList中的主键属性转换为字符串集合
-            var newIds = newList.Select(item => GetPropertyValueAsString(item, pkName)).ToList();
+            var newIds = newList.Select(item => GetPropertyValueAsString(item, pkName)).ToHashSet();
 
             // 获取在old中但不在newList中的主键属性值
             result = old.Where(item => !newIds.Contains(GetPropertyValueAsString(item, pkName)))

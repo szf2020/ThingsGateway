@@ -2,6 +2,6 @@
 {
     public interface ICustomConditionalFunc
     {
-        KeyValuePair<string, SugarParameter[]> GetConditionalSql(ConditionalModel json, int index);
+        KeyValuePair<string, IReadOnlyList<SugarParameter>> GetConditionalSql(ConditionalModel json, int index);
     }
 }

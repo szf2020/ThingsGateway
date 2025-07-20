@@ -3,9 +3,9 @@ namespace ThingsGateway.SqlSugar
 {
     public static class DbExtensions
     {
-        public static string ToJoinSqlInVals<T>(this T[] array)
+        public static string ToJoinSqlInVals<T>(this IEnumerable<T> array)
         {
-            if (array == null || array.Length == 0)
+            if (array?.Any() != true)
             {
                 return ToSqlValue(string.Empty);
             }
@@ -14,9 +14,20 @@ namespace ThingsGateway.SqlSugar
                 return string.Join(",", array.Where(c => c != null).Select(it => it.ToSqlValue()));
             }
         }
-        public static string ToJoinSqlInValsByVarchar<T>(this T[] array)
+        public static string ToJoinSqlInVals<T>(this IReadOnlyList<T> array)
         {
-            if (array == null || array.Length == 0)
+            if (array == null || array.Count == 0)
+            {
+                return ToSqlValue(string.Empty);
+            }
+            else
+            {
+                return string.Join(",", array.Where(c => c != null).Select(it => it.ToSqlValue()));
+            }
+        }
+        public static string ToJoinSqlInValsByVarchar<T>(this IEnumerable<T> array)
+        {
+            if (array?.Any() != true)
             {
                 return ToSqlValue(string.Empty);
             }
@@ -25,9 +36,20 @@ namespace ThingsGateway.SqlSugar
                 return string.Join(",", array.Where(c => c != null).Select(it => "N" + it.ToSqlValue()));
             }
         }
-        public static string ToJoinSqlInValsN<T>(this T[] array)
+        public static string ToJoinSqlInValsByVarchar<T>(this IReadOnlyList<T> array)
         {
-            if (array == null || array.Length == 0)
+            if (array == null || array.Count == 0)
+            {
+                return ToSqlValue(string.Empty);
+            }
+            else
+            {
+                return string.Join(",", array.Where(c => c != null).Select(it => "N" + it.ToSqlValue()));
+            }
+        }
+        public static string ToJoinSqlInValsN<T>(this IReadOnlyList<T> array)
+        {
+            if (array == null || array.Count == 0)
             {
                 return ToSqlValue(string.Empty);
             }

@@ -44,28 +44,24 @@ namespace ThingsGateway.SqlSugar
             {
                 action = (row, rowGroup) => row[memberName] = rowGroup.Key;
             }
-
-            var rows = source.GroupBy(rowSelector.Compile())
-             .Select(rowGroup =>
-             {
-                 var row = table.NewRow();
-                 action(row, rowGroup);
-                 foreach (var x in columns.GroupJoin(rowGroup, c => c, r => columnSelector(r),
-                                          (c, columnGroup) =>
-                                          {
-                                              var dic = new Dictionary<string, object>();
-                                              if (c != null)
-                                                  dic[c.ToString()] = dataSelector(columnGroup);
-                                              return dic;
-                                          })
-                       .SelectMany(x => x))
-                 {
-                     row[x.Key] = x.Value;
-                 }
-                 table.Rows.Add(row);
-                 return row;
-             })
-             .ToList();
+            foreach (var rowGroup in source.GroupBy(rowSelector.Compile()))
+            {
+                var row = table.NewRow();
+                action(row, rowGroup);
+                foreach (var x in columns.GroupJoin(rowGroup, c => c, r => columnSelector(r),
+                                         (c, columnGroup) =>
+                                         {
+                                             var dic = new Dictionary<string, object>();
+                                             if (c != null)
+                                                 dic[c.ToString()] = dataSelector(columnGroup);
+                                             return dic;
+                                         })
+                      .SelectMany(x => x))
+                {
+                    row[x.Key] = x.Value;
+                }
+                table.Rows.Add(row);
+            }
 
             return table;
         }

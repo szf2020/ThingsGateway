@@ -1,7 +1,5 @@
 ﻿using System.Diagnostics;
 
-namespace System;
-
 #if NETFRAMEWORK || NETSTANDARD || NETCOREAPP3_1 || NET5_0 || NET6_0 || NET7_0
 /// <summary>提供时间的抽象</summary>
 public abstract class TimeProvider

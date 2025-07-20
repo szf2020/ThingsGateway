@@ -341,7 +341,7 @@ Dictionary<long, Channel> channelDicts)
              .OrderBy(
             a =>
             {
-                var order = a.GetCustomAttribute<AutoGenerateColumnAttribute>()?.Order ?? int.MaxValue; ;
+                var order = a.GetCustomAttribute<AutoGenerateColumnAttribute>()?.Order ?? int.MaxValue;
                 if (order < 0)
                 {
                     order = order + 10000000;
@@ -510,56 +510,49 @@ Dictionary<long, Channel> channelDicts)
     {
         var dataScope = await GlobalData.SysUserService.GetCurrentUserDataScopeAsync().ConfigureAwait(false);
 
-        try
+        // 获取所有设备的字典，以设备名称作为键
+        var deviceDicts = (await GlobalData.DeviceService.GetAllAsync().ConfigureAwait(false)).ToDictionary(a => a.Name);
+
+        // 存储导入检验结果的字典
+        Dictionary<string, ImportPreviewOutputBase> ImportPreviews = new();
+
+        // 设备页导入预览输出
+        ImportPreviewOutput<Dictionary<string, Variable>> deviceImportPreview = new();
+
+        // 获取驱动插件的全名和名称的字典
+        var driverPluginFullNameDict = GlobalData.PluginService.GetList().ToDictionary(a => a.FullName);
+        var driverPluginNameDict = GlobalData.PluginService.GetList().ToDictionary(a => a.Name);
+        ConcurrentDictionary<string, (Type, Dictionary<string, PropertyInfo>, Dictionary<string, PropertyInfo>)> propertysDict = new();
+
+        var sheetNames = uSheetDatas.sheets.Keys.ToList();
+        foreach (var sheetName in sheetNames)
         {
 
-            // 获取所有设备的字典，以设备名称作为键
-            var deviceDicts = (await GlobalData.DeviceService.GetAllAsync().ConfigureAwait(false)).ToDictionary(a => a.Name);
+            List<IDictionary<string, object>> rows = new();
+            var first = uSheetDatas.sheets[sheetName].cellData[0];
 
-            // 存储导入检验结果的字典
-            Dictionary<string, ImportPreviewOutputBase> ImportPreviews = new();
-
-            // 设备页导入预览输出
-            ImportPreviewOutput<Dictionary<string, Variable>> deviceImportPreview = new();
-
-            // 获取驱动插件的全名和名称的字典
-            var driverPluginFullNameDict = GlobalData.PluginService.GetList().ToDictionary(a => a.FullName);
-            var driverPluginNameDict = GlobalData.PluginService.GetList().ToDictionary(a => a.Name);
-            ConcurrentDictionary<string, (Type, Dictionary<string, PropertyInfo>, Dictionary<string, PropertyInfo>)> propertysDict = new();
-
-            var sheetNames = uSheetDatas.sheets.Keys.ToList();
-            foreach (var sheetName in sheetNames)
+            foreach (var item in uSheetDatas.sheets[sheetName].cellData)
             {
-
-                List<IDictionary<string, object>> rows = new();
-                var first = uSheetDatas.sheets[sheetName].cellData[0];
-
-                foreach (var item in uSheetDatas.sheets[sheetName].cellData)
+                if (item.Key == 0)
                 {
-                    if (item.Key == 0)
-                    {
-                        continue;
-                    }
-                    var expando = new Dictionary<string, object>();
-                    foreach (var keyValue in item.Value)
-                    {
-                        expando.Add(first[keyValue.Key].v?.ToString(), keyValue.Value.v);
-                    }
-                    rows.Add(expando);
+                    continue;
                 }
-
-                deviceImportPreview = GlobalData.VariableService.SetVariableData(dataScope, deviceDicts, ImportPreviews, deviceImportPreview, driverPluginNameDict, propertysDict, sheetName, rows);
-                if (ImportPreviews.Any(a => a.Value.HasError))
+                var expando = new Dictionary<string, object>();
+                foreach (var keyValue in item.Value)
                 {
-                    throw new(ImportPreviews.FirstOrDefault(a => a.Value.HasError).Value.Results.FirstOrDefault(a => !a.Success).ErrorMessage ?? "error");
+                    expando.Add(first[keyValue.Key].v?.ToString(), keyValue.Value.v);
                 }
+                rows.Add(expando);
             }
 
-            return ImportPreviews;
+            deviceImportPreview = GlobalData.VariableService.SetVariableData(dataScope, deviceDicts, ImportPreviews, deviceImportPreview, driverPluginNameDict, propertysDict, sheetName, rows);
+            if (ImportPreviews.Any(a => a.Value.HasError))
+            {
+                throw new(ImportPreviews.FirstOrDefault(a => a.Value.HasError).Value.Results.FirstOrDefault(a => !a.Success).ErrorMessage ?? "error");
+            }
         }
-        finally
-        {
-        }
+
+        return ImportPreviews;
 
     }
 

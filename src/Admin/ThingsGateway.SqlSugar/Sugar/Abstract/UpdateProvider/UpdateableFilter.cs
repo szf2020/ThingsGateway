@@ -26,7 +26,7 @@
                 }
                 this.Context.Utilities.PageEach(DataList, PageSize, pageItem =>
                 {
-                    result += SetFilterSql(this.Context.UpdateableT(pageItem.First()).AS(TableName).EnableDiffLogEventIF(IsEnableDiffLogEvent, DiffModel).UpdateColumns(UpdateColumns.ToArray())).ExecuteCommand();
+                    result += SetFilterSql(this.Context.UpdateableT(pageItem.First()).AS(TableName).EnableDiffLogEventIF(IsEnableDiffLogEvent, DiffModel).UpdateColumns(UpdateColumns)).ExecuteCommand();
                 });
                 if (isNoTran)
                 {
@@ -63,7 +63,7 @@
                 }
                 await Context.Utilities.PageEachAsync(DataList, PageSize, async pageItem =>
                 {
-                    result += await SetFilterSql(Context.UpdateableT(pageItem.First()).AS(TableName).EnableDiffLogEventIF(IsEnableDiffLogEvent, DiffModel).UpdateColumns(UpdateColumns.ToArray())).ExecuteCommandAsync().ConfigureAwait(false);
+                    result += await SetFilterSql(Context.UpdateableT(pageItem.First()).AS(TableName).EnableDiffLogEventIF(IsEnableDiffLogEvent, DiffModel).UpdateColumns(UpdateColumns)).ExecuteCommandAsync().ConfigureAwait(false);
                 }).ConfigureAwait(false);
                 if (isNoTran)
                 {

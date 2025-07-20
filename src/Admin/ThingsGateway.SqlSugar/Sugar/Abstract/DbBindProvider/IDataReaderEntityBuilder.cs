@@ -551,7 +551,7 @@ namespace ThingsGateway.SqlSugar
                     generator.Emit(OpCodes.Call, method);
                 return;
             }
-            ;
+
             #endregion
 
             #region Common Database Logic

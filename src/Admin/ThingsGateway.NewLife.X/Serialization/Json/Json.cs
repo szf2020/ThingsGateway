@@ -183,7 +183,4 @@ public class Json : FormatterBase, IJson
     }
     #endregion
 
-    #region 辅助函数
-
-    #endregion
 }

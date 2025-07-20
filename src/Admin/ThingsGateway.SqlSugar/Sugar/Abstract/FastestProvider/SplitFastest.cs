@@ -17,7 +17,7 @@ namespace ThingsGateway.SqlSugar
         {
             if (StaticConfig.SplitTableCreateTableFunc != null)
             {
-                StaticConfig.SplitTableCreateTableFunc(typeof(T), datas?.Cast<object>()?.ToArray());
+                StaticConfig.SplitTableCreateTableFunc(typeof(T), datas);
             }
             List<GroupModel> groupModels;
             int result;
@@ -37,7 +37,7 @@ namespace ThingsGateway.SqlSugar
         {
             if (StaticConfig.SplitTableCreateTableFunc != null)
             {
-                StaticConfig.SplitTableCreateTableFunc(typeof(T), datas?.Cast<object>()?.ToArray());
+                StaticConfig.SplitTableCreateTableFunc(typeof(T), datas);
             }
             List<GroupModel> groupModels;
             int result;
@@ -93,7 +93,7 @@ namespace ThingsGateway.SqlSugar
             foreach (var item in groupModels.GroupBy(it => it.GroupName))
             {
                 var addList = item.Select(it => it.Item).ToList();
-                result += FastestProvider.AS(item.Key).BulkUpdate(addList, wherColumns, updateColumns); ;
+                result += FastestProvider.AS(item.Key).BulkUpdate(addList, wherColumns, updateColumns);
             }
             return result;
         }
@@ -107,7 +107,7 @@ namespace ThingsGateway.SqlSugar
             foreach (var item in groupModels.GroupBy(it => it.GroupName))
             {
                 var addList = item.Select(it => it.Item).ToList();
-                result += await FastestProvider.AS(item.Key).BulkUpdateAsync(addList, wherColumns, updateColumns).ConfigureAwait(false); ;
+                result += await FastestProvider.AS(item.Key).BulkUpdateAsync(addList, wherColumns, updateColumns).ConfigureAwait(false);
             }
             return result;
         }

@@ -6,7 +6,7 @@ namespace ThingsGateway.SqlSugar
     {
         internal DataTable DataTable { get; set; }
         internal SqlSugarProvider Context { get; set; }
-        internal string[] Columns { get; set; } = Array.Empty<string>();
+        internal IReadOnlyList<string> Columns { get; set; } = Array.Empty<string>();
         internal string SugarGroupId = "SugarGroupId";
         internal string SugarUpdateRows = "SugarUpdateRows";
         internal string SugarColumns = "SugarColumns";
@@ -23,16 +23,16 @@ namespace ThingsGateway.SqlSugar
             this.formatTime = formatTime;
             return WhereColumns(new string[] { name });
         }
-        public StorageableDataTable WhereColumns(string[] names, Func<DateTime, string> formatTime)
+        public StorageableDataTable WhereColumns(IReadOnlyList<string> names, Func<DateTime, string> formatTime)
         {
             this.formatTime = formatTime;
             return WhereColumns(names);
         }
-        public StorageableDataTable WhereColumns(string[] names)
+        public StorageableDataTable WhereColumns(IReadOnlyList<string> names)
         {
             this.Columns = names;
             var queryable = this.Context.Queryable<object>();
-            Check.Exception(Columns == null || Columns.Length == 0, "need WhereColumns");
+            Check.Exception(Columns == null || Columns.Count == 0, "need WhereColumns");
             var tableName = queryable.SqlBuilder.GetTranslationTableName(DataTable.TableName);
             this.Context.Utilities.PageEach(DataTable.Rows.Cast<DataRow>(), 200, itemList =>
             {
@@ -44,15 +44,12 @@ namespace ThingsGateway.SqlSugar
                     //Oracle driver bug: Error when querying DataTable after dynamically adding columns using '*'.
                     selector = " * /*" + Guid.NewGuid() + "*/";
                 }
-                var addItem = this.Context.Queryable<object>().AS(tableName).Where(conditList).Select(selector).ToDataTable().Rows.Cast<DataRow>().ToList();
+                var addItem = this.Context.Queryable<object>().AS(tableName).Where(conditList).Select(selector).ToDataTable().Rows.Cast<DataRow>();
                 this.dbDataList.AddRange(addItem);
             });
             return this;
         }
-        public StorageableDataTable WhereColumns(List<string> names)
-        {
-            return WhereColumns(names.ToArray());
-        }
+
         public StorageableDataTable SplitInsert(Func<DataRow, bool> conditions, string message = null)
         {
             whereFuncs.Add(new KeyValuePair<StorageType, Func<DataRow, bool>, string>(StorageType.Insert, conditions, message));
@@ -164,9 +161,9 @@ namespace ThingsGateway.SqlSugar
                 item[SugarErrorMessage] = message;
             }
         }
-        private void SetConditList(List<DataRow> itemList, string[] whereColumns, List<IConditionalModel> conditList)
+        private void SetConditList(List<DataRow> itemList, IReadOnlyList<string> whereColumns, List<IConditionalModel> conditList)
         {
-            ;
+
             foreach (var dataItem in itemList)
             {
                 var condition = new ConditionalCollections()

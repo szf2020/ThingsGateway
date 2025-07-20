@@ -480,15 +480,15 @@ namespace ThingsGateway.SqlSugar
             var shortName1 = joinExpression.Parameters[0].Name;
             var sqlObj1 = joinQueryable1.ToSql();
             string sql1 = sqlObj1.Key;
-            UtilMethods.RepairReplicationParameters(ref sql1, sqlObj1.Value.ToArray(), 0, "Join");
-            queryable.QueryBuilder.EntityName = sqlBuilder.GetPackTable(sql1, sqlBuilder.GetTranslationColumnName(shortName1)); ;
+            UtilMethods.RepairReplicationParameters(ref sql1, sqlObj1.Value, 0, "Join");
+            queryable.QueryBuilder.EntityName = sqlBuilder.GetPackTable(sql1, sqlBuilder.GetTranslationColumnName(shortName1));
             queryable.QueryBuilder.Parameters.AddRange(sqlObj1.Value);
 
             //join table 1
             var shortName2 = joinExpression.Parameters[1].Name;
             var sqlObj2 = joinQueryable2.ToSql();
             string sql2 = sqlObj2.Key;
-            UtilMethods.RepairReplicationParameters(ref sql2, sqlObj2.Value.ToArray(), 1, "Join");
+            UtilMethods.RepairReplicationParameters(ref sql2, sqlObj2.Value, 1, "Join");
             queryable.QueryBuilder.Parameters.AddRange(sqlObj2.Value);
             var exp = queryable.QueryBuilder.GetExpressionValue(joinExpression, ResolveExpressType.WhereMultiple);
             queryable.QueryBuilder.JoinQueryInfos.Add(new JoinQueryInfo() { JoinIndex = 0, JoinType = joinType, JoinWhere = exp.GetResultString(), TableName = sqlBuilder.GetPackTable(sql2, sqlBuilder.GetTranslationColumnName(shortName2)) });
@@ -526,15 +526,15 @@ namespace ThingsGateway.SqlSugar
             var shortName1 = joinExpression1.Parameters[0].Name;
             var sqlObj1 = joinQueryable1.ToSql();
             string sql1 = sqlObj1.Key;
-            UtilMethods.RepairReplicationParameters(ref sql1, sqlObj1.Value.ToArray(), 0, "Join");
-            queryable.QueryBuilder.EntityName = sqlBuilder.GetPackTable(sql1, shortName1); ;
+            UtilMethods.RepairReplicationParameters(ref sql1, sqlObj1.Value, 0, "Join");
+            queryable.QueryBuilder.EntityName = sqlBuilder.GetPackTable(sql1, shortName1);
             queryable.QueryBuilder.Parameters.AddRange(sqlObj1.Value);
 
             //join table 1
             var shortName2 = joinExpression1.Parameters[1].Name;
             var sqlObj2 = joinQueryable2.ToSql();
             string sql2 = sqlObj2.Key;
-            UtilMethods.RepairReplicationParameters(ref sql2, sqlObj2.Value.ToArray(), 1, "Join");
+            UtilMethods.RepairReplicationParameters(ref sql2, sqlObj2.Value, 1, "Join");
             queryable.QueryBuilder.Parameters.AddRange(sqlObj2.Value);
             var exp = queryable.QueryBuilder.GetExpressionValue(joinExpression1, ResolveExpressType.WhereMultiple);
             queryable.QueryBuilder.JoinQueryInfos.Add(new JoinQueryInfo() { JoinIndex = 0, JoinType = joinType1, JoinWhere = exp.GetResultString(), TableName = sqlBuilder.GetPackTable(sql2, shortName2) });
@@ -544,7 +544,7 @@ namespace ThingsGateway.SqlSugar
             var shortName3 = joinExpression1.Parameters[2].Name;
             var sqlObj3 = joinQueryable3.ToSql();
             string sql3 = sqlObj3.Key;
-            UtilMethods.RepairReplicationParameters(ref sql3, sqlObj3.Value.ToArray(), 2, "Join");
+            UtilMethods.RepairReplicationParameters(ref sql3, sqlObj3.Value, 2, "Join");
             queryable.QueryBuilder.Parameters.AddRange(sqlObj3.Value);
             var exp2 = queryable.QueryBuilder.GetExpressionValue(joinExpression2, ResolveExpressType.WhereMultiple);
             queryable.QueryBuilder.JoinQueryInfos.Add(new JoinQueryInfo() { JoinIndex = 1, JoinType = joinType2, JoinWhere = exp2.GetResultString(), TableName = sqlBuilder.GetPackTable(sql3, shortName3) });
@@ -581,15 +581,15 @@ namespace ThingsGateway.SqlSugar
             var shortName1 = joinExpression1.Parameters[0].Name;
             var sqlObj1 = joinQueryable1.ToSql();
             string sql1 = sqlObj1.Key;
-            UtilMethods.RepairReplicationParameters(ref sql1, sqlObj1.Value.ToArray(), 0, "Join");
-            queryable.QueryBuilder.EntityName = sqlBuilder.GetPackTable(sql1, shortName1); ;
+            UtilMethods.RepairReplicationParameters(ref sql1, sqlObj1.Value, 0, "Join");
+            queryable.QueryBuilder.EntityName = sqlBuilder.GetPackTable(sql1, shortName1);
             queryable.QueryBuilder.Parameters.AddRange(sqlObj1.Value);
 
             //join table 1
             var shortName2 = joinExpression1.Parameters[1].Name;
             var sqlObj2 = joinQueryable2.ToSql();
             string sql2 = sqlObj2.Key;
-            UtilMethods.RepairReplicationParameters(ref sql2, sqlObj2.Value.ToArray(), 1, "Join");
+            UtilMethods.RepairReplicationParameters(ref sql2, sqlObj2.Value, 1, "Join");
             queryable.QueryBuilder.Parameters.AddRange(sqlObj2.Value);
             var exp = queryable.QueryBuilder.GetExpressionValue(joinExpression1, ResolveExpressType.WhereMultiple);
             queryable.QueryBuilder.JoinQueryInfos.Add(new JoinQueryInfo() { JoinIndex = 0, JoinType = joinType1, JoinWhere = exp.GetResultString(), TableName = sqlBuilder.GetPackTable(sql2, shortName2) });
@@ -599,7 +599,7 @@ namespace ThingsGateway.SqlSugar
             var shortName3 = joinExpression1.Parameters[2].Name;
             var sqlObj3 = joinQueryable3.ToSql();
             string sql3 = sqlObj3.Key;
-            UtilMethods.RepairReplicationParameters(ref sql3, sqlObj3.Value.ToArray(), 2, "Join");
+            UtilMethods.RepairReplicationParameters(ref sql3, sqlObj3.Value, 2, "Join");
             queryable.QueryBuilder.Parameters.AddRange(sqlObj3.Value);
             var exp2 = queryable.QueryBuilder.GetExpressionValue(joinExpression2, ResolveExpressType.WhereMultiple);
             queryable.QueryBuilder.JoinQueryInfos.Add(new JoinQueryInfo() { JoinIndex = 1, JoinType = joinType2, JoinWhere = exp2.GetResultString(), TableName = sqlBuilder.GetPackTable(sql3, shortName3) });
@@ -608,7 +608,7 @@ namespace ThingsGateway.SqlSugar
             var shortName4 = joinExpression1.Parameters[3].Name;
             var sqlObj4 = joinQueryable4.ToSql();
             string sql4 = sqlObj4.Key;
-            UtilMethods.RepairReplicationParameters(ref sql4, sqlObj4.Value.ToArray(), 3, "Join");
+            UtilMethods.RepairReplicationParameters(ref sql4, sqlObj4.Value, 3, "Join");
             queryable.QueryBuilder.Parameters.AddRange(sqlObj4.Value);
             var exp3 = queryable.QueryBuilder.GetExpressionValue(joinExpression3, ResolveExpressType.WhereMultiple);
             queryable.QueryBuilder.JoinQueryInfos.Add(new JoinQueryInfo() { JoinIndex = 1, JoinType = joinType3, JoinWhere = exp3.GetResultString(), TableName = sqlBuilder.GetPackTable(sql4, shortName4) });
@@ -617,37 +617,34 @@ namespace ThingsGateway.SqlSugar
         }
         #endregion
 
-        public virtual ISugarQueryable<T> UnionAll<T>(params ISugarQueryable<T>[] queryables) where T : class
-        {
-            return _UnionAll(queryables);
-        }
 
-        internal ISugarQueryable<T> _UnionAll<T>(ISugarQueryable<T>[] queryables)
+
+        internal ISugarQueryable<T> _UnionAll<T>(IReadOnlyList<ISugarQueryable<T>> queryables)
         {
             var sqlBuilder = InstanceFactory.GetSqlbuilder(this.Context.CurrentConnectionConfig);
             Check.Exception(queryables.IsNullOrEmpty(), "UnionAll.queryables is null ");
             int i = 1;
-            List<KeyValuePair<string, List<SugarParameter>>> allItems = new List<KeyValuePair<string, List<SugarParameter>>>();
+            var allItems = new List<KeyValuePair<string, IReadOnlyList<SugarParameter>>>();
             foreach (var item in queryables)
             {
                 var sqlObj = item.ToSql();
                 string sql = sqlObj.Key;
                 if (this.CurrentConnectionConfig?.MoreSettings?.MaxParameterNameLength > 0)
                 {
-                    UtilMethods.RepairReplicationParameters(this.Context, ref sql, sqlObj.Value.ToArray(), i, "UnionAll");
+                    UtilMethods.RepairReplicationParameters(this.Context, ref sql, sqlObj.Value, i, "UnionAll");
                 }
                 else
                 {
-                    UtilMethods.RepairReplicationParameters(ref sql, sqlObj.Value.ToArray(), i, "UnionAll");
+                    UtilMethods.RepairReplicationParameters(ref sql, sqlObj.Value, i, "UnionAll");
                 }
                 if (sqlObj.Value.HasValue())
-                    allItems.Add(new KeyValuePair<string, List<SugarParameter>>(sqlBuilder.GetUnionFomatSql(sql), sqlObj.Value));
+                    allItems.Add(new KeyValuePair<string, IReadOnlyList<SugarParameter>>(sqlBuilder.GetUnionFomatSql(sql), sqlObj.Value));
                 else
-                    allItems.Add(new KeyValuePair<string, List<SugarParameter>>(sqlBuilder.GetUnionFomatSql(sql), new List<SugarParameter>()));
+                    allItems.Add(new KeyValuePair<string, IReadOnlyList<SugarParameter>>(sqlBuilder.GetUnionFomatSql(sql), new List<SugarParameter>()));
                 i++;
             }
             var allSql = sqlBuilder.GetUnionAllSql(allItems.Select(it => it.Key).ToList());
-            var allParameters = allItems.SelectMany(it => it.Value).ToArray();
+            var allParameters = allItems.SelectMany(it => it.Value);
             var resulut = this.Context.Queryable<object>().AS(UtilMethods.GetPackTable(allSql, "unionTable")).With(SqlWith.Null);
             resulut.AddParameters(allParameters);
             if (this.Context.CurrentConnectionConfig.DbType == DbType.Oracle && sqlBuilder.SqlSelectAll == "*")
@@ -664,17 +661,19 @@ namespace ThingsGateway.SqlSugar
             }
         }
 
-        public virtual ISugarQueryable<T> UnionAll<T>(List<ISugarQueryable<T>> queryables) where T : class
+        public virtual ISugarQueryable<T> UnionAll<T>(IReadOnlyList<ISugarQueryable<T>> queryables) where T : class
         {
             Check.Exception(queryables.IsNullOrEmpty(), "UnionAll.queryables is null ");
-            return UnionAll(queryables.ToArray());
+            return _UnionAll(queryables);
         }
-        public virtual ISugarQueryable<T> Union<T>(params ISugarQueryable<T>[] queryables) where T : class
+
+        public virtual ISugarQueryable<T> Union<T>(IReadOnlyList<ISugarQueryable<T>> queryables) where T : class
         {
+
             var sqlBuilder = InstanceFactory.GetSqlbuilder(this.Context.CurrentConnectionConfig);
             Check.Exception(queryables.IsNullOrEmpty(), "UnionAll.queryables is null ");
             int i = 1;
-            List<KeyValuePair<string, List<SugarParameter>>> allItems = new List<KeyValuePair<string, List<SugarParameter>>>();
+            var allItems = new List<KeyValuePair<string, IReadOnlyList<SugarParameter>>>();
             foreach (var item in queryables)
             {
                 item.QueryBuilder.DisableTop = true;
@@ -682,20 +681,20 @@ namespace ThingsGateway.SqlSugar
                 string sql = sqlObj.Key;
                 if (this.CurrentConnectionConfig?.MoreSettings?.MaxParameterNameLength > 0)
                 {
-                    UtilMethods.RepairReplicationParameters(this.Context, ref sql, sqlObj.Value.ToArray(), i, "Union");
+                    UtilMethods.RepairReplicationParameters(this.Context, ref sql, sqlObj.Value, i, "Union");
                 }
                 else
                 {
-                    UtilMethods.RepairReplicationParameters(ref sql, sqlObj.Value.ToArray(), i, "Union");
+                    UtilMethods.RepairReplicationParameters(ref sql, sqlObj.Value, i, "Union");
                 }
                 if (sqlObj.Value.HasValue())
-                    allItems.Add(new KeyValuePair<string, List<SugarParameter>>(sqlBuilder.GetUnionFomatSql(sql), sqlObj.Value));
+                    allItems.Add(new KeyValuePair<string, IReadOnlyList<SugarParameter>>(sqlBuilder.GetUnionFomatSql(sql), sqlObj.Value));
                 else
-                    allItems.Add(new KeyValuePair<string, List<SugarParameter>>(sqlBuilder.GetUnionFomatSql(sql), new List<SugarParameter>()));
+                    allItems.Add(new KeyValuePair<string, IReadOnlyList<SugarParameter>>(sqlBuilder.GetUnionFomatSql(sql), new List<SugarParameter>()));
                 i++;
             }
             var allSql = sqlBuilder.GetUnionSql(allItems.Select(it => it.Key).ToList());
-            var allParameters = allItems.SelectMany(it => it.Value).ToArray();
+            var allParameters = allItems.SelectMany(it => it.Value);
             var resulut = this.Context.Queryable<object>().AS(UtilMethods.GetPackTable(allSql, "unionTable")).With(SqlWith.Null);
             resulut.AddParameters(allParameters);
             if (this.Context.CurrentConnectionConfig.DbType == DbType.Oracle && sqlBuilder.SqlSelectAll == "*")
@@ -707,11 +706,7 @@ namespace ThingsGateway.SqlSugar
                 return resulut.Select<T>(sqlBuilder.SqlSelectAll);
             }
         }
-        public virtual ISugarQueryable<T> Union<T>(List<ISugarQueryable<T>> queryables) where T : class
-        {
-            Check.Exception(queryables.IsNullOrEmpty(), "Union.queryables is null ");
-            return Union(queryables.ToArray());
-        }
+
         #endregion
 
         #region SqlQueryable
@@ -746,12 +741,12 @@ namespace ThingsGateway.SqlSugar
                 {
                     newList.Add(item);
                 }
-                
+
                 var methods = this.Context.GetType().GetMethods()
                .Where(it => it.Name == "Insertable")
                .Where(it => it.GetGenericArguments().Length != 0)
                .Where(it => it.GetParameters().Any(z => z.ParameterType.Name.StartsWith("IReadOnlyList")))
-               .Where(it => it.Name == "Insertable").ToList();
+               .Where(it => it.Name == "Insertable");
                 var method = methods.Single().MakeGenericMethod(newList.GetType().GetGenericArguments().First());
                 InsertMethodInfo result = new InsertMethodInfo()
                 {
@@ -767,7 +762,7 @@ namespace ThingsGateway.SqlSugar
                     .Where(it => it.Name == "Insertable")
                     .Where(it => it.GetGenericArguments().Length != 0)
                     .Where(it => it.GetParameters().Any(z => z.ParameterType.Name == "T"))
-                    .Where(it => it.Name == "Insertable").ToList();
+                    .Where(it => it.Name == "Insertable");
                 var method = methods.Single().MakeGenericMethod(singleEntityObjectOrListObject.GetType());
                 InsertMethodInfo result = new InsertMethodInfo()
                 {
@@ -801,7 +796,7 @@ namespace ThingsGateway.SqlSugar
             Check.Exception(columnDictionary == null || columnDictionary.Count == 0, "Insertable.columnDictionary can't be null");
             var insertObject = this.Context.Utilities.DeserializeObject<T>(this.Context.Utilities.SerializeObject(columnDictionary));
             var columns = columnDictionary.Select(it => it.Key).ToList();
-            return this.Context.InsertableT(insertObject).InsertColumns(columns.ToArray()); ;
+            return this.Context.InsertableT(insertObject).InsertColumns(columns);
         }
         public virtual IInsertable<T> Insertable<T>(dynamic insertDynamicObject) where T : class, new()
         {
@@ -815,7 +810,7 @@ namespace ThingsGateway.SqlSugar
                 var columns = ((object)insertDynamicObject).GetType().GetProperties().Select(it => it.Name).ToList();
                 Check.Exception(columns.IsNullOrEmpty(), "Insertable.updateDynamicObject can't be null");
                 T insertObject = this.Context.Utilities.DeserializeObject<T>(this.Context.Utilities.SerializeObject(insertDynamicObject));
-                return this.Context.InsertableT(insertObject).InsertColumns(columns.ToArray());
+                return this.Context.InsertableT(insertObject).InsertColumns(columns);
             }
         }
         #endregion
@@ -840,7 +835,7 @@ namespace ThingsGateway.SqlSugar
                .Where(it => it.Name == "Deleteable")
                .Where(it => it.GetGenericArguments().Length != 0)
                .Where(it => it.GetParameters().Any(z => z.Name != "pkValue" && z.ParameterType.Name.StartsWith("IReadOnlyList")))
-               .Where(it => it.Name == "Deleteable").ToList();
+               .Where(it => it.Name == "Deleteable");
                 var method = methods.FirstOrDefault().MakeGenericMethod(newList.GetType().GetGenericArguments().FirstOrDefault());
                 DeleteMethodInfo result = new DeleteMethodInfo()
                 {
@@ -856,7 +851,7 @@ namespace ThingsGateway.SqlSugar
                     .Where(it => it.Name == "Deleteable")
                     .Where(it => it.GetGenericArguments().Length != 0)
                     .Where(it => it.GetParameters().Any(z => z.ParameterType.Name == "T"))
-                    .Where(it => it.Name == "Deleteable").ToList();
+                    .Where(it => it.Name == "Deleteable");
                 var method = methods.Single().MakeGenericMethod(singleEntityObjectOrListObject.GetType());
                 DeleteMethodInfo result = new DeleteMethodInfo()
                 {
@@ -900,7 +895,7 @@ namespace ThingsGateway.SqlSugar
         public virtual IDeleteable<T> DeleteableT<T>(T deleteObj) where T : class, new()
         {
             InitMappingInfo<T>();
-            return this.Context.Deleteable<T>().Where(deleteObj);
+            return this.Context.Deleteable<T>().WhereT(deleteObj);
         }
         public virtual IDeleteable<T> Deleteable<T>(IReadOnlyList<T> deleteObjs) where T : class, new()
         {
@@ -929,7 +924,7 @@ namespace ThingsGateway.SqlSugar
                .Where(it => it.Name == "Updateable")
                .Where(it => it.GetGenericArguments().Length != 0)
                .Where(it => it.GetParameters().Any(z => z.ParameterType.Name.StartsWith("IReadOnlyList")))
-               .Where(it => it.Name == "Updateable").ToList();
+               .Where(it => it.Name == "Updateable");
                 var method = methods.Single().MakeGenericMethod(newList.GetType().GetGenericArguments().First());
                 UpdateMethodInfo result = new UpdateMethodInfo()
                 {
@@ -945,7 +940,7 @@ namespace ThingsGateway.SqlSugar
                     .Where(it => it.Name == "Updateable")
                     .Where(it => it.GetGenericArguments().Length != 0)
                     .Where(it => it.GetParameters().Any(z => z.ParameterType.Name == "T"))
-                    .Where(it => it.Name == "Updateable").ToList();
+                    .Where(it => it.Name == "Updateable");
                 var method = methods.Single().MakeGenericMethod(singleEntityObjectOrListObject.GetType());
                 UpdateMethodInfo result = new UpdateMethodInfo()
                 {
@@ -963,7 +958,7 @@ namespace ThingsGateway.SqlSugar
              .Where(it => it.Name == "Updateable")
              .Where(it => it.GetGenericArguments().Length != 0)
              .Where(it => it.GetParameters().Length == 0)
-             .Where(it => it.Name == "Updateable").ToList();
+             .Where(it => it.Name == "Updateable");
             var method = methods.Single().MakeGenericMethod(entityType);
             result.Context = this.Context;
             result.MethodInfo = method;
@@ -982,7 +977,8 @@ namespace ThingsGateway.SqlSugar
             InitMappingInfo<T>();
             UpdateableProvider<T> result = this.CreateUpdateable(UpdateObjs);
 
-            result.UpdateBuilder.IsListUpdate = true;
+            if (UpdateObjs?.Count > 1)
+                result.UpdateBuilder.IsListUpdate = true;
             return result;
         }
         public virtual IUpdateable<T> UpdateableT<T>(T UpdateObj) where T : class, new()
@@ -1024,7 +1020,7 @@ namespace ThingsGateway.SqlSugar
             Check.Exception(columnDictionary == null || columnDictionary.Count == 0, "Updateable.columnDictionary can't be null");
             var updateObject = this.Context.Utilities.DeserializeObject<T>(this.Context.Utilities.SerializeObject(columnDictionary));
             var columns = columnDictionary.Select(it => it.Key).ToList();
-            return this.Context.UpdateableT(updateObject).UpdateColumns(columns.ToArray()); ;
+            return this.Context.UpdateableT(updateObject).UpdateColumns(columns);
         }
         public virtual IUpdateable<T> Updateable<T>(dynamic updateDynamicObject) where T : class, new()
         {
@@ -1038,7 +1034,7 @@ namespace ThingsGateway.SqlSugar
                 var columns = ((object)updateDynamicObject).GetType().GetProperties().Select(it => it.Name).ToList();
                 Check.Exception(columns.IsNullOrEmpty(), "Updateable.updateDynamicObject can't be null");
                 T updateObject = this.Context.Utilities.DeserializeObject<T>(this.Context.Utilities.SerializeObject(updateDynamicObject));
-                return this.Context.UpdateableT(updateObject).UpdateColumns(columns.ToArray()); ;
+                return this.Context.UpdateableT(updateObject).UpdateColumns(columns);
             }
         }
         #endregion
@@ -1127,7 +1123,7 @@ namespace ThingsGateway.SqlSugar
                .Where(it => it.Name == "Storageable")
                .Where(it => it.GetGenericArguments().Length != 0)
                .Where(it => it.GetParameters().Any(z => z.ParameterType.Name.StartsWith("IReadOnlyList")))
-               .Where(it => it.Name == "Storageable").ToList();
+               .Where(it => it.Name == "Storageable");
                 var method = methods.Single().MakeGenericMethod(newList.GetType().GetGenericArguments().First());
                 StorageableMethodInfo result = new StorageableMethodInfo()
                 {
@@ -1143,7 +1139,7 @@ namespace ThingsGateway.SqlSugar
                     .Where(it => it.Name == "Storageable")
                     .Where(it => it.GetGenericArguments().Length != 0)
                     .Where(it => it.GetParameters().Any(z => z.ParameterType.Name == "T"))
-                    .Where(it => it.Name == "Storageable").ToList();
+                    .Where(it => it.Name == "Storageable");
                 var method = methods.Single().MakeGenericMethod(singleEntityObjectOrList.GetType());
                 StorageableMethodInfo result = new StorageableMethodInfo()
                 {
@@ -1195,7 +1191,7 @@ namespace ThingsGateway.SqlSugar
         }
         public InsertNavTaskInit<T, T> InsertNav<T>(T data, InsertNavRootOptions rootOptions) where T : class, new()
         {
-            return InsertNav(new List<T>() { data }, rootOptions); ;
+            return InsertNav(new List<T>() { data }, rootOptions);
         }
         public InsertNavTaskInit<T, T> InsertNav<T>(List<T> datas, InsertNavRootOptions rootOptions) where T : class, new()
         {
@@ -1254,7 +1250,7 @@ namespace ThingsGateway.SqlSugar
             provider._Roots = datas;
             provider._Context = this;
             result.UpdateNavProvider = provider;
-            result.NavContext = new NavContext() { Items = new List<NavContextItem>() { } };
+            result.NavContext = new NavContext() { Items = new List<NavContextItem>() };
             return result;
         }
         public UpdateNavTaskInit<T, T> UpdateNav<T>(T data, UpdateNavRootOptions rootOptions) where T : class, new()
@@ -1269,8 +1265,8 @@ namespace ThingsGateway.SqlSugar
             provider._RootOptions = rootOptions;
             provider._Context = this;
             result.UpdateNavProvider = provider;
-            result.NavContext = new NavContext() { Items = new List<NavContextItem>() { } };
-            return result; ;
+            result.NavContext = new NavContext() { Items = new List<NavContextItem>() };
+            return result;
         }
         #endregion
 
@@ -1541,7 +1537,7 @@ namespace ThingsGateway.SqlSugar
                             item.Sql = string.Empty;
                         if (item.Parameters == null)
                             item.Parameters = Array.Empty<SugarParameter>();
-                        var itemParsmeters = item.Parameters.OrderByDescending(it => it.ParameterName.Length).ToList();
+                        var itemParsmeters = item.Parameters.OrderByDescending(it => it.ParameterName.Length);
                         List<SugarParameter> addParameters = new List<SugarParameter>();
                         var itemSql = item.Sql;
                         foreach (var itemParameter in itemParsmeters)
@@ -1620,7 +1616,7 @@ namespace ThingsGateway.SqlSugar
                             item.Sql = string.Empty;
                         if (item.Parameters == null)
                             item.Parameters = Array.Empty<SugarParameter>();
-                        var itemParsmeters = item.Parameters.OrderByDescending(it => it.ParameterName.Length).ToList();
+                        var itemParsmeters = item.Parameters.OrderByDescending(it => it.ParameterName.Length);
                         List<SugarParameter> addParameters = new List<SugarParameter>();
                         var itemSql = item.Sql;
                         foreach (var itemParameter in itemParsmeters)

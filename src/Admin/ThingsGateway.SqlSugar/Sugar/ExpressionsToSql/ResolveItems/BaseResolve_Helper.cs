@@ -152,7 +152,7 @@ namespace ThingsGateway.SqlSugar
         {
             this.Start();
             var shortName = parameter.CommonTempData;
-            var listProperties = item.Type.GetProperties().Cast<PropertyInfo>().ToList();
+            var listProperties = item.Type.GetProperties();
             foreach (var property in listProperties)
             {
                 var hasIgnore = this.Context.IgnoreComumnList?.Any(it => it.EntityName.Equals(item.Type.Name, StringComparison.CurrentCultureIgnoreCase) && it.PropertyName.Equals(property.Name, StringComparison.CurrentCultureIgnoreCase)) == true;

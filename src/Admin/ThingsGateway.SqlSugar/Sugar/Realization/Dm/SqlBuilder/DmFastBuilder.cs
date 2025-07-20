@@ -50,7 +50,7 @@ namespace ThingsGateway.SqlSugar
             var queryable = this.Context.Queryable<T>();
             var tableName = queryable.SqlBuilder.GetTranslationTableName(dt.TableName);
             var sqlBuilder = this.Context.Queryable<object>().SqlBuilder;
-            var dts = dt.Columns.Cast<DataColumn>().Select(it => sqlBuilder.GetTranslationColumnName(it.ColumnName)).ToList();
+            var dts = dt.Columns.Cast<DataColumn>().Select(it => sqlBuilder.GetTranslationColumnName(it.ColumnName));
             dt.TableName = "temp" + SnowFlakeSingle.instance.getID();
             var sql = queryable.AS(tableName).Where(it => false).Select(string.Join(",", dts)).ToSql().Key;
             await Context.Ado.ExecuteCommandAsync($"CREATE  TABLE {dt.TableName}    as ( {sql} ) ").ConfigureAwait(false);

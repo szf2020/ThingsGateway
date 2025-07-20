@@ -55,6 +55,7 @@ namespace ThingsGateway.SqlSugar
             }
             return result;
         }
+
         /// <summary>
         /// 获取表信息列表(可自定义SQL转换)
         /// </summary>
@@ -65,11 +66,12 @@ namespace ThingsGateway.SqlSugar
             db.Aop.OnExecutingChangeSql = (sql, pars) =>
             {
                 sql = getChangeSqlFunc(this.Context.CurrentConnectionConfig.DbType, sql);
-                return new KeyValuePair<string, SugarParameter[]>(sql, pars);
+                return new KeyValuePair<string, IReadOnlyList<SugarParameter>>(sql, pars);
             };
             var result = db.DbMaintenance.GetTableInfoList(false);
             return result;
         }
+
         /// <summary>
         /// 获取表信息列表
         /// </summary>
@@ -98,7 +100,7 @@ namespace ThingsGateway.SqlSugar
             db.Aop.OnExecutingChangeSql = (sql, pars) =>
             {
                 sql = getChangeSqlFunc(this.Context.CurrentConnectionConfig.DbType, sql);
-                return new KeyValuePair<string, SugarParameter[]>(sql, pars);
+                return new KeyValuePair<string, IReadOnlyList<SugarParameter>>(sql, pars);
             };
             var result = db.DbMaintenance.GetColumnInfosByTableName(tableName, false);
             return result;
@@ -127,7 +129,7 @@ namespace ThingsGateway.SqlSugar
             cacheKey = GetCacheKey(cacheKey);
             return this.Context.Utilities.GetReflectionInoCacheInstance().GetOrCreate(cacheKey, () =>
             {
-                var result = GetColumnInfosByTableName(tableName).Where(it => it.IsIdentity).ToList();
+                var result = GetColumnInfosByTableName(tableName).Where(it => it.IsIdentity);
                 return result.Select(it => it.DbColumnName).ToList();
             });
         }
@@ -140,7 +142,7 @@ namespace ThingsGateway.SqlSugar
             cacheKey = GetCacheKey(cacheKey);
             return this.Context.Utilities.GetReflectionInoCacheInstance().GetOrCreate(cacheKey, () =>
             {
-                var result = GetColumnInfosByTableName(tableName).Where(it => it.IsPrimarykey).ToList();
+                var result = GetColumnInfosByTableName(tableName).Where(it => it.IsPrimarykey);
                 return result.Select(it => it.DbColumnName).ToList();
             });
         }
@@ -400,7 +402,7 @@ namespace ThingsGateway.SqlSugar
         /// <summary>
         /// 添加复合主键
         /// </summary>
-        public bool AddPrimaryKeys(string tableName, string[] columnNames)
+        public bool AddPrimaryKeys(string tableName, IReadOnlyList<string> columnNames)
         {
             tableName = this.SqlBuilder.GetTranslationTableName(tableName);
             var columnName = string.Join(",", columnNames);
@@ -417,7 +419,7 @@ namespace ThingsGateway.SqlSugar
         /// <summary>
         /// 添加复合主键(指定主键名)
         /// </summary>
-        public bool AddPrimaryKeys(string tableName, string[] columnNames, string pkName)
+        public bool AddPrimaryKeys(string tableName, IReadOnlyList<string> columnNames, string pkName)
         {
             tableName = this.SqlBuilder.GetTranslationTableName(tableName);
             var columnName = string.Join(",", columnNames);
@@ -535,7 +537,7 @@ namespace ThingsGateway.SqlSugar
         /// <summary>
         /// 批量删除表
         /// </summary>
-        public virtual bool DropTable(string[] tableName)
+        public virtual bool DropTable(params string[] tableName)
         {
             foreach (var item in tableName)
             {
@@ -546,7 +548,7 @@ namespace ThingsGateway.SqlSugar
         /// <summary>
         /// 根据实体类型删除表
         /// </summary>
-        public virtual bool DropTable(Type[] tableEnittyTypes)
+        public virtual bool DropTable(params Type[] tableEnittyTypes)
         {
             foreach (var item in tableEnittyTypes)
             {
@@ -837,7 +839,7 @@ namespace ThingsGateway.SqlSugar
         /// <summary>
         /// 创建索引
         /// </summary>
-        public virtual bool CreateIndex(string tableName, string[] columnNames, bool isUnique = false)
+        public virtual bool CreateIndex(string tableName, IReadOnlyList<string> columnNames, bool isUnique = false)
         {
             string sql = string.Format(CreateIndexSql, this.SqlBuilder.GetTranslationTableName(tableName), string.Join(",", columnNames.Select(it => this.SqlBuilder.GetTranslationColumnName(it))), string.Join("_", columnNames) + this.Context.CurrentConnectionConfig.IndexSuffix, isUnique ? "UNIQUE" : "");
             sql = sql.Replace("_" + this.SqlBuilder.SqlTranslationLeft, "_");
@@ -850,7 +852,7 @@ namespace ThingsGateway.SqlSugar
         /// <summary>
         /// 创建唯一索引
         /// </summary>
-        public virtual bool CreateUniqueIndex(string tableName, string[] columnNames)
+        public virtual bool CreateUniqueIndex(string tableName, IReadOnlyList<string> columnNames)
         {
             string sql = string.Format(CreateIndexSql, this.SqlBuilder.GetTranslationTableName(tableName), string.Join(",", columnNames.Select(it => this.SqlBuilder.GetTranslationColumnName(it))), string.Join("_", columnNames) + this.Context.CurrentConnectionConfig.IndexSuffix + "_Unique", "UNIQUE");
             sql = sql.Replace("_" + this.SqlBuilder.SqlTranslationLeft, "_");
@@ -863,7 +865,7 @@ namespace ThingsGateway.SqlSugar
         /// <summary>
         /// 创建索引(指定索引名)
         /// </summary>
-        public virtual bool CreateIndex(string tableName, string[] columnNames, string IndexName, bool isUnique = false)
+        public virtual bool CreateIndex(string tableName, IReadOnlyList<string> columnNames, string IndexName, bool isUnique = false)
         {
             var include = "";
             if (IndexName.Contains("{include:", StringComparison.CurrentCultureIgnoreCase))
@@ -895,7 +897,7 @@ namespace ThingsGateway.SqlSugar
         public virtual bool AddRemark(EntityInfo entity)
         {
             var db = this.Context;
-            var columns = entity.Columns.Where(it => it.IsIgnore == false).ToList();
+            var columns = entity.Columns.Where(it => it.IsIgnore == false);
             List<DbColumnInfo> dbColumn = new List<DbColumnInfo>();
             if (entity.Columns.Any(it => it.ColumnDescription.HasValue()))
             {
@@ -943,11 +945,11 @@ namespace ThingsGateway.SqlSugar
         public virtual void AddIndex(EntityInfo entityInfo)
         {
             var db = this.Context;
-            var columns = entityInfo.Columns.Where(it => it.IsIgnore == false).ToList();
-            var indexColumns = columns.Where(it => it.IndexGroupNameList.HasValue()).ToList();
+            var columns = entityInfo.Columns.Where(it => it.IsIgnore == false);
+            var indexColumns = columns.Where(it => it.IndexGroupNameList.HasValue());
             if (indexColumns.HasValue())
             {
-                var groups = indexColumns.SelectMany(it => it.IndexGroupNameList).GroupBy(it => it).Select(it => it.Key).ToList();
+                var groups = indexColumns.SelectMany(it => it.IndexGroupNameList).GroupBy(it => it).Select(it => it.Key);
                 foreach (var item in groups)
                 {
                     var columnNames = indexColumns.Where(it => it.IndexGroupNameList.Any(i => i.Equals(item, StringComparison.CurrentCultureIgnoreCase))).Select(it => it.DbColumnName).ToArray();
@@ -960,10 +962,10 @@ namespace ThingsGateway.SqlSugar
             }
 
 
-            var uIndexColumns = columns.Where(it => it.UIndexGroupNameList.HasValue()).ToList();
+            var uIndexColumns = columns.Where(it => it.UIndexGroupNameList.HasValue());
             if (uIndexColumns.HasValue())
             {
-                var groups = uIndexColumns.SelectMany(it => it.UIndexGroupNameList).GroupBy(it => it).Select(it => it.Key).ToList();
+                var groups = uIndexColumns.SelectMany(it => it.UIndexGroupNameList).GroupBy(it => it).Select(it => it.Key);
                 foreach (var item in groups)
                 {
                     var columnNames = uIndexColumns.Where(it => it.UIndexGroupNameList.Any(i => i.Equals(item, StringComparison.CurrentCultureIgnoreCase))).Select(it => it.DbColumnName).ToArray();
@@ -1000,7 +1002,7 @@ namespace ThingsGateway.SqlSugar
         {
             var dbColumns = this.GetColumnInfosByTableName(entityInfo.DbTableName, false);
             var db = this.Context;
-            var columns = entityInfo.Columns.Where(it => it.IsIgnore == false).ToList();
+            var columns = entityInfo.Columns.Where(it => it.IsIgnore == false);
             foreach (var item in columns)
             {
                 if (item.DefaultValue != null)

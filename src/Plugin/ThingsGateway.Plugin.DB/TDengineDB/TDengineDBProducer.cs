@@ -143,7 +143,7 @@ public partial class TDengineDBProducer : BusinessBaseWithCacheIntervalVariable,
     public async Task<List<IDBHistoryValue>> GetDBHistoryValuesAsync(DBHistoryValuePageInput input)
     {
         var data = await Query(input, _driverPropertys.NumberTableNameLow).ToListAsync().ConfigureAwait(false);
-        return data.Cast<IDBHistoryValue>().ToList(); ;
+        return data.Cast<IDBHistoryValue>().ToList();
     }
     internal ISugarQueryable<TDengineDBNumberHistoryValue> Query(DBHistoryValuePageInput input, string tableName)
     {

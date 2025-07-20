@@ -348,7 +348,7 @@ namespace ThingsGateway.SqlSugar
         }
         public virtual bool Delete(T deleteObj)
         {
-            return this.Context.Deleteable<T>().Where(deleteObj).ExecuteCommand() > 0;
+            return this.Context.Deleteable<T>().WhereT(deleteObj).ExecuteCommand() > 0;
         }
         public virtual bool Delete(List<T> deleteObjs)
         {
@@ -476,7 +476,7 @@ namespace ThingsGateway.SqlSugar
         }
         public virtual async Task<bool> DeleteAsync(T deleteObj)
         {
-            return await Context.Deleteable<T>().Where(deleteObj).ExecuteCommandAsync().ConfigureAwait(false) > 0;
+            return await Context.Deleteable<T>().WhereT(deleteObj).ExecuteCommandAsync().ConfigureAwait(false) > 0;
         }
         public virtual async Task<bool> DeleteAsync(List<T> deleteObjs)
         {
@@ -502,7 +502,7 @@ namespace ThingsGateway.SqlSugar
             this.Context.Ado.CancellationToken = cancellationToken;
             return this.Context.InsertableT(insertObj).ExecuteReturnSnowflakeIdAsync(cancellationToken);
         }
-        public virtual Task<List<long>> InsertReturnSnowflakeIdAsync(List<T> insertObjs, CancellationToken cancellationToken)
+        public virtual Task<List<long>> InsertReturnSnowflakeIdAsync(IReadOnlyList<T> insertObjs, CancellationToken cancellationToken)
         {
             this.Context.Ado.CancellationToken = cancellationToken;
             return this.Context.Insertable(insertObjs).ExecuteReturnSnowflakeIdListAsync(cancellationToken);
@@ -636,7 +636,7 @@ namespace ThingsGateway.SqlSugar
         public virtual async Task<bool> DeleteAsync(T deleteObj, CancellationToken cancellationToken)
         {
             this.Context.Ado.CancellationToken = cancellationToken;
-            return await Context.Deleteable<T>().Where(deleteObj).ExecuteCommandAsync(cancellationToken).ConfigureAwait(false) > 0;
+            return await Context.Deleteable<T>().WhereT(deleteObj).ExecuteCommandAsync(cancellationToken).ConfigureAwait(false) > 0;
         }
         public virtual async Task<bool> DeleteAsync(List<T> deleteObjs, CancellationToken cancellationToken)
         {

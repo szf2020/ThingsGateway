@@ -43,14 +43,13 @@ namespace ThingsGateway.SqlSugar
 
         private List<JToken> GetAppendTypes()
         {
-            var appendTypeNames = this.jObject.AsJEnumerable().ToList();
-            appendTypeNames = appendTypeNames.OrderBy(it =>
-            {
-                if (it.Path.EqualCase(JsonProviderConfig.KeyUpdateable.Get())) return 0;
-                if (it.Path.EqualCase("Columns")) return 1;
-                else return 3;
+            var appendTypeNames = this.jObject.AsJEnumerable().OrderBy(it =>
+             {
+                 if (it.Path.EqualCase(JsonProviderConfig.KeyUpdateable.Get())) return 0;
+                 if (it.Path.EqualCase("Columns")) return 1;
+                 else return 3;
 
-            }).ToList();
+             }).ToList();
             return appendTypeNames;
         }
 

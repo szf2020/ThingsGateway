@@ -261,7 +261,7 @@ namespace ThingsGateway.SqlSugar
                    MemberName= "yyyy-mm-dd hh24:mi:ss".ToSqlValue()
                   }
                  }
-                    }); ;
+                    });
                 }
                 //Expression<Func<SingleColumnEntity<object>, object>> exp = it => Convert.ToDecimal(it.ColumnName);
                 var result = queryBuilder.LambdaExpressions.DbMehtods.ToDate(new MethodCallExpressionModel()

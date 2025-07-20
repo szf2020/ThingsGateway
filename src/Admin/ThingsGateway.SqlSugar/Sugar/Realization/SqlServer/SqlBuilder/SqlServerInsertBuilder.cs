@@ -47,7 +47,7 @@ namespace ThingsGateway.SqlSugar
                 {
                     batchInsetrSql.AppendFormat(SqlTemplateBatch, GetTableNameString, columnsString);
                     int i = 0;
-                    foreach (var columns in groupList.Skip((pageIndex - 1) * pageSize).Take(pageSize).ToList())
+                    foreach (var columns in groupList.Skip((pageIndex - 1) * pageSize).Take(pageSize))
                     {
                         var isFirst = i == 0;
                         if (!isFirst)
@@ -70,7 +70,7 @@ namespace ThingsGateway.SqlSugar
             if (this.IsOffIdentity)
             {
                 var tableName = this.GetTableNameString;
-                result = $"SET IDENTITY_INSERT {tableName} ON;" + result.TrimEnd(';') + $";SET IDENTITY_INSERT {tableName} OFF"; ;
+                result = $"SET IDENTITY_INSERT {tableName} ON;" + result.TrimEnd(';') + $";SET IDENTITY_INSERT {tableName} OFF";
             }
             return result;
         }

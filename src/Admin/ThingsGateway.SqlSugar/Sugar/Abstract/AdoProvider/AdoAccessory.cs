@@ -23,11 +23,8 @@ namespace ThingsGateway.SqlSugar
         /// <param name="propertyInfo">可选的属性信息数组，若为空则通过反射获取</param>
         /// <param name="sqlParameterKeyWord">SQL参数前缀，例如 "@"</param>
         /// <returns>SugarParameter 数组</returns>
-        protected virtual SugarParameter[] GetParameters(object parameters, PropertyInfo[] propertyInfo, string sqlParameterKeyWord)
+        protected virtual IReadOnlyList<SugarParameter> GetParameters(object parameters, PropertyInfo[] propertyInfo, string sqlParameterKeyWord)
         {
-            // 最终要返回的参数集合
-            List<SugarParameter> result = new List<SugarParameter>();
-
             if (parameters != null)
             {
                 var entityType = parameters.GetType();
@@ -36,17 +33,14 @@ namespace ThingsGateway.SqlSugar
                 var isDictionary = entityType.IsIn(UtilConstants.DicArraySO, UtilConstants.DicArraySS);
 
                 if (isDictionary)
-                    // 字典类型转参数
-                    DictionaryToParameters(parameters, sqlParameterKeyWord, result, entityType);
-                else if (parameters is List<SugarParameter> sugarParamList)
                 {
-                    // 如果已经是 SugarParameter 列表，直接赋值
-                    result = sugarParamList;
+                    // 字典类型转参数
+                    return DictionaryToParameters(parameters, sqlParameterKeyWord, entityType);
                 }
-                else if (parameters is SugarParameter[] sugarParamArray)
+                else if (parameters is IReadOnlyList<SugarParameter> sugarParamArray)
                 {
                     // 如果是 SugarParameter 数组，转 List
-                    result = sugarParamArray.ToList();
+                    return sugarParamArray;
                 }
                 else
                 {
@@ -55,19 +49,18 @@ namespace ThingsGateway.SqlSugar
                         "参数格式错误。\n请使用 new{xx=xx, xx2=xx2} 或 \nDictionary<string, object> 或 \nSugarParameter [] ");
 
                     // 反射对象属性转参数
-                    PropertyToParameter(parameters, propertyInfo, sqlParameterKeyWord, result, entityType);
+                    return PropertyToParameter(parameters, propertyInfo, sqlParameterKeyWord, entityType).ToArray();
                 }
             }
-
-            return result.ToArray();
+            return new List<SugarParameter>();
         }
 
         /// <summary>
         /// 将对象的属性转换为参数集合
         /// </summary>
-        protected void PropertyToParameter(object parameters, PropertyInfo[] propertyInfo, string sqlParameterKeyWord, List<SugarParameter> listParams, Type entityType)
+        protected IEnumerable<SugarParameter> PropertyToParameter(object parameters, PropertyInfo[] propertyInfo, string sqlParameterKeyWord, Type entityType)
         {
-            PropertyInfo[] properties = propertyInfo ?? entityType.GetProperties();
+            var properties = propertyInfo ?? entityType.GetProperties();
 
             foreach (PropertyInfo propertyty in properties)
             {
@@ -89,13 +82,13 @@ namespace ThingsGateway.SqlSugar
                         UdtTypeName = "HIERARCHYID",
                         Value = value
                     };
-                    listParams.Add(parameter);
+                    yield return parameter;
                 }
                 else
                 {
                     // 常规参数
                     var parameter = new SugarParameter(sqlParameterKeyWord + propertyty.Name, value);
-                    listParams.Add(parameter);
+                    yield return parameter;
                 }
             }
         }
@@ -103,21 +96,21 @@ namespace ThingsGateway.SqlSugar
         /// <summary>
         /// 将字典类型的参数转换为参数集合
         /// </summary>
-        protected void DictionaryToParameters(object parameters, string sqlParameterKeyWord, List<SugarParameter> listParams, Type entityType)
+        protected IReadOnlyList<SugarParameter> DictionaryToParameters(object parameters, string sqlParameterKeyWord, Type entityType)
         {
             if (entityType == UtilConstants.DicArraySO)
             {
                 // Dictionary<string, object> 转参数
                 var dictionaryParameters = (Dictionary<string, object>)parameters;
                 var sugarParameters = dictionaryParameters.Select(it => new SugarParameter(sqlParameterKeyWord + it.Key, it.Value));
-                listParams.AddRange(sugarParameters);
+                return sugarParameters.ToArray();
             }
             else
             {
                 // Dictionary<string, string> 转参数
                 var dictionaryParameters = (Dictionary<string, string>)parameters;
                 var sugarParameters = dictionaryParameters.Select(it => new SugarParameter(sqlParameterKeyWord + it.Key, it.Value));
-                listParams.AddRange(sugarParameters);
+                return sugarParameters.ToArray();
             }
         }
     }

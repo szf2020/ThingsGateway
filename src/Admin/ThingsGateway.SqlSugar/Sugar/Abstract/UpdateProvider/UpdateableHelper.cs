@@ -114,7 +114,7 @@ namespace ThingsGateway.SqlSugar
                     diffColumns = diffColumns.Where(it => !pks.Contains(it)).ToList();
                     if (diffColumns.Count > 0)
                     {
-                        newUpdateable.UpdateColumns(diffColumns.ToArray());
+                        newUpdateable.UpdateColumns(diffColumns);
                     }
                 }
                 else
@@ -128,9 +128,9 @@ namespace ThingsGateway.SqlSugar
         {
             if (SetColumnsIndex > 0)
             {
-                var keys = UpdateBuilder.SetValues.Select(it => SqlBuilder.GetNoTranslationColumnName(it.Key)).ToList();
+                var keys = UpdateBuilder.SetValues.Select(it => SqlBuilder.GetNoTranslationColumnName(it.Key));
                 var addKeys = keys.Where(k => !this.UpdateBuilder.DbColumnInfoList.Any(it => it.PropertyName.Equals(k, StringComparison.CurrentCultureIgnoreCase) || it.DbColumnName.Equals(k, StringComparison.CurrentCultureIgnoreCase))).ToList();
-                var addItems = this.EntityInfo.Columns.Where(it => !GetPrimaryKeys().Any(p => p.Equals(it.PropertyName, StringComparison.CurrentCultureIgnoreCase) || p.Equals(it.DbColumnName, StringComparison.CurrentCultureIgnoreCase)) && addKeys.Any(k => it.PropertyName?.Equals(k, StringComparison.OrdinalIgnoreCase) == true || it.DbColumnName?.Equals(k, StringComparison.OrdinalIgnoreCase) == true)).ToList();
+                var addItems = this.EntityInfo.Columns.Where(it => !GetPrimaryKeys().Any(p => p.Equals(it.PropertyName, StringComparison.CurrentCultureIgnoreCase) || p.Equals(it.DbColumnName, StringComparison.CurrentCultureIgnoreCase)) && addKeys.Any(k => it.PropertyName?.Equals(k, StringComparison.OrdinalIgnoreCase) == true || it.DbColumnName?.Equals(k, StringComparison.OrdinalIgnoreCase) == true));
                 this.UpdateBuilder.DbColumnInfoList.AddRange(addItems.Select(it => new DbColumnInfo() { PropertyName = it.PropertyName, DbColumnName = it.DbColumnName }));
             }
             SetColumnsIndex++;
@@ -159,7 +159,7 @@ namespace ThingsGateway.SqlSugar
 
         private void _WhereColumn(string columnName)
         {
-            var columnInfos = columns.Where(it => it.DbColumnName.Equals(columnName, StringComparison.OrdinalIgnoreCase) || it.PropertyName.Equals(columnName, StringComparison.OrdinalIgnoreCase)).ToList();
+            var columnInfos = columns.Where(it => it.DbColumnName.Equals(columnName, StringComparison.OrdinalIgnoreCase) || it.PropertyName.Equals(columnName, StringComparison.OrdinalIgnoreCase));
             if (!this.UpdateBuilder.DbColumnInfoList.Any(y => y.DbColumnName == columnInfos.First().DbColumnName))
             {
                 this.UpdateBuilder.DbColumnInfoList.AddRange(columnInfos);
@@ -214,10 +214,10 @@ namespace ThingsGateway.SqlSugar
             }
             this.columns = this.UpdateBuilder.DbColumnInfoList;
 
-            var ignoreColumns = EntityInfo.Columns.Where(it => it.IsOnlyIgnoreUpdate).ToList();
+            var ignoreColumns = EntityInfo.Columns.Where(it => it.IsOnlyIgnoreUpdate).Select(it => it.PropertyName).ToList();
             if (ignoreColumns != null && ignoreColumns.Count != 0)
             {
-                this.IgnoreColumns(ignoreColumns.Select(it => it.PropertyName).ToArray());
+                this.IgnoreColumns(ignoreColumns);
             }
         }
 
@@ -238,7 +238,7 @@ namespace ThingsGateway.SqlSugar
                     diffColumns = diffColumns.Where(it => !pks.Contains(it)).ToList();
                     if (diffColumns.Count > 0)
                     {
-                        this.UpdateColumns(diffColumns.ToArray());
+                        this.UpdateColumns(diffColumns);
                     }
                 }
                 else
@@ -646,7 +646,7 @@ namespace ThingsGateway.SqlSugar
         private void ValidateVersion()
         {
             var versionColumn = this.EntityInfo.Columns.FirstOrDefault(it => it.IsEnableUpdateVersionValidation);
-            var pks = this.UpdateBuilder.DbColumnInfoList.Where(it => it.IsPrimarykey).ToList();
+            var pks = this.UpdateBuilder.DbColumnInfoList.Where(it => it.IsPrimarykey);
             if (versionColumn != null && this.IsVersionValidation)
             {
                 Check.Exception(pks.IsNullOrEmpty(), "UpdateVersionValidation the primary key is required.");
@@ -699,10 +699,10 @@ namespace ThingsGateway.SqlSugar
                 var parameters = UpdateBuilder.Parameters;
                 if (parameters == null)
                     parameters = new List<SugarParameter>();
-                diffModel.AfterData = GetDiffTable(sql, parameters);
-                diffModel.Time = this.Context.Ado.SqlExecutionTime;
+                DiffModel.AfterData = GetDiffTable(sql, parameters);
+                DiffModel.Time = this.Context.Ado.SqlExecutionTime;
                 if (this.Context.CurrentConnectionConfig.AopEvents.OnDiffLogEvent != null)
-                    this.Context.CurrentConnectionConfig.AopEvents.OnDiffLogEvent(diffModel);
+                    this.Context.CurrentConnectionConfig.AopEvents.OnDiffLogEvent(DiffModel);
                 this.Ado.IsDisableMasterSlaveSeparation = isDisableMasterSlaveSeparation;
             }
             if (this.RemoveCacheFunc != null)
@@ -751,9 +751,9 @@ namespace ThingsGateway.SqlSugar
                 var parameters = UpdateBuilder.Parameters;
                 if (parameters == null)
                     parameters = new List<SugarParameter>();
-                diffModel.BeforeData = GetDiffTable(sql, parameters);
-                diffModel.Sql = sql;
-                diffModel.Parameters = parameters.ToArray();
+                DiffModel.BeforeData = GetDiffTable(sql, parameters);
+                DiffModel.Sql = sql;
+                DiffModel.Parameters = parameters;
                 this.Ado.IsDisableMasterSlaveSeparation = isDisableMasterSlaveSeparation;
             }
         }
@@ -822,21 +822,21 @@ namespace ThingsGateway.SqlSugar
             }
             else
             {
-                if (this.UpdateObjs.ToList().Count == 0)
+                if (this.UpdateObjs.Count == 0)
                 {
                     dt = new DataTable();
                 }
                 else if (this.WhereColumnList?.Count > 0)
                 {
-                    dt = this.Context.Queryable<T>().Filter(null, true).WhereClassByWhereColumns(this.UpdateObjs.ToList(), this.WhereColumnList.ToArray()).ToDataTable();
+                    dt = this.Context.Queryable<T>().Filter(null, true).WhereClassByWhereColumns(this.UpdateObjs, this.WhereColumnList).ToDataTable();
                 }
                 else if (this.UpdateBuilder.TableName.HasValue())
                 {
-                    dt = this.Context.Queryable<T>().AS(this.UpdateBuilder.TableName).Filter(null, true).WhereClassByPrimaryKey(this.UpdateObjs.ToList()).ToDataTable();
+                    dt = this.Context.Queryable<T>().AS(this.UpdateBuilder.TableName).Filter(null, true).WhereClassByPrimaryKey(this.UpdateObjs).ToDataTable();
                 }
                 else
                 {
-                    dt = this.Context.Queryable<T>().Filter(null, true).WhereClassByPrimaryKey(this.UpdateObjs.ToList()).ToDataTable();
+                    dt = this.Context.Queryable<T>().Filter(null, true).WhereClassByPrimaryKey(this.UpdateObjs).ToDataTable();
                 }
             }
             if (dt.Rows?.Count > 0)

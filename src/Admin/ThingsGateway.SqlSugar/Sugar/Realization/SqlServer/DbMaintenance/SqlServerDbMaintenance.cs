@@ -176,7 +176,7 @@ namespace ThingsGateway.SqlSugar
         {
             get
             {
-                return "EXECUTE sp_addextendedproperty N'MS_Description', N'{2}', N'user', N'dbo', N'table', N'{1}', N'column', N'{0}'"; ;
+                return "EXECUTE sp_addextendedproperty N'MS_Description', N'{2}', N'user', N'dbo', N'table', N'{1}', N'column', N'{0}'";
             }
         }
 
@@ -466,7 +466,7 @@ AND syscomments.text LIKE '%" + tableName + "%'");
         {
             var dbColumns = this.GetColumnInfosByTableName(entityInfo.DbTableName, false);
             var db = this.Context;
-            var columns = entityInfo.Columns.Where(it => it.IsIgnore == false).ToList();
+            var columns = entityInfo.Columns.Where(it => it.IsIgnore == false);
             foreach (var item in columns)
             {
                 if (item.DefaultValue.HasValue() || (string.IsNullOrEmpty(item.DefaultValue) && item.UnderType == UtilConstants.StringType))

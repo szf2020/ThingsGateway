@@ -123,7 +123,7 @@ public abstract class TcpServiceChannelBase<TClient> : TcpService<TClient>, ITcp
             var result = await base.StopAsync(token).ConfigureAwait(false);
             return result;
         }
-        return Result.Success; ;
+        return Result.Success;
     }
 
 

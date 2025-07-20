@@ -125,7 +125,7 @@ public static class Native
     /// <returns></returns>
     public static int GetIdlePort()
     {
-        return NetworkUtility.FindAvailableTcpPort(); ;
+        return NetworkUtility.FindAvailableTcpPort();
     }
 
 }

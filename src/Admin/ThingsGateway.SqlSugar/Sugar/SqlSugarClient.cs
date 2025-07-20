@@ -38,7 +38,7 @@ namespace ThingsGateway.SqlSugar
             InitConfigs(configs);
             var config = configs.First();
             InitContext(config);
-            _AllClients = configs.Select(it => new SugarTenant() { ConnectionConfig = it }).ToList(); ;
+            _AllClients = configs.Select(it => new SugarTenant() { ConnectionConfig = it }).ToList();
             _AllClients.First(it => it.ConnectionConfig.ConfigId == config.ConfigId).Context = this.Context;
         }
         public SqlSugarClient(ConnectionConfig config, Action<SqlSugarClient> configAction)
@@ -56,7 +56,7 @@ namespace ThingsGateway.SqlSugar
             InitConfigs(configs);
             var config = configs.First();
             InitContext(config);
-            _AllClients = configs.Select(it => new SugarTenant() { ConnectionConfig = it }).ToList(); ;
+            _AllClients = configs.Select(it => new SugarTenant() { ConnectionConfig = it }).ToList();
             _AllClients.First(it => it.ConnectionConfig.ConfigId == config.ConfigId).Context = this.Context;
             configAction(this);
         }
@@ -256,25 +256,18 @@ namespace ThingsGateway.SqlSugar
         #endregion
 
         #region Union
-        public ISugarQueryable<T> Union<T>(List<ISugarQueryable<T>> queryables) where T : class
+        public ISugarQueryable<T> Union<T>(IReadOnlyList<ISugarQueryable<T>> queryables) where T : class
         {
             return this.Context.Union(queryables);
         }
 
-        public ISugarQueryable<T> Union<T>(params ISugarQueryable<T>[] queryables) where T : class
-        {
-            return this.Context.Union(queryables);
-        }
 
-        public ISugarQueryable<T> UnionAll<T>(List<ISugarQueryable<T>> queryables) where T : class
+
+        public ISugarQueryable<T> UnionAll<T>(IReadOnlyList<ISugarQueryable<T>> queryables) where T : class
         {
             return this.Context.UnionAll(queryables);
         }
 
-        public ISugarQueryable<T> UnionAll<T>(params ISugarQueryable<T>[] queryables) where T : class
-        {
-            return this.Context.UnionAll(queryables);
-        }
         #endregion
 
         public QueryMethodInfo QueryableByObject(Type entityType)
@@ -779,7 +772,7 @@ namespace ThingsGateway.SqlSugar
 
         public IDeleteable<T> DeleteableT<T>(T deleteObj) where T : class, new()
         {
-            return this.Context.Deleteable<T>(deleteObj);
+            return this.Context.DeleteableT<T>(deleteObj);
         }
 
 

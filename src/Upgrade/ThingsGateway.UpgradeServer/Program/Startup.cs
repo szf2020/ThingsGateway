@@ -80,7 +80,7 @@ public class Startup : AppStartup
             // setting.DateParseHandling = DateParseHandling.None; // 解决DateTimeOffset异常
             // setting.Converters.Add(new IsoDateTimeConverter { DateTimeStyles = DateTimeStyles.AssumeUniversal }); // 解决DateTimeOffset异常
         }
-        ;
+
         services.AddMvcFilter<RequestAuditFilter>();
 
         services.AddControllers()

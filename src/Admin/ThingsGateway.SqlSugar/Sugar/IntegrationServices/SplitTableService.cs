@@ -11,7 +11,7 @@ namespace ThingsGateway.SqlSugar
         {
             CheckTableName(EntityInfo.DbTableName);
             var regex = "^" + EntityInfo.DbTableName.Replace("{year}", "([0-9]{2,4})").Replace("{day}", "([0-9]{1,2})").Replace("{month}", "([0-9]{1,2})");
-            var currentTables = tableInfos.Where(it => Regex.IsMatch(it.Name, regex, RegexOptions.IgnoreCase)).Select(it => it.Name).Reverse().ToList();
+            var currentTables = tableInfos.Where(it => Regex.IsMatch(it.Name, regex, RegexOptions.IgnoreCase)).Select(it => it.Name).Reverse();
             List<SplitTableInfo> result = new List<SplitTableInfo>();
             foreach (var item in currentTables)
             {

@@ -27,18 +27,18 @@ namespace ThingsGateway.SqlSugar
                 {
                     Check.ExceptionEasy(addList.Count > 1, "The version number can only be used for single record updates", "版本号只能用于单条记录更新");
                     result += this.Context.UpdateableT(addList.First())
-                    .WhereColumns(this.WhereColumns?.ToArray())
+                    .WhereColumns(this.WhereColumns)
                     .EnableDiffLogEventIF(this.IsEnableDiffLogEvent, this.BusinessData)
-                    .UpdateColumns(updateobj.UpdateBuilder.UpdateColumns?.ToArray())
+                    .UpdateColumns(updateobj.UpdateBuilder.UpdateColumns)
                     .IgnoreColumns(this.updateobj.UpdateBuilder.IsNoUpdateNull, this.updateobj.UpdateBuilder.IsOffIdentity, this.updateobj.UpdateBuilder.IsNoUpdateDefaultValue)
                     .IgnoreColumns(GetIgnoreColumns()).AS(item.Key).ExecuteCommandWithOptLock(isThrowError);
                 }
                 else
                 {
                     result += this.Context.Updateable(addList)
-                        .WhereColumns(this.WhereColumns?.ToArray())
+                        .WhereColumns(this.WhereColumns)
                         .EnableDiffLogEventIF(this.IsEnableDiffLogEvent, this.BusinessData)
-                        .UpdateColumns(updateobj.UpdateBuilder.UpdateColumns?.ToArray())
+                        .UpdateColumns(updateobj.UpdateBuilder.UpdateColumns)
                         .IgnoreColumns(this.updateobj.UpdateBuilder.IsNoUpdateNull, this.updateobj.UpdateBuilder.IsOffIdentity, this.updateobj.UpdateBuilder.IsNoUpdateDefaultValue)
                         .IgnoreColumns(GetIgnoreColumns()).AS(item.Key).ExecuteCommandWithOptLock(isThrowError);
                 }
@@ -58,8 +58,8 @@ namespace ThingsGateway.SqlSugar
                 this.Context.Aop.DataExecuting = null;
                 result += this.Context.Updateable(addList)
                     .EnableDiffLogEventIF(this.IsEnableDiffLogEvent, this.BusinessData)
-                    .WhereColumns(this.WhereColumns?.ToArray())
-                    .UpdateColumns(updateobj.UpdateBuilder.UpdateColumns?.ToArray())
+                    .WhereColumns(this.WhereColumns)
+                    .UpdateColumns(updateobj.UpdateBuilder.UpdateColumns)
                     .IgnoreColumns(this.updateobj.UpdateBuilder.IsNoUpdateNull, this.updateobj.UpdateBuilder.IsOffIdentity, this.updateobj.UpdateBuilder.IsNoUpdateDefaultValue)
                     .IgnoreColumns(GetIgnoreColumns()).AS(item.Key).ExecuteCommand();
                 this.Context.Aop.DataExecuting = dataEvent;
@@ -79,9 +79,9 @@ namespace ThingsGateway.SqlSugar
                 var dataEvent = this.Context.CurrentConnectionConfig.AopEvents?.DataExecuting;
                 this.Context.Aop.DataExecuting = null;
                 result += await Context.Updateable(addList)
-                    .WhereColumns(WhereColumns?.ToArray())
+                    .WhereColumns(WhereColumns)
                     .EnableDiffLogEventIF(IsEnableDiffLogEvent, BusinessData)
-                    .UpdateColumns(updateobj.UpdateBuilder.UpdateColumns?.ToArray())
+                    .UpdateColumns(updateobj.UpdateBuilder.UpdateColumns)
                     .IgnoreColumns(updateobj.UpdateBuilder.IsNoUpdateNull, updateobj.UpdateBuilder.IsOffIdentity, updateobj.UpdateBuilder.IsNoUpdateDefaultValue)
                     .IgnoreColumns(GetIgnoreColumns()).AS(item.Key).ExecuteCommandAsync().ConfigureAwait(false);
                 this.Context.Aop.DataExecuting = dataEvent;
@@ -102,9 +102,9 @@ namespace ThingsGateway.SqlSugar
                 {
                     Check.ExceptionEasy(addList.Count > 1, "The version number can only be used for single record updates", "版本号只能用于单条记录更新");
                     result += await Context.UpdateableT(addList.First())
-                      .WhereColumns(WhereColumns?.ToArray())
+                      .WhereColumns(WhereColumns)
                       .EnableDiffLogEventIF(IsEnableDiffLogEvent, BusinessData)
-                      .UpdateColumns(updateobj.UpdateBuilder.UpdateColumns?.ToArray())
+                      .UpdateColumns(updateobj.UpdateBuilder.UpdateColumns)
                       .IgnoreColumns(updateobj.UpdateBuilder.IsNoUpdateNull, updateobj.UpdateBuilder.IsOffIdentity, updateobj.UpdateBuilder.IsNoUpdateDefaultValue)
                       .IgnoreColumns(GetIgnoreColumns()).AS(item.Key).ExecuteCommandWithOptLockAsync(isThrowError).ConfigureAwait(false);
 
@@ -112,9 +112,9 @@ namespace ThingsGateway.SqlSugar
                 else
                 {
                     result += await Context.Updateable(addList)
-                        .WhereColumns(WhereColumns?.ToArray())
+                        .WhereColumns(WhereColumns)
                         .EnableDiffLogEventIF(IsEnableDiffLogEvent, BusinessData)
-                        .UpdateColumns(updateobj.UpdateBuilder.UpdateColumns?.ToArray())
+                        .UpdateColumns(updateobj.UpdateBuilder.UpdateColumns)
                         .IgnoreColumns(updateobj.UpdateBuilder.IsNoUpdateNull, updateobj.UpdateBuilder.IsOffIdentity, updateobj.UpdateBuilder.IsNoUpdateDefaultValue)
                         .IgnoreColumns(GetIgnoreColumns()).AS(item.Key).ExecuteCommandWithOptLockAsync(isThrowError).ConfigureAwait(false);
                 }
@@ -126,9 +126,8 @@ namespace ThingsGateway.SqlSugar
         {
             if (this.updateobj.UpdateBuilder.DbColumnInfoList.Count != 0)
             {
-                var columns = this.updateobj.UpdateBuilder.DbColumnInfoList.Select(it => it.DbColumnName).Distinct().ToList();
-                var result = this.Context.EntityMaintenance.GetEntityInfo<T>().Columns.Where(x => !columns.Any(y => y.EqualCase(x.DbColumnName))).Select(it => it.DbColumnName).ToArray();
-                result = result.Where(it => !string.IsNullOrEmpty(it)).ToArray();
+                var columns = this.updateobj.UpdateBuilder.DbColumnInfoList.Select(it => it.DbColumnName).ToHashSet();
+                var result = this.Context.EntityMaintenance.GetEntityInfo<T>().Columns.Where(x => !columns.Any(y => y.EqualCase(x.DbColumnName))).Select(it => it.DbColumnName).Where(it => !string.IsNullOrEmpty(it)).ToArray();
                 return result;
             }
             else

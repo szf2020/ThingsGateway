@@ -49,7 +49,7 @@ public static class ExportExcelExtensions
              .OrderBy(
             a =>
             {
-                var order = a.GetCustomAttribute<AutoGenerateColumnAttribute>()?.Order ?? int.MaxValue; ;
+                var order = a.GetCustomAttribute<AutoGenerateColumnAttribute>()?.Order ?? int.MaxValue;
                 if (order < 0)
                 {
                     order = order + 10000000;

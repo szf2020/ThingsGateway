@@ -8,7 +8,7 @@
             PreToSql();
             string sql = InsertBuilder.ToSqlString().Replace("$PrimaryKey", this.SqlBuilder.GetTranslationColumnName(GetIdentityKeys().FirstOrDefault()));
             RestoreMapping();
-            var result = Ado.GetScalar(sql, InsertBuilder.Parameters == null ? null : InsertBuilder.Parameters.ToArray()).ObjToInt();
+            var result = Ado.GetScalar(sql, InsertBuilder.Parameters == null ? null : InsertBuilder.Parameters).ObjToInt();
             return result;
         }
         public override async Task<int> ExecuteReturnIdentityAsync()
@@ -17,14 +17,14 @@
             PreToSql();
             string sql = InsertBuilder.ToSqlString().Replace("$PrimaryKey", this.SqlBuilder.GetTranslationColumnName(GetIdentityKeys().FirstOrDefault()));
             RestoreMapping();
-            var obj = await Ado.GetScalarAsync(sql, InsertBuilder.Parameters == null ? null : InsertBuilder.Parameters.ToArray()).ConfigureAwait(false);
+            var obj = await Ado.GetScalarAsync(sql, InsertBuilder.Parameters == null ? null : InsertBuilder.Parameters).ConfigureAwait(false);
             var result = obj.ObjToInt();
             return result;
         }
-        public override KeyValuePair<string, List<SugarParameter>> ToSql()
+        public override KeyValuePair<string, IReadOnlyList<SugarParameter>> ToSql()
         {
             var result = base.ToSql();
-            return new KeyValuePair<string, List<SugarParameter>>(result.Key.Replace("$PrimaryKey", GetPrimaryKeys().FirstOrDefault()), result.Value);
+            return new KeyValuePair<string, IReadOnlyList<SugarParameter>>(result.Key.Replace("$PrimaryKey", GetPrimaryKeys().FirstOrDefault()), result.Value);
         }
 
         public override long ExecuteReturnBigIdentity()
@@ -42,7 +42,7 @@
             PreToSql();
             string sql = InsertBuilder.ToSqlString().Replace("$PrimaryKey", this.SqlBuilder.GetTranslationColumnName(GetIdentityKeys().FirstOrDefault()));
             RestoreMapping();
-            var result = Convert.ToInt64(await Ado.GetScalarAsync(sql, InsertBuilder.Parameters == null ? null : InsertBuilder.Parameters.ToArray()).ConfigureAwait(false) ?? "0");
+            var result = Convert.ToInt64(await Ado.GetScalarAsync(sql, InsertBuilder.Parameters == null ? null : InsertBuilder.Parameters).ConfigureAwait(false) ?? "0");
             return result;
         }
 

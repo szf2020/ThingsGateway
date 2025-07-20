@@ -40,7 +40,7 @@ namespace ThingsGateway.SqlSugar
         /// <returns></returns>
         IUpdateable<T> WhereColumns(Expression<Func<T, object>> columns);
         IUpdateable<T> WhereColumns(string columnName);
-        IUpdateable<T> WhereColumns(params string[] columnNames);
+        IUpdateable<T> WhereColumns(IReadOnlyList<string> columnNames);
         IUpdateable<T> Where(List<IConditionalModel> conditionalModels);
 
         /// <summary>
@@ -50,8 +50,8 @@ namespace ThingsGateway.SqlSugar
         /// <returns></returns>
         IUpdateable<T> UpdateColumns(Expression<Func<T, object>> columns);
         IUpdateable<T> UpdateColumns(Expression<Func<T, object>> columns, bool appendColumnsByDataFilter);
-        IUpdateable<T> UpdateColumns(params string[] columns);
-        IUpdateable<T> UpdateColumns(string[] columns, bool appendColumnsByDataFilter);
+        IUpdateable<T> UpdateColumns(IReadOnlyList<string> columns);
+        IUpdateable<T> UpdateColumns(IReadOnlyList<string> columns, bool appendColumnsByDataFilter);
 
 
         /// <summary>
@@ -85,7 +85,7 @@ namespace ThingsGateway.SqlSugar
         IUpdateable<T> IgnoreColumns(Expression<Func<T, object>> columns);
         IUpdateable<T> IgnoreColumnsIF(bool isIgnore, Expression<Func<T, object>> columns);
 
-        IUpdateable<T> IgnoreColumns(params string[] columns);
+        IUpdateable<T> IgnoreColumns(IReadOnlyList<string> columns);
         IUpdateable<T> IgnoreNullColumns(bool isIgnoreNull = true);
 
 
@@ -98,7 +98,7 @@ namespace ThingsGateway.SqlSugar
         IUpdateable<T> RemoveDataCache();
         IUpdateable<T> RemoveDataCache(string likeString);
         IUpdateable<T> CallEntityMethod(Expression<Action<T>> method);
-        KeyValuePair<string, List<SugarParameter>> ToSql();
+        KeyValuePair<string, IReadOnlyList<SugarParameter>> ToSql();
         string ToSqlString();
         void AddQueue();
         SplitTableUpdateProvider<T> SplitTable(Func<List<SplitTableInfo>, IEnumerable<SplitTableInfo>> getTableNamesFunc);

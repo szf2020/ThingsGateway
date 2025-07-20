@@ -151,7 +151,6 @@ internal sealed partial class Scheduler
         if (isAppended) schedulerBuilder.AddTriggerBuilder(triggerBuilder);
         else if (isUpdated) schedulerBuilder.UpdateTriggerBuilder(triggerBuilder);
         else if (isRemoved) schedulerBuilder.RemoveTriggerBuilder(triggerId);
-        else { }
 
         // 更新作业
         if (Factory.TryUpdateJob(schedulerBuilder, out _, immediately) != ScheduleResult.Succeed)

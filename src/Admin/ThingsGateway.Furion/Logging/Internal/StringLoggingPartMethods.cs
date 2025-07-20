@@ -98,7 +98,6 @@ public sealed partial class StringLoggingPart
         {
             logger.Log(Level, EventId.Value, Exception, Message, Args);
         }
-        else { }
 
         // 释放临时日志工厂
         if (hasException == true)

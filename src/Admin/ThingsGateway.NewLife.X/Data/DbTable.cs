@@ -33,8 +33,6 @@ public class DbTable : IEnumerable<DbRow>, ICloneable, IAccessor
     public Int32 Total { get; set; }
     #endregion
 
-    #region 构造
-    #endregion
 
     #region 从数据库读取
     /// <summary>读取数据</summary>

@@ -69,7 +69,7 @@ namespace ThingsGateway.SqlSugar
             var sqlObject = joinQueryable.ToSql();
             string sql = sqlObject.Key;
             this.QueryBuilder.LambdaExpressions.ParameterIndex += 100;
-            UtilMethods.RepairReplicationParameters(ref sql, sqlObject.Value.ToArray(), this.QueryBuilder.LambdaExpressions.ParameterIndex, "");
+            UtilMethods.RepairReplicationParameters(ref sql, sqlObject.Value, this.QueryBuilder.LambdaExpressions.ParameterIndex, "");
             joinInfo.TableName = "(" + sql + ")";
             this.QueryBuilder.Parameters.AddRange(sqlObject.Value);
             result.QueryBuilder.JoinQueryInfos.Add(joinInfo);
@@ -104,7 +104,7 @@ namespace ThingsGateway.SqlSugar
             var sqlObject = joinQueryable.ToSql();
             string sql = sqlObject.Key;
             this.QueryBuilder.LambdaExpressions.ParameterIndex += 100;
-            UtilMethods.RepairReplicationParameters(ref sql, sqlObject.Value.ToArray(), this.QueryBuilder.LambdaExpressions.ParameterIndex, "");
+            UtilMethods.RepairReplicationParameters(ref sql, sqlObject.Value, this.QueryBuilder.LambdaExpressions.ParameterIndex, "");
             joinInfo.TableName = "(" + sql + ")";
             this.QueryBuilder.Parameters.AddRange(sqlObject.Value);
             result.QueryBuilder.JoinQueryInfos.Add(joinInfo);
@@ -121,7 +121,7 @@ namespace ThingsGateway.SqlSugar
             var sqlObject = joinQueryable.ToSql();
             string sql = sqlObject.Key;
             this.QueryBuilder.LambdaExpressions.ParameterIndex += 100;
-            UtilMethods.RepairReplicationParameters(ref sql, sqlObject.Value.ToArray(), this.QueryBuilder.LambdaExpressions.ParameterIndex, "");
+            UtilMethods.RepairReplicationParameters(ref sql, sqlObject.Value, this.QueryBuilder.LambdaExpressions.ParameterIndex, "");
             joinInfo.TableName = "(" + sql + ")";
             this.QueryBuilder.Parameters.AddRange(sqlObject.Value);
             result.QueryBuilder.JoinQueryInfos.Add(joinInfo);
@@ -139,7 +139,7 @@ namespace ThingsGateway.SqlSugar
             var sqlObject = joinQueryable.ToSql();
             string sql = sqlObject.Key;
             this.QueryBuilder.LambdaExpressions.ParameterIndex += 100;
-            UtilMethods.RepairReplicationParameters(ref sql, sqlObject.Value.ToArray(), this.QueryBuilder.LambdaExpressions.ParameterIndex, "");
+            UtilMethods.RepairReplicationParameters(ref sql, sqlObject.Value, this.QueryBuilder.LambdaExpressions.ParameterIndex, "");
             joinInfo.TableName = "(" + sql + ")";
             this.QueryBuilder.Parameters.AddRange(sqlObject.Value);
             result.QueryBuilder.JoinQueryInfos.Add(joinInfo);
@@ -543,7 +543,7 @@ namespace ThingsGateway.SqlSugar
         #endregion
 
         #region In
-        public new ISugarQueryable<T, T2> InIF<TParamter>(bool isIn, string fieldName, params TParamter[] pkValues)
+        public new ISugarQueryable<T, T2> InIF<TParamter>(bool isIn, string fieldName, IReadOnlyList<TParamter> pkValues)
         {
             if (isIn)
             {
@@ -551,7 +551,7 @@ namespace ThingsGateway.SqlSugar
             }
             return this;
         }
-        public new ISugarQueryable<T, T2> InIF<TParamter>(bool isIn, params TParamter[] pkValues)
+        public new ISugarQueryable<T, T2> InIF<TParamter>(bool isIn, IReadOnlyList<TParamter> pkValues)
         {
             if (isIn)
             {
@@ -559,16 +559,8 @@ namespace ThingsGateway.SqlSugar
             }
             return this;
         }
-        public new ISugarQueryable<T, T2> In<FieldType>(Expression<Func<T, object>> expression, params FieldType[] inValues)
-        {
-            QueryBuilder.CheckExpression(expression, "In");
-            var isSingle = QueryBuilder.IsSingle();
-            var lamResult = QueryBuilder.GetExpressionValue(expression, isSingle ? ResolveExpressType.FieldSingle : ResolveExpressType.FieldMultiple);
-            var fieldName = lamResult.GetResultString();
-            In(fieldName, inValues);
-            return this;
-        }
-        public new ISugarQueryable<T, T2> In<FieldType>(Expression<Func<T, object>> expression, List<FieldType> inValues)
+
+        public new ISugarQueryable<T, T2> In<FieldType>(Expression<Func<T, object>> expression, IReadOnlyList<FieldType> inValues)
         {
             QueryBuilder.CheckExpression(expression, "In");
             var isSingle = QueryBuilder.IsSingle();
@@ -584,16 +576,7 @@ namespace ThingsGateway.SqlSugar
             return this;
         }
 
-        public ISugarQueryable<T, T2> In<FieldType>(Expression<Func<T, T2, object>> expression, params FieldType[] inValues)
-        {
-            QueryBuilder.CheckExpression(expression, "In");
-            var isSingle = QueryBuilder.IsSingle();
-            var lamResult = QueryBuilder.GetExpressionValue(expression, isSingle ? ResolveExpressType.FieldSingle : ResolveExpressType.FieldMultiple);
-            var fieldName = lamResult.GetResultString();
-            In(fieldName, inValues);
-            return this;
-        }
-        public ISugarQueryable<T, T2> In<FieldType>(Expression<Func<T, T2, object>> expression, List<FieldType> inValues)
+        public ISugarQueryable<T, T2> In<FieldType>(Expression<Func<T, T2, object>> expression, IReadOnlyList<FieldType> inValues)
         {
             QueryBuilder.CheckExpression(expression, "In");
             var isSingle = QueryBuilder.IsSingle();
@@ -665,18 +648,13 @@ namespace ThingsGateway.SqlSugar
                 QueryBuilder.Parameters.AddRange(Context.Ado.GetParameters(parameters));
             return this;
         }
-        public new ISugarQueryable<T, T2> AddParameters(SugarParameter[] parameters)
+        public new ISugarQueryable<T, T2> AddParameters(IEnumerable<SugarParameter> parameters)
         {
             if (parameters != null)
                 QueryBuilder.Parameters.AddRange(parameters);
             return this;
         }
-        public new ISugarQueryable<T, T2> AddParameters(List<SugarParameter> parameters)
-        {
-            if (parameters != null)
-                QueryBuilder.Parameters.AddRange(parameters);
-            return this;
-        }
+
         public new ISugarQueryable<T, T2> AddJoinInfo(string tableName, string shortName, string joinWhere, JoinType type = JoinType.Left)
         {
             QueryBuilder.JoinIndex = +1;
@@ -802,7 +780,7 @@ namespace ThingsGateway.SqlSugar
             var sqlObject = joinQueryable.ToSql();
             string sql = sqlObject.Key;
             this.QueryBuilder.LambdaExpressions.ParameterIndex += 100;
-            UtilMethods.RepairReplicationParameters(ref sql, sqlObject.Value.ToArray(), this.QueryBuilder.LambdaExpressions.ParameterIndex, "");
+            UtilMethods.RepairReplicationParameters(ref sql, sqlObject.Value, this.QueryBuilder.LambdaExpressions.ParameterIndex, "");
             joinInfo.TableName = "(" + sql + ")";
             this.QueryBuilder.Parameters.AddRange(sqlObject.Value);
             result.QueryBuilder.JoinQueryInfos.Add(joinInfo);
@@ -837,7 +815,7 @@ namespace ThingsGateway.SqlSugar
             var sqlObject = joinQueryable.ToSql();
             string sql = sqlObject.Key;
             this.QueryBuilder.LambdaExpressions.ParameterIndex += 100;
-            UtilMethods.RepairReplicationParameters(ref sql, sqlObject.Value.ToArray(), this.QueryBuilder.LambdaExpressions.ParameterIndex, "");
+            UtilMethods.RepairReplicationParameters(ref sql, sqlObject.Value, this.QueryBuilder.LambdaExpressions.ParameterIndex, "");
             joinInfo.TableName = "(" + sql + ")";
             this.QueryBuilder.Parameters.AddRange(sqlObject.Value);
             result.QueryBuilder.JoinQueryInfos.Add(joinInfo);
@@ -854,7 +832,7 @@ namespace ThingsGateway.SqlSugar
             var sqlObject = joinQueryable.ToSql();
             string sql = sqlObject.Key;
             this.QueryBuilder.LambdaExpressions.ParameterIndex += 100;
-            UtilMethods.RepairReplicationParameters(ref sql, sqlObject.Value.ToArray(), this.QueryBuilder.LambdaExpressions.ParameterIndex, "");
+            UtilMethods.RepairReplicationParameters(ref sql, sqlObject.Value, this.QueryBuilder.LambdaExpressions.ParameterIndex, "");
             joinInfo.TableName = "(" + sql + ")";
             this.QueryBuilder.Parameters.AddRange(sqlObject.Value);
             result.QueryBuilder.JoinQueryInfos.Add(joinInfo);
@@ -871,7 +849,7 @@ namespace ThingsGateway.SqlSugar
             var sqlObject = joinQueryable.ToSql();
             string sql = sqlObject.Key;
             this.QueryBuilder.LambdaExpressions.ParameterIndex += 100;
-            UtilMethods.RepairReplicationParameters(ref sql, sqlObject.Value.ToArray(), this.QueryBuilder.LambdaExpressions.ParameterIndex, "");
+            UtilMethods.RepairReplicationParameters(ref sql, sqlObject.Value, this.QueryBuilder.LambdaExpressions.ParameterIndex, "");
             joinInfo.TableName = "(" + sql + ")";
             this.QueryBuilder.Parameters.AddRange(sqlObject.Value);
             result.QueryBuilder.JoinQueryInfos.Add(joinInfo);
@@ -1358,7 +1336,7 @@ namespace ThingsGateway.SqlSugar
         #endregion
 
         #region In
-        public new ISugarQueryable<T, T2, T3> InIF<TParamter>(bool isIn, string fieldName, params TParamter[] pkValues)
+        public new ISugarQueryable<T, T2, T3> InIF<TParamter>(bool isIn, string fieldName, IReadOnlyList<TParamter> pkValues)
         {
             if (isIn)
             {
@@ -1366,7 +1344,7 @@ namespace ThingsGateway.SqlSugar
             }
             return this;
         }
-        public new ISugarQueryable<T, T2, T3> InIF<TParamter>(bool isIn, params TParamter[] pkValues)
+        public new ISugarQueryable<T, T2, T3> InIF<TParamter>(bool isIn, IReadOnlyList<TParamter> pkValues)
         {
             if (isIn)
             {
@@ -1374,7 +1352,7 @@ namespace ThingsGateway.SqlSugar
             }
             return this;
         }
-        public new ISugarQueryable<T, T2, T3> In<FieldType>(Expression<Func<T, object>> expression, params FieldType[] inValues)
+        public new ISugarQueryable<T, T2, T3> In<FieldType>(Expression<Func<T, object>> expression, IReadOnlyList<FieldType> inValues)
         {
             QueryBuilder.CheckExpression(expression, "In");
             var isSingle = QueryBuilder.IsSingle();
@@ -1383,15 +1361,7 @@ namespace ThingsGateway.SqlSugar
             In(fieldName, inValues);
             return this;
         }
-        public new ISugarQueryable<T, T2, T3> In<FieldType>(Expression<Func<T, object>> expression, List<FieldType> inValues)
-        {
-            QueryBuilder.CheckExpression(expression, "In");
-            var isSingle = QueryBuilder.IsSingle();
-            var lamResult = QueryBuilder.GetExpressionValue(expression, isSingle ? ResolveExpressType.FieldSingle : ResolveExpressType.FieldMultiple);
-            var fieldName = lamResult.GetResultString();
-            In(fieldName, inValues);
-            return this;
-        }
+
         public new ISugarQueryable<T, T2, T3> In<FieldType>(Expression<Func<T, object>> expression, ISugarQueryable<FieldType> childQueryExpression)
         {
             var sqlObj = childQueryExpression.ToSql();
@@ -1399,7 +1369,7 @@ namespace ThingsGateway.SqlSugar
             return this;
         }
 
-        public ISugarQueryable<T, T2, T3> In<FieldType>(Expression<Func<T, T2, object>> expression, params FieldType[] inValues)
+        public ISugarQueryable<T, T2, T3> In<FieldType>(Expression<Func<T, T2, object>> expression, IReadOnlyList<FieldType> inValues)
         {
             QueryBuilder.CheckExpression(expression, "In");
             var isSingle = QueryBuilder.IsSingle();
@@ -1408,15 +1378,7 @@ namespace ThingsGateway.SqlSugar
             In(fieldName, inValues);
             return this;
         }
-        public ISugarQueryable<T, T2, T3> In<FieldType>(Expression<Func<T, T2, object>> expression, List<FieldType> inValues)
-        {
-            QueryBuilder.CheckExpression(expression, "In");
-            var isSingle = QueryBuilder.IsSingle();
-            var lamResult = QueryBuilder.GetExpressionValue(expression, isSingle ? ResolveExpressType.FieldSingle : ResolveExpressType.FieldMultiple);
-            var fieldName = lamResult.GetResultString();
-            In(fieldName, inValues);
-            return this;
-        }
+
         public ISugarQueryable<T, T2, T3> In<FieldType>(Expression<Func<T, T2, object>> expression, ISugarQueryable<FieldType> childQueryExpression)
         {
             var sqlObj = childQueryExpression.ToSql();
@@ -1424,7 +1386,7 @@ namespace ThingsGateway.SqlSugar
             return this;
         }
 
-        public ISugarQueryable<T, T2, T3> In<FieldType>(Expression<Func<T, T2, T3, object>> expression, params FieldType[] inValues)
+        public ISugarQueryable<T, T2, T3> In<FieldType>(Expression<Func<T, T2, T3, object>> expression, IReadOnlyList<FieldType> inValues)
         {
             QueryBuilder.CheckExpression(expression, "In");
             var isSingle = QueryBuilder.IsSingle();
@@ -1510,18 +1472,13 @@ namespace ThingsGateway.SqlSugar
                 QueryBuilder.Parameters.AddRange(Context.Ado.GetParameters(parameters));
             return this;
         }
-        public new ISugarQueryable<T, T2, T3> AddParameters(SugarParameter[] parameters)
+        public new ISugarQueryable<T, T2, T3> AddParameters(IEnumerable<SugarParameter> parameters)
         {
             if (parameters != null)
                 QueryBuilder.Parameters.AddRange(parameters);
             return this;
         }
-        public new ISugarQueryable<T, T2, T3> AddParameters(List<SugarParameter> parameters)
-        {
-            if (parameters != null)
-                QueryBuilder.Parameters.AddRange(parameters);
-            return this;
-        }
+
         public new ISugarQueryable<T, T2, T3> AddJoinInfo(string tableName, string shortName, string joinWhere, JoinType type = JoinType.Left)
         {
             QueryBuilder.JoinIndex = +1;
@@ -1641,7 +1598,7 @@ namespace ThingsGateway.SqlSugar
             var sqlObject = joinQueryable.ToSql();
             string sql = sqlObject.Key;
             this.QueryBuilder.LambdaExpressions.ParameterIndex += 100;
-            UtilMethods.RepairReplicationParameters(ref sql, sqlObject.Value.ToArray(), this.QueryBuilder.LambdaExpressions.ParameterIndex, "");
+            UtilMethods.RepairReplicationParameters(ref sql, sqlObject.Value, this.QueryBuilder.LambdaExpressions.ParameterIndex, "");
             joinInfo.TableName = "(" + sql + ")";
             this.QueryBuilder.Parameters.AddRange(sqlObject.Value);
             result.QueryBuilder.JoinQueryInfos.Add(joinInfo);
@@ -1676,7 +1633,7 @@ namespace ThingsGateway.SqlSugar
             var sqlObject = joinQueryable.ToSql();
             string sql = sqlObject.Key;
             this.QueryBuilder.LambdaExpressions.ParameterIndex += 100;
-            UtilMethods.RepairReplicationParameters(ref sql, sqlObject.Value.ToArray(), this.QueryBuilder.LambdaExpressions.ParameterIndex, "");
+            UtilMethods.RepairReplicationParameters(ref sql, sqlObject.Value, this.QueryBuilder.LambdaExpressions.ParameterIndex, "");
             joinInfo.TableName = "(" + sql + ")";
             this.QueryBuilder.Parameters.AddRange(sqlObject.Value);
             result.QueryBuilder.JoinQueryInfos.Add(joinInfo);
@@ -1693,7 +1650,7 @@ namespace ThingsGateway.SqlSugar
             var sqlObject = joinQueryable.ToSql();
             string sql = sqlObject.Key;
             this.QueryBuilder.LambdaExpressions.ParameterIndex += 100;
-            UtilMethods.RepairReplicationParameters(ref sql, sqlObject.Value.ToArray(), this.QueryBuilder.LambdaExpressions.ParameterIndex, "");
+            UtilMethods.RepairReplicationParameters(ref sql, sqlObject.Value, this.QueryBuilder.LambdaExpressions.ParameterIndex, "");
             joinInfo.TableName = "(" + sql + ")";
             this.QueryBuilder.Parameters.AddRange(sqlObject.Value);
             result.QueryBuilder.JoinQueryInfos.Add(joinInfo);
@@ -2189,7 +2146,7 @@ namespace ThingsGateway.SqlSugar
         #endregion
 
         #region In
-        public new ISugarQueryable<T, T2, T3, T4> InIF<TParamter>(bool isIn, string fieldName, params TParamter[] pkValues)
+        public new ISugarQueryable<T, T2, T3, T4> InIF<TParamter>(bool isIn, string fieldName, IReadOnlyList<TParamter> pkValues)
         {
             if (isIn)
             {
@@ -2197,7 +2154,7 @@ namespace ThingsGateway.SqlSugar
             }
             return this;
         }
-        public new ISugarQueryable<T, T2, T3, T4> InIF<TParamter>(bool isIn, params TParamter[] pkValues)
+        public new ISugarQueryable<T, T2, T3, T4> InIF<TParamter>(bool isIn, IReadOnlyList<TParamter> pkValues)
         {
             if (isIn)
             {
@@ -2205,7 +2162,7 @@ namespace ThingsGateway.SqlSugar
             }
             return this;
         }
-        public new ISugarQueryable<T, T2, T3, T4> In<FieldType>(Expression<Func<T, object>> expression, params FieldType[] inValues)
+        public new ISugarQueryable<T, T2, T3, T4> In<FieldType>(Expression<Func<T, object>> expression, IReadOnlyList<FieldType> inValues)
         {
             QueryBuilder.CheckExpression(expression, "In");
             var isSingle = QueryBuilder.IsSingle();
@@ -2214,15 +2171,7 @@ namespace ThingsGateway.SqlSugar
             In(fieldName, inValues);
             return this;
         }
-        public new ISugarQueryable<T, T2, T3, T4> In<FieldType>(Expression<Func<T, object>> expression, List<FieldType> inValues)
-        {
-            QueryBuilder.CheckExpression(expression, "In");
-            var isSingle = QueryBuilder.IsSingle();
-            var lamResult = QueryBuilder.GetExpressionValue(expression, isSingle ? ResolveExpressType.FieldSingle : ResolveExpressType.FieldMultiple);
-            var fieldName = lamResult.GetResultString();
-            In(fieldName, inValues);
-            return this;
-        }
+
         public new ISugarQueryable<T, T2, T3, T4> In<FieldType>(Expression<Func<T, object>> expression, ISugarQueryable<FieldType> childQueryExpression)
         {
             var sqlObj = childQueryExpression.ToSql();
@@ -2230,16 +2179,8 @@ namespace ThingsGateway.SqlSugar
             return this;
         }
 
-        public ISugarQueryable<T, T2, T3, T4> In<FieldType>(Expression<Func<T, T2, object>> expression, params FieldType[] inValues)
-        {
-            QueryBuilder.CheckExpression(expression, "In");
-            var isSingle = QueryBuilder.IsSingle();
-            var lamResult = QueryBuilder.GetExpressionValue(expression, isSingle ? ResolveExpressType.FieldSingle : ResolveExpressType.FieldMultiple);
-            var fieldName = lamResult.GetResultString();
-            In(fieldName, inValues);
-            return this;
-        }
-        public ISugarQueryable<T, T2, T3, T4> In<FieldType>(Expression<Func<T, T2, object>> expression, List<FieldType> inValues)
+
+        public ISugarQueryable<T, T2, T3, T4> In<FieldType>(Expression<Func<T, T2, object>> expression, IReadOnlyList<FieldType> inValues)
         {
             QueryBuilder.CheckExpression(expression, "In");
             var isSingle = QueryBuilder.IsSingle();
@@ -2255,16 +2196,7 @@ namespace ThingsGateway.SqlSugar
             return this;
         }
 
-        public ISugarQueryable<T, T2, T3, T4> In<FieldType>(Expression<Func<T, T2, T3, object>> expression, params FieldType[] inValues)
-        {
-            QueryBuilder.CheckExpression(expression, "In");
-            var isSingle = QueryBuilder.IsSingle();
-            var lamResult = QueryBuilder.GetExpressionValue(expression, isSingle ? ResolveExpressType.FieldSingle : ResolveExpressType.FieldMultiple);
-            var fieldName = lamResult.GetResultString();
-            In(fieldName, inValues);
-            return this;
-        }
-        public ISugarQueryable<T, T2, T3, T4> In<FieldType>(Expression<Func<T, T2, T3, object>> expression, List<FieldType> inValues)
+        public ISugarQueryable<T, T2, T3, T4> In<FieldType>(Expression<Func<T, T2, T3, object>> expression, IReadOnlyList<FieldType> inValues)
         {
             QueryBuilder.CheckExpression(expression, "In");
             var isSingle = QueryBuilder.IsSingle();
@@ -2280,16 +2212,8 @@ namespace ThingsGateway.SqlSugar
             return this;
         }
 
-        public ISugarQueryable<T, T2, T3, T4> In<FieldType>(Expression<Func<T, T2, T3, T4, object>> expression, params FieldType[] inValues)
-        {
-            QueryBuilder.CheckExpression(expression, "In");
-            var isSingle = QueryBuilder.IsSingle();
-            var lamResult = QueryBuilder.GetExpressionValue(expression, isSingle ? ResolveExpressType.FieldSingle : ResolveExpressType.FieldMultiple);
-            var fieldName = lamResult.GetResultString();
-            In(fieldName, inValues);
-            return this;
-        }
-        public ISugarQueryable<T, T2, T3, T4> In<FieldType>(Expression<Func<T, T2, T3, T4, object>> expression, List<FieldType> inValues)
+
+        public ISugarQueryable<T, T2, T3, T4> In<FieldType>(Expression<Func<T, T2, T3, T4, object>> expression, IReadOnlyList<FieldType> inValues)
         {
             QueryBuilder.CheckExpression(expression, "In");
             var isSingle = QueryBuilder.IsSingle();
@@ -2369,18 +2293,13 @@ namespace ThingsGateway.SqlSugar
                 QueryBuilder.Parameters.AddRange(Context.Ado.GetParameters(parameters));
             return this;
         }
-        public new ISugarQueryable<T, T2, T3, T4> AddParameters(SugarParameter[] parameters)
+        public new ISugarQueryable<T, T2, T3, T4> AddParameters(IEnumerable<SugarParameter> parameters)
         {
             if (parameters != null)
                 QueryBuilder.Parameters.AddRange(parameters);
             return this;
         }
-        public new ISugarQueryable<T, T2, T3, T4> AddParameters(List<SugarParameter> parameters)
-        {
-            if (parameters != null)
-                QueryBuilder.Parameters.AddRange(parameters);
-            return this;
-        }
+
         public new ISugarQueryable<T, T2, T3, T4> AddJoinInfo(string tableName, string shortName, string joinWhere, JoinType type = JoinType.Left)
         {
             QueryBuilder.JoinIndex = +1;
@@ -2502,7 +2421,7 @@ namespace ThingsGateway.SqlSugar
             var sqlObject = joinQueryable.ToSql();
             string sql = sqlObject.Key;
             this.QueryBuilder.LambdaExpressions.ParameterIndex += 100;
-            UtilMethods.RepairReplicationParameters(ref sql, sqlObject.Value.ToArray(), this.QueryBuilder.LambdaExpressions.ParameterIndex, "");
+            UtilMethods.RepairReplicationParameters(ref sql, sqlObject.Value, this.QueryBuilder.LambdaExpressions.ParameterIndex, "");
             joinInfo.TableName = "(" + sql + ")";
             this.QueryBuilder.Parameters.AddRange(sqlObject.Value);
             result.QueryBuilder.JoinQueryInfos.Add(joinInfo);
@@ -2538,7 +2457,7 @@ namespace ThingsGateway.SqlSugar
             var sqlObject = joinQueryable.ToSql();
             string sql = sqlObject.Key;
             this.QueryBuilder.LambdaExpressions.ParameterIndex += 100;
-            UtilMethods.RepairReplicationParameters(ref sql, sqlObject.Value.ToArray(), this.QueryBuilder.LambdaExpressions.ParameterIndex, "");
+            UtilMethods.RepairReplicationParameters(ref sql, sqlObject.Value, this.QueryBuilder.LambdaExpressions.ParameterIndex, "");
             joinInfo.TableName = "(" + sql + ")";
             this.QueryBuilder.Parameters.AddRange(sqlObject.Value);
             result.QueryBuilder.JoinQueryInfos.Add(joinInfo);
@@ -2555,7 +2474,7 @@ namespace ThingsGateway.SqlSugar
             var sqlObject = joinQueryable.ToSql();
             string sql = sqlObject.Key;
             this.QueryBuilder.LambdaExpressions.ParameterIndex += 100;
-            UtilMethods.RepairReplicationParameters(ref sql, sqlObject.Value.ToArray(), this.QueryBuilder.LambdaExpressions.ParameterIndex, "");
+            UtilMethods.RepairReplicationParameters(ref sql, sqlObject.Value, this.QueryBuilder.LambdaExpressions.ParameterIndex, "");
             joinInfo.TableName = "(" + sql + ")";
             this.QueryBuilder.Parameters.AddRange(sqlObject.Value);
             result.QueryBuilder.JoinQueryInfos.Add(joinInfo);
@@ -3075,15 +2994,8 @@ namespace ThingsGateway.SqlSugar
         #endregion
 
         #region In
-        public new ISugarQueryable<T, T2, T3, T4, T5> In<FieldType>(Expression<Func<T, object>> expression, params FieldType[] inValues)
-        {
-            var isSingle = QueryBuilder.IsSingle();
-            var lamResult = QueryBuilder.GetExpressionValue(expression, isSingle ? ResolveExpressType.FieldSingle : ResolveExpressType.FieldMultiple);
-            var fieldName = lamResult.GetResultString();
-            In(fieldName, inValues);
-            return this;
-        }
-        public new ISugarQueryable<T, T2, T3, T4, T5> In<FieldType>(Expression<Func<T, object>> expression, List<FieldType> inValues)
+
+        public new ISugarQueryable<T, T2, T3, T4, T5> In<FieldType>(Expression<Func<T, object>> expression, IReadOnlyList<FieldType> inValues)
         {
             var isSingle = QueryBuilder.IsSingle();
             var lamResult = QueryBuilder.GetExpressionValue(expression, isSingle ? ResolveExpressType.FieldSingle : ResolveExpressType.FieldMultiple);
@@ -3162,18 +3074,13 @@ namespace ThingsGateway.SqlSugar
                 QueryBuilder.Parameters.AddRange(Context.Ado.GetParameters(parameters));
             return this;
         }
-        public new ISugarQueryable<T, T2, T3, T4, T5> AddParameters(SugarParameter[] parameters)
+        public new ISugarQueryable<T, T2, T3, T4, T5> AddParameters(IEnumerable<SugarParameter> parameters)
         {
             if (parameters != null)
                 QueryBuilder.Parameters.AddRange(parameters);
             return this;
         }
-        public new ISugarQueryable<T, T2, T3, T4, T5> AddParameters(List<SugarParameter> parameters)
-        {
-            if (parameters != null)
-                QueryBuilder.Parameters.AddRange(parameters);
-            return this;
-        }
+
         public new ISugarQueryable<T, T2, T3, T4, T5> AddJoinInfo(string tableName, string shortName, string joinWhere, JoinType type = JoinType.Left)
         {
             QueryBuilder.JoinIndex = +1;

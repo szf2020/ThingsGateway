@@ -3,6 +3,6 @@
     public class QueueItem
     {
         public string Sql { get; set; }
-        public SugarParameter[] Parameters { get; set; }
+        public IReadOnlyList<SugarParameter> Parameters { get; set; }
     }
 }

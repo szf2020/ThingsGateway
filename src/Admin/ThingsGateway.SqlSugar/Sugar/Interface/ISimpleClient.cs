@@ -123,7 +123,7 @@ namespace ThingsGateway.SqlSugar
         Task<int> InsertReturnIdentityAsync(T insertObj, CancellationToken cancellationToken);
         Task<long> InsertReturnBigIdentityAsync(T insertObj, CancellationToken cancellationToken);
         Task<long> InsertReturnSnowflakeIdAsync(T insertObj, CancellationToken cancellationToken);
-        Task<List<long>> InsertReturnSnowflakeIdAsync(List<T> insertObjs, CancellationToken cancellationToken);
+        Task<List<long>> InsertReturnSnowflakeIdAsync(IReadOnlyList<T> insertObjs, CancellationToken cancellationToken);
         Task<T> InsertReturnEntityAsync(T insertObj, CancellationToken cancellationToken);
 
         Task<bool> IsAnyAsync(Expression<Func<T, bool>> whereExpression, CancellationToken cancellationToken);

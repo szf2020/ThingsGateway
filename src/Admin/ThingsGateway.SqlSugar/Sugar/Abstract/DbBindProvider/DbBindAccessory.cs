@@ -148,7 +148,7 @@ namespace ThingsGateway.SqlSugar
             if (isOwnsOne)
             {
                 var ownsOneColumnsKv = entityInfo.Columns.Where(it => it.ForOwnsOnePropertyInfo != null)
-                    .GroupBy(it => it.ForOwnsOnePropertyInfo).ToList();
+                    .GroupBy(it => it.ForOwnsOnePropertyInfo);
                 foreach (var kv in ownsOneColumnsKv)
                 {
                     var parentObj = kv.Key.GetValue(addItem);
@@ -157,7 +157,7 @@ namespace ThingsGateway.SqlSugar
                         parentObj = kv.Key.PropertyType.Assembly.CreateInstance(kv.Key.PropertyType.FullName);
                         kv.Key.SetValue(addItem, parentObj);
                     }
-                    foreach (var item in kv.ToList())
+                    foreach (var item in kv)
                     {
                         if (this.QueryBuilder?.SelectValue?.Equals("1") == true)
                         {
@@ -210,8 +210,8 @@ namespace ThingsGateway.SqlSugar
         {
             var formats = this.QueryBuilder.QueryableFormats;
             var columns = this.QueryBuilder.Context.EntityMaintenance.GetEntityInfoWithAttr(typeof(T))
-                .Columns.Where(it => formats.Any(y => y.PropertyName == it.PropertyName)).ToList();
-            if (columns.Count != 0)
+                .Columns.Where(it => formats.Any(y => y.PropertyName == it.PropertyName));
+            if (columns.Any())
             {
                 foreach (var item in formats)
                 {

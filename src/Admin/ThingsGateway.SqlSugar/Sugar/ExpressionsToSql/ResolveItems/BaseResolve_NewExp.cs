@@ -68,7 +68,7 @@ namespace ThingsGateway.SqlSugar
                         .Columns
                         .Where(it => it.PropertyInfo != ignoreProperty)
                         .Where(it => it.IsIgnore == true)
-                        .Where(it => it.PropertyInfo.PropertyType.IsClass()).ToList();
+                        .Where(it => it.PropertyInfo.PropertyType.IsClass());
                     foreach (var itemColumnInfo in entityInfoColumns)
                     {
                         if (this.Context.SugarContext.QueryBuilder.SelectNewIgnoreColumns == null)

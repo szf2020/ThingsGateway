@@ -9,7 +9,7 @@ namespace ThingsGateway.SqlSugar
     }
     public partial class SqliteProvider : AdoProvider
     {
-        public override void ExecuteBefore(string sql, SugarParameter[] parameters)
+        public override void ExecuteBefore(string sql, IReadOnlyList<SugarParameter> parameters)
         {
             this.BeforeTime = DateTime.Now;
             if (sql.HasValue() && parameters.HasValue())
@@ -26,10 +26,10 @@ namespace ThingsGateway.SqlSugar
             }
             if (this.IsEnableLogEvent)
             {
-                Action<string, SugarParameter[]> action = LogEventStarting;
+                Action<string, IReadOnlyList<SugarParameter>> action = LogEventStarting;
                 if (action != null)
                 {
-                    if (parameters == null || parameters.Length == 0)
+                    if (parameters == null || parameters.Count == 0)
                     {
                         action(sql, Array.Empty<SugarParameter>());
                     }
@@ -41,8 +41,4 @@ namespace ThingsGateway.SqlSugar
             }
         }
     }
-}
-namespace System.Data.Sqlite
-{
-
 }

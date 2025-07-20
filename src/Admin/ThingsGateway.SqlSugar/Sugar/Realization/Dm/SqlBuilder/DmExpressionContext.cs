@@ -196,7 +196,7 @@
         {
             var parameter = model.Args[0];
             var parameter2 = model.Args[1];
-            return string.Format(" ( cast({0} as date)= cast( {1} as date) ) ", parameter.MemberName, parameter2.MemberName); ;
+            return string.Format(" ( cast({0} as date)= cast( {1} as date) ) ", parameter.MemberName, parameter2.MemberName);
         }
         public override string DateIsSameByType(MethodCallExpressionModel model)
         {

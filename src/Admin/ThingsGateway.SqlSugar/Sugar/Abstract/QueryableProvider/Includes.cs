@@ -157,7 +157,7 @@ namespace ThingsGateway.SqlSugar
         /// </summary>
         private static List<Expression> GetIncludesByNameStringParameters(Type type, EntityColumnInfo item)
         {
-            var parameters = new List<Expression> { };
+            var parameters = new List<Expression>();
             Check.ExceptionEasy(item == null, "\r\nThe \"IncludesByNameString\" method encountered an error. The navigation object does not exist. Please check the parameters and navigation configuration.", "IncludesByNameString方法出错，导航对象不存在，请检查参数和导航配置");
             var propertyType = item.PropertyInfo.PropertyType;
             var propertyItemType = propertyType;
@@ -175,7 +175,7 @@ namespace ThingsGateway.SqlSugar
         /// </summary>
         public ISugarQueryable<T> IncludesByNameString(string navMemberName)
         {
-            var navs = this.EntityInfo.Columns.Where(it => it.Navigat != null && it.PropertyName.EqualCase(navMemberName)).ToList();
+            var navs = this.EntityInfo.Columns.Where(it => it.Navigat != null && it.PropertyName.EqualCase(navMemberName));
             foreach (var item in navs)
             {
                 var propertyType = item.PropertyInfo.PropertyType;
@@ -197,7 +197,7 @@ namespace ThingsGateway.SqlSugar
         /// </summary>
         public ISugarQueryable<T> IncludesAllFirstLayer(params string[] ignorePropertyNameList)
         {
-            var navs = this.EntityInfo.Columns.Where(it => it.Navigat != null).ToList();
+            var navs = this.EntityInfo.Columns.Where(it => it.Navigat != null);
             foreach (var item in navs)
             {
                 if (ignorePropertyNameList?.Any(z => z.EqualCase(item.PropertyName)) == true)
@@ -237,7 +237,7 @@ namespace ThingsGateway.SqlSugar
             {
                 type = type.GetGenericArguments()[0];
             }
-            var navs = this.Context.EntityMaintenance.GetEntityInfo(type).Columns.Where(it => it.Navigat != null).ToList();
+            var navs = this.Context.EntityMaintenance.GetEntityInfo(type).Columns.Where(it => it.Navigat != null);
             foreach (var item in navs)
             {
                 if (ignorePropertyNameList?.Any(z => z.EqualCase(item.PropertyName)) == true)

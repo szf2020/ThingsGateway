@@ -687,7 +687,7 @@ namespace ThingsGateway.SqlSugar
             }
             var dbColumns = this.GetColumnInfosByTableName(talbeName, false);
             var db = this.Context;
-            var columns = entityInfo.Columns.Where(it => it.IsIgnore == false).ToList();
+            var columns = entityInfo.Columns.Where(it => it.IsIgnore == false);
             foreach (var item in columns)
             {
                 if (item.DefaultValue.HasValue())

@@ -1,5 +1,4 @@
-﻿namespace System.Threading.Tasks;
-
+﻿
 #if NET452
 /// <summary>任务扩展</summary>
 public static class TaskEx

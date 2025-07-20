@@ -803,7 +803,7 @@ namespace ThingsGateway.SqlSugar
             }
             catch (InvalidOperationException ex)
             {
-                return new MapperExpressionResolve(expression, ex).GetSql(); ;
+                return new MapperExpressionResolve(expression, ex).GetSql();
             }
             catch (Exception ex)
             {

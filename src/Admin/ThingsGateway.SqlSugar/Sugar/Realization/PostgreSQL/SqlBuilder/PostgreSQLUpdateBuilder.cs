@@ -140,7 +140,7 @@ namespace ThingsGateway.SqlSugar
                 int i = 0;
                 var tableColumnList = this.Context.DbMaintenance.GetColumnInfosByTableName(GetTableNameStringNoWith);
 
-                foreach (var columns in groupList.Skip((pageIndex - 1) * pageSize).Take(pageSize).ToList())
+                foreach (var columns in groupList.Skip((pageIndex - 1) * pageSize).Take(pageSize))
                 {
                     var isFirst = i == 0;
                     if (!isFirst)

@@ -46,7 +46,7 @@ namespace ThingsGateway.SqlSugar
                     var tagString = string.Join(",", tagValues.Where(v => !string.IsNullOrEmpty(v)).Select(v => $"'{v.ToSqlFilter()}'"));
                     tags.Add(tagString);
                     this.Context.Ado.ExecuteCommand($"CREATE TABLE IF NOT EXISTS {childTableName} USING {sTableName} TAGS ({tagString})");
-                    this.Context.Insertable(pageItems).IgnoreColumns(GetTagNames(pageItems.First(), attr).ToArray()).AS(childTableName).ExecuteCommand();
+                    this.Context.Insertable(pageItems).IgnoreColumns(GetTagNames(pageItems.First(), attr)).AS(childTableName).ExecuteCommand();
                 });
             }
             return inserObjects.Count;
@@ -75,7 +75,7 @@ namespace ThingsGateway.SqlSugar
                     var tagString = string.Join(",", tagValues.Where(v => !string.IsNullOrEmpty(v)).Select(v => $"'{v.ToSqlFilter()}'"));
                     tags.Add(tagString);
                     await Context.Ado.ExecuteCommandAsync($"CREATE TABLE IF NOT EXISTS {childTableName} USING {sTableName} TAGS ({tagString})").ConfigureAwait(false);
-                    await Context.Insertable(pageItems).IgnoreColumns(GetTagNames(pageItems.First(), attr).ToArray()).AS(childTableName).ExecuteCommandAsync().ConfigureAwait(false);
+                    await Context.Insertable(pageItems).IgnoreColumns(GetTagNames(pageItems.First(), attr)).AS(childTableName).ExecuteCommandAsync().ConfigureAwait(false);
                 }).ConfigureAwait(false);
             }
             return inserObjects.Count;

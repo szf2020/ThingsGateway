@@ -17,7 +17,7 @@ namespace ThingsGateway.SqlSugar
         {
             var entity = this.Context.EntityMaintenance.GetEntityInfo<T>();
             var treeKey = entity.Columns.FirstOrDefault(it => it.IsTreeKey);
-            List<T> result = new List<T>() { };
+            List<T> result = new List<T>();
             var parentIdName = UtilConvert.ToMemberExpression((parentIdExpression as LambdaExpression).Body).Member.Name;
             var ParentInfo = entity.Columns.First(it => it.PropertyName == parentIdName);
             var parentPropertyName = ParentInfo.DbColumnName;
@@ -75,7 +75,7 @@ namespace ThingsGateway.SqlSugar
         {
             var entity = this.Context.EntityMaintenance.GetEntityInfo<T>();
             var treeKey = entity.Columns.FirstOrDefault(it => it.IsTreeKey);
-            List<T> result = new List<T>() { };
+            List<T> result = new List<T>();
             var parentIdName = UtilConvert.ToMemberExpression((parentIdExpression as LambdaExpression).Body).Member.Name;
             var ParentInfo = entity.Columns.First(it => it.PropertyName == parentIdName);
             var parentPropertyName = ParentInfo.DbColumnName;
@@ -134,7 +134,7 @@ namespace ThingsGateway.SqlSugar
         {
             var entity = this.Context.EntityMaintenance.GetEntityInfo<T>();
             var treeKey = entity.Columns.FirstOrDefault(it => it.IsTreeKey);
-            List<T> result = new List<T>() { };
+            List<T> result = new List<T>();
             var parentIdName = UtilConvert.ToMemberExpression((parentIdExpression as LambdaExpression).Body).Member.Name;
             var ParentInfo = entity.Columns.First(it => it.PropertyName == parentIdName);
             var parentPropertyName = ParentInfo.DbColumnName;
@@ -193,7 +193,7 @@ namespace ThingsGateway.SqlSugar
         {
             var entity = this.Context.EntityMaintenance.GetEntityInfo<T>();
             var treeKey = entity.Columns.FirstOrDefault(it => it.IsTreeKey);
-            List<T> result = new List<T>() { };
+            List<T> result = new List<T>();
             var parentIdName = UtilConvert.ToMemberExpression((parentIdExpression as LambdaExpression).Body).Member.Name;
             var ParentInfo = entity.Columns.First(it => it.PropertyName == parentIdName);
             var parentPropertyName = ParentInfo.DbColumnName;
@@ -395,7 +395,7 @@ namespace ThingsGateway.SqlSugar
             ToSqlBefore();
             sql = QueryBuilder.ToSqlString();
             sql = QueryBuilder.ToCountSql(sql);
-            var result = Context.Ado.GetInt(sql, QueryBuilder.Parameters.ToArray());
+            var result = Context.Ado.GetInt(sql, QueryBuilder.Parameters);
             return result;
         }
         protected async Task<int> GetCountAsync()
@@ -404,7 +404,7 @@ namespace ThingsGateway.SqlSugar
             ToSqlBefore();
             sql = QueryBuilder.ToSqlString();
             sql = QueryBuilder.ToCountSql(sql);
-            var result = Convert.ToInt32(await Context.Ado.GetScalarAsync(sql, QueryBuilder.Parameters.ToArray()).ConfigureAwait(false));
+            var result = Convert.ToInt32(await Context.Ado.GetScalarAsync(sql, QueryBuilder.Parameters).ConfigureAwait(false));
             return result;
         }
         private void _CountEnd(MappingTableList expMapping)
@@ -992,10 +992,10 @@ namespace ThingsGateway.SqlSugar
                     {
                         Check.Exception(true, ".Mapper() parameter error");
                     }
-                    List<string> inValues = entitys.Select(it => it.GetType().GetProperty(fieldName).GetValue(it, null).ObjToString()).ToList();
-                    if (inValues != null && inValues.Count != 0 && UtilMethods.GetUnderType(entitys.First().GetType().GetProperty(fieldName).PropertyType) == UtilConstants.GuidType)
+                    var inValues = entitys.Select(it => it.GetType().GetProperty(fieldName).GetValue(it, null).ObjToString());
+                    if (inValues?.Any() == true && UtilMethods.GetUnderType(entitys.First().GetType().GetProperty(fieldName).PropertyType) == UtilConstants.GuidType)
                     {
-                        inValues = inValues.Select(x => string.IsNullOrEmpty(x) ? "null" : x).Distinct().ToList();
+                        inValues = inValues.Select(x => string.IsNullOrEmpty(x) ? "null" : x).Distinct();
                     }
                     List<IConditionalModel> wheres = new List<IConditionalModel>()
                     {
@@ -1015,7 +1015,7 @@ namespace ThingsGateway.SqlSugar
                         var setObject = item.GetType().GetProperty(objName);
                         if (setObject.PropertyType.FullName.IsCollectionsList())
                         {
-                            setObject.SetValue(item, setValue.ToList(), null);
+                            setObject.SetValue(item, setValue, null);
                         }
                         else
                         {
@@ -1053,7 +1053,7 @@ namespace ThingsGateway.SqlSugar
                     {
                         Check.Exception(true, ".Mapper() parameter error");
                     }
-                    List<string> inValues = entitys.Select(it => it.GetType().GetProperty(whereCol.PropertyName).GetValue(it, null).ObjToString()).ToList();
+                    var inValues = entitys.Select(it => it.GetType().GetProperty(whereCol.PropertyName).GetValue(it, null).ObjToString());
                     var dbColumnName = fieldEntity.Columns.FirstOrDefault(it => it.PropertyName == fieldName).DbColumnName;
                     List<IConditionalModel> wheres = new List<IConditionalModel>()
                     {
@@ -1072,7 +1072,7 @@ namespace ThingsGateway.SqlSugar
                         var setObject = item.GetType().GetProperty(objName);
                         if (setObject.PropertyType.FullName.IsCollectionsList())
                         {
-                            setObject.SetValue(item, setValue.ToList(), null);
+                            setObject.SetValue(item, setValue, null);
                         }
                         else
                         {
@@ -1159,7 +1159,7 @@ namespace ThingsGateway.SqlSugar
                     {
                         Check.Exception(true, ".Mapper() parameter error");
                     }
-                    List<string> inValues = entitys.Select(it => it.GetType().GetProperty(mainFieldName).GetValue(it, null).ObjToString()).ToList();
+                    var inValues = entitys.Select(it => it.GetType().GetProperty(mainFieldName).GetValue(it, null).ObjToString());
                     List<IConditionalModel> wheres = new List<IConditionalModel>()
                     {
                        new ConditionalModel()
@@ -1177,7 +1177,7 @@ namespace ThingsGateway.SqlSugar
                         var setObject = item.GetType().GetProperty(objName);
                         if (setObject.PropertyType.FullName.IsCollectionsList())
                         {
-                            setObject.SetValue(item, setValue.ToList(), null);
+                            setObject.SetValue(item, setValue, null);
                         }
                         else
                         {
@@ -1215,7 +1215,7 @@ namespace ThingsGateway.SqlSugar
                     {
                         Check.Exception(true, ".Mapper() parameter error");
                     }
-                    List<string> inValues = entitys.Select(it => it.GetType().GetProperty(whereCol.PropertyName).GetValue(it, null).ObjToString()).ToList();
+                    var inValues = entitys.Select(it => it.GetType().GetProperty(whereCol.PropertyName).GetValue(it, null).ObjToString());
                     var dbColumnName = fieldEntity.Columns.FirstOrDefault(it => it.PropertyName == mainFieldName).DbColumnName;
                     List<IConditionalModel> wheres = new List<IConditionalModel>()
                     {
@@ -1234,7 +1234,7 @@ namespace ThingsGateway.SqlSugar
                         var setObject = item.GetType().GetProperty(objName);
                         if (setObject.PropertyType.FullName.IsCollectionsList())
                         {
-                            setObject.SetValue(item, setValue.ToList(), null);
+                            setObject.SetValue(item, setValue, null);
                         }
                         else
                         {
@@ -1323,7 +1323,7 @@ namespace ThingsGateway.SqlSugar
             }
         }
 
-        private void OutIntoTableSql(string TableName, out KeyValuePair<string, List<SugarParameter>> sqlInfo, out string sql, Type tableInfo)
+        private void OutIntoTableSql(string TableName, out KeyValuePair<string, IReadOnlyList<SugarParameter>> sqlInfo, out string sql, Type tableInfo)
         {
             var columnList = this.Context.EntityMaintenance.GetEntityInfo(tableInfo).Columns;
             //var entityInfo = this.Context.EntityMaintenance.GetEntityInfo(TableEntityType);
@@ -1759,7 +1759,7 @@ namespace ThingsGateway.SqlSugar
             {
                 var newParas = this.QueryBuilder.Parameters.Where(it => !oldParameterNames.Contains(it.ParameterName)).ToList();
                 this.QueryBuilder.GroupParameters = newParas;
-                var groupBySql = UtilMethods.GetSqlString(DbType.SqlServer, result, newParas.ToArray());
+                var groupBySql = UtilMethods.GetSqlString(DbType.SqlServer, result, newParas);
                 this.QueryBuilder.GroupBySql = groupBySql;
                 this.QueryBuilder.GroupBySqlOld = result;
 
@@ -1774,7 +1774,7 @@ namespace ThingsGateway.SqlSugar
                             var itemObj = q.GetExpressionValue(item, isSingle ? ResolveExpressType.FieldSingle : ResolveExpressType.FieldMultiple).GetResultString();
                             if (q.Parameters.Count != 0)
                             {
-                                var itemGroupBySql = UtilMethods.GetSqlString(DbType.SqlServer, itemObj, q.Parameters.ToArray());
+                                var itemGroupBySql = UtilMethods.GetSqlString(DbType.SqlServer, itemObj, q.Parameters);
                                 this.QueryBuilder.GroupBySql = itemGroupBySql;
                                 this.QueryBuilder.GroupBySqlOld = itemGroupBySql;
                                 this.GroupBy(itemGroupBySql);
@@ -1910,7 +1910,7 @@ namespace ThingsGateway.SqlSugar
                 }
             }
         }
-        protected List<TResult> GetData<TResult>(KeyValuePair<string, List<SugarParameter>> sqlObj)
+        protected List<TResult> GetData<TResult>(KeyValuePair<string, IReadOnlyList<SugarParameter>> sqlObj)
         {
             List<TResult> result;
             var isComplexModel = QueryBuilder.IsComplexModel(sqlObj.Key);
@@ -1918,7 +1918,7 @@ namespace ThingsGateway.SqlSugar
             bool isChangeQueryableSlave = GetIsSlaveQuery();
             bool isChangeQueryableMasterSlave = GetIsMasterQuery();
             string sqlString = sqlObj.Key;
-            SugarParameter[] parameters = sqlObj.Value.ToArray();
+            IReadOnlyList<SugarParameter> parameters = sqlObj.Value;
             var dataReader = this.Db.GetDataReader(sqlString, parameters);
             this.Db.GetDataBefore(sqlString, parameters);
             if (entityType.IsInterface)
@@ -1934,7 +1934,7 @@ namespace ThingsGateway.SqlSugar
             RestChangeSlaveQuery(isChangeQueryableSlave);
             return result;
         }
-        protected async Task<List<TResult>> GetDataAsync<TResult>(KeyValuePair<string, List<SugarParameter>> sqlObj)
+        protected async Task<List<TResult>> GetDataAsync<TResult>(KeyValuePair<string, IReadOnlyList<SugarParameter>> sqlObj)
         {
             List<TResult> result;
             var isComplexModel = QueryBuilder.IsComplexModel(sqlObj.Key);
@@ -1942,7 +1942,7 @@ namespace ThingsGateway.SqlSugar
             bool isChangeQueryableSlave = GetIsSlaveQuery();
             bool isChangeQueryableMasterSlave = GetIsMasterQuery();
             string sqlString = sqlObj.Key;
-            SugarParameter[] parameters = sqlObj.Value.ToArray();
+            IReadOnlyList<SugarParameter> parameters = sqlObj.Value;
             var dataReader = await Db.GetDataReaderAsync(sqlString, parameters).ConfigureAwait(false);
             this.Db.GetDataBefore(sqlString, parameters);
             if (entityType.IsInterface)
@@ -2067,13 +2067,13 @@ namespace ThingsGateway.SqlSugar
                 }
             }
         }
-        protected void _InQueryable(Expression expression, KeyValuePair<string, List<SugarParameter>> sqlObj)
+        protected void _InQueryable(Expression expression, KeyValuePair<string, IReadOnlyList<SugarParameter>> sqlObj)
         {
             QueryBuilder.CheckExpression(expression, "In");
             string sql = sqlObj.Key;
             if (sqlObj.Value.HasValue())
             {
-                this.SqlBuilder.RepairReplicationParameters(ref sql, sqlObj.Value.ToArray(), 100);
+                this.SqlBuilder.RepairReplicationParameters(ref sql, sqlObj.Value, 100);
                 this.QueryBuilder.Parameters.AddRange(sqlObj.Value);
             }
             var isSingle = QueryBuilder.IsSingle();
@@ -2157,7 +2157,7 @@ namespace ThingsGateway.SqlSugar
             asyncQueryableBuilder.SubToListParameters = this.Context.Utilities.TranslateCopy(this.QueryBuilder.SubToListParameters);
             asyncQueryableBuilder.AppendColumns = this.Context.Utilities.TranslateCopy(this.QueryBuilder.AppendColumns);
             asyncQueryableBuilder.AppendValues = this.Context.Utilities.TranslateCopy(this.QueryBuilder.AppendValues);
-            asyncQueryableBuilder.RemoveFilters = this.QueryBuilder.RemoveFilters?.ToArray();
+            asyncQueryableBuilder.RemoveFilters = this.QueryBuilder.RemoveFilters;
             asyncQueryableBuilder.Hints = this.QueryBuilder.Hints;
             asyncQueryableBuilder.MasterDbTableName = this.QueryBuilder.MasterDbTableName;
             asyncQueryableBuilder.IsParameterizedConstructor = this.QueryBuilder.IsParameterizedConstructor;
@@ -2196,13 +2196,13 @@ namespace ThingsGateway.SqlSugar
 
             return cacheDurationInSeconds;
         }
-        public virtual KeyValuePair<string, List<SugarParameter>> _ToSql()
+        public virtual KeyValuePair<string, IReadOnlyList<SugarParameter>> _ToSql()
         {
             InitMapping();
             ToSqlBefore();
             string sql = QueryBuilder.ToSqlString();
             RestoreMapping();
-            return new KeyValuePair<string, List<SugarParameter>>(sql, QueryBuilder.Parameters);
+            return new KeyValuePair<string, IReadOnlyList<SugarParameter>>(sql, QueryBuilder.Parameters);
         }
         #endregion
 
@@ -2354,7 +2354,7 @@ namespace ThingsGateway.SqlSugar
                 foreach (var re in replaceValues)
                 {
                     var config = this.Context.CurrentConnectionConfig;
-                    var p = new SugarParameter[] {
+                    var p = new List<SugarParameter> {
                             new SugarParameter("@p",re.Value)
                         };
                     var isNvarchar = true;
@@ -2388,7 +2388,7 @@ namespace ThingsGateway.SqlSugar
                 sqlstring = regex.Replace(sqlstring, it => ("  as id " + it.Value));
                 callType = typeof(SubQueryToListDefaultT);
             }
-            var methodParamters = new object[] { sqlstring, ps.ToArray() };
+            var methodParamters = new object[] { sqlstring, ps };
             this.QueryBuilder.SubToListParameters = null;
             this.QueryBuilder.AppendColumns = new List<QueryableAppendColumn>() {
                  new QueryableAppendColumn(){ Name="sugarIndex",AsName="sugarIndex" }

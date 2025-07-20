@@ -39,7 +39,7 @@ public static class ChannelServiceHelpers
              .OrderBy(
             a =>
             {
-                var order = a.GetCustomAttribute<AutoGenerateColumnAttribute>()?.Order ?? int.MaxValue; ;
+                var order = a.GetCustomAttribute<AutoGenerateColumnAttribute>()?.Order ?? int.MaxValue;
                 if (order < 0)
                 {
                     order = order + 10000000;
@@ -79,7 +79,7 @@ public static class ChannelServiceHelpers
              .OrderBy(
             a =>
             {
-                var order = a.GetCustomAttribute<AutoGenerateColumnAttribute>()?.Order ?? int.MaxValue; ;
+                var order = a.GetCustomAttribute<AutoGenerateColumnAttribute>()?.Order ?? int.MaxValue;
                 if (order < 0)
                 {
                     order = order + 10000000;
@@ -128,48 +128,42 @@ public static class ChannelServiceHelpers
 
     public static async Task<Dictionary<string, ImportPreviewOutputBase>> ImportAsync(USheetDatas uSheetDatas)
     {
-        try
+        var dataScope = await GlobalData.SysUserService.GetCurrentUserDataScopeAsync().ConfigureAwait(false);
+        var channelDicts = (await GlobalData.ChannelService.GetAllAsync().ConfigureAwait(false)).ToDictionary(a => a.Name);
+        //导入检验结果
+        Dictionary<string, ImportPreviewOutputBase> ImportPreviews = new();
+        //设备页
+
+        var sheetNames = uSheetDatas.sheets.Keys.ToList();
+        foreach (var sheetName in sheetNames)
         {
-            var dataScope = await GlobalData.SysUserService.GetCurrentUserDataScopeAsync().ConfigureAwait(false);
-            var channelDicts = (await GlobalData.ChannelService.GetAllAsync().ConfigureAwait(false)).ToDictionary(a => a.Name);
-            //导入检验结果
-            Dictionary<string, ImportPreviewOutputBase> ImportPreviews = new();
-            //设备页
 
-            var sheetNames = uSheetDatas.sheets.Keys.ToList();
-            foreach (var sheetName in sheetNames)
+            List<IDictionary<string, object>> rows = new();
+            var first = uSheetDatas.sheets[sheetName].cellData[0];
+
+            foreach (var item in uSheetDatas.sheets[sheetName].cellData)
             {
-
-                List<IDictionary<string, object>> rows = new();
-                var first = uSheetDatas.sheets[sheetName].cellData[0];
-
-                foreach (var item in uSheetDatas.sheets[sheetName].cellData)
+                if (item.Key == 0)
                 {
-                    if (item.Key == 0)
-                    {
-                        continue;
-                    }
-                    var expando = new Dictionary<string, object>();
-                    foreach (var keyValue in item.Value)
-                    {
-                        expando.Add(first[keyValue.Key].v?.ToString(), keyValue.Value.v);
-                    }
-                    rows.Add(expando);
+                    continue;
                 }
-
-                GlobalData.ChannelService.SetChannelData(dataScope, channelDicts, ImportPreviews, sheetName, rows);
-                var data = ImportPreviews?.FirstOrDefault().Value;
-                if (data?.HasError == true)
+                var expando = new Dictionary<string, object>();
+                foreach (var keyValue in item.Value)
                 {
-                    throw new(data.Results.FirstOrDefault(a => !a.Success).ErrorMessage ?? "error");
+                    expando.Add(first[keyValue.Key].v?.ToString(), keyValue.Value.v);
                 }
+                rows.Add(expando);
             }
 
-            return ImportPreviews;
+            GlobalData.ChannelService.SetChannelData(dataScope, channelDicts, ImportPreviews, sheetName, rows);
+            var data = ImportPreviews?.FirstOrDefault().Value;
+            if (data?.HasError == true)
+            {
+                throw new(data.Results.FirstOrDefault(a => !a.Success).ErrorMessage ?? "error");
+            }
         }
-        finally
-        {
-        }
+
+        return ImportPreviews;
     }
 
 }

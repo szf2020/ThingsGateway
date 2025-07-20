@@ -19,7 +19,7 @@ namespace ThingsGateway.SqlSugar
         /// <summary>
         /// 待删除对象数组
         /// </summary>
-        public T[] deleteObjects { get; set; }
+        public IReadOnlyList<T> deleteObjects { get; set; }
 
         /// <summary>
         /// 执行删除命令
@@ -61,7 +61,7 @@ namespace ThingsGateway.SqlSugar
         /// <param name="datas">数据数组</param>
         /// <param name="groupModels">分组模型列表</param>
         /// <param name="result">结果值</param>
-        private void GroupDataList(T[] datas, out List<GroupModel> groupModels, out int result)
+        private void GroupDataList(IReadOnlyList<T> datas, out List<GroupModel> groupModels, out int result)
         {
             var attribute = typeof(T).GetCustomAttribute<SplitTableAttribute>() as SplitTableAttribute;
             Check.Exception(attribute == null, $"{typeof(T).Name} need SplitTableAttribute");

@@ -231,7 +231,7 @@
         {
             var parameter = model.Args[0];
             var parameter2 = model.Args[1];
-            return string.Format(" ( to_char({0},'yyyy-MM-dd')=to_char({1},'yyyy-MM-dd') ) ", parameter.MemberName, parameter2.MemberName); ;
+            return string.Format(" ( to_char({0},'yyyy-MM-dd')=to_char({1},'yyyy-MM-dd') ) ", parameter.MemberName, parameter2.MemberName);
         }
 
         public override string HasValue(MethodCallExpressionModel model)

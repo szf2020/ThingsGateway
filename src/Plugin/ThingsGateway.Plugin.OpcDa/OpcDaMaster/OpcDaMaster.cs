@@ -107,43 +107,37 @@ public class OpcDaMaster : CollectBase
     /// <inheritdoc/>
     protected override Task<List<VariableSourceRead>> ProtectedLoadSourceReadAsync(List<VariableRuntime> deviceVariables)
     {
-        try
+        if (deviceVariables.Count > 0)
         {
-            if (deviceVariables.Count > 0)
+            List<VariableSourceRead> variableSourceReads = new List<VariableSourceRead>();
+            foreach (var deviceVariableGroups in deviceVariables.GroupBy(a => a.CollectGroup))
             {
-                List<VariableSourceRead> variableSourceReads = new List<VariableSourceRead>();
-                foreach (var deviceVariableGroups in deviceVariables.GroupBy(a => a.CollectGroup))
-                {
 
-                    var result = _plc.AddItemsWithSave(deviceVariableGroups.Where(a => !string.IsNullOrEmpty(a.RegisterAddress)).Select(a => a.RegisterAddress!).ToList());
-                    var sourVars = result?.Select(
-              it =>
+                var result = _plc.AddItemsWithSave(deviceVariableGroups.Where(a => !string.IsNullOrEmpty(a.RegisterAddress)).Select(a => a.RegisterAddress!).ToList());
+                var sourVars = result?.Select(
+          it =>
+          {
+              var read = new VariableSourceRead()
               {
-                  var read = new VariableSourceRead()
-                  {
-                      IntervalTime = _driverProperties.UpdateRate.ToString(),
-                      RegisterAddress = it.Key,
-                  };
-                  HashSet<string> ids = new(it.Value.Select(b => b.ItemID));
+                  IntervalTime = _driverProperties.UpdateRate.ToString(),
+                  RegisterAddress = it.Key,
+              };
+              HashSet<string> ids = new(it.Value.Select(b => b.ItemID));
 
-                  var variables = deviceVariableGroups.Where(a => ids.Contains(a.RegisterAddress));
-                  foreach (var v in variables)
-                  {
-                      read.AddVariable(v);
-                  }
-                  return read;
-              }).ToList();
-                    variableSourceReads.AddRange(sourVars);
-                }
-                return Task.FromResult(variableSourceReads);
+              var variables = deviceVariableGroups.Where(a => ids.Contains(a.RegisterAddress));
+              foreach (var v in variables)
+              {
+                  read.AddVariable(v);
+              }
+              return read;
+          }).ToList();
+                variableSourceReads.AddRange(sourVars);
             }
-            else
-            {
-                return Task.FromResult(new List<VariableSourceRead>());
-            }
+            return Task.FromResult(variableSourceReads);
         }
-        finally
+        else
         {
+            return Task.FromResult(new List<VariableSourceRead>());
         }
     }
 
@@ -168,28 +162,22 @@ public class OpcDaMaster : CollectBase
 
         using var writeLock = ReadWriteLock.WriterLock();
         await ValueTask.CompletedTask.ConfigureAwait(false);
-        try
+        var result = _plc.WriteItem(writeInfoLists.ToDictionary(a => a.Key.RegisterAddress!, a => a.Value.GetObjectFromJToken()!));
+        var results = new ConcurrentDictionary<string, OperResult>(result.ToDictionary<KeyValuePair<string, Tuple<bool, string>>, string, OperResult>(a =>
         {
-            var result = _plc.WriteItem(writeInfoLists.ToDictionary(a => a.Key.RegisterAddress!, a => a.Value.GetObjectFromJToken()!));
-            var results = new ConcurrentDictionary<string, OperResult>(result.ToDictionary<KeyValuePair<string, Tuple<bool, string>>, string, OperResult>(a =>
-            {
-                return writeInfoLists.Keys.FirstOrDefault(b => b.RegisterAddress == a.Key).Name;
-            }, a =>
-            {
-                if (!a.Value.Item1)
-                    return new OperResult(a.Value.Item2);
-                else
-                    return OperResult.Success;
-            }
-                 ));
-
-            await Check(writeInfoLists, results, cancellationToken).ConfigureAwait(false);
-
-            return new(results);
-        }
-        finally
+            return writeInfoLists.Keys.FirstOrDefault(b => b.RegisterAddress == a.Key).Name;
+        }, a =>
         {
+            if (!a.Value.Item1)
+                return new OperResult(a.Value.Item2);
+            else
+                return OperResult.Success;
         }
+             ));
+
+        await Check(writeInfoLists, results, cancellationToken).ConfigureAwait(false);
+
+        return new(results);
     }
     public override async Task AfterVariablesChangedAsync(CancellationToken cancellationToken)
     {

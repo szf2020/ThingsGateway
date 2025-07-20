@@ -61,7 +61,7 @@ namespace ThingsGateway.SqlSugar
         {
             var methods = type.GetMethods().Where(it => it.Name == name).Where(it =>
             it.GetParameters().Length == argCount &&
-            it.GetParameters()[0].ToString().Contains("List`") == isList).ToList();
+            it.GetParameters()[0].ToString().Contains("List`") == isList);
             return methods.First();
         }
 

@@ -131,7 +131,7 @@ namespace ThingsGateway.SqlSugar
         }
 
 
-        public static List<SugarParameter> CopySugarParameters(List<SugarParameter> pars)
+        public static List<SugarParameter> CopySugarParameters(IReadOnlyList<SugarParameter> pars)
         {
             if (pars == null) return null;
             var newParameters = pars.Select(it => new SugarParameter(it.ParameterName, it.Value)
@@ -242,7 +242,7 @@ namespace ThingsGateway.SqlSugar
         }
         public static IEnumerable<T> BuildTree<T>(ISqlSugarClient db, IEnumerable<T> list, string idName, string pIdName, string childName, object rootValue)
         {
-            var entityInfo = db.EntityMaintenance.GetEntityInfo<T>(); ;
+            var entityInfo = db.EntityMaintenance.GetEntityInfo<T>();
             var mainIdProp = entityInfo.Type.GetProperty(idName);
             var pIdProp = entityInfo.Type.GetProperty(pIdName);
             var childProp = entityInfo.Type.GetProperty(childName);
@@ -620,9 +620,9 @@ namespace ThingsGateway.SqlSugar
                                typeof(List<ulong?>),
                                typeof(List<ushort?>));
         }
-        public static string GetNativeSql(string sql, SugarParameter[] pars)
+        public static string GetNativeSql(string sql, IReadOnlyList<SugarParameter> pars)
         {
-            if (pars == null || pars.Length == 0)
+            if (pars == null || pars.Count == 0)
                 return "\r\n[Sql]:" + sql + "\r\n";
             return $"\r\n[Sql]:{sql} \r\n[Pars]:{string.Join(" ", pars.Select(it => $"\r\n[Name]:{it.ParameterName} [Value]:{it.Value} [Type]:{it.DbType} {(it.IsNvarchar2 ? "nvarchar2" : "")}  "))} \r\n";
         }
@@ -1106,7 +1106,7 @@ namespace ThingsGateway.SqlSugar
             return utcTime2;
         }
 
-        internal static void RepairReplicationParameters(ref string appendSql, SugarParameter[] parameters, int addIndex, string append = null)
+        internal static void RepairReplicationParameters(ref string appendSql, IReadOnlyList<SugarParameter> parameters, int addIndex, string append = null)
         {
             if (appendSql.HasValue() && parameters.HasValue())
             {
@@ -1120,7 +1120,7 @@ namespace ThingsGateway.SqlSugar
                 }
             }
         }
-        internal static void RepairReplicationParameters(ISqlSugarClient db, ref string appendSql, SugarParameter[] parameters, int addIndex, string append = null)
+        internal static void RepairReplicationParameters(ISqlSugarClient db, ref string appendSql, IReadOnlyList<SugarParameter> parameters, int addIndex, string append = null)
         {
             if (appendSql.HasValue() && parameters.HasValue())
             {
@@ -1687,7 +1687,7 @@ namespace ThingsGateway.SqlSugar
             string FirstDay = datetime.AddDays(daydiff).ToString("yyyy-MM-dd");
             return Convert.ToDateTime(FirstDay);
         }
-        public static string GetSqlString(DbType dbType, string sql, SugarParameter[] parameters, bool DisableNvarchar = false)
+        public static string GetSqlString(DbType dbType, string sql, IReadOnlyList<SugarParameter> parameters, bool DisableNvarchar = false)
         {
             if (parameters == null)
                 parameters = Array.Empty<SugarParameter>();
@@ -1698,9 +1698,9 @@ namespace ThingsGateway.SqlSugar
                 {
                     DisableNvarchar = DisableNvarchar
                 }
-            }, new KeyValuePair<string, List<SugarParameter>>(sql, parameters.ToList()));
+            }, new KeyValuePair<string, IReadOnlyList<SugarParameter>>(sql, parameters));
         }
-        public static string GetSqlString(ConnectionConfig connectionConfig, KeyValuePair<string, List<SugarParameter>> sqlObj)
+        public static string GetSqlString(ConnectionConfig connectionConfig, KeyValuePair<string, IReadOnlyList<SugarParameter>> sqlObj)
         {
             var guid = Guid.NewGuid() + "";
             var result = sqlObj.Key;
@@ -1736,7 +1736,7 @@ namespace ThingsGateway.SqlSugar
                     {
                         if (item.DbType == System.Data.DbType.Date || connectionConfig?.MoreSettings?.DisableMillisecond == true)
                         {
-                            var value = "to_date('" + item.Value.ObjToDate().ToString("yyyy-MM-dd HH:mm:ss") + "', 'YYYY-MM-DD HH24:MI:SS')  "; ;
+                            var value = "to_date('" + item.Value.ObjToDate().ToString("yyyy-MM-dd HH:mm:ss") + "', 'YYYY-MM-DD HH24:MI:SS')  ";
                             result = result.Replace(item.ParameterName, value);
                         }
                         else

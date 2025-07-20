@@ -53,7 +53,7 @@ namespace ThingsGateway.SqlSugar
             var array = currentExpression.ToString().Split(',');
             foreach (var item in array)
             {
-                var itemArray = item.Split('=').ToArray();
+                var itemArray = item.Split('=');
                 var last = itemArray.Last().Trim().Split('.').First().TrimEnd(')').TrimEnd('}');
                 var first = itemArray.First().Trim();
                 if (first.Contains('{'))
@@ -69,7 +69,7 @@ namespace ThingsGateway.SqlSugar
                     //future
                 }
             }
-            return result; ;
+            return result;
         }
         protected static Dictionary<string, string> MethodMapping = new Dictionary<string, string>() {
             { "ToString","ToString"},

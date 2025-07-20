@@ -237,9 +237,8 @@ namespace ThingsGateway.SqlSugar
 
                 {
 
-                    var rows = rowInfos.ToList();
 
-                    var value = rows.FirstOrDefault(it =>
+                    var value = rowInfos.FirstOrDefault(it =>
 
                                                              it.DbColumnName.Equals(item.ColumnName, StringComparison.CurrentCultureIgnoreCase) ||
 

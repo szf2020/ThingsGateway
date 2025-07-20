@@ -189,8 +189,6 @@ public sealed class DatabaseLoggerProvider : ILoggerProvider, ISupportExternalSc
                     var databaseWriteError = new DatabaseWriteError(ex);
                     LoggerOptions.HandleWriteError(databaseWriteError);
                 }
-                // 这里不抛出异常，避免中断日志写入
-                else { }
             }
             finally
             {

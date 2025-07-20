@@ -231,7 +231,7 @@ namespace ThingsGateway.SqlSugar
             {
                 tempDataTable = queryable.Clone().AS(AsName).Where(it => false).Select("*").ToDataTable();
             }
-            ;
+
             List<string> uInt64TypeName = new List<string>();
             foreach (DataColumn item in tempDataTable.Columns)
             {
@@ -271,7 +271,7 @@ namespace ThingsGateway.SqlSugar
         private DataTable GetCopyWriteDataTableUpdate(DataTable dt)
         {
             var sqlBuilder = this.context.Queryable<object>().SqlBuilder;
-            var dts = dt.Columns.Cast<DataColumn>().Select(it => sqlBuilder.GetTranslationColumnName(it.ColumnName)).ToList();
+            var dts = dt.Columns.Cast<DataColumn>().Select(it => sqlBuilder.GetTranslationColumnName(it.ColumnName));
             DataTable tempDataTable = null;
             if (AsName == null)
             {
@@ -281,7 +281,7 @@ namespace ThingsGateway.SqlSugar
             {
                 tempDataTable = queryable.Clone().AS(AsName).Where(it => false).Select(string.Join(",", dts)).ToDataTable();
             }
-            ;
+
             List<string> uInt64TypeName = new List<string>();
             foreach (DataColumn item in tempDataTable.Columns)
             {

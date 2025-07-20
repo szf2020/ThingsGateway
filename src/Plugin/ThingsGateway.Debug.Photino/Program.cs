@@ -64,7 +64,7 @@ internal sealed class Program
                       services.Add(item);
                   }
               });
-        ;
+
         Serve.BuildApplication(options, out var app);
 
         app.Start();

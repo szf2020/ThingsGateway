@@ -11,8 +11,6 @@ namespace ThingsGateway.SqlSugar
         public Type EntityType { get; set; }
 
 
-        #region Json 2 sql api
-        #endregion
 
         #region Sql API
 
@@ -298,11 +296,11 @@ namespace ThingsGateway.SqlSugar
             var result = method.Invoke(QueryableObj, Array.Empty<object>());
             return (string)result;
         }
-        public KeyValuePair<string, List<SugarParameter>> ToSql()
+        public KeyValuePair<string, IReadOnlyList<SugarParameter>> ToSql()
         {
             var method = QueryableObj.GetType().GetMyMethod("ToSql", 0);
             var result = method.Invoke(QueryableObj, Array.Empty<object>());
-            return (KeyValuePair<string, List<SugarParameter>>)result;
+            return (KeyValuePair<string, IReadOnlyList<SugarParameter>>)result;
         }
         public object InSingle(object pkValue)
         {

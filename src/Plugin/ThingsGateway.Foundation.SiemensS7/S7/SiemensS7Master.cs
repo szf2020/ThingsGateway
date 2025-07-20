@@ -33,7 +33,7 @@ public partial class SiemensS7Master : DeviceBase
     }
 
     public override IThingsGatewayBitConverter ThingsGatewayBitConverter => s7BitConverter;
-    private S7BitConverter s7BitConverter = new S7BitConverter(EndianType.Big) { };
+    private S7BitConverter s7BitConverter = new S7BitConverter(EndianType.Big);
     /// <summary>
     /// PduLength
     /// </summary>
@@ -122,9 +122,7 @@ public partial class SiemensS7Master : DeviceBase
                 };
 
             case ChannelTypeEnum.UdpSession:
-                return new DeviceUdpDataHandleAdapter<S7Message>()
-                {
-                };
+                return new DeviceUdpDataHandleAdapter<S7Message>();
         }
 
         return new DeviceSingleStreamDataHandleAdapter<S7Message>

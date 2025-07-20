@@ -132,7 +132,7 @@ namespace ThingsGateway.SqlSugar
         {
             return string.Join(" UNION \r\n", sqlList);
         }
-        public virtual void RepairReplicationParameters(ref string appendSql, SugarParameter[] parameters, int addIndex)
+        public virtual void RepairReplicationParameters(ref string appendSql, IReadOnlyList<SugarParameter> parameters, int addIndex)
         {
             UtilMethods.RepairReplicationParameters(ref appendSql, parameters, addIndex);
         }

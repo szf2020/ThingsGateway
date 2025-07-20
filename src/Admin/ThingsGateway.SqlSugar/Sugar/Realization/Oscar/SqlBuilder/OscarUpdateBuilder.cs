@@ -80,8 +80,8 @@ namespace ThingsGateway.SqlSugar
             sb.AppendLine(string.Join("\r\n", groupList.Select(t =>
             {
                 var updateTable = string.Format("UPDATE {0} SET", base.GetTableNameStringNoWith);
-                var setValues = string.Join(",", t.Where(s => !s.IsPrimarykey).Select(m => GetOracleUpdateColumns(i, m)).ToArray());
-                var pkList = t.Where(s => s.IsPrimarykey).ToList();
+                var setValues = string.Join(",", t.Where(s => !s.IsPrimarykey).Select(m => GetOracleUpdateColumns(i, m)));
+                var pkList = t.Where(s => s.IsPrimarykey);
                 List<string> whereList = new List<string>();
                 foreach (var item in pkList)
                 {
@@ -92,7 +92,7 @@ namespace ThingsGateway.SqlSugar
                 }
                 i++;
                 return string.Format("{0} {1} WHERE {2};", updateTable, setValues, string.Join("AND", whereList));
-            }).ToArray()));
+            })));
             return sb.ToString();
         }
         private string GetOracleUpdateColumns(int i, DbColumnInfo m)

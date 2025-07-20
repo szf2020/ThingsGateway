@@ -17,7 +17,7 @@
             string identityColumn = GetIdentityColumn();
             string sql = InsertBuilder.ToSqlString().Replace("$PrimaryKey", this.SqlBuilder.GetTranslationColumnName(identityColumn));
             RestoreMapping();
-            var result = Ado.GetScalar(sql, InsertBuilder.Parameters == null ? null : InsertBuilder.Parameters.ToArray()).ObjToInt();
+            var result = Ado.GetScalar(sql, InsertBuilder.Parameters == null ? null : InsertBuilder.Parameters).ObjToInt();
             After(sql, result);
             return result;
         }
@@ -33,7 +33,7 @@
             string identityColumn = GetIdentityColumn();
             string sql = InsertBuilder.ToSqlString().Replace("$PrimaryKey", this.SqlBuilder.GetTranslationColumnName(identityColumn));
             RestoreMapping();
-            var obj = await Ado.GetScalarAsync(sql, InsertBuilder.Parameters == null ? null : InsertBuilder.Parameters.ToArray()).ConfigureAwait(false);
+            var obj = await Ado.GetScalarAsync(sql, InsertBuilder.Parameters == null ? null : InsertBuilder.Parameters).ConfigureAwait(false);
             var result = obj.ObjToInt();
             After(sql, result);
             return result;
@@ -43,7 +43,7 @@
         /// 生成SQL语句和参数
         /// </summary>
         /// <returns>SQL语句和参数</returns>
-        public override KeyValuePair<string, List<SugarParameter>> ToSql()
+        public override KeyValuePair<string, IReadOnlyList<SugarParameter>> ToSql()
         {
             var result = base.ToSql();
             var primaryKey = GetPrimaryKeys().FirstOrDefault();
@@ -51,7 +51,7 @@
             {
                 primaryKey = this.SqlBuilder.GetTranslationColumnName(primaryKey);
             }
-            return new KeyValuePair<string, List<SugarParameter>>(result.Key.Replace("$PrimaryKey", primaryKey), result.Value);
+            return new KeyValuePair<string, IReadOnlyList<SugarParameter>>(result.Key.Replace("$PrimaryKey", primaryKey), result.Value);
         }
 
         /// <summary>
@@ -64,7 +64,7 @@
             PreToSql();
             string sql = InsertBuilder.ToSqlString().Replace("$PrimaryKey", this.SqlBuilder.GetTranslationColumnName(GetIdentityKeys().FirstOrDefault()));
             RestoreMapping();
-            var result = Convert.ToInt64(Ado.GetScalar(sql, InsertBuilder.Parameters == null ? null : InsertBuilder.Parameters.ToArray()) ?? "0");
+            var result = Convert.ToInt64(Ado.GetScalar(sql, InsertBuilder.Parameters == null ? null : InsertBuilder.Parameters) ?? "0");
             After(sql, result);
             return result;
         }
@@ -79,7 +79,7 @@
             PreToSql();
             string sql = InsertBuilder.ToSqlString().Replace("$PrimaryKey", this.SqlBuilder.GetTranslationColumnName(GetIdentityKeys().FirstOrDefault()));
             RestoreMapping();
-            var result = Convert.ToInt64(await Ado.GetScalarAsync(sql, InsertBuilder.Parameters == null ? null : InsertBuilder.Parameters.ToArray()).ConfigureAwait(false) ?? "0");
+            var result = Convert.ToInt64(await Ado.GetScalarAsync(sql, InsertBuilder.Parameters == null ? null : InsertBuilder.Parameters).ConfigureAwait(false) ?? "0");
             After(sql, result);
             return result;
         }

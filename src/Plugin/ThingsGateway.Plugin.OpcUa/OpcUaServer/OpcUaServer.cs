@@ -462,10 +462,6 @@ public partial class OpcUaServer : BusinessBase
         if (DisposedValue) return;
         if (IdVariableRuntimes.ContainsKey(variableData.Id))
             CollectVariableRuntimes.AddOrUpdate(variableData.Id, variableData, (a, b) => variableData);
-        else
-        {
-
-        }
     }
 
     /// <summary>

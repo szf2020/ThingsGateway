@@ -37,13 +37,13 @@ namespace ThingsGateway.SqlSugar
             //创建属性的集合    
             List<PropertyInfo> pList = new List<PropertyInfo>();
             //把所有的public属性加入到集合 并添加DataTable的列    
-            Array.ForEach(entity.Columns.ToArray(), p =>
+            foreach (var p in entity.Columns)
             {
                 if (!p.IsIgnore && !p.IsOnlyIgnoreInsert)
                 {
                     pList.Add(p.PropertyInfo); dt.Columns.Add(p.DbColumnName);
                 }
-            });
+            }
             DataRow row = null;
             foreach (T item in Entitys)
             {
@@ -85,7 +85,7 @@ namespace ThingsGateway.SqlSugar
                     TableName = dt.TableName,
                     Local = true,
                 };
-                bulk.Columns.AddRange(dt.Columns.Cast<DataColumn>().Select(colum => colum.ColumnName).Distinct().ToArray());
+                bulk.Columns.AddRange(dt.Columns.Cast<DataColumn>().Select(colum => colum.ColumnName).Distinct());
                 IsBulkLoad = bulk.Load() > 0;
                 //执行成功才删除文件
                 if (IsBulkLoad && File.Exists(fileName))
@@ -101,7 +101,7 @@ namespace ThingsGateway.SqlSugar
             {
                 CloseDb();
             }
-            return IsBulkLoad; ;
+            return IsBulkLoad;
         }
 
         public Task<bool> ExecuteBulkCopyAsync()

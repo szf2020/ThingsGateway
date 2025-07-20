@@ -27,8 +27,6 @@ public static class ResourceUtil
         var data = items.Where(a => a.Category == ResourceCategoryEnum.Menu)
         .Select((item, index) =>
             new SelectedItem(item.Id.ToString(), item.Title)
-            {
-            }
         ).ToList();
         return data;
     }

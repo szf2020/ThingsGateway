@@ -167,7 +167,7 @@ namespace ThingsGateway.SqlSugar
         private static bool GetWhereByIndex(object item, List<MappingFieldsExpression> mappingFieldsExpressions, object it, int index)
         {
             var left = mappingFieldsExpressions[index].LeftEntityColumn.PropertyInfo.GetValue(it).ObjToString();
-            var right = mappingFieldsExpressions[index].RightEntityColumn.PropertyInfo.GetValue(item).ObjToString(); ;
+            var right = mappingFieldsExpressions[index].RightEntityColumn.PropertyInfo.GetValue(item).ObjToString();
             return left == right;
         }
 

@@ -603,25 +603,19 @@ namespace ThingsGateway.SqlSugar
             return this.ScopedContext.StorageableByObject(singleEntityObjectOrListObject);
         }
 
-        public ISugarQueryable<T> Union<T>(List<ISugarQueryable<T>> queryables) where T : class
+        public ISugarQueryable<T> Union<T>(IReadOnlyList<ISugarQueryable<T>> queryables) where T : class
         {
             return ScopedContext.Union(queryables);
         }
 
-        public ISugarQueryable<T> Union<T>(params ISugarQueryable<T>[] queryables) where T : class
-        {
-            return ScopedContext.Union(queryables);
-        }
 
-        public ISugarQueryable<T> UnionAll<T>(List<ISugarQueryable<T>> queryables) where T : class
+
+        public ISugarQueryable<T> UnionAll<T>(IReadOnlyList<ISugarQueryable<T>> queryables) where T : class
         {
             return ScopedContext.UnionAll(queryables);
         }
 
-        public ISugarQueryable<T> UnionAll<T>(params ISugarQueryable<T>[] queryables) where T : class
-        {
-            return ScopedContext.UnionAll(queryables);
-        }
+
         public UpdateMethodInfo UpdateableByObject(object singleEntityObjectOrListObject)
         {
             return ScopedContext.UpdateableByObject(singleEntityObjectOrListObject);

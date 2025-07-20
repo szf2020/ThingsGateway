@@ -66,7 +66,7 @@
                 }
                 this.Context.Utilities.PageEach(DataList, PageSize, pageItem =>
                 {
-                    result += this.Context.Insertable(pageItem).AS(TableName).MySqlIgnore(IsMySqlIgnore).IgnoreColumnsNull(this.IsInsertColumnsNull).OffIdentity(IsOffIdentity).EnableDiffLogEventIF(IsEnableDiffLogEvent, DiffModel).InsertColumns(InsertColumns.ToArray()).ExecuteCommand();
+                    result += this.Context.Insertable(pageItem).AS(TableName).MySqlIgnore(IsMySqlIgnore).IgnoreColumnsNull(this.IsInsertColumnsNull).OffIdentity(IsOffIdentity).EnableDiffLogEventIF(IsEnableDiffLogEvent, DiffModel).InsertColumns(InsertColumns).ExecuteCommand();
                 });
                 if (isNoTran)
                 {
@@ -104,7 +104,7 @@
                 }
                 await Context.Utilities.PageEachAsync(DataList, PageSize, async pageItem =>
                 {
-                    result += await Context.Insertable(pageItem).AS(TableName).IgnoreColumnsNull(IsInsertColumnsNull).OffIdentity(IsOffIdentity).EnableDiffLogEventIF(IsEnableDiffLogEvent, DiffModel).InsertColumns(InsertColumns.ToArray()).ExecuteCommandAsync().ConfigureAwait(false);
+                    result += await Context.Insertable(pageItem).AS(TableName).IgnoreColumnsNull(IsInsertColumnsNull).OffIdentity(IsOffIdentity).EnableDiffLogEventIF(IsEnableDiffLogEvent, DiffModel).InsertColumns(InsertColumns).ExecuteCommandAsync().ConfigureAwait(false);
                 }).ConfigureAwait(false);
                 if (isNoTran)
                 {
@@ -142,7 +142,7 @@
                 }
                 this.Context.Utilities.PageEach(DataList, PageSize, pageItem =>
                 {
-                    result.AddRange(this.Context.Insertable(pageItem).AS(TableName).OffIdentity(IsOffIdentity).EnableDiffLogEventIF(IsEnableDiffLogEvent, DiffModel).InsertColumns(InsertColumns.ToArray()).ExecuteReturnSnowflakeIdList());
+                    result.AddRange(this.Context.Insertable(pageItem).AS(TableName).OffIdentity(IsOffIdentity).EnableDiffLogEventIF(IsEnableDiffLogEvent, DiffModel).InsertColumns(InsertColumns).ExecuteReturnSnowflakeIdList());
                 });
                 if (isNoTran)
                 {
@@ -180,7 +180,7 @@
                 }
                 await Context.Utilities.PageEachAsync(DataList, PageSize, async pageItem =>
                 {
-                    result.AddRange(await Context.Insertable(pageItem).AS(TableName).OffIdentity(IsOffIdentity).EnableDiffLogEventIF(IsEnableDiffLogEvent, DiffModel).InsertColumns(InsertColumns.ToArray()).ExecuteReturnSnowflakeIdListAsync().ConfigureAwait(false));
+                    result.AddRange(await Context.Insertable(pageItem).AS(TableName).OffIdentity(IsOffIdentity).EnableDiffLogEventIF(IsEnableDiffLogEvent, DiffModel).InsertColumns(InsertColumns).ExecuteReturnSnowflakeIdListAsync().ConfigureAwait(false));
                 }).ConfigureAwait(false);
                 if (isNoTran)
                 {

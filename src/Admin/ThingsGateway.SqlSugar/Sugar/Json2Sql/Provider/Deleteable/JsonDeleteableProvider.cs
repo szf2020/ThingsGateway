@@ -22,7 +22,7 @@ namespace ThingsGateway.SqlSugar
         {
             List<SqlObjectResult> result = new List<SqlObjectResult>();
             JsonQueryParameter jsonQueryParameter = new JsonQueryParameter();
-            var appendTypeNames = this.jObject.AsJEnumerable().ToList();
+            var appendTypeNames = this.jObject.AsJEnumerable();
             this.sugarDeleteable = this.context.Deleteable<object>();
             foreach (JToken item in appendTypeNames)
             {

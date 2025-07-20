@@ -79,9 +79,7 @@ public partial class MainLayout : IDisposable
             IsScrolling = false,
             Title = Localizer["UserCenter"],
             ShowFooter = false,
-            Component = BootstrapDynamicComponent.CreateComponent<UserCenterPage>(new Dictionary<string, object?>()
-            {
-            })
+            Component = BootstrapDynamicComponent.CreateComponent<UserCenterPage>(new Dictionary<string, object?>())
         });
     }
 

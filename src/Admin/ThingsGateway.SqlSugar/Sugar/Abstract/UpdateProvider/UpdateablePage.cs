@@ -9,7 +9,7 @@
         public bool IsEnableDiffLogEvent { get; internal set; }
         public DiffLogModel DiffModel { get; internal set; }
         public List<string> UpdateColumns { get; internal set; }
-        public string[] WhereColumnList { get; internal set; }
+        public IReadOnlyList<string> WhereColumnList { get; internal set; }
         public Dictionary<string, ReSetValueBySqlExpListModel> ReSetValueBySqlExpList { get; internal set; }
 
         public UpdateableFilter<T> EnableQueryFilter()
@@ -44,7 +44,7 @@
                 {
                     var updateable = this.Context.Updateable(pageItem).AS(TableName);
                     updateable.UpdateBuilder.ReSetValueBySqlExpList = this.ReSetValueBySqlExpList;
-                    result += updateable.WhereColumns(WhereColumnList).EnableDiffLogEventIF(IsEnableDiffLogEvent, DiffModel).UpdateColumns(UpdateColumns.ToArray()).ExecuteCommand();
+                    result += updateable.WhereColumns(WhereColumnList).EnableDiffLogEventIF(IsEnableDiffLogEvent, DiffModel).UpdateColumns(UpdateColumns).ExecuteCommand();
                 });
                 if (isNoTran)
                 {
@@ -80,7 +80,7 @@
                 {
                     var updateable = Context.Updateable(pageItem);
                     updateable.UpdateBuilder.ReSetValueBySqlExpList = ReSetValueBySqlExpList;
-                    result += await updateable.AS(TableName).WhereColumns(WhereColumnList).EnableDiffLogEventIF(IsEnableDiffLogEvent, DiffModel).UpdateColumns(UpdateColumns.ToArray()).ExecuteCommandAsync().ConfigureAwait(false);
+                    result += await updateable.AS(TableName).WhereColumns(WhereColumnList).EnableDiffLogEventIF(IsEnableDiffLogEvent, DiffModel).UpdateColumns(UpdateColumns).ExecuteCommandAsync().ConfigureAwait(false);
                 }).ConfigureAwait(false);
                 if (isNoTran)
                 {

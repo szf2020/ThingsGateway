@@ -167,16 +167,9 @@ public partial class RulesPage
 
     private async Task Notify()
     {
-        try
-        {
-            if (table != null)
-                await table.QueryAsync();
-            await InvokeAsync(StateHasChanged);
-        }
-        finally
-        {
-
-        }
+        if (table != null)
+            await table.QueryAsync();
+        await InvokeAsync(StateHasChanged);
     }
 
 

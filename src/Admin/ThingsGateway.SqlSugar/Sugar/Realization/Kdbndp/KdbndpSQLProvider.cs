@@ -65,7 +65,7 @@ namespace ThingsGateway.SqlSugar
         {
             return new KdbndpDataAdapter();
         }
-        public override DbCommand GetCommand(string sql, SugarParameter[] parameters)
+        public override DbCommand GetCommand(string sql, IReadOnlyList<SugarParameter> parameters)
         {
             KdbndpCommand sqlCommand = new KdbndpCommand(sql, (KdbndpConnection)this.Connection);
             sqlCommand.CommandType = this.CommandType;
@@ -96,10 +96,10 @@ namespace ThingsGateway.SqlSugar
         /// </summary>
         /// <param name="parameters"></param>
         /// <returns></returns>
-        public override IDataParameter[] ToIDbDataParameter(params SugarParameter[] parameters)
+        public override IDataParameter[] ToIDbDataParameter(params IReadOnlyList<SugarParameter> parameters)
         {
-            if (parameters == null || parameters.Length == 0) return null;
-            KdbndpParameter[] result = new KdbndpParameter[parameters.Length];
+            if (parameters == null || parameters.Count == 0) return null;
+            KdbndpParameter[] result = new KdbndpParameter[parameters.Count];
             int index = 0;
             foreach (var parameter in parameters)
             {

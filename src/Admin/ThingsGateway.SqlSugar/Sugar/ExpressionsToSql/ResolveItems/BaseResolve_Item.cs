@@ -188,7 +188,7 @@ namespace ThingsGateway.SqlSugar
                         .Select(it => it.PropertyType.Name).ToList();
                     if (ignorePropertyNames.Count > 0)
                     {
-                        var names = new List<string>() { };
+                        var names = new HashSet<string>();
                         foreach (MemberBinding binding in ((MemberInitExpression)item).Bindings)
                         {
                             names.Add(binding.Member.Name);

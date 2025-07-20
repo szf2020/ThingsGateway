@@ -290,7 +290,7 @@ namespace ThingsGateway.SqlSugar
             {
                 return _ToParentListByTreeKey(parentIdExpression, primaryKeyValue);
             }
-            List<T> result = new List<T>() { };
+            List<T> result = new List<T>();
             Check.Exception(entity.Columns.Where(it => it.IsPrimarykey).Any(), "No Primary key");
             var parentIdName = UtilConvert.ToMemberExpression((parentIdExpression as LambdaExpression).Body).Member.Name;
             var ParentInfo = entity.Columns.First(it => it.PropertyName == parentIdName);
@@ -313,7 +313,7 @@ namespace ThingsGateway.SqlSugar
                 result.Add(current);
                 object parentId = ParentInfo.PropertyInfo.GetValue(current, null);
                 int i = 0;
-                while (parentId != null && this.Context.Queryable<T>().AS(tableName).WithCacheIF(this.IsCache, this.CacheTime).Filter(null, this.QueryBuilder.IsDisabledGobalFilter).ClearFilter(this.QueryBuilder.RemoveFilters).In(parentId).Any())
+                while (parentId != null && this.Context.Queryable<T>().AS(tableName).WithCacheIF(this.IsCache, this.CacheTime).Filter(null, this.QueryBuilder.IsDisabledGobalFilter).ClearFilter(this.QueryBuilder.RemoveFilters).In([parentId]).Any())
                 {
                     Check.Exception(i > 200, ErrorMessage.GetThrowMessage("Dead cycle", "出现死循环或超出循环上限（200），检查最顶层的ParentId是否是null或者0"));
                     var parent = this.Context.Queryable<T>().AS(tableName).WithCacheIF(this.IsCache, this.CacheTime).Filter(null, this.QueryBuilder.IsDisabledGobalFilter).InSingle(parentId);
@@ -332,7 +332,7 @@ namespace ThingsGateway.SqlSugar
             {
                 return _ToParentListByTreeKey(parentIdExpression, primaryKeyValue, parentWhereExpression);
             }
-            List<T> result = new List<T>() { };
+            List<T> result = new List<T>();
             Check.Exception(entity.Columns.Where(it => it.IsPrimarykey).Any(), "No Primary key");
             var parentIdName = UtilConvert.ToMemberExpression((parentIdExpression as LambdaExpression).Body).Member.Name;
             var ParentInfo = entity.Columns.First(it => it.PropertyName == parentIdName);
@@ -355,7 +355,7 @@ namespace ThingsGateway.SqlSugar
                 result.Add(current);
                 object parentId = ParentInfo.PropertyInfo.GetValue(current, null);
                 int i = 0;
-                while (parentId != null && this.Context.Queryable<T>().AS(tableName).WhereIF(parentWhereExpression != default, parentWhereExpression).Filter(null, this.QueryBuilder.IsDisabledGobalFilter).In(parentId).Any())
+                while (parentId != null && this.Context.Queryable<T>().AS(tableName).WhereIF(parentWhereExpression != default, parentWhereExpression).Filter(null, this.QueryBuilder.IsDisabledGobalFilter).In([parentId]).Any())
                 {
                     Check.Exception(i > 200, ErrorMessage.GetThrowMessage("Dead cycle", "出现死循环或超出循环上限（200），检查最顶层的ParentId是否是null或者0"));
                     var parent = this.Context.Queryable<T>().AS(tableName).WhereIF(parentWhereExpression != default, parentWhereExpression).Filter(null, this.QueryBuilder.IsDisabledGobalFilter).InSingle(parentId);
@@ -417,11 +417,11 @@ namespace ThingsGateway.SqlSugar
             if (IsCache)
             {
                 var cacheService = this.Context.CurrentConnectionConfig.ConfigureExternalServices.DataInfoCacheService;
-                result = CacheSchemeMain.GetOrCreate<DataTable>(cacheService, this.QueryBuilder, () => { return this.Db.GetDataTable(sqlObj.Key, sqlObj.Value.ToArray()); }, CacheTime, this.Context, CacheKey);
+                result = CacheSchemeMain.GetOrCreate<DataTable>(cacheService, this.QueryBuilder, () => { return this.Db.GetDataTable(sqlObj.Key, sqlObj.Value); }, CacheTime, this.Context, CacheKey);
             }
             else
             {
-                result = this.Db.GetDataTable(sqlObj.Key, sqlObj.Value.ToArray());
+                result = this.Db.GetDataTable(sqlObj.Key, sqlObj.Value);
             }
             RestChangeMasterQuery(isChangeQueryableMasterSlave);
             RestChangeSlaveQuery(isChangeQueryableSlave);
@@ -597,7 +597,7 @@ namespace ThingsGateway.SqlSugar
                 pkName = ((mappingField as LambdaExpression).Body as MemberExpression).Member.Name;
             }
             var key = thisField.ToString() + mappingField.ToString() + typeof(ParameterT).FullName + typeof(T).FullName;
-            var ids = list.Where(it => it != null).Select(it => it.GetType().GetProperty(pkName).GetValue(it)).Distinct().ToArray();
+            var ids = list.Where(it => it != null).Select(it => it.GetType().GetProperty(pkName).GetValue(it)).Distinct();
             if (queryableContext.TempChildLists == null)
                 queryableContext.TempChildLists = new Dictionary<string, object>();
             if (list != null && queryableContext.TempChildLists.TryGetValue(key, out object? value))
@@ -961,7 +961,7 @@ namespace ThingsGateway.SqlSugar
         }
 
 
-        public virtual KeyValuePair<string, List<SugarParameter>> ToSql()
+        public virtual KeyValuePair<string, IReadOnlyList<SugarParameter>> ToSql()
         {
             if (!QueryBuilder.IsClone)
             {
@@ -1007,7 +1007,7 @@ namespace ThingsGateway.SqlSugar
         }
         public int IntoTable(Type TableEntityType, string TableName)
         {
-            KeyValuePair<string, List<SugarParameter>> sqlInfo;
+            KeyValuePair<string, IReadOnlyList<SugarParameter>> sqlInfo;
             string sql;
             OutIntoTableSql(TableName, out sqlInfo, out sql, TableEntityType);
             return this.Context.Ado.ExecuteCommand(sql, sqlInfo.Value);

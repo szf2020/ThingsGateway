@@ -24,7 +24,7 @@ public class Dlt645_2007Master : DtuServiceDeviceBase
         RegisterByteLength = 2;
         channel.MaxSign = ushort.MaxValue;
     }
-    public override IThingsGatewayBitConverter ThingsGatewayBitConverter { get; } = new Dlt645_2007BitConverter(EndianType.Big) { };
+    public override IThingsGatewayBitConverter ThingsGatewayBitConverter { get; } = new Dlt645_2007BitConverter(EndianType.Big);
 
     /// <inheritdoc/>
     public string FEHead { get; set; } = "FEFEFEFE";
@@ -123,9 +123,7 @@ public class Dlt645_2007Master : DtuServiceDeviceBase
                 };
 
             case ChannelTypeEnum.UdpSession:
-                return new DeviceUdpDataHandleAdapter<Dlt645_2007Message>()
-                {
-                };
+                return new DeviceUdpDataHandleAdapter<Dlt645_2007Message>();
         }
 
         return new DeviceSingleStreamDataHandleAdapter<Dlt645_2007Message>
@@ -389,9 +387,5 @@ public class Dlt645_2007Master : DtuServiceDeviceBase
         return new Dlt645_2007Send(dAddress, read, feHead.HexStringToBytes(), codes, datas);
     }
 
-    #region
-    #endregion
 
-    #region 其他方法
-    #endregion 其他方法
 }

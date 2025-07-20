@@ -147,7 +147,7 @@ namespace ThingsGateway.SqlSugar
             var autoColumns = columnInfos.Columns
                           .Where(it => !dic.ContainsKey(it.PropertyName))
                           .Where(it => it.IsIgnore == false)
-                          .ToList();
+                          ;
             List<string> appendColumns = new List<string>();
             List<string> completeColumnColumns = new List<string>();
             foreach (var item in autoColumns)
@@ -172,11 +172,11 @@ namespace ThingsGateway.SqlSugar
             var select = copyContext.Result.GetString();
             if (dic.Count > 0 && appendColumns.Count == 0)
             {
-                return select + ",@sugarIndex as sugarIndex"; ;
+                return select + ",@sugarIndex as sugarIndex";
             }
             else if (dic.Count > 0 && appendColumns.Count > 0)
             {
-                return select + "," + string.Join(",", appendColumns) + ",@sugarIndex as sugarIndex"; ;
+                return select + "," + string.Join(",", appendColumns) + ",@sugarIndex as sugarIndex";
             }
             else
             {

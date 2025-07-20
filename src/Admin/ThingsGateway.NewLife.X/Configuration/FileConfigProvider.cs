@@ -67,7 +67,7 @@ public abstract class FileConfigProvider : ConfigProvider
         if (!File.Exists(fileName)) return false;
 
         // 读取文件，换个对象，避免数组元素在多次加载后重叠
-        var section = new ConfigSection { };
+        var section = new ConfigSection();
         OnRead(fileName, section);
         Root = section;
 
@@ -199,7 +199,7 @@ public abstract class FileConfigProvider : ConfigProvider
         _reading = true;
         try
         {
-            var section = new ConfigSection { };
+            var section = new ConfigSection();
             OnRead(fileName, section);
             Root = section;
 

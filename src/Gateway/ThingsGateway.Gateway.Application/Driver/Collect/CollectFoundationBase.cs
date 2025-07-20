@@ -147,28 +147,22 @@ public abstract class CollectFoundationBase : CollectBase
     /// </summary>
     protected override async ValueTask<OperResult<byte[]>> ReadSourceAsync(VariableSourceRead variableSourceRead, CancellationToken cancellationToken)
     {
-        try
+
+        if (cancellationToken.IsCancellationRequested)
+            return new(new OperationCanceledException());
+
+        // 从协议读取数据
+        var read = await FoundationDevice.ReadAsync(variableSourceRead.AddressObject, cancellationToken).ConfigureAwait(false);
+
+        // 如果读取成功且有有效内容，则解析结构化内容
+        if (read.IsSuccess)
         {
-
-            if (cancellationToken.IsCancellationRequested)
-                return new(new OperationCanceledException());
-
-            // 从协议读取数据
-            var read = await FoundationDevice.ReadAsync(variableSourceRead.AddressObject, cancellationToken).ConfigureAwait(false);
-
-            // 如果读取成功且有有效内容，则解析结构化内容
-            if (read.IsSuccess)
-            {
-                var prase = variableSourceRead.VariableRuntimes.PraseStructContent(FoundationDevice, read.Content, false);
-                return new OperResult<byte[]>(prase);
-            }
-
-            // 返回读取结果
-            return read;
+            var prase = variableSourceRead.VariableRuntimes.PraseStructContent(FoundationDevice, read.Content, false);
+            return new OperResult<byte[]>(prase);
         }
-        finally
-        {
-        }
+
+        // 返回读取结果
+        return read;
     }
 
     /// <summary>
@@ -178,53 +172,47 @@ public abstract class CollectFoundationBase : CollectBase
     protected override async ValueTask<Dictionary<string, OperResult>> WriteValuesAsync(Dictionary<VariableRuntime, JToken> writeInfoLists, CancellationToken cancellationToken)
     {
         using var writeLock = ReadWriteLock.WriterLock();
-        try
-        {
-            // 检查协议是否为空，如果为空则抛出异常
-            if (FoundationDevice == null)
-                throw new NotSupportedException();
+        // 检查协议是否为空，如果为空则抛出异常
+        if (FoundationDevice == null)
+            throw new NotSupportedException();
 
-            // 创建用于存储操作结果的并发字典
-            ConcurrentDictionary<string, OperResult> operResults = new();
-            var list = writeInfoLists.ToArray();
-            // 使用并发方式遍历写入信息列表，并进行异步写入操作
-            await list.ParallelForEachAsync(async (writeInfo, cancellationToken) =>
+        // 创建用于存储操作结果的并发字典
+        ConcurrentDictionary<string, OperResult> operResults = new();
+        var list = writeInfoLists.ToArray();
+        // 使用并发方式遍历写入信息列表，并进行异步写入操作
+        await list.ParallelForEachAsync(async (writeInfo, cancellationToken) =>
+        {
+            try
             {
-                try
-                {
 
+                if (LogMessage?.LogLevel <= TouchSocket.Core.LogLevel.Debug)
+                    LogMessage?.Debug(string.Format("{0} - Writing [{1} - {2} - {3}]", DeviceName, writeInfo.Key.RegisterAddress, writeInfo.Value, writeInfo.Key.DataType));
+
+                // 调用协议的写入方法，将写入信息中的数据写入到对应的寄存器地址，并获取操作结果
+                var result = await FoundationDevice.WriteAsync(writeInfo.Key.RegisterAddress, writeInfo.Value, writeInfo.Key.DataType, cancellationToken).ConfigureAwait(false);
+
+                if (result.IsSuccess)
+                {
                     if (LogMessage?.LogLevel <= TouchSocket.Core.LogLevel.Debug)
-                        LogMessage?.Debug(string.Format("{0} - Writing [{1} - {2} - {3}]", DeviceName, writeInfo.Key.RegisterAddress, writeInfo.Value, writeInfo.Key.DataType));
-
-                    // 调用协议的写入方法，将写入信息中的数据写入到对应的寄存器地址，并获取操作结果
-                    var result = await FoundationDevice.WriteAsync(writeInfo.Key.RegisterAddress, writeInfo.Value, writeInfo.Key.DataType, cancellationToken).ConfigureAwait(false);
-
-                    if (result.IsSuccess)
-                    {
-                        if (LogMessage?.LogLevel <= TouchSocket.Core.LogLevel.Debug)
-                            LogMessage?.Debug(string.Format("{0} - Write [{1} - {2} - {3}] data succeeded", DeviceName, writeInfo.Key.RegisterAddress, writeInfo.Value, writeInfo.Key.DataType));
-                    }
-                    else
-                    {
-                        LogMessage?.Warning(string.Format("{0} - Write [{1} - {2} - {3}] data failed {4}", DeviceName, writeInfo.Key.RegisterAddress, writeInfo.Value, writeInfo.Key.DataType, result.ToString()));
-                    }
-                    // 将操作结果添加到结果字典中，使用变量名称作为键
-                    operResults.TryAdd(writeInfo.Key.Name, result);
+                        LogMessage?.Debug(string.Format("{0} - Write [{1} - {2} - {3}] data succeeded", DeviceName, writeInfo.Key.RegisterAddress, writeInfo.Value, writeInfo.Key.DataType));
                 }
-                catch (Exception ex)
+                else
                 {
-                    operResults.TryAdd(writeInfo.Key.Name, new(ex));
+                    LogMessage?.Warning(string.Format("{0} - Write [{1} - {2} - {3}] data failed {4}", DeviceName, writeInfo.Key.RegisterAddress, writeInfo.Value, writeInfo.Key.DataType, result.ToString()));
                 }
-            }, CollectProperties.MaxConcurrentCount, cancellationToken).ConfigureAwait(false);
+                // 将操作结果添加到结果字典中，使用变量名称作为键
+                operResults.TryAdd(writeInfo.Key.Name, result);
+            }
+            catch (Exception ex)
+            {
+                operResults.TryAdd(writeInfo.Key.Name, new(ex));
+            }
+        }, CollectProperties.MaxConcurrentCount, cancellationToken).ConfigureAwait(false);
 
-            await Check(writeInfoLists, operResults, cancellationToken).ConfigureAwait(false);
+        await Check(writeInfoLists, operResults, cancellationToken).ConfigureAwait(false);
 
-            // 返回包含操作结果的字典
-            return new Dictionary<string, OperResult>(operResults);
-        }
-        finally
-        {
-        }
+        // 返回包含操作结果的字典
+        return new Dictionary<string, OperResult>(operResults);
     }
 
 

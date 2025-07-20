@@ -47,7 +47,7 @@ public partial class OrgTree : IDisposable
     private List<TreeViewItem<SysOrg>> ZItem;
     protected override async Task OnInitializedAsync()
     {
-        ZItem = new List<TreeViewItem<SysOrg>>() {new TreeViewItem<SysOrg>(new SysOrg(){ })
+        ZItem = new List<TreeViewItem<SysOrg>>() {new TreeViewItem<SysOrg>(new SysOrg())
         {
             Text = AdminLocalizer["All"],
             IsActive = Value == 0,

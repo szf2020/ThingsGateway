@@ -31,7 +31,7 @@ public class VariableRpcNode : VariableNode, IActuatorNode
             }
             Logger?.Warning($" VariableRpcNode - VariableName {Text} : not found");
 
-            return new OperResult<NodeOutput>() { Content = new NodeOutput() { } };
+            return new OperResult<NodeOutput>() { Content = new NodeOutput() };
         }
         catch (Exception ex)
         {

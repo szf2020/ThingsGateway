@@ -43,11 +43,11 @@ namespace ThingsGateway.SqlSugar
         /// <summary>
         /// 差异日志模型
         /// </summary>
-        public DiffLogModel diffModel { get; set; }
+        public DiffLogModel DiffModel { get; set; }
         /// <summary>
         /// 临时主键列表
         /// </summary>
-        public List<string> tempPrimaryKeys { get; set; }
+        public List<string> TempPrimaryKeys { get; set; }
         /// <summary>
         /// 移除缓存函数
         /// </summary>
@@ -82,7 +82,7 @@ namespace ThingsGateway.SqlSugar
         public int ExecuteCommand()
         {
             string sql;
-            SugarParameter[] paramters;
+            IReadOnlyList<SugarParameter> paramters;
             _ExecuteCommand(out sql, out paramters);
             var result = Db.ExecuteCommand(sql, paramters);
             After(sql);
@@ -112,7 +112,7 @@ namespace ThingsGateway.SqlSugar
         public async Task<int> ExecuteCommandAsync()
         {
             string sql;
-            SugarParameter[] paramters;
+            IReadOnlyList<SugarParameter> paramters;
             _ExecuteCommand(out sql, out paramters);
             var result = await Db.ExecuteCommandAsync(sql, paramters).ConfigureAwait(false);
             After(sql);
@@ -165,10 +165,10 @@ namespace ThingsGateway.SqlSugar
         /// </summary>
         public IDeleteable<T> EnableDiffLogEvent(object businessData = null)
         {
-            diffModel = new DiffLogModel();
+            DiffModel = new DiffLogModel();
             this.IsEnableDiffLogEvent = true;
-            diffModel.BusinessData = businessData;
-            diffModel.DiffType = DiffType.delete;
+            DiffModel.BusinessData = businessData;
+            DiffModel.DiffType = DiffType.delete;
             return this;
         }
 
@@ -213,7 +213,7 @@ namespace ThingsGateway.SqlSugar
                     List<string> inItems = new List<string>();
                     this.Context.Utilities.PageEach(primaryKeyValues, 999, pageItems =>
                     {
-                        var inValueString = pageItems.ToArray().ToJoinSqlInVals();
+                        var inValueString = pageItems.ToJoinSqlInVals();
                         var whereItem = string.Format(DeleteBuilder.WhereInTemplate, SqlBuilder.GetTranslationColumnName(primaryFields.Single()), inValueString);
                         inItems.Add(whereItem);
                     });
@@ -224,11 +224,11 @@ namespace ThingsGateway.SqlSugar
                     var inValueString = string.Empty;
                     if (isNvarchar)
                     {
-                        inValueString = primaryKeyValues.ToArray().ToJoinSqlInValsByVarchar();
+                        inValueString = primaryKeyValues.ToJoinSqlInValsByVarchar();
                     }
                     else
                     {
-                        inValueString = primaryKeyValues.ToArray().ToJoinSqlInVals();
+                        inValueString = primaryKeyValues.ToJoinSqlInVals();
                     }
                 }
                 else
@@ -301,7 +301,7 @@ namespace ThingsGateway.SqlSugar
                                       MemberName="'"+entityValue.ObjToDate().ToString("yyyy-MM-dd HH:mm:ss.fff")+"'"
                                  }
                              }
-                            })); ;
+                            }));
                         }
                         else
                         {
@@ -381,10 +381,10 @@ namespace ThingsGateway.SqlSugar
         /// <summary>
         /// 根据对象设置删除条件
         /// </summary>
-        public IDeleteable<T> Where(T deleteObj)
+        public IDeleteable<T> WhereT(T deleteObj)
         {
             Check.Exception(GetPrimaryKeys().IsNullOrEmpty(), "Where(entity) Primary key required");
-            Where(new List<T>() { deleteObj });
+            Where([deleteObj]);
             return this;
         }
 
@@ -422,7 +422,7 @@ namespace ThingsGateway.SqlSugar
         /// <summary>
         /// 设置Where条件
         /// </summary>
-        public IDeleteable<T> Where(string whereString, SugarParameter[] parameters)
+        public IDeleteable<T> Where(string whereString, IReadOnlyList<SugarParameter> parameters)
         {
             DeleteBuilder.WhereInfos.Add(whereString);
             if (DeleteBuilder.Parameters == null)
@@ -499,7 +499,7 @@ namespace ThingsGateway.SqlSugar
         {
             if (columns != null)
             {
-                tempPrimaryKeys = DeleteBuilder.GetExpressionValue(columns, ResolveExpressType.ArraySingle).GetResultArray().Select(it => this.SqlBuilder.GetNoTranslationColumnName(it)).ToList();
+                TempPrimaryKeys = DeleteBuilder.GetExpressionValue(columns, ResolveExpressType.ArraySingle).GetResultArray().Select(it => this.SqlBuilder.GetNoTranslationColumnName(it)).ToList();
             }
             this.Where(list);
             return this;
@@ -607,7 +607,7 @@ namespace ThingsGateway.SqlSugar
             SplitTableDeleteByObjectProvider<T> result = new SplitTableDeleteByObjectProvider<T>();
             result.Context = this.Context;
             Check.ExceptionEasy(this.DeleteObjects == null, "SplitTable() +0  only List<T> can be deleted", "SplitTable()无参数重载只支持根据实体集合删除");
-            result.deleteObjects = this.DeleteObjects.ToArray();
+            result.deleteObjects = this.DeleteObjects;
             SplitTableContext helper = new SplitTableContext((SqlSugarProvider)Context)
             {
                 EntityInfo = this.EntityInfo
@@ -640,25 +640,14 @@ namespace ThingsGateway.SqlSugar
             return this;
         }
 
-        /// <summary>
-        /// IN条件
-        /// </summary>
-        public IDeleteable<T> In<PkType>(List<PkType> primaryKeyValues)
-        {
-            if (primaryKeyValues == null || primaryKeyValues.Count == 0)
-            {
-                Where(SqlBuilder.SqlFalse);
-                return this;
-            }
-            return In<PkType>(primaryKeyValues.ToArray());
-        }
+
 
         /// <summary>
         /// IN条件
         /// </summary>
-        public IDeleteable<T> In<PkType>(PkType[] primaryKeyValues)
+        public IDeleteable<T> In<PkType>(IReadOnlyList<PkType> primaryKeyValues)
         {
-            if (primaryKeyValues == null || primaryKeyValues.Length == 0)
+            if (primaryKeyValues == null || primaryKeyValues.Count == 0)
             {
                 Where(SqlBuilder.SqlFalse);
                 return this;
@@ -667,7 +656,7 @@ namespace ThingsGateway.SqlSugar
             string primaryField = null;
             primaryField = GetPrimaryKeys().FirstOrDefault();
             Check.ArgumentNullException(primaryField, "Table " + tableName + " with no primarykey");
-            if (primaryKeyValues.Length < 10000)
+            if (primaryKeyValues.Count < 10000)
             {
                 Where(string.Format(DeleteBuilder.WhereInTemplate, SqlBuilder.GetTranslationColumnName(primaryField), primaryKeyValues.ToJoinSqlInVals()));
             }
@@ -684,7 +673,7 @@ namespace ThingsGateway.SqlSugar
         /// <summary>
         /// IN条件
         /// </summary>
-        public IDeleteable<T> In<PkType>(PkType primaryKeyValue)
+        public IDeleteable<T> InT<PkType>(PkType primaryKeyValue)
         {
             if (typeof(PkType).FullName.IsCollectionsList())
             {
@@ -703,39 +692,26 @@ namespace ThingsGateway.SqlSugar
         /// <summary>
         /// IN条件
         /// </summary>
-        public IDeleteable<T> In<PkType>(Expression<Func<T, object>> inField, PkType primaryKeyValue)
+        public IDeleteable<T> InT<PkType>(Expression<Func<T, object>> inField, PkType primaryKeyValue)
         {
             var lamResult = DeleteBuilder.GetExpressionValue(inField, ResolveExpressType.FieldSingle);
             var fieldName = lamResult.GetResultString();
-            tempPrimaryKeys = new List<string>() { fieldName };
-            var result = In(primaryKeyValue);
-            tempPrimaryKeys = null;
+            TempPrimaryKeys = new List<string>() { fieldName };
+            var result = In([primaryKeyValue]);
+            TempPrimaryKeys = null;
             return this;
         }
 
         /// <summary>
         /// IN条件
         /// </summary>
-        public IDeleteable<T> In<PkType>(Expression<Func<T, object>> inField, PkType[] primaryKeyValues)
+        public IDeleteable<T> In<PkType>(Expression<Func<T, object>> inField, IReadOnlyList<PkType> primaryKeyValues)
         {
             var lamResult = DeleteBuilder.GetExpressionValue(inField, ResolveExpressType.FieldSingle);
             var fieldName = lamResult.GetResultString();
-            tempPrimaryKeys = new List<string>() { fieldName };
+            TempPrimaryKeys = new List<string>() { fieldName };
             var result = In(primaryKeyValues);
-            tempPrimaryKeys = null;
-            return this;
-        }
-
-        /// <summary>
-        /// IN条件
-        /// </summary>
-        public IDeleteable<T> In<PkType>(Expression<Func<T, object>> inField, List<PkType> primaryKeyValues)
-        {
-            var lamResult = DeleteBuilder.GetExpressionValue(inField, ResolveExpressType.FieldSingle);
-            var fieldName = lamResult.GetResultString();
-            tempPrimaryKeys = new List<string>() { fieldName };
-            var result = In(primaryKeyValues);
-            tempPrimaryKeys = null;
+            TempPrimaryKeys = null;
             return this;
         }
 
@@ -754,11 +730,11 @@ namespace ThingsGateway.SqlSugar
         /// <summary>
         /// IN条件
         /// </summary>
-        public IDeleteable<T> In<PkType>(string inField, List<PkType> primaryKeyValues)
+        public IDeleteable<T> In<PkType>(string inField, IReadOnlyList<PkType> primaryKeyValues)
         {
-            tempPrimaryKeys = new List<string>() { inField };
+            TempPrimaryKeys = new List<string>() { inField };
             var result = In(primaryKeyValues);
-            tempPrimaryKeys = null;
+            TempPrimaryKeys = null;
             return this;
         }
 
@@ -771,7 +747,7 @@ namespace ThingsGateway.SqlSugar
             DeleteablePage<T> result = new DeleteablePage<T>();
             result.DataList = this.DeleteObjects;
             result.Context = this.Context;
-            result.DiffModel = this.diffModel;
+            result.DiffModel = this.DiffModel;
             result.IsEnableDiffLogEvent = this.IsEnableDiffLogEvent;
             result.TableName = this.DeleteBuilder.AsName;
             result.PageSize = pageSize;
@@ -803,13 +779,13 @@ namespace ThingsGateway.SqlSugar
         /// <summary>
         /// 获取SQL和参数
         /// </summary>
-        public KeyValuePair<string, List<SugarParameter>> ToSql()
+        public KeyValuePair<string, IReadOnlyList<SugarParameter>> ToSql()
         {
             DeleteBuilder.EntityInfo = this.Context.EntityMaintenance.GetEntityInfo<T>();
             string sql = DeleteBuilder.ToSqlString();
-            var paramters = DeleteBuilder.Parameters == null ? null : DeleteBuilder.Parameters.ToList();
+            var paramters = DeleteBuilder.Parameters == null ? null : DeleteBuilder.Parameters;
             RestoreMapping();
-            return new KeyValuePair<string, List<SugarParameter>>(sql, paramters);
+            return new KeyValuePair<string, IReadOnlyList<SugarParameter>>(sql, paramters);
         }
 
         /// <summary>
@@ -817,9 +793,9 @@ namespace ThingsGateway.SqlSugar
         /// </summary>
         private List<string> GetPrimaryKeys()
         {
-            if (tempPrimaryKeys.HasValue())
+            if (TempPrimaryKeys.HasValue())
             {
-                return tempPrimaryKeys;
+                return TempPrimaryKeys;
             }
             else
             {
@@ -830,11 +806,11 @@ namespace ThingsGateway.SqlSugar
         /// <summary>
         /// 执行删除命令
         /// </summary>
-        private void _ExecuteCommand(out string sql, out SugarParameter[] paramters)
+        private void _ExecuteCommand(out string sql, out IReadOnlyList<SugarParameter> paramters)
         {
             DeleteBuilder.EntityInfo = this.Context.EntityMaintenance.GetEntityInfo<T>();
             sql = DeleteBuilder.ToSqlString();
-            paramters = DeleteBuilder.Parameters == null ? null : DeleteBuilder.Parameters.ToArray();
+            paramters = DeleteBuilder.Parameters == null ? null : DeleteBuilder.Parameters;
             RestoreMapping();
             AutoRemoveDataCache();
             Before(sql);
@@ -884,10 +860,10 @@ namespace ThingsGateway.SqlSugar
                 var parameters = DeleteBuilder.Parameters;
                 if (parameters == null)
                     parameters = new List<SugarParameter>();
-                diffModel.AfterData = null;
-                diffModel.Time = this.Context.Ado.SqlExecutionTime;
+                DiffModel.AfterData = null;
+                DiffModel.Time = this.Context.Ado.SqlExecutionTime;
                 if (this.Context.CurrentConnectionConfig.AopEvents.OnDiffLogEvent != null)
-                    this.Context.CurrentConnectionConfig.AopEvents.OnDiffLogEvent(diffModel);
+                    this.Context.CurrentConnectionConfig.AopEvents.OnDiffLogEvent(DiffModel);
                 this.Context.Ado.IsDisableMasterSlaveSeparation = isDisableMasterSlaveSeparation;
             }
             if (this.RemoveCacheFunc != null)
@@ -909,9 +885,9 @@ namespace ThingsGateway.SqlSugar
                 var parameters = DeleteBuilder.Parameters;
                 if (parameters == null)
                     parameters = new List<SugarParameter>();
-                diffModel.BeforeData = GetDiffTable(sql, parameters);
-                diffModel.Sql = sql;
-                diffModel.Parameters = parameters.ToArray();
+                DiffModel.BeforeData = GetDiffTable(sql, parameters);
+                DiffModel.Sql = sql;
+                DiffModel.Parameters = parameters;
                 this.Context.Ado.IsDisableMasterSlaveSeparation = isDisableMasterSlaveSeparation;
             }
         }

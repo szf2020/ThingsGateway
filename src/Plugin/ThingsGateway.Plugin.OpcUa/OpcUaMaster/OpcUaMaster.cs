@@ -189,9 +189,6 @@ public class OpcUaMaster : CollectBase
                                         LogMessage?.LogWarning(ex, "AddSubscriptions error");
                                     checkLog = false;
                                 }
-                                finally
-                                {
-                                }
 
                                 LogMessage?.LogInformation("AddSubscriptions done");
 
@@ -288,38 +285,28 @@ public class OpcUaMaster : CollectBase
         {
             return new OperResult<byte[]>($"ReadSourceAsync {addresss.ToSystemTextJsonString()}：{Environment.NewLine}{ex}");
         }
-        finally
-        {
-        }
     }
 
     /// <inheritdoc/>
     protected override async ValueTask<Dictionary<string, OperResult>> WriteValuesAsync(Dictionary<VariableRuntime, JToken> writeInfoLists, CancellationToken cancellationToken)
     {
         using var writeLock = ReadWriteLock.WriterLock();
-        try
+        var result = await _plc.WriteNodeAsync(writeInfoLists.ToDictionary(a => a.Key.RegisterAddress!, a => a.Value), cancellationToken).ConfigureAwait(false);
+        var results = new ConcurrentDictionary<string, OperResult>(result.ToDictionary<KeyValuePair<string, Tuple<bool, string>>, string, OperResult>(a =>
         {
-            var result = await _plc.WriteNodeAsync(writeInfoLists.ToDictionary(a => a.Key.RegisterAddress!, a => a.Value), cancellationToken).ConfigureAwait(false);
-            var results = new ConcurrentDictionary<string, OperResult>(result.ToDictionary<KeyValuePair<string, Tuple<bool, string>>, string, OperResult>(a =>
-            {
-                return writeInfoLists.Keys.FirstOrDefault(b => b.RegisterAddress == a.Key)?.Name!;
-            }
-            , a =>
-            {
-                if (!a.Value.Item1)
-                    return new OperResult(a.Value.Item2);
-                else
-                    return OperResult.Success;
-            }));
-
-            await Check(writeInfoLists, results, cancellationToken).ConfigureAwait(false);
-
-            return new(results);
-
+            return writeInfoLists.Keys.FirstOrDefault(b => b.RegisterAddress == a.Key)?.Name!;
         }
-        finally
+        , a =>
         {
-        }
+            if (!a.Value.Item1)
+                return new OperResult(a.Value.Item2);
+            else
+                return OperResult.Success;
+        }));
+
+        await Check(writeInfoLists, results, cancellationToken).ConfigureAwait(false);
+
+        return new(results);
     }
 
     private void _plc_LogEvent(byte level, object sender, string message, Exception ex)

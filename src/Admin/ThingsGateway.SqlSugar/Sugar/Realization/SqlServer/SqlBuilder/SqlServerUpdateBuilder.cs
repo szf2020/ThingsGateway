@@ -31,7 +31,7 @@ namespace ThingsGateway.SqlSugar
                 }));
                 batchUpdateSql.AppendFormat(SqlTemplateBatch.ToString(), setValues, GetTableNameStringNoWith, TableWithString);
                 int i = 0;
-                foreach (var columns in groupList.Skip((pageIndex - 1) * pageSize).Take(pageSize).ToList())
+                foreach (var columns in groupList.Skip((pageIndex - 1) * pageSize).Take(pageSize))
                 {
                     var isFirst = i == 0;
                     if (!isFirst)

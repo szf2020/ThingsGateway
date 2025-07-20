@@ -10,7 +10,7 @@
             string sql = InsertBuilder.ToSqlString().Replace("$PrimaryKey", this.SqlBuilder.GetTranslationColumnName(identityColumn));
             RestoreMapping();
             AutoRemoveDataCache();
-            var result = Ado.GetScalar(sql, InsertBuilder.Parameters == null ? null : InsertBuilder.Parameters.ToArray()).ObjToInt();
+            var result = Ado.GetScalar(sql, InsertBuilder.Parameters == null ? null : InsertBuilder.Parameters).ObjToInt();
             After(sql, result);
             return result;
         }
@@ -22,12 +22,12 @@
             string sql = InsertBuilder.ToSqlString().Replace("$PrimaryKey", this.SqlBuilder.GetTranslationColumnName(identityColumn));
             RestoreMapping();
             AutoRemoveDataCache();
-            var obj = await Ado.GetScalarAsync(sql, InsertBuilder.Parameters == null ? null : InsertBuilder.Parameters.ToArray()).ConfigureAwait(false);
+            var obj = await Ado.GetScalarAsync(sql, InsertBuilder.Parameters == null ? null : InsertBuilder.Parameters).ConfigureAwait(false);
             var result = obj.ObjToInt();
             After(sql, result);
             return result;
         }
-        public override KeyValuePair<string, List<SugarParameter>> ToSql()
+        public override KeyValuePair<string, IReadOnlyList<SugarParameter>> ToSql()
         {
             var result = base.ToSql();
             var primaryKey = GetPrimaryKeys().FirstOrDefault();
@@ -37,9 +37,9 @@
             }
             else if (result.Key?.EndsWith(" returning $PrimaryKey") == true)
             {
-                result = new KeyValuePair<string, List<SugarParameter>>(result.Key.Replace(" returning $PrimaryKey", null), result.Value);
+                result = new KeyValuePair<string, IReadOnlyList<SugarParameter>>(result.Key.Replace(" returning $PrimaryKey", null), result.Value);
             }
-            return new KeyValuePair<string, List<SugarParameter>>(result.Key.Replace("$PrimaryKey", primaryKey), result.Value);
+            return new KeyValuePair<string, IReadOnlyList<SugarParameter>>(result.Key.Replace("$PrimaryKey", primaryKey), result.Value);
         }
 
         public override long ExecuteReturnBigIdentity()
@@ -49,7 +49,7 @@
             string sql = InsertBuilder.ToSqlString().Replace("$PrimaryKey", this.SqlBuilder.GetTranslationColumnName(GetIdentityKeys().FirstOrDefault()));
             RestoreMapping();
             AutoRemoveDataCache();
-            var result = Convert.ToInt64(Ado.GetScalar(sql, InsertBuilder.Parameters == null ? null : InsertBuilder.Parameters.ToArray()) ?? "0");
+            var result = Convert.ToInt64(Ado.GetScalar(sql, InsertBuilder.Parameters == null ? null : InsertBuilder.Parameters) ?? "0");
             After(sql, result);
             return result;
         }
@@ -60,7 +60,7 @@
             string sql = InsertBuilder.ToSqlString().Replace("$PrimaryKey", this.SqlBuilder.GetTranslationColumnName(GetIdentityKeys().FirstOrDefault()));
             RestoreMapping();
             AutoRemoveDataCache();
-            var result = Convert.ToInt64(await Ado.GetScalarAsync(sql, InsertBuilder.Parameters == null ? null : InsertBuilder.Parameters.ToArray()).ConfigureAwait(false) ?? "0");
+            var result = Convert.ToInt64(await Ado.GetScalarAsync(sql, InsertBuilder.Parameters == null ? null : InsertBuilder.Parameters).ConfigureAwait(false) ?? "0");
             After(sql, result);
             return result;
         }

@@ -25,8 +25,6 @@ public static class UserUtil
         var data = items
         .Select((item, index) =>
             new SelectedItem(item.Id.ToString(), item.Account)
-            {
-            }
         ).ToList();
         return data;
     }

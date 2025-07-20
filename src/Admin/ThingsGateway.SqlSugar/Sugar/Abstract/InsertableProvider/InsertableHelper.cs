@@ -528,10 +528,10 @@ namespace ThingsGateway.SqlSugar
                 var parameters = InsertBuilder.Parameters;
                 if (parameters == null)
                     parameters = new List<SugarParameter>();
-                diffModel.AfterData = GetDiffTable(sql, result);
-                diffModel.Time = this.Context.Ado.SqlExecutionTime;
+                DiffModel.AfterData = GetDiffTable(sql, result);
+                DiffModel.Time = this.Context.Ado.SqlExecutionTime;
                 if (this.Context.CurrentConnectionConfig.AopEvents.OnDiffLogEvent != null)
-                    this.Context.CurrentConnectionConfig.AopEvents.OnDiffLogEvent(diffModel);
+                    this.Context.CurrentConnectionConfig.AopEvents.OnDiffLogEvent(DiffModel);
                 this.Ado.IsDisableMasterSlaveSeparation = isDisableMasterSlaveSeparation;
             }
             if (this.RemoveCacheFunc != null)
@@ -552,9 +552,9 @@ namespace ThingsGateway.SqlSugar
                 var parameters = InsertBuilder.Parameters;
                 if (parameters == null)
                     parameters = new List<SugarParameter>();
-                diffModel.BeforeData = null;
-                diffModel.Sql = sql;
-                diffModel.Parameters = parameters.ToArray();
+                DiffModel.BeforeData = null;
+                DiffModel.Sql = sql;
+                DiffModel.Parameters = parameters;
                 this.Ado.IsDisableMasterSlaveSeparation = isDisableMasterSlaveSeparation;
             }
         }
@@ -730,7 +730,7 @@ namespace ThingsGateway.SqlSugar
             InsertBuilder.IsNoPage = true;
             string sql = _ExecuteCommand();
             sql = this.InsertBuilder.ConvertInsertReturnIdFunc(SqlBuilder.GetTranslationColumnName(pkInfo.DbColumnName), sql);
-            var result = Ado.SqlQuery<Type>(sql, InsertBuilder.Parameters == null ? null : InsertBuilder.Parameters.ToArray());
+            var result = Ado.SqlQuery<Type>(sql, InsertBuilder.Parameters == null ? null : InsertBuilder.Parameters);
             After(sql, null);
             return result;
         }

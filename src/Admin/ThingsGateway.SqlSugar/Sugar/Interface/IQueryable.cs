@@ -57,8 +57,7 @@ namespace ThingsGateway.SqlSugar
         ISugarQueryable<T> Mapper<TObject>(Expression<Func<T, TObject>> mapperObject, Expression<Func<T, object>> mapperField);
         ISugarQueryable<T> Mapper<TObject>(Expression<Func<T, List<TObject>>> mapperObject, Expression<Func<T, object>> mapperField);
         ISugarQueryable<T> AddParameters(object parameters);
-        ISugarQueryable<T> AddParameters(SugarParameter[] parameters);
-        ISugarQueryable<T> AddParameters(List<SugarParameter> parameters);
+        ISugarQueryable<T> AddParameters(IEnumerable<SugarParameter> parameters);
         ISugarQueryable<T> AddJoinInfo(string tableName, string shortName, string joinWhere, JoinType type = JoinType.Left);
         ISugarQueryable<T> AddJoinInfo(Type JoinEntityType, string shortName, string joinWhere, JoinType type = JoinType.Left);
         ISugarQueryable<T> AddJoinInfo(Type JoinEntityType, Dictionary<string, Type> keyIsShortName_ValueIsType_Dictionary, FormattableString onExpString, JoinType type = JoinType.Left);
@@ -76,8 +75,8 @@ namespace ThingsGateway.SqlSugar
         /// <param name="ignoreDefaultValue"></param>
         /// <returns></returns>
         ISugarQueryable<T> WhereClass<ClassType>(List<ClassType> whereClassList, bool ignoreDefaultValue = false) where ClassType : class, new();
-        ISugarQueryable<T> WhereClassByPrimaryKey(List<T> list);
-        ISugarQueryable<T> WhereClassByWhereColumns(List<T> list, string[] whereColumns);
+        ISugarQueryable<T> WhereClassByPrimaryKey(IReadOnlyList<T> list);
+        ISugarQueryable<T> WhereClassByWhereColumns(IReadOnlyList<T> list, IReadOnlyList<string> whereColumns);
         ISugarQueryable<T> WhereClassByPrimaryKey(T data);
         ISugarQueryable<T> WhereColumns(List<Dictionary<string, object>> columns);
         ISugarQueryable<T> WhereColumns(Dictionary<string, object> columns, bool ignoreDefaultValue);
@@ -100,14 +99,11 @@ namespace ThingsGateway.SqlSugar
 
         T InSingle(object pkValue);
         Task<T> InSingleAsync(object pkValue);
-        ISugarQueryable<T> In<TParamter>(params TParamter[] pkValues);
-        ISugarQueryable<T> InIF<TParamter>(bool isIn, string fieldName, params TParamter[] pkValues);
-        ISugarQueryable<T> InIF<TParamter>(bool isIn, params TParamter[] pkValues);
-        ISugarQueryable<T> In<FieldType>(string InFieldName, params FieldType[] inValues);
-        ISugarQueryable<T> In<FieldType>(Expression<Func<T, object>> expression, params FieldType[] inValues);
-        ISugarQueryable<T> In<TParamter>(List<TParamter> pkValues);
-        ISugarQueryable<T> In<FieldType>(string InFieldName, List<FieldType> inValues);
-        ISugarQueryable<T> In<FieldType>(Expression<Func<T, object>> expression, List<FieldType> inValues);
+        ISugarQueryable<T> In<TParamter>(IReadOnlyList<TParamter> pkValues);
+        ISugarQueryable<T> InIF<TParamter>(bool isIn, string fieldName, IReadOnlyList<TParamter> pkValues);
+        ISugarQueryable<T> InIF<TParamter>(bool isIn, IReadOnlyList<TParamter> pkValues);
+        ISugarQueryable<T> In<FieldType>(string InFieldName, IReadOnlyList<FieldType> inValues);
+        ISugarQueryable<T> In<FieldType>(Expression<Func<T, object>> expression, IReadOnlyList<FieldType> inValues);
         ISugarQueryable<T> In<FieldType>(Expression<Func<T, object>> expression, ISugarQueryable<FieldType> childQueryExpression);
         ISugarQueryable<T> InIF<FieldType>(bool isWhere, Expression<Func<T, object>> expression, ISugarQueryable<FieldType> childQueryExpression);
 
@@ -236,7 +232,7 @@ namespace ThingsGateway.SqlSugar
         Task<string> ToJsonPageAsync(int pageIndex, int pageSize);
         string ToJsonPage(int pageIndex, int pageSize, ref int totalNumber);
         Task<string> ToJsonPageAsync(int pageIndex, int pageSize, RefAsync<int> totalNumber);
-        KeyValuePair<string, List<SugarParameter>> ToSql();
+        KeyValuePair<string, IReadOnlyList<SugarParameter>> ToSql();
         string ToSqlString();
         List<T> ToChildList(Expression<Func<T, object>> parentIdExpression, object primaryKeyValue, bool isContainOneself = true);
         List<T> ToChildList(Expression<Func<T, object>> parentIdExpression, object[] primaryKeyValues, bool isContainOneself = true);
@@ -305,7 +301,7 @@ namespace ThingsGateway.SqlSugar
         void Clear();
         void AddQueue();
         ISugarQueryable<T> IgnoreColumns(Expression<Func<T, object>> columns);
-        ISugarQueryable<T> IgnoreColumns(params string[] columns);
+        ISugarQueryable<T> IgnoreColumns(IReadOnlyList<string> columns);
 
         #region 内存行转列
 
@@ -436,15 +432,13 @@ namespace ThingsGateway.SqlSugar
         #endregion
 
         #region In
-        new ISugarQueryable<T, T2> In<FieldType>(Expression<Func<T, object>> expression, params FieldType[] inValues);
-        new ISugarQueryable<T, T2> In<FieldType>(Expression<Func<T, object>> expression, List<FieldType> inValues);
+        new ISugarQueryable<T, T2> In<FieldType>(Expression<Func<T, object>> expression, IReadOnlyList<FieldType> inValues);
         new ISugarQueryable<T, T2> In<FieldType>(Expression<Func<T, object>> expression, ISugarQueryable<FieldType> childQueryExpression);
 
-        ISugarQueryable<T, T2> In<FieldType>(Expression<Func<T, T2, object>> expression, params FieldType[] inValues);
-        ISugarQueryable<T, T2> In<FieldType>(Expression<Func<T, T2, object>> expression, List<FieldType> inValues);
+        ISugarQueryable<T, T2> In<FieldType>(Expression<Func<T, T2, object>> expression, IReadOnlyList<FieldType> inValues);
         ISugarQueryable<T, T2> In<FieldType>(Expression<Func<T, T2, object>> expression, ISugarQueryable<FieldType> childQueryExpression);
-        new ISugarQueryable<T, T2> InIF<TParamter>(bool isIn, params TParamter[] pkValues);
-        new ISugarQueryable<T, T2> InIF<TParamter>(bool isIn, string fieldName, params TParamter[] pkValues);
+        new ISugarQueryable<T, T2> InIF<TParamter>(bool isIn, IReadOnlyList<TParamter> pkValues);
+        new ISugarQueryable<T, T2> InIF<TParamter>(bool isIn, string fieldName, IReadOnlyList<TParamter> pkValues);
         #endregion
 
         #region Other
@@ -459,8 +453,7 @@ namespace ThingsGateway.SqlSugar
         new ISugarQueryable<T, T2> ClearFilter<FilterType1, FilterType2, FilterType3>();
         new ISugarQueryable<T, T2> Filter(string FilterName, bool isDisabledGobalFilter = false);
         new ISugarQueryable<T, T2> AddParameters(object parameters);
-        new ISugarQueryable<T, T2> AddParameters(SugarParameter[] parameters);
-        new ISugarQueryable<T, T2> AddParameters(List<SugarParameter> parameters);
+        new ISugarQueryable<T, T2> AddParameters(IEnumerable<SugarParameter> parameters);
         new ISugarQueryable<T, T2> AddJoinInfo(string tableName, string shortName, string joinWhere, JoinType type = JoinType.Left);
         new ISugarQueryable<T, T2> With(string withString);
         new ISugarQueryable<T, T2> WithCache(int cacheDurationInSeconds = int.MaxValue);
@@ -585,20 +578,17 @@ namespace ThingsGateway.SqlSugar
         #endregion
 
         #region In
-        new ISugarQueryable<T, T2, T3> In<FieldType>(Expression<Func<T, object>> expression, params FieldType[] inValues);
-        new ISugarQueryable<T, T2, T3> In<FieldType>(Expression<Func<T, object>> expression, List<FieldType> inValues);
+        new ISugarQueryable<T, T2, T3> In<FieldType>(Expression<Func<T, object>> expression, IReadOnlyList<FieldType> inValues);
         new ISugarQueryable<T, T2, T3> In<FieldType>(Expression<Func<T, object>> expression, ISugarQueryable<FieldType> childQueryExpression);
 
-        ISugarQueryable<T, T2, T3> In<FieldType>(Expression<Func<T, T2, object>> expression, params FieldType[] inValues);
-        ISugarQueryable<T, T2, T3> In<FieldType>(Expression<Func<T, T2, object>> expression, List<FieldType> inValues);
+        ISugarQueryable<T, T2, T3> In<FieldType>(Expression<Func<T, T2, object>> expression, IReadOnlyList<FieldType> inValues);
         ISugarQueryable<T, T2, T3> In<FieldType>(Expression<Func<T, T2, object>> expression, ISugarQueryable<FieldType> childQueryExpression);
 
-        ISugarQueryable<T, T2, T3> In<FieldType>(Expression<Func<T, T2, T3, object>> expression, params FieldType[] inValues);
-        ISugarQueryable<T, T2, T3> In<FieldType>(Expression<Func<T, T2, T3, object>> expression, List<FieldType> inValues);
+        ISugarQueryable<T, T2, T3> In<FieldType>(Expression<Func<T, T2, T3, object>> expression, IReadOnlyList<FieldType> inValues);
         ISugarQueryable<T, T2, T3> In<FieldType>(Expression<Func<T, T2, T3, object>> expression, ISugarQueryable<FieldType> childQueryExpression);
 
-        new ISugarQueryable<T, T2, T3> InIF<TParamter>(bool isIn, params TParamter[] pkValues);
-        new ISugarQueryable<T, T2, T3> InIF<TParamter>(bool isIn, string fieldName, params TParamter[] pkValues);
+        new ISugarQueryable<T, T2, T3> InIF<TParamter>(bool isIn, IReadOnlyList<TParamter> pkValues);
+        new ISugarQueryable<T, T2, T3> InIF<TParamter>(bool isIn, string fieldName, IReadOnlyList<TParamter> pkValues);
         #endregion
 
         #region Other
@@ -613,8 +603,7 @@ namespace ThingsGateway.SqlSugar
         new ISugarQueryable<T, T2, T3> ClearFilter<FilterType1, FilterType2>();
         new ISugarQueryable<T, T2, T3> ClearFilter<FilterType1, FilterType2, FilterType3>();
         new ISugarQueryable<T, T2, T3> AddParameters(object parameters);
-        new ISugarQueryable<T, T2, T3> AddParameters(SugarParameter[] parameters);
-        new ISugarQueryable<T, T2, T3> AddParameters(List<SugarParameter> parameters);
+        new ISugarQueryable<T, T2, T3> AddParameters(IEnumerable<SugarParameter> parameters);
         new ISugarQueryable<T, T2, T3> AddJoinInfo(string tableName, string shortName, string joinWhere, JoinType type = JoinType.Left);
         new ISugarQueryable<T, T2, T3> With(string withString);
         new ISugarQueryable<T, T2, T3> WithCache(int cacheDurationInSeconds = int.MaxValue);
@@ -740,24 +729,20 @@ namespace ThingsGateway.SqlSugar
         #endregion
 
         #region In
-        new ISugarQueryable<T, T2, T3, T4> In<FieldType>(Expression<Func<T, object>> expression, params FieldType[] inValues);
-        new ISugarQueryable<T, T2, T3, T4> In<FieldType>(Expression<Func<T, object>> expression, List<FieldType> inValues);
+        new ISugarQueryable<T, T2, T3, T4> In<FieldType>(Expression<Func<T, object>> expression, IReadOnlyList<FieldType> inValues);
         new ISugarQueryable<T, T2, T3, T4> In<FieldType>(Expression<Func<T, object>> expression, ISugarQueryable<FieldType> childQueryExpression);
 
-        ISugarQueryable<T, T2, T3, T4> In<FieldType>(Expression<Func<T, T2, object>> expression, params FieldType[] inValues);
-        ISugarQueryable<T, T2, T3, T4> In<FieldType>(Expression<Func<T, T2, object>> expression, List<FieldType> inValues);
+        ISugarQueryable<T, T2, T3, T4> In<FieldType>(Expression<Func<T, T2, object>> expression, IReadOnlyList<FieldType> inValues);
         ISugarQueryable<T, T2, T3, T4> In<FieldType>(Expression<Func<T, T2, object>> expression, ISugarQueryable<FieldType> childQueryExpression);
 
-        ISugarQueryable<T, T2, T3, T4> In<FieldType>(Expression<Func<T, T2, T3, object>> expression, params FieldType[] inValues);
-        ISugarQueryable<T, T2, T3, T4> In<FieldType>(Expression<Func<T, T2, T3, object>> expression, List<FieldType> inValues);
+        ISugarQueryable<T, T2, T3, T4> In<FieldType>(Expression<Func<T, T2, T3, object>> expression, IReadOnlyList<FieldType> inValues);
         ISugarQueryable<T, T2, T3, T4> In<FieldType>(Expression<Func<T, T2, T3, object>> expression, ISugarQueryable<FieldType> childQueryExpression);
 
-        ISugarQueryable<T, T2, T3, T4> In<FieldType>(Expression<Func<T, T2, T3, T4, object>> expression, params FieldType[] inValues);
-        ISugarQueryable<T, T2, T3, T4> In<FieldType>(Expression<Func<T, T2, T3, T4, object>> expression, List<FieldType> inValues);
+        ISugarQueryable<T, T2, T3, T4> In<FieldType>(Expression<Func<T, T2, T3, T4, object>> expression, IReadOnlyList<FieldType> inValues);
         ISugarQueryable<T, T2, T3, T4> In<FieldType>(Expression<Func<T, T2, T3, T4, object>> expression, ISugarQueryable<FieldType> childQueryExpression);
 
-        new ISugarQueryable<T, T2, T3, T4> InIF<TParamter>(bool isIn, params TParamter[] pkValues);
-        new ISugarQueryable<T, T2, T3, T4> InIF<TParamter>(bool isIn, string fieldName, params TParamter[] pkValues);
+        new ISugarQueryable<T, T2, T3, T4> InIF<TParamter>(bool isIn, IReadOnlyList<TParamter> pkValues);
+        new ISugarQueryable<T, T2, T3, T4> InIF<TParamter>(bool isIn, string fieldName, IReadOnlyList<TParamter> pkValues);
         #endregion
 
         #region Other
@@ -772,8 +757,7 @@ namespace ThingsGateway.SqlSugar
         new ISugarQueryable<T, T2, T3, T4> ClearFilter<FilterType1, FilterType2>();
         new ISugarQueryable<T, T2, T3, T4> ClearFilter<FilterType1, FilterType2, FilterType3>();
         new ISugarQueryable<T, T2, T3, T4> AddParameters(object parameters);
-        new ISugarQueryable<T, T2, T3, T4> AddParameters(SugarParameter[] parameters);
-        new ISugarQueryable<T, T2, T3, T4> AddParameters(List<SugarParameter> parameters);
+        new ISugarQueryable<T, T2, T3, T4> AddParameters(IEnumerable<SugarParameter> parameters);
         new ISugarQueryable<T, T2, T3, T4> AddJoinInfo(string tableName, string shortName, string joinWhere, JoinType type = JoinType.Left);
         new ISugarQueryable<T, T2, T3, T4> With(string withString);
         new ISugarQueryable<T, T2, T3, T4> WithCache(int cacheDurationInSeconds = int.MaxValue);
@@ -905,8 +889,7 @@ namespace ThingsGateway.SqlSugar
         #endregion
 
         #region In
-        new ISugarQueryable<T, T2, T3, T4, T5> In<FieldType>(Expression<Func<T, object>> expression, params FieldType[] inValues);
-        new ISugarQueryable<T, T2, T3, T4, T5> In<FieldType>(Expression<Func<T, object>> expression, List<FieldType> inValues);
+        new ISugarQueryable<T, T2, T3, T4, T5> In<FieldType>(Expression<Func<T, object>> expression, IReadOnlyList<FieldType> inValues);
         new ISugarQueryable<T, T2, T3, T4, T5> In<FieldType>(Expression<Func<T, object>> expression, ISugarQueryable<FieldType> childQueryExpression);
         #endregion
 
@@ -922,8 +905,7 @@ namespace ThingsGateway.SqlSugar
         new ISugarQueryable<T, T2, T3, T4, T5> ClearFilter<FilterType1, FilterType2>();
         new ISugarQueryable<T, T2, T3, T4, T5> ClearFilter<FilterType1, FilterType2, FilterType3>();
         new ISugarQueryable<T, T2, T3, T4, T5> AddParameters(object parameters);
-        new ISugarQueryable<T, T2, T3, T4, T5> AddParameters(SugarParameter[] parameters);
-        new ISugarQueryable<T, T2, T3, T4, T5> AddParameters(List<SugarParameter> parameters);
+        new ISugarQueryable<T, T2, T3, T4, T5> AddParameters(IEnumerable<SugarParameter> parameters);
         new ISugarQueryable<T, T2, T3, T4, T5> AddJoinInfo(string tableName, string shortName, string joinWhere, JoinType type = JoinType.Left);
         new ISugarQueryable<T, T2, T3, T4, T5> With(string withString);
         new ISugarQueryable<T, T2, T3, T4, T5> WithCache(int cacheDurationInSeconds = int.MaxValue);
@@ -1064,8 +1046,7 @@ namespace ThingsGateway.SqlSugar
         #endregion
 
         #region In
-        new ISugarQueryable<T, T2, T3, T4, T5, T6> In<FieldType>(Expression<Func<T, object>> expression, params FieldType[] inValues);
-        new ISugarQueryable<T, T2, T3, T4, T5, T6> In<FieldType>(Expression<Func<T, object>> expression, List<FieldType> inValues);
+        new ISugarQueryable<T, T2, T3, T4, T5, T6> In<FieldType>(Expression<Func<T, object>> expression, IReadOnlyList<FieldType> inValues);
         new ISugarQueryable<T, T2, T3, T4, T5, T6> In<FieldType>(Expression<Func<T, object>> expression, ISugarQueryable<FieldType> childQueryExpression);
         #endregion
 
@@ -1081,8 +1062,7 @@ namespace ThingsGateway.SqlSugar
         new ISugarQueryable<T, T2, T3, T4, T5, T6> ClearFilter<FilterType1, FilterType2>();
         new ISugarQueryable<T, T2, T3, T4, T5, T6> ClearFilter<FilterType1, FilterType2, FilterType3>();
         new ISugarQueryable<T, T2, T3, T4, T5, T6> AddParameters(object parameters);
-        new ISugarQueryable<T, T2, T3, T4, T5, T6> AddParameters(SugarParameter[] parameters);
-        new ISugarQueryable<T, T2, T3, T4, T5, T6> AddParameters(List<SugarParameter> parameters);
+        new ISugarQueryable<T, T2, T3, T4, T5, T6> AddParameters(IEnumerable<SugarParameter> parameters);
         new ISugarQueryable<T, T2, T3, T4, T5, T6> AddJoinInfo(string tableName, string shortName, string joinWhere, JoinType type = JoinType.Left);
         new ISugarQueryable<T, T2, T3, T4, T5, T6> With(string withString);
         new ISugarQueryable<T, T2, T3, T4, T5, T6> WithCache(int cacheDurationInSeconds = int.MaxValue);
@@ -1217,8 +1197,7 @@ namespace ThingsGateway.SqlSugar
         #endregion
 
         #region In
-        new ISugarQueryable<T, T2, T3, T4, T5, T6, T7> In<FieldType>(Expression<Func<T, object>> expression, params FieldType[] inValues);
-        new ISugarQueryable<T, T2, T3, T4, T5, T6, T7> In<FieldType>(Expression<Func<T, object>> expression, List<FieldType> inValues);
+        new ISugarQueryable<T, T2, T3, T4, T5, T6, T7> In<FieldType>(Expression<Func<T, object>> expression, IReadOnlyList<FieldType> inValues);
         new ISugarQueryable<T, T2, T3, T4, T5, T6, T7> In<FieldType>(Expression<Func<T, object>> expression, ISugarQueryable<FieldType> childQueryExpression);
         #endregion
 
@@ -1234,8 +1213,7 @@ namespace ThingsGateway.SqlSugar
         new ISugarQueryable<T, T2, T3, T4, T5, T6, T7> ClearFilter<FilterType1, FilterType2>();
         new ISugarQueryable<T, T2, T3, T4, T5, T6, T7> ClearFilter<FilterType1, FilterType2, FilterType3>();
         new ISugarQueryable<T, T2, T3, T4, T5, T6, T7> AddParameters(object parameters);
-        new ISugarQueryable<T, T2, T3, T4, T5, T6, T7> AddParameters(SugarParameter[] parameters);
-        new ISugarQueryable<T, T2, T3, T4, T5, T6, T7> AddParameters(List<SugarParameter> parameters);
+        new ISugarQueryable<T, T2, T3, T4, T5, T6, T7> AddParameters(IEnumerable<SugarParameter> parameters);
         new ISugarQueryable<T, T2, T3, T4, T5, T6, T7> AddJoinInfo(string tableName, string shortName, string joinWhere, JoinType type = JoinType.Left);
         new ISugarQueryable<T, T2, T3, T4, T5, T6, T7> With(string withString);
         new ISugarQueryable<T, T2, T3, T4, T5, T6, T7> WithCache(int cacheDurationInSeconds = int.MaxValue);
@@ -1369,8 +1347,7 @@ namespace ThingsGateway.SqlSugar
         #endregion
 
         #region In
-        new ISugarQueryable<T, T2, T3, T4, T5, T6, T7, T8> In<FieldType>(Expression<Func<T, object>> expression, params FieldType[] inValues);
-        new ISugarQueryable<T, T2, T3, T4, T5, T6, T7, T8> In<FieldType>(Expression<Func<T, object>> expression, List<FieldType> inValues);
+        new ISugarQueryable<T, T2, T3, T4, T5, T6, T7, T8> In<FieldType>(Expression<Func<T, object>> expression, IReadOnlyList<FieldType> inValues);
         new ISugarQueryable<T, T2, T3, T4, T5, T6, T7, T8> In<FieldType>(Expression<Func<T, object>> expression, ISugarQueryable<FieldType> childQueryExpression);
         #endregion
 
@@ -1386,8 +1363,8 @@ namespace ThingsGateway.SqlSugar
         new ISugarQueryable<T, T2, T3, T4, T5, T6, T7, T8> ClearFilter<FilterType1, FilterType2>();
         new ISugarQueryable<T, T2, T3, T4, T5, T6, T7, T8> ClearFilter<FilterType1, FilterType2, FilterType3>();
         new ISugarQueryable<T, T2, T3, T4, T5, T6, T7, T8> AddParameters(object parameters);
-        new ISugarQueryable<T, T2, T3, T4, T5, T6, T7, T8> AddParameters(SugarParameter[] parameters);
-        new ISugarQueryable<T, T2, T3, T4, T5, T6, T7, T8> AddParameters(List<SugarParameter> parameters);
+        new ISugarQueryable<T, T2, T3, T4, T5, T6, T7, T8> AddParameters(IEnumerable<SugarParameter> parameters);
+
         new ISugarQueryable<T, T2, T3, T4, T5, T6, T7, T8> AddJoinInfo(string tableName, string shortName, string joinWhere, JoinType type = JoinType.Left);
         new ISugarQueryable<T, T2, T3, T4, T5, T6, T7, T8> With(string withString);
         new ISugarQueryable<T, T2, T3, T4, T5, T6, T7, T8> WithCache(int cacheDurationInSeconds = int.MaxValue);
@@ -1514,8 +1491,7 @@ namespace ThingsGateway.SqlSugar
         #endregion
 
         #region In
-        new ISugarQueryable<T, T2, T3, T4, T5, T6, T7, T8, T9> In<FieldType>(Expression<Func<T, object>> expression, params FieldType[] inValues);
-        new ISugarQueryable<T, T2, T3, T4, T5, T6, T7, T8, T9> In<FieldType>(Expression<Func<T, object>> expression, List<FieldType> inValues);
+        new ISugarQueryable<T, T2, T3, T4, T5, T6, T7, T8, T9> In<FieldType>(Expression<Func<T, object>> expression, IReadOnlyList<FieldType> inValues);
         new ISugarQueryable<T, T2, T3, T4, T5, T6, T7, T8, T9> In<FieldType>(Expression<Func<T, object>> expression, ISugarQueryable<FieldType> childQueryExpression);
         #endregion
 
@@ -1532,8 +1508,7 @@ namespace ThingsGateway.SqlSugar
         new ISugarQueryable<T, T2, T3, T4, T5, T6, T7, T8, T9> ClearFilter<FilterType1, FilterType2>();
         new ISugarQueryable<T, T2, T3, T4, T5, T6, T7, T8, T9> ClearFilter<FilterType1, FilterType2, FilterType3>();
         new ISugarQueryable<T, T2, T3, T4, T5, T6, T7, T8, T9> AddParameters(object parameters);
-        new ISugarQueryable<T, T2, T3, T4, T5, T6, T7, T8, T9> AddParameters(SugarParameter[] parameters);
-        new ISugarQueryable<T, T2, T3, T4, T5, T6, T7, T8, T9> AddParameters(List<SugarParameter> parameters);
+        new ISugarQueryable<T, T2, T3, T4, T5, T6, T7, T8, T9> AddParameters(IEnumerable<SugarParameter> parameters);
         new ISugarQueryable<T, T2, T3, T4, T5, T6, T7, T8, T9> AddJoinInfo(string tableName, string shortName, string joinWhere, JoinType type = JoinType.Left);
         new ISugarQueryable<T, T2, T3, T4, T5, T6, T7, T8, T9> With(string withString);
         new ISugarQueryable<T, T2, T3, T4, T5, T6, T7, T8, T9> WithCache(int cacheDurationInSeconds = int.MaxValue);
@@ -1663,8 +1638,7 @@ namespace ThingsGateway.SqlSugar
         #endregion
 
         #region In
-        new ISugarQueryable<T, T2, T3, T4, T5, T6, T7, T8, T9, T10> In<FieldType>(Expression<Func<T, object>> expression, params FieldType[] inValues);
-        new ISugarQueryable<T, T2, T3, T4, T5, T6, T7, T8, T9, T10> In<FieldType>(Expression<Func<T, object>> expression, List<FieldType> inValues);
+        new ISugarQueryable<T, T2, T3, T4, T5, T6, T7, T8, T9, T10> In<FieldType>(Expression<Func<T, object>> expression, IReadOnlyList<FieldType> inValues);
         new ISugarQueryable<T, T2, T3, T4, T5, T6, T7, T8, T9, T10> In<FieldType>(Expression<Func<T, object>> expression, ISugarQueryable<FieldType> childQueryExpression);
         #endregion
 
@@ -1681,8 +1655,7 @@ namespace ThingsGateway.SqlSugar
         new ISugarQueryable<T, T2, T3, T4, T5, T6, T7, T8, T9, T10> ClearFilter<FilterType1, FilterType2>();
         new ISugarQueryable<T, T2, T3, T4, T5, T6, T7, T8, T9, T10> ClearFilter<FilterType1, FilterType2, FilterType3>();
         new ISugarQueryable<T, T2, T3, T4, T5, T6, T7, T8, T9, T10> AddParameters(object parameters);
-        new ISugarQueryable<T, T2, T3, T4, T5, T6, T7, T8, T9, T10> AddParameters(SugarParameter[] parameters);
-        new ISugarQueryable<T, T2, T3, T4, T5, T6, T7, T8, T9, T10> AddParameters(List<SugarParameter> parameters);
+        new ISugarQueryable<T, T2, T3, T4, T5, T6, T7, T8, T9, T10> AddParameters(IEnumerable<SugarParameter> parameters);
         new ISugarQueryable<T, T2, T3, T4, T5, T6, T7, T8, T9, T10> AddJoinInfo(string tableName, string shortName, string joinWhere, JoinType type = JoinType.Left);
         new ISugarQueryable<T, T2, T3, T4, T5, T6, T7, T8, T9, T10> With(string withString);
         new ISugarQueryable<T, T2, T3, T4, T5, T6, T7, T8, T9, T10> WithCache(int cacheDurationInSeconds = int.MaxValue);
@@ -1807,8 +1780,7 @@ namespace ThingsGateway.SqlSugar
         #endregion
 
         #region In
-        new ISugarQueryable<T, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11> In<FieldType>(Expression<Func<T, object>> expression, params FieldType[] inValues);
-        new ISugarQueryable<T, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11> In<FieldType>(Expression<Func<T, object>> expression, List<FieldType> inValues);
+        new ISugarQueryable<T, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11> In<FieldType>(Expression<Func<T, object>> expression, IReadOnlyList<FieldType> inValues);
         new ISugarQueryable<T, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11> In<FieldType>(Expression<Func<T, object>> expression, ISugarQueryable<FieldType> childQueryExpression);
         #endregion
 
@@ -1825,8 +1797,7 @@ namespace ThingsGateway.SqlSugar
         new ISugarQueryable<T, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11> ClearFilter<FilterType1, FilterType2>();
         new ISugarQueryable<T, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11> ClearFilter<FilterType1, FilterType2, FilterType3>();
         new ISugarQueryable<T, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11> AddParameters(object parameters);
-        new ISugarQueryable<T, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11> AddParameters(SugarParameter[] parameters);
-        new ISugarQueryable<T, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11> AddParameters(List<SugarParameter> parameters);
+        new ISugarQueryable<T, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11> AddParameters(IEnumerable<SugarParameter> parameters);
         new ISugarQueryable<T, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11> AddJoinInfo(string tableName, string shortName, string joinWhere, JoinType type = JoinType.Left);
         new ISugarQueryable<T, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11> With(string withString);
         new ISugarQueryable<T, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11> WithCache(int cacheDurationInSeconds = int.MaxValue);
@@ -1941,8 +1912,7 @@ namespace ThingsGateway.SqlSugar
         #endregion
 
         #region In
-        new ISugarQueryable<T, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> In<FieldType>(Expression<Func<T, object>> expression, params FieldType[] inValues);
-        new ISugarQueryable<T, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> In<FieldType>(Expression<Func<T, object>> expression, List<FieldType> inValues);
+        new ISugarQueryable<T, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> In<FieldType>(Expression<Func<T, object>> expression, IReadOnlyList<FieldType> inValues);
         new ISugarQueryable<T, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> In<FieldType>(Expression<Func<T, object>> expression, ISugarQueryable<FieldType> childQueryExpression);
         #endregion
 
@@ -1959,8 +1929,7 @@ namespace ThingsGateway.SqlSugar
         new ISugarQueryable<T, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> ClearFilter<FilterType1, FilterType2>();
         new ISugarQueryable<T, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> ClearFilter<FilterType1, FilterType2, FilterType3>();
         new ISugarQueryable<T, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> AddParameters(object parameters);
-        new ISugarQueryable<T, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> AddParameters(SugarParameter[] parameters);
-        new ISugarQueryable<T, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> AddParameters(List<SugarParameter> parameters);
+        new ISugarQueryable<T, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> AddParameters(IEnumerable<SugarParameter> parameters);
         new ISugarQueryable<T, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> AddJoinInfo(string tableName, string shortName, string joinWhere, JoinType type = JoinType.Left);
         new ISugarQueryable<T, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> With(string withString);
         new ISugarQueryable<T, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> WithCache(int cacheDurationInSeconds = int.MaxValue);

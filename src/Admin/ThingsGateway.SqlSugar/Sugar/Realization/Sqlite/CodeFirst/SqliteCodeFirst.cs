@@ -33,8 +33,11 @@
                 var renameColumns = entityColumns
                     .Where(it => !string.IsNullOrEmpty(it.OldDbColumnName))
                     .Where(entityColumn => dbColumns.Any(dbColumn => entityColumn.OldDbColumnName.Equals(dbColumn.DbColumnName, StringComparison.CurrentCultureIgnoreCase)))
-                    .ToList();
-
+                    ;
+                if (renameColumns.HasValue())
+                {
+                    throw new NotSupportedException("rename Column");
+                }
 
                 var isChange = false;
                 foreach (var item in addColumns)
@@ -56,10 +59,7 @@
                 //    //this.Context.DbMaintenance.AddColumn(tableName, EntityColumnToDbColumn(entityInfo, tableName, item));
                 //    //isChange = true;
                 //}
-                foreach (var item in renameColumns)
-                {
-                    throw new NotSupportedException("rename Column");
-                }
+
 
                 foreach (var item in entityColumns)
                 {
@@ -95,11 +95,11 @@
         {
             var tableName2 = GetTableName(entityInfo);
             var dbColumns2 = this.Context.DbMaintenance.GetColumnInfosByTableName(tableName2, false);
-            var entityColumns2 = entityInfo.Columns.Where(it => it.IsIgnore == false).ToList();
+            var entityColumns2 = entityInfo.Columns.Where(it => it.IsIgnore == false);
             ConvertColumns(dbColumns2);
             var addColumns2 = entityColumns2
                                 .Where(ec => ec.OldDbColumnName.IsNullOrEmpty() || !dbColumns2.Any(dc => dc.DbColumnName.Equals(ec.OldDbColumnName, StringComparison.CurrentCultureIgnoreCase)))
-                                .Where(ec => !dbColumns2.Any(dc => ec.DbColumnName.Equals(dc.DbColumnName, StringComparison.CurrentCultureIgnoreCase))).ToList();
+                                .Where(ec => !dbColumns2.Any(dc => ec.DbColumnName.Equals(dc.DbColumnName, StringComparison.CurrentCultureIgnoreCase)));
             foreach (var item in addColumns2)
             {
                 if (item.IsPrimarykey || item.IsIdentity)

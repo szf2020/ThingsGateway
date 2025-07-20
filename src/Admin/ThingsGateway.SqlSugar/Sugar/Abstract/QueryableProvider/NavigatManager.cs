@@ -57,7 +57,7 @@ namespace ThingsGateway.SqlSugar
                 List<object> list = new List<object>();
                 if (isList)
                 {
-                    list = currentList.SelectMany(it => (it.GetType().GetProperty(navObjectName).GetValue(it) as IList)?.Cast<object>() ?? new List<object> { }).ToList();
+                    list = currentList.SelectMany(it => (it.GetType().GetProperty(navObjectName).GetValue(it) as IList)?.Cast<object>() ?? new List<object>()).ToList();
 
                 }
                 else
@@ -252,14 +252,14 @@ namespace ThingsGateway.SqlSugar
             {
                 ConditionalType = ConditionalType.In,
                 FieldName = bPkColumn.DbColumnName,
-                FieldValue = String.Join(",", abids.Select(it => it.Bid).ToArray()),
+                FieldValue = String.Join(",", abids.Select(it => it.Bid)),
                 CSharpTypeName = bColumn.PropertyInfo.PropertyType.Name
             }));
             var sql = GetWhereSql(GetCrossDatabase(abDb, bEntity));
             if (sql.SelectString == null)
             {
                 var columns = bEntityInfo.Columns.Where(it => !it.IsIgnore)
-                     .Select(it => GetOneToManySelectByColumnInfo(it, abDb)).ToList();
+                     .Select(it => GetOneToManySelectByColumnInfo(it, abDb));
                 sql.SelectString = String.Join(",", columns);
             }
             else
@@ -421,7 +421,7 @@ namespace ThingsGateway.SqlSugar
                 if (sqlObj.SelectString == null)
                 {
                     var columns = navEntityInfo.Columns.Where(it => !it.IsIgnore)
-                        .Select(it => GetOneToOneSelectByColumnInfo(it, db)).ToList();
+                        .Select(it => GetOneToOneSelectByColumnInfo(it, db));
                     sqlObj.SelectString = String.Join(",", columns);
                 }
                 var navList = selector(db.Queryable<object>().ClearFilter(QueryBuilder.RemoveFilters).Filter((navPkColumn.IsPrimarykey && navPkCount == 1) ? null : this.QueryBuilder?.IsDisabledGobalFilter == true ? null : navEntityInfo.Type).AS(GetDbTableName(navEntityInfo, sqlObj))
@@ -445,7 +445,7 @@ namespace ThingsGateway.SqlSugar
                                               {
                                                   l,
                                                   n
-                                              }).ToList();
+                                              });
                             foreach (var item in groupQuery)
                             {
 
@@ -476,7 +476,7 @@ namespace ThingsGateway.SqlSugar
                                               {
                                                   l,
                                                   n
-                                              }).ToList();
+                                              });
 
                             foreach (var item in groupQuery)
                             {
@@ -506,7 +506,7 @@ namespace ThingsGateway.SqlSugar
                                       {
                                           l,
                                           n
-                                      }).ToList();
+                                      });
                     foreach (var item in groupQuery)
                     {
 
@@ -569,7 +569,7 @@ namespace ThingsGateway.SqlSugar
                 if (sqlObj.SelectString == null)
                 {
                     var columns = navEntityInfo.Columns.Where(it => !it.IsIgnore)
-                        .Select(it => GetOneToManySelectByColumnInfo(it, childDb)).ToList();
+                        .Select(it => GetOneToManySelectByColumnInfo(it, childDb));
                     sqlObj.SelectString = String.Join(",", columns);
                 }
                 var navList = selector(childDb.Queryable<object>(sqlObj.TableShortName).AS(GetDbTableName(navEntityInfo, sqlObj)).ClearFilter(QueryBuilder.RemoveFilters).Filter(this.QueryBuilder?.IsDisabledGobalFilter == true ? null : navEntityInfo.Type).AddParameters(sqlObj.Parameters).Where(conditionalModels).WhereIF(sqlObj.WhereString.HasValue(), sqlObj.WhereString).WhereIF(navObjectNameColumnInfo?.Navigat?.WhereSql != null, navObjectNameColumnInfo?.Navigat?.WhereSql).Select(sqlObj.SelectString).OrderByIF(sqlObj.OrderByString.HasValue(), sqlObj.OrderByString));
@@ -585,7 +585,7 @@ namespace ThingsGateway.SqlSugar
                                       {
                                           l,
                                           n
-                                      }).GroupBy(it => it.l).ToList();
+                                      }).GroupBy(it => it.l);
                     foreach (var item in groupQuery)
                     {
                         var itemSelectList = item.Select(it => it.n);
@@ -599,20 +599,21 @@ namespace ThingsGateway.SqlSugar
                             itemSelectList = itemSelectList
                                 .Take(sqlObj.Take.Value);
                         }
+                        var list1 = itemSelectList.ToList();
                         if (sqlObj.MappingExpressions.HasValue())
                         {
                             MappingFieldsHelper<T> helper = new MappingFieldsHelper<T>();
                             helper.NavEntity = navEntityInfo;
                             helper.Context = this.Context;
                             helper.RootEntity = this.Context.EntityMaintenance.GetEntityInfo<T>();
-                            helper.SetChildList(navObjectNameColumnInfo, item.Key, itemSelectList.ToList(), sqlObj.MappingExpressions);
+                            helper.SetChildList(navObjectNameColumnInfo, item.Key, list1, sqlObj.MappingExpressions);
                         }
                         else
                         {
 
                             var instance = Activator.CreateInstance(navObjectNameProperty.PropertyType, true);
                             var ilist = instance as IList;
-                            foreach (var value in itemSelectList.ToList())
+                            foreach (var value in list1)
                             {
                                 ilist.Add(value);
                             }

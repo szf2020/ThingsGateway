@@ -154,7 +154,6 @@ public static class UnifyContext
         if (unifyResultSettings.Return200StatusCodes == null) context.Response.StatusCode = 200;
         // 否则只有里面的才设置为 200
         else if (unifyResultSettings.Return200StatusCodes.Contains(statusCode)) context.Response.StatusCode = 200;
-        else { }
     }
 
     /// <summary>

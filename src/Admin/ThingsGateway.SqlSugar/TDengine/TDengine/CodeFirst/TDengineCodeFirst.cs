@@ -128,15 +128,15 @@ namespace ThingsGateway.SqlSugar
                 var dropColumns = dbColumns
                                           .Where(dc => !entityColumns.Any(ec => dc.DbColumnName.Equals(ec.OldDbColumnName, StringComparison.CurrentCultureIgnoreCase)))
                                           .Where(dc => !entityColumns.Any(ec => dc.DbColumnName.Equals(ec.DbColumnName, StringComparison.CurrentCultureIgnoreCase)))
-                                          .ToList();
+                                          ;
                 var addColumns = entityColumns
                                           .Where(ec => ec.OldDbColumnName.IsNullOrEmpty() || !dbColumns.Any(dc => dc.DbColumnName.Equals(ec.OldDbColumnName, StringComparison.CurrentCultureIgnoreCase)))
-                                          .Where(ec => !dbColumns.Any(dc => ec.DbColumnName.Equals(dc.DbColumnName, StringComparison.CurrentCultureIgnoreCase))).ToList();
+                                          .Where(ec => !dbColumns.Any(dc => ec.DbColumnName.Equals(dc.DbColumnName, StringComparison.CurrentCultureIgnoreCase)));
 
                 var renameColumns = entityColumns
                     .Where(it => !string.IsNullOrEmpty(it.OldDbColumnName))
                     .Where(entityColumn => dbColumns.Any(dbColumn => entityColumn.OldDbColumnName.Equals(dbColumn.DbColumnName, StringComparison.CurrentCultureIgnoreCase)))
-                    .ToList();
+                    ;
 
 
                 var isMultiplePrimaryKey = dbColumns.Where(it => it.IsPrimarykey).Count() > 1 || entityColumns.Where(it => it.IsPrimarykey).Count() > 1;
@@ -156,66 +156,13 @@ namespace ThingsGateway.SqlSugar
                         isChange = true;
                     }
                 }
-                //foreach (var item in alterColumns)
-                //{
 
-                //    if (this.Context.CurrentConnectionConfig.DbType == DbType.Oracle)
-                //    {
-                //        var entityColumnItem = entityColumns.FirstOrDefault(y => y.DbColumnName == item.DbColumnName);
-                //        if (entityColumnItem != null && !string.IsNullOrEmpty(entityColumnItem.DataType))
-                //        {
-                //            continue;
-                //        }
-                //    }
-
-                //    this.Context.DbMaintenance.UpdateColumn(tableName, EntityColumnToDbColumn(entityInfo, tableName, item));
-                //    isChange = true;
-                //}
                 foreach (var item in renameColumns)
                 {
                     this.Context.DbMaintenance.RenameColumn(tableName, item.OldDbColumnName, item.DbColumnName);
                     isChange = true;
                 }
-                //var isAddPrimaryKey = false;
-                //foreach (var item in entityColumns)
-                //{
-                //    var dbColumn = dbColumns.FirstOrDefault(dc => dc.DbColumnName.Equals(item.DbColumnName, StringComparison.CurrentCultureIgnoreCase));
-                //    if (dbColumn == null) continue;
-                //    bool pkDiff, idEntityDiff;
-                //    KeyAction(item, dbColumn, out pkDiff, out idEntityDiff);
-                //    if (dbColumn != null && pkDiff && !idEntityDiff && isMultiplePrimaryKey == false)
-                //    {
-                //        var isAdd = item.IsPrimarykey;
-                //        if (isAdd)
-                //        {
-                //            isAddPrimaryKey = true;
-                //            this.Context.DbMaintenance.AddPrimaryKey(tableName, item.DbColumnName);
-                //        }
-                //        else
-                //        {
-                //            this.Context.DbMaintenance.DropConstraint(tableName, string.Format("PK_{0}_{1}", tableName, item.DbColumnName));
-                //        }
-                //    }
-                //    else if ((pkDiff || idEntityDiff) && isMultiplePrimaryKey == false)
-                //    {
-                //        ChangeKey(entityInfo, tableName, item);
-                //    }
-                //}
-                //if (isAddPrimaryKey == false && entityColumns.Count(it => it.IsPrimarykey) == 1 && dbColumns.Count(it => it.IsPrimarykey) == 0)
-                //{
-                //    //var addPk = entityColumns.First(it => it.IsPrimarykey);
-                //    //this.Context.DbMaintenance.AddPrimaryKey(tableName, addPk.DbColumnName);
-                //}
-                //if (isMultiplePrimaryKey)
-                //{
-                //    var oldPkNames = dbColumns.Where(it => it.IsPrimarykey).Select(it => it.DbColumnName.ToLower()).OrderBy(it => it).ToList();
-                //    var newPkNames = entityColumns.Where(it => it.IsPrimarykey).Select(it => it.DbColumnName.ToLower()).OrderBy(it => it).ToList();
-                //    if (!Enumerable.SequenceEqual(oldPkNames, newPkNames))
-                //    {
-                //        Check.Exception(true, ErrorMessage.GetThrowMessage("Modification of multiple primary key tables is not supported. Delete tables while creating", "不支持修改多主键表，请删除表在创建"));
-                //    }
 
-                //}
                 if (isChange && IsBackupTable)
                 {
                     this.Context.DbMaintenance.BackupTable(tableName, tableName + DateTime.Now.ToString("yyyyMMddHHmmss"), MaxBackupDataRows);

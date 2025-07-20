@@ -29,7 +29,7 @@ namespace ThingsGateway.SqlSugar
         #endregion
 
         #region Splicing basic  
-        public List<SugarParameter> GroupParameters { get; set; }
+        public IReadOnlyList<SugarParameter> GroupParameters { get; set; }
         public string GroupBySql { get; set; }
         public string GroupBySqlOld { get; set; }
         public Type AsType { get; set; }
@@ -381,10 +381,10 @@ namespace ThingsGateway.SqlSugar
         {
             if (!IsDisabledGobalFilter && this.Context.QueryFilter.GetFilterList.HasValue())
             {
-                var gobalFilterList = this.Context.QueryFilter.GetFilterList.Where(it => it.FilterName.IsNullOrEmpty()).ToList();
+                var gobalFilterList = this.Context.QueryFilter.GetFilterList.Where(it => it.FilterName.IsNullOrEmpty());
                 if (this.RemoveFilters?.Length > 0)
                 {
-                    gobalFilterList = gobalFilterList.Where(it => !this.RemoveFilters.Contains(it.type)).ToList();
+                    gobalFilterList = gobalFilterList.Where(it => !this.RemoveFilters.Contains(it.type));
                 }
                 foreach (var item in gobalFilterList)
                 {
@@ -440,7 +440,7 @@ namespace ThingsGateway.SqlSugar
             }
             else if (isEasyJoin && ChildType.IsInterface && this.JoinExpression != null && (this.JoinExpression as LambdaExpression)?.Parameters?.Any(it => it.Type.GetInterfaces().Any(z => z == ChildType)) == true)
             {
-                var parameters = (this.JoinExpression as LambdaExpression).Parameters.Where(it => it.Type.GetInterfaces().Any(z => z == ChildType)).ToList();
+                var parameters = (this.JoinExpression as LambdaExpression).Parameters.Where(it => it.Type.GetInterfaces().Any(z => z == ChildType));
                 foreach (var parameter in parameters)
                 {
                     var shortName = this.Builder.GetTranslationColumnName(parameter.Name) + ".";
@@ -798,7 +798,7 @@ namespace ThingsGateway.SqlSugar
                     var matches = Regex
                         .Matches(paramter.Value.ObjToString(), regex, RegexOptions.IgnoreCase).Cast<Match>()
                         .Where(it => allShortName.Any(z => it.Value.ObjToString().Contains(z, StringComparison.CurrentCultureIgnoreCase)))
-                        .Select(it => it.Value).ToList();
+                        .Select(it => it.Value);
                     names.AddRange(matches);
                 }
                 int i = 0;
@@ -920,7 +920,7 @@ namespace ThingsGateway.SqlSugar
                 }
                 if (this.GroupParameters?.Count > 0 && this.GroupBySql.HasValue())
                 {
-                    var selectSql = UtilMethods.GetSqlString(DbType.SqlServer, result, UtilMethods.CopySugarParameters(this.Parameters).ToArray());
+                    var selectSql = UtilMethods.GetSqlString(DbType.SqlServer, result, UtilMethods.CopySugarParameters(this.Parameters));
                     if (selectSql.Contains(this.GroupBySql))
                     {
                         result = selectSql;

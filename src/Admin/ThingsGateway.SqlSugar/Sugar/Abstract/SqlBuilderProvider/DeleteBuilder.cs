@@ -135,8 +135,8 @@ namespace ThingsGateway.SqlSugar
                 int pageCount = (totalRecord + pageSize - 1) / pageSize;
                 while (pageCount >= pageIndex)
                 {
-                    var inValues = this.BigDataInValues.Skip((pageIndex - 1) * pageSize).Take(pageSize).ToList();
-                    batchDeleteSql.Append(sql + string.Format(WhereInTemplate, BigDataField, inValues.ToArray().ToJoinSqlInVals()));
+                    var inValues = this.BigDataInValues.Skip((pageIndex - 1) * pageSize).Take(pageSize);
+                    batchDeleteSql.Append(sql + string.Format(WhereInTemplate, BigDataField, inValues.ToJoinSqlInVals()));
                     batchDeleteSql.Append(';');
                     pageIndex++;
                 }

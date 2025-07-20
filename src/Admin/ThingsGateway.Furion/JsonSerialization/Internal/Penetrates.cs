@@ -35,7 +35,7 @@ internal static class Penetrates
         {
             return longValue.ConvertToDateTime();
         }
-        ;
+
 
         var stringValue = reader.GetString();
 

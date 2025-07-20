@@ -64,30 +64,30 @@ namespace ThingsGateway.SqlSugar
     public class SqlMiddle
     {
         public bool? IsSqlMiddle { get; set; }
-        public Func<string, SugarParameter[], object> GetScalar { get; set; } = (s, p) => throw new Exception("SqlMiddle.GetScalar is null");
-        public Func<string, SugarParameter[], int> ExecuteCommand { get; set; } = (s, p) => throw new Exception("SqlMiddle.ExecuteCommand is null");
-        public Func<string, SugarParameter[], IDataReader> GetDataReader { get; set; } = (s, p) => throw new Exception("SqlMiddle.GetDataReader is null");
-        public Func<string, SugarParameter[], DataSet> GetDataSetAll { get; set; } = (s, p) => throw new Exception("SqlMiddle.GetDataSetAll is null");
-        public Func<string, SugarParameter[], Task<object>> GetScalarAsync { get; set; } = (s, p) => throw new Exception("SqlMiddle.GetScalarAsync is null");
-        public Func<string, SugarParameter[], Task<int>> ExecuteCommandAsync { get; set; } = (s, p) => throw new Exception("SqlMiddle.ExecuteCommandAsync is null");
-        public Func<string, SugarParameter[], Task<IDataReader>> GetDataReaderAsync { get; set; } = (s, p) => throw new Exception("SqlMiddle.GetDataReaderAsync is null");
-        public Func<string, SugarParameter[], Task<DataSet>> GetDataSetAllAsync { get; set; } = (s, p) => throw new Exception("SqlMiddle.GetDataSetAllAsync is null");
+        public Func<string, IReadOnlyList<SugarParameter>, object> GetScalar { get; set; } = (s, p) => throw new Exception("SqlMiddle.GetScalar is null");
+        public Func<string, IReadOnlyList<SugarParameter>, int> ExecuteCommand { get; set; } = (s, p) => throw new Exception("SqlMiddle.ExecuteCommand is null");
+        public Func<string, IReadOnlyList<SugarParameter>, IDataReader> GetDataReader { get; set; } = (s, p) => throw new Exception("SqlMiddle.GetDataReader is null");
+        public Func<string, IReadOnlyList<SugarParameter>, DataSet> GetDataSetAll { get; set; } = (s, p) => throw new Exception("SqlMiddle.GetDataSetAll is null");
+        public Func<string, IReadOnlyList<SugarParameter>, Task<object>> GetScalarAsync { get; set; } = (s, p) => throw new Exception("SqlMiddle.GetScalarAsync is null");
+        public Func<string, IReadOnlyList<SugarParameter>, Task<int>> ExecuteCommandAsync { get; set; } = (s, p) => throw new Exception("SqlMiddle.ExecuteCommandAsync is null");
+        public Func<string, IReadOnlyList<SugarParameter>, Task<IDataReader>> GetDataReaderAsync { get; set; } = (s, p) => throw new Exception("SqlMiddle.GetDataReaderAsync is null");
+        public Func<string, IReadOnlyList<SugarParameter>, Task<DataSet>> GetDataSetAllAsync { get; set; } = (s, p) => throw new Exception("SqlMiddle.GetDataSetAllAsync is null");
 
     }
     public class AopEvents
     {
         public Action<DiffLogModel> OnDiffLogEvent { get; set; }
         public Action<SqlSugarException> OnError { get; set; }
-        public Action<string, SugarParameter[]> OnLogExecuting { get; set; }
-        public Action<string, SugarParameter[]> OnLogExecuted { get; set; }
-        public Func<string, SugarParameter[], KeyValuePair<string, SugarParameter[]>> OnExecutingChangeSql { get; set; }
+        public Action<string, IReadOnlyList<SugarParameter>> OnLogExecuting { get; set; }
+        public Action<string, IReadOnlyList<SugarParameter>> OnLogExecuted { get; set; }
+        public Func<string, IReadOnlyList<SugarParameter>, KeyValuePair<string, IReadOnlyList<SugarParameter>>> OnExecutingChangeSql { get; set; }
         public Action<object, DataFilterModel> DataExecuting { get; set; }
         public Action<object, DataFilterModel> DataChangesExecuted { get; set; }
         public Action<object, DataAfterModel> DataExecuted { get; set; }
         public Action<IDbConnection> CheckConnectionExecuting { get; set; }
         public Action<IDbConnection, TimeSpan> CheckConnectionExecuted { get; set; }
-        public Action<string, SugarParameter[]> OnGetDataReadering { get; set; }
-        public Action<string, SugarParameter[], TimeSpan> OnGetDataReadered { get; set; }
+        public Action<string, IReadOnlyList<SugarParameter>> OnGetDataReadering { get; set; }
+        public Action<string, IReadOnlyList<SugarParameter>, TimeSpan> OnGetDataReadered { get; set; }
     }
     public class ConfigureExternalServices
     {

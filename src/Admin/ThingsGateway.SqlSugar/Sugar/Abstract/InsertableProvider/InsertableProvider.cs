@@ -76,7 +76,7 @@ namespace ThingsGateway.SqlSugar
         /// <summary>
         /// 差异日志模型
         /// </summary>
-        public DiffLogModel diffModel { get; set; }
+        public DiffLogModel DiffModel { get; set; }
         /// <summary>
         /// 移除缓存函数
         /// </summary>
@@ -106,7 +106,7 @@ namespace ThingsGateway.SqlSugar
                 return 0;
             }
             string sql = _ExecuteCommand();
-            var result = Ado.ExecuteCommand(sql, InsertBuilder.Parameters == null ? null : InsertBuilder.Parameters.ToArray());
+            var result = Ado.ExecuteCommand(sql, InsertBuilder.Parameters == null ? null : InsertBuilder.Parameters);
             After(sql, null);
             if (result == -1) return this.InsertObjs.Count;
             return result;
@@ -127,7 +127,7 @@ namespace ThingsGateway.SqlSugar
         /// 转换为SQL
         /// </summary>
         /// <returns>键值对形式的SQL和参数</returns>
-        public virtual KeyValuePair<string, List<SugarParameter>> ToSql()
+        public virtual KeyValuePair<string, IReadOnlyList<SugarParameter>> ToSql()
         {
             InsertBuilder.IsReturnIdentity = true;
             if (this.SqlBuilder.SqlParameterKeyWord == ":" && !this.EntityInfo.Columns.Any(it => it.IsIdentity))
@@ -138,7 +138,7 @@ namespace ThingsGateway.SqlSugar
             AutoRemoveDataCache();
             string sql = InsertBuilder.ToSqlString();
             RestoreMapping();
-            return new KeyValuePair<string, List<SugarParameter>>(sql, InsertBuilder.Parameters);
+            return new KeyValuePair<string, IReadOnlyList<SugarParameter>>(sql, InsertBuilder.Parameters);
         }
         /// <summary>
         /// 异步执行并返回主键列表
@@ -202,8 +202,8 @@ namespace ThingsGateway.SqlSugar
                     isAuto = this.Context.CurrentConnectionConfig.IsAutoCloseConnection;
                     this.Context.CurrentConnectionConfig.IsAutoCloseConnection = false;
                 }
-                result = Ado.GetInt(sql.Split(';').First(), InsertBuilder.Parameters == null ? null : InsertBuilder.Parameters.ToArray());
-                result = Ado.GetInt(sql.Split(';').Last(), InsertBuilder.Parameters == null ? null : InsertBuilder.Parameters.ToArray());
+                result = Ado.GetInt(sql.Split(';').First(), InsertBuilder.Parameters == null ? null : InsertBuilder.Parameters);
+                result = Ado.GetInt(sql.Split(';').Last(), InsertBuilder.Parameters == null ? null : InsertBuilder.Parameters);
                 if (this.Context.Ado.IsAnyTran() == false && isAuto)
                 {
                     this.Ado.Close();
@@ -212,7 +212,7 @@ namespace ThingsGateway.SqlSugar
             }
             else
             {
-                result = Ado.GetInt(sql, InsertBuilder.Parameters == null ? null : InsertBuilder.Parameters.ToArray());
+                result = Ado.GetInt(sql, InsertBuilder.Parameters == null ? null : InsertBuilder.Parameters);
             }
             After(sql, result);
             return result;
@@ -238,8 +238,8 @@ namespace ThingsGateway.SqlSugar
                     isAuto = this.Context.CurrentConnectionConfig.IsAutoCloseConnection;
                     this.Context.CurrentConnectionConfig.IsAutoCloseConnection = false;
                 }
-                result = Convert.ToInt64(Ado.GetScalar(sql.Split(';').First(), InsertBuilder.Parameters == null ? null : InsertBuilder.Parameters.ToArray()));
-                result = Convert.ToInt64(Ado.GetScalar(sql.Split(';').Last(), InsertBuilder.Parameters == null ? null : InsertBuilder.Parameters.ToArray()));
+                result = Convert.ToInt64(Ado.GetScalar(sql.Split(';').First(), InsertBuilder.Parameters == null ? null : InsertBuilder.Parameters));
+                result = Convert.ToInt64(Ado.GetScalar(sql.Split(';').Last(), InsertBuilder.Parameters == null ? null : InsertBuilder.Parameters));
                 if (this.Context.Ado.IsAnyTran() == false && isAuto)
                 {
                     this.Ado.Close();
@@ -248,7 +248,7 @@ namespace ThingsGateway.SqlSugar
             }
             else
             {
-                result = (Ado.GetScalar(sql, InsertBuilder.Parameters == null ? null : InsertBuilder.Parameters.ToArray())).ObjToLong();
+                result = (Ado.GetScalar(sql, InsertBuilder.Parameters == null ? null : InsertBuilder.Parameters)).ObjToLong();
             }
             After(sql, result);
             return result;
@@ -463,7 +463,7 @@ namespace ThingsGateway.SqlSugar
                 return 0;
             }
             string sql = _ExecuteCommand();
-            var result = await Ado.ExecuteCommandAsync(sql, InsertBuilder.Parameters == null ? null : InsertBuilder.Parameters.ToArray()).ConfigureAwait(false);
+            var result = await Ado.ExecuteCommandAsync(sql, InsertBuilder.Parameters == null ? null : InsertBuilder.Parameters).ConfigureAwait(false);
             After(sql, null);
             if (result == -1) return this.InsertObjs.Count;
             return result;
@@ -498,8 +498,8 @@ namespace ThingsGateway.SqlSugar
                     isAuto = this.Context.CurrentConnectionConfig.IsAutoCloseConnection;
                     this.Context.CurrentConnectionConfig.IsAutoCloseConnection = false;
                 }
-                result = Ado.GetInt(sql.Split(';').First(), InsertBuilder.Parameters == null ? null : InsertBuilder.Parameters.ToArray());
-                result = Ado.GetInt(sql.Split(';').Last(), InsertBuilder.Parameters == null ? null : InsertBuilder.Parameters.ToArray());
+                result = Ado.GetInt(sql.Split(';').First(), InsertBuilder.Parameters == null ? null : InsertBuilder.Parameters);
+                result = Ado.GetInt(sql.Split(';').Last(), InsertBuilder.Parameters == null ? null : InsertBuilder.Parameters);
                 if (this.Context.Ado.IsAnyTran() == false && isAuto)
                 {
                     this.Ado.Close();
@@ -508,7 +508,7 @@ namespace ThingsGateway.SqlSugar
             }
             else
             {
-                result = await Ado.GetIntAsync(sql, InsertBuilder.Parameters == null ? null : InsertBuilder.Parameters.ToArray()).ConfigureAwait(false);
+                result = await Ado.GetIntAsync(sql, InsertBuilder.Parameters == null ? null : InsertBuilder.Parameters).ConfigureAwait(false);
             }
             After(sql, result);
             return result;
@@ -643,8 +643,8 @@ namespace ThingsGateway.SqlSugar
                     isAuto = this.Context.CurrentConnectionConfig.IsAutoCloseConnection;
                     this.Context.CurrentConnectionConfig.IsAutoCloseConnection = false;
                 }
-                result = Ado.GetInt(sql.Split(';').First(), InsertBuilder.Parameters == null ? null : InsertBuilder.Parameters.ToArray());
-                result = Ado.GetInt(sql.Split(';').Last(), InsertBuilder.Parameters == null ? null : InsertBuilder.Parameters.ToArray());
+                result = Ado.GetInt(sql.Split(';').First(), InsertBuilder.Parameters == null ? null : InsertBuilder.Parameters);
+                result = Ado.GetInt(sql.Split(';').Last(), InsertBuilder.Parameters == null ? null : InsertBuilder.Parameters);
                 if (this.Context.Ado.IsAnyTran() == false && isAuto)
                 {
                     this.Ado.Close();
@@ -653,7 +653,7 @@ namespace ThingsGateway.SqlSugar
             }
             else
             {
-                result = (await Ado.GetScalarAsync(sql, InsertBuilder.Parameters == null ? null : InsertBuilder.Parameters.ToArray()).ConfigureAwait(false)).ObjToLong();
+                result = (await Ado.GetScalarAsync(sql, InsertBuilder.Parameters == null ? null : InsertBuilder.Parameters).ConfigureAwait(false)).ObjToLong();
             }
             After(sql, result);
             return result;
@@ -675,7 +675,7 @@ namespace ThingsGateway.SqlSugar
             result.DataList = this.InsertObjs;
             result.TableName = this.InsertBuilder.AsName;
             result.IsEnableDiffLogEvent = this.IsEnableDiffLogEvent;
-            result.DiffModel = this.diffModel;
+            result.DiffModel = this.DiffModel;
             result.IsMySqlIgnore = this.InsertBuilder.MySqlIgnore;
             result.IsOffIdentity = this.InsertBuilder.IsOffIdentity;
             if (this.InsertBuilder.DbColumnInfoList.Count != 0)
@@ -710,7 +710,7 @@ namespace ThingsGateway.SqlSugar
         public IInsertable<T> AS(string tableName)
         {
             this.InsertBuilder.AsName = tableName;
-            return this; ;
+            return this;
         }
         /// <summary>
         /// 忽略指定列
@@ -730,7 +730,7 @@ namespace ThingsGateway.SqlSugar
         /// </summary>
         /// <param name="columns">列名数组</param>
         /// <returns>可插入对象</returns>
-        public IInsertable<T> IgnoreColumns(params string[] columns)
+        public IInsertable<T> IgnoreColumns(IReadOnlyList<string> columns)
         {
             if (columns == null)
                 columns = Array.Empty<string>();
@@ -813,7 +813,7 @@ namespace ThingsGateway.SqlSugar
         /// </summary>
         /// <param name="columns">列名数组</param>
         /// <returns>可插入对象</returns>
-        public IInsertable<T> InsertColumns(string[] columns)
+        public IInsertable<T> InsertColumns(IReadOnlyList<string> columns)
         {
             if (columns == null) return this;
             this.InsertBuilder.DbColumnInfoList = this.InsertBuilder.DbColumnInfoList.Where(it => columns.Any(ig => ig.Equals(it.PropertyName, StringComparison.CurrentCultureIgnoreCase)) || columns.Any(ig => ig.Equals(it.DbColumnName, StringComparison.CurrentCultureIgnoreCase))).ToList();
@@ -981,10 +981,10 @@ namespace ThingsGateway.SqlSugar
         public IInsertable<T> EnableDiffLogEvent(object businessData = null)
         {
             //Check.Exception(this.InsertObjs.HasValue() && this.InsertObjs.Count() > 1, "DiffLog does not support batch operations");
-            diffModel = new DiffLogModel();
+            DiffModel = new DiffLogModel();
             this.IsEnableDiffLogEvent = true;
-            diffModel.BusinessData = businessData;
-            diffModel.DiffType = DiffType.insert;
+            DiffModel.BusinessData = businessData;
+            DiffModel.DiffType = DiffType.insert;
             return this;
         }
 

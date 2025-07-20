@@ -24,8 +24,8 @@
                 csharpTypeName = "bool";
             if (csharpTypeName == "DateTimeOffset")
                 csharpTypeName = "DateTime";
-            var mappings = this.MappingTypes.Where(it => it.Value.ToString().Equals(csharpTypeName, StringComparison.CurrentCultureIgnoreCase)).ToList();
-            if (mappings?.Count > 0)
+            var mappings = this.MappingTypes.Where(it => it.Value.ToString().Equals(csharpTypeName, StringComparison.CurrentCultureIgnoreCase));
+            if (mappings?.Any() == true)
                 return mappings.First().Key;
             else
                 return "varchar";
@@ -106,10 +106,6 @@
             else if (TDengineDbBind.MappingTypesConst.FirstOrDefault(it => (it.Key).Equals(dbTypeName, StringComparison.CurrentCultureIgnoreCase)) is { } data)
             {
                 dbTypeName = data.Value.ToString();
-            }
-            else
-            {
-
             }
             return dbTypeName;
         }

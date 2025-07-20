@@ -77,7 +77,7 @@ namespace ThingsGateway.SqlSugar
         protected virtual SqlSugarProvider GetContext(bool isInit = false)
         {
             SqlSugarProvider result = null;
-            var key = GetKey(); ;
+            var key = GetKey();
             StackTrace st = new StackTrace(false);
             var methods = st.GetFrames();
             var isAsync = UtilMethods.IsAnyAsyncMethod(methods);
@@ -278,10 +278,7 @@ namespace ThingsGateway.SqlSugar
             return ScopedContext.InsertableT(insertObj);
         }
 
-        public IInsertable<T> Insertable<T>(T[] insertObjs) where T : class, new()
-        {
-            return ScopedContext.Insertable(insertObjs);
-        }
+
 
         public void Open()
         {
@@ -635,25 +632,19 @@ namespace ThingsGateway.SqlSugar
             return ScopedContext.StorageableByObject(singleEntityObjectOrListObject);
         }
 
-        public ISugarQueryable<T> Union<T>(List<ISugarQueryable<T>> queryables) where T : class
+        public ISugarQueryable<T> Union<T>(IReadOnlyList<ISugarQueryable<T>> queryables) where T : class
         {
             return ScopedContext.Union(queryables);
         }
 
-        public ISugarQueryable<T> Union<T>(params ISugarQueryable<T>[] queryables) where T : class
-        {
-            return ScopedContext.Union(queryables);
-        }
 
-        public ISugarQueryable<T> UnionAll<T>(List<ISugarQueryable<T>> queryables) where T : class
+
+        public ISugarQueryable<T> UnionAll<T>(IReadOnlyList<ISugarQueryable<T>> queryables) where T : class
         {
             return ScopedContext.UnionAll(queryables);
         }
 
-        public ISugarQueryable<T> UnionAll<T>(params ISugarQueryable<T>[] queryables) where T : class
-        {
-            return ScopedContext.UnionAll(queryables);
-        }
+
         public UpdateExpressionMethodInfo UpdateableByObject(Type entityType)
         {
             return ScopedContext.UpdateableByObject(entityType);
@@ -701,11 +692,7 @@ namespace ThingsGateway.SqlSugar
         {
             return ScopedContext.UpdateableT(UpdateObj);
         }
-
-        public IUpdateable<T> Updateable<T>(T[] UpdateObjs) where T : class, new()
-        {
-            return ScopedContext.Updateable(UpdateObjs);
-        }
+ 
         public SplitTableContext SplitHelper<T>() where T : class, new()
         {
             return ScopedContext.SplitHelper<T>();

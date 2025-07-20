@@ -370,7 +370,7 @@ WHERE EVENT_OBJECT_TABLE = '" + tableName + "'");
             columnName = this.SqlBuilder.GetTranslationColumnName(columnName);
             var sql = this.Context.Ado.GetDataTable($"SHOW CREATE TABLE {tableName};").Rows[0][1] + "";
             var columns = sql.Split('\n');
-            var columnList = columns.Where(it => it.Last() == ',').ToList();
+            var columnList = columns.Where(it => it.Last() == ',');
 
             foreach (var column in columnList)
             {
@@ -506,7 +506,7 @@ WHERE EVENT_OBJECT_TABLE = '" + tableName + "'");
             var oldColumns = this.Context.DbMaintenance.GetColumnInfosByTableName(entity.DbTableName, false);
             var db = this.Context;
             db.DbMaintenance.AddTableRemark(entity.DbTableName, entity.TableDescription);
-            List<EntityColumnInfo> columns = entity.Columns.Where(it => it.IsIgnore == false).ToList();
+            var columns = entity.Columns.Where(it => it.IsIgnore == false);
             foreach (var item in columns)
             {
                 if (item.ColumnDescription != null)

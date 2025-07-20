@@ -11,7 +11,7 @@ namespace ThingsGateway.SqlSugar
             if (IsAppendSelect())
             {
                 JArray jArray = new JArray();
-                var tableConfigs = this.jsonTableConfigs.GroupBy(it => it.TableName).Select(it => it.First()).ToList();
+                var tableConfigs = this.jsonTableConfigs.GroupBy(it => it.TableName).Select(it => it.First());
                 var isJoinTable = IsAnyJoin(appendTypeNames);
                 foreach (var config in tableConfigs)
                 {

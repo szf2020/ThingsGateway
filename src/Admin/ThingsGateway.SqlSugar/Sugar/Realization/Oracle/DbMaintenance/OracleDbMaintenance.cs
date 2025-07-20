@@ -357,7 +357,7 @@ WHERE table_name = '" + tableName + "'");
             ConvertCreateColumnInfo(columnInfo);
             return base.AddColumn(tableName, columnInfo);
         }
-        public override bool CreateIndex(string tableName, string[] columnNames, bool isUnique = false)
+        public override bool CreateIndex(string tableName, IReadOnlyList<string> columnNames, bool isUnique = false)
         {
             string sql = string.Format(CreateIndexSql, tableName, string.Join(",", columnNames), string.Join("_", columnNames.Select(it => (it + "abc").Substring(0, 3))), isUnique ? "UNIQUE" : "");
             this.Context.Ado.ExecuteCommand(sql);
@@ -405,7 +405,7 @@ WHERE table_name = '" + tableName + "'");
         public override bool AddRemark(EntityInfo entity)
         {
             var db = this.Context;
-            var columns = entity.Columns.Where(it => it.IsIgnore == false).ToList();
+            var columns = entity.Columns.Where(it => it.IsIgnore == false);
 
             foreach (var item in columns)
             {

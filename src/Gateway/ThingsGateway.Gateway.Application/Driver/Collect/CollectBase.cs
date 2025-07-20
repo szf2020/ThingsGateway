@@ -563,32 +563,25 @@ public abstract class CollectBase : DriverBase, IRpcDriver
 
 
         using var writeLock = ReadWriteLock.WriterLock();
-
-        try
+        var list = writeInfoLists
+        .Where(a => !results.Any(b => b.Key == a.Key.Name))
+        .ToDictionary(item => item.Key, item => item.Value).ToArray();
+        // 使用并发方式遍历写入信息列表，并进行异步写入操作
+        await list.ParallelForEachAsync(async (writeInfo, cancellationToken) =>
         {
-            var list = writeInfoLists
-            .Where(a => !results.Any(b => b.Key == a.Key.Name))
-            .ToDictionary(item => item.Key, item => item.Value).ToArray();
-            // 使用并发方式遍历写入信息列表，并进行异步写入操作
-            await list.ParallelForEachAsync(async (writeInfo, cancellationToken) =>
+            try
             {
-                try
-                {
-                    // 调用协议的写入方法，将写入信息中的数据写入到对应的寄存器地址，并获取操作结果
-                    var result = await InvokeMethodAsync(writeInfo.Key.VariableMethod, writeInfo.Value?.ToString(), false, cancellationToken).ConfigureAwait(false);
+                // 调用协议的写入方法，将写入信息中的数据写入到对应的寄存器地址，并获取操作结果
+                var result = await InvokeMethodAsync(writeInfo.Key.VariableMethod, writeInfo.Value?.ToString(), false, cancellationToken).ConfigureAwait(false);
 
-                    // 将操作结果添加到结果字典中，使用变量名称作为键
-                    operResults.TryAdd(writeInfo.Key.Name, result);
-                }
-                catch (Exception ex)
-                {
-                    operResults.TryAdd(writeInfo.Key.Name, new(ex));
-                }
-            }, CollectProperties.MaxConcurrentCount, cancellationToken).ConfigureAwait(false);
-        }
-        finally
-        {
-        }
+                // 将操作结果添加到结果字典中，使用变量名称作为键
+                operResults.TryAdd(writeInfo.Key.Name, result);
+            }
+            catch (Exception ex)
+            {
+                operResults.TryAdd(writeInfo.Key.Name, new(ex));
+            }
+        }, CollectProperties.MaxConcurrentCount, cancellationToken).ConfigureAwait(false);
 
         // 将转换失败的变量和写入成功的变量的操作结果合并到结果字典中
         return new Dictionary<string, Dictionary<string, IOperResult>>()
@@ -731,9 +724,6 @@ public abstract class CollectBase : DriverBase, IRpcDriver
         {
             // 捕获异常并返回错误结果
             return new OperResult<object>(ex);
-        }
-        finally
-        {
         }
     }
 

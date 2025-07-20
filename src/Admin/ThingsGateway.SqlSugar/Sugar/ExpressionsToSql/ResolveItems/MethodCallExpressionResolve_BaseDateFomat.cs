@@ -225,7 +225,7 @@ namespace ThingsGateway.SqlSugar
                 formatString = formatString.Replace("ms", begin + UtilMethods.ConvertStringToNumbers(this.GetMethodValue("DateValue", parameters).ObjToString()) + end);
             }
 
-            var items = Regex.Matches(formatString, @"\^\d+\$").Cast<Match>().ToList();
+            var items = Regex.Matches(formatString, @"\^\d+\$").Cast<Match>();
             foreach (var item in items)
             {
                 formatString = formatString.Replace(item.Value, "$@" + UtilMethods.ConvertNumbersToString(item.Value.TrimStart('^').TrimEnd('$')) + "$");

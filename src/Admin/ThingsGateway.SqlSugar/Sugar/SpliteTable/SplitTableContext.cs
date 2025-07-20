@@ -75,7 +75,7 @@ namespace ThingsGateway.SqlSugar
             var tables = StaticConfig.SplitTableGetTablesFunc();
             List<SplitTableInfo> result = Service.GetAllTables(this.Context, EntityInfo, tables.Select(it => new DbTableInfo() { Name = it.TableName }).ToList());
             this.Context.Ado.IsEnableLogEvent = oldIsEnableLogEvent;
-            return result.ToList();
+            return result;
         }
 
         public string GetDefaultTableName()

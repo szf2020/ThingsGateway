@@ -22,7 +22,7 @@ namespace ThingsGateway.SqlSugar
         public override async Task CreateTempAsync<T>(DataTable dt)
         {
             var sqlBuilder = this.Context.Queryable<object>().SqlBuilder;
-            var dts = dt.Columns.Cast<DataColumn>().Select(it => sqlBuilder.GetTranslationColumnName(it.ColumnName)).ToList();
+            var dts = dt.Columns.Cast<DataColumn>().Select(it => sqlBuilder.GetTranslationColumnName(it.ColumnName));
             //await Task.FromResult(0);
             //throw new Exception("Oracle no support BulkUpdate");
             var oldTableName = dt.TableName;
@@ -34,7 +34,7 @@ namespace ThingsGateway.SqlSugar
             }
             var sql = this.Context.Queryable<T>().AS(oldTableName).Where(it => false).Select(string.Join(",", dts)).ToSql().Key;
             await Context.Ado.ExecuteCommandAsync($"create table {dt.TableName} as {sql} ").ConfigureAwait(false);
-            this.Context.DbMaintenance.AddPrimaryKeys(dt.TableName, columns.ToArray(), "Pk_" + SnowFlakeSingle.instance.getID().ToString());
+            this.Context.DbMaintenance.AddPrimaryKeys(dt.TableName, columns, "Pk_" + SnowFlakeSingle.instance.getID().ToString());
         }
         public override async Task<int> UpdateByTempAsync(string tableName, string tempName, string[] updateColumns, string[] whereColumns)
         {
@@ -43,7 +43,7 @@ namespace ThingsGateway.SqlSugar
             Check.ArgumentNullException(whereColumns.Length == 0, "where columns count is 0");
             var sets = string.Join(",", updateColumns.Select(it => $"TM{it}=TE{it}"));
             var wheres = string.Join(" AND ", whereColumns.Select(it => $"TM.{sqlBuilder.GetTranslationColumnName(it)}=TE.{sqlBuilder.GetTranslationColumnName(it)}"));
-            var forms = string.Join(",", updateColumns.Select(it => $" TM.{sqlBuilder.GetTranslationColumnName(it)} TM{it},TE.{sqlBuilder.GetTranslationColumnName(it)} TE{it}")); ;
+            var forms = string.Join(",", updateColumns.Select(it => $" TM.{sqlBuilder.GetTranslationColumnName(it)} TM{it},TE.{sqlBuilder.GetTranslationColumnName(it)} TE{it}"));
             string sql = string.Format(UpdateSql, sets, wheres, tableName, tempName, forms);
             return await Context.Ado.ExecuteCommandAsync(sql).ConfigureAwait(false);
         }

@@ -246,7 +246,7 @@ namespace ThingsGateway.SqlSugar
             }).ToList();
             foreach (var item in whereFuncs.OrderByDescending(it => (int)it.key))
             {
-                List<StorageableMessage<T>> whereList = messageList.Where(it => it.StorageType == null).ToList();
+                var whereList = messageList.Where(it => it.StorageType == null);
                 Func<StorageableMessage<T>, bool> exp = item.value1;
                 var list = whereList.Where(exp).ToList();
                 foreach (var it in list)
@@ -335,7 +335,7 @@ namespace ThingsGateway.SqlSugar
             }).ToList();
             foreach (var item in whereFuncs.OrderByDescending(it => (int)it.key))
             {
-                List<StorageableMessage<T>> whereList = messageList.Where(it => it.StorageType == null).ToList();
+                var whereList = messageList.Where(it => it.StorageType == null);
                 Func<StorageableMessage<T>, bool> exp = item.value1;
                 var list = whereList.Where(exp).ToList();
                 foreach (var it in list)
@@ -417,7 +417,7 @@ namespace ThingsGateway.SqlSugar
             }).ToList();
             foreach (var item in whereFuncs.OrderByDescending(it => (int)it.key))
             {
-                List<StorageableMessage<T>> whereList = messageList.Where(it => it.StorageType == null).ToList();
+                var whereList = messageList.Where(it => it.StorageType == null);
                 Func<StorageableMessage<T>, bool> exp = item.value1;
                 var list = whereList.Where(exp).ToList();
                 foreach (var it in list)
@@ -487,7 +487,7 @@ namespace ThingsGateway.SqlSugar
             }
             else
             {
-                List<string> list = GetExpressionValue(columns, ResolveExpressType.ArraySingle).GetResultArray().Select(it => Builder.GetNoTranslationColumnName(it)).ToList();
+                var list = GetExpressionValue(columns, ResolveExpressType.ArraySingle).GetResultArray().Select(it => Builder.GetNoTranslationColumnName(it));
                 var dbColumns = this.Context.EntityMaintenance.GetEntityInfo<T>().Columns.Where(it => it.IsIgnore == false);
                 var whereColumns = dbColumns.Where(it => list.Any(y =>
                                       it.DbColumnName.Equals(y, StringComparison.CurrentCultureIgnoreCase) ||
@@ -537,7 +537,7 @@ namespace ThingsGateway.SqlSugar
         }
         private void SetConditList(List<StorageableInfo<T>> itemList, List<EntityColumnInfo> whereColumns, List<IConditionalModel> conditList)
         {
-            ;
+
             foreach (var dataItem in itemList)
             {
                 var condition = new ConditionalCollections()
@@ -589,7 +589,7 @@ namespace ThingsGateway.SqlSugar
 
         public virtual ExpressionResult GetExpressionValue(Expression expression, ResolveExpressType resolveType)
         {
-            ILambdaExpressions resolveExpress = InstanceFactory.GetLambdaExpressions(this.Context.CurrentConnectionConfig); ;
+            ILambdaExpressions resolveExpress = InstanceFactory.GetLambdaExpressions(this.Context.CurrentConnectionConfig);
             if (this.Context.CurrentConnectionConfig.MoreSettings != null)
             {
                 resolveExpress.TableEnumIsString = this.Context.CurrentConnectionConfig.MoreSettings.TableEnumIsString;

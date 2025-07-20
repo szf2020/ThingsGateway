@@ -58,19 +58,12 @@ internal sealed class RulesEngineHostedService : BackgroundService, IRulesEngine
 
     public async Task Edit(Rules rules)
     {
-        try
+        await Delete(new List<long>() { rules.Id }).ConfigureAwait(false);
+        if (rules.Status)
         {
-            await Delete(new List<long>() { rules.Id }).ConfigureAwait(false);
-            if (rules.Status)
-            {
-                var data = Init(rules);
-                Start(data.rulesLog, data.blazorDiagram, TokenSource.Token);
-                dispatchService.Dispatch(null);
-            }
-
-        }
-        finally
-        {
+            var data = Init(rules);
+            Start(data.rulesLog, data.blazorDiagram, TokenSource.Token);
+            dispatchService.Dispatch(null);
         }
     }
 

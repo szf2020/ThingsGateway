@@ -23,12 +23,12 @@ namespace ThingsGateway.SqlSugar
             sb.AppendLine(string.Join("\r\n", groupList.Select(t =>
             {
                 var updateTable = string.Format("UPDATE {0} SET", base.GetTableNameStringNoWith);
-                var setValues = string.Join(",", t.Where(s => !s.IsPrimarykey).Where(s => OldPrimaryKeys?.Contains(s.DbColumnName) != true).Select(m => GetOracleUpdateColumns(i, m)).ToArray());
-                var pkList = t.Where(s => s.IsPrimarykey).ToList();
+                var setValues = string.Join(",", t.Where(s => !s.IsPrimarykey).Where(s => OldPrimaryKeys?.Contains(s.DbColumnName) != true).Select(m => GetOracleUpdateColumns(i, m)));
+                var pkList = t.Where(s => s.IsPrimarykey);
                 if (this.IsWhereColumns && this.PrimaryKeys?.Count > 0)
                 {
-                    var whereColumns = pkList.Where(it => this.PrimaryKeys?.Any(p => p.EqualCase(it.PropertyName) || p.EqualCase(it.DbColumnName)) == true).ToList();
-                    if (whereColumns.Count != 0)
+                    var whereColumns = pkList.Where(it => this.PrimaryKeys?.Any(p => p.EqualCase(it.PropertyName) || p.EqualCase(it.DbColumnName)) == true);
+                    if (whereColumns.Any())
                     {
                         pkList = whereColumns;
                     }
@@ -43,7 +43,7 @@ namespace ThingsGateway.SqlSugar
                 }
                 i++;
                 return string.Format("{0} {1} WHERE {2};", updateTable, setValues, string.Join("AND", whereList));
-            }).ToArray()));
+            })));
             var result = sb.ToString();
             if (groupList.Count == 0)
             {

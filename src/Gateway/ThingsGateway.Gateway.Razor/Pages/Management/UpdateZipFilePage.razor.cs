@@ -38,7 +38,7 @@ public partial class UpdateZipFilePage
         }
         catch
         {
-            return new QueryData<UpdateZipFile>() { };
+            return new QueryData<UpdateZipFile>();
         }
 
     }

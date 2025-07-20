@@ -6,8 +6,6 @@ namespace ThingsGateway.NewLife.Caching;
 /// <typeparam name="T"></typeparam>
 public class RedisList<T> : RedisBase, IList<T>
 {
-    #region 属性
-    #endregion
 
     #region 构造
     /// <summary>实例化</summary>

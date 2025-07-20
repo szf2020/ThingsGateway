@@ -5,10 +5,10 @@
     /// </summary>
     public partial interface ISqlBuilder
     {
-        KeyValuePair<string, SugarParameter[]> OrderByModelToSql(List<OrderByModel> models);
-        KeyValuePair<string, SugarParameter[]> GroupByModelToSql(List<GroupByModel> models);
-        KeyValuePair<string, SugarParameter[]> SelectModelToSql(List<SelectModel> models);
-        KeyValuePair<string, SugarParameter[]> FuncModelToSql(IFuncModel model);
+        KeyValuePair<string, IReadOnlyList<SugarParameter>> OrderByModelToSql(List<OrderByModel> models);
+        KeyValuePair<string, IReadOnlyList<SugarParameter>> GroupByModelToSql(List<GroupByModel> models);
+        KeyValuePair<string, IReadOnlyList<SugarParameter>> SelectModelToSql(List<SelectModel> models);
+        KeyValuePair<string, IReadOnlyList<SugarParameter>> FuncModelToSql(IFuncModel model);
     }
 
 }

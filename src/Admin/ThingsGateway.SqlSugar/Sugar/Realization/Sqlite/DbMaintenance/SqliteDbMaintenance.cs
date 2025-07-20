@@ -415,9 +415,12 @@ AND sql LIKE '%" + tableName + "%'");
             {
                 path = Regex.Match(connString, @"[a-z,A-Z]\:\\").Value;
             }
-            if (!FileHelper.IsExistDirectory(path))
+            if (!path.IsNullOrEmpty())
             {
-                FileHelper.CreateDirectory(path);
+                if (!FileHelper.IsExistDirectory(path))
+                {
+                    FileHelper.CreateDirectory(path);
+                }
             }
             this.Context.Ado.Connection.Open();
             this.Context.Ado.Connection.Close();

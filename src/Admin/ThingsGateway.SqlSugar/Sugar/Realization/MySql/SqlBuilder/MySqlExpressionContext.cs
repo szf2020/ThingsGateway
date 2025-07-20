@@ -93,7 +93,7 @@
         {
             var parameter = model.Args[0];
             var parameter2 = model.Args[1];
-            return string.Format(" (TIMESTAMPDIFF(day,date({0}),date({1}))=0) ", parameter.MemberName, parameter2.MemberName); ;
+            return string.Format(" (TIMESTAMPDIFF(day,date({0}),date({1}))=0) ", parameter.MemberName, parameter2.MemberName);
         }
 
         public override string DateIsSameByType(MethodCallExpressionModel model)

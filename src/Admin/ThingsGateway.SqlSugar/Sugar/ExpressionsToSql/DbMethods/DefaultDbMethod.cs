@@ -178,7 +178,7 @@ namespace ThingsGateway.SqlSugar
             {
                 if (isNvarchar && model.Args[2].MemberValue.Equals(true))
                 {
-                    inValueString = inValues.ToArray().ToJoinSqlInValsN();
+                    inValueString = inValues.ToJoinSqlInVals();
                 }
                 else if (inValues.Count != 0 && inValues.FirstOrDefault() is bool && inValues.All(it => it is bool))
                 {
@@ -186,7 +186,7 @@ namespace ThingsGateway.SqlSugar
                 }
                 else
                 {
-                    inValueString = inValues.ToArray().ToJoinSqlInVals();
+                    inValueString = inValues.ToJoinSqlInVals();
                 }
             }
             if (inValueString.IsNullOrEmpty())
@@ -241,7 +241,7 @@ namespace ThingsGateway.SqlSugar
         {
             var parameter = model.Args[0];
             var parameter2 = model.Args[1];
-            return string.Format(" ({0} = {1}) ", parameter.MemberName, parameter2.MemberName); ;
+            return string.Format(" ({0} = {1}) ", parameter.MemberName, parameter2.MemberName);
         }
 
         public virtual string EqualsNull(MethodCallExpressionModel model)
@@ -261,7 +261,7 @@ namespace ThingsGateway.SqlSugar
         {
             var parameter = model.Args[0];
             var parameter2 = model.Args[1];
-            return string.Format(" (DATEDIFF(day,{0},{1})=0) ", parameter.MemberName, parameter2.MemberName); ;
+            return string.Format(" (DATEDIFF(day,{0},{1})=0) ", parameter.MemberName, parameter2.MemberName);
         }
 
         public virtual string DateIsSameByType(MethodCallExpressionModel model)
@@ -574,33 +574,33 @@ namespace ThingsGateway.SqlSugar
         {
             var parameter = model.Args[0];
             var parameter2 = model.Args[1];
-            return string.Format(" ({0} & {1}) ", parameter.MemberName, parameter2.MemberName); ;
+            return string.Format(" ({0} & {1}) ", parameter.MemberName, parameter2.MemberName);
         }
         public virtual string BitwiseInclusiveOR(MethodCallExpressionModel model)
         {
             var parameter = model.Args[0];
             var parameter2 = model.Args[1];
-            return string.Format(" ({0} | {1}) ", parameter.MemberName, parameter2.MemberName); ;
+            return string.Format(" ({0} | {1}) ", parameter.MemberName, parameter2.MemberName);
         }
 
         public string Oracle_ToDate(MethodCallExpressionModel model)
         {
             var parameter = model.Args[0];
             var parameter2 = model.Args[1];
-            return string.Format(" to_date({0},{1}) ", parameter.MemberName, parameter2.MemberName); ;
+            return string.Format(" to_date({0},{1}) ", parameter.MemberName, parameter2.MemberName);
         }
         public string Oracle_ToChar(MethodCallExpressionModel model)
         {
             var parameter = model.Args[0];
             var parameter2 = model.Args[1];
-            return string.Format("to_char({0},{1}) ", parameter.MemberName, parameter2.MemberName); ;
+            return string.Format("to_char({0},{1}) ", parameter.MemberName, parameter2.MemberName);
         }
         public string SqlServer_DateDiff(MethodCallExpressionModel model)
         {
             var parameter = model.Args[0];
             var parameter2 = model.Args[1];
             var parameter3 = model.Args[2];
-            return string.Format(" DATEDIFF({0},{1},{2}) ", parameter.MemberValue?.ToString().ToSqlFilter(), parameter2.MemberName, parameter3.MemberName); ;
+            return string.Format(" DATEDIFF({0},{1},{2}) ", parameter.MemberValue?.ToString().ToSqlFilter(), parameter2.MemberName, parameter3.MemberName);
         }
 
         public virtual string FormatRowNumber(MethodCallExpressionModel model)
@@ -609,7 +609,7 @@ namespace ThingsGateway.SqlSugar
             var array = model.Args.Skip(1).Select(it => it.IsMember ? it.MemberName : it.MemberValue).ToArray();
             if (array.Length == 1 && array[0] is string[])
             {
-                return string.Format("'" + str + "'", array[0] as string[]); ;
+                return string.Format("'" + str + "'", array[0] as string[]);
             }
             else
             {
@@ -635,7 +635,7 @@ namespace ThingsGateway.SqlSugar
                 return Format(new MethodCallExpressionModel()
                 {
                     Args = args
-                }); ;
+                });
             }
             str = Regex.Replace(str, @"(\{\d+?\})", revalue);
             var array = model.Args.Skip(1).Select(it => it.IsMember ? it.MemberName : (it.MemberValue == null ? "''" : it.MemberValue.ToSqlValue()))
@@ -657,7 +657,7 @@ namespace ThingsGateway.SqlSugar
                 return Format(new MethodCallExpressionModel()
                 {
                     Args = args
-                }); ;
+                });
             }
             str = Regex.Replace(str, @"(\{\d+?\})", "',$1,'");
             var array = model.Args.Skip(1).Select(it => it.IsMember ? it.MemberName : (it.MemberValue == null ? "''" : it.MemberValue.ToSqlValue()))

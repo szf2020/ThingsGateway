@@ -10,8 +10,8 @@
             this.BeforeWhereFunc = () =>
             {
                 var masterTable = GetMasterTable();
-                var masterFilters = this.jsonTableConfigs.Where(it => it.TableName.EqualCase(masterTable.Table)).ToList();
-                if (masterFilters.Count != 0)
+                var masterFilters = this.jsonTableConfigs.Where(it => it.TableName.EqualCase(masterTable.Table));
+                if (masterFilters.Any())
                 {
                     foreach (var filter in masterFilters)
                     {
@@ -23,7 +23,7 @@
                         appendIndex++;
                         sugarQueryable.Where(sql, p.Value);
                     }
-                    ;
+
 
                 }
             };

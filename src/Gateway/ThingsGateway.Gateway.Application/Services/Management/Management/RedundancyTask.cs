@@ -135,55 +135,47 @@ internal sealed class RedundancyTask : IRpcDriver, IAsyncDisposable
         {
             bool online = false;
             var waitInvoke = CreateDmtpInvokeOption(stoppingToken);
+            await _tcpDmtpClient.TryConnectAsync().ConfigureAwait(false);
 
-
-            try
             {
-                await _tcpDmtpClient.TryConnectAsync().ConfigureAwait(false);
-
+                // 初始化读取错误计数器
+                var readErrorCount = 0;
+                // 当读取错误次数小于最大错误计数时循环执行
+                while (readErrorCount < RedundancyOptions.MaxErrorCount)
                 {
-                    // 初始化读取错误计数器
-                    var readErrorCount = 0;
-                    // 当读取错误次数小于最大错误计数时循环执行
-                    while (readErrorCount < RedundancyOptions.MaxErrorCount)
+                    try
                     {
-                        try
+                        // 发送 Ping 请求以检查设备是否在线，超时时间为 10000 毫秒
+                        online = await _tcpDmtpClient.PingAsync(10000).ConfigureAwait(false);
+                        if (online)
+                            break;
+                        else
                         {
-                            // 发送 Ping 请求以检查设备是否在线，超时时间为 10000 毫秒
-                            online = await _tcpDmtpClient.PingAsync(10000).ConfigureAwait(false);
-                            if (online)
-                                break;
-                            else
-                            {
-                                readErrorCount++;
-                                await Task.Delay(RedundancyOptions.SyncInterval, stoppingToken).ConfigureAwait(false);
-                            }
-                        }
-                        catch
-                        {
-                            // 捕获异常，增加读取错误计数器
                             readErrorCount++;
                             await Task.Delay(RedundancyOptions.SyncInterval, stoppingToken).ConfigureAwait(false);
                         }
                     }
-                }
-
-
-                // 如果设备不在线
-                if (!online)
-                {
-                    // 无法获取状态，启动本机
-                    await ActiveAsync().ConfigureAwait(false);
-                }
-                else
-                {
-                    // 如果设备在线
-                    LogMessage?.LogTrace($"Ping ActiveStation {RedundancyOptions.MasterUri} success");
-                    await StandbyAsync().ConfigureAwait(false);
+                    catch
+                    {
+                        // 捕获异常，增加读取错误计数器
+                        readErrorCount++;
+                        await Task.Delay(RedundancyOptions.SyncInterval, stoppingToken).ConfigureAwait(false);
+                    }
                 }
             }
-            finally
+
+
+            // 如果设备不在线
+            if (!online)
             {
+                // 无法获取状态，启动本机
+                await ActiveAsync().ConfigureAwait(false);
+            }
+            else
+            {
+                // 如果设备在线
+                LogMessage?.LogTrace($"Ping ActiveStation {RedundancyOptions.MasterUri} success");
+                await StandbyAsync().ConfigureAwait(false);
             }
         }
         catch (OperationCanceledException)

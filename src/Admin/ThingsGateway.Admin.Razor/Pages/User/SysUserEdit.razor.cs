@@ -35,7 +35,7 @@ public partial class SysUserEdit
     protected override async Task OnInitializedAsync()
     {
         BoolItems = LocalizerUtil.GetBoolItems(Model.GetType(), nameof(Model.Status));
-        var items = await SysPositionService.SelectorAsync(new PositionSelectorInput() { });
+        var items = await SysPositionService.SelectorAsync(new PositionSelectorInput());
         Items = PositionUtil.BuildCascaderItemList(items);
         ModuleSelectedItems = ResourceUtil.BuildModuleSelectList((await SysResourceService.GetAllAsync())).ToList();
         await InvokeAsync(StateHasChanged);

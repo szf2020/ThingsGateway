@@ -298,7 +298,7 @@ namespace ThingsGateway.SqlSugar
         public override bool AddRemark(EntityInfo entity)
         {
             var db = this.Context;
-            var columns = entity.Columns.Where(it => it.IsIgnore == false).ToList();
+            var columns = entity.Columns.Where(it => it.IsIgnore == false);
 
             foreach (var item in columns)
             {

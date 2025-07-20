@@ -17,8 +17,8 @@
                 csharpTypeName = "bool";
             if (csharpTypeName == "DateTimeOffset")
                 return "timestamptz";
-            var mappings = this.MappingTypes.Where(it => it.Value.ToString().Equals(csharpTypeName, StringComparison.CurrentCultureIgnoreCase)).ToList();
-            if (mappings?.Count > 0)
+            var mappings = this.MappingTypes.Where(it => it.Value.ToString().Equals(csharpTypeName, StringComparison.CurrentCultureIgnoreCase));
+            if (mappings?.Any() == true)
                 return mappings.First().Key;
             else
                 return "varchar";

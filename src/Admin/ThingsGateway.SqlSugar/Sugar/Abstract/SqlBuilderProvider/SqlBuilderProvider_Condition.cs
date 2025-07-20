@@ -6,9 +6,9 @@ namespace ThingsGateway.SqlSugar
     public abstract partial class SqlBuilderProvider : SqlBuilderAccessory, ISqlBuilder
     {
         #region Core
-        public virtual KeyValuePair<string, SugarParameter[]> ConditionalModelToSql(List<IConditionalModel> models, int beginIndex = 0)
+        public virtual KeyValuePair<string, IReadOnlyList<SugarParameter>> ConditionalModelToSql(List<IConditionalModel> models, int beginIndex = 0)
         {
-            if (models.IsNullOrEmpty()) return new KeyValuePair<string, SugarParameter[]>();
+            if (models.IsNullOrEmpty()) return new KeyValuePair<string, IReadOnlyList<SugarParameter>>();
             StringBuilder builder = new StringBuilder();
             List<SugarParameter> parameters = new List<SugarParameter>();
             var sqlBuilder = InstanceFactory.GetSqlbuilder(this.Context.CurrentConnectionConfig);
@@ -180,10 +180,6 @@ namespace ThingsGateway.SqlSugar
                             {
                                 builder.Append(" ) ");
                             }
-                            else
-                            {
-
-                            }
                         }
                     }
                 }
@@ -194,7 +190,7 @@ namespace ThingsGateway.SqlSugar
                 }
                 mainIndex++;
             }
-            return new KeyValuePair<string, SugarParameter[]>(builder.ToString(), parameters.ToArray());
+            return new KeyValuePair<string, IReadOnlyList<SugarParameter>>(builder.ToString(), parameters);
         }
 
         #endregion
@@ -218,7 +214,7 @@ namespace ThingsGateway.SqlSugar
         }
         private static void InLike(StringBuilder builder, List<SugarParameter> parameters, ConditionalModel item, int index, string type, string parameterName)
         {
-            var array = (item.FieldValue + "").Split(',').ToList();
+            var array = (item.FieldValue + "").Split(',');
             List<string> sqls = new List<string>();
             int i = 0;
             foreach (var val in array)
@@ -334,11 +330,11 @@ namespace ThingsGateway.SqlSugar
             {
                 if (item.CSharpTypeName.EqualCase("string") || item.CSharpTypeName == null)
                 {
-                    sqlList.Add("(" + item.FieldName.ToSqlFilter() + " IN (" + items.Distinct().ToArray().ToJoinSqlInVals() + "))");
+                    sqlList.Add("(" + item.FieldName.ToSqlFilter() + " IN (" + items.Distinct().ToJoinSqlInVals() + "))");
                 }
                 else
                 {
-                    sqlList.Add("(" + item.FieldName.ToSqlFilter() + " IN (" + items.Select(it => string.IsNullOrEmpty(it) ? "null" : it).Distinct().ToArray().ToJoinSqlInVals() + "))");
+                    sqlList.Add("(" + item.FieldName.ToSqlFilter() + " IN (" + items.Select(it => string.IsNullOrEmpty(it) ? "null" : it).Distinct().ToJoinSqlInVals() + "))");
                 }
             });
             var inValue1 = $" {string.Join(" OR ", sqlList)} ";
@@ -354,14 +350,14 @@ namespace ThingsGateway.SqlSugar
             string inValue1;
             if (item.CSharpTypeName.EqualCase("string") || item.CSharpTypeName == null)
             {
-                inValue1 = ("(" + inArray.Distinct().ToArray().ToJoinSqlInVals() + ")");
+                inValue1 = ("(" + inArray.Distinct().ToJoinSqlInVals() + ")");
             }
             if (item.CSharpTypeName.EqualCase("bool") || item.CSharpTypeName.EqualCase("Boolean"))
             {
                 var lam = InstanceFactory.GetLambdaExpressions(this.Context.CurrentConnectionConfig);
                 lam.Context = this.Context;
                 var value = lam.DbMehtods.TrueValue();
-                inValue1 = ("(" + string.Join(",", inArray.Distinct().ToArray()) + ")");
+                inValue1 = ("(" + string.Join(",", inArray.Distinct()) + ")");
                 if (value.EqualCase("true"))
                 {
                     inValue1 = inValue1.Replace("1", "true").Replace("0", "false");
@@ -371,11 +367,11 @@ namespace ThingsGateway.SqlSugar
             {
                 if (item.CSharpTypeName.EqualCase("nstring"))
                 {
-                    inValue1 = ("(" + inArray.Select(it => string.IsNullOrEmpty(it) ? "null" : it).Distinct().ToArray().ToJoinSqlInValsByVarchar() + ")");
+                    inValue1 = ("(" + inArray.Select(it => string.IsNullOrEmpty(it) ? "null" : it).Distinct().ToJoinSqlInValsByVarchar() + ")");
                 }
                 else
                 {
-                    inValue1 = ("(" + inArray.Select(it => string.IsNullOrEmpty(it) ? "null" : it).Distinct().ToArray().ToJoinSqlInVals() + ")");
+                    inValue1 = ("(" + inArray.Select(it => string.IsNullOrEmpty(it) ? "null" : it).Distinct().ToJoinSqlInVals() + ")");
                 }
             }
 

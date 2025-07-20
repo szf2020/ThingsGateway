@@ -80,7 +80,7 @@ namespace ThingsGateway.SqlSugar
         /// 初始化多个表
         /// </summary>
         /// <param name="types">实体类型数组</param>
-        public void InitTables(Type[] types)
+        public void InitTables(params Type[] types)
         {
             foreach (var type in types)
             {

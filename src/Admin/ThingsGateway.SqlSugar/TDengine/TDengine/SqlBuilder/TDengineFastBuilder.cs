@@ -32,7 +32,7 @@ namespace ThingsGateway.SqlSugar
         public async Task<int> ExecuteBulkCopyAsync(DataTable dt)
         {
             // 移除自增列  
-            var identities = this.FastEntityInfo.Columns.Where(it => it.IsIdentity).Select(it => it.DbColumnName).ToList();
+            var identities = this.FastEntityInfo.Columns.Where(it => it.IsIdentity).Select(it => it.DbColumnName);
             foreach (var identity in identities)
             {
                 if (dt.Columns.Contains(identity))
@@ -106,9 +106,9 @@ namespace ThingsGateway.SqlSugar
                     // Build the column names and value placeholders
                     var valuePlaceholdersList = table.Rows.Cast<DataRow>().Select(row =>
                     {
-                        var values = row.ItemArray.Select(item => FormatValue(item)).ToList();
+                        var values = row.ItemArray.Select(item => FormatValue(item));
                         return $"({string.Join(", ", values)})";
-                    }).ToList();
+                    });
 
                     var valuePlaceholders = string.Join(", ", valuePlaceholdersList);
                     // Construct SQL without tags

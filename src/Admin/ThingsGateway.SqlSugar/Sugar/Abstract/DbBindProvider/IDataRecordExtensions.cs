@@ -115,7 +115,7 @@ namespace ThingsGateway.SqlSugar
             var result = dr.GetDateTime(i);
             if (result == DateTime.MinValue)
             {
-                return null; ;
+                return null;
             }
             return result;
         }
@@ -131,7 +131,7 @@ namespace ThingsGateway.SqlSugar
             var result = dr.GetValue(i);
             if (result == DBNull.Value)
             {
-                return null; ;
+                return null;
             }
             return Convert.ToDateTime(result.ToString());
         }

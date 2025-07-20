@@ -55,7 +55,7 @@ public partial class SysSignalRLoginConnectionHub : ComponentBase, IAsyncDisposa
                                 return true;
                             };
                         }
-                        ;
+
                         return message;
                     };
                     foreach (var item in App.User?.Claims ?? new List<Claim>())

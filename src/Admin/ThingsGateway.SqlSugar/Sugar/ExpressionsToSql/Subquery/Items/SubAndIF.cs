@@ -56,7 +56,7 @@ namespace ThingsGateway.SqlSugar
                 copyContext = this.Context.GetCopyContextWithMapping();
                 copyContext.IsSingle = false;
             }
-            var result = "AND " + SubTools.GetMethodValue(copyContext, argExp, ResolveExpressType.WhereMultiple); ;
+            var result = "AND " + SubTools.GetMethodValue(copyContext, argExp, ResolveExpressType.WhereMultiple);
             if (this.Context.JoinIndex > 0)
             {
                 this.Context.Parameters.AddRange(copyContext.Parameters);

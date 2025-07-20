@@ -35,7 +35,7 @@ public class TimeIntervalTriggerNode : TextNode, ITriggerNode, IDisposable
             if (Func != null)
             {
                 Logger?.Trace($"Timer: {Text}");
-                await Func.Invoke(new NodeOutput() { }, cancellationToken).ConfigureAwait(false);
+                await Func.Invoke(new NodeOutput(), cancellationToken).ConfigureAwait(false);
             }
         }
         catch (Exception ex)

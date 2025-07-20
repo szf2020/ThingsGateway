@@ -95,7 +95,7 @@ internal sealed class Program
                       services.Add(item);
                   }
               });
-        ;
+
         Serve.BuildApplication(options, default, out var startUrls, out var app);
 
         app.Start();

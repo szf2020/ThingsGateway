@@ -530,8 +530,8 @@ namespace ThingsGateway.SqlSugar
                         List<string> ignorePropertyNames = null;
                         if (this.QueryBuilder?.SelectNewIgnoreColumns?.Count > 0)
                         {
-                            var ignoreColumns = this.QueryBuilder.SelectNewIgnoreColumns.Where(it => it.Value == item.PropertyType.Name).ToList();
-                            if (ignoreColumns.Count != 0)
+                            var ignoreColumns = this.QueryBuilder.SelectNewIgnoreColumns.Where(it => it.Value == item.PropertyType.Name);
+                            if (ignoreColumns.Any())
                             {
                                 ignorePropertyNames = ignoreColumns.Select(it => it.Key).ToList();
                             }
@@ -689,7 +689,7 @@ namespace ThingsGateway.SqlSugar
             {
                 return null;
             }
-            var classProperties = type.GetProperties().ToList();
+            var classProperties = type.GetProperties();
             if (type.Name.StartsWith("Dictionary`"))
             {
                 return null;
@@ -1195,7 +1195,7 @@ namespace ThingsGateway.SqlSugar
         #endregion
 
         #region Conditional
-        public KeyValuePair<string, SugarParameter[]> ConditionalModelsToSql(List<IConditionalModel> conditionalModels, int beginIndex = 0)
+        public KeyValuePair<string, IReadOnlyList<SugarParameter>> ConditionalModelsToSql(List<IConditionalModel> conditionalModels, int beginIndex = 0)
         {
             var sqlBuilder = InstanceFactory.GetSqlBuilderWithContext(this.Context);
             var result = sqlBuilder.ConditionalModelToSql(conditionalModels, beginIndex);

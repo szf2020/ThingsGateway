@@ -70,7 +70,7 @@ namespace ThingsGateway.SqlSugar
                 {
                     if (this.Context.CurrentConnectionConfig.MoreSettings?.TableEnumIsString == true)
                     {
-                        return value.ToSqlValue(); ;
+                        return value.ToSqlValue();
                     }
                     else
                     {

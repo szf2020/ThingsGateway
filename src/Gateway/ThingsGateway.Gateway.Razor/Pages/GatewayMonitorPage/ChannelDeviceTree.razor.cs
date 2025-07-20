@@ -369,7 +369,7 @@ finally
              });
 
         }
-        ;
+
         await DialogService.Show(op);
     }
     async Task DeleteCurrentChannel(ChannelDeviceTreeItem channelDeviceTreeItem)
@@ -535,7 +535,7 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
             });
 
         }
-    ;
+
         await DialogService.Show(op);
     }
     async Task ExportCurrentChannel(ChannelDeviceTreeItem channelDeviceTreeItem)
@@ -764,7 +764,7 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
         {
             //插件名称
             var data = await GlobalData.GetCurrentUserDevices().ConfigureAwait(false);
-            models = data.Where(a => a.PluginName == pluginName); ;
+            models = data.Where(a => a.PluginName == pluginName);
             oldModel = models.FirstOrDefault();
             changedModels = models;
             oneModel = oldModel.AdaptDevice();
@@ -775,7 +775,7 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
             //采集
 
             var data = await GlobalData.GetCurrentUserDevices().ConfigureAwait(false);
-            models = data.Where(a => a.PluginType == pluginType); ;
+            models = data.Where(a => a.PluginType == pluginType);
             oldModel = models.FirstOrDefault();
             changedModels = models;
             oneModel = oldModel.AdaptDevice();
@@ -912,7 +912,7 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
             });
 
         }
-    ;
+
         await DialogService.Show(op);
     }
 
@@ -1082,7 +1082,7 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
             });
 
         }
-        ;
+
         await DialogService.Show(op);
     }
 
@@ -1279,9 +1279,6 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
             {
                 ZItem.Remove(UnknownTreeViewItem);
             }
-            else
-            {
-            }
         }
 
         Items = ZItem.AdaptListTreeViewItemChannelDeviceTreeItem();
@@ -1397,9 +1394,6 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
                 {
                     ZItem.Remove(UnknownTreeViewItem);
                 }
-                else
-                {
-                }
             }
             Items = ZItem.AdaptListTreeViewItemChannelDeviceTreeItem();
             return Items;
@@ -1479,9 +1473,6 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
                 if (ZItem.Count >= 3)
                 {
                     ZItem.Remove(UnknownTreeViewItem);
-                }
-                else
-                {
                 }
             }
 
