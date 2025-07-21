@@ -85,7 +85,6 @@ public sealed class PKCS7PaddingTransform : ICryptoTransform
             }
 
             return count;
-
         }
 
         if (_hasWithheldBlock)

@@ -1,5 +1,4 @@
 ﻿
-
 using ThingsGateway.Blazor.Diagrams.Core.Geometry;
 using ThingsGateway.NewLife;
 
@@ -72,7 +71,6 @@ public class ExecuteScriptNode : TextNode, IActuatorNode, IExexcuteExpressionsBa
             
 
             """;
-
     }
 
     private string text;
@@ -95,7 +93,6 @@ public class ExecuteScriptNode : TextNode, IActuatorNode, IExexcuteExpressionsBa
                 }
                 catch
                 {
-
                 }
                 CSharpScriptEngineExtension.Remove(text);
             }
@@ -123,8 +120,6 @@ public class ExecuteScriptNode : TextNode, IActuatorNode, IExexcuteExpressionsBa
             Logger?.LogWarning(ex);
             return new OperResult<NodeOutput>(ex);
         }
-
-
     }
 
     public void Dispose()
@@ -138,7 +133,6 @@ public class ExecuteScriptNode : TextNode, IActuatorNode, IExexcuteExpressionsBa
             }
             catch
             {
-
             }
             CSharpScriptEngineExtension.Remove(text);
         }

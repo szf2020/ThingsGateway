@@ -5,7 +5,6 @@ namespace ThingsGateway.SqlSugar
     {
         public ConditionalExpressionResolve(ExpressionParameter parameter) : base(parameter)
         {
-
             string name = "IIF";
             var express = base.Expression as ConditionalExpression;
             var args = new List<Expression>() {

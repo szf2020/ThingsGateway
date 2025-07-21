@@ -11,7 +11,7 @@
             {
                 var dbMain = new SqlServerDbMaintenance() { Context = this.Context };
                 var schmes = dbMain.GetSchemas();
-                if (!schmes.Any(it => it.EqualCase(tableArray.First())))
+                if (!schmes.Any(it => it.EqualCase(tableArray[0])))
                 {
                     return tableArray.Last();
                 }

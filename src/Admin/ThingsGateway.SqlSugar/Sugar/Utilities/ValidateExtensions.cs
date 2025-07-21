@@ -137,7 +137,6 @@ namespace ThingsGateway.SqlSugar
         {
             if (thisValue == null) return false;
             return System.Text.RegularExpressions.Regex.IsMatch(thisValue.ToString(), @"^(\(\d{3,4}\)|\d{3,4}-|\s)?\d{8}$");
-
         }
 
         public static bool IsIDcard(this object thisValue)

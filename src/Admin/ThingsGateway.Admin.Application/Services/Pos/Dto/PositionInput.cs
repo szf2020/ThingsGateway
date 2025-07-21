@@ -10,9 +10,6 @@
 
 namespace ThingsGateway.Admin.Application;
 
-
-
-
 public class PositionSelectorInput : UserSelectorInput
 {
 }

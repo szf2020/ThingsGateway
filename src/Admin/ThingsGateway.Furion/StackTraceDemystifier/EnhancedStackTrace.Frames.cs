@@ -392,7 +392,6 @@ namespace System.Diagnostics
                         if (v.LocalType == type)
                         {
                             GetOrdinal(method, ref ordinal);
-
                         }
                         method = candidateMethod;
                         type = method.DeclaringType;
@@ -539,7 +538,6 @@ namespace System.Diagnostics
             closeBracketOffset = -1;
             return false;
         }
-
 
         private static int IndexOfBalancedParenthesis(string str, int openingOffset, char closing)
         {

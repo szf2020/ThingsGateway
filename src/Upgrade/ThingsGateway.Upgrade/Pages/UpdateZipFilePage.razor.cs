@@ -45,10 +45,7 @@ public partial class UpdateZipFilePage
             Title = Loaclozer["SaveUpdateZipFile"],
             ShowFooter = false,
             ShowCloseButton = false,
-            OnCloseAsync = async () =>
-            {
-                await InvokeAsync(table.QueryAsync);
-            },
+            OnCloseAsync = async () => await InvokeAsync(table.QueryAsync),
         };
         op.Component = BootstrapDynamicComponent.CreateComponent<SaveUpdateZipFile>(new Dictionary<string, object?>
         {

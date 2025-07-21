@@ -162,7 +162,6 @@ public sealed class DataValidationPageFilter : IAsyncPageFilter, IOrderedFilter
             Code = validationMetadata.Message
         };
 
-
         return true;
     }
 }

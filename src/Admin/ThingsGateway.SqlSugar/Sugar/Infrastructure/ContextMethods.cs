@@ -86,7 +86,6 @@ namespace ThingsGateway.SqlSugar
             return result;
         }
 
-
         /// <summary>
         ///DataReader to Dynamic
         /// </summary>
@@ -154,7 +153,6 @@ namespace ThingsGateway.SqlSugar
             }
         }
 
-
         /// <summary>
         ///DataReader to Dynamic List
         /// </summary>
@@ -190,7 +188,6 @@ namespace ThingsGateway.SqlSugar
             }
             return result;
         }
-
 
         /// <summary>
         ///DataReader to DataReaderToDictionary
@@ -299,7 +296,6 @@ namespace ThingsGateway.SqlSugar
             }
         }
 
-
         public List<T> DataReaderToSelectJsonList<T>(IDataReader dataReader)
         {
             List<T> result = new List<T>();
@@ -393,7 +389,6 @@ namespace ThingsGateway.SqlSugar
                 return reval;
             }
         }
-
 
         public async Task<List<T>> DataReaderToSelectJsonListAsync<T>(IDataReader dataReader)
         {
@@ -548,7 +543,6 @@ namespace ThingsGateway.SqlSugar
                         {
                             var valueFomatInfo = this.QueryBuilder?.QueryableFormats?.First(it => it.PropertyName == name);
                             addValue = UtilMethods.GetFormatValue(addValue, valueFomatInfo);
-
                         }
                         var type = UtilMethods.GetUnderType(item.PropertyType);
                         if (addValue == DBNull.Value || addValue == null)
@@ -597,7 +591,6 @@ namespace ThingsGateway.SqlSugar
 
             return result;
         }
-
 
         private void SetAppendColumns(IDataReader dataReader)
         {
@@ -654,13 +647,12 @@ namespace ThingsGateway.SqlSugar
                                     Regex.IsMatch(readerValues.First().Value.ObjToString(), @"^\{.+\}$");
         }
 
-
         private static bool IsArrayItem(Dictionary<string, object> readerValues, PropertyInfo item)
         {
             var isArray = item.PropertyType.IsArray && readerValues.Any(y => y.Key.EqualCase(item.Name)) && readerValues.FirstOrDefault(y => y.Key.EqualCase(item.Name)).Value is string;
             var isListItem = item.PropertyType.FullName.IsCollectionsList() &&
                 item.PropertyType.GenericTypeArguments.Length == 1 &&
-                item.PropertyType.GenericTypeArguments.First().IsClass() == false && readerValues.FirstOrDefault(y => y.Key.EqualCase(item.Name)).Value is string;
+                item.PropertyType.GenericTypeArguments[0].IsClass() == false && readerValues.FirstOrDefault(y => y.Key.EqualCase(item.Name)).Value is string;
             return isArray || isListItem;
         }
 
@@ -708,7 +700,6 @@ namespace ThingsGateway.SqlSugar
                     var suagrColumn = prop.GetCustomAttribute<SugarColumn>();
                     if (suagrColumn?.IsJson == true)
                     {
-
                         if (mappingKeys != null && mappingKeys.TryGetValue(item.Name, out string? key))
                         {
                             Json(readerValues, result, name, typeName, key, item);
@@ -830,7 +821,6 @@ namespace ThingsGateway.SqlSugar
                     {
                         var jsonString = readerValues.First(it => it.Key.EqualCase(item.Name + "." + name)).Value;
                         AddJson(result, name, jsonString);
-
                     }
                 }
             }
@@ -869,7 +859,6 @@ namespace ThingsGateway.SqlSugar
                 else
                 {
                     result.Add(name, this.DeserializeObject<List<Dictionary<string, object>>>(jsonString + ""));
-
                 }
             }
         }
@@ -906,7 +895,6 @@ namespace ThingsGateway.SqlSugar
                 }
             }
         }
-
 
         /// <summary>
         /// Serialize Object
@@ -954,10 +942,10 @@ namespace ThingsGateway.SqlSugar
         #endregion
 
         #region DataTable
-        public DataTable DictionaryListToDataTable(List<Dictionary<string, object>> list)
+        public DataTable DictionaryListToDataTable(IEnumerable<Dictionary<string, object>> list)
         {
             DataTable result = new DataTable();
-            if (list.Count == 0)
+            if (!list.Any())
                 return result;
 
             var columnNames = list.First();
@@ -1002,7 +990,6 @@ namespace ThingsGateway.SqlSugar
                 deserializeObject.Add(childRow);
             }
             return this.DeserializeObject<dynamic>(this.SerializeObject(deserializeObject));
-
         }
         public List<T> DataTableToList<T>(DataTable table)
         {
@@ -1207,7 +1194,6 @@ namespace ThingsGateway.SqlSugar
             var jarray = this.Context.Utilities.DeserializeObject<JArray>(json);
             foreach (var item in jarray)
             {
-
                 if (item.Any())
                 {
                     if (item.ToString().Contains("ConditionalList"))

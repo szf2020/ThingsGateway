@@ -16,7 +16,7 @@ namespace ThingsGateway.SqlSugar
             while (pageCount >= pageIndex)
             {
                 StringBuilder updateTable = new StringBuilder();
-                string setValues = string.Join(",", groupList.First().Where(it => it.IsPrimarykey == false && (it.IsIdentity == false || (IsOffIdentity && it.IsIdentity))).Select(it =>
+                string setValues = string.Join(",", groupList[0].Where(it => it.IsPrimarykey == false && (it.IsIdentity == false || (IsOffIdentity && it.IsIdentity))).Select(it =>
                 {
                     if (SetValues.IsValuable())
                     {

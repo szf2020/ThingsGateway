@@ -357,7 +357,7 @@ public partial class Crontab
                 parser = parser[offset..] + missingParser;
 
                 // 转换成 int 值返回（SUN，JAN.....）
-                var returnValue = replaceVal.First().Value;
+                var returnValue = replaceVal[0].Value;
 
                 // 验证值范围
                 if (returnValue > maximum)
@@ -796,7 +796,7 @@ public partial class Crontab
     private static int Increment(List<ITimeParser> parsers, int value, int defaultValue, out bool overflow)
     {
         // 检查是否是随机 R 字符解析器
-        if (parsers.Count == 1 && parsers.First() is RandomParser randomParser)
+        if (parsers.Count == 1 && parsers[0] is RandomParser randomParser)
         {
             overflow = true;
             return randomParser.Next(value).Value;

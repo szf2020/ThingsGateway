@@ -28,7 +28,6 @@ public static class RedisCacheServiceCollectionExtensions
         if (setupAction == null)
             throw new ArgumentNullException(nameof(setupAction));
 
-
         services.AddOptions();
         services.Configure(setupAction);
         services.AddSingleton(sp => new RedisCache(sp, sp.GetRequiredService<IOptions<RedisOptions>>()));
@@ -37,7 +36,6 @@ public static class RedisCacheServiceCollectionExtensions
         services.TryAddSingleton<FullRedis>(sp => sp.GetRequiredService<RedisCache>());
         services.TryAddSingleton<ICache>(p =>
         {
-
             var result = p.GetRequiredService<RedisCache>();
             Cache.Default = result;
             return result;
@@ -58,6 +56,5 @@ public static class RedisCacheServiceCollectionExtensions
         return services;
     }
 }
-
 
 #endif

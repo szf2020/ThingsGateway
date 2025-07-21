@@ -13,19 +13,14 @@ namespace ThingsGateway.SqlSugar
         public EntityInfo EntityInfo { get { return this.Context.EntityMaintenance.GetEntityInfo<T>(); } }
 
         /// <summary>批量插入数据(分表)</summary>
-        public int BulkCopy(List<T> datas)
+        public int BulkCopy(IEnumerable<T> datas)
         {
-            if (StaticConfig.SplitTableCreateTableFunc != null)
-            {
-                StaticConfig.SplitTableCreateTableFunc(typeof(T), datas);
-            }
-            List<GroupModel> groupModels;
-            int result;
-            GroupDataList(datas, out groupModels, out result);
+            int result = 0;
+            var groupModels = GroupDataList(datas);
             foreach (var item in groupModels.GroupBy(it => it.GroupName))
             {
                 CreateTable(item.Key);
-                var addList = item.Select(it => it.Item).ToList();
+                var addList = item.Select(it => it.Item);
                 result += FastestProvider.AS(item.Key).BulkCopy(addList);
                 this.Context.MappingTables.Add(EntityInfo.EntityName, EntityInfo.DbTableName);
             }
@@ -33,19 +28,14 @@ namespace ThingsGateway.SqlSugar
         }
 
         /// <summary>异步批量插入数据(分表)</summary>
-        public async Task<int> BulkCopyAsync(List<T> datas)
+        public async Task<int> BulkCopyAsync(IEnumerable<T> datas)
         {
-            if (StaticConfig.SplitTableCreateTableFunc != null)
-            {
-                StaticConfig.SplitTableCreateTableFunc(typeof(T), datas);
-            }
-            List<GroupModel> groupModels;
-            int result;
-            GroupDataList(datas, out groupModels, out result);
+            int result = 0;
+            var groupModels = GroupDataList(datas);
             foreach (var item in groupModels.GroupBy(it => it.GroupName))
             {
                 CreateTable(item.Key);
-                var addList = item.Select(it => it.Item).ToList();
+                var addList = item.Select(it => it.Item);
                 result += await FastestProvider.AS(item.Key).BulkCopyAsync(addList).ConfigureAwait(false);
                 this.Context.MappingTables.Add(EntityInfo.EntityName, EntityInfo.DbTableName);
             }
@@ -53,15 +43,15 @@ namespace ThingsGateway.SqlSugar
         }
 
         /// <summary>批量更新数据(分表)</summary>
-        public int BulkUpdate(List<T> datas)
+        public int BulkUpdate(IEnumerable<T> datas)
         {
-            List<GroupModel> groupModels;
-            int result;
-            GroupDataList(datas, out groupModels, out result);
+            int result = 0;
+
+            var groupModels = GroupDataList(datas);
             foreach (var item in groupModels.GroupBy(it => it.GroupName))
             {
                 CreateTable(item.Key);
-                var addList = item.Select(it => it.Item).ToList();
+                var addList = item.Select(it => it.Item);
                 result += FastestProvider.AS(item.Key).BulkUpdate(addList);
                 this.Context.MappingTables.Add(EntityInfo.EntityName, EntityInfo.DbTableName);
             }
@@ -69,15 +59,15 @@ namespace ThingsGateway.SqlSugar
         }
 
         /// <summary>异步批量更新数据(分表)</summary>
-        public async Task<int> BulkUpdateAsync(List<T> datas)
+        public async Task<int> BulkUpdateAsync(IEnumerable<T> datas)
         {
-            List<GroupModel> groupModels;
-            int result;
-            GroupDataList(datas, out groupModels, out result);
+            int result = 0;
+
+            var groupModels = GroupDataList(datas);
             foreach (var item in groupModels.GroupBy(it => it.GroupName))
             {
                 CreateTable(item.Key);
-                var addList = item.Select(it => it.Item).ToList();
+                var addList = item.Select(it => it.Item);
                 result += await FastestProvider.AS(item.Key).BulkUpdateAsync(addList).ConfigureAwait(false);
                 this.Context.MappingTables.Add(EntityInfo.EntityName, EntityInfo.DbTableName);
             }
@@ -85,28 +75,28 @@ namespace ThingsGateway.SqlSugar
         }
 
         /// <summary>批量更新数据(分表，指定条件列和更新列)</summary>
-        public int BulkUpdate(List<T> datas, string[] wherColumns, string[] updateColumns)
+        public int BulkUpdate(IEnumerable<T> datas, string[] wherColumns, string[] updateColumns)
         {
-            List<GroupModel> groupModels;
-            int result;
-            GroupDataList(datas, out groupModels, out result);
+            int result = 0;
+
+            var groupModels = GroupDataList(datas);
             foreach (var item in groupModels.GroupBy(it => it.GroupName))
             {
-                var addList = item.Select(it => it.Item).ToList();
+                var addList = item.Select(it => it.Item);
                 result += FastestProvider.AS(item.Key).BulkUpdate(addList, wherColumns, updateColumns);
             }
             return result;
         }
 
         /// <summary>异步批量更新数据(分表，指定条件列和更新列)</summary>
-        public async Task<int> BulkUpdateAsync(List<T> datas, string[] wherColumns, string[] updateColumns)
+        public async Task<int> BulkUpdateAsync(IEnumerable<T> datas, string[] wherColumns, string[] updateColumns)
         {
-            List<GroupModel> groupModels;
-            int result;
-            GroupDataList(datas, out groupModels, out result);
+            int result = 0;
+
+            var groupModels = GroupDataList(datas);
             foreach (var item in groupModels.GroupBy(it => it.GroupName))
             {
-                var addList = item.Select(it => it.Item).ToList();
+                var addList = item.Select(it => it.Item);
                 result += await FastestProvider.AS(item.Key).BulkUpdateAsync(addList, wherColumns, updateColumns).ConfigureAwait(false);
             }
             return result;
@@ -126,27 +116,37 @@ namespace ThingsGateway.SqlSugar
         }
 
         /// <summary>分组数据列表</summary>
-        private void GroupDataList(List<T> datas, out List<GroupModel> groupModels, out int result)
+        private IEnumerable<GroupModel> GroupDataList(IEnumerable<T> datas)
         {
             var attribute = typeof(T).GetCustomAttribute<SplitTableAttribute>() as SplitTableAttribute;
             Check.Exception(attribute == null, $"{typeof(T).Name} need SplitTableAttribute");
-            groupModels = new List<GroupModel>();
+
             var db = FastestProvider.context;
             var hasSplitField = typeof(T).GetProperties().Any(it => it.GetCustomAttribute<SplitFieldAttribute>() != null);
-
             var context = db.SplitHelper<T>();
+
+            string? firstGroupName = null;
+
             foreach (var item in datas)
             {
-                if (groupModels.Count > 0 && !hasSplitField)
-                    groupModels.Add(new GroupModel() { GroupName = groupModels[0].GroupName, Item = item });
+                if (!hasSplitField)
+                {
+                    if (firstGroupName == null)
+                    {
+                        // 第一个 item 时才初始化 group name
+                        var value = context.GetValue(attribute.SplitType, item);
+                        firstGroupName = context.GetTableName(attribute.SplitType, value);
+                    }
+
+                    yield return new GroupModel() { GroupName = firstGroupName, Item = item };
+                }
                 else
                 {
                     var value = context.GetValue(attribute.SplitType, item);
                     var tableName = context.GetTableName(attribute.SplitType, value);
-                    groupModels.Add(new GroupModel() { GroupName = tableName, Item = item });
+                    yield return new GroupModel() { GroupName = tableName, Item = item };
                 }
             }
-            result = 0;
         }
 
         /// <summary>分组模型</summary>

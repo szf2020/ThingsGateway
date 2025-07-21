@@ -29,7 +29,7 @@
         /// <param name="insertDatas">要插入的数据列表</param>
         /// <param name="dateFormat">日期格式字符串</param>
         /// <returns>插入的记录数</returns>
-        public int BulkCopy<T>(List<T> insertDatas, string dateFormat = "yyyy/M/d H:mm:ss") where T : class, new()
+        public int BulkCopy<T>(IEnumerable<T> insertDatas, string dateFormat = "yyyy/M/d H:mm:ss") where T : class, new()
         {
             int result = 0;
             // 使用分页方式处理大数据量插入
@@ -48,7 +48,7 @@
         /// <param name="insertDatas">要插入的数据列表</param>
         /// <param name="dateFormat">日期格式字符串</param>
         /// <returns>插入的记录数</returns>
-        public async Task<int> BulkCopyAsync<T>(List<T> insertDatas, string dateFormat = "yyyy/M/d H:mm:ss") where T : class, new()
+        public async Task<int> BulkCopyAsync<T>(IEnumerable<T> insertDatas, string dateFormat = "yyyy/M/d H:mm:ss") where T : class, new()
         {
             int result = 0;
             // 异步分页处理大数据量插入

@@ -163,7 +163,6 @@ namespace ThingsGateway.SqlSugar
         }
         private void SetConditList(List<DataRow> itemList, IReadOnlyList<string> whereColumns, List<IConditionalModel> conditList)
         {
-
             foreach (var dataItem in itemList)
             {
                 var condition = new ConditionalCollections()
@@ -215,7 +214,6 @@ namespace ThingsGateway.SqlSugar
                 var result = true;
                 foreach (var name in columns)
                 {
-
                     if (result)
                     {
                         result = row[name].ObjToString() == it[name].ObjToString();

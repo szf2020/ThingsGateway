@@ -53,7 +53,6 @@ namespace ThingsGateway.Plugin.Mqtt
                     var fileName = Path.Combine(filePath, fileObjectName);//获取文件全路径
                     fileName = fileName.Replace("\\", "/");//格式化一系
 
-
                     using (var stream = File.Create(Path.Combine(filePath, fileObjectName)))
                     {
                         using var fs = file.File.OpenReadStream(1024 * 1024 * 500);
@@ -62,7 +61,6 @@ namespace ThingsGateway.Plugin.Mqtt
 
                     mqttClientProperty.CAFile = fileName;
                 }
-
             }
         }
         private async Task OnClientCertificateFileChange(UploadFile file)
@@ -71,8 +69,6 @@ namespace ThingsGateway.Plugin.Mqtt
 
             if (mqttClientProperty.TLS == true)
             {
-
-
                 {
                     var filePath = Path.Combine("PluginFile", Id, nameof(mqttClientProperty.ClientCertificateFile));
                     if (!Directory.Exists(filePath))//如果不存在就创建文件夹
@@ -81,7 +77,6 @@ namespace ThingsGateway.Plugin.Mqtt
                     var fileObjectName = $"{file.File.Name}";//存储后的文件名
                     var fileName = Path.Combine(filePath, fileObjectName);//获取文件全路径
                     fileName = fileName.Replace("\\", "/");//格式化一系
-
 
                     using (var stream = File.Create(Path.Combine(filePath, fileObjectName)))
                     {
@@ -92,8 +87,6 @@ namespace ThingsGateway.Plugin.Mqtt
                     mqttClientProperty.ClientCertificateFile = fileName;
                 }
 
-
-
             }
         }
         private async Task OnClientKeyFileChange(UploadFile file)
@@ -102,8 +95,6 @@ namespace ThingsGateway.Plugin.Mqtt
 
             if (mqttClientProperty.TLS == true)
             {
-
-
 
                 {
                     var filePath = Path.Combine("PluginFile", Id, nameof(mqttClientProperty.ClientKeyFile));
@@ -114,7 +105,6 @@ namespace ThingsGateway.Plugin.Mqtt
                     var fileName = Path.Combine(filePath, fileObjectName);//获取文件全路径
                     fileName = fileName.Replace("\\", "/");//格式化一系
 
-
                     using (var stream = File.Create(Path.Combine(filePath, fileObjectName)))
                     {
                         using var fs = file.File.OpenReadStream(1024 * 1024 * 500);
@@ -123,7 +113,6 @@ namespace ThingsGateway.Plugin.Mqtt
 
                     mqttClientProperty.ClientKeyFile = fileName;
                 }
-
             }
         }
         [Inject]
@@ -131,11 +120,7 @@ namespace ThingsGateway.Plugin.Mqtt
         [Inject]
         private ToastService ToastService { get; set; }
 
-
-
         [Inject]
         private DialogService DialogService { get; set; }
-
-
     }
 }

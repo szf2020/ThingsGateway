@@ -37,7 +37,6 @@ internal sealed class ImportExportService : IImportExportService
     /// <returns></returns>
     public async Task<FileStreamResult> ExportAsync<T>(object input, string fileName, bool isDynamicExcelColumn = true) where T : class
     {
-
         var path = ImportExportUtil.GetFileDir(ref fileName);
 
         fileName = CommonUtils.GetSingleId() + fileName;
@@ -94,8 +93,6 @@ internal sealed class ImportExportService : IImportExportService
         fileName = HttpUtility.UrlEncode(fileName, Encoding.GetEncoding("UTF-8"));//文件名转utf8不然前端下载会乱码
         return fileName;
     }
-
-
 
     #endregion 方法
 }

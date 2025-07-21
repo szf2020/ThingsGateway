@@ -33,7 +33,6 @@ namespace System.Diagnostics
             _frames = GetFrames(e);
         }
 
-
         public EnhancedStackTrace(StackTrace stackTrace)
         {
             if (stackTrace == null)
@@ -81,7 +80,6 @@ namespace System.Diagnostics
             return sb.ToString();
         }
 
-
         internal void Append(StringBuilder sb)
         {
             var frames = _frames;
@@ -105,7 +103,6 @@ namespace System.Diagnostics
                 {
                     sb.Append(" in ");
                     sb.Append(TryGetFullPath(fileName));
-
                 }
 
                 var lineNo = frame.GetFileLineNumber();

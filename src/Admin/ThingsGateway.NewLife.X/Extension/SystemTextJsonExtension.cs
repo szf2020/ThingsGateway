@@ -108,8 +108,6 @@ public static class SystemTextJsonExtension
     {
         return JsonSerializer.SerializeToUtf8Bytes(item, item.GetType(), indented ? IndentedOptions : NoneIndentedOptions);
     }
-
-
 }
 
 /// <summary>
@@ -373,7 +371,6 @@ public class JObjectSystemTextJsonConverter : JsonConverter<JObject>
 
     public override void Write(Utf8JsonWriter writer, JObject value, JsonSerializerOptions options)
     {
-
         writer.WriteStartObject();
         foreach (var prop in (JObject)value)
         {
@@ -381,9 +378,7 @@ public class JObjectSystemTextJsonConverter : JsonConverter<JObject>
             Write(writer, prop.Value!, options);
         }
         writer.WriteEndObject();
-
     }
-
 
     private static void Write(Utf8JsonWriter writer, JToken value, JsonSerializerOptions options)
     {
@@ -450,7 +445,6 @@ public class JObjectSystemTextJsonConverter : JsonConverter<JObject>
                 break;
         }
     }
-
 }
 
 /// <summary>
@@ -526,14 +520,12 @@ public class JArraySystemTextJsonConverter : JsonConverter<JArray>
 
     public override void Write(Utf8JsonWriter writer, JArray value, JsonSerializerOptions options)
     {
-
         writer.WriteStartArray();
         foreach (var item in (JArray)value)
         {
             Write(writer, item!, options);
         }
         writer.WriteEndArray();
-
     }
 
     private static void Write(Utf8JsonWriter writer, JToken value, JsonSerializerOptions options)
@@ -602,7 +594,6 @@ public class JArraySystemTextJsonConverter : JsonConverter<JArray>
         }
     }
 }
-
 
 /// <summary>
 /// System.Text.Json → JToken / JObject / JArray 转换器

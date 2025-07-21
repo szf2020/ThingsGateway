@@ -52,21 +52,17 @@ public partial class ChannelComponent : ComponentBase
                 if (OnDisConnectClick.HasDelegate)
                     await OnDisConnectClick.InvokeAsync();
             }
-
-
         }
         catch (Exception ex)
         {
             Channel?.Logger?.LogWarning(ex);
         }
-
     }
 
     ValidateForm ValidateForm { get; set; }
 
     private async Task ConnectClick()
     {
-
         try
         {
             var validate = ValidateForm.Validate();
@@ -97,7 +93,6 @@ public partial class ChannelComponent : ComponentBase
 
             if (OnConnectClick.HasDelegate)
                 await OnConnectClick.InvokeAsync(Channel);
-
         }
         catch (Exception ex)
         {

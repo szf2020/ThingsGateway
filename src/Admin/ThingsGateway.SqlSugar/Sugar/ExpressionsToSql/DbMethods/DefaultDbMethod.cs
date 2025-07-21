@@ -105,7 +105,6 @@ namespace ThingsGateway.SqlSugar
             return string.Format("( {0}>0 AND {0} IS NOT NULL )", parameter.MemberName);
         }
 
-
         public virtual string ToUpper(MethodCallExpressionModel model)
         {
             var parameter = model.Args[0];
@@ -618,7 +617,6 @@ namespace ThingsGateway.SqlSugar
         }
         public virtual string Format(MethodCallExpressionModel model)
         {
-
             var str = "'" + model.Args[0].MemberValue.ObjToString() + "'";
             if (model.Args[0].MemberValue.ObjToString().StartsWith('\'') && model.Args[0].MemberValue.ObjToString().EndsWith('\''))
             {
@@ -649,7 +647,6 @@ namespace ThingsGateway.SqlSugar
         }
         private string FormatConcat(MethodCallExpressionModel model)
         {
-
             var str = "concat('" + model.Args[0].MemberValue.ObjToString() + "')";
             if (model.Args.Count == 2 && model.Args[1].MemberValue is string[])
             {
@@ -774,7 +771,6 @@ namespace ThingsGateway.SqlSugar
             var parameter1 = model.Args[1];
             return $"({parameter.MemberName}::json ->> {parameter1.MemberValue})";
         }
-
 
         public virtual string JsonField(MethodCallExpressionModel model)
         {
@@ -955,7 +951,6 @@ namespace ThingsGateway.SqlSugar
                                 {
                                     if (columnInfo.SqlParameterDbType is System.Data.DbType type && type == System.Data.DbType.AnsiString)
                                     {
-
                                     }
                                     else
                                     {
@@ -1134,7 +1129,6 @@ namespace ThingsGateway.SqlSugar
                                     {
                                         if (model.DataObject is EntityColumnInfo dc && dc.SqlParameterDbType is System.Data.DbType type && type == System.Data.DbType.AnsiString)
                                         {
-
                                         }
                                         else
                                         {
@@ -1156,12 +1150,8 @@ namespace ThingsGateway.SqlSugar
                         else
                         {
                             Regex reg = new Regex(ParameterKeyWord + @"MethodConst\d+");
-                            sql = reg.Replace(sql, it =>
-                            {
-                                return " " + newValue + " ";
-                            });
+                            sql = reg.Replace(sql, it => " " + newValue + " ");
                         }
-
                     }
                     sb.Append(sql);
                 }
@@ -1246,12 +1236,8 @@ namespace ThingsGateway.SqlSugar
                         else
                         {
                             Regex reg = new Regex(ParameterKeyWord + @"MethodConst\d+");
-                            sql = reg.Replace(sql, it =>
-                            {
-                                return " " + newValue + " ";
-                            });
+                            sql = reg.Replace(sql, it => " " + newValue + " ");
                         }
-
                     }
                     sb.Append(sql);
                 }
@@ -1268,7 +1254,6 @@ namespace ThingsGateway.SqlSugar
                 return result;
             }
         }
-
 
         private static List<MethodCallExpressionArgs> GetStringFormatArgs(string str, object array)
         {
@@ -1304,7 +1289,6 @@ namespace ThingsGateway.SqlSugar
         }
         public virtual string TrimStart(MethodCallExpressionModel mode)
         {
-
             var parameterNameA = mode.Args[0].MemberName;
             var parameterNameB = mode.Args[1].MemberName;
             return $" CASE WHEN LEFT({parameterNameA}, 1) = {parameterNameB} THEN RIGHT({parameterNameA}, LEN({parameterNameA}) - 1) ELSE {parameterNameA} END  ";

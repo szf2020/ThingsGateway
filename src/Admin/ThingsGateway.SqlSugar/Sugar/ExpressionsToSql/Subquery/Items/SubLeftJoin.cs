@@ -4,7 +4,6 @@ namespace ThingsGateway.SqlSugar
 {
     public class SubLeftJoin : ISubOperation
     {
-
         public bool HasWhere
         {
             get; set;

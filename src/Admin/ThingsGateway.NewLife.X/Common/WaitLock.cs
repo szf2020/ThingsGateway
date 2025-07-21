@@ -70,7 +70,6 @@ public sealed class WaitLock : IDisposable
                 }
             }
         }
-
     }
 
     /// <summary>

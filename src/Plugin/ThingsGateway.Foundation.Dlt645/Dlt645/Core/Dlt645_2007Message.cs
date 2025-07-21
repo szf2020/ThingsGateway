@@ -59,9 +59,6 @@ public class Dlt645_2007Message : MessageBase, IResultMessage
             }
             Response.Station = byteBlock.Span.Slice(HeadCodeIndex + 1, 6).ToArray();
 
-
-
-
             var controlCode = byteBlock[HeadCodeIndex + 8];
             if ((controlCode & 0x40) == 0x40)//控制码bit6为1时，返回错误
             {
@@ -71,7 +68,6 @@ public class Dlt645_2007Message : MessageBase, IResultMessage
                 OperCode = 999;
                 return FilterResult.Success;
             }
-
 
             if (Dlt645_2007Send != null)
             {
@@ -135,7 +131,6 @@ public class Dlt645_2007Message : MessageBase, IResultMessage
             BodyLength = byteBlock[HeadCodeIndex + 9] + 2;
 
         return true;
-
     }
     public override void SendInfo(ISendMessage sendMessage, ref ValueByteBlock byteBlock)
     {

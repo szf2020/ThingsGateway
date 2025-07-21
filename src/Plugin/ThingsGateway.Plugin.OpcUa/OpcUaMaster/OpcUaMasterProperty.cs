@@ -94,5 +94,4 @@ public class OpcUaMasterProperty : CollectPropertyRetryBase
     /// </summary>
     [DynamicProperty]
     public int KeepAliveInterval { get; set; } = 3000;
-
 }

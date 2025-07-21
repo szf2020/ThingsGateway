@@ -5,7 +5,6 @@ namespace ThingsGateway.SqlSugar
 {
     public static class SqlSugarDynamicExpressionParser
     {
-
         public static LambdaExpression ParseLambda(ParameterExpression[] parameterExpressions, Type type, string sql, object[] objects)
         {
             if (StaticConfig.DynamicExpressionParserType == null)
@@ -31,7 +30,6 @@ namespace ThingsGateway.SqlSugar
             }
             else
             {
-
                 // 查找 ParseLambda 方法
                 MethodInfo parseLambdaMethod = StaticConfig.DynamicExpressionParserType
                     .GetMyMethod("ParseLambda", 4, typeof(ParameterExpression[]), typeof(Type), typeof(string), typeof(object[]));
@@ -47,7 +45,5 @@ namespace ThingsGateway.SqlSugar
                 return lambda;
             }
         }
-
     }
 }
-

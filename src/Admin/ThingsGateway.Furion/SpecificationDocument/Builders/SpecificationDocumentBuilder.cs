@@ -358,10 +358,7 @@ public static class SpecificationDocumentBuilder
     /// <param name="swaggerGenOptions"></param>
     private static void ConfigureTagsAction(SwaggerGenOptions swaggerGenOptions)
     {
-        swaggerGenOptions.TagActionsBy(apiDescription =>
-        {
-            return new[] { GetActionTag(apiDescription) };
-        });
+        swaggerGenOptions.TagActionsBy(apiDescription => new[] { GetActionTag(apiDescription) });
     }
 
     /// <summary>
@@ -512,7 +509,6 @@ public static class SpecificationDocumentBuilder
                         // 处理逻辑：获取类型命名空间，最后调用 GenerateInheritdocCref 进行生成
                         else
                         {
-
                             try
                             {
                                 var className = memberName[memberName.IndexOf(':')..memberName.LastIndexOf(':')];

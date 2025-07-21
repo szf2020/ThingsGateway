@@ -32,7 +32,6 @@ namespace ThingsGateway.Debug
         [Inject]
         IStringLocalizer<ThingsGateway.Razor._Imports> RazorLocalizer { get; set; }
 
-
         [Parameter, EditorRequired]
         public IEnumerable<IEditorItem> PluginPropertyEditorItems { get; set; }
         [Parameter, EditorRequired]
@@ -56,9 +55,7 @@ namespace ThingsGateway.Debug
             string script = null;
             {
                 script = pname == businessProperty.BigTextScriptHistoryTable ? businessProperty.BigTextScriptHistoryTable : businessProperty.BigTextScriptRealTable;
-
             }
-
 
             var op = new DialogOption()
             {
@@ -86,7 +83,6 @@ namespace ThingsGateway.Debug
                 await getDeviceModel.DBInit(db,default);
               await getDeviceModel.DBInsertable(db,data,default);
               return stringBuilder.ToString();
-
         }},
 
                {nameof(ScriptCheck.OnGetDemo),()=>
@@ -97,6 +93,8 @@ namespace ThingsGateway.Debug
                     using ThingsGateway.Foundation;
                     
                     using System.Dynamic;
+                    using ThingsGateway.Plugin.DB;
+                    using ThingsGateway.SqlSugar;
                     
                     using TouchSocket.Core;
                     public class S1 : DynamicSQLBase
@@ -106,15 +104,15 @@ namespace ThingsGateway.Debug
                         {
 
                             var sql = $"""
-
-                                    """;
+                                            1
+                                            """;
                             await db.Ado.ExecuteCommandAsync(sql, default, cancellationToken: cancellationToken).ConfigureAwait(false);
                         }
                         public override async Task DBInsertable(ISqlSugarClient db, IEnumerable<object> datas, CancellationToken cancellationToken)
                         {
                             var sql = $"""
-
-                                    """;
+                                            1
+                                            """;
                             await db.Ado.ExecuteCommandAsync(sql, default, cancellationToken: cancellationToken).ConfigureAwait(false);
                         }
                     }
@@ -129,7 +127,9 @@ namespace ThingsGateway.Debug
                     using System.Dynamic;
                     using ThingsGateway.Foundation;
                     
-
+                    using ThingsGateway.Plugin.DB;
+                    using ThingsGateway.SqlSugar;
+                    
                     using TouchSocket.Core;
                     public class S1 : DynamicSQLBase
                     {
@@ -138,15 +138,15 @@ namespace ThingsGateway.Debug
                         {
 
                             var sql = $"""
-
-                                    """;
+                                            1
+                                            """;
                             await db.Ado.ExecuteCommandAsync(sql, default, cancellationToken: cancellationToken).ConfigureAwait(false);
                         }
                         public override async Task DBInsertable(ISqlSugarClient db, IEnumerable<object> datas, CancellationToken cancellationToken)
                         {
                             var sql = $"""
-
-                                    """;
+                                            1
+                                            """;
                             await db.Ado.ExecuteCommandAsync(sql, default, cancellationToken: cancellationToken).ConfigureAwait(false);
                         }
                     }
@@ -162,21 +162,15 @@ namespace ThingsGateway.Debug
                  if (pname == nameof(SqlDBProducerProperty.BigTextScriptHistoryTable))
     {
             businessProperty.BigTextScriptHistoryTable=v;
-
     }
     else if (pname == nameof(SqlDBProducerProperty.BigTextScriptRealTable))
     {
            businessProperty.BigTextScriptRealTable=v;
     }
-
         }) },
-
     });
             await DialogService.Show(op);
-
         }
-
-
 
         private async Task CheckScript(RealDBProducerProperty businessProperty, string pname)
         {
@@ -214,7 +208,6 @@ namespace ThingsGateway.Debug
                 await getDeviceModel.DBInit(db,default);
               await getDeviceModel.DBInsertable(db,data,default);
               return stringBuilder.ToString();
-
         }},
 
                {nameof(ScriptCheck.OnGetDemo),()=>
@@ -229,7 +222,6 @@ namespace ThingsGateway.Debug
                     using ThingsGateway.Gateway.Application;
                     using ThingsGateway.Plugin.DB;
                     using System.Dynamic;
-                    
                     using TouchSocket.Core;
                     public class S1 : DynamicSQLBase
                     {
@@ -238,15 +230,15 @@ namespace ThingsGateway.Debug
                         {
 
                             var sql = $"""
-                                        111
-                                    """;
+                                            111
+                                            """;
                             await db.Ado.ExecuteCommandAsync(sql, default, cancellationToken: cancellationToken).ConfigureAwait(false);
                         }
                         public override async Task DBInsertable(ISqlSugarClient db, IEnumerable<object> datas, CancellationToken cancellationToken)
                         {
                             var sql = $"""
-                                        111
-                                    """;
+                                            111
+                                            """;
                             await db.Ado.ExecuteCommandAsync(sql, default, cancellationToken: cancellationToken).ConfigureAwait(false);
                         }
                     }
@@ -272,15 +264,15 @@ namespace ThingsGateway.Debug
                         {
 
                             var sql = $"""
-                                        111
-                                    """;
+                                            111
+                                            """;
                             await db.Ado.ExecuteCommandAsync(sql, default, cancellationToken: cancellationToken).ConfigureAwait(false);
                         }
                         public override async Task DBInsertable(ISqlSugarClient db, IEnumerable<object> datas, CancellationToken cancellationToken)
                         {
                             var sql = $"""
                                             111
-                                    """;
+                                            """;
                             await db.Ado.ExecuteCommandAsync(sql, default, cancellationToken: cancellationToken).ConfigureAwait(false);
                         }
                     }
@@ -291,22 +283,12 @@ namespace ThingsGateway.Debug
                     ;
                 }
             },
-        {nameof(ScriptCheck.ScriptChanged),EventCallback.Factory.Create<string>(this, v =>
-        {
-businessProperty.BigTextScriptHistoryTable=v;
-
-        }) },
-
+        {nameof(ScriptCheck.ScriptChanged),EventCallback.Factory.Create<string>(this, v => businessProperty.BigTextScriptHistoryTable=v) },
     });
             await DialogService.Show(op);
-
         }
-
 
         [Inject]
         DialogService DialogService { get; set; }
     }
 }
-
-
-

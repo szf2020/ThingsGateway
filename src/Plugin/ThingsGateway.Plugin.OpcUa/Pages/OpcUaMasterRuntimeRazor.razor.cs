@@ -32,7 +32,6 @@ namespace ThingsGateway.Plugin.OpcUa
         [Inject]
         IStringLocalizer<OpcUaMasterProperty> OpcUaMasterPropertyLocalizer { get; set; }
 
-
         private async Task Export()
         {
             try
@@ -61,7 +60,6 @@ namespace ThingsGateway.Plugin.OpcUa
             {
                 await ToastService.Warn(ex);
             }
-
         }
     }
 }

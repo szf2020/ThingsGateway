@@ -3,7 +3,6 @@
 using ThingsGateway.NewLife.Collections;
 namespace ThingsGateway.SqlSugar
 {
-
     public static class InstanceFactory
     {
         static Assembly assembly = Assembly.GetExecutingAssembly();
@@ -375,7 +374,6 @@ namespace ThingsGateway.SqlSugar
                             //currentConnectionConfig.DbType != DbType.GBase &&
                             currentConnectionConfig.DbType != DbType.Sqlite &&
                             GetCustomTypeByClass($"{SugarConst.StartName}SqlSugar.{currentConnectionConfig.DbType}.{currentConnectionConfig.DbType}Provider") != null;
-
         }
 
         public static IDbBind GetDbBind(ConnectionConfig currentConnectionConfig)
@@ -584,7 +582,6 @@ namespace ThingsGateway.SqlSugar
         }
         private static Restult NoCacheGetCacheInstance<Restult>(string className, Type[] types)
         {
-
             Type type = null;
             if (string.IsNullOrEmpty(CustomDllName))
             {
@@ -700,7 +697,6 @@ namespace ThingsGateway.SqlSugar
                         }
                     }
                 }
-
             }
 
             return type;

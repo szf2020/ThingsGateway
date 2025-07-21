@@ -12,7 +12,6 @@
 //using System.Text;
 //using System.Xml;
 
-
 //namespace Opc.Ua;
 
 //public class OPCUAJsonEncoder : IJsonEncoder, IEncoder, IDisposable

@@ -72,7 +72,7 @@
             if (identityKeys.Count == 0) { return this.ExecuteCommand() > 0; }
             var idValue = ExecuteReturnBigIdentity();
             Check.Exception(identityKeys.Count > 1, "ExecuteCommandIdentityIntoEntity does not support multiple identity keys");
-            var identityKey = identityKeys.First();
+            var identityKey = identityKeys[0];
             object setValue = 0;
             if (idValue > int.MaxValue)
                 setValue = idValue;
@@ -93,6 +93,5 @@
             }
             return identityColumn;
         }
-
     }
 }

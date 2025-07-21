@@ -80,9 +80,7 @@ public abstract class CollectBase : DriverBase, IRpcDriver
                 !a.RegisterAddress.Equals("Script", StringComparison.OrdinalIgnoreCase) &&
                 !a.RegisterAddress.Equals("ScriptRead", StringComparison.OrdinalIgnoreCase)
                 ;
-
             });
-
 
             currentDevice.VariableScriptReads = tags.Where(a => !source(a)).Select(a =>
             {
@@ -205,7 +203,6 @@ public abstract class CollectBase : DriverBase, IRpcDriver
         _addVariableTasks = true;
         tasks.AddRange(VariableTasks);
         return tasks;
-
     }
 
     protected List<IScheduledTask> AddVariableTask(CancellationToken cancellationToken)
@@ -219,7 +216,6 @@ public abstract class CollectBase : DriverBase, IRpcDriver
 
                 var executeTask = ScheduledTaskHelper.GetTask(variableSourceRead.IntervalTime, ReadVariableSource, variableSourceRead, LogMessage, cancellationToken);
                 variableTasks.Add(executeTask);
-
             }
         }
 
@@ -229,7 +225,6 @@ public abstract class CollectBase : DriverBase, IRpcDriver
 
             var executeTask = ScheduledTaskHelper.GetTask(variableMethod.IntervalTime, ReadVariableMed, variableMethod, LogMessage, cancellationToken);
             variableTasks.Add(executeTask);
-
         }
 
         for (int i = 0; i < CurrentDevice.VariableScriptReads.Count; i++)
@@ -238,7 +233,6 @@ public abstract class CollectBase : DriverBase, IRpcDriver
 
             var executeTask = ScheduledTaskHelper.GetTask(variableScriptRead.IntervalTime, ScriptVariableRun, variableScriptRead, LogMessage, cancellationToken);
             variableTasks.Add(executeTask);
-
         }
 
         return variableTasks;
@@ -265,7 +259,6 @@ public abstract class CollectBase : DriverBase, IRpcDriver
             CurrentDevice.SetDeviceStatus(TimerX.Now, true);
         }
     }
-
 
     #region private
 
@@ -382,7 +375,6 @@ public abstract class CollectBase : DriverBase, IRpcDriver
             if (LogMessage?.LogLevel <= TouchSocket.Core.LogLevel.Trace)
                 LogMessage?.Trace(string.Format("{0} - Collection [{1} - {2}] failed - {3}", DeviceName, variableSourceRead?.RegisterAddress, variableSourceRead?.Length, readResult.ErrorMessage));
 
-
             //if (LogMessage?.LogLevel <= TouchSocket.Core.LogLevel.Trace)
             //    LogMessage?.Trace(string.Format("{0} - Collecting [{1} - {2}]", DeviceName, variableSourceRead?.RegisterAddress, variableSourceRead?.Length));
             readResult = await ReadSourceAsync(variableSourceRead, allToken).ConfigureAwait(false);
@@ -426,7 +418,6 @@ public abstract class CollectBase : DriverBase, IRpcDriver
             var time = DateTime.Now;
             variableSourceRead.VariableRuntimes.ForEach(a => a.SetValue(null, time, isOnline: false));
         }
-
     }
 
     #endregion
@@ -447,7 +438,6 @@ public abstract class CollectBase : DriverBase, IRpcDriver
         if (cancellationToken.IsCancellationRequested)
             return;
         {
-
             var variableRuntime = variableScriptRead.VariableRuntime;
             if (variableRuntime.RegisterAddress.Equals(nameof(DeviceRuntime.DeviceStatus), StringComparison.OrdinalIgnoreCase))
             {
@@ -457,7 +447,6 @@ public abstract class CollectBase : DriverBase, IRpcDriver
             {
                 variableRuntime.SetValue(variableRuntime.Value, dateTime);
             }
-
         }
     }
 
@@ -469,9 +458,7 @@ public abstract class CollectBase : DriverBase, IRpcDriver
     /// <returns></returns>
     protected abstract Task<List<VariableSourceRead>> ProtectedLoadSourceReadAsync(List<VariableRuntime> deviceVariables);
 
-
     protected AsyncReadWriteLock ReadWriteLock = new();
-
 
     /// <summary>
     /// 采集驱动读取，读取成功后直接赋值变量
@@ -561,7 +548,6 @@ public abstract class CollectBase : DriverBase, IRpcDriver
 
         ConcurrentDictionary<string, OperResult<object>> operResults = new();
 
-
         using var writeLock = ReadWriteLock.WriterLock();
         var list = writeInfoLists
         .Where(a => !results.Any(b => b.Key == a.Key.Name))
@@ -603,7 +589,6 @@ public abstract class CollectBase : DriverBase, IRpcDriver
     {
         // 初始化结果字典
         Dictionary<string, OperResult> results = new Dictionary<string, OperResult>();
-
 
         // 遍历写入信息列表
         foreach (var (deviceVariable, jToken) in writeInfoLists)
@@ -696,7 +681,6 @@ public abstract class CollectBase : DriverBase, IRpcDriver
                         result.Content = contentProperty.GetValue(data);
                     }
                 }
-
 
                 // 如果方法有返回值，并且是读取操作
                 if (method.HasReturn && isRead)

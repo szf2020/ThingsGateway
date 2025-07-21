@@ -21,7 +21,6 @@ public partial class DeviceCopyComponent
     [EditorRequired]
     public Device Model { get; set; }
 
-
     [Parameter]
     [EditorRequired]
     public List<Variable> Variables { get; set; }
@@ -71,6 +70,4 @@ public partial class DeviceCopyComponent
             await ToastService.Warn(ex);
         }
     }
-
-
 }

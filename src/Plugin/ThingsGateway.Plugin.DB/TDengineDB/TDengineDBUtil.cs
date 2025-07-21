@@ -29,5 +29,4 @@ public static class TDengineDBUtil
         db.MappingSTableName<TDengineDBNumberHistoryValue>(stableName);
         return db;
     }
-
 }

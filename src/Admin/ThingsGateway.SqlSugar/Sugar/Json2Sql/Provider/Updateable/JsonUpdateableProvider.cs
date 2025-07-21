@@ -19,7 +19,7 @@ namespace ThingsGateway.SqlSugar
         {
             var result = new JsonUpdateResult();
             var sqlInfo = this.ToSqlList();
-            var sqlInfoResult = sqlInfo.First();
+            var sqlInfoResult = sqlInfo[0];
             result.UpdateRows = this.context.Ado.ExecuteCommand(sqlInfoResult.Sql, sqlInfoResult.Parameters);
             return result;
         }
@@ -48,7 +48,6 @@ namespace ThingsGateway.SqlSugar
                  if (it.Path.EqualCase(JsonProviderConfig.KeyUpdateable.Get())) return 0;
                  if (it.Path.EqualCase("Columns")) return 1;
                  else return 3;
-
              }).ToList();
             return appendTypeNames;
         }

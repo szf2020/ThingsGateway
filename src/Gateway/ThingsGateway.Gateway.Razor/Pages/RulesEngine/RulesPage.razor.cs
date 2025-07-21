@@ -43,7 +43,6 @@ public partial class RulesPage
     private string DiagramsCSS => $"{Id}DiagramsCSS";
     private string DiagramsJS => $"{Id}DiagramsJS";
 
-
     [Inject]
     ToastService ToastService { get; set; }
 
@@ -85,18 +84,13 @@ public partial class RulesPage
                 var result = await RulesService.DeleteRulesAsync(ruless.Select(a => a.Id));
                 return result;
             });
-
         }
         catch (Exception ex)
         {
-            await InvokeAsync(async () =>
-            {
-                await ToastService.Warn(ex);
-            });
+            await InvokeAsync(async () => await ToastService.Warn(ex));
             return false;
         }
     }
-
 
     private async Task<bool> Save(Rules rules, ItemChangedType itemChangedType)
     {
@@ -107,10 +101,7 @@ public partial class RulesPage
         }
         catch (Exception ex)
         {
-            await InvokeAsync(async () =>
-            {
-                await ToastService.Warn(ex);
-            });
+            await InvokeAsync(async () => await ToastService.Warn(ex));
             return false;
         }
     }
@@ -128,7 +119,6 @@ public partial class RulesPage
         {
             await Task.Run(async () =>
             {
-
                 await RulesService.ClearRulesAsync();
                 await InvokeAsync(async () =>
                 {
@@ -139,16 +129,10 @@ public partial class RulesPage
         }
         catch (Exception ex)
         {
-            await InvokeAsync(async () =>
-            {
-                await ToastService.Warn(ex);
-            });
+            await InvokeAsync(async () => await ToastService.Warn(ex));
         }
-
     }
     #endregion
-
-
 
     #region status
 
@@ -171,7 +155,6 @@ public partial class RulesPage
             await table.QueryAsync();
         await InvokeAsync(StateHasChanged);
     }
-
 
     private async Task Notify(DispatchEntry<Rules> entry)
     {

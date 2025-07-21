@@ -90,7 +90,6 @@ public class Startup : AppStartup
             if (configId.Count() > 1) throw new($"Sqlsugar connect configId: {configId.Key} Duplicate!");
         }
 
-
         //遍历配置
         DbContext.DbConfigs?.ForEach(it =>
         {
@@ -99,7 +98,6 @@ public class Startup : AppStartup
             if (it.InitDatabase == true)
                 connection.DbMaintenance.CreateDatabase();//创建数据库,如果存在则不创建
         });
-
 
         //兼容变量名称唯一键处理
         try
@@ -114,8 +112,6 @@ public class Startup : AppStartup
 
         var fullName = Assembly.GetExecutingAssembly().FullName;//获取程序集全名
         CodeFirstUtils.CodeFirst(fullName!);//CodeFirst
-
-
 
         //10.4.9 删除logenable
         try
@@ -142,7 +138,6 @@ public class Startup : AppStartup
             using var db = DbContext.GetDB<BackendLog>();
             if (db.CurrentConnectionConfig.DbType == SqlSugar.DbType.Sqlite)
             {
-
                 if (!db.DbMaintenance.IsAnyIndex("idx_backendlog_logtime_date"))
                 {
                     var indexsql = "CREATE INDEX idx_backendlog_logtime_date ON backend_log(strftime('%Y-%m-%d', LogTime));";
@@ -157,7 +152,6 @@ public class Startup : AppStartup
             using var db = DbContext.GetDB<RpcLog>();
             if (db.CurrentConnectionConfig.DbType == SqlSugar.DbType.Sqlite)
             {
-
                 if (!db.DbMaintenance.IsAnyIndex("idx_rpclog_logtime_date"))
                 {
                     var indexsql = "CREATE INDEX idx_rpclog_logtime_date ON rpc_log(strftime('%Y-%m-%d', LogTime));";
@@ -167,14 +161,8 @@ public class Startup : AppStartup
         }
         catch { }
 
-        serviceProvider.GetService<IHostApplicationLifetime>().ApplicationStarted.Register(() =>
-        {
-            serviceProvider.GetService<ILoggerFactory>().CreateLogger(nameof(ThingsGateway)).LogInformation("ThingsGateway is started...");
-        });
-        serviceProvider.GetService<IHostApplicationLifetime>().ApplicationStopping.Register(() =>
-        {
-            serviceProvider.GetService<ILoggerFactory>().CreateLogger(nameof(ThingsGateway)).LogInformation("ThingsGateway is stopping...");
-        });
+        serviceProvider.GetService<IHostApplicationLifetime>().ApplicationStarted.Register(() => serviceProvider.GetService<ILoggerFactory>().CreateLogger(nameof(ThingsGateway)).LogInformation("ThingsGateway is started..."));
+        serviceProvider.GetService<IHostApplicationLifetime>().ApplicationStopping.Register(() => serviceProvider.GetService<ILoggerFactory>().CreateLogger(nameof(ThingsGateway)).LogInformation("ThingsGateway is stopping..."));
     }
     /// <summary>
     /// 删除指定表上的索引（自动根据数据库类型生成正确的 DROP INDEX SQL）
@@ -201,9 +189,5 @@ public class Startup : AppStartup
                 break;
         }
         db.Ado.ExecuteCommand(dropIndexSql);
-
     }
 }
-
-
-

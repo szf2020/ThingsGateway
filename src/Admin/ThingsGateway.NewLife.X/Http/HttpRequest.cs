@@ -185,7 +185,6 @@ public class HttpRequest : HttpBase
 
             // 判断是否最后一个分隔符
             if (data.Slice(bd2.Length, 2).ToStr() == "--") break;
-
         } while (data.Length > 0);
 
         return dic;

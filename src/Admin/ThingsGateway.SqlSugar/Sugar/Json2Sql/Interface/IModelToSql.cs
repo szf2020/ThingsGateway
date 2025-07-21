@@ -10,5 +10,4 @@
         KeyValuePair<string, IReadOnlyList<SugarParameter>> SelectModelToSql(List<SelectModel> models);
         KeyValuePair<string, IReadOnlyList<SugarParameter>> FuncModelToSql(IFuncModel model);
     }
-
 }

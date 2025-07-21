@@ -117,7 +117,6 @@ public partial class SysUserPage
                 {
                     GrantResourceData data = new();
 
-
                     var allResource = await SysResourceService.GetAllAsync();
                     var resources = allResource.Where(a => value.Contains(a.Id));
                     var pResources = SysResourceService.GetMyParentResources(allResource, resources);
@@ -150,7 +149,6 @@ public partial class SysUserPage
                     await ToastService.Warn(ex);
                     return false;
                 }
-
             },
             Class = "dialog-table",
             BodyTemplate = BootstrapDynamicComponent.CreateComponent<GrantResourceDialog>(new Dictionary<string, object?>
@@ -193,9 +191,7 @@ public partial class SysUserPage
             {
                 [nameof(RoleChoiceDialog.Values)] = data,
                 [nameof(RoleChoiceDialog.ValuesChanged)] = (HashSet<long> v) => OnGrantRoleValueChanged(v, id),
-
             }).Render(),
-
         };
         await DialogService.Show(option);
     }
@@ -214,7 +210,6 @@ public partial class SysUserPage
             await SysUserService.GrantRoleAsync(userGrantRoleInput);
         }
     }
-
 
     private async Task ResetPassword(long id)
     {

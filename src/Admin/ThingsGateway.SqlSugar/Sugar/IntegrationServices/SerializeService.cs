@@ -54,11 +54,8 @@ namespace ThingsGateway.SqlSugar
     }
     public class MyContractResolver : Newtonsoft.Json.Serialization.DefaultContractResolver
     {
-
-
         public MyContractResolver()
         {
-
         }
 
         protected override IList<JsonProperty> CreateProperties(Type type, MemberSerialization memberSerialization)
@@ -101,5 +98,4 @@ namespace ThingsGateway.SqlSugar
             }
         }
     }
-
 }

@@ -4,7 +4,6 @@ namespace ThingsGateway.Gateway.Application;
 
 public abstract class VariableNode : TextNode
 {
-
     public VariableNode(string id, Point? position = null) : base(id, position)
     {
         Placeholder = "Variable.Placeholder";

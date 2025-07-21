@@ -12,11 +12,8 @@ using ThingsGateway.ConfigurableOptions;
 
 namespace ThingsGateway.Gateway.Application;
 
-
 public sealed class GatewayLogOptions : IConfigurableOptions
 {
-
     public int RpcLogDaysAgo { get; set; }
     public int BackendLogDaysAgo { get; set; }
-
 }

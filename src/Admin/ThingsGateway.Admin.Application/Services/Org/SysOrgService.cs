@@ -122,8 +122,6 @@ internal sealed class SysOrgService : BaseService<SysOrg>, ISysOrgService
             {
                 throw new(result.ErrorMessage, result.ErrorException);
             }
-
-
         }
     }
 
@@ -165,9 +163,7 @@ internal sealed class SysOrgService : BaseService<SysOrg>, ISysOrgService
         {
             return false;
         }
-
     }
-
 
     /// <summary>
     /// 从缓存/数据库获取系统配置列表
@@ -243,7 +239,6 @@ internal sealed class SysOrgService : BaseService<SysOrg>, ISysOrgService
         return reuslt;
     }
 
-
     /// <inheritdoc />
     public async Task<HashSet<long>> GetOrgChildIdsAsync(long orgId, bool isContainOneself = true, List<SysOrg> sysOrgList = null)
     {
@@ -272,8 +267,6 @@ internal sealed class SysOrgService : BaseService<SysOrg>, ISysOrgService
         }
         return childList;
     }
-
-
 
     /// <inheritdoc />
     public async Task<List<SysOrg>> GetTenantListAsync()
@@ -380,7 +373,6 @@ internal sealed class SysOrgService : BaseService<SysOrg>, ISysOrgService
             );
     }
 
-
     /// <summary>
     /// 获取组织所有下级
     /// </summary>
@@ -405,7 +397,6 @@ internal sealed class SysOrgService : BaseService<SysOrg>, ISysOrgService
         return new List<SysOrg>();
     }
 
-
     /// <summary>
     /// 重新生成组织实体
     /// </summary>
@@ -425,7 +416,6 @@ internal sealed class SysOrgService : BaseService<SysOrg>, ISysOrgService
     /// </summary>
     private async Task CheckInput(SysOrg input)
     {
-
         if (!(await SysUserService.GetUserByIdAsync(UserManager.UserId).ConfigureAwait(false)).IsGlobal)
         {
             if (input.ParentId == 0)
@@ -467,8 +457,6 @@ internal sealed class SysOrgService : BaseService<SysOrg>, ISysOrgService
         }
     }
 
-
-
     /// <summary>
     /// 刷新缓存
     /// </summary>
@@ -482,7 +470,6 @@ internal sealed class SysOrgService : BaseService<SysOrg>, ISysOrgService
 
         _dispatchService.Dispatch(null);
     }
-
 
     /// <summary>
     /// 获取全称
@@ -505,7 +492,6 @@ internal sealed class SysOrgService : BaseService<SysOrg>, ISysOrgService
         var parentIdList = parents.Select(it => it.Id).ToList();//赋值父Id列表
         return parentIdList;
     }
-
 
     /// <inheritdoc />
     private static List<SysOrg> GetOrgParents(List<SysOrg> allOrgList, long orgId, bool includeSelf = true)

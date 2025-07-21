@@ -45,7 +45,6 @@
                             }
                             navPropertyValue = pkValue;
                         }
-
                     }
                     if (!IsDefaultValue(navPropertyValue) && isManyPk == false && parentPkColumn.IsIdentity == false)
                     {

@@ -80,7 +80,6 @@ public static class ResourceUtil
         return trees;
     }
 
-
     /// <summary>
     /// 构建树节点，传入的列表已经是树结构
     /// </summary>
@@ -89,8 +88,6 @@ public static class ResourceUtil
         if (channelRuntimes == null) return null;
         items ??= new();
         var trees = new List<TreeViewItem<ChannelDeviceTreeItem>>();
-
-
 
         //筛选插件名称
         foreach (var pluginName in channelRuntimes.Select(a => a.PluginName).ToHashSet())
@@ -112,8 +109,6 @@ public static class ResourceUtil
             pluginItem.Items.Clear();
             foreach (var channelRuntime in channelRuntimes.Where(a => a.PluginName == pluginName))
             {
-
-
                 var channelRuntimeTreeItem = new ChannelDeviceTreeItem() { ChannelDevicePluginType = ChannelDevicePluginTypeEnum.Channel, ChannelRuntimeId = channelRuntime.Id, Id = channelRuntime.Id };
 
                 var channelTreeItemItem = channelOldItems.FirstOrDefault(a => a.Value.Equals(channelRuntimeTreeItem));
@@ -129,8 +124,6 @@ public static class ResourceUtil
                         Template = render,
                     };
                 }
-
-
 
                 var deviceOldItems = channelTreeItemItem.Items.ToList();
                 channelTreeItemItem.Items.Clear();
@@ -167,7 +160,6 @@ public static class ResourceUtil
         return trees;
     }
 
-
     /// <summary>
     /// 构建树节点，传入的列表已经是树结构
     /// </summary>
@@ -182,7 +174,6 @@ public static class ResourceUtil
         foreach (var pluginName in dict.Select(a => a.Key.PluginName).ToHashSet())
         {
             var pluginItemValue = new ChannelDeviceTreeItem() { ChannelDevicePluginType = ChannelDevicePluginTypeEnum.PluginName, PluginName = pluginName };
-
 
             var pluginItem = items.FirstOrDefault(a => a.Value.Equals(pluginItemValue));
 
@@ -201,7 +192,6 @@ public static class ResourceUtil
             foreach (var channelRuntime in dict.Where(a => a.Key.PluginName == pluginName))
             {
                 var channelRuntimeTreeItem = new ChannelDeviceTreeItem() { ChannelDevicePluginType = ChannelDevicePluginTypeEnum.Channel, ChannelRuntimeId = channelRuntime.Key.Id, Id = channelRuntime.Key.Id };
-
 
                 var channelTreeItemItem = channelOldItems.FirstOrDefault(a => a.Value.Equals(channelRuntimeTreeItem));
 
@@ -223,8 +213,6 @@ public static class ResourceUtil
                 foreach (var deviceRuntime in channelRuntime.Value.OrderBy(a => a.DeviceStatus))
                 {
                     var deviceRuntimeTreeItem = new ChannelDeviceTreeItem() { ChannelDevicePluginType = ChannelDevicePluginTypeEnum.Device, DeviceRuntimeId = deviceRuntime.Id, Id = deviceRuntime.Id };
-
-
 
                     var deviceTreeItemItem = deviceOldItems.FirstOrDefault(a => a.Value.Equals(deviceRuntimeTreeItem));
 
@@ -253,5 +241,4 @@ public static class ResourceUtil
 
         return trees;
     }
-
 }

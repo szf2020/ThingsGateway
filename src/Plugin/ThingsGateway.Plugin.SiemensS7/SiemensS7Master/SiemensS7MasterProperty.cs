@@ -11,7 +11,6 @@
 using ThingsGateway.Foundation.SiemensS7;
 using ThingsGateway.Gateway.Application;
 
-
 namespace ThingsGateway.Plugin.SiemensS7;
 
 /// <summary>
@@ -43,7 +42,5 @@ public class SiemensS7MasterProperty : CollectFoundationPackPropertyBase
     /// </summary>
     [DynamicProperty]
     public int LocalTSAP { get; set; } = 0;
-
-
 
 }

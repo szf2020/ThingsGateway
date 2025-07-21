@@ -31,9 +31,7 @@ public class AuthController : ControllerBase
     [LoginLog]
     public Task<LoginOutput> LoginAsync([FromBody] LoginInput input)
     {
-
         return _authService.LoginAsync(input);
-
     }
 
     [HttpGet("oauth-login")]
@@ -47,7 +45,6 @@ public class AuthController : ControllerBase
         };
         return Challenge(props, scheme);
     }
-
 
     [HttpPost("logout")]
     [Authorize]

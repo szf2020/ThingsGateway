@@ -16,7 +16,6 @@ namespace ThingsGateway.SqlSugar
         /// <exception cref="Exception">文件操作过程中可能抛出的异常</exception>
         public static void CreateFile(string filePath, string text, Encoding encoding)
         {
-
             if (IsExistFile(filePath))
             {
                 DeleteFile(filePath);
@@ -37,7 +36,6 @@ namespace ThingsGateway.SqlSugar
                     }
                 }
             }
-
         }
 
         /// <summary>

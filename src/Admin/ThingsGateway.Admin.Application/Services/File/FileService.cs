@@ -25,7 +25,6 @@ internal sealed class FileService : IFileService
         IStringLocalizer<FileService> localizer)
     {
         _localizer = localizer;
-
     }
     /// <summary>
     /// 获取本地存储文件流
@@ -88,5 +87,4 @@ internal sealed class FileService : IFileService
         string[] allowTypeS = allowTypes == null ? ["xlsx"] : allowTypes;//允许上传的文件类型
         if (!allowTypeS.Contains(fileSuffix)) throw Oops.Bah(_localizer["FileTypeError", fileSuffix]);
     }
-
 }

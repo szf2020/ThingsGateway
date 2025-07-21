@@ -29,8 +29,6 @@ namespace ThingsGateway.Plugin.TDengineDB;
 public partial class TDengineDBProducer : BusinessBaseWithCacheIntervalVariable, IDBHistoryValueService
 {
 
-
-
     internal readonly RealDBProducerProperty _driverPropertys = new()
     {
         DbType = DbType.TDengine,
@@ -55,8 +53,6 @@ public partial class TDengineDBProducer : BusinessBaseWithCacheIntervalVariable,
 
     protected override BusinessPropertyWithCacheInterval _businessPropertyWithCacheInterval => _driverPropertys;
 
-
-
     protected override void Dispose(bool disposing)
     {
         _db?.TryDispose();
@@ -78,7 +74,6 @@ public partial class TDengineDBProducer : BusinessBaseWithCacheIntervalVariable,
         assemblies.Add(typeof(TDengineProvider).Assembly);
         InstanceFactory.CustomAssemblies = assemblies.ToArray();
 
-
         await base.InitChannelAsync(channel, cancellationToken).ConfigureAwait(false);
     }
 
@@ -97,7 +92,6 @@ public partial class TDengineDBProducer : BusinessBaseWithCacheIntervalVariable,
     {
         _db.DbMaintenance.CreateDatabase();
 
-
         //必须为间隔上传
         if (!_driverPropertys.BigTextScriptHistoryTable.IsNullOrEmpty())
         {
@@ -105,11 +99,9 @@ public partial class TDengineDBProducer : BusinessBaseWithCacheIntervalVariable,
             {
                 await hisModel.DBInit(_db, cancellationToken).ConfigureAwait(false);
             }
-
         }
         else
         {
-
             var sql = $"""
                 CREATE STABLE IF NOT EXISTS  `{_driverPropertys.StringTableNameLow}`(
                 `createtime` TIMESTAMP   ,
@@ -120,7 +112,6 @@ public partial class TDengineDBProducer : BusinessBaseWithCacheIntervalVariable,
                 """;
             await _db.Ado.ExecuteCommandAsync(sql, default, cancellationToken: cancellationToken).ConfigureAwait(false);
 
-
             sql = $"""
                 CREATE STABLE IF NOT EXISTS  `{_driverPropertys.NumberTableNameLow}`(
                 `createtime` TIMESTAMP   ,
@@ -130,7 +121,6 @@ public partial class TDengineDBProducer : BusinessBaseWithCacheIntervalVariable,
                 `value` DOUBLE    ) TAGS(`devicename`  VARCHAR(100) ,`name`  VARCHAR(100))
                 """;
             await _db.Ado.ExecuteCommandAsync(sql, default, cancellationToken: cancellationToken).ConfigureAwait(false);
-
         }
         await base.ProtectedStartAsync(cancellationToken).ConfigureAwait(false);
     }

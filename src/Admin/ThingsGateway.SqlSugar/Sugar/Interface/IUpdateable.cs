@@ -19,7 +19,6 @@ namespace ThingsGateway.SqlSugar
         Task<bool> ExecuteCommandHasChangeAsync();
         Task<bool> ExecuteCommandHasChangeAsync(CancellationToken token);
 
-
         IUpdateable<T> AS(string tableName);
         IUpdateable<T> AsType(Type tableNameType);
         IUpdateable<T> With(string lockString);
@@ -30,8 +29,6 @@ namespace ThingsGateway.SqlSugar
         IUpdateable<T> Where(string whereSql, object parameters = null);
 
         IUpdateable<T> Where(string fieldName, string conditionalType, object fieldValue);
-
-
 
         /// <summary>
         /// Non primary key entity update function,.WhereColumns(it=>new{ it.Id })
@@ -52,7 +49,6 @@ namespace ThingsGateway.SqlSugar
         IUpdateable<T> UpdateColumns(Expression<Func<T, object>> columns, bool appendColumnsByDataFilter);
         IUpdateable<T> UpdateColumns(IReadOnlyList<string> columns);
         IUpdateable<T> UpdateColumns(IReadOnlyList<string> columns, bool appendColumnsByDataFilter);
-
 
         /// <summary>
         ///.SetColumns(it=>it.Name=="a")
@@ -75,11 +71,8 @@ namespace ThingsGateway.SqlSugar
         IUpdateable<T> UpdateColumnsIF(bool isUpdateColumns, Expression<Func<T, object>> columns);
         IUpdateable<T> UpdateColumnsIF(bool isUpdateColumns, params string[] columns);
 
-
         IUpdateable<T> SetColumnsIF(bool isUpdateColumns, Expression<Func<T, T>> columns);
         IUpdateable<T> SetColumnsIF(bool isUpdateColumns, Expression<Func<T, bool>> columns);
-
-
 
         IUpdateable<T> IgnoreColumns(bool ignoreAllNullColumns, bool isOffIdentity = false, bool ignoreAllDefaultValue = false);
         IUpdateable<T> IgnoreColumns(Expression<Func<T, object>> columns);
@@ -87,7 +80,6 @@ namespace ThingsGateway.SqlSugar
 
         IUpdateable<T> IgnoreColumns(IReadOnlyList<string> columns);
         IUpdateable<T> IgnoreNullColumns(bool isIgnoreNull = true);
-
 
         IUpdateable<T> IsEnableUpdateVersionValidation();
         IUpdateable<T> EnableDiffLogEvent(object businessData = null);

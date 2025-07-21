@@ -63,7 +63,6 @@ public partial class ChannelDeviceTree
         if (item.TryGetChannelRuntime(out var channelRuntime))
         {
             return channelRuntime.DeviceThreadManage != null ? "enable--text" : "disabled--text";
-
         }
         else if (item.TryGetDeviceRuntime(out var deviceRuntime))
         {
@@ -91,8 +90,6 @@ public partial class ChannelDeviceTree
 
     [Inject]
     WinBoxService WinBoxService { get; set; }
-
-
 
     [Inject]
     [NotNull]
@@ -133,7 +130,6 @@ public partial class ChannelDeviceTree
         });
 
         await DialogService.Show(op);
-
     }
 
     Task CopyChannel(ContextMenuItem item, object value)
@@ -143,7 +139,6 @@ public partial class ChannelDeviceTree
 
     async Task CopyChannel(string text, ChannelDeviceTreeItem channelDeviceTreeItem)
     {
-
         Channel oneModel = null;
         Dictionary<Device, List<Variable>> deviceDict = new();
 
@@ -159,7 +154,6 @@ public partial class ChannelDeviceTree
             return;
         }
 
-
         var op = new DialogOption()
         {
             IsScrolling = false,
@@ -174,7 +168,6 @@ public partial class ChannelDeviceTree
         {
              {nameof(ChannelCopyComponent.OnSave), async (List<Channel> channels,Dictionary<Device,List<Variable>> devices) =>
             {
-
                 await Task.Run(() =>GlobalData.ChannelRuntimeService.CopyAsync(channels,devices,AutoRestartThread, default));
                     //await Notify();
 
@@ -184,8 +177,6 @@ public partial class ChannelDeviceTree
         });
 
         await DialogService.Show(op);
-
-
     }
 
     Task BatchEditChannel(ContextMenuItem item, object value)
@@ -214,7 +205,6 @@ public partial class ChannelDeviceTree
             oldModel = models.FirstOrDefault();
             changedModels = models;
             oneModel = oldModel.AdaptChannel();
-
         }
         else if (channelDeviceTreeItem.TryGetPluginType(out var pluginType))
         {
@@ -225,8 +215,6 @@ public partial class ChannelDeviceTree
             oldModel = models.FirstOrDefault();
             changedModels = models;
             oneModel = oldModel.AdaptChannel();
-
-
         }
         else
         {
@@ -253,12 +241,7 @@ public partial class ChannelDeviceTree
                 await Task.Run(() => GlobalData.ChannelRuntimeService.BatchEditAsync(changedModels, oldModel, oneModel,AutoRestartThread));
 
               //await Notify();
-                await InvokeAsync(() =>
-                {
-
-                    Spinner.SetRun(false);
-                });
-
+                await InvokeAsync(() => Spinner.SetRun(false));
             } },
             {nameof(ChannelEditComponent.Model),oneModel },
             {nameof(ChannelEditComponent.ValidateEnable),true },
@@ -266,8 +249,6 @@ public partial class ChannelDeviceTree
         });
 
         await DialogService.Show(op);
-
-
     }
 
     Task ExcelChannel(ContextMenuItem item, object value)
@@ -276,7 +257,6 @@ public partial class ChannelDeviceTree
     }
     async Task ExcelChannel(string text)
     {
-
         var op = new DialogOption()
         {
             IsScrolling = false,
@@ -308,20 +288,13 @@ public partial class ChannelDeviceTree
 finally
                 {
                //await Notify();
-            await InvokeAsync( ()=>
-            {
-
-            Spinner.SetRun(false);
-                });
+            await InvokeAsync( ()=> Spinner.SetRun(false));
                 }
-
-
             }},
             {nameof(USheet.Model),uSheetDatas },
         });
 
         await DialogService.Show(op);
-
     }
 
     Task DeleteChannel(ContextMenuItem item, object value)
@@ -367,7 +340,6 @@ finally
 
                  builder.CloseElement();
              });
-
         }
 
         await DialogService.Show(op);
@@ -385,7 +357,6 @@ finally
             //插件名称
             var data = await GlobalData.GetCurrentUserChannels().ConfigureAwait(false);
             modelIds = data.Where(a => a.PluginName == pluginName);
-
         }
         else if (channelDeviceTreeItem.TryGetPluginType(out var pluginType))
         {
@@ -393,19 +364,16 @@ finally
 
             var data = await GlobalData.GetCurrentUserChannels().ConfigureAwait(false);
             modelIds = data.Where(a => a.PluginType == pluginType);
-
         }
         else
         {
             return;
-
         }
 
         try
         {
             var op = new SwalOption()
             {
-
                 Title = GatewayLocalizer["DeleteConfirmTitle"],
                 BodyTemplate = (__builder) =>
                 {
@@ -424,26 +392,17 @@ finally
             var ret = await SwalService.ShowModal(op);
             if (ret)
             {
-
                 Spinner.SetRun(true);
 
                 await Task.Run(() => GlobalData.ChannelRuntimeService.DeleteChannelAsync(modelIds.Select(a => a.Id), AutoRestartThread, default));
                 //await Notify();
-                await InvokeAsync(() =>
-                {
-                    Spinner.SetRun(false);
-                });
+                await InvokeAsync(() => Spinner.SetRun(false));
             }
-
         }
         catch (Exception ex)
         {
-            await InvokeAsync(async () =>
-            {
-                await ToastService.Warn(ex);
-            });
+            await InvokeAsync(async () => await ToastService.Warn(ex));
         }
-
     }
     async Task DeleteAllChannel()
     {
@@ -473,21 +432,13 @@ finally
                 var key = await GlobalData.GetCurrentUserChannels().ConfigureAwait(false);
                 await Task.Run(() => GlobalData.ChannelRuntimeService.DeleteChannelAsync(key.Select(a => a.Id), AutoRestartThread, default));
                 //await Notify();
-                await InvokeAsync(() =>
-                {
-                    Spinner.SetRun(false);
-                });
+                await InvokeAsync(() => Spinner.SetRun(false));
             }
-
         }
         catch (Exception ex)
         {
-            await InvokeAsync(async () =>
-            {
-                await ToastService.Warn(ex);
-            });
+            await InvokeAsync(async () => await ToastService.Warn(ex));
         }
-
     }
 
     Task ExportChannel(ContextMenuItem item, object value)
@@ -533,7 +484,6 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
 
                 builder.CloseElement();
             });
-
         }
 
         await DialogService.Show(op);
@@ -574,7 +524,6 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
             await ToastService.Default();
     }
 
-
     Task ImportChannel(ContextMenuItem item, object value)
     {
         return ImportChannel(item.Text);
@@ -599,18 +548,10 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
         Func<IBrowserFile, Task<Dictionary<string, ImportPreviewOutputBase>>> preview = (a => GlobalData.ChannelRuntimeService.PreviewAsync(a));
         Func<Dictionary<string, ImportPreviewOutputBase>, Task> import = (async value =>
         {
-            await InvokeAsync(() =>
-            {
-                Spinner.SetRun(true);
-
-            });
+            await InvokeAsync(() => Spinner.SetRun(true));
             await Task.Run(() => GlobalData.ChannelRuntimeService.ImportChannelAsync(value, AutoRestartThread));
             //await Notify();
-            await InvokeAsync(() =>
-            {
-                Spinner.SetRun(false);
-            });
-
+            await InvokeAsync(() => Spinner.SetRun(false));
         });
         op.Component = BootstrapDynamicComponent.CreateComponent<ImportExcel>(new Dictionary<string, object?>
         {
@@ -621,7 +562,6 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
 
         //await InvokeAsync(table.QueryAsync);
     }
-
 
     #endregion
 
@@ -658,7 +598,6 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
         {
              {nameof(DeviceCopyComponent.OnSave), async (Dictionary<Device,List<Variable>> devices) =>
             {
-
                 await Task.Run(() =>GlobalData.DeviceRuntimeService.CopyAsync(devices,AutoRestartThread, default));
                //await Notify();
 
@@ -668,9 +607,7 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
         });
 
         await DialogService.Show(op);
-
     }
-
 
     Task EditDevice(ContextMenuItem item, object value, ItemChangedType itemChangedType)
     {
@@ -722,12 +659,10 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
         });
 
         await DialogService.Show(op);
-
     }
 
     async Task BatchEditDevice(ContextMenuItem item, object value)
     {
-
         var op = new DialogOption()
         {
             IsScrolling = true,
@@ -768,7 +703,6 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
             oldModel = models.FirstOrDefault();
             changedModels = models;
             oneModel = oldModel.AdaptDevice();
-
         }
         else if (channelDeviceTreeItem.TryGetPluginType(out var pluginType))
         {
@@ -779,8 +713,6 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
             oldModel = models.FirstOrDefault();
             changedModels = models;
             oneModel = oldModel.AdaptDevice();
-
-
         }
         else
         {
@@ -793,17 +725,10 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
         {
              {nameof(DeviceEditComponent.OnValidSubmit), async () =>
             {
-                    await InvokeAsync( () =>
-            {
-                Spinner.SetRun(true);
-
-                });
+                    await InvokeAsync( () => Spinner.SetRun(true));
                 await Task.Run(() =>GlobalData.DeviceRuntimeService.BatchEditAsync(changedModels,oldModel,oneModel,AutoRestartThread));
                 //await Notify();
-                         await InvokeAsync(() =>
-            {
-                                Spinner.SetRun(false);
-                });
+                         await InvokeAsync(() => Spinner.SetRun(false));
             }},
             {nameof(DeviceEditComponent.Model),oneModel },
             {nameof(DeviceEditComponent.AutoRestartThread),AutoRestartThread },
@@ -812,12 +737,10 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
         });
 
         await DialogService.Show(op);
-
     }
 
     async Task ExcelDevice(ContextMenuItem item, object value)
     {
-
         var op = new DialogOption()
         {
             IsScrolling = false,
@@ -849,22 +772,14 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
 finally
                 {
                 //await Notify();
-                                 await InvokeAsync( ()=>
-            {
-
-            Spinner.SetRun(false);
-                });
+                                 await InvokeAsync( ()=> Spinner.SetRun(false));
                 }
-
-
             }},
             {nameof(USheet.Model),uSheetDatas },
         });
 
         await DialogService.Show(op);
-
     }
-
 
     Task DeleteDevice(ContextMenuItem item, object value)
     {
@@ -910,12 +825,10 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
 
                 builder.CloseElement();
             });
-
         }
 
         await DialogService.Show(op);
     }
-
 
     async Task DeleteCurrentDevice(ChannelDeviceTreeItem channelDeviceTreeItem)
     {
@@ -935,7 +848,6 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
             //插件名称
             var data = await GlobalData.GetCurrentUserDevices().ConfigureAwait(false);
             modelIds = data.Where(a => a.PluginName == pluginName);
-
         }
         else if (channelDeviceTreeItem.TryGetPluginType(out var pluginType))
         {
@@ -946,7 +858,6 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
         else
         {
             return;
-
         }
 
         try
@@ -971,26 +882,17 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
             var ret = await SwalService.ShowModal(op);
             if (ret)
             {
-
                 Spinner.SetRun(true);
 
                 await Task.Run(() => GlobalData.DeviceRuntimeService.DeleteDeviceAsync(modelIds.Select(a => a.Id), AutoRestartThread, default));
                 //await Notify();
-                await InvokeAsync(() =>
-                {
-                    Spinner.SetRun(false);
-                });
+                await InvokeAsync(() => Spinner.SetRun(false));
             }
-
         }
         catch (Exception ex)
         {
-            await InvokeAsync(async () =>
-            {
-                await ToastService.Warn(ex);
-            });
+            await InvokeAsync(async () => await ToastService.Warn(ex));
         }
-
     }
 
     async Task DeleteAllDevice()
@@ -1016,30 +918,20 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
             var ret = await SwalService.ShowModal(op);
             if (ret)
             {
-
                 Spinner.SetRun(true);
 
                 var data = await GlobalData.GetCurrentUserDevices().ConfigureAwait(false);
 
                 await Task.Run(() => GlobalData.DeviceRuntimeService.DeleteDeviceAsync(data.Select(a => a.Id), AutoRestartThread, default));
                 //await Notify();
-                await InvokeAsync(() =>
-                {
-                    Spinner.SetRun(false);
-                });
+                await InvokeAsync(() => Spinner.SetRun(false));
             }
-
         }
         catch (Exception ex)
         {
-            await InvokeAsync(async () =>
-            {
-                await ToastService.Warn(ex);
-            });
+            await InvokeAsync(async () => await ToastService.Warn(ex));
         }
-
     }
-
 
     async Task ExportDevice(ContextMenuItem item, object value)
     {
@@ -1080,12 +972,10 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
 
                 builder.CloseElement();
             });
-
         }
 
         await DialogService.Show(op);
     }
-
 
     async Task ExportCurrentDevice(ContextMenuItem item, object value)
     {
@@ -1139,29 +1029,17 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
             Title = item.Text,
             ShowFooter = false,
             ShowCloseButton = false,
-            OnCloseAsync = async () =>
-            {
-                await InvokeAsync(StateHasChanged);
-            },
+            OnCloseAsync = async () => await InvokeAsync(StateHasChanged),
         };
 
         Func<IBrowserFile, Task<Dictionary<string, ImportPreviewOutputBase>>> preview = (a => GlobalData.DeviceRuntimeService.PreviewAsync(a));
         Func<Dictionary<string, ImportPreviewOutputBase>, Task> import = (async value =>
         {
-            await InvokeAsync(() =>
-            {
-
-                Spinner.SetRun(true);
-
-            });
+            await InvokeAsync(() => Spinner.SetRun(true));
 
             await Task.Run(() => GlobalData.DeviceRuntimeService.ImportDeviceAsync(value, AutoRestartThread));
             //await Notify();
-            await InvokeAsync(() =>
-            {
-                Spinner.SetRun(false);
-            });
-
+            await InvokeAsync(() => Spinner.SetRun(false));
         });
         op.Component = BootstrapDynamicComponent.CreateComponent<ImportExcel>(new Dictionary<string, object?>
         {
@@ -1173,10 +1051,7 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
         //await InvokeAsync(table.QueryAsync);
     }
 
-
     #endregion
-
-
 
     [Inject]
     SwalService SwalService { get; set; }
@@ -1219,11 +1094,9 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
         {
             Value = item.Value;
         }
-
     }
 
     private List<TreeViewItem<ChannelDeviceTreeItem>> ZItem;
-
 
     private ChannelDeviceTreeItem CollectItem = new() { ChannelDevicePluginType = ChannelDevicePluginTypeEnum.PluginType, PluginType = PluginTypeEnum.Collect };
     private ChannelDeviceTreeItem BusinessItem = new() { ChannelDevicePluginType = ChannelDevicePluginTypeEnum.PluginType, PluginType = PluginTypeEnum.Business };
@@ -1234,8 +1107,6 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
     SmartTriggerScheduler? scheduler;
     protected override async Task OnInitializedAsync()
     {
-
-
         UnknownTreeViewItem = new TreeViewItem<ChannelDeviceTreeItem>(UnknownItem)
         {
             Text = GatewayLocalizer["Unknown"],
@@ -1265,13 +1136,11 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
             UnknownTreeViewItem.Items = item2;
             if (ZItem.Count >= 3)
             {
-
             }
             else
             {
                 ZItem.Add(UnknownTreeViewItem);
             }
-
         }
         else
         {
@@ -1296,7 +1165,6 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
                 }
                 catch
                 {
-
                 }
                 finally
                 {
@@ -1307,7 +1175,6 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
 
         await base.OnInitializedAsync();
     }
-
 
     private async Task Notify(CancellationToken cancellationToken)
     {
@@ -1321,8 +1188,6 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
             await ChannelDeviceChanged.Invoke(Value);
         }
         await InvokeAsync(StateHasChanged);
-
-
     }
 
     private static ChannelDeviceTreeItem GetValue(ChannelDeviceTreeItem channelDeviceTreeItem)
@@ -1348,8 +1213,6 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
                 };
         }
     }
-
-
 
     private Task Refresh(DispatchEntry<ChannelRuntime> entry)
     {
@@ -1380,13 +1243,11 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
                 UnknownTreeViewItem.Items = item2;
                 if (ZItem.Count >= 3)
                 {
-
                 }
                 else
                 {
                     ZItem.Add(UnknownTreeViewItem);
                 }
-
             }
             else
             {
@@ -1416,7 +1277,6 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
                     businessChannelDevices.Add(item, new());
                 else
                     otherChannelDevices.Add(item, new());
-
             }
             foreach (var item in deviceItems.Where(a => a.IsCollect == true))
             {
@@ -1460,13 +1320,11 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
                 UnknownTreeViewItem.Items = item2;
                 if (ZItem.Count >= 3)
                 {
-
                 }
                 else
                 {
                     ZItem.Add(UnknownTreeViewItem);
                 }
-
             }
             else
             {
@@ -1479,7 +1337,6 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
             Items = ZItem.AdaptListTreeViewItemChannelDeviceTreeItem();
             return Items;
         }
-
     }
 
     private static bool ModelEqualityComparer(ChannelDeviceTreeItem x, ChannelDeviceTreeItem y)
@@ -1523,5 +1380,4 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
         }
         return Task.CompletedTask;
     }
-
 }

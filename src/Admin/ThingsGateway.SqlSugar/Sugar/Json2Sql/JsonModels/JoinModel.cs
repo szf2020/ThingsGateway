@@ -1,6 +1,5 @@
 ﻿namespace ThingsGateway.SqlSugar
 {
-
     public class JoinModel
     {
         public string TableName { get; set; }

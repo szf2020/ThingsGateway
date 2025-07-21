@@ -22,7 +22,6 @@ namespace ThingsGateway.SqlSugar
             get; set;
         }
 
-
         public int Sort
         {
             get
@@ -56,7 +55,7 @@ namespace ThingsGateway.SqlSugar
                 this.Context.RefreshMapping();
             }
             var result = "COUNT(DISTINCT " + SubTools.GetMethodValue(Context, argExp, ResolveExpressType.WhereMultiple) + ")";
-            var selfParameterName = Context.GetTranslationColumnName(parameters.First().Name) + UtilConstants.Dot;
+            var selfParameterName = Context.GetTranslationColumnName(parameters[0].Name) + UtilConstants.Dot;
             if (this.Context.JoinIndex == 0)
                 result = result.Replace(selfParameterName, SubTools.GetSubReplace(this.Context));
             return result;
@@ -72,6 +71,5 @@ namespace ThingsGateway.SqlSugar
                 }
             }
         }
-
     }
 }

@@ -50,7 +50,7 @@ namespace ThingsGateway.SqlSugar
             {
                 result = (OrderIndex == 0 ? "ORDER BY " : ",") + SubTools.GetMethodValueSubJoin(this.Context, argExp, ResolveExpressType.FieldMultiple);
             }
-            var selfParameterName = this.Context.GetTranslationColumnName((argExp as LambdaExpression).Parameters.First().Name) + UtilConstants.Dot;
+            var selfParameterName = this.Context.GetTranslationColumnName((argExp as LambdaExpression).Parameters[0].Name) + UtilConstants.Dot;
             if (this.Context.JoinIndex == 0)
             {
                 result = result.Replace(selfParameterName, SubTools.GetSubReplace(this.Context));
@@ -102,7 +102,7 @@ namespace ThingsGateway.SqlSugar
             {
                 result = (OrderIndex == 0 ? "ORDER BY " : ",") + SubTools.GetMethodValueSubJoin(this.Context, argExp, ResolveExpressType.FieldMultiple) + " DESC";
             }
-            var selfParameterName = this.Context.GetTranslationColumnName((argExp as LambdaExpression).Parameters.First().Name) + UtilConstants.Dot;
+            var selfParameterName = this.Context.GetTranslationColumnName((argExp as LambdaExpression).Parameters[0].Name) + UtilConstants.Dot;
             if (this.Context.JoinIndex == 0)
             {
                 result = result.Replace(selfParameterName, string.Empty);

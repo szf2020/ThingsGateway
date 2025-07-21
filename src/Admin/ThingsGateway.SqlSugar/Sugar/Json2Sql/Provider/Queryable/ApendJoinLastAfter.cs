@@ -15,10 +15,8 @@ namespace ThingsGateway.SqlSugar
                 var isJoinTable = IsAnyJoin(appendTypeNames);
                 foreach (var config in tableConfigs)
                 {
-
                     if (isJoinTable)
                     {
-
                     }
                     else
                     {

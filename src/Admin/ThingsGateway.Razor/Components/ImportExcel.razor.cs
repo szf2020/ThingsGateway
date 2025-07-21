@@ -70,7 +70,6 @@ public partial class ImportExcel
                 await Import.Invoke(_importPreviews);
                 _importFile = null;
 
-
                 await InvokeAsync(async () =>
                 {
                     if (OnCloseAsync != null)
@@ -81,10 +80,7 @@ public partial class ImportExcel
         }
         catch (Exception ex)
         {
-            await InvokeAsync(async () =>
-            {
-                await ToastService.Warn(ex);
-            });
+            await InvokeAsync(async () => await ToastService.Warn(ex));
         }
     }
 }

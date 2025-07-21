@@ -12,7 +12,6 @@ namespace ThingsGateway.Foundation.Dlt645;
 
 public static class AppResource
 {
-
     public static string Error1 => ThingsGateway.Foundation.AppResource.Lang == Language.Chinese ? ChineseResource.Error1 : EnglishResource.Error1;
     public static string Error2 => ThingsGateway.Foundation.AppResource.Lang == Language.Chinese ? ChineseResource.Error2 : EnglishResource.Error2;
     public static string Error3 => ThingsGateway.Foundation.AppResource.Lang == Language.Chinese ? ChineseResource.Error3 : EnglishResource.Error3;
@@ -30,7 +29,6 @@ public static class AppResource
     public static string CountError => ThingsGateway.Foundation.AppResource.Lang == Language.Chinese ? ChineseResource.CountError : EnglishResource.CountError;
     public static string DataIdError => ThingsGateway.Foundation.AppResource.Lang == Language.Chinese ? ChineseResource.DataIdError : EnglishResource.DataIdError;
     public static string BaudRateError => ThingsGateway.Foundation.AppResource.Lang == Language.Chinese ? ChineseResource.BaudRateError : EnglishResource.BaudRateError;
-
 }
 
 public static class ChineseResource
@@ -57,7 +55,6 @@ public static class ChineseResource
         00010000    (当前)正向有功总电能
         """;
 
-
     public const string SumError = "和校验错误";
     public const string StationNotSame = "站号不一致";
     public const string FunctionError = "异常控制码：{0}，错误信息：{1}";
@@ -66,8 +63,6 @@ public static class ChineseResource
     public const string CountError = "写入参数数量不符合地址要求";
     public const string DataIdError = "变量寄存器地址错误";
     public const string BaudRateError = "不支持此波特率 {0}";
-
-
 
 }
 

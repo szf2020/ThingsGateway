@@ -46,5 +46,4 @@ public class FullStringAttribute : AccessorAttribute
 
         return false;
     }
-
 }

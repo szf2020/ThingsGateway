@@ -91,8 +91,5 @@ public sealed class LoginConfig
     /// <summary>
     /// 登录逻辑
     /// </summary>
-    public Func<string, string, HttpContext, Task<bool>> OnLoging { get; set; } = (username, password, httpContext) =>
-    {
-        return Task.FromResult(username == "schedule" && string.IsNullOrWhiteSpace(password));
-    };
+    public Func<string, string, HttpContext, Task<bool>> OnLoging { get; set; } = (username, password, httpContext) => Task.FromResult(username == "schedule" && string.IsNullOrWhiteSpace(password));
 }

@@ -44,6 +44,5 @@ namespace ThingsGateway.SqlSugar
 
         bool SupportReadToken { get; set; }
         Task<bool> GetReaderByToken(IDataReader dataReader, CancellationToken cancellationToken);
-
     }
 }

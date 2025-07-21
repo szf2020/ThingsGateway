@@ -14,7 +14,6 @@ namespace System.Collections.Generic;
 /// <summary>集合扩展</summary>
 public static class CollectionHelper
 {
-
     /// <summary>集合转为数组，加锁确保安全</summary>
     /// <typeparam name="T"></typeparam>
     /// <param name="collection"></param>

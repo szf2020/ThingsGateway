@@ -16,7 +16,6 @@ namespace ThingsGateway.DB;
 [ThingsGateway.DependencyInjection.SuppressSniffer]
 public static class QueryPageOptionsExtensions
 {
-
     public static IEnumerable<T> GetData<T>(this IEnumerable<T> datas, QueryPageOptions option, out int totalCount, FilterKeyValueAction where = null)
     {
         totalCount = 0;

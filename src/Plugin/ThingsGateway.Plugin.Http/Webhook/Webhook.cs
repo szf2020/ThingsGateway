@@ -22,5 +22,4 @@ public partial class Webhook : BusinessBaseWithCacheIntervalScriptAll
 
     /// <inheritdoc/>
     public override bool IsConnected() => success;
-
 }

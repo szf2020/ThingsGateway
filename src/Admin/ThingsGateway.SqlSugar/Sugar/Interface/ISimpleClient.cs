@@ -57,16 +57,12 @@ namespace ThingsGateway.SqlSugar
         List<long> InsertReturnSnowflakeId(IReadOnlyList<T> insertObjs);
         T InsertReturnEntity(T insertObj);
 
-
         bool IsAny(Expression<Func<T, bool>> whereExpression);
         bool IsAny(List<IConditionalModel> conditionalModels);
         bool Update(Expression<Func<T, T>> columns, Expression<Func<T, bool>> whereExpression);
         bool UpdateSetColumnsTrue(Expression<Func<T, T>> columns, Expression<Func<T, bool>> whereExpression);
         bool Update(T updateObj);
         bool UpdateRange(IReadOnlyList<T> updateObjs);
-
-
-
 
         Task<int> CountAsync(Expression<Func<T, bool>> whereExpression);
         Task<bool> DeleteAsync(Expression<Func<T, bool>> whereExpression);
@@ -98,9 +94,6 @@ namespace ThingsGateway.SqlSugar
         Task<bool> UpdateAsync(T updateObj);
         Task<bool> UpdateRangeAsync(IReadOnlyList<T> updateObjs);
 
-
-
-
         Task<int> CountAsync(Expression<Func<T, bool>> whereExpression, CancellationToken cancellationToken);
         Task<bool> DeleteAsync(Expression<Func<T, bool>> whereExpression, CancellationToken cancellationToken);
         Task<bool> DeleteAsync(T deleteObj, CancellationToken cancellationToken);
@@ -131,6 +124,5 @@ namespace ThingsGateway.SqlSugar
         Task<bool> UpdateAsync(Expression<Func<T, T>> columns, Expression<Func<T, bool>> whereExpression, CancellationToken cancellationToken);
         Task<bool> UpdateAsync(T updateObj, CancellationToken cancellationToken);
         Task<bool> UpdateRangeAsync(IReadOnlyList<T> updateObjs, CancellationToken cancellationToken);
-
     }
 }

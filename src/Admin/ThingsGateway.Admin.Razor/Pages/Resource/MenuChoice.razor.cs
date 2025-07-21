@@ -79,7 +79,6 @@ public partial class MenuChoice
 
                 [nameof(MenuChoiceDialog.ValueChanged)] = EventCallback.Factory.Create<long>(this, v => OnValueChanged(v))
             }).Render(),
-
         };
         await DialogService.Show(option);
     }

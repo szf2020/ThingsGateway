@@ -12,10 +12,7 @@ using ThingsGateway.ConfigurableOptions;
 
 namespace ThingsGateway.Admin.Application;
 
-
 public sealed class AdminLogOptions : IConfigurableOptions
 {
-
     public int OperateLogDaysAgo { get; set; }
-
 }

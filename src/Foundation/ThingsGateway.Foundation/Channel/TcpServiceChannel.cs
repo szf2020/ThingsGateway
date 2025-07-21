@@ -20,7 +20,6 @@ namespace ThingsGateway.Foundation;
 /// <typeparam name="TClient"></typeparam>
 public abstract class TcpServiceChannelBase<TClient> : TcpService<TClient>, ITcpService<TClient> where TClient : TcpSessionClientChannel, new()
 {
-
     /// <inheritdoc/>
     public ConcurrentList<IDevice> Collects { get; } = new();
 
@@ -28,7 +27,6 @@ public abstract class TcpServiceChannelBase<TClient> : TcpService<TClient>, ITcp
     /// 停止时是否发送ShutDown
     /// </summary>
     public bool ShutDownEnable { get; set; } = true;
-
 
     /// <inheritdoc/>
     public override async Task ClearAsync()
@@ -48,7 +46,6 @@ public abstract class TcpServiceChannelBase<TClient> : TcpService<TClient>, ITcp
             }
         }
     }
-
 
     public async Task ClientDisposeAsync(string id)
     {
@@ -103,7 +100,6 @@ public abstract class TcpServiceChannelBase<TClient> : TcpService<TClient>, ITcp
                 await _connectLock.WaitAsync(token).ConfigureAwait(false);
                 if (Monitors.Any())
                 {
-
                     await ClearAsync().ConfigureAwait(false);
                     var iPHost = Monitors.FirstOrDefault()?.Option.IpHost;
                     var result = await base.StopAsync(token).ConfigureAwait(false);
@@ -116,7 +112,6 @@ public abstract class TcpServiceChannelBase<TClient> : TcpService<TClient>, ITcp
             {
                 _connectLock.Release();
             }
-
         }
         else
         {
@@ -125,8 +120,6 @@ public abstract class TcpServiceChannelBase<TClient> : TcpService<TClient>, ITcp
         }
         return Result.Success;
     }
-
-
 
     /// <inheritdoc/>
     protected override Task OnTcpClosed(TClient socketClient, ClosedEventArgs e)
@@ -162,7 +155,6 @@ public abstract class TcpServiceChannelBase<TClient> : TcpService<TClient>, ITcp
 /// </summary>
 public class TcpServiceChannel<TClient> : TcpServiceChannelBase<TClient>, IChannel, ITcpServiceChannel where TClient : TcpSessionClientChannel, IClientChannel, IChannel, new()
 {
-
     /// <inheritdoc/>
     public TcpServiceChannel(IChannelOptions channelOptions)
     {
@@ -248,8 +240,6 @@ public class TcpServiceChannel<TClient> : TcpServiceChannelBase<TClient>, IChann
         await base.OnTcpConnecting(socketClient, e).ConfigureAwait(false);
     }
 
-
-
     /// <inheritdoc/>
     protected override async Task OnTcpReceived(TClient socketClient, ReceivedDataEventArgs e)
     {
@@ -267,9 +257,7 @@ public class TcpServiceChannel<TClient> : TcpServiceChannelBase<TClient>, IChann
             return;
 
         await socketClient.OnChannelReceivedEvent(e, ChannelReceived).ConfigureAwait(false);
-
     }
-
 
     /// <inheritdoc/>
     public ConcurrentDictionary<long, Func<IClientChannel, ReceivedDataEventArgs, bool, Task>> ChannelReceivedWaitDict { get; } = new();
@@ -281,7 +269,6 @@ public class TcpServiceChannel<TClient> : TcpServiceChannelBase<TClient>, IChann
         client.ChannelOptions = ChannelOptions;
 
         client.WaitLock = new NewLife.WaitLock(nameof(TcpServiceChannelBase<TClient>), ChannelOptions.WaitLock.MaxCount);
-
 
         base.ClientInitialized(client);
     }

@@ -44,7 +44,6 @@ public class SqlDBProducerProperty : BusinessPropertyWithCacheInterval
     [DynamicProperty]
     public string ReadDBTableName { get; set; } = "ReadDBTableName";
 
-
     [DynamicProperty]
     [Required]
     public string NumberTableName { get; set; } = "historyNumberValue";
@@ -55,7 +54,6 @@ public class SqlDBProducerProperty : BusinessPropertyWithCacheInterval
 
     public string NumberTableNameLow => NumberTableName.ToLower();
     public string StringTableNameLow => StringTableName.ToLower();
-
 
     [DynamicProperty]
     public DbType DbType { get; set; } = DbType.SqlServer;
@@ -80,5 +78,4 @@ public class SqlDBProducerProperty : BusinessPropertyWithCacheInterval
     [DynamicProperty(Remark = "必须为间隔上传，才生效")]
     [AutoGenerateColumn(Visible = true, IsVisibleWhenEdit = false, IsVisibleWhenAdd = false)]
     public string? BigTextScriptHistoryTable { get; set; }
-
 }

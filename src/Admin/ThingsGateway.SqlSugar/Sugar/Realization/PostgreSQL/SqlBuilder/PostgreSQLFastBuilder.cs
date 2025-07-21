@@ -142,7 +142,6 @@ namespace ThingsGateway.SqlSugar
             }
         }
 
-
         public override async Task<int> UpdateByTempAsync(string tableName, string tempName, string[] updateColumns, string[] whereColumns)
         {
             var sqlquerybulder = this.Context.Queryable<object>().SqlBuilder;

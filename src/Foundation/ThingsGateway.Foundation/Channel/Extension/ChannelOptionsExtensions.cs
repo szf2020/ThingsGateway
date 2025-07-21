@@ -14,7 +14,6 @@ using TouchSocket.SerialPorts;
 
 namespace ThingsGateway.Foundation;
 
-
 /// <summary>
 /// 通道扩展
 /// </summary>
@@ -175,7 +174,6 @@ public static class ChannelOptionsExtensions
             default:
                 return new TcpServiceChannel<TcpSessionClientChannel>(channelOptions);
         }
-
     }
 
     /// <summary>
@@ -200,7 +198,6 @@ public static class ChannelOptionsExtensions
             config.SetBindIPHost(bindUrl);
         else
             config.SetBindIPHost(new IPHost(0));
-
 
         switch (channelOptions.DtuSeviceType)
         {
@@ -228,6 +225,5 @@ public static class ChannelOptionsExtensions
 #endif
                 return udpSessionChannel;
         }
-
     }
 }

@@ -60,7 +60,6 @@ public abstract class DeviceBase : DisposableObject, IDevice
 
                 if (Channel is IClientChannel clientChannel)
                 {
-
                     if (clientChannel.ChannelType == ChannelTypeEnum.UdpSession)
                     {
                         channel.Config.SetUdpDataHandlingAdapter(() =>
@@ -87,8 +86,6 @@ public abstract class DeviceBase : DisposableObject, IDevice
                         return adapter;
                     });
                 }
-
-
             }
 
             channel.Collects.Add(this);
@@ -97,7 +94,6 @@ public abstract class DeviceBase : DisposableObject, IDevice
             Channel.Stoping.Add(ChannelStoping);
             Channel.Started.Add(ChannelStarted);
             Channel.ChannelReceived.Add(ChannelReceived);
-
 
             SetChannel();
         }
@@ -136,7 +132,6 @@ public abstract class DeviceBase : DisposableObject, IDevice
     /// <inheritdoc/>
     public bool OnLine => Channel.Online;
 
-
     #endregion
 
     #region 属性
@@ -146,8 +141,6 @@ public abstract class DeviceBase : DisposableObject, IDevice
 
     /// <inheritdoc/>
     public virtual int Timeout { get; set; } = 3000;
-
-
 
     /// <summary>
     /// <inheritdoc cref="IThingsGatewayBitConverter.IsStringReverseByteWord"/>
@@ -315,17 +308,14 @@ public abstract class DeviceBase : DisposableObject, IDevice
     /// </summary>
     protected virtual Task ChannelReceived(IClientChannel client, ReceivedDataEventArgs e, bool last)
     {
-
         if (e.RequestInfo is MessageBase response)
         {
             try
             {
-
                 if (client.WaitHandlePool.SetRun(response))
                 {
                     e.Handled = true;
                 }
-
             }
             catch (Exception ex)
             {
@@ -385,8 +375,6 @@ public abstract class DeviceBase : DisposableObject, IDevice
 
         if (token.IsCancellationRequested)
             throw new OperationCanceledException();
-
-
     }
 
     private WaitLock connectWaitLock = new(nameof(DeviceBase));
@@ -425,7 +413,6 @@ public abstract class DeviceBase : DisposableObject, IDevice
 
             try
             {
-
                 await BefortSendAsync(channelResult.Content, cancellationToken).ConfigureAwait(false);
 
                 await waitLock.WaitAsync(cancellationToken).ConfigureAwait(false);
@@ -445,7 +432,6 @@ public abstract class DeviceBase : DisposableObject, IDevice
         {
             return new(ex);
         }
-
     }
 
     /// <inheritdoc/>
@@ -478,7 +464,6 @@ public abstract class DeviceBase : DisposableObject, IDevice
     {
         if (Channel is IDtuUdpSessionChannel udpSessionChannel)
         {
-
             if (string.IsNullOrWhiteSpace(socketId))
                 return udpSessionChannel.DefaultEndpoint;
 
@@ -496,12 +481,10 @@ public abstract class DeviceBase : DisposableObject, IDevice
                     throw new Exception(string.Format(AppResource.DtuNoConnectedWaining, socketId));
                 }
             }
-
         }
 
         return null;
     }
-
 
     /// <inheritdoc/>
     public virtual ValueTask<OperResult<byte[]>> SendThenReturnAsync(ISendMessage sendMessage, CancellationToken cancellationToken = default)
@@ -544,20 +527,17 @@ public abstract class DeviceBase : DisposableObject, IDevice
     /// </summary>
     protected async ValueTask<MessageBase> GetResponsedDataAsync(ISendMessage command, IClientChannel clientChannel, int timeout = 3000, CancellationToken cancellationToken = default)
     {
-
         var waitData = clientChannel.WaitHandlePool.GetWaitDataAsync(out var sign);
         command.Sign = sign;
         WaitLock? waitLock = null;
         try
         {
-
             var dtuId = this is IDtu dtu1 ? dtu1.DtuId : null;
             waitLock = GetWaitLock(clientChannel, dtuId);
 
             await BefortSendAsync(clientChannel, cancellationToken).ConfigureAwait(false);
 
             await waitLock.WaitAsync(cancellationToken).ConfigureAwait(false);
-
 
             EndPoint? endPoint = GetUdpEndpoint(dtuId);
 
@@ -566,7 +546,6 @@ public abstract class DeviceBase : DisposableObject, IDevice
 
             if (clientChannel.ReadOnlyDataHandlingAdapter != null)
                 clientChannel.ReadOnlyDataHandlingAdapter.Logger = Logger;
-
 
             Channel.ChannelReceivedWaitDict.TryAdd(sign, ChannelReceived);
 
@@ -597,7 +576,6 @@ public abstract class DeviceBase : DisposableObject, IDevice
                 }
                 return new MessageBase(result);
             }
-
         }
         catch (Exception ex)
         {
@@ -974,7 +952,6 @@ public abstract class DeviceBase : DisposableObject, IDevice
         {
             lock (Channel)
             {
-
                 Channel.Starting.Remove(ChannelStarting);
                 Channel.Stoped.Remove(ChannelStoped);
                 Channel.Started.Remove(ChannelStarted);
@@ -985,10 +962,7 @@ public abstract class DeviceBase : DisposableObject, IDevice
                 {
                     if (Channel is ITcpServiceChannel tcpServiceChannel)
                     {
-                        tcpServiceChannel.Clients.ForEach(a =>
-                        {
-                            a.WaitHandlePool.SafeDispose();
-                        });
+                        tcpServiceChannel.Clients.ForEach(a => a.WaitHandlePool.SafeDispose());
                     }
 
                     try
@@ -1014,12 +988,10 @@ public abstract class DeviceBase : DisposableObject, IDevice
                             client.WaitHandlePool?.SafeDispose();
                             _ = client.CloseAsync();
                         }
-
                     }
                 }
 
                 Channel.Collects.Remove(this);
-
             }
         }
 
@@ -1044,5 +1016,4 @@ public abstract class DeviceBase : DisposableObject, IDevice
         return a => { };
     }
     public abstract ValueTask<OperResult<byte[]>> ReadAsync(object state, CancellationToken cancellationToken = default);
-
 }

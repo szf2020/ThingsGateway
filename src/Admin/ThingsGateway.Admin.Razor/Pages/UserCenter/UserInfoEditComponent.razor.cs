@@ -31,7 +31,6 @@ public partial class UserInfoEditComponent
     [FileValidation(Extensions = [".png", ".jpg", ".jpeg"], FileSize = 200 * 1024)]
     public IBrowserFile? Picture { get; set; }
 
-
     private CancellationTokenSource? ReadAvatarToken { get; set; }
 
     public void Dispose()

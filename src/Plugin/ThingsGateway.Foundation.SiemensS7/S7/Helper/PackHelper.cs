@@ -55,7 +55,6 @@ internal static class PackHelper
                     s7BitConverter.WStringEnable = s7Address.WStringEnable;
                 }
 
-
                 int lastLen = it.DataType.GetByteLength();
 
                 // 处理特殊情况下的长度
@@ -200,7 +199,7 @@ internal static class PackHelper
             return address + it.Length; // 返回排序后的地址加上长度
         }).ToList();
 
-        var minAddress = addresses.First().AddressStart; // 获取最小地址
+        var minAddress = addresses[0].AddressStart; // 获取最小地址
         var maxAddress = addresses.Last().AddressStart; // 获取最大地址
 
         while (maxAddress >= minAddress) // 循环，直到最大地址小于最小地址
@@ -214,7 +213,7 @@ internal static class PackHelper
                 // 如果是计数器或计时器
                 tempAddresses = addresses.Where(t => t.AddressStart >= minAddress && ((t.AddressStart) + t.Length) <= ((minAddress) + readLength / 2)).ToList();
 
-                while ((tempAddresses.Last().AddressStart * 2) + tempAddresses.Last().Length - (tempAddresses.First().AddressStart * 2) > readLength)
+                while ((tempAddresses.Last().AddressStart * 2) + tempAddresses.Last().Length - (tempAddresses[0].AddressStart * 2) > readLength)
                 {
                     tempAddresses.Remove(tempAddresses.Last()); // 移除超出限制的地址
                 }
@@ -223,7 +222,7 @@ internal static class PackHelper
             {
                 tempAddresses = addresses.Where(t => t.AddressStart >= minAddress && ((t.AddressStart) + t.Length) <= ((minAddress) + readLength * 8)).ToList();
 
-                while ((tempAddresses.Last().AddressStart / 8) + tempAddresses.Last().Length - (tempAddresses.First().AddressStart / 8) > readLength)
+                while ((tempAddresses.Last().AddressStart / 8) + tempAddresses.Last().Length - (tempAddresses[0].AddressStart / 8) > readLength)
                 {
                     tempAddresses.Remove(tempAddresses.Last());
                 }
@@ -236,12 +235,12 @@ internal static class PackHelper
             if (functionCode == (byte)S7WordLength.Counter || functionCode == (byte)S7WordLength.Timer)
             {
                 lastAddress = tempAddresses.Last().AddressStart * 2;
-                firstAddress = tempAddresses.First().AddressStart * 2;
+                firstAddress = tempAddresses[0].AddressStart * 2;
             }
             else
             {
                 lastAddress = tempAddresses.Last().AddressStart / 8;
-                firstAddress = tempAddresses.First().AddressStart / 8;
+                firstAddress = tempAddresses[0].AddressStart / 8;
             }
 
             var sourceLen = lastAddress + tempAddresses.Last().Length - firstAddress; // 计算源长度
@@ -263,12 +262,12 @@ internal static class PackHelper
                     if (readNode.DataType == DataTypeEnum.Boolean)
                     {
                         // 计算索引（针对计数器和计时器的布尔型变量）
-                        readNode.Index = (((item.AddressStart * 2) - (tempAddresses.First().AddressStart * 2)) * 8) + readNode.Index;
+                        readNode.Index = (((item.AddressStart * 2) - (tempAddresses[0].AddressStart * 2)) * 8) + readNode.Index;
                     }
                     else
                     {
                         // 计算索引（针对计数器和计时器的非布尔型变量）
-                        readNode.Index = (item.AddressStart * 2) - (tempAddresses.First().AddressStart * 2) + readNode.Index;
+                        readNode.Index = (item.AddressStart * 2) - (tempAddresses[0].AddressStart * 2) + readNode.Index;
                     }
                 }
                 else
@@ -276,12 +275,12 @@ internal static class PackHelper
                     if (readNode.DataType == DataTypeEnum.Boolean)
                     {
                         // 计算索引（针对非计数器和计时器的布尔型变量）
-                        readNode.Index = (((item.AddressStart / 8) - (tempAddresses.First().AddressStart / 8)) * 8) + readNode.Index;
+                        readNode.Index = (((item.AddressStart / 8) - (tempAddresses[0].AddressStart / 8)) * 8) + readNode.Index;
                     }
                     else
                     {
                         // 计算索引（针对非计数器和计时器的非布尔型变量）
-                        readNode.Index = (item.AddressStart / 8) - (tempAddresses.First().AddressStart / 8) + readNode.Index;
+                        readNode.Index = (item.AddressStart / 8) - (tempAddresses[0].AddressStart / 8) + readNode.Index;
                     }
                 }
 
@@ -293,7 +292,7 @@ internal static class PackHelper
 
             if (addresses.Count > 0)
             {
-                minAddress = addresses.First().AddressStart; // 更新最小地址
+                minAddress = addresses[0].AddressStart; // 更新最小地址
             }
             else
             {

@@ -12,7 +12,6 @@ using ThingsGateway.ConfigurableOptions;
 
 namespace ThingsGateway.Admin.Application;
 
-
 /// <summary>
 /// 邮件配置选项
 /// </summary>

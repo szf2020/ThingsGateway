@@ -2,7 +2,6 @@
 {
     public partial class JsonUpdateableProvider : IJsonUpdateableProvider<JsonUpdateResult>
     {
-
         private static bool IsColumns(string name)
         {
             return name.Equals("Columns", StringComparison.CurrentCultureIgnoreCase);

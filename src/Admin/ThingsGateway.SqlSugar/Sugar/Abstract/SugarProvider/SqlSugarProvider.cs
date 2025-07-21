@@ -13,7 +13,6 @@ namespace ThingsGateway.SqlSugar
     /// </summary>
     public partial class SqlSugarProvider : ISqlSugarClient
     {
-
         #region Constructor
         public SqlSugarProvider(ConnectionConfig config)
         {
@@ -121,7 +120,6 @@ namespace ThingsGateway.SqlSugar
         /// </summary>
         public virtual ISugarQueryable<T> Queryable<T>()
         {
-
             InitMappingInfo<T>();
             var result = this.CreateQueryable<T>();
             UtilMethods.AddDiscrimator(typeof(T), result);
@@ -496,7 +494,6 @@ namespace ThingsGateway.SqlSugar
             return queryable;
         }
 
-
         public virtual ISugarQueryable<T, T2, T3> Queryable<T, T2, T3>(
                 ISugarQueryable<T> joinQueryable1, ISugarQueryable<T2> joinQueryable2, ISugarQueryable<T3> joinQueryable3,
                 JoinType joinType1, Expression<Func<T, T2, T3, bool>> joinExpression1,
@@ -538,7 +535,6 @@ namespace ThingsGateway.SqlSugar
             queryable.QueryBuilder.Parameters.AddRange(sqlObj2.Value);
             var exp = queryable.QueryBuilder.GetExpressionValue(joinExpression1, ResolveExpressType.WhereMultiple);
             queryable.QueryBuilder.JoinQueryInfos.Add(new JoinQueryInfo() { JoinIndex = 0, JoinType = joinType1, JoinWhere = exp.GetResultString(), TableName = sqlBuilder.GetPackTable(sql2, shortName2) });
-
 
             //join table 2
             var shortName3 = joinExpression1.Parameters[2].Name;
@@ -594,7 +590,6 @@ namespace ThingsGateway.SqlSugar
             var exp = queryable.QueryBuilder.GetExpressionValue(joinExpression1, ResolveExpressType.WhereMultiple);
             queryable.QueryBuilder.JoinQueryInfos.Add(new JoinQueryInfo() { JoinIndex = 0, JoinType = joinType1, JoinWhere = exp.GetResultString(), TableName = sqlBuilder.GetPackTable(sql2, shortName2) });
 
-
             //join table 2
             var shortName3 = joinExpression1.Parameters[2].Name;
             var sqlObj3 = joinQueryable3.ToSql();
@@ -616,8 +611,6 @@ namespace ThingsGateway.SqlSugar
             return queryable;
         }
         #endregion
-
-
 
         internal ISugarQueryable<T> _UnionAll<T>(IReadOnlyList<ISugarQueryable<T>> queryables)
         {
@@ -669,7 +662,6 @@ namespace ThingsGateway.SqlSugar
 
         public virtual ISugarQueryable<T> Union<T>(IReadOnlyList<ISugarQueryable<T>> queryables) where T : class
         {
-
             var sqlBuilder = InstanceFactory.GetSqlbuilder(this.Context.CurrentConnectionConfig);
             Check.Exception(queryables.IsNullOrEmpty(), "UnionAll.queryables is null ");
             int i = 1;
@@ -983,7 +975,6 @@ namespace ThingsGateway.SqlSugar
         }
         public virtual IUpdateable<T> UpdateableT<T>(T UpdateObj) where T : class, new()
         {
-
             return this.Context.Updateable(new T[] { UpdateObj });
         }
         public virtual IUpdateable<T> Updateable<T>() where T : class, new()
@@ -1065,7 +1056,7 @@ namespace ThingsGateway.SqlSugar
         {
             return new SaveableProvider<T>(this, saveObject);
         }
-        public StorageableDataTable Storageable(List<Dictionary<string, object>> dictionaryList, string tableName)
+        public StorageableDataTable Storageable(IEnumerable<Dictionary<string, object>> dictionaryList, string tableName)
         {
             DataTable dt = this.Context.Utilities.DictionaryListToDataTable(dictionaryList);
             dt.TableName = tableName;
@@ -1077,9 +1068,9 @@ namespace ThingsGateway.SqlSugar
             dt.TableName = tableName;
             return this.Context.Storageable(dt);
         }
-        public IStorageable<T> Storageable<T>(IReadOnlyList<T> dataList) where T : class, new()
+        public IStorageable<T> Storageable<T>(IEnumerable<T> dataList) where T : class, new()
         {
-            dataList = dataList.Where(it => it != null).ToList();
+            dataList = dataList.Where(it => it != null);
             this.InitMappingInfo<T>();
             var sqlBuilder = InstanceFactory.GetSqlbuilder(this.Context.CurrentConnectionConfig);
             var result = new Storageable<T>(dataList, this);
@@ -1122,7 +1113,7 @@ namespace ThingsGateway.SqlSugar
                 var methods = this.Context.GetType().GetMethods()
                .Where(it => it.Name == "Storageable")
                .Where(it => it.GetGenericArguments().Length != 0)
-               .Where(it => it.GetParameters().Any(z => z.ParameterType.Name.StartsWith("IReadOnlyList")))
+               .Where(it => it.GetParameters().Any(z => z.ParameterType.Name.StartsWith("IEnumerable")))
                .Where(it => it.Name == "Storageable");
                 var method = methods.Single().MakeGenericMethod(newList.GetType().GetGenericArguments().First());
                 StorageableMethodInfo result = new StorageableMethodInfo()
@@ -1406,68 +1397,68 @@ namespace ThingsGateway.SqlSugar
         #region   Queue
         public int SaveQueues(bool isTran = true)
         {
-            return SaveQueuesProvider(isTran, (sql, parameters) => { return this.Ado.ExecuteCommand(sql, parameters); });
+            return SaveQueuesProvider(isTran, (sql, parameters) => this.Ado.ExecuteCommand(sql, parameters));
         }
 
         public async Task<int> SaveQueuesAsync(bool isTran = true)
         {
-            return await SaveQueuesProviderAsync(isTran, (sql, parameters) => { return Ado.ExecuteCommandAsync(sql, parameters); }).ConfigureAwait(false);
+            return await SaveQueuesProviderAsync(isTran, (sql, parameters) => Ado.ExecuteCommandAsync(sql, parameters)).ConfigureAwait(false);
         }
         public List<T> SaveQueues<T>(bool isTran = true)
         {
-            return SaveQueuesProvider(isTran, (sql, parameters) => { return this.Ado.SqlQuery<T>(sql, parameters); });
+            return SaveQueuesProvider(isTran, (sql, parameters) => this.Ado.SqlQuery<T>(sql, parameters));
         }
         public async Task<List<T>> SaveQueuesAsync<T>(bool isTran = true)
         {
-            return await SaveQueuesProviderAsync(isTran, (sql, parameters) => { return Ado.SqlQueryAsync<T>(sql, parameters); }).ConfigureAwait(false);
+            return await SaveQueuesProviderAsync(isTran, (sql, parameters) => Ado.SqlQueryAsync<T>(sql, parameters)).ConfigureAwait(false);
         }
         public Tuple<List<T>, List<T2>> SaveQueues<T, T2>(bool isTran = true)
         {
-            return SaveQueuesProvider(isTran, (sql, parameters) => { return this.Ado.SqlQuery<T, T2>(sql, parameters); });
+            return SaveQueuesProvider(isTran, (sql, parameters) => this.Ado.SqlQuery<T, T2>(sql, parameters));
         }
         public async Task<Tuple<List<T>, List<T2>>> SaveQueuesAsync<T, T2>(bool isTran = true)
         {
-            return await SaveQueuesProviderAsync(isTran, (sql, parameters) => { return Ado.SqlQueryAsync<T, T2>(sql, parameters); }).ConfigureAwait(false);
+            return await SaveQueuesProviderAsync(isTran, (sql, parameters) => Ado.SqlQueryAsync<T, T2>(sql, parameters)).ConfigureAwait(false);
         }
         public Tuple<List<T>, List<T2>, List<T3>> SaveQueues<T, T2, T3>(bool isTran = true)
         {
-            return SaveQueuesProvider(isTran, (sql, parameters) => { return this.Ado.SqlQuery<T, T2, T3>(sql, parameters); });
+            return SaveQueuesProvider(isTran, (sql, parameters) => this.Ado.SqlQuery<T, T2, T3>(sql, parameters));
         }
         public async Task<Tuple<List<T>, List<T2>, List<T3>>> SaveQueuesAsync<T, T2, T3>(bool isTran = true)
         {
-            return await SaveQueuesProviderAsync(isTran, (sql, parameters) => { return Ado.SqlQueryAsync<T, T2, T3>(sql, parameters); }).ConfigureAwait(false);
+            return await SaveQueuesProviderAsync(isTran, (sql, parameters) => Ado.SqlQueryAsync<T, T2, T3>(sql, parameters)).ConfigureAwait(false);
         }
         public Tuple<List<T>, List<T2>, List<T3>, List<T4>> SaveQueues<T, T2, T3, T4>(bool isTran = true)
         {
-            return SaveQueuesProvider(isTran, (sql, parameters) => { return this.Ado.SqlQuery<T, T2, T3, T4>(sql, parameters); });
+            return SaveQueuesProvider(isTran, (sql, parameters) => this.Ado.SqlQuery<T, T2, T3, T4>(sql, parameters));
         }
         public async Task<Tuple<List<T>, List<T2>, List<T3>, List<T4>>> SaveQueuesAsync<T, T2, T3, T4>(bool isTran = true)
         {
-            return await SaveQueuesProviderAsync(isTran, (sql, parameters) => { return Ado.SqlQueryAsync<T, T2, T3, T4>(sql, parameters); }).ConfigureAwait(false);
+            return await SaveQueuesProviderAsync(isTran, (sql, parameters) => Ado.SqlQueryAsync<T, T2, T3, T4>(sql, parameters)).ConfigureAwait(false);
         }
         public Tuple<List<T>, List<T2>, List<T3>, List<T4>, List<T5>> SaveQueues<T, T2, T3, T4, T5>(bool isTran = true)
         {
-            return SaveQueuesProvider(isTran, (sql, parameters) => { return this.Ado.SqlQuery<T, T2, T3, T4, T5>(sql, parameters); });
+            return SaveQueuesProvider(isTran, (sql, parameters) => this.Ado.SqlQuery<T, T2, T3, T4, T5>(sql, parameters));
         }
         public async Task<Tuple<List<T>, List<T2>, List<T3>, List<T4>, List<T5>>> SaveQueuesAsync<T, T2, T3, T4, T5>(bool isTran = true)
         {
-            return await SaveQueuesProviderAsync(isTran, (sql, parameters) => { return Ado.SqlQueryAsync<T, T2, T3, T4, T5>(sql, parameters); }).ConfigureAwait(false);
+            return await SaveQueuesProviderAsync(isTran, (sql, parameters) => Ado.SqlQueryAsync<T, T2, T3, T4, T5>(sql, parameters)).ConfigureAwait(false);
         }
         public Tuple<List<T>, List<T2>, List<T3>, List<T4>, List<T5>, List<T6>> SaveQueues<T, T2, T3, T4, T5, T6>(bool isTran = true)
         {
-            return SaveQueuesProvider(isTran, (sql, parameters) => { return this.Ado.SqlQuery<T, T2, T3, T4, T5, T6>(sql, parameters); });
+            return SaveQueuesProvider(isTran, (sql, parameters) => this.Ado.SqlQuery<T, T2, T3, T4, T5, T6>(sql, parameters));
         }
         public async Task<Tuple<List<T>, List<T2>, List<T3>, List<T4>, List<T5>, List<T6>>> SaveQueuesAsync<T, T2, T3, T4, T5, T6>(bool isTran = true)
         {
-            return await SaveQueuesProviderAsync(isTran, (sql, parameters) => { return Ado.SqlQueryAsync<T, T2, T3, T4, T5, T6>(sql, parameters); }).ConfigureAwait(false);
+            return await SaveQueuesProviderAsync(isTran, (sql, parameters) => Ado.SqlQueryAsync<T, T2, T3, T4, T5, T6>(sql, parameters)).ConfigureAwait(false);
         }
         public Tuple<List<T>, List<T2>, List<T3>, List<T4>, List<T5>, List<T6>, List<T7>> SaveQueues<T, T2, T3, T4, T5, T6, T7>(bool isTran = true)
         {
-            return SaveQueuesProvider(isTran, (sql, parameters) => { return this.Ado.SqlQuery<T, T2, T3, T4, T5, T6, T7>(sql, parameters); });
+            return SaveQueuesProvider(isTran, (sql, parameters) => this.Ado.SqlQuery<T, T2, T3, T4, T5, T6, T7>(sql, parameters));
         }
         public async Task<Tuple<List<T>, List<T2>, List<T3>, List<T4>, List<T5>, List<T6>, List<T7>>> SaveQueuesAsync<T, T2, T3, T4, T5, T6, T7>(bool isTran = true)
         {
-            return await SaveQueuesProviderAsync(isTran, (sql, parameters) => { return Ado.SqlQueryAsync<T, T2, T3, T4, T5, T6, T7>(sql, parameters); }).ConfigureAwait(false);
+            return await SaveQueuesProviderAsync(isTran, (sql, parameters) => Ado.SqlQueryAsync<T, T2, T3, T4, T5, T6, T7>(sql, parameters)).ConfigureAwait(false);
         }
         public void AddQueue(string sql, object parsmeters = null)
         {
@@ -1487,7 +1478,6 @@ namespace ThingsGateway.SqlSugar
                 }
             }
             this.Queues.Add(sql, pars);
-
         }
         public void AddQueue(string sql, SugarParameter parsmeter)
         {
@@ -1506,8 +1496,6 @@ namespace ThingsGateway.SqlSugar
             this.Queues.Add(sql, parsmeters);
         }
         public QueueList Queues { get { if (_Queues == null) { _Queues = new QueueList(); } return _Queues; } set { _Queues = value; } }
-
-
 
         private async Task<T> SaveQueuesProviderAsync<T>(bool isTran, Func<string, List<SugarParameter>, Task<T>> func)
         {
@@ -1815,18 +1803,12 @@ namespace ThingsGateway.SqlSugar
         }
         public void ThenMapper<T>(IEnumerable<T> list, Action<T> action)
         {
-            this.Context.Utilities.PageEach(list, 200, pageList =>
-            {
-                _ThenMapper(pageList, action);
-            });
+            this.Context.Utilities.PageEach(list, 200, pageList => _ThenMapper(pageList, action));
         }
 
         public async Task ThenMapperAsync<T>(IEnumerable<T> list, Func<T, Task> action)
         {
-            await Context.Utilities.PageEachAsync(list, 200, async pageList =>
-            {
-                await _ThenMapperAsync(pageList, action).ConfigureAwait(false);
-            }).ConfigureAwait(false);
+            await Context.Utilities.PageEachAsync(list, 200, async pageList => await _ThenMapperAsync(pageList, action).ConfigureAwait(false)).ConfigureAwait(false);
         }
         #endregion
     }

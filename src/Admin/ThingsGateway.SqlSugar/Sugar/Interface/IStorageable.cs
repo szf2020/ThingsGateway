@@ -160,7 +160,6 @@ namespace ThingsGateway.SqlSugar
         }
         public int BulkUpdate(params string[] UpdateColumns)
         {
-
             Check.Exception(UpdateColumns == null, "UpdateColumns is null");
             if (_WhereColumnList != null && _WhereColumnList.Count != 0)
             {

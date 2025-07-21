@@ -7,7 +7,6 @@ namespace ThingsGateway.SqlSugar
     /// </summary>
     public partial class JsonQueryableProvider : IJsonQueryableProvider<JsonQueryResult>
     {
-
         public JsonQueryableProvider(ISqlSugarClient context, JObject jobject)
         {
             this.jobject = jobject;

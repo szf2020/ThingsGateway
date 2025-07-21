@@ -26,7 +26,6 @@ namespace TDengineAdo
             set => throw new NotSupportedException();
         }
 
-
         public override string Database => connectionStringBuilder.Database;
 
         public override string DataSource => connectionStringBuilder.Host;
@@ -76,8 +75,6 @@ namespace TDengineAdo
             connection?.Dispose();
         }
 
-
         public override void ChangeDatabase(string databaseName) => connectionStringBuilder.Database = databaseName;
-
     }
 }

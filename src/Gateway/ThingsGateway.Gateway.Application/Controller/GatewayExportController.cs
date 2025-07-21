@@ -51,7 +51,6 @@ public class GatewayExportController : ControllerBase
         input.QueryPageOptions.IsVirtualScroll = false;
         var sheets = await _deviceService.ExportDeviceAsync(input).ConfigureAwait(false);
         return await _importExportService.ExportAsync<Device>(sheets, "Device", false).ConfigureAwait(false);
-
     }
 
     /// <summary>
@@ -67,7 +66,6 @@ public class GatewayExportController : ControllerBase
         var sheets = await _channelService.ExportChannelAsync(input).ConfigureAwait(false);
         return await _importExportService.ExportAsync<Channel>(sheets, "Channel", false).ConfigureAwait(false);
     }
-
 
     /// <summary>
     /// 下载变量

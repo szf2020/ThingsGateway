@@ -64,7 +64,6 @@ public static class GlobalData
     /// </summary>
     public static event VariableAlarmEventHandler? AlarmChangedEvent;
 
-
     public static async Task<IEnumerable<ChannelRuntime>> GetCurrentUserChannels()
     {
         var dataScope = await GlobalData.SysUserService.GetCurrentUserDataScopeAsync().ConfigureAwait(false);
@@ -90,7 +89,6 @@ public static class GlobalData
         return RealAlarmIdVariables.WhereIf(dataScope != null && dataScope?.Count > 0, u => dataScope.Contains(u.Value.CreateOrgId))//在指定机构列表查询
           .WhereIf(dataScope?.Count == 0, u => u.Value.CreateUserId == UserManager.UserId).Select(a => a.Value);
     }
-
 
     public static async Task<IEnumerable<VariableRuntime>> GetCurrentUserAlarmEnableVariables()
     {
@@ -118,7 +116,6 @@ public static class GlobalData
         }
 
         return a.VariablePropertys?.ContainsKey(businessDeviceId) == true;
-
     }
 
     /// <summary>
@@ -166,12 +163,10 @@ public static class GlobalData
         return false;
     }
 
-
     public static IEnumerable<VariableRuntime> GetEnableVariables()
     {
         return IdDevices.SelectMany(a => a.Value.VariableRuntimes).Where(a => a.Value?.Enable == true).Select(a => a.Value);
     }
-
 
     public static bool TryGetDeviceThreadManage(DeviceRuntime deviceRuntime, out IDeviceThreadManage deviceThreadManage)
     {
@@ -204,7 +199,6 @@ public static class GlobalData
     }
 
     #region 单例服务
-
 
     private static IDispatchService<ChannelRuntime> channelRuntimeDispatchService;
     public static IDispatchService<ChannelRuntime> ChannelDeviceRuntimeDispatchService
@@ -242,7 +236,6 @@ public static class GlobalData
         }
     }
 
-
     private static IVariableRuntimeService variableRuntimeService;
     public static IVariableRuntimeService VariableRuntimeService
     {
@@ -255,7 +248,6 @@ public static class GlobalData
             return variableRuntimeService;
         }
     }
-
 
     private static IDeviceRuntimeService deviceRuntimeService;
     public static IDeviceRuntimeService DeviceRuntimeService
@@ -294,7 +286,6 @@ public static class GlobalData
             return channelThreadManage;
         }
     }
-
 
     private static IGatewayMonitorHostedService gatewayMonitorHostedService;
     public static IGatewayMonitorHostedService GatewayMonitorHostedService
@@ -346,7 +337,6 @@ public static class GlobalData
         }
     }
 
-
     private static IPluginService? pluginService;
     public static IPluginService PluginService
     {
@@ -356,7 +346,6 @@ public static class GlobalData
             return pluginService;
         }
     }
-
 
     private static IChannelService? channelService;
     internal static IChannelService ChannelService
@@ -368,7 +357,6 @@ public static class GlobalData
         }
     }
 
-
     private static IDeviceService? deviceService;
     internal static IDeviceService DeviceService
     {
@@ -378,7 +366,6 @@ public static class GlobalData
             return deviceService;
         }
     }
-
 
     private static IVariableService? variableService;
     internal static IVariableService VariableService
@@ -429,8 +416,6 @@ public static class GlobalData
     /// </summary>
     internal static ConcurrentDictionary<string, ChannelRuntime> Channels { get; } = new();
 
-
-
     /// <summary>
     /// 只读的设备字典，提供对设备的只读访问
     /// </summary>
@@ -441,7 +426,6 @@ public static class GlobalData
     /// </summary>
     public static IReadOnlyDictionary<string, DeviceRuntime> ReadOnlyDevices => Devices;
 
-
     /// <summary>
     /// 内部使用的设备字典，用于存储设备对象
     /// </summary>
@@ -450,7 +434,6 @@ public static class GlobalData
     /// 内部使用的设备字典，用于存储设备对象
     /// </summary>
     internal static ConcurrentDictionary<long, DeviceRuntime> IdDevices { get; } = new();
-
 
     /// <summary>
     /// 内部使用的报警配置变量字典
@@ -477,8 +460,6 @@ public static class GlobalData
     /// </summary>
     public static IReadOnlyDictionary<long, VariableRuntime> ReadOnlyIdVariables => IdVariables;
 
-
-
     #region 变化事件
     /// <summary>
     /// 报警状态变化处理方法，用于处理报警状态变化时的逻辑
@@ -486,11 +467,8 @@ public static class GlobalData
     /// <param name="alarmVariable">报警变量</param>
     internal static void AlarmChange(AlarmVariable alarmVariable)
     {
-
-
         // 触发设备状态变化事件，并将设备运行时对象转换为设备数据对象进行传递
         AlarmChangedEvent?.Invoke(alarmVariable);
-
     }
 
     /// <summary>
@@ -501,11 +479,8 @@ public static class GlobalData
     {
         deviceRuntime.Driver?.LogMessage?.LogInformation($"Status changed: {deviceRuntime.DeviceStatus}");
 
-
-
         // 触发设备状态变化事件，并将设备运行时对象转换为设备数据对象进行传递
         DeviceStatusChangeEvent?.Invoke(deviceRuntime, deviceRuntime.AdaptDeviceBasicData());
-
     }
 
     /// <summary>
@@ -514,11 +489,8 @@ public static class GlobalData
     /// <param name="variableRuntime">变量运行时对象</param>
     internal static void VariableValueChange(VariableRuntime variableRuntime)
     {
-
-
         // 触发变量值变化事件，并将变量运行时对象转换为变量数据对象进行传递
         VariableValueChangeEvent?.Invoke(variableRuntime, variableRuntime.AdaptVariableBasicData());
-
     }
     /// <summary>
     /// 变量采集处理方法，用于处理变量进行采集时的逻辑
@@ -526,11 +498,8 @@ public static class GlobalData
     /// <param name="variableRuntime">变量运行时对象</param>
     internal static void VariableCollectChange(VariableRuntime variableRuntime)
     {
-
-
         // 触发变量采集事件，并将变量运行时对象转换为变量数据对象进行传递
         VariableCollectChangeEvent?.Invoke(variableRuntime);
-
     }
 
     #endregion

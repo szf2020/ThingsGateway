@@ -86,7 +86,6 @@ public class SysPositionService : BaseService<SysPosition>, ISysPositionService
         {
             return false;
         }
-
     }
 
     /// <summary>
@@ -278,8 +277,6 @@ public class SysPositionService : BaseService<SysPosition>, ISysPositionService
                 throw Oops.Bah(Localizer["CodeDup", input.Code]);
         }
     }
-
-
 
 
 }

@@ -27,7 +27,6 @@ public partial class ChannelRuntimeInfo1 : IDisposable
             await Task.Run(() => GlobalData.ChannelThreadManage.RestartChannelAsync(ChannelRuntime));
     }
 
-
     protected override void OnInitialized()
     {
         _ = RunTimerAsync();

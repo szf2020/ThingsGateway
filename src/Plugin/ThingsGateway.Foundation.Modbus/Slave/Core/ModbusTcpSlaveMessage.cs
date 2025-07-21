@@ -69,7 +69,6 @@ public class ModbusTcpSlaveMessage : MessageBase, IResultMessage
         return false;
     }
 
-
     public override FilterResult CheckBody<TByteBlock>(ref TByteBlock byteBlock)
     {
         var pos = byteBlock.Position - HeaderLength;
@@ -91,5 +90,4 @@ public class ModbusTcpSlaveMessage : MessageBase, IResultMessage
         OperCode = 0;
         return FilterResult.Success;
     }
-
 }

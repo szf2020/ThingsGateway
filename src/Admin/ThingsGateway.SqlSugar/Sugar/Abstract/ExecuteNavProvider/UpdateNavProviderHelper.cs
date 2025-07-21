@@ -55,7 +55,7 @@ namespace ThingsGateway.SqlSugar
         /// </summary>
         /// <typeparam name="Type">实体类型</typeparam>
         /// <param name="datas">实体列表</param>
-        private void InsertIdentity<Type>(List<Type> datas) where Type : class, new()
+        private void InsertIdentity<Type>(IEnumerable<Type> datas) where Type : class, new()
         {
             foreach (var item in datas)
             {

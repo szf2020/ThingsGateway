@@ -80,7 +80,6 @@ public partial class VariableRuntime : Variable, IVariable, IDisposable
                 {
                     string stachTrace = string.Join(Environment.NewLine, ex.StackTrace.Split(new[] { Environment.NewLine }, StringSplitOptions.None).Take(3));
                     _lastErrorMessage = $"{Name} Conversion expression failed：{ex.Message}{Environment.NewLine}{stachTrace}";
-
                 }
                 else
                 {
@@ -177,7 +176,6 @@ public partial class VariableRuntime : Variable, IVariable, IDisposable
 
     public void Init(DeviceRuntime deviceRuntime)
     {
-
         GlobalData.AlarmEnableIdVariables.Remove(Id);
         if (GlobalData.RealAlarmIdVariables.TryRemove(Id, out var oldAlarm))
         {
@@ -185,7 +183,6 @@ public partial class VariableRuntime : Variable, IVariable, IDisposable
             oldAlarm.EventTime = DateTime.Now;
             GlobalData.AlarmChange(this.AdaptAlarmVariable());
         }
-
 
         DeviceRuntime?.VariableRuntimes?.Remove(Name);
 
@@ -200,10 +197,8 @@ public partial class VariableRuntime : Variable, IVariable, IDisposable
         }
     }
 
-
     public void Dispose()
     {
-
         DeviceRuntime?.VariableRuntimes?.Remove(Name);
 
         GlobalData.IdVariables.Remove(Id);
@@ -234,4 +229,3 @@ public partial class VariableRuntime : Variable, IVariable, IDisposable
         _lastErrorMessage = lastErrorMessage;
     }
 }
-

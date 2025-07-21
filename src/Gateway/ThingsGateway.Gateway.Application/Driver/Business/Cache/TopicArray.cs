@@ -20,5 +20,4 @@ public struct TopicArray
     public int Count { get; set; } = 1;
     public byte[] Payload { get; set; }
     public string Topic { get; set; }
-
 }

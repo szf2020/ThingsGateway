@@ -55,7 +55,6 @@ public interface ISysOrgService
     /// <returns></returns>
     Task<HashSet<long>> GetOrgChildIdsAsync(long orgId, bool isContainOneself = true, List<SysOrg> sysOrgList = null);
 
-
     /// <summary>
     /// 根据组织ID获取租户ID
     /// </summary>

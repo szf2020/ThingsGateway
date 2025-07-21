@@ -31,5 +31,4 @@ public class DBHistoryValuePageInput : BasePageInput
     /// 变量名称组
     /// </summary>
     public virtual string[]? VariableNames { get; set; }
-
 }

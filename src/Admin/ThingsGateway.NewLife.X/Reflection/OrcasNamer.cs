@@ -104,7 +104,6 @@ static class OrcasNamer
         //    Type eiiType = eiiMethod.DeclaringType;
         //    TextWriter eiiWriter = new StringWriter();
 
-
         //    //we need to keep the param names instead of turning them into numbers
         //    //get the template to the right format
         //    if (eiiType != null && eiiType.Template != null)
@@ -169,13 +168,10 @@ static class OrcasNamer
         //    if (eiiProperties.Length > 0) eiiProperty = eiiProperties[0];
         //}
 
-
-
         //if (eiiProperty != null)
         //{
         //    TypeNode eiiType = eiiProperty.DeclaringType;
         //    TextWriter eiiWriter = new StringWriter();
-
 
         //    if (eiiType != null && eiiType.Template != null)
         //    {

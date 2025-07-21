@@ -21,7 +21,6 @@ public partial class ChannelCopyComponent
     [EditorRequired]
     public Channel Model { get; set; }
 
-
     [Parameter]
     [EditorRequired]
     public Dictionary<Device, List<Variable>> Devices { get; set; }
@@ -73,7 +72,6 @@ public partial class ChannelCopyComponent
                 }
 
                 channels.Add(channel);
-
             }
 
             if (OnSave != null)
@@ -87,6 +85,4 @@ public partial class ChannelCopyComponent
             await ToastService.Warn(ex);
         }
     }
-
-
 }

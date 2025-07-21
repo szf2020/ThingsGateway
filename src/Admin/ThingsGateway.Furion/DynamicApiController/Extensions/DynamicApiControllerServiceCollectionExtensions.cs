@@ -40,7 +40,6 @@ public static class DynamicApiControllerServiceCollectionExtensions
         return mvcBuilder;
     }
 
-
     /// <summary>
     /// 配置动态 WebAPI
     /// </summary>

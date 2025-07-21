@@ -21,7 +21,6 @@ namespace ThingsGateway.Debug;
 
 internal sealed class Program
 {
-
     [STAThread]
     private static void Main(string[] args)
     {
@@ -80,7 +79,6 @@ internal sealed class Program
         hybridApp.MainWindow.SetTitle("ThingsGateway.Debug.Photino");
         hybridApp.MainWindow.SetIconFile("favicon.ico");
 
-
         AppDomain.CurrentDomain.UnhandledException += (sender, error) =>
         {
         };
@@ -93,6 +91,4 @@ internal sealed class Program
         hybridApp.Run();
         Thread.Sleep(3000);
     }
-
-
 }

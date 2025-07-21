@@ -69,7 +69,6 @@
             }
         }
         public static List<KeyValuePair<string, CSharpDataType>> MappingTypesConst = new List<KeyValuePair<string, CSharpDataType>>(){
-
                      new KeyValuePair<string, CSharpDataType>("byte",CSharpDataType.@byte),
                     new KeyValuePair<string, CSharpDataType>("short",CSharpDataType.@short),
                     new KeyValuePair<string, CSharpDataType>("smallint",CSharpDataType.@short),

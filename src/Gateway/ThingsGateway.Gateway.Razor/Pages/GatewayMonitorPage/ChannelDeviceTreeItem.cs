@@ -18,14 +18,10 @@ public enum ChannelDevicePluginTypeEnum
 }
 public class ChannelDeviceTreeItem : IEqualityComparer<ChannelDeviceTreeItem>
 {
-
     public long Id { get; set; }
     public ChannelDevicePluginTypeEnum ChannelDevicePluginType { get; set; }
 
-
-
     public long DeviceRuntimeId { get; set; }
-
 
     public long ChannelRuntimeId { get; set; }
     public string PluginName { get; set; }
@@ -53,7 +49,6 @@ public class ChannelDeviceTreeItem : IEqualityComparer<ChannelDeviceTreeItem>
             }
         }
         return false;
-
     }
 
     public override int GetHashCode()
@@ -113,7 +108,6 @@ public class ChannelDeviceTreeItem : IEqualityComparer<ChannelDeviceTreeItem>
         channelRuntime = null;
         return false;
     }
-
 
     public override string ToString()
     {

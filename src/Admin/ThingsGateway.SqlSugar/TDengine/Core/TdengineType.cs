@@ -2,7 +2,6 @@
 {
     internal static class TDengineType
     {
-
         public static object GetObjectByType(object dataValue, byte typeValue)
         {
             if (dataValue is string && dataValue?.ToString().ToUpper() == "NULL")

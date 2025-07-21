@@ -28,5 +28,4 @@ public class UserSelectorInput
     /// 角色ID
     /// </summary>
     public long RoleId { get; set; }
-
 }

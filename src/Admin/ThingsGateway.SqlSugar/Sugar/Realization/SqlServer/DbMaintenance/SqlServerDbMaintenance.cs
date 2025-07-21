@@ -186,7 +186,6 @@ namespace ThingsGateway.SqlSugar
             {
                 return "EXEC sp_dropextendedproperty 'MS_Description','user',dbo,'table','{1}','column','{0}'";
             }
-
         }
 
         protected override string IsAnyColumnRemarkSql
@@ -202,7 +201,6 @@ namespace ThingsGateway.SqlSugar
                                 " LEFT JOIN sys.columns B ON B.object_id = A.object_id AND C.minor_id = B.column_id" +
                                 " INNER JOIN sys.schemas SC ON SC.schema_id = A.schema_id AND SC.name = 'dbo'" +
                                 " WHERE A.name = '{1}' and B.name = '{0}'";
-
             }
         }
 
@@ -220,7 +218,6 @@ namespace ThingsGateway.SqlSugar
             {
                 return "EXEC sp_dropextendedproperty 'MS_Description','user',dbo,'table','{0}' ";
             }
-
         }
 
         protected override string IsAnyTableRemarkSql
@@ -233,7 +230,6 @@ namespace ThingsGateway.SqlSugar
 								INNER JOIN sys.schemas SC ON  SC.schema_id=A.schema_id AND SC.name='dbo'
                                 WHERE A.name = '{0}'  AND minor_id=0";
             }
-
         }
 
         protected override string RenameTableSql
@@ -727,7 +723,6 @@ AND syscomments.text LIKE '%" + tableName + "%'");
                         item.DataType = item.DataType.ToLower().Replace("varchar", "nvarchar");
                     }
                 }
-
             }
             string sql = GetCreateTableSql(tableName, columns);
             this.Context.Ado.ExecuteCommand(sql);

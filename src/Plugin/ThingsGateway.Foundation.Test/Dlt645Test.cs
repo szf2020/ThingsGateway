@@ -17,7 +17,6 @@ namespace ThingsGateway.Foundation.Test;
 
 public class Dlt645Test
 {
-
     [Theory]
     [InlineData("02010100", "FE FE FE FE 68 11 11 11 11 11 11 68 91 07 33 34 34 35 33 59 36 60 16 ")]
     public async Task Dlt645_Read_OK(string address, string data)
@@ -34,10 +33,8 @@ public class Dlt645Test
 
         var task1 = Task.Run(async () =>
          {
-
              var result = await dltMaster.ReadAsync(address, default).ConfigureAwait(false);
              Assert.True(result.IsSuccess, result.ToString());
-
          });
         await Task.Delay(50);
         var task2 = Task.Run(async () =>
@@ -50,6 +47,4 @@ public class Dlt645Test
         });
         await Task.WhenAll(task1, task2);
     }
-
-
 }

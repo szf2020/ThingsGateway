@@ -22,7 +22,6 @@ namespace ThingsGateway.SqlSugar.DbConvert
 
         public T QueryConverter<T>(IDataRecord dr, int i)
         {
-
             var str = dr.GetString(i);
             Type undertype = UtilMethods.GetUnderType(typeof(T));//获取没有nullable的枚举类型
             return (T)Enum.Parse(undertype, str);
@@ -42,7 +41,6 @@ namespace ThingsGateway.SqlSugar.DbConvert
 
         public T QueryConverter<T>(IDataRecord dr, int i)
         {
-
             var value = dr.GetValue(i);
             return (T)UtilMethods.ChangeType2(value, typeof(T));
         }
@@ -58,18 +56,14 @@ namespace ThingsGateway.SqlSugar.DbConvert
 
         public T QueryConverter<T>(IDataRecord dr, int i)
         {
-
-
             var value = dr.GetValue(i);
             if (value is byte[] && typeof(T) != UtilConstants.ByteArrayType)
             {
                 value = Encoding.UTF8.GetString((byte[])value);
             }
             return (T)UtilMethods.ChangeType2(value, typeof(T));
-
         }
     }
-
 
     public class Nvarchar2PropertyConvert : ISugarDataConverter
     {
@@ -82,7 +76,6 @@ namespace ThingsGateway.SqlSugar.DbConvert
 
         public T QueryConverter<T>(IDataRecord dr, int i)
         {
-
             var value = dr.GetString(i);
             return (T)(object)value;
         }
@@ -99,7 +92,6 @@ namespace ThingsGateway.SqlSugar.DbConvert
 
         public T QueryConverter<T>(IDataRecord dr, int i)
         {
-
             var value = dr.GetString(i);
             return (T)(object)value;
         }

@@ -13,9 +13,7 @@ namespace ThingsGateway.Admin.Application;
 /// <inheritdoc/>
 public class BlazorHybridAuthorizationHandler : BlazorAuthenticationHandler
 {
-
     public BlazorHybridAuthorizationHandler(ISysUserService sysUserService, ISysRoleService sysRoleService, ISysDictService sysDictService) : base(sysUserService, sysRoleService, sysDictService)
     {
     }
-
 }

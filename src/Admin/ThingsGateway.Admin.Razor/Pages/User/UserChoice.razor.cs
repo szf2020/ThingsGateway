@@ -80,7 +80,6 @@ public partial class UserChoice
                 [nameof(UserChoiceDialog.Values)] = Values,
                 [nameof(UserChoiceDialog.ValuesChanged)] = (HashSet<long> v) => OnValueChanged(v)
             }).Render(),
-
         };
         await DialogService.Show(option);
     }

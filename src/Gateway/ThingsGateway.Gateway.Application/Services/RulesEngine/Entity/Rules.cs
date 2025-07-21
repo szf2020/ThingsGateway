@@ -30,7 +30,6 @@ public class Rules : BaseDataEntity
     [IgnoreExcel]
     [AutoGenerateColumn(Ignore = true)]
     public RulesJson RulesJson { get; set; } = new();
-
 }
 public class RulesJson
 {

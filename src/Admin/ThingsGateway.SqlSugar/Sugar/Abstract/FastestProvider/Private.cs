@@ -51,7 +51,7 @@ namespace ThingsGateway.SqlSugar
         }
 
         /// <summary>将实体列表转换为DataTable</summary>
-        private DataTable ToDdateTable(List<T> datas)
+        private DataTable ToDdateTable(IEnumerable<T> datas)
         {
             var builder = GetBuider();
             DataTable tempDataTable = ReflectionInoCore<DataTable>.GetInstance().GetOrCreate("BulkCopyAsync" + typeof(T).GetHashCode(),
@@ -119,7 +119,6 @@ namespace ThingsGateway.SqlSugar
                     }
                     else if (isMySql && column.UnderType == UtilConstants.BoolType)
                     {
-
                         if (value.ObjToBool() == false && uInt64TypeName.Any(z => z.EqualCase(column.DbColumnName)))
                         {
                             value = DBNull.Value;
@@ -247,7 +246,6 @@ namespace ThingsGateway.SqlSugar
                 DataRow dr = tempDataTable.NewRow();
                 foreach (DataColumn column in columns)
                 {
-
                     dr[column.ColumnName] = item[column.ColumnName];
                     if (dr[column.ColumnName] == null || dr[column.ColumnName] == DBNull.Value)
                     {
@@ -297,7 +295,6 @@ namespace ThingsGateway.SqlSugar
                 DataRow dr = tempDataTable.NewRow();
                 foreach (DataColumn column in columns)
                 {
-
                     dr[column.ColumnName] = item[column.ColumnName];
                     if (dr[column.ColumnName] == null || dr[column.ColumnName] == DBNull.Value)
                     {

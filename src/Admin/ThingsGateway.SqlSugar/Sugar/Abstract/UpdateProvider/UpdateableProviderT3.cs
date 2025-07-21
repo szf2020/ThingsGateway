@@ -46,7 +46,6 @@ namespace ThingsGateway.SqlSugar
 
         public IUpdateable<T, T2, T3> Where(Expression<Func<T, T2, T3, bool>> whereExpression)
         {
-
             var value = updateableObj.UpdateBuilder.GetExpressionValue(whereExpression, ResolveExpressType.WhereMultiple).GetString();
             updateableObj.UpdateBuilder.WhereValues.Add(value);
             return this;

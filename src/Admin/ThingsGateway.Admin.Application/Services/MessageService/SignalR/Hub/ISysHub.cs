@@ -32,5 +32,4 @@ public interface ISysHub
     /// <param name="message">消息内容</param>
     /// <returns>异步操作结果</returns>
     Task NewMesage(AppMessage message);
-
 }

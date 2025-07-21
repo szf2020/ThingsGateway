@@ -13,7 +13,6 @@ public class DeviceChangedTriggerNode : TextNode, ITriggerNode, IDisposable
 {
     public DeviceChangedTriggerNode(string id, Point? position = null) : base(id, position) { Title = "DeviceChangedTriggerNode"; Placeholder = "Device.Placeholder"; }
 
-
     private Func<NodeOutput, CancellationToken, Task> Func { get; set; }
     Task ITriggerNode.StartAsync(Func<NodeOutput, CancellationToken, Task> func, CancellationToken cancellationToken)
     {
@@ -62,7 +61,6 @@ public class DeviceChangedTriggerNode : TextNode, ITriggerNode, IDisposable
     {
         return DeviceDatas.GetConsumingEnumerable().ParallelForEachStreamedAsync((async (deviceDatas, token) =>
             {
-
                 if (DeviceChangedTriggerNodeDict.TryGetValue(deviceDatas.Name ?? string.Empty, out var valueChangedTriggerNodes))
                 {
                     await valueChangedTriggerNodes.ParallelForEachAsync(async (item, token) =>
@@ -73,7 +71,6 @@ public class DeviceChangedTriggerNode : TextNode, ITriggerNode, IDisposable
                              {
                                  item.Logger?.Trace($"Device changed: {item.Text}");
                                  await func.Invoke(new NodeOutput() { Value = deviceDatas }, token).ConfigureAwait(false);
-
                              }
                          }
                          catch (Exception ex)
@@ -85,7 +82,6 @@ public class DeviceChangedTriggerNode : TextNode, ITriggerNode, IDisposable
             }), default);
     }
 
-
     public void Dispose()
     {
         FuncDict.Remove(this);
@@ -95,4 +91,3 @@ public class DeviceChangedTriggerNode : TextNode, ITriggerNode, IDisposable
         }
     }
 }
-

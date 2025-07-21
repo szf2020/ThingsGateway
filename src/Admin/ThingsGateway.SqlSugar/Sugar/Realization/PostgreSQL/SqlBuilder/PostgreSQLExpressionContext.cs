@@ -530,6 +530,5 @@
 
             return result;
         }
-
     }
 }

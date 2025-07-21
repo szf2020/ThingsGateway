@@ -40,5 +40,4 @@ public class Dlt645_2007MasterProperty : CollectFoundationDtuPropertyBase
     /// </summary>
     [DynamicProperty]
     public string FEHead { get; set; } = "FEFEFEFE";
-
 }

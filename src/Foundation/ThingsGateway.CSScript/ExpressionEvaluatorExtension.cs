@@ -58,7 +58,6 @@ public static class ExpressionEvaluatorExtension
                 }
                 catch
                 {
-
                 }
             }
 

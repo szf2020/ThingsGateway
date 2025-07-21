@@ -30,7 +30,7 @@
             }
             if (result.Count == 0 && tables.Count != 0)
             {
-                result.Add(tables.First());
+                result.Add(tables[0]);
             }
             return result;
         }

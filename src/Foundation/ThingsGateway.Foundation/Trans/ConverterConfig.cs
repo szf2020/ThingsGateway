@@ -92,8 +92,6 @@ public class ConverterConfig
         VariableStringLength = wstring;
         Stringlength = stringlength;
         BcdFormat = bcdFormat;
-
-
     }
     public override string ToString()
     {
@@ -134,5 +132,4 @@ public class ConverterConfig
 
         return data;
     }
-
 }

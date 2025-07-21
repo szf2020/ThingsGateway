@@ -24,18 +24,12 @@ public static class LoggerFormatter
     /// <summary>
     /// Json 输出格式化
     /// </summary>
-    public static readonly Func<LogMessage, string> Json = (logMsg) =>
-    {
-        return logMsg.Write(writer => WriteJson(logMsg, writer));
-    };
+    public static readonly Func<LogMessage, string> Json = (logMsg) => logMsg.Write(writer => WriteJson(logMsg, writer));
 
     /// <summary>
     /// Json 输出格式化
     /// </summary>
-    public static readonly Func<LogMessage, string> JsonIndented = (logMsg) =>
-    {
-        return logMsg.Write(writer => WriteJson(logMsg, writer), true);
-    };
+    public static readonly Func<LogMessage, string> JsonIndented = (logMsg) => logMsg.Write(writer => WriteJson(logMsg, writer), true);
 
     /// <summary>
     /// 写入 JSON

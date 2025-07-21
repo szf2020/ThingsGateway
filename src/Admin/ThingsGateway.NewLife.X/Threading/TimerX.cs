@@ -76,7 +76,6 @@ public class TimerX : ITimer, ITimerx, IDisposable
     /// <summary>平均耗时。毫秒</summary>
     public Int32 Cost { get; internal set; }
 
-
     /// <summary>Cron表达式，实现复杂的定时逻辑</summary>
     public Cron[]? Crons => _crons;
 

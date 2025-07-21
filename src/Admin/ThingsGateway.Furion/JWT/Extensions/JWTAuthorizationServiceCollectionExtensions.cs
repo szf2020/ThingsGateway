@@ -60,10 +60,7 @@ public static class JWTAuthorizationServiceCollectionExtensions
         //启用全局授权
         if (enableGlobalAuthorize)
         {
-            authenticationBuilder.Services.Configure<MvcOptions>(options =>
-            {
-                options.Filters.Add(new AuthorizeFilter());
-            });
+            authenticationBuilder.Services.Configure<MvcOptions>(options => options.Filters.Add(new AuthorizeFilter()));
         }
 
         return authenticationBuilder;
@@ -136,9 +133,6 @@ public static class JWTAuthorizationServiceCollectionExtensions
         services.AddOptions<JWTSettingsOptions>()
                 .BindConfiguration("JWTSettings")
                 .ValidateDataAnnotations()
-                .PostConfigure(options =>
-                {
-                    _ = JWTEncryption.SetDefaultJwtSettings(options);
-                });
+                .PostConfigure(options => _ = JWTEncryption.SetDefaultJwtSettings(options));
     }
 }

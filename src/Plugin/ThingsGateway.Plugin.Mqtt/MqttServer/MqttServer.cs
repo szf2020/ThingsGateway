@@ -34,7 +34,6 @@ public partial class MqttServer : BusinessBaseWithCacheIntervalScriptAll
 
     protected override async Task InitChannelAsync(IChannel? channel, CancellationToken cancellationToken)
     {
-
         #region 初始化
 
         var configuration = new ConfigurationBuilder()
@@ -56,8 +55,6 @@ public partial class MqttServer : BusinessBaseWithCacheIntervalScriptAll
         #endregion 初始化
         await base.InitChannelAsync(channel, cancellationToken).ConfigureAwait(false);
     }
-
-
 
     /// <inheritdoc/>
     public override bool IsConnected() => _mqttServer?.IsStarted == true;
@@ -81,12 +78,10 @@ public partial class MqttServer : BusinessBaseWithCacheIntervalScriptAll
             _mqttServer?.SafeDispose();
         }
         _webHost?.SafeDispose();
-
     }
 
     protected override async Task ProtectedStartAsync(CancellationToken cancellationToken)
     {
-
         if (_mqttServer != null)
         {
             _mqttServer.ClientDisconnectedAsync -= MqttServer_ClientDisconnectedAsync;
@@ -100,12 +95,10 @@ public partial class MqttServer : BusinessBaseWithCacheIntervalScriptAll
             await _mqttServer.StartAsync().ConfigureAwait(false);
         }
         await base.ProtectedStartAsync(cancellationToken).ConfigureAwait(false);
-
     }
 
     protected override Task ProtectedExecuteAsync(object? state, CancellationToken cancellationToken)
     {
         return Update(cancellationToken);
-
     }
 }

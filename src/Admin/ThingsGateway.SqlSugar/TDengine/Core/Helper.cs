@@ -2,7 +2,6 @@
 {
     internal static class Helper
     {
-
         //public static bool HasMicrosecondPrecision(DateTime dateTime)
         //{
         //    const long ticksPerMicrosecond = TimeSpan.TicksPerMillisecond / 1000;
@@ -98,8 +97,6 @@
 
             return unixTimeSeconds * 1000000 + microseconds;
         }
-
-
 
         // Method to convert a local DateTime to Unix timestamp (long)
         public static long ToUnixTimestamp(DateTime dateTime)

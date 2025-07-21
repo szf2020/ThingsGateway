@@ -63,9 +63,6 @@ public class SQLHistoryValue : IPrimaryIdEntity
     public DateTime CreateTime { get; set; }
 }
 
-
-
-
 [SplitTable(SplitType._Custom01)]//按周分表 （自带分表支持 年、季、月、周、日）
 [SugarTable("{name}_{year}{month}{day}", TableDescription = "设备采集历史表")]//3个变量必须要有
 [SugarIndex("index_Id", nameof(SQLNumberHistoryValue.Id), OrderByType.Desc)]

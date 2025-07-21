@@ -4,7 +4,6 @@ namespace ThingsGateway.SqlSugar
 {
     internal static class QuestDbRestAPHelper
     {
-
         /// <summary>
         /// 绑定RestAPI需要的信息
         /// </summary>

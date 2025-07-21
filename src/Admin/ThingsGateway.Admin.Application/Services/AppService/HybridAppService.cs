@@ -71,5 +71,4 @@ public class HybridAppService : IAppService
         User = new ClaimsPrincipal(claimsIdentity);
         return Task.CompletedTask;
     }
-
 }

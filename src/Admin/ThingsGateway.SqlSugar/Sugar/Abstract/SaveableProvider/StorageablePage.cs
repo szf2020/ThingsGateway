@@ -15,7 +15,7 @@ namespace ThingsGateway.SqlSugar
 
         public int ExecuteCommand()
         {
-            if (Data.Count == 1 && Data.First() == null)
+            if (Data.Count == 1 && Data[0] == null)
             {
                 return 0;
             }
@@ -55,7 +55,7 @@ namespace ThingsGateway.SqlSugar
         {
             if (cancellationToken != null)
                 this.Context.Ado.CancellationToken = cancellationToken.Value;
-            if (Data.Count == 1 && Data.First() == null)
+            if (Data.Count == 1 && Data[0] == null)
             {
                 return 0;
             }
@@ -93,7 +93,7 @@ namespace ThingsGateway.SqlSugar
         }
         public int ExecuteSqlBulkCopy()
         {
-            if (Data.Count == 1 && Data.First() == null)
+            if (Data.Count == 1 && Data[0] == null)
             {
                 return 0;
             }
@@ -102,7 +102,6 @@ namespace ThingsGateway.SqlSugar
             var isNoTran = this.Context.Ado.IsNoTran();
             try
             {
-
                 this.Context.Utilities.PageEach(Data, PageSize, pageItem =>
                 {
                     result += this.Context.Storageable(pageItem).As(TableName).TranLock(lockType).WhereColumns(whereExpression).ExecuteSqlBulkCopy();
@@ -122,7 +121,7 @@ namespace ThingsGateway.SqlSugar
         {
             if (cancellationToken != null)
                 this.Context.Ado.CancellationToken = cancellationToken.Value;
-            if (Data.Count == 1 && Data.First() == null)
+            if (Data.Count == 1 && Data[0] == null)
             {
                 return 0;
             }
@@ -146,6 +145,5 @@ namespace ThingsGateway.SqlSugar
             }
             return result;
         }
-
     }
 }

@@ -11,6 +11,5 @@ namespace ThingsGateway.SqlSugar
         private string IdentityId { get; set; }
         private int Count { get; set; }
         private IInsertable<Dictionary<string, object>> sugarInsertable;
-
     }
 }

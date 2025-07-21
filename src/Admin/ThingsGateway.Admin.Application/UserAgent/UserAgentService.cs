@@ -33,11 +33,7 @@ namespace ThingsGateway.Admin.Application
         public UserAgent? Parse(string? userAgentString)
         {
             userAgentString = ((userAgentString?.Length > Settings.UaStringSizeLimit) ? userAgentString?.Trim().Substring(0, Settings.UaStringSizeLimit) : userAgentString?.Trim()) ?? "";
-            return MemoryCache.GetOrAdd(userAgentString, entry =>
-            {
-                return new UserAgent(Settings, userAgentString);
-            });
+            return MemoryCache.GetOrAdd(userAgentString, entry => new UserAgent(Settings, userAgentString));
         }
-
     }
 }

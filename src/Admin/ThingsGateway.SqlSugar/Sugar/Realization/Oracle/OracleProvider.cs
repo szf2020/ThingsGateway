@@ -66,7 +66,6 @@ namespace ThingsGateway.SqlSugar
                 }
                 catch (Exception ex)
                 {
-
                     Check.Exception(true, ErrorMessage.ConnnectionOpen, ex.Message);
                 }
                 return base._DbConnection;
@@ -97,7 +96,6 @@ namespace ThingsGateway.SqlSugar
 
         public override Func<string, IReadOnlyList<SugarParameter>, KeyValuePair<string, IReadOnlyList<SugarParameter>>> ProcessingEventStartingSQL => (sql, parameter) =>
         {
-
             if (sql == "-- No table ")
             {
                 sql = " SELECT  'No table' FROM DUAL WHERE 1=2 ";
@@ -111,7 +109,6 @@ namespace ThingsGateway.SqlSugar
                 return new KeyValuePair<string, IReadOnlyList<SugarParameter>>(sql, parameter);
             }
         };
-
 
         public override IDataAdapter GetAdapter()
         {

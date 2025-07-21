@@ -277,7 +277,6 @@ namespace ThingsGateway.SqlSugar
                 {
                     result.Add(di);
                 }
-
             }
             return result;
         }
@@ -364,7 +363,6 @@ namespace ThingsGateway.SqlSugar
                 if (item.ColumnDescription != null)
                 {
                     db.DbMaintenance.AddColumnRemark(item.DbColumnName, item.DbTableName, item.ColumnDescription);
-
                 }
             }
             //table remak
@@ -397,7 +395,6 @@ namespace ThingsGateway.SqlSugar
             if (columns.Any(it => it.IsPrimarykey) && isCreatePrimaryKey)
             {
                 primaryKeyInfo = string.Format(", Primary key({0})", string.Join(",", columns.Where(it => it.IsPrimarykey).Select(it => this.SqlBuilder.GetTranslationColumnName(it.DbColumnName.ToLower()))));
-
             }
             sql = sql.Replace("$PrimaryKey", primaryKeyInfo);
             this.Context.Ado.ExecuteCommand(sql + splitSql.TrimStart('_'));

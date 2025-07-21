@@ -2,7 +2,6 @@
 {
     public static class SugarRetry
     {
-
         public static void Execute(Action action, TimeSpan retryInterval, int retryCount = 3)
         {
             Execute<object>(() =>
@@ -11,7 +10,6 @@
                 return null;
             }, retryInterval, retryCount);
         }
-
 
         public static void Execute<T1>(Action<T1> action, T1 arg1, TimeSpan retryInterval, int retryCount = 3)
         {
@@ -22,7 +20,6 @@
             }, arg1, retryInterval, retryCount);
         }
 
-
         public static void Execute<T1, T2>(Action<T1, T2> action, T1 arg1, T2 arg2, TimeSpan retryInterval, int retryCount = 3)
         {
             Execute<T1, T2, object>((x1, x2) =>
@@ -31,7 +28,6 @@
                 return null;
             }, arg1, arg2, retryInterval, retryCount);
         }
-
 
         public static void Execute<T1, T2, T3>(Action<T1, T2, T3> action, T1 arg1, T2 arg2, T3 arg3, TimeSpan retryInterval, int retryCount = 3)
         {
@@ -42,7 +38,6 @@
             }, arg1, arg2, arg3, retryInterval, retryCount);
         }
 
-
         public static void Execute<T1, T2, T3, T4>(Action<T1, T2, T3, T4> action, T1 arg1, T2 arg2, T3 arg3, T4 arg4, TimeSpan retryInterval, int retryCount = 3)
         {
             Execute<T1, T2, T3, T4, object>((x1, x2, x3, x4) =>
@@ -51,7 +46,6 @@
                 return null;
             }, arg1, arg2, arg3, arg4, retryInterval, retryCount);
         }
-
 
         public static T Execute<T>(Func<T> func, TimeSpan retryInterval, int retryCount = 3)
         {
@@ -72,7 +66,6 @@
 
             throw new AggregateException(exceptions);
         }
-
 
         public static T Execute<T1, T>(Func<T1, T> func, T1 arg1, TimeSpan retryInterval, int retryCount = 3)
         {
@@ -114,7 +107,6 @@
             throw new AggregateException(exceptions);
         }
 
-
         public static T Execute<T1, T2, T3, T>(Func<T1, T2, T3, T> func, T1 arg1, T2 arg2, T3 arg3, TimeSpan retryInterval, int retryCount = 3)
         {
             var exceptions = new List<Exception>();
@@ -134,7 +126,6 @@
 
             throw new AggregateException(exceptions);
         }
-
 
         public static T Execute<T1, T2, T3, T4, T>(Func<T1, T2, T3, T4, T> func, T1 arg1, T2 arg2, T3 arg3, T4 arg4, TimeSpan retryInterval, int retryCount = 3)
         {

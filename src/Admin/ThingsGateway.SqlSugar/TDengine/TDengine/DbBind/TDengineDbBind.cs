@@ -133,7 +133,6 @@
         /// TDengine 数据库类型与C#类型的常量映射关系
         /// </summary>
         public static List<KeyValuePair<string, CSharpDataType>> MappingTypesConst = new List<KeyValuePair<string, CSharpDataType>>(){
-
                     new KeyValuePair<string, CSharpDataType>("BOOL",CSharpDataType.@bool),
                     new KeyValuePair<string, CSharpDataType>("TINYINT",CSharpDataType.@byte),
                      new KeyValuePair<string, CSharpDataType>("TINYINT",CSharpDataType.@int),

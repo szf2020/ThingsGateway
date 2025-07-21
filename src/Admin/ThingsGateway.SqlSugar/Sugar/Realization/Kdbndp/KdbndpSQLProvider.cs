@@ -179,7 +179,6 @@ namespace ThingsGateway.SqlSugar
             { typeof(bool[]),KdbndpDbType.Boolean},
             {typeof(DateTime[]),KdbndpDbType.Date},
 
-
             { typeof(int?[]),KdbndpDbType.Integer},
             { typeof(short?[]),KdbndpDbType.Smallint},
             { typeof(long?[]),KdbndpDbType.Bigint},
@@ -188,7 +187,6 @@ namespace ThingsGateway.SqlSugar
             { typeof(byte?[]),KdbndpDbType.Bytea},
             { typeof(bool?[]),KdbndpDbType.Boolean},
             {typeof(DateTime?[]),KdbndpDbType.Date},
-
 
              { typeof(string[]), KdbndpDbType.Text},
         };

@@ -14,7 +14,6 @@ namespace ThingsGateway.Admin.Application;
 
 internal sealed class SysOperateLogService : BaseService<SysOperateLog>, ISysOperateLogService
 {
-
     #region 查询
 
     /// <summary>
@@ -85,7 +84,5 @@ internal sealed class SysOperateLogService : BaseService<SysOperateLog>, ISysOpe
     }
 
     #endregion 删除
-
-
 
 }

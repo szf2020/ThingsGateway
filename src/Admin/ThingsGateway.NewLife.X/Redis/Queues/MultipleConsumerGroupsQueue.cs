@@ -97,7 +97,6 @@ public class MultipleConsumerGroupsQueue<T> : IDisposable
         }
         else
             throw new NullReferenceException("连接Redis服务器失败。");
-
     }
 
     /// <summary>
@@ -172,8 +171,6 @@ public class MultipleConsumerGroupsQueue<T> : IDisposable
                 OnStopSubscribe(err.Message);
                 return;
             }
-
-
         }
 
         Task.Run(() => getSubscribe(subscribeAppName), _Cts.Token);
@@ -213,7 +210,6 @@ public class MultipleConsumerGroupsQueue<T> : IDisposable
 
         while (_Cts?.IsCancellationRequested == false)
         {
-
             var msg = await _Queue.TakeMessageAsync(10).ConfigureAwait(false);
             if (msg?.Id.IsNullOrEmpty() == false)
             {
@@ -231,7 +227,6 @@ public class MultipleConsumerGroupsQueue<T> : IDisposable
                 }
                 catch (Exception err)
                 {
-
                     if (XTrace.Debug) XTrace.WriteException(err);
                     //多消费组中，假如当前消息解析异常，原因大多是因为新增加消息格式等原因导致
                     //所以都可以正常忽略，如有特殊需要配置IgnoreErrMsg为false
@@ -245,10 +240,8 @@ public class MultipleConsumerGroupsQueue<T> : IDisposable
                         OnStopSubscribe(err.Message);
                         return;
                     }
-
                 }
             }
-
         }
     }
 

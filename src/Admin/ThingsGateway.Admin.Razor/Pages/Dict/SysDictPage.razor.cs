@@ -22,7 +22,6 @@ public partial class SysDictPage
 
     #region 查询
 
-
     private async Task<QueryData<SysDict>> OnQueryAsync(QueryPageOptions options)
     {
         var data = await SysDictService.PageAsync(options);

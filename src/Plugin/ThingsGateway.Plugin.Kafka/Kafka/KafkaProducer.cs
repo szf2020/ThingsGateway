@@ -81,7 +81,6 @@ public partial class KafkaProducer : BusinessBaseWithCacheIntervalScriptAll
         }
         catch
         {
-
         }
         _producer?.SafeDispose();
         base.Dispose(disposing);
@@ -90,6 +89,5 @@ public partial class KafkaProducer : BusinessBaseWithCacheIntervalScriptAll
     protected override Task ProtectedExecuteAsync(object? state, CancellationToken cancellationToken)
     {
         return Update(cancellationToken);
-
     }
 }

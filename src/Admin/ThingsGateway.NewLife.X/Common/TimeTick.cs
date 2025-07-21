@@ -82,8 +82,6 @@ public class TimeTick
             return nextTime;
         }
 
-
-
     }
 
     public DateTime GetNextTime(bool setLastTime = false) => GetNextTime(DateTime.UtcNow, setLastTime);

@@ -8,7 +8,6 @@
         public static int DatacenterId = 1;
         private SnowFlakeSingle()
         {
-
         }
         static SnowFlakeSingle() { }
         public static DistributedSystem.Snowflake.IdWorker Instance

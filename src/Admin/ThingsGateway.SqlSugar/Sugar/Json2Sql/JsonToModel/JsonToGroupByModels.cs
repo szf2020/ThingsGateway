@@ -22,6 +22,5 @@ namespace ThingsGateway.SqlSugar
             }
             return conditionalModels;
         }
-
     }
 }

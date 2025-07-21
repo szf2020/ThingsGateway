@@ -12,7 +12,6 @@ using System.ComponentModel.DataAnnotations;
 
 namespace ThingsGateway;
 
-
 /// <summary>
 /// 最小值校验
 /// </summary>

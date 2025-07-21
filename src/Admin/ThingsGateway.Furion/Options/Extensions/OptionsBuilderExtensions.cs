@@ -117,10 +117,7 @@ public static class OptionsBuilderExtensions
         }
 
         // 逐条配置选项构建器
-        Array.ForEach(optionsBuilderTypes, optionsBuilderType =>
-        {
-            optionsBuilder.ConfigureBuilder(optionsBuilderType);
-        });
+        Array.ForEach(optionsBuilderTypes, optionsBuilderType => optionsBuilder.ConfigureBuilder(optionsBuilderType));
 
         return optionsBuilder;
     }
@@ -168,10 +165,7 @@ public static class OptionsBuilderExtensions
             var validateOptionsType = typeof(IValidateOptions<TOptions>);
 
             // 注册复杂选项
-            Array.ForEach(optionsBuilderAttribute.ValidateOptionsTypes!, type =>
-            {
-                optionsBuilder.Services.TryAddEnumerable(ServiceDescriptor.Singleton(validateOptionsType, type));
-            });
+            Array.ForEach(optionsBuilderAttribute.ValidateOptionsTypes!, type => optionsBuilder.Services.TryAddEnumerable(ServiceDescriptor.Singleton(validateOptionsType, type)));
         }
 
         return optionsBuilder;

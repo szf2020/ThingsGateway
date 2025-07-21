@@ -32,8 +32,6 @@ public partial class DeviceRuntimeInfo1 : IDisposable
         base.OnParametersSet();
     }
 
-
-
     private async Task ShowDriverUI()
     {
         var driver = DeviceRuntime.Driver?.DriverUIType;
@@ -86,10 +84,7 @@ public partial class DeviceRuntimeInfo1 : IDisposable
             try
             {
                 OnParametersSet();
-                await InvokeAsync(() =>
-                {
-                    StateHasChanged();
-                });
+                await InvokeAsync(() => StateHasChanged());
             }
             catch (Exception ex)
             {

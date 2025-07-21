@@ -31,5 +31,4 @@ public partial class GatewayInfo
     public ShowTypeEnum? ShowType { get; set; }
     [Parameter]
     public bool AutoRestartThread { get; set; } = true;
-
 }

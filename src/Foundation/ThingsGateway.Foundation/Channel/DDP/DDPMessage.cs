@@ -42,14 +42,11 @@ public abstract class DDPMessage : MessageBase, IResultMessage
             BodyLength = GetBodyLength(ref byteBlock);
             return true;
         }
-
     }
 
     public abstract int GetBodyLength<TByteBlock>(ref TByteBlock byteBlock) where TByteBlock : IByteBlock;
     public abstract byte[] GetContent<TByteBlock>(ref TByteBlock byteBlock) where TByteBlock : IByteBlock;
-
 }
-
 
 public class DDPTcpMessage : DDPMessage
 {

@@ -32,7 +32,6 @@ namespace ThingsGateway.SqlSugar
                         FieldName = fileName,
                         AsName = asName
                     });
-
                 }
                 else if (IsArray(item))
                 {
@@ -47,7 +46,6 @@ namespace ThingsGateway.SqlSugar
                         FieldName = fileName,
                         AsName = asName
                     });
-
                 }
                 else
                 {
@@ -57,7 +55,6 @@ namespace ThingsGateway.SqlSugar
                         AsName = item.ObjToString().Trim()
                     });
                 }
-
             }
             return conditionalModels;
         }

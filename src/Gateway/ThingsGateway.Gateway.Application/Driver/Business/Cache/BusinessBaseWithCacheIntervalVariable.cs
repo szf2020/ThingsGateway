@@ -15,7 +15,6 @@ namespace ThingsGateway.Gateway.Application;
 /// </summary>
 public abstract class BusinessBaseWithCacheIntervalVariable : BusinessBaseWithCacheInterval
 {
-
     protected override bool AlarmModelEnable => false;
 
     protected override bool DevModelEnable => false;
@@ -30,7 +29,5 @@ public abstract class BusinessBaseWithCacheIntervalVariable : BusinessBaseWithCa
     {
         throw new NotImplementedException();
     }
-
-
 
 }

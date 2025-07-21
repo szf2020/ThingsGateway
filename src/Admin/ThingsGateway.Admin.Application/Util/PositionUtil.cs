@@ -14,7 +14,6 @@ namespace ThingsGateway.Admin.Application;
 [ThingsGateway.DependencyInjection.SuppressSniffer]
 public static class PositionUtil
 {
-
     /// <summary>
     /// 构建树节点
     /// </summary>
@@ -39,7 +38,6 @@ public static class PositionUtil
         return trees;
     }
 
-
     public static List<CascaderItem> BuildCascaderItemList(IEnumerable<PositionSelectorOutput> sysresources)
     {
         if (sysresources == null) return null;
@@ -60,6 +58,4 @@ public static class PositionUtil
         }
         return trees;
     }
-
-
 }

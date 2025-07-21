@@ -16,10 +16,7 @@ namespace SvgPathProperties
             ToX = x1;
             ToY = y1;
 
-            Length = ApproximateArcLengthOfCurve(300, t =>
-            {
-                return PointOnEllipticalArc(new Point(x0, y0), rx, ry, xAxisRotate, largeArcFlag, sweepFlag, new Point(x1, y1), t);
-            });
+            Length = ApproximateArcLengthOfCurve(300, t => PointOnEllipticalArc(new Point(x0, y0), rx, ry, xAxisRotate, largeArcFlag, sweepFlag, new Point(x1, y1), t));
         }
 
         public double FromX { get; }

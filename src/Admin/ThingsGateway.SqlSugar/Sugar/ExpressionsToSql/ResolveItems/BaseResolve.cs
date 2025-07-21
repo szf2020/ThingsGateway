@@ -6,10 +6,8 @@ namespace ThingsGateway.SqlSugar
     /// </summary>
     public partial class BaseResolve
     {
-
         private BaseResolve()
         {
-
         }
         public BaseResolve(ExpressionParameter parameter)
         {

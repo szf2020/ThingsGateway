@@ -1040,7 +1040,6 @@ public partial class Clay
     /// </returns>
     public bool DeletePathValue(string path) => RemovePathValue(path);
 
-
     /// <summary>
     ///     将 <see cref="Clay" /> 转换为目标类型
     /// </summary>

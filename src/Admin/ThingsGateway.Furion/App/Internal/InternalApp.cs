@@ -151,8 +151,6 @@ internal static class InternalApp
         // 存储服务提供器
         InternalServices = hostApplicationBuilder.Services;
 
-
-
         // 存储根服务
         hostApplicationBuilder.Services.AddHostedService<GenericHostLifetimeEventsHostedService>();
 

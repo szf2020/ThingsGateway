@@ -87,10 +87,7 @@ public static class EventBusServiceCollectionExtensions
         var defaultStorerOfChannel = new ChannelEventSourceStorer(eventBusOptionsBuilder.ChannelCapacity);
 
         // 注册后台任务队列接口/实例为单例，采用工厂方式创建
-        services.AddSingleton<IEventSourceStorer>(_ =>
-        {
-            return defaultStorerOfChannel;
-        });
+        services.AddSingleton<IEventSourceStorer>(_ => defaultStorerOfChannel);
 
         // 注册默认内存通道事件发布者
         services.AddSingleton<IEventPublisher, ChannelEventPublisher>();

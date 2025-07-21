@@ -30,7 +30,6 @@ public class LogJob : IJob
         await DeleteLocalDB(stoppingToken).ConfigureAwait(false);
     }
 
-
     private static async Task DeleteRpcLog(int daysAgo, CancellationToken stoppingToken)
     {
         using var db = DbContext.GetDB<RpcLog>();
@@ -44,8 +43,6 @@ public class LogJob : IJob
         var time = DateTime.Now.AddDays(-daysAgo);
         await db.DeleteableWithAttr<BackendLog>().Where(u => u.LogTime < time).ExecuteCommandAsync(stoppingToken).ConfigureAwait(false); // 删除操作日志
     }
-
-
 
     private static async Task DeleteTextLog(CancellationToken stoppingToken)
     {
@@ -62,8 +59,6 @@ public class LogJob : IJob
         Delete(channelBaseDir, channelNames, stoppingToken);
         Delete(deviceBaseDir, deviceNames, stoppingToken);
 
-
-
         //网关通道日志以通道id命名
         var rulesService = App.RootServices.GetService<IRulesService>();
         var ruleNames = (await rulesService.GetAllAsync().ConfigureAwait(false)).Select(a => a.Name.ToString()).ToHashSet();
@@ -71,8 +66,6 @@ public class LogJob : IJob
         Directory.CreateDirectory(ruleBaseDir);
 
         Delete(ruleBaseDir, ruleNames, stoppingToken);
-
-
 
         //底层调试
         var debugDir = LoggerExtensions.GetDebugLogBasePath();
@@ -94,7 +87,6 @@ public class LogJob : IJob
             }
             catch { }
         }
-
     }
 
     private static void Delete(string baseDir, HashSet<string> strings, CancellationToken stoppingToken)
@@ -143,7 +135,5 @@ public class LogJob : IJob
             }
             catch { }
         }
-
     }
-
 }

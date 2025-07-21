@@ -245,7 +245,6 @@ internal sealed class SysDictService : BaseService<SysDict>, ISysDictService
         return sysDicts;
     }
 
-
     /// <summary>
     /// 从缓存/数据库获取系统配置列表
     /// </summary>
@@ -263,7 +262,6 @@ internal sealed class SysDictService : BaseService<SysDict>, ISysDictService
 
         return sysDicts;
     }
-
 
     /// <summary>
     /// 表格查询
@@ -301,7 +299,6 @@ internal sealed class SysDictService : BaseService<SysDict>, ISysDictService
     /// <param name="input">配置项</param>
     private async Task CheckInput(SysDict input)
     {
-
         //设置类型为业务
         input.DictType = DictTypeEnum.Define;
 
@@ -313,7 +310,6 @@ internal sealed class SysDictService : BaseService<SysDict>, ISysDictService
         {
             throw Oops.Bah(Localizer["DictDup", input.Category, input.Name]);
         }
-
     }
 
     /// <summary>
@@ -327,7 +323,6 @@ internal sealed class SysDictService : BaseService<SysDict>, ISysDictService
         if (define == DictTypeEnum.System)
             App.CacheService.Remove($"{CacheConst.Cache_SysDict}{define}{nameof(AppConfig)}");
     }
-
 
     #endregion 方法
 }

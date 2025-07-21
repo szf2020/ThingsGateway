@@ -61,7 +61,7 @@ namespace ThingsGateway.SqlSugar
         /// <param name="datas">数据数组</param>
         /// <param name="groupModels">分组模型列表</param>
         /// <param name="result">结果值</param>
-        private void GroupDataList(IReadOnlyList<T> datas, out List<GroupModel> groupModels, out int result)
+        private void GroupDataList(IEnumerable<T> datas, out List<GroupModel> groupModels, out int result)
         {
             var attribute = typeof(T).GetCustomAttribute<SplitTableAttribute>() as SplitTableAttribute;
             Check.Exception(attribute == null, $"{typeof(T).Name} need SplitTableAttribute");

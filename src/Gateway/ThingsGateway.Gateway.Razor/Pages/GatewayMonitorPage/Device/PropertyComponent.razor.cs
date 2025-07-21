@@ -44,7 +44,6 @@ public partial class PropertyComponent : IPropertyUIBase
         else if (pname == nameof(BusinessPropertyWithCacheIntervalScript.BigTextScriptVariableModel))
         {
             script = businessProperty.BigTextScriptVariableModel;
-
         }
         else if (pname == nameof(BusinessPropertyWithCacheIntervalScript.BigTextScriptDeviceModel))
         {
@@ -90,6 +89,7 @@ public partial class PropertyComponent : IPropertyUIBase
                     {
                         public IEnumerable<dynamic> GetList(IEnumerable<object> datas)
                         {
+                            if(datas==null) return null;
                             List<ExpandoObject> deviceObjs = new List<ExpandoObject>();
                             foreach (var v in datas)
                             {
@@ -129,7 +129,7 @@ public partial class PropertyComponent : IPropertyUIBase
                     {
                         public IEnumerable<dynamic> GetList(IEnumerable<object> datas)
                         {
-
+                            if(datas==null) return null;
                             List<ExpandoObject> deviceObjs = new List<ExpandoObject>();
                             //按设备名称分组
                             var groups = datas.Where(a => !string.IsNullOrEmpty(((VariableBasicData)a).DeviceName)).GroupBy(a => ((VariableBasicData)a).DeviceName, a => ((VariableBasicData)a));
@@ -174,7 +174,7 @@ public partial class PropertyComponent : IPropertyUIBase
                     {
                         public IEnumerable<dynamic> GetList(IEnumerable<object> datas)
                         {
-
+                            if(datas==null) return null;
                             List<ExpandoObject> deviceObjs = new List<ExpandoObject>();
                             //按设备名称分组
                             var groups = datas.Where(a => !string.IsNullOrEmpty(((AlarmVariable)a).DeviceName)).GroupBy(a => ((AlarmVariable)a).DeviceName, a => ((AlarmVariable)a));
@@ -223,7 +223,6 @@ public partial class PropertyComponent : IPropertyUIBase
                  if (pname == nameof(BusinessPropertyWithCacheIntervalScript.BigTextScriptAlarmModel))
     {
             businessProperty.BigTextScriptAlarmModel=v;
-
     }
     else if (pname == nameof(BusinessPropertyWithCacheIntervalScript.BigTextScriptVariableModel))
     {
@@ -233,19 +232,11 @@ public partial class PropertyComponent : IPropertyUIBase
     {
         businessProperty.BigTextScriptDeviceModel=v;
     }
-
         }) },
-
     });
         await dialogService.Show(op);
-
     }
-
 
     [Inject]
     private DialogService DialogService { get; set; }
 }
-
-
-
-

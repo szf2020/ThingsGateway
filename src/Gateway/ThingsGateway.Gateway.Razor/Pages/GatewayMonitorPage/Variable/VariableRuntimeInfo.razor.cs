@@ -20,7 +20,6 @@ namespace ThingsGateway.Gateway.Razor;
 
 public partial class VariableRuntimeInfo : IDisposable
 {
-
     private static void BeforeShowEditDialogCallback(ITableEditDialogOption<VariableRuntime> tableEditDialogOption)
     {
         tableEditDialogOption.Model = tableEditDialogOption.Model.AdaptVariableRuntime();
@@ -77,7 +76,6 @@ public partial class VariableRuntimeInfo : IDisposable
     private IDispatchService<VariableRuntime> VariableRuntimeDispatchService { get; set; }
     private SmartTriggerScheduler scheduler;
 
-
     private Task Refresh(DispatchEntry<VariableRuntime> entry)
     {
         scheduler.Trigger();
@@ -91,7 +89,6 @@ public partial class VariableRuntimeInfo : IDisposable
         if (table != null)
             await InvokeAsync(table.QueryAsync);
     }
-
 
     private async Task RunTimerAsync()
     {
@@ -155,10 +152,7 @@ public partial class VariableRuntimeInfo : IDisposable
 
     #endregion 写入变量
 
-
-
     #region 编辑
-
 
     private int TestVariableCount { get; set; }
     private int TestDeviceCount { get; set; }
@@ -187,16 +181,13 @@ public partial class VariableRuntimeInfo : IDisposable
         {
              {nameof(VariableCopyComponent.OnSave), async (List<Variable> variables1) =>
             {
-
                 await Task.Run(() =>GlobalData.VariableRuntimeService.BatchSaveVariableAsync(variables1,ItemChangedType.Add,AutoRestartThread,default));
                 await InvokeAsync(table.QueryAsync);
-
             }},
             {nameof(VariableCopyComponent.Model),variables },
         });
 
         await DialogService.Show(op);
-
     }
 
     private async Task BatchEdit(IEnumerable<Variable> variables)
@@ -235,23 +226,15 @@ public partial class VariableRuntimeInfo : IDisposable
         await DialogService.Show(op);
     }
 
-
     private async Task<bool> Delete(IEnumerable<Variable> variables)
     {
         try
         {
-            return await Task.Run(async () =>
-            {
-                return await GlobalData.VariableRuntimeService.DeleteVariableAsync(variables.Select(a => a.Id), AutoRestartThread, default);
-            });
-
+            return await Task.Run(async () => await GlobalData.VariableRuntimeService.DeleteVariableAsync(variables.Select(a => a.Id), AutoRestartThread, default));
         }
         catch (Exception ex)
         {
-            await InvokeAsync(async () =>
-            {
-                await ToastService.Warn(ex);
-            });
+            await InvokeAsync(async () => await ToastService.Warn(ex));
             return false;
         }
     }
@@ -323,7 +306,6 @@ public partial class VariableRuntimeInfo : IDisposable
 
                     break;
             }
-
         }
 
         // 返回 true 时自动弹出提示框
@@ -333,7 +315,6 @@ public partial class VariableRuntimeInfo : IDisposable
 
     async Task ExcelVariableAsync(ITableExportContext<VariableRuntime> tableExportContext)
     {
-
         var op = new DialogOption()
         {
             IsScrolling = false,
@@ -369,22 +350,16 @@ finally
                 {
                                  await InvokeAsync( async ()=>
             {
-
                     await table.QueryAsync();
              StateHasChanged();
                 });
                 }
-
-
             }},
             {nameof(USheet.Model),uSheetDatas },
         });
 
         await DialogService.Show(op);
-
     }
-
-
 
     private async Task ExcelImportAsync(ITableExportContext<VariableRuntime> tableExportContext)
     {
@@ -396,10 +371,7 @@ finally
             Title = GatewayLocalizer["ImportVariable"],
             ShowFooter = false,
             ShowCloseButton = false,
-            OnCloseAsync = async () =>
-            {
-                await InvokeAsync(table.QueryAsync);
-            },
+            OnCloseAsync = async () => await InvokeAsync(table.QueryAsync),
         };
 
         Func<IBrowserFile, Task<Dictionary<string, ImportPreviewOutputBase>>> preview = (a => GlobalData.VariableRuntimeService.PreviewAsync(a));
@@ -410,7 +382,6 @@ finally
             {nameof(ImportExcel.Preview),preview },
         });
         await DialogService.Show(op);
-
     }
 
     #endregion 导出
@@ -423,7 +394,6 @@ finally
         {
             await Task.Run(async () =>
             {
-
                 await GlobalData.VariableRuntimeService.ClearVariableAsync(AutoRestartThread, default);
                 await InvokeAsync(async () =>
                 {
@@ -434,12 +404,8 @@ finally
         }
         catch (Exception ex)
         {
-            await InvokeAsync(async () =>
-            {
-                await ToastService.Warn(ex);
-            });
+            await InvokeAsync(async () => await ToastService.Warn(ex));
         }
-
     }
     #endregion
 
@@ -447,7 +413,6 @@ finally
     {
         try
         {
-
             try
             {
                 await Task.Run(() => GlobalData.VariableRuntimeService.InsertTestDataAsync(TestVariableCount, TestDeviceCount, SlaveUrl, BusinessEnable, AutoRestartThread, default));
@@ -461,16 +426,11 @@ finally
                     StateHasChanged();
                 });
             }
-
         }
         catch (Exception ex)
         {
-            await InvokeAsync(async () =>
-            {
-                await ToastService.Warn(ex);
-            });
+            await InvokeAsync(async () => await ToastService.Warn(ex));
         }
-
     }
 
     [Parameter]

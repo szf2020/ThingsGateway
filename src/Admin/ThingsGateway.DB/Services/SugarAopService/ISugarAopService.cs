@@ -10,7 +10,6 @@
 
 namespace ThingsGateway.DB;
 
-
 /// <summary>
 /// Aop设置
 /// </summary>
@@ -20,7 +19,6 @@ public interface ISugarAopService
     /// Aop设置
     /// </summary>
     public void AopSetting(ISqlSugarClient db, bool? isShowSql = null);
-
 }
 /// <summary>
 /// Aop设置，可自定义加解密等

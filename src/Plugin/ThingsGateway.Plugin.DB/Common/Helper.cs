@@ -39,11 +39,8 @@ internal static class Helper
             );
     }
 
-
     public static SQLHistoryValue AdaptSQLHistoryValue(this VariableBasicData src)
     {
-
-
         var dest = new SQLHistoryValue();
         dest.Id = src.Id;
         dest.Value = GetValue(src.Value);
@@ -61,7 +58,12 @@ internal static class Helper
                 Enumerable.Select(src, x => AdaptSQLHistoryValue(x))
             );
     }
-
+    public static IEnumerable<SQLHistoryValue> AdaptEnumerableSQLHistoryValue(this IEnumerable<VariableBasicData> src)
+    {
+        return (
+                Enumerable.Select(src, x => AdaptSQLHistoryValue(x))
+            );
+    }
 
     public static SQLNumberHistoryValue AdaptSQLNumberHistoryValue(this VariableRuntime src)
     {
@@ -82,12 +84,15 @@ internal static class Helper
                 Enumerable.Select(src, x => AdaptSQLNumberHistoryValue(x))
             );
     }
-
+    public static IEnumerable<SQLNumberHistoryValue> AdaptEnumerableSQLNumberHistoryValue(this IEnumerable<VariableRuntime> src)
+    {
+        return (
+                Enumerable.Select(src, x => AdaptSQLNumberHistoryValue(x))
+            );
+    }
 
     public static SQLNumberHistoryValue AdaptSQLNumberHistoryValue(this VariableBasicData src)
     {
-
-
         var dest = new SQLNumberHistoryValue();
         dest.Id = src.Id;
         dest.Value = src.Value.GetType() == typeof(bool) ? ConvertUtility.Convert.ToBoolean(src.Value, false) ? 1 : 0 : ConvertUtility.Convert.ToDecimal(src.Value, 0);
@@ -105,8 +110,12 @@ internal static class Helper
                 Enumerable.Select(src, x => AdaptSQLNumberHistoryValue(x))
             );
     }
-
-
+    public static IEnumerable<SQLNumberHistoryValue> AdaptEnumerableSQLNumberHistoryValue(this IEnumerable<VariableBasicData> src)
+    {
+        return (
+                Enumerable.Select(src, x => AdaptSQLNumberHistoryValue(x))
+            );
+    }
 
     public static SQLRealValue AdaptSQLRealValue(this VariableBasicData src)
     {
@@ -126,7 +135,12 @@ internal static class Helper
                 Enumerable.Select(src, x => AdaptSQLRealValue(x))
             );
     }
-
+    public static IEnumerable<SQLRealValue> AdaptEnumerableSQLRealValue(this IEnumerable<VariableBasicData> src)
+    {
+        return (
+                Enumerable.Select(src, x => AdaptSQLRealValue(x))
+            );
+    }
     public static SQLRealValue AdaptSQLRealValue(this VariableRuntime src)
     {
         var dest = new SQLRealValue();
@@ -145,7 +159,12 @@ internal static class Helper
                 Enumerable.Select(src, x => AdaptSQLRealValue(x))
             );
     }
-
+    public static IEnumerable<SQLRealValue> AdaptEnumerableSQLRealValue(this IEnumerable<VariableRuntime> src)
+    {
+        return (
+                Enumerable.Select(src, x => AdaptSQLRealValue(x))
+            );
+    }
     #endregion
 
     #region
@@ -169,11 +188,8 @@ internal static class Helper
             );
     }
 
-
     public static QuestDBHistoryValue AdaptQuestDBHistoryValue(this VariableBasicData src)
     {
-
-
         var dest = new QuestDBHistoryValue();
         dest.Id = src.Id;
         dest.Value = GetValue(src.Value);
@@ -191,7 +207,6 @@ internal static class Helper
                 Enumerable.Select(src, x => AdaptQuestDBHistoryValue(x))
             );
     }
-
 
     public static QuestDBNumberHistoryValue AdaptQuestDBNumberHistoryValue(this VariableRuntime src)
     {
@@ -213,11 +228,8 @@ internal static class Helper
             );
     }
 
-
     public static QuestDBNumberHistoryValue AdaptQuestDBNumberHistoryValue(this VariableBasicData src)
     {
-
-
         var dest = new QuestDBNumberHistoryValue();
         dest.Id = src.Id;
         dest.Value = src.Value.GetType() == typeof(bool) ? ConvertUtility.Convert.ToBoolean(src.Value, false) ? 1 : 0 : ConvertUtility.Convert.ToDecimal(src.Value, 0);
@@ -236,16 +248,9 @@ internal static class Helper
             );
     }
 
-
-
     static DateTime UtcTime1970 = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
-
     #endregion
-
-
-
-
 
     private static string GetValue(object src)
     {
@@ -269,6 +274,4 @@ internal static class Helper
             return string.Empty;
         }
     }
-
-
 }

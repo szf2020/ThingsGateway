@@ -33,9 +33,7 @@ public class S7Message : MessageBase, IResultMessage
     }
     public override FilterResult CheckBody<TByteBlock>(ref TByteBlock byteBlock)
     {
-
         var pos = byteBlock.Position;
-
 
         if (byteBlock[pos + 1] == 0xD0) // 首次握手0XD0连接确认
         {
@@ -177,6 +175,4 @@ public class S7Message : MessageBase, IResultMessage
         ErrorMessage = "Unsupport function code";
         return FilterResult.Success;
     }
-
-
 }

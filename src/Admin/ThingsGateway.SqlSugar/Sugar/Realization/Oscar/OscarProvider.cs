@@ -127,7 +127,6 @@ namespace ThingsGateway.SqlSugar
             return result;
         }
 
-
         static readonly Dictionary<Type, OscarDbType> ArrayMapping = new Dictionary<Type, OscarDbType>()
         {
             { typeof(int[]),OscarDbType.Integer},
@@ -140,7 +139,6 @@ namespace ThingsGateway.SqlSugar
             {typeof(DateTime[]),OscarDbType.Date},
             {typeof(float[]),OscarDbType.Real},
 
-
             { typeof(int?[]),OscarDbType.Integer},
             { typeof(short?[]),OscarDbType.SmallInt},
             { typeof(long?[]),OscarDbType.BigInt},
@@ -149,7 +147,6 @@ namespace ThingsGateway.SqlSugar
             { typeof(byte?[]),OscarDbType.Bytea},
             { typeof(bool?[]),OscarDbType.Boolean},
             {typeof(DateTime?[]),OscarDbType.Date},
-
 
              { typeof(string[]), OscarDbType.Text},
              {typeof(float?[]),OscarDbType.Real},

@@ -15,10 +15,8 @@ namespace ThingsGateway.Admin.Razor;
 
 public partial class SysRoleEdit
 {
-
     [Inject]
     private IStringLocalizer<ThingsGateway.Admin.Razor._Imports>? AdminLocalizer { get; set; }
-
 
     [Parameter]
     [NotNull]
@@ -64,6 +62,4 @@ public partial class SysRoleEdit
     }
     [NotNull]
     private List<TreeViewItem<long>> OrgItems { get; set; }
-
-
 }

@@ -8,7 +8,6 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-
 using BootstrapBlazor.Components;
 
 using System.Collections.Concurrent;
@@ -22,7 +21,6 @@ namespace ThingsGateway.Gateway.Application;
 
 public static class VariableServiceHelpers
 {
-
     public static async Task<USheetDatas> ExportVariableAsync(IEnumerable<Variable> variables, string sortName = nameof(Variable.Id), SortOrder sortOrder = SortOrder.Asc)
     {
         var deviceDicts = (await GlobalData.DeviceService.GetAllAsync().ConfigureAwait(false)).ToDictionary(a => a.Id);
@@ -87,7 +85,6 @@ Dictionary<long, Channel> channelDicts)
             return false;
         });
     }
-
 
     public static Dictionary<string, object> ExportSheets(
     IEnumerable<Variable> data,
@@ -381,7 +378,6 @@ Dictionary<long, Channel> channelDicts)
             #region 插件sheet
             if (variable.VariablePropertys != null)
             {
-
                 foreach (var item in variable.VariablePropertys)
                 {
                     //插件属性
@@ -406,7 +402,6 @@ Dictionary<long, Channel> channelDicts)
                     {
                         try
                         {
-
                             var variableProperty = ((BusinessBase)GlobalData.PluginService.GetDriver(channel.PluginName))?.VariablePropertys;
                             propertys.Item1 = variableProperty;
                             var variablePropertyType = variableProperty.GetType();
@@ -415,11 +410,9 @@ Dictionary<long, Channel> channelDicts)
                .ToDictionary(a => variablePropertyType.GetPropertyDisplayName(a.Name, a =>
                a.GetCustomAttribute<DynamicPropertyAttribute>(true)?.Description));
                             propertysDict.TryAdd(channel.PluginName, propertys);
-
                         }
                         catch
                         {
-
                         }
                     }
                     if (propertys.Item2?.Count == null)
@@ -465,7 +458,6 @@ Dictionary<long, Channel> channelDicts)
                                     if (driverInfo.Count > 0)
                                         devicePropertys.TryAdd(pluginName.Item2, new() { driverInfo });
                                 }
-
                             }
                         }
                     }
@@ -527,7 +519,6 @@ Dictionary<long, Channel> channelDicts)
         var sheetNames = uSheetDatas.sheets.Keys.ToList();
         foreach (var sheetName in sheetNames)
         {
-
             List<IDictionary<string, object>> rows = new();
             var first = uSheetDatas.sheets[sheetName].cellData[0];
 
@@ -553,7 +544,5 @@ Dictionary<long, Channel> channelDicts)
         }
 
         return ImportPreviews;
-
     }
-
 }

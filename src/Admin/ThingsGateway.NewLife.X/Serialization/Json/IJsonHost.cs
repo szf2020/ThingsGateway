@@ -4,7 +4,6 @@ using ThingsGateway.NewLife.Collections;
 using ThingsGateway.NewLife.Model;
 using ThingsGateway.NewLife.Reflection;
 
-
 #if NET6_0_OR_GREATER
 using System.Text.Encodings.Web;
 using System.Text.Json;
@@ -299,7 +298,6 @@ public class SystemJson : IJsonHost
 
     #endregion
 
-
     #region 构造
     /// <summary>实例化</summary>
     static SystemJson()
@@ -320,7 +318,6 @@ public class SystemJson : IJsonHost
     public JsonSerializerOptions JsonSerializerOptions { get; } = new JsonSerializerOptions(Options);
     public SystemJson()
     {
-
     }
     #endregion
 
@@ -354,7 +351,6 @@ public class SystemJson : IJsonHost
         var options = GetOptions(Options, indented, nullValue, camelCase);
         return JsonSerializer.Serialize(value, options);
     }
-
 
     /// <summary>写入对象，得到Json字符串</summary>
     /// <param name="value"></param>

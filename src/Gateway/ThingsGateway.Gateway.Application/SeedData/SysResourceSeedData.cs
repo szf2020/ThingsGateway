@@ -25,11 +25,9 @@ public class SysResourceSeedData : ISqlSugarEntitySeedData<SysResource>
         var data2 = SeedDataUtil.GetSeedData<SysResource>(PathExtensions.CombinePathWithOs("SeedData", "Management", "seed_sys_resource.json"));
         var data3 = SeedDataUtil.GetSeedData<SysResource>(PathExtensions.CombinePathWithOs("SeedData", "Management", "seed_sys_resourcebutton.json"));
 
-
         var data4 = SeedDataUtil.GetSeedData<SysResource>(PathExtensions.CombinePathWithOs("SeedData", "RulesEngine", "seed_sys_resource.json"));
         var data5 = SeedDataUtil.GetSeedData<SysResource>(PathExtensions.CombinePathWithOs("SeedData", "RulesEngine", "seed_sys_resourcebutton.json"));
 
         return SeedDataUtil.GetSeedDataByJson<SysResource>(SeedDataUtil.GetManifestResourceStream(assembly, "SeedData.RulesEngine.seed_sys_resource.json")).Concat(SeedDataUtil.GetSeedDataByJson<SysResource>(SeedDataUtil.GetManifestResourceStream(assembly, "SeedData.RulesEngine.seed_sys_resourcebutton.json"))).Concat(data4).Concat(data5).Concat(SeedDataUtil.GetSeedDataByJson<SysResource>(SeedDataUtil.GetManifestResourceStream(assembly, "SeedData.Gateway.seed_gateway_resource.json"))).Concat(data1).Concat(SeedDataUtil.GetSeedDataByJson<SysResource>(SeedDataUtil.GetManifestResourceStream(assembly, "SeedData.Management.seed_sys_resource.json"))).Concat(SeedDataUtil.GetSeedDataByJson<SysResource>(SeedDataUtil.GetManifestResourceStream(assembly, "SeedData.Management.seed_sys_resourcebutton.json"))).Concat(data2).Concat(data3);
-
     }
 }

@@ -99,13 +99,10 @@ internal interface IVariableService
     /// <param name="type">变量变化类型。</param>
     Task<bool> SaveVariableAsync(Variable input, ItemChangedType type);
 
-
-
     /// <summary>
     /// 保存初始值
     /// </summary>
     Task UpdateInitValueAsync(List<Variable> variables);
-
 
     Task<List<Variable>> GetByDeviceIdAsync(List<long> deviceIds);
     void DeleteVariableCache();

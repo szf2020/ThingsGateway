@@ -48,10 +48,7 @@ public static class ILoggingBuilderExtensions
     public static ILoggingBuilder AddFile(this ILoggingBuilder builder, string fileName, bool append = true)
     {
         // 注册文件日志记录器提供器
-        builder.Services.Add(ServiceDescriptor.Singleton<ILoggerProvider, FileLoggerProvider>((serviceProvider) =>
-        {
-            return new FileLoggerProvider(fileName ?? "application.log", append);
-        }));
+        builder.Services.Add(ServiceDescriptor.Singleton<ILoggerProvider, FileLoggerProvider>((serviceProvider) => new FileLoggerProvider(fileName ?? "application.log", append)));
 
         return builder;
     }
@@ -98,10 +95,7 @@ public static class ILoggingBuilderExtensions
     public static ILoggingBuilder AddFile(this ILoggingBuilder builder, Func<string> configuraionKey, Action<FileLoggerOptions> configure = default)
     {
         // 注册文件日志记录器提供器
-        builder.Services.Add(ServiceDescriptor.Singleton<ILoggerProvider, FileLoggerProvider>((serviceProvider) =>
-        {
-            return Penetrates.CreateFromConfiguration(configuraionKey, configure);
-        }));
+        builder.Services.Add(ServiceDescriptor.Singleton<ILoggerProvider, FileLoggerProvider>((serviceProvider) => Penetrates.CreateFromConfiguration(configuraionKey, configure)));
 
         return builder;
     }

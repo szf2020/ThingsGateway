@@ -25,10 +25,8 @@ public class TDengineDBNumberHistoryValue : STable, IPrimaryIdEntity, IDBHistory
     [AutoGenerateColumn(Order = 1, Visible = true, Sortable = true, Filterable = false)]
     public DateTime CreateTime { get; set; }
 
-
     [AutoGenerateColumn(Order = 1, Visible = true, Sortable = true, Filterable = false)]
     public DateTime CollectTime { get; set; }
-
 
     [AutoGenerateColumn(Order = 1, Visible = true, Sortable = true, Filterable = false)]
     public bool IsOnline { get; set; }
@@ -36,11 +34,8 @@ public class TDengineDBNumberHistoryValue : STable, IPrimaryIdEntity, IDBHistory
     [AutoGenerateColumn(Order = 1, Visible = true, Sortable = true, Filterable = false)]
     public decimal Value { get; set; }
 
-
-
     [AutoGenerateColumn(Order = 1, Visible = true, Sortable = true, Filterable = false)]
     public string DeviceName { get; set; }
-
 
     [AutoGenerateColumn(Order = 1, Visible = true, Sortable = true, Filterable = false)]
     public string Name { get; set; }

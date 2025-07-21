@@ -25,7 +25,3 @@ public static partial class AdminMapper
     public static partial QueryData<UserSelectorOutput> AdaptQueryDataUserSelectorOutput(this QueryData<SysUser> src);
     public static partial LoginInput AdaptLoginInput(this LoginInput src);
 }
-
-
-
-

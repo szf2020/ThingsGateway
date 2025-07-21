@@ -47,7 +47,6 @@ public interface IPluginService
     /// <returns></returns>
     List<PluginInfo> GetList(PluginTypeEnum? pluginType = null);
 
-
     /// <summary>
     /// 获取变量属性
     /// </summary>
@@ -79,5 +78,4 @@ public interface IPluginService
     /// <param name="driver"></param>
     /// <param name="deviceProperties"></param>
     void SetDriverProperties(IDriver driver, Dictionary<string, string> deviceProperties);
-
 }

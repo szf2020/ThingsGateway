@@ -71,7 +71,5 @@ namespace ThingsGateway.Gateway.Razor
                 return ret;
             }
         }
-
-
     }
 }

@@ -38,11 +38,9 @@ internal sealed class RedundancyHostedService : BackgroundService, IRedundancyHo
 
     public Task ForcedSync(CancellationToken cancellationToken = default) => RedundancyTask.ForcedSync(cancellationToken);
 
-
     public override async Task StopAsync(CancellationToken cancellationToken)
     {
         await RedundancyTask.DisposeAsync().ConfigureAwait(false);
         await base.StopAsync(cancellationToken).ConfigureAwait(false);
     }
-
 }

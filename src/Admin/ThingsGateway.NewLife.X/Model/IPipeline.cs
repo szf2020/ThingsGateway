@@ -3,7 +3,6 @@
 /// <summary>管道。进站顺序，出站逆序</summary>
 public interface IPipeline
 {
-
     #region 基础方法
     /// <summary>添加处理器到末尾</summary>
     /// <param name="handler">处理器</param>
@@ -45,7 +44,6 @@ public class Pipeline : IPipeline
     /// <summary>处理器集合</summary>
     public IList<IHandler> Handlers { get; } = [];
     #endregion
-
 
     #region 方法
     /// <summary>添加处理器到末尾</summary>

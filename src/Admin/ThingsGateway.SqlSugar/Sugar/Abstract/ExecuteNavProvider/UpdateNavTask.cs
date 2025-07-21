@@ -320,10 +320,7 @@ namespace ThingsGateway.SqlSugar
             }
             else
             {
-                this.Context.Ado.UseTran(() =>
-                {
-                    PreFunc();
-                }, ex => throw ex);
+                this.Context.Ado.UseTran(() => PreFunc(), ex => throw ex);
             }
             return true;
         }

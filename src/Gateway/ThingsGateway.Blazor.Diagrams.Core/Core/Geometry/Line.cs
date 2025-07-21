@@ -27,7 +27,6 @@ public class Line
         {
             if (alpha > det || beta > det)
                 return null;
-
         }
         else
         {

@@ -23,10 +23,7 @@ namespace ThingsGateway.SqlSugar
             if (List.Count > pageSize)
             {
                 var result = 0;
-                this.Context.Utilities.PageEach(List, pageSize, pageItem =>
-                {
-                    result += _ExecuteCommand(pageItem);
-                });
+                this.Context.Utilities.PageEach(List, pageSize, pageItem => result += _ExecuteCommand(pageItem));
                 return result;
             }
             else
@@ -34,17 +31,13 @@ namespace ThingsGateway.SqlSugar
                 var list = List;
                 return _ExecuteCommand(list);
             }
-
         }
         public int ExecuteSqlBulkCopy()
         {
             if (List.Count > pageSize)
             {
                 var result = 0;
-                this.Context.Utilities.PageEach(List, pageSize, pageItem =>
-                {
-                    result += _ExecuteSqlBulkCopy(pageItem);
-                });
+                this.Context.Utilities.PageEach(List, pageSize, pageItem => result += _ExecuteSqlBulkCopy(pageItem));
                 return result;
             }
             else
@@ -52,9 +45,7 @@ namespace ThingsGateway.SqlSugar
                 var list = List;
                 return _ExecuteSqlBulkCopy(list);
             }
-
         }
-
 
         public async Task<int> ExecuteCommandAsync()
         {
@@ -99,16 +90,14 @@ namespace ThingsGateway.SqlSugar
             }
         }
 
-
-        private async Task<int> _ExecuteCommandAsync(List<T> list)
+        private async Task<int> _ExecuteCommandAsync(IEnumerable<T> list)
         {
             int resultValue = 0;
-            List<GroupModel> groupModels;
-            int result;
-            GroupDataList(list, out groupModels, out result);
+            var groupModels = GroupDataList(list);
             foreach (var item in groupModels.GroupBy(it => it.GroupName))
             {
-                var addList = item.Select(it => it.Item).ToList();
+                CreateTable(item.Key);
+                var addList = item.Select(it => it.Item);
                 resultValue += await Context.Storageable(addList).As(item.Key).WhereColumns(whereExpression).ExecuteCommandAsync().ConfigureAwait(false);
                 if (ActionCallBack != null)
                 {
@@ -117,29 +106,28 @@ namespace ThingsGateway.SqlSugar
             }
             return resultValue;
         }
-        private int _ExecuteCommand(List<T> list)
+        private int _ExecuteCommand(IEnumerable<T> list)
         {
             int resultValue = 0;
-            List<GroupModel> groupModels;
-            int result;
-            GroupDataList(list, out groupModels, out result);
+
+            var groupModels = GroupDataList(list);
             foreach (var item in groupModels.GroupBy(it => it.GroupName))
             {
-                var addList = item.Select(it => it.Item).ToList();
+                CreateTable(item.Key);
+                var addList = item.Select(it => it.Item);
                 resultValue += this.Context.Storageable(addList).As(item.Key).WhereColumns(whereExpression).ExecuteCommand();
             }
             return resultValue;
         }
 
-        private async Task<int> _ExecuteSqlBulkCopyAsync(List<T> list)
+        private async Task<int> _ExecuteSqlBulkCopyAsync(IEnumerable<T> list)
         {
             int resultValue = 0;
-            List<GroupModel> groupModels;
-            int result;
-            GroupDataList(list, out groupModels, out result);
+            var groupModels = GroupDataList(list);
             foreach (var item in groupModels.GroupBy(it => it.GroupName))
             {
-                var addList = item.Select(it => it.Item).ToList();
+                CreateTable(item.Key);
+                var addList = item.Select(it => it.Item);
                 resultValue += await Context.Storageable(addList).As(item.Key).WhereColumns(whereExpression).ExecuteSqlBulkCopyAsync().ConfigureAwait(false);
                 if (ActionCallBack != null)
                 {
@@ -148,55 +136,53 @@ namespace ThingsGateway.SqlSugar
             }
             return resultValue;
         }
-        private int _ExecuteSqlBulkCopy(List<T> list)
+        private int _ExecuteSqlBulkCopy(IEnumerable<T> list)
         {
             int resultValue = 0;
-            List<GroupModel> groupModels;
-            int result;
-            GroupDataList(list, out groupModels, out result);
+
+            var groupModels = GroupDataList(list);
             foreach (var item in groupModels.GroupBy(it => it.GroupName))
             {
-                var addList = item.Select(it => it.Item).ToList();
+                CreateTable(item.Key);
+                var addList = item.Select(it => it.Item);
                 resultValue += this.Context.Storageable(addList).As(item.Key).WhereColumns(whereExpression).ExecuteSqlBulkCopy();
             }
             return resultValue;
         }
 
-        private void GroupDataList(List<T> datas, out List<GroupModel> groupModels, out int result)
+        private IEnumerable<GroupModel> GroupDataList(IEnumerable<T> datas)
         {
             var attribute = typeof(T).GetCustomAttribute<SplitTableAttribute>() as SplitTableAttribute;
             Check.Exception(attribute == null, $"{typeof(T).Name} need SplitTableAttribute");
-            groupModels = new List<GroupModel>();
+
             var db = this.Context;
             var context = db.SplitHelper<T>();
+
             foreach (var item in datas)
             {
                 var value = context.GetValue(attribute.SplitType, item);
                 var tableName = context.GetTableName(attribute.SplitType, value);
-                groupModels.Add(new GroupModel() { GroupName = tableName, Item = item });
+                yield return new GroupModel { GroupName = tableName, Item = item };
             }
-            var tablenames = groupModels.Select(it => it.GroupName).Distinct().ToList();
-            CreateTable(tablenames);
-            result = 0;
         }
-        private void CreateTable(List<string> tableNames)
+
+        /// <summary>创建分表</summary>
+        private void CreateTable(string tableName)
         {
-            var isLog = this.Context.Ado.IsEnableLogEvent;
-            this.Context.Ado.IsEnableLogEvent = false;
-            foreach (var item in tableNames)
+            if (tableName != null)
             {
-                if (!this.Context.DbMaintenance.IsAnyTable(item, false))
+                var isLog = this.Context.Ado.IsEnableLogEvent;
+                this.Context.Ado.IsEnableLogEvent = false;
+                if (!this.Context.DbMaintenance.IsAnyTable(tableName, false))
                 {
-                    if (item != null)
-                    {
-                        this.Context.MappingTables.Add(EntityInfo.EntityName, item);
-                        this.Context.CodeFirst.InitTables<T>();
-                    }
+                    this.Context.MappingTables.Add(EntityInfo.EntityName, tableName);
+                    this.Context.CodeFirst.InitTables<T>();
                 }
+                this.Context.Ado.IsEnableLogEvent = isLog;
+                this.Context.MappingTables.Add(EntityInfo.EntityName, EntityInfo.DbTableName);
             }
-            this.Context.Ado.IsEnableLogEvent = isLog;
-            this.Context.MappingTables.Add(EntityInfo.EntityName, EntityInfo.DbTableName);
         }
+
         internal class GroupModel
         {
             public string GroupName { get; set; }

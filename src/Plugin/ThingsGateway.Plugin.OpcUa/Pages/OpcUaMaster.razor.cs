@@ -85,9 +85,7 @@ public partial class OpcUaMaster : IDisposable
         {
             await ToastService.Warn(ex);
         }
-
     }
-
 
     protected override void OnInitialized()
     {

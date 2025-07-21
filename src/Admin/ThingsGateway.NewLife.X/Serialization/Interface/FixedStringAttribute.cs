@@ -45,5 +45,4 @@ public class FixedStringAttribute : AccessorAttribute
 
         return false;
     }
-
 }

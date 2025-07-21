@@ -34,7 +34,6 @@ namespace ThingsGateway.SqlSugar
             IsUpdate = true;
         }
 
-
         public async Task<int> ExecuteBulkCopyAsync(DataTable dt)
         {
             if (dt.Rows.Count == 0 || IsUpdate)
@@ -83,7 +82,7 @@ namespace ThingsGateway.SqlSugar
                 }
                 else
                 {
-                    cmd.CommandText = this.Context.InsertableT(dictionary.First()).AS(dt.TableName).ToSql().Key.Replace(";SELECT LAST_INSERT_ROWID();", "");
+                    cmd.CommandText = this.Context.InsertableT(dictionary[0]).AS(dt.TableName).ToSql().Key.Replace(";SELECT LAST_INSERT_ROWID();", "");
                     TransformInsertCommand(cmd);
                     foreach (DataRow dataRow in dt.Rows)
                     {
@@ -138,7 +137,7 @@ namespace ThingsGateway.SqlSugar
                 }
                 else
                 {
-                    cmd.CommandText = this.Context.UpdateableT(dictionary.First())
+                    cmd.CommandText = this.Context.UpdateableT(dictionary[0])
                         .WhereColumns(whereColumns)
                         .UpdateColumns(updateColumns)
                         .AS(dt.TableName).ToSql().Key;
@@ -210,7 +209,7 @@ namespace ThingsGateway.SqlSugar
             return result;
         }
 
-        public async Task<int> Merge<T>(string tableName, DataTable dt, EntityInfo entityInfo, string[] whereColumns, string[] updateColumns, List<T> datas) where T : class, new()
+        public async Task<int> Merge<T>(string tableName, DataTable dt, EntityInfo entityInfo, string[] whereColumns, string[] updateColumns, IEnumerable<T> datas) where T : class, new()
         {
             var result = 0;
             await Context.Utilities.PageEachAsync(datas, 2000, async pageItems =>

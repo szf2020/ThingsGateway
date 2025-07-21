@@ -62,7 +62,6 @@
             }
         }
         public static List<KeyValuePair<string, CSharpDataType>> MappingTypesConst = new List<KeyValuePair<string, CSharpDataType>>(){
-
                     new KeyValuePair<string, CSharpDataType>("int2",CSharpDataType.@short),
                     new KeyValuePair<string, CSharpDataType>("uint2",CSharpDataType.@short),
                     //new KeyValuePair<string, CSharpDataType>("int1",CSharpDataType.@byte),

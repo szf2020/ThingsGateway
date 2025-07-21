@@ -11,7 +11,6 @@
 namespace ThingsGateway.Foundation;
 
 /// <inheritdoc/>
-
 public class LogMessage
 {
     public LogMessage(int level, string message)

@@ -53,8 +53,6 @@ internal sealed class ChannelService : BaseService<Channel>, IChannelService
             ManageHelper.CheckVariableCount(variables.Count);
 
             await db.Insertable(variables).ExecuteCommandAsync().ConfigureAwait(false);
-
-
         }).ConfigureAwait(false);
         if (result.IsSuccess)//如果成功了
         {
@@ -68,9 +66,7 @@ internal sealed class ChannelService : BaseService<Channel>, IChannelService
             //写日志
             throw new(result.ErrorMessage, result.ErrorException);
         }
-
     }
-
 
     /// <inheritdoc/>
     [OperDesc("UpdateGatewayData", localizerType: typeof(Channel), isRecordPar: false)]
@@ -81,16 +77,11 @@ internal sealed class ChannelService : BaseService<Channel>, IChannelService
         //事务
         var result = await db.UseTranAsync(async () =>
         {
-
             await db.Updateable(models).ExecuteCommandAsync().ConfigureAwait(false);
-
 
             await db.Updateable(devices).ExecuteCommandAsync().ConfigureAwait(false);
 
-
             await db.Updateable(variables).ExecuteCommandAsync().ConfigureAwait(false);
-
-
         }).ConfigureAwait(false);
         if (result.IsSuccess)//如果成功了
         {
@@ -104,9 +95,7 @@ internal sealed class ChannelService : BaseService<Channel>, IChannelService
             //写日志
             throw new(result.ErrorMessage, result.ErrorException);
         }
-
     }
-
 
     /// <inheritdoc/>
     [OperDesc("CopyChannel", localizerType: typeof(Channel), isRecordPar: false)]
@@ -130,8 +119,6 @@ internal sealed class ChannelService : BaseService<Channel>, IChannelService
             ManageHelper.CheckVariableCount(variable.Count);
 
             await db.Insertable(variable).ExecuteCommandAsync().ConfigureAwait(false);
-
-
         }).ConfigureAwait(false);
         if (result.IsSuccess)//如果成功了
         {
@@ -145,9 +132,7 @@ internal sealed class ChannelService : BaseService<Channel>, IChannelService
             //写日志
             throw new(result.ErrorMessage, result.ErrorException);
         }
-
     }
-
 
     public async Task UpdateLogAsync(long channelId, LogLevel logLevel)
     {
@@ -159,7 +144,6 @@ internal sealed class ChannelService : BaseService<Channel>, IChannelService
             //更新数据库
 
             await db.Updateable<Channel>().SetColumns(it => new Channel() { LogLevel = logLevel }).Where(a => a.Id == channelId).ExecuteCommandAsync().ConfigureAwait(false);
-
         }).ConfigureAwait(false);
         if (result.IsSuccess)//如果成功了
         {
@@ -192,7 +176,6 @@ internal sealed class ChannelService : BaseService<Channel>, IChannelService
 
                 //更新数据库
                 await db.Updateable(data).UpdateColumns(differences.Select(a => a.Key).ToArray()).ExecuteCommandAsync().ConfigureAwait(false);
-
             }).ConfigureAwait(false);
             if (result.IsSuccess)//如果成功了
             {
@@ -210,7 +193,6 @@ internal sealed class ChannelService : BaseService<Channel>, IChannelService
             return true;
         }
     }
-
 
     [OperDesc("DeleteChannel", localizerType: typeof(Channel), isRecordPar: false)]
     public async Task<bool> DeleteChannelAsync(IEnumerable<long> ids)
@@ -345,9 +327,6 @@ internal sealed class ChannelService : BaseService<Channel>, IChannelService
         return false;
     }
 
-
-
-
     #endregion
 
     #region 导出
@@ -369,7 +348,7 @@ internal sealed class ChannelService : BaseService<Channel>, IChannelService
 
         var query = GetQuery(db, exportFilter.QueryPageOptions, whereQuery, exportFilter.FilterKeyValueAction);
 
-        return query.GetAsyncEnumerable();
+        return query.ToAsyncEnumerable();
     }
 
     /// <inheritdoc/>
@@ -384,8 +363,6 @@ internal sealed class ChannelService : BaseService<Channel>, IChannelService
         return memoryStream;
     }
 
-
-
     #endregion 导出
 
     #region 导入
@@ -394,7 +371,7 @@ internal sealed class ChannelService : BaseService<Channel>, IChannelService
     [OperDesc("ImportChannel", isRecordPar: false, localizerType: typeof(Channel))]
     public async Task<HashSet<long>> ImportChannelAsync(Dictionary<string, ImportPreviewOutputBase> input)
     {
-        var channels = new List<Channel>();
+        List<Channel>? channels = new List<Channel>();
         foreach (var item in input)
         {
             if (item.Key == ExportString.ChannelName)
@@ -538,10 +515,6 @@ internal sealed class ChannelService : BaseService<Channel>, IChannelService
 
         #endregion sheet
     }
-
-
-
-
 
     #endregion 导入
 }

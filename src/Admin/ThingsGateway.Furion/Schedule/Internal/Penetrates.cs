@@ -130,7 +130,7 @@ internal static class Penetrates
         if (string.IsNullOrWhiteSpace(str)) return str;
 
         // 获取首个字母
-        var firstLetter = str.First().ToString();
+        var firstLetter = str[0].ToString();
 
         // 拼接最终返回字符串
         return string.Concat(isUpper

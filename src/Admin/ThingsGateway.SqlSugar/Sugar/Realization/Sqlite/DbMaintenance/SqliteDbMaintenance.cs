@@ -432,11 +432,7 @@ AND sql LIKE '%" + tableName + "%'");
             cacheKey = GetCacheKey(cacheKey);
             if (isCache)
             {
-                return this.Context.Utilities.GetReflectionInoCacheInstance().GetOrCreate<List<DbColumnInfo>>(cacheKey, () =>
-                {
-                    return GetColumnInfosByTableName(tableName);
-
-                });
+                return this.Context.Utilities.GetReflectionInoCacheInstance().GetOrCreate<List<DbColumnInfo>>(cacheKey, () => GetColumnInfosByTableName(tableName));
             }
             else
             {
@@ -522,7 +518,6 @@ AND sql LIKE '%" + tableName + "%'");
         {
             return true;
         }
-
 
         public override bool BackupTable(string oldTableName, string newTableName, int maxBackupDataRows = int.MaxValue)
         {

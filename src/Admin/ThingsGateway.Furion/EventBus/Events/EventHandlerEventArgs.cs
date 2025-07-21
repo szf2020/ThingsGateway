@@ -43,7 +43,6 @@ public sealed class EventHandlerEventArgs : EventArgs
     /// </summary>
     public Exception Exception { get; internal set; }
 
-
     /// <summary>
     /// 执行结果
     /// </summary>

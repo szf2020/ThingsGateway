@@ -276,7 +276,7 @@ namespace ThingsGateway.SqlSugar
                 {
                     if (_Roots.Count == 1 && _RootOptions?.IsOptLock == true)
                     {
-                        this._Context.UpdateableT(_Roots.First())
+                        this._Context.UpdateableT(_Roots[0])
                           .EnableDiffLogEventIF(_RootOptions.IsDiffLogEvent, _RootOptions.DiffLogBizData)
                           .UpdateColumns(_RootOptions.UpdateColumns)
                           .IgnoreColumns(_RootOptions.IgnoreColumns)

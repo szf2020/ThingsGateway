@@ -62,7 +62,6 @@ public partial class LogConsole : IDisposable
     [Inject]
     private IPlatformService PlatformService { get; set; }
 
-
     private string logPath;
     protected override async Task OnParametersSetAsync()
     {
@@ -130,7 +129,6 @@ public partial class LogConsole : IDisposable
         }
         finally
         {
-
             WaitLock.Release();
         }
     }

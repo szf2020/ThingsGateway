@@ -70,7 +70,6 @@ namespace ThingsGateway.SqlSugar
                     {
                         items.Add(new ExpressionItems() { Type = 2, Expression = child2Expression, ThisEntityInfo = this.context.EntityMaintenance.GetEntityInfo(child2Expression.Type), ParentEntityInfo = this.context.EntityMaintenance.GetEntityInfo(GetMemberExpression(child2Expression).Type) });
                         child2Expression = GetMemberExpression(child2Expression);
-
                     }
                     else if (IsParameter(child2Expression))
                     {
@@ -95,7 +94,7 @@ namespace ThingsGateway.SqlSugar
             MapperSql MapperSql = new MapperSql();
             var memberInfo = this.items.Where(it => it.Type == 3).First();
             var subInfos = this.items.Where(it => it.Type == 2).Reverse().ToList();
-            var formInfo = subInfos.First();
+            var formInfo = subInfos[0];
             var joinInfos = subInfos.Skip(1).ToList();
             var i = 0;
             var masterShortName = formInfo.ThisEntityInfo.DbTableName + i;
@@ -120,7 +119,7 @@ namespace ThingsGateway.SqlSugar
             }
             var isAny = (memberInfo.Expression as MethodCallExpression).Method.Name == "Any";
             queryable.Select(isAny ? "1" : " COUNT(1) ");
-            var last = subInfos.First();
+            var last = subInfos[0];
             var FirstPkColumn = last.ThisEntityInfo.Columns.FirstOrDefault(it => it.IsPrimarykey);
             FirstPkColumn = GetFirstPkColumn(last, FirstPkColumn);
             Check.ExceptionEasy(FirstPkColumn == null, $"{last.ThisEntityInfo.EntityName} need PrimayKey", $"使用导航属性{last.ThisEntityInfo.EntityName} 缺少主键");
@@ -132,7 +131,6 @@ namespace ThingsGateway.SqlSugar
             if (isAny)
             {
                 MapperSql.Sql = $" EXISTS( {MapperSql.Sql}) ";
-
             }
             return MapperSql;
         }
@@ -210,7 +208,6 @@ namespace ThingsGateway.SqlSugar
             return lastShortName;
         }
 
-
         private string ManyToMany(ref ExpressionItems formInfo, ref int i, ISugarQueryable<object> queryable, ref int index, ExpressionItems item)
         {
             string lastShortName;
@@ -274,7 +271,6 @@ namespace ThingsGateway.SqlSugar
                             sqlBuilder.GetTranslationColumnName(lastShortName) + "." + sqlBuilder.GetTranslationColumnName(it.DbColumnName));
                         if (oldWhere != newWhere && !oldWhere.Contains($" {sqlBuilder.GetTranslationColumnName(it.DbColumnName)}"))
                         {
-
                         }
                         else
                         {

@@ -57,7 +57,6 @@ public static class DbContext
         return Db.GetConnection(tenant).CopyNew();//获取数据库对象
     }
 
-
     private static ISugarAopService sugarAopService;
     private static ISugarAopService SugarAopService
     {
@@ -87,7 +86,6 @@ public static class DbContext
             );
         });
     }
-
 
     /// <summary>
     /// 实体更多配置
@@ -123,9 +121,7 @@ public static class DbContext
         Console.WriteLine("【Sql语句】：" + msg + Environment.NewLine);
     }
 
-
-
-    public static async Task BulkCopyAsync<TITEM>(this SqlSugarClient db, List<TITEM> datas, int size) where TITEM : class, new()
+    public static async Task BulkCopyAsync<TITEM>(this SqlSugarClient db, IEnumerable<TITEM> datas, int size) where TITEM : class, new()
     {
         switch (db.CurrentConnectionConfig.DbType)
         {
@@ -140,12 +136,11 @@ public static class DbContext
                 await db.Fastest<TITEM>().PageSize(size).BulkCopyAsync(datas).ConfigureAwait(false);
                 break;
             default:
-                await db.Insertable(datas).PageSize(size).ExecuteCommandAsync().ConfigureAwait(false);
+                await db.Insertable(datas is IReadOnlyList<TITEM> values ? values : datas.ToList()).PageSize(size).ExecuteCommandAsync().ConfigureAwait(false);
                 break;
         }
-
     }
-    public static async Task BulkUpdateAsync<TITEM>(this SqlSugarClient db, List<TITEM> datas, int size) where TITEM : class, new()
+    public static async Task BulkUpdateAsync<TITEM>(this SqlSugarClient db, IEnumerable<TITEM> datas, int size) where TITEM : class, new()
     {
         switch (db.CurrentConnectionConfig.DbType)
         {
@@ -160,7 +155,7 @@ public static class DbContext
                 await db.Fastest<TITEM>().PageSize(size).BulkUpdateAsync(datas).ConfigureAwait(false);
                 break;
             default:
-                await db.Updateable(datas).PageSize(size).ExecuteCommandAsync().ConfigureAwait(false);
+                await db.Updateable(datas is IReadOnlyList<TITEM> values ? values : datas.ToList()).PageSize(size).ExecuteCommandAsync().ConfigureAwait(false);
                 break;
         }
     }

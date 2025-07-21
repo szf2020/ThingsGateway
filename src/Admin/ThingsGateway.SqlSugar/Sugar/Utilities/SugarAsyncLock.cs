@@ -4,10 +4,8 @@
     {
         static readonly SemaphoreSlim SemaphoreSlim = new SemaphoreSlim(1);
 
-
         public SugarAsyncLock(SqlSugarProvider db)
         {
-
         }
 
         public async Task<SugarAsyncLock> AsyncLock(int timeOutSeconds)

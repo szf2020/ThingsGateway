@@ -36,7 +36,6 @@ namespace ThingsGateway.SqlSugar
                 var shortName = item.First()[1].ObjToString();
                 jsonTableNameInfo.ShortName = shortName;
                 jsonTableNameInfo.TableName = tableName;
-
             }
             else
             {
@@ -47,7 +46,6 @@ namespace ThingsGateway.SqlSugar
         }
         public KeyValuePair<string, IReadOnlyList<SugarParameter>> GetWhere(string item, SqlSugarProvider context)
         {
-
             if (!IsConditionalModel(item))
             {
                 var obj = context.Utilities.JsonToSqlFuncModels(item);

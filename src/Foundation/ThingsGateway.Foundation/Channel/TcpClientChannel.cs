@@ -8,9 +8,6 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-
-
-
 using System.Collections.Concurrent;
 
 using ThingsGateway.NewLife;
@@ -63,7 +60,6 @@ public class TcpClientChannel : TcpClient, IClientChannel
     public WaitHandlePool<MessageBase> WaitHandlePool { get; } = new();
     public virtual WaitLock GetLock(string key) => WaitLock;
 
-
     /// <inheritdoc/>
     public WaitLock WaitLock => ChannelOptions.WaitLock;
 
@@ -113,7 +109,6 @@ public class TcpClientChannel : TcpClient, IClientChannel
                     {
                         if (token.IsCancellationRequested) return;
                         await this.OnChannelEvent(Started).ConfigureAwait(false);
-
                     }
                 }
             }
@@ -137,14 +132,11 @@ public class TcpClientChannel : TcpClient, IClientChannel
         return $"{IP}:{Port}";
     }
 
-
     protected override async Task OnTcpClosed(ClosedEventArgs e)
     {
-
         Logger?.Info($"{ToString()}  Closed{(e.Message.IsNullOrEmpty() ? string.Empty : $" -{e.Message}")}");
 
         await base.OnTcpClosed(e).ConfigureAwait(false);
-
     }
     /// <inheritdoc/>
     protected override async Task OnTcpClosing(ClosingEventArgs e)
@@ -185,10 +177,8 @@ public class TcpClientChannel : TcpClient, IClientChannel
         if (e.Handled)
             return;
 
-
         await this.OnChannelReceivedEvent(e, ChannelReceived).ConfigureAwait(false);
     }
-
 
     /// <inheritdoc/>
     protected override void Dispose(bool disposing)

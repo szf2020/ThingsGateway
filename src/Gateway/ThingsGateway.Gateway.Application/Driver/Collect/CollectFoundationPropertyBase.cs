@@ -22,8 +22,6 @@ public abstract class CollectFoundationPackPropertyBase : CollectFoundationPrope
     /// </summary>
     [DynamicProperty]
     public ushort MaxPack { get; set; } = 100;
-
-
 }
 public abstract class CollectFoundationPropertyBase : CollectPropertyRetryBase
 {
@@ -39,7 +37,6 @@ public abstract class CollectFoundationPropertyBase : CollectPropertyRetryBase
     [DynamicProperty]
     public virtual int SendDelayTime { get; set; } = 0;
 
-
     [DynamicProperty]
     public bool IsStringReverseByteWord { get; set; }
 
@@ -48,8 +45,6 @@ public abstract class CollectFoundationPropertyBase : CollectPropertyRetryBase
     /// </summary>
     [DynamicProperty]
     public virtual DataFormatEnum DataFormat { get; set; }
-
-
 }
 
 /// <summary>
@@ -59,14 +54,11 @@ public abstract class CollectFoundationPropertyBase : CollectPropertyRetryBase
 /// </summary>
 public abstract class CollectFoundationDtuPropertyBase : CollectFoundationPropertyBase
 {
-
     /// <summary>
     /// 默认DtuId
     /// </summary>
     [DynamicProperty]
     public string? DtuId { get; set; }
-
-
 }
 
 /// <summary>
@@ -76,12 +68,9 @@ public abstract class CollectFoundationDtuPropertyBase : CollectFoundationProper
 /// </summary>
 public abstract class CollectFoundationDtuPackPropertyBase : CollectFoundationPackPropertyBase
 {
-
     /// <summary>
     /// 默认DtuId
     /// </summary>
     [DynamicProperty]
     public string? DtuId { get; set; }
-
-
 }

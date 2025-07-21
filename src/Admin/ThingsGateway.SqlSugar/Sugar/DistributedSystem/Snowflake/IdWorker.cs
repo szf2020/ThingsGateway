@@ -27,7 +27,6 @@ namespace ThingsGateway.SqlSugar.DistributedSystem.Snowflake
         private long _sequence = 0L;
         private long _lastTimestamp = -1L;
 
-
         public IdWorker(long workerId, long datacenterId, long sequence = 0L)
         {
             WorkerId = workerId;

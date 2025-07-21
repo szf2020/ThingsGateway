@@ -60,6 +60,4 @@ public partial class ChoiceTable<TItem> where TItem : class, new()
     }
 
 
-
-
 }

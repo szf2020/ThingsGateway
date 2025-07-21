@@ -6,7 +6,6 @@ namespace ThingsGateway.SqlSugar
     {
         internal static List<TResult> GetList<T, TResult>(Expression<Func<T, TResult>> expression, QueryableProvider<T> queryableProvider)
         {
-
             List<TResult> result = new List<TResult>();
             var isSqlFunc = IsSqlFunc(expression, queryableProvider);
             var isClass = IsClass(expression, queryableProvider);
@@ -54,7 +53,6 @@ namespace ThingsGateway.SqlSugar
                     }
                     catch
                     {
-
                         throw;
                     }
                 }
@@ -122,7 +120,7 @@ namespace ThingsGateway.SqlSugar
 
         internal static async Task<List<TResult>> GetListAsync<T, TResult>(Expression<Func<T, TResult>> expression, QueryableProvider<T> queryableProvider)
         {
-            return await Task.Run(() => { return GetList(expression, queryableProvider); }).ConfigureAwait(false);
+            return await Task.Run(() => GetList(expression, queryableProvider)).ConfigureAwait(false);
         }
 
         private static string GetGroupSelect(Type type, SqlSugarProvider context, QueryBuilder queryBuilder)
@@ -328,7 +326,6 @@ namespace ThingsGateway.SqlSugar
             }
             else if (method.Method.Name == "Join")
             {
-
                 if (item.ToString().Contains($" {parameterName}."))
                 {
                     result.Add(new NavMappingColumn() { IsError = true });

@@ -27,7 +27,6 @@ using TouchSocket.Sockets;
 
 namespace ThingsGateway.Management;
 
-
 internal sealed class UpdateZipFileHostedService : BackgroundService, IUpdateZipFileHostedService
 {
     public UpdateZipFileHostedService(ILogger<UpdateZipFileHostedService> logger, INoticeService noticeService, IVerificatInfoService verificatInfoService)
@@ -103,8 +102,6 @@ internal sealed class UpdateZipFileHostedService : BackgroundService, IUpdateZip
         }
     }
 
-
-
     private INoticeService NoticeService { get; set; }
     private IVerificatInfoService VerificatInfoService { get; set; }
 
@@ -116,7 +113,6 @@ internal sealed class UpdateZipFileHostedService : BackgroundService, IUpdateZip
     private LoggerGroup _log { get; set; }
     public TextFileLogger TextLogger { get; }
     public string LogPath { get; }
-
 
     /// <summary>
     /// 传输限速
@@ -172,7 +168,6 @@ internal sealed class UpdateZipFileHostedService : BackgroundService, IUpdateZip
             }
             try
             {
-
                 await WaitLock.WaitAsync().ConfigureAwait(false);
                 RestartServerHelper.DeleteAndBackup();
 
@@ -195,7 +190,6 @@ internal sealed class UpdateZipFileHostedService : BackgroundService, IUpdateZip
         catch (Exception ex)
         {
             _log.LogWarning(ex);
-
         }
         finally
         {
@@ -281,7 +275,6 @@ internal sealed class UpdateZipFileHostedService : BackgroundService, IUpdateZip
         var result = await client.GetDmtpFileTransferActor().PushFileAsync(fileOperator).ConfigureAwait(false);
 
         client.Logger.Info(result.ToString());
-
     }
 
     /// <summary>
@@ -307,10 +300,7 @@ internal sealed class UpdateZipFileHostedService : BackgroundService, IUpdateZip
                })
                .ConfigureContainer(a =>
                {
-                   a.AddRpcStore(store =>
-                   {
-                       store.RegisterServer<UpgradeRpcServer>();
-                   });
+                   a.AddRpcStore(store => store.RegisterServer<UpgradeRpcServer>());
                    a.AddLogger(_log);
                    a.AddDmtpRouteService();//添加路由策略
                })

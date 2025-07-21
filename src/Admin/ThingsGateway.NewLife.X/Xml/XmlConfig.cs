@@ -102,7 +102,6 @@ public class XmlConfig<TConfig> : DisposeBase where TConfig : XmlConfig<TConfig>
         /// <summary>配置文件路径</summary>
         public static String ConfigFile { get; set; }
 
-
         public static String DataPath { get; set; } = "Configuration";
         /// <summary>重新加载时间。单位：毫秒</summary>
         public static Int32 ReloadTime { get; set; }

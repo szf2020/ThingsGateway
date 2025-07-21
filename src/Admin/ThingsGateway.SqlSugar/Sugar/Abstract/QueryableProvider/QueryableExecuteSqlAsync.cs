@@ -3,12 +3,10 @@ using System.Linq.Expressions;
 
 namespace ThingsGateway.SqlSugar
 {
-
     public partial class QueryableProvider<T> : QueryableAccessory, ISugarQueryable<T>
     {
         public virtual async Task<T[]> ToArrayAsync()
         {
-
             var result = await ToListAsync().ConfigureAwait(false);
             if (result.HasValue())
                 return result.ToArray();
@@ -152,7 +150,7 @@ namespace ThingsGateway.SqlSugar
             if (IsCache)
             {
                 var cacheService = this.Context.CurrentConnectionConfig.ConfigureExternalServices.DataInfoCacheService;
-                result = CacheSchemeMain.GetOrCreate<int>(cacheService, this.QueryBuilder, () => { return GetCount(); }, CacheTime, this.Context, CacheKey);
+                result = CacheSchemeMain.GetOrCreate<int>(cacheService, this.QueryBuilder, () => GetCount(), CacheTime, this.Context, CacheKey);
             }
             else
             {
@@ -322,10 +320,7 @@ namespace ThingsGateway.SqlSugar
             if (IsCache)
             {
                 var cacheService = this.Context.CurrentConnectionConfig.ConfigureExternalServices.DataInfoCacheService;
-                var result = CacheSchemeMain.GetOrCreate<string>(cacheService, this.QueryBuilder, () =>
-                {
-                    return this.Context.Utilities.SerializeObject(this.ToList(), typeof(T));
-                }, CacheTime, this.Context, CacheKey);
+                var result = CacheSchemeMain.GetOrCreate<string>(cacheService, this.QueryBuilder, () => this.Context.Utilities.SerializeObject(this.ToList(), typeof(T)), CacheTime, this.Context, CacheKey);
                 return result;
             }
             else
@@ -392,7 +387,7 @@ namespace ThingsGateway.SqlSugar
             if (IsCache)
             {
                 var cacheService = this.Context.CurrentConnectionConfig.ConfigureExternalServices.DataInfoCacheService;
-                result = CacheSchemeMain.GetOrCreate<DataTable>(cacheService, this.QueryBuilder, () => { return this.Db.GetDataTable(sqlObj.Key, sqlObj.Value); }, CacheTime, this.Context, CacheKey);
+                result = CacheSchemeMain.GetOrCreate<DataTable>(cacheService, this.QueryBuilder, () => this.Db.GetDataTable(sqlObj.Key, sqlObj.Value), CacheTime, this.Context, CacheKey);
             }
             else
             {
@@ -581,10 +576,7 @@ ParameterT parameter)
             {
                 if (queryableContext.TempChildLists == null)
                     queryableContext.TempChildLists = new Dictionary<string, object>();
-                await Context.Utilities.PageEachAsync(ids, 200, async pageIds =>
-                {
-                    result.AddRange(await Clone().In(thisField, pageIds).ToListAsync().ConfigureAwait(false));
-                }).ConfigureAwait(false);
+                await Context.Utilities.PageEachAsync(ids, 200, async pageIds => result.AddRange(await Clone().In(thisField, pageIds).ToListAsync().ConfigureAwait(false))).ConfigureAwait(false);
                 queryableContext.TempChildLists[key] = result;
             }
             var name = "";
@@ -677,11 +669,11 @@ ParameterT parameter)
             {
                 if (this.QueryBuilder.JoinQueryInfos.Count > 0)
                 {
-                    tableName = this.QueryBuilder.JoinQueryInfos.First().TableName;
+                    tableName = this.QueryBuilder.JoinQueryInfos[0].TableName;
                 }
                 if (this.QueryBuilder.EasyJoinInfos.Count > 0)
                 {
-                    tableName = this.QueryBuilder.JoinQueryInfos.First().TableName;
+                    tableName = this.QueryBuilder.JoinQueryInfos[0].TableName;
                 }
             }
             var current = await Context.Queryable<T>().AS(tableName).WithCacheIF(IsCache, CacheTime).Filter(null, QueryBuilder.IsDisabledGobalFilter).InSingleAsync(primaryKeyValue).ConfigureAwait(false);
@@ -719,11 +711,11 @@ ParameterT parameter)
             {
                 if (this.QueryBuilder.JoinQueryInfos.Count > 0)
                 {
-                    tableName = this.QueryBuilder.JoinQueryInfos.First().TableName;
+                    tableName = this.QueryBuilder.JoinQueryInfos[0].TableName;
                 }
                 if (this.QueryBuilder.EasyJoinInfos.Count > 0)
                 {
-                    tableName = this.QueryBuilder.JoinQueryInfos.First().TableName;
+                    tableName = this.QueryBuilder.JoinQueryInfos[0].TableName;
                 }
             }
             var current = await Context.Queryable<T>().AS(tableName).WhereIF(parentWhereExpression != default, parentWhereExpression).Filter(null, QueryBuilder.IsDisabledGobalFilter).InSingleAsync(primaryKeyValue).ConfigureAwait(false);

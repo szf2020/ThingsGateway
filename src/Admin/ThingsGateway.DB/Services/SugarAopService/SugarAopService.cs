@@ -8,7 +8,6 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-
 using Microsoft.Extensions.Hosting;
 
 namespace ThingsGateway.DB;
@@ -116,7 +115,6 @@ public class SugarAopService : ISugarAopService
         {
         };
 
-
         db.Aop.OnLogExecuted = (sql, pars) =>
         {
             //执行时间超过1秒
@@ -127,9 +125,7 @@ public class SugarAopService : ISugarAopService
             }
         };
     }
-
 }
-
 
 public class SugarConfigAopService : ISugarConfigAopService
 {

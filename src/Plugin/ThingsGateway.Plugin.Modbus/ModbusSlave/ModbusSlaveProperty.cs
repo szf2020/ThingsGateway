@@ -53,5 +53,4 @@ public class ModbusSlaveProperty : BusinessPropertyBase
     /// </summary>
     [DynamicProperty]
     public bool IsWriteMemory { get; set; } = true;
-
 }

@@ -44,10 +44,7 @@ public static class JsonSerializationServiceCollectionExtensions
     public static IServiceCollection AddJsonOptions(this IServiceCollection services, Action<JsonOptions> configure)
     {
         // 手动添加配置
-        services.Configure<JsonOptions>(options =>
-        {
-            configure?.Invoke(options);
-        });
+        services.Configure<JsonOptions>(options => configure?.Invoke(options));
 
         return services;
     }

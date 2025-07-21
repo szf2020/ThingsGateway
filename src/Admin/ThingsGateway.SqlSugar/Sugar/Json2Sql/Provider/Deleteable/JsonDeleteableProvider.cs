@@ -75,7 +75,7 @@ namespace ThingsGateway.SqlSugar
         {
             var result = new JsonDeleteResult();
             var sqlInfo = this.ToSqlList();
-            var sqlInfoResult = sqlInfo.First();
+            var sqlInfoResult = sqlInfo[0];
             result.UpdateRows = this.context.Ado.ExecuteCommand(sqlInfoResult.Sql, sqlInfoResult.Parameters);
             return result;
         }

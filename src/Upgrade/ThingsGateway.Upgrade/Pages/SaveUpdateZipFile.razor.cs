@@ -20,7 +20,6 @@ public partial class SaveUpdateZipFile
     [NotNull]
     public IStringLocalizer<ThingsGateway.Razor._Imports>? RazorLocalizer { get; set; }
 
-
     [Parameter]
     [NotNull]
     public Func<UpdateZipFileAddInput, Task>? OnSaveUpdateZipFile { get; set; }

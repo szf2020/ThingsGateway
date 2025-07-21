@@ -35,7 +35,6 @@ public static class ExportString
     /// </summary>
     public static string VariableName => Localizer["VariableName"];
 
-
     public static IStringLocalizer localizer;
     public static IStringLocalizer Localizer
     {
@@ -46,5 +45,4 @@ public static class ExportString
             return localizer;
         }
     }
-
 }

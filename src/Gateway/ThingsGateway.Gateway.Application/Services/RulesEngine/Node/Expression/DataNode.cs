@@ -13,7 +13,6 @@ public class DataNode : TextNode, IExpressionNode
     {
         Title = "DataNode"; Placeholder = "DataNode.Placeholder";
         Text = "return 1;";
-
     }
 
     Task<OperResult<NodeOutput>> IExpressionNode.ExecuteAsync(NodeInput input, CancellationToken cancellationToken)
@@ -31,6 +30,5 @@ public class DataNode : TextNode, IExpressionNode
             Logger?.LogWarning(ex);
             return Task.FromResult(new OperResult<NodeOutput>(ex));
         }
-
     }
 }

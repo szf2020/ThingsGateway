@@ -332,7 +332,6 @@ namespace ThingsGateway.SqlSugar
 
         #endregion
 
-
         #region Methods  
         /// <summary>
         /// 获取表信息列表

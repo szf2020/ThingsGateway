@@ -18,13 +18,11 @@ namespace ThingsGateway.Plugin.DB;
 public static partial class GatewayMapper
 {
     public static partial List<HistoryAlarm> AdaptListHistoryAlarm(this IEnumerable<AlarmVariable> src);
+    public static partial IEnumerable<HistoryAlarm> AdaptEnumerableHistoryAlarm(this IEnumerable<AlarmVariable> src);
 
     [MapProperty(nameof(AlarmVariable.Id), nameof(HistoryAlarm.Id), Use = nameof(MapId))]
     private static partial HistoryAlarm AdaptHistoryAlarm(AlarmVariable src);
 
     [UserMapping(Default = false)]
     private static long MapId(long id) => CommonUtils.GetSingleId();
-
 }
-
-

@@ -68,7 +68,6 @@ public partial class RpcLogPage
             var data = await RpcLogService.PageAsync(options);
             return data;
         });
-
     }
 
     #endregion 查询

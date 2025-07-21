@@ -266,10 +266,7 @@ namespace ThingsGateway.SqlSugar
             }
             else
             {
-                this.Context.Ado.UseTran(() =>
-                {
-                    ExecTasks();
-                }, ex => throw ex);
+                this.Context.Ado.UseTran(() => ExecTasks(), ex => throw ex);
             }
             return true;
         }

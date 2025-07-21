@@ -46,10 +46,8 @@ public class Dlt645_2007Master : CollectFoundationBase
     /// <inheritdoc/>
     public override IDevice? FoundationDevice => _plc;
 
-
     protected override async Task InitChannelAsync(IChannel? channel, CancellationToken cancellationToken)
     {
-
         ArgumentNullException.ThrowIfNull(channel);
 
         var plc = _plc;

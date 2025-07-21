@@ -22,7 +22,6 @@ internal static class TestAdapterHelper
 
         if (isSingleStreamData)
         {
-
             for (int bufferLength = 1; bufferLength < 256; bufferLength += 1)
             {
                 SingleStreamDataAdapterTester tester = SingleStreamDataAdapterTester.CreateTester(new DeviceSingleStreamDataHandleAdapter<T>()
@@ -57,8 +56,6 @@ internal static class TestAdapterHelper
                 {
                     Xunit.Assert.Fail($"{ex.Message} bufferLength: {bufferLength}");
                 }
-
-
             }
         }
         else
@@ -89,8 +86,6 @@ internal static class TestAdapterHelper
             }
         }
 
-
         Xunit.Assert.True(isSuccess, message?.ErrorMessage);
     }
-
 }

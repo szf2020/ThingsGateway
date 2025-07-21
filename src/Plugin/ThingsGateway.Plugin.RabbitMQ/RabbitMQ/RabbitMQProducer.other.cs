@@ -37,7 +37,6 @@ public partial class RabbitMQProducer : BusinessBaseWithCacheIntervalScriptAll
     }
     protected override void DeviceTimeInterval(DeviceRuntime deviceRunTime, DeviceBasicData deviceData)
     {
-
         if (!_businessPropertyWithCacheIntervalScript.DeviceTopic.IsNullOrWhiteSpace())
             AddQueueDevModel(new(deviceData));
 
@@ -116,7 +115,6 @@ public partial class RabbitMQProducer : BusinessBaseWithCacheIntervalScriptAll
             {
                 //获取组内全部变量
                 AddQueueVarModel(new CacheDBItem<List<VariableBasicData>>(variableRuntimeGroup.AdaptListVariableBasicData()));
-
             }
             else
             {

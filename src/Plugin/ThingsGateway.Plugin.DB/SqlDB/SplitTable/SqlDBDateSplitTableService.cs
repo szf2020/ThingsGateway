@@ -52,7 +52,6 @@ public class SqlDBDateSplitTableService : DateSplitTableService
     {
         var type = (SplitType)_sqlDBProducerProperty.SqlDBSplitType;
         return GetTableName(db, EntityInfo, type);
-
     }
 
     public override string GetTableName(ISqlSugarClient db, EntityInfo EntityInfo, SplitType splitType)

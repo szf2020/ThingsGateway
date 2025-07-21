@@ -220,7 +220,6 @@ public static class ScheduleExtensions
             {
                 continue;
             }
-
         }
 
         return target as TTarget;

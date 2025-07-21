@@ -6,7 +6,6 @@ namespace ThingsGateway.SqlSugar
     {
         public static List<ISubOperation> SubItems(ExpressionContext Context)
         {
-
             return new List<ISubOperation>()
                                                 {
                                                     new SubSelect() { Context=Context },

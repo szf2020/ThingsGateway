@@ -14,8 +14,6 @@ using System.ComponentModel.DataAnnotations;
 
 using ThingsGateway.Common.Extension;
 
-
-
 #if NET8_0_OR_GREATER
 using System.Collections.Frozen;
 #endif
@@ -223,10 +221,7 @@ internal class CacheManager
         {
             var type = value.GetType();
             var cacheKey = $"{CacheKeyPrefix}-Lambda-Count-{type.GetUniqueTypeName()}";
-            var invoker = Instance.GetOrCreate(cacheKey, entry =>
-            {
-                return LambdaExtensions.CountLambda(type).Compile();
-            });
+            var invoker = Instance.GetOrCreate(cacheKey, entry => LambdaExtensions.CountLambda(type).Compile());
             ret = invoker(value);
         }
         return ret;

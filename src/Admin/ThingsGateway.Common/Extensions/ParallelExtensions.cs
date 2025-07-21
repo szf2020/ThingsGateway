@@ -29,10 +29,7 @@ public static class ParallelExtensions
         ParallelOptions options = new();
         options.MaxDegreeOfParallelism = Environment.ProcessorCount;
         // 使用 Parallel.ForEach 执行指定的操作
-        Parallel.ForEach(source, options, (variable) =>
-        {
-            body(variable);
-        });
+        Parallel.ForEach(source, options, (variable) => body(variable));
     }
 
     /// <summary>
@@ -46,10 +43,7 @@ public static class ParallelExtensions
         ParallelOptions options = new();
         options.MaxDegreeOfParallelism = Environment.ProcessorCount;
         // 使用 Parallel.ForEach 执行指定的操作
-        Parallel.ForEach(source, options, (variable, state, index) =>
-        {
-            body(variable, state, index);
-        });
+        Parallel.ForEach(source, options, (variable, state, index) => body(variable, state, index));
     }
 
     /// <summary>
@@ -65,13 +59,8 @@ public static class ParallelExtensions
         var options = new ParallelOptions();
         options.MaxDegreeOfParallelism = parallelCount == 0 ? 1 : parallelCount;
         // 使用 Parallel.ForEach 执行指定的操作
-        Parallel.ForEach(source, options, variable =>
-        {
-            body(variable);
-        });
+        Parallel.ForEach(source, options, variable => body(variable));
     }
-
-
 
     /// <summary>
     /// 使用默认的并行设置执行指定的操作（Partitioner 分区）
@@ -111,7 +100,6 @@ public static class ParallelExtensions
         Parallel.ForEach(partitioner, options, body);
     }
 
-
     /// <summary>
     /// 异步执行指定的操作，并指定最大并行度和取消标志
     /// </summary>
@@ -142,9 +130,6 @@ public static class ParallelExtensions
     {
         return ParallelForEachAsync(source, body, Environment.ProcessorCount, cancellationToken);
     }
-
-
 }
-
 
 #endif

@@ -39,7 +39,6 @@ public class DiagramLinkOptions
         sourcePortModel.Alignment == PortAlignment.Bottom
         )
         {
-
             if (targetAnchor.Model == null || (targetAnchor is SinglePortAnchor targetPortAnchor &&
                targetPortAnchor.Model is PortModel targetPortModel &&
                targetPortModel.Alignment == PortAlignment.Top

@@ -42,7 +42,6 @@ internal sealed class RedundancyTask : IRpcDriver, IAsyncDisposable
         TextLogger.LogLevel = TouchSocket.Core.LogLevel.Trace;
     }
 
-
     public ILog LogMessage { get; set; }
     public TextFileLogger TextLogger { get; }
     public string LogPath { get; }
@@ -72,7 +71,6 @@ internal sealed class RedundancyTask : IRpcDriver, IAsyncDisposable
     /// </summary>
     private async Task DoMasterWork(object? state, CancellationToken stoppingToken)
     {
-
         try
         {
             bool online = false;
@@ -88,17 +86,14 @@ internal sealed class RedundancyTask : IRpcDriver, IAsyncDisposable
                 // 如果 online 为 true，表示设备在线
                 if (online)
                 {
-
                     int batchSize = 50;
 
                     var deviceRunTimes = GlobalData.ReadOnlyIdDevices.Where(a => a.Value.IsCollect == true).Select(a => a.Value).Batch(batchSize);
-
 
                     foreach (var item in _tcpDmtpService.Clients)
                     {
                         foreach (var deviceDataWithValues in deviceRunTimes)
                         {
-
                             // 将 GlobalData.CollectDevices 和 GlobalData.Variables 同步到从站
                             await item.GetDmtpRpcActor().InvokeAsync(
                                              nameof(ReverseCallbackServer.UpData), null, waitInvoke, deviceDataWithValues.AdaptListDeviceDataWithValue()).ConfigureAwait(false);
@@ -164,7 +159,6 @@ internal sealed class RedundancyTask : IRpcDriver, IAsyncDisposable
                 }
             }
 
-
             // 如果设备不在线
             if (!online)
             {
@@ -190,10 +184,7 @@ internal sealed class RedundancyTask : IRpcDriver, IAsyncDisposable
         }
     }
 
-
     private WaitLock _switchLock = new(nameof(RedundancyTask));
-
-
 
     private bool first;
     private async Task StandbyAsync()
@@ -286,7 +277,6 @@ internal sealed class RedundancyTask : IRpcDriver, IAsyncDisposable
 
             scheduledTask.Start();
         }
-
     }
     public async Task StopTaskAsync()
     {
@@ -316,7 +306,6 @@ internal sealed class RedundancyTask : IRpcDriver, IAsyncDisposable
             {
             }
         }
-
     }
 
     public async ValueTask DisposeAsync()
@@ -329,7 +318,6 @@ internal sealed class RedundancyTask : IRpcDriver, IAsyncDisposable
         _tcpDmtpClient?.TryDispose();
         _tcpDmtpService = null;
         _tcpDmtpClient = null;
-
     }
 
     #region
@@ -348,10 +336,7 @@ internal sealed class RedundancyTask : IRpcDriver, IAsyncDisposable
                .ConfigureContainer(a =>
                {
                    a.AddLogger(LogMessage);
-                   a.AddRpcStore(store =>
-                   {
-                       store.RegisterServer(new ReverseCallbackServer(this));
-                   });
+                   a.AddRpcStore(store => store.RegisterServer(new ReverseCallbackServer(this)));
                })
                .ConfigurePlugins(a =>
                {
@@ -359,8 +344,6 @@ internal sealed class RedundancyTask : IRpcDriver, IAsyncDisposable
                    a.UseDmtpHeartbeat()//使用Dmtp心跳
                    .SetTick(TimeSpan.FromMilliseconds(redundancy.HeartbeatInterval))
                    .SetMaxFailCount(redundancy.MaxErrorCount);
-
-
 
                });
 
@@ -382,10 +365,7 @@ internal sealed class RedundancyTask : IRpcDriver, IAsyncDisposable
                .ConfigureContainer(a =>
                {
                    a.AddLogger(LogMessage);
-                   a.AddRpcStore(store =>
-                   {
-                       store.RegisterServer(new ReverseCallbackServer(this));
-                   });
+                   a.AddRpcStore(store => store.RegisterServer(new ReverseCallbackServer(this)));
                })
                .ConfigurePlugins(a =>
                {
@@ -411,7 +391,6 @@ internal sealed class RedundancyTask : IRpcDriver, IAsyncDisposable
     }
     private RedundancyOptions RedundancyOptions;
 
-
     #endregion
 
     #region ForcedSync
@@ -422,7 +401,6 @@ internal sealed class RedundancyTask : IRpcDriver, IAsyncDisposable
         await ForcedSyncWaitLock.WaitAsync(cancellationToken).ConfigureAwait(false);
         try
         {
-
             if (!RedundancyOptions.IsMaster)
                 return;
 
@@ -460,7 +438,6 @@ internal sealed class RedundancyTask : IRpcDriver, IAsyncDisposable
             {
                 LogMessage?.LogWarning(ex, "ForcedSync data error");
             }
-
         }
         finally
         {
@@ -500,7 +477,6 @@ internal sealed class RedundancyTask : IRpcDriver, IAsyncDisposable
                     deviceBatch.Remove(device);
                 }
             }
-
         }
 
         // 发送最后剩余的一批
@@ -510,7 +486,6 @@ internal sealed class RedundancyTask : IRpcDriver, IAsyncDisposable
         }
 
         LogMessage?.LogTrace($"ForcedSync data success");
-
     }
 
     #endregion
@@ -589,7 +564,6 @@ internal sealed class RedundancyTask : IRpcDriver, IAsyncDisposable
         Dictionary<string, Dictionary<string, string>> deviceDatas,
         DmtpInvokeOption invokeOption)
     {
-
         return await _tcpDmtpClient.GetDmtpRpcActor()
             .InvokeTAsync<Dictionary<string, Dictionary<string, OperResult<object>>>>(
                 nameof(ReverseCallbackServer.Rpc), invokeOption, deviceDatas)
@@ -647,10 +621,7 @@ internal sealed class RedundancyTask : IRpcDriver, IAsyncDisposable
                 }
             }
         }
-
-
     }
-
 
     private static Dictionary<string, Dictionary<string, OperResult<object>>> NoOnline(Dictionary<string, Dictionary<string, OperResult<object>>> dataResult, Dictionary<string, Dictionary<string, string>> deviceDatas)
     {
@@ -664,7 +635,6 @@ internal sealed class RedundancyTask : IRpcDriver, IAsyncDisposable
             }
         }
         return dataResult;
-
     }
 
     /// <summary>
@@ -695,10 +665,6 @@ internal sealed class RedundancyTask : IRpcDriver, IAsyncDisposable
                 await _tcpDmtpClient.TryConnectAsync().ConfigureAwait(false);
         }
     }
-
-
-
-
 
     #endregion
 }

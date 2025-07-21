@@ -31,7 +31,6 @@ public interface ISysResourceService
     /// <returns></returns>
     IEnumerable<SysResource> ConstructMenuTrees(IEnumerable<SysResource> resourceList, long parentId = 0);
 
-
     /// <summary>
     /// 复制资源到其他模块
     /// </summary>

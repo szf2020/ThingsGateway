@@ -16,7 +16,6 @@ namespace ThingsGateway.Admin.Razor;
 [ThingsGateway.DependencyInjection.SuppressSniffer]
 public static class ResourceUtil
 {
-
     /// <summary>
     /// 构造选择项，ID/TITLE
     /// </summary>
@@ -117,5 +116,4 @@ public static class ResourceUtil
         }
         return trees;
     }
-
 }

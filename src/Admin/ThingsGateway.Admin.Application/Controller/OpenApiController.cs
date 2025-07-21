@@ -15,7 +15,6 @@ using System.ComponentModel;
 
 namespace ThingsGateway.Admin.Application;
 
-
 /// <summary>
 /// 登录
 /// </summary>

@@ -8,7 +8,6 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-
 using System.Security.Claims;
 
 namespace ThingsGateway.Admin.Application;
@@ -47,7 +46,4 @@ public interface IAppService
     /// </summary>
     /// <returns></returns>
     public Task LoginAsync(ClaimsIdentity claimsIdentity, int expire);
-
 }
-
-

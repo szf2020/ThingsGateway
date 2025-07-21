@@ -73,7 +73,7 @@ namespace ThingsGateway.SqlSugar
                     if (_instance == null)
                     {
                         _instance = new ReflectionInoCore<V>();
-                        Action addItem = () => { ReflectionInoCore<V>.GetInstance().RemoveAllCache(); };
+                        Action addItem = () => ReflectionInoCore<V>.GetInstance().RemoveAllCache();
                         ReflectionInoHelper.AddRemoveFunc(addItem);
                     }
             return _instance;

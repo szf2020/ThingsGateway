@@ -12,7 +12,6 @@ namespace ThingsGateway.Gateway.Application;
 
 public static class AppResource
 {
-
     public static string RulesEngineTaskStart => ThingsGateway.Foundation.AppResource.Lang == Language.Chinese ? ChineseResource.RulesEngineTaskStart : EnglishResource.RulesEngineTaskStart;
 
     public static string RealAlarmTaskStart => ThingsGateway.Foundation.AppResource.Lang == Language.Chinese ? ChineseResource.RealAlarmTaskStart : EnglishResource.RealAlarmTaskStart;
@@ -44,7 +43,6 @@ public static class AppResource
     public static string LoadTypeFail2 => ThingsGateway.Foundation.AppResource.Lang == Language.Chinese ? ChineseResource.LoadTypeFail2 : EnglishResource.LoadTypeFail2;
     public static string LoadTypeSuccess => ThingsGateway.Foundation.AppResource.Lang == Language.Chinese ? ChineseResource.LoadTypeSuccess : EnglishResource.LoadTypeSuccess;
 }
-
 
 public static class ChineseResource
 {
@@ -79,10 +77,7 @@ public static class ChineseResource
     public const string LoadTypeFail1 = "加载插件 {0} 失败，插件类型不存在";
     public const string LoadTypeFail2 = "加载插件文件 {0} 失败，文件不存在";
     public const string LoadTypeSuccess = "加载插件 {0} 成功";
-
-
 }
-
 
 public static class EnglishResource
 {

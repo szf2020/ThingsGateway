@@ -29,14 +29,14 @@ namespace ThingsGateway.SqlSugar
                     this.context.SingleTableNameSubqueryShortName = (childExpression as ParameterExpression).Name;
                 else
                 {
-                    this.context.SingleTableNameSubqueryShortName = (context.Expression as LambdaExpression).Parameters.First().Name;
+                    this.context.SingleTableNameSubqueryShortName = (context.Expression as LambdaExpression).Parameters[0].Name;
                 }
             }
             else if (context.IsSingle && ExpressionTool.GetMethodName(currentExpression) != "ToList")
             {
                 if (context.Expression is LambdaExpression)
                 {
-                    this.context.SingleTableNameSubqueryShortName = (context.Expression as LambdaExpression).Parameters.First().Name;
+                    this.context.SingleTableNameSubqueryShortName = (context.Expression as LambdaExpression).Parameters[0].Name;
                 }
                 else if (context.Expression is MethodCallExpression)
                 {
@@ -46,7 +46,7 @@ namespace ThingsGateway.SqlSugar
                         var meExp = expArgs[0] as LambdaExpression;
                         if (meExp != null)
                         {
-                            var selfParameterName = meExp.Parameters.First().Name;
+                            var selfParameterName = meExp.Parameters[0].Name;
                             if ((meExp.Body is BinaryExpression))
                             {
                                 context.SingleTableNameSubqueryShortName = (((meExp.Body as BinaryExpression).Left as MemberExpression)?.Expression as ParameterExpression)?.Name;
@@ -70,12 +70,11 @@ namespace ThingsGateway.SqlSugar
                 }
                 else if (context.Expression.GetType().Name == "MethodBinaryExpression")
                 {
-
                     var subExp = (context.Expression as BinaryExpression).Left is MethodCallExpression ? (context.Expression as BinaryExpression).Left : (context.Expression as BinaryExpression).Right;
                     if (subExp is MethodCallExpression)
                     {
                         var meExp = ((subExp as MethodCallExpression).Object as MethodCallExpression).Arguments[0] as LambdaExpression;
-                        var selfParameterName = meExp.Parameters.First().Name;
+                        var selfParameterName = meExp.Parameters[0].Name;
                         context.SingleTableNameSubqueryShortName = (((meExp.Body as BinaryExpression).Left as MemberExpression).Expression as ParameterExpression).Name;
                         if (context.SingleTableNameSubqueryShortName == selfParameterName)
                         {
@@ -97,7 +96,7 @@ namespace ThingsGateway.SqlSugar
                         if (argus.Count > 0)
                         {
                             var meExp = argus[0] as LambdaExpression;
-                            var selfParameterName = meExp.Parameters.First().Name;
+                            var selfParameterName = meExp.Parameters[0].Name;
                             context.SingleTableNameSubqueryShortName = (((meExp.Body as BinaryExpression).Left as MemberExpression)?.Expression as ParameterExpression)?.Name;
                             if (context.SingleTableNameSubqueryShortName == selfParameterName)
                             {
@@ -111,7 +110,7 @@ namespace ThingsGateway.SqlSugar
                     var getParameters = ExpressionTool.GetParameters(context.Expression).Select(it => it.Name).Distinct().ToList();
                     if (getParameters?.Count > 1)
                     {
-                        context.SingleTableNameSubqueryShortName = getParameters.First();
+                        context.SingleTableNameSubqueryShortName = getParameters[0];
                     }
                 }
                 else
@@ -182,7 +181,7 @@ namespace ThingsGateway.SqlSugar
             {
                 if (sqlItems[i].StartsWith("FROM " + this.context.SqlTranslationLeft))
                 {
-                    var asName = this.context.GetTranslationTableName(asItems.First().Replace(subKey, ""), false);
+                    var asName = this.context.GetTranslationTableName(asItems[0].Replace(subKey, ""), false);
                     var repKey = $"\\{this.context.SqlTranslationLeft}.+\\{this.context.SqlTranslationRight}";
                     if (this.context.IsSingle && this.context.JoinIndex == 0 && this.context.CurrentShortName.HasValue() && isAsAttr && !asName.Contains(this.context.CurrentShortName))
                     {

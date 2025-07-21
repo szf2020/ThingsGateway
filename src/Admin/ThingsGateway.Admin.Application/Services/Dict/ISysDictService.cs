@@ -60,7 +60,6 @@ public interface ISysDictService
     /// <returns>系统字典项</returns>
     Task<SysDict> GetByKeyAsync(string category, string name);
 
-
     /// <summary>
     /// 从缓存/数据库获取自定义配置列表
     /// </summary>

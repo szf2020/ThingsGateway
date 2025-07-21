@@ -212,7 +212,6 @@
             return string.Format("  {0}({1})   ", format, parameter.MemberName);
         }
 
-
         public override string StartsWith(MethodCallExpressionModel model)
         {
             var parameter = model.Args[0];

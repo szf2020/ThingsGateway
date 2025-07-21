@@ -41,9 +41,7 @@ public class LogData
     public string Message { get; set; }
 }
 
-
 /// <summary>日志文本文件倒序读取</summary>
-
 public class LogDataCache
 {
     public List<LogData> LogDatas { get; set; }
@@ -92,7 +90,6 @@ public static class TextFileReader
         result.Content = fileInfos;
         return result;
     }
-
 
     public static OperResult<List<LogData>> LastLog(string file, int lineCount = 200)
     {
@@ -172,7 +169,6 @@ public static class TextFileReader
                   })
                   .ToList();
 
-
         return result; // 返回解析结果
     }
 
@@ -237,7 +233,6 @@ public static class TextFileReader
         }
     }
 
-
     private static bool MatchSeparator(byte[] arr, int length)
     {
         if (length < TextFileLogger.SeparatorBytes.Length)
@@ -252,7 +247,6 @@ public static class TextFileReader
         }
         return true;
     }
-
 
     private static List<string> ParseCSV(string data)
     {

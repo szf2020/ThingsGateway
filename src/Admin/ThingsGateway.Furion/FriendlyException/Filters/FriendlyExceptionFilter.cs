@@ -150,7 +150,5 @@ public sealed class FriendlyExceptionFilter : IAsyncExceptionFilter
             // 记录拦截日常
             logger.LogError(context.Exception, context.Exception.Message);
         }
-
     }
-
 }

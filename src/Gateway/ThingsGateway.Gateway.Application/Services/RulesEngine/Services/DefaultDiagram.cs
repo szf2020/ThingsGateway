@@ -11,5 +11,4 @@ internal class DefaultDiagram : Diagram
     {
         Options = new();
     }
-
 }

@@ -48,7 +48,6 @@ public class S7Request
     /// </summary>
     public int Length { get; set; }
 
-
     public int BitLength { get; set; }
     public bool IsBit { get; set; }
     #endregion Request
@@ -145,7 +144,6 @@ public class S7Send : ISendMessage
 
     internal void GetWriteByteCommand<TByteBlock>(ref TByteBlock valueByteBlock, SiemensS7Address[] addresss) where TByteBlock : IByteBlock
     {
-
         byte itemLen = (byte)addresss.Length;
         ushort parameterLen = (ushort)(itemLen * 12 + 2);
         //TPKT
@@ -168,8 +166,6 @@ public class S7Send : ISendMessage
         valueByteBlock.WriteByte(0x05);//功能码，4 Read Var, 5 Write Var
         valueByteBlock.WriteByte(itemLen);//Item数量
         //写入Item与读取大致相同
-
-
 
         foreach (var address in addresss)
         {

@@ -8,7 +8,6 @@ namespace ThingsGateway.SqlSugar
 {
     public class SqlServerProvider : AdoProvider
     {
-
         public SqlServerProvider()
         {
             this.IsOpenAsync = true;

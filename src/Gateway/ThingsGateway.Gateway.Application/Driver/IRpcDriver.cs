@@ -8,16 +8,13 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-
 using Newtonsoft.Json.Linq;
 
 namespace ThingsGateway.Gateway.Application;
 
 public interface IRpcDriver
 {
-
     ValueTask<Dictionary<string, Dictionary<string, IOperResult>>> InvokeMethodAsync(Dictionary<VariableRuntime, JToken> writeInfoLists, CancellationToken cancellationToken);
 
     ValueTask<Dictionary<string, Dictionary<string, IOperResult>>> InVokeWriteAsync(Dictionary<VariableRuntime, JToken> writeInfoLists, CancellationToken cancellationToken);
-
 }

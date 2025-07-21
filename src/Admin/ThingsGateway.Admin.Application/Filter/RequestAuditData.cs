@@ -61,7 +61,6 @@ public class RequestAuditData
 
     public long TimeOperationElapsedMilliseconds { get; set; }
 
-
     /// <summary>
     /// 服务端
     /// </summary>
@@ -98,4 +97,3 @@ public class RequestAuditData
     public Validation Validation { get; set; }
     public MethodInfo MethodInfo { get; set; }
 }
-

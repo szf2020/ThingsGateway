@@ -87,8 +87,6 @@ public static class AppWebApplicationBuilderExtensions
         return webApplicationBuilder;
     }
 
-
-
     /// <summary>
     /// 注册 WebApplicationBuilder 依赖组件
     /// </summary>

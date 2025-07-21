@@ -1,9 +1,9 @@
 ﻿using System.Data;
 using System.Linq.Expressions;
+using System.Runtime.CompilerServices;
 
 namespace ThingsGateway.SqlSugar
 {
-
     public partial class QueryableProvider<T> : QueryableAccessory, ISugarQueryable<T>
     {
         public virtual T Single()
@@ -124,7 +124,7 @@ namespace ThingsGateway.SqlSugar
             if (IsCache)
             {
                 var cacheService = this.Context.CurrentConnectionConfig.ConfigureExternalServices.DataInfoCacheService;
-                result = CacheSchemeMain.GetOrCreate<int>(cacheService, this.QueryBuilder, () => { return GetCount(); }, CacheTime, this.Context, CacheKey);
+                result = CacheSchemeMain.GetOrCreate<int>(cacheService, this.QueryBuilder, () => GetCount(), CacheTime, this.Context, CacheKey);
             }
             else
             {
@@ -186,7 +186,6 @@ namespace ThingsGateway.SqlSugar
         }
         public virtual T[] ToArray()
         {
-
             var result = this.ToList();
             if (result.HasValue())
                 return result.ToArray();
@@ -199,10 +198,7 @@ namespace ThingsGateway.SqlSugar
             if (IsCache)
             {
                 var cacheService = this.Context.CurrentConnectionConfig.ConfigureExternalServices.DataInfoCacheService;
-                var result = CacheSchemeMain.GetOrCreate<string>(cacheService, this.QueryBuilder, () =>
-                {
-                    return this.Context.Utilities.SerializeObject(this.ToList(), typeof(T));
-                }, CacheTime, this.Context, CacheKey);
+                var result = CacheSchemeMain.GetOrCreate<string>(cacheService, this.QueryBuilder, () => this.Context.Utilities.SerializeObject(this.ToList(), typeof(T)), CacheTime, this.Context, CacheKey);
                 return result;
             }
             else
@@ -300,11 +296,11 @@ namespace ThingsGateway.SqlSugar
             {
                 if (this.QueryBuilder.JoinQueryInfos.Count > 0)
                 {
-                    tableName = this.QueryBuilder.JoinQueryInfos.First().TableName;
+                    tableName = this.QueryBuilder.JoinQueryInfos[0].TableName;
                 }
                 if (this.QueryBuilder.EasyJoinInfos.Count > 0)
                 {
-                    tableName = this.QueryBuilder.JoinQueryInfos.First().TableName;
+                    tableName = this.QueryBuilder.JoinQueryInfos[0].TableName;
                 }
             }
             var current = this.Context.Queryable<T>().AS(tableName).WithCacheIF(this.IsCache, this.CacheTime).Filter(null, this.QueryBuilder.IsDisabledGobalFilter).ClearFilter(this.QueryBuilder.RemoveFilters).InSingle(primaryKeyValue);
@@ -342,11 +338,11 @@ namespace ThingsGateway.SqlSugar
             {
                 if (this.QueryBuilder.JoinQueryInfos.Count > 0)
                 {
-                    tableName = this.QueryBuilder.JoinQueryInfos.First().TableName;
+                    tableName = this.QueryBuilder.JoinQueryInfos[0].TableName;
                 }
                 if (this.QueryBuilder.EasyJoinInfos.Count > 0)
                 {
-                    tableName = this.QueryBuilder.JoinQueryInfos.First().TableName;
+                    tableName = this.QueryBuilder.JoinQueryInfos[0].TableName;
                 }
             }
             var current = this.Context.Queryable<T>().AS(tableName).WhereIF(parentWhereExpression != default, parentWhereExpression).Filter(null, this.QueryBuilder.IsDisabledGobalFilter).InSingle(primaryKeyValue);
@@ -417,7 +413,7 @@ namespace ThingsGateway.SqlSugar
             if (IsCache)
             {
                 var cacheService = this.Context.CurrentConnectionConfig.ConfigureExternalServices.DataInfoCacheService;
-                result = CacheSchemeMain.GetOrCreate<DataTable>(cacheService, this.QueryBuilder, () => { return this.Db.GetDataTable(sqlObj.Key, sqlObj.Value); }, CacheTime, this.Context, CacheKey);
+                result = CacheSchemeMain.GetOrCreate<DataTable>(cacheService, this.QueryBuilder, () => this.Db.GetDataTable(sqlObj.Key, sqlObj.Value), CacheTime, this.Context, CacheKey);
             }
             else
             {
@@ -608,10 +604,7 @@ namespace ThingsGateway.SqlSugar
             {
                 if (queryableContext.TempChildLists == null)
                     queryableContext.TempChildLists = new Dictionary<string, object>();
-                this.Context.Utilities.PageEach(ids, 200, pageIds =>
-                {
-                    result.AddRange(this.Clone().In(thisField, pageIds).ToList());
-                });
+                this.Context.Utilities.PageEach(ids, 200, pageIds => result.AddRange(this.Clone().In(thisField, pageIds).ToList()));
                 queryableContext.TempChildLists[key] = result;
             }
             var name = "";
@@ -693,7 +686,6 @@ namespace ThingsGateway.SqlSugar
             {
                 while (dr.Read())
                 {
-
                     var order = entytyList.Build(dr);
                     action(order);
                 }
@@ -703,36 +695,41 @@ namespace ThingsGateway.SqlSugar
                 this.Context.Ado.Close();
             }
         }
-        public IEnumerable<T> GetEnumerable()
+        public IEnumerable<T> ToEnumerable(CancellationToken cancellationToken)
         {
             var queryable = this.Clone();
             var sql = queryable.ToSql();
             var dr = this.Context.Ado.GetDataReader(sql.Key, sql.Value);
             var entityInfo = this.Context.EntityMaintenance.GetEntityInfo<T>();
             var columns = UtilMethods.GetColumnInfo(dr);
-            var cacheKey = "GetEnumerable" + typeof(T).GetHashCode() + string.Join(",", columns.Select(it => it.Item1 + it.Item2.Name + "_"));
+            var cacheKey = "ToEnumerable" + typeof(T).GetHashCode() + string.Join(",", columns.Select(it => it.Item1 + it.Item2.Name + "_"));
             IDataReaderEntityBuilder<T> entytyList = this.Context.Utilities.GetReflectionInoCacheInstance().GetOrCreate(cacheKey, () =>
             {
                 var cacheResult = new IDataReaderEntityBuilder<T>(this.Context, dr,
                     columns.Select(it => it.Item1).ToList()).CreateBuilder(typeof(T));
                 return cacheResult;
             });
+            if (cancellationToken.IsCancellationRequested) yield break;
 
-
-            using (dr)
+            try
             {
-                while (dr.Read())
+                using (dr)
                 {
+                    while (dr.Read())
+                    {
+                        if (cancellationToken.IsCancellationRequested) yield break;
 
-                    var order = entytyList.Build(dr);
-                    yield return order;
+                        var order = entytyList.Build(dr);
+                        yield return order;
+                    }
                 }
             }
-
-
-            if (this.Context.CurrentConnectionConfig.IsAutoCloseConnection)
+            finally
             {
-                this.Context.Ado.Close();
+                if (this.Context.CurrentConnectionConfig.IsAutoCloseConnection)
+                {
+                    this.Context.Ado.Close();
+                }
             }
         }
         public async Task ForEachDataReaderAsync(Action<T> action)
@@ -753,7 +750,6 @@ namespace ThingsGateway.SqlSugar
             {
                 while (dr.Read())
                 {
-
                     var order = entytyList.Build(dr);
                     action(order);
                 }
@@ -768,14 +764,14 @@ namespace ThingsGateway.SqlSugar
         /// Diego 新增一个延迟返回
         /// </summary>
         /// <returns></returns>
-        public async IAsyncEnumerable<T> GetAsyncEnumerable()
+        public async IAsyncEnumerable<T> ToAsyncEnumerable([EnumeratorCancellation] CancellationToken cancellationToken)
         {
             var queryable = this.Clone();
             var sql = queryable.ToSql();
             var dr = await Context.Ado.GetDataReaderAsync(sql.Key, sql.Value).ConfigureAwait(false);
             var entityInfo = this.Context.EntityMaintenance.GetEntityInfo<T>();
             var columns = UtilMethods.GetColumnInfo(dr);
-            var cacheKey = "GetAsyncEnumerable" + typeof(T).GetHashCode() + string.Join(",", columns.Select(it => it.Item1 + it.Item2.Name + "_"));
+            var cacheKey = "ToAsyncEnumerable" + typeof(T).GetHashCode() + string.Join(",", columns.Select(it => it.Item1 + it.Item2.Name + "_"));
             IDataReaderEntityBuilder<T> entytyList = this.Context.Utilities.GetReflectionInoCacheInstance().GetOrCreate(cacheKey, () =>
             {
                 var cacheResult = new IDataReaderEntityBuilder<T>(this.Context, dr,
@@ -783,21 +779,27 @@ namespace ThingsGateway.SqlSugar
                 return cacheResult;
             });
 
+            if (cancellationToken.IsCancellationRequested) yield break;
 
-            using (dr)
+            try
             {
-                while (dr.Read())
+                using (dr)
                 {
-
-                    var order = entytyList.Build(dr);
-                    yield return order;
+                    while (dr.Read())
+                    {
+                        if (cancellationToken.IsCancellationRequested) yield break;
+                        var order = entytyList.Build(dr);
+                        yield return order;
+                    }
                 }
             }
-            if (this.Context.CurrentConnectionConfig.IsAutoCloseConnection)
+            finally
             {
-                this.Context.Ado.Close();
+                if (this.Context.CurrentConnectionConfig.IsAutoCloseConnection)
+                {
+                    this.Context.Ado.Close();
+                }
             }
-
         }
         public virtual void ForEach(Action<T> action, int singleMaxReads = 300, System.Threading.CancellationTokenSource cancellationTokenSource = null)
         {
@@ -959,7 +961,6 @@ namespace ThingsGateway.SqlSugar
             result = UtilMethods.GetSqlString(this.Context.CurrentConnectionConfig, sqlObj);
             return result;
         }
-
 
         public virtual KeyValuePair<string, IReadOnlyList<SugarParameter>> ToSql()
         {

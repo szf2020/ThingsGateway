@@ -141,10 +141,7 @@ public class MachineInfo : IExtend
     {
         if (_task != null) return _task;
 
-        return _task = Task.Factory.StartNew(() =>
-        {
-            return Register();
-        });
+        return _task = Task.Factory.StartNew(() => Register());
     }
 
     private static MachineInfo Register()

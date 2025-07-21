@@ -10,11 +10,11 @@ namespace ThingsGateway.SqlSugar
             var value = itemFirst.ToString();
             var dics = context.Utilities.JsonToColumnsModels(value);
             if (isObject)
-                sugarUpdateable = this.context.UpdateableT(dics.First()).AS(this.TableName);
+                sugarUpdateable = this.context.UpdateableT(dics[0]).AS(this.TableName);
             else
             {
                 sugarUpdateable = this.context.Updateable<Dictionary<string, object>>(dics).AS(this.TableName);
-                isList = dics.Take(2).Any();
+                isList = dics.Count > 1;
             }
         }
     }

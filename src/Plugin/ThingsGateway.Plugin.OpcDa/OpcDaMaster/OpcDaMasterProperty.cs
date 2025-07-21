@@ -64,5 +64,4 @@ public class OpcDaMasterProperty : CollectPropertyRetryBase
     /// </summary>
     [DynamicProperty]
     public int UpdateRate { get; set; } = 1000;
-
 }

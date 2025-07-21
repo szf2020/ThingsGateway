@@ -26,17 +26,14 @@ public class JsonWriter
     /// <summary>使用小写名称</summary>
     public Boolean LowerCase { get; set; }
 
-
     /// <summary>忽略只读属性。默认false</summary>
     public Boolean IgnoreReadOnlyProperties { get; set; }
 
     /// <summary>忽略注释。默认true</summary>
     public Boolean IgnoreComment { get; set; } = true;
 
-
     /// <summary>枚举使用字符串。默认false使用数字</summary>
     public Boolean EnumString { get; set; }
-
 
     ///// <summary>智能缩进，内层不换行。默认false</summary>
     //public Boolean SmartIndented { get; set; }
@@ -127,25 +124,18 @@ public class JsonWriter
     {
         if (obj is null or DBNull)
             _Builder.Append("null");
-
         else if (obj is String or Char)
             WriteString(obj + "");
-
         else if (obj is Type type)
             WriteString(type.FullName?.TrimStart("System.") + "");
-
         else if (obj is Guid)
             WriteStringFast(obj + "");
-
         else if (obj is Boolean)
             _Builder.Append((obj + "").ToLower());
-
         else if ((obj is Int64 vInt64) && Int64AsString && (vInt64 > 9007199254740991 || vInt64 < -9007199254740991))
             WriteStringFast(obj + "");
-
         else if ((obj is UInt64 vUInt64) && Int64AsString && vUInt64 > 9007199254740991)
             WriteStringFast(obj + "");
-
         else if (
             obj is Int32 or Int64 or Double or
             Decimal or Single or
@@ -154,13 +144,10 @@ public class JsonWriter
             UInt32 or UInt64
         )
             _Builder.Append(((IConvertible)obj).ToString(NumberFormatInfo.InvariantInfo));
-
         else if (obj is TimeSpan)
             WriteString(obj + "");
-
         else if (obj is DateTime time)
             WriteDateTime(time);
-
         else if (obj is DateTimeOffset offset)
             _Builder.AppendFormat("\"{0:O}\"", offset);
 #if NET6_0_OR_GREATER
@@ -189,7 +176,6 @@ public class JsonWriter
             WriteStringFast(ByteArrayAsHex ? pk.ToHex(-1) : pk.ToArray().ToBase64());
         else if (obj is StringDictionary dictionary2)
             WriteSD(dictionary2);
-
         else if (obj is NameValueCollection collection)
             WriteNV(collection);
 
@@ -200,7 +186,6 @@ public class JsonWriter
         // Linq产生的枚举
         else if (obj is IEnumerable arr && obj.GetType().Assembly == typeof(Enumerable).Assembly)
             WriteArray(arr);
-
         else if (obj is Enum)
         {
             if (EnumString)
@@ -212,7 +197,6 @@ public class JsonWriter
         // 支持格式化的类型，有去有回
         else if (obj is IFormattable)
             WriteValue(obj + "");
-
         else
             WriteObject(obj);
     }

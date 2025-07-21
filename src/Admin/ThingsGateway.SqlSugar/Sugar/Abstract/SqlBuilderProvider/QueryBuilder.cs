@@ -7,7 +7,6 @@ namespace ThingsGateway.SqlSugar
 {
     public abstract class QueryBuilder : IDMLBuilder
     {
-
         public QueryBuilder()
         {
             this.Parameters = new List<SugarParameter>();
@@ -707,7 +706,6 @@ namespace ThingsGateway.SqlSugar
             }
             if (joinInfo.JoinType == JoinType.Cross)
             {
-
                 var onIndex = result.IndexOf(" ON ");
                 result = result.Substring(0, onIndex);
             }
@@ -757,10 +755,7 @@ namespace ThingsGateway.SqlSugar
 
         protected virtual string ReplaceHints(string result)
         {
-            result = Regex.Replace(result, "^SELECT ", it =>
-            {
-                return $"{it} {Hints}  ";
-            });
+            result = Regex.Replace(result, "^SELECT ", it => $"{it} {Hints}  ");
             return result;
         }
 
@@ -1055,7 +1050,6 @@ namespace ThingsGateway.SqlSugar
                 }
                 if (this.EasyJoinInfos.IsValuable())
                 {
-
                     if (this.TableWithString.HasValue() && this.TableWithString != SqlWith.Null)
                     {
                         result += "," + string.Join(",", this.EasyJoinInfos.Select(it => string.Format("{0} {1} {2} ", GetTableName(it.Value), " " + Builder.GetTranslationColumnName(it.Key.ObjToString().Trim()), TableWithString)));
@@ -1092,7 +1086,6 @@ namespace ThingsGateway.SqlSugar
                 return this.GroupByValue;
             }
         }
-
 
         #endregion
 

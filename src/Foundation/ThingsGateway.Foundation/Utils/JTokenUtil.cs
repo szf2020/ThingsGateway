@@ -129,7 +129,6 @@ public static class JTokenUtil
             default:
                 return token.ToString();
         }
-
     }
 
     #region json
@@ -157,7 +156,7 @@ public static class JTokenUtil
 
     private static JTokenType GetElementsType(this JToken[] jTokens)
     {
-        return jTokens.First().Type;
+        return jTokens[0].Type;
     }
 
     #endregion json

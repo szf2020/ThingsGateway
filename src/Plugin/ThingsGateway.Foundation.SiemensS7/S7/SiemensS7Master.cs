@@ -25,7 +25,6 @@ public partial class SiemensS7Master : DeviceBase
         base.InitChannel(channel, deviceLog);
 
         RegisterByteLength = 1;
-
     }
 
     protected override void SetChannel()
@@ -153,7 +152,6 @@ public partial class SiemensS7Master : DeviceBase
                     var start = sAddress.AddressStart;
                     try
                     {
-
                         while (num < addressLen)
                         {
                             //pdu长度，重复生成报文，直至全部生成
@@ -173,7 +171,6 @@ public partial class SiemensS7Master : DeviceBase
                             {
                                 sAddress.AddressStart += len * 8;
                             }
-
                         }
                     }
                     finally
@@ -199,8 +196,6 @@ public partial class SiemensS7Master : DeviceBase
     /// </summary>
     public async ValueTask<Dictionary<SiemensS7Address, OperResult>> S7WriteAsync(SiemensS7Address[] sAddresss, CancellationToken cancellationToken = default)
     {
-
-
         var dictOperResult = new Dictionary<SiemensS7Address, OperResult>();
 
         void SetFailOperResult(OperResult operResult)
@@ -218,11 +213,9 @@ public partial class SiemensS7Master : DeviceBase
                 var byteBlock = new ValueByteBlock(2048);
                 try
                 {
-
                     var wresult = await SendThenReturnAsync(new S7Send([sAddress], false), cancellationToken: cancellationToken).ConfigureAwait(false);
                     dictOperResult.TryAdd(sAddress, wresult);
                     return dictOperResult;
-
                 }
                 catch (Exception ex)
                 {
@@ -274,12 +267,10 @@ public partial class SiemensS7Master : DeviceBase
                             return dictOperResult;
                         }
                     }
-
                 }
 
                 foreach (var item in siemensS7Addresses)
                 {
-
                     try
                     {
                         var result = await SendThenReturnAsync(new S7Send(item.ToArray(), false), cancellationToken: cancellationToken).ConfigureAwait(false);
@@ -290,14 +281,11 @@ public partial class SiemensS7Master : DeviceBase
                     }
                     catch (Exception ex)
                     {
-
                         SetFailOperResult(new OperResult(ex));
                         return dictOperResult;
                     }
-
                 }
                 return dictOperResult;
-
             }
         }
     }
@@ -336,7 +324,6 @@ public partial class SiemensS7Master : DeviceBase
             return EasyValueTask.FromResult(new OperResult<byte[]>(ex));
         }
     }
-
 
     /// <inheritdoc/>
     public override async ValueTask<OperResult> WriteAsync(string address, byte[] value, DataTypeEnum dataType, CancellationToken cancellationToken = default)

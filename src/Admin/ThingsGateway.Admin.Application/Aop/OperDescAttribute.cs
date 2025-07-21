@@ -84,7 +84,6 @@ public sealed class OperDescAttribute : MoAttribute
     {
         if (App.HttpContext?.Request.Path.StartsWithSegments("/_blazor") == true)
         {
-
             //插入操作日志
             SysOperateLog log = GetOperLog(LocalizerType, context);
             OperDescAttribute.WriteToQueue(log);

@@ -101,8 +101,6 @@ public partial class ThingsGatewayBitConverter : IThingsGatewayBitConverter
 
     public virtual void OtherPropertySet(IThingsGatewayBitConverter thingsGatewayBitConverter, string registerAddress)
     {
-
-
     }
 
     /// <summary>

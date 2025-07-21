@@ -47,7 +47,6 @@ internal sealed class AlarmTask : IDisposable
         scheduledTask?.TryDispose();
     }
 
-
     #region 核心实现
 
     /// <summary>
@@ -164,7 +163,6 @@ internal sealed class AlarmTask : IDisposable
             return AlarmTypeEnum.H; // 返回高报警类型枚举
         }
 
-
         // 检查是否启用了低低报警功能，并且变量的值小于低低报警的限制值
         if (tag.LLAlarmEnable && tag.Value.ToDecimal() < tag.LLAlarmCode.ToDecimal())
         {
@@ -173,7 +171,6 @@ internal sealed class AlarmTask : IDisposable
             text = tag.LLAlarmText!; // 获取低低报警时的报警文本
             return AlarmTypeEnum.LL; // 返回低低报警类型枚举
         }
-
 
         // 检查是否启用了低报警功能，并且变量的值小于低报警的限制值
         if (tag.LAlarmEnable && tag.Value.ToDecimal() < tag.LAlarmCode.ToDecimal())
@@ -331,7 +328,6 @@ internal sealed class AlarmTask : IDisposable
                             item.PrepareEventTime = null;
                             changed = true;
                         }
-
                     }
                     else
                     {
@@ -352,8 +348,6 @@ internal sealed class AlarmTask : IDisposable
                 item.AlarmText = text;
                 changed = true;
             }
-
-
         }
         else if (eventEnum == EventTypeEnum.Finish)
         {
@@ -392,7 +386,6 @@ internal sealed class AlarmTask : IDisposable
             }
             GlobalData.AlarmChange(item.AdaptAlarmVariable());
         }
-
     }
 
     public void ConfirmAlarm(long variableId)
@@ -416,7 +409,6 @@ internal sealed class AlarmTask : IDisposable
     /// <param name="cancellation">取消任务的 CancellationToken</param>
     private void DoWork(object? state, CancellationToken cancellation)
     {
-
         try
         {
             if (!GlobalData.StartBusinessChannelEnable)
@@ -445,8 +437,6 @@ internal sealed class AlarmTask : IDisposable
 
                     // 对该变量进行报警分析
                     AlarmAnalysis(item);
-
-
                 }
             });
             }
@@ -468,8 +458,6 @@ internal sealed class AlarmTask : IDisposable
             _logger.LogWarning(ex, "Alarm analysis fail");
         }
     }
-
-
 
 
 

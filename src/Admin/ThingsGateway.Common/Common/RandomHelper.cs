@@ -25,7 +25,6 @@ public static class RandomHelper
     /// <returns></returns>
     public static string CreateLetter(int Length)
     {
-
         char[] Pattern = new char[] { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z' };
         string result = "";
         int n = Pattern.Length;
@@ -38,7 +37,6 @@ public static class RandomHelper
         return result;
     }
 
-
     /// <summary>
     /// 生成随机字母和数字随机数
     /// </summary>
@@ -46,7 +44,6 @@ public static class RandomHelper
     /// <returns></returns>
     public static string CreateLetterAndNumber(int Length)
     {
-
         char[] Pattern = new char[] { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
         string result = "";
         int n = Pattern.Length;
@@ -66,7 +63,6 @@ public static class RandomHelper
     /// <returns></returns>
     public static string CreateLetterAndNumberLower(int Length)
     {
-
         char[] Pattern = new char[] { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
         string result = "";
         int n = Pattern.Length;
@@ -78,8 +74,6 @@ public static class RandomHelper
         }
         return result;
     }
-
-
 
     /// <summary>
     /// 生成随机字符串
@@ -163,6 +157,4 @@ public static class RandomHelper
         string abc = Convert.ToChar(num).ToString();
         return abc;
     }
-
 }
-

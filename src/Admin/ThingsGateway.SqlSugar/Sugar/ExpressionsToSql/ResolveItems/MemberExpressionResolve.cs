@@ -93,8 +93,6 @@ namespace ThingsGateway.SqlSugar
             }
         }
 
-
-
         #region Navigate
         private static bool IsNavValue(MemberExpression expression)
         {
@@ -347,7 +345,6 @@ namespace ThingsGateway.SqlSugar
             var result = this.Context.DbMehtods.DateValue(new MethodCallExpressionModel()
             {
                 Args = new List<MethodCallExpressionArgs>() {
-
                       new MethodCallExpressionArgs(){
                            MemberName=value,
                             MemberValue=value
@@ -360,7 +357,6 @@ namespace ThingsGateway.SqlSugar
             });
             base.AppendMember(parameter, isLeft, result);
         }
-
 
         private void ResolveDateDiff(ExpressionParameter parameter, bool? isLeft, MemberExpression expression)
         {

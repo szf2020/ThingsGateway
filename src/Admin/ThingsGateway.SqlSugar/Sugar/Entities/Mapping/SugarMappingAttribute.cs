@@ -135,15 +135,12 @@
             set { _IsOnlyIgnoreUpdate = value; }
         }
 
-
         private bool _IsEnableUpdateVersionValidation;
         public bool IsEnableUpdateVersionValidation
         {
             get { return _IsEnableUpdateVersionValidation; }
             set { _IsEnableUpdateVersionValidation = value; }
         }
-
-
 
         private bool _IsTranscoding;
         public bool IsTranscoding
@@ -172,7 +169,6 @@
             get { return _IsJson; }
             set { _IsJson = value; }
         }
-
 
         private string _DefaultValue;
         public string DefaultValue
@@ -216,7 +212,6 @@
         public bool IsDisabledAlterColumn { get; set; }
         public bool IsOwnsOne { get; set; }
     }
-
 
     [AttributeUsage(AttributeTargets.Class, Inherited = true)]
     public class TenantAttribute : Attribute
@@ -319,8 +314,6 @@
         }
     }
 
-
-
     [AttributeUsage(AttributeTargets.Class, Inherited = true, AllowMultiple = true)]
     public class SugarIndexAttribute : Attribute
     {
@@ -333,7 +326,6 @@
             IndexFields = new Dictionary<string, OrderByType>();
             IndexFields.Add(fieldName, sortType);
             this.IsUnique = isUnique;
-
         }
         public SugarIndexAttribute(string indexName, string fieldName1, OrderByType sortType1, string fieldName2, OrderByType sortType2, bool isUnique = false)
         {
@@ -459,5 +451,4 @@
             this.IsUnique = isUnique;
         }
     }
-
 }

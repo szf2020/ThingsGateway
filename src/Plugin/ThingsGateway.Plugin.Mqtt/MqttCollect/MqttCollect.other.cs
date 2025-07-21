@@ -37,9 +37,7 @@ public partial class MqttCollect : CollectBase
 
     private WaitLock ConnectLock = new(nameof(MqttCollect));
 
-
     #region mqtt方法
-
 
     private Task MqttClient_ApplicationMessageReceivedAsync(MqttApplicationMessageReceivedEventArgs args)
     {
@@ -59,7 +57,6 @@ public partial class MqttCollect : CollectBase
             var tuples = TopicItemDict.FirstOrDefault(t => (MqttTopicFilterComparer.Compare(args.ApplicationMessage.Topic, t.Key) == MqttTopicFilterCompareResult.IsMatch)).Value;
             if (tuples != null)
             {
-
                 var payLoad = Encoding.UTF8.GetString(payload);
 
                 if (_driverPropertys.DetailLog)
@@ -70,7 +67,6 @@ public partial class MqttCollect : CollectBase
                 else
                 {
                     LogMessage?.LogTrace($"Topic：{args.ApplicationMessage.Topic}");
-
                 }
 
                 Newtonsoft.Json.Linq.JToken json = Newtonsoft.Json.Linq.JToken.Parse(payLoad);
@@ -107,8 +103,6 @@ public partial class MqttCollect : CollectBase
             LogMessage?.LogWarning($"parse error: topic  {Environment.NewLine}{args.ApplicationMessage.Topic} {Environment.NewLine} {ex}");
         }
         return Task.CompletedTask;
-
-
     }
 
     private async Task MqttClient_ConnectedAsync(MqttClientConnectedEventArgs args)
@@ -132,7 +126,6 @@ public partial class MqttCollect : CollectBase
             }
         }
     }
-
 
     private async ValueTask<OperResult> TryMqttClientAsync(CancellationToken cancellationToken)
     {
@@ -181,7 +174,6 @@ public partial class MqttCollect : CollectBase
             }
         }
     }
-
 
     #endregion mqtt方法
 }

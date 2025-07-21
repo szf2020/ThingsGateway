@@ -9,7 +9,6 @@ using ThingsGateway.Blazor.Diagrams.Core.Models;
 using ThingsGateway.Blazor.Diagrams.Options;
 using ThingsGateway.NewLife.Json.Extension;
 
-
 namespace ThingsGateway.Gateway.Razor;
 
 public partial class DragAndDrop
@@ -22,8 +21,6 @@ public partial class DragAndDrop
     private string? _draggedType;
     [Inject]
     IStringLocalizer<ThingsGateway.Gateway.Razor._Imports> Localizer { get; set; }
-
-
 
     protected override void OnInitialized()
     {
@@ -40,7 +37,6 @@ public partial class DragAndDrop
             }
         }
     }
-
 
     private Task OnDragStart(string key)
     {
@@ -120,15 +116,12 @@ public partial class DragAndDrop
     {
         try
         {
-
             var data = RuleHelpers.Save(_blazorDiagram);
             await DownloadService.DownloadFromStreamAsync("RulesJson.json", new MemoryStream(Encoding.UTF8.GetBytes(data.ToSystemTextJsonString())));
-
         }
         catch (Exception ex)
         {
             await ToastService.Warn(ex);
         }
     }
-
 }

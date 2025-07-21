@@ -614,17 +614,13 @@ public static class Serve
         // 获取命令行参数
         var args = options.Args ?? Environment.GetCommandLineArgs().Skip(1).ToArray();
 
-
-
         // 初始化 WebApplicationBuilder
         var builder = (options.Options == null
             ? WebApplication.CreateBuilder(args)
             : WebApplication.CreateBuilder(options.Options));
 
-
         // 调用自定义配置服务
         options?.FirstActionBuilder?.Invoke(builder);
-
 
         // 注册 WebApplicationBuilder 组件
         if (options.WebComponents.Count > 0)
@@ -638,10 +634,7 @@ public static class Serve
         // 静默启动排除指定日志类名
         if (options.IsSilence && !options.SilenceLogging)
         {
-            builder.Logging.AddFilter((provider, category, logLevel) =>
-            {
-                return !SilenceExcludesOfLogCategoryName.Any(u => category.StartsWith(u));
-            });
+            builder.Logging.AddFilter((provider, category, logLevel) => !SilenceExcludesOfLogCategoryName.Any(u => category.StartsWith(u)));
         }
 
         // 添加自定义配置
@@ -677,8 +670,6 @@ public static class Serve
         // 构建主机
         app = builder.Build();
         InternalApp.RootServices ??= app.Services;
-
-
 
         var applicationPartManager = app.Services.GetService<ApplicationPartManager>();
 
@@ -723,10 +714,7 @@ public static class Serve
         {
             builder = builder.ConfigureLogging(logging =>
             {
-                logging.AddFilter((provider, category, logLevel) =>
-                {
-                    return !SilenceExcludesOfLogCategoryName.Any(u => category.StartsWith(u));
-                });
+                logging.AddFilter((provider, category, logLevel) => !SilenceExcludesOfLogCategoryName.Any(u => category.StartsWith(u)));
             });
         }
 
@@ -828,10 +816,7 @@ public static class Serve
         {
             builder = builder.ConfigureLogging(logging =>
             {
-                logging.AddFilter((provider, category, logLevel) =>
-                {
-                    return !SilenceExcludesOfLogCategoryName.Any(u => category.StartsWith(u));
-                });
+                logging.AddFilter((provider, category, logLevel) => !SilenceExcludesOfLogCategoryName.Any(u => category.StartsWith(u)));
             });
         }
 
@@ -864,7 +849,6 @@ public static class Serve
         app = builder.Build();
         InternalApp.RootServices ??= app.Services;
 
-
         var applicationPartManager = app.Services.GetService<ApplicationPartManager>();
         applicationPartManager?.ApplicationParts?.RemoveWhere(p => App.BakImageNames.Any(b => b == p.Name));
 
@@ -873,8 +857,6 @@ public static class Serve
         // 释放内存
         App.AppStartups.Clear();
     }
-
-
 
     /// <summary>
     /// 配置 Startup 的 Configure
@@ -894,7 +876,6 @@ public static class Serve
     /// <param name="app">应用构建器</param>
     private static void UseStartups(IApplicationBuilder app)
     {
-
         // 反转，处理排序
         var startups = App.AppStartups.Reverse();
         if (!startups.Any()) return;
@@ -935,7 +916,6 @@ public static class Serve
                 method.Invoke(startup, ResolveMethodParameterInstances(serviceProvider, method));
             }
         }
-
     }
     /// <summary>
     /// 批量将自定义 AppStartup 添加到 Startup.cs 的 Configure 中
@@ -963,7 +943,6 @@ public static class Serve
                 method.Invoke(startup, ResolveMethodParameterInstances(app, method));
             }
         }
-
     }
     /// <summary>
     /// 解析方法参数实例

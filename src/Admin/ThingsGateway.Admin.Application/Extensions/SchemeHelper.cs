@@ -16,7 +16,6 @@ namespace ThingsGateway.Admin.Application;
 [ThingsGateway.DependencyInjection.SuppressSniffer]
 public static class SchemeHelper
 {
-
     public static string GetOrCreate()
     {
         var path = "Keys/SchemeKey.txt";
@@ -33,5 +32,4 @@ public static class SchemeHelper
             return data;
         }
     }
-
 }

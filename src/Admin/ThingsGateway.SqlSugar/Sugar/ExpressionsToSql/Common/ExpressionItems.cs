@@ -24,6 +24,5 @@ namespace ThingsGateway.SqlSugar
                 return null;
             }
         }
-
     }
 }

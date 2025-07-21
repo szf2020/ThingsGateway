@@ -14,12 +14,10 @@ namespace ThingsGateway.Gateway.Application;
 
 internal static class ManageHelper
 {
-
     /// <summary>
     /// 线程最大等待间隔时间
     /// </summary>
     public static volatile ChannelThreadOptions ChannelThreadOptions = App.GetOptions<ChannelThreadOptions>();
-
 
     public static void CheckChannelCount(int addCount)
     {
@@ -50,5 +48,4 @@ internal static class ManageHelper
             throw new Exception($"The number of variables exceeds the limit {Math.Min(ManageHelper.ChannelThreadOptions.MaxVariableCount, authorizeInfo?.MaxVariableCount ?? 0)}");
         }
     }
-
 }

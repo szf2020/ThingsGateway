@@ -17,7 +17,6 @@ namespace ThingsGateway.Foundation.OpcUa;
 /// </summary>
 public static class OpcUaUtils
 {
-
     /// <summary>
     /// Finds the endpoint that best matches the current settings.
     /// </summary>
@@ -56,7 +55,6 @@ public static class OpcUaUtils
             return selectedEndpoint;
         }
     }
-
 
     /// <summary>
     /// Browses the address space and returns the references found.

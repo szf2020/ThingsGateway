@@ -15,9 +15,8 @@ namespace ThingsGateway.SqlSugar
 
         public int ExecuteCommandWithOptLock(bool isThrowError = false)
         {
-            List<GroupModel> groupModels;
-            int result;
-            GroupDataList(UpdateObjects, out groupModels, out result);
+            int result = 0;
+            var groupModels = GroupDataList(UpdateObjects);
             var dataEvent = this.Context.CurrentConnectionConfig.AopEvents?.DataExecuting;
             this.Context.Aop.DataExecuting = null;
             foreach (var item in groupModels.GroupBy(it => it.GroupName))
@@ -25,8 +24,8 @@ namespace ThingsGateway.SqlSugar
                 var addList = item.Select(it => it.Item).ToList();
                 if (IsVersion())
                 {
-                    Check.ExceptionEasy(addList.Count > 1, "The version number can only be used for single record updates", "版本号只能用于单条记录更新");
-                    result += this.Context.UpdateableT(addList.First())
+                    //Check.ExceptionEasy(addList.Count > 1, "The version number can only be used for single record updates", "版本号只能用于单条记录更新");
+                    result += this.Context.UpdateableT(addList[0])
                     .WhereColumns(this.WhereColumns)
                     .EnableDiffLogEventIF(this.IsEnableDiffLogEvent, this.BusinessData)
                     .UpdateColumns(updateobj.UpdateBuilder.UpdateColumns)
@@ -48,9 +47,8 @@ namespace ThingsGateway.SqlSugar
         }
         public int ExecuteCommand()
         {
-            List<GroupModel> groupModels;
-            int result;
-            GroupDataList(UpdateObjects, out groupModels, out result);
+            int result = 0;
+            var groupModels = GroupDataList(UpdateObjects);
             foreach (var item in groupModels.GroupBy(it => it.GroupName))
             {
                 var addList = item.Select(it => it.Item).ToList();
@@ -67,12 +65,11 @@ namespace ThingsGateway.SqlSugar
             return result;
         }
 
-
         public async Task<int> ExecuteCommandAsync()
         {
-            List<GroupModel> groupModels;
-            int result;
-            GroupDataList(UpdateObjects, out groupModels, out result);
+            int result = 0;
+
+            var groupModels = GroupDataList(UpdateObjects);
             foreach (var item in groupModels.GroupBy(it => it.GroupName))
             {
                 var addList = item.Select(it => it.Item).ToList();
@@ -90,9 +87,9 @@ namespace ThingsGateway.SqlSugar
         }
         public async Task<int> ExecuteCommandWithOptLockAsync(bool isThrowError = false)
         {
-            List<GroupModel> groupModels;
-            int result;
-            GroupDataList(UpdateObjects, out groupModels, out result);
+            int result = 0;
+
+            var groupModels = GroupDataList(UpdateObjects);
             var dataEvent = this.Context.CurrentConnectionConfig.AopEvents?.DataExecuting;
             this.Context.Aop.DataExecuting = null;
             foreach (var item in groupModels.GroupBy(it => it.GroupName))
@@ -100,14 +97,13 @@ namespace ThingsGateway.SqlSugar
                 var addList = item.Select(it => it.Item).ToList();
                 if (IsVersion())
                 {
-                    Check.ExceptionEasy(addList.Count > 1, "The version number can only be used for single record updates", "版本号只能用于单条记录更新");
-                    result += await Context.UpdateableT(addList.First())
+                    //Check.ExceptionEasy(addList.Count > 1, "The version number can only be used for single record updates", "版本号只能用于单条记录更新");
+                    result += await Context.UpdateableT(addList[0])
                       .WhereColumns(WhereColumns)
                       .EnableDiffLogEventIF(IsEnableDiffLogEvent, BusinessData)
                       .UpdateColumns(updateobj.UpdateBuilder.UpdateColumns)
                       .IgnoreColumns(updateobj.UpdateBuilder.IsNoUpdateNull, updateobj.UpdateBuilder.IsOffIdentity, updateobj.UpdateBuilder.IsNoUpdateDefaultValue)
                       .IgnoreColumns(GetIgnoreColumns()).AS(item.Key).ExecuteCommandWithOptLockAsync(isThrowError).ConfigureAwait(false);
-
                 }
                 else
                 {
@@ -135,21 +131,22 @@ namespace ThingsGateway.SqlSugar
                 return null;
             }
         }
-        private void GroupDataList(IReadOnlyList<T> datas, out List<GroupModel> groupModels, out int result)
+        private IEnumerable<GroupModel> GroupDataList(IEnumerable<T> datas)
         {
             var attribute = typeof(T).GetCustomAttribute<SplitTableAttribute>() as SplitTableAttribute;
             Check.Exception(attribute == null, $"{typeof(T).Name} need SplitTableAttribute");
-            groupModels = new List<GroupModel>();
+
             var db = this.Context;
             var context = db.SplitHelper<T>();
+
             foreach (var item in datas)
             {
                 var value = context.GetValue(attribute.SplitType, item);
                 var tableName = context.GetTableName(attribute.SplitType, value);
-                groupModels.Add(new GroupModel() { GroupName = tableName, Item = item });
+                yield return new GroupModel { GroupName = tableName, Item = item };
             }
-            result = 0;
         }
+
         private bool IsVersion()
         {
             return this.Context.EntityMaintenance.GetEntityInfo<T>().Columns.Any(it => it.IsEnableUpdateVersionValidation);

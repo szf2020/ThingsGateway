@@ -49,8 +49,6 @@ public class Variable : BaseDataEntity, IValidatableObject
     private ProtectTypeEnum protectType = ProtectTypeEnum.ReadWrite;
     private DataTypeEnum dataType = DataTypeEnum.Int16;
 
-
-
     /// <summary>
     /// 导入验证专用
     /// </summary>
@@ -105,8 +103,6 @@ public class Variable : BaseDataEntity, IValidatableObject
     private string remark4;
     private string remark5;
 
-
-
     /// <summary>
     /// 变量额外属性Json
     /// </summary>
@@ -114,7 +110,6 @@ public class Variable : BaseDataEntity, IValidatableObject
     [Newtonsoft.Json.JsonIgnore]
     [MapperIgnore]
     public ConcurrentDictionary<long, ModelValueValidateForm>? VariablePropertyModels;
-
 
     /// <summary>
     /// 设备
@@ -507,14 +502,12 @@ public class Variable : BaseDataEntity, IValidatableObject
 
     #endregion 备用字段
 
-
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {
         if (string.IsNullOrEmpty(RegisterAddress) && string.IsNullOrEmpty(OtherMethod))
         {
             yield return new ValidationResult("Both RegisterAddress and OtherMethod cannot be empty or null.", new[] { nameof(RegisterAddress), nameof(OtherMethod) });
         }
-
 
         if (HHAlarmEnable && HAlarmEnable && HHAlarmCode <= HAlarmCode)
         {
@@ -542,6 +535,4 @@ public class Variable : BaseDataEntity, IValidatableObject
             yield return new ValidationResult("HAlarmCode should be greater than or less than LLAlarmCode", new[] { nameof(HAlarmCode), nameof(LLAlarmCode) });
         }
     }
-
-
 }

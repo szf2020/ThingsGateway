@@ -4,10 +4,7 @@ namespace ThingsGateway.SqlSugar
 {
     public class SqlServerInsertBuilder : InsertBuilder
     {
-        public override Func<string, string, string> ConvertInsertReturnIdFunc { get; set; } = (name, sql) =>
-        {
-            return sql.Replace("select SCOPE_IDENTITY();", "").Replace(")\r\n SELECT", $")\r\n OUTPUT INSERTED.{name} as {name}  \r\nSELECT");
-        };
+        public override Func<string, string, string> ConvertInsertReturnIdFunc { get; set; } = (name, sql) => sql.Replace("select SCOPE_IDENTITY();", "").Replace(")\r\n SELECT", $")\r\n OUTPUT INSERTED.{name} as {name}  \r\nSELECT");
         public override bool IsNoPage { get; set; } = true;
         public override string ToSqlString()
         {
@@ -17,7 +14,7 @@ namespace ThingsGateway.SqlSugar
             }
             var groupList = DbColumnInfoList.GroupBy(it => it.TableId).ToList();
             var isSingle = groupList.Count == 1;
-            string columnsString = string.Join(",", groupList.First().Select(it => Builder.GetTranslationColumnName(it.DbColumnName)));
+            string columnsString = string.Join(",", groupList[0].Select(it => Builder.GetTranslationColumnName(it.DbColumnName)));
             var result = "";
             if (isSingle)
             {

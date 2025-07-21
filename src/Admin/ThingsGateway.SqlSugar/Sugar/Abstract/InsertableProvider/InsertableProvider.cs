@@ -82,7 +82,6 @@ namespace ThingsGateway.SqlSugar
         /// </summary>
         internal Action RemoveCacheFunc { get; set; }
 
-
         #region Core
         /// <summary>
         /// 添加到队列
@@ -569,7 +568,6 @@ namespace ThingsGateway.SqlSugar
                 var snowColumn = this.EntityInfo.Columns.FirstOrDefault(it => it.IsPrimarykey && it.UnderType == UtilConstants.LongType);
                 if (snowColumn != null)
                 {
-
                     if (Convert.ToInt64(snowColumn.PropertyInfo.GetValue(result)) == 0)
                     {
                         var id = await ExecuteReturnSnowflakeIdAsync().ConfigureAwait(false);
@@ -934,7 +932,6 @@ namespace ThingsGateway.SqlSugar
         public OracleBlukCopy UseOracle()
 
         {
-
             PreToSql();
 
             var currentType = this.Context.CurrentConnectionConfig.DbType;
@@ -955,9 +952,7 @@ namespace ThingsGateway.SqlSugar
             InsertBuilder.IsBlukCopy = true;
 
             return result;
-
         }
-
 
         /// <summary>
         /// 条件启用差异日志事件
@@ -1074,10 +1069,6 @@ namespace ThingsGateway.SqlSugar
         /// <returns>可分表插入对象</returns>
         public SplitInsertable<T> SplitTable()
         {
-            if (StaticConfig.SplitTableCreateTableFunc != null)
-            {
-                StaticConfig.SplitTableCreateTableFunc(typeof(T), this.InsertObjs);
-            }
             UtilMethods.StartCustomSplitTable(this.Context, typeof(T));
             var splitTableAttribute = typeof(T).GetCustomAttribute<SplitTableAttribute>();
             if (splitTableAttribute != null)

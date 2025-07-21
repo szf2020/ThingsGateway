@@ -29,7 +29,6 @@ public class DeviceRuntimeService : IDeviceRuntimeService
 
     private WaitLock WaitLock { get; set; } = new WaitLock(nameof(DeviceRuntimeService));
 
-
     public async Task<bool> CopyAsync(Dictionary<Device, List<Variable>> devices, bool restart, CancellationToken cancellationToken)
     {
         try
@@ -43,13 +42,11 @@ public class DeviceRuntimeService : IDeviceRuntimeService
 
             await RuntimeServiceHelper.InitAsync(newDeviceRuntimes, _logger).ConfigureAwait(false);
 
-
             //根据条件重启通道线程
             if (restart)
             {
                 await RuntimeServiceHelper.RestartDeviceAsync(newDeviceRuntimes).ConfigureAwait(false);
                 await RuntimeServiceHelper.ChangedDriverAsync(_logger, cancellationToken).ConfigureAwait(false);
-
             }
 
             return true;
@@ -101,7 +98,6 @@ public class DeviceRuntimeService : IDeviceRuntimeService
         {
             await WaitLock.WaitAsync(cancellationToken).ConfigureAwait(false);
 
-
             var devids = ids.ToHashSet();
 
             var result = await GlobalData.DeviceService.DeleteDeviceAsync(devids).ConfigureAwait(false);
@@ -116,11 +112,9 @@ public class DeviceRuntimeService : IDeviceRuntimeService
                 await RuntimeServiceHelper.RemoveDeviceAsync(deviceRuntimes).ConfigureAwait(false);
 
                 await RuntimeServiceHelper.ChangedDriverAsync(changedDriver, _logger, cancellationToken).ConfigureAwait(false);
-
             }
 
             return true;
-
         }
         finally
         {
@@ -128,13 +122,10 @@ public class DeviceRuntimeService : IDeviceRuntimeService
         }
     }
 
-
-
     public Task<Dictionary<string, object>> ExportDeviceAsync(ExportFilter exportFilter) => GlobalData.DeviceService.ExportDeviceAsync(exportFilter);
     public Task<Dictionary<string, ImportPreviewOutputBase>> PreviewAsync(IBrowserFile browserFile) => GlobalData.DeviceService.PreviewAsync(browserFile);
     public Task<MemoryStream> ExportMemoryStream(List<Device> data, string channelName, string plugin) =>
           GlobalData.DeviceService.ExportMemoryStream(data, channelName, plugin);
-
 
     public async Task ImportDeviceAsync(Dictionary<string, ImportPreviewOutputBase> input, bool restart)
     {
@@ -148,10 +139,8 @@ public class DeviceRuntimeService : IDeviceRuntimeService
 
             if (restart)
             {
-
                 var newDeciceIds = newDeviceRuntimes.Select(a => a.Id).ToHashSet();
                 await RuntimeServiceHelper.RemoveDeviceAsync(newDeciceIds).ConfigureAwait(false);
-
             }
 
             //批量修改之后，需要重新加载通道
@@ -160,35 +149,26 @@ public class DeviceRuntimeService : IDeviceRuntimeService
             //根据条件重启通道线程
             if (restart)
             {
-
                 await RuntimeServiceHelper.RestartDeviceAsync(newDeviceRuntimes).ConfigureAwait(false);
-
             }
-
-
         }
         finally
         {
             WaitLock.Release();
         }
-
     }
 
     public async Task<bool> SaveDeviceAsync(Device input, ItemChangedType type, bool restart)
     {
         try
         {
-
             await WaitLock.WaitAsync().ConfigureAwait(false);
 
             var result = await GlobalData.DeviceService.SaveDeviceAsync(input, type).ConfigureAwait(false);
 
             var newDeviceRuntimes = await RuntimeServiceHelper.GetNewDeviceRuntimesAsync(new HashSet<long>() { input.Id }).ConfigureAwait(false);
 
-
-
             RuntimeServiceHelper.Init(newDeviceRuntimes);
-
 
             if (restart)
             {
@@ -204,13 +184,10 @@ public class DeviceRuntimeService : IDeviceRuntimeService
         }
     }
 
-
     public async Task<bool> BatchSaveDeviceAsync(List<Device> input, ItemChangedType type, bool restart)
     {
-
         try
         {
-
             await WaitLock.WaitAsync().ConfigureAwait(false);
 
             var result = await GlobalData.DeviceService.BatchSaveDeviceAsync(input, type).ConfigureAwait(false);
@@ -232,5 +209,4 @@ public class DeviceRuntimeService : IDeviceRuntimeService
             WaitLock.Release();
         }
     }
-
 }

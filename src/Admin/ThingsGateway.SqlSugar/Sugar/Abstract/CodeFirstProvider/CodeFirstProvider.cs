@@ -133,10 +133,7 @@ namespace ThingsGateway.SqlSugar
 
                 if (this.Context.Ado.Transaction == null)
                 {
-                    var executeResult = Context.Ado.UseTran(() =>
-                    {
-                        Execute(entityType, entityInfo);
-                    });
+                    var executeResult = Context.Ado.UseTran(() => Execute(entityType, entityInfo));
                     Check.Exception(!executeResult.IsSuccess, executeResult.ErrorMessage);
                 }
                 else
@@ -146,7 +143,6 @@ namespace ThingsGateway.SqlSugar
 
                 RestMappingTables(oldTableList);
             }
-
         }
 
         /// <summary>
@@ -215,7 +211,6 @@ namespace ThingsGateway.SqlSugar
                     }
                     catch (Exception ex)
                     {
-
                         throw new Exception(item.Name + " 创建失败,请认真检查 1、属性需要get set 2、特殊类型需要加Ignore 具体错误内容： " + ex.Message);
                     }
                 }
@@ -316,7 +311,6 @@ namespace ThingsGateway.SqlSugar
             db.MappingTables.Add(type.Name, tempTableName);
             try
             {
-
                 var codeFirst = db.CodeFirst;
                 codeFirst.SetStringDefaultLength(this.DefaultLength);
                 codeFirst.InitTables(type);
@@ -567,9 +561,7 @@ namespace ThingsGateway.SqlSugar
                     .Where(entityColumn => dbColumns.Any(dbColumn => entityColumn.OldDbColumnName.Equals(dbColumn.DbColumnName, StringComparison.CurrentCultureIgnoreCase)))
                     .ToList();
 
-
                 var isMultiplePrimaryKey = dbColumns.Where(it => it.IsPrimarykey).Count() > 1 || entityColumns.Where(it => it.IsPrimarykey).Count() > 1;
-
 
                 var isChange = false;
                 foreach (var item in addColumns)
@@ -587,7 +579,6 @@ namespace ThingsGateway.SqlSugar
                 }
                 foreach (var item in alterColumns)
                 {
-
                     if (this.Context.CurrentConnectionConfig.DbType == DbType.Oracle)
                     {
                         var entityColumnItem = entityColumns.FirstOrDefault(y => y.DbColumnName == item.DbColumnName);
@@ -655,7 +646,6 @@ namespace ThingsGateway.SqlSugar
                     {
                         Check.Exception(true, ErrorMessage.GetThrowMessage("Modification of multiple primary key tables is not supported. Delete tables while creating", "不支持修改多主键表，请删除表在创建"));
                     }
-
                 }
                 if (isChange && IsBackupTable)
                 {
@@ -716,7 +706,6 @@ namespace ThingsGateway.SqlSugar
         /// <param name="dbColumns">数据库列集合</param>
         protected virtual void ExistLogicEnd(List<EntityColumnInfo> dbColumns)
         {
-
         }
         /// <summary>
         /// 转换列
@@ -724,7 +713,6 @@ namespace ThingsGateway.SqlSugar
         /// <param name="dbColumns">数据库列集合</param>
         protected virtual void ConvertColumns(List<DbColumnInfo> dbColumns)
         {
-
         }
         #endregion
 
@@ -954,7 +942,6 @@ namespace ThingsGateway.SqlSugar
                 default:
                     return name;
             }
-
         }
 
         #endregion

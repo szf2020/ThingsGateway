@@ -22,7 +22,6 @@ public class ModbusTcpMessage : MessageBase, IResultMessage
 
     public override FilterResult CheckBody<TByteBlock>(ref TByteBlock byteBlock)
     {
-
         var f = Response.FunctionCode > 0x30 ? Response.FunctionCode - 0x30 : Response.FunctionCode;
         if (error)
         {
@@ -98,6 +97,5 @@ public class ModbusTcpMessage : MessageBase, IResultMessage
             error = true;
         }
         return true;
-
     }
 }

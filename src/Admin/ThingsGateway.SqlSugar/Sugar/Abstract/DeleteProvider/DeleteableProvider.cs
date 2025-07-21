@@ -361,7 +361,7 @@ namespace ThingsGateway.SqlSugar
                     var tableName = this.SqlBuilder.GetTranslationColumnName(entityTableName);
                     whereString = whereString.Replace(tableName, $"( SELECT * FROM {tableName})  ");
                 }
-                whereString = whereString.Replace(this.SqlBuilder.GetTranslationColumnName(expression.Parameters.First().Name) + ".", this.SqlBuilder.GetTranslationTableName(entityTableName) + ".");
+                whereString = whereString.Replace(this.SqlBuilder.GetTranslationColumnName(expression.Parameters[0].Name) + ".", this.SqlBuilder.GetTranslationTableName(entityTableName) + ".");
             }
             else if (expResult.IsNavicate)
             {
@@ -370,9 +370,8 @@ namespace ThingsGateway.SqlSugar
                 {
                     entityTableName2 = this.DeleteBuilder.AsName;
                 }
-                whereString = whereString.Replace(expression.Parameters.First().Name + ".", this.SqlBuilder.GetTranslationTableName(entityTableName2) + ".");
-                whereString = whereString.Replace(this.SqlBuilder.GetTranslationColumnName(expression.Parameters.First().Name) + ".", this.SqlBuilder.GetTranslationTableName(entityTableName2) + ".");
-
+                whereString = whereString.Replace(expression.Parameters[0].Name + ".", this.SqlBuilder.GetTranslationTableName(entityTableName2) + ".");
+                whereString = whereString.Replace(this.SqlBuilder.GetTranslationColumnName(expression.Parameters[0].Name) + ".", this.SqlBuilder.GetTranslationTableName(entityTableName2) + ".");
             }
             DeleteBuilder.WhereInfos.Add(whereString);
             return this;
@@ -639,8 +638,6 @@ namespace ThingsGateway.SqlSugar
             };
             return this;
         }
-
-
 
         /// <summary>
         /// IN条件

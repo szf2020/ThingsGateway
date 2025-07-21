@@ -2,8 +2,6 @@
 {
     public class SqlObjectResult
     {
-
-
         public SqlObjectResult(KeyValuePair<string, IReadOnlyList<SugarParameter>> keyValuePair, JsonProviderType jsonSqlType)
         {
             this.Sql = keyValuePair.Key;

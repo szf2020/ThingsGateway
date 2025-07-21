@@ -55,7 +55,6 @@ namespace ThingsGateway.SqlSugar
                 var memInit = lamda.Body as MemberInitExpression;
                 if (memInit.Bindings != null)
                 {
-
                     MemberAssignment memberAssignment = (MemberAssignment)memInit.Bindings[0];
                     SubList.Add(new SubInsertTreeExpression()
                     {
@@ -106,10 +105,7 @@ namespace ThingsGateway.SqlSugar
         public async Task<object> ExecuteCommandAsync()
         {
             object resut = 0;
-            await Task.Run(() =>
-            {
-                resut = ExecuteCommand();
-            }).ConfigureAwait(false);
+            await Task.Run(() => resut = ExecuteCommand()).ConfigureAwait(false);
             return resut;
         }
         /// <summary>
@@ -267,7 +263,6 @@ namespace ThingsGateway.SqlSugar
             {
                 if (item.IsIdentity || item.IsIgnore)
                 {
-
                 }
                 else if (!string.IsNullOrEmpty(item.OracleSequenceName) && this.Context.CurrentConnectionConfig.DbType == DbType.Oracle)
                 {
@@ -300,8 +295,7 @@ namespace ThingsGateway.SqlSugar
             MemberExpression listMember = null;
             if (subMemberException.Expression is MethodCallExpression)
             {
-                listMember = (subMemberException.Expression as MethodCallExpression).Arguments.First() as MemberExpression;
-
+                listMember = (subMemberException.Expression as MethodCallExpression).Arguments[0] as MemberExpression;
             }
             else
             {

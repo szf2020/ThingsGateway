@@ -315,7 +315,6 @@ internal sealed class SysResourceService : BaseService<SysResource>, ISysResourc
 
     #endregion 方法
 
-
     /// <inheritdoc/>
     private static List<SysResource> MenuTreesToSaveLevel(IEnumerable<SysResource> resourceList)
     {
@@ -345,7 +344,6 @@ internal sealed class SysResourceService : BaseService<SysResource>, ISysResourc
         return flatList;
     }
 
-
     /// <inheritdoc/>
     public IEnumerable<SysResource> ConstructMenuTrees(IEnumerable<SysResource> resourceList, long parentId = 0)
     {
@@ -362,7 +360,6 @@ internal sealed class SysResourceService : BaseService<SysResource>, ISysResourc
         return resources;
     }
 
-
     /// <inheritdoc/>
     public IEnumerable<SysResource> GetMyParentResources(IEnumerable<SysResource> allMenuList, IEnumerable<SysResource> myMenus)
     {
@@ -374,7 +371,6 @@ internal sealed class SysResourceService : BaseService<SysResource>, ISysResourc
                                 .Distinct();
         return parentList;
     }
-
 
     /// <inheritdoc/>
     public IEnumerable<SysResource> GetResourceChilden(IEnumerable<SysResource> resourceList, long parentId)
@@ -391,7 +387,5 @@ internal sealed class SysResourceService : BaseService<SysResource>, ISysResourc
         return resourceList.Where(it => it.Id == resourceId)
                            .SelectMany(item => new List<SysResource> { item }.Concat(GetResourceParent(resourceList, item.ParentId)));
     }
-
-
 
 }

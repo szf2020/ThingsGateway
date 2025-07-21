@@ -19,7 +19,6 @@ namespace ThingsGateway.SqlSugar
                     var orderByModel = item as GroupByModel;
                     sql.Append($" {this.GetTranslationColumnName(orderByModel.FieldName.ObjToString().ToSqlFilter())} ,");
                 }
-
             }
             return new KeyValuePair<string, IReadOnlyList<SugarParameter>>(sql.ToString().TrimEnd(','), pars);
         }

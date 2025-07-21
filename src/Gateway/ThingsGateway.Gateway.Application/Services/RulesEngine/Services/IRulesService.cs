@@ -12,10 +12,8 @@ using BootstrapBlazor.Components;
 
 namespace ThingsGateway.Gateway.Application;
 
-
 public interface IRulesService
 {
-
     /// <summary>
     /// 清除所有规则
     /// </summary>

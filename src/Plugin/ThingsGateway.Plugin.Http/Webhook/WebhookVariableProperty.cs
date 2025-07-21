@@ -15,5 +15,4 @@ namespace ThingsGateway.Plugin.Webhook;
 /// </summary>
 public class WebhookVariableProperty : VariablePropertyBase
 {
-
 }

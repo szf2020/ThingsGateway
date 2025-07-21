@@ -130,5 +130,4 @@ namespace TDengineAdo
             parameters[index] = (TDengineParameter)value;
         }
     }
-
 }

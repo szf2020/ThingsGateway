@@ -67,7 +67,7 @@ namespace ThingsGateway.SqlSugar
             var list = (value as List<object>);
             if (list.Count == 1)
             {
-                return GetSqlPart(list.First(), pars).ObjToString();
+                return GetSqlPart(list[0], pars).ObjToString();
             }
             else
             {

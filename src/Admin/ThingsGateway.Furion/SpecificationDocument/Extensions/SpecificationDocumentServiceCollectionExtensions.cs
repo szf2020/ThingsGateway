@@ -63,6 +63,4 @@ public static class SpecificationDocumentServiceCollectionExtensions
 
         return services;
     }
-
-
 }

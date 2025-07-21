@@ -28,13 +28,9 @@ public class Startup : AppStartup
         services.AddSingleton<IClaimsPrincipalService, ClaimsPrincipalService>();
 
         StaticConfig.EnableAllWhereIF = true;
-
-
     }
 
     public void Use(IServiceProvider serviceProvider)
     {
-
-
     }
 }

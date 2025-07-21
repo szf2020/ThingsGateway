@@ -63,14 +63,12 @@ public abstract class CollectFoundationBase : CollectBase
         {
             await FoundationDevice.ConnectAsync(cancellationToken).ConfigureAwait(false);
         }
-
     }
 
     public override string GetAddressDescription()
     {
         return FoundationDevice?.GetAddressDescription();
     }
-
 
     protected override async Task TestOnline(object? state, CancellationToken cancellationToken)
     {
@@ -92,7 +90,6 @@ public abstract class CollectFoundationBase : CollectBase
                         {
                             await Task.Delay(30000, cancellationToken).ConfigureAwait(false);
                         }
-
                     }
                 }
                 catch (OperationCanceledException)
@@ -141,13 +138,11 @@ public abstract class CollectFoundationBase : CollectBase
         return;
     }
 
-
     /// <summary>
     /// 采集驱动读取，读取成功后直接赋值变量，失败不做处理，注意非通用设备需重写
     /// </summary>
     protected override async ValueTask<OperResult<byte[]>> ReadSourceAsync(VariableSourceRead variableSourceRead, CancellationToken cancellationToken)
     {
-
         if (cancellationToken.IsCancellationRequested)
             return new(new OperationCanceledException());
 
@@ -184,7 +179,6 @@ public abstract class CollectFoundationBase : CollectBase
         {
             try
             {
-
                 if (LogMessage?.LogLevel <= TouchSocket.Core.LogLevel.Debug)
                     LogMessage?.Debug(string.Format("{0} - Writing [{1} - {2} - {3}]", DeviceName, writeInfo.Key.RegisterAddress, writeInfo.Value, writeInfo.Key.DataType));
 
@@ -214,6 +208,4 @@ public abstract class CollectFoundationBase : CollectBase
         // 返回包含操作结果的字典
         return new Dictionary<string, OperResult>(operResults);
     }
-
-
 }

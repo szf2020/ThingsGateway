@@ -229,8 +229,6 @@ public class DefaultSpan : ISpan
             var builder = tracer?.BuildSpan(name);
             builder?.Finish(this);
         }
-
-
     }
 
     /// <summary>抛弃埋点，不计入采集</summary>

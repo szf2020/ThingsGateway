@@ -51,6 +51,5 @@ public static class ClaimConst
     /// </summary>
     public const string TenantId = "TenantId";
 
-
     public static volatile string Scheme = "ThingsGateway.AdminServer";
 }

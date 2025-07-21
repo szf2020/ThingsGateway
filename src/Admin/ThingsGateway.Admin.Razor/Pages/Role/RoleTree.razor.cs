@@ -42,7 +42,6 @@ public partial class RoleTree : IDisposable
         }
     }
 
-
     private List<TreeViewItem<RoleTreeOutput>> ZItem;
     protected override async Task OnInitializedAsync()
     {
@@ -67,10 +66,7 @@ public partial class RoleTree : IDisposable
         try
         {
             ExecutionContext.Restore(context);
-            await InvokeAsync(async () =>
-            {
-                await OnClickSearch(SearchText);
-            });
+            await InvokeAsync(async () => await OnClickSearch(SearchText));
         }
         finally
         {

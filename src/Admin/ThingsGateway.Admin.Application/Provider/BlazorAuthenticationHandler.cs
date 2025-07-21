@@ -52,7 +52,6 @@ public class BlazorAuthenticationHandler : AppAuthorizeHandler
         {
             await Fail(context).ConfigureAwait(false);// 授权失败
         }
-
     }
     static async Task Fail(AuthorizationHandlerContext context)
     {
@@ -263,14 +262,11 @@ public class BlazorAuthenticationHandler : AppAuthorizeHandler
                 {
                     verificatInfo.VerificatTimeout = verificatInfo.VerificatTimeout.AddMinutes(verificatInfo.Expire); //新的过期时间
                     VerificatInfoService.Update(verificatInfo); //更新tokne信息到cache
-
-
                 }
 
                 //无法在server中刷新cookies，单页面应用会一直保持登录状态，所以这里不需要刷新cookies，但是F5刷新后会重新登录
 
             }
-
 
             return true;
         }

@@ -16,7 +16,6 @@ public partial class GatewayMonitorPage
 
     #region 查询
 
-
     private async Task TreeChangedAsync(ChannelDeviceTreeItem channelDeviceTreeItem)
     {
         ShowChannelRuntime = 0;
@@ -67,7 +66,6 @@ public partial class GatewayMonitorPage
                 VariableRuntimes = channels.Where(a => a.PluginName == pluginName).SelectMany(a => a.ReadDeviceRuntimes).Where(a => a.Value.Driver?.IdVariableRuntimes != null).SelectMany(a => a.Value.Driver?.IdVariableRuntimes).Select(a => a.Value);
             }
 
-
             ChannelRuntimes = channels.Where(a => a.PluginName == pluginName);
             DeviceRuntimes = devices.Where(a => a.PluginName == pluginName);
         }
@@ -86,7 +84,6 @@ public partial class GatewayMonitorPage
                 {
                     ChannelRuntimes = channels;
                     DeviceRuntimes = devices;
-
                 }
             }
         }
@@ -105,11 +102,8 @@ public partial class GatewayMonitorPage
     public IEnumerable<ChannelRuntime> ChannelRuntimes { get; set; } = Enumerable.Empty<ChannelRuntime>();
     public IEnumerable<DeviceRuntime> DeviceRuntimes { get; set; } = Enumerable.Empty<DeviceRuntime>();
 
-
     private long ShowChannelRuntime { get; set; }
     private long ShowDeviceRuntime { get; set; }
     public ShowTypeEnum? ShowType { get; set; }
     private bool AutoRestartThread { get; set; } = true;
-
-
 }

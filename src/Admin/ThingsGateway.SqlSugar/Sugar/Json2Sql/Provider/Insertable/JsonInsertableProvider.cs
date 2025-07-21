@@ -18,7 +18,7 @@ namespace ThingsGateway.SqlSugar
         {
             var result = new JsonInsertResult();
             var sqlInfo = this.ToSqlList();
-            var sqlInfoResult = sqlInfo.First();
+            var sqlInfoResult = sqlInfo[0];
             if (sqlInfoResult.JsonSqlType != JsonProviderType.InsertableIdentity)
             {
                 result.InsertCount = this.context.Ado.ExecuteCommand(sqlInfoResult.Sql, sqlInfoResult.Parameters);

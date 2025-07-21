@@ -45,7 +45,6 @@ internal sealed class SysUserService : BaseService<SysUser>, ISysUserService
         _verificatInfoService = verificatInfoService;
     }
 
-
     #region 数据范围相关
 
     /// <inheritdoc/>
@@ -100,7 +99,6 @@ internal sealed class SysUserService : BaseService<SysUser>, ISysUserService
         return hasPermission;
     }
 
-
     public async Task<bool> CheckApiDataScopeAsync(IEnumerable<long> orgIds, IEnumerable<long> createUerIds, bool throwEnable = true)
     {
         var hasPermission = true;
@@ -126,7 +124,6 @@ internal sealed class SysUserService : BaseService<SysUser>, ISysUserService
     #endregion
 
     #region 查询
-
 
     /// <inheritdoc/>
     public async Task<SysUser?> GetUserByAccountAsync(string account, long? tenantId)
@@ -178,7 +175,6 @@ internal sealed class SysUserService : BaseService<SysUser>, ISysUserService
         var userId = App.CacheService.HashGetOne<long>(key, account);
         if (userId == 0)
         {
-
             //单查获取用户账号对应ID
             using var db = GetDB();
             userId = await db.Queryable<SysUser>()
@@ -272,7 +268,6 @@ internal sealed class SysUserService : BaseService<SysUser>, ISysUserService
                     ApiUrl = it.Key,
                 });
             }
-
         }
 
         #endregion Razor页面权限
@@ -303,7 +298,6 @@ internal sealed class SysUserService : BaseService<SysUser>, ISysUserService
                     ApiUrl = it.Key,
                 });
             }
-
         }
 
         #endregion API权限
@@ -352,7 +346,6 @@ internal sealed class SysUserService : BaseService<SysUser>, ISysUserService
                 u.Phone = DESEncryption.Decrypt(u.Phone);//解密手机号
 #pragma warning restore CS8625 // 无法将 null 字面量转换为非 null 的引用类型。
             })).ConfigureAwait(false);
-
         }
         else
         {
@@ -365,8 +358,6 @@ internal sealed class SysUserService : BaseService<SysUser>, ISysUserService
 #pragma warning restore CS8625 // 无法将 null 字面量转换为非 null 的引用类型。
                 })).ConfigureAwait(false);
         }
-
-
 
 
     }
@@ -561,7 +552,6 @@ internal sealed class SysUserService : BaseService<SysUser>, ISysUserService
             var resources = await _sysResourceService.GetAllAsync().ConfigureAwait(false);
             var menusList = resources.Where(a => a.Category == ResourceCategoryEnum.Menu).Where(a => menuIds.Contains(a.Id));
 
-
             #region 用户模块处理
 
             //获取我的模块信息Id列表
@@ -689,7 +679,6 @@ internal sealed class SysUserService : BaseService<SysUser>, ISysUserService
 
             //删除组织表主管信息
             await db.Deleteable<SysOrg>(it => ids.Contains(it.DirectorId.Value)).ExecuteCommandAsync().ConfigureAwait(false);
-
         }).ConfigureAwait(false);
 
         if (result.IsSuccess)//如果成功了
@@ -752,8 +741,6 @@ internal sealed class SysUserService : BaseService<SysUser>, ISysUserService
             App.CacheService.HashDel<long>(CacheConst.Cache_SysUserAccount, accounts);
 
             App.CacheService.HashDel<VerificatInfo>(CacheConst.Cache_Token, userIds.Select(it => it.ToString()).ToArray());
-
-
         }
     }
 
@@ -792,7 +779,6 @@ internal sealed class SysUserService : BaseService<SysUser>, ISysUserService
     /// <param name="sysUser"></param>
     private async Task CheckInput(SysUser sysUser)
     {
-
         var sysOrgList = await _sysOrgService.GetAllAsync().ConfigureAwait(false);//获取组织列表
         var userOrg = sysOrgList.FirstOrDefault(it => it.Id == sysUser.OrgId);
         if (userOrg == null)
@@ -884,8 +870,6 @@ internal sealed class SysUserService : BaseService<SysUser>, ISysUserService
             sysUser.RoleIdList = roleCodeList.Select(it => it.Id).ToHashSet();
             sysUser.PermissionCodeList = permissionCodeList;
             sysUser.IsGlobal = roleCodeList.Any(a => a.Category == RoleCategoryEnum.Global);
-
-
 
             var sysOrgList = await _sysOrgService.GetAllAsync().ConfigureAwait(false);
             var scopeOrgChildList =

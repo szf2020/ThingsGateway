@@ -52,7 +52,6 @@ namespace ThingsGateway.SqlSugar
             sb.Append(base.GetDbColumn(m, FormatValue(m.Value, m.IsPrimarykey, m.PropertyName)));
             sb.Append(' ');
 
-
             if (isWhere && m.Value == null)
             {
                 sb.Replace("=NULL ", " is NULL ");

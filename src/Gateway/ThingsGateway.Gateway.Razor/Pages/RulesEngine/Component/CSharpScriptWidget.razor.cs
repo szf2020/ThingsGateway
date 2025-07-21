@@ -23,10 +23,8 @@ namespace ThingsGateway.Gateway.Razor
         [Parameter]
         public TextNode Node { get; set; }
 
-
         private async Task CheckScript()
         {
-
             var op = new DialogOption()
             {
                 IsScrolling = true,
@@ -40,7 +38,6 @@ namespace ThingsGateway.Gateway.Razor
             op.Component = BootstrapDynamicComponent.CreateComponent<ScriptEdit>(new Dictionary<string, object?>
     {
         {nameof(ScriptEdit.OnCheckScript),  new Func<string,Task<string>>(async a=>{
-
             if(Node is IConditionNode conditionNode)
           return  (await conditionNode.ExecuteAsync(new NodeInput(){Value=a==null?a:JToken.Parse(a??string.Empty) },default).ConfigureAwait(false)).ToString();
              if(Node is IExpressionNode expressionNode)
@@ -58,15 +55,9 @@ namespace ThingsGateway.Gateway.Razor
         return string.Empty;
         }) },
         {nameof(ScriptEdit.Script),Node.Text },
-        {nameof(ScriptEdit.ScriptChanged),EventCallback.Factory.Create<string>(this, v =>
-        {
-           Node.Text=v;
-
-        })},
-
+        {nameof(ScriptEdit.ScriptChanged),EventCallback.Factory.Create<string>(this, v => Node.Text=v)},
     });
             await DialogService.Show(op);
-
         }
 
         [Inject]

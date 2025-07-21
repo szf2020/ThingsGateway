@@ -4,7 +4,6 @@
     {
         public BlockExpressionResolve(ExpressionParameter parameter) : base(parameter)
         {
-
         }
     }
 }

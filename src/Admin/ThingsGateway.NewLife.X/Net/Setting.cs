@@ -4,7 +4,6 @@ using ThingsGateway.NewLife.Configuration;
 
 namespace ThingsGateway.NewLife.Net;
 
-
 /// <summary>网络设置</summary>
 [DisplayName("网络设置")]
 [Config("Socket")]

@@ -11,12 +11,10 @@
 using ThingsGateway.Admin.Application;
 using ThingsGateway.NewLife.Json.Extension;
 
-
 namespace ThingsGateway.Admin.Razor;
 
 internal sealed class AuthRazorService : IAuthRazorService
 {
-
     private AjaxService AjaxService { get; set; }
     public AuthRazorService(AjaxService ajaxService)
     {

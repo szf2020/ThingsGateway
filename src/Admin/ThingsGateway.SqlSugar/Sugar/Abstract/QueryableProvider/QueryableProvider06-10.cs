@@ -306,7 +306,6 @@ namespace ThingsGateway.SqlSugar
         /// <returns></returns>
         public new ISugarQueryable<T, T2, T3, T4, T5, T6> WhereClass<ClassType>(List<ClassType> whereClassTypes, bool ignoreDefaultValue = false) where ClassType : class, new()
         {
-
             base.WhereClass(whereClassTypes, ignoreDefaultValue);
             return this;
         }
@@ -741,7 +740,6 @@ namespace ThingsGateway.SqlSugar
             return this;
         }
 
-
         public new ISugarQueryable<T, T2, T3, T4, T5, T6> ClearFilter(params Type[] types)
         {
             base.ClearFilter(types);
@@ -1134,7 +1132,6 @@ namespace ThingsGateway.SqlSugar
         /// <returns></returns>
         public new ISugarQueryable<T, T2, T3, T4, T5, T6, T7> WhereClass<ClassType>(List<ClassType> whereClassTypes, bool ignoreDefaultValue = false) where ClassType : class, new()
         {
-
             base.WhereClass(whereClassTypes, ignoreDefaultValue);
             return this;
         }
@@ -1977,7 +1974,6 @@ namespace ThingsGateway.SqlSugar
         /// <returns></returns>
         public new ISugarQueryable<T, T2, T3, T4, T5, T6, T7, T8> WhereClass<ClassType>(List<ClassType> whereClassTypes, bool ignoreDefaultValue = false) where ClassType : class, new()
         {
-
             base.WhereClass(whereClassTypes, ignoreDefaultValue);
             return this;
         }

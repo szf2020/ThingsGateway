@@ -40,9 +40,7 @@ public partial class ThingsGatewayServer : StandardServer
     public ThingsGatewayServer(OpcUaServer opcUaServer)
     {
         _opcUaServer = opcUaServer;
-
     }
-
 
     /// <inheritdoc/>
     protected override MasterNodeManager CreateMasterNodeManager(IServerInternal server, ApplicationConfiguration configuration)

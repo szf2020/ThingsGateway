@@ -5,8 +5,6 @@ using ThingsGateway.NewLife.Extension;
 
 using TouchSocket.Core;
 
-
-
 namespace ThingsGateway.Gateway.Application;
 
 [CategoryNode(Category = "Expression", ImgUrl = "_content/ThingsGateway.Gateway.Razor/img/CSharpScript.svg", Desc = nameof(ConditionNode), LocalizerType = typeof(ThingsGateway.Gateway.Application.DefaultDiagram), WidgetType = "ThingsGateway.Gateway.Razor.CSharpScriptWidget,ThingsGateway.Gateway.Razor")]
@@ -18,9 +16,6 @@ public class ConditionNode : TextNode, IConditionNode
         Text = "return true;";
     }
 
-
-
-
     Task<bool> IConditionNode.ExecuteAsync(NodeInput input, CancellationToken cancellationToken)
     {
         var value = Text.GetExpressionsResult(input.Value, Logger);
@@ -28,5 +23,4 @@ public class ConditionNode : TextNode, IConditionNode
         Logger?.Trace($"Condition result: {next}");
         return Task.FromResult(next);
     }
-
 }

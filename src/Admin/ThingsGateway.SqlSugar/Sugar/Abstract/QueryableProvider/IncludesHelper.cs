@@ -142,7 +142,6 @@ namespace ThingsGateway.SqlSugar
                 var array = ExpressionTool.ExtractMemberNames(include1);
                 if (array.Count > 1)
                 {
-
                     if (array.Count == 2)
                     {
                         result = this.IncludesByNameString(array[0], array[1]);

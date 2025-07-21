@@ -28,8 +28,6 @@ public class AdminOAuthHandler<TOptions>(
 ) : OAuthHandler<TOptions>(options, logger, encoder)
     where TOptions : AdminOAuthOptions, new()
 {
-
-
     static AdminOAuthHandler()
     {
         Task.Factory.StartNew(Insertable, TaskCreationOptions.LongRunning);
@@ -66,8 +64,6 @@ public class AdminOAuthHandler<TOptions>(
                 await Task.Delay(3000, appLifetime.ApplicationStopping).ConfigureAwait(false);
             }
         }
-
-
     }
 
     protected override async Task<AuthenticationTicket> CreateTicketAsync(
@@ -96,7 +92,6 @@ public class AdminOAuthHandler<TOptions>(
         identity.AddClaim(new Claim(ClaimConst.SuperAdmin, "true"));
         identity.AddClaim(new Claim(ClaimConst.OrgId, RoleConst.DefaultTenantId.ToString()));
         identity.AddClaim(new Claim(ClaimConst.TenantId, RoleConst.DefaultTenantId.ToString()));
-
 
         var context = new OAuthCreatingTicketContext(
             new ClaimsPrincipal(identity),
@@ -143,10 +138,6 @@ public class AdminOAuthHandler<TOptions>(
         return new AuthenticationTicket(context.Principal, context.Properties, Scheme.Name);
     }
 
-
-
-
-
     private async Task<LoginEvent> GetLogin(int expire)
     {
         var sysUser = await sysUserService.GetUserByIdAsync(RoleConst.SuperAdminId).ConfigureAwait(false);//获取用户信息
@@ -173,7 +164,6 @@ public class AdminOAuthHandler<TOptions>(
             LoginIp = loginEvent.Ip,
             LoginTime = loginEvent.DateTime
         };
-
 
         //添加到verificat列表
         verificatInfoService.Add(verificatInfo);

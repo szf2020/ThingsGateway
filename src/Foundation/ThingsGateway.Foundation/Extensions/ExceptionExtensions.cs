@@ -30,5 +30,4 @@ public static class ExceptionExtensions
             throw new ArgumentNullException(paramName);
         }
     }
-
 }

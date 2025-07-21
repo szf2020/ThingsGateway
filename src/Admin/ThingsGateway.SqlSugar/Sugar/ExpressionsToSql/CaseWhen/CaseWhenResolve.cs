@@ -2,7 +2,6 @@
 
 namespace ThingsGateway.SqlSugar
 {
-
     public class CaseWhenResolve
     {
         List<MethodCallExpression> allMethods = new List<MethodCallExpression>();
@@ -24,7 +23,7 @@ namespace ThingsGateway.SqlSugar
             {
                 if (context.Expression is LambdaExpression)
                 {
-                    this.context.SingleTableNameSubqueryShortName = (context.Expression as LambdaExpression).Parameters.First().Name;
+                    this.context.SingleTableNameSubqueryShortName = (context.Expression as LambdaExpression).Parameters[0].Name;
                 }
             }
             while (currentExpression != null)
@@ -42,7 +41,7 @@ namespace ThingsGateway.SqlSugar
             List<KeyValuePair<string, string>> sqls = new List<KeyValuePair<string, string>>();
             foreach (var methodExp in allMethods)
             {
-                var isFirst = allMethods.First() == methodExp;
+                var isFirst = allMethods[0] == methodExp;
                 var isLast = allMethods.Last() == methodExp;
                 var isIsNegate = false;
                 if (methodExp.Arguments.Count == 0)

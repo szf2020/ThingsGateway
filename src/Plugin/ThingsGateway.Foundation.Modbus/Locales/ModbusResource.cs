@@ -10,7 +10,6 @@
 
 namespace ThingsGateway.Foundation.Modbus;
 
-
 public static class AppResource
 {
     public static string CrcError => ThingsGateway.Foundation.AppResource.Lang == Language.Chinese ? ChineseResource.CrcError : EnglishResource.CrcError;
@@ -28,13 +27,10 @@ public static class AppResource
     public static string StationNotSame => ThingsGateway.Foundation.AppResource.Lang == Language.Chinese ? ChineseResource.StationNotSame : EnglishResource.StationNotSame;
     public static string AddressDes => ThingsGateway.Foundation.AppResource.Lang == Language.Chinese ? ChineseResource.AddressDes : EnglishResource.AddressDes;
     public static string ValueOverlimit => ThingsGateway.Foundation.AppResource.Lang == Language.Chinese ? ChineseResource.ValueOverlimit : EnglishResource.ValueOverlimit;
-
 }
-
 
 public static class ChineseResource
 {
-
     public const string CrcError = "Crc校验失败";
     public const string FunctionError = "功能码错误";
     public const string FunctionNotSame = "功能码不一致，请求功能码 {0}，返回功能码 {1}";
@@ -59,10 +55,7 @@ public static class ChineseResource
         写入功能码 ，比如40001;w=16; ，代表保持寄存器第一个寄存器，写入值时采用0x10功能码
         """;
     public const string ValueOverlimit = "{0} 不能超过 {1}";
-
 }
-
-
 
 public static class EnglishResource
 {

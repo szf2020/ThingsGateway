@@ -46,7 +46,6 @@ public class RuntimeInfoController : ControllerBase
     [DisplayName("获取通道信息")]
     public async Task<SqlSugarPagedList<ChannelRuntime>> GetChannelListAsync([FromQuery] ChannelPageInput input)
     {
-
         var channelRuntimes = await GlobalData.GetCurrentUserChannels().ConfigureAwait(false);
 
         var data = channelRuntimes
@@ -56,7 +55,6 @@ public class RuntimeInfoController : ControllerBase
          .ToPagedList(input);
         return data;
     }
-
 
     /// <summary>
     /// 获取设备信息
@@ -107,17 +105,12 @@ public class RuntimeInfoController : ControllerBase
         .WhereIF(!input.Name.IsNullOrWhiteSpace(), a => a.Name == input.Name)
          .WhereIF(!input.DeviceName.IsNullOrEmpty(), a => a.DeviceName == input.DeviceName)
             .WhereIF(!input.RegisterAddress.IsNullOrWhiteSpace(), a => a.RegisterAddress == input.RegisterAddress)
-            .WhereIF(input.BusinessDeviceId > 0, a =>
-            {
-                return GlobalData.ContainsVariable(input.BusinessDeviceId, a);
-            }
+            .WhereIF(input.BusinessDeviceId > 0, a => GlobalData.ContainsVariable(input.BusinessDeviceId, a)
            )
-
 
             .ToPagedList(input);
         return data;
     }
-
 
     /// <summary>
     /// 获取默认插件属性
@@ -161,7 +154,6 @@ public class ChannelPageInput : BasePageInput
     /// <inheritdoc/>
     public PluginTypeEnum? PluginType { get; set; }
 }
-
 
 public class DevicePageInput : BasePageInput
 {

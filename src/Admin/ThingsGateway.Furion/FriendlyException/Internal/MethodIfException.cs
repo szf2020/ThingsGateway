@@ -22,5 +22,4 @@ internal sealed class MethodIfException
     /// 出异常的方法
     /// </summary>
     public MethodBase ErrorMethod { get; set; }
-
 }

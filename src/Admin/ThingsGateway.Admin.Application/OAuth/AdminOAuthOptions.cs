@@ -34,7 +34,6 @@ public abstract class AdminOAuthOptions : OAuthOptions
     /// <summary>配置 Claims 映射</summary>
     protected virtual void ConfigureClaims()
     {
-
     }
 
     public virtual string GetName(JsonElement element)
@@ -45,8 +44,6 @@ public abstract class AdminOAuthOptions : OAuthOptions
 
     /// <summary>获得/设置 登陆后首页</summary>
     public string HomePath { get; set; } = "/";
-
-
 
     /// <summary>处理用户信息方法</summary>
     public virtual async Task<JsonElement> HandleUserInfoAsync(HttpContext context, OAuthTokenResponse tokens)

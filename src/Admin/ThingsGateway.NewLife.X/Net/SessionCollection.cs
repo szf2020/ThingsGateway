@@ -54,7 +54,7 @@ internal class SessionCollection : DisposeBase, IDictionary<String, ISocketSessi
         var p = ClearPeriod * 1000;
         _clearTimer ??= new TimerX(RemoveNotAlive, null, p, p) { Async = true, };
 
-        session.OnDisposed += (s, e) => { _dic.Remove((s as ISocketSession)?.Remote.EndPoint + ""); };
+        session.OnDisposed += (s, e) => _dic.Remove((s as ISocketSession)?.Remote.EndPoint + "");
 
         return true;
     }

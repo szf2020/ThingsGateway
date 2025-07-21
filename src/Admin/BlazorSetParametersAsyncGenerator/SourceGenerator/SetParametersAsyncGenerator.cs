@@ -435,5 +435,4 @@ namespace {namespaceName}
                 m.DeclaredAccessibility == Accessibility.Public &&
                 !m.IsStatic);
     }
-
 }

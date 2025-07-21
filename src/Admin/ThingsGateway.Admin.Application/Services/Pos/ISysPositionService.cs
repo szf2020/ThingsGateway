@@ -62,8 +62,6 @@ public interface ISysPositionService
     /// <returns></returns>
     Task<List<PositionSelectorOutput>> SelectorAsync(PositionSelectorInput input);
 
-
-
     #endregion
 
 }

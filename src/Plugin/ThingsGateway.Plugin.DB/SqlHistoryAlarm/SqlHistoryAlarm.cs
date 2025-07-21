@@ -23,7 +23,6 @@ namespace ThingsGateway.Plugin.SqlHistoryAlarm;
 /// </summary>
 public partial class SqlHistoryAlarm : BusinessBaseWithCacheAlarm, IDBHistoryAlarmService
 {
-
     internal readonly SqlHistoryAlarmProperty _driverPropertys = new();
     private readonly SqlHistoryAlarmVariableProperty _variablePropertys = new();
     public override Type DriverUIType => typeof(HistoryAlarmPage);

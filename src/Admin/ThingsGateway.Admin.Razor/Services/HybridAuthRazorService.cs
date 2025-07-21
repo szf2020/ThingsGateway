@@ -12,10 +12,8 @@ using ThingsGateway.Admin.Application;
 
 namespace ThingsGateway.Admin.Razor;
 
-
 public class HybridAuthRazorService : IAuthRazorService
 {
-
     private IAuthService AuthService { get; set; }
     public HybridAuthRazorService(IAuthService authService)
     {
@@ -26,7 +24,6 @@ public class HybridAuthRazorService : IAuthRazorService
     /// </summary>
     public async Task<UnifyResult<LoginOutput>> LoginAsync(LoginInput input)
     {
-
         var ret = await AuthService.LoginAsync(input).ConfigureAwait(false);
         return new UnifyResult<LoginOutput>
         {
@@ -35,7 +32,6 @@ public class HybridAuthRazorService : IAuthRazorService
             Data = ret,
             Time = DateTime.Now,
         };
-
     }
 
     /// <summary>

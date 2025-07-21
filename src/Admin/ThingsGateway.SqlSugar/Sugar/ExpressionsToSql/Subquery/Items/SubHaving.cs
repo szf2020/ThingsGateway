@@ -37,7 +37,7 @@ namespace ThingsGateway.SqlSugar
             var exp = expression as MethodCallExpression;
             var argExp = exp.Arguments[0];
             var result = "Having " + SubTools.GetMethodValue(Context, argExp, ResolveExpressType.WhereMultiple);
-            var selfParameterName = Context.GetTranslationColumnName((argExp as LambdaExpression).Parameters.First().Name) + UtilConstants.Dot;
+            var selfParameterName = Context.GetTranslationColumnName((argExp as LambdaExpression).Parameters[0].Name) + UtilConstants.Dot;
             if (this.Context.JoinIndex == 0)
                 result = result.Replace(selfParameterName, SubTools.GetSubReplace(this.Context));
             return result;

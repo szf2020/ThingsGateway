@@ -31,7 +31,6 @@ public partial class GrantResourceDialog
     [NotNull]
     private ISysResourceService? SysResourceService { get; set; }
 
-
     protected override async Task OnInitializedAsync()
     {
         var items = (await SysResourceService.GetAllAsync()).Where(a => a.Category != ResourceCategoryEnum.Module).OrderBy(a => a.Module).ThenBy(a => a.Id).ToList();
@@ -44,7 +43,6 @@ public partial class GrantResourceDialog
     private string GetApp(long? moduleId) => ModuleList.FirstOrDefault(i => i.Id == moduleId)?.Title;
 
     private static bool ModelEqualityComparer(SysResource x, SysResource y) => x.Id == y.Id;
-
 
     private async Task OnTreeItemChecked(List<TreeViewItem<SysResource>> items)
     {

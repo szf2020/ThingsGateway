@@ -32,4 +32,3 @@ public interface IExexcuteExpressions : IExexcuteExpressionsBase
     public TouchSocket.Core.ILog Logger { get; set; }
     Task<NodeOutput> ExecuteAsync(NodeInput input, CancellationToken cancellationToken);
 }
-

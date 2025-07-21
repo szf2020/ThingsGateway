@@ -14,11 +14,9 @@ namespace ThingsGateway.Gateway.Application;
 
 public sealed class ChannelThreadOptions : IConfigurableOptions
 {
-
     public int CheckInterval { get; set; } = 1800000;
 
     public int MaxChannelCount { get; set; } = 1000;
     public int MaxDeviceCount { get; set; } = 1000;
     public int MaxVariableCount { get; set; } = 1000000;
-
 }

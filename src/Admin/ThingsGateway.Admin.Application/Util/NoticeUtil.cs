@@ -38,7 +38,6 @@ public class UserLoginOutEvent
     /// <summary>
     /// verificat信息
     /// </summary>
-
     public List<string>? ClientIds { get; set; }
 
     /// <summary>

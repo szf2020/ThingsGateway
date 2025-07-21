@@ -34,10 +34,8 @@ public class MqttClientProperty : BusinessPropertyWithCacheIntervalScript
     [DynamicProperty]
     public int Port { get; set; } = 1883;
 
-
     [DynamicProperty]
     public MqttQualityOfServiceLevel MqttQualityOfServiceLevel { get; set; } = MqttQualityOfServiceLevel.AtMostOnce;
-
 
     [DynamicProperty]
     public MqttProtocolVersion MqttProtocolVersion { get; set; } = MqttProtocolVersion.V311;

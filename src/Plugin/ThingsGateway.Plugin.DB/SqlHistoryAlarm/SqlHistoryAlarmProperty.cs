@@ -14,7 +14,6 @@ using System.ComponentModel.DataAnnotations;
 
 using ThingsGateway.Plugin.SqlDB;
 
-
 namespace ThingsGateway.Plugin.SqlHistoryAlarm;
 
 /// <summary>
@@ -38,7 +37,6 @@ public class SqlHistoryAlarmProperty : BusinessPropertyWithCache
     [DynamicProperty]
     [AutoGenerateColumn(Visible = true, IsVisibleWhenEdit = false, IsVisibleWhenAdd = false)]
     public string? BigTextScriptHistoryTable { get; set; }
-
 
     public override bool OnlineFilter { get; set; } = false;
 }

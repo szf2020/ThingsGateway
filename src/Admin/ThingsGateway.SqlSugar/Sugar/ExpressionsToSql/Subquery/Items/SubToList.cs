@@ -22,7 +22,6 @@ namespace ThingsGateway.SqlSugar
             get; set;
         }
 
-
         public int Sort
         {
             get
@@ -101,7 +100,6 @@ namespace ThingsGateway.SqlSugar
                 {
                     this.Context.CurrentShortName = this.Context.GetTranslationColumnName(parameters[0].ObjToString());
                 }
-
             }
         }
         public void SetShortNameNext(MethodCallExpression exp, string result)
@@ -113,7 +111,6 @@ namespace ThingsGateway.SqlSugar
                 {
                     this.Context.CurrentShortName = this.Context.GetTranslationColumnName(parameters[0].ObjToString());
                 }
-
             }
         }
 
@@ -130,7 +127,6 @@ namespace ThingsGateway.SqlSugar
 
                 // 将返回值表达式作为lambda表达式的主体
                 selectExp = Expression.Lambda(body, parameter);
-
             }
             var bodyExp = ExpressionTool.GetLambdaExpressionBody(selectExp);
             var newMemExp = (bodyExp as MemberInitExpression);
@@ -153,7 +149,6 @@ namespace ThingsGateway.SqlSugar
             List<string> completeColumnColumns = new List<string>();
             foreach (var item in autoColumns)
             {
-
                 foreach (var parameter in parameters)
                 {
                     var parameterColumns = db.EntityMaintenance.GetEntityInfo(parameter.Type).Columns.Where(it => it.IsIgnore == false);

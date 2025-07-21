@@ -44,7 +44,6 @@ namespace ThingsGateway.SqlSugar
             {
                 this.Context.CodeFirst.SetStringDefaultLength(this.DefaultLength).InitTables(type);
             }
-
         }
         /// <summary>
         /// 内部初始化表方法

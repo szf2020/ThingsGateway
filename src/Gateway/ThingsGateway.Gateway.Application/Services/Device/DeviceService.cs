@@ -40,7 +40,6 @@ internal sealed class DeviceService : BaseService<Device>, IDeviceService
         _pluginService = App.RootServices.GetRequiredService<IPluginService>();
     }
 
-
     /// <inheritdoc/>
     [OperDesc("CopyDevice", localizerType: typeof(Device), isRecordPar: false)]
     public async Task<bool> CopyAsync(Dictionary<Device, List<Variable>> devices)
@@ -50,8 +49,6 @@ internal sealed class DeviceService : BaseService<Device>, IDeviceService
         //事务
         var result = await db.UseTranAsync(async () =>
         {
-
-
             var device = devices.Keys.ToList();
             ManageHelper.CheckDeviceCount(device.Count);
 
@@ -61,8 +58,6 @@ internal sealed class DeviceService : BaseService<Device>, IDeviceService
             ManageHelper.CheckVariableCount(variable.Count);
 
             await db.Insertable(variable).ExecuteCommandAsync().ConfigureAwait(false);
-
-
         }).ConfigureAwait(false);
         if (result.IsSuccess)//如果成功了
         {
@@ -75,9 +70,7 @@ internal sealed class DeviceService : BaseService<Device>, IDeviceService
             //写日志
             throw new(result.ErrorMessage, result.ErrorException);
         }
-
     }
-
 
     public async Task UpdateLogAsync(long channelId, LogLevel logLevel)
     {
@@ -89,7 +82,6 @@ internal sealed class DeviceService : BaseService<Device>, IDeviceService
             //更新数据库
 
             await db.Updateable<Device>().SetColumns(it => new Device() { LogLevel = logLevel }).Where(a => a.Id == channelId).ExecuteCommandAsync().ConfigureAwait(false);
-
         }).ConfigureAwait(false);
         if (result.IsSuccess)//如果成功了
         {
@@ -224,7 +216,6 @@ internal sealed class DeviceService : BaseService<Device>, IDeviceService
 
         return await QueryAsync(exportFilter.QueryPageOptions, whereQuery
        , exportFilter.FilterKeyValueAction).ConfigureAwait(false);
-
     }
     private async Task<Func<ISugarQueryable<Device>, ISugarQueryable<Device>>> GetWhereQueryFunc(ExportFilter exportFilter)
     {
@@ -270,7 +261,6 @@ internal sealed class DeviceService : BaseService<Device>, IDeviceService
         return whereQuery;
     }
 
-
     /// <summary>
     /// 保存设备
     /// </summary>
@@ -302,7 +292,6 @@ internal sealed class DeviceService : BaseService<Device>, IDeviceService
     [OperDesc("SaveDevice", localizerType: typeof(Device), isRecordPar: false)]
     public async Task<bool> BatchSaveDeviceAsync(List<Device> input, ItemChangedType type)
     {
-
         if (type == ItemChangedType.Update)
             await GlobalData.SysUserService.CheckApiDataScopeAsync(input.Select(a => a.CreateOrgId), input.Select(a => a.CreateUserId)).ConfigureAwait(false);
         else
@@ -314,10 +303,7 @@ internal sealed class DeviceService : BaseService<Device>, IDeviceService
             return true;
         }
         return false;
-
     }
-
-
 
     #region 导出
 
@@ -348,7 +334,7 @@ internal sealed class DeviceService : BaseService<Device>, IDeviceService
     private async Task<IAsyncEnumerable<Device>> GetAsyncEnumerableData(ExportFilter exportFilter)
     {
         var whereQuery = await GetEnumerableData(exportFilter).ConfigureAwait(false);
-        return whereQuery.GetAsyncEnumerable();
+        return whereQuery.ToAsyncEnumerable();
     }
     private async Task<ISugarQueryable<Device>> GetEnumerableData(ExportFilter exportFilter)
     {
@@ -356,7 +342,6 @@ internal sealed class DeviceService : BaseService<Device>, IDeviceService
         var whereQuery = await GetWhereQueryFunc(exportFilter).ConfigureAwait(false);
 
         return GetQuery(db, exportFilter.QueryPageOptions, whereQuery, exportFilter.FilterKeyValueAction);
-
     }
 
     /// <summary>
@@ -381,9 +366,6 @@ internal sealed class DeviceService : BaseService<Device>, IDeviceService
         return memoryStream;
     }
 
-
-
-
     #endregion 导出
 
     #region 导入
@@ -392,13 +374,13 @@ internal sealed class DeviceService : BaseService<Device>, IDeviceService
     [OperDesc("ImportDevice", isRecordPar: false, localizerType: typeof(Device))]
     public async Task<HashSet<long>> ImportDeviceAsync(Dictionary<string, ImportPreviewOutputBase> input)
     {
-        var devices = new List<Device>();
+        IEnumerable<Device>? devices = new List<Device>();
         foreach (var item in input)
         {
             if (item.Key == ExportString.DeviceName)
             {
                 var deviceImports = ((ImportPreviewOutput<Device>)item.Value).Data;
-                devices = deviceImports.Select(a => a.Value).ToList();
+                devices = deviceImports.Select(a => a.Value);
                 break;
             }
         }
@@ -649,8 +631,6 @@ internal sealed class DeviceService : BaseService<Device>, IDeviceService
             {
                 try
                 {
-
-
                     // 获取驱动插件实例
                     var driver = _pluginService.GetDriver(driverPluginType.FullName);
                     var type = driver.DriverProperties.GetType();
@@ -670,7 +650,6 @@ internal sealed class DeviceService : BaseService<Device>, IDeviceService
                 }
                 catch
                 {
-
                 }
             }
 

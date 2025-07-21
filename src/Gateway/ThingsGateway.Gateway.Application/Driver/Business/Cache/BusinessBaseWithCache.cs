@@ -20,7 +20,6 @@ namespace ThingsGateway.Gateway.Application;
 /// </summary>
 public abstract class BusinessBaseWithCache : BusinessBase
 {
-
     #region 条件
 
     protected abstract bool AlarmModelEnable { get; }
@@ -66,7 +65,6 @@ public abstract class BusinessBaseWithCache : BusinessBase
 
         if (VarModelEnable)
         {
-
             await UpdateVarModelCache(cancellationToken).ConfigureAwait(false);
             await UpdateVarModelsCache(cancellationToken).ConfigureAwait(false);
         }
@@ -80,21 +78,15 @@ public abstract class BusinessBaseWithCache : BusinessBase
         {
             await UpdateAlarmModelCache(cancellationToken).ConfigureAwait(false);
         }
-
-
     }
     #endregion
 
-
     #region alarm
-
-
 
     protected ConcurrentQueue<CacheDBItem<AlarmVariable>> _memoryAlarmModelQueue = new();
 
     private volatile bool LocalDBCacheAlarmModelInited;
     private CacheDB DBCacheAlarm;
-
 
     /// <summary>
     /// 入缓存
@@ -102,7 +94,6 @@ public abstract class BusinessBaseWithCache : BusinessBase
     /// <param name="data"></param>
     protected virtual void AddCache(List<CacheDBItem<AlarmVariable>> data)
     {
-
         if (_businessPropertyWithCache.CacheEnable && data?.Count > 0)
         {
             try
@@ -201,8 +192,6 @@ public abstract class BusinessBaseWithCache : BusinessBase
         return cacheDb;
     }
 
-
-
     /// <summary>
     /// 需实现上传到通道
     /// </summary>
@@ -224,8 +213,8 @@ public abstract class BusinessBaseWithCache : BusinessBase
                     while (!cancellationToken.IsCancellationRequested)
                     {
                         //循环获取，固定读最大行数量，执行完成需删除行
-                        var varList = await DBCacheAlarm.DBProvider.Queryable<CacheDBItem<AlarmVariable>>().Take(_businessPropertyWithCache.SplitSize).ToListAsync(cancellationToken).ConfigureAwait(false);
-                        if (varList.Count > 0)
+                        var varList = DBCacheAlarm.DBProvider.Queryable<CacheDBItem<AlarmVariable>>().Take(_businessPropertyWithCache.SplitSize).ToEnumerable(cancellationToken);
+                        if (varList.Any())
                         {
                             try
                             {
@@ -315,10 +304,7 @@ public abstract class BusinessBaseWithCache : BusinessBase
 
     #endregion
 
-
-
     #region device
-
 
     protected ConcurrentQueue<CacheDBItem<DeviceBasicData>> _memoryDevModelQueue = new();
 
@@ -326,17 +312,14 @@ public abstract class BusinessBaseWithCache : BusinessBase
 
     private CacheDB DBCacheDev;
 
-
     /// <summary>
     /// 入缓存
     /// </summary>
     /// <param name="data"></param>
     protected virtual void AddCache(List<CacheDBItem<DeviceBasicData>> data)
     {
-
         if (_businessPropertyWithCache.CacheEnable && data?.Count > 0)
         {
-
             try
             {
                 LogMessage?.LogInformation($"Add {typeof(DeviceBasicData).Name} data to file cache, count {data.Count}");
@@ -432,8 +415,6 @@ public abstract class BusinessBaseWithCache : BusinessBase
         return cacheDb;
     }
 
-
-
     /// <summary>
     /// 需实现上传到通道
     /// </summary>
@@ -454,10 +435,9 @@ public abstract class BusinessBaseWithCache : BusinessBase
                 {
                     while (!cancellationToken.IsCancellationRequested)
                     {
-
                         //循环获取
-                        var varList = await DBCacheDev.DBProvider.Queryable<CacheDBItem<DeviceBasicData>>().Take(_businessPropertyWithCache.SplitSize).ToListAsync(cancellationToken).ConfigureAwait(false);
-                        if (varList.Count > 0)
+                        var varList = DBCacheDev.DBProvider.Queryable<CacheDBItem<DeviceBasicData>>().Take(_businessPropertyWithCache.SplitSize).ToEnumerable(cancellationToken);
+                        if (varList.Any())
                         {
                             try
                             {
@@ -547,10 +527,7 @@ public abstract class BusinessBaseWithCache : BusinessBase
 
     #endregion
 
-
-
     #region variable
-
 
     protected ConcurrentQueue<CacheDBItem<VariableBasicData>> _memoryVarModelQueue = new();
     protected ConcurrentQueue<CacheDBItem<List<VariableBasicData>>> _memoryVarModelsQueue = new();
@@ -559,8 +536,6 @@ public abstract class BusinessBaseWithCache : BusinessBase
     private volatile bool LocalDBCacheVarModelsInited;
     private CacheDB DBCacheVar;
     private CacheDB DBCacheVars;
-
-
 
     protected sealed override BusinessPropertyBase _businessPropertyBase => _businessPropertyWithCache;
 
@@ -738,7 +713,6 @@ public abstract class BusinessBaseWithCache : BusinessBase
         }
     }
 
-
     /// <summary>
     /// 获取缓存对象，注意using
     /// </summary>
@@ -766,7 +740,6 @@ public abstract class BusinessBaseWithCache : BusinessBase
         }
         return cacheDb;
     }
-
 
     /// <summary>
     /// 需实现上传到通道
@@ -798,8 +771,8 @@ public abstract class BusinessBaseWithCache : BusinessBase
                     {
                         //循环获取
 
-                        var varList = await DBCacheVar.DBProvider.Queryable<CacheDBItem<VariableBasicData>>().Take(_businessPropertyWithCache.SplitSize).ToListAsync(cancellationToken).ConfigureAwait(false);
-                        if (varList.Count > 0)
+                        var varList = DBCacheVar.DBProvider.Queryable<CacheDBItem<VariableBasicData>>().Take(_businessPropertyWithCache.SplitSize).ToEnumerable(cancellationToken);
+                        if (varList.Any())
                         {
                             try
                             {
@@ -858,7 +831,6 @@ public abstract class BusinessBaseWithCache : BusinessBase
                     while (!cancellationToken.IsCancellationRequested)
                     {
                         //循环获取
-
                         var varList = await DBCacheVars.DBProvider.Queryable<CacheDBItem<List<VariableBasicData>>>().FirstAsync(cancellationToken).ConfigureAwait(false);
                         if (varList?.Value?.Count > 0)
                         {
@@ -970,7 +942,6 @@ public abstract class BusinessBaseWithCache : BusinessBase
                             var result = await UpdateVarModels(item, cancellationToken).ConfigureAwait(false);
                             if (!result.IsSuccess)
                             {
-
                                 AddCache(new List<CacheDBItem<List<VariableBasicData>>>() { new CacheDBItem<List<VariableBasicData>>(item.ToList()) });
                             }
                         }
@@ -997,9 +968,6 @@ public abstract class BusinessBaseWithCache : BusinessBase
 
         #endregion //上传变量内存队列中的数据
     }
-
-
-
 
     #endregion
 }

@@ -15,13 +15,10 @@ namespace ThingsGateway.Gateway.Application;
 /// </summary>
 public class VariableScriptRead
 {
-
     public string IntervalTime { get; set; }
 
     /// <summary>
     /// 需分配的变量列表
     /// </summary>
     public VariableRuntime VariableRuntime;
-
-
 }

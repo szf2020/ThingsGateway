@@ -9,7 +9,6 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-
 #pragma warning disable CA2007 // 考虑对等待的任务调用 ConfigureAwait
 
 using BootstrapBlazor.Components;
@@ -24,14 +23,12 @@ using ThingsGateway.Extension;
 
 namespace ThingsGateway.AdminServer;
 
-
 [Authorize]
 [IgnoreRolePermission]
 [Route("/")]
 [TabItemOption(Text = "Home", Icon = "fas fa-house")]
 public partial class AdminIndex
 {
-
     [Inject]
     private BlazorAppContext AppContext { get; set; }
 
@@ -59,4 +56,3 @@ public partial class AdminIndex
         await base.OnParametersSetAsync();
     }
 }
-

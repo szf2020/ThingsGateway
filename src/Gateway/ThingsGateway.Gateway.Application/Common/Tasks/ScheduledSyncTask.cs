@@ -85,7 +85,6 @@ public class ScheduledSyncTask : DisposeBase, IScheduledTask, IScheduledIntInter
         }
     }
 
-
     public void SetNext(int interval)
     {
         if (!Check())

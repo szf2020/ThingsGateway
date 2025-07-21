@@ -41,7 +41,6 @@ public partial class ChannelTable : IDisposable
         base.OnInitialized();
     }
 
-
     private SmartTriggerScheduler scheduler;
     private IEnumerable<ChannelRuntime>? _previousItemsRef;
     protected override void OnParametersSet()
@@ -102,7 +101,6 @@ public partial class ChannelTable : IDisposable
     #region 修改
     private async Task Copy(IEnumerable<ChannelRuntime> channels)
     {
-
         if (!channels.Any())
         {
             await ToastService.Warning(null, RazorLocalizer["PleaseSelect"]);
@@ -116,7 +114,6 @@ public partial class ChannelTable : IDisposable
         oneModel.Id = 0;
 
         deviceDict = channelRuntime.ReadDeviceRuntimes.ToDictionary(a => a.Value.AdaptDevice(), a => a.Value.ReadOnlyVariableRuntimes.Select(a => a.Value).AdaptListVariable());
-
 
         var op = new DialogOption()
         {
@@ -132,10 +129,8 @@ public partial class ChannelTable : IDisposable
         {
              {nameof(ChannelCopyComponent.OnSave), async (List<Channel> channels,Dictionary<Device,List<Variable>> devices) =>
             {
-
                 await Task.Run(() =>GlobalData.ChannelRuntimeService.CopyAsync(channels,devices,AutoRestartThread, default));
                     await InvokeAsync(table.QueryAsync);
-
             }},
             {nameof(ChannelCopyComponent.Model),oneModel },
             {nameof(ChannelCopyComponent.Devices),deviceDict },
@@ -143,13 +138,10 @@ public partial class ChannelTable : IDisposable
 
         await DialogService.Show(op);
 
-
-
     }
 
     private async Task BatchEdit(IEnumerable<Channel> changedModels)
     {
-
         var oldModel = changedModels.FirstOrDefault();//默认值显示第一个
         if (oldModel == null)
         {
@@ -177,7 +169,6 @@ public partial class ChannelTable : IDisposable
                 await Task.Run(() => GlobalData.ChannelRuntimeService.BatchEditAsync(changedModels, oldModel, oneModel,AutoRestartThread));
 
                    await InvokeAsync(table.QueryAsync);
-
             } },
             {nameof(ChannelEditComponent.Model),oneModel },
             {nameof(ChannelEditComponent.ValidateEnable),true },
@@ -186,26 +177,17 @@ public partial class ChannelTable : IDisposable
 
         await DialogService.Show(op);
 
-
-
     }
-
 
     private async Task<bool> Delete(IEnumerable<Channel> channels)
     {
         try
         {
-            return await Task.Run(async () =>
-            {
-                return await GlobalData.ChannelRuntimeService.DeleteChannelAsync(channels.Select(a => a.Id), AutoRestartThread, default);
-            });
+            return await Task.Run(async () => await GlobalData.ChannelRuntimeService.DeleteChannelAsync(channels.Select(a => a.Id), AutoRestartThread, default));
         }
         catch (Exception ex)
         {
-            await InvokeAsync(async () =>
-            {
-                await ToastService.Warn(ex);
-            });
+            await InvokeAsync(async () => await ToastService.Warn(ex));
             return false;
         }
     }
@@ -263,7 +245,6 @@ public partial class ChannelTable : IDisposable
 
                     break;
             }
-
         }
 
         // 返回 true 时自动弹出提示框
@@ -273,7 +254,6 @@ public partial class ChannelTable : IDisposable
 
     async Task ExcelChannelAsync(ITableExportContext<ChannelRuntime> tableExportContext)
     {
-
         var op = new DialogOption()
         {
             IsScrolling = false,
@@ -312,22 +292,16 @@ finally
                 {
                                  await InvokeAsync( async ()=>
             {
-
                     await table.QueryAsync();
              StateHasChanged();
                 });
                 }
-
-
             }},
             {nameof(USheet.Model),uSheetDatas },
         });
 
         await DialogService.Show(op);
-
     }
-
-
 
     private async Task ExcelImportAsync(ITableExportContext<ChannelRuntime> tableExportContext)
     {
@@ -339,10 +313,7 @@ finally
             Title = GatewayLocalizer["ImportChannel"],
             ShowFooter = false,
             ShowCloseButton = false,
-            OnCloseAsync = async () =>
-            {
-                await InvokeAsync(table.QueryAsync);
-            },
+            OnCloseAsync = async () => await InvokeAsync(table.QueryAsync),
         };
 
         Func<IBrowserFile, Task<Dictionary<string, ImportPreviewOutputBase>>> preview = (a => GlobalData.ChannelRuntimeService.PreviewAsync(a));
@@ -353,7 +324,6 @@ finally
             {nameof(ImportExcel.Preview),preview },
         });
         await DialogService.Show(op);
-
     }
 
     #endregion 导出
@@ -366,7 +336,6 @@ finally
         {
             await Task.Run(async () =>
             {
-
                 await GlobalData.ChannelRuntimeService.DeleteChannelAsync(Items.Select(a => a.Id), AutoRestartThread, default);
                 await InvokeAsync(async () =>
                 {
@@ -377,12 +346,8 @@ finally
         }
         catch (Exception ex)
         {
-            await InvokeAsync(async () =>
-            {
-                await ToastService.Warn(ex);
-            });
+            await InvokeAsync(async () => await ToastService.Warn(ex));
         }
-
     }
     #endregion
 

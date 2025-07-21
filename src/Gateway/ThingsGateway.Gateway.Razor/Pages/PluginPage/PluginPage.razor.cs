@@ -65,10 +65,7 @@ public partial class PluginPage
             Title = PluginAddInputLoaclozer["SavePlugin"],
             ShowFooter = false,
             ShowCloseButton = false,
-            OnCloseAsync = async () =>
-            {
-                await InvokeAsync(table.QueryAsync);
-            },
+            OnCloseAsync = async () => await InvokeAsync(table.QueryAsync),
         };
         op.Component = BootstrapDynamicComponent.CreateComponent<SavePlugin>(new Dictionary<string, object?>
         {

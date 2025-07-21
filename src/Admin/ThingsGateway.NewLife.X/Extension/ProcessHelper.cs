@@ -14,8 +14,6 @@ namespace ThingsGateway.NewLife;
 /// </remarks>
 public static class ProcessHelper
 {
-
-
     public static int GetProcessId()
     {
 #if NET6_0_OR_GREATER
@@ -51,8 +49,6 @@ public static class ProcessHelper
 
         return pname;
     }
-
-
 
     /// <summary>获取指定进程的命令行参数</summary>
     /// <param name="processId"></param>

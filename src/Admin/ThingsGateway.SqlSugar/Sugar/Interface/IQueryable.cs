@@ -118,7 +118,6 @@ namespace ThingsGateway.SqlSugar
         ISugarQueryable<T> SampleBy(int timeNumber, SampleByUnit timeType);
         ISugarQueryable<T> SampleBy(int timeNumber, string timeType);
 
-
         ISugarQueryable<T> GroupBy(Expression<Func<T, object>> expression);
         ISugarQueryable<T> GroupBy(string groupFields);
         ISugarQueryable<T> GroupByIF(bool isGroupBy, Expression<Func<T, object>> expression);
@@ -265,7 +264,6 @@ namespace ThingsGateway.SqlSugar
         Task<DataTable> ToDataTablePageAsync(int pageNumber, int pageSize, RefAsync<int> totalNumber);
         Task<DataTable> ToDataTableByEntityPageAsync(int pageNumber, int pageSize, RefAsync<int> totalNumber);
 
-
         DataTable ToOffsetDataTablePage(int pageNumber, int pageSize);
         Task<DataTable> ToOffsetDataTablePageAsync(int pageNumber, int pageSize);
         DataTable ToOffsetDataTablePage(int pageNumber, int pageSize, ref int totalNumber);
@@ -273,7 +271,6 @@ namespace ThingsGateway.SqlSugar
         DataTable ToOffsetDataTablePage(int pageNumber, int pageSize, ref int totalNumber, ref int totalPage);
         Task<DataTable> ToOffsetDataTablePageAsync(int pageNumber, int pageSize, RefAsync<int> totalNumber);
         Task<DataTable> ToOffsetDataTableByEntityPageAsync(int pageNumber, int pageSize, RefAsync<int> totalNumber);
-
 
         List<T> ToOffsetPage(int pageNumber, int pageSize);
         List<T> ToOffsetPage(int pageNumber, int pageSize, ref int totalNumber);
@@ -1602,8 +1599,6 @@ namespace ThingsGateway.SqlSugar
         ISugarQueryable<T, T2, T3, T4, T5, T6, T7, T8, T9, T10> OrderBy(Expression<Func<T, T2, T3, T4, T5, T6, T7, T8, object>> expression, OrderByType type = OrderByType.Asc);
         ISugarQueryable<T, T2, T3, T4, T5, T6, T7, T8, T9, T10> OrderBy(Expression<Func<T, T2, T3, T4, T5, T6, T7, T8, T9, object>> expression, OrderByType type = OrderByType.Asc);
         ISugarQueryable<T, T2, T3, T4, T5, T6, T7, T8, T9, T10> OrderBy(Expression<Func<T, T2, T3, T4, T5, T6, T7, T8, T9, T10, object>> expression, OrderByType type = OrderByType.Asc);
-
-
 
         new ISugarQueryable<T, T2, T3, T4, T5, T6, T7, T8, T9, T10> OrderByIF(bool isOrderBy, Expression<Func<T, object>> expression, OrderByType type = OrderByType.Asc);
         ISugarQueryable<T, T2, T3, T4, T5, T6, T7, T8, T9, T10> OrderByIF(bool isOrderBy, Expression<Func<T, T2, object>> expression, OrderByType type = OrderByType.Asc);

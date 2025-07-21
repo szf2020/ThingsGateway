@@ -22,7 +22,6 @@ namespace ThingsGateway.Plugin.Webhook;
 /// </summary>
 public partial class Webhook : BusinessBaseWithCacheIntervalScriptAll
 {
-
     protected override void AlarmChange(AlarmVariable alarmVariable)
     {
         if (!_businessPropertyWithCacheIntervalScript.AlarmTopic.IsNullOrWhiteSpace())
@@ -30,11 +29,8 @@ public partial class Webhook : BusinessBaseWithCacheIntervalScriptAll
         base.AlarmChange(alarmVariable);
     }
 
-
-
     protected override void DeviceTimeInterval(DeviceRuntime deviceRunTime, DeviceBasicData deviceData)
     {
-
         if (!_businessPropertyWithCacheIntervalScript.DeviceTopic.IsNullOrWhiteSpace())
             AddQueueDevModel(new(deviceData));
 
@@ -42,8 +38,6 @@ public partial class Webhook : BusinessBaseWithCacheIntervalScriptAll
     }
     protected override void DeviceChange(DeviceRuntime deviceRunTime, DeviceBasicData deviceData)
     {
-
-
         if (!_businessPropertyWithCacheIntervalScript.DeviceTopic.IsNullOrWhiteSpace())
             AddQueueDevModel(new(deviceData));
 
@@ -57,8 +51,6 @@ public partial class Webhook : BusinessBaseWithCacheIntervalScriptAll
 
     protected override ValueTask<OperResult> UpdateDevModel(IEnumerable<CacheDBItem<DeviceBasicData>> item, CancellationToken cancellationToken)
     {
-
-
         return UpdateDevModel(item.Select(a => a.Value).OrderBy(a => a.Id), cancellationToken);
     }
 
@@ -111,17 +103,13 @@ public partial class Webhook : BusinessBaseWithCacheIntervalScriptAll
         }
     }
 
-
     private void UpdateVariable(VariableBasicData variable)
     {
         if (!_businessPropertyWithCacheIntervalScript.VariableTopic.IsNullOrWhiteSpace())
         {
-
             if (_driverPropertys.GroupUpdate && variable.BusinessGroupUpdateTrigger && !variable.BusinessGroup.IsNullOrEmpty() && VariableRuntimeGroups.TryGetValue(variable.BusinessGroup, out var variableRuntimeGroup))
             {
-
                 AddQueueVarModel(new CacheDBItem<List<VariableBasicData>>(variableRuntimeGroup.AdaptListVariableBasicData()));
-
             }
             else
             {
@@ -130,13 +118,10 @@ public partial class Webhook : BusinessBaseWithCacheIntervalScriptAll
         }
     }
 
-
-
     private readonly HttpClient client = new HttpClient();
 
     private async Task<OperResult> WebhookUpAsync(TopicArray topicArray, CancellationToken cancellationToken)
     {
-
         // 设置请求内容
         //var content = new StringContent(json, Encoding.UTF8, "application/json");
         using var content = new ByteArrayContent(topicArray.Payload);
@@ -173,7 +158,6 @@ public partial class Webhook : BusinessBaseWithCacheIntervalScriptAll
         {
             return new(ex);
         }
-
     }
 
     #region private
@@ -202,8 +186,6 @@ public partial class Webhook : BusinessBaseWithCacheIntervalScriptAll
         return OperResult.Success;
     }
 
-
-
     private ValueTask<OperResult> UpdateAlarmModel(IEnumerable<AlarmVariable> item, CancellationToken cancellationToken)
     {
         var topicArrayList = GetAlarmTopicArrays(item);
@@ -212,7 +194,6 @@ public partial class Webhook : BusinessBaseWithCacheIntervalScriptAll
 
     private ValueTask<OperResult> UpdateDevModel(IEnumerable<DeviceBasicData> item, CancellationToken cancellationToken)
     {
-
         var topicArrayList = GetDeviceTopicArray(item);
         return Update(topicArrayList, cancellationToken);
     }
@@ -223,9 +204,6 @@ public partial class Webhook : BusinessBaseWithCacheIntervalScriptAll
         return Update(topicArrayList, cancellationToken);
     }
 
-
     #endregion private
-
-
 
 }

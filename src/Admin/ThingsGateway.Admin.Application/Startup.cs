@@ -64,7 +64,6 @@ public class Startup : AppStartup
 
         services.AddSingleton(typeof(IEventService<>), typeof(EventService<>));
 
-
         #region 控制台美化
 
         services.AddConsoleFormatter(options =>
@@ -153,7 +152,6 @@ public class Startup : AppStartup
         var fullName = Assembly.GetExecutingAssembly().FullName;//获取程序集全名
         CodeFirstUtils.CodeFirst(fullName!);//CodeFirst
 
-
         try
         {
             using var db = DbContext.GetDB<SysOperateLog>();
@@ -168,11 +166,8 @@ public class Startup : AppStartup
         }
         catch { }
 
-
         //删除在线用户统计
         var verificatInfoService = App.RootServices.GetService<IVerificatInfoService>();
         verificatInfoService.RemoveAllClientId();
-
-
     }
 }

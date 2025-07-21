@@ -10,7 +10,5 @@
         {
             throw new NotSupportedException("TDengine库不支持更新操作");
         }
-
-
     }
 }

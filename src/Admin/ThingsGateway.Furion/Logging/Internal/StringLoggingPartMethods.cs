@@ -169,9 +169,6 @@ public sealed partial class StringLoggingPart
             })
         : null;
 
-        return LoggerFactory.Create(builder =>
-        {
-            builder.AddConsoleFormatter(configure);
-        });
+        return LoggerFactory.Create(builder => builder.AddConsoleFormatter(configure));
     }
 }

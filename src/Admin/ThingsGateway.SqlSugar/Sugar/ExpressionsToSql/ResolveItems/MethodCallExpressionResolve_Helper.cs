@@ -85,11 +85,10 @@ namespace ThingsGateway.SqlSugar
             {
                 if (this.Context.SingleTableNameSubqueryShortName == null)
                 {
-                    this.Context.SingleTableNameSubqueryShortName = lamExp.Parameters.First().Name;
+                    this.Context.SingleTableNameSubqueryShortName = lamExp.Parameters[0].Name;
                 }
             }
         }
-
 
         private void AppendItem(ExpressionParameter parameter, string name, IEnumerable<Expression> args, MethodCallExpressionModel model, Expression item)
         {
@@ -193,7 +192,6 @@ namespace ThingsGateway.SqlSugar
             else if (isIFFBoolMember && !isFirst)
             {
                 AppendModelByIIFMember(parameter, model, item);
-
             }
             else if (isIFFBoolBinary && !isFirst)
             {
@@ -232,7 +230,6 @@ namespace ThingsGateway.SqlSugar
                 {
                     AppendModelByIIFBinary(parameter, model, item);
                 }
-
             }
             else if (isIFFBoolMethod && !isFirst)
             {
@@ -335,7 +332,6 @@ namespace ThingsGateway.SqlSugar
                 AppendModel(parameter, model, item, name, args);
             }
         }
-
 
         private void AppendModelByIIFMember(ExpressionParameter parameter, MethodCallExpressionModel model, Expression item)
         {
@@ -543,7 +539,6 @@ namespace ThingsGateway.SqlSugar
             parameter.ChildExpression = null;
         }
 
-
         private void GetConfigValue(MethodCallExpression express, ExpressionParameter parameter)
         {
             var exp = express.Arguments[0];
@@ -586,7 +581,6 @@ namespace ThingsGateway.SqlSugar
                         TypeName = item.TypeName,
                         Value = item.Value,
                         _Size = item._Size
-
                     });
                 }
             }
@@ -796,13 +790,13 @@ namespace ThingsGateway.SqlSugar
                     case "ToString":
                         if (model.Args.Count > 1)
                         {
-                            var dateString2 = this.Context.DbMehtods.GetDateString(model.Args.First().MemberName.ObjToString(), model.Args.Last().MemberValue.ObjToString());
+                            var dateString2 = this.Context.DbMehtods.GetDateString(model.Args[0].MemberName.ObjToString(), model.Args.Last().MemberValue.ObjToString());
                             if (IsSqlServerModel())
                             {
-                                return string.Format("FORMAT({0},'{1}','en-US')", model.Args.First().MemberName.ObjToString(), model.Args.Last().MemberValue.ObjToString());
+                                return string.Format("FORMAT({0},'{1}','en-US')", model.Args[0].MemberName.ObjToString(), model.Args.Last().MemberValue.ObjToString());
                             }
                             if (dateString2 != null) return dateString2;
-                            return GeDateFormat(model.Args.Last().MemberValue.ObjToString(), model.Args.First().MemberName.ObjToString());
+                            return GeDateFormat(model.Args.Last().MemberValue.ObjToString(), model.Args[0].MemberName.ObjToString());
                         }
                         //Check.Exception(model.Args.Count > 1, "ToString (Format) is not supported, Use ToString().If time formatting can be used it.Date.Year+\"-\"+it.Data.Month+\"-\"+it.Date.Day ");
                         return this.Context.DbMehtods.ToString(model);
@@ -909,7 +903,8 @@ namespace ThingsGateway.SqlSugar
                         {
                             result = this.Context.DbMehtods.FormatRowNumber(model);
                         }
-                        this.Context.Parameters.RemoveAll(it => model.Args.Select(x => x.MemberName.ObjToString()).Contains(it.ParameterName));
+                        var ids = model.Args.Select(x => x.MemberName.ObjToString()).ToHashSet();
+                        this.Context.Parameters.RemoveAll(it => ids.Contains(it.ParameterName));
                         return result;
                     case "Abs":
                         return this.Context.DbMehtods.Abs(model);
@@ -1061,7 +1056,7 @@ namespace ThingsGateway.SqlSugar
             {
                 if (express.Arguments.Count == 2)
                 {
-                    if (express.Arguments.First() is MethodCallExpression callExpression)
+                    if (express.Arguments[0] is MethodCallExpression callExpression)
                     {
                         if (callExpression.Method.Name == "op_Implicit")
                         {

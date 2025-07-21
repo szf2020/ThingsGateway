@@ -13,7 +13,6 @@ public class AlarmChangedTriggerNode : VariableNode, ITriggerNode, IDisposable
 {
     public AlarmChangedTriggerNode(string id, Point? position = null) : base(id, position) { Title = "AlarmChangedTriggerNode"; }
 
-
     private Func<NodeOutput, CancellationToken, Task> Func { get; set; }
     Task ITriggerNode.StartAsync(Func<NodeOutput, CancellationToken, Task> func, CancellationToken cancellationToken)
     {
@@ -21,7 +20,6 @@ public class AlarmChangedTriggerNode : VariableNode, ITriggerNode, IDisposable
         FuncDict.TryAdd(this, func);
         if (AlarmChangedTriggerNodeDict.TryGetValue(DeviceText, out var deviceVariableDict))
         {
-
             if (deviceVariableDict.TryGetValue(Text, out var alarmChangedTriggerNodes))
             {
                 alarmChangedTriggerNodes.Add(this);
@@ -37,7 +35,6 @@ public class AlarmChangedTriggerNode : VariableNode, ITriggerNode, IDisposable
             AlarmChangedTriggerNodeDict.TryAdd(DeviceText, new());
             AlarmChangedTriggerNodeDict[DeviceText].TryAdd(Text, new());
             AlarmChangedTriggerNodeDict[DeviceText][Text].Add(this);
-
         }
         return Task.CompletedTask;
     }
@@ -51,10 +48,7 @@ public class AlarmChangedTriggerNode : VariableNode, ITriggerNode, IDisposable
     {
         Task.Factory.StartNew(RunAsync);
         GlobalData.AlarmChangedEvent -= AlarmHostedService_OnAlarmChanged;
-        GlobalData.ReadOnlyRealAlarmIdVariables?.ForEach(a =>
-        {
-            AlarmHostedService_OnAlarmChanged(a.Value);
-        });
+        GlobalData.ReadOnlyRealAlarmIdVariables?.ForEach(a => AlarmHostedService_OnAlarmChanged(a.Value));
         GlobalData.AlarmChangedEvent += AlarmHostedService_OnAlarmChanged;
     }
     private static void AlarmHostedService_OnAlarmChanged(AlarmVariable alarmVariable)
@@ -98,7 +92,6 @@ public class AlarmChangedTriggerNode : VariableNode, ITriggerNode, IDisposable
                            }
                        }, token).ConfigureAwait(false);
                 }
-
             }), default);
     }
 

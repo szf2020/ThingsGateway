@@ -159,7 +159,6 @@ public class CronScheduledTask : DisposeBase, IScheduledTask
         _timer = null;
     }
 
-
     protected override void Dispose(bool disposing)
     {
         Stop();

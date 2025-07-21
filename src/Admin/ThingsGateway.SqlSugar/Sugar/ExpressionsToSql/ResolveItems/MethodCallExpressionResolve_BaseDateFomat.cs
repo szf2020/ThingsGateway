@@ -246,7 +246,6 @@ namespace ThingsGateway.SqlSugar
                 }
                 else
                 {
-
                     var name = base.AppendParameter(r);
                     joinStringParameter.Args.Add(new MethodCallExpressionArgs()
                     {

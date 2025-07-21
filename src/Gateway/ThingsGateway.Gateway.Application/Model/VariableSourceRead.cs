@@ -15,7 +15,6 @@ namespace ThingsGateway.Gateway.Application;
 /// </summary>
 public class VariableSourceRead : IVariableSource
 {
-
     private List<IVariable> _variableRuntimes = new List<IVariable>();
 
     /// <summary>
@@ -56,6 +55,4 @@ public class VariableSourceRead : IVariableSource
         }
         _variableRuntimes.AddRange(variables);
     }
-
-
 }

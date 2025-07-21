@@ -89,6 +89,5 @@
             // 设置新的父实体信息
             SetNewParent<TChild>(thisEntity, thisPkColumn);
         }
-
     }
 }

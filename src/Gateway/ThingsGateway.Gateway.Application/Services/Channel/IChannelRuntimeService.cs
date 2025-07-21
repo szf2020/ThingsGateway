@@ -32,7 +32,6 @@ public interface IChannelRuntimeService
     /// <param name="restart">重启</param>
     Task<bool> BatchSaveChannelAsync(List<Channel> input, ItemChangedType type, bool restart);
 
-
     /// <summary>
     /// 批量修改
     /// </summary>

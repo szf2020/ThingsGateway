@@ -22,7 +22,6 @@ namespace ThingsGateway.SqlSugar
             get; set;
         }
 
-
         public int Sort
         {
             get
@@ -73,7 +72,6 @@ namespace ThingsGateway.SqlSugar
                 {
                     this.Context.CurrentShortName = this.Context.GetTranslationColumnName(parameters[0].ObjToString());
                 }
-
             }
         }
         public void SetShortNameNext(MethodCallExpression exp, string result)
@@ -85,7 +83,6 @@ namespace ThingsGateway.SqlSugar
                 {
                     this.Context.CurrentShortName = this.Context.GetTranslationColumnName(parameters[0].ObjToString());
                 }
-
             }
         }
     }

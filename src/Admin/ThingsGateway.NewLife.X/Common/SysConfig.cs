@@ -141,7 +141,6 @@ public class SysConfig : Config<SysConfig>
                     .ToList();
 
                 return list.FirstOrDefault();
-
             }
             catch { return null; }
         }

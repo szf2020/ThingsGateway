@@ -20,5 +20,4 @@ public class HybridClaimsPrincipalService : IClaimsPrincipalService
         _hybridAppService = hybridAppService;
     }
     public ClaimsPrincipal? User => _hybridAppService.User;
-
 }

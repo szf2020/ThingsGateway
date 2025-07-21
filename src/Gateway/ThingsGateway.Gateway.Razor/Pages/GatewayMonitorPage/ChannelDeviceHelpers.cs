@@ -12,7 +12,6 @@ namespace ThingsGateway.Gateway.Razor
 {
     internal static class ChannelDeviceHelpers
     {
-
         internal static Channel GetChannelModel(ItemChangedType itemChangedType, ChannelDeviceTreeItem channelDeviceTreeItem)
         {
             Channel oneModel = null;
@@ -81,8 +80,6 @@ namespace ThingsGateway.Gateway.Razor
             return pluginTypeEnum;
         }
 
-
-
         internal static async Task ShowCopy(Channel oneModel, Dictionary<Device, List<Variable>> deviceDict, string text, bool autoRestart, Func<Task> onsave, DialogService dialogService)
         {
             var op = new DialogOption()
@@ -99,11 +96,9 @@ namespace ThingsGateway.Gateway.Razor
         {
              {nameof(ChannelCopyComponent.OnSave), async (List<Channel> channels,Dictionary<Device,List<Variable>> devices) =>
             {
-
                 await Task.Run(() =>GlobalData.ChannelRuntimeService.CopyAsync(channels,devices,autoRestart, default));
                 if(onsave!=null)
                     await onsave();
-
             }},
             {nameof(ChannelCopyComponent.Model),oneModel },
             {nameof(ChannelCopyComponent.Devices),deviceDict },
@@ -111,8 +106,6 @@ namespace ThingsGateway.Gateway.Razor
 
             await dialogService.Show(op);
         }
-
-
 
 
 

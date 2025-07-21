@@ -19,7 +19,6 @@ namespace ThingsGateway.Gateway.Application;
 /// </summary>
 public class DeviceBasicData
 {
-
     /// <inheritdoc cref="PrimaryIdEntity.Id"/>
     public long Id { get; set; }
 
@@ -69,8 +68,6 @@ public class DeviceBasicData
     [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
     [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
     public string Remark5 { get; set; }
-
-
 }
 
 /// <summary>
@@ -78,7 +75,6 @@ public class DeviceBasicData
 /// </summary>
 public class VariableBasicData
 {
-
     /// <inheritdoc cref="PrimaryIdEntity.Id"/>
     public long Id { get; set; }
 
@@ -182,5 +178,3 @@ public class VariableBasicData
     [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
     public string Remark5 { get; set; }
 }
-
-

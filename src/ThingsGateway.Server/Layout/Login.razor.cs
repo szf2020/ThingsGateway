@@ -87,7 +87,6 @@ public partial class Login
     NavigationManager NavigationManager { get; set; }
     private async Task LoginAsync(EditContext context)
     {
-
         var websiteOptions = App.GetOptions<WebsiteOptions>()!;
         if (websiteOptions.Demo)
         {
@@ -100,7 +99,6 @@ public partial class Login
 
             try
             {
-
                 var ret = await AuthRazorService.LoginAsync(model);
 
                 if (ret.Code != 200)
@@ -128,6 +126,4 @@ public partial class Login
             }
         }
     }
-
-
 }

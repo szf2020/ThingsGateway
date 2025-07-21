@@ -58,7 +58,6 @@ namespace ThingsGateway.SqlSugar
                 if (isList)
                 {
                     list = currentList.SelectMany(it => (it.GetType().GetProperty(navObjectName).GetValue(it) as IList)?.Cast<object>() ?? new List<object>()).ToList();
-
                 }
                 else
                 {
@@ -121,7 +120,6 @@ namespace ThingsGateway.SqlSugar
             if (isList)
             {
                 list = currentList.Where(it => it.GetType().GetProperty(navObjectName).GetValue(it) != null).SelectMany(it => (it.GetType().GetProperty(navObjectName).GetValue(it) as IList).Cast<object>()).ToList();
-
             }
             else
             {
@@ -155,42 +153,25 @@ namespace ThingsGateway.SqlSugar
             var navObjectNameColumnInfo = listItemEntity.Columns.First(it => it.PropertyName == navObjectName);
             Check.ExceptionEasy(navObjectNameColumnInfo.Navigat == null, $"{navObjectName} not [Navigat(..)] ", $"{navObjectName} 没有导航特性 [Navigat(..)] ");
 
-
-
             if (navObjectNameColumnInfo.Navigat.NavigatType == NavigateType.OneToOne)
             {
-                this.Context.Utilities.PageEach(list, 5000, pageList =>
-                {
-                    OneToOne(pageList, selector, listItemEntity, navObjectNameProperty, navObjectNameColumnInfo);
-                });
+                this.Context.Utilities.PageEach(list, 5000, pageList => OneToOne(pageList, selector, listItemEntity, navObjectNameProperty, navObjectNameColumnInfo));
             }
             else if (navObjectNameColumnInfo.Navigat.NavigatType == NavigateType.OneToMany)
             {
-                this.Context.Utilities.PageEach(list, 5000, pageList =>
-                {
-                    OneToMany(pageList, selector, listItemEntity, navObjectNameProperty, navObjectNameColumnInfo);
-                });
+                this.Context.Utilities.PageEach(list, 5000, pageList => OneToMany(pageList, selector, listItemEntity, navObjectNameProperty, navObjectNameColumnInfo));
             }
             else if (navObjectNameColumnInfo.Navigat.NavigatType == NavigateType.ManyToOne)
             {
-                this.Context.Utilities.PageEach(list, 5000, pageList =>
-                {
-                    OneToOne(pageList, selector, listItemEntity, navObjectNameProperty, navObjectNameColumnInfo);
-                });
+                this.Context.Utilities.PageEach(list, 5000, pageList => OneToOne(pageList, selector, listItemEntity, navObjectNameProperty, navObjectNameColumnInfo));
             }
             else if (navObjectNameColumnInfo.Navigat.NavigatType == NavigateType.Dynamic)
             {
-                this.Context.Utilities.PageEach(list, 100, pageList =>
-                {
-                    Dynamic(pageList, selector, listItemEntity, navObjectNameProperty, navObjectNameColumnInfo, expression);
-                });
+                this.Context.Utilities.PageEach(list, 100, pageList => Dynamic(pageList, selector, listItemEntity, navObjectNameProperty, navObjectNameColumnInfo, expression));
             }
             else
             {
-                this.Context.Utilities.PageEach(list, 100, pageList =>
-                {
-                    ManyToMany(pageList, selector, listItemEntity, navObjectNameProperty, navObjectNameColumnInfo);
-                });
+                this.Context.Utilities.PageEach(list, 100, pageList => ManyToMany(pageList, selector, listItemEntity, navObjectNameProperty, navObjectNameColumnInfo));
             }
         }
 
@@ -415,7 +396,7 @@ namespace ThingsGateway.SqlSugar
                     }
                 }
             }
-            if (list.Count != 0 && navObjectNameProperty.GetValue(list.First()) == null)
+            if (list.Count != 0 && navObjectNameProperty.GetValue(list[0]) == null)
             {
                 var sqlObj = GetWhereSql(db, navObjectNameColumnInfo.Navigat.Name);
                 if (sqlObj.SelectString == null)
@@ -448,7 +429,6 @@ namespace ThingsGateway.SqlSugar
                                               });
                             foreach (var item in groupQuery)
                             {
-
                                 // var setValue = navList.FirstOrDefault(x => navPkColumn.PropertyInfo.GetValue(x).ObjToString() == navColumn.PropertyInfo.GetValue(item).ObjToString());
 
                                 if (navObjectNameProperty.GetValue(item.l) == null)
@@ -459,7 +439,6 @@ namespace ThingsGateway.SqlSugar
                                 {
                                     //The reserved
                                 }
-
                             }
                         }
                         else
@@ -480,7 +459,6 @@ namespace ThingsGateway.SqlSugar
 
                             foreach (var item in groupQuery)
                             {
-
                                 // var setValue = navList.FirstOrDefault(x => navPkColumn.PropertyInfo.GetValue(x).ObjToString() == navColumn.PropertyInfo.GetValue(item).ObjToString());
 
                                 if (navObjectNameProperty.GetValue(item.l) == null)
@@ -491,7 +469,6 @@ namespace ThingsGateway.SqlSugar
                                 {
                                     //The reserved
                                 }
-
                             }
                         }
                     }
@@ -509,7 +486,6 @@ namespace ThingsGateway.SqlSugar
                                       });
                     foreach (var item in groupQuery)
                     {
-
                         // var setValue = navList.FirstOrDefault(x => navPkColumn.PropertyInfo.GetValue(x).ObjToString() == navColumn.PropertyInfo.GetValue(item).ObjToString());
 
                         if (navObjectNameProperty.GetValue(item.l) == null)
@@ -520,7 +496,6 @@ namespace ThingsGateway.SqlSugar
                         {
                             //The reserved
                         }
-
                     }
                 }
             }
@@ -564,7 +539,7 @@ namespace ThingsGateway.SqlSugar
             }));
             var sqlObj = GetWhereSql(childDb, navObjectNameColumnInfo.Navigat.Name);
 
-            if (list.Count != 0 && navObjectNameProperty.GetValue(list.First()) == null)
+            if (list.Count != 0 && navObjectNameProperty.GetValue(list[0]) == null)
             {
                 if (sqlObj.SelectString == null)
                 {
@@ -610,7 +585,6 @@ namespace ThingsGateway.SqlSugar
                         }
                         else
                         {
-
                             var instance = Activator.CreateInstance(navObjectNameProperty.PropertyType, true);
                             var ilist = instance as IList;
                             foreach (var value in list1)
@@ -666,7 +640,7 @@ namespace ThingsGateway.SqlSugar
                 }
             }
             Check.ExceptionEasy(sqlObj.MappingExpressions.IsNullOrEmpty(), $"{expression} error,dynamic need MappingField ,Demo: Includes(it => it.Books.MappingField(z=>z.studenId,()=>it.StudentId).ToList())", $"{expression} 解析出错,自定义映射需要 MappingField ,例子: Includes(it => it.Books.MappingField(z=>z.studenId,()=>it.StudentId).ToList())");
-            if (list.Count != 0 && navObjectNameProperty.GetValue(list.First()) == null)
+            if (list.Count != 0 && navObjectNameProperty.GetValue(list[0]) == null)
             {
                 MappingFieldsHelper<T> helper = new MappingFieldsHelper<T>();
                 helper.Context = childDb;
@@ -682,7 +656,6 @@ namespace ThingsGateway.SqlSugar
                     }
                 }
             }
-
         }
 
         private void DynamicOneToOne(List<object> list, Func<ISugarQueryable<object>, List<object>> selector, EntityInfo listItemEntity, System.Reflection.PropertyInfo navObjectNameProperty, EntityColumnInfo navObjectNameColumnInfo, Expression expression)
@@ -702,7 +675,7 @@ namespace ThingsGateway.SqlSugar
                 }
             }
             Check.ExceptionEasy(sqlObj.MappingExpressions.IsNullOrEmpty(), $"{expression} error，dynamic need MappingField ,Demo: Includes(it => it.Books.MappingField(z=>z.studenId,()=>it.StudentId).ToList())", $"{expression}解析出错， 自定义映射需要 MappingField ,例子: Includes(it => it.Books.MappingField(z=>z.studenId,()=>it.StudentId).ToList())");
-            if (list.Count != 0 && navObjectNameProperty.GetValue(list.First()) == null)
+            if (list.Count != 0 && navObjectNameProperty.GetValue(list[0]) == null)
             {
                 MappingFieldsHelper<T> helper = new MappingFieldsHelper<T>();
                 helper.Context = this.Context;
@@ -844,17 +817,17 @@ namespace ThingsGateway.SqlSugar
             }
             if (where.Count != 0)
             {
-                Check.ExceptionEasy(isList == false, $"{_ListCallFunc.First()} need is ToList()", $"{_ListCallFunc.First()} 需要ToList");
+                Check.ExceptionEasy(isList == false, $"{_ListCallFunc[0]} need is ToList()", $"{_ListCallFunc[0]} 需要ToList");
                 result.WhereString = String.Join(" AND ", where);
             }
             if (orderBy.Count != 0)
             {
-                Check.ExceptionEasy(isList == false, $"{_ListCallFunc.First()} need is ToList()", $"{_ListCallFunc.First()} 需要ToList");
+                Check.ExceptionEasy(isList == false, $"{_ListCallFunc[0]} need is ToList()", $"{_ListCallFunc[0]} 需要ToList");
                 result.OrderByString = String.Join(" , ", orderBy);
             }
             if (result.SelectString.HasValue())
             {
-                Check.ExceptionEasy(isList == false, $"{_ListCallFunc.First()} need is ToList()", $"{_ListCallFunc.First()} 需要ToList");
+                Check.ExceptionEasy(isList == false, $"{_ListCallFunc[0]} need is ToList()", $"{_ListCallFunc[0]} 需要ToList");
                 result.OrderByString = String.Join(" , ", orderBy);
             }
             return result;
@@ -948,7 +921,6 @@ namespace ThingsGateway.SqlSugar
             }
         }
 
-
         private SqlSugarProvider GetCrossDatabase(SqlSugarProvider db, Type type)
         {
             if (IsCrossQueryWithAttr == false && this.CrossQueryItems == null)
@@ -1023,7 +995,6 @@ namespace ThingsGateway.SqlSugar
             return shortName;
         }
 
-
         private string GetDbTableName(EntityInfo navEntityInfo, SqlInfo sqlInfo)
         {
             if (navEntityInfo.Type.GetCustomAttribute<SplitTableAttribute>() != null && sqlInfo.SplitTable != null)
@@ -1054,7 +1025,6 @@ namespace ThingsGateway.SqlSugar
                 }
             }
         }
-
 
         private bool IsEnumNumber(EntityColumnInfo navPkColumn)
         {
@@ -1088,7 +1058,6 @@ namespace ThingsGateway.SqlSugar
                 Check.ExceptionEasy(cColumn == null, $"{m} does not exist in {listItemEntity.EntityName}", $"{m}不存在于{listItemEntity.EntityName}");
                 sqlObj.MappingExpressions.Add(new MappingFieldsExpression()
                 {
-
                     LeftEntityColumn = cColumn,
                     RightEntityColumn = mColumn,
                 });
@@ -1117,11 +1086,9 @@ namespace ThingsGateway.SqlSugar
             }
             if (it.ForOwnsOnePropertyInfo != null)
             {
-
                 return QueryBuilder.Builder.GetTranslationColumnName(it.DbColumnName);
             }
             return QueryBuilder.Builder.GetTranslationColumnName(it.DbColumnName) + " AS " + QueryBuilder.Builder.GetTranslationColumnName(it.PropertyName);
         }
-
     }
 }

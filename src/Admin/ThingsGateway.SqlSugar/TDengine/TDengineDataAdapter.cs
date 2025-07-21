@@ -26,7 +26,6 @@ namespace ThingsGateway.SqlSugar
 
         public TDengineDataAdapter()
         {
-
         }
 
         /// <summary>
@@ -134,7 +133,6 @@ namespace ThingsGateway.SqlSugar
                         {
                             columns.Add(new DataColumn(name + i, type));
                         }
-
                     }
 
                     while (dr.Read())
@@ -168,6 +166,5 @@ namespace ThingsGateway.SqlSugar
         {
             throw new NotImplementedException();
         }
-
     }
 }

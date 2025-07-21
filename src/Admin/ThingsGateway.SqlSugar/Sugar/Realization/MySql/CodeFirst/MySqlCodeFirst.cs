@@ -119,7 +119,6 @@
             }
         }
 
-
         protected override bool IsNotSameType(EntityColumnInfo ec, DbColumnInfo dc)
         {
             if (ec.UnderType == UtilConstants.BoolType && dc.DataType == "tinyint" && dc.Length == 1)

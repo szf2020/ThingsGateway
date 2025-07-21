@@ -14,7 +14,6 @@ namespace SvgPathProperties
 
         public SvgPath()
         {
-
         }
 
         public SvgPath(string path, bool unarc = false)

@@ -43,6 +43,4 @@ public class PlatformService : IPlatformService
             await jSObject.InvokeVoidAsync("blazor_downloadFile", url, fileName, new { FileName = path });
         }
     }
-
-
 }

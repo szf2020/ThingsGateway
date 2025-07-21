@@ -162,7 +162,6 @@ public class OpcDaMaster : IDisposable
     {
         lock (this)
         {
-
             int i = ItemDicts.Count;
             var addItems = items.ConvertAll(o => new OpcItem(o)).ChunkTrivialBetter(OpcDaProperty.GroupSize).ToDictionary(a => "default" + (i++));
 

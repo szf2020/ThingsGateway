@@ -193,7 +193,6 @@ public sealed class JobBuilder : JobDetail
             var jobType = Penetrates.LoadAssembly(assemblyName)
                 .GetType(jobTypeFullName);
 
-
             return SetJobType(jobType);
         }
 
@@ -227,8 +226,6 @@ public sealed class JobBuilder : JobDetail
         AssemblyName = jobType.Assembly.GetName().Name;
         JobType = jobType.FullName;
         RuntimeJobType = jobType;
-
-
 
         return this;
     }

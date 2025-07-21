@@ -57,8 +57,6 @@ public class UnifyResultProvider : IUnifyResultProvider
         return new JsonResult(RESTfulResult(StatusCodes.Status200OK, true, data));
     }
 
-
-
     /// <summary>
     /// 返回 RESTful 风格结果集
     /// </summary>
@@ -95,6 +93,4 @@ public class UnifyResultProvider : IUnifyResultProvider
         return new JsonResult(RESTfulResult(metadata.StatusCode ?? StatusCodes.Status400BadRequest, data: metadata.Data, errors: metadata.ValidationResult) // 如果需要只显示第一条错误，修改为：errors: metadata.FirstErrorMessage
                       , UnifyContext.GetSerializerSettings(context));
     }
-
-
 }

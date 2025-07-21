@@ -52,7 +52,6 @@ namespace ThingsGateway.SqlSugar
 
         public static Type SugarType = typeof(SqlSugarProvider);
 
-
         internal static Type[] NumericalTypes = new Type[]
         {
             typeof(int),

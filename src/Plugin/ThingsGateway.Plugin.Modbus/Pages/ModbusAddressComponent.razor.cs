@@ -40,7 +40,6 @@ public partial class ModbusAddressComponent : ComponentBase, IAddressUIBase
         }
         catch
         {
-
         }
         base.OnParametersSet();
     }
@@ -50,7 +49,6 @@ public partial class ModbusAddressComponent : ComponentBase, IAddressUIBase
     {
         try
         {
-
             Model = $"{ConverterConfig.ToString()}{Value?.ToString()}";
 
             ModelChanged?.Invoke(Model);

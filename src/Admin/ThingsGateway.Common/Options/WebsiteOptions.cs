@@ -58,10 +58,8 @@ public class WebsiteOptions : IConfigurableOptions
     /// </summary>
     public string WikiUrl { get; set; } = "https://thingsgateway.cn/";
 
-
     /// <summary>
     /// 显示授权
     /// </summary>
     public bool ShowAuthorize { get; set; } = true;
-
 }

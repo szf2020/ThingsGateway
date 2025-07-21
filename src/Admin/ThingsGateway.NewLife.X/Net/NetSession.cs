@@ -213,7 +213,6 @@ public class NetSession : DisposeBase, INetSession, IServiceProvider, IExtend
     /// <param name="reason">断开原因。包括 SendError/RemoveNotAlive/Dispose/GC 等，其中 ConnectionReset 为网络被动断开或对方断开</param>
     protected virtual void OnDisconnected(String reason) => Disconnected?.Invoke(this, new EventArgs<String>(reason));
 
-
     /// <summary>收到客户端发来的数据。基类负责触发Received事件</summary>
     /// <param name="e"></param>
     protected virtual void OnReceive(ReceivedEventArgs e) => Received?.Invoke(this, e);

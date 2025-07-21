@@ -45,7 +45,6 @@
         }
     }
 
-
     public class QueueList : List<QueueItem>
     {
         public void Add(string sql, IReadOnlyList<SugarParameter> parameters)

@@ -47,8 +47,6 @@ public class OpcUaMaster : CollectBase
 
     protected override async Task InitChannelAsync(IChannel? channel, CancellationToken cancellationToken)
     {
-
-
         //载入配置
         OpcUaProperty config = new()
         {
@@ -154,19 +152,14 @@ public class OpcUaMaster : CollectBase
         {
             if (_driverProperties.ActiveSubscribe)
             {
-
                 //获取设备连接状态
                 if (IsConnected())
                 {
-
                     //更新设备活动时间
                     {
-
                         //如果是订阅模式，连接时添加订阅组
                         if (_plc.OpcUaProperty?.ActiveSubscribe == true && CurrentDevice.VariableSourceReads.Count > 0 && _plc.Session.SubscriptionCount < CurrentDevice.VariableSourceReads.Count)
                         {
-
-
                             foreach (var variableSourceRead in CurrentDevice.VariableSourceReads)
                             {
                                 try
@@ -176,7 +169,6 @@ public class OpcUaMaster : CollectBase
                                         await _plc.AddSubscriptionAsync(variableSourceRead.RegisterAddress, variableSourceRead.VariableRuntimes.Where(a => !a.RegisterAddress.IsNullOrEmpty()).Select(a => a.RegisterAddress!).ToHashSet().ToArray(), _plc.OpcUaProperty.LoadType, cancellationToken).ConfigureAwait(false);
 
                                         LogMessage?.LogInformation($"AddSubscription index  {CurrentDevice.VariableSourceReads.IndexOf(variableSourceRead)}  done");
-
                                     }
 
                                     await Task.Delay(100, cancellationToken).ConfigureAwait(false); // allow for subscription to be finished on server?
@@ -191,15 +183,11 @@ public class OpcUaMaster : CollectBase
                                 }
 
                                 LogMessage?.LogInformation("AddSubscriptions done");
-
                             }
-
                         }
                     }
                 }
-
             }
-
         }
     }
 
@@ -226,7 +214,6 @@ public class OpcUaMaster : CollectBase
                     }
                     variableSourceReads.Add(sourVars);
                 }
-
             }
             return Task.FromResult(variableSourceReads);
         }
@@ -234,7 +221,6 @@ public class OpcUaMaster : CollectBase
         {
             return Task.FromResult(new List<VariableSourceRead>());
         }
-
     }
 
     /// <inheritdoc/>
@@ -244,7 +230,6 @@ public class OpcUaMaster : CollectBase
         var addresss = deviceVariableSourceRead.VariableRuntimes.Where(a => !a.RegisterAddress.IsNullOrEmpty()).Select(a => a.RegisterAddress!).ToArray();
         try
         {
-
             var result = await _plc.ReadJTokenValueAsync(addresss, cancellationToken).ConfigureAwait(false);
             foreach (var data in result)
             {
@@ -292,10 +277,7 @@ public class OpcUaMaster : CollectBase
     {
         using var writeLock = ReadWriteLock.WriterLock();
         var result = await _plc.WriteNodeAsync(writeInfoLists.ToDictionary(a => a.Key.RegisterAddress!, a => a.Value), cancellationToken).ConfigureAwait(false);
-        var results = new ConcurrentDictionary<string, OperResult>(result.ToDictionary<KeyValuePair<string, Tuple<bool, string>>, string, OperResult>(a =>
-        {
-            return writeInfoLists.Keys.FirstOrDefault(b => b.RegisterAddress == a.Key)?.Name!;
-        }
+        var results = new ConcurrentDictionary<string, OperResult>(result.ToDictionary<KeyValuePair<string, Tuple<bool, string>>, string, OperResult>(a => writeInfoLists.Keys.FirstOrDefault(b => b.RegisterAddress == a.Key)?.Name!
         , a =>
         {
             if (!a.Value.Item1)
@@ -335,7 +317,6 @@ public class OpcUaMaster : CollectBase
         }
 
         RefreshVariableTasks(cancellationToken);
-
     }
 
     private Dictionary<string, List<VariableRuntime>> VariableAddresDicts { get; set; } = new();
@@ -350,8 +331,6 @@ public class OpcUaMaster : CollectBase
             if (DisposedValue)
                 return;
             if (TaskSchedulerLoop?.Stoped == true) return;
-
-
 
             LogMessage?.Trace($"Change: {Environment.NewLine} {data.monitoredItem.StartNodeId} : {data.jToken?.ToString()}");
 
@@ -398,5 +377,4 @@ public class OpcUaMaster : CollectBase
             success = false;
         }
     }
-
 }

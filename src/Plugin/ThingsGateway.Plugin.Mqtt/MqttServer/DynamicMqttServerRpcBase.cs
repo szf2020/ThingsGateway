@@ -35,7 +35,6 @@ public abstract class DynamicMqttServerRpcBase
     /// <returns></returns>
     public virtual async Task RPCInvokeAsync(TouchSocket.Core.ILog logMessage, InterceptingPublishEventArgs args, MqttServerProperty driverPropertys, MQTTnet.Server.MqttServer mqttServer, Func<string, Dictionary<string, Dictionary<string, JToken>>, ValueTask<Dictionary<string, Dictionary<string, IOperResult>>>> getRpcResult, CancellationToken cancellationToken)
     {
-
         if (driverPropertys.RpcWriteTopic.IsNullOrWhiteSpace()) return;
 
         var t = string.Format(null, "{0}/+", driverPropertys.RpcWriteTopic);

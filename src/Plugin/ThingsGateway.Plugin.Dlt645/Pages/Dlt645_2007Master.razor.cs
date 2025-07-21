@@ -59,10 +59,7 @@ public partial class Dlt645_2007Master : ComponentBase, IDisposable
 
         op.Component = BootstrapDynamicComponent.CreateComponent<Dlt645_2007AddressComponent>(new Dictionary<string, object?>
         {
-             {nameof(Dlt645_2007AddressComponent.ModelChanged),  (string a) =>
-            {
-                DeviceComponent?.SetRegisterAddress(a);
-            }},
+             {nameof(Dlt645_2007AddressComponent.ModelChanged),  (string a) => DeviceComponent?.SetRegisterAddress(a)},
             {nameof(Dlt645_2007AddressComponent.Model),address },
         });
 

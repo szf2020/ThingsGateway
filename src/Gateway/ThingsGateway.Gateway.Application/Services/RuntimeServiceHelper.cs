@@ -8,7 +8,6 @@
 // QQ群：605534569
 // ------------------------------------------------------------------------------
 
-
 using BootstrapBlazor.Components;
 
 using Microsoft.Extensions.Logging;
@@ -20,12 +19,10 @@ using ThingsGateway.NewLife.DictionaryExtensions;
 
 using TouchSocket.Core;
 
-
 namespace ThingsGateway.Gateway.Application;
 
 internal static class RuntimeServiceHelper
 {
-
     public static async Task InitAsync(List<ChannelRuntime> newChannelRuntimes, List<DeviceRuntime> newDeviceRuntimes, ILogger logger)
     {
         //批量修改之后，需要重新加载通道
@@ -40,10 +37,7 @@ internal static class RuntimeServiceHelper
 
                     var newVariableRuntimes = (await GlobalData.VariableService.GetAllAsync(newDeviceRuntime.Id).ConfigureAwait(false)).AdaptListVariableRuntime();
 
-                    newVariableRuntimes.ParallelForEach(item =>
-                    {
-                        item.Init(newDeviceRuntime);
-                    });
+                    newVariableRuntimes.ParallelForEach(item => item.Init(newDeviceRuntime));
                 }
             }
             catch (Exception ex)
@@ -53,7 +47,6 @@ internal static class RuntimeServiceHelper
         }
         GlobalData.ChannelDeviceRuntimeDispatchService.Dispatch(null);
         GlobalData.VariableRuntimeDispatchService.Dispatch(null);
-
     }
 
     public static void Init(List<ChannelRuntime> newChannelRuntimes)
@@ -71,13 +64,10 @@ internal static class RuntimeServiceHelper
             else
             {
                 newChannelRuntime.Init();
-
             }
-
         }
         GlobalData.ChannelDeviceRuntimeDispatchService.Dispatch(null);
     }
-
 
     public static async Task InitAsync(List<DeviceRuntime> newDeviceRuntimes, ILogger logger)
     {
@@ -85,18 +75,13 @@ internal static class RuntimeServiceHelper
         {
             try
             {
-
-
                 if (GlobalData.IdChannels.TryGetValue(newDeviceRuntime.ChannelId, out var newChannelRuntime))
                 {
                     newDeviceRuntime.Init(newChannelRuntime);
 
                     var newVariableRuntimes = (await GlobalData.VariableService.GetAllAsync(newDeviceRuntime.Id).ConfigureAwait(false)).AdaptListVariableRuntime();
 
-                    newVariableRuntimes.ParallelForEach(item =>
-                    {
-                        item.Init(newDeviceRuntime);
-                    });
+                    newVariableRuntimes.ParallelForEach(item => item.Init(newDeviceRuntime));
                 }
                 else
                 {
@@ -111,7 +96,6 @@ internal static class RuntimeServiceHelper
 
         GlobalData.ChannelDeviceRuntimeDispatchService.Dispatch(null);
         GlobalData.VariableRuntimeDispatchService.Dispatch(null);
-
     }
 
     public static void Init(List<DeviceRuntime> newDeviceRuntimes)
@@ -136,7 +120,6 @@ internal static class RuntimeServiceHelper
 
         GlobalData.ChannelDeviceRuntimeDispatchService.Dispatch(null);
         GlobalData.VariableRuntimeDispatchService.Dispatch(null);
-
     }
     public static void Init(List<VariableRuntime> newVariableRuntimes)
     {
@@ -154,7 +137,6 @@ internal static class RuntimeServiceHelper
         GlobalData.VariableRuntimeDispatchService.Dispatch(null);
     }
 
-
     public static void RemoveOldChannelRuntimes(IEnumerable<ChannelRuntime> oldChannelRuntimes)
     {
         var devs = oldChannelRuntimes.SelectMany(a => a.DeviceRuntimes).Select(a => a.Value).ToArray();
@@ -164,7 +146,6 @@ internal static class RuntimeServiceHelper
 
         GlobalData.ChannelDeviceRuntimeDispatchService.Dispatch(null);
         GlobalData.VariableRuntimeDispatchService.Dispatch(null);
-
     }
 
     public static async Task<List<ChannelRuntime>> GetNewChannelRuntimesAsync(HashSet<long> ids)
@@ -189,7 +170,6 @@ internal static class RuntimeServiceHelper
             var vars = deviceRuntime.VariableRuntimes.Select(a => a.Value).ToArray();
             vars.ParallelForEach(v =>
             {
-
                 //需要重启业务线程
                 var deviceRuntimes = GlobalData.IdDevices.Where(a => GlobalData.ContainsVariable(a.Key, v)).Select(a => a.Value);
                 foreach (var deviceRuntime in deviceRuntimes)
@@ -237,19 +217,13 @@ internal static class RuntimeServiceHelper
                             }
                         }
 
-
                         v.Dispose();
-
-
                     }
                     ));
                     a.Dispose();
-
                 }));
             }
-
         }
-
 
         GlobalData.ChannelDeviceRuntimeDispatchService.Dispatch(null);
         GlobalData.VariableRuntimeDispatchService.Dispatch(null);
@@ -281,7 +255,6 @@ internal static class RuntimeServiceHelper
                 await group.Key.RemoveDeviceAsync(group.Value.Select(a => a.Id).ToArray()).ConfigureAwait(false);
         }
     }
-
 
     public static async Task ChangedDriverAsync(ILogger logger, CancellationToken cancellationToken)
     {
@@ -323,7 +296,6 @@ internal static class RuntimeServiceHelper
 
         foreach (var group in data)
         {
-
             //这里改动的可能是旧绑定设备
             //需要改动DeviceRuntim的变量字典
             foreach (var item in group)
@@ -341,7 +313,6 @@ internal static class RuntimeServiceHelper
                         changedDriver.TryAdd(deviceRuntime.Driver);
                     }
                 }
-
             }
             if (group.Key != null)
             {
@@ -354,10 +325,8 @@ internal static class RuntimeServiceHelper
     }
     public static void VariableRuntimesDispose(IEnumerable<long> variableIds)
     {
-
         foreach (var variableId in variableIds)
         {
-
             if (GlobalData.IdVariables.TryGetValue(variableId, out var variableRuntime))
             {
                 variableRuntime.Dispose();
@@ -366,7 +335,6 @@ internal static class RuntimeServiceHelper
 
         GlobalData.VariableRuntimeDispatchService.Dispatch(null);
     }
-
 
     public static void AddCollectChangedDriver(IEnumerable<VariableRuntime> newVariableRuntimes, ConcurrentHashSet<IDriver> changedDriver)
     {
@@ -385,5 +353,4 @@ internal static class RuntimeServiceHelper
         }
         GlobalData.VariableRuntimeDispatchService.Dispatch(null);
     }
-
 }

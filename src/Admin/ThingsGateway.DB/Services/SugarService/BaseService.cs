@@ -170,6 +170,4 @@ public class BaseService<T> : IDataService<T>, IDisposable where T : class, new(
     {
         return DbContext.GetDB<T>();
     }
-
-
 }

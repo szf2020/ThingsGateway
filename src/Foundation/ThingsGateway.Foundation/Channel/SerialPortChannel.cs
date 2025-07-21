@@ -21,7 +21,6 @@ namespace ThingsGateway.Foundation;
 /// </summary>
 public class SerialPortChannel : SerialPortClient, IClientChannel
 {
-
     public SerialPortChannel(IChannelOptions channelOptions)
     {
         ChannelOptions = channelOptions;
@@ -76,7 +75,6 @@ public class SerialPortChannel : SerialPortClient, IClientChannel
     /// <inheritdoc/>
     public override async Task<Result> CloseAsync(string msg, CancellationToken token)
     {
-
         if (Online)
         {
             try
@@ -126,8 +124,6 @@ public class SerialPortChannel : SerialPortClient, IClientChannel
         }
     }
 
-
-
     /// <inheritdoc/>
     public void SetDataHandlingAdapter(DataHandlingAdapter adapter)
     {
@@ -150,7 +146,6 @@ public class SerialPortChannel : SerialPortClient, IClientChannel
         }
         return base.ToString();
     }
-
 
     protected override async Task OnSerialClosed(ClosedEventArgs e)
     {
@@ -195,7 +190,6 @@ public class SerialPortChannel : SerialPortClient, IClientChannel
 
         await this.OnChannelReceivedEvent(e, ChannelReceived).ConfigureAwait(false);
     }
-
 
     /// <inheritdoc/>
     protected override void Dispose(bool disposing)

@@ -32,8 +32,8 @@ namespace ThingsGateway.SqlSugar
         NavISugarQueryable<T> Includes<TReturn1, TReturn2, TReturn3>(Expression<Func<T, TReturn1>> include1, Expression<Func<TReturn1, TReturn2>> include2, Expression<Func<TReturn2, List<TReturn3>>> include3);
         NavISugarQueryable<T> Includes<TReturn1, TReturn2, TReturn3>(Expression<Func<T, List<TReturn1>>> include1, Expression<Func<TReturn1, TReturn2>> include2, Expression<Func<TReturn2, TReturn3>> include3);
         NavISugarQueryable<T> Includes<TReturn1, TReturn2, TReturn3>(Expression<Func<T, TReturn1>> include1, Expression<Func<TReturn1, List<TReturn2>>> include2, Expression<Func<TReturn2, List<TReturn3>>> include3);
-        IAsyncEnumerable<T> GetAsyncEnumerable();
-        IEnumerable<T> GetEnumerable();
+        IAsyncEnumerable<T> ToAsyncEnumerable(CancellationToken cancellationToken = default);
+        IEnumerable<T> ToEnumerable(CancellationToken cancellationToken = default);
     }
 
     /// <summary>
@@ -282,6 +282,5 @@ namespace ThingsGateway.SqlSugar
         NavQueryableProvider<T> Includes<TReturn1, TReturn2, TReturn3, TReturn4, TReturn5, TReturn6, TReturn7>(Expression<Func<T, List<TReturn1>>> include1, Expression<Func<TReturn1, TReturn2>> include2, Expression<Func<TReturn2, List<TReturn3>>> include3, Expression<Func<TReturn3, List<TReturn4>>> include4, Expression<Func<TReturn4, TReturn5>> include5, Expression<Func<TReturn5, TReturn6>> include6, Expression<Func<TReturn6, TReturn7>> include7);
         NavQueryableProvider<T> Includes<TReturn1, TReturn2, TReturn3, TReturn4, TReturn5, TReturn6, TReturn7>(Expression<Func<T, List<TReturn1>>> include1, Expression<Func<TReturn1, List<TReturn2>>> include2, Expression<Func<TReturn2, List<TReturn3>>> include3, Expression<Func<TReturn3, TReturn4>> include4, Expression<Func<TReturn4, TReturn5>> include5, Expression<Func<TReturn5, TReturn6>> include6, Expression<Func<TReturn6, TReturn7>> include7);
         NavQueryableProvider<T> Includes<TReturn1, TReturn2, TReturn3, TReturn4, TReturn5, TReturn6, TReturn7>(Expression<Func<T, TReturn1>> include1, Expression<Func<TReturn1, List<TReturn2>>> include2, Expression<Func<TReturn2, List<TReturn3>>> include3, Expression<Func<TReturn3, List<TReturn4>>> include4, Expression<Func<TReturn4, TReturn5>> include5, Expression<Func<TReturn5, List<TReturn6>>> include6, Expression<Func<TReturn6, TReturn7>> include7);
-
     }
 }

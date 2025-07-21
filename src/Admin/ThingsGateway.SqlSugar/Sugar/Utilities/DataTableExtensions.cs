@@ -12,7 +12,6 @@ namespace ThingsGateway.SqlSugar
             Expression<Func<T, TRow>> rowSelector,
             Func<IEnumerable<T>, TData> dataSelector)
         {
-
             DataTable table = new DataTable();
 
             var rowName = new List<string>();
@@ -24,7 +23,6 @@ namespace ThingsGateway.SqlSugar
             }
             else
                 rowName.AddRange(((NewExpression)rowSelector.Body).Arguments.Select(it => it as MemberExpression).Select(it => it.Member.Name));
-
 
             table.Columns.AddRange(rowName.Select(x => new DataColumn(x)).ToArray());
             var columns = source.Select(columnSelector).Distinct();
@@ -72,7 +70,6 @@ namespace ThingsGateway.SqlSugar
             Expression<Func<T, TRow>> rowSelector,
             Func<IEnumerable<T>, TData> dataSelector)
         {
-
             var memberName = string.Empty;
 
             if (rowSelector.Body is MemberExpression)
@@ -115,7 +112,6 @@ namespace ThingsGateway.SqlSugar
                 return row;
             });
             return rows;
-
         }
     }
 }

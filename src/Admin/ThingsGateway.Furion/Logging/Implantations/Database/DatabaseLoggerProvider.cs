@@ -57,8 +57,6 @@ public sealed class DatabaseLoggerProvider : ILoggerProvider, ISupportExternalSc
     /// <remarks>实现不间断写入</remarks>
     private Task _processQueueTask;
 
-
-
     /// <summary>
     /// 构造函数
     /// </summary>

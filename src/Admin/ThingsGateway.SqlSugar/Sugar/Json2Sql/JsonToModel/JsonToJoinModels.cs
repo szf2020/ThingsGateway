@@ -7,7 +7,6 @@ namespace ThingsGateway.SqlSugar
     /// </summary>
     public partial class ContextMethods : IContextMethods
     {
-
         public JoinModel JsonToJoinModels(string json)
         {
             JoinModel conditionalModels = new JoinModel();

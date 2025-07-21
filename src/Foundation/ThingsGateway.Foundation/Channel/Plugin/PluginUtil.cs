@@ -79,10 +79,7 @@ public static class PluginUtil
             await c.CloseAsync($"{channelOptions.CheckClearTime}ms Timeout").ConfigureAwait(false);
         });
             };
-
         }
         return action;
     }
-
-
 }

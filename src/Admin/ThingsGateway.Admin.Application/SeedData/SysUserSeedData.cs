@@ -35,6 +35,4 @@ public class SysUserSeedData : ISqlSugarEntitySeedData<SysUser>
             }
         }.Concat(SeedDataUtil.GetSeedDataByJson<SysUser>(SeedDataUtil.GetManifestResourceStream(assembly, "SeedData.Admin.seed_sys_user.json"))).Concat(data);
     }
-
-
 }

@@ -171,9 +171,8 @@ namespace ThingsGateway.SqlSugar
                 string result = "";
                 PageEach(inValueIEnumerable, 999, it =>
                 {
-                    model.Args.First().MemberValue = it;
+                    model.Args[0].MemberValue = it;
                     result += (base.ContainsArray(model) + " OR ");
-
                 });
                 return " ( " + result.TrimEnd(' ').TrimEnd('R').TrimEnd('O') + " ) ";
             }
@@ -411,7 +410,6 @@ namespace ThingsGateway.SqlSugar
         }
         public override string TrimStart(MethodCallExpressionModel mode)
         {
-
             var parameterNameA = mode.Args[0].MemberName;
             var parameterNameB = mode.Args[1].MemberName;
             return $" LTRIM({parameterNameA}, {parameterNameB}) ";

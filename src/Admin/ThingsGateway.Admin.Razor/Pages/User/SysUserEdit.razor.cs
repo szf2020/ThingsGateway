@@ -16,13 +16,11 @@ namespace ThingsGateway.Admin.Razor;
 
 public partial class SysUserEdit
 {
-
     private List<SelectedItem> ModuleSelectedItems { get; set; }
     [Inject]
     private IStringLocalizer<ThingsGateway.Admin.Razor._Imports>? AdminLocalizer { get; set; }
     [Inject]
     private ISysPositionService? SysPositionService { get; set; }
-
 
     [Parameter]
     [NotNull]
@@ -56,7 +54,6 @@ public partial class SysUserEdit
 
     [FileValidation(Extensions = [".png", ".jpg", ".jpeg"], FileSize = 200 * 1024)]
     public IBrowserFile? Picture { get; set; }
-
 
     private CancellationTokenSource? ReadAvatarToken { get; set; }
 

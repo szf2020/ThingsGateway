@@ -8,7 +8,6 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-
 using System.Collections.Concurrent;
 
 using ThingsGateway.NewLife;
@@ -146,5 +145,4 @@ public class TcpSessionClientChannel : TcpSessionClient, IClientChannel
 
         await this.OnChannelReceivedEvent(e, ChannelReceived).ConfigureAwait(false);
     }
-
 }

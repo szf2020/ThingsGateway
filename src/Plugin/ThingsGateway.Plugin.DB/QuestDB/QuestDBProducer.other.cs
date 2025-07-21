@@ -23,7 +23,6 @@ namespace ThingsGateway.Plugin.QuestDB;
 /// </summary>
 public partial class QuestDBProducer : BusinessBaseWithCacheIntervalVariable
 {
-
     protected override ValueTask<OperResult> UpdateVarModel(IEnumerable<CacheDBItem<VariableBasicData>> item, CancellationToken cancellationToken)
     {
         return UpdateVarModel(item.Select(a => a.Value).OrderBy(a => a.Id), cancellationToken);
@@ -42,7 +41,6 @@ public partial class QuestDBProducer : BusinessBaseWithCacheIntervalVariable
     {
         return UpdateVarModel(item, cancellationToken);
     }
-
 
     private void TimeIntervalUpdateVariable(IEnumerable<VariableBasicData> variables)
     {
@@ -69,14 +67,11 @@ public partial class QuestDBProducer : BusinessBaseWithCacheIntervalVariable
         }
     }
 
-
     private void UpdateVariable(VariableRuntime variableRuntime, VariableBasicData variable)
     {
         if (_driverPropertys.GroupUpdate && variable.BusinessGroupUpdateTrigger && !variable.BusinessGroup.IsNullOrEmpty() && VariableRuntimeGroups.TryGetValue(variable.BusinessGroup, out var variableRuntimeGroup))
         {
-
             AddQueueVarModel(new CacheDBItem<List<VariableBasicData>>(variableRuntimeGroup.AdaptListVariableBasicData()));
-
         }
         else
         {
@@ -109,17 +104,14 @@ public partial class QuestDBProducer : BusinessBaseWithCacheIntervalVariable
                 getDeviceModel.Logger = LogMessage;
 
                 await getDeviceModel.DBInsertable(_db, dbInserts, cancellationToken).ConfigureAwait(false);
-
             }
             else
             {
-
                 var stringData = dbInserts.Where(a => (!a.IsNumber && a.Value is not bool));
                 var numberData = dbInserts.Where(a => (a.IsNumber || a.Value is bool));
 
                 if (numberData.Any())
                 {
-
                     Stopwatch stopwatch = new();
                     stopwatch.Start();
                     var data = numberData.AdaptListQuestDBNumberHistoryValue();
@@ -132,7 +124,6 @@ public partial class QuestDBProducer : BusinessBaseWithCacheIntervalVariable
                         LogMessage?.Trace($"TableName：{_driverPropertys.NumberTableName}，Count：{result}，watchTime:  {stopwatch.ElapsedMilliseconds} ms");
                     }
                 }
-
 
                 if (stringData.Any())
                 {
@@ -149,7 +140,6 @@ public partial class QuestDBProducer : BusinessBaseWithCacheIntervalVariable
                     }
                 }
             }
-
 
             return OperResult.Success;
         }

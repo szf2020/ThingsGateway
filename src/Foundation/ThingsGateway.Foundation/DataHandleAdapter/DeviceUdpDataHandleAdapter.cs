@@ -166,7 +166,6 @@ public class DeviceUdpDataHandleAdapter<TRequest> : UdpDataHandlingAdapter where
             throw new Exception($"Unable to convert {nameof(requestInfo)} to {nameof(ISendMessage)}");
         }
 
-
         var byteBlock = new ValueByteBlock(sendMessage.MaxLength);
         try
         {

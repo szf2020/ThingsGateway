@@ -18,7 +18,6 @@ namespace ThingsGateway.SqlSugar
         }
         public override string ToSqlString()
         {
-
             if (PartitionByValue.HasValue())
             {
                 return base.ToSqlString();

@@ -7,7 +7,6 @@
         {
             base.DbMehtods = new SqlServerMethod();
         }
-
     }
     public partial class SqlServerMethod : DefaultDbMethod, IDbMethods
     {
@@ -162,7 +161,6 @@
         }
         public override string TrimStart(MethodCallExpressionModel mode)
         {
-
             var parameterNameA = mode.Args[0].MemberName;
             var parameterNameB = mode.Args[1].MemberName;
             return $" CASE WHEN LEFT({parameterNameA}, 1) = {parameterNameB} THEN RIGHT({parameterNameA}, LEN({parameterNameA}) - 1) ELSE {parameterNameA} END ";
@@ -192,6 +190,4 @@
             return $" CONTAINS({columns},{searchWord}) ";
         }
     }
-
-
 }

@@ -92,7 +92,6 @@ public class HardwareJob : IJob, IHardwareJob
                     HardwareInfo.UUID = HardwareInfo.MachineInfo.UUID;
 
                     HardwareInfo.UpdateTime = TimerX.Now.ToDefaultDateTimeFormat();
-
                 }
             }
             catch
@@ -154,5 +153,4 @@ public class HardwareJob : IJob, IHardwareJob
             }
         }
     }
-
 }

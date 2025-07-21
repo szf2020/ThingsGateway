@@ -111,7 +111,6 @@ public partial class PluginDebugPage
                 };
                 await WinBoxService.Show(option);
             }
-
         }
     }
 
@@ -131,7 +130,6 @@ public partial class PluginDebugPage
                 });
             }
         }
-
     }
 
     private TreeViewItem<PluginInfo> active;

@@ -17,7 +17,6 @@ namespace ThingsGateway.Foundation.Test;
 
 public class ModbusTest
 {
-
     [Theory]
     [InlineData("400045", true, "00000000002F01032C0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000")]
     [InlineData("300045", true, "00000000002F01042C0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000")]
@@ -49,7 +48,6 @@ public class ModbusTest
                  var result = await modbusMaster.WriteAsync(address, JTokenUtil.GetJTokenFromString(writeData), dataTypeEnum).ConfigureAwait(false);
                  Assert.True(result.IsSuccess, result.ToString());
              }
-
          });
         await Task.Delay(50);
         var task2 = Task.Run(async () =>
@@ -94,7 +92,6 @@ public class ModbusTest
                 var result = await modbusMaster.WriteAsync(address, JTokenUtil.GetJTokenFromString(writeData), dataTypeEnum).ConfigureAwait(false);
                 Assert.True(result.IsSuccess, result.ToString());
             }
-
         });
         await Task.Delay(50);
         var task2 = Task.Run(async () =>
@@ -107,8 +104,6 @@ public class ModbusTest
         });
         await Task.WhenAll(task1, task2);
     }
-
-
 
 
 

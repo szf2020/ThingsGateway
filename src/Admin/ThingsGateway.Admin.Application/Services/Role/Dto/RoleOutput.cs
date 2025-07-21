@@ -10,7 +10,6 @@
 
 namespace ThingsGateway.Admin.Application;
 
-
 /// <summary>
 ///  角色树输出参数
 /// </summary>

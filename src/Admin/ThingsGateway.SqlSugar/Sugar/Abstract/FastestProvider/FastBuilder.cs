@@ -95,7 +95,7 @@ namespace ThingsGateway.SqlSugar
         /// <param name="updateColumns">更新列</param>
         /// <param name="datas">数据列表</param>
         /// <returns>影响行数</returns>
-        public async virtual Task<int> Merge<T>(string tableName, DataTable dt, EntityInfo entityInfo, string[] whereColumns, string[] updateColumns, List<T> datas) where T : class, new()
+        public async virtual Task<int> Merge<T>(string tableName, DataTable dt, EntityInfo entityInfo, string[] whereColumns, string[] updateColumns, IEnumerable<T> datas) where T : class, new()
         {
             var result = 0;
             var pageSize = 2000;

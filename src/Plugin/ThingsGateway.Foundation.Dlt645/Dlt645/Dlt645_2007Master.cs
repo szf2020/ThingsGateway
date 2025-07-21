@@ -64,19 +64,13 @@ public class Dlt645_2007Master : DtuServiceDeviceBase
     /// <inheritdoc/>
     public ValueTask<OperResult<byte[]>> Dlt645RequestAsync(Dlt645_2007Address dAddress, ControlCode controlCode, string feHead, byte[] codes = default, string[] datas = default, CancellationToken cancellationToken = default)
     {
-
         return SendThenReturnAsync(GetSendMessage(dAddress, controlCode, feHead, codes, datas), cancellationToken);
-
     }
 
     /// <inheritdoc/>
     public ValueTask<OperResult> Dlt645SendAsync(Dlt645_2007Address dAddress, ControlCode controlCode, string feHead, byte[] codes = default, string[] datas = default, CancellationToken cancellationToken = default)
     {
-
-
         return SendAsync(GetSendMessage(dAddress, controlCode, feHead, codes, datas), cancellationToken);
-
-
     }
 
     /// <summary>
@@ -153,7 +147,6 @@ public class Dlt645_2007Master : DtuServiceDeviceBase
     }
     public override ValueTask<OperResult<byte[]>> ReadAsync(object state, CancellationToken cancellationToken = default)
     {
-
         if (state is Dlt645_2007Address dlt645_2007Address)
         {
             return Dlt645RequestAsync(dlt645_2007Address, ControlCode.Read, FEHead, cancellationToken: cancellationToken);
@@ -162,7 +155,6 @@ public class Dlt645_2007Master : DtuServiceDeviceBase
         {
             return EasyValueTask.FromResult(new OperResult<byte[]>(new ArgumentException("State must be of type Dlt645_2007Address", nameof(state))));
         }
-
     }
     /// <summary>
     /// 读取通信地址
@@ -386,6 +378,4 @@ public class Dlt645_2007Master : DtuServiceDeviceBase
     {
         return new Dlt645_2007Send(dAddress, read, feHead.HexStringToBytes(), codes, datas);
     }
-
-
 }

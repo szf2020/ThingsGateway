@@ -131,7 +131,6 @@ public class NodeRenderer : ComponentBase, IDisposable
         if (firstRender && !Node.Visible)
             return;
 
-
         if (firstRender || _becameVisible)
         {
             _becameVisible = false;

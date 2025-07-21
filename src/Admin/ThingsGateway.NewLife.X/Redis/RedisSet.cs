@@ -9,7 +9,6 @@ namespace ThingsGateway.NewLife.Caching;
 /// <typeparam name="T"></typeparam>
 public class RedisSet<T> : RedisBase, ICollection<T>
 {
-
     #region 构造
     /// <summary>实例化</summary>
     /// <param name="redis"></param>

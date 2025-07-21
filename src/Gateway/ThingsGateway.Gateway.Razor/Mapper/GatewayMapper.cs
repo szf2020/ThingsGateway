@@ -17,7 +17,4 @@ namespace ThingsGateway.Gateway.Razor;
 public static partial class GatewayMapper
 {
     public static partial List<TcpSessionClientDto> AdaptListTcpSessionClientDto(this List<TcpSessionClientChannel> src);
-
 }
-
-

@@ -3,7 +3,6 @@ using System.Data.Common;
 
 namespace TDengineAdo
 {
-
     /// <summary>
     /// 数据填充器
     /// </summary>
@@ -24,7 +23,6 @@ namespace TDengineAdo
 
         public TDengineDataAdapter()
         {
-
         }
 
         /// <summary>
@@ -127,7 +125,6 @@ namespace TDengineAdo
                         {
                             columns.Add(new DataColumn(name + i, dr.GetFieldType(i)));
                         }
-
                     }
 
                     while (dr.Read())
@@ -165,5 +162,4 @@ namespace TDengineAdo
             throw new NotImplementedException();
         }
     }
-
 }

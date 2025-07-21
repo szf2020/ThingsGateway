@@ -170,8 +170,6 @@ public class DeviceSingleStreamDataHandleAdapter<TRequest> : TcpCustomDataHandli
         Request = null;
     }
 
-
-
     /// <inheritdoc />
     protected override async Task PreviewSendAsync(ReadOnlyMemory<byte> memory)
     {

@@ -47,7 +47,6 @@ public partial class VariableCopyComponent
                     item.Name = $"{CopyVariableNamePrefix}{CopyVariableNameSuffixNumber + i}";
                     variables.Add(item);
                 }
-
             }
 
             if (OnSave != null)
@@ -61,6 +60,4 @@ public partial class VariableCopyComponent
             await ToastService.Warn(ex);
         }
     }
-
-
 }

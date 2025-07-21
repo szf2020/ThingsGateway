@@ -59,10 +59,7 @@ public partial class SiemensS7Master : ComponentBase, IDisposable
 
         op.Component = BootstrapDynamicComponent.CreateComponent<SiemensS7AddressComponent>(new Dictionary<string, object?>
         {
-             {nameof(SiemensS7AddressComponent.ModelChanged),  (string a) =>
-            {
-                DeviceComponent?.SetRegisterAddress(a);
-            }},
+             {nameof(SiemensS7AddressComponent.ModelChanged),  (string a) => DeviceComponent?.SetRegisterAddress(a)},
             {nameof(SiemensS7AddressComponent.Model),address },
         });
 
@@ -72,4 +69,3 @@ public partial class SiemensS7Master : ComponentBase, IDisposable
     [Inject]
     DialogService DialogService { get; set; }
 }
-

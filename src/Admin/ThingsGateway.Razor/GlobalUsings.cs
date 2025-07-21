@@ -20,7 +20,5 @@ global using System.Globalization;
 global using ThingsGateway.Common;
 global using ThingsGateway.NewLife.Extension;
 
-
-
 [assembly: SuppressMessage("Reliability", "CA2007", Justification = "<挂起>", Scope = "module")]
 [assembly: GlobalGenerateSetParametersAsync(true)]

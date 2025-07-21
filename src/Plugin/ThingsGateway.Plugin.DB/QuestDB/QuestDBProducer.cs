@@ -26,8 +26,6 @@ namespace ThingsGateway.Plugin.QuestDB;
 /// </summary>
 public partial class QuestDBProducer : BusinessBaseWithCacheIntervalVariable, IDBHistoryValueService
 {
-
-
     internal readonly RealDBProducerProperty _driverPropertys = new();
     private readonly QuestDBProducerVariableProperty _variablePropertys = new();
 
@@ -49,8 +47,6 @@ public partial class QuestDBProducer : BusinessBaseWithCacheIntervalVariable, ID
 
     protected override BusinessPropertyWithCacheInterval _businessPropertyWithCacheInterval => _driverPropertys;
 
-
-
     private SqlSugarClient _db;
 
     protected override void Dispose(bool disposing)
@@ -58,7 +54,6 @@ public partial class QuestDBProducer : BusinessBaseWithCacheIntervalVariable, ID
         _db?.TryDispose();
         base.Dispose(disposing);
     }
-
 
     protected override async Task InitChannelAsync(IChannel? channel, CancellationToken cancellationToken)
     {
@@ -78,7 +73,6 @@ public partial class QuestDBProducer : BusinessBaseWithCacheIntervalVariable, ID
 
     protected override async Task ProtectedStartAsync(CancellationToken cancellationToken)
     {
-
         _db.DbMaintenance.CreateDatabase();
 
         //必须为间隔上传
@@ -87,7 +81,6 @@ public partial class QuestDBProducer : BusinessBaseWithCacheIntervalVariable, ID
             DynamicSQLBase? hisModel = CSharpScriptEngineExtension.Do<DynamicSQLBase>(_driverPropertys.BigTextScriptHistoryTable);
             hisModel.Logger = LogMessage;
             await hisModel.DBInit(_db, cancellationToken).ConfigureAwait(false);
-
         }
         else
         {
@@ -97,7 +90,6 @@ public partial class QuestDBProducer : BusinessBaseWithCacheIntervalVariable, ID
 
         await base.ProtectedStartAsync(cancellationToken).ConfigureAwait(false);
     }
-
 
     public async Task<SqlSugarPagedList<IDBHistoryValue>> GetDBHistoryValuePagesAsync(DBHistoryValuePageInput input)
     {
@@ -170,5 +162,4 @@ public partial class QuestDBProducer : BusinessBaseWithCacheIntervalVariable, ID
         }
         return ret;
     }
-
 }

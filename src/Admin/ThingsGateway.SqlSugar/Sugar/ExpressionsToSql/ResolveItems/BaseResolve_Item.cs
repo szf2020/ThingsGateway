@@ -466,6 +466,5 @@ namespace ThingsGateway.SqlSugar
             parameter.Context.Result.Append(this.Context.GetAsString(asName, parameterName));
             this.Context.Parameters.Add(new SugarParameter(parameterName, parameter.CommonTempData));
         }
-
     }
 }

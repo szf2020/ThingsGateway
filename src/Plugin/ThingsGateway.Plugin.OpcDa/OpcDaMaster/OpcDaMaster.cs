@@ -39,8 +39,6 @@ public class OpcDaMaster : CollectBase
     /// <inheritdoc/>
     public override Type DriverDebugUIType => typeof(ThingsGateway.Debug.OpcDaMaster);
 
-
-
     /// <inheritdoc/>
     protected override async Task InitChannelAsync(IChannel? channel, CancellationToken cancellationToken)
     {
@@ -101,7 +99,6 @@ public class OpcDaMaster : CollectBase
         return _plc?.GetAddressDescription();
     }
 
-
     protected override bool VariableSourceReadsEnable => !_driverProperties.ActiveSubscribe;
 
     /// <inheritdoc/>
@@ -112,7 +109,6 @@ public class OpcDaMaster : CollectBase
             List<VariableSourceRead> variableSourceReads = new List<VariableSourceRead>();
             foreach (var deviceVariableGroups in deviceVariables.GroupBy(a => a.CollectGroup))
             {
-
                 var result = _plc.AddItemsWithSave(deviceVariableGroups.Where(a => !string.IsNullOrEmpty(a.RegisterAddress)).Select(a => a.RegisterAddress!).ToList());
                 var sourVars = result?.Select(
           it =>
@@ -153,20 +149,15 @@ public class OpcDaMaster : CollectBase
         {
             return ValueTask.FromResult(new OperResult<byte[]>($"ReadSourceAsync Error：{Environment.NewLine}{ex}"));
         }
-
     }
 
     /// <inheritdoc/>
     protected override async ValueTask<Dictionary<string, OperResult>> WriteValuesAsync(Dictionary<VariableRuntime, JToken> writeInfoLists, CancellationToken cancellationToken)
     {
-
         using var writeLock = ReadWriteLock.WriterLock();
         await ValueTask.CompletedTask.ConfigureAwait(false);
         var result = _plc.WriteItem(writeInfoLists.ToDictionary(a => a.Key.RegisterAddress!, a => a.Value.GetObjectFromJToken()!));
-        var results = new ConcurrentDictionary<string, OperResult>(result.ToDictionary<KeyValuePair<string, Tuple<bool, string>>, string, OperResult>(a =>
-        {
-            return writeInfoLists.Keys.FirstOrDefault(b => b.RegisterAddress == a.Key).Name;
-        }, a =>
+        var results = new ConcurrentDictionary<string, OperResult>(result.ToDictionary<KeyValuePair<string, Tuple<bool, string>>, string, OperResult>(a => writeInfoLists.Keys.FirstOrDefault(b => b.RegisterAddress == a.Key).Name, a =>
         {
             if (!a.Value.Item1)
                 return new OperResult(a.Value.Item2);
@@ -259,6 +250,4 @@ public class OpcDaMaster : CollectBase
             success = false;
         }
     }
-
-
 }

@@ -40,7 +40,6 @@ public partial class Dlt645_2007AddressComponent : ComponentBase, IAddressUIBase
         }
         catch
         {
-
         }
         base.OnParametersSet();
     }
@@ -50,7 +49,6 @@ public partial class Dlt645_2007AddressComponent : ComponentBase, IAddressUIBase
     {
         try
         {
-
             Model = $"{ConverterConfig.ToString()}{Value?.ToString()}";
 
             ModelChanged?.Invoke(Model);

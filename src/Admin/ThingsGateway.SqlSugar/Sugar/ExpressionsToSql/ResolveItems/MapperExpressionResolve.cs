@@ -67,7 +67,6 @@ namespace ThingsGateway.SqlSugar
             }
             else if (isSameProperty)
             {
-
             }
             else if (isFillFild1SameType)
             {
@@ -79,13 +78,12 @@ namespace ThingsGateway.SqlSugar
             }
         }
 
-
         private void oneToOne(MapperExpressionInfo fillInfo, MapperExpressionInfo mappingFild1Info, MapperExpressionInfo mappingFild1Info2, MapperExpressionInfo selectInfo)
         {
             var pkColumn = selectInfo.EntityInfo.Columns.Where(it => it.IsPrimarykey == true).FirstOrDefault();
             if (pkColumn == null)
             {
-                pkColumn = selectInfo.EntityInfo.Columns.First();
+                pkColumn = selectInfo.EntityInfo.Columns[0];
             }
             var tableName = sqlBuilder.GetTranslationTableName(fillInfo.EntityInfo.DbTableName);
             var whereLeft = sqlBuilder.GetTranslationColumnName(pkColumn.DbColumnName);
@@ -152,7 +150,6 @@ namespace ThingsGateway.SqlSugar
 
         private MapperExpressionInfo GetSelectInfo(Expression expression)
         {
-
             var field = expression;
             if (field is UnaryExpression)
             {

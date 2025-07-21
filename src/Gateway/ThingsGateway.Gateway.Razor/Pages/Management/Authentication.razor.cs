@@ -60,5 +60,4 @@ public partial class Authentication
 
         await InvokeAsync(StateHasChanged);
     }
-
 }

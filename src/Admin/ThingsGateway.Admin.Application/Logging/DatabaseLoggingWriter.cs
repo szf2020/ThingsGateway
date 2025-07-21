@@ -105,7 +105,6 @@ public class DatabaseLoggingWriter : IDatabaseLoggingWriter
         //获取结果json字符串
         var resultJson = requestAuditData.ReturnInformation?.ToSystemTextJsonString();
 
-
         //操作日志表实体
         var sysLogOperate = new SysOperateLog
         {

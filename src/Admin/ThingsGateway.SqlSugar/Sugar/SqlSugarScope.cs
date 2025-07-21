@@ -8,7 +8,6 @@ namespace ThingsGateway.SqlSugar
     {
         private SqlSugarScope()
         {
-
         }
         public SqlSugarScope(ConnectionConfig config)
         {
@@ -481,8 +480,6 @@ namespace ThingsGateway.SqlSugar
             return ScopedContext.Reportable(list);
         }
 
-
-
         public void RollbackTran()
         {
             ScopedContext.RollbackTran();
@@ -577,7 +574,7 @@ namespace ThingsGateway.SqlSugar
             return ScopedContext.SqlQueryable<T>(sql);
         }
 
-        public StorageableDataTable Storageable(List<Dictionary<string, object>> dictionaryList, string tableName)
+        public StorageableDataTable Storageable(IEnumerable<Dictionary<string, object>> dictionaryList, string tableName)
         {
             return ScopedContext.Storageable(dictionaryList, tableName);
         }
@@ -586,7 +583,7 @@ namespace ThingsGateway.SqlSugar
             return ScopedContext.Storageable(dictionary, tableName);
         }
 
-        public IStorageable<T> Storageable<T>(IReadOnlyList<T> dataList) where T : class, new()
+        public IStorageable<T> Storageable<T>(IEnumerable<T> dataList) where T : class, new()
         {
             return ScopedContext.Storageable(dataList);
         }
@@ -608,13 +605,10 @@ namespace ThingsGateway.SqlSugar
             return ScopedContext.Union(queryables);
         }
 
-
-
         public ISugarQueryable<T> UnionAll<T>(IReadOnlyList<ISugarQueryable<T>> queryables) where T : class
         {
             return ScopedContext.UnionAll(queryables);
         }
-
 
         public UpdateMethodInfo UpdateableByObject(object singleEntityObjectOrListObject)
         {
@@ -662,7 +656,6 @@ namespace ThingsGateway.SqlSugar
         {
             return ScopedContext.UpdateableT(UpdateObj);
         }
-
 
         public SplitTableContext SplitHelper<T>() where T : class, new()
         {
@@ -790,7 +783,6 @@ namespace ThingsGateway.SqlSugar
         {
             return ScopedContext.DeleteNav(whereExpression);
         }
-
 
         public DeleteNavTaskInit<T, T> DeleteNav<T>(T data, DeleteNavRootOptions options) where T : class, new()
         {

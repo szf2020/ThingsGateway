@@ -63,5 +63,4 @@ public class SysHub : Hub<ISysHub>
         VerificatInfoUtil.UpdateVerificat(userIdentifier, VerificatId, false);//更新cache
         return base.OnDisconnectedAsync(exception);
     }
-
 }

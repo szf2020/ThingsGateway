@@ -36,7 +36,6 @@ internal sealed class RpcService : IRpcService
         Localizer = localizer;
         Task.Factory.StartNew(RpcLogInsertAsync, TaskCreationOptions.LongRunning);
         _rpcLogOptions = App.GetOptions<RpcLogOptions>();
-
     }
 
     private IStringLocalizer Localizer { get; }
@@ -108,7 +107,6 @@ internal sealed class RpcService : IRpcService
                     continue;
                 }
 
-
                 JToken tagValue = JTokenUtil.GetJTokenFromString(item.Value);
                 bool isOtherMethodEmpty = string.IsNullOrEmpty(tag.OtherMethod);
                 var collection = isOtherMethodEmpty ? writeVariables : writeMethods;
@@ -122,7 +120,6 @@ internal sealed class RpcService : IRpcService
                     collection[collect].Add(tag, tagValue);
                 }
             }
-
         }
         var writeVariableArrays = writeVariables.ToArray();
         // 使用并行方式写入变量
@@ -137,11 +134,8 @@ internal sealed class RpcService : IRpcService
                 // 写入日志
                 foreach (var resultItem in result)
                 {
-
-
                     foreach (var variableResult in resultItem.Value)
                     {
-
                         string operObj = variableResult.Key;
 
                         string parJson = deviceDatas[resultItem.Key][variableResult.Key];
@@ -202,7 +196,6 @@ internal sealed class RpcService : IRpcService
                 // 写入日志
                 foreach (var resultItem in result)
                 {
-
                     foreach (var variableResult in resultItem.Value)
                     {
                         string operObj = variableResult.Key;
@@ -236,10 +229,8 @@ internal sealed class RpcService : IRpcService
                         }
                     }
 
-
                     results[resultItem.Key].AddRange(resultItem.Value.ToDictionary(a => a.Key, a => a.Value));
                 }
-
             }
             catch (Exception ex)
             {

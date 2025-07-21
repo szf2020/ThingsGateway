@@ -28,7 +28,6 @@ namespace ThingsGateway.Gateway.Application;
 /// </summary>
 internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
 {
-
     Microsoft.Extensions.Logging.ILogger? _logger;
 
     /// <summary>
@@ -37,7 +36,6 @@ internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
     /// <param name="channelRuntime">通道表</param>
     public DeviceThreadManage(ChannelRuntime channelRuntime)
     {
-
         var config = new TouchSocketConfig();
         LogMessage = new LoggerGroup() { LogLevel = TouchSocket.Core.LogLevel.Warning };//不显示调试日志
         // 配置容器中注册日志记录器实例
@@ -52,7 +50,6 @@ internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
 
         // 根据配置获取通道实例
         Channel = channelRuntime.GetChannel(config);
-
 
         //初始设置输出文本日志
         SetLog(CurrentChannel.LogLevel);
@@ -98,7 +95,6 @@ internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
             }
 
             SetLog(CurrentChannel.LogLevel);
-
         }
         catch (Exception ex)
         {
@@ -124,7 +120,6 @@ internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
         TextLogger.LogLevel = logLevel ?? TouchSocket.Core.LogLevel.Trace;
         // 将文件日志记录器添加到日志消息组中
         LogMessage?.AddLogger(TextLogger);
-
     }
 
     private TextFileLogger? TextLogger;
@@ -132,7 +127,6 @@ internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
     public LoggerGroup LogMessage { get; private set; }
 
     public string LogPath => CurrentChannel?.LogPath;
-
 
     #endregion
 
@@ -194,7 +188,6 @@ internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
     /// </summary>
     public async Task RestartDeviceAsync(IList<DeviceRuntime> deviceRuntimes, bool deleteCache)
     {
-
         try
         {
             await NewDeviceLock.WaitAsync(App.HostApplicationLifetime.ApplicationStopping).ConfigureAwait(false);
@@ -210,7 +203,6 @@ internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
     {
         try
         {
-
             await PrivateRemoveDevicesAsync(deviceRuntimes.Select(a => a.Id).ToArray()).ConfigureAwait(false);
 
             if (Disposed)
@@ -236,9 +228,7 @@ internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
                     }
                     catch { }
                 }
-
             }
-
 
             var idSet = GlobalData.GetRedundantDeviceIds();
 
@@ -322,7 +312,6 @@ internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
 
                     // 初始化驱动程序对象，并加载源读取
                     await driver.InitChannelAsync(Channel, token).ConfigureAwait(false);
-
                 }
                 catch (Exception ex)
                 {
@@ -347,10 +336,7 @@ internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
                 CancellationTokenSources.TryAdd(driver.DeviceId, cts);
 
                 _ = Task.Factory.StartNew((state) => DriverStart(state, token), driver, token);
-
             }).ConfigureAwait(false);
-
-
         }
         catch (Exception ex)
         {
@@ -373,7 +359,6 @@ internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
         finally
         {
             NewDeviceLock.Release();
-
         }
     }
 
@@ -392,7 +377,6 @@ internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
         finally
         {
             NewDeviceLock.Release();
-
         }
     }
 
@@ -424,8 +408,6 @@ internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
                     }
                 }
 
-
-
                 // 取消驱动程序的操作
                 if (CancellationTokenSources.TryRemove(deviceId, out var token))
                 {
@@ -437,14 +419,11 @@ internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
                     }
                 }
 
-
                 if (DriverTasks.TryRemove(deviceId, out var task))
                 {
                     task.Stop();
                 }
-
             });
-
 
             await Task.Delay(100).ConfigureAwait(false);
 
@@ -510,7 +489,6 @@ internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
                 DriverTasks.TryAdd(driver.DeviceId, driverTask);
 
                 driverTask.Start();
-
             }
         }
         catch (OperationCanceledException)
@@ -521,14 +499,11 @@ internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
         {
             return;
         }
-
     }
-
 
     #endregion
 
     #region 设备冗余切换
-
 
     private void GlobalData_DeviceStatusChangeEvent(DeviceRuntime deviceRuntime, DeviceBasicData deviceData)
     {
@@ -536,7 +511,6 @@ internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
         if (deviceRuntime.ChannelId != ChannelId) return;
         try
         {
-
             if (GlobalData.IsRedundant(deviceRuntime.Id) && deviceRuntime.Driver != null)
             {
                 if (deviceRuntime.RedundantSwitchType == RedundantSwitchTypeEnum.OffLine)
@@ -561,14 +535,10 @@ internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
                         }
                     }, CancellationToken);
                 }
-
             }
-
-
         }
         catch
         {
-
         }
     }
 
@@ -595,7 +565,6 @@ internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
 
             //注意切换后需要刷新业务设备的变量和采集设备集合
             await RemoveDeviceAsync(deviceRuntime.Id).ConfigureAwait(false);
-
 
             //获取主设备
             var devices = await GlobalData.DeviceService.GetAllAsync().ConfigureAwait(false);//获取设备属性
@@ -639,12 +608,10 @@ internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
                 else
                 {
                     SetRedundantDevice(deviceRuntime, newDeviceRuntime);
-
                 }
             }
 
             if (newDeviceRuntime == null) return;
-
 
             deviceRuntime.RedundantType = RedundantTypeEnum.Standby;
             newDeviceRuntime.RedundantType = RedundantTypeEnum.Primary;
@@ -676,7 +643,6 @@ internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
                       {
                           LogMessage?.LogWarning(ex);
                       }
-
                   }
               }, cancellationToken).ConfigureAwait(false);
         }
@@ -747,13 +713,9 @@ internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
         {
             try
             {
-
-
                 //检测设备线程假死
                 await Task.Delay(ManageHelper.ChannelThreadOptions.CheckInterval, cancellationToken).ConfigureAwait(false);
                 if (Disposed) return;
-
-
 
                 var num = Drivers.Count;
                 foreach (var driver in Drivers.Select(a => a.Value).Where(a => a != null).ToList())
@@ -832,15 +794,12 @@ internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
             LogMessage?.LogInformation(string.Format(AppResource.ChannelDispose, CurrentChannel?.Name ?? string.Empty));
 
             LogMessage?.Logs?.ForEach(a => a.TryDispose());
-
         }
         finally
         {
             NewDeviceLock.Release();
         }
     }
-
-
 
     #endregion 外部获取
 

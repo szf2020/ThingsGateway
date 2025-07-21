@@ -483,7 +483,6 @@ public class JsonParser
 
             if (ch > ' ') break;
             if (ch != ' ' && ch != '\t' && ch != '\n' && ch != '\r') break;
-
         } while (++index < _json.Length);
 
         if (index == _json.Length)

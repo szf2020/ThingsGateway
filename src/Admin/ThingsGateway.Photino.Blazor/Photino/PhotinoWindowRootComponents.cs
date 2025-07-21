@@ -35,10 +35,7 @@ namespace Photino.Blazor
                 : ParameterView.FromDictionary(parameters);
 
             // Dispatch because this is going to be async, and we want to catch any errors
-            _ = _manager.Dispatcher.InvokeAsync(async () =>
-            {
-                await _manager.AddRootComponentAsync(typeComponent, selector, parameterView);
-            });
+            _ = _manager.Dispatcher.InvokeAsync(async () => await _manager.AddRootComponentAsync(typeComponent, selector, parameterView));
         }
     }
 }

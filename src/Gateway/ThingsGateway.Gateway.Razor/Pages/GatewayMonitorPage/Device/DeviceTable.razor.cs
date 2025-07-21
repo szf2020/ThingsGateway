@@ -102,7 +102,6 @@ public partial class DeviceTable : IDisposable
     #region 修改
     private async Task Copy(IEnumerable<DeviceRuntime> devices)
     {
-
         if (!devices.Any())
         {
             await ToastService.Warning(null, RazorLocalizer["PleaseSelect"]);
@@ -116,7 +115,6 @@ public partial class DeviceTable : IDisposable
         oneModel.Id = 0;
 
         variables = deviceRuntime.ReadOnlyVariableRuntimes.Select(a => a.Value).AdaptListVariable();
-
 
         var op = new DialogOption()
         {
@@ -132,18 +130,14 @@ public partial class DeviceTable : IDisposable
         {
              {nameof(DeviceCopyComponent.OnSave), async (Dictionary<Device,List<Variable>> devices) =>
             {
-
                 await Task.Run(() =>GlobalData.DeviceRuntimeService.CopyAsync(devices,AutoRestartThread, default));
                     await InvokeAsync(table.QueryAsync);
-
             }},
             {nameof(DeviceCopyComponent.Model),oneModel },
             {nameof(DeviceCopyComponent.Variables),variables },
         });
 
         await DialogService.Show(op);
-
-
 
     }
 
@@ -176,7 +170,6 @@ public partial class DeviceTable : IDisposable
                 await Task.Run(() => GlobalData.DeviceRuntimeService.BatchEditAsync(changedModels, oldModel, oneModel,AutoRestartThread));
 
                    await InvokeAsync(table.QueryAsync);
-
             } },
             {nameof(DeviceEditComponent.Model),oneModel },
             {nameof(DeviceEditComponent.ValidateEnable),true },
@@ -185,26 +178,17 @@ public partial class DeviceTable : IDisposable
 
         await DialogService.Show(op);
 
-
-
     }
-
 
     private async Task<bool> Delete(IEnumerable<Device> devices)
     {
         try
         {
-            return await Task.Run(async () =>
-            {
-                return await GlobalData.DeviceRuntimeService.DeleteDeviceAsync(devices.Select(a => a.Id), AutoRestartThread, default);
-            });
+            return await Task.Run(async () => await GlobalData.DeviceRuntimeService.DeleteDeviceAsync(devices.Select(a => a.Id), AutoRestartThread, default));
         }
         catch (Exception ex)
         {
-            await InvokeAsync(async () =>
-            {
-                await ToastService.Warn(ex);
-            });
+            await InvokeAsync(async () => await ToastService.Warn(ex));
             return false;
         }
     }
@@ -230,7 +214,6 @@ public partial class DeviceTable : IDisposable
     {
         return Task.FromResult(ChannelDeviceHelpers.GetDeviceModel(ItemChangedType.Add, SelectModel).AdaptDeviceRuntime());
     }
-
 
     #region 导出
 
@@ -264,7 +247,6 @@ public partial class DeviceTable : IDisposable
 
                     break;
             }
-
         }
 
         // 返回 true 时自动弹出提示框
@@ -274,7 +256,6 @@ public partial class DeviceTable : IDisposable
 
     async Task ExcelDeviceAsync(ITableExportContext<DeviceRuntime> tableExportContext)
     {
-
         var op = new DialogOption()
         {
             IsScrolling = false,
@@ -313,22 +294,16 @@ finally
                 {
                                  await InvokeAsync( async ()=>
             {
-
                     await table.QueryAsync();
              StateHasChanged();
                 });
                 }
-
-
             }},
             {nameof(USheet.Model),uSheetDatas },
         });
 
         await DialogService.Show(op);
-
     }
-
-
 
     private async Task ExcelImportAsync(ITableExportContext<DeviceRuntime> tableExportContext)
     {
@@ -340,10 +315,7 @@ finally
             Title = GatewayLocalizer["ImportDevice"],
             ShowFooter = false,
             ShowCloseButton = false,
-            OnCloseAsync = async () =>
-            {
-                await InvokeAsync(table.QueryAsync);
-            },
+            OnCloseAsync = async () => await InvokeAsync(table.QueryAsync),
         };
 
         Func<IBrowserFile, Task<Dictionary<string, ImportPreviewOutputBase>>> preview = (a => GlobalData.DeviceRuntimeService.PreviewAsync(a));
@@ -354,7 +326,6 @@ finally
             {nameof(ImportExcel.Preview),preview },
         });
         await DialogService.Show(op);
-
     }
 
     #endregion 导出
@@ -367,7 +338,6 @@ finally
         {
             await Task.Run(async () =>
             {
-
                 await GlobalData.DeviceRuntimeService.DeleteDeviceAsync(Items.Select(a => a.Id), AutoRestartThread, default);
                 await InvokeAsync(async () =>
                 {
@@ -378,12 +348,8 @@ finally
         }
         catch (Exception ex)
         {
-            await InvokeAsync(async () =>
-            {
-                await ToastService.Warn(ex);
-            });
+            await InvokeAsync(async () => await ToastService.Warn(ex));
         }
-
     }
     #endregion
 

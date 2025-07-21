@@ -8,7 +8,6 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-
 #pragma warning disable CA2007 // 考虑对等待的任务调用 ConfigureAwait
 
 using ThingsGateway.Management;
@@ -40,7 +39,6 @@ public partial class UpdateZipFilePage
         {
             return new QueryData<UpdateZipFile>();
         }
-
     }
 
     #endregion 查询
@@ -61,12 +59,9 @@ public partial class UpdateZipFilePage
                 [nameof(UpdateZipFileInfo.Logger)] = UpdateZipFileHostedService.TextLogger,
                 [nameof(UpdateZipFileInfo.LogPath)] = UpdateZipFileHostedService.LogPath,
                 [nameof(UpdateZipFileInfo.Model)] = updateZipFile,
-
             }).Render(),
         };
 
         await DialogService.Show(op);
     }
-
-
 }

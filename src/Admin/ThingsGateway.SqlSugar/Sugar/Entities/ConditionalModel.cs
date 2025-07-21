@@ -2,7 +2,6 @@
 {
     public interface IConditionalModel
     {
-
     }
     public class ConditionalCollections : IConditionalModel
     {
@@ -21,7 +20,6 @@
         public string FieldName { get; set; }
         public string FieldValue { get; set; }
         public string CSharpTypeName { get; set; }
-
 
         public ICustomConditionalFunc CustomConditionalFunc { get; set; }
         public object CustomParameterValue { get; set; }

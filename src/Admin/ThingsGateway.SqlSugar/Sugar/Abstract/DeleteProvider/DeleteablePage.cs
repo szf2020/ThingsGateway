@@ -54,10 +54,7 @@
                 {
                     this.Context.Ado.BeginTran();
                 }
-                this.Context.Utilities.PageEach(DataList, PageSize, pageItem =>
-                {
-                    result += this.Context.Deleteable(pageItem).AS(TableName).EnableDiffLogEventIF(IsEnableDiffLogEvent, DiffModel).ExecuteCommand();
-                });
+                this.Context.Utilities.PageEach(DataList, PageSize, pageItem => result += this.Context.Deleteable(pageItem).AS(TableName).EnableDiffLogEventIF(IsEnableDiffLogEvent, DiffModel).ExecuteCommand());
                 if (isNoTran)
                 {
                     this.Context.Ado.CommitTran();
@@ -93,10 +90,7 @@
                 {
                     await Context.Ado.BeginTranAsync().ConfigureAwait(false);
                 }
-                await Context.Utilities.PageEachAsync(DataList, PageSize, async pageItem =>
-                {
-                    result += await Context.Deleteable(pageItem).AS(TableName).EnableDiffLogEventIF(IsEnableDiffLogEvent, DiffModel).ExecuteCommandAsync().ConfigureAwait(false);
-                }).ConfigureAwait(false);
+                await Context.Utilities.PageEachAsync(DataList, PageSize, async pageItem => result += await Context.Deleteable(pageItem).AS(TableName).EnableDiffLogEventIF(IsEnableDiffLogEvent, DiffModel).ExecuteCommandAsync().ConfigureAwait(false)).ConfigureAwait(false);
                 if (isNoTran)
                 {
                     await Context.Ado.CommitTranAsync().ConfigureAwait(false);

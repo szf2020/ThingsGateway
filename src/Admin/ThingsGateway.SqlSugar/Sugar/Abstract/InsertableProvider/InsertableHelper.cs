@@ -98,10 +98,7 @@ namespace ThingsGateway.SqlSugar
                 List<string> identities = GetIdentityKeys();
                 if (identities != null && identities.Count != 0)
                 {
-                    this.InsertBuilder.DbColumnInfoList = this.InsertBuilder.DbColumnInfoList.Where(it =>
-                    {
-                        return !identities.Any(i => it.DbColumnName.Equals(i, StringComparison.CurrentCultureIgnoreCase));
-                    }).ToList();
+                    this.InsertBuilder.DbColumnInfoList = this.InsertBuilder.DbColumnInfoList.Where(it => !identities.Any(i => it.DbColumnName.Equals(i, StringComparison.CurrentCultureIgnoreCase))).ToList();
                 }
             }
             #endregion
@@ -110,19 +107,13 @@ namespace ThingsGateway.SqlSugar
             if (this.Context.IgnoreColumns?.Any() == true)
             {
                 var currentIgnoreColumns = this.Context.IgnoreColumns.Where(it => it.EntityName == this.EntityInfo.EntityName).ToList();
-                this.InsertBuilder.DbColumnInfoList = this.InsertBuilder.DbColumnInfoList.Where(it =>
-                {
-                    return !currentIgnoreColumns.Any(i => it.PropertyName.Equals(i.PropertyName, StringComparison.CurrentCulture));
-                }).ToList();
+                this.InsertBuilder.DbColumnInfoList = this.InsertBuilder.DbColumnInfoList.Where(it => !currentIgnoreColumns.Any(i => it.PropertyName.Equals(i.PropertyName, StringComparison.CurrentCulture))).ToList();
             }
 
             if (this.Context.IgnoreInsertColumns?.Any() == true)
             {
                 var currentIgnoreColumns = this.Context.IgnoreInsertColumns.Where(it => it.EntityName == this.EntityInfo.EntityName).ToList();
-                this.InsertBuilder.DbColumnInfoList = this.InsertBuilder.DbColumnInfoList.Where(it =>
-                {
-                    return !currentIgnoreColumns.Any(i => it.PropertyName.Equals(i.PropertyName, StringComparison.CurrentCulture));
-                }).ToList();
+                this.InsertBuilder.DbColumnInfoList = this.InsertBuilder.DbColumnInfoList.Where(it => !currentIgnoreColumns.Any(i => it.PropertyName.Equals(i.PropertyName, StringComparison.CurrentCulture))).ToList();
             }
             #endregion
             if (this.IsSingle)
@@ -156,7 +147,6 @@ namespace ThingsGateway.SqlSugar
                         {
                             ArrayNull(item, paramters);
                         }
-
                     }
                     if (item.Value == null && isDic)
                     {
@@ -164,7 +154,6 @@ namespace ThingsGateway.SqlSugar
                         if (type != null)
                         {
                             paramters = new SugarParameter(this.SqlBuilder.SqlParameterKeyWord + item.DbColumnName, item.Value, type);
-
                         }
                     }
                     this.InsertBuilder.Parameters.Add(paramters);
@@ -258,7 +247,6 @@ namespace ThingsGateway.SqlSugar
         /// </summary>
         private void DataChangeAop(IReadOnlyList<T> items)
         {
-
             var dataEvent = this.Context.CurrentConnectionConfig.AopEvents?.DataChangesExecuted;
             if (dataEvent != null)
             {
@@ -349,7 +337,6 @@ namespace ThingsGateway.SqlSugar
                     DataType = column.DataType,
                     SqlParameterDbType = column.SqlParameterDbType,
                     IsIdentity = column.IsIdentity
-
                 };
                 if (column.DbColumnName == null)
                 {
@@ -467,13 +454,11 @@ namespace ThingsGateway.SqlSugar
         {
             return this.EntityInfo.Columns.Where(it =>
             {
-
                 if (StaticConfig.Check_StringIdentity)
                 {
                     Check.ExceptionEasy(it.IsIdentity && it.UnderType == typeof(string), "Auto-incremented is not a string, how can I use a executable startup configuration: StaticConfig.Check_StringIdentity=false ", "自增不是能string,如何非要用可以程序启动配置：StaticConfig.Check_StringIdentity=false");
                 }
                 return it.IsIdentity;
-
             }).Select(it => it.DbColumnName).ToList();
         }
         //private void TaskStart<Type>(Task<Type> result)
@@ -563,7 +548,6 @@ namespace ThingsGateway.SqlSugar
         /// </summary>
         private List<DiffLogTableInfo> GetDiffTable(string sql, long? identity)
         {
-
             if (GetIdentityKeys().HasValue() && this.InsertObjs.Count > 1)
             {
                 return GetDiffTableByEntity();
@@ -576,7 +560,6 @@ namespace ThingsGateway.SqlSugar
             {
                 return GetDiffTableBySql(identity);
             }
-
         }
 
         /// <summary>

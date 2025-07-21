@@ -65,5 +65,4 @@
                   new KeyValuePair<string, CSharpDataType>("datetimeoffset", CSharpDataType.DateTimeOffset),
                   new KeyValuePair<string, CSharpDataType>("datetimeoffset", CSharpDataType.DateTime)};
     };
-
 }

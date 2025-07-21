@@ -72,7 +72,6 @@ namespace ThingsGateway.SqlSugar
         public Func<string, IReadOnlyList<SugarParameter>, Task<int>> ExecuteCommandAsync { get; set; } = (s, p) => throw new Exception("SqlMiddle.ExecuteCommandAsync is null");
         public Func<string, IReadOnlyList<SugarParameter>, Task<IDataReader>> GetDataReaderAsync { get; set; } = (s, p) => throw new Exception("SqlMiddle.GetDataReaderAsync is null");
         public Func<string, IReadOnlyList<SugarParameter>, Task<DataSet>> GetDataSetAllAsync { get; set; } = (s, p) => throw new Exception("SqlMiddle.GetDataSetAllAsync is null");
-
     }
     public class AopEvents
     {
@@ -91,7 +90,6 @@ namespace ThingsGateway.SqlSugar
     }
     public class ConfigureExternalServices
     {
-
         private ISerializeService _SerializeService;
         private ICacheService _ReflectionInoCache;
         private ICacheService _DataInfoCache;
@@ -147,7 +145,6 @@ namespace ThingsGateway.SqlSugar
 
         public List<SqlFuncExternal> SqlFuncServices { get; set; }
         public List<KeyValuePair<string, CSharpDataType>> AppendDataReaderTypeMappings { get; set; }
-
 
         public Action<PropertyInfo, EntityColumnInfo> EntityService { get; set; }
         public Action<Type, EntityInfo> EntityNameService { get; set; }

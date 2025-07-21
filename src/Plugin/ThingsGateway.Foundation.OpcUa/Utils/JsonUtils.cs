@@ -395,7 +395,7 @@ public static class JsonUtils
     {
         if (!jTokens.ElementsHasSameType())
             throw new Exception("The array sent must have the same type of element in each dimension");
-        return jTokens.First().Type;
+        return jTokens[0].Type;
     }
 
     private static Type GetSystemType(JTokenType jsonType)

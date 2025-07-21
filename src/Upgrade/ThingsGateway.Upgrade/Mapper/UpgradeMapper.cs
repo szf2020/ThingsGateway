@@ -17,6 +17,4 @@ namespace ThingsGateway.Upgrade;
 public static partial class UpgradeMapper
 {
     public static partial List<TcpSessionClientDto> AdaptListTcpSessionClientDto(this List<TcpDmtpSessionClient> src);
-
 }
-

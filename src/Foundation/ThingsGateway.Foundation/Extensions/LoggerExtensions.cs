@@ -95,8 +95,6 @@ public static class LoggerExtensions
         return GetChannelLogBasePath().CombinePath(channelId.SanitizeFileName());
     }
 
-
-
     /// <summary>
     /// GetLogBasePath
     /// </summary>

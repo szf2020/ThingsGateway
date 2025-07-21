@@ -73,7 +73,6 @@ public partial class Login
 
         try
         {
-
             var ret = await AuthRazorService.LoginAsync(model);
 
             if (ret.Code != 200)
@@ -100,8 +99,6 @@ public partial class Login
             await ToastService.Error(Localizer["LoginErrorh2"], Localizer["LoginErrorc2"]);
         }
     }
-
-
 
 
 }

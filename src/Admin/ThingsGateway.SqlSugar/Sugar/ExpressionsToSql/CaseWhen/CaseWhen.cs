@@ -17,7 +17,6 @@
     }
     public class CaseThen
     {
-
         public CaseWhen Return<T>(T result)
         {
             return null;

@@ -68,7 +68,6 @@ namespace System.Diagnostics
 
             if (DeclaringType != null)
             {
-
                 if (Name == ".ctor")
                 {
                     if (string.IsNullOrEmpty(SubMethod) && !IsLambda)

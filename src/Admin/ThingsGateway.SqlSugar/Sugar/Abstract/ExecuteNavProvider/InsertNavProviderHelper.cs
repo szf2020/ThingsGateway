@@ -76,7 +76,7 @@
         /// </summary>
         /// <typeparam name="Type">实体类型</typeparam>
         /// <param name="datas">要插入的数据列表</param>
-        private void InsertIdentity<Type>(List<Type> datas) where Type : class, new()
+        private void InsertIdentity<Type>(IEnumerable<Type> datas) where Type : class, new()
         {
             foreach (var item in datas)
             {
@@ -176,7 +176,7 @@
         /// <typeparam name="TChild">子实体类型</typeparam>
         /// <param name="updateData">要更新的数据列表</param>
         /// <param name="pkColumn">主键列信息</param>
-        private void ClearPk<TChild>(List<TChild> updateData, EntityColumnInfo pkColumn) where TChild : class, new()
+        private void ClearPk<TChild>(IEnumerable<TChild> updateData, EntityColumnInfo pkColumn) where TChild : class, new()
         {
             foreach (var child in updateData)
             {

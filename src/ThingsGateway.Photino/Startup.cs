@@ -53,9 +53,7 @@ public class Startup : AppStartup
 
         services.AddScoped<IPlatformService, HybridPlatformService>();
         services.AddScoped<IGatewayExportService, HybridGatewayExportService>();
-
     }
-
 
     public void ConfigBlazor(IServiceCollection services)
     {
@@ -69,7 +67,6 @@ public class Startup : AppStartup
             options.ServicesStopConcurrently = true;
         });
 
-
         //// 事件总线
         //services.AddEventBus(options =>
         //{
@@ -77,11 +74,7 @@ public class Startup : AppStartup
         //});
 
         // 任务调度
-        services.AddSchedule(options =>
-        {
-            options.AddPersistence<JobPersistence>();
-        });
-
+        services.AddSchedule(options => options.AddPersistence<JobPersistence>());
 
         // 允许跨域
         services.AddCorsAccessor();
@@ -112,7 +105,6 @@ public class Startup : AppStartup
             //.AddXmlDataContractSerializerFormatters()
             .AddInjectWithUnifyResult<UnifyResultProvider>();
 
-
         // 配置Nginx转发获取客户端真实IP
         // 注1：如果负载均衡不是在本机通过 Loopback 地址转发请求的，一定要加上options.KnownNetworks.Clear()和options.KnownProxies.Clear()
         // 注2：如果设置环境变量 ASPNETCORE_FORWARDEDHEADERS_ENABLED 为 True，则不需要下面的配置代码
@@ -122,12 +114,6 @@ public class Startup : AppStartup
             options.KnownNetworks.Clear();
             options.KnownProxies.Clear();
         });
-
-
-
-
-
-
 
         //已添加AddOptions
         // 增加多语言支持配置信息
@@ -180,7 +166,6 @@ public class Startup : AppStartup
         services.AddSignalR();
         #endregion
 
-
 #if NET9_0_OR_GREATER
         var certificate = X509CertificateLoader.LoadPkcs12FromFile("ThingsGateway.pfx", "ThingsGateway", X509KeyStorageFlags.EphemeralKeySet);
 #else
@@ -196,14 +181,11 @@ public class Startup : AppStartup
             });
     }
 
-
-
     public void Use(IApplicationBuilder applicationBuilder, IWebHostEnvironment env)
     {
         var app = (WebApplication)applicationBuilder;
         app.UseForwardedHeaders(new ForwardedHeadersOptions { ForwardedHeaders = ForwardedHeaders.All, KnownNetworks = { }, KnownProxies = { } });
         app.UseBootstrapBlazor();
-
 
         // 启用本地化
         var option = app.Services.GetService<IOptions<RequestLocalizationOptions>>();
@@ -233,7 +215,6 @@ public class Startup : AppStartup
             app.UseStaticFiles(new StaticFileOptions { OnPrepareResponse = ctx => ctx.ProcessCache(app.Configuration) });
         }
 
-
         app.UseStaticFiles(new StaticFileOptions
         {
             OnPrepareResponse = (stf) =>
@@ -252,7 +233,6 @@ public class Startup : AppStartup
         app.UseStaticFiles(new StaticFileOptions { ContentTypeProvider = provider });
         app.UseStaticFiles();
 
-
         // 特定文件类型（文件后缀）处理
         var contentTypeProvider = FS.GetFileExtensionContentTypeProvider();
         // contentTypeProvider.Mappings[".文件后缀"] = "MIME 类型";
@@ -263,7 +243,6 @@ public class Startup : AppStartup
 
         //// 启用HTTPS
         //app.UseHttpsRedirection();
-
 
         // 添加状态码拦截中间件
         app.UseUnifyResultStatusCodes();
@@ -297,6 +276,4 @@ public class Startup : AppStartup
         app.MapControllers();
         app.MapHubs();
     }
-
-
 }

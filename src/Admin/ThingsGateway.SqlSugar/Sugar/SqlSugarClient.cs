@@ -36,7 +36,7 @@ namespace ThingsGateway.SqlSugar
         {
             Check.Exception(configs.IsNullOrEmpty(), "List<ConnectionConfig> configs is null or count=0");
             InitConfigs(configs);
-            var config = configs.First();
+            var config = configs[0];
             InitContext(config);
             _AllClients = configs.Select(it => new SugarTenant() { ConnectionConfig = it }).ToList();
             _AllClients.First(it => it.ConnectionConfig.ConfigId == config.ConfigId).Context = this.Context;
@@ -54,7 +54,7 @@ namespace ThingsGateway.SqlSugar
             _configAction = configAction;
             Check.Exception(configs.IsNullOrEmpty(), "List<ConnectionConfig> configs is null or count=0");
             InitConfigs(configs);
-            var config = configs.First();
+            var config = configs[0];
             InitContext(config);
             _AllClients = configs.Select(it => new SugarTenant() { ConnectionConfig = it }).ToList();
             _AllClients.First(it => it.ConnectionConfig.ConfigId == config.ConfigId).Context = this.Context;
@@ -260,8 +260,6 @@ namespace ThingsGateway.SqlSugar
         {
             return this.Context.Union(queryables);
         }
-
-
 
         public ISugarQueryable<T> UnionAll<T>(IReadOnlyList<ISugarQueryable<T>> queryables) where T : class
         {
@@ -474,7 +472,6 @@ namespace ThingsGateway.SqlSugar
             return this.Context.Queryable(joinQueryable1, joinQueryable2, joinType, joinExpression).With(SqlWith.Null);
         }
 
-
         public ISugarQueryable<T, T2, T3> Queryable<T, T2, T3>(ISugarQueryable<T> joinQueryable1, ISugarQueryable<T2> joinQueryable2, ISugarQueryable<T3> joinQueryable3,
             JoinType joinType1, Expression<Func<T, T2, T3, bool>> joinExpression1,
             JoinType joinType2, Expression<Func<T, T2, T3, bool>> joinExpression2)
@@ -503,7 +500,6 @@ namespace ThingsGateway.SqlSugar
 
         public ISugarQueryable<T> Queryable<T>(ISugarQueryable<T> queryable)
         {
-
             var result = this.Context.Queryable<T>(queryable);
             var QueryBuilder = queryable.QueryBuilder;
             result.QueryBuilder.IsQueryInQuery = true;
@@ -537,7 +533,7 @@ namespace ThingsGateway.SqlSugar
         {
             return this.Context.Storageable(data);
         }
-        public StorageableDataTable Storageable(List<Dictionary<string, object>> dictionaryList, string tableName)
+        public StorageableDataTable Storageable(IEnumerable<Dictionary<string, object>> dictionaryList, string tableName)
         {
             DataTable dt = this.Context.Utilities.DictionaryListToDataTable(dictionaryList);
             dt.TableName = tableName;
@@ -550,7 +546,7 @@ namespace ThingsGateway.SqlSugar
             return this.Context.Storageable(dt);
         }
 
-        public IStorageable<T> Storageable<T>(IReadOnlyList<T> dataList) where T : class, new()
+        public IStorageable<T> Storageable<T>(IEnumerable<T> dataList) where T : class, new()
         {
             return this.Context.Storageable(dataList);
         }
@@ -775,7 +771,6 @@ namespace ThingsGateway.SqlSugar
             return this.Context.DeleteableT<T>(deleteObj);
         }
 
-
         #endregion
 
         #region Fastest
@@ -923,7 +918,6 @@ namespace ThingsGateway.SqlSugar
             InitTenant();
             var db = this._AllClients.FirstOrDefault(it => Convert.ToString(it.ConnectionConfig.ConfigId) == Convert.ToString(configId));
             return db != null;
-
         }
         public void ChangeDatabase(object configId)
         {
@@ -982,7 +976,6 @@ namespace ThingsGateway.SqlSugar
             this.Context.Ado.CommitTran();
             AllClientEach(it =>
             {
-
                 try
                 {
                     it.Ado.CommitTran();
@@ -991,7 +984,6 @@ namespace ThingsGateway.SqlSugar
                 {
                     SugarRetry.Execute(() => it.Ado.CommitTran(), new TimeSpan(0, 0, 5), 3);
                 }
-
             });
             _IsAllTran = false;
         }
@@ -1001,7 +993,6 @@ namespace ThingsGateway.SqlSugar
             await Context.Ado.CommitTranAsync().ConfigureAwait(false);
             await AllClientEachAsync(async it =>
             {
-
                 try
                 {
                     await it.Ado.CommitTranAsync().ConfigureAwait(false);
@@ -1010,7 +1001,6 @@ namespace ThingsGateway.SqlSugar
                 {
                     SugarRetry.Execute(() => it.Ado.CommitTran(), new TimeSpan(0, 0, 5), 3);
                 }
-
             }).ConfigureAwait(false);
             _IsAllTran = false;
         }
@@ -1121,7 +1111,6 @@ namespace ThingsGateway.SqlSugar
             this.Context.Ado.RollbackTran();
             AllClientEach(it =>
             {
-
                 try
                 {
                     it.Ado.RollbackTran();
@@ -1130,7 +1119,6 @@ namespace ThingsGateway.SqlSugar
                 {
                     SugarRetry.Execute(() => it.Ado.RollbackTran(), new TimeSpan(0, 0, 5), 3);
                 }
-
             });
             _IsAllTran = false;
         }
@@ -1139,7 +1127,6 @@ namespace ThingsGateway.SqlSugar
             await Context.Ado.RollbackTranAsync().ConfigureAwait(false);
             await AllClientEachAsync(async it =>
             {
-
                 try
                 {
                     await it.Ado.RollbackTranAsync().ConfigureAwait(false);
@@ -1148,7 +1135,6 @@ namespace ThingsGateway.SqlSugar
                 {
                     SugarRetry.Execute(() => it.Ado.RollbackTran(), new TimeSpan(0, 0, 5), 3);
                 }
-
             }).ConfigureAwait(false);
             _IsAllTran = false;
         }
@@ -1201,7 +1187,6 @@ namespace ThingsGateway.SqlSugar
         }
         public SqlSugarClient CopyNew()
         {
-
             if (_AllClients?.Count > 1 && _configAction != null)
             {
                 List<ConnectionConfig> connections = new List<ConnectionConfig>();
@@ -1507,7 +1492,6 @@ namespace ThingsGateway.SqlSugar
                 }
             }
         }
-
 
         private async Task AllClientEachAsync(Func<ISqlSugarClient, Task> action)
         {

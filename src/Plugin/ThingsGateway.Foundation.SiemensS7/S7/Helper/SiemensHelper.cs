@@ -126,8 +126,6 @@ internal sealed partial class SiemensHelper
         return await plc.WriteAsync(address, DataTransUtil.SpliceArray([(byte)value.Length], inBytes), DataTypeEnum.String, cancellationToken).ConfigureAwait(false);
     }
 
-
-
     internal static async ValueTask<OperResult<string>> ReadWStringAsync(SiemensS7Master plc, string address, Encoding encoding, CancellationToken cancellationToken)
     {
         //先读取一次获取长度，再读取实际值

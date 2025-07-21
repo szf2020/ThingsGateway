@@ -57,7 +57,6 @@ internal sealed class PluginService : IPluginService
 
         DeleteBackup(DirName);
         DeleteBackup(AppContext.BaseDirectory);
-
     }
 
     /// <summary>
@@ -87,7 +86,6 @@ internal sealed class PluginService : IPluginService
         using var driver = GetDriver(pluginName);
         return driver?.DriverVariableAddressUIType;
     }
-
 
     /// <summary>
     /// 根据插件名称获取对应的驱动程序。
@@ -218,8 +216,6 @@ internal sealed class PluginService : IPluginService
         }
     }
 
-
-
     /// <summary>
     /// 获取指定插件的属性类型及其信息，将其缓存在内存中
     /// </summary>
@@ -319,7 +315,6 @@ internal sealed class PluginService : IPluginService
             }
         }
     }
-
 
     /// <summary>
     /// 分页显示插件
@@ -438,8 +433,6 @@ internal sealed class PluginService : IPluginService
 
                 assembly = null;
 
-
-
                 if (isDefaultDriver)
                 {
                     // 将主程序集保存到文件
@@ -449,7 +442,6 @@ internal sealed class PluginService : IPluginService
                     {
                         await MarkSave(fullDir.CombinePathWithOs(item.Name), item.MemoryStream).ConfigureAwait(false);
                     }
-
                 }
                 else
                 {
@@ -467,7 +459,6 @@ internal sealed class PluginService : IPluginService
                         await item.MemoryStream.DisposeAsync().ConfigureAwait(false);
                     }
                 }
-
             }
             finally
             {
@@ -483,7 +474,6 @@ internal sealed class PluginService : IPluginService
                 }
                 catch
                 {
-
                 }
             }
         }
@@ -589,10 +579,7 @@ internal sealed class PluginService : IPluginService
             {
                 NewLife.Log.XTrace.WriteException(ex);
             }
-            _ = Task.Run(() =>
-            {
-                _dispatchService.Dispatch(null);
-            });
+            _ = Task.Run(() => _dispatchService.Dispatch(null));
         }
     }
 
@@ -624,7 +611,6 @@ internal sealed class PluginService : IPluginService
     {
         try
         {
-
             Assembly assembly = null;
             //全部程序集路径
             List<string> paths = new();
@@ -650,7 +636,6 @@ internal sealed class PluginService : IPluginService
                 _logger?.LogInformation(string.Format(AppResource.AddPluginFile, path));
             }
             return assembly;
-
         }
         catch
         {

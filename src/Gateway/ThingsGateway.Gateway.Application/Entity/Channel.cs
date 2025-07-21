@@ -234,7 +234,6 @@ public class Channel : ChannelOptionsBase, IPrimaryIdEntity, IBaseDataEntity, IB
     [AutoGenerateColumn(Ignore = true)]
     public virtual bool IsDelete { get; set; } = false;
 
-
     /// <summary>
     /// 更新时间
     /// </summary>

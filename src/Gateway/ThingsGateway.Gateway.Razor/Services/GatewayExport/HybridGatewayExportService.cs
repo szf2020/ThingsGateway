@@ -14,12 +14,10 @@ namespace ThingsGateway.Gateway.Razor;
 
 public sealed class HybridGatewayExportService : IGatewayExportService
 {
-
     private readonly IChannelRuntimeService _channelService;
     private readonly IDeviceRuntimeService _deviceService;
     private readonly IVariableRuntimeService _variableService;
     private readonly IImportExportService _importExportService;
-
 
     public HybridGatewayExportService(
         IChannelRuntimeService channelService,
@@ -32,15 +30,12 @@ public sealed class HybridGatewayExportService : IGatewayExportService
         _deviceService = deviceService;
         _variableService = variableService;
         _importExportService = importExportService;
-
     }
 
     public async Task<bool> OnChannelExport(ExportFilter exportFilter)
     {
         try
         {
-
-
             exportFilter.QueryPageOptions.IsPage = false;
             exportFilter.QueryPageOptions.IsVirtualScroll = false;
 
@@ -49,11 +44,9 @@ public sealed class HybridGatewayExportService : IGatewayExportService
 
             Open(path);
             return true;
-
         }
         catch
         {
-
             return false;
         }
     }
@@ -61,7 +54,6 @@ public sealed class HybridGatewayExportService : IGatewayExportService
     private static bool Open(string path)
     {
         path = System.IO.Path.GetDirectoryName(path); // Ensure the path is absolute
-
 
         if (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows))
         {
@@ -83,7 +75,6 @@ public sealed class HybridGatewayExportService : IGatewayExportService
     {
         try
         {
-
             exportFilter.QueryPageOptions.IsPage = false;
             exportFilter.QueryPageOptions.IsVirtualScroll = false;
             var sheets = await _deviceService.ExportDeviceAsync(exportFilter).ConfigureAwait(false);
@@ -91,11 +82,9 @@ public sealed class HybridGatewayExportService : IGatewayExportService
             Open(path);
 
             return true;
-
         }
         catch
         {
-
             return false;
         }
     }
@@ -104,7 +93,6 @@ public sealed class HybridGatewayExportService : IGatewayExportService
     {
         try
         {
-
             exportFilter.QueryPageOptions.IsPage = false;
             exportFilter.QueryPageOptions.IsVirtualScroll = false;
             var sheets = await _variableService.ExportVariableAsync(exportFilter).ConfigureAwait(false);
@@ -114,7 +102,6 @@ public sealed class HybridGatewayExportService : IGatewayExportService
         }
         catch
         {
-
             return false;
         }
     }

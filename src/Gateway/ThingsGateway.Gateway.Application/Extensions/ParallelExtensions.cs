@@ -16,7 +16,6 @@ namespace ThingsGateway.Gateway.Application;
 [ThingsGateway.DependencyInjection.SuppressSniffer]
 public static class ParallelExtension
 {
-
     /// <summary>
     /// 异步执行指定的操作，并指定最大并行度和取消标志
     /// </summary>

@@ -5,7 +5,6 @@ namespace ThingsGateway.SqlSugar
 {
     public class SqlQueryBuilder : IDMLBuilder
     {
-
         #region  Fields
         private string _Fields;
         private StringBuilder _Sql;

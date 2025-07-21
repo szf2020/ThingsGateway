@@ -150,7 +150,6 @@ internal sealed class RulesEngineHostedService : BackgroundService, IRulesEngine
                         await Analysis((link.Target.Model as PortModel)?.Parent, new NodeInput() { Value = nodeOutput.Content.Value, }, rulesLog, cancellationToken).ConfigureAwait(false);
                     }
                 }
-
             }
             else if (targetNode is IActuatorNode actuatorNode)
             {
@@ -165,7 +164,6 @@ internal sealed class RulesEngineHostedService : BackgroundService, IRulesEngine
             }
             else if (targetNode is ITriggerNode triggerNode)
             {
-
                 Func<NodeOutput, CancellationToken, Task> func = (async (a, token) =>
                 {
                     foreach (var link in targetNode.PortLinks.Where(a => ((a.Target.Model as PortModel)?.Parent) != targetNode))
@@ -174,9 +172,7 @@ internal sealed class RulesEngineHostedService : BackgroundService, IRulesEngine
                     }
                 });
                 await triggerNode.StartAsync(func, cancellationToken).ConfigureAwait(false);
-
             }
-
         }
         catch (TaskCanceledException) { }
         catch (OperationCanceledException) { }
@@ -185,7 +181,6 @@ internal sealed class RulesEngineHostedService : BackgroundService, IRulesEngine
             rulesLog.Log?.LogWarning(ex);
         }
     }
-
 
     #region worker服务
 
@@ -273,7 +268,6 @@ internal sealed class RulesEngineHostedService : BackgroundService, IRulesEngine
             RestartLock.Release(); // 释放锁
         }
     }
-
 
     #endregion worker服务
 }

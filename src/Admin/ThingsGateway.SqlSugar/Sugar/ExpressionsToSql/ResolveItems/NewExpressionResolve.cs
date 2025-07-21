@@ -139,7 +139,6 @@ namespace ThingsGateway.SqlSugar
                 int i = 0;
                 foreach (var item in expression.Arguments)
                 {
-
                     string memberName = expression.Members?[i]?.Name;
                     if (memberName == null && expression.Members == null && item is MemberExpression member)
                     {
@@ -158,4 +157,3 @@ namespace ThingsGateway.SqlSugar
         }
     }
 }
-

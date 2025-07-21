@@ -244,7 +244,7 @@ internal static class V5_ObjectExtensions
             }
 
             // 获取 KeyValuePair<,> 集合中元素类型
-            var keyValuePairType = keyValuePairs.First()?.GetType()!;
+            var keyValuePairType = keyValuePairs[0]?.GetType()!;
 
             // 获取 Key 和 Value 属性值访问器
             var getters = keyValuePairType.GetKeyValuePairOrJPropertyGetters();

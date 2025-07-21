@@ -28,7 +28,6 @@ public static class AppResource
     public static string ReturnError => ThingsGateway.Foundation.AppResource.Lang == Language.Chinese ? ChineseResource.ReturnError : EnglishResource.ReturnError;
     public static string ValidateDataError => ThingsGateway.Foundation.AppResource.Lang == Language.Chinese ? ChineseResource.ValidateDataError : EnglishResource.ValidateDataError;
     public static string AddressError => ThingsGateway.Foundation.AppResource.Lang == Language.Chinese ? ChineseResource.AddressError : EnglishResource.AddressError;
-
 }
 public static class ChineseResource
 {

@@ -24,6 +24,4 @@ public partial class GatewayAbout
     [Inject]
     [NotNull]
     private IOptions<WebsiteOptions>? WebsiteOption { get; set; }
-
-
 }

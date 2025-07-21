@@ -2,7 +2,6 @@
 
 namespace ThingsGateway.SqlSugar
 {
-
     public static class ReflectionExtensions
     {
         public static Type GetTypeInfo(this Type typeInfo)

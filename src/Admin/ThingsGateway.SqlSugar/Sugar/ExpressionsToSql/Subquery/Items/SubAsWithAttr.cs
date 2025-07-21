@@ -22,7 +22,6 @@ namespace ThingsGateway.SqlSugar
             get; set;
         }
 
-
         public int Sort
         {
             get

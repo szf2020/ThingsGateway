@@ -76,7 +76,6 @@ namespace ThingsGateway.SqlSugar
             var right = ExpressionTool.RemoveConvert(expression.Right);
             if (operatorValue?.IsIn("AND", "OR") == true && left is BinaryExpression && right is BinaryExpression)
             {
-
                 var leftChild = ExpressionTool.RemoveConvert((left as BinaryExpression).Right);
                 var rightChild = ExpressionTool.RemoveConvert((right as BinaryExpression).Right);
                 var isLeftSelect = ExpressionTool.GetMethodName(leftChild) == "Select" || leftChild is BinaryExpression;
@@ -156,8 +155,6 @@ namespace ThingsGateway.SqlSugar
                 base.Context.Result.Append($" {joinString} ");
             }
         }
-
-
 
         private void DefaultBinary(ExpressionParameter parameter, BinaryExpression expression, string operatorValue)
         {
@@ -402,6 +399,5 @@ namespace ThingsGateway.SqlSugar
                 rightExpression is MethodCallExpression &&
                 (rightExpression as MethodCallExpression).Method.Name == "HasValue";
         }
-
     }
 }

@@ -3,7 +3,6 @@ using System.Reflection;
 
 namespace ThingsGateway.SqlSugar
 {
-
     public partial class SimpleClient<T> : ISugarRepository, ISimpleClient<T> where T : class, new()
     {
         #region Interface
@@ -29,7 +28,6 @@ namespace ThingsGateway.SqlSugar
 
         public SimpleClient()
         {
-
         }
         public SimpleClient(ISqlSugarClient context)
         {
@@ -276,7 +274,6 @@ namespace ThingsGateway.SqlSugar
         }
         public virtual int Count(Expression<Func<T, bool>> whereExpression)
         {
-
             return Context.Queryable<T>().Where(whereExpression).Count();
         }
 
@@ -323,7 +320,6 @@ namespace ThingsGateway.SqlSugar
         {
             return this.Context.InsertableT(insertObj).ExecuteReturnEntity();
         }
-
 
         public virtual bool InsertRange(IReadOnlyList<T> insertObjs)
         {
@@ -424,7 +420,6 @@ namespace ThingsGateway.SqlSugar
         }
         public virtual Task<int> CountAsync(Expression<Func<T, bool>> whereExpression)
         {
-
             return Context.Queryable<T>().Where(whereExpression).CountAsync();
         }
 

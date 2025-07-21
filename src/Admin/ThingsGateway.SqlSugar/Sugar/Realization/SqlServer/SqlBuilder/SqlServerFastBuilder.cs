@@ -4,7 +4,6 @@ using System.Data;
 
 namespace ThingsGateway.SqlSugar
 {
-
     public class SqlServerFastBuilder : FastBuilder, IFastBuilder
     {
         public override bool IsActionUpdateColumns { get; set; } = true;
@@ -15,7 +14,6 @@ namespace ThingsGateway.SqlSugar
         };
         public async Task<int> ExecuteBulkCopyAsync(DataTable dt)
         {
-
             SqlBulkCopy bulkCopy = GetBulkCopyInstance();
             bulkCopy.DestinationTableName = dt.TableName;
             try
@@ -52,7 +50,6 @@ namespace ThingsGateway.SqlSugar
                 }
                 else
                 {
-
                     copy = new SqlBulkCopy((SqlConnection)this.Context.Ado.Connection, SqlBulkCopyOptions.CheckConstraints, (SqlTransaction)this.Context.Ado.Transaction);
                 }
             }
@@ -63,7 +60,7 @@ namespace ThingsGateway.SqlSugar
             copy.BulkCopyTimeout = this.Context.Ado.CommandTimeOut;
             return copy;
         }
-        public override Task<int> Merge<T>(string tableName, DataTable dt, EntityInfo entityInfo, string[] whereColumns, string[] updateColumns, List<T> datas)
+        public override Task<int> Merge<T>(string tableName, DataTable dt, EntityInfo entityInfo, string[] whereColumns, string[] updateColumns, IEnumerable<T> datas)
         {
             var sqlBuilder = this.Context.Queryable<object>().SqlBuilder;
             var insertColumns = entityInfo.Columns

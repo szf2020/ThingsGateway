@@ -154,7 +154,6 @@ namespace ThingsGateway.SqlSugar
             return result;
         }
 
-
         protected override void SugarCatch(Exception ex, string sql, IReadOnlyList<SugarParameter> parameters)
         {
             base.SugarCatch(ex, sql, parameters);

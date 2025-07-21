@@ -69,7 +69,6 @@ public class Setting : Config<Setting>
     [Description("辅助解析程序集。程序集加载过程中，被依赖程序集未能解析时，是否协助解析，默认false")]
     public Boolean AssemblyResolve { get; set; }
 
-
     #endregion
 
     #region 方法

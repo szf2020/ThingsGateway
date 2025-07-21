@@ -23,8 +23,6 @@
                         appendIndex++;
                         sugarQueryable.Where(sql, p.Value);
                     }
-
-
                 }
             };
         }

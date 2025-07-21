@@ -59,8 +59,6 @@ public class AppService : IAppService
         }
     }
 
-
-
     public async Task LoginAsync(ClaimsIdentity identity, int expire)
     {
         var diffTime = DateTime.Now + TimeSpan.FromMinutes(expire);

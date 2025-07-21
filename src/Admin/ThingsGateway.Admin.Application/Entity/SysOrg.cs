@@ -66,12 +66,9 @@ public class SysOrg : BaseEntity
     [AutoGenerateColumn(Visible = true, Sortable = true, Filterable = true)]
     public OrgEnum Category { get; set; }
 
-
     [SugarColumn(ColumnName = "Status", ColumnDescription = "启用")]
     [AutoGenerateColumn(Visible = true, Sortable = true, Filterable = true)]
     public bool Status { get; set; } = true;
-
-
 
 
 }

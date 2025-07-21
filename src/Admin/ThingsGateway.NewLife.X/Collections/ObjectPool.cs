@@ -182,7 +182,6 @@ public class ObjectPool<T> : DisposeBase, IPool<T> where T : notnull
     /// <returns></returns>
     public PoolItem<T> GetItem() => new(this, Get());
 
-
     /// <summary>归还</summary>
     /// <param name="value"></param>
     public virtual Boolean Return(T value)

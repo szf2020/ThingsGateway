@@ -37,7 +37,6 @@ internal sealed class ChannelThreadManage : IChannelThreadManage
     /// <param name="channelIds">要移除的通道ID</param>
     private async Task PrivateRemoveChannelsAsync(IList<long> channelIds)
     {
-
         await channelIds.ParallelForEachAsync(async (channelId, token) =>
           {
               try
@@ -45,14 +44,12 @@ internal sealed class ChannelThreadManage : IChannelThreadManage
                   if (!DeviceThreadManages.TryRemove(channelId, out var deviceThreadManage)) return;
 
                   await deviceThreadManage.DisposeAsync().ConfigureAwait(false);
-
               }
               catch (Exception ex)
               {
                   _logger.LogWarning(ex, nameof(PrivateRemoveChannelsAsync));
               }
           }).ConfigureAwait(false);
-
     }
 
     /// <summary>
@@ -70,7 +67,6 @@ internal sealed class ChannelThreadManage : IChannelThreadManage
         finally
         {
             NewChannelLock.Release();
-
         }
     }
 
@@ -89,11 +85,8 @@ internal sealed class ChannelThreadManage : IChannelThreadManage
         finally
         {
             NewChannelLock.Release();
-
         }
     }
-
-
 
     private async Task PrivateRestartChannelAsync(IList<ChannelRuntime> channelRuntimes)
     {
@@ -135,16 +128,12 @@ internal sealed class ChannelThreadManage : IChannelThreadManage
                 deviceThreadManage.ChannelThreadManage = this;
 
                 await deviceThreadManage.RestartDeviceAsync(channelRuntime.DeviceRuntimes.Select(a => a.Value).ToList(), false).ConfigureAwait(false);
-
             }
             catch (Exception ex)
             {
                 _logger.LogWarning(ex, nameof(PrivateRestartChannelAsync));
             }
-
         }).ConfigureAwait(false);
-
-
     }
 
     /// <summary>
@@ -168,7 +157,6 @@ internal sealed class ChannelThreadManage : IChannelThreadManage
     /// </summary>
     public async Task RestartChannelAsync(IList<ChannelRuntime> channelRuntimes)
     {
-
         try
         {
             await NewChannelLock.WaitAsync(App.HostApplicationLifetime.ApplicationStopping).ConfigureAwait(false);
@@ -186,6 +174,5 @@ internal sealed class ChannelThreadManage : IChannelThreadManage
     }
 
     #endregion
-
 
 }

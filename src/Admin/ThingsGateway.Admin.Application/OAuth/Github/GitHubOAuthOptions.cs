@@ -27,10 +27,7 @@ public class GitHubOAuthOptions : AdminOAuthOptions
         Scope.Add("read:user");
         Scope.Add("public_repo"); // 需要用于 Star 仓库
 
-        Events.OnCreatingTicket = async context =>
-        {
-            await HandleGitHubStarAsync(context).ConfigureAwait(false);
-        };
+        Events.OnCreatingTicket = async context => await HandleGitHubStarAsync(context).ConfigureAwait(false);
 
         Events.OnRedirectToAuthorizationEndpoint = context =>
         {
@@ -66,8 +63,6 @@ public class GitHubOAuthOptions : AdminOAuthOptions
         if (string.IsNullOrWhiteSpace(context.AccessToken))
             throw new InvalidOperationException("Access token is missing.");
 
-
-
         var request = new HttpRequestMessage(HttpMethod.Put, $"https://api.github.com/user/starred/{repoFullName}")
         {
             Headers =
@@ -93,17 +88,12 @@ public class GitHubOAuthOptions : AdminOAuthOptions
                 await Task.Delay(5000).ConfigureAwait(false);
                 await _noticeService.NavigationMesage(verificatInfoIds.ClientIds, "https://github.com/ThingsGateway/ThingsGateway", "创作不易，如有帮助请star仓库").ConfigureAwait(false);
             });
-
         }
-
-
     }
-
 
     /// <summary>处理用户信息方法</summary>
     public override async Task<JsonElement> HandleUserInfoAsync(HttpContext context, OAuthTokenResponse tokens)
     {
-
         var request = new HttpRequestMessage(HttpMethod.Get, UserInformationEndpoint);
         request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", tokens.AccessToken);
         request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/vnd.github+json"));

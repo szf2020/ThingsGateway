@@ -183,7 +183,6 @@ namespace ThingsGateway.SqlSugar
             return result;
         }
 
-
         static readonly Dictionary<Type, NpgsqlDbType> ArrayMapping = new Dictionary<Type, NpgsqlDbType>()
         {
             { typeof(int[]),NpgsqlDbType.Integer},
@@ -196,7 +195,6 @@ namespace ThingsGateway.SqlSugar
             {typeof(DateTime[]),NpgsqlDbType.Date},
             {typeof(float[]),NpgsqlDbType.Real},
 
-
             { typeof(int?[]),NpgsqlDbType.Integer},
             { typeof(short?[]),NpgsqlDbType.Smallint},
             { typeof(long?[]),NpgsqlDbType.Bigint},
@@ -205,7 +203,6 @@ namespace ThingsGateway.SqlSugar
             { typeof(byte?[]),NpgsqlDbType.Bytea},
             { typeof(bool?[]),NpgsqlDbType.Boolean},
             {typeof(DateTime?[]),NpgsqlDbType.Date},
-
 
              { typeof(string[]), NpgsqlDbType.Text},
              {typeof(float?[]),NpgsqlDbType.Real},

@@ -145,7 +145,6 @@ public sealed class LoggingMonitorSettings
         SkipValidation = true
     };
 
-
     /// <summary>
     /// 格式化提供器
     /// </summary>

@@ -44,7 +44,6 @@ public class TimeIntervalTriggerNode : TextNode, ITriggerNode, IDisposable
         }
     }
 
-
     public void Dispose()
     {
         _task?.Stop();

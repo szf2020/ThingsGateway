@@ -49,7 +49,6 @@ namespace ThingsGateway.SqlSugar
             {
                 if (typeof(T).IsClass())
                 {
-
                     var result = (T)Activator.CreateInstance(typeof(T), true);
                     datas = new List<T>() { result };
                     ClassMethod(result, sb, true);
@@ -112,7 +111,6 @@ namespace ThingsGateway.SqlSugar
 
         private string GetSelect<Y>(EntityColumnInfo it, Y data)
         {
-
             return string.Format(" {0} AS {1} ", FormatValue(it.PropertyInfo.GetValue(data, null), it), queryBuilder.Builder.GetTranslationColumnName(it.PropertyName));
         }
 
@@ -280,6 +278,5 @@ namespace ThingsGateway.SqlSugar
                 return formatBuilder.FormatValue(value);
             }
         }
-
     }
 }

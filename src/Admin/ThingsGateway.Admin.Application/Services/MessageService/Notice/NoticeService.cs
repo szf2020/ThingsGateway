@@ -24,7 +24,6 @@ internal sealed class NoticeService : INoticeService
         NavigationMesageDispatchService = navigationMesageDispatchService;
     }
 
-
     /// <inheritdoc/>
     public async Task NewMesage(IEnumerable<string>? clientIds, AppMessage message)
     {
@@ -50,8 +49,6 @@ internal sealed class NoticeService : INoticeService
             }
         }
     }
-
-
 
     /// <inheritdoc/>
     public async Task NavigationMesage(IEnumerable<string>? clientIds, string uri, string message)

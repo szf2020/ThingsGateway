@@ -12,6 +12,5 @@ namespace ThingsGateway.SqlSugar
             var obj = context.Utilities.JsonToSqlFuncModels(value);
             sugarQueryable.Having(obj);
         }
-
     }
 }

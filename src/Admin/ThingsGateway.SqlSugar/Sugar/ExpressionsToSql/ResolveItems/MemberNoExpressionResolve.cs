@@ -57,5 +57,4 @@ namespace ThingsGateway.SqlSugar
             return value;
         }
     }
-
 }

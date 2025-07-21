@@ -15,8 +15,6 @@ namespace ThingsGateway.Foundation;
 /// </summary>
 public enum ErrorTypeEnum
 {
-
-
     /// <summary>
     /// 执行失败报错，默认失败类型
     /// </summary>

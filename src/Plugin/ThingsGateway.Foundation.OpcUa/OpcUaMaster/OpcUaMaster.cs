@@ -154,9 +154,7 @@ public class OpcUaMaster : IDisposable
             {
                 DefaultSessionTimeout = 60000,
                 MinSubscriptionLifetime = 10000,
-
             },
-
         };
 
         certificateValidator.Update(m_configuration);
@@ -310,7 +308,6 @@ public class OpcUaMaster : IDisposable
 
         if (_subscriptionDicts.TryAdd(subscriptionName, m_subscription))
         {
-
         }
         else if (_subscriptionDicts.TryGetValue(subscriptionName, out var existingSubscription))
         {
@@ -406,7 +403,6 @@ public class OpcUaMaster : IDisposable
         {
             m_session = null;
         }
-
     }
 
     /// <inheritdoc/>
@@ -732,7 +728,6 @@ public class OpcUaMaster : IDisposable
     /// <param name="subscriptionName">组名称</param>
     public async Task RemoveSubscriptionAsync(string subscriptionName)
     {
-
         if (_subscriptionDicts.TryGetValue(subscriptionName, out var subscription))
         {
             // remove
@@ -741,7 +736,6 @@ public class OpcUaMaster : IDisposable
             try { subscription.Dispose(); } catch { }
             _subscriptionDicts.TryRemove(subscriptionName, out _);
         }
-
     }
 
     /// <summary>
@@ -866,7 +860,6 @@ public class OpcUaMaster : IDisposable
         }
         try
         {
-
             await waitLock.WaitAsync(cancellationToken).ConfigureAwait(false);
             if (m_session != null)
             {
@@ -917,13 +910,10 @@ public class OpcUaMaster : IDisposable
 
             typeSystem = new ComplexTypeSystem(m_session);
 
-
             // raise an event.
             DoConnectComplete(true);
 
             Log(2, null, "Connected");
-
-
         }
         finally
         {
@@ -1014,7 +1004,6 @@ public class OpcUaMaster : IDisposable
         }
         NodeId nodeToRead = new(nodeIdStr);
 
-
         uint[] attributes = new uint[] { Attributes.NodeId, Attributes.DataType };
 
         // build list of values to read.
@@ -1063,7 +1052,6 @@ public class OpcUaMaster : IDisposable
 
         NodeId nodeToRead = new(nodeIdStr);
 
-
         uint[] attributes = new uint[] { Attributes.NodeId, Attributes.DataType };
 
         // build list of values to read.
@@ -1098,7 +1086,6 @@ public class OpcUaMaster : IDisposable
         return variableNode;
     }
 
-
     private List<VariableNode> GetVariableNodes(ReadValueIdCollection itemsToRead, DataValueCollection values, DiagnosticInfoCollection diagnosticInfos, ResponseHeader responseHeader, int count = 1)
     {
         ClientBase.ValidateResponse(values, itemsToRead);
@@ -1106,7 +1093,6 @@ public class OpcUaMaster : IDisposable
         List<VariableNode> variableNodes = new();
         for (int i = 0; i < count; i++)
         {
-
             VariableNode variableNode = new VariableNode();
             DataValue value = values[1 + 2 * i];
 
@@ -1158,7 +1144,6 @@ public class OpcUaMaster : IDisposable
             ReadValueIdCollection itemsToRead = new ReadValueIdCollection();
             foreach (var item in items)
             {
-
                 foreach (uint attributeId in attributes)
                 {
                     ReadValueId itemToRead = new ReadValueId
@@ -1385,7 +1370,6 @@ public class OpcUaMaster : IDisposable
                     e.CancelKeepAlive = true;
                 }
             }
-
 
             // raise any additional notifications.
             m_KeepAliveComplete?.Invoke(this, e);

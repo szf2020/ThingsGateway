@@ -64,5 +64,4 @@ public class RabbitMQProducerProperty : BusinessPropertyWithCacheIntervalScript
     /// </summary>
     [DynamicProperty]
     public string? ExchangeName { get; set; } = "";
-
 }

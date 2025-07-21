@@ -150,7 +150,6 @@ public class OssClient : IObjectStorage
         var infos = new List<ObjectInfo>();
         foreach (var item in list.Cast<IDictionary<String, Object>>())
         {
-
         }
 
         return infos;
@@ -190,7 +189,6 @@ public class OssClient : IObjectStorage
         var infos = new List<ObjectInfo>();
         foreach (var item in list.Cast<IDictionary<String, Object>>())
         {
-
         }
 
         return infos;

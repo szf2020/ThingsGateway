@@ -11,8 +11,6 @@
 
 #pragma warning disable CA2007 // 考虑对等待的任务调用 ConfigureAwait
 
-
-
 using BootstrapBlazor.Components;
 
 using Microsoft.AspNetCore.Authorization;
@@ -25,7 +23,6 @@ using ThingsGateway.Extension;
 using ThingsGateway.Gateway.Application;
 
 namespace ThingsGateway.Server;
-
 
 [Authorize]
 [IgnoreRolePermission]
@@ -91,4 +88,3 @@ public partial class GatewayIndex
         await base.OnParametersSetAsync();
     }
 }
-

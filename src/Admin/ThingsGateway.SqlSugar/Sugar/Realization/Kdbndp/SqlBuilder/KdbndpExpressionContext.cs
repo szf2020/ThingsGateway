@@ -558,6 +558,5 @@
         {
             return model?.Conext?.SugarContext?.Context?.CurrentConnectionConfig?.MoreSettings?.DatabaseModel == DbType.SqlServer;
         }
-
     }
 }

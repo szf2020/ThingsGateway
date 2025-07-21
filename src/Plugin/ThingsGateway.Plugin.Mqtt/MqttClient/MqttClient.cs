@@ -61,7 +61,6 @@ public partial class MqttClient : BusinessBaseWithCacheIntervalScriptAll
     {
         #region 初始化
 
-
 #if NET8_0_OR_GREATER
         var mqttFactory = new MqttClientFactory();
         var mqttClientOptionsBuilder = mqttFactory.CreateClientOptionsBuilder()
@@ -80,10 +79,7 @@ public partial class MqttClient : BusinessBaseWithCacheIntervalScriptAll
             mqttClientOptionsBuilder = mqttClientOptionsBuilder.WithTlsOptions(a => a
                     .WithTrustChain(new X509Certificate2Collection(caCert))
                     .WithClientCertificates(new X509Certificate2Collection(clientCert))
-                    .WithCertificateValidationHandler((a) =>
-                    {
-                        return true;
-                    })
+                    .WithCertificateValidationHandler((a) => true)
                     );
         }
 
@@ -111,38 +107,26 @@ public partial class MqttClient : BusinessBaseWithCacheIntervalScriptAll
             if (_driverPropertys.RpcWriteTopic == ThingsBoardRpcTopic)
             {
                 mqttClientSubscribeOptionsBuilder = mqttClientSubscribeOptionsBuilder.WithTopicFilter(
-     f =>
-     {
-         f.WithTopic(_driverPropertys.RpcWriteTopic);
-     });
+     f => f.WithTopic(_driverPropertys.RpcWriteTopic));
             }
             else
             {
                 if (!_driverPropertys.BigTextScriptRpc.IsNullOrEmpty())
                 {
                     mqttClientSubscribeOptionsBuilder = mqttClientSubscribeOptionsBuilder.WithTopicFilter(
-                          f =>
-                          {
-                              f.WithTopic(_driverPropertys.RpcWriteTopic);
-                          });
+                          f => f.WithTopic(_driverPropertys.RpcWriteTopic));
                 }
                 else
                 {
                     mqttClientSubscribeOptionsBuilder = mqttClientSubscribeOptionsBuilder.WithTopicFilter(
-                        f =>
-                        {
-                            f.WithTopic(string.Format(null, RpcTopic, _driverPropertys.RpcWriteTopic));
-                        });
+                        f => f.WithTopic(string.Format(null, RpcTopic, _driverPropertys.RpcWriteTopic)));
                 }
             }
         }
         if (!_driverPropertys.RpcQuestTopic.IsNullOrWhiteSpace())
         {
             mqttClientSubscribeOptionsBuilder = mqttClientSubscribeOptionsBuilder.WithTopicFilter(
-                f =>
-                {
-                    f.WithTopic(_driverPropertys.RpcQuestTopic);
-                });
+                f => f.WithTopic(_driverPropertys.RpcQuestTopic));
         }
         var mqttClientSubscribeOptions = mqttClientSubscribeOptionsBuilder.Build();
         if (mqttClientSubscribeOptions.TopicFilters.Count > 0)
@@ -211,8 +195,6 @@ public partial class MqttClient : BusinessBaseWithCacheIntervalScriptAll
             await UpdateThingsBoardDeviceConnect(item).ConfigureAwait(false);
         }
 
-
         await Update(cancellationToken).ConfigureAwait(false);
-
     }
 }

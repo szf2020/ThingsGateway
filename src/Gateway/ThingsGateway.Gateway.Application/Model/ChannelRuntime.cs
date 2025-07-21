@@ -114,7 +114,6 @@ public class ChannelRuntime : Channel, IChannelOptions, IDisposable
     [AutoGenerateColumn(Ignore = true)]
     public string LogPath => Name.GetChannelLogPath();
 
-
     public void Init()
     {
         // 通过插件名称获取插件信息
@@ -125,7 +124,6 @@ public class ChannelRuntime : Channel, IChannelOptions, IDisposable
 
         GlobalData.IdChannels.TryAdd(Id, this);
         GlobalData.Channels.TryAdd(Name, this);
-
     }
 
     public void Dispose()
@@ -146,15 +144,12 @@ public class ChannelRuntime : Channel, IChannelOptions, IDisposable
         return $"{Name}[{base.ToString()}]";
     }
 
-
     public IChannel GetChannel(TouchSocketConfig config)
     {
         lock (GlobalData.IdChannels)
         {
-
             if (DeviceThreadManage?.Channel?.DisposedValue == false)
                 return DeviceThreadManage?.Channel;
-
 
             if (ChannelType == ChannelTypeEnum.TcpService
                 || ChannelType == ChannelTypeEnum.SerialPort
@@ -196,7 +191,5 @@ public class ChannelRuntime : Channel, IChannelOptions, IDisposable
             var ichannel = config.GetChannel(this);
             return ichannel;
         }
-
     }
-
 }

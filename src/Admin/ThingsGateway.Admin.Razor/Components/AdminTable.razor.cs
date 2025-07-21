@@ -13,7 +13,6 @@ namespace ThingsGateway.Admin.Razor;
 [CascadingTypeParameter(nameof(TItem))]
 public partial class AdminTable<TItem> where TItem : class, new()
 {
-
     /// <inheritdoc cref="Table{TItem}.DoubleClickToEdit"/>
     [Parameter]
     public bool DoubleClickToEdit { get; set; } = false;
@@ -26,7 +25,6 @@ public partial class AdminTable<TItem> where TItem : class, new()
     /// <inheritdoc cref="Table{TItem}.OnClickRowCallback"/>
     [Parameter]
     public Func<TItem, Task>? OnClickRowCallback { get; set; }
-
 
     /// <inheritdoc cref="Table{TItem}.AllowDragColumn"/>
     [Parameter]
@@ -133,7 +131,6 @@ public partial class AdminTable<TItem> where TItem : class, new()
     /// <inheritdoc cref="Table{TItem}.CreateItemCallback"/>
     [Parameter]
     public Func<TItem> CreateItemCallback { get; set; }
-
 
     /// <inheritdoc cref="Table{TItem}.IsPagination"/>
     [Parameter]
@@ -337,7 +334,6 @@ public partial class AdminTable<TItem> where TItem : class, new()
     [Parameter]
     public bool ShowSearch { get; set; } = true;
 
-
     /// <inheritdoc cref="Table{TItem}.BeforeShowEditDialogCallback"/>
     [Parameter]
     public Action<ITableEditDialogOption<TItem>>? BeforeShowEditDialogCallback { get; set; }
@@ -426,5 +422,4 @@ public partial class AdminTable<TItem> where TItem : class, new()
         var url = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
         return AppContext.IsHasButtonWithRole(url, operate);
     }
-
 }

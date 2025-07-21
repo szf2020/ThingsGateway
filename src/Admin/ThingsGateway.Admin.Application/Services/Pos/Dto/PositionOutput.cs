@@ -10,7 +10,6 @@
 
 namespace ThingsGateway.Admin.Application;
 
-
 public class PositionTreeOutput
 {
     /// <summary>
@@ -33,7 +32,6 @@ public class PositionTreeOutput
     /// </summary>
     public List<PositionTreeOutput> Children { get; set; } = new List<PositionTreeOutput>();
 }
-
 
 public class PositionSelectorOutput
 {

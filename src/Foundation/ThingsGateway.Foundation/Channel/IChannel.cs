@@ -37,7 +37,6 @@ public interface IChannel : ISetupConfigObject, IDisposable, IClosableClient, IC
     /// </summary>
     public ConcurrentList<IDevice> Collects { get; }
 
-
     /// <summary>
     /// MaxSign
     /// </summary>
@@ -67,7 +66,6 @@ public interface IChannel : ISetupConfigObject, IDisposable, IClosableClient, IC
     /// 主动请求时的等待池
     /// </summary>
     public ConcurrentDictionary<long, Func<IClientChannel, ReceivedDataEventArgs, bool, Task>> ChannelReceivedWaitDict { get; }
-
 }
 
 /// <summary>

@@ -8,14 +8,11 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-
 #pragma warning disable CA2007 // 考虑对等待的任务调用 ConfigureAwait
 namespace ThingsGateway.Management;
 
 public partial class RedundancyOptionsHeader : IDisposable
 {
-
-
     [Inject]
     [NotNull]
     private IStringLocalizer<RedundancyOptions>? RedundancyLocalizer { get; set; }

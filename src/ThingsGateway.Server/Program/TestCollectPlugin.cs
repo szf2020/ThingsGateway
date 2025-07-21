@@ -28,7 +28,6 @@
 //    /// </summary>
 //    public override Type DriverVariableAddressUIType => base.DriverVariableAddressUIType;
 
-
 //    /// <summary>
 //    /// 插件配置项，继承<see cref="CollectPropertyBase"/> 返回类实例
 //    /// </summary>
@@ -59,12 +58,10 @@
 //        return Task.FromResult(new List<VariableSourceRead>());
 //    }
 
-
 //    /// <summary>
 //    /// 实现<see cref="IDevice"/>
 //    /// </summary>
 //    public override IDevice? FoundationDevice => base.FoundationDevice;
-
 
 //    /// <summary>
 //    /// 特殊方法，添加<see cref="DynamicMethodAttribute"/> 特性 ，返回IOperResult
@@ -93,9 +90,6 @@
 
 //}
 
-
-
-
 ///// <summary>
 ///// 插件类，完全自定义
 ///// </summary>
@@ -117,7 +111,6 @@
 //    /// 插件变量寄存器UI Type，继承<see cref="IAddressUIBase"/>如果不存在无需重写
 //    /// </summary>
 //    public override Type DriverVariableAddressUIType => base.DriverVariableAddressUIType;
-
 
 //    /// <summary>
 //    /// 插件配置项，继承<see cref="CollectPropertyBase"/> 返回类实例
@@ -148,7 +141,6 @@
 
 //        return Task.FromResult(new List<VariableSourceRead>());
 //    }
-
 
 //    /// <summary>
 //    /// 如果不实现ReadSourceAsync方法，可以返回flase
@@ -213,7 +205,6 @@
 //        base.PauseThread(pause);
 //    }
 
-
 //    /// <summary>
 //    /// 开始前执行
 //    /// </summary>
@@ -248,7 +239,6 @@
 //    {
 //        base.Dispose(disposing);
 //    }
-
 
 //    /// <summary>
 //    /// 特殊方法，添加<see cref="DynamicMethodAttribute"/> 特性 ，返回IOperResult

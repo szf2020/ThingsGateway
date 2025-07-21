@@ -336,7 +336,6 @@ namespace ThingsGateway.SqlSugar
                     string propertyName = assignment.Member.Name;
                     dict.Add(assignment.Member.Name, assignment.Expression);
                 }
-
             }
             return dict;
         }
@@ -412,7 +411,6 @@ namespace ThingsGateway.SqlSugar
             }
         }
 
-
         public static void GetOneToOneInfo<T>(SqlSugarProvider context, Expression<Func<T, object>> LeftObject, out MemberExpression memberExpression, out string navObjectName, out EntityColumnInfo navColumn, out EntityInfo navEntityInfo, out EntityColumnInfo navPkColumn)
         {
             memberExpression = ((LeftObject as LambdaExpression).Body as MemberExpression);
@@ -437,7 +435,6 @@ namespace ThingsGateway.SqlSugar
                 navPkColumn = navEntityInfo.Columns.Where(it => it.PropertyName == navObjectNameColumnInfo.Navigat.Name2).FirstOrDefault();
             }
         }
-
 
         public static List<ParameterExpression> ExpressionParameters(Expression expression)
         {
@@ -481,7 +478,6 @@ namespace ThingsGateway.SqlSugar
 
             return newExp;
         }
-
 
         public static string GetFirstTypeNameFromExpression(Expression expression)
         {
@@ -590,7 +586,6 @@ namespace ThingsGateway.SqlSugar
                 }
                 if (memberExpr.Expression == null)
                 {
-
                 }
                 expression = memberExpr.Expression;
             }
@@ -737,7 +732,6 @@ namespace ThingsGateway.SqlSugar
             return reval;
         }
 
-
         public static bool IsConstExpression(MemberExpression memberExpr)
         {
             var result = false;
@@ -874,7 +868,6 @@ namespace ThingsGateway.SqlSugar
                 }
                 else if (memberAssignment.Expression is MemberInitExpression || memberAssignment.Expression is NewExpression)
                 {
-
                     var dic = ExpressionTool.GetNewExpressionItemList(memberAssignment.Expression);
                     foreach (var kv in dic)
                     {
@@ -903,7 +896,6 @@ namespace ThingsGateway.SqlSugar
                     //additem.Value = "";
                     result.Add(additem);
                 }
-
             }
             return result;
         }
@@ -961,7 +953,6 @@ namespace ThingsGateway.SqlSugar
                 }
                 else if (binding is MemberInitExpression || binding is NewExpression)
                 {
-
                     var dic = ExpressionTool.GetNewExpressionItemList(binding);
                     foreach (var kv in dic)
                     {
@@ -1065,7 +1056,6 @@ namespace ThingsGateway.SqlSugar
             }
             return result;
         }
-
 
         public static bool IsNegate(Expression exp)
         {

@@ -41,7 +41,6 @@ namespace ThingsGateway.SqlSugar
             }
         }
 
-
         #endregion
 
         #region Fields       
@@ -607,7 +606,7 @@ namespace ThingsGateway.SqlSugar
                 var isNoPgAuto = this.Context.CurrentConnectionConfig.MoreSettings?.PgSqlIsAutoToLower == false;
                 if (isFirst)
                 {
-                    var firstItem = lambdaParameters.First();
+                    var firstItem = lambdaParameters[0];
                     lambdaParameters.Remove(firstItem);
                     shortName = firstItem.Name;
                     if (isNoPgAuto)
@@ -662,7 +661,7 @@ namespace ThingsGateway.SqlSugar
         {
             Dictionary<string, string> result = new Dictionary<string, string>();
             var lambdaParameters = ((LambdaExpression)joinExpression).Parameters.ToList();
-            shortName = lambdaParameters.First().Name;
+            shortName = lambdaParameters[0].Name;
             var isNoPgAuto = this.Context.CurrentConnectionConfig.MoreSettings?.PgSqlIsAutoToLower == false;
             var index = 1;
             foreach (var item in entityTypeArray)

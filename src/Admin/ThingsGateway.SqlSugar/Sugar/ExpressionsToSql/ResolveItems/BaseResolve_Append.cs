@@ -9,7 +9,6 @@ namespace ThingsGateway.SqlSugar
     {
         protected void AppendMember(ExpressionParameter parameter, bool? isLeft, object appendValue)
         {
-
             Context.ParameterIndex++;
             if (isLeft == true)
             {

@@ -1,7 +1,6 @@
 ﻿using System.Data;
 using System.Text.RegularExpressions;
 
-
 namespace ThingsGateway.SqlSugar
 {
     public class QueryMethodInfo
@@ -9,8 +8,6 @@ namespace ThingsGateway.SqlSugar
         public object QueryableObj { get; internal set; }
         public SqlSugarProvider Context { get; internal set; }
         public Type EntityType { get; set; }
-
-
 
         #region Sql API
 

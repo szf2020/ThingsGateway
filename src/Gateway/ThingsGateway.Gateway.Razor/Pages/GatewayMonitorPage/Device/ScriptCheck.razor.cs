@@ -25,7 +25,6 @@ public partial class ScriptCheck
         Script = script;
         if (ScriptChanged.HasDelegate)
             await ScriptChanged.InvokeAsync(script);
-
     }
 
     [Parameter]
@@ -35,19 +34,15 @@ public partial class ScriptCheck
     {
         try
         {
-
             if (GetResult != null)
             {
                 Output = await GetResult(Input, Script).ConfigureAwait(false);
             }
-
         }
-
         catch (Exception ex)
         {
             Output = ex.ToString();
         }
-
     }
     [Inject]
     private IStringLocalizer<DeviceEditComponent> Localizer { get; set; }

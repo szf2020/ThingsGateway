@@ -23,6 +23,4 @@ public class SysDictSeedData : ISqlSugarEntitySeedData<SysDict>
         var assembly = GetType().Assembly;
         return SeedDataUtil.GetSeedDataByJson<SysDict>(SeedDataUtil.GetManifestResourceStream(assembly, "SeedData.Admin.seed_sys_dict.json")).Concat(data);
     }
-
-
 }

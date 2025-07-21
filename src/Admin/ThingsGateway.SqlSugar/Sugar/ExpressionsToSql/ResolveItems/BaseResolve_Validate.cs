@@ -6,7 +6,6 @@ namespace ThingsGateway.SqlSugar
     /// </summary>
     public partial class BaseResolve
     {
-
         private static bool IsSubToList(Expression item)
         {
             return ExpressionTool.GetMethodName(item).IsIn("ToList", "First") && IsSubquery(item);

@@ -37,8 +37,6 @@ namespace ThingsGateway.Gateway.Application;
 public class ControlController : ControllerBase
 {
 
-
-
     /// <summary>
     /// 清空全部缓存
     /// </summary>
@@ -140,7 +138,6 @@ public class ControlController : ControllerBase
         }
 
         return (await GlobalData.RpcService.InvokeDeviceMethodAsync($"WebApi-{UserManager.UserAccount}-{App.HttpContext?.GetRemoteIpAddressToIPv4()}", deviceDatas).ConfigureAwait(false)).ToDictionary(a => a.Key, a => a.Value.ToDictionary(b => b.Key, b => (OperResult)b.Value));
-
     }
 
     /// <summary>
@@ -184,7 +181,6 @@ public class ControlController : ControllerBase
         return GlobalData.ChannelRuntimeService.DeleteChannelAsync(ids, restart, default);
     }
 
-
     /// <summary>
     /// 删除设备
     /// </summary>
@@ -207,7 +203,6 @@ public class ControlController : ControllerBase
         return GlobalData.VariableRuntimeService.DeleteVariableAsync(ids, restart, default);
     }
 
-
     /// <summary>
     /// 增加测试数据
     /// </summary>
@@ -217,7 +212,6 @@ public class ControlController : ControllerBase
     {
         return GlobalData.VariableRuntimeService.InsertTestDataAsync(testVariableCount, testDeviceCount, slaveUrl, businessEnable, restart, default);
     }
-
 
     /// <summary>
     /// 确认实时报警
@@ -349,9 +343,7 @@ public class ChannelInput
     #endregion
 
     public virtual DtuSeviceType DtuSeviceType { get; set; }
-
 }
-
 
 public class DeviceInput : IValidatableObject
 {
@@ -462,13 +454,10 @@ public class DeviceInput : IValidatableObject
             yield return new ValidationResult("When enable redundancy, you must select a redundant device.", new[] { nameof(RedundantEnable), nameof(RedundantDeviceId) });
         }
     }
-
 }
-
 
 public class VariableInput : IValidatableObject
 {
-
     public virtual long Id { get; set; }
 
     /// <summary>
@@ -788,6 +777,4 @@ public class VariableInput : IValidatableObject
             yield return new ValidationResult("HAlarmCode should be greater than or less than LLAlarmCode", new[] { nameof(HAlarmCode), nameof(LLAlarmCode) });
         }
     }
-
-
 }

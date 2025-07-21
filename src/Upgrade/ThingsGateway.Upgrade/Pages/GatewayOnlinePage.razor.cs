@@ -27,7 +27,6 @@ public partial class GatewayOnlinePage
         }
         catch (OperationCanceledException)
         {
-
         }
         catch (Exception ex)
         {
@@ -42,14 +41,12 @@ public partial class GatewayOnlinePage
         }
         catch (OperationCanceledException)
         {
-
         }
         catch (Exception ex)
         {
             await ToastService.Warn(ex);
         }
     }
-
 
     [Inject]
     private ToastService ToastService { get; set; }
@@ -88,6 +85,4 @@ public class TcpSessionClientDto
 
     [AutoGenerateColumn(Searchable = true, Filterable = true, Sortable = true)]
     public int Port { get; set; }
-
-
 }

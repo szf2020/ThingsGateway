@@ -17,7 +17,6 @@ namespace ThingsGateway.Admin.Application;
 /// </summary>
 public class JobPersistence : IJobPersistence
 {
-
     /// <summary>
     /// 作业调度服务启动时
     /// </summary>
@@ -61,7 +60,6 @@ public class JobPersistence : IJobPersistence
     public async Task OnTriggerChangedAsync(PersistenceTriggerContext context)
     {
         await Task.CompletedTask.ConfigureAwait(false);
-
     }
 
     /// <summary>

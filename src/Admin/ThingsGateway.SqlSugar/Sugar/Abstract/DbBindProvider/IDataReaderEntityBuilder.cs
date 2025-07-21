@@ -220,7 +220,6 @@ namespace ThingsGateway.SqlSugar
         /// </summary>
         private IDataReaderEntityBuilder()
         {
-
         }
 
         /// <summary>
@@ -362,7 +361,6 @@ namespace ThingsGateway.SqlSugar
         /// <param name="fieldName">字段名</param>
         private void BindClass(ILGenerator generator, LocalBuilder result, EntityColumnInfo columnInfo, string fieldName)
         {
-
             if (columnInfo.SqlParameterDbType is Type)
             {
                 BindCustomFunc(generator, result, columnInfo, fieldName);
@@ -683,14 +681,12 @@ namespace ThingsGateway.SqlSugar
             if (method == null)
                 method = isNullableType ? getOtherNull.MakeGenericMethod(bindPropertyType) : getOther.MakeGenericMethod(bindPropertyType);
 
-
             if (method.IsVirtual)
                 generator.Emit(OpCodes.Callvirt, method);
             else
                 generator.Emit(OpCodes.Call, method);
             #endregion
         }
-
 
         /// <summary>
         /// 检查类型

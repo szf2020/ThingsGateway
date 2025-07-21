@@ -46,7 +46,6 @@ namespace ThingsGateway.SqlSugar
             // 提取 FormattableString 中的参数值
             var arguments = whereSql.GetArguments();
 
-
             var sql = ReplaceFormatParameters(whereSql.Format);
 
             sql = CompatibleDynamicLinqCoreBug(sql);
@@ -82,7 +81,6 @@ namespace ThingsGateway.SqlSugar
             // 提取 FormattableString 中的参数值
             var arguments = whereSql.GetArguments();
 
-
             var sql = ReplaceFormatParameters(whereSql.Format);
 
             // 构建动态表达式，使用常量表达式和 whereSql 中的参数值
@@ -101,7 +99,6 @@ namespace ThingsGateway.SqlSugar
 
             // 提取 FormattableString 中的参数值
             var arguments = whereSql.GetArguments();
-
 
             var sql = ReplaceFormatParameters(whereSql.Format);
 
@@ -124,7 +121,6 @@ namespace ThingsGateway.SqlSugar
             // 提取 FormattableString 中的参数值
             var arguments = memberSql.GetArguments();
 
-
             var sql = ReplaceFormatParameters(memberSql.Format);
 
             // 构建动态表达式，使用常量表达式和 whereSql 中的参数值
@@ -143,7 +139,6 @@ namespace ThingsGateway.SqlSugar
 
             // 提取 FormattableString 中的参数值
             var arguments = memberSql.GetArguments();
-
 
             var sql = ReplaceFormatParameters(memberSql.Format);
 

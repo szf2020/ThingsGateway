@@ -20,7 +20,6 @@ namespace ThingsGateway.Gateway.Application;
 
 internal sealed class RulesService : BaseService<Rules>, IRulesService
 {
-
     private IRulesEngineHostedService _rulesEngineHostedService;
     private IRulesEngineHostedService RulesEngineHostedService
     {
@@ -48,7 +47,6 @@ internal sealed class RulesService : BaseService<Rules>, IRulesService
 
         DeleteRulesFromCache();
         await RulesEngineHostedService.Delete(data).ConfigureAwait(false);
-
     }
 
     [OperDesc("DeleteRules", localizerType: typeof(Rules))]
@@ -65,7 +63,6 @@ internal sealed class RulesService : BaseService<Rules>, IRulesService
         DeleteRulesFromCache();
         await RulesEngineHostedService.Delete(ids).ConfigureAwait(false);
         return true;
-
     }
     private const string cacheKey = "ThingsGateway:Cache_RulesEngines:List";
     /// <inheritdoc />
@@ -113,7 +110,6 @@ internal sealed class RulesService : BaseService<Rules>, IRulesService
     [OperDesc("SaveRules", localizerType: typeof(Rules))]
     public async Task<bool> SaveRulesAsync(Rules input, ItemChangedType type)
     {
-
         //验证
         CheckInput(input);
         if (type == ItemChangedType.Update)
@@ -130,8 +126,5 @@ internal sealed class RulesService : BaseService<Rules>, IRulesService
 
     private static void CheckInput(Rules input)
     {
-
     }
-
 }
-

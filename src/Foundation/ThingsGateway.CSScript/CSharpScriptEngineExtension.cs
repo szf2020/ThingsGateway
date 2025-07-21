@@ -44,7 +44,6 @@ public static class CSharpScriptEngineExtension
                 }
                 catch
                 {
-
                 }
             }
 
@@ -91,7 +90,6 @@ public static class CSharpScriptEngineExtension
                 runScript = Instance.Get<T>(field);
                 if (runScript == null)
                 {
-
                     var src = source.Split(Environment.NewLine.ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
                     var _using = new StringBuilder();
                     var _body = new StringBuilder();
@@ -105,16 +103,19 @@ public static class CSharpScriptEngineExtension
                         {
                             _body.AppendLine(l);
                         }
-
                     });
                     var evaluator = CSScript.Evaluator;
                     foreach (var item in assemblies)
                     {
                         evaluator = evaluator.ReferenceAssembly(item.Location);
                     }
-                    // 动态加载并执行代码
-                    runScript = evaluator.With(eval => eval.IsAssemblyUnloadingEnabled = true).LoadCode<T>(
-                       $@"
+                    try
+                    {
+
+
+                        // 动态加载并执行代码
+                        runScript = evaluator.With(eval => eval.IsAssemblyUnloadingEnabled = true).LoadCode<T>(
+                           $@"
         using System;
         using System.Linq;
         using System.Threading.Tasks;
@@ -130,10 +131,17 @@ public static class CSharpScriptEngineExtension
         {_using}
         {_body}
     ");
-                    Instance.Set(field, runScript);
+
+                        Instance.Set(field, runScript);
+
+                    }
+                    catch (NullReferenceException)
+                    {
+                        string exString = string.Format(CSScriptResource.CSScriptResource.Error1, typeof(T).FullName);
+                        throw new(exString);
+                    }
                 }
             }
-
         }
         Instance.SetExpire(field, TimeSpan.FromHours(1));
 
@@ -145,7 +153,4 @@ public static class CSharpScriptEngineExtension
         var field = $"{CacheKey}-{source}";
         Instance.SetExpire(field, timeSpan ?? TimeSpan.FromHours(1));
     }
-
 }
-
-

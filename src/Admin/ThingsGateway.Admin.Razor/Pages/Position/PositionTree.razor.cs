@@ -66,10 +66,7 @@ public partial class PositionTree : IDisposable
         try
         {
             ExecutionContext.Restore(context);
-            await InvokeAsync(async () =>
-            {
-                await OnClickSearch(SearchText);
-            });
+            await InvokeAsync(async () => await OnClickSearch(SearchText));
         }
         finally
         {
@@ -91,7 +88,6 @@ public partial class PositionTree : IDisposable
         var items = (await SysPositionService.TreeAsync());
         items = items.WhereIF(!searchText.IsNullOrEmpty(), a => a.Name.Contains(searchText)).ToList();
         return ZItem.Concat(PositionUtil.BuildTreeItemList(items, new List<long> { Value })).ToList();
-
     }
 
     public void Dispose()

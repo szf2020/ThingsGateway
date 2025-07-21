@@ -80,7 +80,6 @@ public sealed class IncrementCount
         lock (this)
         {
             _current = value <= _max ? value >= _start ? value : _start : _max;
-
         }
     }
 
@@ -122,6 +121,4 @@ public sealed class IncrementCount
             }
         }
     }
-
-
 }

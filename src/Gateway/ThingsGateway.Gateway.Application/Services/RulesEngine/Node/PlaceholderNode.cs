@@ -4,7 +4,6 @@ namespace ThingsGateway.Gateway.Application;
 
 public abstract class PlaceholderNode : BaseNode
 {
-
     protected PlaceholderNode(string id, Point? position = null) : base(id, position)
     {
     }

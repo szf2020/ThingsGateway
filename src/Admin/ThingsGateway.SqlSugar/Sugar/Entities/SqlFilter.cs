@@ -20,7 +20,6 @@ namespace ThingsGateway.SqlSugar
     {
         private TableFilterItem()
         {
-
         }
         private Expression exp { get; set; }
         public TableFilterItem(Expression<Func<T, bool>> expression, bool isJoinOn = false)
@@ -43,7 +42,6 @@ namespace ThingsGateway.SqlSugar
         private new Func<ISqlSugarClient, SqlFilterResult> FilterValue { get; set; }
         private new bool IsJoinQuery { get; set; }
     }
-
 
     public class SqlFilterResult
     {

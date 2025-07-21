@@ -31,7 +31,6 @@ public static class Reflect
         return Provider.GetType(typeName, false);
     }
 
-
     /// <summary>获取方法</summary>
     /// <remarks>用于具有多个签名的同名方法的场合，不确定是否存在性能问题，不建议普通场合使用</remarks>
     /// <param name="type">类型</param>
@@ -520,7 +519,6 @@ public static class Reflect
     /// <param name="baseType">基类或接口</param>
     /// <returns></returns>
     public static IEnumerable<Type> GetAllSubclasses(this Type baseType) => Provider.GetAllSubclasses(baseType);
-
 
     #endregion
 

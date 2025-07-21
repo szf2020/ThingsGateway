@@ -35,7 +35,6 @@ public abstract class DynamicMqttClientRpcBase
     /// <returns></returns>
     public virtual async Task RPCInvokeAsync(TouchSocket.Core.ILog logMessage, MqttApplicationMessageReceivedEventArgs args, MqttClientProperty driverPropertys, MQTTnet.IMqttClient mqttClient, Func<string, Dictionary<string, Dictionary<string, JToken>>, ValueTask<Dictionary<string, Dictionary<string, IOperResult>>>> getRpcResult, Func<CancellationToken, ValueTask<OperResult>> tryMqttClientAsync, CancellationToken cancellationToken)
     {
-
         if (driverPropertys.RpcWriteTopic.IsNullOrWhiteSpace()) return;
         var t = string.Format(null, "{0}/+", driverPropertys.RpcWriteTopic);
         if (MqttTopicFilterComparer.Compare(args.ApplicationMessage.Topic, t) != MqttTopicFilterCompareResult.IsMatch)
@@ -51,13 +50,10 @@ public abstract class DynamicMqttClientRpcBase
             var isConnect = await tryMqttClientAsync(CancellationToken.None).ConfigureAwait(false);
             if (isConnect.IsSuccess)
             {
-
                 var variableMessage = new MqttApplicationMessageBuilder()
 .WithTopic($"{args.ApplicationMessage.Topic}/Response")
 .WithPayload(mqttRpcResult.ToSystemTextJsonString(driverPropertys.JsonFormattingIndented)).Build();
                 await mqttClient.PublishAsync(variableMessage, cancellationToken).ConfigureAwait(false);
-
-
             }
         }
         catch

@@ -25,7 +25,6 @@ public class ModbusRtuSlaveMessage : MessageBase, IResultMessage
 
     public ModbusRequest Request { get; set; } = new();
 
-
     /// <inheritdoc/>
     public override bool CheckHead<TByteBlock>(ref TByteBlock byteBlock)
     {
@@ -102,6 +101,4 @@ public class ModbusRtuSlaveMessage : MessageBase, IResultMessage
 
         return FilterResult.GoOn;
     }
-
-
 }

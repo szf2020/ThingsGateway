@@ -421,8 +421,6 @@ namespace ThingsGateway.SqlSugar
             return this;
         }
 
-
-
         public IUpdateable<T> IgnoreColumns(bool ignoreAllNullColumns, bool isOffIdentity = false, bool ignoreAllDefaultValue = false)
         {
             //Check.Exception(this.UpdateObjs.Count() > 1 && ignoreAllNullColumns, ErrorMessage.GetThrowMessage("ignoreNullColumn NoSupport batch insert", "ignoreNullColumn 不支持批量操作"));
@@ -470,7 +468,6 @@ namespace ThingsGateway.SqlSugar
             }
             return this;
         }
-
 
         public IUpdateable<T> ReSetValue(Action<T> setValueExpression)
         {
@@ -593,7 +590,6 @@ namespace ThingsGateway.SqlSugar
         }
         public IUpdateable<T> WhereColumns(string columnName)
         {
-
             ThrowUpdateByExpression();
             if (this.WhereColumnList == null) this.WhereColumnList = new List<string>();
             _WhereColumn(columnName);
@@ -844,7 +840,6 @@ namespace ThingsGateway.SqlSugar
             return this;
         }
 
-
         public virtual IUpdateable<T> SetColumns(Expression<Func<T, T>> columns, bool appendColumnsByDataFilter)
         {
             ThrowUpdateByObject();
@@ -1014,7 +1009,7 @@ namespace ThingsGateway.SqlSugar
                     var tableName = this.SqlBuilder.GetTranslationColumnName(entityTableName);
                     whereString = whereString.Replace(tableName, $"( SELECT * FROM {tableName})  ");
                 }
-                whereString = whereString.Replace(this.SqlBuilder.GetTranslationColumnName(expression.Parameters.First().Name) + ".", this.SqlBuilder.GetTranslationTableName(entityTableName) + ".");
+                whereString = whereString.Replace(this.SqlBuilder.GetTranslationColumnName(expression.Parameters[0].Name) + ".", this.SqlBuilder.GetTranslationTableName(entityTableName) + ".");
             }
             else if (expResult.IsNavicate)
             {
@@ -1023,8 +1018,8 @@ namespace ThingsGateway.SqlSugar
                 {
                     entityTableName2 = this.UpdateBuilder.TableName;
                 }
-                whereString = whereString.Replace(expression.Parameters.First().Name + ".", this.SqlBuilder.GetTranslationTableName(entityTableName2) + ".");
-                whereString = whereString.Replace(this.SqlBuilder.GetTranslationColumnName(expression.Parameters.First().Name) + ".", this.SqlBuilder.GetTranslationTableName(entityTableName2) + ".");
+                whereString = whereString.Replace(expression.Parameters[0].Name + ".", this.SqlBuilder.GetTranslationTableName(entityTableName2) + ".");
+                whereString = whereString.Replace(this.SqlBuilder.GetTranslationColumnName(expression.Parameters[0].Name) + ".", this.SqlBuilder.GetTranslationTableName(entityTableName2) + ".");
             }
             UpdateBuilder.WhereValues.Add(whereString);
             return this;

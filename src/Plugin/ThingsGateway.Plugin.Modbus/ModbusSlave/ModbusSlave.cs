@@ -118,16 +118,12 @@ public class ModbusSlave : BusinessBase
 
         GlobalData.VariableValueChangeEvent -= VariableValueChange;
         GlobalData.VariableValueChangeEvent += VariableValueChange;
-
     }
     public override async Task AfterVariablesChangedAsync(CancellationToken cancellationToken)
     {
         await base.AfterVariablesChangedAsync(cancellationToken).ConfigureAwait(false);
         ModbusVariableQueue?.Clear();
-        IdVariableRuntimes.ForEach(a =>
-        {
-            VariableValueChange(a.Value, default);
-        });
+        IdVariableRuntimes.ForEach(a => VariableValueChange(a.Value, default));
 
         ModbusVariables = IdVariableRuntimes.ToDictionary(a =>
         {
@@ -138,7 +134,6 @@ public class ModbusSlave : BusinessBase
         },
         a => a.Value
         );
-
     }
     /// <inheritdoc/>
     protected override void Dispose(bool disposing)
@@ -149,7 +144,6 @@ public class ModbusSlave : BusinessBase
         _plc?.SafeDispose();
         base.Dispose(disposing);
     }
-
 
     protected override async Task ProtectedExecuteAsync(object? state, CancellationToken cancellationToken)
     {
@@ -190,7 +184,6 @@ public class ModbusSlave : BusinessBase
                 await _plc.WriteAsync(item.Key, JToken.FromObject(variableRuntime.Value), variableRuntime.DataType, cancellationToken).ConfigureAwait(false);
             }
         }
-
     }
 
     /// <summary>
@@ -207,7 +200,6 @@ public class ModbusSlave : BusinessBase
 
             foreach (var item in tag)
             {
-
                 var type = item.Value.GetPropertyValue(DeviceId, nameof(ModbusSlaveVariableProperty.DataType));
                 var dType = Enum.TryParse(type, out DataTypeEnum dataType) ? dataType : item.Value.DataType;
                 var addressStr = item.Value.GetPropertyValue(DeviceId, nameof(ModbusSlaveVariableProperty.ServiceAddress));
@@ -226,7 +218,6 @@ public class ModbusSlave : BusinessBase
 
                     if (!result.IsSuccess)
                         return result;
-
                 }
                 else
                 {
@@ -267,13 +258,8 @@ public class ModbusSlave : BusinessBase
             base.PauseThread(pause);
             if (!pause && oldV != pause)
             {
-                IdVariableRuntimes.ForEach(a =>
-                {
-                    VariableValueChange(a.Value, null);
-                });
+                IdVariableRuntimes.ForEach(a => VariableValueChange(a.Value, null));
             }
         }
     }
-
-
 }

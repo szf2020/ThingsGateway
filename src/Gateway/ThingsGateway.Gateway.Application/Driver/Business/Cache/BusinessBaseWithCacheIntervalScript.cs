@@ -85,7 +85,6 @@ public abstract partial class BusinessBaseWithCacheIntervalScript : BusinessBase
                     // 上传内容
                     if (_businessPropertyWithCacheIntervalScript.IsAlarmList)
                     {
-
                         // 如果是报警列表，则将整个分组转换为 JSON 字符串
                         var gList = group.Select(a => a).ToList();
                         string json = gList.ToSystemTextJsonString(_businessPropertyWithCacheIntervalScript.JsonFormattingIndented);
@@ -122,9 +121,7 @@ public abstract partial class BusinessBaseWithCacheIntervalScript : BusinessBase
                 }
             }
         }
-
     }
-
 
     protected IEnumerable<TopicJson> GetDeviceData(IEnumerable<DeviceBasicData> item)
     {
@@ -293,7 +290,6 @@ public abstract partial class BusinessBaseWithCacheIntervalScript : BusinessBase
                         // 上传内容
                         if (_businessPropertyWithCacheIntervalScript.IsVariableList)
                         {
-
                             // 如果是变量列表，则将整个分组转换为 JSON 字符串
                             string json = group.Select(a => a).GroupBy(a => a.DeviceName, b => b).ToDictionary(a => a.Key, b => b.ToList()).ToSystemTextJsonString(_businessPropertyWithCacheIntervalScript.JsonFormattingIndented);
                             // 将主题和 JSON 内容添加到列表中
@@ -391,7 +387,6 @@ public abstract partial class BusinessBaseWithCacheIntervalScript : BusinessBase
                 }
             }
         }
-
     }
 
     protected IEnumerable<TopicArray> GetDeviceTopicArray(IEnumerable<DeviceBasicData> item)
@@ -601,7 +596,6 @@ public abstract partial class BusinessBaseWithCacheIntervalScript : BusinessBase
         }
     }
 
-
     protected string GetDetailLogString(TopicArray topicArray, int queueCount)
     {
         if (queueCount > 0)
@@ -616,7 +610,6 @@ public abstract partial class BusinessBaseWithCacheIntervalScript : BusinessBase
             return $"Up Topic：{topicArray.Topic}{Environment.NewLine}Count：{topicArray.Count} {Environment.NewLine} VarModelQueue:{queueCount}";
         else
             return $"Up Topic：{topicArray.Topic}{Environment.NewLine}Count：{topicArray.Count}";
-
     }
     [GeneratedRegex(@"\$\{(.+?)\}")]
     private static partial Regex TopicRegex();

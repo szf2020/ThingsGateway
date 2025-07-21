@@ -46,7 +46,6 @@ public class Startup : AppStartup
             options.ServicesStopConcurrently = true;
         });
 
-
         //// 事件总线
         //services.AddEventBus(options =>
         //{
@@ -54,11 +53,7 @@ public class Startup : AppStartup
         //});
 
         // 任务调度
-        services.AddSchedule(options =>
-        {
-            options.AddPersistence<JobPersistence>();
-        });
-
+        services.AddSchedule(options => options.AddPersistence<JobPersistence>());
 
         // 允许跨域
         services.AddCorsAccessor();
@@ -83,7 +78,6 @@ public class Startup : AppStartup
             // setting.Converters.Add(new IsoDateTimeConverter { DateTimeStyles = DateTimeStyles.AssumeUniversal }); // 解决DateTimeOffset异常
         }
 
-
         services.AddMvcFilter<RequestAuditFilter>();
 
         services.AddControllers()
@@ -92,13 +86,9 @@ public class Startup : AppStartup
             //.AddXmlDataContractSerializerFormatters()
             .AddInjectWithUnifyResult<UnifyResultProvider>();
 
-
 #if NET8_0_OR_GREATER
         services
-         .AddRazorComponents(options =>
-     {
-         options.TemporaryRedirectionUrlValidityDuration = TimeSpan.FromMinutes(10);
-     })
+         .AddRazorComponents(options => options.TemporaryRedirectionUrlValidityDuration = TimeSpan.FromMinutes(10))
          .AddInteractiveServerComponents(options =>
          {
              options.RootComponents.MaxJSRootComponents = 500;
@@ -148,12 +138,6 @@ public class Startup : AppStartup
             options.KnownProxies.Clear();
         });
 
-
-
-
-
-
-
         //已添加AddOptions
         // 增加多语言支持配置信息
         services.AddRequestLocalization<IOptionsMonitor<BootstrapBlazor.Components.BootstrapBlazorOptions>>((localizerOption, blazorOption) =>
@@ -198,7 +182,6 @@ public class Startup : AppStartup
             var data = App.GetConfig<GiteeOAuthSettings>("GiteeOAuthSettings");
             options.ClientId = data.ClientId;
             options.ClientSecret = data.ClientSecret;
-
         });
 
             authenticationBuilder.AddOAuth<GitHubOAuthOptions, AdminOAuthHandler<GitHubOAuthOptions>>("Github", "Github", options =>
@@ -206,7 +189,6 @@ public class Startup : AppStartup
                 var data = App.GetConfig<GithubOAuthSettings>("GithubOAuthSettings");
                 options.ClientId = data.ClientId;
                 options.ClientSecret = data.ClientSecret;
-
             });
         }
 
@@ -220,7 +202,6 @@ public class Startup : AppStartup
         services.AddAuthorizationCore();
         services.AddScoped<IAuthorizationHandler, BlazorServerAuthenticationHandler>();
         services.AddScoped<AuthenticationStateProvider, BlazorServerAuthenticationStateProvider>();
-
 
 #if NET9_0_OR_GREATER
         var certificate = X509CertificateLoader.LoadPkcs12FromFile("ThingsGateway.pfx", "ThingsGateway", X509KeyStorageFlags.EphemeralKeySet);
@@ -237,15 +218,12 @@ public class Startup : AppStartup
             });
     }
 
-
-
     public void Use(IApplicationBuilder applicationBuilder, IWebHostEnvironment env)
     {
         var app = (WebApplication)applicationBuilder;
         app.UseForwardedHeaders(new ForwardedHeadersOptions { ForwardedHeaders = ForwardedHeaders.All, KnownNetworks = { }, KnownProxies = { } });
 
         app.UseBootstrapBlazor();
-
 
         // 启用本地化
         var option = app.Services.GetService<IOptions<RequestLocalizationOptions>>();
@@ -275,7 +253,6 @@ public class Startup : AppStartup
             app.UseStaticFiles(new StaticFileOptions { OnPrepareResponse = ctx => ctx.ProcessCache(app.Configuration) });
         }
 
-
         app.UseStaticFiles(new StaticFileOptions
         {
             OnPrepareResponse = (stf) =>
@@ -304,7 +281,6 @@ public class Startup : AppStartup
 
         //// 启用HTTPS
         //app.UseHttpsRedirection();
-
 
         // 添加状态码拦截中间件
         app.UseUnifyResultStatusCodes();
@@ -355,8 +331,5 @@ public class Startup : AppStartup
 
         app.MapControllers();
         app.MapHubs();
-
     }
-
-
 }

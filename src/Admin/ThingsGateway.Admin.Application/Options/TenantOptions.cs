@@ -12,12 +12,10 @@ using ThingsGateway.ConfigurableOptions;
 
 namespace ThingsGateway.Admin.Application;
 
-
 public sealed class TenantOptions : IConfigurableOptions
 {
     /// <summary>
     /// 启用
     /// </summary>
     public bool Enable { get; set; }
-
 }

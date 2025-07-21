@@ -8,7 +8,7 @@ namespace ThingsGateway.SqlSugar
         SqlSugarProvider Context { get; set; }
         internal ISqlBuilder Builder;
         List<SugarParameter> Parameters;
-        List<StorageableInfo<T>> allDatas = new List<StorageableInfo<T>>();
+        IEnumerable<StorageableInfo<T>> allDatas;
         List<T> dbDataList = new List<T>();
         List<KeyValuePair<StorageType, Func<StorageableInfo<T>, bool>, string>> whereFuncs = new List<KeyValuePair<StorageType, Func<StorageableInfo<T>, bool>, string>>();
         Expression<Func<T, object>> whereExpression;
@@ -16,7 +16,7 @@ namespace ThingsGateway.SqlSugar
         DbLockType? lockType;
         private string asname { get; set; }
         private bool isDisableFilters = false;
-        public Storageable(IReadOnlyList<T> datas, SqlSugarProvider context)
+        public Storageable(IEnumerable<T> datas, SqlSugarProvider context)
         {
             this.Context = context;
             if (datas == null)
@@ -24,7 +24,7 @@ namespace ThingsGateway.SqlSugar
             this.allDatas = datas.Select(it => new StorageableInfo<T>()
             {
                 Item = it
-            }).ToList();
+            });
         }
 
         Expression<Func<T, bool>> queryableWhereExp;
@@ -132,7 +132,6 @@ namespace ThingsGateway.SqlSugar
                 var defaultValue = UtilMethods.GetDefaultValue(column.PropertyInfo.PropertyType);
                 var result = itemPkValue != null && itemPkValue.ObjToString() != defaultValue.ObjToString();
                 return result;
-
             }).SplitInsert(it => true);
         }
 
@@ -210,7 +209,7 @@ namespace ThingsGateway.SqlSugar
             {
                 return this.Saveable().ToStorage();
             }
-            if (this.allDatas.Count == 0)
+            if (!this.allDatas.Any())
                 return new StorageableResult<T>()
                 {
                     AsDeleteable = this.Context.Deleteable<T>().AS(asname).Where(it => false),
@@ -299,7 +298,7 @@ namespace ThingsGateway.SqlSugar
             {
                 return this.Saveable().GetStorageableResult();
             }
-            if (this.allDatas.Count == 0)
+            if (!this.allDatas.Any())
                 return new StorageableResult<T>()
                 {
                     //AsDeleteable = this.Context.Deleteable<T>().AS(asname).Where(it => false),
@@ -381,7 +380,7 @@ namespace ThingsGateway.SqlSugar
             {
                 return await Saveable().ToStorageAsync().ConfigureAwait(false);
             }
-            if (this.allDatas.Count == 0)
+            if (!this.allDatas.Any())
                 return new StorageableResult<T>()
                 {
                     AsDeleteable = this.Context.Deleteable<T>().AS(asname).Where(it => false),
@@ -457,7 +456,6 @@ namespace ThingsGateway.SqlSugar
             return result;
         }
 
-
         private string[] GetPkProperties(IEnumerable<EntityColumnInfo> pkInfos)
         {
             if (whereExpression == null)
@@ -477,7 +475,6 @@ namespace ThingsGateway.SqlSugar
         }
         public IStorageable<T> WhereColumns(Expression<Func<T, object>> columns)
         {
-
             if (columns == null)
                 return this;
             else if (asname == null && typeof(T).GetCustomAttribute<SplitTableAttribute>() != null)
@@ -523,7 +520,6 @@ namespace ThingsGateway.SqlSugar
             }
         }
 
-
         public IStorageable<T> WhereColumns(string[] columns)
         {
             var list = columns.Select(it => this.Context.EntityMaintenance.GetPropertyName<T>(it)).ToList();
@@ -537,7 +533,6 @@ namespace ThingsGateway.SqlSugar
         }
         private void SetConditList(List<StorageableInfo<T>> itemList, List<EntityColumnInfo> whereColumns, List<IConditionalModel> conditList)
         {
-
             foreach (var dataItem in itemList)
             {
                 var condition = new ConditionalCollections()

@@ -44,10 +44,7 @@ public static class AuthorizationServiceCollectionExtensions
         //启用全局授权
         if (enableGlobalAuthorize)
         {
-            services.Configure<MvcOptions>(options =>
-            {
-                options.Filters.Add(new AuthorizeFilter());
-            });
+            services.Configure<MvcOptions>(options => options.Filters.Add(new AuthorizeFilter()));
         }
 
         configure?.Invoke(services);

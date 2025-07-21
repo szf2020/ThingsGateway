@@ -18,7 +18,6 @@ public sealed class RolePermissionAttribute : Attribute
 {
 }
 
-
 /// <summary>
 /// 忽略角色授权权限
 /// </summary>

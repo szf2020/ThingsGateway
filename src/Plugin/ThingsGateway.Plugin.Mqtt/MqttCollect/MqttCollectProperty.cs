@@ -76,5 +76,4 @@ public class MqttCollectProperty : CollectPropertyBase
 
     [DynamicProperty]
     public int CheckClearTime { get; set; } = 60000;
-
 }

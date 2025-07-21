@@ -47,7 +47,6 @@ public class TextFileLogger : ThingsGateway.NewLife.Log.TextFileLog, TouchSocket
         }
     }
 
-
     private static readonly MemoryCache cache = new MemoryCache();
 
     /// <summary>
@@ -61,7 +60,6 @@ public class TextFileLogger : ThingsGateway.NewLife.Log.TextFileLog, TouchSocket
         _headEnable = false;
         CacheKey = (path + fileFormat).ToLower();
     }
-
 
     /// <summary>每个目录的日志实例应该只有一个，所以采用静态创建</summary>
     /// <param name="path">日志目录或日志文件路径</param>

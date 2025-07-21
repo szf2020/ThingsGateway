@@ -86,7 +86,6 @@ public static class CodeFirstUtils
     /// <param name="assemblyName">程序集名称</param>
     private static void InitTable(string assemblyName)
     {
-
         // 获取所有实体表-初始化表结构
         var entityTypes = App.EffectiveTypes.Where(u =>
             !u.IsInterface && !u.IsAbstract && u.IsClass && u.IsDefined(typeof(SugarTable), false) && u.Assembly.FullName == assemblyName);

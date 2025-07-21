@@ -105,9 +105,7 @@ public class ThingsGatewayNodeManager : CustomNodeManager2
             }
             AddPredefinedNode(SystemContext, rootFolder);
             rootFolder.ClearChangeMasks(SystemContext, true);
-
         }
-
     }
 
     /// <summary>
@@ -118,7 +116,6 @@ public class ThingsGatewayNodeManager : CustomNodeManager2
     {
         lock (Lock)
         {
-
             dbDrivers = new(GlobalData.GetEnableDevices().Where(a => a.Driver is IDBHistoryValueService).Select(a => a.Driver));
             if (!externalReferences.TryGetValue(ObjectIds.ObjectsFolder, out IList<IReference> references))
             {
@@ -131,7 +128,6 @@ public class ThingsGatewayNodeManager : CustomNodeManager2
 
             RefreshVariable();
         }
-
     }
 
     /// <summary>
@@ -156,7 +152,6 @@ public class ThingsGatewayNodeManager : CustomNodeManager2
         var startTime = readDetail.StartTime;
         var endTime = readDetail.EndTime;
 
-
         for (int i = 0; i < nodesToRead.Count; i++)
         {
             var historyRead = nodesToRead[i];
@@ -170,7 +165,6 @@ public class ThingsGatewayNodeManager : CustomNodeManager2
                     };
                     continue;
                 }
-
 
                 var service = dbDrivers.FirstOrDefault(a => GlobalData.ContainsVariable(a.DeviceId, variableRuntime));
                 if (service == null)
@@ -189,7 +183,6 @@ public class ThingsGatewayNodeManager : CustomNodeManager2
                     StartTime = startTime,
                     VariableName = tag.SymbolicName
                 }).ConfigureAwait(false).GetAwaiter().GetResult();
-
 
                 if (data.Count > 0)
                 {
@@ -221,7 +214,6 @@ public class ThingsGatewayNodeManager : CustomNodeManager2
                 };
             }
         }
-
     }
 
     /// <summary>
@@ -352,7 +344,6 @@ public class ThingsGatewayNodeManager : CustomNodeManager2
             tag.DataType = DataNodeType(tp);
             tag.ClearChangeMasks(SystemContext, false);
         }
-
     }
 
     /// <summary>
@@ -475,7 +466,6 @@ public class ThingsGatewayNodeManager : CustomNodeManager2
             //    };
             //    AddProperty(folder, property);
             //}
-
 
             parent?.AddChild(folder);
 
@@ -623,7 +613,6 @@ public class ThingsGatewayNodeManager : CustomNodeManager2
         return variable;
     }
 
-
     public void AddProperty(BaseInstanceState parent, BaseInstanceState property)
     {
         parent.AddReference(ReferenceTypeIds.HasProperty, false, property.NodeId);
@@ -733,9 +722,7 @@ public class ThingsGatewayNodeManager : CustomNodeManager2
                     {
                         //skip the InstrumentRange check if the transformation isn't possible.
                     }
-
                 }
-
 
                 writeEnable[ii] = true;
                 hashSetNodeId.Add(nodeToWrite.NodeId.Identifier.ToString(), nodeToWrite);
@@ -789,7 +776,6 @@ public class ThingsGatewayNodeManager : CustomNodeManager2
                     handle.Node.ReadAttribute(systemContext, nodeToWrite.AttributeId, nodeToWrite.ParsedIndexRange, null, oldValue);
                 }
 
-
                 if (NodeIdTags.TryGetValue(nodeToWrite.NodeId.Identifier.ToString(), out OpcUaTag tag) && GlobalData.ReadOnlyIdVariables.TryGetValue(tag.Id, out var variableRuntime) && result.TryGetValue(variableRuntime.DeviceName, out var deviceResult) && deviceResult.TryGetValue(variableRuntime.Name, out var operResult))
                 {
                     if (operResult.IsSuccess == true)
@@ -802,8 +788,6 @@ public class ThingsGatewayNodeManager : CustomNodeManager2
                     }
                     // write the attribute value.
                 }
-
-
 
                 // report the write value audit event 
                 Server.ReportAuditWriteUpdateEvent(systemContext, nodeToWrite, oldValue?.Value, errors[ii]?.StatusCode ?? StatusCodes.Good);
@@ -952,7 +936,6 @@ public class ThingsGatewayNodeManager : CustomNodeManager2
         }
     }
 
-
     #endregion 多写
     /// <summary>
     /// 网关转OPC数据类型
@@ -978,7 +961,6 @@ public class ThingsGatewayNodeManager : CustomNodeManager2
         }
         return null;
     }
-
 
     private static byte ProtectTypeTrans(VariableRuntime variableRuntime, bool historizing)
     {

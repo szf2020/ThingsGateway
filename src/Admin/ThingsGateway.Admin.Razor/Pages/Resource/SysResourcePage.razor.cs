@@ -74,7 +74,6 @@ public partial class SysResourcePage
         {
             await ToastService.Warn(ex);
         }
-
     }
     private async Task OnChangeParent()
     {
@@ -88,7 +87,6 @@ public partial class SysResourcePage
         {
             await ToastService.Warn(ex);
         }
-
     }
 
     private async Task<bool> Delete(IEnumerable<SysResource> sysResources)

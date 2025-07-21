@@ -55,7 +55,6 @@ public static class ExpandoObjectExtensions
         // 遍历动态对象的属性
         expandoObject.ForEach(keyValuePair =>
         {
-
             // 检查动态对象的属性是否存在于目标类型的属性中
             if (properties.TryGetValue(keyValuePair.Key, out var property))
             {

@@ -21,8 +21,6 @@ namespace ThingsGateway.SqlSugar
         private static readonly CompositeFormat privateENotSupportedArrayCompositeFormat = CompositeFormat.Parse("This type of Array is not supported for the time being. You can try object[] or contact the author!");
         private static readonly CompositeFormat privateCNotSupportedArrayCompositeFormat = CompositeFormat.Parse("暂时不支持该类型的Array 你可以试试 object[] 或者联系作者！");
 
-
-
         internal static string GetThrowMessage(string enMessage, string cnMessage, params string[] args)
         {
             if (SugarLanguageType == LanguageType.Default)

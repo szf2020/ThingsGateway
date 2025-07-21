@@ -5,7 +5,6 @@ using System.Text;
 
 namespace ThingsGateway.SqlSugar
 {
-
     public partial class MySqlFastBuilder : FastBuilder, IFastBuilder
     {
         public override string UpdateSql { get; set; } = @"UPDATE  {1} TM    INNER JOIN {2} TE  ON {3} SET {0} ";

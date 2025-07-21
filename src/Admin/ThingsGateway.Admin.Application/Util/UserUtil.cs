@@ -14,7 +14,6 @@ namespace ThingsGateway.Admin.Application;
 [ThingsGateway.DependencyInjection.SuppressSniffer]
 public static class UserUtil
 {
-
     /// <summary>
     /// 构造选择项，ID/TITLE
     /// </summary>
@@ -28,6 +27,4 @@ public static class UserUtil
         ).ToList();
         return data;
     }
-
-
 }

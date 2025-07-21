@@ -41,7 +41,6 @@ public class ChannelOptions : ChannelOptionsBase, IChannelOptions, IDisposable
     private volatile int _maxConcurrentCount = 1;
     public TouchSocketConfig Config { get; set; } = new();
 
-
     public void Dispose()
     {
         Config?.SafeDispose();

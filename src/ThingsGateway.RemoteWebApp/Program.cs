@@ -48,14 +48,8 @@ internal sealed class Program
         {
         };
 
-        window.WindowClosing += (sender, e) =>
-        {
-
-            return false;
-        };
+        window.WindowClosing += (sender, e) => false;
         window.WaitForClose();
         Thread.Sleep(2000);
     }
-
-
 }

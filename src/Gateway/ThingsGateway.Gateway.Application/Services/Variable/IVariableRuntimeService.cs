@@ -24,7 +24,6 @@ namespace ThingsGateway.Gateway.Application
         Task ImportVariableAsync(Dictionary<string, ImportPreviewOutputBase> input, bool restart, CancellationToken cancellationToken);
         Task InsertTestDataAsync(int testVariableCount, int testDeviceCount, string slaveUrl, bool businessEnable, bool restart, CancellationToken cancellationToken);
 
-
         Task<bool> BatchSaveVariableAsync(List<Variable> input, ItemChangedType type, bool restart, CancellationToken cancellationToken);
 
         Task<Dictionary<string, ImportPreviewOutputBase>> PreviewAsync(IBrowserFile browserFile);

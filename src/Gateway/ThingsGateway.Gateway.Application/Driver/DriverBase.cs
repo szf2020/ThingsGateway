@@ -109,7 +109,6 @@ public abstract class DriverBase : DisposableObject, IDriver
         }
     }
 
-
     private IStringLocalizer Localizer { get; }
 
     #endregion 属性
@@ -132,8 +131,6 @@ public abstract class DriverBase : DisposableObject, IDriver
                 TaskSchedulerLoop.Start();
         }
     }
-
-
 
     #region 任务管理器传入
 
@@ -169,7 +166,6 @@ public abstract class DriverBase : DisposableObject, IDriver
             }
 
             SetLog(CurrentDevice.LogLevel);
-
         }
         catch (Exception ex)
         {
@@ -182,7 +178,6 @@ public abstract class DriverBase : DisposableObject, IDriver
     }
     private void SetLog(LogLevel? logLevel = null)
     {
-
         LogMessage.LogLevel = logLevel ?? TouchSocket.Core.LogLevel.Trace;
         // 移除旧的文件日志记录器并释放资源
         if (TextLogger != null)
@@ -258,7 +253,6 @@ public abstract class DriverBase : DisposableObject, IDriver
 
         try
         {
-
             // 记录设备任务开始信息
             LogMessage?.LogInformation(string.Format(AppResource.DeviceTaskStart, DeviceName));
 
@@ -297,7 +291,6 @@ public abstract class DriverBase : DisposableObject, IDriver
 
     protected internal TaskSchedulerLoop TaskSchedulerLoop;
 
-
     /// <summary>
     /// 获取任务
     /// </summary>
@@ -307,7 +300,6 @@ public abstract class DriverBase : DisposableObject, IDriver
     {
         TaskSchedulerLoop = new(ProtectedGetTasks(cancellationToken));
 
-
         //var count = GlobalData.ChannelThreadManage.DeviceThreadManages.Select(a => a.Value.TaskCount).Sum();
         //ThreadPool.GetMinThreads(out var wt, out var io);
         //if (wt < count + 128)
@@ -316,7 +308,6 @@ public abstract class DriverBase : DisposableObject, IDriver
         //    ThreadPool.SetMinThreads(wt, io);
         //    GlobalData.GatewayMonitorHostedService.Logger.LogInformation($"set min threads count {wt}, device tasks count {count}");
         //}
-
 
         return TaskSchedulerLoop;
     }
@@ -328,7 +319,6 @@ public abstract class DriverBase : DisposableObject, IDriver
     /// </summary>
     internal virtual void Stop()
     {
-
         if (!DisposedValue)
         {
             lock (this)
@@ -362,7 +352,6 @@ public abstract class DriverBase : DisposableObject, IDriver
         var device = CurrentDevice;
         if (device != null)
             device.Driver = null;
-
 
         LogMessage?.Logs?.ForEach(a => a.TryDispose());
         LogMessage = null;
@@ -423,7 +412,6 @@ public abstract class DriverBase : DisposableObject, IDriver
     /// </summary>
     internal virtual void ProtectedInitDevice(DeviceRuntime device)
     {
-
     }
 
     /// <summary>

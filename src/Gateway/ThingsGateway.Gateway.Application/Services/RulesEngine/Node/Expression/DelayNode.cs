@@ -23,9 +23,5 @@ public class DelayNode : NumberNode, IExpressionNode
             Logger?.LogWarning(ex);
             return new OperResult<NodeOutput>(ex);
         }
-
     }
-
 }
-
-

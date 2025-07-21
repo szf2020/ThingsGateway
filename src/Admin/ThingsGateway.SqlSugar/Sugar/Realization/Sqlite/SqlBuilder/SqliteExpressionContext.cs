@@ -311,7 +311,6 @@
         }
         public override string TrimStart(MethodCallExpressionModel mode)
         {
-
             var parameterNameA = mode.Args[0].MemberName;
             var parameterNameB = mode.Args[1].MemberName;
             return $"  CASE WHEN SUBSTR({parameterNameA}, 1, 1) ={parameterNameB} THEN SUBSTR({parameterNameA}, 2) ELSE {parameterNameA} END ";

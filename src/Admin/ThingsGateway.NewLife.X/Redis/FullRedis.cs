@@ -652,7 +652,6 @@ public class FullRedis : Redis
     public override IEventBus<T> GetEventBus<T>(String topic, String clientId = "") => new RedisEventBus<T>(this, topic, clientId);
     #endregion
 
-
     public RedisHash<string, T> GetHashMap<T>(string key)
     {
         return new RedisHash<String, T>(this, key);
@@ -704,7 +703,6 @@ public class FullRedis : Redis
 
         return 0L;
     }
-
 
     #region 字符串操作
     /// <summary>附加字符串</summary>

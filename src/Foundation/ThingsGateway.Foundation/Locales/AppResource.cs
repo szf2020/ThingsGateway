@@ -35,8 +35,6 @@ public static class AppResource
 
     public static Language Lang { get; set; } = Language.Chinese;
 
-
-
     public static string DefaultAddressDes => Lang == Language.Chinese ? ChineseResource.DefaultAddressDes : EnglishResource.DefaultAddressDes;
     public static string StringAddressError => Lang == Language.Chinese ? ChineseResource.StringAddressError : EnglishResource.StringAddressError;
     public static string ErrorMessage => Lang == Language.Chinese ? ChineseResource.ErrorMessage : EnglishResource.ErrorMessage;
@@ -51,7 +49,6 @@ public static class AppResource
     public static string DataTypeNotSupported => Lang == Language.Chinese ? ChineseResource.DataTypeNotSupported : EnglishResource.DataTypeNotSupported;
     public static string TransBytesError => Lang == Language.Chinese ? ChineseResource.TransBytesError : EnglishResource.TransBytesError;
 }
-
 
 public static class ChineseResource
 {

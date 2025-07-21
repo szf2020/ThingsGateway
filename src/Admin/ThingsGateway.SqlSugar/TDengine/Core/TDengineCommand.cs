@@ -69,13 +69,11 @@ namespace TDengineAdo
                 var sql = GetNoParameterSql(commandText);
                 long res = connection.connection.Exec(sql);
 
-
                 connection.Close();
                 return res > int.MaxValue ? int.MaxValue : Convert.ToInt32(res);
             }
             catch (Exception)
             {
-
                 connection.Close();
                 throw;
             }
@@ -100,7 +98,6 @@ namespace TDengineAdo
             }
             catch (Exception)
             {
-
                 connection.Close();
                 throw;
             }
@@ -117,7 +114,6 @@ namespace TDengineAdo
                 var res = connection.connection.Query(sql);
                 TDengineDataReader reader = new TDengineDataReader(res);
 
-
                 connection.Close();
                 return reader;
             }
@@ -127,7 +123,6 @@ namespace TDengineAdo
                 throw;
             }
         }
-
 
         public override void Prepare()
         {

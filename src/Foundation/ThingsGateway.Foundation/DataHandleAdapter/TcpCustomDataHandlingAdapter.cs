@@ -18,7 +18,6 @@ namespace ThingsGateway.Foundation;
 /// </summary>
 public abstract class TcpCustomDataHandlingAdapter<TRequest> : SingleStreamDataHandlingAdapter where TRequest : IRequestInfo
 {
-
     private ValueByteBlock m_tempByteBlock;
 
     private readonly Type m_requestType;
@@ -33,7 +32,6 @@ public abstract class TcpCustomDataHandlingAdapter<TRequest> : SingleStreamDataH
     {
         this.m_requestType = typeof(TRequest);
     }
-
 
     private TRequest m_tempRequest;
 

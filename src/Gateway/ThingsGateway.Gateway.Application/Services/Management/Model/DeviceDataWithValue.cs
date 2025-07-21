@@ -33,6 +33,3 @@ public class DeviceDataWithValue
     /// <inheritdoc cref="DeviceRuntime.ReadOnlyVariableRuntimes"/>
     public Dictionary<string, VariableDataWithValue> ReadOnlyVariableRuntimes { get; set; }
 }
-
-
-

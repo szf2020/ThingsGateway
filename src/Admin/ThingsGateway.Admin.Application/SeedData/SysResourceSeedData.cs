@@ -31,6 +31,5 @@ public class SysResourceSeedData : ISqlSugarEntitySeedData<SysResource>
             .Concat(data2)
             .Concat(data3)
             ;
-
     }
 }

@@ -48,7 +48,6 @@ public static class ObjectExtensions
         bool IsTheRawGenericType(Type type) => generic == (type.IsGenericType ? type.GetGenericTypeDefinition() : type);
     }
 
-
     /// <summary>
     /// 将 DateTimeOffset 转换成本地 DateTime
     /// </summary>
@@ -418,7 +417,6 @@ public static class ObjectExtensions
         return foundAttribute;
     }
 
-
     /// <summary>
     /// 获取方法真实返回类型
     /// </summary>
@@ -552,7 +550,7 @@ public static class ObjectExtensions
     {
         if (string.IsNullOrWhiteSpace(str)) return str;
 
-        return string.Concat(str.First().ToString().ToLower(), str.AsSpan(1));
+        return string.Concat(str[0].ToString().ToLower(), str.AsSpan(1));
     }
 
     /// <summary>
@@ -610,7 +608,7 @@ public static class ObjectExtensions
     {
         if (string.IsNullOrWhiteSpace(str)) return str;
 
-        return string.Concat(str.First().ToString().ToUpper(), str.AsSpan(1));
+        return string.Concat(str[0].ToString().ToUpper(), str.AsSpan(1));
     }
 }
 #endif

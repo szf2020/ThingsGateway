@@ -11,7 +11,6 @@ namespace System.Diagnostics.Internal
         private readonly byte[] _cil;
         private int ptr;
 
-
         public ILReader(byte[] cil) => _cil = cil;
 
         public OpCode OpCode { get; private set; }

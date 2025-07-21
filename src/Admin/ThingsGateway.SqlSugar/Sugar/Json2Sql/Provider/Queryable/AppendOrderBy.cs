@@ -13,6 +13,5 @@ namespace ThingsGateway.SqlSugar
             var obj = context.Utilities.JsonToOrderByModels(value);
             sugarQueryable.OrderBy(obj);
         }
-
     }
 }

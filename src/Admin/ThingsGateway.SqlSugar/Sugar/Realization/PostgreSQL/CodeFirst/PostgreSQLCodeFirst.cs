@@ -80,6 +80,5 @@
             if (item.IsPrimarykey)
                 this.Context.DbMaintenance.AddPrimaryKey(tableName, item.DbColumnName);
         }
-
     }
 }

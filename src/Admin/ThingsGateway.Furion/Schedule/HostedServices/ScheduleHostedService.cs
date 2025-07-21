@@ -252,10 +252,7 @@ internal sealed class ScheduleHostedService : BackgroundService
                             if (Executor == default)
                             {
                                 // 调用作业处理程序并配置出错执行重试
-                                await Retry.InvokeAsync(async () =>
-                                {
-                                    await jobHandler.ExecuteAsync(jobExecutingContext, jobCancellationTokenSource.Token).ConfigureAwait(false);
-                                }
+                                await Retry.InvokeAsync(async () => await jobHandler.ExecuteAsync(jobExecutingContext, jobCancellationTokenSource.Token).ConfigureAwait(false)
                                 , trigger.NumRetries
                                 , trigger.RetryTimeout
                                 , retryAction: (total, times) =>
@@ -392,7 +389,6 @@ internal sealed class ScheduleHostedService : BackgroundService
                             // 清空存储作业执行过程中传递的数据
                             jobExecutingContext.Items?.Clear();
 
-
                             // 释放服务作用域
                             await ReleaseJobHandlerAsync(jobHandler).ConfigureAwait(false);
                             jobHandler = null;
@@ -505,7 +501,6 @@ internal sealed class ScheduleHostedService : BackgroundService
     /// <returns><see cref="Task"/></returns>
     private async Task ReleaseJobHandlerAsync(IJob jobHandler)
     {
-
         if (jobHandler is null) return;
 
         var isService = _serviceProviderIsService.IsService(jobHandler.GetType());

@@ -206,10 +206,8 @@ public static class Oops
         // 获取出错的方法
         var methodIfException = GetEndPointExceptionMethod();
 
-
         // 获取错误码消息
         var errorCodeMessage = _errorCodeMessages.GetValueOrDefault(errorCode.ToString()) ?? _friendlyExceptionSettings.DefaultErrorMessage;
-
 
         // 字符串格式化
         return (errorCode, MontageErrorMessage(errorCodeMessage, errorCode.ToString(), hideErrorCode
@@ -325,7 +323,6 @@ public static class Oops
             // 判断是否已经缓存过该方法，避免重复解析
             var isCached = _errorMethods.TryGetValue(errorMethod, out var methodIfException);
             if (isCached) return methodIfException;
-
 
             // 组装方法异常对象
             methodIfException = new MethodIfException

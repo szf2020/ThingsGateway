@@ -141,7 +141,6 @@ public class DefaultSpanBuilder : ISpanBuilder
             {
                 span.Tracer = tracer2;
                 span.Name = Name;
-
             }
         }
 

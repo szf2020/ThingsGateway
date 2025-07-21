@@ -68,7 +68,7 @@ namespace ThingsGateway.SqlSugar
                 this.Context.Index = copyContext.Index;
                 this.Context.ParameterIndex = copyContext.ParameterIndex;
             }
-            var selfParameterName = Context.GetTranslationColumnName((argExp as LambdaExpression).Parameters.First().Name) + UtilConstants.Dot;
+            var selfParameterName = Context.GetTranslationColumnName((argExp as LambdaExpression).Parameters[0].Name) + UtilConstants.Dot;
             if (this.Context.JoinIndex == 0)
                 result = result.Replace(selfParameterName, SubTools.GetSubReplace(this.Context));
             if (!string.IsNullOrEmpty(selfParameterName) && this.Context.IsSingle && this.Context.JoinIndex == 0)

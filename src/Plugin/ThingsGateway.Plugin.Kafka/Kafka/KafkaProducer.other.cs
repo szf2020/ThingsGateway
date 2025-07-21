@@ -112,9 +112,7 @@ public partial class KafkaProducer : BusinessBaseWithCacheIntervalScriptAll
         {
             if (_driverPropertys.GroupUpdate && variable.BusinessGroupUpdateTrigger && !variable.BusinessGroup.IsNullOrEmpty() && VariableRuntimeGroups.TryGetValue(variable.BusinessGroup, out var variableRuntimeGroup))
             {
-
                 AddQueueVarModel(new CacheDBItem<List<VariableBasicData>>(variableRuntimeGroup.AdaptListVariableBasicData()));
-
             }
             else
             {
@@ -122,7 +120,6 @@ public partial class KafkaProducer : BusinessBaseWithCacheIntervalScriptAll
             }
         }
     }
-
 
     #region private
 

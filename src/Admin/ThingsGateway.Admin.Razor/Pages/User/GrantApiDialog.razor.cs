@@ -38,10 +38,6 @@ public partial class GrantApiDialog
 
     private static bool ModelEqualityComparer(OpenApiPermissionTreeSelector x, OpenApiPermissionTreeSelector y) => x.ApiRoute == y.ApiRoute;
 
-
-
-
-
     private async Task OnTreeItemChecked(List<TreeViewItem<OpenApiPermissionTreeSelector>> items)
     {
         var value = items.Where(a => a.Items == null || a.Items.Count <= 0).Select(a => a.Value.ApiRoute).ToList();

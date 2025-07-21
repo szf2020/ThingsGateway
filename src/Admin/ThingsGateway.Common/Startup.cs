@@ -33,8 +33,5 @@ public class Startup : AppStartup
         {
             WorkerId = 1// 取值范围0~63
         });
-
-
     }
-
 }

@@ -19,7 +19,6 @@ namespace ThingsGateway.Foundation;
 /// </summary>
 public static class ThingsGatewayBitConverterExtension
 {
-
     //private static MemoryCache MemoryCache = new() { Capacity = 10000000 };
 
     #region 获取对应数据类型的数据
@@ -403,8 +402,6 @@ public static class ThingsGatewayBitConverterExtension
                 }
         }
     }
-
-
 
     #endregion 获取对应数据类型的数据
 }

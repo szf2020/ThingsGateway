@@ -202,7 +202,6 @@ namespace ThingsGateway.SqlSugar
             }
         }
 
-
         protected void Field(ExpressionParameter parameter, bool? isLeft, string name, IEnumerable<Expression> args, MethodCallExpressionModel model, List<MethodCallExpressionArgs> appendArgs = null)
         {
             if (this.Context.ResolveType == ResolveExpressType.FieldSingle)
@@ -302,7 +301,6 @@ namespace ThingsGateway.SqlSugar
             if (isRoot && parameter.BaseExpression == null && this.Context.ResolveType.IsIn(ResolveExpressType.WhereMultiple, ResolveExpressType.WhereSingle) && (parameter.CurrentExpression is MethodCallExpression) && ((parameter.CurrentExpression as MethodCallExpression).Method.Name.IsIn("ToBool", "ToBoolean")))
             {
                 methodValue = methodValue + "=1 ";
-
             }
             if (isRoot && parameter.BaseExpression == null && this.Context.ResolveType.IsIn(ResolveExpressType.WhereMultiple, ResolveExpressType.WhereSingle) && (parameter.CurrentExpression is ConditionalExpression) && ((parameter.CurrentExpression as ConditionalExpression).Type == UtilConstants.BoolType))
             {
@@ -334,6 +332,5 @@ namespace ThingsGateway.SqlSugar
             }
             base.AppendValue(parameter, isLeft, methodValue);
         }
-
     }
 }

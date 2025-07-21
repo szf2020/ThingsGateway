@@ -89,8 +89,6 @@ public static partial class DeviceExtension
 
     #endregion 读取
 
-
-
     /// <summary>
     /// 在返回的字节数组中解析每个变量的值
     /// 根据每个变量的<see cref="IVariable.Index"/>
@@ -131,7 +129,6 @@ public static partial class DeviceExtension
             }
         }
         return result;
-
     }
 
     /// <summary>

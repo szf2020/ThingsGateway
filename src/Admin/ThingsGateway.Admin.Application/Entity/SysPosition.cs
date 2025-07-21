@@ -10,8 +10,6 @@
 
 using System.ComponentModel.DataAnnotations;
 
-
-
 namespace ThingsGateway.Admin.Application;
 
 /// <summary>
@@ -44,7 +42,6 @@ public class SysPosition : BaseEntity
     [AutoGenerateColumn(Visible = true, Sortable = true, Filterable = true)]
     public string Code { get; set; }
 
-
     [SugarColumn(ColumnName = "Status", ColumnDescription = "启用")]
     [AutoGenerateColumn(Visible = true, Sortable = true, Filterable = true)]
     public bool Status { get; set; } = true;
@@ -55,5 +52,4 @@ public class SysPosition : BaseEntity
     [SugarColumn(ColumnName = "Category", ColumnDescription = "分类")]
     [AutoGenerateColumn(Visible = true, Sortable = true, Filterable = true)]
     public virtual PositionCategoryEnum Category { get; set; }
-
 }

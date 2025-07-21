@@ -1,8 +1,4 @@
 ﻿
-
-
-
-
 namespace ThingsGateway.Upgrade;
 
 public interface IUpdateZipFileHostedService

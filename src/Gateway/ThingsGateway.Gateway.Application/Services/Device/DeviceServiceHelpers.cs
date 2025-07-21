@@ -8,7 +8,6 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-
 using BootstrapBlazor.Components;
 
 using System.Collections.Concurrent;
@@ -20,7 +19,6 @@ namespace ThingsGateway.Gateway.Application;
 
 public static class DeviceServiceHelpers
 {
-
     public static async Task<USheetDatas> ExportDeviceAsync(IEnumerable<Device> models)
     {
         var deviceDicts = (await GlobalData.DeviceService.GetAllAsync().ConfigureAwait(false)).ToDictionary(a => a.Id);
@@ -33,9 +31,7 @@ public static class DeviceServiceHelpers
         }).ToHashSet();
         var data = ExportSheets(models, deviceDicts, channelDicts, pluginSheetNames); // IEnumerable 延迟执行
         return USheetDataHelpers.GetUSheetDatas(data);
-
     }
-
 
     public static Dictionary<string, object> ExportSheets(
         IEnumerable<Device>? data,
@@ -47,11 +43,9 @@ HashSet<string> pluginSheetNames,
         if (data?.Any() != true)
             data = new List<Device>();
 
-
         var result = new Dictionary<string, object>();
         result.Add(ExportString.DeviceName, GetDeviceSheets(data, deviceDicts, channelDicts, channelName));
         ConcurrentDictionary<string, (object, Dictionary<string, PropertyInfo>)> propertysDict = new();
-
 
         foreach (var plugin in pluginSheetNames)
         {
@@ -62,7 +56,6 @@ HashSet<string> pluginSheetNames,
         }
         return result;
     }
-
 
     public static Dictionary<string, object> ExportSheets(
 IAsyncEnumerable<Device>? data1,
@@ -78,7 +71,6 @@ string? channelName = null)
         var result = new Dictionary<string, object>();
         result.Add(ExportString.DeviceName, GetDeviceSheets(data1, deviceDicts, channelDicts, channelName));
         ConcurrentDictionary<string, (object, Dictionary<string, PropertyInfo>)> propertysDict = new();
-
 
         foreach (var plugin in pluginSheetNames)
         {
@@ -145,17 +137,14 @@ Dictionary<long, Device>? deviceDicts,
         foreach (var device in data)
         {
             yield return GetDeviceRows(device, propertyInfos, type, deviceDicts, channelDicts, channelName);
-
         }
     }
-
 
     static IEnumerable<Dictionary<string, object>> GetPluginSheets(
     IEnumerable<Device> data,
     ConcurrentDictionary<string, (object, Dictionary<string, PropertyInfo>)> propertysDict,
     string? plugin)
     {
-
         foreach (var device in data)
         {
             var row = GetPluginRows(device, plugin, propertysDict);
@@ -163,11 +152,8 @@ Dictionary<long, Device>? deviceDicts,
             {
                 yield return row;
             }
-
         }
     }
-
-
 
     static async IAsyncEnumerable<Dictionary<string, object>> GetDeviceSheets(
     IAsyncEnumerable<Device> data,
@@ -191,22 +177,17 @@ Dictionary<long, Device>? deviceDicts,
         {
             var device = enumerator.Current;
             yield return GetDeviceRows(device, propertyInfos, type, deviceDicts, channelDicts, channelName);
-
-
         }
     }
-
 
     static async IAsyncEnumerable<Dictionary<string, object>> GetPluginSheets(
     IAsyncEnumerable<Device> data,
     ConcurrentDictionary<string, (object, Dictionary<string, PropertyInfo>)> propertysDict,
     string? plugin)
     {
-
         var enumerator = data.GetAsyncEnumerator();
         while (await enumerator.MoveNextAsync().ConfigureAwait(false))
         {
-
             var device = enumerator.Current;
             var row = GetPluginRows(device, plugin, propertysDict);
             if (row != null)
@@ -224,7 +205,6 @@ Dictionary<long, Device>? deviceDicts,
  Dictionary<long, Channel>? channelDicts,
 string? channelName)
     {
-
         Dictionary<string, object> devExport = new();
         deviceDicts.TryGetValue(device.RedundantDeviceId ?? 0, out var redundantDevice);
         channelDicts.TryGetValue(device.ChannelId, out var channel);
@@ -246,7 +226,6 @@ string? channelName)
 
     static Dictionary<string, object> GetPluginRows(Device device, string? plugin, ConcurrentDictionary<string, (object, Dictionary<string, PropertyInfo>)> propertysDict)
     {
-
         Dictionary<string, object> driverInfo = new();
         var propDict = device.DevicePropertys;
         if (!propertysDict.TryGetValue(plugin, out var propertys))
@@ -260,19 +239,14 @@ string? channelName)
 .Where(a => a.GetCustomAttribute<DynamicPropertyAttribute>() != null)
 .ToDictionary(a => driverPropertyType.GetPropertyDisplayName(a.Name, a => a.GetCustomAttribute<DynamicPropertyAttribute>(true)?.Description), a => a);
                 propertysDict.TryAdd(plugin, propertys);
-
             }
             catch
             {
-
             }
-
         }
 
         if (propertys.Item2 != null)
         {
-
-
             if (propertys.Item2.Count > 0)
             {
                 //没有包含设备名称，手动插入
@@ -292,11 +266,8 @@ string? channelName)
                 }
             }
 
-
-
             if (driverInfo.Count > 0)
                 return driverInfo;
-
         }
         return null;
     }
@@ -323,11 +294,9 @@ string? channelName)
         var driverPluginNameDict = GlobalData.PluginService.GetList().DistinctBy(a => a.Name).ToDictionary(a => a.Name);
         ConcurrentDictionary<string, (Type, Dictionary<string, PropertyInfo>, Dictionary<string, PropertyInfo>)> propertysDict = new();
 
-
         var sheetNames = uSheetDatas.sheets.Keys.ToList();
         foreach (var sheetName in sheetNames)
         {
-
             List<IDictionary<string, object>> rows = new();
             var first = uSheetDatas.sheets[sheetName].cellData[0];
 
@@ -352,8 +321,5 @@ string? channelName)
             }
         }
         return ImportPreviews;
-
-
     }
-
 }

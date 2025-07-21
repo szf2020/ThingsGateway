@@ -17,5 +17,4 @@ public interface ITcpServiceChannel : IChannel
     Task ClientDisposeAsync(string id);
 
     public bool TryGetClient(string id, out TcpSessionClientChannel client);
-
 }

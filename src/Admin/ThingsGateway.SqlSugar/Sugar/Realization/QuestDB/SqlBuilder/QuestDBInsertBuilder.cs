@@ -21,7 +21,6 @@ namespace ThingsGateway.SqlSugar
            ({1})
      VALUES
            ({2}) ;";
-
                 }
             }
         }
@@ -38,7 +37,7 @@ namespace ThingsGateway.SqlSugar
             }
             var groupList = DbColumnInfoList.GroupBy(it => it.TableId).ToList();
             var isSingle = groupList.Count == 1;
-            string columnsString = string.Join(",", groupList.First().Select(it => Builder.GetTranslationColumnName(it.DbColumnName)));
+            string columnsString = string.Join(",", groupList[0].Select(it => Builder.GetTranslationColumnName(it.DbColumnName)));
             //if (isSingle)
             //{
             //    string columnParametersString = string.Join(",", this.DbColumnInfoList.Select(it =>

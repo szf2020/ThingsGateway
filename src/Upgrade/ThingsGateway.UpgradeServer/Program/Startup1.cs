@@ -36,8 +36,5 @@ public class Startup1 : AppStartup
         });
         var fullName = Assembly.GetExecutingAssembly().FullName;//获取程序集全名
         CodeFirstUtils.CodeFirst(fullName!);//CodeFirst
-
-
     }
-
 }

@@ -7,10 +7,8 @@ using System.Text.RegularExpressions;
 
 namespace ThingsGateway.SqlSugar
 {
-
     public partial class QueryableProvider<T> : QueryableAccessory, ISugarQueryable<T>
     {
-
         public ISugarQueryable<T> CrossQuery<Type>(string configId)
         {
             return this.CrossQuery(typeof(Type), configId);
@@ -108,7 +106,6 @@ namespace ThingsGateway.SqlSugar
         }
         public ISugarQueryable<T, T2> LeftJoin<T2>(ISugarQueryable<T2> joinQueryable, Expression<Func<T, T2, bool>> joinExpression)
         {
-
             if (MasterHasWhereFirstJoin())
             {
                 return this.MergeTable().LeftJoin<T2>(joinQueryable, joinExpression);
@@ -153,7 +150,6 @@ namespace ThingsGateway.SqlSugar
         }
         public ISugarQueryable<T, T2> RightJoin<T2>(ISugarQueryable<T2> joinQueryable, Expression<Func<T, T2, bool>> joinExpression)
         {
-
             if (MasterHasWhereFirstJoin())
             {
                 return this.MergeTable().RightJoin<T2>(joinQueryable, joinExpression);
@@ -176,7 +172,6 @@ namespace ThingsGateway.SqlSugar
         }
         public ISugarQueryable<T, T2> FullJoin<T2>(ISugarQueryable<T2> joinQueryable, Expression<Func<T, T2, bool>> joinExpression)
         {
-
             if (MasterHasWhereFirstJoin())
             {
                 return this.MergeTable().FullJoin<T2>(joinQueryable, joinExpression);
@@ -262,7 +257,6 @@ namespace ThingsGateway.SqlSugar
         }
         public ISugarQueryable<T, T2> RightJoin<T2>(Expression<Func<T, T2, bool>> joinExpression)
         {
-
             if (MasterHasWhereFirstJoin())
             {
                 return this.MergeTable().RightJoin<T2>(joinExpression);
@@ -283,7 +277,6 @@ namespace ThingsGateway.SqlSugar
         }
         public ISugarQueryable<T, T2> InnerJoin<T2>(Expression<Func<T, T2, bool>> joinExpression)
         {
-
             if (MasterHasWhereFirstJoin())
             {
                 return this.MergeTable().InnerJoin<T2>(joinExpression);
@@ -479,8 +472,6 @@ namespace ThingsGateway.SqlSugar
             {
                 var list = cache.Get<Dictionary<object, List<BType>>>(oldList =>
                 {
-
-
                     //query mapping by a
                     var cons = new List<IConditionalModel>() {
                      new ConditionalModel(){
@@ -515,7 +506,6 @@ namespace ThingsGateway.SqlSugar
                         result.Add(item.Key, bList.Where(z => currentBids.Contains(UtilMethods.GetPropertyValue(z, bProperty))).ToList());
                     }
                     return result;
-
                 }, expression.ToString());
                 foreach (var item in aEntity.Columns)
                 {
@@ -631,7 +621,6 @@ namespace ThingsGateway.SqlSugar
         }
         public virtual ISugarQueryable<T> AddJoinInfo(string tableName, string shortName, string joinWhere, JoinType type = JoinType.Left)
         {
-
             QueryBuilder.JoinIndex = +1;
             QueryBuilder.JoinQueryInfos
                 .Add(new JoinQueryInfo()
@@ -756,7 +745,6 @@ namespace ThingsGateway.SqlSugar
         /// <returns></returns>
         public ISugarQueryable<T> _WhereClassByPrimaryKey(IReadOnlyList<T> whereClassTypes)
         {
-
             if (whereClassTypes.HasValue())
             {
                 var columns = this.Context.EntityMaintenance.GetEntityInfo<T>().Columns.Where(it => it.IsIgnore == false && it.IsPrimarykey == true);
@@ -775,7 +763,6 @@ namespace ThingsGateway.SqlSugar
                             cons.ConditionalList = new List<KeyValuePair<WhereType, ConditionalModel>>();
                             if (QueryBuilder.WhereInfos.IsNullOrEmpty() && whereModels.IsNullOrEmpty())
                             {
-
                             }
                             else
                             {
@@ -828,7 +815,6 @@ namespace ThingsGateway.SqlSugar
         /// <returns></returns>
         public ISugarQueryable<T> _WhereClassByWhereColumns(IReadOnlyList<T> whereClassTypes, IReadOnlyList<string> whereColumns)
         {
-
             if (whereClassTypes.HasValue())
             {
                 var columns = this.Context.EntityMaintenance.GetEntityInfo<T>().Columns.Where(it => whereColumns.Any(x => x == it.PropertyName) || whereColumns.Any(x => x.EqualCase(it.DbColumnName)));
@@ -847,7 +833,6 @@ namespace ThingsGateway.SqlSugar
                             cons.ConditionalList = new List<KeyValuePair<WhereType, ConditionalModel>>();
                             if (QueryBuilder.WhereInfos.IsNullOrEmpty() && whereModels.IsNullOrEmpty())
                             {
-
                             }
                             else
                             {
@@ -902,7 +887,6 @@ namespace ThingsGateway.SqlSugar
         /// <returns></returns>
         public ISugarQueryable<T> WhereClass<ClassType>(List<ClassType> whereClassTypes, bool ignoreDefaultValue = false) where ClassType : class, new()
         {
-
             if (whereClassTypes.HasValue())
             {
                 var columns = this.Context.EntityMaintenance.GetEntityInfo<ClassType>().Columns.Where(it => it.IsIgnore == false);
@@ -912,7 +896,6 @@ namespace ThingsGateway.SqlSugar
                     var cons = new ConditionalCollections();
                     foreach (var column in columns)
                     {
-
                         var value = column.PropertyInfo.GetValue(item, null);
                         WhereType WhereType = WhereType.And;
                         var isNotNull = ignoreDefaultValue == false && value != null;
@@ -924,13 +907,11 @@ namespace ThingsGateway.SqlSugar
                                 cons.ConditionalList = new List<KeyValuePair<WhereType, ConditionalModel>>();
                                 if (QueryBuilder.WhereInfos.IsNullOrEmpty() && whereModels.IsNullOrEmpty())
                                 {
-
                                 }
                                 else
                                 {
                                     WhereType = WhereType.Or;
                                 }
-
                             }
                             var data = new KeyValuePair<WhereType, ConditionalModel>(WhereType, new ConditionalModel()
                             {
@@ -943,13 +924,11 @@ namespace ThingsGateway.SqlSugar
                             {
                                 if (this.Context.CurrentConnectionConfig?.MoreSettings?.TableEnumIsString == true)
                                 {
-
                                 }
                                 else
                                 {
                                     data.Value.FieldValue = Convert.ToInt64(value).ObjToString();
                                 }
-
                             }
                             else if (value != null && column.PropertyInfo.PropertyType == UtilConstants.DateType)
                             {
@@ -958,10 +937,7 @@ namespace ThingsGateway.SqlSugar
                             cons.ConditionalList.Add(data);
                             if (this.Context.CurrentConnectionConfig.DbType == DbType.PostgreSQL)
                             {
-                                data.Value.FieldValueConvertFunc = it =>
-                                {
-                                    return UtilMethods.ChangeType2(it, value.GetType());
-                                };
+                                data.Value.FieldValueConvertFunc = it => UtilMethods.ChangeType2(it, value.GetType());
                             }
                         }
                     }
@@ -1062,7 +1038,6 @@ namespace ThingsGateway.SqlSugar
         }
         public virtual ISugarQueryable<T> Having(string whereString, object parameters = null)
         {
-
             QueryBuilder.HavingInfos = SqlBuilder.AppendHaving(whereString);
             if (parameters != null)
                 QueryBuilder.Parameters.AddRange(Context.Ado.GetParameters(parameters));
@@ -1188,7 +1163,6 @@ namespace ThingsGateway.SqlSugar
                     }
                 }
                 this.Where(string.Format(QueryBuilder.InTemplate, SqlBuilder.GetTranslationColumnName(field), string.Join(",", values)));
-
             }
             return this;
         }
@@ -1219,9 +1193,6 @@ namespace ThingsGateway.SqlSugar
                 return In(fieldName, inValues);
             }
         }
-
-
-
 
         public ISugarQueryable<T> InIF<FieldType>(bool isWhere, Expression<Func<T, object>> expression, ISugarQueryable<FieldType> childQueryExpression)
         {
@@ -1361,7 +1332,6 @@ namespace ThingsGateway.SqlSugar
 
             return this;
         }
-
 
         public virtual ISugarQueryable<T> OrderByIF(bool isOrderBy, string orderByFields)
         {
@@ -1708,7 +1678,6 @@ namespace ThingsGateway.SqlSugar
                 }
                 else if (SplitType.Season == type.SplitType)
                 {
-
                     var beginSeason = Convert.ToDateTime(beginTime.AddMonths(0 - ((beginTime.Month - 1) % 3)).ToString("yyyy-MM-01")).Date;
                     var endSeason = DateTime.Parse(endTime.AddMonths(3 - ((endTime.Month - 1) % 3)).ToString("yyyy-MM-01")).AddDays(-1).Date;
                     result = result.Where(y =>

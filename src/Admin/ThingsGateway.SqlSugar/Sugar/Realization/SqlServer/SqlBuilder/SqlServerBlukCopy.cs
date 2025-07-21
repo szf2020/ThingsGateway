@@ -81,7 +81,6 @@ namespace ThingsGateway.SqlSugar
                 DataRow dr = result.NewRow();
                 foreach (DataColumn column in result.Columns)
                 {
-
                     if (dt.Columns.Cast<DataColumn>().Select(it => it.ColumnName).Contains(column.ColumnName, StringComparer.OrdinalIgnoreCase))
                     {
                         dr[column.ColumnName] = item[column.ColumnName];

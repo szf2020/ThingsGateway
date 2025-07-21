@@ -4,7 +4,6 @@ using System.Data;
 
 namespace ThingsGateway.SqlSugar
 {
-
     public class DmFastBuilder : FastBuilder, IFastBuilder
     {
         public override bool IsActionUpdateColumns { get; set; } = true;
@@ -93,6 +92,5 @@ namespace ThingsGateway.SqlSugar
             copy.BulkCopyTimeout = this.Context.Ado.CommandTimeOut;
             return copy;
         }
-
     }
 }

@@ -205,7 +205,6 @@ namespace ThingsGateway.SqlSugar
                     item.RightEntityColumn = this.RootEntity.Columns.FirstOrDefault(it => it.PropertyName == rightName);
             }
         }
-
     }
     /// <summary>
     /// 映射字段信息

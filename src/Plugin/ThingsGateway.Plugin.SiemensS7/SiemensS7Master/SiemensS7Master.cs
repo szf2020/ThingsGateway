@@ -53,10 +53,8 @@ public class SiemensS7Master : CollectFoundationBase
 
     public override Type DriverVariableAddressUIType => typeof(SiemensS7AddressComponent);
 
-
     protected override async Task InitChannelAsync(IChannel? channel = null, CancellationToken cancellationToken = default)
     {
-
         ArgumentNullException.ThrowIfNull(channel);
 
         var plc = _plc;
@@ -120,10 +118,8 @@ public class SiemensS7Master : CollectFoundationBase
         }
     }
 
-
     protected override async ValueTask<Dictionary<string, OperResult>> WriteValuesAsync(Dictionary<VariableRuntime, JToken> writeInfoLists, CancellationToken cancellationToken)
     {
-
         using var writeLock = ReadWriteLock.WriterLock();
 
         // 检查协议是否为空，如果为空则抛出异常
@@ -155,7 +151,6 @@ public class SiemensS7Master : CollectFoundationBase
         }
         if (addresses.Count > 0)
         {
-
             var result = await _plc.S7WriteAsync(addresses.Select(a => a.Value).ToArray(), cancellationToken).ConfigureAwait(false);
             foreach (var writeInfo in addresses)
             {
@@ -187,7 +182,6 @@ public class SiemensS7Master : CollectFoundationBase
 
         // 返回包含操作结果的字典
         return new Dictionary<string, OperResult>(operResults);
-
     }
 
     [ThingsGateway.Gateway.Application.DynamicMethod("ReadWriteDateAsync", "读写日期格式")]
@@ -217,7 +211,6 @@ public class SiemensS7Master : CollectFoundationBase
         }
         catch
         {
-
         }
         List<VariableSourceRead> variableSourceReads = new();
         foreach (var deviceVariable in deviceVariables.GroupBy(a => a.CollectGroup))

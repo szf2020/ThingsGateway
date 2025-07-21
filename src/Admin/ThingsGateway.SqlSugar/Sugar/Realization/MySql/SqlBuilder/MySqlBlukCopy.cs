@@ -7,10 +7,8 @@ namespace ThingsGateway.SqlSugar
 {
     public partial class MySqlBlukCopy<T>
     {
-
         private MySqlBlukCopy()
         {
-
         }
 
         public bool ExecuteBulkCopy(string characterSet)
@@ -182,7 +180,6 @@ namespace ThingsGateway.SqlSugar
             }
             return sb.ToString();
         }
-
 
         private static object GetValue(PropertyInfo p, T item)
         {

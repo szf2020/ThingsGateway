@@ -66,10 +66,9 @@ namespace ThingsGateway.SqlSugar
             }
             copy.BulkCopyTimeout = this.Context.Ado.CommandTimeOut;
             return copy;
-
         }
 
-        public override Task<int> Merge<T>(string tableName, DataTable dt, EntityInfo entityInfo, string[] whereColumns, string[] updateColumns, List<T> datas) where T : class
+        public override Task<int> Merge<T>(string tableName, DataTable dt, EntityInfo entityInfo, string[] whereColumns, string[] updateColumns, IEnumerable<T> datas) where T : class
         {
             Check.Exception(this.entityInfo.Columns.Any(it => it.OracleSequenceName.HasValue()), "The BulkMerge method cannot be used for  sequence", "BulkMerge方法不能用序列");
             var sqlBuilder = this.Context.Queryable<object>().SqlBuilder;

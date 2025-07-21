@@ -37,6 +37,5 @@ public class SysOrgSeedData : ISqlSugarEntitySeedData<SysOrg>
                   SortCode=0
             }
         }.Concat(SeedDataUtil.GetSeedDataByJson<SysOrg>(SeedDataUtil.GetManifestResourceStream(assembly, "SeedData.Admin.seed_sys_org.json")).Concat(data));
-
     }
 }

@@ -24,5 +24,4 @@ public interface IGatewayRedundantSerivce
     /// 业务通道是否可用
     /// </summary>
     public bool StartBusinessChannelEnable { get; }
-
 }

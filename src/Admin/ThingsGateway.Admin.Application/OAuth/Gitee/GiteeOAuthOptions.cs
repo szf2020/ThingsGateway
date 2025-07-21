@@ -26,10 +26,7 @@ public class GiteeOAuthOptions : AdminOAuthOptions
         Scope.Add("user_info");
         Scope.Add("projects");
 
-        Events.OnCreatingTicket = async context =>
-        {
-            await HandlerGiteeStarredUrl(context).ConfigureAwait(false);
-        };
+        Events.OnCreatingTicket = async context => await HandlerGiteeStarredUrl(context).ConfigureAwait(false);
 
         Events.OnRedirectToAuthorizationEndpoint = context =>
         {
@@ -66,8 +63,6 @@ public class GiteeOAuthOptions : AdminOAuthOptions
 
         return OAuthTokenResponse.Failed(new OAuthTokenException($"OAuth token endpoint failure: {await Display(response).ConfigureAwait(false)}"));
     }
-
-
 
     public override string GetName(JsonElement element)
     {
@@ -109,8 +104,6 @@ public class GiteeOAuthOptions : AdminOAuthOptions
              });
             //throw new Exception($"Failed to star repository: {response.StatusCode}, {content}");
         }
-
-
     }
     protected override void ConfigureClaims()
     {

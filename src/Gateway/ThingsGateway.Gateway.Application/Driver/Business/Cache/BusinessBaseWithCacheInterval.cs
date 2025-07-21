@@ -19,7 +19,6 @@ namespace ThingsGateway.Gateway.Application;
 /// </summary>
 public abstract class BusinessBaseWithCacheInterval : BusinessBaseWithCache
 {
-
     /// <summary>
     /// 获取具体业务属性的缓存设置。
     /// </summary>
@@ -30,24 +29,18 @@ public abstract class BusinessBaseWithCacheInterval : BusinessBaseWithCache
     /// </summary>
     protected abstract BusinessPropertyWithCacheInterval _businessPropertyWithCacheInterval { get; }
 
-
-
     protected internal override async Task InitChannelAsync(IChannel? channel, CancellationToken cancellationToken)
     {
         if (AlarmModelEnable)
         {
             GlobalData.AlarmChangedEvent -= AlarmValueChange;
-            GlobalData.ReadOnlyRealAlarmIdVariables?.ForEach(a =>
-            {
-                AlarmValueChange(a.Value);
-            });
+            GlobalData.ReadOnlyRealAlarmIdVariables?.ForEach(a => AlarmValueChange(a.Value));
 
             GlobalData.AlarmChangedEvent += AlarmValueChange;
             // 解绑全局数据的事件
         }
         if (DevModelEnable)
         {
-
             // 如果不是间隔上传，则订阅全局变量值改变事件和设备状态改变事件，并触发一次事件处理
             if (_businessPropertyWithCacheInterval.BusinessUpdateEnum != BusinessUpdateEnum.Interval)
             {
@@ -79,7 +72,6 @@ public abstract class BusinessBaseWithCacheInterval : BusinessBaseWithCache
                 CollectDevices = GlobalData.GetEnableDevices().Where(a => a.IsCollect == true).ToDictionary(a => a.Id);
 
                 VariableRuntimeGroups = IdVariableRuntimes.GroupBy(a => a.Value.BusinessGroup ?? string.Empty).ToDictionary(a => a.Key, a => a.Select(a => a.Value).ToList());
-
             }
             else
             {
@@ -87,16 +79,13 @@ public abstract class BusinessBaseWithCacheInterval : BusinessBaseWithCache
             }
         }
 
-
         if (DevModelEnable)
         {
-
             CollectDevices?.ForEach(a =>
             {
                 if (a.Value.DeviceStatus == DeviceStatusEnum.OnLine && _businessPropertyWithCacheInterval.BusinessUpdateEnum != BusinessUpdateEnum.Interval)
                     DeviceStatusChange(a.Value, a.Value.AdaptDeviceBasicData());
             });
-
         }
 
         if (VarModelEnable)
@@ -138,14 +127,11 @@ public abstract class BusinessBaseWithCacheInterval : BusinessBaseWithCache
         // 在设备状态变化时执行的自定义逻辑
     }
 
-
-
     /// <summary>
     /// 释放资源方法
     /// </summary>
     protected override void Dispose(bool disposing)
     {
-
         // 解绑事件
         GlobalData.AlarmChangedEvent -= AlarmValueChange;
         GlobalData.VariableValueChangeEvent -= VariableValueChange;
@@ -172,7 +158,6 @@ public abstract class BusinessBaseWithCacheInterval : BusinessBaseWithCache
         // 如果业务属性的缓存为间隔上传，则根据定时器间隔执行相应操作
         if (_businessPropertyWithCacheInterval.BusinessUpdateEnum != BusinessUpdateEnum.Change)
         {
-
             if (VarModelEnable)
             {
                 try
@@ -210,7 +195,6 @@ public abstract class BusinessBaseWithCacheInterval : BusinessBaseWithCache
                 }
             }
         }
-
     }
 
     protected override List<IScheduledTask> ProtectedGetTasks(CancellationToken cancellationToken)
@@ -260,7 +244,6 @@ public abstract class BusinessBaseWithCacheInterval : BusinessBaseWithCache
         }
     }
 
-
     public override void PauseThread(bool pause)
     {
         lock (this)
@@ -271,10 +254,7 @@ public abstract class BusinessBaseWithCacheInterval : BusinessBaseWithCache
             {
                 if (AlarmModelEnable)
                 {
-                    GlobalData.ReadOnlyRealAlarmIdVariables?.ForEach(a =>
-                    {
-                        AlarmChange(a.Value);
-                    });
+                    GlobalData.ReadOnlyRealAlarmIdVariables?.ForEach(a => AlarmChange(a.Value));
                 }
                 if (DevModelEnable)
                 {
@@ -336,6 +316,4 @@ public abstract class BusinessBaseWithCacheInterval : BusinessBaseWithCache
                 VariableChange(variableRuntime, variable);
         }
     }
-
-
 }

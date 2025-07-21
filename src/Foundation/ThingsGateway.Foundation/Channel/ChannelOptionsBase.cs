@@ -103,7 +103,6 @@ namespace ThingsGateway.Foundation
 
         public virtual IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
-
             if (ChannelType == ChannelTypeEnum.TcpClient)
             {
                 if (string.IsNullOrEmpty(RemoteUrl))
@@ -132,9 +131,7 @@ namespace ThingsGateway.Foundation
                     yield return new ValidationResult(AppResource.Localizer["PortNameNotNull"], new[] { nameof(PortName) });
                 }
             }
-
         }
-
 
         public override string ToString()
         {

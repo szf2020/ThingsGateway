@@ -97,10 +97,8 @@ public partial class MainLayout : IDisposable
 
     private async Task LogoutAsync()
     {
-
         try
         {
-
             var ret = await AuthRazorService.LoginOutAsync();
             if (ret.Code != 200)
             {

@@ -40,10 +40,7 @@ public sealed class ServeServiceComponent : IServiceComponent
 
         // 控制器和规范化结果
         services.AddControllers()
-                .AddJsonOptions(options =>
-                {
-                    options.JsonSerializerOptions.Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping;
-                })
+                .AddJsonOptions(options => options.JsonSerializerOptions.Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping)
                 .AddInjectWithUnifyResult();
     }
 }
@@ -91,9 +88,6 @@ public sealed class ServeApplicationComponent : IApplicationComponent
         app.UseInject(string.Empty);
 
         // 配置路由
-        app.UseEndpoints(endpoints =>
-        {
-            endpoints.MapControllers();
-        });
+        app.UseEndpoints(endpoints => endpoints.MapControllers());
     }
 }

@@ -10,6 +10,5 @@ namespace ThingsGateway.SqlSugar
             Check.ExceptionEasy(columns.IsNullOrEmpty(), "need WhereColumns", "WhereColumns 需要设置列名");
             this.sugarUpdateable.WhereColumns(columns);
         }
-
     }
 }

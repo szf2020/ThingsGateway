@@ -474,4 +474,3 @@ public struct OperResult : IOperResult
         return $"{messageString}{exceptionString}";
     }
 }
-

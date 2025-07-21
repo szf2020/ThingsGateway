@@ -31,7 +31,6 @@ public class SmartTriggerScheduler
     {
         lock (_lock)
         {
-
             if (_isRunning)
             {
                 // 如果正在执行中，标记为“等待处理”，之后再执行一次
@@ -74,7 +73,6 @@ public class SmartTriggerScheduler
                     _isRunning = false;
                     return;
                 }
-
             }
         }
     }

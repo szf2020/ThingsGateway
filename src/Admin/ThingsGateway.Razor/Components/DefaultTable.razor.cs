@@ -8,7 +8,6 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-
 namespace ThingsGateway.Razor;
 
 [CascadingTypeParameter(nameof(TItem))]
@@ -85,7 +84,6 @@ public partial class DefaultTable<TItem> where TItem : class, new()
     public RenderFragment<ITableExportContext<TItem>> ExportButtonDropdownTemplate { get; set; }
 
     /// <inheritdoc cref="Table{TItem}.ExportButtonText"/>
-
     /// <inheritdoc cref="Table{TItem}.ExtendButtonColumnWidth"/>
     [Parameter]
     public int ExtendButtonColumnWidth { get; set; } = 130;
@@ -232,7 +230,6 @@ public partial class DefaultTable<TItem> where TItem : class, new()
     [Parameter]
     public bool ShowEditButton { get; set; } = true;
 
-
     /// <inheritdoc cref="Table{TItem}.ShowEmpty"/>
     [Parameter]
     public bool ShowEmpty { get; set; } = true;
@@ -340,7 +337,6 @@ public partial class DefaultTable<TItem> where TItem : class, new()
     [Parameter]
     public Size EditDialogSize { get; set; } = Size.ExtraExtraLarge;
 
-
     [NotNull]
     private Table<TItem>? Instance { get; set; }
 
@@ -360,7 +356,5 @@ public partial class DefaultTable<TItem> where TItem : class, new()
 
     /// <inheritdoc cref="Table{TItem}.ToggleLoading(bool)"/>
     public ValueTask ToggleLoading(bool v) => Instance.ToggleLoading(v);
-
-
 
 }

@@ -118,7 +118,6 @@ namespace ThingsGateway.SqlSugar
                 return GetListOrCache<DbColumnInfo>(cacheKey, sql).GroupBy(it => it.DbColumnName).Select(it => it.First()).ToList();
             else
                 return this.Context.Ado.SqlQuery<DbColumnInfo>(sql).GroupBy(it => it.DbColumnName).Select(it => it.First()).ToList();
-
         }
         /// <summary>
         /// 获取自增列列表
@@ -960,7 +959,6 @@ namespace ThingsGateway.SqlSugar
                     }
                 }
             }
-
 
             var uIndexColumns = columns.Where(it => it.UIndexGroupNameList.HasValue());
             if (uIndexColumns.HasValue())

@@ -52,7 +52,6 @@ namespace ThingsGateway.SqlSugar
                             var obj = Activator.CreateInstance(type);
                             var p = ParameterConverter.Invoke(obj, new object[] { expression.Value, 100 }) as SugarParameter;
                             customParameter = base.AppendParameter(p);
-
                         }
                     }
                 }

@@ -140,7 +140,6 @@ namespace ThingsGateway.SqlSugar
             {
                 return GetManyToManySql();
             }
-
         }
 
         private MapperSql GetDynamicSql()
@@ -203,7 +202,6 @@ namespace ThingsGateway.SqlSugar
 
         private MapperSql GetManyToManySql()
         {
-
             var bPk = this.ProPertyEntity.Columns.FirstOrDefault(it => it.IsPrimarykey == true)?.DbColumnName;
             var aPk = this.EntityInfo.Columns.FirstOrDefault(it => it.IsPrimarykey == true)?.DbColumnName;
             if (Navigat.BClassId.HasValue())
@@ -332,6 +330,5 @@ namespace ThingsGateway.SqlSugar
             }
             return sql;
         }
-
     }
 }

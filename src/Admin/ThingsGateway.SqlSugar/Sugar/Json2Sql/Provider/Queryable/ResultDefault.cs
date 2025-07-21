@@ -2,7 +2,6 @@
 
 namespace ThingsGateway.SqlSugar
 {
-
     /// <summary>
     /// ResultDefault
     /// </summary>

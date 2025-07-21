@@ -112,5 +112,4 @@ public class RedisCache : FullRedis, IDistributedCache, IDisposable
     public Task RemoveAsync(String key, CancellationToken token = default) => Task.Run(() => base.Remove(key), token);
 }
 
-
 #endif

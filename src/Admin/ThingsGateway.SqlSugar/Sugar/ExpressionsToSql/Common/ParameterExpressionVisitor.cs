@@ -69,7 +69,7 @@ namespace ThingsGateway.SqlSugar
             _nodes.Add(node);
             if (node.Arguments.Count != 0)
             {
-                Visit(node.Arguments.First());
+                Visit(node.Arguments[0]);
             }
             return node;
         }
@@ -80,5 +80,4 @@ namespace ThingsGateway.SqlSugar
             return _nodes;
         }
     }
-
 }

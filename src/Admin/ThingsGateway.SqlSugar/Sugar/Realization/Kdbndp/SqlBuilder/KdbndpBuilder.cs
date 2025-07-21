@@ -31,7 +31,6 @@
             }
         }
 
-
         public override string GetTranslationColumnName(string propertyName)
         {
             if (propertyName.Contains('.') && !propertyName.Contains(SqlTranslationLeft))
@@ -94,7 +93,6 @@
         {
             return " ( " + sql + " )  ";
         }
-
 
         /// <summary>
         /// 

@@ -73,11 +73,9 @@ public partial class SysOrgPage
             {
                 [nameof(SysOrgCopy.SysOrgCopyInput)] = SysOrgCopyInput,
             }).Render(),
-
         };
         SysOrgCopyInput.Ids = SelectedRows.Select(a => a.Id).ToList();
         await DialogService.Show(option);
-
     }
     private async Task<bool> Delete(IEnumerable<SysOrg> sysOrgs)
     {

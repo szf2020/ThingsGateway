@@ -71,8 +71,6 @@ public class SysRole : BaseEntity
     }
 }
 
-
-
 /// <summary>
 /// 默认数据范围
 /// </summary>

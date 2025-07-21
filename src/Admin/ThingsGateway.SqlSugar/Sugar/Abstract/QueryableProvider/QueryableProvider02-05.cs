@@ -199,7 +199,6 @@ namespace ThingsGateway.SqlSugar
             return result;
         }
 
-
         public ISugarQueryable<T, T2, T3> LeftJoinIF<T3>(bool isJoin, Expression<Func<T, T2, T3, bool>> joinExpression, string tableName)
         {
             var result = LeftJoin<T3>(joinExpression);
@@ -322,7 +321,6 @@ namespace ThingsGateway.SqlSugar
         /// <returns></returns>
         public new ISugarQueryable<T, T2> WhereClass<ClassType>(List<ClassType> whereClassTypes, bool ignoreDefaultValue = false) where ClassType : class, new()
         {
-
             base.WhereClass(whereClassTypes, ignoreDefaultValue);
             return this;
         }
@@ -884,7 +882,6 @@ namespace ThingsGateway.SqlSugar
             return result;
         }
 
-
         public ISugarQueryable<T, T2, T3, T4> InnerJoin<T4>(Expression<Func<T, T2, T3, T4, bool>> joinExpression)
         {
             this.Context.InitMappingInfo<T4>();
@@ -918,7 +915,6 @@ namespace ThingsGateway.SqlSugar
             var result = RightJoin<T4>(joinExpression);
             result.QueryBuilder.JoinQueryInfos.Last().TableName = tableName;
             return result;
-
         }
 
         public ISugarQueryable<T, T2, T3, T4> LeftJoinIF<T4>(bool isJoin, Expression<Func<T, T2, T3, T4, bool>> joinExpression, string tableName)
@@ -961,7 +957,6 @@ namespace ThingsGateway.SqlSugar
             }
             return result;
         }
-
 
         #region  Group 
         public new ISugarQueryable<T, T2, T3> PartitionBy(Expression<Func<T, object>> expression)
@@ -1294,7 +1289,6 @@ namespace ThingsGateway.SqlSugar
         /// <returns></returns>
         public new ISugarQueryable<T, T2, T3> WhereClass<ClassType>(List<ClassType> whereClassTypes, bool ignoreDefaultValue = false) where ClassType : class, new()
         {
-
             base.WhereClass(whereClassTypes, ignoreDefaultValue);
             return this;
         }
@@ -1861,7 +1855,6 @@ namespace ThingsGateway.SqlSugar
         /// <returns></returns>
         public new ISugarQueryable<T, T2, T3, T4> WhereClass<ClassType>(List<ClassType> whereClassTypes, bool ignoreDefaultValue = false) where ClassType : class, new()
         {
-
             base.WhereClass(whereClassTypes, ignoreDefaultValue);
             return this;
         }
@@ -2179,7 +2172,6 @@ namespace ThingsGateway.SqlSugar
             return this;
         }
 
-
         public ISugarQueryable<T, T2, T3, T4> In<FieldType>(Expression<Func<T, T2, object>> expression, IReadOnlyList<FieldType> inValues)
         {
             QueryBuilder.CheckExpression(expression, "In");
@@ -2212,7 +2204,6 @@ namespace ThingsGateway.SqlSugar
             return this;
         }
 
-
         public ISugarQueryable<T, T2, T3, T4> In<FieldType>(Expression<Func<T, T2, T3, T4, object>> expression, IReadOnlyList<FieldType> inValues)
         {
             QueryBuilder.CheckExpression(expression, "In");
@@ -2229,7 +2220,6 @@ namespace ThingsGateway.SqlSugar
             return this;
         }
         #endregion
-
 
         #region Other
         public new ISugarQueryable<T, T2, T3, T4> Take(int num)
@@ -2544,7 +2534,6 @@ namespace ThingsGateway.SqlSugar
             return result;
         }
 
-
         #region Where
         public new ISugarQueryable<T, T2, T3, T4, T5> Where(string expShortName, FormattableString expressionString)
         {
@@ -2659,7 +2648,6 @@ namespace ThingsGateway.SqlSugar
         /// <returns></returns>
         public new ISugarQueryable<T, T2, T3, T4, T5> WhereClass<ClassType>(List<ClassType> whereClassTypes, bool ignoreDefaultValue = false) where ClassType : class, new()
         {
-
             base.WhereClass(whereClassTypes, ignoreDefaultValue);
             return this;
         }
@@ -3045,7 +3033,6 @@ namespace ThingsGateway.SqlSugar
             _Filter(FilterName, isDisabledGobalFilter);
             return this;
         }
-
 
         public new ISugarQueryable<T, T2, T3, T4, T5> ClearFilter(params Type[] types)
         {

@@ -40,7 +40,7 @@ namespace ThingsGateway.SqlSugar
             MapperSql MapperSql = new MapperSql();
             var memberInfo = this.items.Where(it => it.Type == 1).First();
             var subInfos = this.items.Where(it => it.Type == 2).Reverse().ToList();
-            var formInfo = subInfos.First();
+            var formInfo = subInfos[0];
             var rootWhereSql = formInfo?.Nav?.WhereSql;
             var joinInfos = subInfos.Skip(1).ToList();
             var i = 0;
@@ -80,7 +80,7 @@ namespace ThingsGateway.SqlSugar
                 queryable.Where(rootWhereSql);
             }
             queryable.Select($" {ToShortName(lastShortName)}.{queryable.SqlBuilder.GetTranslationColumnName(selectColumnInfo.DbColumnName)}");
-            var last = subInfos.First();
+            var last = subInfos[0];
             var FirstPkColumn = last.ThisEntityInfo.Columns.FirstOrDefault(it => it.IsPrimarykey);
             if (last.Nav.Name2.HasValue())
             {
@@ -120,7 +120,6 @@ namespace ThingsGateway.SqlSugar
                     {
                         items.Add(new ExpressionItems() { Type = 2, Expression = child2Expression, ThisEntityInfo = this.context.EntityMaintenance.GetEntityInfo(child2Expression.Type), ParentEntityInfo = this.context.EntityMaintenance.GetEntityInfo(GetMemberExpression(child2Expression).Type) });
                         child2Expression = GetMemberExpression(child2Expression);
-
                     }
                     else if (IsParameter(child2Expression))
                     {

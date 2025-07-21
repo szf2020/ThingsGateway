@@ -12,7 +12,6 @@ namespace ThingsGateway.Admin.Application;
 
 public enum DataScopeEnum
 {
-
     /// <summary>
     /// 仅自己
     /// </summary>
@@ -37,5 +36,4 @@ public enum DataScopeEnum
     /// 自定义
     /// </summary>
     SCOPE_ORG_DEFINE,
-
 }

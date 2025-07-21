@@ -17,7 +17,6 @@ public class ValueTransformConfig
     /// </summary>
     public int DecimalPlaces { get; set; } = 2;
 
-
     /// <summary>
     /// 限制范围
     /// </summary>
@@ -41,8 +40,6 @@ public class ValueTransformConfig
     /// 实际高
     /// </summary>
     public decimal ActualMax { get; set; }
-
-
 }
 
 public enum ValueTransformType

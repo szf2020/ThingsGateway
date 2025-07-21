@@ -117,7 +117,6 @@ public class UdpSessionChannel : UdpSession, IClientChannel
                         await this.OnChannelEvent(Started).ConfigureAwait(false);
                     }
                 }
-
             }
             finally
             {
@@ -169,7 +168,6 @@ public class UdpSessionChannel : UdpSession, IClientChannel
         return $"{ChannelOptions.BindUrl} {ChannelOptions.RemoteUrl}";
     }
 
-
     /// <inheritdoc/>
     protected override async Task OnUdpReceived(UdpReceivedDataEventArgs e)
     {
@@ -195,5 +193,4 @@ public class UdpSessionChannel : UdpSession, IClientChannel
         WaitHandlePool.SafeDispose();
         base.Dispose(disposing);
     }
-
 }

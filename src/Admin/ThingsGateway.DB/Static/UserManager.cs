@@ -27,7 +27,6 @@ public static class UserManager
     /// </summary>
     public static bool SuperAdmin => (_claimsPrincipalService.User?.FindFirst(ClaimConst.SuperAdmin)?.Value).ToBoolean(false);
 
-
     /// <summary>
     /// 当前用户账号
     /// </summary>
@@ -51,5 +50,4 @@ public static class UserManager
     public static long OrgId => (_claimsPrincipalService.User?.FindFirst(ClaimConst.OrgId)?.Value).ToLong();
 
     public static long TenantId => (_claimsPrincipalService.User?.FindFirst(ClaimConst.TenantId)?.Value)?.ToLong() ?? 0;
-
 }

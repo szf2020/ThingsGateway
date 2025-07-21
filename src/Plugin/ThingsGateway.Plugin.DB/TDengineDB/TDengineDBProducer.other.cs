@@ -28,7 +28,6 @@ namespace ThingsGateway.Plugin.TDengineDB;
 /// </summary>
 public partial class TDengineDBProducer : BusinessBaseWithCacheIntervalVariable
 {
-
     protected override ValueTask<OperResult> UpdateVarModel(IEnumerable<CacheDBItem<VariableBasicData>> item, CancellationToken cancellationToken)
     {
         return UpdateVarModel(item.Select(a => a.Value).OrderBy(a => a.Id), cancellationToken);
@@ -78,9 +77,7 @@ public partial class TDengineDBProducer : BusinessBaseWithCacheIntervalVariable
     {
         if (_driverPropertys.GroupUpdate && variable.BusinessGroupUpdateTrigger && !variable.BusinessGroup.IsNullOrEmpty() && VariableRuntimeGroups.TryGetValue(variable.BusinessGroup, out var variableRuntimeGroup))
         {
-
             AddQueueVarModel(new CacheDBItem<List<VariableBasicData>>(variableRuntimeGroup.AdaptListVariableBasicData()));
-
         }
         else
         {
@@ -113,7 +110,6 @@ public partial class TDengineDBProducer : BusinessBaseWithCacheIntervalVariable
                 var getDeviceModel = CSharpScriptEngineExtension.Do<DynamicSQLBase>(_driverPropertys.BigTextScriptHistoryTable);
                 getDeviceModel.Logger = LogMessage;
                 await getDeviceModel.DBInsertable(_db, dbInserts, cancellationToken).ConfigureAwait(false);
-
             }
             else
             {
@@ -123,7 +119,6 @@ public partial class TDengineDBProducer : BusinessBaseWithCacheIntervalVariable
                 await InserableAsync(numberData, _driverPropertys.NumberTableNameLow, cancellationToken).ConfigureAwait(false);
 
                 await InserableAsync(stringData, _driverPropertys.StringTableNameLow, cancellationToken).ConfigureAwait(false);
-
             }
             return OperResult.Success;
         }
@@ -163,20 +158,17 @@ public partial class TDengineDBProducer : BusinessBaseWithCacheIntervalVariable
                 }
                 stringBuilder.Remove(stringBuilder.Length - 1, 1);
             }
-
         }
         stringBuilder.Append(';');
         stringBuilder.AppendLine();
 
         var result = await _db.Ado.ExecuteCommandAsync(stringBuilder.ToString(), default, cancellationToken: cancellationToken).ConfigureAwait(false);
 
-
         stopwatch.Stop();
         //if (result > 0)
         {
             LogMessage?.Trace($"TableName：{tableName}，Count：{result}，watchTime:  {stopwatch.ElapsedMilliseconds} ms");
         }
-
     }
     private string GetValue(VariableBasicData src)
     {

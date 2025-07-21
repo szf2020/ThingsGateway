@@ -41,12 +41,10 @@ namespace ThingsGateway.SqlSugar
 
         private void AfterJoin()
         {
-
         }
 
         private void BeforeJoin()
         {
-
         }
     }
 }

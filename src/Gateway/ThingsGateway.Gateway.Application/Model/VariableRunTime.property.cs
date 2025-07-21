@@ -21,8 +21,6 @@ public partial class VariableRuntime : Variable, IVariable, IDisposable
 {
 
 
-
-
     #region 属性
     /// <summary>
     /// 事件类型
@@ -36,13 +34,11 @@ public partial class VariableRuntime : Variable, IVariable, IDisposable
     [AutoGenerateColumn(Visible = false)]
     public AlarmTypeEnum? AlarmType { get => alarmType; set => alarmType = value; }
 
-
     /// <summary>
     /// 报警值
     /// </summary>
     [AutoGenerateColumn(Visible = false)]
     public string AlarmCode { get => alarmCode; set => alarmCode = value; }
-
 
     /// <summary>
     /// 恢复值
@@ -73,13 +69,11 @@ public partial class VariableRuntime : Variable, IVariable, IDisposable
     [AutoGenerateColumn(Visible = false)]
     public DateTime AlarmTime { get => alarmTime; set => alarmTime = value; }
 
-
     /// <summary>
     /// 事件时间
     /// </summary>
     [AutoGenerateColumn(Visible = false)]
     public DateTime EventTime { get => eventTime; set => eventTime = value; }
-
 
     /// <summary>
     /// 采集时间
@@ -87,12 +81,10 @@ public partial class VariableRuntime : Variable, IVariable, IDisposable
     [AutoGenerateColumn(Visible = true, Filterable = true, Sortable = true, Order = 5)]
     public DateTime CollectTime { get => collectTime; set => collectTime = value; }
 
-
     [SugarColumn(ColumnDescription = "排序码", IsNullable = true)]
     [AutoGenerateColumn(Visible = false, DefaultSort = false, Sortable = true)]
     [IgnoreExcel]
     public override int SortCode { get => sortCode; set => sortCode = value; }
-
 
     /// <summary>
     /// 上次值
@@ -105,8 +97,6 @@ public partial class VariableRuntime : Variable, IVariable, IDisposable
     /// </summary>
     [AutoGenerateColumn(Visible = false, Order = 6)]
     public object RawValue { get => rawValue; set => rawValue = value; }
-
-
 
     /// <summary>
     /// 所在采集设备
@@ -134,8 +124,6 @@ public partial class VariableRuntime : Variable, IVariable, IDisposable
     [AutoGenerateColumn(Ignore = true)]
     public VariableMethod? VariableMethod { get => variableMethod; set => variableMethod = value; }
 
-
-
     /// <summary>
     /// 这个参数值由自动打包方法写入<see cref="IDevice.LoadSourceRead{T}(IEnumerable{IVariable}, int, string)"/>
     /// </summary>
@@ -143,9 +131,6 @@ public partial class VariableRuntime : Variable, IVariable, IDisposable
     [System.Text.Json.Serialization.JsonIgnore]
     [AutoGenerateColumn(Ignore = true)]
     public IThingsGatewayBitConverter? ThingsGatewayBitConverter { get => thingsGatewayBitConverter; set => thingsGatewayBitConverter = value; }
-
-
-
 
     /// <summary>
     /// 设备名称
@@ -177,7 +162,6 @@ public partial class VariableRuntime : Variable, IVariable, IDisposable
         }
     }
 
-
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
@@ -193,7 +177,6 @@ public partial class VariableRuntime : Variable, IVariable, IDisposable
         }
     }
 
-
     /// <summary>
     /// 实时值类型
     /// </summary>
@@ -205,11 +188,6 @@ public partial class VariableRuntime : Variable, IVariable, IDisposable
     /// </summary>
     [AutoGenerateColumn(Visible = true, Order = 6)]
     public object Value { get => _value; set => _value = value; }
-
-
-
-
-
 
     /// <summary>
     /// 报警使能
@@ -238,4 +216,3 @@ public partial class VariableRuntime : Variable, IVariable, IDisposable
     #endregion
 
 }
-

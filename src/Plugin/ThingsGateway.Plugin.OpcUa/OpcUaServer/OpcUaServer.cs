@@ -93,7 +93,6 @@ public partial class OpcUaServer : BusinessBase
         m_server?.Stop();
     }
 
-
     protected override async Task InitChannelAsync(IChannel? channel, CancellationToken cancellationToken)
     {
         await UaInit().ConfigureAwait(false);
@@ -103,8 +102,6 @@ public partial class OpcUaServer : BusinessBase
         Localizer = App.CreateLocalizerByType(typeof(OpcUaServer))!;
 
         await base.InitChannelAsync(channel, cancellationToken).ConfigureAwait(false);
-
-
     }
 
     private async Task UaInit()
@@ -118,10 +115,7 @@ public partial class OpcUaServer : BusinessBase
         m_application.ApplicationConfiguration = m_configuration;
         if (m_configuration.SecurityConfiguration.AutoAcceptUntrustedCertificates)
         {
-            m_configuration.CertificateValidator.CertificateValidation += (s, e) =>
-            {
-                e.Accept = (e.Error.StatusCode == StatusCodes.BadCertificateUntrusted);
-            };
+            m_configuration.CertificateValidator.CertificateValidation += (s, e) => e.Accept = (e.Error.StatusCode == StatusCodes.BadCertificateUntrusted);
         }
 
         m_server = new(this);
@@ -134,8 +128,6 @@ public partial class OpcUaServer : BusinessBase
         {
             try
             {
-
-
                 //https://github.com/OPCFoundation/UA-.NETStandard/pull/3113
 
                 if (m_server?.MessageContext?.Factory != null)
@@ -147,7 +139,6 @@ public partial class OpcUaServer : BusinessBase
 
                 typeof(EncodeableFactory).GetField("s_globalFactory", BindingFlags.NonPublic | BindingFlags.Static)?.SetValue(null, new EncodeableFactory());
                 typeof(ServiceMessageContext).GetField("s_globalContext", BindingFlags.NonPublic | BindingFlags.Static)?.SetValue(null, typeof(ServiceMessageContext).GetConstructor(BindingFlags.NonPublic | BindingFlags.Instance, null, new Type[] { typeof(bool) }, null).Invoke(new object[] { true }));
-
 
                 var listeners = m_server.GetValue("m_listeners") as List<ITransportListener>;
                 if (listeners != null)
@@ -164,7 +155,6 @@ public partial class OpcUaServer : BusinessBase
             }
             catch
             {
-
             }
         }
         m_server?.Stop();
@@ -182,7 +172,6 @@ public partial class OpcUaServer : BusinessBase
         {
             return false;
         }
-
     }
 
     /// <inheritdoc/>
@@ -195,18 +184,13 @@ public partial class OpcUaServer : BusinessBase
         base.Dispose(disposing);
     }
 
-
-
     protected override async Task ProtectedStartAsync(CancellationToken cancellationToken)
     {
         // 启动服务器。
         await m_application.CheckApplicationInstanceCertificates(true, 1200, cancellationToken).ConfigureAwait(false);
 
         await m_application.Start(m_server).ConfigureAwait(false);
-        IdVariableRuntimes.ForEach(a =>
-        {
-            VariableValueChange(a.Value, a.Value.AdaptVariableBasicData());
-        });
+        IdVariableRuntimes.ForEach(a => VariableValueChange(a.Value, a.Value.AdaptVariableBasicData()));
         await base.ProtectedStartAsync(cancellationToken).ConfigureAwait(false);
     }
 
@@ -223,10 +207,7 @@ public partial class OpcUaServer : BusinessBase
                     await m_application.Start(m_server).ConfigureAwait(false);
                     connect_success = true;
                     await Task.Delay(2000, cancellationToken).ConfigureAwait(false);
-                    IdVariableRuntimes.ForEach(a =>
-                    {
-                        VariableValueChange(a.Value, a.Value.AdaptVariableBasicData());
-                    });
+                    IdVariableRuntimes.ForEach(a => VariableValueChange(a.Value, a.Value.AdaptVariableBasicData()));
                 }
                 catch (Exception ex)
                 {
@@ -264,7 +245,6 @@ public partial class OpcUaServer : BusinessBase
                 LogMessage?.LogWarning(ex);
             success = false;
         }
-
     }
 
     private ApplicationConfiguration GetDefaultConfiguration()
@@ -357,7 +337,6 @@ public partial class OpcUaServer : BusinessBase
             MaxRequestThreadCount = 1000,
             MaxQueuedRequestCount = 20000,
 
-
             DiagnosticsEnabled = false,           // 是否启用诊断
             MaxSessionCount = 1000,               // 最大打开会话数
             MinSessionTimeout = 10000,            // 允许该会话在与客户端断开时（单位毫秒）仍然保持连接的最小时间
@@ -381,10 +360,8 @@ public partial class OpcUaServer : BusinessBase
             MaxSubscriptionCount = 1000,
             MaxEventQueueSize = 50000,
 
-
             MaxTrustListSize = 0,
             MultiCastDnsEnabled = false,
-
         };
         config.SecurityConfiguration = new SecurityConfiguration()
         {
@@ -476,10 +453,7 @@ public partial class OpcUaServer : BusinessBase
             base.PauseThread(pause);
             if (!pause && oldV != pause)
             {
-                IdVariableRuntimes.ForEach(a =>
-                {
-                    VariableValueChange(a.Value, a.Value.AdaptVariableBasicData());
-                });
+                IdVariableRuntimes.ForEach(a => VariableValueChange(a.Value, a.Value.AdaptVariableBasicData()));
             }
         }
     }

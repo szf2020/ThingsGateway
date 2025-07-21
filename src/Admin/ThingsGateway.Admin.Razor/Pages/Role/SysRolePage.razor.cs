@@ -29,7 +29,6 @@ public partial class SysRolePage
     [NotNull]
     private ISysOrgService? SysOrgService { get; set; }
 
-
     #region 查询
 
     private async Task<QueryData<SysRole>> OnQueryAsync(QueryPageOptions options)
@@ -83,7 +82,6 @@ public partial class SysRolePage
         var ids = new List<string>();
         ids.AddRange(hasResources.Select(a => a.ApiUrl));
 
-
         var op = new DialogOption()
         {
             IsScrolling = true,
@@ -116,7 +114,6 @@ public partial class SysRolePage
                 [nameof(GrantApiDialog.ValueChanged)] = (List<string> v) => { ids = v; return Task.CompletedTask; },
             }).Render(),
         };
-
 
         await DialogService.Show(op);
     }
@@ -174,7 +171,6 @@ public partial class SysRolePage
                     await ToastService.Warn(ex);
                     return false;
                 }
-
             },
             Class = "dialog-table",
             BodyTemplate = BootstrapDynamicComponent.CreateComponent<GrantResourceDialog>(new Dictionary<string, object?>
@@ -185,7 +181,6 @@ public partial class SysRolePage
         };
         await DialogService.Show(op);
     }
-
 
     private async Task GrantUser(long id)
     {
@@ -218,10 +213,8 @@ public partial class SysRolePage
                 [nameof(UserChoiceDialog.Values)] = data,
                 [nameof(UserChoiceDialog.ValuesChanged)] = (HashSet<long> v) => OnGrantUserValueChanged(v, id)
             }).Render(),
-
         };
         await DialogService.Show(option);
-
     }
     private HashSet<long> GrantUserChoiceValues = new();
     private async Task OnGrantUserValueChanged(HashSet<long> values, long roleId, bool change = false)

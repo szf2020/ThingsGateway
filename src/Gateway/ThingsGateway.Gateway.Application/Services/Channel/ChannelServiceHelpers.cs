@@ -8,7 +8,6 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-
 using BootstrapBlazor.Components;
 
 using System.Reflection;
@@ -19,7 +18,6 @@ namespace ThingsGateway.Gateway.Application;
 
 public static class ChannelServiceHelpers
 {
-
     public static USheetDatas ExportChannel(IEnumerable<Channel> channels)
     {
         var rows = ExportRows(channels); // IEnumerable 延迟执行
@@ -137,7 +135,6 @@ public static class ChannelServiceHelpers
         var sheetNames = uSheetDatas.sheets.Keys.ToList();
         foreach (var sheetName in sheetNames)
         {
-
             List<IDictionary<string, object>> rows = new();
             var first = uSheetDatas.sheets[sheetName].cellData[0];
 
@@ -165,5 +162,4 @@ public static class ChannelServiceHelpers
 
         return ImportPreviews;
     }
-
 }

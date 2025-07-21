@@ -58,7 +58,6 @@ public class ModbusTcpSend : ISendMessage
 
         var wf = ModbusAddress.WriteFunctionCode;
 
-
         if (ModbusAddress.FunctionCode > 0x30 && ModbusAddress.WriteFunctionCode < 0x30)
         {
             ModbusAddress.WriteFunctionCode += 0x30;

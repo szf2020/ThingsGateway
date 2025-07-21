@@ -94,7 +94,7 @@ namespace ThingsGateway.SqlSugar
                 }
             }
 
-            var selfParameterName = this.Context.GetTranslationColumnName((argExp as LambdaExpression).Parameters.First().Name) + UtilConstants.Dot;
+            var selfParameterName = this.Context.GetTranslationColumnName((argExp as LambdaExpression).Parameters[0].Name) + UtilConstants.Dot;
             if (this.Context.JoinIndex == 0 && result.Contains(" FROM "))
             {
                 this.Context.CurrentShortName = selfParameterName.TrimEnd('.');

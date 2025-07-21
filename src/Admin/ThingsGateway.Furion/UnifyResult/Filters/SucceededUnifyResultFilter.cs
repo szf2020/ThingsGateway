@@ -116,7 +116,6 @@ public class SucceededUnifyResultFilter : IAsyncActionFilter, IOrderedFilter
 
             var result = unifyResult.OnValidateFailed(context, validationMetadata);
             if (result != null) actionExecutedContext.Result = result;
-
         }
         else
         {

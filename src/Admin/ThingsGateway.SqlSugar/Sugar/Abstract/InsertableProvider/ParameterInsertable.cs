@@ -123,7 +123,6 @@ namespace ThingsGateway.SqlSugar
         /// <returns>影响行数</returns>
         public int ValuesExecuteCommand()
         {
-
             int result = 0;
             var inserable = Inserable as InsertableProvider<T>;
             var columns = inserable.InsertBuilder.DbColumnInfoList.GroupBy(it => it.DbColumnName).Select(it => it.Key).Distinct().ToList();
@@ -144,15 +143,12 @@ namespace ThingsGateway.SqlSugar
             pageSize = GetPageSize(pageSize, count);
             this.Context.Utilities.PageEach(objects, pageSize, pagelist =>
             {
-
                 StringBuilder batchInsetrSql;
                 List<SugarParameter> allParamter = new List<SugarParameter>();
                 GetInsertValues(identityList, columns, tableWithString, removeCacheFunc, pagelist, out batchInsetrSql, allParamter);
                 result += this.Context.Ado.ExecuteCommand(batchInsetrSql.ToString(), allParamter);
-
             });
             return result;
-
         }
 
         /// <summary>
@@ -174,12 +170,10 @@ namespace ThingsGateway.SqlSugar
             }
             await Context.Utilities.PageEachAsync(objects, 100, async pagelist =>
             {
-
                 StringBuilder batchInsetrSql;
                 List<SugarParameter> allParamter = new List<SugarParameter>();
                 GetInsertValues(identityList, columns, tableWithString, removeCacheFunc, pagelist, out batchInsetrSql, allParamter);
                 result += await Context.Ado.ExecuteCommandAsync(batchInsetrSql.ToString(), allParamter).ConfigureAwait(false);
-
             }).ConfigureAwait(false);
             return result;
         }
@@ -218,7 +212,7 @@ namespace ThingsGateway.SqlSugar
             batchInsetrSql.Append("INSERT INTO " + itemable.InsertBuilder.GetTableNameString + " ");
             batchInsetrSql.Append('(');
             var groupList = itemable.InsertBuilder.DbColumnInfoList.Where(it => !identitys.Contains(it.PropertyName)).GroupBy(it => it.TableId).ToList();
-            string columnsString = string.Join(",", groupList.First().Select(it => itemable.InsertBuilder.Builder.GetTranslationColumnName(it.DbColumnName)));
+            string columnsString = string.Join(",", groupList[0].Select(it => itemable.InsertBuilder.Builder.GetTranslationColumnName(it.DbColumnName)));
             batchInsetrSql.Append(columnsString);
             batchInsetrSql.Append(") VALUES");
             string insertColumns = "";

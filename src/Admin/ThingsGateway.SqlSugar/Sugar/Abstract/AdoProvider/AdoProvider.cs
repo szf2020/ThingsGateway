@@ -1084,17 +1084,11 @@ namespace ThingsGateway.SqlSugar
             // 由于DataSet不支持真正的异步操作，这里使用Task.Run模拟异步
             if (CancellationToken == null)
             {
-                return Task.Run(() =>
-                {
-                    return GetDataSetAll(sql, parameters);
-                });
+                return Task.Run(() => GetDataSetAll(sql, parameters));
             }
             else
             {
-                return Task.Run(() =>
-                {
-                    return GetDataSetAll(sql, parameters);
-                }, this.CancellationToken.Value);
+                return Task.Run(() => GetDataSetAll(sql, parameters), this.CancellationToken.Value);
             }
         }
         #endregion
@@ -1133,7 +1127,6 @@ namespace ThingsGateway.SqlSugar
             return Convert.ToString(await GetScalarAsync(sql, parameters).ConfigureAwait(false));
         }
 
-
         /// <summary>
         /// 获取长整型结果(使用对象参数)
         /// </summary>
@@ -1158,7 +1151,6 @@ namespace ThingsGateway.SqlSugar
             return GetInt(sql, this.GetParameters(parameters));
         }
 
-
         /// <summary>
         /// 获取整型结果(使用参数数组)
         /// </summary>
@@ -1174,8 +1166,6 @@ namespace ThingsGateway.SqlSugar
         {
             return GetIntAsync(sql, this.GetParameters(parameters));
         }
-
-
 
         /// <summary>
         /// 异步获取整型结果(使用参数数组)
@@ -1202,8 +1192,6 @@ namespace ThingsGateway.SqlSugar
             return GetScalar(sql, parameters).ObjToMoney();
         }
 
-
-
         /// <summary>
         /// 异步获取双精度浮点数结果(使用对象参数)
         /// </summary>
@@ -1221,7 +1209,6 @@ namespace ThingsGateway.SqlSugar
             return result.ObjToMoney();
         }
 
-
         /// <summary>
         /// 获取十进制数结果(使用对象参数)
         /// </summary>
@@ -1237,8 +1224,6 @@ namespace ThingsGateway.SqlSugar
         {
             return GetScalar(sql, parameters).ObjToDecimal();
         }
-
-
 
         /// <summary>
         /// 异步获取十进制数结果(使用对象参数)
@@ -1257,7 +1242,6 @@ namespace ThingsGateway.SqlSugar
             return result.ObjToDecimal();
         }
 
-
         /// <summary>
         /// 获取日期时间结果(使用对象参数)
         /// </summary>
@@ -1273,8 +1257,6 @@ namespace ThingsGateway.SqlSugar
         {
             return GetScalar(sql, parameters).ObjToDate();
         }
-
-
 
         /// <summary>
         /// 异步获取日期时间结果(使用对象参数)
@@ -1292,8 +1274,6 @@ namespace ThingsGateway.SqlSugar
             var list = await GetScalarAsync(sql, parameters).ConfigureAwait(false);
             return list.ObjToDate();
         }
-
-
 
         #endregion
 
@@ -1340,8 +1320,6 @@ namespace ThingsGateway.SqlSugar
             this.Context.Ado.IsDisableMasterSlaveSeparation = oldValue;
             return result;
         }
-
-
 
         /// <summary>
         /// 执行SQL查询并返回两个结果集
@@ -1496,8 +1474,6 @@ namespace ThingsGateway.SqlSugar
             return result.Item1;
         }
 
-
-
         /// <summary>
         /// 异步执行SQL查询并返回两个结果集
         /// </summary>
@@ -1639,8 +1615,6 @@ namespace ThingsGateway.SqlSugar
             return result == null ? default(T) : result.FirstOrDefault();
         }
 
-
-
         /// <summary>
         /// 异步执行SQL查询并返回单个对象(使用对象参数)
         /// </summary>
@@ -1658,8 +1632,6 @@ namespace ThingsGateway.SqlSugar
             var result = await SqlQueryAsync<T>(sql, parameters).ConfigureAwait(false);
             return result == null ? default(T) : result.FirstOrDefault();
         }
-
-
 
         #endregion
 
@@ -1683,8 +1655,6 @@ namespace ThingsGateway.SqlSugar
             return GetDataTable(sql, this.GetParameters(parameters));
         }
 
-
-
         /// <summary>
         /// 异步获取DataTable(使用参数数组)
         /// </summary>
@@ -1703,8 +1673,6 @@ namespace ThingsGateway.SqlSugar
             return GetDataTableAsync(sql, this.GetParameters(parameters));
         }
 
-
-
         #endregion
 
         #region DataSet Methods
@@ -1717,7 +1685,6 @@ namespace ThingsGateway.SqlSugar
             return GetDataSetAll(sql, this.GetParameters(parameters));
         }
 
-
         /// <summary>
         /// 异步获取DataSet(使用对象参数)
         /// </summary>
@@ -1725,7 +1692,6 @@ namespace ThingsGateway.SqlSugar
         {
             return GetDataSetAllAsync(sql, this.GetParameters(parameters));
         }
-
 
         #endregion
 
@@ -1739,8 +1705,6 @@ namespace ThingsGateway.SqlSugar
             return GetDataReader(sql, this.GetParameters(parameters));
         }
 
-
-
         /// <summary>
         /// 异步获取DataReader(使用对象参数)
         /// </summary>
@@ -1748,7 +1712,6 @@ namespace ThingsGateway.SqlSugar
         {
             return GetDataReaderAsync(sql, this.GetParameters(parameters));
         }
-
 
         #endregion
 
@@ -1762,7 +1725,6 @@ namespace ThingsGateway.SqlSugar
             return GetScalar(sql, this.GetParameters(parameters));
         }
 
-
         /// <summary>
         /// 异步获取标量值(使用对象参数)
         /// </summary>
@@ -1770,7 +1732,6 @@ namespace ThingsGateway.SqlSugar
         {
             return GetScalarAsync(sql, this.GetParameters(parameters));
         }
-
 
         #endregion
 
@@ -1783,8 +1744,6 @@ namespace ThingsGateway.SqlSugar
         {
             return ExecuteCommand(sql, GetParameters(parameters));
         }
-
-
 
         /// <summary>
         /// 异步执行命令(带取消令牌)
@@ -1802,7 +1761,6 @@ namespace ThingsGateway.SqlSugar
         {
             return ExecuteCommandAsync(sql, GetParameters(parameters));
         }
-
 
         #endregion
 
@@ -1934,7 +1892,7 @@ namespace ThingsGateway.SqlSugar
                     var gobalOutputParamter = this.OutputParameters.FirstOrDefault(it => it.ParameterName == outputParameter.ParameterName);
                     if (gobalOutputParamter == null)
                     {//Oracle bug
-                        gobalOutputParamter = this.OutputParameters.FirstOrDefault(it => it.ParameterName == outputParameter.ParameterName.TrimStart(outputParameter.ParameterName.First()));
+                        gobalOutputParamter = this.OutputParameters.FirstOrDefault(it => it.ParameterName == outputParameter.ParameterName.TrimStart(outputParameter.ParameterName[0]));
                     }
                     outputParameter.Value = gobalOutputParamter.Value;
                     this.OutputParameters.Remove(gobalOutputParamter);

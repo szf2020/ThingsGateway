@@ -8,7 +8,6 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-
 using ThingsGateway.Admin.Application;
 
 namespace ThingsGateway.Admin.Razor;
@@ -59,10 +58,7 @@ public partial class LoginConnectionHub : ComponentBase, IDisposable
                 else
                     await InvokeAsync(async () => await ToastService.Warning(message.Data));
             });
-            NavigationUri.Subscribe(ClientId, async (message) =>
-            {
-                await ShowMessage(message);
-            });
+            NavigationUri.Subscribe(ClientId, async (message) => await ShowMessage(message));
             VerificatInfoUtil.UpdateVerificat(ClientId, VerificatId, isConnect: true);
         }
         catch (OperationCanceledException)
@@ -88,12 +84,7 @@ public partial class LoginConnectionHub : ComponentBase, IDisposable
             ShowDismiss = true,
             IsAutoHide = false,
             ChildContent = RenderItem(navigationUri),
-            OnDismiss = () =>
-            {
-                return Task.CompletedTask;
-            }
+            OnDismiss = () => Task.CompletedTask
         });
     }
-
-
 }

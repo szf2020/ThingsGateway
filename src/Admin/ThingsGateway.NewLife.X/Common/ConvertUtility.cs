@@ -543,7 +543,6 @@ public class DefaultConvert
             {
                 return n3 != 0;
             }
-
         }
         try
         {

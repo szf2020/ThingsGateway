@@ -294,7 +294,6 @@ namespace ThingsGateway.SqlSugar
                         string name = this.Context.GetTranslationTableName(parameter.CurrentExpression.Type.Name, true);
                         if (name.Contains('.'))
                         {
-
                         }
                         else if (isSubJoin)
                         {

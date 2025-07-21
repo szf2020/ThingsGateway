@@ -7,7 +7,6 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Text.RegularExpressions;
 
-
 namespace ThingsGateway.SqlSugar
 {
     public partial class QueryableProvider<T> : QueryableAccessory, ISugarQueryable<T>
@@ -26,11 +25,11 @@ namespace ThingsGateway.SqlSugar
             {
                 if (this.QueryBuilder.JoinQueryInfos.Count > 0)
                 {
-                    tableName = this.QueryBuilder.JoinQueryInfos.First().TableName;
+                    tableName = this.QueryBuilder.JoinQueryInfos[0].TableName;
                 }
                 if (this.QueryBuilder.EasyJoinInfos.Count > 0)
                 {
-                    tableName = this.QueryBuilder.JoinQueryInfos.First().TableName;
+                    tableName = this.QueryBuilder.JoinQueryInfos[0].TableName;
                 }
             }
             var current = this.Context.Queryable<T>().AS(tableName).Filter(null, this.QueryBuilder.IsDisabledGobalFilter).Where(new List<IConditionalModel>() {
@@ -84,11 +83,11 @@ namespace ThingsGateway.SqlSugar
             {
                 if (this.QueryBuilder.JoinQueryInfos.Count > 0)
                 {
-                    tableName = this.QueryBuilder.JoinQueryInfos.First().TableName;
+                    tableName = this.QueryBuilder.JoinQueryInfos[0].TableName;
                 }
                 if (this.QueryBuilder.EasyJoinInfos.Count > 0)
                 {
-                    tableName = this.QueryBuilder.JoinQueryInfos.First().TableName;
+                    tableName = this.QueryBuilder.JoinQueryInfos[0].TableName;
                 }
             }
             var current = this.Context.Queryable<T>().AS(tableName).WhereIF(parentWhereExpression != default, parentWhereExpression).Filter(null, this.QueryBuilder.IsDisabledGobalFilter).Where(new List<IConditionalModel>() {
@@ -143,11 +142,11 @@ namespace ThingsGateway.SqlSugar
             {
                 if (this.QueryBuilder.JoinQueryInfos.Count > 0)
                 {
-                    tableName = this.QueryBuilder.JoinQueryInfos.First().TableName;
+                    tableName = this.QueryBuilder.JoinQueryInfos[0].TableName;
                 }
                 if (this.QueryBuilder.EasyJoinInfos.Count > 0)
                 {
-                    tableName = this.QueryBuilder.JoinQueryInfos.First().TableName;
+                    tableName = this.QueryBuilder.JoinQueryInfos[0].TableName;
                 }
             }
             var current = await Context.Queryable<T>().AS(tableName).Filter(null, QueryBuilder.IsDisabledGobalFilter).Where(new List<IConditionalModel>() {
@@ -202,11 +201,11 @@ namespace ThingsGateway.SqlSugar
             {
                 if (this.QueryBuilder.JoinQueryInfos.Count > 0)
                 {
-                    tableName = this.QueryBuilder.JoinQueryInfos.First().TableName;
+                    tableName = this.QueryBuilder.JoinQueryInfos[0].TableName;
                 }
                 if (this.QueryBuilder.EasyJoinInfos.Count > 0)
                 {
-                    tableName = this.QueryBuilder.JoinQueryInfos.First().TableName;
+                    tableName = this.QueryBuilder.JoinQueryInfos[0].TableName;
                 }
             }
             var current = await Context.Queryable<T>().AS(tableName).WhereIF(parentWhereExpression != default, parentWhereExpression).Filter(null, QueryBuilder.IsDisabledGobalFilter).Where(new List<IConditionalModel>() {
@@ -363,10 +362,8 @@ namespace ThingsGateway.SqlSugar
         {
             var result = alllist.Where(it =>
             {
-
                 var value = it.GetType().GetProperty(parentIdName).GetValue(it);
                 return value.ObjToString() == pkValue.ObjToString();
-
             }).ToList();
             if (result?.Count > 0)
             {
@@ -417,7 +414,7 @@ namespace ThingsGateway.SqlSugar
                 {
                     this.QueryableMappingTableList = new MappingTableList();
                 }
-                this.QueryableMappingTableList.Add(expMapping.First());
+                this.QueryableMappingTableList.Add(expMapping[0]);
             }
         }
         private void _CountBegin(out MappingTableList expMapping, out int result)
@@ -599,8 +596,7 @@ namespace ThingsGateway.SqlSugar
                 var isSqlMethod = expressionTree.Count != 0 && ExpressionTool.GetMethodName(expressionTree.Last()).IsIn("Any", "Count");
                 if (expressionTree.Count != 0 && isSqlMethod == false)
                 {
-
-                    var name = ExpressionTool.GetMemberName(expressionTree.First());
+                    var name = ExpressionTool.GetMemberName(expressionTree[0]);
                     if (name != null && entityColumns.Any(it => it.Navigat != null && it.PropertyName == name))
                     {
                         var mappingNavColumnInfo = new MappingNavColumnInfo()
@@ -627,7 +623,6 @@ namespace ThingsGateway.SqlSugar
                         navInfo.MappingNavProperties.Add(item.Key, mappingNavColumnInfo);
                     }
                 }
-
             }
         }
 
@@ -639,7 +634,7 @@ namespace ThingsGateway.SqlSugar
             }
             foreach (var item in navManages)
             {
-                var FirstExp = item.Expressions.First();
+                var FirstExp = item.Expressions[0];
                 var navName = ExpressionTool.GetMemberName(FirstExp);
                 if (FirstExp is LambdaExpression && ExpressionTool.GetMethodName((FirstExp as LambdaExpression).Body) == "ToList")
                 {
@@ -685,7 +680,7 @@ namespace ThingsGateway.SqlSugar
         {
             if (this.QueryBuilder.Includes != null)
             {
-                await Task.Run(() => { _InitNavigat(result); }).ConfigureAwait(false);
+                await Task.Run(() => _InitNavigat(result)).ConfigureAwait(false);
             }
         }
         private void _InitNavigat<TResult>(List<TResult> result)
@@ -728,7 +723,7 @@ namespace ThingsGateway.SqlSugar
                     var allColumns = this.Context.EntityMaintenance.GetEntityInfo(tType)
                         .Columns;
                     var columns = allColumns
-                        .Where(a => this.QueryBuilder.AppendNavInfo.Result.First().result.ContainsKey("SugarNav_" + a.PropertyName))
+                        .Where(a => this.QueryBuilder.AppendNavInfo.Result[0].result.ContainsKey("SugarNav_" + a.PropertyName))
                         .ToList();
                     var listType = typeof(List<>).MakeGenericType(tType);
                     if (outList == null)
@@ -774,7 +769,6 @@ namespace ThingsGateway.SqlSugar
                     //  object value = item;
                     if (item.Value.ExpressionList.Count > 1 && rightValue != null)
                     {
-
                         //foreach (var callExp in item.Value.ExpressionList.Skip(1))
                         //{
                         try
@@ -822,13 +816,11 @@ namespace ThingsGateway.SqlSugar
                     var propertyInfo = columns.First(i => i.PropertyName == propertyName).PropertyInfo;
                     if (kv.Value is decimal && UtilMethods.GetUnderType(propertyInfo.PropertyType).IsIn(typeof(int), typeof(long)))
                     {
-
                         var changeValue = UtilMethods.ChangeType2(kv.Value, propertyInfo.PropertyType);
                         propertyInfo.SetValue(addItem, changeValue);
                     }
                     else if (kv.Value == DBNull.Value && UtilMethods.GetUnderType(propertyInfo.PropertyType).IsIn(typeof(int), typeof(long)))
                     {
-
                         var changeValue = UtilMethods.ChangeType2(0, propertyInfo.PropertyType);
                         propertyInfo.SetValue(addItem, changeValue);
                     }
@@ -970,7 +962,7 @@ namespace ThingsGateway.SqlSugar
                 Action<List<T>> mapper = (entitys) =>
                 {
                     if (entitys.IsNullOrEmpty() || entitys.Count == 0) return;
-                    var entity = entitys.First();
+                    var entity = entitys[0];
                     var whereCol = fieldEntity.Columns.FirstOrDefault(it => it.PropertyName.Equals(fieldName, StringComparison.CurrentCultureIgnoreCase));
                     if (whereCol == null)
                     {
@@ -993,7 +985,7 @@ namespace ThingsGateway.SqlSugar
                         Check.Exception(true, ".Mapper() parameter error");
                     }
                     var inValues = entitys.Select(it => it.GetType().GetProperty(fieldName).GetValue(it, null).ObjToString());
-                    if (inValues?.Any() == true && UtilMethods.GetUnderType(entitys.First().GetType().GetProperty(fieldName).PropertyType) == UtilConstants.GuidType)
+                    if (inValues?.Any() == true && UtilMethods.GetUnderType(entitys[0].GetType().GetProperty(fieldName).PropertyType) == UtilConstants.GuidType)
                     {
                         inValues = inValues.Select(x => string.IsNullOrEmpty(x) ? "null" : x).Distinct();
                     }
@@ -1030,7 +1022,7 @@ namespace ThingsGateway.SqlSugar
                 Action<List<T>> mapper = (entitys) =>
                 {
                     if (entitys.IsNullOrEmpty() || entitys.Count == 0) return;
-                    var entity = entitys.First();
+                    var entity = entitys[0];
                     var tEntity = this.Context.EntityMaintenance.GetEntityInfo<T>();
                     var whereCol = tEntity.Columns.FirstOrDefault(it => it.PropertyName.Equals(fieldName, StringComparison.CurrentCultureIgnoreCase));
                     if (whereCol == null)
@@ -1137,7 +1129,7 @@ namespace ThingsGateway.SqlSugar
                 Action<List<T>> mapper = (entitys) =>
                 {
                     if (entitys.IsNullOrEmpty() || entitys.Count == 0) return;
-                    var entity = entitys.First();
+                    var entity = entitys[0];
                     var whereCol = fieldEntity.Columns.FirstOrDefault(it => it.PropertyName.Equals(childFieldName, StringComparison.CurrentCultureIgnoreCase));
                     if (whereCol == null)
                     {
@@ -1192,7 +1184,7 @@ namespace ThingsGateway.SqlSugar
                 Action<List<T>> mapper = (entitys) =>
                 {
                     if (entitys.IsNullOrEmpty() || entitys.Count == 0) return;
-                    var entity = entitys.First();
+                    var entity = entitys[0];
                     var tEntity = this.Context.EntityMaintenance.GetEntityInfo<T>();
                     var whereCol = tEntity.Columns.FirstOrDefault(it => it.PropertyName.Equals(childFieldName, StringComparison.CurrentCultureIgnoreCase));
                     if (whereCol == null)
@@ -1391,7 +1383,7 @@ namespace ThingsGateway.SqlSugar
                 var dbLinkName = this.Context.Root.GetConnection(attr.configId).CurrentConnectionConfig.DbLinkName;
                 if (dbLinkName != null)
                 {
-                    if (dbLinkName.First() == '@')
+                    if (dbLinkName[0] == '@')
                     {
                         tableName = this.QueryBuilder.Builder.GetTranslationColumnName(oldTableName) + dbLinkName;
                     }
@@ -1477,7 +1469,6 @@ namespace ThingsGateway.SqlSugar
                     if (!sql.Contains($"{SqlBuilder.GetTranslationColumnName(item.DbColumnName)} AS {SqlBuilder.GetTranslationColumnName(item.PropertyName)}") &&
                         !sql.Contains($"{SqlBuilder.GetTranslationColumnName(item.DbColumnName)} AS  {SqlBuilder.GetTranslationColumnName(item.PropertyName)}"))
                     {
-
                         if (parameterIndex1 == 0 && this.QueryBuilder.JoinQueryInfos.Count != 0)
                         {
                             sql = $" {sql},{SqlBuilder.GetTranslationColumnName(this.QueryBuilder.TableShortName)}.{SqlBuilder.GetTranslationColumnName(item.DbColumnName)} AS {SqlBuilder.GetTranslationColumnName(item.PropertyName)} ";
@@ -1563,7 +1554,7 @@ namespace ThingsGateway.SqlSugar
             }
             if (result.JoinIndex == 0)
             {
-                var firstPareamter = (express as LambdaExpression).Parameters.First();
+                var firstPareamter = (express as LambdaExpression).Parameters[0];
                 this.QueryBuilder.TableShortName = firstPareamter.Name;
                 if (this.QueryBuilder.AsTables?.Count == 1)
                 {
@@ -1763,7 +1754,6 @@ namespace ThingsGateway.SqlSugar
                 this.QueryBuilder.GroupBySql = groupBySql;
                 this.QueryBuilder.GroupBySqlOld = result;
 
-
                 if (expression is NewExpression s && s.Arguments.Count > 1)
                 {
                     foreach (var item in s.Arguments)
@@ -1861,7 +1851,7 @@ namespace ThingsGateway.SqlSugar
             if (IsCache)
             {
                 var cacheService = this.Context.CurrentConnectionConfig.ConfigureExternalServices.DataInfoCacheService;
-                result = CacheSchemeMain.GetOrCreate<List<TResult>>(cacheService, this.QueryBuilder, () => { return GetData<TResult>(sqlObj); }, CacheTime, this.Context, CacheKey);
+                result = CacheSchemeMain.GetOrCreate<List<TResult>>(cacheService, this.QueryBuilder, () => GetData<TResult>(sqlObj), CacheTime, this.Context, CacheKey);
             }
             else
             {
@@ -1874,8 +1864,6 @@ namespace ThingsGateway.SqlSugar
             return result;
         }
 
-
-
         protected async Task<List<TResult>> _ToListAsync<TResult>()
         {
             List<TResult> result = null;
@@ -1883,7 +1871,7 @@ namespace ThingsGateway.SqlSugar
             if (IsCache)
             {
                 var cacheService = this.Context.CurrentConnectionConfig.ConfigureExternalServices.DataInfoCacheService;
-                result = CacheSchemeMain.GetOrCreate<List<TResult>>(cacheService, this.QueryBuilder, () => { return GetData<TResult>(sqlObj); }, CacheTime, this.Context, CacheKey);
+                result = CacheSchemeMain.GetOrCreate<List<TResult>>(cacheService, this.QueryBuilder, () => GetData<TResult>(sqlObj), CacheTime, this.Context, CacheKey);
             }
             else
             {
@@ -2085,7 +2073,6 @@ namespace ThingsGateway.SqlSugar
         }
         protected List<string> GetPrimaryKeys()
         {
-
             return this.EntityInfo.Columns.Where(it => it.IsPrimarykey).Select(it => it.DbColumnName).ToList();
         }
         protected virtual List<string> GetIdentityKeys()
@@ -2285,7 +2272,6 @@ namespace ThingsGateway.SqlSugar
                 else
                     AppendSubToList(result, appendValues, subPara);
             }
-
         }
 
         private void AppendSubToList<TResult>(List<TResult> result, List<List<QueryableAppendColumn>> appendValues, KeyValuePair<string, object> subPara)
@@ -2348,7 +2334,6 @@ namespace ThingsGateway.SqlSugar
             List<string> sqls = new List<string>();
             foreach (var item in result)
             {
-
                 var sql = subPara.Value.ObjToString();
                 var replaceValues = appendValues[index];
                 foreach (var re in replaceValues)
@@ -2365,7 +2350,6 @@ namespace ThingsGateway.SqlSugar
                     }
                     var value = UtilMethods.GetSqlString(config.DbType, "@p", p, isNvarchar);
                     sql = sql.Replace(re.Name, value);
-
                 }
                 sql = SqlBuilder.RemoveParentheses(sql);
                 sql = sql.Replace("@sugarIndex", index + "");
@@ -2540,7 +2524,7 @@ namespace ThingsGateway.SqlSugar
             {
                 return;
             }
-            await Task.Run(() => { _SubQuery(result); }).ConfigureAwait(false);
+            await Task.Run(() => _SubQuery(result)).ConfigureAwait(false);
         }
         public List<Type> SubQueryList<Type>(string sql, object parameters)
         {

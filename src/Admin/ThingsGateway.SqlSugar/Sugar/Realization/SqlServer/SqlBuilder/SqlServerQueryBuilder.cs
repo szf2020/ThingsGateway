@@ -32,8 +32,6 @@ namespace ThingsGateway.SqlSugar
                 Take = oldTake;
                 Skip = oldSkip;
                 result = this.Context.SqlQueryable<object>(result).Skip(Skip ?? 0).Take(Take ?? 0).ToSql().Key;
-
-
             }
             if (IsDistinct && oldTake == 1 && oldSkip == null)
             {

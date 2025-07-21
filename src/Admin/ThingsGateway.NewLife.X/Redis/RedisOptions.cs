@@ -32,5 +32,4 @@ public class RedisOptions
     public String? Prefix { get; set; }
 
     public Int32 Expire { get; set; } = 3600;
-
 }

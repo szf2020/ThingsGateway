@@ -29,11 +29,11 @@ public static class DynamicModelExtension
         {
             //执行脚本，获取新实体
             var getDeviceModel = CSharpScriptEngineExtension.Do<IDynamicModel>(script);
-            return getDeviceModel.GetList(datas.Cast<object>());
+            return getDeviceModel.GetList(datas?.Cast<object>());
         }
         else
         {
-            return datas.Cast<object>();
+            return datas?.Cast<object>();
         }
     }
 
@@ -118,7 +118,6 @@ public static class DynamicModelExtension
 
         return result; // 返回属性信息集合
     }
-
 }
 
 public interface IDynamicModel

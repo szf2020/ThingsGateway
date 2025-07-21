@@ -81,9 +81,7 @@ public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariable
         {
             if (_driverPropertys.GroupUpdate && variable.BusinessGroupUpdateTrigger && !variable.BusinessGroup.IsNullOrEmpty() && VariableRuntimeGroups.TryGetValue(variable.BusinessGroup, out var variableRuntimeGroup))
             {
-
                 AddQueueVarModel(new CacheDBItem<List<VariableBasicData>>(variableRuntimeGroup.AdaptListVariableBasicData()));
-
             }
             else
             {
@@ -96,7 +94,6 @@ public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariable
             RealTimeVariables.AddOrUpdate(variable.Id, variable, (key, oldValue) => variable);
         }
     }
-
 
     private async ValueTask<OperResult> UpdateVarModel(IEnumerable<VariableBasicData> item, CancellationToken cancellationToken)
     {
@@ -125,17 +122,15 @@ public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariable
                 getDeviceModel.Logger = LogMessage;
 
                 await getDeviceModel.DBInsertable(_db, dbInserts, cancellationToken).ConfigureAwait(false);
-
             }
             else
             {
-
                 var stringData = dbInserts.Where(a => (!a.IsNumber && a.Value is not bool));
                 var numberData = dbInserts.Where(a => (a.IsNumber || a.Value is bool));
 
                 if (numberData.Any())
                 {
-                    var data = numberData.AdaptListSQLNumberHistoryValue();
+                    var data = numberData.AdaptEnumerableSQLNumberHistoryValue();
                     Stopwatch stopwatch = new();
                     stopwatch.Start();
                     var result = await _db.Fastest<SQLNumberHistoryValue>().SplitTable().BulkCopyAsync(data).ConfigureAwait(false);
@@ -146,14 +141,13 @@ public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariable
                     {
                         LogMessage?.Trace($"TableName：{_driverPropertys.NumberTableName}，Count：{result}，watchTime:  {stopwatch.ElapsedMilliseconds} ms");
                     }
-
                 }
 
                 if (stringData.Any())
                 {
                     Stopwatch stopwatch = new();
                     stopwatch.Start();
-                    var data = stringData.AdaptListSQLHistoryValue();
+                    var data = stringData.AdaptEnumerableSQLHistoryValue();
                     var result = await _db.Fastest<SQLHistoryValue>().SplitTable().BulkCopyAsync(data).ConfigureAwait(false);
                     stopwatch.Stop();
 
@@ -163,10 +157,7 @@ public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariable
                         LogMessage?.Trace($"TableName：{_driverPropertys.StringTableName}，Count：{result}，watchTime:  {stopwatch.ElapsedMilliseconds} ms");
                     }
                 }
-
-
             }
-
 
             return OperResult.Success;
         }
@@ -189,17 +180,15 @@ public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariable
 
                 await getDeviceModel.DBInsertable(_db, datas, cancellationToken).ConfigureAwait(false);
                 return OperResult.Success;
-
             }
             else
             {
-
                 if (!_initRealData)
                 {
                     Stopwatch stopwatch = new();
                     stopwatch.Start();
                     var ids = (await _db.Queryable<SQLRealValue>().AS(_driverPropertys.ReadDBTableName).Select(a => a.Id).ToListAsync(cancellationToken).ConfigureAwait(false)).ToHashSet();
-                    var InsertData = IdVariableRuntimes.Where(a => !ids.Contains(a.Key)).Select(a => a.Value).AdaptListSQLRealValue();
+                    var InsertData = IdVariableRuntimes.Where(a => !ids.Contains(a.Key)).Select(a => a.Value).AdaptEnumerableSQLRealValue();
                     var result = await _db.Fastest<SQLRealValue>().AS(_driverPropertys.ReadDBTableName).BulkCopyAsync(InsertData).ConfigureAwait(false);
                     _initRealData = true;
                     stopwatch.Stop();
@@ -214,7 +203,7 @@ public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariable
                         Stopwatch stopwatch = new();
                         stopwatch.Start();
 
-                        var data = datas.AdaptListSQLRealValue();
+                        var data = datas.AdaptEnumerableSQLRealValue();
                         var result = await _db.Fastest<SQLRealValue>().AS(_driverPropertys.ReadDBTableName).BulkUpdateAsync(data).ConfigureAwait(false);
 
                         stopwatch.Stop();
@@ -226,7 +215,6 @@ public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariable
                     }
                     return OperResult.Success;
                 }
-
             }
         }
         catch (Exception ex)
@@ -234,8 +222,6 @@ public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariable
             return new OperResult(ex);
         }
     }
-
-
 
     #endregion 方法
 }

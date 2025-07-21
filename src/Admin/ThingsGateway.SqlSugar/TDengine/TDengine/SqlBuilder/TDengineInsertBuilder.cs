@@ -49,10 +49,7 @@ namespace ThingsGateway.SqlSugar
         /// <summary>
         /// 转换插入返回ID的函数
         /// </summary>
-        public override Func<string, string, string> ConvertInsertReturnIdFunc { get; set; } = (name, sql) =>
-        {
-            return sql.Trim().TrimEnd(';') + $"returning {name} ";
-        };
+        public override Func<string, string, string> ConvertInsertReturnIdFunc { get; set; } = (name, sql) => sql.Trim().TrimEnd(';') + $"returning {name} ";
 
         /// <summary>
         /// 生成SQL字符串
@@ -66,7 +63,7 @@ namespace ThingsGateway.SqlSugar
             }
             var groupList = DbColumnInfoList.GroupBy(it => it.TableId).ToList();
             var isSingle = groupList.Count == 1;
-            string columnsString = string.Join(",", groupList.First().Select(it => Builder.GetTranslationColumnName(it.DbColumnName)));
+            string columnsString = string.Join(",", groupList[0].Select(it => Builder.GetTranslationColumnName(it.DbColumnName)));
             if (isSingle)
             {
                 string columnParametersString = string.Join(",", this.DbColumnInfoList.Select(it => base.GetDbColumn(it, Builder.SqlParameterKeyWord + it.DbColumnName)));

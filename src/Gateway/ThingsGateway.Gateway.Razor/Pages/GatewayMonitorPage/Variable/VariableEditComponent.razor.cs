@@ -22,7 +22,6 @@ namespace ThingsGateway.Gateway.Razor;
 
 public partial class VariableEditComponent
 {
-
     /// <summary>
     /// IntFormatter
     /// </summary>
@@ -67,7 +66,6 @@ public partial class VariableEditComponent
 
     [Parameter]
     public Func<Task> OnValidSubmit { get; set; }
-
 
     [Parameter]
     public bool ValidateEnable { get; set; }
@@ -135,7 +133,6 @@ public partial class VariableEditComponent
 
     private async Task ShowAddressUI()
     {
-
         if (AddressUIType != null)
         {
             AddressDynamicComponent = new BootstrapDynamicComponent(AddressUIType, new Dictionary<string, object?>
@@ -143,10 +140,7 @@ public partial class VariableEditComponent
                 [nameof(IAddressUIBase.Model)] = Model.RegisterAddress,
 
                 [nameof(IAddressUIBase.ModelChanged)] =
-                     (string address) =>
-                    {
-                        Model.RegisterAddress = address;
-                    }
+                     (string address) => Model.RegisterAddress = address
             });
         }
         else

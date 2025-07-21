@@ -65,5 +65,4 @@ public class RedisXmlRepository : IXmlRepository
     }
 }
 
-
 #endif

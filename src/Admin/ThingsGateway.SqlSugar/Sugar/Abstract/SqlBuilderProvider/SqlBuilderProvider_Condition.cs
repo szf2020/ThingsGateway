@@ -148,7 +148,6 @@ namespace ThingsGateway.SqlSugar
                             if (models.IndexOf(item) == 0 && index == 0 && beginIndex == 0)
                             {
                                 builder.AppendFormat(" ( ");
-
                             }
                             else if (isFirst)
                             {
@@ -159,7 +158,6 @@ namespace ThingsGateway.SqlSugar
                             var childSqlInfo = ConditionalModelToSql(conModels, 1000 * (1 + index) + models.IndexOf(item));
                             if (!isFirst && con.Value.FieldName != $"[value=sql{UtilConstants.ReplaceKey}]")
                             {
-
                                 builder.AppendFormat(" {0} ", con.Key.ToString().ToUpper());
                             }
                             builder.Append(childSqlInfo.Key);

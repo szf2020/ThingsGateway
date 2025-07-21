@@ -138,9 +138,7 @@ namespace ThingsGateway.SqlSugar
                     .Where(entityColumn => dbColumns.Any(dbColumn => entityColumn.OldDbColumnName.Equals(dbColumn.DbColumnName, StringComparison.CurrentCultureIgnoreCase)))
                     ;
 
-
                 var isMultiplePrimaryKey = dbColumns.Where(it => it.IsPrimarykey).Count() > 1 || entityColumns.Where(it => it.IsPrimarykey).Count() > 1;
-
 
                 var isChange = false;
                 foreach (var item in addColumns)

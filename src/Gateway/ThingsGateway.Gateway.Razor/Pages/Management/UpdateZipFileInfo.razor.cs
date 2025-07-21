@@ -18,7 +18,6 @@ namespace ThingsGateway.Upgrade;
 /// <inheritdoc/>
 public partial class UpdateZipFileInfo
 {
-
     [Parameter]
     public string ClassString { get; set; }
 
@@ -80,6 +79,4 @@ public partial class UpdateZipFileInfo
             }
         });
     }
-
-
 }

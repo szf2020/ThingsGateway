@@ -287,10 +287,7 @@ internal sealed class EventBusHostedService : BackgroundService
                             : _serviceProvider.GetService(eventSubscribeAttribute.FallbackPolicy) as IEventFallbackPolicy;
 
                         // 调用事件处理程序并配置出错执行重试
-                        await Retry.InvokeAsync(async () =>
-                        {
-                            await eventHandlerThatShouldRun.Handler!(eventHandlerExecutingContext).ConfigureAwait(false);
-                        }
+                        await Retry.InvokeAsync(async () => await eventHandlerThatShouldRun.Handler!(eventHandlerExecutingContext).ConfigureAwait(false)
                         , eventSubscribeAttribute?.NumRetries ?? 0
                         , eventSubscribeAttribute?.RetryTimeout ?? 1000
                         , exceptionTypes: eventSubscribeAttribute?.ExceptionTypes

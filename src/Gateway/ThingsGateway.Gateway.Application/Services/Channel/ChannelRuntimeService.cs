@@ -48,7 +48,6 @@ public class ChannelRuntimeService : IChannelRuntimeService
                 await GlobalData.ChannelThreadManage.RestartChannelAsync(newChannelRuntimes).ConfigureAwait(false);
 
                 await RuntimeServiceHelper.ChangedDriverAsync(_logger, cancellationToken).ConfigureAwait(false);
-
             }
 
             return true;
@@ -81,7 +80,6 @@ public class ChannelRuntimeService : IChannelRuntimeService
                 await GlobalData.ChannelThreadManage.RestartChannelAsync(newChannelRuntimes).ConfigureAwait(false);
 
                 await RuntimeServiceHelper.ChangedDriverAsync(_logger, cancellationToken).ConfigureAwait(false);
-
             }
 
             return true;
@@ -114,7 +112,6 @@ public class ChannelRuntimeService : IChannelRuntimeService
                 await GlobalData.ChannelThreadManage.RestartChannelAsync(newChannelRuntimes).ConfigureAwait(false);
 
                 await RuntimeServiceHelper.ChangedDriverAsync(_logger, cancellationToken).ConfigureAwait(false);
-
             }
 
             return true;
@@ -171,7 +168,6 @@ public class ChannelRuntimeService : IChannelRuntimeService
             }
 
             return true;
-
         }
         finally
         {
@@ -201,7 +197,6 @@ public class ChannelRuntimeService : IChannelRuntimeService
             //根据条件重启通道线程
             if (restart)
                 await GlobalData.ChannelThreadManage.RestartChannelAsync(newChannelRuntimes).ConfigureAwait(false);
-
         }
 
         finally
@@ -233,7 +228,6 @@ public class ChannelRuntimeService : IChannelRuntimeService
         }
     }
 
-
     public async Task<bool> BatchSaveChannelAsync(List<Channel> input, ItemChangedType type, bool restart)
     {
         try
@@ -258,7 +252,6 @@ public class ChannelRuntimeService : IChannelRuntimeService
         }
     }
 
-
     public async Task RestartChannelAsync(IEnumerable<ChannelRuntime> oldChannelRuntimes)
     {
         RuntimeServiceHelper.RemoveOldChannelRuntimes(oldChannelRuntimes);
@@ -275,9 +268,7 @@ public class ChannelRuntimeService : IChannelRuntimeService
 
             await RuntimeServiceHelper.InitAsync(newChannelRuntimes, newDeviceRuntimes, _logger).ConfigureAwait(false);
 
-
             await GlobalData.ChannelThreadManage.RestartChannelAsync(newChannelRuntimes).ConfigureAwait(false);
-
         }
         catch (Exception ex)
         {
@@ -288,6 +279,4 @@ public class ChannelRuntimeService : IChannelRuntimeService
             WaitLock.Release();
         }
     }
-
-
 }

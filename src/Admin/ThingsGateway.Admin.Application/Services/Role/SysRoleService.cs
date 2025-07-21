@@ -169,7 +169,6 @@ internal sealed class SysRoleService : BaseService<SysRole>, ISysRoleService
         if (hasSuperAdmin)
             throw Oops.Bah(Localizer["CanotDeleteAdmin"]);
 
-
         var dels = (await GetAllAsync().ConfigureAwait(false)).Where(a => ids.Contains(a.Id));
         await SysUserService.CheckApiDataScopeAsync(dels.Select(a => a.OrgId).ToList(), dels.Select(a => a.CreateUserId).ToList()).ConfigureAwait(false);
 
@@ -216,7 +215,6 @@ internal sealed class SysRoleService : BaseService<SysRole>, ISysRoleService
     [OperDesc("SaveRole")]
     public async Task<bool> SaveRoleAsync(SysRole input, ItemChangedType type)
     {
-
         await CheckInput(input).ConfigureAwait(false);//检查参数
 
         if (type == ItemChangedType.Add)
@@ -243,8 +241,6 @@ internal sealed class SysRoleService : BaseService<SysRole>, ISysRoleService
     #endregion 修改
 
     #region 授权
-
-
 
     #region 资源
 
@@ -424,7 +420,6 @@ internal sealed class SysRoleService : BaseService<SysRole>, ISysRoleService
         return relations.Select(it => it.ObjectId);
     }
 
-
     /// <summary>
     /// 授权用户
     /// </summary>
@@ -467,7 +462,6 @@ internal sealed class SysRoleService : BaseService<SysRole>, ISysRoleService
         }
     }
 
-
     #endregion
 
     /// <inheritdoc/>
@@ -476,7 +470,6 @@ internal sealed class SysRoleService : BaseService<SysRole>, ISysRoleService
         App.CacheService.Remove(CacheConst.Cache_SysRole);//删除KEY
 
         _dispatchService.Dispatch(null);
-
     }
 
     #endregion 授权
@@ -517,10 +510,7 @@ internal sealed class SysRoleService : BaseService<SysRole>, ISysRoleService
         //判断是否有相同的Code
         if (sysRoles.Any(it => it.Code == sysRole.Code && it.Id != sysRole.Id))
             throw Oops.Bah(Localizer["CodeDup", sysRole.Code]);
-
-
     }
-
 
     #endregion 方法
 }

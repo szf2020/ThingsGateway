@@ -46,7 +46,6 @@ namespace ThingsGateway.SqlSugar
             {
                 return @"UPDATE {0} SET
            {1} {2}";
-
             }
         }
 
@@ -95,7 +94,6 @@ namespace ThingsGateway.SqlSugar
 
         public virtual void Clear()
         {
-
         }
         public virtual string GetTableNameString
         {
@@ -118,7 +116,6 @@ namespace ThingsGateway.SqlSugar
                 return result;
             }
         }
-
 
         public virtual ExpressionResult GetExpressionValue(Expression expression, ResolveExpressType resolveType, bool isMapping = true)
         {
@@ -176,7 +173,6 @@ namespace ThingsGateway.SqlSugar
                     {
                         return it.Value.ObjToString() != UtilMethods.DefaultForType(it.PropertyType).ObjToString();
                     }
-
                 }).ToList();
             }
             var groupList = DbColumnInfoList.GroupBy(it => it.TableId).ToList();
@@ -203,7 +199,7 @@ namespace ThingsGateway.SqlSugar
             while (pageCount >= pageIndex)
             {
                 StringBuilder updateTable = new StringBuilder();
-                string setValues = string.Join(",", groupList.First().Where(it => it.IsPrimarykey == false && (it.IsIdentity == false || (IsOffIdentity && it.IsIdentity))).Select(it =>
+                string setValues = string.Join(",", groupList[0].Where(it => it.IsPrimarykey == false && (it.IsIdentity == false || (IsOffIdentity && it.IsIdentity))).Select(it =>
                             {
                                 if (SetValues.IsValuable())
                                 {
@@ -256,7 +252,7 @@ namespace ThingsGateway.SqlSugar
 
         protected virtual string ToSingleSqlString(List<IGrouping<int, DbColumnInfo>> groupList)
         {
-            string columnsString = string.Join(",", groupList.First().Where(it => it.IsPrimarykey == false && (it.IsIdentity == false || (IsOffIdentity && it.IsIdentity))).Select(it =>
+            string columnsString = string.Join(",", groupList[0].Where(it => it.IsPrimarykey == false && (it.IsIdentity == false || (IsOffIdentity && it.IsIdentity))).Select(it =>
             {
                 if (SetValues.IsValuable())
                 {
@@ -564,7 +560,6 @@ namespace ThingsGateway.SqlSugar
                 this.Parameters.Add(p);
                 GetDbColumnIndex++;
                 return pname;
-
             }
             else
             {

@@ -179,7 +179,6 @@ public static class StringHelper
         return dic;
     }
 
-
     /// <summary>把一个列表组合成为一个字符串，默认逗号分隔</summary>
     /// <param name="value"></param>
     /// <param name="separator">组合分隔符，默认逗号</param>
@@ -196,7 +195,6 @@ public static class StringHelper
         }
         return sb.Return(true);
     }
-
 
     /// <summary>把一个列表组合成为一个字符串，默认逗号分隔</summary>
     /// <param name="value"></param>
@@ -537,10 +535,7 @@ public static class StringHelper
                         .Any(dist =>
                         {
                             return Enumerable.Range(0, Math.Max(str.Length - item.Length - dist + 1, 0))
-                                .Any(f =>
-                                {
-                                    return LevenshteinDistance(item, str.Substring(f, item.Length + dist)) <= maxDist;
-                                });
+                                .Any(f => LevenshteinDistance(item, str.Substring(f, item.Length + dist)) <= maxDist);
                         })
                     orderby str
                     select str;

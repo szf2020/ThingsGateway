@@ -38,7 +38,6 @@
         }
         public static List<KeyValuePair<string, CSharpDataType>> MappingTypesConst = new List<KeyValuePair<string, CSharpDataType>>()
                 {
-
                     new KeyValuePair<string, CSharpDataType>("integer",CSharpDataType.@int),
                     new KeyValuePair<string, CSharpDataType>("int",CSharpDataType.@int),
                     new KeyValuePair<string, CSharpDataType>("int32",CSharpDataType.@int),

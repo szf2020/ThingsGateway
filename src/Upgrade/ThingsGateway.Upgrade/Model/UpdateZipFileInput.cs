@@ -65,5 +65,4 @@ public class UpdateZipFileInput
     public string OSPlatform { get; set; }
 
     public Architecture Architecture { get; set; }
-
 }

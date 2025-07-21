@@ -46,5 +46,4 @@ public class KafkaProducerProperty : BusinessPropertyWithCacheIntervalScript
 
     [DynamicProperty]
     public SaslMechanism SaslMechanism { get; set; } = SaslMechanism.Plain;
-
 }

@@ -34,7 +34,6 @@ public static class Pool
     /// <summary>字符串构建器池</summary>
     public static IPool<StringBuilder> StringBuilder { get; set; } = new StringBuilderPool();
 
-
     /// <summary>归还一个字符串构建器到对象池</summary>
     /// <param name="sb"></param>
     /// <param name="returnResult">是否需要返回结果</param>
@@ -83,8 +82,6 @@ public static class Pool
     #region MemoryStream
     /// <summary>内存流池</summary>
     public static IPool<MemoryStream> MemoryStream { get; set; } = new MemoryStreamPool();
-
-
 
     /// <summary>归还一个内存流到对象池</summary>
     /// <param name="ms"></param>

@@ -16,11 +16,9 @@ namespace ThingsGateway.SqlSugar
         Guid ContextID { get; set; }
         ConnectionConfig CurrentConnectionConfig { get; set; }
 
-
         IAdo Ado { get; }
         AopProvider Aop { get; }
         ICodeFirst CodeFirst { get; }
-
 
         IDbFirst DbFirst { get; }
         IDbMaintenance DbMaintenance { get; }
@@ -144,8 +142,8 @@ namespace ThingsGateway.SqlSugar
         #region Saveable
         GridSaveProvider<T> GridSave<T>(List<T> saveList) where T : class, new();
         GridSaveProvider<T> GridSave<T>(List<T> oldList, List<T> saveList) where T : class, new();
-        IStorageable<T> Storageable<T>(IReadOnlyList<T> dataList) where T : class, new();
-        StorageableDataTable Storageable(List<Dictionary<string, object>> dictionaryList, string tableName);
+        IStorageable<T> Storageable<T>(IEnumerable<T> dataList) where T : class, new();
+        StorageableDataTable Storageable(IEnumerable<Dictionary<string, object>> dictionaryList, string tableName);
         StorageableDataTable Storageable(Dictionary<string, object> dictionary, string tableName);
         IStorageable<T> StorageableT<T>(T data) where T : class, new();
         StorageableDataTable Storageable(DataTable data);

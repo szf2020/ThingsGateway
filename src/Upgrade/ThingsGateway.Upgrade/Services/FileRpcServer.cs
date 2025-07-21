@@ -11,7 +11,6 @@ public partial class FileRpcServer : SingletonRpcServer
     public FileRpcServer(ILog logger)
     {
         _logger = logger;
-
     }
 
     [DmtpRpc(MethodInvoke = true)]
@@ -19,5 +18,4 @@ public partial class FileRpcServer : SingletonRpcServer
     {
         return App.GetService<IUpdateZipFileHostedService>().GetList(input);
     }
-
 }

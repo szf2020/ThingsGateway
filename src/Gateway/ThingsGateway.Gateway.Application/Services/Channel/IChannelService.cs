@@ -92,7 +92,6 @@ internal interface IChannelService
     /// <param name="type">保存类型</param>
     Task<bool> BatchSaveAsync(List<Channel> input, ItemChangedType type);
 
-
     void SetChannelData(HashSet<long>? dataScope, Dictionary<string, Channel> channelDicts, Dictionary<string, ImportPreviewOutputBase> ImportPreviews, string sheetName, IEnumerable<IDictionary<string, object>> rows);
 
     /// <summary>

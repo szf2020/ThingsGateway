@@ -22,7 +22,6 @@ namespace ThingsGateway.Plugin.SqlHistoryAlarm;
 /// </summary>
 public partial class SqlHistoryAlarm : BusinessBaseWithCacheAlarm
 {
-
     protected override void AlarmChange(AlarmVariable alarmVariable)
     {
         AddQueueAlarmModel(new CacheDBItem<AlarmVariable>(alarmVariable));
@@ -57,7 +56,6 @@ public partial class SqlHistoryAlarm : BusinessBaseWithCacheAlarm
                 getDeviceModel.Logger = LogMessage;
 
                 await getDeviceModel.DBInsertable(_db, dbInserts, cancellationToken).ConfigureAwait(false);
-
             }
             else
             {
@@ -67,9 +65,9 @@ public partial class SqlHistoryAlarm : BusinessBaseWithCacheAlarm
                 stopwatch.Start();
 
                 if (_db.CurrentConnectionConfig.DbType == SqlSugar.DbType.QuestDB)
-                    result = await _db.Insertable(dbInserts).AS(_driverPropertys.TableName).ExecuteCommandAsync(cancellationToken).ConfigureAwait(false);
+                    result = await _db.Insertable(dbInserts.AdaptListHistoryAlarm()).AS(_driverPropertys.TableName).ExecuteCommandAsync(cancellationToken).ConfigureAwait(false);
                 else
-                    result = await _db.Fastest<HistoryAlarm>().AS(_driverPropertys.TableName).PageSize(100000).BulkCopyAsync(dbInserts.AdaptListHistoryAlarm()).ConfigureAwait(false);
+                    result = await _db.Fastest<HistoryAlarm>().AS(_driverPropertys.TableName).PageSize(100000).BulkCopyAsync(dbInserts.AdaptEnumerableHistoryAlarm()).ConfigureAwait(false);
 
                 stopwatch.Stop();
                 //var result = await db.Insertable(dbInserts).SplitTable().ExecuteCommandAsync().ConfigureAwait(false);
@@ -80,15 +78,11 @@ public partial class SqlHistoryAlarm : BusinessBaseWithCacheAlarm
                 return OperResult.Success;
             }
 
-
             return OperResult.Success;
         }
         catch (Exception ex)
         {
             return new OperResult(ex);
         }
-
     }
-
-
 }

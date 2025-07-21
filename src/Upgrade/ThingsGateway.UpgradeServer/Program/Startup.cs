@@ -34,7 +34,6 @@ public class Startup : AppStartup
 {
     public void ConfigBlazorServer(IServiceCollection services)
     {
-
         // 增加中文编码支持网页源码显示汉字
         services.AddSingleton(HtmlEncoder.Create(UnicodeRanges.All));
 
@@ -52,11 +51,7 @@ public class Startup : AppStartup
         //});
 
         // 任务调度
-        services.AddSchedule(options =>
-        {
-            options.AddPersistence<JobPersistence>();
-        });
-
+        services.AddSchedule(options => options.AddPersistence<JobPersistence>());
 
         // 允许跨域
         services.AddCorsAccessor();
@@ -89,13 +84,9 @@ public class Startup : AppStartup
             //.AddXmlDataContractSerializerFormatters()
             .AddInjectWithUnifyResult<UnifyResultProvider>();
 
-
 #if NET8_0_OR_GREATER
         services
-         .AddRazorComponents(options =>
-     {
-         options.TemporaryRedirectionUrlValidityDuration = TimeSpan.FromMinutes(10);
-     })
+         .AddRazorComponents(options => options.TemporaryRedirectionUrlValidityDuration = TimeSpan.FromMinutes(10))
          .AddInteractiveServerComponents(options =>
          {
              options.RootComponents.MaxJSRootComponents = 500;
@@ -144,12 +135,6 @@ public class Startup : AppStartup
             options.KnownNetworks.Clear();
             options.KnownProxies.Clear();
         });
-
-
-
-
-
-
 
         //已添加AddOptions
         // 增加多语言支持配置信息
@@ -211,17 +196,13 @@ public class Startup : AppStartup
                 EncryptionAlgorithm = EncryptionAlgorithm.AES_256_CBC,
                 ValidationAlgorithm = ValidationAlgorithm.HMACSHA256
             });
-
     }
-
-
 
     public void Use(IApplicationBuilder applicationBuilder, IWebHostEnvironment env)
     {
         var app = (WebApplication)applicationBuilder;
         app.UseForwardedHeaders(new ForwardedHeadersOptions { ForwardedHeaders = ForwardedHeaders.All, KnownNetworks = { }, KnownProxies = { } });
         app.UseBootstrapBlazor();
-
 
         // 启用本地化
         var option = app.Services.GetService<IOptions<RequestLocalizationOptions>>();
@@ -251,7 +232,6 @@ public class Startup : AppStartup
             app.UseStaticFiles(new StaticFileOptions { OnPrepareResponse = ctx => ctx.ProcessCache(app.Configuration) });
         }
 
-
         app.UseStaticFiles(new StaticFileOptions
         {
             OnPrepareResponse = (stf) =>
@@ -270,7 +250,6 @@ public class Startup : AppStartup
         app.UseStaticFiles(new StaticFileOptions { ContentTypeProvider = provider });
         app.UseStaticFiles();
 
-
         // 特定文件类型（文件后缀）处理
         var contentTypeProvider = FS.GetFileExtensionContentTypeProvider();
         // contentTypeProvider.Mappings[".文件后缀"] = "MIME 类型";
@@ -281,7 +260,6 @@ public class Startup : AppStartup
 
         //// 启用HTTPS
         //app.UseHttpsRedirection();
-
 
         // 添加状态码拦截中间件
         app.UseUnifyResultStatusCodes();
@@ -315,9 +293,5 @@ public class Startup : AppStartup
         app.MapControllers();
         app.MapHubs();
 
-
-
     }
-
-
 }

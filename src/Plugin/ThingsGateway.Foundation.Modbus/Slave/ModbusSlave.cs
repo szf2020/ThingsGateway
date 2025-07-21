@@ -43,7 +43,6 @@ public class ModbusSlave : DeviceBase, IModbusAddress
     /// </summary>
     private ConcurrentDictionary<byte, ValueByteBlock> ModbusServer04ByteBlocks = new();
 
-
     /// <inheritdoc/>
     public override void InitChannel(IChannel channel, ILog? deviceLog = null)
     {
@@ -114,7 +113,6 @@ public class ModbusSlave : DeviceBase, IModbusAddress
                         {
                             CacheTimeout = TimeSpan.FromMilliseconds(Channel.ChannelOptions.CacheTimeout),
                             IsSingleThread = false,
-
                         };
 
                     case ChannelTypeEnum.UdpSession:

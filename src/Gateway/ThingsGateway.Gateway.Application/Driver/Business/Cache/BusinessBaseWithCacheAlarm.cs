@@ -19,7 +19,6 @@ namespace ThingsGateway.Gateway.Application;
 /// </summary>
 public abstract class BusinessBaseWithCacheAlarm : BusinessBaseWithCache
 {
-
     protected override bool AlarmModelEnable => true;
 
     protected override bool DevModelEnable => false;
@@ -46,7 +45,6 @@ public abstract class BusinessBaseWithCacheAlarm : BusinessBaseWithCache
         IdVariableRuntimes.Clear();
         IdVariableRuntimes.AddRange(GlobalData.ReadOnlyIdVariables.Where(a => a.Value.AlarmEnable));
 
-
         var ids = IdVariableRuntimes.Select(b => b.Value.DeviceId).ToHashSet();
 
         CollectDevices = GlobalData.ReadOnlyIdDevices
@@ -55,12 +53,8 @@ public abstract class BusinessBaseWithCacheAlarm : BusinessBaseWithCache
     }
     protected internal override async Task InitChannelAsync(IChannel? channel, CancellationToken cancellationToken)
     {
-
         GlobalData.AlarmChangedEvent -= AlarmValueChange;
-        GlobalData.ReadOnlyRealAlarmIdVariables?.ForEach(a =>
-        {
-            AlarmValueChange(a.Value);
-        });
+        GlobalData.ReadOnlyRealAlarmIdVariables?.ForEach(a => AlarmValueChange(a.Value));
         GlobalData.AlarmChangedEvent += AlarmValueChange;
 
         await base.InitChannelAsync(channel, cancellationToken).ConfigureAwait(false);
@@ -80,7 +74,7 @@ public abstract class BusinessBaseWithCacheAlarm : BusinessBaseWithCache
             return;
         if (TaskSchedulerLoop?.Stoped == true) return;
 
-        if (AlarmModelEnable) return;
+        if (!AlarmModelEnable) return;
         // 如果业务属性的缓存为间隔上传，则不执行后续操作
         //if (_businessPropertyWithCacheInterval?.IsInterval != true)
         {
@@ -106,12 +100,8 @@ public abstract class BusinessBaseWithCacheAlarm : BusinessBaseWithCache
             base.PauseThread(pause);
             if (!pause && oldV != pause)
             {
-                GlobalData.ReadOnlyRealAlarmIdVariables?.ForEach(a =>
-               {
-                   AlarmChange(a.Value);
-               });
+                GlobalData.ReadOnlyRealAlarmIdVariables?.ForEach(a => AlarmChange(a.Value));
             }
         }
     }
-
 }

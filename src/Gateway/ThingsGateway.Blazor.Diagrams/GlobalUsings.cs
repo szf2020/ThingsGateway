@@ -8,7 +8,6 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-
 global using Microsoft.AspNetCore.Components;
 
 [assembly: GlobalGenerateSetParametersAsync(true)]

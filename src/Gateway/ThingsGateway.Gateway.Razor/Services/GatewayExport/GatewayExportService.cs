@@ -30,12 +30,10 @@ internal sealed class GatewayExportService : IGatewayExportService
     {
         try
         {
-
             await using var ajaxJS = await JSRuntime.InvokeAsync<IJSObjectReference>("import", $"/_content/ThingsGateway.Razor/js/downloadFile.js");
             string url = "api/gatewayExport/channel";
             string fileName = $"{DateTime.Now.ToFileDateTimeFormat()}.xlsx";
             return await ajaxJS.InvokeAsync<bool>("postJson_downloadFile", url, fileName, exportFilter.ToJsonString());
-
         }
         catch
         {
@@ -47,8 +45,6 @@ internal sealed class GatewayExportService : IGatewayExportService
     {
         try
         {
-
-
             await using var ajaxJS = await JSRuntime.InvokeAsync<IJSObjectReference>("import", $"/_content/ThingsGateway.Razor/js/downloadFile.js");
             string url = "api/gatewayExport/device";
             string fileName = $"{DateTime.Now.ToFileDateTimeFormat()}.xlsx";
@@ -73,6 +69,5 @@ internal sealed class GatewayExportService : IGatewayExportService
         {
             return false;
         }
-
     }
 }

@@ -8,7 +8,6 @@ namespace ThingsGateway.Gateway.Application;
 [CategoryNode(Category = "Actuator", ImgUrl = "_content/ThingsGateway.Gateway.Razor/img/Rpc.svg", Desc = nameof(VariableRpcNode), LocalizerType = typeof(ThingsGateway.Gateway.Application.DefaultDiagram), WidgetType = "ThingsGateway.Gateway.Razor.VariableWidget,ThingsGateway.Gateway.Razor")]
 public class VariableRpcNode : VariableNode, IActuatorNode
 {
-
     public VariableRpcNode(string id, Point? position = null) : base(id, position)
     { Title = "VariableRpcNode"; }
 
@@ -16,7 +15,6 @@ public class VariableRpcNode : VariableNode, IActuatorNode
     {
         try
         {
-
             if ((!DeviceText.IsNullOrWhiteSpace()) && GlobalData.ReadOnlyDevices.TryGetValue(DeviceText, out var device))
             {
                 if (device.ReadOnlyVariableRuntimes.TryGetValue(Text, out var value))
@@ -39,6 +37,4 @@ public class VariableRpcNode : VariableNode, IActuatorNode
             return new OperResult<NodeOutput>(ex);
         }
     }
-
-
 }

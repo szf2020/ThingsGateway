@@ -467,7 +467,6 @@ public static class ObjectExtensions
         return obj;
     }
 
-
     /// <summary>
     /// 查找方法指定特性，如果没找到则继续查找声明类
     /// </summary>
@@ -624,7 +623,7 @@ public static class ObjectExtensions
     {
         if (string.IsNullOrWhiteSpace(str)) return str;
 
-        return string.Concat(str.First().ToString().ToLower(), str.AsSpan(1));
+        return string.Concat(str[0].ToString().ToLower(), str.AsSpan(1));
     }
 
     /// <summary>
@@ -636,7 +635,7 @@ public static class ObjectExtensions
     {
         if (string.IsNullOrWhiteSpace(str)) return str;
 
-        return string.Concat(str.First().ToString().ToUpper(), str.AsSpan(1));
+        return string.Concat(str[0].ToString().ToUpper(), str.AsSpan(1));
     }
 
     /// <summary>
@@ -649,7 +648,6 @@ public static class ObjectExtensions
     {
         return collection?.Any() != true;
     }
-
 
     /// <summary>
     /// 获取类型自定义特性

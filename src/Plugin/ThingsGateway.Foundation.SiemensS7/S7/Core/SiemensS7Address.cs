@@ -21,7 +21,6 @@ namespace ThingsGateway.Foundation.SiemensS7;
 /// </summary>
 public class SiemensS7Address : S7Request
 {
-
     public bool WStringEnable { get; set; }
     public SiemensS7Address()
     {
@@ -87,7 +86,6 @@ public class SiemensS7Address : S7Request
         var data = stringBuilder.ToString();
         Pool.StringBuilder.Return(stringBuilder);
         return data;
-
     }
 
     private static string GetStringAddress(int addressStart)

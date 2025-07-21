@@ -36,6 +36,5 @@ public class SysPositionSeedData : ISqlSugarEntitySeedData<SysPosition>
                   SortCode=0
             }
         }.Concat(SeedDataUtil.GetSeedDataByJson<SysPosition>(SeedDataUtil.GetManifestResourceStream(assembly, "SeedData.Admin.seed_sys_position.json")).Concat(data));
-
     }
 }

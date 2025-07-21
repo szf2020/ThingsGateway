@@ -148,7 +148,6 @@ namespace SvgPathProperties
                 return result;
             }
 
-
             // Compensate out-of-range radii
             //
             rx = Math.Abs(rx);
@@ -160,7 +159,6 @@ namespace SvgPathProperties
                 rx *= Math.Sqrt(lambda);
                 ry *= Math.Sqrt(lambda);
             }
-
 
             // Get center parameters (cx, cy, theta1, delta_theta)
             //

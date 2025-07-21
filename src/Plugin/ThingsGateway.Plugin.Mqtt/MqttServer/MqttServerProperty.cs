@@ -58,7 +58,6 @@ public class MqttServerProperty : BusinessPropertyWithCacheIntervalScript
     [DynamicProperty]
     public bool DeviceRpcEnable { get; set; }
 
-
     /// <summary>
     /// Rpc写入Topic
     /// </summary>

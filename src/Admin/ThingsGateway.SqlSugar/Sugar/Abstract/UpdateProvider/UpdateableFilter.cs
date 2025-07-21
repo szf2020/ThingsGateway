@@ -24,10 +24,7 @@
                 {
                     this.Context.Ado.BeginTran();
                 }
-                this.Context.Utilities.PageEach(DataList, PageSize, pageItem =>
-                {
-                    result += SetFilterSql(this.Context.UpdateableT(pageItem.First()).AS(TableName).EnableDiffLogEventIF(IsEnableDiffLogEvent, DiffModel).UpdateColumns(UpdateColumns)).ExecuteCommand();
-                });
+                this.Context.Utilities.PageEach(DataList, PageSize, pageItem => result += SetFilterSql(this.Context.UpdateableT(pageItem[0]).AS(TableName).EnableDiffLogEventIF(IsEnableDiffLogEvent, DiffModel).UpdateColumns(UpdateColumns)).ExecuteCommand());
                 if (isNoTran)
                 {
                     this.Context.Ado.CommitTran();
@@ -44,8 +41,6 @@
             return result;
         }
 
-
-
         public async Task<int> ExecuteCommandAsync()
         {
             if (DataList.Count == 1 && DataList[0] == null)
@@ -61,10 +56,7 @@
                 {
                     await Context.Ado.BeginTranAsync().ConfigureAwait(false);
                 }
-                await Context.Utilities.PageEachAsync(DataList, PageSize, async pageItem =>
-                {
-                    result += await SetFilterSql(Context.UpdateableT(pageItem.First()).AS(TableName).EnableDiffLogEventIF(IsEnableDiffLogEvent, DiffModel).UpdateColumns(UpdateColumns)).ExecuteCommandAsync().ConfigureAwait(false);
-                }).ConfigureAwait(false);
+                await Context.Utilities.PageEachAsync(DataList, PageSize, async pageItem => result += await SetFilterSql(Context.UpdateableT(pageItem[0]).AS(TableName).EnableDiffLogEventIF(IsEnableDiffLogEvent, DiffModel).UpdateColumns(UpdateColumns)).ExecuteCommandAsync().ConfigureAwait(false)).ConfigureAwait(false);
                 if (isNoTran)
                 {
                     await Context.Ado.CommitTranAsync().ConfigureAwait(false);
@@ -80,7 +72,6 @@
             }
             return result;
         }
-
 
         private IUpdateable<T> SetFilterSql(IUpdateable<T> updateable)
         {

@@ -42,7 +42,6 @@ public partial class ChoiceModuleComponent
             await OnClick.Invoke(tabItem.Url.ToLong());
     }
 
-
     private List<RibbonTabItem> GenerateRibbonTabs()
     {
         var tabs = new List<RibbonTabItem>(ModuleList?.Count ?? 1);
@@ -53,6 +52,4 @@ public partial class ChoiceModuleComponent
         }
         return tabs;
     }
-
-
 }

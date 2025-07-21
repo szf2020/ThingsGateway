@@ -7,7 +7,6 @@ namespace ThingsGateway.SqlSugar
     /// </summary>
     public partial class JsonQueryableProvider : IJsonQueryableProvider<JsonQueryResult>
     {
-
         private void AppendFrom(JToken item)
         {
             var tableNameInfo = jsonCommonProvider.GetTableName(item);

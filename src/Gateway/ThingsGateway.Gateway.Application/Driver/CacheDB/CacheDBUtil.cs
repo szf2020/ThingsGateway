@@ -37,7 +37,6 @@ public static class CacheDBUtil
         }
     }
 
-
     /// <summary>
     /// 获取缓存链接
     /// </summary>
@@ -53,7 +52,6 @@ public static class CacheDBUtil
             return cache;
         }
     }
-
 
     public static string GetCacheFileBasePath()
     {

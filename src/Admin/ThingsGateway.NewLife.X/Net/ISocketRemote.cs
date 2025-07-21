@@ -216,10 +216,7 @@ public static class SocketRemoteHelper
     public static Int32 SendFile(this ISocketRemote session, String file, Boolean compressed = false)
     {
         var rs = 0;
-        file.AsFile().OpenRead(compressed, s =>
-        {
-            rs = session.SendMessages(s);
-        });
+        file.AsFile().OpenRead(compressed, s => rs = session.SendMessages(s));
 
         return rs;
     }

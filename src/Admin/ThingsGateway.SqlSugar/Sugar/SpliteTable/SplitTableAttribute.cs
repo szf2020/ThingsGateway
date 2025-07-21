@@ -23,10 +23,8 @@
     [AttributeUsage(AttributeTargets.Property, Inherited = true)]
     public class SplitFieldAttribute : Attribute
     {
-
         public SplitFieldAttribute()
         {
-
         }
     }
 

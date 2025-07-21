@@ -101,7 +101,6 @@ public class TcpConnectionInformation2 : TcpConnectionInformation
         TCP_TABLE_CLASS tblClass,
         Int32 reserved);
 
-
     /// <summary>获取所有Tcp连接</summary>
     /// <returns></returns>
     public static TcpConnectionInformation2[] GetWindowsTcpConnections()

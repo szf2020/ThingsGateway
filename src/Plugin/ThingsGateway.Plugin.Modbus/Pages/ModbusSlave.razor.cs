@@ -52,10 +52,7 @@ public partial class ModbusSlave : ComponentBase, IDisposable
 
         op.Component = BootstrapDynamicComponent.CreateComponent<ModbusAddressComponent>(new Dictionary<string, object?>
         {
-             {nameof(ModbusAddressComponent.ModelChanged),  (string a) =>
-            {
-                DeviceComponent?.SetRegisterAddress(a);
-            }},
+             {nameof(ModbusAddressComponent.ModelChanged),  (string a) => DeviceComponent?.SetRegisterAddress(a)},
             {nameof(ModbusAddressComponent.Model),address },
         });
 

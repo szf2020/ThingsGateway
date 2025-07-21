@@ -42,5 +42,4 @@ public class UpdatePasswordInput
     /// </summary>
     [Required]
     public string ConfirmPassword { get; set; }
-
 }

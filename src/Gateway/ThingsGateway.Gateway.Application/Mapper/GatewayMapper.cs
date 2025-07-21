@@ -37,6 +37,7 @@ public static partial class GatewayMapper
     public static partial ChannelRuntime AdaptChannelRuntime(this Channel src);
 
     public static partial List<VariableRuntime> AdaptListVariableRuntime(this IEnumerable<Variable> src);
+    public static partial IEnumerable<VariableRuntime> AdaptEnumerableVariableRuntime(this IEnumerable<Variable> src);
     public static partial List<DeviceRuntime> AdaptListDeviceRuntime(this IEnumerable<Device> src);
     public static partial List<Device> AdaptListDevice(this IEnumerable<Device> src);
 
@@ -58,5 +59,3 @@ public static partial class GatewayMapper
     public static partial Variable AdaptVariable(this Variable src);
     public static partial List<PluginInfo> AdaptListPluginInfo(this List<PluginInfo> src);
 }
-
-

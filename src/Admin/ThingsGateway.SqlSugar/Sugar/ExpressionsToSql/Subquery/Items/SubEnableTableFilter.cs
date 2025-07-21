@@ -45,6 +45,7 @@ namespace ThingsGateway.SqlSugar
                 BindingFlags flag = BindingFlags.Instance | BindingFlags.NonPublic;
                 Type type = this.Context.SubTableType;
                 var isWhere = HasWhere;
+                var ids = type.GetInterfaces().ToHashSet();
                 if (db.QueryFilter.GetFilterList != null)
                 {
                     foreach (var item in db.QueryFilter.GetFilterList)
@@ -53,7 +54,7 @@ namespace ThingsGateway.SqlSugar
                         if (field != null)
                         {
                             Type ChildType = item.GetType().GetProperty("type", flag).GetValue(item, null) as Type;
-                            if (ChildType == type || (ChildType.IsInterface && type.GetInterfaces().Contains(ChildType)))
+                            if (ChildType == type || (ChildType.IsInterface && ids.Contains(ChildType)))
                             {
                                 var entityInfo = db.EntityMaintenance.GetEntityInfo(ChildType);
                                 this.Context.InitMappingInfo(ChildType);

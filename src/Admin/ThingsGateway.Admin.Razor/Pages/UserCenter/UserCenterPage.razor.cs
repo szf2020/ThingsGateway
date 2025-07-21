@@ -16,7 +16,6 @@ namespace ThingsGateway.Admin.Razor;
 
 public partial class UserCenterPage
 {
-
     [CascadingParameter(Name = "ReloadMenu")]
     private Func<Task>? ReloadMenu { get; set; }
 

@@ -17,7 +17,6 @@ namespace ThingsGateway.Gateway.Application;
 /// </summary>
 public class VariableMethod
 {
-
     public readonly string IntervalTime;
 
     private object?[]? OS;

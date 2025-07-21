@@ -50,7 +50,6 @@ public static class JsonExtension
         return Newtonsoft.Json.JsonConvert.DeserializeObject(json, type, jsonSerializerSettings ?? IndentedOptions);
     }
 
-
     /// <summary>
     /// 反序列化
     /// </summary>
@@ -61,7 +60,6 @@ public static class JsonExtension
     {
         return (T)FromJsonNetString(json, typeof(T), jsonSerializerSettings);
     }
-
 
     /// <summary>
     /// 序列化
@@ -81,8 +79,6 @@ public static class JsonExtension
     {
         return Newtonsoft.Json.JsonConvert.SerializeObject(item, indented == false ? NoneIndentedOptions : IndentedOptions);
     }
-
-
 
 }
 
@@ -129,4 +125,3 @@ public class ByteArrayToNumberArrayConverter : JsonConverter<byte[]>
 
     public override bool CanRead => true;
 }
-

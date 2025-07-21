@@ -15,7 +15,6 @@ namespace ThingsGateway.Management;
 
 public partial class SystemConfigPage
 {
-
     [Inject]
     [NotNull]
     private IStringLocalizer<RedundancyOptions>? RedundancyLocalizer { get; set; }
@@ -63,9 +62,7 @@ public partial class SystemConfigPage
         }
     }
 
-
     [Parameter]
     [SupplyParameterFromQuery]
     public int? Tab { get; set; }
-
 }

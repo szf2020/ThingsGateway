@@ -34,7 +34,6 @@ namespace ThingsGateway.SqlSugar
         }
         public virtual void ChangeJsonType(SugarParameter paramter)
         {
-
         }
         public virtual string GetTranslationTableName(string name)
         {
@@ -118,7 +117,6 @@ namespace ThingsGateway.SqlSugar
         {
             return "t";
         }
-
 
         public string GetWhere(string fieldName, string conditionalType, int? parameterIndex = null)
         {

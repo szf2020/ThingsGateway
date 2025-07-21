@@ -31,7 +31,6 @@ internal sealed class GatewayMonitorHostedService : BackgroundService, IGatewayM
 
     private IStringLocalizer Localizer { get; }
 
-
     private IChannelThreadManage ChannelThreadManage { get; }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -39,7 +38,6 @@ internal sealed class GatewayMonitorHostedService : BackgroundService, IGatewayM
         await Task.Yield();
         try
         {
-
             //网关启动时，获取所有通道
             var channelRuntimes = (await GlobalData.ChannelService.GetAllAsync().ConfigureAwait(false)).AdaptListChannelRuntime();
             var deviceRuntimes = (await GlobalData.DeviceService.GetAllAsync().ConfigureAwait(false)).AdaptListDeviceRuntime();
@@ -58,13 +56,8 @@ internal sealed class GatewayMonitorHostedService : BackgroundService, IGatewayM
 
                         var varRuntimes = variableRuntimes.Where(x => x.DeviceId == item.Id).ToArray();
 
-                        varRuntimes.ParallelForEach(varItem =>
-                        {
-                            varItem.Init(item);
-                        });
-
+                        varRuntimes.ParallelForEach(varItem => varItem.Init(item));
                     }
-
                 }
                 catch (Exception ex)
                 {
@@ -76,15 +69,11 @@ internal sealed class GatewayMonitorHostedService : BackgroundService, IGatewayM
             GlobalData.VariableRuntimeDispatchService.Dispatch(null);
 
             await ChannelThreadManage.RestartChannelAsync(channelRuntimes).ConfigureAwait(false);
-
-
         }
         catch (Exception ex)
         {
             Logger.LogWarning(ex, "Start error");
         }
-
-
     }
 
     public override async Task StopAsync(CancellationToken cancellationToken)

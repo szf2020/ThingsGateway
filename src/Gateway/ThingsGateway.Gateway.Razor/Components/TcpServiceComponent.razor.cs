@@ -86,4 +86,3 @@ public partial class TcpServiceComponent : IDriverUIBase
 
     public ITcpServiceChannel? TcpServiceChannel => (((DriverBase)Driver)?.Channel as ITcpServiceChannel);
 }
-

@@ -37,6 +37,4 @@ public static class OpenApiUtil
         }
         return trees;
     }
-
-
 }

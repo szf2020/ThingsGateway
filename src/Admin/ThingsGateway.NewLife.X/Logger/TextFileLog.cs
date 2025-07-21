@@ -273,7 +273,6 @@ public class TextFileLog : Logger, IDisposable
                             }
                             catch
                             {
-
                             }
                         }
                     }
@@ -341,7 +340,6 @@ public class TextFileLog : Logger, IDisposable
     }
     protected void WriteLog()
     {
-
         // 异步写日志，实时。即使这里错误，定时器那边仍然会补上
         if (Interlocked.CompareExchange(ref _writing, 1, 0) == 0)
         {

@@ -1,6 +1,5 @@
 ﻿namespace ThingsGateway.SqlSugar
 {
-
     public interface IJsonProvider<T>
     {
         List<SqlObjectResult> ToSqlList();

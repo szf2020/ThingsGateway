@@ -88,10 +88,7 @@ public class BlazorAppContext
             var sysResources = (await ResourceService.GetAllAsync()).AdaptListSysResource();
             if (TitleLocalizer != null)
             {
-                sysResources.ForEach(a =>
-                {
-                    a.Title = TitleLocalizer[a.Title];
-                });
+                sysResources.ForEach(a => a.Title = TitleLocalizer[a.Title]);
             }
             AllResource = sysResources;
             var ids = CurrentUser.ModuleList.Select(a => a.Id).ToHashSet();
@@ -109,9 +106,7 @@ public class BlazorAppContext
                 else
                 {
                     CurrentModuleId = CurrentUser.ModuleList.Select(a => a.Id).FirstOrDefault();
-
                 }
-
             }
             else
             {

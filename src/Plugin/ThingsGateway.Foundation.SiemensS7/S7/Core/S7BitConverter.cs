@@ -49,7 +49,6 @@ public class S7BitConverter : ThingsGatewayBitConverter
         {
             return base.ToString(buffer, offset, length);
         }
-
     }
 
     public override void OtherPropertySet(IThingsGatewayBitConverter thingsGatewayBitConverter, string registerAddress)
@@ -63,5 +62,4 @@ public class S7BitConverter : ThingsGatewayBitConverter
 
         base.OtherPropertySet(thingsGatewayBitConverter, registerAddress);
     }
-
 }

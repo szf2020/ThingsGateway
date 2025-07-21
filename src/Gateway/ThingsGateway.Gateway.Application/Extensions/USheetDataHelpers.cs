@@ -8,12 +8,10 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-
 namespace ThingsGateway.Gateway.Application
 {
     internal static class USheetDataHelpers
     {
-
         public static USheetDatas GetUSheetDatas(Dictionary<string, object> data)
         {
             var uSheetDatas = new USheetDatas();
@@ -40,7 +38,6 @@ namespace ThingsGateway.Gateway.Application
                         uSheetData.cellData.Add(row1, usheetColldata);
                     }
                     {
-
                         Dictionary<int, USheetCelldata> usheetColldata = new();
                         int col = 0;
                         foreach (var colData in value[row1])

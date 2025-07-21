@@ -4,7 +4,6 @@ namespace ThingsGateway.SqlSugar
 {
     public partial class Subqueryable<T> where T : class, new()
     {
-
         public Subqueryable<T> AS(string tableName)
         {
             return this;
@@ -28,7 +27,6 @@ namespace ThingsGateway.SqlSugar
         {
             return new Subqueryable<T, JoinType>();
         }
-
 
         public Subqueryable<T> Where(string where)
         {
@@ -126,7 +124,6 @@ namespace ThingsGateway.SqlSugar
         {
             return null;
         }
-
 
         public string Sum(Func<T, string> expression)
         {

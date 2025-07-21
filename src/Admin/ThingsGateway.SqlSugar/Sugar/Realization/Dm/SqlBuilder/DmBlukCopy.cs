@@ -15,7 +15,7 @@ namespace ThingsGateway.SqlSugar
         {
             if (DbColumnInfoList == null || DbColumnInfoList.Count == 0) return 0;
 
-            if (Inserts.First().GetType() == typeof(DataTable))
+            if (Inserts[0].GetType() == typeof(DataTable))
             {
                 return WriteToServer();
             }
@@ -39,7 +39,7 @@ namespace ThingsGateway.SqlSugar
         {
             if (DbColumnInfoList == null || DbColumnInfoList.Count == 0) return 0;
 
-            if (Inserts.First().GetType() == typeof(DataTable))
+            if (Inserts[0].GetType() == typeof(DataTable))
             {
                 return WriteToServer();
             }
@@ -62,7 +62,7 @@ namespace ThingsGateway.SqlSugar
 
         private int WriteToServer()
         {
-            var dt = this.Inserts.First() as DataTable;
+            var dt = this.Inserts[0] as DataTable;
             if (dt == null)
                 return 0;
             Check.Exception(dt.TableName == "Table", "dt.TableName can't be null ");
@@ -81,7 +81,6 @@ namespace ThingsGateway.SqlSugar
                 DataRow dr = result.NewRow();
                 foreach (DataColumn column in result.Columns)
                 {
-
                     if (dt.Columns.Cast<DataColumn>().Select(it => it.ColumnName).Contains(column.ColumnName, StringComparer.OrdinalIgnoreCase))
                     {
                         dr[column.ColumnName] = item[column.ColumnName];

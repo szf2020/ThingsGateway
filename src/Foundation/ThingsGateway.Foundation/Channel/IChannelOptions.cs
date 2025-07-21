@@ -16,7 +16,6 @@ namespace ThingsGateway.Foundation;
 
 public interface IChannelOptions
 {
-
     /// <summary>
     /// 通道类型
     /// </summary>
@@ -101,7 +100,6 @@ public interface IChannelOptions
 
     TouchSocketConfig Config { get; set; }
 
-
     /// <summary>
     /// 最大连接数
     /// </summary>
@@ -116,7 +114,6 @@ public interface IChannelOptions
     /// 心跳检测(utf8)
     /// </summary>
     string Heartbeat { get; set; }
-
 
     #region dtu终端
     /// <summary>

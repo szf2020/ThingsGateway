@@ -386,7 +386,6 @@ namespace ThingsGateway.SqlSugar
         public static DateTime GetDate() { throw new NotSupportedException("Can only be used in expressions"); }
         public static string GetRandom() { throw new NotSupportedException("Can only be used in expressions"); }
 
-
         public static T Abs<T>(T value) { throw new NotSupportedException("Can only be used in expressions"); }
         public static T Round<T>(T value, int precision) { throw new NotSupportedException("Can only be used in expressions"); }
 

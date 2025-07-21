@@ -11,13 +11,11 @@ namespace ThingsGateway.SqlSugar
     {
         public PostgreSQLProvider()
         {
-
             if (StaticConfig.AppContext_ConvertInfinityDateTime == false)
             {
                 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
                 AppContext.SetSwitch("Npgsql.DisableDateTimeInfinityConversions", true);
             }
-
         }
         public override IDbConnection Connection
         {
@@ -171,7 +169,6 @@ namespace ThingsGateway.SqlSugar
             else if (type == DBNull.Value.GetType())
             {
                 DbNullParameterrArray(parameter, sqlParameter);
-
             }
             else
             {
@@ -255,7 +252,6 @@ namespace ThingsGateway.SqlSugar
             {typeof(float[]),NpgsqlDbType.Real},
             {typeof(Guid[]),NpgsqlDbType.Uuid},
 
-
             { typeof(int?[]),NpgsqlDbType.Integer},
             { typeof(short?[]),NpgsqlDbType.Smallint},
             { typeof(long?[]),NpgsqlDbType.Bigint},
@@ -266,7 +262,6 @@ namespace ThingsGateway.SqlSugar
             { typeof(bool?[]),NpgsqlDbType.Boolean},
             {typeof(DateTime?[]),NpgsqlDbType.Date},
             {typeof(Guid?[]),NpgsqlDbType.Uuid},
-
 
              { typeof(string[]), NpgsqlDbType.Text},
              {typeof(float?[]),NpgsqlDbType.Real},

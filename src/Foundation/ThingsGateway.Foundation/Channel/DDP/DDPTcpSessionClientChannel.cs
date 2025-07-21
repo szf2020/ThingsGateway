@@ -8,7 +8,6 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-
 using System.Runtime.CompilerServices;
 
 using ThingsGateway.NewLife;
@@ -28,7 +27,6 @@ public class DDPTcpSessionClientChannel : TcpSessionClientChannel
     /// <param name="e">包含连接信息的事件参数</param>
     protected override Task OnTcpConnected(ConnectedEventArgs e)
     {
-
         // 如果当前实例的配置不为空，则将配置应用到适配器
         if (Config != null)
         {
@@ -61,8 +59,6 @@ public class DDPTcpSessionClientChannel : TcpSessionClientChannel
 
         return EasyTask.CompletedTask;
     }
-
-
 
     private DeviceSingleStreamDataHandleAdapter<DDPTcpMessage> DDPAdapter = new();
     private WaitLock _waitLock = new(nameof(DDPTcpSessionClientChannel));
@@ -118,7 +114,6 @@ public class DDPTcpSessionClientChannel : TcpSessionClientChannel
                             }
                             catch
                             {
-
                             }
                         }
 
@@ -136,18 +131,13 @@ public class DDPTcpSessionClientChannel : TcpSessionClientChannel
                         await Task.Delay(100).ConfigureAwait(false);
                         await this.CloseAsync().ConfigureAwait(false);
                         this.SafeDispose();
-
                     }
                 }
-
             }
         }
 
         return true;
     }
-
-
-
 
     #region Throw
 

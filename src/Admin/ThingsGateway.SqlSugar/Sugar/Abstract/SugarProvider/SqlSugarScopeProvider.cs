@@ -45,7 +45,6 @@ namespace ThingsGateway.SqlSugar
                 }
                 else
                 {
-
                     return result;
                 }
             }
@@ -69,7 +68,6 @@ namespace ThingsGateway.SqlSugar
                 }
                 else
                 {
-
                     return result;
                 }
             }
@@ -154,7 +152,6 @@ namespace ThingsGateway.SqlSugar
 
         public SugarCacheProvider DataCache => ScopedContext.DataCache;
 
-
         public void AddQueue(string sql, object parsmeters = null)
         {
             ScopedContext.AddQueue(sql, parsmeters);
@@ -169,7 +166,6 @@ namespace ThingsGateway.SqlSugar
         {
             ScopedContext.AddQueue(sql, parsmeter);
         }
-
 
         public void Close()
         {
@@ -277,8 +273,6 @@ namespace ThingsGateway.SqlSugar
         {
             return ScopedContext.InsertableT(insertObj);
         }
-
-
 
         public void Open()
         {
@@ -605,7 +599,7 @@ namespace ThingsGateway.SqlSugar
             return ScopedContext.SqlQueryable<T>(sql);
         }
 
-        public StorageableDataTable Storageable(List<Dictionary<string, object>> dictionaryList, string tableName)
+        public StorageableDataTable Storageable(IEnumerable<Dictionary<string, object>> dictionaryList, string tableName)
         {
             return ScopedContext.Storageable(dictionaryList, tableName);
         }
@@ -614,7 +608,7 @@ namespace ThingsGateway.SqlSugar
             return ScopedContext.Storageable(dictionary, tableName);
         }
 
-        public IStorageable<T> Storageable<T>(IReadOnlyList<T> dataList) where T : class, new()
+        public IStorageable<T> Storageable<T>(IEnumerable<T> dataList) where T : class, new()
         {
             return ScopedContext.Storageable(dataList);
         }
@@ -637,13 +631,10 @@ namespace ThingsGateway.SqlSugar
             return ScopedContext.Union(queryables);
         }
 
-
-
         public ISugarQueryable<T> UnionAll<T>(IReadOnlyList<ISugarQueryable<T>> queryables) where T : class
         {
             return ScopedContext.UnionAll(queryables);
         }
-
 
         public UpdateExpressionMethodInfo UpdateableByObject(Type entityType)
         {

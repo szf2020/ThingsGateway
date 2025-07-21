@@ -51,7 +51,6 @@ namespace ThingsGateway.SqlSugar
 
         public void Dispose()
         {
-
             if (this.IsTran && IsCommit == false)
             {
                 this.Tenant.RollbackTran();

@@ -8,8 +8,6 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-
-
 using Microsoft.AspNetCore.SignalR.Client;
 
 using System.Security.Claims;
@@ -50,10 +48,7 @@ public partial class SysSignalRLoginConnectionHub : ComponentBase, IAsyncDisposa
                         if (message is HttpClientHandler clientHandler)
                         {
                             // 绕过SSL证书
-                            clientHandler.ServerCertificateCustomValidationCallback += (sender, certificate, chain, sslPolicyErrors) =>
-                            {
-                                return true;
-                            };
+                            clientHandler.ServerCertificateCustomValidationCallback += (sender, certificate, chain, sslPolicyErrors) => true;
                         }
 
                         return message;
@@ -80,16 +75,12 @@ public partial class SysSignalRLoginConnectionHub : ComponentBase, IAsyncDisposa
                         await InvokeAsync(async () => await ToastService.Warning(message.Data));
                 });
 
-                _hubConnection.On<string, string>(nameof(ISysHub.NavigationMesage), async (url, message) =>
-                {
-                    await ShowMessage(new(url, message));
-                });
+                _hubConnection.On<string, string>(nameof(ISysHub.NavigationMesage), async (url, message) => await ShowMessage(new(url, message)));
 
                 await _hubConnection.StartAsync();
             }
             catch
             {
-
             }
             await base.OnAfterRenderAsync(firstRender);
         }
@@ -100,7 +91,6 @@ public partial class SysSignalRLoginConnectionHub : ComponentBase, IAsyncDisposa
     [Inject]
     private MessageService MessageService { get; set; }
 
-
     private async Task ShowMessage(NavigationUri navigationUri)
     {
         await MessageService.Show(new MessageOption()
@@ -109,11 +99,7 @@ public partial class SysSignalRLoginConnectionHub : ComponentBase, IAsyncDisposa
             ShowDismiss = true,
             IsAutoHide = false,
             ChildContent = RenderItem(navigationUri),
-            OnDismiss = () =>
-            {
-                return Task.CompletedTask;
-            }
+            OnDismiss = () => Task.CompletedTask
         });
     }
-
 }

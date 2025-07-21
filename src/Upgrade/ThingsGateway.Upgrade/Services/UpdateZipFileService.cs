@@ -42,7 +42,6 @@ public class UpdateZipFileHostedService : IUpdateZipFileHostedService
             var path = Path.Combine(AppContext.BaseDirectory, FileConst.ServerDir, model.AppName, model.Version.ToString(), model.DotNetVersion.ToString(), model.OSPlatform.ToString(), model.Architecture.ToString());
             if (path.AsDirectory().Exists)
             {
-
                 path.AsDirectory().Delete(true);
                 var stream = input.ZipFile.OpenReadStream(1024 * 1024 * 500);
                 await jsonStream.DisposeAsync().ConfigureAwait(false);
@@ -56,8 +55,6 @@ public class UpdateZipFileHostedService : IUpdateZipFileHostedService
                 await Create(stream, model, path).ConfigureAwait(false);
                 await stream.DisposeAsync().ConfigureAwait(false);
             }
-
-
         }
         finally
         {
@@ -88,8 +85,6 @@ public class UpdateZipFileHostedService : IUpdateZipFileHostedService
                 var stream = input.ZipFile;
                 await Create(stream, model, path).ConfigureAwait(false);
             }
-
-
         }
         finally
         {

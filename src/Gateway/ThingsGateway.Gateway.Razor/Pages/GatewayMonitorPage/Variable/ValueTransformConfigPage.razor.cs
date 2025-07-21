@@ -27,7 +27,6 @@ public partial class ValueTransformConfigPage
     [Parameter]
     public string Expressions { get; set; }
 
-
     [Parameter]
     public EventCallback<string> ExpressionsChanged { get; set; }
 
@@ -167,8 +166,6 @@ public partial class ValueTransformConfigPage
         }
     }
 
-
-
     protected override void OnParametersSet()
     {
         if (!Expressions.IsNullOrWhiteSpace())
@@ -184,8 +181,6 @@ public partial class ValueTransformConfigPage
     #region 修改
     [CascadingParameter]
     private Func<Task>? OnCloseAsync { get; set; }
-
-
 
     private async Task OnSave(EditContext editContext)
     {

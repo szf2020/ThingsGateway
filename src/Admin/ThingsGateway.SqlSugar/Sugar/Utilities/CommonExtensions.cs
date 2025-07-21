@@ -4,7 +4,6 @@ namespace ThingsGateway.SqlSugar
 {
     public static class CommonExtensions
     {
-
         public static string GetNonNegativeHashCodeString(this string input)
         {
             // 获取哈希码，然后取绝对值，转换为字符串

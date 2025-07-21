@@ -13,7 +13,6 @@ namespace ThingsGateway.Foundation.Modbus;
 /// <inheritdoc/>
 public partial class ModbusMaster : DtuServiceDeviceBase, IModbusAddress
 {
-
     public override void InitChannel(IChannel channel, ILog? deviceLog = null)
     {
         base.InitChannel(channel, deviceLog);
@@ -135,7 +134,6 @@ public partial class ModbusMaster : DtuServiceDeviceBase, IModbusAddress
         }
     }
 
-
     public ValueTask<OperResult<byte[]>> ModbusRequestAsync(ModbusAddress mAddress, bool read, CancellationToken cancellationToken = default)
     {
         try
@@ -163,8 +161,6 @@ public partial class ModbusMaster : DtuServiceDeviceBase, IModbusAddress
             return EasyValueTask.FromResult(new OperResult<byte[]>(ex));
         }
     }
-
-
 
     /// <inheritdoc/>
     public override async ValueTask<OperResult> WriteAsync(string address, byte[] value, DataTypeEnum dataType, CancellationToken cancellationToken = default)

@@ -42,7 +42,6 @@ namespace ThingsGateway.SqlSugar
             //    Skip = oldSkip;
             //    result = this.Context.SqlQueryable<object>(result).Skip(Skip??0).Take(Take??0).ToSql().Key;
 
-
             //}
             if (TranLock != null)
             {
@@ -131,6 +130,5 @@ namespace ThingsGateway.SqlSugar
             string temp = isExternal ? ExternalPageTempalte : PageTempalte;
             return string.Format(temp, sql.ToString(), (pageIndex - 1) * pageSize + 1, pageIndex * pageSize);
         }
-
     }
 }

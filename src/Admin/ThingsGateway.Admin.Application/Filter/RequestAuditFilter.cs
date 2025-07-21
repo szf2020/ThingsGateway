@@ -41,7 +41,6 @@ public class RequestAuditFilter : IAsyncActionFilter, IOrderedFilter
         // 获取动作方法描述器
         var actionMethod = controllerActionDescriptor?.MethodInfo;
 
-
         // 处理 Blazor Server
         if (actionMethod == null)
         {
@@ -61,7 +60,6 @@ public class RequestAuditFilter : IAsyncActionFilter, IOrderedFilter
             return;
         }
 
-
         // 只有方法贴有特性才进行审计
         if (
             !actionMethod.DeclaringType.IsDefined(typeof(RequestAuditAttribute), true)
@@ -71,11 +69,7 @@ public class RequestAuditFilter : IAsyncActionFilter, IOrderedFilter
             return;
         }
 
-
-
-
         var logData = new RequestAuditData();
-
 
         logData.TimeOperationElapsedMilliseconds = timeOperation.ElapsedMilliseconds;
 
@@ -145,8 +139,6 @@ public class RequestAuditFilter : IAsyncActionFilter, IOrderedFilter
             });
         }
 
-
-
         logData.LocalIPv4 = httpContext.GetLocalIpAddressToIPv4();
         logData.LogDateTime = DateTimeOffset.Now;
         var parameterValues = context.ActionArguments;
@@ -166,7 +158,6 @@ public class RequestAuditFilter : IAsyncActionFilter, IOrderedFilter
             var parameterType = parameter.ParameterType;
 
             _ = parameterValues.TryGetValue(name, out var value);
-
 
             var par = new Parameters()
             {
@@ -233,7 +224,6 @@ public class RequestAuditFilter : IAsyncActionFilter, IOrderedFilter
             par.Value = rawValue;
         }
 
-
         // 获取异常对象情况
         Exception exception = resultContext.Exception;
         if (exception is AppFriendlyException friendlyException)
@@ -248,8 +238,6 @@ public class RequestAuditFilter : IAsyncActionFilter, IOrderedFilter
             logData.Exception.StackTrace = exception.StackTrace;
             logData.Exception.Type = HandleGenericType(exception.GetType());
         }
-
-
 
         // 创建日志记录器
         var logger = httpContext.RequestServices.GetRequiredService<ILogger<RequestAudit>>();
@@ -294,8 +282,6 @@ public class RequestAuditFilter : IAsyncActionFilter, IOrderedFilter
 
         return typeName;
     }
-
-
 
 
 }

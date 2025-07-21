@@ -48,7 +48,6 @@ public partial class MqttServer : BusinessBaseWithCacheIntervalScriptAll
     }
     protected override void DeviceTimeInterval(DeviceRuntime deviceRunTime, DeviceBasicData deviceData)
     {
-
         if (!_businessPropertyWithCacheIntervalScript.DeviceTopic.IsNullOrWhiteSpace())
             AddQueueDevModel(new(deviceData));
 
@@ -75,8 +74,6 @@ public partial class MqttServer : BusinessBaseWithCacheIntervalScriptAll
     {
         return UpdateVarModel(item.Select(a => a.Value).OrderBy(a => a.Id), cancellationToken);
     }
-
-
 
     protected override ValueTask<OperResult> UpdateVarModels(IEnumerable<VariableBasicData> item, CancellationToken cancellationToken)
     {
@@ -128,7 +125,6 @@ public partial class MqttServer : BusinessBaseWithCacheIntervalScriptAll
             {
                 //获取组内全部变量
                 AddQueueVarModel(new CacheDBItem<List<VariableBasicData>>(variableRuntimeGroup.AdaptListVariableBasicData()));
-
             }
             else
             {
@@ -192,7 +188,6 @@ public partial class MqttServer : BusinessBaseWithCacheIntervalScriptAll
                 {
                     foreach (var item in rpcData.Value)
                     {
-
                         if (device.ReadOnlyVariableRuntimes.TryGetValue(item.Key, out var variable) && IdVariableRuntimes.TryGetValue(variable.Id, out var tag))
                         {
                             var rpcEnable = tag.GetPropertyValue(DeviceId, nameof(_variablePropertys.VariableRpcEnable))?.ToBoolean();
@@ -216,14 +211,12 @@ public partial class MqttServer : BusinessBaseWithCacheIntervalScriptAll
 
                 foreach (var kv in item.Value)
                 {
-
                     if (!mqttRpcResult[item.Key].ContainsKey(kv.Key))
                     {
                         writeData[item.Key].Add(kv.Key, kv.Value?.ToString());
                     }
                 }
             }
-
 
             var result = await GlobalData.RpcService.InvokeDeviceMethodAsync(ToString() + "-" + clientId,
                 writeData).ConfigureAwait(false);
@@ -234,7 +227,6 @@ public partial class MqttServer : BusinessBaseWithCacheIntervalScriptAll
                 {
                     mqttRpcResult[dictKv.Key].TryAdd(item.Key, item.Value);
                 }
-
             }
         }
         catch (Exception ex)
@@ -309,8 +301,6 @@ public partial class MqttServer : BusinessBaseWithCacheIntervalScriptAll
     {
         try
         {
-
-
 #if NET8_0_OR_GREATER
 
             var payload = args.ApplicationMessage.Payload;
@@ -341,11 +331,9 @@ public partial class MqttServer : BusinessBaseWithCacheIntervalScriptAll
                 var rpcBase = CSharpScriptEngineExtension.Do<DynamicMqttServerRpcBase>(_driverPropertys.BigTextScriptRpc);
 
                 await rpcBase.RPCInvokeAsync(LogMessage, args, _driverPropertys, _mqttServer, GetRpcResult, CancellationToken.None).ConfigureAwait(false);
-
             }
             else
             {
-
                 if (_driverPropertys.RpcWriteTopic.IsNullOrWhiteSpace()) return;
 
                 var t = string.Format(null, RpcTopic, _driverPropertys.RpcWriteTopic);
@@ -367,8 +355,6 @@ public partial class MqttServer : BusinessBaseWithCacheIntervalScriptAll
                 {
                 }
             }
-
-
         }
         catch (Exception ex)
         {

@@ -99,6 +99,5 @@ namespace ThingsGateway.SqlSugar
         {
             return string.Format("\"{0}\"={1}", m.DbColumnName.ToUpper(), base.GetDbColumn(m, FormatValue(m.Value)));
         }
-
     }
 }

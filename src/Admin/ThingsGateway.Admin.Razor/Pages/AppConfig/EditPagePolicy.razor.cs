@@ -49,7 +49,5 @@ public partial class EditPagePolicy
         await Task.CompletedTask;
         ShortcutsSearchText = searchText;
         return ResourceUtil.BuildTreeItemList(AppContext.OwnMenus.WhereIf(!ShortcutsSearchText.IsNullOrEmpty(), a => a.Title.Contains(ShortcutsSearchText)), Model.Shortcuts, null);
-
     }
-
 }

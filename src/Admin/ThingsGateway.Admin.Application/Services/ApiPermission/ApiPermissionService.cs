@@ -8,7 +8,6 @@
 // QQ群：605534569
 // ------------------------------------------------------------------------------
 
-
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.Mvc.Controllers;
@@ -63,10 +62,8 @@ internal sealed class ApiPermissionService : IApiPermissionService
 
             //foreach (var groupOpenApi in groupOpenApis)
             {
-
                 foreach (var apiDescriptionGroup in apiDescriptions)
                 {
-
                     var routes = apiDescriptionGroup.Items.Where(api => api.ActionDescriptor is ControllerActionDescriptor);
 
                     Dictionary<string, OpenApiPermissionTreeSelector> openApiPermissionTreeSelectorDict = new();
@@ -80,7 +77,6 @@ internal sealed class ApiPermissionService : IApiPermissionService
 
                         if (openApiPermissionTreeSelectorDict.TryGetValue(actionDesc.ControllerName, out var openApiControllerGroup))
                         {
-
                         }
                         else
                         {
@@ -104,19 +100,15 @@ internal sealed class ApiPermissionService : IApiPermissionService
                         });
                     }
 
-
                     if (openApiPermissionTreeSelectorDict.Values.Any(a => a.Children.Count > 0))
                         permissions.AddRange(openApiPermissionTreeSelectorDict.Values);
-
                 }
-
             }
 
             App.CacheService.Set(cacheKey, permissions);
         }
         return permissions;
     }
-
 
     /// <summary>
     /// 获取路由地址名称

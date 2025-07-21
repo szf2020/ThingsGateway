@@ -36,7 +36,6 @@ internal static class Penetrates
             return longValue.ConvertToDateTime();
         }
 
-
         var stringValue = reader.GetString();
 
         // 处理时间戳自动转换

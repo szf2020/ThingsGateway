@@ -213,5 +213,4 @@ public class OtherChannel : SetupConfigObject, IClientChannel
             throw new NotSupportedException($"当前适配器为空或者不支持对象发送。");
         }
     }
-
 }

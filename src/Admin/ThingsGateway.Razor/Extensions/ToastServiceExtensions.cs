@@ -36,7 +36,5 @@ public static class ToastServiceExtensions
             return toastService.Warning("Warn", ex.ToString());
         else
             return toastService.Warning("Warn", ex.Message);
-
-
     }
 }

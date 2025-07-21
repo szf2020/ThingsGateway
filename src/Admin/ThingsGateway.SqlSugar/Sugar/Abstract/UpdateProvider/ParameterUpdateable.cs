@@ -41,7 +41,6 @@ namespace ThingsGateway.SqlSugar
             return result < 0 ? count : result;
         }
 
-
         private void Before(List<T> updateObjects)
         {
             if (this.Updateable.IsEnableDiffLogEvent && updateObjects.Count > 0)

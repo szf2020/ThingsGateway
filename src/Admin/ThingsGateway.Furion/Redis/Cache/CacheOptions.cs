@@ -46,7 +46,6 @@ public sealed class CacheOptions : IConfigurableOptions<CacheOptions>
     /// <param name="configuration"></param>
     public void PostConfigure(CacheOptions options, IConfiguration configuration)
     {
-
     }
 }
 public class MemoryCacheOptions
@@ -62,5 +61,4 @@ public class MemoryCacheOptions
 
 public class RedisCacheOptions : RedisOptions
 {
-
 }

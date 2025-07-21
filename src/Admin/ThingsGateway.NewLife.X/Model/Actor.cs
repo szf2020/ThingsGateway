@@ -149,7 +149,6 @@ public abstract class Actor : DisposeBase, IActor
         return Task.Factory.StartNew(DoActorWork, cancellationToken, creationOptions, scheduler);
     }
 
-
     /// <summary>通知停止添加消息，并等待处理完成</summary>
     /// <param name="msTimeout">等待的毫秒数。0表示不等待，-1表示无限等待</param>
     public virtual Boolean Stop(Int32 msTimeout = 0)

@@ -27,7 +27,7 @@ public static class StringExtensions
         {
             return input;
         }
-        return $"{input.First().ToString().ToLower()}{input.Substring(1)}";
+        return $"{input[0].ToString().ToLower()}{input.Substring(1)}";
     }
 
     /// <summary>
@@ -35,7 +35,7 @@ public static class StringExtensions
     /// </summary>
     /// <param name="input"></param>
     /// <returns></returns>
-    public static string FirstCharToUpper(this string input) => string.IsNullOrEmpty(input) ? input : input.First().ToString().ToUpper();
+    public static string FirstCharToUpper(this string input) => string.IsNullOrEmpty(input) ? input : input[0].ToString().ToUpper();
 
     /// <inheritdoc/>
     public static string Format(this string str, params object[] args)
@@ -116,7 +116,7 @@ public static class StringExtensions
     {
         if (string.IsNullOrWhiteSpace(str)) return str;
 
-        return string.Concat(str.First().ToString().ToLower(), str.AsSpan(1));
+        return string.Concat(str[0].ToString().ToLower(), str.AsSpan(1));
     }
 
     /// <summary>
@@ -128,7 +128,7 @@ public static class StringExtensions
     {
         if (string.IsNullOrWhiteSpace(str)) return str;
 
-        return string.Concat(str.First().ToString().ToUpper(), str.AsSpan(1));
+        return string.Concat(str[0].ToString().ToUpper(), str.AsSpan(1));
     }
 
     /// <summary>

@@ -171,7 +171,6 @@ public static class StringExtensions
             objResult = value.GetJTokenFromString();
         else if (propertyType.IsEnum)
             objResult = Enum.Parse(propertyType, value);
-
         else
         {
             objResult = null;

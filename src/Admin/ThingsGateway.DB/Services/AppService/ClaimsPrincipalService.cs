@@ -14,7 +14,5 @@ namespace ThingsGateway.DB;
 
 public class ClaimsPrincipalService : IClaimsPrincipalService
 {
-
     public ClaimsPrincipal? User => App.User;
-
 }

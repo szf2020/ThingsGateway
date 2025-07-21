@@ -70,7 +70,7 @@ public class PortRenderer : ComponentBase, IDisposable
         builder.AddEventStopPropagationAttribute(5, "onpointerdown", true);
         builder.AddAttribute(6, "onpointerup", EventCallback.Factory.Create<PointerEventArgs>(this, OnPointerUp));
         builder.AddEventStopPropagationAttribute(7, "onpointerup", true);
-        builder.AddElementReferenceCapture(8, __value => { _element = __value; });
+        builder.AddElementReferenceCapture(8, __value => _element = __value);
         builder.AddContent(9, ChildContent);
         builder.CloseElement();
     }

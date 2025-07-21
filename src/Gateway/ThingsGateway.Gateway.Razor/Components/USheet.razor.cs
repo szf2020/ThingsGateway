@@ -14,7 +14,6 @@ namespace ThingsGateway.Gateway.Razor;
 
 public partial class USheet
 {
-
     private UniverSheet? _sheetExcel = null;
     private Task OnReadyAsync() => OnPushExcelData();
 

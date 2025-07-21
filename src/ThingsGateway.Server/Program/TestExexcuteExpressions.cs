@@ -4,7 +4,6 @@
 //using ThingsGateway.Gateway.Application;
 //using ThingsGateway.RulesEngine;
 
-
 //public class TestExexcuteExpressions : IExexcuteExpressions
 //{
 
@@ -35,7 +34,6 @@
 //        //if (mqttClient == null)
 //        //    throw new("mqttClient NOT FOUND");
 
-
 //        //TopicArray topicArray = new()
 //        //{
 //        //    Topic = "test",
@@ -47,6 +45,3 @@
 //        //return new NodeOutput() { Value = result };
 //    }
 //}
-
-
-

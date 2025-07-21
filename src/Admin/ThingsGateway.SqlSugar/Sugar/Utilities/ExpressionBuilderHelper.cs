@@ -32,7 +32,6 @@ namespace ThingsGateway.SqlSugar
         /// </summary>
         public static Expression CreateExpression(Expression left, Expression value, ExpressionType type)
         {
-
             if (type == ExpressionType.Equal)
             {
                 return Expression.Equal(left, Expression.Convert(value, left.Type));
@@ -64,7 +63,6 @@ namespace ThingsGateway.SqlSugar
             Type sourceType = typeof(T);
             Dictionary<string, PropertyInfo> sourceProperties = entity.Columns.Where(it => propertyNames.Contains(it.PropertyName)).ToDictionary(it => it.PropertyName, it => it.PropertyInfo);
 
-
             if (StaticConfig.EnableAot)
             {
                 Type dynamicType = typeof(T);
@@ -77,8 +75,6 @@ namespace ThingsGateway.SqlSugar
             }
             else
             {
-
-
                 Type dynamicType = LinqRuntimeTypeBuilder.GetDynamicType(sourceProperties.Values);
 
                 ParameterExpression sourceItem = Expression.Parameter(sourceType, "t");
@@ -104,7 +100,6 @@ namespace ThingsGateway.SqlSugar
         public static Expression CreateExpressionSelectFieldObject(Type classType, string propertyName)
         {
             ParameterExpression parameter = Expression.Parameter(classType, "it");
-
 
             PropertyInfo propertyInfo = classType.GetProperty(propertyName);
             MemberExpression property = Expression.Property(parameter, propertyInfo);

@@ -2,9 +2,9 @@
 {
     public class StackTraceInfo
     {
-        public string FirstFileName { get { return this.MyStackTraceList.First().FileName; } }
-        public string FirstMethodName { get { return this.MyStackTraceList.First().MethodName; } }
-        public int FirstLine { get { return this.MyStackTraceList.First().Line; } }
+        public string FirstFileName { get { return this.MyStackTraceList[0].FileName; } }
+        public string FirstMethodName { get { return this.MyStackTraceList[0].MethodName; } }
+        public int FirstLine { get { return this.MyStackTraceList[0].Line; } }
 
         public List<StackTraceInfoItem> MyStackTraceList { get; set; }
         public List<StackTraceInfoItem> SugarStackTraceList { get; set; }

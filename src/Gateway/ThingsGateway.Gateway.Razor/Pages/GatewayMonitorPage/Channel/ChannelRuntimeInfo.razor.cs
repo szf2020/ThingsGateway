@@ -14,5 +14,4 @@ public partial class ChannelRuntimeInfo
 {
     [Parameter, EditorRequired]
     public ChannelRuntime ChannelRuntime { get; set; }
-
 }

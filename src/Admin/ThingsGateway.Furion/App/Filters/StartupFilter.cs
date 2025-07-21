@@ -63,17 +63,14 @@ public class StartupFilter : IStartupFilter
                     {
                         context.Response.StatusCode = StatusCodes.Status403Forbidden;
                     }
-
                 }
             });
 
             // 调用默认中间件
             app.UseApp();
 
-
             // 调用启动层的 Startup
             next(app);
         };
     }
-
 }

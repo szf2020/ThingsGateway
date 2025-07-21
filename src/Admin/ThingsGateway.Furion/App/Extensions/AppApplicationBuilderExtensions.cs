@@ -21,7 +21,6 @@ namespace Microsoft.AspNetCore.Builder;
 [SuppressSniffer]
 public static class AppApplicationBuilderExtensions
 {
-
     /// <summary>
     /// 设置默认服务存储器
     /// </summary>
@@ -87,10 +86,7 @@ public static class AppApplicationBuilderExtensions
     public static IApplicationBuilder MapRouteControllers(this IApplicationBuilder app)
     {
         app.UseRouting();
-        app.UseEndpoints(endpoints =>
-        {
-            endpoints.MapControllers();
-        });
+        app.UseEndpoints(endpoints => endpoints.MapControllers());
 
         return app;
     }

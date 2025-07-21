@@ -130,7 +130,6 @@ namespace ThingsGateway.SqlSugar
             return value;
         }
 
-
         public static List<SugarParameter> CopySugarParameters(IReadOnlyList<SugarParameter> pars)
         {
             if (pars == null) return null;
@@ -176,7 +175,7 @@ namespace ThingsGateway.SqlSugar
             var dbLinkName = context.Root.GetConnection(attr.configId).CurrentConnectionConfig.DbLinkName;
             if (dbLinkName != null)
             {
-                if (dbLinkName.First() == '@')
+                if (dbLinkName[0] == '@')
                 {
                     tableName = queryBuilder.Builder.GetTranslationColumnName(oldTableName) + dbLinkName;
                 }
@@ -424,7 +423,6 @@ namespace ThingsGateway.SqlSugar
             }
             else if (valueFomatInfo.MethodName == "OnlyInSelectConvertToString")
             {
-
                 var methodInfo = valueFomatInfo.MethodInfo;
                 if (methodInfo != null)
                 {
@@ -594,7 +592,6 @@ namespace ThingsGateway.SqlSugar
 
         internal static bool IsNumberArray(Type type)
         {
-
             return type.IsIn(typeof(int[]),
                                typeof(long[]),
                                typeof(short[]),
@@ -756,7 +753,6 @@ namespace ThingsGateway.SqlSugar
                 if (destinationType.IsEnum && value is decimal)
                     return Enum.ToObject(destinationType, Convert.ToInt32(value));
 
-
                 if (destinationType.Name == "TimeOnly" && sourceType.Name != "TimeOnly")
                 {
                     var type = Type.GetType("System.TimeOnly", true, true);
@@ -788,7 +784,6 @@ namespace ThingsGateway.SqlSugar
             }
             return isAsync;
         }
-
 
         public static ConnectionConfig CopyConfig(ConnectionConfig it)
         {
@@ -861,7 +856,6 @@ namespace ThingsGateway.SqlSugar
                     ClickHouseEnableFinal = it.MoreSettings.ClickHouseEnableFinal,
                     PgSqlIsAutoToLowerSchema = it.MoreSettings.PgSqlIsAutoToLowerSchema,
                     EnableJsonb = it.MoreSettings.EnableJsonb
-
                 },
                 SqlMiddle = it.SqlMiddle == null ? null : new SqlMiddle
                 {
@@ -919,11 +913,8 @@ namespace ThingsGateway.SqlSugar
             return name.EndsWith("ExecuteAsync") || name.Contains("OutputAsyncCausalityEvents") || name.Contains("OutputWaitEtwEvents");
         }
 
-
-
         public static StackTraceInfo GetStackTrace()
         {
-
             StackTrace st = new StackTrace(true);
             StackTraceInfo info = new StackTraceInfo();
             info.MyStackTraceList = new List<StackTraceInfoItem>();
@@ -931,7 +922,7 @@ namespace ThingsGateway.SqlSugar
             for (int i = 0; i < st.FrameCount; i++)
             {
                 var frame = st.GetFrame(i);
-                if (!frame.GetMethod().Module.Name.Equals("thingsgateway.sqlsugar.dll", StringComparison.CurrentCultureIgnoreCase) && frame.GetMethod().Name.First() != '<')
+                if (!frame.GetMethod().Module.Name.Equals("thingsgateway.sqlsugar.dll", StringComparison.CurrentCultureIgnoreCase) && frame.GetMethod().Name[0] != '<')
                 {
                     info.MyStackTraceList.Add(new StackTraceInfoItem()
                     {
@@ -1020,7 +1011,6 @@ namespace ThingsGateway.SqlSugar
             }
             return baseType;
         }
-
 
         internal static Type GetUnderType(PropertyInfo propertyInfo, ref bool isNullable)
         {
@@ -1308,7 +1298,7 @@ namespace ThingsGateway.SqlSugar
             }
         }
 
-        public static void DataInoveByExpresson<Type>(IReadOnlyList<Type> datas, MethodCallExpression callExpresion)
+        public static void DataInoveByExpresson<Type>(IEnumerable<Type> datas, MethodCallExpression callExpresion)
         {
             var methodInfo = callExpresion.Method;
             foreach (var item in datas)
@@ -1361,7 +1351,6 @@ namespace ThingsGateway.SqlSugar
 
         public static Type GetTypeByTypeName(string ctypename)
         {
-
             if (ctypename.EqualCase(UtilConstants.DecType.Name))
             {
                 return UtilConstants.DecType;
@@ -1812,7 +1801,6 @@ namespace ThingsGateway.SqlSugar
             return sb.ToString();
         }
 
-
         public static string FieldNameSql()
         {
             if (StaticConfig.TableQuerySqlKey != Guid.Empty)
@@ -1870,7 +1858,6 @@ namespace ThingsGateway.SqlSugar
             // 使用反射创建DateOnly实例
             return constructor.Invoke(new object[] { year, month, day });
         }
-
 
         internal static void AddDiscrimator<T>(Type type, ISugarQueryable<T> queryable, string shortName = null)
         {

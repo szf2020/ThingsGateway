@@ -98,10 +98,8 @@ public partial class MainLayout : IDisposable
 
     private async Task LogoutAsync()
     {
-
         try
         {
-
             var ret = await AuthRazorService.LoginOutAsync();
             if (ret.Code != 200)
             {
@@ -122,7 +120,6 @@ public partial class MainLayout : IDisposable
     }
 
     #endregion 注销
-
 
     private async Task WinboxRender(ContextMenuItem item, object? context)
     {
@@ -154,7 +151,6 @@ public partial class MainLayout : IDisposable
             };
             await WinBoxService.Show(option);
         }
-
     }
 
     private string _versionString = string.Empty;

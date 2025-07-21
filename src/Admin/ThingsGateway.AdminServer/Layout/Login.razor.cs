@@ -25,7 +25,6 @@ using ThingsGateway.DataEncryption;
 using ThingsGateway.NewLife.Extension;
 using ThingsGateway.Razor;
 
-
 namespace ThingsGateway.AdminServer;
 
 public partial class Login
@@ -75,7 +74,6 @@ public partial class Login
         model.Password = DESEncryption.Encrypt(model.Password);
         try
         {
-
             var ret = await AuthRazorService.LoginAsync(model);
 
             if (ret.Code != 200)
@@ -102,8 +100,6 @@ public partial class Login
             await ToastService.Error(Localizer["LoginErrorh2"], Localizer["LoginErrorc2"]);
         }
     }
-
-
 
 
 }

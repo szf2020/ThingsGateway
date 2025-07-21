@@ -36,7 +36,6 @@ namespace ThingsGateway.SqlSugar
         }
         public UpdateExpressionMethodInfo SetColumns(string expShortName, FormattableString fieldExpressionString)
         {
-
             var newMethod = objectValue.GetType().GetMethods()
                 .Where(it =>
                 {

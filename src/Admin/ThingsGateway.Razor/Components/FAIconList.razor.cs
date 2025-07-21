@@ -108,8 +108,5 @@ public partial class FAIconList : IAsyncDisposable
     /// </summary>
     /// <returns></returns>
     [JSInvokable]
-    public Task ShowDialog(string text) => DialogService.ShowCloseDialog<IconDialog>(DialogHeaderText, parameters =>
-    {
-        parameters.Add(nameof(IconDialog.IconName), text);
-    });
+    public Task ShowDialog(string text) => DialogService.ShowCloseDialog<IconDialog>(DialogHeaderText, parameters => parameters.Add(nameof(IconDialog.IconName), text));
 }

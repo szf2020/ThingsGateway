@@ -28,14 +28,12 @@ internal sealed partial class ReverseCallbackServer : SingletonRpcServer
     [DmtpRpc(MethodInvoke = true)]
     public void UpData(ICallContext callContext, List<DeviceDataWithValue> deviceDatas)
     {
-
         foreach (var deviceData in deviceDatas)
         {
             if (GlobalData.ReadOnlyDevices.TryGetValue(deviceData.Name, out var device))
             {
                 device.RpcDriver = RedundancyTask;
                 device.Tag = callContext.Caller is IIdClient idClient ? idClient.Id : string.Empty;
-
 
                 device.SetDeviceStatus(deviceData.ActiveTime, deviceData.DeviceStatus == DeviceStatusEnum.OnLine ? false : true, lastErrorMessage: deviceData.LastErrorMessage);
 
@@ -47,7 +45,6 @@ internal sealed partial class ReverseCallbackServer : SingletonRpcServer
                         value.SetErrorMessage(variableData.Value.LastErrorMessage);
                     }
                 }
-
             }
         }
         RedundancyTask.LogMessage?.Trace("RpcServer Update data success");
@@ -56,7 +53,6 @@ internal sealed partial class ReverseCallbackServer : SingletonRpcServer
     [DmtpRpc(MethodInvoke = true)]
     public async Task SyncData(List<Channel> channels, List<Device> devices, List<Variable> variables)
     {
-
         List<Channel> addChannels = new();
         List<Device> addDevices = new();
         List<Variable> addVariables = new();
@@ -90,7 +86,6 @@ internal sealed partial class ReverseCallbackServer : SingletonRpcServer
         {
             if (GlobalData.ReadOnlyDevices.TryGetValue(device.Name, out var deviceRuntime))
             {
-
                 deviceNewId.TryAdd(device.Id, deviceRuntime.Id);
                 device.Id = deviceRuntime.Id;
 
@@ -145,12 +140,10 @@ internal sealed partial class ReverseCallbackServer : SingletonRpcServer
             }
         }
 
-
         await GlobalData.ChannelRuntimeService.InsertAsync(addChannels, addDevices, addVariables, true, default).ConfigureAwait(false);
         await GlobalData.ChannelRuntimeService.UpdateAsync(upChannels, upDevices, upVariables, true, default).ConfigureAwait(false);
 
         RedundancyTask.LogMessage?.LogTrace($"Sync data success");
-
     }
 
     [DmtpRpc(MethodInvoke = true)]

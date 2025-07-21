@@ -58,6 +58,4 @@ public class DynamicXml : DynamicObject
         result = new DynamicXml(getNode);
         return true;
     }
-
-
 }

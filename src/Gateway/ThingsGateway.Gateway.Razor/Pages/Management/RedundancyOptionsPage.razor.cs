@@ -18,7 +18,6 @@ namespace ThingsGateway.Management;
 
 public partial class RedundancyOptionsPage
 {
-
     [Inject]
     [NotNull]
     private IStringLocalizer<RedundancyOptions>? RedundancyLocalizer { get; set; }
@@ -70,7 +69,6 @@ public partial class RedundancyOptionsPage
             });
             if (ret)
             {
-
                 await RedundancyService.EditRedundancyOptionAsync(Model);
                 await ToastService.Success(RedundancyLocalizer[nameof(RedundancyOptions)], $"{RazorLocalizer["Save"]}{RazorLocalizer["Success"]}");
 
@@ -78,18 +76,14 @@ public partial class RedundancyOptionsPage
                 await RedundancyHostedService.StartTaskAsync(CancellationToken.None);
                 await ToastService.Success(RedundancyLocalizer[nameof(RedundancyOptions)], $"{RazorLocalizer["Success"]}");
 
-
-
                 await InvokeAsync(StateHasChanged);
             }
-
         }
         catch (Exception ex)
         {
             await ToastService.Warning(RedundancyLocalizer[nameof(RedundancyOptions)], $"{RazorLocalizer["Save"]}{RazorLocalizer["Fail", ex]}");
         }
     }
-
 
     private async Task ForcedSync(MouseEventArgs args)
     {

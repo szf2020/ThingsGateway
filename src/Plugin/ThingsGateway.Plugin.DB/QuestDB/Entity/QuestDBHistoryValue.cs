@@ -60,7 +60,6 @@ public class QuestDBHistoryValue : IPrimaryIdEntity
     public string Value { get; set; }
 }
 
-
 [SugarTable("historyNumberValue")]
 public class QuestDBNumberHistoryValue : IPrimaryIdEntity, IDBHistoryValue
 {

@@ -14,8 +14,6 @@ using CSScripting;
 
 using MQTTnet;
 
-
-
 #if NET6_0
 using MQTTnet.Client;
 #endif
@@ -91,7 +89,6 @@ public partial class MqttClient : BusinessBaseWithCacheIntervalScriptAll
 
                 topicJsonTBList.Add(topicArray);
             }
-
         }
         var result = await Update(topicJsonTBList, default).ConfigureAwait(false);
         if (success != result.IsSuccess)
@@ -107,7 +104,6 @@ public partial class MqttClient : BusinessBaseWithCacheIntervalScriptAll
 
     protected override void DeviceTimeInterval(DeviceRuntime deviceRunTime, DeviceBasicData deviceData)
     {
-
         if (!_businessPropertyWithCacheIntervalScript.DeviceTopic.IsNullOrWhiteSpace())
             AddQueueDevModel(new(deviceData));
 
@@ -125,7 +121,6 @@ public partial class MqttClient : BusinessBaseWithCacheIntervalScriptAll
 
         base.DeviceChange(deviceRunTime, deviceData);
     }
-
 
     protected override void VariableTimeInterval(IEnumerable<VariableRuntime> variableRuntimes, IEnumerable<VariableBasicData> variables)
     {
@@ -188,8 +183,6 @@ public partial class MqttClient : BusinessBaseWithCacheIntervalScriptAll
 
     protected override ValueTask<OperResult> UpdateDevModel(IEnumerable<CacheDBItem<DeviceBasicData>> item, CancellationToken cancellationToken)
     {
-
-
         return UpdateDevModel(item.Select(a => a.Value).OrderBy(a => a.Id), cancellationToken);
     }
 
@@ -237,7 +230,6 @@ public partial class MqttClient : BusinessBaseWithCacheIntervalScriptAll
 
     private ValueTask<OperResult> UpdateDevModel(IEnumerable<DeviceBasicData> item, CancellationToken cancellationToken)
     {
-
         var topicArrayList = GetDeviceTopicArray(item);
         return Update(topicArrayList, cancellationToken);
     }
@@ -293,7 +285,6 @@ public partial class MqttClient : BusinessBaseWithCacheIntervalScriptAll
                 {
                     foreach (var item in rpcData.Value)
                     {
-
                         if (device.ReadOnlyVariableRuntimes.TryGetValue(item.Key, out var variable) && IdVariableRuntimes.TryGetValue(variable.Id, out var tag))
                         {
                             var rpcEnable = tag.GetPropertyValue(DeviceId, nameof(_variablePropertys.VariableRpcEnable))?.ToBoolean();
@@ -317,14 +308,12 @@ public partial class MqttClient : BusinessBaseWithCacheIntervalScriptAll
 
                 foreach (var kv in item.Value)
                 {
-
                     if (!mqttRpcResult[item.Key].ContainsKey(kv.Key))
                     {
                         writeData[item.Key].Add(kv.Key, kv.Value?.ToString());
                     }
                 }
             }
-
 
             var result = await GlobalData.RpcService.InvokeDeviceMethodAsync(ToString() + "-" + clientId,
                 writeData).ConfigureAwait(false);
@@ -335,7 +324,6 @@ public partial class MqttClient : BusinessBaseWithCacheIntervalScriptAll
                 {
                     mqttRpcResult[dictKv.Key].TryAdd(item.Key, item.Value);
                 }
-
             }
         }
         catch (Exception ex)
@@ -350,7 +338,6 @@ public partial class MqttClient : BusinessBaseWithCacheIntervalScriptAll
     {
         try
         {
-
 #if NET8_0_OR_GREATER
 
             var payload = args.ApplicationMessage.Payload;
@@ -361,7 +348,6 @@ public partial class MqttClient : BusinessBaseWithCacheIntervalScriptAll
         var payloadCount = payload.Count;
 
 #endif
-
 
             if (args.ApplicationMessage.Topic == _driverPropertys.RpcQuestTopic && payloadCount > 0)
             {
@@ -377,7 +363,6 @@ public partial class MqttClient : BusinessBaseWithCacheIntervalScriptAll
                 var rpcBase = CSharpScriptEngineExtension.Do<DynamicMqttClientRpcBase>(_driverPropertys.BigTextScriptRpc);
 
                 await rpcBase.RPCInvokeAsync(LogMessage, args, _driverPropertys, _mqttClient, GetRpcResult, TryMqttClientAsync, CancellationToken.None).ConfigureAwait(false);
-
             }
             else
             {
@@ -410,8 +395,6 @@ public partial class MqttClient : BusinessBaseWithCacheIntervalScriptAll
         .WithTopic($"{args.ApplicationMessage.Topic}")
         .WithPayload(thingsBoardRpcResponseData.ToSystemTextJsonString(_driverPropertys.JsonFormattingIndented)).Build();
                             await _mqttClient.PublishAsync(variableMessage).ConfigureAwait(false);
-
-
                         }
                     }
                     catch
@@ -433,22 +416,17 @@ public partial class MqttClient : BusinessBaseWithCacheIntervalScriptAll
                         var isConnect = await TryMqttClientAsync(CancellationToken.None).ConfigureAwait(false);
                         if (isConnect.IsSuccess)
                         {
-
                             var variableMessage = new MqttApplicationMessageBuilder()
         .WithTopic($"{args.ApplicationMessage.Topic}/Response")
         .WithPayload(mqttRpcResult.ToSystemTextJsonString(_driverPropertys.JsonFormattingIndented)).Build();
                             await _mqttClient.PublishAsync(variableMessage).ConfigureAwait(false);
-
-
                         }
                     }
                     catch
                     {
                     }
                 }
-
             }
-
         }
         catch (Exception ex)
         {

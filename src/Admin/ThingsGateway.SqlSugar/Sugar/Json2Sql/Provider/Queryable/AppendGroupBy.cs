@@ -6,7 +6,6 @@ namespace ThingsGateway.SqlSugar
     /// </summary>
     public partial class JsonQueryableProvider : IJsonQueryableProvider<JsonQueryResult>
     {
-
         private void AppendGroupBy(JToken item)
         {
             var value = item.First().ToString();

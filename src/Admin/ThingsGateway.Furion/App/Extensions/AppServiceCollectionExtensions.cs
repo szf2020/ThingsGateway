@@ -219,7 +219,6 @@ public static class AppServiceCollectionExtensions
                 Expire = cacheOptions.MemoryCacheOptions.Expire,
                 Period = cacheOptions.MemoryCacheOptions.Period
             });
-
         }
         else if (cacheOptions.CacheType == CacheType.Redis)
         {
@@ -234,12 +233,8 @@ public static class AppServiceCollectionExtensions
                 options.Prefix = cacheOptions.RedisCacheOptions.Prefix;
                 options.InstanceName = cacheOptions.RedisCacheOptions.InstanceName;
                 options.Expire = cacheOptions.RedisCacheOptions.Expire;
-
             });
         }
-
-
-
 
         // 注册全局依赖注入
         services.AddDependencyInjection();

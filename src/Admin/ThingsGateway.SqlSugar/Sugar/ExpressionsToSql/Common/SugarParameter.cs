@@ -39,7 +39,6 @@ namespace ThingsGateway.SqlSugar
             SettingDataType(type);
         }
 
-
         public SugarParameter(string name, object value, System.Data.DbType type)
         {
             this.Value = value;
@@ -180,7 +179,6 @@ namespace ThingsGateway.SqlSugar
             {
                 this.Value = this.Value == null ? default(string) : this.Value.ObjToString();
             }
-
         }
         public SugarParameter(string name, object value, bool isOutput)
         {
@@ -231,7 +229,6 @@ namespace ThingsGateway.SqlSugar
                     {
                         var length = Value.ToString().Length;
                         _Size = length < 4000 ? 4000 : -1;
-
                     }
                 }
                 if (_Size == 0)
@@ -282,7 +279,6 @@ namespace ThingsGateway.SqlSugar
         {
             this.DbType = System.Data.DbType.String;
         }
-
 
         public string TypeName { get; set; }
         public bool IsJson { get; set; }

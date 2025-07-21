@@ -31,7 +31,6 @@ public class OpenApiLoginInput
     [Required]
     public string Password { get; set; }
 
-
     /// <summary>
     /// 租户Id
     ///</summary>
@@ -63,5 +62,4 @@ public class LoginInput
     /// </summary>
     ///<example>252885263003720</example>
     public long? TenantId { get; set; } = RoleConst.DefaultTenantId;
-
 }

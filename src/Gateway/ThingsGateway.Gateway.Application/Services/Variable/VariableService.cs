@@ -114,10 +114,8 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
             }
         }
 
-
         if (businessEnable)
         {
-
             Channel serviceChannel = new Channel();
             Device serviceDevice = new Device();
 
@@ -175,7 +173,6 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
             };
                 newDevices.Add(mqttDevice);
             }
-
         }
 
         //Channel opcuaChannel = new Channel();
@@ -224,7 +221,6 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
                 await db.BulkCopyAsync(newDevices, 10000).ConfigureAwait(false);
                 await db.BulkCopyAsync(newVariables, 10000).ConfigureAwait(false);
             }
-
         }).ConfigureAwait(false);
         if (result.IsSuccess)//如果成功了
         {
@@ -240,7 +236,6 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
     }
 
     #endregion 测试
-
 
     /// <summary>
     /// 保存初始值
@@ -258,15 +253,11 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
     [OperDesc("SaveVariable", isRecordPar: false, localizerType: typeof(Variable))]
     public async Task<bool> BatchSaveVariableAsync(List<Variable> input, ItemChangedType type)
     {
-
-
         if (type == ItemChangedType.Add)
         {
-
             ManageHelper.CheckVariableCount(input.Count);
 
             using var db = GetDB();
-
 
             var result = await db.Insertable(input).ExecuteCommandAsync().ConfigureAwait(false);
 
@@ -274,12 +265,10 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
             {
                 DeleteVariableCache();
                 return true;
-
             }
         }
         else
         {
-
             using var db = GetDB();
 
             var result = await db.Updateable(input).ExecuteCommandAsync().ConfigureAwait(false);
@@ -401,7 +390,6 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
                 .WhereIF(dataScope != null && dataScope?.Count > 0, u => dataScope.Contains(u.CreateOrgId))//在指定机构列表查询
         .WhereIF(dataScope?.Count == 0, u => u.CreateUserId == UserManager.UserId)
 
-
         .WhereIF(exportFilter.PluginType == PluginTypeEnum.Business, u => SqlFunc.JsonLike(u.VariablePropertys, exportFilter.DeviceId.ToString()));
         return whereQuery;
     }
@@ -426,7 +414,6 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
 
                 .WhereIF(dataScope != null && dataScope?.Count > 0, u => dataScope.Contains(u.CreateOrgId))//在指定机构列表查询
         .WhereIF(dataScope?.Count == 0, u => u.CreateUserId == UserManager.UserId)
-
 
         .WhereIF(exportFilter.PluginType == PluginTypeEnum.Business, u => SqlFunc.JsonLike(u.VariablePropertys, exportFilter.DeviceId.ToString()));
         return whereQuery;
@@ -458,12 +445,11 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
         App.CacheService.Remove(ThingsGatewayCacheConst.Cache_Variable);
     }
 
-
     public List<VariableRuntime> GetAllVariableRuntime()
     {
         using (var db = DbContext.GetDB<Variable>())
         {
-            var deviceVariables = db.Queryable<Variable>().OrderBy(a => a.Id).GetEnumerable();
+            var deviceVariables = db.Queryable<Variable>().OrderBy(a => a.Id).ToEnumerable();
             return deviceVariables.AdaptListVariableRuntime();
         }
     }
@@ -503,7 +489,6 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
     {
         if (GlobalData.HardwareJob.HardwareInfo.MachineInfo.AvailableMemory < 4 * 1024 * 1024)
         {
-
             var whereQuery = await GetWhereEnumerableFunc(exportFilter).ConfigureAwait(false);
             //导出
             var variables = GlobalData.IdVariables.Select(a => a.Value).GetQuery(exportFilter.QueryPageOptions, whereQuery, exportFilter.FilterKeyValueAction);
@@ -524,7 +509,6 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
             var sheets = VariableServiceHelpers.ExportSheets(variables, deviceDicts, channelDicts, pluginSheetNames); // IEnumerable 延迟执行
 
             return sheets;
-
         }
         else
         {
@@ -532,12 +516,11 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
             var sheets = await VariableServiceHelpers.ExportCoreAsync(data.Items, sortName: exportFilter.QueryPageOptions.SortName, sortOrder: exportFilter.QueryPageOptions.SortOrder).ConfigureAwait(false);
             return sheets;
         }
-
     }
     private async Task<IAsyncEnumerable<Variable>> GetAsyncEnumerableData(ExportFilter exportFilter)
     {
         var whereQuery = await GetEnumerableData(exportFilter).ConfigureAwait(false);
-        return whereQuery.GetAsyncEnumerable();
+        return whereQuery.ToAsyncEnumerable();
     }
     private async Task<ISugarQueryable<Variable>> GetEnumerableData(ExportFilter exportFilter)
     {
@@ -545,9 +528,7 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
         var whereQuery = await GetWhereQueryFunc(exportFilter).ConfigureAwait(false);
 
         return GetQuery(db, exportFilter.QueryPageOptions, whereQuery, exportFilter.FilterKeyValueAction);
-
     }
-
 
     #endregion 导出
 
@@ -557,13 +538,13 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
     [OperDesc("ImportVariable", isRecordPar: false, localizerType: typeof(Variable))]
     public async Task<HashSet<long>> ImportVariableAsync(Dictionary<string, ImportPreviewOutputBase> input)
     {
-        var variables = new List<Variable>();
+        IEnumerable<Variable>? variables = new List<Variable>();
         foreach (var item in input)
         {
             if (item.Key == ExportString.VariableName)
             {
                 var variableImports = ((ImportPreviewOutput<Dictionary<string, Variable>>)item.Value).Data;
-                variables = variableImports.SelectMany(a => a.Value.Select(a => a.Value)).ToList();
+                variables = variableImports.SelectMany(a => a.Value.Select(a => a.Value));
                 break;
             }
         }
@@ -584,8 +565,6 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
         DeleteVariableCache();
         return variables.Select(a => a.Id).ToHashSet();
     }
-
-
 
     public async Task<Dictionary<string, ImportPreviewOutputBase>> PreviewAsync(IBrowserFile browserFile)
     {
@@ -758,8 +737,6 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
                 {
                     try
                     {
-
-
                         var variableProperty = ((BusinessBase)_pluginService.GetDriver(driverPluginType.FullName)).VariablePropertys;
                         var variablePropertyType = variableProperty.GetType();
                         propertys.Item1 = variablePropertyType;
@@ -776,7 +753,6 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
                     }
                     catch
                     {
-
                     }
                 }
 
@@ -890,7 +866,6 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
 
         return deviceImportPreview;
     }
-
 
     #endregion 导入
 }

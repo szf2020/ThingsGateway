@@ -55,7 +55,7 @@ namespace ThingsGateway.SqlSugar
             {
                 var itemArray = item.Split('=');
                 var last = itemArray.Last().Trim().Split('.').First().TrimEnd(')').TrimEnd('}');
-                var first = itemArray.First().Trim();
+                var first = itemArray[0].Trim();
                 if (first.Contains('{'))
                 {
                     first = first.Split('{').Last().Trim();

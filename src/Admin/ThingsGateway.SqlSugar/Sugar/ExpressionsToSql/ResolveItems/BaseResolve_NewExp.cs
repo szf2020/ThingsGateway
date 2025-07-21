@@ -134,6 +134,5 @@ namespace ThingsGateway.SqlSugar
                 Check.ThrowNotSupportedException(item.GetType().Name);
             }
         }
-
     }
 }

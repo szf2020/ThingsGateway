@@ -41,10 +41,7 @@ namespace ThingsGateway.Foundation
 
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        context.RegisterPostInitializationOutput(ctx =>
-        {
-            ctx.AddSource("GeneratorVariableAttribute.g.cs", SourceText.From(AttributeSource, Encoding.UTF8));
-        });
+        context.RegisterPostInitializationOutput(ctx => ctx.AddSource("GeneratorVariableAttribute.g.cs", SourceText.From(AttributeSource, Encoding.UTF8)));
 
         var variableObjectTypes = context.SyntaxProvider
             .CreateSyntaxProvider(
@@ -53,7 +50,6 @@ namespace ThingsGateway.Foundation
             .Where(static t => t is not null)
             .Select(static (t, _) => (INamedTypeSymbol)t!)  // 明确转成 INamedTypeSymbol
             .Collect();
-
 
         var compilationAndTypes = context.CompilationProvider.Combine(variableObjectTypes);
 
@@ -72,10 +68,8 @@ namespace ThingsGateway.Foundation
                     spc.AddSource($"{builder.GetFileName()}.g.cs", SourceText.From(ret, Encoding.UTF8));
                 }
             }
-
         });
     }
-
 }
 
 #endif

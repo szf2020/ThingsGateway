@@ -74,7 +74,6 @@ public class RpcLogPageInput : ITableSearchModel
     /// </summary>
     public DateTimeRangeValue? SearchDate { get; set; }
 
-
     /// <inheritdoc/>
     public IEnumerable<IFilterAction> GetSearches()
     {

@@ -256,8 +256,6 @@ public class AssemblyX
         // 如果没有包含圆点，说明其不是FullName
         if (!typeName.Contains('.'))
         {
-
-
             // 遍历所有类型，包括内嵌类型
             foreach (var item in Types)
             {

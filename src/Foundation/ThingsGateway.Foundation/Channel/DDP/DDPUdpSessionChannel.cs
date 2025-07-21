@@ -25,7 +25,6 @@ public class DDPUdpSessionChannel : UdpSessionChannel, IClientChannel, IDtuUdpSe
 {
     public DDPUdpSessionChannel(IChannelOptions channelOptions) : base(channelOptions)
     {
-
     }
     protected override void LoadConfig(TouchSocketConfig config)
     {
@@ -48,9 +47,7 @@ public class DDPUdpSessionChannel : UdpSessionChannel, IClientChannel, IDtuUdpSe
         DDPAdapter.SendCallBackAsync = DDPSendAsync;
         DDPAdapter.ReceivedCallBack = DDPHandleReceivedData;
         DataHandlingAdapter.SendCallBackAsync = DefaultSendAsync;
-
     }
-
 
     protected Task DefaultSendAsync(EndPoint endPoint, ReadOnlyMemory<byte> memory)
     {
@@ -82,7 +79,6 @@ public class DDPUdpSessionChannel : UdpSessionChannel, IClientChannel, IDtuUdpSe
     }
 
     private DeviceUdpDataHandleAdapter<DDPUdpMessage> DDPAdapter = new();
-
 
     public EndPoint DefaultEndpoint => RemoteIPHost?.EndPoint;
 
@@ -170,15 +166,12 @@ public class DDPUdpSessionChannel : UdpSessionChannel, IClientChannel, IDtuUdpSe
                         await Task.Delay(100).ConfigureAwait(false);
                         IdDict.TryRemove(endPoint, out _);
                         EndPointDcit.TryRemove(id, out _);
-
                     }
                 }
-
             }
         }
         return true;
     }
-
 
     #region Throw
 
@@ -202,10 +195,6 @@ public class DDPUdpSessionChannel : UdpSessionChannel, IClientChannel, IDtuUdpSe
     }
 
     #endregion Throw
-
-
-
-
 
     InternalConcurrentDictionary<EndPoint, string> IdDict { get; set; } = new();
     InternalConcurrentDictionary<string, EndPoint> EndPointDcit { get; set; } = new();

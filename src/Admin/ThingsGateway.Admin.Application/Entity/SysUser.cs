@@ -225,7 +225,6 @@ public class SysUser : BaseEntity
     [AutoGenerateColumn(Ignore = true)]
     public long? TenantId { get; set; }
 
-
     /// <summary>
     /// 全局用戶
     /// </summary>

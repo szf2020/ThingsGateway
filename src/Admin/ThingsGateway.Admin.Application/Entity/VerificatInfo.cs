@@ -15,7 +15,6 @@ namespace ThingsGateway.Admin.Application;
 /// <summary>
 /// 会话信息
 /// </summary>
-
 [SugarTable("verificatinfo", TableDescription = "验证缓存表")]
 [Tenant(SqlSugarConst.DB_TokenCache)]
 public class VerificatInfo : PrimaryIdEntity
@@ -79,6 +78,4 @@ public class VerificatInfo : PrimaryIdEntity
     /// </summary>
     [AutoGenerateColumn(Filterable = true, Sortable = true, Width = 100)]
     public string Device { get; set; }
-
-
 }

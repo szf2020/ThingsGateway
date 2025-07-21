@@ -24,10 +24,7 @@ public partial class SessionPage
 
     private Task<QueryData<SessionOutput>> OnQueryAsync(QueryPageOptions options)
     {
-        return Task.Run(() =>
-         {
-             return SessionService.PageAsync(options);
-         });
+        return Task.Run(() => SessionService.PageAsync(options));
     }
 
     #endregion 查询

@@ -90,7 +90,6 @@ public static class RestartServerHelper
             }
         }
 
-
         var cmd = $"#!/bin/bash{Environment.NewLine}{stringBuilder}";
         Process.Start(new ProcessStartInfo()
         {
@@ -172,7 +171,6 @@ public static class RestartServerHelper
         }
         catch
         {
-
         }
     }
 
@@ -222,7 +220,6 @@ public static class RestartServerHelper
                 }
                 catch
                 {
-
                 }
             }
         }
@@ -231,22 +228,17 @@ public static class RestartServerHelper
         di.Delete(true);
     }
 
-
     private static void Backup()
     {
         try
         {
-
             //备份原数据
             var backupDir = new DirectoryInfo(AppContext.BaseDirectory);
             backupDir.CopyTo(FileConst.BackupDirPath, allSub: true);
             FileConst.BackupDirPath.AsDirectory().Compress(FileConst.BackupPath);
-
         }
         catch
         {
-
         }
     }
-
 }

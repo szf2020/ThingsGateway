@@ -333,10 +333,7 @@ namespace ThingsGateway.SqlSugar
             else
             {
                 Root result = null;
-                this.Context.Ado.UseTran(() =>
-                {
-                    result = (Root)PreFunc()?._RootList?.FirstOrDefault();
-                }, ex => throw ex);
+                this.Context.Ado.UseTran(() => result = (Root)PreFunc()?._RootList?.FirstOrDefault(), ex => throw ex);
                 return result;
             }
         }
@@ -369,10 +366,7 @@ namespace ThingsGateway.SqlSugar
             }
             else
             {
-                this.Context.Ado.UseTran(() =>
-                {
-                    PreFunc();
-                }, ex => throw ex);
+                this.Context.Ado.UseTran(() => PreFunc(), ex => throw ex);
             }
             return true;
         }
@@ -411,5 +405,4 @@ namespace ThingsGateway.SqlSugar
             return result;
         }
     }
-
 }

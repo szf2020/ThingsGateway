@@ -885,7 +885,6 @@ public abstract class Redis : Cache, IConfigMapping, ILogFeature
     public override ICollection<T> GetSet<T>(String key) => throw new NotSupportedException("Redis未支持该功能，需要new FullRedis");
     #endregion
 
-
     #region 高级操作
     private static Version _v2612 = new("2.6.12");
     /// <summary>添加，已存在时不更新</summary>

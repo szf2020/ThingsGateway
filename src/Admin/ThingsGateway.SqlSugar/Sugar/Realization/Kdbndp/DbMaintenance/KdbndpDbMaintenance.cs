@@ -44,14 +44,12 @@
                                 ) pkey on pcolumn.table_name = pkey.relname
                                 order by ptables.tablename";
 
-
                 if (IsPgModel())
                 {
                     sql = sql.Replace("sys_", "pg_");
                 }
                 else if (IsSqlServerModel())
                 {
-
                     sql = sql.Replace("sys_", "pg_");
                     sql = sql.Replace("pg_constraint.conkey[1]", "pg_constraint.conkey{{1}}");
                     sql = sql.Replace("UPPER(", "pg_catalog.upper(");
@@ -520,7 +518,6 @@ WHERE tgrelid = '" + tableName + "'::regclass");
                 if (item.ColumnDescription != null)
                 {
                     db.DbMaintenance.AddColumnRemark(SqlBuilder.GetTranslationColumnName(item.DbColumnName).ToUpper(IsUpper), SqlBuilder.GetTranslationColumnName(item.DbTableName).ToUpper(IsUpper), item.ColumnDescription);
-
                 }
             }
             //table remak
@@ -553,7 +550,6 @@ WHERE tgrelid = '" + tableName + "'::regclass");
             {
                 foreach (var item in columns)
                 {
-
                     ConvertCreateColumnInfo(item);
                     //if (item.DbColumnName.Equals("GUID", StringComparison.CurrentCultureIgnoreCase) && item.Length == 0)
                     //{
@@ -569,7 +565,6 @@ WHERE tgrelid = '" + tableName + "'::regclass");
             if (columns.Any(it => it.IsPrimarykey) && isCreatePrimaryKey)
             {
                 primaryKeyInfo = string.Format(", Primary key({0})", string.Join(",", columns.Where(it => it.IsPrimarykey).Select(it => this.SqlBuilder.GetTranslationColumnName(it.DbColumnName.ToUpper(IsUpper)))));
-
             }
             sql = sql.Replace("$PrimaryKey", primaryKeyInfo);
             this.Context.Ado.ExecuteCommand(sql);
@@ -679,7 +674,6 @@ WHERE tgrelid = '" + tableName + "'::regclass");
             }
             catch
             {
-
             }
             return result;
         }

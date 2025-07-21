@@ -1,7 +1,6 @@
 ﻿using Newtonsoft.Json.Linq;
 namespace ThingsGateway.SqlSugar
 {
-
     /// <summary>
     /// AppendSelect
     /// </summary>

@@ -8,7 +8,6 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-
 using ThingsGateway.NewLife.Extension;
 namespace ThingsGateway.Management;
 
@@ -85,8 +84,6 @@ internal sealed class RedundancyService : BaseService<SysDict>, IRedundancyServi
 
         return redundancy;
     }
-
-
 
 
 }

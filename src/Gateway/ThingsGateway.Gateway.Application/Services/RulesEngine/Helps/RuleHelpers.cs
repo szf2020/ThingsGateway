@@ -71,10 +71,8 @@ public static class RuleHelpers
             {
                 node.AddPort(PortAlignment.Top);
                 node.AddPort(PortAlignment.Bottom);
-
             }
             return node;
-
         }
         else
         {
@@ -106,7 +104,6 @@ public static class RuleHelpers
             }
         }
     }
-
 
     public static NodeModel OnNodeJson(Diagram blazorDiagram, string draggedType, string id, Point point)
     {
@@ -153,7 +150,6 @@ public static class RuleHelpers
             var nodeModel = OnNodeJson(blazorDiagram, item.DraggedType, item.Id, item.Point);
 
             SetModelValue(nodeModel, item.CValues);
-
         }
         foreach (var item in rules.LinkJsons)
         {
@@ -164,10 +160,8 @@ public static class RuleHelpers
             if (linkModel == null)
                 continue;
             blazorDiagram.Links.Add(linkModel);
-
         }
 
         blazorDiagram.Refresh();
     }
-
 }

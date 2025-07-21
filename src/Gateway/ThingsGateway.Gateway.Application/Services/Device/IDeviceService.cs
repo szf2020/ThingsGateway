@@ -121,10 +121,8 @@ internal interface IDeviceService
 
     void SetDeviceData(HashSet<long>? dataScope, Dictionary<string, Device> deviceDicts, Dictionary<string, Channel> channelDicts, Dictionary<string, ImportPreviewOutputBase> ImportPreviews, ref ImportPreviewOutput<Device> deviceImportPreview, Dictionary<string, PluginInfo> driverPluginNameDict, ConcurrentDictionary<string, (Type, Dictionary<string, PropertyInfo>, Dictionary<string, PropertyInfo>)> propertysDict, string sheetName, IEnumerable<IDictionary<string, object>> rows);
 
-
     /// <summary>
     /// 保存是否输出日志和日志等级
     /// </summary>
     Task UpdateLogAsync(long deviceId, TouchSocket.Core.LogLevel logLevel);
-
 }

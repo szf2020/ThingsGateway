@@ -37,10 +37,7 @@ public class FileHostService : BackgroundService, IFileHostService
                .SetListenIPHosts(new IPHost[] { new IPHost(upgradeServerOptions.UpgradeServerPort) })
                .ConfigureContainer(a =>
                {
-                   a.AddRpcStore(store =>
-                   {
-                       store.RegisterServer<FileRpcServer>();
-                   });
+                   a.AddRpcStore(store => store.RegisterServer<FileRpcServer>());
                    a.AddLogger(_log);
                    a.AddDmtpRouteService();//添加路由策略
                })
@@ -95,7 +92,6 @@ public class FileHostService : BackgroundService, IFileHostService
     #region Rpc
     public async ValueTask Updrade(string id, CancellationToken stoppingToken)
     {
-
         var waitInvoke = new DmtpInvokeOption()
         {
             FeedbackType = FeedbackType.WaitInvoke,
@@ -112,13 +108,10 @@ public class FileHostService : BackgroundService, IFileHostService
         // 将 GlobalData.CollectDevices 和 GlobalData.Variables 同步到从站
         await client.GetDmtpRpcActor().InvokeAsync(
                          nameof(Upgrade), null, waitInvoke).ConfigureAwait(false);
-
-
     }
 
     public async ValueTask Restart(string id, CancellationToken stoppingToken)
     {
-
         var waitInvoke = new DmtpInvokeOption()
         {
             FeedbackType = FeedbackType.WaitInvoke,
@@ -135,7 +128,6 @@ public class FileHostService : BackgroundService, IFileHostService
         // 将 GlobalData.CollectDevices 和 GlobalData.Variables 同步到从站
         await client.GetDmtpRpcActor().InvokeAsync(
                          nameof(Restart), null, waitInvoke).ConfigureAwait(false);
-
     }
     #endregion
 
@@ -149,15 +141,12 @@ public class FileHostService : BackgroundService, IFileHostService
             {
                 if (TcpDmtpService.ServerState != ServerState.Running)
                 {
-
                     await TcpDmtpService.StartAsync().ConfigureAwait(false);
-
                 }
                 await Task.Delay(30000, stoppingToken).ConfigureAwait(false);
             }
             catch (OperationCanceledException)
             {
-
             }
             catch (Exception ex)
             {

@@ -62,9 +62,6 @@ public class AuthService : IAuthService
             throw Oops.Bah(appConfig.WebsitePolicy.CloseTip);
         }
 
-
-
-
         string? password = input.Password;
         if (isCookie) //openApi登录不再需要解密
         {

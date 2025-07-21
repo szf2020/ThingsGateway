@@ -10,7 +10,6 @@
 
 namespace ThingsGateway.Admin.Application;
 
-
 [AttributeUsage(AttributeTargets.Method)]
 public sealed class LoginLogAttribute : Attribute
 {

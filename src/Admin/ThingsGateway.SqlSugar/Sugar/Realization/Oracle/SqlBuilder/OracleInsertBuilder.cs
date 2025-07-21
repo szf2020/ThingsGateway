@@ -12,7 +12,6 @@ namespace ThingsGateway.SqlSugar
            ({1})
      VALUES
            ({2}) ";
-
             }
         }
         public override string SqlTemplateBatch
@@ -35,10 +34,9 @@ namespace ThingsGateway.SqlSugar
             }
             var groupList = DbColumnInfoList.GroupBy(it => it.TableId).ToList();
             var isSingle = groupList.Count == 1;
-            string columnsString = string.Join(",", groupList.First().Select(it => Builder.GetTranslationColumnName(it.DbColumnName)));
+            string columnsString = string.Join(",", groupList[0].Select(it => Builder.GetTranslationColumnName(it.DbColumnName)));
             if (isSingle && this.EntityInfo.EntityName != "Dictionary`2")
             {
-
                 string columnParametersString = string.Join(",", this.DbColumnInfoList.Select(it => base.GetDbColumn(it, Builder.SqlParameterKeyWord + it.DbColumnName)));
                 if (identities.HasValue())
                 {
@@ -98,7 +96,6 @@ namespace ThingsGateway.SqlSugar
                 }
                 batchInsetrSql.Append(") VALUES");
 
-
                 batchInsetrSql.Append('(');
                 insertColumns = string.Join(",", item.Select(it => GetDbColumn(it, FormatValue(it.Value, it.PropertyName))));
                 batchInsetrSql.Append(insertColumns);
@@ -123,7 +120,6 @@ namespace ThingsGateway.SqlSugar
                     }
                 }
                 batchInsetrSql.AppendLine(")  ");
-
             }
             if (identities.HasValue())
             {

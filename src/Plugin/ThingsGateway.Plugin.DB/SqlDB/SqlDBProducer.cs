@@ -30,8 +30,6 @@ public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariable, IDBH
 {
 
 
-
-
     internal readonly SqlDBProducerProperty _driverPropertys = new();
     private readonly SqlDBProducerVariableProperty _variablePropertys = new();
 
@@ -79,7 +77,6 @@ public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariable, IDBH
         return $" {nameof(SqlDBProducer)}";
     }
 
-
     protected override async Task InitChannelAsync(IChannel? channel, CancellationToken cancellationToken)
     {
         _db = SqlDBBusinessDatabaseUtil.GetDb(_driverPropertys);
@@ -90,8 +87,6 @@ public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariable, IDBH
         }
 
         await base.InitChannelAsync(channel, cancellationToken).ConfigureAwait(false);
-
-
     }
 
     public override Task AfterVariablesChangedAsync(CancellationToken cancellationToken)
@@ -114,7 +109,6 @@ public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariable, IDBH
             {
                 await hisModel.DBInit(_db, cancellationToken).ConfigureAwait(false);
             }
-
         }
         else
         {
@@ -122,7 +116,6 @@ public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariable, IDBH
             {
                 _db.CodeFirst.InitTables(typeof(SQLHistoryValue));
                 _db.CodeFirst.InitTables(typeof(SQLNumberHistoryValue));
-
             }
         }
         if (!_driverPropertys.BigTextScriptRealTable.IsNullOrEmpty())
@@ -133,7 +126,6 @@ public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariable, IDBH
             {
                 await realModel.DBInit(_db, cancellationToken).ConfigureAwait(false);
             }
-
         }
         else
         {
@@ -169,10 +161,7 @@ public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariable, IDBH
                     LogMessage?.LogWarning(ex);
                 success = false;
 
-                list.ForEach(variable =>
-                {
-                    RealTimeVariables.AddOrUpdate(variable.Id, variable, (key, oldValue) => variable);
-                });
+                list.ForEach(variable => RealTimeVariables.AddOrUpdate(variable.Id, variable, (key, oldValue) => variable));
             }
         }
 
@@ -282,5 +271,4 @@ public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariable, IDBH
         }
         return ret;
     }
-
 }

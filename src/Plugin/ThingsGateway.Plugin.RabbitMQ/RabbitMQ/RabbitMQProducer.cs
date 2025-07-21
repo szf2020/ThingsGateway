@@ -28,8 +28,6 @@ public partial class RabbitMQProducer : BusinessBaseWithCacheIntervalScriptAll
     protected override BusinessPropertyWithCacheIntervalScript _businessPropertyWithCacheIntervalScript => _driverPropertys;
     protected override async Task InitChannelAsync(Foundation.IChannel? channel, CancellationToken cancellationToken)
     {
-
-
         #region 初始化
 
         _connectionFactory = new ConnectionFactory
@@ -95,6 +93,5 @@ public partial class RabbitMQProducer : BusinessBaseWithCacheIntervalScriptAll
         {
             await Update(cancellationToken).ConfigureAwait(false);
         }
-
     }
 }

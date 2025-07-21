@@ -57,7 +57,6 @@ public partial class QuickActions
 
     #region 配置
 
-
     [Parameter]
     public bool AutoRestartThread { get; set; } = true;
     [Parameter]
@@ -73,7 +72,6 @@ public partial class QuickActions
     }
 
     private List<SelectedItem> AutoRestartThreadBoolItems;
-
 
     private static async Task Restart()
     {

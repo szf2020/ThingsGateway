@@ -28,7 +28,7 @@ namespace ThingsGateway.SqlSugar
                 {
                     Check.ExceptionEasy("Enable MappingColumn need in ConnectionConfig - > MoreSettings - > EnableModelFuncMappingColumn set to true", "MappingColumn考虑到风险情况需要开启才能使用，请在 ConnectionConfig->MoreSettings->EnableModelFuncMappingColumn设置为true");
                 }
-                resSql = parameters.First() + "";
+                resSql = parameters[0] + "";
             }
             return new KeyValuePair<string, IReadOnlyList<SugarParameter>>(resSql, resPars);
         }
@@ -61,7 +61,6 @@ namespace ThingsGateway.SqlSugar
 
             return resSql;
         }
-
 
         private static System.Reflection.MethodInfo GetMethod(IDbMethods dbMethods, string methodName)
         {
@@ -122,7 +121,7 @@ namespace ThingsGateway.SqlSugar
             }
             if (IsToStringFormat(methodName, args))
             {
-                var fieldName = args.First().MemberName.ObjToString();
+                var fieldName = args[0].MemberName.ObjToString();
                 var format = args.Last().MemberValue.ObjToString();
                 var queryable = this.Context.Queryable<object>()
                     .Select(it => SqlFunc.MappingColumn<DateTime>(fieldName).ToString(format));
@@ -167,7 +166,7 @@ namespace ThingsGateway.SqlSugar
 
         private static bool IsSqlFuncMethod(System.Reflection.ParameterInfo[] pars)
         {
-            return pars.First().ParameterType == typeof(MethodCallExpressionModel);
+            return pars[0].ParameterType == typeof(MethodCallExpressionModel);
         }
         private static bool IsFormatMethod(string methodName)
         {

@@ -35,7 +35,6 @@ namespace ThingsGateway.SqlSugar
         public object DiffLogBizData { get; set; }
         public string[] IgnoreInsertColumns { get; set; }
         public bool IsOptLock { get; set; }
-
     }
     public class UpdateNavOptions
     {

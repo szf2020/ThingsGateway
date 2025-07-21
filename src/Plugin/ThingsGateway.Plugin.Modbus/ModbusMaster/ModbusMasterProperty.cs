@@ -11,7 +11,6 @@
 using ThingsGateway.Foundation.Modbus;
 using ThingsGateway.Gateway.Application;
 
-
 namespace ThingsGateway.Plugin.Modbus;
 
 /// <summary>
@@ -27,6 +26,4 @@ public class ModbusMasterProperty : CollectFoundationDtuPackPropertyBase
     /// </summary>
     [DynamicProperty]
     public byte Station { get; set; } = 1;
-
-
 }

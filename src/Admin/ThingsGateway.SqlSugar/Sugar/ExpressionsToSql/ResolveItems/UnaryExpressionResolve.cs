@@ -146,7 +146,6 @@ namespace ThingsGateway.SqlSugar
             parameter.CommonTempData = null;
         }
 
-
         private void AppendNotMember(ExpressionParameter parameter, ExpressionType nodeType)
         {
             BaseParameter.ChildExpression = base.Expression;
@@ -166,7 +165,6 @@ namespace ThingsGateway.SqlSugar
             parameter.CommonTempData = null;
         }
 
-
         private void AppendNotParameter(ExpressionParameter parameter, ExpressionType nodeType)
         {
             BaseParameter.ChildExpression = base.Expression;
@@ -185,6 +183,5 @@ namespace ThingsGateway.SqlSugar
             parameter.BaseParameter.ChildExpression = base.Expression;
             parameter.CommonTempData = null;
         }
-
     }
 }

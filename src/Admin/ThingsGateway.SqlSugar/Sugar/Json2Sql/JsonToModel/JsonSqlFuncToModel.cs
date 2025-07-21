@@ -78,7 +78,5 @@ namespace ThingsGateway.SqlSugar
 
         #endregion
 
-
-
     }
 }

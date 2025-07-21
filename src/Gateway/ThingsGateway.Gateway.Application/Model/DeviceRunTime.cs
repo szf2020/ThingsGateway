@@ -98,7 +98,6 @@ public class DeviceRuntime : Device, IDisposable
         }
     }
 
-
     /// <summary>
     /// 暂停
     /// </summary>
@@ -136,10 +135,7 @@ public class DeviceRuntime : Device, IDisposable
     /// </summary>
     public int DeviceVariableCount { get => Driver == null ? VariableRuntimes?.Count ?? 0 : Driver.IdVariableRuntimes.Count; }
 
-
-
     #region 采集
-
 
     /// <summary>
     /// 设备变量
@@ -195,7 +191,6 @@ public class DeviceRuntime : Device, IDisposable
     [AutoGenerateColumn(Ignore = true)]
     public List<VariableScriptRead>? VariableScriptReads { get; set; }
 
-
     public volatile bool CheckEnable;
     private readonly object _lockObject = new object();
 
@@ -222,8 +217,6 @@ public class DeviceRuntime : Device, IDisposable
         if (lastErrorMessage != null)
             LastErrorMessage = lastErrorMessage;
     }
-
-
 
     [System.Text.Json.Serialization.JsonIgnore]
     [Newtonsoft.Json.JsonIgnore]
@@ -254,7 +247,6 @@ public class DeviceRuntime : Device, IDisposable
         GlobalData.IdDevices.TryAdd(Id, this);
         GlobalData.Devices.TryRemove(Name, out _);
         GlobalData.Devices.TryAdd(Name, this);
-
     }
 
     public void Dispose()
@@ -264,7 +256,6 @@ public class DeviceRuntime : Device, IDisposable
         GlobalData.IdDevices.TryRemove(Id, out _);
         GlobalData.Devices.TryRemove(Name, out _);
 
-
         Driver = null;
         VariableSourceReads?.Clear();
         VariableScriptReads?.Clear();
@@ -272,5 +263,4 @@ public class DeviceRuntime : Device, IDisposable
 
         GC.SuppressFinalize(this);
     }
-
 }

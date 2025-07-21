@@ -2,7 +2,6 @@
 {
     internal static class DorisHelper
     {
-
         public static void UpdateDateParameter(MySqlConnector.MySqlParameter sqlParameter)
         {
             if (sqlParameter.DbType == System.Data.DbType.DateTime)

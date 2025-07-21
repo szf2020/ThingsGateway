@@ -32,7 +32,6 @@ public static class JSRuntimeExtensions
         {
             return null;
         }
-
     }
 
     /// <summary>
@@ -48,8 +47,6 @@ public static class JSRuntimeExtensions
         }
         catch
         {
-
         }
-
     }
 }

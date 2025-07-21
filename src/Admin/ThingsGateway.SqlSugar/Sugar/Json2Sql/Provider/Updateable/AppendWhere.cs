@@ -10,6 +10,5 @@ namespace ThingsGateway.SqlSugar
             var sqlObj = jsonCommonProvider.GetWhere(item, sugarUpdateable.UpdateBuilder.Context);
             sugarUpdateable.Where(sqlObj.Key, sqlObj.Value);
         }
-
     }
 }

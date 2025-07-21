@@ -365,7 +365,6 @@ WHERE EVENT_OBJECT_TABLE = '" + tableName + "'");
         }
         public override bool AddColumnRemark(string columnName, string tableName, string description)
         {
-
             tableName = this.SqlBuilder.GetTranslationColumnName(tableName);
             columnName = this.SqlBuilder.GetTranslationColumnName(columnName);
             var sql = this.Context.Ado.GetDataTable($"SHOW CREATE TABLE {tableName};").Rows[0][1] + "";
@@ -401,7 +400,6 @@ WHERE EVENT_OBJECT_TABLE = '" + tableName + "'");
         /// <returns></returns>
         public override bool CreateDatabase(string databaseName, string databaseDirectory = null)
         {
-
             if (this.Context.Ado.IsValidConnection() && this.Context.Ado.Connection.Database.EqualCase(databaseName))
             {
                 return true;
@@ -487,7 +485,6 @@ WHERE EVENT_OBJECT_TABLE = '" + tableName + "'");
             if (columns.Any(it => it.IsPrimarykey) && isCreatePrimaryKey)
             {
                 primaryKeyInfo = string.Format(", Primary key({0})", string.Join(",", columns.Where(it => it.IsPrimarykey).Select(it => this.SqlBuilder.GetTranslationColumnName(it.DbColumnName))));
-
             }
             if (DorisHelper.IsDoris(this.Context))
             {
@@ -532,7 +529,6 @@ WHERE EVENT_OBJECT_TABLE = '" + tableName + "'");
             Check.Exception(columns.IsNullOrEmpty(), "No columns found ");
             foreach (var item in columns)
             {
-
                 ConvertCreateColumnInfo(item);
 
                 string columnName = item.DbColumnName;
@@ -615,7 +611,6 @@ WHERE EVENT_OBJECT_TABLE = '" + tableName + "'");
             }
             return base.UpdateColumn(tableName, column);
         }
-
 
         protected override string GetSize(DbColumnInfo item)
         {

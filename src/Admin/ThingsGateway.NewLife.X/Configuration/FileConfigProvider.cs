@@ -34,7 +34,6 @@ public abstract class FileConfigProvider : ConfigProvider
 
     #region 方法
 
-
     /// <summary>初始化</summary>
     /// <param name="value"></param>
     public override void Init(String value)

@@ -20,7 +20,6 @@ public class ValueChangedTriggerNode : VariableNode, ITriggerNode, IDisposable
         FuncDict.TryAdd(this, func);
         if (ValueChangedTriggerNodeDict.TryGetValue(DeviceText, out var deviceVariableDict))
         {
-
             if (deviceVariableDict.TryGetValue(Text, out var valueChangedTriggerNodes))
             {
                 valueChangedTriggerNodes.Add(this);
@@ -36,7 +35,6 @@ public class ValueChangedTriggerNode : VariableNode, ITriggerNode, IDisposable
             ValueChangedTriggerNodeDict.TryAdd(DeviceText, new());
             ValueChangedTriggerNodeDict[DeviceText].TryAdd(Text, new());
             ValueChangedTriggerNodeDict[DeviceText][Text].Add(this);
-
         }
         return Task.CompletedTask;
     }
@@ -71,7 +69,6 @@ public class ValueChangedTriggerNode : VariableNode, ITriggerNode, IDisposable
     {
         return VariableBasicDatas.GetConsumingEnumerable().ParallelForEachStreamedAsync((async (variableBasicData, token) =>
         {
-
             if (ValueChangedTriggerNodeDict.TryGetValue(variableBasicData.DeviceName, out var valueNodeDict) &&
         valueNodeDict.TryGetValue(variableBasicData.Name, out var valueChangedTriggerNodes))
             {
@@ -83,7 +80,6 @@ public class ValueChangedTriggerNode : VariableNode, ITriggerNode, IDisposable
                     {
                         item.Logger?.Trace($"Variable changed: {item.Text}");
                         await func.Invoke(new NodeOutput() { Value = variableBasicData }, token).ConfigureAwait(false);
-
                     }
                 }
                 catch (Exception ex)
@@ -92,9 +88,7 @@ public class ValueChangedTriggerNode : VariableNode, ITriggerNode, IDisposable
                 }
             }, token).ConfigureAwait(false);
             }
-
         }), default);
-
     }
 
     public void Dispose()

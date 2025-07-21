@@ -82,7 +82,6 @@ internal sealed class DynamicApiControllerApplicationModelConvention : IApplicat
                 && (_dynamicApiControllerBuilder?.ControllerFilter == null || _dynamicApiControllerBuilder.ControllerFilter.Invoke(u));
         });
 
-
         foreach (var controller in controllers)
         {
             var controllerType = controller.ControllerType;
@@ -154,7 +153,6 @@ internal sealed class DynamicApiControllerApplicationModelConvention : IApplicat
                 action.ApiExplorer.IsVisible = false;
                 continue;
             }
-
 
             var actionMethod = action.ActionMethod;
             var actionApiDescriptionSettings = actionMethod.IsDefined(typeof(ApiDescriptionSettingsAttribute), true) ? actionMethod.GetCustomAttribute<ApiDescriptionSettingsAttribute>(true) : default;
@@ -300,7 +298,7 @@ internal sealed class DynamicApiControllerApplicationModelConvention : IApplicat
                 if (!CheckIsKeepVerb(apiDescriptionSettings, controllerApiDescriptionSettings))
                 {
                     var words = tempName.SplitCamelCase();
-                    var verbKey = words.First().ToLower();
+                    var verbKey = words[0].ToLower();
                     // 处理类似 getlist,getall 多个单词
                     if (words.Length > 1 && Penetrates.VerbToHttpMethods.ContainsKey((words[0] + words[1]).ToLower()))
                     {
@@ -328,7 +326,7 @@ internal sealed class DynamicApiControllerApplicationModelConvention : IApplicat
 
         // 解析请求谓词
         var words = action.ActionMethod.Name.SplitCamelCase();
-        var verbKey = words.First().ToLower();
+        var verbKey = words[0].ToLower();
 
         // 处理类似 getlist,getall 多个单词
         if (words.Length > 1 && Penetrates.VerbToHttpMethods.ContainsKey((words[0] + words[1]).ToLower()))

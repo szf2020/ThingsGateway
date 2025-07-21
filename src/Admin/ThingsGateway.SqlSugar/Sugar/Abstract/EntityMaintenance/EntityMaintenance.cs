@@ -66,10 +66,7 @@ namespace ThingsGateway.SqlSugar
         {
             string cacheKey = "GetEntityInfo" + type.GetHashCode() + type.FullName + this.Context?.CurrentConnectionConfig?.ConfigId;
             return this.Context.Utilities.GetReflectionInoCacheInstance().GetOrCreate(cacheKey,
-            () =>
-            {
-                return GetEntityInfoNoCache(type);
-            });
+            () => GetEntityInfoNoCache(type));
         }
 
         /// <summary>

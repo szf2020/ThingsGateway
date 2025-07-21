@@ -10,7 +10,6 @@
 
 using MQTTnet;
 
-
 #if NET6_0
 using MQTTnet.Client;
 #endif
@@ -68,7 +67,6 @@ public partial class MqttCollect : CollectBase
             
             """;
     }
-
 
     private Dictionary<string, List<Tuple<string, string, VariableRuntime>>> TopicItemDict = new();
 
@@ -150,18 +148,13 @@ public partial class MqttCollect : CollectBase
                 dataResult.Add(sourVars);
             }
 
-
-
             var mqttClientSubscribeOptionsBuilder = new MqttClientSubscribeOptionsBuilder();
             foreach (var item in TopicItemDict.Keys)
             {
                 if (!item.IsNullOrWhiteSpace())
                 {
                     mqttClientSubscribeOptionsBuilder = mqttClientSubscribeOptionsBuilder.WithTopicFilter(
-                        f =>
-                        {
-                            f.WithTopic(item);
-                        });
+                        f => f.WithTopic(item));
                 }
                 var mqttClientSubscribeOptions = mqttClientSubscribeOptionsBuilder.Build();
                 if (mqttClientSubscribeOptions.TopicFilters.Count > 0)
@@ -174,7 +167,6 @@ public partial class MqttCollect : CollectBase
         {
             return Task.FromResult(new List<VariableSourceRead>());
         }
-
     }
 
     protected override async Task InitChannelAsync(IChannel? channel, CancellationToken cancellationToken)
@@ -208,7 +200,6 @@ public partial class MqttCollect : CollectBase
         else
             _mqttClientOptions = mqttClientOptionsBuilder.WithTcpServer(_driverPropertys.IP, _driverPropertys.Port)//服务器
            .Build();
-
 
         _mqttClient = mqttFactory.CreateMqttClient();
         _mqttClient.ConnectedAsync += MqttClient_ConnectedAsync;
@@ -257,7 +248,6 @@ public partial class MqttCollect : CollectBase
         }
     }
 
-
     private volatile bool success;
 
     protected override bool VariableSourceReadsEnable => false;
@@ -286,8 +276,5 @@ public partial class MqttCollect : CollectBase
             await Task.Delay(10000, cancellationToken).ConfigureAwait(false);
             //return;
         }
-
     }
-
-
 }

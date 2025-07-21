@@ -96,7 +96,7 @@ namespace ThingsGateway.SqlSugar
             while (pageCount >= pageIndex)
             {
                 StringBuilder updateTable = new StringBuilder();
-                string setValues = string.Join(",", groupList.First().Where(it => it.IsPrimarykey == false && (it.IsIdentity == false || (IsOffIdentity && it.IsIdentity))).Select(it =>
+                string setValues = string.Join(",", groupList[0].Where(it => it.IsPrimarykey == false && (it.IsIdentity == false || (IsOffIdentity && it.IsIdentity))).Select(it =>
                 {
                     if (SetValues.IsValuable())
                     {
@@ -109,7 +109,7 @@ namespace ThingsGateway.SqlSugar
                     var result = string.Format("{0}=T.{0}", Builder.GetTranslationColumnName(it.DbColumnName));
                     return result;
                 }));
-                string tempColumnValue = string.Join(",", groupList.First().Select(it =>
+                string tempColumnValue = string.Join(",", groupList[0].Select(it =>
                 {
                     if (SetValues.IsValuable())
                     {
@@ -190,7 +190,6 @@ namespace ThingsGateway.SqlSugar
                             }
                         }
                         return string.Format("CAST({0} AS {1})", base.GetDbColumn(it, FormatValue(it.Value)), dbType);
-
                     })) + ")");
                     ++i;
                 }

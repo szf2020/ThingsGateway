@@ -19,7 +19,6 @@ namespace ThingsGateway.Foundation.Test;
 
 public class SiemensS7Test
 {
-
     [Theory]
     [InlineData("M100", true, "03 00 00 1B 02 F0 80 32 03 00 00 00 03 00 02 00 06 00 00 04 01 FF 04 00 10 00 00")]
     [InlineData("M100", false, "03 00 00 16 02 F0 80 32 03 00 00 00 03 00 02 00 01 00 00 05 01 FF", "1", DataTypeEnum.UInt16)]
@@ -47,7 +46,6 @@ public class SiemensS7Test
                 var result = await siemensS7Master.WriteAsync(address, JTokenUtil.GetJTokenFromString(writeData), dataTypeEnum).ConfigureAwait(false);
                 Assert.True(result.IsSuccess, result.ToString());
             }
-
         });
         var task2 = Task.Run(async () =>
         {
@@ -61,8 +59,6 @@ public class SiemensS7Test
         });
         await Task.WhenAll(task1, task2);
     }
-
-
 
 
 }

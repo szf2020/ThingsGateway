@@ -26,8 +26,6 @@ public class VariableRuntimeService : IVariableRuntimeService
         _logger = logger;
     }
 
-
-
     public async Task<bool> BatchSaveVariableAsync(List<Variable> input, ItemChangedType type, bool restart, CancellationToken cancellationToken)
     {
         try
@@ -44,7 +42,6 @@ public class VariableRuntimeService : IVariableRuntimeService
             RuntimeServiceHelper.VariableRuntimesDispose(variableIds);
             RuntimeServiceHelper.AddCollectChangedDriver(newVariableRuntimes, changedDriver);
             RuntimeServiceHelper.AddBusinessChangedDriver(variableIds, changedDriver);
-
 
             if (restart)
             {
@@ -64,7 +61,6 @@ public class VariableRuntimeService : IVariableRuntimeService
         try
         {
             // await WaitLock.WaitAsync().ConfigureAwait(false);
-
 
             var result = await GlobalData.VariableService.BatchEditAsync(models, oldModel, model).ConfigureAwait(false);
 
@@ -88,7 +84,6 @@ public class VariableRuntimeService : IVariableRuntimeService
             }
 
             return true;
-
         }
         finally
         {
@@ -106,7 +101,6 @@ public class VariableRuntimeService : IVariableRuntimeService
 
             var result = await GlobalData.VariableService.DeleteVariableAsync(variableIds).ConfigureAwait(false);
 
-
             ConcurrentHashSet<IDriver> changedDriver = new();
 
             RuntimeServiceHelper.AddBusinessChangedDriver(variableIds, changedDriver);
@@ -123,8 +117,6 @@ public class VariableRuntimeService : IVariableRuntimeService
         {
             //WaitLock.Release();
         }
-
-
     }
 
     public async Task<bool> ClearVariableAsync(bool restart, CancellationToken cancellationToken)
@@ -132,7 +124,6 @@ public class VariableRuntimeService : IVariableRuntimeService
         try
         {
             // await WaitLock.WaitAsync().ConfigureAwait(false);
-
 
             var result = await GlobalData.VariableService.DeleteVariableAsync(null).ConfigureAwait(false);
 
@@ -143,7 +134,6 @@ public class VariableRuntimeService : IVariableRuntimeService
 
             if (restart)
             {
-
                 await RuntimeServiceHelper.ChangedDriverAsync(changedDriver, _logger, cancellationToken).ConfigureAwait(false);
             }
 
@@ -153,22 +143,17 @@ public class VariableRuntimeService : IVariableRuntimeService
         {
             //WaitLock.Release();
         }
-
-
     }
-
 
     public Task<Dictionary<string, object>> ExportVariableAsync(ExportFilter exportFilter) => GlobalData.VariableService.ExportVariableAsync(exportFilter);
 
     public async Task ImportVariableAsync(Dictionary<string, ImportPreviewOutputBase> input, bool restart, CancellationToken cancellationToken)
     {
-
         try
         {
             // await WaitLock.WaitAsync().ConfigureAwait(false);
 
             var result = await GlobalData.VariableService.ImportVariableAsync(input).ConfigureAwait(false);
-
 
             using var db = DbContext.GetDB<Variable>();
             var newVariableRuntimes = (await db.Queryable<Variable>().Where(a => result.Contains(a.Id)).ToListAsync(cancellationToken).ConfigureAwait(false)).AdaptListVariableRuntime();
@@ -186,14 +171,11 @@ public class VariableRuntimeService : IVariableRuntimeService
                 await RuntimeServiceHelper.ChangedDriverAsync(changedDriver, _logger, cancellationToken).ConfigureAwait(false);
             }
 
-
-
         }
         finally
         {
             //WaitLock.Release();
         }
-
     }
 
     public async Task InsertTestDataAsync(int testVariableCount, int testDeviceCount, string slaveUrl, bool businessEnable, bool restart, CancellationToken cancellationToken)
@@ -201,8 +183,6 @@ public class VariableRuntimeService : IVariableRuntimeService
         try
         {
             // await WaitLock.WaitAsync().ConfigureAwait(false);
-
-
 
             var datas = await GlobalData.VariableService.InsertTestDataAsync(testVariableCount, testDeviceCount, slaveUrl, businessEnable).ConfigureAwait(false);
 
@@ -213,16 +193,13 @@ public class VariableRuntimeService : IVariableRuntimeService
                 RuntimeServiceHelper.Init(newChannelRuntimes);
 
                 {
-
                     var newDeviceRuntimes = datas.Item2.AdaptListDeviceRuntime();
 
                     RuntimeServiceHelper.Init(newDeviceRuntimes);
-
                 }
                 {
                     var newVariableRuntimes = datas.Item3.AdaptListVariableRuntime();
                     RuntimeServiceHelper.Init(newVariableRuntimes);
-
                 }
                 //根据条件重启通道线程
 
@@ -232,17 +209,13 @@ public class VariableRuntimeService : IVariableRuntimeService
 
                     await RuntimeServiceHelper.ChangedDriverAsync(_logger, cancellationToken).ConfigureAwait(false);
                 }
-
             }
         }
         finally
         {
             //WaitLock.Release();
         }
-
     }
-
-
 
     public Task<Dictionary<string, ImportPreviewOutputBase>> PreviewAsync(IBrowserFile browserFile)
     {
@@ -255,10 +228,7 @@ public class VariableRuntimeService : IVariableRuntimeService
         {
             // await WaitLock.WaitAsync().ConfigureAwait(false);
 
-
-
             var result = await GlobalData.VariableService.SaveVariableAsync(input, type).ConfigureAwait(false);
-
 
             using var db = DbContext.GetDB<Variable>();
             var newVariableRuntimes = (await db.Queryable<Variable>().Where(a => a.Id == input.Id).ToListAsync(cancellationToken).ConfigureAwait(false)).AdaptListVariableRuntime();
@@ -277,7 +247,6 @@ public class VariableRuntimeService : IVariableRuntimeService
                 await RuntimeServiceHelper.ChangedDriverAsync(changedDriver, _logger, cancellationToken).ConfigureAwait(false);
             }
 
-
             return true;
         }
         finally
@@ -286,9 +255,6 @@ public class VariableRuntimeService : IVariableRuntimeService
         }
     }
 
-
     public Task<MemoryStream> ExportMemoryStream(List<Variable> data, string deviceName) => GlobalData.VariableService.ExportMemoryStream(data, deviceName);
-
-
 
 }

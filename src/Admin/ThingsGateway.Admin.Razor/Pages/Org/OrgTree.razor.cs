@@ -24,7 +24,6 @@ public partial class OrgTree : IDisposable
     [NotNull]
     private List<TreeViewItem<SysOrg>> Items { get; set; }
 
-
     [Inject]
     private IStringLocalizer<ThingsGateway.Admin.Razor._Imports> AdminLocalizer { get; set; }
     [Inject]
@@ -42,7 +41,6 @@ public partial class OrgTree : IDisposable
             await ValueChanged.Invoke(value);
         }
     }
-
 
     private List<TreeViewItem<SysOrg>> ZItem;
     protected override async Task OnInitializedAsync()
@@ -67,10 +65,7 @@ public partial class OrgTree : IDisposable
         try
         {
             ExecutionContext.Restore(context);
-            await InvokeAsync(async () =>
-            {
-                await OnClickSearch(SearchText);
-            });
+            await InvokeAsync(async () => await OnClickSearch(SearchText));
         }
         finally
         {

@@ -24,6 +24,5 @@ public class SysResourceSeedData : ISqlSugarEntitySeedData<SysResource>
         var data2 = SeedDataUtil.GetSeedData<SysResource>(PathExtensions.CombinePathWithOs("SeedData", "Upgrade", "seed_upgrade_resourcebutton.json"));
         var assembly = GetType().Assembly;
         return SeedDataUtil.GetSeedDataByJson<SysResource>(SeedDataUtil.GetManifestResourceStream(assembly, "SeedData.AutoUpdate.seed_upgrade_resource.json")).Concat(SeedDataUtil.GetSeedDataByJson<SysResource>(SeedDataUtil.GetManifestResourceStream(assembly, "SeedData.AutoUpdate.seed_upgrade_resourcebutton.json"))).Concat(data1).Concat(data2);
-
     }
 }

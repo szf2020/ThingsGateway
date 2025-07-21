@@ -16,5 +16,4 @@ global using Microsoft.Extensions.Options;
 global using System.Diagnostics.CodeAnalysis;
 global using System.Globalization;
 
-
 global using ThingsGateway.NewLife.Extension;

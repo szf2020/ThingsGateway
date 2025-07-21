@@ -60,7 +60,6 @@
                 //    //isChange = true;
                 //}
 
-
                 foreach (var item in entityColumns)
                 {
                     var dbColumn = dbColumns.FirstOrDefault(dc => dc.DbColumnName.Equals(item.DbColumnName, StringComparison.CurrentCultureIgnoreCase));

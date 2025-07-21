@@ -37,7 +37,6 @@ namespace ThingsGateway.SqlSugar
                 }
                 else if (this.Context is OracleExpressionContext)
                 {
-
                     return 401;
                 }
                 else
@@ -46,7 +45,6 @@ namespace ThingsGateway.SqlSugar
                 }
             }
         }
-
 
         public string GetValue(Expression expression)
         {

@@ -35,7 +35,6 @@ public class Startup : AppStartup
         services.ConfigureIconThemeOptions(options => options.ThemeKey = "fa");
         services.AddSingleton<IAppVersionService, VersionService>();
         services.AddScoped<IMenuService, DefaultMenuService>();
-
     }
 
     /// <inheritdoc/>

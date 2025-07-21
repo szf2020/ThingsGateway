@@ -9,7 +9,6 @@
 // 许可证的完整文本可以在源代码树根目录中的 LICENSE-APACHE 和 LICENSE-MIT 文件中找到。
 // ------------------------------------------------------------------------
 
-
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -31,7 +30,6 @@ public sealed class RunOptions : IRunOptions
     internal RunOptions()
     {
     }
-
 
     /// <summary>
     /// 默认配置
@@ -90,7 +88,6 @@ public sealed class RunOptions : IRunOptions
         FirstActionBuilder = configureAction;
         return this;
     }
-
 
     /// <summary>
     /// 配置 <see cref="IServiceCollection"/>

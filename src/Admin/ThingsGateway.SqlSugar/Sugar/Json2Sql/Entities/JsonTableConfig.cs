@@ -1,6 +1,5 @@
 ﻿namespace ThingsGateway.SqlSugar
 {
-
     public class JsonTableConfig
     {
         public string TableName { get; set; }

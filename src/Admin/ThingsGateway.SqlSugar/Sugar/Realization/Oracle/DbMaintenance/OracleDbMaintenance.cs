@@ -447,11 +447,7 @@ WHERE table_name = '" + tableName + "'");
                 return GetColumnInfosByTableName(tableName);
             else
                 return this.Context.Utilities.GetReflectionInoCacheInstance().GetOrCreate(cacheKey,
-                        () =>
-                        {
-                            return GetColumnInfosByTableName(tableName);
-
-                        });
+                        () => GetColumnInfosByTableName(tableName));
         }
 
         private List<DbColumnInfo> GetColumnInfosByTableName(string tableName)
@@ -580,7 +576,7 @@ WHERE table_name = '" + tableName + "'");
                               this.Context.Ado.IsEnableLogEvent = oldIsEnableLog;
                               return pks;
                           });
-            return comments.HasValue() ? comments.First() : "";
+            return comments.HasValue() ? comments[0] : "";
         }
 
         public string GetFieldComment(string tableName, string fieldName)
@@ -597,7 +593,6 @@ WHERE table_name = '" + tableName + "'");
                                return pks;
                            });
             return comments.HasValue() ? comments.FirstOrDefault(it => it.DbColumnName.EqualCase(fieldName))?.ColumnDescription : "";
-
         }
 
         public override bool CreateTable(string tableName, List<DbColumnInfo> columns, bool isCreatePrimaryKey = true)

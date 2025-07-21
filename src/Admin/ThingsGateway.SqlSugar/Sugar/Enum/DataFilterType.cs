@@ -16,7 +16,6 @@ namespace ThingsGateway.SqlSugar
         public string PropertyName { get { return EntityColumnInfo.PropertyInfo.Name; } }
         public string EntityName { get { return EntityColumnInfo.EntityName; } }
 
-
         public void SetValue(object value)
         {
             try
@@ -44,7 +43,6 @@ namespace ThingsGateway.SqlSugar
     }
     public class DataAfterModel
     {
-
         public List<EntityColumnInfo> EntityColumnInfos { get; set; }
         public object EntityValue { get; set; }
         public EntityInfo Entity { get; set; }

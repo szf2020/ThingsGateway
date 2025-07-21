@@ -17,7 +17,6 @@ namespace ThingsGateway.Foundation;
 /// </summary>
 public class DDPSend : ISendMessage
 {
-
     public int MaxLength => 300;
     public int Sign { get; set; }
     ReadOnlyMemory<byte> ReadOnlyMemory;
@@ -66,6 +65,5 @@ public class DDPSend : ISendMessage
             return newBytes;
         }
         return bytes;
-
     }
 }

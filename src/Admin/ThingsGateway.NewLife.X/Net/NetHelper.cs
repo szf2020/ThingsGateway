@@ -257,7 +257,6 @@ public static class NetHelper
     /// <returns></returns>
     public static Boolean CheckPort(this NetUri uri) => uri.Address.CheckPort(uri.Type, uri.Port);
 
-
     /// <summary>获取所有Tcp连接，带进程Id</summary>
     /// <returns></returns>
     public static TcpConnectionInformation2[] GetAllTcpConnections(Int32 processId = -1)
@@ -396,7 +395,6 @@ public static class NetHelper
                     }
                     else
                     {
-
                         if (addr.IsIPv4MappedToIPv6) continue;
                         if (addr.IsIPv6LinkLocal) factor--;
                         if (addr.IsIPv6Multicast) continue;

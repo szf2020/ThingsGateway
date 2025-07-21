@@ -432,7 +432,6 @@ WHERE tgrelid = '" + tableName + "'::regclass");
                 if (item.ColumnDescription != null)
                 {
                     db.DbMaintenance.AddColumnRemark(item.DbColumnName, item.DbTableName, item.ColumnDescription);
-
                 }
             }
             //table remak
@@ -463,7 +462,6 @@ WHERE tgrelid = '" + tableName + "'::regclass");
             if (columns.Any(it => it.IsPrimarykey) && isCreatePrimaryKey)
             {
                 primaryKeyInfo = string.Format(", Primary key({0})", string.Join(",", columns.Where(it => it.IsPrimarykey).Select(it => this.SqlBuilder.GetTranslationColumnName(it.DbColumnName.ToLower(isAutoToLowerCodeFirst)))));
-
             }
             sql = sql.Replace("$PrimaryKey", primaryKeyInfo);
             this.Context.Ado.ExecuteCommand(sql);
@@ -573,7 +571,6 @@ WHERE tgrelid = '" + tableName + "'::regclass");
             }
             catch
             {
-
             }
             return result;
         }

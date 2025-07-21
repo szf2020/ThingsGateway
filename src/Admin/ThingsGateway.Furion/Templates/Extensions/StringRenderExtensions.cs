@@ -45,7 +45,6 @@ public static class StringRenderExtensions
         return template.Render(templateData == null ? default : templateData.ObjectToDictionary().ToDictionary(u => u.Key.ToString(), u => u.Value), encode);
     }
 
-
     /// <summary>
     /// 渲染模板
     /// </summary>

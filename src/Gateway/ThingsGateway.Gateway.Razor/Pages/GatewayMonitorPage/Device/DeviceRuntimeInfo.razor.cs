@@ -14,5 +14,4 @@ public partial class DeviceRuntimeInfo
 {
     [Parameter, EditorRequired]
     public DeviceRuntime DeviceRuntime { get; set; }
-
 }

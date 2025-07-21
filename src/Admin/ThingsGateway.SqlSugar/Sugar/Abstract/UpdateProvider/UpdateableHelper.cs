@@ -449,7 +449,7 @@ namespace ThingsGateway.SqlSugar
             {
                 value = value.Replace("= \"SYSDATE\"", "= SYSDATE");
             }
-            var shortName = (columns as LambdaExpression).Parameters.First().Name;
+            var shortName = (columns as LambdaExpression).Parameters[0].Name;
             var replaceKey = "," + this.SqlBuilder.GetTranslationColumnName(shortName) + ".";
             var newKey = "," + this.SqlBuilder.GetTranslationColumnName(this.EntityInfo.DbTableName) + ".";
             if (replaceKey != newKey)
@@ -486,10 +486,7 @@ namespace ThingsGateway.SqlSugar
             if (this.Context.IgnoreColumns?.Any() == true)
             {
                 var currentIgnoreColumns = this.Context.IgnoreColumns.Where(it => it.EntityName == this.EntityInfo.EntityName).ToList();
-                this.UpdateBuilder.DbColumnInfoList = this.UpdateBuilder.DbColumnInfoList.Where(it =>
-                {
-                    return !currentIgnoreColumns.Any(i => it.PropertyName.Equals(i.PropertyName, StringComparison.CurrentCulture));
-                }).ToList();
+                this.UpdateBuilder.DbColumnInfoList = this.UpdateBuilder.DbColumnInfoList.Where(it => !currentIgnoreColumns.Any(i => it.PropertyName.Equals(i.PropertyName, StringComparison.CurrentCulture))).ToList();
             }
             #endregion
             if (this.IsSingle)
@@ -631,7 +628,6 @@ namespace ThingsGateway.SqlSugar
         }
         protected virtual List<string> GetIdentityKeys()
         {
-
             return this.EntityInfo.Columns.Where(it => it.IsIdentity).Select(it => it.DbColumnName).ToList();
         }
         private void RestoreMapping()
@@ -641,7 +637,6 @@ namespace ThingsGateway.SqlSugar
                 this.Context.MappingTables = OldMappingTableList;
             }
         }
-
 
         private void ValidateVersion()
         {

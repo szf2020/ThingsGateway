@@ -134,7 +134,6 @@ public static class App
         return StringLocalizerFactory?.Create(baseName, location);
     }
 
-
     /// <summary>
     /// 判断是否是单文件环境
     /// </summary>
@@ -171,7 +170,6 @@ public static class App
     /// </summary>
     /// <remarks>只有授权访问的页面或接口才存在值，否则为 null</remarks>
     public static ClaimsPrincipal User => HttpContext?.User;
-
 
     /// <summary>
     /// 获取配置
@@ -322,13 +320,11 @@ public static class App
         return serviceDescriptor?.Lifetime;
     }
 
-
     /// <summary>
     /// 构造函数
     /// </summary>
     static App()
     {
-
         // 加载程序集
         var assObject = GetAssemblies();
         Assemblies = assObject.Assemblies.ToList();
@@ -419,8 +415,6 @@ public static class App
 
                 fixedSingleFileAssemblies = fixedSingleFileAssemblies.Concat(nativeAssemblies)
                                                             .Concat(loadAssemblies);
-
-
             }
             else
             {
@@ -507,7 +501,6 @@ public static class App
                     var loadTypes = GetTypes(loadedAssembly);
                     if (!loadTypes.Any())
                     {
-
                         BakImagePaths.TryAdd(assemblyFileFullPath);
                         BakImageNames.TryAdd(loadedAssembly.GetName().Name);
                         continue;

@@ -22,7 +22,6 @@ namespace System.Collections.Generic.Enumerable
 
         public static EnumerableIList<T> Empty = default;
 
-
         // IList pass through
 
         /// <inheritdoc />

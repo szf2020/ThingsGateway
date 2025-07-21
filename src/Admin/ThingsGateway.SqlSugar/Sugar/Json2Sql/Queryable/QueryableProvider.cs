@@ -1,6 +1,5 @@
 ﻿namespace ThingsGateway.SqlSugar
 {
-
     public partial class QueryableProvider<T> : QueryableAccessory, ISugarQueryable<T>
     {
         public ISugarQueryable<T> AddJoinInfo(string tableName, string shortName, IFuncModel models, JoinType type = JoinType.Left)
@@ -82,8 +81,6 @@
             result.QueryBuilder.Parameters.AddRange(orderObj.Value);
             return result;
         }
-
-
 
         public ISugarQueryable<T> Select(List<SelectModel> models, AsNameFormatType type)
         {

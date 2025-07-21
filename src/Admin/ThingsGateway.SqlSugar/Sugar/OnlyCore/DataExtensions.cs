@@ -16,7 +16,6 @@ using System.Data.OscarClient;
 
 namespace ThingsGateway.SqlSugar
 {
-
     /// <summary>
     /// 数据填充器
     /// </summary>
@@ -37,7 +36,6 @@ namespace ThingsGateway.SqlSugar
 
         public SqlDataAdapter()
         {
-
         }
 
         /// <summary>
@@ -135,7 +133,6 @@ namespace ThingsGateway.SqlSugar
                         {
                             columns.Add(new DataColumn(name + i, dr.GetFieldType(i)));
                         }
-
                     }
 
                     while (dr.Read())
@@ -173,7 +170,6 @@ namespace ThingsGateway.SqlSugar
 
         public MySqlDataAdapter()
         {
-
         }
 
         /// <summary>
@@ -320,7 +316,6 @@ namespace ThingsGateway.SqlSugar
 
         public SqliteDataAdapter()
         {
-
         }
 
         /// <summary>
@@ -465,7 +460,6 @@ namespace ThingsGateway.SqlSugar
 
         public MyOracleDataAdapter()
         {
-
         }
 
         /// <summary>
@@ -600,7 +594,6 @@ namespace ThingsGateway.SqlSugar
 
         public NpgsqlDataAdapter()
         {
-
         }
 
         /// <summary>
@@ -715,7 +708,6 @@ namespace ThingsGateway.SqlSugar
         }
     }
 
-
     /// <summary>
     /// 数据填充器
     /// </summary>
@@ -736,7 +728,6 @@ namespace ThingsGateway.SqlSugar
 
         public MyDmDataAdapter()
         {
-
         }
 
         /// <summary>
@@ -851,7 +842,6 @@ namespace ThingsGateway.SqlSugar
         }
     }
 
-
     /// <summary>
     /// 数据填充器
     /// </summary>
@@ -872,7 +862,6 @@ namespace ThingsGateway.SqlSugar
 
         public KdbndpDataAdapter()
         {
-
         }
 
         /// <summary>
@@ -987,7 +976,6 @@ namespace ThingsGateway.SqlSugar
         }
     }
 
-
     /// <summary>
     /// 数据填充器
     /// </summary>
@@ -1008,7 +996,6 @@ namespace ThingsGateway.SqlSugar
 
         public OscarDataAdapter()
         {
-
         }
 
         /// <summary>
@@ -1122,6 +1109,4 @@ namespace ThingsGateway.SqlSugar
             }
         }
     }
-
-
 }

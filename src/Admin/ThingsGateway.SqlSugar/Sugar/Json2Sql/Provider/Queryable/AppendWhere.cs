@@ -2,7 +2,6 @@
 
 namespace ThingsGateway.SqlSugar
 {
-
     /// <summary>
     /// AppendWhere
     /// </summary>
@@ -18,7 +17,6 @@ namespace ThingsGateway.SqlSugar
 
         private void AfterWhere()
         {
-
         }
 
         private void BeforeWhere()

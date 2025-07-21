@@ -64,10 +64,7 @@ internal sealed class Program
             if (!builder.Environment.IsDevelopment())
             {
                 builder.Services.AddResponseCompression(
-                    opts =>
-                    {
-                        opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(second);
-                    });
+                    opts => opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(second));
             }
 
             builder.WebHost.UseWebRoot("wwwroot");
@@ -81,12 +78,9 @@ internal sealed class Program
             });
 
 
-
-
         })
               .Configure(app =>
               {
-
               }).Silence(true, true)
               .ConfigureServices(services =>
               {
@@ -123,6 +117,4 @@ internal sealed class Program
         hybridApp.Run();
         Thread.Sleep(2000);
     }
-
-
 }

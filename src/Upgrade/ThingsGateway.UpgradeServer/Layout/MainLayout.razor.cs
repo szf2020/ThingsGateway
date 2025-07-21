@@ -26,7 +26,6 @@ public partial class MainLayout : IDisposable
     [Inject]
     IStringLocalizer<ThingsGateway.Razor._Imports> RazorLocalizer { get; set; }
 
-
     #region 全局通知
 
     [Inject]
@@ -95,10 +94,8 @@ public partial class MainLayout : IDisposable
 
     private async Task LogoutAsync()
     {
-
         try
         {
-
             var ret = await AuthRazorService.LoginOutAsync();
             if (ret.Code != 200)
             {

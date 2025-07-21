@@ -78,6 +78,5 @@ namespace ThingsGateway.SqlSugar
         {
             return _configs.Select(it => UtilMethods.CopyConfig(it)).ToList();
         }
-
     }
 }

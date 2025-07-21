@@ -14,8 +14,6 @@ namespace ThingsGateway.Admin.Application;
 [ThingsGateway.DependencyInjection.SuppressSniffer]
 public static class RoleUtil
 {
-
-
     /// <summary>
     /// 构建树节点
     /// </summary>
@@ -39,8 +37,6 @@ public static class RoleUtil
         }
         return trees;
     }
-
-
 
 
 }

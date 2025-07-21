@@ -118,10 +118,7 @@ internal sealed class VariableCodeBuilder
         return m_pluginClass
             .GetMembers()
             .OfType<IPropertySymbol>()
-            .Where(m =>
-            {
-                return m.GetAttributes().Any(a => a.AttributeClass.ToDisplayString() == VariableObjectSyntaxFilter.VariableRuntimeAttributeTypeName);
-            });
+            .Where(m => m.GetAttributes().Any(a => a.AttributeClass.ToDisplayString() == VariableObjectSyntaxFilter.VariableRuntimeAttributeTypeName));
     }
 }
 
