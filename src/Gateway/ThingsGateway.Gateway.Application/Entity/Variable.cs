@@ -506,7 +506,7 @@ public class Variable : BaseDataEntity, IValidatableObject
     {
         if (string.IsNullOrEmpty(RegisterAddress) && string.IsNullOrEmpty(OtherMethod))
         {
-            yield return new ValidationResult("Both RegisterAddress and OtherMethod cannot be empty or null.", new[] { nameof(RegisterAddress), nameof(OtherMethod) });
+            yield return new ValidationResult("Both RegisterAddress and OtherMethod cannot be empty or null.", new[] { nameof(OtherMethod), nameof(RegisterAddress) });
         }
 
         if (HHAlarmEnable && HAlarmEnable && HHAlarmCode <= HAlarmCode)
