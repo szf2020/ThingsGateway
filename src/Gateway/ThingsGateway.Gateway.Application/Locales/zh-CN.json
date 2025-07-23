@@ -235,11 +235,13 @@
     "DeleteChannel": "删除通道",
     "Disconnect": "断开",
     "DtrEnable": "Dtr",
-    "DtuId": "Dtu终端注册包(utf-8)",
+    "DtuId": "Dtu终端注册包",
     "DtuSeviceType": "DTU服务类型",
     "Enable": "启用",
     "ExportChannel": "导出通道",
-    "Heartbeat": "心跳内容(utf8)",
+    "Heartbeat": "心跳内容",
+    "DtuIdHex": "Dtu终端注册包是否Hex",
+    "HeartbeatHex": "心跳内容是否Hex",
     "HeartbeatTime": "心跳间隔",
     "ImportChannel": "导入通道",
     "ImportNullError": "无法识别",
@@ -273,10 +275,10 @@
   },
 
   "ThingsGateway.Gateway.Application.CollectFoundationDtuPackPropertyBase": {
-    "DtuId": "Dtu注册包(UTF8)"
+    "DtuId": "Dtu注册包"
   },
   "ThingsGateway.Gateway.Application.CollectFoundationDtuPropertyBase": {
-    "DtuId": "Dtu注册包(UTF8)"
+    "DtuId": "Dtu注册包"
   },
   "ThingsGateway.Gateway.Application.CollectFoundationPackPropertyBase": {
     "MaxPack": "最大打包长度"

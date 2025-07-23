@@ -111,10 +111,13 @@ public interface IChannelOptions
     int CheckClearTime { get; set; }
 
     /// <summary>
-    /// 心跳检测(utf8)
+    /// 心跳检测
     /// </summary>
     string Heartbeat { get; set; }
-
+    /// <summary>
+    /// 心跳检测是否hex
+    /// </summary>
+    bool HeartbeatHex { get; set; }
     #region dtu终端
     /// <summary>
     /// 心跳时间
@@ -122,10 +125,13 @@ public interface IChannelOptions
     public int HeartbeatTime { get; set; }
 
     /// <summary>
-    /// 默认Dtu注册包(utf-8)
+    /// 默认Dtu注册包
     /// </summary>
     public string DtuId { get; set; }
-
+    /// <summary>
+    /// 默认Dtu注册包是否hex
+    /// </summary>
+    bool DtuIdHex { get; set; }
     #endregion
 
     public DtuSeviceType DtuSeviceType { get; set; }

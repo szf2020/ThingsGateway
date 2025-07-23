@@ -94,10 +94,12 @@ namespace ThingsGateway.Foundation
         public virtual int MaxClientCount { get; set; }
         public virtual int CheckClearTime { get; set; }
         public virtual string Heartbeat { get; set; }
+        public virtual bool HeartbeatHex { get; set; }
 
         #region dtu终端
         public virtual int HeartbeatTime { get; set; }
         public virtual string DtuId { get; set; }
+        public virtual bool DtuIdHex { get; set; }
         #endregion
         public virtual DtuSeviceType DtuSeviceType { get; set; }
 

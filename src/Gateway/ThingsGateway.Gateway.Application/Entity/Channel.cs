@@ -177,6 +177,10 @@ public class Channel : ChannelOptionsBase, IPrimaryIdEntity, IBaseDataEntity, IB
     [AutoGenerateColumn(Visible = true, Filterable = true, Sortable = true)]
     public override string Heartbeat { get; set; }
 
+    [SugarColumn(ColumnDescription = "心跳内容是否Hex", IsNullable = true)]
+    [AutoGenerateColumn(Visible = true, Filterable = true, Sortable = true)]
+    public override bool HeartbeatHex { get; set; }
+
     #region dtu终端
 
     [SugarColumn(ColumnDescription = "心跳间隔", IsNullable = true)]
@@ -187,6 +191,9 @@ public class Channel : ChannelOptionsBase, IPrimaryIdEntity, IBaseDataEntity, IB
     [AutoGenerateColumn(Visible = true, Filterable = true, Sortable = true)]
     public override string DtuId { get; set; }
 
+    [SugarColumn(ColumnDescription = "DtuId是否Hex", IsNullable = true)]
+    [AutoGenerateColumn(Visible = true, Filterable = true, Sortable = true)]
+    public override bool DtuIdHex { get; set; }
     #endregion
 
     [SugarColumn(ColumnDescription = "Dtu类型", IsNullable = true)]

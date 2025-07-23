@@ -242,6 +242,8 @@
     "ExportChannel": "Export Channel",
     "Heartbeat": "Heartbeat",
     "HeartbeatTime": "HeartbeatTime",
+    "DtuIdHex": "DtuIdHex",
+    "HeartbeatHex": "HeartbeatHex",
     "ImportChannel": "Import Channel",
     "ImportNullError": "Unable to recognize",
     "LogEnable": "LogEnable",
@@ -274,10 +276,10 @@
   },
 
   "ThingsGateway.Gateway.Application.CollectFoundationDtuPackPropertyBase": {
-    "DtuId": "DtuId(UTF8)"
+    "DtuId": "DtuId"
   },
   "ThingsGateway.Gateway.Application.CollectFoundationDtuPropertyBase": {
-    "DtuId": "DtuId(UTF8)"
+    "DtuId": "DtuId"
   },
   "ThingsGateway.Gateway.Application.CollectFoundationPackPropertyBase": {
     "MaxPack": "MaxPack"

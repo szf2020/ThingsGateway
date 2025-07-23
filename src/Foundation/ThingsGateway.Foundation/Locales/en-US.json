@@ -12,6 +12,8 @@
     "DtuSeviceType": "DtuSeviceType",
     "Heartbeat": "Heartbeat",
     "HeartbeatTime": "HeartbeatTime",
+    "DtuIdHex": "DtuIdHex",
+    "HeartbeatHex": "HeartbeatHex",
     "MaxClientCount": "MaxClientCount",
     "MaxConcurrentCount": "MaxConcurrentCount",
     "Name": "Name",
@@ -73,7 +75,7 @@
     "Timeout": "Timeout"
   },
   "ThingsGateway.Foundation.DtuServiceDeviceBase": {
-    "DtuId": "DtuId(UTF8)"
+    "DtuId": "DtuId"
   },
   "ThingsGateway.Foundation.VariableClass": {
     "RegisterAddress": "RegisterAddress"

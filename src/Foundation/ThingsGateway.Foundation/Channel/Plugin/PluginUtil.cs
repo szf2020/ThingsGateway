@@ -25,6 +25,8 @@ public static class PluginUtil
             action += a =>
             {
                 var plugin = a.Add<HeartbeatAndReceivePlugin>();
+                plugin.HeartbeatHex = channelOptions.HeartbeatHex;
+                plugin.DtuIdHex = channelOptions.DtuIdHex;
                 plugin.Heartbeat = channelOptions.Heartbeat;
                 plugin.DtuId = channelOptions.DtuId;
                 plugin.HeartbeatTime = channelOptions.HeartbeatTime;
@@ -52,7 +54,9 @@ public static class PluginUtil
             action += a =>
             {
                 var plugin = a.Add<DtuPlugin>();
+                plugin.HeartbeatHex = channelOptions.HeartbeatHex;
                 plugin.Heartbeat = channelOptions.Heartbeat;
+                plugin.DtuIdHex = channelOptions.DtuIdHex;
             };
         }
         return action;

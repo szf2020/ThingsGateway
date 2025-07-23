@@ -10,6 +10,8 @@
 
 using System.Text;
 
+using ThingsGateway.Foundation.Extension.String;
+
 namespace ThingsGateway.Foundation;
 
 /// <inheritdoc/>
@@ -28,12 +30,33 @@ public class DtuPlugin : PluginBase, ITcpReceivingPlugin
         set
         {
             _heartbeat = value;
-            if (!_heartbeat.IsNullOrEmpty())
-                HeartbeatByte = new ArraySegment<byte>(Encoding.UTF8.GetBytes(value));
+            if (!heartbeatHex)
+                HeartbeatByte = new ArraySegment<byte>(Encoding.UTF8.GetBytes(_heartbeat ?? string.Empty));
+            else
+                HeartbeatByte = new ArraySegment<byte>(_heartbeat?.HexStringToBytes() ?? Array.Empty<byte>());
         }
     }
     private string _heartbeat;
     private ArraySegment<byte> HeartbeatByte = new();
+
+
+    private bool heartbeatHex;
+    public bool HeartbeatHex
+    {
+        get
+        {
+            return heartbeatHex;
+        }
+        set
+        {
+            heartbeatHex = value;
+            if (!heartbeatHex)
+                HeartbeatByte = new ArraySegment<byte>(Encoding.UTF8.GetBytes(_heartbeat ?? string.Empty));
+            else
+                HeartbeatByte = new ArraySegment<byte>(_heartbeat?.HexStringToBytes() ?? Array.Empty<byte>());
+        }
+    }
+    public bool DtuIdHex { get; set; }
 
     /// <inheritdoc/>
     public async Task OnTcpReceiving(ITcpSession client, ByteBlockEventArgs e)
@@ -43,7 +66,7 @@ public class DtuPlugin : PluginBase, ITcpReceivingPlugin
         {
             if (!socket.Id.StartsWith("ID="))
             {
-                var id = $"ID={e.ByteBlock}";
+                var id = DtuIdHex ? $"ID={e.ByteBlock.Span.ToHexString()}" : $"ID={e.ByteBlock.ToString(0, e.ByteBlock.Length)}";
                 if (tcpServiceChannel.TryGetClient(id, out var oldClient))
                 {
                     try

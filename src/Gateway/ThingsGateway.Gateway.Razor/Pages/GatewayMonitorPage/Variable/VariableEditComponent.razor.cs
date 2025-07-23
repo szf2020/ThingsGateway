@@ -138,9 +138,8 @@ public partial class VariableEditComponent
             AddressDynamicComponent = new BootstrapDynamicComponent(AddressUIType, new Dictionary<string, object?>
             {
                 [nameof(IAddressUIBase.Model)] = Model.RegisterAddress,
-
                 [nameof(IAddressUIBase.ModelChanged)] =
-                     (string address) => Model.RegisterAddress = address
+                     (Action<string>)(address => Model.RegisterAddress = address)
             });
         }
         else

@@ -54,20 +54,29 @@ public static class ChannelOptionsExtensions
     /// <returns></returns>
     internal static async Task OnChannelEvent(this IClientChannel clientChannel, ChannelEventHandler funcs)
     {
-        clientChannel.ThrowIfNull(nameof(IClientChannel));
-        funcs.ThrowIfNull(nameof(ChannelEventHandler));
-
-        if (funcs.Count > 0)
+        try
         {
-            for (int i = 0; i < funcs.Count; i++)
+
+            clientChannel.ThrowIfNull(nameof(IClientChannel));
+            funcs.ThrowIfNull(nameof(ChannelEventHandler));
+
+            if (funcs.Count > 0)
             {
-                var func = funcs[i];
-                var handled = await func.Invoke(clientChannel, i == funcs.Count - 1).ConfigureAwait(false);
-                if (handled)
+                for (int i = 0; i < funcs.Count; i++)
                 {
-                    break;
+                    var func = funcs[i];
+                    var handled = await func.Invoke(clientChannel, i == funcs.Count - 1).ConfigureAwait(false);
+                    if (handled)
+                    {
+                        break;
+                    }
                 }
             }
+
+        }
+        catch (Exception ex)
+        {
+            clientChannel.Logger?.LogWarning(ex, "fail ChannelEvent");
         }
     }
 

@@ -142,7 +142,20 @@ public static partial class DeviceExtension
                 return new();
 
             case WaitDataStatus.Canceled: return new(new OperationCanceledException());
-            case WaitDataStatus.Overtime: return waitDataAsync.WaitResult == null ? new(new TimeoutException()) : new(waitDataAsync.WaitResult);
+            case WaitDataStatus.Overtime:
+                {
+                    if (waitDataAsync.WaitResult != null)
+                    {
+                        waitDataAsync.WaitResult.Exception = new TimeoutException();
+                        if (waitDataAsync.WaitResult.IsSuccess) waitDataAsync.WaitResult.OperCode = 999;
+                        if (waitDataAsync.WaitResult.ErrorMessage.IsNullOrEmpty()) waitDataAsync.WaitResult.ErrorMessage = "Timeout";
+                        return new(waitDataAsync.WaitResult);
+                    }
+                    else
+                    {
+                        return new(new TimeoutException());
+                    }
+                }
             case WaitDataStatus.Disposed:
             case WaitDataStatus.Default:
             default:

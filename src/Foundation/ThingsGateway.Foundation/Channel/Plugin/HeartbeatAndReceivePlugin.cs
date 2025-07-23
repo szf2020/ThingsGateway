@@ -10,6 +10,8 @@
 
 using System.Text;
 
+using ThingsGateway.Foundation.Extension.String;
+
 namespace ThingsGateway.Foundation;
 
 [PluginOption(Singleton = true)]
@@ -24,7 +26,10 @@ internal sealed class HeartbeatAndReceivePlugin : PluginBase, ITcpConnectedPlugi
         set
         {
             _dtuId = value;
-            DtuIdByte = new ArraySegment<byte>(Encoding.UTF8.GetBytes(value));
+            if (!dtuIdHex)
+                DtuIdByte = new ArraySegment<byte>(Encoding.UTF8.GetBytes(_dtuId ?? string.Empty));
+            else
+                DtuIdByte = new ArraySegment<byte>(_dtuId?.HexStringToBytes() ?? Array.Empty<byte>());
         }
     }
     private string _dtuId;
@@ -42,15 +47,64 @@ internal sealed class HeartbeatAndReceivePlugin : PluginBase, ITcpConnectedPlugi
         set
         {
             _heartbeat = value;
-            if (!_heartbeat.IsNullOrEmpty())
-            {
-                HeartbeatByte = new ArraySegment<byte>(Encoding.UTF8.GetBytes(value));
-            }
+            if (!heartbeatHex)
+                HeartbeatByte = new ArraySegment<byte>(Encoding.UTF8.GetBytes(_heartbeat ?? string.Empty));
+            else
+                HeartbeatByte = new ArraySegment<byte>(_heartbeat?.HexStringToBytes() ?? Array.Empty<byte>());
         }
     }
     private string _heartbeat;
     private ArraySegment<byte> HeartbeatByte;
 
+
+
+
+
+
+    private bool heartbeatHex;
+    public bool HeartbeatHex
+    {
+        get
+        {
+            return heartbeatHex;
+        }
+        set
+        {
+            heartbeatHex = value;
+            if (!heartbeatHex)
+            {
+                HeartbeatByte = new ArraySegment<byte>(Encoding.UTF8.GetBytes(_heartbeat ?? string.Empty));
+
+            }
+            else
+            {
+                HeartbeatByte = new ArraySegment<byte>(_heartbeat?.HexStringToBytes() ?? Array.Empty<byte>());
+
+            }
+        }
+    }
+    private bool dtuIdHex;
+    public bool DtuIdHex
+    {
+        get
+        {
+            return dtuIdHex;
+        }
+        set
+        {
+            dtuIdHex = value;
+            if (!dtuIdHex)
+            {
+                DtuIdByte = new ArraySegment<byte>(Encoding.UTF8.GetBytes(_dtuId ?? string.Empty));
+
+            }
+            else
+            {
+                DtuIdByte = new ArraySegment<byte>(_dtuId?.HexStringToBytes() ?? Array.Empty<byte>());
+
+            }
+        }
+    }
     private Task Task;
     private bool SendHeartbeat;
     public int HeartbeatTime { get; set; } = 3000;

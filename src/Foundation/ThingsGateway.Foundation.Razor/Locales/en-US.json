@@ -72,6 +72,8 @@
     "DtuId": "DtuId",
     "DtuSeviceType": "DtuSeviceType",
     "Heartbeat": "Heartbeat",
+    "DtuIdHex": "DtuIdHex",
+    "HeartbeatHex": "HeartbeatHex",
     "HeartbeatTime": "HeartbeatTime",
     "MaxClientCount": "MaxClientCount",
     "MaxConcurrentCount": "MaxConcurrentCount",

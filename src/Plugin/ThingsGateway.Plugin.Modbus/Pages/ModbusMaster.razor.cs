@@ -59,7 +59,7 @@ public partial class ModbusMaster : ComponentBase, IDisposable
 
         op.Component = BootstrapDynamicComponent.CreateComponent<ModbusAddressComponent>(new Dictionary<string, object?>
         {
-             {nameof(ModbusAddressComponent.ModelChanged),  (string a) => DeviceComponent?.SetRegisterAddress(a)},
+             {nameof(ModbusAddressComponent.ModelChanged),  (Action<string>)(a => DeviceComponent?.SetRegisterAddress(a))},
             {nameof(ModbusAddressComponent.Model),address },
         });
 
