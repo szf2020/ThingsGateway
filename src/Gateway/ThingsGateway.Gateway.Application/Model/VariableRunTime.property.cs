@@ -55,7 +55,12 @@ public partial class VariableRuntime : Variable, IVariable, IDisposable
     /// 事件时间
     /// </summary>
     [AutoGenerateColumn(Ignore = true)]
-    internal DateTime? PrepareEventTime { get => prepareEventTime; set => prepareEventTime = value; }
+    internal DateTime? PrepareAlarmEventTime { get => prepareAlarmEventTime; set => prepareAlarmEventTime = value; }
+    /// <summary>
+    /// 事件时间
+    /// </summary>
+    [AutoGenerateColumn(Ignore = true)]
+    internal DateTime? PrepareFinishEventTime { get => prepareFinishEventTime; set => prepareFinishEventTime = value; }
 
     /// <summary>
     /// 变化时间

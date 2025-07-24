@@ -21,7 +21,8 @@ namespace ThingsGateway.Gateway.Application;
 /// </summary>
 public partial class VariableRuntime : Variable, IVariable, IDisposable
 {
-    private DateTime? prepareEventTime;
+    private DateTime? prepareAlarmEventTime;
+    private DateTime? prepareFinishEventTime;
     private EventTypeEnum? eventType;
 
     private AlarmTypeEnum? alarmType { get; set; }

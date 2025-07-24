@@ -284,16 +284,16 @@ internal sealed class AlarmTask : IDisposable
             //添加报警延时策略
             if (delay > 0)
             {
-                if (item.EventType != EventTypeEnum.Alarm && item.EventType != EventTypeEnum.Prepare)
+                if (item.EventType != EventTypeEnum.Alarm && item.EventType != EventTypeEnum.PrepareAlarm)
                 {
-                    item.EventType = EventTypeEnum.Prepare;//准备报警
-                    item.PrepareEventTime = now;
+                    item.EventType = EventTypeEnum.PrepareAlarm;//准备报警
+                    item.PrepareAlarmEventTime = now;
                 }
                 else
                 {
-                    if (item.EventType == EventTypeEnum.Prepare)
+                    if (item.EventType == EventTypeEnum.PrepareAlarm)
                     {
-                        if ((now - item.PrepareEventTime!.Value).TotalSeconds > delay)
+                        if ((now - item.PrepareAlarmEventTime!.Value).TotalMilliseconds > delay)
                         {
                             //超过延时时间，触发报警
                             item.EventType = EventTypeEnum.Alarm;
@@ -304,7 +304,7 @@ internal sealed class AlarmTask : IDisposable
                             item.AlarmCode = item.Value.ToString();
                             item.RecoveryCode = string.Empty;
                             item.AlarmText = text;
-                            item.PrepareEventTime = null;
+                            item.PrepareAlarmEventTime = null;
 
                             changed = true;
                         }
@@ -312,9 +312,9 @@ internal sealed class AlarmTask : IDisposable
                     else if (item.EventType == EventTypeEnum.Alarm && item.AlarmType != alarmEnum)
                     {
                         //报警类型改变，重新计时
-                        if (item.PrepareEventTime == null)
-                            item.PrepareEventTime = now;
-                        if ((now - item.PrepareEventTime!.Value).TotalSeconds > delay)
+                        if (item.PrepareAlarmEventTime == null)
+                            item.PrepareAlarmEventTime = now;
+                        if ((now - item.PrepareAlarmEventTime!.Value).TotalMilliseconds > delay)
                         {
                             //超过延时时间，触发报警
                             item.EventType = EventTypeEnum.Alarm;
@@ -325,7 +325,7 @@ internal sealed class AlarmTask : IDisposable
                             item.AlarmCode = item.Value.ToString();
                             item.RecoveryCode = string.Empty;
                             item.AlarmText = text;
-                            item.PrepareEventTime = null;
+                            item.PrepareAlarmEventTime = null;
                             changed = true;
                         }
                     }
@@ -346,24 +346,64 @@ internal sealed class AlarmTask : IDisposable
                 item.AlarmCode = item.Value.ToString();
                 item.RecoveryCode = string.Empty;
                 item.AlarmText = text;
+                item.PrepareAlarmEventTime = null;
                 changed = true;
             }
         }
         else if (eventEnum == EventTypeEnum.Finish)
         {
-            // 如果是需恢复报警事件
-            // 获取旧的报警信息
-            if (GlobalData.RealAlarmIdVariables.TryGetValue(item.Id, out var oldAlarm))
+            var now = DateTime.Now;
+            //添加报警延时策略
+            if (delay > 0)
             {
-                item.AlarmType = oldAlarm.AlarmType;
-                item.EventType = eventEnum;
-                item.AlarmLimit = oldAlarm.AlarmLimit;
-                item.AlarmCode = oldAlarm.AlarmCode;
-                item.RecoveryCode = item.Value.ToString();
-                item.AlarmText = oldAlarm.AlarmText;
-                item.EventTime = DateTime.Now;
+                if (item.EventType != EventTypeEnum.Finish && item.EventType != EventTypeEnum.PrepareFinish)
+                {
+                    item.EventType = EventTypeEnum.PrepareFinish;//准备报警
+                    item.PrepareFinishEventTime = now;
+                }
+                else
+                {
+                    if (item.EventType == EventTypeEnum.PrepareFinish)
+                    {
+                        if ((now - item.PrepareFinishEventTime!.Value).TotalMilliseconds > delay)
+                        {
+                            if (GlobalData.RealAlarmIdVariables.TryGetValue(item.Id, out var oldAlarm))
+                            {
+                                item.AlarmType = oldAlarm.AlarmType;
+                                item.EventType = eventEnum;
+                                item.AlarmLimit = oldAlarm.AlarmLimit;
+                                item.AlarmCode = oldAlarm.AlarmCode;
+                                item.RecoveryCode = item.Value.ToString();
+                                item.AlarmText = oldAlarm.AlarmText;
+                                item.EventTime = DateTime.Now;
+                                item.PrepareFinishEventTime = null;
+                                changed = true;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        return;
+                    }
+                }
             }
-            changed = true;
+            else
+            {
+                // 如果是需恢复报警事件
+                // 获取旧的报警信息
+                if (GlobalData.RealAlarmIdVariables.TryGetValue(item.Id, out var oldAlarm))
+                {
+                    item.AlarmType = oldAlarm.AlarmType;
+                    item.EventType = eventEnum;
+                    item.AlarmLimit = oldAlarm.AlarmLimit;
+                    item.AlarmCode = oldAlarm.AlarmCode;
+                    item.RecoveryCode = item.Value.ToString();
+                    item.AlarmText = oldAlarm.AlarmText;
+                    item.EventTime = DateTime.Now;
+                    item.PrepareFinishEventTime = null;
+                    changed = true;
+                }
+            }
         }
 
         // 触发报警变化事件

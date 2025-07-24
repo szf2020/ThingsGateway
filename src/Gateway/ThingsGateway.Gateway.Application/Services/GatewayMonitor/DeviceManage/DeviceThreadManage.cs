@@ -333,6 +333,8 @@ internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
                     }
                 }
 
+                driver.IdVariableRuntimes.ForEach(a => a.Value.SetErrorMessage(null));
+
                 CancellationTokenSources.TryAdd(driver.DeviceId, cts);
 
                 _ = Task.Factory.StartNew((state) => DriverStart(state, token), driver, token);
@@ -395,17 +397,21 @@ internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
                 // 查找具有指定设备ID的驱动程序对象
                 if (Drivers.TryRemove(deviceId, out var driver))
                 {
+                    driver.CurrentDevice.SetDeviceStatus(now, false, "Communication connection has been removed");
                     if (IsCollectChannel == true)
                     {
                         foreach (var a in driver.IdVariableRuntimes)
                         {
                             a.Value.SetValue(a.Value.Value, now, false);
+                            a.Value.SetErrorMessage("Communication connection has been removed");
                             if (a.Value.SaveValue && !a.Value.DynamicVariable)
                             {
                                 saveVariableRuntimes.Add(a.Value);
                             }
                         }
+
                     }
+
                 }
 
                 // 取消驱动程序的操作

@@ -18,7 +18,7 @@ public enum EventTypeEnum
     /// <summary>
     /// 准备报警
     /// </summary>
-    Prepare,
+    PrepareAlarm,
 
     /// <summary>
     /// 报警产生
@@ -34,4 +34,9 @@ public enum EventTypeEnum
     /// 报警恢复
     /// </summary>
     Finish,
+
+    /// <summary>
+    /// 准备恢复
+    /// </summary>
+    PrepareFinish,
 }

@@ -238,7 +238,7 @@ public abstract class TcpCustomDataHandlingAdapter<TRequest> : SingleStreamDataH
                     // 如果缓存的数据长度超过设定的最大包大小，则抛出异常。
                     if (this.m_tempByteBlock.Length > this.MaxPackageSize)
                     {
-                        throw new Exception("缓存的数据长度大于设定值的情况下未收到解析信号");
+                        throw new Exception($"The parsed signal was not received when the cached data length {m_tempByteBlock.Length} exceeds the set value {MaxPackageSize}");
                     }
 
                     // 将字节块指针移到末尾。
@@ -306,7 +306,7 @@ public abstract class TcpCustomDataHandlingAdapter<TRequest> : SingleStreamDataH
 
                         if (this.m_tempByteBlock.Length > this.MaxPackageSize)
                         {
-                            this.OnError(default, "缓存的数据长度大于设定值的情况下未收到解析信号", true, true);
+                            this.OnError(default, $"The parsed signal was not received when the cached data length {m_tempByteBlock.Length} exceeds the set value {MaxPackageSize}", true, true);
                         }
                     }
                     if (this.UpdateCacheTimeWhenRev)

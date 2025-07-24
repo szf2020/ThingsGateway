@@ -53,6 +53,8 @@
         <TableColumn Field="@context.BindUrl" FieldExpression=@(() => context.BindUrl) ShowTips=true Filterable=true Sortable=true Visible=false />
         <TableColumn Field="@context.MaxClientCount" FieldExpression=@(() => context.MaxClientCount) ShowTips=true Filterable=true Sortable=true Visible=false />
         <TableColumn Field="@context.MaxConcurrentCount" FieldExpression=@(() => context.MaxConcurrentCount) ShowTips=true Filterable=true Sortable=true Visible=false />
+        <TableColumn Field="@context.DtuIdHex" FieldExpression=@(() => context.DtuIdHex) ShowTips=true Filterable=true Sortable=true Visible=false />
+        <TableColumn Field="@context.HeartbeatHex" FieldExpression=@(() => context.HeartbeatHex) ShowTips=true Filterable=true Sortable=true Visible=false />
 
         <TableColumn @bind-Field="@context.Id" Filterable=true Sortable=true Visible="false" DefaultSort=true DefaultSortOrder="SortOrder.Asc" />
 
