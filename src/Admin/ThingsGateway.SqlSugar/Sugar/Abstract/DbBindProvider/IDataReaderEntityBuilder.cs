@@ -305,11 +305,11 @@ namespace ThingsGateway.SqlSugar
 
                         if (this.ReaderKeys.TryGetValue(fileName, out var v))
                         {
-                            BindClass(generator, result, columnInfo, v);
+                            BindField(generator, result, columnInfo, v);
                         }
                         else if (this.ReaderKeys.TryGetValue(columnInfo.PropertyName, out var v1))
                         {
-                            BindClass(generator, result, columnInfo, v1);
+                            BindField(generator, result, columnInfo, v1);
                         }
                     }
                 }
