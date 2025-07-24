@@ -31,12 +31,13 @@ public partial class ChoiceTable<TItem> where TItem : class, new()
 
     public async Task OnAddAsync(IEnumerable<TItem> selectorOutputs)
     {
-        if (MaxCount > 0 && selectorOutputs.Count() + SelectedRows.Count > MaxCount)
+        var data= selectorOutputs is IReadOnlyCollection<TItem> list ? list : selectorOutputs.ToList();
+        if (MaxCount > 0 && data.Count + SelectedRows.Count > MaxCount)
         {
             await ToastService.Warning(AdminLocalizer["MaxCount"]);
             return;
         }
-        foreach (var item in selectorOutputs)
+        foreach (var item in data)
         {
             SelectedRows.Add(item);
             await table2.QueryAsync();

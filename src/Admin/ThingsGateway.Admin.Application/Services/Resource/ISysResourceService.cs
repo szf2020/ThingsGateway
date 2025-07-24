@@ -29,7 +29,7 @@ public interface ISysResourceService
     /// <param name="resourceList">资源列表</param>
     /// <param name="parentId">父ID</param>
     /// <returns></returns>
-    IEnumerable<SysResource> ConstructMenuTrees(IEnumerable<SysResource> resourceList, long parentId = 0);
+    IEnumerable<SysResource> ConstructMenuTrees(List<SysResource> resourceList, long parentId = 0);
 
     /// <summary>
     /// 复制资源到其他模块
@@ -44,7 +44,7 @@ public interface ISysResourceService
     /// </summary>
     /// <param name="ids">id列表</param>
     /// <returns></returns>
-    Task<bool> DeleteResourceAsync(IEnumerable<long> ids);
+    Task<bool> DeleteResourceAsync(HashSet<long> ids);
 
     /// <summary>
     /// 从缓存/数据库读取全部资源列表

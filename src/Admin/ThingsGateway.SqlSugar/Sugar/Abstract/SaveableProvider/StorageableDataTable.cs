@@ -6,7 +6,7 @@ namespace ThingsGateway.SqlSugar
     {
         internal DataTable DataTable { get; set; }
         internal SqlSugarProvider Context { get; set; }
-        internal IReadOnlyList<string> Columns { get; set; } = Array.Empty<string>();
+        internal IReadOnlyCollection<string> Columns { get; set; } = Array.Empty<string>();
         internal string SugarGroupId = "SugarGroupId";
         internal string SugarUpdateRows = "SugarUpdateRows";
         internal string SugarColumns = "SugarColumns";
@@ -23,12 +23,12 @@ namespace ThingsGateway.SqlSugar
             this.formatTime = formatTime;
             return WhereColumns(new string[] { name });
         }
-        public StorageableDataTable WhereColumns(IReadOnlyList<string> names, Func<DateTime, string> formatTime)
+        public StorageableDataTable WhereColumns(IReadOnlyCollection<string> names, Func<DateTime, string> formatTime)
         {
             this.formatTime = formatTime;
             return WhereColumns(names);
         }
-        public StorageableDataTable WhereColumns(IReadOnlyList<string> names)
+        public StorageableDataTable WhereColumns(IReadOnlyCollection<string> names)
         {
             this.Columns = names;
             var queryable = this.Context.Queryable<object>();
@@ -161,7 +161,7 @@ namespace ThingsGateway.SqlSugar
                 item[SugarErrorMessage] = message;
             }
         }
-        private void SetConditList(List<DataRow> itemList, IReadOnlyList<string> whereColumns, List<IConditionalModel> conditList)
+        private void SetConditList(List<DataRow> itemList, IReadOnlyCollection<string> whereColumns, List<IConditionalModel> conditList)
         {
             foreach (var dataItem in itemList)
             {

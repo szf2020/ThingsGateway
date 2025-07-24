@@ -43,7 +43,7 @@
         /// 生成SQL语句和参数
         /// </summary>
         /// <returns>SQL语句和参数</returns>
-        public override KeyValuePair<string, IReadOnlyList<SugarParameter>> ToSql()
+        public override KeyValuePair<string, IReadOnlyCollection<SugarParameter>> ToSql()
         {
             var result = base.ToSql();
             var primaryKey = GetPrimaryKeys().FirstOrDefault();
@@ -51,7 +51,7 @@
             {
                 primaryKey = this.SqlBuilder.GetTranslationColumnName(primaryKey);
             }
-            return new KeyValuePair<string, IReadOnlyList<SugarParameter>>(result.Key.Replace("$PrimaryKey", primaryKey), result.Value);
+            return new KeyValuePair<string, IReadOnlyCollection<SugarParameter>>(result.Key.Replace("$PrimaryKey", primaryKey), result.Value);
         }
 
         /// <summary>
@@ -90,7 +90,7 @@
         /// <returns>是否成功</returns>
         public override bool ExecuteCommandIdentityIntoEntity()
         {
-            var result = InsertObjs[0];
+            var result = InsertObjs.First();
             var identityKeys = GetIdentityKeys();
             if (identityKeys.Count == 0) { return this.ExecuteCommand() > 0; }
             var idValue = ExecuteReturnBigIdentity();

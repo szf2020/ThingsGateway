@@ -541,7 +541,7 @@ namespace ThingsGateway.SqlSugar
         #endregion
 
         #region In
-        public new ISugarQueryable<T, T2> InIF<TParamter>(bool isIn, string fieldName, IReadOnlyList<TParamter> pkValues)
+        public new ISugarQueryable<T, T2> InIF<TParamter>(bool isIn, string fieldName, IReadOnlyCollection<TParamter> pkValues)
         {
             if (isIn)
             {
@@ -549,7 +549,7 @@ namespace ThingsGateway.SqlSugar
             }
             return this;
         }
-        public new ISugarQueryable<T, T2> InIF<TParamter>(bool isIn, IReadOnlyList<TParamter> pkValues)
+        public new ISugarQueryable<T, T2> InIF<TParamter>(bool isIn, IReadOnlyCollection<TParamter> pkValues)
         {
             if (isIn)
             {
@@ -558,7 +558,7 @@ namespace ThingsGateway.SqlSugar
             return this;
         }
 
-        public new ISugarQueryable<T, T2> In<FieldType>(Expression<Func<T, object>> expression, IReadOnlyList<FieldType> inValues)
+        public new ISugarQueryable<T, T2> In<FieldType>(Expression<Func<T, object>> expression, IReadOnlyCollection<FieldType> inValues)
         {
             QueryBuilder.CheckExpression(expression, "In");
             var isSingle = QueryBuilder.IsSingle();
@@ -574,7 +574,7 @@ namespace ThingsGateway.SqlSugar
             return this;
         }
 
-        public ISugarQueryable<T, T2> In<FieldType>(Expression<Func<T, T2, object>> expression, IReadOnlyList<FieldType> inValues)
+        public ISugarQueryable<T, T2> In<FieldType>(Expression<Func<T, T2, object>> expression, IReadOnlyCollection<FieldType> inValues)
         {
             QueryBuilder.CheckExpression(expression, "In");
             var isSingle = QueryBuilder.IsSingle();
@@ -1330,7 +1330,7 @@ namespace ThingsGateway.SqlSugar
         #endregion
 
         #region In
-        public new ISugarQueryable<T, T2, T3> InIF<TParamter>(bool isIn, string fieldName, IReadOnlyList<TParamter> pkValues)
+        public new ISugarQueryable<T, T2, T3> InIF<TParamter>(bool isIn, string fieldName, IReadOnlyCollection<TParamter> pkValues)
         {
             if (isIn)
             {
@@ -1338,7 +1338,7 @@ namespace ThingsGateway.SqlSugar
             }
             return this;
         }
-        public new ISugarQueryable<T, T2, T3> InIF<TParamter>(bool isIn, IReadOnlyList<TParamter> pkValues)
+        public new ISugarQueryable<T, T2, T3> InIF<TParamter>(bool isIn, IReadOnlyCollection<TParamter> pkValues)
         {
             if (isIn)
             {
@@ -1346,7 +1346,7 @@ namespace ThingsGateway.SqlSugar
             }
             return this;
         }
-        public new ISugarQueryable<T, T2, T3> In<FieldType>(Expression<Func<T, object>> expression, IReadOnlyList<FieldType> inValues)
+        public new ISugarQueryable<T, T2, T3> In<FieldType>(Expression<Func<T, object>> expression, IReadOnlyCollection<FieldType> inValues)
         {
             QueryBuilder.CheckExpression(expression, "In");
             var isSingle = QueryBuilder.IsSingle();
@@ -1363,7 +1363,7 @@ namespace ThingsGateway.SqlSugar
             return this;
         }
 
-        public ISugarQueryable<T, T2, T3> In<FieldType>(Expression<Func<T, T2, object>> expression, IReadOnlyList<FieldType> inValues)
+        public ISugarQueryable<T, T2, T3> In<FieldType>(Expression<Func<T, T2, object>> expression, IReadOnlyCollection<FieldType> inValues)
         {
             QueryBuilder.CheckExpression(expression, "In");
             var isSingle = QueryBuilder.IsSingle();
@@ -1380,7 +1380,7 @@ namespace ThingsGateway.SqlSugar
             return this;
         }
 
-        public ISugarQueryable<T, T2, T3> In<FieldType>(Expression<Func<T, T2, T3, object>> expression, IReadOnlyList<FieldType> inValues)
+        public ISugarQueryable<T, T2, T3> In<FieldType>(Expression<Func<T, T2, T3, object>> expression, IReadOnlyCollection<FieldType> inValues)
         {
             QueryBuilder.CheckExpression(expression, "In");
             var isSingle = QueryBuilder.IsSingle();
@@ -2139,7 +2139,7 @@ namespace ThingsGateway.SqlSugar
         #endregion
 
         #region In
-        public new ISugarQueryable<T, T2, T3, T4> InIF<TParamter>(bool isIn, string fieldName, IReadOnlyList<TParamter> pkValues)
+        public new ISugarQueryable<T, T2, T3, T4> InIF<TParamter>(bool isIn, string fieldName, IReadOnlyCollection<TParamter> pkValues)
         {
             if (isIn)
             {
@@ -2147,7 +2147,7 @@ namespace ThingsGateway.SqlSugar
             }
             return this;
         }
-        public new ISugarQueryable<T, T2, T3, T4> InIF<TParamter>(bool isIn, IReadOnlyList<TParamter> pkValues)
+        public new ISugarQueryable<T, T2, T3, T4> InIF<TParamter>(bool isIn, IReadOnlyCollection<TParamter> pkValues)
         {
             if (isIn)
             {
@@ -2155,7 +2155,7 @@ namespace ThingsGateway.SqlSugar
             }
             return this;
         }
-        public new ISugarQueryable<T, T2, T3, T4> In<FieldType>(Expression<Func<T, object>> expression, IReadOnlyList<FieldType> inValues)
+        public new ISugarQueryable<T, T2, T3, T4> In<FieldType>(Expression<Func<T, object>> expression, IReadOnlyCollection<FieldType> inValues)
         {
             QueryBuilder.CheckExpression(expression, "In");
             var isSingle = QueryBuilder.IsSingle();
@@ -2172,7 +2172,7 @@ namespace ThingsGateway.SqlSugar
             return this;
         }
 
-        public ISugarQueryable<T, T2, T3, T4> In<FieldType>(Expression<Func<T, T2, object>> expression, IReadOnlyList<FieldType> inValues)
+        public ISugarQueryable<T, T2, T3, T4> In<FieldType>(Expression<Func<T, T2, object>> expression, IReadOnlyCollection<FieldType> inValues)
         {
             QueryBuilder.CheckExpression(expression, "In");
             var isSingle = QueryBuilder.IsSingle();
@@ -2188,7 +2188,7 @@ namespace ThingsGateway.SqlSugar
             return this;
         }
 
-        public ISugarQueryable<T, T2, T3, T4> In<FieldType>(Expression<Func<T, T2, T3, object>> expression, IReadOnlyList<FieldType> inValues)
+        public ISugarQueryable<T, T2, T3, T4> In<FieldType>(Expression<Func<T, T2, T3, object>> expression, IReadOnlyCollection<FieldType> inValues)
         {
             QueryBuilder.CheckExpression(expression, "In");
             var isSingle = QueryBuilder.IsSingle();
@@ -2204,7 +2204,7 @@ namespace ThingsGateway.SqlSugar
             return this;
         }
 
-        public ISugarQueryable<T, T2, T3, T4> In<FieldType>(Expression<Func<T, T2, T3, T4, object>> expression, IReadOnlyList<FieldType> inValues)
+        public ISugarQueryable<T, T2, T3, T4> In<FieldType>(Expression<Func<T, T2, T3, T4, object>> expression, IReadOnlyCollection<FieldType> inValues)
         {
             QueryBuilder.CheckExpression(expression, "In");
             var isSingle = QueryBuilder.IsSingle();
@@ -2983,7 +2983,7 @@ namespace ThingsGateway.SqlSugar
 
         #region In
 
-        public new ISugarQueryable<T, T2, T3, T4, T5> In<FieldType>(Expression<Func<T, object>> expression, IReadOnlyList<FieldType> inValues)
+        public new ISugarQueryable<T, T2, T3, T4, T5> In<FieldType>(Expression<Func<T, object>> expression, IReadOnlyCollection<FieldType> inValues)
         {
             var isSingle = QueryBuilder.IsSingle();
             var lamResult = QueryBuilder.GetExpressionValue(expression, isSingle ? ResolveExpressType.FieldSingle : ResolveExpressType.FieldMultiple);

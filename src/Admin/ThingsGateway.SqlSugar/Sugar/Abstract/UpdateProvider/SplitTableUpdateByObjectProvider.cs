@@ -6,7 +6,7 @@ namespace ThingsGateway.SqlSugar
     {
         public SqlSugarProvider Context;
         public UpdateableProvider<T> updateobj;
-        public IReadOnlyList<T> UpdateObjects { get; set; }
+        public IReadOnlyCollection<T> UpdateObjects { get; set; }
 
         public IEnumerable<SplitTableInfo> Tables { get; set; }
         internal List<string> WhereColumns { get; set; }

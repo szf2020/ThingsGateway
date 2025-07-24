@@ -289,7 +289,7 @@ namespace ThingsGateway.SqlSugar
             }
         }
 
-        private void DataChangesAop(IReadOnlyList<T> items)
+        private void DataChangesAop(IReadOnlyCollection<T> items)
         {
             if (typeof(T).FullName.StartsWith("System.Collections.Generic.Dictionary`"))
             {
@@ -653,7 +653,7 @@ namespace ThingsGateway.SqlSugar
                 var dbInfo = this.Context.Queryable<T>().Where(conModels).First();
                 if (dbInfo != null)
                 {
-                    var currentVersion = this.EntityInfo.Type.GetProperty(versionColumn.PropertyName).GetValue(UpdateObjs[^1], null);
+                    var currentVersion = this.EntityInfo.Type.GetProperty(versionColumn.PropertyName).GetValue(UpdateObjs.Last(), null);
                     var dbVersion = this.EntityInfo.Type.GetProperty(versionColumn.PropertyName).GetValue(dbInfo, null);
                     Check.Exception(currentVersion == null, "UpdateVersionValidation entity property {0} is not null", versionColumn.PropertyName);
                     Check.Exception(dbVersion == null, "UpdateVersionValidation database column {0} is not null", versionColumn.DbColumnName);

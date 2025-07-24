@@ -61,42 +61,46 @@ internal sealed class SysRoleService : BaseService<SysRole>, ISysRoleService
 
         var topOrgList = sysOrgList.Where(it => it.ParentId == 0);//获取顶级机构
         var globalRole = sysRoles.Where(it => it.Category == RoleCategoryEnum.Global);//获取全局角色
-        if (globalRole.Any())
+        var children = globalRole.Select(it => new RoleTreeOutput
         {
-            result.Add(new RoleTreeOutput()
-            {
-                Id = CommonUtils.GetSingleId(),
-                Name = Localizer["Global"],
-                Children = globalRole.Select(it => new RoleTreeOutput
-                {
-                    Id = it.Id,
-                    Name = it.Name,
-                    IsRole = true
-                }).ToList()
-            });//添加全局角色
-        }
+            Id = it.Id,
+            Name = it.Name,
+            IsRole = true
+        }).ToList();
+
+        result.Add(new RoleTreeOutput()
+        {
+            Id = CommonUtils.GetSingleId(),
+            Name = Localizer["Global"],
+            Children = children
+        });//添加全局角色
         //遍历顶级机构
         foreach (var org in topOrgList)
         {
             var childIds = await _sysOrgService.GetOrgChildIdsAsync(org.Id, true, sysOrgList).ConfigureAwait(false);//获取机构下的所有子级ID
             var childRoles = sysRoles.Where(it => it.OrgId != 0 && childIds.Contains(it.OrgId));//获取机构下的所有角色
-            if (childRoles.Any())
+
+            List<RoleTreeOutput> childrenRoleTreeOutputs = new();
+
+            foreach (var it in childRoles)
+            {
+                childrenRoleTreeOutputs.Add(new RoleTreeOutput()
+                {
+                    Id = it.Id,
+                    Name = it.Name,
+                    IsRole = true
+                });
+            }
+            if (childrenRoleTreeOutputs.Count > 0)
+
             {
                 var roleTreeOutput = new RoleTreeOutput
                 {
                     Id = org.Id,
                     Name = org.Name,
-                    IsRole = false
+                    IsRole = false,
+                    Children = childrenRoleTreeOutputs
                 };//实例化角色树
-                foreach (var it in childRoles)
-                {
-                    roleTreeOutput.Children.Add(new RoleTreeOutput()
-                    {
-                        Id = it.Id,
-                        Name = it.Name,
-                        IsRole = true
-                    });
-                }
                 result.Add(roleTreeOutput);
             }
         }
@@ -147,7 +151,7 @@ internal sealed class SysRoleService : BaseService<SysRole>, ISysRoleService
     /// </summary>
     /// <param name="input">角色id列表</param>
     /// <returns>角色列表</returns>
-    public async Task<IEnumerable<SysRole>> GetRoleListByIdListAsync(IEnumerable<long> input)
+    public async Task<IEnumerable<SysRole>> GetRoleListByIdListAsync(HashSet<long> input)
     {
         var roles = await GetAllAsync().ConfigureAwait(false);
         var roleList = roles.Where(it => input.Contains(it.Id));
@@ -162,7 +166,7 @@ internal sealed class SysRoleService : BaseService<SysRole>, ISysRoleService
     /// </summary>
     /// <param name="ids">id列表</param>
     [OperDesc("DeleteRole")]
-    public async Task<bool> DeleteRoleAsync(IEnumerable<long> ids)
+    public async Task<bool> DeleteRoleAsync(HashSet<long> ids)
     {
         var sysRoles = await GetAllAsync().ConfigureAwait(false);//获取所有角色
         var hasSuperAdmin = sysRoles.Any(it => it.Id == RoleConst.SuperAdminRoleId && ids.Contains(it.Id));//判断是否有超级管理员
@@ -170,10 +174,10 @@ internal sealed class SysRoleService : BaseService<SysRole>, ISysRoleService
             throw Oops.Bah(Localizer["CanotDeleteAdmin"]);
 
         var dels = (await GetAllAsync().ConfigureAwait(false)).Where(a => ids.Contains(a.Id));
-        await SysUserService.CheckApiDataScopeAsync(dels.Select(a => a.OrgId).ToList(), dels.Select(a => a.CreateUserId).ToList()).ConfigureAwait(false);
+        await SysUserService.CheckApiDataScopeAsync(dels.Select(a => a.OrgId), dels.Select(a => a.CreateUserId)).ConfigureAwait(false);
 
         //数据库是string所以这里转下
-        var targetIds = ids.Select(it => it.ToString());
+        var targetIds = ids.Select(it => it.ToString()).ToList();
         //定义删除的关系
         var delRelations = new List<RelationCategoryEnum> {
             RelationCategoryEnum.RoleHasResource,
@@ -184,7 +188,7 @@ internal sealed class SysRoleService : BaseService<SysRole>, ISysRoleService
         //事务
         var result = await db.UseTranAsync(async () =>
         {
-            await db.Deleteable<SysRole>().In(ids.ToList()).ExecuteCommandHasChangeAsync().ConfigureAwait(false);//删除
+            await db.Deleteable<SysRole>().In(ids).ExecuteCommandHasChangeAsync().ConfigureAwait(false);//删除
             //删除关系表角色与资源关系，角色与权限关系
             await db.Deleteable<SysRelation>(it => ids.Contains(it.ObjectId) && delRelations.Contains(it.Category)).ExecuteCommandAsync().ConfigureAwait(false);
             //删除关系表角色与用户关系
@@ -317,7 +321,7 @@ internal sealed class SysRoleService : BaseService<SysRole>, ISysRoleService
             #region 角色权限处理.
             var defaultDataScope = sysRole.DefaultDataScope;//获取默认数据范围
 
-            if (menusList.Any())
+            if (relationRoles.Count != 0)
             {
                 //获取权限授权树
                 var permissions = App.GetService<IApiPermissionService>().PermissionTreeSelector(menusList.Select(it => it.Href));

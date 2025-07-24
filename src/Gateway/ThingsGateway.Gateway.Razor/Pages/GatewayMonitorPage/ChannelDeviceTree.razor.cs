@@ -1263,7 +1263,7 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
         {
             var items = channels.WhereIF(!searchText.IsNullOrEmpty(), a => a.Name.Contains(searchText));
             var devices = await GlobalData.GetCurrentUserDevices().ConfigureAwait(false);
-            var deviceItems = devices.WhereIF(!searchText.IsNullOrEmpty(), a => a.Name.Contains(searchText));
+            var deviceItems = devices.WhereIF(!searchText.IsNullOrEmpty(), a => a.Name.Contains(searchText)).ToArray();
 
             Dictionary<ChannelRuntime, List<DeviceRuntime>> collectChannelDevices = new();
             Dictionary<ChannelRuntime, List<DeviceRuntime>> businessChannelDevices = new();

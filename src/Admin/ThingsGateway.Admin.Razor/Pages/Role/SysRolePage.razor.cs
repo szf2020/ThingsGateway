@@ -50,7 +50,7 @@ public partial class SysRolePage
     {
         try
         {
-            return await SysRoleService.DeleteRoleAsync(sysRoles.Select(a => a.Id));
+            return await SysRoleService.DeleteRoleAsync(sysRoles.Select(a => a.Id).ToHashSet());
         }
         catch (Exception ex)
         {

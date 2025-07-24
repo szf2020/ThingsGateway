@@ -9,7 +9,7 @@
         /// <summary>
         /// 要删除的数据列表
         /// </summary>
-        public IReadOnlyList<T> DataList { get; set; }
+        public IReadOnlyCollection<T> DataList { get; set; }
         /// <summary>
         /// SqlSugar客户端实例
         /// </summary>
@@ -41,7 +41,7 @@
         /// <returns>受影响的行数</returns>
         public int ExecuteCommand()
         {
-            if (DataList.Count == 1 && DataList[0] == null)
+            if (DataList.Count == 1 && DataList.First() == null)
             {
                 return 0;
             }
@@ -77,7 +77,7 @@
         /// <returns>受影响的行数</returns>
         public async Task<int> ExecuteCommandAsync()
         {
-            if (DataList.Count == 1 && DataList[0] == null)
+            if (DataList.Count == 1 && DataList.First() == null)
             {
                 return 0;
             }

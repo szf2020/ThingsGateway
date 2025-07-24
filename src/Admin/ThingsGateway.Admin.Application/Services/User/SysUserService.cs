@@ -587,7 +587,7 @@ internal sealed class SysUserService : BaseService<SysUser>, ISysUserService
             #region 用户权限处理.
 
             //获取菜单信息
-            if (menusList.Any())
+            if (relationUsers.Count != 0)
             {
                 //获取权限授权树
                 var permissions = App.GetService<IApiPermissionService>().PermissionTreeSelector(menusList.Select(it => it.Href));
@@ -642,7 +642,7 @@ internal sealed class SysUserService : BaseService<SysUser>, ISysUserService
 
     /// <inheritdoc/>
     [OperDesc("DeleteUser")]
-    public async Task<bool> DeleteUserAsync(IEnumerable<long> ids)
+    public async Task<bool> DeleteUserAsync(HashSet<long> ids)
     {
         using var db = GetDB();
         var containsSuperAdmin = await db.Queryable<SysUser>().Where(it => it.Id == RoleConst.SuperAdminId && ids.Contains(it.Id)).AnyAsync().ConfigureAwait(false);//判断是否有超管
@@ -672,7 +672,7 @@ internal sealed class SysUserService : BaseService<SysUser>, ISysUserService
             .ExecuteCommandAsync().ConfigureAwait(false);
 
             //删除用户
-            await db.Deleteable<SysUser>().In(ids.ToList()).ExecuteCommandHasChangeAsync().ConfigureAwait(false);//删除
+            await db.Deleteable<SysUser>().In(ids).ExecuteCommandHasChangeAsync().ConfigureAwait(false);//删除
 
             //删除关系表用户与资源关系，用户与权限关系,用户与角色关系
             await db.Deleteable<SysRelation>(it => ids.Contains(it.ObjectId) && delRelations.Contains(it.Category)).ExecuteCommandAsync().ConfigureAwait(false);
@@ -718,16 +718,16 @@ internal sealed class SysUserService : BaseService<SysUser>, ISysUserService
     public void DeleteUserFromCache(IEnumerable<long> ids)
     {
         var userIds = ids.Select(it => it.ToString()).ToArray();//id转string列表
-        var sysUsers = App.CacheService.HashGet<SysUser>(CacheConst.Cache_SysUser, userIds).Where(it => it != null);//获取用户列表
-        if (sysUsers.Any() == true)
+        var sysUsers = App.CacheService.HashGet<SysUser>(CacheConst.Cache_SysUser, userIds);//获取用户列表
+        if (sysUsers.Count != 0)
         {
             var accounts = sysUsers.Where(it => it != null).Select(it => it.Account).ToArray();//账号集合
-            var phones = sysUsers.Select(it => it.Phone);//手机号集合
+            var phones = sysUsers.Select(it => it?.Phone);//手机号集合
 
-            if (sysUsers.Any(it => it.TenantId != null))//如果有租户id不是空的表示是多租户模式
+            if (sysUsers.Any(it => it?.TenantId != null))//如果有租户id不是空的表示是多租户模式
             {
                 var userAccountKey = CacheConst.Cache_SysUserAccount;
-                var tenantIds = sysUsers.Where(it => it.TenantId != null).Select(it => it.TenantId.Value).Distinct().ToArray();//租户id列表
+                var tenantIds = sysUsers.Where(it => it?.TenantId != null).Select(it => it.TenantId.Value).Distinct().ToArray();//租户id列表
                 foreach (var tenantId in tenantIds)
                 {
                     userAccountKey = $"{userAccountKey}:{tenantId}";

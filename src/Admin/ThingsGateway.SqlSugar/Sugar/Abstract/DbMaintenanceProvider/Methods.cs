@@ -66,7 +66,7 @@ namespace ThingsGateway.SqlSugar
             db.Aop.OnExecutingChangeSql = (sql, pars) =>
             {
                 sql = getChangeSqlFunc(this.Context.CurrentConnectionConfig.DbType, sql);
-                return new KeyValuePair<string, IReadOnlyList<SugarParameter>>(sql, pars);
+                return new KeyValuePair<string, IReadOnlyCollection<SugarParameter>>(sql, pars);
             };
             var result = db.DbMaintenance.GetTableInfoList(false);
             return result;
@@ -100,7 +100,7 @@ namespace ThingsGateway.SqlSugar
             db.Aop.OnExecutingChangeSql = (sql, pars) =>
             {
                 sql = getChangeSqlFunc(this.Context.CurrentConnectionConfig.DbType, sql);
-                return new KeyValuePair<string, IReadOnlyList<SugarParameter>>(sql, pars);
+                return new KeyValuePair<string, IReadOnlyCollection<SugarParameter>>(sql, pars);
             };
             var result = db.DbMaintenance.GetColumnInfosByTableName(tableName, false);
             return result;
@@ -401,7 +401,7 @@ namespace ThingsGateway.SqlSugar
         /// <summary>
         /// 添加复合主键
         /// </summary>
-        public bool AddPrimaryKeys(string tableName, IReadOnlyList<string> columnNames)
+        public bool AddPrimaryKeys(string tableName, IReadOnlyCollection<string> columnNames)
         {
             tableName = this.SqlBuilder.GetTranslationTableName(tableName);
             var columnName = string.Join(",", columnNames);
@@ -418,7 +418,7 @@ namespace ThingsGateway.SqlSugar
         /// <summary>
         /// 添加复合主键(指定主键名)
         /// </summary>
-        public bool AddPrimaryKeys(string tableName, IReadOnlyList<string> columnNames, string pkName)
+        public bool AddPrimaryKeys(string tableName, IReadOnlyCollection<string> columnNames, string pkName)
         {
             tableName = this.SqlBuilder.GetTranslationTableName(tableName);
             var columnName = string.Join(",", columnNames);
@@ -469,7 +469,7 @@ namespace ThingsGateway.SqlSugar
                         var sqlobj = this.Context.UpdateableT(dt)
                         .AS(tableName)
                         .Where($"{this.SqlBuilder.GetTranslationColumnName(columnInfo.DbColumnName)} is null ").ToSql();
-                        sqlobj.Value[0].IsJson = true;
+                        sqlobj.Value.First().IsJson = true;
                         this.Context.Ado.ExecuteCommand(sqlobj.Key, sqlobj.Value);
                     }
                 }
@@ -480,7 +480,7 @@ namespace ThingsGateway.SqlSugar
                         var sqlobj = this.Context.UpdateableT(dt)
                         .AS(tableName)
                         .Where($"{this.SqlBuilder.GetTranslationColumnName(columnInfo.DbColumnName)} is null ").ToSql();
-                        sqlobj.Value[0].IsJson = true;
+                        sqlobj.Value.First().IsJson = true;
                         this.Context.Ado.ExecuteCommand(sqlobj.Key, sqlobj.Value);
                     }
                 }
@@ -838,7 +838,7 @@ namespace ThingsGateway.SqlSugar
         /// <summary>
         /// 创建索引
         /// </summary>
-        public virtual bool CreateIndex(string tableName, IReadOnlyList<string> columnNames, bool isUnique = false)
+        public virtual bool CreateIndex(string tableName, IReadOnlyCollection<string> columnNames, bool isUnique = false)
         {
             string sql = string.Format(CreateIndexSql, this.SqlBuilder.GetTranslationTableName(tableName), string.Join(",", columnNames.Select(it => this.SqlBuilder.GetTranslationColumnName(it))), string.Join("_", columnNames) + this.Context.CurrentConnectionConfig.IndexSuffix, isUnique ? "UNIQUE" : "");
             sql = sql.Replace("_" + this.SqlBuilder.SqlTranslationLeft, "_");
@@ -851,7 +851,7 @@ namespace ThingsGateway.SqlSugar
         /// <summary>
         /// 创建唯一索引
         /// </summary>
-        public virtual bool CreateUniqueIndex(string tableName, IReadOnlyList<string> columnNames)
+        public virtual bool CreateUniqueIndex(string tableName, IReadOnlyCollection<string> columnNames)
         {
             string sql = string.Format(CreateIndexSql, this.SqlBuilder.GetTranslationTableName(tableName), string.Join(",", columnNames.Select(it => this.SqlBuilder.GetTranslationColumnName(it))), string.Join("_", columnNames) + this.Context.CurrentConnectionConfig.IndexSuffix + "_Unique", "UNIQUE");
             sql = sql.Replace("_" + this.SqlBuilder.SqlTranslationLeft, "_");
@@ -864,7 +864,7 @@ namespace ThingsGateway.SqlSugar
         /// <summary>
         /// 创建索引(指定索引名)
         /// </summary>
-        public virtual bool CreateIndex(string tableName, IReadOnlyList<string> columnNames, string IndexName, bool isUnique = false)
+        public virtual bool CreateIndex(string tableName, IReadOnlyCollection<string> columnNames, string IndexName, bool isUnique = false)
         {
             var include = "";
             if (IndexName.Contains("{include:", StringComparison.CurrentCultureIgnoreCase))
@@ -944,8 +944,8 @@ namespace ThingsGateway.SqlSugar
         public virtual void AddIndex(EntityInfo entityInfo)
         {
             var db = this.Context;
-            var columns = entityInfo.Columns.Where(it => it.IsIgnore == false);
-            var indexColumns = columns.Where(it => it.IndexGroupNameList.HasValue());
+            var columns = entityInfo.Columns.Where(it => it.IsIgnore == false).ToArray();
+            var indexColumns = columns.Where(it => it.IndexGroupNameList.HasValue()).ToArray();
             if (indexColumns.HasValue())
             {
                 var groups = indexColumns.SelectMany(it => it.IndexGroupNameList).GroupBy(it => it).Select(it => it.Key);
@@ -960,7 +960,7 @@ namespace ThingsGateway.SqlSugar
                 }
             }
 
-            var uIndexColumns = columns.Where(it => it.UIndexGroupNameList.HasValue());
+            var uIndexColumns = columns.Where(it => it.UIndexGroupNameList.HasValue()).ToArray();
             if (uIndexColumns.HasValue())
             {
                 var groups = uIndexColumns.SelectMany(it => it.UIndexGroupNameList).GroupBy(it => it).Select(it => it.Key);

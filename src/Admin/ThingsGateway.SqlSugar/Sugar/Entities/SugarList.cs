@@ -47,7 +47,7 @@
 
     public class QueueList : List<QueueItem>
     {
-        public void Add(string sql, IReadOnlyList<SugarParameter> parameters)
+        public void Add(string sql, IReadOnlyCollection<SugarParameter> parameters)
         {
             this.Add(new QueueItem() { Sql = sql, Parameters = parameters });
         }

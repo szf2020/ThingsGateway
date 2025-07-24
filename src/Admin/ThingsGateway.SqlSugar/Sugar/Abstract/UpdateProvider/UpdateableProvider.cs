@@ -12,7 +12,7 @@ namespace ThingsGateway.SqlSugar
         public ISqlBuilder SqlBuilder { get; internal set; }
         public UpdateBuilder UpdateBuilder { get; set; }
         public IAdo Ado { get { return Context.Ado; } }
-        public IReadOnlyList<T> UpdateObjs { get; set; }
+        public IReadOnlyCollection<T> UpdateObjs { get; set; }
         /// <summary>
         /// true : by expression  update
         /// false: by object update
@@ -46,12 +46,12 @@ namespace ThingsGateway.SqlSugar
             return result;
         }
 
-        public KeyValuePair<string, IReadOnlyList<SugarParameter>> ToSql()
+        public KeyValuePair<string, IReadOnlyCollection<SugarParameter>> ToSql()
         {
             PreToSql();
             string sql = UpdateBuilder.ToSqlString();
             RestoreMapping();
-            return new KeyValuePair<string, IReadOnlyList<SugarParameter>>(sql, UpdateBuilder.Parameters);
+            return new KeyValuePair<string, IReadOnlyCollection<SugarParameter>>(sql, UpdateBuilder.Parameters);
         }
         public void AddQueue()
         {
@@ -72,7 +72,7 @@ namespace ThingsGateway.SqlSugar
         public virtual int ExecuteCommandWithOptLock(bool IsVersionValidation = false)
         {
             Check.ExceptionEasy(UpdateObjs?.Count > 1, " OptLock can only be used on a single object, and the argument cannot be List", "乐观锁只能用于单个对象,参数不能是List,如果是一对多操作请更新主表统一用主表验证");
-            var updateData = UpdateObjs[0];
+            var updateData = UpdateObjs.First();
             if (updateData == null) return 0;
             object oldValue = null;
             var name = _ExecuteCommandWithOptLock(updateData, ref oldValue);
@@ -136,7 +136,7 @@ namespace ThingsGateway.SqlSugar
             var rows = this.ExecuteCommand();
             if (rows > 0 && !this.UpdateParameterIsNull)
             {
-                return this.UpdateObjs[0];
+                return this.UpdateObjs.First();
             }
             else if (rows > 0 && this.UpdateParameterIsNull)
             {
@@ -160,7 +160,7 @@ namespace ThingsGateway.SqlSugar
         public virtual async Task<int> ExecuteCommandWithOptLockAsync(bool IsVersionValidation = false)
         {
             Check.ExceptionEasy(UpdateObjs?.Count > 1, " OptLock can only be used on a single object, and the argument cannot be List", "乐观锁只能用于单个对象,参数不能是List,如果是一对多操作请更新主表统一用主表验证");
-            var updateData = UpdateObjs[0];
+            var updateData = UpdateObjs.First();
             if (updateData == null) return 0;
             object oldValue = null;
             var name = _ExecuteCommandWithOptLock(updateData, ref oldValue);
@@ -178,7 +178,7 @@ namespace ThingsGateway.SqlSugar
             var rows = await ExecuteCommandAsync().ConfigureAwait(false);
             if (rows > 0 && !this.UpdateParameterIsNull)
             {
-                return this.UpdateObjs[0];
+                return this.UpdateObjs.First();
             }
             else if (rows > 0 && this.UpdateParameterIsNull)
             {
@@ -456,7 +456,7 @@ namespace ThingsGateway.SqlSugar
                 return this;
             }
         }
-        public IUpdateable<T> IgnoreColumns(IReadOnlyList<string> columns)
+        public IUpdateable<T> IgnoreColumns(IReadOnlyCollection<string> columns)
         {
             if (columns.HasValue())
             {
@@ -597,7 +597,7 @@ namespace ThingsGateway.SqlSugar
             return this;
         }
 
-        public IUpdateable<T> WhereColumns(IReadOnlyList<string> columnNames)
+        public IUpdateable<T> WhereColumns(IReadOnlyCollection<string> columnNames)
         {
             if (columnNames == null) return this;
 
@@ -637,14 +637,14 @@ namespace ThingsGateway.SqlSugar
             //this.UpdateBuilder.DbColumnInfoList = this.UpdateBuilder.DbColumnInfoList.Where(it => updateColumns.Any(uc => uc.Equals(it.PropertyName, StringComparison.CurrentCultureIgnoreCase) || uc.Equals(it.DbColumnName, StringComparison.CurrentCultureIgnoreCase)) || it.IsPrimarykey || it.IsIdentity).ToList();
             return this;
         }
-        public IUpdateable<T> UpdateColumns(IReadOnlyList<string> columns, bool appendColumnsByDataFilter)
+        public IUpdateable<T> UpdateColumns(IReadOnlyCollection<string> columns, bool appendColumnsByDataFilter)
         {
             List<string> updateColumns = new List<string>();
             if (appendColumnsByDataFilter)
             {
                 var newData = new T();
                 UtilMethods.ClearPublicProperties(newData, this.EntityInfo);
-                var data = ((UpdateableProvider<T>)this.Context.UpdateableT(newData)).UpdateObjs[0];
+                var data = ((UpdateableProvider<T>)this.Context.UpdateableT(newData)).UpdateObjs.First();
                 foreach (var item in this.EntityInfo.Columns.Where(it => !it.IsPrimarykey && !it.IsIgnore && !it.IsOnlyIgnoreUpdate))
                 {
                     var value = item.PropertyInfo.GetValue(data);
@@ -660,7 +660,7 @@ namespace ThingsGateway.SqlSugar
             updateColumns.AddRange(columns);
             return UpdateColumns(updateColumns);
         }
-        public IUpdateable<T> UpdateColumns(IReadOnlyList<string> columns)
+        public IUpdateable<T> UpdateColumns(IReadOnlyCollection<string> columns)
         {
             if (columns == null || columns.Count == 0) return this;
             ThrowUpdateByExpression();
@@ -863,7 +863,7 @@ namespace ThingsGateway.SqlSugar
             {
                 var newData = new T();
                 UtilMethods.ClearPublicProperties(newData, this.EntityInfo);
-                var data = ((UpdateableProvider<T>)this.Context.UpdateableT(newData)).UpdateObjs[0];
+                var data = ((UpdateableProvider<T>)this.Context.UpdateableT(newData)).UpdateObjs.First();
                 foreach (var item in this.EntityInfo.Columns.Where(it => !it.IsPrimarykey && !it.IsIgnore && !it.IsOnlyIgnoreUpdate))
                 {
                     var value = item.PropertyInfo.GetValue(data);

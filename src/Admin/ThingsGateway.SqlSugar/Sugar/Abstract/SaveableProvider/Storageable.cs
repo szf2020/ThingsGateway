@@ -223,12 +223,12 @@ namespace ThingsGateway.SqlSugar
                     OtherList = new List<StorageableMessage<T>>(),
                     TotalList = new List<StorageableMessage<T>>()
                 };
-            var pkInfos = this.Context.EntityMaintenance.GetEntityInfo<T>().Columns.Where(it => it.IsPrimarykey);
-            if (whereExpression == null && !pkInfos.Any())
+            var pkInfos = this.Context.EntityMaintenance.GetEntityInfo<T>().Columns.Where(it => it.IsPrimarykey).ToArray();
+            if (whereExpression == null && pkInfos.Length == 0)
             {
                 Check.ExceptionEasy(true, "Need primary key or WhereColumn", "使用Storageable实体需要主键或者使用WhereColumn指定条件列");
             }
-            if (whereExpression == null && pkInfos.Any())
+            if (whereExpression == null && pkInfos.Length != 0)
             {
                 this.Context.Utilities.PageEach(allDatas, 300, item =>
                 {
@@ -312,12 +312,12 @@ namespace ThingsGateway.SqlSugar
                     OtherList = new List<StorageableMessage<T>>(),
                     TotalList = new List<StorageableMessage<T>>()
                 };
-            var pkInfos = this.Context.EntityMaintenance.GetEntityInfo<T>().Columns.Where(it => it.IsPrimarykey);
-            if (whereExpression == null && !pkInfos.Any())
+            var pkInfos = this.Context.EntityMaintenance.GetEntityInfo<T>().Columns.Where(it => it.IsPrimarykey).ToArray();
+            if (whereExpression == null && pkInfos.Length == 0)
             {
                 Check.ExceptionEasy(true, "Need primary key or WhereColumn", "使用Storageable实体需要主键或者使用WhereColumn指定条件列");
             }
-            if (whereExpression == null && pkInfos.Any())
+            if (whereExpression == null && pkInfos.Length != 0)
             {
                 this.Context.Utilities.PageEach(allDatas, 300, item =>
                 {
@@ -394,12 +394,12 @@ namespace ThingsGateway.SqlSugar
                     OtherList = new List<StorageableMessage<T>>(),
                     TotalList = new List<StorageableMessage<T>>()
                 };
-            var pkInfos = this.Context.EntityMaintenance.GetEntityInfo<T>().Columns.Where(it => it.IsPrimarykey);
-            if (whereExpression == null && !pkInfos.Any())
+            var pkInfos = this.Context.EntityMaintenance.GetEntityInfo<T>().Columns.Where(it => it.IsPrimarykey).ToArray();
+            if (whereExpression == null && pkInfos.Length == 0)
             {
                 Check.Exception(true, "Need primary key or WhereColumn");
             }
-            if (whereExpression == null && pkInfos.Any())
+            if (whereExpression == null && pkInfos.Length != 0)
             {
                 await Context.Utilities.PageEachAsync(allDatas, 300, async item =>
                 {
@@ -485,7 +485,7 @@ namespace ThingsGateway.SqlSugar
             else
             {
                 var list = GetExpressionValue(columns, ResolveExpressType.ArraySingle).GetResultArray().Select(it => Builder.GetNoTranslationColumnName(it));
-                var dbColumns = this.Context.EntityMaintenance.GetEntityInfo<T>().Columns.Where(it => it.IsIgnore == false);
+                var dbColumns = this.Context.EntityMaintenance.GetEntityInfo<T>().Columns.Where(it => it.IsIgnore == false).ToArray();
                 var whereColumns = dbColumns.Where(it => list.Any(y =>
                                       it.DbColumnName.Equals(y, StringComparison.CurrentCultureIgnoreCase) ||
                                       it.PropertyName.Equals(y, StringComparison.CurrentCultureIgnoreCase))

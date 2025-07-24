@@ -228,21 +228,21 @@ namespace ThingsGateway.SqlSugar
             }
             if (entityInfo.Columns.Any(it => it.EntityName == entityInfo.EntityName))
             {
-                var mappingColumnInfos = this.MappingColumns.Where(it => it.EntityName == entityInfo.EntityName);
+                var mappingColumnInfos = this.MappingColumns.Where(it => it.EntityName == entityInfo.EntityName).ToArray();
                 foreach (var item in entityInfo.Columns.Where(it => it.IsIgnore == false))
                 {
                     if (!mappingColumnInfos.Any(it => it.PropertyName == item.PropertyName))
                         if (item.PropertyName != item.DbColumnName && item.DbColumnName.HasValue())
                             this.MappingColumns.Add(item.PropertyName, item.DbColumnName, item.EntityName);
                 }
-                var ignoreInfos = this.IgnoreColumns.Where(it => it.EntityName == entityInfo.EntityName);
+                var ignoreInfos = this.IgnoreColumns.Where(it => it.EntityName == entityInfo.EntityName).ToArray();
                 foreach (var item in entityInfo.Columns.Where(it => it.IsIgnore))
                 {
                     if (!ignoreInfos.Any(it => it.PropertyName == item.PropertyName))
                         this.IgnoreColumns.Add(item.PropertyName, item.EntityName);
                 }
 
-                var ignoreInsertInfos = this.IgnoreInsertColumns.Where(it => it.EntityName == entityInfo.EntityName);
+                var ignoreInsertInfos = this.IgnoreInsertColumns.Where(it => it.EntityName == entityInfo.EntityName).ToArray();
                 foreach (var item in entityInfo.Columns.Where(it => it.IsOnlyIgnoreInsert))
                 {
                     if (!ignoreInsertInfos.Any(it => it.PropertyName == item.PropertyName))
@@ -277,7 +277,7 @@ namespace ThingsGateway.SqlSugar
             }
             return result;
         }
-        protected InsertableProvider<T> CreateInsertable<T>(IReadOnlyList<T> insertObjs) where T : class, new()
+        protected InsertableProvider<T> CreateInsertable<T>(IReadOnlyCollection<T> insertObjs) where T : class, new()
         {
             this.SugarActionType = SugarActionType.Insert;
             var result = InstanceFactory.GetInsertableProvider<T>(this.CurrentConnectionConfig);
@@ -314,7 +314,7 @@ namespace ThingsGateway.SqlSugar
             }
             return result;
         }
-        protected UpdateableProvider<T> CreateUpdateable<T>(IReadOnlyList<T> UpdateObjs) where T : class, new()
+        protected UpdateableProvider<T> CreateUpdateable<T>(IReadOnlyCollection<T> UpdateObjs) where T : class, new()
         {
             this.SugarActionType = SugarActionType.Update;
             var result = InstanceFactory.GetUpdateableProvider<T>(this.CurrentConnectionConfig);
@@ -380,7 +380,7 @@ namespace ThingsGateway.SqlSugar
             var key = "Queryable_To_Context";
             result.context.TempItems.Add(key, result);
             result.list = list.ToList();
-            foreach (var item in list)
+            foreach (var item in result.list)
             {
                 action.Invoke(item);
             }
@@ -397,7 +397,7 @@ namespace ThingsGateway.SqlSugar
             var key = "Queryable_To_Context";
             result.context.TempItems.Add(key, result);
             result.list = list.ToList();
-            foreach (var item in list)
+            foreach (var item in result.list)
             {
                 await action.Invoke(item).ConfigureAwait(false);
             }
@@ -626,7 +626,7 @@ namespace ThingsGateway.SqlSugar
             return result;
         }
 
-        private string[] MergeJoinArray(IReadOnlyList<string> joinArray)
+        private string[] MergeJoinArray(IReadOnlyCollection<string> joinArray)
         {
             List<string> result = new List<string>();
             string joinValue = null;

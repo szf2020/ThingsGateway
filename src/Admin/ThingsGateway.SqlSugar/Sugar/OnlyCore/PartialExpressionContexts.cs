@@ -16,10 +16,10 @@
     {
         internal SqlSugarProvider Context { get; set; }
         internal ISqlBuilder Builder { get; set; }
-        internal IReadOnlyList<T> Entitys { get; set; }
+        internal IReadOnlyCollection<T> Entitys { get; set; }
         internal string Chara { get; set; }
 
-        public MySqlBlukCopy(SqlSugarProvider context, ISqlBuilder builder, IReadOnlyList<T> entitys)
+        public MySqlBlukCopy(SqlSugarProvider context, ISqlBuilder builder, IReadOnlyCollection<T> entitys)
         {
             this.Context = context;
             this.Builder = builder;

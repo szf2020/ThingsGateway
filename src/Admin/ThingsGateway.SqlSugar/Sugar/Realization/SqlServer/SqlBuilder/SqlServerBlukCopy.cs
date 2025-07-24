@@ -10,13 +10,13 @@ namespace ThingsGateway.SqlSugar
         internal SqlSugarProvider Context { get; set; }
         internal ISqlBuilder Builder { get; set; }
         internal InsertBuilder InsertBuilder { get; set; }
-        internal IReadOnlyList<object> Inserts { get; set; }
+        internal IReadOnlyCollection<object> Inserts { get; set; }
 
         public int ExecuteBulkCopy()
         {
             if (DbColumnInfoList == null || DbColumnInfoList.Count == 0) return 0;
 
-            if (Inserts[0].GetType() == typeof(DataTable))
+            if (Inserts.First().GetType() == typeof(DataTable))
             {
                 return WriteToServer();
             }
@@ -40,7 +40,7 @@ namespace ThingsGateway.SqlSugar
         {
             if (DbColumnInfoList == null || DbColumnInfoList.Count == 0) return 0;
 
-            if (Inserts[0].GetType() == typeof(DataTable))
+            if (Inserts.First().GetType() == typeof(DataTable))
             {
                 return WriteToServer();
             }
@@ -62,7 +62,7 @@ namespace ThingsGateway.SqlSugar
 
         private int WriteToServer()
         {
-            var dt = this.Inserts[0] as DataTable;
+            var dt = this.Inserts.First() as DataTable;
             if (dt == null)
                 return 0;
             Check.Exception(dt.TableName == "Table", "dt.TableName can't be null ");

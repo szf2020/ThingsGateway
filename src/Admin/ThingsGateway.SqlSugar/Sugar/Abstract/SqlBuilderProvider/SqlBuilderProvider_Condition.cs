@@ -6,9 +6,9 @@ namespace ThingsGateway.SqlSugar
     public abstract partial class SqlBuilderProvider : SqlBuilderAccessory, ISqlBuilder
     {
         #region Core
-        public virtual KeyValuePair<string, IReadOnlyList<SugarParameter>> ConditionalModelToSql(List<IConditionalModel> models, int beginIndex = 0)
+        public virtual KeyValuePair<string, IReadOnlyCollection<SugarParameter>> ConditionalModelToSql(List<IConditionalModel> models, int beginIndex = 0)
         {
-            if (models.IsNullOrEmpty()) return new KeyValuePair<string, IReadOnlyList<SugarParameter>>();
+            if (models.IsNullOrEmpty()) return new KeyValuePair<string, IReadOnlyCollection<SugarParameter>>();
             StringBuilder builder = new StringBuilder();
             List<SugarParameter> parameters = new List<SugarParameter>();
             var sqlBuilder = InstanceFactory.GetSqlbuilder(this.Context.CurrentConnectionConfig);
@@ -188,7 +188,7 @@ namespace ThingsGateway.SqlSugar
                 }
                 mainIndex++;
             }
-            return new KeyValuePair<string, IReadOnlyList<SugarParameter>>(builder.ToString(), parameters);
+            return new KeyValuePair<string, IReadOnlyCollection<SugarParameter>>(builder.ToString(), parameters);
         }
 
         #endregion

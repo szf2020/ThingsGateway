@@ -62,8 +62,8 @@ namespace ThingsGateway.SqlSugar
                         {
                             item.Value = Guid.NewGuid();
                         }
-                        if (InsertObjs[0].GetType().GetProperties().Any(it => it.Name == item.PropertyName))
-                            InsertObjs[0].GetType().GetProperties().First(it => it.Name == item.PropertyName).SetValue(InsertObjs[0], item.Value, null);
+                        if (InsertObjs.First().GetType().GetProperties().Any(it => it.Name == item.PropertyName))
+                            InsertObjs.First().GetType().GetProperties().First(it => it.Name == item.PropertyName).SetValue(InsertObjs.First(), item.Value, null);
                     }
                 }
             }
@@ -245,7 +245,7 @@ namespace ThingsGateway.SqlSugar
         /// <summary>
         /// 数据变更AOP处理
         /// </summary>
-        private void DataChangeAop(IReadOnlyList<T> items)
+        private void DataChangeAop(IReadOnlyCollection<T> items)
         {
             var dataEvent = this.Context.CurrentConnectionConfig.AopEvents?.DataChangesExecuted;
             if (dataEvent != null)
@@ -625,7 +625,7 @@ namespace ThingsGateway.SqlSugar
                 foreach (var item in this.EntityInfo.Columns.Where(it => it.IsIgnore == false && GetPrimaryKeys().Any(pk => pk.Equals(it.DbColumnName, StringComparison.CurrentCultureIgnoreCase))))
                 {
                     var fielddName = item.DbColumnName;
-                    var fieldObject = this.EntityInfo.Columns.FirstOrDefault(it => it.PropertyName == item.PropertyName).PropertyInfo.GetValue(this.InsertObjs[^1], null);
+                    var fieldObject = this.EntityInfo.Columns.FirstOrDefault(it => it.PropertyName == item.PropertyName).PropertyInfo.GetValue(this.InsertObjs.Last(), null);
                     var fieldValue = fieldObject.ObjToString();
                     if (fieldObject != null && fieldObject.GetType() != typeof(string) && this.Context.CurrentConnectionConfig.DbType == DbType.PostgreSQL)
                     {
@@ -674,7 +674,7 @@ namespace ThingsGateway.SqlSugar
                 {
                     ColumnDescription = it.ColumnDescription,
                     ColumnName = it.DbColumnName,
-                    Value = it.PropertyInfo.GetValue(this.InsertObjs[^1], null),
+                    Value = it.PropertyInfo.GetValue(this.InsertObjs.Last(), null),
                     IsPrimaryKey = it.IsPrimarykey
                 }).ToList();
                 return new List<DiffLogTableInfo>() { diffTable };

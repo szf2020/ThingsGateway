@@ -30,7 +30,7 @@ public interface ISysRoleService
     /// 删除角色
     /// </summary>
     /// <param name="ids">id列表</param>
-    Task<bool> DeleteRoleAsync(IEnumerable<long> ids);
+    Task<bool> DeleteRoleAsync(HashSet<long> ids);
 
     /// <summary>
     /// 从缓存/数据库获取全部角色信息
@@ -43,7 +43,7 @@ public interface ISysRoleService
     /// </summary>
     /// <param name="input">角色id列表</param>
     /// <returns>角色列表</returns>
-    Task<IEnumerable<SysRole>> GetRoleListByIdListAsync(IEnumerable<long> input);
+    Task<IEnumerable<SysRole>> GetRoleListByIdListAsync(HashSet<long> input);
 
     /// <summary>
     /// 根据用户id获取角色列表

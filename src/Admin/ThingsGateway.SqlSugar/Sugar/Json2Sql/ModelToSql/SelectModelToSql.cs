@@ -3,7 +3,7 @@ namespace ThingsGateway.SqlSugar
 {
     public abstract partial class SqlBuilderProvider : SqlBuilderAccessory, ISqlBuilder
     {
-        public KeyValuePair<string, IReadOnlyList<SugarParameter>> SelectModelToSql(List<SelectModel> models)
+        public KeyValuePair<string, IReadOnlyCollection<SugarParameter>> SelectModelToSql(List<SelectModel> models)
         {
             StringBuilder sql = new StringBuilder("");
             var pars = new List<SugarParameter>();
@@ -17,7 +17,7 @@ namespace ThingsGateway.SqlSugar
                     AppendFieldName(sql, orderByModel);
                 }
             }
-            return new KeyValuePair<string, IReadOnlyList<SugarParameter>>(sql.ToString().TrimEnd(','), pars);
+            return new KeyValuePair<string, IReadOnlyCollection<SugarParameter>>(sql.ToString().TrimEnd(','), pars);
         }
 
         private string GetAsName(SelectModel orderByModel)

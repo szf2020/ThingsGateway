@@ -60,273 +60,6 @@ public abstract partial class BusinessBaseWithCacheIntervalScript : BusinessBase
 
     #region 封装方法
 
-    protected IEnumerable<TopicJson> GetAlarms(IEnumerable<AlarmVariable> item)
-    {
-        var data = Application.DynamicModelExtension.GetDynamicModel<AlarmVariable>(item, _businessPropertyWithCacheIntervalScript.BigTextScriptAlarmModel);
-        var topics = Match(_businessPropertyWithCacheIntervalScript.AlarmTopic);
-        if (topics.Count > 0)
-        {
-            {
-                //获取分组最终结果
-                var groups = data.GroupByKeys(topics);
-
-                foreach (var group in groups)
-                {
-                    // 上传主题
-                    // 获取预定义的报警主题
-                    string topic = _businessPropertyWithCacheIntervalScript.AlarmTopic;
-
-                    // 将主题中的占位符替换为分组键对应的值
-                    for (int i = 0; i < topics.Count; i++)
-                    {
-                        topic = topic.Replace(@"${" + topics[i] + @"}", group.Key[i]?.ToString());
-                    }
-
-                    // 上传内容
-                    if (_businessPropertyWithCacheIntervalScript.IsAlarmList)
-                    {
-                        // 如果是报警列表，则将整个分组转换为 JSON 字符串
-                        var gList = group.Select(a => a).ToList();
-                        string json = gList.ToSystemTextJsonString(_businessPropertyWithCacheIntervalScript.JsonFormattingIndented);
-                        // 将主题和 JSON 内容添加到列表中
-                        yield return new(topic, json, gList.Count);
-                    }
-                    else
-                    {
-                        // 如果不是报警列表，则将每个分组元素分别转换为 JSON 字符串
-                        foreach (var gro in group)
-                        {
-                            string json = SystemTextJsonExtension.ToSystemTextJsonString(gro, _businessPropertyWithCacheIntervalScript.JsonFormattingIndented);
-                            // 将主题和 JSON 内容添加到列表中
-                            yield return new(topic, json, 1);
-                        }
-                    }
-                }
-            }
-        }
-        else
-        {
-            if (_businessPropertyWithCacheIntervalScript.IsAlarmList)
-            {
-                var gList = data.Select(a => a).ToList();
-                string json = gList.ToSystemTextJsonString(_businessPropertyWithCacheIntervalScript.JsonFormattingIndented);
-                yield return new(_businessPropertyWithCacheIntervalScript.AlarmTopic, json, gList.Count);
-            }
-            else
-            {
-                foreach (var group in data)
-                {
-                    string json = SystemTextJsonExtension.ToSystemTextJsonString(group, _businessPropertyWithCacheIntervalScript.JsonFormattingIndented);
-                    yield return new(_businessPropertyWithCacheIntervalScript.AlarmTopic, json, 1);
-                }
-            }
-        }
-    }
-
-    protected IEnumerable<TopicJson> GetDeviceData(IEnumerable<DeviceBasicData> item)
-    {
-        var data = Application.DynamicModelExtension.GetDynamicModel<DeviceBasicData>(item, _businessPropertyWithCacheIntervalScript.BigTextScriptDeviceModel);
-        var topics = Match(_businessPropertyWithCacheIntervalScript.DeviceTopic);
-        if (topics.Count > 0)
-        {
-            {
-                //获取分组最终结果
-                var groups = data.GroupByKeys(topics).ToList();
-                if (groups.Count > 0)
-                {
-                    foreach (var group in groups)
-                    {
-                        // 上传主题
-                        // 获取预定义的设备主题
-                        string topic = _businessPropertyWithCacheIntervalScript.DeviceTopic;
-
-                        // 将主题中的占位符替换为分组键对应的值
-                        for (int i = 0; i < topics.Count; i++)
-                        {
-                            topic = topic.Replace(@"${" + topics[i] + @"}", group.Key[i]?.ToString());
-                        }
-
-                        // 上传内容
-                        if (_businessPropertyWithCacheIntervalScript.IsDeviceList)
-                        {
-                            // 如果是设备列表，则将整个分组转换为 JSON 字符串
-                            var gList = group.Select(a => a).ToList();
-                            string json = gList.ToSystemTextJsonString(_businessPropertyWithCacheIntervalScript.JsonFormattingIndented);
-                            // 将主题和 JSON 内容添加到列表中
-                            yield return new(topic, json, gList.Count);
-                        }
-                        else
-                        {
-                            // 如果不是设备列表，则将每个分组元素分别转换为 JSON 字符串
-                            foreach (var gro in group)
-                            {
-                                string json = SystemTextJsonExtension.ToSystemTextJsonString(gro, _businessPropertyWithCacheIntervalScript.JsonFormattingIndented);
-                                // 将主题和 JSON 内容添加到列表中
-                                yield return new(topic, json, 1);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        else
-        {
-            if (_businessPropertyWithCacheIntervalScript.IsDeviceList)
-            {
-                var gList = data.Select(a => a).ToList();
-                string json = gList.ToSystemTextJsonString(_businessPropertyWithCacheIntervalScript.JsonFormattingIndented);
-                yield return new(_businessPropertyWithCacheIntervalScript.DeviceTopic, json, gList.Count);
-            }
-            else
-            {
-                foreach (var group in data)
-                {
-                    string json = SystemTextJsonExtension.ToSystemTextJsonString(group, _businessPropertyWithCacheIntervalScript.JsonFormattingIndented);
-                    yield return new(_businessPropertyWithCacheIntervalScript.DeviceTopic, json, 1);
-                }
-            }
-        }
-    }
-
-    protected IEnumerable<TopicJson> GetVariableScript(IEnumerable<VariableBasicData> item)
-    {
-        var data = Application.DynamicModelExtension.GetDynamicModel<VariableBasicData>(item, _businessPropertyWithCacheIntervalScript.BigTextScriptVariableModel);
-        var topics = Match(_businessPropertyWithCacheIntervalScript.VariableTopic);
-        if (topics.Count > 0)
-        {
-            {
-                //获取分组最终结果
-                var groups = data.GroupByKeys(topics).ToList();
-                if (groups.Count > 0)
-                {
-                    foreach (var group in groups)
-                    {
-                        // 上传主题
-                        // 获取预定义的变量主题
-                        string topic = _businessPropertyWithCacheIntervalScript.VariableTopic;
-
-                        // 将主题中的占位符替换为分组键对应的值
-                        for (int i = 0; i < topics.Count; i++)
-                        {
-                            topic = topic.Replace(@"${" + topics[i] + @"}", group.Key[i]?.ToString());
-                        }
-
-                        // 上传内容
-                        if (_businessPropertyWithCacheIntervalScript.IsVariableList)
-                        {
-                            // 如果是变量列表，则将整个分组转换为 JSON 字符串
-                            var gList = group.Select(a => a).ToList();
-                            string json = gList.ToSystemTextJsonString(_businessPropertyWithCacheIntervalScript.JsonFormattingIndented);
-                            // 将主题和 JSON 内容添加到列表中
-                            yield return new(topic, json, gList.Count);
-                        }
-                        else
-                        {
-                            // 如果不是变量列表，则将每个分组元素分别转换为 JSON 字符串
-                            foreach (var gro in group)
-                            {
-                                string json = SystemTextJsonExtension.ToSystemTextJsonString(gro, _businessPropertyWithCacheIntervalScript.JsonFormattingIndented);
-                                // 将主题和 JSON 内容添加到列表中
-                                yield return new(topic, json, 1);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        else
-        {
-            if (_businessPropertyWithCacheIntervalScript.IsVariableList)
-            {
-                var gList = data.Select(a => a).ToList();
-                string json = gList.ToSystemTextJsonString(_businessPropertyWithCacheIntervalScript.JsonFormattingIndented);
-                yield return new(_businessPropertyWithCacheIntervalScript.VariableTopic, json, gList.Count);
-            }
-            else
-            {
-                foreach (var group in data)
-                {
-                    string json = SystemTextJsonExtension.ToSystemTextJsonString(group, _businessPropertyWithCacheIntervalScript.JsonFormattingIndented);
-                    yield return new(_businessPropertyWithCacheIntervalScript.VariableTopic, json, 1);
-                }
-            }
-        }
-    }
-
-    protected IEnumerable<TopicJson> GetVariableBasicData(IEnumerable<VariableBasicData> item)
-    {
-        IEnumerable<VariableBasicData>? data = null;
-        if (!_businessPropertyWithCacheIntervalScript.BigTextScriptVariableModel.IsNullOrWhiteSpace())
-        {
-            foreach (var v in GetVariableScript(item))
-                yield return v;
-
-            yield break;  // 提前结束
-        }
-        else
-        {
-            data = item;
-        }
-        var topics = Match(_businessPropertyWithCacheIntervalScript.VariableTopic);
-        if (topics.Count > 0)
-        {
-            {
-                //获取分组最终结果
-                var groups = data.GroupByKeys(topics).ToList();
-                if (groups.Count > 0)
-                {
-                    foreach (var group in groups)
-                    {
-                        // 上传主题
-                        // 获取预定义的变量主题
-                        string topic = _businessPropertyWithCacheIntervalScript.VariableTopic;
-
-                        // 将主题中的占位符替换为分组键对应的值
-                        for (int i = 0; i < topics.Count; i++)
-                        {
-                            topic = topic.Replace(@"${" + topics[i] + @"}", group.Key[i]?.ToString());
-                        }
-
-                        // 上传内容
-                        if (_businessPropertyWithCacheIntervalScript.IsVariableList)
-                        {
-                            // 如果是变量列表，则将整个分组转换为 JSON 字符串
-                            string json = group.Select(a => a).GroupBy(a => a.DeviceName, b => b).ToDictionary(a => a.Key, b => b.ToList()).ToSystemTextJsonString(_businessPropertyWithCacheIntervalScript.JsonFormattingIndented);
-                            // 将主题和 JSON 内容添加到列表中
-                            yield return new(topic, json, group.Count());
-                        }
-                        else
-                        {
-                            // 如果不是变量列表，则将每个分组元素分别转换为 JSON 字符串
-                            foreach (var gro in group)
-                            {
-                                string json = SystemTextJsonExtension.ToSystemTextJsonString(gro, _businessPropertyWithCacheIntervalScript.JsonFormattingIndented);
-                                // 将主题和 JSON 内容添加到列表中
-                                yield return new(topic, json, 1);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        else
-        {
-            if (_businessPropertyWithCacheIntervalScript.IsVariableList)
-            {
-                string json = data.Select(a => a).GroupBy(a => a.DeviceName, b => b).ToDictionary(a => a.Key, b => b.ToList()).ToSystemTextJsonString(_businessPropertyWithCacheIntervalScript.JsonFormattingIndented);
-                yield return new(_businessPropertyWithCacheIntervalScript.VariableTopic, json, data.Count());
-            }
-            else
-            {
-                foreach (var group in data)
-                {
-                    string json = SystemTextJsonExtension.ToSystemTextJsonString(group, _businessPropertyWithCacheIntervalScript.JsonFormattingIndented);
-                    yield return new(_businessPropertyWithCacheIntervalScript.VariableTopic, json, 1);
-                }
-            }
-        }
-    }
-
     protected IEnumerable<TopicArray> GetAlarmTopicArrays(IEnumerable<AlarmVariable> item)
     {
         var data = Application.DynamicModelExtension.GetDynamicModel<AlarmVariable>(item, _businessPropertyWithCacheIntervalScript.BigTextScriptAlarmModel);
@@ -352,7 +85,7 @@ public abstract partial class BusinessBaseWithCacheIntervalScript : BusinessBase
                     // 上传内容
                     if (_businessPropertyWithCacheIntervalScript.IsAlarmList)
                     {
-                        var gList = group.Select(a => a).ToList();
+                        var gList = group.ToList();
                         var json = gList.ToSystemTextJsonUtf8Bytes(_businessPropertyWithCacheIntervalScript.JsonFormattingIndented);
                         // 将主题和 JSON 内容添加到列表中
                         yield return new(topic, json, gList.Count);
@@ -374,7 +107,7 @@ public abstract partial class BusinessBaseWithCacheIntervalScript : BusinessBase
         {
             if (_businessPropertyWithCacheIntervalScript.IsAlarmList)
             {
-                var gList = data.Select(a => a).ToList();
+                var gList = data.ToList();
                 var json = gList.ToSystemTextJsonUtf8Bytes(_businessPropertyWithCacheIntervalScript.JsonFormattingIndented);
                 yield return new(_businessPropertyWithCacheIntervalScript.AlarmTopic, json, gList.Count);
             }
@@ -439,7 +172,7 @@ public abstract partial class BusinessBaseWithCacheIntervalScript : BusinessBase
         {
             if (_businessPropertyWithCacheIntervalScript.IsDeviceList)
             {
-                var gList = data.Select(a => a).ToList();
+                var gList = data.ToList();
                 var json = gList.ToSystemTextJsonUtf8Bytes(_businessPropertyWithCacheIntervalScript.JsonFormattingIndented);
                 yield return new(_businessPropertyWithCacheIntervalScript.DeviceTopic, json, gList.Count);
             }
@@ -504,7 +237,7 @@ public abstract partial class BusinessBaseWithCacheIntervalScript : BusinessBase
         {
             if (_businessPropertyWithCacheIntervalScript.IsVariableList)
             {
-                var gList = data.Select(a => a).ToList();
+                var gList = data.ToList();
                 var json = gList.ToSystemTextJsonUtf8Bytes(_businessPropertyWithCacheIntervalScript.JsonFormattingIndented);
                 yield return new(_businessPropertyWithCacheIntervalScript.VariableTopic, json, gList.Count);
             }
@@ -581,7 +314,7 @@ public abstract partial class BusinessBaseWithCacheIntervalScript : BusinessBase
         {
             if (_businessPropertyWithCacheIntervalScript.IsVariableList)
             {
-                var gList = data.Select(a => a).ToList();
+                var gList = data.ToList();
                 var json = gList.ToSystemTextJsonUtf8Bytes(_businessPropertyWithCacheIntervalScript.JsonFormattingIndented);
                 yield return new(_businessPropertyWithCacheIntervalScript.VariableTopic, json, gList.Count);
             }

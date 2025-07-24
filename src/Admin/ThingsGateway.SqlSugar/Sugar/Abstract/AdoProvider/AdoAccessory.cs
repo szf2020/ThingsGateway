@@ -23,7 +23,7 @@ namespace ThingsGateway.SqlSugar
         /// <param name="propertyInfo">可选的属性信息数组，若为空则通过反射获取</param>
         /// <param name="sqlParameterKeyWord">SQL参数前缀，例如 "@"</param>
         /// <returns>SugarParameter 数组</returns>
-        protected virtual IReadOnlyList<SugarParameter> GetParameters(object parameters, PropertyInfo[] propertyInfo, string sqlParameterKeyWord)
+        protected virtual IReadOnlyCollection<SugarParameter> GetParameters(object parameters, PropertyInfo[] propertyInfo, string sqlParameterKeyWord)
         {
             if (parameters != null)
             {
@@ -37,7 +37,7 @@ namespace ThingsGateway.SqlSugar
                     // 字典类型转参数
                     return DictionaryToParameters(parameters, sqlParameterKeyWord, entityType);
                 }
-                else if (parameters is IReadOnlyList<SugarParameter> sugarParamArray)
+                else if (parameters is IReadOnlyCollection<SugarParameter> sugarParamArray)
                 {
                     // 如果是 SugarParameter 数组，转 List
                     return sugarParamArray;
@@ -96,7 +96,7 @@ namespace ThingsGateway.SqlSugar
         /// <summary>
         /// 将字典类型的参数转换为参数集合
         /// </summary>
-        protected IReadOnlyList<SugarParameter> DictionaryToParameters(object parameters, string sqlParameterKeyWord, Type entityType)
+        protected IReadOnlyCollection<SugarParameter> DictionaryToParameters(object parameters, string sqlParameterKeyWord, Type entityType)
         {
             if (entityType == UtilConstants.DicArraySO)
             {

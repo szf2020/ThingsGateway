@@ -55,7 +55,7 @@ namespace ThingsGateway.SqlSugar
         /// <summary>
         /// 删除对象列表
         /// </summary>
-        public IReadOnlyList<T> DeleteObjects { get; set; }
+        public IReadOnlyCollection<T> DeleteObjects { get; set; }
         /// <summary>
         /// 实体信息
         /// </summary>
@@ -82,7 +82,7 @@ namespace ThingsGateway.SqlSugar
         public int ExecuteCommand()
         {
             string sql;
-            IReadOnlyList<SugarParameter> paramters;
+            IReadOnlyCollection<SugarParameter> paramters;
             _ExecuteCommand(out sql, out paramters);
             var result = Db.ExecuteCommand(sql, paramters);
             After(sql);
@@ -112,7 +112,7 @@ namespace ThingsGateway.SqlSugar
         public async Task<int> ExecuteCommandAsync()
         {
             string sql;
-            IReadOnlyList<SugarParameter> paramters;
+            IReadOnlyCollection<SugarParameter> paramters;
             _ExecuteCommand(out sql, out paramters);
             var result = await Db.ExecuteCommandAsync(sql, paramters).ConfigureAwait(false);
             After(sql);
@@ -175,7 +175,7 @@ namespace ThingsGateway.SqlSugar
         /// <summary>
         /// 根据对象列表设置删除条件
         /// </summary>
-        public IDeleteable<T> Where(IReadOnlyList<T> deleteObjs)
+        public IDeleteable<T> Where(IReadOnlyCollection<T> deleteObjs)
         {
             this.DeleteObjects = deleteObjs;
             if (deleteObjs == null || deleteObjs.Count == 0)
@@ -242,14 +242,15 @@ namespace ThingsGateway.SqlSugar
             else
             {
                 StringBuilder whereInSql = new StringBuilder();
-                for (int index = 0; index < deleteObjs.Count; index++)
+                bool first = true;
+                foreach (var deleteObj in deleteObjs)
                 {
-                    var deleteObj = deleteObjs[index];
                     StringBuilder orString = new StringBuilder();
-                    if (index > 0)
+                    if (!first)
                     {
                         orString.Append(DeleteBuilder.WhereInOrTemplate + UtilConstants.Space);
                     }
+                    first = false;
                     int i = 0;
                     StringBuilder andString = new StringBuilder();
                     foreach (var primaryField in primaryFields)
@@ -421,7 +422,7 @@ namespace ThingsGateway.SqlSugar
         /// <summary>
         /// 设置Where条件
         /// </summary>
-        public IDeleteable<T> Where(string whereString, IReadOnlyList<SugarParameter> parameters)
+        public IDeleteable<T> Where(string whereString, IReadOnlyCollection<SugarParameter> parameters)
         {
             DeleteBuilder.WhereInfos.Add(whereString);
             if (DeleteBuilder.Parameters == null)
@@ -642,7 +643,7 @@ namespace ThingsGateway.SqlSugar
         /// <summary>
         /// IN条件
         /// </summary>
-        public IDeleteable<T> In<PkType>(IReadOnlyList<PkType> primaryKeyValues)
+        public IDeleteable<T> In<PkType>(IReadOnlyCollection<PkType> primaryKeyValues)
         {
             if (primaryKeyValues == null || primaryKeyValues.Count == 0)
             {
@@ -702,7 +703,7 @@ namespace ThingsGateway.SqlSugar
         /// <summary>
         /// IN条件
         /// </summary>
-        public IDeleteable<T> In<PkType>(Expression<Func<T, object>> inField, IReadOnlyList<PkType> primaryKeyValues)
+        public IDeleteable<T> In<PkType>(Expression<Func<T, object>> inField, IReadOnlyCollection<PkType> primaryKeyValues)
         {
             var lamResult = DeleteBuilder.GetExpressionValue(inField, ResolveExpressType.FieldSingle);
             var fieldName = lamResult.GetResultString();
@@ -727,7 +728,7 @@ namespace ThingsGateway.SqlSugar
         /// <summary>
         /// IN条件
         /// </summary>
-        public IDeleteable<T> In<PkType>(string inField, IReadOnlyList<PkType> primaryKeyValues)
+        public IDeleteable<T> In<PkType>(string inField, IReadOnlyCollection<PkType> primaryKeyValues)
         {
             TempPrimaryKeys = new List<string>() { inField };
             var result = In(primaryKeyValues);
@@ -776,13 +777,13 @@ namespace ThingsGateway.SqlSugar
         /// <summary>
         /// 获取SQL和参数
         /// </summary>
-        public KeyValuePair<string, IReadOnlyList<SugarParameter>> ToSql()
+        public KeyValuePair<string, IReadOnlyCollection<SugarParameter>> ToSql()
         {
             DeleteBuilder.EntityInfo = this.Context.EntityMaintenance.GetEntityInfo<T>();
             string sql = DeleteBuilder.ToSqlString();
             var paramters = DeleteBuilder.Parameters == null ? null : DeleteBuilder.Parameters;
             RestoreMapping();
-            return new KeyValuePair<string, IReadOnlyList<SugarParameter>>(sql, paramters);
+            return new KeyValuePair<string, IReadOnlyCollection<SugarParameter>>(sql, paramters);
         }
 
         /// <summary>
@@ -803,7 +804,7 @@ namespace ThingsGateway.SqlSugar
         /// <summary>
         /// 执行删除命令
         /// </summary>
-        private void _ExecuteCommand(out string sql, out IReadOnlyList<SugarParameter> paramters)
+        private void _ExecuteCommand(out string sql, out IReadOnlyCollection<SugarParameter> paramters)
         {
             DeleteBuilder.EntityInfo = this.Context.EntityMaintenance.GetEntityInfo<T>();
             sql = DeleteBuilder.ToSqlString();
@@ -943,7 +944,7 @@ namespace ThingsGateway.SqlSugar
         /// <summary>
         /// 数据变更AOP
         /// </summary>
-        protected virtual void DataChangesAop(IReadOnlyList<T> deleteObjs)
+        protected virtual void DataChangesAop(IReadOnlyCollection<T> deleteObjs)
         {
             var dataEvent = this.Context.CurrentConnectionConfig.AopEvents?.DataChangesExecuted;
             if (dataEvent != null && deleteObjs != null)

@@ -44,7 +44,7 @@ namespace ThingsGateway.SqlSugar
             }
             return jsonTableNameInfo;
         }
-        public KeyValuePair<string, IReadOnlyList<SugarParameter>> GetWhere(string item, SqlSugarProvider context)
+        public KeyValuePair<string, IReadOnlyCollection<SugarParameter>> GetWhere(string item, SqlSugarProvider context)
         {
             if (!IsConditionalModel(item))
             {
@@ -59,7 +59,7 @@ namespace ThingsGateway.SqlSugar
                 return sqlObj;
             }
         }
-        public KeyValuePair<string, IReadOnlyList<SugarParameter>> GetWhere(JToken item, SqlSugarProvider context)
+        public KeyValuePair<string, IReadOnlyCollection<SugarParameter>> GetWhere(JToken item, SqlSugarProvider context)
         {
             var value = item.First().ToString();
             Check.ExceptionEasy(item.First().Type != JTokenType.Array, "Where format error " + item, "Where格式错误" + item);

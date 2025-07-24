@@ -14,7 +14,7 @@ namespace ThingsGateway.SqlSugar
                 return string.Join(",", array.Where(c => c != null).Select(it => it.ToSqlValue()));
             }
         }
-        public static string ToJoinSqlInVals<T>(this IReadOnlyList<T> array)
+        public static string ToJoinSqlInVals<T>(this IReadOnlyCollection<T> array)
         {
             if (array == null || array.Count == 0)
             {
@@ -36,7 +36,7 @@ namespace ThingsGateway.SqlSugar
                 return string.Join(",", array.Where(c => c != null).Select(it => "N" + it.ToSqlValue()));
             }
         }
-        public static string ToJoinSqlInValsByVarchar<T>(this IReadOnlyList<T> array)
+        public static string ToJoinSqlInValsByVarchar<T>(this IReadOnlyCollection<T> array)
         {
             if (array == null || array.Count == 0)
             {
@@ -47,7 +47,7 @@ namespace ThingsGateway.SqlSugar
                 return string.Join(",", array.Where(c => c != null).Select(it => "N" + it.ToSqlValue()));
             }
         }
-        public static string ToJoinSqlInValsN<T>(this IReadOnlyList<T> array)
+        public static string ToJoinSqlInValsN<T>(this IReadOnlyCollection<T> array)
         {
             if (array == null || array.Count == 0)
             {

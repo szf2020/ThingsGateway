@@ -95,8 +95,9 @@ public partial class MqttServer : BusinessBaseWithCacheIntervalScriptAll
         {
             if (_driverPropertys.GroupUpdate)
             {
-                var varList = variables.Where(a => a.BusinessGroup.IsNullOrEmpty());
-                var varGroup = variables.Where(a => !a.BusinessGroup.IsNullOrEmpty()).GroupBy(a => a.BusinessGroup);
+                var data = variables.ToArray();
+                var varList = data.Where(a => a.BusinessGroup.IsNullOrEmpty());
+                var varGroup = data.Where(a => !a.BusinessGroup.IsNullOrEmpty()).GroupBy(a => a.BusinessGroup);
 
                 foreach (var group in varGroup)
                 {

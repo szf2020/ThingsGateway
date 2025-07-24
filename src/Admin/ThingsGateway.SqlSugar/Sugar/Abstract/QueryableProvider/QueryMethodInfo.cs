@@ -293,11 +293,11 @@ namespace ThingsGateway.SqlSugar
             var result = method.Invoke(QueryableObj, Array.Empty<object>());
             return (string)result;
         }
-        public KeyValuePair<string, IReadOnlyList<SugarParameter>> ToSql()
+        public KeyValuePair<string, IReadOnlyCollection<SugarParameter>> ToSql()
         {
             var method = QueryableObj.GetType().GetMyMethod("ToSql", 0);
             var result = method.Invoke(QueryableObj, Array.Empty<object>());
-            return (KeyValuePair<string, IReadOnlyList<SugarParameter>>)result;
+            return (KeyValuePair<string, IReadOnlyCollection<SugarParameter>>)result;
         }
         public object InSingle(object pkValue)
         {

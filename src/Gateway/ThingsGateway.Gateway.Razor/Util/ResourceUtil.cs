@@ -90,6 +90,7 @@ public static class ResourceUtil
         var trees = new List<TreeViewItem<ChannelDeviceTreeItem>>();
 
         //筛选插件名称
+#pragma warning disable CA1851
         foreach (var pluginName in channelRuntimes.Select(a => a.PluginName).ToHashSet())
         {
             var pluginItemValue = new ChannelDeviceTreeItem() { ChannelDevicePluginType = ChannelDevicePluginTypeEnum.PluginName, PluginName = pluginName };
@@ -156,6 +157,7 @@ public static class ResourceUtil
             pluginItem.Items = pluginItem.Items.OrderBy(a => a.Value.Id).ToList();
             trees.Add(pluginItem);
         }
+#pragma warning restore CA1851
 
         return trees;
     }

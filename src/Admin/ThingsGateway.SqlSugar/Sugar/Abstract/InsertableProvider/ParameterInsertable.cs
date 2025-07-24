@@ -129,7 +129,7 @@ namespace ThingsGateway.SqlSugar
             var tableWithString = inserable.InsertBuilder.AsName;
             var removeCacheFunc = inserable.RemoveCacheFunc;
             var objects = inserable.InsertObjs;
-            if (objects == null || objects.Count == 0 || (objects.Count == 1 && objects[0] == null))
+            if (objects == null || objects.Count == 0 || (objects.Count == 1 && objects.First() == null))
             {
                 return result;
             }

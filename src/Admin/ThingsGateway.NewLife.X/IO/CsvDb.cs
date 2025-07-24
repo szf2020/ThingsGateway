@@ -74,7 +74,6 @@ public class CsvDb<T> : DisposeBase where T : new()
     /// <param name="append">是否附加在尾部。为false时从头写入，覆盖已有数据</param>
     public void Write(IEnumerable<T> models, Boolean append)
     {
-        if (!models.Any() && append) return;
 
         var file = GetFile();
         file.EnsureDirectory(true);

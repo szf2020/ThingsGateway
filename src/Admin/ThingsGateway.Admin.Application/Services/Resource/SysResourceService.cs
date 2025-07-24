@@ -75,10 +75,10 @@ internal sealed class SysResourceService : BaseService<SysResource>, ISysResourc
     /// <param name="ids">id列表</param>
     /// <returns></returns>
     [OperDesc("DeleteResource")]
-    public async Task<bool> DeleteResourceAsync(IEnumerable<long> ids)
+    public async Task<bool> DeleteResourceAsync(HashSet<long> ids)
     {
         //删除
-        if (ids.Any())
+        if (ids.Count != 0)
         {
             //获取所有菜单和按钮
             var resourceList = await GetAllAsync().ConfigureAwait(false);
@@ -86,10 +86,11 @@ internal sealed class SysResourceService : BaseService<SysResource>, ISysResourc
             var delSysResources = resourceList.Where(it => ids.Contains(it.Id));
             //找到要删除的模块
             var delModules = resourceList.Where(a => a.Category == ResourceCategoryEnum.Module).Where(it => ids.Contains(it.Id));
-            if (delModules.Any())
+
+            //获取模块下的所有列表
+            var delHashSet = delModules.Select(a => a.Id).ToHashSet();
+            if (delHashSet.Count != 0)
             {
-                //获取模块下的所有列表
-                var delHashSet = delModules.Select(a => a.Id).ToHashSet();
                 var delModuleResources = resourceList.Where(it => delHashSet.Contains(it.Module));
                 delSysResources = delSysResources.Concat(delModuleResources).ToHashSet();
             }
@@ -345,17 +346,14 @@ internal sealed class SysResourceService : BaseService<SysResource>, ISysResourc
     }
 
     /// <inheritdoc/>
-    public IEnumerable<SysResource> ConstructMenuTrees(IEnumerable<SysResource> resourceList, long parentId = 0)
+    public IEnumerable<SysResource> ConstructMenuTrees(List<SysResource> resourceList, long parentId = 0)
     {
         //找下级资源ID列表
         var resources = resourceList.Where(it => it.ParentId == parentId).OrderBy(it => it.SortCode);
-        if (resources.Any())//如果数量大于0
+        foreach (var item in resources)//遍历资源
         {
-            foreach (var item in resources)//遍历资源
-            {
-                var children = ConstructMenuTrees(resourceList, item.Id).ToList();//添加子节点
-                item.Children = children.Count > 0 ? children : null;
-            }
+            var children = ConstructMenuTrees(resourceList, item.Id).ToList();//添加子节点
+            item.Children = children.Count > 0 ? children : null;
         }
         return resources;
     }

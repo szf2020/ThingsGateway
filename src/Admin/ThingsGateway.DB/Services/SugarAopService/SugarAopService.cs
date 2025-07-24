@@ -62,7 +62,7 @@ public class SugarAopService : ISugarAopService
             if (ex.Parameters == null) return;
             Console.ForegroundColor = ConsoleColor.Red;
             DbContext.WriteLog($"{config.ConfigId}库操作异常");
-            DbContext.WriteErrorLogWithSql(UtilMethods.GetNativeSql(ex.Sql, (IReadOnlyList<SugarParameter>)ex.Parameters));
+            DbContext.WriteErrorLogWithSql(UtilMethods.GetNativeSql(ex.Sql, ex.Parameters));
             NewLife.Log.XTrace.WriteException(ex);
             Console.ForegroundColor = ConsoleColor.White;
         };
@@ -110,10 +110,6 @@ public class SugarAopService : ISugarAopService
             }
         };
 
-        //查询数据转换
-        db.Aop.DataExecuted = (value, entity) =>
-        {
-        };
 
         db.Aop.OnLogExecuted = (sql, pars) =>
         {

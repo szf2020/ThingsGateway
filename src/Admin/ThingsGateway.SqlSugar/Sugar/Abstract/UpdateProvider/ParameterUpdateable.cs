@@ -109,7 +109,7 @@ namespace ThingsGateway.SqlSugar
 
         #region Values Helper
 
-        public KeyValuePair<string, IReadOnlyList<SugarParameter>> GetSql(List<T> updateObjects)
+        public KeyValuePair<string, IReadOnlyCollection<SugarParameter>> GetSql(List<T> updateObjects)
         {
             var inserable = Updateable as UpdateableProvider<T>;
             var builder = inserable.UpdateBuilder.Builder;
@@ -161,7 +161,7 @@ namespace ThingsGateway.SqlSugar
                 sbAllSql.Append(builderItem);
             }
             builder.FormatSaveQueueSql(sbAllSql);
-            return new KeyValuePair<string, IReadOnlyList<SugarParameter>>(sbAllSql.ToString(), parameters);
+            return new KeyValuePair<string, IReadOnlyCollection<SugarParameter>>(sbAllSql.ToString(), parameters);
         }
 
         private int GetPageSize(int pageSize, int count)

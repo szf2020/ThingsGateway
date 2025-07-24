@@ -67,7 +67,7 @@ namespace ThingsGateway.SqlSugar
                 return _Result.ToString().Replace(UtilConstants.ReplaceCommaKey, ",").TrimEnd(',');
         }
         #region functions
-        public IReadOnlyList<string> GetResultArray()
+        public IReadOnlyCollection<string> GetResultArray()
         {
             if (this._Result == null) return null;
             var result = new List<string>();

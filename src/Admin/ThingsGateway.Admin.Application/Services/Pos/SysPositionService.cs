@@ -75,7 +75,7 @@ public class SysPositionService : BaseService<SysPosition>, ISysPositionService
             }
 
             var dels = (await GetAllAsync().ConfigureAwait(false)).Where(a => ids.Contains(a.Id));
-            await SysUserService.CheckApiDataScopeAsync(dels.Select(a => a.OrgId).ToList(), dels.Select(a => a.CreateUserId).ToList()).ConfigureAwait(false);
+            await SysUserService.CheckApiDataScopeAsync(dels.Select(a => a.OrgId), dels.Select(a => a.CreateUserId)).ConfigureAwait(false);
             //删除职位
             var result = await base.DeleteAsync(ids).ConfigureAwait(false);
             if (result)

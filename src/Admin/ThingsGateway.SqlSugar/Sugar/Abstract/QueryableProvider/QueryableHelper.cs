@@ -1315,7 +1315,7 @@ namespace ThingsGateway.SqlSugar
             }
         }
 
-        private void OutIntoTableSql(string TableName, out KeyValuePair<string, IReadOnlyList<SugarParameter>> sqlInfo, out string sql, Type tableInfo)
+        private void OutIntoTableSql(string TableName, out KeyValuePair<string, IReadOnlyCollection<SugarParameter>> sqlInfo, out string sql, Type tableInfo)
         {
             var columnList = this.Context.EntityMaintenance.GetEntityInfo(tableInfo).Columns;
             //var entityInfo = this.Context.EntityMaintenance.GetEntityInfo(TableEntityType);
@@ -1898,7 +1898,7 @@ namespace ThingsGateway.SqlSugar
                 }
             }
         }
-        protected List<TResult> GetData<TResult>(KeyValuePair<string, IReadOnlyList<SugarParameter>> sqlObj)
+        protected List<TResult> GetData<TResult>(KeyValuePair<string, IReadOnlyCollection<SugarParameter>> sqlObj)
         {
             List<TResult> result;
             var isComplexModel = QueryBuilder.IsComplexModel(sqlObj.Key);
@@ -1906,7 +1906,7 @@ namespace ThingsGateway.SqlSugar
             bool isChangeQueryableSlave = GetIsSlaveQuery();
             bool isChangeQueryableMasterSlave = GetIsMasterQuery();
             string sqlString = sqlObj.Key;
-            IReadOnlyList<SugarParameter> parameters = sqlObj.Value;
+            IReadOnlyCollection<SugarParameter> parameters = sqlObj.Value;
             var dataReader = this.Db.GetDataReader(sqlString, parameters);
             this.Db.GetDataBefore(sqlString, parameters);
             if (entityType.IsInterface)
@@ -1922,7 +1922,7 @@ namespace ThingsGateway.SqlSugar
             RestChangeSlaveQuery(isChangeQueryableSlave);
             return result;
         }
-        protected async Task<List<TResult>> GetDataAsync<TResult>(KeyValuePair<string, IReadOnlyList<SugarParameter>> sqlObj)
+        protected async Task<List<TResult>> GetDataAsync<TResult>(KeyValuePair<string, IReadOnlyCollection<SugarParameter>> sqlObj)
         {
             List<TResult> result;
             var isComplexModel = QueryBuilder.IsComplexModel(sqlObj.Key);
@@ -1930,7 +1930,7 @@ namespace ThingsGateway.SqlSugar
             bool isChangeQueryableSlave = GetIsSlaveQuery();
             bool isChangeQueryableMasterSlave = GetIsMasterQuery();
             string sqlString = sqlObj.Key;
-            IReadOnlyList<SugarParameter> parameters = sqlObj.Value;
+            IReadOnlyCollection<SugarParameter> parameters = sqlObj.Value;
             var dataReader = await Db.GetDataReaderAsync(sqlString, parameters).ConfigureAwait(false);
             this.Db.GetDataBefore(sqlString, parameters);
             if (entityType.IsInterface)
@@ -2042,8 +2042,8 @@ namespace ThingsGateway.SqlSugar
             if (StaticConfig.EnableAot)
             {
                 var entityInfo = this.Context.EntityMaintenance.GetEntityInfo<TResult>();
-                var navColumnList = entityInfo.Columns.Where(it => it.Navigat != null);
-                if (navColumnList.Any())
+                var navColumnList = entityInfo.Columns.Where(it => it.Navigat != null).ToArray();
+                if (navColumnList.Length != 0)
                 {
                     foreach (var item in result)
                     {
@@ -2055,7 +2055,7 @@ namespace ThingsGateway.SqlSugar
                 }
             }
         }
-        protected void _InQueryable(Expression expression, KeyValuePair<string, IReadOnlyList<SugarParameter>> sqlObj)
+        protected void _InQueryable(Expression expression, KeyValuePair<string, IReadOnlyCollection<SugarParameter>> sqlObj)
         {
             QueryBuilder.CheckExpression(expression, "In");
             string sql = sqlObj.Key;
@@ -2183,13 +2183,13 @@ namespace ThingsGateway.SqlSugar
 
             return cacheDurationInSeconds;
         }
-        public virtual KeyValuePair<string, IReadOnlyList<SugarParameter>> _ToSql()
+        public virtual KeyValuePair<string, IReadOnlyCollection<SugarParameter>> _ToSql()
         {
             InitMapping();
             ToSqlBefore();
             string sql = QueryBuilder.ToSqlString();
             RestoreMapping();
-            return new KeyValuePair<string, IReadOnlyList<SugarParameter>>(sql, QueryBuilder.Parameters);
+            return new KeyValuePair<string, IReadOnlyCollection<SugarParameter>>(sql, QueryBuilder.Parameters);
         }
         #endregion
 

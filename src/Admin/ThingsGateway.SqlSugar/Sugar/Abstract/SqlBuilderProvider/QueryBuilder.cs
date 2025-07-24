@@ -28,7 +28,7 @@ namespace ThingsGateway.SqlSugar
         #endregion
 
         #region Splicing basic  
-        public IReadOnlyList<SugarParameter> GroupParameters { get; set; }
+        public IReadOnlyCollection<SugarParameter> GroupParameters { get; set; }
         public string GroupBySql { get; set; }
         public string GroupBySqlOld { get; set; }
         public Type AsType { get; set; }
@@ -380,10 +380,10 @@ namespace ThingsGateway.SqlSugar
         {
             if (!IsDisabledGobalFilter && this.Context.QueryFilter.GetFilterList.HasValue())
             {
-                var gobalFilterList = this.Context.QueryFilter.GetFilterList.Where(it => it.FilterName.IsNullOrEmpty());
+                var gobalFilterList = this.Context.QueryFilter.GetFilterList.Where(it => it.FilterName.IsNullOrEmpty()).ToArray();
                 if (this.RemoveFilters?.Length > 0)
                 {
-                    gobalFilterList = gobalFilterList.Where(it => !this.RemoveFilters.Contains(it.type));
+                    gobalFilterList = gobalFilterList.Where(it => !this.RemoveFilters.Contains(it.type)).ToArray();
                 }
                 foreach (var item in gobalFilterList)
                 {

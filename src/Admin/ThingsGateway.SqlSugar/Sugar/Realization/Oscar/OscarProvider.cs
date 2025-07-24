@@ -48,7 +48,7 @@ namespace ThingsGateway.SqlSugar
         {
             return new OscarDataAdapter();
         }
-        public override DbCommand GetCommand(string sql, IReadOnlyList<SugarParameter> parameters)
+        public override DbCommand GetCommand(string sql, IReadOnlyCollection<SugarParameter> parameters)
         {
             OscarCommand sqlCommand = new OscarCommand(sql, (OscarConnection)this.Connection);
             sqlCommand.CommandType = this.CommandType;
@@ -75,7 +75,7 @@ namespace ThingsGateway.SqlSugar
         /// </summary>
         /// <param name="parameters"></param>
         /// <returns></returns>
-        public override IDataParameter[] ToIDbDataParameter(params IReadOnlyList<SugarParameter> parameters)
+        public override IDataParameter[] ToIDbDataParameter(params IReadOnlyCollection<SugarParameter> parameters)
         {
             if (parameters == null || parameters.Count == 0) return null;
             OscarParameter[] result = new OscarParameter[parameters.Count];

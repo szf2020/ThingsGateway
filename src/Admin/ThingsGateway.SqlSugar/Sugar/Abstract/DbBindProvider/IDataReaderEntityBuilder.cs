@@ -284,31 +284,32 @@ namespace ThingsGateway.SqlSugar
                     }
                     if (!isGemo && columnInfo.PropertyInfo.PropertyType.IsClass() && columnInfo.PropertyInfo.PropertyType != UtilConstants.ByteArrayType && columnInfo.PropertyInfo.PropertyType != UtilConstants.ObjType)
                     {
-                        if (this.ReaderKeys.Contains(fileName))
+                        if (this.ReaderKeys.TryGetValue(fileName, out var v))
                         {
-                            BindClass(generator, result, columnInfo, ReaderKeys.First(it => it.Equals(fileName, StringComparison.CurrentCultureIgnoreCase)));
+                            BindClass(generator, result, columnInfo, v);
                         }
-                        else if (this.ReaderKeys.Any(it => it.Equals(columnInfo.PropertyName, StringComparison.CurrentCultureIgnoreCase)))
+                        else if (this.ReaderKeys.TryGetValue(columnInfo.PropertyName, out var v1))
                         {
-                            BindClass(generator, result, columnInfo, ReaderKeys.First(it => it.Equals(columnInfo.PropertyName, StringComparison.CurrentCultureIgnoreCase)));
+                            BindClass(generator, result, columnInfo, v1);
                         }
                     }
                     else if (!isGemo && columnInfo.IsJson && columnInfo.PropertyInfo.PropertyType != UtilConstants.StringType)
                     {   //json is struct
-                        if (this.ReaderKeys.Contains(fileName))
+                        if (this.ReaderKeys.TryGetValue(fileName, out var v))
                         {
-                            BindClass(generator, result, columnInfo, ReaderKeys.First(it => it.Equals(fileName, StringComparison.CurrentCultureIgnoreCase)));
+                            BindClass(generator, result, columnInfo, v);
                         }
                     }
                     else
                     {
-                        if (this.ReaderKeys.Contains(fileName))
+
+                        if (this.ReaderKeys.TryGetValue(fileName, out var v))
                         {
-                            BindField(generator, result, columnInfo, ReaderKeys.First(it => it.Equals(fileName, StringComparison.CurrentCultureIgnoreCase)));
+                            BindClass(generator, result, columnInfo, v);
                         }
-                        else if (this.ReaderKeys.Any(it => it.Equals(columnInfo.PropertyName, StringComparison.CurrentCultureIgnoreCase)))
+                        else if (this.ReaderKeys.TryGetValue(columnInfo.PropertyName, out var v1))
                         {
-                            BindField(generator, result, columnInfo, ReaderKeys.First(it => it.Equals(columnInfo.PropertyName, StringComparison.CurrentCultureIgnoreCase)));
+                            BindClass(generator, result, columnInfo, v1);
                         }
                     }
                 }

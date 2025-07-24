@@ -962,7 +962,7 @@ namespace ThingsGateway.SqlSugar
             return result;
         }
 
-        public virtual KeyValuePair<string, IReadOnlyList<SugarParameter>> ToSql()
+        public virtual KeyValuePair<string, IReadOnlyCollection<SugarParameter>> ToSql()
         {
             if (!QueryBuilder.IsClone)
             {
@@ -1008,7 +1008,7 @@ namespace ThingsGateway.SqlSugar
         }
         public int IntoTable(Type TableEntityType, string TableName)
         {
-            KeyValuePair<string, IReadOnlyList<SugarParameter>> sqlInfo;
+            KeyValuePair<string, IReadOnlyCollection<SugarParameter>> sqlInfo;
             string sql;
             OutIntoTableSql(TableName, out sqlInfo, out sql, TableEntityType);
             return this.Context.Ado.ExecuteCommand(sql, sqlInfo.Value);

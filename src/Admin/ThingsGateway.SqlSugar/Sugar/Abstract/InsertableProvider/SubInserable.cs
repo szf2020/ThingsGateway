@@ -24,7 +24,7 @@ namespace ThingsGateway.SqlSugar
         /// <summary>
         /// 待插入对象数组
         /// </summary>
-        internal IReadOnlyList<T> InsertObjects { get; set; }
+        internal IReadOnlyCollection<T> InsertObjects { get; set; }
         /// <summary>
         /// 插入构建器
         /// </summary>

@@ -45,7 +45,7 @@ public partial class SysUserPage
     {
         try
         {
-            return await SysUserService.DeleteUserAsync(sysUsers.Select(a => a.Id));
+            return await SysUserService.DeleteUserAsync(sysUsers.Select(a => a.Id).ToHashSet());
         }
         catch (Exception ex)
         {

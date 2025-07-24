@@ -102,7 +102,8 @@ public partial class DeviceTable : IDisposable
     #region 修改
     private async Task Copy(IEnumerable<DeviceRuntime> devices)
     {
-        if (!devices.Any())
+        var deviceRuntime = devices.FirstOrDefault();
+        if (deviceRuntime == null)
         {
             await ToastService.Warning(null, RazorLocalizer["PleaseSelect"]);
             return;
@@ -110,7 +111,6 @@ public partial class DeviceTable : IDisposable
 
         Device oneModel = null;
         List<Variable> variables = new();
-        var deviceRuntime = devices.FirstOrDefault();
         oneModel = deviceRuntime.AdaptDevice();
         oneModel.Id = 0;
 

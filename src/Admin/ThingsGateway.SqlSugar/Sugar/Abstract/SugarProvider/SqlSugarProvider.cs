@@ -612,12 +612,12 @@ namespace ThingsGateway.SqlSugar
         }
         #endregion
 
-        internal ISugarQueryable<T> _UnionAll<T>(IReadOnlyList<ISugarQueryable<T>> queryables)
+        internal ISugarQueryable<T> _UnionAll<T>(IReadOnlyCollection<ISugarQueryable<T>> queryables)
         {
             var sqlBuilder = InstanceFactory.GetSqlbuilder(this.Context.CurrentConnectionConfig);
             Check.Exception(queryables.IsNullOrEmpty(), "UnionAll.queryables is null ");
             int i = 1;
-            var allItems = new List<KeyValuePair<string, IReadOnlyList<SugarParameter>>>();
+            var allItems = new List<KeyValuePair<string, IReadOnlyCollection<SugarParameter>>>();
             foreach (var item in queryables)
             {
                 var sqlObj = item.ToSql();
@@ -631,9 +631,9 @@ namespace ThingsGateway.SqlSugar
                     UtilMethods.RepairReplicationParameters(ref sql, sqlObj.Value, i, "UnionAll");
                 }
                 if (sqlObj.Value.HasValue())
-                    allItems.Add(new KeyValuePair<string, IReadOnlyList<SugarParameter>>(sqlBuilder.GetUnionFomatSql(sql), sqlObj.Value));
+                    allItems.Add(new KeyValuePair<string, IReadOnlyCollection<SugarParameter>>(sqlBuilder.GetUnionFomatSql(sql), sqlObj.Value));
                 else
-                    allItems.Add(new KeyValuePair<string, IReadOnlyList<SugarParameter>>(sqlBuilder.GetUnionFomatSql(sql), new List<SugarParameter>()));
+                    allItems.Add(new KeyValuePair<string, IReadOnlyCollection<SugarParameter>>(sqlBuilder.GetUnionFomatSql(sql), new List<SugarParameter>()));
                 i++;
             }
             var allSql = sqlBuilder.GetUnionAllSql(allItems.Select(it => it.Key).ToList());
@@ -654,18 +654,18 @@ namespace ThingsGateway.SqlSugar
             }
         }
 
-        public virtual ISugarQueryable<T> UnionAll<T>(IReadOnlyList<ISugarQueryable<T>> queryables) where T : class
+        public virtual ISugarQueryable<T> UnionAll<T>(IReadOnlyCollection<ISugarQueryable<T>> queryables) where T : class
         {
             Check.Exception(queryables.IsNullOrEmpty(), "UnionAll.queryables is null ");
             return _UnionAll(queryables);
         }
 
-        public virtual ISugarQueryable<T> Union<T>(IReadOnlyList<ISugarQueryable<T>> queryables) where T : class
+        public virtual ISugarQueryable<T> Union<T>(IReadOnlyCollection<ISugarQueryable<T>> queryables) where T : class
         {
             var sqlBuilder = InstanceFactory.GetSqlbuilder(this.Context.CurrentConnectionConfig);
             Check.Exception(queryables.IsNullOrEmpty(), "UnionAll.queryables is null ");
             int i = 1;
-            var allItems = new List<KeyValuePair<string, IReadOnlyList<SugarParameter>>>();
+            var allItems = new List<KeyValuePair<string, IReadOnlyCollection<SugarParameter>>>();
             foreach (var item in queryables)
             {
                 item.QueryBuilder.DisableTop = true;
@@ -680,9 +680,9 @@ namespace ThingsGateway.SqlSugar
                     UtilMethods.RepairReplicationParameters(ref sql, sqlObj.Value, i, "Union");
                 }
                 if (sqlObj.Value.HasValue())
-                    allItems.Add(new KeyValuePair<string, IReadOnlyList<SugarParameter>>(sqlBuilder.GetUnionFomatSql(sql), sqlObj.Value));
+                    allItems.Add(new KeyValuePair<string, IReadOnlyCollection<SugarParameter>>(sqlBuilder.GetUnionFomatSql(sql), sqlObj.Value));
                 else
-                    allItems.Add(new KeyValuePair<string, IReadOnlyList<SugarParameter>>(sqlBuilder.GetUnionFomatSql(sql), new List<SugarParameter>()));
+                    allItems.Add(new KeyValuePair<string, IReadOnlyCollection<SugarParameter>>(sqlBuilder.GetUnionFomatSql(sql), new List<SugarParameter>()));
                 i++;
             }
             var allSql = sqlBuilder.GetUnionSql(allItems.Select(it => it.Key).ToList());
@@ -737,7 +737,7 @@ namespace ThingsGateway.SqlSugar
                 var methods = this.Context.GetType().GetMethods()
                .Where(it => it.Name == "Insertable")
                .Where(it => it.GetGenericArguments().Length != 0)
-               .Where(it => it.GetParameters().Any(z => z.ParameterType.Name.StartsWith("IReadOnlyList")))
+               .Where(it => it.GetParameters().Any(z => z.ParameterType.Name.StartsWith("IReadOnlyCollection")))
                .Where(it => it.Name == "Insertable");
                 var method = methods.Single().MakeGenericMethod(newList.GetType().GetGenericArguments().First());
                 InsertMethodInfo result = new InsertMethodInfo()
@@ -766,7 +766,7 @@ namespace ThingsGateway.SqlSugar
             }
         }
 
-        public virtual IInsertable<T> Insertable<T>(IReadOnlyList<T> insertObjs) where T : class, new()
+        public virtual IInsertable<T> Insertable<T>(IReadOnlyCollection<T> insertObjs) where T : class, new()
         {
             if (insertObjs?.IsNullOrEmpty() != false)
             {
@@ -826,7 +826,7 @@ namespace ThingsGateway.SqlSugar
                 var methods = this.Context.GetType().GetMethods()
                .Where(it => it.Name == "Deleteable")
                .Where(it => it.GetGenericArguments().Length != 0)
-               .Where(it => it.GetParameters().Any(z => z.Name != "pkValue" && z.ParameterType.Name.StartsWith("IReadOnlyList")))
+               .Where(it => it.GetParameters().Any(z => z.Name != "pkValue" && z.ParameterType.Name.StartsWith("IReadOnlyCollection")))
                .Where(it => it.Name == "Deleteable");
                 var method = methods.FirstOrDefault().MakeGenericMethod(newList.GetType().GetGenericArguments().FirstOrDefault());
                 DeleteMethodInfo result = new DeleteMethodInfo()
@@ -889,7 +889,7 @@ namespace ThingsGateway.SqlSugar
             InitMappingInfo<T>();
             return this.Context.Deleteable<T>().WhereT(deleteObj);
         }
-        public virtual IDeleteable<T> Deleteable<T>(IReadOnlyList<T> deleteObjs) where T : class, new()
+        public virtual IDeleteable<T> Deleteable<T>(IReadOnlyCollection<T> deleteObjs) where T : class, new()
         {
             InitMappingInfo<T>();
             return this.Context.Deleteable<T>().Where(deleteObjs);
@@ -915,7 +915,7 @@ namespace ThingsGateway.SqlSugar
                 var methods = this.Context.GetType().GetMethods()
                .Where(it => it.Name == "Updateable")
                .Where(it => it.GetGenericArguments().Length != 0)
-               .Where(it => it.GetParameters().Any(z => z.ParameterType.Name.StartsWith("IReadOnlyList")))
+               .Where(it => it.GetParameters().Any(z => z.ParameterType.Name.StartsWith("IReadOnlyCollection")))
                .Where(it => it.Name == "Updateable");
                 var method = methods.Single().MakeGenericMethod(newList.GetType().GetGenericArguments().First());
                 UpdateMethodInfo result = new UpdateMethodInfo()
@@ -959,7 +959,7 @@ namespace ThingsGateway.SqlSugar
             return result;
         }
 
-        public virtual IUpdateable<T> Updateable<T>(IReadOnlyList<T> UpdateObjs) where T : class, new()
+        public virtual IUpdateable<T> Updateable<T>(IReadOnlyCollection<T> UpdateObjs) where T : class, new()
         {
             //Check.ArgumentNullException(UpdateObjs, "Updateable.UpdateObjs can't be null");
             if (UpdateObjs == null)
@@ -1153,7 +1153,7 @@ namespace ThingsGateway.SqlSugar
             result.queryBuilder = this.Queryable<object>().QueryBuilder;
             return result;
         }
-        public IReportable<T> Reportable<T>(IReadOnlyList<T> list)
+        public IReportable<T> Reportable<T>(IReadOnlyCollection<T> list)
         {
             var result = new ReportableProvider<T>(list);
             result.formatBuilder = InstanceFactory.GetInsertBuilder(this.Context.CurrentConnectionConfig);
@@ -1516,9 +1516,9 @@ namespace ThingsGateway.SqlSugar
                     var repeatList =
                         Queues.SelectMany(it => it.Parameters ?? Array.Empty<SugarParameter>()).Select(it => it.ParameterName)
                        .GroupBy(it => it?.ToLower())
-                       .Where(it => it.Count() > 1);
-                    var repeatCount = repeatList.Count();
-                    var isParameterNameRepeat = repeatList.Any();
+                       .Where(it => it.Count() > 1).ToArray();
+                    var repeatCount = repeatList.Length;
+                    var isParameterNameRepeat = repeatCount>0;
                     foreach (var item in Queues)
                     {
                         if (item.Sql == null)
@@ -1595,9 +1595,9 @@ namespace ThingsGateway.SqlSugar
                     var repeatList =
                          Queues.SelectMany(it => it.Parameters ?? Array.Empty<SugarParameter>()).Select(it => it.ParameterName)
                         .GroupBy(it => it?.ToLower())
-                        .Where(it => it.Count() > 1);
-                    var repeatCount = repeatList.Count();
-                    var isParameterNameRepeat = repeatList.Any();
+                        .Where(it => it.Count() > 1).ToArray();
+                    var repeatCount = repeatList.Length;
+                    var isParameterNameRepeat = repeatList.Length != 0;
                     foreach (var item in Queues)
                     {
                         if (item.Sql == null)

@@ -357,7 +357,7 @@ WHERE table_name = '" + tableName + "'");
             ConvertCreateColumnInfo(columnInfo);
             return base.AddColumn(tableName, columnInfo);
         }
-        public override bool CreateIndex(string tableName, IReadOnlyList<string> columnNames, bool isUnique = false)
+        public override bool CreateIndex(string tableName, IReadOnlyCollection<string> columnNames, bool isUnique = false)
         {
             string sql = string.Format(CreateIndexSql, tableName, string.Join(",", columnNames), string.Join("_", columnNames.Select(it => (it + "abc").Substring(0, 3))), isUnique ? "UNIQUE" : "");
             this.Context.Ado.ExecuteCommand(sql);

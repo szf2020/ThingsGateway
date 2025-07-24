@@ -34,7 +34,7 @@ namespace ThingsGateway.SqlSugar
         IDeleteable<T> Deleteable<T>(dynamic[] primaryKeyValues) where T : class, new();
         IDeleteable<T> Deleteable<T>(Expression<Func<T, bool>> expression) where T : class, new();
         IDeleteable<T> Deleteable<T>(List<dynamic> pkValue) where T : class, new();
-        IDeleteable<T> Deleteable<T>(IReadOnlyList<T> deleteObjs) where T : class, new();
+        IDeleteable<T> Deleteable<T>(IReadOnlyCollection<T> deleteObjs) where T : class, new();
         IDeleteable<T> DeleteableT<T>(T deleteObj) where T : class, new();
         #endregion
 
@@ -65,7 +65,7 @@ namespace ThingsGateway.SqlSugar
         #region Insertable
         IInsertable<T> Insertable<T>(Dictionary<string, object> columnDictionary) where T : class, new();
         IInsertable<T> Insertable<T>(dynamic insertDynamicObject) where T : class, new();
-        IInsertable<T> Insertable<T>(IReadOnlyList<T> insertObjs) where T : class, new();
+        IInsertable<T> Insertable<T>(IReadOnlyCollection<T> insertObjs) where T : class, new();
         IInsertable<T> InsertableT<T>(T insertObj) where T : class, new();
         InsertMethodInfo InsertableByObject(object singleEntityObjectOrListObject);
         IInsertable<Dictionary<string, object>> InsertableByDynamic(object insertDynamicObject);
@@ -175,8 +175,8 @@ namespace ThingsGateway.SqlSugar
         #endregion
 
         #region Union 
-        ISugarQueryable<T> Union<T>(IReadOnlyList<ISugarQueryable<T>> queryables) where T : class;
-        ISugarQueryable<T> UnionAll<T>(IReadOnlyList<ISugarQueryable<T>> queryables) where T : class;
+        ISugarQueryable<T> Union<T>(IReadOnlyCollection<ISugarQueryable<T>> queryables) where T : class;
+        ISugarQueryable<T> UnionAll<T>(IReadOnlyCollection<ISugarQueryable<T>> queryables) where T : class;
         #endregion
 
         #region Updateable
@@ -187,14 +187,14 @@ namespace ThingsGateway.SqlSugar
         IUpdateable<T> Updateable<T>(dynamic updateDynamicObject) where T : class, new();
         IUpdateable<T> Updateable<T>(Expression<Func<T, bool>> columns) where T : class, new();
         IUpdateable<T> Updateable<T>(Expression<Func<T, T>> columns) where T : class, new();
-        IUpdateable<T> Updateable<T>(IReadOnlyList<T> UpdateObjs) where T : class, new();
+        IUpdateable<T> Updateable<T>(IReadOnlyCollection<T> UpdateObjs) where T : class, new();
         IUpdateable<T> UpdateableT<T>(T UpdateObj) where T : class, new();
         IUpdateable<Dictionary<string, object>> UpdateableByDynamic(object updateDynamicObject);
         #endregion
 
         #region Reportable
         IReportable<T> ReportableT<T>(T data);
-        IReportable<T> Reportable<T>(IReadOnlyList<T> list);
+        IReportable<T> Reportable<T>(IReadOnlyCollection<T> list);
         #endregion
 
         #region Cache

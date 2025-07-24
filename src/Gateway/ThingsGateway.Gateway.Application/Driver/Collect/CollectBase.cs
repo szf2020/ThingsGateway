@@ -82,6 +82,7 @@ public abstract class CollectBase : DriverBase, IRpcDriver
                 ;
             });
 
+#pragma warning disable CA1851
             currentDevice.VariableScriptReads = tags.Where(a => !source(a)).Select(a =>
             {
                 var data = new VariableScriptRead();
@@ -92,6 +93,7 @@ public abstract class CollectBase : DriverBase, IRpcDriver
 
             // 将打包后的结果存储在当前设备的 VariableSourceReads 属性中
             currentDevice.VariableSourceReads = await ProtectedLoadSourceReadAsync(tags.Where(source).ToList()).ConfigureAwait(false);
+#pragma warning restore CA1851
         }
         catch (Exception ex)
         {

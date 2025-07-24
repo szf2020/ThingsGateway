@@ -101,7 +101,8 @@ public partial class ChannelTable : IDisposable
     #region 修改
     private async Task Copy(IEnumerable<ChannelRuntime> channels)
     {
-        if (!channels.Any())
+        var channelRuntime = channels.FirstOrDefault();
+        if (channelRuntime==null)
         {
             await ToastService.Warning(null, RazorLocalizer["PleaseSelect"]);
             return;
@@ -109,7 +110,6 @@ public partial class ChannelTable : IDisposable
 
         Channel oneModel = null;
         Dictionary<Device, List<Variable>> deviceDict = new();
-        var channelRuntime = channels.FirstOrDefault();
         oneModel = channelRuntime.AdaptChannel();
         oneModel.Id = 0;
 

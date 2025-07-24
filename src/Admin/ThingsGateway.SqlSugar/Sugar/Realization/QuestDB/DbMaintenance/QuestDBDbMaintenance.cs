@@ -225,7 +225,7 @@ namespace ThingsGateway.SqlSugar
                 }
             }
         }
-        public override bool CreateIndex(string tableName, IReadOnlyList<string> columnNames, bool isUnique = false)
+        public override bool CreateIndex(string tableName, IReadOnlyCollection<string> columnNames, bool isUnique = false)
         {
             if (isUnique)
             {
@@ -250,14 +250,14 @@ namespace ThingsGateway.SqlSugar
             }
             return true;
         }
-        public override bool CreateIndex(string tableName, IReadOnlyList<string> columnNames, string IndexName, bool isUnique = false)
+        public override bool CreateIndex(string tableName, IReadOnlyCollection<string> columnNames, string IndexName, bool isUnique = false)
         {
             if (isUnique)
                 throw new Exception("no support  unique index");
             return CreateIndex(tableName, columnNames, isUnique);
         }
 
-        public override bool CreateUniqueIndex(string tableName, IReadOnlyList<string> columnNames)
+        public override bool CreateUniqueIndex(string tableName, IReadOnlyCollection<string> columnNames)
         {
             throw new Exception("no support  unique index");
         }

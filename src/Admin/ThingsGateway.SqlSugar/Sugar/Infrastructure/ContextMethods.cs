@@ -1182,7 +1182,7 @@ namespace ThingsGateway.SqlSugar
         #endregion
 
         #region Conditional
-        public KeyValuePair<string, IReadOnlyList<SugarParameter>> ConditionalModelsToSql(List<IConditionalModel> conditionalModels, int beginIndex = 0)
+        public KeyValuePair<string, IReadOnlyCollection<SugarParameter>> ConditionalModelsToSql(List<IConditionalModel> conditionalModels, int beginIndex = 0)
         {
             var sqlBuilder = InstanceFactory.GetSqlBuilderWithContext(this.Context);
             var result = sqlBuilder.ConditionalModelToSql(conditionalModels, beginIndex);

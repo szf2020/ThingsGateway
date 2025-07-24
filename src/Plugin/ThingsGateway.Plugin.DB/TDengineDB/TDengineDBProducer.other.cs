@@ -52,8 +52,9 @@ public partial class TDengineDBProducer : BusinessBaseWithCacheIntervalVariable
     {
         if (_driverPropertys.GroupUpdate)
         {
-            var varList = variables.Where(a => a.BusinessGroup.IsNullOrEmpty());
-            var varGroup = variables.Where(a => !a.BusinessGroup.IsNullOrEmpty()).GroupBy(a => a.BusinessGroup);
+            var data = variables.ToArray();
+            var varList = data.Where(a => a.BusinessGroup.IsNullOrEmpty());
+            var varGroup = data.Where(a => !a.BusinessGroup.IsNullOrEmpty()).GroupBy(a => a.BusinessGroup);
 
             foreach (var group in varGroup)
             {
@@ -130,20 +131,19 @@ public partial class TDengineDBProducer : BusinessBaseWithCacheIntervalVariable
 
     private async Task InserableAsync(IEnumerable<VariableBasicData> dbInserts, string tableName, CancellationToken cancellationToken)
     {
-        if (!dbInserts.Any())
-        {
-            return;
-        }
+
         Stopwatch stopwatch = new();
         stopwatch.Start();
 
         StringBuilder stringBuilder = new();
         stringBuilder.Append($"INSERT INTO");
+        bool any = false;
         //(`id`,`createtime`,`collecttime`,`isonline`,`value`) 
         foreach (var deviceGroup in dbInserts.GroupBy(a => a.DeviceName))
         {
             foreach (var variableGroup in deviceGroup.GroupBy(a => a.Name))
             {
+                any = true;
                 stringBuilder.Append($"""
 
                      `{tableName}_{deviceGroup.Key}_{variableGroup.Key}` 
@@ -159,6 +159,9 @@ public partial class TDengineDBProducer : BusinessBaseWithCacheIntervalVariable
                 stringBuilder.Remove(stringBuilder.Length - 1, 1);
             }
         }
+
+        if (!any) return;
+
         stringBuilder.Append(';');
         stringBuilder.AppendLine();
 

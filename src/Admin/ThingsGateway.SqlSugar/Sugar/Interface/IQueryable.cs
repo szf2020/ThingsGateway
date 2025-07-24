@@ -75,8 +75,8 @@ namespace ThingsGateway.SqlSugar
         /// <param name="ignoreDefaultValue"></param>
         /// <returns></returns>
         ISugarQueryable<T> WhereClass<ClassType>(List<ClassType> whereClassList, bool ignoreDefaultValue = false) where ClassType : class, new();
-        ISugarQueryable<T> WhereClassByPrimaryKey(IReadOnlyList<T> list);
-        ISugarQueryable<T> WhereClassByWhereColumns(IReadOnlyList<T> list, IReadOnlyList<string> whereColumns);
+        ISugarQueryable<T> WhereClassByPrimaryKey(IReadOnlyCollection<T> list);
+        ISugarQueryable<T> WhereClassByWhereColumns(IReadOnlyCollection<T> list, IReadOnlyCollection<string> whereColumns);
         ISugarQueryable<T> WhereClassByPrimaryKey(T data);
         ISugarQueryable<T> WhereColumns(List<Dictionary<string, object>> columns);
         ISugarQueryable<T> WhereColumns(Dictionary<string, object> columns, bool ignoreDefaultValue);
@@ -99,11 +99,11 @@ namespace ThingsGateway.SqlSugar
 
         T InSingle(object pkValue);
         Task<T> InSingleAsync(object pkValue);
-        ISugarQueryable<T> In<TParamter>(IReadOnlyList<TParamter> pkValues);
-        ISugarQueryable<T> InIF<TParamter>(bool isIn, string fieldName, IReadOnlyList<TParamter> pkValues);
-        ISugarQueryable<T> InIF<TParamter>(bool isIn, IReadOnlyList<TParamter> pkValues);
-        ISugarQueryable<T> In<FieldType>(string InFieldName, IReadOnlyList<FieldType> inValues);
-        ISugarQueryable<T> In<FieldType>(Expression<Func<T, object>> expression, IReadOnlyList<FieldType> inValues);
+        ISugarQueryable<T> In<TParamter>(IReadOnlyCollection<TParamter> pkValues);
+        ISugarQueryable<T> InIF<TParamter>(bool isIn, string fieldName, IReadOnlyCollection<TParamter> pkValues);
+        ISugarQueryable<T> InIF<TParamter>(bool isIn, IReadOnlyCollection<TParamter> pkValues);
+        ISugarQueryable<T> In<FieldType>(string InFieldName, IReadOnlyCollection<FieldType> inValues);
+        ISugarQueryable<T> In<FieldType>(Expression<Func<T, object>> expression, IReadOnlyCollection<FieldType> inValues);
         ISugarQueryable<T> In<FieldType>(Expression<Func<T, object>> expression, ISugarQueryable<FieldType> childQueryExpression);
         ISugarQueryable<T> InIF<FieldType>(bool isWhere, Expression<Func<T, object>> expression, ISugarQueryable<FieldType> childQueryExpression);
 
@@ -231,7 +231,7 @@ namespace ThingsGateway.SqlSugar
         Task<string> ToJsonPageAsync(int pageIndex, int pageSize);
         string ToJsonPage(int pageIndex, int pageSize, ref int totalNumber);
         Task<string> ToJsonPageAsync(int pageIndex, int pageSize, RefAsync<int> totalNumber);
-        KeyValuePair<string, IReadOnlyList<SugarParameter>> ToSql();
+        KeyValuePair<string, IReadOnlyCollection<SugarParameter>> ToSql();
         string ToSqlString();
         List<T> ToChildList(Expression<Func<T, object>> parentIdExpression, object primaryKeyValue, bool isContainOneself = true);
         List<T> ToChildList(Expression<Func<T, object>> parentIdExpression, object[] primaryKeyValues, bool isContainOneself = true);
@@ -298,7 +298,7 @@ namespace ThingsGateway.SqlSugar
         void Clear();
         void AddQueue();
         ISugarQueryable<T> IgnoreColumns(Expression<Func<T, object>> columns);
-        ISugarQueryable<T> IgnoreColumns(IReadOnlyList<string> columns);
+        ISugarQueryable<T> IgnoreColumns(IReadOnlyCollection<string> columns);
 
         #region 内存行转列
 
@@ -429,13 +429,13 @@ namespace ThingsGateway.SqlSugar
         #endregion
 
         #region In
-        new ISugarQueryable<T, T2> In<FieldType>(Expression<Func<T, object>> expression, IReadOnlyList<FieldType> inValues);
+        new ISugarQueryable<T, T2> In<FieldType>(Expression<Func<T, object>> expression, IReadOnlyCollection<FieldType> inValues);
         new ISugarQueryable<T, T2> In<FieldType>(Expression<Func<T, object>> expression, ISugarQueryable<FieldType> childQueryExpression);
 
-        ISugarQueryable<T, T2> In<FieldType>(Expression<Func<T, T2, object>> expression, IReadOnlyList<FieldType> inValues);
+        ISugarQueryable<T, T2> In<FieldType>(Expression<Func<T, T2, object>> expression, IReadOnlyCollection<FieldType> inValues);
         ISugarQueryable<T, T2> In<FieldType>(Expression<Func<T, T2, object>> expression, ISugarQueryable<FieldType> childQueryExpression);
-        new ISugarQueryable<T, T2> InIF<TParamter>(bool isIn, IReadOnlyList<TParamter> pkValues);
-        new ISugarQueryable<T, T2> InIF<TParamter>(bool isIn, string fieldName, IReadOnlyList<TParamter> pkValues);
+        new ISugarQueryable<T, T2> InIF<TParamter>(bool isIn, IReadOnlyCollection<TParamter> pkValues);
+        new ISugarQueryable<T, T2> InIF<TParamter>(bool isIn, string fieldName, IReadOnlyCollection<TParamter> pkValues);
         #endregion
 
         #region Other
@@ -575,17 +575,17 @@ namespace ThingsGateway.SqlSugar
         #endregion
 
         #region In
-        new ISugarQueryable<T, T2, T3> In<FieldType>(Expression<Func<T, object>> expression, IReadOnlyList<FieldType> inValues);
+        new ISugarQueryable<T, T2, T3> In<FieldType>(Expression<Func<T, object>> expression, IReadOnlyCollection<FieldType> inValues);
         new ISugarQueryable<T, T2, T3> In<FieldType>(Expression<Func<T, object>> expression, ISugarQueryable<FieldType> childQueryExpression);
 
-        ISugarQueryable<T, T2, T3> In<FieldType>(Expression<Func<T, T2, object>> expression, IReadOnlyList<FieldType> inValues);
+        ISugarQueryable<T, T2, T3> In<FieldType>(Expression<Func<T, T2, object>> expression, IReadOnlyCollection<FieldType> inValues);
         ISugarQueryable<T, T2, T3> In<FieldType>(Expression<Func<T, T2, object>> expression, ISugarQueryable<FieldType> childQueryExpression);
 
-        ISugarQueryable<T, T2, T3> In<FieldType>(Expression<Func<T, T2, T3, object>> expression, IReadOnlyList<FieldType> inValues);
+        ISugarQueryable<T, T2, T3> In<FieldType>(Expression<Func<T, T2, T3, object>> expression, IReadOnlyCollection<FieldType> inValues);
         ISugarQueryable<T, T2, T3> In<FieldType>(Expression<Func<T, T2, T3, object>> expression, ISugarQueryable<FieldType> childQueryExpression);
 
-        new ISugarQueryable<T, T2, T3> InIF<TParamter>(bool isIn, IReadOnlyList<TParamter> pkValues);
-        new ISugarQueryable<T, T2, T3> InIF<TParamter>(bool isIn, string fieldName, IReadOnlyList<TParamter> pkValues);
+        new ISugarQueryable<T, T2, T3> InIF<TParamter>(bool isIn, IReadOnlyCollection<TParamter> pkValues);
+        new ISugarQueryable<T, T2, T3> InIF<TParamter>(bool isIn, string fieldName, IReadOnlyCollection<TParamter> pkValues);
         #endregion
 
         #region Other
@@ -726,20 +726,20 @@ namespace ThingsGateway.SqlSugar
         #endregion
 
         #region In
-        new ISugarQueryable<T, T2, T3, T4> In<FieldType>(Expression<Func<T, object>> expression, IReadOnlyList<FieldType> inValues);
+        new ISugarQueryable<T, T2, T3, T4> In<FieldType>(Expression<Func<T, object>> expression, IReadOnlyCollection<FieldType> inValues);
         new ISugarQueryable<T, T2, T3, T4> In<FieldType>(Expression<Func<T, object>> expression, ISugarQueryable<FieldType> childQueryExpression);
 
-        ISugarQueryable<T, T2, T3, T4> In<FieldType>(Expression<Func<T, T2, object>> expression, IReadOnlyList<FieldType> inValues);
+        ISugarQueryable<T, T2, T3, T4> In<FieldType>(Expression<Func<T, T2, object>> expression, IReadOnlyCollection<FieldType> inValues);
         ISugarQueryable<T, T2, T3, T4> In<FieldType>(Expression<Func<T, T2, object>> expression, ISugarQueryable<FieldType> childQueryExpression);
 
-        ISugarQueryable<T, T2, T3, T4> In<FieldType>(Expression<Func<T, T2, T3, object>> expression, IReadOnlyList<FieldType> inValues);
+        ISugarQueryable<T, T2, T3, T4> In<FieldType>(Expression<Func<T, T2, T3, object>> expression, IReadOnlyCollection<FieldType> inValues);
         ISugarQueryable<T, T2, T3, T4> In<FieldType>(Expression<Func<T, T2, T3, object>> expression, ISugarQueryable<FieldType> childQueryExpression);
 
-        ISugarQueryable<T, T2, T3, T4> In<FieldType>(Expression<Func<T, T2, T3, T4, object>> expression, IReadOnlyList<FieldType> inValues);
+        ISugarQueryable<T, T2, T3, T4> In<FieldType>(Expression<Func<T, T2, T3, T4, object>> expression, IReadOnlyCollection<FieldType> inValues);
         ISugarQueryable<T, T2, T3, T4> In<FieldType>(Expression<Func<T, T2, T3, T4, object>> expression, ISugarQueryable<FieldType> childQueryExpression);
 
-        new ISugarQueryable<T, T2, T3, T4> InIF<TParamter>(bool isIn, IReadOnlyList<TParamter> pkValues);
-        new ISugarQueryable<T, T2, T3, T4> InIF<TParamter>(bool isIn, string fieldName, IReadOnlyList<TParamter> pkValues);
+        new ISugarQueryable<T, T2, T3, T4> InIF<TParamter>(bool isIn, IReadOnlyCollection<TParamter> pkValues);
+        new ISugarQueryable<T, T2, T3, T4> InIF<TParamter>(bool isIn, string fieldName, IReadOnlyCollection<TParamter> pkValues);
         #endregion
 
         #region Other
@@ -886,7 +886,7 @@ namespace ThingsGateway.SqlSugar
         #endregion
 
         #region In
-        new ISugarQueryable<T, T2, T3, T4, T5> In<FieldType>(Expression<Func<T, object>> expression, IReadOnlyList<FieldType> inValues);
+        new ISugarQueryable<T, T2, T3, T4, T5> In<FieldType>(Expression<Func<T, object>> expression, IReadOnlyCollection<FieldType> inValues);
         new ISugarQueryable<T, T2, T3, T4, T5> In<FieldType>(Expression<Func<T, object>> expression, ISugarQueryable<FieldType> childQueryExpression);
         #endregion
 
@@ -1043,7 +1043,7 @@ namespace ThingsGateway.SqlSugar
         #endregion
 
         #region In
-        new ISugarQueryable<T, T2, T3, T4, T5, T6> In<FieldType>(Expression<Func<T, object>> expression, IReadOnlyList<FieldType> inValues);
+        new ISugarQueryable<T, T2, T3, T4, T5, T6> In<FieldType>(Expression<Func<T, object>> expression, IReadOnlyCollection<FieldType> inValues);
         new ISugarQueryable<T, T2, T3, T4, T5, T6> In<FieldType>(Expression<Func<T, object>> expression, ISugarQueryable<FieldType> childQueryExpression);
         #endregion
 
@@ -1194,7 +1194,7 @@ namespace ThingsGateway.SqlSugar
         #endregion
 
         #region In
-        new ISugarQueryable<T, T2, T3, T4, T5, T6, T7> In<FieldType>(Expression<Func<T, object>> expression, IReadOnlyList<FieldType> inValues);
+        new ISugarQueryable<T, T2, T3, T4, T5, T6, T7> In<FieldType>(Expression<Func<T, object>> expression, IReadOnlyCollection<FieldType> inValues);
         new ISugarQueryable<T, T2, T3, T4, T5, T6, T7> In<FieldType>(Expression<Func<T, object>> expression, ISugarQueryable<FieldType> childQueryExpression);
         #endregion
 
@@ -1344,7 +1344,7 @@ namespace ThingsGateway.SqlSugar
         #endregion
 
         #region In
-        new ISugarQueryable<T, T2, T3, T4, T5, T6, T7, T8> In<FieldType>(Expression<Func<T, object>> expression, IReadOnlyList<FieldType> inValues);
+        new ISugarQueryable<T, T2, T3, T4, T5, T6, T7, T8> In<FieldType>(Expression<Func<T, object>> expression, IReadOnlyCollection<FieldType> inValues);
         new ISugarQueryable<T, T2, T3, T4, T5, T6, T7, T8> In<FieldType>(Expression<Func<T, object>> expression, ISugarQueryable<FieldType> childQueryExpression);
         #endregion
 
@@ -1488,7 +1488,7 @@ namespace ThingsGateway.SqlSugar
         #endregion
 
         #region In
-        new ISugarQueryable<T, T2, T3, T4, T5, T6, T7, T8, T9> In<FieldType>(Expression<Func<T, object>> expression, IReadOnlyList<FieldType> inValues);
+        new ISugarQueryable<T, T2, T3, T4, T5, T6, T7, T8, T9> In<FieldType>(Expression<Func<T, object>> expression, IReadOnlyCollection<FieldType> inValues);
         new ISugarQueryable<T, T2, T3, T4, T5, T6, T7, T8, T9> In<FieldType>(Expression<Func<T, object>> expression, ISugarQueryable<FieldType> childQueryExpression);
         #endregion
 
@@ -1633,7 +1633,7 @@ namespace ThingsGateway.SqlSugar
         #endregion
 
         #region In
-        new ISugarQueryable<T, T2, T3, T4, T5, T6, T7, T8, T9, T10> In<FieldType>(Expression<Func<T, object>> expression, IReadOnlyList<FieldType> inValues);
+        new ISugarQueryable<T, T2, T3, T4, T5, T6, T7, T8, T9, T10> In<FieldType>(Expression<Func<T, object>> expression, IReadOnlyCollection<FieldType> inValues);
         new ISugarQueryable<T, T2, T3, T4, T5, T6, T7, T8, T9, T10> In<FieldType>(Expression<Func<T, object>> expression, ISugarQueryable<FieldType> childQueryExpression);
         #endregion
 
@@ -1775,7 +1775,7 @@ namespace ThingsGateway.SqlSugar
         #endregion
 
         #region In
-        new ISugarQueryable<T, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11> In<FieldType>(Expression<Func<T, object>> expression, IReadOnlyList<FieldType> inValues);
+        new ISugarQueryable<T, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11> In<FieldType>(Expression<Func<T, object>> expression, IReadOnlyCollection<FieldType> inValues);
         new ISugarQueryable<T, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11> In<FieldType>(Expression<Func<T, object>> expression, ISugarQueryable<FieldType> childQueryExpression);
         #endregion
 
@@ -1907,7 +1907,7 @@ namespace ThingsGateway.SqlSugar
         #endregion
 
         #region In
-        new ISugarQueryable<T, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> In<FieldType>(Expression<Func<T, object>> expression, IReadOnlyList<FieldType> inValues);
+        new ISugarQueryable<T, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> In<FieldType>(Expression<Func<T, object>> expression, IReadOnlyCollection<FieldType> inValues);
         new ISugarQueryable<T, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> In<FieldType>(Expression<Func<T, object>> expression, ISugarQueryable<FieldType> childQueryExpression);
         #endregion
 

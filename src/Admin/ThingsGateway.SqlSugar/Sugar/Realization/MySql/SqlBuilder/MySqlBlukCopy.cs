@@ -22,7 +22,7 @@ namespace ThingsGateway.SqlSugar
             var IsBulkLoad = false;
             if (Entitys == null || Entitys.Count <= 0)
                 return IsBulkLoad;
-            if (Entitys[0] == null && Entitys.Count == 1)
+            if (Entitys.First() == null && Entitys.Count == 1)
                 return IsBulkLoad;
             DataTable dt = new DataTable();
             Type type = typeof(T);

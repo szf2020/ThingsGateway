@@ -134,7 +134,7 @@ namespace ThingsGateway.SqlSugar
         /// <param name="inserObjects">插入对象数组</param>
         /// <param name="attr">STable特性</param>
         /// <returns>分组结果</returns>
-        private static IEnumerable<IGrouping<string, T>> GetGroupInfos(IReadOnlyList<T> inserObjects, STableAttribute? attr)
+        private static IEnumerable<IGrouping<string, T>> GetGroupInfos(IReadOnlyCollection<T> inserObjects, STableAttribute? attr)
         {
             var groups = inserObjects.GroupBy(it =>
             {

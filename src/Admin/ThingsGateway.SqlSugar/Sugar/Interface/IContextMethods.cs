@@ -45,7 +45,7 @@ namespace ThingsGateway.SqlSugar
         List<IConditionalModel> JsonToConditionalModels(string json);
         DataTable DictionaryListToDataTable(IEnumerable<Dictionary<string, object>> dictionaryList);
         List<T> ToTree<T>(List<T> list, Expression<Func<T, IEnumerable<object>>> childListExpression, Expression<Func<T, object>> parentIdExpression, Expression<Func<T, object>> pkExpression, object rootValue);
-        KeyValuePair<string, IReadOnlyList<SugarParameter>> ConditionalModelsToSql(List<IConditionalModel> conditionalModels, int beginIndex = 0);
+        KeyValuePair<string, IReadOnlyCollection<SugarParameter>> ConditionalModelsToSql(List<IConditionalModel> conditionalModels, int beginIndex = 0);
         string EscapeLikeValue(string value, char wildcard = '%');
     }
 }

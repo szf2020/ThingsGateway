@@ -59,7 +59,7 @@ namespace ThingsGateway.SqlSugar
         /// <summary>
         /// 插入对象数组
         /// </summary>
-        public IReadOnlyList<T> InsertObjs { get; set; }
+        public IReadOnlyCollection<T> InsertObjs { get; set; }
 
         /// <summary>
         /// 旧映射表列表
@@ -88,7 +88,7 @@ namespace ThingsGateway.SqlSugar
         /// </summary>
         public void AddQueue()
         {
-            if (this.InsertObjs?.Count > 0 && this.InsertObjs[0] != null)
+            if (this.InsertObjs?.Count > 0 && this.InsertObjs.First() != null)
             {
                 var sqlObj = this.ToSql();
                 this.Context.Queues.Add(sqlObj.Key, sqlObj.Value);
@@ -100,7 +100,7 @@ namespace ThingsGateway.SqlSugar
         /// <returns>影响行数</returns>
         public virtual int ExecuteCommand()
         {
-            if (this.InsertObjs.Count == 1 && this.InsertObjs[0] == null)
+            if (this.InsertObjs.Count == 1 && this.InsertObjs.First() == null)
             {
                 return 0;
             }
@@ -126,7 +126,7 @@ namespace ThingsGateway.SqlSugar
         /// 转换为SQL
         /// </summary>
         /// <returns>键值对形式的SQL和参数</returns>
-        public virtual KeyValuePair<string, IReadOnlyList<SugarParameter>> ToSql()
+        public virtual KeyValuePair<string, IReadOnlyCollection<SugarParameter>> ToSql()
         {
             InsertBuilder.IsReturnIdentity = true;
             if (this.SqlBuilder.SqlParameterKeyWord == ":" && !this.EntityInfo.Columns.Any(it => it.IsIdentity))
@@ -137,7 +137,7 @@ namespace ThingsGateway.SqlSugar
             AutoRemoveDataCache();
             string sql = InsertBuilder.ToSqlString();
             RestoreMapping();
-            return new KeyValuePair<string, IReadOnlyList<SugarParameter>>(sql, InsertBuilder.Parameters);
+            return new KeyValuePair<string, IReadOnlyCollection<SugarParameter>>(sql, InsertBuilder.Parameters);
         }
         /// <summary>
         /// 异步执行并返回主键列表
@@ -187,7 +187,7 @@ namespace ThingsGateway.SqlSugar
         /// <returns>自增ID</returns>
         public virtual int ExecuteReturnIdentity()
         {
-            if (this.InsertObjs.Count == 1 && this.InsertObjs[0] == null)
+            if (this.InsertObjs.Count == 1 && this.InsertObjs.First() == null)
             {
                 return 0;
             }
@@ -223,7 +223,7 @@ namespace ThingsGateway.SqlSugar
         /// <returns>自增ID</returns>
         public virtual long ExecuteReturnBigIdentity()
         {
-            if (this.InsertObjs.Count == 1 && this.InsertObjs[0] == null)
+            if (this.InsertObjs.Count == 1 && this.InsertObjs.First() == null)
             {
                 return 0;
             }
@@ -272,7 +272,7 @@ namespace ThingsGateway.SqlSugar
             foreach (var item in this.InsertBuilder.DbColumnInfoList.Where(it => it.PropertyName == snowProperty.PropertyName))
             {
                 item.Value = id;
-                snowProperty?.PropertyInfo.SetValue(this.InsertObjs[0], id);
+                snowProperty?.PropertyInfo.SetValue(this.InsertObjs.First(), id);
             }
             this.ExecuteCommand();
             return id;
@@ -326,7 +326,7 @@ namespace ThingsGateway.SqlSugar
             foreach (var item in this.InsertBuilder.DbColumnInfoList.Where(it => it.PropertyName == snowProperty.PropertyName))
             {
                 item.Value = id;
-                snowProperty?.PropertyInfo.SetValue(this.InsertObjs[0], id);
+                snowProperty?.PropertyInfo.SetValue(this.InsertObjs.First(), id);
             }
             await ExecuteCommandAsync().ConfigureAwait(false);
             return id;
@@ -375,7 +375,7 @@ namespace ThingsGateway.SqlSugar
         public virtual T ExecuteReturnEntity()
         {
             ExecuteCommandIdentityIntoEntity();
-            return InsertObjs[0];
+            return InsertObjs.First();
         }
         /// <summary>
         /// 执行命令并将自增ID设置到实体
@@ -383,7 +383,7 @@ namespace ThingsGateway.SqlSugar
         /// <returns>是否成功</returns>
         public virtual bool ExecuteCommandIdentityIntoEntity()
         {
-            var result = InsertObjs[0];
+            var result = InsertObjs.First();
             var identityKeys = GetIdentityKeys();
             if (this.Context?.CurrentConnectionConfig?.MoreSettings?.EnableOracleIdentity == true)
             {
@@ -457,7 +457,7 @@ namespace ThingsGateway.SqlSugar
         /// <returns>影响行数</returns>
         public async Task<int> ExecuteCommandAsync()
         {
-            if (this.InsertObjs.Count == 1 && this.InsertObjs[0] == null)
+            if (this.InsertObjs.Count == 1 && this.InsertObjs.First() == null)
             {
                 return 0;
             }
@@ -483,7 +483,7 @@ namespace ThingsGateway.SqlSugar
         /// <returns>自增ID</returns>
         public virtual async Task<int> ExecuteReturnIdentityAsync()
         {
-            if (this.InsertObjs.Count == 1 && this.InsertObjs[0] == null)
+            if (this.InsertObjs.Count == 1 && this.InsertObjs.First() == null)
             {
                 return 0;
             }
@@ -536,7 +536,7 @@ namespace ThingsGateway.SqlSugar
         public async Task<T> ExecuteReturnEntityAsync()
         {
             await ExecuteCommandIdentityIntoEntityAsync().ConfigureAwait(false);
-            return InsertObjs[0];
+            return InsertObjs.First();
         }
         /// <summary>
         /// 异步执行并返回包含所有第一层导航属性的实体
@@ -561,7 +561,7 @@ namespace ThingsGateway.SqlSugar
         /// <returns>是否成功</returns>
         public virtual async Task<bool> ExecuteCommandIdentityIntoEntityAsync()
         {
-            var result = InsertObjs[0];
+            var result = InsertObjs.First();
             var identityKeys = GetIdentityKeys();
             if (identityKeys.Count == 0)
             {
@@ -627,7 +627,7 @@ namespace ThingsGateway.SqlSugar
         /// <returns>自增ID</returns>
         public virtual async Task<long> ExecuteReturnBigIdentityAsync()
         {
-            if (this.InsertObjs.Count == 1 && this.InsertObjs[0] == null)
+            if (this.InsertObjs.Count == 1 && this.InsertObjs.First() == null)
             {
                 return 0;
             }
@@ -728,7 +728,7 @@ namespace ThingsGateway.SqlSugar
         /// </summary>
         /// <param name="columns">列名数组</param>
         /// <returns>可插入对象</returns>
-        public IInsertable<T> IgnoreColumns(IReadOnlyList<string> columns)
+        public IInsertable<T> IgnoreColumns(IReadOnlyCollection<string> columns)
         {
             if (columns == null)
                 columns = Array.Empty<string>();
@@ -811,7 +811,7 @@ namespace ThingsGateway.SqlSugar
         /// </summary>
         /// <param name="columns">列名数组</param>
         /// <returns>可插入对象</returns>
-        public IInsertable<T> InsertColumns(IReadOnlyList<string> columns)
+        public IInsertable<T> InsertColumns(IReadOnlyCollection<string> columns)
         {
             if (columns == null) return this;
             this.InsertBuilder.DbColumnInfoList = this.InsertBuilder.DbColumnInfoList.Where(it => columns.Any(ig => ig.Equals(it.PropertyName, StringComparison.CurrentCultureIgnoreCase)) || columns.Any(ig => ig.Equals(it.DbColumnName, StringComparison.CurrentCultureIgnoreCase))).ToList();

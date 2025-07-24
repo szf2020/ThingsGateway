@@ -772,7 +772,7 @@ ParameterT parameter)
         public virtual async Task<int> IntoTableAsync(Type TableEntityType, string TableName, CancellationToken cancellationToken = default)
         {
             this.Context.Ado.CancellationToken = cancellationToken;
-            KeyValuePair<string, IReadOnlyList<SugarParameter>> sqlInfo;
+            KeyValuePair<string, IReadOnlyCollection<SugarParameter>> sqlInfo;
             string sql;
             OutIntoTableSql(TableName, out sqlInfo, out sql, TableEntityType);
             return await Context.Ado.ExecuteCommandAsync(sql, sqlInfo.Value).ConfigureAwait(false);

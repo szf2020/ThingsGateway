@@ -57,7 +57,7 @@ namespace ThingsGateway.SqlSugar
         {
             return new SqlDataAdapter();
         }
-        public override DbCommand GetCommand(string sql, IReadOnlyList<SugarParameter> parameters)
+        public override DbCommand GetCommand(string sql, IReadOnlyCollection<SugarParameter> parameters)
         {
             SqlCommand sqlCommand = new SqlCommand(sql, (SqlConnection)this.Connection);
             sqlCommand.CommandType = this.CommandType;
@@ -74,7 +74,7 @@ namespace ThingsGateway.SqlSugar
             CheckConnection();
             return sqlCommand;
         }
-        public override async Task<DbCommand> GetCommandAsync(string sql, IReadOnlyList<SugarParameter> parameters)
+        public override async Task<DbCommand> GetCommandAsync(string sql, IReadOnlyCollection<SugarParameter> parameters)
         {
             SqlCommand sqlCommand = new SqlCommand(sql, (SqlConnection)this.Connection);
             sqlCommand.CommandType = this.CommandType;
@@ -101,7 +101,7 @@ namespace ThingsGateway.SqlSugar
         /// </summary>
         /// <param name="parameters"></param>
         /// <returns></returns>
-        public override IDataParameter[] ToIDbDataParameter(params IReadOnlyList<SugarParameter> parameters)
+        public override IDataParameter[] ToIDbDataParameter(params IReadOnlyCollection<SugarParameter> parameters)
         {
             if (parameters == null || parameters.Count == 0) return null;
             SqlParameter[] result = new SqlParameter[parameters.Count];
@@ -133,7 +133,7 @@ namespace ThingsGateway.SqlSugar
         /// </summary>
         /// <param name="parameters"></param>
         /// <returns></returns>
-        public SqlParameter[] GetSqlParameter(params IReadOnlyList<SugarParameter> parameters)
+        public SqlParameter[] GetSqlParameter(params IReadOnlyCollection<SugarParameter> parameters)
         {
             var isVarchar = this.Context.IsVarchar();
             if (parameters == null || parameters.Count == 0) return null;

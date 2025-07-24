@@ -97,7 +97,7 @@ namespace ThingsGateway.SqlSugar
         {
             return new MyDmDataAdapter();
         }
-        public override DbCommand GetCommand(string sql, IReadOnlyList<SugarParameter> parameters)
+        public override DbCommand GetCommand(string sql, IReadOnlyCollection<SugarParameter> parameters)
         {
             sql = ReplaceKeyWordParameterName(sql, parameters);
             DmCommand sqlCommand = new DmCommand(sql, (DmConnection)this.Connection);
@@ -125,7 +125,7 @@ namespace ThingsGateway.SqlSugar
         /// </summary>
         /// <param name="parameters"></param>
         /// <returns></returns>
-        public override IDataParameter[] ToIDbDataParameter(params IReadOnlyList<SugarParameter> parameters)
+        public override IDataParameter[] ToIDbDataParameter(params IReadOnlyCollection<SugarParameter> parameters)
         {
             if (parameters == null || parameters.Count == 0) return null;
             DmParameter[] result = new DmParameter[parameters.Count];
@@ -202,7 +202,7 @@ namespace ThingsGateway.SqlSugar
         }
 
         private static string[] KeyWord = new string[] { ":asc", "@asc", ":desc", "@desc", "@month", ":month", ":day", "@day", "@group", ":group", ":index", "@index", "@order", ":order", "@user", "@level", ":user", ":level", ":type", "@type", ":year", "@year" };
-        private static string ReplaceKeyWordParameterName(string sql, IReadOnlyList<SugarParameter> parameters)
+        private static string ReplaceKeyWordParameterName(string sql, IReadOnlyCollection<SugarParameter> parameters)
         {
             sql = ReplaceKeyWordWithAd(sql, parameters);
             if (parameters.HasValue() && parameters.Any(it => it.ParameterName.IsInCase(KeyWord)))
@@ -222,7 +222,7 @@ namespace ThingsGateway.SqlSugar
             return sql;
         }
 
-        private static string ReplaceKeyWordWithAd(string sql, IReadOnlyList<SugarParameter> parameters)
+        private static string ReplaceKeyWordWithAd(string sql, IReadOnlyCollection<SugarParameter> parameters)
         {
             if (parameters != null && sql?.Contains('@') == true)
             {

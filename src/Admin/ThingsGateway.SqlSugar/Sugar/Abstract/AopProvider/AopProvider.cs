@@ -36,17 +36,17 @@ namespace ThingsGateway.SqlSugar
         /// <summary>
         /// 设置SQL执行前日志事件处理程序
         /// </summary>
-        public Action<string, IReadOnlyList<SugarParameter>> OnLogExecuting { set { this.Context.CurrentConnectionConfig.AopEvents.OnLogExecuting = value; } }
+        public Action<string, IReadOnlyCollection<SugarParameter>> OnLogExecuting { set { this.Context.CurrentConnectionConfig.AopEvents.OnLogExecuting = value; } }
 
         /// <summary>
         /// 设置SQL执行后日志事件处理程序
         /// </summary>
-        public Action<string, IReadOnlyList<SugarParameter>> OnLogExecuted { set { this.Context.CurrentConnectionConfig.AopEvents.OnLogExecuted = value; } }
+        public Action<string, IReadOnlyCollection<SugarParameter>> OnLogExecuted { set { this.Context.CurrentConnectionConfig.AopEvents.OnLogExecuted = value; } }
 
         /// <summary>
         /// 设置执行SQL前修改SQL的事件处理程序
         /// </summary>
-        public Func<string, IReadOnlyList<SugarParameter>, KeyValuePair<string, IReadOnlyList<SugarParameter>>> OnExecutingChangeSql { set { this.Context.CurrentConnectionConfig.AopEvents.OnExecutingChangeSql = value; } }
+        public Func<string, IReadOnlyCollection<SugarParameter>, KeyValuePair<string, IReadOnlyCollection<SugarParameter>>> OnExecutingChangeSql { set { this.Context.CurrentConnectionConfig.AopEvents.OnExecutingChangeSql = value; } }
 
         /// <summary>
         /// 设置数据执行前事件处理程序
@@ -76,11 +76,11 @@ namespace ThingsGateway.SqlSugar
         /// <summary>
         /// 设置获取数据读取前事件处理程序
         /// </summary>
-        public Action<string, IReadOnlyList<SugarParameter>> OnGetDataReadering { set { this.Context.CurrentConnectionConfig.AopEvents.OnGetDataReadering = value; } }
+        public Action<string, IReadOnlyCollection<SugarParameter>> OnGetDataReadering { set { this.Context.CurrentConnectionConfig.AopEvents.OnGetDataReadering = value; } }
 
         /// <summary>
         /// 设置获取数据读取后事件处理程序
         /// </summary>
-        public Action<string, IReadOnlyList<SugarParameter>, TimeSpan> OnGetDataReadered { set { this.Context.CurrentConnectionConfig.AopEvents.OnGetDataReadered = value; } }
+        public Action<string, IReadOnlyCollection<SugarParameter>, TimeSpan> OnGetDataReadered { set { this.Context.CurrentConnectionConfig.AopEvents.OnGetDataReadered = value; } }
     }
 }

@@ -66,7 +66,7 @@ namespace ThingsGateway.SqlSugar
         {
             return new MySqlDataAdapter();
         }
-        public override DbCommand GetCommand(string sql, IReadOnlyList<SugarParameter> parameters)
+        public override DbCommand GetCommand(string sql, IReadOnlyCollection<SugarParameter> parameters)
         {
             MySqlCommand sqlCommand = new MySqlCommand(sql, (MySqlConnection)this.Connection);
             sqlCommand.CommandType = this.CommandType;
@@ -93,7 +93,7 @@ namespace ThingsGateway.SqlSugar
         /// </summary>
         /// <param name="parameters"></param>
         /// <returns></returns>
-        public override IDataParameter[] ToIDbDataParameter(params IReadOnlyList<SugarParameter> parameters)
+        public override IDataParameter[] ToIDbDataParameter(params IReadOnlyCollection<SugarParameter> parameters)
         {
             if (parameters == null || parameters.Count == 0) return null;
             MySqlParameter[] result = new MySqlParameter[parameters.Count];
@@ -154,7 +154,7 @@ namespace ThingsGateway.SqlSugar
             return result;
         }
 
-        protected override void SugarCatch(Exception ex, string sql, IReadOnlyList<SugarParameter> parameters)
+        protected override void SugarCatch(Exception ex, string sql, IReadOnlyCollection<SugarParameter> parameters)
         {
             base.SugarCatch(ex, sql, parameters);
 
@@ -165,7 +165,7 @@ namespace ThingsGateway.SqlSugar
         }
 
         #region async
-        public override async Task<DbCommand> GetCommandAsync(string sql, IReadOnlyList<SugarParameter> parameters)
+        public override async Task<DbCommand> GetCommandAsync(string sql, IReadOnlyCollection<SugarParameter> parameters)
         {
             MySqlCommand sqlCommand = new MySqlCommand(sql, (MySqlConnection)this.Connection);
             sqlCommand.CommandType = this.CommandType;
@@ -192,7 +192,7 @@ namespace ThingsGateway.SqlSugar
             }
             return sqlCommand;
         }
-        public override async Task<int> ExecuteCommandAsync(string sql, params IReadOnlyList<SugarParameter> parameters)
+        public override async Task<int> ExecuteCommandAsync(string sql, params IReadOnlyCollection<SugarParameter> parameters)
         {
             if (this.Context.CurrentConnectionConfig?.SqlMiddle?.IsSqlMiddle == true)
                 return await base.ExecuteCommandAsync(sql, parameters).ConfigureAwait(false);
@@ -235,7 +235,7 @@ namespace ThingsGateway.SqlSugar
                 SetConnectionEnd(sql);
             }
         }
-        public override async Task<IDataReader> GetDataReaderAsync(string sql, params IReadOnlyList<SugarParameter> parameters)
+        public override async Task<IDataReader> GetDataReaderAsync(string sql, params IReadOnlyCollection<SugarParameter> parameters)
         {
             if (this.Context.CurrentConnectionConfig?.SqlMiddle?.IsSqlMiddle == true)
                 return await base.GetDataReaderAsync(sql, parameters).ConfigureAwait(false);
@@ -274,7 +274,7 @@ namespace ThingsGateway.SqlSugar
                 throw;
             }
         }
-        public override async Task<object> GetScalarAsync(string sql, params IReadOnlyList<SugarParameter> parameters)
+        public override async Task<object> GetScalarAsync(string sql, params IReadOnlyCollection<SugarParameter> parameters)
         {
             if (this.Context.CurrentConnectionConfig?.SqlMiddle?.IsSqlMiddle == true)
                 return await base.GetScalarAsync(sql, parameters).ConfigureAwait(false);

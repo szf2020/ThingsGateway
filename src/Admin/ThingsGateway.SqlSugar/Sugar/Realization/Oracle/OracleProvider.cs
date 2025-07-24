@@ -94,7 +94,7 @@ namespace ThingsGateway.SqlSugar
             ((OracleConnection)this.Connection).BeginTransaction(iso);
         }
 
-        public override Func<string, IReadOnlyList<SugarParameter>, KeyValuePair<string, IReadOnlyList<SugarParameter>>> ProcessingEventStartingSQL => (sql, parameter) =>
+        public override Func<string, IReadOnlyCollection<SugarParameter>, KeyValuePair<string, IReadOnlyCollection<SugarParameter>>> ProcessingEventStartingSQL => (sql, parameter) =>
         {
             if (sql == "-- No table ")
             {
@@ -106,7 +106,7 @@ namespace ThingsGateway.SqlSugar
             }
             else
             {
-                return new KeyValuePair<string, IReadOnlyList<SugarParameter>>(sql, parameter);
+                return new KeyValuePair<string, IReadOnlyCollection<SugarParameter>>(sql, parameter);
             }
         };
 
@@ -114,7 +114,7 @@ namespace ThingsGateway.SqlSugar
         {
             return new MyOracleDataAdapter();
         }
-        public override DbCommand GetCommand(string sql, IReadOnlyList<SugarParameter> parameters)
+        public override DbCommand GetCommand(string sql, IReadOnlyCollection<SugarParameter> parameters)
         {
             sql = ReplaceKeyWordParameterName(sql, parameters);
             if (sql?.EndsWith(';') == true && sql?.TrimStart()?.StartsWith("begin", StringComparison.CurrentCultureIgnoreCase) != true && sql?.TrimStart()?.Contains("begin", StringComparison.CurrentCultureIgnoreCase) != true)
@@ -139,7 +139,7 @@ namespace ThingsGateway.SqlSugar
             return sqlCommand;
         }
         private static string[] KeyWord = new string[] { ":asc", "@asc", ":desc", "@desc", "@month", ":month", ":day", "@day", "@group", ":group", ":index", "@index", "@order", ":order", "@user", "@level", ":user", ":level", ":type", "@type", ":year", "@year", "@date", ":date" };
-        private string ReplaceKeyWordParameterName(string sql, IReadOnlyList<SugarParameter> parameters)
+        private string ReplaceKeyWordParameterName(string sql, IReadOnlyCollection<SugarParameter> parameters)
         {
             sql = ReplaceKeyWordWithAd(sql, parameters);
             if (parameters.HasValue() && this.CommandType != CommandType.StoredProcedure)
@@ -166,7 +166,7 @@ namespace ThingsGateway.SqlSugar
             return sql;
         }
 
-        private static string ReplaceKeyWordWithAd(string sql, IReadOnlyList<SugarParameter> parameters)
+        private static string ReplaceKeyWordWithAd(string sql, IReadOnlyCollection<SugarParameter> parameters)
         {
             if (parameters != null && sql?.Contains('@') == true)
             {
@@ -204,7 +204,7 @@ namespace ThingsGateway.SqlSugar
         /// </summary>
         /// <param name="parameters"></param>
         /// <returns></returns>
-        public override IDataParameter[] ToIDbDataParameter(params IReadOnlyList<SugarParameter> parameters)
+        public override IDataParameter[] ToIDbDataParameter(params IReadOnlyCollection<SugarParameter> parameters)
         {
             if (parameters == null || parameters.Count == 0) return null;
             OracleParameter[] result = new OracleParameter[parameters.Count];

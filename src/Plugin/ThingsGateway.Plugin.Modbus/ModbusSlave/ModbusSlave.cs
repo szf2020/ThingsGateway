@@ -193,13 +193,15 @@ public class ModbusSlave : BusinessBase
     {
         try
         {
-            var tag = ModbusVariables.Where(a => a.Key?.StartAddress == modbusRequest.StartAddress && a.Key?.Station == modbusRequest.Station && a.Key?.FunctionCode == modbusRequest.FunctionCode);
-            if (!tag.Any()) return OperResult.Success;
-            if (!(tag.All(a => a.Value.GetPropertyValue(DeviceId, nameof(_variablePropertys.VariableRpcEnable)).ToBoolean(false) && _driverPropertys.DeviceRpcEnable)))
-                return new OperResult("Not Permitted to Write");
+            var tag = ModbusVariables.Where(a => a.Key?.StartAddress == modbusRequest.StartAddress && a.Key?.Station == modbusRequest.Station && a.Key?.FunctionCode == modbusRequest.FunctionCode).ToArray();
+            if (tag.Length == 0) return OperResult.Success;
+
 
             foreach (var item in tag)
             {
+                if (!(item.Value.GetPropertyValue(DeviceId, nameof(_variablePropertys.VariableRpcEnable)).ToBoolean(false) && _driverPropertys.DeviceRpcEnable))
+                    return new OperResult("Not Permitted to Write");
+
                 var type = item.Value.GetPropertyValue(DeviceId, nameof(ModbusSlaveVariableProperty.DataType));
                 var dType = Enum.TryParse(type, out DataTypeEnum dataType) ? dataType : item.Value.DataType;
                 var addressStr = item.Value.GetPropertyValue(DeviceId, nameof(ModbusSlaveVariableProperty.ServiceAddress));

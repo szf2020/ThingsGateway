@@ -4,7 +4,7 @@
     {
         public List<DiffLogTableInfo> AfterData { get; set; }
         public List<DiffLogTableInfo> BeforeData { get; set; }
-        public IReadOnlyList<SugarParameter> Parameters { get; set; }
+        public IReadOnlyCollection<SugarParameter> Parameters { get; set; }
         public string Sql { get; set; }
         public TimeSpan? Time { get; set; }
         public object BusinessData { get; set; }

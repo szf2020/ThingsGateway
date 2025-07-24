@@ -58,7 +58,7 @@ public interface ISysUserService
     /// </summary>
     /// <param name="ids">用户ID列表。</param>
     /// <returns>是否删除成功。</returns>
-    Task<bool> DeleteUserAsync(IEnumerable<long> ids);
+    Task<bool> DeleteUserAsync(HashSet<long> ids);
 
     /// <summary>
     /// 从缓存中删除用户信息。

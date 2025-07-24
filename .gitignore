@@ -367,3 +367,4 @@ FodyWeavers.xsd
 /src/*pro*
 /src/*pro*/
 /src/ThingsGateway.Server/Configuration/GiteeOAuthSettings.json
+/src/.idea/

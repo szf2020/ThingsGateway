@@ -77,7 +77,7 @@ namespace ThingsGateway.SqlSugar
             }
             if (NotAny(name))
             {
-                DeleteMany(thisEntity, ids.ToList(), thisFkColumn.DbColumnName);
+                DeleteMany(thisEntity, ids, thisFkColumn.DbColumnName);
                 if (this._Options?.OneToManyEnableLogicDelete == true)
                 {
                     var locgicColumn = thisEntity.Columns.FirstOrDefault(it => it.PropertyName.EqualCase("IsDeleted") || it.PropertyName.EqualCase("IsDelete"));
@@ -104,7 +104,7 @@ namespace ThingsGateway.SqlSugar
                 {
                     var list = this._Context.Queryable<TChild>()
                         .AS(thisEntity.DbTableName)
-                        .In(thisFkColumn.DbColumnName, ids.ToList())
+                        .In(thisFkColumn.DbColumnName, ids)
                         .ToList();
                     List<TChild> result = GetNoExistsId(list, children, thisPkColumn.PropertyName);
                     if (result.Count != 0)
@@ -173,7 +173,7 @@ namespace ThingsGateway.SqlSugar
             }
             if (NotAny(name))
             {
-                DeleteMany(thisEntity, ids.ToList(), thisFkColumn.DbColumnName);
+                DeleteMany(thisEntity, ids, thisFkColumn.DbColumnName);
                 if (this._Options?.OneToManyEnableLogicDelete == true)
                 {
                     var locgicColumn = thisEntity.Columns.FirstOrDefault(it => it.PropertyName.EqualCase("IsDeleted") || it.PropertyName.EqualCase("IsDelete"));
@@ -203,13 +203,13 @@ namespace ThingsGateway.SqlSugar
                         this._Context.Deleteable<object>()
                            .AS(thisEntity.DbTableName)
                            .EnableQueryFilter(thisEntity.Type)
-                           .In(thisFkColumn.DbColumnName, ids.ToList()).ExecuteCommand();
+                           .In(thisFkColumn.DbColumnName, ids).ExecuteCommand();
                     }
                     else
                     {
                         this._Context.Deleteable<object>()
                             .AS(thisEntity.DbTableName)
-                            .In(thisFkColumn.DbColumnName, ids.ToList()).ExecuteCommand();
+                            .In(thisFkColumn.DbColumnName, ids).ExecuteCommand();
                     }
                 }
                 _NavigateType = NavigateType.OneToMany;
@@ -261,7 +261,7 @@ namespace ThingsGateway.SqlSugar
         /// <param name="thisEntity">当前实体信息</param>
         /// <param name="ids">ID列表</param>
         /// <param name="fkName">外键名称</param>
-        private void DeleteMany(EntityInfo thisEntity, List<object> ids, string fkName)
+        private void DeleteMany(EntityInfo thisEntity, IReadOnlyCollection<object> ids, string fkName)
         {
             if (_Options == null || _Options.OneToManyDeleteAll == false)
             {

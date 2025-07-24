@@ -2,7 +2,7 @@
 {
     public class UpdateableFilter<T> where T : class, new()
     {
-        public IReadOnlyList<T> DataList { get; set; }
+        public IReadOnlyCollection<T> DataList { get; set; }
         public SqlSugarProvider Context { get; set; }
         public int PageSize { get; internal set; }
         public string TableName { get; internal set; }
@@ -11,7 +11,7 @@
         public List<string> UpdateColumns { get; internal set; }
         public int ExecuteCommand()
         {
-            if (DataList.Count == 1 && DataList[0] == null)
+            if (DataList.Count == 1 && DataList.First() == null)
             {
                 return 0;
             }
@@ -43,7 +43,7 @@
 
         public async Task<int> ExecuteCommandAsync()
         {
-            if (DataList.Count == 1 && DataList[0] == null)
+            if (DataList.Count == 1 && DataList.First() == null)
             {
                 return 0;
             }

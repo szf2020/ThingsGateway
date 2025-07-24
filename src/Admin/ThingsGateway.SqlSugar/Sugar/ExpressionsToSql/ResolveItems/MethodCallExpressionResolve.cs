@@ -214,7 +214,7 @@ namespace ThingsGateway.SqlSugar
             }
             Where(parameter, isLeft, name, args, model);
         }
-        protected void Select(ExpressionParameter parameter, bool? isLeft, string name, IEnumerable<Expression> args, MethodCallExpressionModel model, List<MethodCallExpressionArgs> appendArgs = null)
+        protected void Select(ExpressionParameter parameter, bool? isLeft, string name, List<Expression> args, MethodCallExpressionModel model, List<MethodCallExpressionArgs> appendArgs = null)
         {
             if (name.IsIn("GetSelfAndAutoFill", "SelectAll"))
             {

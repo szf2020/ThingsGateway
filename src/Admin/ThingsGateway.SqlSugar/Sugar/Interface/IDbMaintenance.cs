@@ -36,9 +36,9 @@
 
         #region DDL
         bool AddDefaultValue(string tableName, string columnName, string defaultValue);
-        bool CreateIndex(string tableName, IReadOnlyList<string> columnNames, bool isUnique = false);
-        bool CreateIndex(string tableName, IReadOnlyList<string> columnNames, string IndexName, bool isUnique = false);
-        bool CreateUniqueIndex(string tableName, IReadOnlyList<string> columnNames);
+        bool CreateIndex(string tableName, IReadOnlyCollection<string> columnNames, bool isUnique = false);
+        bool CreateIndex(string tableName, IReadOnlyCollection<string> columnNames, string IndexName, bool isUnique = false);
+        bool CreateUniqueIndex(string tableName, IReadOnlyCollection<string> columnNames);
 
         bool DropTable(string tableName);
         bool DropView(string viewName);
@@ -64,8 +64,8 @@
         bool AddColumn(string tableName, DbColumnInfo column);
         bool UpdateColumn(string tableName, DbColumnInfo column);
         bool AddPrimaryKey(string tableName, string columnName);
-        bool AddPrimaryKeys(string tableName, IReadOnlyList<string> columnNames);
-        bool AddPrimaryKeys(string tableName, IReadOnlyList<string> columnNames, string pkName);
+        bool AddPrimaryKeys(string tableName, IReadOnlyCollection<string> columnNames);
+        bool AddPrimaryKeys(string tableName, IReadOnlyCollection<string> columnNames, string pkName);
         bool DropConstraint(string tableName, string constraintName);
         bool BackupDataBase(string databaseName, string fullFileName);
         bool BackupTable(string oldTableName, string newTableName, int maxBackupDataRows = int.MaxValue);

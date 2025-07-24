@@ -149,7 +149,7 @@ namespace ThingsGateway.SqlSugar
             return ScopedContext.Deleteable<T>(pkValue);
         }
 
-        public IDeleteable<T> Deleteable<T>(IReadOnlyList<T> deleteObjs) where T : class, new()
+        public IDeleteable<T> Deleteable<T>(IReadOnlyCollection<T> deleteObjs) where T : class, new()
         {
             return ScopedContext.Deleteable(deleteObjs);
         }
@@ -226,7 +226,7 @@ namespace ThingsGateway.SqlSugar
             return ScopedContext.Insertable<T>((object)insertDynamicObject);
         }
 
-        public IInsertable<T> Insertable<T>(IReadOnlyList<T> insertObjs) where T : class, new()
+        public IInsertable<T> Insertable<T>(IReadOnlyCollection<T> insertObjs) where T : class, new()
         {
             return ScopedContext.Insertable(insertObjs);
         }
@@ -475,7 +475,7 @@ namespace ThingsGateway.SqlSugar
             return ScopedContext.ReportableT(data);
         }
 
-        public IReportable<T> Reportable<T>(IReadOnlyList<T> list)
+        public IReportable<T> Reportable<T>(IReadOnlyCollection<T> list)
         {
             return ScopedContext.Reportable(list);
         }
@@ -600,12 +600,12 @@ namespace ThingsGateway.SqlSugar
             return this.ScopedContext.StorageableByObject(singleEntityObjectOrListObject);
         }
 
-        public ISugarQueryable<T> Union<T>(IReadOnlyList<ISugarQueryable<T>> queryables) where T : class
+        public ISugarQueryable<T> Union<T>(IReadOnlyCollection<ISugarQueryable<T>> queryables) where T : class
         {
             return ScopedContext.Union(queryables);
         }
 
-        public ISugarQueryable<T> UnionAll<T>(IReadOnlyList<ISugarQueryable<T>> queryables) where T : class
+        public ISugarQueryable<T> UnionAll<T>(IReadOnlyCollection<ISugarQueryable<T>> queryables) where T : class
         {
             return ScopedContext.UnionAll(queryables);
         }
@@ -647,7 +647,7 @@ namespace ThingsGateway.SqlSugar
             return ScopedContext.Updateable(columns);
         }
 
-        public IUpdateable<T> Updateable<T>(IReadOnlyList<T> UpdateObjs) where T : class, new()
+        public IUpdateable<T> Updateable<T>(IReadOnlyCollection<T> UpdateObjs) where T : class, new()
         {
             return ScopedContext.Updateable(UpdateObjs);
         }
@@ -724,7 +724,7 @@ namespace ThingsGateway.SqlSugar
         {
             return ScopedContext.InsertableWithAttrT<T>(insertObj);
         }
-        public IInsertable<T> InsertableWithAttr<T>(IReadOnlyList<T> insertObjs) where T : class, new()
+        public IInsertable<T> InsertableWithAttr<T>(IReadOnlyCollection<T> insertObjs) where T : class, new()
         {
             return ScopedContext.InsertableWithAttr<T>(insertObjs);
         }
@@ -738,7 +738,7 @@ namespace ThingsGateway.SqlSugar
             return ScopedContext.UpdateableWithAttr<T>();
         }
 
-        public IUpdateable<T> UpdateableWithAttr<T>(IReadOnlyList<T> updateObjs) where T : class, new()
+        public IUpdateable<T> UpdateableWithAttr<T>(IReadOnlyCollection<T> updateObjs) where T : class, new()
         {
             return ScopedContext.UpdateableWithAttr<T>(updateObjs);
         }
@@ -750,7 +750,7 @@ namespace ThingsGateway.SqlSugar
         {
             return ScopedContext.DeleteableWithAttr<T>();
         }
-        public IDeleteable<T> DeleteableWithAttr<T>(IReadOnlyList<T> deleteObjs) where T : class, new()
+        public IDeleteable<T> DeleteableWithAttr<T>(IReadOnlyCollection<T> deleteObjs) where T : class, new()
         {
             return ScopedContext.DeleteableWithAttr<T>(deleteObjs);
         }

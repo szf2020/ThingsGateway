@@ -130,7 +130,7 @@ namespace ThingsGateway.SqlSugar
             return value;
         }
 
-        public static List<SugarParameter> CopySugarParameters(IReadOnlyList<SugarParameter> pars)
+        public static List<SugarParameter> CopySugarParameters(IReadOnlyCollection<SugarParameter> pars)
         {
             if (pars == null) return null;
             var newParameters = pars.Select(it => new SugarParameter(it.ParameterName, it.Value)
@@ -617,7 +617,7 @@ namespace ThingsGateway.SqlSugar
                                typeof(List<ulong?>),
                                typeof(List<ushort?>));
         }
-        public static string GetNativeSql(string sql, IReadOnlyList<SugarParameter> pars)
+        public static string GetNativeSql(string sql, IReadOnlyCollection<SugarParameter> pars)
         {
             if (pars == null || pars.Count == 0)
                 return "\r\n[Sql]:" + sql + "\r\n";
@@ -1096,7 +1096,7 @@ namespace ThingsGateway.SqlSugar
             return utcTime2;
         }
 
-        internal static void RepairReplicationParameters(ref string appendSql, IReadOnlyList<SugarParameter> parameters, int addIndex, string append = null)
+        internal static void RepairReplicationParameters(ref string appendSql, IReadOnlyCollection<SugarParameter> parameters, int addIndex, string append = null)
         {
             if (appendSql.HasValue() && parameters.HasValue())
             {
@@ -1110,7 +1110,7 @@ namespace ThingsGateway.SqlSugar
                 }
             }
         }
-        internal static void RepairReplicationParameters(ISqlSugarClient db, ref string appendSql, IReadOnlyList<SugarParameter> parameters, int addIndex, string append = null)
+        internal static void RepairReplicationParameters(ISqlSugarClient db, ref string appendSql, IReadOnlyCollection<SugarParameter> parameters, int addIndex, string append = null)
         {
             if (appendSql.HasValue() && parameters.HasValue())
             {
@@ -1676,7 +1676,7 @@ namespace ThingsGateway.SqlSugar
             string FirstDay = datetime.AddDays(daydiff).ToString("yyyy-MM-dd");
             return Convert.ToDateTime(FirstDay);
         }
-        public static string GetSqlString(DbType dbType, string sql, IReadOnlyList<SugarParameter> parameters, bool DisableNvarchar = false)
+        public static string GetSqlString(DbType dbType, string sql, IReadOnlyCollection<SugarParameter> parameters, bool DisableNvarchar = false)
         {
             if (parameters == null)
                 parameters = Array.Empty<SugarParameter>();
@@ -1687,9 +1687,9 @@ namespace ThingsGateway.SqlSugar
                 {
                     DisableNvarchar = DisableNvarchar
                 }
-            }, new KeyValuePair<string, IReadOnlyList<SugarParameter>>(sql, parameters));
+            }, new KeyValuePair<string, IReadOnlyCollection<SugarParameter>>(sql, parameters));
         }
-        public static string GetSqlString(ConnectionConfig connectionConfig, KeyValuePair<string, IReadOnlyList<SugarParameter>> sqlObj)
+        public static string GetSqlString(ConnectionConfig connectionConfig, KeyValuePair<string, IReadOnlyCollection<SugarParameter>> sqlObj)
         {
             var guid = Guid.NewGuid() + "";
             var result = sqlObj.Key;

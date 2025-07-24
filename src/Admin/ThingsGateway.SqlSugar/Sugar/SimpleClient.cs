@@ -195,7 +195,7 @@ namespace ThingsGateway.SqlSugar
             return Context.Insertable<T>(insertObj);
         }
 
-        public virtual IInsertable<T> AsInsertable(IReadOnlyList<T> insertObjs)
+        public virtual IInsertable<T> AsInsertable(IReadOnlyCollection<T> insertObjs)
         {
             return Context.Insertable<T>(insertObjs);
         }
@@ -204,7 +204,7 @@ namespace ThingsGateway.SqlSugar
             return Context.Updateable<T>(updateObj);
         }
 
-        public virtual IUpdateable<T> AsUpdateable(IReadOnlyList<T> updateObjs)
+        public virtual IUpdateable<T> AsUpdateable(IReadOnlyCollection<T> updateObjs)
         {
             return Context.Updateable<T>(updateObjs);
         }
@@ -286,7 +286,7 @@ namespace ThingsGateway.SqlSugar
         {
             return this.Context.StorageableT(data).ExecuteCommand() > 0;
         }
-        public virtual bool InsertOrUpdate(IReadOnlyList<T> datas)
+        public virtual bool InsertOrUpdate(IReadOnlyCollection<T> datas)
         {
             return this.Context.Storageable(datas).ExecuteCommand() > 0;
         }
@@ -303,7 +303,7 @@ namespace ThingsGateway.SqlSugar
         {
             return this.Context.InsertableT(insertObj).ExecuteReturnSnowflakeId();
         }
-        public virtual List<long> InsertReturnSnowflakeId(IReadOnlyList<T> insertObjs)
+        public virtual List<long> InsertReturnSnowflakeId(IReadOnlyCollection<T> insertObjs)
         {
             return this.Context.Insertable(insertObjs).ExecuteReturnSnowflakeIdList();
         }
@@ -311,7 +311,7 @@ namespace ThingsGateway.SqlSugar
         {
             return this.Context.InsertableT(insertObj).ExecuteReturnSnowflakeIdAsync();
         }
-        public virtual Task<List<long>> InsertReturnSnowflakeIdAsync(IReadOnlyList<T> insertObjs)
+        public virtual Task<List<long>> InsertReturnSnowflakeIdAsync(IReadOnlyCollection<T> insertObjs)
         {
             return this.Context.Insertable(insertObjs).ExecuteReturnSnowflakeIdListAsync();
         }
@@ -321,7 +321,7 @@ namespace ThingsGateway.SqlSugar
             return this.Context.InsertableT(insertObj).ExecuteReturnEntity();
         }
 
-        public virtual bool InsertRange(IReadOnlyList<T> insertObjs)
+        public virtual bool InsertRange(IReadOnlyCollection<T> insertObjs)
         {
             return this.Context.Insertable(insertObjs).ExecuteCommand() > 0;
         }
@@ -330,7 +330,7 @@ namespace ThingsGateway.SqlSugar
             return this.Context.UpdateableT(updateObj).ExecuteCommand() > 0;
         }
 
-        public virtual bool UpdateRange(IReadOnlyList<T> updateObjs)
+        public virtual bool UpdateRange(IReadOnlyCollection<T> updateObjs)
         {
             return this.Context.Updateable(updateObjs).ExecuteCommand() > 0;
         }
@@ -427,7 +427,7 @@ namespace ThingsGateway.SqlSugar
         {
             return await Context.StorageableT(data).ExecuteCommandAsync().ConfigureAwait(false) > 0;
         }
-        public virtual async Task<bool> InsertOrUpdateAsync(IReadOnlyList<T> datas)
+        public virtual async Task<bool> InsertOrUpdateAsync(IReadOnlyCollection<T> datas)
         {
             return await Context.Storageable(datas).ExecuteCommandAsync().ConfigureAwait(false) > 0;
         }
@@ -448,7 +448,7 @@ namespace ThingsGateway.SqlSugar
             return await Context.InsertableT(insertObj).ExecuteReturnEntityAsync().ConfigureAwait(false);
         }
 
-        public virtual async Task<bool> InsertRangeAsync(IReadOnlyList<T> insertObjs)
+        public virtual async Task<bool> InsertRangeAsync(IReadOnlyCollection<T> insertObjs)
         {
             return await Context.Insertable(insertObjs).ExecuteCommandAsync().ConfigureAwait(false) > 0;
         }
@@ -457,7 +457,7 @@ namespace ThingsGateway.SqlSugar
             return await Context.UpdateableT(updateObj).ExecuteCommandAsync().ConfigureAwait(false) > 0;
         }
 
-        public virtual async Task<bool> UpdateRangeAsync(IReadOnlyList<T> updateObjs)
+        public virtual async Task<bool> UpdateRangeAsync(IReadOnlyCollection<T> updateObjs)
         {
             return await Context.Updateable(updateObjs).ExecuteCommandAsync().ConfigureAwait(false) > 0;
         }
@@ -497,7 +497,7 @@ namespace ThingsGateway.SqlSugar
             this.Context.Ado.CancellationToken = cancellationToken;
             return this.Context.InsertableT(insertObj).ExecuteReturnSnowflakeIdAsync(cancellationToken);
         }
-        public virtual Task<List<long>> InsertReturnSnowflakeIdAsync(IReadOnlyList<T> insertObjs, CancellationToken cancellationToken)
+        public virtual Task<List<long>> InsertReturnSnowflakeIdAsync(IReadOnlyCollection<T> insertObjs, CancellationToken cancellationToken)
         {
             this.Context.Ado.CancellationToken = cancellationToken;
             return this.Context.Insertable(insertObjs).ExecuteReturnSnowflakeIdListAsync(cancellationToken);
@@ -602,7 +602,7 @@ namespace ThingsGateway.SqlSugar
             return await Context.InsertableT(insertObj).ExecuteReturnEntityAsync().ConfigureAwait(false);
         }
 
-        public virtual async Task<bool> InsertRangeAsync(IReadOnlyList<T> insertObjs, CancellationToken cancellationToken)
+        public virtual async Task<bool> InsertRangeAsync(IReadOnlyCollection<T> insertObjs, CancellationToken cancellationToken)
         {
             this.Context.Ado.CancellationToken = cancellationToken;
             return await Context.Insertable(insertObjs).ExecuteCommandAsync(cancellationToken).ConfigureAwait(false) > 0;
@@ -613,7 +613,7 @@ namespace ThingsGateway.SqlSugar
             return await Context.UpdateableT(updateObj).ExecuteCommandAsync(cancellationToken).ConfigureAwait(false) > 0;
         }
 
-        public virtual async Task<bool> UpdateRangeAsync(IReadOnlyList<T> updateObjs, CancellationToken cancellationToken)
+        public virtual async Task<bool> UpdateRangeAsync(IReadOnlyCollection<T> updateObjs, CancellationToken cancellationToken)
         {
             this.Context.Ado.CancellationToken = cancellationToken;
             return await Context.Updateable(updateObjs).ExecuteCommandAsync(cancellationToken).ConfigureAwait(false) > 0;

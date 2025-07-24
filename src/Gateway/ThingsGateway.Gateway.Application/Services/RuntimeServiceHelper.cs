@@ -139,10 +139,11 @@ internal static class RuntimeServiceHelper
 
     public static void RemoveOldChannelRuntimes(IEnumerable<ChannelRuntime> oldChannelRuntimes)
     {
-        var devs = oldChannelRuntimes.SelectMany(a => a.DeviceRuntimes).Select(a => a.Value).ToArray();
+        var channels = oldChannelRuntimes.ToArray();
+        var devs = channels.SelectMany(a => a.DeviceRuntimes).Select(a => a.Value).ToArray();
         devs.SelectMany(a => a.VariableRuntimes).Select(a => a.Value).ToArray().ParallelForEach(a => a.Dispose());
         devs.ParallelForEach(a => a.Dispose());
-        oldChannelRuntimes.ToArray().ParallelForEach(a => a.Dispose());
+        channels.ParallelForEach(a => a.Dispose());
 
         GlobalData.ChannelDeviceRuntimeDispatchService.Dispatch(null);
         GlobalData.VariableRuntimeDispatchService.Dispatch(null);

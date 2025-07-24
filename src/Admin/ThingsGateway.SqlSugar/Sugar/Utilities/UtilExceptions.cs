@@ -4,7 +4,7 @@ namespace ThingsGateway.SqlSugar
     public class SqlSugarException : Exception
     {
         public string Sql { get; set; }
-        public object Parameters { get; set; }
+        public IReadOnlyCollection<SugarParameter> Parameters { get; set; }
         public new Exception InnerException;
         public new string StackTrace;
         public new MethodBase TargetSite;
@@ -19,14 +19,14 @@ namespace ThingsGateway.SqlSugar
             this.Sql = sql;
         }
 
-        public SqlSugarException(SqlSugarProvider context, string message, string sql, object pars)
+        public SqlSugarException(SqlSugarProvider context, string message, string sql, IReadOnlyCollection<SugarParameter> pars)
             : base(message)
         {
             this.Sql = sql;
             this.Parameters = pars;
         }
 
-        public SqlSugarException(SqlSugarProvider context, Exception ex, string sql, object pars)
+        public SqlSugarException(SqlSugarProvider context, Exception ex, string sql, IReadOnlyCollection<SugarParameter> pars)
             : base(ex.Message)
         {
             this.Sql = sql;
@@ -37,7 +37,7 @@ namespace ThingsGateway.SqlSugar
             this.Source = ex.Source;
         }
 
-        public SqlSugarException(SqlSugarProvider context, string message, object pars)
+        public SqlSugarException(SqlSugarProvider context, string message, IReadOnlyCollection<SugarParameter> pars)
             : base(message)
         {
             this.Parameters = pars;
@@ -60,15 +60,15 @@ namespace ThingsGateway.SqlSugar
         {
         }
 
-        public VersionExceptions(SqlSugarProvider context, string message, string sql, object pars) : base(context, message, sql, pars)
+        public VersionExceptions(SqlSugarProvider context, string message, string sql, IReadOnlyCollection<SugarParameter> pars) : base(context, message, sql, pars)
         {
         }
 
-        public VersionExceptions(SqlSugarProvider context, Exception ex, string sql, object pars) : base(context, ex, sql, pars)
+        public VersionExceptions(SqlSugarProvider context, Exception ex, string sql, IReadOnlyCollection<SugarParameter> pars) : base(context, ex, sql, pars)
         {
         }
 
-        public VersionExceptions(SqlSugarProvider context, string message, object pars) : base(context, message, pars)
+        public VersionExceptions(SqlSugarProvider context, string message, IReadOnlyCollection<SugarParameter> pars) : base(context, message, pars)
         {
         }
 

@@ -210,8 +210,8 @@ namespace ThingsGateway.SqlSugar
         {
             var formats = this.QueryBuilder.QueryableFormats;
             var columns = this.QueryBuilder.Context.EntityMaintenance.GetEntityInfoWithAttr(typeof(T))
-                .Columns.Where(it => formats.Any(y => y.PropertyName == it.PropertyName));
-            if (columns.Any())
+                .Columns.Where(it => formats.Any(y => y.PropertyName == it.PropertyName)).ToArray();
+            if (columns.Length != 0)
             {
                 foreach (var item in formats)
                 {

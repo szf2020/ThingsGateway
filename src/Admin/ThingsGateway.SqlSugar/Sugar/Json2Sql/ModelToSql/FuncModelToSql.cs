@@ -8,7 +8,7 @@ namespace ThingsGateway.SqlSugar
     public abstract partial class SqlBuilderProvider : SqlBuilderAccessory, ISqlBuilder
     {
         #region Root
-        public KeyValuePair<string, IReadOnlyList<SugarParameter>> FuncModelToSql(IFuncModel model)
+        public KeyValuePair<string, IReadOnlyCollection<SugarParameter>> FuncModelToSql(IFuncModel model)
         {
             ObjectFuncModel data = model as ObjectFuncModel;
             var name = data.FuncName;
@@ -30,7 +30,7 @@ namespace ThingsGateway.SqlSugar
                 }
                 resSql = parameters[0] + "";
             }
-            return new KeyValuePair<string, IReadOnlyList<SugarParameter>>(resSql, resPars);
+            return new KeyValuePair<string, IReadOnlyCollection<SugarParameter>>(resSql, resPars);
         }
         #endregion
 

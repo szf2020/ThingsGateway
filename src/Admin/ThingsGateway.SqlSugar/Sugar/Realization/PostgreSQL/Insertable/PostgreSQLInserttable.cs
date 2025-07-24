@@ -27,7 +27,7 @@
             After(sql, result);
             return result;
         }
-        public override KeyValuePair<string, IReadOnlyList<SugarParameter>> ToSql()
+        public override KeyValuePair<string, IReadOnlyCollection<SugarParameter>> ToSql()
         {
             var result = base.ToSql();
             var primaryKey = GetPrimaryKeys().FirstOrDefault();
@@ -37,9 +37,9 @@
             }
             else if (result.Key?.EndsWith(" returning $PrimaryKey") == true)
             {
-                result = new KeyValuePair<string, IReadOnlyList<SugarParameter>>(result.Key.Replace(" returning $PrimaryKey", null), result.Value);
+                result = new KeyValuePair<string, IReadOnlyCollection<SugarParameter>>(result.Key.Replace(" returning $PrimaryKey", null), result.Value);
             }
-            return new KeyValuePair<string, IReadOnlyList<SugarParameter>>(result.Key.Replace("$PrimaryKey", primaryKey), result.Value);
+            return new KeyValuePair<string, IReadOnlyCollection<SugarParameter>>(result.Key.Replace("$PrimaryKey", primaryKey), result.Value);
         }
 
         public override long ExecuteReturnBigIdentity()
@@ -67,7 +67,7 @@
 
         public override bool ExecuteCommandIdentityIntoEntity()
         {
-            var result = InsertObjs[0];
+            var result = InsertObjs.First();
             var identityKeys = GetIdentityKeys();
             if (identityKeys.Count == 0) { return this.ExecuteCommand() > 0; }
             var idValue = ExecuteReturnBigIdentity();

@@ -93,7 +93,7 @@ public partial class SysResourcePage
     {
         try
         {
-            var result = await SysResourceService.DeleteResourceAsync(sysResources.Select(a => a.Id));
+            var result = await SysResourceService.DeleteResourceAsync(sysResources.Select(a => a.Id).ToHashSet());
             if (ReloadUser != null)
             {
                 await ReloadUser();

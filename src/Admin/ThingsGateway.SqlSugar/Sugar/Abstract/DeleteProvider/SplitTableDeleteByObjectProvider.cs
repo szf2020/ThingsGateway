@@ -19,7 +19,7 @@ namespace ThingsGateway.SqlSugar
         /// <summary>
         /// 待删除对象数组
         /// </summary>
-        public IReadOnlyList<T> deleteObjects { get; set; }
+        public IReadOnlyCollection<T> deleteObjects { get; set; }
 
         /// <summary>
         /// 执行删除命令

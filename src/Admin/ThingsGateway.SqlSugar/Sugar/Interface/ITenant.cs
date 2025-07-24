@@ -30,12 +30,12 @@ namespace ThingsGateway.SqlSugar
         SqlSugarScopeProvider GetConnectionScopeWithAttr<T>();
         ISugarQueryable<T> QueryableWithAttr<T>();
         IInsertable<T> InsertableWithAttrT<T>(T insertObj) where T : class, new();
-        IInsertable<T> InsertableWithAttr<T>(IReadOnlyList<T> insertObjs) where T : class, new();
+        IInsertable<T> InsertableWithAttr<T>(IReadOnlyCollection<T> insertObjs) where T : class, new();
         IUpdateable<T> UpdateableWithAttrT<T>(T updateObj) where T : class, new();
         IUpdateable<T> UpdateableWithAttr<T>() where T : class, new();
-        IUpdateable<T> UpdateableWithAttr<T>(IReadOnlyList<T> updateObjs) where T : class, new();
+        IUpdateable<T> UpdateableWithAttr<T>(IReadOnlyCollection<T> updateObjs) where T : class, new();
         IDeleteable<T> DeleteableWithAttrT<T>(T deleteObjs) where T : class, new();
-        IDeleteable<T> DeleteableWithAttr<T>(IReadOnlyList<T> deleteObjs) where T : class, new();
+        IDeleteable<T> DeleteableWithAttr<T>(IReadOnlyCollection<T> deleteObjs) where T : class, new();
         IDeleteable<T> DeleteableWithAttr<T>() where T : class, new();
 
         bool IsAnyConnection(object configId);

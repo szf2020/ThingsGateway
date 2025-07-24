@@ -72,7 +72,7 @@ namespace ThingsGateway.SqlSugar
             }
             else
             {
-                return await _BulkCopy(datas is IReadOnlyList<T> values ? values : datas.ToList()).ConfigureAwait(false);
+                return await _BulkCopy(datas is IReadOnlyCollection<T> values ? values : datas.ToList()).ConfigureAwait(false);
             }
         }
         #endregion
@@ -129,7 +129,7 @@ namespace ThingsGateway.SqlSugar
             }
             else
             {
-                return await _BulkUpdate(datas is IReadOnlyList<T> values ? values : datas.ToList(), whereColumns, updateColumns).ConfigureAwait(false);
+                return await _BulkUpdate(datas is IReadOnlyCollection<T> values ? values : datas.ToList(), whereColumns, updateColumns).ConfigureAwait(false);
             }
         }
 
@@ -243,7 +243,7 @@ namespace ThingsGateway.SqlSugar
             }
             else
             {
-                return await _BulkMerge(datas is IReadOnlyList<T> values ? values : datas.ToList(), updateColumns, whereColumns).ConfigureAwait(false);
+                return await _BulkMerge(datas is IReadOnlyCollection<T> values ? values : datas.ToList(), updateColumns, whereColumns).ConfigureAwait(false);
             }
         }
         /// <summary>批量合并实体列表</summary>
@@ -253,7 +253,7 @@ namespace ThingsGateway.SqlSugar
         }
 
         /// <summary>执行批量合并操作</summary>
-        private async Task<int> _BulkMerge(IReadOnlyList<T> datas, string[] updateColumns, string[] whereColumns)
+        private async Task<int> _BulkMerge(IReadOnlyCollection<T> datas, string[] updateColumns, string[] whereColumns)
         {
             try
             {
@@ -364,7 +364,7 @@ namespace ThingsGateway.SqlSugar
         }
 
         /// <summary>执行批量更新操作</summary>
-        private async Task<int> _BulkUpdate(IReadOnlyList<T> datas, string[] whereColumns, string[] updateColumns)
+        private async Task<int> _BulkUpdate(IReadOnlyCollection<T> datas, string[] whereColumns, string[] updateColumns)
         {
             var isAuto = this.context.CurrentConnectionConfig.IsAutoCloseConnection;
             var isAutoOk = false;
@@ -486,7 +486,7 @@ namespace ThingsGateway.SqlSugar
             return result;
         }
         /// <summary>执行批量插入操作</summary>
-        private async Task<int> _BulkCopy(IReadOnlyList<T> datas)
+        private async Task<int> _BulkCopy(IReadOnlyCollection<T> datas)
         {
             Begin(datas, true);
             DataTable dt = ToDdateTable(datas);

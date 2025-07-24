@@ -304,7 +304,7 @@ namespace ThingsGateway.SqlSugar
             var ignoreColumns = QueryBuilder.GetExpressionValue(columns, ResolveExpressType.ArraySingle).GetResultArray().Select(it => this.SqlBuilder.GetNoTranslationColumnName(it).ToLower()).ToList();
             return IgnoreColumns(ignoreColumns);
         }
-        public ISugarQueryable<T> IgnoreColumns(IReadOnlyList<string> columns)
+        public ISugarQueryable<T> IgnoreColumns(IReadOnlyCollection<string> columns)
         {
             if (QueryBuilder.IgnoreColumns.IsNullOrEmpty())
             {
@@ -644,13 +644,13 @@ namespace ThingsGateway.SqlSugar
         {
             return WhereClass(new List<ClassType>() { whereClass }, ignoreDefaultValue);
         }
-        public virtual ISugarQueryable<T> WhereClassByPrimaryKey(IReadOnlyList<T> list)
+        public virtual ISugarQueryable<T> WhereClassByPrimaryKey(IReadOnlyCollection<T> list)
         {
             _WhereClassByPrimaryKey(list);
             return this;
         }
 
-        public virtual ISugarQueryable<T> WhereClassByWhereColumns(IReadOnlyList<T> list, IReadOnlyList<string> whereColumns)
+        public virtual ISugarQueryable<T> WhereClassByWhereColumns(IReadOnlyCollection<T> list, IReadOnlyCollection<string> whereColumns)
         {
             _WhereClassByWhereColumns(list, whereColumns);
             return this;
@@ -743,7 +743,7 @@ namespace ThingsGateway.SqlSugar
         /// </summary>
         /// <param name="whereClassTypes"></param>
         /// <returns></returns>
-        public ISugarQueryable<T> _WhereClassByPrimaryKey(IReadOnlyList<T> whereClassTypes)
+        public ISugarQueryable<T> _WhereClassByPrimaryKey(IReadOnlyCollection<T> whereClassTypes)
         {
             if (whereClassTypes.HasValue())
             {
@@ -813,7 +813,7 @@ namespace ThingsGateway.SqlSugar
         /// <param name="whereClassTypes"></param>
         /// <param name="whereColumns"></param>
         /// <returns></returns>
-        public ISugarQueryable<T> _WhereClassByWhereColumns(IReadOnlyList<T> whereClassTypes, IReadOnlyList<string> whereColumns)
+        public ISugarQueryable<T> _WhereClassByWhereColumns(IReadOnlyCollection<T> whereClassTypes, IReadOnlyCollection<string> whereColumns)
         {
             if (whereClassTypes.HasValue())
             {
@@ -1072,7 +1072,7 @@ namespace ThingsGateway.SqlSugar
             if (list == null) return default(T);
             else return list.SingleOrDefault();
         }
-        public ISugarQueryable<T> InIF<TParamter>(bool isIn, string fieldName, IReadOnlyList<TParamter> pkValues)
+        public ISugarQueryable<T> InIF<TParamter>(bool isIn, string fieldName, IReadOnlyCollection<TParamter> pkValues)
         {
             if (isIn)
             {
@@ -1083,7 +1083,7 @@ namespace ThingsGateway.SqlSugar
                 return this;
             }
         }
-        public ISugarQueryable<T> InIF<TParamter>(bool isIn, IReadOnlyList<TParamter> pkValues)
+        public ISugarQueryable<T> InIF<TParamter>(bool isIn, IReadOnlyCollection<TParamter> pkValues)
         {
             if (isIn)
             {
@@ -1091,17 +1091,17 @@ namespace ThingsGateway.SqlSugar
             }
             return this;
         }
-        public virtual ISugarQueryable<T> In<TParamter>(IReadOnlyList<TParamter> pkValues)
+        public virtual ISugarQueryable<T> In<TParamter>(IReadOnlyCollection<TParamter> pkValues)
         {
             if (pkValues == null || pkValues.Count == 0)
             {
                 Where(SqlBuilder.SqlFalse);
                 return this;
             }
-            if (pkValues.Count == 1 && pkValues[0].GetType().FullName.IsCollectionsList() || (pkValues[0] is IEnumerable && pkValues[0].GetType() != UtilConstants.StringType))
+            if (pkValues.Count == 1 && pkValues.First().GetType().FullName.IsCollectionsList() || (pkValues.First() is IEnumerable && pkValues.First().GetType() != UtilConstants.StringType))
             {
                 var newValues = new List<object>();
-                foreach (var item in pkValues[0] as IEnumerable)
+                foreach (var item in pkValues.First() as IEnumerable)
                 {
                     newValues.Add(item);
                 }
@@ -1114,7 +1114,7 @@ namespace ThingsGateway.SqlSugar
             field = shortName + field;
             return In(field, pkValues);
         }
-        public virtual ISugarQueryable<T> In<FieldType>(string field, IReadOnlyList<FieldType> inValues)
+        public virtual ISugarQueryable<T> In<FieldType>(string field, IReadOnlyCollection<FieldType> inValues)
         {
             if (inValues == null || inValues.Count == 0)
             {
@@ -1128,7 +1128,7 @@ namespace ThingsGateway.SqlSugar
                 {
                     var whereIndex = QueryBuilder.WhereIndex;
                     string parameterName = this.SqlBuilder.SqlParameterKeyWord + "InPara" + whereIndex;
-                    this.AddParameters(new SugarParameter(parameterName, inValues[0]));
+                    this.AddParameters(new SugarParameter(parameterName, inValues.First()));
                     this.Where(string.Format(QueryBuilder.EqualTemplate, SqlBuilder.GetTranslationColumnName(field), parameterName));
                     QueryBuilder.WhereIndex++;
                 }
@@ -1166,27 +1166,27 @@ namespace ThingsGateway.SqlSugar
             }
             return this;
         }
-        public virtual ISugarQueryable<T> In<FieldType>(Expression<Func<T, object>> expression, IReadOnlyList<FieldType> inValues)
+        public virtual ISugarQueryable<T> In<FieldType>(Expression<Func<T, object>> expression, IReadOnlyCollection<FieldType> inValues)
         {
             if (inValues == null || inValues.Count == 0)
             {
                 Where(SqlBuilder.SqlFalse);
                 return this;
             }
-
+            var first = inValues.First();
             QueryBuilder.CheckExpression(expression, "In");
             var isSingle = QueryBuilder.IsSingle();
             var lamResult = QueryBuilder.GetExpressionValue(expression, isSingle ? ResolveExpressType.FieldSingle : ResolveExpressType.FieldMultiple);
             var fieldName = lamResult.GetResultString();
             var propertyName = ExpressionTool.GetMemberName(expression);
             var propertyColumn = this.EntityInfo.Columns.FirstOrDefault(it => it.PropertyName == propertyName);
-            if (inValues?.Count == 1 && inValues[0]?.GetType()?.FullName?.IsCollectionsList() == true && propertyColumn != null && propertyColumn?.UnderType?.FullName?.IsCollectionsList() != true)
+            if (inValues?.Count == 1 && first?.GetType()?.FullName?.IsCollectionsList() == true && propertyColumn != null && propertyColumn?.UnderType?.FullName?.IsCollectionsList() != true)
             {
-                return In(fieldName, UtilMethods.ConvertToListOfObjects(inValues[0]));
+                return In(fieldName, UtilMethods.ConvertToListOfObjects(first));
             }
-            else if (inValues?.Count == 1 && inValues[0]?.GetType()?.IsArray == true && propertyColumn != null && propertyColumn?.UnderType?.IsArray != true)
+            else if (inValues?.Count == 1 && first?.GetType()?.IsArray == true && propertyColumn != null && propertyColumn?.UnderType?.IsArray != true)
             {
-                return In(fieldName, UtilMethods.ConvertToListOfObjects(inValues[0]));
+                return In(fieldName, UtilMethods.ConvertToListOfObjects(first));
             }
             else
             {

@@ -32,10 +32,10 @@ namespace ThingsGateway.SqlSugar
         IInsertable<T> AsType(Type tableNameType);
         IInsertable<T> With(string lockString);
         IInsertable<T> InsertColumns(Expression<Func<T, object>> columns);
-        IInsertable<T> InsertColumns(IReadOnlyList<string> columns);
+        IInsertable<T> InsertColumns(IReadOnlyCollection<string> columns);
 
         IInsertable<T> IgnoreColumns(Expression<Func<T, object>> columns);
-        IInsertable<T> IgnoreColumns(IReadOnlyList<string> columns);
+        IInsertable<T> IgnoreColumns(IReadOnlyCollection<string> columns);
         IInsertable<T> IgnoreColumns(bool ignoreNullColumn, bool isOffIdentity = false);
         IInsertable<T> IgnoreColumnsNull(bool isIgnoreNull = true);
 
@@ -48,7 +48,7 @@ namespace ThingsGateway.SqlSugar
         IInsertable<T> EnableDiffLogEventIF(bool isDiffLogEvent, object businessData = null);
         IInsertable<T> RemoveDataCache();
         IInsertable<T> RemoveDataCache(string likeString);
-        KeyValuePair<string, IReadOnlyList<SugarParameter>> ToSql();
+        KeyValuePair<string, IReadOnlyCollection<SugarParameter>> ToSql();
         string ToSqlString();
         SqlServerBlukCopy UseSqlServer();
         MySqlBlukCopy<T> UseMySql();

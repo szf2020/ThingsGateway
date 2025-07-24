@@ -149,12 +149,12 @@ namespace ThingsGateway.SqlSugar
         /// <summary>
         /// 日志开始事件
         /// </summary>
-        public virtual Action<string, IReadOnlyList<SugarParameter>> LogEventStarting => this.Context.CurrentConnectionConfig.AopEvents?.OnLogExecuting;
+        public virtual Action<string, IReadOnlyCollection<SugarParameter>> LogEventStarting => this.Context.CurrentConnectionConfig.AopEvents?.OnLogExecuting;
 
         /// <summary>
         /// 日志完成事件
         /// </summary>
-        public virtual Action<string, IReadOnlyList<SugarParameter>> LogEventCompleted => this.Context.CurrentConnectionConfig.AopEvents?.OnLogExecuted;
+        public virtual Action<string, IReadOnlyCollection<SugarParameter>> LogEventCompleted => this.Context.CurrentConnectionConfig.AopEvents?.OnLogExecuted;
 
         /// <summary>
         /// 检查连接执行前事件
@@ -169,17 +169,17 @@ namespace ThingsGateway.SqlSugar
         /// <summary>
         /// 获取数据读取前事件
         /// </summary>
-        public virtual Action<string, IReadOnlyList<SugarParameter>> OnGetDataReadering => this.Context.CurrentConnectionConfig.AopEvents?.OnGetDataReadering;
+        public virtual Action<string, IReadOnlyCollection<SugarParameter>> OnGetDataReadering => this.Context.CurrentConnectionConfig.AopEvents?.OnGetDataReadering;
 
         /// <summary>
         /// 获取数据读取后事件
         /// </summary>
-        public virtual Action<string, IReadOnlyList<SugarParameter>, TimeSpan> OnGetDataReadered => this.Context.CurrentConnectionConfig.AopEvents?.OnGetDataReadered;
+        public virtual Action<string, IReadOnlyCollection<SugarParameter>, TimeSpan> OnGetDataReadered => this.Context.CurrentConnectionConfig.AopEvents?.OnGetDataReadered;
 
         /// <summary>
         /// 处理SQL执行前事件
         /// </summary>
-        public virtual Func<string, IReadOnlyList<SugarParameter>, KeyValuePair<string, IReadOnlyList<SugarParameter>>> ProcessingEventStartingSQL => this.Context.CurrentConnectionConfig.AopEvents?.OnExecutingChangeSql;
+        public virtual Func<string, IReadOnlyCollection<SugarParameter>, KeyValuePair<string, IReadOnlyCollection<SugarParameter>>> ProcessingEventStartingSQL => this.Context.CurrentConnectionConfig.AopEvents?.OnExecutingChangeSql;
 
         /// <summary>
         /// SQL格式化函数
@@ -531,7 +531,7 @@ namespace ThingsGateway.SqlSugar
         /// <summary>
         /// 将SugarParameter数组转换为IDataParameter数组
         /// </summary>
-        public abstract IDataParameter[] ToIDbDataParameter(params IReadOnlyList<SugarParameter> pars);
+        public abstract IDataParameter[] ToIDbDataParameter(params IReadOnlyCollection<SugarParameter> pars);
 
         /// <summary>
         /// 设置命令到数据适配器
@@ -546,7 +546,7 @@ namespace ThingsGateway.SqlSugar
         /// <summary>
         /// 获取数据库命令对象
         /// </summary>
-        public abstract DbCommand GetCommand(string sql, IReadOnlyList<SugarParameter> pars);
+        public abstract DbCommand GetCommand(string sql, IReadOnlyCollection<SugarParameter> pars);
 
         /// <summary>
         /// 数据库连接对象
@@ -702,7 +702,7 @@ namespace ThingsGateway.SqlSugar
         /// <summary>
         /// 执行包含GO语句的SQL命令
         /// </summary>
-        public virtual int ExecuteCommandWithGo(string sql, params IReadOnlyList<SugarParameter> parameters)
+        public virtual int ExecuteCommandWithGo(string sql, params IReadOnlyCollection<SugarParameter> parameters)
         {
             if (string.IsNullOrEmpty(sql))
                 return 0;
@@ -735,7 +735,7 @@ namespace ThingsGateway.SqlSugar
         /// <summary>
         /// 执行SQL命令
         /// </summary>
-        public virtual int ExecuteCommand(string sql, params IReadOnlyList<SugarParameter> parameters)
+        public virtual int ExecuteCommand(string sql, params IReadOnlyCollection<SugarParameter> parameters)
         {
             try
             {
@@ -782,7 +782,7 @@ namespace ThingsGateway.SqlSugar
         /// <summary>
         /// 获取数据读取器
         /// </summary>
-        public virtual IDataReader GetDataReader(string sql, params IReadOnlyList<SugarParameter> parameters)
+        public virtual IDataReader GetDataReader(string sql, params IReadOnlyCollection<SugarParameter> parameters)
         {
             try
             {
@@ -830,7 +830,7 @@ namespace ThingsGateway.SqlSugar
         /// <summary>
         /// 获取数据集
         /// </summary>
-        public virtual DataSet GetDataSetAll(string sql, params IReadOnlyList<SugarParameter> parameters)
+        public virtual DataSet GetDataSetAll(string sql, params IReadOnlyCollection<SugarParameter> parameters)
         {
             try
             {
@@ -878,7 +878,7 @@ namespace ThingsGateway.SqlSugar
         /// <summary>
         /// 获取单个值
         /// </summary>
-        public virtual object GetScalar(string sql, params IReadOnlyList<SugarParameter> parameters)
+        public virtual object GetScalar(string sql, params IReadOnlyCollection<SugarParameter> parameters)
         {
             try
             {
@@ -922,7 +922,7 @@ namespace ThingsGateway.SqlSugar
         /// <summary>
         /// 异步执行SQL命令
         /// </summary>
-        public virtual async Task<int> ExecuteCommandAsync(string sql, params IReadOnlyList<SugarParameter> parameters)
+        public virtual async Task<int> ExecuteCommandAsync(string sql, params IReadOnlyCollection<SugarParameter> parameters)
         {
             try
             {
@@ -973,7 +973,7 @@ namespace ThingsGateway.SqlSugar
         /// <summary>
         /// 异步获取数据读取器
         /// </summary>
-        public virtual async Task<IDataReader> GetDataReaderAsync(string sql, params IReadOnlyList<SugarParameter> parameters)
+        public virtual async Task<IDataReader> GetDataReaderAsync(string sql, params IReadOnlyCollection<SugarParameter> parameters)
         {
             try
             {
@@ -1027,7 +1027,7 @@ namespace ThingsGateway.SqlSugar
         /// <summary>
         /// 异步获取单个值
         /// </summary>
-        public virtual async Task<object> GetScalarAsync(string sql, params IReadOnlyList<SugarParameter> parameters)
+        public virtual async Task<object> GetScalarAsync(string sql, params IReadOnlyCollection<SugarParameter> parameters)
         {
             try
             {
@@ -1077,7 +1077,7 @@ namespace ThingsGateway.SqlSugar
         /// <summary>
         /// 异步获取数据集(伪异步实现)
         /// </summary>
-        public virtual Task<DataSet> GetDataSetAllAsync(string sql, params IReadOnlyList<SugarParameter> parameters)
+        public virtual Task<DataSet> GetDataSetAllAsync(string sql, params IReadOnlyCollection<SugarParameter> parameters)
         {
             Async();
 
@@ -1106,7 +1106,7 @@ namespace ThingsGateway.SqlSugar
         /// <summary>
         /// 获取字符串结果(使用参数数组)
         /// </summary>
-        public virtual string GetString(string sql, params IReadOnlyList<SugarParameter> parameters)
+        public virtual string GetString(string sql, params IReadOnlyCollection<SugarParameter> parameters)
         {
             return Convert.ToString(GetScalar(sql, parameters));
         }
@@ -1122,7 +1122,7 @@ namespace ThingsGateway.SqlSugar
         /// <summary>
         /// 异步获取字符串结果(使用参数数组)
         /// </summary>
-        public virtual async Task<string> GetStringAsync(string sql, params IReadOnlyList<SugarParameter> parameters)
+        public virtual async Task<string> GetStringAsync(string sql, params IReadOnlyCollection<SugarParameter> parameters)
         {
             return Convert.ToString(await GetScalarAsync(sql, parameters).ConfigureAwait(false));
         }
@@ -1154,7 +1154,7 @@ namespace ThingsGateway.SqlSugar
         /// <summary>
         /// 获取整型结果(使用参数数组)
         /// </summary>
-        public virtual int GetInt(string sql, params IReadOnlyList<SugarParameter> parameters)
+        public virtual int GetInt(string sql, params IReadOnlyCollection<SugarParameter> parameters)
         {
             return GetScalar(sql, parameters).ObjToInt();
         }
@@ -1170,7 +1170,7 @@ namespace ThingsGateway.SqlSugar
         /// <summary>
         /// 异步获取整型结果(使用参数数组)
         /// </summary>
-        public virtual async Task<int> GetIntAsync(string sql, params IReadOnlyList<SugarParameter> parameters)
+        public virtual async Task<int> GetIntAsync(string sql, params IReadOnlyCollection<SugarParameter> parameters)
         {
             var list = await GetScalarAsync(sql, parameters).ConfigureAwait(false);
             return list.ObjToInt();
@@ -1187,7 +1187,7 @@ namespace ThingsGateway.SqlSugar
         /// <summary>
         /// 获取双精度浮点数结果(使用参数数组)
         /// </summary>
-        public virtual Double GetDouble(string sql, params IReadOnlyList<SugarParameter> parameters)
+        public virtual Double GetDouble(string sql, params IReadOnlyCollection<SugarParameter> parameters)
         {
             return GetScalar(sql, parameters).ObjToMoney();
         }
@@ -1203,7 +1203,7 @@ namespace ThingsGateway.SqlSugar
         /// <summary>
         /// 异步获取双精度浮点数结果(使用参数数组)
         /// </summary>
-        public virtual async Task<Double> GetDoubleAsync(string sql, params IReadOnlyList<SugarParameter> parameters)
+        public virtual async Task<Double> GetDoubleAsync(string sql, params IReadOnlyCollection<SugarParameter> parameters)
         {
             var result = await GetScalarAsync(sql, parameters).ConfigureAwait(false);
             return result.ObjToMoney();
@@ -1220,7 +1220,7 @@ namespace ThingsGateway.SqlSugar
         /// <summary>
         /// 获取十进制数结果(使用参数数组)
         /// </summary>
-        public virtual decimal GetDecimal(string sql, params IReadOnlyList<SugarParameter> parameters)
+        public virtual decimal GetDecimal(string sql, params IReadOnlyCollection<SugarParameter> parameters)
         {
             return GetScalar(sql, parameters).ObjToDecimal();
         }
@@ -1236,7 +1236,7 @@ namespace ThingsGateway.SqlSugar
         /// <summary>
         /// 异步获取十进制数结果(使用参数数组)
         /// </summary>
-        public virtual async Task<decimal> GetDecimalAsync(string sql, params IReadOnlyList<SugarParameter> parameters)
+        public virtual async Task<decimal> GetDecimalAsync(string sql, params IReadOnlyCollection<SugarParameter> parameters)
         {
             var result = await GetScalarAsync(sql, parameters).ConfigureAwait(false);
             return result.ObjToDecimal();
@@ -1253,7 +1253,7 @@ namespace ThingsGateway.SqlSugar
         /// <summary>
         /// 获取日期时间结果(使用参数数组)
         /// </summary>
-        public virtual DateTime GetDateTime(string sql, params IReadOnlyList<SugarParameter> parameters)
+        public virtual DateTime GetDateTime(string sql, params IReadOnlyCollection<SugarParameter> parameters)
         {
             return GetScalar(sql, parameters).ObjToDate();
         }
@@ -1269,7 +1269,7 @@ namespace ThingsGateway.SqlSugar
         /// <summary>
         /// 异步获取日期时间结果(使用参数数组)
         /// </summary>
-        public virtual async Task<DateTime> GetDateTimeAsync(string sql, params IReadOnlyList<SugarParameter> parameters)
+        public virtual async Task<DateTime> GetDateTimeAsync(string sql, params IReadOnlyCollection<SugarParameter> parameters)
         {
             var list = await GetScalarAsync(sql, parameters).ConfigureAwait(false);
             return list.ObjToDate();
@@ -1291,7 +1291,7 @@ namespace ThingsGateway.SqlSugar
         /// <summary>
         /// 执行SQL查询并返回对象列表(使用参数数组)
         /// </summary>
-        public virtual List<T> SqlQuery<T>(string sql, params IReadOnlyList<SugarParameter> parameters)
+        public virtual List<T> SqlQuery<T>(string sql, params IReadOnlyCollection<SugarParameter> parameters)
         {
             var result = SqlQuery<T, object, object, object, object, object, object>(sql, parameters);
             return result.Item1;
@@ -1378,7 +1378,7 @@ namespace ThingsGateway.SqlSugar
             if (parsmeterArray != null && parsmeterArray.Count != 0)
                 builder.SqlQueryBuilder.Parameters.AddRange(parsmeterArray);
             string sqlString = builder.SqlQueryBuilder.ToSqlString();
-            IReadOnlyList<SugarParameter> Parameters = builder.SqlQueryBuilder.Parameters;
+            IReadOnlyCollection<SugarParameter> Parameters = builder.SqlQueryBuilder.Parameters;
             this.GetDataBefore(sqlString, Parameters);
             using (var dataReader = this.GetDataReader(sqlString, Parameters))
             {
@@ -1468,7 +1468,7 @@ namespace ThingsGateway.SqlSugar
         /// <summary>
         /// 异步执行SQL查询并返回对象列表(使用参数数组)
         /// </summary>
-        public virtual async Task<List<T>> SqlQueryAsync<T>(string sql, params IReadOnlyList<SugarParameter> parameters)
+        public virtual async Task<List<T>> SqlQueryAsync<T>(string sql, params IReadOnlyCollection<SugarParameter> parameters)
         {
             var result = await SqlQueryAsync<T, object, object, object, object, object, object>(sql, parameters).ConfigureAwait(false);
             return result.Item1;
@@ -1531,7 +1531,7 @@ namespace ThingsGateway.SqlSugar
             if (parsmeterArray != null && parsmeterArray.Count != 0)
                 builder.SqlQueryBuilder.Parameters.AddRange(parsmeterArray);
             string sqlString = builder.SqlQueryBuilder.ToSqlString();
-            IReadOnlyList<SugarParameter> Parameters = builder.SqlQueryBuilder.Parameters;
+            IReadOnlyCollection<SugarParameter> Parameters = builder.SqlQueryBuilder.Parameters;
             this.GetDataBefore(sqlString, Parameters);
             using (var dataReader = await GetDataReaderAsync(sqlString, Parameters).ConfigureAwait(false))
             {
@@ -1609,7 +1609,7 @@ namespace ThingsGateway.SqlSugar
         /// <summary>
         /// 执行SQL查询并返回单个对象(使用参数数组)
         /// </summary>
-        public virtual T SqlQuerySingle<T>(string sql, params IReadOnlyList<SugarParameter> parameters)
+        public virtual T SqlQuerySingle<T>(string sql, params IReadOnlyCollection<SugarParameter> parameters)
         {
             var result = SqlQuery<T>(sql, parameters);
             return result == null ? default(T) : result.FirstOrDefault();
@@ -1627,7 +1627,7 @@ namespace ThingsGateway.SqlSugar
         /// <summary>
         /// 异步执行SQL查询并返回单个对象(使用参数数组)
         /// </summary>
-        public virtual async Task<T> SqlQuerySingleAsync<T>(string sql, params IReadOnlyList<SugarParameter> parameters)
+        public virtual async Task<T> SqlQuerySingleAsync<T>(string sql, params IReadOnlyCollection<SugarParameter> parameters)
         {
             var result = await SqlQueryAsync<T>(sql, parameters).ConfigureAwait(false);
             return result == null ? default(T) : result.FirstOrDefault();
@@ -1640,7 +1640,7 @@ namespace ThingsGateway.SqlSugar
         /// <summary>
         /// 获取DataTable(使用参数数组)
         /// </summary>
-        public virtual DataTable GetDataTable(string sql, params IReadOnlyList<SugarParameter> parameters)
+        public virtual DataTable GetDataTable(string sql, params IReadOnlyCollection<SugarParameter> parameters)
         {
             var ds = GetDataSetAll(sql, parameters);
             if (ds.Tables.Count != 0 && ds.Tables.Count > 0) return ds.Tables[0];
@@ -1658,7 +1658,7 @@ namespace ThingsGateway.SqlSugar
         /// <summary>
         /// 异步获取DataTable(使用参数数组)
         /// </summary>
-        public virtual async Task<DataTable> GetDataTableAsync(string sql, params IReadOnlyList<SugarParameter> parameters)
+        public virtual async Task<DataTable> GetDataTableAsync(string sql, params IReadOnlyCollection<SugarParameter> parameters)
         {
             var ds = await GetDataSetAllAsync(sql, parameters).ConfigureAwait(false);
             if (ds.Tables.Count != 0 && ds.Tables.Count > 0) return ds.Tables[0];
@@ -1769,7 +1769,7 @@ namespace ThingsGateway.SqlSugar
         /// <summary>
         /// 异步获取命令对象(需要子类实现)
         /// </summary>
-        public virtual async Task<DbCommand> GetCommandAsync(string sql, IReadOnlyList<SugarParameter> parameters)
+        public virtual async Task<DbCommand> GetCommandAsync(string sql, IReadOnlyCollection<SugarParameter> parameters)
         {
             await Task.FromResult(0).ConfigureAwait(false);
             throw new NotImplementedException();
@@ -1803,7 +1803,7 @@ namespace ThingsGateway.SqlSugar
         /// <summary>
         /// 异常处理
         /// </summary>
-        protected virtual void SugarCatch(Exception ex, string sql, IReadOnlyList<SugarParameter> parameters)
+        protected virtual void SugarCatch(Exception ex, string sql, IReadOnlyCollection<SugarParameter> parameters)
         {
             if (sql?.Contains("{year}{month}{day}") == true)
             {
@@ -1848,7 +1848,7 @@ namespace ThingsGateway.SqlSugar
         /// <summary>
         /// 处理执行前的SQL
         /// </summary>
-        protected void ExecuteProcessingSQL(ref string sql, ref IReadOnlyList<SugarParameter> parameters)
+        protected void ExecuteProcessingSQL(ref string sql, ref IReadOnlyCollection<SugarParameter> parameters)
         {
             var result = this.ProcessingEventStartingSQL(sql, parameters);
             sql = result.Key;
@@ -1858,12 +1858,12 @@ namespace ThingsGateway.SqlSugar
         /// <summary>
         /// 执行前的操作
         /// </summary>
-        public virtual void ExecuteBefore(string sql, IReadOnlyList<SugarParameter> parameters)
+        public virtual void ExecuteBefore(string sql, IReadOnlyCollection<SugarParameter> parameters)
         {
             this.BeforeTime = DateTime.Now;
             if (this.IsEnableLogEvent)
             {
-                Action<string, IReadOnlyList<SugarParameter>> action = LogEventStarting;
+                Action<string, IReadOnlyCollection<SugarParameter>> action = LogEventStarting;
                 if (action != null)
                 {
                     if (parameters == null || parameters.Count == 0)
@@ -1881,7 +1881,7 @@ namespace ThingsGateway.SqlSugar
         /// <summary>
         /// 执行后的操作
         /// </summary>
-        public virtual void ExecuteAfter(string sql, IReadOnlyList<SugarParameter> parameters)
+        public virtual void ExecuteAfter(string sql, IReadOnlyCollection<SugarParameter> parameters)
         {
             this.AfterTime = DateTime.Now;
             var hasParameter = parameters.HasValue();
@@ -1900,7 +1900,7 @@ namespace ThingsGateway.SqlSugar
             }
             if (this.IsEnableLogEvent)
             {
-                Action<string, IReadOnlyList<SugarParameter>> action = LogEventCompleted;
+                Action<string, IReadOnlyCollection<SugarParameter>> action = LogEventCompleted;
                 if (action != null)
                 {
                     if (parameters == null || parameters.Count == 0)
@@ -1928,12 +1928,12 @@ namespace ThingsGateway.SqlSugar
         /// </summary>
         /// <param name="sql">SQL语句</param>
         /// <param name="parameters">参数数组</param>
-        public virtual void GetDataBefore(string sql, IReadOnlyList<SugarParameter> parameters)
+        public virtual void GetDataBefore(string sql, IReadOnlyCollection<SugarParameter> parameters)
         {
             this.GetDataBeforeTime = DateTime.Now;
             if (this.IsEnableLogEvent)
             {
-                Action<string, IReadOnlyList<SugarParameter>> action = OnGetDataReadering;
+                Action<string, IReadOnlyCollection<SugarParameter>> action = OnGetDataReadering;
                 if (action != null)
                 {
                     if (parameters == null || parameters.Count == 0)
@@ -1953,12 +1953,12 @@ namespace ThingsGateway.SqlSugar
         /// </summary>
         /// <param name="sql">SQL语句</param>
         /// <param name="parameters">参数数组</param>
-        public virtual void GetDataAfter(string sql, IReadOnlyList<SugarParameter> parameters)
+        public virtual void GetDataAfter(string sql, IReadOnlyCollection<SugarParameter> parameters)
         {
             this.GetDataAfterTime = DateTime.Now;
             if (this.IsEnableLogEvent)
             {
-                Action<string, IReadOnlyList<SugarParameter>, TimeSpan> action = OnGetDataReadered;
+                Action<string, IReadOnlyCollection<SugarParameter>, TimeSpan> action = OnGetDataReadered;
                 if (action != null)
                 {
                     if (parameters == null || parameters.Count == 0)
@@ -1981,7 +1981,7 @@ namespace ThingsGateway.SqlSugar
         /// <param name="parameters">参数对象</param>
         /// <param name="propertyInfo">属性信息数组</param>
         /// <returns>SugarParameter数组</returns>
-        public virtual IReadOnlyList<SugarParameter> GetParameters(object parameters, PropertyInfo[] propertyInfo = null)
+        public virtual IReadOnlyCollection<SugarParameter> GetParameters(object parameters, PropertyInfo[] propertyInfo = null)
         {
             if (parameters == null) return Array.Empty<SugarParameter>();
             return base.GetParameters(parameters, propertyInfo, this.SqlParameterKeyWord);
@@ -2065,7 +2065,7 @@ namespace ThingsGateway.SqlSugar
         /// <summary>
         /// 检查是否需要格式化SQL
         /// </summary>
-        private bool IsFormat(IReadOnlyList<SugarParameter> parameters)
+        private bool IsFormat(IReadOnlyCollection<SugarParameter> parameters)
         {
             return FormatSql != null && parameters?.Count > 0;
         }
@@ -2105,7 +2105,7 @@ namespace ThingsGateway.SqlSugar
         /// <param name="sql">SQL语句</param>
         /// <param name="parameters">参数数组</param>
         /// <param name="ex">异常对象</param>
-        protected void ExecuteErrorEvent(string sql, IReadOnlyList<SugarParameter> parameters, Exception ex)
+        protected void ExecuteErrorEvent(string sql, IReadOnlyCollection<SugarParameter> parameters, Exception ex)
         {
             this.AfterTime = DateTime.Now;
             ErrorEvent(new SqlSugarException(this.Context, ex, sql, parameters));
@@ -2120,7 +2120,7 @@ namespace ThingsGateway.SqlSugar
         /// </summary>
         /// <param name="sql">SQL语句引用</param>
         /// <param name="parameters">参数数组</param>
-        protected void InitParameters(ref string sql, IReadOnlyList<SugarParameter> parameters)
+        protected void InitParameters(ref string sql, IReadOnlyCollection<SugarParameter> parameters)
         {
             this.SqlExecuteCount = 0;
             this.BeforeTime = DateTime.MinValue;

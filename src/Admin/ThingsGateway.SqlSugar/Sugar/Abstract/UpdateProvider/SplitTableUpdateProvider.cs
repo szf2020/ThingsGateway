@@ -12,7 +12,7 @@ namespace ThingsGateway.SqlSugar
         public int ExecuteCommandWithOptLock(bool isThrowError = false)
         {
             var updates = updateobj.UpdateObjs;
-            var tableName = this.Context.SplitHelper(updates[0]).GetTableName();
+            var tableName = this.Context.SplitHelper(updates.First()).GetTableName();
             var names = updateobj.UpdateBuilder.DbColumnInfoList.Select(it => it.DbColumnName).Distinct().ToArray();
             return this.Context.Updateable(updates).AS(tableName)
                 .UpdateColumns(names).ExecuteCommandWithOptLock(isThrowError);
@@ -42,7 +42,7 @@ namespace ThingsGateway.SqlSugar
         public async Task<int> ExecuteCommandWithOptLockAsync(bool isThrowError = false)
         {
             var updates = updateobj.UpdateObjs;
-            var tableName = this.Context.SplitHelper(updates[0]).GetTableName();
+            var tableName = this.Context.SplitHelper(updates.First()).GetTableName();
             var names = updateobj.UpdateBuilder.DbColumnInfoList.Select(it => it.DbColumnName).Distinct().ToArray();
             return await Context.Updateable(updates).AS(tableName)
                 .UpdateColumns(names).ExecuteCommandWithOptLockAsync(isThrowError).ConfigureAwait(false);
@@ -94,7 +94,7 @@ namespace ThingsGateway.SqlSugar
             return result;
         }
 
-        private KeyValuePair<string, List<SugarParameter>> GetSqlObj(KeyValuePair<string, IReadOnlyList<SugarParameter>> keyValuePair, string asName)
+        private KeyValuePair<string, List<SugarParameter>> GetSqlObj(KeyValuePair<string, IReadOnlyCollection<SugarParameter>> keyValuePair, string asName)
         {
             List<SugarParameter> pars = new List<SugarParameter>();
             string sql = keyValuePair.Key;

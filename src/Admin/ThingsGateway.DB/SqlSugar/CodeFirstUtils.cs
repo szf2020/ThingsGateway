@@ -42,7 +42,6 @@ public static class CodeFirstUtils
         var seedDataTypes = App.EffectiveTypes
     .Where(u => !u.IsInterface && !u.IsAbstract && u.IsClass
     && u.GetInterfaces().Any(i => i.HasImplementedRawGeneric(typeof(ISqlSugarEntitySeedData<>))) && u.Assembly.FullName == assemblyName);
-        if (!seedDataTypes.Any()) return;
         foreach (var seedType in seedDataTypes)//遍历种子类
         {
             //使用与指定参数匹配程度最高的构造函数来创建指定类型的实例。
@@ -62,10 +61,12 @@ public static class CodeFirstUtils
             // seedDataTable.TableName = db.EntityMaintenance.GetEntityInfo(entityType).DbTableName;//获取表名
             var ignoreAdd = seedDataMethod!.GetCustomAttribute<IgnoreSeedDataAddAttribute>();//读取忽略插入特性
             var ignoreUpdate = seedDataMethod!.GetCustomAttribute<IgnoreSeedDataUpdateAttribute>();//读取忽略更新特性
+
+            var seedDataList = seedData.ToList();
             if (entityInfo.Columns.Any(u => u.IsPrimarykey))//判断种子数据是否有主键
             {
                 // 按主键进行批量增加和更新
-                var storage = db.StorageableByObject(seedData.ToList()).ToStorage();
+                var storage = db.StorageableByObject(seedDataList).ToStorage();
                 if (ignoreAdd == null)
                     storage.AsInsertable.ExecuteCommand();//执行插入
                 if (ignoreUpdate == null && config.IsUpdateSeedData) storage.AsUpdateable.ExecuteCommand();//只有没有忽略更新的特性才执行更新
@@ -75,7 +76,7 @@ public static class CodeFirstUtils
                 //全量插入
                 // 无主键则只进行插入
                 if (!db.Queryable(entityInfo.DbTableName, entityInfo.DbTableName).Any() && ignoreAdd == null)
-                    db.InsertableByObject(seedData.ToList()).ExecuteCommand();
+                    db.InsertableByObject(seedDataList).ExecuteCommand();
             }
         }
     }
@@ -89,7 +90,6 @@ public static class CodeFirstUtils
         // 获取所有实体表-初始化表结构
         var entityTypes = App.EffectiveTypes.Where(u =>
             !u.IsInterface && !u.IsAbstract && u.IsClass && u.IsDefined(typeof(SugarTable), false) && u.Assembly.FullName == assemblyName);
-        if (!entityTypes.Any()) return;//没有就退出
         foreach (var entityType in entityTypes)
         {
             var tenantAtt = entityType.GetCustomAttribute<TenantAttribute>();//获取Sqlsugar多库特性
