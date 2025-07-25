@@ -38,7 +38,7 @@ namespace ThingsGateway.SqlSugar
             object objectValue = null;
             MethodInfo method = GetSaveMethod(ref objectValue);
             if (method == null) return new StorageableAsMethodInfo(null);
-            method = objectValue.GetType().GetMethod("ToStorage");
+            method = objectValue.GetType().GetMethod(nameof(ToStorage));
             objectValue = method.Invoke(objectValue, Array.Empty<object>());
             StorageableAsMethodInfo result = new StorageableAsMethodInfo(type);
             result.ObjectValue = objectValue;
@@ -51,7 +51,7 @@ namespace ThingsGateway.SqlSugar
             if (objectValue == null)
                 return null;
             callValue = MethodInfo.Invoke(Context, new object[] { objectValue });
-            return callValue.GetType().GetMyMethod("ExecuteCommand", 0);
+            return callValue.GetType().GetMyMethod(nameof(ExecuteCommand), 0);
         }
 
         public StorageableMethodInfo ToStorage()
@@ -64,7 +64,7 @@ namespace ThingsGateway.SqlSugar
             object objectValue = null;
             MethodInfo method = GetSaveMethod(ref objectValue);
             if (method == null) return new StorageableSplitTableMethodInfo(null);
-            method = objectValue.GetType().GetMethod("SplitTable");
+            method = objectValue.GetType().GetMethod(nameof(SplitTable));
             objectValue = method.Invoke(objectValue, Array.Empty<object>());
             StorageableSplitTableMethodInfo result = new StorageableSplitTableMethodInfo(null);
             result.ObjectValue = objectValue;
@@ -77,7 +77,7 @@ namespace ThingsGateway.SqlSugar
             object objectValue = null;
             MethodInfo method = GetSaveMethod(ref objectValue);
             if (method == null) return new StorageableSplitTableMethodInfo(null);
-            method = objectValue.GetType().GetMyMethod("As", 1);
+            method = objectValue.GetType().GetMyMethod(nameof(QueryMethodInfo.AS), 1);
             objectValue = method.Invoke(objectValue, new object[] { tableName });
             StorageableSplitTableMethodInfo result = new StorageableSplitTableMethodInfo(null);
             result.ObjectValue = objectValue;
@@ -114,14 +114,14 @@ namespace ThingsGateway.SqlSugar
             if (type == null) return 0;
             PropertyInfo property = ObjectValue.GetType().GetProperty(type);
             var value = property.GetValue(ObjectValue);
-            var newObj = value.GetType().GetMethod("ExecuteCommand").Invoke(value, Array.Empty<object>());
+            var newObj = value.GetType().GetMethod(nameof(ExecuteCommand)).Invoke(value, Array.Empty<object>());
             return (int)newObj;
         }
         public StorageableCommonMethodInfo IgnoreColumns(params string[] ignoreColumns)
         {
             PropertyInfo property = ObjectValue?.GetType().GetProperty(type);
             var value = property?.GetValue(ObjectValue);
-            var newObj = value?.GetType().GetMyMethod("IgnoreColumns", 1, typeof(string[])).Invoke(value, new object[] { ignoreColumns });
+            var newObj = value?.GetType().GetMyMethod(nameof(IgnoreColumns), 1, typeof(string[])).Invoke(value, new object[] { ignoreColumns });
             StorageableCommonMethodInfo result = new StorageableCommonMethodInfo();
             result.Value = newObj;
             return result;
@@ -133,7 +133,7 @@ namespace ThingsGateway.SqlSugar
         public int ExecuteCommand()
         {
             if (Value == null) return 0;
-            var newObj = Value.GetType().GetMethod("ExecuteCommand").Invoke(Value, Array.Empty<object>());
+            var newObj = Value.GetType().GetMethod(nameof(ExecuteCommand)).Invoke(Value, Array.Empty<object>());
             return (int)newObj;
         }
     }
@@ -150,7 +150,7 @@ namespace ThingsGateway.SqlSugar
         internal MethodInfo Method { get; set; }
         public int ExecuteCommand()
         {
-            var newObj = ObjectValue.GetType().GetMethod("ExecuteCommand").Invoke(ObjectValue, Array.Empty<object>());
+            var newObj = ObjectValue.GetType().GetMethod(nameof(ExecuteCommand)).Invoke(ObjectValue, Array.Empty<object>());
             return (int)newObj;
         }
     }

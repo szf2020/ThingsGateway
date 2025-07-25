@@ -400,7 +400,7 @@ internal sealed class ScheduleHostedService : BackgroundService
                             // 通知 GC 垃圾回收器回收
                             //_schedulerFactory.GCCollect();
                         }
-                    }, stoppingToken);
+                    }, stoppingToken, TaskCreationOptions.None, TaskScheduler.Default);
                 });
             }
         });

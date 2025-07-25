@@ -150,18 +150,18 @@ public static class DependencyInjectionServiceCollectionExtensions
         {
             Register(services, dependencyType, type, injectionAttribute);
         }
-
-        if (!canInjectInterfaces.Any()) return;
+        var list = canInjectInterfaces.ToList();
+        if (list.Count == 0) return;
 
         // 只注册第一个接口
         if (injectionAttribute.Pattern is InjectionPatterns.FirstInterface or InjectionPatterns.SelfWithFirstInterface)
         {
-            Register(services, dependencyType, type, injectionAttribute, canInjectInterfaces.Last());
+            Register(services, dependencyType, type, injectionAttribute, list.Last());
         }
         // 注册多个接口
         else if (injectionAttribute.Pattern is InjectionPatterns.ImplementedInterfaces or InjectionPatterns.All)
         {
-            foreach (var inter in canInjectInterfaces)
+            foreach (var inter in list)
             {
                 Register(services, dependencyType, type, injectionAttribute, inter);
             }

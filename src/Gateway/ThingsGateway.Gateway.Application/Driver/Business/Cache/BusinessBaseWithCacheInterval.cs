@@ -246,7 +246,7 @@ public abstract class BusinessBaseWithCacheInterval : BusinessBaseWithCache
 
     public override void PauseThread(bool pause)
     {
-        lock (this)
+        lock (pauseLock)
         {
             var oldV = CurrentDevice.Pause;
             base.PauseThread(pause);

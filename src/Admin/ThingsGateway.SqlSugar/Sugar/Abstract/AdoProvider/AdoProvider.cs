@@ -374,7 +374,12 @@ namespace ThingsGateway.SqlSugar
             {
                 try
                 {
-                    await (Connection as DbConnection).OpenAsync().ConfigureAwait(false);
+                    if (IsOpenAsync)
+                        await (Connection as DbConnection).OpenAsync().ConfigureAwait(false);
+                    else
+#pragma warning disable CA1849
+                        (Connection as DbConnection).Open();
+#pragma warning restore CA1849
                 }
                 catch (Exception ex)
                 {
@@ -609,10 +614,17 @@ namespace ThingsGateway.SqlSugar
             var result = new DbResult<bool>();
             try
             {
-                await BeginTranAsync().ConfigureAwait(false);
+                if (IsOpenAsync)
+                    await BeginTranAsync().ConfigureAwait(false);
+                else
+#pragma warning disable CA1849
+                    BeginTran();
                 if (action != null)
                     await action().ConfigureAwait(false);
-                await CommitTranAsync().ConfigureAwait(false);
+                if (IsOpenAsync)
+                    await CommitTranAsync().ConfigureAwait(false);
+                else
+                    CommitTran();
                 result.Data = result.IsSuccess = true;
             }
             catch (Exception ex)
@@ -620,7 +632,11 @@ namespace ThingsGateway.SqlSugar
                 result.ErrorException = ex;
                 result.ErrorMessage = ex.Message;
                 result.IsSuccess = false;
-                await RollbackTranAsync().ConfigureAwait(false);
+                if (IsOpenAsync)
+                    await RollbackTranAsync().ConfigureAwait(false);
+                else
+                    RollbackTran();
+#pragma warning restore CA1849
                 if (errorCallBack != null)
                 {
                     errorCallBack(ex);
@@ -665,10 +681,17 @@ namespace ThingsGateway.SqlSugar
             var result = new DbResult<T>();
             try
             {
-                await BeginTranAsync().ConfigureAwait(false);
+                if (IsOpenAsync)
+                    await BeginTranAsync().ConfigureAwait(false);
+                else
+#pragma warning disable CA1849
+                    BeginTran();
                 if (action != null)
                     result.Data = await action().ConfigureAwait(false);
-                await CommitTranAsync().ConfigureAwait(false);
+                if (IsOpenAsync)
+                    await CommitTranAsync().ConfigureAwait(false);
+                else
+                    CommitTran();
                 result.IsSuccess = true;
             }
             catch (Exception ex)
@@ -676,7 +699,11 @@ namespace ThingsGateway.SqlSugar
                 result.ErrorException = ex;
                 result.ErrorMessage = ex.Message;
                 result.IsSuccess = false;
-                await RollbackTranAsync().ConfigureAwait(false);
+                if (IsOpenAsync)
+                    await RollbackTranAsync().ConfigureAwait(false);
+                else
+                    RollbackTran();
+#pragma warning restore CA1849
                 if (errorCallBack != null)
                 {
                     errorCallBack(ex);
@@ -939,7 +966,9 @@ namespace ThingsGateway.SqlSugar
                     ExecuteProcessingSQL(ref sql, ref parameters);
 
                 ExecuteBefore(sql, parameters);
+#pragma warning disable CA1849
                 var sqlCommand = IsOpenAsync ? await GetCommandAsync(sql, parameters).ConfigureAwait(false) : GetCommand(sql, parameters);
+#pragma warning restore CA1849
 
                 int count;
                 if (this.CancellationToken == null)
@@ -965,7 +994,8 @@ namespace ThingsGateway.SqlSugar
             }
             finally
             {
-                if (this.IsAutoClose()) this.Close();
+                if (this.IsAutoClose())
+                    await this.CloseAsync().ConfigureAwait(false);
                 SetConnectionEnd(sql);
             }
         }
@@ -992,7 +1022,9 @@ namespace ThingsGateway.SqlSugar
                     ExecuteProcessingSQL(ref sql, ref parameters);
 
                 ExecuteBefore(sql, parameters);
+#pragma warning disable CA1849
                 var sqlCommand = IsOpenAsync ? await GetCommandAsync(sql, parameters).ConfigureAwait(false) : GetCommand(sql, parameters);
+#pragma warning restore CA1849
 
                 DbDataReader sqlDataReader;
                 if (this.CancellationToken == null)
@@ -1044,7 +1076,9 @@ namespace ThingsGateway.SqlSugar
                     ExecuteProcessingSQL(ref sql, ref parameters);
 
                 ExecuteBefore(sql, parameters);
+#pragma warning disable CA1849
                 var sqlCommand = IsOpenAsync ? await GetCommandAsync(sql, parameters).ConfigureAwait(false) : GetCommand(sql, parameters);
+#pragma warning restore CA1849
 
                 object scalar;
                 if (CancellationToken == null)
@@ -1069,7 +1103,8 @@ namespace ThingsGateway.SqlSugar
             }
             finally
             {
-                if (this.IsAutoClose()) this.Close();
+                if (this.IsAutoClose())
+                    await this.CloseAsync().ConfigureAwait(false);
                 SetConnectionEnd(sql);
             }
         }
@@ -1786,7 +1821,12 @@ namespace ThingsGateway.SqlSugar
             }
             if (this.Connection != null && this.Connection.State == ConnectionState.Open)
             {
-                await (Connection as DbConnection).CloseAsync().ConfigureAwait(false);
+                if (IsOpenAsync)
+                    await (Connection as DbConnection).CloseAsync().ConfigureAwait(false);
+                else
+#pragma warning disable CA1849
+                    (Connection as DbConnection).Close();
+#pragma warning restore CA1849
             }
             if (this.IsMasterSlaveSeparation && this.SlaveConnections.HasValue())
             {
@@ -1794,7 +1834,12 @@ namespace ThingsGateway.SqlSugar
                 {
                     if (slaveConnection != null && slaveConnection.State == ConnectionState.Open)
                     {
-                        await (slaveConnection as DbConnection).CloseAsync().ConfigureAwait(false);
+                        if (IsOpenAsync)
+                            await (Connection as DbConnection).CloseAsync().ConfigureAwait(false);
+                        else
+#pragma warning disable CA1849
+                            (Connection as DbConnection).Close();
+#pragma warning restore CA1849
                     }
                 }
             }

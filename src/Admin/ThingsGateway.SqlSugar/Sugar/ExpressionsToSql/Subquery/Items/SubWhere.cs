@@ -12,7 +12,7 @@ namespace ThingsGateway.SqlSugar
 
         public string Name
         {
-            get { return "Where"; }
+            get { return nameof(QueryMethodInfo.Where); }
         }
 
         public Expression Expression
@@ -46,8 +46,8 @@ namespace ThingsGateway.SqlSugar
                 argExp = ExpressionTool.DynamicInvoke(argExp) as Expression;
             }
             var copyContext = this.Context;
-            var pars = ExpressionTool.GetParameters(expression).Distinct();
-            if (this.Context.JoinIndex > 0 || pars.Count() > 1)
+            var pars = ExpressionTool.GetParameters(expression).Distinct().ToArray();
+            if (this.Context.JoinIndex > 0 || pars.Length > 1)
             {
                 copyContext = this.Context.GetCopyContextWithMapping();
                 copyContext.IsSingle = false;
@@ -73,7 +73,7 @@ namespace ThingsGateway.SqlSugar
                 this.Context.Parameters.AddRange(sqlObj.Value);
                 return result;
             }
-            if (this.Context.JoinIndex > 0 || pars.Count() > 1)
+            if (this.Context.JoinIndex > 0 || pars.Length > 1)
             {
                 this.Context.Parameters.AddRange(copyContext.Parameters);
                 this.Context.Index = copyContext.Index;

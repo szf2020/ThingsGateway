@@ -325,7 +325,7 @@ internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
                 {
                     try
                     {
-                        oldCts.Cancel();
+                        await oldCts.CancelAsync().ConfigureAwait(false);
                         oldCts.SafeDispose();
                     }
                     catch
@@ -337,7 +337,7 @@ internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
 
                 CancellationTokenSources.TryAdd(driver.DeviceId, cts);
 
-                _ = Task.Factory.StartNew((state) => DriverStart(state, token), driver, token);
+                _ = Task.Factory.StartNew((state) => DriverStart(state, token), driver, token, TaskCreationOptions.None, TaskScheduler.Default);
             }).ConfigureAwait(false);
         }
         catch (Exception ex)
@@ -788,7 +788,7 @@ internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
         Disposed = true;
         try
         {
-            CancellationTokenSource.Cancel();
+            await CancellationTokenSource.CancelAsync().ConfigureAwait(false);
             CancellationTokenSource.SafeDispose();
             GlobalData.DeviceStatusChangeEvent -= GlobalData_DeviceStatusChangeEvent;
             await NewDeviceLock.WaitAsync().ConfigureAwait(false);

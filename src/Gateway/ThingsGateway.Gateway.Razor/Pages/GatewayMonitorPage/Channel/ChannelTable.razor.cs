@@ -102,7 +102,7 @@ public partial class ChannelTable : IDisposable
     private async Task Copy(IEnumerable<ChannelRuntime> channels)
     {
         var channelRuntime = channels.FirstOrDefault();
-        if (channelRuntime==null)
+        if (channelRuntime == null)
         {
             await ToastService.Warning(null, RazorLocalizer["PleaseSelect"]);
             return;

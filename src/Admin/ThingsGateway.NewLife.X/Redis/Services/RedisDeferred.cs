@@ -53,6 +53,7 @@ public class RedisDeferred : DisposeBase
         _timer.TryDispose();
     }
     #endregion
+    protected object lockThis = new();
 
     #region 方法
     /// <summary>放入队列。后面定时批量处理</summary>
@@ -68,7 +69,7 @@ public class RedisDeferred : DisposeBase
     {
         if (_timer == null)
         {
-            lock (this)
+            lock (lockThis)
             {
                 if (_timer == null)
                 {

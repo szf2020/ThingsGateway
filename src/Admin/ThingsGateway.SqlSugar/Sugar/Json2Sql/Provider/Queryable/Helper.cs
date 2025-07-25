@@ -28,27 +28,27 @@ namespace ThingsGateway.SqlSugar
 
         private static bool IsSelect(string name)
         {
-            return name.Equals("Select", StringComparison.CurrentCultureIgnoreCase);
+            return name.Equals(nameof(QueryMethodInfo.Select), StringComparison.CurrentCultureIgnoreCase);
         }
 
         private static bool IsHaving(string name)
         {
-            return name.Equals("Having", StringComparison.CurrentCultureIgnoreCase);
+            return name.Equals(nameof(QueryMethodInfo.Having), StringComparison.CurrentCultureIgnoreCase);
         }
 
         private static bool IsGroupBy(string name)
         {
-            return name.Equals("GroupBy", StringComparison.CurrentCultureIgnoreCase);
+            return name.Equals(nameof(QueryMethodInfo.GroupBy), StringComparison.CurrentCultureIgnoreCase);
         }
 
         private static bool IsOrderBy(string name)
         {
-            return name.Equals("OrderBy", StringComparison.CurrentCultureIgnoreCase);
+            return name.Equals(nameof(QueryMethodInfo.OrderBy), StringComparison.CurrentCultureIgnoreCase);
         }
 
         private static bool IsWhere(string name)
         {
-            return name.Equals("Where", StringComparison.CurrentCultureIgnoreCase);
+            return name.Equals(nameof(QueryMethodInfo.Where), StringComparison.CurrentCultureIgnoreCase);
         }
 
         private static bool IsForm(string name)

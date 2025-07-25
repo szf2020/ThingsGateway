@@ -32,7 +32,7 @@ namespace ThingsGateway.SqlSugar
             if (Context == null) return 0;
             var inertable = MethodInfo.Invoke(Context, new object[] { objectValue });
             inertable = GetPageInsertable(inertable);
-            var result = inertable.GetType().GetMethod("ExecuteCommand").Invoke(inertable, Array.Empty<object>());
+            var result = inertable.GetType().GetMethod(nameof(ExecuteCommand)).Invoke(inertable, Array.Empty<object>());
             return (int)result;
         }
 
@@ -53,7 +53,7 @@ namespace ThingsGateway.SqlSugar
             if (Context == null) return 0;
             var inertable = MethodInfo.Invoke(Context, new object[] { objectValue });
             inertable = GetPageInsertable(inertable);
-            var result = inertable.GetType().GetMyMethod("ExecuteCommandAsync", 0).Invoke(inertable, Array.Empty<object>());
+            var result = inertable.GetType().GetMyMethod(nameof(ExecuteCommandAsync), 0).Invoke(inertable, Array.Empty<object>());
             return await ((Task<int>)result).ConfigureAwait(false);
         }
 
@@ -64,14 +64,14 @@ namespace ThingsGateway.SqlSugar
         {
             if (Context == null) return 0;
             var inertable = MethodInfo.Invoke(Context, new object[] { objectValue });
-            var result = inertable.GetType().GetMethod("ExecuteReturnIdentity").Invoke(inertable, Array.Empty<object>());
+            var result = inertable.GetType().GetMethod(nameof(ExecuteReturnIdentity)).Invoke(inertable, Array.Empty<object>());
             return (int)result;
         }
         public long ExecuteReturnBigIdentity()
         {
             if (Context == null) return 0;
             var inertable = MethodInfo.Invoke(Context, new object[] { objectValue });
-            var result = inertable.GetType().GetMethod("ExecuteReturnBigIdentity").Invoke(inertable, Array.Empty<object>());
+            var result = inertable.GetType().GetMethod(nameof(ExecuteReturnBigIdentity)).Invoke(inertable, Array.Empty<object>());
             return (long)result;
         }
 
@@ -82,14 +82,14 @@ namespace ThingsGateway.SqlSugar
         {
             if (Context == null) return Task.FromResult(0);
             var inertable = MethodInfo.Invoke(Context, new object[] { objectValue });
-            var result = inertable.GetType().GetMyMethod("ExecuteReturnIdentityAsync", 0).Invoke(inertable, Array.Empty<object>());
+            var result = inertable.GetType().GetMyMethod(nameof(ExecuteReturnIdentityAsync), 0).Invoke(inertable, Array.Empty<object>());
             return Task.FromResult((int)result);
         }
         public Task<long> ExecuteReturnBigIdentityAsync()
         {
             if (Context == null) return Task.FromResult((long)0);
             var inertable = MethodInfo.Invoke(Context, new object[] { objectValue });
-            var result = inertable.GetType().GetMyMethod("ExecuteReturnBigIdentityAsync", 0).Invoke(inertable, Array.Empty<object>());
+            var result = inertable.GetType().GetMyMethod(nameof(ExecuteReturnBigIdentityAsync), 0).Invoke(inertable, Array.Empty<object>());
             return Task.FromResult((long)result);
         }
         /// <summary>
@@ -98,7 +98,7 @@ namespace ThingsGateway.SqlSugar
         public CommonMethodInfo AS(string tableName)
         {
             var inertable = MethodInfo.Invoke(Context, new object[] { objectValue });
-            var newMethod = inertable.GetType().GetMyMethod("AS", 1, typeof(string));
+            var newMethod = inertable.GetType().GetMyMethod(nameof(QueryMethodInfo.AS), 1, typeof(string));
             var result = newMethod.Invoke(inertable, new object[] { tableName });
             return new CommonMethodInfo()
             {
@@ -112,7 +112,7 @@ namespace ThingsGateway.SqlSugar
         public CommonMethodInfo EnableDiffLogEvent(object businessData = null)
         {
             var inertable = MethodInfo.Invoke(Context, new object[] { objectValue });
-            var newMethod = inertable.GetType().GetMyMethod("EnableDiffLogEvent", 1, typeof(object));
+            var newMethod = inertable.GetType().GetMyMethod(nameof(EnableDiffLogEvent), 1, typeof(object));
             var result = newMethod.Invoke(inertable, new object[] { businessData });
             return new CommonMethodInfo()
             {
@@ -126,7 +126,7 @@ namespace ThingsGateway.SqlSugar
         public CommonMethodInfo IgnoreColumns(params string[] ignoreColumns)
         {
             var inertable = MethodInfo.Invoke(Context, new object[] { objectValue });
-            var newMethod = inertable.GetType().GetMyMethod("IgnoreColumns", 1, typeof(string[]));
+            var newMethod = inertable.GetType().GetMyMethod(nameof(IgnoreColumns), 1, typeof(string[]));
             var result = newMethod.Invoke(inertable, new object[] { ignoreColumns });
             return new CommonMethodInfo()
             {
@@ -140,7 +140,7 @@ namespace ThingsGateway.SqlSugar
         public CommonMethodInfo IgnoreColumns(bool ignoreNullColumn)
         {
             var inertable = MethodInfo.Invoke(Context, new object[] { objectValue });
-            var newMethod = inertable.GetType().GetMyMethod("IgnoreColumns", 2, typeof(bool), typeof(bool));
+            var newMethod = inertable.GetType().GetMyMethod(nameof(IgnoreColumns), 2, typeof(bool), typeof(bool));
             var result = newMethod.Invoke(inertable, new object[] { ignoreNullColumn, true });
             return new CommonMethodInfo()
             {
@@ -154,7 +154,7 @@ namespace ThingsGateway.SqlSugar
         public SplitMethodInfo SplitTable()
         {
             var inertable = MethodInfo.Invoke(Context, new object[] { objectValue });
-            var newMethod = inertable.GetType().GetMyMethod("SplitTable", 0);
+            var newMethod = inertable.GetType().GetMyMethod(nameof(SplitTable), 0);
             var result = newMethod.Invoke(inertable, Array.Empty<object>());
             return new SplitMethodInfo()
             {
@@ -169,7 +169,7 @@ namespace ThingsGateway.SqlSugar
         {
             if (Context == null) return 0;
             var inertable = MethodInfo.Invoke(Context, new object[] { objectValue });
-            var result = inertable.GetType().GetMethod("ExecuteReturnSnowflakeId").Invoke(inertable, Array.Empty<object>());
+            var result = inertable.GetType().GetMethod(nameof(ExecuteReturnSnowflakeId)).Invoke(inertable, Array.Empty<object>());
             return (long)result;
         }
 
@@ -180,7 +180,7 @@ namespace ThingsGateway.SqlSugar
         {
             if (Context == null) return 0;
             var inertable = MethodInfo.Invoke(Context, new object[] { objectValue });
-            var result = inertable.GetType().GetMyMethod("ExecuteReturnSnowflakeIdAsync", 0).Invoke(inertable, Array.Empty<object>());
+            var result = inertable.GetType().GetMyMethod(nameof(ExecuteReturnSnowflakeIdAsync), 0).Invoke(inertable, Array.Empty<object>());
             return await ((Task<long>)result).ConfigureAwait(false);
         }
 

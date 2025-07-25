@@ -192,7 +192,7 @@ namespace ThingsGateway.SqlSugar
                             }
                             else if (UtilMethods.IsParameterConverter(item))
                             {
-                                setValue = UtilMethods.QueryConverter(itemIndex, null, dataReader, entityInfo, item);
+                                setValue = UtilMethods.QueryConverter(itemIndex, dataReader, entityInfo, item);
                             }
                             item.PropertyInfo.SetValue(parentObj, setValue);
                         }

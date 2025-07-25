@@ -32,7 +32,7 @@ namespace ThingsGateway.SqlSugar
                     this.context.SingleTableNameSubqueryShortName = (context.Expression as LambdaExpression).Parameters[0].Name;
                 }
             }
-            else if (context.IsSingle && ExpressionTool.GetMethodName(currentExpression) != "ToList")
+            else if (context.IsSingle && ExpressionTool.GetMethodName(currentExpression) != nameof(QueryMethodInfo.ToList))
             {
                 if (context.Expression is LambdaExpression)
                 {
@@ -51,7 +51,7 @@ namespace ThingsGateway.SqlSugar
                             {
                                 context.SingleTableNameSubqueryShortName = (((meExp.Body as BinaryExpression).Left as MemberExpression)?.Expression as ParameterExpression)?.Name;
                             }
-                            if (ExpressionTool.GetMethodName(context.Expression).IsContainsIn("ToList") && meExp.Parameters.Any(it => it.Name == selfParameterName))
+                            if (ExpressionTool.GetMethodName(context.Expression).IsContainsIn(nameof(QueryMethodInfo.ToList)) && meExp.Parameters.Any(it => it.Name == selfParameterName))
                             {
                                 if (meExp.Body is BinaryExpression)
                                 {

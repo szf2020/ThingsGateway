@@ -18,6 +18,7 @@ public sealed class IncrementCount
     private long _current = 0;
     private long _max = long.MaxValue;
     private long _start = 0;
+    private object lockThis = new();
 
     /// <inheritdoc cref="IncrementCount"/>
     public IncrementCount(long max, long start = 0, int tick = 1)
@@ -43,7 +44,7 @@ public sealed class IncrementCount
     /// </summary>
     public long GetCurrentValue()
     {
-        lock (this)
+        lock (lockThis)
         {
             long current = _current;
             _current += IncreaseTick;
@@ -65,7 +66,7 @@ public sealed class IncrementCount
     /// </summary>
     public void ResetCurrentValue()
     {
-        lock (this)
+        lock (lockThis)
         {
             _current = _start;
         }
@@ -77,7 +78,7 @@ public sealed class IncrementCount
     /// <param name="value">指定值</param>
     public void ResetCurrentValue(long value)
     {
-        lock (this)
+        lock (lockThis)
         {
             _current = value <= _max ? value >= _start ? value : _start : _max;
         }
@@ -88,7 +89,7 @@ public sealed class IncrementCount
     /// </summary>
     public void ResetMaxValue(long max)
     {
-        lock (this)
+        lock (lockThis)
         {
             if (max > _start)
             {
@@ -108,7 +109,7 @@ public sealed class IncrementCount
     /// <param name="start">初始值</param>
     public void ResetStartValue(long start)
     {
-        lock (this)
+        lock (lockThis)
         {
             if (start < _max)
             {

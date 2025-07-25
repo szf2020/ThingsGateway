@@ -76,17 +76,8 @@ public class VariableMethod
             }
 
             dynamic result;
-            switch (MethodInfo.ReturnKind)
-            {
-                case MethodReturnKind.Awaitable:
-                case MethodReturnKind.AwaitableObject:
-                    result = await MethodInfo.InvokeAsync(driverBase, os).ConfigureAwait(false);
-                    break;
 
-                default:
-                    result = MethodInfo.Invoke(driverBase, os);
-                    break;
-            }
+            result = await MethodInfo.InvokeAsync(driverBase, os).ConfigureAwait(false);
             if (MethodInfo.HasReturn)
             {
                 return result;

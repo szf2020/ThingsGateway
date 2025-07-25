@@ -130,7 +130,7 @@ public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariable, IDBH
         else
         {
             if (_driverPropertys.IsReadDB)
-                _db.CodeFirst.As<SQLRealValue>(_driverPropertys.ReadDBTableName).InitTables<SQLRealValue>();
+                _db.CodeFirst.AS<SQLRealValue>(_driverPropertys.ReadDBTableName).InitTables<SQLRealValue>();
         }
 
         await base.ProtectedStartAsync(cancellationToken).ConfigureAwait(false);

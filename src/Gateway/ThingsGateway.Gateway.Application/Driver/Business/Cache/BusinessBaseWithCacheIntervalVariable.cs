@@ -21,11 +21,11 @@ public abstract class BusinessBaseWithCacheIntervalVariable : BusinessBaseWithCa
 
     protected override bool VarModelEnable => true;
 
-    protected override ValueTask<OperResult> UpdateDevModel(IEnumerable<CacheDBItem<DeviceBasicData>> item, CancellationToken cancellationToken)
+    protected override ValueTask<OperResult> UpdateDevModel(List<CacheDBItem<DeviceBasicData>> item, CancellationToken cancellationToken)
     {
         throw new NotImplementedException();
     }
-    protected override ValueTask<OperResult> UpdateAlarmModel(IEnumerable<CacheDBItem<AlarmVariable>> item, CancellationToken cancellationToken)
+    protected override ValueTask<OperResult> UpdateAlarmModel(List<CacheDBItem<AlarmVariable>> item, CancellationToken cancellationToken)
     {
         throw new NotImplementedException();
     }

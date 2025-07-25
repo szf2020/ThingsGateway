@@ -593,7 +593,9 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
             foreach (var sheetName in sheetNames)
             {
                 // 获取当前工作表的所有行数据
+#pragma warning disable CA1849
                 var rows = MiniExcel.Query(path, useHeaderRow: true, sheetName: sheetName).Cast<IDictionary<string, object>>();
+#pragma warning restore CA1849
 
                 deviceImportPreview = SetVariableData(dataScope, deviceDicts, ImportPreviews, deviceImportPreview, driverPluginNameDict, propertysDict, sheetName, rows);
             }

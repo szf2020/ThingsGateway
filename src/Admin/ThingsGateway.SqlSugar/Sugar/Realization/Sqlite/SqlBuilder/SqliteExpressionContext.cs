@@ -271,7 +271,7 @@
                     time = time * 24 * 60 * 60 * 1000;
                     break;
             }
-            return string.Format(" Cast((JulianDay({0}) - JulianDay({1}))  *{2} As INTEGER)", parameter, parameter2, time);
+            return string.Format(" Cast((JulianDay({0}) - JulianDay({1}))  *{2} AS INTEGER)", parameter, parameter2, time);
         }
 
         public override string MergeString(params string[] strings)

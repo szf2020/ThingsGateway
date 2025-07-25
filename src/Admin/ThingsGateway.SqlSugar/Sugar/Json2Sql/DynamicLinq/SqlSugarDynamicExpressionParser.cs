@@ -16,7 +16,7 @@ namespace ThingsGateway.SqlSugar
             {
                 // 查找 ParseLambda 方法
                 MethodInfo parseLambdaMethod = StaticConfig.DynamicExpressionParserType
-                    .GetMyMethod("ParseLambda", 5, StaticConfig.DynamicExpressionParsingConfig.GetType(), typeof(ParameterExpression[]), typeof(Type), typeof(string), typeof(object[]));
+                    .GetMyMethod(nameof(ParseLambda), 5, StaticConfig.DynamicExpressionParsingConfig.GetType(), typeof(ParameterExpression[]), typeof(Type), typeof(string), typeof(object[]));
 
                 if (parseLambdaMethod == null)
                 {
@@ -32,7 +32,7 @@ namespace ThingsGateway.SqlSugar
             {
                 // 查找 ParseLambda 方法
                 MethodInfo parseLambdaMethod = StaticConfig.DynamicExpressionParserType
-                    .GetMyMethod("ParseLambda", 4, typeof(ParameterExpression[]), typeof(Type), typeof(string), typeof(object[]));
+                    .GetMyMethod(nameof(ParseLambda), 4, typeof(ParameterExpression[]), typeof(Type), typeof(string), typeof(object[]));
 
                 if (parseLambdaMethod == null)
                 {

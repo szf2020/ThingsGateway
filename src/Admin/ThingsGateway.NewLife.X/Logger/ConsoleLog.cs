@@ -25,7 +25,7 @@ public class ConsoleLog : Logger
                 return;
             }
 
-            lock (this)
+            lock (lockThis)
             {
                 var cc = Console.ForegroundColor;
                 cc = level switch

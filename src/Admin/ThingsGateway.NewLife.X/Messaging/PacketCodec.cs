@@ -43,6 +43,7 @@ public class PacketCodec
     /// <summary>APM性能追踪器</summary>
     public ITracer? Tracer { get; set; }
     #endregion
+    protected object lockThis = new();
 
     /// <summary>数据包加入缓存数据末尾，分析数据流，得到一帧或多帧数据</summary>
     /// <param name="pk">待分析数据包</param>
@@ -96,7 +97,7 @@ public class PacketCodec
         }
 
         // 加锁，避免多线程冲突
-        lock (this)
+        lock (lockThis)
         {
             // 检查缓存，内部可能创建或清空
             CheckCache();

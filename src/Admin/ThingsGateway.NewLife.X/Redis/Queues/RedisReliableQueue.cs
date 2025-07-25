@@ -263,14 +263,14 @@ public class RedisReliableQueue<T> : QueueBase, IProducerConsumer<T>, IDisposabl
     {
         if (_delay == null)
         {
-            lock (this)
+            lock (lockThis)
             {
                 _delay ??= new RedisDelayQueue<T>(Redis, $"{Key}:Delay");
             }
         }
         if (_delayTask?.IsCompleted != false)
         {
-            lock (this)
+            lock (lockThis)
             {
                 if (_delayTask?.IsCompleted != false)
                 {

@@ -508,10 +508,7 @@ namespace ThingsGateway.SqlSugar
                             var columnInfo = entity.Columns.FirstOrDefault(it => it.PropertyName == member.Member.Name);
                             if (columnInfo?.SqlParameterDbType is Type)
                             {
-                                var type = columnInfo.SqlParameterDbType as Type;
-                                var ParameterConverter = type.GetMethod("ParameterConverter").MakeGenericMethod(columnInfo.PropertyInfo.PropertyType);
-                                var obj = Activator.CreateInstance(type);
-                                var p = ParameterConverter.Invoke(obj, new object[] { value, 100 + this.ContentIndex }) as SugarParameter;
+                                var p = UtilMethods.GetParameterConverter(this.ContentIndex, value, columnInfo);
                                 value = p.Value;
                             }
                         }

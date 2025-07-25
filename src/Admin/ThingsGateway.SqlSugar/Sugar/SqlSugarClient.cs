@@ -168,9 +168,9 @@ namespace ThingsGateway.SqlSugar
 
         public IInsertable<T> Insertable<T>(dynamic insertDynamicObject) where T : class, new()
         {
-            if (insertDynamicObject is IList<T>)
+            if (insertDynamicObject is IReadOnlyCollection<T>)
             {
-                return this.Context.Insertable<T>((insertDynamicObject as IList<T>).ToList());
+                return this.Context.Insertable<T>((insertDynamicObject as IReadOnlyCollection<T>).ToList());
             }
             return this.Context.Insertable<T>(insertDynamicObject);
         }
@@ -697,9 +697,9 @@ namespace ThingsGateway.SqlSugar
 
         public IUpdateable<T> Updateable<T>(dynamic updateDynamicObject) where T : class, new()
         {
-            if (updateDynamicObject is IList<T>)
+            if (updateDynamicObject is IReadOnlyCollection<T>)
             {
-                return this.Context.Updateable<T>((updateDynamicObject as IList<T>).ToList());
+                return this.Context.Updateable<T>((updateDynamicObject as IReadOnlyCollection<T>).ToList());
             }
             return this.Context.Updateable<T>(updateDynamicObject);
         }
@@ -1084,11 +1084,11 @@ namespace ThingsGateway.SqlSugar
             var result = new DbResult<T>();
             try
             {
-                this.BeginTran();
+                await this.BeginTranAsync().ConfigureAwait(false);
                 T data = default(T);
                 if (action != null)
                     data = await action().ConfigureAwait(false);
-                this.CommitTran();
+                await this.CommitTranAsync().ConfigureAwait(false);
                 result.IsSuccess = true;
                 result.Data = data;
             }
@@ -1097,7 +1097,7 @@ namespace ThingsGateway.SqlSugar
                 result.ErrorException = ex;
                 result.ErrorMessage = ex.Message;
                 result.IsSuccess = false;
-                this.RollbackTran();
+                await this.RollbackTranAsync().ConfigureAwait(false);
                 if (errorCallBack != null)
                 {
                     errorCallBack(ex);

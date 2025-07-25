@@ -22,7 +22,16 @@
       "commandName": "Project",
       "launchBrowser": true,
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "PostgreSQL "
+        "ASPNETCORE_ENVIRONMENT": "PostgreSQL"
+      },
+      "dotnetRunMessages": true,
+      "applicationUrl": "http://*:5000"
+    },
+    "SqlServer": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "SqlServer"
       },
       "dotnetRunMessages": true,
       "applicationUrl": "http://*:5000"

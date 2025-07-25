@@ -13,7 +13,7 @@ namespace ThingsGateway.SqlSugar
         {
             get
             {
-                return "ToList";
+                return nameof(QueryMethodInfo.ToList);
             }
         }
 
@@ -151,7 +151,7 @@ namespace ThingsGateway.SqlSugar
             {
                 foreach (var parameter in parameters)
                 {
-                    var parameterColumns = db.EntityMaintenance.GetEntityInfo(parameter.Type).Columns.Where(it => it.IsIgnore == false);
+                    var parameterColumns = db.EntityMaintenance.GetEntityInfo(parameter.Type).Columns.Where(it => it.IsIgnore == false).ToArray();
                     if (!completeColumnColumns.Any(it => it.EqualCase(item.PropertyName)) && parameterColumns.Any(it => it.PropertyName.EqualCase(item.PropertyName)))
                     {
                         var completeColumn = parameterColumns.First(it => it.PropertyName.EqualCase(item.PropertyName));

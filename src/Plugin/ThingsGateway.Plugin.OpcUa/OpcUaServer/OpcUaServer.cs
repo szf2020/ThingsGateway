@@ -440,14 +440,13 @@ public partial class OpcUaServer : BusinessBase
         if (IdVariableRuntimes.ContainsKey(variableData.Id))
             CollectVariableRuntimes.AddOrUpdate(variableData.Id, variableData, (a, b) => variableData);
     }
-
     /// <summary>
     /// 暂停
     /// </summary>
     /// <param name="pause">暂停</param>
     public override void PauseThread(bool pause)
     {
-        lock (this)
+        lock (pauseLock)
         {
             var oldV = CurrentDevice.Pause;
             base.PauseThread(pause);

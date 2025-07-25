@@ -38,7 +38,7 @@ namespace ThingsGateway.SqlSugar
             {
                 if (lambda.Body is MethodCallExpression method)
                 {
-                    if (method.Method.Name == "ToList")
+                    if (method.Method.Name == nameof(QueryMethodInfo.ToList))
                     {
                         var arg = method.Arguments.FirstOrDefault();
                         if (arg != null)
@@ -204,9 +204,7 @@ namespace ThingsGateway.SqlSugar
             var columnDbType = columnInfo.SqlParameterDbType as Type;
             if (columnDbType != null)
             {
-                var ParameterConverter = columnDbType.GetMethod("ParameterConverter").MakeGenericMethod(columnInfo.PropertyInfo.PropertyType);
-                var obj = Activator.CreateInstance(columnDbType);
-                var p = ParameterConverter.Invoke(obj, new object[] { value, index }) as SugarParameter;
+                var p = UtilMethods.GetParameterConverter(index, value, columnDbType, columnInfo.PropertyInfo.PropertyType);
                 return p;
             }
             else
@@ -404,9 +402,9 @@ namespace ThingsGateway.SqlSugar
                 case ExpressionType.Coalesce:
                     throw new Exception("Expression no support ?? ,Use SqlFunc.IsNull");
                 default:
-#pragma warning disable CA1863 // 使用 "CompositeFormat"
+#pragma warning disable CA1863
                     Check.ThrowNotSupportedException(string.Format(ErrorMessage.OperatorError, expressiontype.ToString()));
-#pragma warning restore CA1863 // 使用 "CompositeFormat"
+#pragma warning restore CA1863
                     return null;
             }
         }

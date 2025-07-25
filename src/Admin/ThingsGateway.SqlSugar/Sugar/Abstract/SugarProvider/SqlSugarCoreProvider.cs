@@ -17,22 +17,7 @@ namespace ThingsGateway.SqlSugar
             StackTrace st = new StackTrace(false);
             var methods = st.GetFrames();
             var isAsync = UtilMethods.IsAnyAsyncMethod(methods);
-            //if (methods?.Length >= 0)
-            //{
-            //    foreach (var method in methods.Take(35))
-            //    {
-            //        var refType = method.GetMethod()?.ReflectedType;
-            //        if (refType != null)
-            //        {
-            //            var getInterfaces = refType.Name.StartsWith('<') ? refType?.ReflectedType?.GetInterfaces() : refType?.GetInterfaces();
-            //            if (getInterfaces?.Any(it => it.Name.IsIn("IJob")) == true)
-            //            {
-            //                key = $"{key}IJob";
-            //                break;
-            //            }
-            //        }
-            //    }
-            //}
+
             if (isAsync)
             {
                 result = GetAsyncContext(key);

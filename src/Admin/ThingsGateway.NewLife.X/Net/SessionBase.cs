@@ -93,6 +93,7 @@ public abstract class SessionBase : DisposeBase, ISocketClient, ITransport, ILog
     public override String ToString() => Local + string.Empty;
 
     #endregion 构造
+    protected object lockThis = new();
 
     #region 打开关闭
 
@@ -101,14 +102,14 @@ public abstract class SessionBase : DisposeBase, ISocketClient, ITransport, ILog
     public virtual Boolean Open()
     {
         if (Active) return true;
-        if (!Monitor.TryEnter(this, Timeout + 100)) return false;
+        if (!Monitor.TryEnter(lockThis, Timeout + 100)) return false;
         try
         {
             return OpenAsync().ConfigureAwait(false).GetAwaiter().GetResult();
         }
         finally
         {
-            Monitor.Exit(this);
+            Monitor.Exit(lockThis);
         }
     }
 
@@ -177,14 +178,14 @@ public abstract class SessionBase : DisposeBase, ISocketClient, ITransport, ILog
     public virtual Boolean Close(String reason)
     {
         if (!Active) return true;
-        if (!Monitor.TryEnter(this, Timeout + 100)) return false;
+        if (!Monitor.TryEnter(lockThis, Timeout + 100)) return false;
         try
         {
             return CloseAsync(reason).ConfigureAwait(false).GetAwaiter().GetResult();
         }
         finally
         {
-            Monitor.Exit(this);
+            Monitor.Exit(lockThis);
         }
     }
 

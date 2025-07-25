@@ -96,26 +96,7 @@ namespace ThingsGateway.SqlSugar
                 return this.initkey;
             }
             var key = "SqlSugarProviderScope_" + conn.CurrentConnectionConfig.ConfigId;
-            //if (frames == null)
-            //{
-            //    frames = new StackTrace(false).GetFrames();
-            //}
-            //if (true)
-            //{
-            //    foreach (var method in frames.Take(35))
-            //    {
-            //        var refType = method.GetMethod()?.ReflectedType;
-            //        if (refType != null)
-            //        {
-            //            var getInterfaces = refType.Name.StartsWith('<') ? refType?.ReflectedType?.GetInterfaces() : refType?.GetInterfaces();
-            //            if (getInterfaces?.Any(it => it.Name.IsIn("IJob")) == true)
-            //            {
-            //                key = $"{key}IJob";
-            //                break;
-            //            }
-            //        }
-            //    }
-            //}
+
             return key;
         }
 

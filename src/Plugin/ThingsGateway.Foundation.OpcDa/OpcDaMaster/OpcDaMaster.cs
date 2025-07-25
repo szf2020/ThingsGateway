@@ -71,6 +71,7 @@ public class OpcDaMaster : IDisposable
 
     private OpcServer m_server;
     private bool publicConnect;
+    protected object lockThis = new();
 
     /// <summary>
     /// <inheritdoc/>
@@ -160,7 +161,7 @@ public class OpcDaMaster : IDisposable
     /// <returns></returns>
     public Dictionary<string, List<OpcItem>> AddItemsWithSave(List<string> items)
     {
-        lock (this)
+        lock (lockThis)
         {
             int i = ItemDicts.Count;
             var addItems = items.ConvertAll(o => new OpcItem(o)).ChunkTrivialBetter(OpcDaProperty.GroupSize).ToDictionary(a => "default" + (i++));
@@ -422,7 +423,7 @@ public class OpcDaMaster : IDisposable
 
     private void PrivateConnect()
     {
-        lock (this)
+        lock (lockThis)
         {
             if (m_server?.IsConnected == true)
             {
@@ -457,7 +458,7 @@ public class OpcDaMaster : IDisposable
 
     private void PrivateDisconnect()
     {
-        lock (this)
+        lock (lockThis)
         {
             if (IsConnected)
                 LogEvent?.Invoke(1, this, $"{m_server.Host} - {m_server.Name} - Disconnect", null);

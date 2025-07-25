@@ -31,7 +31,7 @@ public partial class ChoiceTable<TItem> where TItem : class, new()
 
     public async Task OnAddAsync(IEnumerable<TItem> selectorOutputs)
     {
-        var data= selectorOutputs is IReadOnlyCollection<TItem> list ? list : selectorOutputs.ToList();
+        var data = selectorOutputs is IReadOnlyCollection<TItem> list ? list : selectorOutputs.ToList();
         if (MaxCount > 0 && data.Count + SelectedRows.Count > MaxCount)
         {
             await ToastService.Warning(AdminLocalizer["MaxCount"]);

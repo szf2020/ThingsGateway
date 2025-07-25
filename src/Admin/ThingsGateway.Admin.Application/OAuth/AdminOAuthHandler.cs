@@ -30,7 +30,7 @@ public class AdminOAuthHandler<TOptions>(
 {
     static AdminOAuthHandler()
     {
-        Task.Factory.StartNew(Insertable, TaskCreationOptions.LongRunning);
+        Task.Factory.StartNew(InsertableAsync, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
     }
 
     /// <summary>
@@ -41,7 +41,7 @@ public class AdminOAuthHandler<TOptions>(
     /// <summary>
     /// 创建访问日志
     /// </summary>
-    private static async Task Insertable()
+    private static async Task InsertableAsync()
     {
         var db = DbContext.GetDB<SysOperateLog>();
         var appLifetime = App.RootServices!.GetService<IHostApplicationLifetime>()!;

@@ -142,11 +142,11 @@ namespace ThingsGateway.SqlSugar
             }
             throw new Exception(parameter + " datediff no support");
         }
-        private void PageEach<T>(IEnumerable<T> pageItems, int pageSize, Action<List<T>> action)
+        private void PageEach(object[] pageItems, int pageSize, Action<List<object>> action)
         {
-            if (pageItems?.Any() == true)
+            if (pageItems?.Length > 0)
             {
-                int totalRecord = pageItems.Count();
+                int totalRecord = pageItems.Length;
                 int pageCount = (totalRecord + pageSize - 1) / pageSize;
                 for (int i = 1; i <= pageCount; i++)
                 {

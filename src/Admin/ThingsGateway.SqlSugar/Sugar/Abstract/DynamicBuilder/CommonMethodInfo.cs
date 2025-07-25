@@ -17,7 +17,7 @@
         public int ExecuteReturnIdentity()
         {
             if (Context == null) return 0;
-            var result = Context.GetType().GetMyMethod("ExecuteReturnIdentity", 0).Invoke(Context, Array.Empty<object>());
+            var result = Context.GetType().GetMyMethod(nameof(ExecuteReturnIdentity), 0).Invoke(Context, Array.Empty<object>());
             return (int)result;
         }
 
@@ -28,7 +28,7 @@
         public async Task<int> ExecuteReturnIdentityAsync()
         {
             if (Context == null) return 0;
-            var result = Context.GetType().GetMyMethod("ExecuteReturnIdentityAsync", 0).Invoke(Context, Array.Empty<object>());
+            var result = Context.GetType().GetMyMethod(nameof(ExecuteReturnIdentityAsync), 0).Invoke(Context, Array.Empty<object>());
             return await ((Task<int>)result).ConfigureAwait(false);
         }
 
@@ -39,7 +39,7 @@
         public int ExecuteCommand()
         {
             if (Context == null) return 0;
-            var result = Context.GetType().GetMyMethod("ExecuteCommand", 0).Invoke(Context, Array.Empty<object>());
+            var result = Context.GetType().GetMyMethod(nameof(ExecuteCommand), 0).Invoke(Context, Array.Empty<object>());
             return (int)result;
         }
 
@@ -50,7 +50,7 @@
         public async Task<int> ExecuteCommandAsync()
         {
             if (Context == null) return 0;
-            var result = Context.GetType().GetMyMethod("ExecuteCommandAsync", 0).Invoke(Context, Array.Empty<object>());
+            var result = Context.GetType().GetMyMethod(nameof(ExecuteCommandAsync), 0).Invoke(Context, Array.Empty<object>());
             return await ((Task<int>)result).ConfigureAwait(false);
         }
     }
@@ -72,7 +72,7 @@
         public int ExecuteCommand()
         {
             if (Context == null) return 0;
-            var result = Context.GetType().GetMyMethod("ExecuteCommand", 0).Invoke(Context, Array.Empty<object>());
+            var result = Context.GetType().GetMyMethod(nameof(ExecuteCommand), 0).Invoke(Context, Array.Empty<object>());
             return (int)result;
         }
 
@@ -83,7 +83,7 @@
         public async Task<int> ExecuteCommandAsync()
         {
             if (Context == null) return 0;
-            var result = Context.GetType().GetMyMethod("ExecuteCommandAsync", 0).Invoke(Context, Array.Empty<object>());
+            var result = Context.GetType().GetMyMethod(nameof(ExecuteCommandAsync), 0).Invoke(Context, Array.Empty<object>());
             return await ((Task<int>)result).ConfigureAwait(false);
         }
     }
@@ -105,7 +105,7 @@
         public int ExecuteCommand()
         {
             if (Context == null) return 0;
-            var result = Context.GetType().GetMyMethod("ExecuteCommand", 0).Invoke(Context, Array.Empty<object>());
+            var result = Context.GetType().GetMyMethod(nameof(ExecuteCommand), 0).Invoke(Context, Array.Empty<object>());
             return (int)result;
         }
 
@@ -129,7 +129,7 @@
         /// <returns>更新通用方法信息</returns>
         public UpdateCommonMethodInfo UpdateColumns(params string[] columns)
         {
-            var result = Context.GetType().GetMyMethod("UpdateColumns", 1, typeof(string[])).Invoke(Context, new object[] { columns });
+            var result = Context.GetType().GetMyMethod(nameof(UpdateColumns), 1, typeof(string[])).Invoke(Context, new object[] { columns });
             UpdateCommonMethodInfo updateCommonMethod = new UpdateCommonMethodInfo();
             updateCommonMethod.Context = result;
             return updateCommonMethod;
@@ -142,7 +142,7 @@
         public async Task<int> ExecuteCommandAsync()
         {
             if (Context == null) return 0;
-            var result = Context.GetType().GetMyMethod("ExecuteCommandAsync", 0).Invoke(Context, Array.Empty<object>());
+            var result = Context.GetType().GetMyMethod(nameof(ExecuteCommandAsync), 0).Invoke(Context, Array.Empty<object>());
             return await ((Task<int>)result).ConfigureAwait(false);
         }
 
@@ -152,7 +152,7 @@
         /// <returns>更新通用方法信息</returns>
         public UpdateCommonMethodInfo SplitTable()
         {
-            var newMethod = this.Context.GetType().GetMyMethod("SplitTable", 0);
+            var newMethod = this.Context.GetType().GetMyMethod(nameof(SplitTable), 0);
             var result = newMethod.Invoke(Context, Array.Empty<object>());
             return new UpdateCommonMethodInfo()
             {

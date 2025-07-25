@@ -46,7 +46,7 @@ public class AlarmChangedTriggerNode : VariableNode, ITriggerNode, IDisposable
     public static BlockingCollection<AlarmVariable> AlarmVariables = new();
     static AlarmChangedTriggerNode()
     {
-        Task.Factory.StartNew(RunAsync);
+        Task.Factory.StartNew(RunAsync, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
         GlobalData.AlarmChangedEvent -= AlarmHostedService_OnAlarmChanged;
         GlobalData.ReadOnlyRealAlarmIdVariables?.ForEach(a => AlarmHostedService_OnAlarmChanged(a.Value));
         GlobalData.AlarmChangedEvent += AlarmHostedService_OnAlarmChanged;

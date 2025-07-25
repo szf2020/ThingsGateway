@@ -465,7 +465,7 @@ namespace ThingsGateway.SqlSugar
         }
         public virtual async Task ForEachByPageAsync(Action<T> action, int pageIndex, int pageSize, RefAsync<int> totalNumber, int singleMaxReads = 300, System.Threading.CancellationTokenSource cancellationTokenSource = null)
         {
-            int count = this.Clone().Count();
+            int count = await this.Clone().CountAsync().ConfigureAwait(false);
             if (count > 0)
             {
                 if (pageSize > singleMaxReads && count - ((pageIndex - 1) * pageSize) > singleMaxReads)
@@ -491,7 +491,7 @@ namespace ThingsGateway.SqlSugar
                 else
                 {
                     if (cancellationTokenSource?.IsCancellationRequested == true) return;
-                    foreach (var item in this.Clone().ToPageList(pageIndex, pageSize))
+                    foreach (var item in await this.Clone().ToPageListAsync(pageIndex, pageSize).ConfigureAwait(false))
                     {
                         if (cancellationTokenSource?.IsCancellationRequested == true) return;
                         action.Invoke(item);
@@ -609,7 +609,7 @@ ParameterT parameter)
             var isJson = this.Context.EntityMaintenance.GetEntityInfo<T>().Columns.Where(it => it.IsJson && it.PropertyName == ExpressionTool.GetMemberName(value)).Any();
             if (isJson)
             {
-                var result = this.Select<T>(keyName + "," + valueName).ToList().ToDictionary(ExpressionTool.GetMemberName(key), ExpressionTool.GetMemberName(value));
+                var result = (await this.Select<T>(keyName + "," + valueName).ToListAsync().ConfigureAwait(false)).ToDictionary(ExpressionTool.GetMemberName(key), ExpressionTool.GetMemberName(value));
                 return result;
             }
             else

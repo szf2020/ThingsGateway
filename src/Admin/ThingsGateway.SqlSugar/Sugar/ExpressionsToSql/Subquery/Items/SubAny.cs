@@ -23,7 +23,7 @@ namespace ThingsGateway.SqlSugar
         {
             get
             {
-                return "Any";
+                return nameof(QueryMethodInfo.Any);
             }
         }
 

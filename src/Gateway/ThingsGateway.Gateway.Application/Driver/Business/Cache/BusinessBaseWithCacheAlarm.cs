@@ -25,16 +25,16 @@ public abstract class BusinessBaseWithCacheAlarm : BusinessBaseWithCache
 
     protected override bool VarModelEnable => false;
 
-    protected override ValueTask<OperResult> UpdateDevModel(IEnumerable<CacheDBItem<DeviceBasicData>> item, CancellationToken cancellationToken)
+    protected override ValueTask<OperResult> UpdateDevModel(List<CacheDBItem<DeviceBasicData>> item, CancellationToken cancellationToken)
     {
         throw new NotImplementedException();
     }
-    protected override ValueTask<OperResult> UpdateVarModel(IEnumerable<CacheDBItem<VariableBasicData>> item, CancellationToken cancellationToken)
+    protected override ValueTask<OperResult> UpdateVarModel(List<CacheDBItem<VariableBasicData>> item, CancellationToken cancellationToken)
     {
         throw new NotImplementedException();
     }
 
-    protected override ValueTask<OperResult> UpdateVarModels(IEnumerable<VariableBasicData> item, CancellationToken cancellationToken)
+    protected override ValueTask<OperResult> UpdateVarModels(List<VariableBasicData> item, CancellationToken cancellationToken)
     {
         throw new NotImplementedException();
     }
@@ -94,7 +94,7 @@ public abstract class BusinessBaseWithCacheAlarm : BusinessBaseWithCache
 
     public override void PauseThread(bool pause)
     {
-        lock (this)
+        lock (pauseLock)
         {
             var oldV = CurrentDevice.Pause;
             base.PauseThread(pause);

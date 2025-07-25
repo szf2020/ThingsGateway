@@ -101,7 +101,9 @@ namespace Photino.Blazor
                 while (true)
                 {
                     var message = await reader.ReadAsync();
+#pragma warning disable CA1849
                     _window.SendWebMessage(message);
+#pragma warning restore CA1849
                 }
             }
             catch (ChannelClosedException) { }

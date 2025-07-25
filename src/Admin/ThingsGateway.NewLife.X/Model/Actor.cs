@@ -102,6 +102,7 @@ public abstract class Actor : DisposeBase, IActor
     /// <returns></returns>
     public override String ToString() => Name;
     #endregion
+    protected object lockThis = new();
 
     #region 方法
 
@@ -114,7 +115,7 @@ public abstract class Actor : DisposeBase, IActor
     public virtual Task? Start(CancellationToken cancellationToken = default)
     {
         if (Active) return _task;
-        lock (this)
+        lock (lockThis)
         {
             if (Active) return _task;
 
@@ -128,7 +129,7 @@ public abstract class Actor : DisposeBase, IActor
             // 启动异步
             if (_task == null)
             {
-                lock (this)
+                lock (lockThis)
                 {
                     _task ??= OnStart(_source.Token);
                 }

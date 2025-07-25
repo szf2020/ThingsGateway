@@ -27,7 +27,7 @@ public partial class SqlHistoryAlarm : BusinessBaseWithCacheAlarm
         AddQueueAlarmModel(new CacheDBItem<AlarmVariable>(alarmVariable));
     }
 
-    protected override ValueTask<OperResult> UpdateAlarmModel(IEnumerable<CacheDBItem<AlarmVariable>> item, CancellationToken cancellationToken)
+    protected override ValueTask<OperResult> UpdateAlarmModel(List<CacheDBItem<AlarmVariable>> item, CancellationToken cancellationToken)
     {
         return UpdateAlarmModel(item.Select(a => a.Value).OrderBy(a => a.Id), cancellationToken);
     }

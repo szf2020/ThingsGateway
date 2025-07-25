@@ -733,7 +733,6 @@ WHERE EVENT_OBJECT_TABLE = '" + tableName + "'");
 
                 // Get the MySqlBackup type
                 Type mbType = assembly.GetType("MySqlConnector.MySqlBackup", false);
-
                 // Create an instance of the MySqlBackup class
                 object mb = Activator.CreateInstance(mbType, db.Ado.Connection.CreateCommand());
 

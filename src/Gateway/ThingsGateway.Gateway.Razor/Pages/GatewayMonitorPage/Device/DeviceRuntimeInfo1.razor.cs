@@ -83,7 +83,9 @@ public partial class DeviceRuntimeInfo1 : IDisposable
         {
             try
             {
+#pragma warning disable CA1849
                 OnParametersSet();
+#pragma warning restore CA1849
                 await InvokeAsync(() => StateHasChanged());
             }
             catch (Exception ex)

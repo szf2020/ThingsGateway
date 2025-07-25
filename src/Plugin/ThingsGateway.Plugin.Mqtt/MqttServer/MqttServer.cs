@@ -50,7 +50,7 @@ public partial class MqttServer : BusinessBaseWithCacheIntervalScriptAll
         _webHost = webBuilder.UseConfiguration(configuration)
            .Build();
         _mqttServer = _webHost.Services.GetRequiredService<MqttHostedServer>();
-        _webHost.Start();
+        await _webHost.StartAsync(cancellationToken).ConfigureAwait(false);
 
         #endregion 初始化
         await base.InitChannelAsync(channel, cancellationToken).ConfigureAwait(false);

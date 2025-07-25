@@ -707,7 +707,7 @@ namespace ThingsGateway.SqlSugar
             {
                 var method = item as MethodCallExpression;
                 var queryable = db.Queryable<object>();
-                if (method.Method.Name == "Where")
+                if (method.Method.Name == nameof(QueryMethodInfo.Where))
                 {
                     if (method.Arguments[1].Type == typeof(List<IConditionalModel>))
                     {
@@ -746,7 +746,7 @@ namespace ThingsGateway.SqlSugar
                         parameterIndex = queryable.QueryBuilder.LambdaExpressions.ParameterIndex;
                     }
                 }
-                else if (method.Method.Name.IsIn("OrderBy", "ThenBy"))
+                else if (method.Method.Name.IsIn(nameof(QueryMethodInfo.OrderBy), "ThenBy"))
                 {
                     var exp = method.Arguments[1];
                     orderBy.Add(" " + queryable.QueryBuilder.GetExpressionValue(exp, ResolveExpressType.WhereSingle).GetString());
@@ -762,7 +762,7 @@ namespace ThingsGateway.SqlSugar
                         RightColumnExpression = method.Arguments[2]
                     });
                 }
-                else if (method.Method.Name == "Select")
+                else if (method.Method.Name == nameof(QueryMethodInfo.Select))
                 {
                     Select(propertyName, result, method, queryable);
                 }
@@ -795,7 +795,7 @@ namespace ThingsGateway.SqlSugar
                         result.Take = (int)ExpressionTool.GetExpressionValue(exp);
                     }
                 }
-                else if (method.Method.Name == "ToList")
+                else if (method.Method.Name == nameof(QueryMethodInfo.ToList))
                 {
                     if (method.Arguments.Count > 1)
                     {
@@ -803,7 +803,7 @@ namespace ThingsGateway.SqlSugar
                     }
                     isList = true;
                 }
-                else if (method.Method.Name == "SplitTable")
+                else if (method.Method.Name == nameof(SqlInfo.SplitTable))
                 {
                     var exp = (Expression<Func<List<SplitTableInfo>, IEnumerable<SplitTableInfo>>>)(item as MethodCallExpression).Arguments[1];
                     result.SplitTable = exp.Compile();

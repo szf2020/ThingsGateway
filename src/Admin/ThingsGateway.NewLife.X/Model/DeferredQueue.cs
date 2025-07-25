@@ -55,6 +55,7 @@ public class DeferredQueue : DisposeBase
     /// <summary>批次处理失败时</summary>
     public Action<IList<Object>, Exception>? Error;
     #endregion
+    protected object lockThis = new();
 
     #region 构造
     /// <summary>实例化</summary>
@@ -76,7 +77,7 @@ public class DeferredQueue : DisposeBase
         // 首次使用时初始化定时器
         if (_Timer == null)
         {
-            lock (this)
+            lock (lockThis)
             {
                 _Timer ??= OnInit();
             }

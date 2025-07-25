@@ -37,7 +37,7 @@ public class DeviceChangedTriggerNode : TextNode, ITriggerNode, IDisposable
 
     static DeviceChangedTriggerNode()
     {
-        Task.Factory.StartNew(RunAsync);
+        Task.Factory.StartNew(RunAsync, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
         GlobalData.DeviceStatusChangeEvent += GlobalData_DeviceStatusChangeEvent;
     }
 

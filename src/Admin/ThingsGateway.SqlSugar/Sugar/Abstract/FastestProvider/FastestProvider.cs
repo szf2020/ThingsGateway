@@ -323,10 +323,10 @@ namespace ThingsGateway.SqlSugar
             var value = this.context.DynamicBuilder().CreateObjectByType(type, dicList);
             newValue = UtilMethods.ConvertToObjectList(type, value);
             fastestMethod = this.context.GetType()
-                                  .GetMethod("Fastest")
+                                  .GetMethod(nameof(ISqlSugarClient.Fastest))
                                   .MakeGenericMethod(type)
                                   .Invoke(this.context, null);
-            bulkCopyMethod = fastestMethod.GetType().GetMyMethod(isAsync ? "BulkMergeAsync" : "BulkMerge", 1);
+            bulkCopyMethod = fastestMethod.GetType().GetMyMethod(isAsync ? nameof(BulkMergeAsync) : nameof(BulkMerge), 1);
         }
         /// <summary>准备批量合并操作</summary>
         private void _BulkMerge(DataTable dataTable, string[] whereColumns, string[] updateColumns, out object newValue, out object fastestMethod, out MethodInfo bulkCopyMethod, bool isAsync, bool isIdentity)
@@ -357,10 +357,10 @@ namespace ThingsGateway.SqlSugar
             var value = this.context.DynamicBuilder().CreateObjectByType(type, dicList);
             newValue = UtilMethods.ConvertToObjectList(type, value);
             fastestMethod = this.context.GetType()
-                                  .GetMethod("Fastest")
+                                  .GetMethod(nameof(ISqlSugarClient.Fastest))
                                   .MakeGenericMethod(type)
                                   .Invoke(this.context, null);
-            bulkCopyMethod = fastestMethod.GetType().GetMyMethod(isAsync ? "BulkMergeAsync" : "BulkMerge", 3, newValue.GetType(), typeof(string[]), typeof(string[]));
+            bulkCopyMethod = fastestMethod.GetType().GetMyMethod(isAsync ? nameof(BulkMergeAsync) : nameof(BulkMerge), 3, newValue.GetType(), typeof(string[]), typeof(string[]));
         }
 
         /// <summary>执行批量更新操作</summary>
@@ -519,7 +519,7 @@ namespace ThingsGateway.SqlSugar
             var title = isAdd ? "BulkCopy" : "BulkUpdate";
             if (isMerge)
             {
-                title = "BulkMerge";
+                title = nameof(BulkMerge);
             }
             this.context.Ado.IsEnableLogEvent = isLog;
             if (this.context.CurrentConnectionConfig?.AopEvents?.OnLogExecuted != null)
@@ -534,7 +534,7 @@ namespace ThingsGateway.SqlSugar
             var title = isAdd ? "BulkCopy" : "BulkUpdate";
             if (isMerge)
             {
-                title = "BulkMerge";
+                title = nameof(BulkMerge);
             }
             isLog = this.context.Ado.IsEnableLogEvent;
             this.context.Ado.IsEnableLogEvent = false;

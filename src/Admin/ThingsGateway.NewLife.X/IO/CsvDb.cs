@@ -67,6 +67,7 @@ public class CsvDb<T> : DisposeBase where T : new()
         _cache = null;
     }
     #endregion
+    protected object lockThis = new();
 
     #region 添删改查
     /// <summary>批量写入数据（高性能）</summary>
@@ -145,7 +146,7 @@ public class CsvDb<T> : DisposeBase where T : new()
     {
         if (predicate == null) throw new ArgumentNullException(nameof(predicate));
 
-        lock (this)
+        lock (lockThis)
         {
             if (_cache != null) return _cache.RemoveAll(x => predicate(x));
 
@@ -189,7 +190,7 @@ public class CsvDb<T> : DisposeBase where T : new()
     {
         if (Comparer == null) throw new ArgumentNullException(nameof(Comparer));
 
-        lock (this)
+        lock (lockThis)
         {
             var list = _cache ?? FindAll();
             if (!add && list.Count == 0) return false;
@@ -265,7 +266,7 @@ public class CsvDb<T> : DisposeBase where T : new()
         var file = GetFile();
         if (!File.Exists(file)) yield break;
 
-        lock (this)
+        lock (lockThis)
         {
             using var csv = new CsvFile(file, false) { Encoding = Encoding };
 
@@ -333,7 +334,7 @@ public class CsvDb<T> : DisposeBase where T : new()
     {
         if (_cache != null) return _cache!.Count;
 
-        lock (this)
+        lock (lockThis)
         {
             var file = GetFile();
             if (!File.Exists(file)) return 0;

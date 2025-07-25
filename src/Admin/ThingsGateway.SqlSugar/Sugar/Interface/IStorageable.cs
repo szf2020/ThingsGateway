@@ -21,7 +21,7 @@ namespace ThingsGateway.SqlSugar
         StorageableResult<T> ToStorage();
         StorageableResult<T> GetStorageableResult();
         Task<StorageableResult<T>> ToStorageAsync();
-        IStorageable<T> As(string tableName);
+        IStorageable<T> AS(string tableName);
         int ExecuteCommand();
         T ExecuteReturnEntity();
         Task<T> ExecuteReturnEntityAsync();

@@ -8,7 +8,11 @@ namespace ThingsGateway.SqlSugar
 {
     public class MySqlProvider : AdoProvider
     {
-        public MySqlProvider() { }
+
+        public MySqlProvider()
+        {
+            this.IsOpenAsync = true;
+        }
         public override IDbConnection Connection
         {
             get

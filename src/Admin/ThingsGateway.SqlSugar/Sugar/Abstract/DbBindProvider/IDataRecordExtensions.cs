@@ -285,7 +285,7 @@ namespace ThingsGateway.SqlSugar
         /// <param name="dr">数据记录器</param>
         /// <param name="i">字段索引</param>
         /// <returns>可空长整型</returns>
-        public static long? GetConvetInt64(this IDataRecord dr, int i)
+        public static long? GetConvertInt64(this IDataRecord dr, int i)
         {
             if (dr.IsDBNull(i))
             {
@@ -317,7 +317,7 @@ namespace ThingsGateway.SqlSugar
         /// <param name="dr">数据记录器</param>
         /// <param name="i">字段索引</param>
         /// <returns>日期时间</returns>
-        public static DateTime GetdatetimeoffsetDate(this IDataRecord dr, int i)
+        public static DateTime GetDateTimeOffsetDate(this IDataRecord dr, int i)
         {
             if (dr.IsDBNull(i))
             {
@@ -351,7 +351,7 @@ namespace ThingsGateway.SqlSugar
         /// <param name="dr">数据记录器</param>
         /// <param name="i">字段索引</param>
         /// <returns>DateTimeOffset</returns>
-        public static DateTimeOffset Getdatetimeoffset(this IDataRecord dr, int i)
+        public static DateTimeOffset GetDateTimeOffset(this IDataRecord dr, int i)
         {
             if (dr.IsDBNull(i))
             {

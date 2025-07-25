@@ -12,25 +12,24 @@ namespace ThingsGateway.Foundation.OpcDa;
 
 internal static class CollectionExtension
 {
-    /// <summary>
-    /// 将项目列表分解为特定大小的块
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    /// <param name="source"></param>
-    /// <param name="chunksize"></param>
-    /// <returns></returns>
-    internal static List<List<T>> ChunkTrivialBetter<T>(this IEnumerable<T> source, int chunksize)
-    {
-        var pos = 0;
-        List<List<T>> n = new();
-        while (source.Skip(pos).Any())
-        {
-            n.Add(source.Skip(pos).Take(chunksize).ToList());
-            pos += chunksize;
-        }
-        return n;
-    }
 
+    public static IEnumerable<List<T>> ChunkTrivialBetter<T>(this IEnumerable<T> source, int chunkSize)
+    {
+        if (source == null) throw new ArgumentNullException(nameof(source));
+        if (chunkSize <= 0) yield break;
+
+        using var enumerator = source.GetEnumerator();
+        while (enumerator.MoveNext())
+        {
+            var chunk = new List<T>(chunkSize) { enumerator.Current };
+            for (int i = 1; i < chunkSize && enumerator.MoveNext(); i++)
+            {
+                chunk.Add(enumerator.Current);
+            }
+
+            yield return chunk;
+        }
+    }
     /// <summary>
     /// 移除符合条件的元素
     /// </summary>

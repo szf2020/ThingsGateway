@@ -161,7 +161,7 @@ namespace ThingsGateway.SqlSugar
             {
                 var method = express.Method;
                 string name = method.Name;
-                if (name == "Any" && ExpressionTool.IsVariable(express.Arguments[0]))
+                if (name == nameof(QueryMethodInfo.Any) && ExpressionTool.IsVariable(express.Arguments[0]))
                 {
                     name = "ListAny";
                 }
@@ -202,7 +202,7 @@ namespace ThingsGateway.SqlSugar
             }
         }
 
-        protected void Field(ExpressionParameter parameter, bool? isLeft, string name, IEnumerable<Expression> args, MethodCallExpressionModel model, List<MethodCallExpressionArgs> appendArgs = null)
+        protected void Field(ExpressionParameter parameter, bool? isLeft, string name, List<Expression> args, MethodCallExpressionModel model, List<MethodCallExpressionArgs> appendArgs = null)
         {
             if (this.Context.ResolveType == ResolveExpressType.FieldSingle)
             {
@@ -225,7 +225,7 @@ namespace ThingsGateway.SqlSugar
                 }
                 var data = new MethodCallExpressionArgs() { MemberValue = memberValue, IsMember = true, MemberName = memberValue };
                 model.Args.Add(data);
-                if (args.Count() == 2)
+                if (args.Count == 2)
                 {
                     data.MemberName = (args.Last()).ToString().Replace("\"", "");
                     data.MemberValue = ".";
@@ -265,7 +265,7 @@ namespace ThingsGateway.SqlSugar
                 parameter.BaseParameter.CommonTempData = GetMethodValue(name, model);
             }
         }
-        protected void Where(ExpressionParameter parameter, bool? isLeft, string name, IEnumerable<Expression> args, MethodCallExpressionModel model, List<MethodCallExpressionArgs> appendArgs = null)
+        protected void Where(ExpressionParameter parameter, bool? isLeft, string name, List<Expression> args, MethodCallExpressionModel model, List<MethodCallExpressionArgs> appendArgs = null)
         {
             foreach (var item in args)
             {

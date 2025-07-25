@@ -195,6 +195,10 @@ namespace ThingsGateway.SqlSugar
         {
             dbTypeName = dbTypeName.ToLower();
             var propertyTypes = MappingTypes.Where(it => it.Key.Equals(dbTypeName, StringComparison.CurrentCultureIgnoreCase));
+
+            var kv = propertyTypes.FirstOrDefault();
+            var key = kv.Key;
+            var type = kv.Value;
             if (dbTypeName == "int32")
             {
                 return "int";
@@ -219,17 +223,17 @@ namespace ThingsGateway.SqlSugar
             {
                 return "bool";
             }
-            else if (propertyTypes?.Any() != true)
+            else if (key == null)
             {
                 return "object";
             }
-            else if (propertyTypes.First().Value == CSharpDataType.byteArray)
+            else if (type == CSharpDataType.byteArray)
             {
                 return "byte[]";
             }
             else
             {
-                return propertyTypes.First().Value.ToString();
+                return type.ToString();
             }
         }
 
@@ -367,7 +371,7 @@ namespace ThingsGateway.SqlSugar
         /// <returns>实体列表</returns>
         public virtual List<T> GetEntityListByType<T>(Type entityType, SqlSugarProvider context, IDataReader dataReader)
         {
-            var method = typeof(DbBindProvider).GetMethod("GetEntityList", BindingFlags.Instance | BindingFlags.NonPublic);
+            var method = typeof(DbBindProvider).GetMethod(nameof(GetEntityList), BindingFlags.Instance | BindingFlags.NonPublic);
             var genericMethod = method.MakeGenericMethod(entityType);
             var objectValue = genericMethod.Invoke(this, new object[] { context, dataReader });
             List<T> result = new List<T>();
@@ -388,7 +392,7 @@ namespace ThingsGateway.SqlSugar
         /// <returns>实体列表</returns>
         public virtual async Task<List<T>> GetEntityListByTypeAsync<T>(Type entityType, SqlSugarProvider context, IDataReader dataReader)
         {
-            var method = typeof(DbBindProvider).GetMethod("GetEntityListAsync", BindingFlags.Instance | BindingFlags.NonPublic);
+            var method = typeof(DbBindProvider).GetMethod(nameof(GetEntityListAsync), BindingFlags.Instance | BindingFlags.NonPublic);
             var genericMethod = method.MakeGenericMethod(entityType);
             Task task = (Task)genericMethod.Invoke(this, new object[] { context, dataReader });
             return await GetTask<T>(task).ConfigureAwait(false);

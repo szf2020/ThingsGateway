@@ -11,7 +11,7 @@ namespace ThingsGateway.SqlSugar
 
         public string Name
         {
-            get { return "Having"; }
+            get { return nameof(QueryMethodInfo.Having); }
         }
 
         public Expression Expression

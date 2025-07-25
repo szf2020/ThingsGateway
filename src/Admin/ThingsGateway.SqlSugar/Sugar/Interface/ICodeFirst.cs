@@ -6,8 +6,8 @@
         ICodeFirst BackupTable(int maxBackupDataRows = int.MaxValue);
         ICodeFirst SetStringDefaultLength(int length);
 
-        ICodeFirst As(Type type, string newTableName);
-        ICodeFirst As<T>(string newTableName);
+        ICodeFirst AS(Type type, string newTableName);
+        ICodeFirst AS<T>(string newTableName);
 
         void InitTables(string entitiesNamespace);
         void InitTables(string[] entitiesNamespaces);

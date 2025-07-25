@@ -240,7 +240,7 @@ public class TcpServer : DisposeBase, ISocketServer, ILogFeature
             if (io)
                 ProcessAccept(se);
             else
-                Task.Factory.StartNew(() => ProcessAccept(se));
+                Task.Factory.StartNew(() => ProcessAccept(se), CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
         }
 
         return true;

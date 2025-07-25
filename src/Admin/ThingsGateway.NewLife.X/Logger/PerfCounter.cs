@@ -33,6 +33,7 @@ public class PerfCounter : DisposeBase, ICounter
         _Timer.TryDispose();
     }
     #endregion
+    protected object lockThis = new();
 
     #region 核心方法
     /// <summary>增加</summary>
@@ -49,7 +50,7 @@ public class PerfCounter : DisposeBase, ICounter
 
         if (_Timer == null)
         {
-            lock (this)
+            lock (lockThis)
             {
                 _Timer ??= new TimerX(DoWork, null, Interval, Interval) { Async = true };
             }

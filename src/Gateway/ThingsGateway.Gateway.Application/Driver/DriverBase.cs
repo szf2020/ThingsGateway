@@ -112,14 +112,14 @@ public abstract class DriverBase : DisposableObject, IDriver
     private IStringLocalizer Localizer { get; }
 
     #endregion 属性
-
+    protected object pauseLock = new object();
     /// <summary>
     /// 暂停
     /// </summary>
     /// <param name="pause">暂停</param>
     public virtual void PauseThread(bool pause)
     {
-        lock (this)
+        lock (pauseLock)
         {
             if (CurrentDevice == null) return;
             LogMessage?.LogInformation(pause == true ? string.Format(AppResource.DeviceTaskPause, DeviceName) : string.Format(AppResource.DeviceTaskContinue, DeviceName));
@@ -314,6 +314,7 @@ public abstract class DriverBase : DisposableObject, IDriver
 
     protected abstract List<IScheduledTask> ProtectedGetTasks(CancellationToken cancellationToken);
 
+    protected object stopLock = new();
     /// <summary>
     /// 已停止任务，释放插件
     /// </summary>
@@ -321,7 +322,7 @@ public abstract class DriverBase : DisposableObject, IDriver
     {
         if (!DisposedValue)
         {
-            lock (this)
+            lock (stopLock)
             {
                 if (!DisposedValue)
                 {

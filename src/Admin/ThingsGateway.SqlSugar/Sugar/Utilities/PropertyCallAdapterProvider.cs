@@ -34,14 +34,14 @@ namespace ThingsGateway.SqlSugar
                 var propertys = typeof(TThis).GetProperties(
 
                     BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
-                    .Where(it => it.Name == forPropertyName);
-                if (propertys.Count() == 1)
+                    .Where(it => it.Name == forPropertyName).ToArray();
+                if (propertys.Length == 1)
                 {
-                    property = propertys.First();
+                    property = propertys[0];
                 }
                 else
                 {
-                    property = propertys.First();
+                    property = propertys[0];
                 }
 
                 MethodInfo getMethod;

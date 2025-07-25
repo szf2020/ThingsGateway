@@ -13,7 +13,7 @@ namespace ThingsGateway.SqlSugar
         {
             get
             {
-                return "Count";
+                return nameof(QueryMethodInfo.Count);
             }
         }
 

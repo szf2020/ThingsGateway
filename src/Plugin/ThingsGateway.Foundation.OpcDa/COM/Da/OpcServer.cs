@@ -17,6 +17,7 @@ namespace ThingsGateway.Foundation.OpcDa.Da;
 
 internal sealed class OpcServer : IDisposable
 {
+    private object lockThis = new();
     private bool disposedValue;
 
     private IOPCServer m_OpcServer = null;
@@ -85,7 +86,7 @@ internal sealed class OpcServer : IDisposable
     /// </summary>
     internal List<BrowseElement> Browse(string itemId = null)
     {
-        lock (this)
+        lock (lockThis)
         {
             if (null == m_OpcServer || IsConnected == false)
                 throw new("Uninitialized connection");

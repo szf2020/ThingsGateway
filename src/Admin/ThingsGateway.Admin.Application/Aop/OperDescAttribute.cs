@@ -38,9 +38,9 @@ public sealed class OperDescAttribute : MoAttribute
 
     static OperDescAttribute()
     {
-        // 创建长时间运行的后台任务，并将日志消息队列中数据写入存储中
-        Task.Factory.StartNew(ProcessQueue, TaskCreationOptions.LongRunning);
         AppService = App.RootServices.GetService<IAppService>();
+        // 创建长时间运行的后台任务，并将日志消息队列中数据写入存储中
+        Task.Factory.StartNew(ProcessQueueAsync, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
     }
 
     public OperDescAttribute(string description, bool isRecordPar = true, object localizerType = null)
@@ -93,7 +93,7 @@ public sealed class OperDescAttribute : MoAttribute
     /// <summary>
     /// 将日志消息写入数据库中
     /// </summary>
-    private static async Task ProcessQueue()
+    private static async Task ProcessQueueAsync()
     {
         var appLifetime = App.RootServices!.GetService<IHostApplicationLifetime>()!;
         while (!appLifetime.ApplicationStopping.IsCancellationRequested)

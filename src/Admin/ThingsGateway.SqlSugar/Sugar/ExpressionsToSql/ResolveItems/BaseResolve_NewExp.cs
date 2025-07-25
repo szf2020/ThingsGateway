@@ -121,7 +121,7 @@ namespace ThingsGateway.SqlSugar
             {
                 ResloveNot(parameter, item, asName);
             }
-            else if (item is MethodCallExpression && (item as MethodCallExpression).Method.Name.IsIn("Count", "Any") && !item.ToString().StartsWith("Subqueryable"))
+            else if (item is MethodCallExpression && (item as MethodCallExpression).Method.Name.IsIn(nameof(QueryMethodInfo.Count), nameof(QueryMethodInfo.Any)) && !item.ToString().StartsWith("Subqueryable"))
             {
                 ResloveCountAny(parameter, item, asName);
             }

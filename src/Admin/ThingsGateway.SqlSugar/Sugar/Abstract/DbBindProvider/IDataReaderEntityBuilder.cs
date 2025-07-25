@@ -34,175 +34,58 @@ namespace ThingsGateway.SqlSugar
         /// <summary>
         /// IsDBNull方法
         /// </summary>
-        private static readonly MethodInfo isDBNullMethod = typeof(IDataRecord).GetMethod("IsDBNull", new Type[] { typeof(int) });
+        private static readonly MethodInfo isDBNullMethod = typeof(IDataRecord).GetMethod(nameof(IDataRecord.IsDBNull), new Type[] { typeof(int) });
         /// <summary>
         /// GetBoolean方法
         /// </summary>
-        private static readonly MethodInfo getBoolean = typeof(IDataRecord).GetMethod("GetBoolean", new Type[] { typeof(int) });
+        private static readonly MethodInfo getBoolean = typeof(IDataRecord).GetMethod(nameof(IDataRecord.GetBoolean), new Type[] { typeof(int) });
         /// <summary>
         /// GetByte方法
         /// </summary>
-        private static readonly MethodInfo getByte = typeof(IDataRecord).GetMethod("GetByte", new Type[] { typeof(int) });
+        private static readonly MethodInfo getByte = typeof(IDataRecord).GetMethod(nameof(IDataRecord.GetByte), new Type[] { typeof(int) });
         /// <summary>
         /// GetDateTime方法
         /// </summary>
-        private static readonly MethodInfo getDateTime = typeof(IDataRecord).GetMethod("GetDateTime", new Type[] { typeof(int) });
-        /// <summary>
-        /// GetDecimal方法
-        /// </summary>
-        private static readonly MethodInfo getDecimal = typeof(IDataRecord).GetMethod("GetDecimal", new Type[] { typeof(int) });
-        /// <summary>
-        /// GetDouble方法
-        /// </summary>
-        private static readonly MethodInfo getDouble = typeof(IDataRecord).GetMethod("GetDouble", new Type[] { typeof(int) });
-        /// <summary>
-        /// GetFloat方法
-        /// </summary>
-        private static readonly MethodInfo getFloat = typeof(IDataRecord).GetMethod("GetFloat", new Type[] { typeof(int) });
-        /// <summary>
-        /// GetGuid方法
-        /// </summary>
-        private static readonly MethodInfo getGuid = typeof(IDataRecord).GetMethod("GetGuid", new Type[] { typeof(int) });
-        /// <summary>
-        /// GetInt16方法
-        /// </summary>
-        private static readonly MethodInfo getInt16 = typeof(IDataRecord).GetMethod("GetInt16", new Type[] { typeof(int) });
-        /// <summary>
-        /// GetInt32方法
-        /// </summary>
-        private static readonly MethodInfo getInt32 = typeof(IDataRecord).GetMethod("GetInt32", new Type[] { typeof(int) });
-        /// <summary>
-        /// GetInt64方法
-        /// </summary>
-        private static readonly MethodInfo getInt64 = typeof(IDataRecord).GetMethod("GetInt64", new Type[] { typeof(int) });
-        /// <summary>
-        /// GetString方法
-        /// </summary>
-        private static readonly MethodInfo getString = typeof(IDataRecord).GetMethod("GetString", new Type[] { typeof(int) });
-        /// <summary>
-        /// Getdatetimeoffset方法
-        /// </summary>
-        private static readonly MethodInfo getdatetimeoffset = typeof(IDataRecordExtensions).GetMethod("Getdatetimeoffset");
-        /// <summary>
-        /// GetdatetimeoffsetDate方法
-        /// </summary>
-        private static readonly MethodInfo getdatetimeoffsetDate = typeof(IDataRecordExtensions).GetMethod("GetdatetimeoffsetDate");
-        /// <summary>
-        /// GetStringGuid方法
-        /// </summary>
-        private static readonly MethodInfo getStringGuid = typeof(IDataRecordExtensions).GetMethod("GetStringGuid");
-        /// <summary>
-        /// GetXelement方法
-        /// </summary>
-        private static readonly MethodInfo getXelement = typeof(IDataRecordExtensions).GetMethod("GetXelement");
-        /// <summary>
-        /// GetConvertStringGuid方法
-        /// </summary>
-        private static readonly MethodInfo getConvertStringGuid = typeof(IDataRecordExtensions).GetMethod("GetConvertStringGuid");
-        /// <summary>
-        /// GetEnum方法
-        /// </summary>
-        private static readonly MethodInfo getEnum = typeof(IDataRecordExtensions).GetMethod("GetEnum");
-        /// <summary>
-        /// GetConvertString方法
-        /// </summary>
-        private static readonly MethodInfo getConvertString = typeof(IDataRecordExtensions).GetMethod("GetConvertString");
-        /// <summary>
-        /// GetConvertFloat方法
-        /// </summary>
-        private static readonly MethodInfo getConvertFloat = typeof(IDataRecordExtensions).GetMethod("GetConvertFloat");
-        /// <summary>
-        /// GetConvertBoolean方法
-        /// </summary>
-        private static readonly MethodInfo getConvertBoolean = typeof(IDataRecordExtensions).GetMethod("GetConvertBoolean");
-        /// <summary>
-        /// GetConvertByte方法
-        /// </summary>
-        private static readonly MethodInfo getConvertByte = typeof(IDataRecordExtensions).GetMethod("GetConvertByte");
-        /// <summary>
-        /// GetConvertChar方法
-        /// </summary>
-        private static readonly MethodInfo getConvertChar = typeof(IDataRecordExtensions).GetMethod("GetConvertChar");
-        /// <summary>
-        /// GetConvertDateTime方法
-        /// </summary>
-        private static readonly MethodInfo getConvertDateTime = typeof(IDataRecordExtensions).GetMethod("GetConvertDateTime");
-        /// <summary>
-        /// GetConvertTime方法
-        /// </summary>
-        private static readonly MethodInfo getConvertTime = typeof(IDataRecordExtensions).GetMethod("GetConvertTime");
-        /// <summary>
-        /// GetTime方法
-        /// </summary>
-        private static readonly MethodInfo getTime = typeof(IDataRecordExtensions).GetMethod("GetTime");
-        /// <summary>
-        /// GetConvertDecimal方法
-        /// </summary>
-        private static readonly MethodInfo getConvertDecimal = typeof(IDataRecordExtensions).GetMethod("GetConvertDecimal");
-        /// <summary>
-        /// GetConvertDouble方法
-        /// </summary>
-        private static readonly MethodInfo getConvertDouble = typeof(IDataRecordExtensions).GetMethod("GetConvertDouble");
-        /// <summary>
-        /// GetConvertDoubleToFloat方法
-        /// </summary>
-        private static readonly MethodInfo getConvertDoubleToFloat = typeof(IDataRecordExtensions).GetMethod("GetConvertDoubleToFloat");
-        /// <summary>
-        /// GetConvertGuid方法
-        /// </summary>
-        private static readonly MethodInfo getConvertGuid = typeof(IDataRecordExtensions).GetMethod("GetConvertGuid");
-        /// <summary>
-        /// GetConvertInt16方法
-        /// </summary>
-        private static readonly MethodInfo getConvertInt16 = typeof(IDataRecordExtensions).GetMethod("GetConvertInt16");
-        /// <summary>
-        /// GetConvertInt32方法
-        /// </summary>
-        private static readonly MethodInfo getConvertInt32 = typeof(IDataRecordExtensions).GetMethod("GetConvertInt32");
-        /// <summary>
-        /// GetConvetInt64方法
-        /// </summary>
-        private static readonly MethodInfo getConvertInt64 = typeof(IDataRecordExtensions).GetMethod("GetConvetInt64");
-        /// <summary>
-        /// GetConvertEnum_Null方法
-        /// </summary>
-        private static readonly MethodInfo getConvertEnum_Null = typeof(IDataRecordExtensions).GetMethod("GetConvertEnum_Null");
-        /// <summary>
-        /// GetConvertdatetimeoffset方法
-        /// </summary>
-        private static readonly MethodInfo getConvertdatetimeoffset = typeof(IDataRecordExtensions).GetMethod("GetConvertdatetimeoffset");
-        /// <summary>
-        /// GetConvertdatetimeoffsetDate方法
-        /// </summary>
-        private static readonly MethodInfo getConvertdatetimeoffsetDate = typeof(IDataRecordExtensions).GetMethod("GetConvertdatetimeoffsetDate");
-        /// <summary>
-        /// GetOtherNull方法
-        /// </summary>
-        private static readonly MethodInfo getOtherNull = typeof(IDataRecordExtensions).GetMethod("GetOtherNull");
-        /// <summary>
-        /// GetOther方法
-        /// </summary>
-        private static readonly MethodInfo getOther = typeof(IDataRecordExtensions).GetMethod("GetOther");
-        /// <summary>
-        /// GetJson方法
-        /// </summary>
-        private static readonly MethodInfo getJson = typeof(IDataRecordExtensions).GetMethod("GetJson");
-        /// <summary>
-        /// GetArray方法
-        /// </summary>
-        private static readonly MethodInfo getArray = typeof(IDataRecordExtensions).GetMethod("GetArray");
-        /// <summary>
-        /// GetEntity方法
-        /// </summary>
-        private static readonly MethodInfo getEntity = typeof(IDataRecordExtensions).GetMethod("GetEntity", new Type[] { typeof(SqlSugarProvider) });
-        /// <summary>
-        /// GetMyIntNull方法
-        /// </summary>
-        private static readonly MethodInfo getMyIntNull = typeof(IDataRecordExtensions).GetMethod("GetMyIntNull");
-        /// <summary>
-        /// GetMyInt方法
-        /// </summary>
-        private static readonly MethodInfo getMyInt = typeof(IDataRecordExtensions).GetMethod("GetMyInt");
+        private static readonly MethodInfo getDateTime = typeof(IDataRecord).GetMethod(nameof(IDataRecord.GetDateTime), new Type[] { typeof(int) });
+        private static readonly MethodInfo getDecimal = typeof(IDataRecord).GetMethod(nameof(IDataRecord.GetDecimal), new[] { typeof(int) });
+        private static readonly MethodInfo getDouble = typeof(IDataRecord).GetMethod(nameof(IDataRecord.GetDouble), new[] { typeof(int) });
+        private static readonly MethodInfo getFloat = typeof(IDataRecord).GetMethod(nameof(IDataRecord.GetFloat), new[] { typeof(int) });
+        private static readonly MethodInfo getGuid = typeof(IDataRecord).GetMethod(nameof(IDataRecord.GetGuid), new[] { typeof(int) });
+        private static readonly MethodInfo getInt16 = typeof(IDataRecord).GetMethod(nameof(IDataRecord.GetInt16), new[] { typeof(int) });
+        private static readonly MethodInfo getInt32 = typeof(IDataRecord).GetMethod(nameof(IDataRecord.GetInt32), new[] { typeof(int) });
+        private static readonly MethodInfo getInt64 = typeof(IDataRecord).GetMethod(nameof(IDataRecord.GetInt64), new[] { typeof(int) });
+        private static readonly MethodInfo getString = typeof(IDataRecord).GetMethod(nameof(IDataRecord.GetString), new[] { typeof(int) });
+        private static readonly MethodInfo getdatetimeoffset = typeof(IDataRecordExtensions).GetMethod(nameof(IDataRecordExtensions.GetDateTimeOffset));
+        private static readonly MethodInfo getdatetimeoffsetDate = typeof(IDataRecordExtensions).GetMethod(nameof(IDataRecordExtensions.GetDateTimeOffsetDate));
+        private static readonly MethodInfo getStringGuid = typeof(IDataRecordExtensions).GetMethod(nameof(IDataRecordExtensions.GetStringGuid));
+        private static readonly MethodInfo getXelement = typeof(IDataRecordExtensions).GetMethod(nameof(IDataRecordExtensions.GetXelement));
+        private static readonly MethodInfo getConvertStringGuid = typeof(IDataRecordExtensions).GetMethod(nameof(IDataRecordExtensions.GetConvertStringGuid));
+        private static readonly MethodInfo getEnum = typeof(IDataRecordExtensions).GetMethod(nameof(IDataRecordExtensions.GetEnum));
+        private static readonly MethodInfo getConvertString = typeof(IDataRecordExtensions).GetMethod(nameof(IDataRecordExtensions.GetConvertString));
+        private static readonly MethodInfo getConvertFloat = typeof(IDataRecordExtensions).GetMethod(nameof(IDataRecordExtensions.GetConvertFloat));
+        private static readonly MethodInfo getConvertBoolean = typeof(IDataRecordExtensions).GetMethod(nameof(IDataRecordExtensions.GetConvertBoolean));
+        private static readonly MethodInfo getConvertByte = typeof(IDataRecordExtensions).GetMethod(nameof(IDataRecordExtensions.GetConvertByte));
+        private static readonly MethodInfo getConvertChar = typeof(IDataRecordExtensions).GetMethod(nameof(IDataRecordExtensions.GetConvertChar));
+        private static readonly MethodInfo getConvertDateTime = typeof(IDataRecordExtensions).GetMethod(nameof(IDataRecordExtensions.GetConvertDateTime));
+        private static readonly MethodInfo getConvertTime = typeof(IDataRecordExtensions).GetMethod(nameof(IDataRecordExtensions.GetConvertTime));
+        private static readonly MethodInfo getTime = typeof(IDataRecordExtensions).GetMethod(nameof(IDataRecordExtensions.GetTime));
+        private static readonly MethodInfo getConvertDecimal = typeof(IDataRecordExtensions).GetMethod(nameof(IDataRecordExtensions.GetConvertDecimal));
+        private static readonly MethodInfo getConvertDouble = typeof(IDataRecordExtensions).GetMethod(nameof(IDataRecordExtensions.GetConvertDouble));
+        private static readonly MethodInfo getConvertDoubleToFloat = typeof(IDataRecordExtensions).GetMethod(nameof(IDataRecordExtensions.GetConvertDoubleToFloat));
+        private static readonly MethodInfo getConvertGuid = typeof(IDataRecordExtensions).GetMethod(nameof(IDataRecordExtensions.GetConvertGuid));
+        private static readonly MethodInfo getConvertInt16 = typeof(IDataRecordExtensions).GetMethod(nameof(IDataRecordExtensions.GetConvertInt16));
+        private static readonly MethodInfo getConvertInt32 = typeof(IDataRecordExtensions).GetMethod(nameof(IDataRecordExtensions.GetConvertInt32));
+        private static readonly MethodInfo getConvertInt64 = typeof(IDataRecordExtensions).GetMethod(nameof(IDataRecordExtensions.GetConvertInt64));
+        private static readonly MethodInfo getConvertEnum_Null = typeof(IDataRecordExtensions).GetMethod(nameof(IDataRecordExtensions.GetConvertEnum_Null));
+        private static readonly MethodInfo getConvertdatetimeoffset = typeof(IDataRecordExtensions).GetMethod(nameof(IDataRecordExtensions.GetConvertdatetimeoffset));
+        private static readonly MethodInfo getConvertdatetimeoffsetDate = typeof(IDataRecordExtensions).GetMethod(nameof(IDataRecordExtensions.GetConvertdatetimeoffsetDate));
+        private static readonly MethodInfo getOtherNull = typeof(IDataRecordExtensions).GetMethod(nameof(IDataRecordExtensions.GetOtherNull));
+        private static readonly MethodInfo getOther = typeof(IDataRecordExtensions).GetMethod(nameof(IDataRecordExtensions.GetOther));
+        private static readonly MethodInfo getJson = typeof(IDataRecordExtensions).GetMethod(nameof(IDataRecordExtensions.GetJson));
+        private static readonly MethodInfo getArray = typeof(IDataRecordExtensions).GetMethod(nameof(IDataRecordExtensions.GetArray));
+        private static readonly MethodInfo getEntity = typeof(IDataRecordExtensions).GetMethod(nameof(IDataRecordExtensions.GetEntity), new[] { typeof(SqlSugarProvider) });
+        private static readonly MethodInfo getMyIntNull = typeof(IDataRecordExtensions).GetMethod(nameof(IDataRecordExtensions.GetMyIntNull));
+        private static readonly MethodInfo getMyInt = typeof(IDataRecordExtensions).GetMethod(nameof(IDataRecordExtensions.GetMyInt));
 
         /// <summary>
         /// 加载委托
@@ -339,7 +222,7 @@ namespace ThingsGateway.SqlSugar
             generator.Emit(OpCodes.Callvirt, isDBNullMethod);
             generator.Emit(OpCodes.Brtrue, endIfLabel);
             generator.Emit(OpCodes.Ldloc, result);
-            var method = (columnInfo.SqlParameterDbType as Type).GetMethod("QueryConverter");
+            var method = (columnInfo.SqlParameterDbType as Type).GetMethod(nameof(ISugarDataConverter.QueryConverter));
             method = method.MakeGenericMethod(new Type[] { columnInfo.PropertyInfo.PropertyType });
             Type type = (columnInfo.SqlParameterDbType as Type);
             generator.Emit(OpCodes.Newobj, type.GetConstructor(Type.EmptyTypes));
@@ -387,7 +270,7 @@ namespace ThingsGateway.SqlSugar
                     {
                         IDataRecordExtensions.DeserializeObjectFunc = insertBuilder.DeserializeObjectFunc;
                     }
-                    jsonMethod = typeof(IDataRecordExtensions).GetMethod("GetDeserializeObject").MakeGenericMethod(columnInfo.PropertyInfo.PropertyType);
+                    jsonMethod = typeof(IDataRecordExtensions).GetMethod(nameof(IDataRecordExtensions.GetDeserializeObject)).MakeGenericMethod(columnInfo.PropertyInfo.PropertyType);
                 }
                 generator.Emit(OpCodes.Call, jsonMethod);
                 generator.Emit(OpCodes.Callvirt, columnInfo.PropertyInfo.GetSetMethod(true));

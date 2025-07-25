@@ -756,7 +756,7 @@ namespace ThingsGateway.SqlSugar
             }
             if (this.Context.CurrentConnectionConfig.IsAutoCloseConnection)
             {
-                this.Context.Ado.Close();
+                await this.Context.Ado.CloseAsync().ConfigureAwait(false);
             }
         }
 
@@ -797,7 +797,7 @@ namespace ThingsGateway.SqlSugar
             {
                 if (this.Context.CurrentConnectionConfig.IsAutoCloseConnection)
                 {
-                    this.Context.Ado.Close();
+                    await this.Context.Ado.CloseAsync().ConfigureAwait(false);
                 }
             }
         }

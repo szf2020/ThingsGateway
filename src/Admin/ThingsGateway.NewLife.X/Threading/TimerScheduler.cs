@@ -62,6 +62,7 @@ public class TimerScheduler : ILogFeature
     private TimerX[] Timers = [];
     #endregion
 
+    protected object lockThis = new();
     /// <summary>把定时器加入队列</summary>
     /// <param name="timer"></param>
     public void Add(TimerX timer)
@@ -73,7 +74,7 @@ public class TimerScheduler : ILogFeature
         timer.Id = Interlocked.Increment(ref _tid);
         WriteLog("Timer.Add {0}", timer);
 
-        lock (this)
+        lock (lockThis)
         {
             var list = new List<TimerX>(Timers);
             if (list.Contains(timer)) return;
@@ -109,7 +110,7 @@ public class TimerScheduler : ILogFeature
         using var span = DefaultTracer.Instance?.NewSpan("timer:Remove", reason + " " + timer);
         WriteLog("Timer.Remove {0} reason:{1}", timer, reason);
 
-        lock (this)
+        lock (lockThis)
         {
             timer.Id = 0;
 
@@ -172,7 +173,7 @@ public class TimerScheduler : ILogFeature
                         // 必须在主线程设置状态，否则可能异步线程还没来得及设置开始状态，主线程又开始了新的一轮调度
                         timer.Calling = true;
                         if (timer.IsAsyncTask)
-                            Task.Factory.StartNew(ExecuteAsync, timer);
+                            Task.Factory.StartNew(ExecuteAsync, timer, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
                         else if (!timer.Async)
                             Execute(timer);
                         else

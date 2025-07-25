@@ -12,6 +12,8 @@
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<SignAssembly>True</SignAssembly>
 		<AssemblyOriginatorKeyFile>newlife.snk</AssemblyOriginatorKeyFile>
+
+
 	</PropertyGroup>
 
 	<ItemGroup>

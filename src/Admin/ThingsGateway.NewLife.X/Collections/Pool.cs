@@ -25,6 +25,7 @@ public class Pool<T> : IPool<T> where T : class
         public T? Value;
     }
     #endregion
+    protected object lockThis = new();
 
     #region 构造
     /// <summary>实例化对象池。默认大小CPU*2</summary>
@@ -63,7 +64,7 @@ public class Pool<T> : IPool<T> where T : class
     private void Init()
     {
         if (_items != null) return;
-        lock (this)
+        lock (lockThis)
         {
             if (_items != null) return;
 

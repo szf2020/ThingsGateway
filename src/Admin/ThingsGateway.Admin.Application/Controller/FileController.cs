@@ -34,12 +34,16 @@ public class FileController : ControllerBase
             return BadRequest("Invalid file name.");
         }
 
-        var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", fileName);
-
-        if (!System.IO.File.Exists(filePath))
+        var root = Directory.GetCurrentDirectory();
+        var wwwroot = Path.Combine(root, "wwwroot");
+        var filePath = Path.Combine(wwwroot, fileName);
+        // 防止路径穿越攻击
+#pragma warning disable CA3003
+        if (!filePath.StartsWith(wwwroot, StringComparison.OrdinalIgnoreCase) || !System.IO.File.Exists(filePath))
         {
             return NotFound();
         }
+#pragma warning restore CA3003
 
         var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
 

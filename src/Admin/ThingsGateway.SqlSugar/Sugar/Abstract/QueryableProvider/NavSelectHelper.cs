@@ -313,11 +313,11 @@ namespace ThingsGateway.SqlSugar
         private static void AddCallError(List<NavMappingColumn> result, Expression item, string parameterName)
         {
             var method = (item as MethodCallExpression);
-            if (method.Method.Name == "ToList" && method.Arguments.Count > 0 && method.Arguments[0] is MethodCallExpression)
+            if (method.Method.Name == nameof(QueryMethodInfo.ToList) && method.Arguments.Count > 0 && method.Arguments[0] is MethodCallExpression)
             {
                 method = (MethodCallExpression)method.Arguments[0];
             }
-            if (method.Method.Name == "Select")
+            if (method.Method.Name == nameof(QueryMethodInfo.Select))
             {
                 if (!item.ToString().Contains("Subqueryable"))
                 {

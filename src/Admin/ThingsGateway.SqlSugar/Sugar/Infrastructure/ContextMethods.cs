@@ -286,7 +286,7 @@ namespace ThingsGateway.SqlSugar
                 {
                     while (reader.Read())
                     {
-                        Dictionary<string, object> result = DataReaderToList(reader, tType, classProperties, reval);
+                        Dictionary<string, object> result = privateDataReaderToList(reader, tType, classProperties, reval);
                         var stringValue = SerializeObject(result);
                         reval.Add((T)DeserializeObject<T>(stringValue));
                         SetAppendColumns(reader);
@@ -355,7 +355,7 @@ namespace ThingsGateway.SqlSugar
             {
                 while (reader.Read())
                 {
-                    Dictionary<string, object> result = DataReaderToList(reader, tType, classProperties, reval);
+                    Dictionary<string, object> result = privateDataReaderToList(reader, tType, classProperties, reval);
                     var stringValue = SerializeObject(result);
                     reval.Add((T)DeserializeObject<T>(stringValue));
                     SetAppendColumns(reader);
@@ -380,7 +380,7 @@ namespace ThingsGateway.SqlSugar
                 {
                     while (await ((DbDataReader)reader).ReadAsync().ConfigureAwait(false))
                     {
-                        Dictionary<string, object> result = DataReaderToList(reader, tType, classProperties, reval);
+                        Dictionary<string, object> result = privateDataReaderToList(reader, tType, classProperties, reval);
                         var stringValue = SerializeObject(result);
                         reval.Add((T)DeserializeObject<T>(stringValue));
                         SetAppendColumns(reader);
@@ -446,7 +446,7 @@ namespace ThingsGateway.SqlSugar
             {
                 while (await ((DbDataReader)reader).ReadAsync().ConfigureAwait(false))
                 {
-                    Dictionary<string, object> result = DataReaderToList(reader, tType, classProperties, reval);
+                    Dictionary<string, object> result = privateDataReaderToList(reader, tType, classProperties, reval);
                     var stringValue = SerializeObject(result);
                     reval.Add((T)DeserializeObject<T>(stringValue));
                 }
@@ -454,7 +454,7 @@ namespace ThingsGateway.SqlSugar
             return reval;
         }
 
-        private Dictionary<string, object> DataReaderToList<T>(IDataReader reader, Type tType, List<PropertyInfo> classProperties, List<T> reval)
+        private Dictionary<string, object> privateDataReaderToList<T>(IDataReader reader, Type tType, List<PropertyInfo> classProperties, List<T> reval)
         {
             var readerValues = DataReaderToDictionary(reader, tType);
             var mappingKeys = this.QueryBuilder?.MappingKeys;
@@ -525,10 +525,10 @@ namespace ThingsGateway.SqlSugar
                         List<string> ignorePropertyNames = null;
                         if (this.QueryBuilder?.SelectNewIgnoreColumns?.Count > 0)
                         {
-                            var ignoreColumns = this.QueryBuilder.SelectNewIgnoreColumns.Where(it => it.Value == item.PropertyType.Name);
-                            if (ignoreColumns.Any())
+                            var ignoreColumns = this.QueryBuilder.SelectNewIgnoreColumns.Where(it => it.Value == item.PropertyType.Name).Select(it => it.Key).ToList();
+                            if (ignoreColumns.Count != 0)
                             {
-                                ignorePropertyNames = ignoreColumns.Select(it => it.Key).ToList();
+                                ignorePropertyNames = ignoreColumns;
                             }
                         }
                         result.Add(name, DataReaderToDynamicList_Part(readerValues, item, reval, mappingKeys, ignorePropertyNames));
@@ -945,16 +945,21 @@ namespace ThingsGateway.SqlSugar
         public DataTable DictionaryListToDataTable(IEnumerable<Dictionary<string, object>> list)
         {
             DataTable result = new DataTable();
-            if (!list.Any())
-                return result;
 
-            var columnNames = list.First();
-            foreach (var item in columnNames)
-            {
-                result.Columns.Add(item.Key, item.Value == null ? typeof(object) : item.Value.GetType());
-            }
+            bool first = true;
             foreach (var item in list)
             {
+                if (first)
+                {
+                    foreach (var kv in item)
+                    {
+                        result.Columns.Add(kv.Key, kv.Value == null ? typeof(object) : kv.Value.GetType());
+                    }
+                }
+
+
+                first = false;
+
                 var row = result.NewRow();
                 foreach (var key in item.Keys)
                 {
@@ -1048,7 +1053,7 @@ namespace ThingsGateway.SqlSugar
             result.TableName = entityInfo.DbTableName;
             if (list?.Count > 0)
             {
-                var colimnInfos = entityInfo.Columns.Where(it => it.IsIgnore == false);
+                var colimnInfos = entityInfo.Columns.Where(it => it.IsIgnore == false).ToArray();
                 foreach (var pi in colimnInfos)
                 {
                     //获取类型
@@ -1138,46 +1143,73 @@ namespace ThingsGateway.SqlSugar
         #endregion
 
         #region Page Each
-        public void PageEach<T>(IEnumerable<T> pageItems, int pageSize, Action<List<T>> action)
+        public void PageEach<T>(IEnumerable<T> source, int pageSize, Action<List<T>> action)
         {
-            if (pageItems?.Any() == true)
+            if (source == null) throw new ArgumentNullException(nameof(source));
+            if (pageSize <= 0) throw new ArgumentOutOfRangeException(nameof(pageSize));
+
+            var buffer = new List<T>(pageSize);
+            foreach (var item in source)
             {
-                int totalRecord = pageItems.Count();
-                int pageCount = (totalRecord + pageSize - 1) / pageSize;
-                for (int i = 1; i <= pageCount; i++)
+                buffer.Add(item);
+                if (buffer.Count == pageSize)
                 {
-                    var list = pageItems.Skip((i - 1) * pageSize).Take(pageSize).ToList();
-                    action(list);
+                    action(buffer);
+                    buffer = new List<T>(pageSize); // 重建 list，避免副作用
                 }
+            }
+
+            if (buffer.Count > 0)
+            {
+                action(buffer); // 处理最后一页（不足 pageSize）
+            }
+        }
+        public async Task PageEachAsync<T>(IEnumerable<T> source, int pageSize, Func<List<T>, Task> action)
+        {
+            if (source == null) throw new ArgumentNullException(nameof(source));
+            if (pageSize <= 0) throw new ArgumentOutOfRangeException(nameof(pageSize));
+            if (action == null) throw new ArgumentNullException(nameof(action));
+
+            var buffer = new List<T>(pageSize);
+            foreach (var item in source)
+            {
+                buffer.Add(item);
+                if (buffer.Count == pageSize)
+                {
+                    await action(buffer).ConfigureAwait(false);
+                    buffer = new List<T>(pageSize);
+                }
+            }
+
+            if (buffer.Count > 0)
+            {
+                await action(buffer).ConfigureAwait(false);
             }
         }
 
-        public async Task PageEachAsync<T>(IEnumerable<T> pageItems, int pageSize, Func<List<T>, Task> action)
+        public async Task PageEachAsync<T, TResult>(IEnumerable<T> source, int pageSize, Func<List<T>, Task<TResult>> action)
         {
-            if (pageItems?.Any() == true)
+            if (source == null) throw new ArgumentNullException(nameof(source));
+            if (pageSize <= 0) throw new ArgumentOutOfRangeException(nameof(pageSize));
+            if (action == null) throw new ArgumentNullException(nameof(action));
+
+            var buffer = new List<T>(pageSize);
+            foreach (var item in source)
             {
-                int totalRecord = pageItems.Count();
-                int pageCount = (totalRecord + pageSize - 1) / pageSize;
-                for (int i = 1; i <= pageCount; i++)
+                buffer.Add(item);
+                if (buffer.Count == pageSize)
                 {
-                    var list = pageItems.Skip((i - 1) * pageSize).Take(pageSize).ToList();
-                    await action(list).ConfigureAwait(false);
+                    await action(buffer).ConfigureAwait(false);
+                    buffer = new List<T>(pageSize);
                 }
             }
-        }
-        public async Task PageEachAsync<T, ResultType>(IEnumerable<T> pageItems, int pageSize, Func<List<T>, Task<ResultType>> action)
-        {
-            if (pageItems?.Any() == true)
+
+            if (buffer.Count > 0)
             {
-                int totalRecord = pageItems.Count();
-                int pageCount = (totalRecord + pageSize - 1) / pageSize;
-                for (int i = 1; i <= pageCount; i++)
-                {
-                    var list = pageItems.Skip((i - 1) * pageSize).Take(pageSize).ToList();
-                    await action(list).ConfigureAwait(false);
-                }
+                await action(buffer).ConfigureAwait(false);
             }
         }
+
 
         #endregion
 

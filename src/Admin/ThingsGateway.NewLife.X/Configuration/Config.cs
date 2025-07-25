@@ -39,7 +39,7 @@ public class Config<TConfig> where TConfig : Config<TConfig>, new()
 
         Provider = prv;
     }
-
+    private static readonly Object _lock = new Object();
     private static TConfig? _Current;
     /// <summary>当前实例。通过置空可以使其重新加载。</summary>
     public static TConfig Current
@@ -47,7 +47,7 @@ public class Config<TConfig> where TConfig : Config<TConfig>, new()
         get
         {
             if (_Current != null) return _Current;
-            lock (typeof(TConfig))
+            lock (_lock)
             {
                 if (_Current != null) return _Current;
 

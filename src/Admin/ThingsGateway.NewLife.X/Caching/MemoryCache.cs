@@ -865,7 +865,7 @@ public class MemoryCache : Cache
     /// <inheritdoc/>
     public override void HashAdd<T>(string key, string hashKey, T value)
     {
-        lock (this)
+        lock (lockThis)
         {
             //获取字典
             var exist = GetDictionary<T>(key);
@@ -879,7 +879,7 @@ public class MemoryCache : Cache
     /// <inheritdoc/>
     public override bool HashSet<T>(string key, Dictionary<string, T> dic)
     {
-        lock (this)
+        lock (lockThis)
         {
             //获取字典
             var exist = GetDictionary<T>(key);

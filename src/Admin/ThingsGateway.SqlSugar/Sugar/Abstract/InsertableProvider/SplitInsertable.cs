@@ -73,14 +73,14 @@
             {
                 try
                 {
-                    this.Context.Ado.BeginTran();
+                    await this.Context.Ado.BeginTranAsync().ConfigureAwait(false);
                     var result = await _ExecuteCommandAsync().ConfigureAwait(false);
-                    this.Context.Ado.CommitTran();
+                    await this.Context.Ado.CommitTranAsync().ConfigureAwait(false);
                     return result;
                 }
                 catch (Exception)
                 {
-                    this.Context.Ado.RollbackTran();
+                    await this.Context.Ado.RollbackTranAsync().ConfigureAwait(false);
                     throw;
                 }
             }
@@ -125,14 +125,14 @@
             {
                 try
                 {
-                    this.Context.Ado.BeginTran();
+                    await this.Context.Ado.BeginTranAsync().ConfigureAwait(false);
                     var result = await _ExecuteReturnSnowflakeIdListAsync().ConfigureAwait(false);
-                    this.Context.Ado.CommitTran();
+                    await this.Context.Ado.CommitTranAsync().ConfigureAwait(false);
                     return result;
                 }
                 catch (Exception)
                 {
-                    this.Context.Ado.RollbackTran();
+                    await this.Context.Ado.RollbackTranAsync().ConfigureAwait(false);
                     throw;
                 }
             }

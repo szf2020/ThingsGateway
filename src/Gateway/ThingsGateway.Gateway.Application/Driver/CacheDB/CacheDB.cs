@@ -42,7 +42,7 @@ public class CacheDB : DisposeBase
 
     public void InitDb()
     {
-        lock (CacheDBOption.FileFullName)
+        lock (CacheDBOption)
         {
             if (!Disposed)
             {

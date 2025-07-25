@@ -98,7 +98,7 @@ namespace ThingsGateway.SqlSugar
             {
                 CreateTable(item.Key);
                 var addList = item.Select(it => it.Item);
-                resultValue += await Context.Storageable(addList).As(item.Key).WhereColumns(whereExpression).ExecuteCommandAsync().ConfigureAwait(false);
+                resultValue += await Context.Storageable(addList).AS(item.Key).WhereColumns(whereExpression).ExecuteCommandAsync().ConfigureAwait(false);
                 if (ActionCallBack != null)
                 {
                     ActionCallBack(resultValue);
@@ -115,7 +115,7 @@ namespace ThingsGateway.SqlSugar
             {
                 CreateTable(item.Key);
                 var addList = item.Select(it => it.Item);
-                resultValue += this.Context.Storageable(addList).As(item.Key).WhereColumns(whereExpression).ExecuteCommand();
+                resultValue += this.Context.Storageable(addList).AS(item.Key).WhereColumns(whereExpression).ExecuteCommand();
             }
             return resultValue;
         }
@@ -128,7 +128,7 @@ namespace ThingsGateway.SqlSugar
             {
                 CreateTable(item.Key);
                 var addList = item.Select(it => it.Item);
-                resultValue += await Context.Storageable(addList).As(item.Key).WhereColumns(whereExpression).ExecuteSqlBulkCopyAsync().ConfigureAwait(false);
+                resultValue += await Context.Storageable(addList).AS(item.Key).WhereColumns(whereExpression).ExecuteSqlBulkCopyAsync().ConfigureAwait(false);
                 if (ActionCallBack != null)
                 {
                     ActionCallBack(resultValue);
@@ -145,7 +145,7 @@ namespace ThingsGateway.SqlSugar
             {
                 CreateTable(item.Key);
                 var addList = item.Select(it => it.Item);
-                resultValue += this.Context.Storageable(addList).As(item.Key).WhereColumns(whereExpression).ExecuteSqlBulkCopy();
+                resultValue += this.Context.Storageable(addList).AS(item.Key).WhereColumns(whereExpression).ExecuteSqlBulkCopy();
             }
             return resultValue;
         }

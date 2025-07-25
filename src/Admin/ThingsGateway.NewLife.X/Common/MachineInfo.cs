@@ -132,17 +132,6 @@ public class MachineInfo : IExtend
     /// <summary>机器信息提供者。外部实现可修改部分行为</summary>
     public static IMachineInfo? Provider { get; set; }
 
-    //static MachineInfo() => RegisterAsync().Wait(100);
-
-    private static Task<MachineInfo>? _task;
-    /// <summary>异步注册一个初始化后的机器信息实例</summary>
-    /// <returns></returns>
-    public static Task<MachineInfo> RegisterAsync()
-    {
-        if (_task != null) return _task;
-
-        return _task = Task.Factory.StartNew(() => Register());
-    }
 
     private static MachineInfo Register()
     {

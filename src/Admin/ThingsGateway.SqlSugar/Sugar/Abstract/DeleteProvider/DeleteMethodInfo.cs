@@ -28,7 +28,7 @@ namespace ThingsGateway.SqlSugar
         {
             if (Context == null) return 0;
             var inertable = MethodInfo.Invoke(Context, new object[] { objectValue });
-            var result = inertable.GetType().GetMethod("ExecuteCommand").Invoke(inertable, Array.Empty<object>());
+            var result = inertable.GetType().GetMethod(nameof(ExecuteCommand)).Invoke(inertable, Array.Empty<object>());
             return (int)result;
         }
         /// <summary>
@@ -39,7 +39,7 @@ namespace ThingsGateway.SqlSugar
         {
             if (Context == null) return 0;
             var inertable = MethodInfo.Invoke(Context, new object[] { objectValue });
-            var result = inertable.GetType().GetMyMethod("ExecuteCommandAsync", 0).Invoke(inertable, Array.Empty<object>());
+            var result = inertable.GetType().GetMyMethod(nameof(ExecuteCommandAsync), 0).Invoke(inertable, Array.Empty<object>());
             return await ((Task<int>)result).ConfigureAwait(false);
         }
 
@@ -51,7 +51,7 @@ namespace ThingsGateway.SqlSugar
         public CommonMethodInfo AS(string tableName)
         {
             var inertable = MethodInfo.Invoke(Context, new object[] { objectValue });
-            var newMethod = inertable.GetType().GetMyMethod("AS", 1, typeof(string));
+            var newMethod = inertable.GetType().GetMyMethod(nameof(QueryMethodInfo.AS), 1, typeof(string));
             var result = newMethod.Invoke(inertable, new object[] { tableName });
             return new CommonMethodInfo()
             {
@@ -70,7 +70,7 @@ namespace ThingsGateway.SqlSugar
                 return new CommonMethodInfo();
             }
             var inertable = MethodInfo.Invoke(Context, new object[] { objectValue });
-            var newMethod = inertable.GetType().GetMyMethod("EnableDiffLogEvent", 1, typeof(object));
+            var newMethod = inertable.GetType().GetMyMethod(nameof(EnableDiffLogEvent), 1, typeof(object));
             var result = newMethod.Invoke(inertable, new object[] { businessData });
             return new CommonMethodInfo()
             {
@@ -84,7 +84,7 @@ namespace ThingsGateway.SqlSugar
         public CommonMethodInfo SplitTable()
         {
             var inertable = MethodInfo.Invoke(Context, new object[] { objectValue });
-            var newMethod = inertable.GetType().GetMyMethod("SplitTable", 0);
+            var newMethod = inertable.GetType().GetMyMethod(nameof(SplitTable), 0);
             var result = newMethod.Invoke(inertable, Array.Empty<object>());
             return new CommonMethodInfo()
             {

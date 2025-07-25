@@ -46,11 +46,8 @@ public static class CacheDBUtil
         var fileStart = GetFileName(name);
         var fullName = dir.CombinePathWithOs($"{fileStart}{EX}");
 
-        lock (fullName)
-        {
-            var cache = new CacheDB(tableType, new CacheDBOption() { FileFullName = $"{fullName}" });
-            return cache;
-        }
+        var cache = new CacheDB(tableType, new CacheDBOption() { FileFullName = $"{fullName}" });
+        return cache;
     }
 
     public static string GetCacheFileBasePath()

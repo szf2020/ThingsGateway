@@ -546,7 +546,9 @@ internal sealed partial class HttpRemoteService : IHttpRemoteService
             else
             {
                 // ReSharper disable once MethodHasAsyncOverload
+#pragma warning disable CA1849
                 InvokeStatusCodeHandlers(httpRequestBuilder, httpResponseMessage, timeoutCancellationToken);
+#pragma warning restore CA1849
             }
 
             // 检查 HTTP 响应内容长度是否在设定的最大缓冲区大小限制内

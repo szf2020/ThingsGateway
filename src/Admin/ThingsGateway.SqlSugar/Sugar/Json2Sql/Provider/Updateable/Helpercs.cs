@@ -9,7 +9,7 @@
 
         private static bool IsWhere(string name)
         {
-            return name.Equals("Where", StringComparison.CurrentCultureIgnoreCase);
+            return name.Equals(nameof(QueryMethodInfo.Where), StringComparison.CurrentCultureIgnoreCase);
         }
 
         private static bool IsWhereColumns(string name)

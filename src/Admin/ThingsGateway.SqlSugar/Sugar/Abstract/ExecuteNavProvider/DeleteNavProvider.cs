@@ -159,11 +159,11 @@ namespace ThingsGateway.SqlSugar
             {
                 Context = this._Context
             };
-            if (method.Method.Name == "ToList")
+            if (method.Method.Name == nameof(QueryMethodInfo.ToList))
             {
                 // 不处理ToList方法
             }
-            else if (method.Method.Name == "Where")
+            else if (method.Method.Name == nameof(QueryMethodInfo.Where))
             {
                 navigatManager.CheckHasRootShortName(method.Arguments[0], method.Arguments[1]);
                 var exp = method.Arguments[1];

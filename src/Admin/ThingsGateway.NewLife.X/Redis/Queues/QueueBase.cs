@@ -53,6 +53,8 @@ public abstract class QueueBase : RedisBase
     }
     #endregion
 
+    protected object lockThis = new();
+
     #region 方法
     /// <summary>验证失败</summary>
     /// <param name="span"></param>

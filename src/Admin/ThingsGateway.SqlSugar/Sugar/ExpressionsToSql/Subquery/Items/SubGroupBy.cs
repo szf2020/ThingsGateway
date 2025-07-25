@@ -11,7 +11,7 @@ namespace ThingsGateway.SqlSugar
 
         public string Name
         {
-            get { return "GroupBy"; }
+            get { return nameof(QueryMethodInfo.GroupBy); }
         }
 
         public Expression Expression

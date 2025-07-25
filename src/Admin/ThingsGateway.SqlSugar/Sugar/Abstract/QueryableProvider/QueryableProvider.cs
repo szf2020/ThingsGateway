@@ -1444,7 +1444,7 @@ namespace ThingsGateway.SqlSugar
                 SetAppendNavColumns(selectObj.Exp);
             }
             var exp = selectObj.Exp;
-            var method = GetType().GetMethod("_Select", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
+            var method = GetType().GetMethod(nameof(_Select), System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
              .MakeGenericMethod(selectObj.ResultNewType);
             dynamicCoreSelectModel.Value = method.Invoke(this, new object[] { exp });
             return dynamicCoreSelectModel;
@@ -1518,7 +1518,7 @@ namespace ThingsGateway.SqlSugar
                     Check.ExceptionEasy("Select< interface > requires a full example of AsType(type) db.Queryable<object>().AsType(type).Select<Interface>().ToList()"
                         , "Select<接口>需要AsType(type)完整示例db.Queryable<object>().AsType(type).Select<Interface>().ToList()");
                 }
-                if (this.QueryBuilder.SelectValue.HasValue() && this.QueryBuilder.SelectValue.ObjToString().Contains("AS"))
+                if (this.QueryBuilder.SelectValue.HasValue() && this.QueryBuilder.SelectValue.ObjToString().Contains(nameof(QueryMethodInfo.AS)))
                 {
                     return this.Select<TResult>(this.QueryBuilder.SelectValue + "");
                 }

@@ -138,7 +138,7 @@ public partial class MqttClient : BusinessBaseWithCacheIntervalScriptAll
         {
             if (_driverPropertys.GroupUpdate)
             {
-                var data = variables.ToArray();
+                var data = variables is System.Collections.IList ? variables : variables.ToArray();
                 var varList = data.Where(a => a.BusinessGroup.IsNullOrEmpty());
                 var varGroup = data.Where(a => !a.BusinessGroup.IsNullOrEmpty()).GroupBy(a => a.BusinessGroup);
 
@@ -177,21 +177,21 @@ public partial class MqttClient : BusinessBaseWithCacheIntervalScriptAll
         }
     }
 
-    protected override ValueTask<OperResult> UpdateAlarmModel(IEnumerable<CacheDBItem<AlarmVariable>> item, CancellationToken cancellationToken)
+    protected override ValueTask<OperResult> UpdateAlarmModel(List<CacheDBItem<AlarmVariable>> item, CancellationToken cancellationToken)
     {
         return UpdateAlarmModel(item.Select(a => a.Value).OrderBy(a => a.Id), cancellationToken);
     }
 
-    protected override ValueTask<OperResult> UpdateDevModel(IEnumerable<CacheDBItem<DeviceBasicData>> item, CancellationToken cancellationToken)
+    protected override ValueTask<OperResult> UpdateDevModel(List<CacheDBItem<DeviceBasicData>> item, CancellationToken cancellationToken)
     {
         return UpdateDevModel(item.Select(a => a.Value).OrderBy(a => a.Id), cancellationToken);
     }
 
-    protected override ValueTask<OperResult> UpdateVarModel(IEnumerable<CacheDBItem<VariableBasicData>> item, CancellationToken cancellationToken)
+    protected override ValueTask<OperResult> UpdateVarModel(List<CacheDBItem<VariableBasicData>> item, CancellationToken cancellationToken)
     {
         return UpdateVarModel(item.Select(a => a.Value).OrderBy(a => a.Id), cancellationToken);
     }
-    protected override ValueTask<OperResult> UpdateVarModels(IEnumerable<VariableBasicData> item, CancellationToken cancellationToken)
+    protected override ValueTask<OperResult> UpdateVarModels(List<VariableBasicData> item, CancellationToken cancellationToken)
     {
         return UpdateVarModel(item, cancellationToken);
     }

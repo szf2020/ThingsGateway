@@ -115,7 +115,7 @@ internal sealed partial class SchedulerFactory : ISchedulerFactory
         if (Persistence is not null)
         {
             // 创建长时间运行的后台任务，并将作业运行消息写入持久化中
-            _processQueueTask = Task.Factory.StartNew(ProcessQueueAsync, TaskCreationOptions.LongRunning);
+            _processQueueTask = Task.Factory.StartNew(ProcessQueueAsync, CancellationToken.None, TaskCreationOptions.LongRunning, TaskScheduler.Default);
         }
     }
 
@@ -163,19 +163,16 @@ internal sealed partial class SchedulerFactory : ISchedulerFactory
             var initialSchedulerBuilders = _schedulerBuilders.Concat(preloadSchedulerBuilders ?? Enumerable.Empty<SchedulerBuilder>());
 
             // 如果作业调度器中包含作业计划构建器
-            if (initialSchedulerBuilders.Any())
+            // 逐条遍历并加载到内存中
+            foreach (var schedulerBuilder in initialSchedulerBuilders)
             {
-                // 逐条遍历并加载到内存中
-                foreach (var schedulerBuilder in initialSchedulerBuilders)
+                SchedulerBuilder schedulerBuilderObj = null;
+                if (isSetPersistence)
                 {
-                    SchedulerBuilder schedulerBuilderObj = null;
-                    if (isSetPersistence)
-                    {
-                        schedulerBuilderObj = await Persistence.OnLoadingAsync(schedulerBuilder, stoppingToken).ConfigureAwait(false);
-                    }
-
-                    _ = TrySaveJob(schedulerBuilderObj ?? schedulerBuilder, out _, false);
+                    schedulerBuilderObj = await Persistence.OnLoadingAsync(schedulerBuilder, stoppingToken).ConfigureAwait(false);
                 }
+
+                _ = TrySaveJob(schedulerBuilderObj ?? schedulerBuilder, out _, false);
             }
         }
         catch (Exception ex)
@@ -484,11 +481,12 @@ internal sealed partial class SchedulerFactory : ISchedulerFactory
                 .Where(t => t.NextShouldRun(startAt))
                 .Select(t => t.NextRunTime.Value));
 
-        // 空检查
+#pragma warning disable CA1851
         if (!nextRunTimes.Any()) return null;
 
         // 获取最早触发的时间
         var earliestTriggerTime = nextRunTimes.Min();
+#pragma warning restore CA1851
 
         // 计算总休眠时间
         var sleepMilliseconds = (earliestTriggerTime - startAt).TotalMilliseconds;

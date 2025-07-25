@@ -56,7 +56,7 @@ public partial class SqlHistoryAlarm : BusinessBaseWithCacheAlarm, IDBHistoryAla
     protected override Task ProtectedStartAsync(CancellationToken cancellationToken)
     {
         _db.DbMaintenance.CreateDatabase();
-        _db.CodeFirst.As<HistoryAlarm>(_driverPropertys.TableName).InitTables<HistoryAlarm>();
+        _db.CodeFirst.AS<HistoryAlarm>(_driverPropertys.TableName).InitTables<HistoryAlarm>();
         return base.ProtectedStartAsync(cancellationToken);
     }
 

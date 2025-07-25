@@ -149,7 +149,7 @@ public class FullRedis : Redis
     public void InitCluster()
     {
         if (_initCluster) return;
-        lock (this)
+        lock (lockThis)
         {
             if (_initCluster) return;
 

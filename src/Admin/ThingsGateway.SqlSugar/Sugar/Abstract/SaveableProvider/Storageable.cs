@@ -163,7 +163,7 @@ namespace ThingsGateway.SqlSugar
         }
         public async Task<T> ExecuteReturnEntityAsync()
         {
-            var x = this.ToStorage();
+            var x = await this.ToStorageAsync().ConfigureAwait(false);
             if (x.InsertList.Count != 0)
             {
                 var data = await x.AsInsertable.ExecuteReturnEntityAsync().ConfigureAwait(false);
@@ -563,9 +563,7 @@ namespace ThingsGateway.SqlSugar
                     {
                         var columnInfo = item;
                         var type = columnInfo.SqlParameterDbType as Type;
-                        var ParameterConverter = type.GetMethod("ParameterConverter").MakeGenericMethod(columnInfo.PropertyInfo.PropertyType);
-                        var obj = Activator.CreateInstance(type);
-                        var p = ParameterConverter.Invoke(obj, new object[] { value, 100 }) as SugarParameter;
+                        var p = UtilMethods.GetParameterConverter(100, value, type, columnInfo.PropertyInfo.PropertyType);
                         value = p.Value;
                     }
                     condition.ConditionalList.Add(new KeyValuePair<WhereType, ConditionalModel>(i == 0 ? WhereType.Or : WhereType.And, new ConditionalModel()
@@ -621,7 +619,7 @@ namespace ThingsGateway.SqlSugar
             return result;
         }
 
-        public IStorageable<T> As(string tableName)
+        public IStorageable<T> AS(string tableName)
         {
             this.asname = tableName;
             return this;

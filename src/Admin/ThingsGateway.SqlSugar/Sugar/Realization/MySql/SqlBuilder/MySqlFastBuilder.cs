@@ -26,12 +26,12 @@ namespace ThingsGateway.SqlSugar
             }
             var fileName = Path.Combine(dllPath, Guid.NewGuid().ToString() + ".csv");
             var dataTableToCsv = new MySqlBlukCopy<object>(this.Context.Context, null, null).DataTableToCsvString(dt);
-            File.WriteAllText(fileName, dataTableToCsv, new UTF8Encoding(false));
+            await File.WriteAllTextAsync(fileName, dataTableToCsv, new UTF8Encoding(false)).ConfigureAwait(false);
             MySqlConnection conn = this.Context.Ado.Connection as MySqlConnection;
             int result = 0;
             try
             {
-                this.Context.Ado.Open();
+                await this.Context.Ado.OpenAsync().ConfigureAwait(false);
                 // IsolationLevel.Parse
                 MySqlBulkLoader bulk = new MySqlBulkLoader(conn)
                 {
@@ -69,7 +69,7 @@ namespace ThingsGateway.SqlSugar
                 }
                 else if (ex.Message == "Loading local data is disabled; this must be enabled on both the client and server sides")
                 {
-                    this.Context.Ado.ExecuteCommand("SET GLOBAL local_infile=1");
+                    await this.Context.Ado.ExecuteCommandAsync("SET GLOBAL local_infile=1").ConfigureAwait(false);
                     Check.ExceptionEasy(ex.Message, " 检测到你没有开启文件，AllowLoadLocalInfile=true加到自符串上，已自动执行 SET GLOBAL local_infile=1 在试一次");
                 }
                 else

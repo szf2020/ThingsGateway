@@ -908,7 +908,6 @@ public static class Serve
                     && u.GetParameters().Length > 0
                     && u.GetParameters().First().ParameterType == typeof(IServiceProvider));
 
-            if (!configureMethods.Any()) continue;
 
             // 自动安装属性调用
             foreach (var method in configureMethods)
@@ -935,7 +934,6 @@ public static class Serve
                     && u.GetParameters().Length > 0
                     && u.GetParameters().First().ParameterType == typeof(IApplicationBuilder));
 
-            if (!configureMethods.Any()) continue;
 
             // 自动安装属性调用
             foreach (var method in configureMethods)

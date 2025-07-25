@@ -232,7 +232,7 @@ public abstract class Cache : DisposeBase, ICache
     /// <returns></returns>
     public virtual Int64 Increment(String key, Int64 value)
     {
-        lock (this)
+        lock (lockThis)
         {
             var v = Get<Int64>(key);
             v += value;
@@ -248,7 +248,7 @@ public abstract class Cache : DisposeBase, ICache
     /// <returns></returns>
     public virtual Double Increment(String key, Double value)
     {
-        lock (this)
+        lock (lockThis)
         {
             var v = Get<Double>(key);
             v += value;
@@ -264,7 +264,7 @@ public abstract class Cache : DisposeBase, ICache
     /// <returns></returns>
     public virtual Int64 Decrement(String key, Int64 value)
     {
-        lock (this)
+        lock (lockThis)
         {
             var v = Get<Int64>(key);
             v -= value;
@@ -273,14 +273,14 @@ public abstract class Cache : DisposeBase, ICache
             return v;
         }
     }
-
+    protected object lockThis = new();
     /// <summary>递减，原子操作</summary>
     /// <param name="key">键</param>
     /// <param name="value">变化量</param>
     /// <returns></returns>
     public virtual Double Decrement(String key, Double value)
     {
-        lock (this)
+        lock (lockThis)
         {
             var v = Get<Double>(key);
             v -= value;

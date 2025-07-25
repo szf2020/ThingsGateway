@@ -242,13 +242,13 @@ namespace ThingsGateway.SqlSugar
         public virtual string GetAsString(string asName, string fieldValue)
         {
             if (fieldValue.Contains(".*") || fieldValue == "*") return fieldValue;
-            return string.Format(" {0} {1} {2} ", GetTranslationColumnName(fieldValue), "AS", GetTranslationColumnName(asName));
+            return string.Format(" {0} {1} {2} ", GetTranslationColumnName(fieldValue), nameof(QueryMethodInfo.AS), GetTranslationColumnName(asName));
         }
 
         public virtual string GetAsString2(string asName, string fieldValue)
         {
             if (fieldValue.Contains(".*") || fieldValue == "*") return fieldValue;
-            return string.Format(" {0} {1} {2} ", fieldValue, "AS", GetTranslationColumnName(asName));
+            return string.Format(" {0} {1} {2} ", fieldValue, nameof(QueryMethodInfo.AS), GetTranslationColumnName(asName));
         }
 
         public virtual string GetEqString(string eqName, string fieldValue)
@@ -259,7 +259,7 @@ namespace ThingsGateway.SqlSugar
         public virtual string GetAsString(string asName, string fieldValue, string fieldShortName)
         {
             if (fieldValue.Contains(".*") || fieldValue == "*") return fieldValue;
-            return string.Format(" {0} {1} {2} ", GetTranslationColumnName(fieldShortName + "." + fieldValue), "AS", GetTranslationColumnName(asName));
+            return string.Format(" {0} {1} {2} ", GetTranslationColumnName(fieldShortName + "." + fieldValue), nameof(QueryMethodInfo.AS), GetTranslationColumnName(asName));
         }
         #endregion
     }

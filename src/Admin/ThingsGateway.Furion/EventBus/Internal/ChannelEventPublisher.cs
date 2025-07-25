@@ -60,7 +60,7 @@ internal sealed partial class ChannelEventPublisher : IEventPublisher
             await Task.Delay(TimeSpan.FromMilliseconds(delay), eventSource.CancellationToken).ConfigureAwait(false);
 
             await _eventSourceStorer.WriteAsync(eventSource, eventSource.CancellationToken).ConfigureAwait(false);
-        }, eventSource.CancellationToken);
+        }, eventSource.CancellationToken, TaskCreationOptions.None, TaskScheduler.Default);
 
         return Task.CompletedTask;
     }

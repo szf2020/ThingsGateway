@@ -278,7 +278,6 @@ public static class AppServiceCollectionExtensions
                     && u.GetParameters().Length > 0
                     && u.GetParameters().First().ParameterType == typeof(IServiceCollection));
 
-            if (!serviceMethods.Any()) continue;
 
             // 自动安装属性调用
             foreach (var method in serviceMethods)

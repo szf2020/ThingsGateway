@@ -113,7 +113,7 @@ namespace ThingsGateway.SqlSugar
             }
             await Context.Utilities.PageEachAsync(datas, pageSize, async pageItems =>
             {
-                var x = await Context.Storageable(pageItems).As(tableName).WhereColumns(whereColumns).ToStorageAsync().ConfigureAwait(false);
+                var x = await Context.Storageable(pageItems).AS(tableName).WhereColumns(whereColumns).ToStorageAsync().ConfigureAwait(false);
                 result += await x.BulkCopyAsync().ConfigureAwait(false);
                 result += await x.BulkUpdateAsync(updateColumns).ConfigureAwait(false);
                 return result;

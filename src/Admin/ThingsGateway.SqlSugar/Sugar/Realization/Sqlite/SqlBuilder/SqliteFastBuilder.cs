@@ -54,11 +54,13 @@ namespace ThingsGateway.SqlSugar
             Open(cn);
             if (this.Context.Ado.Transaction == null)
             {
-                using (var transaction = cn.BeginTransaction())
+#pragma warning disable CA2007 // 考虑对等待的任务调用 ConfigureAwait
+                await using (var transaction = await cn.BeginTransactionAsync().ConfigureAwait(false))
                 {
                     result = await _BulkCopy(dt, dictionary, result, cn).ConfigureAwait(false);
-                    transaction.Commit();
+                    await transaction.CommitAsync().ConfigureAwait(false);
                 }
+#pragma warning restore CA2007 // 考虑对等待的任务调用 ConfigureAwait
             }
             else
             {
@@ -196,11 +198,13 @@ namespace ThingsGateway.SqlSugar
             Open(cn);
             if (this.Context.Ado.Transaction == null)
             {
-                using (var transaction = cn.BeginTransaction())
+#pragma warning disable CA2007 // 考虑对等待的任务调用 ConfigureAwait
+                await using (var transaction = await cn.BeginTransactionAsync().ConfigureAwait(false))
                 {
                     result = await _BulkUpdate(dt, dictionary, result, whereColumns, updateColumns, cn).ConfigureAwait(false);
-                    transaction.Commit();
+                    await transaction.CommitAsync().ConfigureAwait(false);
                 }
+#pragma warning restore CA2007 // 考虑对等待的任务调用 ConfigureAwait
             }
             else
             {
@@ -214,7 +218,7 @@ namespace ThingsGateway.SqlSugar
             var result = 0;
             await Context.Utilities.PageEachAsync(datas, 2000, async pageItems =>
             {
-                var x = await Context.Storageable(pageItems).As(tableName).WhereColumns(whereColumns).ToStorageAsync().ConfigureAwait(false);
+                var x = await Context.Storageable(pageItems).AS(tableName).WhereColumns(whereColumns).ToStorageAsync().ConfigureAwait(false);
                 result += await x.BulkCopyAsync().ConfigureAwait(false);
                 result += await x.BulkUpdateAsync(updateColumns).ConfigureAwait(false);
                 return result;

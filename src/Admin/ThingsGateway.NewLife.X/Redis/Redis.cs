@@ -387,7 +387,7 @@ public abstract class Redis : Cache, IConfigMapping, ILogFeature
         get
         {
             if (_Pool != null) return _Pool;
-            lock (this)
+            lock (lockThis)
             {
                 if (_Pool != null) return _Pool;
 

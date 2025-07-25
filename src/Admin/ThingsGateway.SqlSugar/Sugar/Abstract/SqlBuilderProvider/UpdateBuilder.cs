@@ -295,7 +295,7 @@ namespace ThingsGateway.SqlSugar
                         {
                             var columnInfo = GetColumnInfo(item);
                             var value = this.DbColumnInfoList.FirstOrDefault(it => it.DbColumnName.EqualCase(item) || it.PropertyName.EqualCase(item))?.Value;
-                            var p = UtilMethods.GetParameterConverter(i, this.Context, value, this.EntityInfo, this.EntityInfo?.Columns.First(it => it.DbColumnName.Equals(item) || it.PropertyName.Equals(item)));
+                            var p = UtilMethods.GetParameterConverter(i, value, this.EntityInfo?.Columns.First(it => it.DbColumnName.Equals(item) || it.PropertyName.Equals(item)));
                             whereString += Builder.GetTranslationColumnName(item) + "=" + p.ParameterName;
                             this.Parameters.Add(p);
                         }
@@ -504,24 +504,20 @@ namespace ThingsGateway.SqlSugar
                 }
                 return columnInfo.UpdateSql;
             }
-            else if (columnInfo.SqlParameterDbType is Type && IsNoParameterConvert(columnInfo))
+            else if (columnInfo.SqlParameterDbType is Type dbType)
             {
-                var type = columnInfo.SqlParameterDbType as Type;
-                var ParameterConverter = type.GetMethod("ParameterConverter").MakeGenericMethod(typeof(string));
-                var obj = Activator.CreateInstance(type);
-                var p = ParameterConverter.Invoke(obj, new object[] { columnInfo.Value, GetDbColumnIndex }) as SugarParameter;
-                return p.ParameterName;
-            }
-            else if (columnInfo.SqlParameterDbType is Type)
-            {
-                var type = columnInfo.SqlParameterDbType as Type;
-                var ParameterConverter = type.GetMethod("ParameterConverter").MakeGenericMethod(columnInfo.PropertyType);
-                var obj = Activator.CreateInstance(type);
-                var p = ParameterConverter.Invoke(obj, new object[] { columnInfo.Value, GetDbColumnIndex }) as SugarParameter;
-                GetDbColumnIndex++;
-                //this.Parameters.RemoveAll(it => it.ParameterName == it.ParameterName);
-                this.Parameters.Add(p);
-                return p.ParameterName;
+                var p = UtilMethods.GetParameterConverter(GetDbColumnIndex, columnInfo.Value, dbType, columnInfo.PropertyType);
+                if (IsNoParameterConvert(columnInfo))
+                {
+                    return p.ParameterName;
+                }
+                else
+                {
+                    GetDbColumnIndex++;
+                    //this.Parameters.RemoveAll(it => it.ParameterName == it.ParameterName);
+                    this.Parameters.Add(p);
+                    return p.ParameterName;
+                }
             }
             else if (columnInfo.PropertyType?.Name == "TimeOnly" && name?.ObjToString().StartsWith(Builder.SqlParameterKeyWord) == false)
             {

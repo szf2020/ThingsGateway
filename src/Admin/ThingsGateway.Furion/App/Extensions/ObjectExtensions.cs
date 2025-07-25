@@ -18,6 +18,8 @@ using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 
+using ThingsGateway.NewLife;
+
 namespace ThingsGateway.Extensions;
 
 /// <summary>
@@ -187,7 +189,7 @@ public static class ObjectExtensions
             {
                 if (current == last) func(arg);
                 task.Dispose();
-            });
+            }, CancellationToken.None, TaskContinuationOptions.None, TaskScheduler.Default);
         };
     }
 
@@ -207,8 +209,8 @@ public static class ObjectExtensions
             Task.Delay(milliseconds).ContinueWith(task =>
             {
                 if (current == last) func();
-                task.Dispose();
-            });
+                task.TryDispose();
+            }, CancellationToken.None, TaskContinuationOptions.None, TaskScheduler.Default);
         };
     }
 

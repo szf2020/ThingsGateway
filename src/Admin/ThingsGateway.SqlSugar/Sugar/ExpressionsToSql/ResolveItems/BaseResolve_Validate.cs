@@ -8,7 +8,7 @@ namespace ThingsGateway.SqlSugar
     {
         private static bool IsSubToList(Expression item)
         {
-            return ExpressionTool.GetMethodName(item).IsIn("ToList", "First") && IsSubquery(item);
+            return ExpressionTool.GetMethodName(item).IsIn(nameof(QueryMethodInfo.ToList), nameof(QueryMethodInfo.First)) && IsSubquery(item);
         }
 
         private static bool IsSubquery(Expression item)
@@ -66,7 +66,7 @@ namespace ThingsGateway.SqlSugar
             {
                 return false;
             }
-            else if ((item as MethodCallExpression).Method.Name == "Select" && item.ToString().Contains("Subqueryable()"))
+            else if ((item as MethodCallExpression).Method.Name == nameof(QueryMethodInfo.Select) && item.ToString().Contains("Subqueryable()"))
             {
                 return false;
             }

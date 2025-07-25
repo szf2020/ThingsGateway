@@ -13,7 +13,7 @@ namespace ThingsGateway.SqlSugar
         {
             get
             {
-                return "First";
+                return nameof(QueryMethodInfo.First);
             }
         }
 

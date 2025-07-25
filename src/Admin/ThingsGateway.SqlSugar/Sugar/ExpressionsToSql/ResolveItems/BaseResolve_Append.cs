@@ -142,7 +142,7 @@ namespace ThingsGateway.SqlSugar
                 }
                 else if (UtilMethods.IsParameterConverter(columnInfo))
                 {
-                    SugarParameter p = UtilMethods.GetParameterConverter(this.Context.ParameterIndex, this.Context.SugarContext.Context, value, oppoSiteExpression, columnInfo);
+                    SugarParameter p = UtilMethods.GetParameterConverter(this.Context.ParameterIndex, value, columnInfo);
                     appendValue = p.ParameterName;
                     this.Context.Parameters.Add(p);
                 }

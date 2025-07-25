@@ -47,12 +47,14 @@ internal sealed class NamedServiceProvider<TService> : INamedServiceProvider<TSe
     {
         var services = _serviceProvider.GetServices<TService>();
 
+#pragma warning disable CA1851
         if (services
             .OfType<AspectDispatchProxy>()
             .FirstOrDefault(u => ResovleServiceName(((dynamic)u).Target.GetType()) == serviceName) is not TService service)
         {
             service = services.FirstOrDefault(u => ResovleServiceName(u.GetType()) == serviceName);
         }
+#pragma warning restore CA1851
 
         return service;
     }
@@ -80,12 +82,14 @@ internal sealed class NamedServiceProvider<TService> : INamedServiceProvider<TSe
         // 解析所有实现
         var services = _serviceProvider.GetServices<TService>();
 
+#pragma warning disable CA1851
         if (services
             .OfType<AspectDispatchProxy>()
             .FirstOrDefault(u => ResovleServiceName(((dynamic)u).Target.GetType()) == serviceName) is not TService service)
         {
             service = services.FirstOrDefault(u => ResovleServiceName(u.GetType()) == serviceName);
         }
+#pragma warning restore CA1851
 
         // 如果服务不存在，抛出异常
         return service ?? throw new InvalidOperationException($"Named service `{serviceName}` is not registered in container.");

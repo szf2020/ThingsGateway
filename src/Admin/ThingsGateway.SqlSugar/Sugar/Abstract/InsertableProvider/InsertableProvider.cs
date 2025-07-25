@@ -497,11 +497,11 @@ namespace ThingsGateway.SqlSugar
                     isAuto = this.Context.CurrentConnectionConfig.IsAutoCloseConnection;
                     this.Context.CurrentConnectionConfig.IsAutoCloseConnection = false;
                 }
-                result = Ado.GetInt(sql.Split(';').First(), InsertBuilder.Parameters == null ? null : InsertBuilder.Parameters);
-                result = Ado.GetInt(sql.Split(';').Last(), InsertBuilder.Parameters == null ? null : InsertBuilder.Parameters);
+                result = await Ado.GetIntAsync(sql.Split(';').First(), InsertBuilder.Parameters == null ? null : InsertBuilder.Parameters).ConfigureAwait(false);
+                result = await Ado.GetIntAsync(sql.Split(';').Last(), InsertBuilder.Parameters == null ? null : InsertBuilder.Parameters).ConfigureAwait(false);
                 if (this.Context.Ado.IsAnyTran() == false && isAuto)
                 {
-                    this.Ado.Close();
+                    await this.Ado.CloseAsync().ConfigureAwait(false);
                     this.Context.CurrentConnectionConfig.IsAutoCloseConnection = isAuto;
                 }
             }
@@ -641,11 +641,11 @@ namespace ThingsGateway.SqlSugar
                     isAuto = this.Context.CurrentConnectionConfig.IsAutoCloseConnection;
                     this.Context.CurrentConnectionConfig.IsAutoCloseConnection = false;
                 }
-                result = Ado.GetInt(sql.Split(';').First(), InsertBuilder.Parameters == null ? null : InsertBuilder.Parameters);
-                result = Ado.GetInt(sql.Split(';').Last(), InsertBuilder.Parameters == null ? null : InsertBuilder.Parameters);
+                result = await Ado.GetIntAsync(sql.Split(';').First(), InsertBuilder.Parameters == null ? null : InsertBuilder.Parameters).ConfigureAwait(false);
+                result = await Ado.GetIntAsync(sql.Split(';').Last(), InsertBuilder.Parameters == null ? null : InsertBuilder.Parameters).ConfigureAwait(false);
                 if (this.Context.Ado.IsAnyTran() == false && isAuto)
                 {
-                    this.Ado.Close();
+                    await this.Ado.CloseAsync().ConfigureAwait(false);
                     this.Context.CurrentConnectionConfig.IsAutoCloseConnection = isAuto;
                 }
             }

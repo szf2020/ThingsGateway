@@ -22,9 +22,11 @@ namespace ThingsGateway.NewLife.Xml;
 /// <typeparam name="TConfig"></typeparam>
 public class XmlConfig<TConfig> : DisposeBase where TConfig : XmlConfig<TConfig>, new()
 {
+    protected object lockThis = new();
     #region 静态
     private static Boolean _loading;
     private static TConfig? _Current;
+    private static WaitLock _WaitLock = new WaitLock(typeof(TConfig).FullName ?? "XmlConfig");
     /// <summary>当前实例。通过置空可以使其重新加载。</summary>
     public static TConfig Current
     {
@@ -58,7 +60,8 @@ public class XmlConfig<TConfig> : DisposeBase where TConfig : XmlConfig<TConfig>
             }
 
             // 现在没有对象，尝试加载，若返回null则实例化一个新的
-            lock (dcf)
+            _WaitLock.Wait();
+            try
             {
                 if (_Current != null) return _Current;
 
@@ -87,7 +90,10 @@ public class XmlConfig<TConfig> : DisposeBase where TConfig : XmlConfig<TConfig>
                     }
                 }
             }
-
+            finally
+            {
+                _WaitLock.Release();
+            }
             return config;
         }
         set { _Current = value; }
@@ -295,7 +301,7 @@ public class XmlConfig<TConfig> : DisposeBase where TConfig : XmlConfig<TConfig>
         filename = filename.GetBasePath();
 
         // 加锁避免多线程保存同一个文件冲突
-        lock (filename)
+        lock (lockThis)
         {
             var xml1 = File.Exists(filename) ? File.ReadAllText(filename).Trim() : null;
             var xml2 = GetXml();
@@ -326,7 +332,7 @@ public class XmlConfig<TConfig> : DisposeBase where TConfig : XmlConfig<TConfig>
     {
         if (_Timer == null)
         {
-            lock (this)
+            lock (lockThis)
             {
                 _Timer ??= new TimerX(DoSave, null, 1000, 5000)
                 {

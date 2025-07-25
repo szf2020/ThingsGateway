@@ -38,6 +38,7 @@ public static class IEndpointRouteBuilderExtensions
             && u.IsDefined(typeof(MapHubAttribute), true)
             && (typeof(Hub).IsAssignableFrom(u) || u.HasImplementedRawGeneric(typeof(Hub<>))));
 
+#pragma warning disable CA1851
         if (!hubs.Any()) return;
 
         // 反射获取 MapHub 拓展方法
@@ -65,5 +66,6 @@ public static class IEndpointRouteBuilderExtensions
             hub.GetMethod("HubEndpointConventionBuilderSettings", BindingFlags.Public | BindingFlags.Static)
                 ?.Invoke(null, new object[] { hubEndpointConventionBuilder });
         }
+#pragma warning restore CA1851
     }
 }

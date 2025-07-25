@@ -36,13 +36,13 @@ namespace ThingsGateway.SqlSugar
         public async Task<bool> ExecuteCommandAsync()
         {
             if (Context == null) return false;
-            var result = MethodInfos.GetType().GetMethod("ExecuteCommandAsync").Invoke(MethodInfos, Array.Empty<object>());
+            var result = MethodInfos.GetType().GetMethod(nameof(ExecuteCommandAsync)).Invoke(MethodInfos, Array.Empty<object>());
             return await ((Task<bool>)result).ConfigureAwait(false);
         }
         public bool ExecuteCommand()
         {
             if (Context == null) return false;
-            var result = MethodInfos.GetType().GetMethod("ExecuteCommand").Invoke(MethodInfos, Array.Empty<object>());
+            var result = MethodInfos.GetType().GetMethod(nameof(ExecuteCommand)).Invoke(MethodInfos, Array.Empty<object>());
             return (bool)result;
         }
     }

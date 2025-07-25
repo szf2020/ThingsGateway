@@ -41,7 +41,7 @@ internal sealed class RedundancyService : BaseService<SysDict>, IRedundancyServi
             new SysDict() { DictType = DictTypeEnum.System, Category = nameof(RedundancyOptions), Name = nameof(RedundancyOptions.IsStartBusinessDevice), Code = input.IsStartBusinessDevice.ToString() },
             new SysDict() { DictType = DictTypeEnum.System, Category = nameof(RedundancyOptions), Name = nameof(RedundancyOptions.SyncInterval), Code = input.SyncInterval.ToString() },
          };
-        var storageable = db.Storageable(dicts).WhereColumns(it => new { it.DictType, it.Category, it.Name }).ToStorage();
+        var storageable = await db.Storageable(dicts).WhereColumns(it => new { it.DictType, it.Category, it.Name }).ToStorageAsync().ConfigureAwait(false);
 
         //事务
         var result = await db.UseTranAsync(async () =>

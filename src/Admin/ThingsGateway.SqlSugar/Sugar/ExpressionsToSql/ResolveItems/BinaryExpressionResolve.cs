@@ -78,8 +78,8 @@ namespace ThingsGateway.SqlSugar
             {
                 var leftChild = ExpressionTool.RemoveConvert((left as BinaryExpression).Right);
                 var rightChild = ExpressionTool.RemoveConvert((right as BinaryExpression).Right);
-                var isLeftSelect = ExpressionTool.GetMethodName(leftChild) == "Select" || leftChild is BinaryExpression;
-                var isRightSelect = ExpressionTool.GetMethodName(rightChild) == "Select" || rightChild is BinaryExpression;
+                var isLeftSelect = ExpressionTool.GetMethodName(leftChild) == nameof(QueryMethodInfo.Select) || leftChild is BinaryExpression;
+                var isRightSelect = ExpressionTool.GetMethodName(rightChild) == nameof(QueryMethodInfo.Select) || rightChild is BinaryExpression;
                 var isLeftGroup = ExpressionTool.ContainsMethodName(left as BinaryExpression, "Group");
                 var isRightGroup = ExpressionTool.ContainsMethodName(right as BinaryExpression, "Group");
                 if (
@@ -167,7 +167,7 @@ namespace ThingsGateway.SqlSugar
             {
                 if (exp?.Left is BinaryExpression expChild)
                 {
-                    if (ExpressionTool.GetMethodName(expChild?.Right) == "Select" && ExpressionTool.ContainsMethodName(expChild, "GroupBy"))
+                    if (ExpressionTool.GetMethodName(expChild?.Right) == nameof(QueryMethodInfo.Select) && ExpressionTool.ContainsMethodName(expChild, nameof(QueryMethodInfo.GroupBy)))
                     {
                         var childLeft = GetNewExpressionValue(expChild.Left);
                         var childRight = GetNewExpressionValue(expChild.Right);
@@ -370,7 +370,7 @@ namespace ThingsGateway.SqlSugar
                 return false;
             }
             var method = (rightExpression as MethodCallExpression);
-            if (method.Method.Name != "Select")
+            if (method.Method.Name != nameof(QueryMethodInfo.Select))
             {
                 return false;
             }
@@ -379,7 +379,7 @@ namespace ThingsGateway.SqlSugar
             {
                 return false;
             }
-            if (!topMethods.Contains("GroupBy"))
+            if (!topMethods.Contains(nameof(QueryMethodInfo.GroupBy)))
             {
                 return false;
             }

@@ -12,7 +12,7 @@ namespace ThingsGateway.SqlSugar
 
         public string Name
         {
-            get { return "OrderBy"; }
+            get { return nameof(QueryMethodInfo.OrderBy); }
         }
 
         public Expression Expression

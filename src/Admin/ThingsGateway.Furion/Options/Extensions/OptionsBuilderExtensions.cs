@@ -85,6 +85,7 @@ public static class OptionsBuilderExtensions
         var builderInterfaces = optionsBuilderType.GetInterfaces()
             .Where(u => optionsBuilderDependency.IsAssignableFrom(u) && u != optionsBuilderDependency);
 
+#pragma warning disable CA1851
         if (!builderInterfaces.Any())
         {
             return optionsBuilder;
@@ -95,6 +96,7 @@ public static class OptionsBuilderExtensions
         {
             InvokeMapMethod(optionsBuilder, optionsBuilderType, builderInterface);
         }
+#pragma warning restore CA1851
 
         return optionsBuilder;
     }

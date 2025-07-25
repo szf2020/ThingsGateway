@@ -48,7 +48,7 @@ namespace ThingsGateway.SqlSugar
             }
             else
             {
-                string className = "Queryable";
+                string className = nameof(Queryable);
                 className = GetClassName(currentConnectionConfig.DbType.ToString(), className);
                 ISugarQueryable<T> result = CreateInstance<T, ISugarQueryable<T>>(className);
                 return result;
@@ -62,7 +62,7 @@ namespace ThingsGateway.SqlSugar
             }
             else
             {
-                string className = "Queryable";
+                string className = nameof(Queryable);
                 className = GetClassName(currentConnectionConfig.DbType.ToString(), className);
                 ISugarQueryable<T, T2> result = CreateInstance<T, T2, ISugarQueryable<T, T2>>(className);
                 return result;
@@ -76,7 +76,7 @@ namespace ThingsGateway.SqlSugar
             }
             else
             {
-                string className = "Queryable";
+                string className = nameof(Queryable);
                 className = GetClassName(currentConnectionConfig.DbType.ToString(), className);
                 ISugarQueryable<T, T2, T3> result = CreateInstance<T, T2, T3, ISugarQueryable<T, T2, T3>>(className);
                 return result;
@@ -84,35 +84,35 @@ namespace ThingsGateway.SqlSugar
         }
         public static ISugarQueryable<T, T2, T3, T4> GetQueryable<T, T2, T3, T4>(ConnectionConfig currentConnectionConfig)
         {
-            string className = "Queryable";
+            string className = nameof(Queryable);
             className = GetClassName(currentConnectionConfig.DbType.ToString(), className);
             ISugarQueryable<T, T2, T3, T4> result = CreateInstance<T, T2, T3, T4, ISugarQueryable<T, T2, T3, T4>>(className);
             return result;
         }
         public static ISugarQueryable<T, T2, T3, T4, T5> GetQueryable<T, T2, T3, T4, T5>(ConnectionConfig currentConnectionConfig)
         {
-            string className = "Queryable";
+            string className = nameof(Queryable);
             className = GetClassName(currentConnectionConfig.DbType.ToString(), className);
             ISugarQueryable<T, T2, T3, T4, T5> result = CreateInstance<T, T2, T3, T4, T5, ISugarQueryable<T, T2, T3, T4, T5>>(className);
             return result;
         }
         public static ISugarQueryable<T, T2, T3, T4, T5, T6> GetQueryable<T, T2, T3, T4, T5, T6>(ConnectionConfig currentConnectionConfig)
         {
-            string className = "Queryable";
+            string className = nameof(Queryable);
             className = GetClassName(currentConnectionConfig.DbType.ToString(), className);
             ISugarQueryable<T, T2, T3, T4, T5, T6> result = CreateInstance<T, T2, T3, T4, T5, T6, ISugarQueryable<T, T2, T3, T4, T5, T6>>(className);
             return result;
         }
         public static ISugarQueryable<T, T2, T3, T4, T5, T6, T7> GetQueryable<T, T2, T3, T4, T5, T6, T7>(ConnectionConfig currentConnectionConfig)
         {
-            string className = "Queryable";
+            string className = nameof(Queryable);
             className = GetClassName(currentConnectionConfig.DbType.ToString(), className);
             ISugarQueryable<T, T2, T3, T4, T5, T6, T7> result = CreateInstance<T, T2, T3, T4, T5, T6, T7, ISugarQueryable<T, T2, T3, T4, T5, T6, T7>>(className);
             return result;
         }
         public static ISugarQueryable<T, T2, T3, T4, T5, T6, T7, T8> GetQueryable<T, T2, T3, T4, T5, T6, T7, T8>(ConnectionConfig currentConnectionConfig)
         {
-            string className = "Queryable";
+            string className = nameof(Queryable);
             className = GetClassName(currentConnectionConfig.DbType.ToString(), className);
             ISugarQueryable<T, T2, T3, T4, T5, T6, T7, T8> result = CreateInstance<T, T2, T3, T4, T5, T6, T7, T8, ISugarQueryable<T, T2, T3, T4, T5, T6, T7, T8>>(className);
             return result;
@@ -121,28 +121,28 @@ namespace ThingsGateway.SqlSugar
         #region 9-12
         public static ISugarQueryable<T, T2, T3, T4, T5, T6, T7, T8, T9> GetQueryable<T, T2, T3, T4, T5, T6, T7, T8, T9>(ConnectionConfig currentConnectionConfig)
         {
-            string className = "Queryable";
+            string className = nameof(Queryable);
             className = GetClassName(currentConnectionConfig.DbType.ToString(), className);
             ISugarQueryable<T, T2, T3, T4, T5, T6, T7, T8, T9> result = CreateInstance<T, T2, T3, T4, T5, T6, T7, T8, T9, ISugarQueryable<T, T2, T3, T4, T5, T6, T7, T8, T9>>(className);
             return result;
         }
         public static ISugarQueryable<T, T2, T3, T4, T5, T6, T7, T8, T9, T10> GetQueryable<T, T2, T3, T4, T5, T6, T7, T8, T9, T10>(ConnectionConfig currentConnectionConfig)
         {
-            string className = "Queryable";
+            string className = nameof(Queryable);
             className = GetClassName(currentConnectionConfig.DbType.ToString(), className);
             ISugarQueryable<T, T2, T3, T4, T5, T6, T7, T8, T9, T10> result = CreateInstance<T, T2, T3, T4, T5, T6, T7, T8, T9, T10, ISugarQueryable<T, T2, T3, T4, T5, T6, T7, T8, T9, T10>>(className);
             return result;
         }
         public static ISugarQueryable<T, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11> GetQueryable<T, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11>(ConnectionConfig currentConnectionConfig)
         {
-            string className = "Queryable";
+            string className = nameof(Queryable);
             className = GetClassName(currentConnectionConfig.DbType.ToString(), className);
             ISugarQueryable<T, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11> result = CreateInstance<T, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, ISugarQueryable<T, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11>>(className);
             return result;
         }
         public static ISugarQueryable<T, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> GetQueryable<T, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12>(ConnectionConfig currentConnectionConfig)
         {
-            string className = "Queryable";
+            string className = nameof(Queryable);
             className = GetClassName(currentConnectionConfig.DbType.ToString(), className);
             ISugarQueryable<T, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> result = CreateInstance<T, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, ISugarQueryable<T, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12>>(className);
             return result;

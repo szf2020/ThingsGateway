@@ -320,7 +320,7 @@ internal sealed class DeviceService : BaseService<Device>, IDeviceService
         var devicesSql = await GetEnumerableData(exportFilter).ConfigureAwait(false);
         var deviceDicts = (await GlobalData.DeviceService.GetAllAsync().ConfigureAwait(false)).ToDictionary(a => a.Id);
         var channelDicts = (await GlobalData.ChannelService.GetAllAsync().ConfigureAwait(false)).ToDictionary(a => a.Id);
-        var pluginSheetNames = devicesSql.Select(a => a.ChannelId).ToList().Select(a =>
+        var pluginSheetNames = (await devicesSql.Select(a => a.ChannelId).ToListAsync().ConfigureAwait(false)).Select(a =>
         {
             channelDicts.TryGetValue(a, out var channel);
             var pluginKey = channel?.PluginName;
@@ -431,7 +431,9 @@ internal sealed class DeviceService : BaseService<Device>, IDeviceService
             ConcurrentDictionary<string, (Type, Dictionary<string, PropertyInfo>, Dictionary<string, PropertyInfo>)> propertysDict = new();
             foreach (var sheetName in sheetNames)
             {
+#pragma warning disable CA1849
                 var rows = MiniExcel.Query(path, useHeaderRow: true, sheetName: sheetName).Cast<IDictionary<string, object>>();
+#pragma warning restore CA1849
 
                 SetDeviceData(dataScope, deviceDicts, channelDicts, ImportPreviews, ref deviceImportPreview, driverPluginNameDict, propertysDict, sheetName, rows);
             }

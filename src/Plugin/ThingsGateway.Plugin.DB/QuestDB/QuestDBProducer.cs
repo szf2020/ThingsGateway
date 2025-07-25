@@ -84,8 +84,8 @@ public partial class QuestDBProducer : BusinessBaseWithCacheIntervalVariable, ID
         }
         else
         {
-            _db.CodeFirst.As<QuestDBNumberHistoryValue>(_driverPropertys.NumberTableName).InitTables(typeof(QuestDBNumberHistoryValue));
-            _db.CodeFirst.As<QuestDBHistoryValue>(_driverPropertys.StringTableName).InitTables(typeof(QuestDBHistoryValue));
+            _db.CodeFirst.AS<QuestDBNumberHistoryValue>(_driverPropertys.NumberTableName).InitTables(typeof(QuestDBNumberHistoryValue));
+            _db.CodeFirst.AS<QuestDBHistoryValue>(_driverPropertys.StringTableName).InitTables(typeof(QuestDBHistoryValue));
         }
 
         await base.ProtectedStartAsync(cancellationToken).ConfigureAwait(false);

@@ -84,13 +84,14 @@ public class Snowflake
         }
     }
     #endregion
+    protected object lockThis = new();
 
     #region 核心方法
     private Boolean _inited;
     private void Init()
     {
         if (_inited) return;
-        lock (this)
+        lock (lockThis)
         {
             if (_inited) return;
 
@@ -152,7 +153,7 @@ public class Snowflake
 
         // 核心理念：时间不同时序号置零，时间相同时序号递增
         var seq = 0;
-        lock (this)
+        lock (lockThis)
         {
             while (true)
             {
@@ -180,7 +181,7 @@ public class Snowflake
         //{
         //    if (ms > origin)
         //    {
-        //        lock (this)
+        //        lock (lockThis)
         //        {
         //            origin = Volatile.Read(ref _lastTime);
         //            if (ms > origin)
@@ -209,7 +210,7 @@ public class Snowflake
         //    origin = Volatile.Read(ref _lastTime);
         //    if (ms == origin)
         //    {
-        //        lock (this)
+        //        lock (lockThis)
         //        {
         //            origin = Volatile.Read(ref _lastTime);
         //            if (ms == origin)

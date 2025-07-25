@@ -415,7 +415,9 @@ internal sealed class ChannelService : BaseService<Channel>, IChannelService
             //设备页
             foreach (var sheetName in sheetNames)
             {
+#pragma warning disable CA1849
                 var rows = MiniExcel.Query(path, useHeaderRow: true, sheetName: sheetName).Cast<IDictionary<string, object>>();
+#pragma warning restore CA1849
                 SetChannelData(dataScope, channelDicts, ImportPreviews, sheetName, rows);
             }
 

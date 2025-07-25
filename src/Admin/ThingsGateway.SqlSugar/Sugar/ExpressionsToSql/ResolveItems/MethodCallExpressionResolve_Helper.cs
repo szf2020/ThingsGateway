@@ -90,7 +90,7 @@ namespace ThingsGateway.SqlSugar
             }
         }
 
-        private void AppendItem(ExpressionParameter parameter, string name, IEnumerable<Expression> args, MethodCallExpressionModel model, Expression item)
+        private void AppendItem(ExpressionParameter parameter, string name, List<Expression> args, MethodCallExpressionModel model, Expression item)
         {
             if (ExpressionTool.IsUnConvertExpress(item))
             {
@@ -389,7 +389,7 @@ namespace ThingsGateway.SqlSugar
             }
         }
 
-        private void AppendModel(ExpressionParameter parameter, MethodCallExpressionModel model, Expression item, string name, IEnumerable<Expression> args)
+        private void AppendModel(ExpressionParameter parameter, MethodCallExpressionModel model, Expression item, string name, List<Expression> args)
         {
             parameter.CommonTempData = CommonTempDataType.Result;
             base.Expression = item;
@@ -502,10 +502,10 @@ namespace ThingsGateway.SqlSugar
                 {
                     value = value?.ToString();
                 }
-                else if (name == "ContainsArray" && args.Count() == 2 && value != null && value is IList)
+                else if (name == "ContainsArray" && args.Count == 2 && value != null && value is IEnumerable objects)
                 {
                     List<object> result = new List<object>();
-                    foreach (var memItem in (value as IList))
+                    foreach (var memItem in objects)
                     {
                         result.Add(GetMemberValue(memItem, args.Last()));
                     }
@@ -1091,7 +1091,7 @@ namespace ThingsGateway.SqlSugar
             {
                 return true;
             }
-            if (expression.Method.Name == "Any" && expression.Arguments.Count > 0 && ExpressionTool.IsVariable(expression.Arguments[0]))
+            if (expression.Method.Name == nameof(QueryMethodInfo.Any) && expression.Arguments.Count > 0 && ExpressionTool.IsVariable(expression.Arguments[0]))
             {
                 return true;
             }

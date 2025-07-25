@@ -356,7 +356,7 @@ internal sealed class EventBusHostedService : BackgroundService
                         GC.WaitForPendingFinalizers();
                     }
                 }
-            }, stoppingToken);
+            }, stoppingToken, TaskCreationOptions.None, TaskScheduler.Default);
         });
     }
 

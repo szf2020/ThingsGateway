@@ -105,7 +105,7 @@ namespace ThingsGateway.SqlSugar
             var whereLeft = sqlBuilder.GetTranslationColumnName(mappingFild1Info.FieldString);
             var whereRight = sqlBuilder.GetTranslationColumnName(shortName + "." + pkColumn.DbColumnName);
             string whereExpression = GetWhereExpression(methodCallExpression);
-            if (methodName == "Any")
+            if (methodName == nameof(QueryMethodInfo.Any))
             {
                 this.sql = " (" + this.context.Queryable<object>()
                                                             .AS(tableName)

@@ -111,10 +111,7 @@ namespace ThingsGateway.SqlSugar
                     if (column.SqlParameterDbType != null && column.SqlParameterDbType is Type && UtilMethods.HasInterface((Type)column.SqlParameterDbType, typeof(ISugarDataConverter)))
                     {
                         var columnInfo = column;
-                        var type = columnInfo.SqlParameterDbType as Type;
-                        var ParameterConverter = type.GetMethod("ParameterConverter").MakeGenericMethod(columnInfo.PropertyInfo.PropertyType);
-                        var obj = Activator.CreateInstance(type);
-                        var p = ParameterConverter.Invoke(obj, new object[] { value, 100 }) as SugarParameter;
+                        var p = UtilMethods.GetParameterConverter(0, value, columnInfo);
                         value = p.Value;
                     }
                     else if (isMySql && column.UnderType == UtilConstants.BoolType)

@@ -180,6 +180,7 @@ public abstract class ConfigProvider : DisposeBase, IConfigProvider
     /// <param name="value"></param>
     public virtual void Init(String value) { }
     #endregion
+    protected object lockThis = new();
 
     #region 加载/保存
     /// <summary>从数据源加载数据到配置树</summary>
@@ -189,7 +190,7 @@ public abstract class ConfigProvider : DisposeBase, IConfigProvider
     private void EnsureLoad()
     {
         if (_Loaded) return;
-        lock (this)
+        lock (lockThis)
         {
             if (_Loaded) return;
 

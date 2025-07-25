@@ -32,6 +32,7 @@ public class DefaultMatchQueue : IMatchQueue
     private readonly ItemWrap[] Items;
     private Int32 _Count;
     private TimerX? _Timer;
+    protected object lockThis = new();
 
     /// <summary>按指定大小来初始化队列</summary>
     /// <param name="size"></param>
@@ -76,7 +77,7 @@ public class DefaultMatchQueue : IMatchQueue
 
         if (_Timer == null)
         {
-            lock (this)
+            lock (lockThis)
             {
                 _Timer ??= new TimerX(Check, null, 1000, 1000, "Match")
                 {

@@ -42,16 +42,6 @@ namespace ThingsGateway.SqlSugar
             return reval;
         }
 
-        public static MethodInfo GetMethod(this Type type, string name)
-        {
-            var reval = type.GetTypeInfo().GetMethod(name);
-            return reval;
-        }
-        public static MethodInfo GetMethod(this Type type, string name, Type[] types)
-        {
-            var reval = type.GetTypeInfo().GetMethod(name, types);
-            return reval;
-        }
         public static ConstructorInfo GetConstructor(this Type type, Type[] types)
         {
             var reval = type.GetTypeInfo().GetConstructor(types);

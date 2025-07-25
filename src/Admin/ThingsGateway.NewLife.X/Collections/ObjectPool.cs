@@ -80,7 +80,7 @@ public class ObjectPool<T> : DisposeBase, IPool<T> where T : notnull
     {
         if (_inited) return;
 
-        lock (this)
+        lock (lockThis)
         {
             if (_inited) return;
             _inited = true;
@@ -274,6 +274,7 @@ public class ObjectPool<T> : DisposeBase, IPool<T> where T : notnull
     /// <returns></returns>
     protected virtual T? OnCreate() => (T?)typeof(T).CreateInstance();
     #endregion
+    protected object lockThis = new();
 
     #region 定期清理
     private TimerX? _timer;
@@ -281,7 +282,7 @@ public class ObjectPool<T> : DisposeBase, IPool<T> where T : notnull
     private void StartTimer()
     {
         if (_timer != null) return;
-        lock (this)
+        lock (lockThis)
         {
             if (_timer != null) return;
 

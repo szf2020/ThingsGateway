@@ -30,7 +30,7 @@ namespace ThingsGateway.SqlSugar
             if (exp is MethodCallExpression)
             {
                 var memberExp = exp as MethodCallExpression;
-                if (memberExp.Method.Name.IsIn("Any", "Count") && memberExp.Arguments.Count > 0 && memberExp.Arguments[0] is MemberExpression)
+                if (memberExp.Method.Name.IsIn(nameof(QueryMethodInfo.Any), nameof(QueryMethodInfo.Count)) && memberExp.Arguments.Count > 0 && memberExp.Arguments[0] is MemberExpression)
                 {
                     result = ValiteOneManyCall(result, memberExp, memberExp.Arguments[0] as MemberExpression, memberExp.Arguments[0]);
                     if (memberExp.Arguments.Count > 1)
@@ -117,7 +117,7 @@ namespace ThingsGateway.SqlSugar
                     lastShortName = ManyToMany(ref formInfo, ref i, queryable, ref index, item);
                 }
             }
-            var isAny = (memberInfo.Expression as MethodCallExpression).Method.Name == "Any";
+            var isAny = (memberInfo.Expression as MethodCallExpression).Method.Name == nameof(QueryMethodInfo.Any);
             queryable.Select(isAny ? "1" : " COUNT(1) ");
             var last = subInfos[0];
             var FirstPkColumn = last.ThisEntityInfo.Columns.FirstOrDefault(it => it.IsPrimarykey);

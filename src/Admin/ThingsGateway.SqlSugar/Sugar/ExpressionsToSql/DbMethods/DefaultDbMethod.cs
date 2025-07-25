@@ -886,11 +886,11 @@ namespace ThingsGateway.SqlSugar
                 return ListArrayAny(model);
             }
             StringBuilder sb = new StringBuilder();
-            if (model.Args[0].MemberValue != null && (model.Args[0].MemberValue as IList).Count > 0)
+            if (model.Args[0].MemberValue != null && (model.Args[0].MemberValue is ICollection list) && list.Count > 0)
             {
                 sb.Append(" ( ");
                 var listPar = model.Args[1].MemberValue as ListAnyParameter;
-                foreach (var item in (model.Args[0].MemberValue as IList))
+                foreach (var item in list)
                 {
                     var sql = listPar.Sql;
                     if (sb.Length > 3)
@@ -982,11 +982,11 @@ namespace ThingsGateway.SqlSugar
                 return ListArrayAll(model);
             }
             StringBuilder sb = new StringBuilder();
-            if (model.Args[0].MemberValue != null && (model.Args[0].MemberValue as IList).Count > 0)
+            if (model.Args[0].MemberValue != null && (model.Args[0].MemberValue is ICollection list) && list.Count > 0)
             {
                 sb.Append(" ( ");
                 var listPar = model.Args[1].MemberValue as ListAnyParameter;
-                foreach (var item in (model.Args[0].MemberValue as IList))
+                foreach (var item in list)
                 {
                     var sql = listPar.Sql;
                     if (sb.Length > 3)
@@ -1073,11 +1073,11 @@ namespace ThingsGateway.SqlSugar
         private string ListArrayAny(MethodCallExpressionModel model)
         {
             StringBuilder sb = new StringBuilder();
-            if (model.Args[0].MemberValue != null && (model.Args[0].MemberValue as IList).Count > 0)
+            if (model.Args[0].MemberValue != null && (model.Args[0].MemberValue is ICollection list) && list.Count > 0)
             {
                 sb.Append(" ( ");
                 var listPar = model.Args[1].MemberValue as ListAnyParameter;
-                foreach (var item in (model.Args[0].MemberValue as IList))
+                foreach (var item in list)
                 {
                     var sql = listPar.Sql;
                     if (sb.Length > 3)
@@ -1172,11 +1172,11 @@ namespace ThingsGateway.SqlSugar
         private string ListArrayAll(MethodCallExpressionModel model)
         {
             StringBuilder sb = new StringBuilder();
-            if (model.Args[0].MemberValue != null && (model.Args[0].MemberValue as IList).Count > 0)
+            if (model.Args[0].MemberValue != null && (model.Args[0].MemberValue is ICollection list) && list.Count > 0)
             {
                 sb.Append(" ( ");
                 var listPar = model.Args[1].MemberValue as ListAnyParameter;
-                foreach (var item in (model.Args[0].MemberValue as IList))
+                foreach (var item in list)
                 {
                     var sql = listPar.Sql;
                     if (sb.Length > 3)

@@ -1,32 +1,68 @@
-﻿using System.Linq.Expressions;
+﻿using System.Collections;
+using System.Linq.Expressions;
 using System.Reflection;
 using System.Reflection.Emit;
+
+using ThingsGateway.NewLife.Caching;
 
 namespace ThingsGateway.SqlSugar
 {
     public static class ExpressionBuilderHelper
     {
-        public static object CallFunc(Type type, object[] param, object methodData, string methodName)
+
+        public static object CallFunc(Type genericType, object[] param, object methodData, string methodName)
         {
-            MethodInfo mi = methodData.GetType().GetMethod(methodName).MakeGenericMethod(new Type[] { type });
-            var ret = mi.Invoke(methodData, param);
-            return ret;
-        }
-        public static T CallFunc<T>(object param, object methodData, string methodName)
-        {
-            Type type = param.GetType();
-            MethodInfo mi = methodData.GetType().GetMethod(methodName).MakeGenericMethod(new Type[] { type });
-            var ret = mi.Invoke(methodData, new object[] { param });
-            return (T)ret;
+            var type = methodData.GetType();
+            var key = $"{type.FullName}.{methodName}<{genericType.FullName}>";
+
+            var func = MemoryCache.Instance.GetOrAdd(key, _ => BuildDelegate(type, methodName, genericType));
+
+            return func(methodData, param);
         }
 
-        public static T CallStaticFunc<T>(object param, Type methodType, string methodName)
+        private static Func<object, object[], object> BuildDelegate(Type targetType, string methodName, Type genericType)
         {
-            Type type = param.GetType();
-            MethodInfo mi = methodType.GetMethod(methodName).MakeGenericMethod(new Type[] { type });
-            var ret = mi.Invoke(null, new object[] { param });
-            return (T)ret;
+            // 找到泛型方法定义
+            var method = targetType.GetMethod(methodName);
+            if (method == null)
+                throw new MissingMethodException($"Method '{methodName}' not found on type '{targetType.FullName}'");
+
+            var genericMethod = method.MakeGenericMethod(genericType);
+
+            // 参数： (object target, object[] args)
+            var targetParam = Expression.Parameter(typeof(object), "target");
+            var argsParam = Expression.Parameter(typeof(object[]), "args");
+
+            // 方法参数列表构造，将 object[] args 中的元素转换到具体参数类型
+            var methodParams = genericMethod.GetParameters();
+            Expression[] callParams = new Expression[methodParams.Length];
+
+            for (int i = 0; i < methodParams.Length; i++)
+            {
+                var indexExpr = Expression.Constant(i);
+                var paramAccessorExpr = Expression.ArrayIndex(argsParam, indexExpr);
+                var paramCastExpr = Expression.Convert(paramAccessorExpr, methodParams[i].ParameterType);
+                callParams[i] = paramCastExpr;
+            }
+
+            // 转换调用目标
+            var instanceCast = Expression.Convert(targetParam, targetType);
+
+            // 调用方法表达式
+            var callExpr = Expression.Call(instanceCast, genericMethod, callParams);
+
+            // 如果方法返回 void，返回 null，否则装箱返回值
+            Expression body = genericMethod.ReturnType == typeof(void)
+                ? Expression.Block(callExpr, Expression.Constant(null))
+                : Expression.Convert(callExpr, typeof(object));
+
+            // 创建 lambda (object target, object[] args) => ...
+            var lambda = Expression.Lambda<Func<object, object[], object>>(body, targetParam, argsParam);
+
+            return lambda.Compile();
         }
+
+
         /// <summary>
         /// Create Expression
         /// </summary>
@@ -50,7 +86,7 @@ namespace ThingsGateway.SqlSugar
         {
             var parameter = Expression.Parameter(entityType, "p");
             MemberExpression memberProperty = Expression.PropertyOrField(parameter, propertyName);
-            MethodInfo method = typeof(List<>).MakeGenericType(typeof(ColumnType)).GetMethod("Contains");
+            MethodInfo method = typeof(List<>).MakeGenericType(typeof(ColumnType)).GetMethod(nameof(IList.Contains));
             ConstantExpression constantCollection = Expression.Constant(list);
 
             MethodCallExpression methodCall = Expression.Call(constantCollection, method, memberProperty);
@@ -135,8 +171,7 @@ namespace ThingsGateway.SqlSugar
 
         public static Type BuildDynamicType(Dictionary<string, Type> properties)
         {
-            if (null == properties)
-                throw new ArgumentNullException(nameof(properties));
+            ArgumentNullException.ThrowIfNull(properties);
             if (0 == properties.Count)
                 throw new ArgumentOutOfRangeException(nameof(properties), "fields must have at least 1 field definition");
 

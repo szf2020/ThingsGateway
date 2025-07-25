@@ -443,10 +443,7 @@ public static class ObjectExtensions
         where TAttribute : Attribute
     {
         // 空检查
-        if (type == null)
-        {
-            throw new ArgumentNullException(nameof(type));
-        }
+        ArgumentNullException.ThrowIfNull(type);
 
         // 检查特性并获取特性对象
         return type.IsDefined(typeof(TAttribute), inherit)

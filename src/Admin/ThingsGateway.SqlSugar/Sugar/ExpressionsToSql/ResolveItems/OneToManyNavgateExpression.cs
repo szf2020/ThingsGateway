@@ -33,7 +33,7 @@ namespace ThingsGateway.SqlSugar
             {
                 var memberExp = exp as MethodCallExpression;
                 MethodName = memberExp.Method.Name;
-                if (memberExp.Method.Name.IsIn("Any", "Count") && memberExp.Arguments.Count > 0 && memberExp.Arguments[0] is MemberExpression)
+                if (memberExp.Method.Name.IsIn(nameof(QueryMethodInfo.Any), nameof(QueryMethodInfo.Count)) && memberExp.Arguments.Count > 0 && memberExp.Arguments[0] is MemberExpression)
                 {
                     result = ValidateNav(result, memberExp.Arguments[0] as MemberExpression, memberExp.Arguments[0]);
                     if (memberExp.Arguments.Count > 1)
@@ -183,7 +183,7 @@ namespace ThingsGateway.SqlSugar
                 queryable.Where($" {queryable.SqlBuilder.GetTranslationColumnName(ShorName)}.{queryable.SqlBuilder.GetTranslationColumnName(leftName)}={queryable.SqlBuilder.GetTranslationColumnName(rightName)} ");
             }
             var sqlObj = queryable.ToSql();
-            // .Where($" {name}={queryable.QueryBuilder.Builder.GetTranslationColumnName(ShorName)}.{pk} ").Select(MethodName == "Any" ? "1" : " COUNT(1) ").ToSql();
+            // .Where($" {name}={queryable.QueryBuilder.Builder.GetTranslationColumnName(ShorName)}.{pk} ").Select(MethodName == nameof(QueryMethodInfo.Any) ? "1" : " COUNT(1) ").ToSql();
             if (sqlObj.Value?.Count > 0)
             {
                 foreach (var item in sqlObj.Value)
@@ -240,7 +240,7 @@ namespace ThingsGateway.SqlSugar
                 }
             }
 
-            mapper.Sql = $" (select {(MethodName == "Any" ? "1" : " COUNT(1) ")} from {bTableName} {this.ProPertyEntity.DbTableName}_1  where  {this.ProPertyEntity.DbTableName}_1.{bPk} in (select {mappingB} from {mappingTableName} where {mappingA} = {ShorName}.{aPk} )  )";
+            mapper.Sql = $" (select {(MethodName == nameof(QueryMethodInfo.Any) ? "1" : " COUNT(1) ")} from {bTableName} {this.ProPertyEntity.DbTableName}_1  where  {this.ProPertyEntity.DbTableName}_1.{bPk} in (select {mappingB} from {mappingTableName} where {mappingA} = {ShorName}.{aPk} )  )";
             if (this.whereSql.HasValue())
             {
                 mapper.Sql = mapper.Sql.TrimEnd(')');
@@ -258,7 +258,7 @@ namespace ThingsGateway.SqlSugar
                 }
                 mapper.Sql = mapper.Sql + " AND " + this.whereSql + ")";
             }
-            if (MethodName == "Any")
+            if (MethodName == nameof(QueryMethodInfo.Any))
             {
                 mapper.Sql = $" {mapper.Sql} ";
             }
@@ -305,7 +305,7 @@ namespace ThingsGateway.SqlSugar
                 .ClearFilter(clearTypes)
                 .Filter(isClearFilter ? null : this.ProPertyEntity.Type)
                 .WhereIF(!string.IsNullOrEmpty(whereSql), whereSql)
-                .Where($" {name}={queryable.QueryBuilder.Builder.GetTranslationColumnName(ShorName)}.{pk} ").Select(MethodName == "Any" ? "1" : " COUNT(1) ").ToSql();
+                .Where($" {name}={queryable.QueryBuilder.Builder.GetTranslationColumnName(ShorName)}.{pk} ").Select(MethodName == nameof(QueryMethodInfo.Any) ? "1" : " COUNT(1) ").ToSql();
             if (sqlObj.Value?.Count > 0)
             {
                 foreach (var item in sqlObj.Value)
@@ -324,7 +324,7 @@ namespace ThingsGateway.SqlSugar
 
         private string GetMethodSql(string sql)
         {
-            if (MethodName == "Any")
+            if (MethodName == nameof(QueryMethodInfo.Any))
             {
                 return $" ( EXISTS {sql} ) ";
             }

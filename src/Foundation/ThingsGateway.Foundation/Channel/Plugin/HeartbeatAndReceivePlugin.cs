@@ -160,7 +160,7 @@ internal sealed class HeartbeatAndReceivePlugin : PluginBase, ITcpConnectedPlugi
                      }
 
                      Task = null;
-                 });
+                 }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
             }
         }
 

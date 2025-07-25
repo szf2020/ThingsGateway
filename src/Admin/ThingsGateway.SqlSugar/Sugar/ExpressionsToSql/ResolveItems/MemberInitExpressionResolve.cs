@@ -67,7 +67,7 @@ namespace ThingsGateway.SqlSugar
                     else if (UtilMethods.IsParameterConverter(columnInfo))
                     {
                         var value = ExpressionTool.DynamicInvoke(item);
-                        var p = UtilMethods.GetParameterConverter(this.Context.ParameterIndex, this.Context.SugarContext.Context, value, memberAssignment.Expression, columnInfo);
+                        var p = UtilMethods.GetParameterConverter(this.Context.ParameterIndex, value, columnInfo);
                         this.Context.Result.Append(base.Context.GetEqString(memberName, p.ParameterName));
                         this.Context.ParameterIndex++;
                         this.Context.Parameters.Add(p);
@@ -86,11 +86,9 @@ namespace ThingsGateway.SqlSugar
                     && IsConstNew(ExpressionTool.RemoveConvertThanOne(item)))
                 {
                     var columnInfo = entityMaintenance.GetEntityInfo(expression.Type).Columns.First(it => it.SqlParameterDbType is Type && it.PropertyInfo.Name == memberName);
-                    var columnDbType = columnInfo.SqlParameterDbType as Type;
-                    var ParameterConverter = columnDbType.GetMethod("ParameterConverter").MakeGenericMethod(columnInfo.PropertyInfo.PropertyType);
-                    var obj = Activator.CreateInstance(columnDbType);
+
                     var value = ExpressionTool.DynamicInvoke(item);
-                    var p = ParameterConverter.Invoke(obj, new object[] { value, 100 + i }) as SugarParameter;
+                    var p = UtilMethods.GetParameterConverter(i, value, columnInfo);
                     parameter.Context.Result.Append(base.Context.GetEqString(memberName, p.ParameterName));
                     this.Context.Parameters.Add(p);
                 }

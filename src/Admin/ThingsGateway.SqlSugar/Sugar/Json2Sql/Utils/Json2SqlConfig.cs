@@ -4,7 +4,7 @@
     {
         public const string KeyInsertable = "Insertable";
         public const string KeyUpdateable = "Updateable";
-        public const string KeyQueryable = "Queryable";
+        public const string KeyQueryable = nameof(Queryable);
         public const string KeyDeleteable = "Deleteable";
 
         private static Dictionary<string, string> words = new Dictionary<string, string>()

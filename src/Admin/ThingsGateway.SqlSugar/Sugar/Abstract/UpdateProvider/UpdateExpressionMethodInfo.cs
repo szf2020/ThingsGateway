@@ -11,20 +11,20 @@ namespace ThingsGateway.SqlSugar
         public int ExecuteCommand()
         {
             if (Context == null) return 0;
-            var result = objectValue.GetType().GetMethod("ExecuteCommand").Invoke(objectValue, Array.Empty<object>());
+            var result = objectValue.GetType().GetMethod(nameof(ExecuteCommand)).Invoke(objectValue, Array.Empty<object>());
             return (int)result;
         }
 
         public async Task<int> ExecuteCommandAsync()
         {
             if (Context == null) return 0;
-            var result = objectValue.GetType().GetMyMethod("ExecuteCommandAsync", 0).Invoke(objectValue, Array.Empty<object>());
+            var result = objectValue.GetType().GetMyMethod(nameof(ExecuteCommandAsync), 0).Invoke(objectValue, Array.Empty<object>());
             return await ((Task<int>)result).ConfigureAwait(false);
         }
 
         public UpdateExpressionMethodInfo Where(string expShortName, FormattableString whereExpressionString)
         {
-            var newMethod = objectValue.GetType().GetMyMethod("Where", 1);
+            var newMethod = objectValue.GetType().GetMyMethod(nameof(QueryMethodInfo.Where), 1);
             var exp = DynamicCoreHelper.GetWhere(Type, expShortName, whereExpressionString);
             var result = newMethod.Invoke(objectValue, new object[] { exp });
             return new UpdateExpressionMethodInfo()

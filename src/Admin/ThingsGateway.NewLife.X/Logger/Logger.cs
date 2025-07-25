@@ -271,4 +271,7 @@ public abstract class Logger : ILog
         return sb.ToString();
     }
     #endregion
+
+    protected object lockThis = new();
+
 }

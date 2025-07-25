@@ -107,7 +107,7 @@ public abstract class BusinessBaseWithCache : BusinessBase
                 var fileStart = CacheDBUtil.GetFileName($"{CurrentDevice.PluginName}_{typeof(AlarmVariable).FullName}_{nameof(AlarmVariable)}");
                 var fullName = dir.CombinePathWithOs($"{fileStart}{CacheDBUtil.EX}");
 
-                lock (fullName)
+                lock (cacheLock)
                 {
                     bool s = false;
                     while (!s)
@@ -123,7 +123,7 @@ public abstract class BusinessBaseWithCache : BusinessBase
                 try
                 {
                     using var cache = LocalDBCacheAlarmModel();
-                    lock (cache.CacheDBOption.FileFullName)
+                    lock (cache.CacheDBOption)
                     {
                         cache.DBProvider.Fastest<CacheDBItem<AlarmVariable>>().PageSize(50000).BulkCopy(data);
                     }
@@ -198,7 +198,7 @@ public abstract class BusinessBaseWithCache : BusinessBase
     /// <param name="item"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    protected abstract ValueTask<OperResult> UpdateAlarmModel(IEnumerable<CacheDBItem<AlarmVariable>> item, CancellationToken cancellationToken);
+    protected abstract ValueTask<OperResult> UpdateAlarmModel(List<CacheDBItem<AlarmVariable>> item, CancellationToken cancellationToken);
 
     protected async Task UpdateAlarmModelCache(CancellationToken cancellationToken)
     {
@@ -213,8 +213,8 @@ public abstract class BusinessBaseWithCache : BusinessBase
                     while (!cancellationToken.IsCancellationRequested)
                     {
                         //循环获取，固定读最大行数量，执行完成需删除行
-                        var varList = DBCacheAlarm.DBProvider.Queryable<CacheDBItem<AlarmVariable>>().Take(_businessPropertyWithCache.SplitSize).ToEnumerable(cancellationToken);
-                        if (varList.Any())
+                        var varList = await DBCacheAlarm.DBProvider.Queryable<CacheDBItem<AlarmVariable>>().Take(_businessPropertyWithCache.SplitSize).ToListAsync(cancellationToken).ConfigureAwait(false);
+                        if (varList.Count != 0)
                         {
                             try
                             {
@@ -276,7 +276,7 @@ public abstract class BusinessBaseWithCache : BusinessBase
                         var result = await UpdateAlarmModel(item, cancellationToken).ConfigureAwait(false);
                         if (!result.IsSuccess)
                         {
-                            AddCache(item.ToList());
+                            AddCache(item);
                         }
                     }
                     else
@@ -331,7 +331,7 @@ public abstract class BusinessBaseWithCache : BusinessBase
                 var fileStart = CacheDBUtil.GetFileName($"{CurrentDevice.PluginName}_{typeof(DeviceBasicData).FullName}_{nameof(DeviceBasicData)}");
                 var fullName = dir.CombinePathWithOs($"{fileStart}{CacheDBUtil.EX}");
 
-                lock (fullName)
+                lock (cacheLock)
                 {
                     bool s = false;
                     while (!s)
@@ -347,7 +347,7 @@ public abstract class BusinessBaseWithCache : BusinessBase
                 try
                 {
                     using var cache = LocalDBCacheDevModel();
-                    lock (cache.CacheDBOption.FileFullName)
+                    lock (cache.CacheDBOption)
                     {
                         cache.DBProvider.Fastest<CacheDBItem<DeviceBasicData>>().PageSize(50000).BulkCopy(data);
                     }
@@ -421,7 +421,7 @@ public abstract class BusinessBaseWithCache : BusinessBase
     /// <param name="item"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    protected abstract ValueTask<OperResult> UpdateDevModel(IEnumerable<CacheDBItem<DeviceBasicData>> item, CancellationToken cancellationToken);
+    protected abstract ValueTask<OperResult> UpdateDevModel(List<CacheDBItem<DeviceBasicData>> item, CancellationToken cancellationToken);
 
     protected async Task UpdateDevModelCache(CancellationToken cancellationToken)
     {
@@ -436,8 +436,8 @@ public abstract class BusinessBaseWithCache : BusinessBase
                     while (!cancellationToken.IsCancellationRequested)
                     {
                         //循环获取
-                        var varList = DBCacheDev.DBProvider.Queryable<CacheDBItem<DeviceBasicData>>().Take(_businessPropertyWithCache.SplitSize).ToEnumerable(cancellationToken);
-                        if (varList.Any())
+                        var varList = await DBCacheDev.DBProvider.Queryable<CacheDBItem<DeviceBasicData>>().Take(_businessPropertyWithCache.SplitSize).ToListAsync(cancellationToken).ConfigureAwait(false);
+                        if (varList.Count != 0)
                         {
                             try
                             {
@@ -499,7 +499,7 @@ public abstract class BusinessBaseWithCache : BusinessBase
                         var result = await UpdateDevModel(item, cancellationToken).ConfigureAwait(false);
                         if (!result.IsSuccess)
                         {
-                            AddCache(item.ToList());
+                            AddCache(item);
                         }
                     }
                     else
@@ -541,6 +541,8 @@ public abstract class BusinessBaseWithCache : BusinessBase
 
     protected abstract BusinessPropertyWithCache _businessPropertyWithCache { get; }
 
+    protected object cacheLock = new();
+
     /// <summary>
     /// 入缓存
     /// </summary>
@@ -560,7 +562,7 @@ public abstract class BusinessBaseWithCache : BusinessBase
                 var fileStart = CacheDBUtil.GetFileName($"{CurrentDevice.PluginName}_{typeof(VariableBasicData).Name}");
                 var fullName = dir.CombinePathWithOs($"{fileStart}{CacheDBUtil.EX}");
 
-                lock (this)
+                lock (cacheLock)
                 {
                     bool s = false;
                     while (!s)
@@ -577,8 +579,10 @@ public abstract class BusinessBaseWithCache : BusinessBase
                 try
                 {
                     using var cache = LocalDBCacheVarModel();
-                    lock (cache.CacheDBOption.FileFullName)
+                    lock (cache.CacheDBOption)
+                    {
                         cache.DBProvider.Fastest<CacheDBItem<VariableBasicData>>().PageSize(50000).BulkCopy(data);
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -605,7 +609,7 @@ public abstract class BusinessBaseWithCache : BusinessBase
                 var fileStart = CacheDBUtil.GetFileName($"{CurrentDevice.PluginName}_List_{typeof(VariableBasicData).Name}");
                 var fullName = dir.CombinePathWithOs($"{fileStart}{CacheDBUtil.EX}");
 
-                lock (this)
+                lock (cacheLock)
                 {
                     bool s = false;
                     while (!s)
@@ -622,8 +626,10 @@ public abstract class BusinessBaseWithCache : BusinessBase
                 try
                 {
                     using var cache = LocalDBCacheVarModels();
-                    lock (cache.CacheDBOption.FileFullName)
+                    lock (cache.CacheDBOption)
+                    {
                         cache.DBProvider.Fastest<CacheDBItem<List<VariableBasicData>>>().PageSize(50000).BulkCopy(data);
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -747,7 +753,7 @@ public abstract class BusinessBaseWithCache : BusinessBase
     /// <param name="item"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    protected abstract ValueTask<OperResult> UpdateVarModel(IEnumerable<CacheDBItem<VariableBasicData>> item, CancellationToken cancellationToken);
+    protected abstract ValueTask<OperResult> UpdateVarModel(List<CacheDBItem<VariableBasicData>> item, CancellationToken cancellationToken);
 
     /// <summary>
     /// 需实现上传到通道
@@ -755,7 +761,7 @@ public abstract class BusinessBaseWithCache : BusinessBase
     /// <param name="item"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    protected abstract ValueTask<OperResult> UpdateVarModels(IEnumerable<VariableBasicData> item, CancellationToken cancellationToken);
+    protected abstract ValueTask<OperResult> UpdateVarModels(List<VariableBasicData> item, CancellationToken cancellationToken);
 
     protected async Task UpdateVarModelCache(CancellationToken cancellationToken)
     {
@@ -771,8 +777,8 @@ public abstract class BusinessBaseWithCache : BusinessBase
                     {
                         //循环获取
 
-                        var varList = DBCacheVar.DBProvider.Queryable<CacheDBItem<VariableBasicData>>().Take(_businessPropertyWithCache.SplitSize).ToEnumerable(cancellationToken);
-                        if (varList.Any())
+                        var varList = await DBCacheVar.DBProvider.Queryable<CacheDBItem<VariableBasicData>>().Take(_businessPropertyWithCache.SplitSize).ToListAsync(cancellationToken).ConfigureAwait(false);
+                        if (varList.Count != 0)
                         {
                             try
                             {
@@ -894,7 +900,7 @@ public abstract class BusinessBaseWithCache : BusinessBase
                         var result = await UpdateVarModel(item, cancellationToken).ConfigureAwait(false);
                         if (!result.IsSuccess)
                         {
-                            AddCache(item.ToList());
+                            AddCache(item);
                         }
                     }
                     else
@@ -942,7 +948,7 @@ public abstract class BusinessBaseWithCache : BusinessBase
                             var result = await UpdateVarModels(item, cancellationToken).ConfigureAwait(false);
                             if (!result.IsSuccess)
                             {
-                                AddCache(new List<CacheDBItem<List<VariableBasicData>>>() { new CacheDBItem<List<VariableBasicData>>(item.ToList()) });
+                                AddCache(new List<CacheDBItem<List<VariableBasicData>>>() { new CacheDBItem<List<VariableBasicData>>(item) });
                             }
                         }
                         else

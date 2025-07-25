@@ -110,7 +110,7 @@ public abstract class FileConfigProvider : ConfigProvider
         if (model == null) return false;
 
         // 加锁，避免多线程冲突
-        lock (this)
+        lock (lockThis)
         {
             // 文件存储，直接覆盖Root
             Root.Childs?.Clear();
@@ -168,7 +168,7 @@ public abstract class FileConfigProvider : ConfigProvider
     private void InitTimer()
     {
         if (_timer != null) return;
-        lock (this)
+        lock (lockThis)
         {
             if (_timer != null) return;
 

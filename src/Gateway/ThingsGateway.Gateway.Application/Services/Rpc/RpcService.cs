@@ -34,7 +34,7 @@ internal sealed class RpcService : IRpcService
     public RpcService(IStringLocalizer<RpcService> localizer)
     {
         Localizer = localizer;
-        Task.Factory.StartNew(RpcLogInsertAsync, TaskCreationOptions.LongRunning);
+        Task.Factory.StartNew(RpcLogInsertAsync, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
         _rpcLogOptions = App.GetOptions<RpcLogOptions>();
     }
 

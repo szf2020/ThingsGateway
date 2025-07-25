@@ -122,6 +122,7 @@ using Microsoft.AspNetCore.Components;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
+#pragma warning disable CA1849
 #pragma warning disable CA2007
 #pragma warning disable CS0162
 #pragma warning disable CS8632
@@ -276,6 +277,7 @@ namespace {namespaceName}
 #pragma warning restore CS8632
 #pragma warning restore CS0162
 #pragma warning restore CA2007
+#pragma warning restore CA1849
 ");
         var bases = class_symbol.GetTypeHierarchy().Where(t => !SymbolEqualityComparer.Default.Equals(t, class_symbol));
         var members = class_symbol.GetMembers() // members of the type itself

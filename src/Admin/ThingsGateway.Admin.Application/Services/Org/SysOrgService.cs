@@ -128,18 +128,19 @@ internal sealed class SysOrgService : BaseService<SysOrg>, ISysOrgService
     [OperDesc("DeleteOrg")]
     public async Task<bool> DeleteOrgAsync(IEnumerable<long> ids)
     {
+        var sysDeleteOrgList = new List<long>();//需要删除的组织ID集合
+        var sysOrgList = await GetAllAsync().ConfigureAwait(false);//获取所有组织
+        foreach (var it in ids)
+        {
+            var children = SysOrgService.GetSysOrgChildren(sysOrgList, it);//查找下级组织
+            sysDeleteOrgList.AddRange(children.Select(it => it.Id).ToList());
+            sysDeleteOrgList.Add(it);
+        }
         //获取所有ID
-        if (ids.Any())
+        if (sysDeleteOrgList.Count != 0)
         {
             using var db = GetDB();
-            var sysOrgList = await GetAllAsync().ConfigureAwait(false);//获取所有组织
-            var sysDeleteOrgList = new List<long>();//需要删除的组织ID集合
-            foreach (var it in ids)
-            {
-                var children = SysOrgService.GetSysOrgChildren(sysOrgList, it);//查找下级组织
-                sysDeleteOrgList.AddRange(children.Select(it => it.Id).ToList());
-                sysDeleteOrgList.Add(it);
-            }
+
             //如果组织下有用户则不能删除
             if (await db.Queryable<SysUser>().AnyAsync(it => sysDeleteOrgList.Contains(it.OrgId)).ConfigureAwait(false))
             {

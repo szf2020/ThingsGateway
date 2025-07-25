@@ -7,6 +7,7 @@ public static class DiagramExtensions
 {
     public static Rectangle GetBounds(this IEnumerable<NodeModel> nodes)
     {
+#pragma warning disable CA1851
         if (!nodes.Any())
             return Rectangle.Zero;
 
@@ -16,6 +17,7 @@ public static class DiagramExtensions
         var maxY = double.MinValue;
 
         foreach (var node in nodes)
+#pragma warning restore CA1851
         {
             if (node.Size == null) // Ignore nodes that didn't get a size yet
                 continue;

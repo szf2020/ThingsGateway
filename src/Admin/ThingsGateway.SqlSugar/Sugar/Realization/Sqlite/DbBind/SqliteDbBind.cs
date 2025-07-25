@@ -19,7 +19,7 @@
             if (csharpTypeName == "DateTimeOffset")
                 csharpTypeName = "DateTime";
             var mappings = this.MappingTypes.Where(it => it.Value.ToString().Equals(csharpTypeName, StringComparison.CurrentCultureIgnoreCase));
-            return mappings.Any() ? mappings.First().Key : "varchar";
+            return mappings.FirstOrDefault().Key ?? "varchar";
         }
         public override List<KeyValuePair<string, CSharpDataType>> MappingTypes
         {

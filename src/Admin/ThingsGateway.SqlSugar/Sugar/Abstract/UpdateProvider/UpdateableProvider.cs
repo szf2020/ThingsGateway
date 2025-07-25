@@ -189,7 +189,7 @@ namespace ThingsGateway.SqlSugar
                     q.Where(item);
                 }
                 q.AddParameters(UtilMethods.CopySugarParameters(this.UpdateBuilder.Parameters));
-                return q.First();
+                return await q.FirstAsync().ConfigureAwait(false);
             }
             return null;
         }

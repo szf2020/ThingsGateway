@@ -11,7 +11,7 @@
                 throw new InvalidOperationException("Value cannot be null.");
             }
 
-            var method = Value.GetType().GetMyMethod("ToList", 0);
+            var method = Value.GetType().GetMyMethod(nameof(QueryMethodInfo.ToList), 0);
             if (method == null)
             {
                 throw new InvalidOperationException("The Value object does not have a ToList method with no parameters.");
@@ -27,7 +27,7 @@
                 throw new InvalidOperationException("Value cannot be null.");
             }
 
-            var method = Value.GetType().GetMyMethod("ToListAsync", 0);
+            var method = Value.GetType().GetMyMethod(nameof(ToListAsync), 0);
             if (method == null)
             {
                 throw new InvalidOperationException("The Value object does not have a ToListAsync method with no parameters.");
@@ -44,7 +44,7 @@
                 throw new InvalidOperationException("Value cannot be null.");
             }
 
-            var method = Value.GetType().GetMyMethod("ToPageList", 2);
+            var method = Value.GetType().GetMyMethod(nameof(ToPageList), 2);
             if (method == null)
             {
                 throw new InvalidOperationException("The Value object does not have a ToPageList method with two parameters.");
@@ -60,7 +60,7 @@
                 throw new InvalidOperationException("Value cannot be null.");
             }
 
-            var method = Value.GetType().GetMyMethod("ToPageListAsync", 2);
+            var method = Value.GetType().GetMyMethod(nameof(ToPageListAsync), 2);
             if (method == null)
             {
                 throw new InvalidOperationException("The Value object does not have a ToPageListAsync method with two parameters.");
@@ -77,7 +77,7 @@
                 throw new InvalidOperationException("Value cannot be null.");
             }
 
-            var method = Value.GetType().GetMyMethod("ToPageList", 3);
+            var method = Value.GetType().GetMyMethod(nameof(ToPageList), 3);
             if (method == null)
             {
                 throw new InvalidOperationException("The Value object does not have a ToPageList method with three parameters.");
@@ -96,7 +96,7 @@
                 throw new InvalidOperationException("Value cannot be null.");
             }
 
-            var method = Value.GetType().GetMyMethod("ToPageListAsync", 3, typeof(int), typeof(int), typeof(RefAsync<int>));
+            var method = Value.GetType().GetMyMethod(nameof(ToPageListAsync), 3, typeof(int), typeof(int), typeof(RefAsync<int>));
             if (method == null)
             {
                 throw new InvalidOperationException("The Value object does not have a ToPageListAsync method with three parameters.");
@@ -114,7 +114,7 @@
                 throw new InvalidOperationException("Value cannot be null.");
             }
 
-            var method = Value.GetType().GetMyMethod("Single", 0);
+            var method = Value.GetType().GetMyMethod(nameof(Single), 0);
             if (method == null)
             {
                 throw new InvalidOperationException("The Value object does not have a Single method with no parameters.");
@@ -129,7 +129,7 @@
                 throw new InvalidOperationException("Value cannot be null.");
             }
 
-            var method = Value.GetType().GetMyMethod("First", 0);
+            var method = Value.GetType().GetMyMethod(nameof(QueryMethodInfo.First), 0);
             if (method == null)
             {
                 throw new InvalidOperationException("The Value object does not have a First method with no parameters.");
@@ -145,7 +145,7 @@
                 throw new InvalidOperationException("Value cannot be null.");
             }
 
-            var method = Value.GetType().GetMyMethod("SingleAsync", 0);
+            var method = Value.GetType().GetMyMethod(nameof(SingleAsync), 0);
             if (method == null)
             {
                 throw new InvalidOperationException("The Value object does not have a SingleAsync method with no parameters.");
@@ -162,7 +162,7 @@
                 throw new InvalidOperationException("Value cannot be null.");
             }
 
-            var method = Value.GetType().GetMyMethod("FirstAsync", 0);
+            var method = Value.GetType().GetMyMethod(nameof(FirstAsync), 0);
             if (method == null)
             {
                 throw new InvalidOperationException("The Value object does not have a FirstAsync method with no parameters.");

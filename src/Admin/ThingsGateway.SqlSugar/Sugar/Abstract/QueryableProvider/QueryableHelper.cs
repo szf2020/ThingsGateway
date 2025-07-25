@@ -593,7 +593,7 @@ namespace ThingsGateway.SqlSugar
             {
                 var value = item.Value;
                 var expressionTree = new ExpressionTreeVisitor().GetExpressions(value);
-                var isSqlMethod = expressionTree.Count != 0 && ExpressionTool.GetMethodName(expressionTree.Last()).IsIn("Any", "Count");
+                var isSqlMethod = expressionTree.Count != 0 && ExpressionTool.GetMethodName(expressionTree.Last()).IsIn(nameof(QueryMethodInfo.Any), nameof(QueryMethodInfo.Count));
                 if (expressionTree.Count != 0 && isSqlMethod == false)
                 {
                     var name = ExpressionTool.GetMemberName(expressionTree[0]);
@@ -636,7 +636,7 @@ namespace ThingsGateway.SqlSugar
             {
                 var FirstExp = item.Expressions[0];
                 var navName = ExpressionTool.GetMemberName(FirstExp);
-                if (FirstExp is LambdaExpression && ExpressionTool.GetMethodName((FirstExp as LambdaExpression).Body) == "ToList")
+                if (FirstExp is LambdaExpression && ExpressionTool.GetMethodName((FirstExp as LambdaExpression).Body) == nameof(QueryMethodInfo.ToList))
                 {
                     navName = ExpressionTool.GetFirstTypeNameFromExpression(FirstExp);
                 }
@@ -734,7 +734,7 @@ namespace ThingsGateway.SqlSugar
                     {
                         p.SetValue(it, outList);
                     }
-                    it.GetType().GetMethod("Execute").Invoke(it, null);
+                    it.GetType().GetMethod(nameof(NavigatManager<TResult>.Execute)).Invoke(it, null);
                     SelectNavQuery_MappingList(it, result, outList, allColumns.Where(a => a.Navigat != null).ToList());
                 }
             }
@@ -803,7 +803,7 @@ namespace ThingsGateway.SqlSugar
 
         private IList SelectNavQuery_SetList<TResult>(List<TResult> result, object it, PropertyInfo p, Type tType, List<EntityColumnInfo> columns, Type listType)
         {
-            var outList = Activator.CreateInstance(listType);
+            var outList = Activator.CreateInstance(listType) as IList;
             p.SetValue(it, outList);
             var index = 0;
             foreach (var item in result)
@@ -845,10 +845,10 @@ namespace ThingsGateway.SqlSugar
                         propertyInfo.SetValue(addItem, kv.Value);
                     }
                 }
-                (outList as IList).Add(addItem);
+                outList.Add(addItem);
                 index++;
             }
-            return outList as IList;
+            return outList;
         }
 
         private bool IsSelectNavQuery()
@@ -1596,7 +1596,7 @@ namespace ThingsGateway.SqlSugar
         }
         protected ISugarQueryable<TResult> _Select<TResult>(Expression expression)
         {
-            QueryBuilder.CheckExpression(expression, "Select");
+            QueryBuilder.CheckExpression(expression, nameof(QueryMethodInfo.Select));
             this.Context.InitMappingInfo(typeof(TResult));
             var result = InstanceFactory.GetQueryable<TResult>(this.Context.CurrentConnectionConfig);
             result.Context = this.Context;
@@ -1617,14 +1617,14 @@ namespace ThingsGateway.SqlSugar
         }
         protected void _Where(Expression expression)
         {
-            QueryBuilder.CheckExpression(expression, "Where");
+            QueryBuilder.CheckExpression(expression, nameof(QueryMethodInfo.Where));
             var isSingle = QueryBuilder.IsSingle();
             var result = QueryBuilder.GetExpressionValue(expression, isSingle ? ResolveExpressType.WhereSingle : ResolveExpressType.WhereMultiple);
             QueryBuilder.WhereInfos.Add(SqlBuilder.AppendWhereOrAnd(QueryBuilder.WhereInfos.IsNullOrEmpty(), result.GetResultString()));
         }
         protected ISugarQueryable<T> _OrderBy(Expression expression, OrderByType type = OrderByType.Asc)
         {
-            QueryBuilder.CheckExpression(expression, "OrderBy");
+            QueryBuilder.CheckExpression(expression, nameof(QueryMethodInfo.OrderBy));
             var isSingle = QueryBuilder.IsSingle();
             var member = ExpressionTool.RemoveConvert(ExpressionTool.GetLambdaExpressionBody(expression)) is MemberExpression;
             if (member == false && expression.ToString().IsContainsIn("Desc(", "Asc("))
@@ -1716,7 +1716,7 @@ namespace ThingsGateway.SqlSugar
         {
             var oldParameterNames = this.QueryBuilder.Parameters?.Select(it => it.ParameterName)
                 ?.ToHashSet();
-            QueryBuilder.CheckExpression(expression, "GroupBy");
+            QueryBuilder.CheckExpression(expression, nameof(QueryMethodInfo.GroupBy));
             LambdaExpression lambda = expression as LambdaExpression;
             expression = lambda.Body;
             var isSingle = QueryBuilder.IsSingle();
@@ -1792,9 +1792,9 @@ namespace ThingsGateway.SqlSugar
             {
                 if (this.QueryBuilder.JoinQueryInfos.Count(it => it.TableName.EqualCase(tableName)) > 1)
                 {
-                    Check.ExceptionEasy($"if same entity name ,.LeftJoin(db.Queryable<{entityName}>,(x,y..)=>....).As(\"{tableName}\")", $"存在相同实体，请使用.LeftJoin(db.Queryable<{entityName}>).As(\"{tableName}\",(x,y..)=>...)");
+                    Check.ExceptionEasy($"if same entity name ,.LeftJoin(db.Queryable<{entityName}>,(x,y..)=>....).AS(\"{tableName}\")", $"存在相同实体，请使用.LeftJoin(db.Queryable<{entityName}>).AS(\"{tableName}\",(x,y..)=>...)");
                 }
-                Check.Exception(true, ErrorMessage.GetThrowMessage($"use As<{tableName}>(\"{tableName}\")", $"请把 As(\"{tableName}\"), 改成 As<{tableName}实体>(\"{tableName}\")"));
+                Check.Exception(true, ErrorMessage.GetThrowMessage($"use AS<{tableName}>(\"{tableName}\")", $"请把 AS(\"{tableName}\"), 改成 AS<{tableName}实体>(\"{tableName}\")"));
             }
             else
             {
@@ -1838,7 +1838,7 @@ namespace ThingsGateway.SqlSugar
         }
         protected ISugarQueryable<T> _Having(Expression expression)
         {
-            QueryBuilder.CheckExpression(expression, "Having");
+            QueryBuilder.CheckExpression(expression, nameof(QueryMethodInfo.Having));
             var isSingle = QueryBuilder.IsSingle();
             var lamResult = QueryBuilder.GetExpressionValue(expression, isSingle ? ResolveExpressType.WhereSingle : ResolveExpressType.WhereMultiple);
             Having(lamResult.GetResultString());
@@ -2314,9 +2314,9 @@ namespace ThingsGateway.SqlSugar
                 {
                     if (isFirst)
                     {
-                        if ((subList as IList).Count > 0)
+                        if ((subList is IList list) && list.Count > 0)
                         {
-                            itemProperty.SetValue(item, (subList as IList)[0]);
+                            itemProperty.SetValue(item, list[0]);
                         }
                     }
                     else

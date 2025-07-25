@@ -222,7 +222,7 @@ namespace ThingsGateway.SqlSugar
         /// <param name="type">实体类型</param>
         /// <param name="newTableName">新表名</param>
         /// <returns>代码优先接口</returns>
-        public ICodeFirst As(Type type, string newTableName)
+        public ICodeFirst AS(Type type, string newTableName)
         {
             if (!MappingTables.TryAdd(type, newTableName))
             {
@@ -236,9 +236,9 @@ namespace ThingsGateway.SqlSugar
         /// <typeparam name="T">实体类型</typeparam>
         /// <param name="newTableName">新表名</param>
         /// <returns>代码优先接口</returns>
-        public ICodeFirst As<T>(string newTableName)
+        public ICodeFirst AS<T>(string newTableName)
         {
-            return As(typeof(T), newTableName);
+            return AS(typeof(T), newTableName);
         }
 
         /// <summary>

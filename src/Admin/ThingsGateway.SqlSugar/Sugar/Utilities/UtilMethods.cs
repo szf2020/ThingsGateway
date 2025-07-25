@@ -10,6 +10,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 
 using ThingsGateway.NewLife;
+using ThingsGateway.NewLife.Caching;
 
 namespace ThingsGateway.SqlSugar
 {
@@ -212,18 +213,20 @@ namespace ThingsGateway.SqlSugar
 
             return columnInfo;
         }
+
         public static object ConvertToObjectList(Type targetType, List<object> sourceList)
         {
-            // 创建 List<Type> 类型的实例
-            object resultList = Activator.CreateInstance(typeof(List<>).MakeGenericType(targetType));
-            // 获取 Add 方法
-            var addMethod = resultList.GetType().GetMethod("Add");
+            var listType = typeof(List<>).MakeGenericType(targetType);
+            var resultList = (IList)Activator.CreateInstance(listType);
+
             foreach (var obj in sourceList)
             {
-                addMethod.Invoke(resultList, new object[] { obj });
+                resultList.Add(obj);
             }
+
             return resultList;
         }
+
         public static Dictionary<string, object> DataRowToDictionary(DataRow row)
         {
             Dictionary<string, object> dictionary = new Dictionary<string, object>();
@@ -289,31 +292,110 @@ namespace ThingsGateway.SqlSugar
             return columnInfo?.SqlParameterDbType != null && columnInfo.SqlParameterDbType is Type
                 && typeof(ISugarDataConverter).IsAssignableFrom(columnInfo.SqlParameterDbType as Type);
         }
-        internal static SugarParameter GetParameterConverter(int index, ISqlSugarClient db, object value, Expression oppoSiteExpression, EntityColumnInfo columnInfo)
+
+
+        internal static SugarParameter GetParameterConverter(int index, object value, EntityColumnInfo columnInfo)
         {
-            var entity = db.EntityMaintenance.GetEntityInfo(oppoSiteExpression.Type);
-            var type = columnInfo.SqlParameterDbType as Type;
-            var ParameterConverter = type.GetMethod("ParameterConverter").MakeGenericMethod(columnInfo.PropertyInfo.PropertyType);
-            var obj = Activator.CreateInstance(type);
-            var p = ParameterConverter.Invoke(obj, new object[] { value, 100 + index }) as SugarParameter;
-            return p;
+            return InvokeParameterConverter(
+                columnInfo.SqlParameterDbType as Type,
+                columnInfo.PropertyInfo.PropertyType,
+                value,
+                100 + index
+            );
         }
-        internal static SugarParameter GetParameterConverter(int index, ISqlSugarClient db, object value, EntityInfo entity, EntityColumnInfo columnInfo)
+        internal static SugarParameter GetParameterConverter(int index, object value, Type type, Type PropertyType)
         {
-            var type = columnInfo.SqlParameterDbType as Type;
-            var ParameterConverter = type.GetMethod("ParameterConverter").MakeGenericMethod(columnInfo.PropertyInfo.PropertyType);
-            var obj = Activator.CreateInstance(type);
-            var p = ParameterConverter.Invoke(obj, new object[] { value, 100 + index }) as SugarParameter;
-            return p;
+            return InvokeParameterConverter(
+                type,
+                PropertyType,
+                value,
+                index
+            );
         }
-        internal static object QueryConverter(int index, ISqlSugarClient db, IDataReader dataReader, EntityInfo entity, EntityColumnInfo columnInfo)
+        private static SugarParameter InvokeParameterConverter(Type converterType, Type valueType, object value, int parameterIndex)
         {
-            var type = columnInfo.SqlParameterDbType as Type;
-            var ParameterConverter = type.GetMethod("QueryConverter").MakeGenericMethod(columnInfo.PropertyInfo.PropertyType);
-            var obj = Activator.CreateInstance(type);
-            var p = ParameterConverter.Invoke(obj, new object[] { dataReader, index });
-            return p;
+            var key = $"{nameof(InvokeParameterConverter)}{converterType.FullName}_{valueType.FullName}";
+            var data = MemoryCache.Instance.GetOrAdd(key, _ => BuildParameterInvoker(converterType, valueType));
+            return data.invoker(value, parameterIndex);
         }
+
+        private static (object instance, Func<object, int, SugarParameter> invoker) BuildParameterInvoker(Type converterType, Type valueType)
+        {
+            var instance = Activator.CreateInstance(converterType)
+                          ?? throw new InvalidOperationException($"Cannot create instance of {converterType.FullName}");
+
+            var method = converterType.GetMethod(nameof(ISugarDataConverter.ParameterConverter));
+            if (method == null)
+                throw new MissingMethodException($"Method 'ParameterConverter' not found on type '{converterType.FullName}'");
+
+            var genericMethod = method.MakeGenericMethod(valueType);
+
+            // 构建表达式 (object value, int index) => ((Converter)instance).ParameterConverter<T>(value, index)
+            var valueParam = Expression.Parameter(typeof(object), "value");
+            var indexParam = Expression.Parameter(typeof(int), "index");
+            var instanceExpr = Expression.Constant(instance);
+
+            var callExpr = Expression.Call(
+                Expression.Convert(instanceExpr, converterType),
+                genericMethod,
+                valueParam,
+                indexParam
+            );
+
+            var lambda = Expression.Lambda<Func<object, int, SugarParameter>>(callExpr, valueParam, indexParam);
+            var compiled = lambda.Compile();
+
+            return (instance, compiled);
+        }
+
+        /// <summary>
+        /// 反射执行<see cref="ISugarDataConverter.QueryConverter{T}(IDataRecord, int)"/>
+        /// </summary>
+        internal static object QueryConverter(int index, IDataReader dataReader, EntityInfo entity, EntityColumnInfo columnInfo)
+        {
+            return InvokeQueryConverter(columnInfo.SqlParameterDbType as Type, columnInfo.PropertyInfo.PropertyType, dataReader, index);
+        }
+        private static object InvokeQueryConverter(Type converterType, Type valueType, IDataReader reader, int index)
+        {
+            var key = $"{nameof(InvokeQueryConverter)}{converterType.FullName}_{valueType.FullName}";
+            var data = MemoryCache.Instance.GetOrAdd(key, (key) => BuildInvoker(converterType, valueType));
+            return data.invoker(reader, index);
+        }
+
+        private static (object instance, Func<IDataReader, int, object> invoker) BuildInvoker(Type converterType, Type valueType)
+        {
+
+            // 创建实例（默认构造函数）
+            var instance = Activator.CreateInstance(converterType)
+                          ?? throw new InvalidOperationException($"Cannot create instance of {converterType.FullName}");
+
+            // 获取泛型方法
+            var method = converterType.GetMethod(nameof(ISugarDataConverter.QueryConverter));
+            if (method == null)
+                throw new MissingMethodException($"Method 'QueryConverter' not found on type '{converterType.FullName}'");
+
+            var genericMethod = method.MakeGenericMethod(valueType);
+
+            // 构造委托 (IDataReader reader, int index) => converter.QueryConverter<T>(reader, index)
+            var readerParam = Expression.Parameter(typeof(IDataReader), "reader");
+            var indexParam = Expression.Parameter(typeof(int), "index");
+            var instanceExpr = Expression.Constant(instance);
+
+            var callExpr = Expression.Call(
+                Expression.Convert(instanceExpr, converterType),
+                genericMethod,
+                readerParam,
+                indexParam
+            );
+
+            var lambda = Expression.Lambda<Func<IDataReader, int, object>>(
+                Expression.Convert(callExpr, typeof(object)), readerParam, indexParam);
+
+            var compiled = lambda.Compile();
+
+            return (instance, compiled);
+        }
+
         internal static bool IsErrorParameterName(ConnectionConfig connectionConfig, DbColumnInfo columnInfo)
         {
             return connectionConfig.MoreSettings?.IsCorrectErrorSqlParameterName == true &&

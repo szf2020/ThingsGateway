@@ -103,26 +103,24 @@ public static class GenericExtensions
         return objArrayList;
     }
 
-    /// <summary>
-    /// 将项目列表分解为特定大小的块
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    /// <param name="source">原数组</param>
-    /// <param name="chunkSize">分组大小</param>
-    /// <param name="isToList">是否ToList</param>
-    /// <returns></returns>
-    public static IEnumerable<IEnumerable<T>> ChunkBetter<T>(this IEnumerable<T> source, int chunkSize, bool isToList = false)
+    public static IEnumerable<List<T>> ChunkBetter<T>(this IEnumerable<T> source, int chunkSize)
     {
-        if (chunkSize <= 0)
-            yield break;
-        var pos = 0;
-        while (source.Skip(pos).Any())
+        if (source == null) throw new ArgumentNullException(nameof(source));
+        if (chunkSize <= 0) yield break;
+
+        using var enumerator = source.GetEnumerator();
+        while (enumerator.MoveNext())
         {
-            var chunk = source.Skip(pos).Take(chunkSize);
-            yield return isToList ? chunk.ToList() : chunk;
-            pos += chunkSize;
+            var chunk = new List<T>(chunkSize) { enumerator.Current };
+            for (int i = 1; i < chunkSize && enumerator.MoveNext(); i++)
+            {
+                chunk.Add(enumerator.Current);
+            }
+
+            yield return chunk;
         }
     }
+
 
     /// <summary>拷贝当前的实例数组，是基于引用层的浅拷贝，如果类型为值类型，那就是深度拷贝，如果类型为引用类型，就是浅拷贝</summary>
     public static T[] CopyArray<T>(this T[] value)

@@ -163,7 +163,7 @@ internal sealed class PluginService : IPluginService
     /// <returns>返回列表</returns>
     public List<DriverMethodInfo> GetDriverMethodInfos(string pluginName, IDriver? driver = null)
     {
-        //lock (this)
+
         {
             string cacheKey = $"{nameof(PluginService)}_{nameof(GetDriverMethodInfos)}_{CultureInfo.CurrentUICulture.Name}";
             // 如果未提供驱动基类对象，则尝试根据插件名称获取驱动对象
@@ -224,7 +224,7 @@ internal sealed class PluginService : IPluginService
     /// <returns>返回包含属性名称及其信息的字典</returns>
     public (IEnumerable<IEditorItem> EditorItems, object Model, Type PropertyUIType) GetDriverPropertyTypes(string pluginName, IDriver? driver = null)
     {
-        //lock (this)
+
         {
             string cacheKey = $"{nameof(PluginService)}_{nameof(GetDriverPropertyTypes)}_{CultureInfo.CurrentUICulture.Name}";
 
@@ -288,7 +288,7 @@ internal sealed class PluginService : IPluginService
     /// </summary>
     public (IEnumerable<IEditorItem> EditorItems, object Model, Type VariablePropertyUIType) GetVariablePropertyTypes(string pluginName, BusinessBase? businessBase = null)
     {
-        //lock (this)
+
         {
             string cacheKey = $"{nameof(PluginService)}_{nameof(GetVariablePropertyTypes)}_{CultureInfo.CurrentUICulture.Name}";
             var dispose = businessBase == null;
@@ -358,7 +358,7 @@ internal sealed class PluginService : IPluginService
         try
         {
             // 等待锁可用
-            _locker.Wait();
+            await _locker.WaitAsync().ConfigureAwait(false);
 
             // 创建程序集加载上下文
             var assemblyLoadContext = new AssemblyLoadContext(CommonUtils.GetSingleId().ToString(), true);
@@ -556,7 +556,7 @@ internal sealed class PluginService : IPluginService
     /// </summary>
     private void ClearCache()
     {
-        //lock (this)
+
         {
             App.CacheService.Remove(CacheKeyGetPluginOutputs);
             App.CacheService.DelByPattern($"{nameof(PluginService)}_");

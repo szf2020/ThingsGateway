@@ -62,7 +62,7 @@ internal sealed class RulesEngineHostedService : BackgroundService, IRulesEngine
         if (rules.Status)
         {
             var data = Init(rules);
-            Start(data.rulesLog, data.blazorDiagram, TokenSource.Token);
+            TaskStart(data.rulesLog, data.blazorDiagram, TokenSource.Token);
             dispatchService.Dispatch(null);
         }
     }
@@ -107,7 +107,7 @@ internal sealed class RulesEngineHostedService : BackgroundService, IRulesEngine
 
         return result;
     }
-    private static void Start(RulesLog rulesLog, DefaultDiagram item, CancellationToken cancellationToken)
+    private static void TaskStart(RulesLog rulesLog, DefaultDiagram item, CancellationToken cancellationToken)
     {
         rulesLog.Log.Trace("Start");
         var startNodes = item.Nodes.Where(a => a is IStartNode);
@@ -223,7 +223,7 @@ internal sealed class RulesEngineHostedService : BackgroundService, IRulesEngine
             foreach (var rules in Rules.Where(a => a.Status))
             {
                 var item = Init(rules);
-                Start(item.rulesLog, item.blazorDiagram, TokenSource.Token);
+                TaskStart(item.rulesLog, item.blazorDiagram, TokenSource.Token);
             }
             dispatchService.Dispatch(null);
 

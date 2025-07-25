@@ -21,21 +21,21 @@ namespace ThingsGateway.SqlSugar
                 try
                 {
                     if (isNoTran)
-                        this.Context.Ado.BeginTran();
+                        await this.Context.Ado.BeginTranAsync().ConfigureAwait(false);
 
-                    this.Context.Ado.ExecuteCommand($"SET IDENTITY_INSERT {dt.TableName} ON");
+                    await this.Context.Ado.ExecuteCommandAsync($"SET IDENTITY_INSERT {dt.TableName} ON").ConfigureAwait(false);
                     var result = await _Execute(dt).ConfigureAwait(false);
-                    this.Context.Ado.ExecuteCommand($"SET IDENTITY_INSERT {dt.TableName} OFF");
+                    await this.Context.Ado.ExecuteCommandAsync($"SET IDENTITY_INSERT {dt.TableName} OFF").ConfigureAwait(false);
 
                     if (isNoTran)
-                        this.Context.Ado.CommitTran();
+                        await this.Context.Ado.CommitTranAsync().ConfigureAwait(false);
 
                     return result;
                 }
                 catch (Exception)
                 {
                     if (isNoTran)
-                        this.Context.Ado.CommitTran();
+                        await this.Context.Ado.CommitTranAsync().ConfigureAwait(false);
                     throw;
                 }
             }

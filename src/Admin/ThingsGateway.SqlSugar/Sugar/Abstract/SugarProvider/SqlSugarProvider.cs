@@ -73,7 +73,7 @@ namespace ThingsGateway.SqlSugar
         public QueryMethodInfo QueryableByObject(Type entityType)
         {
             QueryMethodInfo result = new QueryMethodInfo();
-            var method = this.GetType().GetMyMethod("Queryable", 0);
+            var method = this.GetType().GetMyMethod(nameof(Queryable), 0);
             var methodT = method.MakeGenericMethod(entityType);
             var queryableObj = methodT.Invoke(this, Array.Empty<object>());
             result.QueryableObj = queryableObj;
@@ -1507,7 +1507,8 @@ namespace ThingsGateway.SqlSugar
                 //}
                 if (this.Queues == null || this.Queues.Count == 0) return default(T);
                 isTran = isTran && this.Ado.Transaction == null;
-                if (isTran) this.Ado.BeginTran();
+                if (isTran)
+                    await this.Ado.BeginTranAsync().ConfigureAwait(false);
                 StringBuilder sqlBuilder = new StringBuilder();
                 var parsmeters = new List<SugarParameter>();
                 var index = 1;
@@ -1518,7 +1519,7 @@ namespace ThingsGateway.SqlSugar
                        .GroupBy(it => it?.ToLower())
                        .Where(it => it.Count() > 1).ToArray();
                     var repeatCount = repeatList.Length;
-                    var isParameterNameRepeat = repeatCount>0;
+                    var isParameterNameRepeat = repeatCount > 0;
                     foreach (var item in Queues)
                     {
                         if (item.Sql == null)
@@ -1567,12 +1568,14 @@ namespace ThingsGateway.SqlSugar
                 var builder = InstanceFactory.GetSqlbuilder(this.Context.CurrentConnectionConfig);
                 builder.FormatSaveQueueSql(sqlBuilder);
                 var result = await func(sqlBuilder.ToString(), parsmeters).ConfigureAwait(false);
-                if (isTran) this.Ado.CommitTran();
+                if (isTran)
+                    await this.Ado.CommitTranAsync().ConfigureAwait(false);
                 return result;
             }
             catch (Exception)
             {
-                if (isTran) this.Ado.RollbackTran();
+                if (isTran)
+                    await this.Ado.RollbackTranAsync().ConfigureAwait(false);
                 throw;
             }
         }

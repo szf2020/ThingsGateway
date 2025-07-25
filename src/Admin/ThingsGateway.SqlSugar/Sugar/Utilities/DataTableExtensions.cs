@@ -7,7 +7,7 @@ namespace ThingsGateway.SqlSugar
     internal static class DataTableExtensions
     {
         public static DataTable ToPivotTable<T, TColumn, TRow, TData>(
-            this IEnumerable<T> source,
+            this IReadOnlyCollection<T> source,
             Func<T, TColumn> columnSelector,
             Expression<Func<T, TRow>> rowSelector,
             Func<IEnumerable<T>, TData> dataSelector)
@@ -25,7 +25,7 @@ namespace ThingsGateway.SqlSugar
                 rowName.AddRange(((NewExpression)rowSelector.Body).Arguments.Select(it => it as MemberExpression).Select(it => it.Member.Name));
 
             table.Columns.AddRange(rowName.Select(x => new DataColumn(x)).ToArray());
-            var columns = source.Select(columnSelector).Distinct();
+            var columns = source.Select(columnSelector).Distinct().ToArray();
             table.Columns.AddRange(columns.Select(x => new DataColumn(x?.ToString())).ToArray());
 
             Action<DataRow, IGrouping<TRow, T>> action;
@@ -65,7 +65,7 @@ namespace ThingsGateway.SqlSugar
         }
 
         public static IEnumerable<dynamic> ToPivotList<T, TColumn, TRow, TData>(
-            this IEnumerable<T> source,
+            this IReadOnlyCollection<T> source,
             Func<T, TColumn> columnSelector,
             Expression<Func<T, TRow>> rowSelector,
             Func<IEnumerable<T>, TData> dataSelector)
