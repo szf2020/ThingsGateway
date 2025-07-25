@@ -63,26 +63,28 @@ public abstract class CollectBase : DriverBase, IRpcDriver
              }
          });
 
+
+        // 连读打包
+        // 从收集的变量运行时信息中筛选需要读取的变量
+        var tags = IdVariableRuntimes.Select(a => a.Value)
+            .Where(it => it.ProtectType != ProtectTypeEnum.WriteOnly
+            && string.IsNullOrEmpty(it.OtherMethod)
+            && !string.IsNullOrEmpty(it.RegisterAddress));
+
+        //筛选特殊变量地址
+        //1、DeviceStatus
+        Func<VariableRuntime, bool> source = (a =>
+        {
+            return !a.RegisterAddress.Equals(nameof(DeviceRuntime.DeviceStatus), StringComparison.OrdinalIgnoreCase) &&
+            !a.RegisterAddress.Equals("Script", StringComparison.OrdinalIgnoreCase) &&
+            !a.RegisterAddress.Equals("ScriptRead", StringComparison.OrdinalIgnoreCase)
+            ;
+        });
+        var now = DateTime.Now;
+#pragma warning disable CA1851
         try
         {
-            // 连读打包
-            // 从收集的变量运行时信息中筛选需要读取的变量
-            var tags = IdVariableRuntimes.Select(a => a.Value)
-                .Where(it => it.ProtectType != ProtectTypeEnum.WriteOnly
-                && string.IsNullOrEmpty(it.OtherMethod)
-                && !string.IsNullOrEmpty(it.RegisterAddress));
 
-            //筛选特殊变量地址
-            //1、DeviceStatus
-            Func<VariableRuntime, bool> source = (a =>
-            {
-                return !a.RegisterAddress.Equals(nameof(DeviceRuntime.DeviceStatus), StringComparison.OrdinalIgnoreCase) &&
-                !a.RegisterAddress.Equals("Script", StringComparison.OrdinalIgnoreCase) &&
-                !a.RegisterAddress.Equals("ScriptRead", StringComparison.OrdinalIgnoreCase)
-                ;
-            });
-
-#pragma warning disable CA1851
             currentDevice.VariableScriptReads = tags.Where(a => !source(a)).Select(a =>
             {
                 var data = new VariableScriptRead();
@@ -90,16 +92,26 @@ public abstract class CollectBase : DriverBase, IRpcDriver
                 data.IntervalTime = a.IntervalTime ?? currentDevice.IntervalTime;
                 return data;
             }).ToList();
-
-            // 将打包后的结果存储在当前设备的 VariableSourceReads 属性中
-            currentDevice.VariableSourceReads = await ProtectedLoadSourceReadAsync(tags.Where(source).ToList()).ConfigureAwait(false);
-#pragma warning restore CA1851
         }
         catch (Exception ex)
         {
             // 如果出现异常，记录日志并初始化 VariableSourceReads 属性为新实例
+            currentDevice.VariableScriptReads = new();
+            LogMessage?.LogWarning(ex, string.Format(AppResource.VariablePackError, ex.Message));
+            tags.Where(a => !source(a)).ForEach(a => a.SetValue(null, now, isOnline: false));
+        }
+        var variableReads = tags.Where(source).ToList();
+        try
+        {
+            // 将打包后的结果存储在当前设备的 VariableSourceReads 属性中
+            currentDevice.VariableSourceReads = await ProtectedLoadSourceReadAsync(variableReads).ConfigureAwait(false);
+#pragma warning restore CA1851
+        }
+        catch (Exception ex)
+        {
             currentDevice.VariableSourceReads = new();
             LogMessage?.LogWarning(ex, string.Format(AppResource.VariablePackError, ex.Message));
+            variableReads.ForEach(a => a.SetValue(null, now, isOnline: false));
         }
         try
         {
