@@ -83,7 +83,7 @@ public abstract class BusinessBaseWithCacheInterval : BusinessBaseWithCache
         {
             CollectDevices?.ForEach(a =>
             {
-                if (a.Value.DeviceStatus == DeviceStatusEnum.OnLine && _businessPropertyWithCacheInterval.BusinessUpdateEnum != BusinessUpdateEnum.Interval)
+                if (_businessPropertyWithCacheInterval.BusinessUpdateEnum != BusinessUpdateEnum.Interval)
                     DeviceStatusChange(a.Value, a.Value.AdaptDeviceBasicData());
             });
         }
@@ -93,7 +93,7 @@ public abstract class BusinessBaseWithCacheInterval : BusinessBaseWithCache
             // 触发一次变量值变化事件
             IdVariableRuntimes.ForEach(a =>
             {
-                if (a.Value.IsOnline && _businessPropertyWithCacheInterval.BusinessUpdateEnum != BusinessUpdateEnum.Interval)
+                if (((!_businessPropertyWithCacheInterval.OnlineFilter) || a.Value.IsOnline) && _businessPropertyWithCacheInterval.BusinessUpdateEnum != BusinessUpdateEnum.Interval)
                     VariableValueChange(a.Value, a.Value.AdaptVariableBasicData());
             });
         }
@@ -260,7 +260,7 @@ public abstract class BusinessBaseWithCacheInterval : BusinessBaseWithCache
                 {
                     CollectDevices?.ForEach(a =>
                 {
-                    if (a.Value.DeviceStatus == DeviceStatusEnum.OnLine && _businessPropertyWithCacheInterval.BusinessUpdateEnum != BusinessUpdateEnum.Interval)
+                    if (_businessPropertyWithCacheInterval.BusinessUpdateEnum != BusinessUpdateEnum.Interval)
                         DeviceStatusChange(a.Value, a.Value.AdaptDeviceBasicData());
                 });
                 }
@@ -268,7 +268,7 @@ public abstract class BusinessBaseWithCacheInterval : BusinessBaseWithCache
                 {
                     IdVariableRuntimes.ForEach(a =>
                 {
-                    if (a.Value.IsOnline && _businessPropertyWithCacheInterval.BusinessUpdateEnum != BusinessUpdateEnum.Interval)
+                    if (((!_businessPropertyWithCacheInterval.OnlineFilter) || a.Value.IsOnline) && _businessPropertyWithCacheInterval.BusinessUpdateEnum != BusinessUpdateEnum.Interval)
                         VariableValueChange(a.Value, a.Value.AdaptVariableBasicData());
                 });
                 }
