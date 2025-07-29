@@ -869,17 +869,13 @@ namespace ThingsGateway.SqlSugar
             InitMappingInfo<T>();
             return this.Context.Deleteable<T>().Where(expression);
         }
-        public virtual IDeleteable<T> Deleteable<T>(dynamic primaryKeyValue) where T : class, new()
+        public virtual IDeleteable<T> DeleteableById<T>(dynamic primaryKeyValue) where T : class, new()
         {
             InitMappingInfo<T>();
             return this.Context.Deleteable<T>().In(primaryKeyValue);
         }
-        public virtual IDeleteable<T> Deleteable<T>(dynamic[] primaryKeyValues) where T : class, new()
-        {
-            InitMappingInfo<T>();
-            return this.Context.Deleteable<T>().In(primaryKeyValues);
-        }
-        public virtual IDeleteable<T> Deleteable<T>(List<dynamic> pkValue) where T : class, new()
+
+        public virtual IDeleteable<T> DeleteableById<T>(IReadOnlyCollection<dynamic> pkValue) where T : class, new()
         {
             InitMappingInfo<T>();
             return this.Context.Deleteable<T>().In(pkValue);

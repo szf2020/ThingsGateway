@@ -15,6 +15,7 @@ using System.Text;
 
 using ThingsGateway.Admin.Application;
 using ThingsGateway.DB;
+using ThingsGateway.NewLife;
 using ThingsGateway.NewLife.Log;
 using ThingsGateway.SqlSugar;
 
@@ -34,6 +35,7 @@ public class Program
 
         ClaimConst.Scheme = $"{typeof(Program).Assembly.GetName().Name}{SchemeHelper.GetOrCreate()}";
 
+        Runtime.CreateConfigOnMissing = true;
         #region 控制台输出Logo
 
         Console.Write(Environment.NewLine);

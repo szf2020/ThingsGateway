@@ -102,6 +102,8 @@ public abstract class BusinessBase : DriverBase
     /// <returns>表示异步操作结果的枚举。</returns>
     protected override List<IScheduledTask> ProtectedGetTasks(CancellationToken cancellationToken)
     {
+        cancellationToken.ThrowIfCancellationRequested();
+
         var setDeviceStatusTask = new ScheduledSyncTask(3000, SetDeviceStatus, null, LogMessage, cancellationToken);
 
         var executeTask = ScheduledTaskHelper.GetTask(CurrentDevice.IntervalTime, ProtectedExecuteAsync, null, LogMessage, cancellationToken);
@@ -123,11 +125,11 @@ public abstract class BusinessBase : DriverBase
         // 获取设备连接状态并更新设备活动时间
         if (IsConnected())
         {
-            CurrentDevice.SetDeviceStatus(TimerX.Now, false);
+            CurrentDevice?.SetDeviceStatus(TimerX.Now, false);
         }
         else
         {
-            CurrentDevice.SetDeviceStatus(TimerX.Now, true);
+            CurrentDevice?.SetDeviceStatus(TimerX.Now, true);
         }
     }
 }

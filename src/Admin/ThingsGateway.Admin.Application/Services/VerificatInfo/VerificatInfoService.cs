@@ -145,7 +145,7 @@ internal sealed class VerificatInfoService : BaseService<VerificatInfo>, IVerifi
     public void Delete(long id)
     {
         using var db = GetDB();
-        db.Deleteable<VerificatInfo>(id).ExecuteCommand();
+        db.Deleteable<VerificatInfo>(a => a.Id == id).ExecuteCommand();
         VerificatInfoService.RemoveCache(id);
     }
 

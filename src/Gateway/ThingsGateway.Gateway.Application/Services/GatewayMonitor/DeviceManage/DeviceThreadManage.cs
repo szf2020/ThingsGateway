@@ -484,6 +484,7 @@ internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
         try
         {
             if (state is not DriverBase driver) return;
+            token.ThrowIfCancellationRequested();
             // 只有当驱动成功初始化后才执行操作
             if (driver.IsInitSuccess)
             {
@@ -494,6 +495,7 @@ internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
 
                 DriverTasks.TryAdd(driver.DeviceId, driverTask);
 
+                token.ThrowIfCancellationRequested();
                 driverTask.Start();
             }
         }

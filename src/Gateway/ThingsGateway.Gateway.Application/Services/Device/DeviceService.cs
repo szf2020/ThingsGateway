@@ -134,7 +134,7 @@ internal sealed class DeviceService : BaseService<Device>, IDeviceService
              .WhereIf(dataScope?.Count == 0, u => u.CreateUserId == UserManager.UserId)
              .Where(a => IdhashSet.Contains(a.ChannelId))
             .Select(a => a.Id).ToList();
-            await db.Deleteable<Device>(data).ExecuteCommandAsync().ConfigureAwait(false);
+            await db.Deleteable<Device>(a => data.Contains(a.Id)).ExecuteCommandAsync().ConfigureAwait(false);
             await variableService.DeleteByDeviceIdAsync(data, db).ConfigureAwait(false);
         }).ConfigureAwait(false);
         if (result.IsSuccess)//如果成功了

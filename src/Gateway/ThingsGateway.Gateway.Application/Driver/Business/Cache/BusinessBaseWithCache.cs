@@ -848,7 +848,7 @@ public abstract class BusinessBaseWithCache : BusinessBase
                                     if (result.IsSuccess)
                                     {
                                         //删除缓存
-                                        await DBCacheVars.DBProvider.Deleteable<CacheDBItem<List<VariableBasicData>>>(varList).ExecuteCommandAsync(cancellationToken).ConfigureAwait(false);
+                                        await DBCacheVars.DBProvider.DeleteableT<CacheDBItem<List<VariableBasicData>>>(varList).ExecuteCommandAsync(cancellationToken).ConfigureAwait(false);
                                     }
                                     else
                                         break;

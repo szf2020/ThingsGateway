@@ -30,10 +30,9 @@ namespace ThingsGateway.SqlSugar
         #region Deleteable
         DeleteMethodInfo DeleteableByObject(object singleEntityObjectOrListObject);
         IDeleteable<T> Deleteable<T>() where T : class, new();
-        IDeleteable<T> Deleteable<T>(dynamic primaryKeyValue) where T : class, new();
-        IDeleteable<T> Deleteable<T>(dynamic[] primaryKeyValues) where T : class, new();
+        IDeleteable<T> DeleteableById<T>(dynamic primaryKeyValue) where T : class, new();
         IDeleteable<T> Deleteable<T>(Expression<Func<T, bool>> expression) where T : class, new();
-        IDeleteable<T> Deleteable<T>(List<dynamic> pkValue) where T : class, new();
+        IDeleteable<T> DeleteableById<T>(IReadOnlyCollection<dynamic> pkValue) where T : class, new();
         IDeleteable<T> Deleteable<T>(IReadOnlyCollection<T> deleteObjs) where T : class, new();
         IDeleteable<T> DeleteableT<T>(T deleteObj) where T : class, new();
         #endregion

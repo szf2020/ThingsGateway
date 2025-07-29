@@ -43,7 +43,7 @@ internal sealed class RulesService : BaseService<Rules>, IRulesService
               .WhereIf(dataScope != null && dataScope?.Count > 0, u => dataScope.Contains(u.CreateOrgId))//在指定机构列表查询
             .WhereIf(dataScope?.Count == 0, u => u.CreateUserId == UserManager.UserId)
             .Select(a => a.Id).ToList();
-        await db.Deleteable<Rules>(data).ExecuteCommandAsync().ConfigureAwait(false);
+        await db.Deleteable<Rules>(a => data.Contains(a.Id)).ExecuteCommandAsync().ConfigureAwait(false);
 
         DeleteRulesFromCache();
         await RulesEngineHostedService.Delete(data).ConfigureAwait(false);

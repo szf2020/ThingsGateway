@@ -1,4 +1,6 @@
 ﻿using System.ComponentModel;
+using System.Runtime.Serialization;
+using System.Xml.Serialization;
 
 using ThingsGateway.NewLife.Common;
 using ThingsGateway.NewLife.Configuration;
@@ -13,7 +15,7 @@ namespace ThingsGateway.NewLife;
 /// 文档 https://newlifex.com/core/setting
 /// </remarks>
 [DisplayName("核心设置")]
-[Config("Core")]
+[Config("LogConfig", Provider = "json")]
 public class Setting : Config<Setting>
 {
     #region 属性
@@ -23,6 +25,7 @@ public class Setting : Config<Setting>
 
     /// <summary>日志等级，只输出大于等于该级别的日志，All/Debug/Info/Warn/Error/Fatal，默认Info</summary>
     [Description("日志等级。只输出大于等于该级别的日志，All/Debug/Info/Warn/Error/Fatal，默认Info")]
+    [XmlIgnore, IgnoreDataMember]
     public LogLevel LogLevel { get; set; } = LogLevel.Info;
 
     /// <summary>文件日志目录。默认Log子目录</summary>
@@ -43,30 +46,37 @@ public class Setting : Config<Setting>
 
     /// <summary>日志行格式。默认Time|ThreadId|Kind|Name|Message，还支持Level</summary>
     [Description("日志行格式。默认Time|ThreadId|Kind|Name|Message，还支持Level")]
+    [XmlIgnore, IgnoreDataMember]
     public String LogLineFormat { get; set; } = "Time|ThreadId|Kind|Name|Message";
 
     /// <summary>网络日志。本地子网日志广播udp://255.255.255.255:514，或者http://xxx:80/log</summary>
     [Description("网络日志。本地子网日志广播udp://255.255.255.255:514，或者http://xxx:80/log")]
+    [XmlIgnore, IgnoreDataMember]
     public String NetworkLog { get; set; } = string.Empty;
 
     /// <summary>日志记录时间UTC校正，单位：小时。默认0表示使用的是本地时间，使用UTC时间的系统转换成本地时间则相差8小时</summary>
     [Description("日志记录时间UTC校正，小时")]
+    [XmlIgnore, IgnoreDataMember]
     public Int32 UtcIntervalHours { get; set; } = 0;
 
     /// <summary>数据目录。本地数据库目录，默认Data子目录</summary>
     [Description("数据目录。本地数据库目录，默认Data子目录")]
+    [XmlIgnore, IgnoreDataMember]
     public String DataPath { get; set; } = string.Empty;
 
     /// <summary>备份目录。备份数据库时存放的目录，默认Backup子目录</summary>
     [Description("备份目录。备份数据库时存放的目录，默认Backup子目录")]
+    [XmlIgnore, IgnoreDataMember]
     public String BackupPath { get; set; } = string.Empty;
 
     /// <summary>插件目录</summary>
     [Description("插件目录")]
+    [XmlIgnore, IgnoreDataMember]
     public String PluginPath { get; set; } = string.Empty;
 
     /// <summary>辅助解析程序集。程序集加载过程中，被依赖程序集未能解析时，是否协助解析，默认false</summary>
     [Description("辅助解析程序集。程序集加载过程中，被依赖程序集未能解析时，是否协助解析，默认false")]
+    [XmlIgnore, IgnoreDataMember]
     public Boolean AssemblyResolve { get; set; }
 
     #endregion

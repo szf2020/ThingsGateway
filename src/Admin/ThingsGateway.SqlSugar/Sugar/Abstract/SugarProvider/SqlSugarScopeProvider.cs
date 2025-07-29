@@ -161,24 +161,20 @@ namespace ThingsGateway.SqlSugar
             return ScopedContext.Deleteable<T>();
         }
 
-        public IDeleteable<T> Deleteable<T>(dynamic primaryKeyValue) where T : class, new()
+        public IDeleteable<T> DeleteableById<T>(dynamic primaryKeyValue) where T : class, new()
         {
-            return ScopedContext.Deleteable<T>(primaryKeyValue);
+            return ScopedContext.DeleteableById<T>(primaryKeyValue);
         }
 
-        public IDeleteable<T> Deleteable<T>(dynamic[] primaryKeyValues) where T : class, new()
-        {
-            return ScopedContext.Deleteable<T>(primaryKeyValues);
-        }
 
         public IDeleteable<T> Deleteable<T>(Expression<Func<T, bool>> expression) where T : class, new()
         {
             return ScopedContext.Deleteable(expression);
         }
 
-        public IDeleteable<T> Deleteable<T>(List<dynamic> pkValue) where T : class, new()
+        public IDeleteable<T> DeleteableById<T>(IReadOnlyCollection<dynamic> pkValue) where T : class, new()
         {
-            return ScopedContext.Deleteable<T>(pkValue);
+            return ScopedContext.DeleteableById<T>(pkValue);
         }
 
         public IDeleteable<T> Deleteable<T>(IReadOnlyCollection<T> deleteObjs) where T : class, new()

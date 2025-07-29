@@ -136,7 +136,7 @@ public static class DbContext
                 await db.Fastest<TITEM>().PageSize(size).BulkCopyAsync(datas).ConfigureAwait(false);
                 break;
             default:
-                await db.Insertable(datas is IReadOnlyList<TITEM> values ? values : datas.ToList()).PageSize(size).ExecuteCommandAsync().ConfigureAwait(false);
+                await db.Insertable(datas is IReadOnlyCollection<TITEM> values ? values : datas.ToList()).PageSize(size).ExecuteCommandAsync().ConfigureAwait(false);
                 break;
         }
     }
@@ -155,7 +155,7 @@ public static class DbContext
                 await db.Fastest<TITEM>().PageSize(size).BulkUpdateAsync(datas).ConfigureAwait(false);
                 break;
             default:
-                await db.Updateable(datas is IReadOnlyList<TITEM> values ? values : datas.ToList()).PageSize(size).ExecuteCommandAsync().ConfigureAwait(false);
+                await db.Updateable(datas is IReadOnlyCollection<TITEM> values ? values : datas.ToList()).PageSize(size).ExecuteCommandAsync().ConfigureAwait(false);
                 break;
         }
     }
