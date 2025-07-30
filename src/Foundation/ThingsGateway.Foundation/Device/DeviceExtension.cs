@@ -1,4 +1,4 @@
-﻿//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 //  此代码版权声明为全文件覆盖，如有原作者特别声明，会在下方手动补充
 //  此代码版权（除特别声明外的代码）归作者本人Diego所有
 //  源代码使用协议遵循本仓库的开源协议及附加协议
@@ -99,7 +99,7 @@ public static partial class DeviceExtension
     /// <param name="buffer">返回的字节数组</param>
     /// <param name="exWhenAny">任意一个失败时抛出异常</param>
     /// <returns>解析结果</returns>
-    public static OperResult PraseStructContent<T>(this IEnumerable<T> variables, IDevice device, byte[] buffer, bool exWhenAny) where T : IVariable
+    public static OperResult PraseStructContent<T>(this IEnumerable<T> variables, IDevice device, ReadOnlySpan<byte> buffer, bool exWhenAny) where T : IVariable
     {
         var time = DateTime.Now;
         var result = OperResult.Success;

@@ -1,4 +1,4 @@
-﻿//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 //  此代码版权声明为全文件覆盖，如有原作者特别声明，会在下方手动补充
 //  此代码版权（除特别声明外的代码）归作者本人Diego所有
 //  源代码使用协议遵循本仓库的开源协议及附加协议
@@ -36,9 +36,11 @@ public static class CRC16Utils
     {
         int length = bytes.Length;
         int num = 0xFFFF;
+
         for (int i = 0; i < length; i++)
         {
-            num = (num >> ((!crc16) ? 8 : 0)) ^ bytes[i];
+            num = (num >> (crc16 ? 0 : 8)) ^ bytes[i];
+
             for (int j = 0; j < 8; j++)
             {
                 int num2 = num & 1;
@@ -50,14 +52,22 @@ public static class CRC16Utils
             }
         }
 
-        return (!crc16) ?
-        [
-            (byte)(num >> 8),
-            (byte)((uint)num & 0xFFu)
-        ] :
-        [
-            (byte)((uint)num & 0xFFu),
+        if (crc16)
+        {
+            return new byte[]
+            {
+            (byte)(num & 0xFFu),
             (byte)(num >> 8)
-        ];
+            };
+        }
+        else
+        {
+            return new byte[]
+            {
+            (byte)(num >> 8),
+            (byte)(num & 0xFFu)
+            };
+        }
     }
+
 }

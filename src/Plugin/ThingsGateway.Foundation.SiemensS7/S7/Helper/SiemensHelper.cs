@@ -10,6 +10,8 @@
 
 using System.Text;
 
+using ThingsGateway.NewLife.Extension;
+
 namespace ThingsGateway.Foundation.SiemensS7;
 
 internal sealed partial class SiemensHelper
@@ -75,18 +77,19 @@ internal sealed partial class SiemensHelper
             {
                 return new OperResult<string>(result1);
             }
-            if (result1.Content[0] == 0 || result1.Content[0] == byte.MaxValue)
+            var span = result1.Content.Span;
+            if (span[0] == 0 || span[0] == byte.MaxValue)
             {
                 return new OperResult<string>(AppResource.NotString);
             }
-            var result2 = await plc.ReadAsync(address, 2 + result1.Content[1], cancellationToken).ConfigureAwait(false);
+            var result2 = await plc.ReadAsync(address, 2 + span[1], cancellationToken).ConfigureAwait(false);
             if (!result2.IsSuccess)
             {
                 return new OperResult<string>(result2);
             }
             else
             {
-                return OperResult.CreateSuccessResult(encoding.GetString(result2.Content, 2, result2.Content.Length - 2));
+                return OperResult.CreateSuccessResult(encoding.GetString(result2.Content.Span.Slice(2, result2.Content.Length - 2)));
             }
         }
         else
@@ -94,14 +97,15 @@ internal sealed partial class SiemensHelper
             var result1 = await plc.ReadAsync(address, 1, cancellationToken).ConfigureAwait(false);
             if (!result1.IsSuccess)
                 return new OperResult<string>(result1);
-            var result2 = await plc.ReadAsync(address, 1 + result1.Content[0], cancellationToken).ConfigureAwait(false);
+            var span = result1.Content.Span;
+            var result2 = await plc.ReadAsync(address, 1 + span[0], cancellationToken).ConfigureAwait(false);
             if (!result2.IsSuccess)
             {
                 return new OperResult<string>(result2);
             }
             else
             {
-                return OperResult.CreateSuccessResult(encoding.GetString(result2.Content, 1, result2.Content.Length - 1));
+                return OperResult.CreateSuccessResult(encoding.GetString(result2.Content.Span.Slice(1, result2.Content.Length - 1)));
             }
         }
     }
@@ -114,12 +118,14 @@ internal sealed partial class SiemensHelper
         {
             var result = await plc.ReadAsync(address, 2, cancellationToken).ConfigureAwait(false);
             if (!result.IsSuccess) return result;
-            if (result.Content[0] == byte.MaxValue) return new OperResult<string>(AppResource.NotString);
-            if (result.Content[0] == 0) result.Content[0] = 254;
-            if (value.Length > result.Content[0]) return new OperResult<string>(AppResource.WriteDataLengthMore);
+            var span = result.Content.Span;
+            var len = span[0];
+            if (len == byte.MaxValue) return new OperResult<string>(AppResource.NotString);
+            if (len == 0) len = 254;
+            if (value.Length > span[0]) return new OperResult<string>(AppResource.WriteDataLengthMore);
             return await plc.WriteAsync(
                 address,
-                DataTransUtil.SpliceArray([result.Content[0], (byte)value.Length],
+                DataTransUtil.SpliceArray([len, (byte)value.Length],
                 inBytes
                 ), DataTypeEnum.String, cancellationToken).ConfigureAwait(false);
         }
@@ -137,18 +143,19 @@ internal sealed partial class SiemensHelper
             {
                 return new OperResult<string>(result1);
             }
-            if (result1.Content[0] == 0 || result1.Content[0] == byte.MaxValue)
+            var span = result1.Content.Span;
+            if (span[0] == 0 || span[0] == byte.MaxValue)
             {
                 return new OperResult<string>(AppResource.NotString);
             }
-            var result2 = await plc.ReadAsync(address, 4 + (plc.ThingsGatewayBitConverter.ToUInt16(result1.Content, 2) * 2), cancellationToken).ConfigureAwait(false);
+            var result2 = await plc.ReadAsync(address, 4 + (plc.ThingsGatewayBitConverter.ToUInt16(span, 2) * 2), cancellationToken).ConfigureAwait(false);
             if (!result2.IsSuccess)
             {
                 return new OperResult<string>(result2);
             }
             else
             {
-                return OperResult.CreateSuccessResult(encoding.GetString(result2.Content, 4, result2.Content.Length - 4));
+                return OperResult.CreateSuccessResult(encoding.GetString(result2.Content.Span.Slice(4, result2.Content.Length - 4)));
             }
         }
         else
@@ -157,14 +164,14 @@ internal sealed partial class SiemensHelper
             var result1 = await plc.ReadAsync(address, 1, cancellationToken).ConfigureAwait(false);
             if (!result1.IsSuccess)
                 return new OperResult<string>(result1);
-            var result2 = await plc.ReadAsync(address, 1 + (result1.Content[0] * 2), cancellationToken).ConfigureAwait(false);
+            var result2 = await plc.ReadAsync(address, 1 + (result1.Content.Span[0] * 2), cancellationToken).ConfigureAwait(false);
             if (!result2.IsSuccess)
             {
                 return new OperResult<string>(result2);
             }
             else
             {
-                return OperResult.CreateSuccessResult(encoding.GetString(result2.Content, 1, result2.Content.Length - 1));
+                return OperResult.CreateSuccessResult(encoding.GetString(result2.Content.Span.Slice(1, result2.Content.Length - 1)));
             }
         }
     }
@@ -177,7 +184,7 @@ internal sealed partial class SiemensHelper
             byte[] inBytes1 = (encoding ?? Encoding.BigEndianUnicode).GetBytes(value);
             var result = await plc.ReadAsync(address, 4, cancellationToken).ConfigureAwait(false);
             if (!result.IsSuccess) return result;
-            var num = plc.ThingsGatewayBitConverter.ToUInt16(result.Content, 0);
+            var num = plc.ThingsGatewayBitConverter.ToUInt16(result.Content.Span, 0);
             if (num == 0)
                 num = 254;
             if (value.Length > num) return new OperResult<string>(AppResource.WriteDataLengthMore);

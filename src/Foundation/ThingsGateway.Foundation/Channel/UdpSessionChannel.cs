@@ -1,4 +1,4 @@
-﻿//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 //  此代码版权声明为全文件覆盖，如有原作者特别声明，会在下方手动补充
 //  此代码版权（除特别声明外的代码）归作者本人Diego所有
 //  源代码使用协议遵循本仓库的开源协议及附加协议
@@ -25,11 +25,16 @@ public class UdpSessionChannel : UdpSession, IClientChannel
     public UdpSessionChannel(IChannelOptions channelOptions)
     {
         ChannelOptions = channelOptions;
-        WaitHandlePool.MaxSign = ushort.MaxValue;
     }
     public override TouchSocketConfig Config => base.Config ?? ChannelOptions.Config;
 
-    public int MaxSign { get => WaitHandlePool.MaxSign; set => WaitHandlePool.MaxSign = value; }
+    public void ResetSign(int minSign = 0, int maxSign = ushort.MaxValue)
+    {
+        var pool = WaitHandlePool;
+        WaitHandlePool = new WaitHandlePool<MessageBase>(minSign, maxSign);
+        pool?.CancelAll();
+        pool?.SafeDispose();
+    }
 
     /// <inheritdoc/>
     public ChannelReceivedEventHandler ChannelReceived { get; set; } = new();
@@ -92,7 +97,8 @@ public class UdpSessionChannel : UdpSession, IClientChannel
         if (adapter is UdpDataHandlingAdapter udpDataHandlingAdapter)
             SetAdapter(udpDataHandlingAdapter);
     }
-
+    public CancellationToken ClosedToken => this.m_transport == null ? new CancellationToken(true) : this.m_transport.Token;
+    private CancellationTokenSource m_transport;
     /// <inheritdoc/>
     public override async Task StartAsync()
     {
@@ -120,6 +126,10 @@ public class UdpSessionChannel : UdpSession, IClientChannel
             }
             finally
             {
+                var cts = m_transport;
+                m_transport = new();
+                cts?.SafeCancel();
+                cts?.SafeDispose();
                 _connectLock.Release();
             }
         }
@@ -152,6 +162,10 @@ public class UdpSessionChannel : UdpSession, IClientChannel
             }
             finally
             {
+                var cts = m_transport;
+                m_transport = null;
+                cts?.SafeCancel();
+                cts?.SafeDispose();
                 _connectLock.Release();
             }
         }
@@ -188,9 +202,10 @@ public class UdpSessionChannel : UdpSession, IClientChannel
     }
 
     /// <inheritdoc/>
-    protected override void Dispose(bool disposing)
+    protected override void SafetyDispose(bool disposing)
     {
+        m_transport?.SafeDispose();
         WaitHandlePool.SafeDispose();
-        base.Dispose(disposing);
+        base.SafetyDispose(disposing);
     }
 }

@@ -1,4 +1,4 @@
-﻿//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 //  此代码版权声明为全文件覆盖，如有原作者特别声明，会在下方手动补充
 //  此代码版权（除特别声明外的代码）归作者本人Diego所有
 //  源代码使用协议遵循本仓库的开源协议及附加协议
@@ -121,7 +121,7 @@ public interface IDevice : IDisposable, IDisposableObject
     /// <param name="dataType">数据类型</param>
     /// <param name="cancellationToken">取消令箭</param>
     /// <returns></returns>
-    ValueTask<IOperResult<Array>> ReadAsync(string address, int length, DataTypeEnum dataType, CancellationToken cancellationToken = default);
+    ValueTask<IOperResult<Array>> ReadArrayAsync(string address, int length, DataTypeEnum dataType, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// 根据数据类型，写入类型值
@@ -131,7 +131,7 @@ public interface IDevice : IDisposable, IDisposableObject
     /// <param name="dataType">数据类型</param>
     /// <param name="cancellationToken">取消令箭</param>
     /// <returns></returns>
-    ValueTask<OperResult> WriteAsync(string address, JToken value, DataTypeEnum dataType, CancellationToken cancellationToken = default);
+    ValueTask<OperResult> WriteJTokenAsync(string address, JToken value, DataTypeEnum dataType, CancellationToken cancellationToken = default);
 
     #endregion 动态类型读写
 
@@ -144,7 +144,7 @@ public interface IDevice : IDisposable, IDisposableObject
     /// <param name="length">读取寄存器数量，对于不同PLC，对应的字节数量可能不一样</param>
     /// <param name="cancellationToken">取消令箭</param>
     /// <returns></returns>
-    ValueTask<OperResult<byte[]>> ReadAsync(string address, int length, CancellationToken cancellationToken = default);
+    ValueTask<OperResult<ReadOnlyMemory<byte>>> ReadAsync(string address, int length, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// 读取布尔量数组
@@ -253,12 +253,12 @@ public interface IDevice : IDisposable, IDisposableObject
     /// <summary>
     /// 写入原始的byte数组数据到指定的地址，返回结果
     /// </summary>
-    ValueTask<OperResult> WriteAsync(string address, byte[] value, DataTypeEnum dataType, CancellationToken cancellationToken = default);
+    ValueTask<OperResult> WriteAsync(string address, ReadOnlyMemory<byte> value, DataTypeEnum dataType, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// 写入bool数组数据，返回结果
     /// </summary>
-    ValueTask<OperResult> WriteAsync(string address, bool[] value, CancellationToken cancellationToken = default);
+    ValueTask<OperResult> WriteAsync(string address, ReadOnlyMemory<bool> value, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// 写入bool数据，返回结果
@@ -327,7 +327,7 @@ public interface IDevice : IDisposable, IDisposableObject
     /// <param name="bitConverter">转换规则</param>
     /// <param name="cancellationToken">取消令箭</param>
     /// <returns>写入结果</returns>
-    ValueTask<OperResult> WriteAsync(string address, string[] value, IThingsGatewayBitConverter bitConverter = null, CancellationToken cancellationToken = default);
+    ValueTask<OperResult> WriteAsync(string address, ReadOnlyMemory<string> value, IThingsGatewayBitConverter bitConverter = null, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// 写入Double数组
@@ -337,7 +337,7 @@ public interface IDevice : IDisposable, IDisposableObject
     /// <param name="bitConverter">转换规则</param>
     /// <param name="cancellationToken">取消令箭</param>
     /// <returns>写入结果</returns>
-    ValueTask<OperResult> WriteAsync(string address, double[] value, IThingsGatewayBitConverter bitConverter = null, CancellationToken cancellationToken = default);
+    ValueTask<OperResult> WriteAsync(string address, ReadOnlyMemory<double> value, IThingsGatewayBitConverter bitConverter = null, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// 写入Single数组
@@ -347,7 +347,7 @@ public interface IDevice : IDisposable, IDisposableObject
     /// <param name="bitConverter">转换规则</param>
     /// <param name="cancellationToken">取消令箭</param>
     /// <returns>写入结果</returns>
-    ValueTask<OperResult> WriteAsync(string address, float[] value, IThingsGatewayBitConverter bitConverter = null, CancellationToken cancellationToken = default);
+    ValueTask<OperResult> WriteAsync(string address, ReadOnlyMemory<float> value, IThingsGatewayBitConverter bitConverter = null, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// 写入Int32数组
@@ -357,7 +357,7 @@ public interface IDevice : IDisposable, IDisposableObject
     /// <param name="bitConverter">转换规则</param>
     /// <param name="cancellationToken">取消令箭</param>
     /// <returns>写入结果</returns>
-    ValueTask<OperResult> WriteAsync(string address, int[] value, IThingsGatewayBitConverter bitConverter = null, CancellationToken cancellationToken = default);
+    ValueTask<OperResult> WriteAsync(string address, ReadOnlyMemory<int> value, IThingsGatewayBitConverter bitConverter = null, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// 写入Int64数组
@@ -367,7 +367,7 @@ public interface IDevice : IDisposable, IDisposableObject
     /// <param name="bitConverter">转换规则</param>
     /// <param name="cancellationToken">取消令箭</param>
     /// <returns>写入结果</returns>
-    ValueTask<OperResult> WriteAsync(string address, long[] value, IThingsGatewayBitConverter bitConverter = null, CancellationToken cancellationToken = default);
+    ValueTask<OperResult> WriteAsync(string address, ReadOnlyMemory<long> value, IThingsGatewayBitConverter bitConverter = null, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// 写入Int16数组
@@ -377,7 +377,7 @@ public interface IDevice : IDisposable, IDisposableObject
     /// <param name="bitConverter">转换规则</param>
     /// <param name="cancellationToken">取消令箭</param>
     /// <returns>写入结果</returns>
-    ValueTask<OperResult> WriteAsync(string address, short[] value, IThingsGatewayBitConverter bitConverter = null, CancellationToken cancellationToken = default);
+    ValueTask<OperResult> WriteAsync(string address, ReadOnlyMemory<short> value, IThingsGatewayBitConverter bitConverter = null, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// 写入UInt32数组
@@ -387,7 +387,7 @@ public interface IDevice : IDisposable, IDisposableObject
     /// <param name="bitConverter">转换规则</param>
     /// <param name="cancellationToken">取消令箭</param>
     /// <returns>写入结果</returns>
-    ValueTask<OperResult> WriteAsync(string address, uint[] value, IThingsGatewayBitConverter bitConverter = null, CancellationToken cancellationToken = default);
+    ValueTask<OperResult> WriteAsync(string address, ReadOnlyMemory<uint> value, IThingsGatewayBitConverter bitConverter = null, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// 写入UInt64数组
@@ -397,7 +397,7 @@ public interface IDevice : IDisposable, IDisposableObject
     /// <param name="bitConverter">转换规则</param>
     /// <param name="cancellationToken">取消令箭</param>
     /// <returns>写入结果</returns>
-    ValueTask<OperResult> WriteAsync(string address, ulong[] value, IThingsGatewayBitConverter bitConverter = null, CancellationToken cancellationToken = default);
+    ValueTask<OperResult> WriteAsync(string address, ReadOnlyMemory<ulong> value, IThingsGatewayBitConverter bitConverter = null, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// 写入UInt16数组
@@ -407,7 +407,7 @@ public interface IDevice : IDisposable, IDisposableObject
     /// <param name="bitConverter">转换规则</param>
     /// <param name="cancellationToken">取消令箭</param>
     /// <returns>写入结果</returns>
-    ValueTask<OperResult> WriteAsync(string address, ushort[] value, IThingsGatewayBitConverter bitConverter = null, CancellationToken cancellationToken = default);
+    ValueTask<OperResult> WriteAsync(string address, ReadOnlyMemory<ushort> value, IThingsGatewayBitConverter bitConverter = null, CancellationToken cancellationToken = default);
 
     #endregion 写入数组
 
@@ -445,7 +445,7 @@ public interface IDevice : IDisposable, IDisposableObject
     /// <param name="cancellationToken">取消令箭</param>
     /// <param name="channel">通道</param>
     /// <returns>返回消息体</returns>
-    ValueTask<OperResult<byte[]>> SendThenReturnAsync(ISendMessage command, IClientChannel channel = default, CancellationToken cancellationToken = default);
+    ValueTask<OperResult<ReadOnlyMemory<byte>>> SendThenReturnAsync(ISendMessage command, IClientChannel channel = default, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// 发送并等待返回，会经过适配器，可传入socketId，如果为空，则默认通道必须为<see cref="IClientChannel"/>类型
@@ -453,7 +453,7 @@ public interface IDevice : IDisposable, IDisposableObject
     /// <param name="sendMessage">发送字节数组</param>
     /// <param name="cancellationToken">取消令箭</param>
     /// <returns>返回消息体</returns>
-    ValueTask<OperResult<byte[]>> SendThenReturnAsync(ISendMessage sendMessage, CancellationToken cancellationToken = default);
+    ValueTask<OperResult<ReadOnlyMemory<byte>>> SendThenReturnAsync(ISendMessage sendMessage, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// 支持通道多设备
@@ -467,6 +467,6 @@ public interface IDevice : IDisposable, IDisposableObject
     /// <param name="channel">通道</param>
     /// <param name="deviceLog">单独设备日志</param>
     void InitChannel(IChannel channel, ILog? deviceLog = null);
-    ValueTask<OperResult<byte[]>> ReadAsync(object state, CancellationToken cancellationToken = default);
+    ValueTask<OperResult<ReadOnlyMemory<byte>>> ReadAsync(object state, CancellationToken cancellationToken = default);
     Task ConnectAsync(CancellationToken token);
 }

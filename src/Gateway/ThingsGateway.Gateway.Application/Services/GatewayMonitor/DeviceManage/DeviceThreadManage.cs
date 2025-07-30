@@ -320,16 +320,18 @@ internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
                         driver.IsInitSuccess = false;
                     LogMessage?.LogWarning(ex, string.Format(AppResource.InitFail, CurrentChannel.PluginName, driver?.DeviceName));
                 }
-
-                if (CancellationTokenSources.TryGetValue(driver.DeviceId, out var oldCts))
+                if (driver?.DeviceId > 0)
                 {
-                    try
+                    if (CancellationTokenSources.TryGetValue(driver.DeviceId, out var oldCts))
                     {
-                        await oldCts.CancelAsync().ConfigureAwait(false);
-                        oldCts.SafeDispose();
-                    }
-                    catch
-                    {
+                        try
+                        {
+                            await oldCts.CancelAsync().ConfigureAwait(false);
+                            oldCts.SafeDispose();
+                        }
+                        catch
+                        {
+                        }
                     }
                 }
 
@@ -491,12 +493,16 @@ internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
                 if (!driver.IsStarted)
                     await driver.StartAsync(token).ConfigureAwait(false);
 
-                var driverTask = driver.GetTasks(token); // 执行驱动的异步执行操作
+                driver.GetTasks(token); // 执行驱动的异步执行操作
 
-                DriverTasks.TryAdd(driver.DeviceId, driverTask);
+                DriverTasks.TryAdd(driver.DeviceId, driver.TaskSchedulerLoop);
 
                 token.ThrowIfCancellationRequested();
-                driverTask.Start();
+                lock (driver.TaskSchedulerLoop)
+                {
+                    if (!driver.DisposedValue && !token.IsCancellationRequested)
+                        driver.TaskSchedulerLoop.Start();
+                }
             }
         }
         catch (OperationCanceledException)

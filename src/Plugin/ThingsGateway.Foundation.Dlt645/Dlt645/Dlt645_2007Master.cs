@@ -8,7 +8,6 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-using ThingsGateway.Foundation.Extension.Generic;
 using ThingsGateway.Foundation.Extension.String;
 
 using TouchSocket.Core;
@@ -22,7 +21,6 @@ public class Dlt645_2007Master : DtuServiceDeviceBase
     {
         base.InitChannel(channel, deviceLog);
         RegisterByteLength = 2;
-        channel.MaxSign = ushort.MaxValue;
     }
     public override IThingsGatewayBitConverter ThingsGatewayBitConverter { get; } = new Dlt645_2007BitConverter(EndianType.Big);
 
@@ -62,7 +60,7 @@ public class Dlt645_2007Master : DtuServiceDeviceBase
     }
 
     /// <inheritdoc/>
-    public ValueTask<OperResult<byte[]>> Dlt645RequestAsync(Dlt645_2007Address dAddress, ControlCode controlCode, string feHead, byte[] codes = default, string[] datas = default, CancellationToken cancellationToken = default)
+    public ValueTask<OperResult<ReadOnlyMemory<byte>>> Dlt645RequestAsync(Dlt645_2007Address dAddress, ControlCode controlCode, string feHead, ReadOnlyMemory<byte> codes = default, ReadOnlyMemory<string> datas = default, CancellationToken cancellationToken = default)
     {
         return SendThenReturnAsync(GetSendMessage(dAddress, controlCode, feHead, codes, datas), cancellationToken);
     }
@@ -133,7 +131,7 @@ public class Dlt645_2007Master : DtuServiceDeviceBase
     }
 
     /// <inheritdoc/>
-    public override ValueTask<OperResult<byte[]>> ReadAsync(string address, int length, CancellationToken cancellationToken = default)
+    public override ValueTask<OperResult<ReadOnlyMemory<byte>>> ReadAsync(string address, int length, CancellationToken cancellationToken = default)
     {
         try
         {
@@ -142,10 +140,10 @@ public class Dlt645_2007Master : DtuServiceDeviceBase
         }
         catch (Exception ex)
         {
-            return EasyValueTask.FromResult(new OperResult<byte[]>(ex));
+            return EasyValueTask.FromResult(new OperResult<ReadOnlyMemory<byte>>(ex));
         }
     }
-    public override ValueTask<OperResult<byte[]>> ReadAsync(object state, CancellationToken cancellationToken = default)
+    public override ValueTask<OperResult<ReadOnlyMemory<byte>>> ReadAsync(object state, CancellationToken cancellationToken = default)
     {
         if (state is Dlt645_2007Address dlt645_2007Address)
         {
@@ -153,7 +151,7 @@ public class Dlt645_2007Master : DtuServiceDeviceBase
         }
         else
         {
-            return EasyValueTask.FromResult(new OperResult<byte[]>(new ArgumentException("State must be of type Dlt645_2007Address", nameof(state))));
+            return EasyValueTask.FromResult(new OperResult<ReadOnlyMemory<byte>>(new ArgumentException("State must be of type Dlt645_2007Address", nameof(state))));
         }
     }
     /// <summary>
@@ -171,8 +169,9 @@ public class Dlt645_2007Master : DtuServiceDeviceBase
             var result = await Dlt645RequestAsync(dAddress, ControlCode.ReadStation, FEHead, cancellationToken: cancellationToken).ConfigureAwait(false);
             if (result.IsSuccess)
             {
-                var buffer = result.Content.SelectMiddle(0, 6).BytesAdd(-0x33);
-                return OperResult.CreateSuccessResult(buffer.Reverse().ToArray().ToHexString());
+                var buffer = result.Content.Slice(0, 6).Span.BytesAdd(-0x33).AsSpan();
+                buffer.Reverse();
+                return OperResult.CreateSuccessResult(buffer.ToHexString());
             }
             else
             {
@@ -191,16 +190,16 @@ public class Dlt645_2007Master : DtuServiceDeviceBase
         bitConverter ??= ThingsGatewayBitConverter.GetTransByAddress(address);
 
         var result = await ReadAsync(address, GetLength(address, 0, 1), cancellationToken).ConfigureAwait(false);
-        return result.OperResultFrom<String[], byte[]>(() =>
+        return result.OperResultFrom<string[], ReadOnlyMemory<byte>>((a) =>
         {
-            var data = bitConverter.ToString(result.Content, 0, result.Content.Length);
+            var data = bitConverter.ToString(a.Span, 0, a.Length);
             return [data];
         }
         );
     }
 
     /// <inheritdoc/>
-    public override async ValueTask<OperResult> WriteAsync(string address, string[] value, IThingsGatewayBitConverter bitConverter = null, CancellationToken cancellationToken = default)
+    public override async ValueTask<OperResult> WriteAsync(string address, ReadOnlyMemory<string> value, IThingsGatewayBitConverter bitConverter = null, CancellationToken cancellationToken = default)
     {
         try
         {
@@ -212,7 +211,7 @@ public class Dlt645_2007Master : DtuServiceDeviceBase
                 OperCode = OperCode.PadLeft(8, '0');
 
             var codes = DataTransUtil.SpliceArray(Password.HexStringToBytes(), OperCode.HexStringToBytes());
-            string[] strArray = value;
+            var strArray = value;
             var dAddress = Dlt645_2007Address.ParseFrom(address, Station);
             return await Dlt645RequestAsync(dAddress, ControlCode.Write, FEHead, codes, strArray, cancellationToken: cancellationToken).ConfigureAwait(false);
         }
@@ -237,7 +236,7 @@ public class Dlt645_2007Master : DtuServiceDeviceBase
     }
 
     /// <inheritdoc/>
-    public override async ValueTask<OperResult> WriteAsync(string address, byte[] value, DataTypeEnum dataType, CancellationToken cancellationToken = default)
+    public override async ValueTask<OperResult> WriteAsync(string address, ReadOnlyMemory<byte> value, DataTypeEnum dataType, CancellationToken cancellationToken = default)
     {
         try
         {
@@ -283,7 +282,7 @@ public class Dlt645_2007Master : DtuServiceDeviceBase
     public override ValueTask<OperResult> WriteAsync(string address, int value, IThingsGatewayBitConverter bitConverter = null, CancellationToken cancellationToken = default) => WriteAsync(address, value.ToString(), bitConverter, cancellationToken);
 
     /// <inheritdoc/>
-    public override ValueTask<OperResult> WriteAsync(string address, bool[] value, CancellationToken cancellationToken = default) => throw new NotSupportedException();
+    public override ValueTask<OperResult> WriteAsync(string address, ReadOnlyMemory<bool> value, CancellationToken cancellationToken = default) => throw new NotSupportedException();
 
     /// <summary>
     /// 修改波特率
@@ -310,7 +309,7 @@ public class Dlt645_2007Master : DtuServiceDeviceBase
 
             Dlt645_2007Address dAddress = new();
             dAddress.SetStation(station ?? Station);
-            dAddress.DataId = [baudRateByte];
+            dAddress.DataId = new byte[] { baudRateByte };
 
             return await Dlt645RequestAsync(dAddress, ControlCode.ReadStation, FEHead, cancellationToken: cancellationToken).ConfigureAwait(false);
         }
@@ -332,7 +331,8 @@ public class Dlt645_2007Master : DtuServiceDeviceBase
         {
             Dlt645_2007Address dAddress = new();
             dAddress.Station = "AAAAAAAAAAAA".HexStringToBytes();
-            dAddress.DataId = station.HexStringToBytes().Reverse().ToArray();
+            var memory = station.HexStringToBytes(); memory.Span.Reverse();
+            dAddress.DataId = memory;
 
             return await Dlt645RequestAsync(dAddress, ControlCode.WriteStation, FEHead, cancellationToken: cancellationToken).ConfigureAwait(false);
         }
@@ -355,11 +355,16 @@ public class Dlt645_2007Master : DtuServiceDeviceBase
     {
         try
         {
-            string str = $"04000C{level + 1:D2}";
+            var levelstr = $"04000C{level + 1:D2}".HexStringToBytes();
+            var newPasswordstr = oldPassword.HexStringToBytes();
+            var oldPasswordstr = newPassword.HexStringToBytes();
+            levelstr.Span.Reverse();
+            newPasswordstr.Span.Reverse();
+            oldPasswordstr.Span.Reverse();
 
-            var bytes = DataTransUtil.SpliceArray(str.HexStringToBytes().Reverse().ToArray()
-                , (oldPassword.HexStringToBytes().Reverse().ToArray())
-                , (newPassword.HexStringToBytes().Reverse().ToArray()));
+            var bytes = DataTransUtil.SpliceArray(levelstr
+                , newPasswordstr
+                , oldPasswordstr);
 
             Dlt645_2007Address dAddress = new();
             dAddress.SetStation(station ?? Station);
@@ -374,7 +379,7 @@ public class Dlt645_2007Master : DtuServiceDeviceBase
         }
     }
 
-    private static Dlt645_2007Send GetSendMessage(Dlt645_2007Address dAddress, ControlCode read, string feHead, byte[] codes = default, string[] datas = default)
+    private static Dlt645_2007Send GetSendMessage(Dlt645_2007Address dAddress, ControlCode read, string feHead, ReadOnlyMemory<byte> codes = default, ReadOnlyMemory<string> datas = default)
     {
         return new Dlt645_2007Send(dAddress, read, feHead.HexStringToBytes(), codes, datas);
     }

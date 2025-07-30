@@ -26,7 +26,7 @@ public abstract partial class BusinessBaseWithCacheIntervalScript : BusinessBase
 
     protected abstract BusinessPropertyWithCacheIntervalScript _businessPropertyWithCacheIntervalScript { get; }
 
-    public virtual List<string> Match(string input)
+    public virtual string[] Match(string input)
     {
         // 生成缓存键，以确保缓存的唯一性
         var cacheKey = $"{nameof(BusinessBaseWithCacheIntervalScript)}-{CultureInfo.CurrentUICulture.Name}-Match-{input}";
@@ -51,7 +51,7 @@ public abstract partial class BusinessBaseWithCacheIntervalScript : BusinessBase
             }
 
             // 返回匹配结果列表
-            return strings;
+            return strings.ToArray();
         });
 
         // 返回匹配结果列表
@@ -64,7 +64,7 @@ public abstract partial class BusinessBaseWithCacheIntervalScript : BusinessBase
     {
         var data = Application.DynamicModelExtension.GetDynamicModel<AlarmVariable>(item, _businessPropertyWithCacheIntervalScript.BigTextScriptAlarmModel);
         var topics = Match(_businessPropertyWithCacheIntervalScript.AlarmTopic);
-        if (topics.Count > 0)
+        if (topics.Length > 0)
         {
             {
                 //获取分组最终结果
@@ -77,7 +77,7 @@ public abstract partial class BusinessBaseWithCacheIntervalScript : BusinessBase
                     string topic = _businessPropertyWithCacheIntervalScript.AlarmTopic;
 
                     // 将主题中的占位符替换为分组键对应的值
-                    for (int i = 0; i < topics.Count; i++)
+                    for (int i = 0; i < topics.Length; i++)
                     {
                         topic = topic.Replace(@"${" + topics[i] + @"}", group.Key[i]?.ToString());
                     }
@@ -126,7 +126,7 @@ public abstract partial class BusinessBaseWithCacheIntervalScript : BusinessBase
     {
         var data = Application.DynamicModelExtension.GetDynamicModel<DeviceBasicData>(item, _businessPropertyWithCacheIntervalScript.BigTextScriptDeviceModel);
         var topics = Match(_businessPropertyWithCacheIntervalScript.DeviceTopic);
-        if (topics.Count > 0)
+        if (topics.Length > 0)
         {
             {
                 //获取分组最终结果
@@ -140,7 +140,7 @@ public abstract partial class BusinessBaseWithCacheIntervalScript : BusinessBase
                         string topic = _businessPropertyWithCacheIntervalScript.DeviceTopic;
 
                         // 将主题中的占位符替换为分组键对应的值
-                        for (int i = 0; i < topics.Count; i++)
+                        for (int i = 0; i < topics.Length; i++)
                         {
                             topic = topic.Replace(@"${" + topics[i] + @"}", group.Key[i]?.ToString());
                         }
@@ -191,7 +191,7 @@ public abstract partial class BusinessBaseWithCacheIntervalScript : BusinessBase
     {
         var data = Application.DynamicModelExtension.GetDynamicModel<VariableBasicData>(item, _businessPropertyWithCacheIntervalScript.BigTextScriptVariableModel);
         var topics = Match(_businessPropertyWithCacheIntervalScript.VariableTopic);
-        if (topics.Count > 0)
+        if (topics.Length > 0)
         {
             {
                 //获取分组最终结果
@@ -205,7 +205,7 @@ public abstract partial class BusinessBaseWithCacheIntervalScript : BusinessBase
                         string topic = _businessPropertyWithCacheIntervalScript.VariableTopic;
 
                         // 将主题中的占位符替换为分组键对应的值
-                        for (int i = 0; i < topics.Count; i++)
+                        for (int i = 0; i < topics.Length; i++)
                         {
                             topic = topic.Replace(@"${" + topics[i] + @"}", group.Key[i]?.ToString());
                         }
@@ -268,7 +268,7 @@ public abstract partial class BusinessBaseWithCacheIntervalScript : BusinessBase
         }
 
         var topics = Match(_businessPropertyWithCacheIntervalScript.VariableTopic);
-        if (topics.Count > 0)
+        if (topics.Length > 0)
         {
             {
                 //获取分组最终结果
@@ -282,7 +282,7 @@ public abstract partial class BusinessBaseWithCacheIntervalScript : BusinessBase
                         string topic = _businessPropertyWithCacheIntervalScript.VariableTopic;
 
                         // 将主题中的占位符替换为分组键对应的值
-                        for (int i = 0; i < topics.Count; i++)
+                        for (int i = 0; i < topics.Length; i++)
                         {
                             topic = topic.Replace(@"${" + topics[i] + @"}", group.Key[i]?.ToString());
                         }

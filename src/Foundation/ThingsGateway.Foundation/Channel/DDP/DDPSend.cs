@@ -1,4 +1,4 @@
-﻿//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 //  此代码版权声明为全文件覆盖，如有原作者特别声明，会在下方手动补充
 //  此代码版权（除特别声明外的代码）归作者本人Diego所有
 //  源代码使用协议遵循本仓库的开源协议及附加协议
@@ -9,6 +9,8 @@
 //------------------------------------------------------------------------------
 
 using System.Text;
+
+using ThingsGateway.NewLife.Extension;
 
 namespace ThingsGateway.Foundation;
 
@@ -30,40 +32,37 @@ public class DDPSend : ISendMessage
         Id = id;
         Command = command;
     }
-    public void Build<TByteBlock>(ref TByteBlock byteBlock) where TByteBlock : IByteBlock
+    public void Build<TByteBlock>(ref TByteBlock byteBlock) where TByteBlock : IByteBlockWriter
     {
-        byteBlock.WriteByte(0x7b);
-        byteBlock.WriteByte(Command);
-        byteBlock.WriteUInt16(0x10, EndianType.Big);//len
-        byteBlock.Write(PadTo11Byte(Id.Remove(0, 3)));
+        WriterExtension.WriteValue(ref byteBlock, (byte)0x7b);
+        WriterExtension.WriteValue(ref byteBlock, (byte)Command);
+        var id = PadTo11Byte(Id.Remove(0, 3));
         if (Tcp)
         {
-            byteBlock.Write(ReadOnlyMemory.Span);
-            byteBlock.WriteByte(0x7b);
-            byteBlock.Position = 2;
-            byteBlock.WriteUInt16((ushort)byteBlock.Length, EndianType.Big);//len
+            WriterExtension.WriteValue(ref byteBlock, (ushort)(id.Length + ReadOnlyMemory.Length + 3), EndianType.Big);//len
         }
         else
         {
-            byteBlock.WriteByte(0x7b);
+            WriterExtension.WriteValue(ref byteBlock, (ushort)0x10, EndianType.Big);//len
+        }
+        byteBlock.Write(id);
+        if (Tcp)
+        {
+            byteBlock.Write(ReadOnlyMemory.Span);
+            WriterExtension.WriteValue(ref byteBlock, (byte)0x7b);
+        }
+        else
+        {
+            WriterExtension.WriteValue(ref byteBlock, (byte)0x7b);
             byteBlock.Write(ReadOnlyMemory.Span);
         }
     }
 
     private static byte[] PadTo11Byte(string id)
     {
-        var bytes = Encoding.UTF8.GetBytes(id);
-
-        if (bytes.Length < 11)
-        {
-            byte[] newBytes = new byte[11];
-            Array.Copy(bytes, newBytes, bytes.Length);
-            for (int i = bytes.Length; i < 11; i++)
-            {
-                newBytes[i] = 0;
-            }
-            return newBytes;
-        }
-        return bytes;
+        var buffer = new byte[11];
+        var str = id.AsSpan();
+        int byteCount = Encoding.UTF8.GetBytes(str.Slice(0, Math.Min(str.Length, 11)), buffer);
+        return buffer;
     }
 }

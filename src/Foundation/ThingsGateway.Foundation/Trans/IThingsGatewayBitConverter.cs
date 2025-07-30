@@ -1,4 +1,4 @@
-﻿//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 //  此代码版权声明为全文件覆盖，如有原作者特别声明，会在下方手动补充
 //  此代码版权（除特别声明外的代码）归作者本人Diego所有
 //  源代码使用协议遵循本仓库的开源协议及附加协议
@@ -95,7 +95,7 @@ public interface IThingsGatewayBitConverter
     /// </summary>
     /// <param name="values">等待转化的数组</param>
     /// <returns>buffer数据</returns>
-    byte[] GetBytes(bool[] values);
+    byte[] GetBytes(ReadOnlySpan<bool> values);
 
     /// <summary>
     /// short变量转化缓存数据，一个short数据可以转为2个字节的byte数组<br />
@@ -105,29 +105,30 @@ public interface IThingsGatewayBitConverter
     byte[] GetBytes(short value);
 
     /// <inheritdoc/>
-    byte[] GetBytes(short[] value);
+    byte[] GetBytes(ReadOnlySpan<short> value);
 
     /// <inheritdoc/>
-    byte[] GetBytes(ushort[] value);
+    byte[] GetBytes(ReadOnlySpan<ushort> value);
 
     /// <inheritdoc/>
-    byte[] GetBytes(int[] value);
+    byte[] GetBytes(ReadOnlySpan<int> value);
 
     /// <inheritdoc/>
-    byte[] GetBytes(uint[] value);
+    byte[] GetBytes(ReadOnlySpan<uint> value);
 
     /// <inheritdoc/>
-    byte[] GetBytes(long[] value);
+    byte[] GetBytes(ReadOnlySpan<long> value);
 
     /// <inheritdoc/>
-    byte[] GetBytes(ulong[] value);
+    byte[] GetBytes(ReadOnlySpan<ulong> value);
 
     /// <inheritdoc/>
-    byte[] GetBytes(float[] value);
+    byte[] GetBytes(ReadOnlySpan<float> value);
 
     /// <inheritdoc/>
-    byte[] GetBytes(double[] value);
-
+    byte[] GetBytes(ReadOnlySpan<double> value);
+    /// <inheritdoc/>
+    byte[] GetBytes(ReadOnlySpan<decimal> value);
     /// <summary>
     /// ushort变量转化缓存数据，一个ushort数据可以转为2个字节的Byte数组<br />
     /// </summary>
@@ -182,7 +183,7 @@ public interface IThingsGatewayBitConverter
     /// </summary>
     /// <param name="value">等待转化的数据</param>
     /// <returns>buffer数据</returns>
-    byte[] GetBytes(string value);
+    Memory<byte> GetBytes(string value);
 
     #endregion GetBytes
 
@@ -194,16 +195,16 @@ public interface IThingsGatewayBitConverter
     /// <param name="buffer">等待提取的缓存数据</param>
     /// <param name="offset">位的索引，注意：是从0开始的位索引，10则表示 buffer[1] 的第二位。</param>
     /// <param name="isReverse">是否需要按字反转</param>
-    bool ToBoolean(byte[] buffer, int offset, bool isReverse);
+    bool ToBoolean(ReadOnlySpan<byte> buffer, int offset, bool isReverse);
 
     /// <inheritdoc/>
-    bool[] ToBoolean(byte[] buffer, int offset, int len, bool isReverse);
+    bool[] ToBoolean(ReadOnlySpan<byte> buffer, int offset, int len, bool isReverse);
 
     /// <inheritdoc/>
-    byte ToByte(byte[] buffer, int offset);
+    byte ToByte(ReadOnlySpan<byte> buffer, int offset);
 
     /// <inheritdoc/>
-    byte[] ToByte(byte[] buffer, int offset, int length);
+    byte[] ToByte(ReadOnlySpan<byte> buffer, int offset, int length);
 
     /// <summary>
     /// 从缓存中提取double结果，需要指定起始的字节索引，按照字节为单位，一个double占用八个字节<br />
@@ -211,10 +212,10 @@ public interface IThingsGatewayBitConverter
     /// <param name="buffer">缓存对象</param>
     /// <param name="offset">索引位置</param>
     /// <returns>double对象</returns>
-    double ToDouble(byte[] buffer, int offset);
+    double ToDouble(ReadOnlySpan<byte> buffer, int offset);
 
     /// <inheritdoc/>
-    double[] ToDouble(byte[] buffer, int offset, int len);
+    double[] ToDouble(ReadOnlySpan<byte> buffer, int offset, int len);
 
     /// <summary>
     /// 从缓存中提取short结果，需要指定起始的字节索引，按照字节为单位，一个short占用两个字节<br />
@@ -222,10 +223,10 @@ public interface IThingsGatewayBitConverter
     /// <param name="buffer">缓存数据</param>
     /// <param name="offset">索引位置</param>
     /// <returns>short对象</returns>
-    short ToInt16(byte[] buffer, int offset);
+    short ToInt16(ReadOnlySpan<byte> buffer, int offset);
 
     /// <inheritdoc/>
-    short[] ToInt16(byte[] buffer, int offset, int len);
+    short[] ToInt16(ReadOnlySpan<byte> buffer, int offset, int len);
 
     /// <summary>
     /// 从缓存中提取int结果，需要指定起始的字节索引，按照字节为单位，一个int占用四个字节<br />
@@ -233,10 +234,10 @@ public interface IThingsGatewayBitConverter
     /// <param name="buffer">缓存数据</param>
     /// <param name="offset">索引位置</param>
     /// <returns>int对象</returns>
-    int ToInt32(byte[] buffer, int offset);
+    int ToInt32(ReadOnlySpan<byte> buffer, int offset);
 
     /// <inheritdoc/>
-    int[] ToInt32(byte[] buffer, int offset, int len);
+    int[] ToInt32(ReadOnlySpan<byte> buffer, int offset, int len);
 
     /// <summary>
     /// 从缓存中提取long结果，需要指定起始的字节索引，按照字节为单位，一个long占用八个字节<br />
@@ -244,10 +245,10 @@ public interface IThingsGatewayBitConverter
     /// <param name="buffer">缓存数据</param>
     /// <param name="offset">索引位置</param>
     /// <returns>long对象</returns>
-    long ToInt64(byte[] buffer, int offset);
+    long ToInt64(ReadOnlySpan<byte> buffer, int offset);
 
     /// <inheritdoc/>
-    long[] ToInt64(byte[] buffer, int offset, int len);
+    long[] ToInt64(ReadOnlySpan<byte> buffer, int offset, int len);
 
     /// <summary>
     /// 从缓存中提取float结果，需要指定起始的字节索引，按照字节为单位，一个float占用四个字节<b />
@@ -255,10 +256,10 @@ public interface IThingsGatewayBitConverter
     /// <param name="buffer">缓存对象</param>
     /// <param name="offset">索引位置</param>
     /// <returns>float对象</returns>
-    float ToSingle(byte[] buffer, int offset);
+    float ToSingle(ReadOnlySpan<byte> buffer, int offset);
 
     /// <inheritdoc/>
-    float[] ToSingle(byte[] buffer, int offset, int len);
+    float[] ToSingle(ReadOnlySpan<byte> buffer, int offset, int len);
 
     /// <summary>
     /// 从缓存中的部分字节数组转化为string结果，使用指定的编码，指定起始的字节索引，字节长度信息。<br />
@@ -267,7 +268,7 @@ public interface IThingsGatewayBitConverter
     /// <param name="offset">索引位置</param>
     /// <param name="length">byte数组长度</param>
     /// <returns>string对象</returns>
-    string ToString(byte[] buffer, int offset, int length);
+    string ToString(ReadOnlySpan<byte> buffer, int offset, int length);
 
     /// <summary>
     /// 从缓存中提取ushort结果，需要指定起始的字节索引，按照字节为单位，一个ushort占用两个字节<br />
@@ -275,10 +276,10 @@ public interface IThingsGatewayBitConverter
     /// <param name="buffer">缓存数据</param>
     /// <param name="offset">索引位置</param>
     /// <returns>ushort对象</returns>
-    ushort ToUInt16(byte[] buffer, int offset);
+    ushort ToUInt16(ReadOnlySpan<byte> buffer, int offset);
 
     /// <inheritdoc/>
-    ushort[] ToUInt16(byte[] buffer, int offset, int len);
+    ushort[] ToUInt16(ReadOnlySpan<byte> buffer, int offset, int len);
 
     /// <summary>
     /// 从缓存中提取uint结果，需要指定起始的字节索引，按照字节为单位，一个uint占用四个字节<br />
@@ -286,10 +287,10 @@ public interface IThingsGatewayBitConverter
     /// <param name="buffer">缓存数据</param>
     /// <param name="offset">索引位置</param>
     /// <returns>uint对象</returns>
-    uint ToUInt32(byte[] buffer, int offset);
+    uint ToUInt32(ReadOnlySpan<byte> buffer, int offset);
 
     /// <inheritdoc/>
-    uint[] ToUInt32(byte[] buffer, int offset, int len);
+    uint[] ToUInt32(ReadOnlySpan<byte> buffer, int offset, int len);
 
     /// <summary>
     /// 从缓存中提取ulong结果，需要指定起始的字节索引，按照字节为单位，一个ulong占用八个字节<b />
@@ -297,10 +298,10 @@ public interface IThingsGatewayBitConverter
     /// <param name="buffer">缓存数据</param>
     /// <param name="offset">索引位置</param>
     /// <returns>ulong对象</returns>
-    ulong ToUInt64(byte[] buffer, int offset);
+    ulong ToUInt64(ReadOnlySpan<byte> buffer, int offset);
 
     /// <inheritdoc/>
-    ulong[] ToUInt64(byte[] buffer, int offset, int len);
+    ulong[] ToUInt64(ReadOnlySpan<byte> buffer, int offset, int len);
 
     /// <summary>
     ///  转换为指定端模式的<see cref="decimal"/>数据。
@@ -308,7 +309,7 @@ public interface IThingsGatewayBitConverter
     /// <param name="buffer"></param>
     /// <param name="offset"></param>
     /// <returns></returns>
-    decimal ToDecimal(byte[] buffer, int offset);
+    decimal ToDecimal(ReadOnlySpan<byte> buffer, int offset);
 
     /// <summary>
     ///  转换为指定端模式的Char数据。
@@ -316,7 +317,7 @@ public interface IThingsGatewayBitConverter
     /// <param name="buffer"></param>
     /// <param name="offset"></param>
     /// <returns></returns>
-    char ToChar(byte[] buffer, int offset);
+    char ToChar(ReadOnlySpan<byte> buffer, int offset);
 
     /// <summary>
     /// 从缓存中提取decimal结果，需要指定起始的字节索引，按照字节为单位，一个decimal占用16个字节<b />
@@ -325,7 +326,7 @@ public interface IThingsGatewayBitConverter
     /// <param name="offset">索引位置</param>
     /// <param name="length">length</param>
     /// <returns>decimal对象</returns>
-    decimal[] ToDecimal(byte[] buffer, int offset, int length);
+    decimal[] ToDecimal(ReadOnlySpan<byte> buffer, int offset, int length);
     IThingsGatewayBitConverter GetTransByAddress(string? registerAddress);
 
     #endregion ToValue

@@ -1,4 +1,4 @@
-﻿//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 //  此代码版权声明为全文件覆盖，如有原作者特别声明，会在下方手动补充
 //  此代码版权（除特别声明外的代码）归作者本人Diego所有
 //  源代码使用协议遵循本仓库的开源协议及附加协议
@@ -11,6 +11,8 @@
 using System.Collections.Concurrent;
 
 using ThingsGateway.NewLife;
+
+using TouchSocket.SerialPorts;
 
 namespace ThingsGateway.Foundation;
 
@@ -25,15 +27,17 @@ public class OtherChannel : SetupConfigObject, IClientChannel
     public OtherChannel(IChannelOptions channelOptions)
     {
         ChannelOptions = channelOptions;
-
-        WaitHandlePool.MaxSign = ushort.MaxValue;
     }
 
     public override TouchSocketConfig Config => base.Config ?? ChannelOptions.Config;
 
-    /// <inheritdoc/>
-    public int MaxSign { get => WaitHandlePool.MaxSign; set => WaitHandlePool.MaxSign = value; }
-
+    public void ResetSign(int minSign = 0, int maxSign = ushort.MaxValue)
+    {
+        var pool = WaitHandlePool;
+        WaitHandlePool = new WaitHandlePool<MessageBase>(minSign, maxSign);
+        pool?.CancelAll();
+        pool?.SafeDispose();
+    }
     /// <inheritdoc/>
     public ChannelReceivedEventHandler ChannelReceived { get; set; } = new();
 
@@ -60,7 +64,7 @@ public class OtherChannel : SetupConfigObject, IClientChannel
     /// <summary>
     /// 等待池
     /// </summary>
-    public WaitHandlePool<MessageBase> WaitHandlePool { get; } = new();
+    public WaitHandlePool<MessageBase> WaitHandlePool { get; internal set; } = new();
 
     /// <inheritdoc/>
     public WaitLock WaitLock => ChannelOptions.WaitLock;
@@ -109,7 +113,7 @@ public class OtherChannel : SetupConfigObject, IClientChannel
         m_dataHandlingAdapter = adapter;
     }
 
-    private async Task PrivateHandleReceivedData(ByteBlock byteBlock, IRequestInfo requestInfo)
+    private async Task PrivateHandleReceivedData(IByteBlockReader byteBlock, IRequestInfo requestInfo)
     {
         LastReceivedTime = DateTime.Now;
         await this.OnChannelReceivedEvent(new ReceivedDataEventArgs(byteBlock, requestInfo), ChannelReceived).ConfigureAwait(false);
@@ -119,8 +123,9 @@ public class OtherChannel : SetupConfigObject, IClientChannel
     /// 异步发送数据，保护方法。
     /// </summary>
     /// <param name="memory">待发送的字节数据内存。</param>
+    /// <param name="cancellationToken">cancellationToken</param>
     /// <returns>异步任务。</returns>
-    protected Task ProtectedDefaultSendAsync(ReadOnlyMemory<byte> memory)
+    protected Task ProtectedDefaultSendAsync(ReadOnlyMemory<byte> memory, CancellationToken cancellationToken)
     {
         LastSentTime = DateTime.Now;
         return Task.CompletedTask;
@@ -134,77 +139,58 @@ public class OtherChannel : SetupConfigObject, IClientChannel
 
     public bool IsClient => true;
 
-    public bool Online => true;
-
+    public bool Online => online;
+    public CancellationToken ClosedToken => this.m_transport == null ? new CancellationToken(true) : this.m_transport.Token;
+    private CancellationTokenSource m_transport;
     public Task<Result> CloseAsync(string msg, CancellationToken token)
     {
+        var cts = m_transport;
+        m_transport = null;
+        cts?.SafeCancel();
+        cts?.SafeDispose();
+        online = false;
+
         return Task.FromResult(Result.Success);
     }
-
+    public volatile bool online;
     public Task ConnectAsync(int millisecondsTimeout, CancellationToken token)
     {
+        var cts = m_transport;
+        m_transport = new();
+        cts?.SafeCancel();
+        cts?.SafeDispose();
+        online = true;
+        if (this.m_dataHandlingAdapter == null)
+        {
+            var adapter = this.Config.GetValue(SerialPortConfigExtension.SerialDataHandlingAdapterProperty)?.Invoke();
+            if (adapter != null)
+            {
+                this.SetAdapter(adapter);
+            }
+        }
         return Task.CompletedTask;
     }
 
-    public async Task SendAsync(IList<ArraySegment<byte>> transferBytes)
-    {
-        // 检查数据处理适配器是否存在且支持拼接发送
-        if (m_dataHandlingAdapter?.CanSplicingSend != true)
-        {
-            // 如果不支持拼接发送，则计算所有字节片段的总长度
-            var length = 0;
-            foreach (var item in transferBytes)
-            {
-                length += item.Count;
-            }
-            // 使用计算出的总长度创建一个连续的内存块
-            using (var byteBlock = new ByteBlock(length))
-            {
-                // 将每个字节片段写入连续的内存块
-                foreach (var item in transferBytes)
-                {
-                    byteBlock.Write(new ReadOnlySpan<byte>(item.Array, item.Offset, item.Count));
-                }
-                // 根据数据处理适配器的存在与否，选择不同的发送方式
-                if (m_dataHandlingAdapter == null)
-                {
-                    // 如果没有数据处理适配器，则使用默认方式发送
-                    await ProtectedDefaultSendAsync(byteBlock.Memory).ConfigureAwait(EasyTask.ContinueOnCapturedContext);
-                }
-                else
-                {
-                    // 如果有数据处理适配器，则通过适配器发送
-                    await m_dataHandlingAdapter.SendInputAsync(byteBlock.Memory).ConfigureAwait(EasyTask.ContinueOnCapturedContext);
-                }
-            }
-        }
-        else
-        {
-            // 如果数据处理适配器支持拼接发送，则直接发送字节列表
-            await m_dataHandlingAdapter.SendInputAsync(transferBytes).ConfigureAwait(EasyTask.ContinueOnCapturedContext);
-        }
-    }
-
-    public Task SendAsync(ReadOnlyMemory<byte> memory)
+    public Task SendAsync(ReadOnlyMemory<byte> memory, CancellationToken cancellationToken)
     {
         if (m_dataHandlingAdapter == null)
         {
-            return ProtectedDefaultSendAsync(memory);
+            return ProtectedDefaultSendAsync(memory, cancellationToken);
         }
         else
         {
             // 否则，使用适配器的发送方法进行数据发送。
-            return m_dataHandlingAdapter.SendInputAsync(memory);
+            return m_dataHandlingAdapter.SendInputAsync(memory, cancellationToken);
         }
     }
 
-    public Task SendAsync(IRequestInfo requestInfo)
+    public Task SendAsync(IRequestInfo requestInfo, CancellationToken cancellationToken)
     {
         // 检查是否具备发送请求的条件，如果不具备则抛出异常
         ThrowIfCannotSendRequestInfo();
 
         // 使用数据处理适配器异步发送输入请求
-        return m_dataHandlingAdapter.SendInputAsync(requestInfo);
+        return m_dataHandlingAdapter.SendInputAsync(requestInfo, cancellationToken);
     }
     private void ThrowIfCannotSendRequestInfo()
     {

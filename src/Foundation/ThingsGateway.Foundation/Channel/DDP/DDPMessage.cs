@@ -1,4 +1,4 @@
-﻿//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 //  此代码版权声明为全文件覆盖，如有原作者特别声明，会在下方手动补充
 //  此代码版权（除特别声明外的代码）归作者本人Diego所有
 //  源代码使用协议遵循本仓库的开源协议及附加协议
@@ -30,8 +30,8 @@ public abstract class DDPMessage : MessageBase, IResultMessage
 
     public override bool CheckHead<TByteBlock>(ref TByteBlock byteBlock)
     {
-        var code = byteBlock.ReadByte();
-        Type = byteBlock.ReadByte();
+        var code = ReaderExtension.ReadValue<TByteBlock, byte>(ref byteBlock);
+        Type = ReaderExtension.ReadValue<TByteBlock, byte>(ref byteBlock);
 
         if (code != 0x7B)
         {
@@ -44,15 +44,15 @@ public abstract class DDPMessage : MessageBase, IResultMessage
         }
     }
 
-    public abstract int GetBodyLength<TByteBlock>(ref TByteBlock byteBlock) where TByteBlock : IByteBlock;
-    public abstract byte[] GetContent<TByteBlock>(ref TByteBlock byteBlock) where TByteBlock : IByteBlock;
+    public abstract int GetBodyLength<TByteBlock>(ref TByteBlock byteBlock) where TByteBlock : IByteBlockReader;
+    public abstract byte[] GetContent<TByteBlock>(ref TByteBlock byteBlock) where TByteBlock : IByteBlockReader;
 }
 
 public class DDPTcpMessage : DDPMessage
 {
     public override int GetBodyLength<TByteBlock>(ref TByteBlock byteBlock)
     {
-        return byteBlock.ReadUInt16(EndianType.Big) - 4;
+        return ReaderExtension.ReadValue<TByteBlock, ushort>(ref byteBlock, EndianType.Big) - 4;
     }
 
     public override byte[] GetContent<TByteBlock>(ref TByteBlock byteBlock)

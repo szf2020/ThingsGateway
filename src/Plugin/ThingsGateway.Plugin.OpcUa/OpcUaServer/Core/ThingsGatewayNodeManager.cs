@@ -621,6 +621,9 @@ public class ThingsGatewayNodeManager : CustomNodeManager2
     }
 
     #region 多写
+
+    private object lockObject = new();
+
     public override void Write(OperationContext context, IList<WriteValue> nodesToWrite, IList<ServiceResult> errors)
     {
         if (nodesToWrite.Any(a => a.AttributeId != Attributes.Value))
@@ -633,7 +636,7 @@ public class ThingsGatewayNodeManager : CustomNodeManager2
         IDictionary<NodeId, NodeState> operationCache = new NodeIdDictionary<NodeState>();
         List<NodeHandle> nodesToValidate = new List<NodeHandle>();
 
-        lock (Lock)
+        lock (lockObject)
         {
             bool[] writeEnable = new bool[nodesToWrite.Count];
             Dictionary<string, WriteValue> hashSetNodeId = new();

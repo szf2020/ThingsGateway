@@ -1,4 +1,4 @@
-﻿//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 //  此代码版权声明为全文件覆盖，如有原作者特别声明，会在下方手动补充
 //  此代码版权（除特别声明外的代码）归作者本人Diego所有
 //  源代码使用协议遵循本仓库的开源协议及附加协议
@@ -65,31 +65,31 @@ public static class JTokenUtil
                 var array = (JArray)token;
 
                 if (array.All(x => x.Type == JTokenType.Integer))
-                    return array.Select(x => x.Value<long>()).ToList();
+                    return array.Select(x => x.Value<long>()).ToArray();
 
                 if (array.All(x => x.Type == JTokenType.Float))
-                    return array.Select(x => x.Value<double>()).ToList();
+                    return array.Select(x => x.Value<double>()).ToArray();
 
                 if (array.All(x => x.Type == JTokenType.String))
-                    return array.Select(x => x.Value<string>()).ToList();
+                    return array.Select(x => x.Value<string>()).ToArray();
 
                 if (array.All(x => x.Type == JTokenType.Boolean))
-                    return array.Select(x => x.Value<bool>()).ToList();
+                    return array.Select(x => x.Value<bool>()).ToArray();
 
                 if (array.All(x => x.Type == JTokenType.Date))
-                    return array.Select(x => x.Value<DateTime>()).ToList();
+                    return array.Select(x => x.Value<DateTime>()).ToArray();
 
                 if (array.All(x => x.Type == JTokenType.TimeSpan))
-                    return array.Select(x => x.Value<TimeSpan>()).ToList();
+                    return array.Select(x => x.Value<TimeSpan>()).ToArray();
 
                 if (array.All(x => x.Type == JTokenType.Guid))
-                    return array.Select(x => x.Value<Guid>()).ToList();
+                    return array.Select(x => x.Value<Guid>()).ToArray();
 
                 if (array.All(x => x.Type == JTokenType.Uri))
-                    return array.Select(x => x.Value<Uri>()).ToList();
+                    return array.Select(x => x.Value<Uri>()).ToArray();
 
                 // 否则递归
-                return array.Select(x => GetObjectFromJToken(x)).ToList();
+                return array.Select(x => GetObjectFromJToken(x)).ToArray();
 
             case JTokenType.Integer:
                 return token.ToObject<long>();

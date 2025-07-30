@@ -1,5 +1,5 @@
 
-<div align="center"><h1 align="center">ThingsBlazor</a></h1></div>
+<div align="center"><h1 align="center">ThingsBlazor</h1></div>
 <div align="center"><h3 align="center">权限管理框架</h3></div>
 
 

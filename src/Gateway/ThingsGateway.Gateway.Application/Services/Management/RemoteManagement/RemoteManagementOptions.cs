@@ -8,25 +8,30 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-namespace ThingsGateway.Gateway.Application;
+using System.ComponentModel.DataAnnotations;
 
-/// <summary>
-/// 返回状态
-/// </summary>
-public enum ThreadRunReturnTypeEnum
+namespace ThingsGateway.Management;
+
+public class RemoteManagementOptions
 {
-    /// <summary>
-    /// 无
-    /// </summary>
-    None,
+    public bool Enable { get; set; }
+
+    public string Name { get; set; }
+
+    public bool IsServer { get; set; }
+
+    public string ServerUri { get; set; }
 
     /// <summary>
-    /// 继续
+    /// 获取或设置用于验证的令牌。
     /// </summary>
-    Continue,
+    [Required]
+    public string VerifyToken { get; set; }
 
     /// <summary>
-    /// 跳出
+    /// 获取或设置心跳间隔。
     /// </summary>
-    Break,
+    [MinValue(3000)]
+    public int HeartbeatInterval { get; set; }
+
 }

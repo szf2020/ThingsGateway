@@ -1,4 +1,4 @@
-﻿//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 //  此代码版权声明为全文件覆盖，如有原作者特别声明，会在下方手动补充
 //  此代码版权（除特别声明外的代码）归作者本人Diego所有
 //  源代码使用协议遵循本仓库的开源协议及附加协议
@@ -37,10 +37,7 @@ public interface IChannel : ISetupConfigObject, IDisposable, IClosableClient, IC
     /// </summary>
     public ConcurrentList<IDevice> Collects { get; }
 
-    /// <summary>
-    /// MaxSign
-    /// </summary>
-    int MaxSign { get; set; }
+
 
     /// <summary>
     /// 通道启动成功后
@@ -66,6 +63,11 @@ public interface IChannel : ISetupConfigObject, IDisposable, IClosableClient, IC
     /// 主动请求时的等待池
     /// </summary>
     public ConcurrentDictionary<long, Func<IClientChannel, ReceivedDataEventArgs, bool, Task>> ChannelReceivedWaitDict { get; }
+
+    void ResetSign(int minSign = 0, int maxSign = ushort.MaxValue);
+
+
+
 }
 
 /// <summary>

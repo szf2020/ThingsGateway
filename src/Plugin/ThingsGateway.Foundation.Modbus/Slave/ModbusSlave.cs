@@ -8,7 +8,6 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-using System.Buffers;
 using System.Collections.Concurrent;
 
 using TouchSocket.Sockets;
@@ -26,29 +25,28 @@ public class ModbusSlave : DeviceBase, IModbusAddress
     /// <summary>
     /// 继电器
     /// </summary>
-    private ConcurrentDictionary<byte, ValueByteBlock> ModbusServer01ByteBlocks = new();
+    private ConcurrentDictionary<byte, ByteBlock> ModbusServer01ByteBlocks = new();
 
     /// <summary>
     /// 开关输入
     /// </summary>
-    private ConcurrentDictionary<byte, ValueByteBlock> ModbusServer02ByteBlocks = new();
+    private ConcurrentDictionary<byte, ByteBlock> ModbusServer02ByteBlocks = new();
 
     /// <summary>
     /// 输入寄存器
     /// </summary>
-    private ConcurrentDictionary<byte, ValueByteBlock> ModbusServer03ByteBlocks = new();
+    private ConcurrentDictionary<byte, ByteBlock> ModbusServer03ByteBlocks = new();
 
     /// <summary>
     /// 保持寄存器
     /// </summary>
-    private ConcurrentDictionary<byte, ValueByteBlock> ModbusServer04ByteBlocks = new();
+    private ConcurrentDictionary<byte, ByteBlock> ModbusServer04ByteBlocks = new();
 
     /// <inheritdoc/>
     public override void InitChannel(IChannel channel, ILog? deviceLog = null)
     {
         base.InitChannel(channel, deviceLog);
         RegisterByteLength = 2;
-        channel.MaxSign = ushort.MaxValue;
     }
     public override IThingsGatewayBitConverter ThingsGatewayBitConverter { get; } = new ThingsGatewayBitConverter(EndianType.Big);
 
@@ -185,10 +183,30 @@ public class ModbusSlave : DeviceBase, IModbusAddress
     /// <inheritdoc/>
     private void Init(ModbusRequest mAddress)
     {
-        ModbusServer01ByteBlocks.GetOrAdd(mAddress.Station, a => new ValueByteBlock(new byte[ushort.MaxValue * 2]));
-        ModbusServer02ByteBlocks.GetOrAdd(mAddress.Station, a => new ValueByteBlock(new byte[ushort.MaxValue * 2]));
-        ModbusServer03ByteBlocks.GetOrAdd(mAddress.Station, a => new ValueByteBlock(new byte[ushort.MaxValue * 2]));
-        ModbusServer04ByteBlocks.GetOrAdd(mAddress.Station, a => new ValueByteBlock(new byte[ushort.MaxValue * 2]));
+        ModbusServer01ByteBlocks.GetOrAdd(mAddress.Station, a =>
+        {
+            var bytes = new ByteBlock(ushort.MaxValue * 2);
+            bytes.SetLength(ushort.MaxValue * 2);
+            return bytes;
+        });
+        ModbusServer02ByteBlocks.GetOrAdd(mAddress.Station, a =>
+        {
+            var bytes = new ByteBlock(ushort.MaxValue * 2);
+            bytes.SetLength(ushort.MaxValue * 2);
+            return bytes;
+        });
+        ModbusServer03ByteBlocks.GetOrAdd(mAddress.Station, a =>
+        {
+            var bytes = new ByteBlock(ushort.MaxValue * 2);
+            bytes.SetLength(ushort.MaxValue * 2);
+            return bytes;
+        });
+        ModbusServer04ByteBlocks.GetOrAdd(mAddress.Station, a =>
+        {
+            var bytes = new ByteBlock(ushort.MaxValue * 2);
+            bytes.SetLength(ushort.MaxValue * 2);
+            return bytes;
+        });
     }
 
     public override Action<IPluginManager> ConfigurePlugins(TouchSocketConfig config)
@@ -294,22 +312,22 @@ public class ModbusSlave : DeviceBase, IModbusAddress
     }
 
     /// <inheritdoc/>
-    public override ValueTask<OperResult<byte[]>> ReadAsync(string address, int length, CancellationToken cancellationToken = default)
+    public override ValueTask<OperResult<ReadOnlyMemory<byte>>> ReadAsync(string address, int length, CancellationToken cancellationToken = default)
     {
         var mAddress = GetModbusAddress(address, Station);
         mAddress.Length = (ushort)(length * RegisterByteLength);
         var result = ModbusRequest(mAddress, true, cancellationToken);
         if (result.IsSuccess)
         {
-            return EasyValueTask.FromResult(new OperResult<byte[]>() { Content = result.Content.ToArray() });
+            return EasyValueTask.FromResult(new OperResult<ReadOnlyMemory<byte>>() { Content = result.Content });
         }
         else
         {
-            return EasyValueTask.FromResult(new OperResult<byte[]>(result));
+            return EasyValueTask.FromResult(new OperResult<ReadOnlyMemory<byte>>(result));
         }
     }
 
-    public override ValueTask<OperResult<byte[]>> ReadAsync(object state, CancellationToken cancellationToken = default)
+    public override ValueTask<OperResult<ReadOnlyMemory<byte>>> ReadAsync(object state, CancellationToken cancellationToken = default)
     {
         try
         {
@@ -318,21 +336,21 @@ public class ModbusSlave : DeviceBase, IModbusAddress
                 var result = ModbusRequest(mAddress, true, cancellationToken);
                 if (result.IsSuccess)
                 {
-                    return EasyValueTask.FromResult(new OperResult<byte[]>() { Content = result.Content.ToArray() });
+                    return EasyValueTask.FromResult(new OperResult<ReadOnlyMemory<byte>>() { Content = result.Content });
                 }
                 else
                 {
-                    return EasyValueTask.FromResult(new OperResult<byte[]>(result));
+                    return EasyValueTask.FromResult(new OperResult<ReadOnlyMemory<byte>>(result));
                 }
             }
             else
             {
-                return EasyValueTask.FromResult(new OperResult<byte[]>(new ArgumentException("State must be of type ModbusAddress", nameof(state))));
+                return EasyValueTask.FromResult(new OperResult<ReadOnlyMemory<byte>>(new ArgumentException("State must be of type ModbusAddress", nameof(state))));
             }
         }
         catch (Exception ex)
         {
-            return EasyValueTask.FromResult(new OperResult<byte[]>(ex));
+            return EasyValueTask.FromResult(new OperResult<ReadOnlyMemory<byte>>(ex));
         }
     }
 
@@ -342,7 +360,7 @@ public class ModbusSlave : DeviceBase, IModbusAddress
         return mAddress;
     }
     /// <inheritdoc/>
-    public override async ValueTask<OperResult> WriteAsync(string address, byte[] value, DataTypeEnum dataType, CancellationToken cancellationToken = default)
+    public override async ValueTask<OperResult> WriteAsync(string address, ReadOnlyMemory<byte> value, DataTypeEnum dataType, CancellationToken cancellationToken = default)
     {
         try
         {
@@ -358,7 +376,7 @@ public class ModbusSlave : DeviceBase, IModbusAddress
     }
 
     /// <inheritdoc/>
-    public override async ValueTask<OperResult> WriteAsync(string address, bool[] value, CancellationToken cancellationToken = default)
+    public override async ValueTask<OperResult> WriteAsync(string address, ReadOnlyMemory<bool> value, CancellationToken cancellationToken = default)
     {
         try
         {
@@ -366,7 +384,7 @@ public class ModbusSlave : DeviceBase, IModbusAddress
             var mAddress = GetModbusAddress(address, Station);
             if (mAddress.IsBitFunction)
             {
-                mAddress.Data = new ReadOnlyMemory<byte>(value.Select(a => a ? (byte)0xff : (byte)0).ToArray());
+                mAddress.Data = value.Span.BoolToByte();
                 ModbusRequest(mAddress, false, cancellationToken);
                 return OperResult.Success;
             }
@@ -378,9 +396,10 @@ public class ModbusSlave : DeviceBase, IModbusAddress
                     var readData = ModbusRequest(mAddress, true, cancellationToken);
                     if (!readData.IsSuccess) return readData;
                     var writeData = TouchSocketBitConverter.BigEndian.To<ushort>(readData.Content.Span);
+                    var span = value.Span;
                     for (int i = 0; i < value.Length; i++)
                     {
-                        writeData = writeData.SetBit(mAddress.BitIndex.Value + i, value[i]);
+                        writeData = writeData.SetBit(mAddress.BitIndex.Value + i, span[i]);
                     }
                     mAddress.Data = ThingsGatewayBitConverter.GetBytes(writeData);
                     ModbusRequest(mAddress, false, cancellationToken);
@@ -442,44 +461,44 @@ public class ModbusSlave : DeviceBase, IModbusAddress
             var data = ModbusRequest(modbusRequest, true);
             if (data.IsSuccess)
             {
-                ValueByteBlock valueByteBlock = new(1024);
+                ValueByteBlock byteBlock = new(1024);
                 try
                 {
                     if (modbusRtu)
                     {
-                        valueByteBlock.Write(Bytes.Slice(0, 2).Span);
+                        byteBlock.Write(Bytes.Slice(0, 2).Span);
                         if (modbusRequest.IsBitFunction)
                         {
-                            var bitdata = data.Content.ToArray().Select(m => m > 0).ToArray().BoolArrayToByte();
-                            ReadOnlyMemory<byte> bitwritedata = bitdata.Length == (int)Math.Ceiling(modbusRequest.Length / 8.0) ? new ReadOnlyMemory<byte>(bitdata) : new ReadOnlyMemory<byte>(bitdata).Slice(0, (int)Math.Ceiling(modbusRequest.Length / 8.0));
-                            valueByteBlock.WriteByte((byte)bitwritedata.Length);
-                            valueByteBlock.Write(bitwritedata.Span);
+                            var bitdata = data.Content.Span.ByteToBool().AsSpan().BoolArrayToByte();
+                            ReadOnlyMemory<byte> bitwritedata = bitdata.Length == (int)Math.Ceiling(modbusRequest.Length / 8.0) ? bitdata.AsMemory() : bitdata.AsMemory().Slice(0, (int)Math.Ceiling(modbusRequest.Length / 8.0));
+                            WriterExtension.WriteValue(ref byteBlock, (byte)bitwritedata.Length);
+                            byteBlock.Write(bitwritedata.Span);
                         }
                         else
                         {
-                            valueByteBlock.WriteByte((byte)data.Content.Length);
-                            valueByteBlock.Write(data.Content.Span);
+                            WriterExtension.WriteValue(ref byteBlock, (byte)data.Content.Length);
+                            byteBlock.Write(data.Content.Span);
                         }
-                        valueByteBlock.Write(CRC16Utils.Crc16Only(valueByteBlock.Memory.Span));
-                        await ReturnData(client, valueByteBlock.Memory, e).ConfigureAwait(false);
+                        byteBlock.Write(CRC16Utils.Crc16Only(byteBlock.Memory.Span));
+                        await ReturnData(client, byteBlock.Memory, e).ConfigureAwait(false);
                     }
                     else
                     {
-                        valueByteBlock.Write(Bytes.Slice(0, 8).Span);
+                        byteBlock.Write(Bytes.Slice(0, 8).Span);
                         if (modbusRequest.IsBitFunction)
                         {
-                            var bitdata = data.Content.ToArray().Select(m => m > 0).ToArray().BoolArrayToByte();
-                            ReadOnlyMemory<byte> bitwritedata = bitdata.Length == (int)Math.Ceiling(modbusRequest.Length / 8.0) ? new ReadOnlyMemory<byte>(bitdata) : new ReadOnlyMemory<byte>(bitdata).Slice(0, (int)Math.Ceiling(modbusRequest.Length / 8.0));
-                            valueByteBlock.WriteByte((byte)bitwritedata.Length);
-                            valueByteBlock.Write(bitwritedata.Span);
+                            var bitdata = data.Content.Span.ByteToBool().AsSpan().BoolArrayToByte();
+                            ReadOnlyMemory<byte> bitwritedata = bitdata.Length == (int)Math.Ceiling(modbusRequest.Length / 8.0) ? bitdata.AsMemory() : bitdata.AsMemory().Slice(0, (int)Math.Ceiling(modbusRequest.Length / 8.0));
+                            WriterExtension.WriteValue(ref byteBlock, (byte)bitwritedata.Length);
+                            byteBlock.Write(bitwritedata.Span);
                         }
                         else
                         {
-                            valueByteBlock.WriteByte((byte)data.Content.Length);
-                            valueByteBlock.Write(data.Content.Span);
+                            WriterExtension.WriteValue(ref byteBlock, (byte)data.Content.Length);
+                            byteBlock.Write(data.Content.Span);
                         }
-                        valueByteBlock[5] = (byte)(valueByteBlock.Length - 6);
-                        await ReturnData(client, valueByteBlock.Memory, e).ConfigureAwait(false);
+                        ByteBlockExtension.WriteBackValue(ref byteBlock, (byte)(byteBlock.Length - 6), 5);
+                        await ReturnData(client, byteBlock.Memory, e).ConfigureAwait(false);
                     }
                 }
                 catch
@@ -488,7 +507,7 @@ public class ModbusSlave : DeviceBase, IModbusAddress
                 }
                 finally
                 {
-                    valueByteBlock.SafeDispose();
+                    byteBlock.SafeDispose();
                 }
             }
             else
@@ -585,56 +604,56 @@ public class ModbusSlave : DeviceBase, IModbusAddress
         if (client is IUdpClientSender udpClientSender)
             await udpClientSender.SendAsync(((UdpReceivedDataEventArgs)e).EndPoint, sendData).ConfigureAwait(false);
         else
-            await client.SendAsync(sendData).ConfigureAwait(false);
+            await client.SendAsync(sendData, client.ClosedToken).ConfigureAwait(false);
     }
 
     private async Task WriteError(bool modbusRtu, IClientChannel client, ReadOnlyMemory<byte> bytes, ReceivedDataEventArgs e)
     {
-        ValueByteBlock valueByteBlock = new(20);
+        ValueByteBlock byteBlock = new(20);
         try
         {
             if (modbusRtu)
             {
-                valueByteBlock.Write(bytes.Slice(0, 2).Span);
-                valueByteBlock.WriteByte(1);
-                valueByteBlock.Write(CRC16Utils.Crc16Only(valueByteBlock.Span));
-                valueByteBlock[1] = (byte)(valueByteBlock[1] + 128);
+                byteBlock.Write(bytes.Slice(0, 2).Span);
+                WriterExtension.WriteValue(ref byteBlock, (byte)1);
+                byteBlock.Write(CRC16Utils.Crc16Only(byteBlock.Span));
+                ByteBlockExtension.WriteBackValue(ref byteBlock, (byte)(byteBlock.Span[1] + 128), 1);
             }
             else
             {
-                valueByteBlock.Write(bytes.Slice(0, 8).Span);
-                valueByteBlock.WriteByte(1);
-                valueByteBlock[5] = (byte)(valueByteBlock.Length - 6);
-                valueByteBlock[7] = (byte)(valueByteBlock[7] + 128);
+                byteBlock.Write(bytes.Slice(0, 8).Span);
+                WriterExtension.WriteValue(ref byteBlock, (byte)1);
+                ByteBlockExtension.WriteBackValue(ref byteBlock, (byte)(byteBlock.Length - 6), 5);
+                ByteBlockExtension.WriteBackValue(ref byteBlock, (byte)(byteBlock.Span[7] + 128), 7);
             }
-            await ReturnData(client, valueByteBlock.Memory, e).ConfigureAwait(false);
+            await ReturnData(client, byteBlock.Memory, e).ConfigureAwait(false);
         }
         finally
         {
-            valueByteBlock.SafeDispose();
+            byteBlock.SafeDispose();
         }
     }
 
     private async Task WriteSuccess(bool modbusRtu, IClientChannel client, ReadOnlyMemory<byte> bytes, ReceivedDataEventArgs e)
     {
-        ValueByteBlock valueByteBlock = new(20);
+        ValueByteBlock byteBlock = new(20);
         try
         {
             if (modbusRtu)
             {
-                valueByteBlock.Write(bytes.Slice(0, 6).Span);
-                valueByteBlock.Write(CRC16Utils.Crc16Only(valueByteBlock.Span));
+                byteBlock.Write(bytes.Slice(0, 6).Span);
+                byteBlock.Write(CRC16Utils.Crc16Only(byteBlock.Span));
             }
             else
             {
-                valueByteBlock.Write(bytes.Slice(0, 12).Span);
-                valueByteBlock[5] = (byte)(valueByteBlock.Length - 6);
+                byteBlock.Write(bytes.Slice(0, 12).Span);
+                ByteBlockExtension.WriteBackValue(ref byteBlock, (byte)(byteBlock.Length - 6), 5);
             }
-            await ReturnData(client, valueByteBlock.Memory, e).ConfigureAwait(false);
+            await ReturnData(client, byteBlock.Memory, e).ConfigureAwait(false);
         }
         finally
         {
-            valueByteBlock.SafeDispose();
+            byteBlock.SafeDispose();
         }
     }
 

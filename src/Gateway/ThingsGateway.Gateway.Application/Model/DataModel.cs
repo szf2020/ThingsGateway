@@ -68,6 +68,12 @@ public class DeviceBasicData
     [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
     [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
     public string Remark5 { get; set; }
+
+    /// <inheritdoc cref="BaseDataEntity.CreateOrgId"/>
+    [JsonProperty(NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling = DefaultValueHandling.Ignore)]
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
+    public long CreateOrgId { get; set; }
+
 }
 
 /// <summary>
@@ -77,7 +83,6 @@ public class VariableBasicData
 {
     /// <inheritdoc cref="PrimaryIdEntity.Id"/>
     public long Id { get; set; }
-
     /// <inheritdoc cref="Variable.Name"/>
     public string Name { get; set; }
 
@@ -177,4 +182,10 @@ public class VariableBasicData
     [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
     [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
     public string Remark5 { get; set; }
+
+    /// <inheritdoc cref="BaseDataEntity.CreateOrgId"/>
+    [JsonProperty(NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling = DefaultValueHandling.Ignore)]
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
+    public long CreateOrgId { get; set; }
+
 }

@@ -96,7 +96,7 @@ internal sealed class RedundancyTask : IRpcDriver, IAsyncDisposable
                         {
                             // 将 GlobalData.CollectDevices 和 GlobalData.Variables 同步到从站
                             await item.GetDmtpRpcActor().InvokeAsync(
-                                             nameof(ReverseCallbackServer.UpData), null, waitInvoke, deviceDataWithValues.AdaptListDeviceDataWithValue()).ConfigureAwait(false);
+                                             nameof(RedundantRpcServer.UpData), null, waitInvoke, deviceDataWithValues.AdaptListDeviceDataWithValue()).ConfigureAwait(false);
                         }
                         LogMessage?.LogTrace($"{item.GetIPPort()} Update StandbyStation data success");
                     }
@@ -336,7 +336,7 @@ internal sealed class RedundancyTask : IRpcDriver, IAsyncDisposable
                .ConfigureContainer(a =>
                {
                    a.AddLogger(LogMessage);
-                   a.AddRpcStore(store => store.RegisterServer(new ReverseCallbackServer(this)));
+                   a.AddRpcStore(store => store.RegisterServer(new RedundantRpcServer(this)));
                })
                .ConfigurePlugins(a =>
                {
@@ -365,7 +365,7 @@ internal sealed class RedundancyTask : IRpcDriver, IAsyncDisposable
                .ConfigureContainer(a =>
                {
                    a.AddLogger(LogMessage);
-                   a.AddRpcStore(store => store.RegisterServer(new ReverseCallbackServer(this)));
+                   a.AddRpcStore(store => store.RegisterServer(new RedundantRpcServer(this)));
                })
                .ConfigurePlugins(a =>
                {
@@ -470,7 +470,7 @@ internal sealed class RedundancyTask : IRpcDriver, IAsyncDisposable
                 if (variableBatch.Count >= maxBatchSize)
                 {
                     // 发送一批
-                    await client.GetDmtpRpcActor().InvokeAsync(nameof(ReverseCallbackServer.SyncData), null, invokeOption, channelBatch.ToList(), deviceBatch.ToList(), variableBatch).ConfigureAwait(false);
+                    await client.GetDmtpRpcActor().InvokeAsync(nameof(RedundantRpcServer.SyncData), null, invokeOption, channelBatch.ToList(), deviceBatch.ToList(), variableBatch).ConfigureAwait(false);
 
                     variableBatch.Clear();
                     channelBatch.Remove(channel);
@@ -482,7 +482,7 @@ internal sealed class RedundancyTask : IRpcDriver, IAsyncDisposable
         // 发送最后剩余的一批
         if (variableBatch.Count > 0)
         {
-            await client.GetDmtpRpcActor().InvokeAsync(nameof(ReverseCallbackServer.SyncData), null, invokeOption, channelBatch.ToList(), deviceBatch.ToList(), variableBatch).ConfigureAwait(false);
+            await client.GetDmtpRpcActor().InvokeAsync(nameof(RedundantRpcServer.SyncData), null, invokeOption, channelBatch.ToList(), deviceBatch.ToList(), variableBatch).ConfigureAwait(false);
         }
 
         LogMessage?.LogTrace($"ForcedSync data success");
@@ -566,7 +566,7 @@ internal sealed class RedundancyTask : IRpcDriver, IAsyncDisposable
     {
         return await _tcpDmtpClient.GetDmtpRpcActor()
             .InvokeTAsync<Dictionary<string, Dictionary<string, OperResult<object>>>>(
-                nameof(ReverseCallbackServer.Rpc), invokeOption, deviceDatas)
+                nameof(RedundantRpcServer.Rpc), invokeOption, deviceDatas)
             .ConfigureAwait(false);
     }
     private async Task InvokeRpcServerAsync(
@@ -607,7 +607,7 @@ internal sealed class RedundancyTask : IRpcDriver, IAsyncDisposable
             try
             {
                 var data = await client.GetDmtpRpcActor().InvokeTAsync<Dictionary<string, Dictionary<string, OperResult<object>>>>(
-                    nameof(ReverseCallbackServer.Rpc), invokeOption, variableDatas)
+                    nameof(RedundantRpcServer.Rpc), invokeOption, variableDatas)
                     .ConfigureAwait(false);
 
                 dataResult.AddRange(data);

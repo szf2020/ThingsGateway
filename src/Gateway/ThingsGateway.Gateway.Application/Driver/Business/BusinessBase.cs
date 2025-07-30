@@ -104,6 +104,8 @@ public abstract class BusinessBase : DriverBase
     {
         cancellationToken.ThrowIfCancellationRequested();
 
+        LogMessage?.LogInformation("Get business tasks");
+
         var setDeviceStatusTask = new ScheduledSyncTask(3000, SetDeviceStatus, null, LogMessage, cancellationToken);
 
         var executeTask = ScheduledTaskHelper.GetTask(CurrentDevice.IntervalTime, ProtectedExecuteAsync, null, LogMessage, cancellationToken);

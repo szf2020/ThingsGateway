@@ -52,7 +52,7 @@ public class ModbusRtuMessage : MessageBase, IResultMessage
         else if (f == 5 || f == 6)
         {
             byteBlock.Position = HeaderLength - 1;
-            Response.StartAddress = byteBlock.ReadUInt16(EndianType.Big);
+            Response.StartAddress = ReaderExtension.ReadValue<TByteBlock, ushort>(ref byteBlock, EndianType.Big);
             OperCode = 0;
             Content = byteBlock.ToArrayTake(BodyLength - 4);
             Response.Data = Content;
@@ -61,8 +61,8 @@ public class ModbusRtuMessage : MessageBase, IResultMessage
         else if (f == 15 || f == 16)
         {
             byteBlock.Position = HeaderLength - 1;
-            Response.StartAddress = byteBlock.ReadUInt16(EndianType.Big);
-            Response.Length = byteBlock.ReadUInt16(EndianType.Big);
+            Response.StartAddress = ReaderExtension.ReadValue<TByteBlock, ushort>(ref byteBlock, EndianType.Big);
+            Response.Length = ReaderExtension.ReadValue<TByteBlock, ushort>(ref byteBlock, EndianType.Big);
             OperCode = 0;
             Content = Array.Empty<byte>();
             crcLen = 6;
@@ -78,8 +78,8 @@ public class ModbusRtuMessage : MessageBase, IResultMessage
             var crc = CRC16Utils.Crc16Only(byteBlock.Span.Slice(pos, crcLen));
 
             //Crc
-            var checkCrc = byteBlock.Span.Slice(pos + crcLen, 2).ToArray();
-            if (crc.SequenceEqual(checkCrc))
+            var checkCrc = byteBlock.Span.Slice(pos + crcLen, 2);
+            if (checkCrc.SequenceEqual(crc))
             {
                 //验证发送/返回站号与功能码
                 //站号验证
@@ -108,9 +108,9 @@ public class ModbusRtuMessage : MessageBase, IResultMessage
 
     public override bool CheckHead<TByteBlock>(ref TByteBlock byteBlock)
     {
-        Response.Station = byteBlock.ReadByte();
+        Response.Station = ReaderExtension.ReadValue<TByteBlock, byte>(ref byteBlock);
         bool error = false;
-        var code = byteBlock.ReadByte();
+        var code = ReaderExtension.ReadValue<TByteBlock, byte>(ref byteBlock);
         if ((code & 0x80) == 0)
         {
             Response.FunctionCode = code;
@@ -124,7 +124,7 @@ public class ModbusRtuMessage : MessageBase, IResultMessage
 
         if (error)
         {
-            Response.ErrorCode = byteBlock.ReadByte();
+            Response.ErrorCode = ReaderExtension.ReadValue<TByteBlock, byte>(ref byteBlock);
             OperCode = 999;
             ErrorMessage = ModbusHelper.GetDescriptionByErrorCode(Response.ErrorCode.Value);
             ErrorType = ErrorTypeEnum.DeviceError;
@@ -148,7 +148,7 @@ public class ModbusRtuMessage : MessageBase, IResultMessage
             }
             else if (f <= 4)
             {
-                Response.Length = byteBlock.ReadByte();
+                Response.Length = ReaderExtension.ReadValue<TByteBlock, byte>(ref byteBlock);
                 BodyLength = Response.Length + 2; //数据区+crc
                 return true;
             }

@@ -30,7 +30,8 @@
 		<ProjectReference Include="..\PluginPro\ThingsGateway.Plugin.Inovance\ThingsGateway.Plugin.Inovance.csproj" />
 		
 		<ProjectReference Include="..\PluginPro\ThingsGateway.Plugin.ModbusGY\ThingsGateway.Plugin.ModbusGY.csproj" />
-		
+		<ProjectReference Include="..\PluginPro\ThingsGateway.Plugin.IXCom29s\ThingsGateway.Plugin.IXCom29s.csproj" />
+
 	</ItemGroup>
 
 

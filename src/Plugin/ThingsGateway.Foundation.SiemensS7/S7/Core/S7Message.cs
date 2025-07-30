@@ -28,25 +28,25 @@ public class S7Message : MessageBase, IResultMessage
     public override bool CheckHead<TByteBlock>(ref TByteBlock byteBlock)
     {
         byteBlock.Position += 2;
-        BodyLength = byteBlock.ReadUInt16(EndianType.Big) - 4;
+        BodyLength = ReaderExtension.ReadValue<TByteBlock, ushort>(ref byteBlock, EndianType.Big) - 4;
         return true;
     }
     public override FilterResult CheckBody<TByteBlock>(ref TByteBlock byteBlock)
     {
         var pos = byteBlock.Position;
-
-        if (byteBlock[pos + 1] == 0xD0) // 首次握手0XD0连接确认
+        var span = byteBlock.Span;
+        if (span[pos + 1] == 0xD0) // 首次握手0XD0连接确认
         {
             OperCode = 0;
             return FilterResult.Success;
         }
-        else if (byteBlock[pos + 15] == 0xF0) // PDU
+        else if (span[pos + 15] == 0xF0) // PDU
         {
             // 其余情况判断错误代码
-            if (byteBlock[pos + 13] + byteBlock[pos + 14] > 0) // 如果错误代码不为0
+            if (span[pos + 13] + span[pos + 14] > 0) // 如果错误代码不为0
             {
                 OperCode = 999;
-                ErrorMessage = string.Format(AppResource.ReturnError, byteBlock[pos + 13].ToString("X2"), byteBlock[pos + 14].ToString("X2"));
+                ErrorMessage = string.Format(AppResource.ReturnError, span[pos + 13].ToString("X2"), span[pos + 14].ToString("X2"));
                 return FilterResult.Success;
             }
             else
@@ -58,22 +58,22 @@ public class S7Message : MessageBase, IResultMessage
         }
 
         //分bit/byte解析
-        else if (byteBlock[pos + 15] == 0x04) // Read
+        else if (span[pos + 15] == 0x04) // Read
         {
             byteBlock.Position = pos + 7;
-            var sign = byteBlock.ReadUInt16(EndianType.Big);//数据ID标识
+            var sign = ReaderExtension.ReadValue<TByteBlock, ushort>(ref byteBlock, EndianType.Big);//数据ID标识
             Sign = sign;
             byteBlock.Position = pos;
 
-            int length = byteBlock[pos + 17];
-            int itemLen = byteBlock[pos + 16];
+            int length = span[pos + 17];
+            int itemLen = span[pos + 16];
 
             //添加错误代码校验
             // 其余情况判断错误代码
-            if (byteBlock[pos + 13] + byteBlock[pos + 14] > 0) // 如果错误代码不为0
+            if (span[pos + 13] + span[pos + 14] > 0) // 如果错误代码不为0
             {
                 OperCode = 999;
-                ErrorMessage = string.Format(AppResource.ReturnError, byteBlock[pos + 13].ToString("X2"), byteBlock[pos + 14].ToString("X2"));
+                ErrorMessage = string.Format(AppResource.ReturnError, span[pos + 13].ToString("X2"), span[pos + 14].ToString("X2"));
                 return FilterResult.Success;
             }
             else
@@ -84,10 +84,10 @@ public class S7Message : MessageBase, IResultMessage
                     ErrorMessage = AppResource.DataLengthError;
                     return FilterResult.Success;
                 }
-                if (byteBlock[pos + 17] != byte.MaxValue)
+                if (span[pos + 17] != byte.MaxValue)
                 {
                     OperCode = 999;
-                    ErrorMessage = string.Format(AppResource.ValidateDataError, byteBlock[pos + 17], SiemensHelper.GetCpuError(byteBlock[pos + 17]));
+                    ErrorMessage = string.Format(AppResource.ValidateDataError, span[pos + 17], SiemensHelper.GetCpuError(span[pos + 17]));
                     return FilterResult.Success;
                 }
 
@@ -95,24 +95,24 @@ public class S7Message : MessageBase, IResultMessage
                 var dataIndex = pos + 17;
                 for (int index = 0; index < itemLen; index++)
                 {
-                    if (byteBlock[dataIndex] != byte.MaxValue)
+                    if (span[dataIndex] != byte.MaxValue)
                     {
                         OperCode = 999;
-                        ErrorMessage = string.Format(AppResource.ValidateDataError, byteBlock[dataIndex], SiemensHelper.GetCpuError(byteBlock[dataIndex]));
+                        ErrorMessage = string.Format(AppResource.ValidateDataError, span[dataIndex], SiemensHelper.GetCpuError(span[dataIndex]));
                         return FilterResult.Success;
                     }
 
-                    if (byteBlock[dataIndex + 1] == 4)//Bit:3;Byte:4;Counter或者Timer:9
+                    if (span[dataIndex + 1] == 4)//Bit:3;Byte:4;Counter或者Timer:9
                     {
                         byteBlock.Position = dataIndex + 2;
-                        var byteLength = byteBlock.ReadUInt16(EndianType.Big) / 8;
-                        data.Write(byteBlock.Span.Slice(dataIndex + 4, byteLength));
+                        var byteLength = ReaderExtension.ReadValue<TByteBlock, ushort>(ref byteBlock, EndianType.Big) / 8;
+                        data.Write(span.Slice(dataIndex + 4, byteLength));
                         dataIndex += byteLength + 4;
                     }
-                    else if (byteBlock[dataIndex + 1] == 9)//Counter或者Timer:9
+                    else if (span[dataIndex + 1] == 9)//Counter或者Timer:9
                     {
                         byteBlock.Position = dataIndex + 2;
-                        var byteLength = byteBlock.ReadUInt16(EndianType.Big);
+                        var byteLength = ReaderExtension.ReadValue<TByteBlock, ushort>(ref byteBlock, EndianType.Big);
                         if (byteLength % 3 == 0)
                         {
                             for (int indexCT = 0; indexCT < byteLength / 3; indexCT++)
@@ -136,17 +136,17 @@ public class S7Message : MessageBase, IResultMessage
                 return FilterResult.Success;
             }
         }
-        else if (byteBlock[pos + 15] == 0x05) // Write
+        else if (span[pos + 15] == 0x05) // Write
         {
             byteBlock.Position = pos + 7;
-            var sign = byteBlock.ReadUInt16(EndianType.Big);//数据ID标识
+            var sign = ReaderExtension.ReadValue<TByteBlock, ushort>(ref byteBlock, EndianType.Big);//数据ID标识
             Sign = sign;
             byteBlock.Position = pos;
-            int itemLen = byteBlock[pos + 16];
-            if (byteBlock[pos + 13] + byteBlock[pos + 14] > 0) // 如果错误代码不为0
+            int itemLen = span[pos + 16];
+            if (span[pos + 13] + span[pos + 14] > 0) // 如果错误代码不为0
             {
                 OperCode = 999;
-                ErrorMessage = string.Format(AppResource.ReturnError, byteBlock[pos + 13].ToString("X2"), byteBlock[pos + 14].ToString("X2"));
+                ErrorMessage = string.Format(AppResource.ReturnError, span[pos + 13].ToString("X2"), span[pos + 14].ToString("X2"));
                 return FilterResult.Success;
             }
             if (byteBlock.Length < pos + 18)
@@ -157,10 +157,10 @@ public class S7Message : MessageBase, IResultMessage
             }
             for (int i = 0; i < itemLen; i++)
             {
-                if (byteBlock[pos + 17 + i] != byte.MaxValue)
+                if (span[pos + 17 + i] != byte.MaxValue)
                 {
                     OperCode = 999;
-                    ErrorMessage = string.Format(AppResource.ValidateDataError, byteBlock[pos + 17 + i], SiemensHelper.GetCpuError(byteBlock[pos + 17 + i]));
+                    ErrorMessage = string.Format(AppResource.ValidateDataError, span[pos + 17 + i], SiemensHelper.GetCpuError(span[pos + 17 + i]));
                     return FilterResult.Success;
                 }
             }

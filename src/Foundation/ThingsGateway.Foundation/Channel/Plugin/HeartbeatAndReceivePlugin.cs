@@ -1,4 +1,4 @@
-﻿//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 //  此代码版权声明为全文件覆盖，如有原作者特别声明，会在下方手动补充
 //  此代码版权（除特别声明外的代码）归作者本人Diego所有
 //  源代码使用协议遵循本仓库的开源协议及附加协议
@@ -15,7 +15,7 @@ using ThingsGateway.Foundation.Extension.String;
 namespace ThingsGateway.Foundation;
 
 [PluginOption(Singleton = true)]
-internal sealed class HeartbeatAndReceivePlugin : PluginBase, ITcpConnectedPlugin, ITcpReceivingPlugin, ITcpClosingPlugin
+internal sealed class HeartbeatAndReceivePlugin : PluginBase, ITcpConnectedPlugin, ITcpReceivingPlugin, ITcpClosedPlugin
 {
     public string DtuId
     {
@@ -27,13 +27,13 @@ internal sealed class HeartbeatAndReceivePlugin : PluginBase, ITcpConnectedPlugi
         {
             _dtuId = value;
             if (!dtuIdHex)
-                DtuIdByte = new ArraySegment<byte>(Encoding.UTF8.GetBytes(_dtuId ?? string.Empty));
+                DtuIdByte = (Encoding.UTF8.GetBytes(_dtuId ?? string.Empty));
             else
-                DtuIdByte = new ArraySegment<byte>(_dtuId?.HexStringToBytes() ?? Array.Empty<byte>());
+                DtuIdByte = (_dtuId?.HexStringToBytes() ?? Array.Empty<byte>());
         }
     }
     private string _dtuId;
-    private ArraySegment<byte> DtuIdByte;
+    private Memory<byte> DtuIdByte;
 
     /// <summary>
     /// 心跳字符串
@@ -48,13 +48,13 @@ internal sealed class HeartbeatAndReceivePlugin : PluginBase, ITcpConnectedPlugi
         {
             _heartbeat = value;
             if (!heartbeatHex)
-                HeartbeatByte = new ArraySegment<byte>(Encoding.UTF8.GetBytes(_heartbeat ?? string.Empty));
+                HeartbeatByte = (Encoding.UTF8.GetBytes(_heartbeat ?? string.Empty));
             else
-                HeartbeatByte = new ArraySegment<byte>(_heartbeat?.HexStringToBytes() ?? Array.Empty<byte>());
+                HeartbeatByte = (_heartbeat?.HexStringToBytes() ?? Array.Empty<byte>());
         }
     }
     private string _heartbeat;
-    private ArraySegment<byte> HeartbeatByte;
+    private Memory<byte> HeartbeatByte;
 
 
 
@@ -73,12 +73,12 @@ internal sealed class HeartbeatAndReceivePlugin : PluginBase, ITcpConnectedPlugi
             heartbeatHex = value;
             if (!heartbeatHex)
             {
-                HeartbeatByte = new ArraySegment<byte>(Encoding.UTF8.GetBytes(_heartbeat ?? string.Empty));
+                HeartbeatByte = (Encoding.UTF8.GetBytes(_heartbeat ?? string.Empty));
 
             }
             else
             {
-                HeartbeatByte = new ArraySegment<byte>(_heartbeat?.HexStringToBytes() ?? Array.Empty<byte>());
+                HeartbeatByte = (_heartbeat?.HexStringToBytes() ?? Array.Empty<byte>());
 
             }
         }
@@ -95,12 +95,12 @@ internal sealed class HeartbeatAndReceivePlugin : PluginBase, ITcpConnectedPlugi
             dtuIdHex = value;
             if (!dtuIdHex)
             {
-                DtuIdByte = new ArraySegment<byte>(Encoding.UTF8.GetBytes(_dtuId ?? string.Empty));
+                DtuIdByte = (Encoding.UTF8.GetBytes(_dtuId ?? string.Empty));
 
             }
             else
             {
-                DtuIdByte = new ArraySegment<byte>(_dtuId?.HexStringToBytes() ?? Array.Empty<byte>());
+                DtuIdByte = (_dtuId?.HexStringToBytes() ?? Array.Empty<byte>());
 
             }
         }
@@ -123,7 +123,7 @@ internal sealed class HeartbeatAndReceivePlugin : PluginBase, ITcpConnectedPlugi
 
         if (client is ITcpClient tcpClient)
         {
-            await tcpClient.SendAsync(DtuIdByte).ConfigureAwait(false);
+            await tcpClient.SendAsync(DtuIdByte, tcpClient.ClosedToken).ConfigureAwait(false);
 
             if (Task == null)
             {
@@ -145,7 +145,7 @@ internal sealed class HeartbeatAndReceivePlugin : PluginBase, ITcpConnectedPlugi
                                  await Task.Delay(200).ConfigureAwait(false);
                              }
 
-                             await tcpClient.SendAsync(HeartbeatByte).ConfigureAwait(false);
+                             await tcpClient.SendAsync(HeartbeatByte, tcpClient.ClosedToken).ConfigureAwait(false);
                              tcpClient.Logger?.Trace($"{tcpClient}- Heartbeat");
                              failedCount = 0;
                          }
@@ -178,10 +178,10 @@ internal sealed class HeartbeatAndReceivePlugin : PluginBase, ITcpConnectedPlugi
 
         if (client is ITcpClient tcpClient)
         {
-            var len = HeartbeatByte.Count;
+            var len = HeartbeatByte.Length;
             if (len > 0)
             {
-                if (HeartbeatByte.SequenceEqual(e.ByteBlock.AsSegment(0, len)))
+                if (HeartbeatByte.Span.SequenceEqual(e.ByteBlock.Memory.Slice(0, len).Span))
                 {
                     e.Handled = true;
                 }
@@ -190,7 +190,7 @@ internal sealed class HeartbeatAndReceivePlugin : PluginBase, ITcpConnectedPlugi
         }
     }
 
-    public Task OnTcpClosing(ITcpSession client, ClosingEventArgs e)
+    public Task OnTcpClosed(ITcpSession client, ClosedEventArgs e)
     {
         SendHeartbeat = false;
         return EasyTask.CompletedTask;

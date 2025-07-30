@@ -207,6 +207,8 @@ public abstract class CollectBase : DriverBase, IRpcDriver
     {
         var tasks = new List<IScheduledTask>();
 
+        LogMessage?.LogInformation("Get collect tasks");
+
         var setDeviceStatusTask = new ScheduledSyncTask(10000, SetDeviceStatus, null, LogMessage, cancellationToken);
         tasks.Add(setDeviceStatusTask);
 
@@ -398,7 +400,7 @@ public abstract class CollectBase : DriverBase, IRpcDriver
         {
             // 读取成功时记录日志并增加成功计数器
             if (LogMessage?.LogLevel <= TouchSocket.Core.LogLevel.Trace)
-                LogMessage?.Trace(string.Format("{0} - Collection [{1} - {2}] data succeeded {3}", DeviceName, variableSourceRead?.RegisterAddress, variableSourceRead?.Length, readResult.Content?.ToHexString(' ')));
+                LogMessage?.Trace(string.Format("{0} - Collection [{1} - {2}] data succeeded {3}", DeviceName, variableSourceRead?.RegisterAddress, variableSourceRead?.Length, readResult.Content.Span.ToHexString(' ')));
             CurrentDevice.SetDeviceStatus(TimerX.Now, null);
         }
         else
@@ -477,10 +479,11 @@ public abstract class CollectBase : DriverBase, IRpcDriver
     /// <summary>
     /// 采集驱动读取，读取成功后直接赋值变量
     /// </summary>
-    protected virtual ValueTask<OperResult<byte[]>> ReadSourceAsync(VariableSourceRead variableSourceRead, CancellationToken cancellationToken)
+    protected virtual ValueTask<OperResult<ReadOnlyMemory<byte>>> ReadSourceAsync(VariableSourceRead variableSourceRead, CancellationToken cancellationToken)
     {
-        return ValueTask.FromResult(new OperResult<byte[]>(new NotImplementedException()));
+        return ValueTask.FromResult(new OperResult<ReadOnlyMemory<byte>>(new NotImplementedException()));
     }
+
     /// <summary>
     /// 批量写入变量值,需返回变量名称/结果
     /// </summary>

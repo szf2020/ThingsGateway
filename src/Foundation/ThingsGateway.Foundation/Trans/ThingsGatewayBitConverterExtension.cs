@@ -1,4 +1,4 @@
-﻿//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 //  此代码版权声明为全文件覆盖，如有原作者特别声明，会在下方手动补充
 //  此代码版权（除特别声明外的代码）归作者本人Diego所有
 //  源代码使用协议遵循本仓库的开源协议及附加协议
@@ -26,9 +26,9 @@ public static class ThingsGatewayBitConverterExtension
     /// <summary>
     /// 根据数据类型获取字节数组
     /// </summary>
-    public static byte[] GetBytesFormData(this IThingsGatewayBitConverter byteConverter, JToken value, DataTypeEnum dataType, int arrayLength = 1)
+    public static ReadOnlyMemory<byte> GetBytesFormData(this IThingsGatewayBitConverter byteConverter, JToken value, DataTypeEnum dataType, bool array)
     {
-        if (arrayLength > 1)
+        if (array)
         {
             switch (dataType)
             {
@@ -62,16 +62,21 @@ public static class ThingsGatewayBitConverterExtension
                 case DataTypeEnum.Double:
                     return byteConverter.GetBytes(value.ToObject<Double[]>());
 
+                case DataTypeEnum.Decimal:
+                    return byteConverter.GetBytes(value.ToObject<Decimal[]>());
+
                 case DataTypeEnum.String:
-                default:
-                    List<byte> bytes = new();
+                    List<ReadOnlyMemory<byte>> bytes = new();
+
                     String[] strings = value.ToObject<String[]>();
-                    for (int i = 0; i < arrayLength; i++)
+                    for (int i = 0; i < strings.Length; i++)
                     {
                         var data = byteConverter.GetBytes(strings[i]);
-                        bytes.AddRange(data.ArrayExpandToLength(byteConverter.StringLength ?? data.Length));
+                        bytes.Add(data.ArrayExpandToLength(byteConverter.StringLength ?? data.Length));
                     }
-                    return bytes.ToArray();
+                    return bytes.CombineMemoryBlocks();
+                default:
+                    throw new(string.Format(ThingsGateway.Foundation.AppResource.DataTypeNotSupported, dataType));
             }
         }
         else
@@ -108,9 +113,14 @@ public static class ThingsGatewayBitConverterExtension
                 case DataTypeEnum.Double:
                     return byteConverter.GetBytes(value.ToObject<Double>());
 
+                case DataTypeEnum.Decimal:
+                    return byteConverter.GetBytes(value.ToObject<Decimal>());
+
                 case DataTypeEnum.String:
-                default:
                     return byteConverter.GetBytes(value.ToObject<String>());
+
+                default:
+                    throw new(string.Format(ThingsGateway.Foundation.AppResource.DataTypeNotSupported, dataType));
             }
         }
     }
@@ -122,7 +132,7 @@ public static class ThingsGatewayBitConverterExtension
         this IThingsGatewayBitConverter byteConverter,
         IDevice device,
         string address,
-        byte[] buffer,
+        ReadOnlySpan<byte> buffer,
         int index,
         DataTypeEnum dataType,
         int arrayLength,
@@ -370,7 +380,29 @@ public static class ThingsGatewayBitConverterExtension
                     result = newVal;
                     return true;
                 }
-
+            case DataTypeEnum.Decimal:
+                if (arrayLength > 1)
+                {
+                    var newVal = byteConverter.ToDecimal(buffer, index, arrayLength);
+                    if (oldValue is decimal[] oldArr && newVal.SequenceEqual(oldArr))
+                    {
+                        result = oldValue;
+                        return false;
+                    }
+                    result = newVal;
+                    return true;
+                }
+                else
+                {
+                    var newVal = byteConverter.ToDecimal(buffer, index);
+                    if (oldValue is decimal oldVal && oldVal == newVal)
+                    {
+                        result = oldValue;
+                        return false;
+                    }
+                    result = newVal;
+                    return true;
+                }
             case DataTypeEnum.String:
             default:
                 if (arrayLength > 1)

@@ -79,42 +79,16 @@ public class SiemensS7Master : CollectFoundationBase
     /// <param name="dataType"></param>
     /// <param name="value"></param>
     /// <returns></returns>
-    public byte[] GetBytes(DataTypeEnum dataType, JToken value)
+    public ReadOnlyMemory<byte> GetBytes(DataTypeEnum dataType, JToken value)
     {
         //排除字符串
-        if (value is JArray jArray)
+        if (value is JArray jArray && jArray.Count > 1)
         {
-            return dataType switch
-            {
-                DataTypeEnum.Boolean => jArray.ToObject<Boolean[]>().BoolArrayToByte(),
-                DataTypeEnum.Byte => jArray.ToObject<Byte[]>(),
-                DataTypeEnum.Int16 => _plc.ThingsGatewayBitConverter.GetBytes(jArray.ToObject<Int16[]>()),
-                DataTypeEnum.UInt16 => _plc.ThingsGatewayBitConverter.GetBytes(jArray.ToObject<UInt16[]>()),
-                DataTypeEnum.Int32 => _plc.ThingsGatewayBitConverter.GetBytes(jArray.ToObject<Int32[]>()),
-                DataTypeEnum.UInt32 => _plc.ThingsGatewayBitConverter.GetBytes(jArray.ToObject<UInt32[]>()),
-                DataTypeEnum.Int64 => _plc.ThingsGatewayBitConverter.GetBytes(jArray.ToObject<Int64[]>()),
-                DataTypeEnum.UInt64 => _plc.ThingsGatewayBitConverter.GetBytes(jArray.ToObject<UInt64[]>()),
-                DataTypeEnum.Single => _plc.ThingsGatewayBitConverter.GetBytes(jArray.ToObject<Single[]>()),
-                DataTypeEnum.Double => _plc.ThingsGatewayBitConverter.GetBytes(jArray.ToObject<Double[]>()),
-                _ => throw new(string.Format(ThingsGateway.Foundation.AppResource.DataTypeNotSupported, dataType)),
-            };
+            return this._plc.ThingsGatewayBitConverter.GetBytesFormData(value, dataType, true);
         }
         else
         {
-            return dataType switch
-            {
-                DataTypeEnum.Boolean => _plc.ThingsGatewayBitConverter.GetBytes(value.ToObject<Boolean>()),
-                DataTypeEnum.Byte => [value.ToObject<Byte>()],
-                DataTypeEnum.Int16 => _plc.ThingsGatewayBitConverter.GetBytes(value.ToObject<Int16>()),
-                DataTypeEnum.UInt16 => _plc.ThingsGatewayBitConverter.GetBytes(value.ToObject<UInt16>()),
-                DataTypeEnum.Int32 => _plc.ThingsGatewayBitConverter.GetBytes(value.ToObject<Int32>()),
-                DataTypeEnum.UInt32 => _plc.ThingsGatewayBitConverter.GetBytes(value.ToObject<UInt32>()),
-                DataTypeEnum.Int64 => _plc.ThingsGatewayBitConverter.GetBytes(value.ToObject<Int64>()),
-                DataTypeEnum.UInt64 => _plc.ThingsGatewayBitConverter.GetBytes(value.ToObject<UInt64>()),
-                DataTypeEnum.Single => _plc.ThingsGatewayBitConverter.GetBytes(value.ToObject<Single>()),
-                DataTypeEnum.Double => _plc.ThingsGatewayBitConverter.GetBytes(value.ToObject<Double>()),
-                _ => throw new(string.Format(ThingsGateway.Foundation.AppResource.DataTypeNotSupported, dataType)),
-            };
+            return this._plc.ThingsGatewayBitConverter.GetBytesFormData(value, dataType, false);
         }
     }
 
@@ -167,7 +141,7 @@ public class SiemensS7Master : CollectFoundationBase
             try
             {
                 // 调用协议的写入方法，将写入信息中的数据写入到对应的寄存器地址，并获取操作结果
-                var result = await FoundationDevice.WriteAsync(writeInfo.Key.RegisterAddress, writeInfo.Value, writeInfo.Key.DataType, cancellationToken).ConfigureAwait(false);
+                var result = await FoundationDevice.WriteJTokenAsync(writeInfo.Key.RegisterAddress, writeInfo.Value, writeInfo.Key.DataType, cancellationToken).ConfigureAwait(false);
 
                 // 将操作结果添加到结果字典中，使用变量名称作为键
                 operResults.TryAdd(writeInfo.Key.Name, result);

@@ -87,7 +87,7 @@ public abstract class DeviceComponentBase : ComponentBase, IDisposable
         {
             try
             {
-                var data = await Plc.ReadAsync(RegisterAddress, ArrayLength, DataType);
+                var data = await Plc.ReadArrayAsync(RegisterAddress, ArrayLength, DataType);
                 if (data.IsSuccess)
                 {
                     Plc.Logger?.LogInformation(data.Content.ToSystemTextJsonString());
@@ -111,7 +111,7 @@ public abstract class DeviceComponentBase : ComponentBase, IDisposable
         {
             try
             {
-                var data = await Plc.WriteAsync(RegisterAddress, WriteValue.GetJTokenFromString(), DataType);
+                var data = await Plc.WriteJTokenAsync(RegisterAddress, WriteValue.GetJTokenFromString(), DataType);
                 if (data.IsSuccess)
                 {
                     Plc.Logger?.LogInformation($" {WriteValue.GetJTokenFromString()} {Localizer["WriteSuccess"]}");

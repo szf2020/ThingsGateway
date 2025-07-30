@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------
 // 此代码版权声明为全文件覆盖，如有原作者特别声明，会在下方手动补充
 // 此代码版权（除特别声明外的代码）归作者本人Diego所有
 // 源代码使用协议遵循本仓库的开源协议及附加协议
@@ -33,6 +33,66 @@ public static class GenericExtensions
     }
 
     /// <summary>
+    /// 将一个数组进行扩充到指定长度，或是缩短到指定长度<br />
+    /// </summary>
+    public static Memory<T> ArrayExpandToLength<T>(this Memory<T> data, int length)
+    {
+        if (data.IsEmpty)
+        {
+            return Memory<T>.Empty;
+        }
+
+        if (data.Length == length)
+        {
+            return data;
+        }
+
+        var result = new T[length];
+        data.Slice(0, Math.Min(data.Length, length)).CopyTo(result);
+        return result;
+    }
+
+    /// <summary>
+    /// 将一个数组进行扩充到指定长度，或是缩短到指定长度<br />
+    /// </summary>
+    public static ReadOnlyMemory<T> ArrayExpandToLength<T>(this ReadOnlyMemory<T> data, int length)
+    {
+        if (data.IsEmpty)
+        {
+            return ReadOnlyMemory<T>.Empty;
+        }
+
+        if (data.Length == length)
+        {
+            return data;
+        }
+
+        var result = new T[length];
+        data.Slice(0, Math.Min(data.Length, length)).CopyTo(result);
+        return result;
+    }
+
+    /// <summary>
+    /// 将一个数组进行扩充到指定长度，或是缩短到指定长度<br />
+    /// </summary>
+    public static ReadOnlySpan<T> ArrayExpandToLength<T>(this ReadOnlySpan<T> data, int length)
+    {
+        if (data.IsEmpty)
+        {
+            return ReadOnlySpan<T>.Empty;
+        }
+
+        if (data.Length == length)
+        {
+            return data;
+        }
+
+        var result = new T[length];
+        data.Slice(0, Math.Min(data.Length, length)).CopyTo(result);
+        return result;
+    }
+
+    /// <summary>
     /// 将一个数组进行扩充到偶数长度<br />
     /// </summary>
     public static T[] ArrayExpandToLengthEven<T>(this T[] data)
@@ -44,11 +104,41 @@ public static class GenericExtensions
 
         return data.Length % 2 == 1 ? data.ArrayExpandToLength(data.Length + 1) : data;
     }
+    /// <summary>
+    /// 将一个数组进行扩充到偶数长度<br />
+    /// </summary>
+    public static ReadOnlyMemory<T> ArrayExpandToLengthEven<T>(this ReadOnlyMemory<T> data)
+    {
+        if (data.IsEmpty)
+        {
+            return Array.Empty<T>();
+        }
+
+        return data.Length % 2 == 1 ? data.ArrayExpandToLength(data.Length + 1) : data;
+    }
 
     /// <summary>
-    /// <inheritdoc cref="ArrayRemoveDouble{T}(T[], int, int)"/>
+    /// 将一个数组进行扩充到偶数长度<br />
     /// </summary>
-    public static T[] ArrayRemoveBegin<T>(T[] value, int length) => ArrayRemoveDouble(value, length, 0);
+    public static Memory<T> ArrayExpandToLengthEven<T>(this Memory<T> data)
+    {
+        if (data.IsEmpty)
+        {
+            return Array.Empty<T>();
+        }
+
+        return data.Length % 2 == 1 ? data.ArrayExpandToLength(data.Length + 1) : data;
+    }
+
+
+    public static T[] ArrayRemoveBegin<T>(this T[] value, int length) => ArrayRemoveDouble(value, length, 0);
+    public static T[] ArrayRemoveLast<T>(this T[] value, int length) => ArrayRemoveDouble(value, 0, length);
+
+    public static ReadOnlySpan<T> ArrayRemoveBegin<T>(ReadOnlySpan<T> value, int length) => ArrayRemoveDouble(value, length, 0);
+    public static ReadOnlySpan<T> ArrayRemoveLast<T>(ReadOnlySpan<T> value, int length) => ArrayRemoveDouble(value, 0, length);
+
+    public static ReadOnlyMemory<T> ArrayRemoveBegin<T>(ReadOnlyMemory<T> value, int length) => ArrayRemoveDouble(value, length, 0);
+    public static ReadOnlyMemory<T> ArrayRemoveLast<T>(ReadOnlyMemory<T> value, int length) => ArrayRemoveDouble(value, 0, length);
 
     /// <summary>
     /// 从数组中移除指定数量的元素，并返回新的数组
@@ -60,8 +150,20 @@ public static class GenericExtensions
     /// <returns>移除元素后的新数组</returns>
     public static T[] ArrayRemoveDouble<T>(T[] value, int leftLength, int rightLength)
     {
+        return ArrayRemoveDouble((ReadOnlySpan<T>)value, leftLength, rightLength).ToArray();
+    }
+    /// <summary>
+    /// 从数组中移除指定数量的元素，并返回新的数组
+    /// </summary>
+    /// <typeparam name="T">数组元素类型</typeparam>
+    /// <param name="value">要移除元素的数组</param>
+    /// <param name="leftLength">从左侧移除的元素个数</param>
+    /// <param name="rightLength">从右侧移除的元素个数</param>
+    /// <returns>移除元素后的新数组</returns>
+    public static ReadOnlySpan<T> ArrayRemoveDouble<T>(ReadOnlySpan<T> value, int leftLength, int rightLength)
+    {
         // 如果输入数组为空或者剩余长度不足以移除左右两侧指定的元素，则返回空数组
-        if (value == null || value.Length <= leftLength + rightLength)
+        if (value.IsEmpty || value.Length <= leftLength + rightLength)
         {
             return Array.Empty<T>();
         }
@@ -69,13 +171,28 @@ public static class GenericExtensions
         // 计算新数组的长度
         int newLength = value.Length - leftLength - rightLength;
 
-        // 创建新数组
-        T[] result = new T[newLength];
+        return value.Slice(leftLength, newLength);
+    }
+    /// <summary>
+    /// 从数组中移除指定数量的元素，并返回新的数组
+    /// </summary>
+    /// <typeparam name="T">数组元素类型</typeparam>
+    /// <param name="value">要移除元素的数组</param>
+    /// <param name="leftLength">从左侧移除的元素个数</param>
+    /// <param name="rightLength">从右侧移除的元素个数</param>
+    /// <returns>移除元素后的新数组</returns>
+    public static ReadOnlyMemory<T> ArrayRemoveDouble<T>(ReadOnlyMemory<T> value, int leftLength, int rightLength)
+    {
+        // 如果输入数组为空或者剩余长度不足以移除左右两侧指定的元素，则返回空数组
+        if (value.IsEmpty || value.Length <= leftLength + rightLength)
+        {
+            return Array.Empty<T>();
+        }
 
-        // 将剩余的元素复制到新数组中
-        Array.Copy(value, leftLength, result, 0, newLength);
+        // 计算新数组的长度
+        int newLength = value.Length - leftLength - rightLength;
 
-        return result;
+        return value.Slice(leftLength, newLength);
     }
 
     /// <summary>
@@ -120,7 +237,13 @@ public static class GenericExtensions
             yield return chunk;
         }
     }
-
+    public static IEnumerable<ReadOnlyMemory<T>> ChunkBetter<T>(this ReadOnlyMemory<T> span, int groupSize)
+    {
+        for (int i = 0; i < span.Length; i += groupSize)
+        {
+            yield return span.Slice(i, Math.Min(groupSize, span.Length - i));
+        }
+    }
 
     /// <summary>拷贝当前的实例数组，是基于引用层的浅拷贝，如果类型为值类型，那就是深度拷贝，如果类型为引用类型，就是浅拷贝</summary>
     public static T[] CopyArray<T>(this T[] value)
@@ -153,37 +276,7 @@ public static class GenericExtensions
         return arrayFromOneArray;
     }
 
-    /// <summary>
-    /// 将一个数组的前后移除指定位数，返回新的一个数组<br />
-    /// </summary>
-    public static T[] RemoveArray<T>(this T[] value, int leftLength, int rightLength)
-    {
-        if (value == null || value.Length == 0)
-        {
-            return Array.Empty<T>();
-        }
 
-        int newLength = value.Length - leftLength - rightLength;
-        if (newLength <= 0)
-        {
-            return Array.Empty<T>();
-        }
-
-        T[] result = new T[newLength];
-        Array.Copy(value, leftLength, result, 0, newLength);
-
-        return result;
-    }
-
-    /// <summary>
-    /// 将一个数组的前面指定位数移除，返回新的一个数组<br />
-    /// </summary>
-    public static T[] RemoveBegin<T>(this T[] value, int length) => value.RemoveArray(length, 0);
-
-    /// <summary>
-    /// 将一个数组的后面指定位数移除，返回新的一个数组<br />
-    /// </summary>
-    public static T[] RemoveLast<T>(this T[] value, int length) => value.RemoveArray(0, length);
 
     /// <summary>
     /// 选择数组中的最后几个元素组成新的数组
@@ -192,25 +285,7 @@ public static class GenericExtensions
     /// <param name="value">输入数组</param>
     /// <param name="length">选择的元素个数</param>
     /// <returns>由最后几个元素组成的新数组</returns>
-    public static T[] SelectLast<T>(this T[] value, int length)
-    {
-        // 如果输入数组为空，则返回空数组
-        if (value == null || value.Length == 0)
-        {
-            return Array.Empty<T>();
-        }
-
-        // 计算实际需要复制的元素个数，取输入数组长度和指定长度的较小值
-        int count = Math.Min(value.Length, length);
-
-        // 创建新数组来存储选择的元素
-        T[] result = new T[count];
-
-        // 复制最后几个元素到新数组中
-        Array.Copy(value, value.Length - count, result, 0, count);
-
-        return result;
-    }
+    public static T[] SelectLast<T>(this T[] value, int length) => ArrayRemoveBegin(value, value.Length - length);
 
     /// <summary>
     /// 从数组中获取指定索引开始的中间一段长度的子数组
@@ -220,23 +295,5 @@ public static class GenericExtensions
     /// <param name="index">起始索引</param>
     /// <param name="length">选择的元素个数</param>
     /// <returns>中间指定长度的子数组</returns>
-    public static T[] SelectMiddle<T>(this T[] value, int index, int length)
-    {
-        // 如果输入数组为空，则返回空数组
-        if (value == null || value.Length == 0)
-        {
-            return Array.Empty<T>();
-        }
-
-        // 计算实际需要复制的元素个数，取输入数组剩余元素和指定长度的较小值
-        int count = Math.Min(value.Length - index, length);
-
-        // 创建新数组来存储选择的元素
-        T[] result = new T[count];
-
-        // 复制中间指定长度的元素到新数组中
-        Array.Copy(value, index, result, 0, count);
-
-        return result;
-    }
+    public static T[] SelectMiddle<T>(this T[] value, int index, int length) => ArrayRemoveDouble(value, index, value.Length - index - length);
 }

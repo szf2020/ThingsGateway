@@ -1,4 +1,4 @@
-﻿//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 //  此代码版权声明为全文件覆盖，如有原作者特别声明，会在下方手动补充
 //  此代码版权（除特别声明外的代码）归作者本人Diego所有
 //  源代码使用协议遵循本仓库的开源协议及附加协议
@@ -31,13 +31,13 @@ public class DtuPlugin : PluginBase, ITcpReceivingPlugin
         {
             _heartbeat = value;
             if (!heartbeatHex)
-                HeartbeatByte = new ArraySegment<byte>(Encoding.UTF8.GetBytes(_heartbeat ?? string.Empty));
+                HeartbeatByte = (Encoding.UTF8.GetBytes(_heartbeat ?? string.Empty));
             else
-                HeartbeatByte = new ArraySegment<byte>(_heartbeat?.HexStringToBytes() ?? Array.Empty<byte>());
+                HeartbeatByte = (_heartbeat?.HexStringToBytes() ?? Array.Empty<byte>());
         }
     }
     private string _heartbeat;
-    private ArraySegment<byte> HeartbeatByte = new();
+    private Memory<byte> HeartbeatByte = new();
 
 
     private bool heartbeatHex;
@@ -51,9 +51,9 @@ public class DtuPlugin : PluginBase, ITcpReceivingPlugin
         {
             heartbeatHex = value;
             if (!heartbeatHex)
-                HeartbeatByte = new ArraySegment<byte>(Encoding.UTF8.GetBytes(_heartbeat ?? string.Empty));
+                HeartbeatByte = (Encoding.UTF8.GetBytes(_heartbeat ?? string.Empty));
             else
-                HeartbeatByte = new ArraySegment<byte>(_heartbeat?.HexStringToBytes() ?? Array.Empty<byte>());
+                HeartbeatByte = (_heartbeat?.HexStringToBytes() ?? Array.Empty<byte>());
         }
     }
     public bool DtuIdHex { get; set; }
@@ -61,7 +61,7 @@ public class DtuPlugin : PluginBase, ITcpReceivingPlugin
     /// <inheritdoc/>
     public async Task OnTcpReceiving(ITcpSession client, ByteBlockEventArgs e)
     {
-        var len = HeartbeatByte.Count;
+        var len = HeartbeatByte.Length;
         if (client is TcpSessionClientChannel socket && socket.Service is ITcpServiceChannel tcpServiceChannel)
         {
             if (!socket.Id.StartsWith("ID="))
@@ -71,7 +71,7 @@ public class DtuPlugin : PluginBase, ITcpReceivingPlugin
                 {
                     try
                     {
-                        await oldClient.ShutdownAsync(System.Net.Sockets.SocketShutdown.Both).ConfigureAwait(false);
+                        //await oldClient.ShutdownAsync(System.Net.Sockets.SocketShutdown.Both).ConfigureAwait(false);
                         await oldClient.CloseAsync().ConfigureAwait(false);
                         oldClient.Dispose();
                     }
@@ -88,7 +88,7 @@ public class DtuPlugin : PluginBase, ITcpReceivingPlugin
             {
                 try
                 {
-                    await socket.ShutdownAsync(System.Net.Sockets.SocketShutdown.Both).ConfigureAwait(false);
+                    //await socket.ShutdownAsync(System.Net.Sockets.SocketShutdown.Both).ConfigureAwait(false);
                     await socket.CloseAsync().ConfigureAwait(false);
                     socket.Dispose();
                 }
@@ -102,14 +102,14 @@ public class DtuPlugin : PluginBase, ITcpReceivingPlugin
 
             if (len > 0)
             {
-                if (HeartbeatByte.SequenceEqual(e.ByteBlock.AsSegment(0, len)))
+                if (HeartbeatByte.Span.SequenceEqual(e.ByteBlock.Memory.Slice(0, len).Span))
                 {
                     if (DateTimeOffset.Now - socket.LastSentTime < TimeSpan.FromMilliseconds(200))
                     {
                         await Task.Delay(200).ConfigureAwait(false);
                     }
                     //回应心跳包
-                    await socket.SendAsync(HeartbeatByte).ConfigureAwait(false);
+                    await socket.SendAsync(HeartbeatByte, socket.ClosedToken).ConfigureAwait(false);
                     e.Handled = true;
                     if (socket.Logger?.LogLevel <= LogLevel.Trace)
                         socket.Logger?.Trace($"{socket}- Heartbeat");

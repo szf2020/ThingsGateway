@@ -52,7 +52,7 @@ public class AsyncReadWriteLock
         {
             var resetEvent = _readerLock;
             _readerLock = new(false);
-            resetEvent.SafeDispose();
+            resetEvent.SetAll();
         }
     }
 

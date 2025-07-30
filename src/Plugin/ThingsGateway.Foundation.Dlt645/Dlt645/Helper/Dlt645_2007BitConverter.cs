@@ -10,6 +10,8 @@
 
 using System.Text;
 
+using ThingsGateway.NewLife.Extension;
+
 using TouchSocket.Core;
 
 namespace ThingsGateway.Foundation.Dlt645;
@@ -33,46 +35,48 @@ public class Dlt645_2007BitConverter : ThingsGatewayBitConverter
     /// <param name="buffer">带数据项标识</param>
     /// <param name="offset"></param>
     /// <returns></returns>
-    public override double ToDouble(byte[] buffer, int offset)
+    public override double ToDouble(ReadOnlySpan<byte> buffer, int offset)
     {
         return Convert.ToDouble(ToString(buffer, offset, buffer.Length));
     }
 
+
     /// <inheritdoc/>
-    public override short ToInt16(byte[] buffer, int offset)
+    public override short ToInt16(ReadOnlySpan<byte> buffer, int offset)
     {
         return Convert.ToInt16(ToString(buffer, offset, buffer.Length));
     }
 
     /// <inheritdoc/>
-    public override int ToInt32(byte[] buffer, int offset)
+    public override int ToInt32(ReadOnlySpan<byte> buffer, int offset)
     {
         return Convert.ToInt32(ToString(buffer, offset, buffer.Length));
     }
 
     /// <inheritdoc/>
-    public override long ToInt64(byte[] buffer, int offset)
+    public override long ToInt64(ReadOnlySpan<byte> buffer, int offset)
     {
         return Convert.ToInt64(ToString(buffer, offset, buffer.Length));
     }
 
     /// <inheritdoc/>
-    public override float ToSingle(byte[] buffer, int offset)
+    public override float ToSingle(ReadOnlySpan<byte> buffer, int offset)
     {
         return Convert.ToSingle(ToString(buffer, offset, buffer.Length));
     }
 
     /// <inheritdoc/>
-    public override string ToString(byte[] buffer, int offset, int length)
+    public override string ToString(ReadOnlySpan<byte> buffer, int offset, int length)
     {
-        var data = new ReadOnlySpan<byte>(buffer, offset, buffer.Length - offset).BytesAdd(-0x33);
+        var data = buffer.Slice(offset, buffer.Length - offset).BytesAdd(-0x33).AsSpan();
         var dataInfos = Dlt645Helper.GetDataInfos(data);
         StringBuilder stringBuilder = new();
         int index = 0;
         foreach (var dataInfo in dataInfos)
         {
             //实际数据
-            var content = data.Slice(4 + index, dataInfo.ByteLength).ToArray().Reverse().ToArray();
+            var content = data.Slice(4 + index, dataInfo.ByteLength);
+            content.Reverse();
             if (dataInfo.IsSigned)//可能为负数
             {
                 if (content[0] >= 0x80)//最高位是表示正负
@@ -101,7 +105,7 @@ public class Dlt645_2007BitConverter : ThingsGatewayBitConverter
 
         return stringBuilder.ToString();
 
-        void ToString(StringBuilder stringBuilder, Dlt645DataInfo dataInfo, byte[] content)
+        void ToString(StringBuilder stringBuilder, Dlt645DataInfo dataInfo, Span<byte> content)
         {
             if (dataInfo.Digtal < 0)
             {
@@ -119,19 +123,19 @@ public class Dlt645_2007BitConverter : ThingsGatewayBitConverter
     }
 
     /// <inheritdoc/>
-    public override ushort ToUInt16(byte[] buffer, int offset)
+    public override ushort ToUInt16(ReadOnlySpan<byte> buffer, int offset)
     {
         return Convert.ToUInt16(ToString(buffer, offset, buffer.Length));
     }
 
     /// <inheritdoc/>
-    public override uint ToUInt32(byte[] buffer, int offset)
+    public override uint ToUInt32(ReadOnlySpan<byte> buffer, int offset)
     {
         return Convert.ToUInt32(ToString(buffer, offset, buffer.Length));
     }
 
     /// <inheritdoc/>
-    public override ulong ToUInt64(byte[] buffer, int offset)
+    public override ulong ToUInt64(ReadOnlySpan<byte> buffer, int offset)
     {
         return Convert.ToUInt64(ToString(buffer, offset, buffer.Length));
     }

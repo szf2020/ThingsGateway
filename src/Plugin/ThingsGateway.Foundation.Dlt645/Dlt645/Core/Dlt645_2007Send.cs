@@ -26,19 +26,24 @@ public class Dlt645_2007Request
     /// <summary>
     /// 数据标识
     /// </summary>
-    public byte[] DataId { get; set; } = Array.Empty<byte>();
+    public Memory<byte> DataId { get; set; } = Memory<byte>.Empty;
+    private string data;
     public string Data
     {
         get
         {
-            return DataId.Reverse().ToArray().ToHexString();
+            return data;
         }
         set
         {
+            data = value;
             if (value != null)
-                DataId = value?.HexStringToBytes().Reverse().ToArray();
+            {
+                DataId = value.HexStringToBytes();
+                DataId.Span.Reverse();
+            }
             else
-                DataId = null;
+                DataId = Memory<byte>.Empty;
         }
     }
     /// <summary>
@@ -49,23 +54,26 @@ public class Dlt645_2007Request
     /// <summary>
     /// 站号信息
     /// </summary>
-    public byte[] Station { get; set; } = Array.Empty<byte>();
+    public Memory<byte> Station { get; set; } = Memory<byte>.Empty;
+    private string stationString;
     public string StationString
     {
         get
         {
-            return Station.Reverse().ToArray().ToHexString();
+            return stationString;
         }
         set
         {
+            stationString = value;
             if (value != null)
             {
                 if (value.Length < 12)
                     value = value.PadLeft(12, '0');
-                Station = value?.HexStringToBytes().Reverse().ToArray();
+                Station = value.HexStringToBytes();
+                Station.Span.Reverse();
             }
             else
-                Station = null;
+                Station = Memory<byte>.Empty;
         }
     }
     #endregion Request
@@ -81,23 +89,23 @@ public class Dlt645_2007Send : ISendMessage
     /// <summary>
     /// 密码、操作码
     /// </summary>
-    private byte[] Codes = default;
+    private ReadOnlyMemory<byte> Codes = default;
 
     /// <summary>
     /// 写入值
     /// </summary>
-    private string[] Datas = default;
+    private ReadOnlyMemory<string> Datas = default;
 
-    private byte[] Fehead = default;
+    private ReadOnlyMemory<byte> Fehead = default;
 
-    public Dlt645_2007Send(Dlt645_2007Address dlt645_2007Address, ControlCode controlCode, byte[] fehead = default, byte[] codes = default, string[] datas = default)
+    public Dlt645_2007Send(Dlt645_2007Address dlt645_2007Address, ControlCode controlCode, ReadOnlyMemory<byte> fehead = default, ReadOnlyMemory<byte> codes = default, ReadOnlyMemory<string> datas = default)
     {
         Dlt645_2007Address = dlt645_2007Address;
         ControlCode = controlCode;
 
-        Fehead = fehead ?? Array.Empty<byte>();
-        Codes = codes ?? Array.Empty<byte>();
-        Datas = datas ?? Array.Empty<string>();
+        Fehead = fehead;
+        Codes = codes;
+        Datas = datas;
     }
 
     public int MaxLength => 300;
@@ -105,7 +113,7 @@ public class Dlt645_2007Send : ISendMessage
     public int Sign { get; set; }
     internal Dlt645_2007Address Dlt645_2007Address { get; }
 
-    public void Build<TByteBlock>(ref TByteBlock byteBlock) where TByteBlock : IByteBlock
+    public void Build<TByteBlock>(ref TByteBlock byteBlock) where TByteBlock : IByteBlockWriter
     {
         if (Dlt645_2007Address?.DataId.Length < 4)
         {
@@ -113,39 +121,41 @@ public class Dlt645_2007Send : ISendMessage
         }
         if (Fehead.Length > 0)
         {
-            byteBlock.Write(Fehead);//帧起始符
+            byteBlock.Write(Fehead.Span);//帧起始符
             SendHeadCodeIndex = Fehead.Length;
         }
 
-        byteBlock.WriteByte(0x68);//帧起始符
-        byteBlock.Write(Dlt645_2007Address.Station);//6个字节地址域
-        byteBlock.WriteByte(0x68);//帧起始符
-        byteBlock.WriteByte((byte)ControlCode);//控制码
+        WriterExtension.WriteValue(ref byteBlock, (byte)0x68);//帧起始符
+        byteBlock.Write(Dlt645_2007Address.Station.Span);//6个字节地址域
+        WriterExtension.WriteValue(ref byteBlock, (byte)0x68);//帧起始符
+        WriterExtension.WriteValue(ref byteBlock, (byte)ControlCode);//控制码
 
-        byteBlock.WriteByte((byte)(Dlt645_2007Address.DataId.Length));//数据域长度
-        byteBlock.Write(Dlt645_2007Address.DataId);//数据域标识DI3、DI2、DI1、DI0
+        WriterExtension.WriteValue(ref byteBlock, (byte)(Dlt645_2007Address.DataId.Length));//数据域长度
+        byteBlock.Write(Dlt645_2007Address.DataId.Span);//数据域标识DI3、DI2、DI1、DI0
 
-        byteBlock.Write(Codes);
+        byteBlock.Write(Codes.Span);
 
         if (Datas.Length > 0)
         {
-            var dataInfos = Dlt645Helper.GetDataInfos(Dlt645_2007Address.DataId);
+            var dataInfos = Dlt645Helper.GetDataInfos(Dlt645_2007Address.DataId.Span);
             if (Datas.Length != dataInfos.Count)
             {
                 throw new(AppResource.CountError);
             }
+            var datas = Datas.Span;
             for (int i = 0; i < Datas.Length; i++)
             {
                 var dataInfo = dataInfos[i];
-                byte[] data;
+                Span<byte> data;
                 if (dataInfo.IsSigned)//可能为负数
                 {
-                    var doubleValue = Convert.ToDouble(Datas[i]);
+                    var doubleValue = Convert.ToDouble(datas[i]);
                     if (dataInfo.Digtal != 0)//无小数点
                     {
                         doubleValue *= Math.Pow(10.0, dataInfo.Digtal);
                     }
-                    data = doubleValue.ToString().HexStringToBytes().Reverse().ToArray();
+                    data = doubleValue.ToString().HexStringToBytes().Span;
+                    data.Reverse();
                     if (doubleValue < 0)
                     {
                         data[0] = (byte)(data[0] & 0x80);
@@ -155,15 +165,18 @@ public class Dlt645_2007Send : ISendMessage
                 {
                     if (dataInfo.Digtal < 0)
                     {
-                        data = Encoding.ASCII.GetBytes(Datas[i]).Reverse().ToArray();
+                        data = Encoding.ASCII.GetBytes(datas[i]).AsSpan();
+                        data.Reverse();
                     }
                     else if (dataInfo.Digtal == 0)//无小数点
                     {
-                        data = Datas[i].HexStringToBytes().Reverse().ToArray();
+                        data = datas[i].HexStringToBytes().Span;
+                        data.Reverse();
                     }
                     else
                     {
-                        data = (Convert.ToDouble(Datas[i]) * Math.Pow(10.0, dataInfo.Digtal)).ToString().HexStringToBytes().Reverse().ToArray();
+                        data = (Convert.ToDouble(datas[i]) * Math.Pow(10.0, dataInfo.Digtal)).ToString().HexStringToBytes().Span;
+                        data.Reverse();
                     }
                 }
 
@@ -171,15 +184,16 @@ public class Dlt645_2007Send : ISendMessage
             }
         }
 
-        byteBlock[Fehead.Length + 9] = (byte)(byteBlock.Length - 10 - Fehead.Length);//数据域长度
+        ByteBlockExtension.WriteBackValue(ref byteBlock, (byte)(byteBlock.Length - 10 - Fehead.Length), Fehead.Length + 9);//数据域长度
 
         for (int index = Fehead.Length + 10; index < byteBlock.Length; ++index)
-            byteBlock[index] += 0x33;//传输时发送方按字节进行加33H处理，接收方按字节进行减33H处理
+            ByteBlockExtension.WriteBackAddValue(ref byteBlock, (byte)0x33, index);//传输时发送方按字节进行加33H处理，接收方按字节进行减33H处理
 
         int num = 0;
+        var span = byteBlock.Span;
         for (int index = Fehead.Length; index < byteBlock.Length; ++index)
-            num += byteBlock[index];
-        byteBlock.WriteByte((byte)num);//校验码,总加和
-        byteBlock.WriteByte(0x16);//结束符
+            num += span[index];
+        WriterExtension.WriteValue(ref byteBlock, (byte)num);//校验码,总加和
+        WriterExtension.WriteValue(ref byteBlock, (byte)0x16);//结束符
     }
 }

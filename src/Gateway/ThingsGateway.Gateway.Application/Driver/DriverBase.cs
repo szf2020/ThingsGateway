@@ -289,14 +289,14 @@ public abstract class DriverBase : DisposableObject, IDriver
         }
     }
 
-    protected internal TaskSchedulerLoop TaskSchedulerLoop;
+    protected internal TaskSchedulerLoop TaskSchedulerLoop { get; protected set; }
 
     /// <summary>
     /// 获取任务
     /// </summary>
     /// <param name="cancellationToken">取消操作的令牌。</param>
     /// <returns>表示异步操作结果的枚举。</returns>
-    internal virtual TaskSchedulerLoop GetTasks(CancellationToken cancellationToken)
+    internal virtual void GetTasks(CancellationToken cancellationToken)
     {
         TaskSchedulerLoop = new(ProtectedGetTasks(cancellationToken));
 
@@ -309,7 +309,6 @@ public abstract class DriverBase : DisposableObject, IDriver
         //    GlobalData.GatewayMonitorHostedService.Logger.LogInformation($"set min threads count {wt}, device tasks count {count}");
         //}
 
-        return TaskSchedulerLoop;
     }
 
     protected abstract List<IScheduledTask> ProtectedGetTasks(CancellationToken cancellationToken);
@@ -345,7 +344,15 @@ public abstract class DriverBase : DisposableObject, IDriver
 
     protected override void Dispose(bool disposing)
     {
-        TaskSchedulerLoop?.Stop();
+        base.Dispose(disposing);
+        if (TaskSchedulerLoop != null)
+        {
+            lock (TaskSchedulerLoop)
+            {
+                TaskSchedulerLoop.Stop();
+            }
+        }
+
         TextLogger?.Dispose();
         _logger?.TryDispose();
         IdVariableRuntimes?.Clear();
@@ -359,7 +366,6 @@ public abstract class DriverBase : DisposableObject, IDriver
         pluginPropertyEditorItems?.Clear();
         pluginPropertyEditorItems = null;
         DeviceThreadManage = null;
-        base.Dispose(disposing);
     }
     #endregion 插件生命周期
 

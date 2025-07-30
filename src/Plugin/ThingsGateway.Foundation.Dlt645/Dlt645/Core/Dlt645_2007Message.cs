@@ -38,32 +38,32 @@ public class Dlt645_2007Message : MessageBase, IResultMessage
     public override int HeaderLength { get; set; } = 10;
 
     public Dlt645_2007Address? Request { get; set; }
-    public Dlt645_2007Response Response { get; set; } = new();
 
     public override FilterResult CheckBody<TByteBlock>(ref TByteBlock byteBlock)
     {
+        var span = byteBlock.Span;
         var pos = byteBlock.Position - HeaderLength;
         var endIndex = HeaderLength + BodyLength + pos;
-        if (byteBlock[endIndex - 1] == 0x16)
+        if (span[endIndex - 1] == 0x16)
         {
             //检查校验码
             int sumCheck = 0;
             for (int i = HeadCodeIndex; i < endIndex - 2; i++)
-                sumCheck += byteBlock[i];
-            if ((byte)sumCheck != byteBlock[endIndex - 2])
+                sumCheck += span[i];
+            if ((byte)sumCheck != span[endIndex - 2])
             {
                 //校验错误
                 ErrorMessage = AppResource.SumError;
                 OperCode = 999;
                 return FilterResult.Success;
             }
-            Response.Station = byteBlock.Span.Slice(HeadCodeIndex + 1, 6).ToArray();
-
-            var controlCode = byteBlock[HeadCodeIndex + 8];
+            var Station = byteBlock.Span.Slice(HeadCodeIndex + 1, 6);
+            byte? ErrorCode;
+            var controlCode = span[HeadCodeIndex + 8];
             if ((controlCode & 0x40) == 0x40)//控制码bit6为1时，返回错误
             {
-                Response.ErrorCode = (byte)(byteBlock[HeadCodeIndex + 10] - 0x33);
-                var error = Dlt645Helper.Get2007ErrorMessage(Response.ErrorCode.Value);
+                ErrorCode = (byte)(span[HeadCodeIndex + 10] - 0x33);
+                var error = Dlt645Helper.Get2007ErrorMessage(ErrorCode.Value);
                 ErrorMessage = string.Format(AppResource.FunctionError, $"0x{controlCode:X2}", error);
                 OperCode = 999;
                 return FilterResult.Success;
@@ -71,9 +71,9 @@ public class Dlt645_2007Message : MessageBase, IResultMessage
 
             if (Dlt645_2007Send != null)
             {
-                if (!Response.Station.SequenceEqual(Request.Station))//设备地址不符合时，返回错误
+                if (!Station.SequenceEqual(Request.Station.Span))//设备地址不符合时，返回错误
                 {
-                    if (!Request.Station.SequenceEqual(ReadStation))//读写通讯地址例外
+                    if (!Request.Station.Span.SequenceEqual(ReadStation))//读写通讯地址例外
                     {
                         ErrorMessage = AppResource.StationNotSame;
                         OperCode = 999;
@@ -90,8 +90,8 @@ public class Dlt645_2007Message : MessageBase, IResultMessage
                 if (Dlt645_2007Send.ControlCode == ControlCode.Read || Dlt645_2007Send.ControlCode == ControlCode.Write)
                 {
                     //数据标识不符合时，返回错误
-                    Response.DataId = byteBlock.Span.Slice(HeadCodeIndex + 10, 4).ToArray().BytesAdd(-0x33);
-                    if (!Response.DataId.SequenceEqual(Request.DataId))
+                    var DataId = byteBlock.Span.Slice(HeadCodeIndex + 10, 4).BytesAdd(-0x33).AsSpan();
+                    if (!DataId.SequenceEqual(Request.DataId.Span))
                     {
                         ErrorMessage = AppResource.DataIdNotSame;
                         OperCode = 999;
@@ -112,12 +112,12 @@ public class Dlt645_2007Message : MessageBase, IResultMessage
     public override bool CheckHead<TByteBlock>(ref TByteBlock byteBlock)
     {
         //因为设备可能带有FE前导符开头，这里找到0x68的位置
-
+        var span = byteBlock.Span;
         if (byteBlock != null)
         {
             for (int index = byteBlock.Position; index < byteBlock.Length; index++)
             {
-                if (byteBlock[index] == 0x68)
+                if (span[index] == 0x68)
                 {
                     HeadCodeIndex = index;
                     break;
@@ -128,7 +128,7 @@ public class Dlt645_2007Message : MessageBase, IResultMessage
         //帧起始符 地址域  帧起始符 控制码 数据域长度共10个字节
         HeaderLength = HeadCodeIndex - byteBlock.Position + 10;
         if (byteBlock.Length > HeadCodeIndex + 9)
-            BodyLength = byteBlock[HeadCodeIndex + 9] + 2;
+            BodyLength = span[HeadCodeIndex + 9] + 2;
 
         return true;
     }

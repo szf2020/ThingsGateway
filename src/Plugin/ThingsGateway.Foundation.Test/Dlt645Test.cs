@@ -8,6 +8,8 @@
 // QQ群：605534569
 // ------------------------------------------------------------------------------
 
+using System.Diagnostics;
+
 using ThingsGateway.Foundation.Dlt645;
 using ThingsGateway.Foundation.Extension.String;
 
@@ -21,14 +23,21 @@ public class Dlt645Test
     [InlineData("02010100", "FE FE FE FE 68 11 11 11 11 11 11 68 91 07 33 34 34 35 33 59 36 60 16 ")]
     public async Task Dlt645_Read_OK(string address, string data)
     {
-        byte[] bytes = data.HexStringToBytes();
         var dltChannel = new TouchSocketConfig().GetChannel(new ChannelOptions()
         {
             ChannelType = ChannelTypeEnum.Other
         }) as IClientChannel;
+        dltChannel.Config.ConfigureContainer(a =>
+        {
+            a.AddEasyLogger((a, b, c, d) =>
+            {
+                Debug.WriteLine($"{c}{Environment.NewLine}{d?.ToString()}");
+            }, LogLevel.Trace);
+        });
         var dltMaster = new Dlt645_2007Master() { Timeout = 10000, Station = "111111111111" };
         dltMaster.InitChannel(dltChannel);
         await dltChannel.SetupAsync(dltChannel.Config);
+        await dltChannel.ConnectAsync(dltChannel.ChannelOptions.ConnectTimeout, CancellationToken.None);
         var adapter = dltChannel.ReadOnlyDataHandlingAdapter as SingleStreamDataHandlingAdapter;
 
         var task1 = Task.Run(async () =>
@@ -39,9 +48,10 @@ public class Dlt645Test
         await Task.Delay(50);
         var task2 = Task.Run(async () =>
         {
+            var bytes = data.HexStringToBytes().GetArray();
             foreach (var item in bytes)
             {
-                var data = new ByteBlock([item]);
+                var data = new ByteBlock(1); data.WriteByte(item);
                 await adapter.ReceivedInputAsync(data).ConfigureAwait(false);
             }
         });

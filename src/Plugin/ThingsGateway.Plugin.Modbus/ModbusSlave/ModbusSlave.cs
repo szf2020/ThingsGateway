@@ -177,11 +177,11 @@ public class ModbusSlave : BusinessBase
             var type = variableRuntime.GetPropertyValue(CurrentDevice.Id, nameof(ModbusSlaveVariableProperty.DataType));
             if (Enum.TryParse(type, out DataTypeEnum result))
             {
-                await _plc.WriteAsync(item.Key, JToken.FromObject(variableRuntime.Value), result, cancellationToken).ConfigureAwait(false);
+                await _plc.WriteJTokenAsync(item.Key, JToken.FromObject(variableRuntime.Value), result, cancellationToken).ConfigureAwait(false);
             }
             else
             {
-                await _plc.WriteAsync(item.Key, JToken.FromObject(variableRuntime.Value), variableRuntime.DataType, cancellationToken).ConfigureAwait(false);
+                await _plc.WriteJTokenAsync(item.Key, JToken.FromObject(variableRuntime.Value), variableRuntime.DataType, cancellationToken).ConfigureAwait(false);
             }
         }
     }

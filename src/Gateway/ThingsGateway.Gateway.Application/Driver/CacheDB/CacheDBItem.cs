@@ -25,6 +25,6 @@ public class CacheDBItem<T> : IPrimaryIdEntity
     [SugarColumn(IsPrimaryKey = true)]
     public long Id { get; set; }
 
-    [SugarColumn(IsJson = true)]
+    [SugarColumn(IsJson = true, ColumnDataType = "TEXT")]
     public T Value { get; set; }
 }

@@ -224,7 +224,7 @@ public class OpcUaMaster : CollectBase
     }
 
     /// <inheritdoc/>
-    protected override async ValueTask<OperResult<byte[]>> ReadSourceAsync(VariableSourceRead deviceVariableSourceRead, CancellationToken cancellationToken)
+    protected override async ValueTask<OperResult<ReadOnlyMemory<byte>>> ReadSourceAsync(VariableSourceRead deviceVariableSourceRead, CancellationToken cancellationToken)
     {
         DateTime time = DateTime.Now;
         var addresss = deviceVariableSourceRead.VariableRuntimes.Where(a => !a.RegisterAddress.IsNullOrEmpty()).Select(a => a.RegisterAddress!).ToArray();
@@ -264,11 +264,11 @@ public class OpcUaMaster : CollectBase
                 }
             }
 
-            return OperResult.CreateSuccessResult<byte[]>(null);
+            return OperResult.CreateSuccessResult<ReadOnlyMemory<byte>>(null);
         }
         catch (Exception ex)
         {
-            return new OperResult<byte[]>($"ReadSourceAsync {addresss.ToSystemTextJsonString()}：{Environment.NewLine}{ex}");
+            return new OperResult<ReadOnlyMemory<byte>>($"ReadSourceAsync {addresss.ToSystemTextJsonString()}：{Environment.NewLine}{ex}");
         }
     }
 

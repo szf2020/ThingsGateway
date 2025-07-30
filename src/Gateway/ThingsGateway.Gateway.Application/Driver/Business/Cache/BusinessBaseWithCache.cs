@@ -98,7 +98,7 @@ public abstract class BusinessBaseWithCache : BusinessBase
         {
             try
             {
-                LogMessage?.LogInformation($"Add {typeof(DeviceBasicData).Name} data to file cache, count {data.Count}");
+                LogMessage?.LogInformation($"Add {typeof(AlarmVariable).Name} data to file cache, count {data.Count}");
                 foreach (var item in data)
                 {
                     item.Id = CommonUtils.GetSingleId();

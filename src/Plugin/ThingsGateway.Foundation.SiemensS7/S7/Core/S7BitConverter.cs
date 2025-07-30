@@ -28,8 +28,10 @@ public class S7BitConverter : ThingsGatewayBitConverter
     public bool SMART200 { get; set; } = false;
     public bool WStringEnable { get; set; } = false;
     public override int? StringLength { get; set; } = 100;
+
+
     /// <inheritdoc/>
-    public override string ToString(byte[] buffer, int offset, int length)
+    public override string ToString(ReadOnlySpan<byte> buffer, int offset, int length)
     {
         if (WStringEnable)
         {

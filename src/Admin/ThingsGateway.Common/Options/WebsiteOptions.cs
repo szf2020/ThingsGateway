@@ -28,6 +28,10 @@ public class WebsiteOptions : IConfigurableOptions
     public bool Demo { get; set; }
 
     public bool WebPageEnable { get; set; } = true;
+
+    public int MaxBlazorConnections { get; set; } = 5;
+    public bool BlazorConnectionLimitEnable { get; set; } = false;
+
     /// <summary>
     /// 是否显示关于页面
     /// </summary>

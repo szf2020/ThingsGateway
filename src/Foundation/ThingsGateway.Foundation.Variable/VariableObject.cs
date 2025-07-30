@@ -83,7 +83,7 @@ public abstract class VariableObject
     /// GetBytes
     /// </summary>
     /// <returns></returns>
-    public virtual byte[] GetBytes(Expression<Func<object>> accessor)
+    public virtual ReadOnlyMemory<byte> GetBytes(Expression<Func<object>> accessor)
     {
         if (accessor.Body == null)
         {
@@ -107,8 +107,8 @@ public abstract class VariableObject
         }
 
         var func = accessor.Compile();
-
-        return variable.VariableClass.ThingsGatewayBitConverter.GetBytesFormData(GetExpressionsValue(func(), variable), variable.VariableClass.DataType);
+        var data = GetExpressionsValue(func(), variable);
+        return variable.VariableClass.ThingsGatewayBitConverter.GetBytesFormData(data, variable.VariableClass.DataType, data is JArray jArray && jArray.Count > 1 ? true : false);
     }
 
     /// <summary>
@@ -149,7 +149,7 @@ public abstract class VariableObject
                 var result = await Device.ReadAsync(item.RegisterAddress, item.Length, cancellationToken).ConfigureAwait(false);
                 if (result.IsSuccess)
                 {
-                    var result1 = item.VariableRuntimes.PraseStructContent(Device, result.Content, exWhenAny: true);
+                    var result1 = item.VariableRuntimes.PraseStructContent(Device, result.Content.Span, exWhenAny: true);
                     if (!result1.IsSuccess)
                     {
                         item.LastErrorMessage = result1.ErrorMessage;
@@ -221,7 +221,7 @@ public abstract class VariableObject
 
             JToken jToken = GetExpressionsValue(value, variableRuntimeProperty);
 
-            var result = await Device.WriteAsync(variableRuntimeProperty.VariableClass.RegisterAddress, jToken, variableRuntimeProperty.VariableClass.DataType, cancellationToken).ConfigureAwait(false);
+            var result = await Device.WriteJTokenAsync(variableRuntimeProperty.VariableClass.RegisterAddress, jToken, variableRuntimeProperty.VariableClass.DataType, cancellationToken).ConfigureAwait(false);
             return result;
         }
         catch (Exception ex)

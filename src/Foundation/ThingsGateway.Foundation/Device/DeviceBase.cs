@@ -1,4 +1,4 @@
-﻿//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 //  此代码版权声明为全文件覆盖，如有原作者特别声明，会在下方手动补充
 //  此代码版权（除特别声明外的代码）归作者本人Diego所有
 //  源代码使用协议遵循本仓库的开源协议及附加协议
@@ -16,6 +16,8 @@ using ThingsGateway.Foundation.Extension.Generic;
 using ThingsGateway.Foundation.Extension.String;
 using ThingsGateway.NewLife;
 using ThingsGateway.NewLife.Extension;
+
+using TouchSocket.SerialPorts;
 
 namespace ThingsGateway.Foundation;
 
@@ -70,13 +72,17 @@ public abstract class DeviceBase : DisposableObject, IDevice
                     }
                     else
                     {
+                        channel.Config.SetSerialDataHandlingAdapter(() =>
+                        {
+                            var adapter = GetDataAdapter() as SingleStreamDataHandlingAdapter;
+                            return adapter;
+                        });
                         channel.Config.SetTcpDataHandlingAdapter(() =>
                         {
                             var adapter = GetDataAdapter() as SingleStreamDataHandlingAdapter;
                             return adapter;
                         });
                     }
-                    clientChannel.SetDataHandlingAdapter(GetDataAdapter());
                 }
                 else if (Channel is ITcpServiceChannel serviceChannel)
                 {
@@ -345,11 +351,11 @@ public abstract class DeviceBase : DisposableObject, IDevice
 
             if (channel is IDtuUdpSessionChannel udpSession)
             {
-                await udpSession.SendAsync(endPoint, sendMessage).ConfigureAwait(false);
+                await udpSession.SendAsync(endPoint, sendMessage, token).ConfigureAwait(false);
             }
             else
             {
-                await channel.SendAsync(sendMessage).ConfigureAwait(false);
+                await channel.SendAsync(sendMessage, token).ConfigureAwait(false);
             }
 
             return OperResult.Success;
@@ -487,28 +493,22 @@ public abstract class DeviceBase : DisposableObject, IDevice
     }
 
     /// <inheritdoc/>
-    public virtual ValueTask<OperResult<byte[]>> SendThenReturnAsync(ISendMessage sendMessage, CancellationToken cancellationToken = default)
+    public virtual ValueTask<OperResult<ReadOnlyMemory<byte>>> SendThenReturnAsync(ISendMessage sendMessage, CancellationToken cancellationToken = default)
     {
         var channelResult = GetChannel(this is IDtu dtu ? dtu.DtuId : null);
-        if (!channelResult.IsSuccess) return EasyValueTask.FromResult(new OperResult<byte[]>(channelResult));
+        if (!channelResult.IsSuccess) return EasyValueTask.FromResult(new OperResult<ReadOnlyMemory<byte>>(channelResult));
         return SendThenReturnAsync(sendMessage, channelResult.Content, cancellationToken);
     }
 
-    /// <inheritdoc/>
-    protected virtual async ValueTask<MessageBase> SendThenReturnMessageAsync(ISendMessage sendMessage, CancellationToken cancellationToken = default)
-    {
-        var channelResult = GetChannel(this is IDtu dtu ? dtu.DtuId : null);
-        if (!channelResult.IsSuccess) return new MessageBase(channelResult);
-        return await SendThenReturnMessageBaseAsync(sendMessage, channelResult.Content, cancellationToken).ConfigureAwait(false);
-    }
+
 
     /// <inheritdoc/>
-    public virtual async ValueTask<OperResult<byte[]>> SendThenReturnAsync(ISendMessage sendMessage, IClientChannel channel, CancellationToken cancellationToken = default)
+    public virtual async ValueTask<OperResult<ReadOnlyMemory<byte>>> SendThenReturnAsync(ISendMessage sendMessage, IClientChannel channel, CancellationToken cancellationToken = default)
     {
         try
         {
-            var result = await SendThenReturnMessageBaseAsync(sendMessage, channel, cancellationToken).ConfigureAwait(false);
-            return new OperResult<byte[]>(result) { Content = result.Content };
+            var result = await SendThenReturnMessageAsync(sendMessage, channel, cancellationToken).ConfigureAwait(false);
+            return new OperResult<ReadOnlyMemory<byte>>(result) { Content = result.Content };
         }
         catch (Exception ex)
         {
@@ -517,7 +517,15 @@ public abstract class DeviceBase : DisposableObject, IDevice
     }
 
     /// <inheritdoc/>
-    protected virtual ValueTask<MessageBase> SendThenReturnMessageBaseAsync(ISendMessage command, IClientChannel clientChannel = default, CancellationToken cancellationToken = default)
+    protected virtual async ValueTask<MessageBase> SendThenReturnMessageAsync(ISendMessage sendMessage, CancellationToken cancellationToken = default)
+    {
+        var channelResult = GetChannel(this is IDtu dtu ? dtu.DtuId : null);
+        if (!channelResult.IsSuccess) return new MessageBase(channelResult);
+        return await SendThenReturnMessageAsync(sendMessage, channelResult.Content, cancellationToken).ConfigureAwait(false);
+    }
+
+    /// <inheritdoc/>
+    protected virtual ValueTask<MessageBase> SendThenReturnMessageAsync(ISendMessage command, IClientChannel clientChannel, CancellationToken cancellationToken = default)
     {
         return GetResponsedDataAsync(command, clientChannel, Timeout, cancellationToken);
     }
@@ -612,13 +620,13 @@ public abstract class DeviceBase : DisposableObject, IDevice
     #region 动态类型读写
 
     /// <inheritdoc/>
-    public virtual async ValueTask<IOperResult<Array>> ReadAsync(string address, int length, DataTypeEnum dataType, CancellationToken cancellationToken = default)
+    public virtual async ValueTask<IOperResult<Array>> ReadArrayAsync(string address, int length, DataTypeEnum dataType, CancellationToken cancellationToken = default)
     {
         return dataType switch
         {
             DataTypeEnum.String => await ReadStringAsync(address, length, cancellationToken: cancellationToken).ConfigureAwait(false),
             DataTypeEnum.Boolean => await ReadBooleanAsync(address, length, cancellationToken: cancellationToken).ConfigureAwait(false),
-            DataTypeEnum.Byte => await ReadAsync(address, length, cancellationToken).ConfigureAwait(false),
+            DataTypeEnum.Byte => (await ReadAsync(address, length, cancellationToken).ConfigureAwait(false)).OperResultFrom(a => a.ToArray()),
             DataTypeEnum.Int16 => await ReadInt16Async(address, length, cancellationToken: cancellationToken).ConfigureAwait(false),
             DataTypeEnum.UInt16 => await ReadUInt16Async(address, length, cancellationToken: cancellationToken).ConfigureAwait(false),
             DataTypeEnum.Int32 => await ReadInt32Async(address, length, cancellationToken: cancellationToken).ConfigureAwait(false),
@@ -627,12 +635,13 @@ public abstract class DeviceBase : DisposableObject, IDevice
             DataTypeEnum.UInt64 => await ReadUInt64Async(address, length, cancellationToken: cancellationToken).ConfigureAwait(false),
             DataTypeEnum.Single => await ReadSingleAsync(address, length, cancellationToken: cancellationToken).ConfigureAwait(false),
             DataTypeEnum.Double => await ReadDoubleAsync(address, length, cancellationToken: cancellationToken).ConfigureAwait(false),
+            DataTypeEnum.Decimal => await ReadDecimalAsync(address, length, cancellationToken: cancellationToken).ConfigureAwait(false),
             _ => new OperResult<Array>(string.Format(AppResource.DataTypeNotSupported, dataType)),
         };
     }
 
     /// <inheritdoc/>
-    public virtual async ValueTask<OperResult> WriteAsync(string address, JToken value, DataTypeEnum dataType, CancellationToken cancellationToken = default)
+    public virtual async ValueTask<OperResult> WriteJTokenAsync(string address, JToken value, DataTypeEnum dataType, CancellationToken cancellationToken = default)
     {
         try
         {
@@ -641,17 +650,18 @@ public abstract class DeviceBase : DisposableObject, IDevice
             {
                 return dataType switch
                 {
-                    DataTypeEnum.String => await WriteAsync(address, jArray.ToObject<String[]>(), cancellationToken: cancellationToken).ConfigureAwait(false),
-                    DataTypeEnum.Boolean => await WriteAsync(address, jArray.ToObject<Boolean[]>(), cancellationToken).ConfigureAwait(false),
-                    DataTypeEnum.Byte => await WriteAsync(address, jArray.ToObject<Byte[]>(), dataType, cancellationToken).ConfigureAwait(false),
-                    DataTypeEnum.Int16 => await WriteAsync(address, jArray.ToObject<Int16[]>(), cancellationToken: cancellationToken).ConfigureAwait(false),
-                    DataTypeEnum.UInt16 => await WriteAsync(address, jArray.ToObject<UInt16[]>(), cancellationToken: cancellationToken).ConfigureAwait(false),
-                    DataTypeEnum.Int32 => await WriteAsync(address, jArray.ToObject<Int32[]>(), cancellationToken: cancellationToken).ConfigureAwait(false),
-                    DataTypeEnum.UInt32 => await WriteAsync(address, jArray.ToObject<UInt32[]>(), cancellationToken: cancellationToken).ConfigureAwait(false),
-                    DataTypeEnum.Int64 => await WriteAsync(address, jArray.ToObject<Int64[]>(), cancellationToken: cancellationToken).ConfigureAwait(false),
-                    DataTypeEnum.UInt64 => await WriteAsync(address, jArray.ToObject<UInt64[]>(), cancellationToken: cancellationToken).ConfigureAwait(false),
-                    DataTypeEnum.Single => await WriteAsync(address, jArray.ToObject<Single[]>(), cancellationToken: cancellationToken).ConfigureAwait(false),
-                    DataTypeEnum.Double => await WriteAsync(address, jArray.ToObject<Double[]>(), cancellationToken: cancellationToken).ConfigureAwait(false),
+                    DataTypeEnum.String => await WriteAsync(address, jArray.ToObject<String[]>().AsMemory(), cancellationToken: cancellationToken).ConfigureAwait(false),
+                    DataTypeEnum.Boolean => await WriteAsync(address, jArray.ToObject<Boolean[]>().AsMemory(), cancellationToken).ConfigureAwait(false),
+                    DataTypeEnum.Byte => await WriteAsync(address, jArray.ToObject<Byte[]>().AsMemory(), dataType, cancellationToken).ConfigureAwait(false),
+                    DataTypeEnum.Int16 => await WriteAsync(address, jArray.ToObject<Int16[]>().AsMemory(), cancellationToken: cancellationToken).ConfigureAwait(false),
+                    DataTypeEnum.UInt16 => await WriteAsync(address, jArray.ToObject<UInt16[]>().AsMemory(), cancellationToken: cancellationToken).ConfigureAwait(false),
+                    DataTypeEnum.Int32 => await WriteAsync(address, jArray.ToObject<Int32[]>().AsMemory(), cancellationToken: cancellationToken).ConfigureAwait(false),
+                    DataTypeEnum.UInt32 => await WriteAsync(address, jArray.ToObject<UInt32[]>().AsMemory(), cancellationToken: cancellationToken).ConfigureAwait(false),
+                    DataTypeEnum.Int64 => await WriteAsync(address, jArray.ToObject<Int64[]>().AsMemory(), cancellationToken: cancellationToken).ConfigureAwait(false),
+                    DataTypeEnum.UInt64 => await WriteAsync(address, jArray.ToObject<UInt64[]>().AsMemory(), cancellationToken: cancellationToken).ConfigureAwait(false),
+                    DataTypeEnum.Single => await WriteAsync(address, jArray.ToObject<Single[]>().AsMemory(), cancellationToken: cancellationToken).ConfigureAwait(false),
+                    DataTypeEnum.Double => await WriteAsync(address, jArray.ToObject<Double[]>().AsMemory(), cancellationToken: cancellationToken).ConfigureAwait(false),
+                    DataTypeEnum.Decimal => await WriteAsync(address, jArray.ToObject<Decimal[]>().AsMemory(), cancellationToken: cancellationToken).ConfigureAwait(false),
                     _ => new OperResult(string.Format(AppResource.DataTypeNotSupported, dataType)),
                 };
             }
@@ -670,6 +680,7 @@ public abstract class DeviceBase : DisposableObject, IDevice
                     DataTypeEnum.UInt64 => await WriteAsync(address, value.ToObject<UInt64>(), bitConverter, cancellationToken).ConfigureAwait(false),
                     DataTypeEnum.Single => await WriteAsync(address, value.ToObject<Single>(), bitConverter, cancellationToken).ConfigureAwait(false),
                     DataTypeEnum.Double => await WriteAsync(address, value.ToObject<Double>(), bitConverter, cancellationToken).ConfigureAwait(false),
+                    DataTypeEnum.Decimal => await WriteAsync(address, value.ToObject<Decimal>(), bitConverter, cancellationToken).ConfigureAwait(false),
                     _ => new OperResult(string.Format(AppResource.DataTypeNotSupported, dataType)),
                 };
             }
@@ -685,16 +696,16 @@ public abstract class DeviceBase : DisposableObject, IDevice
     #region 读取
 
     /// <inheritdoc/>
-    public abstract ValueTask<OperResult<byte[]>> ReadAsync(string address, int length, CancellationToken cancellationToken = default);
+    public abstract ValueTask<OperResult<ReadOnlyMemory<byte>>> ReadAsync(string address, int length, CancellationToken cancellationToken = default);
 
     /// <inheritdoc/>
-    public virtual async ValueTask<OperResult<Boolean[]>> ReadBooleanAsync(string address, int length, IThingsGatewayBitConverter bitConverter = null, CancellationToken cancellationToken = default)
+    public virtual async ValueTask<OperResult<bool[]>> ReadBooleanAsync(string address, int length, IThingsGatewayBitConverter bitConverter = null, CancellationToken cancellationToken = default)
     {
         bitConverter ??= ThingsGatewayBitConverter.GetTransByAddress(address);
 
         var result = await ReadAsync(address, GetLength(address, length, RegisterByteLength, true), cancellationToken).ConfigureAwait(false);
 
-        return result.OperResultFrom(() => bitConverter.ToBoolean(result.Content, GetBitOffsetDefault(address), length, BitReverse(address)));
+        return result.OperResultFrom(() => bitConverter.ToBoolean(result.Content.Span, GetBitOffsetDefault(address), length, BitReverse(address)));
     }
 
     /// <inheritdoc/>
@@ -702,7 +713,7 @@ public abstract class DeviceBase : DisposableObject, IDevice
     {
         bitConverter ??= ThingsGatewayBitConverter.GetTransByAddress(address);
         var result = await ReadAsync(address, GetLength(address, length, 2), cancellationToken).ConfigureAwait(false);
-        return result.OperResultFrom(() => bitConverter.ToInt16(result.Content, 0, length));
+        return result.OperResultFrom(() => bitConverter.ToInt16(result.Content.Span, 0, length));
     }
 
     /// <inheritdoc/>
@@ -710,7 +721,7 @@ public abstract class DeviceBase : DisposableObject, IDevice
     {
         bitConverter ??= ThingsGatewayBitConverter.GetTransByAddress(address);
         var result = await ReadAsync(address, GetLength(address, length, 2), cancellationToken).ConfigureAwait(false);
-        return result.OperResultFrom(() => bitConverter.ToUInt16(result.Content, 0, length));
+        return result.OperResultFrom(() => bitConverter.ToUInt16(result.Content.Span, 0, length));
     }
 
     /// <inheritdoc/>
@@ -718,7 +729,7 @@ public abstract class DeviceBase : DisposableObject, IDevice
     {
         bitConverter ??= ThingsGatewayBitConverter.GetTransByAddress(address);
         var result = await ReadAsync(address, GetLength(address, length, 4), cancellationToken).ConfigureAwait(false);
-        return result.OperResultFrom(() => bitConverter.ToInt32(result.Content, 0, length));
+        return result.OperResultFrom(() => bitConverter.ToInt32(result.Content.Span, 0, length));
     }
 
     /// <inheritdoc/>
@@ -726,7 +737,7 @@ public abstract class DeviceBase : DisposableObject, IDevice
     {
         bitConverter ??= ThingsGatewayBitConverter.GetTransByAddress(address);
         var result = await ReadAsync(address, GetLength(address, length, 4), cancellationToken).ConfigureAwait(false);
-        return result.OperResultFrom(() => bitConverter.ToUInt32(result.Content, 0, length));
+        return result.OperResultFrom(() => bitConverter.ToUInt32(result.Content.Span, 0, length));
     }
 
     /// <inheritdoc/>
@@ -734,7 +745,7 @@ public abstract class DeviceBase : DisposableObject, IDevice
     {
         bitConverter ??= ThingsGatewayBitConverter.GetTransByAddress(address);
         var result = await ReadAsync(address, GetLength(address, length, 8), cancellationToken).ConfigureAwait(false);
-        return result.OperResultFrom(() => bitConverter.ToInt64(result.Content, 0, length));
+        return result.OperResultFrom(() => bitConverter.ToInt64(result.Content.Span, 0, length));
     }
 
     /// <inheritdoc/>
@@ -742,7 +753,7 @@ public abstract class DeviceBase : DisposableObject, IDevice
     {
         bitConverter ??= ThingsGatewayBitConverter.GetTransByAddress(address);
         var result = await ReadAsync(address, GetLength(address, length, 8), cancellationToken).ConfigureAwait(false);
-        return result.OperResultFrom(() => bitConverter.ToUInt64(result.Content, 0, length));
+        return result.OperResultFrom(() => bitConverter.ToUInt64(result.Content.Span, 0, length));
     }
 
     /// <inheritdoc/>
@@ -750,7 +761,7 @@ public abstract class DeviceBase : DisposableObject, IDevice
     {
         bitConverter ??= ThingsGatewayBitConverter.GetTransByAddress(address);
         var result = await ReadAsync(address, GetLength(address, length, 4), cancellationToken).ConfigureAwait(false);
-        return result.OperResultFrom(() => bitConverter.ToSingle(result.Content, 0, length));
+        return result.OperResultFrom(() => bitConverter.ToSingle(result.Content.Span, 0, length));
     }
 
     /// <inheritdoc/>
@@ -758,9 +769,15 @@ public abstract class DeviceBase : DisposableObject, IDevice
     {
         bitConverter ??= ThingsGatewayBitConverter.GetTransByAddress(address);
         var result = await ReadAsync(address, GetLength(address, length, 8), cancellationToken).ConfigureAwait(false);
-        return result.OperResultFrom(() => bitConverter.ToDouble(result.Content, 0, length));
+        return result.OperResultFrom(() => bitConverter.ToDouble(result.Content.Span, 0, length));
     }
-
+    /// <inheritdoc/>
+    public virtual async ValueTask<OperResult<Decimal[]>> ReadDecimalAsync(string address, int length, IThingsGatewayBitConverter bitConverter = null, CancellationToken cancellationToken = default)
+    {
+        bitConverter ??= ThingsGatewayBitConverter.GetTransByAddress(address);
+        var result = await ReadAsync(address, GetLength(address, length, 8), cancellationToken).ConfigureAwait(false);
+        return result.OperResultFrom(() => bitConverter.ToDecimal(result.Content.Span, 0, length));
+    }
     /// <inheritdoc/>
     public virtual async ValueTask<OperResult<String[]>> ReadStringAsync(string address, int length, IThingsGatewayBitConverter bitConverter = null, CancellationToken cancellationToken = default)
     {
@@ -771,13 +788,13 @@ public abstract class DeviceBase : DisposableObject, IDevice
         var result = await ReadAsync(address, GetLength(address, len.Value, 1), cancellationToken).ConfigureAwait(false);
         return result.OperResultFrom(() =>
         {
-            List<String> strings = new();
+            String[] strings = new String[length];
             for (int i = 0; i < length; i++)
             {
-                var data = bitConverter.ToString(result.Content, i * bitConverter.StringLength.Value, bitConverter.StringLength.Value);
-                strings.Add(data);
+                var data = bitConverter.ToString(result.Content.Span, i * bitConverter.StringLength.Value, bitConverter.StringLength.Value);
+                strings[i] = data;
             }
-            return strings.ToArray();
+            return strings;
         }
         );
     }
@@ -787,10 +804,10 @@ public abstract class DeviceBase : DisposableObject, IDevice
     #region 写入
 
     /// <inheritdoc/>
-    public abstract ValueTask<OperResult> WriteAsync(string address, byte[] value, DataTypeEnum dataType, CancellationToken cancellationToken = default);
+    public abstract ValueTask<OperResult> WriteAsync(string address, ReadOnlyMemory<byte> value, DataTypeEnum dataType, CancellationToken cancellationToken = default);
 
     /// <inheritdoc/>
-    public abstract ValueTask<OperResult> WriteAsync(string address, bool[] value, CancellationToken cancellationToken = default);
+    public abstract ValueTask<OperResult> WriteAsync(string address, ReadOnlyMemory<bool> value, CancellationToken cancellationToken = default);
 
     /// <inheritdoc/>
     public virtual ValueTask<OperResult> WriteAsync(string address, bool value, IThingsGatewayBitConverter bitConverter = null, CancellationToken cancellationToken = default)
@@ -802,7 +819,7 @@ public abstract class DeviceBase : DisposableObject, IDevice
     public virtual ValueTask<OperResult> WriteAsync(string address, byte value, IThingsGatewayBitConverter bitConverter = null, CancellationToken cancellationToken = default)
     {
         bitConverter ??= ThingsGatewayBitConverter.GetTransByAddress(address);
-        return WriteAsync(address, new byte[] { value }, DataTypeEnum.Byte, cancellationToken);
+        return WriteAsync(address, new byte[] { value }.AsMemory(), DataTypeEnum.Byte, cancellationToken);
     }
 
     /// <inheritdoc/>
@@ -860,7 +877,12 @@ public abstract class DeviceBase : DisposableObject, IDevice
         bitConverter ??= ThingsGatewayBitConverter.GetTransByAddress(address);
         return WriteAsync(address, bitConverter.GetBytes(value), DataTypeEnum.Double, cancellationToken);
     }
-
+    /// <inheritdoc/>
+    public virtual ValueTask<OperResult> WriteAsync(string address, decimal value, IThingsGatewayBitConverter bitConverter = null, CancellationToken cancellationToken = default)
+    {
+        bitConverter ??= ThingsGatewayBitConverter.GetTransByAddress(address);
+        return WriteAsync(address, bitConverter.GetBytes(value), DataTypeEnum.Decimal, cancellationToken);
+    }
     /// <inheritdoc/>
     public virtual ValueTask<OperResult> WriteAsync(string address, string value, IThingsGatewayBitConverter bitConverter = null, CancellationToken cancellationToken = default)
     {
@@ -874,73 +896,81 @@ public abstract class DeviceBase : DisposableObject, IDevice
     #region 写入数组
 
     /// <inheritdoc/>
-    public virtual ValueTask<OperResult> WriteAsync(string address, short[] value, IThingsGatewayBitConverter bitConverter = null, CancellationToken cancellationToken = default)
+    public virtual ValueTask<OperResult> WriteAsync(string address, ReadOnlyMemory<short> value, IThingsGatewayBitConverter bitConverter = null, CancellationToken cancellationToken = default)
     {
         bitConverter ??= ThingsGatewayBitConverter.GetTransByAddress(address);
-        return WriteAsync(address, bitConverter.GetBytes(value), DataTypeEnum.Int16, cancellationToken);
+        return WriteAsync(address, bitConverter.GetBytes(value.Span), DataTypeEnum.Int16, cancellationToken);
     }
 
     /// <inheritdoc/>
-    public virtual ValueTask<OperResult> WriteAsync(string address, ushort[] value, IThingsGatewayBitConverter bitConverter = null, CancellationToken cancellationToken = default)
+    public virtual ValueTask<OperResult> WriteAsync(string address, ReadOnlyMemory<ushort> value, IThingsGatewayBitConverter bitConverter = null, CancellationToken cancellationToken = default)
     {
         bitConverter ??= ThingsGatewayBitConverter.GetTransByAddress(address);
-        return WriteAsync(address, bitConverter.GetBytes(value), DataTypeEnum.UInt16, cancellationToken);
+        return WriteAsync(address, bitConverter.GetBytes(value.Span), DataTypeEnum.UInt16, cancellationToken);
     }
 
     /// <inheritdoc/>
-    public virtual ValueTask<OperResult> WriteAsync(string address, int[] value, IThingsGatewayBitConverter bitConverter = null, CancellationToken cancellationToken = default)
+    public virtual ValueTask<OperResult> WriteAsync(string address, ReadOnlyMemory<int> value, IThingsGatewayBitConverter bitConverter = null, CancellationToken cancellationToken = default)
     {
         bitConverter ??= ThingsGatewayBitConverter.GetTransByAddress(address);
-        return WriteAsync(address, bitConverter.GetBytes(value), DataTypeEnum.Int32, cancellationToken);
+        return WriteAsync(address, bitConverter.GetBytes(value.Span), DataTypeEnum.Int32, cancellationToken);
     }
 
     /// <inheritdoc/>
-    public virtual ValueTask<OperResult> WriteAsync(string address, uint[] value, IThingsGatewayBitConverter bitConverter = null, CancellationToken cancellationToken = default)
+    public virtual ValueTask<OperResult> WriteAsync(string address, ReadOnlyMemory<uint> value, IThingsGatewayBitConverter bitConverter = null, CancellationToken cancellationToken = default)
     {
         bitConverter ??= ThingsGatewayBitConverter.GetTransByAddress(address);
-        return WriteAsync(address, bitConverter.GetBytes(value), DataTypeEnum.UInt32, cancellationToken);
+        return WriteAsync(address, bitConverter.GetBytes(value.Span), DataTypeEnum.UInt32, cancellationToken);
     }
 
     /// <inheritdoc/>
-    public virtual ValueTask<OperResult> WriteAsync(string address, long[] value, IThingsGatewayBitConverter bitConverter = null, CancellationToken cancellationToken = default)
+    public virtual ValueTask<OperResult> WriteAsync(string address, ReadOnlyMemory<long> value, IThingsGatewayBitConverter bitConverter = null, CancellationToken cancellationToken = default)
     {
         bitConverter ??= ThingsGatewayBitConverter.GetTransByAddress(address);
-        return WriteAsync(address, bitConverter.GetBytes(value), DataTypeEnum.Int64, cancellationToken);
+        return WriteAsync(address, bitConverter.GetBytes(value.Span), DataTypeEnum.Int64, cancellationToken);
     }
 
     /// <inheritdoc/>
-    public virtual ValueTask<OperResult> WriteAsync(string address, ulong[] value, IThingsGatewayBitConverter bitConverter = null, CancellationToken cancellationToken = default)
+    public virtual ValueTask<OperResult> WriteAsync(string address, ReadOnlyMemory<ulong> value, IThingsGatewayBitConverter bitConverter = null, CancellationToken cancellationToken = default)
     {
         bitConverter ??= ThingsGatewayBitConverter.GetTransByAddress(address);
-        return WriteAsync(address, bitConverter.GetBytes(value), DataTypeEnum.UInt64, cancellationToken);
+        return WriteAsync(address, bitConverter.GetBytes(value.Span), DataTypeEnum.UInt64, cancellationToken);
     }
 
     /// <inheritdoc/>
-    public virtual ValueTask<OperResult> WriteAsync(string address, float[] value, IThingsGatewayBitConverter bitConverter = null, CancellationToken cancellationToken = default)
+    public virtual ValueTask<OperResult> WriteAsync(string address, ReadOnlyMemory<float> value, IThingsGatewayBitConverter bitConverter = null, CancellationToken cancellationToken = default)
     {
         bitConverter ??= ThingsGatewayBitConverter.GetTransByAddress(address);
-        return WriteAsync(address, bitConverter.GetBytes(value), DataTypeEnum.Single, cancellationToken);
+        return WriteAsync(address, bitConverter.GetBytes(value.Span), DataTypeEnum.Single, cancellationToken);
     }
 
     /// <inheritdoc/>
-    public virtual ValueTask<OperResult> WriteAsync(string address, double[] value, IThingsGatewayBitConverter bitConverter = null, CancellationToken cancellationToken = default)
+    public virtual ValueTask<OperResult> WriteAsync(string address, ReadOnlyMemory<double> value, IThingsGatewayBitConverter bitConverter = null, CancellationToken cancellationToken = default)
     {
         bitConverter ??= ThingsGatewayBitConverter.GetTransByAddress(address);
-        return WriteAsync(address, bitConverter.GetBytes(value), DataTypeEnum.Double, cancellationToken);
+        return WriteAsync(address, bitConverter.GetBytes(value.Span), DataTypeEnum.Double, cancellationToken);
     }
 
     /// <inheritdoc/>
-    public virtual async ValueTask<OperResult> WriteAsync(string address, string[] value, IThingsGatewayBitConverter bitConverter = null, CancellationToken cancellationToken = default)
+    public virtual ValueTask<OperResult> WriteAsync(string address, ReadOnlyMemory<decimal> value, IThingsGatewayBitConverter bitConverter = null, CancellationToken cancellationToken = default)
+    {
+        bitConverter ??= ThingsGatewayBitConverter.GetTransByAddress(address);
+        return WriteAsync(address, bitConverter.GetBytes(value.Span), DataTypeEnum.Decimal, cancellationToken);
+    }
+
+    /// <inheritdoc/>
+    public virtual async ValueTask<OperResult> WriteAsync(string address, ReadOnlyMemory<string> value, IThingsGatewayBitConverter bitConverter = null, CancellationToken cancellationToken = default)
     {
         bitConverter ??= ThingsGatewayBitConverter.GetTransByAddress(address);
         if (bitConverter.StringLength == null) return new OperResult(AppResource.StringAddressError);
-        List<byte> bytes = new();
-        foreach (var a in value)
+        List<ReadOnlyMemory<byte>> bytes = new();
+        foreach (var a in value.Span)
         {
             var data = bitConverter.GetBytes(a);
-            bytes.AddRange(data.ArrayExpandToLength(bitConverter.StringLength ?? data.Length));
+            bytes.Add(data.ArrayExpandToLength(bitConverter.StringLength ?? data.Length));
         }
-        return await WriteAsync(address, bytes.ToArray(), DataTypeEnum.String, cancellationToken).ConfigureAwait(false);
+
+        return await WriteAsync(address, bytes.CombineMemoryBlocks(), DataTypeEnum.String, cancellationToken).ConfigureAwait(false);
     }
 
     #endregion 写入数组
@@ -1015,5 +1045,5 @@ public abstract class DeviceBase : DisposableObject, IDevice
         }
         return a => { };
     }
-    public abstract ValueTask<OperResult<byte[]>> ReadAsync(object state, CancellationToken cancellationToken = default);
+    public abstract ValueTask<OperResult<ReadOnlyMemory<byte>>> ReadAsync(object state, CancellationToken cancellationToken = default);
 }

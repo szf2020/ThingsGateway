@@ -92,9 +92,11 @@
 
             <EditTemplate Context="value">
                 <div class="col-12 col-sm-6 col-md-6">
-                    <Select SkipValidate="true" @bind-Value="@value.ChannelType" OnSelectedItemChanged=@((a)=>
+                    <Select SkipValidate="true" @bind-Value="@value.ChannelType" OnSelectedItemChanged=@(async(a)=>
                                                                                                              {
-                                                                                                                 return InvokeAsync(StateHasChanged);
+                                                                                                                 await InvokeAsync(StateHasChanged);
+                                                                                                                 await Task.Delay(100);
+                                                                                                                 await InvokeAsync(StateHasChanged);
                                                                                                              }) />
                 </div>
             </EditTemplate>

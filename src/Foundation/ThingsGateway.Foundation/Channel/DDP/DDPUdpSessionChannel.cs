@@ -1,4 +1,4 @@
-﻿//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 //  此代码版权声明为全文件覆盖，如有原作者特别声明，会在下方手动补充
 //  此代码版权（除特别声明外的代码）归作者本人Diego所有
 //  源代码使用协议遵循本仓库的开源协议及附加协议
@@ -49,11 +49,12 @@ public class DDPUdpSessionChannel : UdpSessionChannel, IClientChannel, IDtuUdpSe
         DataHandlingAdapter.SendCallBackAsync = DefaultSendAsync;
     }
 
-    protected Task DefaultSendAsync(EndPoint endPoint, ReadOnlyMemory<byte> memory)
+
+    protected Task DefaultSendAsync(EndPoint endPoint, ReadOnlyMemory<byte> memory, CancellationToken token)
     {
         if (TryGetId(endPoint, out var id))
         {
-            return DDPAdapter.SendInputAsync(endPoint, new DDPSend(memory, id, false));
+            return DDPAdapter.SendInputAsync(endPoint, new DDPSend(memory, id, false), token);
         }
         else
         {
@@ -61,14 +62,14 @@ public class DDPUdpSessionChannel : UdpSessionChannel, IClientChannel, IDtuUdpSe
         }
     }
 
-    protected Task DDPSendAsync(EndPoint endPoint, ReadOnlyMemory<byte> memory)
+    protected Task DDPSendAsync(EndPoint endPoint, ReadOnlyMemory<byte> memory, CancellationToken token)
     {
         //获取endpoint
-        return base.ProtectedDefaultSendAsync(endPoint, memory);
+        return base.ProtectedDefaultSendAsync(endPoint, memory, token);
     }
 
     private ConcurrentDictionary<EndPoint, DDPMessage> DDPMessageDict { get; set; } = new();
-    private Task DDPHandleReceivedData(EndPoint endPoint, ByteBlock byteBlock, IRequestInfo requestInfo)
+    private Task DDPHandleReceivedData(EndPoint endPoint, IByteBlockReader byteBlock, IRequestInfo requestInfo)
     {
         if (requestInfo is DDPMessage dDPMessage)
         {
@@ -126,9 +127,18 @@ public class DDPUdpSessionChannel : UdpSessionChannel, IClientChannel, IDtuUdpSe
                 var id = $"ID={message.Id}";
                 if (message.Type == 0x09)
                 {
-                    byteBlock.Reset();
-                    byteBlock.Write(message.Content);
-                    return false;
+                    var reader = new ByteBlockReader(message.Content);
+
+                    if (this.DataHandlingAdapter == null)
+                    {
+                        await this.OnUdpReceived(new UdpReceivedDataEventArgs(endPoint, reader, default)).ConfigureAwait(EasyTask.ContinueOnCapturedContext);
+                    }
+                    else
+                    {
+                        await this.DataHandlingAdapter.ReceivedInput(endPoint, reader).ConfigureAwait(EasyTask.ContinueOnCapturedContext);
+                    }
+
+                    return true;
                 }
                 else
                 {
@@ -155,13 +165,13 @@ public class DDPUdpSessionChannel : UdpSessionChannel, IClientChannel, IDtuUdpSe
                         }
 
                         //发送成功
-                        await DDPAdapter.SendInputAsync(endPoint, new DDPSend(ReadOnlyMemory<byte>.Empty, id, false, 0x81)).ConfigureAwait(false);
+                        await DDPAdapter.SendInputAsync(endPoint, new DDPSend(ReadOnlyMemory<byte>.Empty, id, false, 0x81), ClosedToken).ConfigureAwait(false);
                         if (log)
                             Logger?.Info(string.Format(AppResource.DtuConnected, id));
                     }
                     else if (message.Type == 0x02)
                     {
-                        await DDPAdapter.SendInputAsync(endPoint, new DDPSend(ReadOnlyMemory<byte>.Empty, id, false, 0x82)).ConfigureAwait(false);
+                        await DDPAdapter.SendInputAsync(endPoint, new DDPSend(ReadOnlyMemory<byte>.Empty, id, false, 0x82), ClosedToken).ConfigureAwait(false);
                         Logger?.Info(string.Format(AppResource.DtuDisconnecting, id));
                         await Task.Delay(100).ConfigureAwait(false);
                         IdDict.TryRemove(endPoint, out _);

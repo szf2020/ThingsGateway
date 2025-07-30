@@ -1,4 +1,4 @@
-﻿//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 //  此代码版权声明为全文件覆盖，如有原作者特别声明，会在下方手动补充
 //  此代码版权（除特别声明外的代码）归作者本人Diego所有
 //  源代码使用协议遵循本仓库的开源协议及附加协议
@@ -26,9 +26,6 @@ public class DeviceSingleStreamDataHandleAdapter<TRequest> : TcpCustomDataHandli
 
     /// <inheritdoc/>
     public override bool CanSendRequestInfo => true;
-
-    /// <inheritdoc/>
-    public override bool CanSplicingSend => false;
 
     /// <summary>
     /// 报文输出时采用字符串还是HexString
@@ -171,23 +168,24 @@ public class DeviceSingleStreamDataHandleAdapter<TRequest> : TcpCustomDataHandli
     }
 
     /// <inheritdoc />
-    protected override async Task PreviewSendAsync(ReadOnlyMemory<byte> memory)
+    protected override async Task PreviewSendAsync(ReadOnlyMemory<byte> memory, CancellationToken cancellationToken)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         if (Logger?.LogLevel <= LogLevel.Trace)
             Logger?.Trace($"{ToString()}- Send:{(IsHexLog ? memory.Span.ToHexString() : (memory.Span.ToString(Encoding.UTF8)))}");
 
         //发送
-        await GoSendAsync(memory).ConfigureAwait(false);
+        await GoSendAsync(memory, cancellationToken).ConfigureAwait(false);
     }
 
     /// <inheritdoc/>
-    protected override async Task PreviewSendAsync(IRequestInfo requestInfo)
+    protected override async Task PreviewSendAsync(IRequestInfo requestInfo, CancellationToken cancellationToken)
     {
         if (!(requestInfo is ISendMessage sendMessage))
         {
             throw new Exception($"Unable to convert {nameof(requestInfo)} to {nameof(ISendMessage)}");
         }
-
+        cancellationToken.ThrowIfCancellationRequested();
         var byteBlock = new ValueByteBlock(sendMessage.MaxLength);
         try
         {
@@ -199,7 +197,7 @@ public class DeviceSingleStreamDataHandleAdapter<TRequest> : TcpCustomDataHandli
             {
                 SetRequest(sendMessage, ref byteBlock);
             }
-            await GoSendAsync(byteBlock.Memory).ConfigureAwait(false);
+            await GoSendAsync(byteBlock.Memory, cancellationToken).ConfigureAwait(false);
         }
         finally
         {

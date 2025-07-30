@@ -226,7 +226,7 @@
 //    /// 读取源变量，在<see cref="VariableSourceReadsEnable"/> 为true时，添加源读取任务，任务启动时会执行
 //    /// 一般需要更新设备变量值，调用<see cref="VariableRuntime.SetValue(object?, DateTime, bool)"/>
 //    /// </summary>
-//    protected override ValueTask<OperResult<byte[]>> ReadSourceAsync(VariableSourceRead variableSourceRead, CancellationToken cancellationToken)
+//    protected override ValueTask<OperResult<ReadOnlyMemory<byte>>> ReadSourceAsync(VariableSourceRead variableSourceRead, CancellationToken cancellationToken)
 //    {
 //        return base.ReadSourceAsync(variableSourceRead, cancellationToken);
 //    }

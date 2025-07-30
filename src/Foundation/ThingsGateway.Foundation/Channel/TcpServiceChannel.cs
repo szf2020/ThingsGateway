@@ -1,4 +1,4 @@
-﻿//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 //  此代码版权声明为全文件覆盖，如有原作者特别声明，会在下方手动补充
 //  此代码版权（除特别声明外的代码）归作者本人Diego所有
 //  源代码使用协议遵循本仓库的开源协议及附加协议
@@ -23,10 +23,10 @@ public abstract class TcpServiceChannelBase<TClient> : TcpService<TClient>, ITcp
     /// <inheritdoc/>
     public ConcurrentList<IDevice> Collects { get; } = new();
 
-    /// <summary>
-    /// 停止时是否发送ShutDown
-    /// </summary>
-    public bool ShutDownEnable { get; set; } = true;
+    ///// <summary>
+    ///// 停止时是否发送ShutDown
+    ///// </summary>
+    //public bool ShutDownEnable { get; set; } = true;
 
     /// <inheritdoc/>
     public override async Task ClearAsync()
@@ -35,8 +35,8 @@ public abstract class TcpServiceChannelBase<TClient> : TcpService<TClient>, ITcp
         {
             try
             {
-                if (ShutDownEnable)
-                    await client.ShutdownAsync(System.Net.Sockets.SocketShutdown.Both).ConfigureAwait(false);
+                //if (ShutDownEnable)
+                //    await client.ShutdownAsync(System.Net.Sockets.SocketShutdown.Both).ConfigureAwait(false);
 
                 await client.CloseAsync().ConfigureAwait(false);
                 client.SafeDispose();
@@ -51,8 +51,8 @@ public abstract class TcpServiceChannelBase<TClient> : TcpService<TClient>, ITcp
     {
         if (this.TryGetClient(id, out var client))
         {
-            if (ShutDownEnable)
-                await client.ShutdownAsync(System.Net.Sockets.SocketShutdown.Both).ConfigureAwait(false);
+            //if (ShutDownEnable)
+            //    await client.ShutdownAsync(System.Net.Sockets.SocketShutdown.Both).ConfigureAwait(false);
             await client.CloseAsync().ConfigureAwait(false);
             client.SafeDispose();
         }
@@ -85,6 +85,10 @@ public abstract class TcpServiceChannelBase<TClient> : TcpService<TClient>, ITcp
             }
             finally
             {
+                var cts = m_transport;
+                m_transport = new();
+                cts?.SafeCancel();
+                cts?.SafeDispose();
                 _connectLock.Release();
             }
         }
@@ -110,6 +114,10 @@ public abstract class TcpServiceChannelBase<TClient> : TcpService<TClient>, ITcp
             }
             finally
             {
+                var cts = m_transport;
+                m_transport = null;
+                cts?.SafeCancel();
+                cts?.SafeDispose();
                 _connectLock.Release();
             }
         }
@@ -121,6 +129,14 @@ public abstract class TcpServiceChannelBase<TClient> : TcpService<TClient>, ITcp
         return Result.Success;
     }
 
+    public CancellationToken ClosedToken => this.m_transport == null ? new CancellationToken(true) : this.m_transport.Token;
+    private CancellationTokenSource m_transport;
+
+    protected override void SafetyDispose(bool disposing)
+    {
+        m_transport?.SafeDispose();
+        base.SafetyDispose(disposing);
+    }
     /// <inheritdoc/>
     protected override Task OnTcpClosed(TClient socketClient, ClosedEventArgs e)
     {
@@ -208,10 +224,16 @@ public class TcpServiceChannel<TClient> : TcpServiceChannelBase<TClient>, IChann
     protected override TClient NewClient()
     {
         var data = new TClient();
-        data.WaitHandlePool.MaxSign = MaxSign;
+        data.ResetSign(MinSign, MaxSign);
         return data;
     }
     public int MaxSign { get; set; }
+    public int MinSign { get; set; }
+    public void ResetSign(int minSign = 0, int maxSign = ushort.MaxValue)
+    {
+        MinSign = minSign;
+        MaxSign = maxSign;
+    }
     /// <inheritdoc/>
     protected override async Task OnTcpClosing(TClient socketClient, ClosingEventArgs e)
     {
@@ -263,6 +285,7 @@ public class TcpServiceChannel<TClient> : TcpServiceChannelBase<TClient>, IChann
     public ConcurrentDictionary<long, Func<IClientChannel, ReceivedDataEventArgs, bool, Task>> ChannelReceivedWaitDict { get; } = new();
 
     IEnumerable<TcpSessionClientChannel> ITcpServiceChannel.Clients => base.Clients;
+
 
     protected override void ClientInitialized(TClient client)
     {

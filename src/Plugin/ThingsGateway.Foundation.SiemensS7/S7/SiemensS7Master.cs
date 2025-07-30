@@ -139,7 +139,7 @@ public partial class SiemensS7Master : DeviceBase
     /// <summary>
     /// 此方法并不会智能分组以最大化效率，减少传输次数，因为返回值是byte[]，所以一切都按地址数组的顺序执行，最后合并数组
     /// </summary>
-    public async ValueTask<OperResult<byte[]>> S7ReadAsync(SiemensS7Address[] sAddresss, CancellationToken cancellationToken = default)
+    public async ValueTask<OperResult<ReadOnlyMemory<byte>>> S7ReadAsync(SiemensS7Address[] sAddresss, CancellationToken cancellationToken = default)
     {
         {
             var byteBlock = new ValueByteBlock(2048);
@@ -160,7 +160,7 @@ public partial class SiemensS7Master : DeviceBase
                             var result = await SendThenReturnAsync(new S7Send([sAddress], true), cancellationToken: cancellationToken).ConfigureAwait(false);
                             if (!result.IsSuccess) return result;
 
-                            byteBlock.Write(result.Content);
+                            byteBlock.Write(result.Content.Span);
                             num += len;
 
                             if (sAddress.DataCode == S7Area.TM || sAddress.DataCode == S7Area.CT)
@@ -179,11 +179,11 @@ public partial class SiemensS7Master : DeviceBase
                     }
                 }
 
-                return new OperResult<byte[]>() { Content = byteBlock.ToArray() };
+                return new OperResult<ReadOnlyMemory<byte>>() { Content = byteBlock.ToArray() };
             }
             catch (Exception ex)
             {
-                return new OperResult<byte[]>(ex);
+                return new OperResult<ReadOnlyMemory<byte>>(ex);
             }
             finally
             {
@@ -293,7 +293,7 @@ public partial class SiemensS7Master : DeviceBase
     #region 读写
 
     /// <inheritdoc/>
-    public override ValueTask<OperResult<byte[]>> ReadAsync(string address, int length, CancellationToken cancellationToken = default)
+    public override ValueTask<OperResult<ReadOnlyMemory<byte>>> ReadAsync(string address, int length, CancellationToken cancellationToken = default)
     {
         try
         {
@@ -302,11 +302,11 @@ public partial class SiemensS7Master : DeviceBase
         }
         catch (Exception ex)
         {
-            return EasyValueTask.FromResult(new OperResult<byte[]>(ex));
+            return EasyValueTask.FromResult(new OperResult<ReadOnlyMemory<byte>>(ex));
         }
     }
 
-    public override ValueTask<OperResult<byte[]>> ReadAsync(object state, CancellationToken cancellationToken = default)
+    public override ValueTask<OperResult<ReadOnlyMemory<byte>>> ReadAsync(object state, CancellationToken cancellationToken = default)
     {
         try
         {
@@ -316,17 +316,17 @@ public partial class SiemensS7Master : DeviceBase
             }
             else
             {
-                return EasyValueTask.FromResult(new OperResult<byte[]>(new ArgumentException("State must be of type SiemensS7Address", nameof(state))));
+                return EasyValueTask.FromResult(new OperResult<ReadOnlyMemory<byte>>(new ArgumentException("State must be of type SiemensS7Address", nameof(state))));
             }
         }
         catch (Exception ex)
         {
-            return EasyValueTask.FromResult(new OperResult<byte[]>(ex));
+            return EasyValueTask.FromResult(new OperResult<ReadOnlyMemory<byte>>(ex));
         }
     }
 
     /// <inheritdoc/>
-    public override async ValueTask<OperResult> WriteAsync(string address, byte[] value, DataTypeEnum dataType, CancellationToken cancellationToken = default)
+    public override async ValueTask<OperResult> WriteAsync(string address, ReadOnlyMemory<byte> value, DataTypeEnum dataType, CancellationToken cancellationToken = default)
     {
         try
         {
@@ -342,12 +342,12 @@ public partial class SiemensS7Master : DeviceBase
     }
 
     /// <inheritdoc/>
-    public override async ValueTask<OperResult> WriteAsync(string address, bool[] value, CancellationToken cancellationToken = default)
+    public override async ValueTask<OperResult> WriteAsync(string address, ReadOnlyMemory<bool> value, CancellationToken cancellationToken = default)
     {
         try
         {
             var sAddress = SiemensS7Address.ParseFrom(address);
-            sAddress.Data = value.BoolArrayToByte();
+            sAddress.Data = value.Span.BoolArrayToByte();
             sAddress.Length = sAddress.Data.Length;
             sAddress.BitLength = value.Length;
             sAddress.IsBit = true;
@@ -437,7 +437,7 @@ public partial class SiemensS7Master : DeviceBase
 
             try
             {
-                var result2 = await SendThenReturnMessageBaseAsync(new S7Send(ISO_CR), channel).ConfigureAwait(false);
+                var result2 = await SendThenReturnMessageAsync(new S7Send(ISO_CR), channel, channel.ClosedToken).ConfigureAwait(false);
                 if (!result2.IsSuccess)
                 {
                     await channel.CloseAsync().ConfigureAwait(false);
@@ -455,7 +455,7 @@ public partial class SiemensS7Master : DeviceBase
             }
             try
             {
-                var result2 = await SendThenReturnMessageBaseAsync(new S7Send(S7_PN), channel).ConfigureAwait(false);
+                var result2 = await SendThenReturnMessageAsync(new S7Send(S7_PN), channel, channel.ClosedToken).ConfigureAwait(false);
                 if (!result2.IsSuccess)
                 {
                     await channel.CloseAsync().ConfigureAwait(false);
@@ -463,12 +463,12 @@ public partial class SiemensS7Master : DeviceBase
                         Logger?.LogWarning(string.Format(AppResource.HandshakeError2, channel.ToString(), result2));
                     return true;
                 }
-                if (result2.Content == null)
+                if (result2.Content.IsEmpty)
                 {
                     await channel.CloseAsync().ConfigureAwait(false);
                     return true;
                 }
-                PduLength = ThingsGatewayBitConverter.ToUInt16(result2.Content, 0) - 28;
+                PduLength = ThingsGatewayBitConverter.ToUInt16(result2.Content.Span, 0) - 28;
                 Logger?.LogInformation($"PduLength：{PduLength}");
                 PduLength = PduLength < 200 ? 200 : PduLength;
             }
@@ -508,7 +508,7 @@ public partial class SiemensS7Master : DeviceBase
     {
         return (await ReadAsync(address, 2, cancellationToken).ConfigureAwait(false)).
              Then(m => OperResult.CreateSuccessResult(S7DateTime.SpecMinimumDateTime.AddDays(
-                 ThingsGatewayBitConverter.ToUInt16(m, 0)))
+                 ThingsGatewayBitConverter.ToUInt16(m.Span, 0)))
              );
     }
 
@@ -518,7 +518,7 @@ public partial class SiemensS7Master : DeviceBase
     /// <returns></returns>
     public async ValueTask<OperResult<System.DateTime>> ReadDateTimeAsync(string address, CancellationToken cancellationToken)
     {
-        return OperResultExtension.GetResultFromBytes(await ReadAsync(address, 8, cancellationToken).ConfigureAwait(false), S7DateTime.FromByteArray);
+        return OperResultExtension.GetResultFromBytes(await ReadAsync(address, 8, cancellationToken).ConfigureAwait(false), (a) => S7DateTime.FromByteArray(a.Span));
     }
 
     /// <summary>

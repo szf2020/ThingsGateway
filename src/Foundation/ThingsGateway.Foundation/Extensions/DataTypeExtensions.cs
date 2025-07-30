@@ -1,4 +1,4 @@
-﻿//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 //  此代码版权声明为全文件覆盖，如有原作者特别声明，会在下方手动补充
 //  此代码版权（除特别声明外的代码）归作者本人Diego所有
 //  源代码使用协议遵循本仓库的开源协议及附加协议
@@ -34,6 +34,7 @@ public static class DataTypeExtensions
             DataTypeEnum.UInt64 => 8,
             DataTypeEnum.Single => 4,
             DataTypeEnum.Double => 8,
+            DataTypeEnum.Decimal => 16,
             _ => 0,
         };
     }
@@ -58,6 +59,7 @@ public static class DataTypeExtensions
             TypeCode.UInt64 => DataTypeEnum.UInt64,
             TypeCode.Single => DataTypeEnum.Single,
             TypeCode.Double => DataTypeEnum.Double,
+            TypeCode.Decimal => DataTypeEnum.Decimal,
             _ => DataTypeEnum.Object,
         };
     }
@@ -82,6 +84,7 @@ public static class DataTypeExtensions
             DataTypeEnum.UInt64 => typeof(ulong),
             DataTypeEnum.Single => typeof(float),
             DataTypeEnum.Double => typeof(double),
+            DataTypeEnum.Decimal => typeof(decimal),
             _ => typeof(object),
         };
     }

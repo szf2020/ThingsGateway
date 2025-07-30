@@ -84,7 +84,7 @@ public partial class DeviceComponent : DeviceComponentBase
                 {
                     try
                     {
-                        var result1 = item.VariableRuntimes.PraseStructContent(Plc, result.Content, exWhenAny: true);
+                        var result1 = item.VariableRuntimes.PraseStructContent(Plc, result.Content.Span, exWhenAny: true);
                         if (!result1.IsSuccess)
                         {
                             item.LastErrorMessage = result1.ErrorMessage;

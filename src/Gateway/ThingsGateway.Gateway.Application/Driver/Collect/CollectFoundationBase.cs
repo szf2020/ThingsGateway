@@ -141,23 +141,32 @@ public abstract class CollectFoundationBase : CollectBase
     /// <summary>
     /// 采集驱动读取，读取成功后直接赋值变量，失败不做处理，注意非通用设备需重写
     /// </summary>
-    protected override async ValueTask<OperResult<byte[]>> ReadSourceAsync(VariableSourceRead variableSourceRead, CancellationToken cancellationToken)
+    protected override async ValueTask<OperResult<ReadOnlyMemory<byte>>> ReadSourceAsync(VariableSourceRead variableSourceRead, CancellationToken cancellationToken)
     {
-        if (cancellationToken.IsCancellationRequested)
-            return new(new OperationCanceledException());
-
-        // 从协议读取数据
-        var read = await FoundationDevice.ReadAsync(variableSourceRead.AddressObject, cancellationToken).ConfigureAwait(false);
-
-        // 如果读取成功且有有效内容，则解析结构化内容
-        if (read.IsSuccess)
+        try
         {
-            var prase = variableSourceRead.VariableRuntimes.PraseStructContent(FoundationDevice, read.Content, false);
-            return new OperResult<byte[]>(prase);
-        }
 
-        // 返回读取结果
-        return read;
+            if (cancellationToken.IsCancellationRequested)
+                return new(new OperationCanceledException());
+
+            // 从协议读取数据
+            var read = await FoundationDevice.ReadAsync(variableSourceRead.AddressObject, cancellationToken).ConfigureAwait(false);
+
+            // 如果读取成功且有有效内容，则解析结构化内容
+            if (read.IsSuccess)
+            {
+                var prase = variableSourceRead.VariableRuntimes.PraseStructContent(FoundationDevice, read.Content.Span, false);
+                return new OperResult<ReadOnlyMemory<byte>>(prase);
+            }
+
+            // 返回读取结果
+            return read;
+        }
+        catch (Exception ex)
+        {
+            // 捕获异常并返回失败结果
+            return new OperResult<ReadOnlyMemory<byte>>(ex);
+        }
     }
 
     /// <summary>
@@ -183,7 +192,7 @@ public abstract class CollectFoundationBase : CollectBase
                     LogMessage?.Debug(string.Format("{0} - Writing [{1} - {2} - {3}]", DeviceName, writeInfo.Key.RegisterAddress, writeInfo.Value, writeInfo.Key.DataType));
 
                 // 调用协议的写入方法，将写入信息中的数据写入到对应的寄存器地址，并获取操作结果
-                var result = await FoundationDevice.WriteAsync(writeInfo.Key.RegisterAddress, writeInfo.Value, writeInfo.Key.DataType, cancellationToken).ConfigureAwait(false);
+                var result = await FoundationDevice.WriteJTokenAsync(writeInfo.Key.RegisterAddress, writeInfo.Value, writeInfo.Key.DataType, cancellationToken).ConfigureAwait(false);
 
                 if (result.IsSuccess)
                 {

@@ -1,4 +1,4 @@
-﻿//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 //  此代码版权声明为全文件覆盖，如有原作者特别声明，会在下方手动补充
 //  此代码版权（除特别声明外的代码）归作者本人Diego所有
 //  源代码使用协议遵循本仓库的开源协议及附加协议
@@ -15,6 +15,8 @@ using System.Text;
 
 using ThingsGateway.Foundation.Extension.Generic;
 using ThingsGateway.Foundation.Extension.String;
+
+using TouchSocket.Resources;
 
 namespace ThingsGateway.Foundation;
 
@@ -225,22 +227,22 @@ public partial class ThingsGatewayBitConverter : IThingsGatewayBitConverter
     #region GetBytes
 
     /// <inheritdoc/>
-    public virtual byte[] GetBytes(string value)
+    public virtual Memory<byte> GetBytes(string value)
     {
         if (string.IsNullOrEmpty(value))
         {
-            return Array.Empty<byte>();
+            return Memory<byte>.Empty;
         }
         if (StringLength != null)
         {
             if (BcdFormat != null)
             {
-                byte[] bytes = DataTransUtil.GetBytesFromBCD(value, BcdFormat.Value);
+                var bytes = DataTransUtil.GetBytesFromBCD(value, BcdFormat.Value).AsMemory();
                 return IsStringReverseByteWord ? bytes.BytesReverseByWord().ArrayExpandToLength(StringLength.Value) : bytes.ArrayExpandToLength(StringLength.Value);
             }
             else
             {
-                byte[] bytes = EncodingValue.GetBytes(value);
+                var bytes = Encoding.GetBytes(value).AsMemory();
                 return IsStringReverseByteWord ? bytes.BytesReverseByWord().ArrayExpandToLength(StringLength.Value) : bytes.ArrayExpandToLength(StringLength.Value);
             }
         }
@@ -248,323 +250,204 @@ public partial class ThingsGatewayBitConverter : IThingsGatewayBitConverter
         {
             if (BcdFormat != null)
             {
-                byte[] bytes = DataTransUtil.GetBytesFromBCD(value, BcdFormat.Value);
+                var bytes = DataTransUtil.GetBytesFromBCD(value, BcdFormat.Value).AsMemory();
                 return IsStringReverseByteWord ? bytes.BytesReverseByWord() : bytes;
             }
             else
             {
-                byte[] bytes = EncodingValue.GetBytes(value);
+                var bytes = Encoding.GetBytes(value).AsMemory();
                 return IsStringReverseByteWord ? bytes.BytesReverseByWord() : bytes;
             }
         }
     }
 
+
+
     /// <inheritdoc/>
-    public virtual byte[] GetBytes(short[] value)
+    public virtual byte[] GetBytes(decimal value)
     {
-        using ValueByteBlock byteBlock = new ValueByteBlock(value.Length * 2);
-        for (int index = 0; index < value.Length; ++index)
-        {
-            byte[] bytes = GetBytes(value[index]);
-            byteBlock.Write(bytes);
-        }
-        return byteBlock.ToArray();
+        return GetTBytes(value);
     }
 
     /// <inheritdoc/>
-    public virtual byte[] GetBytes(ushort[] value)
+    public virtual byte[] GetBytes(char value)
     {
-        using ValueByteBlock byteBlock = new ValueByteBlock(value.Length * 2);
-        for (int index = 0; index < value.Length; ++index)
-        {
-            byte[] bytes = GetBytes(value[index]);
-            byteBlock.Write(bytes);
-        }
-        return byteBlock.ToArray();
+        return GetTBytes(value);
     }
 
     /// <inheritdoc/>
-    public virtual byte[] GetBytes(int[] value)
+    public virtual byte[] GetBytes(bool value)
     {
-        using ValueByteBlock byteBlock = new ValueByteBlock(value.Length * 4);
-        for (int index = 0; index < value.Length; ++index)
-        {
-            byte[] bytes = GetBytes(value[index]);
-            byteBlock.Write(bytes);
-        }
-        return byteBlock.ToArray();
+        return GetTBytes(value);
     }
 
     /// <inheritdoc/>
-    public virtual byte[] GetBytes(uint[] value)
+    public virtual byte[] GetBytes(short value)
     {
-        using ValueByteBlock byteBlock = new ValueByteBlock(value.Length * 4);
-        for (int index = 0; index < value.Length; ++index)
-        {
-            byte[] bytes = GetBytes(value[index]);
-            byteBlock.Write(bytes);
-        }
-        return byteBlock.ToArray();
+        return GetTBytes(value);
     }
 
     /// <inheritdoc/>
-    public virtual byte[] GetBytes(long[] value)
+    public virtual byte[] GetBytes(ushort value)
     {
-        using ValueByteBlock byteBlock = new ValueByteBlock(value.Length * 4);
-        for (int index = 0; index < value.Length; ++index)
-        {
-            byte[] bytes = GetBytes(value[index]);
-            byteBlock.Write(bytes);
-        }
-        return byteBlock.ToArray();
+        return GetTBytes(value);
     }
 
     /// <inheritdoc/>
-    public virtual byte[] GetBytes(ulong[] value)
+    public virtual byte[] GetBytes(ReadOnlySpan<bool> values)
     {
-        using ValueByteBlock byteBlock = new ValueByteBlock(value.Length * 4);
-        for (int index = 0; index < value.Length; ++index)
-        {
-            byte[] bytes = GetBytes(value[index]);
-            byteBlock.Write(bytes);
-        }
-        return byteBlock.ToArray();
+        return GetTBytes(values);
     }
 
     /// <inheritdoc/>
-    public virtual byte[] GetBytes(float[] value)
+    public virtual byte[] GetBytes(ReadOnlySpan<short> value)
     {
-        using ValueByteBlock byteBlock = new ValueByteBlock(value.Length * 4);
-        for (int index = 0; index < value.Length; ++index)
-        {
-            byte[] bytes = GetBytes(value[index]);
-            byteBlock.Write(bytes);
-        }
-        return byteBlock.ToArray();
+        return GetTBytes(value);
     }
 
     /// <inheritdoc/>
-    public virtual byte[] GetBytes(double[] value)
+    public virtual byte[] GetBytes(ReadOnlySpan<ushort> value)
     {
-        using ValueByteBlock byteBlock = new ValueByteBlock(value.Length * 4);
-        for (int index = 0; index < value.Length; ++index)
-        {
-            byte[] bytes = GetBytes(value[index]);
-            byteBlock.Write(bytes);
-        }
-        return byteBlock.ToArray();
+        return GetTBytes(value);
     }
 
+    /// <inheritdoc/>
+    public virtual byte[] GetBytes(ReadOnlySpan<int> value)
+    {
+        return GetTBytes(value);
+    }
+
+    /// <inheritdoc/>
+    public virtual byte[] GetBytes(ReadOnlySpan<uint> value)
+    {
+        return GetTBytes(value);
+    }
+
+    /// <inheritdoc/>
+    public virtual byte[] GetBytes(ReadOnlySpan<long> value)
+    {
+        return GetTBytes(value);
+    }
+
+    /// <inheritdoc/>
+    public virtual byte[] GetBytes(ReadOnlySpan<ulong> value)
+    {
+        return GetTBytes(value);
+    }
+
+    /// <inheritdoc/>
+    public virtual byte[] GetBytes(ReadOnlySpan<float> value)
+    {
+        return GetTBytes(value);
+    }
+
+    /// <inheritdoc/>
+    public virtual byte[] GetBytes(ReadOnlySpan<double> value)
+    {
+        return GetTBytes(value);
+    }
+    /// <inheritdoc/>
+    public virtual byte[] GetBytes(ReadOnlySpan<decimal> value)
+    {
+        return GetTBytes(value);
+    }
     #endregion GetBytes
 
     /// <inheritdoc/>
-    public virtual string ToString(byte[] buffer, int offset, int len)
+    public virtual string ToString(ReadOnlySpan<byte> buffer, int offset, int length)
     {
+        buffer = buffer.Slice(offset, length);
         if (BcdFormat != null)
         {
-            return IsStringReverseByteWord ? DataTransUtil.GetBcdValue(new ReadOnlySpan<byte>(buffer, offset, len).ToArray().BytesReverseByWord(), BcdFormat.Value) : DataTransUtil.GetBcdValue(new ReadOnlySpan<byte>(buffer, offset, len), BcdFormat.Value);
+            return IsStringReverseByteWord ? DataTransUtil.GetBcdValue(buffer.BytesReverseByWord(), BcdFormat.Value) : DataTransUtil.GetBcdValue(buffer, BcdFormat.Value);
         }
         else
         {
             return IsStringReverseByteWord ?
-                EncodingValue.GetString(new ReadOnlySpan<byte>(buffer, offset, len).ToArray().BytesReverseByWord()).TrimEnd().Replace($"\0", "") :
-                EncodingValue.GetString(buffer, offset, len).TrimEnd().Replace($"\0", "");
+                buffer.BytesReverseByWord().ToString(Encoding).TrimEnd().Replace($"\0", "") :
+                buffer.ToString(Encoding).TrimEnd().Replace($"\0", "");
         }
     }
 
     /// <inheritdoc/>
-    public virtual bool ToBoolean(byte[] buffer, int offset, bool isReverse)
+    public virtual bool ToBoolean(ReadOnlySpan<byte> buffer, int offset, bool isReverse)
     {
-        byte[] bytes;
+        ReadOnlySpan<byte> bytes;
         if (isReverse)
             bytes = buffer.BytesReverseByWord();
         else
-            bytes = buffer.CopyArray();
+            bytes = buffer;
         return bytes.GetBoolByIndex(offset);
     }
 
     /// <inheritdoc/>
-    public virtual byte ToByte(byte[] buffer, int offset)
+    public virtual byte ToByte(ReadOnlySpan<byte> buffer, int offset)
     {
         return buffer[offset];
     }
 
     /// <inheritdoc/>
-    public virtual short ToInt16(byte[] buffer, int offset)
+    public virtual char ToChar(ReadOnlySpan<byte> buffer, int offset)
     {
-        return TouchSocketBitConverter.ToInt16(buffer, offset);
+        return To<char>(buffer.Slice(offset));
     }
 
     /// <inheritdoc/>
-    public virtual int ToInt32(byte[] buffer, int offset)
+    public virtual decimal ToDecimal(ReadOnlySpan<byte> buffer, int offset)
     {
-        if (buffer.Length - offset < 4)
-        {
-            throw new ArgumentOutOfRangeException(nameof(offset));
-        }
-
-        unsafe
-        {
-            fixed (byte* p = &buffer[offset])
-            {
-                if (DataFormat == DataFormatEnum.DCBA)
-                {
-                    return Unsafe.Read<int>(p);
-                }
-                else
-                {
-                    ByteTransDataFormat4_Net6(ref buffer[offset]);
-                    var v = Unsafe.Read<int>(p);
-                    ByteTransDataFormat4_Net6(ref buffer[offset]);
-                    return v;
-                }
-            }
-        }
+        return To<decimal>(buffer.Slice(offset));
     }
 
     /// <inheritdoc/>
-    public virtual long ToInt64(byte[] buffer, int offset)
+    public virtual short ToInt16(ReadOnlySpan<byte> buffer, int offset)
     {
-        if (buffer.Length - offset < 8)
-        {
-            throw new ArgumentOutOfRangeException(nameof(offset));
-        }
-
-        unsafe
-        {
-            fixed (byte* p = &buffer[offset])
-            {
-                if (DataFormat == DataFormatEnum.DCBA)
-                {
-                    return Unsafe.Read<long>(p);
-                }
-                else
-                {
-                    ByteTransDataFormat8_Net6(ref buffer[offset]);
-                    var v = Unsafe.Read<long>(p);
-                    ByteTransDataFormat8_Net6(ref buffer[offset]);
-                    return v;
-                }
-            }
-        }
+        return To<Int16>(buffer.Slice(offset));
     }
 
     /// <inheritdoc/>
-    public virtual ushort ToUInt16(byte[] buffer, int offset)
+    public virtual int ToInt32(ReadOnlySpan<byte> buffer, int offset)
     {
-        return TouchSocketBitConverter.ToUInt16(buffer, offset);
+        return To<Int32>(buffer.Slice(offset));
     }
 
     /// <inheritdoc/>
-    public virtual uint ToUInt32(byte[] buffer, int offset)
+    public virtual long ToInt64(ReadOnlySpan<byte> buffer, int offset)
     {
-        if (buffer.Length - offset < 4)
-        {
-            throw new ArgumentOutOfRangeException(nameof(offset));
-        }
-
-        unsafe
-        {
-            fixed (byte* p = &buffer[offset])
-            {
-                if (DataFormat == DataFormatEnum.DCBA)
-                {
-                    return Unsafe.Read<uint>(p);
-                }
-                else
-                {
-                    ByteTransDataFormat4_Net6(ref buffer[offset]);
-                    var v = Unsafe.Read<uint>(p);
-                    ByteTransDataFormat4_Net6(ref buffer[offset]);
-                    return v;
-                }
-            }
-        }
+        return To<Int64>(buffer.Slice(offset));
     }
 
     /// <inheritdoc/>
-    public virtual ulong ToUInt64(byte[] buffer, int offset)
+    public virtual ushort ToUInt16(ReadOnlySpan<byte> buffer, int offset)
     {
-        if (buffer.Length - offset < 8)
-        {
-            throw new ArgumentOutOfRangeException(nameof(offset));
-        }
-
-        unsafe
-        {
-            fixed (byte* p = &buffer[offset])
-            {
-                if (DataFormat == DataFormatEnum.DCBA)
-                {
-                    return Unsafe.Read<ulong>(p);
-                }
-                else
-                {
-                    ByteTransDataFormat8_Net6(ref buffer[offset]);
-                    var v = Unsafe.Read<ulong>(p);
-                    ByteTransDataFormat8_Net6(ref buffer[offset]);
-                    return v;
-                }
-            }
-        }
+        return To<UInt16>(buffer.Slice(offset));
     }
 
     /// <inheritdoc/>
-    public virtual float ToSingle(byte[] buffer, int offset)
+    public virtual uint ToUInt32(ReadOnlySpan<byte> buffer, int offset)
     {
-        if (buffer.Length - offset < 4)
-        {
-            throw new ArgumentOutOfRangeException(nameof(offset));
-        }
-
-        unsafe
-        {
-            fixed (byte* p = &buffer[offset])
-            {
-                if (DataFormat == DataFormatEnum.DCBA)
-                {
-                    return Unsafe.Read<float>(p);
-                }
-                else
-                {
-                    ByteTransDataFormat4_Net6(ref buffer[offset]);
-                    var v = Unsafe.Read<float>(p);
-                    ByteTransDataFormat4_Net6(ref buffer[offset]);
-                    return v;
-                }
-            }
-        }
+        return To<UInt32>(buffer.Slice(offset));
     }
 
     /// <inheritdoc/>
-    public virtual double ToDouble(byte[] buffer, int offset)
+    public virtual ulong ToUInt64(ReadOnlySpan<byte> buffer, int offset)
     {
-        if (buffer.Length - offset < 8)
-        {
-            throw new ArgumentOutOfRangeException(nameof(offset));
-        }
-
-        unsafe
-        {
-            fixed (byte* p = &buffer[offset])
-            {
-                if (DataFormat == DataFormatEnum.DCBA)
-                {
-                    return Unsafe.Read<double>(p);
-                }
-                else
-                {
-                    ByteTransDataFormat8_Net6(ref buffer[offset]);
-                    var v = Unsafe.Read<double>(p);
-                    ByteTransDataFormat8_Net6(ref buffer[offset]);
-                    return v;
-                }
-            }
-        }
+        return To<UInt64>(buffer.Slice(offset));
     }
 
     /// <inheritdoc/>
-    public virtual bool[] ToBoolean(byte[] buffer, int offset, int len, bool isReverse = false)
+    public virtual float ToSingle(ReadOnlySpan<byte> buffer, int offset)
+    {
+        return To<float>(buffer.Slice(offset));
+    }
+
+    /// <inheritdoc/>
+    public virtual double ToDouble(ReadOnlySpan<byte> buffer, int offset)
+    {
+        return To<double>(buffer.Slice(offset));
+    }
+
+    /// <inheritdoc/>
+    public virtual bool[] ToBoolean(ReadOnlySpan<byte> buffer, int offset, int len, bool isReverse = false)
     {
         bool[] result = new bool[len];
         for (int i = 0; i < result.Length; i++)
@@ -575,15 +458,15 @@ public partial class ThingsGatewayBitConverter : IThingsGatewayBitConverter
     }
 
     /// <inheritdoc/>
-    public virtual byte[] ToByte(byte[] buffer, int offset, int length)
+    public virtual byte[] ToByte(ReadOnlySpan<byte> buffer, int offset, int length)
     {
         byte[] bytes = new byte[length];
-        Array.Copy(buffer, offset, bytes, 0, bytes.Length);
+        buffer.Slice(offset, length).CopyTo(bytes);
         return bytes;
     }
 
     /// <inheritdoc/>
-    public virtual double[] ToDouble(byte[] buffer, int offset, int len)
+    public virtual double[] ToDouble(ReadOnlySpan<byte> buffer, int offset, int len)
     {
         double[] numArray = new double[len];
         for (int index = 0; index < len; ++index)
@@ -594,7 +477,7 @@ public partial class ThingsGatewayBitConverter : IThingsGatewayBitConverter
     }
 
     /// <inheritdoc/>
-    public virtual short[] ToInt16(byte[] buffer, int offset, int len)
+    public virtual short[] ToInt16(ReadOnlySpan<byte> buffer, int offset, int len)
     {
         short[] numArray = new short[len];
         for (int index = 0; index < len; ++index)
@@ -605,7 +488,7 @@ public partial class ThingsGatewayBitConverter : IThingsGatewayBitConverter
     }
 
     /// <inheritdoc/>
-    public virtual int[] ToInt32(byte[] buffer, int offset, int len)
+    public virtual int[] ToInt32(ReadOnlySpan<byte> buffer, int offset, int len)
     {
         int[] numArray = new int[len];
         for (int index = 0; index < len; ++index)
@@ -616,7 +499,7 @@ public partial class ThingsGatewayBitConverter : IThingsGatewayBitConverter
     }
 
     /// <inheritdoc/>
-    public virtual long[] ToInt64(byte[] buffer, int offset, int len)
+    public virtual long[] ToInt64(ReadOnlySpan<byte> buffer, int offset, int len)
     {
         long[] numArray = new long[len];
         for (int index = 0; index < len; ++index)
@@ -627,7 +510,7 @@ public partial class ThingsGatewayBitConverter : IThingsGatewayBitConverter
     }
 
     /// <inheritdoc/>
-    public virtual float[] ToSingle(byte[] buffer, int offset, int len)
+    public virtual float[] ToSingle(ReadOnlySpan<byte> buffer, int offset, int len)
     {
         float[] numArray = new float[len];
         for (int index = 0; index < len; ++index)
@@ -638,7 +521,7 @@ public partial class ThingsGatewayBitConverter : IThingsGatewayBitConverter
     }
 
     /// <inheritdoc/>
-    public virtual ushort[] ToUInt16(byte[] buffer, int offset, int len)
+    public virtual ushort[] ToUInt16(ReadOnlySpan<byte> buffer, int offset, int len)
     {
         ushort[] numArray = new ushort[len];
         for (int index = 0; index < len; ++index)
@@ -649,7 +532,7 @@ public partial class ThingsGatewayBitConverter : IThingsGatewayBitConverter
     }
 
     /// <inheritdoc/>
-    public virtual uint[] ToUInt32(byte[] buffer, int offset, int len)
+    public virtual uint[] ToUInt32(ReadOnlySpan<byte> buffer, int offset, int len)
     {
         uint[] numArray = new uint[len];
         for (int index = 0; index < len; ++index)
@@ -660,7 +543,7 @@ public partial class ThingsGatewayBitConverter : IThingsGatewayBitConverter
     }
 
     /// <inheritdoc/>
-    public virtual ulong[] ToUInt64(byte[] buffer, int offset, int len)
+    public virtual ulong[] ToUInt64(ReadOnlySpan<byte> buffer, int offset, int len)
     {
         ulong[] numArray = new ulong[len];
         for (int index = 0; index < len; ++index)
@@ -671,7 +554,7 @@ public partial class ThingsGatewayBitConverter : IThingsGatewayBitConverter
     }
 
     /// <inheritdoc/>
-    public virtual decimal[] ToDecimal(byte[] buffer, int offset, int len)
+    public virtual decimal[] ToDecimal(ReadOnlySpan<byte> buffer, int offset, int len)
     {
         decimal[] numArray = new decimal[len];
         for (int index = 0; index < len; ++index)
@@ -681,248 +564,182 @@ public partial class ThingsGatewayBitConverter : IThingsGatewayBitConverter
         return numArray;
     }
 
+
+
     /// <inheritdoc/>
-    public virtual byte[] GetBytes(decimal value)
+    public virtual byte[] GetTBytes<T>(ReadOnlySpan<T> value) where T : unmanaged
     {
-        var bytes = new byte[16];
-        Unsafe.As<byte, decimal>(ref bytes[0]) = value;
-        if (DataFormat != DataFormatEnum.DCBA)
+        var size = Unsafe.SizeOf<T>();
+        using (ValueByteBlock byteBlock = new ValueByteBlock(value.Length * size))
         {
-            ByteTransDataFormat16_Net6(ref bytes[0]);
-        }
-        return bytes;
-    }
-
-    /// <inheritdoc/>
-    public virtual byte[] GetBytes(char value)
-    {
-        return TouchSocketBitConverter.GetBytes(value);
-    }
-
-    /// <inheritdoc/>
-    public virtual byte[] GetBytes(bool value)
-    {
-        return TouchSocketBitConverter.GetBytes(value);
-    }
-
-    /// <inheritdoc/>
-    public virtual byte[] GetBytes(bool[] values)
-    {
-        return TouchSocketBitConverter.GetBytes(values);
-    }
-
-    /// <inheritdoc/>
-    public virtual byte[] GetBytes(short value)
-    {
-        return TouchSocketBitConverter.GetBytes(value);
-    }
-
-    /// <inheritdoc/>
-    public virtual byte[] GetBytes(ushort value)
-    {
-        return TouchSocketBitConverter.GetBytes(value);
-    }
-
-    /// <inheritdoc/>
-    public virtual byte[] GetBytes(int value)
-    {
-        var bytes = BitConverter.GetBytes(value);
-
-        if (DataFormat != DataFormatEnum.DCBA)
-            bytes = ByteTransDataFormat4(bytes, 0);
-
-        return bytes;
-    }
-
-    /// <inheritdoc/>
-    public virtual byte[] GetBytes(uint value)
-    {
-        var bytes = BitConverter.GetBytes(value);
-
-        if (DataFormat != DataFormatEnum.DCBA)
-            bytes = ByteTransDataFormat4(bytes, 0);
-
-        return bytes;
-    }
-
-    /// <inheritdoc/>
-    public virtual byte[] GetBytes(long value)
-    {
-        var bytes = BitConverter.GetBytes(value);
-
-        if (DataFormat != DataFormatEnum.DCBA)
-            bytes = ByteTransDataFormat8(bytes, 0);
-
-        return bytes;
-    }
-
-    /// <inheritdoc/>
-    public virtual byte[] GetBytes(ulong value)
-    {
-        var bytes = BitConverter.GetBytes(value);
-
-        if (DataFormat != DataFormatEnum.DCBA)
-            bytes = ByteTransDataFormat8(bytes, 0);
-
-        return bytes;
-    }
-
-    /// <inheritdoc/>
-    public virtual byte[] GetBytes(float value)
-    {
-        var bytes = BitConverter.GetBytes(value);
-
-        if (DataFormat != DataFormatEnum.DCBA)
-            bytes = ByteTransDataFormat4(bytes, 0);
-
-        return bytes;
-    }
-
-    /// <inheritdoc/>
-    public virtual byte[] GetBytes(double value)
-    {
-        var bytes = BitConverter.GetBytes(value);
-
-        if (DataFormat != DataFormatEnum.DCBA)
-            bytes = ByteTransDataFormat8(bytes, 0);
-
-        return bytes;
-    }
-
-    /// <inheritdoc/>
-    public virtual decimal ToDecimal(byte[] buffer, int offset)
-    {
-        if (buffer.Length - offset < 16)
-        {
-            throw new ArgumentOutOfRangeException(nameof(offset));
-        }
-
-        unsafe
-        {
-            fixed (byte* p = &buffer[offset])
+            for (int index = 0; index < value.Length; ++index)
             {
-                if (DataFormat == DataFormatEnum.DCBA)
+                var bytes = GetTBytes(value[index]);
+                byteBlock.Write(bytes);
+            }
+            return byteBlock.ToArray();
+        }
+    }
+
+
+    private byte[] GetTBytes<T>(T value) where T : unmanaged
+    {
+        var size = Unsafe.SizeOf<T>();
+        var bytes = new byte[size];
+        this.WriteBytes(bytes, value);
+        return bytes;
+    }
+
+
+    /// <summary>
+    /// 将指定值的字节表示形式写入到指定的字节跨度中。
+    /// </summary>
+    /// <typeparam name="T">要写入的值的类型，必须是非托管类型。</typeparam>
+    /// <param name="span">要写入字节的目标跨度。</param>
+    /// <param name="value">要写入的值。</param>
+    /// <returns>写入的字节数。</returns>
+    private unsafe int WriteBytes<T>(Span<byte> span, T value) where T : unmanaged
+    {
+        var size = sizeof(T);
+
+        if (span.Length < size)
+        {
+            throw new ArgumentOutOfRangeException(nameof(span.Length), TouchSocketCoreResource.ValueLessThan.Format(nameof(span.Length), span.Length, size));
+        }
+
+        if (size == 2)
+        {
+            return TouchSocketBitConverter.WriteBytes(span, value);
+        }
+
+        Unsafe.As<byte, T>(ref span[0]) = value;
+
+        if (size == 1)
+        {
+            // 对于单字节类型，不需要转换
+            return size;
+        }
+
+        if (!TouchSocketBitConverter.IsSameOfSet())
+        {
+
+            if (size == 4)
+            {
+                this.ByteTransDataFormat4_Net6(ref span[0]);
+            }
+            else if (size == 8)
+            {
+                this.ByteTransDataFormat8_Net6(ref span[0]);
+            }
+            else if (size == 16)
+            {
+                this.ByteTransDataFormat16_Net6(ref span[0]);
+            }
+            else
+            {
+                throw new NotSupportedException(size.ToString());
+            }
+        }
+
+        return size;
+    }
+
+    /// <summary>
+    /// 将字节跨度转换为指定类型
+    /// </summary>
+    /// <typeparam name="T">要转换成的类型</typeparam>
+    /// <param name="span">要转换的字节跨度</param>
+    /// <returns>转换后的值</returns>
+    /// <exception cref="ArgumentOutOfRangeException">当字节跨度长度不足以表示类型T时抛出</exception>
+    /// <exception cref="NotSupportedException">当类型T不支持时抛出</exception>
+    public unsafe T To<T>(ReadOnlySpan<byte> span) where T : unmanaged
+    {
+        var size = sizeof(T);
+        if (span.Length < size)
+        {
+            throw new ArgumentOutOfRangeException(nameof(span.Length), TouchSocketCoreResource.ValueLessThan.Format(nameof(span.Length), span.Length, size));
+        }
+
+        if (size == 2)
+        {
+            return TouchSocketBitConverter.To<T>(span);
+        }
+
+        fixed (byte* p = &span[0])
+        {
+            if (this.TouchSocketBitConverter.IsSameOfSet())
+            {
+                return Unsafe.Read<T>(p);
+            }
+            else
+            {
+                if (size == 4)
                 {
-                    return Unsafe.Read<decimal>(p);
+                    this.ByteTransDataFormat4_Net6(p);
+                    var v = Unsafe.Read<T>(p);
+                    this.ByteTransDataFormat4_Net6(p);
+                    return v;
+                }
+                else if (size == 8)
+                {
+                    this.ByteTransDataFormat8_Net6(p);
+                    var v = Unsafe.Read<T>(p);
+                    this.ByteTransDataFormat8_Net6(p);
+                    return v;
+                }
+                else if (size == 16)
+                {
+                    this.ByteTransDataFormat16_Net6(p);
+                    var v = Unsafe.Read<T>(p);
+                    this.ByteTransDataFormat16_Net6(p);
+                    return v;
                 }
                 else
                 {
-                    ByteTransDataFormat16_Net6(ref buffer[offset]);
-                    var v = Unsafe.Read<decimal>(p);
-                    ByteTransDataFormat16_Net6(ref buffer[offset]);
-                    return v;
+                    throw new NotSupportedException(size.ToString());
                 }
             }
         }
     }
 
     /// <inheritdoc/>
-    public virtual char ToChar(byte[] buffer, int offset)
+    public virtual byte[] GetBytes(int value)
     {
-        return TouchSocketBitConverter.ToChar(buffer, offset);
+        return GetTBytes(value);
     }
 
-    #region Tool
-
-    /// <summary>反转多字节的数据信息</summary>
-    /// <param name="value">数据字节</param>
-    /// <param name="offset">起始索引，默认值为0</param>
-    /// <returns>实际字节信息</returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private byte[] ByteTransDataFormat4(byte[] value, int offset)
+    /// <inheritdoc/>
+    public virtual byte[] GetBytes(uint value)
     {
-        var numArray = new byte[4];
-        switch (DataFormat)
-        {
-            case DataFormatEnum.ABCD:
-                numArray[0] = value[offset + 3];
-                numArray[1] = value[offset + 2];
-                numArray[2] = value[offset + 1];
-                numArray[3] = value[offset];
-                break;
-
-            case DataFormatEnum.BADC:
-                numArray[0] = value[offset + 2];
-                numArray[1] = value[offset + 3];
-                numArray[2] = value[offset];
-                numArray[3] = value[offset + 1];
-                break;
-
-            case DataFormatEnum.CDAB:
-                numArray[0] = value[offset + 1];
-                numArray[1] = value[offset];
-                numArray[2] = value[offset + 3];
-                numArray[3] = value[offset + 2];
-                break;
-
-            case DataFormatEnum.DCBA:
-                numArray[0] = value[offset];
-                numArray[1] = value[offset + 1];
-                numArray[2] = value[offset + 2];
-                numArray[3] = value[offset + 3];
-                break;
-        }
-        return numArray;
+        return GetTBytes(value);
     }
 
-    /// <summary>反转多字节的数据信息</summary>
-    /// <param name="value">数据字节</param>
-    /// <param name="offset">起始索引，默认值为0</param>
-    /// <returns>实际字节信息</returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private byte[] ByteTransDataFormat8(byte[] value, int offset)
+    /// <inheritdoc/>
+    public virtual byte[] GetBytes(long value)
     {
-        var numArray = new byte[8];
-        switch (DataFormat)
-        {
-            case DataFormatEnum.ABCD:
-                numArray[0] = value[offset + 7];
-                numArray[1] = value[offset + 6];
-                numArray[2] = value[offset + 5];
-                numArray[3] = value[offset + 4];
-                numArray[4] = value[offset + 3];
-                numArray[5] = value[offset + 2];
-                numArray[6] = value[offset + 1];
-                numArray[7] = value[offset];
-                break;
-
-            case DataFormatEnum.BADC:
-                numArray[0] = value[offset + 6];
-                numArray[1] = value[offset + 7];
-                numArray[2] = value[offset + 4];
-                numArray[3] = value[offset + 5];
-                numArray[4] = value[offset + 2];
-                numArray[5] = value[offset + 3];
-                numArray[6] = value[offset];
-                numArray[7] = value[offset + 1];
-                break;
-
-            case DataFormatEnum.CDAB:
-                numArray[0] = value[offset + 1];
-                numArray[1] = value[offset];
-                numArray[2] = value[offset + 3];
-                numArray[3] = value[offset + 2];
-                numArray[4] = value[offset + 5];
-                numArray[5] = value[offset + 4];
-                numArray[6] = value[offset + 7];
-                numArray[7] = value[offset + 6];
-                break;
-
-            case DataFormatEnum.DCBA:
-                numArray[0] = value[offset];
-                numArray[1] = value[offset + 1];
-                numArray[2] = value[offset + 2];
-                numArray[3] = value[offset + 3];
-                numArray[4] = value[offset + 4];
-                numArray[5] = value[offset + 5];
-                numArray[6] = value[offset + 6];
-                numArray[7] = value[offset + 7];
-                break;
-        }
-        return numArray;
+        return GetTBytes(value);
     }
 
-    #endregion Tool
+    /// <inheritdoc/>
+    public virtual byte[] GetBytes(ulong value)
+    {
+        return GetTBytes(value);
+    }
+
+    /// <inheritdoc/>
+    public virtual byte[] GetBytes(float value)
+    {
+        return GetTBytes(value);
+    }
+
+    /// <inheritdoc/>
+    public virtual byte[] GetBytes(double value)
+    {
+        return GetTBytes(value);
+    }
+
+
+
 
     #region Tool
 
@@ -1047,6 +864,114 @@ public partial class ThingsGatewayBitConverter : IThingsGatewayBitConverter
                         throw new NotSupportedException();
                 }
             }
+        }
+    }
+
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private unsafe void ByteTransDataFormat4_Net6(byte* p)
+    {
+        var a = Unsafe.ReadUnaligned<byte>(p);
+        var b = Unsafe.ReadUnaligned<byte>(p + 1);
+        var c = Unsafe.ReadUnaligned<byte>(p + 2);
+        var d = Unsafe.ReadUnaligned<byte>(p + 3);
+
+        switch (this.DataFormat)
+        {
+            case DataFormatEnum.ABCD:
+                Unsafe.WriteUnaligned(p, d);
+                Unsafe.WriteUnaligned(p + 1, c);
+                Unsafe.WriteUnaligned(p + 2, b);
+                Unsafe.WriteUnaligned(p + 3, a);
+                break;
+
+            case DataFormatEnum.BADC:
+                Unsafe.WriteUnaligned(p, c);
+                Unsafe.WriteUnaligned(p + 1, d);
+                Unsafe.WriteUnaligned(p + 2, a);
+                Unsafe.WriteUnaligned(p + 3, b);
+                break;
+
+            case DataFormatEnum.CDAB:
+                Unsafe.WriteUnaligned(p, b);
+                Unsafe.WriteUnaligned(p + 1, a);
+                Unsafe.WriteUnaligned(p + 2, d);
+                Unsafe.WriteUnaligned(p + 3, c);
+                break;
+
+            case DataFormatEnum.DCBA:
+                return;
+        }
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private unsafe void ByteTransDataFormat8_Net6(byte* p)
+    {
+        var a = Unsafe.ReadUnaligned<byte>(p);
+        var b = Unsafe.ReadUnaligned<byte>(p + 1);
+        var c = Unsafe.ReadUnaligned<byte>(p + 2);
+        var d = Unsafe.ReadUnaligned<byte>(p + 3);
+        var e = Unsafe.ReadUnaligned<byte>(p + 4);
+        var f = Unsafe.ReadUnaligned<byte>(p + 5);
+        var g = Unsafe.ReadUnaligned<byte>(p + 6);
+        var h = Unsafe.ReadUnaligned<byte>(p + 7);
+
+        switch (this.DataFormat)
+        {
+            case DataFormatEnum.ABCD:
+                Unsafe.WriteUnaligned(p, h);
+                Unsafe.WriteUnaligned(p + 1, g);
+                Unsafe.WriteUnaligned(p + 2, f);
+                Unsafe.WriteUnaligned(p + 3, e);
+                Unsafe.WriteUnaligned(p + 4, d);
+                Unsafe.WriteUnaligned(p + 5, c);
+                Unsafe.WriteUnaligned(p + 6, b);
+                Unsafe.WriteUnaligned(p + 7, a);
+                break;
+
+            case DataFormatEnum.BADC:
+                Unsafe.WriteUnaligned(p, g);
+                Unsafe.WriteUnaligned(p + 1, h);
+                Unsafe.WriteUnaligned(p + 2, e);
+                Unsafe.WriteUnaligned(p + 3, f);
+                Unsafe.WriteUnaligned(p + 4, c);
+                Unsafe.WriteUnaligned(p + 5, d);
+                Unsafe.WriteUnaligned(p + 6, a);
+                Unsafe.WriteUnaligned(p + 7, b);
+                break;
+
+            case DataFormatEnum.CDAB:
+                Unsafe.WriteUnaligned(p, b);
+                Unsafe.WriteUnaligned(p + 1, a);
+                Unsafe.WriteUnaligned(p + 2, d);
+                Unsafe.WriteUnaligned(p + 3, c);
+                Unsafe.WriteUnaligned(p + 4, f);
+                Unsafe.WriteUnaligned(p + 5, e);
+                Unsafe.WriteUnaligned(p + 6, h);
+                Unsafe.WriteUnaligned(p + 7, g);
+                break;
+
+            case DataFormatEnum.DCBA:
+                break;
+        }
+    }
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private unsafe void ByteTransDataFormat16_Net6(byte* p)
+    {
+        switch (this.DataFormat)
+        {
+            case DataFormatEnum.ABCD:
+                var span = new Span<byte>(p, 16);
+                span.Reverse();
+                break;
+
+            case DataFormatEnum.DCBA:
+                return;
+
+            default:
+            case DataFormatEnum.CDAB:
+            case DataFormatEnum.BADC:
+                throw new NotSupportedException();
         }
     }
 

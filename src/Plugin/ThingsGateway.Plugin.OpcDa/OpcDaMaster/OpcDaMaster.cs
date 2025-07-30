@@ -138,16 +138,16 @@ public class OpcDaMaster : CollectBase
     }
 
     /// <inheritdoc/>
-    protected override ValueTask<OperResult<byte[]>> ReadSourceAsync(VariableSourceRead deviceVariableSourceRead, CancellationToken cancellationToken)
+    protected override ValueTask<OperResult<ReadOnlyMemory<byte>>> ReadSourceAsync(VariableSourceRead deviceVariableSourceRead, CancellationToken cancellationToken)
     {
         try
         {
             _plc.ReadItemsWithGroup(deviceVariableSourceRead.RegisterAddress);
-            return ValueTask.FromResult(OperResult.CreateSuccessResult(Array.Empty<byte>()));
+            return ValueTask.FromResult(OperResult.CreateSuccessResult(ReadOnlyMemory<byte>.Empty));
         }
         catch (Exception ex)
         {
-            return ValueTask.FromResult(new OperResult<byte[]>($"ReadSourceAsync Error：{Environment.NewLine}{ex}"));
+            return ValueTask.FromResult(new OperResult<ReadOnlyMemory<byte>>($"ReadSourceAsync Error：{Environment.NewLine}{ex}"));
         }
     }
 

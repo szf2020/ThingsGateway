@@ -1,4 +1,4 @@
-﻿//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 //  此代码版权声明为全文件覆盖，如有原作者特别声明，会在下方手动补充
 //  此代码版权（除特别声明外的代码）归作者本人Diego所有
 //  源代码使用协议遵循本仓库的开源协议及附加协议
@@ -11,7 +11,7 @@
 namespace ThingsGateway.Foundation;
 
 /// <inheritdoc cref="IResultMessage"/>
-public class MessageBase : OperResultClass<byte[]>, IResultMessage, IWaitHandle
+public class MessageBase : OperResultClass<ReadOnlyMemory<byte>>, IResultMessage, IWaitHandle
 {
     #region 构造
 
@@ -42,13 +42,13 @@ public class MessageBase : OperResultClass<byte[]>, IResultMessage, IWaitHandle
     public virtual int Sign { get; set; } = -1;
 
     /// <inheritdoc />
-    public virtual FilterResult CheckBody<TByteBlock>(ref TByteBlock byteBlock) where TByteBlock : IByteBlock
+    public virtual FilterResult CheckBody<TByteBlock>(ref TByteBlock byteBlock) where TByteBlock : IByteBlockReader
     {
         return FilterResult.Success;
     }
 
     /// <inheritdoc/>
-    public virtual bool CheckHead<TByteBlock>(ref TByteBlock byteBlock) where TByteBlock : IByteBlock
+    public virtual bool CheckHead<TByteBlock>(ref TByteBlock byteBlock) where TByteBlock : IByteBlockReader
     {
         return true;
     }

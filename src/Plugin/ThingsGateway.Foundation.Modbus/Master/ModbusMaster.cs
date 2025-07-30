@@ -18,7 +18,6 @@ public partial class ModbusMaster : DtuServiceDeviceBase, IModbusAddress
         base.InitChannel(channel, deviceLog);
 
         RegisterByteLength = 2;
-        channel.MaxSign = ushort.MaxValue;
     }
 
     protected override void SetChannel()
@@ -102,7 +101,7 @@ public partial class ModbusMaster : DtuServiceDeviceBase, IModbusAddress
         return PackHelper.LoadSourceRead<T>(this, deviceVariables, maxPack, defaultIntervalTime, Station);
     }
 
-    public override ValueTask<OperResult<byte[]>> ReadAsync(object state, CancellationToken cancellationToken = default)
+    public override ValueTask<OperResult<ReadOnlyMemory<byte>>> ReadAsync(object state, CancellationToken cancellationToken = default)
     {
         try
         {
@@ -112,16 +111,16 @@ public partial class ModbusMaster : DtuServiceDeviceBase, IModbusAddress
             }
             else
             {
-                return EasyValueTask.FromResult(new OperResult<byte[]>(new ArgumentException("State must be of type ModbusAddress", nameof(state))));
+                return EasyValueTask.FromResult(new OperResult<ReadOnlyMemory<byte>>(new ArgumentException("State must be of type ModbusAddress", nameof(state))));
             }
         }
         catch (Exception ex)
         {
-            return EasyValueTask.FromResult(new OperResult<byte[]>(ex));
+            return EasyValueTask.FromResult(new OperResult<ReadOnlyMemory<byte>>(ex));
         }
     }
 
-    public ValueTask<OperResult<byte[]>> ModbusReadAsync(ModbusAddress mAddress, CancellationToken cancellationToken = default)
+    public ValueTask<OperResult<ReadOnlyMemory<byte>>> ModbusReadAsync(ModbusAddress mAddress, CancellationToken cancellationToken = default)
     {
         try
         {
@@ -130,11 +129,11 @@ public partial class ModbusMaster : DtuServiceDeviceBase, IModbusAddress
         }
         catch (Exception ex)
         {
-            return EasyValueTask.FromResult(new OperResult<byte[]>(ex));
+            return EasyValueTask.FromResult(new OperResult<ReadOnlyMemory<byte>>(ex));
         }
     }
 
-    public ValueTask<OperResult<byte[]>> ModbusRequestAsync(ModbusAddress mAddress, bool read, CancellationToken cancellationToken = default)
+    public ValueTask<OperResult<ReadOnlyMemory<byte>>> ModbusRequestAsync(ModbusAddress mAddress, bool read, CancellationToken cancellationToken = default)
     {
         try
         {
@@ -143,12 +142,12 @@ public partial class ModbusMaster : DtuServiceDeviceBase, IModbusAddress
         }
         catch (Exception ex)
         {
-            return EasyValueTask.FromResult(new OperResult<byte[]>(ex));
+            return EasyValueTask.FromResult(new OperResult<ReadOnlyMemory<byte>>(ex));
         }
     }
 
     /// <inheritdoc/>
-    public override ValueTask<OperResult<byte[]>> ReadAsync(string address, int length, CancellationToken cancellationToken = default)
+    public override ValueTask<OperResult<ReadOnlyMemory<byte>>> ReadAsync(string address, int length, CancellationToken cancellationToken = default)
     {
         try
         {
@@ -158,12 +157,12 @@ public partial class ModbusMaster : DtuServiceDeviceBase, IModbusAddress
         }
         catch (Exception ex)
         {
-            return EasyValueTask.FromResult(new OperResult<byte[]>(ex));
+            return EasyValueTask.FromResult(new OperResult<ReadOnlyMemory<byte>>(ex));
         }
     }
 
     /// <inheritdoc/>
-    public override async ValueTask<OperResult> WriteAsync(string address, byte[] value, DataTypeEnum dataType, CancellationToken cancellationToken = default)
+    public override async ValueTask<OperResult> WriteAsync(string address, ReadOnlyMemory<byte> value, DataTypeEnum dataType, CancellationToken cancellationToken = default)
     {
         try
         {
@@ -179,12 +178,14 @@ public partial class ModbusMaster : DtuServiceDeviceBase, IModbusAddress
                 mAddress.Length = 1; //请求寄存器数量
                 var readData = await ModbusRequestAsync(mAddress, true, cancellationToken).ConfigureAwait(false);
                 if (!readData.IsSuccess) return readData;
+                var v = value.Span[0];
+                var writeValye = readData.Content.ToArray();
                 if (mAddress.BitIndex == 0)
-                    readData.Content[1] = value[0];
+                    writeValye[1] = v;
                 else
-                    readData.Content[0] = value[0];
+                    writeValye[0] = v;
 
-                mAddress.Data = readData.Content;
+                mAddress.Data = writeValye;
                 return await ModbusRequestAsync(mAddress, false, cancellationToken).ConfigureAwait(false);
             }
             else
@@ -203,7 +204,7 @@ public partial class ModbusMaster : DtuServiceDeviceBase, IModbusAddress
         return mAddress;
     }
     /// <inheritdoc/>
-    public override async ValueTask<OperResult> WriteAsync(string address, bool[] value, CancellationToken cancellationToken = default)
+    public override async ValueTask<OperResult> WriteAsync(string address, ReadOnlyMemory<bool> value, CancellationToken cancellationToken = default)
     {
         try
         {
@@ -211,12 +212,13 @@ public partial class ModbusMaster : DtuServiceDeviceBase, IModbusAddress
             if (value.Length > 1 && (mAddress.FunctionCode == 1 || mAddress.FunctionCode == 0x31))
             {
                 mAddress.WriteFunctionCode = 15;
-                mAddress.Data = value.BoolArrayToByte();
+                mAddress.Data = value.Span.BoolArrayToByte();
                 return await ModbusRequestAsync(mAddress, false, cancellationToken).ConfigureAwait(false);
             }
             else if (mAddress.BitIndex == null)
             {
-                mAddress.Data = value[0] ? new byte[2] { 255, 0 } : [0, 0];
+                var span = value.Span;
+                mAddress.Data = span[0] ? new byte[2] { 255, 0 } : [0, 0];
                 return await ModbusRequestAsync(mAddress, false, cancellationToken).ConfigureAwait(false);
             }
             else
@@ -226,10 +228,11 @@ public partial class ModbusMaster : DtuServiceDeviceBase, IModbusAddress
                     mAddress.Length = 1; //请求寄存器数量
                     var readData = await ModbusRequestAsync(mAddress, true, cancellationToken).ConfigureAwait(false);
                     if (!readData.IsSuccess) return readData;
-                    var writeData = ThingsGatewayBitConverter.ToUInt16(readData.Content, 0);
-                    for (int i = 0; i < value.Length; i++)
+                    var writeData = ThingsGatewayBitConverter.ToUInt16(readData.Content.Span, 0);
+                    var span = value.Span;
+                    for (int i = 0; i < span.Length; i++)
                     {
-                        writeData = writeData.SetBit(mAddress.BitIndex.Value + i, value[i]);
+                        writeData = writeData.SetBit(mAddress.BitIndex.Value + i, span[i]);
                     }
                     mAddress.Data = ThingsGatewayBitConverter.GetBytes(writeData);
                     return await ModbusRequestAsync(mAddress, false, cancellationToken).ConfigureAwait(false);

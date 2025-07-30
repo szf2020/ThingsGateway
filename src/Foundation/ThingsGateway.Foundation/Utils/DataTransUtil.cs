@@ -1,4 +1,4 @@
-﻿//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 //  此代码版权声明为全文件覆盖，如有原作者特别声明，会在下方手动补充
 //  此代码版权（除特别声明外的代码）归作者本人Diego所有
 //  源代码使用协议遵循本仓库的开源协议及附加协议
@@ -22,8 +22,9 @@ public static class DataTransUtil
     /// </summary>
     /// <param name="InBytes">字节数组</param>
     /// <param name="segment">分割符</param>
+    /// <param name="newLineCount">指定在何处换行，设为0则不换行</param>
     /// <returns>返回的字符串</returns>
-    public static string ByteToHexString(byte[] InBytes, char segment = default) => ByteToHexString(InBytes, segment, 0);
+    public static string ByteToHexString(ReadOnlySpan<byte> InBytes, char segment = default, int newLineCount = 0) => ByteToHexString(InBytes, 0, InBytes.Length, segment, newLineCount);
 
     /// <summary>
     /// 将字节数组转换为十六进制表示的字符串
@@ -34,60 +35,30 @@ public static class DataTransUtil
     /// <param name="segment">用于分隔每个字节的字符</param>
     /// <param name="newLineCount">指定在何处换行，设为0则不换行</param>
     /// <returns>转换后的十六进制字符串</returns>
-    public static string ByteToHexString(byte[] inBytes, int offset, int length, char segment = default, int newLineCount = 0)
+    public static string ByteToHexString(ReadOnlySpan<byte> inBytes, int offset, int length, char segment = default, int newLineCount = 0)
     {
-        if (inBytes == null || inBytes.Length == 0)
+        // 合法性检查：避免越界和空输入
+        if (inBytes.IsEmpty || offset < 0 || length <= 0 || offset + length > inBytes.Length)
             return string.Empty;
+        // 每个字节占 2 个字符，如果有分隔符 +1，再加换行（估算上限）
+        int estimatedSize = length * (segment != default ? 3 : 2) + (length / Math.Max(newLineCount, int.MaxValue));
+        StringBuilder sb = new StringBuilder(estimatedSize);
 
-        StringBuilder stringBuilder = new();
-        var len = length + offset;
-        for (int i = offset; i < len; i++)
+        int end = offset + length;
+        for (int i = offset; i < end; i++)
         {
-            // 将字节转换为两位十六进制数并追加到字符串构建器中
-            stringBuilder.Append(inBytes[i].ToString("X2"));
+            sb.Append(inBytes[i].ToString("X2")); // 转大写16进制
 
-            // 如果设置了分隔符并且不是最后一个字节，则添加分隔符
-            if (segment != char.MinValue && i < len - 1)
-                stringBuilder.Append(segment);
+            if (segment != default && i < end - 1)
+                sb.Append(segment);
 
-            // 如果设置了换行数且当前位置满足换行条件，则换行
-            if (newLineCount > 0 && (i + 1) % newLineCount == 0)
-                stringBuilder.AppendLine();
+            if (newLineCount > 0 && (i - offset + 1) % newLineCount == 0)
+                sb.AppendLine();
         }
 
-        return stringBuilder.ToString();
+        return sb.ToString();
     }
 
-    /// <summary>
-    /// 将字节数组转换为十六进制表示的字符串
-    /// </summary>
-    /// <param name="inBytes">输入的字节数组</param>
-    /// <param name="segment">用于分隔每个字节的字符</param>
-    /// <param name="newLineCount">指定在何处换行，设为0则不换行</param>
-    /// <returns>转换后的十六进制字符串</returns>
-    public static string ByteToHexString(ReadOnlySpan<byte> inBytes, char segment = default, int newLineCount = 0)
-    {
-        if (inBytes.Length == 0)
-            return string.Empty;
-
-        StringBuilder stringBuilder = new();
-        var len = inBytes.Length;
-        for (int i = 0; i < len; i++)
-        {
-            // 将字节转换为两位十六进制数并追加到字符串构建器中
-            stringBuilder.Append(inBytes[i].ToString("X2"));
-
-            // 如果设置了分隔符并且不是最后一个字节，则添加分隔符
-            if (segment != char.MinValue && i < len - 1)
-                stringBuilder.Append(segment);
-
-            // 如果设置了换行数且当前位置满足换行条件，则换行
-            if (newLineCount > 0 && (i + 1) % newLineCount == 0)
-                stringBuilder.AppendLine();
-        }
-
-        return stringBuilder.ToString();
-    }
 
     /// <summary>
     /// 获取Bcd值
@@ -286,32 +257,30 @@ public static class DataTransUtil
     /// <returns>转换后的字节数组</returns>
     public static byte[] GetBytesFromBCD(string value, BcdFormatEnum format)
     {
-        // 如果输入字符串为空，则返回空字节数组
         if (string.IsNullOrEmpty(value))
         {
             return Array.Empty<byte>();
         }
 
-        // 计算输出字节数组的长度
-        int length = value.Length % 2 == 1 ? (value.Length / 2) + 1 : value.Length / 2;
+        int length = (value.Length + 1) / 2;
         byte[] bytesFromBcd = new byte[length];
 
-        // 遍历输入的Bcd值字符串进行转换
         for (int index = 0; index < length; ++index)
         {
-            // 将每两个字符转换为一个字节
-            bytesFromBcd[index] = (byte)(bytesFromBcd[index] | ((uint)GetBcdCodeFromChar(value[2 * index], format) << 4));
+            byte highNibble = (byte)(GetBcdCodeFromChar(value[2 * index], format) << 4);
+            byte lowNibble = 0;
 
-            // 如果还有下一个字符，则将其转换为字节的低四位
             if ((2 * index) + 1 < value.Length)
             {
-                bytesFromBcd[index] = (byte)(bytesFromBcd[index] | (uint)GetBcdCodeFromChar(value[(2 * index) + 1], format));
+                lowNibble = GetBcdCodeFromChar(value[(2 * index) + 1], format);
             }
+
+            bytesFromBcd[index] = (byte)(highNibble | lowNibble);
         }
 
-        // 返回转换后的字节数组
         return bytesFromBcd;
     }
+
 
     /// <summary>
     /// 返回bit代表的数据
@@ -368,25 +337,34 @@ public static class DataTransUtil
     /// </summary>
     /// <param name="hex">输入的十六进制字符串</param>
     /// <returns>转换后的字节数组</returns>
-    public static byte[] HexStringToBytes(string hex)
+    public static Memory<byte> HexStringToBytes(string hex)
     {
-        // 创建内存流用于存储转换后的字节数据
-        using var bytes = new MemoryStream();
+        if (string.IsNullOrEmpty(hex))
+            return Memory<byte>.Empty;
 
-        // 遍历十六进制字符串进行转换
-        for (int index = 0; index < hex.Length; ++index)
+        int len = hex.Length / 2;
+        var result = new byte[len];
+        int byteIndex = 0;
+
+        for (int i = 0; i < hex.Length - 1; i += 2)
         {
-            // 检查当前字符和下一个字符是否都在合法的十六进制范围内
-            if (index + 1 < hex.Length && GetHexCharIndex(hex[index]) <= 0x0F && GetHexCharIndex(hex[index + 1]) <= 0x0F)
+            int hi = GetHexCharIndex(hex[i]);
+            int lo = GetHexCharIndex(hex[i + 1]);
+
+            if (hi >= 0 && lo >= 0 && hi < 0x10 && lo < 0x10)
             {
-                // 计算两个十六进制字符对应的字节值并写入内存流
-                bytes.WriteByte((byte)(GetHexCharIndex(hex[index]) * 16 + GetHexCharIndex(hex[index + 1])));
-                ++index; // 跳过下一个字符，因为已经处理过了
+                result[byteIndex++] = (byte)((hi << 4) | lo);
+            }
+            else
+            {
+                i--;
+                continue;
             }
         }
 
-        return bytes.ToArray();
+        return new Memory<byte>(result, 0, byteIndex);
     }
+
 
     /// <summary>
     /// 拼接任意个泛型数组为一个总的泛型数组对象。
@@ -396,21 +374,75 @@ public static class DataTransUtil
     /// <returns>拼接之后的最终的结果对象</returns>
     public static T[] SpliceArray<T>(params T[][] arrays)
     {
-        // 初始化一个动态数组用于存储拼接后的结果
-        List<T> resultList = new List<T>();
+        if (arrays == null || arrays.Length == 0)
+            return Array.Empty<T>();
 
-        // 遍历输入的数组
-        foreach (T[] array in arrays)
+        // 预先计算所有数组的总长度，避免多次扩容
+        int totalLength = 0;
+        foreach (var array in arrays)
         {
-            // 如果数组不为空且长度不为0，则将其元素添加到结果数组中
-            if (array != null && array.Length != 0)
-            {
-                resultList.AddRange(array);
-            }
+            if (array != null)
+                totalLength += array.Length;
         }
 
-        // 将动态数组转换为静态数组并返回
-        return resultList.ToArray();
+        if (totalLength == 0)
+            return Array.Empty<T>();
+
+        // 分配目标数组
+        T[] result = new T[totalLength];
+        int offset = 0;
+
+        // 拷贝所有数组到目标数组中
+        foreach (var array in arrays)
+        {
+            if (array == null || array.Length == 0)
+                continue;
+
+            Array.Copy(array, 0, result, offset, array.Length);
+            offset += array.Length;
+        }
+
+        return result;
+    }
+
+
+    /// <summary>
+    /// 拼接任意个泛型数组为一个总的泛型数组对象。
+    /// </summary>
+    /// <typeparam name="T">数组的类型信息</typeparam>
+    /// <param name="arrays">任意个长度的数组</param>
+    /// <returns>拼接之后的最终的结果对象</returns>
+    public static Memory<T> SpliceArray<T>(params Memory<T>[] arrays)
+    {
+        if (arrays == null || arrays.Length == 0)
+            return Array.Empty<T>();
+
+        // 预先计算所有数组的总长度，避免多次扩容
+        int totalLength = 0;
+        foreach (var array in arrays)
+        {
+            if (!array.IsEmpty)
+                totalLength += array.Length;
+        }
+
+        if (totalLength == 0)
+            return Array.Empty<T>();
+
+        // 分配目标数组
+        Memory<T> result = new T[totalLength];
+        int offset = 0;
+
+        // 拷贝所有数组到目标数组中
+        foreach (var array in arrays)
+        {
+            if (array.IsEmpty)
+                continue;
+
+            array.CopyTo(result.Slice(offset, array.Length));
+            offset += array.Length;
+        }
+
+        return result;
     }
 
     /// <summary>

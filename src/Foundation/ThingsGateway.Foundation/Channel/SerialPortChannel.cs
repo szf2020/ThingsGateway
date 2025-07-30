@@ -1,4 +1,4 @@
-﻿//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 //  此代码版权声明为全文件覆盖，如有原作者特别声明，会在下方手动补充
 //  此代码版权（除特别声明外的代码）归作者本人Diego所有
 //  源代码使用协议遵循本仓库的开源协议及附加协议
@@ -24,15 +24,17 @@ public class SerialPortChannel : SerialPortClient, IClientChannel
     public SerialPortChannel(IChannelOptions channelOptions)
     {
         ChannelOptions = channelOptions;
-
-        WaitHandlePool.MaxSign = ushort.MaxValue;
     }
 
     public override TouchSocketConfig Config => base.Config ?? ChannelOptions.Config;
 
-    /// <inheritdoc/>
-    public int MaxSign { get => WaitHandlePool.MaxSign; set => WaitHandlePool.MaxSign = value; }
-
+    public void ResetSign(int minSign = 0, int maxSign = ushort.MaxValue)
+    {
+        var pool = WaitHandlePool;
+        WaitHandlePool = new WaitHandlePool<MessageBase>(minSign, maxSign);
+        pool?.CancelAll();
+        pool?.SafeDispose();
+    }
     /// <inheritdoc/>
     public ChannelReceivedEventHandler ChannelReceived { get; set; } = new();
 
@@ -62,7 +64,7 @@ public class SerialPortChannel : SerialPortClient, IClientChannel
     /// <summary>
     /// 等待池
     /// </summary>
-    public WaitHandlePool<MessageBase> WaitHandlePool { get; } = new();
+    public WaitHandlePool<MessageBase> WaitHandlePool { get; internal set; } = new();
 
     /// <inheritdoc/>
     public WaitLock WaitLock => ChannelOptions.WaitLock;
@@ -82,6 +84,7 @@ public class SerialPortChannel : SerialPortClient, IClientChannel
                 //await _connectLock.WaitAsync().ConfigureAwait(false);
                 if (Online)
                 {
+                    PortName = null;
                     var result = await base.CloseAsync(msg, token).ConfigureAwait(false);
                     if (!Online)
                     {
@@ -99,7 +102,7 @@ public class SerialPortChannel : SerialPortClient, IClientChannel
     }
 
     /// <inheritdoc/>
-    public new async Task ConnectAsync(int millisecondsTimeout, CancellationToken token)
+    public override async Task ConnectAsync(int millisecondsTimeout, CancellationToken token)
     {
         if (!Online)
         {
@@ -109,6 +112,12 @@ public class SerialPortChannel : SerialPortClient, IClientChannel
                 if (!Online)
                 {
                     if (token.IsCancellationRequested) return;
+
+
+                    var port = Config?.GetValue(SerialPortConfigExtension.SerialPortOptionProperty);
+                    if (port != null)
+                        PortName = $"{port.PortName}";
+
                     await base.ConnectAsync(millisecondsTimeout, token).ConfigureAwait(false);
                     if (Online)
                     {
@@ -130,20 +139,16 @@ public class SerialPortChannel : SerialPortClient, IClientChannel
         if (adapter is SingleStreamDataHandlingAdapter singleStreamDataHandlingAdapter)
             SetAdapter(singleStreamDataHandlingAdapter);
     }
-
+    private string PortName { get; set; }
     /// <inheritdoc/>
     public override string? ToString()
     {
-        if (ProtectedMainSerialPort != null)
-        {
-            return $"{ProtectedMainSerialPort.PortName}";
-        }
-        else
-        {
-            var port = Config?.GetValue(SerialPortConfigExtension.SerialPortOptionProperty);
-            if (port != null)
-                return $"{port.PortName}";
-        }
+        if (!PortName.IsNullOrEmpty())
+            return PortName;
+
+        var port = Config?.GetValue(SerialPortConfigExtension.SerialPortOptionProperty);
+        if (port != null)
+            return $"{port.PortName}";
         return base.ToString();
     }
 
@@ -192,9 +197,9 @@ public class SerialPortChannel : SerialPortClient, IClientChannel
     }
 
     /// <inheritdoc/>
-    protected override void Dispose(bool disposing)
+    protected override void SafetyDispose(bool disposing)
     {
         WaitHandlePool.SafeDispose();
-        base.Dispose(disposing);
+        base.SafetyDispose(disposing);
     }
 }

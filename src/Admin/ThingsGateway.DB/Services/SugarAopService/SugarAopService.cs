@@ -43,12 +43,12 @@ public class SugarAopService : ISugarAopService
                 }
                 if (sql.StartsWith("INSERT"))
                 {
-                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.ForegroundColor = ConsoleColor.Blue;
                     DbContext.WriteLog($"添加{config.ConfigId}库操作");
                 }
                 if (sql.StartsWith("DELETE"))
                 {
-                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.ForegroundColor = ConsoleColor.Blue;
                     DbContext.WriteLog($"删除{config.ConfigId}库操作");
                 }
                 DbContext.WriteLogWithSql(UtilMethods.GetNativeSql(sql, pars));

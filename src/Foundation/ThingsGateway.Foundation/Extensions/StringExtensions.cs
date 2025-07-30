@@ -1,4 +1,4 @@
-﻿//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 //  此代码版权声明为全文件覆盖，如有原作者特别声明，会在下方手动补充
 //  此代码版权（除特别声明外的代码）归作者本人Diego所有
 //  源代码使用协议遵循本仓库的开源协议及附加协议
@@ -184,7 +184,7 @@ public static class StringExtensions
     /// </summary>
     /// <param name="str"></param>
     /// <returns></returns>
-    public static byte[] HexStringToBytes(this string str) => DataTransUtil.HexStringToBytes(str);
+    public static Memory<byte> HexStringToBytes(this string str) => DataTransUtil.HexStringToBytes(str);
     private static readonly char[] DotSeparator = new char[] { '.' };
     private static readonly char[] SlashSeparator = new char[] { '/' };
     private static readonly char[] CommaSeparator = new char[] { ',' };

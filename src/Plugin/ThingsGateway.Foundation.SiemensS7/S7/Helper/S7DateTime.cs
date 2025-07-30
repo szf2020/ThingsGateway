@@ -34,7 +34,7 @@ public static class S7DateTime
     /// <exception cref="ArgumentOutOfRangeException">Thrown when the length of
     ///   <paramref name="bytes"/> is not 8 or any value in <paramref name="bytes"/>
     ///   is outside the valid range of values.</exception>
-    public static System.DateTime FromByteArray(this byte[]? bytes)
+    public static System.DateTime FromByteArray(this ReadOnlySpan<byte> bytes)
     {
         return FromByteArrayImpl(bytes);
     }
@@ -47,7 +47,7 @@ public static class S7DateTime
     /// <exception cref="ArgumentOutOfRangeException">Thrown when the length of
     ///   <paramref name="bytes"/> is not a multiple of 8 or any value in
     ///   <paramref name="bytes"/> is outside the valid range of values.</exception>
-    public static System.DateTime[] ToArray(byte[] bytes)
+    public static System.DateTime[] ToArray(ReadOnlySpan<byte> bytes)
     {
         if (bytes.Length % 8 != 0)
             throw new ArgumentOutOfRangeException(nameof(bytes), bytes.Length,
@@ -57,7 +57,7 @@ public static class S7DateTime
         var result = new System.DateTime[bytes.Length / 8];
 
         for (var i = 0; i < cnt; i++)
-            result[i] = FromByteArrayImpl(new ArraySegment<byte>(bytes, i * 8, 8));
+            result[i] = FromByteArrayImpl(bytes.Slice(i * 8, 8));
 
         return result;
     }
@@ -118,13 +118,13 @@ public static class S7DateTime
         return bytes.ToArray();
     }
 
-    private static System.DateTime FromByteArrayImpl(IList<byte>? bytes)
+    private static System.DateTime FromByteArrayImpl(ReadOnlySpan<byte> bytes)
     {
         if (bytes == null)
             throw new ArgumentNullException(nameof(bytes));
-        if (bytes.Count != 8)
-            throw new ArgumentOutOfRangeException(nameof(bytes), bytes.Count,
-                $"Parsing a DateTime requires exactly 8 bytes of input data, input data is {bytes.Count} bytes long.");
+        if (bytes.Length != 8)
+            throw new ArgumentOutOfRangeException(nameof(bytes), bytes.Length,
+                $"Parsing a DateTime requires exactly 8 bytes of input data, input data is {bytes.Length} bytes long.");
 
         int DecodeBcd(byte input) => 10 * (input >> 4) + (input & 0b00001111);
 

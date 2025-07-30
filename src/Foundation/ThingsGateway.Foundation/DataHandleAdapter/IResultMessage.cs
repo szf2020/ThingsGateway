@@ -1,4 +1,4 @@
-﻿//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 //  此代码版权声明为全文件覆盖，如有原作者特别声明，会在下方手动补充
 //  此代码版权（除特别声明外的代码）归作者本人Diego所有
 //  源代码使用协议遵循本仓库的开源协议及附加协议
@@ -23,7 +23,7 @@ public interface IResultMessage : IOperResult, IRequestInfo
     /// <summary>
     /// 解析的字节信息
     /// </summary>
-    byte[] Content { get; set; }
+    ReadOnlyMemory<byte> Content { get; set; }
 
     /// <summary>
     /// 消息头的指令长度,不固定时返回0
@@ -42,14 +42,14 @@ public interface IResultMessage : IOperResult, IRequestInfo
     /// <para>然后返回<see cref="FilterResult.GoOn"/></para>
     /// </summary>
     /// <returns>是否成功有效</returns>
-    FilterResult CheckBody<TByteBlock>(ref TByteBlock byteBlock) where TByteBlock : IByteBlock;
+    FilterResult CheckBody<TByteBlock>(ref TByteBlock byteBlock) where TByteBlock : IByteBlockReader;
 
     /// <summary>
     /// 检查头子节的合法性,并赋值<see cref="BodyLength"/><br />
     /// <para>如果返回false，意味着放弃本次解析的所有数据，包括已经解析完成的Header</para>
     /// </summary>
     /// <returns>是否成功的结果</returns>
-    bool CheckHead<TByteBlock>(ref TByteBlock byteBlock) where TByteBlock : IByteBlock;
+    bool CheckHead<TByteBlock>(ref TByteBlock byteBlock) where TByteBlock : IByteBlockReader;
 
     /// <summary>
     /// 发送前的信息处理，例如存储某些特征信息：站号/功能码等等用于验证后续的返回信息是否合法

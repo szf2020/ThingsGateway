@@ -10,6 +10,7 @@
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.Components.Server.Circuits;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption;
 using Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption.ConfigurationModel;
@@ -37,6 +38,8 @@ public class Startup : AppStartup
 {
     public void ConfigBlazorServer(IServiceCollection services)
     {
+
+
         // 增加中文编码支持网页源码显示汉字
         services.AddSingleton(HtmlEncoder.Create(UnicodeRanges.All));
         //并发启动/停止host
@@ -174,7 +177,11 @@ public class Startup : AppStartup
             a.LoginPath = "/Account/Login/";
         });
 
-        var websiteOptions = App.GetOptions<WebsiteOptions>()!;
+        var websiteOptions = App.GetConfig<WebsiteOptions>("Website");
+        if (websiteOptions.BlazorConnectionLimitEnable)
+        {
+            services.AddSingleton<CircuitHandler, ConnectionLimiterCircuitHandler>();
+        }
         if (websiteOptions.Demo)
         {
             authenticationBuilder.AddOAuth<GiteeOAuthOptions, AdminOAuthHandler<GiteeOAuthOptions>>("Gitee", "Gitee", options =>

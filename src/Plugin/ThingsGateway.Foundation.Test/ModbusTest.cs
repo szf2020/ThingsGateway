@@ -8,6 +8,8 @@
 // QQ群：605534569
 // ------------------------------------------------------------------------------
 
+using System.Diagnostics;
+
 using ThingsGateway.Foundation.Extension.String;
 using ThingsGateway.Foundation.Modbus;
 
@@ -26,14 +28,21 @@ public class ModbusTest
     [InlineData("000045", false, "0000000000060105002CFF00", "true", DataTypeEnum.Boolean)]
     public async Task ModbusTcp_ReadWrite_OK(string address, bool read, string data, string writeData = null, DataTypeEnum dataTypeEnum = DataTypeEnum.UInt16)
     {
-        byte[] bytes = data.HexStringToBytes();
         var modbusChannel = new TouchSocketConfig().GetChannel(new ChannelOptions()
         {
             ChannelType = ChannelTypeEnum.Other
         }) as IClientChannel;
+        modbusChannel.Config.ConfigureContainer(a =>
+        {
+            a.AddEasyLogger((a, b, c, d) =>
+            {
+                Debug.WriteLine($"{c}{Environment.NewLine}{d?.ToString()}");
+            }, LogLevel.Trace);
+        });
         var modbusMaster = new ModbusMaster() { ModbusType = ModbusTypeEnum.ModbusTcp, Timeout = 10000 };
         modbusMaster.InitChannel(modbusChannel);
         await modbusChannel.SetupAsync(modbusChannel.Config);
+        await modbusChannel.ConnectAsync(modbusChannel.ChannelOptions.ConnectTimeout, CancellationToken.None);
         var adapter = modbusChannel.ReadOnlyDataHandlingAdapter as SingleStreamDataHandlingAdapter;
 
         var task1 = Task.Run(async () =>
@@ -45,16 +54,17 @@ public class ModbusTest
              }
              else
              {
-                 var result = await modbusMaster.WriteAsync(address, JTokenUtil.GetJTokenFromString(writeData), dataTypeEnum).ConfigureAwait(false);
+                 var result = await modbusMaster.WriteJTokenAsync(address, JTokenUtil.GetJTokenFromString(writeData), dataTypeEnum).ConfigureAwait(false);
                  Assert.True(result.IsSuccess, result.ToString());
              }
          });
         await Task.Delay(50);
         var task2 = Task.Run(async () =>
         {
+            var bytes = data.HexStringToBytes().GetArray();
             foreach (var item in bytes)
             {
-                var data = new ByteBlock([item]);
+                var data = new ByteBlock(1); data.WriteByte(item);
                 await adapter.ReceivedInputAsync(data).ConfigureAwait(false);
             }
         });
@@ -70,14 +80,21 @@ public class ModbusTest
     [InlineData("000045", false, "0105002CFF004DF3", "true", DataTypeEnum.Boolean)]
     public async Task ModbusRtu_ReadWrite_OK(string address, bool read, string data, string writeData = null, DataTypeEnum dataTypeEnum = DataTypeEnum.UInt16)
     {
-        byte[] bytes = data.HexStringToBytes();
         var modbusChannel = new TouchSocketConfig().GetChannel(new ChannelOptions()
         {
             ChannelType = ChannelTypeEnum.Other
         }) as IClientChannel;
+        modbusChannel.Config.ConfigureContainer(a =>
+        {
+            a.AddEasyLogger((a, b, c, d) =>
+           {
+               Debug.WriteLine($"{c}{Environment.NewLine}{d?.ToString()}");
+           }, LogLevel.Trace);
+        });
         var modbusMaster = new ModbusMaster() { ModbusType = ModbusTypeEnum.ModbusRtu, Timeout = 10000, Station = 1 };
         modbusMaster.InitChannel(modbusChannel);
         await modbusChannel.SetupAsync(modbusChannel.Config);
+        await modbusChannel.ConnectAsync(modbusChannel.ChannelOptions.ConnectTimeout, CancellationToken.None);
         var adapter = modbusChannel.ReadOnlyDataHandlingAdapter as SingleStreamDataHandlingAdapter;
 
         var task1 = Task.Run(async () =>
@@ -89,17 +106,18 @@ public class ModbusTest
             }
             else
             {
-                var result = await modbusMaster.WriteAsync(address, JTokenUtil.GetJTokenFromString(writeData), dataTypeEnum).ConfigureAwait(false);
+                var result = await modbusMaster.WriteJTokenAsync(address, JTokenUtil.GetJTokenFromString(writeData), dataTypeEnum).ConfigureAwait(false);
                 Assert.True(result.IsSuccess, result.ToString());
             }
         });
         await Task.Delay(50);
         var task2 = Task.Run(async () =>
         {
+            var bytes = data.HexStringToBytes().GetArray();
             foreach (var item in bytes)
             {
-                var data = new ByteBlock([item]);
-                await adapter.ReceivedInputAsync(data).ConfigureAwait(false);
+                var data = new ByteBlock(1); data.WriteByte(item);
+                await (adapter).ReceivedInputAsync(data).ConfigureAwait(false);
             }
         });
         await Task.WhenAll(task1, task2);

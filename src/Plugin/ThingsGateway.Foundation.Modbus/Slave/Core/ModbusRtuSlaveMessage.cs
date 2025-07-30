@@ -28,43 +28,43 @@ public class ModbusRtuSlaveMessage : MessageBase, IResultMessage
     /// <inheritdoc/>
     public override bool CheckHead<TByteBlock>(ref TByteBlock byteBlock)
     {
-        Request.Station = byteBlock.ReadByte();
-        Request.FunctionCode = byteBlock.ReadByte();
+        Request.Station = ReaderExtension.ReadValue<TByteBlock, byte>(ref byteBlock);
+        Request.FunctionCode = ReaderExtension.ReadValue<TByteBlock, byte>(ref byteBlock);
         var f = Request.FunctionCode > 0x30 ? Request.FunctionCode - 0x30 : Request.FunctionCode;
-        Request.StartAddress = byteBlock.ReadUInt16(EndianType.Big);
+        Request.StartAddress = ReaderExtension.ReadValue<TByteBlock, ushort>(ref byteBlock, EndianType.Big);
         if (f == 3 || f == 4)
         {
-            Request.Length = (ushort)(byteBlock.ReadUInt16(EndianType.Big) * 2);
+            Request.Length = (ushort)(ReaderExtension.ReadValue<TByteBlock, ushort>(ref byteBlock, EndianType.Big) * 2);
             BodyLength = 1;
             return true;
         }
         else if (f == 1 || f == 2)
         {
-            Request.Length = byteBlock.ReadUInt16(EndianType.Big);
+            Request.Length = ReaderExtension.ReadValue<TByteBlock, ushort>(ref byteBlock, EndianType.Big);
             BodyLength = 1;
             return true;
         }
         else if (f == 5)
         {
-            Request.Data = byteBlock.AsSegmentTake(1);
+            Request.Data = byteBlock.Memory.Slice(byteBlock.Position, 1);
             BodyLength = 1;
             return true;
         }
         else if (f == 6)
         {
-            Request.Data = byteBlock.AsSegmentTake(2);
+            Request.Data = byteBlock.Memory.Slice(byteBlock.Position, 2);
             BodyLength = 1;
             return true;
         }
         else if (f == 15)
         {
-            Request.Length = byteBlock.ReadUInt16(EndianType.Big);
+            Request.Length = ReaderExtension.ReadValue<TByteBlock, ushort>(ref byteBlock, EndianType.Big);
             BodyLength = Request.Length + 2;
             return true;
         }
         else if (f == 16)
         {
-            Request.Length = (ushort)(byteBlock.ReadUInt16(EndianType.Big) * 2);
+            Request.Length = (ushort)(ReaderExtension.ReadValue<TByteBlock, ushort>(ref byteBlock, EndianType.Big) * 2);
             BodyLength = Request.Length + 2;
             return true;
         }
@@ -75,16 +75,16 @@ public class ModbusRtuSlaveMessage : MessageBase, IResultMessage
     {
         var pos = byteBlock.Position - HeaderLength;
         var crcLen = 0;
-        Bytes = byteBlock.AsSegment(pos, HeaderLength + BodyLength);
+        Bytes = byteBlock.Memory.Slice(pos, HeaderLength + BodyLength);
 
         var f = Request.FunctionCode > 0x30 ? Request.FunctionCode - 0x30 : Request.FunctionCode;
         if (f == 15)
         {
-            Request.Data = byteBlock.AsSegmentTake(Request.Length).AsSpan().ByteToBoolArray(Request.Length).Select(a => a ? (byte)0xff : (byte)0).ToArray();
+            Request.Data = byteBlock.Memory.Slice(byteBlock.Position, Request.Length).Span.ByteToBoolArray(Request.Length).BoolToByte();
         }
         else if (f == 16)
         {
-            Request.Data = byteBlock.AsSegmentTake(Request.Length);
+            Request.Data = byteBlock.Memory.Slice(byteBlock.Position, Request.Length);
         }
 
         crcLen = HeaderLength + BodyLength - 2;
@@ -92,8 +92,8 @@ public class ModbusRtuSlaveMessage : MessageBase, IResultMessage
         var crc = CRC16Utils.Crc16Only(byteBlock.Span.Slice(pos, crcLen));
 
         //Crc
-        var checkCrc = byteBlock.Span.Slice(pos + crcLen, 2).ToArray();
-        if (crc.SequenceEqual(checkCrc))
+        var checkCrc = byteBlock.Span.Slice(pos + crcLen, 2);
+        if (checkCrc.SequenceEqual(crc))
         {
             OperCode = 0;
             return FilterResult.Success;

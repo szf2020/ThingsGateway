@@ -79,10 +79,10 @@ public static class DynamicModelExtension
         return null; // 未找到对应的业务设备Id，返回null
     }
 
-    public static IEnumerable<IGrouping<object[], T>> GroupByKeys<T>(this IEnumerable<T> values, IEnumerable<string> keys)
+    public static IEnumerable<IGrouping<object[], T>> GroupByKeys<T>(this IEnumerable<T> values, params string[] keys)
     {
         // 获取动态对象集合中指定键的属性信息
-        var properties = GetProperties(values, keys.ToArray());
+        var properties = GetProperties(values, keys);
 
         // 使用对象数组作为键进行分组
         return values.GroupBy(v => properties.Select(property => property.GetValue(v)).ToArray(), new ArrayEqualityComparer());

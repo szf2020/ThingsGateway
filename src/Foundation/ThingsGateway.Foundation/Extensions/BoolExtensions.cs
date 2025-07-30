@@ -1,4 +1,4 @@
-﻿//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 //  此代码版权声明为全文件覆盖，如有原作者特别声明，会在下方手动补充
 //  此代码版权（除特别声明外的代码）归作者本人Diego所有
 //  源代码使用协议遵循本仓库的开源协议及附加协议
@@ -16,23 +16,32 @@ namespace ThingsGateway.Foundation;
 public static class BoolExtensions
 {
     /// <summary>
-    /// 将bool数组转换到byte数组
+    /// 将布尔数组转换为压缩的字节数组（每 8 位布尔值压缩为 1 个字节，低位在前）。
     /// </summary>
-    public static byte[] BoolArrayToByte(this bool[] array)
+    /// <param name="array">布尔数组</param>
+    /// <returns>压缩后的只读字节内存</returns>
+    public static byte[] BoolArrayToByte(this ReadOnlySpan<bool> array)
     {
+        if (array.IsEmpty)
+            return Array.Empty<byte>();
+
         int byteLength = (array.Length + 7) / 8;
-        byte[] byteArray = new byte[byteLength];
+        byte[] result = new byte[byteLength];
 
         for (int i = 0; i < array.Length; i++)
         {
             if (array[i])
             {
-                int byteIndex = i / 8;
-                int bitOffset = i % 8;
-                byteArray[byteIndex] |= (byte)(1 << bitOffset);
+                result[i / 8] |= (byte)(1 << (i % 8));
             }
         }
 
-        return byteArray;
+        return result;
     }
+
+    /// <summary>
+    /// 将布尔数组转换为压缩的字节数组（每 8 位布尔值压缩为 1 个字节，低位在前）。
+    /// </summary>
+    public static byte[] BoolArrayToByte(this Span<bool> array)
+        => ((ReadOnlySpan<bool>)array).BoolArrayToByte();
 }

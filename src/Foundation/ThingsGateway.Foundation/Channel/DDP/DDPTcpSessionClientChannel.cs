@@ -1,4 +1,4 @@
-﻿//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 //  此代码版权声明为全文件覆盖，如有原作者特别声明，会在下方手动补充
 //  此代码版权（除特别声明外的代码）归作者本人Diego所有
 //  源代码使用协议遵循本仓库的开源协议及附加协议
@@ -42,17 +42,17 @@ public class DDPTcpSessionClientChannel : TcpSessionClientChannel
         DataHandlingAdapter.SendAsyncCallBack = DefaultSendAsync;
         return base.OnTcpConnected(e);
     }
-    protected Task DefaultSendAsync(ReadOnlyMemory<byte> memory)
+    protected Task DefaultSendAsync(ReadOnlyMemory<byte> memory, CancellationToken cancellationToken)
     {
-        return DDPAdapter.SendInputAsync(new DDPSend(memory, Id, true));
+        return DDPAdapter.SendInputAsync(new DDPSend(memory, Id, true), cancellationToken);
     }
-    protected Task DDPSendAsync(ReadOnlyMemory<byte> memory)
+    protected Task DDPSendAsync(ReadOnlyMemory<byte> memory, CancellationToken cancellationToken)
     {
-        return base.ProtectedDefaultSendAsync(memory);
+        return base.ProtectedDefaultSendAsync(memory, cancellationToken);
     }
 
     private DDPMessage DDPMessage { get; set; }
-    private Task DDPHandleReceivedData(ByteBlock byteBlock, IRequestInfo requestInfo)
+    private Task DDPHandleReceivedData(IByteBlockReader byteBlock, IRequestInfo requestInfo)
     {
         if (requestInfo is DDPMessage dDPMessage)
             DDPMessage = dDPMessage;
@@ -62,13 +62,14 @@ public class DDPTcpSessionClientChannel : TcpSessionClientChannel
 
     private DeviceSingleStreamDataHandleAdapter<DDPTcpMessage> DDPAdapter = new();
     private WaitLock _waitLock = new(nameof(DDPTcpSessionClientChannel));
-    protected override async ValueTask<bool> OnTcpReceiving(ByteBlock byteBlock)
+
+    protected override async ValueTask<bool> OnTcpReceiving(IByteBlockReader byteBlock)
     {
         DDPMessage? message = null;
         try
         {
             await _waitLock.WaitAsync().ConfigureAwait(false);
-            await DDPAdapter.ReceivedInputAsync(byteBlock).ConfigureAwait(EasyTask.ContinueOnCapturedContext);
+            await DDPAdapter.ReceivedInputAsync(byteBlock).ConfigureAwait(false);
 
             message = DDPMessage;
             DDPMessage = null;
@@ -85,9 +86,18 @@ public class DDPTcpSessionClientChannel : TcpSessionClientChannel
                 var id = $"ID={message.Id}";
                 if (message.Type == 0x09)
                 {
-                    byteBlock.Reset();
-                    byteBlock.Write(message.Content);
-                    return false;
+                    var reader = new ByteBlockReader(message.Content);
+
+                    if (this.DataHandlingAdapter == null)
+                    {
+                        await this.OnTcpReceived(new ReceivedDataEventArgs(reader, default)).ConfigureAwait(EasyTask.ContinueOnCapturedContext);
+                    }
+                    else
+                    {
+                        await this.DataHandlingAdapter.ReceivedInputAsync(reader).ConfigureAwait(EasyTask.ContinueOnCapturedContext);
+                    }
+
+                    return true;
                 }
                 else
                 {
@@ -102,7 +112,7 @@ public class DDPTcpSessionClientChannel : TcpSessionClientChannel
                             Logger?.Debug($"Old socket connections with the same ID {id} will be closed");
                             try
                             {
-                                await oldClient.ShutdownAsync(System.Net.Sockets.SocketShutdown.Both).ConfigureAwait(false);
+                                //await oldClient.ShutdownAsync(System.Net.Sockets.SocketShutdown.Both).ConfigureAwait(false);
                                 await oldClient.CloseAsync().ConfigureAwait(false);
                             }
                             catch
@@ -120,13 +130,13 @@ public class DDPTcpSessionClientChannel : TcpSessionClientChannel
                         await ResetIdAsync(id).ConfigureAwait(false);
 
                         //发送成功
-                        await DDPAdapter.SendInputAsync(new DDPSend(ReadOnlyMemory<byte>.Empty, id, true, 0x81)).ConfigureAwait(false);
+                        await DDPAdapter.SendInputAsync(new DDPSend(ReadOnlyMemory<byte>.Empty, id, true, 0x81), ClosedToken).ConfigureAwait(false);
                         if (log)
                             Logger?.Info(string.Format(AppResource.DtuConnected, Id));
                     }
                     else if (message.Type == 0x02)
                     {
-                        await DDPAdapter.SendInputAsync(new DDPSend(ReadOnlyMemory<byte>.Empty, Id, true, 0x82)).ConfigureAwait(false);
+                        await DDPAdapter.SendInputAsync(new DDPSend(ReadOnlyMemory<byte>.Empty, Id, true, 0x82), ClosedToken).ConfigureAwait(false);
                         Logger?.Info(string.Format(AppResource.DtuDisconnecting, Id));
                         await Task.Delay(100).ConfigureAwait(false);
                         await this.CloseAsync().ConfigureAwait(false);
