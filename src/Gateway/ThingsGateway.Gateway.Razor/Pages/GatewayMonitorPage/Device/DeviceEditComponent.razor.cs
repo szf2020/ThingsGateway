@@ -11,6 +11,9 @@
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Components.Web;
 
+using System.ComponentModel.DataAnnotations;
+
+using ThingsGateway.Common.Extension;
 using ThingsGateway.Extension.Generic;
 using ThingsGateway.NewLife.Extension;
 
@@ -53,7 +56,16 @@ public partial class DeviceEditComponent
         try
         {
             var result = (!PluginServiceUtil.HasDynamicProperty(Model.ModelValueValidateForm.Value)) || (Model.ModelValueValidateForm.ValidateForm?.Validate() != false);
-            if (!result) return;
+            if (!result)
+            {
+                // 进行设备对象属性的验证
+                var validationContext = new ValidationContext(Model.ModelValueValidateForm.Value);
+                var validationResults = new List<ValidationResult>();
+                validationContext.ValidateProperty(validationResults);
+
+                if (validationResults.Any(v => !string.IsNullOrEmpty(v.ErrorMessage)))
+                    return;
+            }
 
             Model.DevicePropertys = PluginServiceUtil.SetDict(Model.ModelValueValidateForm.Value);
 

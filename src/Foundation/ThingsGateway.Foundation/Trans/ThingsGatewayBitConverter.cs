@@ -242,7 +242,7 @@ public partial class ThingsGatewayBitConverter : IThingsGatewayBitConverter
             }
             else
             {
-                var bytes = Encoding.GetBytes(value).AsMemory();
+                var bytes = EncodingValue.GetBytes(value).AsMemory();
                 return IsStringReverseByteWord ? bytes.BytesReverseByWord().ArrayExpandToLength(StringLength.Value) : bytes.ArrayExpandToLength(StringLength.Value);
             }
         }
@@ -255,7 +255,7 @@ public partial class ThingsGatewayBitConverter : IThingsGatewayBitConverter
             }
             else
             {
-                var bytes = Encoding.GetBytes(value).AsMemory();
+                var bytes = EncodingValue.GetBytes(value).AsMemory();
                 return IsStringReverseByteWord ? bytes.BytesReverseByWord() : bytes;
             }
         }
@@ -364,8 +364,8 @@ public partial class ThingsGatewayBitConverter : IThingsGatewayBitConverter
         else
         {
             return IsStringReverseByteWord ?
-                buffer.BytesReverseByWord().ToString(Encoding).TrimEnd().Replace($"\0", "") :
-                buffer.ToString(Encoding).TrimEnd().Replace($"\0", "");
+                buffer.BytesReverseByWord().ToString(EncodingValue).TrimEnd().Replace($"\0", "") :
+                buffer.ToString(EncodingValue).TrimEnd().Replace($"\0", "");
         }
     }
 
