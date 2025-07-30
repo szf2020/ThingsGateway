@@ -41,7 +41,7 @@ public class SiemensS7Test
         var siemensS7Master = new SiemensS7Master() { SiemensS7Type = SiemensTypeEnum.S1200, Timeout = 10000 };
         siemensS7Master.InitChannel(siemensS7Channel);
         await siemensS7Channel.SetupAsync(siemensS7Channel.Config);
-        await siemensS7Channel.ConnectAsync(siemensS7Channel.ChannelOptions.ConnectTimeout, CancellationToken.None);
+        await siemensS7Master.ConnectAsync(CancellationToken.None);
         var adapter = siemensS7Channel.ReadOnlyDataHandlingAdapter as SingleStreamDataHandlingAdapter;
         await siemensS7Master.ConnectAsync(CancellationToken.None);
         var task1 = Task.Run(async () =>

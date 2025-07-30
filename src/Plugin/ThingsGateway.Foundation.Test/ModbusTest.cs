@@ -42,7 +42,7 @@ public class ModbusTest
         var modbusMaster = new ModbusMaster() { ModbusType = ModbusTypeEnum.ModbusTcp, Timeout = 10000 };
         modbusMaster.InitChannel(modbusChannel);
         await modbusChannel.SetupAsync(modbusChannel.Config);
-        await modbusChannel.ConnectAsync(modbusChannel.ChannelOptions.ConnectTimeout, CancellationToken.None);
+        await modbusMaster.ConnectAsync(CancellationToken.None);
         var adapter = modbusChannel.ReadOnlyDataHandlingAdapter as SingleStreamDataHandlingAdapter;
 
         var task1 = Task.Run(async () =>
@@ -94,7 +94,7 @@ public class ModbusTest
         var modbusMaster = new ModbusMaster() { ModbusType = ModbusTypeEnum.ModbusRtu, Timeout = 10000, Station = 1 };
         modbusMaster.InitChannel(modbusChannel);
         await modbusChannel.SetupAsync(modbusChannel.Config);
-        await modbusChannel.ConnectAsync(modbusChannel.ChannelOptions.ConnectTimeout, CancellationToken.None);
+        await modbusMaster.ConnectAsync(CancellationToken.None);
         var adapter = modbusChannel.ReadOnlyDataHandlingAdapter as SingleStreamDataHandlingAdapter;
 
         var task1 = Task.Run(async () =>

@@ -37,7 +37,7 @@ public class Dlt645Test
         var dltMaster = new Dlt645_2007Master() { Timeout = 10000, Station = "111111111111" };
         dltMaster.InitChannel(dltChannel);
         await dltChannel.SetupAsync(dltChannel.Config);
-        await dltChannel.ConnectAsync(dltChannel.ChannelOptions.ConnectTimeout, CancellationToken.None);
+        await dltMaster.ConnectAsync(CancellationToken.None);
         var adapter = dltChannel.ReadOnlyDataHandlingAdapter as SingleStreamDataHandlingAdapter;
 
         var task1 = Task.Run(async () =>

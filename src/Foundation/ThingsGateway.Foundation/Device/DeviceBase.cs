@@ -394,6 +394,8 @@ public abstract class DeviceBase : DisposableObject, IDevice
                 await connectWaitLock.WaitAsync(token).ConfigureAwait(false);
                 if (AutoConnect && Channel != null && Channel?.Online != true)
                 {
+                    if (Channel.PluginManager == null)
+                        await Channel.SetupAsync(Channel.Config.Clone()).ConfigureAwait(false);
                     await Channel.CloseAsync().ConfigureAwait(false);
                     await Task.Delay(500, token).ConfigureAwait(false);
                     await Channel.ConnectAsync(Channel.ChannelOptions.ConnectTimeout, token).ConfigureAwait(false);
