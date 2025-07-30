@@ -166,7 +166,7 @@ public partial class VariableRuntime : Variable, IVariable, IDisposable
 
             LastSetValue = _value;
 
-
+            ValueInited = true;
 
             if (_isOnline == true)
             {
