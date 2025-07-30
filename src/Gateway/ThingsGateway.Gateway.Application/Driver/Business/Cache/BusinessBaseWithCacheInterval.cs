@@ -94,7 +94,7 @@ public abstract class BusinessBaseWithCacheInterval : BusinessBaseWithCache
             IdVariableRuntimes.ForEach(a =>
             {
                 if (((!_businessPropertyWithCacheInterval.OnlineFilter) || a.Value.IsOnline) && _businessPropertyWithCacheInterval.BusinessUpdateEnum != BusinessUpdateEnum.Interval)
-                    VariableValueChange(a.Value, a.Value.AdaptVariableBasicData());
+                    VariableValueInit(a.Value);
             });
         }
     }
@@ -269,7 +269,7 @@ public abstract class BusinessBaseWithCacheInterval : BusinessBaseWithCache
                     IdVariableRuntimes.ForEach(a =>
                 {
                     if (((!_businessPropertyWithCacheInterval.OnlineFilter) || a.Value.IsOnline) && _businessPropertyWithCacheInterval.BusinessUpdateEnum != BusinessUpdateEnum.Interval)
-                        VariableValueChange(a.Value, a.Value.AdaptVariableBasicData());
+                        VariableValueInit(a.Value);
                 });
                 }
             }
@@ -316,4 +316,29 @@ public abstract class BusinessBaseWithCacheInterval : BusinessBaseWithCache
                 VariableChange(variableRuntime, variable);
         }
     }
+
+    /// <summary>
+    /// 当初始化时触发此事件处理方法。该方法内部会检查是否需要进行变量上传，如果需要，则调用 <see cref="VariableChange(VariableRuntime, VariableBasicData)"/> 方法。
+    /// </summary>
+    /// <param name="variableRuntime">变量运行时信息</param>
+    protected void VariableValueInit(VariableRuntime variableRuntime)
+    {
+        if (CurrentDevice?.Pause != false)
+            return;
+        if (!VarModelEnable) return;
+        if (TaskSchedulerLoop?.Stoped == true) return;
+
+        // 如果业务属性的缓存为间隔上传，则不执行后续操作
+        //if (_businessPropertyWithCacheInterval?.IsInterval != true)
+        {
+            // 检查当前设备的变量是否包含此变量，如果包含，则触发变量的变化处理方法
+            if (IdVariableRuntimes.ContainsKey(variableRuntime.Id))
+            {
+                var data = variableRuntime.AdaptVariableBasicData();
+                data.ValueInited = false;
+                VariableChange(variableRuntime, data);
+            }
+        }
+    }
+
 }

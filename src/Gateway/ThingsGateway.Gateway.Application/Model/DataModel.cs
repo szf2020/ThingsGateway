@@ -188,4 +188,7 @@ public class VariableBasicData
     [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
     public long CreateOrgId { get; set; }
 
+    /// <inheritdoc cref="VariableRuntime.ValueInited"/>
+    public bool ValueInited { get; set; }
+
 }

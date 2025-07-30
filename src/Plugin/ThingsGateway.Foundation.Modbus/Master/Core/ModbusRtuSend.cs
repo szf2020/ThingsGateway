@@ -8,6 +8,8 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
+using ThingsGateway.Foundation.Extension.Generic;
+
 namespace ThingsGateway.Foundation.Modbus;
 
 /// <summary>
@@ -65,12 +67,15 @@ public class ModbusRtuSend : ISendMessage
         }
         else if (wf == 15 || wf == 16)
         {
+            var data = ModbusAddress.Data.ArrayExpandToLengthEven().Span;
+            WriterExtension.WriteValue(ref byteBlock, (ushort)(data.Length + 7), EndianType.Big);
             WriterExtension.WriteValue(ref byteBlock, (byte)ModbusAddress.Station);
             WriterExtension.WriteValue(ref byteBlock, (byte)ModbusAddress.WriteFunctionCode);
             WriterExtension.WriteValue(ref byteBlock, (ushort)ModbusAddress.StartAddress, EndianType.Big);
-            WriterExtension.WriteValue(ref byteBlock, (ushort)Math.Ceiling(wf == 15 ? ModbusAddress.Data.Length * 8 : ModbusAddress.Data.Length / 2.0), EndianType.Big);
-            WriterExtension.WriteValue(ref byteBlock, (byte)ModbusAddress.Data.Length);
-            byteBlock.Write(ModbusAddress.Data.Span);
+            var len = (ushort)Math.Ceiling(wf == 15 ? ModbusAddress.Data.Length * 8 : ModbusAddress.Data.Length / 2.0);
+            WriterExtension.WriteValue(ref byteBlock, len, EndianType.Big);
+            WriterExtension.WriteValue(ref byteBlock, (byte)(len * 2));
+            byteBlock.Write(data);
         }
         else
         {

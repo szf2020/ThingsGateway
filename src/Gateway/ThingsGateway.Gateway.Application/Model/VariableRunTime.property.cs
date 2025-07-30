@@ -20,6 +20,8 @@ namespace ThingsGateway.Gateway.Application;
 public partial class VariableRuntime : Variable, IVariable, IDisposable
 {
 
+    [AutoGenerateColumn(Visible = false)]
+    public bool ValueInited { get; set; }
 
     #region 属性
     /// <summary>

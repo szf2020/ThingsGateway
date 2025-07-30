@@ -36,6 +36,7 @@ public partial class VariableRuntime : Variable, IVariable, IDisposable
 
     private bool _isOnline;
     private bool _isOnlineChanged;
+    private bool _valueInited;
 
     private string alarmLimit;
     private string alarmText;
@@ -164,6 +165,8 @@ public partial class VariableRuntime : Variable, IVariable, IDisposable
             ChangeTime = time;
 
             LastSetValue = _value;
+
+
 
             if (_isOnline == true)
             {
