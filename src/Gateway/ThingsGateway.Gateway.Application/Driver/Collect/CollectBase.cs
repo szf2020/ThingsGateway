@@ -194,6 +194,8 @@ public abstract class CollectBase : DriverBase, IRpcDriver
 
         // 从插件服务中获取当前设备关联的驱动方法信息列表
         DriverMethodInfos = GlobalData.PluginService.GetDriverMethodInfos(device.PluginName, this);
+
+        ReadWriteLock = new(CollectProperties.DutyCycle);
     }
 
     public virtual string GetAddressDescription()
@@ -474,7 +476,7 @@ public abstract class CollectBase : DriverBase, IRpcDriver
     /// <returns></returns>
     protected abstract Task<List<VariableSourceRead>> ProtectedLoadSourceReadAsync(List<VariableRuntime> deviceVariables);
 
-    protected AsyncReadWriteLock ReadWriteLock = new();
+    protected AsyncReadWriteLock ReadWriteLock;
 
     /// <summary>
     /// 采集驱动读取，读取成功后直接赋值变量
@@ -565,7 +567,8 @@ public abstract class CollectBase : DriverBase, IRpcDriver
 
         ConcurrentDictionary<string, OperResult<object>> operResults = new();
 
-        using var writeLock = ReadWriteLock.WriterLock();
+
+        using var writeLock = await ReadWriteLock.WriterLockAsync(cancellationToken).ConfigureAwait(false);
         var list = writeInfoLists
         .Where(a => !results.Any(b => b.Key == a.Key.Name))
         .ToDictionary(item => item.Key, item => item.Value).ToArray();

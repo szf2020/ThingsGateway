@@ -10,6 +10,7 @@
     "IsWriteMemory": "IsWriteMemory",
     "ModbusType": "ModbusType",
     "MulStation": "MultipleStations",
+    "SendDelayTime": "SendDelayTime",
     "Station": "DefaultStation"
   },
   "ThingsGateway.Plugin.Modbus.ModbusSlaveVariableProperty": {

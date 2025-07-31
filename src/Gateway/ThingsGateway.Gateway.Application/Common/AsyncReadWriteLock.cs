@@ -14,48 +14,88 @@ namespace ThingsGateway.Gateway.Application;
 
 public class AsyncReadWriteLock
 {
+    private readonly int _writeReadRatio = 3; // 写3次会允许1次读，但写入也不会被阻止，具体协议取决于插件协议实现
+    public AsyncReadWriteLock(int writeReadRatio)
+    {
+        _writeReadRatio = writeReadRatio;
+    }
     private AsyncAutoResetEvent _readerLock = new AsyncAutoResetEvent(false); // 控制读计数
     private long _writerCount = 0; // 当前活跃的写线程数
+    private long _readerCount = 0; // 当前被阻塞的读线程数
     private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
     /// <summary>
     /// 获取读锁，支持多个线程并发读取，但写入时会阻止所有读取。
     /// </summary>
     public async Task<CancellationToken> ReaderLockAsync(CancellationToken cancellationToken)
     {
+
         if (Interlocked.Read(ref _writerCount) > 0)
         {
+            Interlocked.Increment(ref _readerCount);
+
             // 第一个读者需要获取写入锁，防止写操作
             await _readerLock.WaitOneAsync(cancellationToken).ConfigureAwait(false);
+
+            Interlocked.Decrement(ref _readerCount);
+
         }
         return _cancellationTokenSource.Token;
     }
 
+    public bool WriteWaited => _writerCount > 0;
+
     /// <summary>
     /// 获取写锁，阻止所有读取。
     /// </summary>
-    public IDisposable WriterLock()
+    public async Task<IDisposable> WriterLockAsync(CancellationToken cancellationToken)
     {
+
         if (Interlocked.Increment(ref _writerCount) == 1)
         {
             var cancellationTokenSource = _cancellationTokenSource;
             _cancellationTokenSource = new();
-            cancellationTokenSource.Cancel();//取消读取
+            await cancellationTokenSource.CancelAsync().ConfigureAwait(false); // 取消读取
             cancellationTokenSource.SafeDispose();
         }
 
         return new Writer(this);
     }
-
     private void ReleaseWriter()
     {
-        if (Interlocked.Decrement(ref _writerCount) == 0)
+        var writerCount = Interlocked.Decrement(ref _writerCount);
+        if (writerCount == 0)
         {
             var resetEvent = _readerLock;
             _readerLock = new(false);
+            Interlocked.Exchange(ref _writeSinceLastReadCount, 0);
             resetEvent.SetAll();
+        }
+        else
+        {
+
+            // 读写占空比， 用于控制写操作与读操作的比率。该比率 n 次写入操作会执行一次读取操作。即使在应用程序执行大量的连续写入操作时，也必须确保足够的读取数据处理时间。相对于更加均衡的读写数据流而言，该特点使得外部写入可连续无顾忌操作
+
+            if (_writeReadRatio > 0)
+            {
+                if (Interlocked.Read(ref _readerCount) > 0)
+                {
+                    var count = Interlocked.Increment(ref _writeSinceLastReadCount);
+                    if (count >= _writeReadRatio)
+                    {
+                        Interlocked.Exchange(ref _writeSinceLastReadCount, 0);
+                        _readerLock.Set();
+                    }
+                }
+            }
+            else
+            {
+                _readerLock.Set();
+            }
+
         }
     }
 
+    private int _writeSinceLastReadCount = 0;
     private struct Writer : IDisposable
     {
         private readonly AsyncReadWriteLock _lock;

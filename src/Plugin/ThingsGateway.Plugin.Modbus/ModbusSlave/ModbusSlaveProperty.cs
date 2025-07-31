@@ -53,4 +53,7 @@ public class ModbusSlaveProperty : BusinessPropertyBase
     /// </summary>
     [DynamicProperty]
     public bool IsWriteMemory { get; set; } = true;
+
+    [DynamicProperty]
+    public int SendDelayTime { get; set; }
 }

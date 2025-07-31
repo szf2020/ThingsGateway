@@ -31,6 +31,11 @@ public abstract class CollectPropertyBase : DriverPropertyBase
     /// 失败重试次数，默认3
     /// </summary>
     public virtual int RetryCount { get; set; } = 3;
+
+    /// <summary>
+    /// 读写占空比
+    /// </summary>
+    public virtual int DutyCycle { get; set; } = 3;
 }
 
 /// <summary>
@@ -45,4 +50,8 @@ public abstract class CollectPropertyRetryBase : CollectPropertyBase
     /// </summary>
     [DynamicProperty]
     public override int RetryCount { get; set; } = 3;
+
+    [DynamicProperty(Remark = "n 次写入操作会执行一次读取")]
+    public override int DutyCycle { get; set; } = 3;
+
 }

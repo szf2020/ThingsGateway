@@ -295,7 +295,8 @@
     "RetryCount": "RetryCount"
   },
   "ThingsGateway.Gateway.Application.CollectPropertyRetryBase": {
-    "RetryCount": "RetryCount"
+    "RetryCount": "RetryCount",
+    "DutyCycle": "DutyCycle"
   },
   "ThingsGateway.Gateway.Application.ControlController": {
     "BatchSaveChannelAsync": "BatchSaveChannel",

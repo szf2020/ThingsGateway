@@ -294,7 +294,8 @@
     "RetryCount": "失败重试次数"
   },
   "ThingsGateway.Gateway.Application.CollectPropertyRetryBase": {
-    "RetryCount": "失败重试次数"
+    "RetryCount": "失败重试次数",
+    "DutyCycle": "占空比"
   },
   "ThingsGateway.Gateway.Application.ControlController": {
     "BatchSaveChannelAsync": "保存通道",

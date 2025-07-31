@@ -54,7 +54,7 @@ public static class PluginServiceUtil
                 {
                     { "title", classAttribute.Remark }
                 };
-                tc.ComponentParameters.AddItem(
+                tc.ComponentParameters = tc.ComponentParameters.AddItem(
                    new("title", classAttribute.Remark)
                );
             }

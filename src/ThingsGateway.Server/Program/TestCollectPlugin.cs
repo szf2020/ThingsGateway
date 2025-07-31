@@ -215,7 +215,7 @@
 //    }
 
 //    /// <summary>
-//    /// 写入变量，实现设备写入操作，注意执行写锁，using var writeLock = ReadWriteLock.WriterLock();
+//    /// 写入变量，实现设备写入操作，注意执行写锁，        using var writeLock =await ReadWriteLock.WriterLockAsync(cancellationToken).ConfigureAwait(false);
 //    /// </summary>
 //    protected override ValueTask<Dictionary<string, OperResult>> WriteValuesAsync(Dictionary<VariableRuntime, JToken> writeInfoLists, CancellationToken cancellationToken)
 //    {
