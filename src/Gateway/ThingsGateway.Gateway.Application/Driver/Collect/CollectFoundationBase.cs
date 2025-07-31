@@ -188,8 +188,6 @@ public abstract class CollectFoundationBase : CollectBase
         {
             try
             {
-                if (LogMessage?.LogLevel <= TouchSocket.Core.LogLevel.Debug)
-                    LogMessage?.Debug(string.Format("{0} - Writing [{1} - {2} - {3}]", DeviceName, writeInfo.Key.RegisterAddress, writeInfo.Value, writeInfo.Key.DataType));
 
                 // 调用协议的写入方法，将写入信息中的数据写入到对应的寄存器地址，并获取操作结果
                 var result = await FoundationDevice.WriteJTokenAsync(writeInfo.Key.RegisterAddress, writeInfo.Value, writeInfo.Key.DataType, cancellationToken).ConfigureAwait(false);

@@ -15,6 +15,7 @@ using System.Collections.Concurrent;
 using ThingsGateway.Debug;
 using ThingsGateway.Foundation.SiemensS7;
 using ThingsGateway.Gateway.Application;
+using ThingsGateway.NewLife.Json.Extension;
 
 using TouchSocket.Core;
 using TouchSocket.Sockets;
@@ -133,6 +134,9 @@ public class SiemensS7Master : CollectFoundationBase
                     operResults.TryAdd(writeInfo.Key.Name, r1);
                 }
             }
+
+
+
         }
 
         // 使用并发方式遍历写入信息列表，并进行异步写入操作
@@ -153,7 +157,8 @@ public class SiemensS7Master : CollectFoundationBase
         }).ConfigureAwait(false);
 
         await Check(writeInfoLists, operResults, cancellationToken).ConfigureAwait(false);
-
+        if (LogMessage?.LogLevel <= TouchSocket.Core.LogLevel.Debug)
+            LogMessage?.Debug(string.Format("Write result: {0} - {1}", DeviceName, operResults.Select(a => $"{a.Key} - {a.Key.Length} - {(a.Value.IsSuccess ? "Success" : a.Value.ErrorMessage)}").ToSystemTextJsonString(false)));
         // 返回包含操作结果的字典
         return new Dictionary<string, OperResult>(operResults);
     }

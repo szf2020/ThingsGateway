@@ -21,7 +21,7 @@ public partial class VariableRuntime : Variable, IVariable, IDisposable
 {
 
     [AutoGenerateColumn(Visible = false)]
-    public bool ValueInited { get; set; }
+    public bool ValueInited { get => _valueInited; set => _valueInited = value; }
 
     #region 属性
     /// <summary>

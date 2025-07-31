@@ -167,7 +167,8 @@ public class OpcDaMaster : CollectBase
              ));
 
         await Check(writeInfoLists, results, cancellationToken).ConfigureAwait(false);
-
+        if (LogMessage?.LogLevel <= TouchSocket.Core.LogLevel.Debug)
+            LogMessage?.Debug(string.Format("Write result: {0} - {1}", DeviceName, results.Select(a => $"{a.Key} - {a.Key.Length} - {(a.Value.IsSuccess ? "Success" : a.Value.ErrorMessage)}").ToSystemTextJsonString(false)));
         return new(results);
     }
     public override async Task AfterVariablesChangedAsync(CancellationToken cancellationToken)
