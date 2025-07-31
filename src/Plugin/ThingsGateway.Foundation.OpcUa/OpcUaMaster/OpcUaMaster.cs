@@ -286,7 +286,7 @@ public class OpcUaMaster : IDisposable
             }
             catch (Exception)
             {
-                m_session.RemoveSubscription(m_subscription);
+                await m_session.RemoveSubscriptionAsync(m_subscription, cancellationToken).ConfigureAwait(false);
                 throw;
             }
         }
@@ -312,7 +312,7 @@ public class OpcUaMaster : IDisposable
         else if (_subscriptionDicts.TryGetValue(subscriptionName, out var existingSubscription))
         {
             // remove
-            existingSubscription.Delete(true);
+            await existingSubscription.DeleteAsync(true, cancellationToken).ConfigureAwait(false);
             await m_session.RemoveSubscriptionAsync(existingSubscription, cancellationToken).ConfigureAwait(false);
             try { existingSubscription.Dispose(); } catch { }
             _subscriptionDicts[subscriptionName] = m_subscription;
@@ -715,7 +715,7 @@ public class OpcUaMaster : IDisposable
     {
         foreach (var item in _subscriptionDicts)
         {
-            item.Value.Delete(true);
+            await item.Value.DeleteAsync(true).ConfigureAwait(false);
             await m_session.RemoveSubscriptionAsync(item.Value).ConfigureAwait(false);
             try { item.Value.Dispose(); } catch { }
         }
@@ -731,7 +731,7 @@ public class OpcUaMaster : IDisposable
         if (_subscriptionDicts.TryGetValue(subscriptionName, out var subscription))
         {
             // remove
-            subscription.Delete(true);
+            await subscription.DeleteAsync(true).ConfigureAwait(false);
             await m_session.RemoveSubscriptionAsync(subscription).ConfigureAwait(false);
             try { subscription.Dispose(); } catch { }
             _subscriptionDicts.TryRemove(subscriptionName, out _);
@@ -758,7 +758,7 @@ public class OpcUaMaster : IDisposable
                 var dataValue = JsonUtils.Decode(
                     m_session.MessageContext,
                     variableNode.DataType,
-                    TypeInfo.GetBuiltInType(variableNode.DataType, m_session.SystemContext.TypeTable),
+                   await TypeInfo.GetBuiltInTypeAsync(variableNode.DataType, m_session.SystemContext.TypeTable, cancellationToken).ConfigureAwait(false),
                     item.Value.CalculateActualValueRank(),
                     item.Value
                     );
@@ -983,7 +983,7 @@ public class OpcUaMaster : IDisposable
         for (int i = 0; i < results.Count; i++)
         {
             var variableNode = await ReadNodeAsync(nodeIds[i].ToString(), false, StatusCode.IsGood(results[i].StatusCode), cancellationToken).ConfigureAwait(false);
-            var type = TypeInfo.GetBuiltInType(variableNode.DataType, m_session.SystemContext.TypeTable);
+            var type = await TypeInfo.GetBuiltInTypeAsync(variableNode.DataType, m_session.SystemContext.TypeTable, cancellationToken).ConfigureAwait(false);
             var jToken = JsonUtils.Encode(m_session.MessageContext, type, results[i].Value);
             jTokens.Add((variableNode.NodeId.ToString(), results[i], jToken));
         }
@@ -1078,7 +1078,7 @@ public class OpcUaMaster : IDisposable
         var responseHeader = readResponse.ResponseHeader;
         VariableNode variableNode = GetVariableNodes(itemsToRead, values, diagnosticInfos, responseHeader).FirstOrDefault();
 
-        if (OpcUaProperty.LoadType && variableNode.DataType != NodeId.Null && TypeInfo.GetBuiltInType(variableNode.DataType, m_session.SystemContext.TypeTable) == BuiltInType.ExtensionObject)
+        if (OpcUaProperty.LoadType && variableNode.DataType != NodeId.Null && (await TypeInfo.GetBuiltInTypeAsync(variableNode.DataType, m_session.SystemContext.TypeTable, cancellationToken).ConfigureAwait(false)) == BuiltInType.ExtensionObject)
             await typeSystem.LoadType(variableNode.DataType, ct: cancellationToken).ConfigureAwait(false);
 
         if (cache)
@@ -1178,7 +1178,7 @@ public class OpcUaMaster : IDisposable
                 {
                     if (cache)
                         _variableDicts.AddOrUpdate(nodeIdStrs[i], a => node, (a, b) => node);
-                    if (node.DataType != NodeId.Null && TypeInfo.GetBuiltInType(node.DataType, m_session.SystemContext.TypeTable) == BuiltInType.ExtensionObject)
+                    if (node.DataType != NodeId.Null && (await TypeInfo.GetBuiltInTypeAsync(node.DataType, m_session.SystemContext.TypeTable, cancellationToken).ConfigureAwait(false)) == BuiltInType.ExtensionObject)
                     {
                         await typeSystem.LoadType(node.DataType, ct: cancellationToken).ConfigureAwait(false);
                     }
