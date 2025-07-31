@@ -575,12 +575,25 @@ public abstract class DeviceBase : DisposableObject, IDevice
 
             var sendOperResult = await SendAsync(command, clientChannel, endPoint, cancellationToken).ConfigureAwait(false);
             if (!sendOperResult.IsSuccess)
-                throw sendOperResult.Exception ?? new(sendOperResult.ErrorMessage ?? "unknown error");
+                return new MessageBase(sendOperResult);
 
-            waitData.SetCancellationToken(cancellationToken);
+            try
+            {
+                waitData.SetCancellationToken(Channel.ClosedToken);
 
-            await waitData.WaitAsync(timeout).ConfigureAwait(false);
-
+                await waitData.WaitAsync(timeout).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    if (!this.DisposedValue)
+                    {
+                        await Task.Delay(timeout, Channel.ClosedToken).ConfigureAwait(false);
+                    }
+                }
+                return new MessageBase(ex);
+            }
             var result = waitData.Check();
             if (result.IsSuccess)
             {
@@ -588,33 +601,11 @@ public abstract class DeviceBase : DisposableObject, IDevice
             }
             else
             {
-                if (cancellationToken.IsCancellationRequested && result.Exception is OperationCanceledException)
-                {
-                    waitData.Reset();
-                    waitData.SetCancellationToken(CancellationToken.None);
-                    await waitData.WaitAsync(timeout).ConfigureAwait(false);
-                    result = waitData.Check();
-                    if (result.IsSuccess)
-                    {
-                        return waitData.WaitResult;
-                    }
-                    else
-                    {
-                        return new MessageBase(result);
-                    }
-                }
                 return new MessageBase(result);
             }
         }
         catch (Exception ex)
         {
-            if (cancellationToken.IsCancellationRequested)
-            {
-                if (!this.DisposedValue)
-                {
-                    await Task.Delay(timeout, CancellationToken.None).ConfigureAwait(false);
-                }
-            }
             return new MessageBase(ex);
         }
         finally
