@@ -406,22 +406,24 @@ AND sql LIKE '%" + tableName + "%'");
         public override bool CreateDatabase(string databaseName, string databaseDirectory = null)
         {
             var connString = this.Context.CurrentConnectionConfig.ConnectionString;
-            var path = Regex.Match(connString, @"[a-z,A-Z]\:\\.+\\").Value;
-            if (path.IsNullOrEmpty())
+
+
+            // 提取 Data Source=xxx（不管是绝对还是相对路径）
+            var match = Regex.Match(connString, @"(?i)Data\s+Source\s*=\s*(.+?)(;|$)");
+            if (match.Success)
             {
-                path = Regex.Match(connString, @"\/.+\/").Value;
-            }
-            if (path.IsNullOrEmpty())
-            {
-                path = Regex.Match(connString, @"[a-z,A-Z]\:\\").Value;
-            }
-            if (!path.IsNullOrEmpty())
-            {
-                if (!FileHelper.IsExistDirectory(path))
+                var filePath = match.Groups[1].Value.Trim(); // => ./DB/data.sqlite
+                var folderPath = Path.GetDirectoryName(filePath); // => ./DB
+
+                if (!folderPath.IsNullOrEmpty())
                 {
-                    FileHelper.CreateDirectory(path);
+                    if (!FileHelper.IsExistDirectory(folderPath))
+                    {
+                        FileHelper.CreateDirectory(folderPath);
+                    }
                 }
             }
+
             this.Context.Ado.Connection.Open();
             this.Context.Ado.Connection.Close();
             return true;
