@@ -252,7 +252,7 @@ public static class ByteExtensions
     /// 字节数组默认转16进制字符
     /// </summary>
     /// <returns></returns>
-    public static string ToHexString(this ArraySegment<byte> buffer, char splite = ' ', int newLineCount = 0)
+    public static string ToHexString(this ArraySegment<byte> buffer, char splite = default, int newLineCount = 0)
     {
         return DataTransUtil.ByteToHexString(buffer, splite, newLineCount);
     }
@@ -261,7 +261,7 @@ public static class ByteExtensions
     /// 字节数组默认转16进制字符
     /// </summary>
     /// <returns></returns>
-    public static string ToHexString(this byte[] buffer, char splite = ' ', int newLineCount = 0)
+    public static string ToHexString(this byte[] buffer, char splite = default, int newLineCount = 0)
     {
         return DataTransUtil.ByteToHexString(buffer, splite, newLineCount);
     }
@@ -269,7 +269,7 @@ public static class ByteExtensions
     /// 字节数组默认转16进制字符
     /// </summary>
     /// <returns></returns>
-    public static string ToHexString(this Span<byte> buffer, char splite = ' ', int newLineCount = 0)
+    public static string ToHexString(this Span<byte> buffer, char splite = default, int newLineCount = 0)
     {
         return DataTransUtil.ByteToHexString(buffer, splite, newLineCount);
     }
@@ -277,7 +277,7 @@ public static class ByteExtensions
     /// 字节数组默认转16进制字符
     /// </summary>
     /// <returns></returns>
-    public static string ToHexString(this ReadOnlySpan<byte> buffer, char splite = ' ', int newLineCount = 0)
+    public static string ToHexString(this ReadOnlySpan<byte> buffer, char splite = default, int newLineCount = 0)
     {
         return DataTransUtil.ByteToHexString(buffer, splite, newLineCount);
     }

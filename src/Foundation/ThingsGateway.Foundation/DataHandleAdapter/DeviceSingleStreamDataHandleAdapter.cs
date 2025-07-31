@@ -58,7 +58,7 @@ public class DeviceSingleStreamDataHandleAdapter<TRequest> : TcpCustomDataHandli
     protected override FilterResult Filter<TByteBlock>(ref TByteBlock byteBlock, bool beCached, ref TRequest request, ref int tempCapacity)
     {
         if (Logger?.LogLevel <= LogLevel.Trace)
-            Logger?.Trace($"{ToString()}- Receive:{(IsHexLog ? byteBlock.AsSegmentTake().ToHexString() : byteBlock.ToString(byteBlock.Position))}");
+            Logger?.Trace($"{ToString()}- Receive:{(IsHexLog ? byteBlock.AsSegmentTake().ToHexString(' ') : byteBlock.ToString(byteBlock.Position))}");
 
         try
         {
@@ -172,7 +172,7 @@ public class DeviceSingleStreamDataHandleAdapter<TRequest> : TcpCustomDataHandli
     {
         cancellationToken.ThrowIfCancellationRequested();
         if (Logger?.LogLevel <= LogLevel.Trace)
-            Logger?.Trace($"{ToString()}- Send:{(IsHexLog ? memory.Span.ToHexString() : (memory.Span.ToString(Encoding.UTF8)))}");
+            Logger?.Trace($"{ToString()}- Send:{(IsHexLog ? memory.Span.ToHexString(' ') : (memory.Span.ToString(Encoding.UTF8)))}");
 
         //发送
         await GoSendAsync(memory, cancellationToken).ConfigureAwait(false);
@@ -191,7 +191,7 @@ public class DeviceSingleStreamDataHandleAdapter<TRequest> : TcpCustomDataHandli
         {
             sendMessage.Build(ref byteBlock);
             if (Logger?.LogLevel <= LogLevel.Trace)
-                Logger?.Trace($"{ToString()}- Send:{(IsHexLog ? byteBlock.Span.ToHexString() : (byteBlock.Span.ToString(Encoding.UTF8)))}");
+                Logger?.Trace($"{ToString()}- Send:{(IsHexLog ? byteBlock.Span.ToHexString(' ') : (byteBlock.Span.ToString(Encoding.UTF8)))}");
             //非并发主从协议
             if (IsSingleThread)
             {

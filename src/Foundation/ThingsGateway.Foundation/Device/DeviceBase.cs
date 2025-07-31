@@ -446,7 +446,13 @@ public abstract class DeviceBase : DisposableObject, IDevice
     public virtual OperResult<IClientChannel> GetChannel(string socketId)
     {
         if (string.IsNullOrWhiteSpace(socketId))
-            return new OperResult<IClientChannel>() { Content = (IClientChannel)Channel };
+        {
+            if (Channel is IClientChannel clientChannel)
+                return new OperResult<IClientChannel>() { Content = clientChannel };
+            else
+                return new OperResult<IClientChannel>("The communication link cannot be obtained, DtuId must be set!");
+        }
+
 
         if (Channel is ITcpServiceChannel serviceChannel)
         {
@@ -464,7 +470,12 @@ public abstract class DeviceBase : DisposableObject, IDevice
             }
         }
         else
-            return new OperResult<IClientChannel>() { Content = (IClientChannel)Channel };
+        {
+            if (Channel is IClientChannel clientChannel)
+                return new OperResult<IClientChannel>() { Content = clientChannel };
+            else
+                return new OperResult<IClientChannel>("The communication link cannot be obtained!");
+        }
     }
 
     /// <inheritdoc/>
