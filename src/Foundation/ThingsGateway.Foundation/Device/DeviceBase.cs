@@ -577,11 +577,19 @@ public abstract class DeviceBase : DisposableObject, IDevice
             }
             else
             {
-                if (cancellationToken.IsCancellationRequested)
+                if (cancellationToken.IsCancellationRequested && result.Exception is OperationCanceledException)
                 {
-                    if (!this.DisposedValue)
+                    waitData.Reset();
+                    waitData.SetCancellationToken(CancellationToken.None);
+                    await waitData.WaitAsync(timeout).ConfigureAwait(false);
+                    result = waitData.Check();
+                    if (result.IsSuccess)
                     {
-                        await Task.Delay(timeout, CancellationToken.None).ConfigureAwait(false);
+                        return waitData.WaitResult;
+                    }
+                    else
+                    {
+                        return new MessageBase(result);
                     }
                 }
                 return new MessageBase(result);
