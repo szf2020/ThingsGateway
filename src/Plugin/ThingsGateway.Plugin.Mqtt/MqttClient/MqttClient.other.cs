@@ -505,6 +505,7 @@ public partial class MqttClient : BusinessBaseWithCacheIntervalScriptAll
 
     private async ValueTask<OperResult> TryMqttClientAsync(CancellationToken cancellationToken)
     {
+        System.Console.WriteLine($"{this.DeviceName} TryMqttClientAsync {DateTime.Now:HH:mm:ss.fff}");
         if (_mqttClient?.IsConnected == true)
             return OperResult.Success;
         return await Client().ConfigureAwait(false);

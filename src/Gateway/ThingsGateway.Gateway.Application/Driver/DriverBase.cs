@@ -39,8 +39,7 @@ public abstract class DriverBase : DisposableObject, IDriver
     /// <summary>
     /// 当前设备
     /// </summary>
-    public DeviceRuntime? CurrentDevice => WeakReferenceCurrentDevice?.TryGetTarget(out var target) == true ? target : null;
-    private WeakReference<DeviceRuntime> WeakReferenceCurrentDevice { get; set; }
+    public DeviceRuntime? CurrentDevice { get; private set; }
     /// <summary>
     /// 当前设备Id
     /// </summary>
@@ -208,7 +207,7 @@ public abstract class DriverBase : DisposableObject, IDriver
     /// </summary>
     internal void InitDevice(DeviceRuntime device)
     {
-        WeakReferenceCurrentDevice = new WeakReference<DeviceRuntime>(device);
+        CurrentDevice = device;
 
         _logger = App.RootServices.GetService<Microsoft.Extensions.Logging.ILoggerFactory>().CreateLogger($"Driver[{CurrentDevice.Name}]");
 
