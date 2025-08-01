@@ -21,10 +21,10 @@ namespace ThingsGateway.Gateway.Application;
 
 public static class VariableServiceHelpers
 {
-    public static async Task<USheetDatas> ExportVariableAsync(IEnumerable<Variable> variables, string sortName = nameof(Variable.Id), SortOrder sortOrder = SortOrder.Asc)
+    public static USheetDatas ExportVariable(IEnumerable<Variable> variables, string sortName = nameof(Variable.Id), SortOrder sortOrder = SortOrder.Asc)
     {
-        var deviceDicts = (await GlobalData.DeviceService.GetAllAsync().ConfigureAwait(false)).ToDictionary(a => a.Id);
-        var channelDicts = (await GlobalData.ChannelService.GetAllAsync().ConfigureAwait(false)).ToDictionary(a => a.Id);
+        var deviceDicts = GlobalData.IdDevices;
+        var channelDicts = GlobalData.IdChannels;
         var pluginSheetNames = variables.Where(a => a.VariablePropertys?.Count > 0).SelectMany(a => a.VariablePropertys).Select(a =>
         {
             if (deviceDicts.TryGetValue(a.Key, out var device) && channelDicts.TryGetValue(device.ChannelId, out var channel))
@@ -41,8 +41,8 @@ public static class VariableServiceHelpers
     static IAsyncEnumerable<Variable> FilterPluginDevices(
     IAsyncEnumerable<Variable> data,
     string pluginName,
-Dictionary<long, Device> deviceDicts,
-    Dictionary<long, Channel> channelDicts)
+IReadOnlyDictionary<long, DeviceRuntime> deviceDicts,
+    IReadOnlyDictionary<long, ChannelRuntime> channelDicts)
     {
         return data.Where(variable =>
         {
@@ -65,8 +65,8 @@ Dictionary<long, Device> deviceDicts,
     static IEnumerable<Variable> FilterPluginDevices(
 IEnumerable<Variable> data,
 string pluginName,
-Dictionary<long, Device> deviceDicts,
-Dictionary<long, Channel> channelDicts)
+IReadOnlyDictionary<long, DeviceRuntime> deviceDicts,
+IReadOnlyDictionary<long, ChannelRuntime> channelDicts)
     {
         return data.Where(variable =>
         {
@@ -88,8 +88,8 @@ Dictionary<long, Channel> channelDicts)
 
     public static Dictionary<string, object> ExportSheets(
     IEnumerable<Variable> data,
-    Dictionary<long, Device> deviceDicts,
-    Dictionary<long, Channel> channelDicts,
+    IReadOnlyDictionary<long, DeviceRuntime> deviceDicts,
+    IReadOnlyDictionary<long, ChannelRuntime> channelDicts,
     Dictionary<string, VariablePropertyBase> pluginDrivers,
     string? deviceName = null)
     {
@@ -112,7 +112,7 @@ Dictionary<long, Channel> channelDicts)
 
     static IEnumerable<Dictionary<string, object>> GetVariableSheets(
     IEnumerable<Variable> data,
-    Dictionary<long, Device> deviceDicts,
+    IReadOnlyDictionary<long, DeviceRuntime> deviceDicts,
     string? deviceName)
     {
         var type = typeof(Variable);
@@ -132,7 +132,7 @@ Dictionary<long, Channel> channelDicts)
         }
     }
 
-    private static Dictionary<string, object> GetVariable(Dictionary<long, Device> deviceDicts, string? deviceName, Type type, IOrderedEnumerable<PropertyInfo> propertyInfos, Variable variable)
+    private static Dictionary<string, object> GetVariable(IReadOnlyDictionary<long, DeviceRuntime> deviceDicts, string? deviceName, Type type, IOrderedEnumerable<PropertyInfo> propertyInfos, Variable variable)
     {
         var row = new Dictionary<string, object>();
         deviceDicts.TryGetValue(variable.DeviceId, out var device);
@@ -153,8 +153,8 @@ Dictionary<long, Channel> channelDicts)
 
     static IEnumerable<Dictionary<string, object>> GetPluginSheets(
     IEnumerable<Variable> data,
-    Dictionary<long, Device> deviceDicts,
-    Dictionary<long, Channel> channelDicts,
+    IReadOnlyDictionary<long, DeviceRuntime> deviceDicts,
+    IReadOnlyDictionary<long, ChannelRuntime> channelDicts,
     string plugin,
     Dictionary<string, VariablePropertyBase> pluginDrivers,
     ConcurrentDictionary<string, (VariablePropertyBase, Dictionary<string, PropertyInfo>)> propertysDict)
@@ -224,8 +224,8 @@ Dictionary<long, Channel> channelDicts)
 
     public static Dictionary<string, object> ExportSheets(
     IAsyncEnumerable<Variable> data,
-    Dictionary<long, Device> deviceDicts,
-    Dictionary<long, Channel> channelDicts,
+    IReadOnlyDictionary<long, DeviceRuntime> deviceDicts,
+    IReadOnlyDictionary<long, ChannelRuntime> channelDicts,
     Dictionary<string, VariablePropertyBase> pluginDrivers,
     string? deviceName = null)
     {
@@ -248,7 +248,7 @@ Dictionary<long, Channel> channelDicts)
 
     static async IAsyncEnumerable<Dictionary<string, object>> GetVariableSheets(
     IAsyncEnumerable<Variable> data,
-    Dictionary<long, Device> deviceDicts,
+    IReadOnlyDictionary<long, DeviceRuntime> deviceDicts,
     string? deviceName)
     {
         var type = typeof(Variable);
@@ -270,8 +270,8 @@ Dictionary<long, Channel> channelDicts)
 
     static async IAsyncEnumerable<Dictionary<string, object>> GetPluginSheets(
     IAsyncEnumerable<Variable> data,
-    Dictionary<long, Device> deviceDicts,
-    Dictionary<long, Channel> channelDicts,
+    IReadOnlyDictionary<long, DeviceRuntime> deviceDicts,
+    IReadOnlyDictionary<long, ChannelRuntime> channelDicts,
     string plugin,
     Dictionary<string, VariablePropertyBase> pluginDrivers,
     ConcurrentDictionary<string, (VariablePropertyBase, Dictionary<string, PropertyInfo>)> propertysDict)
@@ -314,14 +314,14 @@ Dictionary<long, Channel> channelDicts)
         }
     }
 
-    public static async Task<Dictionary<string, object>> ExportCoreAsync(IEnumerable<Variable> data, string deviceName = null, string sortName = nameof(Variable.Id), SortOrder sortOrder = SortOrder.Asc)
+    public static Dictionary<string, object> ExportCore(IEnumerable<Variable> data, string deviceName = null, string sortName = nameof(Variable.Id), SortOrder sortOrder = SortOrder.Asc)
     {
         if (data?.Any() != true)
         {
             data = new List<Variable>();
         }
-        var deviceDicts = (await GlobalData.DeviceService.GetAllAsync().ConfigureAwait(false)).ToDictionary(a => a.Id);
-        var channelDicts = (await GlobalData.ChannelService.GetAllAsync().ConfigureAwait(false)).ToDictionary(a => a.Id);
+        var deviceDicts = GlobalData.IdDevices;
+        var channelDicts = GlobalData.IdChannels;
         var driverPluginDicts = GlobalData.PluginService.GetList(PluginTypeEnum.Business).ToDictionary(a => a.FullName);
         //总数据
         Dictionary<string, object> sheets = new();
@@ -503,7 +503,7 @@ Dictionary<long, Channel> channelDicts)
         var dataScope = await GlobalData.SysUserService.GetCurrentUserDataScopeAsync().ConfigureAwait(false);
 
         // 获取所有设备的字典，以设备名称作为键
-        var deviceDicts = (await GlobalData.DeviceService.GetAllAsync().ConfigureAwait(false)).ToDictionary(a => a.Name);
+        var deviceDicts = GlobalData.Devices;
 
         // 存储导入检验结果的字典
         Dictionary<string, ImportPreviewOutputBase> ImportPreviews = new();

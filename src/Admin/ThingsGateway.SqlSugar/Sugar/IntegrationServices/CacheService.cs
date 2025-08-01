@@ -86,7 +86,7 @@ namespace ThingsGateway.SqlSugar
 
         public void Add(string key, V value, int cacheDurationInSeconds)
         {
-            Check.ThrowNotSupportedException("ReflectionInoCache.Add(string key, V value, int cacheDurationInSeconds)");
+            this.InstanceCache.Add<V>(key, value, cacheDurationInSeconds);
         }
 
         public void Remove(string key)
@@ -109,7 +109,8 @@ namespace ThingsGateway.SqlSugar
 
         public V GetOrCreate(string cacheKey, Func<V> create)
         {
-            return InstanceCache.GetOrAdd<V>(cacheKey, (a) => create());
+            return InstanceCache.GetOrAdd<V>(cacheKey, (a) =>
+            create());
         }
     }
     public static class ReflectionInoHelper

@@ -213,12 +213,18 @@ public static class AppServiceCollectionExtensions
         // 缓存
         if (cacheOptions.CacheType == CacheType.Memory)
         {
-            services.AddSingleton<ICache, MemoryCache>(a => new()
+            services.AddSingleton<ICache>(a =>
             {
-                Capacity = cacheOptions.MemoryCacheOptions.Capacity,
-                Expire = cacheOptions.MemoryCacheOptions.Expire,
-                Period = cacheOptions.MemoryCacheOptions.Period
-            });
+                Cache.Default = new MemoryCache()
+                {
+                    Capacity = cacheOptions.MemoryCacheOptions.Capacity,
+                    Expire = cacheOptions.MemoryCacheOptions.Expire,
+                    Period = cacheOptions.MemoryCacheOptions.Period
+                };
+                return Cache.Default;
+            }
+        );
+
         }
         else if (cacheOptions.CacheType == CacheType.Redis)
         {

@@ -19,10 +19,10 @@ namespace ThingsGateway.Gateway.Application;
 
 public static class DeviceServiceHelpers
 {
-    public static async Task<USheetDatas> ExportDeviceAsync(IEnumerable<Device> models)
+    public static USheetDatas ExportDevice(IEnumerable<Device> models)
     {
-        var deviceDicts = (await GlobalData.DeviceService.GetAllAsync().ConfigureAwait(false)).ToDictionary(a => a.Id);
-        var channelDicts = (await GlobalData.ChannelService.GetAllAsync().ConfigureAwait(false)).ToDictionary(a => a.Id);
+        var deviceDicts = GlobalData.IdDevices;
+        var channelDicts = GlobalData.IdChannels;
         var pluginSheetNames = models.Select(a => a.ChannelId).Select(a =>
         {
             channelDicts.TryGetValue(a, out var channel);
@@ -35,8 +35,8 @@ public static class DeviceServiceHelpers
 
     public static Dictionary<string, object> ExportSheets(
         IEnumerable<Device>? data,
-        Dictionary<long, Device>? deviceDicts,
-    Dictionary<long, Channel> channelDicts,
+        IReadOnlyDictionary<long, DeviceRuntime>? deviceDicts,
+    IReadOnlyDictionary<long, ChannelRuntime> channelDicts,
 HashSet<string> pluginSheetNames,
         string? channelName = null)
     {
@@ -60,8 +60,8 @@ HashSet<string> pluginSheetNames,
     public static Dictionary<string, object> ExportSheets(
 IAsyncEnumerable<Device>? data1,
 IAsyncEnumerable<Device>? data2,
-Dictionary<long, Device>? deviceDicts,
-    Dictionary<long, Channel> channelDicts,
+IReadOnlyDictionary<long, DeviceRuntime>? deviceDicts,
+    IReadOnlyDictionary<long, ChannelRuntime> channelDicts,
 HashSet<string> pluginSheetNames,
 string? channelName = null)
     {
@@ -82,7 +82,7 @@ string? channelName = null)
 
         return result;
     }
-    static IAsyncEnumerable<Device> FilterPluginDevices(IAsyncEnumerable<Device> data, string plugin, Dictionary<long, Channel> channelDicts)
+    static IAsyncEnumerable<Device> FilterPluginDevices(IAsyncEnumerable<Device> data, string plugin, IReadOnlyDictionary<long, ChannelRuntime> channelDicts)
     {
         return data.Where(device =>
         {
@@ -99,7 +99,7 @@ string? channelName = null)
             }
         });
     }
-    static IEnumerable<Device> FilterPluginDevices(IEnumerable<Device> data, string plugin, Dictionary<long, Channel> channelDicts)
+    static IEnumerable<Device> FilterPluginDevices(IEnumerable<Device> data, string plugin, IReadOnlyDictionary<long, ChannelRuntime> channelDicts)
     {
         return data.Where(device =>
         {
@@ -119,8 +119,8 @@ string? channelName = null)
 
     static IEnumerable<Dictionary<string, object>> GetDeviceSheets(
     IEnumerable<Device> data,
-Dictionary<long, Device>? deviceDicts,
-    Dictionary<long, Channel> channelDicts,
+IReadOnlyDictionary<long, DeviceRuntime>? deviceDicts,
+    IReadOnlyDictionary<long, ChannelRuntime> channelDicts,
     string? channelName)
     {
         var type = typeof(Device);
@@ -157,8 +157,8 @@ Dictionary<long, Device>? deviceDicts,
 
     static async IAsyncEnumerable<Dictionary<string, object>> GetDeviceSheets(
     IAsyncEnumerable<Device> data,
-Dictionary<long, Device>? deviceDicts,
-    Dictionary<long, Channel> channelDicts,
+IReadOnlyDictionary<long, DeviceRuntime>? deviceDicts,
+    IReadOnlyDictionary<long, ChannelRuntime> channelDicts,
     string? channelName)
     {
         var type = typeof(Device);
@@ -201,8 +201,8 @@ Dictionary<long, Device>? deviceDicts,
 Device device,
  IEnumerable<PropertyInfo>? propertyInfos,
  Type type,
-Dictionary<long, Device>? deviceDicts,
- Dictionary<long, Channel>? channelDicts,
+IReadOnlyDictionary<long, DeviceRuntime>? deviceDicts,
+ IReadOnlyDictionary<long, ChannelRuntime>? channelDicts,
 string? channelName)
     {
         Dictionary<string, object> devExport = new();
@@ -276,10 +276,10 @@ string? channelName)
     {
         var dataScope = await GlobalData.SysUserService.GetCurrentUserDataScopeAsync().ConfigureAwait(false);
         // 获取所有设备，并将设备名称作为键构建设备字典
-        var deviceDicts = (await GlobalData.DeviceService.GetAllAsync().ConfigureAwait(false)).ToDictionary(a => a.Name);
+        var deviceDicts = GlobalData.Devices;
 
         // 获取所有通道，并将通道名称作为键构建通道字典
-        var channelDicts = (await GlobalData.ChannelService.GetAllAsync().ConfigureAwait(false)).ToDictionary(a => a.Name);
+        var channelDicts = GlobalData.Channels;
 
         // 导入检验结果的预览字典，键为名称，值为导入预览对象
         Dictionary<string, ImportPreviewOutputBase> ImportPreviews = new();

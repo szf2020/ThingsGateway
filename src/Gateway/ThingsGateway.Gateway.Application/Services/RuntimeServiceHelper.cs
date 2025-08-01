@@ -151,13 +151,13 @@ internal static class RuntimeServiceHelper
 
     public static async Task<List<ChannelRuntime>> GetNewChannelRuntimesAsync(HashSet<long> ids)
     {
-        var newChannelRuntimes = (await GlobalData.ChannelService.GetAllAsync().ConfigureAwait(false)).Where(a => ids.Contains(a.Id)).AdaptListChannelRuntime();
+        var newChannelRuntimes = (await GlobalData.ChannelService.GetFromDBAsync((a => ids.Contains(a.Id))).ConfigureAwait(false)).AdaptListChannelRuntime();
         return newChannelRuntimes;
     }
 
     public static async Task<List<DeviceRuntime>> GetNewDeviceRuntimesAsync(HashSet<long> deviceids)
     {
-        var newDeviceRuntimes = (await GlobalData.DeviceService.GetAllAsync().ConfigureAwait(false)).Where(a => deviceids.Contains(a.Id)).AdaptListDeviceRuntime();
+        var newDeviceRuntimes = (await GlobalData.DeviceService.GetFromDBAsync((a => deviceids.Contains(a.Id))).ConfigureAwait(false)).AdaptListDeviceRuntime();
         return newDeviceRuntimes;
     }
 

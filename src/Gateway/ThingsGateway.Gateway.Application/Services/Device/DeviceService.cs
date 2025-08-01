@@ -16,6 +16,7 @@ using MiniExcelLibs;
 
 using System.Collections.Concurrent;
 using System.ComponentModel.DataAnnotations;
+using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 
@@ -129,11 +130,11 @@ internal sealed class DeviceService : BaseService<Device>, IDeviceService
         //事务
         var result = await db.UseTranAsync(async () =>
         {
-            var data = (await GetAllAsync(db).ConfigureAwait(false))
-                          .WhereIf(dataScope != null && dataScope?.Count > 0, u => dataScope.Contains(u.CreateOrgId))//在指定机构列表查询
-             .WhereIf(dataScope?.Count == 0, u => u.CreateUserId == UserManager.UserId)
-             .Where(a => IdhashSet.Contains(a.ChannelId))
-            .Select(a => a.Id).ToList();
+            var data = GlobalData.IdDevices
+                          .WhereIf(dataScope != null && dataScope?.Count > 0, u => dataScope.Contains(u.Value.CreateOrgId))//在指定机构列表查询
+             .WhereIf(dataScope?.Count == 0, u => u.Value.CreateUserId == UserManager.UserId)
+             .Where(a => IdhashSet.Contains(a.Value.ChannelId))
+            .Select(a => a.Value.Id).ToList();
             await db.Deleteable<Device>(a => data.Contains(a.Id)).ExecuteCommandAsync().ConfigureAwait(false);
             await variableService.DeleteByDeviceIdAsync(data, db).ConfigureAwait(false);
         }).ConfigureAwait(false);
@@ -180,30 +181,19 @@ internal sealed class DeviceService : BaseService<Device>, IDeviceService
     /// <inheritdoc />
     public void DeleteDeviceFromCache()
     {
-        App.CacheService.Remove(ThingsGatewayCacheConst.Cache_Device);//删除设备缓存
+        //App.CacheService.Remove(ThingsGatewayCacheConst.Cache_Device);//删除设备缓存
     }
 
     /// <summary>
     /// 从缓存/数据库获取全部信息
     /// </summary>
     /// <returns>列表</returns>
-    public async Task<List<Device>> GetAllAsync(SqlSugarClient db = null)
+    public async Task<List<Device>> GetFromDBAsync(Expression<Func<Device, bool>> expression = null, SqlSugarClient db = null)
     {
-        var key = ThingsGatewayCacheConst.Cache_Device;
-        var devices = App.CacheService.Get<List<Device>>(key);
-        if (devices == null)
-        {
-            db ??= GetDB();
-            devices = await db.Queryable<Device>().OrderBy(a => a.Id).ToListAsync().ConfigureAwait(false);
-            App.CacheService.Set(key, devices);
-        }
-        return devices;
-    }
+        db ??= GetDB();
+        var devices = await db.Queryable<Device>().WhereIF(expression != null, expression).OrderBy(a => a.Id).ToListAsync().ConfigureAwait(false);
 
-    public async Task<Device?> GetDeviceByIdAsync(long id)
-    {
-        var data = await GetAllAsync().ConfigureAwait(false);
-        return data?.FirstOrDefault(x => x.Id == id);
+        return devices;
     }
 
     /// <summary>
@@ -222,12 +212,12 @@ internal sealed class DeviceService : BaseService<Device>, IDeviceService
         HashSet<long>? channel = null;
         if (!exportFilter.PluginName.IsNullOrWhiteSpace())
         {
-            channel = (await _channelService.GetAllAsync().ConfigureAwait(false)).Where(a => a.PluginName == exportFilter.PluginName).Select(a => a.Id).ToHashSet();
+            channel = (GlobalData.IdChannels).Where(a => a.Value.PluginName == exportFilter.PluginName).Select(a => a.Value.Id).ToHashSet();
         }
         if (exportFilter.PluginType != null)
         {
             var pluginInfo = GlobalData.PluginService.GetList(exportFilter.PluginType).Select(a => a.FullName).ToHashSet();
-            channel = (await _channelService.GetAllAsync().ConfigureAwait(false)).Where(a => pluginInfo.Contains(a.PluginName)).Select(a => a.Id).ToHashSet();
+            channel = (GlobalData.IdChannels).Where(a => pluginInfo.Contains(a.Value.PluginName)).Select(a => a.Value.Id).ToHashSet();
         }
         var dataScope = await GlobalData.SysUserService.GetCurrentUserDataScopeAsync().ConfigureAwait(false);
         var whereQuery = (ISugarQueryable<Device> a) => a
@@ -244,12 +234,12 @@ internal sealed class DeviceService : BaseService<Device>, IDeviceService
         HashSet<long>? channel = null;
         if (!exportFilter.PluginName.IsNullOrWhiteSpace())
         {
-            channel = (await _channelService.GetAllAsync().ConfigureAwait(false)).Where(a => a.PluginName == exportFilter.PluginName).Select(a => a.Id).ToHashSet();
+            channel = (GlobalData.IdChannels).Where(a => a.Value.PluginName == exportFilter.PluginName).Select(a => a.Value.Id).ToHashSet();
         }
         if (exportFilter.PluginType != null)
         {
             var pluginInfo = GlobalData.PluginService.GetList(exportFilter.PluginType).Select(a => a.FullName).ToHashSet();
-            channel = (await _channelService.GetAllAsync().ConfigureAwait(false)).Where(a => pluginInfo.Contains(a.PluginName)).Select(a => a.Id).ToHashSet();
+            channel = (GlobalData.IdChannels).Where(a => pluginInfo.Contains(a.Value.PluginName)).Select(a => a.Value.Id).ToHashSet();
         }
         var dataScope = await GlobalData.SysUserService.GetCurrentUserDataScopeAsync().ConfigureAwait(false);
         var whereQuery = (IEnumerable<Device> a) => a
@@ -269,7 +259,7 @@ internal sealed class DeviceService : BaseService<Device>, IDeviceService
     [OperDesc("SaveDevice", localizerType: typeof(Device))]
     public async Task<bool> SaveDeviceAsync(Device input, ItemChangedType type)
     {
-        if ((await GetAllAsync().ConfigureAwait(false)).ToDictionary(a => a.Name).TryGetValue(input.Name, out var device))
+        if (GlobalData.Devices.TryGetValue(input.Name, out var device))
         {
             if (device.Id != input.Id)
             {
@@ -318,8 +308,8 @@ internal sealed class DeviceService : BaseService<Device>, IDeviceService
         var devices = await GetAsyncEnumerableData(exportFilter).ConfigureAwait(false);
         var plugins = await GetAsyncEnumerableData(exportFilter).ConfigureAwait(false);
         var devicesSql = await GetEnumerableData(exportFilter).ConfigureAwait(false);
-        var deviceDicts = (await GlobalData.DeviceService.GetAllAsync().ConfigureAwait(false)).ToDictionary(a => a.Id);
-        var channelDicts = (await GlobalData.ChannelService.GetAllAsync().ConfigureAwait(false)).ToDictionary(a => a.Id);
+        var deviceDicts = GlobalData.IdDevices;
+        var channelDicts = GlobalData.IdChannels;
         var pluginSheetNames = (await devicesSql.Select(a => a.ChannelId).ToListAsync().ConfigureAwait(false)).Select(a =>
         {
             channelDicts.TryGetValue(a, out var channel);
@@ -350,8 +340,8 @@ internal sealed class DeviceService : BaseService<Device>, IDeviceService
     [OperDesc("ExportDevice", isRecordPar: false, localizerType: typeof(Device))]
     public async Task<MemoryStream> ExportMemoryStream(List<Device>? models, string channelName = null, string plugin = null)
     {
-        var deviceDicts = (await GlobalData.DeviceService.GetAllAsync().ConfigureAwait(false)).ToDictionary(a => a.Id);
-        var channelDicts = (await GlobalData.ChannelService.GetAllAsync().ConfigureAwait(false)).ToDictionary(a => a.Id);
+        var deviceDicts = GlobalData.IdDevices;
+        var channelDicts = GlobalData.IdChannels;
         var pluginSheetNames = models.Select(a => a.ChannelId).Select(a =>
         {
             channelDicts.TryGetValue(a, out var channel);
@@ -415,10 +405,10 @@ internal sealed class DeviceService : BaseService<Device>, IDeviceService
             var sheetNames = MiniExcel.GetSheetNames(path);
 
             // 获取所有设备，并将设备名称作为键构建设备字典
-            var deviceDicts = (await GetAllAsync().ConfigureAwait(false)).ToDictionary(a => a.Name);
+            var deviceDicts = GlobalData.Devices;
 
             // 获取所有通道，并将通道名称作为键构建通道字典
-            var channelDicts = (await _channelService.GetAllAsync().ConfigureAwait(false)).ToDictionary(a => a.Name);
+            var channelDicts = GlobalData.Channels;
 
             // 导入检验结果的预览字典，键为名称，值为导入预览对象
             Dictionary<string, ImportPreviewOutputBase> ImportPreviews = new();
@@ -446,7 +436,7 @@ internal sealed class DeviceService : BaseService<Device>, IDeviceService
         }
     }
 
-    public void SetDeviceData(HashSet<long>? dataScope, Dictionary<string, Device> deviceDicts, Dictionary<string, Channel> channelDicts, Dictionary<string, ImportPreviewOutputBase> ImportPreviews, ref ImportPreviewOutput<Device> deviceImportPreview, Dictionary<string, PluginInfo> driverPluginNameDict, ConcurrentDictionary<string, (Type, Dictionary<string, PropertyInfo>, Dictionary<string, PropertyInfo>)> propertysDict, string sheetName, IEnumerable<IDictionary<string, object>> rows)
+    public void SetDeviceData(HashSet<long>? dataScope, IReadOnlyDictionary<string, DeviceRuntime> deviceDicts, IReadOnlyDictionary<string, ChannelRuntime> channelDicts, Dictionary<string, ImportPreviewOutputBase> ImportPreviews, ref ImportPreviewOutput<Device> deviceImportPreview, Dictionary<string, PluginInfo> driverPluginNameDict, ConcurrentDictionary<string, (Type, Dictionary<string, PropertyInfo>, Dictionary<string, PropertyInfo>)> propertysDict, string sheetName, IEnumerable<IDictionary<string, object>> rows)
     {
         #region 采集设备sheet
 

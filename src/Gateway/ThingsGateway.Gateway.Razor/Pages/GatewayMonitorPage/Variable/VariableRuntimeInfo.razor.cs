@@ -331,7 +331,7 @@ public partial class VariableRuntimeInfo : IDisposable
             await ToastService.Warning("online Excel max data count 50000");
             return;
         }
-        var uSheetDatas = await VariableServiceHelpers.ExportVariableAsync(models, _option.SortName, _option.SortOrder);
+        var uSheetDatas = VariableServiceHelpers.ExportVariable(models, _option.SortName, _option.SortOrder);
 
         op.Component = BootstrapDynamicComponent.CreateComponent<USheet>(new Dictionary<string, object?>
         {

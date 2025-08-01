@@ -16,20 +16,20 @@ namespace ThingsGateway.Gateway.Application;
 [ThingsGateway.DependencyInjection.SuppressSniffer]
 public static class ThingsGatewayCacheConst
 {
-    /// <summary>
-    /// 通道
-    /// </summary>
-    public const string Cache_Channel = $"{Cache_Prefix}Cache_Channel:List";
+    ///// <summary>
+    ///// 通道
+    ///// </summary>
+    //public const string Cache_Channel = $"{Cache_Prefix}Cache_Channel:List";
 
-    /// <summary>
-    /// device
-    /// </summary>
-    public const string Cache_Device = $"{Cache_Prefix}Cache_Device:List";
+    ///// <summary>
+    ///// device
+    ///// </summary>
+    //public const string Cache_Device = $"{Cache_Prefix}Cache_Device:List";
 
-    /// <summary>
-    /// variable
-    /// </summary>
-    public const string Cache_Variable = $"{Cache_Prefix}Cache_Variable:IdNameList";
+    ///// <summary>
+    ///// variable
+    ///// </summary>
+    //public const string Cache_Variable = $"{Cache_Prefix}Cache_Variable:IdNameList";
 
     /// <summary>
     /// 前缀

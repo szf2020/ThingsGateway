@@ -375,37 +375,37 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
         HashSet<long>? deviceId = null;
         if (!exportFilter.PluginName.IsNullOrWhiteSpace())
         {
-            var channel = (await _channelService.GetAllAsync().ConfigureAwait(false)).Where(a => a.PluginName == exportFilter.PluginName).Select(a => a.Id).ToHashSet();
-            deviceId = (await _deviceService.GetAllAsync().ConfigureAwait(false)).Where(a => channel.Contains(a.ChannelId)).Select(a => a.Id).ToHashSet();
+            var channel = (GlobalData.IdChannels).Where(a => a.Value.PluginName == exportFilter.PluginName).Select(a => a.Value.Id).ToHashSet();
+            deviceId = (GlobalData.IdDevices).Where(a => channel.Contains(a.Value.ChannelId)).Select(a => a.Value.Id).ToHashSet();
         }
         else if (exportFilter.ChannelId != null)
         {
-            deviceId = (await _deviceService.GetAllAsync().ConfigureAwait(false)).Where(a => a.ChannelId == exportFilter.ChannelId).Select(a => a.Id).ToHashSet();
+            deviceId = (GlobalData.IdDevices).Where(a => a.Value.ChannelId == exportFilter.ChannelId).Select(a => a.Value.Id).ToHashSet();
         }
         var whereQuery = (ISugarQueryable<Variable> a) => a
         .WhereIF(!exportFilter.QueryPageOptions.SearchText.IsNullOrWhiteSpace(), a => a.Name.Contains(exportFilter.QueryPageOptions.SearchText!))
         .WhereIF(exportFilter.PluginType == PluginTypeEnum.Collect, a => a.DeviceId == exportFilter.DeviceId)
         .WhereIF(deviceId != null, a => deviceId.Contains(a.DeviceId))
 
-                .WhereIF(dataScope != null && dataScope?.Count > 0, u => dataScope.Contains(u.CreateOrgId))//在指定机构列表查询
+        .WhereIF(dataScope != null && dataScope?.Count > 0, u => dataScope.Contains(u.CreateOrgId))//在指定机构列表查询
         .WhereIF(dataScope?.Count == 0, u => u.CreateUserId == UserManager.UserId)
 
         .WhereIF(exportFilter.PluginType == PluginTypeEnum.Business, u => SqlFunc.JsonLike(u.VariablePropertys, exportFilter.DeviceId.ToString()));
         return whereQuery;
     }
 
-    private async Task<Func<IEnumerable<Variable>, IEnumerable<Variable>>> GetWhereEnumerableFunc(ExportFilter exportFilter)
+    private async Task<Func<IEnumerable<Variable>, IEnumerable<Variable>>> GetWhereEnumerableFunc(ExportFilter exportFilter, bool sql = false)
     {
         var dataScope = await GlobalData.SysUserService.GetCurrentUserDataScopeAsync().ConfigureAwait(false);
         HashSet<long>? deviceId = null;
         if (!exportFilter.PluginName.IsNullOrWhiteSpace())
         {
-            var channel = (await _channelService.GetAllAsync().ConfigureAwait(false)).Where(a => a.PluginName == exportFilter.PluginName).Select(a => a.Id).ToHashSet();
-            deviceId = (await _deviceService.GetAllAsync().ConfigureAwait(false)).Where(a => channel.Contains(a.ChannelId)).Select(a => a.Id).ToHashSet();
+            var channel = (GlobalData.IdChannels).Where(a => a.Value.PluginName == exportFilter.PluginName).Select(a => a.Value.Id).ToHashSet();
+            deviceId = (GlobalData.IdDevices).Where(a => channel.Contains(a.Value.ChannelId)).Select(a => a.Value.Id).ToHashSet();
         }
         else if (exportFilter.ChannelId != null)
         {
-            deviceId = (await _deviceService.GetAllAsync().ConfigureAwait(false)).Where(a => a.ChannelId == exportFilter.ChannelId).Select(a => a.Id).ToHashSet();
+            deviceId = (GlobalData.IdDevices).Where(a => a.Value.ChannelId == exportFilter.ChannelId).Select(a => a.Value.Id).ToHashSet();
         }
         var whereQuery = (IEnumerable<Variable> a) => a
         .WhereIF(!exportFilter.QueryPageOptions.SearchText.IsNullOrWhiteSpace(), a => a.Name.Contains(exportFilter.QueryPageOptions.SearchText!))
@@ -415,7 +415,12 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
                 .WhereIF(dataScope != null && dataScope?.Count > 0, u => dataScope.Contains(u.CreateOrgId))//在指定机构列表查询
         .WhereIF(dataScope?.Count == 0, u => u.CreateUserId == UserManager.UserId)
 
-        .WhereIF(exportFilter.PluginType == PluginTypeEnum.Business, u => SqlFunc.JsonLike(u.VariablePropertys, exportFilter.DeviceId.ToString()));
+        .WhereIF(sql && exportFilter.PluginType == PluginTypeEnum.Business, u => SqlFunc.JsonLike(u.VariablePropertys, exportFilter.DeviceId.ToString()))
+        .WhereIF(!sql && exportFilter.PluginType == PluginTypeEnum.Business && exportFilter.DeviceId > 0, u =>
+        GlobalData.IdVariables.TryGetValue(u.Id, out var runtime) &&
+        GlobalData.ContainsVariable(exportFilter.DeviceId.Value, runtime)
+
+        );
         return whereQuery;
     }
 
@@ -442,7 +447,7 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
 
     public void DeleteVariableCache()
     {
-        App.CacheService.Remove(ThingsGatewayCacheConst.Cache_Variable);
+        //App.CacheService.Remove(ThingsGatewayCacheConst.Cache_Variable);
     }
 
     public List<VariableRuntime> GetAllVariableRuntime()
@@ -461,8 +466,8 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
     [OperDesc("ExportVariable", isRecordPar: false, localizerType: typeof(Variable))]
     public async Task<MemoryStream> ExportMemoryStream(List<Variable> variables, string deviceName = null)
     {
-        var deviceDicts = (await GlobalData.DeviceService.GetAllAsync().ConfigureAwait(false)).ToDictionary(a => a.Id);
-        var channelDicts = (await GlobalData.ChannelService.GetAllAsync().ConfigureAwait(false)).ToDictionary(a => a.Id);
+        var deviceDicts = GlobalData.IdDevices;
+        var channelDicts = GlobalData.IdChannels;
         var pluginSheetNames = variables.Where(a => a.VariablePropertys?.Count > 0).SelectMany(a => a.VariablePropertys).Select(a =>
         {
             if (deviceDicts.TryGetValue(a.Key, out var device) && channelDicts.TryGetValue(device.ChannelId, out var channel))
@@ -493,8 +498,8 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
             //导出
             var variables = GlobalData.IdVariables.Select(a => a.Value).GetQuery(exportFilter.QueryPageOptions, whereQuery, exportFilter.FilterKeyValueAction);
 
-            var deviceDicts = (await GlobalData.DeviceService.GetAllAsync().ConfigureAwait(false)).ToDictionary(a => a.Id);
-            var channelDicts = (await GlobalData.ChannelService.GetAllAsync().ConfigureAwait(false)).ToDictionary(a => a.Id);
+            var deviceDicts = GlobalData.IdDevices;
+            var channelDicts = GlobalData.IdChannels;
             var pluginSheetNames = variables.Where(a => a.VariablePropertys?.Count > 0).SelectMany(a => a.VariablePropertys).Select(a =>
             {
                 if (deviceDicts.TryGetValue(a.Key, out var device) && channelDicts.TryGetValue(device.ChannelId, out var channel))
@@ -512,8 +517,11 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
         }
         else
         {
-            var data = (await PageAsync(exportFilter).ConfigureAwait(false));
-            var sheets = await VariableServiceHelpers.ExportCoreAsync(data.Items, sortName: exportFilter.QueryPageOptions.SortName, sortOrder: exportFilter.QueryPageOptions.SortOrder).ConfigureAwait(false);
+            var whereQuery = await GetWhereEnumerableFunc(exportFilter).ConfigureAwait(false);
+            //导出
+            var data = GlobalData.IdVariables.Select(a => a.Value).GetQuery(exportFilter.QueryPageOptions, whereQuery, exportFilter.FilterKeyValueAction);
+            //var data = (await PageAsync(exportFilter).ConfigureAwait(false));
+            var sheets = VariableServiceHelpers.ExportCore(data, sortName: exportFilter.QueryPageOptions.SortName, sortOrder: exportFilter.QueryPageOptions.SortOrder);
             return sheets;
         }
     }
@@ -578,7 +586,7 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
             var sheetNames = MiniExcel.GetSheetNames(path);
 
             // 获取所有设备的字典，以设备名称作为键
-            var deviceDicts = (await _deviceService.GetAllAsync().ConfigureAwait(false)).ToDictionary(a => a.Name);
+            var deviceDicts = GlobalData.Devices;
 
             // 存储导入检验结果的字典
             Dictionary<string, ImportPreviewOutputBase> ImportPreviews = new();
@@ -609,7 +617,7 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
         }
     }
 
-    public ImportPreviewOutput<Dictionary<string, Variable>> SetVariableData(HashSet<long>? dataScope, Dictionary<string, Device> deviceDicts, Dictionary<string, ImportPreviewOutputBase> ImportPreviews, ImportPreviewOutput<Dictionary<string, Variable>> deviceImportPreview, Dictionary<string, PluginInfo> driverPluginNameDict, ConcurrentDictionary<string, (Type, Dictionary<string, PropertyInfo>, Dictionary<string, PropertyInfo>)> propertysDict, string sheetName, IEnumerable<IDictionary<string, object>> rows)
+    public ImportPreviewOutput<Dictionary<string, Variable>> SetVariableData(HashSet<long>? dataScope, IReadOnlyDictionary<string, DeviceRuntime> deviceDicts, Dictionary<string, ImportPreviewOutputBase> ImportPreviews, ImportPreviewOutput<Dictionary<string, Variable>> deviceImportPreview, Dictionary<string, PluginInfo> driverPluginNameDict, ConcurrentDictionary<string, (Type, Dictionary<string, PropertyInfo>, Dictionary<string, PropertyInfo>)> propertysDict, string sheetName, IEnumerable<IDictionary<string, object>> rows)
     {
         // 变量页处理
         if (sheetName == ExportString.VariableName)

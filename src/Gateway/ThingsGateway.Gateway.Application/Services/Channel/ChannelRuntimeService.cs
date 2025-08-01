@@ -259,12 +259,12 @@ public class ChannelRuntimeService : IChannelRuntimeService
         try
         {
             await WaitLock.WaitAsync().ConfigureAwait(false);
-
+            var channelIds = GlobalData.IdChannels.Keys.ToList();
             //网关启动时，获取所有通道
-            var newChannelRuntimes = (await GlobalData.ChannelService.GetAllAsync().ConfigureAwait(false)).Where(a => ids.Contains(a.Id) || !GlobalData.IdChannels.ContainsKey(a.Id)).AdaptListChannelRuntime();
+            var newChannelRuntimes = (await GlobalData.ChannelService.GetFromDBAsync((a => ids.Contains(a.Id) || !channelIds.Contains(a.Id))).ConfigureAwait(false)).AdaptListChannelRuntime();
 
             var chanelIds = newChannelRuntimes.Select(a => a.Id).ToHashSet();
-            var newDeviceRuntimes = (await GlobalData.DeviceService.GetAllAsync().ConfigureAwait(false)).Where(a => chanelIds.Contains(a.ChannelId)).AdaptListDeviceRuntime();
+            var newDeviceRuntimes = (await GlobalData.DeviceService.GetFromDBAsync((a => chanelIds.Contains(a.ChannelId))).ConfigureAwait(false)).AdaptListDeviceRuntime();
 
             await RuntimeServiceHelper.InitAsync(newChannelRuntimes, newDeviceRuntimes, _logger).ConfigureAwait(false);
 

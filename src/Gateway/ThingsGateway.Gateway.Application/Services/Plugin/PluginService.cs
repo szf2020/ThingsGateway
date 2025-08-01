@@ -35,7 +35,7 @@ internal sealed class PluginService : IPluginService
     /// </summary>
     public const string DirName = "GatewayPlugins";
 
-    private const string CacheKeyGetPluginOutputs = $"{ThingsGatewayCacheConst.Cache_Prefix}{nameof(PluginService)}{nameof(GetList)}";
+    private const string CacheKeyGetPluginOutputs = $"ThingsGateway.Gateway.Application.{nameof(PluginService)}{nameof(GetList)}";
     private const string SaveEx = ".save";
     private const string DelEx = ".del";
 

@@ -25,6 +25,7 @@ public class UdpSessionChannel : UdpSession, IClientChannel
     public UdpSessionChannel(IChannelOptions channelOptions)
     {
         ChannelOptions = channelOptions;
+        ResetSign();
     }
     public override TouchSocketConfig Config => base.Config ?? ChannelOptions.Config;
 
@@ -37,7 +38,7 @@ public class UdpSessionChannel : UdpSession, IClientChannel
     }
 
     /// <inheritdoc/>
-    public ChannelReceivedEventHandler ChannelReceived { get; set; } = new();
+    public ChannelReceivedEventHandler ChannelReceived { get; } = new();
 
     /// <inheritdoc/>
     public IChannelOptions ChannelOptions { get; }
@@ -55,15 +56,15 @@ public class UdpSessionChannel : UdpSession, IClientChannel
     public DataHandlingAdapter ReadOnlyDataHandlingAdapter => DataHandlingAdapter;
 
     /// <inheritdoc/>
-    public ChannelEventHandler Started { get; set; } = new();
+    public ChannelEventHandler Started { get; } = new();
 
     /// <inheritdoc/>
-    public ChannelEventHandler Starting { get; set; } = new();
+    public ChannelEventHandler Starting { get; } = new();
 
     /// <inheritdoc/>
-    public ChannelEventHandler Stoped { get; set; } = new();
+    public ChannelEventHandler Stoped { get; } = new();
     /// <inheritdoc/>
-    public ChannelEventHandler Stoping { get; set; } = new();
+    public ChannelEventHandler Stoping { get; } = new();
 
     /// <summary>
     /// 等待池

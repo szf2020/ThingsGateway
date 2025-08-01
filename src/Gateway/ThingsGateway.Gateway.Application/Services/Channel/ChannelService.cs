@@ -16,6 +16,7 @@ using MiniExcelLibs;
 
 using System.ComponentModel.DataAnnotations;
 using System.Data;
+using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 
@@ -225,23 +226,20 @@ internal sealed class ChannelService : BaseService<Channel>, IChannelService
     /// <inheritdoc />
     public void DeleteChannelFromCache()
     {
-        App.CacheService.Remove(ThingsGatewayCacheConst.Cache_Channel);//删除通道缓存
+        //App.CacheService.Remove(ThingsGatewayCacheConst.Cache_Channel);//删除通道缓存
     }
+
+
 
     /// <summary>
     /// 从缓存/数据库获取全部信息
     /// </summary>
     /// <returns>列表</returns>
-    public async Task<List<Channel>> GetAllAsync(SqlSugarClient db = null)
+    public async Task<List<Channel>> GetFromDBAsync(Expression<Func<Channel, bool>> expression = null, SqlSugarClient db = null)
     {
-        var key = ThingsGatewayCacheConst.Cache_Channel;
-        var channels = App.CacheService.Get<List<Channel>>(key);
-        if (channels == null)
-        {
-            db ??= GetDB();
-            channels = await db.Queryable<Channel>().OrderBy(a => a.Id).ToListAsync().ConfigureAwait(false);
-            App.CacheService.Set(key, channels);
-        }
+
+        db ??= GetDB();
+        var channels = await db.Queryable<Channel>().WhereIF(expression != null, expression).OrderBy(a => a.Id).ToListAsync().ConfigureAwait(false);
         return channels;
     }
 
@@ -263,7 +261,7 @@ internal sealed class ChannelService : BaseService<Channel>, IChannelService
         if (exportFilter.PluginType != null)
         {
             var pluginInfo = GlobalData.PluginService.GetList(exportFilter.PluginType).Select(a => a.FullName).ToHashSet();
-            channel = (await GetAllAsync().ConfigureAwait(false)).Where(a => pluginInfo.Contains(a.PluginName)).Select(a => a.Id).ToHashSet();
+            channel = GlobalData.IdChannels.Where(a => pluginInfo.Contains(a.Value.PluginName)).Select(a => a.Value.Id).ToHashSet();
         }
         var dataScope = await GlobalData.SysUserService.GetCurrentUserDataScopeAsync().ConfigureAwait(false);
         var whereQuery = (ISugarQueryable<Channel> a) => a
@@ -285,7 +283,7 @@ internal sealed class ChannelService : BaseService<Channel>, IChannelService
     [OperDesc("SaveChannel", localizerType: typeof(Channel))]
     public async Task<bool> SaveChannelAsync(Channel input, ItemChangedType type)
     {
-        if ((await GetAllAsync().ConfigureAwait(false)).ToDictionary(a => a.Name).TryGetValue(input.Name, out var channel))
+        if (GlobalData.Channels.TryGetValue(input.Name, out var channel))
         {
             if (channel.Id != input.Id)
             {
@@ -409,7 +407,7 @@ internal sealed class ChannelService : BaseService<Channel>, IChannelService
         {
             var dataScope = await GlobalData.SysUserService.GetCurrentUserDataScopeAsync().ConfigureAwait(false);
             var sheetNames = MiniExcel.GetSheetNames(path);
-            var channelDicts = (await GetAllAsync().ConfigureAwait(false)).ToDictionary(a => a.Name);
+            var channelDicts = GlobalData.Channels;
             //导入检验结果
             Dictionary<string, ImportPreviewOutputBase> ImportPreviews = new();
             //设备页
@@ -429,7 +427,7 @@ internal sealed class ChannelService : BaseService<Channel>, IChannelService
         }
     }
 
-    public void SetChannelData(HashSet<long>? dataScope, Dictionary<string, Channel> channelDicts, Dictionary<string, ImportPreviewOutputBase> ImportPreviews, string sheetName, IEnumerable<IDictionary<string, object>> rows)
+    public void SetChannelData(HashSet<long>? dataScope, IReadOnlyDictionary<string, ChannelRuntime> channelDicts, Dictionary<string, ImportPreviewOutputBase> ImportPreviews, string sheetName, IEnumerable<IDictionary<string, object>> rows)
     {
         #region sheet
 

@@ -275,7 +275,7 @@ public partial class DeviceTable : IDisposable
             await ToastService.Warning("online Excel max data count 50000");
             return;
         }
-        var uSheetDatas = await DeviceServiceHelpers.ExportDeviceAsync(models);
+        var uSheetDatas = DeviceServiceHelpers.ExportDevice(models);
 
         op.Component = BootstrapDynamicComponent.CreateComponent<USheet>(new Dictionary<string, object?>
         {

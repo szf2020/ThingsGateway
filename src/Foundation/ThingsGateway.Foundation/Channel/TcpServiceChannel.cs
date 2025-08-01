@@ -180,7 +180,7 @@ public class TcpServiceChannel<TClient> : TcpServiceChannelBase<TClient>, IChann
     public override TouchSocketConfig Config => base.Config ?? ChannelOptions.Config;
 
     /// <inheritdoc/>
-    public ChannelReceivedEventHandler ChannelReceived { get; set; } = new();
+    public ChannelReceivedEventHandler ChannelReceived { get; } = new();
 
     /// <inheritdoc/>
     public IChannelOptions ChannelOptions { get; }
@@ -192,15 +192,15 @@ public class TcpServiceChannel<TClient> : TcpServiceChannelBase<TClient>, IChann
     public bool Online => ServerState == ServerState.Running;
 
     /// <inheritdoc/>
-    public ChannelEventHandler Started { get; set; } = new();
+    public ChannelEventHandler Started { get; } = new();
 
     /// <inheritdoc/>
-    public ChannelEventHandler Starting { get; set; } = new();
+    public ChannelEventHandler Starting { get; } = new();
 
     /// <inheritdoc/>
-    public ChannelEventHandler Stoped { get; set; } = new();
+    public ChannelEventHandler Stoped { get; } = new();
     /// <inheritdoc/>
-    public ChannelEventHandler Stoping { get; set; } = new();
+    public ChannelEventHandler Stoping { get; } = new();
 
     /// <inheritdoc/>
     public Task<Result> CloseAsync(string msg, CancellationToken token)
@@ -228,8 +228,8 @@ public class TcpServiceChannel<TClient> : TcpServiceChannelBase<TClient>, IChann
         data.ResetSign(MinSign, MaxSign);
         return data;
     }
-    public int MaxSign { get; set; }
-    public int MinSign { get; set; }
+    public int MaxSign { get; private set; } = 0;
+    public int MinSign { get; private set; } = ushort.MaxValue;
     public void ResetSign(int minSign = 0, int maxSign = ushort.MaxValue)
     {
         MinSign = minSign;

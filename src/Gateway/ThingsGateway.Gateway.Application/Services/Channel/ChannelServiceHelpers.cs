@@ -127,7 +127,7 @@ public static class ChannelServiceHelpers
     public static async Task<Dictionary<string, ImportPreviewOutputBase>> ImportAsync(USheetDatas uSheetDatas)
     {
         var dataScope = await GlobalData.SysUserService.GetCurrentUserDataScopeAsync().ConfigureAwait(false);
-        var channelDicts = (await GlobalData.ChannelService.GetAllAsync().ConfigureAwait(false)).ToDictionary(a => a.Name);
+        var channelDicts = GlobalData.Channels;
         //导入检验结果
         Dictionary<string, ImportPreviewOutputBase> ImportPreviews = new();
         //设备页

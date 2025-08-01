@@ -12,6 +12,8 @@ using BootstrapBlazor.Components;
 
 using Microsoft.AspNetCore.Components.Forms;
 
+using System.Linq.Expressions;
+
 namespace ThingsGateway.Gateway.Application;
 
 /// <summary>
@@ -57,7 +59,7 @@ internal interface IChannelService
     /// 从缓存/数据库获取全部信息
     /// </summary>
     /// <returns>通道列表</returns>
-    Task<List<Channel>> GetAllAsync(SqlSugarClient db = null);
+    Task<List<Channel>> GetFromDBAsync(Expression<Func<Channel, bool>> expression = null, SqlSugarClient db = null);
 
     /// <summary>
     /// 导入通道数据
@@ -92,7 +94,7 @@ internal interface IChannelService
     /// <param name="type">保存类型</param>
     Task<bool> BatchSaveAsync(List<Channel> input, ItemChangedType type);
 
-    void SetChannelData(HashSet<long>? dataScope, Dictionary<string, Channel> channelDicts, Dictionary<string, ImportPreviewOutputBase> ImportPreviews, string sheetName, IEnumerable<IDictionary<string, object>> rows);
+    void SetChannelData(HashSet<long>? dataScope, IReadOnlyDictionary<string, ChannelRuntime> channelDicts, Dictionary<string, ImportPreviewOutputBase> ImportPreviews, string sheetName, IEnumerable<IDictionary<string, object>> rows);
 
     /// <summary>
     /// 保存是否输出日志和日志等级

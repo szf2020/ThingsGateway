@@ -27,7 +27,7 @@ public class LogJob : IJob
         await DeleteRpcLog(rpcLogDaysdaysAgo, stoppingToken).ConfigureAwait(false);
         await DeleteBackendLog(backendLogdaysAgo, stoppingToken).ConfigureAwait(false);
         await DeleteTextLog(stoppingToken).ConfigureAwait(false);
-        await DeleteLocalDB(stoppingToken).ConfigureAwait(false);
+        DeleteLocalDB(stoppingToken);
     }
 
     private static async Task DeleteRpcLog(int daysAgo, CancellationToken stoppingToken)
@@ -49,8 +49,8 @@ public class LogJob : IJob
         //网关通道日志以通道id命名
         var channelService = App.RootServices.GetService<IChannelService>();
         var deviceService = App.RootServices.GetService<IDeviceService>();
-        var channelNames = (await channelService.GetAllAsync().ConfigureAwait(false)).Select(a => a.Name.ToString()).ToHashSet();
-        var deviceNames = (await deviceService.GetAllAsync().ConfigureAwait(false)).Select(a => a.Name.ToString()).ToHashSet();
+        var channelNames = (GlobalData.Channels.Keys).ToHashSet();
+        var deviceNames = (GlobalData.Devices.Keys).ToHashSet();
         var channelBaseDir = LoggerExtensions.GetChannelLogBasePath();
         Directory.CreateDirectory(channelBaseDir);
         var deviceBaseDir = LoggerExtensions.GetDeviceLogBasePath();
@@ -112,10 +112,9 @@ public class LogJob : IJob
         }
     }
 
-    public async Task DeleteLocalDB(CancellationToken stoppingToken)
+    public void DeleteLocalDB(CancellationToken stoppingToken)
     {
-        var deviceService = App.RootServices.GetService<IDeviceService>();
-        var data = (await deviceService.GetAllAsync().ConfigureAwait(false)).Select(a => a.Name).ToHashSet();
+        var data = (GlobalData.Devices.Keys).ToHashSet();
         var dir = CacheDBUtil.GetCacheFileBasePath();
         string[] dirs = Directory.GetDirectories(dir);
         foreach (var item in dirs)

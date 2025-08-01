@@ -23,7 +23,7 @@ public class TcpClientChannel : TcpClient, IClientChannel
     public TcpClientChannel(IChannelOptions channelOptions)
     {
         ChannelOptions = channelOptions;
-
+        ResetSign();
     }
     public override TouchSocketConfig Config => base.Config ?? ChannelOptions.Config;
     public void ResetSign(int minSign = 0, int maxSign = ushort.MaxValue)

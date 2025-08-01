@@ -584,13 +584,13 @@ internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
             await RemoveDeviceAsync(deviceRuntime.Id).ConfigureAwait(false);
 
             //获取主设备
-            var devices = await GlobalData.DeviceService.GetAllAsync().ConfigureAwait(false);//获取设备属性
+            var devices = GlobalData.IdDevices;
 
             if (deviceRuntime.RedundantEnable && deviceRuntime.RedundantDeviceId != null)
             {
                 if (!GlobalData.ReadOnlyIdDevices.TryGetValue(deviceRuntime.RedundantDeviceId ?? 0, out newDeviceRuntime))
                 {
-                    var newDev = await GlobalData.DeviceService.GetDeviceByIdAsync(deviceRuntime.RedundantDeviceId ?? 0).ConfigureAwait(false);
+                    devices.TryGetValue(deviceRuntime.RedundantDeviceId ?? 0, out var newDev);
                     if (newDev == null)
                     {
                         LogMessage?.LogWarning($"Device with deviceId {deviceRuntime.RedundantDeviceId} not found");
@@ -611,7 +611,7 @@ internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
                 newDeviceRuntime = GlobalData.ReadOnlyIdDevices.FirstOrDefault(a => a.Value.RedundantDeviceId == deviceRuntime.Id).Value;
                 if (newDeviceRuntime == null)
                 {
-                    var newDev = devices.FirstOrDefault(a => a.RedundantDeviceId == deviceRuntime.Id);
+                    var newDev = devices.FirstOrDefault(a => a.Value.RedundantDeviceId == deviceRuntime.Id).Value;
                     if (newDev == null)
                     {
                         LogMessage?.LogWarning($"Device with redundantDeviceId {deviceRuntime.Id} not found");

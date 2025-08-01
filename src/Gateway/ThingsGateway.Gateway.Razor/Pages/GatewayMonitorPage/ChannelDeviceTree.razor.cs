@@ -752,7 +752,7 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
         };
 
         var models = await GlobalData.GetCurrentUserDevices().ConfigureAwait(false);
-        var uSheetDatas = await DeviceServiceHelpers.ExportDeviceAsync(models);
+        var uSheetDatas = DeviceServiceHelpers.ExportDevice(models);
 
         op.Component = BootstrapDynamicComponent.CreateComponent<USheet>(new Dictionary<string, object?>
         {
