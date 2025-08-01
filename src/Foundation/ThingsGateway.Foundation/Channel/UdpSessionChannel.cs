@@ -204,6 +204,7 @@ public class UdpSessionChannel : UdpSession, IClientChannel
     /// <inheritdoc/>
     protected override void SafetyDispose(bool disposing)
     {
+        m_transport?.SafeCancel();
         m_transport?.SafeDispose();
         WaitHandlePool.SafeDispose();
         base.SafetyDispose(disposing);

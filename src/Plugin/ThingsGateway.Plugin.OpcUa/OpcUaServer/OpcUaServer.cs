@@ -175,13 +175,13 @@ public partial class OpcUaServer : BusinessBase
     }
 
     /// <inheritdoc/>
-    protected override void Dispose(bool disposing)
+    protected override Task DisposeAsync(bool disposing)
     {
         GlobalData.VariableValueChangeEvent -= VariableValueChange;
         UaDispose();
         CollectVariableRuntimes?.Clear();
         IdVariableRuntimes?.Clear();
-        base.Dispose(disposing);
+        return base.DisposeAsync(disposing);
     }
 
     protected override async Task ProtectedStartAsync(CancellationToken cancellationToken)

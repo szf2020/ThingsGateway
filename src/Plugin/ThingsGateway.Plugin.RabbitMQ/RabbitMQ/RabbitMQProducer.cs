@@ -12,8 +12,6 @@ using RabbitMQ.Client;
 
 using ThingsGateway.Foundation;
 
-using TouchSocket.Core;
-
 namespace ThingsGateway.Plugin.RabbitMQ;
 
 /// <summary>
@@ -53,11 +51,13 @@ public partial class RabbitMQProducer : BusinessBaseWithCacheIntervalScriptAll
     }
 
     /// <inheritdoc/>
-    protected override void Dispose(bool disposing)
+    protected override async Task DisposeAsync(bool disposing)
     {
-        _channel?.SafeDispose();
-        _connection?.SafeDispose();
-        base.Dispose(disposing);
+        if (_channel != null)
+            await _channel.SafeDisposeAsync().ConfigureAwait(false);
+        if (_connection != null)
+            await _connection.SafeDisposeAsync().ConfigureAwait(false);
+        await base.DisposeAsync(disposing).ConfigureAwait(false);
     }
 
     protected override async Task ProtectedExecuteAsync(object? state, CancellationToken cancellationToken)

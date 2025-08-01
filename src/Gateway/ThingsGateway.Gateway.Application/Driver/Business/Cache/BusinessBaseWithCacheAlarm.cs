@@ -59,10 +59,10 @@ public abstract class BusinessBaseWithCacheAlarm : BusinessBaseWithCache
 
         await base.InitChannelAsync(channel, cancellationToken).ConfigureAwait(false);
     }
-    protected override void Dispose(bool disposing)
+    protected override Task DisposeAsync(bool disposing)
     {
         GlobalData.AlarmChangedEvent -= AlarmValueChange;
-        base.Dispose(disposing);
+        return base.DisposeAsync(disposing);
     }
     /// <summary>
     /// 当报警值发生变化时触发此事件处理方法。该方法内部会检查是否需要进行报警上传，如果需要，则调用 <see cref="AlarmChange(AlarmVariable)"/> 方法。

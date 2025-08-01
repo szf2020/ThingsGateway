@@ -11,6 +11,7 @@
 using ThingsGateway.NewLife.Extension;
 
 namespace ThingsGateway.Foundation.Modbus;
+#pragma warning disable CA1851
 
 /// <summary>
 /// PackHelper

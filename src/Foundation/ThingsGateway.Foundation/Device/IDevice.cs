@@ -15,7 +15,7 @@ namespace ThingsGateway.Foundation;
 /// <summary>
 /// 协议设备接口
 /// </summary>
-public interface IDevice : IDisposable, IDisposableObject
+public interface IDevice : IDisposable, IDisposableObject, IAsyncDisposable
 {
     #region 属性
 

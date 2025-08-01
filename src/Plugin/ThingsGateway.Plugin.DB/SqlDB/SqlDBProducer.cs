@@ -51,10 +51,10 @@ public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariable, IDBH
 
     protected override BusinessPropertyWithCacheInterval _businessPropertyWithCacheInterval => _driverPropertys;
     private SqlSugarClient _db;
-    protected override void Dispose(bool disposing)
+    protected override Task DisposeAsync(bool disposing)
     {
         _db?.TryDispose();
-        base.Dispose(disposing);
+        return base.DisposeAsync(disposing);
     }
     public async Task<SqlSugarPagedList<IDBHistoryValue>> GetDBHistoryValuePagesAsync(DBHistoryValuePageInput input)
     {

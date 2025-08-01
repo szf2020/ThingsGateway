@@ -49,10 +49,10 @@ public partial class QuestDBProducer : BusinessBaseWithCacheIntervalVariable, ID
 
     private SqlSugarClient _db;
 
-    protected override void Dispose(bool disposing)
+    protected override Task DisposeAsync(bool disposing)
     {
         _db?.TryDispose();
-        base.Dispose(disposing);
+        return base.DisposeAsync(disposing);
     }
 
     protected override async Task InitChannelAsync(IChannel? channel, CancellationToken cancellationToken)

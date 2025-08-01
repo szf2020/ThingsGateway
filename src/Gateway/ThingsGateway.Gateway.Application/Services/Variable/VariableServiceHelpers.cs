@@ -30,7 +30,7 @@ public static class VariableServiceHelpers
             if (deviceDicts.TryGetValue(a.Key, out var device) && channelDicts.TryGetValue(device.ChannelId, out var channel))
             {
                 var pluginKey = channel?.PluginName;
-                using var businessBase = (BusinessBase)GlobalData.PluginService.GetDriver(pluginKey);
+                var businessBase = (BusinessBase)GlobalData.PluginService.GetDriver(pluginKey);
                 return new KeyValuePair<string, VariablePropertyBase>(pluginKey, businessBase.VariablePropertys);
             }
             return new KeyValuePair<string, VariablePropertyBase>(string.Empty, null);

@@ -12,8 +12,9 @@ using Microsoft.Extensions.Logging;
 
 using ThingsGateway.Common.Extension;
 using ThingsGateway.Gateway.Application.Extensions;
-using ThingsGateway.NewLife;
 using ThingsGateway.NewLife.Extension;
+
+using TouchSocket.Core;
 
 namespace ThingsGateway.Gateway.Application;
 
@@ -44,7 +45,7 @@ internal sealed class AlarmTask : IDisposable
     public void Dispose()
     {
         StopTask();
-        scheduledTask?.TryDispose();
+        scheduledTask?.SafeDispose();
     }
 
     #region 核心实现

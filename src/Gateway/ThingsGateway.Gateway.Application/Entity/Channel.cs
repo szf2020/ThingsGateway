@@ -17,6 +17,7 @@ using TouchSocket.Core;
 using TouchSocket.Sockets;
 
 namespace ThingsGateway.Gateway.Application;
+#pragma warning disable CS0649
 
 /// <summary>
 /// 通道表

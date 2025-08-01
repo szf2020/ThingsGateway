@@ -47,10 +47,10 @@ public partial class SqlHistoryAlarm : BusinessBaseWithCacheAlarm, IDBHistoryAla
     /// <returns></returns>
     public override bool IsConnected() => success;
 
-    protected override void Dispose(bool disposing)
+    protected override Task DisposeAsync(bool disposing)
     {
         _db?.TryDispose();
-        base.Dispose(disposing);
+        return base.DisposeAsync(disposing);
     }
 
     protected override Task ProtectedStartAsync(CancellationToken cancellationToken)

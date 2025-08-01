@@ -24,7 +24,7 @@ namespace ThingsGateway.Foundation;
 /// <summary>
 /// 协议基类
 /// </summary>
-public abstract class DeviceBase : DisposableObject, IDevice
+public abstract class DeviceBase : AsyncAndSyncDisposableObject, IDevice
 {
     /// <inheritdoc/>
     public IChannel Channel { get; private set; }
@@ -585,13 +585,6 @@ public abstract class DeviceBase : DisposableObject, IDevice
             }
             catch (Exception ex)
             {
-                if (cancellationToken.IsCancellationRequested)
-                {
-                    if (!this.DisposedValue)
-                    {
-                        await Task.Delay(timeout, Channel.ClosedToken).ConfigureAwait(false);
-                    }
-                }
                 return new MessageBase(ex);
             }
             var result = waitData.Check();
@@ -1042,6 +1035,56 @@ public abstract class DeviceBase : DisposableObject, IDevice
     }
 
     /// <inheritdoc/>
+    protected override async Task DisposeAsync(bool disposing)
+    {
+        if (Channel != null)
+        {
+            Channel.Starting.Remove(ChannelStarting);
+            Channel.Stoped.Remove(ChannelStoped);
+            Channel.Started.Remove(ChannelStarted);
+            Channel.Stoping.Remove(ChannelStoping);
+            Channel.ChannelReceived.Remove(ChannelReceived);
+
+            if (Channel.Collects.Count == 1)
+            {
+                if (Channel is ITcpServiceChannel tcpServiceChannel)
+                {
+                    tcpServiceChannel.Clients.ForEach(a => a.WaitHandlePool.SafeDispose());
+                }
+
+                try
+                {
+                    //只关闭，不释放
+                    await Channel.CloseAsync().ConfigureAwait(false);
+                    if (Channel is IClientChannel client)
+                    {
+                        client.WaitHandlePool.SafeDispose();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Logger?.LogWarning(ex);
+                }
+            }
+            else
+            {
+                if (Channel is ITcpServiceChannel tcpServiceChannel && this is IDtu dtu)
+                {
+                    if (tcpServiceChannel.TryGetClient($"ID={dtu.DtuId}", out var client))
+                    {
+                        client.WaitHandlePool?.SafeDispose();
+                        await client.CloseAsync().ConfigureAwait(false);
+                    }
+                }
+            }
+
+            Channel.Collects.Remove(this);
+        }
+
+        _deviceLogger?.TryDispose();
+        base.Dispose(disposing);
+    }
+    /// <inheritdoc/>
     public virtual Action<IPluginManager> ConfigurePlugins(TouchSocketConfig config)
     {
         switch (Channel.ChannelType)
@@ -1058,4 +1101,5 @@ public abstract class DeviceBase : DisposableObject, IDevice
         return a => { };
     }
     public abstract ValueTask<OperResult<ReadOnlyMemory<byte>>> ReadAsync(object state, CancellationToken cancellationToken = default);
+
 }

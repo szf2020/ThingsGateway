@@ -16,6 +16,7 @@ using System.Collections.Concurrent;
 using System.ComponentModel.DataAnnotations;
 
 namespace ThingsGateway.Gateway.Application;
+#pragma warning disable CS0649
 
 /// <summary>
 /// 设备变量表

@@ -60,7 +60,8 @@ public class SiemensS7Master : CollectFoundationBase
 
         var plc = _plc;
         _plc = new();
-        plc?.SafeDispose();
+        if (plc != null)
+            await plc.SafeDisposeAsync().ConfigureAwait(false);
 
         //载入配置
         _plc.DataFormat = _driverPropertys.DataFormat;

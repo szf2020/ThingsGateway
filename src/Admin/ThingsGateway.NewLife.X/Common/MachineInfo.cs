@@ -683,36 +683,20 @@ public class MachineInfo : IExtend
             if (dic.TryGetValue("MemTotal", out var str) && !str.IsNullOrEmpty())
                 Memory = (UInt64)str.TrimEnd(" kB").ToLong();
 
-            /*
-指标	含义	是否可回收
-MemTotal	系统总物理内存	❌ 固定值
-MemFree	完全未使用的内存（不含缓存/缓冲区）	✅ 100% 可用
-MemAvailable	内核估计的可用内存（含可回收缓存和缓冲区）	✅ 最权威的保守估计
-Cached	文件系统缓存（Page Cache），可完全回收	✅ 100% 可回收
-SReclaimable	Slab 缓存中可回收的部分（如 dentry/inode）	✅ 大部分可回收（80%~90%）
-Buffers	磁盘块缓存（现代内核中值较小，可回收）	✅ 可回收
-Slab	内核对象缓存总大小（含可回收和不可回收部分）	⚠️ 需区分 SReclaimable
-SwapCached	被缓存到 Swap 的内存（可回收，但性能较差）	✅ 可回收但不建议依赖
+            ulong ma = 0;
+            if (dic.TryGetValue("MemAvailable", out str) && !str.IsNullOrEmpty())
+            {
+                ma = (UInt64)(str.TrimEnd(" kB").ToLong());
+            }
 
-             */
-
-            var ma = (UInt64)(dic["MemAvailable"]?.TrimEnd(" kB").ToLong() ?? 0);
+            //低于3.14内核的版本用 free+cache
             var mf = (UInt64)(dic["MemFree"]?.TrimEnd(" kB").ToLong() ?? 0);
             var mc = (UInt64)(dic["Cached"]?.TrimEnd(" kB").ToLong() ?? 0);
+            var bf = (UInt64)(dic["Buffers"]?.TrimEnd(" kB").ToLong() ?? 0);
 
-            if (dic.TryGetValue("SReclaimable", out str) && !str.IsNullOrEmpty())
-            {
-                var sr = (UInt64)(str?.TrimEnd(" kB").ToLong() ?? 0);
-                mf += (ulong)(sr * 0.9);
-            }
-            if (dic.TryGetValue("Buffers", out str) && !str.IsNullOrEmpty())
-            {
-                var bf = (UInt64)(str?.TrimEnd(" kB").ToLong() ?? 0);
-                mf += bf;
-            }
-            mf += mc;
+            var free = mf + mc + bf;
 
-            AvailableMemory = ma > mf ? ma : mf;
+            AvailableMemory = ma > free ? ma : free;
         }
 
         // A2/A4温度获取，Buildroot，CPU温度和主板温度

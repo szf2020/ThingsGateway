@@ -326,7 +326,7 @@ internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
                     {
                         try
                         {
-                            await oldCts.CancelAsync().ConfigureAwait(false);
+                            await oldCts.SafeCancelAsync().ConfigureAwait(false);
                             oldCts.SafeDispose();
                         }
                         catch
@@ -340,7 +340,7 @@ internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
                 CancellationTokenSources.TryAdd(driver.DeviceId, cts);
 
                 _ = Task.Factory.StartNew((state) => DriverStart(state, token), driver, token, TaskCreationOptions.None, TaskScheduler.Default);
-            }).ConfigureAwait(false);
+            }, App.HostApplicationLifetime.ApplicationStopping).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
@@ -393,45 +393,48 @@ internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
         try
         {
             ConcurrentList<VariableRuntime> saveVariableRuntimes = new();
-            deviceIds.ParallelForEach((deviceId) =>
-            {
-                var now = DateTime.Now;
-                // 查找具有指定设备ID的驱动程序对象
-                if (Drivers.TryRemove(deviceId, out var driver))
-                {
-                    driver.CurrentDevice.SetDeviceStatus(now, false, "Communication connection has been removed");
-                    if (IsCollectChannel == true)
-                    {
-                        foreach (var a in driver.IdVariableRuntimes)
-                        {
-                            a.Value.SetValue(a.Value.Value, now, false);
-                            a.Value.SetErrorMessage("Communication connection has been removed");
-                            if (a.Value.SaveValue && !a.Value.DynamicVariable)
-                            {
-                                saveVariableRuntimes.Add(a.Value);
-                            }
-                        }
+            await deviceIds.ParallelForEachAsync(async (deviceId, cancellationToken) =>
+             {
+                 var now = DateTime.Now;
+                 // 查找具有指定设备ID的驱动程序对象
+                 if (Drivers.TryRemove(deviceId, out var driver))
+                 {
+                     driver.CurrentDevice.SetDeviceStatus(now, false, "Communication connection has been removed");
+                     if (IsCollectChannel == true)
+                     {
+                         foreach (var a in driver.IdVariableRuntimes)
+                         {
+                             a.Value.SetValue(a.Value.Value, now, false);
+                             a.Value.SetErrorMessage("Communication connection has been removed");
+                             if (a.Value.SaveValue && !a.Value.DynamicVariable)
+                             {
+                                 saveVariableRuntimes.Add(a.Value);
+                             }
+                         }
 
-                    }
+                     }
 
-                }
+                 }
 
-                // 取消驱动程序的操作
-                if (CancellationTokenSources.TryRemove(deviceId, out var token))
-                {
-                    if (token != null)
-                    {
-                        driver.Stop();
-                        token.Cancel();
-                        token.Dispose();
-                    }
-                }
+                 // 取消驱动程序的操作
+                 if (CancellationTokenSources.TryRemove(deviceId, out var token))
+                 {
+                     if (token != null)
+                     {
+                         await token.SafeCancelAsync().ConfigureAwait(false);
+                         token.SafeDispose();
+                         if (driver != null)
+                         {
+                             await driver.StopAsync().ConfigureAwait(false);
+                         }
+                     }
+                 }
 
-                if (DriverTasks.TryRemove(deviceId, out var task))
-                {
-                    task.Stop();
-                }
-            });
+                 if (DriverTasks.TryRemove(deviceId, out var task))
+                 {
+                     task.Stop();
+                 }
+             }).ConfigureAwait(false);
 
             await Task.Delay(100).ConfigureAwait(false);
 
@@ -796,7 +799,7 @@ internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
         Disposed = true;
         try
         {
-            await CancellationTokenSource.CancelAsync().ConfigureAwait(false);
+            await CancellationTokenSource.SafeCancelAsync().ConfigureAwait(false);
             CancellationTokenSource.SafeDispose();
             GlobalData.DeviceStatusChangeEvent -= GlobalData_DeviceStatusChangeEvent;
             await NewDeviceLock.WaitAsync().ConfigureAwait(false);

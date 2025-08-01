@@ -70,7 +70,7 @@ public class OpcUaMaster : CollectBase
         {
             plc.DataChangedHandler -= DataChangedHandler;
             plc.LogEvent -= _plc_LogEvent;
-            plc.SafeDispose();
+            await plc.SafeDisposeAsync().ConfigureAwait(false);
         }
 
         _plc.LogEvent += _plc_LogEvent;
@@ -88,19 +88,18 @@ public class OpcUaMaster : CollectBase
     }
 
     /// <inheritdoc/>
-    protected override void Dispose(bool disposing)
+    protected override async Task DisposeAsync(bool disposing)
     {
         if (_plc != null)
         {
             _plc.DataChangedHandler -= DataChangedHandler;
             _plc.LogEvent -= _plc_LogEvent;
 
-            _plc.Disconnect();
-            _plc.SafeDispose();
+            await _plc.DisposeAsync().ConfigureAwait(false);
         }
 
         VariableAddresDicts?.Clear();
-        base.Dispose(disposing);
+        await base.DisposeAsync(disposing).ConfigureAwait(false);
     }
 
     public override string GetAddressDescription()
@@ -301,7 +300,8 @@ public class OpcUaMaster : CollectBase
     {
         try
         {
-            _plc?.Disconnect();
+            if (_plc != null)
+                await _plc.DisconnectAsync().ConfigureAwait(false);
             await base.AfterVariablesChangedAsync(cancellationToken).ConfigureAwait(false);
         }
         finally

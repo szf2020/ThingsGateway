@@ -54,7 +54,7 @@ public class AsyncReadWriteLock
         {
             var cancellationTokenSource = _cancellationTokenSource;
             _cancellationTokenSource = new();
-            await cancellationTokenSource.CancelAsync().ConfigureAwait(false); // 取消读取
+            await cancellationTokenSource.SafeCancelAsync().ConfigureAwait(false); // 取消读取
             cancellationTokenSource.SafeDispose();
         }
 

@@ -43,7 +43,7 @@ internal sealed class ChannelThreadManage : IChannelThreadManage
               {
                   if (!DeviceThreadManages.TryRemove(channelId, out var deviceThreadManage)) return;
 
-                  await deviceThreadManage.DisposeAsync().ConfigureAwait(false);
+                  await deviceThreadManage.SafeDisposeAsync().ConfigureAwait(false);
               }
               catch (Exception ex)
               {

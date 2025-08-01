@@ -73,7 +73,7 @@ public partial class KafkaProducer : BusinessBaseWithCacheIntervalScriptAll
     }
 
     /// <inheritdoc/>
-    protected override void Dispose(bool disposing)
+    protected override Task DisposeAsync(bool disposing)
     {
         try
         {
@@ -83,7 +83,7 @@ public partial class KafkaProducer : BusinessBaseWithCacheIntervalScriptAll
         {
         }
         _producer?.SafeDispose();
-        base.Dispose(disposing);
+        return base.DisposeAsync(disposing);
     }
 
     protected override Task ProtectedExecuteAsync(object? state, CancellationToken cancellationToken)

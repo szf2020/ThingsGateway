@@ -119,7 +119,7 @@ public partial class OpcUaMaster : IDisposable
     {
         try
         {
-            _plc.Disconnect();
+            await _plc.DisconnectAsync().ConfigureAwait(false);
             LogPath = _plc?.GetHashCode().ToLong().GetDebugLogPath();
             await GetOpc().ConnectAsync(CancellationToken.None);
         }

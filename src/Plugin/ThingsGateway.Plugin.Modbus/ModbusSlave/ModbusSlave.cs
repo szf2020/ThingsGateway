@@ -92,7 +92,8 @@ public class ModbusSlave : BusinessBase
         ArgumentNullException.ThrowIfNull(channel);
         var plc = _plc;
         _plc = new();
-        plc?.SafeDispose();
+        if (plc != null)
+            await plc.SafeDisposeAsync().ConfigureAwait(false);
         //载入配置
         _plc.DataFormat = _driverPropertys.DataFormat;
         _plc.IsStringReverseByteWord = _driverPropertys.IsStringReverseByteWord;
@@ -137,13 +138,14 @@ public class ModbusSlave : BusinessBase
         );
     }
     /// <inheritdoc/>
-    protected override void Dispose(bool disposing)
+    protected override async Task DisposeAsync(bool disposing)
     {
         ModbusVariables?.Clear();
         ModbusVariableQueue?.Clear();
         GlobalData.VariableValueChangeEvent -= VariableValueChange;
-        _plc?.SafeDispose();
-        base.Dispose(disposing);
+        if (_plc != null)
+            await _plc.SafeDisposeAsync().ConfigureAwait(false);
+        await base.DisposeAsync(disposing).ConfigureAwait(false);
     }
 
     protected override async Task ProtectedExecuteAsync(object? state, CancellationToken cancellationToken)

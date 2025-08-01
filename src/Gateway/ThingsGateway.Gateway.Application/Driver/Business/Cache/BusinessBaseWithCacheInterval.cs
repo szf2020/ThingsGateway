@@ -130,7 +130,7 @@ public abstract class BusinessBaseWithCacheInterval : BusinessBaseWithCache
     /// <summary>
     /// 释放资源方法
     /// </summary>
-    protected override void Dispose(bool disposing)
+    protected override Task DisposeAsync(bool disposing)
     {
         // 解绑事件
         GlobalData.AlarmChangedEvent -= AlarmValueChange;
@@ -142,7 +142,7 @@ public abstract class BusinessBaseWithCacheInterval : BusinessBaseWithCache
         _memoryDevModelQueue.Clear();
         _memoryVarModelQueue.Clear();
         _memoryVarModelsQueue.Clear();
-        base.Dispose(disposing);
+        return base.DisposeAsync(disposing);
     }
 
     /// <summary>

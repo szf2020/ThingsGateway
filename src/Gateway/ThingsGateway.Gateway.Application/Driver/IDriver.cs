@@ -14,7 +14,7 @@ using TouchSocket.Core;
 
 namespace ThingsGateway.Gateway.Application
 {
-    public interface IDriver : IDisposable
+    public interface IDriver : IAsyncDisposable
     {
         bool DisposedValue { get; }
         ChannelRuntime CurrentChannel { get; }

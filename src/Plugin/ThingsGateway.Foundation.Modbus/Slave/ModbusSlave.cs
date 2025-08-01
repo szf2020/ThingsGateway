@@ -155,7 +155,7 @@ public class ModbusSlave : DeviceBase, IModbusAddress
     }
 
     /// <inheritdoc/>
-    protected override void Dispose(bool disposing)
+    protected override Task DisposeAsync(bool disposing)
     {
         foreach (var item in ModbusServer01ByteBlocks)
         {
@@ -177,7 +177,7 @@ public class ModbusSlave : DeviceBase, IModbusAddress
         ModbusServer02ByteBlocks.Clear();
         ModbusServer03ByteBlocks.Clear();
         ModbusServer04ByteBlocks.Clear();
-        base.Dispose(disposing);
+        return base.DisposeAsync(disposing);
     }
 
     /// <inheritdoc/>

@@ -26,11 +26,12 @@ namespace ThingsGateway.Gateway.Application;
 /// <summary>
 /// 插件基类
 /// </summary>
-public abstract class DriverBase : DisposableObject, IDriver
+public abstract class DriverBase : AsyncDisposableObject, IDriver
 {
     /// <inheritdoc cref="DriverBase"/>
     public DriverBase()
     {
+
         Localizer = App.CreateLocalizerByType(typeof(DriverBase))!;
     }
 
@@ -312,38 +313,44 @@ public abstract class DriverBase : DisposableObject, IDriver
 
     protected abstract List<IScheduledTask> ProtectedGetTasks(CancellationToken cancellationToken);
 
-    protected object stopLock = new();
+    protected WaitLock stopLock = new(nameof(DriverBase));
     /// <summary>
     /// 已停止任务，释放插件
     /// </summary>
-    internal virtual void Stop()
+    internal virtual async Task StopAsync()
     {
         if (!DisposedValue)
         {
-            lock (stopLock)
+            await stopLock.WaitAsync().ConfigureAwait(false);
+            try
             {
+
+
                 if (!DisposedValue)
                 {
-                    try
-                    {
-                        // 执行资源释放操作
-                        Dispose();
-                    }
-                    catch (Exception ex)
-                    {
-                        // 记录 Dispose 方法执行失败的错误信息
-                        LogMessage?.LogError(ex, "Dispose");
-                    }
+
+                    // 执行资源释放操作
+                    await this.SafeDisposeAsync().ConfigureAwait(false);
+
                     // 记录设备线程已停止的信息
                     LogMessage?.LogInformation(string.Format(AppResource.DeviceTaskStop, DeviceName));
                 }
             }
+            catch (Exception ex)
+            {
+                // 记录 Dispose 方法执行失败的错误信息
+                LogMessage?.LogError(ex, "Dispose");
+            }
+            finally
+            {
+                stopLock.Release();
+            }
         }
     }
 
-    protected override void Dispose(bool disposing)
+    protected override async Task DisposeAsync(bool disposing)
     {
-        base.Dispose(disposing);
+        await base.DisposeAsync(disposing).ConfigureAwait(false);
         if (TaskSchedulerLoop != null)
         {
             lock (TaskSchedulerLoop)

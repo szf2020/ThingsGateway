@@ -17,6 +17,7 @@ using System.ComponentModel.DataAnnotations;
 using ThingsGateway.NewLife.Extension;
 
 namespace ThingsGateway.Gateway.Application;
+#pragma warning disable CS0649
 
 /// <summary>
 /// 设备表

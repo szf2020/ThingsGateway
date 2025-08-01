@@ -10,8 +10,6 @@
 
 using ThingsGateway.Gateway.Application;
 
-using TouchSocket.Core;
-
 namespace ThingsGateway.Plugin.Dlt645;
 
 /// <summary>
@@ -52,7 +50,8 @@ public class Dlt645_2007Master : CollectFoundationBase
 
         var plc = _plc;
         _plc = new();
-        plc?.SafeDispose();
+        if (plc != null)
+            await plc.SafeDisposeAsync().ConfigureAwait(false);
 
         //载入配置
         _plc.DtuId = _driverPropertys.DtuId;

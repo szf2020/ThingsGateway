@@ -417,13 +417,15 @@ public partial class SiemensS7Master : DeviceBase
                 //本地TSAP
                 if (SiemensS7Type == SiemensTypeEnum.S200 || SiemensS7Type == SiemensTypeEnum.S200Smart)
                 {
-                    ISO_CR[13] = BitConverter.GetBytes(LocalTSAP)[1];
-                    ISO_CR[14] = BitConverter.GetBytes(LocalTSAP)[0];
+                    var data = s7BitConverter.GetBytes(LocalTSAP);
+                    ISO_CR[13] = data[0];
+                    ISO_CR[14] = data[1];
                 }
                 else
                 {
-                    ISO_CR[16] = BitConverter.GetBytes(LocalTSAP)[1];
-                    ISO_CR[17] = BitConverter.GetBytes(LocalTSAP)[0];
+                    var data = s7BitConverter.GetBytes(LocalTSAP);
+                    ISO_CR[16] = data[0];
+                    ISO_CR[17] = data[1];
                 }
             }
             if (Rack > 0 || Slot > 0)

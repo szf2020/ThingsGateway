@@ -66,9 +66,9 @@ public partial class MqttServer : BusinessBaseWithCacheIntervalScriptAll
     }
 
     /// <inheritdoc/>
-    protected override void Dispose(bool disposing)
+    protected override async Task DisposeAsync(bool disposing)
     {
-        base.Dispose(disposing);
+        await base.DisposeAsync(disposing).ConfigureAwait(false);
         if (_mqttServer != null)
         {
             _mqttServer.ClientDisconnectedAsync -= MqttServer_ClientDisconnectedAsync;

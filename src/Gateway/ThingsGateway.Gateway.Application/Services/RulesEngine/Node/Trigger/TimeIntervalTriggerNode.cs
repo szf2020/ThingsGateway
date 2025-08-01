@@ -47,7 +47,7 @@ public class TimeIntervalTriggerNode : TextNode, ITriggerNode, IDisposable
     public void Dispose()
     {
         _task?.Stop();
-        _task.TryDispose();
+        _task?.TryDispose();
 
         GC.SuppressFinalize(this);
     }

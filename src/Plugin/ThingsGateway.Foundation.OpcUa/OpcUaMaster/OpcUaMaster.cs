@@ -28,7 +28,7 @@ public delegate void LogEventHandler(byte level, object sender, string message, 
 /// <summary>
 /// OpcUaMaster
 /// </summary>
-public class OpcUaMaster : IDisposable
+public class OpcUaMaster : IDisposable, IAsyncDisposable
 {
     #region 属性，变量等
 
@@ -405,6 +405,18 @@ public class OpcUaMaster : IDisposable
         }
     }
 
+    /// <summary>
+    /// 断开连接。
+    /// </summary>
+    public async Task DisconnectAsync()
+    {
+        await PrivateDisconnectAsync().ConfigureAwait(false);
+        // disconnect any existing session.
+        if (m_session != null)
+        {
+            m_session = null;
+        }
+    }
     /// <inheritdoc/>
     public void Dispose()
     {
@@ -412,7 +424,12 @@ public class OpcUaMaster : IDisposable
         _variableDicts?.Clear();
         _subscriptionDicts?.Clear();
     }
-
+    public async ValueTask DisposeAsync()
+    {
+        await DisconnectAsync().ConfigureAwait(false);
+        _variableDicts?.Clear();
+        _subscriptionDicts?.Clear();
+    }
     /// <summary>
     /// 获取变量说明
     /// </summary>
@@ -865,7 +882,7 @@ public class OpcUaMaster : IDisposable
             {
                 return;
             }
-            PrivateDisconnect();
+            await PrivateDisconnectAsync().ConfigureAwait(false);
             if (LastServerUrl != serverUrl)
             {
                 _variableDicts.Clear();
@@ -934,6 +951,29 @@ public class OpcUaMaster : IDisposable
         {
             m_session.KeepAlive -= Session_KeepAlive;
             m_session.Close(10000);
+            m_session.Dispose();
+            m_session = null;
+        }
+
+        if (state)
+        {
+            Log(2, null, "Disconnected");
+            DoConnectComplete(false);
+        }
+    }
+    private async Task PrivateDisconnectAsync()
+    {
+        bool state = m_session?.Connected == true;
+
+        if (m_reConnectHandler != null)
+        {
+            try { m_reConnectHandler.Dispose(); } catch { }
+            m_reConnectHandler = null;
+        }
+        if (m_session != null)
+        {
+            m_session.KeepAlive -= Session_KeepAlive;
+            await m_session.CloseAsync(10000).ConfigureAwait(false);
             m_session.Dispose();
             m_session = null;
         }
@@ -1375,6 +1415,8 @@ public class OpcUaMaster : IDisposable
             m_KeepAliveComplete?.Invoke(this, e);
         }
     }
+
+
 
     #endregion 私有方法
 }

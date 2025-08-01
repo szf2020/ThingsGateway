@@ -134,6 +134,7 @@ public abstract class TcpServiceChannelBase<TClient> : TcpService<TClient>, ITcp
 
     protected override void SafetyDispose(bool disposing)
     {
+        m_transport?.SafeCancel();
         m_transport?.SafeDispose();
         base.SafetyDispose(disposing);
     }

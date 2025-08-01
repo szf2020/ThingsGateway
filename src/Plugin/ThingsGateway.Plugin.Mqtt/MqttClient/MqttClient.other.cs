@@ -505,8 +505,8 @@ public partial class MqttClient : BusinessBaseWithCacheIntervalScriptAll
 
     private async ValueTask<OperResult> TryMqttClientAsync(CancellationToken cancellationToken)
     {
-        if(DisposedValue|| _mqttClient==null) return new OperResult("MqttClient is disposed");
-        
+        if (DisposedValue || _mqttClient == null) return new OperResult("MqttClient is disposed");
+
         if (_mqttClient?.IsConnected == true)
             return OperResult.Success;
         return await Client().ConfigureAwait(false);

@@ -78,12 +78,12 @@ internal sealed class PluginService : IPluginService
 
     public Type GetDebugUI(string pluginName)
     {
-        using var driver = GetDriver(pluginName);
+        var driver = GetDriver(pluginName);
         return driver?.DriverDebugUIType;
     }
     public Type GetAddressUI(string pluginName)
     {
-        using var driver = GetDriver(pluginName);
+        var driver = GetDriver(pluginName);
         return driver?.DriverVariableAddressUIType;
     }
 
@@ -167,7 +167,6 @@ internal sealed class PluginService : IPluginService
         {
             string cacheKey = $"{nameof(PluginService)}_{nameof(GetDriverMethodInfos)}_{CultureInfo.CurrentUICulture.Name}";
             // 如果未提供驱动基类对象，则尝试根据插件名称获取驱动对象
-            var dispose = driver == null; // 标记是否需要释放驱动对象
             driver ??= GetDriver(pluginName); // 如果未提供驱动对象，则根据插件名称获取驱动对象
 
             // 检查插件名称是否为空或null
@@ -183,10 +182,10 @@ internal sealed class PluginService : IPluginService
             }
 
             // 如果未从缓存中获取到指定插件的属性信息，则尝试从驱动基类对象中获取
-            return SetDriverMethodInfosCache(driver, pluginName, cacheKey, dispose); // 获取并设置属性信息缓存
+            return SetDriverMethodInfosCache(driver, pluginName, cacheKey); // 获取并设置属性信息缓存
 
             // 用于设置驱动方法信息缓存的内部方法
-            List<DriverMethodInfo> SetDriverMethodInfosCache(IDriver driver, string pluginName, string cacheKey, bool dispose)
+            List<DriverMethodInfo> SetDriverMethodInfosCache(IDriver driver, string pluginName, string cacheKey)
             {
                 // 获取驱动对象的方法信息，并筛选出带有 DynamicMethodAttribute 特性的方法
                 var dependencyPropertyWithInfos = driver.GetType().GetMethods()?.SelectMany(it =>
@@ -206,10 +205,6 @@ internal sealed class PluginService : IPluginService
                 var result = dependencyPropertyWithInfos.ToList();
                 App.CacheService.HashAdd(cacheKey, pluginName, result);
 
-                // 如果是通过方法内部创建的驱动对象，则在方法执行完成后释放该驱动对象
-                if (dispose)
-                    driver.SafeDispose();
-
                 // 返回获取到的属性信息字典
                 return result;
             }
@@ -228,7 +223,6 @@ internal sealed class PluginService : IPluginService
         {
             string cacheKey = $"{nameof(PluginService)}_{nameof(GetDriverPropertyTypes)}_{CultureInfo.CurrentUICulture.Name}";
 
-            var dispose = driver == null;
             driver ??= GetDriver(pluginName); // 如果 driver 为 null， 获取驱动实例
             // 检查插件名称是否为空或空字符串
             if (!pluginName.IsNullOrEmpty())
@@ -245,17 +239,15 @@ internal sealed class PluginService : IPluginService
             }
             // 如果缓存中不存在该插件的数据，则重新获取并缓存
 
-            return (SetCache(driver, pluginName, cacheKey, dispose), driver.DriverProperties, driver.DriverPropertyUIType); // 调用 SetCache 方法进行缓存并返回结果
+            return (SetCache(driver, pluginName, cacheKey), driver.DriverProperties, driver.DriverPropertyUIType); // 调用 SetCache 方法进行缓存并返回结果
 
             // 定义 SetCache 方法，用于设置缓存并返回
-            IEnumerable<IEditorItem> SetCache(IDriver driver, string pluginName, string cacheKey, bool dispose)
+            IEnumerable<IEditorItem> SetCache(IDriver driver, string pluginName, string cacheKey)
             {
                 var editorItems = PluginServiceUtil.GetEditorItems(driver.DriverProperties?.GetType()).ToList();
                 // 将结果存入缓存中，键为插件名称
                 App.CacheService.HashAdd(cacheKey, pluginName, editorItems);
-                // 如果 dispose 参数为 true，则释放 driver 对象
-                if (dispose)
-                    driver.SafeDispose();
+
                 return editorItems;
             }
         }
@@ -291,7 +283,6 @@ internal sealed class PluginService : IPluginService
 
         {
             string cacheKey = $"{nameof(PluginService)}_{nameof(GetVariablePropertyTypes)}_{CultureInfo.CurrentUICulture.Name}";
-            var dispose = businessBase == null;
             businessBase ??= (BusinessBase)GetDriver(pluginName); // 如果 driver 为 null， 获取驱动实例
 
             var data = App.CacheService.HashGetAll<List<IEditorItem>>(cacheKey);
@@ -309,8 +300,6 @@ internal sealed class PluginService : IPluginService
                 // 将结果存入缓存中，键为插件名称
                 App.CacheService.HashAdd(cacheKey, pluginName, editorItems);
                 // 如果 dispose 参数为 true，则释放 driver 对象
-                if (dispose)
-                    businessBase.SafeDispose();
                 return editorItems;
             }
         }

@@ -47,10 +47,11 @@ public abstract class CollectFoundationBase : CollectBase
     }
 
     /// <inheritdoc/>
-    protected override void Dispose(bool disposing)
+    protected override async Task DisposeAsync(bool disposing)
     {
-        FoundationDevice?.Dispose();
-        base.Dispose(disposing);
+        if (FoundationDevice != null)
+            await FoundationDevice.SafeDisposeAsync().ConfigureAwait(false);
+        await base.DisposeAsync(disposing).ConfigureAwait(false);
     }
     /// <summary>
     /// 开始通讯执行的方法

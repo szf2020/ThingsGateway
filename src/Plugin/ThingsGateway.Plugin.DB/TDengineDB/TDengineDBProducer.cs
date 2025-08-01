@@ -53,10 +53,10 @@ public partial class TDengineDBProducer : BusinessBaseWithCacheIntervalVariable,
 
     protected override BusinessPropertyWithCacheInterval _businessPropertyWithCacheInterval => _driverPropertys;
 
-    protected override void Dispose(bool disposing)
+    protected override Task DisposeAsync(bool disposing)
     {
         _db?.TryDispose();
-        base.Dispose(disposing);
+        return base.DisposeAsync(disposing);
     }
 
     protected override async Task InitChannelAsync(IChannel? channel, CancellationToken cancellationToken)

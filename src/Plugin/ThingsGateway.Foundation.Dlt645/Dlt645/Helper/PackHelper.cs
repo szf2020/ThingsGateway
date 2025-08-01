@@ -9,6 +9,7 @@
 //------------------------------------------------------------------------------
 
 namespace ThingsGateway.Foundation.Dlt645;
+#pragma warning disable CA1851
 
 internal static class PackHelper
 {

@@ -312,10 +312,10 @@ internal sealed class RedundancyTask : IRpcDriver, IAsyncDisposable
     {
         await StopTaskAsync().ConfigureAwait(false);
         TextLogger?.TryDispose();
-        scheduledTask?.TryDispose();
+        scheduledTask?.SafeDispose();
 
-        _tcpDmtpService?.TryDispose();
-        _tcpDmtpClient?.TryDispose();
+        _tcpDmtpService?.SafeDispose();
+        _tcpDmtpClient?.SafeDispose();
         _tcpDmtpService = null;
         _tcpDmtpClient = null;
     }

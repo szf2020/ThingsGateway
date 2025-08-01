@@ -38,11 +38,16 @@ public partial class MqttCollect : CollectBase
     }
 
     /// <inheritdoc/>
-    protected override void Dispose(bool disposing)
+    protected override async Task DisposeAsync(bool disposing)
     {
-        _mqttClient?.SafeDispose();
+        await base.DisposeAsync(disposing).ConfigureAwait(false);
+        if (_mqttClient != null)
+        {
+            await _mqttClient.DisconnectAsync().ConfigureAwait(false);
+            _mqttClient.SafeDispose();
+        }
+        _mqttClient = null;
         TopicItemDict?.Clear();
-        base.Dispose(disposing);
     }
 
     public override string GetAddressDescription()

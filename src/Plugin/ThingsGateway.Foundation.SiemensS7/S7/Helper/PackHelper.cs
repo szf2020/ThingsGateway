@@ -9,6 +9,7 @@
 //------------------------------------------------------------------------------
 
 namespace ThingsGateway.Foundation.SiemensS7;
+#pragma warning disable CA1851
 
 internal static class PackHelper
 {
