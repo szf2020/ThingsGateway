@@ -152,6 +152,7 @@ public partial class MqttClient : BusinessBaseWithCacheIntervalScriptAll
     /// <inheritdoc/>
     protected override void Dispose(bool disposing)
     {
+        base.Dispose(disposing);
         _ = Task.Run(async () =>
         {
             if (_mqttClient != null)
@@ -159,8 +160,8 @@ public partial class MqttClient : BusinessBaseWithCacheIntervalScriptAll
                 await _mqttClient.DisconnectAsync().ConfigureAwait(false);
                 _mqttClient.SafeDispose();
             }
+            _mqttClient = null;
         });
-        base.Dispose(disposing);
     }
 
     protected override async Task ProtectedStartAsync(CancellationToken cancellationToken)
