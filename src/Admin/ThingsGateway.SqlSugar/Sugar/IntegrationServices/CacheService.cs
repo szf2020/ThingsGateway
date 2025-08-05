@@ -43,7 +43,7 @@ namespace ThingsGateway.SqlSugar
     }
     public class ReflectionInoCore<V>
     {
-        private MemoryCache InstanceCache => MemoryCache.Instance;
+        private MemoryCache InstanceCache => new MemoryCache() { Expire = 60 };
         private static ReflectionInoCore<V> _instance = null;
         private static readonly object _instanceLock = new object();
         private ReflectionInoCore() { }

@@ -23,6 +23,7 @@ public abstract class PrimaryIdEntity : IPrimaryIdEntity
     [SugarColumn(ColumnDescription = "Id", IsPrimaryKey = true)]
     [IgnoreExcel]
     [AutoGenerateColumn(Visible = false, IsVisibleWhenEdit = false, IsVisibleWhenAdd = false, Sortable = true, DefaultSort = true, DefaultSortOrder = SortOrder.Asc)]
+    [System.ComponentModel.DataAnnotations.Key]
     public virtual long Id { get; set; }
 }
 

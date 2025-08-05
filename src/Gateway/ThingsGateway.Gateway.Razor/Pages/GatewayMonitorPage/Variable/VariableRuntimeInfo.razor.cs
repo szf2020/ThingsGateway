@@ -11,6 +11,8 @@
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.Extensions.Options;
 
+using ThingsGateway.Admin.Application;
+using ThingsGateway.Admin.Razor;
 using ThingsGateway.DB;
 using ThingsGateway.Extension.Generic;
 using ThingsGateway.NewLife.Extension;

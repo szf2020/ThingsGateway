@@ -85,11 +85,14 @@ internal static class InternalApp
             // 存储根服务（解决 Web 主机还未启动时在 HostedService 中使用 App.GetService 问题
             services.AddHostedService<GenericHostLifetimeEventsHostedService>();
 
-            // 注册 Startup 过滤器
-            services.AddTransient<IStartupFilter, StartupFilter>();
+            if (WebEnableVariable.WebEnable == true)
+            {
+                // 注册 Startup 过滤器
+                services.AddTransient<IStartupFilter, StartupFilter>();
 
-            // 注册 HttpContextAccessor 服务
-            services.AddHttpContextAccessor();
+                // 注册 HttpContextAccessor 服务
+                services.AddHttpContextAccessor();
+            }
 
             // 初始化应用服务
             services.AddApp();

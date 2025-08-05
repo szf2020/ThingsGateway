@@ -21,22 +21,24 @@ namespace ThingsGateway.Management;
 public partial class RemoteManagementRpcServer : SingletonRpcServer,
     IBackendLogService
 {
-    [DmtpRpc(MethodInvoke = true)]
+    [DmtpRpc]
     public Task DeleteBackendLogAsync() => App.GetService<IBackendLogService>().DeleteBackendLogAsync();
-    [DmtpRpc(MethodInvoke = true)]
+    [DmtpRpc]
     public Task<List<BackendLogDayStatisticsOutput>> StatisticsByDayAsync(int day) => App.GetService<IBackendLogService>().StatisticsByDayAsync(day);
 
-    [DmtpRpc(MethodInvoke = true)]
+    [DmtpRpc]
     public Task<List<BackendLog>> GetNewLog() => App.GetService<IBackendLogService>().GetNewLog();
 
-    [DmtpRpc(MethodInvoke = true)]
+    [DmtpRpc]
     public Task<QueryData<BackendLog>> PageAsync(QueryPageOptions option) => App.GetService<IBackendLogService>().PageAsync(option);
 
 
-    [DmtpRpc(MethodInvoke = true)]
-    public Task<Dictionary<string, Dictionary<string, IOperResult>>> Rpc(ICallContext callContext, Dictionary<string, Dictionary<string, string>> deviceDatas, CancellationToken cancellationToken)
+    [DmtpRpc]
+    public async Task<Dictionary<string, Dictionary<string, OperResult<object>>>> Rpc(ICallContext callContext, Dictionary<string, Dictionary<string, string>> deviceDatas, CancellationToken cancellationToken)
     {
-        return GlobalData.RpcService.InvokeDeviceMethodAsync($"RemoteManagement[{(callContext.Caller is ITcpSession tcpSession ? tcpSession.GetIPPort() : string.Empty)}]", deviceDatas, cancellationToken);
+        var data = await GlobalData.RpcService.InvokeDeviceMethodAsync($"RemoteManagement[{(callContext.Caller is ITcpSession tcpSession ? tcpSession.GetIPPort() : string.Empty)}]", deviceDatas, cancellationToken).ConfigureAwait(false);
+
+        return data.ToDictionary(a => a.Key, a => a.Value.ToDictionary(b => b.Key, b => b.Value.GetOperResult()));
     }
 
 

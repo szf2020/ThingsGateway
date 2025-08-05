@@ -9,6 +9,7 @@ using TouchSocket.Dmtp;
 using TouchSocket.Dmtp.FileTransfer;
 using TouchSocket.Dmtp.Rpc;
 using TouchSocket.Rpc;
+using TouchSocket.Rpc.Generators;
 using TouchSocket.Sockets;
 
 namespace ThingsGateway.Upgrade;
@@ -37,13 +38,14 @@ public class FileHostService : BackgroundService, IFileHostService
                .SetListenIPHosts(new IPHost[] { new IPHost(upgradeServerOptions.UpgradeServerPort) })
                .ConfigureContainer(a =>
                {
-                   a.AddRpcStore(store => store.RegisterServer<FileRpcServer>());
+                   a.AddRpcStore(store => store.RegisterServer<IFileRpcServer, FileRpcServer>());
                    a.AddLogger(_log);
                    a.AddDmtpRouteService();//添加路由策略
                })
                .ConfigurePlugins(a =>
                {
                    a.Add<TcpServiceReceiveAsyncPlugin>();
+                   a.UseTcpSessionCheckClear();
                    a.UseDmtpRpc();
                    a.UseDmtpFileTransfer()//必须添加文件传输插件
                    .SetMaxSmallFileLength(1024 * 1024 * 10);//设置小文件的最大限制长度
@@ -106,8 +108,7 @@ public class FileHostService : BackgroundService, IFileHostService
         }
 
         // 将 GlobalData.CollectDevices 和 GlobalData.Variables 同步到从站
-        await client.GetDmtpRpcActor().InvokeAsync(
-                         nameof(Upgrade), null, waitInvoke).ConfigureAwait(false);
+        await client.GetDmtpRpcActor().UpgradeAsync(waitInvoke).ConfigureAwait(false);
     }
 
     public async ValueTask Restart(string id, CancellationToken stoppingToken)
@@ -126,8 +127,7 @@ public class FileHostService : BackgroundService, IFileHostService
         }
 
         // 将 GlobalData.CollectDevices 和 GlobalData.Variables 同步到从站
-        await client.GetDmtpRpcActor().InvokeAsync(
-                         nameof(Restart), null, waitInvoke).ConfigureAwait(false);
+        await client.GetDmtpRpcActor().RestartAsync(waitInvoke).ConfigureAwait(false);
     }
     #endregion
 

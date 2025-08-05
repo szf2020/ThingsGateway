@@ -27,11 +27,19 @@ using System.Security.Claims;
 using ThingsGateway.ConfigurableOptions;
 using ThingsGateway.NewLife.Caching;
 using ThingsGateway.NewLife.Collections;
+using ThingsGateway.NewLife.Extension;
 using ThingsGateway.NewLife.Log;
 using ThingsGateway.Reflection;
 using ThingsGateway.Templates;
 
 namespace ThingsGateway;
+
+
+public static class WebEnableVariable
+{
+    public static bool WebEnable => Environment.GetEnvironmentVariable(nameof(WebEnable)).ToBoolean(true);
+
+}
 
 /// <summary>
 /// 全局应用类
@@ -39,6 +47,7 @@ namespace ThingsGateway;
 [SuppressSniffer]
 public static class App
 {
+
     /// <summary>
     /// 私有设置，避免重复解析
     /// </summary>
@@ -157,7 +166,7 @@ public static class App
     var httpContextAccessor = RootServices?.GetService<IHttpContextAccessor>();
     try
     {
-        return httpContextAccessor.HttpContext;
+        return httpContextAccessor?.HttpContext;
     }
     catch
     {

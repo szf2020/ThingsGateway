@@ -24,6 +24,7 @@ public class SQLRealValue : IPrimaryIdEntity
 {
     [SugarColumn(ColumnDescription = "变量Id", IsPrimaryKey = true)]
     [AutoGenerateColumn(Order = 1, Visible = true, Sortable = true, Filterable = false)]
+    [System.ComponentModel.DataAnnotations.Key]
     public long Id { get; set; }
 
     /// <summary>

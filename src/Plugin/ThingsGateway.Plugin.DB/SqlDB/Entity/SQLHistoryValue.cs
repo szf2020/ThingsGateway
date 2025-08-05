@@ -25,6 +25,7 @@ public class SQLHistoryValue : IPrimaryIdEntity
 {
     [SugarColumn(ColumnDescription = "变量Id")]
     [AutoGenerateColumn(Order = 1, Visible = true, Sortable = true, Filterable = true)]
+    [System.ComponentModel.DataAnnotations.Key]
     public long Id { get; set; }
 
     /// <summary>
@@ -73,6 +74,7 @@ public class SQLNumberHistoryValue : IPrimaryIdEntity, IDBHistoryValue
 {
     [SugarColumn(ColumnDescription = "变量Id")]
     [AutoGenerateColumn(Order = 1, Visible = true, Sortable = true, Filterable = true)]
+    [System.ComponentModel.DataAnnotations.Key]
     public long Id { get; set; }
 
     /// <summary>

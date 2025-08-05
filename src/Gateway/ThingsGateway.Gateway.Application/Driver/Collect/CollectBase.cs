@@ -353,14 +353,12 @@ public abstract class CollectBase : DriverBase, IRpcDriver
 
     async Task ReadVariableSource(object? state, CancellationToken cancellationToken)
     {
+        var readToken = await ReadWriteLock.ReaderLockAsync(cancellationToken).ConfigureAwait(false);
+
         if (state is not VariableSourceRead variableSourceRead) return;
 
         if (Pause) return;
         if (cancellationToken.IsCancellationRequested) return;
-
-        var readErrorCount = 0;
-
-        var readToken = await ReadWriteLock.ReaderLockAsync(cancellationToken).ConfigureAwait(false);
 
         if (readToken.IsCancellationRequested)
         {
@@ -374,6 +372,8 @@ public abstract class CollectBase : DriverBase, IRpcDriver
         //if (LogMessage?.LogLevel <= TouchSocket.Core.LogLevel.Trace)
         //    LogMessage?.Trace(string.Format("{0} - Collecting [{1} - {2}]", DeviceName, variableSourceRead?.RegisterAddress, variableSourceRead?.Length));
         var readResult = await ReadSourceAsync(variableSourceRead, allToken).ConfigureAwait(false);
+
+        var readErrorCount = 0;
 
         // 读取失败时重试一定次数
         while (!readResult.IsSuccess && readErrorCount < CollectProperties.RetryCount)
@@ -688,19 +688,8 @@ public abstract class CollectBase : DriverBase, IRpcDriver
             {
                 // 调用方法并获取结果
                 var data = await variableMethod.InvokeMethodAsync(this, value, cancellationToken).ConfigureAwait(false);
-                result = new(data);
-                var operResultType = typeof(IOperResult<>);
-                var interfaceType = data.GetType().GetInterfaces()
-                    .FirstOrDefault(x => x.IsGenericType && x.GetGenericTypeDefinition() == operResultType);
 
-                if (interfaceType != null)
-                {
-                    var contentProperty = interfaceType.GetProperty("Content");
-                    if (contentProperty != null)
-                    {
-                        result.Content = contentProperty.GetValue(data);
-                    }
-                }
+                result = data.GetOperResult();
 
                 // 如果方法有返回值，并且是读取操作
                 if (method.HasReturn && isRead)
@@ -730,6 +719,7 @@ public abstract class CollectBase : DriverBase, IRpcDriver
             return new OperResult<object>(ex);
         }
     }
+
 
     #endregion 写入方法
 }

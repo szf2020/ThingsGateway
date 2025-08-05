@@ -31,22 +31,7 @@ public class ChannelDeviceTreeItem : IEqualityComparer<ChannelDeviceTreeItem>
     {
         if (obj is ChannelDeviceTreeItem item)
         {
-            if (ChannelDevicePluginType != item.ChannelDevicePluginType)
-                return false;
-
-            switch (ChannelDevicePluginType)
-            {
-                case ChannelDevicePluginTypeEnum.Device:
-                    return DeviceRuntimeId == item.DeviceRuntimeId;
-                case ChannelDevicePluginTypeEnum.PluginType:
-                    return PluginType == item.PluginType;
-                case ChannelDevicePluginTypeEnum.Channel:
-                    return ChannelRuntimeId == item.ChannelRuntimeId;
-                case ChannelDevicePluginTypeEnum.PluginName:
-                    return PluginName == item.PluginName;
-                default:
-                    return false;
-            }
+            return Equals(this, item);
         }
         return false;
     }
@@ -130,9 +115,24 @@ public class ChannelDeviceTreeItem : IEqualityComparer<ChannelDeviceTreeItem>
         return base.ToString();
     }
 
-    public bool Equals(ChannelDeviceTreeItem? x, ChannelDeviceTreeItem? y)
+    public bool Equals(ChannelDeviceTreeItem? x, ChannelDeviceTreeItem? item)
     {
-        return y.Equals(x);
+        if (x.ChannelDevicePluginType != item.ChannelDevicePluginType)
+            return false;
+
+        switch (x.ChannelDevicePluginType)
+        {
+            case ChannelDevicePluginTypeEnum.Device:
+                return x.DeviceRuntimeId == item.DeviceRuntimeId;
+            case ChannelDevicePluginTypeEnum.PluginType:
+                return x.PluginType == item.PluginType;
+            case ChannelDevicePluginTypeEnum.Channel:
+                return x.ChannelRuntimeId == item.ChannelRuntimeId;
+            case ChannelDevicePluginTypeEnum.PluginName:
+                return x.PluginName == item.PluginName;
+            default:
+                return false;
+        }
     }
 
     public int GetHashCode([DisallowNull] ChannelDeviceTreeItem obj)

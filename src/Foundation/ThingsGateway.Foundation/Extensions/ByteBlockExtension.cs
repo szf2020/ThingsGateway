@@ -8,6 +8,7 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
+using System.Buffers;
 using System.Text;
 
 namespace ThingsGateway.Foundation;
@@ -235,5 +236,28 @@ public static class ByteBlockExtension
     }
     #endregion AsSegment
 
+    #region ToString
 
+
+    public static string ToString<TByteBlock>(this TByteBlock byteBlock, long offset, long length) where TByteBlock : IBytesReader
+    {
+        return byteBlock.TotalSequence.Slice(offset, length).ToString(Encoding.UTF8);
+    }
+    public static string ToString(this ReadOnlySequence<byte> byteBlock, Encoding encoding)
+    {
+# if NET6_0_OR_GREATER
+        return encoding.GetString(byteBlock);
+#else
+        using ContiguousMemoryBuffer contiguousMemoryBuffer = new(byteBlock);
+        return contiguousMemoryBuffer.Memory.Span.ToString(encoding);
+#endif
+    }
+
+    /// <inheritdoc/>
+    public static string ToString<TByteBlock>(this TByteBlock byteBlock, long offset) where TByteBlock : IBytesReader
+    {
+        return ToString(byteBlock, offset, byteBlock.BytesRead + byteBlock.BytesRemaining - offset);
+
+    }
+    #endregion ToString
 }

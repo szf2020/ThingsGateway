@@ -1,0 +1,19 @@
+{
+  "$schema": "null",
+
+  "RemoteClientManagement": {
+    "Enable": false,
+    "Name": "ThingsGateway",
+    "ServerUri": "127.0.0.1:7999",
+    "VerifyToken": "ThingsGateway",
+    "HeartbeatInterval": 3000
+  },
+
+  "RemoteServerManagement": {
+    "Enable": true,
+    "Name": "ThingsGateway",
+    "ServerUri": "0.0.0.0:7999",
+    "VerifyToken": "ThingsGateway",
+    "HeartbeatInterval": 3000
+  }
+}

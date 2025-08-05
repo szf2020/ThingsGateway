@@ -20,6 +20,7 @@ namespace ThingsGateway;
 /// </summary>
 public sealed class AppSettingsOptions : IConfigurableOptions<AppSettingsOptions>
 {
+
     /// <summary>
     /// 是否启用规范化文档
     /// </summary>

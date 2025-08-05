@@ -14,6 +14,8 @@ using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel;
 
 using ThingsGateway.NewLife.Extension;
+
+using TouchSocket.Rpc;
 namespace ThingsGateway.Gateway.Application;
 
 /// <summary>
@@ -25,7 +27,9 @@ namespace ThingsGateway.Gateway.Application;
 [ApiController]
 [RolePermission]
 [Authorize(AuthenticationSchemes = "Bearer")]
-public class RuntimeInfoController : ControllerBase
+[TouchSocket.WebApi.Router("/miniapi/[api]/[action]")]
+[TouchSocket.WebApi.EnableCors("cors")]
+public class RuntimeInfoController : ControllerBase, IRpcServer
 {
     /// <summary>
     /// 获取冗余状态
@@ -33,6 +37,7 @@ public class RuntimeInfoController : ControllerBase
     /// <returns></returns>
     [HttpGet("redundancyStatus")]
     [DisplayName("获取冗余状态")]
+    [TouchSocket.WebApi.WebApi(Method = TouchSocket.WebApi.HttpMethodType.Get)]
     public bool GetRedundancyStatus()
     {
         return GlobalData.StartCollectChannelEnable;
@@ -44,7 +49,8 @@ public class RuntimeInfoController : ControllerBase
     /// <returns></returns>
     [HttpGet("channelList")]
     [DisplayName("获取通道信息")]
-    public async Task<SqlSugarPagedList<ChannelRuntime>> GetChannelListAsync([FromQuery] ChannelPageInput input)
+    [TouchSocket.WebApi.WebApi(Method = TouchSocket.WebApi.HttpMethodType.Post)]
+    public async Task<SqlSugarPagedList<ChannelRuntime>> GetChannelListAsync([FromQuery][TouchSocket.WebApi.FromBody] ChannelPageInput input)
     {
         var channelRuntimes = await GlobalData.GetCurrentUserChannels().ConfigureAwait(false);
 
@@ -62,7 +68,8 @@ public class RuntimeInfoController : ControllerBase
     /// <returns></returns>
     [HttpGet("deviceList")]
     [DisplayName("获取设备信息")]
-    public async Task<SqlSugarPagedList<DeviceRuntime>> GetDeviceListAsync([FromQuery] DevicePageInput input)
+    [TouchSocket.WebApi.WebApi(Method = TouchSocket.WebApi.HttpMethodType.Post)]
+    public async Task<SqlSugarPagedList<DeviceRuntime>> GetDeviceListAsync([FromQuery][TouchSocket.WebApi.FromBody] DevicePageInput input)
     {
         var deviceRuntimes = await GlobalData.GetCurrentUserDevices().ConfigureAwait(false);
         var data = deviceRuntimes
@@ -80,7 +87,8 @@ public class RuntimeInfoController : ControllerBase
     /// <returns></returns>
     [HttpGet("realAlarmList")]
     [DisplayName("获取实时报警变量信息")]
-    public async Task<SqlSugarPagedList<AlarmVariable>> GetRealAlarmList([FromQuery] AlarmVariablePageInput input)
+    [TouchSocket.WebApi.WebApi(Method = TouchSocket.WebApi.HttpMethodType.Post)]
+    public async Task<SqlSugarPagedList<AlarmVariable>> GetRealAlarmList([FromQuery][TouchSocket.WebApi.FromBody] AlarmVariablePageInput input)
     {
         var realAlarmVariables = await GlobalData.GetCurrentUserRealAlarmVariables().ConfigureAwait(false);
 
@@ -98,7 +106,8 @@ public class RuntimeInfoController : ControllerBase
     /// <returns></returns>
     [HttpGet("variableList")]
     [DisplayName("获取变量信息")]
-    public async Task<SqlSugarPagedList<VariableRuntime>> GetVariableList([FromQuery] VariablePageInput input)
+    [TouchSocket.WebApi.WebApi(Method = TouchSocket.WebApi.HttpMethodType.Post)]
+    public async Task<SqlSugarPagedList<VariableRuntime>> GetVariableList([FromQuery][TouchSocket.WebApi.FromBody] VariablePageInput input)
     {
         var variables = await GlobalData.GetCurrentUserIdVariables().ConfigureAwait(false);
         var data = variables
@@ -117,6 +126,7 @@ public class RuntimeInfoController : ControllerBase
     /// </summary>
     [HttpGet("getPluginPropertys")]
     [DisplayName("获取默认插件属性")]
+    [TouchSocket.WebApi.WebApi(Method = TouchSocket.WebApi.HttpMethodType.Get)]
     public Dictionary<string, string> GetPluginPropertys(string pluginName)
     {
         var data = GlobalData.PluginService.GetDriverPropertyTypes(pluginName);
@@ -131,7 +141,8 @@ public class RuntimeInfoController : ControllerBase
     /// </summary>
     [HttpGet("getPluginInfos")]
     [DisplayName("获取插件")]
-    public SqlSugarPagedList<PluginInfo> GetPluginInfos([FromQuery] PluginInfoPageInput input)
+    [TouchSocket.WebApi.WebApi(Method = TouchSocket.WebApi.HttpMethodType.Post)]
+    public SqlSugarPagedList<PluginInfo> GetPluginInfos([FromQuery][TouchSocket.WebApi.FromBody] PluginInfoPageInput input)
     {
         //指定关键词搜索为插件FullName
         return GlobalData.PluginService.GetList().WhereIF(!input.Name.IsNullOrWhiteSpace(), a => a.Name == input.Name)

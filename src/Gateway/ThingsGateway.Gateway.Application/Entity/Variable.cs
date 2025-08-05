@@ -32,6 +32,7 @@ public class Variable : BaseDataEntity, IValidatableObject
     /// </summary>
     [SugarColumn(ColumnDescription = "Id", IsPrimaryKey = true)]
     [AutoGenerateColumn(Visible = false, IsVisibleWhenEdit = false, IsVisibleWhenAdd = false, Sortable = true, DefaultSort = true, DefaultSortOrder = SortOrder.Asc)]
+    [System.ComponentModel.DataAnnotations.Key]
     public override long Id { get; set; }
 
     /// <summary>

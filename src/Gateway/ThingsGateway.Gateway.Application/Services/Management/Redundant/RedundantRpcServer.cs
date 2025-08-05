@@ -17,7 +17,7 @@ using TouchSocket.Sockets;
 
 namespace ThingsGateway.Management;
 
-internal sealed partial class RedundantRpcServer : SingletonRpcServer
+internal sealed partial class RedundantRpcServer : SingletonRpcServer, IRedundantRpcServer
 {
     RedundancyTask RedundancyTask;
     public RedundantRpcServer(RedundancyTask redundancyTask)
@@ -25,7 +25,7 @@ internal sealed partial class RedundantRpcServer : SingletonRpcServer
         RedundancyTask = redundancyTask;
     }
 
-    [DmtpRpc(MethodInvoke = true)]
+    [DmtpRpc]
     public void UpData(ICallContext callContext, List<DeviceDataWithValue> deviceDatas)
     {
         foreach (var deviceData in deviceDatas)
@@ -50,7 +50,7 @@ internal sealed partial class RedundantRpcServer : SingletonRpcServer
         RedundancyTask.LogMessage?.Trace("RpcServer Update data success");
     }
 
-    [DmtpRpc(MethodInvoke = true)]
+    [DmtpRpc]
     public async Task SyncData(List<Channel> channels, List<Device> devices, List<Variable> variables)
     {
         List<Channel> addChannels = new();
@@ -146,9 +146,13 @@ internal sealed partial class RedundantRpcServer : SingletonRpcServer
         RedundancyTask.LogMessage?.LogTrace($"Sync data success");
     }
 
-    [DmtpRpc(MethodInvoke = true)]
-    public Task<Dictionary<string, Dictionary<string, IOperResult>>> Rpc(ICallContext callContext, Dictionary<string, Dictionary<string, string>> deviceDatas, CancellationToken cancellationToken)
+    [DmtpRpc]
+    public async Task<Dictionary<string, Dictionary<string, OperResult<object>>>> Rpc(ICallContext callContext, Dictionary<string, Dictionary<string, string>> deviceDatas)
     {
-        return GlobalData.RpcService.InvokeDeviceMethodAsync($"Redundant[{(callContext.Caller is ITcpSession tcpSession ? tcpSession.GetIPPort() : string.Empty)}]", deviceDatas, cancellationToken);
+        var data = await GlobalData.RpcService.InvokeDeviceMethodAsync($"Redundant[{(callContext.Caller is ITcpSession tcpSession ? tcpSession.GetIPPort() : string.Empty)}]", deviceDatas, callContext.Token).ConfigureAwait(false);
+
+        return data.ToDictionary(a => a.Key, a => a.Value.ToDictionary(b => b.Key, b => b.Value.GetOperResult()));
     }
+
+
 }

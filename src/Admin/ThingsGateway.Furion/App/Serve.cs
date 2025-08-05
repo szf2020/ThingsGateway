@@ -603,6 +603,33 @@ public static class Serve
     }
 
     /// <summary>
+    /// 启动 WebApplication 主机
+    /// </summary>
+    /// <remarks>未包含 Web 基础功能，需手动注册服务/中间件</remarks>
+    /// <param name="options">配置选项</param>
+    /// <param name="urls">默认 5000/5001 端口</param>
+    /// <param name="cancellationToken"></param>
+    /// <returns><see cref="IHost"/></returns>
+    public static async Task<IHost> RunAsync(MiniRunOptions options, string urls = default, CancellationToken cancellationToken = default)
+    {
+        // 构建 WebApplication 对象
+        BuildMiniApplication(options, urls, out var app);
+
+        // 是否静默启动
+        if (!options.IsSilence)
+        {
+            // 配置启动地址和端口
+            await app.RunAsync(cancellationToken).ConfigureAwait(false);
+        }
+        else
+        {
+            await app.StartAsync(cancellationToken).ConfigureAwait(false);
+        }
+
+        return app;
+    }
+
+    /// <summary>
     /// 构建 WebApplication 对象
     /// </summary>
     /// <param name="options">配置选项</param>
@@ -616,8 +643,8 @@ public static class Serve
 
         // 初始化 WebApplicationBuilder
         var builder = (options.Options == null
-            ? WebApplication.CreateBuilder(args)
-            : WebApplication.CreateBuilder(options.Options));
+           ? WebApplication.CreateBuilder(args)
+           : WebApplication.CreateBuilder(options.Options));
 
         // 调用自定义配置服务
         options?.FirstActionBuilder?.Invoke(builder);
@@ -798,6 +825,132 @@ public static class Serve
         // 释放内存
         App.AppStartups.Clear();
     }
+
+    /// <summary>
+    /// 构建 IHost 对象
+    /// </summary>
+    /// <param name="options">配置选项</param>
+    /// <param name="urls">默认 5000/5001 端口</param>
+    /// <param name="app"><see cref="IHost"/></param>
+    public static void BuildMiniApplication(MiniRunOptions options, string urls, out IHost app)
+    {
+        // 获取命令行参数
+        var args = options.Args ?? Environment.GetCommandLineArgs().Skip(1).ToArray();
+
+
+        var builder = Host.CreateDefaultBuilder(args);
+
+        // 静默启动排除指定日志类名
+        if (options.IsSilence && !options.SilenceLogging)
+        {
+            builder = builder.ConfigureLogging(logging =>
+            {
+                logging.AddFilter((provider, category, logLevel) => !SilenceExcludesOfLogCategoryName.Any(u => category.StartsWith(u)));
+            });
+        }
+
+
+        // 配置 Web 主机
+        builder = builder.ConfigureWebHost(webHostBuilder =>
+        {
+
+
+            // 调用自定义配置服务
+            options?.FirstActionBuilder?.Invoke(builder);
+
+            // 注册 WebApplicationBuilder 组件
+            if (options.WebComponents.Count > 0)
+            {
+                foreach (var (componentType, opt) in options.WebComponents)
+                {
+                    webHostBuilder.AddWebComponent(componentType, opt);
+                }
+            }
+
+            webHostBuilder.Configure((WebHostBuilderContext app, IApplicationBuilder applicationBuilder) =>
+            {
+
+                // 添加自定义配置
+                options.ActionConfigurationManager?.Invoke(app.HostingEnvironment, app.Configuration);
+
+
+
+
+
+            });
+
+            // 初始化框架
+            webHostBuilder.Inject(options.ActionInject);
+
+
+
+            // 配置服务
+            if (options.ServiceComponents.Count > 0)
+            {
+                webHostBuilder = webHostBuilder.ConfigureServices(services =>
+                {
+                    // 注册应用服务组件
+                    foreach (var (componentType, opt) in options.ServiceComponents)
+                    {
+                        services.AddComponent(componentType, opt);
+                    }
+
+                });
+            }
+
+            // 配置启动地址和端口
+            var startUrls = !string.IsNullOrWhiteSpace(urls) ? urls : webHostBuilder.GetSetting(nameof(urls));
+
+            // 自定义启动端口
+            if (!string.IsNullOrWhiteSpace(startUrls))
+            {
+                webHostBuilder = webHostBuilder.UseUrls(startUrls);
+            }
+
+
+
+
+            // 调用自定义配置
+            options?.ActionBuilder?.Invoke(webHostBuilder);
+
+            // 配置中间件
+            if (options.ApplicationComponents.Count > 0)
+            {
+                webHostBuilder = webHostBuilder.Configure((context, app) =>
+                {
+                    // 注册应用中间件组件
+                    foreach (var (componentType, opt) in options.ApplicationComponents)
+                    {
+                        app.UseComponent(context.HostingEnvironment, componentType, opt);
+                    }
+                });
+            }
+
+        });
+
+
+        builder = builder.ConfigureServices(services =>
+        {
+            // 调用自定义配置服务
+            options?.ActionServices?.Invoke(services);
+        });
+
+        // 构建主机
+        app = builder.Build();
+
+        InternalApp.RootServices ??= app.Services;
+
+        var applicationPartManager = app.Services.GetService<ApplicationPartManager>();
+
+        applicationPartManager?.ApplicationParts?.RemoveWhere(p => App.BakImageNames.Any(b => b == p.Name));
+        // 配置所有 Starup Configure
+        UseStartups(app.Services);
+        // 释放内存
+        App.AppStartups.Clear();
+        // 调用自定义配置
+        options?.ActionConfigure?.Invoke(app);
+    }
+
 
     /// <summary>
     /// 构建 IHost 对象

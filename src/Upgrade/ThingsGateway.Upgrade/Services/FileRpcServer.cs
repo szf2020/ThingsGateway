@@ -4,7 +4,7 @@ using TouchSocket.Rpc;
 
 namespace ThingsGateway.Upgrade;
 
-public partial class FileRpcServer : SingletonRpcServer
+public partial class FileRpcServer : SingletonRpcServer, IFileRpcServer
 {
     private readonly ILog _logger;
 
@@ -13,7 +13,7 @@ public partial class FileRpcServer : SingletonRpcServer
         _logger = logger;
     }
 
-    [DmtpRpc(MethodInvoke = true)]
+    [DmtpRpc]
     public List<UpdateZipFile> GetList(UpdateZipFileInput input)
     {
         return App.GetService<IUpdateZipFileHostedService>().GetList(input);

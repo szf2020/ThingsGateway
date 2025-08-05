@@ -679,7 +679,7 @@ namespace ThingsGateway.SqlSugar
             IDataReaderEntityBuilder<T> entytyList = this.Context.Utilities.GetReflectionInoCacheInstance().GetOrCreate(cacheKey, () =>
             {
                 var cacheResult = new IDataReaderEntityBuilder<T>(this.Context, dr,
-                    columns.Select(it => it.Item1).ToList()).CreateBuilder(typeof(T));
+                    columns.Select(it => it.Item1)).CreateBuilder(typeof(T));
                 return cacheResult;
             });
             using (dr)
@@ -706,7 +706,7 @@ namespace ThingsGateway.SqlSugar
             IDataReaderEntityBuilder<T> entytyList = this.Context.Utilities.GetReflectionInoCacheInstance().GetOrCreate(cacheKey, () =>
             {
                 var cacheResult = new IDataReaderEntityBuilder<T>(this.Context, dr,
-                    columns.Select(it => it.Item1).ToList()).CreateBuilder(typeof(T));
+                    columns.Select(it => it.Item1)).CreateBuilder(typeof(T));
                 return cacheResult;
             });
             if (cancellationToken.IsCancellationRequested) yield break;
@@ -743,7 +743,7 @@ namespace ThingsGateway.SqlSugar
             IDataReaderEntityBuilder<T> entytyList = this.Context.Utilities.GetReflectionInoCacheInstance().GetOrCreate(cacheKey, () =>
             {
                 var cacheResult = new IDataReaderEntityBuilder<T>(this.Context, dr,
-                    columns.Select(it => it.Item1).ToList()).CreateBuilder(typeof(T));
+                    columns.Select(it => it.Item1)).CreateBuilder(typeof(T));
                 return cacheResult;
             });
             using (dr)
@@ -775,7 +775,7 @@ namespace ThingsGateway.SqlSugar
             IDataReaderEntityBuilder<T> entytyList = this.Context.Utilities.GetReflectionInoCacheInstance().GetOrCreate(cacheKey, () =>
             {
                 var cacheResult = new IDataReaderEntityBuilder<T>(this.Context, dr,
-                    columns.Select(it => it.Item1).ToList()).CreateBuilder(typeof(T));
+                    columns.Select(it => it.Item1)).CreateBuilder(typeof(T));
                 return cacheResult;
             });
 

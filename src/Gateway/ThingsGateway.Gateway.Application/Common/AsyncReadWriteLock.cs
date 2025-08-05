@@ -60,6 +60,7 @@ public class AsyncReadWriteLock
 
         return new Writer(this);
     }
+    private object lockObject = new();
     private void ReleaseWriter()
     {
         var writerCount = Interlocked.Decrement(ref _writerCount);
@@ -72,12 +73,11 @@ public class AsyncReadWriteLock
         }
         else
         {
-
-            // 读写占空比， 用于控制写操作与读操作的比率。该比率 n 次写入操作会执行一次读取操作。即使在应用程序执行大量的连续写入操作时，也必须确保足够的读取数据处理时间。相对于更加均衡的读写数据流而言，该特点使得外部写入可连续无顾忌操作
-
-            if (_writeReadRatio > 0)
+            lock (lockObject)
             {
-                if (Interlocked.Read(ref _readerCount) > 0)
+
+                // 读写占空比， 用于控制写操作与读操作的比率。该比率 n 次写入操作会执行一次读取操作。即使在应用程序执行大量的连续写入操作时，也必须确保足够的读取数据处理时间。相对于更加均衡的读写数据流而言，该特点使得外部写入可连续无顾忌操作
+                if (_writeReadRatio > 0)
                 {
                     var count = Interlocked.Increment(ref _writeSinceLastReadCount);
                     if (count >= _writeReadRatio)
@@ -86,10 +86,10 @@ public class AsyncReadWriteLock
                         _readerLock.Set();
                     }
                 }
-            }
-            else
-            {
-                _readerLock.Set();
+                else
+                {
+                    _readerLock.Set();
+                }
             }
 
         }

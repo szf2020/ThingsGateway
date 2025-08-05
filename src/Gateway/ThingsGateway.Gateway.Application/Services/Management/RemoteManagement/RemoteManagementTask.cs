@@ -8,6 +8,10 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
+using Microsoft.Extensions.Logging;
+
+using ThingsGateway.Gateway.Application;
+
 using TouchSocket.Core;
 using TouchSocket.Dmtp;
 using TouchSocket.Dmtp.Rpc;
@@ -16,18 +20,36 @@ using TouchSocket.Sockets;
 
 namespace ThingsGateway.Management;
 
-public partial class RemoteManagementTask
+public partial class RemoteManagementTask : AsyncDisposableObject
 {
+    internal const string LogPath = $"Logs/{nameof(RemoteManagementTask)}";
     private ILog LogMessage;
+    private ILogger _logger;
+    private TextFileLogger TextLogger;
 
-    public RemoteManagementTask(ILog log)
+    public RemoteManagementTask(ILogger logger, RemoteManagementOptions remoteManagementOptions)
     {
+        _logger = logger;
+        TextLogger = TextFileLogger.GetMultipleFileLogger(LogPath);
+        TextLogger.LogLevel = TouchSocket.Core.LogLevel.Trace;
+        var log = new LoggerGroup() { LogLevel = TouchSocket.Core.LogLevel.Trace };
+        log?.AddLogger(new EasyLogger(Log_Out) { LogLevel = TouchSocket.Core.LogLevel.Trace });
+        log?.AddLogger(TextLogger);
         LogMessage = log;
-        _remoteManagementOptions = App.GetOptions<RemoteManagementOptions>();
+
+        _remoteManagementOptions = remoteManagementOptions;
+
+    }
+
+    private void Log_Out(TouchSocket.Core.LogLevel logLevel, object source, string message, Exception exception)
+    {
+        _logger?.Log_Out(logLevel, source, message, exception);
     }
 
     public async Task StartAsync(CancellationToken cancellationToken)
     {
+        if (!_remoteManagementOptions.Enable) return;
+
         if (_remoteManagementOptions.IsServer)
         {
             _tcpDmtpService ??= await GetTcpDmtpService().ConfigureAwait(false);
@@ -68,14 +90,27 @@ public partial class RemoteManagementTask
                .ConfigureContainer(a =>
                {
                    a.AddLogger(LogMessage);
-                   a.AddRpcStore(store => store.RegisterServer(new RemoteManagementRpcServer()));
+                   a.AddRpcStore(store => store.RegisterServer<RemoteManagementRpcServer>());
                })
                .ConfigurePlugins(a =>
                {
+                   a.UseTcpSessionCheckClear();
                    a.UseDmtpRpc();
                    a.UseDmtpHeartbeat()//使用Dmtp心跳
                    .SetTick(TimeSpan.FromMilliseconds(_remoteManagementOptions.HeartbeatInterval))
                    .SetMaxFailCount(3);
+
+                   a.AddDmtpHandshakedPlugin(async () =>
+                   {
+                       try
+                       {
+                           await tcpDmtpClient.ResetIdAsync($"{_remoteManagementOptions.Name}:{GlobalData.HardwareJob.HardwareInfo.UUID}").ConfigureAwait(false);
+                       }
+                       catch (Exception)
+                       {
+                           await tcpDmtpClient.CloseAsync().ConfigureAwait(false);
+                       }
+                   });
                });
 
         await tcpDmtpClient.SetupAsync(config).ConfigureAwait(false);
@@ -92,10 +127,11 @@ public partial class RemoteManagementTask
                .ConfigureContainer(a =>
                {
                    a.AddLogger(LogMessage);
-                   a.AddRpcStore(store => store.RegisterServer(new RemoteManagementRpcServer()));
+                   a.AddRpcStore(store => store.RegisterServer<RemoteManagementRpcServer>());
                })
                .ConfigurePlugins(a =>
                {
+                   a.UseTcpSessionCheckClear();
                    a.UseDmtpRpc();
                    a.UseDmtpHeartbeat()//使用Dmtp心跳
                    .SetTick(TimeSpan.FromMilliseconds(_remoteManagementOptions.HeartbeatInterval))
@@ -123,5 +159,23 @@ public partial class RemoteManagementTask
             if (!_tcpDmtpClient.Online)
                 await _tcpDmtpClient.ConnectAsync().ConfigureAwait(false);
         }
+    }
+
+
+    protected override async Task DisposeAsync(bool disposing)
+    {
+        if (_tcpDmtpClient != null)
+        {
+            await _tcpDmtpClient.CloseAsync().ConfigureAwait(false);
+            _tcpDmtpClient.SafeDispose();
+            _tcpDmtpClient = null;
+        }
+        if (_tcpDmtpService != null)
+        {
+            await _tcpDmtpService.ClearAsync().ConfigureAwait(false);
+            _tcpDmtpService.SafeDispose();
+            _tcpDmtpService = null;
+        }
+        await base.DisposeAsync(disposing).ConfigureAwait(false);
     }
 }

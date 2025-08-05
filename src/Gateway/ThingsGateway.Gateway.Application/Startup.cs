@@ -36,6 +36,10 @@ public class Startup : AppStartup
         services.AddSingleton<IRedundancyService, RedundancyService>();
         services.AddGatewayHostedService<IRedundancyHostedService, RedundancyHostedService>();
         services.AddGatewayHostedService<IUpdateZipFileHostedService, UpdateZipFileHostedService>();
+
+        services.AddHostedService<RemoteManagementHostedService>();
+        services.AddHostedService<WebApiHostedService>();
+
         services.AddSingleton<GatewayRedundantSerivce>();
         services.AddSingleton<IGatewayRedundantSerivce>(provider => provider.GetRequiredService<GatewayRedundantSerivce>());
         services.AddConfigurableOptions<UpgradeServerOptions>();
@@ -47,6 +51,10 @@ public class Startup : AppStartup
         services.AddConfigurableOptions<ChannelThreadOptions>();
         services.AddConfigurableOptions<GatewayLogOptions>();
         services.AddConfigurableOptions<RpcLogOptions>();
+
+        services.AddConfigurableOptions<RemoteClientManagementOptions>();
+        services.AddConfigurableOptions<RemoteServerManagementOptions>();
+        services.AddConfigurableOptions<WebApiOptions>();
 
         //底层多语言配置
         Foundation.LocalizerUtil.SetLocalizerFactory((a) => App.CreateLocalizerByType(a));

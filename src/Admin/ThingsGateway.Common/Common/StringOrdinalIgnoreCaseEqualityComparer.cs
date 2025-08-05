@@ -8,14 +8,18 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-namespace ThingsGateway.Gateway.Razor;
+namespace ThingsGateway.Common;
 
-public partial class SpinnerComponent
+public sealed class StringOrdinalIgnoreCaseEqualityComparer : EqualityComparer<string>
 {
-    public void SetRun(bool run)
+    public new static StringOrdinalIgnoreCaseEqualityComparer Default = new StringOrdinalIgnoreCaseEqualityComparer();
+    public override bool Equals(string? x, string? y)
     {
-        show = run;
-        StateHasChanged();
+        return x.Equals(y, StringComparison.OrdinalIgnoreCase);
     }
-    private bool show;
+
+    public override int GetHashCode([DisallowNull] string obj)
+    {
+        return obj.ToUpper().GetHashCode();
+    }
 }

@@ -8,9 +8,10 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
+using ThingsGateway.Admin.Application;
 using ThingsGateway.NewLife.Json.Extension;
 
-namespace ThingsGateway.Gateway.Razor;
+namespace ThingsGateway.Admin.Razor;
 
 public partial class USheet
 {

@@ -60,43 +60,47 @@ public class Program
 
         #endregion 控制台输出Logo
 
-        await Serve.RunAsync(RunOptions.Default.ConfigureFirstActionBuilder(builder =>
+        if (WebEnableVariable.WebEnable)
         {
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                builder.Host.UseWindowsService();
-            else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-                builder.Host.UseSystemd();
 
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                builder.Logging.ClearProviders(); //去除默认的事件日志提供者，某些情况下会日志输出异常，导致程序崩溃
-        }).ConfigureBuilder(builder =>
-           {
-               if (!builder.Environment.IsDevelopment())
-               {
-                   builder.Services.AddResponseCompression(
-                       opts => opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(second));
-               }
-
-               builder.WebHost.UseWebRoot("wwwroot");
-               builder.WebHost.UseStaticWebAssets();
-               // 设置接口超时时间和上传大小-Kestrel
-               builder.WebHost.ConfigureKestrel(u =>
-               {
-                   u.Limits.KeepAliveTimeout = TimeSpan.FromMinutes(30);
-                   u.Limits.RequestHeadersTimeout = TimeSpan.FromMinutes(30);
-                   u.Limits.MaxRequestBodySize = null;
-               });
-           })
-            .Configure(app =>
+            await Serve.RunAsync(RunOptions.Default.ConfigureFirstActionBuilder(builder =>
             {
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                    builder.Host.UseWindowsService();
+                else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+                    builder.Host.UseSystemd();
+
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                    builder.Logging.ClearProviders(); //去除默认的事件日志提供者，某些情况下会日志输出异常，导致程序崩溃
+            }).ConfigureBuilder(builder =>
+               {
+                   if (!builder.Environment.IsDevelopment())
+                   {
+                       builder.Services.AddResponseCompression(
+                       opts => opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(second));
+                   }
+
+                   builder.WebHost.UseWebRoot("wwwroot");
+                   builder.WebHost.UseStaticWebAssets();
+                   // 设置接口超时时间和上传大小-Kestrel
+                   builder.WebHost.ConfigureKestrel(u =>
+                   {
+                       u.Limits.KeepAliveTimeout = TimeSpan.FromMinutes(30);
+                       u.Limits.RequestHeadersTimeout = TimeSpan.FromMinutes(30);
+                       u.Limits.MaxRequestBodySize = null;
+                   });
+               })
+                .Configure(app =>
+                {
+
 #if NET9_0_OR_GREATER
-                app.MapRazorComponents<BlazorApp>()
-                    .AddAdditionalAssemblies(App.RazorAssemblies.Distinct().Where(a => a != typeof(Program).Assembly).ToArray())
-                    .AddInteractiveServerRenderMode();
+                    app.MapRazorComponents<BlazorApp>()
+                        .AddAdditionalAssemblies(App.RazorAssemblies.Distinct().Where(a => a != typeof(Program).Assembly).ToArray())
+                        .AddInteractiveServerRenderMode();
 #elif NET8_0_OR_GREATER
-                app.MapRazorComponents<BlazorAppNet8>()
-                    .AddAdditionalAssemblies(App.RazorAssemblies.Distinct().Where(a => a != typeof(Program).Assembly).ToArray())
-                    .AddInteractiveServerRenderMode();
+                    app.MapRazorComponents<BlazorAppNet8>()
+                .AddAdditionalAssemblies(App.RazorAssemblies.Distinct().Where(a => a != typeof(Program).Assembly).ToArray())
+                .AddInteractiveServerRenderMode();
 #else
 
                 app.MapBlazorHub();
@@ -104,11 +108,58 @@ public class Program
 
 #endif
 
-                ReflectionInoHelper.RemoveAllCache();
-                InstanceFactory.RemoveCache();
-            })
-            ).ConfigureAwait(false);
+                    ReflectionInoHelper.RemoveAllCache();
+                    InstanceFactory.RemoveCache();
+                })
+                ).ConfigureAwait(false);
+        }
+        else
+        {
+            await Serve.RunAsync(MiniRunOptions.Default.ConfigureFirstActionBuilder(builder =>
+            {
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                    builder.UseWindowsService();
+                else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+                    builder.UseSystemd();
 
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                    builder.ConfigureLogging(logging =>
+                    {
+                        //去除默认的事件日志提供者，某些情况下会日志输出异常，导致程序崩溃
+                        foreach (var provider in logging.Services.Where(s => s.ImplementationType?.Name == "EventLogLoggerProvider").ToList())
+                        {
+                            logging.Services.Remove(provider);
+                        }
+                    });
+
+
+
+            }).ConfigureBuilder(builder =>
+            {
+                // 设置接口超时时间和上传大小-Kestrel
+                builder.ConfigureKestrel(u =>
+                {
+                    u.Limits.KeepAliveTimeout = TimeSpan.FromMinutes(30);
+                    u.Limits.RequestHeadersTimeout = TimeSpan.FromMinutes(30);
+                    u.Limits.MaxRequestBodySize = null;
+                }).UseKestrel().Configure(app =>
+                {
+                    // ✅ 最小中间件
+                    app.Run(context =>
+                    {
+                        return context.Response.WriteAsync("web is disable");
+                    });
+                });
+            })
+                .Configure(app =>
+                {
+                    ReflectionInoHelper.RemoveAllCache();
+                    InstanceFactory.RemoveCache();
+                })
+                ).ConfigureAwait(false);
+
+
+        }
         await Task.Delay(2000).ConfigureAwait(false);
     }
 }

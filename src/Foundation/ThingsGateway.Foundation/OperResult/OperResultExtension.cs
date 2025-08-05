@@ -15,6 +15,27 @@ namespace ThingsGateway.Foundation;
 /// </summary>
 public static class OperResultExtension
 {
+
+    public static OperResult<object> GetOperResult(this IOperResult data)
+    {
+        OperResult<object> result = new(data);
+        var operResultType = typeof(IOperResult<>);
+        var interfaceType = data.GetType().GetInterfaces()
+            .FirstOrDefault(x => x.IsGenericType && x.GetGenericTypeDefinition() == operResultType);
+
+        if (interfaceType != null)
+        {
+            var contentProperty = interfaceType.GetProperty("Content");
+            if (contentProperty != null)
+            {
+                result.Content = contentProperty.GetValue(data);
+            }
+        }
+
+        return result;
+    }
+
+
     /// <summary>
     /// 转换对应类型
     /// </summary>

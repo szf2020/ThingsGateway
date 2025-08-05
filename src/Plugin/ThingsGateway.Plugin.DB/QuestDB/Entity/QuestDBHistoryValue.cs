@@ -20,6 +20,7 @@ public class QuestDBHistoryValue : IPrimaryIdEntity
 {
     [SugarColumn(ColumnDescription = "变量Id")]
     [AutoGenerateColumn(Visible = true, Filterable = true, Sortable = true)]
+    [System.ComponentModel.DataAnnotations.Key]
     public long Id { get; set; }
 
     /// <summary>
@@ -65,6 +66,7 @@ public class QuestDBNumberHistoryValue : IPrimaryIdEntity, IDBHistoryValue
 {
     [SugarColumn(ColumnDescription = "变量Id")]
     [AutoGenerateColumn(Visible = true, Filterable = true, Sortable = true)]
+    [System.ComponentModel.DataAnnotations.Key]
     public long Id { get; set; }
 
     /// <summary>

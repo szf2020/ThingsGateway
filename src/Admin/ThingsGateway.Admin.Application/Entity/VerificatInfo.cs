@@ -38,6 +38,7 @@ public class VerificatInfo : PrimaryIdEntity
     [AutoGenerateColumn(Filterable = true, Sortable = true)]
     [SugarColumn(ColumnDescription = "Id", IsPrimaryKey = true)]
     [IgnoreExcel]
+    [System.ComponentModel.DataAnnotations.Key]
     public override long Id { get; set; }
 
     /// <summary>

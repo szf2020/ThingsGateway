@@ -16,6 +16,11 @@
 
 
 	<ItemGroup>
+	  <Compile Include="..\..\Gateway\ThingsGateway.Gateway.Application\Services\Management\Update\Services\IUpgradeRpcServer.cs" Link="Services\IUpgradeRpcServer.cs" />
+	</ItemGroup>
+
+
+	<ItemGroup>
 	  <PackageReference Include="TouchSocket.Dmtp" Version="4.0.0-Alpha.12" />
 		<PackageReference Include="Riok.Mapperly" Version="4.2.1" ExcludeAssets="runtime" PrivateAssets="all" />
 	</ItemGroup>

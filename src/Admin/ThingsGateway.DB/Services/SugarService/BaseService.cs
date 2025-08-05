@@ -46,7 +46,7 @@ public class BaseService<T> : IDataService<T>, IDisposable where T : class, new(
     public async Task<bool> DeleteAsync(IEnumerable<T> models)
     {
         using var db = GetDB();
-        return await db.Deleteable<T>().In(models.ToList()).ExecuteCommandHasChangeAsync().ConfigureAwait(false);
+        return await db.Deleteable<T>(models.ToList()).ExecuteCommandHasChangeAsync().ConfigureAwait(false);
     }
 
     /// <inheritdoc/>
@@ -140,18 +140,22 @@ public class BaseService<T> : IDataService<T>, IDisposable where T : class, new(
             return (await db.UpdateableT(model).ExecuteCommandAsync().ConfigureAwait(false)) > 0;
         }
     }
-
     /// <inheritdoc/>
     public virtual async Task<bool> SaveAsync(List<T> model, ItemChangedType changedType)
+    {
+        return (await SaveReturnCountAsync(model, changedType).ConfigureAwait(false)) > 0;
+    }
+    /// <inheritdoc/>
+    public async Task<int> SaveReturnCountAsync(List<T> model, ItemChangedType changedType)
     {
         using var db = GetDB();
         if (changedType == ItemChangedType.Add)
         {
-            return (await db.Insertable(model).ExecuteCommandAsync().ConfigureAwait(false)) > 0;
+            return (await db.Insertable(model).ExecuteCommandAsync().ConfigureAwait(false));
         }
         else
         {
-            return (await db.Updateable(model).ExecuteCommandAsync().ConfigureAwait(false)) > 0;
+            return (await db.Updateable(model).ExecuteCommandAsync().ConfigureAwait(false));
         }
     }
     /// <summary>

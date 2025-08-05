@@ -8,18 +8,17 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-namespace ThingsGateway.Gateway.Application;
 
-public sealed class StringOrdinalIgnoreCaseEqualityComparer : EqualityComparer<string>
+using TouchSocket.Dmtp.Rpc;
+using TouchSocket.Rpc;
+
+namespace ThingsGateway.Management;
+
+[GeneratorRpcProxy(GeneratorFlag = GeneratorFlag.ExtensionAsync)]
+public interface IUpgradeRpcServer : IRpcServer
 {
-    public new static StringOrdinalIgnoreCaseEqualityComparer Default = new StringOrdinalIgnoreCaseEqualityComparer();
-    public override bool Equals(string? x, string? y)
-    {
-        return x.Equals(y, StringComparison.OrdinalIgnoreCase);
-    }
-
-    public override int GetHashCode([DisallowNull] string obj)
-    {
-        return obj.ToUpper().GetHashCode();
-    }
+    [DmtpRpc]
+    void Restart();
+    [DmtpRpc]
+    Task Upgrade();
 }

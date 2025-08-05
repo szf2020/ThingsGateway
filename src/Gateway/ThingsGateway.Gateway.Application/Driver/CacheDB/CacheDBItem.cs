@@ -23,6 +23,7 @@ public class CacheDBItem<T> : IPrimaryIdEntity
     }
 
     [SugarColumn(IsPrimaryKey = true)]
+    [System.ComponentModel.DataAnnotations.Key]
     public long Id { get; set; }
 
     [SugarColumn(IsJson = true, ColumnDataType = "TEXT")]

@@ -21,6 +21,7 @@ using TouchSocket.Core;
 using TouchSocket.Dmtp;
 using TouchSocket.Dmtp.Rpc;
 using TouchSocket.Rpc;
+using TouchSocket.Rpc.Generators;
 using TouchSocket.Sockets;
 
 namespace ThingsGateway.Management;
@@ -95,8 +96,7 @@ internal sealed class RedundancyTask : IRpcDriver, IAsyncDisposable
                         foreach (var deviceDataWithValues in deviceRunTimes)
                         {
                             // 将 GlobalData.CollectDevices 和 GlobalData.Variables 同步到从站
-                            await item.GetDmtpRpcActor().InvokeAsync(
-                                             nameof(RedundantRpcServer.UpData), null, waitInvoke, deviceDataWithValues.AdaptListDeviceDataWithValue()).ConfigureAwait(false);
+                            await item.GetDmtpRpcActor().UpDataAsync(deviceDataWithValues.AdaptListDeviceDataWithValue(), waitInvoke).ConfigureAwait(false);
                         }
                         LogMessage?.LogTrace($"{item.GetIPPort()} Update StandbyStation data success");
                     }
@@ -336,10 +336,12 @@ internal sealed class RedundancyTask : IRpcDriver, IAsyncDisposable
                .ConfigureContainer(a =>
                {
                    a.AddLogger(LogMessage);
-                   a.AddRpcStore(store => store.RegisterServer(new RedundantRpcServer(this)));
+                   a.AddRpcStore(store => store.RegisterServer(typeof(IRedundantRpcServer), new RedundantRpcServer(this)));
                })
                .ConfigurePlugins(a =>
                {
+                   a.UseTcpSessionCheckClear();
+
                    a.UseDmtpRpc();
                    a.UseDmtpHeartbeat()//使用Dmtp心跳
                    .SetTick(TimeSpan.FromMilliseconds(redundancy.HeartbeatInterval))
@@ -365,10 +367,11 @@ internal sealed class RedundancyTask : IRpcDriver, IAsyncDisposable
                .ConfigureContainer(a =>
                {
                    a.AddLogger(LogMessage);
-                   a.AddRpcStore(store => store.RegisterServer(new RedundantRpcServer(this)));
+                   a.AddRpcStore(store => store.RegisterServer(typeof(IRedundantRpcServer), new RedundantRpcServer(this)));
                })
                .ConfigurePlugins(a =>
                {
+                   a.UseTcpSessionCheckClear();
                    a.UseDmtpRpc();
                    a.UseDmtpHeartbeat()//使用Dmtp心跳
                    .SetTick(TimeSpan.FromMilliseconds(redundancy.HeartbeatInterval))
@@ -470,7 +473,7 @@ internal sealed class RedundancyTask : IRpcDriver, IAsyncDisposable
                 if (variableBatch.Count >= maxBatchSize)
                 {
                     // 发送一批
-                    await client.GetDmtpRpcActor().InvokeAsync(nameof(RedundantRpcServer.SyncData), null, invokeOption, channelBatch.ToList(), deviceBatch.ToList(), variableBatch).ConfigureAwait(false);
+                    await client.GetDmtpRpcActor().SyncDataAsync(channelBatch.ToList(), deviceBatch.ToList(), variableBatch, invokeOption).ConfigureAwait(false);
 
                     variableBatch.Clear();
                     channelBatch.Remove(channel);
@@ -482,7 +485,7 @@ internal sealed class RedundancyTask : IRpcDriver, IAsyncDisposable
         // 发送最后剩余的一批
         if (variableBatch.Count > 0)
         {
-            await client.GetDmtpRpcActor().InvokeAsync(nameof(RedundantRpcServer.SyncData), null, invokeOption, channelBatch.ToList(), deviceBatch.ToList(), variableBatch).ConfigureAwait(false);
+            await client.GetDmtpRpcActor().SyncDataAsync(channelBatch.ToList(), deviceBatch.ToList(), variableBatch, invokeOption).ConfigureAwait(false);
         }
 
         LogMessage?.LogTrace($"ForcedSync data success");
@@ -564,10 +567,7 @@ internal sealed class RedundancyTask : IRpcDriver, IAsyncDisposable
         Dictionary<string, Dictionary<string, string>> deviceDatas,
         DmtpInvokeOption invokeOption)
     {
-        return await _tcpDmtpClient.GetDmtpRpcActor()
-            .InvokeTAsync<Dictionary<string, Dictionary<string, OperResult<object>>>>(
-                nameof(RedundantRpcServer.Rpc), invokeOption, deviceDatas)
-            .ConfigureAwait(false);
+        return await _tcpDmtpClient.GetDmtpRpcActor().RpcAsync(deviceDatas, invokeOption).ConfigureAwait(false);
     }
     private async Task InvokeRpcServerAsync(
         Dictionary<string, Dictionary<string, string>> deviceDatas,
@@ -606,9 +606,7 @@ internal sealed class RedundancyTask : IRpcDriver, IAsyncDisposable
         {
             try
             {
-                var data = await client.GetDmtpRpcActor().InvokeTAsync<Dictionary<string, Dictionary<string, OperResult<object>>>>(
-                    nameof(RedundantRpcServer.Rpc), invokeOption, variableDatas)
-                    .ConfigureAwait(false);
+                var data = await client.GetDmtpRpcActor().RpcAsync(variableDatas, invokeOption).ConfigureAwait(false);
 
                 dataResult.AddRange(data);
             }

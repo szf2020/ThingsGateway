@@ -13,14 +13,14 @@ using TouchSocket.Rpc;
 
 namespace ThingsGateway.Management;
 
-public partial class UpgradeRpcServer : SingletonRpcServer
+public partial class UpgradeRpcServer : SingletonRpcServer, IUpgradeRpcServer
 {
-    [DmtpRpc(MethodInvoke = true)]
+    [DmtpRpc]
     public void Restart()
     {
         RestartServerHelper.RestartServer();
     }
-    [DmtpRpc(MethodInvoke = true)]
+    [DmtpRpc]
     public async Task Upgrade()
     {
         var _updateZipFileService = App.GetService<IUpdateZipFileHostedService>();

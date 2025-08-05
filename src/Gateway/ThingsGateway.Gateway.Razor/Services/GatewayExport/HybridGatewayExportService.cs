@@ -40,7 +40,7 @@ public sealed class HybridGatewayExportService : IGatewayExportService
             exportFilter.QueryPageOptions.IsVirtualScroll = false;
 
             var sheets = await _channelService.ExportChannelAsync(exportFilter).ConfigureAwait(false);
-            var path = await _importExportService.CreateFileAsync<Device>(sheets, "Channel", false).ConfigureAwait(false);
+            var path = await _importExportService.CreateFileAsync<Channel>(sheets, "Channel", false).ConfigureAwait(false);
 
             Open(path);
             return true;

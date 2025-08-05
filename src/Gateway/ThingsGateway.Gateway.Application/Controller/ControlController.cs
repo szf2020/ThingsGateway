@@ -21,6 +21,7 @@ using System.IO.Ports;
 using ThingsGateway.FriendlyException;
 
 using TouchSocket.Core;
+using TouchSocket.Rpc;
 using TouchSocket.Sockets;
 
 namespace ThingsGateway.Gateway.Application;
@@ -34,7 +35,9 @@ namespace ThingsGateway.Gateway.Application;
 [RequestAudit]
 [ApiController]
 [Authorize(AuthenticationSchemes = "Bearer")]
-public class ControlController : ControllerBase
+[TouchSocket.WebApi.Router("/miniapi/[api]/[action]")]
+[TouchSocket.WebApi.EnableCors("cors")]
+public class ControlController : ControllerBase, IRpcServer
 {
 
     /// <summary>
@@ -43,6 +46,7 @@ public class ControlController : ControllerBase
     /// <returns></returns>
     [HttpPost("removeAllCache")]
     [DisplayName("清空全部缓存")]
+    [TouchSocket.WebApi.WebApi(Method = TouchSocket.WebApi.HttpMethodType.Post)]
     public void RemoveAllCache()
     {
         App.CacheService.Clear();
@@ -54,6 +58,7 @@ public class ControlController : ControllerBase
     /// <returns></returns>
     [HttpPost("removeCache")]
     [DisplayName("删除通道/设备缓存")]
+    [TouchSocket.WebApi.WebApi(Method = TouchSocket.WebApi.HttpMethodType.Post)]
     public void RemoveCache()
     {
         App.GetService<IDeviceService>().DeleteDeviceFromCache();
@@ -66,6 +71,7 @@ public class ControlController : ControllerBase
     /// <returns></returns>
     [HttpPost("pauseBusinessThread")]
     [DisplayName("控制设备线程启停")]
+    [TouchSocket.WebApi.WebApi(Method = TouchSocket.WebApi.HttpMethodType.Post)]
     public async Task PauseDeviceThreadAsync(long id, bool pause)
     {
         if (GlobalData.IdDevices.TryGetValue(id, out var device))
@@ -85,6 +91,7 @@ public class ControlController : ControllerBase
     /// <returns></returns>
     [HttpPost("restartScopeThread")]
     [DisplayName("重启当前机构线程")]
+    [TouchSocket.WebApi.WebApi(Method = TouchSocket.WebApi.HttpMethodType.Post)]
     public async Task RestartScopeThread()
     {
         var data = await GlobalData.GetCurrentUserChannels().ConfigureAwait(false);
@@ -97,6 +104,7 @@ public class ControlController : ControllerBase
     /// <returns></returns>
     [HttpPost("restartAllThread")]
     [DisplayName("重启全部线程")]
+    [TouchSocket.WebApi.WebApi(Method = TouchSocket.WebApi.HttpMethodType.Post)]
     public async Task RestartAllThread()
     {
         await GlobalData.ChannelRuntimeService.RestartChannelAsync(GlobalData.IdChannels.Values).ConfigureAwait(false);
@@ -108,6 +116,7 @@ public class ControlController : ControllerBase
     /// <returns></returns>
     [HttpPost("restartThread")]
     [DisplayName("重启设备线程")]
+    [TouchSocket.WebApi.WebApi(Method = TouchSocket.WebApi.HttpMethodType.Post)]
     public async Task RestartDeviceThreadAsync(long deviceId)
     {
         if (GlobalData.IdDevices.TryGetValue(deviceId, out var deviceRuntime))
@@ -126,7 +135,8 @@ public class ControlController : ControllerBase
     /// </summary>
     [HttpPost("writeVariables")]
     [DisplayName("写入变量")]
-    public async Task<Dictionary<string, Dictionary<string, OperResult>>> WriteVariablesAsync([FromBody] Dictionary<string, Dictionary<string, string>> deviceDatas)
+    [TouchSocket.WebApi.WebApi(Method = TouchSocket.WebApi.HttpMethodType.Post)]
+    public async Task<Dictionary<string, Dictionary<string, OperResult>>> WriteVariablesAsync([FromBody][TouchSocket.WebApi.FromBody] Dictionary<string, Dictionary<string, string>> deviceDatas)
     {
         foreach (var deviceData in deviceDatas)
         {
@@ -145,7 +155,8 @@ public class ControlController : ControllerBase
     /// </summary>
     [HttpPost("batchSaveChannel")]
     [DisplayName("保存通道")]
-    public Task<bool> BatchSaveChannelAsync([FromBody] List<ChannelInput> channels, ItemChangedType type, bool restart = true)
+    [TouchSocket.WebApi.WebApi(Method = TouchSocket.WebApi.HttpMethodType.Post)]
+    public Task<bool> BatchSaveChannelAsync([FromBody][TouchSocket.WebApi.FromBody] List<ChannelInput> channels, ItemChangedType type, bool restart = true)
     {
         return GlobalData.ChannelRuntimeService.BatchSaveChannelAsync(channels.AdaptListChannel(), type, restart);
     }
@@ -155,7 +166,8 @@ public class ControlController : ControllerBase
     /// </summary>
     [HttpPost("batchSaveDevice")]
     [DisplayName("保存设备")]
-    public Task<bool> BatchSaveDeviceAsync([FromBody] List<DeviceInput> devices, ItemChangedType type, bool restart = true)
+    [TouchSocket.WebApi.WebApi(Method = TouchSocket.WebApi.HttpMethodType.Post)]
+    public Task<bool> BatchSaveDeviceAsync([FromBody][TouchSocket.WebApi.FromBody] List<DeviceInput> devices, ItemChangedType type, bool restart = true)
     {
         return GlobalData.DeviceRuntimeService.BatchSaveDeviceAsync(devices.AdaptListDevice(), type, restart);
     }
@@ -165,7 +177,8 @@ public class ControlController : ControllerBase
     /// </summary>
     [HttpPost("batchSaveVariable")]
     [DisplayName("保存变量")]
-    public Task<bool> BatchSaveVariableAsync([FromBody] List<VariableInput> variables, ItemChangedType type, bool restart = true)
+    [TouchSocket.WebApi.WebApi(Method = TouchSocket.WebApi.HttpMethodType.Post)]
+    public Task<bool> BatchSaveVariableAsync([FromBody][TouchSocket.WebApi.FromBody] List<VariableInput> variables, ItemChangedType type, bool restart = true)
     {
         return GlobalData.VariableRuntimeService.BatchSaveVariableAsync(variables.AdaptListVariable(), type, restart, default);
     }
@@ -175,7 +188,8 @@ public class ControlController : ControllerBase
     /// </summary>
     [HttpPost("deleteChannel")]
     [DisplayName("删除通道")]
-    public Task<bool> DeleteChannelAsync([FromBody] List<long> ids, bool restart = true)
+    [TouchSocket.WebApi.WebApi(Method = TouchSocket.WebApi.HttpMethodType.Post)]
+    public Task<bool> DeleteChannelAsync([FromBody][TouchSocket.WebApi.FromBody] List<long> ids, bool restart = true)
     {
         if (ids == null || ids.Count == 0) ids = GlobalData.IdChannels.Keys.ToList();
         return GlobalData.ChannelRuntimeService.DeleteChannelAsync(ids, restart, default);
@@ -186,7 +200,8 @@ public class ControlController : ControllerBase
     /// </summary>
     [HttpPost("deleteDevice")]
     [DisplayName("删除设备")]
-    public Task<bool> DeleteDeviceAsync([FromBody] List<long> ids, bool restart = true)
+    [TouchSocket.WebApi.WebApi(Method = TouchSocket.WebApi.HttpMethodType.Post)]
+    public Task<bool> DeleteDeviceAsync([FromBody][TouchSocket.WebApi.FromBody] List<long> ids, bool restart = true)
     {
         if (ids == null || ids.Count == 0) ids = GlobalData.IdDevices.Keys.ToList();
         return GlobalData.DeviceRuntimeService.DeleteDeviceAsync(ids, restart, default);
@@ -197,7 +212,8 @@ public class ControlController : ControllerBase
     /// </summary>
     [HttpPost("deleteVariable")]
     [DisplayName("删除变量")]
-    public Task<bool> DeleteVariableAsync([FromBody] List<long> ids, bool restart = true)
+    [TouchSocket.WebApi.WebApi(Method = TouchSocket.WebApi.HttpMethodType.Post)]
+    public Task<bool> DeleteVariableAsync([FromBody][TouchSocket.WebApi.FromBody] List<long> ids, bool restart = true)
     {
         if (ids == null || ids.Count == 0) ids = GlobalData.IdVariables.Keys.ToList();
         return GlobalData.VariableRuntimeService.DeleteVariableAsync(ids, restart, default);
@@ -208,6 +224,7 @@ public class ControlController : ControllerBase
     /// </summary>
     [HttpPost("insertTestData")]
     [DisplayName("增加测试数据")]
+    [TouchSocket.WebApi.WebApi(Method = TouchSocket.WebApi.HttpMethodType.Post)]
     public Task InsertTestDataAsync(int testVariableCount, int testDeviceCount, string slaveUrl, bool businessEnable, bool restart = true)
     {
         return GlobalData.VariableRuntimeService.InsertTestDataAsync(testVariableCount, testDeviceCount, slaveUrl, businessEnable, restart, default);
@@ -220,6 +237,7 @@ public class ControlController : ControllerBase
     [HttpPost("checkRealAlarm")]
     [RequestAudit]
     [DisplayName("确认实时报警")]
+    [TouchSocket.WebApi.WebApi(Method = TouchSocket.WebApi.HttpMethodType.Post)]
     public async Task CheckRealAlarm(long variableId)
     {
         if (GlobalData.ReadOnlyRealAlarmIdVariables.TryGetValue(variableId, out var variable))

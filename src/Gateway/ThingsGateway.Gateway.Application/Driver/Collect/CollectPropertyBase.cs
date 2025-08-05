@@ -35,6 +35,7 @@ public abstract class CollectPropertyBase : DriverPropertyBase
     /// <summary>
     /// 读写占空比
     /// </summary>
+    [MinValue(1)]
     public virtual int DutyCycle { get; set; } = 3;
 }
 
@@ -52,6 +53,7 @@ public abstract class CollectPropertyRetryBase : CollectPropertyBase
     public override int RetryCount { get; set; } = 3;
 
     [DynamicProperty(Remark = "n 次写入操作会执行一次读取")]
+    [MinValue(1)]
     public override int DutyCycle { get; set; } = 3;
 
 }

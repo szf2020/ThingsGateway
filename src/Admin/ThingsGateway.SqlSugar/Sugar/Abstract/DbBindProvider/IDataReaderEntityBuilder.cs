@@ -111,7 +111,7 @@ namespace ThingsGateway.SqlSugar
         /// <param name="context">SqlSugar提供者</param>
         /// <param name="dataRecord">数据记录器</param>
         /// <param name="fieldNames">字段名列表</param>
-        public IDataReaderEntityBuilder(SqlSugarProvider context, IDataRecord dataRecord, List<string> fieldNames)
+        public IDataReaderEntityBuilder(SqlSugarProvider context, IDataRecord dataRecord, IEnumerable<string> fieldNames)
         {
             this.Context = context;
             this.DataRecord = dataRecord;

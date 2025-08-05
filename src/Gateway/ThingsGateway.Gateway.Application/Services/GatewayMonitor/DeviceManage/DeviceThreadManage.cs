@@ -298,7 +298,11 @@ internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
                 try
                 {
                     driver = CreateDriver(deviceRuntime);
-
+                    if (driver == null)
+                    {
+                        LogMessage?.LogWarning(string.Format(AppResource.InitFail, CurrentChannel.PluginName, driver?.DeviceName));
+                        return;
+                    }
                     //初始状态
                     deviceRuntime.DeviceStatus = DeviceStatusEnum.Default;
 

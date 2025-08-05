@@ -10,28 +10,34 @@
 
 using System.ComponentModel.DataAnnotations;
 
-namespace ThingsGateway.Management;
+using ThingsGateway.ConfigurableOptions;
 
+namespace ThingsGateway.Management;
 public class RemoteManagementOptions
 {
     public bool Enable { get; set; }
 
+    [Required]
     public string Name { get; set; }
 
-    public bool IsServer { get; set; }
+    public virtual bool IsServer { get; }
 
+    [Required]
     public string ServerUri { get; set; }
 
-    /// <summary>
-    /// 获取或设置用于验证的令牌。
-    /// </summary>
     [Required]
     public string VerifyToken { get; set; }
 
-    /// <summary>
-    /// 获取或设置心跳间隔。
-    /// </summary>
     [MinValue(3000)]
     public int HeartbeatInterval { get; set; }
 
+}
+
+public class RemoteClientManagementOptions : RemoteManagementOptions, IConfigurableOptions
+{
+    public override bool IsServer => false;
+}
+public class RemoteServerManagementOptions : RemoteManagementOptions, IConfigurableOptions
+{
+    public override bool IsServer => true;
 }

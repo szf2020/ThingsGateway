@@ -10,9 +10,13 @@
 
 using BootstrapBlazor.Components;
 
+using TouchSocket.Dmtp.Rpc;
+using TouchSocket.Rpc;
+
 namespace ThingsGateway.Gateway.Application;
 
-public interface IBackendLogService
+[GeneratorRpcProxy(GeneratorFlag = GeneratorFlag.ExtensionAsync)]
+public interface IBackendLogService : IRpcServer
 {
     /// <summary>
     /// 删除 BackendLog 表中的所有记录
@@ -20,12 +24,14 @@ public interface IBackendLogService
     /// <remarks>
     /// 调用此方法会删除 BackendLog 表中的所有记录。
     /// </remarks>
+    [DmtpRpc]
     Task DeleteBackendLogAsync();
 
     /// <summary>
     /// 获取最新的十条 BackendLog 记录
     /// </summary>
     /// <returns>最新的十条记录</returns>
+    [DmtpRpc]
     Task<List<BackendLog>> GetNewLog();
 
     /// <summary>
@@ -33,6 +39,7 @@ public interface IBackendLogService
     /// </summary>
     /// <param name="option">查询选项</param>
     /// <returns>查询到的数据</returns>
+    [DmtpRpc]
     Task<QueryData<BackendLog>> PageAsync(QueryPageOptions option);
 
     /// <summary>
@@ -40,5 +47,6 @@ public interface IBackendLogService
     /// </summary>
     /// <param name="day">要统计的天数</param>
     /// <returns>按天统计的后端日志信息列表</returns>
+    [DmtpRpc]
     Task<List<BackendLogDayStatisticsOutput>> StatisticsByDayAsync(int day);
 }

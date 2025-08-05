@@ -9,6 +9,15 @@
       "dotnetRunMessages": true,
       "applicationUrl": "http://*:5000"
     },
+    "WebDisable": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "WebDisable",
+        "WebEnable": "false"
+      },
+      "dotnetRunMessages": true,
+      "applicationUrl": "http://*:5000"
+    },
     "demo": {
       "commandName": "Project",
       "launchBrowser": true,

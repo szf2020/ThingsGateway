@@ -23,8 +23,8 @@ using TouchSocket.Dmtp;
 using TouchSocket.Dmtp.FileTransfer;
 using TouchSocket.Dmtp.Rpc;
 using TouchSocket.Rpc;
+using TouchSocket.Rpc.Generators;
 using TouchSocket.Sockets;
-
 namespace ThingsGateway.Management;
 
 internal sealed class UpdateZipFileHostedService : BackgroundService, IUpdateZipFileHostedService
@@ -136,7 +136,7 @@ internal sealed class UpdateZipFileHostedService : BackgroundService, IUpdateZip
             Token = tokenSource.Token//配置可取消令箭
         };
 
-        var updateZipFiles = await TcpDmtpClient.GetDmtpRpcActor().InvokeTAsync<List<UpdateZipFile>>(nameof(GetList), invokeOption, new UpdateZipFileInput()
+        var updateZipFiles = await TcpDmtpClient.GetDmtpRpcActor().GetListAsync(new UpdateZipFileInput()
         {
             Version = Assembly.GetEntryAssembly().GetName().Version,
             DotNetVersion = Environment.Version,
@@ -145,7 +145,7 @@ internal sealed class UpdateZipFileHostedService : BackgroundService, IUpdateZip
                            RuntimeInformation.IsOSPlatform(OSPlatform.OSX) ? "OSX" : "Unknown",
             Architecture = RuntimeInformation.ProcessArchitecture,
             AppName = "ThingsGateway"
-        }).ConfigureAwait(false);
+        }, invokeOption).ConfigureAwait(false);
 
         return updateZipFiles.OrderByDescending(a => a.Version).ToList();
     }
@@ -300,12 +300,14 @@ internal sealed class UpdateZipFileHostedService : BackgroundService, IUpdateZip
                })
                .ConfigureContainer(a =>
                {
-                   a.AddRpcStore(store => store.RegisterServer<UpgradeRpcServer>());
                    a.AddLogger(_log);
+                   var rpcServer = new UpgradeRpcServer();
+                   a.AddRpcStore(store => store.RegisterServer<IUpgradeRpcServer>(rpcServer));
                    a.AddDmtpRouteService();//添加路由策略
                })
                .ConfigurePlugins(a =>
                {
+                   a.UseTcpSessionCheckClear();
                    a.UseDmtpRpc();
                    a.UseDmtpFileTransfer();//必须添加文件传输插件
 

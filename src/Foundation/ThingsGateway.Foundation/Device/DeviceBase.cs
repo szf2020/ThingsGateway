@@ -553,10 +553,10 @@ public abstract class DeviceBase : AsyncAndSyncDisposableObject, IDevice
         WaitLock? waitLock = null;
         try
         {
+            await BefortSendAsync(clientChannel, cancellationToken).ConfigureAwait(false);
+
             var dtuId = this is IDtu dtu1 ? dtu1.DtuId : null;
             waitLock = GetWaitLock(clientChannel, dtuId);
-
-            await BefortSendAsync(clientChannel, cancellationToken).ConfigureAwait(false);
 
             await waitLock.WaitAsync(cancellationToken).ConfigureAwait(false);
 

@@ -19,6 +19,7 @@ namespace ThingsGateway.Plugin.TDengineDB;
 [STableAttribute(STableName = "historyValue", Tag1 = nameof(DeviceName), Tag2 = nameof(Name))]
 public class TDengineDBNumberHistoryValue : STable, IPrimaryIdEntity, IDBHistoryValue
 {
+    [System.ComponentModel.DataAnnotations.Key]
     public long Id { get; set; }
 
     [SugarColumn(InsertServerTime = true)]

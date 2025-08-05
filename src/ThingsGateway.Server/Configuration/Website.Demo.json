@@ -10,7 +10,6 @@
     "Title": "ThingsGateway",
     "Demo": true,
     "ShowAuthorize": true,
-    "WebPageEnable": true,
     "BlazorConnectionLimitEnable": false,
     "MaxBlazorConnections": 5
   }

@@ -18,6 +18,7 @@ public class SessionOutput : PrimaryIdEntity
     /// <summary>
     /// 主键Id
     /// </summary>
+    [System.ComponentModel.DataAnnotations.Key]
     public override long Id { get; set; }
 
     /// <summary>

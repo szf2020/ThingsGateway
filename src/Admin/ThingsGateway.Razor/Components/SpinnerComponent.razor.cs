@@ -8,25 +8,14 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-namespace ThingsGateway.Gateway.Application;
+namespace ThingsGateway.Razor;
 
-public class USheetDatas
+public partial class SpinnerComponent
 {
-    public string locale { get; set; } = System.Globalization.CultureInfo.CurrentUICulture.Name;
-    public Dictionary<string, USheetData> sheets { get; set; } = new();
-}
-
-public class USheetData
-{
-    public string id { get; set; }
-    public string name { get; set; }
-    public int rowCount { get; set; }
-    public int columnCount { get; set; }
-
-    public Dictionary<int, Dictionary<int, USheetCelldata>> cellData { get; set; } = new();
-}
-
-public class USheetCelldata
-{
-    public object v { get; set; }
+    public void SetRun(bool run)
+    {
+        show = run;
+        StateHasChanged();
+    }
+    private bool show;
 }
