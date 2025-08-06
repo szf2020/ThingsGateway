@@ -118,7 +118,7 @@ public partial class QuestDBProducer : BusinessBaseWithCacheIntervalVariable
                     stopwatch.Start();
                     var data = numberData.AdaptListQuestDBNumberHistoryValue();
                     int result = 0;
-                    if (_driverPropertys.BulkCopy)
+                    if (_driverPropertys.RestApi)
                     {
                         result = await _db.RestApi(_driverPropertys.HttpPort).BulkCopyAsync(data, _driverPropertys.NumberTableName).ConfigureAwait(false);//不要加分表
                     }
@@ -141,7 +141,7 @@ public partial class QuestDBProducer : BusinessBaseWithCacheIntervalVariable
                     stopwatch.Start();
                     var data = stringData.AdaptListQuestDBHistoryValue();
                     int result = 0;
-                    if (_driverPropertys.BulkCopy)
+                    if (_driverPropertys.RestApi)
                     {
                         result = await _db.RestApi(_driverPropertys.HttpPort).BulkCopyAsync(data, _driverPropertys.StringTableName).ConfigureAwait(false);//不要加分表
                     }

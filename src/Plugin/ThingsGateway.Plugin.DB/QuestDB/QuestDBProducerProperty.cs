@@ -26,7 +26,7 @@ public class QuestDBProducerProperty : RealDBProducerProperty
     public override string BigTextConnectStr { get; set; } = "host=localhost;port=8812;username=admin;password=quest;database=qdb;ServerCompatibilityMode=NoTypeLoading;";
 
     [DynamicProperty]
-    public bool BulkCopy { get; set; } = true;
+    public bool RestApi { get; set; } = true;
 
     [DynamicProperty]
     public int HttpPort { get; set; } = 9000;
