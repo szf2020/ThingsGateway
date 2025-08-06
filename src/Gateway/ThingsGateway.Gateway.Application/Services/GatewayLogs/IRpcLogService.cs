@@ -26,19 +26,19 @@ public interface IRpcLogService
     /// 获取最新的十条 RpcLog 记录
     /// </summary>
     /// <returns>最新的十条记录</returns>
-    Task<List<RpcLog>> GetNewLog();
+    Task<List<RpcLog>> GetNewRpcLog();
 
     /// <summary>
     /// 分页查询 RpcLog 数据
     /// </summary>
     /// <param name="option">查询选项</param>
     /// <returns>查询到的数据</returns>
-    Task<QueryData<RpcLog>> PageAsync(QueryPageOptions option);
+    Task<QueryData<RpcLog>> RpcLogPageAsync(QueryPageOptions option);
 
     /// <summary>
     /// 按天统计 RpcLog 数据
     /// </summary>
     /// <param name="day">统计的天数</param>
     /// <returns>按天统计的结果列表</returns>
-    Task<List<RpcLogDayStatisticsOutput>> StatisticsByDayAsync(int day);
+    Task<List<RpcLogDayStatisticsOutput>> RpcLogStatisticsByDayAsync(int day);
 }

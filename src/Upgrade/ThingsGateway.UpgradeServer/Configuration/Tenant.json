@@ -1,6 +1,0 @@
-{
-  //网站配置
-  "Tenant": {
-    "Enable": false
-  }
-}

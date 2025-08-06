@@ -1,4 +1,22 @@
 ﻿{
+  "ThingsGateway.Management.Application._Imports": {
+    "Restart": "Restart",
+    "Upgrade": "Upgrade"
+  },
+  "ThingsGateway.Management.Application.SaveUpdateZipFile": {
+    "DownTemplate": "Download Template",
+    "SaveUpdateZipFile": "Upload Version Package"
+  },
+  "ThingsGateway.Management.Application.UpdateZipFile": {
+    "AppName": "AppName",
+    "Architecture": "Architecture",
+    "DotNetVersion": "DotNetVersion",
+    "FilePath": "FilePath",
+    "FileSize": "FileSize",
+    "MinimumCompatibleVersion": "MinimumCompatibleVersion",
+    "OSPlatform": "OSPlatform",
+    "Version": "Version"
+  },
 
   "ThingsGateway.Gateway.Application.DefaultDiagram": {
 
@@ -53,11 +71,7 @@
   },
 
 
-  "ThingsGateway.Management.AutoUpdateController": {
-    "AutoUpdateController": "AutoUpdate",
-    "Update": "Update"
-  },
-  "ThingsGateway.Management.RedundancyHostedService": {
+  "ThingsGateway.Gateway.Application.RedundancyHostedService": {
     "ErrorSynchronizingData": "Synchronize data to standby site error",
     "RedundancyDisable": "Redundant gateway site not enabled",
     "RedundancyDup": "Redundant station settings duplicated",
@@ -67,10 +81,10 @@
     "SwitchNormalState": "Local machine (primary site) will switch to normal state",
     "SwitchSlaveState": "Master site has recovered, local machine (standby) will switch to standby state"
   },
-  "ThingsGateway.Management.RedundancyOptions": {
+  "ThingsGateway.Gateway.Application.RedundancyOptions": {
     "Confirm": "Confirm switching to redundant state",
     "Enable": "Enable Dual-Machine Redundancy",
-    "ForcedSync": "Forced Synchronous",
+    "RedundancyForcedSync": "Forced Synchronous",
     "ForcedSyncWarning": "Forcing synchronization will generate database configuration information.Are you sure you want to continue?",
     "HeartbeatInterval": "Heartbeat Interval",
     "IsMaster": "IsMaster",
@@ -86,13 +100,13 @@
     "SyncInterval": "Data Synchronization Interval",
     "VerifyToken": "Verification Token"
   },
-  "ThingsGateway.Management.RedundancyService": {
+  "ThingsGateway.Gateway.Application.RedundancyService": {
     "EditRedundancyOption": "EditRedundancyOption"
   },
-  "ThingsGateway.Management.UpdateZipFileHostedService": {
+  "ThingsGateway.Gateway.Application.UpdateZipFileService": {
     "Update": "New version detected"
   },
-  "ThingsGateway.Upgrade.UpdateZipFile": {
+  "ThingsGateway.Gateway.Application.UpdateZipFile": {
     "AppName": "AppName",
     "Architecture": "Architecture",
     "DotNetVersion": "DotNetVersion",

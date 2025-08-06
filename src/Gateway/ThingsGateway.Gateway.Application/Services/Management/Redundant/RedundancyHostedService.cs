@@ -11,7 +11,7 @@
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace ThingsGateway.Management;
+namespace ThingsGateway.Gateway.Application;
 
 internal sealed class RedundancyHostedService : BackgroundService, IRedundancyHostedService
 {
@@ -24,23 +24,37 @@ internal sealed class RedundancyHostedService : BackgroundService, IRedundancyHo
     }
     private RedundancyTask RedundancyTask;
 
-    public TextFileLogger TextLogger => RedundancyTask.TextLogger;
-
-    public string LogPath => RedundancyTask.LogPath;
-
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         await Task.Yield();
-        await RedundancyTask.StartTaskAsync(stoppingToken).ConfigureAwait(false);
+        await RedundancyTask.StartRedundancyTaskAsync(stoppingToken).ConfigureAwait(false);
     }
-    public Task StartTaskAsync(CancellationToken cancellationToken) => RedundancyTask.StartTaskAsync(cancellationToken);
-    public Task StopTaskAsync() => RedundancyTask.StopTaskAsync();
 
-    public Task ForcedSync(CancellationToken cancellationToken = default) => RedundancyTask.ForcedSync(cancellationToken);
+    public Task StartRedundancyTaskAsync() => RedundancyTask.StartRedundancyTaskAsync();
+
+    public Task StopRedundancyTaskAsync() => RedundancyTask.StopRedundancyTaskAsync();
+
+    public Task RedundancyForcedSync() => RedundancyTask.RedundancyForcedSync();
 
     public override async Task StopAsync(CancellationToken cancellationToken)
     {
         await RedundancyTask.DisposeAsync().ConfigureAwait(false);
         await base.StopAsync(cancellationToken).ConfigureAwait(false);
+    }
+
+    public Task<TouchSocket.Core.LogLevel> RedundancyLogLevel()
+    {
+        return Task.FromResult(RedundancyTask.TextLogger.LogLevel);
+    }
+
+    public Task SetRedundancyLogLevel(TouchSocket.Core.LogLevel logLevel)
+    {
+        RedundancyTask.TextLogger.LogLevel = logLevel;
+        return Task.CompletedTask;
+    }
+
+    public Task<string> RedundancyLogPath()
+    {
+        return Task.FromResult(RedundancyTask.LogPath);
     }
 }

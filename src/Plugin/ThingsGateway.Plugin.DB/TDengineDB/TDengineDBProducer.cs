@@ -29,11 +29,7 @@ namespace ThingsGateway.Plugin.TDengineDB;
 public partial class TDengineDBProducer : BusinessBaseWithCacheIntervalVariable, IDBHistoryValueService
 {
 
-    internal readonly RealDBProducerProperty _driverPropertys = new()
-    {
-        DbType = DbType.TDengine,
-        BigTextConnectStr = "protocol=WebSocket;host=localhost;port=6041;useSSL=false;username=root;password=taosdata;db=power"
-    };
+    internal readonly TDengineDBProducerProperty _driverPropertys = new();
     private readonly TDengineDBProducerVariableProperty _variablePropertys = new();
     /// <inheritdoc/>
     public override Type DriverPropertyUIType => typeof(SqlDBProducerPropertyRazor);

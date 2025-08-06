@@ -100,7 +100,7 @@ public static class ResourceUtil
             {
                 pluginItem = new TreeViewItem<ChannelDeviceTreeItem>(pluginItemValue)
                 {
-                    Text = PluginServiceUtil.GetFileNameAndTypeName(pluginName).TypeName,
+                    Text = PluginInfoUtil.GetFileNameAndTypeName(pluginName).TypeName,
                     IsExpand = true,
                     Parent = parent,
                 };
@@ -183,7 +183,7 @@ public static class ResourceUtil
             {
                 pluginItem = new TreeViewItem<ChannelDeviceTreeItem>(pluginItemValue)
                 {
-                    Text = PluginServiceUtil.GetFileNameAndTypeName(pluginName).TypeName,
+                    Text = PluginInfoUtil.GetFileNameAndTypeName(pluginName).TypeName,
                     IsExpand = true,
                     Parent = parent,
                 };

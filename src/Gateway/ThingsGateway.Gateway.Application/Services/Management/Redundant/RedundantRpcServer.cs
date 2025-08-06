@@ -8,14 +8,12 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-using ThingsGateway.Gateway.Application;
-
 using TouchSocket.Core;
 using TouchSocket.Dmtp.Rpc;
 using TouchSocket.Rpc;
 using TouchSocket.Sockets;
 
-namespace ThingsGateway.Management;
+namespace ThingsGateway.Gateway.Application;
 
 internal sealed partial class RedundantRpcServer : SingletonRpcServer, IRedundantRpcServer
 {

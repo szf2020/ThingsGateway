@@ -15,7 +15,7 @@
     "ActualMax": "实际最大值"
   },
 
-  "ThingsGateway.Management.Authentication": {
+  "ThingsGateway.Gateway.Razor.Authentication": {
     "AuthName": "公司名称",
     "Authorized": "已授权",
     "ExpireTime": "过期时间",

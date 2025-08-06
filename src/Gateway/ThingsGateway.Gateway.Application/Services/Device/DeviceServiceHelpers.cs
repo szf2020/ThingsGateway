@@ -50,7 +50,7 @@ HashSet<string> pluginSheetNames,
         foreach (var plugin in pluginSheetNames)
         {
             var filtered = FilterPluginDevices(data, plugin, channelDicts);
-            var filtResult = PluginServiceUtil.GetFileNameAndTypeName(plugin);
+            var filtResult = PluginInfoUtil.GetFileNameAndTypeName(plugin);
             var pluginSheets = GetPluginSheets(filtered, propertysDict, plugin);
             result.Add(filtResult.TypeName, pluginSheets);
         }
@@ -75,7 +75,7 @@ string? channelName = null)
         foreach (var plugin in pluginSheetNames)
         {
             var filtered = FilterPluginDevices(data2, plugin, channelDicts);
-            var filtResult = PluginServiceUtil.GetFileNameAndTypeName(plugin);
+            var filtResult = PluginInfoUtil.GetFileNameAndTypeName(plugin);
             var pluginSheets = GetPluginSheets(filtered, propertysDict, plugin);
             result.Add(filtResult.TypeName, pluginSheets);
         }
@@ -288,10 +288,10 @@ string? channelName)
         ImportPreviewOutput<Device> deviceImportPreview = new();
 
         // 获取所有驱动程序，并将驱动程序的完整名称作为键构建字典
-        var driverPluginFullNameDict = GlobalData.PluginService.GetList().ToDictionary(a => a.FullName);
+        var driverPluginFullNameDict = GlobalData.PluginService.GetPluginListSync().ToDictionary(a => a.FullName);
 
         // 获取所有驱动程序，并将驱动程序名称作为键构建字典
-        var driverPluginNameDict = GlobalData.PluginService.GetList().DistinctBy(a => a.Name).ToDictionary(a => a.Name);
+        var driverPluginNameDict = GlobalData.PluginService.GetPluginListSync().DistinctBy(a => a.Name).ToDictionary(a => a.Name);
         ConcurrentDictionary<string, (Type, Dictionary<string, PropertyInfo>, Dictionary<string, PropertyInfo>)> propertysDict = new();
 
         var sheetNames = uSheetDatas.sheets.Keys.ToList();

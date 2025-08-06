@@ -216,7 +216,7 @@ internal sealed class DeviceService : BaseService<Device>, IDeviceService
         }
         if (exportFilter.PluginType != null)
         {
-            var pluginInfo = GlobalData.PluginService.GetList(exportFilter.PluginType).Select(a => a.FullName).ToHashSet();
+            var pluginInfo = GlobalData.PluginService.GetPluginListSync(exportFilter.PluginType).Select(a => a.FullName).ToHashSet();
             channel = (GlobalData.IdChannels).Where(a => pluginInfo.Contains(a.Value.PluginName)).Select(a => a.Value.Id).ToHashSet();
         }
         var dataScope = await GlobalData.SysUserService.GetCurrentUserDataScopeAsync().ConfigureAwait(false);
@@ -238,7 +238,7 @@ internal sealed class DeviceService : BaseService<Device>, IDeviceService
         }
         if (exportFilter.PluginType != null)
         {
-            var pluginInfo = GlobalData.PluginService.GetList(exportFilter.PluginType).Select(a => a.FullName).ToHashSet();
+            var pluginInfo = GlobalData.PluginService.GetPluginListSync(exportFilter.PluginType).Select(a => a.FullName).ToHashSet();
             channel = (GlobalData.IdChannels).Where(a => pluginInfo.Contains(a.Value.PluginName)).Select(a => a.Value.Id).ToHashSet();
         }
         var dataScope = await GlobalData.SysUserService.GetCurrentUserDataScopeAsync().ConfigureAwait(false);
@@ -417,7 +417,7 @@ internal sealed class DeviceService : BaseService<Device>, IDeviceService
             ImportPreviewOutput<Device> deviceImportPreview = new();
 
             // 获取所有驱动程序，并将驱动程序名称作为键构建字典
-            var driverPluginNameDict = _pluginService.GetList().DistinctBy(a => a.Name).ToDictionary(a => a.Name);
+            var driverPluginNameDict = _pluginService.GetPluginListSync().DistinctBy(a => a.Name).ToDictionary(a => a.Name);
             ConcurrentDictionary<string, (Type, Dictionary<string, PropertyInfo>, Dictionary<string, PropertyInfo>)> propertysDict = new();
             foreach (var sheetName in sheetNames)
             {

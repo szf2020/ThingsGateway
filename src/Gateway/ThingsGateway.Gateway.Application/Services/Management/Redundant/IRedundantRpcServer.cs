@@ -8,12 +8,10 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-using ThingsGateway.Gateway.Application;
-
 using TouchSocket.Dmtp.Rpc;
 using TouchSocket.Rpc;
 
-namespace ThingsGateway.Management;
+namespace ThingsGateway.Gateway.Application;
 
 [GeneratorRpcProxy(GeneratorFlag = GeneratorFlag.ExtensionAsync)]
 internal interface IRedundantRpcServer : IRpcServer
@@ -26,13 +24,3 @@ internal interface IRedundantRpcServer : IRpcServer
     [DmtpRpc]
     void UpData(ICallContext callContext, List<DeviceDataWithValue> deviceDatas);
 }
-
-//internal static partial class RedundantRpcServerExtensions
-//{
-//    public static Task<Dictionary<string, Dictionary<string, OperResult<object>>>> RpcAsync<TClient>(this TClient client, System.Collections.Generic.Dictionary<string, System.Collections.Generic.Dictionary<string, string>> deviceDatas, IInvokeOption invokeOption = default)
-//        where TClient : TouchSocket.Rpc.IRpcClient, TouchSocket.Dmtp.Rpc.IDmtpRpcActor
-//    {
-//        return client.InvokeTAsync<Dictionary<string, Dictionary<string, OperResult<object>>>>($"{nameof(ThingsGateway.Management)}{nameof(ThingsGateway.Management)}{nameof(ThingsGateway.Management.IRedundantRpcServer)}{nameof(ThingsGateway.Management.IRedundantRpcServer.Rpc)}", invokeOption, deviceDatas);
-//    }
-
-//}

@@ -103,7 +103,7 @@ IReadOnlyDictionary<long, ChannelRuntime> channelDicts)
         foreach (var plugin in pluginDrivers.Keys.Distinct())
         {
             var filtered = FilterPluginDevices(data, plugin, deviceDicts, channelDicts);
-            var pluginName = PluginServiceUtil.GetFileNameAndTypeName(plugin).Item2;
+            var pluginName = PluginInfoUtil.GetFileNameAndTypeName(plugin).Item2;
             sheets.Add(pluginName, GetPluginSheets(filtered, deviceDicts, channelDicts, plugin, pluginDrivers, propertysDict));
         }
 
@@ -239,7 +239,7 @@ IReadOnlyDictionary<long, ChannelRuntime> channelDicts)
         foreach (var plugin in pluginDrivers.Keys.Distinct())
         {
             var filtered = FilterPluginDevices(data, plugin, deviceDicts, channelDicts);
-            var pluginName = PluginServiceUtil.GetFileNameAndTypeName(plugin).Item2;
+            var pluginName = PluginInfoUtil.GetFileNameAndTypeName(plugin).Item2;
             sheets.Add(pluginName, GetPluginSheets(filtered, deviceDicts, channelDicts, plugin, pluginDrivers, propertysDict));
         }
 
@@ -322,7 +322,7 @@ IReadOnlyDictionary<long, ChannelRuntime> channelDicts)
         }
         var deviceDicts = GlobalData.IdDevices;
         var channelDicts = GlobalData.IdChannels;
-        var driverPluginDicts = GlobalData.PluginService.GetList(PluginTypeEnum.Business).ToDictionary(a => a.FullName);
+        var driverPluginDicts = GlobalData.PluginService.GetPluginListSync(PluginTypeEnum.Business).ToDictionary(a => a.FullName);
         //总数据
         Dictionary<string, object> sheets = new();
         //变量页
@@ -436,7 +436,7 @@ IReadOnlyDictionary<long, ChannelRuntime> channelDicts)
                     if (!driverPluginDicts.ContainsKey(channel.PluginName))
                         continue;
 
-                    var pluginName = PluginServiceUtil.GetFileNameAndTypeName(channel.PluginName);
+                    var pluginName = PluginInfoUtil.GetFileNameAndTypeName(channel.PluginName);
                     //lock (devicePropertys)
                     {
                         if (devicePropertys.ContainsKey(pluginName.Item2))
@@ -510,10 +510,10 @@ IReadOnlyDictionary<long, ChannelRuntime> channelDicts)
 
         // 设备页导入预览输出
         ImportPreviewOutput<Dictionary<string, Variable>> deviceImportPreview = new();
-
+        var plugins = GlobalData.PluginService.GetPluginListSync();
         // 获取驱动插件的全名和名称的字典
-        var driverPluginFullNameDict = GlobalData.PluginService.GetList().ToDictionary(a => a.FullName);
-        var driverPluginNameDict = GlobalData.PluginService.GetList().ToDictionary(a => a.Name);
+        var driverPluginFullNameDict = plugins.ToDictionary(a => a.FullName);
+        var driverPluginNameDict = plugins.ToDictionary(a => a.Name);
         ConcurrentDictionary<string, (Type, Dictionary<string, PropertyInfo>, Dictionary<string, PropertyInfo>)> propertysDict = new();
 
         var sheetNames = uSheetDatas.sheets.Keys.ToList();

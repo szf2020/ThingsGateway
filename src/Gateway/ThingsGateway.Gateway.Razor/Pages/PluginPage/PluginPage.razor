@@ -1,7 +1,14 @@
-﻿@page "/gateway/plugin"
+﻿
+@{
+#if !Management
+}
+@page "/gateway/plugin"
 @attribute [Authorize]
 @attribute [RolePermission]
 
+@{
+#endif
+}
 @namespace ThingsGateway.Gateway.Razor
 @using BootstrapBlazor.Components
 @using ThingsGateway.Admin.Application

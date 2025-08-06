@@ -26,7 +26,7 @@ public partial class RpcLogPage
         if (App.HostApplicationLifetime.ApplicationStopping.IsCancellationRequested) return (new ChartDataSource());
         if (ChartDataSource == null)
         {
-            var dayStatisticsOutputs = await RpcLogService.StatisticsByDayAsync(7);
+            var dayStatisticsOutputs = await RpcLogService.RpcLogStatisticsByDayAsync(7);
             ChartDataSource = new ChartDataSource();
             ChartDataSource.Options.Title = Localizer[nameof(RpcLog)];
             ChartDataSource.Options.X.Title = Localizer["Date"];
@@ -47,7 +47,7 @@ public partial class RpcLogPage
         }
         else
         {
-            var dayStatisticsOutputs = await RpcLogService.StatisticsByDayAsync(7);
+            var dayStatisticsOutputs = await RpcLogService.RpcLogStatisticsByDayAsync(7);
             ChartDataSource.Labels = dayStatisticsOutputs.Select(a => a.Date);
             ChartDataSource.Data[0].Data = dayStatisticsOutputs.Select(a => (object)a.SuccessCount);
             ChartDataSource.Data[1].Data = dayStatisticsOutputs.Select(a => (object)a.FailCount);
@@ -65,7 +65,7 @@ public partial class RpcLogPage
     {
         return await Task.Run(async () =>
         {
-            var data = await RpcLogService.PageAsync(options);
+            var data = await RpcLogService.RpcLogPageAsync(options);
             return data;
         });
     }

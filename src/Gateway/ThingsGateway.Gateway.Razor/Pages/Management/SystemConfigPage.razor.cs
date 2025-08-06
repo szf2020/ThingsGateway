@@ -11,7 +11,7 @@
 #pragma warning disable CA2007 // 考虑对等待的任务调用 ConfigureAwait
 using Microsoft.Extensions.Options;
 
-namespace ThingsGateway.Management;
+namespace ThingsGateway.Gateway.Razor;
 
 public partial class SystemConfigPage
 {
@@ -27,11 +27,23 @@ public partial class SystemConfigPage
     [NotNull]
     private SwalService? SwalService { get; set; }
 
+    private string LogPath;
+    private TouchSocket.Core.LogLevel LogLevel;
+
+    private Task SetLogLevel(TouchSocket.Core.LogLevel logLevel)
+    {
+        LogLevel = logLevel;
+        return RedundancyHostedService.SetRedundancyLogLevel(logLevel);
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        LogPath = await RedundancyHostedService.RedundancyLogPath();
+        LogLevel = await RedundancyHostedService.RedundancyLogLevel();
+        await base.OnInitializedAsync();
+    }
     protected override Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender)
-            TabItem?.SetHeader(AppContext.TitleLocalizer["系统管理"]);
-
         if (firstRender && Tab != null && tabComponent != null)
         {
             tabComponent.ActiveTab(Tab.Value);
@@ -49,6 +61,8 @@ public partial class SystemConfigPage
     [NotNull]
     public IStringLocalizer<ThingsGateway.Gateway.Razor._Imports> GatewayLocalizer { get; set; }
 
+    [Inject]
+    public IRestartService RestartService { get; set; }
     private async Task OnRestart()
     {
         var result = await SwalService.ShowModal(new SwalOption()
@@ -58,7 +72,7 @@ public partial class SystemConfigPage
         });
         if (result)
         {
-            RestartServerHelper.RestartServer();
+            await RestartService.RestartServer();
         }
     }
 

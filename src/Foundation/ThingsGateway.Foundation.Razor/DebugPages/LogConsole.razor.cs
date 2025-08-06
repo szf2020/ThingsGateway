@@ -77,7 +77,8 @@ public partial class LogConsole : IDisposable
 
     [Inject]
     private ToastService ToastService { get; set; }
-
+    [Inject]
+    ITextFileReadService TextFileReadService { get; set; }
     public void Dispose()
     {
         Disposed = true;
@@ -94,7 +95,7 @@ public partial class LogConsole : IDisposable
 
             if (LogPath != null)
             {
-                var files = TextFileReader.GetFiles(LogPath);
+                var files = await TextFileReadService.GetLogFiles(LogPath);
                 if (!files.IsSuccess)
                 {
                     Messages = new List<LogMessage>();
@@ -105,7 +106,7 @@ public partial class LogConsole : IDisposable
                     await Task.Run(async () =>
                     {
                         Stopwatch sw = Stopwatch.StartNew();
-                        var result = TextFileReader.LastLog(files.Content.FirstOrDefault());
+                        var result = await TextFileReadService.LastLogData(files.Content.FirstOrDefault());
                         if (result.IsSuccess)
                         {
                             Messages = result.Content.Where(a => a.LogLevel >= LogLevel).Select(a => new LogMessage((int)a.LogLevel, $"{a.LogTime} - {a.Message}{(a.ExceptionString.IsNullOrWhiteSpace() ? null : $"{Environment.NewLine}{a.ExceptionString}")}")).ToList();
@@ -143,7 +144,7 @@ public partial class LogConsole : IDisposable
     {
         if (LogPath != null)
         {
-            var files = TextFileReader.GetFiles(LogPath);
+            var files = await TextFileReadService.GetLogFiles(LogPath);
             if (files.IsSuccess)
             {
                 foreach (var item in files.Content)

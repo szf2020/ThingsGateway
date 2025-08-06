@@ -13,7 +13,7 @@ using Microsoft.Extensions.Options;
 
 using ThingsGateway.Authentication;
 
-namespace ThingsGateway.Management;
+namespace ThingsGateway.Gateway.Razor;
 
 /// <inheritdoc/>
 public partial class Authentication
@@ -30,20 +30,21 @@ public partial class Authentication
     private AuthorizeInfo AuthorizeInfo { get; set; }
     [Inject]
     ToastService ToastService { get; set; }
-
-    protected override void OnParametersSet()
+    [Inject]
+    IAuthenticationService AuthenticationService { get; set; }
+    protected override async Task OnParametersSetAsync()
     {
-        ProAuthentication.TryGetAuthorizeInfo(out var authorizeInfo);
+        var authorizeInfo = await AuthenticationService.TryGetAuthorizeInfo();
         AuthorizeInfo = authorizeInfo;
         base.OnParametersSet();
     }
 
     private async Task Register()
     {
-        var result = ProAuthentication.TryAuthorize(Password, out var authorizeInfo);
-        if (result)
+        var result = await AuthenticationService.TryAuthorize(Password);
+        if (result.Auth)
         {
-            AuthorizeInfo = authorizeInfo;
+            AuthorizeInfo = result;
             await ToastService.Default();
         }
         else
@@ -54,8 +55,8 @@ public partial class Authentication
     }
     private async Task Unregister()
     {
-        ProAuthentication.UnAuthorize();
-        _ = ProAuthentication.TryGetAuthorizeInfo(out var authorizeInfo);
+        await AuthenticationService.UnAuthorize();
+        var authorizeInfo = await AuthenticationService.TryGetAuthorizeInfo();
         AuthorizeInfo = authorizeInfo;
 
         await InvokeAsync(StateHasChanged);

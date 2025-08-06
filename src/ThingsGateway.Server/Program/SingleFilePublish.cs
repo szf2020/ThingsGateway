@@ -45,9 +45,6 @@ public class SingleFilePublish : ISingleFilePublish
             "ThingsGateway.Admin.Application",
             "ThingsGateway.SqlSugar",
 
-            "ThingsGateway.Management",
-            "ThingsGateway.RulesEngine",
-
             "ThingsGateway.CSScript",
             "ThingsGateway.Foundation"   ,
             "ThingsGateway.Foundation.Razor",

@@ -97,7 +97,7 @@ internal sealed class RulesEngineHostedService : BackgroundService, IRulesEngine
     private (RulesLog rulesLog, DefaultDiagram blazorDiagram) Init(Rules rules)
     {
 #pragma warning disable CA1863
-        var log = TextFileLogger.GetMultipleFileLogger(string.Format(LogPathFormat, rules.Name));
+        var log = TextFileLogger.GetMultipleFileLogger(string.Format(LogPathFormat, rules.Name.SanitizeFileName()));
 #pragma warning restore CA1863
         log.LogLevel = TouchSocket.Core.LogLevel.Trace;
         DefaultDiagram blazorDiagram = new();

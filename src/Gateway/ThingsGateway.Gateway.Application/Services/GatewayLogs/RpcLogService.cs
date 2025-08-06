@@ -21,7 +21,7 @@ internal sealed class RpcLogService : BaseService<RpcLog>, IRpcLogService
     /// <summary>
     /// 最新十条
     /// </summary>
-    public async Task<List<RpcLog>> GetNewLog()
+    public async Task<List<RpcLog>> GetNewRpcLog()
     {
         using var db = GetDB();
         var data = await db.Queryable<RpcLog>().OrderByDescending(a => a.LogTime).Take(10).ToListAsync().ConfigureAwait(false);
@@ -32,7 +32,7 @@ internal sealed class RpcLogService : BaseService<RpcLog>, IRpcLogService
     /// 表格查询
     /// </summary>
     /// <param name="option">查询条件</param>
-    public Task<QueryData<RpcLog>> PageAsync(QueryPageOptions option)
+    public Task<QueryData<RpcLog>> RpcLogPageAsync(QueryPageOptions option)
     {
         return QueryAsync(option);
     }
@@ -51,7 +51,7 @@ internal sealed class RpcLogService : BaseService<RpcLog>, IRpcLogService
 
     #endregion 删除
 
-    public async Task<List<RpcLogDayStatisticsOutput>> StatisticsByDayAsync(int day)
+    public async Task<List<RpcLogDayStatisticsOutput>> RpcLogStatisticsByDayAsync(int day)
     {
         using var db = GetDB();
         //取最近七天

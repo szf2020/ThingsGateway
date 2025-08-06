@@ -56,7 +56,7 @@ public partial class GatewayMonitorPage
         }
         else if (channelDeviceTreeItem.TryGetPluginName(out var pluginName))
         {
-            var pluginType = GlobalData.PluginService.GetList().FirstOrDefault(a => a.FullName == pluginName)?.PluginType;
+            var pluginType = GlobalData.PluginService.GetPluginListSync().FirstOrDefault(a => a.FullName == pluginName)?.PluginType;
             if (pluginType == PluginTypeEnum.Collect)
             {
                 VariableRuntimes = channels.Where(a => a.PluginName == pluginName).SelectMany(a => a.ReadDeviceRuntimes).SelectMany(a => a.Value.ReadOnlyVariableRuntimes).Select(a => a.Value).Where(a => a != null);

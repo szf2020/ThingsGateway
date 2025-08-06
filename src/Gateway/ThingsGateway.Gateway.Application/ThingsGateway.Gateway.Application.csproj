@@ -50,18 +50,4 @@
 		<ProjectReference Include="..\ThingsGateway.Blazor.Diagrams.Core\ThingsGateway.Blazor.Diagrams.Core.csproj" />
 	</ItemGroup>
 
-	<ItemGroup>
-		<Compile Include="..\..\Upgrade\ThingsGateway.Upgrade\Extensions\LogExtensions.cs" Link="Services\Management\Update\Files\LogExtensions.cs" />
-		<Compile Include="..\..\Upgrade\ThingsGateway.Upgrade\Model\UpdateZipFile.cs" Link="Services\Management\Update\Files\UpdateZipFile.cs" />
-		<Compile Include="..\..\Upgrade\ThingsGateway.Upgrade\Model\UpdateZipFileInput.cs" Link="Services\Management\Update\Files\UpdateZipFileInput.cs" />
-
-
-		<Compile Include="..\..\Upgrade\ThingsGateway.Upgrade\Services\IFileRpcServer.cs" Link="Services\Management\Update\Files\IFileRpcServer.cs" />
-		<Compile Include="..\..\Upgrade\ThingsGateway.Upgrade\Services\FileConst.cs" Link="Services\Management\Update\Files\FileConst.cs" />
-		<Compile Include="..\..\Upgrade\ThingsGateway.Upgrade\Services\FilePlugin.cs" Link="Services\Management\Update\Files\FilePlugin.cs" />
-		<Compile Include="..\..\Upgrade\ThingsGateway.Upgrade\Services\UpgradeServerOptions.cs" Link="Services\Management\Update\Files\UpgradeServerOptions.cs" />
-	</ItemGroup>
-
-
-
 </Project>

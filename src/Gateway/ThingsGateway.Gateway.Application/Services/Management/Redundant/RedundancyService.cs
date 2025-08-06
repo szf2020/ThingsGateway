@@ -9,7 +9,7 @@
 //------------------------------------------------------------------------------
 
 using ThingsGateway.NewLife.Extension;
-namespace ThingsGateway.Management;
+namespace ThingsGateway.Gateway.Application;
 
 internal sealed class RedundancyService : BaseService<SysDict>, IRedundancyService
 {

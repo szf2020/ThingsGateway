@@ -8,7 +8,7 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-namespace ThingsGateway.Management;
+namespace ThingsGateway.Gateway.Application;
 
 /// <summary>
 /// 系统配置种子数据

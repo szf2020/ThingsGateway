@@ -21,7 +21,7 @@ internal sealed class BackendLogService : BaseService<BackendLog>, IBackendLogSe
     /// <summary>
     /// 最新十条
     /// </summary>
-    public async Task<List<BackendLog>> GetNewLog()
+    public async Task<List<BackendLog>> GetNewBackendLog()
     {
         using var db = GetDB();
         var data = await db.Queryable<BackendLog>().OrderByDescending(a => a.LogTime).Take(10).ToListAsync().ConfigureAwait(false);
@@ -32,7 +32,7 @@ internal sealed class BackendLogService : BaseService<BackendLog>, IBackendLogSe
     /// 表格查询
     /// </summary>
     /// <param name="option">查询条件</param>
-    public Task<QueryData<BackendLog>> PageAsync(QueryPageOptions option)
+    public Task<QueryData<BackendLog>> BackendLogPageAsync(QueryPageOptions option)
     {
         return QueryAsync(option);
     }
@@ -58,7 +58,7 @@ internal sealed class BackendLogService : BaseService<BackendLog>, IBackendLogSe
     /// </summary>
     /// <param name="day">天</param>
     /// <returns>统计信息</returns>
-    public async Task<List<BackendLogDayStatisticsOutput>> StatisticsByDayAsync(int day)
+    public async Task<List<BackendLogDayStatisticsOutput>> BackendLogStatisticsByDayAsync(int day)
     {
         using var db = GetDB();
         //取最近七天

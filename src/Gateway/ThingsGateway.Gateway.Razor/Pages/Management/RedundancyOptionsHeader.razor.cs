@@ -9,7 +9,7 @@
 //------------------------------------------------------------------------------
 
 #pragma warning disable CA2007 // 考虑对等待的任务调用 ConfigureAwait
-namespace ThingsGateway.Management;
+namespace ThingsGateway.Gateway.Razor;
 
 public partial class RedundancyOptionsHeader : IDisposable
 {
@@ -22,14 +22,22 @@ public partial class RedundancyOptionsHeader : IDisposable
     {
         Disposed = true;
     }
-    protected override Task OnInitializedAsync()
+
+    [Inject]
+    IChannelEnableService ChannelEnableService { get; set; }
+
+    private bool StartCollectChannelEnable;
+
+    protected override async Task OnInitializedAsync()
     {
+        StartCollectChannelEnable = await ChannelEnableService.StartCollectChannelEnable();
         _ = Task.Run(async () =>
         {
             while (!Disposed)
             {
                 try
                 {
+                    StartCollectChannelEnable = await ChannelEnableService.StartCollectChannelEnable();
                     await InvokeAsync(StateHasChanged);
                 }
                 finally
@@ -38,6 +46,6 @@ public partial class RedundancyOptionsHeader : IDisposable
                 }
             }
         });
-        return base.OnInitializedAsync();
+        await base.OnInitializedAsync();
     }
 }

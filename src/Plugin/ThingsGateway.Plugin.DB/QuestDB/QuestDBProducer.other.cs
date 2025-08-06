@@ -13,6 +13,7 @@ using System.Diagnostics;
 using ThingsGateway.Extension.Generic;
 using ThingsGateway.Foundation;
 using ThingsGateway.Plugin.DB;
+using ThingsGateway.SqlSugar;
 
 using TouchSocket.Core;
 
@@ -116,7 +117,15 @@ public partial class QuestDBProducer : BusinessBaseWithCacheIntervalVariable
                     Stopwatch stopwatch = new();
                     stopwatch.Start();
                     var data = numberData.AdaptListQuestDBNumberHistoryValue();
-                    var result = await _db.Insertable(data).AS(_driverPropertys.NumberTableName).ExecuteCommandAsync(cancellationToken).ConfigureAwait(false);//不要加分表
+                    int result = 0;
+                    if (_driverPropertys.BulkCopy)
+                    {
+                        result = await _db.RestApi(_driverPropertys.HttpPort).BulkCopyAsync(data, _driverPropertys.NumberTableName).ConfigureAwait(false);//不要加分表
+                    }
+                    else
+                    {
+                        result = await _db.Insertable(data).AS(_driverPropertys.NumberTableName).ExecuteCommandAsync(cancellationToken).ConfigureAwait(false);//不要加分表
+                    }
                     stopwatch.Stop();
 
                     //var result = await db.Insertable(dbInserts).SplitTable().ExecuteCommandAsync().ConfigureAwait(false);
@@ -131,7 +140,16 @@ public partial class QuestDBProducer : BusinessBaseWithCacheIntervalVariable
                     Stopwatch stopwatch = new();
                     stopwatch.Start();
                     var data = stringData.AdaptListQuestDBHistoryValue();
-                    var result = await _db.Insertable(data).AS(_driverPropertys.StringTableName).ExecuteCommandAsync(cancellationToken).ConfigureAwait(false);//不要加分表
+                    int result = 0;
+                    if (_driverPropertys.BulkCopy)
+                    {
+                        result = await _db.RestApi(_driverPropertys.HttpPort).BulkCopyAsync(data, _driverPropertys.StringTableName).ConfigureAwait(false);//不要加分表
+                    }
+                    else
+                    {
+                        result = await _db.Insertable(data).AS(_driverPropertys.StringTableName).ExecuteCommandAsync(cancellationToken).ConfigureAwait(false);//不要加分表
+                    }
+
                     stopwatch.Stop();
 
                     //var result = await db.Insertable(dbInserts).SplitTable().ExecuteCommandAsync().ConfigureAwait(false);

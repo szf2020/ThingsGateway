@@ -27,7 +27,7 @@ public class PluginInfo
     /// 插件文件名称.插件类型名称
     /// </summary>
     [AutoGenerateColumn(Ignore = true)]
-    public string FullName => PluginServiceUtil.GetFullName(FileName, Name);
+    public string FullName => PluginInfoUtil.GetFullName(FileName, Name);
 
     /// <summary>
     /// 插件文件名称
@@ -70,8 +70,5 @@ public class PluginInfo
     /// </summary>
     [IgnoreExcel]
     [SugarColumn(IsIgnore = true)]
-    [System.Text.Json.Serialization.JsonIgnore]
-    [Newtonsoft.Json.JsonIgnore]
-    [AutoGenerateColumn(Ignore = true)]
     public string Directory { get; set; }
 }

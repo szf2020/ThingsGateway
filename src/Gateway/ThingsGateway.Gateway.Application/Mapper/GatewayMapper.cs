@@ -10,8 +10,6 @@
 
 using Riok.Mapperly.Abstractions;
 
-using ThingsGateway.Management;
-
 namespace ThingsGateway.Gateway.Application;
 [Mapper(UseDeepCloning = true, EnumMappingStrategy = EnumMappingStrategy.ByName, RequiredMappingStrategy = RequiredMappingStrategy.None)]
 public static partial class GatewayMapper

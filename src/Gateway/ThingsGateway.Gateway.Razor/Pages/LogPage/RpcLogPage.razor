@@ -1,10 +1,19 @@
 ﻿@namespace ThingsGateway.Gateway.Razor
-@page "/gateway/rpclog"
 @using ThingsGateway.Admin.Application
 @using ThingsGateway.Admin.Razor
 @using ThingsGateway.Gateway.Application
+
+@{
+#if !Management
+}
+@page "/gateway/rpclog"
 @attribute [Authorize]
 @attribute [RolePermission]
+
+@{
+#endif
+}
+
 @inherits ComponentDefault
 
 <Chart @ref=LineChart OnInitAsync="OnInit" Height="var(--line-chart-height)" Width="100%" />

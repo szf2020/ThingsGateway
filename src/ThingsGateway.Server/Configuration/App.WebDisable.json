@@ -18,8 +18,6 @@
       "ThingsGateway.DB",
       "ThingsGateway.Gateway.Application",
       "ThingsGateway.Gateway.Razor",
-      "ThingsGateway.Management",
-      "ThingsGateway.RulesEngine",
 
       "ThingsGateway.Foundation.Razor",
       "ThingsGateway.Debug.Razor",

@@ -594,7 +594,7 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
             // 设备页导入预览输出
             ImportPreviewOutput<Dictionary<string, Variable>> deviceImportPreview = new();
 
-            var driverPluginNameDict = _pluginService.GetList().ToDictionary(a => a.Name);
+            var driverPluginNameDict = _pluginService.GetPluginListSync().ToDictionary(a => a.Name);
             ConcurrentDictionary<string, (Type, Dictionary<string, PropertyInfo>, Dictionary<string, PropertyInfo>)> propertysDict = new();
 
             // 遍历每个工作表

@@ -28,16 +28,16 @@ namespace ThingsGateway.SqlSugar
         /// 初始化 QuestDbRestAPI 实例
         /// </summary>
         /// <param name="db">SqlSugar 数据库客户端</param>
-        public QuestDbRestAPI(ISqlSugarClient db)
+        /// <param name="httpPort">restApi端口</param>
+        public QuestDbRestAPI(ISqlSugarClient db, int httpPort = 9000)
         {
             var builder = new DbConnectionStringBuilder();
             builder.ConnectionString = db.CurrentConnectionConfig.ConnectionString;
             this.db = db;
-            string httpPort = String.Empty;
             string host = String.Empty;
             string username = String.Empty;
             string password = String.Empty;
-            QuestDbRestAPHelper.SetRestApiInfo(builder, ref host, ref httpPort, ref username, ref password);
+            QuestDbRestAPHelper.SetRestApiInfo(builder, ref host, ref username, ref password);
             BindHost(host, httpPort, username, password);
         }
 
@@ -68,34 +68,34 @@ namespace ThingsGateway.SqlSugar
             return ExecuteCommandAsync(sql).GetAwaiter().GetResult();
         }
 
-        /// <summary>
-        /// 异步批量插入单条数据
-        /// </summary>
-        /// <typeparam name="T">数据类型</typeparam>
-        /// <param name="insertData">要插入的数据</param>
-        /// <param name="dateFormat">日期格式字符串</param>
-        /// <returns>影响的行数</returns>
-        public async Task<int> BulkCopyAsync<T>(T insertData, string dateFormat = "yyyy/M/d H:mm:ss") where T : class, new()
-        {
-            if (db.CurrentConnectionConfig.MoreSettings == null)
-                db.CurrentConnectionConfig.MoreSettings = new ConnMoreSettings();
-            db.CurrentConnectionConfig.MoreSettings.DisableNvarchar = true;
-            var sql = db.InsertableT(insertData).ToSqlString();
-            var result = await ExecuteCommandAsync(sql).ConfigureAwait(false);
-            return result.Contains("OK", StringComparison.OrdinalIgnoreCase) ? 1 : 0;
-        }
+        ///// <summary>
+        ///// 异步批量插入单条数据
+        ///// </summary>
+        ///// <typeparam name="T">数据类型</typeparam>
+        ///// <param name="insertData">要插入的数据</param>
+        ///// <param name="dateFormat">日期格式字符串</param>
+        ///// <returns>影响的行数</returns>
+        //public async Task<int> BulkCopyAsync<T>(T insertData, string dateFormat = "yyyy/M/d H:mm:ss") where T : class, new()
+        //{
+        //    if (db.CurrentConnectionConfig.MoreSettings == null)
+        //        db.CurrentConnectionConfig.MoreSettings = new ConnMoreSettings();
+        //    db.CurrentConnectionConfig.MoreSettings.DisableNvarchar = true;
+        //    var sql = db.InsertableT(insertData).ToSqlString();
+        //    var result = await ExecuteCommandAsync(sql).ConfigureAwait(false);
+        //    return result.Contains("OK", StringComparison.OrdinalIgnoreCase) ? 1 : 0;
+        //}
 
-        /// <summary>
-        /// 同步批量插入单条数据
-        /// </summary>
-        /// <typeparam name="T">数据类型</typeparam>
-        /// <param name="insertData">要插入的数据</param>
-        /// <param name="dateFormat">日期格式字符串</param>
-        /// <returns>影响的行数</returns>
-        public int BulkCopy<T>(T insertData, string dateFormat = "yyyy/M/d H:mm:ss") where T : class, new()
-        {
-            return BulkCopyAsync(insertData, dateFormat).GetAwaiter().GetResult();
-        }
+        ///// <summary>
+        ///// 同步批量插入单条数据
+        ///// </summary>
+        ///// <typeparam name="T">数据类型</typeparam>
+        ///// <param name="insertData">要插入的数据</param>
+        ///// <param name="dateFormat">日期格式字符串</param>
+        ///// <returns>影响的行数</returns>
+        //public int BulkCopy<T>(T insertData, string dateFormat = "yyyy/M/d H:mm:ss") where T : class, new()
+        //{
+        //    return BulkCopyAsync(insertData, dateFormat).GetAwaiter().GetResult();
+        //}
 
         /// <summary>
         /// 创建分页批量插入器
@@ -115,9 +115,10 @@ namespace ThingsGateway.SqlSugar
         /// </summary>
         /// <typeparam name="T">数据类型</typeparam>
         /// <param name="insertList">要插入的数据列表</param>
+        /// <param name="tableName">表名称</param>
         /// <param name="dateFormat">日期格式字符串</param>
         /// <returns>插入的记录数</returns>
-        public async Task<int> BulkCopyAsync<T>(List<T> insertList, string dateFormat = "yyyy/M/d H:mm:ss") where T : class, new()
+        public async Task<int> BulkCopyAsync<T>(List<T> insertList, string tableName = null, string dateFormat = "yyyy/M/d H:mm:ss") where T : class, new()
         {
             var result = 0;
             var fileName = $"{Guid.NewGuid()}.csv";
@@ -127,12 +128,12 @@ namespace ThingsGateway.SqlSugar
                 // 准备多部分表单数据
                 var boundary = "---------------" + DateTime.Now.Ticks.ToString("x");
                 var list = new List<Hashtable>();
-                var name = db.EntityMaintenance.GetEntityInfo<T>().DbTableName;
+                tableName ??= db.EntityMaintenance.GetEntityInfo<T>().DbTableName;
 
                 // 获取或创建列信息缓存
                 var key = "QuestDbBulkCopy" + typeof(T).FullName + typeof(T).GetHashCode();
                 var columns = ReflectionInoCacheService.Instance.GetOrCreate(key, () =>
-                 db.CopyNew().DbMaintenance.GetColumnInfosByTableName(name));
+                 db.CopyNew().DbMaintenance.GetColumnInfosByTableName(tableName));
 
                 // 构建schema信息
                 columns.ForEach(d =>
@@ -170,8 +171,8 @@ namespace ThingsGateway.SqlSugar
                 // 准备HTTP请求内容
                 using var httpContent = new MultipartFormDataContent(boundary);
                 using var fileStream = File.OpenRead(filePath);
-                if (!string.IsNullOrWhiteSpace(this.authorization))
-                    client.DefaultRequestHeaders.Add("Authorization", this.authorization);
+                //if (!string.IsNullOrWhiteSpace(this.authorization))
+                //    client.DefaultRequestHeaders.Add("Authorization", this.authorization);
                 httpContent.Add(new StringContent(schema), "schema");
                 var streamContent = new StreamContent(fileStream);
                 streamContent.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
@@ -184,7 +185,7 @@ namespace ThingsGateway.SqlSugar
 
                 // 发送请求并处理响应
                 var httpResponseMessage =
-                    await Post(client, name, httpContent).ConfigureAwait(false);
+                    await Post(client, tableName, httpContent).ConfigureAwait(false);
                 var readAsStringAsync = await httpResponseMessage.Content.ReadAsStringAsync().ConfigureAwait(false);
                 var splitByLine = QuestDbRestAPHelper.SplitByLine(readAsStringAsync);
 
@@ -266,11 +267,12 @@ namespace ThingsGateway.SqlSugar
         /// </summary>
         /// <typeparam name="T">数据类型</typeparam>
         /// <param name="insertList">要插入的数据列表</param>
+        /// <param name="tableName">表名称</param>
         /// <param name="dateFormat">日期格式字符串</param>
         /// <returns>插入的记录数</returns>
-        public int BulkCopy<T>(List<T> insertList, string dateFormat = "yyyy/M/d H:mm:ss") where T : class, new()
+        public int BulkCopy<T>(List<T> insertList, string tableName = null, string dateFormat = "yyyy/M/d H:mm:ss") where T : class, new()
         {
-            return BulkCopyAsync(insertList, dateFormat).GetAwaiter().GetResult();
+            return BulkCopyAsync(insertList, tableName, dateFormat).GetAwaiter().GetResult();
         }
 
         /// <summary>
@@ -280,7 +282,7 @@ namespace ThingsGateway.SqlSugar
         /// <param name="httpPort">HTTP端口</param>
         /// <param name="username">用户名</param>
         /// <param name="password">密码</param>
-        private void BindHost(string host, string httpPort, string username, string password)
+        private void BindHost(string host, int httpPort, string username, string password)
         {
             url = host;
             if (url.EndsWith('/'))

@@ -7,15 +7,11 @@ namespace ThingsGateway.SqlSugar
         /// <summary>
         /// 绑定RestAPI需要的信息
         /// </summary>
-        public static void SetRestApiInfo(DbConnectionStringBuilder builder, ref string host, ref string httpPort, ref string username, ref string password)
+        public static void SetRestApiInfo(DbConnectionStringBuilder builder, ref string host, ref string username, ref string password)
         {
             if (builder.TryGetValue("Host", out object hostValue))
             {
                 host = Convert.ToString(hostValue);
-            }
-            if (builder.TryGetValue("HttpPort", out object httpPortValue))
-            {
-                httpPort = Convert.ToString(httpPortValue);
             }
             if (builder.TryGetValue("Username", out object usernameValue))
             {

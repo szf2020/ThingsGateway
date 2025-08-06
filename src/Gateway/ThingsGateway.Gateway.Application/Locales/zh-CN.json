@@ -1,4 +1,22 @@
 ﻿{
+  "ThingsGateway.Management.Application._Imports": {
+    "Restart": "重启",
+    "Upgrade": "更新"
+  },
+  "ThingsGateway.Management.Application.SaveUpdateZipFile": {
+    "DownTemplate": "下载模板",
+    "SaveUpdateZipFile": "上传版本包"
+  },
+  "ThingsGateway.Management.Application.UpdateZipFile": {
+    "AppName": "名称",
+    "Architecture": "架构",
+    "DotNetVersion": ".net版本",
+    "FilePath": "文件路径",
+    "FileSize": "文件大小",
+    "MinimumCompatibleVersion": "最小兼容版本",
+    "OSPlatform": "系统版本",
+    "Version": "版本"
+  },
 
   "ThingsGateway.Gateway.Application.DefaultDiagram": {
 
@@ -51,11 +69,8 @@
     "RulesId": "名称"
   },
 
-  "ThingsGateway.Management.AutoUpdateController": {
-    "AutoUpdateController": "程序更新",
-    "Update": "更新"
-  },
-  "ThingsGateway.Management.RedundancyHostedService": {
+
+  "ThingsGateway.Gateway.Application.RedundancyHostedService": {
     "ErrorSynchronizingData": "同步数据到从站错误",
     "RedundancyDisable": "不启用网关冗余站点",
     "RedundancyDup": "主备站设置重复",
@@ -65,10 +80,10 @@
     "SwitchNormalState": "本机(主站)将切换到正常状态",
     "SwitchSlaveState": "主站已恢复，本机(从站)将切换到备用状态"
   },
-  "ThingsGateway.Management.RedundancyOptions": {
+  "ThingsGateway.Gateway.Application.RedundancyOptions": {
     "Confirm": "确认切换冗余状态",
     "Enable": "启用双机冗余",
-    "ForcedSync": "强制同步",
+    "RedundancyForcedSync": "强制同步",
     "ForcedSyncWarning": "强制同步会生成数据库配置信息，是否继续?",
     "HeartbeatInterval": "心跳间隔",
     "IsMaster": "是否为主站",
@@ -84,13 +99,13 @@
     "SyncInterval": "数据同步间隔",
     "VerifyToken": "Token"
   },
-  "ThingsGateway.Management.RedundancyService": {
+  "ThingsGateway.Gateway.Application.RedundancyService": {
     "EditRedundancyOption": "修改网关冗余配置"
   },
-  "ThingsGateway.Management.UpdateZipFileHostedService": {
+  "ThingsGateway.Gateway.Application.UpdateZipFileService": {
     "Update": "检测到新版本"
   },
-  "ThingsGateway.Upgrade.UpdateZipFile": {
+  "ThingsGateway.Gateway.Application.UpdateZipFile": {
     "AppName": "名称",
     "Architecture": "架构",
     "DotNetVersion": ".net版本",

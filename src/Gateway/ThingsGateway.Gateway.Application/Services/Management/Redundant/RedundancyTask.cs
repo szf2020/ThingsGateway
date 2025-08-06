@@ -14,7 +14,6 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
 
 using ThingsGateway.Extension.Generic;
-using ThingsGateway.Gateway.Application;
 using ThingsGateway.NewLife;
 
 using TouchSocket.Core;
@@ -24,7 +23,7 @@ using TouchSocket.Rpc;
 using TouchSocket.Rpc.Generators;
 using TouchSocket.Sockets;
 
-namespace ThingsGateway.Management;
+namespace ThingsGateway.Gateway.Application;
 
 internal sealed class RedundancyTask : IRpcDriver, IAsyncDisposable
 {
@@ -238,9 +237,9 @@ internal sealed class RedundancyTask : IRpcDriver, IAsyncDisposable
         return GlobalData.ChannelRuntimeService.RestartChannelAsync(GlobalData.ReadOnlyIdChannels.Values);
     }
 
-    public async Task StartTaskAsync(CancellationToken cancellationToken)
+    public async Task StartRedundancyTaskAsync(CancellationToken cancellationToken = default)
     {
-        await StopTaskAsync().ConfigureAwait(false);
+        await StopRedundancyTaskAsync().ConfigureAwait(false);
         RedundancyOptions = (await _redundancyService.GetRedundancyAsync().ConfigureAwait(false)).AdaptRedundancyOptions();
 
         if (RedundancyOptions?.Enable == true)
@@ -278,7 +277,7 @@ internal sealed class RedundancyTask : IRpcDriver, IAsyncDisposable
             scheduledTask.Start();
         }
     }
-    public async Task StopTaskAsync()
+    public async Task StopRedundancyTaskAsync()
     {
         if (scheduledTask?.Enable == true)
         {
@@ -310,7 +309,7 @@ internal sealed class RedundancyTask : IRpcDriver, IAsyncDisposable
 
     public async ValueTask DisposeAsync()
     {
-        await StopTaskAsync().ConfigureAwait(false);
+        await StopRedundancyTaskAsync().ConfigureAwait(false);
         TextLogger?.TryDispose();
         scheduledTask?.SafeDispose();
 
@@ -336,13 +335,22 @@ internal sealed class RedundancyTask : IRpcDriver, IAsyncDisposable
                .ConfigureContainer(a =>
                {
                    a.AddLogger(LogMessage);
-                   a.AddRpcStore(store => store.RegisterServer(typeof(IRedundantRpcServer), new RedundantRpcServer(this)));
+                   a.AddRpcStore(store =>
+                   {
+                       store.RegisterServer<IRedundantRpcServer>(new RedundantRpcServer(this));
+
+                   });
                })
                .ConfigurePlugins(a =>
                {
                    a.UseTcpSessionCheckClear();
 
-                   a.UseDmtpRpc();
+                   a.UseDmtpRpc().ConfigureDefaultSerializationSelector(b =>
+                   {
+                       b.UseSystemTextJson(json =>
+                       {
+                       });
+                   });
                    a.UseDmtpHeartbeat()//使用Dmtp心跳
                    .SetTick(TimeSpan.FromMilliseconds(redundancy.HeartbeatInterval))
                    .SetMaxFailCount(redundancy.MaxErrorCount);
@@ -367,12 +375,21 @@ internal sealed class RedundancyTask : IRpcDriver, IAsyncDisposable
                .ConfigureContainer(a =>
                {
                    a.AddLogger(LogMessage);
-                   a.AddRpcStore(store => store.RegisterServer(typeof(IRedundantRpcServer), new RedundantRpcServer(this)));
+                   a.AddRpcStore(store =>
+                   {
+                       store.RegisterServer<IRedundantRpcServer>(new RedundantRpcServer(this));
+
+                   });
                })
                .ConfigurePlugins(a =>
                {
                    a.UseTcpSessionCheckClear();
-                   a.UseDmtpRpc();
+                   a.UseDmtpRpc().ConfigureDefaultSerializationSelector(b =>
+                   {
+                       b.UseSystemTextJson(json =>
+                       {
+                       });
+                   });
                    a.UseDmtpHeartbeat()//使用Dmtp心跳
                    .SetTick(TimeSpan.FromMilliseconds(redundancy.HeartbeatInterval))
                    .SetMaxFailCount(redundancy.MaxErrorCount);
@@ -396,10 +413,10 @@ internal sealed class RedundancyTask : IRpcDriver, IAsyncDisposable
 
     #endregion
 
-    #region ForcedSync
+    #region RedundancyForcedSync
 
     WaitLock ForcedSyncWaitLock = new WaitLock(nameof(RedundancyTask));
-    public async Task ForcedSync(CancellationToken cancellationToken = default)
+    public async Task RedundancyForcedSync(CancellationToken cancellationToken = default)
     {
         await ForcedSyncWaitLock.WaitAsync(cancellationToken).ConfigureAwait(false);
         try
@@ -420,7 +437,7 @@ internal sealed class RedundancyTask : IRpcDriver, IAsyncDisposable
 
                 if (!online)
                 {
-                    LogMessage?.LogWarning("ForcedSync data error, no client online");
+                    LogMessage?.LogWarning("RedundancyForcedSync data error, no client online");
                     return;
                 }
 
@@ -439,7 +456,7 @@ internal sealed class RedundancyTask : IRpcDriver, IAsyncDisposable
             catch (OperationCanceledException) { }
             catch (Exception ex)
             {
-                LogMessage?.LogWarning(ex, "ForcedSync data error");
+                LogMessage?.LogWarning(ex, "RedundancyForcedSync data error");
             }
         }
         finally
@@ -488,7 +505,7 @@ internal sealed class RedundancyTask : IRpcDriver, IAsyncDisposable
             await client.GetDmtpRpcActor().SyncDataAsync(channelBatch.ToList(), deviceBatch.ToList(), variableBatch, invokeOption).ConfigureAwait(false);
         }
 
-        LogMessage?.LogTrace($"ForcedSync data success");
+        LogMessage?.LogTrace($"RedundancyForcedSync data success");
     }
 
     #endregion

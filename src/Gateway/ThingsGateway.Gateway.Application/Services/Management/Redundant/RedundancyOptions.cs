@@ -10,7 +10,7 @@
 
 using System.ComponentModel.DataAnnotations;
 
-namespace ThingsGateway.Management;
+namespace ThingsGateway.Gateway.Application;
 
 /// <summary>
 /// 冗余配置

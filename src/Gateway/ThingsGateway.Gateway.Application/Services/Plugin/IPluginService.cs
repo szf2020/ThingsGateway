@@ -15,10 +15,19 @@ namespace ThingsGateway.Gateway.Application;
 /// <summary>
 /// 驱动插件服务
 /// </summary>
-public interface IPluginService
+public interface IPluginService : IPluginPageService
 {
     Type GetDebugUI(string pluginName);
     Type GetAddressUI(string pluginName);
+
+
+    /// <summary>
+    /// 根据插件类型获取信息
+    /// </summary>
+    /// <param name="pluginType"></param>
+    /// <returns></returns>
+    List<PluginInfo> GetPluginListSync(PluginTypeEnum? pluginType = null);
+
 
     /// <summary>
     /// 根据插件全名称构建插件实例
@@ -40,12 +49,7 @@ public interface IPluginService
     /// <returns></returns>
     (IEnumerable<IEditorItem> EditorItems, object Model, Type PropertyUIType) GetDriverPropertyTypes(string pluginName, IDriver? driver = null);
 
-    /// <summary>
-    /// 根据插件类型获取信息
-    /// </summary>
-    /// <param name="pluginType"></param>
-    /// <returns></returns>
-    List<PluginInfo> GetList(PluginTypeEnum? pluginType = null);
+
 
     /// <summary>
     /// 获取变量属性
@@ -55,22 +59,6 @@ public interface IPluginService
     /// <returns></returns>
     (IEnumerable<IEditorItem> EditorItems, object Model, Type VariablePropertyUIType) GetVariablePropertyTypes(string pluginName, BusinessBase? businessBase = null);
 
-    /// <summary>
-    /// 分页显示插件
-    /// </summary>
-    public QueryData<PluginInfo> Page(QueryPageOptions options, PluginTypeEnum? pluginTypeEnum = null);
-
-    /// <summary>
-    /// 重载插件
-    /// </summary>
-    void Reload();
-
-    /// <summary>
-    /// 添加插件
-    /// </summary>
-    /// <param name="plugin"></param>
-    /// <returns></returns>
-    Task SavePlugin(PluginAddInput plugin);
 
     /// <summary>
     /// 设置插件动态属性

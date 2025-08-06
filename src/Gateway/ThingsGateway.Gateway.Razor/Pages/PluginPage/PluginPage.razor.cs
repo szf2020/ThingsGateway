@@ -16,7 +16,7 @@ public partial class PluginPage
 
     [Inject]
     [NotNull]
-    private IPluginService? PluginService { get; set; }
+    private IPluginPageService? PluginService { get; set; }
 
     private PluginInfo SearchModel { get; set; } = new();
 
@@ -24,7 +24,7 @@ public partial class PluginPage
     {
         return await Task.Run(() =>
         {
-            var data = PluginService.Page(options);
+            var data = PluginService.PluginPage(options);
             return data;
         });
     }
@@ -69,14 +69,14 @@ public partial class PluginPage
         };
         op.Component = BootstrapDynamicComponent.CreateComponent<SavePlugin>(new Dictionary<string, object?>
         {
-            [nameof(SavePlugin.OnSavePlugin)] = new Func<PluginAddInput, Task>(PluginService.SavePlugin),
+            [nameof(SavePlugin.OnSavePlugin)] = new Func<PluginAddInput, Task>(PluginInfoUtil.SavePlugin),
         });
         await DialogService.Show(op);
     }
 
-    private void OnReload()
+    private Task OnReload()
     {
-        PluginService.Reload();
+        return PluginService.ReloadPlugin();
     }
 
     #endregion 添加

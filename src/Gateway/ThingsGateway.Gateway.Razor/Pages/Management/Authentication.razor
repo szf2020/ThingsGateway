@@ -1,4 +1,4 @@
-﻿@namespace ThingsGateway.Management
+﻿@namespace ThingsGateway.Gateway.Razor
 @using ThingsGateway
 @using ThingsGateway.Authentication
 @if (WebsiteOption.Value.ShowAuthorize)
@@ -14,8 +14,10 @@
 
                             @Localizer["UUID"]
                         </label>
-
-                        <Textarea Value="@ProAuthentication.UUID" rows="5" />
+                        @if (AuthorizeInfo != null)
+                        {
+                            <Textarea Value="@AuthorizeInfo.Uuid" rows="5" />
+                        }
                     </div>
                 </div>
 

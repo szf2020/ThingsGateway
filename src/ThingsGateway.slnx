@@ -62,15 +62,7 @@
   <Folder Name="/Plugin/test/">
     <Project Path="Plugin/ThingsGateway.Foundation.Test/ThingsGateway.Foundation.Test.csproj" />
   </Folder>
-  <Folder Name="/Upgrade/">
-    <Project Path="Upgrade/ThingsGateway.Upgrade/ThingsGateway.Upgrade.csproj" />
-    <Project Path="Upgrade/ThingsGateway.UpgradeServer/ThingsGateway.UpgradeServer.csproj" />
-  </Folder>
   <Project Path="ThingsGateway.Photino/ThingsGateway.Photino.csproj" />
   <Project Path="ThingsGateway.RemoteWebApp/ThingsGateway.RemoteWebApp.csproj" />
   <Project Path="ThingsGateway.Server/ThingsGateway.Server.csproj" />
-  <Properties Name="ExtensibilityGlobals" Scope="PostLoad">
-    <Property Name="RESX_NeutralResourcesLanguage" Value="zh-Hans" />
-    <Property Name="RESX_Rules" Value="{&quot;EnabledRules&quot;:[]}" />
-  </Properties>
 </Solution>

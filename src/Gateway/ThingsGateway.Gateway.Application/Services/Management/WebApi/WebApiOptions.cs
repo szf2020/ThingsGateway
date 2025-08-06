@@ -12,7 +12,7 @@ using System.ComponentModel.DataAnnotations;
 
 using ThingsGateway.ConfigurableOptions;
 
-namespace ThingsGateway.Management;
+namespace ThingsGateway.Gateway.Application;
 public class WebApiOptions : IConfigurableOptions
 {
     public bool Enable { get; set; }

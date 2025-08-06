@@ -8,12 +8,11 @@
 // QQ群：605534569
 // ------------------------------------------------------------------------------
 
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
 namespace ThingsGateway.Gateway.Application;
 
-public interface IGatewayMonitorHostedService : IHostedService
+public interface IGatewayMonitorHostedService
 {
     public ILogger Logger { get; }
 }

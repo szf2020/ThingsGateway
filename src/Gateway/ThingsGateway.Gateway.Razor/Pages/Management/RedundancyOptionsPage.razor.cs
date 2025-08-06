@@ -14,7 +14,7 @@ using Microsoft.AspNetCore.Components.Web;
 
 using TouchSocket.Core;
 
-namespace ThingsGateway.Management;
+namespace ThingsGateway.Gateway.Razor;
 
 public partial class RedundancyOptionsPage
 {
@@ -34,17 +34,37 @@ public partial class RedundancyOptionsPage
     private RedundancyOptions Model { get; set; }
 
     [Parameter, EditorRequired]
-    public ILog Logger { get; set; }
+    public LogLevel LogLevel { get; set; }
+
+    [Parameter, EditorRequired]
+    public Func<LogLevel, Task> LogLevelChanged { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        var logLevel = await RedundancyHostedService.RedundancyLogLevel();
+        if (logLevel != LogLevel)
+        {
+            LogLevel = logLevel;
+            if (LogLevelChanged != null)
+            {
+                await LogLevelChanged?.Invoke(LogLevel);
+            }
+            await InvokeAsync(StateHasChanged);
+        }
+        await base.OnAfterRenderAsync(firstRender);
+    }
 
     [Inject]
     [NotNull]
     public IStringLocalizer<ThingsGateway.Gateway.Razor._Imports> GatewayLocalizer { get; set; }
+
+
     /// <inheritdoc/>
     protected override async Task OnInitializedAsync()
     {
-        await base.OnInitializedAsync();
         HeaderText = GatewayLocalizer[nameof(HeaderText)];
         Model = (await RedundancyService.GetRedundancyAsync()).AdaptRedundancyOptions();
+        await base.OnInitializedAsync();
     }
 
     [Inject]
@@ -54,6 +74,9 @@ public partial class RedundancyOptionsPage
     [Inject]
     [NotNull]
     private IRedundancyService? RedundancyService { get; set; }
+
+
+
 
     [Inject]
     [NotNull]
@@ -72,8 +95,8 @@ public partial class RedundancyOptionsPage
                 await RedundancyService.EditRedundancyOptionAsync(Model);
                 await ToastService.Success(RedundancyLocalizer[nameof(RedundancyOptions)], $"{RazorLocalizer["Save"]}{RazorLocalizer["Success"]}");
 
-                await RedundancyHostedService.StopTaskAsync();
-                await RedundancyHostedService.StartTaskAsync(CancellationToken.None);
+                await RedundancyHostedService.StopRedundancyTaskAsync();
+                await RedundancyHostedService.StartRedundancyTaskAsync();
                 await ToastService.Success(RedundancyLocalizer[nameof(RedundancyOptions)], $"{RazorLocalizer["Success"]}");
 
                 await InvokeAsync(StateHasChanged);
@@ -85,7 +108,7 @@ public partial class RedundancyOptionsPage
         }
     }
 
-    private async Task ForcedSync(MouseEventArgs args)
+    private async Task RedundancyForcedSync(MouseEventArgs args)
     {
         var ret = await SwalService.ShowModal(new SwalOption()
         {
@@ -94,7 +117,7 @@ public partial class RedundancyOptionsPage
         });
         if (ret)
         {
-            await RedundancyHostedService.ForcedSync();
+            await RedundancyHostedService.RedundancyForcedSync();
         }
     }
 }

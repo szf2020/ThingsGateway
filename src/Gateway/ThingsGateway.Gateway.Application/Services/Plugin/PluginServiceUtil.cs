@@ -67,44 +67,6 @@ public static class PluginServiceUtil
         return cols;
     }
 
-    /// <summary>
-    /// 根据插件FullName获取插件主程序集名称和插件类型名称
-    /// </summary>
-    /// <param name="pluginName"></param>
-    /// <returns></returns>
-    public static (string FileName, string TypeName) GetFileNameAndTypeName(string pluginName)
-    {
-        if (pluginName.IsNullOrWhiteSpace())
-            return (string.Empty, string.Empty);
-        // 查找最后一个 '.' 的索引
-        int lastIndex = pluginName.LastIndexOf('.');
-
-        // 如果找到了最后一个 '.'，并且它不是最后一个字符
-        if (lastIndex != -1 && lastIndex < pluginName.Length - 1)
-        {
-            // 获取子串直到最后一个 '.'
-            string part1 = pluginName.Substring(0, lastIndex);
-            // 获取最后一个 '.' 后面的部分
-            string part2 = pluginName.Substring(lastIndex + 1);
-            return (part1, part2);
-        }
-        else
-        {
-            // 如果没有找到 '.'，或者 '.' 是最后一个字符，则返回默认的键和插件名称
-            return (nameof(ThingsGateway), pluginName);
-        }
-    }
-
-    /// <summary>
-    /// 根据插件主程序集名称和插件类型名称获取插件FullName
-    /// </summary>
-    /// <param name="fileName"></param>
-    /// <param name="name"></param>
-    /// <returns></returns>
-    public static string GetFullName(string fileName, string name)
-    {
-        return string.IsNullOrEmpty(fileName) ? name : $"{fileName}.{name}";
-    }
 
     public static bool HasDynamicProperty(object model)
     {

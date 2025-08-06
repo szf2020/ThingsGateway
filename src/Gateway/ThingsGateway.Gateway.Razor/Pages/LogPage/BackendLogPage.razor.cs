@@ -26,7 +26,7 @@ public partial class BackendLogPage
         if (App.HostApplicationLifetime.ApplicationStopping.IsCancellationRequested) return (new ChartDataSource());
         if (ChartDataSource == null)
         {
-            var dayStatisticsOutputs = await BackendLogService.StatisticsByDayAsync(7);
+            var dayStatisticsOutputs = await BackendLogService.BackendLogStatisticsByDayAsync(7);
             ChartDataSource = new ChartDataSource();
             ChartDataSource.Options.Title = Localizer[nameof(BackendLog)];
             ChartDataSource.Options.X.Title = Localizer["Date"];
@@ -59,7 +59,7 @@ public partial class BackendLogPage
         }
         else
         {
-            var dayStatisticsOutputs = await BackendLogService.StatisticsByDayAsync(7);
+            var dayStatisticsOutputs = await BackendLogService.BackendLogStatisticsByDayAsync(7);
             ChartDataSource.Labels = dayStatisticsOutputs.Select(a => a.Date);
             ChartDataSource.Data[0].Data = dayStatisticsOutputs.Select(a => (object)a.DebugCount);
             ChartDataSource.Data[1].Data = dayStatisticsOutputs.Select(a => (object)a.InfoCount);
@@ -79,7 +79,7 @@ public partial class BackendLogPage
     {
         return await Task.Run(async () =>
           {
-              var data = await BackendLogService.PageAsync(options);
+              var data = await BackendLogService.BackendLogPageAsync(options);
               return data;
           });
     }

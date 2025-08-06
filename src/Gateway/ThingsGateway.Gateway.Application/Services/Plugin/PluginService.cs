@@ -35,7 +35,7 @@ internal sealed class PluginService : IPluginService
     /// </summary>
     public const string DirName = "GatewayPlugins";
 
-    private const string CacheKeyGetPluginOutputs = $"ThingsGateway.Gateway.Application.{nameof(PluginService)}{nameof(GetList)}";
+    private const string CacheKeyGetPluginOutputs = $"ThingsGateway.Gateway.Application.{nameof(PluginService)}{nameof(GetPluginListSync)}";
     private const string SaveEx = ".save";
     private const string DelEx = ".del";
 
@@ -69,6 +69,7 @@ internal sealed class PluginService : IPluginService
     /// </summary>
     private System.Collections.ObjectModel.ReadOnlyDictionary<string, Type> _defaultDriverBaseDict { get; }
 
+
     /// <summary>
     /// 插件FullName/插件Type
     /// </summary>
@@ -100,7 +101,7 @@ internal sealed class PluginService : IPluginService
             _locker.Wait();
 
             // 解析插件名称，获取文件名和类型名
-            var filtResult = PluginServiceUtil.GetFileNameAndTypeName(pluginName);
+            var filtResult = PluginInfoUtil.GetFileNameAndTypeName(pluginName);
 
             // 如果是默认键，则搜索主程序上下文中的类型
             if (_defaultDriverBaseDict.TryGetValue(pluginName, out var type))
@@ -258,7 +259,29 @@ internal sealed class PluginService : IPluginService
     /// </summary>
     /// <param name="pluginType">要筛选的插件类型，可选参数</param>
     /// <returns>符合条件的插件列表</returns>
-    public List<PluginInfo> GetList(PluginTypeEnum? pluginType = null)
+    public Task<List<PluginInfo>> GetPluginListAsync(PluginTypeEnum? pluginType = null)
+    {
+        // 获取完整的插件列表
+        var pluginList = PrivateGetList();
+
+        if (pluginType == null)
+        {
+            // 如果未指定插件类型，则返回完整的插件列表
+            return Task.FromResult(pluginList.ToList());
+        }
+
+        // 筛选出指定类型的插件
+        var filteredPlugins = pluginList.Where(c => c.PluginType == pluginType).ToList();
+
+        return Task.FromResult(filteredPlugins);
+    }
+
+    /// <summary>
+    /// 获取插件信息的方法，可以根据插件类型筛选插件列表。
+    /// </summary>
+    /// <param name="pluginType">要筛选的插件类型，可选参数</param>
+    /// <returns>符合条件的插件列表</returns>
+    public List<PluginInfo> GetPluginListSync(PluginTypeEnum? pluginType = null)
     {
         // 获取完整的插件列表
         var pluginList = PrivateGetList();
@@ -274,7 +297,6 @@ internal sealed class PluginService : IPluginService
 
         return filteredPlugins;
     }
-
     /// <summary>
     /// 获取变量的属性类型
     /// </summary>
@@ -308,21 +330,21 @@ internal sealed class PluginService : IPluginService
     /// <summary>
     /// 分页显示插件
     /// </summary>
-    public QueryData<PluginInfo> Page(QueryPageOptions options, PluginTypeEnum? pluginType = null)
+    public async Task<QueryData<PluginInfo>> PluginPage(QueryPageOptions options, PluginTypeEnum? pluginType = null)
     {
         //指定关键词搜索为插件FullName
-        var query = GetList(pluginType).WhereIf(!options.SearchText.IsNullOrWhiteSpace(), a => a.FullName.Contains(options.SearchText)).GetQueryData(options);
+        var query = (await GetPluginListAsync(pluginType).ConfigureAwait(false)).WhereIf(!options.SearchText.IsNullOrWhiteSpace(), a => a.FullName.Contains(options.SearchText)).GetQueryData(options);
         return query;
     }
 
     /// <summary>
     /// 移除全部插件
     /// </summary>
-    public void Reload()
+    public async Task ReloadPlugin()
     {
         try
         {
-            _locker.Wait();
+            await _locker.WaitAsync().ConfigureAwait(false);
             _driverBaseDict.Clear();
             foreach (var item in _assemblyLoadContextDict)
             {
@@ -335,53 +357,56 @@ internal sealed class PluginService : IPluginService
         {
             _locker.Release();
         }
+
     }
 
+
+
+    private WaitLock SaveLock = new(nameof(PluginService));
     /// <summary>
     /// 异步保存驱动程序信息。
     /// </summary>
     /// <param name="plugin">要保存的插件信息。</param>
     [OperDesc("SavePlugin", isRecordPar: false, localizerType: typeof(PluginAddInput))]
-    public async Task SavePlugin(PluginAddInput plugin)
+    public async Task SavePluginByPath(PluginAddPathInput plugin)
     {
         try
         {
             // 等待锁可用
-            await _locker.WaitAsync().ConfigureAwait(false);
-
+            await SaveLock.WaitAsync().ConfigureAwait(false);
+            var tempDir = DirName;
             // 创建程序集加载上下文
             var assemblyLoadContext = new AssemblyLoadContext(CommonUtils.GetSingleId().ToString(), true);
             // 存储其他文件的内存流列表
             List<(string Name, MemoryStream MemoryStream)> otherFilesStreams = new();
-            var maxFileSize = 100 * 1024 * 1024; // 最大100MB
 
             // 获取主程序集文件名
-            var mainFileName = Path.GetFileNameWithoutExtension(plugin.MainFile.Name);
+            var mainFileName = Path.GetFileNameWithoutExtension(plugin.MainFilePath);
             string fullDir = string.Empty;
             bool isDefaultDriver = false;
             //判定是否上下文程序集
             var defaultDriver = _defaultDriverBaseDict.FirstOrDefault(a => Path.GetFileNameWithoutExtension(new FileInfo(a.Value.Assembly.Location).Name) == mainFileName);
             if (defaultDriver.Value != null)
             {
-                var filtResult = PluginServiceUtil.GetFileNameAndTypeName(defaultDriver.Key);
+                var filtResult = PluginInfoUtil.GetFileNameAndTypeName(defaultDriver.Key);
                 fullDir = Path.GetDirectoryName(filtResult.FileName);
                 isDefaultDriver = true;
             }
             else
             {
                 // 构建插件文件夹绝对路径
-                fullDir = AppContext.BaseDirectory.CombinePathWithOs(DirName, mainFileName);
+                fullDir = AppContext.BaseDirectory.CombinePathWithOs(tempDir, mainFileName);
                 isDefaultDriver = false;
             }
-
+            // 获取主程序集文件流
+            MemoryStream mainMemoryStream = new MemoryStream();
             try
             {
                 // 构建主程序集绝对路径
-                var fullPath = fullDir.CombinePathWithOs(plugin.MainFile.Name);
+                var fullPath = fullDir.CombinePathWithOs(Path.GetFileName(plugin.MainFilePath));
 
-                // 获取主程序集文件流
-                using var stream = plugin.MainFile.OpenReadStream(maxFileSize);
-                MemoryStream mainMemoryStream = new MemoryStream();
+
+                using var stream = File.Open(plugin.MainFilePath, FileMode.Open, FileAccess.Read);
                 await stream.CopyToAsync(mainMemoryStream).ConfigureAwait(false);
                 mainMemoryStream.Seek(0, SeekOrigin.Begin);
 
@@ -389,14 +414,14 @@ internal sealed class PluginService : IPluginService
                 // 先加载到内存，如果成功添加后再装载到文件
                 // 加载主程序集
                 var assembly = assemblyLoadContext.LoadFromStream(mainMemoryStream);
-                foreach (var item in plugin.OtherFiles ?? new())
+                foreach (var item in plugin.OtherFilePaths ?? new())
                 {
                     // 获取附属文件流
-                    using var otherStream = item.OpenReadStream(maxFileSize);
+                    using var otherStream = File.Open(plugin.MainFilePath, FileMode.Open, FileAccess.Read);
                     MemoryStream memoryStream = new MemoryStream();
                     await otherStream.CopyToAsync(memoryStream).ConfigureAwait(false);
                     memoryStream.Seek(0, SeekOrigin.Begin);
-                    otherFilesStreams.Add((item.Name, memoryStream));
+                    otherFilesStreams.Add((Path.GetFileName(item), memoryStream));
                     try
                     {
                         // 尝试加载附属程序集
@@ -451,6 +476,16 @@ internal sealed class PluginService : IPluginService
             }
             finally
             {
+                if (mainMemoryStream != null)
+                    await mainMemoryStream.SafeDisposeAsync().ConfigureAwait(false);
+                otherFilesStreams.ForEach(async a =>
+                {
+                    if (a.MemoryStream != null)
+                    {
+                        await a.MemoryStream.SafeDisposeAsync().ConfigureAwait(false);
+                    }
+                });
+
                 // 卸载程序集加载上下文并清除缓存
                 assemblyLoadContext.Unload();
 
@@ -469,7 +504,7 @@ internal sealed class PluginService : IPluginService
         finally
         {
             // 释放锁资源
-            _locker.Release();
+            SaveLock.Release();
         }
     }
 
@@ -583,7 +618,7 @@ internal sealed class PluginService : IPluginService
         if (_assemblyLoadContextDict.TryGetValue(path, out var assemblyLoadContext))
         {
             //移除字典
-            _driverBaseDict.RemoveWhere(a => path == PluginServiceUtil.GetFileNameAndTypeName(a.Key).FileName);
+            _driverBaseDict.RemoveWhere(a => path == PluginInfoUtil.GetFileNameAndTypeName(a.Key).FileName);
             _assemblyLoadContextDict.Remove(path);
             //卸载
             assemblyLoadContext.AssemblyLoadContext.Unload();
@@ -713,6 +748,7 @@ internal sealed class PluginService : IPluginService
         {
             var plugins = new List<PluginInfo>();
             // 主程序上下文
+            string tempDir = DirName;
 
             // 遍历程序集上下文默认驱动字典，生成默认驱动插件信息
             foreach (var item in _defaultDriverBaseDict)
@@ -740,7 +776,7 @@ internal sealed class PluginService : IPluginService
             }
 
             // 获取插件文件夹路径列表
-            string[] folderPaths = Directory.GetDirectories(AppContext.BaseDirectory.CombinePathWithOs(DirName));
+            string[] folderPaths = Directory.GetDirectories(AppContext.BaseDirectory.CombinePathWithOs(tempDir));
 
             // 遍历插件文件夹
             foreach (string folderPath in folderPaths)
@@ -769,7 +805,7 @@ internal sealed class PluginService : IPluginService
                             {
                                 //添加到字典
                                 _driverBaseDict.TryAdd($"{driverMainName}.{type.Name}", type);
-                                _logger?.LogInformation(string.Format(AppResource.LoadTypeSuccess, PluginServiceUtil.GetFullName(driverMainName, type.Name)));
+                                _logger?.LogInformation(string.Format(AppResource.LoadTypeSuccess, PluginInfoUtil.GetFullName(driverMainName, type.Name)));
                             }
                             var plugin = new PluginInfo()
                             {
@@ -789,10 +825,15 @@ internal sealed class PluginService : IPluginService
                 catch (Exception ex)
                 {
                     // 记录加载插件失败的日志
-                    _logger?.LogWarning(ex, string.Format(AppResource.LoadPluginFail, Path.GetRelativePath(AppContext.BaseDirectory.CombinePathWithOs(DirName), folderPath)));
+                    _logger?.LogWarning(ex, string.Format(AppResource.LoadPluginFail, Path.GetRelativePath(AppContext.BaseDirectory.CombinePathWithOs(tempDir), folderPath)));
                 }
             }
             return plugins.DistinctBy(a => a.FullName).OrderBy(a => a.EducationPlugin);
         }
     }
+
+    //public Task SavePlugin(PluginAddInput plugin)
+    //{
+    //    return PluginInfoUtil.SavePlugin(plugin);
+    //}
 }

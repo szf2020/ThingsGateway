@@ -237,7 +237,7 @@
                                         GlobalData.ReadOnlyIdDevices.TryGetValue(item.Key, out var items);
                                     }
                                     <div class="flex-fill">
-                                        @($"{items.Name} - {PluginServiceUtil.GetFileNameAndTypeName(items?.PluginName).TypeName}")
+                                        @($"{items.Name} - {PluginInfoUtil.GetFileNameAndTypeName(items?.PluginName).TypeName}")
                                     </div>
 
                                     <Button OnClick=@((a)=>

@@ -2,31 +2,34 @@
 @using BootstrapBlazor.Components
 @using Microsoft.AspNetCore.Authorization
 @using ThingsGateway.Admin.Razor
-@using ThingsGateway.Debug
 @using ThingsGateway.Gateway.Application
 @using ThingsGateway.Admin.Application
 @using ThingsGateway.Razor
-@namespace ThingsGateway.Management
+@namespace ThingsGateway.Gateway.Razor
 
+@if(Model!=null)
+{
+    <div class=@($"{ClassString} row g-0 h-100 mx-2") style="min-height:500px;">
 
-<div class=@($"{ClassString} row g-0 h-100 mx-2") style="min-height:500px;">
+        <div class="col-12 col-md-6 h-100">
 
-    <div class="col-12 col-md-6 h-100">
+            <EditComponent ItemsPerRow=1 Model="Model" OnSave="OnSaveRedundancy" />
 
-        <EditComponent ItemsPerRow=1 Model="Model" OnSave="OnSaveRedundancy" />
+            <Button IsDisabled=@(!Model.IsMaster||(!Model.Enable)) OnClick="RedundancyForcedSync">@RedundancyLocalizer["RedundancyForcedSync"]</Button>
+        </div>
+        <div class="col-12 col-md-6 h-100">
 
-        <Button IsDisabled=@(!Model.IsMaster||(!Model.Enable)) OnClick="ForcedSync">@RedundancyLocalizer["ForcedSync"]</Button>
+                <ThingsGateway.Debug.LogConsole HeightString="calc(100% - 100px)" LogLevel=@(LogLevel) LogLevelChanged="async (a)=>{
+    LogLevel=a;
+    if(LogLevelChanged!=null)
+    {
+    await LogLevelChanged?.Invoke(a);
+    }
+    }" LogPath=@LogPath HeaderText=@HeaderText></ThingsGateway.Debug.LogConsole>
+
+        </div>
     </div>
-    <div class="col-12 col-md-6 h-100">
-
-        @if (Logger != null)
-        {
-            <LogConsole HeightString="calc(100% - 100px)" LogLevel=@(Logger.LogLevel) LogLevelChanged="(a)=>{
-Logger.LogLevel=a;
-}" LogPath=@LogPath HeaderText=@HeaderText></LogConsole>
-        }
-    </div>
-</div>
 
 
 
+}

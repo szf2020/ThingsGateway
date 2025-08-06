@@ -12,15 +12,13 @@ using Microsoft.Extensions.Logging;
 
 using System.Text;
 
-using ThingsGateway.Gateway.Application;
-
 using TouchSocket.Core;
 using TouchSocket.Http;
 using TouchSocket.Rpc;
 using TouchSocket.Sockets;
 using TouchSocket.WebApi.Swagger;
 
-namespace ThingsGateway.Management;
+namespace ThingsGateway.Gateway.Application;
 
 public partial class WebApiTask : AsyncDisposableObject
 {
@@ -143,6 +141,7 @@ public partial class WebApiTask : AsyncDisposableObject
             _httpService = null;
         }
         await base.DisposeAsync(disposing).ConfigureAwait(false);
+        TextLogger?.Dispose();
     }
 }
 /// <summary>

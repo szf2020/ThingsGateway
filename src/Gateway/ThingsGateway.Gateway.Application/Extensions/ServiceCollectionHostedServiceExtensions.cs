@@ -8,7 +8,6 @@
 // QQ群：605534569
 // ------------------------------------------------------------------------------
 
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 
 namespace Microsoft.Extensions.DependencyInjection;
@@ -19,30 +18,19 @@ namespace Microsoft.Extensions.DependencyInjection;
 [ThingsGateway.DependencyInjection.SuppressSniffer]
 public static class ServiceCollectionHostedServiceExtensions
 {
-    /// <summary>
-    /// Add an <see cref="IHostedService"/> registration for the given type.
-    /// </summary>
-    /// <typeparam name="THostedService">An <see cref="IHostedService"/> to register.</typeparam>
-    /// <param name="services">The <see cref="IServiceCollection"/> to register with.</param>
-    /// <returns>The original <see cref="IServiceCollection"/>.</returns>
-    public static IServiceCollection AddGatewayHostedService<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] THostedService>(this IServiceCollection services)
-        where THostedService : class, IHostedService
-    {
-        services.AddSingleton<THostedService>();
-        services.TryAddEnumerable(ServiceDescriptor.Singleton<IHostedService, THostedService>(seriveProvider => seriveProvider.GetService<THostedService>()));
-
-        return services;
-    }
 
     /// <summary>
     /// Add an <see cref="IHostedService"/> registration for the given type.
     /// </summary>
     public static IServiceCollection AddGatewayHostedService<TService, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] THostedService>(this IServiceCollection services)
-    where TService : class, IHostedService
+    where TService : class
     where THostedService : class, IHostedService, TService
     {
-        services.AddSingleton(typeof(TService), typeof(THostedService));
-        services.TryAddEnumerable(ServiceDescriptor.Singleton<IHostedService, TService>(seriveProvider => seriveProvider.GetService<TService>()));
+
+        services.AddSingleton<THostedService>();
+        services.AddHostedService<THostedService>(a => a.GetService<THostedService>());
+        services.AddSingleton<TService>(a => a.GetService<THostedService>());
+
         return services;
     }
 }

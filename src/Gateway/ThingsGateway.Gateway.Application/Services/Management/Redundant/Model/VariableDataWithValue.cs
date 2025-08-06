@@ -10,9 +10,7 @@
 
 using Newtonsoft.Json;
 
-using ThingsGateway.Gateway.Application;
-
-namespace ThingsGateway.Management;
+namespace ThingsGateway.Gateway.Application;
 
 public class VariableDataWithValue
 {

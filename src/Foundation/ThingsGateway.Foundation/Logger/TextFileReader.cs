@@ -59,7 +59,7 @@ public static class TextFileReader
     /// </summary>
     /// <param name="directoryPath">目录路径</param>
     /// <returns>包含文件信息的列表</returns>
-    public static OperResult<List<string>> GetFiles(string directoryPath)
+    public static OperResult<List<string>> GetLogFiles(string directoryPath)
     {
         OperResult<List<string>> result = new(); // 初始化结果对象
         // 检查目录是否存在
@@ -91,7 +91,7 @@ public static class TextFileReader
         return result;
     }
 
-    public static OperResult<List<LogData>> LastLog(string file, int lineCount = 200)
+    public static OperResult<List<LogData>> LastLogData(string file, int lineCount = 200)
     {
         if (!File.Exists(file))
             return new OperResult<List<LogData>>("The file path is invalid");
@@ -104,7 +104,7 @@ public static class TextFileReader
             {
                 var fileInfo = new FileInfo(file);
                 var length = fileInfo.Length;
-                var cacheKey = $"{nameof(TextFileReader)}_{nameof(LastLog)}_{file})";
+                var cacheKey = $"{nameof(TextFileReader)}_{nameof(LastLogData)}_{file})";
                 if (_cache.TryGetValue<LogDataCache>(cacheKey, out var cachedData))
                 {
                     if (cachedData != null && cachedData.Length == length)

@@ -8,9 +8,7 @@
 // QQ群：605534569
 // ------------------------------------------------------------------------------
 
-using ThingsGateway.Gateway.Application;
-
-namespace ThingsGateway.Management;
+namespace ThingsGateway.Gateway.Application;
 
 public class GatewayRedundantSerivce : IGatewayRedundantSerivce
 {

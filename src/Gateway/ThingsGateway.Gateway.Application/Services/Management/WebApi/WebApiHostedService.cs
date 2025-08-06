@@ -11,7 +11,7 @@
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace ThingsGateway.Management;
+namespace ThingsGateway.Gateway.Application;
 
 internal sealed class WebApiHostedService : BackgroundService
 {

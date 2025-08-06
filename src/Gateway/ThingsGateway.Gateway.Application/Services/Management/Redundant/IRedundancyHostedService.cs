@@ -8,16 +8,15 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-using Microsoft.Extensions.Hosting;
+namespace ThingsGateway.Gateway.Application;
 
-namespace ThingsGateway.Management;
-
-public interface IRedundancyHostedService : IHostedService
+public interface IRedundancyHostedService
 {
-    Task StartTaskAsync(CancellationToken cancellationToken);
-    Task StopTaskAsync();
-    Task ForcedSync(CancellationToken cancellationToken = default);
+    Task StartRedundancyTaskAsync();
+    Task StopRedundancyTaskAsync();
+    Task RedundancyForcedSync();
 
-    public TextFileLogger TextLogger { get; }
-    public string LogPath { get; }
+    public Task<TouchSocket.Core.LogLevel> RedundancyLogLevel();
+    public Task SetRedundancyLogLevel(TouchSocket.Core.LogLevel logLevel);
+    public Task<string> RedundancyLogPath();
 }

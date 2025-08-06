@@ -187,24 +187,44 @@ public class ModbusSlave : DeviceBase, IModbusAddress
         {
             var bytes = new ByteBlock(ushort.MaxValue * 2);
             bytes.SetLength(ushort.MaxValue * 2);
+            for (int i = 0; i < bytes.Length; i++)
+            {
+                bytes.WriteByte(0);
+            }
+            bytes.Position = 0;
             return bytes;
         });
         ModbusServer02ByteBlocks.GetOrAdd(mAddress.Station, a =>
         {
             var bytes = new ByteBlock(ushort.MaxValue * 2);
             bytes.SetLength(ushort.MaxValue * 2);
+            for (int i = 0; i < bytes.Length; i++)
+            {
+                bytes.WriteByte(0);
+            }
+            bytes.Position = 0;
             return bytes;
         });
         ModbusServer03ByteBlocks.GetOrAdd(mAddress.Station, a =>
         {
             var bytes = new ByteBlock(ushort.MaxValue * 2);
             bytes.SetLength(ushort.MaxValue * 2);
+            for (int i = 0; i < bytes.Length; i++)
+            {
+                bytes.WriteByte(0);
+            }
+            bytes.Position = 0;
             return bytes;
         });
         ModbusServer04ByteBlocks.GetOrAdd(mAddress.Station, a =>
         {
             var bytes = new ByteBlock(ushort.MaxValue * 2);
             bytes.SetLength(ushort.MaxValue * 2);
+            for (int i = 0; i < bytes.Length; i++)
+            {
+                bytes.WriteByte(0);
+            }
+            bytes.Position = 0;
             return bytes;
         });
     }
@@ -289,7 +309,7 @@ public class ModbusSlave : DeviceBase, IModbusAddress
                             return new();
 
                         case 4:
-                            ModbusServer04ByteBlock.Position = mAddress.StartAddress;
+                            ModbusServer04ByteBlock.Position = mAddress.StartAddress * RegisterByteLength;
                             ModbusServer04ByteBlock.Write(mAddress.Data.Span);
                             return new();
 

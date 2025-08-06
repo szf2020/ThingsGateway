@@ -8,11 +8,9 @@
 // QQ群：605534569
 // ------------------------------------------------------------------------------
 
-using Microsoft.Extensions.Hosting;
-
 namespace ThingsGateway.Gateway.Application;
 
-public interface IAlarmHostedService : IHostedService
+public interface IAlarmHostedService
 {
     /// <summary>
     /// 确认报警

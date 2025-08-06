@@ -1,17 +1,22 @@
-﻿@page "/gateway/system"
+﻿@{
+#if !Management
+}
+@page "/gateway/system"
 @attribute [Authorize]
 @attribute [RolePermission]
+
+@{
+#endif
+}
 @inherits ComponentDefault
 @using BootstrapBlazor.Components
 @using Microsoft.AspNetCore.Authorization
 @using ThingsGateway.Admin.Razor
 @using ThingsGateway.Authentication
-@using ThingsGateway.Upgrade
-@using ThingsGateway.Debug
 @using ThingsGateway.Gateway.Application
 @using ThingsGateway.Admin.Application
 @using ThingsGateway.Razor
-@namespace ThingsGateway.Management
+@namespace ThingsGateway.Gateway.Razor
 
 
 <div class="appconfig">
@@ -29,26 +34,13 @@
 
                 <BodyTemplate>
 
-                    <RedundancyOptionsPage Logger="@RedundancyHostedService.TextLogger" LogPath="@RedundancyHostedService.LogPath" />
+                    <RedundancyOptionsPage LogLevel="LogLevel" LogLevelChanged=@(SetLogLevel) LogPath="@LogPath" />
 
                 </BodyTemplate>
 
             </Card>
 
         </TabItem>
-
-        <TabItem Text=@GatewayLocalizer["CheckUpdate"]>
-
-            <Card class="h-100">
-
-                <BodyTemplate>
-                    <UpdateZipFilePage></UpdateZipFilePage>
-                </BodyTemplate>
-
-            </Card>
-
-        </TabItem>
-
 
         <TabItem Text=@GatewayLocalizer["Restart"]>
 

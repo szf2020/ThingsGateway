@@ -30,3 +30,20 @@ public class PluginAddInput
     /// </summary>
     public List<IBrowserFile> OtherFiles { get; set; }
 }
+
+/// <summary>
+/// 插件添加DTO
+/// </summary>
+public class PluginAddPathInput
+{
+    /// <summary>
+    /// 主程序集
+    /// </summary>
+    [Required]
+    public string MainFilePath { get; set; }
+
+    /// <summary>
+    /// 附属程序集
+    /// </summary>
+    public List<string> OtherFilePaths { get; set; } = new();
+}

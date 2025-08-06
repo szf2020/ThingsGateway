@@ -14,8 +14,6 @@ using Microsoft.Extensions.Logging;
 using System.Reflection;
 
 using ThingsGateway.Authentication;
-using ThingsGateway.Management;
-using ThingsGateway.Upgrade;
 
 namespace ThingsGateway.Gateway.Application;
 
@@ -35,16 +33,15 @@ public class Startup : AppStartup
 
         services.AddSingleton<IRedundancyService, RedundancyService>();
         services.AddGatewayHostedService<IRedundancyHostedService, RedundancyHostedService>();
-        services.AddGatewayHostedService<IUpdateZipFileHostedService, UpdateZipFileHostedService>();
 
-        services.AddHostedService<RemoteManagementHostedService>();
+        services.AddHostedService<ManagementHostedService>();
         services.AddHostedService<WebApiHostedService>();
 
         services.AddSingleton<GatewayRedundantSerivce>();
         services.AddSingleton<IGatewayRedundantSerivce>(provider => provider.GetRequiredService<GatewayRedundantSerivce>());
-        services.AddConfigurableOptions<UpgradeServerOptions>();
 
         #endregion
+        services.AddSingleton<ITextFileReadService, TextFileReadService>();
 
         ProAuthentication.TryGetAuthorizeInfo(out var authorizeInfo);
 
@@ -81,9 +78,14 @@ public class Startup : AppStartup
         services.AddSingleton<IDeviceService, DeviceService>();
         services.AddSingleton<IDeviceRuntimeService, DeviceRuntimeService>();
         services.AddSingleton<IPluginService, PluginService>();
+        services.AddSingleton<IPluginPageService>(a => a.GetService<IPluginService>());
+
         services.AddSingleton<IBackendLogService, BackendLogService>();
         services.AddSingleton<IRpcLogService, RpcLogService>();
         services.AddSingleton<IRpcService, RpcService>();
+        services.AddSingleton<IAuthenticationService, AuthenticationService>();
+        services.AddSingleton<IRestartService, RestartService>();
+        services.AddSingleton<IChannelEnableService, ChannelEnableService>();
 
         services.AddGatewayHostedService<IAlarmHostedService, AlarmHostedService>();
         services.AddGatewayHostedService<IGatewayMonitorHostedService, GatewayMonitorHostedService>();

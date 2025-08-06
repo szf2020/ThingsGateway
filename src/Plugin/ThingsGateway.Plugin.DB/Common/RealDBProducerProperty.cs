@@ -18,12 +18,12 @@ namespace ThingsGateway.Plugin.DB;
 
 public class RealDBProducerProperty : BusinessPropertyWithCacheInterval
 {
-    public DbType DbType { get; set; } = DbType.QuestDB;
+    public virtual DbType DbType { get; } = DbType.QuestDB;
 
     [DynamicProperty]
     [Required]
     [AutoGenerateColumn(ComponentType = typeof(Textarea), Rows = 1)]
-    public string BigTextConnectStr { get; set; } = "host=localhost;port=8812;username=admin;password=quest;database=qdb;ServerCompatibilityMode=NoTypeLoading;";
+    public virtual string BigTextConnectStr { get; set; } = "host=localhost;port=8812;username=admin;password=quest;database=qdb;ServerCompatibilityMode=NoTypeLoading;";
 
     [DynamicProperty]
     [Required]

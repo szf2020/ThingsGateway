@@ -8,13 +8,11 @@
 // QQ群：605534569
 // ------------------------------------------------------------------------------
 
-using Microsoft.Extensions.Hosting;
-
 using ThingsGateway.Blazor.Diagrams.Core;
 
 namespace ThingsGateway.Gateway.Application;
 
-public interface IRulesEngineHostedService : IHostedService
+public interface IRulesEngineHostedService
 {
     Dictionary<RulesLog, Diagram> Diagrams { get; }
     Task Delete(IEnumerable<long> ids);

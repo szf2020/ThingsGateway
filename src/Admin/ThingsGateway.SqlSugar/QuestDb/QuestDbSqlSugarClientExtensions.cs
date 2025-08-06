@@ -2,9 +2,9 @@
 {
     public static class QuestDbSqlSugarClientExtensions
     {
-        public static QuestDbRestAPI RestApi(this ISqlSugarClient db)
+        public static QuestDbRestAPI RestApi(this ISqlSugarClient db, int httpPort = 9000)
         {
-            return new QuestDbRestAPI(db);
+            return new QuestDbRestAPI(db, httpPort);
         }
     }
 }
