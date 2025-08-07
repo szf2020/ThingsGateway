@@ -20,10 +20,9 @@ public class TDengineDBProducerProperty : RealDBProducerProperty
 {
     public override DbType DbType { get; } = DbType.TDengine;
 
-    [DynamicProperty]
-    [Required]
-    [AutoGenerateColumn(ComponentType = typeof(Textarea), Rows = 1)]
-    public override string BigTextConnectStr { get; set; } = "protocol=WebSocket;host=localhost;port=6041;useSSL=false;username=root;password=taosdata;db=power";
-
+    public TDengineDBProducerProperty()
+    {
+        BigTextConnectStr = "protocol=WebSocket;host=localhost;port=6041;useSSL=false;username=root;password=taosdata;db=power";
+    }
 
 }

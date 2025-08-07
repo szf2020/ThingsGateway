@@ -20,11 +20,10 @@ public class QuestDBProducerProperty : RealDBProducerProperty
 {
     public override DbType DbType { get; } = DbType.QuestDB;
 
-    [DynamicProperty]
-    [Required]
-    [AutoGenerateColumn(ComponentType = typeof(Textarea), Rows = 1)]
-    public override string BigTextConnectStr { get; set; } = "host=localhost;port=8812;username=admin;password=quest;database=qdb;ServerCompatibilityMode=NoTypeLoading;";
-
+    public QuestDBProducerProperty()
+    {
+        BigTextConnectStr="host=localhost;port=8812;username=admin;password=quest;database=qdb;ServerCompatibilityMode=NoTypeLoading;";
+    }
     [DynamicProperty]
     public bool RestApi { get; set; } = true;
 
