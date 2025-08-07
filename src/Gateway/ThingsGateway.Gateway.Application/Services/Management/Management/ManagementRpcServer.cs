@@ -88,7 +88,7 @@ public partial class ManagementRpcServer : IRpcServer, IManagementRpcServer, IBa
 
     public Task<OperResult<List<LogData>>> LastLogDataAsync(string file, int lineCount = 200) => App.GetService<ITextFileReadService>().LastLogDataAsync(file, lineCount);
 
-    public Task<List<PluginInfo>> GetPluginListAsync(PluginTypeEnum? pluginType = null) => App.GetService<IPluginPageService>().GetPluginListAsync(pluginType);
+    public Task<List<PluginInfo>> GetPluginsAsync(PluginTypeEnum? pluginType = null) => App.GetService<IPluginPageService>().GetPluginsAsync(pluginType);
 
     public Task<QueryData<PluginInfo>> PluginPageAsync(QueryPageOptions options, PluginTypeEnum? pluginTypeEnum = null) => App.GetService<IPluginPageService>().PluginPageAsync(options, pluginTypeEnum);
 

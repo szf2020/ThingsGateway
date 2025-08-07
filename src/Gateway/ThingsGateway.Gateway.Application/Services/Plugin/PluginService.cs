@@ -35,7 +35,7 @@ internal sealed class PluginService : IPluginService
     /// </summary>
     public const string DirName = "GatewayPlugins";
 
-    private const string CacheKeyGetPluginOutputs = $"ThingsGateway.Gateway.Application.{nameof(PluginService)}{nameof(GetPluginListSync)}";
+    private const string CacheKeyGetPluginOutputs = $"ThingsGateway.Gateway.Application.{nameof(PluginService)}{nameof(GetPluginList)}";
     private const string SaveEx = ".save";
     private const string DelEx = ".del";
 
@@ -259,7 +259,7 @@ internal sealed class PluginService : IPluginService
     /// </summary>
     /// <param name="pluginType">要筛选的插件类型，可选参数</param>
     /// <returns>符合条件的插件列表</returns>
-    public Task<List<PluginInfo>> GetPluginListAsync(PluginTypeEnum? pluginType = null)
+    public Task<List<PluginInfo>> GetPluginsAsync(PluginTypeEnum? pluginType = null)
     {
         // 获取完整的插件列表
         var pluginList = PrivateGetList();
@@ -281,7 +281,7 @@ internal sealed class PluginService : IPluginService
     /// </summary>
     /// <param name="pluginType">要筛选的插件类型，可选参数</param>
     /// <returns>符合条件的插件列表</returns>
-    public List<PluginInfo> GetPluginListSync(PluginTypeEnum? pluginType = null)
+    public List<PluginInfo> GetPluginList(PluginTypeEnum? pluginType = null)
     {
         // 获取完整的插件列表
         var pluginList = PrivateGetList();
@@ -333,7 +333,7 @@ internal sealed class PluginService : IPluginService
     public async Task<QueryData<PluginInfo>> PluginPageAsync(QueryPageOptions options, PluginTypeEnum? pluginType = null)
     {
         //指定关键词搜索为插件FullName
-        var query = (await GetPluginListAsync(pluginType).ConfigureAwait(false)).WhereIf(!options.SearchText.IsNullOrWhiteSpace(), a => a.FullName.Contains(options.SearchText)).GetQueryData(options);
+        var query = (await GetPluginsAsync(pluginType).ConfigureAwait(false)).WhereIf(!options.SearchText.IsNullOrWhiteSpace(), a => a.FullName.Contains(options.SearchText)).GetQueryData(options);
         return query;
     }
 
@@ -747,7 +747,7 @@ internal sealed class PluginService : IPluginService
             if (data == null)
             {
                 var pluginInfos = GetPluginOutputs();
-                App.CacheService.Set(CacheKeyGetPluginOutputs, pluginInfos);
+                App.CacheService.Set(CacheKeyGetPluginOutputs, pluginInfos.ToList());
                 return pluginInfos;
             }
 

@@ -363,7 +363,7 @@ string? deviceName)
         }
         var deviceDicts = GlobalData.IdDevices;
         var channelDicts = GlobalData.IdChannels;
-        var driverPluginDicts = GlobalData.PluginService.GetPluginListSync(PluginTypeEnum.Business).ToDictionary(a => a.FullName);
+        var driverPluginDicts = GlobalData.PluginService.GetPluginList(PluginTypeEnum.Business).ToDictionary(a => a.FullName);
         //总数据
         Dictionary<string, object> sheets = new();
         //变量页
@@ -592,7 +592,7 @@ string? deviceName)
 
         // 设备页导入预览输出
         ImportPreviewOutput<Dictionary<string, Variable>> deviceImportPreview = new();
-        var plugins = GlobalData.PluginService.GetPluginListSync();
+        var plugins = GlobalData.PluginService.GetPluginList();
         // 获取驱动插件的全名和名称的字典
         var driverPluginFullNameDict = plugins.ToDictionary(a => a.FullName);
         var driverPluginNameDict = plugins.ToDictionary(a => a.Name);

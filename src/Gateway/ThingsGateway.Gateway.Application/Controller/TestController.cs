@@ -11,14 +11,19 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace ThingsGateway.Admin.Application;
+using TouchSocket.Rpc;
+
+namespace ThingsGateway.Gateway.Application;
 
 [Route("api/[controller]/[action]")]
 [AllowAnonymous]
 [ApiController]
-public class TestController : ControllerBase
+[TouchSocket.WebApi.Router("/miniapi/[api]/[action]")]
+[TouchSocket.WebApi.EnableCors("cors")]
+public class TestController : ControllerBase, IRpcServer
 {
     [HttpGet]
+    [TouchSocket.WebApi.WebApi(Method = TouchSocket.WebApi.HttpMethodType.Get)]
     public void Test()
     {
         GC.Collect();

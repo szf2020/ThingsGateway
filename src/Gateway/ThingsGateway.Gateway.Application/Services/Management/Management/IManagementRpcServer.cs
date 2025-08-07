@@ -127,7 +127,7 @@ public interface IManagementRpcServer : IRpcServer
     /// <param name="pluginType"></param>
     /// <returns></returns>
     [DmtpRpc]
-    Task<List<PluginInfo>> GetPluginListAsync(PluginTypeEnum? pluginType = null);
+    Task<List<PluginInfo>> GetPluginsAsync(PluginTypeEnum? pluginType = null);
 
     /// <summary>
     /// 分页显示插件

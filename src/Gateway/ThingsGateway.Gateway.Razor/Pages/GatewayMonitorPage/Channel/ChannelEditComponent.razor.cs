@@ -58,7 +58,7 @@ public partial class ChannelEditComponent
 
     protected override void OnInitialized()
     {
-        var plugins = GlobalData.PluginService.GetPluginListSync(PluginType);
+        var plugins = GlobalData.PluginService.GetPluginList(PluginType);
 
         PluginDcit = plugins.ToDictionary(a => a.FullName);
         PluginNames = plugins.BuildPluginSelectList();

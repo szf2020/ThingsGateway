@@ -8,8 +8,10 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
+using System.Diagnostics;
 using System.Text;
 
 using TouchSocket.Core;
@@ -86,6 +88,7 @@ public partial class WebApiTask : AsyncDisposableObject
                    {
                        store.RegisterServer<ControlController>();
                        store.RegisterServer<RuntimeInfoController>();
+                       store.RegisterServer<TestController>();
                    });
 
                    //添加跨域服务
@@ -109,7 +112,8 @@ public partial class WebApiTask : AsyncDisposableObject
 
                    a.UseWebApi();
 
-                   a.UseSwagger();
+                   if (App.WebHostEnvironment.IsDevelopment() || Debugger.IsAttached)
+                       a.UseSwagger();
 
                    a.UseDefaultHttpServicePlugin();
                });

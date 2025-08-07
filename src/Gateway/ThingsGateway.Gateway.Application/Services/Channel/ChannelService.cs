@@ -260,7 +260,7 @@ internal sealed class ChannelService : BaseService<Channel>, IChannelService
         HashSet<long>? channel = null;
         if (exportFilter.PluginType != null)
         {
-            var pluginInfo = GlobalData.PluginService.GetPluginListSync(exportFilter.PluginType).Select(a => a.FullName).ToHashSet();
+            var pluginInfo = GlobalData.PluginService.GetPluginList(exportFilter.PluginType).Select(a => a.FullName).ToHashSet();
             channel = GlobalData.IdChannels.Where(a => pluginInfo.Contains(a.Value.PluginName)).Select(a => a.Value.Id).ToHashSet();
         }
         var dataScope = await GlobalData.SysUserService.GetCurrentUserDataScopeAsync().ConfigureAwait(false);

@@ -26,7 +26,7 @@ public interface IPluginService : IPluginPageService
     /// </summary>
     /// <param name="pluginType"></param>
     /// <returns></returns>
-    List<PluginInfo> GetPluginListSync(PluginTypeEnum? pluginType = null);
+    List<PluginInfo> GetPluginList(PluginTypeEnum? pluginType = null);
 
 
     /// <summary>

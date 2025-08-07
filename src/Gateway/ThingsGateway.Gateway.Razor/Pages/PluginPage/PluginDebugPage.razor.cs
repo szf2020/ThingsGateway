@@ -26,7 +26,7 @@ public partial class PluginDebugPage
     /// <inheritdoc/>
     protected override void OnParametersSet()
     {
-        var pluginInfos = PluginService.GetPluginListSync().AdaptListPluginInfo();
+        var pluginInfos = PluginService.GetPluginList().AdaptListPluginInfo();
 
         foreach (var pluginInfo in pluginInfos.ToList())
         {
