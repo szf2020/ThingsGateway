@@ -9,9 +9,11 @@ using ThingsGateway.Blazor.Diagrams.Core.Models;
 
 namespace ThingsGateway.Gateway.Application;
 
+#if !Management
 [SugarTable("rules", TableDescription = "规则引擎")]
 [SugarIndex("unique_rules_name", nameof(Rules.Name), OrderByType.Asc, true)]
 [Tenant(SqlSugarConst.DB_Custom)]
+#endif
 public class Rules : BaseDataEntity
 {
     [SugarColumn(ColumnDescription = "名称", Length = 200)]

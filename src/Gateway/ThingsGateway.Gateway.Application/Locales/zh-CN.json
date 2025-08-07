@@ -18,7 +18,7 @@
     "Version": "版本"
   },
 
-  "ThingsGateway.Gateway.Application.DefaultDiagram": {
+  "ThingsGateway.Gateway.Application.INode": {
 
     "Actuator": "执行",
     "AlarmChangedTriggerNode": "报警状态触发器",
@@ -120,6 +120,7 @@
   "ThingsGateway.Gateway.Application.AlarmVariable": {
     "AlarmCode": "报警值",
     "AlarmDelay": "报警延时",
+    "AlarmLevel": "报警等级",
     "AlarmEnable": "报警使能",
     "AlarmLimit": "报警限值",
     "AlarmText": "报警文本",
@@ -453,6 +454,7 @@
   "ThingsGateway.Gateway.Application.Variable": {
     "AddressOrOtherMethodNotNull": " 变量地址或特殊方法不能同时为空 ",
     "AlarmDelay": "报警延时",
+    "AlarmLevel": "报警等级",
     "ArrayLength": "数组长度",
     "BoolCloseAlarmEnable": "布尔关报警使能",
     "BoolCloseAlarmText": "布尔关报警文本",

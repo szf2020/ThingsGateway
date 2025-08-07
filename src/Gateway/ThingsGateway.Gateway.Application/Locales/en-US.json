@@ -18,7 +18,7 @@
     "Version": "Version"
   },
 
-  "ThingsGateway.Gateway.Application.DefaultDiagram": {
+  "ThingsGateway.Gateway.Application.INode": {
 
     "Actuator": "Actuator",
     "AlarmChangedTriggerNode": "AlarmStateTrigger",
@@ -120,6 +120,7 @@
   "ThingsGateway.Gateway.Application.AlarmVariable": {
     "AlarmCode": "AlarmCode",
     "AlarmDelay": "AlarmDelay",
+    "AlarmLevel": "AlarmLevel",
     "AlarmEnable": "AlarmEnable",
     "AlarmLimit": "AlarmLimit",
     "AlarmText": "AlarmText",
@@ -451,6 +452,7 @@
   "ThingsGateway.Gateway.Application.Variable": {
     "AddressOrOtherMethodNotNull": "Variable address or special method cannot be empty at the same time",
     "AlarmDelay": "AlarmDelay",
+    "AlarmLevel": "AlarmLevel",
     "ArrayLength": "ArrayLength",
     "BoolCloseAlarmEnable": "BoolCloseAlarmEnable",
     "BoolCloseAlarmText": "BoolCloseAlarmText",

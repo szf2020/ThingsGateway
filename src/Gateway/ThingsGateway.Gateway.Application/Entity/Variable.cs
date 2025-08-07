@@ -21,10 +21,12 @@ namespace ThingsGateway.Gateway.Application;
 /// <summary>
 /// 设备变量表
 /// </summary>
+#if !Management
 [SugarTable("variable", TableDescription = "设备变量表")]
 [Tenant(SqlSugarConst.DB_Custom)]
 [SugarIndex("index_device", nameof(Variable.DeviceId), OrderByType.Asc)]
 [SugarIndex("unique_deviceid_variable_name", nameof(Variable.Name), OrderByType.Asc, nameof(Variable.DeviceId), OrderByType.Asc, true)]
+#endif
 public class Variable : BaseDataEntity, IValidatableObject
 {
     /// <summary>
@@ -47,7 +49,8 @@ public class Variable : BaseDataEntity, IValidatableObject
     private double lLAlarmCode = 0;
     private long deviceId;
     private int? arrayLength;
-    private int alarmDelay;
+    private int alarmDelay; 
+    private int alarmLevel; 
     private ProtectTypeEnum protectType = ProtectTypeEnum.ReadWrite;
     private DataTypeEnum dataType = DataTypeEnum.Int16;
 
@@ -56,7 +59,7 @@ public class Variable : BaseDataEntity, IValidatableObject
     /// </summary>
     [System.Text.Json.Serialization.JsonIgnore]
     [Newtonsoft.Json.JsonIgnore]
-    internal bool IsUp;
+    internal bool IsUp; 
     private bool enable = true;
     public bool DynamicVariable;
     private bool rpcWriteEnable = true;
@@ -274,6 +277,15 @@ public class Variable : BaseDataEntity, IValidatableObject
     public Dictionary<long, Dictionary<string, string>>? VariablePropertys { get => variablePropertys; set => variablePropertys = value; }
 
     #region 报警
+
+
+    /// <summary>
+    /// 报警等级
+    /// </summary>
+    [SugarColumn(ColumnDescription = "报警等级")]
+    [AutoGenerateColumn(Visible = false, Filterable = true, Sortable = true)]
+    public int AlarmLevel { get => alarmLevel; set => alarmLevel = value; }
+
     /// <summary>
     /// 报警延时
     /// </summary>

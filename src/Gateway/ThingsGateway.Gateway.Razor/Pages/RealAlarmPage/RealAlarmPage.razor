@@ -1,10 +1,19 @@
-﻿@page "/gateway/realalarm"
+﻿
+@{
+#if !Management
+}
+@page "/gateway/realalarm"
+@attribute [Authorize]
+@attribute [RolePermission]
+
+@{
+#endif
+}
+
 @namespace ThingsGateway.Gateway.Razor
 @using ThingsGateway.Admin.Application
 @using ThingsGateway.Admin.Razor
 @using ThingsGateway.Gateway.Application
-@attribute [Authorize]
-@attribute [RolePermission]
 @inherits ComponentDefault
 
 
@@ -17,7 +26,6 @@
                 AllowResizing="true"
                 IsFixedHeader=true
                 IsMultipleSelect=false
-                SearchModel=SearchModel
                 ShowExtendButtons=false
                 ShowExportButton=false
                 ShowExtendDeleteButton=false
@@ -31,13 +39,15 @@
                 IsPagination=true>
 
         <TableColumns>
-            <TableColumn Field="@context.DeviceName" FieldExpression=@(()=>context.DeviceName) Filterable="true" Sortable="true" Visible="true" />
+            <TableColumn @bind-Field="@context.Id" Filterable=true Sortable=true Visible=false />
+            <TableColumn Field="@context.DeviceName" FieldExpression=@(() => context.DeviceName) Filterable="true" Sortable="true" Visible="true" />
             <TableColumn @bind-Field="@context.Name" Filterable=true Sortable=true Visible=true />
             <TableColumn @bind-Field="@context.Description" Filterable=true Sortable=true Visible=true />
             <TableColumn @bind-Field="@context.DataType" Filterable=true Sortable=true Visible=true />
             <TableColumn @bind-Field="@context.AlarmTime" Filterable=true Sortable=true Visible=true />
             <TableColumn @bind-Field="@context.AlarmCode" Filterable=true Sortable=true Visible=true />
             <TableColumn @bind-Field="@context.AlarmLimit" Filterable=true Sortable=true Visible=true />
+            <TableColumn @bind-Field="@context.AlarmLevel" Filterable=true Sortable=true Visible=true />
             <TableColumn @bind-Field="@context.AlarmText" Filterable=true Sortable=true Visible=true />
             <TableColumn @bind-Field="@context.AlarmType" Filterable=true Sortable=true Visible=true />
             <TableColumn @bind-Field="@context.RecoveryCode" Filterable=true Sortable=true Visible=true />

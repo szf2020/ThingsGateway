@@ -366,9 +366,9 @@ internal sealed class PluginService : IPluginService
     /// <summary>
     /// 异步保存驱动程序信息。
     /// </summary>
-    /// <param name="plugin">要保存的插件信息。</param>
+    /// <param name="pluginAddPathInput">要保存的插件信息。</param>
     [OperDesc("SavePlugin", isRecordPar: false, localizerType: typeof(PluginAddInput))]
-    public async Task SavePluginByPath(PluginAddPathInput plugin)
+    public async Task SavePluginByPath(PluginAddPathInput pluginAddPathInput)
     {
         try
         {
@@ -381,7 +381,7 @@ internal sealed class PluginService : IPluginService
             List<(string Name, MemoryStream MemoryStream)> otherFilesStreams = new();
 
             // 获取主程序集文件名
-            var mainFileName = Path.GetFileNameWithoutExtension(plugin.MainFilePath);
+            var mainFileName = Path.GetFileNameWithoutExtension(pluginAddPathInput.MainFilePath);
             string fullDir = string.Empty;
             bool isDefaultDriver = false;
             //判定是否上下文程序集
@@ -403,34 +403,40 @@ internal sealed class PluginService : IPluginService
             try
             {
                 // 构建主程序集绝对路径
-                var fullPath = fullDir.CombinePathWithOs(Path.GetFileName(plugin.MainFilePath));
+                var fullPath = fullDir.CombinePathWithOs(Path.GetFileName(pluginAddPathInput.MainFilePath));
 
 
-                using var stream = File.Open(plugin.MainFilePath, FileMode.Open, FileAccess.Read);
-                await stream.CopyToAsync(mainMemoryStream).ConfigureAwait(false);
+                using (var stream = File.Open(pluginAddPathInput.MainFilePath, FileMode.Open, FileAccess.Read))
+                {
+
+                    await stream.CopyToAsync(mainMemoryStream).ConfigureAwait(false);
+                }
                 mainMemoryStream.Seek(0, SeekOrigin.Begin);
 
                 #region
                 // 先加载到内存，如果成功添加后再装载到文件
                 // 加载主程序集
                 var assembly = assemblyLoadContext.LoadFromStream(mainMemoryStream);
-                foreach (var item in plugin.OtherFilePaths ?? new())
+                foreach (var item in pluginAddPathInput.OtherFilePaths ?? new())
                 {
                     // 获取附属文件流
-                    using var otherStream = File.Open(plugin.MainFilePath, FileMode.Open, FileAccess.Read);
-                    MemoryStream memoryStream = new MemoryStream();
-                    await otherStream.CopyToAsync(memoryStream).ConfigureAwait(false);
-                    memoryStream.Seek(0, SeekOrigin.Begin);
-                    otherFilesStreams.Add((Path.GetFileName(item), memoryStream));
-                    try
+                    using (var otherStream = File.Open(pluginAddPathInput.MainFilePath, FileMode.Open, FileAccess.Read))
                     {
-                        // 尝试加载附属程序集
-                        assemblyLoadContext.LoadFromStream(memoryStream);
-                    }
-                    catch (Exception ex)
-                    {
-                        // 加载失败时记录警告信息
-                        _logger?.LogWarning(ex, string.Format(AppResource.LoadOtherFileFail, item));
+
+                        MemoryStream memoryStream = new MemoryStream();
+                        await otherStream.CopyToAsync(memoryStream).ConfigureAwait(false);
+                        memoryStream.Seek(0, SeekOrigin.Begin);
+                        otherFilesStreams.Add((Path.GetFileName(item), memoryStream));
+                        try
+                        {
+                            // 尝试加载附属程序集
+                            assemblyLoadContext.LoadFromStream(memoryStream);
+                        }
+                        catch (Exception ex)
+                        {
+                            // 加载失败时记录警告信息
+                            _logger?.LogWarning(ex, string.Format(AppResource.LoadOtherFileFail, item));
+                        }
                     }
                 }
                 #endregion
@@ -503,6 +509,17 @@ internal sealed class PluginService : IPluginService
         }
         finally
         {
+            if (File.Exists(pluginAddPathInput.MainFilePath))
+            {
+                File.Delete(pluginAddPathInput.MainFilePath);
+            }
+            foreach (var item in pluginAddPathInput.OtherFilePaths)
+            {
+                if (File.Exists(item))
+                {
+                    File.Delete(item);
+                }
+            }
             // 释放锁资源
             SaveLock.Release();
         }

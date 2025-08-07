@@ -21,7 +21,7 @@ public static class PluginInfoUtil
     /// <summary>
     /// 异步保存驱动程序信息。
     /// </summary>
-    public static async Task SavePlugin(PluginAddInput plugin)
+    public static async Task SavePlugin(PluginAddInput plugin, IPluginPageService pluginPageService)
     {
         try
         {
@@ -31,11 +31,11 @@ public static class PluginInfoUtil
             string tempDir = TempDirName;
             // 获取主程序集文件名
             var mainFileName = Path.GetFileNameWithoutExtension(plugin.MainFile.Name);
-            string fullDir = string.Empty;
-            //判定是否上下文程序集
 
             // 构建插件文件夹绝对路径
-            fullDir = AppContext.BaseDirectory.CombinePathWithOs(tempDir, mainFileName);
+            string fullDir = AppContext.BaseDirectory.CombinePathWithOs(tempDir, mainFileName);
+
+            Directory.CreateDirectory(fullDir);
 
             PluginAddPathInput pluginAddPathInput = new();
 
@@ -46,26 +46,34 @@ public static class PluginInfoUtil
                 var fullPath = fullDir.CombinePathWithOs(plugin.MainFile.Name);
 
                 // 获取主程序集文件流
-                using var stream = plugin.MainFile.OpenReadStream(maxFileSize);
+                using (var stream = plugin.MainFile.OpenReadStream(maxFileSize))
+                {
+                    FileStream fs = new(fullPath, FileMode.Create);
 
-                using FileStream fs = new($"{fullPath}", FileMode.Create);
-                await stream.CopyToAsync(fs).ConfigureAwait(false);
+                    await stream.CopyToAsync(fs).ConfigureAwait(false);
+                    await fs.SafeDisposeAsync().ConfigureAwait(false);
+                }
                 pluginAddPathInput.MainFilePath = fullPath;
 
                 foreach (var item in plugin.OtherFiles ?? new())
                 {
                     // 获取附属文件流
-                    using var otherStream = item.OpenReadStream(maxFileSize);
-                    var otherFullPath = $"{fullDir.CombinePathWithOs(item.Name)}";
-                    using FileStream otherFs = new(otherFullPath, FileMode.Create);
-                    await stream.CopyToAsync(otherFs).ConfigureAwait(false);
+                    using (var otherStream = item.OpenReadStream(maxFileSize))
+                    {
 
-                    pluginAddPathInput.OtherFilePaths.Add(otherFullPath);
+                        var otherFullPath = $"{fullDir.CombinePathWithOs(item.Name)}";
+                        FileStream otherFs = new(otherFullPath, FileMode.Create);
+
+                        await otherStream.CopyToAsync(otherFs).ConfigureAwait(false);
+                        await otherFs.SafeDisposeAsync().ConfigureAwait(false);
+
+                        pluginAddPathInput.OtherFilePaths.Add(otherFullPath);
+                    }
 
                 }
 
 
-                await App.GetService<IPluginPageService>().SavePluginByPath(pluginAddPathInput).ConfigureAwait(false);
+                await pluginPageService.SavePluginByPath(pluginAddPathInput).ConfigureAwait(false);
 
 
             }

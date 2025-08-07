@@ -108,7 +108,7 @@ namespace ThingsGateway.SqlSugar
             return result;
         }
 
-        private static readonly HttpClient client = new HttpClient();
+        private readonly HttpClient client = new HttpClient();
 
         /// <summary>
         /// 异步批量快速插入数据

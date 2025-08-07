@@ -149,4 +149,9 @@ public interface IManagementRpcServer : IRpcServer
     /// <returns></returns>
     [DmtpRpc]
     Task SavePluginByPath(PluginAddPathInput plugin);
+
+
+    [DmtpRpc]
+    Task<IEnumerable<AlarmVariable>> GetCurrentUserRealAlarmVariables();
+
 }

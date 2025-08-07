@@ -8,11 +8,13 @@ using TouchSocket.Core;
 
 namespace ThingsGateway.Gateway.Application;
 
-[CategoryNode(Category = "Trigger", ImgUrl = "_content/ThingsGateway.Gateway.Razor/img/ValueChanged.svg", Desc = nameof(DeviceChangedTriggerNode), LocalizerType = typeof(ThingsGateway.Gateway.Application.DefaultDiagram), WidgetType = "ThingsGateway.Gateway.Razor.DeviceWidget,ThingsGateway.Gateway.Razor")]
+[CategoryNode(Category = "Trigger", ImgUrl = "_content/ThingsGateway.Gateway.Razor/img/ValueChanged.svg", Desc = nameof(DeviceChangedTriggerNode), LocalizerType = typeof(ThingsGateway.Gateway.Application.INode), WidgetType = "ThingsGateway.Gateway.Razor.DeviceWidget,ThingsGateway.Gateway.Razor")]
 public class DeviceChangedTriggerNode : TextNode, ITriggerNode, IDisposable
 {
     public DeviceChangedTriggerNode(string id, Point? position = null) : base(id, position) { Title = "DeviceChangedTriggerNode"; Placeholder = "Device.Placeholder"; }
 
+
+#if !Management
     private Func<NodeOutput, CancellationToken, Task> Func { get; set; }
     Task ITriggerNode.StartAsync(Func<NodeOutput, CancellationToken, Task> func, CancellationToken cancellationToken)
     {
@@ -90,4 +92,18 @@ public class DeviceChangedTriggerNode : TextNode, ITriggerNode, IDisposable
             list.Remove(this);
         }
     }
+#else
+
+    Task ITriggerNode.StartAsync(Func<NodeOutput, CancellationToken, Task> func, CancellationToken cancellationToken)
+    {
+        return Task.CompletedTask;
+    }
+
+
+    public void Dispose()
+    {
+ 
+    }
+
+#endif
 }

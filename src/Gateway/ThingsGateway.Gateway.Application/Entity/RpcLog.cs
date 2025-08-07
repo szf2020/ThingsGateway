@@ -15,8 +15,10 @@ namespace ThingsGateway.Gateway.Application;
 /// <summary>
 /// Rpc写入日志
 ///</summary>
+#if !Management
 [SugarTable("rpc_log", TableDescription = "RPC操作日志")]
 [Tenant(SqlSugarConst.DB_Log)]
+#endif
 public class RpcLog : PrimaryIdEntity
 {
     /// <summary>

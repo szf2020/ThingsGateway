@@ -86,6 +86,7 @@ public class Startup : AppStartup
         services.AddSingleton<IAuthenticationService, AuthenticationService>();
         services.AddSingleton<IRestartService, RestartService>();
         services.AddSingleton<IChannelEnableService, ChannelEnableService>();
+        services.AddSingleton<IRealAlarmService, RealAlarmService>();
 
         services.AddGatewayHostedService<IAlarmHostedService, AlarmHostedService>();
         services.AddGatewayHostedService<IGatewayMonitorHostedService, GatewayMonitorHostedService>();

@@ -8,24 +8,16 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-using ThingsGateway.DB;
+namespace ThingsGateway.Gateway.Application;
 
-namespace ThingsGateway.Gateway.Razor;
-
-public partial class RealAlarmPage
+public class RulesLog
 {
-    [Inject]
-    IRealAlarmService RealAlarmService { get; set; }
-
-    #region 查询
-
-    private async Task<QueryData<AlarmVariable>> OnQueryAsync(QueryPageOptions options)
+    public RulesLog(Rules rules, TextFileLogger log)
     {
-        var realAlarmVariables = await RealAlarmService.GetCurrentUserRealAlarmVariables().ConfigureAwait(false);
-        var data = realAlarmVariables
-           .GetQueryData(options);
-        return data;
+        Log = log;
+        Rules = rules;
     }
 
-    #endregion 查询
+    public TextFileLogger Log { get; set; }
+    public Rules Rules { get; set; }
 }

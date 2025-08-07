@@ -22,9 +22,11 @@ namespace ThingsGateway.Gateway.Application;
 /// <summary>
 /// 设备表
 /// </summary>
+#if !Management
 [SugarTable("device", TableDescription = "设备表")]
 [Tenant(SqlSugarConst.DB_Custom)]
 [SugarIndex("unique_device_name", nameof(Device.Name), OrderByType.Asc, true)]
+#endif
 public class Device : BaseDataEntity, IValidatableObject
 {
     public override string ToString()

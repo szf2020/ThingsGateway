@@ -123,6 +123,15 @@ public static class QueryPageOptionsExtensions
         };
         var items = datas.GetData(option, out var totalCount, where);
         ret.TotalCount = totalCount;
+
+        if (totalCount > 0)
+        {
+            if (!items.Any() && option.PageIndex != 1)
+            {
+                option.PageIndex = 1;
+                items = datas.GetData(option, out totalCount, where);
+            }
+        }
         ret.Items = items.ToList();
         return ret;
     }

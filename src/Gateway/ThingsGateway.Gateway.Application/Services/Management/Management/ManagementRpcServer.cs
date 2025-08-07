@@ -19,7 +19,7 @@ using TouchSocket.Sockets;
 
 namespace ThingsGateway.Gateway.Application;
 
-public partial class ManagementRpcServer : IRpcServer, IManagementRpcServer, IBackendLogService, IRpcLogService, IRestartService, IAuthenticationService, IChannelEnableService, IRedundancyHostedService, IRedundancyService, ITextFileReadService, IPluginPageService
+public partial class ManagementRpcServer : IRpcServer, IManagementRpcServer, IBackendLogService, IRpcLogService, IRestartService, IAuthenticationService, IChannelEnableService, IRedundancyHostedService, IRedundancyService, ITextFileReadService, IPluginPageService, IRealAlarmService
 {
 
 
@@ -97,4 +97,6 @@ public partial class ManagementRpcServer : IRpcServer, IManagementRpcServer, IBa
 
 
     public Task SavePluginByPath(PluginAddPathInput plugin) => App.GetService<IPluginPageService>().SavePluginByPath(plugin);
+
+    public Task<IEnumerable<AlarmVariable>> GetCurrentUserRealAlarmVariables() => App.GetService<IRealAlarmService>().GetCurrentUserRealAlarmVariables();
 }

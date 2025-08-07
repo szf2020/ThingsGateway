@@ -5,12 +5,14 @@ using TouchSocket.Core;
 
 namespace ThingsGateway.Gateway.Application;
 
-[CategoryNode(Category = "Actuator", ImgUrl = "_content/ThingsGateway.Gateway.Razor/img/Rpc.svg", Desc = nameof(VariableRpcNode), LocalizerType = typeof(ThingsGateway.Gateway.Application.DefaultDiagram), WidgetType = "ThingsGateway.Gateway.Razor.VariableWidget,ThingsGateway.Gateway.Razor")]
+[CategoryNode(Category = "Actuator", ImgUrl = "_content/ThingsGateway.Gateway.Razor/img/Rpc.svg", Desc = nameof(VariableRpcNode), LocalizerType = typeof(ThingsGateway.Gateway.Application.INode), WidgetType = "ThingsGateway.Gateway.Razor.VariableWidget,ThingsGateway.Gateway.Razor")]
 public class VariableRpcNode : VariableNode, IActuatorNode
 {
     public VariableRpcNode(string id, Point? position = null) : base(id, position)
     { Title = "VariableRpcNode"; }
 
+
+#if !Management
     async Task<OperResult<NodeOutput>> IActuatorNode.ExecuteAsync(NodeInput input, CancellationToken cancellationToken)
     {
         try
@@ -37,4 +39,10 @@ public class VariableRpcNode : VariableNode, IActuatorNode
             return new OperResult<NodeOutput>(ex);
         }
     }
+#else
+    Task<OperResult<NodeOutput>> IActuatorNode.ExecuteAsync(NodeInput input, CancellationToken cancellationToken)
+    {
+        return Task.FromResult(new OperResult<NodeOutput>());
+    }
+#endif
 }

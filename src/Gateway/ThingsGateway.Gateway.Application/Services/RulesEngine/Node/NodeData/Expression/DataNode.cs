@@ -1,12 +1,13 @@
 ﻿
 using ThingsGateway.Blazor.Diagrams.Core.Geometry;
+#if !Management
 using ThingsGateway.Gateway.Application.Extensions;
-
+#endif
 using TouchSocket.Core;
 
 namespace ThingsGateway.Gateway.Application;
 
-[CategoryNode(Category = "Expression", ImgUrl = "_content/ThingsGateway.Gateway.Razor/img/CSharpScript.svg", Desc = nameof(DataNode), LocalizerType = typeof(ThingsGateway.Gateway.Application.DefaultDiagram), WidgetType = "ThingsGateway.Gateway.Razor.CSharpScriptWidget,ThingsGateway.Gateway.Razor")]
+[CategoryNode(Category = "Expression", ImgUrl = "_content/ThingsGateway.Gateway.Razor/img/CSharpScript.svg", Desc = nameof(DataNode), LocalizerType = typeof(ThingsGateway.Gateway.Application.INode), WidgetType = "ThingsGateway.Gateway.Razor.CSharpScriptWidget,ThingsGateway.Gateway.Razor")]
 public class DataNode : TextNode, IExpressionNode
 {
     public DataNode(string id, Point? position = null) : base(id, position)
@@ -14,6 +15,7 @@ public class DataNode : TextNode, IExpressionNode
         Title = "DataNode"; Placeholder = "DataNode.Placeholder";
         Text = "return 1;";
     }
+#if !Management
 
     Task<OperResult<NodeOutput>> IExpressionNode.ExecuteAsync(NodeInput input, CancellationToken cancellationToken)
     {
@@ -31,4 +33,10 @@ public class DataNode : TextNode, IExpressionNode
             return Task.FromResult(new OperResult<NodeOutput>(ex));
         }
     }
+#else
+    Task<OperResult<NodeOutput>> IExpressionNode.ExecuteAsync(NodeInput input, CancellationToken cancellationToken)
+    {
+        return Task.FromResult(new OperResult<NodeOutput>());
+    }
+#endif
 }

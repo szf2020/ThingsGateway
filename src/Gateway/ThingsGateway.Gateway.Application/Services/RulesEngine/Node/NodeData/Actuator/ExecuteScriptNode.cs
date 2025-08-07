@@ -6,7 +6,7 @@ using TouchSocket.Core;
 
 namespace ThingsGateway.Gateway.Application;
 
-[CategoryNode(Category = "Actuator", ImgUrl = "_content/ThingsGateway.Gateway.Razor/img/CSharpScript.svg", Desc = nameof(ExecuteScriptNode), LocalizerType = typeof(ThingsGateway.Gateway.Application.DefaultDiagram), WidgetType = "ThingsGateway.Gateway.Razor.CSharpScriptWidget,ThingsGateway.Gateway.Razor")]
+[CategoryNode(Category = "Actuator", ImgUrl = "_content/ThingsGateway.Gateway.Razor/img/CSharpScript.svg", Desc = nameof(ExecuteScriptNode), LocalizerType = typeof(ThingsGateway.Gateway.Application.INode), WidgetType = "ThingsGateway.Gateway.Razor.CSharpScriptWidget,ThingsGateway.Gateway.Razor")]
 public class ExecuteScriptNode : TextNode, IActuatorNode, IExexcuteExpressionsBase, IDisposable
 {
     public ExecuteScriptNode(string id, Point? position = null) : base(id, position)
@@ -84,6 +84,7 @@ public class ExecuteScriptNode : TextNode, IActuatorNode, IExexcuteExpressionsBa
         }
         set
         {
+#if !Management
             if (text != value)
             {
                 try
@@ -96,11 +97,11 @@ public class ExecuteScriptNode : TextNode, IActuatorNode, IExexcuteExpressionsBa
                 }
                 CSharpScriptEngineExtension.Remove(text);
             }
-
+#endif
             text = value;
         }
     }
-
+#if !Management
     async Task<OperResult<NodeOutput>> IActuatorNode.ExecuteAsync(NodeInput input, CancellationToken cancellationToken)
     {
         try
@@ -121,9 +122,15 @@ public class ExecuteScriptNode : TextNode, IActuatorNode, IExexcuteExpressionsBa
             return new OperResult<NodeOutput>(ex);
         }
     }
-
+#else
+    Task<OperResult<NodeOutput>> IActuatorNode.ExecuteAsync(NodeInput input, CancellationToken cancellationToken)
+    {
+        return Task.FromResult(new OperResult<NodeOutput>());
+    }
+#endif
     public void Dispose()
     {
+#if !Management
         if (!text.IsNullOrWhiteSpace())
         {
             try
@@ -136,6 +143,7 @@ public class ExecuteScriptNode : TextNode, IActuatorNode, IExexcuteExpressionsBa
             }
             CSharpScriptEngineExtension.Remove(text);
         }
+#endif
         GC.SuppressFinalize(this);
     }
 }

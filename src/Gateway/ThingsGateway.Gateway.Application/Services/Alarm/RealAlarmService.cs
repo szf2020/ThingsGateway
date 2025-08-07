@@ -8,24 +8,16 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-using ThingsGateway.DB;
+namespace ThingsGateway.Gateway.Application;
 
-namespace ThingsGateway.Gateway.Razor;
-
-public partial class RealAlarmPage
+/// <summary>
+/// 设备采集报警后台服务
+/// </summary>
+internal sealed class RealAlarmService : IRealAlarmService
 {
-    [Inject]
-    IRealAlarmService RealAlarmService { get; set; }
-
-    #region 查询
-
-    private async Task<QueryData<AlarmVariable>> OnQueryAsync(QueryPageOptions options)
+    public Task<IEnumerable<AlarmVariable>> GetCurrentUserRealAlarmVariables()
     {
-        var realAlarmVariables = await RealAlarmService.GetCurrentUserRealAlarmVariables().ConfigureAwait(false);
-        var data = realAlarmVariables
-           .GetQueryData(options);
-        return data;
+        return GlobalData.GetCurrentUserRealAlarmVariables();
     }
 
-    #endregion 查询
 }

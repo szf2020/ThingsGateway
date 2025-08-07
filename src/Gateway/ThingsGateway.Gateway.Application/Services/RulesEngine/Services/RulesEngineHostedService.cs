@@ -20,17 +20,6 @@ using ThingsGateway.NewLife;
 using TouchSocket.Core;
 
 namespace ThingsGateway.Gateway.Application;
-public class RulesLog
-{
-    public RulesLog(Rules rules, TextFileLogger log)
-    {
-        Log = log;
-        Rules = rules;
-    }
-
-    public TextFileLogger Log { get; set; }
-    public Rules Rules { get; set; }
-}
 
 internal sealed class RulesEngineHostedService : BackgroundService, IRulesEngineHostedService
 {

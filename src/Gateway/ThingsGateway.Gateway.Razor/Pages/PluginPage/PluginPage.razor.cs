@@ -69,7 +69,7 @@ public partial class PluginPage
         };
         op.Component = BootstrapDynamicComponent.CreateComponent<SavePlugin>(new Dictionary<string, object?>
         {
-            [nameof(SavePlugin.OnSavePlugin)] = new Func<PluginAddInput, Task>(PluginInfoUtil.SavePlugin),
+            [nameof(SavePlugin.OnSavePlugin)] = new Func<PluginAddInput, Task>((a) => PluginInfoUtil.SavePlugin(a, PluginService)),
         });
         await DialogService.Show(op);
     }

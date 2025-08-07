@@ -5,7 +5,7 @@ using TouchSocket.Core;
 
 namespace ThingsGateway.Gateway.Application;
 
-[CategoryNode(Category = "Trigger", ImgUrl = "_content/ThingsGateway.Gateway.Razor/img/TimeInterval.svg", Desc = nameof(TimeIntervalTriggerNode), LocalizerType = typeof(ThingsGateway.Gateway.Application.DefaultDiagram), WidgetType = "ThingsGateway.Gateway.Razor.TextWidget,ThingsGateway.Gateway.Razor")]
+[CategoryNode(Category = "Trigger", ImgUrl = "_content/ThingsGateway.Gateway.Razor/img/TimeInterval.svg", Desc = nameof(TimeIntervalTriggerNode), LocalizerType = typeof(ThingsGateway.Gateway.Application.INode), WidgetType = "ThingsGateway.Gateway.Razor.TextWidget,ThingsGateway.Gateway.Razor")]
 public class TimeIntervalTriggerNode : TextNode, ITriggerNode, IDisposable
 {
     ~TimeIntervalTriggerNode()
@@ -14,6 +14,7 @@ public class TimeIntervalTriggerNode : TextNode, ITriggerNode, IDisposable
     }
     public TimeIntervalTriggerNode(string id, Point? position = null) : base(id, position) { Title = "TimeIntervalTriggerNode"; Placeholder = "TimeIntervalTriggerNode.Placeholder"; }
 
+#if !Management
     private IScheduledTask _task;
     private Func<NodeOutput, CancellationToken, Task> Func { get; set; }
     Task ITriggerNode.StartAsync(Func<NodeOutput, CancellationToken, Task> func, CancellationToken cancellationToken)
@@ -51,4 +52,21 @@ public class TimeIntervalTriggerNode : TextNode, ITriggerNode, IDisposable
 
         GC.SuppressFinalize(this);
     }
+
+
+
+#else
+
+    Task ITriggerNode.StartAsync(Func<NodeOutput, CancellationToken, Task> func, CancellationToken cancellationToken)
+    {
+        return Task.CompletedTask;
+    }
+
+
+    public void Dispose()
+    {
+
+    }
+
+#endif
 }

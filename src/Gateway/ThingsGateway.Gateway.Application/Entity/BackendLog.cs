@@ -17,8 +17,10 @@ namespace ThingsGateway.Gateway.Application;
 /// <summary>
 /// 后台日志表
 ///</summary>
+#if !Management
 [SugarTable("backend_log", TableDescription = "后台日志表")]
 [Tenant(SqlSugarConst.DB_Log)]
+#endif
 public class BackendLog : PrimaryIdEntity
 {
     /// <summary>

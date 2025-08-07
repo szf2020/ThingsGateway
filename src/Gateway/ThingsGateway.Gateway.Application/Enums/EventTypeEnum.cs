@@ -39,4 +39,9 @@ public enum EventTypeEnum
     /// 准备恢复
     /// </summary>
     PrepareFinish,
+
+    /// <summary>
+    /// 报警确认并恢复
+    /// </summary>
+    ConfirmAndFinish,
 }
