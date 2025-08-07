@@ -448,6 +448,28 @@ namespace ThingsGateway.SqlSugar
 
         public override List<DbColumnInfo> GetColumnInfosByTableName(string tableName, bool isCache = true)
         {
+
+            if (string.IsNullOrEmpty(tableName)) return new List<DbColumnInfo>();
+            string cacheKey = "QuestDB.GetColumnInfosByTableName." + this.SqlBuilder.GetNoTranslationColumnName(tableName).ToLower() + this.Context.CurrentConnectionConfig.ConfigId;
+            cacheKey = GetCacheKey(cacheKey);
+
+            if (isCache)
+            {
+
+                return this.Context.Utilities.GetReflectionInoCacheInstance().GetOrCreate(cacheKey, () =>
+                {
+                    return GetColInfo(tableName);
+                });
+            }
+            else
+            {
+                return GetColInfo(tableName);
+
+            }
+        }
+
+        private List<DbColumnInfo> GetColInfo(string tableName)
+        {
             var sql = String.Format(GetColumnInfosByTableNameSql, tableName);
             List<DbColumnInfo> result = new List<DbColumnInfo>();
             var dt = this.Context.Ado.GetDataTable(sql);

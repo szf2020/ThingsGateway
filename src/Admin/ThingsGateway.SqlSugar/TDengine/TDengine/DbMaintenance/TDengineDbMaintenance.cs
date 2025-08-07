@@ -717,8 +717,32 @@ namespace ThingsGateway.SqlSugar
         /// <returns>列信息列表</returns>
         public override List<DbColumnInfo> GetColumnInfosByTableName(string tableName, bool isCache = true)
         {
-            var sql = $"select * from {this.SqlBuilder.GetTranslationColumnName(tableName)} where 1=2 ";
+
+            if (string.IsNullOrEmpty(tableName)) return new List<DbColumnInfo>();
+            string cacheKey = "TDengine.GetColumnInfosByTableName." + this.SqlBuilder.GetNoTranslationColumnName(tableName).ToLower() + this.Context.CurrentConnectionConfig.ConfigId;
+            cacheKey = GetCacheKey(cacheKey);
+
+            if (isCache)
+            {
+
+                return this.Context.Utilities.GetReflectionInoCacheInstance().GetOrCreate(cacheKey, () =>
+                     {
+                         return GetColInfo(tableName);
+                     });
+            }
+            else
+            {
+                return GetColInfo(tableName);
+
+            }
+
+        }
+
+        private List<DbColumnInfo> GetColInfo(string tableName)
+        {
             List<DbColumnInfo> result = new List<DbColumnInfo>();
+
+            var sql = $"select * from {this.SqlBuilder.GetTranslationColumnName(tableName)} where 1=2 ";
             DataTable dt = null;
             try
             {

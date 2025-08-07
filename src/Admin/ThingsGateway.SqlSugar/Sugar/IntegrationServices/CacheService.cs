@@ -31,7 +31,7 @@ namespace ThingsGateway.SqlSugar
             return ReflectionInoCore<V>.GetInstance().GetAllKey();
         }
 
-        public V GetOrCreate<V>(string cacheKey, Func<V> create, int cacheDurationInSeconds = int.MaxValue)
+        public V GetOrCreate<V>(string cacheKey, Func<V> create, int cacheDurationInSeconds = 3600)
         {
             return ReflectionInoCore<V>.GetInstance().GetOrCreate(cacheKey, create);
         }
@@ -43,10 +43,13 @@ namespace ThingsGateway.SqlSugar
     }
     public class ReflectionInoCore<V>
     {
-        private MemoryCache InstanceCache => new MemoryCache() { Expire = 60 };
+        private MemoryCache InstanceCache = new MemoryCache() { Expire = 180 };
         private static ReflectionInoCore<V> _instance = null;
         private static readonly object _instanceLock = new object();
-        private ReflectionInoCore() { }
+        private ReflectionInoCore()
+        {
+        
+        }
 
         public V this[string key]
         {
@@ -107,10 +110,10 @@ namespace ThingsGateway.SqlSugar
             return this.InstanceCache.Keys;
         }
 
-        public V GetOrCreate(string cacheKey, Func<V> create)
+        public V GetOrCreate(string cacheKey, Func<V> create, int expire = 3600)
         {
             return InstanceCache.GetOrAdd<V>(cacheKey, (a) =>
-            create());
+            create(), expire);
         }
     }
     public static class ReflectionInoHelper

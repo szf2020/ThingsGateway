@@ -8,6 +8,6 @@
         V Get<V>(string key);
         IEnumerable<string> GetAllKey<V>();
         void Remove<V>(string key);
-        V GetOrCreate<V>(string cacheKey, Func<V> create, int cacheDurationInSeconds = int.MaxValue);
+        V GetOrCreate<V>(string cacheKey, Func<V> create, int cacheDurationInSeconds = 3600);
     }
 }
