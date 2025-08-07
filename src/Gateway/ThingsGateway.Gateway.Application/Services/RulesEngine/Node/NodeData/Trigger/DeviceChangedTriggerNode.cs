@@ -102,7 +102,7 @@ public class DeviceChangedTriggerNode : TextNode, ITriggerNode, IDisposable
 
     public void Dispose()
     {
- 
+
     }
 
 #endif

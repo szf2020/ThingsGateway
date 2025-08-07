@@ -233,7 +233,7 @@ internal sealed class AlarmTask : IDisposable
                     if (result)
                     {
                         // 如果表达式结果为true，则触发报警事件
-                        AlarmChange(item, limit, text,false, alarmEnum, delay);
+                        AlarmChange(item, limit, text, false, alarmEnum, delay);
                     }
                 }
             }
@@ -433,7 +433,7 @@ internal sealed class AlarmTask : IDisposable
                 {
 
                     // 如果是需恢复报警事件，则从实时报警列表中移除该变量
-                    if(item.AlarmConfirm)
+                    if (item.AlarmConfirm)
                     {
                         GlobalData.RealAlarmIdVariables.TryRemove(item.Id, out _);
                         item.EventType = EventTypeEnum.ConfirmAndFinish;

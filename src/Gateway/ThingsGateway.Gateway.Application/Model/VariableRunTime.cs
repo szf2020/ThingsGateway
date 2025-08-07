@@ -46,7 +46,7 @@ public partial class VariableRuntime : Variable, IVariable, IDisposable
     private object _value;
     private object lastSetValue;
     private object rawValue;
-    internal object AlarmLockObject=new();
+    internal object AlarmLockObject = new();
     internal bool AlarmConfirm;
     private DeviceRuntime? deviceRuntime;
     private IVariableSource? variableSource;

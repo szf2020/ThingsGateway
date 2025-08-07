@@ -1,7 +1,9 @@
 ﻿
 using ThingsGateway.Blazor.Diagrams.Core.Geometry;
+
 #if !Management
 using ThingsGateway.Gateway.Application.Extensions;
+
 #endif
 using TouchSocket.Core;
 

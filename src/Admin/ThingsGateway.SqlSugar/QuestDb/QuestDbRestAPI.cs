@@ -189,8 +189,8 @@ namespace ThingsGateway.SqlSugar
                     "multipart/form-data; boundary=" + boundary);
 
                 // 发送请求并处理响应
-              using  var httpResponseMessage =
-                    await Post(client, tableName, httpContent).ConfigureAwait(false);
+                using var httpResponseMessage =
+                      await Post(client, tableName, httpContent).ConfigureAwait(false);
                 var readAsStringAsync = await httpResponseMessage.Content.ReadAsStringAsync().ConfigureAwait(false);
                 var splitByLine = QuestDbRestAPHelper.SplitByLine(readAsStringAsync);
 

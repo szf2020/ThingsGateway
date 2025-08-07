@@ -67,7 +67,7 @@ public class AlarmVariable : PrimaryIdEntity, IDBHistoryAlarm
     [SugarColumn(ColumnDescription = "报警等级", IsNullable = false)]
     [AutoGenerateColumn(Visible = true, Filterable = true, Sortable = true)]
     public int AlarmLevel { get; set; }
-    
+
     /// <inheritdoc  cref="VariableRuntime.AlarmCode"/>
     [SugarColumn(ColumnDescription = "报警值", IsNullable = false)]
     [AutoGenerateColumn(Visible = true, Filterable = true, Sortable = true)]

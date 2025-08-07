@@ -118,7 +118,7 @@ public class AlarmChangedTriggerNode : VariableNode, ITriggerNode, IDisposable
 
     public void Dispose()
     {
- 
+
     }
 #endif
 

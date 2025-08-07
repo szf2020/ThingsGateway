@@ -8,10 +8,6 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-using BootstrapBlazor.Components;
-
-using System.ComponentModel.DataAnnotations;
-
 using ThingsGateway.SqlSugar;
 
 namespace ThingsGateway.Plugin.DB;
@@ -22,7 +18,7 @@ public class QuestDBProducerProperty : RealDBProducerProperty
 
     public QuestDBProducerProperty()
     {
-        BigTextConnectStr="host=localhost;port=8812;username=admin;password=quest;database=qdb;ServerCompatibilityMode=NoTypeLoading;";
+        BigTextConnectStr = "host=localhost;port=8812;username=admin;password=quest;database=qdb;ServerCompatibilityMode=NoTypeLoading;";
     }
     [DynamicProperty]
     public bool RestApi { get; set; } = true;

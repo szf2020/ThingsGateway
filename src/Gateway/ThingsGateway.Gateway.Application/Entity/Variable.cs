@@ -49,8 +49,8 @@ public class Variable : BaseDataEntity, IValidatableObject
     private double lLAlarmCode = 0;
     private long deviceId;
     private int? arrayLength;
-    private int alarmDelay; 
-    private int alarmLevel; 
+    private int alarmDelay;
+    private int alarmLevel;
     private ProtectTypeEnum protectType = ProtectTypeEnum.ReadWrite;
     private DataTypeEnum dataType = DataTypeEnum.Int16;
 
@@ -59,7 +59,7 @@ public class Variable : BaseDataEntity, IValidatableObject
     /// </summary>
     [System.Text.Json.Serialization.JsonIgnore]
     [Newtonsoft.Json.JsonIgnore]
-    internal bool IsUp; 
+    internal bool IsUp;
     private bool enable = true;
     public bool DynamicVariable;
     private bool rpcWriteEnable = true;
