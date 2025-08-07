@@ -157,7 +157,11 @@
     </TabItem>
 
     <TabItem Text=@GatewayLocalizer["AlarmInformation"]>
-        <EditorForm class="p-2" AutoGenerateAllItem="false" RowType=RowType.Inline ItemsPerRow=2 LabelWidth=250 Model="Model">
+        <ValidateForm Model="Model.AlarmPropertys" @ref=Model.AlarmPropertysValidateForm
+                      @key=@($"VariableEditAlarmPropertysValidateForm{Model.Id}")
+                      Id=@($"VariableEditAlarmPropertysValidateForm{Model.Id}")>
+
+        <EditorForm class="p-2" AutoGenerateAllItem="false" RowType=RowType.Inline ItemsPerRow=2 LabelWidth=250 Model="Model.AlarmPropertys">
             <FieldItems>
 
                 <EditorItem @bind-Field="@context.BoolCloseAlarmText" />
@@ -188,9 +192,11 @@
                 <EditorItem @bind-Field="@context.CustomAlarmEnable" />
                 <EditorItem @bind-Field="@context.AlarmDelay" />
                 <EditorItem @bind-Field="@context.AlarmLevel" />
-                
+
             </FieldItems>
         </EditorForm>
+
+        </ValidateForm>
     </TabItem>
 @if (!BatchEditEnable)
 {

@@ -79,7 +79,7 @@ public partial class SqlHistoryAlarm : BusinessBaseWithCacheAlarm, IDBHistoryAla
         using var db = BusinessDatabaseUtil.GetDb((DbType)_driverPropertys.DbType, _driverPropertys.BigTextConnectStr);
         var query = db.Queryable<HistoryAlarm>().AS(_driverPropertys.TableName)
                              .WhereIF(input.StartTime != null, a => a.EventTime >= input.StartTime)
-                           .WhereIF(input.EndTime != null, a => a.EventTime <= input.EndTime)
+                           .WhereIF(input.EndTime != null, a => a.AlarmTime <= input.EndTime)
                            .WhereIF(!string.IsNullOrEmpty(input.VariableName), it => it.Name.Contains(input.VariableName))
                            .WhereIF(input.AlarmType != null, a => a.AlarmType == input.AlarmType)
                            .WhereIF(input.EventType != null, a => a.EventType == input.EventType)

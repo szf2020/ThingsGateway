@@ -63,77 +63,86 @@ public class AlarmVariable : PrimaryIdEntity, IDBHistoryAlarm
     [AutoGenerateColumn(Visible = true, Filterable = true, Sortable = true)]
     public DataTypeEnum DataType { get; set; }
 
-    /// <inheritdoc  cref="Variable.AlarmLevel"/>
+    /// <inheritdoc  cref="AlarmPropertys.AlarmLevel"/>
     [SugarColumn(ColumnDescription = "报警等级", IsNullable = false)]
     [AutoGenerateColumn(Visible = true, Filterable = true, Sortable = true)]
     public int AlarmLevel { get; set; }
 
-    /// <inheritdoc  cref="VariableRuntime.AlarmCode"/>
+    /// <inheritdoc  cref="AlarmRuntimePropertys.AlarmCode"/>
     [SugarColumn(ColumnDescription = "报警值", IsNullable = false)]
     [AutoGenerateColumn(Visible = true, Filterable = true, Sortable = true)]
     public string AlarmCode { get; set; }
 
-    /// <inheritdoc  cref="VariableRuntime.AlarmLimit"/>
+    /// <inheritdoc  cref="AlarmRuntimePropertys.AlarmLimit"/>
     [SugarColumn(ColumnDescription = "报警限值", IsNullable = false)]
     [AutoGenerateColumn(Visible = true, Filterable = true, Sortable = true)]
     public string AlarmLimit { get; set; }
 
-    /// <inheritdoc  cref="VariableRuntime.AlarmText"/>
+    /// <inheritdoc  cref="AlarmRuntimePropertys.AlarmText"/>
     [SugarColumn(ColumnDescription = "报警文本", IsNullable = true)]
     [AutoGenerateColumn(Visible = true, Filterable = true, Sortable = true)]
     public string? AlarmText { get; set; }
 
-    /// <inheritdoc  cref="VariableRuntime.RecoveryCode"/>
+    /// <inheritdoc  cref="AlarmRuntimePropertys.RecoveryCode"/>
     [SugarColumn(ColumnDescription = "恢复值", IsNullable = false)]
     [AutoGenerateColumn(Visible = true, Filterable = true, Sortable = true)]
     public string RecoveryCode { get; set; }
 
-    /// <inheritdoc  cref="VariableRuntime.AlarmTime"/>
+    /// <inheritdoc  cref="AlarmRuntimePropertys.AlarmTime"/>
     [SugarColumn(ColumnDescription = "报警时间", IsNullable = false)]
     [AutoGenerateColumn(Visible = true, Filterable = true, Sortable = true)]
     public DateTime AlarmTime { get; set; }
 
-    /// <inheritdoc  cref="VariableRuntime.EventTime"/>
+
+    /// <inheritdoc  cref="AlarmRuntimePropertys.EventTime"/>
     [SugarColumn(ColumnDescription = "事件时间", IsNullable = false)]
     [AutoGenerateColumn(Visible = true, Filterable = true, Sortable = true)]
     [TimeDbSplitField(DateType.Month)]
     public DateTime EventTime { get; set; }
 
-    /// <summary>
-    /// 报警类型
-    /// </summary>
+    /// <inheritdoc  cref="AlarmRuntimePropertys.FinishTime"/>
+    [SugarColumn(ColumnDescription = "恢复时间", IsNullable = false)]
+    [AutoGenerateColumn(Visible = true, Filterable = true, Sortable = true)]
+    [TimeDbSplitField(DateType.Month)]
+    public DateTime FinishTime { get; set; }
+
+    /// <inheritdoc  cref="AlarmRuntimePropertys.ConfirmTime"/>
+    [SugarColumn(ColumnDescription = "确认时间", IsNullable = false)]
+    [AutoGenerateColumn(Visible = true, Filterable = true, Sortable = true)]
+    [TimeDbSplitField(DateType.Month)]
+    public DateTime ConfirmTime { get; set; }
+
+    /// <inheritdoc  cref="AlarmRuntimePropertys.AlarmType"/>
     [SugarColumn(ColumnDescription = "报警类型", IsNullable = false)]
     [AutoGenerateColumn(Visible = true, Filterable = true, Sortable = true)]
     public AlarmTypeEnum? AlarmType { get; set; }
 
-    /// <summary>
-    /// 事件类型
-    /// </summary>
+    /// <inheritdoc  cref="AlarmRuntimePropertys.EventType"/>
     [SugarColumn(ColumnDescription = "事件类型", IsNullable = false)]
     [AutoGenerateColumn(Visible = true, Filterable = true, Sortable = true)]
     public EventTypeEnum EventType { get; set; }
 
-    /// <inheritdoc cref="Device.Remark1"/>
+    /// <inheritdoc cref="Variable.Remark1"/>
     [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
     [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
     public string Remark1 { get; set; }
 
-    /// <inheritdoc cref="Device.Remark2"/>
+    /// <inheritdoc cref="Variable.Remark2"/>
     [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
     [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
     public string Remark2 { get; set; }
 
-    /// <inheritdoc cref="Device.Remark3"/>
+    /// <inheritdoc cref="Variable.Remark3"/>
     [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
     [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
     public string Remark3 { get; set; }
 
-    /// <inheritdoc cref="Device.Remark4"/>
+    /// <inheritdoc cref="Variable.Remark4"/>
     [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
     [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
     public string Remark4 { get; set; }
 
-    /// <inheritdoc cref="Device.Remark5"/>
+    /// <inheritdoc cref="Variable.Remark5"/>
     [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
     [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
     public string Remark5 { get; set; }

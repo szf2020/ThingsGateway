@@ -29,7 +29,7 @@ namespace ThingsGateway.Gateway.Application;
 /// 采集插件，继承实现不同PLC通讯
 /// <para></para>
 /// </summary>
-public abstract class CollectBase : DriverBase, IRpcDriver
+public abstract partial class CollectBase : DriverBase, IRpcDriver
 {
     /// <summary>
     /// 插件配置项
@@ -278,11 +278,9 @@ public abstract class CollectBase : DriverBase, IRpcDriver
         }
     }
 
-    #region private
 
     #region 执行方法
-
-    async Task ReadVariableMed(object? state, CancellationToken cancellationToken)
+    async ValueTask ReadVariableMed(object? state, CancellationToken cancellationToken)
     {
         if (state is not VariableMethod readVariableMethods) return;
         if (Pause)
@@ -348,25 +346,25 @@ public abstract class CollectBase : DriverBase, IRpcDriver
     }
 
     #endregion
+    private readonly LinkedCancellationTokenSourceCache _linkedCtsCache = new();
 
     #region 执行默认读取
-
-    async Task ReadVariableSource(object? state, CancellationToken cancellationToken)
+    async ValueTask ReadVariableSource(object? state, CancellationToken cancellationToken)
     {
-        var readToken = await ReadWriteLock.ReaderLockAsync(cancellationToken).ConfigureAwait(false);
 
         if (state is not VariableSourceRead variableSourceRead) return;
 
         if (Pause) return;
         if (cancellationToken.IsCancellationRequested) return;
 
+        var readToken = await ReadWriteLock.ReaderLockAsync(cancellationToken).ConfigureAwait(false);
         if (readToken.IsCancellationRequested)
         {
             await ReadVariableSource(state, cancellationToken).ConfigureAwait(false);
             return;
         }
 
-        using var allTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, readToken);
+        var allTokenSource = _linkedCtsCache.GetLinkedTokenSource(cancellationToken, readToken);
         var allToken = allTokenSource.Token;
 
         //if (LogMessage?.LogLevel <= TouchSocket.Core.LogLevel.Trace)
@@ -434,13 +432,15 @@ public abstract class CollectBase : DriverBase, IRpcDriver
             variableSourceRead.LastErrorMessage = readResult.ErrorMessage;
             CurrentDevice.SetDeviceStatus(TimerX.Now, null, readResult.ErrorMessage);
             var time = DateTime.Now;
-            variableSourceRead.VariableRuntimes.ForEach(a => a.SetValue(null, time, isOnline: false));
+            foreach (var item in variableSourceRead.VariableRuntimes)
+            {
+                item.SetValue(null, time, isOnline: false);
+            }
         }
     }
 
     #endregion
 
-    #endregion
 
     protected virtual Task TestOnline(object? state, CancellationToken cancellationToken)
     {
@@ -722,4 +722,10 @@ public abstract class CollectBase : DriverBase, IRpcDriver
 
 
     #endregion 写入方法
+
+    protected override Task DisposeAsync(bool disposing)
+    {
+        _linkedCtsCache?.SafeDispose();
+        return base.DisposeAsync(disposing);
+    }
 }

@@ -74,6 +74,8 @@
     "Description": "描述",
     "DeviceName": "采集设备",
     "EventTime": "事件时间",
+    "ConfirmTime": "确认时间",
+    "FinishTime": "恢复时间",
     "EventType": "事件类型",
     "Name": "名称",
     "RecoveryCode": "恢复值",

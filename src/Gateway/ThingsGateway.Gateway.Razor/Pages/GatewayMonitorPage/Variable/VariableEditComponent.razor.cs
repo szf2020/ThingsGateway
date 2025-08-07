@@ -80,8 +80,15 @@ public partial class VariableEditComponent
     {
         try
         {
+            if (Model.AlarmPropertysValidateForm?.Validate() == false)
+            {
+                return;
+            }
+
             if (OnValidSubmit != null)
                 await OnValidSubmit.Invoke();
+
+
             if (OnCloseAsync != null)
                 await OnCloseAsync();
             await ToastService.Default();
@@ -91,11 +98,11 @@ public partial class VariableEditComponent
             await ToastService.Warn(ex);
         }
     }
-
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
 
+        Model.AlarmPropertys ??= new();
         Model.VariablePropertys ??= new();
         foreach (var item in Model.VariablePropertys)
         {

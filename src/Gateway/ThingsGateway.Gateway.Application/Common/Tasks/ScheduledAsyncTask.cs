@@ -10,6 +10,7 @@ public class ScheduledAsyncTask : DisposeBase, IScheduledTask, IScheduledIntInte
     private int _interval10MS = 10;
     public int IntervalMS { get; }
     private readonly Func<object?, CancellationToken, Task> _taskFunc;
+    private readonly Func<object?, CancellationToken, ValueTask> _valueTaskFunc;
     private readonly CancellationToken _token;
     private TimerX? _timer;
     private object? _state;
@@ -24,6 +25,14 @@ public class ScheduledAsyncTask : DisposeBase, IScheduledTask, IScheduledIntInte
         LogMessage = log;
         _state = state;
         _taskFunc = taskFunc;
+        _token = token;
+    }
+    public ScheduledAsyncTask(int interval, Func<object?, CancellationToken, ValueTask> taskFunc, object? state, ILog log, CancellationToken token)
+    {
+        IntervalMS = interval;
+        LogMessage = log;
+        _state = state;
+        _valueTaskFunc = taskFunc;
         _token = token;
     }
     private bool Check()
@@ -42,10 +51,16 @@ public class ScheduledAsyncTask : DisposeBase, IScheduledTask, IScheduledIntInte
             _timer = new TimerX(DoAsync, _state, IntervalMS, IntervalMS, nameof(IScheduledTask)) { Async = true };
     }
 
-    private async Task DoAsync(object? state)
+    private async ValueTask DoAsync(object? state)
     {
         if (Check())
             return;
+
+        if (_taskFunc == null && _valueTaskFunc == null)
+        {
+            Dispose();
+            return;
+        }
 
         Interlocked.Increment(ref _pendingTriggers);
 
@@ -55,9 +70,13 @@ public class ScheduledAsyncTask : DisposeBase, IScheduledTask, IScheduledIntInte
         // 减少一个触发次数
         Interlocked.Decrement(ref _pendingTriggers);
 
+
         try
         {
-            await _taskFunc(state, _token).ConfigureAwait(false);
+            if (_taskFunc != null)
+                await _taskFunc(state, _token).ConfigureAwait(false);
+            else if (_valueTaskFunc != null)
+                await _valueTaskFunc(state, _token).ConfigureAwait(false);
         }
         catch (OperationCanceledException)
         {

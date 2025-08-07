@@ -48,7 +48,7 @@ namespace ThingsGateway.SqlSugar
         private static readonly object _instanceLock = new object();
         private ReflectionInoCore()
         {
-        
+
         }
 
         public V this[string key]

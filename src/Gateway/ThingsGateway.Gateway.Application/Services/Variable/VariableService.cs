@@ -622,7 +622,7 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
         // 变量页处理
         if (sheetName == ExportString.VariableName)
         {
-            int row = 0;
+            int row = 1;
             ImportPreviewOutput<Dictionary<string, Variable>> importPreviewOutput = new();
             ImportPreviews.Add(sheetName, importPreviewOutput);
             deviceImportPreview = importPreviewOutput;
@@ -721,7 +721,97 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
             // 将变量列表转换为字典，并赋值给导入预览输出对象的 Data 属性
             importPreviewOutput.Data = variables.OrderBy(a => a.Row).GroupBy(a => a.DeviceId.ToString()).ToDictionary(a => a.Key, b => b.ToDictionary(a => a.Name));
         }
+        else if (sheetName == ExportString.AlarmName)
+        {
+            int row = 1;
+            ImportPreviewOutput<string> importPreviewOutput = new();
+            ImportPreviews.Add(sheetName, importPreviewOutput);
+            var type = typeof(AlarmPropertys);
+            // 获取目标类型的所有属性，并根据是否需要过滤 IgnoreExcelAttribute 进行筛选
+            var variableProperties = type.GetRuntimeProperties().Where(a => (a.GetCustomAttribute<IgnoreExcelAttribute>() == null) && a.CanWrite)
+                                        .ToDictionary(a => type.GetPropertyDisplayName(a.Name), a => (a, a.IsNullableType()));
 
+            // 并行处理每一行数据
+            rows.ParallelForEachStreamed((item, state, index) =>
+            {
+                try
+                {
+                    var alarm = item.ConvertToEntity<AlarmPropertys>(variableProperties);
+
+                    // 如果转换失败，则添加错误信息到导入预览结果并返回
+                    if (alarm == null)
+                    {
+                        importPreviewOutput.HasError = true;
+                        importPreviewOutput.Results.Add((Interlocked.Increment(ref row), false, Localizer["ImportNullError"]));
+                        return;
+                    }
+
+                    // 转化插件名称和变量名称
+                    item.TryGetValue(ExportString.VariableName, out var variableNameObj);
+                    item.TryGetValue(ExportString.DeviceName, out var collectDevName);
+                    deviceDicts.TryGetValue(collectDevName?.ToString(), out var collectDevice);
+                    // 如果设备名称或变量名称为空，或者找不到对应的设备，则添加错误信息到导入预览结果并返回
+                    if (collectDevName == null || collectDevice == null)
+                    {
+                        importPreviewOutput.HasError = true;
+                        importPreviewOutput.Results.Add((Interlocked.Increment(ref row), false, Localizer["DeviceNotNull"]));
+                        return;
+                    }
+                    if (variableNameObj == null)
+                    {
+                        importPreviewOutput.HasError = true;
+                        importPreviewOutput.Results.Add((Interlocked.Increment(ref row), false, Localizer["VariableNotNull"]));
+                        return;
+                    }
+
+                    // 对对象进行验证
+                    var validationContext = new ValidationContext(alarm);
+                    var validationResults = new List<ValidationResult>();
+                    validationContext.ValidateProperty(validationResults);
+
+                    // 构建验证结果的错误信息
+                    StringBuilder stringBuilder = new();
+                    foreach (var validationResult in validationResults.Where(v => !string.IsNullOrEmpty(v.ErrorMessage)))
+                    {
+                        foreach (var memberName in validationResult.MemberNames)
+                        {
+                            stringBuilder.Append(validationResult.ErrorMessage!);
+                        }
+                    }
+
+                    // 如果有验证错误，则添加错误信息到导入预览结果并返回
+                    if (stringBuilder.Length > 0)
+                    {
+                        importPreviewOutput.HasError = true;
+                        importPreviewOutput.Results.Add((Interlocked.Increment(ref row), false, stringBuilder.ToString()));
+                        return;
+                    }
+
+                    // 获取变量名称并检查是否存在于设备导入预览数据中
+                    var variableName = variableNameObj?.ToString();
+                    // 如果存在，则更新变量属性字典，并添加成功信息到导入预览结果；否则，添加错误信息到导入预览结果并返回
+                    if (deviceImportPreview.Data.TryGetValue(collectDevice.Id.ToString(), out var deviceVariables) && deviceVariables.TryGetValue(variableName, out var deviceVariable))
+                    {
+                        deviceVariable.AlarmPropertys = alarm;
+                        importPreviewOutput.Results.Add((Interlocked.Increment(ref row), true, null));
+                    }
+                    else
+                    {
+                        importPreviewOutput.HasError = true;
+                        importPreviewOutput.Results.Add((Interlocked.Increment(ref row), false, Localizer["VariableNotNull"]));
+                        return;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    // 捕获异常并添加错误信息到导入预览结果
+                    importPreviewOutput.HasError = true;
+                    importPreviewOutput.Results.Add((Interlocked.Increment(ref row), false, ex.Message));
+                }
+            });
+
+
+        }
         // 其他工作表处理
         else
         {

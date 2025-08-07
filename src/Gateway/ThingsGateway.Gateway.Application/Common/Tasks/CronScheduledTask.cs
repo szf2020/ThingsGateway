@@ -10,6 +10,7 @@ public class CronScheduledTask : DisposeBase, IScheduledTask
     private int _interval10MS = 10;
     private string _interval;
     private readonly Func<object?, CancellationToken, Task> _taskFunc;
+    private readonly Func<object?, CancellationToken, ValueTask> _valueTaskFunc;
     private readonly Action<object?, CancellationToken> _taskAction;
     private readonly CancellationToken _token;
     private TimerX? _timer;
@@ -28,6 +29,17 @@ public class CronScheduledTask : DisposeBase, IScheduledTask
         _taskFunc = taskFunc;
         _token = token;
     }
+    public CronScheduledTask(string interval, Func<object?, CancellationToken, ValueTask> taskFunc, object? state, ILog log, CancellationToken token)
+    {
+        _interval = interval;
+        LogMessage = log;
+        _state = state;
+        _valueTaskFunc = taskFunc;
+        _token = token;
+    }
+
+
+
     public CronScheduledTask(string interval, Action<object?, CancellationToken> taskAction, object? state, ILog log, CancellationToken token)
     {
         _interval = interval;
@@ -51,14 +63,14 @@ public class CronScheduledTask : DisposeBase, IScheduledTask
         if (Check()) return;
         if (_taskAction != null)
             _timer = new TimerX(TimerCallback, _state, _interval, nameof(IScheduledTask)) { Async = true };
-        else if (_taskFunc != null)
+        else if (_taskFunc != null || _valueTaskFunc != null)
             _timer = new TimerX(TimerCallbackAsync, _state, _interval, nameof(IScheduledTask)) { Async = true };
     }
 
-    private async Task TimerCallbackAsync(object? state)
+    private async ValueTask TimerCallbackAsync(object? state)
     {
         if (Check()) return;
-        if (_taskFunc == null)
+        if (_taskFunc == null && _valueTaskFunc == null)
         {
             Dispose();
             return;
@@ -74,7 +86,10 @@ public class CronScheduledTask : DisposeBase, IScheduledTask
 
         try
         {
-            await _taskFunc(state, _token).ConfigureAwait(false);
+            if (_taskFunc != null)
+                await _taskFunc(state, _token).ConfigureAwait(false);
+            else if (_valueTaskFunc != null)
+                await _valueTaskFunc(state, _token).ConfigureAwait(false);
         }
         catch (OperationCanceledException)
         {

@@ -306,8 +306,19 @@ public class TimerScheduler : ILogFeature
                 return;
             }
 
-            var func = timer.Method.As<Func<Object?, Task>>(target);
-            await func!(timer.State).ConfigureAwait(false);
+#if NET6_0_OR_GREATER
+            if (timer.IsValueTask)
+            {
+                var func = timer.Method.As<Func<Object?, ValueTask>>(target);
+                await func!(timer.State).ConfigureAwait(false);
+            }
+            else
+#endif
+            {
+                var func = timer.Method.As<Func<Object?, Task>>(target);
+                await func!(timer.State).ConfigureAwait(false);
+            }
+
         }
         catch (ThreadAbortException) { throw; }
         catch (ThreadInterruptedException) { throw; }

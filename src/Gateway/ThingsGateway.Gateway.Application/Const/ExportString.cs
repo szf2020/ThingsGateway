@@ -35,6 +35,12 @@ public static class ExportString
     /// </summary>
     public static string VariableName => Localizer["VariableName"];
 
+
+    /// <summary>
+    /// 变量报警表名称
+    /// </summary>
+    public static string AlarmName => Localizer["AlarmName"];
+
     public static IStringLocalizer localizer;
     public static IStringLocalizer Localizer
     {

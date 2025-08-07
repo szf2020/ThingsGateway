@@ -255,6 +255,12 @@ public partial class VariableRuntimeInfo : IDisposable
                 }
             }
 
+            variable.AlarmPropertys ??= new();
+            if (variable.AlarmPropertysValidateForm?.Validate() == false)
+            {
+                return false;
+            }
+
             variable.VariablePropertys = PluginServiceUtil.SetDict(variable.VariablePropertyModels);
             variable = variable.AdaptVariable();
             return await Task.Run(() => GlobalData.VariableRuntimeService.SaveVariableAsync(variable, itemChangedType, AutoRestartThread, default));

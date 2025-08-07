@@ -21,33 +21,22 @@ namespace ThingsGateway.Gateway.Application;
 /// </summary>
 public partial class VariableRuntime : Variable, IVariable, IDisposable
 {
-    private DateTime? prepareAlarmEventTime;
-    private DateTime? prepareFinishEventTime;
-    private EventTypeEnum? eventType;
 
-    private AlarmTypeEnum? alarmType { get; set; }
 
     private int index;
     private int sortCode;
     private DateTime changeTime = DateTime.UnixEpoch.ToLocalTime();
-    private DateTime alarmTime;
-    private DateTime eventTime;
+
     private DateTime collectTime = DateTime.UnixEpoch.ToLocalTime();
 
     private bool _isOnline;
     private bool _isOnlineChanged;
     private bool _valueInited;
 
-    private string alarmLimit;
-    private string alarmText;
-    private string alarmCode;
     private string _lastErrorMessage;
-    private string recoveryCode;
     private object _value;
     private object lastSetValue;
     private object rawValue;
-    internal object AlarmLockObject = new();
-    internal bool AlarmConfirm;
     private DeviceRuntime? deviceRuntime;
     private IVariableSource? variableSource;
     private VariableMethod? variableMethod;
@@ -183,9 +172,9 @@ public partial class VariableRuntime : Variable, IVariable, IDisposable
     public void Init(DeviceRuntime deviceRuntime)
     {
         GlobalData.AlarmEnableIdVariables.Remove(Id);
-        if (GlobalData.RealAlarmIdVariables.TryRemove(Id, out var oldAlarm))
+        if (!AlarmEnable && GlobalData.RealAlarmIdVariables.TryRemove(Id, out var oldAlarm))
         {
-            oldAlarm.EventType = EventTypeEnum.Finish;
+            oldAlarm.EventType = EventTypeEnum.Restart;
             oldAlarm.EventTime = DateTime.Now;
             GlobalData.AlarmChange(this.AdaptAlarmVariable());
         }
@@ -199,6 +188,7 @@ public partial class VariableRuntime : Variable, IVariable, IDisposable
         GlobalData.IdVariables.TryAdd(Id, this);
         if (AlarmEnable)
         {
+            this.AlarmRuntimePropertys = new();
             GlobalData.AlarmEnableIdVariables.TryAdd(Id, this);
         }
     }
@@ -212,7 +202,7 @@ public partial class VariableRuntime : Variable, IVariable, IDisposable
         GlobalData.AlarmEnableIdVariables.Remove(Id);
         if (GlobalData.RealAlarmIdVariables.TryRemove(Id, out var oldAlarm))
         {
-            oldAlarm.EventType = EventTypeEnum.Finish;
+            oldAlarm.EventType = EventTypeEnum.Restart;
             oldAlarm.EventTime = DateTime.Now;
             GlobalData.AlarmChange(this.AdaptAlarmVariable());
         }

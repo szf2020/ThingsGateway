@@ -147,6 +147,8 @@
     "DeviceName": "设备名称",
     "Enable": "变量使能",
     "EventTime": "事件时间",
+    "ConfirmTime": "确认时间",
+    "FinishTime": "恢复时间",
     "EventType": "事件类型",
     "HAlarmCode": "高限值",
     "HAlarmEnable": "高报使能",
@@ -392,6 +394,7 @@
     "BusinessDeviceName": "业务设备",
     "ChannelName": "通道",
     "DeviceName": "设备",
+    "AlarmName": "报警",
     "RedundantDeviceName": "冗余设备",
     "VariableName": "变量"
   },
@@ -523,6 +526,40 @@
     "VariableNotNull": "变量名称不存在",
     "WriteExpressions": "写入表达式"
   },
+
+  "ThingsGateway.Gateway.Application.AlarmPropertys": {
+
+    "AlarmDelay": "报警延时",
+    "AlarmLevel": "报警等级",
+    "BoolCloseAlarmEnable": "布尔关报警使能",
+    "BoolCloseAlarmText": "布尔关报警文本",
+    "BoolCloseRestrainExpressions": "布尔关报警约束",
+    "BoolOpenAlarmEnable": "布尔开报警使能",
+    "BoolOpenAlarmText": "布尔开报警文本",
+    "BoolOpenRestrainExpressions": "布尔开报警约束",
+    "CustomAlarmCode": "自定义报警限值",
+    "CustomAlarmEnable": "自定义报警使能",
+    "CustomAlarmText": "自定义报警文本",
+    "CustomRestrainExpressions": "自定义报警约束",
+    "HAlarmCode": "高限值",
+    "HAlarmEnable": "高报使能",
+    "HAlarmText": "高报文本",
+    "HHAlarmCode": "高高限值",
+    "HHAlarmEnable": "高高报使能",
+    "HHAlarmText": "高高报文本",
+    "HHRestrainExpressions": "高高报约束",
+    "HRestrainExpressions": "高报约束",
+    "LAlarmCode": "低限值",
+    "LAlarmEnable": "低报使能",
+    "LAlarmText": "低报文本",
+    "LLAlarmCode": "低低限值",
+    "LLAlarmEnable": "低低报使能",
+    "LLAlarmText": "低低报文本",
+    "LLRestrainExpressions": "低低报约束",
+    "LRestrainExpressions": "低报约束"
+   
+  },
+
   "ThingsGateway.Gateway.Application.VariableRuntime": {
     "AlarmCode": "报警值",
     "AlarmEnable": "报警使能",
@@ -537,6 +574,8 @@
     "DeviceName": "设备名称",
     "DynamicVariable": "动态变量",
     "EventTime": "事件时间",
+    "ConfirmTime": "确认时间",
+    "FinishTime": "恢复时间",
     "EventType": "事件类型",
     "IntervalTime.MinValue": " {0} 值太小",
     "IsOnline": "在线",

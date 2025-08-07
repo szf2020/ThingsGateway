@@ -74,6 +74,8 @@
     "Description": "Description",
     "DeviceName": "DeviceName",
     "EventTime": "EventTime",
+    "ConfirmTime": "ConfirmTime",
+    "FinishTime": "FinishTime",
     "EventType": "EventType",
     "Name": "Name",
     "RecoveryCode": "RecoveryCode",

@@ -69,19 +69,19 @@ internal sealed class AlarmTask : IDisposable
             return null; // 如果是，则返回null
         }
 
-        if (tag.BoolCloseAlarmEnable && !tag.Value.ToBoolean(true)) // 检查是否启用了关闭报警功能，并且变量的布尔值为false
+        if (tag.AlarmPropertys.BoolCloseAlarmEnable && !tag.Value.ToBoolean(true)) // 检查是否启用了关闭报警功能，并且变量的布尔值为false
         {
             limit = false.ToString(); // 将报警限制值设置为"false"
-            expressions = tag.BoolCloseRestrainExpressions!; // 获取关闭报警的约束表达式
-            text = tag.BoolCloseAlarmText!; // 获取关闭报警时的报警文本
+            expressions = tag.AlarmPropertys.BoolCloseRestrainExpressions!; // 获取关闭报警的约束表达式
+            text = tag.AlarmPropertys.BoolCloseAlarmText!; // 获取关闭报警时的报警文本
             return AlarmTypeEnum.Close; // 返回关闭报警类型枚举
         }
 
-        if (tag.BoolOpenAlarmEnable && tag.Value.ToBoolean(false)) // 检查是否启用了开启报警功能，并且变量的布尔值为true
+        if (tag.AlarmPropertys.BoolOpenAlarmEnable && tag.Value.ToBoolean(false)) // 检查是否启用了开启报警功能，并且变量的布尔值为true
         {
             limit = true.ToString(); // 将报警限制值设置为"true"
-            expressions = tag.BoolOpenRestrainExpressions!; // 获取开启报警的约束表达式
-            text = tag.BoolOpenAlarmText!; // 获取开启报警时的报警文本
+            expressions = tag.AlarmPropertys.BoolOpenRestrainExpressions!; // 获取开启报警的约束表达式
+            text = tag.AlarmPropertys.BoolOpenAlarmText!; // 获取开启报警时的报警文本
             return AlarmTypeEnum.Open; // 返回开启报警类型枚举
         }
 
@@ -107,18 +107,18 @@ internal sealed class AlarmTask : IDisposable
             return null; // 如果是，则返回null
         }
 
-        if (tag.CustomAlarmEnable) // 检查是否启用了自定义报警功能
+        if (tag.AlarmPropertys.CustomAlarmEnable) // 检查是否启用了自定义报警功能
         {
             // 调用变量的CustomAlarmCode属性的GetExpressionsResult方法，传入变量的值，获取报警表达式的计算结果
-            var result = tag.CustomAlarmCode.GetExpressionsResult(tag.Value, tag.DeviceRuntime?.Driver?.LogMessage);
+            var result = tag.AlarmPropertys.CustomAlarmCode.GetExpressionsResult(tag.Value, tag.DeviceRuntime?.Driver?.LogMessage);
 
             if (result is bool boolResult) // 检查计算结果是否为布尔类型
             {
                 if (boolResult) // 如果计算结果为true
                 {
-                    limit = tag.CustomAlarmCode; // 将报警限制值设置为自定义报警代码
-                    expressions = tag.CustomRestrainExpressions!; // 获取自定义报警时的报警约束表达式
-                    text = tag.CustomAlarmText!; // 获取自定义报警时的报警文本
+                    limit = tag.AlarmPropertys.CustomAlarmCode; // 将报警限制值设置为自定义报警代码
+                    expressions = tag.AlarmPropertys.CustomRestrainExpressions!; // 获取自定义报警时的报警约束表达式
+                    text = tag.AlarmPropertys.CustomAlarmText!; // 获取自定义报警时的报警文本
                     return AlarmTypeEnum.Custom; // 返回自定义报警类型枚举
                 }
             }
@@ -147,38 +147,38 @@ internal sealed class AlarmTask : IDisposable
         }
 
         // 检查是否启用了高高报警功能，并且变量的值大于高高报警的限制值
-        if (tag.HHAlarmEnable && tag.Value.ToDecimal() > tag.HHAlarmCode.ToDecimal())
+        if (tag.AlarmPropertys.HHAlarmEnable && tag.Value.ToDecimal() > tag.AlarmPropertys.HHAlarmCode)
         {
-            limit = tag.HHAlarmCode.ToString()!; // 将报警限制值设置为高高报警的限制值
-            expressions = tag.HHRestrainExpressions!; // 获取高高报警的约束表达式
-            text = tag.HHAlarmText!; // 获取高高报警时的报警文本
+            limit = tag.AlarmPropertys.HHAlarmCode.ToString()!; // 将报警限制值设置为高高报警的限制值
+            expressions = tag.AlarmPropertys.HHRestrainExpressions!; // 获取高高报警的约束表达式
+            text = tag.AlarmPropertys.HHAlarmText!; // 获取高高报警时的报警文本
             return AlarmTypeEnum.HH; // 返回高高报警类型枚举
         }
 
         // 检查是否启用了高报警功能，并且变量的值大于高报警的限制值
-        if (tag.HAlarmEnable && tag.Value.ToDecimal() > tag.HAlarmCode.ToDecimal())
+        if (tag.AlarmPropertys.HAlarmEnable && tag.Value.ToDecimal() > tag.AlarmPropertys.HAlarmCode)
         {
-            limit = tag.HAlarmCode.ToString()!; // 将报警限制值设置为高报警的限制值
-            expressions = tag.HRestrainExpressions!; // 获取高报警的约束表达式
-            text = tag.HAlarmText!; // 获取高报警时的报警文本
+            limit = tag.AlarmPropertys.HAlarmCode.ToString()!; // 将报警限制值设置为高报警的限制值
+            expressions = tag.AlarmPropertys.HRestrainExpressions!; // 获取高报警的约束表达式
+            text = tag.AlarmPropertys.HAlarmText!; // 获取高报警时的报警文本
             return AlarmTypeEnum.H; // 返回高报警类型枚举
         }
 
         // 检查是否启用了低低报警功能，并且变量的值小于低低报警的限制值
-        if (tag.LLAlarmEnable && tag.Value.ToDecimal() < tag.LLAlarmCode.ToDecimal())
+        if (tag.AlarmPropertys.LLAlarmEnable && tag.Value.ToDecimal() < tag.AlarmPropertys.LLAlarmCode)
         {
-            limit = tag.LLAlarmCode.ToString()!; // 将报警限制值设置为低低报警的限制值
-            expressions = tag.LLRestrainExpressions!; // 获取低低报警的约束表达式
-            text = tag.LLAlarmText!; // 获取低低报警时的报警文本
+            limit = tag.AlarmPropertys.LLAlarmCode.ToString()!; // 将报警限制值设置为低低报警的限制值
+            expressions = tag.AlarmPropertys.LLRestrainExpressions!; // 获取低低报警的约束表达式
+            text = tag.AlarmPropertys.LLAlarmText!; // 获取低低报警时的报警文本
             return AlarmTypeEnum.LL; // 返回低低报警类型枚举
         }
 
         // 检查是否启用了低报警功能，并且变量的值小于低报警的限制值
-        if (tag.LAlarmEnable && tag.Value.ToDecimal() < tag.LAlarmCode.ToDecimal())
+        if (tag.AlarmPropertys.LAlarmEnable && tag.Value.ToDecimal() < tag.AlarmPropertys.LAlarmCode)
         {
-            limit = tag.LAlarmCode.ToString()!; // 将报警限制值设置为低报警的限制值
-            expressions = tag.LRestrainExpressions!; // 获取低报警的约束表达式
-            text = tag.LAlarmText!; // 获取低报警时的报警文本
+            limit = tag.AlarmPropertys.LAlarmCode.ToString()!; // 将报警限制值设置为低报警的限制值
+            expressions = tag.AlarmPropertys.LRestrainExpressions!; // 获取低报警的约束表达式
+            text = tag.AlarmPropertys.LAlarmText!; // 获取低报警时的报警文本
             return AlarmTypeEnum.L; // 返回低报警类型枚举
         }
 
@@ -195,7 +195,7 @@ internal sealed class AlarmTask : IDisposable
         string ex; // 报警约束表达式
         string text; // 报警文本
         AlarmTypeEnum? alarmEnum; // 报警类型枚举
-        int delay = item.AlarmDelay; // 获取报警延迟时间
+        int delay = item.AlarmPropertys.AlarmDelay; // 获取报警延迟时间
 
         // 检查变量的数据类型
         if (item.Value?.GetType() == typeof(bool))
@@ -235,6 +235,10 @@ internal sealed class AlarmTask : IDisposable
                         // 如果表达式结果为true，则触发报警事件
                         AlarmChange(item, limit, text, false, alarmEnum, delay);
                     }
+                    else
+                    {
+                        AlarmChange(item, limit, text, true, alarmEnum, delay);
+                    }
                 }
             }
             else
@@ -256,7 +260,7 @@ internal sealed class AlarmTask : IDisposable
     /// <param name="delay">报警延时</param>
     private static void AlarmChange(VariableRuntime item, object limit, string text, bool finish, AlarmTypeEnum? alarmEnum, int delay)
     {
-        lock (item.AlarmLockObject)
+        lock (item.AlarmRuntimePropertys.AlarmLockObject)
         {
             bool changed = false;
             if (finish)
@@ -270,14 +274,14 @@ internal sealed class AlarmTask : IDisposable
             }
             else
             {
-                if (item.EventType != EventTypeEnum.Confirm)
-                    item.AlarmConfirm = false;
+                if (item.AlarmRuntimePropertys.EventType != EventTypeEnum.Confirm)
+                    item.AlarmRuntimePropertys.AlarmConfirm = false;
                 // 如果是触发报警事件
                 // 在实时报警列表中查找该变量
-                if (GlobalData.RealAlarmIdVariables.TryGetValue(item.Id, out var variable))
+                if (GlobalData.RealAlarmIdVariables.TryGetValue(item.Id, out var variable) && (variable.EventType == EventTypeEnum.Alarm || variable.EventType == EventTypeEnum.Confirm))
                 {
                     // 如果变量已经处于相同的报警类型，则直接返回
-                    if (item.AlarmType == alarmEnum)
+                    if (item.AlarmRuntimePropertys.AlarmType == alarmEnum)
                         return;
                 }
             }
@@ -289,48 +293,48 @@ internal sealed class AlarmTask : IDisposable
                 //添加报警延时策略
                 if (delay > 0)
                 {
-                    if (item.EventType != EventTypeEnum.Alarm && item.EventType != EventTypeEnum.PrepareAlarm)
+                    if (item.AlarmRuntimePropertys.EventType != EventTypeEnum.Alarm && item.AlarmRuntimePropertys.EventType != EventTypeEnum.PrepareAlarm)
                     {
-                        item.EventType = EventTypeEnum.PrepareAlarm;//准备报警
-                        item.PrepareAlarmEventTime = now;
+                        item.AlarmRuntimePropertys.EventType = EventTypeEnum.PrepareAlarm;//准备报警
+                        item.AlarmRuntimePropertys.PrepareAlarmEventTime = now;
                     }
                     else
                     {
-                        if (item.EventType == EventTypeEnum.PrepareAlarm)
+                        if (item.AlarmRuntimePropertys.EventType == EventTypeEnum.PrepareAlarm)
                         {
-                            if ((now - item.PrepareAlarmEventTime!.Value).TotalMilliseconds > delay)
+                            if ((now - item.AlarmRuntimePropertys.PrepareAlarmEventTime!.Value).TotalMilliseconds > delay)
                             {
                                 //超过延时时间，触发报警
-                                item.EventType = EventTypeEnum.Alarm;
-                                item.AlarmTime = now;
-                                item.EventTime = now;
-                                item.AlarmType = alarmEnum;
-                                item.AlarmLimit = limit.ToString();
-                                item.AlarmCode = item.Value.ToString();
-                                item.RecoveryCode = string.Empty;
-                                item.AlarmText = text;
-                                item.PrepareAlarmEventTime = null;
+                                item.AlarmRuntimePropertys.EventType = EventTypeEnum.Alarm;
+                                item.AlarmRuntimePropertys.AlarmTime = now;
+                                item.AlarmRuntimePropertys.EventTime = now;
+                                item.AlarmRuntimePropertys.AlarmType = alarmEnum;
+                                item.AlarmRuntimePropertys.AlarmLimit = limit.ToString();
+                                item.AlarmRuntimePropertys.AlarmCode = item.Value.ToString();
+                                item.AlarmRuntimePropertys.RecoveryCode = string.Empty;
+                                item.AlarmRuntimePropertys.AlarmText = text;
+                                item.AlarmRuntimePropertys.PrepareAlarmEventTime = null;
 
                                 changed = true;
                             }
                         }
-                        else if (item.EventType == EventTypeEnum.Alarm && item.AlarmType != alarmEnum)
+                        else if (item.AlarmRuntimePropertys.EventType == EventTypeEnum.Alarm && item.AlarmRuntimePropertys.AlarmType != alarmEnum)
                         {
                             //报警类型改变，重新计时
-                            if (item.PrepareAlarmEventTime == null)
-                                item.PrepareAlarmEventTime = now;
-                            if ((now - item.PrepareAlarmEventTime!.Value).TotalMilliseconds > delay)
+                            if (item.AlarmRuntimePropertys.PrepareAlarmEventTime == null)
+                                item.AlarmRuntimePropertys.PrepareAlarmEventTime = now;
+                            if ((now - item.AlarmRuntimePropertys.PrepareAlarmEventTime!.Value).TotalMilliseconds > delay)
                             {
                                 //超过延时时间，触发报警
-                                item.EventType = EventTypeEnum.Alarm;
-                                item.AlarmTime = now;
-                                item.EventTime = now;
-                                item.AlarmType = alarmEnum;
-                                item.AlarmLimit = limit.ToString();
-                                item.AlarmCode = item.Value.ToString();
-                                item.RecoveryCode = string.Empty;
-                                item.AlarmText = text;
-                                item.PrepareAlarmEventTime = null;
+                                item.AlarmRuntimePropertys.EventType = EventTypeEnum.Alarm;
+                                item.AlarmRuntimePropertys.AlarmTime = now;
+                                item.AlarmRuntimePropertys.EventTime = now;
+                                item.AlarmRuntimePropertys.AlarmType = alarmEnum;
+                                item.AlarmRuntimePropertys.AlarmLimit = limit.ToString();
+                                item.AlarmRuntimePropertys.AlarmCode = item.Value.ToString();
+                                item.AlarmRuntimePropertys.RecoveryCode = string.Empty;
+                                item.AlarmRuntimePropertys.AlarmText = text;
+                                item.AlarmRuntimePropertys.PrepareAlarmEventTime = null;
                                 changed = true;
                             }
                         }
@@ -343,15 +347,15 @@ internal sealed class AlarmTask : IDisposable
                 else
                 {
                     // 如果是触发报警事件
-                    item.EventType = EventTypeEnum.Alarm;
-                    item.AlarmTime = now;
-                    item.EventTime = now;
-                    item.AlarmType = alarmEnum;
-                    item.AlarmLimit = limit.ToString();
-                    item.AlarmCode = item.Value.ToString();
-                    item.RecoveryCode = string.Empty;
-                    item.AlarmText = text;
-                    item.PrepareAlarmEventTime = null;
+                    item.AlarmRuntimePropertys.EventType = EventTypeEnum.Alarm;
+                    item.AlarmRuntimePropertys.AlarmTime = now;
+                    item.AlarmRuntimePropertys.EventTime = now;
+                    item.AlarmRuntimePropertys.AlarmType = alarmEnum;
+                    item.AlarmRuntimePropertys.AlarmLimit = limit.ToString();
+                    item.AlarmRuntimePropertys.AlarmCode = item.Value.ToString();
+                    item.AlarmRuntimePropertys.RecoveryCode = string.Empty;
+                    item.AlarmRuntimePropertys.AlarmText = text;
+                    item.AlarmRuntimePropertys.PrepareAlarmEventTime = null;
                     changed = true;
                 }
             }
@@ -361,30 +365,31 @@ internal sealed class AlarmTask : IDisposable
                 //添加报警延时策略
                 if (delay > 0)
                 {
-                    if (item.EventType != EventTypeEnum.Finish && item.EventType != EventTypeEnum.PrepareFinish)
+                    if (item.AlarmRuntimePropertys.EventType != EventTypeEnum.Finish && item.AlarmRuntimePropertys.EventType != EventTypeEnum.PrepareFinish)
                     {
-                        item.EventType = EventTypeEnum.PrepareFinish;
-                        item.PrepareFinishEventTime = now;
+                        item.AlarmRuntimePropertys.EventType = EventTypeEnum.PrepareFinish;
+                        item.AlarmRuntimePropertys.PrepareFinishEventTime = now;
                     }
                     else
                     {
-                        if (item.EventType == EventTypeEnum.PrepareFinish)
+                        if (item.AlarmRuntimePropertys.EventType == EventTypeEnum.PrepareFinish)
                         {
-                            if ((now - item.PrepareFinishEventTime!.Value).TotalMilliseconds > delay)
+                            if ((now - item.AlarmRuntimePropertys.PrepareFinishEventTime!.Value).TotalMilliseconds > delay)
                             {
                                 if (GlobalData.RealAlarmIdVariables.TryGetValue(item.Id, out var oldAlarm))
                                 {
-                                    item.AlarmType = oldAlarm.AlarmType;
-                                    item.AlarmLimit = oldAlarm.AlarmLimit;
-                                    item.AlarmCode = oldAlarm.AlarmCode;
-                                    item.RecoveryCode = item.Value.ToString();
-                                    item.AlarmText = oldAlarm.AlarmText;
-                                    if (item.EventType != EventTypeEnum.Finish)
+                                    item.AlarmRuntimePropertys.AlarmType = oldAlarm.AlarmType;
+                                    item.AlarmRuntimePropertys.AlarmLimit = oldAlarm.AlarmLimit;
+                                    item.AlarmRuntimePropertys.AlarmCode = oldAlarm.AlarmCode;
+                                    item.AlarmRuntimePropertys.RecoveryCode = item.Value.ToString();
+                                    item.AlarmRuntimePropertys.AlarmText = oldAlarm.AlarmText;
+                                    if (item.AlarmRuntimePropertys.EventType != EventTypeEnum.Finish)
                                     {
-                                        item.EventTime = now;
+                                        item.AlarmRuntimePropertys.FinishTime = now;
+                                        item.AlarmRuntimePropertys.EventTime = now;
                                     }
-                                    item.EventType = EventTypeEnum.Finish;
-                                    item.PrepareFinishEventTime = null;
+                                    item.AlarmRuntimePropertys.EventType = EventTypeEnum.Finish;
+                                    item.AlarmRuntimePropertys.PrepareFinishEventTime = null;
                                     changed = true;
                                 }
                             }
@@ -399,20 +404,24 @@ internal sealed class AlarmTask : IDisposable
                 {
                     // 如果是需恢复报警事件
                     // 获取旧的报警信息
-                    if (GlobalData.RealAlarmIdVariables.TryGetValue(item.Id, out var oldAlarm))
+                    if (item.AlarmRuntimePropertys.EventType != EventTypeEnum.Finish && item.AlarmRuntimePropertys.EventType != EventTypeEnum.PrepareFinish)
                     {
-                        item.AlarmType = oldAlarm.AlarmType;
-                        item.AlarmLimit = oldAlarm.AlarmLimit;
-                        item.AlarmCode = oldAlarm.AlarmCode;
-                        item.RecoveryCode = item.Value.ToString();
-                        item.AlarmText = oldAlarm.AlarmText;
-                        if (item.EventType != EventTypeEnum.Finish)
+                        if (GlobalData.RealAlarmIdVariables.TryGetValue(item.Id, out var oldAlarm))
                         {
-                            item.EventTime = now;
+                            item.AlarmRuntimePropertys.AlarmType = oldAlarm.AlarmType;
+                            item.AlarmRuntimePropertys.AlarmLimit = oldAlarm.AlarmLimit;
+                            item.AlarmRuntimePropertys.AlarmCode = oldAlarm.AlarmCode;
+                            item.AlarmRuntimePropertys.RecoveryCode = item.Value.ToString();
+                            item.AlarmRuntimePropertys.AlarmText = oldAlarm.AlarmText;
+                            if (item.AlarmRuntimePropertys.EventType != EventTypeEnum.Finish)
+                            {
+                                item.AlarmRuntimePropertys.FinishTime = now;
+                                item.AlarmRuntimePropertys.EventTime = now;
+                            }
+                            item.AlarmRuntimePropertys.EventType = EventTypeEnum.Finish;
+                            item.AlarmRuntimePropertys.PrepareFinishEventTime = null;
+                            changed = true;
                         }
-                        item.EventType = EventTypeEnum.Finish;
-                        item.PrepareFinishEventTime = null;
-                        changed = true;
                     }
                 }
             }
@@ -420,7 +429,7 @@ internal sealed class AlarmTask : IDisposable
             // 触发报警变化事件
             if (changed)
             {
-                if (item.EventType == EventTypeEnum.Alarm)
+                if (item.AlarmRuntimePropertys.EventType == EventTypeEnum.Alarm)
                 {
                     // 如果是触发报警事件
                     //lock (GlobalData. RealAlarmVariables)
@@ -429,14 +438,14 @@ internal sealed class AlarmTask : IDisposable
                         GlobalData.RealAlarmIdVariables.AddOrUpdate(item.Id, a => item.AdaptAlarmVariable(), (a, b) => item.AdaptAlarmVariable());
                     }
                 }
-                else if (item.EventType == EventTypeEnum.Finish)
+                else if (item.AlarmRuntimePropertys.EventType == EventTypeEnum.Finish)
                 {
 
                     // 如果是需恢复报警事件，则从实时报警列表中移除该变量
-                    if (item.AlarmConfirm)
+                    if (item.AlarmRuntimePropertys.AlarmConfirm)
                     {
                         GlobalData.RealAlarmIdVariables.TryRemove(item.Id, out _);
-                        item.EventType = EventTypeEnum.ConfirmAndFinish;
+                        item.AlarmRuntimePropertys.EventType = EventTypeEnum.ConfirmAndFinish;
                     }
                     else
                     {
@@ -454,19 +463,20 @@ internal sealed class AlarmTask : IDisposable
         // 如果是确认报警事件
         if (GlobalData.AlarmEnableIdVariables.TryGetValue(variableId, out var item))
         {
-            lock (item.AlarmLockObject)
+            lock (item.AlarmRuntimePropertys.AlarmLockObject)
             {
-                item.AlarmConfirm = true;
-                item.EventTime = DateTime.Now;
+                item.AlarmRuntimePropertys.AlarmConfirm = true;
+                item.AlarmRuntimePropertys.ConfirmTime = DateTime.Now;
+                item.AlarmRuntimePropertys.EventTime = item.AlarmRuntimePropertys.ConfirmTime;
 
-                if (item.EventType == EventTypeEnum.Finish)
+                if (item.AlarmRuntimePropertys.EventType == EventTypeEnum.Finish)
                 {
-                    item.EventType = EventTypeEnum.ConfirmAndFinish;
+                    item.AlarmRuntimePropertys.EventType = EventTypeEnum.ConfirmAndFinish;
                     GlobalData.RealAlarmIdVariables.TryRemove(variableId, out _);
                 }
                 else
                 {
-                    item.EventType = EventTypeEnum.Confirm;
+                    item.AlarmRuntimePropertys.EventType = EventTypeEnum.Confirm;
                     GlobalData.RealAlarmIdVariables.AddOrUpdate(variableId, a => item.AdaptAlarmVariable(), (a, b) => item.AdaptAlarmVariable());
                 }
 

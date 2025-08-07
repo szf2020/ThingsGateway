@@ -98,6 +98,7 @@ IReadOnlyDictionary<long, ChannelRuntime> channelDicts)
 
         // 主变量页
         sheets.Add(ExportString.VariableName, GetVariableSheets(data, deviceDicts, deviceName));
+        sheets.Add(ExportString.AlarmName, GetAlarmSheets(data, deviceDicts, deviceName));
 
         // 插件页（动态推导）
         foreach (var plugin in pluginDrivers.Keys.Distinct())
@@ -150,6 +151,46 @@ IReadOnlyDictionary<long, ChannelRuntime> channelDicts)
 
         return row;
     }
+
+    static IEnumerable<Dictionary<string, object>> GetAlarmSheets(
+IEnumerable<Variable> data,
+IReadOnlyDictionary<long, DeviceRuntime> deviceDicts,
+string? deviceName)
+    {
+        var type = typeof(AlarmPropertys);
+        var propertyInfos = type.GetRuntimeProperties()
+            .Where(a => a.GetCustomAttribute<IgnoreExcelAttribute>(false) == null)
+            .OrderBy(a =>
+            {
+                var order = a.GetCustomAttribute<AutoGenerateColumnAttribute>()?.Order ?? int.MaxValue;
+                if (order < 0) order += 10000000;
+                else if (order == 0) order = 10000000;
+                return order;
+            });
+
+        foreach (var variable in data)
+        {
+            if (variable.AlarmPropertys != null)
+                yield return GetAlarm(deviceDicts, deviceName, type, propertyInfos, variable);
+        }
+    }
+
+    private static Dictionary<string, object> GetAlarm(IReadOnlyDictionary<long, DeviceRuntime> deviceDicts, string? deviceName, Type type, IOrderedEnumerable<PropertyInfo> propertyInfos, Variable variable)
+    {
+        var row = new Dictionary<string, object>();
+        deviceDicts.TryGetValue(variable.DeviceId, out var device);
+        row.TryAdd(ExportString.DeviceName, device?.Name ?? deviceName);
+        row.TryAdd(ExportString.VariableName, variable.Name);
+
+        foreach (var item in propertyInfos)
+        {
+            var desc = type.GetPropertyDisplayName(item.Name);
+            row.TryAdd(desc ?? item.Name, item.GetValue(variable.AlarmPropertys)?.ToString());
+        }
+
+        return row;
+    }
+
 
     static IEnumerable<Dictionary<string, object>> GetPluginSheets(
     IEnumerable<Variable> data,
@@ -327,6 +368,7 @@ IReadOnlyDictionary<long, ChannelRuntime> channelDicts)
         Dictionary<string, object> sheets = new();
         //变量页
         ConcurrentList<Dictionary<string, object>> variableExports = new();
+        ConcurrentList<Dictionary<string, object>> alarmExports = new();
         //变量附加属性，转成Dict<表名,List<Dict<列名，列数据>>>的形式
         ConcurrentDictionary<string, ConcurrentList<Dictionary<string, object>>> devicePropertys = new();
         ConcurrentDictionary<string, (VariablePropertyBase, Dictionary<string, PropertyInfo>)> propertysDict = new();
@@ -352,29 +394,68 @@ IReadOnlyDictionary<long, ChannelRuntime> channelDicts)
             )
             ;
 
+        var alarmPropertysType = typeof(AlarmPropertys);
+        var alarmPropertysInfos = alarmPropertysType.GetRuntimeProperties().Where(a => a.GetCustomAttribute<IgnoreExcelAttribute>(false) == null)
+             .OrderBy(
+            a =>
+            {
+                var order = a.GetCustomAttribute<AutoGenerateColumnAttribute>()?.Order ?? int.MaxValue;
+                if (order < 0)
+                {
+                    order = order + 10000000;
+                }
+                else if (order == 0)
+                {
+                    order = 10000000;
+                }
+                return order;
+            }
+            )
+            ;
+
         #endregion 列名称
         data.ParallelForEachStreamed((variable, state, index) =>
         {
-            Dictionary<string, object> varExport = new();
-            deviceDicts.TryGetValue(variable.DeviceId, out var device);
-            //设备实体没有包含设备名称，手动插入
-            varExport.TryAdd(ExportString.DeviceName, device?.Name ?? deviceName);
-            foreach (var item in propertyInfos)
             {
-                if (item.Name == nameof(Variable.Id))
+                Dictionary<string, object> varExport = new();
+                deviceDicts.TryGetValue(variable.DeviceId, out var device);
+                //设备实体没有包含设备名称，手动插入
+                varExport.TryAdd(ExportString.DeviceName, device?.Name ?? deviceName);
+                foreach (var item in propertyInfos)
                 {
-                    if (sortName != nameof(Variable.Id))
-                        continue;
+                    if (item.Name == nameof(Variable.Id))
+                    {
+                        if (sortName != nameof(Variable.Id))
+                            continue;
+                    }
+                    //描述
+                    var desc = type.GetPropertyDisplayName(item.Name);
+                    //数据源增加
+                    varExport.TryAdd(desc ?? item.Name, item.GetValue(variable)?.ToString());
                 }
-                //描述
-                var desc = type.GetPropertyDisplayName(item.Name);
-                //数据源增加
-                varExport.TryAdd(desc ?? item.Name, item.GetValue(variable)?.ToString());
+
+                //添加完整设备信息
+                variableExports.Add(varExport);
+
             }
+            if (variable.AlarmPropertys != null)
+            {
+                Dictionary<string, object> alarmExport = new();
+                deviceDicts.TryGetValue(variable.DeviceId, out var device);
+                //设备实体没有包含设备名称，手动插入
+                alarmExport.TryAdd(ExportString.DeviceName, device?.Name ?? deviceName);
+                alarmExport.TryAdd(ExportString.VariableName, variable.Name);
+                foreach (var item in alarmPropertysInfos)
+                {
+                    //描述
+                    var desc = alarmPropertysType.GetPropertyDisplayName(item.Name);
+                    //数据源增加
+                    alarmExport.TryAdd(desc ?? item.Name, item.GetValue(variable.AlarmPropertys)?.ToString());
+                }
 
-            //添加完整设备信息
-            variableExports.Add(varExport);
-
+                //添加完整设备信息
+                alarmExports.Add(alarmExport);
+            }
             #region 插件sheet
             if (variable.VariablePropertys != null)
             {
@@ -485,6 +566,7 @@ IReadOnlyDictionary<long, ChannelRuntime> channelDicts)
 
         //添加设备页
         sheets.Add(ExportString.VariableName, variableExports);
+        sheets.Add(ExportString.AlarmName, alarmExports);
 
         //HASH
         foreach (var item in devicePropertys.Keys)

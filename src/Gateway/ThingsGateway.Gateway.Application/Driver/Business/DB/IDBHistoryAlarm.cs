@@ -21,6 +21,8 @@ public interface IDBHistoryAlarm
     string? Description { get; set; }
     string DeviceName { get; set; }
     DateTime EventTime { get; set; }
+    DateTime FinishTime { get; set; }
+    DateTime ConfirmTime { get; set; }
     EventTypeEnum EventType { get; set; }
     string Name { get; set; }
     string RegisterAddress { get; set; }

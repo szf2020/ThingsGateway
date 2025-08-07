@@ -44,4 +44,11 @@ public enum EventTypeEnum
     /// 报警确认并恢复
     /// </summary>
     ConfirmAndFinish,
+
+
+    /// <summary>
+    /// 重启默认
+    /// </summary>
+    Restart,
+
 }

@@ -24,45 +24,12 @@ public partial class VariableRuntime : Variable, IVariable, IDisposable
     public bool ValueInited { get => _valueInited; set => _valueInited = value; }
 
     #region 属性
-    /// <summary>
-    /// 事件类型
-    /// </summary>
-    [AutoGenerateColumn(Visible = false)]
-    public EventTypeEnum? EventType { get => eventType; set => eventType = value; }
-
-    /// <summary>
-    /// 报警类型
-    /// </summary>
-    [AutoGenerateColumn(Visible = false)]
-    public AlarmTypeEnum? AlarmType { get => alarmType; set => alarmType = value; }
-
-    /// <summary>
-    /// 报警值
-    /// </summary>
-    [AutoGenerateColumn(Visible = false)]
-    public string AlarmCode { get => alarmCode; set => alarmCode = value; }
-
-    /// <summary>
-    /// 恢复值
-    /// </summary>
-    [AutoGenerateColumn(Visible = false)]
-    public string RecoveryCode { get => recoveryCode; set => recoveryCode = value; }
 
     /// <summary>
     /// 这个参数值由自动打包方法写入<see cref="IDevice.LoadSourceRead{T}(IEnumerable{IVariable}, int, string)"/>
     /// </summary>
     [AutoGenerateColumn(Visible = false)]
     public int Index { get => index; set => index = value; }
-    /// <summary>
-    /// 事件时间
-    /// </summary>
-    [AutoGenerateColumn(Ignore = true)]
-    internal DateTime? PrepareAlarmEventTime { get => prepareAlarmEventTime; set => prepareAlarmEventTime = value; }
-    /// <summary>
-    /// 事件时间
-    /// </summary>
-    [AutoGenerateColumn(Ignore = true)]
-    internal DateTime? PrepareFinishEventTime { get => prepareFinishEventTime; set => prepareFinishEventTime = value; }
 
     /// <summary>
     /// 变化时间
@@ -70,17 +37,6 @@ public partial class VariableRuntime : Variable, IVariable, IDisposable
     [AutoGenerateColumn(Visible = true, Filterable = true, Sortable = true, Order = 5)]
     public DateTime ChangeTime { get => changeTime; set => changeTime = value; }
 
-    /// <summary>
-    /// 报警时间
-    /// </summary>
-    [AutoGenerateColumn(Visible = false)]
-    public DateTime AlarmTime { get => alarmTime; set => alarmTime = value; }
-
-    /// <summary>
-    /// 事件时间
-    /// </summary>
-    [AutoGenerateColumn(Visible = false)]
-    public DateTime EventTime { get => eventTime; set => eventTime = value; }
 
     /// <summary>
     /// 采集时间
@@ -204,21 +160,13 @@ public partial class VariableRuntime : Variable, IVariable, IDisposable
     {
         get
         {
-            return LAlarmEnable || LLAlarmEnable || HAlarmEnable || HHAlarmEnable || BoolOpenAlarmEnable || BoolCloseAlarmEnable || CustomAlarmEnable;
+            return AlarmPropertys != null && (AlarmPropertys.LAlarmEnable || AlarmPropertys.LLAlarmEnable || AlarmPropertys.HAlarmEnable || AlarmPropertys.HHAlarmEnable || AlarmPropertys.BoolOpenAlarmEnable || AlarmPropertys.BoolCloseAlarmEnable || AlarmPropertys.CustomAlarmEnable);
         }
     }
 
-    /// <summary>
-    /// 报警限值
-    /// </summary>
-    [AutoGenerateColumn(Visible = false)]
-    public string AlarmLimit { get => alarmLimit; set => alarmLimit = value; }
-
-    /// <summary>
-    /// 报警文本
-    /// </summary>
-    [AutoGenerateColumn(Visible = false)]
-    public string AlarmText { get => alarmText; set => alarmText = value; }
+    [IgnoreExcel]
+    [AutoGenerateColumn(Ignore = true)]
+    public AlarmRuntimePropertys? AlarmRuntimePropertys { get; set; }
 
     #endregion
 

@@ -87,6 +87,8 @@ public class TimerX : ITimer, ITimerx, IDisposable
 
     private DateTime _AbsolutelyNext;
     private readonly Cron[]? _crons;
+
+    internal bool IsValueTask { get; }
     #endregion
 
     //    #region 静态
@@ -158,6 +160,29 @@ public class TimerX : ITimer, ITimerx, IDisposable
         Init(dueTime);
     }
 
+#if NET6_0_OR_GREATER
+
+    /// <summary>实例化一个不可重入的定时器</summary>
+    /// <param name="callback">委托</param>
+    /// <param name="state">用户数据</param>
+    /// <param name="dueTime">多久之后开始。毫秒</param>
+    /// <param name="period">间隔周期。毫秒</param>
+    /// <param name="scheduler">调度器</param>
+    public TimerX(Func<Object, ValueTask> callback, Object? state, Int32 dueTime, Int32 period, String? scheduler = null) : this(callback.Target, callback.Method, state, scheduler)
+    {
+        IsValueTask = true;
+        if (callback == null) throw new ArgumentNullException(nameof(callback));
+        if (dueTime < 0) throw new ArgumentOutOfRangeException(nameof(dueTime));
+
+        IsAsyncTask = true;
+        Async = true;
+        Period = period;
+
+        Init(dueTime);
+    }
+
+#endif
+
     /// <summary>实例化一个绝对定时器，指定时刻执行，跟当前时间和SetNext无关</summary>
     /// <param name="callback">委托</param>
     /// <param name="state">用户数据</param>
@@ -210,6 +235,37 @@ public class TimerX : ITimer, ITimerx, IDisposable
         Init(ms);
     }
 
+#if NET6_0_OR_GREATER
+
+    /// <summary>实例化一个绝对定时器，指定时刻执行，跟当前时间和SetNext无关</summary>
+    /// <param name="callback">委托</param>
+    /// <param name="state">用户数据</param>
+    /// <param name="startTime">绝对开始时间</param>
+    /// <param name="period">间隔周期。毫秒</param>
+    /// <param name="scheduler">调度器</param>
+    public TimerX(Func<Object, ValueTask> callback, Object? state, DateTime startTime, Int32 period, String? scheduler = null) : this(callback.Target, callback.Method, state, scheduler)
+    {
+        IsValueTask = true;
+        if (callback == null) throw new ArgumentNullException(nameof(callback));
+        if (startTime <= DateTime.MinValue) throw new ArgumentOutOfRangeException(nameof(startTime));
+        if (period <= 0) throw new ArgumentOutOfRangeException(nameof(period));
+
+        IsAsyncTask = true;
+        Async = true;
+        Period = period;
+        Absolutely = true;
+
+        //var now = DateTime.Now;
+        var now = Scheduler.GetNow();
+        var next = startTime;
+        while (next < now) next = next.AddMilliseconds(period);
+
+        var ms = (Int64)(next - now).TotalMilliseconds;
+        _AbsolutelyNext = next;
+        Init(ms);
+    }
+
+#endif
     /// <summary>实例化一个Cron定时器</summary>
     /// <param name="callback">委托</param>
     /// <param name="state">用户数据</param>
@@ -273,6 +329,42 @@ public class TimerX : ITimer, ITimerx, IDisposable
         Init(ms);
         //Init(_AbsolutelyNext = _cron.GetNext(DateTime.Now));
     }
+
+#if NET6_0_OR_GREATER
+    /// <summary>实例化一个Cron定时器</summary>
+    /// <param name="callback">委托</param>
+    /// <param name="state">用户数据</param>
+    /// <param name="cronExpression">Cron表达式。支持多个表达式，分号分隔</param>
+    /// <param name="scheduler">调度器</param>
+    public TimerX(Func<Object, ValueTask> callback, Object? state, String cronExpression, String? scheduler = null) : this(callback.Target, callback.Method, state, scheduler)
+    {
+        IsValueTask = true;
+        if (callback == null) throw new ArgumentNullException(nameof(callback));
+        if (cronExpression.IsNullOrEmpty()) throw new ArgumentNullException(nameof(cronExpression));
+
+        var list = new List<Cron>();
+        foreach (var item in cronExpression.Split(";"))
+        {
+            var cron = new Cron();
+            if (!cron.Parse(item)) throw new ArgumentException($"Invalid Cron expression[{item}]", nameof(cronExpression));
+
+            list.Add(cron);
+        }
+        _crons = list.ToArray();
+
+        IsAsyncTask = true;
+        Async = true;
+        Absolutely = true;
+
+        //var now = DateTime.Now;
+        var now = Scheduler.GetNow();
+        var next = _crons.Min(e => e.GetNext(now));
+        var ms = (Int64)(next - now).TotalMilliseconds;
+        _AbsolutelyNext = next;
+        Init(ms);
+        //Init(_AbsolutelyNext = _cron.GetNext(DateTime.Now));
+    }
+#endif
 
     public bool Disposed { get; private set; }
     /// <summary>销毁定时器</summary>

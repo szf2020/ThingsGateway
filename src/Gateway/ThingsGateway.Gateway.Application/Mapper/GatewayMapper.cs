@@ -14,9 +14,21 @@ namespace ThingsGateway.Gateway.Application;
 [Mapper(UseDeepCloning = true, EnumMappingStrategy = EnumMappingStrategy.ByName, RequiredMappingStrategy = RequiredMappingStrategy.None)]
 public static partial class GatewayMapper
 {
+    [MapProperty($"{nameof(VariableRuntime.AlarmPropertys)}.{nameof(AlarmPropertys.AlarmLevel)}", nameof(AlarmVariable.AlarmLevel))]
+    [MapProperty($"{nameof(VariableRuntime.AlarmRuntimePropertys)}.{nameof(AlarmRuntimePropertys.AlarmCode)}", nameof(AlarmVariable.AlarmCode))]
+    [MapProperty($"{nameof(VariableRuntime.AlarmRuntimePropertys)}.{nameof(AlarmRuntimePropertys.AlarmLimit)}", nameof(AlarmVariable.AlarmLimit))]
+    [MapProperty($"{nameof(VariableRuntime.AlarmRuntimePropertys)}.{nameof(AlarmRuntimePropertys.AlarmText)}", nameof(AlarmVariable.AlarmText))]
+    [MapProperty($"{nameof(VariableRuntime.AlarmRuntimePropertys)}.{nameof(AlarmRuntimePropertys.RecoveryCode)}", nameof(AlarmVariable.RecoveryCode))]
+    [MapProperty($"{nameof(VariableRuntime.AlarmRuntimePropertys)}.{nameof(AlarmRuntimePropertys.AlarmTime)}", nameof(AlarmVariable.AlarmTime))]
+    [MapProperty($"{nameof(VariableRuntime.AlarmRuntimePropertys)}.{nameof(AlarmRuntimePropertys.FinishTime)}", nameof(AlarmVariable.FinishTime))]
+    [MapProperty($"{nameof(VariableRuntime.AlarmRuntimePropertys)}.{nameof(AlarmRuntimePropertys.ConfirmTime)}", nameof(AlarmVariable.ConfirmTime))]
+    [MapProperty($"{nameof(VariableRuntime.AlarmRuntimePropertys)}.{nameof(AlarmRuntimePropertys.EventTime)}", nameof(AlarmVariable.EventTime))]
+    [MapProperty($"{nameof(VariableRuntime.AlarmRuntimePropertys)}.{nameof(AlarmRuntimePropertys.AlarmType)}", nameof(AlarmVariable.AlarmType))]
+    [MapProperty($"{nameof(VariableRuntime.AlarmRuntimePropertys)}.{nameof(AlarmRuntimePropertys.EventType)}", nameof(AlarmVariable.EventType))]
+    public static partial AlarmVariable AdaptAlarmVariable(this VariableRuntime src);
+
     public static partial VariableDataWithValue AdaptVariableDataWithValue(this VariableBasicData src);
     public static partial VariableDataWithValue AdaptVariableDataWithValue(this VariableRuntime src);
-    public static partial AlarmVariable AdaptAlarmVariable(this VariableRuntime src);
     public static partial DeviceBasicData AdaptDeviceBasicData(this DeviceRuntime src);
     public static partial IEnumerable<DeviceBasicData> AdaptIEnumerableDeviceBasicData(this IEnumerable<DeviceRuntime> src);
     public static partial List<DeviceBasicData> AdaptListDeviceBasicData(this IEnumerable<DeviceRuntime> src);
@@ -28,6 +40,7 @@ public static partial class GatewayMapper
 
     [MapProperty(nameof(Variable.InitValue), nameof(VariableRuntime.Value))]
     public static partial VariableRuntime AdaptVariableRuntime(this Variable src);
+
     public static partial List<Variable> AdaptListVariable(this IEnumerable<Variable> src);
 
     public static partial DeviceRuntime AdaptDeviceRuntime(this Device src);
@@ -49,9 +62,7 @@ public static partial class GatewayMapper
     public static partial RedundancyOptions AdaptRedundancyOptions(this RedundancyOptions src);
 
     public static partial List<DeviceDataWithValue> AdaptListDeviceDataWithValue(this IEnumerable<DeviceRuntime> src);
-    public static partial List<Channel> AdaptListChannel(this List<ChannelInput> src);
-    public static partial List<Device> AdaptListDevice(this List<DeviceInput> src);
-    public static partial List<Variable> AdaptListVariable(this List<VariableInput> src);
+
     public static partial Channel AdaptChannel(this Channel src);
     public static partial Device AdaptDevice(this Device src);
     public static partial Variable AdaptVariable(this Variable src);
