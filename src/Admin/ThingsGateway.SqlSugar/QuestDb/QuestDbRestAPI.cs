@@ -51,9 +51,14 @@ namespace ThingsGateway.SqlSugar
             // HTTP GET 请求执行SQL
             var result = string.Empty;
             var url = $"{this.url}/exec?query={HttpUtility.UrlEncode(sql)}";
+
+            var request = new HttpRequestMessage(HttpMethod.Get, url);
             if (!string.IsNullOrWhiteSpace(authorization))
-                client.DefaultRequestHeaders.Add("Authorization", authorization);
-            var httpResponseMessage = await client.GetAsync(url).ConfigureAwait(false);
+            {
+                request.Headers.Authorization = AuthenticationHeaderValue.Parse(authorization);
+            }
+
+            using var httpResponseMessage = await client.SendAsync(request).ConfigureAwait(false);
             result = await httpResponseMessage.Content.ReadAsStringAsync().ConfigureAwait(false);
             return result;
         }
@@ -184,7 +189,7 @@ namespace ThingsGateway.SqlSugar
                     "multipart/form-data; boundary=" + boundary);
 
                 // 发送请求并处理响应
-                var httpResponseMessage =
+              using  var httpResponseMessage =
                     await Post(client, tableName, httpContent).ConfigureAwait(false);
                 var readAsStringAsync = await httpResponseMessage.Content.ReadAsStringAsync().ConfigureAwait(false);
                 var splitByLine = QuestDbRestAPHelper.SplitByLine(readAsStringAsync);
