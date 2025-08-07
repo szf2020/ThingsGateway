@@ -26,7 +26,7 @@ public class PlatformService : IPlatformService
 
     public async Task OnLogExport(string logPath)
     {
-        var files = TextFileReader.GetLogFiles(logPath);
+        var files = TextFileReader.GetLogFilesAsync(logPath);
         if (!files.IsSuccess)
         {
             return;

@@ -14,7 +14,7 @@ namespace ThingsGateway.Gateway.Application;
 internal sealed class RestartService : IRestartService
 {
 
-    public Task RestartServer()
+    public Task RestartServerAsync()
     {
         RestartServerHelper.RestartServer();
         return Task.CompletedTask;

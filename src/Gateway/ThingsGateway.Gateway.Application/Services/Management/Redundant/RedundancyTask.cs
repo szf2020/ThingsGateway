@@ -15,6 +15,7 @@ using Newtonsoft.Json.Linq;
 
 using ThingsGateway.Extension.Generic;
 using ThingsGateway.NewLife;
+using ThingsGateway.NewLife.Json.Extension;
 
 using TouchSocket.Core;
 using TouchSocket.Dmtp;
@@ -349,6 +350,11 @@ internal sealed class RedundancyTask : IRpcDriver, IAsyncDisposable
                    {
                        b.UseSystemTextJson(json =>
                        {
+                           json.Converters.Add(new ByteArrayToNumberArrayConverterSystemTextJson());
+                           json.Converters.Add(new JTokenSystemTextJsonConverter());
+                           json.Converters.Add(new JValueSystemTextJsonConverter());
+                           json.Converters.Add(new JObjectSystemTextJsonConverter());
+                           json.Converters.Add(new JArraySystemTextJsonConverter());
                        });
                    });
                    a.UseDmtpHeartbeat()//使用Dmtp心跳
@@ -388,6 +394,11 @@ internal sealed class RedundancyTask : IRpcDriver, IAsyncDisposable
                    {
                        b.UseSystemTextJson(json =>
                        {
+                           json.Converters.Add(new ByteArrayToNumberArrayConverterSystemTextJson());
+                           json.Converters.Add(new JTokenSystemTextJsonConverter());
+                           json.Converters.Add(new JValueSystemTextJsonConverter());
+                           json.Converters.Add(new JObjectSystemTextJsonConverter());
+                           json.Converters.Add(new JArraySystemTextJsonConverter());
                        });
                    });
                    a.UseDmtpHeartbeat()//使用Dmtp心跳
@@ -520,10 +531,10 @@ internal sealed class RedundancyTask : IRpcDriver, IAsyncDisposable
     /// <returns>写入操作的结果字典</returns>
     public async ValueTask<Dictionary<string, Dictionary<string, IOperResult>>> InvokeMethodAsync(Dictionary<VariableRuntime, JToken> writeInfoLists, CancellationToken cancellationToken)
     {
-        return (await Rpc(writeInfoLists, cancellationToken).ConfigureAwait(false)).ToDictionary(a => a.Key, a => a.Value.ToDictionary(b => b.Key, b => (IOperResult)b.Value));
+        return (await RpcAsync(writeInfoLists, cancellationToken).ConfigureAwait(false)).ToDictionary(a => a.Key, a => a.Value.ToDictionary(b => b.Key, b => (IOperResult)b.Value));
     }
 
-    private async ValueTask<Dictionary<string, Dictionary<string, OperResult<object>>>> Rpc(Dictionary<VariableRuntime, JToken> writeInfoLists, CancellationToken cancellationToken)
+    private async ValueTask<Dictionary<string, Dictionary<string, OperResult<object>>>> RpcAsync(Dictionary<VariableRuntime, JToken> writeInfoLists, CancellationToken cancellationToken)
     {
         var dataResult = new Dictionary<string, Dictionary<string, OperResult<object>>>();
 
@@ -660,7 +671,7 @@ internal sealed class RedundancyTask : IRpcDriver, IAsyncDisposable
     /// <returns>写入操作的结果字典</returns>
     public async ValueTask<Dictionary<string, Dictionary<string, IOperResult>>> InVokeWriteAsync(Dictionary<VariableRuntime, JToken> writeInfoLists, CancellationToken cancellationToken)
     {
-        return (await Rpc(writeInfoLists, cancellationToken).ConfigureAwait(false)).ToDictionary(a => a.Key, a => a.Value.ToDictionary(b => b.Key, b => (IOperResult)b.Value));
+        return (await RpcAsync(writeInfoLists, cancellationToken).ConfigureAwait(false)).ToDictionary(a => a.Key, a => a.Value.ToDictionary(b => b.Key, b => (IOperResult)b.Value));
     }
     private async Task EnsureChannelOpenAsync(CancellationToken cancellationToken)
     {

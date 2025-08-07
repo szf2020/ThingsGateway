@@ -11,9 +11,10 @@
 
 @if (_rules != null)
 {
-    <LogConsole HeightString="100%" LogLevel=@(_rules.Log.LogLevel) LogLevelChanged="(a)=>{
-_rules.Log.LogLevel=a;
-}" LogPath=@_rules.Log.LogPath HeaderText="@_rules.Rules.Name"></LogConsole>
+    <LogConsole HeightString="100%" LogLevel=@(LogLevel) LogLevelChanged="(a)=>{
+LogLevel=a;
+return RulesEngineHostedService.SetRulesLogLevelAsync(RulesId, a);
+}" LogPath=@LogPath HeaderText="@_rules.Name"></LogConsole>
 }
 
 

@@ -46,11 +46,11 @@ internal sealed class RulesService : BaseService<Rules>, IRulesService
         await db.Deleteable<Rules>(a => data.Contains(a.Id)).ExecuteCommandAsync().ConfigureAwait(false);
 
         DeleteRulesFromCache();
-        await RulesEngineHostedService.Delete(data).ConfigureAwait(false);
+        await RulesEngineHostedService.DeleteRuleRuntimesAsync(data).ConfigureAwait(false);
     }
 
     [OperDesc("DeleteRules", localizerType: typeof(Rules))]
-    public async Task<bool> DeleteRulesAsync(IEnumerable<long> ids)
+    public async Task<bool> DeleteRulesAsync(List<long> ids)
     {
         using var db = GetDB();
         var dataScope = await GlobalData.SysUserService.GetCurrentUserDataScopeAsync().ConfigureAwait(false);
@@ -61,7 +61,7 @@ internal sealed class RulesService : BaseService<Rules>, IRulesService
 .ExecuteCommandAsync().ConfigureAwait(false);
 
         DeleteRulesFromCache();
-        await RulesEngineHostedService.Delete(ids).ConfigureAwait(false);
+        await RulesEngineHostedService.DeleteRuleRuntimesAsync(ids).ConfigureAwait(false);
         return true;
     }
     private const string cacheKey = "ThingsGateway:Cache_RulesEngines:List";
@@ -92,7 +92,7 @@ internal sealed class RulesService : BaseService<Rules>, IRulesService
     /// </summary>
     /// <param name="option">查询条件</param>
     /// <param name="filterKeyValueAction">查询条件</param>
-    public async Task<QueryData<Rules>> PageAsync(QueryPageOptions option, FilterKeyValueAction filterKeyValueAction = null)
+    public async Task<QueryData<Rules>> RulesPageAsync(QueryPageOptions option, FilterKeyValueAction filterKeyValueAction = null)
     {
         var dataScope = await GlobalData.SysUserService.GetCurrentUserDataScopeAsync().ConfigureAwait(false);
         return await QueryAsync(option, a => a
@@ -118,7 +118,7 @@ internal sealed class RulesService : BaseService<Rules>, IRulesService
         if (await base.SaveAsync(input, type).ConfigureAwait(false))
         {
             DeleteRulesFromCache();
-            await RulesEngineHostedService.Edit(input).ConfigureAwait(false);
+            await RulesEngineHostedService.EditRuleRuntimesAsync(input).ConfigureAwait(false);
             return true;
         }
         return false;

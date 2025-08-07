@@ -1,16 +1,26 @@
-﻿@page "/gateway/rules"
+﻿@{
+#if !Management
+}
+@page "/gateway/rules"
+@attribute [Authorize]
+@attribute [RolePermission]
+ 
+
+@{
+#endif
+}
+
 @inherits ThingsGatewayModuleComponentBase
-@attribute [JSModuleAutoLoader("Pages/RulesEngine/RulesPage.razor.js", AutoInvokeDispose = false)]
+
 @namespace ThingsGateway.Gateway.Razor
 @using ThingsGateway.Admin.Application
 @using ThingsGateway.Admin.Razor
 @using ThingsGateway.Gateway.Application
-@attribute [Authorize]
-@attribute [RolePermission]
 
 
 @if (ShowDesign)
 {
+
     <div class="h-100">
         <DragAndDrop @ref=dragAndDrop OnCancel="()=>ShowDesign=false" Value="Value.RulesJson" ValueChanged=@(async(v)=>{
                  try
@@ -28,7 +38,7 @@
 }
 else
 {
-    <div class="row g-1 h-100">
+    <div class="row g-0 h-100">
         <div class="col-12 col-sm-6 h-100">
 
             <AdminTable @ref=table TItem="Rules"
@@ -37,7 +47,6 @@ else
                         AllowResizing="true"
                         IsFixedHeader=true
                         IsMultipleSelect=true
-                        SearchModel=SearchModel
                         EditDialogSize="Size.ExtraLarge"
                         ShowSearch="false"
                         ShowExtendButtons=true
@@ -63,7 +72,7 @@ else
                     <TableCellButton IsShow=@(AuthorizeButton(AdminOperConst.Edit)) Size="Size.ExtraSmall" Color="Color.Warning" Icon="fa-solid fa-bars" Text="@StringLocalizer["Design"]" OnClick="()=>{
 
 Value=context;
-
+Value.RulesJson ??= new();
 ShowDesign=true;}" />
                 </RowButtonTemplate>
             </AdminTable>

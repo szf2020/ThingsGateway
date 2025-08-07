@@ -23,13 +23,13 @@ namespace ThingsGateway.Gateway.Application;
 public interface IManagementRpcServer : IRpcServer
 {
     [DmtpRpc]
-    Task<Dictionary<string, Dictionary<string, OperResult<object>>>> Rpc(ICallContext callContext, Dictionary<string, Dictionary<string, string>> deviceDatas);
+    Task<Dictionary<string, Dictionary<string, OperResult<object>>>> RpcAsync(ICallContext callContext, Dictionary<string, Dictionary<string, string>> deviceDatas);
 
 
     [DmtpRpc]
     Task DeleteBackendLogAsync();
     [DmtpRpc]
-    Task<List<BackendLog>> GetNewBackendLog();
+    Task<List<BackendLog>> GetNewBackendLogAsync();
     [DmtpRpc]
     Task<QueryData<BackendLog>> BackendLogPageAsync(QueryPageOptions option);
     [DmtpRpc]
@@ -50,7 +50,7 @@ public interface IManagementRpcServer : IRpcServer
     /// </summary>
     /// <returns>最新的十条记录</returns>
     [DmtpRpc]
-    Task<List<RpcLog>> GetNewRpcLog();
+    Task<List<RpcLog>> GetNewRpcLogAsync();
 
     /// <summary>
     /// 分页查询 RpcLog 数据
@@ -69,21 +69,21 @@ public interface IManagementRpcServer : IRpcServer
     Task<List<RpcLogDayStatisticsOutput>> RpcLogStatisticsByDayAsync(int day);
 
     [DmtpRpc]
-    Task RestartServer();
+    Task RestartServerAsync();
 
     [DmtpRpc]
-    Task<string> UUID();
+    Task<string> UUIDAsync();
 
     [DmtpRpc]
-    Task<AuthorizeInfo> TryAuthorize(string password);
+    Task<AuthorizeInfo> TryAuthorizeAsync(string password);
     [DmtpRpc]
-    Task<AuthorizeInfo> TryGetAuthorizeInfo();
+    Task<AuthorizeInfo> TryGetAuthorizeInfoAsync();
     [DmtpRpc]
-    Task UnAuthorize();
+    Task UnAuthorizeAsync();
     [DmtpRpc]
-    Task<bool> StartBusinessChannelEnable();
+    Task<bool> StartBusinessChannelEnableAsync();
     [DmtpRpc]
-    Task<bool> StartCollectChannelEnable();
+    Task<bool> StartCollectChannelEnableAsync();
 
 
     [DmtpRpc]
@@ -94,11 +94,11 @@ public interface IManagementRpcServer : IRpcServer
     Task RedundancyForcedSync();
 
     [DmtpRpc]
-    public Task<TouchSocket.Core.LogLevel> RedundancyLogLevel();
+    public Task<TouchSocket.Core.LogLevel> RedundancyLogLevelAsync();
     [DmtpRpc]
-    public Task SetRedundancyLogLevel(TouchSocket.Core.LogLevel logLevel);
+    public Task SetRedundancyLogLevelAsync(TouchSocket.Core.LogLevel logLevel);
     [DmtpRpc]
-    public Task<string> RedundancyLogPath();
+    public Task<string> RedundancyLogPathAsync();
 
     /// <summary>
     /// 修改冗余设置
@@ -112,9 +112,9 @@ public interface IManagementRpcServer : IRpcServer
     [DmtpRpc]
     Task<RedundancyOptions> GetRedundancyAsync();
     [DmtpRpc]
-    Task<OperResult<List<string>>> GetLogFiles(string directoryPath);
+    Task<OperResult<List<string>>> GetLogFilesAsync(string directoryPath);
     [DmtpRpc]
-    Task<OperResult<List<LogData>>> LastLogData(string file, int lineCount = 200);
+    Task<OperResult<List<LogData>>> LastLogDataAsync(string file, int lineCount = 200);
 
 
 
@@ -133,13 +133,13 @@ public interface IManagementRpcServer : IRpcServer
     /// 分页显示插件
     /// </summary>
     [DmtpRpc]
-    public Task<QueryData<PluginInfo>> PluginPage(QueryPageOptions options, PluginTypeEnum? pluginTypeEnum = null);
+    public Task<QueryData<PluginInfo>> PluginPageAsync(QueryPageOptions options, PluginTypeEnum? pluginTypeEnum = null);
 
     /// <summary>
     /// 重载插件
     /// </summary>
     [DmtpRpc]
-    Task ReloadPlugin();
+    Task ReloadPluginAsync();
 
 
     /// <summary>
@@ -148,10 +148,68 @@ public interface IManagementRpcServer : IRpcServer
     /// <param name="plugin"></param>
     /// <returns></returns>
     [DmtpRpc]
-    Task SavePluginByPath(PluginAddPathInput plugin);
+    Task SavePluginByPathAsync(PluginAddPathInput plugin);
 
 
     [DmtpRpc]
-    Task<IEnumerable<AlarmVariable>> GetCurrentUserRealAlarmVariables();
+    Task<IEnumerable<AlarmVariable>> GetCurrentUserRealAlarmVariablesAsync();
 
+
+
+    [DmtpRpc]
+    Task<IEnumerable<SelectedItem>> GetCurrentUserDeviceSelectedItemsAsync(string searchText, int startIndex, int count);
+    [DmtpRpc]
+    Task<QueryData<SelectedItem>> GetCurrentUserDeviceVariableSelectedItemsAsync(string deviceText, string searchText, int startIndex, int count);
+
+
+    [DmtpRpc]
+    Task<TouchSocket.Core.LogLevel> RulesLogLevelAsync(long rulesId);
+    [DmtpRpc]
+    Task SetRulesLogLevelAsync(long rulesId, TouchSocket.Core.LogLevel logLevel);
+    [DmtpRpc]
+    Task<string> RulesLogPathAsync(long rulesId);
+    [DmtpRpc]
+    Task<Rules> GetRuleRuntimesAsync(long rulesId);
+    [DmtpRpc]
+    Task DeleteRuleRuntimesAsync(List<long> ids);
+    [DmtpRpc]
+    Task EditRuleRuntimesAsync(Rules rules);
+
+
+
+    /// <summary>
+    /// 清除所有规则
+    /// </summary>
+    [DmtpRpc]
+    Task ClearRulesAsync();
+
+    /// <summary>
+    /// 删除规则
+    /// </summary>
+    /// <param name="ids">待删除规则的ID列表</param>
+    [DmtpRpc]
+    Task<bool> DeleteRulesAsync(List<long> ids);
+
+    /// <summary>
+    /// 从缓存/数据库获取全部信息
+    /// </summary>
+    /// <returns>规则列表</returns>
+    [DmtpRpc]
+    Task<List<Rules>> GetAllAsync();
+
+    /// <summary>
+    /// 报表查询
+    /// </summary>
+    /// <param name="option">查询条件</param>
+    /// <param name="filterKeyValueAction">查询条件</param>
+    [DmtpRpc]
+    Task<QueryData<Rules>> RulesPageAsync(QueryPageOptions option, FilterKeyValueAction filterKeyValueAction = null);
+
+    /// <summary>
+    /// 保存规则
+    /// </summary>
+    /// <param name="input">规则对象</param>
+    /// <param name="type">保存类型</param>
+    [DmtpRpc]
+    Task<bool> SaveRulesAsync(Rules input, ItemChangedType type);
 }

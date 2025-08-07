@@ -31,7 +31,7 @@ public class Rules : BaseDataEntity
     [SugarColumn(IsJson = true, ColumnDataType = StaticConfig.CodeFirst_BigString, ColumnDescription = "RulesJson", IsNullable = true)]
     [IgnoreExcel]
     [AutoGenerateColumn(Ignore = true)]
-    public RulesJson RulesJson { get; set; } = new();
+    public RulesJson RulesJson { get; set; }
 }
 public class RulesJson
 {

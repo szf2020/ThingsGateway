@@ -33,13 +33,13 @@ public partial class SystemConfigPage
     private Task SetLogLevel(TouchSocket.Core.LogLevel logLevel)
     {
         LogLevel = logLevel;
-        return RedundancyHostedService.SetRedundancyLogLevel(logLevel);
+        return RedundancyHostedService.SetRedundancyLogLevelAsync(logLevel);
     }
 
     protected override async Task OnInitializedAsync()
     {
-        LogPath = await RedundancyHostedService.RedundancyLogPath();
-        LogLevel = await RedundancyHostedService.RedundancyLogLevel();
+        LogPath = await RedundancyHostedService.RedundancyLogPathAsync();
+        LogLevel = await RedundancyHostedService.RedundancyLogLevelAsync();
         await base.OnInitializedAsync();
     }
     protected override Task OnAfterRenderAsync(bool firstRender)
@@ -72,7 +72,7 @@ public partial class SystemConfigPage
         });
         if (result)
         {
-            await RestartService.RestartServer();
+            await RestartService.RestartServerAsync();
         }
     }
 

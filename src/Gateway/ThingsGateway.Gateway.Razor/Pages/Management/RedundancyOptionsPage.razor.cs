@@ -41,7 +41,7 @@ public partial class RedundancyOptionsPage
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        var logLevel = await RedundancyHostedService.RedundancyLogLevel();
+        var logLevel = await RedundancyHostedService.RedundancyLogLevelAsync();
         if (logLevel != LogLevel)
         {
             LogLevel = logLevel;
@@ -51,6 +51,8 @@ public partial class RedundancyOptionsPage
             }
             await InvokeAsync(StateHasChanged);
         }
+        if (firstRender)
+            await InvokeAsync(StateHasChanged);
         await base.OnAfterRenderAsync(firstRender);
     }
 

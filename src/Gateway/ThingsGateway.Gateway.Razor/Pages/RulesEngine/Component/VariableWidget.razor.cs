@@ -8,7 +8,6 @@
 // QQ群：605534569
 // ------------------------------------------------------------------------------
 
-using ThingsGateway.Extension.Generic;
 using ThingsGateway.NewLife.Extension;
 
 namespace ThingsGateway.Gateway.Razor
@@ -21,7 +20,7 @@ namespace ThingsGateway.Gateway.Razor
         [Parameter]
         public VariableNode Node { get; set; }
 
-        private static async Task<QueryData<SelectedItem>> OnRedundantDevicesQuery(VirtualizeQueryOption option)
+        private async Task<QueryData<SelectedItem>> OnRedundantDevicesQuery(VirtualizeQueryOption option)
         {
             var ret = new QueryData<SelectedItem>()
             {
@@ -31,11 +30,9 @@ namespace ThingsGateway.Gateway.Razor
                 IsSearch = !option.SearchText.IsNullOrWhiteSpace()
             };
 
-            var devices = await GlobalData.GetCurrentUserDevices().ConfigureAwait(false);
-            var items = devices.Where(a => a.IsCollect == true).WhereIf(!option.SearchText.IsNullOrWhiteSpace(), a => a.Name.Contains(option.SearchText)).Take(20)
-               .Select(a => new SelectedItem(a.Name, a.Name)).ToList();
+            var items = await GlobalDataService.GetCurrentUserDeviceSelectedItemsAsync(option.SearchText, option.StartIndex, option.Count);
 
-            ret.TotalCount = items.Count;
+            ret.TotalCount = items.Count();
             ret.Items = items;
             return ret;
         }
@@ -44,32 +41,15 @@ namespace ThingsGateway.Gateway.Razor
         {
             return InvokeAsync(StateHasChanged);
         }
-        private async Task<QueryData<SelectedItem>> OnRedundantVariablesQuery(VirtualizeQueryOption option)
+
+
+        [Inject]
+        IGlobalDataService GlobalDataService { get; set; }
+
+        private Task<QueryData<SelectedItem>> OnRedundantVariablesQuery(VirtualizeQueryOption option)
         {
-            await Task.CompletedTask.ConfigureAwait(false);
-            var ret = new QueryData<SelectedItem>()
-            {
-                IsSorted = false,
-                IsFiltered = false,
-                IsAdvanceSearch = false,
-                IsSearch = !option.SearchText.IsNullOrWhiteSpace()
-            };
+            return GlobalDataService.GetCurrentUserDeviceVariableSelectedItemsAsync(Node.DeviceText, option.SearchText, option.StartIndex, option.Count);
 
-            if ((!Node.DeviceText.IsNullOrWhiteSpace()) && GlobalData.ReadOnlyDevices.TryGetValue(Node.DeviceText, out var device))
-            {
-                var items = device.ReadOnlyVariableRuntimes.WhereIf(!option.SearchText.IsNullOrWhiteSpace(), a => a.Value.Name.Contains(option.SearchText)).Select(a => a.Value).Take(20)
-                   .Select(a => new SelectedItem(a.Name, a.Name)).ToList();
-
-                ret.TotalCount = items.Count;
-                ret.Items = items;
-                return ret;
-            }
-            else
-            {
-                ret.TotalCount = 0;
-                ret.Items = new List<SelectedItem>();
-                return ret;
-            }
         }
     }
 }

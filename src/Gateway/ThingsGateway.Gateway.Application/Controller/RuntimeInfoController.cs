@@ -90,7 +90,7 @@ public class RuntimeInfoController : ControllerBase, IRpcServer
     [TouchSocket.WebApi.WebApi(Method = TouchSocket.WebApi.HttpMethodType.Post)]
     public async Task<SqlSugarPagedList<AlarmVariable>> GetRealAlarmList([FromQuery][TouchSocket.WebApi.FromBody] AlarmVariablePageInput input)
     {
-        var realAlarmVariables = await GlobalData.GetCurrentUserRealAlarmVariables().ConfigureAwait(false);
+        var realAlarmVariables = await GlobalData.GetCurrentUserRealAlarmVariablesAsync().ConfigureAwait(false);
 
         var data = realAlarmVariables
             .WhereIF(!input.RegisterAddress.IsNullOrEmpty(), a => a.RegisterAddress == input.RegisterAddress)

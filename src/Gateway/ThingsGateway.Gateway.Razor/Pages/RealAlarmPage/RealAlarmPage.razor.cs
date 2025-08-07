@@ -21,7 +21,7 @@ public partial class RealAlarmPage
 
     private async Task<QueryData<AlarmVariable>> OnQueryAsync(QueryPageOptions options)
     {
-        var realAlarmVariables = await RealAlarmService.GetCurrentUserRealAlarmVariables().ConfigureAwait(false);
+        var realAlarmVariables = await RealAlarmService.GetCurrentUserRealAlarmVariablesAsync().ConfigureAwait(false);
         var data = realAlarmVariables
            .GetQueryData(options);
         return data;

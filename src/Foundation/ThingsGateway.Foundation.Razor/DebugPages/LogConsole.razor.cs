@@ -95,7 +95,7 @@ public partial class LogConsole : IDisposable
 
             if (LogPath != null)
             {
-                var files = await TextFileReadService.GetLogFiles(LogPath);
+                var files = await TextFileReadService.GetLogFilesAsync(LogPath);
                 if (!files.IsSuccess)
                 {
                     Messages = new List<LogMessage>();
@@ -106,7 +106,7 @@ public partial class LogConsole : IDisposable
                     await Task.Run(async () =>
                     {
                         Stopwatch sw = Stopwatch.StartNew();
-                        var result = await TextFileReadService.LastLogData(files.Content.FirstOrDefault());
+                        var result = await TextFileReadService.LastLogDataAsync(files.Content.FirstOrDefault());
                         if (result.IsSuccess)
                         {
                             Messages = result.Content.Where(a => a.LogLevel >= LogLevel).Select(a => new LogMessage((int)a.LogLevel, $"{a.LogTime} - {a.Message}{(a.ExceptionString.IsNullOrWhiteSpace() ? null : $"{Environment.NewLine}{a.ExceptionString}")}")).ToList();
@@ -144,7 +144,7 @@ public partial class LogConsole : IDisposable
     {
         if (LogPath != null)
         {
-            var files = await TextFileReadService.GetLogFiles(LogPath);
+            var files = await TextFileReadService.GetLogFilesAsync(LogPath);
             if (files.IsSuccess)
             {
                 foreach (var item in files.Content)

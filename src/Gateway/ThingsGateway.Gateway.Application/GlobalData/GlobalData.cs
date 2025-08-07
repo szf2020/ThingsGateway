@@ -83,7 +83,7 @@ public static class GlobalData
           .WhereIf(dataScope?.Count == 0, u => u.Value.CreateUserId == UserManager.UserId).Select(a => a.Value);
     }
 
-    public static async Task<IEnumerable<AlarmVariable>> GetCurrentUserRealAlarmVariables()
+    public static async Task<IEnumerable<AlarmVariable>> GetCurrentUserRealAlarmVariablesAsync()
     {
         var dataScope = await GlobalData.SysUserService.GetCurrentUserDataScopeAsync().ConfigureAwait(false);
         return RealAlarmIdVariables.WhereIf(dataScope != null && dataScope?.Count > 0, u => dataScope.Contains(u.Value.CreateOrgId))//在指定机构列表查询

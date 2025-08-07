@@ -15,9 +15,9 @@ namespace ThingsGateway.Gateway.Application;
 /// </summary>
 internal sealed class RealAlarmService : IRealAlarmService
 {
-    public Task<IEnumerable<AlarmVariable>> GetCurrentUserRealAlarmVariables()
+    public Task<IEnumerable<AlarmVariable>> GetCurrentUserRealAlarmVariablesAsync()
     {
-        return GlobalData.GetCurrentUserRealAlarmVariables();
+        return GlobalData.GetCurrentUserRealAlarmVariablesAsync();
     }
 
 }

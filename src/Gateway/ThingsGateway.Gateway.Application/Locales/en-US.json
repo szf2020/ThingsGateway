@@ -1,12 +1,20 @@
 ﻿{
-  "ThingsGateway.Management.Application._Imports": {
-    "Restart": "Restart",
-    "Upgrade": "Upgrade"
+  "ThingsGateway.Management.Application.ExportString": {
+
+    "ManagementConfigName": "ManagementConfigName"
   },
-  "ThingsGateway.Management.Application.SaveUpdateZipFile": {
-    "DownTemplate": "Download Template",
-    "SaveUpdateZipFile": "Upload Version Package"
+  "ThingsGateway.Management.Application.ManagementConfig": {
+
+    "Name": "Name",
+    "ServerUri": "ServerUri",
+    "Enable": "Enable",
+    "IsServer": "IsServer",
+    "VerifyToken": "VerifyToken",
+    "HeartbeatInterval": "HeartbeatInterval",
+
+    "ImportNullError": "Unable to recognize"
   },
+
   "ThingsGateway.Management.Application.UpdateZipFile": {
     "AppName": "AppName",
     "Architecture": "Architecture",

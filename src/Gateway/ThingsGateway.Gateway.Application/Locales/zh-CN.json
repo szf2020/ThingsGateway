@@ -1,12 +1,22 @@
 ﻿{
-  "ThingsGateway.Management.Application._Imports": {
-    "Restart": "重启",
-    "Upgrade": "更新"
+  "ThingsGateway.Management.Application.ExportString": {
+
+    "ManagementConfigName": "通讯配置"
   },
-  "ThingsGateway.Management.Application.SaveUpdateZipFile": {
-    "DownTemplate": "下载模板",
-    "SaveUpdateZipFile": "上传版本包"
+  "ThingsGateway.Management.Application.ManagementConfig": {
+
+    "Name": "名称",
+    "ServerUri": "服务端Url",
+    "Enable": "启用",
+    "IsServer": "服务端",
+    "VerifyToken": "验证令牌",
+    "HeartbeatInterval": "心跳间隔",
+
+    "ImportNullError": "无法识别"
+
   },
+
+
   "ThingsGateway.Management.Application.UpdateZipFile": {
     "AppName": "名称",
     "Architecture": "架构",
@@ -97,7 +107,7 @@
     "Status": "当前站点状态",
     "Switch": "切换",
     "SyncInterval": "数据同步间隔",
-    "VerifyToken": "Token"
+    "VerifyToken": "验证令牌"
   },
   "ThingsGateway.Gateway.Application.RedundancyService": {
     "EditRedundancyOption": "修改网关冗余配置"
@@ -557,7 +567,7 @@
     "LLAlarmText": "低低报文本",
     "LLRestrainExpressions": "低低报约束",
     "LRestrainExpressions": "低报约束"
-   
+
   },
 
   "ThingsGateway.Gateway.Application.VariableRuntime": {

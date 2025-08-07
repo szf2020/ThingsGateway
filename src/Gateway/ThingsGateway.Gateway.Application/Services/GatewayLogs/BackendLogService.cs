@@ -21,7 +21,7 @@ internal sealed class BackendLogService : BaseService<BackendLog>, IBackendLogSe
     /// <summary>
     /// 最新十条
     /// </summary>
-    public async Task<List<BackendLog>> GetNewBackendLog()
+    public async Task<List<BackendLog>> GetNewBackendLogAsync()
     {
         using var db = GetDB();
         var data = await db.Queryable<BackendLog>().OrderByDescending(a => a.LogTime).Take(10).ToListAsync().ConfigureAwait(false);

@@ -18,7 +18,7 @@ public interface ITextFileReadService
     /// </summary>
     /// <param name="directoryPath">目录路径</param>
     /// <returns>包含文件信息的列表</returns>
-    public Task<OperResult<List<string>>> GetLogFiles(string directoryPath);
+    public Task<OperResult<List<string>>> GetLogFilesAsync(string directoryPath);
 
-    public Task<OperResult<List<LogData>>> LastLogData(string file, int lineCount = 200);
+    public Task<OperResult<List<LogData>>> LastLogDataAsync(string file, int lineCount = 200);
 }

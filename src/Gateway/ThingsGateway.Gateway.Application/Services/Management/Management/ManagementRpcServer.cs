@@ -29,14 +29,14 @@ public partial class ManagementRpcServer : IRpcServer, IManagementRpcServer, IBa
     public Task<List<BackendLogDayStatisticsOutput>> BackendLogStatisticsByDayAsync(int day) => App.GetService<IBackendLogService>().BackendLogStatisticsByDayAsync(day);
 
     [DmtpRpc]
-    public Task<List<BackendLog>> GetNewBackendLog() => App.GetService<IBackendLogService>().GetNewBackendLog();
+    public Task<List<BackendLog>> GetNewBackendLogAsync() => App.GetService<IBackendLogService>().GetNewBackendLogAsync();
 
     [DmtpRpc]
     public Task<QueryData<BackendLog>> BackendLogPageAsync(QueryPageOptions option) => App.GetService<IBackendLogService>().BackendLogPageAsync(option);
 
 
     [DmtpRpc]
-    public async Task<Dictionary<string, Dictionary<string, OperResult<object>>>> Rpc(ICallContext callContext, Dictionary<string, Dictionary<string, string>> deviceDatas)
+    public async Task<Dictionary<string, Dictionary<string, OperResult<object>>>> RpcAsync(ICallContext callContext, Dictionary<string, Dictionary<string, string>> deviceDatas)
     {
         var data = await GlobalData.RpcService.InvokeDeviceMethodAsync($"Management[{(callContext.Caller is ITcpSession tcpSession ? tcpSession.GetIPPort() : string.Empty)}]", deviceDatas, callContext.Token).ConfigureAwait(false);
 
@@ -45,26 +45,26 @@ public partial class ManagementRpcServer : IRpcServer, IManagementRpcServer, IBa
 
     public Task DeleteRpcLogAsync() => App.GetService<IRpcLogService>().DeleteRpcLogAsync();
 
-    public Task<List<RpcLog>> GetNewRpcLog() => App.GetService<IRpcLogService>().GetNewRpcLog();
+    public Task<List<RpcLog>> GetNewRpcLogAsync() => App.GetService<IRpcLogService>().GetNewRpcLogAsync();
 
     public Task<QueryData<RpcLog>> RpcLogPageAsync(QueryPageOptions option) => App.GetService<IRpcLogService>().RpcLogPageAsync(option);
 
     public Task<List<RpcLogDayStatisticsOutput>> RpcLogStatisticsByDayAsync(int day) => App.GetService<IRpcLogService>().RpcLogStatisticsByDayAsync(day);
 
-    public Task RestartServer() => App.GetService<IRestartService>().RestartServer();
+    public Task RestartServerAsync() => App.GetService<IRestartService>().RestartServerAsync();
 
-    public Task<string> UUID() => App.GetService<IAuthenticationService>().UUID();
+    public Task<string> UUIDAsync() => App.GetService<IAuthenticationService>().UUIDAsync();
 
-    public Task<AuthorizeInfo> TryAuthorize(string password) => App.GetService<IAuthenticationService>().TryAuthorize(password);
+    public Task<AuthorizeInfo> TryAuthorizeAsync(string password) => App.GetService<IAuthenticationService>().TryAuthorizeAsync(password);
 
-    public Task<AuthorizeInfo> TryGetAuthorizeInfo() => App.GetService<IAuthenticationService>().TryGetAuthorizeInfo();
+    public Task<AuthorizeInfo> TryGetAuthorizeInfoAsync() => App.GetService<IAuthenticationService>().TryGetAuthorizeInfoAsync();
 
-    public Task UnAuthorize() => App.GetService<IAuthenticationService>().UnAuthorize();
+    public Task UnAuthorizeAsync() => App.GetService<IAuthenticationService>().UnAuthorizeAsync();
 
-    public Task<bool> StartBusinessChannelEnable() => App.GetService<IChannelEnableService>().StartBusinessChannelEnable();
+    public Task<bool> StartBusinessChannelEnableAsync() => App.GetService<IChannelEnableService>().StartBusinessChannelEnableAsync();
 
 
-    public Task<bool> StartCollectChannelEnable() => App.GetService<IChannelEnableService>().StartCollectChannelEnable();
+    public Task<bool> StartCollectChannelEnableAsync() => App.GetService<IChannelEnableService>().StartCollectChannelEnableAsync();
 
     public Task StartRedundancyTaskAsync() => App.GetService<IRedundancyHostedService>().StartRedundancyTaskAsync();
 
@@ -77,26 +77,54 @@ public partial class ManagementRpcServer : IRpcServer, IManagementRpcServer, IBa
 
     public Task<RedundancyOptions> GetRedundancyAsync() => App.GetService<IRedundancyService>().GetRedundancyAsync();
 
-    public Task<LogLevel> RedundancyLogLevel() => App.GetService<IRedundancyHostedService>().RedundancyLogLevel();
+    public Task<LogLevel> RedundancyLogLevelAsync() => App.GetService<IRedundancyHostedService>().RedundancyLogLevelAsync();
 
 
-    public Task SetRedundancyLogLevel(LogLevel logLevel) => App.GetService<IRedundancyHostedService>().SetRedundancyLogLevel(logLevel);
+    public Task SetRedundancyLogLevelAsync(LogLevel logLevel) => App.GetService<IRedundancyHostedService>().SetRedundancyLogLevelAsync(logLevel);
 
-    public Task<string> RedundancyLogPath() => App.GetService<IRedundancyHostedService>().RedundancyLogPath();
+    public Task<string> RedundancyLogPathAsync() => App.GetService<IRedundancyHostedService>().RedundancyLogPathAsync();
 
-    public Task<OperResult<List<string>>> GetLogFiles(string directoryPath) => App.GetService<ITextFileReadService>().GetLogFiles(directoryPath);
+    public Task<OperResult<List<string>>> GetLogFilesAsync(string directoryPath) => App.GetService<ITextFileReadService>().GetLogFilesAsync(directoryPath);
 
-    public Task<OperResult<List<LogData>>> LastLogData(string file, int lineCount = 200) => App.GetService<ITextFileReadService>().LastLogData(file, lineCount);
+    public Task<OperResult<List<LogData>>> LastLogDataAsync(string file, int lineCount = 200) => App.GetService<ITextFileReadService>().LastLogDataAsync(file, lineCount);
 
     public Task<List<PluginInfo>> GetPluginListAsync(PluginTypeEnum? pluginType = null) => App.GetService<IPluginPageService>().GetPluginListAsync(pluginType);
 
-    public Task<QueryData<PluginInfo>> PluginPage(QueryPageOptions options, PluginTypeEnum? pluginTypeEnum = null) => App.GetService<IPluginPageService>().PluginPage(options, pluginTypeEnum);
+    public Task<QueryData<PluginInfo>> PluginPageAsync(QueryPageOptions options, PluginTypeEnum? pluginTypeEnum = null) => App.GetService<IPluginPageService>().PluginPageAsync(options, pluginTypeEnum);
 
-    public Task ReloadPlugin() => App.GetService<IPluginPageService>().ReloadPlugin();
+    public Task ReloadPluginAsync() => App.GetService<IPluginPageService>().ReloadPluginAsync();
 
 
 
-    public Task SavePluginByPath(PluginAddPathInput plugin) => App.GetService<IPluginPageService>().SavePluginByPath(plugin);
+    public Task SavePluginByPathAsync(PluginAddPathInput plugin) => App.GetService<IPluginPageService>().SavePluginByPathAsync(plugin);
 
-    public Task<IEnumerable<AlarmVariable>> GetCurrentUserRealAlarmVariables() => App.GetService<IRealAlarmService>().GetCurrentUserRealAlarmVariables();
+    public Task<IEnumerable<AlarmVariable>> GetCurrentUserRealAlarmVariablesAsync() => App.GetService<IRealAlarmService>().GetCurrentUserRealAlarmVariablesAsync();
+
+    public Task<IEnumerable<SelectedItem>> GetCurrentUserDeviceSelectedItemsAsync(string searchText, int startIndex, int count) => App.GetService<IGlobalDataService>().GetCurrentUserDeviceSelectedItemsAsync(searchText, startIndex, count);
+
+    public Task<QueryData<SelectedItem>> GetCurrentUserDeviceVariableSelectedItemsAsync(string deviceText, string searchText, int startIndex, int count) => App.GetService<IGlobalDataService>().GetCurrentUserDeviceVariableSelectedItemsAsync(deviceText, searchText, startIndex, count);
+
+    public Task<TouchSocket.Core.LogLevel> RulesLogLevelAsync(long rulesId) => App.GetService<IRulesEngineHostedService>().RulesLogLevelAsync(rulesId);
+    public Task SetRulesLogLevelAsync(long rulesId, TouchSocket.Core.LogLevel logLevel) => App.GetService<IRulesEngineHostedService>().SetRulesLogLevelAsync(rulesId, logLevel);
+    public Task<string> RulesLogPathAsync(long rulesId) => App.GetService<IRulesEngineHostedService>().RulesLogPathAsync(rulesId);
+    public Task<Rules> GetRuleRuntimesAsync(long rulesId) => App.GetService<IRulesEngineHostedService>().GetRuleRuntimesAsync(rulesId);
+
+
+    public Task DeleteRuleRuntimesAsync(List<long> ids) => App.GetService<IRulesEngineHostedService>().DeleteRuleRuntimesAsync(ids);
+
+    public Task EditRuleRuntimesAsync(Rules rules) => App.GetService<IRulesEngineHostedService>().EditRuleRuntimesAsync(rules);
+
+    public Task ClearRulesAsync() => App.GetService<IRulesService>().ClearRulesAsync();
+
+
+    public Task<bool> DeleteRulesAsync(List<long> ids) => App.GetService<IRulesService>().DeleteRulesAsync(ids);
+
+    public Task<List<Rules>> GetAllAsync() => App.GetService<IRulesService>().GetAllAsync();
+
+
+    public Task<QueryData<Rules>> RulesPageAsync(QueryPageOptions option, FilterKeyValueAction filterKeyValueAction = null) => App.GetService<IRulesService>().RulesPageAsync(option, filterKeyValueAction);
+
+
+    public Task<bool> SaveRulesAsync(Rules input, ItemChangedType type) => App.GetService<IRulesService>().SaveRulesAsync(input, type);
+
 }

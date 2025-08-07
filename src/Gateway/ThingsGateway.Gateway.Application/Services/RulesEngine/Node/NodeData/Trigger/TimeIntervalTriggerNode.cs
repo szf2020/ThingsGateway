@@ -5,7 +5,7 @@ using TouchSocket.Core;
 
 namespace ThingsGateway.Gateway.Application;
 
-[CategoryNode(Category = "Trigger", ImgUrl = "_content/ThingsGateway.Gateway.Razor/img/TimeInterval.svg", Desc = nameof(TimeIntervalTriggerNode), LocalizerType = typeof(ThingsGateway.Gateway.Application.INode), WidgetType = "ThingsGateway.Gateway.Razor.TextWidget,ThingsGateway.Gateway.Razor")]
+[CategoryNode(Category = "Trigger", ImgUrl = $"{INode.ModuleBasePath}img/TimeInterval.svg", Desc = nameof(TimeIntervalTriggerNode), LocalizerType = typeof(ThingsGateway.Gateway.Application.INode), WidgetType = $"ThingsGateway.Gateway.Razor.TextWidget,{INode.FileModulePath}")]
 public class TimeIntervalTriggerNode : TextNode, ITriggerNode, IDisposable
 {
     ~TimeIntervalTriggerNode()

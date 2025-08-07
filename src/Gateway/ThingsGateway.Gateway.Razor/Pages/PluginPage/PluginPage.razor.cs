@@ -18,13 +18,12 @@ public partial class PluginPage
     [NotNull]
     private IPluginPageService? PluginService { get; set; }
 
-    private PluginInfo SearchModel { get; set; } = new();
 
     private async Task<QueryData<PluginInfo>> OnQueryAsync(QueryPageOptions options)
     {
         return await Task.Run(() =>
         {
-            var data = PluginService.PluginPage(options);
+            var data = PluginService.PluginPageAsync(options);
             return data;
         });
     }
@@ -76,7 +75,7 @@ public partial class PluginPage
 
     private Task OnReload()
     {
-        return PluginService.ReloadPlugin();
+        return PluginService.ReloadPluginAsync();
     }
 
     #endregion 添加

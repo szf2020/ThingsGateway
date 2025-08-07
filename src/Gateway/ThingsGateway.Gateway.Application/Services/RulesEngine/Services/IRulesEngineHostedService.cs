@@ -8,13 +8,14 @@
 // QQ群：605534569
 // ------------------------------------------------------------------------------
 
-using ThingsGateway.Blazor.Diagrams.Core;
-
 namespace ThingsGateway.Gateway.Application;
 
 public interface IRulesEngineHostedService
 {
-    Dictionary<RulesLog, Diagram> Diagrams { get; }
-    Task Delete(IEnumerable<long> ids);
-    Task Edit(Rules rules);
+    Task<TouchSocket.Core.LogLevel> RulesLogLevelAsync(long rulesId);
+    Task SetRulesLogLevelAsync(long rulesId, TouchSocket.Core.LogLevel logLevel);
+    Task<string> RulesLogPathAsync(long rulesId);
+    Task<Rules> GetRuleRuntimesAsync(long rulesId);
+    Task DeleteRuleRuntimesAsync(List<long> ids);
+    Task EditRuleRuntimesAsync(Rules rules);
 }

@@ -5,7 +5,7 @@ using TouchSocket.Core;
 
 namespace ThingsGateway.Gateway.Application;
 
-[CategoryNode(Category = "Actuator", ImgUrl = "_content/ThingsGateway.Gateway.Razor/img/Rpc.svg", Desc = nameof(VariableRpcNode), LocalizerType = typeof(ThingsGateway.Gateway.Application.INode), WidgetType = "ThingsGateway.Gateway.Razor.VariableWidget,ThingsGateway.Gateway.Razor")]
+[CategoryNode(Category = "Actuator", ImgUrl = $"{INode.ModuleBasePath}img/Rpc.svg", Desc = nameof(VariableRpcNode), LocalizerType = typeof(ThingsGateway.Gateway.Application.INode), WidgetType = $"ThingsGateway.Gateway.Razor.VariableWidget,{INode.FileModulePath}")]
 public class VariableRpcNode : VariableNode, IActuatorNode
 {
     public VariableRpcNode(string id, Point? position = null) : base(id, position)

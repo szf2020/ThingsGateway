@@ -73,7 +73,7 @@ public static class PluginInfoUtil
                 }
 
 
-                await pluginPageService.SavePluginByPath(pluginAddPathInput).ConfigureAwait(false);
+                await pluginPageService.SavePluginByPathAsync(pluginAddPathInput).ConfigureAwait(false);
 
 
             }

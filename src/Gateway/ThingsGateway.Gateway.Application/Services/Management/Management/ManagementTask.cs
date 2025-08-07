@@ -11,6 +11,8 @@
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
+using ThingsGateway.NewLife.Json.Extension;
+
 using TouchSocket.Core;
 using TouchSocket.Dmtp;
 using TouchSocket.Dmtp.FileTransfer;
@@ -107,6 +109,11 @@ public partial class ManagementTask : AsyncDisposableObject
                    {
                        b.UseSystemTextJson(json =>
                        {
+                           json.Converters.Add(new ByteArrayToNumberArrayConverterSystemTextJson());
+                           json.Converters.Add(new JTokenSystemTextJsonConverter());
+                           json.Converters.Add(new JValueSystemTextJsonConverter());
+                           json.Converters.Add(new JObjectSystemTextJsonConverter());
+                           json.Converters.Add(new JArraySystemTextJsonConverter());
                        });
                    });
 
@@ -162,6 +169,11 @@ public partial class ManagementTask : AsyncDisposableObject
                    {
                        b.UseSystemTextJson(json =>
                        {
+                           json.Converters.Add(new ByteArrayToNumberArrayConverterSystemTextJson());
+                           json.Converters.Add(new JTokenSystemTextJsonConverter());
+                           json.Converters.Add(new JValueSystemTextJsonConverter());
+                           json.Converters.Add(new JObjectSystemTextJsonConverter());
+                           json.Converters.Add(new JArraySystemTextJsonConverter());
                        });
                    });
 

@@ -30,14 +30,14 @@ public partial class RedundancyOptionsHeader : IDisposable
 
     protected override async Task OnInitializedAsync()
     {
-        StartCollectChannelEnable = await ChannelEnableService.StartCollectChannelEnable();
+        StartCollectChannelEnable = await ChannelEnableService.StartCollectChannelEnableAsync();
         _ = Task.Run(async () =>
         {
             while (!Disposed)
             {
                 try
                 {
-                    StartCollectChannelEnable = await ChannelEnableService.StartCollectChannelEnable();
+                    StartCollectChannelEnable = await ChannelEnableService.StartCollectChannelEnableAsync();
                     await InvokeAsync(StateHasChanged);
                 }
                 finally

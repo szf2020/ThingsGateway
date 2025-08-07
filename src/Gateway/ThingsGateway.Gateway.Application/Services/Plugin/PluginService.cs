@@ -330,7 +330,7 @@ internal sealed class PluginService : IPluginService
     /// <summary>
     /// 分页显示插件
     /// </summary>
-    public async Task<QueryData<PluginInfo>> PluginPage(QueryPageOptions options, PluginTypeEnum? pluginType = null)
+    public async Task<QueryData<PluginInfo>> PluginPageAsync(QueryPageOptions options, PluginTypeEnum? pluginType = null)
     {
         //指定关键词搜索为插件FullName
         var query = (await GetPluginListAsync(pluginType).ConfigureAwait(false)).WhereIf(!options.SearchText.IsNullOrWhiteSpace(), a => a.FullName.Contains(options.SearchText)).GetQueryData(options);
@@ -340,7 +340,7 @@ internal sealed class PluginService : IPluginService
     /// <summary>
     /// 移除全部插件
     /// </summary>
-    public async Task ReloadPlugin()
+    public async Task ReloadPluginAsync()
     {
         try
         {
@@ -368,7 +368,7 @@ internal sealed class PluginService : IPluginService
     /// </summary>
     /// <param name="pluginAddPathInput">要保存的插件信息。</param>
     [OperDesc("SavePlugin", isRecordPar: false, localizerType: typeof(PluginAddInput))]
-    public async Task SavePluginByPath(PluginAddPathInput pluginAddPathInput)
+    public async Task SavePluginByPathAsync(PluginAddPathInput pluginAddPathInput)
     {
         try
         {

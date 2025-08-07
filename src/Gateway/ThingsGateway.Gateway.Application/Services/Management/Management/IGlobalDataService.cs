@@ -8,15 +8,12 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
+using BootstrapBlazor.Components;
 
-using TouchSocket.Dmtp.Rpc;
+namespace ThingsGateway.Gateway.Application;
 
-namespace ThingsGateway.Gateway.Application
+public interface IGlobalDataService
 {
-
-    public interface IRealAlarmService
-    {
-        [DmtpRpc]
-        Task<IEnumerable<AlarmVariable>> GetCurrentUserRealAlarmVariablesAsync();
-    }
+    Task<IEnumerable<SelectedItem>> GetCurrentUserDeviceSelectedItemsAsync(string searchText, int startIndex, int count);
+    Task<QueryData<SelectedItem>> GetCurrentUserDeviceVariableSelectedItemsAsync(string deviceText, string searchText, int startIndex, int count);
 }

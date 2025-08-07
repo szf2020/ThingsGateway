@@ -63,7 +63,7 @@ public partial class GatewayIndex
             };
         });
 
-        var data1 = await BackendLogService.GetNewBackendLog();
+        var data1 = await BackendLogService.GetNewBackendLogAsync();
         BackendLogItems = data1.Select(a =>
         {
             return new TimelineItem()
@@ -74,7 +74,7 @@ public partial class GatewayIndex
             };
         });
 
-        var data2 = await RpcLogService.GetNewRpcLog();
+        var data2 = await RpcLogService.GetNewRpcLogAsync();
         RpcLogItems = data2.Select(a =>
         {
             return new TimelineItem()

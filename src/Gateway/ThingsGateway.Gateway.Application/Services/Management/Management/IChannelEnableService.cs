@@ -15,10 +15,10 @@ public interface IChannelEnableService
     /// <summary>
     /// 采集通道是否可用
     /// </summary>
-    public Task<bool> StartCollectChannelEnable();
+    public Task<bool> StartCollectChannelEnableAsync();
 
     /// <summary>
     /// 业务通道是否可用
     /// </summary>
-    public Task<bool> StartBusinessChannelEnable();
+    public Task<bool> StartBusinessChannelEnableAsync();
 }

@@ -1,4 +1,32 @@
 ﻿{
+  "ThingsGateway.Management.Razor.ManagementTree": {
+    "AddManagementConfig": "添加",
+    "ExcelManagementConfig": "在线excel编辑",
+    "UpdateManagementConfig": "编辑",
+    "DeleteManagementConfig": "删除",
+    "ExportManagementConfig": "导出",
+    "ImportManagementConfig": "导入",
+
+    "DeleteCurrentManagementConfig": "删除当前配置",
+    "DeleteAllManagementConfig": "删除全部配置",
+    "DeleteConfirmTitle": "删除确认",
+    "AllManagementConfig": "全部配置",
+
+    "Management": "通讯配置"
+  },
+  "ThingsGateway.Management.Razor.ManagementView": {
+    "BackendLogPage": "后台日志",
+    "RpcLogPage": "Rpc日志",
+    "SystemConfigPage": "系统管理",
+    "PluginPage": "插件管理",
+    "RealAlarmPage": "实时报警",
+    "RulesPage": "规则引擎"
+  },
+  "ThingsGateway.Management.Razor.SaveUpdateZipFile": {
+    "DownTemplate": "下载模板",
+    "SaveUpdateZipFile": "上传版本包"
+  },
+
   "ThingsGateway.Gateway.Razor.ValueTransformType": {
     "None": "无",
     "Linear": "线性",

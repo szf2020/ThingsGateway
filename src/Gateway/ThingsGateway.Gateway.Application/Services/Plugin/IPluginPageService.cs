@@ -29,12 +29,12 @@ public interface IPluginPageService
     /// <summary>
     /// 分页显示插件
     /// </summary>
-    public Task<QueryData<PluginInfo>> PluginPage(QueryPageOptions options, PluginTypeEnum? pluginTypeEnum = null);
+    public Task<QueryData<PluginInfo>> PluginPageAsync(QueryPageOptions options, PluginTypeEnum? pluginTypeEnum = null);
 
     /// <summary>
     /// 重载插件
     /// </summary>
-    Task ReloadPlugin();
+    Task ReloadPluginAsync();
 
     ///// <summary>
     ///// 添加插件
@@ -48,5 +48,5 @@ public interface IPluginPageService
     /// </summary>
     /// <param name="plugin"></param>
     /// <returns></returns>
-    Task SavePluginByPath(PluginAddPathInput plugin);
+    Task SavePluginByPathAsync(PluginAddPathInput plugin);
 }

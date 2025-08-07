@@ -21,7 +21,7 @@ internal sealed class RpcLogService : BaseService<RpcLog>, IRpcLogService
     /// <summary>
     /// 最新十条
     /// </summary>
-    public async Task<List<RpcLog>> GetNewRpcLog()
+    public async Task<List<RpcLog>> GetNewRpcLogAsync()
     {
         using var db = GetDB();
         var data = await db.Queryable<RpcLog>().OrderByDescending(a => a.LogTime).Take(10).ToListAsync().ConfigureAwait(false);

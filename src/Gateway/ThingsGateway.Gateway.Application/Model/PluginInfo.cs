@@ -70,5 +70,6 @@ public class PluginInfo
     /// </summary>
     [IgnoreExcel]
     [SugarColumn(IsIgnore = true)]
+    [AutoGenerateColumn(Ignore = true)]
     public string Directory { get; set; }
 }

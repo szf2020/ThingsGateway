@@ -1,4 +1,33 @@
 ﻿{
+  "ThingsGateway.Management.Razor.ManagementTree": {
+    "AddManagementConfig": "Add",
+    "ExcelManagementConfig": "Excel",
+    "UpdateManagementConfig": "Update",
+    "DeleteManagementConfig": "Delete",
+    "ExportManagementConfig": "Export",
+    "ImportManagementConfig": "Import",
+
+    "DeleteCurrentManagementConfig": "Delete Current",
+    "DeleteAllManagementConfig": "Delete All",
+    "DeleteConfirmTitle": "Delete Confirm",
+    "AllManagementConfig": "All",
+
+    "Management": "Management"
+  },
+  "ThingsGateway.Management.Razor.ManagementView": {
+    "BackendLogPage": "BackendLog",
+    "RpcLogPage": "Rpc",
+    "SystemConfigPage": "SystemConfig",
+    "PluginPage": "Plugin",
+    "RealAlarmPage": "RealAlarm",
+    "RulesPage": "Rules"
+
+  },
+  "ThingsGateway.Management.Razor.SaveUpdateZipFile": {
+    "DownTemplate": "Download Template",
+    "SaveUpdateZipFile": "Upload Version Package"
+  },
+
   "ThingsGateway.Gateway.Razor.ValueTransformType": {
     "None": "None",
     "Linear": "Linear",

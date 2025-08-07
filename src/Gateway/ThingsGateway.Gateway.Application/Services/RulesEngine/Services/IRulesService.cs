@@ -23,12 +23,7 @@ public interface IRulesService
     /// 删除规则
     /// </summary>
     /// <param name="ids">待删除规则的ID列表</param>
-    Task<bool> DeleteRulesAsync(IEnumerable<long> ids);
-
-    /// <summary>
-    /// 从缓存中删除规则
-    /// </summary>
-    void DeleteRulesFromCache();
+    Task<bool> DeleteRulesAsync(List<long> ids);
 
     /// <summary>
     /// 从缓存/数据库获取全部信息
@@ -41,7 +36,7 @@ public interface IRulesService
     /// </summary>
     /// <param name="option">查询条件</param>
     /// <param name="filterKeyValueAction">查询条件</param>
-    Task<QueryData<Rules>> PageAsync(QueryPageOptions option, FilterKeyValueAction filterKeyValueAction = null);
+    Task<QueryData<Rules>> RulesPageAsync(QueryPageOptions option, FilterKeyValueAction filterKeyValueAction = null);
 
     /// <summary>
     /// 保存规则

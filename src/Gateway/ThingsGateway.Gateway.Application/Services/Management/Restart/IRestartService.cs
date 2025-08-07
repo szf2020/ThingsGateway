@@ -12,5 +12,5 @@ namespace ThingsGateway.Gateway.Application;
 
 public interface IRestartService
 {
-    Task RestartServer();
+    Task RestartServerAsync();
 }

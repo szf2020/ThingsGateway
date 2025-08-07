@@ -26,7 +26,7 @@ public interface IRpcLogService
     /// 获取最新的十条 RpcLog 记录
     /// </summary>
     /// <returns>最新的十条记录</returns>
-    Task<List<RpcLog>> GetNewRpcLog();
+    Task<List<RpcLog>> GetNewRpcLogAsync();
 
     /// <summary>
     /// 分页查询 RpcLog 数据

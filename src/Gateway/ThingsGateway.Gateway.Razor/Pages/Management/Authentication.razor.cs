@@ -34,14 +34,14 @@ public partial class Authentication
     IAuthenticationService AuthenticationService { get; set; }
     protected override async Task OnParametersSetAsync()
     {
-        var authorizeInfo = await AuthenticationService.TryGetAuthorizeInfo();
+        var authorizeInfo = await AuthenticationService.TryGetAuthorizeInfoAsync();
         AuthorizeInfo = authorizeInfo;
         base.OnParametersSet();
     }
 
     private async Task Register()
     {
-        var result = await AuthenticationService.TryAuthorize(Password);
+        var result = await AuthenticationService.TryAuthorizeAsync(Password);
         if (result.Auth)
         {
             AuthorizeInfo = result;
@@ -55,8 +55,8 @@ public partial class Authentication
     }
     private async Task Unregister()
     {
-        await AuthenticationService.UnAuthorize();
-        var authorizeInfo = await AuthenticationService.TryGetAuthorizeInfo();
+        await AuthenticationService.UnAuthorizeAsync();
+        var authorizeInfo = await AuthenticationService.TryGetAuthorizeInfoAsync();
         AuthorizeInfo = authorizeInfo;
 
         await InvokeAsync(StateHasChanged);

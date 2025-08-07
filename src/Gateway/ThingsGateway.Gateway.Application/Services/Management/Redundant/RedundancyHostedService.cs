@@ -42,18 +42,18 @@ internal sealed class RedundancyHostedService : BackgroundService, IRedundancyHo
         await base.StopAsync(cancellationToken).ConfigureAwait(false);
     }
 
-    public Task<TouchSocket.Core.LogLevel> RedundancyLogLevel()
+    public Task<TouchSocket.Core.LogLevel> RedundancyLogLevelAsync()
     {
         return Task.FromResult(RedundancyTask.TextLogger.LogLevel);
     }
 
-    public Task SetRedundancyLogLevel(TouchSocket.Core.LogLevel logLevel)
+    public Task SetRedundancyLogLevelAsync(TouchSocket.Core.LogLevel logLevel)
     {
         RedundancyTask.TextLogger.LogLevel = logLevel;
         return Task.CompletedTask;
     }
 
-    public Task<string> RedundancyLogPath()
+    public Task<string> RedundancyLogPathAsync()
     {
         return Task.FromResult(RedundancyTask.LogPath);
     }

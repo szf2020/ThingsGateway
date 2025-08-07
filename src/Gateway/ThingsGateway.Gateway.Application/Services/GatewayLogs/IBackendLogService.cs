@@ -26,7 +26,7 @@ public interface IBackendLogService
     /// 获取最新的十条 BackendLog 记录
     /// </summary>
     /// <returns>最新的十条记录</returns>
-    Task<List<BackendLog>> GetNewBackendLog();
+    Task<List<BackendLog>> GetNewBackendLogAsync();
 
     /// <summary>
     /// 分页查询 BackendLog 数据

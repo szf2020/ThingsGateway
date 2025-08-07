@@ -14,14 +14,17 @@ using System.Data;
 using ThingsGateway.Admin.Razor;
 
 namespace ThingsGateway.Gateway.Razor;
-
-public partial class RulesPage
+#if !Management
+[JSModuleAutoLoader("Pages/RulesEngine/RulesPage.razor.js", AutoInvokeDispose = false)]
+#else
+[JSModuleAutoLoader("Interface/Page/RulesEngine/RulesPage.razor.js", AutoInvokeDispose = false)]
+#endif
+public partial class RulesPage : ThingsGatewayModuleComponentBase
 {
     [Inject]
     [NotNull]
     private IRulesService? RulesService { get; set; }
 
-    private Rules? SearchModel { get; set; } = new();
 
     protected override async Task InvokeInitAsync()
     {
@@ -66,7 +69,8 @@ public partial class RulesPage
     {
         return await Task.Run(async () =>
         {
-            var data = await RulesService.PageAsync(options);
+
+            var data = await RulesService.RulesPageAsync(options);
             return data;
         });
     }
@@ -81,7 +85,7 @@ public partial class RulesPage
         {
             return await Task.Run(async () =>
             {
-                var result = await RulesService.DeleteRulesAsync(ruless.Select(a => a.Id));
+                var result = await RulesService.DeleteRulesAsync(ruless.Select(a => a.Id).ToList());
                 return result;
             });
         }

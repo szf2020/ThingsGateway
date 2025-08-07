@@ -14,8 +14,8 @@ namespace ThingsGateway.Gateway.Application;
 
 public interface IAuthenticationService
 {
-    Task<string> UUID();
-    Task<AuthorizeInfo> TryAuthorize(string password);
-    Task<AuthorizeInfo> TryGetAuthorizeInfo();
-    Task UnAuthorize();
+    Task<string> UUIDAsync();
+    Task<AuthorizeInfo> TryAuthorizeAsync(string password);
+    Task<AuthorizeInfo> TryGetAuthorizeInfoAsync();
+    Task UnAuthorizeAsync();
 }

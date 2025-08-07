@@ -44,10 +44,43 @@ internal sealed class RulesEngineHostedService : BackgroundService, IRulesEngine
     private WaitLock RestartLock { get; } = new(nameof(RulesEngineHostedService));
     private List<Rules> Rules { get; set; } = new();
     public Dictionary<RulesLog, Diagram> Diagrams { get; private set; } = new();
-
-    public async Task Edit(Rules rules)
+    public Task<RulesLog> GetRulesLogAsync(long rulesId)
     {
-        await Delete(new List<long>() { rules.Id }).ConfigureAwait(false);
+        var data = Diagrams.Select(a => a.Key).FirstOrDefault(a => a.Rules.Id == rulesId);
+        return Task.FromResult(data);
+    }
+
+
+    public Task<TouchSocket.Core.LogLevel> RulesLogLevelAsync(long rulesId)
+    {
+        var data = Diagrams.Select(a => a.Key).FirstOrDefault(a => a.Rules.Id == rulesId);
+        return Task.FromResult(data?.Log?.LogLevel ?? TouchSocket.Core.LogLevel.Info);
+    }
+
+    public Task SetRulesLogLevelAsync(long rulesId, TouchSocket.Core.LogLevel logLevel)
+    {
+        var data = Diagrams.Select(a => a.Key).FirstOrDefault(a => a.Rules.Id == rulesId);
+        if (data?.Log != null)
+            data.Log.LogLevel = logLevel;
+
+        return Task.CompletedTask;
+    }
+
+    public Task<string> RulesLogPathAsync(long rulesId)
+    {
+        var data = Diagrams.Select(a => a.Key).FirstOrDefault(a => a.Rules.Id == rulesId);
+        return Task.FromResult(data?.Log?.LogPath);
+    }
+
+    public Task<Rules> GetRuleRuntimesAsync(long rulesId)
+    {
+        var data = Diagrams.Select(a => a.Key).FirstOrDefault(a => a.Rules.Id == rulesId);
+        return Task.FromResult(data?.Rules);
+    }
+
+    public async Task EditRuleRuntimesAsync(Rules rules)
+    {
+        await DeleteRuleRuntimesAsync(new List<long>() { rules.Id }).ConfigureAwait(false);
         if (rules.Status)
         {
             var data = Init(rules);
@@ -56,7 +89,7 @@ internal sealed class RulesEngineHostedService : BackgroundService, IRulesEngine
         }
     }
 
-    public async Task Delete(IEnumerable<long> ids)
+    public async Task DeleteRuleRuntimesAsync(List<long> ids)
     {
         try
         {
@@ -90,7 +123,7 @@ internal sealed class RulesEngineHostedService : BackgroundService, IRulesEngine
 #pragma warning restore CA1863
         log.LogLevel = TouchSocket.Core.LogLevel.Trace;
         DefaultDiagram blazorDiagram = new();
-        RuleHelpers.Load(blazorDiagram, rules.RulesJson);
+        RuleHelpers.Load(blazorDiagram, rules.RulesJson ?? new());
         var result = (new RulesLog(rules, log), blazorDiagram);
         Diagrams.Add(result.Item1, blazorDiagram);
 
@@ -257,6 +290,9 @@ internal sealed class RulesEngineHostedService : BackgroundService, IRulesEngine
             RestartLock.Release(); // 释放锁
         }
     }
+
+
+
 
     #endregion worker服务
 }

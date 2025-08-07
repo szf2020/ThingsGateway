@@ -12,15 +12,52 @@ namespace ThingsGateway.Gateway.Razor;
 
 public partial class RulesStatus
 {
-    private RulesLog? _rules { get; set; }
+    private Rules? _rules { get; set; }
 
     [Parameter, EditorRequired]
     public long RulesId { get; set; }
     [Inject]
     IRulesEngineHostedService RulesEngineHostedService { get; set; }
-    protected override Task OnParametersSetAsync()
+    protected override async Task OnParametersSetAsync()
     {
-        _rules = RulesEngineHostedService.Diagrams.Keys.FirstOrDefault(a => a.Rules.Id == RulesId);
-        return base.OnParametersSetAsync();
+        if (RulesId > 0)
+            _rules = await RulesEngineHostedService.GetRuleRuntimesAsync(RulesId);
+        else
+            _rules = null;
+        await base.OnParametersSetAsync();
     }
+    public TouchSocket.Core.LogLevel LogLevel { get; set; }
+    public string LogPath { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (RulesId > 0)
+        {
+            var path = await RulesEngineHostedService.RulesLogPathAsync(RulesId);
+            var logLevel = await RulesEngineHostedService.RulesLogLevelAsync(RulesId);
+            bool changed = false;
+            if (path != LogPath)
+            {
+                LogPath = path;
+                changed = true;
+            }
+
+            if (logLevel != LogLevel)
+            {
+                LogLevel = logLevel;
+                changed = true;
+            }
+
+            if (changed)
+            {
+                await InvokeAsync(StateHasChanged);
+            }
+
+        }
+        if (firstRender)
+            await InvokeAsync(StateHasChanged);
+        await base.OnAfterRenderAsync(firstRender);
+    }
+
+
 }

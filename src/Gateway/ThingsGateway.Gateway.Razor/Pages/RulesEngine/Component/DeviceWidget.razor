@@ -28,31 +28,4 @@
     }
 </div>
 
-@code {
-    [Inject]
-    IStringLocalizer<ThingsGateway.Gateway.Razor._Imports> Localizer { get; set; }
 
-    [Parameter]
-    public TextNode Node { get; set; }
-
-    private static async Task<QueryData<SelectedItem>> OnRedundantDevicesQuery(VirtualizeQueryOption option)
-    {
-        var ret = new QueryData<SelectedItem>()
-            {
-                IsSorted = false,
-                IsFiltered = false,
-                IsAdvanceSearch = false,
-                IsSearch = !option.SearchText.IsNullOrWhiteSpace()
-            };
-
-        var devices = await GlobalData.GetCurrentUserDevices().ConfigureAwait(false);
-        var items = devices.WhereIf(!option.SearchText.IsNullOrWhiteSpace(), a => a.Name.Contains(option.SearchText)).Take(20)
-           .Select(a => new SelectedItem(a.Name, a.Name));
-
-        ret.TotalCount = items.Count();
-        ret.Items = items;
-        return ret;
-    }
-
-
-}

@@ -15,21 +15,21 @@ namespace ThingsGateway.Gateway.Application;
 
 internal sealed class AuthenticationService : IAuthenticationService
 {
-    public Task<string> UUID() => Task.FromResult(ProAuthentication.UUID);
-    public Task<AuthorizeInfo> TryGetAuthorizeInfo()
+    public Task<string> UUIDAsync() => Task.FromResult(ProAuthentication.UUID);
+    public Task<AuthorizeInfo> TryGetAuthorizeInfoAsync()
     {
         ProAuthentication.TryGetAuthorizeInfo(out var authorizeInfo);
         return Task.FromResult(authorizeInfo);
     }
 
-    public Task<AuthorizeInfo> TryAuthorize(string password)
+    public Task<AuthorizeInfo> TryAuthorizeAsync(string password)
     {
         ProAuthentication.TryAuthorize(password, out var authorizeInfo);
         return Task.FromResult(authorizeInfo);
 
     }
 
-    public Task UnAuthorize()
+    public Task UnAuthorizeAsync()
     {
         ProAuthentication.UnAuthorize();
         return Task.CompletedTask;

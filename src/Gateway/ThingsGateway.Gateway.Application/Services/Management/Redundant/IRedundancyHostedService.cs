@@ -16,7 +16,7 @@ public interface IRedundancyHostedService
     Task StopRedundancyTaskAsync();
     Task RedundancyForcedSync();
 
-    public Task<TouchSocket.Core.LogLevel> RedundancyLogLevel();
-    public Task SetRedundancyLogLevel(TouchSocket.Core.LogLevel logLevel);
-    public Task<string> RedundancyLogPath();
+    public Task<TouchSocket.Core.LogLevel> RedundancyLogLevelAsync();
+    public Task SetRedundancyLogLevelAsync(TouchSocket.Core.LogLevel logLevel);
+    public Task<string> RedundancyLogPathAsync();
 }
