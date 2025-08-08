@@ -14,4 +14,27 @@ public partial class ChannelRuntimeInfo
 {
     [Parameter, EditorRequired]
     public ChannelRuntime ChannelRuntime { get; set; }
+
+    public TouchSocket.Core.LogLevel LogLevel { get; set; }
+    [Inject]
+    IChannelPageService ChannelPageService { get; set; }
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (ChannelRuntime?.Id > 0)
+        {
+            var logLevel = await ChannelPageService.ChannelLogLevelAsync(ChannelRuntime.Id);
+
+            if (logLevel != LogLevel)
+            {
+                LogLevel = logLevel;
+                await InvokeAsync(StateHasChanged);
+            }
+
+
+        }
+        if (firstRender)
+            await InvokeAsync(StateHasChanged);
+        await base.OnAfterRenderAsync(firstRender);
+    }
+
 }

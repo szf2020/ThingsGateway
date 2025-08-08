@@ -177,6 +177,15 @@ public static class GlobalData
         }
         return GlobalData.ChannelThreadManage.DeviceThreadManages.TryGetValue(deviceRuntime.ChannelId, out deviceThreadManage);
     }
+
+    public static IChannelThreadManage GetChannelThreadManage(ChannelRuntime channelRuntime)
+    {
+        if (channelRuntime.DeviceThreadManage?.ChannelThreadManage != null)
+            return channelRuntime.DeviceThreadManage.ChannelThreadManage;
+        else
+            return GlobalData.ChannelThreadManage;
+    }
+
     public static Dictionary<IDeviceThreadManage, List<DeviceRuntime>> GetDeviceThreadManages(IEnumerable<DeviceRuntime> deviceRuntimes)
     {
         Dictionary<IDeviceThreadManage, List<DeviceRuntime>> deviceThreadManages = new();

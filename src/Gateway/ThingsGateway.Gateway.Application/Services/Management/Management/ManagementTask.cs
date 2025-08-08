@@ -47,7 +47,7 @@ public partial class ManagementTask : AsyncDisposableObject
     {
         _logger?.Log_Out(logLevel, source, message, exception);
     }
-
+    private bool success = true;
     public async Task StartAsync(CancellationToken cancellationToken)
     {
         if (!_managementOptions.Enable) return;
@@ -65,10 +65,14 @@ public partial class ManagementTask : AsyncDisposableObject
             try
             {
                 await EnsureChannelOpenAsync(cancellationToken).ConfigureAwait(false);
+                success = true;
             }
             catch (Exception ex)
             {
-                LogMessage?.LogWarning(ex, "Start");
+                if (success)
+                    LogMessage?.LogWarning(ex, "Start");
+
+                success = false;
             }
             finally
             {

@@ -56,9 +56,12 @@ public partial class ChannelEditComponent
     [Parameter]
     public PluginTypeEnum? PluginType { get; set; }
 
-    protected override void OnInitialized()
+    [Inject]
+    IPluginPageService PluginService { get; set; }
+
+    protected override async Task OnInitializedAsync()
     {
-        var plugins = GlobalData.PluginService.GetPluginList(PluginType);
+        var plugins = await PluginService.GetPluginsAsync(PluginType);
 
         PluginDcit = plugins.ToDictionary(a => a.FullName);
         PluginNames = plugins.BuildPluginSelectList();

@@ -17,12 +17,13 @@ namespace ThingsGateway.Gateway.Application;
 /// </summary>
 public class PluginInfo
 {
+#if !Management
     /// <summary>
     /// 插件文件名称.插件类型名称
     /// </summary>
     [AutoGenerateColumn(Ignore = true)]
     public List<PluginInfo>? Children { get; set; } = new();
-
+#endif
     /// <summary>
     /// 插件文件名称.插件类型名称
     /// </summary>

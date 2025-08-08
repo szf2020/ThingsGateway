@@ -10,7 +10,7 @@
 
 using Microsoft.JSInterop;
 
-namespace ThingsGateway.Common.Extension;
+namespace ThingsGateway.Razor.Extension;
 
 /// <summary>
 /// JSRuntime扩展方法
@@ -44,6 +44,30 @@ public static class JSRuntimeExtensions
         try
         {
             await jsRuntime.InvokeVoidAsync("setCultureLocalStorage", cultureName).ConfigureAwait(false);
+        }
+        catch
+        {
+        }
+    }
+
+
+    public static async ValueTask<T> GetLocalStorage<T>(this IJSRuntime jsRuntime, string name)
+    {
+        try
+        {
+            return await jsRuntime.InvokeAsync<T>("getLocalStorage", name).ConfigureAwait(false);
+        }
+        catch
+        {
+            return default;
+        }
+    }
+
+    public static async ValueTask SetLocalStorage<T>(this IJSRuntime jsRuntime, string name, T data)
+    {
+        try
+        {
+            await jsRuntime.InvokeVoidAsync("setLocalStorage", name, data).ConfigureAwait(false);
         }
         catch
         {

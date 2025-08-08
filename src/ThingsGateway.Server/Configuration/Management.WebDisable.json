@@ -2,7 +2,7 @@
   "$schema": "null",
 
   "RemoteClientManagement": {
-    "Enable": false,
+    "Enable": true,
     "Name": "ThingsGateway",
     "ServerUri": "127.0.0.1:8299",
     "VerifyToken": "ThingsGateway",
@@ -10,7 +10,7 @@
   },
 
   "RemoteServerManagement": {
-    "Enable": false,
+    "Enable": true,
     "Name": "ThingsGateway",
     "ServerUri": "0.0.0.0:7999",
     "VerifyToken": "ThingsGateway",

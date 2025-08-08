@@ -33,6 +33,8 @@ public class AsyncReadWriteLock
         {
             Interlocked.Increment(ref _readerCount);
 
+
+
             // 第一个读者需要获取写入锁，防止写操作
             await _readerLock.WaitOneAsync(cancellationToken).ConfigureAwait(false);
 
@@ -63,11 +65,16 @@ public class AsyncReadWriteLock
     private object lockObject = new();
     private void ReleaseWriter()
     {
+
         var writerCount = Interlocked.Decrement(ref _writerCount);
+
+        // 每次释放写时，总是唤醒至少一个读
+        _readerLock.Set();
+
         if (writerCount == 0)
         {
             var resetEvent = _readerLock;
-            _readerLock = new(false);
+            //_readerLock = new(false);
             Interlocked.Exchange(ref _writeSinceLastReadCount, 0);
             resetEvent.SetAll();
         }
@@ -83,12 +90,12 @@ public class AsyncReadWriteLock
                     if (count >= _writeReadRatio)
                     {
                         Interlocked.Exchange(ref _writeSinceLastReadCount, 0);
-                        _readerLock.Set();
+                        //_readerLock.Set();
                     }
                 }
                 else
                 {
-                    _readerLock.Set();
+                    //_readerLock.Set();
                 }
             }
 

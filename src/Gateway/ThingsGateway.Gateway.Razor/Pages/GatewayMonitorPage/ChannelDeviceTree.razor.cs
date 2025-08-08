@@ -10,16 +10,18 @@
 
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Components.Web;
+using Microsoft.JSInterop;
 
 using ThingsGateway.Admin.Application;
 using ThingsGateway.Admin.Razor;
 using ThingsGateway.NewLife.Extension;
 using ThingsGateway.NewLife.Json.Extension;
+using ThingsGateway.Razor.Extension;
 using ThingsGateway.SqlSugar;
 
 namespace ThingsGateway.Gateway.Razor;
 
-public partial class ChannelDeviceTree
+public partial class ChannelDeviceTree : IDisposable
 {
     SpinnerComponent Spinner;
     [Inject]
@@ -41,20 +43,28 @@ public partial class ChannelDeviceTree
     public EventCallback<ShowTypeEnum?> ShowTypeChanged { get; set; }
     [Parameter]
     public ShowTypeEnum? ShowType { get; set; }
-
+    [Inject]
+    IJSRuntime JSRuntime { get; set; }
     private async Task OnShowTypeChanged(ShowTypeEnum? showType)
     {
         ShowType = showType;
-        if (showType != null && Module != null)
-            await Module!.InvokeVoidAsync("saveShowType", ShowType);
+        if (showType != null)
+            await JSRuntime.SetLocalStorage("showType", ShowType);
         if (ShowTypeChanged.HasDelegate)
             await ShowTypeChanged.InvokeAsync(showType);
     }
-    protected override async Task InvokeInitAsync()
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        var showType = await Module!.InvokeAsync<ShowTypeEnum>("getShowType");
-        await OnShowTypeChanged(showType);
+        if (firstRender)
+        {
+            var showType = await JSRuntime!.GetLocalStorage<ShowTypeEnum>("showType");
+            await OnShowTypeChanged(showType);
+            StateHasChanged();
+        }
+        await base.OnAfterRenderAsync(firstRender);
     }
+
 
     [Parameter]
     public bool AutoRestartThread { get; set; }
@@ -140,15 +150,10 @@ public partial class ChannelDeviceTree
 
     async Task CopyChannel(string text, ChannelDeviceTreeItem channelDeviceTreeItem)
     {
-        Channel oneModel = null;
-        Dictionary<Device, List<Variable>> deviceDict = new();
 
         if (channelDeviceTreeItem.TryGetChannelRuntime(out var channelRuntime))
         {
-            oneModel = channelRuntime.AdaptChannel();
-            oneModel.Id = 0;
 
-            deviceDict = channelRuntime.ReadDeviceRuntimes.ToDictionary(a => a.Value.AdaptDevice(), a => a.Value.ReadOnlyVariableRuntimes.Select(a => a.Value).AdaptListVariable());
         }
         else
         {
@@ -167,19 +172,16 @@ public partial class ChannelDeviceTree
 
         op.Component = BootstrapDynamicComponent.CreateComponent<ChannelCopyComponent>(new Dictionary<string, object?>
         {
-             {nameof(ChannelCopyComponent.OnSave), async (List<Channel> channels,Dictionary<Device,List<Variable>> devices) =>
+             {nameof(ChannelCopyComponent.OnSave), async (int CopyCount, string CopyChannelNamePrefix, int CopyChannelNameSuffixNumber, string CopyDeviceNamePrefix, int CopyDeviceNameSuffixNumber) =>
             {
-                await Task.Run(() =>GlobalData.ChannelRuntimeService.CopyAsync(channels,devices,AutoRestartThread, default));
-                    //await Notify();
-
+                await Task.Run(() =>ChannelPageService.CopyChannelAsync(CopyCount,CopyChannelNamePrefix,CopyChannelNameSuffixNumber,CopyDeviceNamePrefix,CopyDeviceNameSuffixNumber,channelRuntime.Id,AutoRestartThread));
             }},
-            {nameof(ChannelCopyComponent.Model),oneModel },
-            {nameof(ChannelCopyComponent.Devices),deviceDict },
         });
 
         await DialogService.Show(op);
     }
-
+    [Inject]
+    IChannelPageService ChannelPageService { get; set; }
     Task BatchEditChannel(ContextMenuItem item, object value)
     {
         return BatchEditChannel(item.Text, value as ChannelDeviceTreeItem);
@@ -1360,11 +1362,10 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
         }
     }
     private bool Disposed;
-    protected override ValueTask DisposeAsync(bool disposing)
+    public void Dispose()
     {
         Disposed = true;
         ChannelRuntimeDispatchService.UnSubscribe(Refresh);
-        return base.DisposeAsync(disposing);
     }
 
     ChannelDeviceTreeItem? SelectModel = default;
@@ -1381,4 +1382,6 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
         }
         return Task.CompletedTask;
     }
+
+
 }

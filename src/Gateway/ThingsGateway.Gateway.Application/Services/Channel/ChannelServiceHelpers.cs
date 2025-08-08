@@ -18,6 +18,23 @@ namespace ThingsGateway.Gateway.Application;
 
 public static class ChannelServiceHelpers
 {
+
+    public static void GetImportChannelData(Dictionary<string, ImportPreviewOutputBase> input, out List<Channel> upData, out List<Channel> insertData)
+    {
+        List<Channel>? channels = new List<Channel>();
+        foreach (var item in input)
+        {
+            if (item.Key == ExportString.ChannelName)
+            {
+                var channelImports = ((ImportPreviewListOutput<Channel>)item.Value).Data;
+                channels = channelImports;
+                break;
+            }
+        }
+        upData = channels.Where(a => a.IsUp).ToList();
+        insertData = channels.Where(a => !a.IsUp).ToList();
+    }
+
     public static USheetDatas ExportChannel(IEnumerable<Channel> channels)
     {
         var rows = ExportRows(channels); // IEnumerable 延迟执行

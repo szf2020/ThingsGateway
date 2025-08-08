@@ -12,7 +12,7 @@
 
         <HeaderTemplate>
 
-            <span class=@((ChannelRuntime?.DeviceThreadManage!=null?"enable--text mx-1 text-h6 overflow-y-auto":"disabled--text mx-1 text-h6 overflow-y-auto"))>
+            <span class=@((ChannelRuntime?.Started==true ?"enable--text mx-1 text-h6 overflow-y-auto":"disabled--text mx-1 text-h6 overflow-y-auto"))>
                 <span class="text-truncate" title=@Name>@(Name)</span>
             </span>
 

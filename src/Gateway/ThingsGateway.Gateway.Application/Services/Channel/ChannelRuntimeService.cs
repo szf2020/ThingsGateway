@@ -19,12 +19,89 @@ namespace ThingsGateway.Gateway.Application;
 
 public class ChannelRuntimeService : IChannelRuntimeService
 {
-    private ILogger _logger;
-    public ChannelRuntimeService(ILogger<ChannelRuntimeService> logger)
+    private Microsoft.Extensions.Logging.ILogger _logger;
+    public ChannelRuntimeService(Microsoft.Extensions.Logging.ILogger<ChannelRuntimeService> logger)
     {
         _logger = logger;
     }
     private WaitLock WaitLock { get; set; } = new WaitLock(nameof(ChannelRuntimeService));
+
+
+    public Task<TouchSocket.Core.LogLevel> ChannelLogLevelAsync(long id)
+    {
+        GlobalData.IdChannels.TryGetValue(id, out var ChannelRuntime);
+        var data = ChannelRuntime?.DeviceThreadManage?.LogMessage?.LogLevel ?? TouchSocket.Core.LogLevel.Trace;
+        return Task.FromResult(data);
+    }
+
+    public async Task RestartChannelAsync(long channelId)
+    {
+        GlobalData.IdChannels.TryGetValue(channelId, out var channelRuntime);
+        await GlobalData.GetChannelThreadManage(channelRuntime).RestartChannelAsync(channelRuntime).ConfigureAwait(false);
+
+    }
+
+    public async Task SetChannelLogLevelAsync(long id, TouchSocket.Core.LogLevel logLevel)
+    {
+        if (GlobalData.IdChannels.TryGetValue(id, out var ChannelRuntime))
+        {
+            if (ChannelRuntime.DeviceThreadManage != null)
+            {
+                await ChannelRuntime.DeviceThreadManage.SetLogAsync(logLevel).ConfigureAwait(false);
+            }
+        }
+    }
+
+
+
+
+    public async Task CopyChannelAsync(int CopyCount, string CopyChannelNamePrefix, int CopyChannelNameSuffixNumber, string CopyDeviceNamePrefix, int CopyDeviceNameSuffixNumber, long channelId, bool AutoRestartThread)
+    {
+        if (!GlobalData.IdChannels.TryGetValue(channelId, out var channelRuntime))
+        {
+            return;
+        }
+        Dictionary<Device, List<Variable>> deviceDict = new();
+        Channel Model = channelRuntime.AdaptChannel();
+        Model.Id = 0;
+
+        var Devices = channelRuntime.ReadDeviceRuntimes.ToDictionary(a => a.Value.AdaptDevice(), a => a.Value.ReadOnlyVariableRuntimes.Select(a => a.Value).AdaptListVariable());
+
+        List<Channel> channels = new();
+        Dictionary<Device, List<Variable>> devices = new();
+        for (int i = 0; i < CopyCount; i++)
+        {
+            Channel channel = Model.AdaptChannel();
+            channel.Id = CommonUtils.GetSingleId();
+            channel.Name = $"{CopyChannelNamePrefix}{CopyChannelNameSuffixNumber + i}";
+
+            int index = 0;
+            foreach (var item in Devices)
+            {
+                Device device = item.Key.AdaptDevice();
+                device.Id = CommonUtils.GetSingleId();
+                device.Name = $"{channel.Name}_{CopyDeviceNamePrefix}{CopyDeviceNameSuffixNumber + (index++)}";
+                device.ChannelId = channel.Id;
+                List<Variable> variables = new();
+
+                foreach (var variable in item.Value)
+                {
+                    Variable v = variable.AdaptVariable();
+                    v.Id = CommonUtils.GetSingleId();
+                    v.DeviceId = device.Id;
+                    variables.Add(v);
+                }
+                devices.Add(device, variables);
+            }
+
+            channels.Add(channel);
+        }
+
+        await GlobalData.ChannelRuntimeService.CopyAsync(channels, devices, AutoRestartThread, default).ConfigureAwait(false);
+    }
+
+
+
 
     public async Task<bool> CopyAsync(List<Channel> models, Dictionary<Device, List<Variable>> devices, bool restart, CancellationToken cancellationToken)
     {
@@ -204,6 +281,31 @@ public class ChannelRuntimeService : IChannelRuntimeService
             WaitLock.Release();
         }
     }
+
+    public async Task ImportChannelAsync(List<Channel> upData, List<Channel> insertData, bool restart)
+    {
+
+        try
+        {
+            await WaitLock.WaitAsync().ConfigureAwait(false);
+
+            var result = await GlobalData.ChannelService.ImportAsync(upData, insertData).ConfigureAwait(false);
+
+            var newChannelRuntimes = await RuntimeServiceHelper.GetNewChannelRuntimesAsync(result).ConfigureAwait(false);
+
+            RuntimeServiceHelper.Init(newChannelRuntimes);
+
+            //根据条件重启通道线程
+            if (restart)
+                await GlobalData.ChannelThreadManage.RestartChannelAsync(newChannelRuntimes).ConfigureAwait(false);
+        }
+
+        finally
+        {
+            WaitLock.Release();
+        }
+    }
+
     public async Task<bool> SaveChannelAsync(Channel input, ItemChangedType type, bool restart)
     {
         try

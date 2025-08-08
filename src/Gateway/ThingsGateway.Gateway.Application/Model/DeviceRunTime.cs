@@ -23,11 +23,16 @@ namespace ThingsGateway.Gateway.Application;
 /// <summary>
 /// 业务设备运行状态
 /// </summary>
-public class DeviceRuntime : Device, IDisposable
+public class DeviceRuntime : Device
+#if !Management
+    , IDisposable
+#endif
 {
     protected volatile DeviceStatusEnum _deviceStatus = DeviceStatusEnum.Default;
 
     private string? _lastErrorMessage;
+
+    private readonly object _lockObject = new object();
 
     /// <summary>
     /// 设备活跃时间
@@ -67,10 +72,14 @@ public class DeviceRuntime : Device, IDisposable
     [AutoGenerateColumn(Ignore = true)]
     public string LogPath => Name.GetDeviceLogPath();
 
+
+#if !Management
+
     [System.Text.Json.Serialization.JsonIgnore]
     [Newtonsoft.Json.JsonIgnore]
     [MapperIgnore]
     public DateTime DeviceStatusChangeTime = DateTime.UnixEpoch.ToLocalTime();
+
 
     /// <summary>
     /// 设备状态
@@ -97,6 +106,58 @@ public class DeviceRuntime : Device, IDisposable
             }
         }
     }
+
+
+    /// <summary>
+    /// 设备变量数量
+    /// </summary>
+    public int DeviceVariableCount { get => Driver == null ? VariableRuntimes?.Count ?? 0 : Driver.IdVariableRuntimes.Count; }
+
+    /// <summary>
+    /// 设备读取打包数量
+    /// </summary>
+    public int SourceVariableCount => VariableSourceReads?.Count ?? 0;
+
+#else
+
+
+
+    /// <summary>
+    /// 设备状态
+    /// </summary>
+    public virtual DeviceStatusEnum DeviceStatus
+    {
+        get
+        {
+            if (!Pause)
+                return _deviceStatus;
+            else
+                return DeviceStatusEnum.Pause;
+        }
+        set
+        {
+            lock (_lockObject)
+            {
+                if (_deviceStatus != value)
+                {
+                    _deviceStatus = value;
+                }
+            }
+        }
+    }
+
+
+    /// <summary>
+    /// 设备变量数量
+    /// </summary>
+    public int DeviceVariableCount { get; set; }
+    /// <summary>
+    /// 设备读取打包数量
+    /// </summary>
+    public int SourceVariableCount { get; set; }
+
+
+#endif
 
     /// <summary>
     /// 暂停
@@ -130,12 +191,17 @@ public class DeviceRuntime : Device, IDisposable
     /// </summary>
     public RedundantTypeEnum? RedundantType { get; set; } = null;
 
-    /// <summary>
-    /// 设备变量数量
-    /// </summary>
-    public int DeviceVariableCount { get => Driver == null ? VariableRuntimes?.Count ?? 0 : Driver.IdVariableRuntimes.Count; }
 
-    #region 采集
+
+    /// <summary>
+    /// 特殊方法数量
+    /// </summary>
+    public int MethodVariableCount { get; set; }
+
+
+
+
+#if !Management
 
     /// <summary>
     /// 设备变量
@@ -155,11 +221,6 @@ public class DeviceRuntime : Device, IDisposable
     internal ConcurrentDictionary<string, VariableRuntime>? VariableRuntimes { get; } = new(Environment.ProcessorCount, 1000);
 
     /// <summary>
-    /// 特殊方法数量
-    /// </summary>
-    public int MethodVariableCount { get; set; }
-
-    /// <summary>
     /// 特殊方法变量
     /// </summary>
     [System.Text.Json.Serialization.JsonIgnore]
@@ -167,11 +228,6 @@ public class DeviceRuntime : Device, IDisposable
     [MapperIgnore]
     [AutoGenerateColumn(Ignore = true)]
     public List<VariableMethod>? ReadVariableMethods { get; set; }
-
-    /// <summary>
-    /// 设备读取打包数量
-    /// </summary>
-    public int SourceVariableCount => VariableSourceReads?.Count ?? 0;
 
     /// <summary>
     /// 打包变量
@@ -191,10 +247,11 @@ public class DeviceRuntime : Device, IDisposable
     [AutoGenerateColumn(Ignore = true)]
     public List<VariableScriptRead>? VariableScriptReads { get; set; }
 
-    public volatile bool CheckEnable;
-    private readonly object _lockObject = new object();
+#endif
 
-    #endregion 采集
+
+
+#if !Management
 
     /// <summary>
     /// 传入设备的状态信息
@@ -218,6 +275,7 @@ public class DeviceRuntime : Device, IDisposable
             LastErrorMessage = lastErrorMessage;
     }
 
+
     [System.Text.Json.Serialization.JsonIgnore]
     [Newtonsoft.Json.JsonIgnore]
     [MapperIgnore]
@@ -229,6 +287,7 @@ public class DeviceRuntime : Device, IDisposable
     [MapperIgnore]
     [AutoGenerateColumn(Ignore = true)]
     public IRpcDriver? RpcDriver { get; set; }
+
 
     [System.Text.Json.Serialization.JsonIgnore]
     [Newtonsoft.Json.JsonIgnore]
@@ -263,4 +322,7 @@ public class DeviceRuntime : Device, IDisposable
 
         GC.SuppressFinalize(this);
     }
+
+
+#endif
 }

@@ -439,6 +439,12 @@ internal sealed class DeviceService : BaseService<Device>, IDeviceService
     public void SetDeviceData(HashSet<long>? dataScope, IReadOnlyDictionary<string, DeviceRuntime> deviceDicts, IReadOnlyDictionary<string, ChannelRuntime> channelDicts, Dictionary<string, ImportPreviewOutputBase> ImportPreviews, ref ImportPreviewOutput<Device> deviceImportPreview, Dictionary<string, PluginInfo> driverPluginNameDict, ConcurrentDictionary<string, (Type, Dictionary<string, PropertyInfo>, Dictionary<string, PropertyInfo>)> propertysDict, string sheetName, IEnumerable<IDictionary<string, object>> rows)
     {
         #region 采集设备sheet
+        string ImportNullError = Localizer["ImportNullError"];
+        string RedundantDeviceError = Localizer["RedundantDeviceError"];
+        string ChannelError = Localizer["ChannelError"];
+
+        string PluginNotNull = Localizer["PluginNotNull"];
+        string DeviceNotNull = Localizer["DeviceNotNull"];
 
         if (sheetName == ExportString.DeviceName)
         {
@@ -459,6 +465,8 @@ internal sealed class DeviceService : BaseService<Device>, IDeviceService
             var deviceProperties = type.GetRuntimeProperties().Where(a => (a.GetCustomAttribute<IgnoreExcelAttribute>() == null) && a.CanWrite)
                                         .ToDictionary(a => type.GetPropertyDisplayName(a.Name), a => (a, a.IsNullableType()));
 
+
+
             // 遍历每一行数据
             rows.ForEach(item =>
             {
@@ -471,7 +479,7 @@ internal sealed class DeviceService : BaseService<Device>, IDeviceService
                     if (device == null)
                     {
                         importPreviewOutput.HasError = true;
-                        importPreviewOutput.Results.Add((Interlocked.Increment(ref row), false, Localizer["ImportNullError"]));
+                        importPreviewOutput.Results.Add((Interlocked.Increment(ref row), false, ImportNullError));
                         return;
                     }
 
@@ -488,7 +496,7 @@ internal sealed class DeviceService : BaseService<Device>, IDeviceService
                         {
                             // 如果找不到对应的冗余设备，则添加错误信息到导入预览结果并返回
                             importPreviewOutput.HasError = true;
-                            importPreviewOutput.Results.Add((Interlocked.Increment(ref row), false, Localizer["RedundantDeviceError"]));
+                            importPreviewOutput.Results.Add((Interlocked.Increment(ref row), false, RedundantDeviceError));
                             return;
                         }
                     }
@@ -498,7 +506,7 @@ internal sealed class DeviceService : BaseService<Device>, IDeviceService
                         if (device.RedundantEnable)
                         {
                             importPreviewOutput.HasError = true;
-                            importPreviewOutput.Results.Add((Interlocked.Increment(ref row), false, Localizer["RedundantDeviceError"]));
+                            importPreviewOutput.Results.Add((Interlocked.Increment(ref row), false, RedundantDeviceError));
                             return;
                         }
                     }
@@ -512,7 +520,7 @@ internal sealed class DeviceService : BaseService<Device>, IDeviceService
                         {
                             // 如果找不到对应的通道信息，则添加错误信息到导入预览结果并返回
                             importPreviewOutput.HasError = true;
-                            importPreviewOutput.Results.Add((Interlocked.Increment(ref row), false, Localizer["ChannelError"]));
+                            importPreviewOutput.Results.Add((Interlocked.Increment(ref row), false, ChannelError));
                             return;
                         }
                     }
@@ -520,7 +528,7 @@ internal sealed class DeviceService : BaseService<Device>, IDeviceService
                     {
                         // 如果未提供通道信息，则添加错误信息到导入预览结果并返回
                         importPreviewOutput.HasError = true;
-                        importPreviewOutput.Results.Add((Interlocked.Increment(ref row), false, Localizer["ChannelError"]));
+                        importPreviewOutput.Results.Add((Interlocked.Increment(ref row), false, ChannelError));
                         return;
                     }
 
@@ -653,7 +661,7 @@ internal sealed class DeviceService : BaseService<Device>, IDeviceService
                     if (propertys.Item1 == null)
                     {
                         importPreviewOutput.HasError = true;
-                        importPreviewOutput.Results.Add((Interlocked.Increment(ref row), false, Localizer["PluginNotNull"]));
+                        importPreviewOutput.Results.Add((Interlocked.Increment(ref row), false, PluginNotNull));
                         continue;
                     }
 
@@ -661,7 +669,7 @@ internal sealed class DeviceService : BaseService<Device>, IDeviceService
                     if (!item.TryGetValue(ExportString.DeviceName, out var deviceName))
                     {
                         importPreviewOutput.HasError = true;
-                        importPreviewOutput.Results.Add((Interlocked.Increment(ref row), false, Localizer["DeviceNotNull"]));
+                        importPreviewOutput.Results.Add((Interlocked.Increment(ref row), false, DeviceNotNull));
                         continue;
                     }
 
@@ -684,7 +692,7 @@ internal sealed class DeviceService : BaseService<Device>, IDeviceService
                     if (pluginProp == null)
                     {
                         importPreviewOutput.HasError = true;
-                        importPreviewOutput.Results.Add((Interlocked.Increment(ref row), false, Localizer["ImportNullError"]));
+                        importPreviewOutput.Results.Add((Interlocked.Increment(ref row), false, ImportNullError));
                         return;
                     }
 

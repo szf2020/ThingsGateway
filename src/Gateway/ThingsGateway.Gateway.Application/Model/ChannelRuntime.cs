@@ -23,27 +23,15 @@ namespace ThingsGateway.Gateway.Application;
 /// <summary>
 /// 业务设备运行状态
 /// </summary>
-public class ChannelRuntime : Channel, IChannelOptions, IDisposable
+public class ChannelRuntime : Channel
+#if !Management
+    ,
+    IChannelOptions,
+    IDisposable
+#endif
 {
-    /// <summary>
-    /// 插件信息
-    /// </summary>
-    [System.Text.Json.Serialization.JsonIgnore]
-    [Newtonsoft.Json.JsonIgnore]
-    [MapperIgnore]
-    [AutoGenerateColumn(Ignore = true)]
-    public PluginInfo? PluginInfo { get; set; }
 
-    /// <summary>
-    /// 是否采集
-    /// </summary>
-    public PluginTypeEnum? PluginType => PluginInfo?.PluginType;
-
-    /// <summary>
-    /// 是否采集
-    /// </summary>
-    [AutoGenerateColumn(Ignore = true)]
-    public bool? IsCollect => PluginInfo == null ? null : PluginInfo?.PluginType == PluginTypeEnum.Collect;
+#if !Management
 
     [System.Text.Json.Serialization.JsonIgnore]
     [Newtonsoft.Json.JsonIgnore]
@@ -105,14 +93,67 @@ public class ChannelRuntime : Channel, IChannelOptions, IDisposable
     [Newtonsoft.Json.JsonIgnore]
     public int? DeviceRuntimeCount => DeviceRuntimes?.Count;
 
+    public bool Started => DeviceThreadManage != null;
+#else
+
+
+
+    /// <inheritdoc/>
+    [MinValue(1)]
+    public override int MaxConcurrentCount { get; set; }
+
+    /// <summary>
+    /// 设备数量
+    /// </summary>
+    public int? DeviceRuntimeCount { get; set; }
+
+    public bool Started { get; set; }
+#endif
+
+
+
+    /// <summary>
+    /// 插件信息
+    /// </summary>
+    [AutoGenerateColumn(Ignore = true)]
+    public PluginInfo? PluginInfo { get; set; }
+
+    /// <summary>
+    /// 是否采集
+    /// </summary>
+    public PluginTypeEnum? PluginType => PluginInfo?.PluginType;
+
+    /// <summary>
+    /// 是否采集
+    /// </summary>
+    [AutoGenerateColumn(Ignore = true)]
+    public bool? IsCollect => PluginInfo == null ? null : PluginInfo?.PluginType == PluginTypeEnum.Collect;
+
+
+
+    public override string ToString()
+    {
+        if (ChannelType == ChannelTypeEnum.Other)
+        {
+            return Name;
+        }
+        return $"{Name}[{base.ToString()}]";
+    }
+
+    [AutoGenerateColumn(Ignore = true)]
+    public string LogPath => Name.GetChannelLogPath();
+
+
+#if !Management
     [System.Text.Json.Serialization.JsonIgnore]
     [Newtonsoft.Json.JsonIgnore]
     [MapperIgnore]
     [AutoGenerateColumn(Ignore = true)]
     public IDeviceThreadManage? DeviceThreadManage { get; internal set; }
 
-    [AutoGenerateColumn(Ignore = true)]
-    public string LogPath => Name.GetChannelLogPath();
+
+
+
 
     public void Init()
     {
@@ -135,14 +176,8 @@ public class ChannelRuntime : Channel, IChannelOptions, IDisposable
         DeviceThreadManage = null;
         GC.SuppressFinalize(this);
     }
-    public override string ToString()
-    {
-        if (ChannelType == ChannelTypeEnum.Other)
-        {
-            return Name;
-        }
-        return $"{Name}[{base.ToString()}]";
-    }
+
+
 
     public IChannel GetChannel(TouchSocketConfig config)
     {
@@ -192,4 +227,7 @@ public class ChannelRuntime : Channel, IChannelOptions, IDisposable
             return ichannel;
         }
     }
+
+
+#endif
 }

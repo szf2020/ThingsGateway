@@ -102,4 +102,6 @@ internal interface IChannelService
     Task UpdateLogAsync(long channelId, TouchSocket.Core.LogLevel logLevel);
     Task<bool> InsertAsync(List<Channel> models, List<Device> devices, List<Variable> variables);
     Task<bool> UpdateAsync(List<Channel> models, List<Device> devices, List<Variable> variables);
+    Task<HashSet<long>> ImportAsync(List<Channel> upData, List<Channel> insertData);
+
 }

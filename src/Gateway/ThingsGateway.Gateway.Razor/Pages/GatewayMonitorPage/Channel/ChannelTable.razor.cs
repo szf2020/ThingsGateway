@@ -100,6 +100,9 @@ public partial class ChannelTable : IDisposable
 
     #region 编辑
 
+    [Inject]
+    IChannelPageService ChannelPageService { get; set; }
+
     #region 修改
     private async Task Copy(IEnumerable<ChannelRuntime> channels)
     {
@@ -109,13 +112,6 @@ public partial class ChannelTable : IDisposable
             await ToastService.Warning(null, RazorLocalizer["PleaseSelect"]);
             return;
         }
-
-        Channel oneModel = null;
-        Dictionary<Device, List<Variable>> deviceDict = new();
-        oneModel = channelRuntime.AdaptChannel();
-        oneModel.Id = 0;
-
-        deviceDict = channelRuntime.ReadDeviceRuntimes.ToDictionary(a => a.Value.AdaptDevice(), a => a.Value.ReadOnlyVariableRuntimes.Select(a => a.Value).AdaptListVariable());
 
         var op = new DialogOption()
         {
@@ -129,13 +125,11 @@ public partial class ChannelTable : IDisposable
 
         op.Component = BootstrapDynamicComponent.CreateComponent<ChannelCopyComponent>(new Dictionary<string, object?>
         {
-             {nameof(ChannelCopyComponent.OnSave), async (List<Channel> channels,Dictionary<Device,List<Variable>> devices) =>
+             {nameof(ChannelCopyComponent.OnSave), async (int CopyCount, string CopyChannelNamePrefix, int CopyChannelNameSuffixNumber, string CopyDeviceNamePrefix, int CopyDeviceNameSuffixNumber) =>
             {
-                await Task.Run(() =>GlobalData.ChannelRuntimeService.CopyAsync(channels,devices,AutoRestartThread, default));
+                await Task.Run(() =>ChannelPageService.CopyChannelAsync(CopyCount,CopyChannelNamePrefix,CopyChannelNameSuffixNumber,CopyDeviceNamePrefix,CopyDeviceNameSuffixNumber,channelRuntime.Id,AutoRestartThread));
                     await InvokeAsync(table.QueryAsync);
             }},
-            {nameof(ChannelCopyComponent.Model),oneModel },
-            {nameof(ChannelCopyComponent.Devices),deviceDict },
         });
 
         await DialogService.Show(op);
@@ -168,7 +162,7 @@ public partial class ChannelTable : IDisposable
         {
              {nameof(ChannelEditComponent.OnValidSubmit), async () =>
             {
-                await Task.Run(() => GlobalData.ChannelRuntimeService.BatchEditAsync(changedModels, oldModel, oneModel,AutoRestartThread));
+                await Task.Run(() => ChannelPageService.BatchEditAsync(changedModels, oldModel, oneModel,AutoRestartThread));
 
                    await InvokeAsync(table.QueryAsync);
             } },
@@ -185,7 +179,7 @@ public partial class ChannelTable : IDisposable
     {
         try
         {
-            return await Task.Run(async () => await GlobalData.ChannelRuntimeService.DeleteChannelAsync(channels.Select(a => a.Id), AutoRestartThread, default));
+            return await Task.Run(async () => await ChannelPageService.DeleteChannelAsync(channels.Select(a => a.Id), AutoRestartThread, default));
         }
         catch (Exception ex)
         {
@@ -199,7 +193,7 @@ public partial class ChannelTable : IDisposable
         try
         {
             channel = channel.AdaptChannel();
-            return await Task.Run(() => GlobalData.ChannelRuntimeService.SaveChannelAsync(channel, itemChangedType, AutoRestartThread));
+            return await Task.Run(() => ChannelPageService.SaveChannelAsync(channel, itemChangedType, AutoRestartThread));
         }
         catch (Exception ex)
         {
@@ -286,7 +280,9 @@ public partial class ChannelTable : IDisposable
                 await Task.Run(async ()=>
                 {
               var importData=await  ChannelServiceHelpers.ImportAsync(data);
-                await    GlobalData.ChannelRuntimeService.ImportChannelAsync(importData,AutoRestartThread);
+                ChannelServiceHelpers.  GetImportChannelData(importData, out var upData, out var insertData);
+
+                await    ChannelPageService.ImportChannelAsync(upData,insertData,AutoRestartThread);
                 })
                     ;
     }
@@ -338,7 +334,7 @@ finally
         {
             await Task.Run(async () =>
             {
-                await GlobalData.ChannelRuntimeService.DeleteChannelAsync(Items.Select(a => a.Id), AutoRestartThread, default);
+                await ChannelPageService.DeleteChannelAsync(Items.Select(a => a.Id), AutoRestartThread, default);
                 await InvokeAsync(async () =>
                 {
                     await ToastService.Default();

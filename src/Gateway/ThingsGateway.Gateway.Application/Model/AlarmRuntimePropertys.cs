@@ -83,5 +83,8 @@ public partial class AlarmRuntimePropertys
     public DateTime EventTime { get; set; } = DateTime.UnixEpoch.ToLocalTime();
 
     internal object AlarmLockObject = new();
+
+#if !Management
     internal bool AlarmConfirm;
+#endif
 }

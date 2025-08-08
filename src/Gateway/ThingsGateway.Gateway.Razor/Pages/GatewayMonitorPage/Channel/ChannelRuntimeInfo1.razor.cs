@@ -17,14 +17,12 @@ public partial class ChannelRuntimeInfo1 : IDisposable
 
     [Parameter, EditorRequired]
     public ChannelRuntime ChannelRuntime { get; set; }
-    private string Name => $"{ChannelRuntime.ToString()}  -  {(ChannelRuntime.DeviceThreadManage == null ? "Task cancel" : "Task run")}";
-
+    private string Name => $"{ChannelRuntime.ToString()}  -  {(ChannelRuntime.Started == false ? "Task cancel" : "Task run")}";
+    [Inject]
+    IChannelPageService ChannelPageService { get; set; }
     private async Task RestartChannelAsync()
     {
-        if (ChannelRuntime.DeviceThreadManage?.ChannelThreadManage != null)
-            await Task.Run(() => ChannelRuntime.DeviceThreadManage.ChannelThreadManage.RestartChannelAsync(ChannelRuntime));
-        else
-            await Task.Run(() => GlobalData.ChannelThreadManage.RestartChannelAsync(ChannelRuntime));
+        await ChannelPageService.RestartChannelAsync(ChannelRuntime.Id);
     }
 
     protected override void OnInitialized()

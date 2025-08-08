@@ -367,21 +367,16 @@ internal sealed class ChannelService : BaseService<Channel>, IChannelService
 
     /// <inheritdoc/>
     [OperDesc("ImportChannel", isRecordPar: false, localizerType: typeof(Channel))]
-    public async Task<HashSet<long>> ImportChannelAsync(Dictionary<string, ImportPreviewOutputBase> input)
+    public Task<HashSet<long>> ImportChannelAsync(Dictionary<string, ImportPreviewOutputBase> input)
     {
-        List<Channel>? channels = new List<Channel>();
-        foreach (var item in input)
-        {
-            if (item.Key == ExportString.ChannelName)
-            {
-                var channelImports = ((ImportPreviewListOutput<Channel>)item.Value).Data;
-                channels = channelImports;
-                break;
-            }
-        }
-        var upData = channels.Where(a => a.IsUp).ToList();
-        var insertData = channels.Where(a => !a.IsUp).ToList();
+        ChannelServiceHelpers.GetImportChannelData(input, out var upData, out var insertData);
+        return ImportAsync(upData, insertData);
+    }
 
+
+
+    public async Task<HashSet<long>> ImportAsync(List<Channel> upData, List<Channel> insertData)
+    {
         ManageHelper.CheckChannelCount(insertData.Count);
 
         using var db = GetDB();
@@ -396,7 +391,7 @@ internal sealed class ChannelService : BaseService<Channel>, IChannelService
             await db.BulkUpdateAsync(upData, 10000).ConfigureAwait(false);
         }
         DeleteChannelFromCache();
-        return channels.Select(a => a.Id).ToHashSet();
+        return upData.Select(a => a.Id).Concat(insertData.Select(a => a.Id)).ToHashSet();
     }
 
     /// <inheritdoc/>
@@ -441,7 +436,7 @@ internal sealed class ChannelService : BaseService<Channel>, IChannelService
             // 获取目标类型的所有属性，并根据是否需要过滤 IgnoreExcelAttribute 进行筛选
             var channelProperties = type.GetRuntimeProperties().Where(a => (a.GetCustomAttribute<IgnoreExcelAttribute>() == null) && a.CanWrite)
                                         .ToDictionary(a => type.GetPropertyDisplayName(a.Name), a => (a, a.IsNullableType()));
-
+            string unportNull = App.CreateLocalizerByType(typeof(Channel))["ImportNullError"];
             rows.ForEach(item =>
             {
                 try
@@ -450,7 +445,7 @@ internal sealed class ChannelService : BaseService<Channel>, IChannelService
                     if (channel == null)
                     {
                         importPreviewOutput.HasError = true;
-                        importPreviewOutput.Results.Add((Interlocked.Increment(ref row), false, Localizer["ImportNullError"]));
+                        importPreviewOutput.Results.Add((Interlocked.Increment(ref row), false, unportNull));
                         return;
                     }
 

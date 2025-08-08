@@ -39,7 +39,7 @@
     <BlazorReconnector @rendermode="new InteractiveServerRenderMode(false)" />
 
     <script src=@($"_content/BootstrapBlazor/js/bootstrap.blazor.bundle.min.js?v={this.GetType().Assembly.GetName().Version}")></script>
-    <script src=@($"{WebsiteConst.DefaultResourceUrl}js/culture.js?v={this.GetType().Assembly.GetName().Version}")></script>
+    <script src=@($"{WebsiteConst.DefaultResourceUrl}js/localStorageUtil.js?v={this.GetType().Assembly.GetName().Version}")></script>
     <script src="_framework/blazor.web.js"></script>
     <!-- PWA Service Worker -->
     <script type="text/javascript">'serviceWorker' in navigator && navigator.serviceWorker.register('./service-worker.js')</script>

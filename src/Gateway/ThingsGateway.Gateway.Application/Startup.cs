@@ -72,6 +72,7 @@ public class Startup : AppStartup
 
         services.AddSingleton<IChannelThreadManage, ChannelThreadManage>();
         services.AddSingleton<IChannelService, ChannelService>();
+        services.AddSingleton<IChannelPageService>(a => a.GetService<IChannelRuntimeService>());
         services.AddSingleton<IChannelRuntimeService, ChannelRuntimeService>();
         services.AddSingleton<IVariableService, VariableService>();
         services.AddSingleton<IVariableRuntimeService, VariableRuntimeService>();

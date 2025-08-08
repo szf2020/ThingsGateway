@@ -80,35 +80,6 @@ namespace ThingsGateway.Gateway.Razor
             return pluginTypeEnum;
         }
 
-        internal static async Task ShowCopy(Channel oneModel, Dictionary<Device, List<Variable>> deviceDict, string text, bool autoRestart, Func<Task> onsave, DialogService dialogService)
-        {
-            var op = new DialogOption()
-            {
-                IsScrolling = false,
-                ShowMaximizeButton = true,
-                Size = Size.ExtraLarge,
-                Title = text,
-                ShowFooter = false,
-                ShowCloseButton = false,
-            };
-
-            op.Component = BootstrapDynamicComponent.CreateComponent<ChannelCopyComponent>(new Dictionary<string, object?>
-        {
-             {nameof(ChannelCopyComponent.OnSave), async (List<Channel> channels,Dictionary<Device,List<Variable>> devices) =>
-            {
-                await Task.Run(() =>GlobalData.ChannelRuntimeService.CopyAsync(channels,devices,autoRestart, default));
-                if(onsave!=null)
-                    await onsave();
-            }},
-            {nameof(ChannelCopyComponent.Model),oneModel },
-            {nameof(ChannelCopyComponent.Devices),deviceDict },
-        });
-
-            await dialogService.Show(op);
-        }
-
-
-
 
     }
 }

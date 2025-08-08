@@ -8,8 +8,6 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-using ThingsGateway.DB;
-
 namespace ThingsGateway.Gateway.Razor;
 
 public partial class ChannelCopyComponent
@@ -17,16 +15,10 @@ public partial class ChannelCopyComponent
     [Inject]
     IStringLocalizer<ThingsGateway.Gateway.Razor._Imports> GatewayLocalizer { get; set; }
 
-    [Parameter]
-    [EditorRequired]
-    public Channel Model { get; set; }
+
 
     [Parameter]
-    [EditorRequired]
-    public Dictionary<Device, List<Variable>> Devices { get; set; }
-
-    [Parameter]
-    public Func<List<Channel>, Dictionary<Device, List<Variable>>, Task> OnSave { get; set; }
+    public Func<int, string, int, string, int, Task> OnSave { get; set; }
 
     [CascadingParameter]
     private Func<Task>? OnCloseAsync { get; set; }
@@ -44,38 +36,8 @@ public partial class ChannelCopyComponent
     {
         try
         {
-            List<Channel> channels = new();
-            Dictionary<Device, List<Variable>> devices = new();
-            for (int i = 0; i < CopyCount; i++)
-            {
-                Channel channel = Model.AdaptChannel();
-                channel.Id = CommonUtils.GetSingleId();
-                channel.Name = $"{CopyChannelNamePrefix}{CopyChannelNameSuffixNumber + i}";
-
-                int index = 0;
-                foreach (var item in Devices)
-                {
-                    Device device = item.Key.AdaptDevice();
-                    device.Id = CommonUtils.GetSingleId();
-                    device.Name = $"{channel.Name}_{CopyDeviceNamePrefix}{CopyDeviceNameSuffixNumber + (index++)}";
-                    device.ChannelId = channel.Id;
-                    List<Variable> variables = new();
-
-                    foreach (var variable in item.Value)
-                    {
-                        Variable v = variable.AdaptVariable();
-                        v.Id = CommonUtils.GetSingleId();
-                        v.DeviceId = device.Id;
-                        variables.Add(v);
-                    }
-                    devices.Add(device, variables);
-                }
-
-                channels.Add(channel);
-            }
-
             if (OnSave != null)
-                await OnSave(channels, devices);
+                await OnSave(CopyCount, CopyChannelNamePrefix, CopyChannelNameSuffixNumber, CopyDeviceNamePrefix, CopyDeviceNameSuffixNumber);
             if (OnCloseAsync != null)
                 await OnCloseAsync();
             await ToastService.Default();
