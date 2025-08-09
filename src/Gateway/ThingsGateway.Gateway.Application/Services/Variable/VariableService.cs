@@ -363,13 +363,13 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
     /// 报表查询
     /// </summary>
     /// <param name="exportFilter">查询条件</param>
-    public async Task<QueryData<Variable>> PageAsync(ExportFilter exportFilter)
+    public async Task<QueryData<Variable>> PageAsync(GatewayExportFilter exportFilter)
     {
         var whereQuery = await GetWhereQueryFunc(exportFilter).ConfigureAwait(false);
 
         return await QueryAsync(exportFilter.QueryPageOptions, whereQuery).ConfigureAwait(false);
     }
-    private async Task<Func<ISugarQueryable<Variable>, ISugarQueryable<Variable>>> GetWhereQueryFunc(ExportFilter exportFilter)
+    private async Task<Func<ISugarQueryable<Variable>, ISugarQueryable<Variable>>> GetWhereQueryFunc(GatewayExportFilter exportFilter)
     {
         var dataScope = await GlobalData.SysUserService.GetCurrentUserDataScopeAsync().ConfigureAwait(false);
         HashSet<long>? deviceId = null;
@@ -394,7 +394,7 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
         return whereQuery;
     }
 
-    private async Task<Func<IEnumerable<Variable>, IEnumerable<Variable>>> GetWhereEnumerableFunc(ExportFilter exportFilter, bool sql = false)
+    private async Task<Func<IEnumerable<Variable>, IEnumerable<Variable>>> GetWhereEnumerableFunc(GatewayExportFilter exportFilter, bool sql = false)
     {
         var dataScope = await GlobalData.SysUserService.GetCurrentUserDataScopeAsync().ConfigureAwait(false);
         HashSet<long>? deviceId = null;
@@ -490,7 +490,7 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
     /// 导出文件
     /// </summary>
     [OperDesc("ExportVariable", isRecordPar: false, localizerType: typeof(Variable))]
-    public async Task<Dictionary<string, object>> ExportVariableAsync(ExportFilter exportFilter)
+    public async Task<Dictionary<string, object>> ExportVariableAsync(GatewayExportFilter exportFilter)
     {
         if (GlobalData.HardwareJob.HardwareInfo.MachineInfo.AvailableMemory < 4 * 1024 * 1024)
         {
@@ -525,12 +525,12 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
             return sheets;
         }
     }
-    private async Task<IAsyncEnumerable<Variable>> GetAsyncEnumerableData(ExportFilter exportFilter)
+    private async Task<IAsyncEnumerable<Variable>> GetAsyncEnumerableData(GatewayExportFilter exportFilter)
     {
         var whereQuery = await GetEnumerableData(exportFilter).ConfigureAwait(false);
         return whereQuery.ToAsyncEnumerable();
     }
-    private async Task<ISugarQueryable<Variable>> GetEnumerableData(ExportFilter exportFilter)
+    private async Task<ISugarQueryable<Variable>> GetEnumerableData(GatewayExportFilter exportFilter)
     {
         var db = GetDB();
         var whereQuery = await GetWhereQueryFunc(exportFilter).ConfigureAwait(false);
@@ -549,7 +549,7 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
         IEnumerable<Variable>? variables = new List<Variable>();
         foreach (var item in input)
         {
-            if (item.Key == ExportString.VariableName)
+            if (item.Key == GatewayExportString.VariableName)
             {
                 var variableImports = ((ImportPreviewOutput<Dictionary<string, Variable>>)item.Value).Data;
                 variables = variableImports.SelectMany(a => a.Value.Select(a => a.Value));
@@ -628,7 +628,7 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
 
 
         // 变量页处理
-        if (sheetName == ExportString.VariableName)
+        if (sheetName == GatewayExportString.VariableName)
         {
             int row = 1;
             ImportPreviewOutput<Dictionary<string, Variable>> importPreviewOutput = new();
@@ -652,7 +652,7 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
                     variable.Row = index;
 
                     // 获取设备名称并查找对应的设备
-                    item.TryGetValue(ExportString.DeviceName, out var value);
+                    item.TryGetValue(GatewayExportString.DeviceName, out var value);
                     var deviceName = value?.ToString();
                     deviceDicts.TryGetValue(deviceName, out var device);
                     var deviceId = device?.Id;
@@ -729,7 +729,7 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
             // 将变量列表转换为字典，并赋值给导入预览输出对象的 Data 属性
             importPreviewOutput.Data = variables.OrderBy(a => a.Row).GroupBy(a => a.DeviceId.ToString()).ToDictionary(a => a.Key, b => b.ToDictionary(a => a.Name));
         }
-        else if (sheetName == ExportString.AlarmName)
+        else if (sheetName == GatewayExportString.AlarmName)
         {
             int row = 1;
             ImportPreviewOutput<string> importPreviewOutput = new();
@@ -755,8 +755,8 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
                     }
 
                     // 转化插件名称和变量名称
-                    item.TryGetValue(ExportString.VariableName, out var variableNameObj);
-                    item.TryGetValue(ExportString.DeviceName, out var collectDevName);
+                    item.TryGetValue(GatewayExportString.VariableName, out var variableNameObj);
+                    item.TryGetValue(GatewayExportString.DeviceName, out var collectDevName);
                     deviceDicts.TryGetValue(collectDevName?.ToString(), out var collectDevice);
                     // 如果设备名称或变量名称为空，或者找不到对应的设备，则添加错误信息到导入预览结果并返回
                     if (collectDevName == null || collectDevice == null)
@@ -887,9 +887,9 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
                         }
 
                         // 转化插件名称和变量名称
-                        item.TryGetValue(ExportString.VariableName, out var variableNameObj);
-                        item.TryGetValue(ExportString.BusinessDeviceName, out var businessDevName);
-                        item.TryGetValue(ExportString.DeviceName, out var collectDevName);
+                        item.TryGetValue(GatewayExportString.VariableName, out var variableNameObj);
+                        item.TryGetValue(GatewayExportString.BusinessDeviceName, out var businessDevName);
+                        item.TryGetValue(GatewayExportString.DeviceName, out var collectDevName);
                         deviceDicts.TryGetValue(businessDevName?.ToString(), out var businessDevice);
                         deviceDicts.TryGetValue(collectDevName?.ToString(), out var collectDevice);
 

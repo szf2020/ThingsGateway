@@ -97,8 +97,8 @@ IReadOnlyDictionary<long, ChannelRuntime> channelDicts)
         var propertysDict = new ConcurrentDictionary<string, (VariablePropertyBase, Dictionary<string, PropertyInfo>)>();
 
         // 主变量页
-        sheets.Add(ExportString.VariableName, GetVariableSheets(data, deviceDicts, deviceName));
-        sheets.Add(ExportString.AlarmName, GetAlarmSheets(data, deviceDicts, deviceName));
+        sheets.Add(GatewayExportString.VariableName, GetVariableSheets(data, deviceDicts, deviceName));
+        sheets.Add(GatewayExportString.AlarmName, GetAlarmSheets(data, deviceDicts, deviceName));
 
         // 插件页（动态推导）
         foreach (var plugin in pluginDrivers.Keys.Distinct())
@@ -137,7 +137,7 @@ IReadOnlyDictionary<long, ChannelRuntime> channelDicts)
     {
         var row = new Dictionary<string, object>();
         deviceDicts.TryGetValue(variable.DeviceId, out var device);
-        row.TryAdd(ExportString.DeviceName, device?.Name ?? deviceName);
+        row.TryAdd(GatewayExportString.DeviceName, device?.Name ?? deviceName);
 
         foreach (var item in propertyInfos)
         {
@@ -179,8 +179,8 @@ string? deviceName)
     {
         var row = new Dictionary<string, object>();
         deviceDicts.TryGetValue(variable.DeviceId, out var device);
-        row.TryAdd(ExportString.DeviceName, device?.Name ?? deviceName);
-        row.TryAdd(ExportString.VariableName, variable.Name);
+        row.TryAdd(GatewayExportString.DeviceName, device?.Name ?? deviceName);
+        row.TryAdd(GatewayExportString.VariableName, variable.Name);
 
         foreach (var item in propertyInfos)
         {
@@ -242,9 +242,9 @@ string? deviceName)
     {
         var row = new Dictionary<string, object>
             {
-                { ExportString.DeviceName, collectDevice.Name },
-                { ExportString.BusinessDeviceName, businessDevice.Name },
-                { ExportString.VariableName, variable.Name }
+                { GatewayExportString.DeviceName, collectDevice.Name },
+                { GatewayExportString.BusinessDeviceName, businessDevice.Name },
+                { GatewayExportString.VariableName, variable.Name }
             };
 
         foreach (var kv in propertys.Item2)
@@ -274,7 +274,7 @@ string? deviceName)
         var propertysDict = new ConcurrentDictionary<string, (VariablePropertyBase, Dictionary<string, PropertyInfo>)>();
 
         // 主变量页
-        sheets.Add(ExportString.VariableName, GetVariableSheets(data, deviceDicts, deviceName));
+        sheets.Add(GatewayExportString.VariableName, GetVariableSheets(data, deviceDicts, deviceName));
 
         // 插件页（动态推导）
         foreach (var plugin in pluginDrivers.Keys.Distinct())
@@ -420,7 +420,7 @@ string? deviceName)
                 Dictionary<string, object> varExport = new();
                 deviceDicts.TryGetValue(variable.DeviceId, out var device);
                 //设备实体没有包含设备名称，手动插入
-                varExport.TryAdd(ExportString.DeviceName, device?.Name ?? deviceName);
+                varExport.TryAdd(GatewayExportString.DeviceName, device?.Name ?? deviceName);
                 foreach (var item in propertyInfos)
                 {
                     if (item.Name == nameof(Variable.Id))
@@ -443,8 +443,8 @@ string? deviceName)
                 Dictionary<string, object> alarmExport = new();
                 deviceDicts.TryGetValue(variable.DeviceId, out var device);
                 //设备实体没有包含设备名称，手动插入
-                alarmExport.TryAdd(ExportString.DeviceName, device?.Name ?? deviceName);
-                alarmExport.TryAdd(ExportString.VariableName, variable.Name);
+                alarmExport.TryAdd(GatewayExportString.DeviceName, device?.Name ?? deviceName);
+                alarmExport.TryAdd(GatewayExportString.VariableName, variable.Name);
                 foreach (var item in alarmPropertysInfos)
                 {
                     //描述
@@ -470,9 +470,9 @@ string? deviceName)
                     channelDicts.TryGetValue(businessDevice.ChannelId, out var channel);
 
                     //没有包含设备名称，手动插入
-                    driverInfo.TryAdd(ExportString.DeviceName, collectDevice.Name);
-                    driverInfo.TryAdd(ExportString.BusinessDeviceName, businessDevice.Name);
-                    driverInfo.TryAdd(ExportString.VariableName, variable.Name);
+                    driverInfo.TryAdd(GatewayExportString.DeviceName, collectDevice.Name);
+                    driverInfo.TryAdd(GatewayExportString.BusinessDeviceName, businessDevice.Name);
+                    driverInfo.TryAdd(GatewayExportString.VariableName, variable.Name);
 
                     var propDict = item.Value;
 
@@ -565,13 +565,13 @@ string? deviceName)
             variableExports.ForEach(a => a.Remove("Id"));
 
         //添加设备页
-        sheets.Add(ExportString.VariableName, variableExports);
-        sheets.Add(ExportString.AlarmName, alarmExports);
+        sheets.Add(GatewayExportString.VariableName, variableExports);
+        sheets.Add(GatewayExportString.AlarmName, alarmExports);
 
         //HASH
         foreach (var item in devicePropertys.Keys)
         {
-            devicePropertys[item] = new(devicePropertys[item].OrderBy(a => a[ExportString.DeviceName]).ThenBy(a => a[ExportString.VariableName]));
+            devicePropertys[item] = new(devicePropertys[item].OrderBy(a => a[GatewayExportString.DeviceName]).ThenBy(a => a[GatewayExportString.VariableName]));
 
             sheets.Add(item, devicePropertys[item]);
         }

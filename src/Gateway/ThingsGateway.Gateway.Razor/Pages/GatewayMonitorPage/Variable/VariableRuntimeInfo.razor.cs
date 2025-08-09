@@ -384,10 +384,10 @@ finally
 
         Func<IBrowserFile, Task<Dictionary<string, ImportPreviewOutputBase>>> preview = (a => GlobalData.VariableRuntimeService.PreviewAsync(a));
         Func<Dictionary<string, ImportPreviewOutputBase>, Task> import = (value => GlobalData.VariableRuntimeService.ImportVariableAsync(value, AutoRestartThread, default));
-        op.Component = BootstrapDynamicComponent.CreateComponent<ImportExcel>(new Dictionary<string, object?>
+        op.Component = BootstrapDynamicComponent.CreateComponent<ImportExcelConfirm>(new Dictionary<string, object?>
         {
-             {nameof(ImportExcel.Import),import },
-            {nameof(ImportExcel.Preview),preview },
+             {nameof(ImportExcelConfirm.Import),import },
+            {nameof(ImportExcelConfirm.Preview),preview },
         });
         await DialogService.Show(op);
     }

@@ -12,13 +12,15 @@ using TouchSocket.Core;
 
 namespace ThingsGateway.Gateway.Application;
 
-public class AsyncReadWriteLock
+public class AsyncReadWriteLock : IAsyncDisposable
 {
     private readonly int _writeReadRatio = 3; // 写3次会允许1次读，但写入也不会被阻止，具体协议取决于插件协议实现
-    public AsyncReadWriteLock(int writeReadRatio)
+    public AsyncReadWriteLock(int writeReadRatio, bool writePriority)
     {
         _writeReadRatio = writeReadRatio;
+        _writePriority = writePriority;
     }
+    private bool _writePriority;
     private AsyncAutoResetEvent _readerLock = new AsyncAutoResetEvent(false); // 控制读计数
     private long _writerCount = 0; // 当前活跃的写线程数
     private long _readerCount = 0; // 当前被阻塞的读线程数
@@ -54,10 +56,13 @@ public class AsyncReadWriteLock
 
         if (Interlocked.Increment(ref _writerCount) == 1)
         {
-            var cancellationTokenSource = _cancellationTokenSource;
-            _cancellationTokenSource = new();
-            await cancellationTokenSource.SafeCancelAsync().ConfigureAwait(false); // 取消读取
-            cancellationTokenSource.SafeDispose();
+            if (_writePriority)
+            {
+                var cancellationTokenSource = _cancellationTokenSource;
+                _cancellationTokenSource = new();
+                await cancellationTokenSource.SafeCancelAsync().ConfigureAwait(false); // 取消读取
+                cancellationTokenSource.SafeDispose();
+            }
         }
 
         return new Writer(this);
@@ -100,6 +105,16 @@ public class AsyncReadWriteLock
             }
 
         }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_cancellationTokenSource != null)
+        {
+            await _cancellationTokenSource.SafeCancelAsync().ConfigureAwait(false);
+            _cancellationTokenSource.SafeDispose();
+        }
+        _readerLock.SetAll();
     }
 
     private int _writeSinceLastReadCount = 0;

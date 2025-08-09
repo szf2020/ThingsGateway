@@ -17,7 +17,6 @@ using System.ComponentModel.DataAnnotations;
 using ThingsGateway.NewLife.Extension;
 
 namespace ThingsGateway.Gateway.Application;
-#pragma warning disable CS0649
 
 /// <summary>
 /// 设备表
@@ -172,6 +171,7 @@ public class Device : BaseDataEntity, IValidatableObject
 
     #endregion 备用字段
 
+#if !Management
     /// <summary>
     /// 导入验证专用
     /// </summary>
@@ -186,6 +186,8 @@ public class Device : BaseDataEntity, IValidatableObject
     [Newtonsoft.Json.JsonIgnore]
     [MapperIgnore]
     public ModelValueValidateForm? ModelValueValidateForm;
+#endif
+
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {
         if (RedundantEnable && RedundantDeviceId == null)

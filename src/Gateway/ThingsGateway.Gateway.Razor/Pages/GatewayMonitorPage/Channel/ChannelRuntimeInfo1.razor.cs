@@ -27,7 +27,9 @@ public partial class ChannelRuntimeInfo1 : IDisposable
 
     protected override void OnInitialized()
     {
+#if !Management
         _ = RunTimerAsync();
+#endif
         base.OnInitialized();
     }
 
@@ -39,6 +41,7 @@ public partial class ChannelRuntimeInfo1 : IDisposable
             try
             {
                 await InvokeAsync(StateHasChanged);
+
             }
             catch (Exception ex)
             {

@@ -53,6 +53,8 @@ public static class QueryPageOptionsExtensions
         return datas;
     }
 
+
+
     public static IEnumerable<T> GetQuery<T>(this IEnumerable<T> query, QueryPageOptions option, Func<IEnumerable<T>, IEnumerable<T>>? queryFunc = null, FilterKeyValueAction where = null)
     {
         if (queryFunc != null)
@@ -133,6 +135,26 @@ public static class QueryPageOptionsExtensions
             }
         }
         ret.Items = items.ToList();
+        return ret;
+    }
+
+    /// <summary>
+    /// 根据查询条件返回QueryData
+    /// </summary>
+    public static QueryData<SelectedItem> GetQueryData<T>(this IEnumerable<T> datas, VirtualizeQueryOption option, Func<IEnumerable<T>, IEnumerable<SelectedItem>> func, FilterKeyValueAction where = null)
+    {
+        var ret = new QueryData<SelectedItem>()
+        {
+            IsSorted = false,
+            IsFiltered = false,
+            IsAdvanceSearch = false,
+            IsSearch = !option.SearchText.IsNullOrWhiteSpace()
+        };
+
+        var items = datas.Skip((option.StartIndex)).Take(option.Count);
+        ret.TotalCount = datas.Count();
+
+        ret.Items = func(items).ToList();
         return ret;
     }
 }

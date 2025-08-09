@@ -32,7 +32,7 @@ public sealed class HybridGatewayExportService : IGatewayExportService
         _importExportService = importExportService;
     }
 
-    public async Task<bool> OnChannelExport(ExportFilter exportFilter)
+    public async Task<bool> OnChannelExport(GatewayExportFilter exportFilter)
     {
         try
         {
@@ -71,7 +71,7 @@ public sealed class HybridGatewayExportService : IGatewayExportService
         return true;
     }
 
-    public async Task<bool> OnDeviceExport(ExportFilter exportFilter)
+    public async Task<bool> OnDeviceExport(GatewayExportFilter exportFilter)
     {
         try
         {
@@ -89,7 +89,7 @@ public sealed class HybridGatewayExportService : IGatewayExportService
         }
     }
 
-    public async Task<bool> OnVariableExport(ExportFilter exportFilter)
+    public async Task<bool> OnVariableExport(GatewayExportFilter exportFilter)
     {
         try
         {

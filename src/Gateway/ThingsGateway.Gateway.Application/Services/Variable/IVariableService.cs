@@ -61,7 +61,7 @@ internal interface IVariableService
     /// <summary>
     /// 异步导出变量数据到文件流中。
     /// </summary>
-    Task<Dictionary<string, object>> ExportVariableAsync(ExportFilter exportFilter);
+    Task<Dictionary<string, object>> ExportVariableAsync(GatewayExportFilter exportFilter);
 
     /// <summary>
     /// 异步获取变量。
@@ -84,7 +84,7 @@ internal interface IVariableService
     /// 表格查询
     /// </summary>
     /// <param name="exportFilter">查询分页选项</param>
-    Task<QueryData<Variable>> PageAsync(ExportFilter exportFilter);
+    Task<QueryData<Variable>> PageAsync(GatewayExportFilter exportFilter);
 
     /// <summary>
     /// 异步预览导入的数据。

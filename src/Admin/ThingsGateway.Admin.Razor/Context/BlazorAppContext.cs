@@ -123,8 +123,8 @@ public class BlazorAppContext
                 }
             }
             var ownMenus = OwnMenus.Where(a => a.Module == CurrentModuleId);
-            OwnMenuItems = ResourceUtil.BuildMenuTrees(ownMenus).ToList();
-            AllOwnMenuItems = ResourceUtil.BuildMenuTrees(OwnMenus).ToList();
+            OwnMenuItems = AdminResourceUtil.BuildMenuTrees(ownMenus).ToList();
+            AllOwnMenuItems = AdminResourceUtil.BuildMenuTrees(OwnMenus).ToList();
             OwnSameLevelMenuItems = ownMenus.Where(a => !a.Href.IsNullOrWhiteSpace()).Select(item => new MenuItem()
             {
                 Match = item.NavLinkMatch ?? Microsoft.AspNetCore.Components.Routing.NavLinkMatch.All,

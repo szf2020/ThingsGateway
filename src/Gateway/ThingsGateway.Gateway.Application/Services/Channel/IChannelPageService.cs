@@ -11,6 +11,8 @@
 
 using BootstrapBlazor.Components;
 
+using Microsoft.AspNetCore.Components.Forms;
+
 namespace ThingsGateway.Gateway.Application
 {
     public interface IChannelPageService
@@ -39,7 +41,7 @@ namespace ThingsGateway.Gateway.Application
         /// <param name="model">新数据</param>
         /// <param name="restart">重启</param>
         /// <returns></returns>
-        Task<bool> BatchEditAsync(IEnumerable<Channel> models, Channel oldModel, Channel model, bool restart);
+        Task<bool> BatchEditChannelAsync(IEnumerable<Channel> models, Channel oldModel, Channel model, bool restart);
 
 
 
@@ -50,6 +52,13 @@ namespace ThingsGateway.Gateway.Application
         Task<bool> DeleteChannelAsync(IEnumerable<long> ids, bool restart, CancellationToken cancellationToken);
 
         Task ImportChannelAsync(List<Channel> upData, List<Channel> insertData, bool restart);
+        Task<Dictionary<string, ImportPreviewOutputBase>> ImportChannelAsync(USheetDatas input, bool restart);
+        Task<Dictionary<string, ImportPreviewOutputBase>> ImportChannelAsync(string filePath, bool restart);
+        Task<Dictionary<string, ImportPreviewOutputBase>> ImportChannelAsync(IBrowserFile file, bool restart);
+
+
+
+        Task<QueryData<SelectedItem>> OnChannelSelectedItemQueryAsync(VirtualizeQueryOption option);
 
     }
 }

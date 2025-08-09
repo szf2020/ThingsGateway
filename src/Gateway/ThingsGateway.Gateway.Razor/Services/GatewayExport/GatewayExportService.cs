@@ -26,7 +26,7 @@ internal sealed class GatewayExportService : IGatewayExportService
 
     private IJSRuntime JSRuntime { get; set; }
 
-    public async Task<bool> OnChannelExport(ExportFilter exportFilter)
+    public async Task<bool> OnChannelExport(GatewayExportFilter exportFilter)
     {
         try
         {
@@ -41,7 +41,7 @@ internal sealed class GatewayExportService : IGatewayExportService
         }
     }
 
-    public async Task<bool> OnDeviceExport(ExportFilter exportFilter)
+    public async Task<bool> OnDeviceExport(GatewayExportFilter exportFilter)
     {
         try
         {
@@ -56,7 +56,7 @@ internal sealed class GatewayExportService : IGatewayExportService
         }
     }
 
-    public async Task<bool> OnVariableExport(ExportFilter exportFilter)
+    public async Task<bool> OnVariableExport(GatewayExportFilter exportFilter)
     {
         try
         {

@@ -15,7 +15,7 @@ using System.ComponentModel.DataAnnotations;
 namespace ThingsGateway.Razor;
 
 /// <inheritdoc/>
-public partial class ImportExcel
+public partial class ImportExcelConfirm
 {
     private Dictionary<string, ImportPreviewOutputBase> _importPreviews = new();
 
@@ -24,17 +24,18 @@ public partial class ImportExcel
     /// </summary>
     [Parameter]
     [EditorRequired]
-    public Func<IBrowserFile, Task<Dictionary<string, ImportPreviewOutputBase>>> Import { get; set; }
+    public Func<Dictionary<string, ImportPreviewOutputBase>, Task> Import { get; set; }
 
     [Inject]
     [NotNull]
     private IStringLocalizer<ImportExcel>? Localizer { get; set; }
 
-    [Inject]
-    [NotNull]
-    private IStringLocalizer<ThingsGateway.Razor._Imports>? RazorLocalizer { get; set; }
-
-
+    /// <summary>
+    /// 预览
+    /// </summary>
+    [Parameter]
+    [EditorRequired]
+    public Func<IBrowserFile, Task<Dictionary<string, ImportPreviewOutputBase>>> Preview { get; set; }
 
     [Inject]
     [NotNull]
@@ -46,17 +47,13 @@ public partial class ImportExcel
     [CascadingParameter]
     private Func<Task>? OnCloseAsync { get; set; }
 
-    private async Task DeviceImport()
+    private async Task DeviceImport(IBrowserFile file)
     {
         try
         {
             _importPreviews.Clear();
-            await InvokeAsync(async () =>
-            {
-                if (OnCloseAsync != null)
-                    await OnCloseAsync();
-                await ToastService.Default();
-            });
+            _importPreviews = await Preview.Invoke(file);
+            await step.Next();
         }
         catch (Exception ex)
         {
@@ -70,12 +67,16 @@ public partial class ImportExcel
         {
             await Task.Run(async () =>
             {
-                _importPreviews = await Import.Invoke(_importFile);
+                await Import.Invoke(_importPreviews);
                 _importFile = null;
 
+                await InvokeAsync(async () =>
+                {
+                    if (OnCloseAsync != null)
+                        await OnCloseAsync();
+                    await ToastService.Default();
+                });
             });
-            await step.Next();
-
         }
         catch (Exception ex)
         {

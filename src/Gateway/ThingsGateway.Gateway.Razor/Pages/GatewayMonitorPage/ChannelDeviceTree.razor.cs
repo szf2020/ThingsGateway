@@ -241,7 +241,7 @@ public partial class ChannelDeviceTree : IDisposable
              {nameof(ChannelEditComponent.OnValidSubmit), async () =>
             {
                 Spinner.SetRun(true);
-                await Task.Run(() => GlobalData.ChannelRuntimeService.BatchEditAsync(changedModels, oldModel, oneModel,AutoRestartThread));
+                await Task.Run(() => GlobalData.ChannelRuntimeService.BatchEditChannelAsync(changedModels, oldModel, oneModel,AutoRestartThread));
 
               //await Notify();
                 await InvokeAsync(() => Spinner.SetRun(false));
@@ -506,7 +506,7 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
         }
         else if (channelDeviceTreeItem.TryGetPluginType(out var pluginType))
         {
-            ret = await GatewayExportService.OnChannelExport(new ExportFilter() { QueryPageOptions = new(), PluginType = pluginType });
+            ret = await GatewayExportService.OnChannelExport(new GatewayExportFilter() { QueryPageOptions = new(), PluginType = pluginType });
         }
         else
         {
@@ -556,10 +556,10 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
             //await Notify();
             await InvokeAsync(() => Spinner.SetRun(false));
         });
-        op.Component = BootstrapDynamicComponent.CreateComponent<ImportExcel>(new Dictionary<string, object?>
+        op.Component = BootstrapDynamicComponent.CreateComponent<ImportExcelConfirm>(new Dictionary<string, object?>
         {
-             {nameof(ImportExcel.Import),import },
-            {nameof(ImportExcel.Preview),preview },
+             {nameof(ImportExcelConfirm.Import),import },
+            {nameof(ImportExcelConfirm.Preview),preview },
         });
         await DialogService.Show(op);
 
@@ -581,32 +581,21 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
             ShowFooter = false,
             ShowCloseButton = false,
         };
-        Device oneModel = null;
-        List<Variable> variables = new();
         if (value is not ChannelDeviceTreeItem channelDeviceTreeItem) return;
 
-        if (channelDeviceTreeItem.TryGetDeviceRuntime(out var deviceRuntime))
-        {
-            oneModel = deviceRuntime.AdaptDevice();
-            oneModel.Id = 0;
-
-            variables = deviceRuntime.ReadOnlyVariableRuntimes.Select(a => a.Value).AdaptListVariable();
-        }
-        else
+        if (!channelDeviceTreeItem.TryGetDeviceRuntime(out var deviceRuntime))
         {
             return;
         }
 
         op.Component = BootstrapDynamicComponent.CreateComponent<DeviceCopyComponent>(new Dictionary<string, object?>
         {
-             {nameof(DeviceCopyComponent.OnSave), async (Dictionary<Device,List<Variable>> devices) =>
+             {nameof(DeviceCopyComponent.OnSave), async (int CopyCount,  string CopyDeviceNamePrefix, int CopyDeviceNameSuffixNumber) =>
             {
-                await Task.Run(() =>GlobalData.DeviceRuntimeService.CopyAsync(devices,AutoRestartThread, default));
+                await Task.Run(() =>GlobalData.DeviceRuntimeService.CopyDeviceAsync(CopyCount,CopyDeviceNamePrefix,CopyDeviceNameSuffixNumber,deviceRuntime.Id,AutoRestartThread));
                //await Notify();
 
             }},
-            {nameof(DeviceCopyComponent.Model),oneModel },
-            {nameof(DeviceCopyComponent.Variables),variables },
         });
 
         await DialogService.Show(op);
@@ -1044,10 +1033,10 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
             //await Notify();
             await InvokeAsync(() => Spinner.SetRun(false));
         });
-        op.Component = BootstrapDynamicComponent.CreateComponent<ImportExcel>(new Dictionary<string, object?>
+        op.Component = BootstrapDynamicComponent.CreateComponent<ImportExcelConfirm>(new Dictionary<string, object?>
         {
-             {nameof(ImportExcel.Import),import },
-            {nameof(ImportExcel.Preview),preview },
+             {nameof(ImportExcelConfirm.Import),import },
+            {nameof(ImportExcelConfirm.Preview),preview },
         });
         await DialogService.Show(op);
 
@@ -1131,9 +1120,9 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
 
         var channels = await GlobalData.GetCurrentUserChannels().ConfigureAwait(false);
 
-        ZItem[0].Items = ResourceUtil.BuildTreeItemList(channels.Where(a => a.IsCollect == true), new List<ChannelDeviceTreeItem> { Value }, RenderTreeItem);
-        ZItem[1].Items = ResourceUtil.BuildTreeItemList(channels.Where(a => a.IsCollect == false), new List<ChannelDeviceTreeItem> { Value }, RenderTreeItem);
-        var item2 = ResourceUtil.BuildTreeItemList(channels.Where(a => a.IsCollect == null), new List<ChannelDeviceTreeItem> { Value }, RenderTreeItem);
+        ZItem[0].Items = GatewayResourceUtil.BuildTreeItemList(channels.Where(a => a.IsCollect == true), new List<ChannelDeviceTreeItem> { Value }, RenderTreeItem);
+        ZItem[1].Items = GatewayResourceUtil.BuildTreeItemList(channels.Where(a => a.IsCollect == false), new List<ChannelDeviceTreeItem> { Value }, RenderTreeItem);
+        var item2 = GatewayResourceUtil.BuildTreeItemList(channels.Where(a => a.IsCollect == null), new List<ChannelDeviceTreeItem> { Value }, RenderTreeItem);
         if (item2.Count > 0)
         {
             UnknownTreeViewItem.Items = item2;
@@ -1237,10 +1226,10 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
         {
             var items = channels.WhereIF(!searchText.IsNullOrEmpty(), a => a.Name.Contains(searchText));
 
-            ZItem[0].Items = ResourceUtil.BuildTreeItemList(items.Where(a => a.IsCollect == true), new List<ChannelDeviceTreeItem> { Value }, RenderTreeItem, items: ZItem[0].Items);
-            ZItem[1].Items = ResourceUtil.BuildTreeItemList(items.Where(a => a.IsCollect == false), new List<ChannelDeviceTreeItem> { Value }, RenderTreeItem, items: ZItem[1].Items);
+            ZItem[0].Items = GatewayResourceUtil.BuildTreeItemList(items.Where(a => a.IsCollect == true), new List<ChannelDeviceTreeItem> { Value }, RenderTreeItem, items: ZItem[0].Items);
+            ZItem[1].Items = GatewayResourceUtil.BuildTreeItemList(items.Where(a => a.IsCollect == false), new List<ChannelDeviceTreeItem> { Value }, RenderTreeItem, items: ZItem[1].Items);
 
-            var item2 = ResourceUtil.BuildTreeItemList(items.Where(a => a.IsCollect == null), new List<ChannelDeviceTreeItem> { Value }, RenderTreeItem);
+            var item2 = GatewayResourceUtil.BuildTreeItemList(items.Where(a => a.IsCollect == null), new List<ChannelDeviceTreeItem> { Value }, RenderTreeItem);
             if (item2.Count > 0)
             {
                 UnknownTreeViewItem.Items = item2;

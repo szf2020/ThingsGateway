@@ -11,6 +11,9 @@
 namespace ThingsGateway.Gateway.Razor;
 
 public partial class GatewayInfo
+#if Management
+: IDisposable
+#endif
 {
     [Parameter]
     public ChannelDeviceTreeItem SelectModel { get; set; } = new() { ChannelDevicePluginType = ChannelDevicePluginTypeEnum.PluginType, PluginType = null };
@@ -31,4 +34,43 @@ public partial class GatewayInfo
     public ShowTypeEnum? ShowType { get; set; }
     [Parameter]
     public bool AutoRestartThread { get; set; } = true;
+
+    protected override void OnInitialized()
+    {
+        _ = RunTimerAsync();
+        base.OnInitialized();
+    }
+
+    private bool Disposed;
+    private async Task RunTimerAsync()
+    {
+        while (!Disposed)
+        {
+            try
+            {
+                await InvokeAsync(StateHasChanged);
+
+            }
+            catch (Exception ex)
+            {
+                NewLife.Log.XTrace.WriteException(ex);
+            }
+            finally
+            {
+                await Task.Delay(5000);
+            }
+        }
+    }
+
+    public void Dispose()
+    {
+        Disposed = true;
+        GC.SuppressFinalize(this);
+    }
+
+#if Management
+
+
+
+#endif
 }

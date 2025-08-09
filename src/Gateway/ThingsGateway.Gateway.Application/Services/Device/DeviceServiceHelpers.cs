@@ -44,7 +44,7 @@ HashSet<string> pluginSheetNames,
             data = new List<Device>();
 
         var result = new Dictionary<string, object>();
-        result.Add(ExportString.DeviceName, GetDeviceSheets(data, deviceDicts, channelDicts, channelName));
+        result.Add(GatewayExportString.DeviceName, GetDeviceSheets(data, deviceDicts, channelDicts, channelName));
         ConcurrentDictionary<string, (object, Dictionary<string, PropertyInfo>)> propertysDict = new();
 
         foreach (var plugin in pluginSheetNames)
@@ -69,7 +69,7 @@ string? channelName = null)
             return new();
 
         var result = new Dictionary<string, object>();
-        result.Add(ExportString.DeviceName, GetDeviceSheets(data1, deviceDicts, channelDicts, channelName));
+        result.Add(GatewayExportString.DeviceName, GetDeviceSheets(data1, deviceDicts, channelDicts, channelName));
         ConcurrentDictionary<string, (object, Dictionary<string, PropertyInfo>)> propertysDict = new();
 
         foreach (var plugin in pluginSheetNames)
@@ -209,7 +209,7 @@ string? channelName)
         deviceDicts.TryGetValue(device.RedundantDeviceId ?? 0, out var redundantDevice);
         channelDicts.TryGetValue(device.ChannelId, out var channel);
 
-        devExport.Add(ExportString.ChannelName, channel?.Name ?? channelName);
+        devExport.Add(GatewayExportString.ChannelName, channel?.Name ?? channelName);
 
         foreach (var item in propertyInfos)
         {
@@ -220,7 +220,7 @@ string? channelName)
         }
 
         //设备实体没有包含冗余设备名称，手动插入
-        devExport.Add(ExportString.RedundantDeviceName, redundantDevice?.Name);
+        devExport.Add(GatewayExportString.RedundantDeviceName, redundantDevice?.Name);
         return devExport;
     }
 
@@ -250,7 +250,7 @@ string? channelName)
             if (propertys.Item2.Count > 0)
             {
                 //没有包含设备名称，手动插入
-                driverInfo.Add(ExportString.DeviceName, device.Name);
+                driverInfo.Add(GatewayExportString.DeviceName, device.Name);
             }
             //根据插件的配置属性项生成列，从数据库中获取值或者获取属性默认值
             foreach (var item in propertys.Item2)

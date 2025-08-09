@@ -12,7 +12,7 @@ using BootstrapBlazor.Components;
 
 namespace ThingsGateway.Gateway.Application;
 
-public class ExportFilter
+public class GatewayExportFilter
 {
     public FilterKeyValueAction FilterKeyValueAction { get; set; }
     public string? PluginName { get; set; }

@@ -37,6 +37,12 @@ public abstract class CollectPropertyBase : DriverPropertyBase
     /// </summary>
     [MinValue(1)]
     public virtual int DutyCycle { get; set; } = 3;
+
+
+    /// <summary>
+    /// 写优先，写入时强制读取消操作
+    /// </summary>
+    public virtual bool WritePriority { get; set; } = false;
 }
 
 /// <summary>
@@ -56,4 +62,6 @@ public abstract class CollectPropertyRetryBase : CollectPropertyBase
     [MinValue(1)]
     public override int DutyCycle { get; set; } = 3;
 
+    [DynamicProperty(Remark = "写优先，写入时强制读取消操作")]
+    public override bool WritePriority { get; set; } = false;
 }

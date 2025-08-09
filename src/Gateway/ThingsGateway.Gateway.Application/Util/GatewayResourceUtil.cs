@@ -8,10 +8,12 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-namespace ThingsGateway.Gateway.Razor;
+using BootstrapBlazor.Components;
+
+namespace ThingsGateway.Gateway.Application;
 
 [ThingsGateway.DependencyInjection.SuppressSniffer]
-public static class ResourceUtil
+public static class GatewayResourceUtil
 {
     /// <summary>
     /// 构造选择项，ID/Name

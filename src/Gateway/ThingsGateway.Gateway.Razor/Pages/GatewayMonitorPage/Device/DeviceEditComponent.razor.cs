@@ -42,14 +42,14 @@ public partial class DeviceEditComponent
 
     [CascadingParameter]
     private Func<Task>? OnCloseAsync { get; set; }
-    private IEnumerable<SelectedItem> _channelItems;
 
-    protected override async Task OnParametersSetAsync()
+    [Inject]
+    IChannelPageService ChannelPageService { get; set; }
+    private Task<QueryData<SelectedItem>> OnChannelSelectedItemQueryAsync(VirtualizeQueryOption option)
     {
-        var channels = await GlobalData.GetCurrentUserChannels().ConfigureAwait(false);
-        _channelItems = channels.BuildChannelSelectList();
-        base.OnParametersSet();
+        return ChannelPageService.OnChannelSelectedItemQueryAsync(option);
     }
+
 
     public async Task ValidSubmit(EditContext editContext)
     {

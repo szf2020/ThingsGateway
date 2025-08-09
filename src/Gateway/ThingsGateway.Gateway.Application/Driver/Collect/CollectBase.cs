@@ -195,7 +195,7 @@ public abstract partial class CollectBase : DriverBase, IRpcDriver
         // 从插件服务中获取当前设备关联的驱动方法信息列表
         DriverMethodInfos = GlobalData.PluginService.GetDriverMethodInfos(device.PluginName, this);
 
-        ReadWriteLock = new(CollectProperties.DutyCycle);
+        ReadWriteLock = new(CollectProperties.DutyCycle, CollectProperties.WritePriority);
     }
 
     public virtual string GetAddressDescription()
@@ -723,9 +723,11 @@ public abstract partial class CollectBase : DriverBase, IRpcDriver
 
     #endregion 写入方法
 
-    protected override Task DisposeAsync(bool disposing)
+    protected override async Task DisposeAsync(bool disposing)
     {
         _linkedCtsCache?.SafeDispose();
-        return base.DisposeAsync(disposing);
+        if (ReadWriteLock != null)
+            await ReadWriteLock.SafeDisposeAsync().ConfigureAwait(false);
+        await base.DisposeAsync(disposing).ConfigureAwait(false);
     }
 }

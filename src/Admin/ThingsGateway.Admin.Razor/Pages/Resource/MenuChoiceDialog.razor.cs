@@ -41,7 +41,7 @@ public partial class MenuChoiceDialog
         var all = (await SysResourceService.GetAllAsync());
         var items = all.Where(a => a.Category == ResourceCategoryEnum.Menu && a.Module == ModuleId);
         ModuleTitle = all.FirstOrDefault(a => a.Id == ModuleId)?.Title;
-        Items = ResourceUtil.BuildTreeItemList(items, new List<long> { Value }, RenderTreeItem);
+        Items = AdminResourceUtil.BuildTreeItemList(items, new List<long> { Value }, RenderTreeItem);
         await base.OnParametersSetAsync();
     }
 

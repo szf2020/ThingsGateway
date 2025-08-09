@@ -10,7 +10,7 @@
 
 namespace ThingsGateway.Gateway.Application;
 
-public static class ExportString
+public static class GatewayExportString
 {
     /// <summary>
     /// 通道名称
@@ -47,7 +47,7 @@ public static class ExportString
         get
         {
             if (localizer == null)
-                localizer = App.CreateLocalizerByType(typeof(ExportString));
+                localizer = App.CreateLocalizerByType(typeof(GatewayExportString));
             return localizer;
         }
     }

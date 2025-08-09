@@ -16,7 +16,7 @@ using ThingsGateway.Common.Extension;
 
 namespace ThingsGateway.Gateway.Application;
 
-public static class ChannelServiceHelpers
+public static partial class ChannelServiceHelpers
 {
 
     public static void GetImportChannelData(Dictionary<string, ImportPreviewOutputBase> input, out List<Channel> upData, out List<Channel> insertData)
@@ -24,7 +24,7 @@ public static class ChannelServiceHelpers
         List<Channel>? channels = new List<Channel>();
         foreach (var item in input)
         {
-            if (item.Key == ExportString.ChannelName)
+            if (item.Key == GatewayExportString.ChannelName)
             {
                 var channelImports = ((ImportPreviewListOutput<Channel>)item.Value).Data;
                 channels = channelImports;
@@ -35,52 +35,6 @@ public static class ChannelServiceHelpers
         insertData = channels.Where(a => !a.IsUp).ToList();
     }
 
-    public static USheetDatas ExportChannel(IEnumerable<Channel> channels)
-    {
-        var rows = ExportRows(channels); // IEnumerable 延迟执行
-        var sheets = WrapAsSheet(ExportString.ChannelName, rows);
-        return USheetDataHelpers.GetUSheetDatas(sheets);
-    }
-
-    internal static IEnumerable<Dictionary<string, object>> ExportRows(IEnumerable<Channel>? data)
-    {
-        if (data == null)
-            yield break;
-
-        #region 列名称
-
-        var type = typeof(Channel);
-        var propertyInfos = type.GetRuntimeProperties().Where(a => a.GetCustomAttribute<IgnoreExcelAttribute>(false) == null)
-             .OrderBy(
-            a =>
-            {
-                var order = a.GetCustomAttribute<AutoGenerateColumnAttribute>()?.Order ?? int.MaxValue;
-                if (order < 0)
-                {
-                    order = order + 10000000;
-                }
-                else if (order == 0)
-                {
-                    order = 10000000;
-                }
-                return order;
-            }
-            )
-            ;
-
-        #endregion 列名称
-
-        foreach (var device in data)
-        {
-            Dictionary<string, object> row = new();
-            foreach (var prop in propertyInfos)
-            {
-                var desc = type.GetPropertyDisplayName(prop.Name);
-                row.Add(desc ?? prop.Name, prop.GetValue(device)?.ToString());
-            }
-            yield return row;
-        }
-    }
 
     internal static async IAsyncEnumerable<Dictionary<string, object>> ExportRows(IAsyncEnumerable<Channel>? data)
     {
@@ -125,13 +79,6 @@ public static class ChannelServiceHelpers
         }
     }
 
-    internal static Dictionary<string, object> WrapAsSheet(string sheetName, IEnumerable<IDictionary<string, object>> rows)
-    {
-        return new Dictionary<string, object>
-        {
-            [sheetName] = rows
-        };
-    }
 
     internal static Dictionary<string, object> WrapAsSheet(string sheetName, IAsyncEnumerable<IDictionary<string, object>> rows)
     {

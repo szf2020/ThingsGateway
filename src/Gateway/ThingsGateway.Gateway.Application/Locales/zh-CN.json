@@ -1,5 +1,5 @@
 ﻿{
-  "ThingsGateway.Management.Application.ExportString": {
+  "ThingsGateway.Management.Application.ManagementExportString": {
 
     "ManagementConfigName": "通讯配置"
   },
@@ -323,7 +323,8 @@
   },
   "ThingsGateway.Gateway.Application.CollectPropertyRetryBase": {
     "RetryCount": "失败重试次数",
-    "DutyCycle": "占空比"
+    "DutyCycle": "占空比",
+    "WritePriority": "写优先"
   },
   "ThingsGateway.Gateway.Application.ControlController": {
     "BatchSaveChannelAsync": "保存通道",
@@ -400,7 +401,7 @@
     "ExpireTime": "过期时间 {0}",
     "Unauthorized": "未授权"
   },
-  "ThingsGateway.Gateway.Application.ExportString": {
+  "ThingsGateway.Gateway.Application.GatewayExportString": {
     "BusinessDeviceName": "业务设备",
     "ChannelName": "通道",
     "DeviceName": "设备",

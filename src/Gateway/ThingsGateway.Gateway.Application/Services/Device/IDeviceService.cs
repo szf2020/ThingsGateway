@@ -59,7 +59,7 @@ internal interface IDeviceService
     /// 导出设备信息到文件流。
     /// </summary>
     /// <returns>导出的文件流</returns>
-    Task<Dictionary<string, object>> ExportDeviceAsync(ExportFilter exportFilter);
+    Task<Dictionary<string, object>> ExportDeviceAsync(GatewayExportFilter exportFilter);
 
     /// <summary>
     /// 导出设备信息到内存流。
@@ -88,7 +88,7 @@ internal interface IDeviceService
     /// </summary>
     /// <param name="exportFilter">查询条件</param>
     /// <returns>查询结果</returns>
-    Task<QueryData<Device>> PageAsync(ExportFilter exportFilter);
+    Task<QueryData<Device>> PageAsync(GatewayExportFilter exportFilter);
 
     /// <summary>
     /// 预览导入设备信息。

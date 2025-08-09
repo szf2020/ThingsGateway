@@ -8,7 +8,8 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-namespace ThingsGateway.Gateway.Razor;
+
+namespace ThingsGateway.Gateway.Application;
 public enum ChannelDevicePluginTypeEnum
 {
     PluginType,

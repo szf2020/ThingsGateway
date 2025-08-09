@@ -60,14 +60,14 @@
   },
   "ThingsGateway.Razor.ImportExcel": {
     "First": "第一步",
-    "Import": "导入",
+    "Import": "若验证无错误，将直接导入数据库",
     "Next": "下一步",
     "Reset": "重置",
     "Second": "第二步",
     "Third": "第三",
     "Tip": "数据量较大时(大于20万)，所需导入时间可能超过1分钟，请耐心等待",
     "Upload": "上传文件",
-    "UploadCount": " 表 {0}，预计导入 {1} 条数据",
+    "UploadCount": " 表 {0}，导入 {1} 条数据",
     "Validate": "验证",
     "ValidateText": "验证内容"
   },

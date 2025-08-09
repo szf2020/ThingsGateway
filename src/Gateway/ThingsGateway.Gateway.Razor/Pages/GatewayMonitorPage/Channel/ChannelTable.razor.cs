@@ -162,7 +162,7 @@ public partial class ChannelTable : IDisposable
         {
              {nameof(ChannelEditComponent.OnValidSubmit), async () =>
             {
-                await Task.Run(() => ChannelPageService.BatchEditAsync(changedModels, oldModel, oneModel,AutoRestartThread));
+                await Task.Run(() => ChannelPageService.BatchEditChannelAsync(changedModels, oldModel, oneModel,AutoRestartThread));
 
                    await InvokeAsync(table.QueryAsync);
             } },
@@ -279,10 +279,8 @@ public partial class ChannelTable : IDisposable
     {
                 await Task.Run(async ()=>
                 {
-              var importData=await  ChannelServiceHelpers.ImportAsync(data);
-                ChannelServiceHelpers.  GetImportChannelData(importData, out var upData, out var insertData);
+              var importData=await  ChannelPageService.ImportChannelAsync(data,AutoRestartThread);
 
-                await    ChannelPageService.ImportChannelAsync(upData,insertData,AutoRestartThread);
                 })
                     ;
     }
@@ -314,13 +312,24 @@ finally
             OnCloseAsync = async () => await InvokeAsync(table.QueryAsync),
         };
 
-        Func<IBrowserFile, Task<Dictionary<string, ImportPreviewOutputBase>>> preview = (a => GlobalData.ChannelRuntimeService.PreviewAsync(a));
-        Func<Dictionary<string, ImportPreviewOutputBase>, Task> import = (value => GlobalData.ChannelRuntimeService.ImportChannelAsync(value, AutoRestartThread));
+        Func<IBrowserFile, Task<Dictionary<string, ImportPreviewOutputBase>>> import = (a =>
+{
+
+    return ChannelPageService.ImportChannelAsync(a, AutoRestartThread);
+
+});
         op.Component = BootstrapDynamicComponent.CreateComponent<ImportExcel>(new Dictionary<string, object?>
         {
              {nameof(ImportExcel.Import),import },
-            {nameof(ImportExcel.Preview),preview },
         });
+
+        //Func<IBrowserFile, Task<Dictionary<string, ImportPreviewOutputBase>>> preview = (a => GlobalData.ChannelRuntimeService.PreviewAsync(a));
+        //Func<Dictionary<string, ImportPreviewOutputBase>, Task> import = (value => GlobalData.ChannelRuntimeService.ImportChannelAsync(value, AutoRestartThread));
+        //op.Component = BootstrapDynamicComponent.CreateComponent<ImportExcel>(new Dictionary<string, object?>
+        //{
+        //     {nameof(ImportExcel.Import),import },
+        //    {nameof(ImportExcel.Preview),preview },
+        //});
         await DialogService.Show(op);
     }
 

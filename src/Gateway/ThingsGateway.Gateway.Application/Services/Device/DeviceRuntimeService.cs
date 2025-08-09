@@ -29,6 +29,46 @@ public class DeviceRuntimeService : IDeviceRuntimeService
 
     private WaitLock WaitLock { get; set; } = new WaitLock(nameof(DeviceRuntimeService));
 
+
+
+
+
+    public async Task CopyDeviceAsync(int CopyCount, string CopyDeviceNamePrefix, int CopyDeviceNameSuffixNumber, long deviceId, bool AutoRestartThread)
+    {
+        if (!GlobalData.IdDevices.TryGetValue(deviceId, out var deviceRuntime))
+        {
+            return;
+        }
+
+        Device Model = deviceRuntime.AdaptDevice();
+        Model.Id = 0;
+        var Variables = deviceRuntime.ReadOnlyVariableRuntimes.Select(a => a.Value).AdaptListVariable();
+
+
+        Dictionary<Device, List<Variable>> devices = new();
+        for (int i = 0; i < CopyCount; i++)
+        {
+            Device device = Model.AdaptDevice();
+            device.Id = CommonUtils.GetSingleId();
+            device.Name = $"{CopyDeviceNamePrefix}{CopyDeviceNameSuffixNumber + i}";
+            List<Variable> variables = new();
+
+            foreach (var item in Variables)
+            {
+                Variable v = item.AdaptVariable();
+                v.Id = CommonUtils.GetSingleId();
+                v.DeviceId = device.Id;
+                variables.Add(v);
+            }
+            devices.Add(device, variables);
+        }
+
+        await GlobalData.DeviceRuntimeService.CopyAsync(devices, AutoRestartThread, default).ConfigureAwait(false);
+    }
+
+
+
+
     public async Task<bool> CopyAsync(Dictionary<Device, List<Variable>> devices, bool restart, CancellationToken cancellationToken)
     {
         try
@@ -56,6 +96,10 @@ public class DeviceRuntimeService : IDeviceRuntimeService
             WaitLock.Release();
         }
     }
+
+
+
+
 
     public async Task<bool> BatchEditAsync(IEnumerable<Device> models, Device oldModel, Device model, bool restart)
     {
@@ -122,7 +166,7 @@ public class DeviceRuntimeService : IDeviceRuntimeService
         }
     }
 
-    public Task<Dictionary<string, object>> ExportDeviceAsync(ExportFilter exportFilter) => GlobalData.DeviceService.ExportDeviceAsync(exportFilter);
+    public Task<Dictionary<string, object>> ExportDeviceAsync(GatewayExportFilter exportFilter) => GlobalData.DeviceService.ExportDeviceAsync(exportFilter);
     public Task<Dictionary<string, ImportPreviewOutputBase>> PreviewAsync(IBrowserFile browserFile) => GlobalData.DeviceService.PreviewAsync(browserFile);
     public Task<MemoryStream> ExportMemoryStream(List<Device> data, string channelName, string plugin) =>
           GlobalData.DeviceService.ExportMemoryStream(data, channelName, plugin);

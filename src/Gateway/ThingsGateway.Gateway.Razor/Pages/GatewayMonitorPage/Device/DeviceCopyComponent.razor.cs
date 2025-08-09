@@ -8,8 +8,6 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-using ThingsGateway.DB;
-
 namespace ThingsGateway.Gateway.Razor;
 
 public partial class DeviceCopyComponent
@@ -26,7 +24,7 @@ public partial class DeviceCopyComponent
     public List<Variable> Variables { get; set; }
 
     [Parameter]
-    public Func<Dictionary<Device, List<Variable>>, Task> OnSave { get; set; }
+    public Func<int, string, int, Task> OnSave { get; set; }
 
     [CascadingParameter]
     private Func<Task>? OnCloseAsync { get; set; }
@@ -41,26 +39,10 @@ public partial class DeviceCopyComponent
     {
         try
         {
-            Dictionary<Device, List<Variable>> devices = new();
-            for (int i = 0; i < CopyCount; i++)
-            {
-                Device device = Model.AdaptDevice();
-                device.Id = CommonUtils.GetSingleId();
-                device.Name = $"{CopyDeviceNamePrefix}{CopyDeviceNameSuffixNumber + i}";
-                List<Variable> variables = new();
 
-                foreach (var item in Variables)
-                {
-                    Variable v = item.AdaptVariable();
-                    v.Id = CommonUtils.GetSingleId();
-                    v.DeviceId = device.Id;
-                    variables.Add(v);
-                }
-                devices.Add(device, variables);
-            }
 
             if (OnSave != null)
-                await OnSave(devices);
+                await OnSave(CopyCount, CopyDeviceNamePrefix, CopyDeviceNameSuffixNumber);
             if (OnCloseAsync != null)
                 await OnCloseAsync();
             await ToastService.Default();

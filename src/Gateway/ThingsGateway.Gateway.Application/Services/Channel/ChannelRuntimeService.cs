@@ -27,6 +27,15 @@ public class ChannelRuntimeService : IChannelRuntimeService
     private WaitLock WaitLock { get; set; } = new WaitLock(nameof(ChannelRuntimeService));
 
 
+
+    public async Task<QueryData<SelectedItem>> OnChannelSelectedItemQueryAsync(VirtualizeQueryOption option)
+    {
+        var channels = await GlobalData.GetCurrentUserChannels().ConfigureAwait(false);
+        var _channelItems = channels.GetQueryData(option, GatewayResourceUtil.BuildChannelSelectList);
+        return _channelItems;
+    }
+
+
     public Task<TouchSocket.Core.LogLevel> ChannelLogLevelAsync(long id)
     {
         GlobalData.IdChannels.TryGetValue(id, out var ChannelRuntime);
@@ -199,7 +208,7 @@ public class ChannelRuntimeService : IChannelRuntimeService
         }
     }
 
-    public async Task<bool> BatchEditAsync(IEnumerable<Channel> models, Channel oldModel, Channel model, bool restart)
+    public async Task<bool> BatchEditChannelAsync(IEnumerable<Channel> models, Channel oldModel, Channel model, bool restart)
     {
         try
         {
@@ -254,10 +263,100 @@ public class ChannelRuntimeService : IChannelRuntimeService
 
     public Task<Dictionary<string, ImportPreviewOutputBase>> PreviewAsync(IBrowserFile browserFile) => GlobalData.ChannelService.PreviewAsync(browserFile);
 
-    public Task<Dictionary<string, object>> ExportChannelAsync(ExportFilter exportFilter) => GlobalData.ChannelService.ExportChannelAsync(exportFilter);
+    public Task<Dictionary<string, object>> ExportChannelAsync(GatewayExportFilter exportFilter) => GlobalData.ChannelService.ExportChannelAsync(exportFilter);
 
     public Task<MemoryStream> ExportMemoryStream(IEnumerable<Channel> data) =>
       GlobalData.ChannelService.ExportMemoryStream(data);
+
+    public async Task<Dictionary<string, ImportPreviewOutputBase>> ImportChannelAsync(USheetDatas input, bool restart)
+    {
+        try
+        {
+            await WaitLock.WaitAsync().ConfigureAwait(false);
+
+
+            var data = await ChannelServiceHelpers.ImportAsync(input).ConfigureAwait(false);
+
+            if (data.Any(a => a.Value.HasError)) return data;
+
+            ChannelServiceHelpers.GetImportChannelData(data, out var upData, out var insertData);
+
+            var result = await GlobalData.ChannelService.ImportChannelAsync(upData, insertData).ConfigureAwait(false);
+
+            var newChannelRuntimes = await RuntimeServiceHelper.GetNewChannelRuntimesAsync(result).ConfigureAwait(false);
+
+            RuntimeServiceHelper.Init(newChannelRuntimes);
+
+            //根据条件重启通道线程
+            if (restart)
+                await GlobalData.ChannelThreadManage.RestartChannelAsync(newChannelRuntimes).ConfigureAwait(false);
+
+            return data;
+        }
+
+        finally
+        {
+            WaitLock.Release();
+        }
+    }
+
+    public async Task<Dictionary<string, ImportPreviewOutputBase>> ImportChannelAsync(string filePath, bool restart)
+    {
+        try
+        {
+            await WaitLock.WaitAsync().ConfigureAwait(false);
+
+            var data = await GlobalData.ChannelService.PreviewAsync(filePath).ConfigureAwait(false);
+
+            if (data.Any(a => a.Value.HasError)) return data;
+            var result = await GlobalData.ChannelService.ImportChannelAsync(data).ConfigureAwait(false);
+
+            var newChannelRuntimes = await RuntimeServiceHelper.GetNewChannelRuntimesAsync(result).ConfigureAwait(false);
+
+            RuntimeServiceHelper.Init(newChannelRuntimes);
+
+            //根据条件重启通道线程
+            if (restart)
+                await GlobalData.ChannelThreadManage.RestartChannelAsync(newChannelRuntimes).ConfigureAwait(false);
+
+            return data;
+        }
+
+        finally
+        {
+            WaitLock.Release();
+        }
+    }
+
+
+    public async Task<Dictionary<string, ImportPreviewOutputBase>> ImportChannelAsync(IBrowserFile file, bool restart)
+    {
+        try
+        {
+            await WaitLock.WaitAsync().ConfigureAwait(false);
+
+            var data = await GlobalData.ChannelService.PreviewAsync(file).ConfigureAwait(false);
+
+            if (data.Any(a => a.Value.HasError)) return data;
+            var result = await GlobalData.ChannelService.ImportChannelAsync(data).ConfigureAwait(false);
+
+            var newChannelRuntimes = await RuntimeServiceHelper.GetNewChannelRuntimesAsync(result).ConfigureAwait(false);
+
+            RuntimeServiceHelper.Init(newChannelRuntimes);
+
+            //根据条件重启通道线程
+            if (restart)
+                await GlobalData.ChannelThreadManage.RestartChannelAsync(newChannelRuntimes).ConfigureAwait(false);
+
+            return data;
+        }
+
+        finally
+        {
+            WaitLock.Release();
+        }
+    }
+
 
     public async Task ImportChannelAsync(Dictionary<string, ImportPreviewOutputBase> input, bool restart)
     {
@@ -289,7 +388,7 @@ public class ChannelRuntimeService : IChannelRuntimeService
         {
             await WaitLock.WaitAsync().ConfigureAwait(false);
 
-            var result = await GlobalData.ChannelService.ImportAsync(upData, insertData).ConfigureAwait(false);
+            var result = await GlobalData.ChannelService.ImportChannelAsync(upData, insertData).ConfigureAwait(false);
 
             var newChannelRuntimes = await RuntimeServiceHelper.GetNewChannelRuntimesAsync(result).ConfigureAwait(false);
 

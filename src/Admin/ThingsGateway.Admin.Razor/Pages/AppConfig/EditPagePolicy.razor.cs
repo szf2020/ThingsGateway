@@ -29,7 +29,7 @@ public partial class EditPagePolicy
 
     protected override Task OnParametersSetAsync()
     {
-        ShortcutsTreeViewItems = ResourceUtil.BuildTreeItemList(AppContext.OwnMenus.WhereIf(!ShortcutsSearchText.IsNullOrEmpty(), a => a.Title.Contains(ShortcutsSearchText)), Model.Shortcuts, null);
+        ShortcutsTreeViewItems = AdminResourceUtil.BuildTreeItemList(AppContext.OwnMenus.WhereIf(!ShortcutsSearchText.IsNullOrEmpty(), a => a.Title.Contains(ShortcutsSearchText)), Model.Shortcuts, null);
         return base.OnParametersSetAsync();
     }
 
@@ -48,6 +48,6 @@ public partial class EditPagePolicy
     {
         await Task.CompletedTask;
         ShortcutsSearchText = searchText;
-        return ResourceUtil.BuildTreeItemList(AppContext.OwnMenus.WhereIf(!ShortcutsSearchText.IsNullOrEmpty(), a => a.Title.Contains(ShortcutsSearchText)), Model.Shortcuts, null);
+        return AdminResourceUtil.BuildTreeItemList(AppContext.OwnMenus.WhereIf(!ShortcutsSearchText.IsNullOrEmpty(), a => a.Title.Contains(ShortcutsSearchText)), Model.Shortcuts, null);
     }
 }

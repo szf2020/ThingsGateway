@@ -247,7 +247,7 @@ internal sealed class ChannelService : BaseService<Channel>, IChannelService
     /// 报表查询
     /// </summary>
     /// <param name="exportFilter">查询条件</param>
-    public async Task<QueryData<Channel>> PageAsync(ExportFilter exportFilter)
+    public async Task<QueryData<Channel>> PageAsync(GatewayExportFilter exportFilter)
     {
         var whereQuery = await GetWhereQueryFunc(exportFilter).ConfigureAwait(false);
 
@@ -255,7 +255,7 @@ internal sealed class ChannelService : BaseService<Channel>, IChannelService
        , exportFilter.FilterKeyValueAction).ConfigureAwait(false);
     }
 
-    private async Task<Func<ISugarQueryable<Channel>, ISugarQueryable<Channel>>> GetWhereQueryFunc(ExportFilter exportFilter)
+    private async Task<Func<ISugarQueryable<Channel>, ISugarQueryable<Channel>>> GetWhereQueryFunc(GatewayExportFilter exportFilter)
     {
         HashSet<long>? channel = null;
         if (exportFilter.PluginType != null)
@@ -331,15 +331,15 @@ internal sealed class ChannelService : BaseService<Channel>, IChannelService
 
     /// <inheritdoc/>
     [OperDesc("ExportChannel", isRecordPar: false, localizerType: typeof(Channel))]
-    public async Task<Dictionary<string, object>> ExportChannelAsync(ExportFilter exportFilter)
+    public async Task<Dictionary<string, object>> ExportChannelAsync(GatewayExportFilter exportFilter)
     {
         var channels = await GetEnumerableData(exportFilter).ConfigureAwait(false);
         var rows = ChannelServiceHelpers.ExportRows(channels); // IEnumerable 延迟执行
-        var sheets = ChannelServiceHelpers.WrapAsSheet(ExportString.ChannelName, rows);
+        var sheets = ChannelServiceHelpers.WrapAsSheet(GatewayExportString.ChannelName, rows);
         return sheets;
     }
 
-    private async Task<IAsyncEnumerable<Channel>> GetEnumerableData(ExportFilter exportFilter)
+    private async Task<IAsyncEnumerable<Channel>> GetEnumerableData(GatewayExportFilter exportFilter)
     {
         var db = GetDB();
         var whereQuery = await GetWhereQueryFunc(exportFilter).ConfigureAwait(false);
@@ -354,7 +354,7 @@ internal sealed class ChannelService : BaseService<Channel>, IChannelService
     public async Task<MemoryStream> ExportMemoryStream(IEnumerable<Channel> channels)
     {
         var rows = ChannelServiceHelpers.ExportRows(channels); // IEnumerable 延迟执行
-        var sheets = ChannelServiceHelpers.WrapAsSheet(ExportString.ChannelName, rows);
+        var sheets = ChannelServiceHelpers.WrapAsSheet(GatewayExportString.ChannelName, rows);
         var memoryStream = new MemoryStream();
         await memoryStream.SaveAsAsync(sheets).ConfigureAwait(false);
         memoryStream.Seek(0, SeekOrigin.Begin);
@@ -365,17 +365,18 @@ internal sealed class ChannelService : BaseService<Channel>, IChannelService
 
     #region 导入
 
+
     /// <inheritdoc/>
     [OperDesc("ImportChannel", isRecordPar: false, localizerType: typeof(Channel))]
     public Task<HashSet<long>> ImportChannelAsync(Dictionary<string, ImportPreviewOutputBase> input)
     {
         ChannelServiceHelpers.GetImportChannelData(input, out var upData, out var insertData);
-        return ImportAsync(upData, insertData);
+        return ImportChannelAsync(upData, insertData);
     }
 
 
 
-    public async Task<HashSet<long>> ImportAsync(List<Channel> upData, List<Channel> insertData)
+    public async Task<HashSet<long>> ImportChannelAsync(List<Channel> upData, List<Channel> insertData)
     {
         ManageHelper.CheckChannelCount(insertData.Count);
 
@@ -394,10 +395,20 @@ internal sealed class ChannelService : BaseService<Channel>, IChannelService
         return upData.Select(a => a.Id).Concat(insertData.Select(a => a.Id)).ToHashSet();
     }
 
+
+
+
+
     /// <inheritdoc/>
     public async Task<Dictionary<string, ImportPreviewOutputBase>> PreviewAsync(IBrowserFile browserFile)
     {
         var path = await browserFile.StorageLocal().ConfigureAwait(false);
+        return await PreviewAsync(path).ConfigureAwait(false);
+    }
+
+    /// <inheritdoc/>
+    public async Task<Dictionary<string, ImportPreviewOutputBase>> PreviewAsync(string path)
+    {
         try
         {
             var dataScope = await GlobalData.SysUserService.GetCurrentUserDataScopeAsync().ConfigureAwait(false);
@@ -426,7 +437,7 @@ internal sealed class ChannelService : BaseService<Channel>, IChannelService
     {
         #region sheet
 
-        if (sheetName == ExportString.ChannelName)
+        if (sheetName == GatewayExportString.ChannelName)
         {
             int row = 1;
             ImportPreviewListOutput<Channel> importPreviewOutput = new();

@@ -200,14 +200,14 @@ internal sealed class DeviceService : BaseService<Device>, IDeviceService
     /// 报表查询
     /// </summary>
     /// <param name="exportFilter">查询条件</param>
-    public async Task<QueryData<Device>> PageAsync(ExportFilter exportFilter)
+    public async Task<QueryData<Device>> PageAsync(GatewayExportFilter exportFilter)
     {
         var whereQuery = await GetWhereQueryFunc(exportFilter).ConfigureAwait(false);
 
         return await QueryAsync(exportFilter.QueryPageOptions, whereQuery
        , exportFilter.FilterKeyValueAction).ConfigureAwait(false);
     }
-    private async Task<Func<ISugarQueryable<Device>, ISugarQueryable<Device>>> GetWhereQueryFunc(ExportFilter exportFilter)
+    private async Task<Func<ISugarQueryable<Device>, ISugarQueryable<Device>>> GetWhereQueryFunc(GatewayExportFilter exportFilter)
     {
         HashSet<long>? channel = null;
         if (!exportFilter.PluginName.IsNullOrWhiteSpace())
@@ -229,7 +229,7 @@ internal sealed class DeviceService : BaseService<Device>, IDeviceService
         return whereQuery;
     }
 
-    private async Task<Func<IEnumerable<Device>, IEnumerable<Device>>> GetWhereEnumerableFunc(ExportFilter exportFilter)
+    private async Task<Func<IEnumerable<Device>, IEnumerable<Device>>> GetWhereEnumerableFunc(GatewayExportFilter exportFilter)
     {
         HashSet<long>? channel = null;
         if (!exportFilter.PluginName.IsNullOrWhiteSpace())
@@ -302,7 +302,7 @@ internal sealed class DeviceService : BaseService<Device>, IDeviceService
     /// </summary>
     /// <returns></returns>
     [OperDesc("ExportDevice", isRecordPar: false, localizerType: typeof(Device))]
-    public async Task<Dictionary<string, object>> ExportDeviceAsync(ExportFilter exportFilter)
+    public async Task<Dictionary<string, object>> ExportDeviceAsync(GatewayExportFilter exportFilter)
     {
         //导出
         var devices = await GetAsyncEnumerableData(exportFilter).ConfigureAwait(false);
@@ -321,12 +321,12 @@ internal sealed class DeviceService : BaseService<Device>, IDeviceService
 
         return sheets;
     }
-    private async Task<IAsyncEnumerable<Device>> GetAsyncEnumerableData(ExportFilter exportFilter)
+    private async Task<IAsyncEnumerable<Device>> GetAsyncEnumerableData(GatewayExportFilter exportFilter)
     {
         var whereQuery = await GetEnumerableData(exportFilter).ConfigureAwait(false);
         return whereQuery.ToAsyncEnumerable();
     }
-    private async Task<ISugarQueryable<Device>> GetEnumerableData(ExportFilter exportFilter)
+    private async Task<ISugarQueryable<Device>> GetEnumerableData(GatewayExportFilter exportFilter)
     {
         var db = GetDB();
         var whereQuery = await GetWhereQueryFunc(exportFilter).ConfigureAwait(false);
@@ -367,7 +367,7 @@ internal sealed class DeviceService : BaseService<Device>, IDeviceService
         IEnumerable<Device>? devices = new List<Device>();
         foreach (var item in input)
         {
-            if (item.Key == ExportString.DeviceName)
+            if (item.Key == GatewayExportString.DeviceName)
             {
                 var deviceImports = ((ImportPreviewOutput<Device>)item.Value).Data;
                 devices = deviceImports.Select(a => a.Value);
@@ -446,7 +446,7 @@ internal sealed class DeviceService : BaseService<Device>, IDeviceService
         string PluginNotNull = Localizer["PluginNotNull"];
         string DeviceNotNull = Localizer["DeviceNotNull"];
 
-        if (sheetName == ExportString.DeviceName)
+        if (sheetName == GatewayExportString.DeviceName)
         {
             // 初始化行数
             int row = 1;
@@ -484,8 +484,8 @@ internal sealed class DeviceService : BaseService<Device>, IDeviceService
                     }
 
                     // 转换冗余设备名称
-                    var hasRedundant = item.TryGetValue(ExportString.RedundantDeviceName, out var redundantObj);
-                    var hasChannel = item.TryGetValue(ExportString.ChannelName, out var channelObj);
+                    var hasRedundant = item.TryGetValue(GatewayExportString.RedundantDeviceName, out var redundantObj);
+                    var hasChannel = item.TryGetValue(GatewayExportString.ChannelName, out var channelObj);
 
                     // 设备ID、冗余设备ID都需要手动补录
                     if (hasRedundant && redundantObj != null)
@@ -666,7 +666,7 @@ internal sealed class DeviceService : BaseService<Device>, IDeviceService
                     }
 
                     // 获取设备名称
-                    if (!item.TryGetValue(ExportString.DeviceName, out var deviceName))
+                    if (!item.TryGetValue(GatewayExportString.DeviceName, out var deviceName))
                     {
                         importPreviewOutput.HasError = true;
                         importPreviewOutput.Results.Add((Interlocked.Increment(ref row), false, DeviceNotNull));
@@ -674,7 +674,7 @@ internal sealed class DeviceService : BaseService<Device>, IDeviceService
                     }
 
                     // 转化插件名称
-                    var value = item[ExportString.DeviceName]?.ToString();
+                    var value = item[GatewayExportString.DeviceName]?.ToString();
 
                     // 检查设备名称是否存在于设备导入预览数据中，如果不存在，则添加错误信息到导入预览结果并继续下一轮循环
                     var hasDevice = deviceImportPreview.Data.ContainsKey(value);

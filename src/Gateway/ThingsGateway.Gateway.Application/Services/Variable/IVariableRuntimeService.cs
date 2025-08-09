@@ -19,7 +19,7 @@ namespace ThingsGateway.Gateway.Application
         Task<bool> BatchEditAsync(IEnumerable<Variable> models, Variable oldModel, Variable model, bool restart, CancellationToken cancellationToken);
         Task<bool> DeleteVariableAsync(IEnumerable<long> ids, bool restart, CancellationToken cancellationToken);
         Task<bool> ClearVariableAsync(bool restart, CancellationToken cancellationToken);
-        Task<Dictionary<string, object>> ExportVariableAsync(ExportFilter exportFilter);
+        Task<Dictionary<string, object>> ExportVariableAsync(GatewayExportFilter exportFilter);
 
         Task ImportVariableAsync(Dictionary<string, ImportPreviewOutputBase> input, bool restart, CancellationToken cancellationToken);
         Task InsertTestDataAsync(int testVariableCount, int testDeviceCount, string slaveUrl, bool businessEnable, bool restart, CancellationToken cancellationToken);

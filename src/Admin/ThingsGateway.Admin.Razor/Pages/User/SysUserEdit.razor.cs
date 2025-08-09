@@ -35,7 +35,7 @@ public partial class SysUserEdit
         BoolItems = LocalizerUtil.GetBoolItems(Model.GetType(), nameof(Model.Status));
         var items = await SysPositionService.SelectorAsync(new PositionSelectorInput());
         Items = PositionUtil.BuildCascaderItemList(items);
-        ModuleSelectedItems = ResourceUtil.BuildModuleSelectList((await SysResourceService.GetAllAsync())).ToList();
+        ModuleSelectedItems = AdminResourceUtil.BuildModuleSelectList((await SysResourceService.GetAllAsync())).ToList();
         await InvokeAsync(StateHasChanged);
         await base.OnInitializedAsync();
     }

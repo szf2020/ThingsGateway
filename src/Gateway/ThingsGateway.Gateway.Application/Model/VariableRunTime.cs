@@ -222,7 +222,9 @@ public partial class VariableRuntime : Variable
     private DateTime collectTime = DateTime.UnixEpoch.ToLocalTime();
 
     private bool _isOnline;
+#pragma warning disable CS0414
     private bool _isOnlineChanged;
+#pragma warning restore CS0414
     private bool _valueInited;
 
     private object _value;

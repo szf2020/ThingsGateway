@@ -1,5 +1,5 @@
 ﻿{
-  "ThingsGateway.Management.Application.ExportString": {
+  "ThingsGateway.Management.Application.ManagementExportString": {
 
     "ManagementConfigName": "ManagementConfigName"
   },
@@ -321,7 +321,8 @@
   },
   "ThingsGateway.Gateway.Application.CollectPropertyRetryBase": {
     "RetryCount": "RetryCount",
-    "DutyCycle": "DutyCycle"
+    "DutyCycle": "DutyCycle",
+    "WritePriority": "WritePriority"
   },
   "ThingsGateway.Gateway.Application.ControlController": {
     "BatchSaveChannelAsync": "BatchSaveChannel",
@@ -396,7 +397,7 @@
     "ExpireTime": "ExpireTime {0}",
     "Unauthorized": "Unauthorized"
   },
-  "ThingsGateway.Gateway.Application.ExportString": {
+  "ThingsGateway.Gateway.Application.GatewayExportString": {
     "BusinessDeviceName": "BusinessDevice",
     "ChannelName": "Channel",
     "DeviceName": "Device",

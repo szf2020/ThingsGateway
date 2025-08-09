@@ -14,7 +14,7 @@ namespace ThingsGateway.Admin.Razor;
 
 /// <inheritdoc/>
 [ThingsGateway.DependencyInjection.SuppressSniffer]
-public static class ResourceUtil
+public static class AdminResourceUtil
 {
     /// <summary>
     /// 构造选择项，ID/TITLE

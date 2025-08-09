@@ -46,7 +46,7 @@ internal interface IChannelService
     /// 导出通道为文件流结果
     /// </summary>
     /// <returns>文件流结果</returns>
-    Task<Dictionary<string, object>> ExportChannelAsync(ExportFilter exportFilter);
+    Task<Dictionary<string, object>> ExportChannelAsync(GatewayExportFilter exportFilter);
 
     /// <summary>
     /// 导出通道为内存流
@@ -71,7 +71,7 @@ internal interface IChannelService
     /// 报表查询
     /// </summary>
     /// <param name="exportFilter">查询条件</param>
-    Task<QueryData<Channel>> PageAsync(ExportFilter exportFilter);
+    Task<QueryData<Channel>> PageAsync(GatewayExportFilter exportFilter);
 
     /// <summary>
     /// 预览导入数据
@@ -102,6 +102,7 @@ internal interface IChannelService
     Task UpdateLogAsync(long channelId, TouchSocket.Core.LogLevel logLevel);
     Task<bool> InsertAsync(List<Channel> models, List<Device> devices, List<Variable> variables);
     Task<bool> UpdateAsync(List<Channel> models, List<Device> devices, List<Variable> variables);
-    Task<HashSet<long>> ImportAsync(List<Channel> upData, List<Channel> insertData);
+    Task<HashSet<long>> ImportChannelAsync(List<Channel> upData, List<Channel> insertData);
 
+    Task<Dictionary<string, ImportPreviewOutputBase>> PreviewAsync(string path);
 }

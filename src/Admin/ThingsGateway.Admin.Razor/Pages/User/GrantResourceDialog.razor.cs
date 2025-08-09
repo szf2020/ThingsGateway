@@ -35,7 +35,7 @@ public partial class GrantResourceDialog
     {
         var items = (await SysResourceService.GetAllAsync()).Where(a => a.Category != ResourceCategoryEnum.Module).OrderBy(a => a.Module).ThenBy(a => a.Id).ToList();
 
-        Items = ResourceUtil.BuildTreeItemList(items, Value, RenderTreeItem);
+        Items = AdminResourceUtil.BuildTreeItemList(items, Value, RenderTreeItem);
         ModuleList = (await SysResourceService.GetAllAsync()).Where(a => a.Category == ResourceCategoryEnum.Module).ToList();
         await base.OnInitializedAsync();
     }

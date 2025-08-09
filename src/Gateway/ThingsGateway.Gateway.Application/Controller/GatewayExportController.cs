@@ -45,7 +45,7 @@ public class GatewayExportController : ControllerBase
     /// </summary>
     /// <returns></returns>
     [HttpPost("device")]
-    public async Task<IActionResult> DownloadDeviceAsync([FromBody] ExportFilter input)
+    public async Task<IActionResult> DownloadDeviceAsync([FromBody] GatewayExportFilter input)
     {
         input.QueryPageOptions.IsPage = false;
         input.QueryPageOptions.IsVirtualScroll = false;
@@ -58,7 +58,7 @@ public class GatewayExportController : ControllerBase
     /// </summary>
     /// <returns></returns>
     [HttpPost("channel")]
-    public async Task<IActionResult> DownloadChannelAsync([FromBody] ExportFilter input)
+    public async Task<IActionResult> DownloadChannelAsync([FromBody] GatewayExportFilter input)
     {
         input.QueryPageOptions.IsPage = false;
         input.QueryPageOptions.IsVirtualScroll = false;
@@ -72,7 +72,7 @@ public class GatewayExportController : ControllerBase
     /// </summary>
     /// <returns></returns>
     [HttpPost("variable")]
-    public async Task<IActionResult> DownloadVariableAsync([FromBody] ExportFilter input)
+    public async Task<IActionResult> DownloadVariableAsync([FromBody] GatewayExportFilter input)
     {
         input.QueryPageOptions.IsPage = false;
         input.QueryPageOptions.IsVirtualScroll = false;

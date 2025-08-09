@@ -8,11 +8,10 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-namespace ThingsGateway.Gateway.Razor;
-
-public interface IGatewayExportService
+namespace ThingsGateway.Gateway.Application
 {
-    Task<bool> OnChannelExport(GatewayExportFilter exportFilter);
-    Task<bool> OnDeviceExport(GatewayExportFilter exportFilter);
-    Task<bool> OnVariableExport(GatewayExportFilter exportFilter);
+    public interface IDevicePageService
+    {
+        Task CopyDeviceAsync(int CopyCount, string CopyDeviceNamePrefix, int CopyDeviceNameSuffixNumber, long deviceId, bool AutoRestartThread);
+    }
 }

@@ -5,7 +5,7 @@
 <Step @ref="@step" IsVertical="true">
     <StepItem Text=@Localizer["First"] Title=@Localizer["Upload"]>
         <InputUpload ShowDeleteButton="true" @bind-Value=_importFile Accept=".xlsx"></InputUpload>
-        <PopConfirmButton IsAsync Color=Color.Warning class="mt-2" OnConfirm=@(SaveDeviceImport)>@Localizer["Import"]</PopConfirmButton>
+        <Button class="mt-2" IsAsync OnClick="() => DeviceImport(_importFile)">@Localizer["Validate"]</Button>
     </StepItem>
     <StepItem Text=@Localizer["Second"] Title=@Localizer["ValidateText"]>
 
@@ -41,12 +41,16 @@
 
             }
 
-            <Button class="mt-2" IsAsync OnClick="() => DeviceImport()">@RazorLocalizer["Close"]</Button>
+            <PopConfirmButton IsAsync IsDisabled=@_importPreviews.Any(it => it.Value.HasError) Color=Color.Warning class="mt-2" OnConfirm=@(SaveDeviceImport)>@Localizer["Import"]</PopConfirmButton>
 
+@* 
+            <Button IsAsync class="mt-2" IsDisabled=@_importPreviews.Any(it => it.Value.HasError) OnClick="() => step.Next()">@Localizer["Next"]</Button> *@
 
         </div>
     </StepItem>
-
+@*     <StepItem Text=@Localizer["Third"] Title=@Localizer["Import"]>
+        <PopConfirmButton IsAsync Color=Color.Warning class="mt-2" OnConfirm=@(SaveDeviceImport)>@Localizer["Import"]</PopConfirmButton>
+    </StepItem> *@
 </Step>
 @code {
     [NotNull]

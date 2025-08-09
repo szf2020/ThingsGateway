@@ -111,13 +111,6 @@ public partial class DeviceTable : IDisposable
             return;
         }
 
-        Device oneModel = null;
-        List<Variable> variables = new();
-        oneModel = deviceRuntime.AdaptDevice();
-        oneModel.Id = 0;
-
-        variables = deviceRuntime.ReadOnlyVariableRuntimes.Select(a => a.Value).AdaptListVariable();
-
         var op = new DialogOption()
         {
             IsScrolling = false,
@@ -130,13 +123,12 @@ public partial class DeviceTable : IDisposable
 
         op.Component = BootstrapDynamicComponent.CreateComponent<DeviceCopyComponent>(new Dictionary<string, object?>
         {
-             {nameof(DeviceCopyComponent.OnSave), async (Dictionary<Device,List<Variable>> devices) =>
+             {nameof(DeviceCopyComponent.OnSave), async (int CopyCount,  string CopyDeviceNamePrefix, int CopyDeviceNameSuffixNumber) =>
             {
-                await Task.Run(() =>GlobalData.DeviceRuntimeService.CopyAsync(devices,AutoRestartThread, default));
-                    await InvokeAsync(table.QueryAsync);
+                await Task.Run(() =>GlobalData.DeviceRuntimeService.CopyDeviceAsync(CopyCount,CopyDeviceNamePrefix,CopyDeviceNameSuffixNumber,deviceRuntime.Id,AutoRestartThread));
+               //await Notify();
+
             }},
-            {nameof(DeviceCopyComponent.Model),oneModel },
-            {nameof(DeviceCopyComponent.Variables),variables },
         });
 
         await DialogService.Show(op);
@@ -322,10 +314,10 @@ finally
 
         Func<IBrowserFile, Task<Dictionary<string, ImportPreviewOutputBase>>> preview = (a => GlobalData.DeviceRuntimeService.PreviewAsync(a));
         Func<Dictionary<string, ImportPreviewOutputBase>, Task> import = (value => GlobalData.DeviceRuntimeService.ImportDeviceAsync(value, AutoRestartThread));
-        op.Component = BootstrapDynamicComponent.CreateComponent<ImportExcel>(new Dictionary<string, object?>
+        op.Component = BootstrapDynamicComponent.CreateComponent<ImportExcelConfirm>(new Dictionary<string, object?>
         {
-             {nameof(ImportExcel.Import),import },
-            {nameof(ImportExcel.Preview),preview },
+             {nameof(ImportExcelConfirm.Import),import },
+            {nameof(ImportExcelConfirm.Preview),preview },
         });
         await DialogService.Show(op);
     }

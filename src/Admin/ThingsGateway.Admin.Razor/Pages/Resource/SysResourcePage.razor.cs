@@ -39,8 +39,8 @@ public partial class SysResourcePage
 
     protected override async Task OnParametersSetAsync()
     {
-        ModuleSelectedItems = ResourceUtil.BuildModuleSelectList((await SysResourceService.GetAllAsync())).ToList();
-        MenuItems = ResourceUtil.BuildMenuSelectList((await SysResourceService.GetAllAsync())).Concat(new List<SelectedItem>() { new("0", AdminLocalizer["Root"]) }).ToList();
+        ModuleSelectedItems = AdminResourceUtil.BuildModuleSelectList((await SysResourceService.GetAllAsync())).ToList();
+        MenuItems = AdminResourceUtil.BuildMenuSelectList((await SysResourceService.GetAllAsync())).Concat(new List<SelectedItem>() { new("0", AdminLocalizer["Root"]) }).ToList();
 
         await base.OnParametersSetAsync();
     }
@@ -49,7 +49,7 @@ public partial class SysResourcePage
 
     private async Task<QueryData<SysResource>> OnQueryAsync(QueryPageOptions options)
     {
-        MenuTreeItems = new List<TreeViewItem<SysResource>>() { new TreeViewItem<SysResource>(new SysResource()) { Text = AdminLocalizer["Root"] } }.Concat(ResourceUtil.BuildTreeItemList((await SysResourceService.GetAllAsync()).Where(a => a.Module == CustomerSearchModel.Module), new(), null)).ToList();
+        MenuTreeItems = new List<TreeViewItem<SysResource>>() { new TreeViewItem<SysResource>(new SysResource()) { Text = AdminLocalizer["Root"] } }.Concat(AdminResourceUtil.BuildTreeItemList((await SysResourceService.GetAllAsync()).Where(a => a.Module == CustomerSearchModel.Module), new(), null)).ToList();
 
         var data = await SysResourceService.PageAsync(options, CustomerSearchModel);
         return data;
@@ -136,14 +136,14 @@ public partial class SysResourcePage
     private async Task<IEnumerable<TableTreeNode<SysResource>>> OnTreeExpand(SysResource menu)
     {
         var sysResources = await SysResourceService.GetAllAsync();
-        var result = ResourceUtil.BuildTableTrees(sysResources, menu.Id);
+        var result = AdminResourceUtil.BuildTableTrees(sysResources, menu.Id);
         return result;
     }
 
     private static async Task<IEnumerable<TableTreeNode<SysResource>>> TreeNodeConverter(IEnumerable<SysResource> items)
     {
         await Task.CompletedTask;
-        var result = ResourceUtil.BuildTableTrees(items, 0);
+        var result = AdminResourceUtil.BuildTableTrees(items, 0);
         return result;
     }
 
