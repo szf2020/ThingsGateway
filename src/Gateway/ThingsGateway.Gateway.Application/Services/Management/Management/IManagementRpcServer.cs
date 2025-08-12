@@ -94,11 +94,11 @@ public interface IManagementRpcServer : IRpcServer
     Task RedundancyForcedSync();
 
     [DmtpRpc]
-    public Task<TouchSocket.Core.LogLevel> RedundancyLogLevelAsync();
+    Task<TouchSocket.Core.LogLevel> RedundancyLogLevelAsync();
     [DmtpRpc]
-    public Task SetRedundancyLogLevelAsync(TouchSocket.Core.LogLevel logLevel);
+    Task SetRedundancyLogLevelAsync(TouchSocket.Core.LogLevel logLevel);
     [DmtpRpc]
-    public Task<string> RedundancyLogPathAsync();
+    Task<string> RedundancyLogPathAsync();
 
     /// <summary>
     /// 修改冗余设置
@@ -133,7 +133,7 @@ public interface IManagementRpcServer : IRpcServer
     /// 分页显示插件
     /// </summary>
     [DmtpRpc]
-    public Task<QueryData<PluginInfo>> PluginPageAsync(QueryPageOptions options, PluginTypeEnum? pluginTypeEnum = null);
+    Task<QueryData<PluginInfo>> PluginPageAsync(QueryPageOptions options, PluginTypeEnum? pluginTypeEnum = null);
 
     /// <summary>
     /// 重载插件
@@ -212,4 +212,159 @@ public interface IManagementRpcServer : IRpcServer
     /// <param name="type">保存类型</param>
     [DmtpRpc]
     Task<bool> SaveRulesAsync(Rules input, ItemChangedType type);
+
+
+
+
+    [DmtpRpc]
+    Task<string> GetPluginNameAsync(long channelId);
+
+    [DmtpRpc]
+    Task RestartChannelAsync(long channelId);
+
+    [DmtpRpc]
+    Task<TouchSocket.Core.LogLevel> ChannelLogLevelAsync(long id);
+    [DmtpRpc]
+    Task SetChannelLogLevelAsync(long id, TouchSocket.Core.LogLevel logLevel);
+    [DmtpRpc]
+    Task CopyChannelAsync(int CopyCount, string CopyChannelNamePrefix, int CopyChannelNameSuffixNumber, string CopyDeviceNamePrefix, int CopyDeviceNameSuffixNumber, long channelId, bool AutoRestartThread);
+
+    [DmtpRpc]
+    Task<QueryData<ChannelRuntime>> OnChannelQueryAsync(QueryPageOptions options);
+    [DmtpRpc]
+    Task<List<Channel>> GetChannelListAsync(QueryPageOptions options, int max = 0);
+
+    [DmtpRpc]
+    Task<bool> SaveChannelAsync(Channel input, ItemChangedType type, bool restart);
+
+    [DmtpRpc]
+    Task<bool> BatchEditChannelAsync(List<Channel> models, Channel oldModel, Channel model, bool restart);
+
+    [DmtpRpc]
+    Task<bool> DeleteChannelAsync(List<long> ids, bool restart);
+
+    [DmtpRpc]
+    Task<bool> ClearChannelAsync(bool restart);
+    [DmtpRpc]
+    Task ImportChannelAsync(List<Channel> upData, List<Channel> insertData, bool restart);
+
+    [DmtpRpc]
+    Task<Dictionary<string, ImportPreviewOutputBase>> ImportChannelUSheetDatasAsync(USheetDatas input, bool restart);
+
+    [DmtpRpc]
+    Task<Dictionary<string, ImportPreviewOutputBase>> ImportChannelFileAsync(string filePath, bool restart);
+
+    [DmtpRpc]
+    Task<USheetDatas> ExportChannelAsync(List<Channel> channels);
+
+    [DmtpRpc]
+    Task<string> ExportChannelFileAsync(GatewayExportFilter exportFilter);
+
+
+    [DmtpRpc]
+    Task<QueryData<SelectedItem>> OnChannelSelectedItemQueryAsync(VirtualizeQueryOption option);
+
+
+    [DmtpRpc]
+    Task<string> GetChannelNameAsync(long channelId);
+
+
+
+
+
+    [DmtpRpc]
+    Task SetDeviceLogLevelAsync(long id, TouchSocket.Core.LogLevel logLevel);
+
+    [DmtpRpc]
+    Task CopyDeviceAsync(int CopyCount, string CopyDeviceNamePrefix, int CopyDeviceNameSuffixNumber, long deviceId, bool AutoRestartThread);
+    [DmtpRpc]
+    Task<TouchSocket.Core.LogLevel> DeviceLogLevelAsync(long id);
+    [DmtpRpc]
+    Task<bool> BatchEditDeviceAsync(List<Device> models, Device oldModel, Device model, bool restart);
+    [DmtpRpc]
+    Task<bool> SaveDeviceAsync(Device input, ItemChangedType type, bool restart);
+    [DmtpRpc]
+    Task<bool> DeleteDeviceAsync(List<long> ids, bool restart);
+    [DmtpRpc]
+    Task<Dictionary<string, ImportPreviewOutputBase>> ImportDeviceUSheetDatasAsync(USheetDatas input, bool restart);
+    [DmtpRpc]
+    Task<USheetDatas> ExportDeviceAsync(List<Device> devices);
+
+    [DmtpRpc]
+    Task<string> ExportDeviceFileAsync(GatewayExportFilter exportFilter);
+
+
+    [DmtpRpc]
+    Task<QueryData<SelectedItem>> OnRedundantDevicesQueryAsync(VirtualizeQueryOption option, long deviceId, long channelId);
+    [DmtpRpc]
+    Task<Dictionary<string, ImportPreviewOutputBase>> ImportDeviceFileAsync(string filePath, bool restart);
+    [DmtpRpc]
+    Task DeviceRedundantThreadAsync(long id);
+    [DmtpRpc]
+    Task RestartDeviceAsync(long id, bool deleteCache);
+    [DmtpRpc]
+    Task PauseThreadAsync(long id);
+    [DmtpRpc]
+    Task<QueryData<DeviceRuntime>> OnDeviceQueryAsync(QueryPageOptions options);
+    [DmtpRpc]
+    Task<List<Device>> GetDeviceListAsync(QueryPageOptions option, int v);
+    [DmtpRpc]
+    Task<bool> ClearDeviceAsync(bool restart);
+    [DmtpRpc]
+    Task<bool> IsRedundantDeviceAsync(long id);
+    [DmtpRpc]
+    Task<string> GetDeviceNameAsync(long redundantDeviceId);
+
+
+
+    [DmtpRpc]
+    Task<List<SelectedItem>> GetDeviceItemsAsync(bool isCollect);
+
+    [DmtpRpc]
+    Task<string> GetDevicePluginNameAsync(long id);
+
+    [DmtpRpc]
+    Task<bool> BatchEditVariableAsync(List<Variable> models, Variable oldModel, Variable model, bool restart);
+
+    [DmtpRpc]
+    Task<bool> DeleteVariableAsync(List<long> ids, bool restart);
+
+    [DmtpRpc]
+    Task<bool> ClearVariableAsync(bool restart);
+
+    [DmtpRpc]
+    Task InsertTestDataAsync(int testVariableCount, int testDeviceCount, string slaveUrl, bool businessEnable, bool restart);
+
+    [DmtpRpc]
+    Task<bool> BatchSaveVariableAsync(List<Variable> input, ItemChangedType type, bool restart);
+
+    [DmtpRpc]
+    Task<bool> SaveVariableAsync(Variable input, ItemChangedType type, bool restart);
+
+    [DmtpRpc]
+    Task CopyVariableAsync(List<Variable> Model, int CopyCount, string CopyVariableNamePrefix, int CopyVariableNameSuffixNumber, bool AutoRestartThread);
+
+    [DmtpRpc]
+    Task<QueryData<VariableRuntime>> OnVariableQueryAsync(QueryPageOptions options);
+    [DmtpRpc]
+    Task<string> ExportVariableFileAsync(GatewayExportFilter exportFilter);
+
+    [DmtpRpc]
+    Task<List<Variable>> GetVariableListAsync(QueryPageOptions option, int v);
+
+    [DmtpRpc]
+    Task<USheetDatas> ExportVariableAsync(List<Variable> models, string? sortName, SortOrder sortOrder);
+
+    [DmtpRpc]
+    Task<Dictionary<string, ImportPreviewOutputBase>> ImportVariableUSheetDatasAsync(USheetDatas data, bool restart);
+
+    [DmtpRpc]
+    Task<OperResult<object>> OnWriteVariableAsync(long id, string writeData);
+
+
+    [DmtpRpc]
+    Task<Dictionary<string, ImportPreviewOutputBase>> ImportVariableFileAsync(string filePath, bool restart);
+    [DmtpRpc]
+    Task<Dictionary<long, Tuple<string, string>>> GetDeviceIdNamesAsync();
+
 }

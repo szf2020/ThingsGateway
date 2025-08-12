@@ -38,20 +38,6 @@ public abstract class DriverBase : AsyncDisposableObject, IDriver
     #region 属性
 
     /// <summary>
-    /// 当前设备
-    /// </summary>
-    public DeviceRuntime? CurrentDevice { get; private set; }
-    /// <summary>
-    /// 当前设备Id
-    /// </summary>
-    public long DeviceId => CurrentDevice?.Id ?? 0;
-
-    /// <summary>
-    /// 当前设备名称
-    /// </summary>
-    public string? DeviceName => CurrentDevice?.Name;
-
-    /// <summary>
     /// 调试UI Type，如果不存在，返回null
     /// </summary>
     public virtual Type DriverDebugUIType { get; }
@@ -76,25 +62,8 @@ public abstract class DriverBase : AsyncDisposableObject, IDriver
     /// </summary>
     public abstract object DriverProperties { get; }
 
-    /// <summary>
-    /// 是否执行了Start方法
-    /// </summary>
-    public bool IsStarted { get; protected set; } = false;
 
-    /// <summary>
-    /// 是否初始化成功，失败时不再执行，等待检测重启
-    /// </summary>
-    public bool IsInitSuccess { get; internal set; } = true;
 
-    /// <summary>
-    /// 是否采集插件
-    /// </summary>
-    public virtual bool? IsCollectDevice => CurrentDevice?.IsCollect;
-
-    /// <summary>
-    /// 暂停
-    /// </summary>
-    public bool Pause => CurrentDevice?.Pause == true;
 
     private List<IEditorItem> pluginPropertyEditorItems;
     public List<IEditorItem> PluginPropertyEditorItems
@@ -112,6 +81,82 @@ public abstract class DriverBase : AsyncDisposableObject, IDriver
     private IStringLocalizer Localizer { get; }
 
     #endregion 属性
+
+
+    public virtual bool GetAuthentication(out DateTime? expireTime)
+    {
+        expireTime = null;
+        return true;
+    }
+
+    public string GetAuthString()
+    {
+        if (PluginServiceUtil.IsEducation(GetType()))
+        {
+            StringBuilder stringBuilder = new();
+            var ret = GetAuthentication(out var expireTime);
+            if (ret)
+            {
+                stringBuilder.Append(Localizer["Authorized"]);
+            }
+            else
+            {
+                stringBuilder.Append(Localizer["Unauthorized"]);
+            }
+
+            stringBuilder.Append("   ");
+            if (expireTime.HasValue && (DateTime.Now - expireTime.Value).TotalHours > -72)
+            {
+                stringBuilder.Append(',');
+                stringBuilder.Append(Localizer["ExpireTime", expireTime.Value.ToString("yyyy-MM-dd HH")]);
+            }
+
+            return stringBuilder.ToString();
+        }
+        return string.Empty;
+    }
+
+
+
+#if !Management
+
+
+    /// <summary>
+    /// 是否执行了Start方法
+    /// </summary>
+    public bool IsStarted { get; protected set; } = false;
+
+    /// <summary>
+    /// 是否初始化成功，失败时不再执行，等待检测重启
+    /// </summary>
+    public bool IsInitSuccess { get; internal set; } = true;
+
+    /// <summary>
+    /// 是否采集插件
+    /// </summary>
+    public virtual bool? IsCollectDevice => CurrentDevice?.IsCollect;
+
+    /// <summary>
+    /// 当前设备
+    /// </summary>
+    public DeviceRuntime? CurrentDevice { get; private set; }
+    /// <summary>
+    /// 当前设备Id
+    /// </summary>
+    public long DeviceId => CurrentDevice?.Id ?? 0;
+
+    /// <summary>
+    /// 当前设备名称
+    /// </summary>
+    public string? DeviceName => CurrentDevice?.Name;
+
+
+
+    /// <summary>
+    /// 暂停
+    /// </summary>
+    public bool Pause => CurrentDevice?.Pause == true;
+
     protected object pauseLock = new object();
     /// <summary>
     /// 暂停
@@ -378,38 +423,6 @@ public abstract class DriverBase : AsyncDisposableObject, IDriver
 
     #region 插件重写
 
-    public virtual bool GetAuthentication(out DateTime? expireTime)
-    {
-        expireTime = null;
-        return true;
-    }
-
-    public string GetAuthString()
-    {
-        if (PluginServiceUtil.IsEducation(GetType()))
-        {
-            StringBuilder stringBuilder = new();
-            var ret = GetAuthentication(out var expireTime);
-            if (ret)
-            {
-                stringBuilder.Append(Localizer["Authorized"]);
-            }
-            else
-            {
-                stringBuilder.Append(Localizer["Unauthorized"]);
-            }
-
-            stringBuilder.Append("   ");
-            if (expireTime.HasValue && (DateTime.Now - expireTime.Value).TotalHours > -72)
-            {
-                stringBuilder.Append(',');
-                stringBuilder.Append(Localizer["ExpireTime", expireTime.Value.ToString("yyyy-MM-dd HH")]);
-            }
-
-            return stringBuilder.ToString();
-        }
-        return string.Empty;
-    }
 
     /// <summary>
     /// 开始通讯执行的方法
@@ -456,4 +469,7 @@ public abstract class DriverBase : AsyncDisposableObject, IDriver
     public abstract Task AfterVariablesChangedAsync(CancellationToken cancellationToken);
 
     #endregion 插件重写
+
+
+#endif
 }

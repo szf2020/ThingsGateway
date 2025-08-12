@@ -14,6 +14,7 @@ using ThingsGateway.Common;
 using ThingsGateway.DB;
 using ThingsGateway.Foundation;
 using ThingsGateway.NewLife;
+using ThingsGateway.NewLife.Extension;
 using ThingsGateway.SqlSugar;
 
 namespace ThingsGateway.Plugin.SqlHistoryAlarm;
@@ -21,11 +22,31 @@ namespace ThingsGateway.Plugin.SqlHistoryAlarm;
 /// <summary>
 /// SqlHistoryAlarm
 /// </summary>
-public partial class SqlHistoryAlarm : BusinessBaseWithCacheAlarm, IDBHistoryAlarmService
+public partial class SqlHistoryAlarm : BusinessBaseWithCacheAlarm
+#if !Management
+    , IDBHistoryAlarmService
+#endif
 {
     internal readonly SqlHistoryAlarmProperty _driverPropertys = new();
     private readonly SqlHistoryAlarmVariableProperty _variablePropertys = new();
-    public override Type DriverUIType => typeof(HistoryAlarmPage);
+
+    /// <inheritdoc/>
+    public override Type DriverUIType
+    {
+        get
+        {
+#if !Management
+            if (_driverPropertys.BigTextScriptHistoryTable.IsNullOrEmpty())
+                return typeof(HistoryAlarmPage);
+            else
+                return null;
+#else
+            return null;
+#endif
+
+        }
+    }
+
 
     /// <inheritdoc/>
     public override VariablePropertyBase VariablePropertys => _variablePropertys;
@@ -34,6 +55,15 @@ public partial class SqlHistoryAlarm : BusinessBaseWithCacheAlarm, IDBHistoryAla
 
     private SqlSugarClient _db;
 
+
+
+    protected override Task DisposeAsync(bool disposing)
+    {
+        _db?.TryDispose();
+        return base.DisposeAsync(disposing);
+    }
+
+#if !Management
     protected override async Task InitChannelAsync(IChannel? channel, CancellationToken cancellationToken)
     {
         _db = BusinessDatabaseUtil.GetDb((DbType)_driverPropertys.DbType, _driverPropertys.BigTextConnectStr);
@@ -46,13 +76,6 @@ public partial class SqlHistoryAlarm : BusinessBaseWithCacheAlarm, IDBHistoryAla
     /// </summary>
     /// <returns></returns>
     public override bool IsConnected() => success;
-
-    protected override Task DisposeAsync(bool disposing)
-    {
-        _db?.TryDispose();
-        return base.DisposeAsync(disposing);
-    }
-
     protected override Task ProtectedStartAsync(CancellationToken cancellationToken)
     {
         _db.DbMaintenance.CreateDatabase();
@@ -136,4 +159,6 @@ public partial class SqlHistoryAlarm : BusinessBaseWithCacheAlarm, IDBHistoryAla
     }
 
     #endregion 数据查询
+
+#endif
 }

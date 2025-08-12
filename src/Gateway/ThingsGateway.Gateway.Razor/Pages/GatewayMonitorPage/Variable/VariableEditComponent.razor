@@ -77,7 +77,7 @@
                     <EditTemplate Context="value">
                         <div class="col-12  col-md-6 ">
                             <BootstrapInputGroup>
-                                <Select IsVirtualize @bind-Value="@value.DeviceId" DefaultVirtualizeItemText=@(GlobalData.ReadOnlyIdDevices.TryGetValue(value.DeviceId, out var deviceRuntime) ? deviceRuntime.Name : string.Empty) IsDisabled=BatchEditEnable Items="@CollectDeviceItems" OnSelectedItemChanged=OnDeviceChanged ShowSearch="true" ShowLabel="true" />
+                                <Select IsVirtualize @bind-Value="@value.DeviceId" DefaultVirtualizeItemText=@DeviceName  IsDisabled=BatchEditEnable Items="@CollectDeviceItems" OnSelectedItemChanged=OnDeviceChanged ShowSearch="true" ShowLabel="true" />
                                 <Button class="text-end" Icon="fa-solid fa-plus" OnClick="AddDevice" IsDisabled=BatchEditEnable></Button>
                             </BootstrapInputGroup>
                         </div>
@@ -99,14 +99,7 @@
                     <EditTemplate Context="value">
                         <div class="col-12">
                             <BootstrapInputGroup>
-                                @if(GlobalData.ReadOnlyIdDevices.TryGetValue(value.DeviceId,out var device)&&device.Driver is CollectBase collectBase)
-                                                                {
-                                <Textarea rows="1" title=@collectBase.GetAddressDescription() @bind-Value="value.RegisterAddress" ShowLabel="true"></Textarea>
-                                                                }
-                                                                else
-                                {
-                                    <Textarea rows="1" @bind-Value="value.RegisterAddress" ShowLabel="true"></Textarea>
-                                }
+                                <Textarea rows="1" title=@AddressDesc @bind-Value="value.RegisterAddress" ShowLabel="true"></Textarea>
                                 <Button IsDisabled=@(AddressUIType == null) Icon="fa-solid fa-bars" OnClick="ShowAddressUI"></Button>
                             </BootstrapInputGroup>
                         </div>
@@ -205,7 +198,7 @@
                 <div class="row g-2 mx-1 form-inline">
 
                     <div class="col-12 col-md-8">
-                        <Select SkipValidate IsVirtualize DefaultVirtualizeItemText=@(GlobalData.ReadOnlyIdDevices.TryGetValue(ChoiceBusinessDeviceId, out var deviceRuntime) ? deviceRuntime.Name : string.Empty) @bind-Value="@ChoiceBusinessDeviceId" Items="@BusinessDeviceItems" ShowSearch="true" ShowLabel="true" />
+                    <Select SkipValidate IsVirtualize DefaultVirtualizeItemText=@(ChoiceBusinessDeviceName) @bind-Value="@ChoiceBusinessDeviceId" Items="@BusinessDeviceItems" ShowSearch="true" ShowLabel="true" />
                     </div>
                     <div class="col-12 col-md-4">
                         <Button OnClick="async() =>{
@@ -234,7 +227,7 @@
 
                     if (!custom)
                     {
-                        var has = VariablePropertyEditors.TryGetValue(item.Key, out var items);
+                        var has = VariablePropertyEditors.TryGetValue(item.Key, out var editorItems);
                         if (has)
                         {
 
@@ -242,10 +235,10 @@
                             <Card IsShadow=true class="m-2 flex-fill" Color="Color.Primary">
                                 <HeaderTemplate>
                                     @{
-                                        GlobalData.ReadOnlyIdDevices.TryGetValue(item.Key, out var items);
+                                        DeviceIdNames.TryGetValue(item.Key, out var items);
                                     }
                                     <div class="flex-fill">
-                                        @($"{items.Name} - {PluginInfoUtil.GetFileNameAndTypeName(items?.PluginName).TypeName}")
+                                        @($"{items.Item1} - {PluginInfoUtil.GetFileNameAndTypeName(items?.Item2).TypeName}")
                                     </div>
 
                                     <Button OnClick=@((a)=>
@@ -261,7 +254,7 @@
                                                                               @key=@($"VariableEditValidateForm{item.Key}{Model.Id}{item.Value.Value.GetType().TypeHandle.Value}")
                                                                               Id=@($"VariableEditValidateForm{item.Key}{Model.Id}{item.Value.Value.GetType().TypeHandle.Value}")>
 
-                                                                    <EditorFormObject class="p-2" Items=items AutoGenerateAllItem="false" RowType=RowType.Inline ItemsPerRow=2 ShowLabelTooltip=true LabelWidth=150 Model="item.Value.Value" @key=@($"VariableEditEditorFormObject{item.Key}{Model.Id}{item.Value.Value.GetType().TypeHandle.Value}")>
+                                                                    <EditorFormObject class="p-2" Items=editorItems AutoGenerateAllItem="false" RowType=RowType.Inline ItemsPerRow=2 ShowLabelTooltip=true LabelWidth=150 Model="item.Value.Value" @key=@($"VariableEditEditorFormObject{item.Key}{Model.Id}{item.Value.Value.GetType().TypeHandle.Value}")>
 
                                                                     </EditorFormObject>
                                                                 </ValidateForm>

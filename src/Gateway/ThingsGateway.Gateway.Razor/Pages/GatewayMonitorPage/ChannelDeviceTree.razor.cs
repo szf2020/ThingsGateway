@@ -241,7 +241,7 @@ public partial class ChannelDeviceTree : IDisposable
              {nameof(ChannelEditComponent.OnValidSubmit), async () =>
             {
                 Spinner.SetRun(true);
-                await Task.Run(() => GlobalData.ChannelRuntimeService.BatchEditChannelAsync(changedModels, oldModel, oneModel,AutoRestartThread));
+                await Task.Run(() => GlobalData.ChannelRuntimeService.BatchEditChannelAsync(changedModels.ToList(), oldModel, oneModel,AutoRestartThread));
 
               //await Notify();
                 await InvokeAsync(() => Spinner.SetRun(false));
@@ -397,7 +397,7 @@ finally
             {
                 Spinner.SetRun(true);
 
-                await Task.Run(() => GlobalData.ChannelRuntimeService.DeleteChannelAsync(modelIds.Select(a => a.Id), AutoRestartThread, default));
+                await Task.Run(() => GlobalData.ChannelRuntimeService.DeleteChannelAsync(modelIds.Select(a => a.Id).ToList(), AutoRestartThread));
                 //await Notify();
                 await InvokeAsync(() => Spinner.SetRun(false));
             }
@@ -433,7 +433,7 @@ finally
                 Spinner.SetRun(true);
 
                 var key = await GlobalData.GetCurrentUserChannels().ConfigureAwait(false);
-                await Task.Run(() => GlobalData.ChannelRuntimeService.DeleteChannelAsync(key.Select(a => a.Id), AutoRestartThread, default));
+                await Task.Run(() => GlobalData.ChannelRuntimeService.DeleteChannelAsync(key.Select(a => a.Id).ToList(), AutoRestartThread));
                 //await Notify();
                 await InvokeAsync(() => Spinner.SetRun(false));
             }
@@ -718,7 +718,7 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
              {nameof(DeviceEditComponent.OnValidSubmit), async () =>
             {
                     await InvokeAsync( () => Spinner.SetRun(true));
-                await Task.Run(() =>GlobalData.DeviceRuntimeService.BatchEditAsync(changedModels,oldModel,oneModel,AutoRestartThread));
+                await Task.Run(() =>GlobalData.DeviceRuntimeService.BatchEditDeviceAsync(changedModels.ToList(),oldModel,oneModel,AutoRestartThread));
                 //await Notify();
                          await InvokeAsync(() => Spinner.SetRun(false));
             }},
@@ -876,7 +876,7 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
             {
                 Spinner.SetRun(true);
 
-                await Task.Run(() => GlobalData.DeviceRuntimeService.DeleteDeviceAsync(modelIds.Select(a => a.Id), AutoRestartThread, default));
+                await Task.Run(() => GlobalData.DeviceRuntimeService.DeleteDeviceAsync(modelIds.Select(a => a.Id).ToList(), AutoRestartThread));
                 //await Notify();
                 await InvokeAsync(() => Spinner.SetRun(false));
             }
@@ -914,7 +914,7 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
 
                 var data = await GlobalData.GetCurrentUserDevices().ConfigureAwait(false);
 
-                await Task.Run(() => GlobalData.DeviceRuntimeService.DeleteDeviceAsync(data.Select(a => a.Id), AutoRestartThread, default));
+                await Task.Run(() => GlobalData.DeviceRuntimeService.DeleteDeviceAsync(data.Select(a => a.Id).ToList(), AutoRestartThread));
                 //await Notify();
                 await InvokeAsync(() => Spinner.SetRun(false));
             }

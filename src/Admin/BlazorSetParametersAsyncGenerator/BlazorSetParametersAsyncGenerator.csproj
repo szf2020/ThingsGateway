@@ -11,6 +11,7 @@
 		<IncludeBuildOutput>false</IncludeBuildOutput>
 		<!-- 避免 DLL 被打包到 lib/ -->
 		<EnableSourceGenerator>true</EnableSourceGenerator>
+		
 		<!-- 可选 -->
 
 		

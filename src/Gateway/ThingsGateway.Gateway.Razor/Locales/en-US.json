@@ -1,4 +1,7 @@
 ﻿{
+  "ThingsGateway.Management.Razor.GatewayUpdateZipFilePage": {
+    "Upgrade": "Upgrade"
+  },
   "ThingsGateway.Management.Razor.ManagementTree": {
     "AddManagementConfig": "Add",
     "ExcelManagementConfig": "Excel",
@@ -20,8 +23,11 @@
     "SystemConfigPage": "SystemConfig",
     "PluginPage": "Plugin",
     "RealAlarmPage": "RealAlarm",
-    "RulesPage": "Rules"
-
+    "RulesPage": "Rules",
+    "ChannelTable": "Channel",
+    "DeviceTable": "Device",
+    "VariableRuntimeInfo": "Variable",
+    "GatewayUpdateZipFilePage": "Version"
   },
   "ThingsGateway.Management.Razor.SaveUpdateZipFile": {
     "DownTemplate": "Download Template",

@@ -30,7 +30,7 @@ public class BlazorAppContext
     /// <summary>
     /// 全部菜单
     /// </summary>
-    public IEnumerable<SysResource> AllMenus { get; private set; }
+    public List<SysResource> AllMenus { get; private set; }
 
     /// <summary>
     /// 当前用户
@@ -42,22 +42,22 @@ public class BlazorAppContext
     /// <summary>
     /// 用户个人菜单
     /// </summary>
-    public IEnumerable<MenuItem> OwnMenuItems { get; private set; }
+    public List<MenuItem> OwnMenuItems { get; private set; }
 
     /// <summary>
     /// 不同模块的菜单
     /// </summary>
-    public IEnumerable<MenuItem> AllOwnMenuItems { get; private set; }
+    public List<MenuItem> AllOwnMenuItems { get; private set; }
 
     /// <summary>
     /// 用户个人菜单，多个模块
     /// </summary>
-    public IEnumerable<SysResource> OwnMenus { get; private set; }
+    public List<SysResource> OwnMenus { get; private set; }
 
     /// <summary>
     /// 用户个人菜单，非树形
     /// </summary>
-    public IEnumerable<MenuItem> OwnSameLevelMenuItems { get; private set; }
+    public List<MenuItem> OwnSameLevelMenuItems { get; private set; }
 
     /// <summary>
     /// 个人工作台
@@ -67,9 +67,9 @@ public class BlazorAppContext
     /// <summary>
     /// 用户个人快捷方式菜单
     /// </summary>
-    public IEnumerable<SysResource> UserWorkbenchOutputs { get; private set; }
+    public List<SysResource> UserWorkbenchOutputs { get; private set; }
 
-    public IEnumerable<SysResource> AllResource { get; private set; }
+    public List<SysResource> AllResource { get; private set; }
 
     private ISysResourceService ResourceService { get; }
     private ISysUserService SysUserService { get; }
@@ -93,7 +93,7 @@ public class BlazorAppContext
             AllResource = sysResources;
             var ids = CurrentUser.ModuleList.Select(a => a.Id).ToHashSet();
             CurrentUser.ModuleList = AllResource.Where(a => ids.Contains(a.Id)).OrderBy(a => a.SortCode).ToList();
-            AllMenus = AllResource.Where(a => a.Category == ResourceCategoryEnum.Menu);
+            AllMenus = AllResource.Where(a => a.Category == ResourceCategoryEnum.Menu).ToList();
 
             if (moduleId == null)
             {
@@ -132,8 +132,8 @@ public class BlazorAppContext
                 Icon = item.Icon,
                 Url = item.Href,
                 Target = item.Target.ToString(),
-            });
-            UserWorkbenchOutputs = AllMenus.Where(it => UserWorkBench.Shortcuts.Contains(it.Id));
+            }).ToList();
+            UserWorkbenchOutputs = AllMenus.Where(it => UserWorkBench.Shortcuts.Contains(it.Id)).ToList();
         }
     }
 

@@ -10,10 +10,11 @@
 
 using MQTTnet;
 
-using Org.BouncyCastle.Crypto;
-using Org.BouncyCastle.OpenSsl;
-using Org.BouncyCastle.Security;
 
+
+#if !Management
+
+#endif
 using System.Security.Cryptography.X509Certificates;
 
 using ThingsGateway.Extension;
@@ -35,6 +36,26 @@ public partial class MqttClient : BusinessBaseWithCacheIntervalScriptAll
 
     public override Type DriverPropertyUIType => typeof(MqttPropertyRazor);
 
+    /// <inheritdoc/>
+    public override string ToString()
+    {
+        return $" {nameof(MqttClient)} IP:{_driverPropertys.IP} Port:{_driverPropertys.Port}";
+    }
+
+    /// <inheritdoc/>
+    protected override async Task DisposeAsync(bool disposing)
+    {
+        await base.DisposeAsync(disposing).ConfigureAwait(false);
+
+        if (_mqttClient != null)
+        {
+            await _mqttClient.DisconnectAsync().ConfigureAwait(false);
+            _mqttClient.SafeDispose();
+        }
+        _mqttClient = null;
+
+    }
+#if !Management
     /// <summary>
     /// 加载 PEM 证书和私钥
     /// </summary>
@@ -43,15 +64,15 @@ public partial class MqttClient : BusinessBaseWithCacheIntervalScriptAll
         var cert = new X509Certificate2(certPath);
 
         using var reader = new StreamReader(keyPath);
-        var pemReader = new PemReader(reader);
-        var keyPair = pemReader.ReadObject() as AsymmetricCipherKeyPair;
+        var pemReader = new Org.BouncyCastle.OpenSsl.PemReader(reader);
+        var keyPair = pemReader.ReadObject() as Org.BouncyCastle.Crypto.AsymmetricCipherKeyPair;
 
         if (keyPair == null)
         {
             throw new Exception("Invalid private key.");
         }
 
-        var rsaPrivateKey = DotNetUtilities.ToRSA(keyPair.Private as Org.BouncyCastle.Crypto.Parameters.RsaPrivateCrtKeyParameters);
+        var rsaPrivateKey = Org.BouncyCastle.Security.DotNetUtilities.ToRSA(keyPair.Private as Org.BouncyCastle.Crypto.Parameters.RsaPrivateCrtKeyParameters);
         var certWithKey = cert.CopyWithPrivateKey(rsaPrivateKey);
 
         return certWithKey;
@@ -143,25 +164,7 @@ public partial class MqttClient : BusinessBaseWithCacheIntervalScriptAll
     /// <inheritdoc/>
     public override bool IsConnected() => _mqttClient?.IsConnected == true;
 
-    /// <inheritdoc/>
-    public override string ToString()
-    {
-        return $" {nameof(MqttClient)} IP:{_driverPropertys.IP} Port:{_driverPropertys.Port}";
-    }
 
-    /// <inheritdoc/>
-    protected override async Task DisposeAsync(bool disposing)
-    {
-        await base.DisposeAsync(disposing).ConfigureAwait(false);
-
-        if (_mqttClient != null)
-        {
-            await _mqttClient.DisconnectAsync().ConfigureAwait(false);
-            _mqttClient.SafeDispose();
-        }
-        _mqttClient = null;
-
-    }
 
     protected override async Task ProtectedStartAsync(CancellationToken cancellationToken)
     {
@@ -204,4 +207,7 @@ public partial class MqttClient : BusinessBaseWithCacheIntervalScriptAll
 
         await Update(cancellationToken).ConfigureAwait(false);
     }
+
+
+#endif
 }

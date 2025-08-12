@@ -26,7 +26,10 @@ namespace ThingsGateway.Plugin.SqlDB;
 /// <summary>
 /// SqlDBProducer
 /// </summary>
-public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariable, IDBHistoryValueService
+public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariable
+#if !Management
+    , IDBHistoryValueService
+#endif
 {
 
 
@@ -40,10 +43,14 @@ public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariable, IDBH
     {
         get
         {
+#if !Management
             if (_driverPropertys.BigTextScriptHistoryTable.IsNullOrEmpty() && _driverPropertys.BigTextScriptRealTable.IsNullOrEmpty())
                 return typeof(SqlDBPage);
             else
                 return null;
+#else
+            return null;
+#endif
         }
     }
 
@@ -56,6 +63,15 @@ public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariable, IDBH
         _db?.TryDispose();
         return base.DisposeAsync(disposing);
     }
+
+    /// <inheritdoc/>
+    public override string ToString()
+    {
+        return $" {nameof(SqlDBProducer)}";
+    }
+
+#if !Management
+
     public async Task<SqlSugarPagedList<IDBHistoryValue>> GetDBHistoryValuePagesAsync(DBHistoryValuePageInput input)
     {
         var data = await Query(input).ToPagedListAsync<SQLNumberHistoryValue, IDBHistoryValue>(input.Current, input.Size).ConfigureAwait(false);//分页
@@ -71,11 +87,7 @@ public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariable, IDBH
     /// <inheritdoc/>
     public override bool IsConnected() => success;
 
-    /// <inheritdoc/>
-    public override string ToString()
-    {
-        return $" {nameof(SqlDBProducer)}";
-    }
+
 
     protected override async Task InitChannelAsync(IChannel? channel, CancellationToken cancellationToken)
     {
@@ -271,4 +283,6 @@ public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariable, IDBH
         }
         return ret;
     }
+
+#endif
 }

@@ -16,7 +16,9 @@ using System.Collections.Concurrent;
 
 using ThingsGateway.Common.Extension;
 using ThingsGateway.Extension.Generic;
+#if !Management
 using ThingsGateway.Gateway.Application.Extensions;
+#endif
 using ThingsGateway.NewLife.Json.Extension;
 using ThingsGateway.NewLife.Threading;
 
@@ -29,19 +31,30 @@ namespace ThingsGateway.Gateway.Application;
 /// 采集插件，继承实现不同PLC通讯
 /// <para></para>
 /// </summary>
-public abstract partial class CollectBase : DriverBase, IRpcDriver
+public abstract partial class CollectBase : DriverBase
+#if !Management
+    , IRpcDriver
+#endif
 {
     /// <summary>
     /// 插件配置项
     /// </summary>
     public abstract CollectPropertyBase CollectProperties { get; }
 
+
+    public sealed override object DriverProperties => CollectProperties;
+
+    public virtual string GetAddressDescription()
+    {
+        return string.Empty;
+    }
+
+#if !Management
+
     /// <summary>
     /// 特殊方法
     /// </summary>
     public List<DriverMethodInfo>? DriverMethodInfos { get; private set; }
-
-    public sealed override object DriverProperties => CollectProperties;
 
     public override async Task AfterVariablesChangedAsync(CancellationToken cancellationToken)
     {
@@ -198,10 +211,7 @@ public abstract partial class CollectBase : DriverBase, IRpcDriver
         ReadWriteLock = new(CollectProperties.DutyCycle, CollectProperties.WritePriority);
     }
 
-    public virtual string GetAddressDescription()
-    {
-        return string.Empty;
-    }
+
     protected virtual bool VariableSourceReadsEnable => true;
 
     protected List<IScheduledTask> VariableTasks = new List<IScheduledTask>();
@@ -468,6 +478,7 @@ public abstract partial class CollectBase : DriverBase, IRpcDriver
         }
     }
 
+
     /// <summary>
     /// 连读打包，返回实际通讯包信息<see cref="VariableSourceRead"/>
     /// <br></br>每个驱动打包方法不一样，所以需要实现这个接口
@@ -730,4 +741,6 @@ public abstract partial class CollectBase : DriverBase, IRpcDriver
             await ReadWriteLock.SafeDisposeAsync().ConfigureAwait(false);
         await base.DisposeAsync(disposing).ConfigureAwait(false);
     }
+
+#endif
 }

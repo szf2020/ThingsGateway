@@ -265,7 +265,7 @@ public partial class OpcUaImportVariable
             }
             await App.RootServices.GetRequiredService<IChannelRuntimeService>().SaveChannelAsync(data.Item1, ItemChangedType.Add, true);
             await App.RootServices.GetRequiredService<IDeviceRuntimeService>().SaveDeviceAsync(data.Item2, ItemChangedType.Add, true);
-            await App.RootServices.GetRequiredService<IVariableRuntimeService>().BatchSaveVariableAsync(data.Item3.ToList(), ItemChangedType.Add, true, default);
+            await App.RootServices.GetRequiredService<IVariableRuntimeService>().BatchSaveVariableAsync(data.Item3.ToList(), ItemChangedType.Add, true);
             await ToastService.Default();
         }
         catch (Exception ex)

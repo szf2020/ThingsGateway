@@ -20,6 +20,12 @@ namespace ThingsGateway.Gateway.Application;
 /// </summary>
 public abstract class BusinessBaseWithCache : BusinessBase
 {
+
+    protected sealed override BusinessPropertyBase _businessPropertyBase => _businessPropertyWithCache;
+
+    protected abstract BusinessPropertyWithCache _businessPropertyWithCache { get; }
+
+#if !Management
     #region 条件
 
     protected abstract bool AlarmModelEnable { get; }
@@ -537,9 +543,7 @@ public abstract class BusinessBaseWithCache : BusinessBase
     private CacheDB DBCacheVar;
     private CacheDB DBCacheVars;
 
-    protected sealed override BusinessPropertyBase _businessPropertyBase => _businessPropertyWithCache;
 
-    protected abstract BusinessPropertyWithCache _businessPropertyWithCache { get; }
 
     protected object cacheLock = new();
 
@@ -976,4 +980,6 @@ public abstract class BusinessBaseWithCache : BusinessBase
     }
 
     #endregion
+
+#endif
 }

@@ -24,7 +24,10 @@ namespace ThingsGateway.Plugin.QuestDB;
 /// <summary>
 /// QuestDBProducer
 /// </summary>
-public partial class QuestDBProducer : BusinessBaseWithCacheIntervalVariable, IDBHistoryValueService
+public partial class QuestDBProducer : BusinessBaseWithCacheIntervalVariable
+#if !Management
+    , IDBHistoryValueService
+#endif
 {
     internal readonly QuestDBProducerProperty _driverPropertys = new();
     private readonly QuestDBProducerVariableProperty _variablePropertys = new();
@@ -37,10 +40,14 @@ public partial class QuestDBProducer : BusinessBaseWithCacheIntervalVariable, ID
     {
         get
         {
+#if !Management
             if (_driverPropertys.BigTextScriptHistoryTable.IsNullOrEmpty())
                 return typeof(QuestDBPage);
             else
                 return null;
+#else
+                return null;
+#endif
         }
     }
     public override VariablePropertyBase VariablePropertys => _variablePropertys;
@@ -54,6 +61,13 @@ public partial class QuestDBProducer : BusinessBaseWithCacheIntervalVariable, ID
         _db?.TryDispose();
         return base.DisposeAsync(disposing);
     }
+    /// <inheritdoc/>
+    public override string ToString()
+    {
+        return $" {nameof(QuestDBProducer)}";
+    }
+
+#if !Management
 
     protected override async Task InitChannelAsync(IChannel? channel, CancellationToken cancellationToken)
     {
@@ -65,11 +79,7 @@ public partial class QuestDBProducer : BusinessBaseWithCacheIntervalVariable, ID
     /// <inheritdoc/>
     public override bool IsConnected() => success;
 
-    /// <inheritdoc/>
-    public override string ToString()
-    {
-        return $" {nameof(QuestDBProducer)}";
-    }
+
 
     protected override async Task ProtectedStartAsync(CancellationToken cancellationToken)
     {
@@ -162,4 +172,6 @@ public partial class QuestDBProducer : BusinessBaseWithCacheIntervalVariable, ID
         }
         return ret;
     }
+
+#endif
 }

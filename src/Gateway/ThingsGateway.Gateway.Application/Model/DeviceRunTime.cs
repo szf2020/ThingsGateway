@@ -39,6 +39,20 @@ public class DeviceRuntime : Device
     /// </summary>
     public DateTime ActiveTime { get; set; } = DateTime.UnixEpoch.ToLocalTime();
 
+
+
+    /// <summary>
+    /// 是否采集
+    /// </summary>
+    [AutoGenerateColumn(Ignore = true)]
+    public bool? IsCollect => PluginType == null ? null : PluginType == PluginTypeEnum.Collect;
+
+
+    [AutoGenerateColumn(Ignore = true)]
+    public string LogPath => Name.GetDeviceLogPath();
+
+#if !Management
+
     /// <summary>
     /// 插件名称
     /// </summary>
@@ -50,12 +64,11 @@ public class DeviceRuntime : Device
     [AutoGenerateColumn(Ignore = true)]
     public virtual PluginTypeEnum? PluginType => ChannelRuntime?.PluginInfo?.PluginType;
 
-    /// <summary>
-    /// 是否采集
-    /// </summary>
-    [AutoGenerateColumn(Ignore = true)]
-    public bool? IsCollect => PluginType == null ? null : PluginType == PluginTypeEnum.Collect;
 
+    /// <summary>
+    /// 通道名称
+    /// </summary>
+    public string? ChannelName => ChannelRuntime?.Name;
     /// <summary>
     /// 通道
     /// </summary>
@@ -65,15 +78,9 @@ public class DeviceRuntime : Device
     [AutoGenerateColumn(Ignore = true)]
     public ChannelRuntime? ChannelRuntime { get; set; }
 
-    /// <summary>
-    /// 通道名称
-    /// </summary>
-    public string? ChannelName => ChannelRuntime?.Name;
+
     [AutoGenerateColumn(Ignore = true)]
-    public string LogPath => Name.GetDeviceLogPath();
-
-
-#if !Management
+    public bool Started => Driver?.DeviceThreadManage != null;
 
     [System.Text.Json.Serialization.JsonIgnore]
     [Newtonsoft.Json.JsonIgnore]
@@ -120,6 +127,27 @@ public class DeviceRuntime : Device
 
 #else
 
+
+
+    /// <summary>
+    /// 插件名称
+    /// </summary>
+    public virtual string PluginName { get; set; }
+
+    /// <summary>
+    /// 插件名称
+    /// </summary>
+    [AutoGenerateColumn(Ignore = true)]
+    public virtual PluginTypeEnum? PluginType { get; set; }
+
+
+    /// <summary>
+    /// 通道名称
+    /// </summary>
+    public string? ChannelName { get; set; }
+
+    [AutoGenerateColumn(Ignore = true)]
+    public bool Started { get; set; }
 
 
     /// <summary>
@@ -175,8 +203,13 @@ public class DeviceRuntime : Device
         }
         set
         {
+#if !Management
             if (!value.IsNullOrWhiteSpace())
                 _lastErrorMessage = TimerX.Now.ToDefaultDateTimeFormat() + " - " + value;
+#else
+            if (!value.IsNullOrWhiteSpace())
+                _lastErrorMessage = value;
+#endif
         }
     }
 

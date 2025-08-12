@@ -31,6 +31,6 @@ public partial class ConverterConfigComponent : ComponentBase
     protected override void OnInitialized()
     {
         BoolItems = LocalizerUtil.GetBoolItems(Model.GetType(), nameof(Model.VariableStringLength), true);
-        EncodingItems = new List<SelectedItem>() { new SelectedItem("", "none") }.Concat(Encoding.GetEncodings().Select(a => new SelectedItem(a.CodePage.ToString(), a.DisplayName))).ToList();
+        EncodingItems = Encoding.GetEncodings().Select(a => new SelectedItem(a.CodePage.ToString(), a.DisplayName)).ToList();
     }
 }

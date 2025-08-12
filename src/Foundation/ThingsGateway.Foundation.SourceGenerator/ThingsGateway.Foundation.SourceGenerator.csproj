@@ -5,6 +5,7 @@
 		<EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
 		<NoPackageAnalysis>true</NoPackageAnalysis>
 		<SignAssembly>false</SignAssembly>
+		
 	</PropertyGroup>
 
 	<ItemGroup>

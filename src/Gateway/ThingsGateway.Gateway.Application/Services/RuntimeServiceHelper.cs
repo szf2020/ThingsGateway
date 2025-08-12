@@ -257,7 +257,7 @@ internal static class RuntimeServiceHelper
         }
     }
 
-    public static async Task ChangedDriverAsync(ILogger logger, CancellationToken cancellationToken)
+    public static async Task ChangedDriverAsync(ILogger logger)
     {
         var channelDevice = GlobalData.IdDevices.Where(a => a.Value.Driver?.DriverProperties is IBusinessPropertyAllVariableBase property && property.IsAllVariable).Select(a => a.Value).ToArray();
 
@@ -271,9 +271,9 @@ internal static class RuntimeServiceHelper
              {
                  logger.LogWarning(ex, "VariablesChanged");
              }
-         }, cancellationToken).ConfigureAwait(false);
+         }).ConfigureAwait(false);
     }
-    public static async Task ChangedDriverAsync(ConcurrentHashSet<IDriver> changedDriver, ILogger logger, CancellationToken cancellationToken)
+    public static async Task ChangedDriverAsync(ConcurrentHashSet<IDriver> changedDriver, ILogger logger)
     {
         var drivers = GlobalData.IdDevices.Where(a => a.Value.Driver?.DriverProperties is IBusinessPropertyAllVariableBase property && property.IsAllVariable).Select(a => a.Value.Driver);
 
@@ -288,7 +288,7 @@ internal static class RuntimeServiceHelper
              {
                  logger.LogWarning(ex, "VariablesChanged");
              }
-         }, cancellationToken).ConfigureAwait(false);
+         }).ConfigureAwait(false);
     }
 
     public static void AddBusinessChangedDriver(HashSet<long> variableIds, ConcurrentHashSet<IDriver> changedDriver)

@@ -16,7 +16,6 @@ namespace ThingsGateway.Gateway.Application;
 
 public interface IChannelRuntimeService : IChannelPageService
 {
-
     /// <summary>
     /// 保存通道
     /// </summary>
@@ -36,9 +35,9 @@ public interface IChannelRuntimeService : IChannelPageService
     Task<Dictionary<string, ImportPreviewOutputBase>> PreviewAsync(IBrowserFile browserFile);
     Task<MemoryStream> ExportMemoryStream(IEnumerable<Channel> data);
     Task RestartChannelAsync(IEnumerable<ChannelRuntime> oldChannelRuntimes);
-    Task<bool> CopyAsync(List<Channel> models, Dictionary<Device, List<Variable>> devices, bool restart, CancellationToken cancellationToken);
-    Task<bool> UpdateAsync(List<Channel> models, List<Device> devices, List<Variable> variables, bool restart, CancellationToken cancellationToken);
-    Task<bool> InsertAsync(List<Channel> models, List<Device> devices, List<Variable> variables, bool restart, CancellationToken cancellationToken);
+    Task<bool> CopyAsync(List<Channel> models, Dictionary<Device, List<Variable>> devices, bool restart);
+    Task<bool> UpdateAsync(List<Channel> models, List<Device> devices, List<Variable> variables, bool restart);
+    Task<bool> InsertAsync(List<Channel> models, List<Device> devices, List<Variable> variables, bool restart);
 
 
 

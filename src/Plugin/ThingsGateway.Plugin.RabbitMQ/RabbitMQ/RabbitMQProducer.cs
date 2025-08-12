@@ -24,6 +24,14 @@ public partial class RabbitMQProducer : BusinessBaseWithCacheIntervalScriptAll
     public override VariablePropertyBase VariablePropertys => _variablePropertys;
 
     protected override BusinessPropertyWithCacheIntervalScript _businessPropertyWithCacheIntervalScript => _driverPropertys;
+    /// <inheritdoc/>
+    public override string ToString()
+    {
+        return $" {nameof(RabbitMQProducer)} IP:{_driverPropertys.IP} Port:{_driverPropertys.Port}";
+    }
+
+
+#if !Management
     protected override async Task InitChannelAsync(Foundation.IChannel? channel, CancellationToken cancellationToken)
     {
         #region 初始化
@@ -44,11 +52,7 @@ public partial class RabbitMQProducer : BusinessBaseWithCacheIntervalScriptAll
     /// <inheritdoc/>
     public override bool IsConnected() => success;
 
-    /// <inheritdoc/>
-    public override string ToString()
-    {
-        return $" {nameof(RabbitMQProducer)} IP:{_driverPropertys.IP} Port:{_driverPropertys.Port}";
-    }
+
 
     /// <inheritdoc/>
     protected override async Task DisposeAsync(bool disposing)
@@ -94,4 +98,6 @@ public partial class RabbitMQProducer : BusinessBaseWithCacheIntervalScriptAll
             await Update(cancellationToken).ConfigureAwait(false);
         }
     }
+
+#endif
 }

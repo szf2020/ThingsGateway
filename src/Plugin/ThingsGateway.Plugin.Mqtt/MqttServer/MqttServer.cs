@@ -32,6 +32,14 @@ public partial class MqttServer : BusinessBaseWithCacheIntervalScriptAll
     protected override BusinessPropertyWithCacheIntervalScript _businessPropertyWithCacheIntervalScript => _driverPropertys;
     public override Type DriverPropertyUIType => typeof(MqttPropertyRazor);
 
+    /// <inheritdoc/>
+    public override string ToString()
+    {
+        return $" {nameof(MqttServer)} IP:{_driverPropertys.IP} Port:{_driverPropertys.Port} WebSocket:{_driverPropertys.WebSocketPort}";
+    }
+
+#if !Management
+
     protected override async Task InitChannelAsync(IChannel? channel, CancellationToken cancellationToken)
     {
         #region 初始化
@@ -59,11 +67,7 @@ public partial class MqttServer : BusinessBaseWithCacheIntervalScriptAll
     /// <inheritdoc/>
     public override bool IsConnected() => _mqttServer?.IsStarted == true;
 
-    /// <inheritdoc/>
-    public override string ToString()
-    {
-        return $" {nameof(MqttServer)} IP:{_driverPropertys.IP} Port:{_driverPropertys.Port} WebSocket:{_driverPropertys.WebSocketPort}";
-    }
+
 
     /// <inheritdoc/>
     protected override async Task DisposeAsync(bool disposing)
@@ -101,4 +105,6 @@ public partial class MqttServer : BusinessBaseWithCacheIntervalScriptAll
     {
         return Update(cancellationToken);
     }
+
+#endif
 }

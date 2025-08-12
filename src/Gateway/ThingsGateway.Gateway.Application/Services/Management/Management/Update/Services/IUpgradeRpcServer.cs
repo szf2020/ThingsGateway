@@ -20,5 +20,9 @@ namespace ThingsGateway.Gateway.Application;
 public interface IUpgradeRpcServer : IRpcServer
 {
     [DmtpRpc]
-    Task Upgrade(ICallContext callContext, List<UpdateZipFile> updateZipFiles);
+    Task UpgradeAsync(ICallContext callContext, UpdateZipFile updateZipFile);
+
+    [DmtpRpc]
+    Task<UpdateZipFileInput> GetUpdateZipFileInputAsync(ICallContext callContext);
+
 }

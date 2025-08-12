@@ -9,7 +9,7 @@
 //------------------------------------------------------------------------------
 
 
-namespace ThingsGateway.Gateway.Application;
+namespace ThingsGateway.Gateway.Razor;
 public enum ChannelDevicePluginTypeEnum
 {
     PluginType,

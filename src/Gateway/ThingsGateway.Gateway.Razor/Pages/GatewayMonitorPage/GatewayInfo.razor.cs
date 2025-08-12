@@ -10,10 +10,7 @@
 
 namespace ThingsGateway.Gateway.Razor;
 
-public partial class GatewayInfo
-#if Management
-: IDisposable
-#endif
+public partial class GatewayInfo : IDisposable
 {
     [Parameter]
     public ChannelDeviceTreeItem SelectModel { get; set; } = new() { ChannelDevicePluginType = ChannelDevicePluginTypeEnum.PluginType, PluginType = null };
@@ -67,10 +64,4 @@ public partial class GatewayInfo
         Disposed = true;
         GC.SuppressFinalize(this);
     }
-
-#if Management
-
-
-
-#endif
 }

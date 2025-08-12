@@ -1,0 +1,13 @@
+﻿{
+ 
+  "ThingsGateway.Admin.Application.BaseDataEntity": {
+    "CreateOrgId": "CreateOrgId"
+  },
+  "ThingsGateway.Admin.Application.BaseEntity": {
+    "CreateTime": "CreateTime",
+    "CreateUser": "CreateUser",
+    "SortCode": "SortCode",
+    "UpdateTime": "UpdateTime",
+    "UpdateUser": "UpdateUser"
+  }
+}

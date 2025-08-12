@@ -80,6 +80,8 @@ public class Variable : BaseDataEntity, IValidatableObject
     private string remark4;
     private string remark5;
 
+    [System.Text.Json.Serialization.JsonIgnore]
+    [Newtonsoft.Json.JsonIgnore]
     [MapperIgnore]
     public ValidateForm AlarmPropertysValidateForm;
 

@@ -8,10 +8,43 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
+using BootstrapBlazor.Components;
+
+using Microsoft.AspNetCore.Components.Forms;
+
+using TouchSocket.Core;
+
 namespace ThingsGateway.Gateway.Application
 {
     public interface IDevicePageService
     {
+        Task SetDeviceLogLevelAsync(long id, TouchSocket.Core.LogLevel logLevel);
+        Task<Dictionary<string, ImportPreviewOutputBase>> ImportDeviceAsync(IBrowserFile file, bool restart);
+
         Task CopyDeviceAsync(int CopyCount, string CopyDeviceNamePrefix, int CopyDeviceNameSuffixNumber, long deviceId, bool AutoRestartThread);
+        Task<LogLevel> DeviceLogLevelAsync(long id);
+        Task<bool> BatchEditDeviceAsync(List<Device> models, Device oldModel, Device model, bool restart);
+        Task<bool> SaveDeviceAsync(Device input, ItemChangedType type, bool restart);
+        Task<bool> DeleteDeviceAsync(List<long> ids, bool restart);
+        Task<Dictionary<string, ImportPreviewOutputBase>> ImportDeviceUSheetDatasAsync(USheetDatas input, bool restart);
+        Task<USheetDatas> ExportDeviceAsync(List<Device> devices);
+
+        Task<string> ExportDeviceFileAsync(GatewayExportFilter exportFilter);
+
+
+        Task<QueryData<SelectedItem>> OnRedundantDevicesQueryAsync(VirtualizeQueryOption option, long deviceId, long channelId);
+        Task<Dictionary<string, ImportPreviewOutputBase>> ImportDeviceFileAsync(string filePath, bool restart);
+        Task DeviceRedundantThreadAsync(long id);
+        Task RestartDeviceAsync(long id, bool deleteCache);
+        Task PauseThreadAsync(long id);
+        Task<QueryData<DeviceRuntime>> OnDeviceQueryAsync(QueryPageOptions options);
+        Task<List<Device>> GetDeviceListAsync(QueryPageOptions option, int v);
+        Task<bool> ClearDeviceAsync(bool restart);
+        Task<bool> IsRedundantDeviceAsync(long id);
+        Task<string> GetDeviceNameAsync(long redundantDeviceId);
+        Task<List<SelectedItem>> GetDeviceItemsAsync(bool isCollect);
+        Task<string> GetDevicePluginNameAsync(long id);
+
+        Task<Dictionary<long, Tuple<string, string>>> GetDeviceIdNamesAsync();
     }
 }

@@ -36,6 +36,20 @@ public class OpcDaMaster : CollectBase
     /// <inheritdoc/>
     public override CollectPropertyBase CollectProperties => _driverProperties;
 
+    public override string ToString()
+    {
+        return $"{_driverProperties.OpcIP}-{_driverProperties.OpcName}";
+    }
+
+
+
+    public override string GetAddressDescription()
+    {
+        return _plc?.GetAddressDescription();
+    }
+#if !Management
+
+
     /// <inheritdoc/>
     public override Type DriverDebugUIType => typeof(ThingsGateway.Debug.OpcDaMaster);
 
@@ -77,10 +91,6 @@ public class OpcDaMaster : CollectBase
     /// <inheritdoc/>
     public override bool IsConnected() => _plc?.IsConnected == true;
 
-    public override string ToString()
-    {
-        return $"{_driverProperties.OpcIP}-{_driverProperties.OpcName}";
-    }
 
     /// <inheritdoc/>
     /// <inheritdoc/>
@@ -92,11 +102,6 @@ public class OpcDaMaster : CollectBase
 
         VariableAddresDicts?.Clear();
         return base.DisposeAsync(disposing);
-    }
-
-    public override string GetAddressDescription()
-    {
-        return _plc?.GetAddressDescription();
     }
 
     protected override bool VariableSourceReadsEnable => !_driverProperties.ActiveSubscribe;
@@ -251,4 +256,6 @@ public class OpcDaMaster : CollectBase
             success = false;
         }
     }
+
+#endif
 }

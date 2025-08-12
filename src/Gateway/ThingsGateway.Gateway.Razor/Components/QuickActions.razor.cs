@@ -62,13 +62,13 @@ public partial class QuickActions
     [Parameter]
     public EventCallback<bool> AutoRestartThreadChanged { get; set; }
 
-    private async Task OnAutoRestartThreadChanged(bool autoRestartThread)
+    private async Task OnAutoRestartThreadChanged(bool restart)
     {
-        AutoRestartThread = autoRestartThread;
+        AutoRestartThread = restart;
         if (Module != null)
-            await Module!.InvokeVoidAsync("saveAutoRestartThread", autoRestartThread);
+            await Module!.InvokeVoidAsync("saveAutoRestartThread", restart);
         if (AutoRestartThreadChanged.HasDelegate)
-            await AutoRestartThreadChanged.InvokeAsync(autoRestartThread);
+            await AutoRestartThreadChanged.InvokeAsync(restart);
     }
 
     private List<SelectedItem> AutoRestartThreadBoolItems;
@@ -84,8 +84,8 @@ public partial class QuickActions
 
     protected override async Task InvokeInitAsync()
     {
-        var autoRestartThread = await Module!.InvokeAsync<bool>("getAutoRestartThread");
-        await OnAutoRestartThreadChanged(autoRestartThread);
+        var restart = await Module!.InvokeAsync<bool>("getAutoRestartThread");
+        await OnAutoRestartThreadChanged(restart);
     }
     #endregion
     private async Task ToggleOpen()

@@ -8,11 +8,11 @@
     themeList.classList.toggle('is-open')
 }
 export function getAutoRestartThread() {
-    return JSON.parse(localStorage.getItem('autoRestartThread'))??true;
+    return JSON.parse(localStorage.getItem('restart'))??true;
 }
 
-export function saveAutoRestartThread(autoRestartThread) {
+export function saveAutoRestartThread(restart) {
     if (localStorage) {
-        localStorage.setItem('autoRestartThread', JSON.stringify(autoRestartThread));
+        localStorage.setItem('restart', JSON.stringify(restart));
     }
 }

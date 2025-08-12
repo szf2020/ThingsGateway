@@ -26,6 +26,8 @@ public abstract partial class BusinessBaseWithCacheIntervalScript : BusinessBase
 
     protected abstract BusinessPropertyWithCacheIntervalScript _businessPropertyWithCacheIntervalScript { get; }
 
+#if !Management
+
     public virtual string[] Match(string input)
     {
         // 生成缓存键，以确保缓存的唯一性
@@ -347,4 +349,7 @@ public abstract partial class BusinessBaseWithCacheIntervalScript : BusinessBase
     [GeneratedRegex(@"\$\{(.+?)\}")]
     private static partial Regex TopicRegex();
     #endregion 封装方法
+
+
+#endif
 }

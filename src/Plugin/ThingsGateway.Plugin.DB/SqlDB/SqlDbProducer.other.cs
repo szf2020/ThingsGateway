@@ -24,6 +24,7 @@ namespace ThingsGateway.Plugin.SqlDB;
 /// </summary>
 public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariable
 {
+#if !Management
     private volatile bool _initRealData;
     private ConcurrentDictionary<long, VariableBasicData> RealTimeVariables { get; } = new ConcurrentDictionary<long, VariableBasicData>();
 
@@ -225,4 +226,6 @@ public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariable
     }
 
     #endregion 方法
+
+#endif
 }

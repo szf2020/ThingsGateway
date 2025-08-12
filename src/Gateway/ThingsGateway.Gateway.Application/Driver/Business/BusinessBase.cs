@@ -57,6 +57,9 @@ public abstract class BusinessBase : DriverBase
     /// </summary>
     protected Dictionary<string, List<VariableRuntime>> VariableRuntimeGroups { get; set; } = new();
 
+
+#if !Management
+
     public override Task AfterVariablesChangedAsync(CancellationToken cancellationToken)
     {
         LogMessage?.LogInformation("Refresh variable");
@@ -117,6 +120,8 @@ public abstract class BusinessBase : DriverBase
             };
     }
 
+
+
     /// <summary>
     /// 间隔执行
     /// </summary>
@@ -134,4 +139,5 @@ public abstract class BusinessBase : DriverBase
             CurrentDevice?.SetDeviceStatus(TimerX.Now, true);
         }
     }
+#endif
 }

@@ -12,48 +12,58 @@
 
         <HeaderTemplate>
 
-            <span class=@((DeviceRuntime?.Driver!=null?"enable--text mx-1 text-h6 overflow-y-auto":"disabled--text mx-1 text-h6 overflow-y-auto"))>
-                @if (PluginServiceUtil.IsEducation(DeviceRuntime?.Driver?.GetType())==true)
+            <span class=@((DeviceRuntime?.Started == true ? "enable--text mx-1 text-h6 overflow-y-auto" : "disabled--text mx-1 text-h6 overflow-y-auto"))>
+                @if (PluginServiceUtil.IsEducation(Driver?.GetType()) == true)
                 {
                     <div style="flex-grow: 1;"></div>
-                    <Tag Color="Color.Primary" >PRO</Tag>
+                    <Tag Color="Color.Primary">PRO</Tag>
                 }
                 <span class="ms-2 text-truncate" title=@Name>@(Name)</span>
-                <span class=@(DeviceRuntime?.Driver?.GetAuthentication(out _)==true?"green--text ms-3":"red--text ms-3")>@(DeviceRuntime?.Driver?.GetAuthString())</span>
+                <span class=@(Driver?.GetAuthentication(out _) == true ? "green--text ms-3" : "red--text ms-3")>@(Driver?.GetAuthString())</span>
             </span>
 
             <div style="flex-grow: 1;"></div>
-            @if (DeviceRuntime.Driver != null)
-            {
-                var driver = DeviceRuntime.Driver;
-                @if (driver?.DriverUIType != null)
+
+            @{
+            #if !Management
+                if (DeviceRuntime.Driver != null)
                 {
-                    <Tooltip Title="@GatewayLocalizer["GatewayDeviceShowDriverUI"]" Placement="Placement.Bottom">
+                    var driver = DeviceRuntime.Driver;
+                    if (driver?.DriverUIType != null)
+                    {
 
-                        <Button OnClick=@(ShowDriverUI) IsDisabled=@(!AuthorizeButton("插件页面")) class="mx-2" Color="Color.None" style="color: var(--bs-card-titlecolor);" Icon=@("fab fa-simplybuilt") />
-                    </Tooltip>
 
+                        <Tooltip Title="@GatewayLocalizer["GatewayDeviceShowDriverUI"]" Placement="Placement.Bottom">
+
+                            <Button OnClick=@(ShowDriverUI) IsDisabled=@(!AuthorizeButton("插件页面")) class="mx-2" Color="Color.None" style="color: var(--bs-card-titlecolor);" Icon=@("fab fa-simplybuilt") />
+                        </Tooltip>
+
+
+                    }
                 }
+            #endif
 
-                <Tooltip Title="@GatewayLocalizer["GatewayDevicePause"]" Placement="Placement.Bottom">
+            }
 
-                    <Button OnClick=@(PauseThread) IsDisabled=@(!AuthorizeButton("暂停")) class="mx-2" Color="Color.None" style="color: var(--bs-card-title-color);" Icon=@(!driver.CurrentDevice.Pause?"fa fa-pause":"fa fa-play") />
+            <Tooltip Title="@GatewayLocalizer["GatewayDevicePause"]" Placement="Placement.Bottom">
+
+                <Button OnClick=@(PauseThreadAsync) IsDisabled=@(!AuthorizeButton("暂停")) class="mx-2" Color="Color.None" style="color: var(--bs-card-title-color);" Icon=@(!DeviceRuntime.Pause ? "fa fa-pause" : "fa fa-play") />
+            </Tooltip>
+
+
+            @if (IsRedundant && AuthorizeButton("切换冗余"))
+            {
+                <Tooltip Title="@GatewayLocalizer["DeviceRedundantThread"]" Placement="Placement.Bottom">
+                    <PopConfirmButton OnConfirm=@(DeviceRedundantThreadAsync) class="mx-2" Color="Color.None" style="color: var(--bs-card-title-color);" Icon=@("fas fa-exchange-alt") />
                 </Tooltip>
 
-
-                @if (GlobalData.IsRedundant(DeviceRuntime.Id) && AuthorizeButton("切换冗余"))
-                {
-                    <Tooltip Title="@GatewayLocalizer["DeviceRedundantThread"]" Placement="Placement.Bottom">
-                        <PopConfirmButton OnConfirm=@(DeviceRedundantThreadAsync) class="mx-2" Color="Color.None" style="color: var(--bs-card-title-color);" Icon=@("fas fa-exchange-alt") />
-                    </Tooltip>
-
-                }
+            }
             }
 
             @if (DeviceRuntime.IsCollect == false && AuthorizeButton("删除缓存"))
             {
                 <Tooltip Title="@GatewayLocalizer["DeleteCache"]" Placement="Placement.Bottom">
-                    <PopConfirmButton OnConfirm=@(()=>RestartDeviceAsync(true)) class="mx-2" Color="Color.None" style="color: var(--bs-card-title-color);" Icon=@("fa-solid fa-rotate") />
+                    <PopConfirmButton OnConfirm=@(() => RestartDeviceAsync(true)) class="mx-2" Color="Color.None" style="color: var(--bs-card-title-color);" Icon=@("fa-solid fa-rotate") />
                 </Tooltip>
             }
 
@@ -61,7 +71,7 @@
             {
                 <Tooltip Title="@GatewayLocalizer["GatewayDeviceRestart"]" Placement="Placement.Bottom">
 
-                    <PopConfirmButton OnConfirm=@(()=>RestartDeviceAsync(false)) class="mx-2" Color="Color.None" style="color: var(--bs-card-title-color);" Icon=@("fa-solid fa-rotate") />
+                    <PopConfirmButton OnConfirm=@(() => RestartDeviceAsync(false)) class="mx-2" Color="Color.None" style="color: var(--bs-card-title-color);" Icon=@("fa-solid fa-rotate") />
                 </Tooltip>
             }
 
@@ -83,7 +93,7 @@
 
                         <EditorItem @bind-Field="@context.Name" />
 
-                        <EditorItem Field=@context.PluginName FieldExpression=@(()=> context.PluginName ) />
+                        <EditorItem Field=@context.PluginName FieldExpression=@(() => context.PluginName) />
 
                         <EditorItem @bind-Field="@context.Enable" />
                         <EditorItem @bind-Field="@context.IntervalTime" />
@@ -97,7 +107,7 @@
                             </EditTemplate>
                         </EditorItem>
 
-                        <EditorItem Field=@context.ChannelName FieldExpression=@(()=> context.ChannelName ) />
+                        <EditorItem Field=@context.ChannelName FieldExpression=@(() => context.ChannelName) />
 
                         <EditorItem TValue="string" TModel="Device" @bind-Field="@context.Name">
                             <EditTemplate Context="value">
@@ -109,11 +119,11 @@
 
                         <EditorItem @bind-Field="@context.ActiveTime" />
                         <EditorItem @bind-Field="@context.DeviceStatus" />
-                        <EditorItem Field=@context.DeviceVariableCount FieldExpression=@(()=> context.DeviceVariableCount ) />
+                        <EditorItem Field=@context.DeviceVariableCount FieldExpression=@(() => context.DeviceVariableCount) />
                         @if (context.IsCollect == true)
                         {
-                            <EditorItem Field=@context.SourceVariableCount FieldExpression=@(()=> context.SourceVariableCount ) />
-                            <EditorItem Field=@context.MethodVariableCount FieldExpression=@(()=> context.MethodVariableCount ) />
+                            <EditorItem Field=@context.SourceVariableCount FieldExpression=@(() => context.SourceVariableCount) />
+                            <EditorItem Field=@context.MethodVariableCount FieldExpression=@(() => context.MethodVariableCount) />
                         }
                         @*<EditorItem ComponentParameters=@(new Dictionary<string,object>(){
                                     ["class"]="red--text",
@@ -124,10 +134,10 @@
                                 <Display Value=@value.LastErrorMessage ValueExpression=@(()=> context.LastErrorMessage ) ShowTooltip class="red--text" ShowLabel="true"  />
                             </EditTemplate> 
                         </EditorItem> *@
-                        <EditorItem Field=@context.LastErrorMessage FieldExpression=@(()=> context.LastErrorMessage ) ShowLabelTooltip="true">
+                        <EditorItem Field=@context.LastErrorMessage FieldExpression=@(() => context.LastErrorMessage) ShowLabelTooltip="true">
                             <EditTemplate Context="value">
                                 <div class="col-12">
-                                    <Display Value=@value.LastErrorMessage ValueExpression=@(()=> context.LastErrorMessage ) ShowTooltip=true class="red--text" ShowLabel="true" />
+                                    <Display Value=@value.LastErrorMessage ValueExpression=@(() => context.LastErrorMessage) ShowTooltip=true class="red--text" ShowLabel="true" />
                                 </div>
                             </EditTemplate>
                         </EditorItem>
@@ -139,9 +149,9 @@
                 <div class="col-12 mt-2">
                     <h6>@GatewayLocalizer["PluginInformation"]</h6>
                 </div>
-                @if (DeviceRuntime.Driver != null)
+                @if (Driver != null)
                 {
-                    <PropertyComponent CanWrite="false" @key=PluginPropertyModel.GetHashCode() Id=@(DeviceRuntime.Id.ToString()) Model=@PluginPropertyModel PluginPropertyEditorItems="DeviceRuntime.Driver.PluginPropertyEditorItems" />
+                    <PropertyComponent CanWrite="false" @key=PluginPropertyModel.GetHashCode() Id=@(DeviceRuntime.Id.ToString()) Model=@PluginPropertyModel PluginPropertyEditorItems="Driver.PluginPropertyEditorItems" />
                 }
             </div>
         </BodyTemplate>

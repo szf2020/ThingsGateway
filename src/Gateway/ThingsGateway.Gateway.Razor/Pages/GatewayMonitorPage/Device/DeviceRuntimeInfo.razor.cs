@@ -14,4 +14,27 @@ public partial class DeviceRuntimeInfo
 {
     [Parameter, EditorRequired]
     public DeviceRuntime DeviceRuntime { get; set; }
+
+
+    public TouchSocket.Core.LogLevel LogLevel { get; set; }
+    [Inject]
+    IDevicePageService DevicePageService { get; set; }
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (DeviceRuntime?.Id > 0)
+        {
+            var logLevel = await DevicePageService.DeviceLogLevelAsync(DeviceRuntime.Id);
+
+            if (logLevel != LogLevel)
+            {
+                LogLevel = logLevel;
+                await InvokeAsync(StateHasChanged);
+            }
+
+
+        }
+        if (firstRender)
+            await InvokeAsync(StateHasChanged);
+        await base.OnAfterRenderAsync(firstRender);
+    }
 }

@@ -37,6 +37,8 @@ public partial class MqttCollect : CollectBase
 
     private WaitLock ConnectLock = new(nameof(MqttCollect));
 
+#if !Management
+
     #region mqtt方法
 
     private Task MqttClient_ApplicationMessageReceivedAsync(MqttApplicationMessageReceivedEventArgs args)
@@ -176,4 +178,6 @@ public partial class MqttCollect : CollectBase
     }
 
     #endregion mqtt方法
+
+#endif
 }

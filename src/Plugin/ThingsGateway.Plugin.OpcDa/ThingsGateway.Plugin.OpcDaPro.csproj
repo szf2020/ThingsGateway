@@ -1,0 +1,48 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
+	<Import Project="..\..\Version.props" />
+	<Import Project="..\..\PackNuget.props" />
+
+	<PropertyGroup>
+		<TargetFrameworks>net8.0;</TargetFrameworks>
+
+		<DefineConstants>$(DefineConstants);Plugin;Management</DefineConstants>
+		<OutputPath>bin\$(Configuration)\Management\</OutputPath>
+		<IntermediateOutputPath>obj\$(Configuration)\Management\$(TargetFramework)\</IntermediateOutputPath>
+		<PackageOutputPath>$(MSBuildThisFileDirectory)..\..\..\..\nupkgs1</PackageOutputPath>
+	</PropertyGroup>
+
+
+	<PropertyGroup>
+		<AssemblyName>ThingsGateway.Plugin.OpcDa</AssemblyName>
+		<PackageId>$(MSBuildProjectName)</PackageId>
+	</PropertyGroup>
+
+
+	<ItemGroup>
+		<Compile Remove="Pages\**" />
+		<Content Remove="Pages\**" />
+		<EmbeddedResource Remove="Pages\**" />
+		<None Remove="Pages\**" />
+	</ItemGroup>
+
+
+	<ItemGroup>
+		<Content Remove="Locales\*.json" />
+		<EmbeddedResource Include="Locales\*.json">
+			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</EmbeddedResource>
+	</ItemGroup>
+
+
+
+	<ItemGroup>
+		<ProjectReference Include="..\..\Foundation\ThingsGateway.Foundation.Razor\ThingsGateway.Foundation.Razor.csproj">
+		</ProjectReference>
+		<ProjectReference Include="..\..\PluginPro\ThingsGateway.Management.Razor\ThingsGateway.Management.Razor.csproj" />
+
+		<ProjectReference Include="..\ThingsGateway.Foundation.OpcDa\ThingsGateway.Foundation.OpcDa.csproj">
+			<PrivateAssets>contentFiles;compile;build;buildMultitargeting;buildTransitive;analyzers;</PrivateAssets>
+		</ProjectReference>
+	</ItemGroup>
+
+</Project>

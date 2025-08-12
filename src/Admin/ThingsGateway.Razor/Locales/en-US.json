@@ -25,7 +25,8 @@
     "Success": "Success",
     "TablesExportButtonExcelText": "Export Excel",
     "TablesImportButtonExcelText": "Import Excel",
-    "True": "Yes"
+    "True": "Yes",
+    "Info": "Info"
   },
   "ThingsGateway.Razor.About": {
     "Community": "Community",
@@ -61,6 +62,19 @@
   "ThingsGateway.Razor.ImportExcel": {
     "First": "Step 1",
     "Import": "If there are no errors during verification, it will be directly imported into the database",
+    "Next": "Next",
+    "Reset": "Reset",
+    "Second": "Step 2",
+    "Third": "Step 3",
+    "Tip": "When the data volume is large (more than 200,000), the import may take more than 1 minute, please be patient",
+    "Upload": "Upload File",
+    "UploadCount": " Table {0}, import {1} records",
+    "Validate": "Validate",
+    "ValidateText": "Validation Content"
+  },
+  "ThingsGateway.Razor.ImportExcelConfirm": {
+    "First": "Step 1",
+    "Import": "Import",
     "Next": "Next",
     "Reset": "Reset",
     "Second": "Step 2",

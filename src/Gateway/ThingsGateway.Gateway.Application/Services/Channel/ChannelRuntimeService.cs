@@ -13,7 +13,9 @@ using BootstrapBlazor.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.Extensions.Logging;
 
+using ThingsGateway.Extension.Generic;
 using ThingsGateway.NewLife;
+using ThingsGateway.NewLife.Extension;
 
 namespace ThingsGateway.Gateway.Application;
 
@@ -26,12 +28,47 @@ public class ChannelRuntimeService : IChannelRuntimeService
     }
     private WaitLock WaitLock { get; set; } = new WaitLock(nameof(ChannelRuntimeService));
 
+    public Task<string> GetChannelNameAsync(long channelId)
+    {
+        return Task.FromResult(GlobalData.ReadOnlyIdChannels.TryGetValue(channelId, out var channelRuntime) ? channelRuntime.Name : string.Empty);
+    }
+
+    public Task<QueryData<ChannelRuntime>> OnChannelQueryAsync(QueryPageOptions options)
+    {
+        var data = GlobalData.IdChannels.Select(a => a.Value)
+        .WhereIf(!options.SearchText.IsNullOrWhiteSpace(), a => a.Name.Contains(options.SearchText))
+        .GetQueryData(options);
+        return Task.FromResult(data);
+    }
+
+    public Task<List<Channel>> GetChannelListAsync(QueryPageOptions options, int max = 0)
+    {
+        var models = GlobalData.IdChannels.Select(a => a.Value)
+        .WhereIf(!options.SearchText.IsNullOrWhiteSpace(), a => a.Name.Contains(options.SearchText))
+        .GetData(options, out var total).Cast<Channel>().ToList();
+
+        if (max > 0 && models.Count > max)
+        {
+            throw new("online Excel max data count 2000");
+        }
+        return Task.FromResult(models);
+    }
+
+    public Task<USheetDatas> ExportChannelAsync(List<Channel> channels)
+    {
+        return Task.FromResult(ChannelServiceHelpers.ExportChannel(channels));
+    }
+    public Task<string> GetPluginNameAsync(long channelId)
+    {
+        var pluginName = GlobalData.ReadOnlyIdChannels.TryGetValue(channelId, out var channel) ? channel.PluginName : string.Empty;
+        return Task.FromResult(pluginName);
+    }
 
 
     public async Task<QueryData<SelectedItem>> OnChannelSelectedItemQueryAsync(VirtualizeQueryOption option)
     {
         var channels = await GlobalData.GetCurrentUserChannels().ConfigureAwait(false);
-        var _channelItems = channels.GetQueryData(option, GatewayResourceUtil.BuildChannelSelectList);
+        var _channelItems = channels.WhereIf(!option.SearchText.IsNullOrWhiteSpace(), a => a.Name.Contains(option.SearchText)).GetQueryData(option, GatewayResourceUtil.BuildChannelSelectList);
         return _channelItems;
     }
 
@@ -106,17 +143,17 @@ public class ChannelRuntimeService : IChannelRuntimeService
             channels.Add(channel);
         }
 
-        await GlobalData.ChannelRuntimeService.CopyAsync(channels, devices, AutoRestartThread, default).ConfigureAwait(false);
+        await GlobalData.ChannelRuntimeService.CopyAsync(channels, devices, AutoRestartThread).ConfigureAwait(false);
     }
 
 
 
 
-    public async Task<bool> CopyAsync(List<Channel> models, Dictionary<Device, List<Variable>> devices, bool restart, CancellationToken cancellationToken)
+    public async Task<bool> CopyAsync(List<Channel> models, Dictionary<Device, List<Variable>> devices, bool restart)
     {
         try
         {
-            await WaitLock.WaitAsync(cancellationToken).ConfigureAwait(false);
+            await WaitLock.WaitAsync().ConfigureAwait(false);
 
             var result = await GlobalData.ChannelService.CopyAsync(models, devices).ConfigureAwait(false);
             var ids = models.Select(a => a.Id).ToHashSet();
@@ -133,7 +170,7 @@ public class ChannelRuntimeService : IChannelRuntimeService
             {
                 await GlobalData.ChannelThreadManage.RestartChannelAsync(newChannelRuntimes).ConfigureAwait(false);
 
-                await RuntimeServiceHelper.ChangedDriverAsync(_logger, cancellationToken).ConfigureAwait(false);
+                await RuntimeServiceHelper.ChangedDriverAsync(_logger).ConfigureAwait(false);
             }
 
             return true;
@@ -144,11 +181,11 @@ public class ChannelRuntimeService : IChannelRuntimeService
         }
     }
 
-    public async Task<bool> InsertAsync(List<Channel> models, List<Device> devices, List<Variable> variables, bool restart, CancellationToken cancellationToken)
+    public async Task<bool> InsertAsync(List<Channel> models, List<Device> devices, List<Variable> variables, bool restart)
     {
         try
         {
-            await WaitLock.WaitAsync(cancellationToken).ConfigureAwait(false);
+            await WaitLock.WaitAsync().ConfigureAwait(false);
 
             var result = await GlobalData.ChannelService.InsertAsync(models, devices, variables).ConfigureAwait(false);
             var ids = models.Select(a => a.Id).ToHashSet();
@@ -165,7 +202,7 @@ public class ChannelRuntimeService : IChannelRuntimeService
             {
                 await GlobalData.ChannelThreadManage.RestartChannelAsync(newChannelRuntimes).ConfigureAwait(false);
 
-                await RuntimeServiceHelper.ChangedDriverAsync(_logger, cancellationToken).ConfigureAwait(false);
+                await RuntimeServiceHelper.ChangedDriverAsync(_logger).ConfigureAwait(false);
             }
 
             return true;
@@ -176,11 +213,11 @@ public class ChannelRuntimeService : IChannelRuntimeService
         }
     }
 
-    public async Task<bool> UpdateAsync(List<Channel> models, List<Device> devices, List<Variable> variables, bool restart, CancellationToken cancellationToken)
+    public async Task<bool> UpdateAsync(List<Channel> models, List<Device> devices, List<Variable> variables, bool restart)
     {
         try
         {
-            await WaitLock.WaitAsync(cancellationToken).ConfigureAwait(false);
+            await WaitLock.WaitAsync().ConfigureAwait(false);
 
             var result = await GlobalData.ChannelService.UpdateAsync(models, devices, variables).ConfigureAwait(false);
             var ids = models.Select(a => a.Id).ToHashSet();
@@ -197,7 +234,7 @@ public class ChannelRuntimeService : IChannelRuntimeService
             {
                 await GlobalData.ChannelThreadManage.RestartChannelAsync(newChannelRuntimes).ConfigureAwait(false);
 
-                await RuntimeServiceHelper.ChangedDriverAsync(_logger, cancellationToken).ConfigureAwait(false);
+                await RuntimeServiceHelper.ChangedDriverAsync(_logger).ConfigureAwait(false);
             }
 
             return true;
@@ -208,7 +245,7 @@ public class ChannelRuntimeService : IChannelRuntimeService
         }
     }
 
-    public async Task<bool> BatchEditChannelAsync(IEnumerable<Channel> models, Channel oldModel, Channel model, bool restart)
+    public async Task<bool> BatchEditChannelAsync(List<Channel> models, Channel oldModel, Channel model, bool restart)
     {
         try
         {
@@ -234,11 +271,11 @@ public class ChannelRuntimeService : IChannelRuntimeService
         }
     }
 
-    public async Task<bool> DeleteChannelAsync(IEnumerable<long> ids, bool restart, CancellationToken cancellationToken)
+    public async Task<bool> DeleteChannelAsync(List<long> ids, bool restart)
     {
         try
         {
-            await WaitLock.WaitAsync(cancellationToken).ConfigureAwait(false);
+            await WaitLock.WaitAsync().ConfigureAwait(false);
 
             var array = ids.ToArray();
             var result = await GlobalData.ChannelService.DeleteChannelAsync(array).ConfigureAwait(false);
@@ -250,7 +287,7 @@ public class ChannelRuntimeService : IChannelRuntimeService
             {
                 await GlobalData.ChannelThreadManage.RemoveChannelAsync(array).ConfigureAwait(false);
 
-                await RuntimeServiceHelper.ChangedDriverAsync(changedDriver, _logger, cancellationToken).ConfigureAwait(false);
+                await RuntimeServiceHelper.ChangedDriverAsync(changedDriver, _logger).ConfigureAwait(false);
             }
 
             return true;
@@ -260,7 +297,10 @@ public class ChannelRuntimeService : IChannelRuntimeService
             WaitLock.Release();
         }
     }
-
+    public Task<bool> ClearChannelAsync(bool restart)
+    {
+        return DeleteChannelAsync(GlobalData.IdChannels.Keys.ToList(), restart);
+    }
     public Task<Dictionary<string, ImportPreviewOutputBase>> PreviewAsync(IBrowserFile browserFile) => GlobalData.ChannelService.PreviewAsync(browserFile);
 
     public Task<Dictionary<string, object>> ExportChannelAsync(GatewayExportFilter exportFilter) => GlobalData.ChannelService.ExportChannelAsync(exportFilter);
@@ -268,7 +308,7 @@ public class ChannelRuntimeService : IChannelRuntimeService
     public Task<MemoryStream> ExportMemoryStream(IEnumerable<Channel> data) =>
       GlobalData.ChannelService.ExportMemoryStream(data);
 
-    public async Task<Dictionary<string, ImportPreviewOutputBase>> ImportChannelAsync(USheetDatas input, bool restart)
+    public async Task<Dictionary<string, ImportPreviewOutputBase>> ImportChannelUSheetDatasAsync(USheetDatas input, bool restart)
     {
         try
         {
@@ -279,9 +319,7 @@ public class ChannelRuntimeService : IChannelRuntimeService
 
             if (data.Any(a => a.Value.HasError)) return data;
 
-            ChannelServiceHelpers.GetImportChannelData(data, out var upData, out var insertData);
-
-            var result = await GlobalData.ChannelService.ImportChannelAsync(upData, insertData).ConfigureAwait(false);
+            var result = await GlobalData.ChannelService.ImportChannelAsync(data).ConfigureAwait(false);
 
             var newChannelRuntimes = await RuntimeServiceHelper.GetNewChannelRuntimesAsync(result).ConfigureAwait(false);
 
@@ -300,7 +338,7 @@ public class ChannelRuntimeService : IChannelRuntimeService
         }
     }
 
-    public async Task<Dictionary<string, ImportPreviewOutputBase>> ImportChannelAsync(string filePath, bool restart)
+    public async Task<Dictionary<string, ImportPreviewOutputBase>> ImportChannelFileAsync(string filePath, bool restart)
     {
         try
         {
@@ -479,5 +517,12 @@ public class ChannelRuntimeService : IChannelRuntimeService
         {
             WaitLock.Release();
         }
+    }
+
+    public async Task<string> ExportChannelFileAsync(GatewayExportFilter exportFilter)
+    {
+        var sheets = await GlobalData.ChannelService.ExportChannelAsync(exportFilter).ConfigureAwait(false);
+        return await App.GetService<IImportExportService>().CreateFileAsync<Channel>(sheets, "Channel", false).ConfigureAwait(false);
+
     }
 }

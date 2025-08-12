@@ -37,6 +37,7 @@ public static class DynamicModelExtension
         }
     }
 
+#if !Management
     /// <summary>
     /// 获取变量的业务属性值
     /// </summary>
@@ -78,6 +79,8 @@ public static class DynamicModelExtension
 
         return null; // 未找到对应的业务设备Id，返回null
     }
+
+#endif
 
     public static IEnumerable<IGrouping<object[], T>> GroupByKeys<T>(this IEnumerable<T> values, params string[] keys)
     {

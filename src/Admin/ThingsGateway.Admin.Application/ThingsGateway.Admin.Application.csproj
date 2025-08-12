@@ -5,6 +5,7 @@
 
 	<PropertyGroup>
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
+		
 	</PropertyGroup>
 	<PropertyGroup>
 		<TargetFrameworks>net8.0;net9.0;</TargetFrameworks>

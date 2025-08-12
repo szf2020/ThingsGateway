@@ -17,13 +17,17 @@ namespace ThingsGateway.Gateway.Application
 {
     public interface IChannelPageService
     {
+        Task<string> GetPluginNameAsync(long channelId);
+
         Task RestartChannelAsync(long channelId);
 
         Task<TouchSocket.Core.LogLevel> ChannelLogLevelAsync(long id);
         Task SetChannelLogLevelAsync(long id, TouchSocket.Core.LogLevel logLevel);
         Task CopyChannelAsync(int CopyCount, string CopyChannelNamePrefix, int CopyChannelNameSuffixNumber, string CopyDeviceNamePrefix, int CopyDeviceNameSuffixNumber, long channelId, bool AutoRestartThread);
 
-
+        Task<QueryData<ChannelRuntime>> OnChannelQueryAsync(QueryPageOptions options);
+        Task<List<Channel>> GetChannelListAsync(QueryPageOptions options, int max = 0);
+        Task<Dictionary<string, ImportPreviewOutputBase>> ImportChannelAsync(IBrowserFile file, bool restart);
 
         /// <summary>
         /// 保存通道
@@ -41,24 +45,27 @@ namespace ThingsGateway.Gateway.Application
         /// <param name="model">新数据</param>
         /// <param name="restart">重启</param>
         /// <returns></returns>
-        Task<bool> BatchEditChannelAsync(IEnumerable<Channel> models, Channel oldModel, Channel model, bool restart);
-
-
-
+        Task<bool> BatchEditChannelAsync(List<Channel> models, Channel oldModel, Channel model, bool restart);
 
         /// <summary>
         /// 删除通道
         /// </summary>
-        Task<bool> DeleteChannelAsync(IEnumerable<long> ids, bool restart, CancellationToken cancellationToken);
-
+        Task<bool> DeleteChannelAsync(List<long> ids, bool restart);
+        /// <summary>
+        /// 删除通道
+        /// </summary>
+        Task<bool> ClearChannelAsync(bool restart);
         Task ImportChannelAsync(List<Channel> upData, List<Channel> insertData, bool restart);
-        Task<Dictionary<string, ImportPreviewOutputBase>> ImportChannelAsync(USheetDatas input, bool restart);
-        Task<Dictionary<string, ImportPreviewOutputBase>> ImportChannelAsync(string filePath, bool restart);
-        Task<Dictionary<string, ImportPreviewOutputBase>> ImportChannelAsync(IBrowserFile file, bool restart);
+        Task<Dictionary<string, ImportPreviewOutputBase>> ImportChannelUSheetDatasAsync(USheetDatas input, bool restart);
+        Task<Dictionary<string, ImportPreviewOutputBase>> ImportChannelFileAsync(string filePath, bool restart);
 
+
+        Task<USheetDatas> ExportChannelAsync(List<Channel> channels);
+
+        Task<string> ExportChannelFileAsync(GatewayExportFilter exportFilter);
 
 
         Task<QueryData<SelectedItem>> OnChannelSelectedItemQueryAsync(VirtualizeQueryOption option);
-
+        Task<string> GetChannelNameAsync(long channelId);
     }
 }

@@ -26,7 +26,10 @@ namespace ThingsGateway.Plugin.TDengineDB;
 /// <summary>
 /// TDengineDBProducer
 /// </summary>
-public partial class TDengineDBProducer : BusinessBaseWithCacheIntervalVariable, IDBHistoryValueService
+public partial class TDengineDBProducer : BusinessBaseWithCacheIntervalVariable
+#if !Management
+    , IDBHistoryValueService
+#endif
 {
 
     internal readonly TDengineDBProducerProperty _driverPropertys = new();
@@ -39,12 +42,19 @@ public partial class TDengineDBProducer : BusinessBaseWithCacheIntervalVariable,
     {
         get
         {
+#if !Management
             if (_driverPropertys.BigTextScriptHistoryTable.IsNullOrEmpty())
                 return typeof(TDengineDBPage);
             else
                 return null;
+#else
+            return null;
+#endif
+
         }
     }
+
+
     public override VariablePropertyBase VariablePropertys => _variablePropertys;
 
     protected override BusinessPropertyWithCacheInterval _businessPropertyWithCacheInterval => _driverPropertys;
@@ -54,6 +64,15 @@ public partial class TDengineDBProducer : BusinessBaseWithCacheIntervalVariable,
         _db?.TryDispose();
         return base.DisposeAsync(disposing);
     }
+
+    /// <inheritdoc/>
+    public override string ToString()
+    {
+        return $" {nameof(TDengineDBProducer)}";
+    }
+    private SqlSugarClient _db;
+
+#if !Management
 
     protected override async Task InitChannelAsync(IChannel? channel, CancellationToken cancellationToken)
     {
@@ -76,13 +95,8 @@ public partial class TDengineDBProducer : BusinessBaseWithCacheIntervalVariable,
     /// <inheritdoc/>
     public override bool IsConnected() => success;
 
-    /// <inheritdoc/>
-    public override string ToString()
-    {
-        return $" {nameof(TDengineDBProducer)}";
-    }
 
-    private SqlSugarClient _db;
+
 
     protected override async Task ProtectedStartAsync(CancellationToken cancellationToken)
     {
@@ -190,4 +204,6 @@ public partial class TDengineDBProducer : BusinessBaseWithCacheIntervalVariable,
         }
         return ret;
     }
+
+#endif
 }

@@ -39,7 +39,7 @@ public class FileController : ControllerBase
         var filePath = Path.Combine(wwwroot, fileName);
         // 防止路径穿越攻击
 #pragma warning disable CA3003
-        if (!filePath.StartsWith(wwwroot, StringComparison.OrdinalIgnoreCase) || !System.IO.File.Exists(filePath))
+        if (filePath.Contains("..") || !System.IO.File.Exists(filePath))
         {
             return NotFound();
         }
@@ -49,6 +49,6 @@ public class FileController : ControllerBase
 
         Response.Headers.Append("Access-Control-Expose-Headers", "Content-Disposition");
 
-        return File(fileStream, "application/octet-stream", (fileName.Replace('/', '_')));
+        return File(fileStream, "application/octet-stream", (Path.GetFileName(filePath).Replace('/', '_')));
     }
 }

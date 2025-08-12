@@ -44,7 +44,7 @@ public static class PluginServiceUtil
             if (classAttribute == null) continue;//删除不需要显示的属性
 
             var displayName = classAttribute.Description ?? BootstrapBlazor.Components.Utility.GetDisplayName(type, prop.Name);
-            InternalTableColumn tc = new InternalTableColumn(prop.Name, prop.PropertyType, displayName);
+            DefaultTableColumn tc = new DefaultTableColumn(prop.Name, prop.PropertyType, displayName);
             if (autoGenerateColumnAttribute != null)
                 IEditItemExtensions.CopyValue(tc, autoGenerateColumnAttribute);
             tc.ComponentParameters ??= new Dictionary<string, object>();
@@ -74,6 +74,7 @@ public static class PluginServiceUtil
         return type.GetRuntimeProperties().Any(a => a.GetCustomAttribute<DynamicPropertyAttribute>(false) != null);
     }
 
+#if !Management
     /// <summary>
     /// 插件是否支持平台
     /// </summary>
@@ -86,6 +87,7 @@ public static class PluginServiceUtil
 
         return true;
     }
+#endif
 
     /// <summary>
     /// 插件是否专业版

@@ -43,6 +43,31 @@ public class ModbusSlave : BusinessBase
     /// <inheritdoc/>
     public override Type DriverDebugUIType => typeof(ThingsGateway.Debug.ModbusSlave);
 
+
+
+    /// <inheritdoc/>
+    public override VariablePropertyBase VariablePropertys => _variablePropertys;
+
+    /// <inheritdoc/>
+    protected override BusinessPropertyBase _businessPropertyBase => _driverPropertys;
+
+    protected IStringLocalizer Localizer { get; private set; }
+
+
+    public override string ToString()
+    {
+        return _plc?.ToString() ?? base.ToString();
+    }
+
+#if !Management
+
+    /// <summary>
+    /// 是否连接成功
+    /// </summary>
+    public override bool IsConnected()
+    {
+        return _plc?.OnLine == true;
+    }
     /// <inheritdoc/>
     public override Type DriverUIType
     {
@@ -53,27 +78,6 @@ public class ModbusSlave : BusinessBase
             else
                 return null;
         }
-    }
-
-    /// <inheritdoc/>
-    public override VariablePropertyBase VariablePropertys => _variablePropertys;
-
-    /// <inheritdoc/>
-    protected override BusinessPropertyBase _businessPropertyBase => _driverPropertys;
-
-    protected IStringLocalizer Localizer { get; private set; }
-
-    /// <summary>
-    /// 是否连接成功
-    /// </summary>
-    public override bool IsConnected()
-    {
-        return _plc?.OnLine == true;
-    }
-
-    public override string ToString()
-    {
-        return _plc?.ToString() ?? base.ToString();
     }
 
     /// <summary>
@@ -267,4 +271,7 @@ public class ModbusSlave : BusinessBase
             }
         }
     }
+
+
+#endif
 }

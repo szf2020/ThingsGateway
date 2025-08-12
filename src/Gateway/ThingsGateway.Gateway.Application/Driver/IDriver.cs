@@ -16,25 +16,31 @@ namespace ThingsGateway.Gateway.Application
 {
     public interface IDriver : IAsyncDisposable
     {
-        bool DisposedValue { get; }
-        ChannelRuntime CurrentChannel { get; }
-        DeviceRuntime? CurrentDevice { get; }
-        long DeviceId { get; }
-        string? DeviceName { get; }
+
         Type DriverDebugUIType { get; }
         object DriverProperties { get; }
 
         Type DriverPropertyUIType { get; }
         Type DriverUIType { get; }
         Type DriverVariableAddressUIType { get; }
+        List<IEditorItem> PluginPropertyEditorItems { get; }
+
+#if !Management
+
         bool? IsCollectDevice { get; }
+        bool DisposedValue { get; }
+        ChannelRuntime CurrentChannel { get; }
+        DeviceRuntime? CurrentDevice { get; }
+        long DeviceId { get; }
+        string? DeviceName { get; }
+
+
         bool IsInitSuccess { get; }
         bool IsStarted { get; }
+        bool Pause { get; }
         LoggerGroup LogMessage { get; }
         string LogPath { get; }
-        bool Pause { get; }
         string PluginDirectory { get; }
-        List<IEditorItem> PluginPropertyEditorItems { get; }
         Dictionary<long, VariableRuntime> IdVariableRuntimes { get; }
         IDeviceThreadManage DeviceThreadManage { get; }
 
@@ -42,6 +48,10 @@ namespace ThingsGateway.Gateway.Application
         void PauseThread(bool pause);
         Task SetLogAsync(LogLevel? logLevel = null, bool upDataBase = true);
         Task AfterVariablesChangedAsync(CancellationToken cancellationToken);
+
+
+#endif
+
         string GetAuthString();
         bool GetAuthentication(out DateTime? expireTime);
     }

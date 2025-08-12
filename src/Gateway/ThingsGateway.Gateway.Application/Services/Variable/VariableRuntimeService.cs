@@ -13,7 +13,9 @@ using BootstrapBlazor.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.Extensions.Logging;
 
+using ThingsGateway.Extension.Generic;
 using ThingsGateway.NewLife.Collections;
+using ThingsGateway.NewLife.Extension;
 
 namespace ThingsGateway.Gateway.Application;
 
@@ -26,7 +28,68 @@ public class VariableRuntimeService : IVariableRuntimeService
         _logger = logger;
     }
 
-    public async Task<bool> BatchSaveVariableAsync(List<Variable> input, ItemChangedType type, bool restart, CancellationToken cancellationToken)
+
+    public Task<QueryData<VariableRuntime>> OnVariableQueryAsync(QueryPageOptions options)
+    {
+        var data = GlobalData.IdVariables.Select(a => a.Value)
+                .WhereIf(!options.SearchText.IsNullOrWhiteSpace(), a => a.Name.Contains(options.SearchText))
+                .GetQueryData(options);
+        return Task.FromResult(data);
+    }
+
+    public Task<List<Variable>> GetVariableListAsync(QueryPageOptions option, int max)
+    {
+        var models = GlobalData.IdVariables.Select(a => a.Value)
+        .WhereIf(!option.SearchText.IsNullOrWhiteSpace(), a => a.Name.Contains(option.SearchText))
+        .GetData(option, out var total).Cast<Variable>().ToList();
+
+        if (max > 0 && models.Count > max)
+        {
+            throw new("online Excel max data count 2000");
+        }
+        return Task.FromResult(models);
+
+    }
+
+    public Task<USheetDatas> ExportVariableAsync(List<Variable> models, string? sortName, SortOrder sortOrder)
+    {
+        return Task.FromResult(VariableServiceHelpers.ExportVariable(models, sortName, sortOrder));
+    }
+
+
+
+    public async Task<OperResult<object>> OnWriteVariableAsync(long id, string writeData)
+    {
+        if (GlobalData.IdVariables.TryGetValue(id, out var variableRuntime))
+        {
+            var data = await variableRuntime.RpcAsync(writeData).ConfigureAwait(false);
+            return data.GetOperResult();
+        }
+        return new OperResult<object>($"Variable with ID {id} not found.");
+    }
+
+
+
+    public async Task CopyVariableAsync(List<Variable> Model, int CopyCount, string CopyVariableNamePrefix, int CopyVariableNameSuffixNumber, bool AutoRestartThread)
+    {
+
+        List<Variable> variables = new();
+        for (int i = 0; i < CopyCount; i++)
+        {
+            var variable = Model.AdaptListVariable();
+            foreach (var item in variable)
+            {
+                item.Id = CommonUtils.GetSingleId();
+                item.Name = $"{CopyVariableNamePrefix}{CopyVariableNameSuffixNumber + i}";
+                variables.Add(item);
+            }
+        }
+        await BatchSaveVariableAsync(variables, ItemChangedType.Add, AutoRestartThread).ConfigureAwait(false);
+    }
+
+
+
+    public async Task<bool> BatchSaveVariableAsync(List<Variable> input, ItemChangedType type, bool restart)
     {
         try
         {
@@ -46,7 +109,7 @@ public class VariableRuntimeService : IVariableRuntimeService
             if (restart)
             {
                 //根据条件重启通道线程
-                await RuntimeServiceHelper.ChangedDriverAsync(changedDriver, _logger, cancellationToken).ConfigureAwait(false);
+                await RuntimeServiceHelper.ChangedDriverAsync(changedDriver, _logger).ConfigureAwait(false);
             }
             return true;
         }
@@ -56,7 +119,7 @@ public class VariableRuntimeService : IVariableRuntimeService
         }
     }
 
-    public async Task<bool> BatchEditAsync(IEnumerable<Variable> models, Variable oldModel, Variable model, bool restart, CancellationToken cancellationToken)
+    public async Task<bool> BatchEditVariableAsync(List<Variable> models, Variable oldModel, Variable model, bool restart)
     {
         try
         {
@@ -67,7 +130,7 @@ public class VariableRuntimeService : IVariableRuntimeService
             using var db = DbContext.GetDB<Variable>();
             var ids = models.Select(a => a.Id).ToHashSet();
 
-            var newVariableRuntimes = (await db.Queryable<Variable>().Where(a => ids.Contains(a.Id)).ToListAsync(cancellationToken).ConfigureAwait(false)).AdaptListVariableRuntime();
+            var newVariableRuntimes = (await db.Queryable<Variable>().Where(a => ids.Contains(a.Id)).ToListAsync().ConfigureAwait(false)).AdaptListVariableRuntime();
 
             var variableIds = newVariableRuntimes.Select(a => a.Id).ToHashSet();
 
@@ -80,7 +143,7 @@ public class VariableRuntimeService : IVariableRuntimeService
             if (restart)
             {
                 //根据条件重启通道线程
-                await RuntimeServiceHelper.ChangedDriverAsync(changedDriver, _logger, cancellationToken).ConfigureAwait(false);
+                await RuntimeServiceHelper.ChangedDriverAsync(changedDriver, _logger).ConfigureAwait(false);
             }
 
             return true;
@@ -91,7 +154,7 @@ public class VariableRuntimeService : IVariableRuntimeService
         }
     }
 
-    public async Task<bool> DeleteVariableAsync(IEnumerable<long> ids, bool restart, CancellationToken cancellationToken)
+    public async Task<bool> DeleteVariableAsync(List<long> ids, bool restart)
     {
         try
         {
@@ -108,7 +171,7 @@ public class VariableRuntimeService : IVariableRuntimeService
 
             if (restart)
             {
-                await RuntimeServiceHelper.ChangedDriverAsync(changedDriver, _logger, cancellationToken).ConfigureAwait(false);
+                await RuntimeServiceHelper.ChangedDriverAsync(changedDriver, _logger).ConfigureAwait(false);
             }
 
             return true;
@@ -119,7 +182,7 @@ public class VariableRuntimeService : IVariableRuntimeService
         }
     }
 
-    public async Task<bool> ClearVariableAsync(bool restart, CancellationToken cancellationToken)
+    public async Task<bool> ClearVariableAsync(bool restart)
     {
         try
         {
@@ -134,7 +197,7 @@ public class VariableRuntimeService : IVariableRuntimeService
 
             if (restart)
             {
-                await RuntimeServiceHelper.ChangedDriverAsync(changedDriver, _logger, cancellationToken).ConfigureAwait(false);
+                await RuntimeServiceHelper.ChangedDriverAsync(changedDriver, _logger).ConfigureAwait(false);
             }
 
             return true;
@@ -147,7 +210,7 @@ public class VariableRuntimeService : IVariableRuntimeService
 
     public Task<Dictionary<string, object>> ExportVariableAsync(GatewayExportFilter exportFilter) => GlobalData.VariableService.ExportVariableAsync(exportFilter);
 
-    public async Task ImportVariableAsync(Dictionary<string, ImportPreviewOutputBase> input, bool restart, CancellationToken cancellationToken)
+    public async Task ImportVariableAsync(Dictionary<string, ImportPreviewOutputBase> input, bool restart)
     {
         try
         {
@@ -156,7 +219,7 @@ public class VariableRuntimeService : IVariableRuntimeService
             var result = await GlobalData.VariableService.ImportVariableAsync(input).ConfigureAwait(false);
 
             using var db = DbContext.GetDB<Variable>();
-            var newVariableRuntimes = (await db.Queryable<Variable>().Where(a => result.Contains(a.Id)).ToListAsync(cancellationToken).ConfigureAwait(false)).AdaptListVariableRuntime();
+            var newVariableRuntimes = (await db.Queryable<Variable>().Where(a => result.Contains(a.Id)).ToListAsync().ConfigureAwait(false)).AdaptListVariableRuntime();
 
             var variableIds = newVariableRuntimes.Select(a => a.Id).ToHashSet();
 
@@ -168,7 +231,7 @@ public class VariableRuntimeService : IVariableRuntimeService
             if (restart)
             {
                 //根据条件重启通道线程
-                await RuntimeServiceHelper.ChangedDriverAsync(changedDriver, _logger, cancellationToken).ConfigureAwait(false);
+                await RuntimeServiceHelper.ChangedDriverAsync(changedDriver, _logger).ConfigureAwait(false);
             }
 
         }
@@ -177,8 +240,114 @@ public class VariableRuntimeService : IVariableRuntimeService
             //WaitLock.Release();
         }
     }
+    public async Task<Dictionary<string, ImportPreviewOutputBase>> ImportVariableUSheetDatasAsync(USheetDatas uSheetDatas, bool restart)
+    {
+        try
+        {
+            // await WaitLock.WaitAsync().ConfigureAwait(false);
 
-    public async Task InsertTestDataAsync(int testVariableCount, int testDeviceCount, string slaveUrl, bool businessEnable, bool restart, CancellationToken cancellationToken)
+            var data = await VariableServiceHelpers.ImportAsync(uSheetDatas).ConfigureAwait(false);
+
+            if (data.Any(a => a.Value.HasError)) return data;
+
+            var result = await GlobalData.VariableService.ImportVariableAsync((Dictionary<string, ImportPreviewOutputBase>)data).ConfigureAwait(false);
+
+            using var db = DbContext.GetDB<Variable>();
+            var newVariableRuntimes = (await db.Queryable<Variable>().Where(a => result.Contains(a.Id)).ToListAsync().ConfigureAwait(false)).AdaptListVariableRuntime();
+
+            var variableIds = newVariableRuntimes.Select(a => a.Id).ToHashSet();
+
+            ConcurrentHashSet<IDriver> changedDriver = new();
+            RuntimeServiceHelper.VariableRuntimesDispose(variableIds);
+            RuntimeServiceHelper.AddCollectChangedDriver(newVariableRuntimes, changedDriver);
+            RuntimeServiceHelper.AddBusinessChangedDriver(variableIds, changedDriver);
+
+            if (restart)
+            {
+                //根据条件重启通道线程
+                await RuntimeServiceHelper.ChangedDriverAsync(changedDriver, _logger).ConfigureAwait(false);
+            }
+            return data;
+        }
+        finally
+        {
+            //WaitLock.Release();
+        }
+
+
+    }
+
+    public async Task<Dictionary<string, ImportPreviewOutputBase>> ImportVariableAsync(IBrowserFile file, bool restart)
+    {
+        try
+        {
+            // await WaitLock.WaitAsync().ConfigureAwait(false);
+
+            var data = await GlobalData.VariableService.PreviewAsync(file).ConfigureAwait(false);
+
+            if (data.Any(a => a.Value.HasError)) return data;
+
+            var result = await GlobalData.VariableService.ImportVariableAsync(data).ConfigureAwait(false);
+
+            using var db = DbContext.GetDB<Variable>();
+            var newVariableRuntimes = (await db.Queryable<Variable>().Where(a => result.Contains(a.Id)).ToListAsync().ConfigureAwait(false)).AdaptListVariableRuntime();
+
+            var variableIds = newVariableRuntimes.Select(a => a.Id).ToHashSet();
+
+            ConcurrentHashSet<IDriver> changedDriver = new();
+            RuntimeServiceHelper.VariableRuntimesDispose(variableIds);
+            RuntimeServiceHelper.AddCollectChangedDriver(newVariableRuntimes, changedDriver);
+            RuntimeServiceHelper.AddBusinessChangedDriver(variableIds, changedDriver);
+
+            if (restart)
+            {
+                //根据条件重启通道线程
+                await RuntimeServiceHelper.ChangedDriverAsync(changedDriver, _logger).ConfigureAwait(false);
+            }
+            return data;
+        }
+        finally
+        {
+            //WaitLock.Release();
+        }
+    }
+    public async Task<Dictionary<string, ImportPreviewOutputBase>> ImportVariableFileAsync(string filePath, bool restart)
+    {
+        try
+        {
+            // await WaitLock.WaitAsync().ConfigureAwait(false);
+
+            var data = await GlobalData.VariableService.PreviewAsync(filePath).ConfigureAwait(false);
+
+            if (data.Any(a => a.Value.HasError)) return data;
+
+            var result = await GlobalData.VariableService.ImportVariableAsync(data).ConfigureAwait(false);
+
+            using var db = DbContext.GetDB<Variable>();
+            var newVariableRuntimes = (await db.Queryable<Variable>().Where(a => result.Contains(a.Id)).ToListAsync().ConfigureAwait(false)).AdaptListVariableRuntime();
+
+            var variableIds = newVariableRuntimes.Select(a => a.Id).ToHashSet();
+
+            ConcurrentHashSet<IDriver> changedDriver = new();
+            RuntimeServiceHelper.VariableRuntimesDispose(variableIds);
+            RuntimeServiceHelper.AddCollectChangedDriver(newVariableRuntimes, changedDriver);
+            RuntimeServiceHelper.AddBusinessChangedDriver(variableIds, changedDriver);
+
+            if (restart)
+            {
+                //根据条件重启通道线程
+                await RuntimeServiceHelper.ChangedDriverAsync(changedDriver, _logger).ConfigureAwait(false);
+            }
+            return data;
+        }
+        finally
+        {
+            //WaitLock.Release();
+        }
+    }
+
+
+    public async Task InsertTestDataAsync(int testVariableCount, int testDeviceCount, string slaveUrl, bool businessEnable, bool restart)
     {
         try
         {
@@ -207,7 +376,7 @@ public class VariableRuntimeService : IVariableRuntimeService
                 {
                     await GlobalData.ChannelThreadManage.RestartChannelAsync(newChannelRuntimes).ConfigureAwait(false);
 
-                    await RuntimeServiceHelper.ChangedDriverAsync(_logger, cancellationToken).ConfigureAwait(false);
+                    await RuntimeServiceHelper.ChangedDriverAsync(_logger).ConfigureAwait(false);
                 }
             }
         }
@@ -222,7 +391,7 @@ public class VariableRuntimeService : IVariableRuntimeService
         return GlobalData.VariableService.PreviewAsync(browserFile);
     }
 
-    public async Task<bool> SaveVariableAsync(Variable input, ItemChangedType type, bool restart, CancellationToken cancellationToken)
+    public async Task<bool> SaveVariableAsync(Variable input, ItemChangedType type, bool restart)
     {
         try
         {
@@ -231,7 +400,7 @@ public class VariableRuntimeService : IVariableRuntimeService
             var result = await GlobalData.VariableService.SaveVariableAsync(input, type).ConfigureAwait(false);
 
             using var db = DbContext.GetDB<Variable>();
-            var newVariableRuntimes = (await db.Queryable<Variable>().Where(a => a.Id == input.Id).ToListAsync(cancellationToken).ConfigureAwait(false)).AdaptListVariableRuntime();
+            var newVariableRuntimes = (await db.Queryable<Variable>().Where(a => a.Id == input.Id).ToListAsync().ConfigureAwait(false)).AdaptListVariableRuntime();
 
             var variableIds = newVariableRuntimes.Select(a => a.Id).ToHashSet();
 
@@ -244,7 +413,7 @@ public class VariableRuntimeService : IVariableRuntimeService
             if (restart)
             {
                 //根据条件重启通道线程
-                await RuntimeServiceHelper.ChangedDriverAsync(changedDriver, _logger, cancellationToken).ConfigureAwait(false);
+                await RuntimeServiceHelper.ChangedDriverAsync(changedDriver, _logger).ConfigureAwait(false);
             }
 
             return true;
@@ -257,4 +426,9 @@ public class VariableRuntimeService : IVariableRuntimeService
 
     public Task<MemoryStream> ExportMemoryStream(List<Variable> data, string deviceName) => GlobalData.VariableService.ExportMemoryStream(data, deviceName);
 
+    public async Task<string> ExportVariableFileAsync(GatewayExportFilter exportFilter)
+    {
+        var sheets = await GlobalData.VariableService.ExportVariableAsync(exportFilter).ConfigureAwait(false);
+        return await App.GetService<IImportExportService>().CreateFileAsync<Variable>(sheets, "Variable", false).ConfigureAwait(false);
+    }
 }

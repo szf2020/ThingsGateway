@@ -16,7 +16,6 @@ using System.Collections.Concurrent;
 using ThingsGateway.NewLife.Extension;
 using ThingsGateway.NewLife.Json.Extension;
 
-using TouchSocket.Core;
 
 namespace ThingsGateway.Gateway.Razor;
 
@@ -44,12 +43,36 @@ public partial class VariableEditComponent
     private IEnumerable<SelectedItem> BusinessDeviceItems { get; set; }
 
     private IEnumerable<SelectedItem> CollectDeviceItems { get; set; }
+    [Inject]
+    IDevicePageService DevicePageService { get; set; }
+    private string DeviceName;
+    private string ChoiceBusinessDeviceName;
+    private bool first = false;
+    public override async Task SetParametersAsync(ParameterView parameters)
+    {
+        if (DeviceName.IsNullOrEmpty() && first == false)
+        {
+            first = true;
+            parameters.SetParameterProperties(this);
+            DeviceName = await DevicePageService.GetDeviceNameAsync(Model?.DeviceId ?? 0);
+            OnInitialized();
+            await OnInitializedAsync();
+            OnParametersSet();
+            StateHasChanged();
+            await OnParametersSetAsync();
+            ChoiceBusinessDeviceId = ChoiceBusinessDeviceId > 0 ? ChoiceBusinessDeviceId : BusinessDeviceItems.FirstOrDefault()?.Value?.ToLong() ?? 0;
+            ChoiceBusinessDeviceName = await DevicePageService.GetDeviceNameAsync(ChoiceBusinessDeviceId);
+        }
+        else
+        {
+            await base.SetParametersAsync(parameters);
+        }
+    }
 
     protected override async Task OnParametersSetAsync()
     {
-        var devices = await GlobalData.GetCurrentUserDevices().ConfigureAwait(false);
-        CollectDeviceItems = devices.Where(a => a.IsCollect == true).BuildDeviceSelectList();
-        BusinessDeviceItems = devices.Where(a => a.IsCollect == false).BuildDeviceSelectList();
+        CollectDeviceItems = await DevicePageService.GetDeviceItemsAsync(true);
+        BusinessDeviceItems = await DevicePageService.GetDeviceItemsAsync(false);
 
         if (Model.DeviceId > 0 && AddressUIType == null)
         {
@@ -98,12 +121,17 @@ public partial class VariableEditComponent
             await ToastService.Warn(ex);
         }
     }
+
+    private Dictionary<long, Tuple<string, string>> DeviceIdNames { get; set; } = new();
+
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
 
         Model.AlarmPropertys ??= new();
         Model.VariablePropertys ??= new();
+
+        DeviceIdNames = await DevicePageService.GetDeviceIdNamesAsync();
         foreach (var item in Model.VariablePropertys)
         {
             await RefreshBusinessPropertyClickAsync(item.Key);
@@ -112,21 +140,25 @@ public partial class VariableEditComponent
 
     Dictionary<string, string> OtherMethods = new Dictionary<string, string>();
     public IEnumerable<SelectedItem> OtherMethodSelectedItems { get; set; }
+
     private async Task OnDeviceChanged(SelectedItem selectedItem)
     {
-        await SetAddressUI(selectedItem.Value.ToLong());
+        var deviceId = selectedItem.Value.ToLong();
+        await SetAddressUI(deviceId);
     }
-
+    [Inject]
+    IPluginService PluginService { get; set; }
     private async Task SetAddressUI(long deviceId)
     {
         try
         {
-            if (GlobalData.ReadOnlyIdDevices.TryGetValue(deviceId, out var device))
+            var pluginName = await DevicePageService.GetDevicePluginNameAsync(deviceId);
+            if (!pluginName.IsNullOrWhiteSpace())
             {
-                OtherMethods = GlobalData.PluginService.GetDriverMethodInfos(device.PluginName).ToDictionary(a => a.Name, a => a.Description);
-                OtherMethodSelectedItems = new List<SelectedItem>() { new SelectedItem(string.Empty, "none") }.Concat(OtherMethods.Select(a => new SelectedItem(a.Key, a.Value)));
-
-                AddressUIType = GlobalData.PluginService.GetAddressUI(device.PluginName);
+                OtherMethods = PluginService.GetDriverMethodInfos(pluginName).ToDictionary(a => a.Name, a => a.Description);
+                OtherMethodSelectedItems = OtherMethods.Select(a => new SelectedItem(a.Key, a.Value));
+                AddressDesc = PluginService.GetDriver(pluginName) is CollectBase collectBase ? collectBase.GetAddressDescription() : string.Empty;
+                AddressUIType = PluginService.GetAddressUI(pluginName);
             }
         }
         catch (Exception ex)
@@ -137,6 +169,7 @@ public partial class VariableEditComponent
 
     private BootstrapDynamicComponent AddressDynamicComponent;
     private Type AddressUIType;
+    private string AddressDesc;
 
     private async Task ShowAddressUI()
     {
@@ -214,7 +247,7 @@ public partial class VariableEditComponent
         {
              {nameof(DeviceEditComponent.OnValidSubmit), async () =>
              {
-                await Task.Run(() =>GlobalData.DeviceRuntimeService.SaveDeviceAsync(oneModel,ItemChangedType.Add,AutoRestartThread));
+                await Task.Run(() =>DevicePageService.SaveDeviceAsync(oneModel,ItemChangedType.Add,AutoRestartThread));
                  OnParametersSet();
             }},
             {nameof(DeviceEditComponent.Model),oneModel },
@@ -230,9 +263,10 @@ public partial class VariableEditComponent
     {
         if (id > 0)
         {
-            if (GlobalData.ReadOnlyIdDevices.TryGetValue(id, out var device))
+            var pluginName = await DevicePageService.GetDevicePluginNameAsync(id);
+            if (!pluginName.IsNullOrWhiteSpace())
             {
-                var data = GlobalData.PluginService.GetVariablePropertyTypes(device.PluginName);
+                var data = PluginService.GetVariablePropertyTypes(pluginName);
                 Model.VariablePropertyModels ??= new();
                 Model.VariablePropertyModels.AddOrUpdate(id, (a) => new ModelValueValidateForm() { Value = data.Model }, (a, b) => new ModelValueValidateForm() { Value = data.Model });
                 VariablePropertyEditors.TryAdd(id, data.EditorItems);
@@ -244,7 +278,7 @@ public partial class VariableEditComponent
                         [nameof(IPropertyUIBase.Model)] = Model,
                         [nameof(IPropertyUIBase.PluginPropertyEditorItems)] = data.EditorItems,
                     });
-                    VariablePropertyRenderFragments.AddOrUpdate(id, component.Render());
+                    VariablePropertyRenderFragments.AddOrUpdate(id, (a) => component.Render(), (a, b) => component.Render());
                 }
 
                 if (Model.VariablePropertys?.TryGetValue(id, out var dict) == true)

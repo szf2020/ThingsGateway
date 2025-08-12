@@ -47,6 +47,8 @@ public partial class MqttClient : BusinessBaseWithCacheIntervalScriptAll
 
     private WaitLock ConnectLock = new(nameof(MqttClient));
 
+#if !Management
+
     protected override void AlarmChange(AlarmVariable alarmVariable)
     {
         if (!_businessPropertyWithCacheIntervalScript.AlarmTopic.IsNullOrWhiteSpace())
@@ -554,4 +556,6 @@ public partial class MqttClient : BusinessBaseWithCacheIntervalScriptAll
     }
 
     #endregion mqtt方法
+
+#endif
 }

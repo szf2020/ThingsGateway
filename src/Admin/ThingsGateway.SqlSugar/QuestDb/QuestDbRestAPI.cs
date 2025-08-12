@@ -132,35 +132,43 @@ namespace ThingsGateway.SqlSugar
             {
                 // 准备多部分表单数据
                 var boundary = "---------------" + DateTime.Now.Ticks.ToString("x");
-                var list = new List<Hashtable>();
+
                 tableName ??= db.EntityMaintenance.GetEntityInfo<T>().DbTableName;
 
                 // 获取或创建列信息缓存
                 var key = "QuestDbBulkCopy" + typeof(T).FullName + typeof(T).GetHashCode();
                 var columns = ReflectionInoCacheService.Instance.GetOrCreate(key, () =>
                  db.CopyNew().DbMaintenance.GetColumnInfosByTableName(tableName));
-
-                // 构建schema信息
-                columns.ForEach(d =>
+                var list = ReflectionInoCacheService.Instance.GetOrCreate($"{key}{dateFormat}List<Hashtable>", () =>
                 {
-                    if (d.DataType == "TIMESTAMP")
+                    var list = new List<Hashtable>();
+
+                    // 构建schema信息
+                    columns.ForEach(d =>
                     {
-                        list.Add(new Hashtable()
+                        if (d.DataType == "TIMESTAMP")
+                        {
+                            list.Add(new Hashtable()
                         {
                             { "name", d.DbColumnName },
                             { "type", d.DataType },
                             { "pattern", dateFormat}
                         });
-                    }
-                    else
-                    {
-                        list.Add(new Hashtable()
+                        }
+                        else
+                        {
+                            list.Add(new Hashtable()
                         {
                             { "name", d.DbColumnName },
                             { "type", d.DataType }
                         });
-                    }
-                });
+                        }
+                    });
+
+                    return list;
+                }
+ );
+
                 var schema = JsonConvert.SerializeObject(list);
 
                 // 写入CSV文件

@@ -61,7 +61,7 @@
                         <EditTemplate Context="value">
                             <div class="col-12  col-md-6 ">
                                 <BootstrapInputGroup>
-                                    <Select IsVirtualize DefaultVirtualizeItemText=@(GlobalData.ReadOnlyIdChannels.TryGetValue(value.ChannelId,out var channelRuntime)?channelRuntime.Name:string.Empty) @bind-Value="@value.ChannelId" IsDisabled=BatchEditEnable OnSelectedItemChanged=OnChannelChanged ShowSearch="true" ShowLabel="true" OnQueryAsync=OnChannelSelectedItemQueryAsync />
+                                    <Select IsVirtualize DefaultVirtualizeItemText=@ChannelName @bind-Value="@value.ChannelId" IsDisabled=BatchEditEnable OnSelectedItemChanged=OnChannelChanged ShowSearch="true" ShowLabel="true" OnQueryAsync=OnChannelSelectedItemQueryAsync />
                                     <Button IsDisabled=BatchEditEnable class="text-end" Icon="fa-solid fa-plus" OnClick="AddChannel"></Button>
                                 </BootstrapInputGroup>
                             </div>
@@ -81,25 +81,9 @@
                     <EditorItem @bind-Field="@context.RedundantDeviceId">
                         <EditTemplate Context="value">
                             <div class="col-12  col-md-6">
-                                <Select IsVirtualize DefaultVirtualizeItemText=@(GlobalData.ReadOnlyIdDevices.TryGetValue(value.RedundantDeviceId??0,out var deviceRuntime)?deviceRuntime.Name:string.Empty) @bind-Value="@value.RedundantDeviceId" class="w-100"
+                                <Select IsVirtualize DefaultVirtualizeItemText=@(DeviceName) @bind-Value="@value.RedundantDeviceId" class="w-100"
                                         OnQueryAsync="(a)=>OnRedundantDevicesQuery(a,value)" IsDisabled="BatchEditEnable"
-                                        ShowSearch="true" IsClearable OnClearAsync=@(()=>
-                                    {
-                                    value.RedundantDeviceId = default;
-                                    return Task.CompletedTask;
-                                    })>
-                                    <DisplayTemplate Context="display">
-                                        @{
-                                    string device = "none";
-                                    if (value.RedundantDeviceId != null)
-                                    {
-                                    if (value.RedundantDeviceId.HasValue)
-                                    if (GlobalData.ReadOnlyIdDevices.TryGetValue(value.RedundantDeviceId.Value, out var deviceRuntime))
-                                    device = deviceRuntime?.Name ?? device;
-                                    }
-                                            @device
-                                        }
-                                    </DisplayTemplate>
+                                        ShowSearch="true" IsClearable>
                                 </Select>
                             </div>
                         </EditTemplate>

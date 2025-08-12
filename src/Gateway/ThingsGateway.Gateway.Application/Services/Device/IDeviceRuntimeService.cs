@@ -16,14 +16,13 @@ namespace ThingsGateway.Gateway.Application
 {
     public interface IDeviceRuntimeService : IDevicePageService
     {
-        Task<bool> BatchEditAsync(IEnumerable<Device> models, Device oldModel, Device model, bool restart);
-        Task<bool> CopyAsync(Dictionary<Device, List<Variable>> devices, bool restart, CancellationToken cancellationToken);
-        Task<bool> DeleteDeviceAsync(IEnumerable<long> ids, bool restart, CancellationToken cancellationToken);
+
+
+        Task<bool> CopyAsync(Dictionary<Device, List<Variable>> devices, bool restart);
         Task<Dictionary<string, object>> ExportDeviceAsync(GatewayExportFilter exportFilter);
         Task<MemoryStream> ExportMemoryStream(List<Device> data, string channelName, string plugin);
         Task ImportDeviceAsync(Dictionary<string, ImportPreviewOutputBase> input, bool restart);
-        Task<Dictionary<string, ImportPreviewOutputBase>> PreviewAsync(IBrowserFile browserFile);
-        Task<bool> SaveDeviceAsync(Device input, ItemChangedType type, bool restart);
         Task<bool> BatchSaveDeviceAsync(List<Device> input, ItemChangedType type, bool restart);
+        Task<Dictionary<string, ImportPreviewOutputBase>> PreviewAsync(IBrowserFile browserFile);
     }
 }

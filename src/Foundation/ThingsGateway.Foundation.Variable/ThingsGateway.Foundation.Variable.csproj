@@ -5,6 +5,7 @@
 	<PropertyGroup>
 		<TargetFrameworks>netstandard2.0;</TargetFrameworks>
 		<Version>$(SourceGeneratorVersion)</Version>
+		
 	</PropertyGroup>
 
 	<ItemGroup>

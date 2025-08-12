@@ -23,7 +23,7 @@
             <EditorItem @bind-Field=Model.EncodingName>
                 <EditTemplate Context="value">
                     <div class="col-12 col-sm-4">
-                        <Select @bind-Value=value.EncodingName Items="EncodingItems" />
+                        <Select @bind-Value=value.EncodingName Items="EncodingItems" IsClearable/>
                     </div>
                 </EditTemplate>
             </EditorItem>

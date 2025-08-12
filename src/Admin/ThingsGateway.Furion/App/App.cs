@@ -554,10 +554,9 @@ public static class App
         {
             types = ass.GetTypes();
         }
-        catch
+        catch (Exception ex)
         {
-            XTrace.Log.Warn($"Error load `{ass.FullName}` assembly.");
-            Console.WriteLine($"Error load `{ass.FullName}` assembly.");
+            XTrace.Log.Warn($"Error load `{ass.FullName}` assembly. : {ex.Message}");
         }
 
         return types.Where(u => u.IsPublic && !u.IsDefined(typeof(SuppressSnifferAttribute), false));

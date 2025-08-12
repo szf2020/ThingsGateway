@@ -18,7 +18,7 @@ namespace BootstrapBlazor.Components;
 /// <param name="fieldName">字段名称</param>
 /// <param name="fieldType">字段类型</param>
 /// <param name="fieldText">显示文字</param>
-internal sealed class InternalTableColumn(string fieldName, Type fieldType, string? fieldText = null) : IEditorItem, ITableColumn
+public sealed class DefaultTableColumn(string fieldName, Type fieldType, string? fieldText = null) : IEditorItem, ITableColumn
 {
     public IEnumerable<KeyValuePair<string, object>>? ComponentParameters { get; set; }
     public Type? ComponentType { get; set; }

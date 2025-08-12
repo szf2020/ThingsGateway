@@ -36,6 +36,7 @@ namespace ThingsGateway.Plugin.Mqtt;
 /// </summary>
 public partial class MqttServer : BusinessBaseWithCacheIntervalScriptAll
 {
+#if !Management
     private static readonly CompositeFormat RpcTopic = CompositeFormat.Parse("{0}/+");
     private MQTTnet.Server.MqttServer _mqttServer;
     private IWebHost _webHost { get; set; }
@@ -431,4 +432,6 @@ public partial class MqttServer : BusinessBaseWithCacheIntervalScriptAll
             return new OperResult("Upload fail", ex);
         }
     }
+
+#endif
 }

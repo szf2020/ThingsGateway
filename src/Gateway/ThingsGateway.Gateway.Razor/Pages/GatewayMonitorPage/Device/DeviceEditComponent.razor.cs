@@ -14,7 +14,6 @@ using Microsoft.AspNetCore.Components.Web;
 using System.ComponentModel.DataAnnotations;
 
 using ThingsGateway.Common.Extension;
-using ThingsGateway.Extension.Generic;
 using ThingsGateway.NewLife.Extension;
 
 namespace ThingsGateway.Gateway.Razor;
@@ -100,7 +99,7 @@ public partial class DeviceEditComponent
         {
              {nameof(ChannelEditComponent.OnValidSubmit), async () =>
              {
-                await Task.Run(() =>GlobalData.ChannelRuntimeService.SaveChannelAsync(oneModel,ItemChangedType.Add,AutoRestartThread));
+                await Task.Run(() =>ChannelPageService.SaveChannelAsync(oneModel,ItemChangedType.Add,AutoRestartThread));
                  OnParametersSet();
             }},
             {nameof(ChannelEditComponent.Model),oneModel },
@@ -111,38 +110,51 @@ public partial class DeviceEditComponent
 
         await DialogService.Show(op);
     }
+    [Inject]
+    IDevicePageService DevicePageService { get; set; }
 
-    private static async Task<QueryData<SelectedItem>> OnRedundantDevicesQuery(VirtualizeQueryOption option, Device device)
+    private Task<QueryData<SelectedItem>> OnRedundantDevicesQuery(VirtualizeQueryOption option, Device device)
     {
-        var ret = new QueryData<SelectedItem>()
-        {
-            IsSorted = false,
-            IsFiltered = false,
-            IsAdvanceSearch = false,
-            IsSearch = !option.SearchText.IsNullOrWhiteSpace()
-        };
-
-        var devices = await GlobalData.GetCurrentUserDevices().ConfigureAwait(false);
-        var pluginName = GlobalData.ReadOnlyIdChannels.TryGetValue(device.ChannelId, out var channel) ? channel.PluginName : string.Empty;
-        var items = new List<SelectedItem>() { new SelectedItem(string.Empty, "none") }.Concat(devices.WhereIf(!option.SearchText.IsNullOrWhiteSpace(), a => a.Name.Contains(option.SearchText))
-            .Where(a => a.PluginName == pluginName && a.Id != device.Id).Take(20).BuildDeviceSelectList()
-            );
-
-        ret.TotalCount = items.Count();
-        ret.Items = items;
-        return ret;
+        return DevicePageService.OnRedundantDevicesQueryAsync(option, device.Id, device.ChannelId);
     }
+
+    private string ChannelName;
+    private string DeviceName;
+    public override async Task SetParametersAsync(ParameterView parameters)
+    {
+        if (ChannelName.IsNullOrEmpty())
+        {
+            parameters.SetParameterProperties(this);
+            ChannelName = await ChannelPageService.GetChannelNameAsync(Model?.ChannelId ?? 0);
+            DeviceName = await DevicePageService.GetDeviceNameAsync(Model?.RedundantDeviceId ?? 0);
+            OnInitialized();
+            await OnInitializedAsync();
+            OnParametersSet();
+            StateHasChanged();
+            await OnParametersSetAsync();
+        }
+        else
+        {
+            await base.SetParametersAsync(parameters);
+        }
+    }
+
+
+
 
     internal IEnumerable<IEditorItem> PluginPropertyEditorItems;
     private RenderFragment PluginPropertyRenderFragment;
 
+    [Inject]
+    IPluginService PluginService { get; set; }
     private async Task OnChannelChanged(SelectedItem selectedItem)
     {
         try
         {
-            var pluginName = GlobalData.ReadOnlyIdChannels.TryGetValue(selectedItem.Value.ToLong(), out var channel) ? channel.PluginName : string.Empty;
+            var pluginName = await ChannelPageService.GetPluginNameAsync(selectedItem.Value.ToLong());
             if (pluginName.IsNullOrEmpty()) return;
-            var data = GlobalData.PluginService.GetDriverPropertyTypes(pluginName);
+
+            var data = PluginService.GetDriverPropertyTypes(pluginName);
             Model.ModelValueValidateForm = new ModelValueValidateForm() { Value = data.Model };
             PluginPropertyEditorItems = data.EditorItems;
             if (data.PropertyUIType != null)

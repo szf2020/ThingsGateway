@@ -8,6 +8,7 @@
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
 		<DocumentationFile></DocumentationFile>
 		<IncludeSymbols>false</IncludeSymbols>
+		
 	</PropertyGroup>
 
 	<ItemGroup>

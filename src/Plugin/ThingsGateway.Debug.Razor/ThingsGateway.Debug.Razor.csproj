@@ -3,6 +3,7 @@
 	<Import Project="..\..\PackNuget.props" />
 	<PropertyGroup>
 		<TargetFrameworks>net8.0;</TargetFrameworks>
+		
 		<!--<UseRazorSourceGenerator>false</UseRazorSourceGenerator>-->
 	</PropertyGroup>
 	<ItemGroup>

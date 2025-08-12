@@ -19,6 +19,7 @@ namespace ThingsGateway.Gateway.Application;
 /// </summary>
 public abstract class BusinessBaseWithCacheAlarm : BusinessBaseWithCache
 {
+#if !Management
     protected override bool AlarmModelEnable => true;
 
     protected override bool DevModelEnable => false;
@@ -104,4 +105,6 @@ public abstract class BusinessBaseWithCacheAlarm : BusinessBaseWithCache
             }
         }
     }
+
+#endif
 }

@@ -20,6 +20,8 @@ public partial class Webhook : BusinessBaseWithCacheIntervalScriptAll
     public override VariablePropertyBase VariablePropertys => _variablePropertys;
     protected override BusinessPropertyWithCacheIntervalScript _businessPropertyWithCacheIntervalScript => _driverPropertys;
 
+#if !Management
     /// <inheritdoc/>
     public override bool IsConnected() => success;
+#endif
 }

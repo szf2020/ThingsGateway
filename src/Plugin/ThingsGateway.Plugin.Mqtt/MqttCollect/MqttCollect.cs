@@ -27,28 +27,16 @@ public partial class MqttCollect : CollectBase
 {
     private readonly MqttCollectProperty _driverPropertys = new();
     public override CollectPropertyBase CollectProperties => _driverPropertys;
-
-    /// <inheritdoc/>
-    public override bool IsConnected() => _mqttClient?.IsConnected == true;
-
     /// <inheritdoc/>
     public override string ToString()
     {
         return $" {nameof(MqttClient)} IP:{_driverPropertys.IP} Port:{_driverPropertys.Port}";
     }
 
-    /// <inheritdoc/>
-    protected override async Task DisposeAsync(bool disposing)
-    {
-        await base.DisposeAsync(disposing).ConfigureAwait(false);
-        if (_mqttClient != null)
-        {
-            await _mqttClient.DisconnectAsync().ConfigureAwait(false);
-            _mqttClient.SafeDispose();
-        }
-        _mqttClient = null;
-        TopicItemDict?.Clear();
-    }
+
+
+
+
 
     public override string GetAddressDescription()
     {
@@ -72,6 +60,25 @@ public partial class MqttCollect : CollectBase
             
             """;
     }
+
+#if !Management
+
+    /// <inheritdoc/>
+    protected override async Task DisposeAsync(bool disposing)
+    {
+        await base.DisposeAsync(disposing).ConfigureAwait(false);
+        if (_mqttClient != null)
+        {
+            await _mqttClient.DisconnectAsync().ConfigureAwait(false);
+            _mqttClient.SafeDispose();
+        }
+        _mqttClient = null;
+        TopicItemDict?.Clear();
+    }
+
+    /// <inheritdoc/>
+    public override bool IsConnected() => _mqttClient?.IsConnected == true;
+
 
     private Dictionary<string, List<Tuple<string, string, VariableRuntime>>> TopicItemDict = new();
 
@@ -282,4 +289,8 @@ public partial class MqttCollect : CollectBase
             //return;
         }
     }
+
+
+#endif
+
 }

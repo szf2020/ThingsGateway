@@ -5,6 +5,7 @@
 
 	<PropertyGroup>
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
+		
 	</PropertyGroup>
 	<PropertyGroup>
 		<TargetFrameworks>net8.0;net9.0;</TargetFrameworks>
@@ -16,6 +17,12 @@
 		<None Include="..\README.zh-CN.md" Pack="true" PackagePath="\" />
 		<None Remove="..\..\..\README.md" Pack="false" PackagePath="\" />
 		<None Remove="..\..\..\README.zh-CN.md" Pack="false" PackagePath="\" />
+	</ItemGroup>
+
+
+	<ItemGroup>
+	  <EmbeddedResource Include="Locales\en-US.json" />
+	  <EmbeddedResource Include="Locales\zh-CN.json" />
 	</ItemGroup>
 
 	<ItemGroup>

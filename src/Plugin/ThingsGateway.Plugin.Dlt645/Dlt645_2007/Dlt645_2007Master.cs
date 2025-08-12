@@ -27,6 +27,14 @@ public class Dlt645_2007Master : CollectFoundationBase
     /// <inheritdoc/>
     public override Type DriverDebugUIType => typeof(ThingsGateway.Debug.Dlt645_2007Master);
 
+
+
+    public override Type DriverVariableAddressUIType => typeof(ThingsGateway.Debug.Dlt645_2007AddressComponent);
+
+    /// <inheritdoc/>
+    public override IDevice? FoundationDevice => _plc;
+
+#if !Management
     /// <inheritdoc/>
     public override Type DriverUIType
     {
@@ -38,11 +46,6 @@ public class Dlt645_2007Master : CollectFoundationBase
                 return null;
         }
     }
-
-    public override Type DriverVariableAddressUIType => typeof(ThingsGateway.Debug.Dlt645_2007AddressComponent);
-
-    /// <inheritdoc/>
-    public override IDevice? FoundationDevice => _plc;
 
     protected override async Task InitChannelAsync(IChannel? channel, CancellationToken cancellationToken)
     {
@@ -71,4 +74,6 @@ public class Dlt645_2007Master : CollectFoundationBase
     {
         return Task.FromResult(_plc.LoadSourceRead<VariableSourceRead>(deviceVariables, 0, CurrentDevice.IntervalTime));
     }
+
+#endif
 }

@@ -12,6 +12,12 @@ namespace ThingsGateway.Gateway.Razor;
 
 public partial class ChannelRuntimeInfo
 {
+#if !Management
+    private string Height { get; set; } = "calc(100% - 270px)";
+#else
+    private string Height { get; set; } = "calc(100% - 330px)";
+
+#endif
     [Parameter, EditorRequired]
     public ChannelRuntime ChannelRuntime { get; set; }
 

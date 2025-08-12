@@ -26,7 +26,32 @@ public partial class KafkaProducer : BusinessBaseWithCacheIntervalScriptAll
     public override VariablePropertyBase VariablePropertys => _variablePropertys;
 
     protected override BusinessPropertyWithCacheIntervalScript _businessPropertyWithCacheIntervalScript => _driverPropertys;
+    private IProducer<Null, byte[]> _producer;
 
+    /// <inheritdoc/>
+    public override string ToString()
+    {
+        return $" {nameof(KafkaProducer)} :{_driverPropertys.BootStrapServers}";
+    }
+
+
+
+    /// <inheritdoc/>
+    protected override Task DisposeAsync(bool disposing)
+    {
+        try
+        {
+            _producer?.Flush(TimeSpan.FromSeconds(10));
+        }
+        catch
+        {
+        }
+        _producer?.SafeDispose();
+        return base.DisposeAsync(disposing);
+    }
+
+
+#if !Management
     protected override async Task InitChannelAsync(IChannel? channel, CancellationToken cancellationToken)
     {
         #region 初始化
@@ -66,28 +91,13 @@ public partial class KafkaProducer : BusinessBaseWithCacheIntervalScriptAll
     /// <inheritdoc/>
     public override bool IsConnected() => success;
 
-    /// <inheritdoc/>
-    public override string ToString()
-    {
-        return $" {nameof(KafkaProducer)} :{_driverPropertys.BootStrapServers}";
-    }
 
-    /// <inheritdoc/>
-    protected override Task DisposeAsync(bool disposing)
-    {
-        try
-        {
-            _producer?.Flush(TimeSpan.FromSeconds(10));
-        }
-        catch
-        {
-        }
-        _producer?.SafeDispose();
-        return base.DisposeAsync(disposing);
-    }
 
     protected override Task ProtectedExecuteAsync(object? state, CancellationToken cancellationToken)
     {
         return Update(cancellationToken);
     }
+
+#endif
+
 }

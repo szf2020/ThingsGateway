@@ -25,6 +25,8 @@ namespace ThingsGateway.Plugin.RabbitMQ;
 /// </summary>
 public partial class RabbitMQProducer : BusinessBaseWithCacheIntervalScriptAll
 {
+
+#if !Management
     private IConnection _connection;
     private ConnectionFactory _connectionFactory;
     private IChannel _channel;
@@ -238,4 +240,7 @@ public partial class RabbitMQProducer : BusinessBaseWithCacheIntervalScriptAll
     }
 
     #endregion 方法
+
+
+#endif
 }

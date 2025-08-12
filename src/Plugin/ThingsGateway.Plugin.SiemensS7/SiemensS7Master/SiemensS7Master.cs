@@ -37,6 +37,34 @@ public class SiemensS7Master : CollectFoundationBase
     /// <inheritdoc/>
     public override Type DriverDebugUIType => typeof(ThingsGateway.Debug.SiemensS7Master);
 
+
+
+
+    /// <inheritdoc/>
+    public override IDevice FoundationDevice => _plc;
+
+    public override Type DriverVariableAddressUIType => typeof(SiemensS7AddressComponent);
+
+    [ThingsGateway.Gateway.Application.DynamicMethod("ReadWriteDateAsync", "读写日期格式")]
+    public async Task<IOperResult<System.DateTime>> ReadWriteDateAsync(string address, System.DateTime? value = null, CancellationToken cancellationToken = default)
+    {
+        if (value == null)
+            return await _plc.ReadDateAsync(address, cancellationToken).ConfigureAwait(false);
+        else
+            return new OperResult<System.DateTime>(await _plc.WriteDateAsync(address, value.Value, cancellationToken).ConfigureAwait(false));
+    }
+
+    [ThingsGateway.Gateway.Application.DynamicMethod("ReadWriteDateTimeAsync", "读写日期时间格式")]
+    public async Task<IOperResult<System.DateTime>> ReadWriteDateTimeAsync(string address, System.DateTime? value = null, CancellationToken cancellationToken = default)
+    {
+        if (value == null)
+            return await _plc.ReadDateTimeAsync(address, cancellationToken).ConfigureAwait(false);
+        else
+            return new OperResult<System.DateTime>(await _plc.WriteDateTimeAsync(address, value.Value, cancellationToken).ConfigureAwait(false));
+    }
+
+#if !Management
+
     /// <inheritdoc/>
     public override Type DriverUIType
     {
@@ -49,10 +77,7 @@ public class SiemensS7Master : CollectFoundationBase
         }
     }
 
-    /// <inheritdoc/>
-    public override IDevice FoundationDevice => _plc;
 
-    public override Type DriverVariableAddressUIType => typeof(SiemensS7AddressComponent);
 
     protected override async Task InitChannelAsync(IChannel? channel = null, CancellationToken cancellationToken = default)
     {
@@ -164,23 +189,7 @@ public class SiemensS7Master : CollectFoundationBase
         return new Dictionary<string, OperResult>(operResults);
     }
 
-    [ThingsGateway.Gateway.Application.DynamicMethod("ReadWriteDateAsync", "读写日期格式")]
-    public async Task<IOperResult<System.DateTime>> ReadWriteDateAsync(string address, System.DateTime? value = null, CancellationToken cancellationToken = default)
-    {
-        if (value == null)
-            return await _plc.ReadDateAsync(address, cancellationToken).ConfigureAwait(false);
-        else
-            return new OperResult<System.DateTime>(await _plc.WriteDateAsync(address, value.Value, cancellationToken).ConfigureAwait(false));
-    }
 
-    [ThingsGateway.Gateway.Application.DynamicMethod("ReadWriteDateTimeAsync", "读写日期时间格式")]
-    public async Task<IOperResult<System.DateTime>> ReadWriteDateTimeAsync(string address, System.DateTime? value = null, CancellationToken cancellationToken = default)
-    {
-        if (value == null)
-            return await _plc.ReadDateTimeAsync(address, cancellationToken).ConfigureAwait(false);
-        else
-            return new OperResult<System.DateTime>(await _plc.WriteDateTimeAsync(address, value.Value, cancellationToken).ConfigureAwait(false));
-    }
 
     /// <inheritdoc/>
     protected override async Task<List<VariableSourceRead>> ProtectedLoadSourceReadAsync(List<VariableRuntime> deviceVariables)
@@ -199,4 +208,6 @@ public class SiemensS7Master : CollectFoundationBase
         }
         return variableSourceReads;
     }
+
+#endif
 }

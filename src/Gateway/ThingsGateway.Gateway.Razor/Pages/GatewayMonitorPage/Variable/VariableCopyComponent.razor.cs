@@ -8,8 +8,6 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-using ThingsGateway.DB;
-
 namespace ThingsGateway.Gateway.Razor;
 
 public partial class VariableCopyComponent
@@ -22,7 +20,7 @@ public partial class VariableCopyComponent
     public IEnumerable<Variable> Model { get; set; }
 
     [Parameter]
-    public Func<List<Variable>, Task> OnSave { get; set; }
+    public Func<int, string, int, Task> OnSave { get; set; }
 
     [CascadingParameter]
     private Func<Task>? OnCloseAsync { get; set; }
@@ -37,20 +35,10 @@ public partial class VariableCopyComponent
     {
         try
         {
-            List<Variable> variables = new();
-            for (int i = 0; i < CopyCount; i++)
-            {
-                var variable = Model.AdaptListVariable();
-                foreach (var item in variable)
-                {
-                    item.Id = CommonUtils.GetSingleId();
-                    item.Name = $"{CopyVariableNamePrefix}{CopyVariableNameSuffixNumber + i}";
-                    variables.Add(item);
-                }
-            }
+
 
             if (OnSave != null)
-                await OnSave(variables);
+                await OnSave(CopyCount, CopyVariableNamePrefix, CopyVariableNameSuffixNumber);
             if (OnCloseAsync != null)
                 await OnCloseAsync();
             await ToastService.Default();

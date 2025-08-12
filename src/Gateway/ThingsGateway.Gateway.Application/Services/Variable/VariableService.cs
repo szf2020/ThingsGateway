@@ -558,6 +558,12 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
         }
         var upData = variables.Where(a => a.IsUp).ToList();
         var insertData = variables.Where(a => !a.IsUp).ToList();
+        return await ImportVariableAsync(upData, insertData).ConfigureAwait(false);
+    }
+
+    [OperDesc("ImportVariable", isRecordPar: false, localizerType: typeof(Variable))]
+    public async Task<HashSet<long>> ImportVariableAsync(List<Variable> upData, List<Variable> insertData)
+    {
         ManageHelper.CheckVariableCount(insertData.Count);
         using var db = GetDB();
         if (GlobalData.HardwareJob.HardwareInfo.MachineInfo.AvailableMemory > 2 * 1024 * 1024)
@@ -571,13 +577,19 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
             await db.BulkUpdateAsync(upData, 10000).ConfigureAwait(false);
         }
         DeleteVariableCache();
-        return variables.Select(a => a.Id).ToHashSet();
+        return upData.Select(a => a.Id).Concat(insertData.Select(a => a.Id)).ToHashSet();
     }
 
     public async Task<Dictionary<string, ImportPreviewOutputBase>> PreviewAsync(IBrowserFile browserFile)
     {
+        var path = await browserFile.StorageLocal().ConfigureAwait(false); // 上传文件并获取文件路径
+
+        return await PreviewAsync(path).ConfigureAwait(false);
+    }
+
+    public async Task<Dictionary<string, ImportPreviewOutputBase>> PreviewAsync(string path)
+    {
         // 上传文件并获取文件路径
-        var path = await browserFile.StorageLocal().ConfigureAwait(false);
         var dataScope = await GlobalData.SysUserService.GetCurrentUserDataScopeAsync().ConfigureAwait(false);
 
         try

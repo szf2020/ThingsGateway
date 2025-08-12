@@ -22,6 +22,7 @@ namespace ThingsGateway.Plugin.SqlHistoryAlarm;
 /// </summary>
 public partial class SqlHistoryAlarm : BusinessBaseWithCacheAlarm
 {
+#if !Management
     protected override void AlarmChange(AlarmVariable alarmVariable)
     {
         AddQueueAlarmModel(new CacheDBItem<AlarmVariable>(alarmVariable));
@@ -85,4 +86,6 @@ public partial class SqlHistoryAlarm : BusinessBaseWithCacheAlarm
             return new OperResult(ex);
         }
     }
+
+#endif
 }

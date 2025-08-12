@@ -5,7 +5,8 @@
 #推送：docker push registry.cn-shenzhen.aliyuncs.com/thingsgateway/thingsgateway
 
 #aspnetcore9.0环境
-FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS base
+#FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS base
+FROM mcr.microsoft.com/dotnet/aspnet:8.0-noble AS base
 COPY .  /app
 WORKDIR /app
 #默认web
@@ -13,6 +14,8 @@ EXPOSE 5000
 
 # 添加时区环境变量，亚洲，上海
 ENV TimeZone=Asia/Shanghai
+# 转发头
+ENV ASPNETCORE_FORWARDEDHEADERS_ENABLED=true
 # 使用软连接，并且将时区配置覆盖/etc/timezone
 RUN ln -snf /usr/share/zoneinfo/$TimeZone /etc/localtime && echo $TimeZone > /etc/timezone
 

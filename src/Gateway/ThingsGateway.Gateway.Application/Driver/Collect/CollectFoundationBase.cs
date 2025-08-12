@@ -33,13 +33,7 @@ public abstract class CollectFoundationBase : CollectBase
     /// </summary>
     public virtual IDevice? FoundationDevice { get; }
 
-    /// <summary>
-    /// 是否连接成功
-    /// </summary>
-    public override bool IsConnected()
-    {
-        return FoundationDevice?.OnLine == true;
-    }
+
 
     public override string ToString()
     {
@@ -53,6 +47,24 @@ public abstract class CollectFoundationBase : CollectBase
             await FoundationDevice.SafeDisposeAsync().ConfigureAwait(false);
         await base.DisposeAsync(disposing).ConfigureAwait(false);
     }
+
+
+
+
+    public override string GetAddressDescription()
+    {
+        return FoundationDevice?.GetAddressDescription();
+    }
+#if !Management
+
+    /// <summary>
+    /// 是否连接成功
+    /// </summary>
+    public override bool IsConnected()
+    {
+        return FoundationDevice?.OnLine == true;
+    }
+
     /// <summary>
     /// 开始通讯执行的方法
     /// </summary>
@@ -66,10 +78,6 @@ public abstract class CollectFoundationBase : CollectBase
         }
     }
 
-    public override string GetAddressDescription()
-    {
-        return FoundationDevice?.GetAddressDescription();
-    }
 
     protected override async Task TestOnline(object? state, CancellationToken cancellationToken)
     {
@@ -216,4 +224,7 @@ public abstract class CollectFoundationBase : CollectBase
         // 返回包含操作结果的字典
         return new Dictionary<string, OperResult>(operResults);
     }
+
+
+#endif
 }

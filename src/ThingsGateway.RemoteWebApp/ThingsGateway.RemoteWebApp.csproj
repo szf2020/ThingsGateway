@@ -45,6 +45,7 @@
 		
 		<!--动态适用GC-->
 		<GarbageCollectionAdaptationMode>1</GarbageCollectionAdaptationMode>
+		
 		<!--使用工作站GC-->
 		<!--<ServerGarbageCollection>true</ServerGarbageCollection>-->
 		<!--<PlatformTarget>x86</PlatformTarget>-->

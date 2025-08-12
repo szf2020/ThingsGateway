@@ -341,6 +341,7 @@
     "WriteVariablesAsync": "Write variables"
   },
   "ThingsGateway.Gateway.Application.Device": {
+    "Pause": "Pause",
     "ChannelError": "Channel error",
     "ChannelId": "Channel",
     "ChannelId.MinValue": "{0} cannot be empty",

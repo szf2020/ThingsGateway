@@ -8,6 +8,9 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
+using System.Reflection;
+using System.Runtime.InteropServices;
+
 using ThingsGateway.NewLife;
 
 using TouchSocket.Dmtp;
@@ -20,10 +23,24 @@ public partial class UpgradeRpcServer : IRpcServer, IUpgradeRpcServer
 {
 
     [DmtpRpc]
-    public async Task Upgrade(ICallContext callContext, List<UpdateZipFile> updateZipFiles)
+    public async Task UpgradeAsync(ICallContext callContext, UpdateZipFile updateZipFile)
     {
-        if (updateZipFiles?.Count > 0 && callContext.Caller is IDmtpActorObject dmtpActorObject)
-            await Update(dmtpActorObject.DmtpActor, updateZipFiles.OrderByDescending(a => a.Version).FirstOrDefault()).ConfigureAwait(false);
+        if (callContext.Caller is IDmtpActorObject dmtpActorObject)
+            await Update(dmtpActorObject.DmtpActor, updateZipFile).ConfigureAwait(false);
+    }
+    [DmtpRpc]
+    public Task<UpdateZipFileInput> GetUpdateZipFileInputAsync(ICallContext callContext)
+    {
+        return Task.FromResult(new UpdateZipFileInput()
+        {
+            Version = Assembly.GetEntryAssembly().GetName().Version,
+            DotNetVersion = Environment.Version,
+            OSPlatform = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "Windows" :
+                           RuntimeInformation.IsOSPlatform(OSPlatform.Linux) ? "Linux" :
+                           RuntimeInformation.IsOSPlatform(OSPlatform.OSX) ? "OSX" : "Unknown",
+            Architecture = RuntimeInformation.ProcessArchitecture,
+            AppName = "ThingsGateway"
+        });
     }
 
     public static async Task Update(IDmtpActor dmtpActor, UpdateZipFile updateZipFile, Func<Task<bool>> check = null)
@@ -62,7 +79,6 @@ public partial class UpgradeRpcServer : IRpcServer, IUpgradeRpcServer
             UpdateWaitLock.Release();
         }
     }
-
 
 
 

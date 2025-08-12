@@ -20,6 +20,43 @@ namespace ThingsGateway.Gateway.Razor;
 
 public partial class DeviceTable : IDisposable
 {
+
+#if !Management
+    [Parameter]
+    public ChannelDeviceTreeItem SelectModel { get; set; }
+    [Parameter]
+    public IEnumerable<DeviceRuntime>? Items { get; set; } = Enumerable.Empty<DeviceRuntime>();
+
+    private IEnumerable<DeviceRuntime>? _previousItemsRef;
+    protected override void OnParametersSet()
+    {
+        if (!ReferenceEquals(_previousItemsRef, Items))
+        {
+            _previousItemsRef = Items;
+            Refresh();
+        }
+        base.OnParametersSet();
+    }
+
+#else
+
+    private async Task DrawerServiceShowDeviceRuntimeInfo(DeviceRuntime deviceRuntime) => await DrawerService.Show(new DrawerOption()
+    {
+        Class = "h-100",
+        Width = "80%",
+        Placement = Placement.Right,
+        ChildContent = BootstrapDynamicComponent.CreateComponent<DeviceRuntimeInfo>(new Dictionary<string, object?>
+        {
+             {nameof(DeviceRuntimeInfo.DeviceRuntime), deviceRuntime }
+        }).Render(),
+        ShowBackdrop = true,
+        AllowResize = true,
+        IsBackdrop = true
+    });
+#endif
+
+    [Inject]
+    DrawerService DrawerService { get; set; }
     private static void BeforeShowEditDialogCallback(ITableEditDialogOption<DeviceRuntime> tableEditDialogOption)
     {
         tableEditDialogOption.Model = tableEditDialogOption.Model.AdaptDeviceRuntime();
@@ -27,8 +64,6 @@ public partial class DeviceTable : IDisposable
 
     public bool Disposed { get; set; }
 
-    [Parameter]
-    public IEnumerable<DeviceRuntime>? Items { get; set; } = Enumerable.Empty<DeviceRuntime>();
 
     public void Dispose()
     {
@@ -44,16 +79,7 @@ public partial class DeviceTable : IDisposable
     }
 
     private SmartTriggerScheduler scheduler;
-    private IEnumerable<DeviceRuntime>? _previousItemsRef;
-    protected override void OnParametersSet()
-    {
-        if (!ReferenceEquals(_previousItemsRef, Items))
-        {
-            _previousItemsRef = Items;
-            Refresh();
-        }
-        base.OnParametersSet();
-    }
+
     private void Refresh()
     {
         scheduler.Trigger();
@@ -72,7 +98,11 @@ public partial class DeviceTable : IDisposable
         {
             try
             {
+#if Management
+                Refresh();
+#else
                 await InvokeAsync(StateHasChanged);
+#endif
             }
             catch (Exception ex)
             {
@@ -90,16 +120,27 @@ public partial class DeviceTable : IDisposable
     private QueryPageOptions _option = new();
     private Task<QueryData<DeviceRuntime>> OnQueryAsync(QueryPageOptions options)
     {
+#if Management
+        var data = DevicePageService.OnDeviceQueryAsync(options);
+
+        _option = options;
+        return data;
+#else
+
         var data = Items
                 .WhereIf(!options.SearchText.IsNullOrWhiteSpace(), a => a.Name.Contains(options.SearchText))
                 .GetQueryData(options);
         _option = options;
         return Task.FromResult(data);
+#endif
     }
 
     #endregion 查询
 
     #region 编辑
+
+    [Inject]
+    IDevicePageService DevicePageService { get; set; }
 
     #region 修改
     private async Task Copy(IEnumerable<DeviceRuntime> devices)
@@ -125,7 +166,7 @@ public partial class DeviceTable : IDisposable
         {
              {nameof(DeviceCopyComponent.OnSave), async (int CopyCount,  string CopyDeviceNamePrefix, int CopyDeviceNameSuffixNumber) =>
             {
-                await Task.Run(() =>GlobalData.DeviceRuntimeService.CopyDeviceAsync(CopyCount,CopyDeviceNamePrefix,CopyDeviceNameSuffixNumber,deviceRuntime.Id,AutoRestartThread));
+                await Task.Run(() =>DevicePageService.CopyDeviceAsync(CopyCount,CopyDeviceNamePrefix,CopyDeviceNameSuffixNumber,deviceRuntime.Id,AutoRestartThread));
                //await Notify();
 
             }},
@@ -137,13 +178,14 @@ public partial class DeviceTable : IDisposable
 
     private async Task BatchEdit(IEnumerable<Device> changedModels)
     {
-        var oldModel = changedModels.FirstOrDefault();//默认值显示第一个
+        var datas = changedModels.ToList();
+        var oldModel = datas.FirstOrDefault();//默认值显示第一个
         if (oldModel == null)
         {
             await ToastService.Warning(null, RazorLocalizer["PleaseSelect"]);
             return;
         }
-        changedModels = changedModels.AdaptListDevice();
+        datas = datas.AdaptListDevice();
         oldModel = oldModel.AdaptDevice();
         var oneModel = oldModel.AdaptDevice();//默认值显示第一个
 
@@ -161,7 +203,7 @@ public partial class DeviceTable : IDisposable
         {
              {nameof(DeviceEditComponent.OnValidSubmit), async () =>
             {
-                await Task.Run(() => GlobalData.DeviceRuntimeService.BatchEditAsync(changedModels, oldModel, oneModel,AutoRestartThread));
+                await Task.Run(() => DevicePageService.BatchEditDeviceAsync(datas, oldModel, oneModel,AutoRestartThread));
 
                    await InvokeAsync(table.QueryAsync);
             } },
@@ -178,7 +220,7 @@ public partial class DeviceTable : IDisposable
     {
         try
         {
-            return await Task.Run(async () => await GlobalData.DeviceRuntimeService.DeleteDeviceAsync(devices.Select(a => a.Id), AutoRestartThread, default));
+            return await Task.Run(async () => await DevicePageService.DeleteDeviceAsync(devices.Select(a => a.Id).ToList(), AutoRestartThread));
         }
         catch (Exception ex)
         {
@@ -193,7 +235,7 @@ public partial class DeviceTable : IDisposable
         {
             device.DevicePropertys = PluginServiceUtil.SetDict(device.ModelValueValidateForm.Value);
             device = device.AdaptDevice();
-            return await Task.Run(() => GlobalData.DeviceRuntimeService.SaveDeviceAsync(device, itemChangedType, AutoRestartThread));
+            return await Task.Run(() => DevicePageService.SaveDeviceAsync(device, itemChangedType, AutoRestartThread));
         }
         catch (Exception ex)
         {
@@ -206,7 +248,11 @@ public partial class DeviceTable : IDisposable
 
     private Task<DeviceRuntime> OnAdd()
     {
+#if !Management
         return Task.FromResult(ChannelDeviceHelpers.GetDeviceModel(ItemChangedType.Add, SelectModel).AdaptDeviceRuntime());
+#else
+        return Task.FromResult(new DeviceRuntime());
+#endif
     }
 
     #region 导出
@@ -224,6 +270,7 @@ public partial class DeviceTable : IDisposable
         }
         else
         {
+#if !Management
             switch (SelectModel.ChannelDevicePluginType)
             {
 
@@ -241,6 +288,9 @@ public partial class DeviceTable : IDisposable
 
                     break;
             }
+#else
+            ret = await GatewayExportService.OnDeviceExport(new() { QueryPageOptions = _option });
+#endif
         }
 
         // 返回 true 时自动弹出提示框
@@ -262,14 +312,24 @@ public partial class DeviceTable : IDisposable
 
         var option = _option;
         option.IsPage = false;
+
+#if !Management
         var models = Items
-                .WhereIf(!option.SearchText.IsNullOrWhiteSpace(), a => a.Name.Contains(option.SearchText)).GetData(option, out var total).ToList();
-        if (models.Count > 50000)
+                .WhereIf(!option.SearchText.IsNullOrWhiteSpace(), a => a.Name.Contains(option.SearchText)).GetData(option, out var total).Cast<Device>().ToList();
+
+#else
+
+        var models = await DevicePageService.GetDeviceListAsync(option, 2000);
+
+#endif
+
+
+        if (models.Count > 2000)
         {
-            await ToastService.Warning("online Excel max data count 50000");
+            await ToastService.Warning("online Excel max data count 2000");
             return;
         }
-        var uSheetDatas = DeviceServiceHelpers.ExportDevice(models);
+        var uSheetDatas = await DevicePageService.ExportDeviceAsync(models);
 
         op.Component = BootstrapDynamicComponent.CreateComponent<USheet>(new Dictionary<string, object?>
         {
@@ -279,8 +339,7 @@ public partial class DeviceTable : IDisposable
     {
                 await Task.Run(async ()=>
                 {
-              var importData=await  DeviceServiceHelpers.ImportAsync(data);
-                await    GlobalData.DeviceRuntimeService.ImportDeviceAsync(importData,AutoRestartThread);
+                    await    DevicePageService.ImportDeviceUSheetDatasAsync(data,AutoRestartThread);
                 })
                     ;
     }
@@ -312,13 +371,17 @@ finally
             OnCloseAsync = async () => await InvokeAsync(table.QueryAsync),
         };
 
-        Func<IBrowserFile, Task<Dictionary<string, ImportPreviewOutputBase>>> preview = (a => GlobalData.DeviceRuntimeService.PreviewAsync(a));
-        Func<Dictionary<string, ImportPreviewOutputBase>, Task> import = (value => GlobalData.DeviceRuntimeService.ImportDeviceAsync(value, AutoRestartThread));
-        op.Component = BootstrapDynamicComponent.CreateComponent<ImportExcelConfirm>(new Dictionary<string, object?>
+        Func<IBrowserFile, Task<Dictionary<string, ImportPreviewOutputBase>>> import = (a =>
         {
-             {nameof(ImportExcelConfirm.Import),import },
-            {nameof(ImportExcelConfirm.Preview),preview },
+
+            return DevicePageService.ImportDeviceAsync(a, AutoRestartThread);
+
         });
+        op.Component = BootstrapDynamicComponent.CreateComponent<ImportExcel>(new Dictionary<string, object?>
+        {
+             {nameof(ImportExcel.Import),import },
+        });
+
         await DialogService.Show(op);
     }
 
@@ -332,7 +395,12 @@ finally
         {
             await Task.Run(async () =>
             {
-                await GlobalData.DeviceRuntimeService.DeleteDeviceAsync(Items.Select(a => a.Id), AutoRestartThread, default);
+#if !Management
+                await DevicePageService.DeleteDeviceAsync(Items.Select(a => a.Id).ToList(), AutoRestartThread);
+#else
+                await DevicePageService.ClearDeviceAsync(AutoRestartThread);
+#endif
+
                 await InvokeAsync(async () =>
                 {
                     await ToastService.Default();
@@ -349,8 +417,7 @@ finally
 
     [Parameter]
     public bool AutoRestartThread { get; set; }
-    [Parameter]
-    public ChannelDeviceTreeItem SelectModel { get; set; }
+
     [Inject]
     [NotNull]
     public IStringLocalizer<ThingsGateway.Gateway.Razor._Imports>? GatewayLocalizer { get; set; }

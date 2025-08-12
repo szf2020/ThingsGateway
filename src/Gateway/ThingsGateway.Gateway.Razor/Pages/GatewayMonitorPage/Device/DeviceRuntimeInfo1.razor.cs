@@ -17,11 +17,30 @@ public partial class DeviceRuntimeInfo1 : IDisposable
 
     [Parameter, EditorRequired]
     public DeviceRuntime DeviceRuntime { get; set; }
-    private string Name => $"{DeviceRuntime.ToString()}  -  {(DeviceRuntime.Driver?.DeviceThreadManage == null ? "Task cancel" : "Task run")}";
+    private string Name => $"{DeviceRuntime.ToString()}  -  {(DeviceRuntime.Started == false ? "Task cancel" : "Task run")}";
     public ModelValueValidateForm PluginPropertyModel;
 
+    [Inject]
+    IPluginService PluginService { get; set; }
+#if !Management
+    private IDriver Driver => DeviceRuntime?.Driver;
+    private bool IsRedundant => GlobalData.IsRedundant(DeviceRuntime.Id);
+#else
+    private IDriver Driver { get; set; }
+    private bool IsRedundant { get; set; }
+#endif
+    protected override async Task OnParametersSetAsync()
+    {
+#if Management
+
+        IsRedundant = await DevicePageService.IsRedundantDeviceAsync(DeviceRuntime.Id);
+
+#endif
+        await base.OnParametersSetAsync();
+    }
     protected override void OnParametersSet()
     {
+#if !Management
         if (PluginPropertyModel?.Value == null || PluginPropertyModel?.Value != DeviceRuntime.Driver?.DriverProperties)
         {
             PluginPropertyModel = new ModelValueValidateForm()
@@ -29,9 +48,27 @@ public partial class DeviceRuntimeInfo1 : IDisposable
                 Value = DeviceRuntime.Driver?.DriverProperties
             };
         }
+
+#else
+        Driver = PluginService.GetDriver(DeviceRuntime.PluginName);
+        var data = PluginService.GetDriverPropertyTypes(DeviceRuntime.PluginName, Driver);
+
+        var DriverProperties = data.Model;
+        PluginServiceUtil.SetModel(DriverProperties, DeviceRuntime.DevicePropertys);
+
+        if (PluginPropertyModel?.Value == null || PluginPropertyModel?.Value != DriverProperties)
+        {
+            PluginPropertyModel = new ModelValueValidateForm()
+            {
+                Value = DriverProperties
+            };
+        }
+#endif
         base.OnParametersSet();
     }
 
+
+#if !Management
     private async Task ShowDriverUI()
     {
         var driver = DeviceRuntime.Driver?.DriverUIType;
@@ -51,28 +88,31 @@ public partial class DeviceRuntimeInfo1 : IDisposable
         })
         });
     }
+#endif
+
+    [Inject]
+    IDevicePageService DevicePageService { get; set; }
     private async Task DeviceRedundantThreadAsync()
     {
-        if (GlobalData.TryGetDeviceThreadManage(DeviceRuntime, out var deviceThreadManage))
-        {
-            await Task.Run(() => deviceThreadManage.DeviceRedundantThreadAsync(DeviceRuntime.Id, default));
-        }
+        await DevicePageService.DeviceRedundantThreadAsync(DeviceRuntime.Id);
     }
+
+
     private async Task RestartDeviceAsync(bool deleteCache)
     {
-        if (GlobalData.TryGetDeviceThreadManage(DeviceRuntime, out var deviceThreadManage))
-        {
-            await Task.Run(() => deviceThreadManage.RestartDeviceAsync(DeviceRuntime, deleteCache));
-        }
+        await DevicePageService.RestartDeviceAsync(DeviceRuntime.Id, deleteCache);
     }
-    private void PauseThread()
+
+    private async Task PauseThreadAsync()
     {
-        DeviceRuntime.Driver?.PauseThread(!DeviceRuntime.Pause);
+        await DevicePageService.PauseThreadAsync(DeviceRuntime.Id);
     }
 
     protected override void OnInitialized()
     {
+#if !Management
         _ = RunTimerAsync();
+#endif
         base.OnInitialized();
     }
 

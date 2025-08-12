@@ -138,8 +138,8 @@ internal sealed partial class RedundantRpcServer : SingletonRpcServer, IRedundan
             }
         }
 
-        await GlobalData.ChannelRuntimeService.InsertAsync(addChannels, addDevices, addVariables, true, default).ConfigureAwait(false);
-        await GlobalData.ChannelRuntimeService.UpdateAsync(upChannels, upDevices, upVariables, true, default).ConfigureAwait(false);
+        await GlobalData.ChannelRuntimeService.InsertAsync(addChannels, addDevices, addVariables, true).ConfigureAwait(false);
+        await GlobalData.ChannelRuntimeService.UpdateAsync(upChannels, upDevices, upVariables, true).ConfigureAwait(false);
 
         RedundancyTask.LogMessage?.LogTrace($"Sync data success");
     }

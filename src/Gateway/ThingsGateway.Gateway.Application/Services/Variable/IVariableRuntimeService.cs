@@ -8,27 +8,17 @@
 // QQ群：605534569
 // ------------------------------------------------------------------------------
 
-using BootstrapBlazor.Components;
-
 using Microsoft.AspNetCore.Components.Forms;
 
 namespace ThingsGateway.Gateway.Application
 {
-    public interface IVariableRuntimeService
+    public interface IVariableRuntimeService : IVariablePageService
     {
-        Task<bool> BatchEditAsync(IEnumerable<Variable> models, Variable oldModel, Variable model, bool restart, CancellationToken cancellationToken);
-        Task<bool> DeleteVariableAsync(IEnumerable<long> ids, bool restart, CancellationToken cancellationToken);
-        Task<bool> ClearVariableAsync(bool restart, CancellationToken cancellationToken);
         Task<Dictionary<string, object>> ExportVariableAsync(GatewayExportFilter exportFilter);
 
-        Task ImportVariableAsync(Dictionary<string, ImportPreviewOutputBase> input, bool restart, CancellationToken cancellationToken);
-        Task InsertTestDataAsync(int testVariableCount, int testDeviceCount, string slaveUrl, bool businessEnable, bool restart, CancellationToken cancellationToken);
-
-        Task<bool> BatchSaveVariableAsync(List<Variable> input, ItemChangedType type, bool restart, CancellationToken cancellationToken);
+        Task ImportVariableAsync(Dictionary<string, ImportPreviewOutputBase> input, bool restart);
 
         Task<Dictionary<string, ImportPreviewOutputBase>> PreviewAsync(IBrowserFile browserFile);
-
-        Task<bool> SaveVariableAsync(Variable input, ItemChangedType type, bool restart, CancellationToken cancellationToken);
 
         Task<MemoryStream> ExportMemoryStream(List<Variable> data, string devName);
     }

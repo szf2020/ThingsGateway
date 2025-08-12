@@ -119,4 +119,6 @@ internal interface IDeviceService
     /// 保存是否输出日志和日志等级
     /// </summary>
     Task UpdateLogAsync(long deviceId, TouchSocket.Core.LogLevel logLevel);
+    Task<HashSet<long>> ImportDeviceAsync(List<Device> upData, List<Device> insertData);
+    Task<Dictionary<string, ImportPreviewOutputBase>> PreviewAsync(string path);
 }

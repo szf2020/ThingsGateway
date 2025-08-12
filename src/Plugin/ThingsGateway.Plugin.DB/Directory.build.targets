@@ -27,7 +27,7 @@
 	<Target Name="IncludeAllFilesInTargetDir" AfterTargets="Build">
 
 		<ItemGroup>
-			<Content Include="$(ProjectDir)bin\$(Configuration)\$(TargetFramework)\**\*DB*.dll">
+			<Content Include="$(ProjectDir)bin\$(Configuration)\$(TargetFramework)\**\*Plugin.DB*.dll">
 				<Pack>true</Pack>
 				<PackagePath>Content</PackagePath>
 			</Content>

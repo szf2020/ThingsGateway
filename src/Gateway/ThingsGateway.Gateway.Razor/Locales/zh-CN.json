@@ -1,4 +1,7 @@
 ﻿{
+  "ThingsGateway.Management.Razor.GatewayUpdateZipFilePage": {
+    "Upgrade": "升级"
+  },
   "ThingsGateway.Management.Razor.ManagementTree": {
     "AddManagementConfig": "添加",
     "ExcelManagementConfig": "在线excel编辑",
@@ -20,7 +23,11 @@
     "SystemConfigPage": "系统管理",
     "PluginPage": "插件管理",
     "RealAlarmPage": "实时报警",
-    "RulesPage": "规则引擎"
+    "RulesPage": "规则引擎",
+    "ChannelTable": "通道信息",
+    "DeviceTable": "设备信息",
+    "VariableRuntimeInfo": "变量信息",
+    "GatewayUpdateZipFilePage": "版本管理"
   },
   "ThingsGateway.Management.Razor.SaveUpdateZipFile": {
     "DownTemplate": "下载模板",

@@ -370,7 +370,18 @@ internal sealed class ChannelService : BaseService<Channel>, IChannelService
     [OperDesc("ImportChannel", isRecordPar: false, localizerType: typeof(Channel))]
     public Task<HashSet<long>> ImportChannelAsync(Dictionary<string, ImportPreviewOutputBase> input)
     {
-        ChannelServiceHelpers.GetImportChannelData(input, out var upData, out var insertData);
+        List<Channel>? channels = new List<Channel>();
+        foreach (var item in input)
+        {
+            if (item.Key == GatewayExportString.ChannelName)
+            {
+                var channelImports = ((ImportPreviewListOutput<Channel>)item.Value).Data;
+                channels = channelImports;
+                break;
+            }
+        }
+        var upData = channels.Where(a => a.IsUp).ToList();
+        var insertData = channels.Where(a => !a.IsUp).ToList();
         return ImportChannelAsync(upData, insertData);
     }
 

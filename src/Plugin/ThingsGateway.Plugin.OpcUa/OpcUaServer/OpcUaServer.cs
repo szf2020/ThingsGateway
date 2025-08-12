@@ -37,7 +37,6 @@ public partial class OpcUaServer : BusinessBase
     private readonly OpcUaServerVariableProperty _variablePropertys = new();
     private ApplicationInstance m_application;
     internal ApplicationConfiguration m_configuration;
-    private ThingsGatewayServer m_server;
     private volatile bool success = true;
     private volatile bool connect_success = true;
 
@@ -47,6 +46,9 @@ public partial class OpcUaServer : BusinessBase
     /// <inheritdoc/>
     protected override BusinessPropertyBase _businessPropertyBase => _driverPropertys;
 
+
+#if !Management
+    private ThingsGatewayServer m_server;
     protected IStringLocalizer Localizer { get; private set; }
     private ConcurrentDictionary<long, VariableBasicData> CollectVariableRuntimes { get; set; } = new();
 
@@ -456,4 +458,6 @@ public partial class OpcUaServer : BusinessBase
             }
         }
     }
+
+#endif
 }

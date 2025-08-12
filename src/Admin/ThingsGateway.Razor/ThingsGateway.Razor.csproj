@@ -3,6 +3,7 @@
 	<Import Project="..\..\PackNuget.props" />
 	<PropertyGroup>
 		<TargetFrameworks>net8.0</TargetFrameworks>
+		
 	</PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="BootstrapBlazor.FontAwesome" Version="9.1.0" />

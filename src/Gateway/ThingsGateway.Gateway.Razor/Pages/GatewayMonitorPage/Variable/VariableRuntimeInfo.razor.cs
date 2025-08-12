@@ -22,14 +22,9 @@ namespace ThingsGateway.Gateway.Razor;
 
 public partial class VariableRuntimeInfo : IDisposable
 {
-    private static void BeforeShowEditDialogCallback(ITableEditDialogOption<VariableRuntime> tableEditDialogOption)
-    {
-        tableEditDialogOption.Model = tableEditDialogOption.Model.AdaptVariableRuntime();
-    }
-
-    [Inject]
-    private IOptions<WebsiteOptions>? WebsiteOption { get; set; }
-    public bool Disposed { get; set; }
+#if !Management
+    [Parameter]
+    public ChannelDeviceTreeItem SelectModel { get; set; }
 
     [Parameter]
     public IEnumerable<VariableRuntime>? Items { get; set; } = Enumerable.Empty<VariableRuntime>();
@@ -42,6 +37,17 @@ public partial class VariableRuntimeInfo : IDisposable
             await Refresh(null);
         }
     }
+#endif
+
+    private static void BeforeShowEditDialogCallback(ITableEditDialogOption<VariableRuntime> tableEditDialogOption)
+    {
+        tableEditDialogOption.Model = tableEditDialogOption.Model.AdaptVariableRuntime();
+    }
+
+    [Inject]
+    private IOptions<WebsiteOptions>? WebsiteOption { get; set; }
+    public bool Disposed { get; set; }
+
 
     public void Dispose()
     {
@@ -56,7 +62,9 @@ public partial class VariableRuntimeInfo : IDisposable
 
         scheduler = new SmartTriggerScheduler(Notify, TimeSpan.FromMilliseconds(1000));
 
+#if !Management
         _ = RunTimerAsync();
+#endif
         base.OnInitialized();
     }
 
@@ -119,11 +127,18 @@ public partial class VariableRuntimeInfo : IDisposable
     private QueryPageOptions _option = new();
     private Task<QueryData<VariableRuntime>> OnQueryAsync(QueryPageOptions options)
     {
+#if Management
+        var data = VariablePageService.OnVariableQueryAsync(options);
+
+        _option = options;
+        return data;
+#else
         var data = Items
                 .WhereIf(!options.SearchText.IsNullOrWhiteSpace(), a => a.Name.Contains(options.SearchText))
                 .GetQueryData(options);
         _option = options;
         return Task.FromResult(data);
+#endif
     }
 
     #endregion 查询
@@ -136,7 +151,7 @@ public partial class VariableRuntimeInfo : IDisposable
     {
         try
         {
-            var data = await Task.Run(async () => await variableRuntime.RpcAsync(WriteValue));
+            var data = await Task.Run(async () => await VariablePageService.OnWriteVariableAsync(variableRuntime.Id, WriteValue));
             if (!data.IsSuccess)
             {
                 await ToastService.Warning(null, data.ErrorMessage);
@@ -162,6 +177,9 @@ public partial class VariableRuntimeInfo : IDisposable
     private string SlaveUrl { get; set; }
     private bool BusinessEnable { get; set; }
 
+    [Inject]
+    IVariablePageService VariablePageService { get; set; }
+
     #region 修改
     private async Task Copy(IEnumerable<Variable> variables)
     {
@@ -181,9 +199,9 @@ public partial class VariableRuntimeInfo : IDisposable
         }
         op.Component = BootstrapDynamicComponent.CreateComponent<VariableCopyComponent>(new Dictionary<string, object?>
         {
-             {nameof(VariableCopyComponent.OnSave), async (List<Variable> variables1) =>
+             {nameof(VariableCopyComponent.OnSave), async  (int CopyCount,  string CopyVariableNamePrefix, int CopyVariableNameSuffixNumber) =>
             {
-                await Task.Run(() =>GlobalData.VariableRuntimeService.BatchSaveVariableAsync(variables1,ItemChangedType.Add,AutoRestartThread,default));
+                await Task.Run(() =>VariablePageService.CopyVariableAsync(variables.ToList(),CopyCount,CopyVariableNamePrefix,CopyVariableNameSuffixNumber,AutoRestartThread));
                 await InvokeAsync(table.QueryAsync);
             }},
             {nameof(VariableCopyComponent.Model),variables },
@@ -216,7 +234,7 @@ public partial class VariableRuntimeInfo : IDisposable
         {
              {nameof(VariableEditComponent.OnValidSubmit), async () =>
             {
-                await Task.Run(()=> GlobalData. VariableRuntimeService.BatchEditAsync(variables,oldModel,model, AutoRestartThread,default));
+                await Task.Run(()=> VariablePageService.BatchEditVariableAsync(variables.ToList(),oldModel,model, AutoRestartThread));
 
                 await InvokeAsync(table.QueryAsync);
             }},
@@ -232,7 +250,7 @@ public partial class VariableRuntimeInfo : IDisposable
     {
         try
         {
-            return await Task.Run(async () => await GlobalData.VariableRuntimeService.DeleteVariableAsync(variables.Select(a => a.Id), AutoRestartThread, default));
+            return await Task.Run(async () => await VariablePageService.DeleteVariableAsync(variables.Select(a => a.Id).ToList(), AutoRestartThread));
         }
         catch (Exception ex)
         {
@@ -263,7 +281,7 @@ public partial class VariableRuntimeInfo : IDisposable
 
             variable.VariablePropertys = PluginServiceUtil.SetDict(variable.VariablePropertyModels);
             variable = variable.AdaptVariable();
-            return await Task.Run(() => GlobalData.VariableRuntimeService.SaveVariableAsync(variable, itemChangedType, AutoRestartThread, default));
+            return await Task.Run(() => VariablePageService.SaveVariableAsync(variable, itemChangedType, AutoRestartThread));
         }
         catch (Exception ex)
         {
@@ -276,10 +294,15 @@ public partial class VariableRuntimeInfo : IDisposable
 
     private Task<VariableRuntime> OnAdd()
     {
+#if !Management
         return Task.FromResult(new VariableRuntime()
         {
             DeviceId = SelectModel?.TryGetDeviceRuntime(out var deviceRuntime) == true ? deviceRuntime?.IsCollect == true ? deviceRuntime?.Id ?? 0 : 0 : 0
         });
+#else
+        return Task.FromResult(new VariableRuntime());
+#endif
+
     }
 
     #region 导出
@@ -297,6 +320,7 @@ public partial class VariableRuntimeInfo : IDisposable
         }
         else
         {
+#if !Management
             switch (SelectModel.ChannelDevicePluginType)
             {
 
@@ -314,6 +338,9 @@ public partial class VariableRuntimeInfo : IDisposable
 
                     break;
             }
+#else
+            ret = await GatewayExportService.OnVariableExport(new() { QueryPageOptions = _option });
+#endif
         }
 
         // 返回 true 时自动弹出提示框
@@ -332,14 +359,23 @@ public partial class VariableRuntimeInfo : IDisposable
             ShowFooter = false,
             ShowCloseButton = false,
         };
+#if !Management
+
         var models = Items
-                .WhereIf(!_option.SearchText.IsNullOrWhiteSpace(), a => a.Name.Contains(_option.SearchText)).GetData(_option, out var total);
-        if (models.Count() > 50000)
+                .WhereIf(!_option.SearchText.IsNullOrWhiteSpace(), a => a.Name.Contains(_option.SearchText)).GetData(_option, out var total).Cast<Variable>().ToList();
+
+#else
+
+        var models = await VariablePageService.GetVariableListAsync(_option, 2000);
+
+#endif
+
+        if (models.Count > 2000)
         {
-            await ToastService.Warning("online Excel max data count 50000");
+            await ToastService.Warning("online Excel max data count 2000");
             return;
         }
-        var uSheetDatas = VariableServiceHelpers.ExportVariable(models, _option.SortName, _option.SortOrder);
+        var uSheetDatas = await VariablePageService.ExportVariableAsync(models, _option.SortName, _option.SortOrder);
 
         op.Component = BootstrapDynamicComponent.CreateComponent<USheet>(new Dictionary<string, object?>
         {
@@ -349,8 +385,7 @@ public partial class VariableRuntimeInfo : IDisposable
     {
                 await Task.Run(async ()=>
                 {
-              var importData=await  VariableServiceHelpers.ImportAsync(data);
-                await    GlobalData.VariableRuntimeService.ImportVariableAsync(importData,AutoRestartThread, default);
+                    await    VariablePageService.ImportVariableUSheetDatasAsync(data,AutoRestartThread);
                 })
                     ;
     }
@@ -382,12 +417,15 @@ finally
             OnCloseAsync = async () => await InvokeAsync(table.QueryAsync),
         };
 
-        Func<IBrowserFile, Task<Dictionary<string, ImportPreviewOutputBase>>> preview = (a => GlobalData.VariableRuntimeService.PreviewAsync(a));
-        Func<Dictionary<string, ImportPreviewOutputBase>, Task> import = (value => GlobalData.VariableRuntimeService.ImportVariableAsync(value, AutoRestartThread, default));
-        op.Component = BootstrapDynamicComponent.CreateComponent<ImportExcelConfirm>(new Dictionary<string, object?>
+        Func<IBrowserFile, Task<Dictionary<string, ImportPreviewOutputBase>>> import = (a =>
         {
-             {nameof(ImportExcelConfirm.Import),import },
-            {nameof(ImportExcelConfirm.Preview),preview },
+
+            return VariablePageService.ImportVariableAsync(a, AutoRestartThread);
+
+        });
+        op.Component = BootstrapDynamicComponent.CreateComponent<ImportExcel>(new Dictionary<string, object?>
+        {
+             {nameof(ImportExcel.Import),import },
         });
         await DialogService.Show(op);
     }
@@ -402,7 +440,9 @@ finally
         {
             await Task.Run(async () =>
             {
-                await GlobalData.VariableRuntimeService.ClearVariableAsync(AutoRestartThread, default);
+
+                await VariablePageService.ClearVariableAsync(AutoRestartThread);
+
                 await InvokeAsync(async () =>
                 {
                     await ToastService.Default();
@@ -423,7 +463,7 @@ finally
         {
             try
             {
-                await Task.Run(() => GlobalData.VariableRuntimeService.InsertTestDataAsync(TestVariableCount, TestDeviceCount, SlaveUrl, BusinessEnable, AutoRestartThread, default));
+                await Task.Run(() => VariablePageService.InsertTestDataAsync(TestVariableCount, TestDeviceCount, SlaveUrl, BusinessEnable, AutoRestartThread));
             }
             finally
             {
@@ -443,8 +483,7 @@ finally
 
     [Parameter]
     public bool AutoRestartThread { get; set; }
-    [Parameter]
-    public ChannelDeviceTreeItem SelectModel { get; set; }
+
     [Inject]
     [NotNull]
     public IStringLocalizer<ThingsGateway.Gateway.Razor._Imports>? GatewayLocalizer { get; set; }

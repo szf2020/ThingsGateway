@@ -362,9 +362,10 @@ internal sealed class DeviceService : BaseService<Device>, IDeviceService
 
     /// <inheritdoc/>
     [OperDesc("ImportDevice", isRecordPar: false, localizerType: typeof(Device))]
-    public async Task<HashSet<long>> ImportDeviceAsync(Dictionary<string, ImportPreviewOutputBase> input)
+    public Task<HashSet<long>> ImportDeviceAsync(Dictionary<string, ImportPreviewOutputBase> input)
     {
-        IEnumerable<Device>? devices = new List<Device>();
+
+        IEnumerable<Device> devices = new List<Device>();
         foreach (var item in input)
         {
             if (item.Key == GatewayExportString.DeviceName)
@@ -376,6 +377,13 @@ internal sealed class DeviceService : BaseService<Device>, IDeviceService
         }
         var upData = devices.Where(a => a.IsUp).ToList();
         var insertData = devices.Where(a => !a.IsUp).ToList();
+        return ImportDeviceAsync(upData, insertData);
+
+    }
+    /// <inheritdoc/>
+    [OperDesc("ImportDevice", isRecordPar: false, localizerType: typeof(Device))]
+    public async Task<HashSet<long>> ImportDeviceAsync(List<Device> upData, List<Device> insertData)
+    {
 
         ManageHelper.CheckDeviceCount(insertData.Count);
 
@@ -391,14 +399,21 @@ internal sealed class DeviceService : BaseService<Device>, IDeviceService
             await db.BulkUpdateAsync(upData, 10000).ConfigureAwait(false);
         }
         DeleteDeviceFromCache();
-        return devices.Select(a => a.Id).ToHashSet();
+        return upData.Select(a => a.Id).Concat(insertData.Select(a => a.Id)).ToHashSet();
     }
+
+
 
     public async Task<Dictionary<string, ImportPreviewOutputBase>> PreviewAsync(IBrowserFile browserFile)
     {
         var path = await browserFile.StorageLocal().ConfigureAwait(false); // 上传文件并获取文件路径
-        var dataScope = await GlobalData.SysUserService.GetCurrentUserDataScopeAsync().ConfigureAwait(false);
 
+        return await PreviewAsync(path).ConfigureAwait(false);
+
+    }
+    public async Task<Dictionary<string, ImportPreviewOutputBase>> PreviewAsync(string path)
+    {
+        var dataScope = await GlobalData.SysUserService.GetCurrentUserDataScopeAsync().ConfigureAwait(false);
         try
         {
             // 获取 Excel 文件中所有工作表的名称
@@ -434,8 +449,8 @@ internal sealed class DeviceService : BaseService<Device>, IDeviceService
         {
             FileUtility.Delete(path);
         }
-    }
 
+    }
     public void SetDeviceData(HashSet<long>? dataScope, IReadOnlyDictionary<string, DeviceRuntime> deviceDicts, IReadOnlyDictionary<string, ChannelRuntime> channelDicts, Dictionary<string, ImportPreviewOutputBase> ImportPreviews, ref ImportPreviewOutput<Device> deviceImportPreview, Dictionary<string, PluginInfo> driverPluginNameDict, ConcurrentDictionary<string, (Type, Dictionary<string, PropertyInfo>, Dictionary<string, PropertyInfo>)> propertysDict, string sheetName, IEnumerable<IDictionary<string, object>> rows)
     {
         #region 采集设备sheet

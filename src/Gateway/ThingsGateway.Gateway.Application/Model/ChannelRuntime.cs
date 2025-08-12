@@ -93,6 +93,7 @@ public class ChannelRuntime : Channel
     [Newtonsoft.Json.JsonIgnore]
     public int? DeviceRuntimeCount => DeviceRuntimes?.Count;
 
+    [AutoGenerateColumn(Ignore = true)]
     public bool Started => DeviceThreadManage != null;
 #else
 
@@ -107,6 +108,7 @@ public class ChannelRuntime : Channel
     /// </summary>
     public int? DeviceRuntimeCount { get; set; }
 
+    [AutoGenerateColumn(Ignore = true)]
     public bool Started { get; set; }
 #endif
 

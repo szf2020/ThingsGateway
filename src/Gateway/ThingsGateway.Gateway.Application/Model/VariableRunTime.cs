@@ -32,7 +32,7 @@ public partial class VariableRuntime : Variable
     IDisposable
 #endif
 {
-    [AutoGenerateColumn(Visible = false)]
+    [AutoGenerateColumn(Ignore = true)]
     public bool ValueInited { get => _valueInited; set => _valueInited = value; }
 
     #region 属性
@@ -112,6 +112,11 @@ public partial class VariableRuntime : Variable
 
 #endif
 
+
+#if !Management
+    private bool _isOnline;
+
+
     /// <summary>
     /// 是否在线
     /// </summary>
@@ -136,7 +141,6 @@ public partial class VariableRuntime : Variable
         }
     }
 
-#if !Management
     /// <summary>
     /// 设备名称
     /// </summary>
@@ -166,6 +170,14 @@ public partial class VariableRuntime : Variable
     public string RuntimeType => Value?.GetType()?.ToString();
 
 #else
+
+
+
+    /// <summary>
+    /// 是否在线
+    /// </summary>
+    [AutoGenerateColumn(Visible = true, Filterable = true, Sortable = true, Order = 5)]
+    public bool IsOnline{get;set;}
 
     /// <summary>
     /// 设备名称
@@ -221,7 +233,6 @@ public partial class VariableRuntime : Variable
 
     private DateTime collectTime = DateTime.UnixEpoch.ToLocalTime();
 
-    private bool _isOnline;
 #pragma warning disable CS0414
     private bool _isOnlineChanged;
 #pragma warning restore CS0414

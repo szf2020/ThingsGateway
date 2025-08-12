@@ -28,6 +28,14 @@ public class ModbusMaster : CollectFoundationBase
     /// <inheritdoc/>
     public override Type DriverDebugUIType => typeof(ThingsGateway.Debug.ModbusMaster);
 
+
+
+    /// <inheritdoc/>
+    public override IDevice FoundationDevice => _plc;
+
+    public override Type DriverVariableAddressUIType => typeof(ModbusAddressComponent);
+
+#if !Management
     /// <inheritdoc/>
     public override Type DriverUIType
     {
@@ -39,12 +47,6 @@ public class ModbusMaster : CollectFoundationBase
                 return null;
         }
     }
-
-    /// <inheritdoc/>
-    public override IDevice FoundationDevice => _plc;
-
-    public override Type DriverVariableAddressUIType => typeof(ModbusAddressComponent);
-
     /// <inheritdoc/>
     protected override async Task InitChannelAsync(IChannel? channel, CancellationToken cancellationToken)
     {
@@ -87,4 +89,6 @@ public class ModbusMaster : CollectFoundationBase
         }
         return Task.FromResult(variableSourceReads);
     }
+
+#endif
 }

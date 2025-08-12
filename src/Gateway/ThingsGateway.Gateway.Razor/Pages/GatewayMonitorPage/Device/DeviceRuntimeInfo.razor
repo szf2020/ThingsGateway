@@ -5,10 +5,11 @@
 
 <DeviceRuntimeInfo1 DeviceRuntime="DeviceRuntime" />
 
-<LogConsole HeightString="calc(100% - 270px)" LogLevel=@((DeviceRuntime?.Driver?.LogMessage)?.LogLevel ?? TouchSocket.Core.LogLevel.Trace)
-            LogLevelChanged="(logLevel)=>
+<LogConsole HeightString="calc(100% - 270px)" LogLevel=@(LogLevel)
+            LogLevelChanged="async (logLevel)=>
         {
-                DeviceRuntime.Driver?.SetLogAsync(logLevel);
+                        LogLevel = logLevel;
+                        await DevicePageService.SetDeviceLogLevelAsync(DeviceRuntime?.Id ?? 0, logLevel);
         }"
 
             LogPath=@DeviceRuntime.LogPath></LogConsole>

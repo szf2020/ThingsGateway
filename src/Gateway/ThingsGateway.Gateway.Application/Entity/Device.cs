@@ -179,6 +179,9 @@ public class Device : BaseDataEntity, IValidatableObject
     [Newtonsoft.Json.JsonIgnore]
     internal bool IsUp;
 
+
+#endif
+
     /// <summary>
     /// 额外属性
     /// </summary>
@@ -186,7 +189,6 @@ public class Device : BaseDataEntity, IValidatableObject
     [Newtonsoft.Json.JsonIgnore]
     [MapperIgnore]
     public ModelValueValidateForm? ModelValueValidateForm;
-#endif
 
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {

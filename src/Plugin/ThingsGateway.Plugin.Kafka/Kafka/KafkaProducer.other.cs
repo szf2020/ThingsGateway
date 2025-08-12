@@ -23,7 +23,7 @@ namespace ThingsGateway.Plugin.Kafka;
 /// </summary>
 public partial class KafkaProducer : BusinessBaseWithCacheIntervalScriptAll
 {
-    private IProducer<Null, byte[]> _producer;
+#if !Management
     private ProducerBuilder<Null, byte[]> _producerBuilder;
     private ProducerConfig _producerconfig;
     private volatile bool producerSuccess = true;
@@ -239,4 +239,7 @@ public partial class KafkaProducer : BusinessBaseWithCacheIntervalScriptAll
     }
 
     #endregion 方法
+
+
+#endif
 }

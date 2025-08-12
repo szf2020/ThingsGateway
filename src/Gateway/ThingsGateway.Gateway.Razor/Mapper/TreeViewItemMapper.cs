@@ -4,7 +4,7 @@ namespace ThingsGateway.Gateway.Razor
 {
     public static class TreeViewItemMapper
     {
-        public static global::System.Collections.Generic.List<global::BootstrapBlazor.Components.TreeViewItem<global::ThingsGateway.Gateway.Application.ChannelDeviceTreeItem>> AdaptListTreeViewItemChannelDeviceTreeItem(this global::System.Collections.Generic.List<global::BootstrapBlazor.Components.TreeViewItem<global::ThingsGateway.Gateway.Application.ChannelDeviceTreeItem>> src)
+        public static global::System.Collections.Generic.List<global::BootstrapBlazor.Components.TreeViewItem<ChannelDeviceTreeItem>> AdaptListTreeViewItemChannelDeviceTreeItem(this global::System.Collections.Generic.List<global::BootstrapBlazor.Components.TreeViewItem<ChannelDeviceTreeItem>> src)
         {
             NormalizeItems(src);
             return src.ToList();

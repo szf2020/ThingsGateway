@@ -21,16 +21,7 @@
     "UserNoModule": "This account has not been assigned a module. Please contact the administrator",
     "UserNull": "User {0} does not exist"
   },
-  "ThingsGateway.Admin.Application.BaseDataEntity": {
-    "CreateOrgId": "CreateOrgId"
-  },
-  "ThingsGateway.Admin.Application.BaseEntity": {
-    "CreateTime": "CreateTime",
-    "CreateUser": "CreateUser",
-    "SortCode": "SortCode",
-    "UpdateTime": "UpdateTime",
-    "UpdateUser": "UpdateUser"
-  },
+  
   "ThingsGateway.Admin.Application.BlazorAuthenticationHandler": {
     "UserExpire": "User expired, please login again"
   },

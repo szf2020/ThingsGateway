@@ -28,7 +28,7 @@ public partial class ImportExcelConfirm
 
     [Inject]
     [NotNull]
-    private IStringLocalizer<ImportExcel>? Localizer { get; set; }
+    private IStringLocalizer<ImportExcelConfirm>? Localizer { get; set; }
 
     /// <summary>
     /// 预览

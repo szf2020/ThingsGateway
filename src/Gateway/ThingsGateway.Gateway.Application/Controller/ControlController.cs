@@ -176,7 +176,7 @@ public class ControlController : ControllerBase, IRpcServer
     [TouchSocket.WebApi.WebApi(Method = TouchSocket.WebApi.HttpMethodType.Post)]
     public Task<bool> BatchSaveVariableAsync([FromBody][TouchSocket.WebApi.FromBody] List<Variable> variables, ItemChangedType type, bool restart = true)
     {
-        return GlobalData.VariableRuntimeService.BatchSaveVariableAsync(variables, type, restart, default);
+        return GlobalData.VariableRuntimeService.BatchSaveVariableAsync(variables, type, restart);
     }
 
     /// <summary>
@@ -188,7 +188,7 @@ public class ControlController : ControllerBase, IRpcServer
     public Task<bool> DeleteChannelAsync([FromBody][TouchSocket.WebApi.FromBody] List<long> ids, bool restart = true)
     {
         if (ids == null || ids.Count == 0) ids = GlobalData.IdChannels.Keys.ToList();
-        return GlobalData.ChannelRuntimeService.DeleteChannelAsync(ids, restart, default);
+        return GlobalData.ChannelRuntimeService.DeleteChannelAsync(ids, restart);
     }
 
     /// <summary>
@@ -200,7 +200,7 @@ public class ControlController : ControllerBase, IRpcServer
     public Task<bool> DeleteDeviceAsync([FromBody][TouchSocket.WebApi.FromBody] List<long> ids, bool restart = true)
     {
         if (ids == null || ids.Count == 0) ids = GlobalData.IdDevices.Keys.ToList();
-        return GlobalData.DeviceRuntimeService.DeleteDeviceAsync(ids, restart, default);
+        return GlobalData.DeviceRuntimeService.DeleteDeviceAsync(ids, restart);
     }
 
     /// <summary>
@@ -212,7 +212,7 @@ public class ControlController : ControllerBase, IRpcServer
     public Task<bool> DeleteVariableAsync([FromBody][TouchSocket.WebApi.FromBody] List<long> ids, bool restart = true)
     {
         if (ids == null || ids.Count == 0) ids = GlobalData.IdVariables.Keys.ToList();
-        return GlobalData.VariableRuntimeService.DeleteVariableAsync(ids, restart, default);
+        return GlobalData.VariableRuntimeService.DeleteVariableAsync(ids, restart);
     }
 
     /// <summary>
@@ -223,7 +223,7 @@ public class ControlController : ControllerBase, IRpcServer
     [TouchSocket.WebApi.WebApi(Method = TouchSocket.WebApi.HttpMethodType.Post)]
     public Task InsertTestDataAsync(int testVariableCount, int testDeviceCount, string slaveUrl, bool businessEnable, bool restart = true)
     {
-        return GlobalData.VariableRuntimeService.InsertTestDataAsync(testVariableCount, testDeviceCount, slaveUrl, businessEnable, restart, default);
+        return GlobalData.VariableRuntimeService.InsertTestDataAsync(testVariableCount, testDeviceCount, slaveUrl, businessEnable, restart);
     }
 
     /// <summary>

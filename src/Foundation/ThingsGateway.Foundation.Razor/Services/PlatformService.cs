@@ -40,7 +40,7 @@ public class PlatformService : IPlatformService
             await using var jSObject = await JSRuntime.InvokeAsync<IJSObjectReference>("import", $"{WebsiteConst.DefaultResourceUrl}js/downloadFile.js");
             var path = Path.GetRelativePath("wwwroot", item);
             string fileName = DateTime.Now.ToFileDateTimeFormat();
-            await jSObject.InvokeVoidAsync("blazor_downloadFile", url, fileName, new { FileName = path });
+            await jSObject.InvokeAsync<bool>("blazor_downloadFile", url, fileName, new { FileName = path });
         }
     }
 }

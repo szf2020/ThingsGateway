@@ -18,6 +18,7 @@
 
 	<PropertyGroup>
 		<TargetFrameworks>net8.0;net9.0</TargetFrameworks>
+		
 		<!--<UseRazorSourceGenerator>false</UseRazorSourceGenerator>-->
 	</PropertyGroup>
 	<ItemGroup>

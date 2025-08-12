@@ -40,6 +40,18 @@ public class OpcUaMaster : CollectBase
     /// <inheritdoc/>
     public override CollectPropertyBase CollectProperties => _driverProperties;
 
+
+    public override string ToString()
+    {
+        return $"{_driverProperties.OpcUrl}";
+    }
+
+    public override string GetAddressDescription()
+    {
+        return _plc?.GetAddressDescription();
+    }
+
+#if !Management
     /// <inheritdoc/>
     public override Type DriverDebugUIType => typeof(ThingsGateway.Debug.OpcUaMaster);
 
@@ -82,10 +94,6 @@ public class OpcUaMaster : CollectBase
     /// <inheritdoc/>
     public override bool IsConnected() => _plc?.Connected == true;
 
-    public override string ToString()
-    {
-        return $"{_driverProperties.OpcUrl}";
-    }
 
     /// <inheritdoc/>
     protected override async Task DisposeAsync(bool disposing)
@@ -102,10 +110,7 @@ public class OpcUaMaster : CollectBase
         await base.DisposeAsync(disposing).ConfigureAwait(false);
     }
 
-    public override string GetAddressDescription()
-    {
-        return _plc?.GetAddressDescription();
-    }
+
     protected override bool VariableSourceReadsEnable => !_driverProperties.ActiveSubscribe;
     protected override List<IScheduledTask> ProtectedGetTasks(CancellationToken cancellationToken)
     {
@@ -378,4 +383,6 @@ public class OpcUaMaster : CollectBase
             success = false;
         }
     }
+
+#endif
 }

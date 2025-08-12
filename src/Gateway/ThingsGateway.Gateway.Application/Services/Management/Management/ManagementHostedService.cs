@@ -30,8 +30,8 @@ internal sealed class ManagementHostedService : BackgroundService
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         await Task.Yield();
-        await RemoteClientManagementTask.StartAsync(stoppingToken).ConfigureAwait(false);
-        await RemoteServerManagementTask.StartAsync(stoppingToken).ConfigureAwait(false);
+        _ = RemoteClientManagementTask.StartAsync(stoppingToken);
+        _ = RemoteServerManagementTask.StartAsync(stoppingToken);
     }
 
     public override async Task StopAsync(CancellationToken cancellationToken)

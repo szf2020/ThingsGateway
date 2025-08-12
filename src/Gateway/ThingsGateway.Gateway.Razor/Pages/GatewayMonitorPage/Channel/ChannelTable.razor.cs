@@ -20,15 +20,53 @@ namespace ThingsGateway.Gateway.Razor;
 
 public partial class ChannelTable : IDisposable
 {
+
+#if !Management
+    [Parameter]
+    public ChannelDeviceTreeItem SelectModel { get; set; }
+
+    [Parameter]
+    public IEnumerable<ChannelRuntime>? Items { get; set; } = Enumerable.Empty<ChannelRuntime>();
+
+    private IEnumerable<ChannelRuntime>? _previousItemsRef;
+    protected override void OnParametersSet()
+    {
+        if (!ReferenceEquals(_previousItemsRef, Items))
+        {
+            _previousItemsRef = Items;
+            Refresh();
+        }
+        base.OnParametersSet();
+    }
+
+#else
+
+    private async Task DrawerServiceShowChannelRuntimeInfo(ChannelRuntime channelRuntime) => await DrawerService.Show(new DrawerOption()
+    {
+        Class = "h-100",
+        Width = "80%",
+        Placement = Placement.Right,
+        ChildContent = BootstrapDynamicComponent.CreateComponent<ChannelRuntimeInfo>(new Dictionary<string, object?>
+        {
+             {nameof(ChannelRuntimeInfo.ChannelRuntime), channelRuntime }
+        }).Render(),
+        ShowBackdrop = true,
+        AllowResize = true,
+        IsBackdrop = true
+    });
+#endif
+
+    [Inject]
+    DrawerService DrawerService { get; set; }
     private static void BeforeShowEditDialogCallback(ITableEditDialogOption<ChannelRuntime> tableEditDialogOption)
     {
         tableEditDialogOption.Model = tableEditDialogOption.Model.AdaptChannelRuntime();
     }
 
+
+
     public bool Disposed { get; set; }
 
-    [Parameter]
-    public IEnumerable<ChannelRuntime>? Items { get; set; } = Enumerable.Empty<ChannelRuntime>();
 
     public void Dispose()
     {
@@ -44,16 +82,7 @@ public partial class ChannelTable : IDisposable
     }
 
     private SmartTriggerScheduler scheduler;
-    private IEnumerable<ChannelRuntime>? _previousItemsRef;
-    protected override void OnParametersSet()
-    {
-        if (!ReferenceEquals(_previousItemsRef, Items))
-        {
-            _previousItemsRef = Items;
-            Refresh();
-        }
-        base.OnParametersSet();
-    }
+
     private void Refresh()
     {
         scheduler.Trigger();
@@ -71,7 +100,11 @@ public partial class ChannelTable : IDisposable
         {
             try
             {
+#if Management
+                Refresh();
+#else
                 await InvokeAsync(StateHasChanged);
+#endif
             }
             catch (Exception ex)
             {
@@ -89,16 +122,23 @@ public partial class ChannelTable : IDisposable
     private QueryPageOptions _option = new();
     private Task<QueryData<ChannelRuntime>> OnQueryAsync(QueryPageOptions options)
     {
+#if Management
+        var data = ChannelPageService.OnChannelQueryAsync(options);
+
+        _option = options;
+        return data;
+#else
         var data = Items
                 .WhereIf(!options.SearchText.IsNullOrWhiteSpace(), a => a.Name.Contains(options.SearchText))
                 .GetQueryData(options);
         _option = options;
         return Task.FromResult(data);
+#endif
+
     }
 
     #endregion 查询
 
-    #region 编辑
 
     [Inject]
     IChannelPageService ChannelPageService { get; set; }
@@ -138,13 +178,14 @@ public partial class ChannelTable : IDisposable
 
     private async Task BatchEdit(IEnumerable<Channel> changedModels)
     {
-        var oldModel = changedModels.FirstOrDefault();//默认值显示第一个
+        var datas = changedModels.ToList();
+        var oldModel = datas.FirstOrDefault();//默认值显示第一个
         if (oldModel == null)
         {
             await ToastService.Warning(null, RazorLocalizer["PleaseSelect"]);
             return;
         }
-        changedModels = changedModels.AdaptListChannel();
+        datas = datas.AdaptListChannel();
         oldModel = oldModel.AdaptChannel();
         var oneModel = oldModel.AdaptChannel();//默认值显示第一个
 
@@ -162,7 +203,7 @@ public partial class ChannelTable : IDisposable
         {
              {nameof(ChannelEditComponent.OnValidSubmit), async () =>
             {
-                await Task.Run(() => ChannelPageService.BatchEditChannelAsync(changedModels, oldModel, oneModel,AutoRestartThread));
+                await Task.Run(() => ChannelPageService.BatchEditChannelAsync(datas, oldModel, oneModel,AutoRestartThread));
 
                    await InvokeAsync(table.QueryAsync);
             } },
@@ -179,7 +220,7 @@ public partial class ChannelTable : IDisposable
     {
         try
         {
-            return await Task.Run(async () => await ChannelPageService.DeleteChannelAsync(channels.Select(a => a.Id), AutoRestartThread, default));
+            return await Task.Run(async () => await ChannelPageService.DeleteChannelAsync(channels.Select(a => a.Id).ToList(), AutoRestartThread));
         }
         catch (Exception ex)
         {
@@ -206,7 +247,11 @@ public partial class ChannelTable : IDisposable
 
     private Task<ChannelRuntime> OnAdd()
     {
+#if !Management
         return Task.FromResult(ChannelDeviceHelpers.GetChannelModel(ItemChangedType.Add, SelectModel).AdaptChannelRuntime());
+#else
+        return Task.FromResult(new ChannelRuntime());
+#endif
     }
 
     #region 导出
@@ -224,6 +269,7 @@ public partial class ChannelTable : IDisposable
         }
         else
         {
+#if !Management
             switch (SelectModel.ChannelDevicePluginType)
             {
 
@@ -241,6 +287,9 @@ public partial class ChannelTable : IDisposable
 
                     break;
             }
+#else
+            ret = await GatewayExportService.OnChannelExport(new() { QueryPageOptions = _option });
+#endif
         }
 
         // 返回 true 时自动弹出提示框
@@ -262,14 +311,21 @@ public partial class ChannelTable : IDisposable
 
         var option = _option;
         option.IsPage = false;
+#if !Management
         var models = Items
-                .WhereIf(!option.SearchText.IsNullOrWhiteSpace(), a => a.Name.Contains(option.SearchText)).GetData(option, out var total).ToList();
-        if (models.Count > 50000)
+                .WhereIf(!option.SearchText.IsNullOrWhiteSpace(), a => a.Name.Contains(option.SearchText)).GetData(option, out var total).Cast<Channel>().ToList();
+
+#else
+
+        var models = await ChannelPageService.GetChannelListAsync(option, 2000);
+
+#endif
+        if (models.Count > 2000)
         {
-            await ToastService.Warning("online Excel max data count 50000");
+            await ToastService.Warning("online Excel max data count 2000");
             return;
         }
-        var uSheetDatas = ChannelServiceHelpers.ExportChannel(models);
+        var uSheetDatas = await ChannelPageService.ExportChannelAsync(models);
 
         op.Component = BootstrapDynamicComponent.CreateComponent<USheet>(new Dictionary<string, object?>
         {
@@ -279,7 +335,7 @@ public partial class ChannelTable : IDisposable
     {
                 await Task.Run(async ()=>
                 {
-              var importData=await  ChannelPageService.ImportChannelAsync(data,AutoRestartThread);
+              var importData=await  ChannelPageService.ImportChannelUSheetDatasAsync(data,AutoRestartThread);
 
                 })
                     ;
@@ -343,7 +399,11 @@ finally
         {
             await Task.Run(async () =>
             {
-                await ChannelPageService.DeleteChannelAsync(Items.Select(a => a.Id), AutoRestartThread, default);
+#if !Management
+                await ChannelPageService.DeleteChannelAsync(Items.Select(a => a.Id).ToList(), AutoRestartThread);
+#else
+                await ChannelPageService.ClearChannelAsync(AutoRestartThread);
+#endif
                 await InvokeAsync(async () =>
                 {
                     await ToastService.Default();
@@ -360,11 +420,10 @@ finally
 
     [Parameter]
     public bool AutoRestartThread { get; set; }
-    [Parameter]
-    public ChannelDeviceTreeItem SelectModel { get; set; }
+
+
     [Inject]
     [NotNull]
     public IStringLocalizer<ThingsGateway.Gateway.Razor._Imports>? GatewayLocalizer { get; set; }
-    #endregion
 
 }

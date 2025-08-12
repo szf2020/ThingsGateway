@@ -24,6 +24,7 @@ namespace ThingsGateway.Plugin.QuestDB;
 /// </summary>
 public partial class QuestDBProducer : BusinessBaseWithCacheIntervalVariable
 {
+#if !Management
     protected override ValueTask<OperResult> UpdateVarModel(List<CacheDBItem<VariableBasicData>> item, CancellationToken cancellationToken)
     {
         return UpdateVarModel(item.Select(a => a.Value).OrderBy(a => a.Id), cancellationToken);
@@ -169,4 +170,7 @@ public partial class QuestDBProducer : BusinessBaseWithCacheIntervalVariable
     }
 
     #endregion 方法
+
+
+#endif
 }

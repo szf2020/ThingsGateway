@@ -22,6 +22,8 @@ namespace ThingsGateway.Plugin.Webhook;
 /// </summary>
 public partial class Webhook : BusinessBaseWithCacheIntervalScriptAll
 {
+#if !Management
+
     protected override void AlarmChange(AlarmVariable alarmVariable)
     {
         if (!_businessPropertyWithCacheIntervalScript.AlarmTopic.IsNullOrWhiteSpace())
@@ -207,4 +209,6 @@ public partial class Webhook : BusinessBaseWithCacheIntervalScriptAll
 
     #endregion private
 
+
+#endif
 }

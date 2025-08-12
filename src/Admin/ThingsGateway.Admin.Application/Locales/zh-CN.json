@@ -21,16 +21,7 @@
     "UserNoModule": "该账号未分配模块,请联系管理员",
     "UserNull": "用户 {0} 不存在"
   },
-  "ThingsGateway.Admin.Application.BaseDataEntity": {
-    "CreateOrgId": "创建机构Id"
-  },
-  "ThingsGateway.Admin.Application.BaseEntity": {
-    "CreateTime": "创建时间",
-    "CreateUser": "创建人",
-    "SortCode": "排序",
-    "UpdateTime": "更新时间",
-    "UpdateUser": "更新人"
-  },
+
   "ThingsGateway.Admin.Application.BlazorAuthenticationHandler": {
     "UserExpire": "用户登录已过期，请重新登录"
   },

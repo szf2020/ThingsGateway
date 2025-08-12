@@ -1,0 +1,40 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<Import Project="..\..\Version.props" />
+	<Import Project="..\..\PackNuget.props" />
+	<PropertyGroup>
+		<TargetFrameworks>net8.0;</TargetFrameworks>
+
+		<DefineConstants>$(DefineConstants);Management</DefineConstants>
+		<OutputPath>bin\$(Configuration)\Management\</OutputPath>
+		<IntermediateOutputPath>obj\$(Configuration)\Management\$(TargetFramework)\</IntermediateOutputPath>
+		<PackageOutputPath>$(MSBuildThisFileDirectory)..\..\..\..\nupkgs1</PackageOutputPath>
+	</PropertyGroup>
+
+
+	<PropertyGroup>
+		<AssemblyName>ThingsGateway.Plugin.RabbitMQ</AssemblyName>
+		<PackageId>$(MSBuildProjectName)</PackageId>
+	</PropertyGroup>
+	
+	<ItemGroup>
+		<ProjectReference Include="..\..\PluginPro\ThingsGateway.Management.Razor\ThingsGateway.Management.Razor.csproj" />
+
+
+	</ItemGroup>
+	
+	<ItemGroup>
+		<PackageReference Include="RabbitMQ.Client" Version="7.1.2" GeneratePathProperty="true">
+			<PrivateAssets>contentFiles;compile;build;buildMultitargeting;buildTransitive;analyzers;</PrivateAssets>
+		</PackageReference>
+
+	</ItemGroup>
+
+	
+	<ItemGroup>
+		<Content Remove="Locales\*.json" />
+		<EmbeddedResource Include="Locales\*.json">
+			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</EmbeddedResource>
+	</ItemGroup>
+
+</Project>

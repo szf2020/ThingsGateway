@@ -35,7 +35,7 @@ internal sealed class PluginService : IPluginService
     /// </summary>
     public const string DirName = "GatewayPlugins";
 
-    private const string CacheKeyGetPluginOutputs = $"ThingsGateway.Gateway.Application.{nameof(PluginService)}{nameof(GetPluginList)}";
+    private const string CacheKeyGetPluginOutputs = $"ThingsGateway.Gateway.Application.{nameof(PluginService)}GetList";
     private const string SaveEx = ".save";
     private const string DelEx = ".del";
 
@@ -166,7 +166,7 @@ internal sealed class PluginService : IPluginService
     {
 
         {
-            string cacheKey = $"{nameof(PluginService)}_{nameof(GetDriverMethodInfos)}_{CultureInfo.CurrentUICulture.Name}";
+            string cacheKey = $"{nameof(PluginService)}_{nameof(GetDriverMethodInfos)}_{System.Globalization.CultureInfo.CurrentUICulture.Name}";
             // 如果未提供驱动基类对象，则尝试根据插件名称获取驱动对象
             driver ??= GetDriver(pluginName); // 如果未提供驱动对象，则根据插件名称获取驱动对象
 
@@ -222,7 +222,7 @@ internal sealed class PluginService : IPluginService
     {
 
         {
-            string cacheKey = $"{nameof(PluginService)}_{nameof(GetDriverPropertyTypes)}_{CultureInfo.CurrentUICulture.Name}";
+            string cacheKey = $"{nameof(PluginService)}_{nameof(GetDriverPropertyTypes)}_{System.Globalization.CultureInfo.CurrentUICulture.Name}";
 
             driver ??= GetDriver(pluginName); // 如果 driver 为 null， 获取驱动实例
             // 检查插件名称是否为空或空字符串
@@ -253,7 +253,7 @@ internal sealed class PluginService : IPluginService
             }
         }
     }
-
+#if !Management
     /// <summary>
     /// 获取插件信息的方法，可以根据插件类型筛选插件列表。
     /// </summary>
@@ -297,6 +297,9 @@ internal sealed class PluginService : IPluginService
 
         return filteredPlugins;
     }
+
+#endif
+
     /// <summary>
     /// 获取变量的属性类型
     /// </summary>
@@ -304,7 +307,7 @@ internal sealed class PluginService : IPluginService
     {
 
         {
-            string cacheKey = $"{nameof(PluginService)}_{nameof(GetVariablePropertyTypes)}_{CultureInfo.CurrentUICulture.Name}";
+            string cacheKey = $"{nameof(PluginService)}_{nameof(GetVariablePropertyTypes)}_{System.Globalization.CultureInfo.CurrentUICulture.Name}";
             businessBase ??= (BusinessBase)GetDriver(pluginName); // 如果 driver 为 null， 获取驱动实例
 
             var data = App.CacheService.HashGetAll<List<IEditorItem>>(cacheKey);
@@ -327,6 +330,7 @@ internal sealed class PluginService : IPluginService
         }
     }
 
+#if !Management
     /// <summary>
     /// 分页显示插件
     /// </summary>
@@ -336,6 +340,7 @@ internal sealed class PluginService : IPluginService
         var query = (await GetPluginsAsync(pluginType).ConfigureAwait(false)).WhereIf(!options.SearchText.IsNullOrWhiteSpace(), a => a.FullName.Contains(options.SearchText)).GetQueryData(options);
         return query;
     }
+#endif
 
     /// <summary>
     /// 移除全部插件
@@ -729,7 +734,7 @@ internal sealed class PluginService : IPluginService
         }
         return assembly;
     }
-
+#if !Management
     /// <summary>
     /// 获取全部插件信息
     /// </summary>
@@ -848,7 +853,7 @@ internal sealed class PluginService : IPluginService
             return plugins.DistinctBy(a => a.FullName).OrderBy(a => a.EducationPlugin);
         }
     }
-
+#endif
     //public Task SavePlugin(PluginAddInput plugin)
     //{
     //    return PluginInfoUtil.SavePlugin(plugin);

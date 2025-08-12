@@ -343,6 +343,7 @@
     "WriteVariablesAsync": "写入变量"
   },
   "ThingsGateway.Gateway.Application.Device": {
+    "Pause": "暂停",
     "ChannelError": "通道错误",
     "ChannelId": "通道",
     "ChannelId.MinValue": " {0} 不可为空",

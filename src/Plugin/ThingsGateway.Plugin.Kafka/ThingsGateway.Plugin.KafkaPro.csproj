@@ -1,0 +1,35 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<Import Project="..\..\Version.props" />
+	<Import Project="..\..\PackNuget.props" />
+	<PropertyGroup>
+		<TargetFrameworks>net8.0;</TargetFrameworks>
+
+		<DefineConstants>$(DefineConstants);Management</DefineConstants>
+		<OutputPath>bin\$(Configuration)\Management\</OutputPath>
+		<IntermediateOutputPath>obj\$(Configuration)\Management\$(TargetFramework)\</IntermediateOutputPath>
+		<PackageOutputPath>$(MSBuildThisFileDirectory)..\..\..\..\nupkgs1</PackageOutputPath>
+	</PropertyGroup>
+
+
+	<PropertyGroup>
+		<AssemblyName>ThingsGateway.Plugin.Kafka</AssemblyName>
+		<PackageId>$(MSBuildProjectName)</PackageId>
+	</PropertyGroup>
+	
+	<ItemGroup>
+		<ProjectReference Include="..\..\PluginPro\ThingsGateway.Management.Razor\ThingsGateway.Management.Razor.csproj" />
+		
+		<PackageReference Include="Confluent.Kafka" Version="2.11.0" GeneratePathProperty="true">
+			<PrivateAssets>contentFiles;compile;build;buildMultitargeting;buildTransitive;analyzers;</PrivateAssets>
+		</PackageReference>
+	</ItemGroup>
+
+	<ItemGroup>
+		<Content Remove="Locales\*.json" />
+		<EmbeddedResource Include="Locales\*.json">
+			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</EmbeddedResource>
+	</ItemGroup>
+	
+</Project>
+
