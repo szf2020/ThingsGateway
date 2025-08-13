@@ -58,7 +58,6 @@
                 </Tooltip>
 
             }
-            }
 
             @if (DeviceRuntime.IsCollect == false && AuthorizeButton("删除缓存"))
             {
@@ -125,15 +124,7 @@
                             <EditorItem Field=@context.SourceVariableCount FieldExpression=@(() => context.SourceVariableCount) />
                             <EditorItem Field=@context.MethodVariableCount FieldExpression=@(() => context.MethodVariableCount) />
                         }
-                        @*<EditorItem ComponentParameters=@(new Dictionary<string,object>(){
-                                    ["class"]="red--text",
-                        }
 
-                        ) Field=@context.LastErrorMessage FieldExpression=@(()=> context.LastErrorMessage ) Rows="1" ShowLabelTooltip="false">
-                             <EditTemplate Context="value">
-                                <Display Value=@value.LastErrorMessage ValueExpression=@(()=> context.LastErrorMessage ) ShowTooltip class="red--text" ShowLabel="true"  />
-                            </EditTemplate> 
-                        </EditorItem> *@
                         <EditorItem Field=@context.LastErrorMessage FieldExpression=@(() => context.LastErrorMessage) ShowLabelTooltip="true">
                             <EditTemplate Context="value">
                                 <div class="col-12">

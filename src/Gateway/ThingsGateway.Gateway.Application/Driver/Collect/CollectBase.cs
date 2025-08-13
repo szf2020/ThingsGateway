@@ -736,10 +736,10 @@ public abstract partial class CollectBase : DriverBase
 
     protected override async Task DisposeAsync(bool disposing)
     {
+        await base.DisposeAsync(disposing).ConfigureAwait(false);
         _linkedCtsCache?.SafeDispose();
         if (ReadWriteLock != null)
             await ReadWriteLock.SafeDisposeAsync().ConfigureAwait(false);
-        await base.DisposeAsync(disposing).ConfigureAwait(false);
     }
 
 #endif
