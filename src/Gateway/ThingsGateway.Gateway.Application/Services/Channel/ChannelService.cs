@@ -392,15 +392,16 @@ internal sealed class ChannelService : BaseService<Channel>, IChannelService
         ManageHelper.CheckChannelCount(insertData.Count);
 
         using var db = GetDB();
-        if (GlobalData.HardwareJob.HardwareInfo.MachineInfo.AvailableMemory > 2 * 1024 * 1024)
-        {
-            await db.BulkCopyAsync(insertData, 200000).ConfigureAwait(false);
-            await db.BulkUpdateAsync(upData, 200000).ConfigureAwait(false);
-        }
-        else
+        if (GlobalData.HardwareJob.HardwareInfo.MachineInfo.AvailableMemory < 2 * 1024 * 1024 || WebEnableVariable.WebEnable == false)
         {
             await db.BulkCopyAsync(insertData, 10000).ConfigureAwait(false);
             await db.BulkUpdateAsync(upData, 10000).ConfigureAwait(false);
+        }
+        else
+        {
+            await db.BulkCopyAsync(insertData, 200000).ConfigureAwait(false);
+            await db.BulkUpdateAsync(upData, 200000).ConfigureAwait(false);
+
         }
         DeleteChannelFromCache();
         return upData.Select(a => a.Id).Concat(insertData.Select(a => a.Id)).ToHashSet();

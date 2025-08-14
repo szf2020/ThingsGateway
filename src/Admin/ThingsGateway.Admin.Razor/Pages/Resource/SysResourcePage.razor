@@ -26,12 +26,12 @@
                 OnQueryAsync="OnQueryAsync" CustomerSearchModel="@CustomerSearchModel"
                 OnSaveAsync="Save" OnDeleteAsync="Delete">
         <TableToolbarTemplate>
-            <PopConfirmButton Color=Color.Warning IsDisabled="SelectedRows.Count<=0||!AuthorizeButton(AdminOperConst.Add)" Text=@OperDescLocalizer["CopyResource"] Icon="fa fa-copy" OnConfirm="OnCopy">
+            <PopConfirmButton Color=Color.Warning IsKeepDisabled="SelectedRows.Count <= 0 || !AuthorizeButton(AdminOperConst.Add)" Text=@OperDescLocalizer["CopyResource"] Icon="fa fa-copy" OnConfirm="OnCopy">
                 <BodyTemplate>
                     <Select Items="ModuleSelectedItems" @bind-Value=CopyModule ShowLabel="false" />
                 </BodyTemplate>
             </PopConfirmButton>
-            <PopConfirmButton Color=Color.Warning IsDisabled="SelectedRows.Count!=1||!AuthorizeButton(AdminOperConst.Edit)" Text=@OperDescLocalizer["ChangeParentResource"] Icon="fa fa-copy" OnConfirm="OnChangeParent">
+            <PopConfirmButton Color=Color.Warning IsKeepDisabled="SelectedRows.Count != 1 || !AuthorizeButton(AdminOperConst.Edit)" Text=@OperDescLocalizer["ChangeParentResource"] Icon="fa fa-copy" OnConfirm="OnChangeParent">
                 <BodyTemplate>
                     <div class="overflow-y-auto" style="height:500px">
                         <TreeView Items="MenuTreeItems" IsVirtualize="true" OnTreeItemClick="a=>{ChangeParentId=a.Value.Id;return Task.CompletedTask;}" />

@@ -177,7 +177,7 @@ public partial class VariableRuntime : Variable
     /// 是否在线
     /// </summary>
     [AutoGenerateColumn(Visible = true, Filterable = true, Sortable = true, Order = 5)]
-    public bool IsOnline{get;set;}
+    public bool IsOnline { get; set; }
 
     /// <summary>
     /// 设备名称

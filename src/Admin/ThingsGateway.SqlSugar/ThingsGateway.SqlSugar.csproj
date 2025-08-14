@@ -32,7 +32,7 @@
 		<PackageReference Include="CsvHelper" Version="33.1.0" />
 		<PackageReference Include="TDengine.Connector" Version="3.1.7" />
 		<PackageReference Include="Oracle.ManagedDataAccess.Core" Version="23.9.1" />
-		<PackageReference Include="Oscar.Data.SqlClient" Version="4.2.22" />
+		<PackageReference Include="Oscar.Data.SqlClient" Version="4.2.23" />
 		<PackageReference Include="System.Data.Common" Version="4.3.0" />
 		<PackageReference Include="Microsoft.Data.SqlClient" Version="6.1.0" />
 		<PackageReference Include="System.Reflection.Emit.Lightweight" Version="4.7.0" />

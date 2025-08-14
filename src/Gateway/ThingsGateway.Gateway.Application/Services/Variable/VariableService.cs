@@ -209,17 +209,18 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
 
         var result = await db.UseTranAsync(async () =>
         {
-            if (GlobalData.HardwareJob.HardwareInfo.MachineInfo.AvailableMemory > 2 * 1024 * 1024)
-            {
-                await db.BulkCopyAsync(newChannels, 200000).ConfigureAwait(false);
-                await db.BulkCopyAsync(newDevices, 200000).ConfigureAwait(false);
-                await db.BulkCopyAsync(newVariables, 200000).ConfigureAwait(false);
-            }
-            else
+            if (GlobalData.HardwareJob.HardwareInfo.MachineInfo.AvailableMemory < 2 * 1024 * 1024 || WebEnableVariable.WebEnable == false)
             {
                 await db.BulkCopyAsync(newChannels, 10000).ConfigureAwait(false);
                 await db.BulkCopyAsync(newDevices, 10000).ConfigureAwait(false);
                 await db.BulkCopyAsync(newVariables, 10000).ConfigureAwait(false);
+            }
+            else
+            {
+                await db.BulkCopyAsync(newChannels, 200000).ConfigureAwait(false);
+                await db.BulkCopyAsync(newDevices, 200000).ConfigureAwait(false);
+                await db.BulkCopyAsync(newVariables, 200000).ConfigureAwait(false);
+
             }
         }).ConfigureAwait(false);
         if (result.IsSuccess)//如果成功了
@@ -492,7 +493,7 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
     [OperDesc("ExportVariable", isRecordPar: false, localizerType: typeof(Variable))]
     public async Task<Dictionary<string, object>> ExportVariableAsync(GatewayExportFilter exportFilter)
     {
-        if (GlobalData.HardwareJob.HardwareInfo.MachineInfo.AvailableMemory < 4 * 1024 * 1024)
+        if (GlobalData.HardwareJob.HardwareInfo.MachineInfo.AvailableMemory < 4 * 1024 * 1024 || WebEnableVariable.WebEnable == false)
         {
             var whereQuery = await GetWhereEnumerableFunc(exportFilter).ConfigureAwait(false);
             //导出
@@ -566,15 +567,16 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
     {
         ManageHelper.CheckVariableCount(insertData.Count);
         using var db = GetDB();
-        if (GlobalData.HardwareJob.HardwareInfo.MachineInfo.AvailableMemory > 2 * 1024 * 1024)
-        {
-            await db.BulkCopyAsync(insertData, 200000).ConfigureAwait(false);
-            await db.BulkUpdateAsync(upData, 200000).ConfigureAwait(false);
-        }
-        else
+        if (GlobalData.HardwareJob.HardwareInfo.MachineInfo.AvailableMemory < 2 * 1024 * 1024 || WebEnableVariable.WebEnable == false)
         {
             await db.BulkCopyAsync(insertData, 10000).ConfigureAwait(false);
             await db.BulkUpdateAsync(upData, 10000).ConfigureAwait(false);
+
+        }
+        else
+        {
+            await db.BulkCopyAsync(insertData, 200000).ConfigureAwait(false);
+            await db.BulkUpdateAsync(upData, 200000).ConfigureAwait(false);
         }
         DeleteVariableCache();
         return upData.Select(a => a.Id).Concat(insertData.Select(a => a.Id)).ToHashSet();

@@ -63,7 +63,7 @@ internal sealed class RedundancyTask : IRpcDriver, IAsyncDisposable
         const int highMemorySize = 100000;
         const long memoryThreshold = 2L * 1024 * 1024; // 2GB，单位KB
 
-        return GlobalData.HardwareJob.HardwareInfo.MachineInfo.AvailableMemory > memoryThreshold
+        return (GlobalData.HardwareJob.HardwareInfo.MachineInfo.AvailableMemory > memoryThreshold && WebEnableVariable.WebEnable == true)
             ? highMemorySize
             : defaultSize;
     }

@@ -1,0 +1,1 @@
+set WebEnable=false && ThingsGateway.Server.exe

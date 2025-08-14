@@ -41,7 +41,7 @@
 
             }
 
-            <PopConfirmButton IsAsync IsDisabled=@_importPreviews.Any(it => it.Value.HasError) Color=Color.Warning class="mt-2" OnConfirm=@(SaveDeviceImport)>@Localizer["Import"]</PopConfirmButton>
+            <PopConfirmButton IsAsync IsKeepDisabled=@_importPreviews.Any(it => it.Value.HasError) Color=Color.Warning class="mt-2" OnConfirm=@(SaveDeviceImport)>@Localizer["Import"]</PopConfirmButton>
 
 @* 
             <Button IsAsync class="mt-2" IsDisabled=@_importPreviews.Any(it => it.Value.HasError) OnClick="() => step.Next()">@Localizer["Next"]</Button> *@

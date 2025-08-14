@@ -71,7 +71,7 @@
     </TableColumns>
     <RowButtonTemplate>
 
-        <PopConfirmButton IsDisabled=@(!AuthorizeButton("写入变量")) Size="Size.ExtraSmall" Color="Color.Warning" Icon="fa-solid fa-bars" Text="@Localizer["WriteVariable"]" IsAsync OnConfirm="() => OnWriteVariable(context)">
+        <PopConfirmButton IsKeepDisabled=@(!AuthorizeButton("写入变量")) Size="Size.ExtraSmall" Color="Color.Warning" Icon="fa-solid fa-bars" Text="@Localizer["WriteVariable"]" IsAsync OnConfirm="() => OnWriteVariable(context)">
 
             <BodyTemplate>
                 <Textarea @bind-Value=WriteValue ShowLabel="true" ShowLabelTooltip="true" />
@@ -125,7 +125,7 @@
 
         @if (WebsiteOption.Value.Demo || App.HostEnvironment.IsDevelopment())
         {
-            <PopConfirmButton Color=Color.Warning Text="@Localizer["Test"]" IsDisabled=@(!AuthorizeButton(AdminOperConst.Add))
+            <PopConfirmButton Color=Color.Warning Text="@Localizer["Test"]" IsKeepDisabled=@(!AuthorizeButton(AdminOperConst.Add))
                               IsAsync OnConfirm=@(InsertTestDataAsync)>
 
                 <BodyTemplate>
