@@ -423,12 +423,14 @@ public class OpcUaMaster : IDisposable, IAsyncDisposable
         Disconnect();
         _variableDicts?.Clear();
         _subscriptionDicts?.Clear();
+        waitLock?.Dispose();
     }
     public async ValueTask DisposeAsync()
     {
         await DisconnectAsync().ConfigureAwait(false);
         _variableDicts?.Clear();
         _subscriptionDicts?.Clear();
+        waitLock?.Dispose();
     }
     /// <summary>
     /// 获取变量说明

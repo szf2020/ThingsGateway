@@ -1,16 +1,21 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
+
 	<Import Project="..\..\Version.props" />
 	<Import Project="..\..\PackNuget.props" />
+	
 	<PropertyGroup>
 		<TargetFrameworks>net8.0;</TargetFrameworks>
 
 		<DefineConstants>$(DefineConstants);Management</DefineConstants>
 
-		<OutputPath>bin\$(Configuration)\Management\</OutputPath>
-		<IntermediateOutputPath>obj\$(Configuration)\Management\$(TargetFramework)\</IntermediateOutputPath>
+		<OutputPath>bin\$(Configuration)\Management</OutputPath>
+		<IntermediateOutputPath>obj\Management\$(Configuration)\</IntermediateOutputPath>
+		<!--<BaseIntermediateOutputPath>obj\Management\</BaseIntermediateOutputPath>
+		<MSBuildProjectExtensionsPath>$(BaseIntermediateOutputPath)</MSBuildProjectExtensionsPath>-->
 		<PackageOutputPath>$(MSBuildThisFileDirectory)..\..\..\..\nupkgs1</PackageOutputPath>
 	</PropertyGroup>
 
+	
 
 	<PropertyGroup>
 		<AssemblyName>ThingsGateway.Plugin.DB</AssemblyName>
@@ -22,7 +27,9 @@
 	<ItemGroup>
 		<ProjectReference Include="..\..\Foundation\ThingsGateway.Foundation.Razor\ThingsGateway.Foundation.Razor.csproj">
 		</ProjectReference>
-		<ProjectReference Include="..\..\PluginPro\ThingsGateway.Management.Razor\ThingsGateway.Management.Razor.csproj" />
+		<ProjectReference Include="..\..\PluginPro\ThingsGateway.Management.Razor\ThingsGateway.Management.Razor.csproj" >
+			<PrivateAssets>contentFiles;compile;build;buildMultitargeting;buildTransitive;analyzers;</PrivateAssets>
+		</ProjectReference>
 		
 		<PackageReference Include="Riok.Mapperly" Version="4.2.1" ExcludeAssets="runtime" PrivateAssets="all" />
 

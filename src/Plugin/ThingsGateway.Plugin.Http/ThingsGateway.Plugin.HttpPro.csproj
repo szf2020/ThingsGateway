@@ -5,8 +5,10 @@
 		<TargetFrameworks>net8.0;</TargetFrameworks>
 
 		<DefineConstants>$(DefineConstants);Management</DefineConstants>
-		<OutputPath>bin\$(Configuration)\Management\</OutputPath>
-		<IntermediateOutputPath>obj\$(Configuration)\Management\$(TargetFramework)\</IntermediateOutputPath>
+		<OutputPath>bin\$(Configuration)\Management</OutputPath>
+		<IntermediateOutputPath>obj\Management\$(Configuration)\</IntermediateOutputPath>
+		<!--<BaseIntermediateOutputPath>obj\Management\</BaseIntermediateOutputPath>
+		<MSBuildProjectExtensionsPath>$(BaseIntermediateOutputPath)</MSBuildProjectExtensionsPath>-->
 		<PackageOutputPath>$(MSBuildThisFileDirectory)..\..\..\..\nupkgs1</PackageOutputPath>
 	</PropertyGroup>
 
@@ -17,7 +19,9 @@
 	</PropertyGroup>
 	
 	<ItemGroup>
-		<ProjectReference Include="..\..\PluginPro\ThingsGateway.Management.Razor\ThingsGateway.Management.Razor.csproj" />
+		<ProjectReference Include="..\..\PluginPro\ThingsGateway.Management.Razor\ThingsGateway.Management.Razor.csproj" >
+			<PrivateAssets>contentFiles;compile;build;buildMultitargeting;buildTransitive;analyzers;</PrivateAssets>
+		</ProjectReference>
 	</ItemGroup>
 
 

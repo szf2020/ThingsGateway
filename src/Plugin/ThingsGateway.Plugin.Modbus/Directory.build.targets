@@ -5,7 +5,7 @@
 	<Target Name="IncludeAllFilesInTargetDir" AfterTargets="Build">
 
 		<ItemGroup>
-			<Content Include="$(ProjectDir)bin\$(Configuration)\$(TargetFramework)\**\*Modbus*.dll">
+			<Content Include="$(ProjectDir)$(OutputPath)\$(TargetFramework)\**\*Modbus*.dll">
 				<Pack>true</Pack>
 				<PackagePath>Content</PackagePath>
 			</Content>

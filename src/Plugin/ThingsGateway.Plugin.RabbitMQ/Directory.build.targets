@@ -20,15 +20,15 @@
 	<!--在构建后触发的。它通过在 Nuget 包的 Content 文件夹中包含目标目录中的所有文件和子文件夹来创建 nuget 包-->
 	<Target Name="IncludeAllFilesInTargetDir" AfterTargets="Build">
 		<ItemGroup>
-			<Content Include="$(ProjectDir)bin\$(Configuration)\$(TargetFramework)\**\*RabbitMQ*.dll">
+			<Content Include="$(ProjectDir)$(OutputPath)\$(TargetFramework)\**\*RabbitMQ*.dll">
 				<Pack>true</Pack>
 				<PackagePath>Content</PackagePath>
 			</Content>
-			<Content Include="$(ProjectDir)bin\$(Configuration)\$(TargetFramework)\**\*Pipelines*.dll">
+			<Content Include="$(ProjectDir)$(OutputPath)\$(TargetFramework)\**\*Pipelines*.dll">
 				<Pack>true</Pack>
 				<PackagePath>Content</PackagePath>
 			</Content>
-			<Content Include="$(ProjectDir)bin\$(Configuration)\$(TargetFramework)\**\*RateLimiting*.dll">
+			<Content Include="$(ProjectDir)$(OutputPath)\$(TargetFramework)\**\*RateLimiting*.dll">
 				<Pack>true</Pack>
 				<PackagePath>Content</PackagePath>
 			</Content>

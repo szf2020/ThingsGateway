@@ -1932,7 +1932,7 @@
 //    }
 //    private void WriteDiagnosticInfo(string fieldName, DiagnosticInfo value, int depth)
 //    {
-//        if (value == null || value.IsNullDiagnosticInfo)
+//        if (value?.IsNullDiagnosticInfo != false)
 //        {
 //            WriteSimpleField(fieldName, null, quotes: false);
 //            return;

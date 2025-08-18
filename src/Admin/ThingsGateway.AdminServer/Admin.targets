@@ -29,7 +29,7 @@
   <Target Name="AdminPostPublish" AfterTargets="Publish">
     <ItemGroup>
       <!-- setting up the variable for convenience -->
-      <AdminFiles Include="bin\$(Configuration)\$(TargetFramework)\SeedData\**" />
+      <AdminFiles Include="$(OutputPath)\$(TargetFramework)\SeedData\**" />
     </ItemGroup>
     <PropertyGroup>
     </PropertyGroup>

@@ -3,7 +3,9 @@
 	<Import Project="..\..\PackNuget.props" />
 	<PropertyGroup>
 		<TargetFrameworks>net8.0;</TargetFrameworks>
-		
+
+		<OutputPath>bin\$(Configuration)</OutputPath>
+		<IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
 	</PropertyGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\..\Gateway\ThingsGateway.Gateway.Application\ThingsGateway.Gateway.Application.csproj">

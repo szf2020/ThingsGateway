@@ -5,7 +5,7 @@
 	<Target Name="IncludeAllFilesInTargetDir" AfterTargets="Build">
 
 		<ItemGroup>
-			<Content Include="$(ProjectDir)bin\$(Configuration)\$(TargetFramework)\**\*Siemens*.dll">
+			<Content Include="$(ProjectDir)$(OutputPath)\$(TargetFramework)\**\*Siemens*.dll">
 				<Pack>true</Pack>
 				<PackagePath>Content</PackagePath>
 			</Content>

@@ -27,19 +27,19 @@
 	<Target Name="IncludeAllFilesInTargetDir" AfterTargets="Build">
 
 		<ItemGroup>
-			<Content Include="$(ProjectDir)bin\$(Configuration)\$(TargetFramework)\**\*Plugin.DB*.dll">
+			<Content Include="$(ProjectDir)$(OutputPath)\$(TargetFramework)\**\*Plugin.DB*.dll">
 				<Pack>true</Pack>
 				<PackagePath>Content</PackagePath>
 			</Content>
-			<Content Include="$(ProjectDir)bin\$(Configuration)\$(TargetFramework)\**\*TDengine*.dll">
+			<Content Include="$(ProjectDir)$(OutputPath)\$(TargetFramework)\**\*TDengine*.dll">
 				<Pack>true</Pack>
 				<PackagePath>Content</PackagePath>
 			</Content>
-			<Content Include="$(ProjectDir)bin\$(Configuration)\$(TargetFramework)\**\*QuestDb*.dll">
+			<Content Include="$(ProjectDir)$(OutputPath)\$(TargetFramework)\**\*QuestDb*.dll">
 				<Pack>true</Pack>
 				<PackagePath>Content</PackagePath>
 			</Content>
-			<Content Include="$(ProjectDir)bin\$(Configuration)\$(TargetFramework)\**\*CsvHelper*.dll">
+			<Content Include="$(ProjectDir)$(OutputPath)\$(TargetFramework)\**\*CsvHelper*.dll">
 				<Pack>true</Pack>
 				<PackagePath>Content</PackagePath>
 			</Content>
