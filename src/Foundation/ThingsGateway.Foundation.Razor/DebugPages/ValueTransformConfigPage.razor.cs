@@ -14,7 +14,7 @@ using System.Text.RegularExpressions;
 
 using ThingsGateway.NewLife.Extension;
 
-namespace ThingsGateway.Gateway.Razor;
+namespace ThingsGateway.Debug;
 
 public partial class ValueTransformConfigPage
 {
@@ -205,5 +205,10 @@ public partial class ValueTransformConfigPage
         }
     }
 
+    [Inject]
+    ToastService ToastService { get; set; }
+
+    [Inject]
+    IStringLocalizer<ThingsGateway.Razor._Imports> RazorLocalizer { get; set; }
     #endregion 修改
 }

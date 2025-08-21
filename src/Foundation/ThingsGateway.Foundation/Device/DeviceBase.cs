@@ -214,10 +214,7 @@ public abstract class DeviceBase : AsyncAndSyncDisposableObject, IDevice
     /// </summary>
     protected virtual ValueTask<bool> ChannelStarting(IClientChannel channel, bool last)
     {
-        if (channel.ReadOnlyDataHandlingAdapter != null)
-        {
-            channel.ReadOnlyDataHandlingAdapter.Logger = Logger;
-        }
+        channel.SetDataHandlingAdapterLogger(Logger);
         return EasyValueTask.FromResult(true);
     }
 
@@ -318,7 +315,7 @@ public abstract class DeviceBase : AsyncAndSyncDisposableObject, IDevice
         {
             try
             {
-                if (client.WaitHandlePool.SetRun(response))
+                if (client.WaitHandlePool.Set(response))
                 {
                     e.Handled = true;
                 }
@@ -366,21 +363,13 @@ public abstract class DeviceBase : AsyncAndSyncDisposableObject, IDevice
         }
     }
 
-    private async ValueTask BefortSendAsync(IClientChannel channel, CancellationToken token)
+    private Task BefortSendAsync(IClientChannel channel, CancellationToken token)
     {
         SetDataAdapter(channel);
-        try
-        {
-            await ConnectAsync(token).ConfigureAwait(false);
-        }
-        catch (Exception)
-        {
-            await Task.Delay(1000, token).ConfigureAwait(false);
-            throw;
-        }
 
-        if (token.IsCancellationRequested)
-            throw new OperationCanceledException();
+        return ConnectAsync(token);
+
+
     }
 
     private WaitLock connectWaitLock = new(nameof(DeviceBase));
@@ -397,13 +386,13 @@ public abstract class DeviceBase : AsyncAndSyncDisposableObject, IDevice
                     if (Channel.PluginManager == null)
                         await Channel.SetupAsync(Channel.Config.Clone()).ConfigureAwait(false);
                     await Channel.CloseAsync().ConfigureAwait(false);
-                    await Task.Delay(500, token).ConfigureAwait(false);
-                    await Channel.ConnectAsync(Channel.ChannelOptions.ConnectTimeout, token).ConfigureAwait(false);
+                    using var ctsTime = new CancellationTokenSource(Channel.ChannelOptions.ConnectTimeout);
+                    using var cts = CancellationTokenSource.CreateLinkedTokenSource(ctsTime.Token, token);
+                    await Channel.ConnectAsync(cts.Token).ConfigureAwait(false);
                 }
             }
             finally
             {
-                try { await Task.Delay(500, token).ConfigureAwait(false); } catch { }
                 connectWaitLock.Release();
             }
         }
@@ -424,8 +413,7 @@ public abstract class DeviceBase : AsyncAndSyncDisposableObject, IDevice
                 await BefortSendAsync(channelResult.Content, cancellationToken).ConfigureAwait(false);
 
                 await waitLock.WaitAsync(cancellationToken).ConfigureAwait(false);
-                if (channelResult.Content.ReadOnlyDataHandlingAdapter != null)
-                    channelResult.Content.ReadOnlyDataHandlingAdapter.Logger = Logger;
+                channelResult.Content.SetDataHandlingAdapterLogger(Logger);
 
                 EndPoint? endPoint = GetUdpEndpoint(dtuId);
 
@@ -438,6 +426,8 @@ public abstract class DeviceBase : AsyncAndSyncDisposableObject, IDevice
         }
         catch (Exception ex)
         {
+            if (!cancellationToken.IsCancellationRequested)
+                await Task.Delay(1000, cancellationToken).ConfigureAwait(false);
             return new(ex);
         }
     }
@@ -513,8 +503,6 @@ public abstract class DeviceBase : AsyncAndSyncDisposableObject, IDevice
         return SendThenReturnAsync(sendMessage, channelResult.Content, cancellationToken);
     }
 
-
-
     /// <inheritdoc/>
     public virtual async ValueTask<OperResult<ReadOnlyMemory<byte>>> SendThenReturnAsync(ISendMessage sendMessage, IClientChannel channel, CancellationToken cancellationToken = default)
     {
@@ -530,11 +518,11 @@ public abstract class DeviceBase : AsyncAndSyncDisposableObject, IDevice
     }
 
     /// <inheritdoc/>
-    protected virtual async ValueTask<MessageBase> SendThenReturnMessageAsync(ISendMessage sendMessage, CancellationToken cancellationToken = default)
+    protected virtual ValueTask<MessageBase> SendThenReturnMessageAsync(ISendMessage sendMessage, CancellationToken cancellationToken = default)
     {
         var channelResult = GetChannel(this is IDtu dtu ? dtu.DtuId : null);
-        if (!channelResult.IsSuccess) return new MessageBase(channelResult);
-        return await SendThenReturnMessageAsync(sendMessage, channelResult.Content, cancellationToken).ConfigureAwait(false);
+        if (!channelResult.IsSuccess) return EasyValueTask.FromResult(new MessageBase(channelResult));
+        return SendThenReturnMessageAsync(sendMessage, channelResult.Content, cancellationToken);
     }
 
     /// <inheritdoc/>
@@ -565,10 +553,8 @@ public abstract class DeviceBase : AsyncAndSyncDisposableObject, IDevice
             if (cancellationToken.IsCancellationRequested)
                 return new MessageBase(new OperationCanceledException());
 
-            if (clientChannel.ReadOnlyDataHandlingAdapter != null)
-                clientChannel.ReadOnlyDataHandlingAdapter.Logger = Logger;
+            clientChannel.SetDataHandlingAdapterLogger(Logger);
 
-            Channel.ChannelReceivedWaitDict.TryAdd(sign, ChannelReceived);
 
             if (cancellationToken.IsCancellationRequested)
                 return new MessageBase(new OperationCanceledException());
@@ -577,20 +563,29 @@ public abstract class DeviceBase : AsyncAndSyncDisposableObject, IDevice
             if (!sendOperResult.IsSuccess)
                 return new MessageBase(sendOperResult);
 
+            using var ctsTime = new CancellationTokenSource(timeout);
             try
             {
-                waitData.SetCancellationToken(Channel.ClosedToken);
-
-                await waitData.WaitAsync(timeout).ConfigureAwait(false);
+                using var cts = CancellationTokenSource.CreateLinkedTokenSource(ctsTime.Token, Channel.ClosedToken);
+                await waitData.WaitAsync(cts.Token).ConfigureAwait(false);
+            }
+            catch (OperationCanceledException)
+            {
+                if (ctsTime.IsCancellationRequested)
+                {
+                    return new MessageBase(new TimeoutException());
+                }
             }
             catch (Exception ex)
             {
                 return new MessageBase(ex);
             }
-            var result = waitData.Check();
+
+            var result = waitData.Check(ctsTime.Token);
+
             if (result.IsSuccess)
             {
-                return waitData.WaitResult;
+                return waitData.CompletedData;
             }
             else
             {
@@ -599,13 +594,14 @@ public abstract class DeviceBase : AsyncAndSyncDisposableObject, IDevice
         }
         catch (Exception ex)
         {
+            if (!cancellationToken.IsCancellationRequested)
+                await Task.Delay(1000, cancellationToken).ConfigureAwait(false);
             return new MessageBase(ex);
         }
         finally
         {
-            Channel.ChannelReceivedWaitDict.TryRemove(sign, out _);
             waitLock?.Release();
-            clientChannel.WaitHandlePool.Destroy(sign);
+            waitData?.SafeDispose();
         }
     }
 
@@ -964,10 +960,10 @@ public abstract class DeviceBase : AsyncAndSyncDisposableObject, IDevice
     }
 
     /// <inheritdoc/>
-    public virtual async ValueTask<OperResult> WriteAsync(string address, ReadOnlyMemory<string> value, IThingsGatewayBitConverter bitConverter = null, CancellationToken cancellationToken = default)
+    public virtual ValueTask<OperResult> WriteAsync(string address, ReadOnlyMemory<string> value, IThingsGatewayBitConverter bitConverter = null, CancellationToken cancellationToken = default)
     {
         bitConverter ??= ThingsGatewayBitConverter.GetTransByAddress(address);
-        if (bitConverter.StringLength == null) return new OperResult(AppResource.StringAddressError);
+        if (bitConverter.StringLength == null) return EasyValueTask.FromResult(new OperResult(AppResource.StringAddressError));
         List<ReadOnlyMemory<byte>> bytes = new();
         foreach (var a in value.Span)
         {
@@ -975,7 +971,7 @@ public abstract class DeviceBase : AsyncAndSyncDisposableObject, IDevice
             bytes.Add(data.ArrayExpandToLength(bitConverter.StringLength ?? data.Length));
         }
 
-        return await WriteAsync(address, bytes.CombineMemoryBlocks(), DataTypeEnum.String, cancellationToken).ConfigureAwait(false);
+        return WriteAsync(address, bytes.CombineMemoryBlocks(), DataTypeEnum.String, cancellationToken);
     }
 
     #endregion 写入数组
@@ -997,7 +993,7 @@ public abstract class DeviceBase : AsyncAndSyncDisposableObject, IDevice
                 {
                     if (Channel is ITcpServiceChannel tcpServiceChannel)
                     {
-                        tcpServiceChannel.Clients.ForEach(a => a.WaitHandlePool.SafeDispose());
+                        tcpServiceChannel.Clients.ForEach(a => a.WaitHandlePool?.CancelAll());
                     }
 
                     try
@@ -1006,7 +1002,7 @@ public abstract class DeviceBase : AsyncAndSyncDisposableObject, IDevice
                         _ = Channel.CloseAsync();
                         if (Channel is IClientChannel client)
                         {
-                            client.WaitHandlePool.SafeDispose();
+                            client.WaitHandlePool?.CancelAll();
                         }
                     }
                     catch (Exception ex)
@@ -1020,7 +1016,7 @@ public abstract class DeviceBase : AsyncAndSyncDisposableObject, IDevice
                     {
                         if (tcpServiceChannel.TryGetClient($"ID={dtu.DtuId}", out var client))
                         {
-                            client.WaitHandlePool?.SafeDispose();
+                            client.WaitHandlePool?.CancelAll();
                             _ = client.CloseAsync();
                         }
                     }
@@ -1049,7 +1045,7 @@ public abstract class DeviceBase : AsyncAndSyncDisposableObject, IDevice
             {
                 if (Channel is ITcpServiceChannel tcpServiceChannel)
                 {
-                    tcpServiceChannel.Clients.ForEach(a => a.WaitHandlePool.SafeDispose());
+                    tcpServiceChannel.Clients.ForEach(a => a.WaitHandlePool?.CancelAll());
                 }
 
                 try
@@ -1058,7 +1054,7 @@ public abstract class DeviceBase : AsyncAndSyncDisposableObject, IDevice
                     await Channel.CloseAsync().ConfigureAwait(false);
                     if (Channel is IClientChannel client)
                     {
-                        client.WaitHandlePool.SafeDispose();
+                        client.WaitHandlePool?.CancelAll();
                     }
                 }
                 catch (Exception ex)
@@ -1072,7 +1068,7 @@ public abstract class DeviceBase : AsyncAndSyncDisposableObject, IDevice
                 {
                     if (tcpServiceChannel.TryGetClient($"ID={dtu.DtuId}", out var client))
                     {
-                        client.WaitHandlePool?.SafeDispose();
+                        client.WaitHandlePool?.CancelAll();
                         await client.CloseAsync().ConfigureAwait(false);
                     }
                 }

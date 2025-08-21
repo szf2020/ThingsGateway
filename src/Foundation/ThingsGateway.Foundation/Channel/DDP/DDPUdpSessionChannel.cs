@@ -36,16 +36,12 @@ public class DDPUdpSessionChannel : UdpSessionChannel, IClientChannel, IDtuUdpSe
             DDPAdapter.Config(Config);
         }
 
-        // 将当前实例的日志记录器和加载回调设置到适配器中
-        DDPAdapter.Logger = Logger;
-
         if (DDPAdapter.Owner != null)
         {
             DDPAdapter.OnLoaded(this);
         }
 
-        DDPAdapter.SendCallBackAsync = DDPSendAsync;
-        DDPAdapter.ReceivedCallBack = DDPHandleReceivedData;
+        DDPAdapter.SendCallBackAsync = base.ProtectedDefaultSendAsync;
         DataHandlingAdapter.SendCallBackAsync = DefaultSendAsync;
     }
 
@@ -62,22 +58,7 @@ public class DDPUdpSessionChannel : UdpSessionChannel, IClientChannel, IDtuUdpSe
         }
     }
 
-    protected Task DDPSendAsync(EndPoint endPoint, ReadOnlyMemory<byte> memory, CancellationToken token)
-    {
-        //获取endpoint
-        return base.ProtectedDefaultSendAsync(endPoint, memory, token);
-    }
 
-    private ConcurrentDictionary<EndPoint, DDPMessage> DDPMessageDict { get; set; } = new();
-    private Task DDPHandleReceivedData(EndPoint endPoint, IByteBlockReader byteBlock, IRequestInfo requestInfo)
-    {
-        if (requestInfo is DDPMessage dDPMessage)
-        {
-            DDPMessageDict.AddOrUpdate(endPoint, dDPMessage);
-        }
-
-        return EasyTask.CompletedTask;
-    }
 
     private DeviceUdpDataHandleAdapter<DDPUdpMessage> DDPAdapter = new();
 
@@ -98,27 +79,14 @@ public class DDPUdpSessionChannel : UdpSessionChannel, IClientChannel, IDtuUdpSe
         return base.StopAsync(token);
     }
 
-    private ConcurrentDictionary<EndPoint, WaitLock> _waitLocks = new();
 
     protected override async ValueTask<bool> OnUdpReceiving(UdpReceiveingEventArgs e)
     {
-        var byteBlock = e.ByteBlock;
+        var byteBlock = e.Memory;
         var endPoint = e.EndPoint;
-        DDPMessage? message = null;
-        var waitLock = _waitLocks.GetOrAdd(endPoint, new WaitLock(nameof(DDPUdpSessionChannel)));
-        try
-        {
-            await waitLock.WaitAsync().ConfigureAwait(false);
-            await DDPAdapter.ReceivedInput(endPoint, byteBlock).ConfigureAwait(EasyTask.ContinueOnCapturedContext);
 
-            if (DDPMessageDict.TryGetValue(endPoint, out var dDPMessage))
-                message = dDPMessage;
-            DDPMessageDict.TryRemove(endPoint, out _);
-        }
-        finally
-        {
-            waitLock.Release();
-        }
+        if (!DDPAdapter.TryParseRequest(endPoint, byteBlock, out var message))
+            return true;
 
         if (message != null)
         {
@@ -127,15 +95,13 @@ public class DDPUdpSessionChannel : UdpSessionChannel, IClientChannel, IDtuUdpSe
                 var id = $"ID={message.Id}";
                 if (message.Type == 0x09)
                 {
-                    var reader = new ByteBlockReader(message.Content);
-
                     if (this.DataHandlingAdapter == null)
                     {
-                        await this.OnUdpReceived(new UdpReceivedDataEventArgs(endPoint, reader, default)).ConfigureAwait(EasyTask.ContinueOnCapturedContext);
+                        await this.OnUdpReceived(new UdpReceivedDataEventArgs(endPoint, message.Content, default)).ConfigureAwait(false);
                     }
                     else
                     {
-                        await this.DataHandlingAdapter.ReceivedInput(endPoint, reader).ConfigureAwait(EasyTask.ContinueOnCapturedContext);
+                        await this.DataHandlingAdapter.ReceivedInputAsync(endPoint, message.Content).ConfigureAwait(false);
                     }
 
                     return true;

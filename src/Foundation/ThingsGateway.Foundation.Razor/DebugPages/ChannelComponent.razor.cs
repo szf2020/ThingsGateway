@@ -89,7 +89,7 @@ public partial class ChannelComponent : ComponentBase
                 await Channel.SetupAsync(config);
             }
 
-            await Channel.ConnectAsync(Channel.ChannelOptions.ConnectTimeout, default);
+            await Channel.ConnectAsync(default);
 
             if (OnConnectClick.HasDelegate)
                 await OnConnectClick.InvokeAsync(Channel);

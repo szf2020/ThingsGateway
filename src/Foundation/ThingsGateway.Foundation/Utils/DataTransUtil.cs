@@ -8,6 +8,7 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
+using System.Buffers;
 using System.Text;
 
 namespace ThingsGateway.Foundation;
@@ -54,6 +55,53 @@ public static class DataTransUtil
 
             if (newLineCount > 0 && (i - offset + 1) % newLineCount == 0)
                 sb.AppendLine();
+        }
+
+        return sb.ToString();
+    }
+
+    public static string ByteToHexString(ReadOnlySequence<byte> InBytes, char segment = default, int newLineCount = 0) => ByteToHexString(InBytes, 0, InBytes.Length, segment, newLineCount);
+
+    public static string ByteToHexString(ReadOnlySequence<byte> sequence, long offset, long length, char segment = default, int newLineCount = 0)
+    {
+        if (length <= 0 || offset < 0 || sequence.Length < offset + length)
+            return string.Empty;
+
+        var estimatedSize = length * (segment != default ? 3 : 2) + (length / Math.Max(newLineCount, int.MaxValue));
+        StringBuilder sb = new StringBuilder((int)estimatedSize);
+
+        int totalConsumed = 0;
+        int totalWritten = 0;
+
+        foreach (var memory in sequence)
+        {
+            var span = memory.Span;
+
+            for (int i = 0; i < span.Length && totalWritten < length; i++)
+            {
+                if (totalConsumed >= offset)
+                {
+                    sb.Append(span[i].ToString("X2"));
+
+                    if (totalWritten < length - 1)
+                    {
+                        if (segment != default)
+                            sb.Append(segment);
+
+                        if (newLineCount > 0 && (totalWritten + 1) % newLineCount == 0)
+                            sb.AppendLine();
+                    }
+
+                    totalWritten++;
+                }
+
+                totalConsumed++;
+                if (totalConsumed >= offset + length)
+                    break;
+            }
+
+            if (totalWritten >= length)
+                break;
         }
 
         return sb.ToString();

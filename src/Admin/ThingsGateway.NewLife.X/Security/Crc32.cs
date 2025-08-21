@@ -190,7 +190,31 @@ public sealed class Crc32 //: HashAlgorithm
         crc.Update(stream, count);
         return crc.Value;
     }
+    /// <summary>
+    /// 添加Sequence进行校验
+    /// </summary>
+    /// <param name="sequence"></param>
+    /// <returns></returns>
+    public Crc32 Update(ReadOnlySequence<byte> sequence)
+    {
+        foreach (var segment in sequence)
+        {
+            Update(segment.Span);
+        }
+        return this;
+    }
 
+    /// <summary>
+    /// 计算校验码 (Sequence)
+    /// </summary>
+    /// <param name="sequence"></param>
+    /// <returns></returns>
+    public static UInt32 Compute(ReadOnlySequence<byte> sequence)
+    {
+        var crc = new Crc32();
+        crc.Update(sequence);
+        return crc.Value;
+    }
     //#region 抽象实现
     ///// <summary>哈希核心</summary>
     ///// <param name="array"></param>

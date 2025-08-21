@@ -215,12 +215,10 @@ public class ModbusSlave : BusinessBase
 
                 var thingsGatewayBitConverter = bitConverter.GetTransByAddress(addressStr);
 
-                var writeData = modbusRequest.Data.ToArray();
-
                 var bitIndex = _plc.GetBitOffset(addressStr);
                 if (modbusRequest.FunctionCode == 0x03 && dType == DataTypeEnum.Boolean && bitIndex != null)
                 {
-                    var int16Data = thingsGatewayBitConverter.ToUInt16(writeData, 0);
+                    var int16Data = thingsGatewayBitConverter.ToUInt16(modbusRequest.MasterWriteDatas.Span, 0);
                     var wData = BitHelper.GetBit(int16Data, bitIndex.Value);
 
                     var result = await item.Value.RpcAsync(wData.ToSystemTextJsonString(), $"{nameof(ModbusSlave)}-{CurrentDevice.Name}-{$"{channel}"}").ConfigureAwait(false);
@@ -230,7 +228,7 @@ public class ModbusSlave : BusinessBase
                 }
                 else
                 {
-                    _ = thingsGatewayBitConverter.GetChangedDataFormBytes(_plc, addressStr, writeData, 0, dType, item.Value.ArrayLength ?? 1, null, out var data);
+                    _ = thingsGatewayBitConverter.GetChangedDataFormBytes(_plc, addressStr, modbusRequest.MasterWriteDatas.Span, 0, dType, item.Value.ArrayLength ?? 1, null, out var data);
 
                     var result = await item.Value.RpcAsync(data.ToSystemTextJsonString(), $"{nameof(ModbusSlave)}-{CurrentDevice.Name}-{$"{channel}"}").ConfigureAwait(false);
 

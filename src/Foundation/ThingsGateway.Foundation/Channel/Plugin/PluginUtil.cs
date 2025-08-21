@@ -77,10 +77,9 @@ public static class PluginUtil
                 a.UseTcpSessionCheckClear()
         .SetCheckClearType(CheckClearType.All)
         .SetTick(TimeSpan.FromMilliseconds(channelOptions.CheckClearTime))
-        .SetOnClose(async (c, t) =>
+        .SetOnClose((c, t) =>
         {
-            //await c.ShutdownAsync(System.Net.Sockets.SocketShutdown.Both).ConfigureAwait(false);
-            await c.CloseAsync($"{channelOptions.CheckClearTime}ms Timeout").ConfigureAwait(false);
+            return c.CloseAsync($"{channelOptions.CheckClearTime}ms Timeout");
         });
             };
         }

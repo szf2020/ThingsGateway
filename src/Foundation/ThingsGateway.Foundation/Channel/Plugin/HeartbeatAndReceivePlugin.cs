@@ -105,7 +105,7 @@ internal sealed class HeartbeatAndReceivePlugin : PluginBase, ITcpConnectedPlugi
             }
         }
     }
-    private Task Task;
+    private Task _task;
     private bool SendHeartbeat;
     public int HeartbeatTime { get; set; } = 3000;
 
@@ -125,17 +125,17 @@ internal sealed class HeartbeatAndReceivePlugin : PluginBase, ITcpConnectedPlugi
         {
             await tcpClient.SendAsync(DtuIdByte, tcpClient.ClosedToken).ConfigureAwait(false);
 
-            if (Task == null)
+            if (_task == null)
             {
-                Task = Task.Factory.StartNew(async () =>
+                _task = Task.Run(async () =>
                  {
                      var failedCount = 0;
                      while (SendHeartbeat)
                      {
-                         await Task.Delay(HeartbeatTime).ConfigureAwait(false);
+                         await Task.Delay(HeartbeatTime, client.ClosedToken).ConfigureAwait(false);
                          if (!client.Online)
                          {
-                             continue;
+                             break;
                          }
 
                          try
@@ -159,15 +159,15 @@ internal sealed class HeartbeatAndReceivePlugin : PluginBase, ITcpConnectedPlugi
                          }
                      }
 
-                     Task = null;
-                 }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
+                     _task = null;
+                 });
             }
         }
 
         await e.InvokeNext().ConfigureAwait(false);
     }
 
-    public async Task OnTcpReceiving(ITcpSession client, ByteBlockEventArgs e)
+    public async Task OnTcpReceiving(ITcpSession client, BytesReaderEventArgs e)
     {
         if (client is ITcpSessionClient)
         {
@@ -181,7 +181,7 @@ internal sealed class HeartbeatAndReceivePlugin : PluginBase, ITcpConnectedPlugi
             var len = HeartbeatByte.Length;
             if (len > 0)
             {
-                if (HeartbeatByte.Span.SequenceEqual(e.ByteBlock.Memory.Slice(0, len).Span))
+                if (HeartbeatByte.Span.SequenceEqual(e.Reader.TotalSequence.Slice(0, len).First.Span))
                 {
                     e.Handled = true;
                 }
@@ -189,6 +189,7 @@ internal sealed class HeartbeatAndReceivePlugin : PluginBase, ITcpConnectedPlugi
             await e.InvokeNext().ConfigureAwait(false);//如果本插件无法处理当前数据，请将数据转至下一个插件。
         }
     }
+
 
     public Task OnTcpClosed(ITcpSession client, ClosedEventArgs e)
     {

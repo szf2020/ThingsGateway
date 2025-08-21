@@ -8,6 +8,7 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
+using System.Buffers;
 using System.ComponentModel.DataAnnotations;
 
 namespace ThingsGateway.Foundation.Modbus;
@@ -22,7 +23,12 @@ public class ModbusRequest
     /// <summary>
     /// 数据
     /// </summary>
-    public ReadOnlyMemory<byte> Data { get; set; }
+    public ReadOnlyMemory<byte> MasterWriteDatas { get; set; }
+
+    /// <summary>
+    /// 当前关联的写入字节数组（Slave端使用）
+    /// </summary>
+    internal ReadOnlySequence<byte> SlaveWriteDatas { get; set; }
 
     /// <summary>
     /// 功能码

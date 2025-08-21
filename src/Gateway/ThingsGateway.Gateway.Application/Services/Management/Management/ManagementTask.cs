@@ -134,7 +134,7 @@ public partial class ManagementTask : AsyncDisposableObject
                    {
                        try
                        {
-                           await tcpDmtpClient.ResetIdAsync($"{_managementOptions.Name}:{GlobalData.HardwareJob.HardwareInfo.UUID}").ConfigureAwait(false);
+                           await tcpDmtpClient.ResetIdAsync($"{_managementOptions.Name}:{GlobalData.HardwareJob.HardwareInfo.UUID}", tcpDmtpClient.ClosedToken).ConfigureAwait(false);
                        }
                        catch (Exception)
                        {

@@ -8,6 +8,8 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
+using System.Buffers;
+
 using TouchSocket.Core;
 
 namespace ThingsGateway.Foundation.Dlt645;
@@ -28,41 +30,62 @@ public class Dlt645_2007Response : Dlt645_2007Request
 /// </summary>
 public class Dlt645_2007Message : MessageBase, IResultMessage
 {
-    private readonly byte[] ReadStation = [0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA];
+    private static readonly byte[] ReadStation = [0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA];
 
-    private int HeadCodeIndex;
+    private long HeadCodeIndex;
 
     public Dlt645_2007Send? Dlt645_2007Send { get; set; }
 
     /// <inheritdoc/>
-    public override int HeaderLength { get; set; } = 10;
+    public override long HeaderLength { get; set; } = 10;
 
     public Dlt645_2007Address? Request { get; set; }
 
+    /// <inheritdoc/>
+    public override bool CheckHead<TByteBlock>(ref TByteBlock byteBlock)
+    {
+        //因为设备可能带有FE前导符开头，这里找到0x68的位置
+        if (byteBlock != null)
+        {
+            var index = byteBlock.TotalSequence.IndexOf(0x68);
+            if (index > -1)
+            {
+                HeadCodeIndex = index;
+            }
+        }
+
+        //帧起始符 地址域  帧起始符 控制码 数据域长度共10个字节
+        HeaderLength = HeadCodeIndex - byteBlock.BytesRead + 10;
+        if (byteBlock.BytesRead + byteBlock.BytesRemaining > HeadCodeIndex + 9)
+        {
+            BodyLength = byteBlock.TotalSequence.GetByte(HeadCodeIndex + 9) + 2;
+        }
+        return true;
+
+    }
+
     public override FilterResult CheckBody<TByteBlock>(ref TByteBlock byteBlock)
     {
-        var span = byteBlock.Span;
-        var pos = byteBlock.Position - HeaderLength;
+        var sequence = byteBlock.TotalSequence;
+        var pos = byteBlock.BytesRead - HeaderLength;
         var endIndex = HeaderLength + BodyLength + pos;
-        if (span[endIndex - 1] == 0x16)
+
+        if (sequence.GetByte(endIndex - 1) == 0x16)
         {
             //检查校验码
-            int sumCheck = 0;
-            for (int i = HeadCodeIndex; i < endIndex - 2; i++)
-                sumCheck += span[i];
-            if ((byte)sumCheck != span[endIndex - 2])
+            var sumCheck = sequence.SumRange(HeadCodeIndex, endIndex - HeadCodeIndex - 2);
+            if ((byte)sumCheck != sequence.GetByte(endIndex - 2))
             {
                 //校验错误
                 ErrorMessage = AppResource.SumError;
                 OperCode = 999;
                 return FilterResult.Success;
             }
-            var Station = byteBlock.Span.Slice(HeadCodeIndex + 1, 6);
             byte? ErrorCode;
-            var controlCode = span[HeadCodeIndex + 8];
+            var controlCode = sequence.GetByte(HeadCodeIndex + 8);
             if ((controlCode & 0x40) == 0x40)//控制码bit6为1时，返回错误
             {
-                ErrorCode = (byte)(span[HeadCodeIndex + 10] - 0x33);
+                ErrorCode = (byte)(sequence.GetByte(HeadCodeIndex + 10) - 0x33);
                 var error = Dlt645Helper.Get2007ErrorMessage(ErrorCode.Value);
                 ErrorMessage = string.Format(AppResource.FunctionError, $"0x{controlCode:X2}", error);
                 OperCode = 999;
@@ -71,6 +94,7 @@ public class Dlt645_2007Message : MessageBase, IResultMessage
 
             if (Dlt645_2007Send != null)
             {
+                var Station = sequence.Slice(HeadCodeIndex + 1, 6);
                 if (!Station.SequenceEqual(Request.Station.Span))//设备地址不符合时，返回错误
                 {
                     if (!Request.Station.Span.SequenceEqual(ReadStation))//读写通讯地址例外
@@ -90,7 +114,7 @@ public class Dlt645_2007Message : MessageBase, IResultMessage
                 if (Dlt645_2007Send.ControlCode == ControlCode.Read || Dlt645_2007Send.ControlCode == ControlCode.Write)
                 {
                     //数据标识不符合时，返回错误
-                    var DataId = byteBlock.Span.Slice(HeadCodeIndex + 10, 4).BytesAdd(-0x33).AsSpan();
+                    var DataId = sequence.Slice(HeadCodeIndex + 10, 4).BytesAdd(-0x33).AsSpan();
                     if (!DataId.SequenceEqual(Request.DataId.Span))
                     {
                         ErrorMessage = AppResource.DataIdNotSame;
@@ -101,38 +125,15 @@ public class Dlt645_2007Message : MessageBase, IResultMessage
             }
 
             OperCode = 0;
-            Content = byteBlock.ToArray(HeadCodeIndex + 10, BodyLength - 2);
+            Content = byteBlock.TotalSequence.Slice(HeadCodeIndex + 10, BodyLength - 2).ToArray();
             return FilterResult.Success;
         }
 
         return FilterResult.GoOn;
     }
 
-    /// <inheritdoc/>
-    public override bool CheckHead<TByteBlock>(ref TByteBlock byteBlock)
-    {
-        //因为设备可能带有FE前导符开头，这里找到0x68的位置
-        var span = byteBlock.Span;
-        if (byteBlock != null)
-        {
-            for (int index = byteBlock.Position; index < byteBlock.Length; index++)
-            {
-                if (span[index] == 0x68)
-                {
-                    HeadCodeIndex = index;
-                    break;
-                }
-            }
-        }
 
-        //帧起始符 地址域  帧起始符 控制码 数据域长度共10个字节
-        HeaderLength = HeadCodeIndex - byteBlock.Position + 10;
-        if (byteBlock.Length > HeadCodeIndex + 9)
-            BodyLength = span[HeadCodeIndex + 9] + 2;
-
-        return true;
-    }
-    public override void SendInfo(ISendMessage sendMessage, ref ValueByteBlock byteBlock)
+    public override void SendInfo(ISendMessage sendMessage)
     {
         Dlt645_2007Send = ((Dlt645_2007Send)sendMessage);
         Request = Dlt645_2007Send.Dlt645_2007Address;

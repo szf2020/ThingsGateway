@@ -132,24 +132,43 @@ public static partial class DeviceExtension
     }
 
     /// <summary>
-    /// 当状态不是<see cref="WaitDataStatus.SetRunning"/>时返回异常。
+    /// 当状态不是<see cref="WaitDataStatus.Success"/>时返回异常。
     /// </summary>
-    public static OperResult Check(this WaitDataAsync<MessageBase> waitDataAsync)
+    public static OperResult Check(this AsyncWaitData<MessageBase> waitDataAsync, CancellationToken cancellationToken)
     {
         switch (waitDataAsync.Status)
         {
-            case WaitDataStatus.SetRunning:
+            case WaitDataStatus.Success:
                 return new();
 
-            case WaitDataStatus.Canceled: return new(new OperationCanceledException());
+            case WaitDataStatus.Canceled:
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    if (waitDataAsync.CompletedData != null)
+                    {
+                        waitDataAsync.CompletedData.Exception = new TimeoutException();
+                        if (waitDataAsync.CompletedData.IsSuccess) waitDataAsync.CompletedData.OperCode = 999;
+                        if (waitDataAsync.CompletedData.ErrorMessage.IsNullOrEmpty()) waitDataAsync.CompletedData.ErrorMessage = "Timeout";
+                        return new(waitDataAsync.CompletedData);
+                    }
+                    else
+                    {
+                        return new(new TimeoutException());
+                    }
+                }
+                else
+                {
+
+                    return new(new OperationCanceledException());
+                }
             case WaitDataStatus.Overtime:
                 {
-                    if (waitDataAsync.WaitResult != null)
+                    if (waitDataAsync.CompletedData != null)
                     {
-                        waitDataAsync.WaitResult.Exception = new TimeoutException();
-                        if (waitDataAsync.WaitResult.IsSuccess) waitDataAsync.WaitResult.OperCode = 999;
-                        if (waitDataAsync.WaitResult.ErrorMessage.IsNullOrEmpty()) waitDataAsync.WaitResult.ErrorMessage = "Timeout";
-                        return new(waitDataAsync.WaitResult);
+                        waitDataAsync.CompletedData.Exception = new TimeoutException();
+                        if (waitDataAsync.CompletedData.IsSuccess) waitDataAsync.CompletedData.OperCode = 999;
+                        if (waitDataAsync.CompletedData.ErrorMessage.IsNullOrEmpty()) waitDataAsync.CompletedData.ErrorMessage = "Timeout";
+                        return new(waitDataAsync.CompletedData);
                     }
                     else
                     {
@@ -160,7 +179,7 @@ public static partial class DeviceExtension
             case WaitDataStatus.Default:
             default:
                 {
-                    return waitDataAsync.WaitResult == null ? new(new Exception(AppResource.UnknownError)) : new(waitDataAsync.WaitResult);
+                    return waitDataAsync.CompletedData == null ? new(new Exception(AppResource.UnknownError)) : new(waitDataAsync.CompletedData);
                 }
         }
     }

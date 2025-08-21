@@ -33,28 +33,28 @@ public class MessageBase : OperResultClass<ReadOnlyMemory<byte>>, IResultMessage
     #endregion 构造
 
     /// <inheritdoc/>
-    public int BodyLength { get; set; }
+    public long BodyLength { get; set; }
 
     /// <inheritdoc/>
-    public virtual int HeaderLength { get; set; }
+    public virtual long HeaderLength { get; set; }
 
     /// <inheritdoc/>
     public virtual int Sign { get; set; } = -1;
 
     /// <inheritdoc />
-    public virtual FilterResult CheckBody<TByteBlock>(ref TByteBlock byteBlock) where TByteBlock : IByteBlockReader
+    public virtual FilterResult CheckBody<TByteBlock>(ref TByteBlock byteBlock) where TByteBlock : IBytesReader
     {
         return FilterResult.Success;
     }
 
     /// <inheritdoc/>
-    public virtual bool CheckHead<TByteBlock>(ref TByteBlock byteBlock) where TByteBlock : IByteBlockReader
+    public virtual bool CheckHead<TByteBlock>(ref TByteBlock byteBlock) where TByteBlock : IBytesReader
     {
         return true;
     }
 
     /// <inheritdoc/>
-    public virtual void SendInfo(ISendMessage sendMessage, ref TouchSocket.Core.ValueByteBlock byteBlock)
+    public virtual void SendInfo(ISendMessage sendMessage)
     {
     }
 }

@@ -8,7 +8,7 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-namespace ThingsGateway.Gateway.Razor;
+namespace ThingsGateway.Debug;
 
 public class ValueTransformConfig
 {

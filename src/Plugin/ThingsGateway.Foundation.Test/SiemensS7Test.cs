@@ -8,22 +8,29 @@
 // QQ群：605534569
 // ------------------------------------------------------------------------------
 
-using System.Diagnostics;
-
 using ThingsGateway.Foundation.Extension.String;
 using ThingsGateway.Foundation.SiemensS7;
-using ThingsGateway.NewLife.Extension;
-using ThingsGateway.NewLife.Reflection;
 
 using TouchSocket.Core;
+
+using Xunit.Abstractions;
 
 namespace ThingsGateway.Foundation.Test;
 
 public class SiemensS7Test
 {
+
+    public SiemensS7Test(ITestOutputHelper output)
+    {
+        _output = output;
+
+    }
+    private readonly ITestOutputHelper _output;
+
+
     [Theory]
-    [InlineData("M100", true, "03 00 00 1B 02 F0 80 32 03 00 00 00 03 00 02 00 06 00 00 04 01 FF 04 00 10 00 00")]
-    [InlineData("M100", false, "03 00 00 16 02 F0 80 32 03 00 00 00 03 00 02 00 01 00 00 05 01 FF", "1", DataTypeEnum.UInt16)]
+    [InlineData("M100", true, "03 00 00 1B 02 F0 80 32 03 00 00 00 01 00 02 00 06 00 00 04 01 FF 04 00 10 00 00")]
+    [InlineData("M100", false, "03 00 00 16 02 F0 80 32 03 00 00 00 01 00 02 00 01 00 00 05 01 FF", "1", DataTypeEnum.UInt16)]
     public async Task SiemensS7_ReadWrite_OK(string address, bool read, string data, string writeData = null, DataTypeEnum dataTypeEnum = DataTypeEnum.UInt16)
     {
         var siemensS7Channel = new TouchSocketConfig().GetChannel(new ChannelOptions()
@@ -34,7 +41,7 @@ public class SiemensS7Test
         {
             a.AddEasyLogger((a, b, c, d) =>
             {
-                Debug.WriteLine($"{c}{Environment.NewLine}{d?.ToString()}");
+                _output.WriteLine($"{c}{Environment.NewLine}{d?.ToString()}");
             }, LogLevel.Trace);
         });
 
@@ -57,16 +64,12 @@ public class SiemensS7Test
                 Assert.True(result.IsSuccess, result.ToString());
             }
         });
+        await Task.Delay(500);
+
         var task2 = Task.Run(async () =>
         {
-            await Task.Delay(1000).ConfigureAwait(false);
-            var bytes = data.HexStringToBytes().GetArray();
-            bytes[12] = (byte)(((IClientChannel)(siemensS7Master.Channel)).WaitHandlePool.GetValue("m_currentSign").ToInt() - 1);
-            foreach (var item in bytes)
-            {
-                var data = new ByteBlock(1); data.WriteByte(item);
-                await adapter.ReceivedInputAsync(data).ConfigureAwait(false);
-            }
+            SingleStreamDataHandlingAdapterTest singleStreamDataHandlingAdapterTest = new();
+            await singleStreamDataHandlingAdapterTest.SendCallback(data.HexStringToBytes(), (a) => singleStreamDataHandlingAdapterTest.ReceivedAsync(adapter, CancellationToken.None), 1, CancellationToken.None).ConfigureAwait(false);
         });
         await Task.WhenAll(task1, task2);
     }

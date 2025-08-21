@@ -22,6 +22,8 @@ public interface IClientChannel : IChannel, ISender, IClient, IClientSender, IOn
     /// </summary>
     DataHandlingAdapter ReadOnlyDataHandlingAdapter { get; }
 
+
+
     /// <summary>
     /// 通道等待池
     /// </summary>
@@ -34,4 +36,6 @@ public interface IClientChannel : IChannel, ISender, IClient, IClientSender, IOn
     /// </summary>
     /// <param name="adapter">适配器</param>
     void SetDataHandlingAdapter(DataHandlingAdapter adapter);
+
+    void SetDataHandlingAdapterLogger(ILog log);
 }

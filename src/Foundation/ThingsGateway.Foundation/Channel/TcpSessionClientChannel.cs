@@ -8,8 +8,6 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-using System.Collections.Concurrent;
-
 using ThingsGateway.NewLife;
 
 namespace ThingsGateway.Foundation;
@@ -23,13 +21,31 @@ public class TcpSessionClientChannel : TcpSessionClient, IClientChannel
     public TcpSessionClientChannel()
     {
     }
-
+    private IDeviceDataHandleAdapter _deviceDataHandleAdapter;
+    public void SetDataHandlingAdapterLogger(ILog log)
+    {
+        if (_deviceDataHandleAdapter == null && DataHandlingAdapter is IDeviceDataHandleAdapter handleAdapter)
+        {
+            _deviceDataHandleAdapter = handleAdapter;
+        }
+        if (_deviceDataHandleAdapter != null)
+        {
+            _deviceDataHandleAdapter.Logger = log;
+        }
+    }
+    /// <inheritdoc/>
+    public void SetDataHandlingAdapter(DataHandlingAdapter adapter)
+    {
+        if (adapter is SingleStreamDataHandlingAdapter singleStreamDataHandlingAdapter)
+            SetAdapter(singleStreamDataHandlingAdapter);
+        if (adapter is IDeviceDataHandleAdapter deviceDataHandleAdapter)
+            _deviceDataHandleAdapter = deviceDataHandleAdapter;
+    }
     public void ResetSign(int minSign = 0, int maxSign = ushort.MaxValue)
     {
         var pool = WaitHandlePool;
         WaitHandlePool = new WaitHandlePool<MessageBase>(minSign, maxSign);
         pool?.CancelAll();
-        pool?.SafeDispose();
     }
     /// <inheritdoc/>
     public ChannelReceivedEventHandler ChannelReceived { get; } = new();
@@ -60,7 +76,7 @@ public class TcpSessionClientChannel : TcpSessionClient, IClientChannel
     /// <summary>
     /// 等待池
     /// </summary>
-    public WaitHandlePool<MessageBase> WaitHandlePool { get; private set; } = new();
+    public WaitHandlePool<MessageBase> WaitHandlePool { get; private set; } = new(0, ushort.MaxValue);
 
     /// <inheritdoc/>
     public WaitLock WaitLock { get; internal set; } = new(nameof(TcpSessionClientChannel));
@@ -69,25 +85,19 @@ public class TcpSessionClientChannel : TcpSessionClient, IClientChannel
     /// <inheritdoc/>
     public override Task<Result> CloseAsync(string msg, CancellationToken token)
     {
-        WaitHandlePool.SafeDispose();
+        WaitHandlePool?.CancelAll();
         return base.CloseAsync(msg, token);
     }
 
     /// <inheritdoc/>
-    public Task ConnectAsync(int timeout, CancellationToken token) => Task.CompletedTask;
+    public Task ConnectAsync(CancellationToken token) => Task.CompletedTask;
 
-    /// <inheritdoc/>
-    public void SetDataHandlingAdapter(DataHandlingAdapter adapter)
-    {
-        if (adapter is SingleStreamDataHandlingAdapter singleStreamDataHandlingAdapter)
-            SetAdapter(singleStreamDataHandlingAdapter);
-    }
+
 
     /// <inheritdoc/>
     public Task SetupAsync(TouchSocketConfig config) => Task.CompletedTask;
 
-    /// <inheritdoc/>
-    public ConcurrentDictionary<long, Func<IClientChannel, ReceivedDataEventArgs, bool, Task>> ChannelReceivedWaitDict { get; } = new();
+
 
     /// <inheritdoc/>
     public override string ToString()
@@ -98,7 +108,7 @@ public class TcpSessionClientChannel : TcpSessionClient, IClientChannel
     /// <inheritdoc/>
     protected override void SafetyDispose(bool disposing)
     {
-        WaitHandlePool.SafeDispose();
+        WaitHandlePool?.CancelAll();
         base.SafetyDispose(disposing);
     }
 
@@ -136,14 +146,7 @@ public class TcpSessionClientChannel : TcpSessionClient, IClientChannel
     protected override async Task OnTcpReceived(ReceivedDataEventArgs e)
     {
         await base.OnTcpReceived(e).ConfigureAwait(false);
-        if (e.RequestInfo is MessageBase response)
-        {
-            if (ChannelReceivedWaitDict.TryRemove(response.Sign, out var func))
-            {
-                await func.Invoke(this, e, ChannelReceived.Count == 1).ConfigureAwait(false);
-                e.Handled = true;
-            }
-        }
+
         if (e.Handled)
             return;
 

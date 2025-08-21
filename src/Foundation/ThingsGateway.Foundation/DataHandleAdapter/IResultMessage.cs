@@ -18,7 +18,7 @@ public interface IResultMessage : IOperResult, IRequestInfo
     /// <summary>
     /// 数据体长度
     /// </summary>
-    int BodyLength { get; set; }
+    long BodyLength { get; set; }
 
     /// <summary>
     /// 解析的字节信息
@@ -28,7 +28,7 @@ public interface IResultMessage : IOperResult, IRequestInfo
     /// <summary>
     /// 消息头的指令长度,不固定时返回0
     /// </summary>
-    int HeaderLength { get; }
+    long HeaderLength { get; }
 
     /// <summary>
     /// 等待标识，对于并发协议，必须从协议中例如固定头部获取标识字段
@@ -42,17 +42,17 @@ public interface IResultMessage : IOperResult, IRequestInfo
     /// <para>然后返回<see cref="FilterResult.GoOn"/></para>
     /// </summary>
     /// <returns>是否成功有效</returns>
-    FilterResult CheckBody<TByteBlock>(ref TByteBlock byteBlock) where TByteBlock : IByteBlockReader;
+    FilterResult CheckBody<TByteBlock>(ref TByteBlock byteBlock) where TByteBlock : IBytesReader;
 
     /// <summary>
     /// 检查头子节的合法性,并赋值<see cref="BodyLength"/><br />
     /// <para>如果返回false，意味着放弃本次解析的所有数据，包括已经解析完成的Header</para>
     /// </summary>
     /// <returns>是否成功的结果</returns>
-    bool CheckHead<TByteBlock>(ref TByteBlock byteBlock) where TByteBlock : IByteBlockReader;
+    bool CheckHead<TByteBlock>(ref TByteBlock byteBlock) where TByteBlock : IBytesReader;
 
     /// <summary>
     /// 发送前的信息处理，例如存储某些特征信息：站号/功能码等等用于验证后续的返回信息是否合法
     /// </summary>
-    void SendInfo(ISendMessage sendMessage, ref ValueByteBlock byteBlock);
+    void SendInfo(ISendMessage sendMessage);
 }

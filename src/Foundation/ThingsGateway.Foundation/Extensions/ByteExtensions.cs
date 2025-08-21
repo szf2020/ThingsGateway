@@ -8,6 +8,7 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
+using System.Buffers;
 using System.Text;
 
 namespace ThingsGateway.Foundation;
@@ -47,6 +48,14 @@ public static class ByteExtensions
         }
         return bytes;
     }
+    public static byte[] BoolToByte(this Span<bool> value, byte trueData = 0xff)
+    {
+        return BoolToByte((ReadOnlySpan<bool>)value, trueData); ;
+    }
+    public static byte[] BoolToByte(this bool[] value, byte trueData = 0xff)
+    {
+        return BoolToByte((ReadOnlySpan<bool>)value, trueData); ;
+    }
     public static bool[] ByteToBool(this ReadOnlySpan<byte> value)
     {
         bool[] bytes = new bool[value.Length];
@@ -76,6 +85,7 @@ public static class ByteExtensions
     {
         return BytesAdd((ReadOnlySpan<byte>)bytes, value);
     }
+
     /// <summary>
     /// 数组内容分别相加某个数字
     /// </summary>
@@ -89,6 +99,31 @@ public static class ByteExtensions
         for (int index = 0; index < bytes.Length; index++)
         {
             result[index] = (byte)(bytes[index] + value);
+        }
+
+        return result;
+    }
+
+
+    /// <summary>
+    /// 将 ReadOnlySequence 的每个字节加上指定值，返回新的 byte 数组。
+    /// </summary>
+    public static byte[] BytesAdd(this ReadOnlySequence<byte> sequence, int value)
+    {
+        if (sequence.Length == 0)
+            return Array.Empty<byte>();
+
+        byte[] result = new byte[sequence.Length];
+        int offset = 0;
+
+        foreach (var segment in sequence)
+        {
+            var span = segment.Span;
+            for (int i = 0; i < span.Length; i++)
+            {
+                result[offset + i] = (byte)(span[i] + value);
+            }
+            offset += span.Length;
         }
 
         return result;
@@ -187,6 +222,34 @@ public static class ByteExtensions
         return boolArray;
     }
 
+    /// <summary>
+    /// 从 <see cref="ReadOnlySequence{T}"/> 中提取位数组，length 代表位数
+    /// </summary>
+    /// <param name="sequence">原始字节序列</param>
+    /// <param name="length">想要转换的位数，如果超出字节序列长度 * 8，则自动缩小为最大位数</param>
+    /// <returns>转换后的布尔数组</returns>
+    public static bool[] ByteToBoolArray(this ReadOnlySequence<byte> sequence, int length)
+    {
+        // 计算字节序列能提供的最大位数
+        long maxBitLength = sequence.Length * 8;
+        if (length > maxBitLength)
+            length = (int)maxBitLength;
+
+        bool[] boolArray = new bool[length];
+
+        int bitIndex = 0; // 目标位索引
+
+        foreach (var segment in sequence)
+        {
+            var span = segment.Span;
+            for (int i = 0; i < span.Length && bitIndex < length; i++)
+            {
+                boolArray[bitIndex] = span[i / 8].BoolOnByteIndex(i % 8);
+            }
+        }
+
+        return boolArray;
+    }
 
     public static ReadOnlyMemory<byte> CombineMemoryBlocks(this List<ReadOnlyMemory<byte>> blocks)
     {
@@ -281,4 +344,15 @@ public static class ByteExtensions
     {
         return DataTransUtil.ByteToHexString(buffer, splite, newLineCount);
     }
+
+
+    /// <summary>
+    /// 字节数组默认转16进制字符
+    /// </summary>
+    /// <returns></returns>
+    public static string ToHexString(this ReadOnlySequence<byte> buffer, char splite = default, int newLineCount = 0)
+    {
+        return DataTransUtil.ByteToHexString(buffer, splite, newLineCount);
+    }
+
 }

@@ -8,6 +8,8 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
+using System.Buffers;
+
 namespace ThingsGateway.Foundation.Modbus;
 
 /// <summary>
@@ -18,10 +20,10 @@ public class ModbusRtuSlaveMessage : MessageBase, IResultMessage
     /// <summary>
     /// 当前关联的字节数组
     /// </summary>
-    public ReadOnlyMemory<byte> Bytes { get; set; }
+    public ReadOnlySequence<byte> Sequences { get; set; }
 
     /// <inheritdoc/>
-    public override int HeaderLength => 7;
+    public override long HeaderLength => 7;
 
     public ModbusRequest Request { get; set; } = new();
 
@@ -46,13 +48,13 @@ public class ModbusRtuSlaveMessage : MessageBase, IResultMessage
         }
         else if (f == 5)
         {
-            Request.Data = byteBlock.Memory.Slice(byteBlock.Position, 1);
+            Request.SlaveWriteDatas = byteBlock.Sequence.Slice(0, 1);
             BodyLength = 1;
             return true;
         }
         else if (f == 6)
         {
-            Request.Data = byteBlock.Memory.Slice(byteBlock.Position, 2);
+            Request.SlaveWriteDatas = byteBlock.Sequence.Slice(0, 2);
             BodyLength = 1;
             return true;
         }
@@ -73,26 +75,27 @@ public class ModbusRtuSlaveMessage : MessageBase, IResultMessage
 
     public override FilterResult CheckBody<TByteBlock>(ref TByteBlock byteBlock)
     {
-        var pos = byteBlock.Position - HeaderLength;
-        var crcLen = 0;
-        Bytes = byteBlock.Memory.Slice(pos, HeaderLength + BodyLength);
+        var pos = byteBlock.BytesRead - HeaderLength;
+        long crcLen = 0;
+        Sequences = byteBlock.TotalSequence.Slice(pos, HeaderLength + BodyLength);
 
         var f = Request.FunctionCode > 0x30 ? Request.FunctionCode - 0x30 : Request.FunctionCode;
         if (f == 15)
         {
-            Request.Data = byteBlock.Memory.Slice(byteBlock.Position, Request.Length).Span.ByteToBoolArray(Request.Length).BoolToByte();
+            Request.SlaveWriteDatas = new ReadOnlySequence<byte>(byteBlock.TotalSequence.Slice(byteBlock.BytesRead, Request.Length).ByteToBoolArray(Request.Length).BoolToByte());
         }
         else if (f == 16)
         {
-            Request.Data = byteBlock.Memory.Slice(byteBlock.Position, Request.Length);
+
+            Request.SlaveWriteDatas = byteBlock.TotalSequence.Slice(byteBlock.BytesRead, Request.Length);
         }
 
         crcLen = HeaderLength + BodyLength - 2;
 
-        var crc = CRC16Utils.Crc16Only(byteBlock.Span.Slice(pos, crcLen));
+        var crc = CRC16Utils.Crc16Only(byteBlock.TotalSequence.Slice(pos, crcLen));
 
         //Crc
-        var checkCrc = byteBlock.Span.Slice(pos + crcLen, 2);
+        var checkCrc = byteBlock.TotalSequence.Slice(pos + crcLen, 2);
         if (checkCrc.SequenceEqual(crc))
         {
             OperCode = 0;

@@ -8,6 +8,8 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
+using System.Buffers;
+
 namespace ThingsGateway.Foundation;
 
 /// <summary>
@@ -66,6 +68,66 @@ public static class CRC16Utils
             {
             (byte)(num >> 8),
             (byte)(num & 0xFFu)
+            };
+        }
+    }
+
+
+
+    /// <summary>
+    /// 通过指定多项式码来获取对应的数据的CRC校验码
+    /// </summary>
+    /// <param name="sequence">需要校验的数据，不包含CRC字节</param>
+    /// <returns>返回带CRC校验码的字节数组，可用于串口发送</returns>
+    public static byte[] Crc16Only(ReadOnlySequence<byte> sequence)
+    {
+        return Crc16Only(sequence, 0xA001);
+    }
+
+    /// <summary>
+    /// 通过指定多项式码来获取对应的数据的CRC校验码
+    /// </summary>
+    /// <param name="sequence">需要校验的数据，不包含CRC字节</param>
+    /// <param name="xdapoly">多项式</param>
+    /// <param name="crc16">是否低位在前（true=低字节优先，false=高字节优先）</param>
+    /// <returns>返回带CRC校验码的字节数组，可用于串口发送</returns>
+    public static byte[] Crc16Only(ReadOnlySequence<byte> sequence, int xdapoly, bool crc16 = true)
+    {
+        int num = 0xFFFF;
+
+        foreach (var segment in sequence)
+        {
+            var span = segment.Span;
+            for (int i = 0; i < span.Length; i++)
+            {
+                num = (num >> (crc16 ? 0 : 8)) ^ span[i];
+
+                for (int j = 0; j < 8; j++)
+                {
+                    int num2 = num & 1;
+                    num >>= 1;
+                    if (num2 == 1)
+                    {
+                        num ^= xdapoly;
+                    }
+                }
+            }
+        }
+
+        if (crc16)
+        {
+            return new byte[]
+            {
+                (byte)(num & 0xFFu),
+                (byte)(num >> 8)
+            };
+        }
+        else
+        {
+            return new byte[]
+            {
+                (byte)(num >> 8),
+                (byte)(num & 0xFFu)
             };
         }
     }

@@ -8,8 +8,6 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-using System.Collections.Concurrent;
-
 using ThingsGateway.NewLife;
 
 namespace ThingsGateway.Foundation;
@@ -28,13 +26,31 @@ public class UdpSessionChannel : UdpSession, IClientChannel
         ResetSign();
     }
     public override TouchSocketConfig Config => base.Config ?? ChannelOptions.Config;
-
+    private IDeviceDataHandleAdapter _deviceDataHandleAdapter;
+    public void SetDataHandlingAdapterLogger(ILog log)
+    {
+        if (_deviceDataHandleAdapter == null && DataHandlingAdapter is IDeviceDataHandleAdapter handleAdapter)
+        {
+            _deviceDataHandleAdapter = handleAdapter;
+        }
+        if (_deviceDataHandleAdapter != null)
+        {
+            _deviceDataHandleAdapter.Logger = log;
+        }
+    }
+    /// <inheritdoc/>
+    public void SetDataHandlingAdapter(DataHandlingAdapter adapter)
+    {
+        if (adapter is UdpDataHandlingAdapter udpDataHandlingAdapter)
+            SetAdapter(udpDataHandlingAdapter);
+        if (adapter is IDeviceDataHandleAdapter deviceDataHandleAdapter)
+            _deviceDataHandleAdapter = deviceDataHandleAdapter;
+    }
     public void ResetSign(int minSign = 0, int maxSign = ushort.MaxValue)
     {
         var pool = WaitHandlePool;
         WaitHandlePool = new WaitHandlePool<MessageBase>(minSign, maxSign);
         pool?.CancelAll();
-        pool?.SafeDispose();
     }
 
     /// <inheritdoc/>
@@ -69,14 +85,13 @@ public class UdpSessionChannel : UdpSession, IClientChannel
     /// <summary>
     /// 等待池
     /// </summary>
-    public WaitHandlePool<MessageBase> WaitHandlePool { get; set; } = new();
+    public WaitHandlePool<MessageBase> WaitHandlePool { get; set; } = new(0, ushort.MaxValue);
 
     /// <inheritdoc/>
     public WaitLock WaitLock => ChannelOptions.WaitLock;
     public virtual WaitLock GetLock(string key) => WaitLock;
 
-    /// <inheritdoc/>
-    public ConcurrentDictionary<long, Func<IClientChannel, ReceivedDataEventArgs, bool, Task>> ChannelReceivedWaitDict { get; } = new();
+
 
     /// <inheritdoc/>
     public Task<Result> CloseAsync(string msg, CancellationToken token)
@@ -85,19 +100,14 @@ public class UdpSessionChannel : UdpSession, IClientChannel
     }
 
     /// <inheritdoc/>
-    public async Task ConnectAsync(int timeout = 3000, CancellationToken token = default)
+    public Task ConnectAsync(CancellationToken token = default)
     {
         if (token.IsCancellationRequested)
-            return;
-        await StartAsync().ConfigureAwait(false);
+            return EasyTask.CompletedTask; ;
+        return StartAsync();
     }
 
-    /// <inheritdoc/>
-    public void SetDataHandlingAdapter(DataHandlingAdapter adapter)
-    {
-        if (adapter is UdpDataHandlingAdapter udpDataHandlingAdapter)
-            SetAdapter(udpDataHandlingAdapter);
-    }
+
     public CancellationToken ClosedToken => this.m_transport == null ? new CancellationToken(true) : this.m_transport.Token;
     private CancellationTokenSource m_transport;
     /// <inheritdoc/>
@@ -188,14 +198,6 @@ public class UdpSessionChannel : UdpSession, IClientChannel
     {
         await base.OnUdpReceived(e).ConfigureAwait(false);
 
-        if (e.RequestInfo is MessageBase response)
-        {
-            if (ChannelReceivedWaitDict.TryRemove(response.Sign, out var func))
-            {
-                await func.Invoke(this, e, ChannelReceived.Count == 1).ConfigureAwait(false);
-                e.Handled = true;
-            }
-        }
         if (e.Handled)
             return;
 
@@ -207,7 +209,8 @@ public class UdpSessionChannel : UdpSession, IClientChannel
     {
         m_transport?.SafeCancel();
         m_transport?.SafeDispose();
-        WaitHandlePool.SafeDispose();
+        m_transport = null;
+        WaitHandlePool?.CancelAll();
         base.SafetyDispose(disposing);
     }
 }

@@ -15,14 +15,17 @@ namespace ThingsGateway.Foundation;
 /// <summary>
 /// TCP/Serial适配器基类
 /// </summary>
-public class DeviceSingleStreamDataHandleAdapter<TRequest> : TcpCustomDataHandlingAdapter<TRequest> where TRequest : MessageBase, new()
+public class DeviceSingleStreamDataHandleAdapter<TRequest> : CustomDataHandlingAdapter<TRequest>, IDeviceDataHandleAdapter where TRequest : MessageBase, new()
 {
+    public new ILog Logger { get; set; }
+
+
     /// <inheritdoc cref="DeviceSingleStreamDataHandleAdapter{TRequest}"/>
     public DeviceSingleStreamDataHandleAdapter()
     {
         CacheTimeoutEnable = true;
-        SurLength = int.MaxValue;
     }
+
 
     /// <inheritdoc/>
     public override bool CanSendRequestInfo => true;
@@ -40,11 +43,11 @@ public class DeviceSingleStreamDataHandleAdapter<TRequest> : TcpCustomDataHandli
     public TRequest Request { get; set; }
 
     /// <inheritdoc />
-    public void SetRequest(ISendMessage sendMessage, ref ValueByteBlock byteBlock)
+    public void SetRequest(ISendMessage sendMessage)
     {
         var request = GetInstance();
         request.Sign = sendMessage.Sign;
-        request.SendInfo(sendMessage, ref byteBlock);
+        request.SendInfo(sendMessage);
         Request = request;
     }
 
@@ -55,24 +58,24 @@ public class DeviceSingleStreamDataHandleAdapter<TRequest> : TcpCustomDataHandli
     }
 
     /// <inheritdoc />
-    protected override FilterResult Filter<TByteBlock>(ref TByteBlock byteBlock, bool beCached, ref TRequest request, ref int tempCapacity)
+    protected override FilterResult Filter<TReader>(ref TReader byteBlock, bool beCached, ref TRequest request)
     {
         if (Logger?.LogLevel <= LogLevel.Trace)
-            Logger?.Trace($"{ToString()}- Receive:{(IsHexLog ? byteBlock.AsSegmentTake().ToHexString(' ') : byteBlock.ToString(byteBlock.Position))}");
+            Logger?.Trace($"{ToString()}- Receive:{(IsHexLog ? byteBlock.ToHexString(byteBlock.BytesRead, ' ') : byteBlock.ToString(byteBlock.BytesRead))}");
 
         try
         {
             if (IsSingleThread)
-                request = Request == null ? GetInstance() : Request;
+                request = Request == null ? Request = GetInstance() : Request;
             else
             {
                 if (!beCached)
                     request = GetInstance();
             }
 
-            var pos = byteBlock.Position;
+            var pos = byteBlock.BytesRead;
 
-            if (request.HeaderLength > byteBlock.CanReadLength)
+            if (request.HeaderLength > byteBlock.BytesRemaining)
             {
                 return FilterResult.Cache;//当头部都无法解析时，直接缓存
             }
@@ -80,19 +83,18 @@ public class DeviceSingleStreamDataHandleAdapter<TRequest> : TcpCustomDataHandli
             //检查头部合法性
             if (request.CheckHead(ref byteBlock))
             {
-                byteBlock.Position = pos;
+                byteBlock.BytesRead = pos;
                 if (request.BodyLength > MaxPackageSize)
                 {
                     request.OperCode = -1;
                     request.ErrorMessage = $"Received BodyLength={request.BodyLength}, greater than the set MaxPackageSize={MaxPackageSize}";
-                    OnError(default, request.ErrorMessage, true, true);
-                    SetResult(request);
+                    Reset();
+                    Logger?.LogWarning($"{ToString()} {request.ErrorMessage}");
                     return FilterResult.GoOn;
                 }
-                if (request.BodyLength + request.HeaderLength > byteBlock.CanReadLength)
+                if (request.BodyLength + request.HeaderLength > byteBlock.BytesRemaining)
                 {
                     //body不满足解析，开始缓存，然后保存对象
-                    tempCapacity = request.BodyLength + request.HeaderLength;
                     return FilterResult.Cache;
                 }
                 //if (request.BodyLength <= 0)
@@ -101,56 +103,47 @@ public class DeviceSingleStreamDataHandleAdapter<TRequest> : TcpCustomDataHandli
                 //    request.BodyLength = byteBlock.Length;
                 //}
                 var headPos = pos + request.HeaderLength;
-                byteBlock.Position = headPos;
+                byteBlock.BytesRead = headPos;
                 var result = request.CheckBody(ref byteBlock);
                 if (result == FilterResult.Cache)
                 {
+                    byteBlock.BytesRead = pos;
                     if (Logger?.LogLevel <= LogLevel.Trace)
-                        Logger?.Trace($"{ToString()}-Received incomplete, cached message, current length:{byteBlock.Length}  {request?.ErrorMessage}");
-                    tempCapacity = request.BodyLength + request.HeaderLength;
+                        Logger?.Trace($"{ToString()}-Received incomplete, cached message, need length:{request.HeaderLength + request.BodyLength} ,current length:{byteBlock.BytesRead + byteBlock.BytesRemaining}  {request?.ErrorMessage}");
                     request.OperCode = -1;
                 }
                 else if (result == FilterResult.GoOn)
                 {
                     var addLen = request.HeaderLength + request.BodyLength;
-                    byteBlock.Position = pos + (addLen > 0 ? addLen : 1);
-                    Logger?.Trace($"{ToString()}-{request?.ToString()}");
+                    byteBlock.BytesRead = pos + (addLen > 0 ? addLen : 1);
+                    if (Logger?.LogLevel <= LogLevel.Trace)
+                        Logger?.Trace($"{ToString()}-{request?.ToString()}");
                     request.OperCode = -1;
-                    SetResult(request);
                 }
                 else if (result == FilterResult.Success)
                 {
                     var addLen = request.HeaderLength + request.BodyLength;
-                    byteBlock.Position = pos + (addLen > 0 ? addLen : 1);
+                    byteBlock.BytesRead = pos + (addLen > 0 ? addLen : 1);
                 }
                 return result;
             }
             else
             {
-                byteBlock.Position = pos + 1;//移动游标
+                byteBlock.BytesRead = pos + 1;//移动游标
                 request.OperCode = -1;
-                SetResult(request);
                 return FilterResult.GoOn;//放弃解析
             }
         }
         catch (Exception ex)
         {
             Logger?.LogWarning(ex, $"{ToString()} Received parsing error");
-            byteBlock.Position = byteBlock.Length;//移动游标
+            byteBlock.BytesRead = byteBlock.BytesRead + byteBlock.BytesRemaining;//移动游标
             request.Exception = ex;
             request.OperCode = -1;
-            SetResult(request);
             return FilterResult.GoOn;//放弃解析
         }
     }
 
-    private void SetResult(TRequest request)
-    {
-        if ((Owner as IClientChannel)?.WaitHandlePool?.TryGetDataAsync(request.Sign, out var waitDataAsync) == true)
-        {
-            waitDataAsync.SetResult(request);
-        }
-    }
 
     /// <summary>
     /// 获取泛型实例。
@@ -161,47 +154,32 @@ public class DeviceSingleStreamDataHandleAdapter<TRequest> : TcpCustomDataHandli
         return new TRequest() { OperCode = -1, Sign = -1 };
     }
 
-    /// <inheritdoc/>
-    protected override void OnReceivedSuccess(TRequest request)
+    public override void SendInput<TWriter>(ref TWriter writer, in ReadOnlyMemory<byte> memory)
     {
-        Request = null;
-    }
-
-    /// <inheritdoc />
-    protected override async Task PreviewSendAsync(ReadOnlyMemory<byte> memory, CancellationToken cancellationToken)
-    {
-        cancellationToken.ThrowIfCancellationRequested();
         if (Logger?.LogLevel <= LogLevel.Trace)
             Logger?.Trace($"{ToString()}- Send:{(IsHexLog ? memory.Span.ToHexString(' ') : (memory.Span.ToString(Encoding.UTF8)))}");
 
-        //发送
-        await GoSendAsync(memory, cancellationToken).ConfigureAwait(false);
+        writer.Write(memory.Span);
     }
 
-    /// <inheritdoc/>
-    protected override async Task PreviewSendAsync(IRequestInfo requestInfo, CancellationToken cancellationToken)
+    public override void SendInput<TWriter>(ref TWriter writer, IRequestInfo requestInfo)
     {
         if (!(requestInfo is ISendMessage sendMessage))
         {
             throw new Exception($"Unable to convert {nameof(requestInfo)} to {nameof(ISendMessage)}");
         }
-        cancellationToken.ThrowIfCancellationRequested();
-        var byteBlock = new ValueByteBlock(sendMessage.MaxLength);
-        try
+        var span = writer.GetSpan(sendMessage.MaxLength);
+        sendMessage.Build(ref writer);
+        if (Logger?.LogLevel <= LogLevel.Trace)
         {
-            sendMessage.Build(ref byteBlock);
-            if (Logger?.LogLevel <= LogLevel.Trace)
-                Logger?.Trace($"{ToString()}- Send:{(IsHexLog ? byteBlock.Span.ToHexString(' ') : (byteBlock.Span.ToString(Encoding.UTF8)))}");
-            //非并发主从协议
-            if (IsSingleThread)
-            {
-                SetRequest(sendMessage, ref byteBlock);
-            }
-            await GoSendAsync(byteBlock.Memory, cancellationToken).ConfigureAwait(false);
+            Logger?.Trace($"{ToString()}- Send:{(IsHexLog ? span.Slice(0, (int)writer.WrittenCount).ToHexString(' ') : (span.Slice(0, (int)writer.WrittenCount).ToString(Encoding.UTF8)))}");
         }
-        finally
+        //非并发主从协议
+        if (IsSingleThread)
         {
-            byteBlock.SafeDispose();
+            SetRequest(sendMessage);
         }
+
     }
+
 }

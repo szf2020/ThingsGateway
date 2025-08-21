@@ -209,16 +209,10 @@ public static class SqlSugarExtensions
     }
 
     /// <inheritdoc/>
-    public static async Task<bool> UpdateRangeAsync<T>(this SqlSugarClient db, List<T> updateObjs) where T : class, new()
+    public static Task<int> UpdateSetColumnsTrueAsync<T>(this SqlSugarClient db, Expression<Func<T, T>> columns, Expression<Func<T, bool>> whereExpression) where T : class, new()
     {
-        return await db.Updateable(updateObjs).ExecuteCommandAsync().ConfigureAwait(false) > 0;
-    }
-
-    /// <inheritdoc/>
-    public static async Task<bool> UpdateSetColumnsTrueAsync<T>(this SqlSugarClient db, Expression<Func<T, T>> columns, Expression<Func<T, bool>> whereExpression) where T : class, new()
-    {
-        return await db.Updateable<T>().SetColumns(columns, appendColumnsByDataFilter: true).Where(whereExpression)
-            .ExecuteCommandAsync().ConfigureAwait(false) > 0;
+        return db.Updateable<T>().SetColumns(columns, appendColumnsByDataFilter: true).Where(whereExpression)
+            .ExecuteCommandAsync();
     }
 
     private static IEnumerable<T> Sort<T>(this IEnumerable<T> list, BasePageInput basePageInput)

@@ -8,6 +8,8 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
+using System.Buffers;
+
 namespace ThingsGateway.Foundation.Modbus;
 
 /// <summary>
@@ -18,17 +20,17 @@ public class ModbusTcpSlaveMessage : MessageBase, IResultMessage
     /// <summary>
     /// 当前关联的字节数组
     /// </summary>
-    public ReadOnlyMemory<byte> Bytes { get; set; }
+    public ReadOnlySequence<byte> Sequences { get; set; }
 
     /// <inheritdoc/>
-    public override int HeaderLength => 12;
+    public override long HeaderLength => 12;
 
     public ModbusRequest Request { get; set; } = new();
 
     public override bool CheckHead<TByteBlock>(ref TByteBlock byteBlock)
     {
         Sign = ReaderExtension.ReadValue<TByteBlock, ushort>(ref byteBlock, EndianType.Big);
-        byteBlock.Position += 2;
+        byteBlock.BytesRead += 2;
         BodyLength = ReaderExtension.ReadValue<TByteBlock, ushort>(ref byteBlock, EndianType.Big) - 6;
         Request.Station = ReaderExtension.ReadValue<TByteBlock, byte>(ref byteBlock);
         Request.FunctionCode = ReaderExtension.ReadValue<TByteBlock, byte>(ref byteBlock);
@@ -48,12 +50,12 @@ public class ModbusTcpSlaveMessage : MessageBase, IResultMessage
         }
         else if (f == 5)
         {
-            Request.Data = byteBlock.Memory.Slice(byteBlock.Position, 1);
+            Request.SlaveWriteDatas = byteBlock.Sequence.Slice(0, 1);
             return true;
         }
         else if (f == 6)
         {
-            Request.Data = byteBlock.Memory.Slice(byteBlock.Position, 2);
+            Request.SlaveWriteDatas = byteBlock.Sequence.Slice(0, 2);
             return true;
         }
         else if (f == 15)
@@ -71,20 +73,20 @@ public class ModbusTcpSlaveMessage : MessageBase, IResultMessage
 
     public override FilterResult CheckBody<TByteBlock>(ref TByteBlock byteBlock)
     {
-        var pos = byteBlock.Position - HeaderLength;
-        Bytes = byteBlock.Memory.Slice(pos, HeaderLength + BodyLength);
+        var pos = byteBlock.BytesRead - HeaderLength;
+        Sequences = byteBlock.TotalSequence.Slice(pos, HeaderLength + BodyLength);
 
         var f = Request.FunctionCode > 0x30 ? Request.FunctionCode - 0x30 : Request.FunctionCode;
 
         if (f == 15)
         {
-            byteBlock.Position += 1;
-            Request.Data = byteBlock.Memory.Slice(byteBlock.Position, Request.Length).Span.ByteToBoolArray(Request.Length).BoolToByte();
+            byteBlock.BytesRead += 1;
+            Request.SlaveWriteDatas = new ReadOnlySequence<byte>(byteBlock.Sequence.Slice(0, Request.Length).ByteToBoolArray(Request.Length).BoolToByte());
         }
         else if (f == 16)
         {
-            byteBlock.Position += 1;
-            Request.Data = byteBlock.Memory.Slice(byteBlock.Position, Request.Length);
+            byteBlock.BytesRead += 1;
+            Request.SlaveWriteDatas = byteBlock.Sequence.Slice(0, Request.Length);
         }
 
         OperCode = 0;

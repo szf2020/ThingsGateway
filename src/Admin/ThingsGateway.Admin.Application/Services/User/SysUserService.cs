@@ -377,9 +377,9 @@ internal sealed class SysUserService : BaseService<SysUser>, ISysUserService
     /// 获取用户拥有的资源
     /// </summary>
     /// <param name="id">用户id</param>
-    public async Task<GrantResourceData> OwnResourceAsync(long id)
+    public Task<GrantResourceData> OwnResourceAsync(long id)
     {
-        return await _roleService.OwnResourceAsync(id, RelationCategoryEnum.UserHasResource).ConfigureAwait(false);
+        return _roleService.OwnResourceAsync(id, RelationCategoryEnum.UserHasResource);
     }
 
     /// <summary>
@@ -505,10 +505,10 @@ internal sealed class SysUserService : BaseService<SysUser>, ISysUserService
         var password = await GetDefaultPassWord(true).ConfigureAwait(false);//获取默认密码,这里不走Aop所以需要加密一下
         using var db = GetDB();
         //重置密码
-        if (await db.UpdateSetColumnsTrueAsync<SysUser>(it => new SysUser
+        if ((await db.UpdateSetColumnsTrueAsync<SysUser>(it => new SysUser
         {
             Password = password
-        }, it => it.Id == id).ConfigureAwait(false))
+        }, it => it.Id == id).ConfigureAwait(false)) > 0)
         {
             DeleteUserFromCache(id);//从cache删除用户信息
             var verificatInfoIds = _verificatInfoService.GetListByUserId(id);

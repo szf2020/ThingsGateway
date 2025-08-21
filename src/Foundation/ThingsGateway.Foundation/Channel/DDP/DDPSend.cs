@@ -25,6 +25,7 @@ public class DDPSend : ISendMessage
     string Id;
     byte Command;
     bool Tcp;
+
     public DDPSend(ReadOnlyMemory<byte> readOnlyMemory, string id, bool tcp, byte command = 0x89)
     {
         Tcp = tcp;
@@ -32,7 +33,8 @@ public class DDPSend : ISendMessage
         Id = id;
         Command = command;
     }
-    public void Build<TByteBlock>(ref TByteBlock byteBlock) where TByteBlock : IByteBlockWriter
+
+    public void Build<TByteBlock>(ref TByteBlock byteBlock) where TByteBlock : IBytesWriter
     {
         WriterExtension.WriteValue(ref byteBlock, (byte)0x7b);
         WriterExtension.WriteValue(ref byteBlock, (byte)Command);

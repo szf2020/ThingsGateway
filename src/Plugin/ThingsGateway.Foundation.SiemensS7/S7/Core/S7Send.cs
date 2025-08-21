@@ -78,7 +78,7 @@ public class S7Send : ISendMessage
     public int MaxLength => 2048;
     public int Sign { get; set; }
 
-    public void Build<TByteBlock>(ref TByteBlock byteBlock) where TByteBlock : IByteBlockWriter
+    public void Build<TByteBlock>(ref TByteBlock byteBlock) where TByteBlock : IBytesWriter
     {
         if (Handshake == true)
         {
@@ -95,7 +95,7 @@ public class S7Send : ISendMessage
         }
     }
 
-    internal void GetReadCommand<TByteBlock>(ref TByteBlock byteBlock, SiemensS7Address[] siemensS7Address) where TByteBlock : IByteBlockWriter
+    internal void GetReadCommand<TByteBlock>(ref TByteBlock byteBlock, SiemensS7Address[] siemensS7Address) where TByteBlock : IBytesWriter
     {
         byte len = (byte)siemensS7Address.Length;
         ushort telegramLen = (ushort)(len * 12 + 19);
@@ -142,7 +142,7 @@ public class S7Send : ISendMessage
         }
     }
 
-    internal void GetWriteByteCommand<TByteBlock>(ref TByteBlock byteBlock, SiemensS7Address[] addresss) where TByteBlock : IByteBlockWriter
+    internal void GetWriteByteCommand<TByteBlock>(ref TByteBlock byteBlock, SiemensS7Address[] addresss) where TByteBlock : IBytesWriter
     {
         byte itemLen = (byte)addresss.Length;
         ushort parameterLen = (ushort)(itemLen * 12 + 2);
@@ -200,10 +200,8 @@ public class S7Send : ISendMessage
             dataLen = (ushort)(dataLen + data.Length + 4);
         }
         ushort telegramLen = (ushort)(itemLen * 12 + 19 + dataLen);
-        byteBlock.Position = 2;
-        WriterExtension.WriteValue(ref byteBlock, (ushort)telegramLen, EndianType.Big);//长度
-        byteBlock.Position = 15;
-        WriterExtension.WriteValue(ref byteBlock, (ushort)dataLen, EndianType.Big);//长度
-        byteBlock.Position = byteBlock.Length;
+
+        ByteBlockExtension.WriteBackValue(ref byteBlock, (ushort)telegramLen, EndianType.Big, 2);//长度
+        ByteBlockExtension.WriteBackValue(ref byteBlock, (ushort)dataLen, EndianType.Big, 15);//长度
     }
 }

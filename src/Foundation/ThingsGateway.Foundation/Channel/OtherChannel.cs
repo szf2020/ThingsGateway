@@ -8,8 +8,6 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-using System.Collections.Concurrent;
-
 using ThingsGateway.NewLife;
 
 using TouchSocket.SerialPorts;
@@ -31,13 +29,23 @@ public class OtherChannel : SetupConfigObject, IClientChannel
     }
 
     public override TouchSocketConfig Config => base.Config ?? ChannelOptions.Config;
+    public void SetDataHandlingAdapterLogger(ILog log)
+    {
+        if (_deviceDataHandleAdapter == null && ReadOnlyDataHandlingAdapter is IDeviceDataHandleAdapter handleAdapter)
+        {
+            _deviceDataHandleAdapter = handleAdapter;
+        }
+        if (_deviceDataHandleAdapter != null)
+        {
+            _deviceDataHandleAdapter.Logger = log;
+        }
+    }
 
     public void ResetSign(int minSign = 0, int maxSign = ushort.MaxValue)
     {
         var pool = WaitHandlePool;
         WaitHandlePool = new WaitHandlePool<MessageBase>(minSign, maxSign);
         pool?.CancelAll();
-        pool?.SafeDispose();
     }
     /// <inheritdoc/>
     public ChannelReceivedEventHandler ChannelReceived { get; } = new();
@@ -65,22 +73,25 @@ public class OtherChannel : SetupConfigObject, IClientChannel
     /// <summary>
     /// 等待池
     /// </summary>
-    public WaitHandlePool<MessageBase> WaitHandlePool { get; internal set; } = new();
+    public WaitHandlePool<MessageBase> WaitHandlePool { get; internal set; } = new(0, ushort.MaxValue);
 
     /// <inheritdoc/>
     public WaitLock WaitLock => ChannelOptions.WaitLock;
     public virtual WaitLock GetLock(string key) => WaitLock;
 
-    /// <inheritdoc/>
-    public ConcurrentDictionary<long, Func<IClientChannel, ReceivedDataEventArgs, bool, Task>> ChannelReceivedWaitDict { get; } = new();
+
 
     //private readonly WaitLock _connectLock = new WaitLock();
+
+    private IDeviceDataHandleAdapter _deviceDataHandleAdapter;
 
     /// <inheritdoc/>
     public void SetDataHandlingAdapter(DataHandlingAdapter adapter)
     {
         if (adapter is SingleStreamDataHandlingAdapter singleStreamDataHandlingAdapter)
             SetAdapter(singleStreamDataHandlingAdapter);
+        if (adapter is IDeviceDataHandleAdapter deviceDataHandleAdapter)
+            _deviceDataHandleAdapter = deviceDataHandleAdapter;
     }
     /// <summary>
     /// 设置数据处理适配器。
@@ -104,20 +115,17 @@ public class OtherChannel : SetupConfigObject, IClientChannel
         }
 
         // 设置适配器的日志记录器和加载、接收数据的回调方法。
-        adapter.Logger = Logger;
         adapter.OnLoaded(this);
         adapter.ReceivedAsyncCallBack = PrivateHandleReceivedData;
-        //adapter.SendCallBack = this.ProtectedDefaultSend;
-        adapter.SendAsyncCallBack = ProtectedDefaultSendAsync;
 
         // 将提供的适配器实例设置为当前实例的数据处理适配器。
         m_dataHandlingAdapter = adapter;
     }
 
-    private async Task PrivateHandleReceivedData(IByteBlockReader byteBlock, IRequestInfo requestInfo)
+    private Task PrivateHandleReceivedData(ReadOnlyMemory<byte> byteBlock, IRequestInfo requestInfo)
     {
         LastReceivedTime = DateTime.Now;
-        await this.OnChannelReceivedEvent(new ReceivedDataEventArgs(byteBlock, requestInfo), ChannelReceived).ConfigureAwait(false);
+        return this.OnChannelReceivedEvent(new ReceivedDataEventArgs(byteBlock, requestInfo), ChannelReceived);
     }
 
     /// <summary>
@@ -154,7 +162,8 @@ public class OtherChannel : SetupConfigObject, IClientChannel
         return Task.FromResult(Result.Success);
     }
     public volatile bool online;
-    public Task ConnectAsync(int millisecondsTimeout, CancellationToken token)
+
+    public Task ConnectAsync(CancellationToken token)
     {
         var cts = m_transport;
         m_transport = new();
@@ -180,8 +189,11 @@ public class OtherChannel : SetupConfigObject, IClientChannel
         }
         else
         {
-            // 否则，使用适配器的发送方法进行数据发送。
-            return m_dataHandlingAdapter.SendInputAsync(memory, cancellationToken);
+            var byteBlock = new ByteBlock(1024);
+            m_dataHandlingAdapter.SendInput(ref byteBlock, memory);
+
+            byteBlock.SafeDispose();
+            return EasyTask.CompletedTask;
         }
     }
 
@@ -190,9 +202,14 @@ public class OtherChannel : SetupConfigObject, IClientChannel
         // 检查是否具备发送请求的条件，如果不具备则抛出异常
         ThrowIfCannotSendRequestInfo();
 
-        // 使用数据处理适配器异步发送输入请求
-        return m_dataHandlingAdapter.SendInputAsync(requestInfo, cancellationToken);
+        var byteBlock = new ByteBlock(1024);
+        m_dataHandlingAdapter.SendInput(ref byteBlock, requestInfo);
+
+        byteBlock.SafeDispose();
+        return EasyTask.CompletedTask;
     }
+
+
     private void ThrowIfCannotSendRequestInfo()
     {
         if (m_dataHandlingAdapter?.CanSendRequestInfo != true)
@@ -200,4 +217,6 @@ public class OtherChannel : SetupConfigObject, IClientChannel
             throw new NotSupportedException($"当前适配器为空或者不支持对象发送。");
         }
     }
+
+
 }

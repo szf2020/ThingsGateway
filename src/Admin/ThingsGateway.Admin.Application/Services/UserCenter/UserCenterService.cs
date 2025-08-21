@@ -185,12 +185,12 @@ internal sealed class UserCenterService : BaseService<SysUser>, IUserCenterServi
         using var db = GetDB();
 
         //更新指定字段
-        var result = await db.UpdateSetColumnsTrueAsync<SysUser>(it => new SysUser
+        var result = (await db.UpdateSetColumnsTrueAsync<SysUser>(it => new SysUser
         {
             Email = input.Email,
             Phone = input.Phone,
             Avatar = input.Avatar,
-        }, it => it.Id == UserManager.UserId).ConfigureAwait(false);
+        }, it => it.Id == UserManager.UserId).ConfigureAwait(false)) > 0;
         if (result)
             _userService.DeleteUserFromCache(UserManager.UserId);//cache删除用户数据
     }

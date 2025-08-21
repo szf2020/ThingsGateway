@@ -1,4 +1,23 @@
 ﻿{
+
+
+  "ThingsGateway.Debug.ValueTransformType": {
+    "None": "None",
+    "Linear": "Linear",
+    "Sqrt": "Sqrt"
+  },
+
+  "ThingsGateway.Debug.ValueTransformConfig": {
+    "TransformType": "TransformType",
+    "MinMax": "MinMax",
+    "ClampToRawRange": "ClampToRawRange",
+    "DecimalPlaces": "DecimalPlaces",
+    "RawMin": "RawMin",
+    "RawMax": "RawMax",
+    "ActualMin": "ActualMin",
+    "ActualMax": "ActualMax"
+  },
+
   "ThingsGateway.Debug.ChannelComponent": {
     "BaudRate": "Baud Rate",
     "BindUrl": "Local Bind IP Address",

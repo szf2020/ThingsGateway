@@ -27,7 +27,7 @@ internal sealed class RedundancyHostedService : BackgroundService, IRedundancyHo
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         await Task.Yield();
-        await RedundancyTask.StartRedundancyTaskAsync(stoppingToken).ConfigureAwait(false);
+        await RedundancyTask.StartRedundancyTaskAsync().ConfigureAwait(false);
     }
 
     public Task StartRedundancyTaskAsync() => RedundancyTask.StartRedundancyTaskAsync();

@@ -29,8 +29,9 @@ public class ModbusRtuSend : ISendMessage
     public ModbusAddress ModbusAddress { get; }
     public int Sign { get; set; }
 
-    public void Build<TByteBlock>(ref TByteBlock byteBlock) where TByteBlock : IByteBlockWriter
+    public void Build<TByteBlock>(ref TByteBlock byteBlock) where TByteBlock : IBytesWriter
     {
+        var span = byteBlock.GetSpan(512);
         var f = ModbusAddress.FunctionCode > 0x30 ? ModbusAddress.FunctionCode - 0x30 : ModbusAddress.FunctionCode;
         if (!Read)
         {
@@ -38,7 +39,7 @@ public class ModbusRtuSend : ISendMessage
             {
                 ModbusAddress.WriteFunctionCode = (byte)(f == 1 ? 5 : 6);
             }
-            if (ModbusAddress.Data.Length > 2 && ModbusAddress.WriteFunctionCode < 15)
+            if (ModbusAddress.MasterWriteDatas.Length > 2 && ModbusAddress.WriteFunctionCode < 15)
             {
                 ModbusAddress.WriteFunctionCode = (byte)(f == 1 ? 15 : 16);
             }
@@ -63,16 +64,16 @@ public class ModbusRtuSend : ISendMessage
             WriterExtension.WriteValue(ref byteBlock, (byte)ModbusAddress.Station);
             WriterExtension.WriteValue(ref byteBlock, (byte)ModbusAddress.WriteFunctionCode);
             WriterExtension.WriteValue(ref byteBlock, (ushort)ModbusAddress.StartAddress, EndianType.Big);
-            byteBlock.Write(ModbusAddress.Data.Span);
+            byteBlock.Write(ModbusAddress.MasterWriteDatas.Span);
         }
         else if (wf == 15 || wf == 16)
         {
-            var data = ModbusAddress.Data.ArrayExpandToLengthEven().Span;
+            var data = ModbusAddress.MasterWriteDatas.ArrayExpandToLengthEven().Span;
             WriterExtension.WriteValue(ref byteBlock, (ushort)(data.Length + 7), EndianType.Big);
             WriterExtension.WriteValue(ref byteBlock, (byte)ModbusAddress.Station);
             WriterExtension.WriteValue(ref byteBlock, (byte)ModbusAddress.WriteFunctionCode);
             WriterExtension.WriteValue(ref byteBlock, (ushort)ModbusAddress.StartAddress, EndianType.Big);
-            var len = (ushort)Math.Ceiling(wf == 15 ? ModbusAddress.Data.Length * 8 : ModbusAddress.Data.Length / 2.0);
+            var len = (ushort)Math.Ceiling(wf == 15 ? ModbusAddress.MasterWriteDatas.Length * 8 : ModbusAddress.MasterWriteDatas.Length / 2.0);
             WriterExtension.WriteValue(ref byteBlock, len, EndianType.Big);
             WriterExtension.WriteValue(ref byteBlock, (byte)(len * 2));
             byteBlock.Write(data);
@@ -81,6 +82,7 @@ public class ModbusRtuSend : ISendMessage
         {
             throw new System.InvalidOperationException(AppResource.ModbusError1);
         }
-        byteBlock.Write(CRC16Utils.Crc16Only(byteBlock.Span));
+        var crclen = byteBlock.WrittenCount;
+        byteBlock.Write(CRC16Utils.Crc16Only(span.Slice(0, (int)crclen)));
     }
 }

@@ -1,1 +1,1 @@
-set WebEnable=false && ThingsGateway.Server.exe
+set WebEnable=false && set ASPNETCORE_ENVIRONMENT=WebDisable && ThingsGateway.Server.exe

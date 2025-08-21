@@ -8,8 +8,6 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-using System.Collections.Concurrent;
-
 namespace ThingsGateway.Foundation;
 
 /// <summary>
@@ -59,13 +57,7 @@ public interface IChannel : ISetupConfigObject, IDisposable, IClosableClient, IC
     /// </summary>
     public ChannelEventHandler Stoping { get; }
 
-    /// <summary>
-    /// 主动请求时的等待池
-    /// </summary>
-    public ConcurrentDictionary<long, Func<IClientChannel, ReceivedDataEventArgs, bool, Task>> ChannelReceivedWaitDict { get; }
-
     void ResetSign(int minSign = 0, int maxSign = ushort.MaxValue);
-
 
 
 }

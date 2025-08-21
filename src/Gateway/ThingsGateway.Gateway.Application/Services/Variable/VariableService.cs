@@ -545,7 +545,7 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
 
     /// <inheritdoc/>
     [OperDesc("ImportVariable", isRecordPar: false, localizerType: typeof(Variable))]
-    public async Task<HashSet<long>> ImportVariableAsync(Dictionary<string, ImportPreviewOutputBase> input)
+    public Task<HashSet<long>> ImportVariableAsync(Dictionary<string, ImportPreviewOutputBase> input)
     {
         IEnumerable<Variable>? variables = new List<Variable>();
         foreach (var item in input)
@@ -559,7 +559,7 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
         }
         var upData = variables.Where(a => a.IsUp).ToList();
         var insertData = variables.Where(a => !a.IsUp).ToList();
-        return await ImportVariableAsync(upData, insertData).ConfigureAwait(false);
+        return ImportVariableAsync(upData, insertData);
     }
 
     [OperDesc("ImportVariable", isRecordPar: false, localizerType: typeof(Variable))]

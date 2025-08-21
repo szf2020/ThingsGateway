@@ -10,8 +10,6 @@
 
 using System.Runtime.CompilerServices;
 
-using ThingsGateway.NewLife;
-
 using TouchSocket.Resources;
 
 namespace ThingsGateway.Foundation;
@@ -33,50 +31,120 @@ public class DDPTcpSessionClientChannel : TcpSessionClientChannel
             DDPAdapter.Config(Config);
         }
 
-        // 将当前实例的日志记录器和加载回调设置到适配器中
-        DDPAdapter.Logger = Logger;
         DDPAdapter.OnLoaded(this);
 
-        DDPAdapter.SendAsyncCallBack = DDPSendAsync;
-        DDPAdapter.ReceivedAsyncCallBack = DDPHandleReceivedData;
-        DataHandlingAdapter.SendAsyncCallBack = DefaultSendAsync;
         return base.OnTcpConnected(e);
     }
-    protected Task DefaultSendAsync(ReadOnlyMemory<byte> memory, CancellationToken cancellationToken)
-    {
-        return DDPAdapter.SendInputAsync(new DDPSend(memory, Id, true), cancellationToken);
-    }
-    protected Task DDPSendAsync(ReadOnlyMemory<byte> memory, CancellationToken cancellationToken)
-    {
-        return base.ProtectedDefaultSendAsync(memory, cancellationToken);
-    }
 
-    private DDPMessage DDPMessage { get; set; }
-    private Task DDPHandleReceivedData(IByteBlockReader byteBlock, IRequestInfo requestInfo)
+    #region 发送
+
+    /// <summary>
+    /// 异步发送数据，通过适配器模式灵活处理数据发送。
+    /// </summary>
+    /// <param name="memory">待发送的只读字节内存块。</param>
+    /// <param name="token">可取消令箭</param>
+    /// <returns>一个异步任务，表示发送操作。</returns>
+    protected virtual async Task NewProtectedSendAsync(ReadOnlyMemory<byte> memory, CancellationToken token)
     {
-        if (requestInfo is DDPMessage dDPMessage)
-            DDPMessage = dDPMessage;
+        this.ThrowIfDisposed();
+        this.ThrowIfClientNotConnected();
 
-        return EasyTask.CompletedTask;
-    }
 
-    private DeviceSingleStreamDataHandleAdapter<DDPTcpMessage> DDPAdapter = new();
-    private WaitLock _waitLock = new(nameof(DDPTcpSessionClientChannel));
+        if (!await this.OnTcpSending(memory).ConfigureAwait(false)) return;
 
-    protected override async ValueTask<bool> OnTcpReceiving(IByteBlockReader byteBlock)
-    {
-        DDPMessage? message = null;
+        var transport = this.Transport;
+        var adapter = this.DataHandlingAdapter;
+        var locker = transport.SemaphoreSlimForWriter;
+
+        await locker.WaitAsync(token).ConfigureAwait(false);
         try
         {
-            await _waitLock.WaitAsync().ConfigureAwait(false);
-            await DDPAdapter.ReceivedInputAsync(byteBlock).ConfigureAwait(false);
-
-            message = DDPMessage;
-            DDPMessage = null;
+            // 如果数据处理适配器未设置，则使用默认发送方式。
+            if (adapter == null)
+            {
+                await transport.Output.WriteAsync(memory, token).ConfigureAwait(false);
+            }
+            else
+            {
+                var byteBlock = new ByteBlock(1024);
+                var ddpSend = new DDPSend(memory, Id, true);
+                ddpSend.Build(ref byteBlock);
+                var newMemory = byteBlock.Memory;
+                var writer = new PipeBytesWriter(transport.Output);
+                adapter.SendInput(ref writer, in newMemory);
+                await writer.FlushAsync(token).ConfigureAwait(false);
+            }
         }
         finally
         {
-            _waitLock.Release();
+            locker.Release();
+        }
+    }
+
+    /// <summary>
+    /// 异步发送请求信息的受保护方法。
+    ///
+    /// 此方法首先检查当前对象是否能够发送请求信息，如果不能，则抛出异常。
+    /// 如果可以发送，它将使用数据处理适配器来异步发送输入请求。
+    /// </summary>
+    /// <param name="requestInfo">要发送的请求信息。</param>
+    /// <param name="token">可取消令箭</param>
+    /// <returns>返回一个任务，该任务代表异步操作的结果。</returns>
+    protected virtual async Task NewProtectedSendAsync(IRequestInfo requestInfo, CancellationToken token)
+    {
+        // 检查是否具备发送请求的条件，如果不具备则抛出异常
+        this.ThrowIfCannotSendRequestInfo();
+
+        this.ThrowIfDisposed();
+        this.ThrowIfClientNotConnected();
+
+        var transport = this.Transport;
+        var adapter = this.DataHandlingAdapter;
+        var locker = transport.SemaphoreSlimForWriter;
+
+        await locker.WaitAsync(token).ConfigureAwait(false);
+        try
+        {
+            var byteBlock = new ByteBlock(1024);
+            if (requestInfo is not IRequestInfoBuilder requestInfoBuilder)
+            {
+                throw new Exception();
+            }
+            requestInfoBuilder.Build(ref byteBlock);
+            var ddpSend = new DDPSend(byteBlock.Memory, Id, true);
+
+            var writer = new PipeBytesWriter(transport.Output);
+            adapter.SendInput(ref writer, ddpSend);
+            await writer.FlushAsync(token).ConfigureAwait(false);
+        }
+        finally
+        {
+            locker.Release();
+        }
+    }
+
+
+    #endregion 发送
+    public override Task SendAsync(IRequestInfo requestInfo, CancellationToken token = default)
+    {
+        return NewProtectedSendAsync(requestInfo, token);
+    }
+
+    public override Task SendAsync(ReadOnlyMemory<byte> memory, CancellationToken token = default)
+    {
+        return NewProtectedSendAsync(memory, token);
+    }
+
+
+
+    private DeviceSingleStreamDataHandleAdapter<DDPTcpMessage> DDPAdapter = new();
+
+    protected override async ValueTask<bool> OnTcpReceiving(IBytesReader byteBlock)
+    {
+
+        if (DDPAdapter.TryParseRequest(ref byteBlock, out var message))
+        {
+            return true;
         }
 
         if (message != null)
@@ -90,11 +158,11 @@ public class DDPTcpSessionClientChannel : TcpSessionClientChannel
 
                     if (this.DataHandlingAdapter == null)
                     {
-                        await this.OnTcpReceived(new ReceivedDataEventArgs(reader, default)).ConfigureAwait(EasyTask.ContinueOnCapturedContext);
+                        await this.OnTcpReceived(new ReceivedDataEventArgs(message.Content, default)).ConfigureAwait(false);
                     }
                     else
                     {
-                        await this.DataHandlingAdapter.ReceivedInputAsync(reader).ConfigureAwait(EasyTask.ContinueOnCapturedContext);
+                        await this.DataHandlingAdapter.ReceivedInputAsync(reader).ConfigureAwait(false);
                     }
 
                     return true;
@@ -127,16 +195,16 @@ public class DDPTcpSessionClientChannel : TcpSessionClientChannel
                             }
                         }
 
-                        await ResetIdAsync(id).ConfigureAwait(false);
+                        await ResetIdAsync(id, ClosedToken).ConfigureAwait(false);
 
                         //发送成功
-                        await DDPAdapter.SendInputAsync(new DDPSend(ReadOnlyMemory<byte>.Empty, id, true, 0x81), ClosedToken).ConfigureAwait(false);
+                        await base.ProtectedSendAsync(new DDPSend(ReadOnlyMemory<byte>.Empty, id, true, 0x81), ClosedToken).ConfigureAwait(false);
                         if (log)
                             Logger?.Info(string.Format(AppResource.DtuConnected, Id));
                     }
                     else if (message.Type == 0x02)
                     {
-                        await DDPAdapter.SendInputAsync(new DDPSend(ReadOnlyMemory<byte>.Empty, Id, true, 0x82), ClosedToken).ConfigureAwait(false);
+                        await base.ProtectedSendAsync(new DDPSend(ReadOnlyMemory<byte>.Empty, Id, true, 0x82), ClosedToken).ConfigureAwait(false);
                         Logger?.Info(string.Format(AppResource.DtuDisconnecting, Id));
                         await Task.Delay(100).ConfigureAwait(false);
                         await this.CloseAsync().ConfigureAwait(false);

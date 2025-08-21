@@ -78,7 +78,7 @@ public class Dlt645_2007Master : DtuServiceDeviceBase
     /// <param name="station">表号</param>
     /// <param name="cancellationToken">取消令箭</param>
     /// <returns></returns>
-    public async ValueTask<OperResult> FreezeAsync(DateTime dateTime, string station = null, CancellationToken cancellationToken = default)
+    public ValueTask<OperResult<ReadOnlyMemory<byte>>> FreezeAsync(DateTime dateTime, string station = null, CancellationToken cancellationToken = default)
     {
         try
         {
@@ -87,11 +87,11 @@ public class Dlt645_2007Master : DtuServiceDeviceBase
             dAddress.SetStation(station ?? Station);
             dAddress.DataId = str.HexStringToBytes();
 
-            return await Dlt645RequestAsync(dAddress, ControlCode.Freeze, FEHead, cancellationToken: cancellationToken).ConfigureAwait(false);
+            return Dlt645RequestAsync(dAddress, ControlCode.Freeze, FEHead, cancellationToken: cancellationToken);
         }
         catch (Exception ex)
         {
-            return new OperResult<string>(ex);
+            return EasyValueTask.FromResult(new OperResult<ReadOnlyMemory<byte>>(ex));
         }
     }
 
@@ -217,7 +217,7 @@ public class Dlt645_2007Master : DtuServiceDeviceBase
         }
         catch (Exception ex)
         {
-            return new OperResult<byte[]>(ex);
+            return new OperResult(ex);
         }
     }
 
@@ -253,7 +253,7 @@ public class Dlt645_2007Master : DtuServiceDeviceBase
         }
         catch (Exception ex)
         {
-            return new OperResult<byte[]>(ex);
+            return new OperResult(ex);
         }
     }
 
@@ -291,7 +291,7 @@ public class Dlt645_2007Master : DtuServiceDeviceBase
     /// <param name="station">表号</param>
     /// <param name="cancellationToken">取消令箭</param>
     /// <returns></returns>
-    public async ValueTask<OperResult> WriteBaudRateAsync(int baudRate, string station = null, CancellationToken cancellationToken = default)
+    public ValueTask<OperResult<ReadOnlyMemory<byte>>> WriteBaudRateAsync(int baudRate, string station = null, CancellationToken cancellationToken = default)
     {
         try
         {
@@ -304,18 +304,18 @@ public class Dlt645_2007Master : DtuServiceDeviceBase
                 case 4800: baudRateByte = 0x10; break;
                 case 9600: baudRateByte = 0x20; break;
                 case 19200: baudRateByte = 0x40; break;
-                default: return new OperResult<string>(string.Format(AppResource.BaudRateError, baudRate));
+                default: return EasyValueTask.FromResult(new OperResult<ReadOnlyMemory<byte>>(string.Format(AppResource.BaudRateError, baudRate)));
             }
 
             Dlt645_2007Address dAddress = new();
             dAddress.SetStation(station ?? Station);
             dAddress.DataId = new byte[] { baudRateByte };
 
-            return await Dlt645RequestAsync(dAddress, ControlCode.ReadStation, FEHead, cancellationToken: cancellationToken).ConfigureAwait(false);
+            return Dlt645RequestAsync(dAddress, ControlCode.ReadStation, FEHead, cancellationToken: cancellationToken);
         }
         catch (Exception ex)
         {
-            return new OperResult<string>(ex);
+            return EasyValueTask.FromResult(new OperResult<ReadOnlyMemory<byte>>(ex));
         }
     }
 
@@ -338,7 +338,7 @@ public class Dlt645_2007Master : DtuServiceDeviceBase
         }
         catch (Exception ex)
         {
-            return new OperResult<string>(ex);
+            return new OperResult(ex);
         }
     }
 
@@ -351,7 +351,7 @@ public class Dlt645_2007Master : DtuServiceDeviceBase
     /// <param name="station">station</param>
     /// <param name="cancellationToken">取消令箭</param>
     /// <returns></returns>
-    public async ValueTask<OperResult> WritePasswordAsync(byte level, string oldPassword, string newPassword, string station = null, CancellationToken cancellationToken = default)
+    public ValueTask<OperResult<ReadOnlyMemory<byte>>> WritePasswordAsync(byte level, string oldPassword, string newPassword, string station = null, CancellationToken cancellationToken = default)
     {
         try
         {
@@ -371,11 +371,11 @@ public class Dlt645_2007Master : DtuServiceDeviceBase
             dAddress.Station = "AAAAAAAAAAAA".HexStringToBytes();
             dAddress.DataId = bytes;
 
-            return await Dlt645RequestAsync(dAddress, ControlCode.WritePassword, FEHead, cancellationToken: cancellationToken).ConfigureAwait(false);
+            return Dlt645RequestAsync(dAddress, ControlCode.WritePassword, FEHead, cancellationToken: cancellationToken);
         }
         catch (Exception ex)
         {
-            return new OperResult<string>(ex);
+            return EasyValueTask.FromResult(new OperResult<ReadOnlyMemory<byte>>(ex));
         }
     }
 

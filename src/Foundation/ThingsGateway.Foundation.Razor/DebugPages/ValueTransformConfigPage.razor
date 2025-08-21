@@ -1,9 +1,5 @@
-﻿@namespace ThingsGateway.Gateway.Razor
-@using ThingsGateway.Admin.Application
-@using ThingsGateway.Admin.Razor
+﻿@namespace ThingsGateway.Debug
 @using ThingsGateway.Foundation
-@using ThingsGateway.Gateway.Application
-@inherits ComponentDefault
 
 <ValidateForm class="p-4 h-100" Model="@ValueTransformConfig" OnValidSubmit="OnSave">
     <EditorForm AutoGenerateAllItem="false" RowType=RowType.Inline ItemsPerRow=1 LabelWidth=150 Model="ValueTransformConfig">

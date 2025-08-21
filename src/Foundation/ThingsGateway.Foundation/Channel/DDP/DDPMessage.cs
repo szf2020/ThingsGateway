@@ -8,6 +8,8 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
+using System.Buffers;
+
 namespace ThingsGateway.Foundation;
 
 /// <summary>
@@ -16,12 +18,12 @@ namespace ThingsGateway.Foundation;
 public abstract class DDPMessage : MessageBase, IResultMessage
 {
     /// <inheritdoc/>
-    public override int HeaderLength => 4;
+    public override long HeaderLength => 4;
     public byte Type = 0;
     public string Id;
     public override FilterResult CheckBody<TByteBlock>(ref TByteBlock byteBlock)
     {
-        Id = byteBlock.ToString(byteBlock.Position, 11).Replace("\0", "");
+        Id = byteBlock.ToString(byteBlock.BytesRead, 11).Replace("\0", "");
         OperCode = 0;
 
         Content = GetContent(ref byteBlock);
@@ -44,31 +46,31 @@ public abstract class DDPMessage : MessageBase, IResultMessage
         }
     }
 
-    public abstract int GetBodyLength<TByteBlock>(ref TByteBlock byteBlock) where TByteBlock : IByteBlockReader;
-    public abstract byte[] GetContent<TByteBlock>(ref TByteBlock byteBlock) where TByteBlock : IByteBlockReader;
+    public abstract long GetBodyLength<TByteBlock>(ref TByteBlock byteBlock) where TByteBlock : IBytesReader;
+    public abstract byte[] GetContent<TByteBlock>(ref TByteBlock byteBlock) where TByteBlock : IBytesReader;
 }
 
 public class DDPTcpMessage : DDPMessage
 {
-    public override int GetBodyLength<TByteBlock>(ref TByteBlock byteBlock)
+    public override long GetBodyLength<TByteBlock>(ref TByteBlock byteBlock)
     {
         return ReaderExtension.ReadValue<TByteBlock, ushort>(ref byteBlock, EndianType.Big) - 4;
     }
 
     public override byte[] GetContent<TByteBlock>(ref TByteBlock byteBlock)
     {
-        return byteBlock.Span.Slice(byteBlock.Position + 11, BodyLength - 12).ToArray();
+        return byteBlock.TotalSequence.Slice(byteBlock.BytesRead + 11, BodyLength - 12).ToArray();
     }
 }
 
 public class DDPUdpMessage : DDPMessage
 {
-    public override int GetBodyLength<TByteBlock>(ref TByteBlock byteBlock)
+    public override long GetBodyLength<TByteBlock>(ref TByteBlock byteBlock)
     {
-        return byteBlock.Length - 4;
+        return (byteBlock.BytesRead + byteBlock.BytesRemaining - 4);
     }
     public override byte[] GetContent<TByteBlock>(ref TByteBlock byteBlock)
     {
-        return byteBlock.Span.Slice(byteBlock.Position + 12, BodyLength - 12).ToArray();
+        return byteBlock.TotalSequence.Slice(byteBlock.BytesRead + 12, BodyLength - 12).ToArray();
     }
 }

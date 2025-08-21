@@ -11,6 +11,10 @@
 
 using Newtonsoft.Json.Linq;
 
+using System.Text;
+
+using TouchSocket.Core;
+
 using Size = BootstrapBlazor.Components.Size;
 
 namespace ThingsGateway.Gateway.Razor
@@ -39,18 +43,30 @@ namespace ThingsGateway.Gateway.Razor
     {
         {nameof(ScriptEdit.OnCheckScript),  new Func<string,Task<string>>(async a=>{
             if(Node is IConditionNode conditionNode)
-          return  (await conditionNode.ExecuteAsync(new NodeInput(){Value=a==null?a:JToken.Parse(a??string.Empty) },default).ConfigureAwait(false)).ToString();
+            {
+                StringBuilder stringBuilder=new();
+                conditionNode.Logger=new EasyLogger((a)=>stringBuilder.AppendLine(a));
+                var out1=  (await conditionNode.ExecuteAsync(new NodeInput(){Value=a==null?a:JToken.Parse(a??string.Empty) },default).ConfigureAwait(false)).ToString();
+                stringBuilder.AppendLine(out1);
+                return stringBuilder.ToString();
+            }
              if(Node is IExpressionNode expressionNode)
             {
+                StringBuilder stringBuilder=new();
+                expressionNode.Logger=new EasyLogger((a)=>stringBuilder.AppendLine(a));
                 var data=await expressionNode.ExecuteAsync(new NodeInput(){Value=a==null?a:JToken.Parse(a??string.Empty) },default).ConfigureAwait(false);
 
-               return  data.IsSuccess? data.Content.JToken?.ToString()??string.Empty: data.ToString();
+                stringBuilder.AppendLine( data.IsSuccess? data.Content.JToken?.ToString()??string.Empty: data.ToString());
+                return stringBuilder.ToString();
             }
              if(Node is IActuatorNode actuatorNode)
             {
-                                var data=await actuatorNode.ExecuteAsync(new NodeInput(){Value=a==null?a:JToken.Parse(a??string.Empty) },default).ConfigureAwait(false);
+                StringBuilder stringBuilder=new();
+                actuatorNode.Logger=new EasyLogger((a)=>stringBuilder.AppendLine(a));
+                var data=await actuatorNode.ExecuteAsync(new NodeInput(){Value=a==null?a:JToken.Parse(a??string.Empty) },default).ConfigureAwait(false);
 
-               return  data.IsSuccess? data.Content.JToken?.ToString()??string.Empty: data.ToString();
+                stringBuilder.AppendLine( data.IsSuccess? data.Content.JToken?.ToString()??string.Empty: data.ToString());
+                return stringBuilder.ToString();
             }
         return string.Empty;
         }) },

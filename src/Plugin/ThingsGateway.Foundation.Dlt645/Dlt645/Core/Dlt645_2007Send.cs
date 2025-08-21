@@ -113,7 +113,7 @@ public class Dlt645_2007Send : ISendMessage
     public int Sign { get; set; }
     internal Dlt645_2007Address Dlt645_2007Address { get; }
 
-    public void Build<TByteBlock>(ref TByteBlock byteBlock) where TByteBlock : IByteBlockWriter
+    public void Build<TByteBlock>(ref TByteBlock byteBlock) where TByteBlock : IBytesWriter
     {
         if (Dlt645_2007Address?.DataId.Length < 4)
         {
@@ -124,16 +124,17 @@ public class Dlt645_2007Send : ISendMessage
             byteBlock.Write(Fehead.Span);//帧起始符
             SendHeadCodeIndex = Fehead.Length;
         }
+        var span = byteBlock.GetSpan(256);
 
         WriterExtension.WriteValue(ref byteBlock, (byte)0x68);//帧起始符
         byteBlock.Write(Dlt645_2007Address.Station.Span);//6个字节地址域
         WriterExtension.WriteValue(ref byteBlock, (byte)0x68);//帧起始符
         WriterExtension.WriteValue(ref byteBlock, (byte)ControlCode);//控制码
 
-        WriterExtension.WriteValue(ref byteBlock, (byte)(Dlt645_2007Address.DataId.Length));//数据域长度
-        byteBlock.Write(Dlt645_2007Address.DataId.Span);//数据域标识DI3、DI2、DI1、DI0
+        var writerLenAnchor = new WriterAnchor<TByteBlock>(ref byteBlock, 1);
+        byteBlock.Write(Dlt645_2007Address.DataId.Span.BytesAdd(0x33));//数据域标识DI3、DI2、DI1、DI0
 
-        byteBlock.Write(Codes.Span);
+        byteBlock.Write(Codes.Span.BytesAdd(0x33));
 
         if (Datas.Length > 0)
         {
@@ -180,18 +181,15 @@ public class Dlt645_2007Send : ISendMessage
                     }
                 }
 
-                byteBlock.Write(data);
+                byteBlock.Write(data.BytesAdd(0x33));
             }
         }
 
-        ByteBlockExtension.WriteBackValue(ref byteBlock, (byte)(byteBlock.Length - 10 - Fehead.Length), Fehead.Length + 9);//数据域长度
-
-        for (int index = Fehead.Length + 10; index < byteBlock.Length; ++index)
-            ByteBlockExtension.WriteBackAddValue(ref byteBlock, (byte)0x33, index);//传输时发送方按字节进行加33H处理，接收方按字节进行减33H处理
+        var lenSpan = writerLenAnchor.Rewind(ref byteBlock, out var length);
+        lenSpan.WriteValue<byte>((byte)(length - 1));//数据域长度
 
         int num = 0;
-        var span = byteBlock.Span;
-        for (int index = Fehead.Length; index < byteBlock.Length; ++index)
+        for (int index = 0; index < byteBlock.WrittenCount; ++index)
             num += span[index];
         WriterExtension.WriteValue(ref byteBlock, (byte)num);//校验码,总加和
         WriterExtension.WriteValue(ref byteBlock, (byte)0x16);//结束符

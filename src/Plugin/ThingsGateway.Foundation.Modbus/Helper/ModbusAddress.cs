@@ -27,7 +27,8 @@ public class ModbusAddress : ModbusRequest
     public ModbusAddress(ModbusRequest modbusAddress)
     {
         StartAddress = modbusAddress.StartAddress;
-        Data = modbusAddress.Data;
+        MasterWriteDatas = modbusAddress.MasterWriteDatas;
+        SlaveWriteDatas = modbusAddress.SlaveWriteDatas;
         FunctionCode = modbusAddress.FunctionCode;
         Length = modbusAddress.Length;
         Station = modbusAddress.Station;
@@ -37,7 +38,8 @@ public class ModbusAddress : ModbusRequest
     public ModbusAddress(ModbusAddress modbusAddress)
     {
         StartAddress = modbusAddress.StartAddress;
-        Data = modbusAddress.Data;
+        MasterWriteDatas = modbusAddress.MasterWriteDatas;
+        SlaveWriteDatas = modbusAddress.SlaveWriteDatas;
         FunctionCode = modbusAddress.FunctionCode;
         Length = modbusAddress.Length;
         BitIndex = modbusAddress.BitIndex;

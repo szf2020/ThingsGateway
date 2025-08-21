@@ -59,19 +59,18 @@ public class DtuPlugin : PluginBase, ITcpReceivingPlugin
     public bool DtuIdHex { get; set; }
 
     /// <inheritdoc/>
-    public async Task OnTcpReceiving(ITcpSession client, ByteBlockEventArgs e)
+    public async Task OnTcpReceiving(ITcpSession client, BytesReaderEventArgs e)
     {
         var len = HeartbeatByte.Length;
         if (client is TcpSessionClientChannel socket && socket.Service is ITcpServiceChannel tcpServiceChannel)
         {
             if (!socket.Id.StartsWith("ID="))
             {
-                var id = DtuIdHex ? $"ID={e.ByteBlock.Span.ToHexString()}" : $"ID={e.ByteBlock.ToString(0, e.ByteBlock.Length)}";
+                var id = DtuIdHex ? $"ID={e.Reader.ToHexString()}" : $"ID={e.Reader.ToString()}";
                 if (tcpServiceChannel.TryGetClient(id, out var oldClient))
                 {
                     try
                     {
-                        //await oldClient.ShutdownAsync(System.Net.Sockets.SocketShutdown.Both).ConfigureAwait(false);
                         await oldClient.CloseAsync().ConfigureAwait(false);
                         oldClient.Dispose();
                     }
@@ -79,7 +78,7 @@ public class DtuPlugin : PluginBase, ITcpReceivingPlugin
                     {
                     }
                 }
-                await socket.ResetIdAsync(id).ConfigureAwait(false);
+                await socket.ResetIdAsync(id, client.ClosedToken).ConfigureAwait(false);
                 client.Logger?.Info(string.Format(AppResource.DtuConnected, id));
                 e.Handled = true;
             }
@@ -88,7 +87,6 @@ public class DtuPlugin : PluginBase, ITcpReceivingPlugin
             {
                 try
                 {
-                    //await socket.ShutdownAsync(System.Net.Sockets.SocketShutdown.Both).ConfigureAwait(false);
                     await socket.CloseAsync().ConfigureAwait(false);
                     socket.Dispose();
                 }
@@ -102,11 +100,11 @@ public class DtuPlugin : PluginBase, ITcpReceivingPlugin
 
             if (len > 0)
             {
-                if (HeartbeatByte.Span.SequenceEqual(e.ByteBlock.Memory.Slice(0, len).Span))
+                if (HeartbeatByte.Span.SequenceEqual(e.Reader.TotalSequence.Slice(0, len).First.Span))
                 {
                     if (DateTimeOffset.Now - socket.LastSentTime < TimeSpan.FromMilliseconds(200))
                     {
-                        await Task.Delay(200).ConfigureAwait(false);
+                        await Task.Delay(200, client.ClosedToken).ConfigureAwait(false);
                     }
                     //回应心跳包
                     await socket.SendAsync(HeartbeatByte, socket.ClosedToken).ConfigureAwait(false);
@@ -118,4 +116,6 @@ public class DtuPlugin : PluginBase, ITcpReceivingPlugin
         }
         await e.InvokeNext().ConfigureAwait(false);//如果本插件无法处理当前数据，请将数据转至下一个插件。
     }
+
+
 }

@@ -16,8 +16,10 @@ namespace ThingsGateway.Foundation;
 /// <summary>
 /// UDP适配器基类
 /// </summary>
-public class DeviceUdpDataHandleAdapter<TRequest> : UdpDataHandlingAdapter where TRequest : MessageBase, new()
+public class DeviceUdpDataHandleAdapter<TRequest> : UdpDataHandlingAdapter, IDeviceDataHandleAdapter where TRequest : MessageBase, new()
 {
+    public new ILog Logger { get; set; }
+
     /// <inheritdoc/>
     public override bool CanSendRequestInfo => true;
 
@@ -34,11 +36,11 @@ public class DeviceUdpDataHandleAdapter<TRequest> : UdpDataHandlingAdapter where
     public TRequest Request { get; set; }
 
     /// <inheritdoc />
-    public void SetRequest(ISendMessage sendMessage, ref ValueByteBlock byteBlock)
+    public void SetRequest(ISendMessage sendMessage)
     {
         var request = GetInstance();
         request.Sign = sendMessage.Sign;
-        request.SendInfo(sendMessage, ref byteBlock);
+        request.SendInfo(sendMessage);
         Request = request;
     }
 
@@ -57,113 +59,132 @@ public class DeviceUdpDataHandleAdapter<TRequest> : UdpDataHandlingAdapter where
         return new TRequest() { OperCode = -1, Sign = -1 };
     }
 
-    /// <inheritdoc/>
-    protected override async Task PreviewReceived(EndPoint remoteEndPoint, IByteBlockReader byteBlock)
+
+    #region ParseRequest
+    /// <summary>
+    /// 尝试从字节读取器中解析出请求信息。
+    /// </summary>
+    /// <param name="remoteEndPoint">remoteEndPoint。</param>
+    /// <param name="memory">memory。</param>
+    /// <param name="request">解析出的请求信息。</param>
+    /// <returns>解析成功返回 true，否则返回 false。</returns>
+    public bool TryParseRequest(EndPoint remoteEndPoint, ReadOnlyMemory<byte> memory, out TRequest request)
     {
+        return this.ParseRequestCore(remoteEndPoint, memory, out request);
+    }
+
+    protected virtual bool ParseRequestCore(EndPoint remoteEndPoint, ReadOnlyMemory<byte> memory, out TRequest request1)
+    {
+        request1 = null;
         try
         {
-            byteBlock.Position = 0;
-
             if (Logger?.LogLevel <= LogLevel.Trace)
-                Logger?.Trace($"{remoteEndPoint}- Receive:{(IsHexLog ? byteBlock.AsSegmentTake().ToHexString(' ') : byteBlock.ToString(byteBlock.Position))}");
+                Logger?.Trace($"{remoteEndPoint}- Receive:{(IsHexLog ? memory.Span.ToHexString(' ') : memory.Span.ToString(Encoding.UTF8))}");
 
             TRequest request = null;
             if (IsSingleThread)
-                request = Request == null ? GetInstance() : Request;
+                request = Request == null ? Request = GetInstance() : Request;
             else
             {
                 request = GetInstance();
             }
+            request1 = request;
 
-            var pos = byteBlock.Position;
+            var byteBlock = new ByteBlockReader(memory);
+            byteBlock.BytesRead = 0;
+
+            var pos = byteBlock.BytesRead;
 
             if (request.HeaderLength > byteBlock.CanReadLength)
             {
-                return;//当头部都无法解析时，直接缓存
+                return false;//当头部都无法解析时，直接缓存
             }
 
             //检查头部合法性
             if (request.CheckHead(ref byteBlock))
             {
-                byteBlock.Position = pos;
+                byteBlock.BytesRead = pos;
 
                 if (request.BodyLength > MaxPackageSize)
                 {
-                    OnError(default, $"Received BodyLength={request.BodyLength}, greater than the set MaxPackageSize={MaxPackageSize}", true, true);
-                    return;
+                    request.OperCode = -1;
+                    request.ErrorMessage = $"Received BodyLength={request.BodyLength}, greater than the set MaxPackageSize={MaxPackageSize}";
+                    Reset();
+                    Logger?.LogWarning($"{ToString()} {request.ErrorMessage}");
+                    return false;
                 }
                 if (request.BodyLength + request.HeaderLength > byteBlock.CanReadLength)
                 {
-                    //body不满足解析，开始缓存，然后保存对象
-                    return;
+                    return false;
                 }
-                //if (request.BodyLength <= 0)
-                //{
-                //    //如果body长度无法确定，直接读取全部
-                //    request.BodyLength = byteBlock.Length;
-                //}
+
                 var headPos = pos + request.HeaderLength;
-                byteBlock.Position = headPos;
+                byteBlock.BytesRead = headPos;
                 var result = request.CheckBody(ref byteBlock);
                 if (result == FilterResult.Cache)
                 {
                     if (Logger?.LogLevel <= LogLevel.Trace)
-                        Logger?.Trace($"{ToString()}-Received incomplete, cached message, current length:{byteBlock.Length}  {request?.ErrorMessage}");
+                        Logger?.Trace($"{ToString()}-Received incomplete, cached message, need length:{request.HeaderLength + request.BodyLength} ,current length:{byteBlock.BytesRead + byteBlock.BytesRemaining}  {request?.ErrorMessage}");
                     request.OperCode = -1;
                 }
                 else if (result == FilterResult.GoOn)
                 {
-                    var addLen = request.HeaderLength + request.BodyLength;
-                    byteBlock.Position = pos + (addLen > 0 ? addLen : 1);
-                    Logger?.Trace($"{ToString()}-{request?.ToString()}");
+                    if (Logger?.LogLevel <= LogLevel.Trace)
+                        Logger?.Trace($"{ToString()}-{request?.ToString()}");
                     request.OperCode = -1;
-                    if ((Owner as IClientChannel)?.WaitHandlePool?.TryGetDataAsync(request.Sign, out var waitDataAsync) == true)
-                    {
-                        waitDataAsync.SetResult(request);
-                    }
                 }
                 else if (result == FilterResult.Success)
                 {
-                    var addLen = request.HeaderLength + request.BodyLength;
-                    byteBlock.Position = pos + (addLen > 0 ? addLen : 1);
-                    await GoReceived(remoteEndPoint, null, request).ConfigureAwait(false);
+                    request1 = request;
+                    return true;
                 }
-                return;
             }
             else
             {
-                byteBlock.Position = pos + 1;
                 request.OperCode = -1;
-                return;
+                return false;
             }
+            return false;
         }
         catch (Exception ex)
         {
             Logger?.LogWarning(ex, $"{ToString()} Received parsing error");
-            byteBlock.Position = byteBlock.Length;//移动游标
-            return;
+            return false;
         }
     }
 
+    #endregion
+
     /// <inheritdoc/>
-    protected override async Task PreviewSendAsync(EndPoint endPoint, ReadOnlyMemory<byte> memory, CancellationToken cancellationToken)
+    protected override Task PreviewReceivedAsync(EndPoint remoteEndPoint, ReadOnlyMemory<byte> memory)
+    {
+        if (ParseRequestCore(remoteEndPoint, memory, out var request))
+        {
+            return GoReceived(remoteEndPoint, null, request);
+        }
+        return EasyTask.CompletedTask;
+    }
+
+    /// <inheritdoc/>
+    protected override Task PreviewSendAsync(EndPoint endPoint, ReadOnlyMemory<byte> memory, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
 
         if (Logger?.LogLevel <= LogLevel.Trace)
             Logger?.Trace($"{ToString()}- Send:{(IsHexLog ? memory.Span.ToHexString(' ') : (memory.Span.ToString(Encoding.UTF8)))}");
         //发送
-        await GoSendAsync(endPoint, memory, cancellationToken).ConfigureAwait(false);
+        return GoSendAsync(endPoint, memory, cancellationToken);
     }
 
     /// <inheritdoc/>
-    protected override async Task PreviewSendAsync(EndPoint endPoint, IRequestInfo requestInfo, CancellationToken cancellationToken)
+    protected override Task PreviewSendAsync(EndPoint endPoint, IRequestInfo requestInfo, CancellationToken cancellationToken)
     {
         if (!(requestInfo is ISendMessage sendMessage))
         {
             throw new Exception($"Unable to convert {nameof(requestInfo)} to {nameof(ISendMessage)}");
         }
         cancellationToken.ThrowIfCancellationRequested();
+
         var byteBlock = new ValueByteBlock(sendMessage.MaxLength);
         try
         {
@@ -173,9 +194,9 @@ public class DeviceUdpDataHandleAdapter<TRequest> : UdpDataHandlingAdapter where
 
             if (IsSingleThread)
             {
-                SetRequest(sendMessage, ref byteBlock);
+                SetRequest(sendMessage);
             }
-            await GoSendAsync(endPoint, byteBlock.Memory, cancellationToken).ConfigureAwait(false);
+            return GoSendAsync(endPoint, byteBlock.Memory, cancellationToken);
         }
         finally
         {

@@ -8,6 +8,7 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
+using System.Buffers;
 using System.Collections.Concurrent;
 
 using TouchSocket.Sockets;
@@ -298,26 +299,29 @@ public class ModbusSlave : DeviceBase, IModbusAddress
                     {
                         case 2:
                             ModbusServer02ByteBlock.Position = mAddress.StartAddress;
-                            ModbusServer02ByteBlock.Write(mAddress.Data.Span);
+                            ByteBlockExtension.Write(ref ModbusServer02ByteBlock, mAddress.SlaveWriteDatas);
                             return new();
 
                         case 1:
                         case 5:
                         case 15:
                             ModbusServer01ByteBlock.Position = mAddress.StartAddress;
-                            ModbusServer01ByteBlock.Write(mAddress.Data.Span);
+                            ByteBlockExtension.Write(ref ModbusServer01ByteBlock, mAddress.SlaveWriteDatas);
+
                             return new();
 
                         case 4:
                             ModbusServer04ByteBlock.Position = mAddress.StartAddress * RegisterByteLength;
-                            ModbusServer04ByteBlock.Write(mAddress.Data.Span);
+                            ByteBlockExtension.Write(ref ModbusServer04ByteBlock, mAddress.SlaveWriteDatas);
+
                             return new();
 
                         case 3:
                         case 6:
                         case 16:
                             ModbusServer03ByteBlock.Position = mAddress.StartAddress * RegisterByteLength;
-                            ModbusServer03ByteBlock.Write(mAddress.Data.Span);
+                            ByteBlockExtension.Write(ref ModbusServer03ByteBlock, mAddress.SlaveWriteDatas);
+
                             return new();
                     }
                 }
@@ -386,7 +390,7 @@ public class ModbusSlave : DeviceBase, IModbusAddress
         {
             await EasyValueTask.CompletedTask.ConfigureAwait(false);
             var mAddress = GetModbusAddress(address, Station);
-            mAddress.Data = value;
+            mAddress.SlaveWriteDatas = new(value);
             return ModbusRequest(mAddress, false, cancellationToken);
         }
         catch (Exception ex)
@@ -404,7 +408,7 @@ public class ModbusSlave : DeviceBase, IModbusAddress
             var mAddress = GetModbusAddress(address, Station);
             if (mAddress.IsBitFunction)
             {
-                mAddress.Data = value.Span.BoolToByte();
+                mAddress.SlaveWriteDatas = new(value.Span.BoolToByte());
                 ModbusRequest(mAddress, false, cancellationToken);
                 return OperResult.Success;
             }
@@ -421,7 +425,7 @@ public class ModbusSlave : DeviceBase, IModbusAddress
                     {
                         writeData = writeData.SetBit(mAddress.BitIndex.Value + i, span[i]);
                     }
-                    mAddress.Data = ThingsGatewayBitConverter.GetBytes(writeData);
+                    mAddress.SlaveWriteDatas = new(ThingsGatewayBitConverter.GetBytes(writeData));
                     ModbusRequest(mAddress, false, cancellationToken);
                     return OperResult.Success;
                 }
@@ -443,7 +447,7 @@ public class ModbusSlave : DeviceBase, IModbusAddress
         var requestInfo = e.RequestInfo;
         bool modbusRtu = false;
         ModbusRequest modbusRequest = default;
-        ReadOnlyMemory<byte> Bytes = default;
+        ReadOnlySequence<byte> readOnlySequences = default;
         //接收外部报文
         if (requestInfo is ModbusRtuSlaveMessage modbusRtuSlaveMessage)
         {
@@ -452,7 +456,7 @@ public class ModbusSlave : DeviceBase, IModbusAddress
                 return;
             }
             modbusRequest = modbusRtuSlaveMessage.Request;
-            Bytes = modbusRtuSlaveMessage.Bytes;
+            readOnlySequences = modbusRtuSlaveMessage.Sequences;
             modbusRtu = true;
         }
         else if (requestInfo is ModbusTcpSlaveMessage modbusTcpSlaveMessage)
@@ -462,7 +466,7 @@ public class ModbusSlave : DeviceBase, IModbusAddress
                 return;
             }
             modbusRequest = modbusTcpSlaveMessage.Request;
-            Bytes = modbusTcpSlaveMessage.Bytes;
+            readOnlySequences = modbusTcpSlaveMessage.Sequences;
             modbusRtu = false;
         }
         else
@@ -486,7 +490,7 @@ public class ModbusSlave : DeviceBase, IModbusAddress
                 {
                     if (modbusRtu)
                     {
-                        byteBlock.Write(Bytes.Slice(0, 2).Span);
+                        ByteBlockExtension.Write(ref byteBlock, readOnlySequences.Slice(0, 2));
                         if (modbusRequest.IsBitFunction)
                         {
                             var bitdata = data.Content.Span.ByteToBool().AsSpan().BoolArrayToByte();
@@ -504,7 +508,7 @@ public class ModbusSlave : DeviceBase, IModbusAddress
                     }
                     else
                     {
-                        byteBlock.Write(Bytes.Slice(0, 8).Span);
+                        ByteBlockExtension.Write(ref byteBlock, readOnlySequences.Slice(0, 8));
                         if (modbusRequest.IsBitFunction)
                         {
                             var bitdata = data.Content.Span.ByteToBool().AsSpan().BoolArrayToByte();
@@ -517,13 +521,13 @@ public class ModbusSlave : DeviceBase, IModbusAddress
                             WriterExtension.WriteValue(ref byteBlock, (byte)data.Content.Length);
                             byteBlock.Write(data.Content.Span);
                         }
-                        ByteBlockExtension.WriteBackValue(ref byteBlock, (byte)(byteBlock.Length - 6), 5);
+                        ByteBlockExtension.WriteBackValue(ref byteBlock, (byte)(byteBlock.Length - 6), EndianType.Big, 5);
                         await ReturnData(client, byteBlock.Memory, e).ConfigureAwait(false);
                     }
                 }
                 catch
                 {
-                    await WriteError(modbusRtu, client, Bytes, e).ConfigureAwait(false);
+                    await WriteError(modbusRtu, client, readOnlySequences, e).ConfigureAwait(false);
                 }
                 finally
                 {
@@ -532,7 +536,7 @@ public class ModbusSlave : DeviceBase, IModbusAddress
             }
             else
             {
-                await WriteError(modbusRtu, client, Bytes, e).ConfigureAwait(false);//返回错误码
+                await WriteError(modbusRtu, client, readOnlySequences, e).ConfigureAwait(false);//返回错误码
             }
         }
         else//写入
@@ -546,21 +550,21 @@ public class ModbusSlave : DeviceBase, IModbusAddress
                     // 接收外部写入时，传出变量地址/写入字节组/转换规则/客户端
                     if ((await WriteData(modbusAddress, ThingsGatewayBitConverter, client).ConfigureAwait(false)).IsSuccess)
                     {
-                        await WriteSuccess(modbusRtu, client, Bytes, e).ConfigureAwait(false);
+                        await WriteSuccess(modbusRtu, client, readOnlySequences, e).ConfigureAwait(false);
                         if (IsWriteMemory)
                         {
                             var result = ModbusRequest(modbusRequest, false);
                             if (result.IsSuccess)
-                                await WriteSuccess(modbusRtu, client, Bytes, e).ConfigureAwait(false);
+                                await WriteSuccess(modbusRtu, client, readOnlySequences, e).ConfigureAwait(false);
                             else
-                                await WriteError(modbusRtu, client, Bytes, e).ConfigureAwait(false);
+                                await WriteError(modbusRtu, client, readOnlySequences, e).ConfigureAwait(false);
                         }
                         else
-                            await WriteSuccess(modbusRtu, client, Bytes, e).ConfigureAwait(false);
+                            await WriteSuccess(modbusRtu, client, readOnlySequences, e).ConfigureAwait(false);
                     }
                     else
                     {
-                        await WriteError(modbusRtu, client, Bytes, e).ConfigureAwait(false);
+                        await WriteError(modbusRtu, client, readOnlySequences, e).ConfigureAwait(false);
                     }
                 }
                 else
@@ -569,11 +573,11 @@ public class ModbusSlave : DeviceBase, IModbusAddress
                     var result = ModbusRequest(modbusRequest, false);
                     if (result.IsSuccess)
                     {
-                        await WriteSuccess(modbusRtu, client, Bytes, e).ConfigureAwait(false);
+                        await WriteSuccess(modbusRtu, client, readOnlySequences, e).ConfigureAwait(false);
                     }
                     else
                     {
-                        await WriteError(modbusRtu, client, Bytes, e).ConfigureAwait(false);
+                        await WriteError(modbusRtu, client, readOnlySequences, e).ConfigureAwait(false);
                     }
                 }
             }
@@ -589,16 +593,16 @@ public class ModbusSlave : DeviceBase, IModbusAddress
                         {
                             var result = ModbusRequest(modbusRequest, false);
                             if (result.IsSuccess)
-                                await WriteSuccess(modbusRtu, client, Bytes, e).ConfigureAwait(false);
+                                await WriteSuccess(modbusRtu, client, readOnlySequences, e).ConfigureAwait(false);
                             else
-                                await WriteError(modbusRtu, client, Bytes, e).ConfigureAwait(false);
+                                await WriteError(modbusRtu, client, readOnlySequences, e).ConfigureAwait(false);
                         }
                         else
-                            await WriteSuccess(modbusRtu, client, Bytes, e).ConfigureAwait(false);
+                            await WriteSuccess(modbusRtu, client, readOnlySequences, e).ConfigureAwait(false);
                     }
                     else
                     {
-                        await WriteError(modbusRtu, client, Bytes, e).ConfigureAwait(false);
+                        await WriteError(modbusRtu, client, readOnlySequences, e).ConfigureAwait(false);
                     }
                 }
                 else
@@ -606,11 +610,11 @@ public class ModbusSlave : DeviceBase, IModbusAddress
                     var result = ModbusRequest(modbusRequest, false);
                     if (result.IsSuccess)
                     {
-                        await WriteSuccess(modbusRtu, client, Bytes, e).ConfigureAwait(false);
+                        await WriteSuccess(modbusRtu, client, readOnlySequences, e).ConfigureAwait(false);
                     }
                     else
                     {
-                        await WriteError(modbusRtu, client, Bytes, e).ConfigureAwait(false);
+                        await WriteError(modbusRtu, client, readOnlySequences, e).ConfigureAwait(false);
                     }
                 }
             }
@@ -627,24 +631,24 @@ public class ModbusSlave : DeviceBase, IModbusAddress
             await client.SendAsync(sendData, client.ClosedToken).ConfigureAwait(false);
     }
 
-    private async Task WriteError(bool modbusRtu, IClientChannel client, ReadOnlyMemory<byte> bytes, ReceivedDataEventArgs e)
+    private async Task WriteError(bool modbusRtu, IClientChannel client, ReadOnlySequence<byte> bytes, ReceivedDataEventArgs e)
     {
         ValueByteBlock byteBlock = new(20);
         try
         {
             if (modbusRtu)
             {
-                byteBlock.Write(bytes.Slice(0, 2).Span);
+                ByteBlockExtension.Write(ref byteBlock, bytes.Slice(0, 2));
                 WriterExtension.WriteValue(ref byteBlock, (byte)1);
                 byteBlock.Write(CRC16Utils.Crc16Only(byteBlock.Span));
-                ByteBlockExtension.WriteBackValue(ref byteBlock, (byte)(byteBlock.Span[1] + 128), 1);
+                ByteBlockExtension.WriteBackValue(ref byteBlock, (byte)(byteBlock.Span[1] + 128), EndianType.Big, 1);
             }
             else
             {
-                byteBlock.Write(bytes.Slice(0, 8).Span);
+                ByteBlockExtension.Write(ref byteBlock, bytes.Slice(0, 8));
                 WriterExtension.WriteValue(ref byteBlock, (byte)1);
-                ByteBlockExtension.WriteBackValue(ref byteBlock, (byte)(byteBlock.Length - 6), 5);
-                ByteBlockExtension.WriteBackValue(ref byteBlock, (byte)(byteBlock.Span[7] + 128), 7);
+                ByteBlockExtension.WriteBackValue(ref byteBlock, (byte)(byteBlock.Length - 6), EndianType.Big, 5);
+                ByteBlockExtension.WriteBackValue(ref byteBlock, (byte)(byteBlock.Span[7] + 128), EndianType.Big, 7);
             }
             await ReturnData(client, byteBlock.Memory, e).ConfigureAwait(false);
         }
@@ -654,20 +658,20 @@ public class ModbusSlave : DeviceBase, IModbusAddress
         }
     }
 
-    private async Task WriteSuccess(bool modbusRtu, IClientChannel client, ReadOnlyMemory<byte> bytes, ReceivedDataEventArgs e)
+    private async Task WriteSuccess(bool modbusRtu, IClientChannel client, ReadOnlySequence<byte> bytes, ReceivedDataEventArgs e)
     {
         ValueByteBlock byteBlock = new(20);
         try
         {
             if (modbusRtu)
             {
-                byteBlock.Write(bytes.Slice(0, 6).Span);
+                ByteBlockExtension.Write(ref byteBlock, bytes.Slice(0, 6));
                 byteBlock.Write(CRC16Utils.Crc16Only(byteBlock.Span));
             }
             else
             {
-                byteBlock.Write(bytes.Slice(0, 12).Span);
-                ByteBlockExtension.WriteBackValue(ref byteBlock, (byte)(byteBlock.Length - 6), 5);
+                ByteBlockExtension.Write(ref byteBlock, bytes.Slice(0, 12));
+                ByteBlockExtension.WriteBackValue(ref byteBlock, (byte)(byteBlock.Length - 6), EndianType.Big, 5);
             }
             await ReturnData(client, byteBlock.Memory, e).ConfigureAwait(false);
         }

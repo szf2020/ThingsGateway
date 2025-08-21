@@ -39,7 +39,7 @@ public class ExecuteScriptNode : TextNode, IActuatorNode, IExexcuteExpressionsBa
                     TopicArray topicArray = new()
                     {
                         Topic = "test",
-                        Json = Encoding.UTF8.GetBytes("test")
+                        Payload = Encoding.UTF8.GetBytes("test")
                     };
                     var result = await mqttClient.MqttUpAsync(topicArray, default).ConfigureAwait(false);// 主题 和 负载
                     if (!result.IsSuccess)
@@ -56,7 +56,7 @@ public class ExecuteScriptNode : TextNode, IActuatorNode, IExexcuteExpressionsBa
                     //TopicArray topicArray = new()
                     //{
                     //    Topic = "test",
-                    //    Json = Encoding.UTF8.GetBytes("test")
+                    //    Payload = Encoding.UTF8.GetBytes("test")
                     //};
                     //var result = await mqttClient.MqttUpAsync(topicArray, default).ConfigureAwait(false);// 主题 和 负载
                     //if (!result.IsSuccess)

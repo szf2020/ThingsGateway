@@ -15,10 +15,19 @@ using ThingsGateway.Foundation.Extension.String;
 
 using TouchSocket.Core;
 
+using Xunit.Abstractions;
+
 namespace ThingsGateway.Foundation.Test;
 
 public class Dlt645Test
 {
+    public Dlt645Test(ITestOutputHelper output)
+    {
+        _output = output;
+
+    }
+    private readonly ITestOutputHelper _output;
+
     [Theory]
     [InlineData("02010100", "FE FE FE FE 68 11 11 11 11 11 11 68 91 07 33 34 34 35 33 59 36 60 16 ")]
     public async Task Dlt645_Read_OK(string address, string data)
@@ -31,10 +40,11 @@ public class Dlt645Test
         {
             a.AddEasyLogger((a, b, c, d) =>
             {
-                Debug.WriteLine($"{c}{Environment.NewLine}{d?.ToString()}");
+                _output.WriteLine($"{c}{Environment.NewLine}{d?.ToString()}");
             }, LogLevel.Trace);
         });
-        var dltMaster = new Dlt645_2007Master() { Timeout = 10000, Station = "111111111111" };
+
+        var dltMaster = new Dlt645_2007Master() { Timeout = 30000, Station = "111111111111" };
         dltMaster.InitChannel(dltChannel);
         await dltChannel.SetupAsync(dltChannel.Config);
         await dltMaster.ConnectAsync(CancellationToken.None);
@@ -42,19 +52,20 @@ public class Dlt645Test
 
         var task1 = Task.Run(async () =>
          {
+             Stopwatch stopwatch = new Stopwatch();
+             stopwatch.Start();
              var result = await dltMaster.ReadAsync(address, default).ConfigureAwait(false);
+             stopwatch.Stop();
              Assert.True(result.IsSuccess, result.ToString());
          });
         await Task.Delay(50);
         var task2 = Task.Run(async () =>
         {
-            var bytes = data.HexStringToBytes().GetArray();
-            foreach (var item in bytes)
-            {
-                var data = new ByteBlock(1); data.WriteByte(item);
-                await adapter.ReceivedInputAsync(data).ConfigureAwait(false);
-            }
+            SingleStreamDataHandlingAdapterTest singleStreamDataHandlingAdapterTest = new();
+            await singleStreamDataHandlingAdapterTest.SendCallback(data.HexStringToBytes(), (a) => singleStreamDataHandlingAdapterTest.ReceivedAsync(adapter, CancellationToken.None), 1, CancellationToken.None).ConfigureAwait(false);
         });
+
         await Task.WhenAll(task1, task2);
     }
+
 }

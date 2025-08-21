@@ -16,95 +16,11 @@ namespace ThingsGateway.Foundation.Modbus;
 public class ModbusRtuMessage : MessageBase, IResultMessage
 {
     /// <inheritdoc/>
-    public override int HeaderLength => 3;
+    public override long HeaderLength => 3;
 
     public ModbusAddress? Request { get; set; }
 
     public ModbusResponse Response { get; set; } = new();
-
-    public override FilterResult CheckBody<TByteBlock>(ref TByteBlock byteBlock)
-    {
-        if (Response.ErrorCode != null)
-        {
-            if (Request != null)
-            {
-                if (Request.Station == Response.Station)
-                {
-                    return FilterResult.Success;
-                }
-                else
-                {
-                    return FilterResult.GoOn;
-                }
-            }
-        }
-
-        var pos = byteBlock.Position - HeaderLength;
-        var crcLen = 0;
-        var f = Response.FunctionCode > 0x30 ? Response.FunctionCode - 0x30 : Response.FunctionCode;
-        if (f <= 4)
-        {
-            OperCode = 0;
-            Content = byteBlock.ToArrayTake(BodyLength - 2);
-            Response.Data = Content;
-            crcLen = 3 + Response.Length;
-        }
-        else if (f == 5 || f == 6)
-        {
-            byteBlock.Position = HeaderLength - 1;
-            Response.StartAddress = ReaderExtension.ReadValue<TByteBlock, ushort>(ref byteBlock, EndianType.Big);
-            OperCode = 0;
-            Content = byteBlock.ToArrayTake(BodyLength - 4);
-            Response.Data = Content;
-            crcLen = 6;
-        }
-        else if (f == 15 || f == 16)
-        {
-            byteBlock.Position = HeaderLength - 1;
-            Response.StartAddress = ReaderExtension.ReadValue<TByteBlock, ushort>(ref byteBlock, EndianType.Big);
-            Response.Length = ReaderExtension.ReadValue<TByteBlock, ushort>(ref byteBlock, EndianType.Big);
-            OperCode = 0;
-            Content = Array.Empty<byte>();
-            crcLen = 6;
-        }
-        else
-        {
-            OperCode = 999;
-            ErrorMessage = AppResource.ModbusError1;
-            return FilterResult.GoOn;
-        }
-        if (crcLen > 0)
-        {
-            var crc = CRC16Utils.Crc16Only(byteBlock.Span.Slice(pos, crcLen));
-
-            //Crc
-            var checkCrc = byteBlock.Span.Slice(pos + crcLen, 2);
-            if (checkCrc.SequenceEqual(crc))
-            {
-                //验证发送/返回站号与功能码
-                //站号验证
-                if (Request != null)
-                {
-                    if (Request.Station != Response.Station)
-                    {
-                        OperCode = 999;
-                        Response.ErrorCode = 1;
-                        ErrorMessage = string.Format(AppResource.StationNotSame, Request.Station, Response.Station);
-                        return FilterResult.GoOn;
-                    }
-                    if (f > 4 ? Request.WriteFunctionCode != Response.FunctionCode : Request.FunctionCode != Response.FunctionCode)
-                    {
-                        OperCode = 999;
-                        Response.ErrorCode = 1;
-                        ErrorMessage = string.Format(AppResource.FunctionNotSame, Request.FunctionCode, Response.FunctionCode);
-                        return FilterResult.GoOn;
-                    }
-                }
-                return FilterResult.Success;
-            }
-        }
-        return FilterResult.GoOn;
-    }
 
     public override bool CheckHead<TByteBlock>(ref TByteBlock byteBlock)
     {
@@ -156,7 +72,93 @@ public class ModbusRtuMessage : MessageBase, IResultMessage
         return false;
     }
 
-    public override void SendInfo(ISendMessage sendMessage, ref ValueByteBlock byteBlock)
+
+    public override FilterResult CheckBody<TByteBlock>(ref TByteBlock byteBlock)
+    {
+        if (Response.ErrorCode != null)
+        {
+            if (Request != null)
+            {
+                if (Request.Station == Response.Station)
+                {
+                    return FilterResult.Success;
+                }
+                else
+                {
+                    return FilterResult.GoOn;
+                }
+            }
+        }
+
+        var pos = byteBlock.BytesRead - HeaderLength;
+        var crcLen = 0;
+        var f = Response.FunctionCode > 0x30 ? Response.FunctionCode - 0x30 : Response.FunctionCode;
+        if (f <= 4)
+        {
+            OperCode = 0;
+            Content = byteBlock.ToArrayTake(BodyLength - 2);
+            Response.MasterWriteDatas = Content;
+            crcLen = 3 + Response.Length;
+        }
+        else if (f == 5 || f == 6)
+        {
+            byteBlock.BytesRead = HeaderLength - 1;
+            Response.StartAddress = ReaderExtension.ReadValue<TByteBlock, ushort>(ref byteBlock, EndianType.Big);
+            OperCode = 0;
+            Content = byteBlock.ToArrayTake(BodyLength - 4);
+            Response.MasterWriteDatas = Content;
+            crcLen = 6;
+        }
+        else if (f == 15 || f == 16)
+        {
+            byteBlock.BytesRead = HeaderLength - 1;
+            Response.StartAddress = ReaderExtension.ReadValue<TByteBlock, ushort>(ref byteBlock, EndianType.Big);
+            Response.Length = ReaderExtension.ReadValue<TByteBlock, ushort>(ref byteBlock, EndianType.Big);
+            OperCode = 0;
+            Content = Array.Empty<byte>();
+            crcLen = 6;
+        }
+        else
+        {
+            OperCode = 999;
+            ErrorMessage = AppResource.ModbusError1;
+            return FilterResult.GoOn;
+        }
+        if (crcLen > 0)
+        {
+            var crc = CRC16Utils.Crc16Only(byteBlock.TotalSequence.Slice(pos, crcLen));
+
+            //Crc
+            var checkCrc = byteBlock.TotalSequence.Slice(pos + crcLen, 2);
+            if (checkCrc.SequenceEqual(crc))
+            {
+                //验证发送/返回站号与功能码
+                //站号验证
+                if (Request != null)
+                {
+                    if (Request.Station != Response.Station)
+                    {
+                        OperCode = 999;
+                        Response.ErrorCode = 1;
+                        ErrorMessage = string.Format(AppResource.StationNotSame, Request.Station, Response.Station);
+                        return FilterResult.GoOn;
+                    }
+                    if (f > 4 ? Request.WriteFunctionCode != Response.FunctionCode : Request.FunctionCode != Response.FunctionCode)
+                    {
+                        OperCode = 999;
+                        Response.ErrorCode = 1;
+                        ErrorMessage = string.Format(AppResource.FunctionNotSame, Request.FunctionCode, Response.FunctionCode);
+                        return FilterResult.GoOn;
+                    }
+                }
+                return FilterResult.Success;
+            }
+        }
+        return FilterResult.GoOn;
+    }
+
+
+    public override void SendInfo(ISendMessage sendMessage)
     {
         Request = ((ModbusRtuSend)sendMessage).ModbusAddress;
     }

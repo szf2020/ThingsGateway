@@ -167,7 +167,7 @@ public partial class ModbusMaster : DtuServiceDeviceBase, IModbusAddress
         try
         {
             var mAddress = GetModbusAddress(address, Station);
-            mAddress.Data = value;
+            mAddress.MasterWriteDatas = value;
 
             if (mAddress.BitIndex == null)
             {
@@ -185,7 +185,7 @@ public partial class ModbusMaster : DtuServiceDeviceBase, IModbusAddress
                 else
                     writeValye[0] = v;
 
-                mAddress.Data = writeValye;
+                mAddress.MasterWriteDatas = writeValye;
                 return await ModbusRequestAsync(mAddress, false, cancellationToken).ConfigureAwait(false);
             }
             else
@@ -212,13 +212,13 @@ public partial class ModbusMaster : DtuServiceDeviceBase, IModbusAddress
             if (value.Length > 1 && (mAddress.FunctionCode == 1 || mAddress.FunctionCode == 0x31))
             {
                 mAddress.WriteFunctionCode = 15;
-                mAddress.Data = value.Span.BoolArrayToByte();
+                mAddress.MasterWriteDatas = value.Span.BoolArrayToByte();
                 return await ModbusRequestAsync(mAddress, false, cancellationToken).ConfigureAwait(false);
             }
             else if (mAddress.BitIndex == null)
             {
                 var span = value.Span;
-                mAddress.Data = span[0] ? new byte[2] { 255, 0 } : [0, 0];
+                mAddress.MasterWriteDatas = span[0] ? new byte[2] { 255, 0 } : [0, 0];
                 return await ModbusRequestAsync(mAddress, false, cancellationToken).ConfigureAwait(false);
             }
             else
@@ -234,7 +234,7 @@ public partial class ModbusMaster : DtuServiceDeviceBase, IModbusAddress
                     {
                         writeData = writeData.SetBit(mAddress.BitIndex.Value + i, span[i]);
                     }
-                    mAddress.Data = ThingsGatewayBitConverter.GetBytes(writeData);
+                    mAddress.MasterWriteDatas = ThingsGatewayBitConverter.GetBytes(writeData);
                     return await ModbusRequestAsync(mAddress, false, cancellationToken).ConfigureAwait(false);
                 }
                 else

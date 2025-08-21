@@ -11,11 +11,31 @@
 using ThingsGateway.Foundation;
 
 using TouchSocket.Core;
-using TouchSocket.Sockets;
 
 internal static class TestAdapterHelper
 {
-    public static void TestAdapter<T>(byte[] data, bool isSingleStreamData) where T : MessageBase, new()
+
+    public static async Task ReceivedInputAsync(SingleStreamDataHandlingAdapter adapter, ReadOnlyMemory<byte> memory, CancellationToken token)
+    {
+        var offset = 0;
+        while (true)
+        {
+            token.ThrowIfCancellationRequested();
+
+            var remainingLength = memory.Length - offset;
+            if (remainingLength <= 0)
+            {
+                break;
+            }
+            var sliceMemory = memory.Slice(offset, Math.Min(remainingLength, 1));
+            var reader = new ClassBytesReader(sliceMemory);
+            await adapter.ReceivedInputAsync(reader).ConfigureAwait(false);
+            offset += sliceMemory.Length;
+        }
+
+    }
+
+    public static async Task TestAdapter<T>(byte[] data, bool isSingleStreamData) where T : MessageBase, new()
     {
         bool isSuccess = false;
         MessageBase message = default;
@@ -25,7 +45,7 @@ internal static class TestAdapterHelper
             for (int bufferLength = 1; bufferLength < 256; bufferLength += 1)
             {
                 SingleStreamDataAdapterTester tester = SingleStreamDataAdapterTester.CreateTester(new DeviceSingleStreamDataHandleAdapter<T>()
-                    , bufferLength, (byteBlock, requestInfo) =>
+                    , (byteBlock, requestInfo) =>
                     {
                         //此处就是接收，如果是自定义适配器，可以将requestInfo强制转换为实际对象，然后判断数据的确定性
                         //if (byteBlock.Length != 15 || (!byteBlock.ToArray().SequenceEqual(data)))
@@ -50,7 +70,8 @@ internal static class TestAdapterHelper
 
                 try
                 {
-                    var time = tester.Run(data, 2, 2, 1000 * 10);
+                    using var cts = new CancellationTokenSource(1000 * 10);
+                    var time = await tester.RunAsync(data, 2, 2, bufferLength, cts.Token).ConfigureAwait(false);
                 }
                 catch (Exception ex)
                 {
@@ -78,7 +99,7 @@ internal static class TestAdapterHelper
          });
             try
             {
-                var time = tester.Run(data, 2, 2, 1000 * 10);
+                var time = await tester.RunAsync(data, 2, 2, 1000 * 10).ConfigureAwait(false);
             }
             catch (Exception ex)
             {

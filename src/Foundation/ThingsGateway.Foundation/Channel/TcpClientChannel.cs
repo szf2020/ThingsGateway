@@ -8,8 +8,6 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-using System.Collections.Concurrent;
-
 using ThingsGateway.NewLife;
 
 namespace ThingsGateway.Foundation;
@@ -31,9 +29,27 @@ public class TcpClientChannel : TcpClient, IClientChannel
         var pool = WaitHandlePool;
         WaitHandlePool = new WaitHandlePool<MessageBase>(minSign, maxSign);
         pool?.CancelAll();
-        pool?.SafeDispose();
     }
-
+    private IDeviceDataHandleAdapter _deviceDataHandleAdapter;
+    public void SetDataHandlingAdapterLogger(ILog log)
+    {
+        if (_deviceDataHandleAdapter == null && DataHandlingAdapter is IDeviceDataHandleAdapter handleAdapter)
+        {
+            _deviceDataHandleAdapter = handleAdapter;
+        }
+        if (_deviceDataHandleAdapter != null)
+        {
+            _deviceDataHandleAdapter.Logger = log;
+        }
+    }
+    /// <inheritdoc/>
+    public void SetDataHandlingAdapter(DataHandlingAdapter adapter)
+    {
+        if (adapter is SingleStreamDataHandlingAdapter singleStreamDataHandlingAdapter)
+            SetAdapter(singleStreamDataHandlingAdapter);
+        if (adapter is IDeviceDataHandleAdapter deviceDataHandleAdapter)
+            _deviceDataHandleAdapter = deviceDataHandleAdapter;
+    }
     /// <inheritdoc/>
     public ChannelReceivedEventHandler ChannelReceived { get; } = new();
 
@@ -62,14 +78,13 @@ public class TcpClientChannel : TcpClient, IClientChannel
     /// <summary>
     /// 等待池
     /// </summary>
-    public WaitHandlePool<MessageBase> WaitHandlePool { get; internal set; } = new();
+    public WaitHandlePool<MessageBase> WaitHandlePool { get; internal set; } = new(0, ushort.MaxValue);
     public virtual WaitLock GetLock(string key) => WaitLock;
 
     /// <inheritdoc/>
     public WaitLock WaitLock => ChannelOptions.WaitLock;
 
-    /// <inheritdoc/>
-    public ConcurrentDictionary<long, Func<IClientChannel, ReceivedDataEventArgs, bool, Task>> ChannelReceivedWaitDict { get; } = new();
+
 
     //private readonly WaitLock _connectLock = new WaitLock();
     /// <inheritdoc/>
@@ -82,6 +97,7 @@ public class TcpClientChannel : TcpClient, IClientChannel
                 //await _connectLock.WaitAsync().ConfigureAwait(false);
                 if (Online)
                 {
+                    await this.OnChannelEvent(Stoping).ConfigureAwait(false);
                     var result = await base.CloseAsync(msg, token).ConfigureAwait(false);
                     if (!Online)
                     {
@@ -99,7 +115,7 @@ public class TcpClientChannel : TcpClient, IClientChannel
     }
 
     /// <inheritdoc/>
-    public override async Task ConnectAsync(int millisecondsTimeout, CancellationToken token)
+    public override async Task ConnectAsync(CancellationToken token)
     {
         if (!Online)
         {
@@ -109,7 +125,8 @@ public class TcpClientChannel : TcpClient, IClientChannel
                 if (!Online)
                 {
                     if (token.IsCancellationRequested) return;
-                    await base.ConnectAsync(millisecondsTimeout, token).ConfigureAwait(false);
+                    await this.OnChannelEvent(Starting).ConfigureAwait(false);
+                    await base.ConnectAsync(token).ConfigureAwait(false);
                     if (Online)
                     {
                         if (token.IsCancellationRequested) return;
@@ -124,12 +141,6 @@ public class TcpClientChannel : TcpClient, IClientChannel
         }
     }
 
-    /// <inheritdoc/>
-    public void SetDataHandlingAdapter(DataHandlingAdapter adapter)
-    {
-        if (adapter is SingleStreamDataHandlingAdapter singleStreamDataHandlingAdapter)
-            SetAdapter(singleStreamDataHandlingAdapter);
-    }
 
     /// <inheritdoc/>
     public override string ToString()
@@ -137,48 +148,39 @@ public class TcpClientChannel : TcpClient, IClientChannel
         return $"{IP}:{Port}";
     }
 
-    protected override async Task OnTcpClosed(ClosedEventArgs e)
+    protected override Task OnTcpClosed(ClosedEventArgs e)
     {
         Logger?.Info($"{ToString()}  Closed{(e.Message.IsNullOrEmpty() ? string.Empty : $" -{e.Message}")}");
 
-        await base.OnTcpClosed(e).ConfigureAwait(false);
+        return base.OnTcpClosed(e);
     }
     /// <inheritdoc/>
-    protected override async Task OnTcpClosing(ClosingEventArgs e)
+    protected override Task OnTcpClosing(ClosingEventArgs e)
     {
-        await this.OnChannelEvent(Stoping).ConfigureAwait(false);
         Logger?.Trace($"{ToString()}  Closing{(e.Message.IsNullOrEmpty() ? string.Empty : $" -{e.Message}")}");
 
-        await base.OnTcpClosing(e).ConfigureAwait(false);
+        return base.OnTcpClosing(e);
     }
 
     /// <inheritdoc/>
-    protected override async Task OnTcpConnecting(ConnectingEventArgs e)
+    protected override Task OnTcpConnecting(ConnectingEventArgs e)
     {
         Logger?.Trace($"{ToString()}  Connecting{(e.Message.IsNullOrEmpty() ? string.Empty : $"-{e.Message}")}");
-        await this.OnChannelEvent(Starting).ConfigureAwait(false);
-        await base.OnTcpConnecting(e).ConfigureAwait(false);
+        return base.OnTcpConnecting(e);
     }
 
-    protected override async Task OnTcpConnected(ConnectedEventArgs e)
+    protected override Task OnTcpConnected(ConnectedEventArgs e)
     {
         Logger?.Info($"{ToString()}  Connected");
 
-        await base.OnTcpConnected(e).ConfigureAwait(false);
+        return base.OnTcpConnected(e);
     }
 
     /// <inheritdoc/>
     protected override async Task OnTcpReceived(ReceivedDataEventArgs e)
     {
         await base.OnTcpReceived(e).ConfigureAwait(false);
-        if (e.RequestInfo is MessageBase response)
-        {
-            if (ChannelReceivedWaitDict.TryRemove(response.Sign, out var func))
-            {
-                await func.Invoke(this, e, ChannelReceived.Count == 1).ConfigureAwait(false);
-                e.Handled = true;
-            }
-        }
+
         if (e.Handled)
             return;
 
@@ -188,7 +190,7 @@ public class TcpClientChannel : TcpClient, IClientChannel
     /// <inheritdoc/>
     protected override void SafetyDispose(bool disposing)
     {
-        WaitHandlePool.SafeDispose();
+        WaitHandlePool?.CancelAll();
         base.SafetyDispose(disposing);
     }
 }

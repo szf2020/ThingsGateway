@@ -8,8 +8,6 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-using System.Collections.Concurrent;
-
 using ThingsGateway.NewLife;
 
 namespace ThingsGateway.Foundation;
@@ -22,30 +20,6 @@ public abstract class TcpServiceChannelBase<TClient> : TcpService<TClient>, ITcp
 {
     /// <inheritdoc/>
     public ConcurrentList<IDevice> Collects { get; } = new();
-
-    ///// <summary>
-    ///// 停止时是否发送ShutDown
-    ///// </summary>
-    //public bool ShutDownEnable { get; set; } = true;
-
-    /// <inheritdoc/>
-    public override async Task ClearAsync()
-    {
-        foreach (var client in Clients)
-        {
-            try
-            {
-                //if (ShutDownEnable)
-                //    await client.ShutdownAsync(System.Net.Sockets.SocketShutdown.Both).ConfigureAwait(false);
-
-                await client.CloseAsync().ConfigureAwait(false);
-                client.SafeDispose();
-            }
-            catch
-            {
-            }
-        }
-    }
 
     public async Task ClientDisposeAsync(string id)
     {
@@ -136,6 +110,7 @@ public abstract class TcpServiceChannelBase<TClient> : TcpService<TClient>, ITcp
     {
         m_transport?.SafeCancel();
         m_transport?.SafeDispose();
+        m_transport = null;
         base.SafetyDispose(disposing);
     }
     /// <inheritdoc/>
@@ -209,7 +184,7 @@ public class TcpServiceChannel<TClient> : TcpServiceChannelBase<TClient>, IChann
     }
 
     /// <inheritdoc/>
-    public Task ConnectAsync(int timeout = 3000, CancellationToken token = default)
+    public Task ConnectAsync(CancellationToken token = default)
     {
         if (token.IsCancellationRequested)
             return EasyTask.CompletedTask;
@@ -268,22 +243,13 @@ public class TcpServiceChannel<TClient> : TcpServiceChannelBase<TClient>, IChann
     {
         await base.OnTcpReceived(socketClient, e).ConfigureAwait(false);
 
-        if (e.RequestInfo is MessageBase response)
-        {
-            if (ChannelReceivedWaitDict.TryRemove(response.Sign, out var func))
-            {
-                await func.Invoke(socketClient, e, ChannelReceived.Count == 1).ConfigureAwait(false);
-                e.Handled = true;
-            }
-        }
         if (e.Handled)
             return;
 
         await socketClient.OnChannelReceivedEvent(e, ChannelReceived).ConfigureAwait(false);
     }
 
-    /// <inheritdoc/>
-    public ConcurrentDictionary<long, Func<IClientChannel, ReceivedDataEventArgs, bool, Task>> ChannelReceivedWaitDict { get; } = new();
+
 
     IEnumerable<TcpSessionClientChannel> ITcpServiceChannel.Clients => base.Clients;
 

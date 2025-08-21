@@ -34,22 +34,6 @@
     "SaveUpdateZipFile": "Upload Version Package"
   },
 
-  "ThingsGateway.Gateway.Razor.ValueTransformType": {
-    "None": "None",
-    "Linear": "Linear",
-    "Sqrt": "Sqrt"
-  },
-
-  "ThingsGateway.Gateway.Razor.ValueTransformConfig": {
-    "TransformType": "TransformType",
-    "MinMax": "MinMax",
-    "ClampToRawRange": "ClampToRawRange",
-    "DecimalPlaces": "DecimalPlaces",
-    "RawMin": "RawMin",
-    "RawMax": "RawMax",
-    "ActualMin": "ActualMin",
-    "ActualMax": "ActualMax"
-  },
 
 
   "ThingsGateway.Gateway.Razor.Authentication": {

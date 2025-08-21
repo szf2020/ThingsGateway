@@ -21,7 +21,7 @@ using TouchSocket.Core;
 using TouchSocket.Dmtp;
 using TouchSocket.Dmtp.Rpc;
 using TouchSocket.Rpc;
-using TouchSocket.Rpc.Generators;
+using TouchSocket.Rpc.DmtpRpc.Generators;
 using TouchSocket.Sockets;
 
 namespace ThingsGateway.Gateway.Application;
@@ -140,8 +140,8 @@ internal sealed class RedundancyTask : IRpcDriver, IAsyncDisposable
                 {
                     try
                     {
-                        // 发送 Ping 请求以检查设备是否在线，超时时间为 10000 毫秒
-                        online = await _tcpDmtpClient.PingAsync(10000).ConfigureAwait(false);
+                        using var cts = new CancellationTokenSource(10000);
+                        online = (await _tcpDmtpClient.PingAsync(cts.Token).ConfigureAwait(false)).IsSuccess;
                         if (online)
                             break;
                         else
@@ -238,7 +238,7 @@ internal sealed class RedundancyTask : IRpcDriver, IAsyncDisposable
         return GlobalData.ChannelRuntimeService.RestartChannelAsync(GlobalData.ReadOnlyIdChannels.Values);
     }
 
-    public async Task StartRedundancyTaskAsync(CancellationToken cancellationToken = default)
+    public async Task StartRedundancyTaskAsync()
     {
         await StopRedundancyTaskAsync().ConfigureAwait(false);
         RedundancyOptions = (await _redundancyService.GetRedundancyAsync().ConfigureAwait(false)).AdaptRedundancyOptions();
@@ -268,11 +268,11 @@ internal sealed class RedundancyTask : IRpcDriver, IAsyncDisposable
             LogMessage?.LogInformation($"Redundancy task started");
             if (RedundancyOptions.IsMaster)
             {
-                scheduledTask = new ScheduledAsyncTask(RedundancyOptions.SyncInterval, DoMasterWork, null, null, cancellationToken);
+                scheduledTask = new ScheduledAsyncTask(RedundancyOptions.SyncInterval, DoMasterWork, null, null, CancellationToken.None);
             }
             else
             {
-                scheduledTask = new ScheduledAsyncTask(5000, DoSlaveWork, null, null, cancellationToken);
+                scheduledTask = new ScheduledAsyncTask(5000, DoSlaveWork, null, null, CancellationToken.None);
             }
 
             scheduledTask.Start();
@@ -416,7 +416,6 @@ internal sealed class RedundancyTask : IRpcDriver, IAsyncDisposable
         {
             FeedbackType = FeedbackType.WaitInvoke,
             Token = cancellationToken,
-            Timeout = 1800000,
             SerializationType = SerializationType.Json,
         };
     }
@@ -591,11 +590,11 @@ internal sealed class RedundancyTask : IRpcDriver, IAsyncDisposable
         }
     }
 
-    private async Task<Dictionary<string, Dictionary<string, OperResult<object>>>> InvokeRpcClientAsync(
+    private Task<Dictionary<string, Dictionary<string, OperResult<object>>>> InvokeRpcClientAsync(
         Dictionary<string, Dictionary<string, string>> deviceDatas,
         DmtpInvokeOption invokeOption)
     {
-        return await _tcpDmtpClient.GetDmtpRpcActor().RpcAsync(deviceDatas, invokeOption).ConfigureAwait(false);
+        return _tcpDmtpClient.GetDmtpRpcActor().RpcAsync(deviceDatas, invokeOption);
     }
     private async Task InvokeRpcServerAsync(
         Dictionary<string, Dictionary<string, string>> deviceDatas,

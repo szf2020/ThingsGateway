@@ -8,6 +8,8 @@
 // QQ群：605534569
 // ------------------------------------------------------------------------------
 
+using System.Buffers;
+
 namespace ThingsGateway.Foundation.Extension.Generic;
 
 /// <inheritdoc/>
@@ -242,6 +244,29 @@ public static class GenericExtensions
         for (int i = 0; i < span.Length; i += groupSize)
         {
             yield return span.Slice(i, Math.Min(groupSize, span.Length - i));
+        }
+    }
+
+    public static IEnumerable<ReadOnlySequence<T>> ChunkBetter<T>(this ReadOnlySequence<T> sequence, int groupSize)
+    {
+        if (groupSize <= 0)
+            throw new ArgumentOutOfRangeException(nameof(groupSize));
+
+        var start = sequence.Start;
+        var remaining = sequence.Length;
+
+        while (remaining > 0)
+        {
+            var len = (int)Math.Min(groupSize, remaining);
+
+            // 计算 chunk 的 end 位置
+            var end = sequence.GetPosition(len, start);
+
+            yield return sequence.Slice(start, end);
+
+            // 移动起始位置
+            start = end;
+            remaining -= len;
         }
     }
 

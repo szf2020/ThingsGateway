@@ -8,6 +8,8 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
+using System.Buffers;
+
 using TouchSocket.Core;
 
 namespace ThingsGateway.Foundation.SiemensS7;
@@ -23,108 +25,116 @@ public class S7Message : MessageBase, IResultMessage
     public byte? Error { get; set; }
 
     /// <inheritdoc/>
-    public override int HeaderLength => 4;
+    public override long HeaderLength => 4;
 
     public override bool CheckHead<TByteBlock>(ref TByteBlock byteBlock)
     {
-        byteBlock.Position += 2;
+        byteBlock.BytesRead += 2;
         BodyLength = ReaderExtension.ReadValue<TByteBlock, ushort>(ref byteBlock, EndianType.Big) - 4;
         return true;
     }
     public override FilterResult CheckBody<TByteBlock>(ref TByteBlock byteBlock)
     {
-        var pos = byteBlock.Position;
-        var span = byteBlock.Span;
-        if (span[pos + 1] == 0xD0) // 首次握手0XD0连接确认
+        var pos = byteBlock.BytesRead;
+        var sequence = byteBlock.TotalSequence;
+        if (sequence.GetByte(pos + 1) == 0xD0) // 首次握手0XD0连接确认
         {
             OperCode = 0;
             return FilterResult.Success;
         }
-        else if (span[pos + 15] == 0xF0) // PDU
+        else if (sequence.GetByte(pos + 15) == 0xF0) // PDU
         {
             // 其余情况判断错误代码
-            if (span[pos + 13] + span[pos + 14] > 0) // 如果错误代码不为0
+            if (sequence.GetByte(pos + 13) + sequence.GetByte(pos + 14) > 0) // 如果错误代码不为0
             {
                 OperCode = 999;
-                ErrorMessage = string.Format(AppResource.ReturnError, span[pos + 13].ToString("X2"), span[pos + 14].ToString("X2"));
+                ErrorMessage = string.Format(AppResource.ReturnError, sequence.GetByte(pos + 13).ToString("X2"), sequence.GetByte(pos + 14).ToString("X2"));
                 return FilterResult.Success;
             }
             else
             {
-                Content = byteBlock.ToArray(byteBlock.Length - 2, 2);
+                Content = byteBlock.TotalSequence.Slice(byteBlock.BytesRead + byteBlock.BytesRemaining - 2, 2).ToArray();
                 OperCode = 0;
                 return FilterResult.Success;
             }
         }
 
         //分bit/byte解析
-        else if (span[pos + 15] == 0x04) // Read
+        else if (sequence.GetByte(pos + 15) == 0x04) // Read
         {
-            byteBlock.Position = pos + 7;
+            byteBlock.BytesRead = pos + 7;
             var sign = ReaderExtension.ReadValue<TByteBlock, ushort>(ref byteBlock, EndianType.Big);//数据ID标识
             Sign = sign;
-            byteBlock.Position = pos;
+            byteBlock.BytesRead = pos;
 
-            int length = span[pos + 17];
-            int itemLen = span[pos + 16];
+            int length = sequence.GetByte(pos + 17);
+            int itemLen = sequence.GetByte(pos + 16);
 
             //添加错误代码校验
             // 其余情况判断错误代码
-            if (span[pos + 13] + span[pos + 14] > 0) // 如果错误代码不为0
+            if (sequence.GetByte(pos + 13) + sequence.GetByte(pos + 14) > 0) // 如果错误代码不为0
             {
                 OperCode = 999;
-                ErrorMessage = string.Format(AppResource.ReturnError, span[pos + 13].ToString("X2"), span[pos + 14].ToString("X2"));
+                ErrorMessage = string.Format(AppResource.ReturnError, sequence.GetByte(pos + 13).ToString("X2"), sequence.GetByte(pos + 14).ToString("X2"));
                 return FilterResult.Success;
             }
             else
             {
-                if (byteBlock.Length < pos + 18)
+                if (byteBlock.BytesRead + byteBlock.BytesRemaining < pos + 18)
                 {
                     OperCode = 999;
                     ErrorMessage = AppResource.DataLengthError;
                     return FilterResult.Success;
                 }
-                if (span[pos + 17] != byte.MaxValue)
+                if (sequence.GetByte(pos + 17) != byte.MaxValue)
                 {
                     OperCode = 999;
-                    ErrorMessage = string.Format(AppResource.ValidateDataError, span[pos + 17], SiemensHelper.GetCpuError(span[pos + 17]));
+                    ErrorMessage = string.Format(AppResource.ValidateDataError, sequence.GetByte(pos + 17), SiemensHelper.GetCpuError(sequence.GetByte(pos + 17)));
                     return FilterResult.Success;
                 }
 
-                using ValueByteBlock data = new(length);
+                ValueByteBlock data = new(length);
                 var dataIndex = pos + 17;
                 for (int index = 0; index < itemLen; index++)
                 {
-                    if (span[dataIndex] != byte.MaxValue)
+                    if (sequence.GetByte(dataIndex) != byte.MaxValue)
                     {
                         OperCode = 999;
-                        ErrorMessage = string.Format(AppResource.ValidateDataError, span[dataIndex], SiemensHelper.GetCpuError(span[dataIndex]));
+                        ErrorMessage = string.Format(AppResource.ValidateDataError, sequence.GetByte(dataIndex), SiemensHelper.GetCpuError(sequence.GetByte(dataIndex)));
                         return FilterResult.Success;
                     }
 
-                    if (span[dataIndex + 1] == 4)//Bit:3;Byte:4;Counter或者Timer:9
+                    if (sequence.GetByte(dataIndex + 1) == 4)//Bit:3;Byte:4;Counter或者Timer:9
                     {
-                        byteBlock.Position = dataIndex + 2;
+                        byteBlock.BytesRead = dataIndex + 2;
                         var byteLength = ReaderExtension.ReadValue<TByteBlock, ushort>(ref byteBlock, EndianType.Big) / 8;
-                        data.Write(span.Slice(dataIndex + 4, byteLength));
+                        ByteBlockExtension.Write(ref data, sequence.Slice(dataIndex + 4, byteLength));
                         dataIndex += byteLength + 4;
                     }
-                    else if (span[dataIndex + 1] == 9)//Counter或者Timer:9
+                    else if (sequence.GetByte(dataIndex + 1) == 9)//Counter或者Timer:9
                     {
-                        byteBlock.Position = dataIndex + 2;
+                        byteBlock.BytesRead = dataIndex + 2;
                         var byteLength = ReaderExtension.ReadValue<TByteBlock, ushort>(ref byteBlock, EndianType.Big);
                         if (byteLength % 3 == 0)
                         {
                             for (int indexCT = 0; indexCT < byteLength / 3; indexCT++)
                             {
-                                data.Write(byteBlock.Span.Slice(dataIndex + 5 + (3 * indexCT), 2));
+                                var readOnlyMemories = byteBlock.TotalSequence.Slice(dataIndex + 5 + (3 * indexCT), 2);
+                                foreach (var item in readOnlyMemories)
+                                {
+                                    data.Write(item.Span);
+                                }
                             }
                         }
                         else
                         {
                             for (int indexCT = 0; indexCT < byteLength / 5; indexCT++)
                             {
-                                data.Write(byteBlock.Span.Slice(dataIndex + 7 + (5 * indexCT), 2));
+                                var readOnlyMemories = byteBlock.TotalSequence.Slice(dataIndex + 7 + (5 * indexCT), 2);
+                                foreach (var item in readOnlyMemories)
+                                {
+                                    data.Write(item.Span);
+                                }
                             }
                         }
                         dataIndex += byteLength + 4;
@@ -133,23 +143,24 @@ public class S7Message : MessageBase, IResultMessage
 
                 OperCode = 0;
                 Content = data.ToArray();
+                data.SafeDispose();
                 return FilterResult.Success;
             }
         }
-        else if (span[pos + 15] == 0x05) // Write
+        else if (sequence.GetByte(pos + 15) == 0x05) // Write
         {
-            byteBlock.Position = pos + 7;
+            byteBlock.BytesRead = pos + 7;
             var sign = ReaderExtension.ReadValue<TByteBlock, ushort>(ref byteBlock, EndianType.Big);//数据ID标识
             Sign = sign;
-            byteBlock.Position = pos;
-            int itemLen = span[pos + 16];
-            if (span[pos + 13] + span[pos + 14] > 0) // 如果错误代码不为0
+            byteBlock.BytesRead = pos;
+            int itemLen = sequence.GetByte(pos + 16);
+            if (sequence.GetByte(pos + 13) + sequence.GetByte(pos + 14) > 0) // 如果错误代码不为0
             {
                 OperCode = 999;
-                ErrorMessage = string.Format(AppResource.ReturnError, span[pos + 13].ToString("X2"), span[pos + 14].ToString("X2"));
+                ErrorMessage = string.Format(AppResource.ReturnError, sequence.GetByte(pos + 13).ToString("X2"), sequence.GetByte(pos + 14).ToString("X2"));
                 return FilterResult.Success;
             }
-            if (byteBlock.Length < pos + 18)
+            if (byteBlock.BytesRead + byteBlock.BytesRemaining < pos + 18)
             {
                 OperCode = 999;
                 ErrorMessage = AppResource.DataLengthError;
@@ -157,10 +168,10 @@ public class S7Message : MessageBase, IResultMessage
             }
             for (int i = 0; i < itemLen; i++)
             {
-                if (span[pos + 17 + i] != byte.MaxValue)
+                if (sequence.GetByte(pos + 17 + i) != byte.MaxValue)
                 {
                     OperCode = 999;
-                    ErrorMessage = string.Format(AppResource.ValidateDataError, span[pos + 17 + i], SiemensHelper.GetCpuError(span[pos + 17 + i]));
+                    ErrorMessage = string.Format(AppResource.ValidateDataError, sequence.GetByte(pos + 17 + i), SiemensHelper.GetCpuError(sequence.GetByte(pos + 17 + i)));
                     return FilterResult.Success;
                 }
             }
