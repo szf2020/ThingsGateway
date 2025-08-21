@@ -28,7 +28,7 @@ public static class JTokenUtil
     {
         try
         {
-            if (item.IsNullOrWhiteSpace())
+            if (item.IsNullOrEmpty())
                 return JValue.CreateNull();
 
             if (bool.TryParse(item, out bool parseBool))
