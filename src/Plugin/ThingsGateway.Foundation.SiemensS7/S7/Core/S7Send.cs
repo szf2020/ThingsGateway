@@ -144,6 +144,7 @@ public class S7Send : ISendMessage
 
     internal void GetWriteByteCommand<TByteBlock>(ref TByteBlock byteBlock, SiemensS7Address[] addresss) where TByteBlock : IBytesWriter
     {
+        var span = byteBlock.GetSpan(1024);
         byte itemLen = (byte)addresss.Length;
         ushort parameterLen = (ushort)(itemLen * 12 + 2);
         //TPKT
@@ -201,7 +202,10 @@ public class S7Send : ISendMessage
         }
         ushort telegramLen = (ushort)(itemLen * 12 + 19 + dataLen);
 
-        ByteBlockExtension.WriteBackValue(ref byteBlock, (ushort)telegramLen, EndianType.Big, 2);//长度
-        ByteBlockExtension.WriteBackValue(ref byteBlock, (ushort)dataLen, EndianType.Big, 15);//长度
+        TouchSocketBitConverter.GetBitConverter(EndianType.Big).WriteBytes(span.Slice(2), (ushort)telegramLen);
+        //ByteBlockExtension.WriteBackValue(ref byteBlock, (ushort)telegramLen, EndianType.Big, 2);//长度
+        TouchSocketBitConverter.GetBitConverter(EndianType.Big).WriteBytes(span.Slice(15), (ushort)dataLen);
+
+        //ByteBlockExtension.WriteBackValue(ref byteBlock, (ushort)dataLen, EndianType.Big, 15);//长度
     }
 }

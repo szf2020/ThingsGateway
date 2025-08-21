@@ -385,39 +385,27 @@ public static class ByteBlockExtension
     }
     public static void WriteBackValue<TWriter, T>(ref TWriter writer, T value, EndianType endianType, int pos)
     where T : unmanaged
-    where TWriter : IBytesWriter
+    where TWriter : IByteBlockWriter
     {
-        if (writer.SupportsRewind)
-        {
-            var nowPos = (int)writer.WrittenCount - pos;
-            writer.Advance(-nowPos);
-            var size = Unsafe.SizeOf<T>();
-            var span = writer.GetSpan(size);
-            TouchSocketBitConverter.GetBitConverter(endianType).WriteBytes(span, value);
-            writer.Advance(nowPos);
-        }
-        else
-        {
-            throw new InvalidOperationException("Writer version mismatch or does not support rewind.");
-        }
+        var nowPos = (int)writer.WrittenCount - pos;
+        writer.Advance(-nowPos);
+        var size = Unsafe.SizeOf<T>();
+        var span = writer.GetSpan(size);
+        TouchSocketBitConverter.GetBitConverter(endianType).WriteBytes(span, value);
+        writer.Advance(nowPos);
+
     }
     public static void WriteBackValue<TWriter, T>(ref TWriter writer, T value, EndianType endianType, long pos)
 where T : unmanaged
-where TWriter : IBytesWriter
+where TWriter : IByteBlockWriter
     {
-        if (writer.SupportsRewind)
-        {
-            var nowPos = (int)(writer.WrittenCount - pos);
-            writer.Advance(-nowPos);
-            var size = Unsafe.SizeOf<T>();
-            var span = writer.GetSpan(size);
-            TouchSocketBitConverter.GetBitConverter(endianType).WriteBytes(span, value);
-            writer.Advance(nowPos);
-        }
-        else
-        {
-            throw new InvalidOperationException("Writer version mismatch or does not support rewind.");
-        }
+        var nowPos = (int)(writer.WrittenCount - pos);
+        writer.Advance(-nowPos);
+        var size = Unsafe.SizeOf<T>();
+        var span = writer.GetSpan(size);
+        TouchSocketBitConverter.GetBitConverter(endianType).WriteBytes(span, value);
+        writer.Advance(nowPos);
+
     }
 
     public static string ReadNormalString<TReader>(ref TReader reader, int length)
@@ -429,20 +417,32 @@ where TWriter : IBytesWriter
         return str;
     }
 
-
     public static void WriteBackNormalString<TWriter>(ref TWriter writer, string value, Encoding encoding, int pos)
-where TWriter : IBytesWriter
+where TWriter : IByteBlockWriter
     {
-        if (writer.SupportsRewind)
+        var nowPos = (int)(writer.WrittenCount - pos);
+        writer.Advance(-nowPos);
+        WriterExtension.WriteNormalString(ref writer, value, encoding);
+        writer.Advance(nowPos);
+
+    }
+
+
+    public static int WriteNormalString(this Span<byte> span, string value, Encoding encoding)
+    {
+        var maxSize = encoding.GetMaxByteCount(value.Length);
+        var chars = value.AsSpan();
+
+        unsafe
         {
-            var nowPos = (int)(writer.WrittenCount - pos);
-            writer.Advance(-nowPos);
-            WriterExtension.WriteNormalString(ref writer, value, encoding);
-            writer.Advance(nowPos);
-        }
-        else
-        {
-            throw new InvalidOperationException("Writer version mismatch or does not support rewind.");
+            fixed (char* p = &chars[0])
+            {
+                fixed (byte* p1 = &span[0])
+                {
+                    var len = Encoding.UTF8.GetBytes(p, chars.Length, p1, maxSize);
+                    return len;
+                }
+            }
         }
 
     }
