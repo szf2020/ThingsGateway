@@ -37,9 +37,8 @@ public class FileController : ControllerBase
         var root = Directory.GetCurrentDirectory();
         var wwwroot = Path.Combine(root, "wwwroot");
         var filePath = Path.Combine(wwwroot, fileName);
-        // 防止路径穿越攻击
 #pragma warning disable CA3003
-        if ((!fileName.StartsWith(@"..\Logs\") && filePath.Contains("..")) || !System.IO.File.Exists(filePath))
+        if ((!(fileName.StartsWith(@"../Logs") || fileName.StartsWith(@"..\Logs")) && filePath.Contains("..")) || !System.IO.File.Exists(filePath))
         {
             return NotFound();
         }
