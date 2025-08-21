@@ -194,7 +194,6 @@ class AuthenticationPlugin : PluginBase, IHttpPlugin
         var username = credentials[0];
         var password = credentials[1];
 
-        // 这里验证用户名和密码，实际项目中应该从数据库验证
         if (username != _webApiOptions.UserName || password != _webApiOptions.Password)
         {
             e.Context.Response.Headers.Add("WWW-Authenticate", "Basic realm=\"ThingsGateway\"");

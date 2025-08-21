@@ -14,7 +14,7 @@
 	<ItemGroup>
 		<PackageReference Include="BootstrapBlazor.TableExport" Version="9.2.6" />
 		<PackageReference Include="Yitter.IdGenerator" Version="1.0.14" />
-		<PackageReference Include="BootstrapBlazor" Version="9.9.2" />
+		<PackageReference Include="BootstrapBlazor" Version="9.9.3" />
 	</ItemGroup>
 
 	<ItemGroup>
