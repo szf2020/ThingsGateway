@@ -23,13 +23,41 @@ namespace ThingsGateway.Plugin.Webhook;
 public partial class Webhook : BusinessBaseWithCacheIntervalScriptAll
 {
 #if !Management
-
     protected override void AlarmChange(AlarmVariable alarmVariable)
     {
         if (!_businessPropertyWithCacheIntervalScript.AlarmTopic.IsNullOrWhiteSpace())
             AddQueueAlarmModel(new(alarmVariable));
         base.AlarmChange(alarmVariable);
     }
+    protected override ValueTask<OperResult> UpdateAlarmModel(List<CacheDBItem<AlarmVariable>> item, CancellationToken cancellationToken)
+    {
+        return UpdateAlarmModel(item.Select(a => a.Value).OrderBy(a => a.Id), cancellationToken);
+    }
+    private ValueTask<OperResult> UpdateAlarmModel(IEnumerable<AlarmVariable> item, CancellationToken cancellationToken)
+    {
+        var topicArrayList = GetAlarmTopicArrays(item);
+        return Update(topicArrayList, cancellationToken);
+    }
+
+
+
+    protected override void PluginChange(PluginEventData pluginEventData)
+    {
+        if (!_businessPropertyWithCacheIntervalScript.PluginEventDataTopic.IsNullOrWhiteSpace())
+            AddQueuePluginDataModel(new(pluginEventData));
+        base.PluginChange(pluginEventData);
+    }
+    protected override ValueTask<OperResult> UpdatePluginEventDataModel(List<CacheDBItem<PluginEventData>> item, CancellationToken cancellationToken)
+    {
+        return UpdatePluginEventDataModel(item.Select(a => a.Value), cancellationToken);
+    }
+    private ValueTask<OperResult> UpdatePluginEventDataModel(IEnumerable<PluginEventData> item, CancellationToken cancellationToken)
+    {
+        var topicArrayList = GetPluginEventDataTopicArrays(item);
+        return Update(topicArrayList, cancellationToken);
+    }
+
+
 
     protected override void DeviceTimeInterval(DeviceRuntime deviceRunTime, DeviceBasicData deviceData)
     {
@@ -46,10 +74,7 @@ public partial class Webhook : BusinessBaseWithCacheIntervalScriptAll
         base.DeviceChange(deviceRunTime, deviceData);
     }
 
-    protected override ValueTask<OperResult> UpdateAlarmModel(List<CacheDBItem<AlarmVariable>> item, CancellationToken cancellationToken)
-    {
-        return UpdateAlarmModel(item.Select(a => a.Value).OrderBy(a => a.Id), cancellationToken);
-    }
+
 
     protected override ValueTask<OperResult> UpdateDevModel(List<CacheDBItem<DeviceBasicData>> item, CancellationToken cancellationToken)
     {
@@ -189,11 +214,7 @@ public partial class Webhook : BusinessBaseWithCacheIntervalScriptAll
         return OperResult.Success;
     }
 
-    private ValueTask<OperResult> UpdateAlarmModel(IEnumerable<AlarmVariable> item, CancellationToken cancellationToken)
-    {
-        var topicArrayList = GetAlarmTopicArrays(item);
-        return Update(topicArrayList, cancellationToken);
-    }
+
 
     private ValueTask<OperResult> UpdateDevModel(IEnumerable<DeviceBasicData> item, CancellationToken cancellationToken)
     {

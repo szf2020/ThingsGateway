@@ -1,4 +1,18 @@
 ﻿{
+  "ThingsGateway.Gateway.Application.BusinessVariableProperty": {
+
+    "Data1": "备注1",
+    "Data2": "备注2",
+    "Data3": "备注3",
+    "Data4": "备注4",
+    "Data5": "备注5",
+    "Data6": "备注6",
+    "Data7": "备注7",
+    "Data8": "备注8",
+    "Data9": "备注9",
+    "Data10": "备注10"
+  },
+
   "ThingsGateway.Management.Application.ManagementExportString": {
 
     "ManagementConfigName": "通讯配置"
@@ -32,6 +46,7 @@
 
     "Actuator": "执行",
     "AlarmChangedTriggerNode": "报警状态触发器",
+    "PluginEventChangedTriggerNode": "插件事件触发器",
     "BusinessNode": "业务设备执行",
     "BusinessNode.Placeholder": "设备名称",
     "Cancel": "取消",
@@ -227,15 +242,19 @@
   },
   "ThingsGateway.Gateway.Application.BusinessPropertyWithCacheIntervalScript": {
     "AlarmTopic": "报警主题",
+    "PluginEventDataTopic": "插件事件主题",
     "BigTextScriptAlarmModel": "报警上传脚本",
+    "BigTextScriptPluginEventDataModel": "插件事件上传脚本",
     "BigTextScriptDeviceModel": "设备上传脚本",
     "BigTextScriptVariableModel": "变量上传脚本",
     "DetailLog": "详细日志",
     "DeviceTopic": "设备主题",
     "IsAlarmList": "报警列表上传",
+    "IsPluginEventDataList": "插件事件列表上传",
     "IsDeviceList": "设备状态列表上传",
     "IsVariableList": "变量列表上传",
     "JsonFormattingIndented": "Json缩进格式化",
+    "JsonIgnoreNull": "Json忽略null值",
     "VariableTopic": "变量主题"
   },
   "ThingsGateway.Gateway.Application.BusinessUpdateEnum": {

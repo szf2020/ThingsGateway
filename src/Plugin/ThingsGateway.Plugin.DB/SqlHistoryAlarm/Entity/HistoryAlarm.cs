@@ -10,7 +10,7 @@
 
 using ThingsGateway.SqlSugar;
 
-namespace ThingsGateway.Plugin.SqlHistoryAlarm;
+namespace ThingsGateway.Plugin.DB;
 
 [SugarTable("historyAlarm", TableDescription = "历史报警表")]
 public class HistoryAlarm : AlarmVariable

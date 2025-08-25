@@ -10,6 +10,6 @@
 
 namespace ThingsGateway.Plugin.TDengineDB;
 
-public class TDengineDBProducerVariableProperty : VariablePropertyBase
+public class TDengineDBProducerVariableProperty : BusinessVariableProperty
 {
 }

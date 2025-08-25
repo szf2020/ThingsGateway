@@ -14,7 +14,7 @@ using Microsoft.AspNetCore.Components;
 
 using ThingsGateway.Common;
 
-namespace ThingsGateway.Plugin.SqlHistoryAlarm;
+namespace ThingsGateway.Plugin.DB;
 
 /// <summary>
 /// HistoryAlarmPage

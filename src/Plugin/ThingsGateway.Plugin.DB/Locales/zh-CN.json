@@ -64,7 +64,7 @@
     "Name": "变量名称",
     "Value": "变量值"
   },
-  "ThingsGateway.Plugin.SqlHistoryAlarm.HistoryAlarm": {
+  "ThingsGateway.Plugin.DB.HistoryAlarm": {
     "AlarmCode": "报警值",
     "AlarmLimit": "报警限值",
     "AlarmText": "报警文本",
@@ -86,10 +86,14 @@
     "Remark4": "备用4",
     "Remark5": "备用5"
   },
-  "ThingsGateway.Plugin.SqlHistoryAlarm.SQLHistoryAlarmProperty": {
+  "ThingsGateway.Plugin.DB.SQLHistoryAlarmProperty": {
     "BigTextConnectStr": "链接字符串",
     "DbType": "数据库类型",
-    "TableName": "表名称"
+    "TableName": "表名称",
+    "VariableAlarmEnable": "变量报警存储",
+    "PluginEventEnable": "插件事件存储",
+    "BigTextScriptHistoryTable": "变量报警脚本",
+    "BigTextScriptPluginEventDataHistoryTable": "插件事件脚本"
   },
   "ThingsGateway.Plugin.TDengineDB.TDengineDBNumberHistoryValue": {
     "CollectTime": "采集时间",

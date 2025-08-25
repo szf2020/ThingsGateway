@@ -11,11 +11,10 @@
 using System.Diagnostics;
 
 using ThingsGateway.Foundation;
-using ThingsGateway.Plugin.DB;
 
 using TouchSocket.Core;
 
-namespace ThingsGateway.Plugin.SqlHistoryAlarm;
+namespace ThingsGateway.Plugin.DB;
 
 /// <summary>
 /// SqlHistoryAlarm
@@ -23,8 +22,61 @@ namespace ThingsGateway.Plugin.SqlHistoryAlarm;
 public partial class SqlHistoryAlarm : BusinessBaseWithCacheAlarm
 {
 #if !Management
+
+    protected override void PluginChange(PluginEventData value)
+    {
+        if (_driverPropertys.PluginEventEnable == false)
+            return;
+        AddQueuePluginDataModel(new CacheDBItem<PluginEventData>(value));
+    }
+
+    protected override ValueTask<OperResult> UpdatePluginEventDataModel(List<CacheDBItem<PluginEventData>> item, CancellationToken cancellationToken)
+    {
+        return UpdatePluginEventDataModel(item.Select(a => a.Value), cancellationToken);
+    }
+    private async ValueTask<OperResult> UpdatePluginEventDataModel(IEnumerable<PluginEventData> item, CancellationToken cancellationToken)
+    {
+        var result = await InserableAsync(item.ToList(), cancellationToken).ConfigureAwait(false);
+        if (success != result.IsSuccess)
+        {
+            if (!result.IsSuccess)
+                LogMessage?.LogWarning(result.ToString());
+            success = result.IsSuccess;
+        }
+
+        return result;
+    }
+    private async ValueTask<OperResult> InserableAsync(List<PluginEventData> dbInserts, CancellationToken cancellationToken)
+    {
+        try
+        {
+            _db.Ado.CancellationToken = cancellationToken;
+            if (!_driverPropertys.BigTextScriptPluginEventDataHistoryTable.IsNullOrEmpty())
+            {
+                var getDeviceModel = CSharpScriptEngineExtension.Do<DynamicSQLBase>(_driverPropertys.BigTextScriptPluginEventDataHistoryTable);
+
+                getDeviceModel.Logger = LogMessage;
+
+                await getDeviceModel.DBInsertable(_db, dbInserts, cancellationToken).ConfigureAwait(false);
+            }
+            else
+            {
+                return new OperResult("Script must be configured");
+            }
+
+            return OperResult.Success;
+        }
+        catch (Exception ex)
+        {
+            return new OperResult(ex);
+        }
+    }
+
+
     protected override void AlarmChange(AlarmVariable alarmVariable)
     {
+        if (_driverPropertys.VariableAlarmEnable == false)
+            return;
         AddQueueAlarmModel(new CacheDBItem<AlarmVariable>(alarmVariable));
     }
 
@@ -86,6 +138,8 @@ public partial class SqlHistoryAlarm : BusinessBaseWithCacheAlarm
             return new OperResult(ex);
         }
     }
+
+
 
 #endif
 }

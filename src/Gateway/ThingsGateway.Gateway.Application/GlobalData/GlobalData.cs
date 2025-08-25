@@ -40,6 +40,28 @@ public delegate void VariableCollectEventHandler(VariableRuntime variableRuntime
 /// </summary>
 public delegate void VariableAlarmEventHandler(AlarmVariable alarmVariable);
 
+public delegate void PluginEventHandler(PluginEventData data);
+
+public class PluginEventData
+{
+    public string DeviceName { get; set; }
+    public Newtonsoft.Json.Linq.JObject Value { get; set; }
+    public string ValueType { get; set; }
+
+    [System.Text.Json.Serialization.JsonIgnore]
+    [Newtonsoft.Json.JsonIgnore]
+    public object ObjectValue { get; set; }
+    //public object ObjectValue => ValueType.IsNullOrEmpty() ? Value : Value.ToObject(Type.GetType(ValueType, false) ?? typeof(JObject));
+
+    public PluginEventData(string deviceName, object value)
+    {
+        DeviceName = deviceName;
+        ObjectValue = value;
+        Value = Newtonsoft.Json.Linq.JObject.FromObject(value);
+        ValueType = $"{value?.GetType().FullName},{value?.GetType().Assembly.GetName().Name}";
+    }
+}
+
 /// <summary>
 /// 采集设备值与状态全局提供类，用于提供全局的设备状态和变量数据的管理
 /// </summary>
@@ -63,6 +85,8 @@ public static class GlobalData
     /// 报警变化事件
     /// </summary>
     public static event VariableAlarmEventHandler? AlarmChangedEvent;
+
+    public static event PluginEventHandler? PluginEventHandler;
 
     public static async Task<IEnumerable<ChannelRuntime>> GetCurrentUserChannels()
     {
@@ -480,6 +504,14 @@ public static class GlobalData
         AlarmChangedEvent?.Invoke(alarmVariable);
     }
 
+    /// <summary>
+    /// 事件状态变化处理方法，用于处理事件状态变化时的逻辑
+    /// </summary>
+    public static void PluginEventChange(PluginEventData pluginEventData)
+    {
+        // 触发设备状态变化事件，并将设备运行时对象转换为设备数据对象进行传递
+        PluginEventHandler?.Invoke(pluginEventData);
+    }
     /// <summary>
     /// 设备状态变化处理方法，用于处理设备状态变化时的逻辑
     /// </summary>

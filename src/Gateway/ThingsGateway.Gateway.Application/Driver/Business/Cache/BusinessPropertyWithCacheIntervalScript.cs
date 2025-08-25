@@ -28,7 +28,11 @@ public class BusinessPropertyWithCacheIntervalScript : BusinessPropertyWithCache
     /// </summary>
     [DynamicProperty]
     public bool JsonFormattingIndented { get; set; } = true;
-
+    /// <summary>
+    /// 忽略Null值
+    /// </summary>
+    [DynamicProperty]
+    public bool JsonIgnoreNull { get; set; } = true;
     /// <summary>
     /// 设备Topic
     /// </summary>
@@ -46,6 +50,11 @@ public class BusinessPropertyWithCacheIntervalScript : BusinessPropertyWithCache
     /// </summary>
     [DynamicProperty]
     public bool IsAlarmList { get; set; } = true;
+    /// <summary>
+    /// 报警Topic
+    /// </summary>
+    [DynamicProperty]
+    public bool IsPluginEventDataList { get; set; } = true;
 
     /// <summary>
     /// 设备Topic
@@ -64,6 +73,12 @@ public class BusinessPropertyWithCacheIntervalScript : BusinessPropertyWithCache
     /// </summary>
     [DynamicProperty(Remark = "可使用${key}作为匹配项，key必须是上传实体中的属性，比如ThingsGateway/Alarm/${DeviceName}")]
     public string AlarmTopic { get; set; }
+
+    /// <summary>
+    /// 报警Topic
+    /// </summary>
+    [DynamicProperty(Remark = "可使用${key}作为匹配项，key必须是上传实体中的属性，比如ThingsGateway/PluginEventData/${DeviceName}")]
+    public string PluginEventDataTopic { get; set; }
 
     /// <summary>
     /// 设备实体脚本
@@ -85,4 +100,11 @@ public class BusinessPropertyWithCacheIntervalScript : BusinessPropertyWithCache
     [DynamicProperty]
     [AutoGenerateColumn(Visible = true, IsVisibleWhenEdit = false, IsVisibleWhenAdd = false)]
     public string? BigTextScriptAlarmModel { get; set; }
+
+    /// <summary>
+    /// 报警实体脚本
+    /// </summary>
+    [DynamicProperty]
+    [AutoGenerateColumn(Visible = true, IsVisibleWhenEdit = false, IsVisibleWhenAdd = false)]
+    public string? BigTextScriptPluginEventDataModel { get; set; }
 }

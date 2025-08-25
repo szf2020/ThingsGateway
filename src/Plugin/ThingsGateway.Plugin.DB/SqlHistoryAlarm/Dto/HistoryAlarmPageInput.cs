@@ -12,7 +12,7 @@ using BootstrapBlazor.Components;
 
 using ThingsGateway.Extension.Generic;
 
-namespace ThingsGateway.Plugin.SqlHistoryAlarm;
+namespace ThingsGateway.Plugin.DB;
 
 public class HistoryAlarmPageInput : ITableSearchModel
 {

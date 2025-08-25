@@ -12,12 +12,13 @@ using BootstrapBlazor.Components;
 
 using ThingsGateway.Common;
 using ThingsGateway.DB;
+using ThingsGateway.Debug;
 using ThingsGateway.Foundation;
 using ThingsGateway.NewLife;
 using ThingsGateway.NewLife.Extension;
 using ThingsGateway.SqlSugar;
 
-namespace ThingsGateway.Plugin.SqlHistoryAlarm;
+namespace ThingsGateway.Plugin.DB;
 
 /// <summary>
 /// SqlHistoryAlarm
@@ -55,7 +56,7 @@ public partial class SqlHistoryAlarm : BusinessBaseWithCacheAlarm
 
     private SqlSugarClient _db;
 
-
+    public override Type DriverPropertyUIType => typeof(SqlDBProducerPropertyRazor);
 
     protected override Task DisposeAsync(bool disposing)
     {
@@ -66,6 +67,7 @@ public partial class SqlHistoryAlarm : BusinessBaseWithCacheAlarm
 #if !Management
     protected override async Task InitChannelAsync(IChannel? channel, CancellationToken cancellationToken)
     {
+
         _db = BusinessDatabaseUtil.GetDb((DbType)_driverPropertys.DbType, _driverPropertys.BigTextConnectStr);
 
         await base.InitChannelAsync(channel, cancellationToken).ConfigureAwait(false);
@@ -76,11 +78,33 @@ public partial class SqlHistoryAlarm : BusinessBaseWithCacheAlarm
     /// </summary>
     /// <returns></returns>
     public override bool IsConnected() => success;
-    protected override Task ProtectedStartAsync(CancellationToken cancellationToken)
+    protected override async Task ProtectedStartAsync(CancellationToken cancellationToken)
     {
         _db.DbMaintenance.CreateDatabase();
-        _db.CodeFirst.AS<HistoryAlarm>(_driverPropertys.TableName).InitTables<HistoryAlarm>();
-        return base.ProtectedStartAsync(cancellationToken);
+        if (_driverPropertys.VariableAlarmEnable)
+        {
+            if (!_driverPropertys.BigTextScriptHistoryTable.IsNullOrEmpty())
+            {
+                var hisModel = CSharpScriptEngineExtension.Do<DynamicSQLBase>(_driverPropertys.BigTextScriptHistoryTable);
+
+                await hisModel.DBInit(_db, cancellationToken).ConfigureAwait(false);
+            }
+            else
+            {
+                _db.CodeFirst.AS<HistoryAlarm>(_driverPropertys.TableName).InitTables<HistoryAlarm>();
+            }
+        }
+        if (_driverPropertys.PluginEventEnable)
+        {
+            if (!_driverPropertys.BigTextScriptPluginEventDataHistoryTable.IsNullOrEmpty())
+            {
+                var hisModel = CSharpScriptEngineExtension.Do<DynamicSQLBase>(_driverPropertys.BigTextScriptPluginEventDataHistoryTable);
+
+                await hisModel.DBInit(_db, cancellationToken).ConfigureAwait(false);
+            }
+        }
+
+        await base.ProtectedStartAsync(cancellationToken).ConfigureAwait(false);
     }
 
     #region 数据查询

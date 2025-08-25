@@ -1,4 +1,21 @@
 ﻿{
+
+  "ThingsGateway.Gateway.Application.BusinessVariableProperty": {
+
+    "Data1": "Data1",
+    "Data2": "Data2",
+    "Data3": "Data3",
+    "Data4": "Data4",
+    "Data5": "Data5",
+    "Data6": "Data6",
+    "Data7": "Data7",
+    "Data8": "Data8",
+    "Data9": "Data9",
+    "Data10": "Data10"
+  },
+
+
+
   "ThingsGateway.Management.Application.ManagementExportString": {
 
     "ManagementConfigName": "ManagementConfigName"
@@ -30,6 +47,7 @@
 
     "Actuator": "Actuator",
     "AlarmChangedTriggerNode": "AlarmStateTrigger",
+    "PluginEventChangedTriggerNode": "PluginEventTrigger",
     "BusinessNode": "BusinessDeviceExecution",
     "BusinessNode.Placeholder": "BusinessDeviceName",
     "Cancel": "Cancel",
@@ -225,15 +243,19 @@
   },
   "ThingsGateway.Gateway.Application.BusinessPropertyWithCacheIntervalScript": {
     "AlarmTopic": "AlarmTopic",
+    "PluginEventDataTopic": "PluginEventDataTopic",
     "BigTextScriptAlarmModel": "BigTextScriptAlarmModel",
+    "BigTextScriptPluginEventDataModel": "BigTextScriptPluginEventDataModel",
     "BigTextScriptDeviceModel": "BigTextScriptDeviceModel",
     "BigTextScriptVariableModel": "BigTextScriptVariableModel",
     "DetailLog": "DetailLog",
     "DeviceTopic": "DeviceTopic",
     "IsAlarmList": "IsAlarmList",
+    "IsPluginEventDataList": "IsPluginEventDataList",
     "IsDeviceList": "IsDeviceList",
     "IsVariableList": "IsVariableList",
     "JsonFormattingIndented": "JsonFormattingIndented",
+    "JsonIgnoreNull": "JsonIgnoreNull",
     "VariableTopic": "VariableTopic"
   },
   "ThingsGateway.Gateway.Application.BusinessUpdateEnum": {

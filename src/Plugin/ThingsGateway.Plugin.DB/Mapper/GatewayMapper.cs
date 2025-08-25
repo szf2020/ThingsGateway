@@ -11,7 +11,6 @@
 using Riok.Mapperly.Abstractions;
 
 using ThingsGateway.DB;
-using ThingsGateway.Plugin.SqlHistoryAlarm;
 
 namespace ThingsGateway.Plugin.DB;
 [Mapper(UseDeepCloning = true, EnumMappingStrategy = EnumMappingStrategy.ByName, RequiredMappingStrategy = RequiredMappingStrategy.None)]

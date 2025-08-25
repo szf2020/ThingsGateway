@@ -13,6 +13,6 @@ namespace ThingsGateway.Plugin.RabbitMQ;
 /// <summary>
 /// RabbitMQProducerVariableProperty
 /// </summary>
-public class RabbitMQProducerVariableProperty : VariablePropertyBase
+public class RabbitMQProducerVariableProperty : BusinessVariableProperty
 {
 }

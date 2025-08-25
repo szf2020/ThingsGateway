@@ -64,7 +64,7 @@
     "Name": "Name",
     "Value": "Value"
   },
-  "ThingsGateway.Plugin.SqlHistoryAlarm.HistoryAlarm": {
+  "ThingsGateway.Plugin.DB.HistoryAlarm": {
     "AlarmCode": "AlarmCode",
     "AlarmLimit": "AlarmLimit",
     "AlarmText": "AlarmText",
@@ -86,10 +86,14 @@
     "Remark4": "Remark4",
     "Remark5": "Remark5"
   },
-  "ThingsGateway.Plugin.SqlHistoryAlarm.SQLHistoryAlarmProperty": {
+  "ThingsGateway.Plugin.DB.SQLHistoryAlarmProperty": {
     "BigTextConnectStr": "ConnectString",
     "DbType": "DbType",
-    "TableName": "TableName"
+    "TableName": "TableName",
+    "VariableAlarmEnable": "VariableAlarmEnable",
+    "PluginEventEnable": "PluginEventEnable",
+    "BigTextScriptHistoryTable": "BigTextScriptHistoryTable",
+    "BigTextScriptPluginEventDataHistoryTable": "BigTextScriptPluginEventDataHistoryTable"
   },
   "ThingsGateway.Plugin.TDengineDB.TDengineDBNumberHistoryValue": {
     "CollectTime": "CollectTime",

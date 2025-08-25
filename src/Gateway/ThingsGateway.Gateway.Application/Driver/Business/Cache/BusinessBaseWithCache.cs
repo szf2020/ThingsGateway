@@ -26,8 +26,21 @@ public abstract class BusinessBaseWithCache : BusinessBase
     protected abstract BusinessPropertyWithCache _businessPropertyWithCache { get; }
 
 #if !Management
+
+    protected override Task DisposeAsync(bool disposing)
+    {
+        // 清空内存队列
+        _memoryPluginEventDataModelQueue.Clear();
+        _memoryAlarmModelQueue.Clear();
+        _memoryDevModelQueue.Clear();
+        _memoryVarModelQueue.Clear();
+        _memoryVarModelsQueue.Clear();
+        return base.DisposeAsync(disposing);
+    }
+
     #region 条件
 
+    protected abstract bool PluginEventDataModelEnable { get; }
     protected abstract bool AlarmModelEnable { get; }
     protected abstract bool DevModelEnable { get; }
     protected abstract bool VarModelEnable { get; }
@@ -35,6 +48,10 @@ public abstract class BusinessBaseWithCache : BusinessBase
     {
         if (AlarmModelEnable)
             DBCacheAlarm = LocalDBCacheAlarmModel();
+
+        if (PluginEventDataModelEnable)
+            DBCachePluginEventData = LocalDBCachePluginEventDataModel();
+
 
         if (DevModelEnable)
             DBCacheDev = LocalDBCacheDevModel();
@@ -68,7 +85,10 @@ public abstract class BusinessBaseWithCache : BusinessBase
         {
             await UpdateAlarmModelMemory(cancellationToken).ConfigureAwait(false);
         }
-
+        if (PluginEventDataModelEnable)
+        {
+            await UpdatePluginEventDataModelMemory(cancellationToken).ConfigureAwait(false);
+        }
         if (VarModelEnable)
         {
             await UpdateVarModelCache(cancellationToken).ConfigureAwait(false);
@@ -83,6 +103,12 @@ public abstract class BusinessBaseWithCache : BusinessBase
         if (AlarmModelEnable)
         {
             await UpdateAlarmModelCache(cancellationToken).ConfigureAwait(false);
+
+        }
+        if (PluginEventDataModelEnable)
+        {
+            await UpdatePluginEventDataModelCache(cancellationToken).ConfigureAwait(false);
+
         }
     }
     #endregion
@@ -90,10 +116,12 @@ public abstract class BusinessBaseWithCache : BusinessBase
     #region alarm
 
     protected ConcurrentQueue<CacheDBItem<AlarmVariable>> _memoryAlarmModelQueue = new();
+    protected ConcurrentQueue<CacheDBItem<PluginEventData>> _memoryPluginEventDataModelQueue = new();
 
     private volatile bool LocalDBCacheAlarmModelInited;
     private CacheDB DBCacheAlarm;
-
+    private volatile bool LocalDBCachePluginEventDataModelInited;
+    private CacheDB DBCachePluginEventData;
     /// <summary>
     /// 入缓存
     /// </summary>
@@ -143,6 +171,55 @@ public abstract class BusinessBaseWithCache : BusinessBase
     }
 
     /// <summary>
+    /// 入缓存
+    /// </summary>
+    /// <param name="data"></param>
+    protected virtual void AddCache(List<CacheDBItem<PluginEventData>> data)
+    {
+        if (_businessPropertyWithCache.CacheEnable && data?.Count > 0)
+        {
+            try
+            {
+                LogMessage?.LogInformation($"Add {typeof(PluginEventData).Name} data to file cache, count {data.Count}");
+                foreach (var item in data)
+                {
+                    item.Id = CommonUtils.GetSingleId();
+                }
+                var dir = CacheDBUtil.GetCacheFilePath(CurrentDevice.Name.ToString());
+                var fileStart = CacheDBUtil.GetFileName($"{CurrentDevice.PluginName}_{typeof(PluginEventData).FullName}_{nameof(PluginEventData)}");
+                var fullName = dir.CombinePathWithOs($"{fileStart}{CacheDBUtil.EX}");
+
+                lock (cacheLock)
+                {
+                    bool s = false;
+                    while (!s)
+                    {
+                        s = CacheDBUtil.DeleteCache(_businessPropertyWithCache.CacheFileMaxLength, fullName);
+                    }
+                    using var cache = LocalDBCachePluginEventDataModel();
+                    cache.DBProvider.Fastest<CacheDBItem<PluginEventData>>().PageSize(50000).BulkCopy(data);
+                }
+            }
+            catch
+            {
+                try
+                {
+                    using var cache = LocalDBCachePluginEventDataModel();
+                    lock (cache.CacheDBOption)
+                    {
+                        cache.DBProvider.Fastest<CacheDBItem<PluginEventData>>().PageSize(50000).BulkCopy(data);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    LogMessage?.LogWarning(ex, "Add cache fail");
+                }
+            }
+        }
+    }
+
+
+    /// <summary>
     /// 添加队列，超限后会入缓存
     /// </summary>
     /// <param name="data"></param>
@@ -184,6 +261,48 @@ public abstract class BusinessBaseWithCache : BusinessBase
     }
 
     /// <summary>
+    /// 添加队列，超限后会入缓存
+    /// </summary>
+    /// <param name="data"></param>
+    protected virtual void AddQueuePluginDataModel(CacheDBItem<PluginEventData> data)
+    {
+        if (_businessPropertyWithCache.CacheEnable)
+        {
+            //检测队列长度，超限存入缓存数据库
+            if (_memoryPluginEventDataModelQueue.Count > _businessPropertyWithCache.QueueMaxCount)
+            {
+                List<CacheDBItem<PluginEventData>> list = null;
+                lock (_memoryPluginEventDataModelQueue)
+                {
+                    if (_memoryPluginEventDataModelQueue.Count > _businessPropertyWithCache.QueueMaxCount)
+                    {
+                        list = _memoryPluginEventDataModelQueue.ToListWithDequeue();
+                    }
+                }
+                AddCache(list);
+            }
+        }
+        if (_memoryPluginEventDataModelQueue.Count > _businessPropertyWithCache.QueueMaxCount)
+        {
+            lock (_memoryPluginEventDataModelQueue)
+            {
+                if (_memoryPluginEventDataModelQueue.Count > _businessPropertyWithCache.QueueMaxCount)
+                {
+                    LogMessage?.LogWarning($"{typeof(PluginEventData).Name} Queue exceeds limit, clear old data. If it doesn't work as expected, increase {_businessPropertyWithCache.QueueMaxCount} or Enable cache");
+                    _memoryPluginEventDataModelQueue.Clear();
+                    _memoryPluginEventDataModelQueue.Enqueue(data);
+                    return;
+                }
+            }
+        }
+        else
+        {
+            _memoryPluginEventDataModelQueue.Enqueue(data);
+        }
+    }
+
+
+    /// <summary>
     /// 获取缓存对象，注意每次获取的对象可能不一样，如顺序操作，需固定引用
     /// </summary>
     protected virtual CacheDB LocalDBCacheAlarmModel()
@@ -197,6 +316,20 @@ public abstract class BusinessBaseWithCache : BusinessBase
         }
         return cacheDb;
     }
+    /// <summary>
+    /// 获取缓存对象，注意每次获取的对象可能不一样，如顺序操作，需固定引用
+    /// </summary>
+    protected virtual CacheDB LocalDBCachePluginEventDataModel()
+    {
+        var cacheDb = CacheDBUtil.GetCache(typeof(CacheDBItem<PluginEventData>), CurrentDevice.Name.ToString(), $"{CurrentDevice.PluginName}_{typeof(PluginEventData).Name}");
+
+        if (!LocalDBCachePluginEventDataModelInited)
+        {
+            cacheDb.InitDb();
+            LocalDBCachePluginEventDataModelInited = true;
+        }
+        return cacheDb;
+    }
 
     /// <summary>
     /// 需实现上传到通道
@@ -205,6 +338,16 @@ public abstract class BusinessBaseWithCache : BusinessBase
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     protected abstract ValueTask<OperResult> UpdateAlarmModel(List<CacheDBItem<AlarmVariable>> item, CancellationToken cancellationToken);
+
+
+    /// <summary>
+    /// 需实现上传到通道
+    /// </summary>
+    /// <param name="item"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    protected abstract ValueTask<OperResult> UpdatePluginEventDataModel(List<CacheDBItem<PluginEventData>> item, CancellationToken cancellationToken);
+
 
     protected async Task UpdateAlarmModelCache(CancellationToken cancellationToken)
     {
@@ -262,10 +405,69 @@ public abstract class BusinessBaseWithCache : BusinessBase
                 }
             }
 
+
             #endregion //成功上传时，补上传缓存数据
         }
     }
+    protected async Task UpdatePluginEventDataModelCache(CancellationToken cancellationToken)
+    {
+        if (_businessPropertyWithCache.CacheEnable)
+        {
+            #region //成功上传时，补上传缓存数据
 
+            if (IsConnected())
+            {
+                try
+                {
+                    while (!cancellationToken.IsCancellationRequested)
+                    {
+                        //循环获取，固定读最大行数量，执行完成需删除行
+                        var varList = await DBCachePluginEventData.DBProvider.Queryable<CacheDBItem<PluginEventData>>().Take(_businessPropertyWithCache.SplitSize).ToListAsync(cancellationToken).ConfigureAwait(false);
+                        if (varList.Count != 0)
+                        {
+                            try
+                            {
+                                if (!cancellationToken.IsCancellationRequested)
+                                {
+                                    var result = await UpdatePluginEventDataModel(varList, cancellationToken).ConfigureAwait(false);
+                                    if (result.IsSuccess)
+                                    {
+                                        //删除缓存
+                                        await DBCachePluginEventData.DBProvider.Deleteable<CacheDBItem<PluginEventData>>(varList).ExecuteCommandAsync(cancellationToken).ConfigureAwait(false);
+                                    }
+                                    else
+                                        break;
+                                }
+                                else
+                                {
+                                    break;
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                if (success)
+                                    LogMessage?.LogWarning(ex);
+                                success = false;
+                                break;
+                            }
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    if (success)
+                        LogMessage?.LogWarning(ex);
+                    success = false;
+                }
+            }
+
+            #endregion //成功上传时，补上传缓存数据
+        }
+    }
     protected async Task UpdateAlarmModelMemory(CancellationToken cancellationToken)
     {
         #region //上传设备内存队列中的数据
@@ -305,6 +507,47 @@ public abstract class BusinessBaseWithCache : BusinessBase
             success = false;
         }
 
+        #endregion //上传设备内存队列中的数据
+    }
+    protected async Task UpdatePluginEventDataModelMemory(CancellationToken cancellationToken)
+    {
+        #region //上传设备内存队列中的数据
+
+
+        try
+        {
+            var list = _memoryPluginEventDataModelQueue.ToListWithDequeue().ChunkBetter(_businessPropertyWithCache.SplitSize);
+            foreach (var item in list)
+            {
+                try
+                {
+                    if (!cancellationToken.IsCancellationRequested)
+                    {
+                        var result = await UpdatePluginEventDataModel(item, cancellationToken).ConfigureAwait(false);
+                        if (!result.IsSuccess)
+                        {
+                            AddCache(item);
+                        }
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    if (success)
+                        LogMessage?.LogWarning(ex);
+                    success = false;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            if (success)
+                LogMessage?.LogWarning(ex);
+            success = false;
+        }
         #endregion //上传设备内存队列中的数据
     }
 

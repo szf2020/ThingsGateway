@@ -21,6 +21,7 @@ namespace ThingsGateway.NewLife.Json.Extension;
 /// </summary>
 public static class SystemTextJsonExtension
 {
+
     /// <summary>
     /// 默认Json规则（带缩进）
     /// </summary>
@@ -31,36 +32,50 @@ public static class SystemTextJsonExtension
     /// </summary>
     public static JsonSerializerOptions NoneIndentedOptions;
 
+
+    /// <summary>
+    /// 默认Json规则（带缩进）
+    /// </summary>
+    public static JsonSerializerOptions IgnoreNullIndentedOptions;
+
+    /// <summary>
+    /// 默认Json规则（无缩进）
+    /// </summary>
+    public static JsonSerializerOptions IgnoreNullNoneIndentedOptions;
+
+    public static JsonSerializerOptions GetOptions(bool writeIndented, bool ignoreNull)
+    {
+        var options = new JsonSerializerOptions
+        {
+            Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+            WriteIndented = writeIndented,
+            DefaultIgnoreCondition = ignoreNull
+                ? JsonIgnoreCondition.WhenWritingNull
+                : JsonIgnoreCondition.Never,
+            NumberHandling = JsonNumberHandling.AllowNamedFloatingPointLiterals,
+        };
+
+        options.Converters.Add(new ByteArrayToNumberArrayConverterSystemTextJson());
+        options.Converters.Add(new JTokenSystemTextJsonConverter());
+        options.Converters.Add(new JValueSystemTextJsonConverter());
+        options.Converters.Add(new JObjectSystemTextJsonConverter());
+        options.Converters.Add(new JArraySystemTextJsonConverter());
+
+        return options;
+    }
+
     static SystemTextJsonExtension()
     {
-        IndentedOptions = new JsonSerializerOptions
-        {
-            Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
-            WriteIndented = true, // 缩进
-            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull, // 忽略 null
-            NumberHandling = JsonNumberHandling.AllowNamedFloatingPointLiterals,
-        };
-        // 如有自定义Converter，这里添加
-        // IndentedOptions.Converters.Add(new ByteArrayJsonConverter());
-        IndentedOptions.Converters.Add(new ByteArrayToNumberArrayConverterSystemTextJson());
-        IndentedOptions.Converters.Add(new JTokenSystemTextJsonConverter());
-        IndentedOptions.Converters.Add(new JValueSystemTextJsonConverter());
-        IndentedOptions.Converters.Add(new JObjectSystemTextJsonConverter());
-        IndentedOptions.Converters.Add(new JArraySystemTextJsonConverter());
-        NoneIndentedOptions = new JsonSerializerOptions
-        {
-            Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
-            WriteIndented = false, // 不缩进
-            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
-            NumberHandling = JsonNumberHandling.AllowNamedFloatingPointLiterals,
-        };
-        NoneIndentedOptions.Converters.Add(new ByteArrayToNumberArrayConverterSystemTextJson());
-        NoneIndentedOptions.Converters.Add(new JTokenSystemTextJsonConverter());
-        NoneIndentedOptions.Converters.Add(new JValueSystemTextJsonConverter());
-        NoneIndentedOptions.Converters.Add(new JObjectSystemTextJsonConverter());
-        NoneIndentedOptions.Converters.Add(new JArraySystemTextJsonConverter());
-        // NoneIndentedOptions.Converters.Add(new ByteArrayJsonConverter());
+
+        IndentedOptions = GetOptions(true, false);
+        NoneIndentedOptions = GetOptions(false, false);
+
+        IgnoreNullIndentedOptions = GetOptions(true, true);
+        IgnoreNullNoneIndentedOptions = GetOptions(false, true);
+
     }
+
+
 
     /// <summary>
     /// 反序列化
@@ -96,17 +111,17 @@ public static class SystemTextJsonExtension
     /// <summary>
     /// 序列化
     /// </summary>
-    public static string ToSystemTextJsonString(this object item, bool indented = true)
+    public static string ToSystemTextJsonString(this object item, bool indented = true, bool ignoreNull = true)
     {
-        return JsonSerializer.Serialize(item, item?.GetType() ?? typeof(object), indented ? IndentedOptions : NoneIndentedOptions);
+        return JsonSerializer.Serialize(item, item?.GetType() ?? typeof(object), ignoreNull ? indented ? IgnoreNullIndentedOptions : IgnoreNullNoneIndentedOptions : indented ? IndentedOptions : NoneIndentedOptions);
     }
 
     /// <summary>
     /// 序列化
     /// </summary>
-    public static byte[] ToSystemTextJsonUtf8Bytes(this object item, bool indented = true)
+    public static byte[] ToSystemTextJsonUtf8Bytes(this object item, bool indented = true, bool ignoreNull = true)
     {
-        return JsonSerializer.SerializeToUtf8Bytes(item, item.GetType(), indented ? IndentedOptions : NoneIndentedOptions);
+        return JsonSerializer.SerializeToUtf8Bytes(item, item.GetType(), ignoreNull ? indented ? IgnoreNullIndentedOptions : IgnoreNullNoneIndentedOptions : indented ? IndentedOptions : NoneIndentedOptions);
     }
 }
 

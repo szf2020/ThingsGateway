@@ -20,6 +20,7 @@ namespace ThingsGateway.Gateway.Application;
 public abstract class BusinessBaseWithCacheAlarm : BusinessBaseWithCache
 {
 #if !Management
+    protected override bool PluginEventDataModelEnable => true;
     protected override bool AlarmModelEnable => true;
 
     protected override bool DevModelEnable => false;
@@ -57,14 +58,40 @@ public abstract class BusinessBaseWithCacheAlarm : BusinessBaseWithCache
         GlobalData.AlarmChangedEvent -= AlarmValueChange;
         GlobalData.ReadOnlyRealAlarmIdVariables?.ForEach(a => AlarmValueChange(a.Value));
         GlobalData.AlarmChangedEvent += AlarmValueChange;
+        GlobalData.PluginEventHandler -= PluginEventChange;
+        GlobalData.PluginEventHandler += PluginEventChange;
 
         await base.InitChannelAsync(channel, cancellationToken).ConfigureAwait(false);
     }
     protected override Task DisposeAsync(bool disposing)
     {
         GlobalData.AlarmChangedEvent -= AlarmValueChange;
+        GlobalData.PluginEventHandler -= PluginEventChange;
         return base.DisposeAsync(disposing);
     }
+
+
+    private void PluginEventChange(PluginEventData value)
+    {
+        if (CurrentDevice?.Pause != false)
+            return;
+        if (TaskSchedulerLoop?.Stoped == true) return;
+
+        if (!PluginEventDataModelEnable) return;
+        // 如果业务属性的缓存为间隔上传，则不执行后续操作
+        //if (_businessPropertyWithCacheInterval?.IsInterval != true)
+        {
+            PluginChange(value);
+        }
+    }
+    /// <summary>
+    /// 当报警状态变化时触发此方法。如果不需要进行报警上传，则可以忽略此方法。通常情况下，需要在此方法中执行 <see cref="BusinessBaseWithCache.AddQueuePluginDataModel(CacheDBItem{PluginEventData})"/> 方法。
+    /// </summary>
+    protected virtual void PluginChange(PluginEventData value)
+    {
+        // 在报警状态变化时执行的自定义逻辑
+    }
+
     /// <summary>
     /// 当报警值发生变化时触发此事件处理方法。该方法内部会检查是否需要进行报警上传，如果需要，则调用 <see cref="AlarmChange(AlarmVariable)"/> 方法。
     /// </summary>

@@ -8,11 +8,11 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-namespace ThingsGateway.Plugin.SqlHistoryAlarm;
+namespace ThingsGateway.Plugin.DB;
 
 /// <summary>
 /// <inheritdoc/>
 /// </summary>
-public class SqlHistoryAlarmVariableProperty : VariablePropertyBase
+public class SqlHistoryAlarmVariableProperty : BusinessVariableProperty
 {
 }

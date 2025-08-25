@@ -53,6 +53,7 @@ public class AlarmChangedTriggerNode : VariableNode, ITriggerNode, IDisposable
         GlobalData.ReadOnlyRealAlarmIdVariables?.ForEach(a => AlarmHostedService_OnAlarmChanged(a.Value));
         GlobalData.AlarmChangedEvent += AlarmHostedService_OnAlarmChanged;
     }
+
     private static void AlarmHostedService_OnAlarmChanged(AlarmVariable alarmVariable)
     {
         if (AlarmChangedTriggerNodeDict.TryGetValue(alarmVariable.DeviceName, out var alarmNodeDict) &&

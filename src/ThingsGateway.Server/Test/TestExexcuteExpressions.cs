@@ -2,7 +2,6 @@
 //using System.Text;
 
 //using ThingsGateway.Gateway.Application;
-//using ThingsGateway.RulesEngine;
 
 //public class TestExexcuteExpressions : IExexcuteExpressions
 //{

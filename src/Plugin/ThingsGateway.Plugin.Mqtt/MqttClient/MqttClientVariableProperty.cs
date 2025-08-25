@@ -13,7 +13,7 @@ namespace ThingsGateway.Plugin.Mqtt;
 /// <summary>
 /// <inheritdoc/>
 /// </summary>
-public class MqttClientVariableProperty : VariablePropertyBase
+public class MqttClientVariableProperty : BusinessVariableProperty
 {
     /// <summary>
     /// 允许写入

@@ -41,6 +41,27 @@ public partial class MqttServer : BusinessBaseWithCacheIntervalScriptAll
     private MQTTnet.Server.MqttServer _mqttServer;
     private IWebHost _webHost { get; set; }
 
+
+
+
+    protected override void PluginChange(PluginEventData pluginEventData)
+    {
+        if (!_businessPropertyWithCacheIntervalScript.PluginEventDataTopic.IsNullOrWhiteSpace())
+            AddQueuePluginDataModel(new(pluginEventData));
+        base.PluginChange(pluginEventData);
+    }
+    protected override ValueTask<OperResult> UpdatePluginEventDataModel(List<CacheDBItem<PluginEventData>> item, CancellationToken cancellationToken)
+    {
+        return UpdatePluginEventDataModel(item.Select(a => a.Value), cancellationToken);
+    }
+    private ValueTask<OperResult> UpdatePluginEventDataModel(IEnumerable<PluginEventData> item, CancellationToken cancellationToken)
+    {
+        var topicArrayList = GetPluginEventDataTopicArrays(item);
+        return Update(topicArrayList, cancellationToken);
+    }
+
+
+
     protected override void AlarmChange(AlarmVariable alarmVariable)
     {
         if (!_businessPropertyWithCacheIntervalScript.AlarmTopic.IsNullOrWhiteSpace())

@@ -3,7 +3,6 @@
 
 //using ThingsGateway.Foundation;
 //using ThingsGateway.Gateway.Application;
-//using ThingsGateway.Razor;
 //namespace ThingsGateway.Server;
 
 ///// <summary>
@@ -231,13 +230,9 @@
 //        return base.ReadSourceAsync(variableSourceRead, cancellationToken);
 //    }
 
-//    /// <summary>
-//    /// 插件释放
-//    /// </summary>
-//    /// <param name="disposing"></param>
-//    protected override void Dispose(bool disposing)
+//    protected override Task DisposeAsync(bool disposing)
 //    {
-//        base.Dispose(disposing);
+//        return base.DisposeAsync(disposing);
 //    }
 
 //    /// <summary>

@@ -10,6 +10,6 @@
 
 namespace ThingsGateway.Plugin.QuestDB;
 
-public class QuestDBProducerVariableProperty : VariablePropertyBase
+public class QuestDBProducerVariableProperty : BusinessVariableProperty
 {
 }

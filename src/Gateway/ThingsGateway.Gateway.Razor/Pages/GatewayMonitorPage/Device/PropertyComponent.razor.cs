@@ -8,7 +8,11 @@
 // QQ群：605534569
 // ------------------------------------------------------------------------------
 
+using System.Text;
+
 using ThingsGateway.NewLife.Json.Extension;
+
+using TouchSocket.Core;
 
 namespace ThingsGateway.Gateway.Razor;
 public partial class PropertyComponent : IPropertyUIBase
@@ -69,11 +73,16 @@ public partial class PropertyComponent : IPropertyUIBase
         {nameof(ScriptCheck.Script),script },
         {nameof(ScriptCheck.GetResult), (string input,string script)=>
         {
+                StringBuilder stringBuilder=new();
+               var logger=new EasyLogger((a)=>stringBuilder.AppendLine(a));
+
+
                 var type=  script == businessProperty.BigTextScriptDeviceModel?typeof(List<DeviceBasicData>):script ==businessProperty.BigTextScriptAlarmModel?typeof(List<AlarmVariable>):typeof(List<VariableBasicData>);
 
                 var  data = (IEnumerable<object>)Newtonsoft.Json.JsonConvert.DeserializeObject(input, type);
-                var value = data.GetDynamicModel(script);
-              return Task.FromResult( value.ToSystemTextJsonString());
+                var value = data.GetDynamicModel(script,logger);
+                stringBuilder.AppendLine(value.ToSystemTextJsonString());
+              return Task.FromResult( stringBuilder.ToString());
         }},
 
         {nameof(ScriptCheck.OnGetDemo),()=>

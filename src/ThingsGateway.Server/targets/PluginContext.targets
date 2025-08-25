@@ -96,7 +96,7 @@
 
 
 
-		<Message Text="将插件复制到插件目录 $(PluginFolder)" Importance="high" />
+		<Message Text="将开源插件复制到插件目录 $(PluginFolder)" Importance="high" />
 		<Copy SourceFiles="@(PkgThingsGateway_Plugin_ModbusPackageFiles)" DestinationFolder="$(PluginFolder)%(RecursiveDir)" />
 		<Copy SourceFiles="@(PkgThingsGateway_Plugin_SiemensS7PackageFiles)" DestinationFolder="$(PluginFolder)%(RecursiveDir)" />
 		<Copy SourceFiles="@(PkgThingsGateway_Plugin_Dlt645PackageFiles)" DestinationFolder="$(PluginFolder)%(RecursiveDir)" />

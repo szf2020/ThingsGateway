@@ -35,6 +35,7 @@
 	<!--<Import Project="targets\Pro3.targets" Condition=" '$(SolutionName)' == 'ThingsGatewayPro' " />
 	<Import Project="targets\Pro5.targets" Condition=" '$(SolutionName)' == 'ThingsGatewayPro' " />-->
 	<!--<Import Project="targets\Pro6.targets" Condition=" '$(SolutionName)' == 'ThingsGatewayPro' AND '$(Configuration)' != 'Debug'" />-->
+	<Import Project="targets\Pro7.targets" Condition=" '$(SolutionName)' == 'ThingsGatewayPro' AND '$(Configuration)' != 'Debug'" />
 
 	<!--打包复制-->
 	<Import Project="targets\PluginPublish.targets" />

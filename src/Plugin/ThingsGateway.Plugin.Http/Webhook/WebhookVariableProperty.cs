@@ -13,6 +13,6 @@ namespace ThingsGateway.Plugin.Webhook;
 /// <summary>
 /// <inheritdoc/>
 /// </summary>
-public class WebhookVariableProperty : VariablePropertyBase
+public class WebhookVariableProperty : BusinessVariableProperty
 {
 }

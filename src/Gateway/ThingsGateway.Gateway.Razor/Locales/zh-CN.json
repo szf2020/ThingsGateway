@@ -55,6 +55,7 @@
 
     "Actuator": "执行",
     "AlarmChangedTriggerNode": "报警状态触发器",
+    "PluginEventChangedTriggerNode": "插件事件触发器",
     "BusinessNode": "业务设备执行",
     "BusinessNode.Placeholder": "设备名称",
     "Cancel": "取消",

@@ -14,7 +14,7 @@ using System.ComponentModel.DataAnnotations;
 
 using ThingsGateway.Plugin.SqlDB;
 
-namespace ThingsGateway.Plugin.SqlHistoryAlarm;
+namespace ThingsGateway.Plugin.DB;
 
 /// <summary>
 /// <inheritdoc/>
@@ -26,10 +26,17 @@ public class SqlHistoryAlarmProperty : BusinessPropertyWithCache
     [DynamicProperty]
     [Required]
     public string TableName { get; set; } = "historyAlarm";
+
+    [DynamicProperty]
+    public bool VariableAlarmEnable { get; set; } = true;
+
+    [DynamicProperty]
+    public bool PluginEventEnable { get; set; } = false;
+
     [DynamicProperty]
     [Required]
     [AutoGenerateColumn(ComponentType = typeof(Textarea), Rows = 1)]
-    public string BigTextConnectStr { get; set; } = "server=.;uid=sa;pwd=111111;database=test;";
+    public string BigTextConnectStr { get; set; } = "server=.;uid=sa;pwd=111111;database=test;Encrypt=True;TrustServerCertificate=True;";
 
     /// <summary>
     /// 历史表脚本
@@ -37,6 +44,16 @@ public class SqlHistoryAlarmProperty : BusinessPropertyWithCache
     [DynamicProperty]
     [AutoGenerateColumn(Visible = true, IsVisibleWhenEdit = false, IsVisibleWhenAdd = false)]
     public string? BigTextScriptHistoryTable { get; set; }
+
+
+
+
+    /// <summary>
+    /// 历史表脚本
+    /// </summary>
+    [DynamicProperty]
+    [AutoGenerateColumn(Visible = true, IsVisibleWhenEdit = false, IsVisibleWhenAdd = false)]
+    public string? BigTextScriptPluginEventDataHistoryTable { get; set; }
 
     public override bool OnlineFilter { get; set; } = false;
 }

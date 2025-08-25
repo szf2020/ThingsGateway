@@ -40,7 +40,13 @@ public abstract class BusinessBaseWithCacheInterval : BusinessBaseWithCache
             GlobalData.ReadOnlyRealAlarmIdVariables?.ForEach(a => AlarmValueChange(a.Value));
 
             GlobalData.AlarmChangedEvent += AlarmValueChange;
-            // 解绑全局数据的事件
+
+        }
+        if (PluginEventDataModelEnable)
+        {
+            GlobalData.PluginEventHandler -= PluginEventChange;
+            GlobalData.PluginEventHandler += PluginEventChange;
+
         }
         if (DevModelEnable)
         {
@@ -64,7 +70,7 @@ public abstract class BusinessBaseWithCacheInterval : BusinessBaseWithCache
     }
     public override async Task AfterVariablesChangedAsync(CancellationToken cancellationToken)
     {
-        if (AlarmModelEnable || DevModelEnable || VarModelEnable)
+        if (AlarmModelEnable || DevModelEnable || VarModelEnable || PluginEventDataModelEnable)
         {
             // 如果业务属性指定了全部变量，则设置当前设备的变量运行时列表和采集设备列表
             if (_businessPropertyWithCacheInterval.IsAllVariable)
@@ -137,14 +143,12 @@ public abstract class BusinessBaseWithCacheInterval : BusinessBaseWithCache
     {
         // 解绑事件
         GlobalData.AlarmChangedEvent -= AlarmValueChange;
+        GlobalData.PluginEventHandler -= PluginEventChange;
+
         GlobalData.VariableValueChangeEvent -= VariableValueChange;
         GlobalData.DeviceStatusChangeEvent -= DeviceStatusChange;
 
-        // 清空内存队列
-        _memoryAlarmModelQueue.Clear();
-        _memoryDevModelQueue.Clear();
-        _memoryVarModelQueue.Clear();
-        _memoryVarModelsQueue.Clear();
+
         return base.DisposeAsync(disposing);
     }
 
@@ -226,7 +230,26 @@ public abstract class BusinessBaseWithCacheInterval : BusinessBaseWithCache
     {
         // 在变量状态变化时执行的自定义逻辑
     }
+    private void PluginEventChange(PluginEventData value)
+    {
+        if (CurrentDevice?.Pause != false)
+            return;
+        if (TaskSchedulerLoop?.Stoped == true) return;
 
+        if (!PluginEventDataModelEnable) return;
+        // 如果业务属性的缓存为间隔上传，则不执行后续操作
+        //if (_businessPropertyWithCacheInterval?.IsInterval != true)
+        {
+            PluginChange(value);
+        }
+    }
+    /// <summary>
+    /// 当报警状态变化时触发此方法。如果不需要进行报警上传，则可以忽略此方法。通常情况下，需要在此方法中执行 <see cref="BusinessBaseWithCache.AddQueueAlarmModel"/> 方法。
+    /// </summary>
+    protected virtual void PluginChange(PluginEventData value)
+    {
+        // 在报警状态变化时执行的自定义逻辑
+    }
     /// <summary>
     /// 当报警值发生变化时触发此事件处理方法。该方法内部会检查是否需要进行报警上传，如果需要，则调用 <see cref="AlarmChange(AlarmVariable)"/> 方法。
     /// </summary>

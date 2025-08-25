@@ -13,6 +13,6 @@ namespace ThingsGateway.Plugin.Kafka;
 /// <summary>
 /// kafka 生产者可变属性
 /// </summary>
-public class KafkaProducerVariableProperty : VariablePropertyBase
+public class KafkaProducerVariableProperty : BusinessVariableProperty
 {
 }

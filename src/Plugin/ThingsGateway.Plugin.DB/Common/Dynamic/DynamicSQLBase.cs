@@ -22,7 +22,7 @@ public abstract class DynamicSQLBase
     /// <returns></returns>
     public virtual Task DBInit(ISqlSugarClient db, CancellationToken cancellationToken)
     {
-        throw new NotSupportedException();
+        return Task.CompletedTask;
     }
 
     /// <summary>

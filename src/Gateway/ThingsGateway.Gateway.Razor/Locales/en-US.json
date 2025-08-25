@@ -55,6 +55,7 @@
 
     "Actuator": "Actuator",
     "AlarmChangedTriggerNode": "AlarmStateTrigger",
+    "PluginEventChangedTriggerNode": "PluginEventTrigger",
     "BusinessNode": "BusinessDeviceExecution",
     "BusinessNode.Placeholder": "BusinessDeviceName",
     "Cancel": "Cancel",

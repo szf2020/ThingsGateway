@@ -17,7 +17,7 @@
 		<PropertyGroup>
 			<PluginFolder>$(TargetDir)GatewayPlugins\</PluginFolder>
 		</PropertyGroup>
-		<Message Text="将插件复制到插件目录 $(PluginFolder)" Importance="high" />
+		<Message Text="将IXCom29s插件复制到插件目录 $(PluginFolder)" Importance="high" />
 
 		<Copy SourceFiles="@(PkgThingsGateway_Plugin_IXCom29sPackageFiles)" DestinationFolder="$(PluginFolder)ThingsGateway.Plugin.IXCom29s%(RecursiveDir)" />
 

@@ -23,12 +23,16 @@ public static class DynamicModelExtension
     /// <summary>
     /// GetDynamicModel
     /// </summary>
-    public static IEnumerable<object> GetDynamicModel<T>(this IEnumerable<T> datas, string script)
+    public static IEnumerable<object> GetDynamicModel<T>(this IEnumerable<T> datas, string script, TouchSocket.Core.ILog log)
     {
         if (!string.IsNullOrEmpty(script))
         {
             //执行脚本，获取新实体
             var getDeviceModel = CSharpScriptEngineExtension.Do<IDynamicModel>(script);
+            if (getDeviceModel is DynamicModelBase dynamicModelBase)
+            {
+                dynamicModelBase.Logger = log;
+            }
             return getDeviceModel.GetList(datas?.Cast<object>());
         }
         else
@@ -50,9 +54,17 @@ public static class DynamicModelExtension
         if (variableRuntime == null || propertyName.IsNullOrWhiteSpace())
             return null;
 
+        // 检查是否存在对应的业务设备Id
+        if (variableRuntime.VariablePropertys?.TryGetValue(businessId, out var keyValuePairs) == true)
+        {
+            keyValuePairs.TryGetValue(propertyName, out var value);
+            return value; // 返回属性值
+        }
+
+
         if (GlobalData.IdDevices.TryGetValue(businessId, out var deviceRuntime))
         {
-            if (deviceRuntime.Driver?.DriverProperties is IBusinessPropertyAllVariableBase property)
+            if (deviceRuntime.Driver is BusinessBase businessBase && businessBase.DriverProperties is IBusinessPropertyAllVariableBase property)
             {
                 if (property.IsAllVariable)
                 {
@@ -64,18 +76,12 @@ public static class DynamicModelExtension
                     }
                     else
                     {
-                        return ThingsGatewayStringConverter.Default.Serialize(null, property.GetValue(propertyName, false));
+                        return ThingsGatewayStringConverter.Default.Serialize(null, businessBase.VariablePropertys.GetValue(propertyName, false));
                     }
                 }
             }
         }
 
-        // 检查是否存在对应的业务设备Id
-        if (variableRuntime.VariablePropertys?.ContainsKey(businessId) == true)
-        {
-            variableRuntime.VariablePropertys[businessId].TryGetValue(propertyName, out var value);
-            return value; // 返回属性值
-        }
 
         return null; // 未找到对应的业务设备Id，返回null
     }
@@ -126,4 +132,9 @@ public static class DynamicModelExtension
 public interface IDynamicModel
 {
     IEnumerable<dynamic> GetList(IEnumerable<object> datas);
+}
+public abstract class DynamicModelBase : IDynamicModel
+{
+    public TouchSocket.Core.ILog Logger { get; set; }
+    public abstract IEnumerable<dynamic> GetList(IEnumerable<object> datas);
 }

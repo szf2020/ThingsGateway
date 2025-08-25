@@ -13,6 +13,6 @@ namespace ThingsGateway.Plugin.SqlDB;
 /// <summary>
 /// SqlDBProducerVariableProperty
 /// </summary>
-public class SqlDBProducerVariableProperty : VariablePropertyBase
+public class SqlDBProducerVariableProperty : BusinessVariableProperty
 {
 }

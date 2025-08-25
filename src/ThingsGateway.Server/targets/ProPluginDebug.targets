@@ -31,6 +31,8 @@
 		
 		<ProjectReference Include="..\PluginPro\ThingsGateway.Plugin.ModbusGY\ThingsGateway.Plugin.ModbusGY.csproj" />
 		<ProjectReference Include="..\PluginPro\ThingsGateway.Plugin.IXCom29s\ThingsGateway.Plugin.IXCom29s.csproj" />
+		<ProjectReference Include="..\PluginPro\ThingsGateway.Plugin.OpcAe\ThingsGateway.Plugin.OpcAe.csproj" />
+		<ProjectReference Include="..\PluginPro\ThingsGateway.Foundation.OpcAe\ThingsGateway.Foundation.OpcAe.csproj" />
 
 	</ItemGroup>
 

@@ -46,6 +46,7 @@ public class ValueChangedTriggerNode : VariableNode, ITriggerNode, IDisposable
     public static BlockingCollection<VariableBasicData> VariableBasicDatas = new();
     static ValueChangedTriggerNode()
     {
+        GlobalData.VariableValueChangeEvent -= GlobalData_VariableValueChangeEvent;
         Task.Factory.StartNew(RunAsync, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
         GlobalData.VariableValueChangeEvent += GlobalData_VariableValueChangeEvent;
     }
