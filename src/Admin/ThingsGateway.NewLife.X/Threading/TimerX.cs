@@ -72,7 +72,8 @@ public class TimerX : ITimer, ITimerx, IDisposable
 
     /// <summary>调用中</summary>
     public Boolean Calling { get; internal set; }
-
+    /// <summary>可重入</summary>
+    public Boolean Reentrant { get; set; } = false;
     /// <summary>平均耗时。毫秒</summary>
     public Int32 Cost { get; internal set; }
 

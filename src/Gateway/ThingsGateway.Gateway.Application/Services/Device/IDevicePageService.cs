@@ -42,7 +42,7 @@ namespace ThingsGateway.Gateway.Application
         Task<bool> ClearDeviceAsync(bool restart);
         Task<bool> IsRedundantDeviceAsync(long id);
         Task<string> GetDeviceNameAsync(long redundantDeviceId);
-        Task<List<SelectedItem>> GetDeviceItemsAsync(bool isCollect);
+        Task<QueryData<SelectedItem>> OnDeviceSelectedItemQueryAsync(VirtualizeQueryOption option, bool isCollect);
         Task<string> GetDevicePluginNameAsync(long id);
 
         Task<Dictionary<long, Tuple<string, string>>> GetDeviceIdNamesAsync();

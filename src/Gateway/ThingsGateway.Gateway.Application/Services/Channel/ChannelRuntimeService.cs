@@ -87,6 +87,12 @@ public class ChannelRuntimeService : IChannelRuntimeService
 
     }
 
+    public async Task RestartChannelsAsync()
+    {
+        var data = await GlobalData.GetCurrentUserChannels().ConfigureAwait(false);
+        await RestartChannelAsync(data.ToList()).ConfigureAwait(false);
+    }
+
     public async Task SetChannelLogLevelAsync(long id, TouchSocket.Core.LogLevel logLevel)
     {
         if (GlobalData.IdChannels.TryGetValue(id, out var ChannelRuntime))

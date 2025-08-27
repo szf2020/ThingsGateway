@@ -103,6 +103,10 @@ public partial class ManagementTask : AsyncDisposableObject
                        store.RegisterServer<IManagementRpcServer>(new ManagementRpcServer());
                        store.RegisterServer<IUpgradeRpcServer>(new UpgradeRpcServer());
 
+                       foreach (var type in App.EffectiveTypes.Where(p => typeof(IPluginRpcServer).IsAssignableFrom(p) && !p.IsAbstract && p.IsClass))
+                       {
+                           store.RegisterServer(type);
+                       }
                    });
 
                })
@@ -162,7 +166,10 @@ public partial class ManagementTask : AsyncDisposableObject
                    {
                        store.RegisterServer<IManagementRpcServer>(new ManagementRpcServer());
                        store.RegisterServer<IUpgradeRpcServer>(new UpgradeRpcServer());
-
+                       foreach (var type in App.EffectiveTypes.Where(p => typeof(IPluginRpcServer).IsAssignableFrom(p) && !p.IsAbstract && p.IsClass))
+                       {
+                           store.RegisterServer(type);
+                       }
                    });
 
                })

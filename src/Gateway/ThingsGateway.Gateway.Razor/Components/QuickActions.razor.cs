@@ -73,12 +73,22 @@ public partial class QuickActions
 
     private List<SelectedItem> AutoRestartThreadBoolItems;
 
-    private static async Task Restart()
+    [Inject]
+    IChannelPageService ChannelPageService { get; set; }
+
+#if Management
+    [Inject]
+    Management.Application.DmtpActorContext DmtpActorContext { get; set; }
+#endif
+    private async Task Restart()
     {
+#if Management
+        if (DmtpActorContext.Current == null)
+            return;
+#endif
         await Task.Run(async () =>
         {
-            var data = await GlobalData.GetCurrentUserChannels().ConfigureAwait(false);
-            await GlobalData.ChannelRuntimeService.RestartChannelAsync(data.ToList());
+            await ChannelPageService.RestartChannelsAsync();
         });
     }
 

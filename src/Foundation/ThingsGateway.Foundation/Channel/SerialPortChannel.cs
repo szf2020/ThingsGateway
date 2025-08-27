@@ -50,7 +50,7 @@ public class SerialPortChannel : SerialPortClient, IClientChannel
     private IDeviceDataHandleAdapter _deviceDataHandleAdapter;
     public void SetDataHandlingAdapterLogger(ILog log)
     {
-        if (_deviceDataHandleAdapter == null && ProtectedDataHandlingAdapter is IDeviceDataHandleAdapter handleAdapter)
+        if (_deviceDataHandleAdapter != ProtectedDataHandlingAdapter && ProtectedDataHandlingAdapter is IDeviceDataHandleAdapter handleAdapter)
         {
             _deviceDataHandleAdapter = handleAdapter;
         }

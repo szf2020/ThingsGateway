@@ -34,12 +34,15 @@ public class DeviceRuntimeService : IDeviceRuntimeService
 
         return Task.FromResult(GlobalData.ReadOnlyIdDevices.ToDictionary(a => a.Key, a => Tuple.Create(a.Value.Name, a.Value.PluginName)));
     }
-
-    public async Task<List<SelectedItem>> GetDeviceItemsAsync(bool isCollect)
+    public async Task<QueryData<SelectedItem>> OnDeviceSelectedItemQueryAsync(VirtualizeQueryOption option, bool isCollect)
     {
         var devices = await GlobalData.GetCurrentUserDevices().ConfigureAwait(false);
-        return devices.Where(a => a.IsCollect == isCollect).BuildDeviceSelectList().ToList();
+
+        return devices.Where(a => a.IsCollect == isCollect).WhereIf(!option.SearchText.IsNullOrWhiteSpace(), a => a.Name.Contains(option.SearchText)).GetQueryData(option, GatewayResourceUtil.BuildDeviceSelectList);
+
     }
+
+
     public Task<string> GetDevicePluginNameAsync(long id)
     {
         return Task.FromResult(GlobalData.ReadOnlyIdDevices.TryGetValue(id, out var deviceRuntime) ? deviceRuntime.PluginName : string.Empty);

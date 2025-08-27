@@ -168,12 +168,13 @@ public class TimerScheduler : ILogFeature
                 _period = 60_000;
                 foreach (var timer in arr)
                 {
-                    if (!timer.Calling && CheckTime(timer, now))
+                    if ((timer.Reentrant || !timer.Calling) && CheckTime(timer, now))
                     {
                         // 必须在主线程设置状态，否则可能异步线程还没来得及设置开始状态，主线程又开始了新的一轮调度
                         timer.Calling = true;
                         if (timer.IsAsyncTask)
-                            Task.Factory.StartNew(ExecuteAsync, timer, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
+                            ExecuteAsync(timer);
+                        //Task.Factory.StartNew(ExecuteAsync, timer, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
                         else if (!timer.Async)
                             Execute(timer);
                         else

@@ -27,7 +27,7 @@ namespace ThingsGateway.Gateway.Application;
 [ApiController]
 [RolePermission]
 [Authorize(AuthenticationSchemes = "Bearer")]
-[TouchSocket.WebApi.Router("/miniapi/[api]/[action]")]
+[TouchSocket.WebApi.Router("/miniapi/runtimeinfo/[action]")]
 [TouchSocket.WebApi.EnableCors("cors")]
 public class RuntimeInfoController : ControllerBase, IRpcServer
 {

@@ -20,6 +20,7 @@ namespace ThingsGateway.Gateway.Application
         Task<string> GetPluginNameAsync(long channelId);
 
         Task RestartChannelAsync(long channelId);
+        Task RestartChannelsAsync();
 
         Task<TouchSocket.Core.LogLevel> ChannelLogLevelAsync(long id);
         Task SetChannelLogLevelAsync(long id, TouchSocket.Core.LogLevel logLevel);

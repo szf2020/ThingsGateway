@@ -31,7 +31,7 @@ namespace ThingsGateway.Gateway.Application;
 [RequestAudit]
 [ApiController]
 [Authorize(AuthenticationSchemes = "Bearer")]
-[TouchSocket.WebApi.Router("/miniapi/[api]/[action]")]
+[TouchSocket.WebApi.Router("/miniapi/control/[action]")]
 [TouchSocket.WebApi.EnableCors("cors")]
 public class ControlController : ControllerBase, IRpcServer
 {

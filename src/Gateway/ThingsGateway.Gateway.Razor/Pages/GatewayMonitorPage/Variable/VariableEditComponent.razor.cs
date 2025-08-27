@@ -41,9 +41,9 @@ public partial class VariableEditComponent
     [Parameter]
     public bool BatchEditEnable { get; set; }
 
-    private IEnumerable<SelectedItem> BusinessDeviceItems { get; set; }
+    //private IEnumerable<SelectedItem> BusinessDeviceItems { get; set; }
 
-    private IEnumerable<SelectedItem> CollectDeviceItems { get; set; }
+    //private IEnumerable<SelectedItem> CollectDeviceItems { get; set; }
     [Inject]
     IDevicePageService DevicePageService { get; set; }
     private string DeviceName;
@@ -59,10 +59,14 @@ public partial class VariableEditComponent
             OnInitialized();
             await OnInitializedAsync();
             OnParametersSet();
-            StateHasChanged();
+
+            ChoiceBusinessDeviceId = ChoiceBusinessDeviceId > 0 ? ChoiceBusinessDeviceId : (await DevicePageService.OnDeviceSelectedItemQueryAsync(new VirtualizeQueryOption() { Count = 1 }, false).ConfigureAwait(false)).Items.FirstOrDefault()?.Value?.ToLong() ?? 0;
+            ChoiceBusinessDeviceName = (await DevicePageService.GetDeviceNameAsync(ChoiceBusinessDeviceId)) ?? string.Empty;
+
+            await InvokeAsync(StateHasChanged);
+
             await OnParametersSetAsync();
-            ChoiceBusinessDeviceId = ChoiceBusinessDeviceId > 0 ? ChoiceBusinessDeviceId : BusinessDeviceItems.FirstOrDefault()?.Value?.ToLong() ?? 0;
-            ChoiceBusinessDeviceName = await DevicePageService.GetDeviceNameAsync(ChoiceBusinessDeviceId);
+
         }
         else
         {
@@ -72,8 +76,6 @@ public partial class VariableEditComponent
 
     protected override async Task OnParametersSetAsync()
     {
-        CollectDeviceItems = await DevicePageService.GetDeviceItemsAsync(true);
-        BusinessDeviceItems = await DevicePageService.GetDeviceItemsAsync(false);
 
         if (Model.DeviceId > 0 && AddressUIType == null)
         {
@@ -81,6 +83,14 @@ public partial class VariableEditComponent
         }
 
         await base.OnParametersSetAsync();
+    }
+    private Task<QueryData<SelectedItem>> OnCollectDeviceSelectedItemQueryAsync(VirtualizeQueryOption option)
+    {
+        return DevicePageService.OnDeviceSelectedItemQueryAsync(option, true);
+    }
+    private Task<QueryData<SelectedItem>> OnBusinessDeviceSelectedItemQueryAsync(VirtualizeQueryOption option)
+    {
+        return DevicePageService.OnDeviceSelectedItemQueryAsync(option, false);
     }
 
     [Parameter]

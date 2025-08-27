@@ -103,6 +103,54 @@ public static class Runtime
 
     /// <summary>是否OSX环境</summary>
     public static Boolean OSX => RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
+
+#if NET6_0_OR_GREATER
+
+    public static Boolean? isLegacyWindows;
+
+    /// <summary>
+    /// 判断是否老系统 (Vista/2008/7/2008R2)
+    /// </summary>
+    public static Boolean IsLegacyWindows
+    {
+        get
+        {
+            if (isLegacyWindows != null) return isLegacyWindows.Value;
+
+            if (Windows == false)
+            {
+                isLegacyWindows = false;
+                return isLegacyWindows.Value;
+            }
+            var version = Environment.OSVersion.Version;
+
+            // 如果能拿到真实的 6.x 就直接判断
+            if (version.Major == 6 && version.Minor <= 1)
+            {
+                isLegacyWindows = true;
+                return isLegacyWindows.Value;
+            }
+            if (version.Major < 6)
+            {
+                isLegacyWindows = true;
+                return isLegacyWindows.Value;
+            }
+
+            // 如果拿到的是 10.0（Win8.1 之后有虚拟化问题），用 OSDescription 来兜底
+            var desc = RuntimeInformation.OSDescription;
+            // desc 示例: "Microsoft Windows 6.1.7601" (Win7/2008R2)
+            if (desc.Contains("Windows 6.0") || desc.Contains("Windows 6.1"))
+            {
+                isLegacyWindows = true;
+                return isLegacyWindows.Value;
+            }
+            isLegacyWindows = false;
+            return isLegacyWindows.Value;
+        }
+
+    }
+#endif
+
 #else
     /// <summary>是否Web环境</summary>
     public static Boolean IsWeb => !String.IsNullOrEmpty(System.Web.HttpRuntime.AppDomainAppId);
@@ -115,6 +163,8 @@ public static class Runtime
 
     /// <summary>是否OSX环境</summary>
     public static Boolean OSX { get; } = Environment.OSVersion.Platform == PlatformID.MacOSX;
+
+
 #endif
     #endregion
 

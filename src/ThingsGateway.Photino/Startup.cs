@@ -166,19 +166,22 @@ public class Startup : AppStartup
         services.AddSignalR();
         #endregion
 
+        if (!NewLife.Runtime.IsLegacyWindows)
+        {
 #if NET9_0_OR_GREATER
-        var certificate = X509CertificateLoader.LoadPkcs12FromFile("ThingsGateway.pfx", "ThingsGateway", X509KeyStorageFlags.EphemeralKeySet);
+            var certificate = X509CertificateLoader.LoadPkcs12FromFile("ThingsGateway.pfx", "ThingsGateway", X509KeyStorageFlags.EphemeralKeySet);
 #else
-        var certificate = new X509Certificate2("ThingsGateway.pfx", "ThingsGateway", X509KeyStorageFlags.EphemeralKeySet);
+            var certificate = new X509Certificate2("ThingsGateway.pfx", "ThingsGateway", X509KeyStorageFlags.EphemeralKeySet);
 #endif
-        services.AddDataProtection()
-            .PersistKeysToFileSystem(new DirectoryInfo("Keys"))
-            .ProtectKeysWithCertificate(certificate)
-            .UseCryptographicAlgorithms(new AuthenticatedEncryptorConfiguration
-            {
-                EncryptionAlgorithm = EncryptionAlgorithm.AES_256_CBC,
-                ValidationAlgorithm = ValidationAlgorithm.HMACSHA256
-            });
+            services.AddDataProtection()
+                .PersistKeysToFileSystem(new DirectoryInfo("Keys"))
+                .ProtectKeysWithCertificate(certificate)
+                .UseCryptographicAlgorithms(new AuthenticatedEncryptorConfiguration
+                {
+                    EncryptionAlgorithm = EncryptionAlgorithm.AES_256_CBC,
+                    ValidationAlgorithm = ValidationAlgorithm.HMACSHA256
+                });
+        }
     }
 
     public void Use(IApplicationBuilder applicationBuilder, IWebHostEnvironment env)

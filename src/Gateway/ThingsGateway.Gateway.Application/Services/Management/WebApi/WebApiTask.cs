@@ -11,7 +11,6 @@
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-using System.Diagnostics;
 using System.Text;
 
 using TouchSocket.Core;
@@ -89,6 +88,14 @@ public partial class WebApiTask : AsyncDisposableObject
                        store.RegisterServer<ControlController>();
                        store.RegisterServer<RuntimeInfoController>();
                        store.RegisterServer<TestController>();
+
+                       store.RegisterServer<IManagementRpcServer>(new ManagementRpcServer());
+                       store.RegisterServer<IUpgradeRpcServer>(new UpgradeRpcServer());
+
+                       foreach (var type in App.EffectiveTypes.Where(p => typeof(IPluginRpcServer).IsAssignableFrom(p) && !p.IsAbstract && p.IsClass))
+                       {
+                           store.RegisterServer(type);
+                       }
                    });
 
                    //添加跨域服务
@@ -112,9 +119,12 @@ public partial class WebApiTask : AsyncDisposableObject
 
                    a.UseWebApi();
 
-                   if (App.WebHostEnvironment.IsDevelopment() || Debugger.IsAttached)
-                       a.UseSwagger();
-
+#if DEBUG
+                   a.UseSwagger().SetPrefix("api");
+#else
+                   if (App.WebHostEnvironment.IsDevelopment())
+                       a.UseSwagger().SetPrefix("api");
+#endif
                    a.UseDefaultHttpServicePlugin();
                });
 

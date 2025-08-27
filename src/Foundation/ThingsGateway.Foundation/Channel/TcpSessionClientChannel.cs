@@ -24,7 +24,7 @@ public class TcpSessionClientChannel : TcpSessionClient, IClientChannel
     private IDeviceDataHandleAdapter _deviceDataHandleAdapter;
     public void SetDataHandlingAdapterLogger(ILog log)
     {
-        if (_deviceDataHandleAdapter == null && DataHandlingAdapter is IDeviceDataHandleAdapter handleAdapter)
+        if (_deviceDataHandleAdapter != DataHandlingAdapter && DataHandlingAdapter is IDeviceDataHandleAdapter handleAdapter)
         {
             _deviceDataHandleAdapter = handleAdapter;
         }

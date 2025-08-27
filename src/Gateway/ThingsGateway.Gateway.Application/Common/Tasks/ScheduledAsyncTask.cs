@@ -7,7 +7,7 @@ namespace ThingsGateway.Gateway.Application;
 
 public class ScheduledAsyncTask : DisposeBase, IScheduledTask, IScheduledIntIntervalTask
 {
-    private int _interval10MS = 10;
+    private int next = -1;
     public int IntervalMS { get; }
     private readonly Func<object?, CancellationToken, Task> _taskFunc;
     private readonly Func<object?, CancellationToken, ValueTask> _valueTaskFunc;
@@ -48,7 +48,7 @@ public class ScheduledAsyncTask : DisposeBase, IScheduledTask, IScheduledIntInte
     {
         _timer?.Dispose();
         if (!Check())
-            _timer = new TimerX(DoAsync, _state, IntervalMS, IntervalMS, nameof(IScheduledTask)) { Async = true };
+            _timer = new TimerX(DoAsync, _state, IntervalMS, IntervalMS, nameof(ScheduledAsyncTask)) { Async = true, Reentrant = true };
     }
 
     private async ValueTask DoAsync(object? state)
@@ -69,7 +69,6 @@ public class ScheduledAsyncTask : DisposeBase, IScheduledTask, IScheduledIntInte
 
         // 减少一个触发次数
         Interlocked.Decrement(ref _pendingTriggers);
-
 
         try
         {
@@ -92,9 +91,9 @@ public class ScheduledAsyncTask : DisposeBase, IScheduledTask, IScheduledIntInte
 
         if (Interlocked.Exchange(ref _pendingTriggers, 0) >= 1)
         {
-            if (!Check())
+            if (!Check() && IntervalMS > 8)
             {
-                SetNext(_interval10MS);
+                SetNext(next);
             }
         }
     }

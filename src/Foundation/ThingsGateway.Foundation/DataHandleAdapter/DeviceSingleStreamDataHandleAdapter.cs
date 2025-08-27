@@ -17,7 +17,19 @@ namespace ThingsGateway.Foundation;
 /// </summary>
 public class DeviceSingleStreamDataHandleAdapter<TRequest> : CustomDataHandlingAdapter<TRequest>, IDeviceDataHandleAdapter where TRequest : MessageBase, new()
 {
-    public new ILog Logger { get; set; }
+    private ILog logger;
+
+    public new ILog Logger
+    {
+        get => logger;
+        set
+        {
+            if (value != logger && value != null)
+            {
+                logger = value;
+            }
+        }
+    }
 
 
     /// <inheritdoc cref="DeviceSingleStreamDataHandleAdapter{TRequest}"/>

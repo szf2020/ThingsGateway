@@ -18,7 +18,7 @@ namespace ThingsGateway.Gateway.Application;
 [Route("api/[controller]/[action]")]
 [AllowAnonymous]
 [ApiController]
-[TouchSocket.WebApi.Router("/miniapi/[api]/[action]")]
+[TouchSocket.WebApi.Router("/miniapi/test/[action]")]
 [TouchSocket.WebApi.EnableCors("cors")]
 public class TestController : ControllerBase, IRpcServer
 {

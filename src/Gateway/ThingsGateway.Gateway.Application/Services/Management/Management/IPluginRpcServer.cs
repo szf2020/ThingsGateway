@@ -8,25 +8,11 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-
-using TouchSocket.Dmtp.Rpc;
 using TouchSocket.Rpc;
-using TouchSocket.WebApi;
 
 namespace ThingsGateway.Gateway.Application;
 
-#if Management
-[GeneratorRpcProxy(GeneratorFlag = GeneratorFlag.ExtensionAsync)]
-#endif
-[TouchSocket.WebApi.Router("/miniapi/upgrade/[action]")]
-public interface IUpgradeRpcServer : IRpcServer
+public interface IPluginRpcServer : IRpcServer
 {
-    [DmtpRpc]
-    [WebApi(Method = HttpMethodType.Post)]
-    Task UpgradeAsync(ICallContext callContext, UpdateZipFile updateZipFile);
-
-    [DmtpRpc]
-    [WebApi(Method = HttpMethodType.Get)]
-    Task<UpdateZipFileInput> GetUpdateZipFileInputAsync(ICallContext callContext);
 
 }

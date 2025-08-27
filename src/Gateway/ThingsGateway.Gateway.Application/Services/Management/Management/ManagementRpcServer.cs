@@ -132,7 +132,8 @@ public partial class ManagementRpcServer : IRpcServer, IManagementRpcServer, IBa
 
     public Task RestartChannelAsync(long channelId) =>
     App.GetService<IChannelPageService>().RestartChannelAsync(channelId);
-
+    public Task RestartChannelsAsync() =>
+    App.GetService<IChannelPageService>().RestartChannelsAsync();
     public Task<LogLevel> ChannelLogLevelAsync(long id) =>
         App.GetService<IChannelPageService>().ChannelLogLevelAsync(id);
 
@@ -246,8 +247,8 @@ public partial class ManagementRpcServer : IRpcServer, IManagementRpcServer, IBa
     public Task<Dictionary<string, ImportPreviewOutputBase>> ImportDeviceAsync(IBrowserFile file, bool restart) =>
         App.GetService<IDevicePageService>().ImportDeviceAsync(file, restart);
 
-    public Task<List<SelectedItem>> GetDeviceItemsAsync(bool isCollect) =>
-        App.GetService<IDevicePageService>().GetDeviceItemsAsync(isCollect);
+    public Task<QueryData<SelectedItem>> OnDeviceSelectedItemQueryAsync(VirtualizeQueryOption option, bool isCollect) =>
+        App.GetService<IDevicePageService>().OnDeviceSelectedItemQueryAsync(option, isCollect);
 
     public Task<string> GetDevicePluginNameAsync(long id) =>
         App.GetService<IDevicePageService>().GetDevicePluginNameAsync(id);

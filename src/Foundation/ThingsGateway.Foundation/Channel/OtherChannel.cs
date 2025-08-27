@@ -31,7 +31,7 @@ public class OtherChannel : SetupConfigObject, IClientChannel
     public override TouchSocketConfig Config => base.Config ?? ChannelOptions.Config;
     public void SetDataHandlingAdapterLogger(ILog log)
     {
-        if (_deviceDataHandleAdapter == null && ReadOnlyDataHandlingAdapter is IDeviceDataHandleAdapter handleAdapter)
+        if (_deviceDataHandleAdapter != ReadOnlyDataHandlingAdapter && ReadOnlyDataHandlingAdapter is IDeviceDataHandleAdapter handleAdapter)
         {
             _deviceDataHandleAdapter = handleAdapter;
         }

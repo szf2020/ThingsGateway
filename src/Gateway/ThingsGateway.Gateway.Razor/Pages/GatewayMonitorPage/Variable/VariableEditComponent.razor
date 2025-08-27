@@ -77,7 +77,7 @@
                     <EditTemplate Context="value">
                         <div class="col-12  col-md-6 ">
                             <BootstrapInputGroup>
-                                <Select IsVirtualize @bind-Value="@value.DeviceId" DefaultVirtualizeItemText=@DeviceName  IsDisabled=BatchEditEnable Items="@CollectDeviceItems" OnSelectedItemChanged=OnDeviceChanged ShowSearch="true" ShowLabel="true" />
+                                <Select IsVirtualize @bind-Value="@value.DeviceId" DefaultVirtualizeItemText=@DeviceName  IsDisabled=BatchEditEnable OnQueryAsync=OnCollectDeviceSelectedItemQueryAsync OnSelectedItemChanged=OnDeviceChanged ShowSearch="true" ShowLabel="true" />
                                 <Button class="text-end" Icon="fa-solid fa-plus" OnClick="AddDevice" IsDisabled=BatchEditEnable></Button>
                             </BootstrapInputGroup>
                         </div>
@@ -198,7 +198,7 @@
                 <div class="row g-2 mx-1 form-inline">
 
                     <div class="col-12 col-md-8">
-                    <Select SkipValidate IsVirtualize DefaultVirtualizeItemText=@(ChoiceBusinessDeviceName) @bind-Value="@ChoiceBusinessDeviceId" Items="@BusinessDeviceItems" ShowSearch="true" ShowLabel="true" />
+                            <Select SkipValidate IsVirtualize @bind-Value="@ChoiceBusinessDeviceId" DefaultVirtualizeItemText=@ChoiceBusinessDeviceName IsDisabled=BatchEditEnable OnQueryAsync=OnBusinessDeviceSelectedItemQueryAsync ShowSearch="true" ShowLabel="true" />
                     </div>
                     <div class="col-12 col-md-4">
                         <Button OnClick="async() =>{
