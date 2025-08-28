@@ -181,7 +181,7 @@ internal sealed class HeartbeatAndReceivePlugin : PluginBase, ITcpConnectedPlugi
             var len = HeartbeatByte.Length;
             if (len > 0)
             {
-                if (HeartbeatByte.Span.SequenceEqual(e.Reader.TotalSequence.Slice(0, len).First.Span))
+                if (HeartbeatByte.Span.SequenceEqual(e.Reader.TotalSequence.Slice(0, (int)Math.Min(len, e.Reader.BytesRemaining + e.Reader.BytesRead)).First.Span))
                 {
                     e.Reader.Advance((int)Math.Min(len, e.Reader.BytesRemaining));
                     e.Handled = true;

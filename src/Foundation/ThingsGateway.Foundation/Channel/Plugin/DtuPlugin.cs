@@ -101,7 +101,7 @@ public class DtuPlugin : PluginBase, ITcpReceivingPlugin
 
             if (len > 0)
             {
-                if (HeartbeatByte.Span.SequenceEqual(e.Reader.TotalSequence.Slice(0, len).First.Span))
+                if (HeartbeatByte.Span.SequenceEqual(e.Reader.TotalSequence.Slice(0, (int)Math.Min(len, e.Reader.BytesRemaining + e.Reader.BytesRead)).First.Span))
                 {
                     if (DateTimeOffset.Now - socket.LastSentTime < TimeSpan.FromMilliseconds(200))
                     {
