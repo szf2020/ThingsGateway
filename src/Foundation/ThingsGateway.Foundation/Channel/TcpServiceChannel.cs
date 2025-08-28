@@ -203,8 +203,8 @@ public class TcpServiceChannel<TClient> : TcpServiceChannelBase<TClient>, IChann
         data.ResetSign(MinSign, MaxSign);
         return data;
     }
-    public int MaxSign { get; private set; } = 0;
-    public int MinSign { get; private set; } = ushort.MaxValue;
+    public int MinSign { get; private set; } = 0;
+    public int MaxSign { get; private set; } = ushort.MaxValue;
     public void ResetSign(int minSign = 0, int maxSign = ushort.MaxValue)
     {
         MinSign = minSign;
