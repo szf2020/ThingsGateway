@@ -192,12 +192,17 @@ public class SerialPortChannel : SerialPortClient, IClientChannel
     /// <inheritdoc/>
     protected override async Task OnSerialReceived(ReceivedDataEventArgs e)
     {
-        await base.OnSerialReceived(e).ConfigureAwait(false);
+        var receivedTask = base.OnSerialReceived(e);
+        if (!receivedTask.IsCompleted)
+            await receivedTask.ConfigureAwait(false);
 
         if (e.Handled)
             return;
 
-        await this.OnChannelReceivedEvent(e, ChannelReceived).ConfigureAwait(false);
+        var channelReceivedTask = this.OnChannelReceivedEvent(e, ChannelReceived);
+        if (!channelReceivedTask.IsCompleted)
+            await channelReceivedTask.ConfigureAwait(false);
+
     }
     /// <inheritdoc/>
     protected override void SafetyDispose(bool disposing)

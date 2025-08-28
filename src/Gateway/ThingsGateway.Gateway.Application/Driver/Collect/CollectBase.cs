@@ -366,8 +366,17 @@ public abstract partial class CollectBase : DriverBase
 
         if (Pause) return;
         if (cancellationToken.IsCancellationRequested) return;
+        CancellationToken readToken = default;
+        var readerLockTask = ReadWriteLock.ReaderLockAsync(cancellationToken);
+        if (!readerLockTask.IsCompleted)
+        {
+            readToken = await readerLockTask.ConfigureAwait(false);
+        }
+        else
+        {
+            readToken = readerLockTask.Result;
+        }
 
-        var readToken = await ReadWriteLock.ReaderLockAsync(cancellationToken).ConfigureAwait(false);
         if (readToken.IsCancellationRequested)
         {
             await ReadVariableSource(state, cancellationToken).ConfigureAwait(false);
@@ -379,7 +388,17 @@ public abstract partial class CollectBase : DriverBase
 
         //if (LogMessage?.LogLevel <= TouchSocket.Core.LogLevel.Trace)
         //    LogMessage?.Trace(string.Format("{0} - Collecting [{1} - {2}]", DeviceName, variableSourceRead?.RegisterAddress, variableSourceRead?.Length));
-        var readResult = await ReadSourceAsync(variableSourceRead, allToken).ConfigureAwait(false);
+
+        OperResult<ReadOnlyMemory<byte>> readResult = default;
+        var readTask = ReadSourceAsync(variableSourceRead, allToken);
+        if (!readTask.IsCompleted)
+        {
+            readResult = await readTask.ConfigureAwait(false);
+        }
+        else
+        {
+            readResult = readTask.Result;
+        }
 
         var readErrorCount = 0;
 
@@ -403,7 +422,16 @@ public abstract partial class CollectBase : DriverBase
 
             //if (LogMessage?.LogLevel <= TouchSocket.Core.LogLevel.Trace)
             //    LogMessage?.Trace(string.Format("{0} - Collecting [{1} - {2}]", DeviceName, variableSourceRead?.RegisterAddress, variableSourceRead?.Length));
-            readResult = await ReadSourceAsync(variableSourceRead, allToken).ConfigureAwait(false);
+            var readTask1 = ReadSourceAsync(variableSourceRead, allToken);
+            if (!readTask1.IsCompleted)
+            {
+                readResult = await readTask1.ConfigureAwait(false);
+            }
+            else
+            {
+                readResult = readTask1.Result;
+            }
+
         }
 
         if (readResult.IsSuccess)

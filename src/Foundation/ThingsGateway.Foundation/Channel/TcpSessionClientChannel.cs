@@ -145,11 +145,15 @@ public class TcpSessionClientChannel : TcpSessionClient, IClientChannel
     /// <inheritdoc/>
     protected override async Task OnTcpReceived(ReceivedDataEventArgs e)
     {
-        await base.OnTcpReceived(e).ConfigureAwait(false);
+        var receivedTask = base.OnTcpReceived(e);
+        if (!receivedTask.IsCompleted)
+            await receivedTask.ConfigureAwait(false);
 
         if (e.Handled)
             return;
 
-        await this.OnChannelReceivedEvent(e, ChannelReceived).ConfigureAwait(false);
+        var channelReceivedTask = this.OnChannelReceivedEvent(e, ChannelReceived);
+        if (!channelReceivedTask.IsCompleted)
+            await channelReceivedTask.ConfigureAwait(false);
     }
 }

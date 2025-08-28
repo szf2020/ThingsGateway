@@ -159,7 +159,16 @@ public abstract class CollectFoundationBase : CollectBase
                 return new(new OperationCanceledException());
 
             // 从协议读取数据
-            var read = await FoundationDevice.ReadAsync(variableSourceRead.AddressObject, cancellationToken).ConfigureAwait(false);
+            OperResult<ReadOnlyMemory<byte>> read = default;
+            var readTask = FoundationDevice.ReadAsync(variableSourceRead.AddressObject, cancellationToken);
+            if (!readTask.IsCompleted)
+            {
+                read = await readTask.ConfigureAwait(false);
+            }
+            else
+            {
+                read = readTask.Result;
+            }
 
             // 如果读取成功且有有效内容，则解析结构化内容
             if (read.IsSuccess)

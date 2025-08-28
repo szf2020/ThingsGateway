@@ -7,7 +7,7 @@ namespace ThingsGateway.Gateway.Application;
 
 public class CronScheduledTask : DisposeBase, IScheduledTask
 {
-    private int next = -1;
+    private int next = 10;
     private string _interval;
     private readonly Func<object?, CancellationToken, Task> _taskFunc;
     private readonly Func<object?, CancellationToken, ValueTask> _valueTaskFunc;
@@ -62,9 +62,9 @@ public class CronScheduledTask : DisposeBase, IScheduledTask
         _timer?.Dispose();
         if (Check()) return;
         if (_taskAction != null)
-            _timer = new TimerX(TimerCallback, _state, _interval, nameof(CronScheduledTask)) { Async = true, Reentrant = true };
+            _timer = new TimerX(TimerCallback, _state, _interval, nameof(CronScheduledTask)) { Async = true, Reentrant = false };
         else if (_taskFunc != null || _valueTaskFunc != null)
-            _timer = new TimerX(TimerCallbackAsync, _state, _interval, nameof(CronScheduledTask)) { Async = true, Reentrant = true };
+            _timer = new TimerX(TimerCallbackAsync, _state, _interval, nameof(CronScheduledTask)) { Async = true, Reentrant = false };
     }
 
     private async ValueTask TimerCallbackAsync(object? state)

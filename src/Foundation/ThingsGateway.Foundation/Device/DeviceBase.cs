@@ -348,11 +348,19 @@ public abstract class DeviceBase : AsyncAndSyncDisposableObject, IDevice
 
             if (channel is IDtuUdpSessionChannel udpSession)
             {
-                await udpSession.SendAsync(endPoint, sendMessage, token).ConfigureAwait(false);
+                var sendTask = udpSession.SendAsync(endPoint, sendMessage, token);
+                if (!sendTask.IsCompleted)
+                {
+                    await sendTask.ConfigureAwait(false);
+                }
             }
             else
             {
-                await channel.SendAsync(sendMessage, token).ConfigureAwait(false);
+                var sendTask = channel.SendAsync(sendMessage, token);
+                if (!sendTask.IsCompleted)
+                {
+                    await sendTask.ConfigureAwait(false);
+                }
             }
 
             return OperResult.Success;
@@ -363,13 +371,17 @@ public abstract class DeviceBase : AsyncAndSyncDisposableObject, IDevice
         }
     }
 
-    private Task BefortSendAsync(IClientChannel channel, CancellationToken token)
+    private Task BeforeSendAsync(IClientChannel channel, CancellationToken token)
     {
         SetDataAdapter(channel);
-
-        return ConnectAsync(token);
-
-
+        if (AutoConnect && Channel != null && Channel?.Online != true)
+        {
+            return ConnectAsync(token);
+        }
+        else
+        {
+            return Task.CompletedTask;
+        }
     }
 
     private WaitLock connectWaitLock = new(nameof(DeviceBase));
@@ -410,7 +422,11 @@ public abstract class DeviceBase : AsyncAndSyncDisposableObject, IDevice
 
             try
             {
-                await BefortSendAsync(channelResult.Content, cancellationToken).ConfigureAwait(false);
+                var beforeSendTask = BeforeSendAsync(channelResult.Content, cancellationToken);
+                if (!beforeSendTask.IsCompleted)
+                {
+                    await beforeSendTask.ConfigureAwait(false);
+                }
 
                 await waitLock.WaitAsync(cancellationToken).ConfigureAwait(false);
                 channelResult.Content.SetDataHandlingAdapterLogger(Logger);
@@ -508,8 +524,18 @@ public abstract class DeviceBase : AsyncAndSyncDisposableObject, IDevice
     {
         try
         {
-            var result = await SendThenReturnMessageAsync(sendMessage, channel, cancellationToken).ConfigureAwait(false);
-            return new OperResult<ReadOnlyMemory<byte>>(result) { Content = result.Content };
+            var sendTask = SendThenReturnMessageAsync(sendMessage, channel, cancellationToken);
+            if (!sendTask.IsCompleted)
+            {
+                var result = await sendTask.ConfigureAwait(false);
+                return new OperResult<ReadOnlyMemory<byte>>(result) { Content = result.Content };
+            }
+            else
+            {
+                var result = sendTask.Result;
+                return new OperResult<ReadOnlyMemory<byte>>(result) { Content = result.Content };
+            }
+
         }
         catch (Exception ex)
         {
@@ -541,8 +567,11 @@ public abstract class DeviceBase : AsyncAndSyncDisposableObject, IDevice
         WaitLock? waitLock = null;
         try
         {
-            await BefortSendAsync(clientChannel, cancellationToken).ConfigureAwait(false);
-
+            var beforeSendTask = BeforeSendAsync(clientChannel, cancellationToken);
+            if (!beforeSendTask.IsCompleted)
+            {
+                await beforeSendTask.ConfigureAwait(false);
+            }
             var dtuId = this is IDtu dtu1 ? dtu1.DtuId : null;
             waitLock = GetWaitLock(clientChannel, dtuId);
 
@@ -559,7 +588,17 @@ public abstract class DeviceBase : AsyncAndSyncDisposableObject, IDevice
             if (cancellationToken.IsCancellationRequested)
                 return new MessageBase(new OperationCanceledException());
 
-            var sendOperResult = await SendAsync(command, clientChannel, endPoint, cancellationToken).ConfigureAwait(false);
+            OperResult sendOperResult = default;
+            var sendTask = SendAsync(command, clientChannel, endPoint, cancellationToken);
+            if (!sendTask.IsCompleted)
+            {
+                sendOperResult = await sendTask.ConfigureAwait(false);
+            }
+            else
+            {
+                sendOperResult = sendTask.Result;
+            }
+
             if (!sendOperResult.IsSuccess)
                 return new MessageBase(sendOperResult);
 
@@ -567,7 +606,11 @@ public abstract class DeviceBase : AsyncAndSyncDisposableObject, IDevice
             try
             {
                 using var cts = CancellationTokenSource.CreateLinkedTokenSource(ctsTime.Token, Channel.ClosedToken);
-                await waitData.WaitAsync(cts.Token).ConfigureAwait(false);
+                var waitDataTask = waitData.WaitAsync(cts.Token);
+                if (!waitDataTask.IsCompleted)
+                {
+                    await waitDataTask.ConfigureAwait(false);
+                }
             }
             catch (OperationCanceledException)
             {

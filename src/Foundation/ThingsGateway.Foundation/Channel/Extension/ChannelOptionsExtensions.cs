@@ -37,7 +37,9 @@ public static class ChannelOptionsExtensions
             for (int i = 0; i < funcs.Count; i++)
             {
                 var func = funcs[i];
-                await func.Invoke(clientChannel, e, i == funcs.Count - 1).ConfigureAwait(false);
+                var task = func.Invoke(clientChannel, e, i == funcs.Count - 1);
+                if (!task.IsCompleted)
+                    await task.ConfigureAwait(false);
                 if (e.Handled)
                 {
                     break;

@@ -7,7 +7,7 @@ namespace ThingsGateway.Gateway.Application;
 
 public class ScheduledAsyncTask : DisposeBase, IScheduledTask, IScheduledIntIntervalTask
 {
-    private int next = -1;
+    private int next = 10;
     public int IntervalMS { get; }
     private readonly Func<object?, CancellationToken, Task> _taskFunc;
     private readonly Func<object?, CancellationToken, ValueTask> _valueTaskFunc;
@@ -48,7 +48,7 @@ public class ScheduledAsyncTask : DisposeBase, IScheduledTask, IScheduledIntInte
     {
         _timer?.Dispose();
         if (!Check())
-            _timer = new TimerX(DoAsync, _state, IntervalMS, IntervalMS, nameof(ScheduledAsyncTask)) { Async = true, Reentrant = true };
+            _timer = new TimerX(DoAsync, _state, IntervalMS, IntervalMS, nameof(ScheduledAsyncTask)) { Async = true, Reentrant = false };
     }
 
     private async ValueTask DoAsync(object? state)

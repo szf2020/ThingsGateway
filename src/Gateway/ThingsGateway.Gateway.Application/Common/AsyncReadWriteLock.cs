@@ -28,7 +28,7 @@ public class AsyncReadWriteLock : IAsyncDisposable
     /// <summary>
     /// 获取读锁，支持多个线程并发读取，但写入时会阻止所有读取。
     /// </summary>
-    public async Task<CancellationToken> ReaderLockAsync(CancellationToken cancellationToken)
+    public async ValueTask<CancellationToken> ReaderLockAsync(CancellationToken cancellationToken)
     {
 
         if (Interlocked.Read(ref _writerCount) > 0)
@@ -51,7 +51,7 @@ public class AsyncReadWriteLock : IAsyncDisposable
     /// <summary>
     /// 获取写锁，阻止所有读取。
     /// </summary>
-    public async Task<IDisposable> WriterLockAsync(CancellationToken cancellationToken)
+    public async ValueTask<IDisposable> WriterLockAsync(CancellationToken cancellationToken)
     {
 
         if (Interlocked.Increment(ref _writerCount) == 1)

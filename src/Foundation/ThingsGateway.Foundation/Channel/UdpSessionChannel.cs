@@ -196,12 +196,17 @@ public class UdpSessionChannel : UdpSession, IClientChannel
     /// <inheritdoc/>
     protected override async Task OnUdpReceived(UdpReceivedDataEventArgs e)
     {
-        await base.OnUdpReceived(e).ConfigureAwait(false);
+        var receivedTask = base.OnUdpReceived(e);
+        if (!receivedTask.IsCompleted)
+            await receivedTask.ConfigureAwait(false);
 
         if (e.Handled)
             return;
 
-        await this.OnChannelReceivedEvent(e, ChannelReceived).ConfigureAwait(false);
+        var channelReceivedTask = this.OnChannelReceivedEvent(e, ChannelReceived);
+        if (!channelReceivedTask.IsCompleted)
+            await channelReceivedTask.ConfigureAwait(false);
+
     }
 
     /// <inheritdoc/>

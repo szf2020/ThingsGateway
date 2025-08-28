@@ -311,13 +311,17 @@ public class TimerScheduler : ILogFeature
             if (timer.IsValueTask)
             {
                 var func = timer.Method.As<Func<Object?, ValueTask>>(target);
-                await func!(timer.State).ConfigureAwait(false);
+                var task = func!(timer.State);
+                if (!task.IsCompleted)
+                    await task.ConfigureAwait(false);
             }
             else
 #endif
             {
                 var func = timer.Method.As<Func<Object?, Task>>(target);
-                await func!(timer.State).ConfigureAwait(false);
+                var task = func!(timer.State);
+                if (!task.IsCompleted)
+                    await task.ConfigureAwait(false);
             }
 
         }
