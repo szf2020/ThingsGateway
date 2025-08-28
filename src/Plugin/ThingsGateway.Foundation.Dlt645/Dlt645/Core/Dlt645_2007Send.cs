@@ -189,7 +189,7 @@ public class Dlt645_2007Send : ISendMessage
         lenSpan.WriteValue<byte>((byte)(length - 1));//数据域长度
 
         int num = 0;
-        for (int index = 0; index < byteBlock.WrittenCount; ++index)
+        for (int index = 0; index < byteBlock.WrittenCount - SendHeadCodeIndex; ++index)
             num += span[index];
         WriterExtension.WriteValue(ref byteBlock, (byte)num);//校验码,总加和
         WriterExtension.WriteValue(ref byteBlock, (byte)0x16);//结束符
