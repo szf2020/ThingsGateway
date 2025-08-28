@@ -66,7 +66,7 @@ public class DtuPlugin : PluginBase, ITcpReceivingPlugin
         {
             if (!socket.Id.StartsWith("ID="))
             {
-                var id = DtuIdHex ? $"ID={e.Reader.ToHexString()}" : $"ID={e.Reader.ToString()}";
+                var id = DtuIdHex ? $"ID={e.Reader.ToHexString()}" : $"ID={e.Reader.TotalSequence.ToString(Encoding.UTF8)}";
                 if (tcpServiceChannel.TryGetClient(id, out var oldClient))
                 {
                     try
