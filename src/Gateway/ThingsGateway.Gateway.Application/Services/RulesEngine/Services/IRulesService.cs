@@ -29,7 +29,7 @@ public interface IRulesService
     /// 从缓存/数据库获取全部信息
     /// </summary>
     /// <returns>规则列表</returns>
-    Task<List<Rules>> GetAllAsync();
+    Task<List<Rules>> GetAllRulesAsync();
 
     /// <summary>
     /// 报表查询

@@ -30,12 +30,13 @@ public static class FileServerHelpers
 
         var metadata = new Metadata();//传递到服务器的元数据
         metadata.Add(FileConst.FilePathKey, path);
+        using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(300));
         var fileOperator = new FileOperator//实例化本次传输的控制器，用于获取传输进度、速度、状态等。
         {
             SavePath = savePath,//客户端本地保存路径
             ResourcePath = path,//请求文件的资源路径
             Metadata = metadata,//传递到服务器的元数据
-            Timeout = TimeSpan.FromSeconds(60),//传输超时时长
+            Token = cts.Token,
             TryCount = 10,//当遇到失败时，尝试次数
             FileSectionSize = 1024 * 512//分包大小，当网络较差时，应该适当减小该值
         };
@@ -75,12 +76,13 @@ public static class FileServerHelpers
         var metadata = new Metadata();//传递到服务器的元数据
         metadata.Add(FileConst.FilePathKey, serverPath);
 
+        using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(300));
         var fileOperator = new FileOperator//实例化本次传输的控制器，用于获取传输进度、速度、状态等。
         {
             SavePath = serverPath,//服务器本地保存路径
             ResourcePath = resourcePath,//客户端本地即将上传文件的资源路径
             Metadata = metadata,//传递到服务器的元数据
-            Timeout = TimeSpan.FromSeconds(60),//传输超时时长
+            Token = cts.Token,
             TryCount = 10,//当遇到失败时，尝试次数
             FileSectionSize = 1024 * 512//分包大小，当网络较差时，应该适当减小该值
         };

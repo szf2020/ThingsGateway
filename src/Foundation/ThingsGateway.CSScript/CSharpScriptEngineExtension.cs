@@ -82,13 +82,14 @@ public static class CSharpScriptEngineExtension
     {
         if (source.IsNullOrEmpty()) return null;
         var field = $"{CacheKey}-{source}";
+        var exfield = $"{CacheKey}-Exception-{source}";
         var runScript = Instance.Get<T>(field);
         if (runScript == null)
         {
             lock (m_waiterLock)
             {
-                runScript = Instance.Get<T>(field);
-                if (runScript == null)
+                var hasValue = Instance.TryGetValue<T>(field, out runScript);
+                if (hasValue == false)
                 {
                     var src = source.Split(Environment.NewLine.ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
                     var _using = new StringBuilder();
@@ -111,8 +112,6 @@ public static class CSharpScriptEngineExtension
                     }
                     try
                     {
-
-
                         // 动态加载并执行代码
                         runScript = evaluator.With(eval => eval.IsAssemblyUnloadingEnabled = true).LoadCode<T>(
                            $@"
@@ -140,11 +139,22 @@ public static class CSharpScriptEngineExtension
                         string exString = string.Format(CSScriptResource.CSScriptResource.Error1, typeof(T).FullName);
                         throw new(exString);
                     }
+                    catch (Exception ex)
+                    {
+                        //如果编译失败，应该不重复编译，避免oom
+                        Instance.Set<T>(field, null, TimeSpan.FromHours(1));
+                        Instance.Set(exfield, ex, TimeSpan.FromHours(1));
+                        throw;
+                    }
                 }
             }
         }
         Instance.SetExpire(field, TimeSpan.FromHours(1));
-
+        Instance.SetExpire(exfield, TimeSpan.FromHours(1));
+        if (runScript == null)
+        {
+            throw (Instance.Get<Exception>(exfield) ?? new Exception("compilation error"));
+        }
         return runScript;
     }
 

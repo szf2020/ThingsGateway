@@ -93,30 +93,38 @@ public static class ExpressionEvaluatorExtension
     public static ReadWriteExpressions GetOrAddScript(string source)
     {
         var field = $"{CacheKey}-{source}";
+        var exfield = $"{CacheKey}-Exception-{source}";
         var runScript = Instance.Get<ReadWriteExpressions>(field);
         if (runScript == null)
         {
-            if (!source.Contains("return"))
+            var hasValue = Instance.TryGetValue<ReadWriteExpressions>(field, out runScript);
+            if (!hasValue)
             {
-                source = $"return {source}";//只判断简单脚本中可省略return字符串
-            }
-            var src = source.Split(Environment.NewLine.ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
-            var _using = new StringBuilder();
-            var _body = new StringBuilder();
-            src.ToList().ForEach(l =>
-            {
-                if (l.StartsWith("using "))
+
+
+                if (!source.Contains("return"))
                 {
-                    _using.AppendLine(l);
+                    source = $"return {source}";//只判断简单脚本中可省略return字符串
                 }
-                else
+                var src = source.Split(Environment.NewLine.ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
+                var _using = new StringBuilder();
+                var _body = new StringBuilder();
+                src.ToList().ForEach(l =>
                 {
-                    _body.AppendLine(l);
-                }
-            });
-            // 动态加载并执行代码
-            runScript = CSScript.Evaluator.With(eval => eval.IsAssemblyUnloadingEnabled = true).LoadCode<ReadWriteExpressions>(
-                $@"
+                    if (l.StartsWith("using "))
+                    {
+                        _using.AppendLine(l);
+                    }
+                    else
+                    {
+                        _body.AppendLine(l);
+                    }
+                });
+                // 动态加载并执行代码
+                try
+                {
+                    runScript = CSScript.Evaluator.With(eval => eval.IsAssemblyUnloadingEnabled = true).LoadCode<ReadWriteExpressions>(
+$@"
         using System;
         using System.Linq;
         using System.Collections.Generic;
@@ -137,9 +145,26 @@ public static class ExpressionEvaluatorExtension
             }}
         }}
     ");
-            Instance.Set(field, runScript);
+                    Instance.Set(field, runScript);
+                }
+                catch (Exception ex)
+                {
+                    //如果编译失败，应该不重复编译，避免oom
+                    Instance.Set<ReadWriteExpressions>(field, null, TimeSpan.FromHours(1));
+                    Instance.Set(exfield, ex, TimeSpan.FromHours(1));
+                    throw;
+                }
+
+            }
+
         }
 
+        Instance.SetExpire(field, TimeSpan.FromHours(1));
+        Instance.SetExpire(exfield, TimeSpan.FromHours(1));
+        if (runScript == null)
+        {
+            throw (Instance.Get<Exception>(exfield) ?? new Exception("compilation error"));
+        }
         return runScript;
     }
 

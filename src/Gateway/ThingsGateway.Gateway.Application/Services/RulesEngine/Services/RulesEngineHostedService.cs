@@ -240,7 +240,7 @@ internal sealed class RulesEngineHostedService : BackgroundService, IRulesEngine
             TokenSource ??= new CancellationTokenSource();
             Clear();
 
-            Rules = await App.GetService<IRulesService>().GetAllAsync().ConfigureAwait(false);
+            Rules = await App.GetService<IRulesService>().GetAllRulesAsync().ConfigureAwait(false);
             Diagrams = new();
             foreach (var rules in Rules.Where(a => a.Status))
             {

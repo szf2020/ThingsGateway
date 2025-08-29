@@ -15,7 +15,6 @@ using Microsoft.AspNetCore.Components.Forms;
 using ThingsGateway.Authentication;
 
 using TouchSocket.Core;
-using TouchSocket.Dmtp.Rpc;
 using TouchSocket.Rpc;
 using TouchSocket.Sockets;
 
@@ -24,189 +23,78 @@ namespace ThingsGateway.Gateway.Application;
 public partial class ManagementRpcServer : IRpcServer, IManagementRpcServer, IBackendLogService, IRpcLogService, IRestartService, IAuthenticationService, IChannelEnableService, IRedundancyHostedService, IRedundancyService, ITextFileReadService, IPluginPageService, IRealAlarmService, IChannelPageService, IDevicePageService, IVariablePageService
 {
 
-    [DmtpRpc]
-    public Task DeleteBackendLogAsync() => App.GetService<IBackendLogService>().DeleteBackendLogAsync();
-    [DmtpRpc]
-    public Task<List<BackendLogDayStatisticsOutput>> BackendLogStatisticsByDayAsync(int day) => App.GetService<IBackendLogService>().BackendLogStatisticsByDayAsync(day);
-
-    [DmtpRpc]
-    public Task<List<BackendLog>> GetNewBackendLogAsync() => App.GetService<IBackendLogService>().GetNewBackendLogAsync();
-
-    [DmtpRpc]
     public Task<QueryData<BackendLog>> BackendLogPageAsync(QueryPageOptions option) => App.GetService<IBackendLogService>().BackendLogPageAsync(option);
 
+    public Task<List<BackendLogDayStatisticsOutput>> BackendLogStatisticsByDayAsync(int day) => App.GetService<IBackendLogService>().BackendLogStatisticsByDayAsync(day);
 
-    [DmtpRpc]
-    public async Task<Dictionary<string, Dictionary<string, OperResult<object>>>> RpcAsync(ICallContext callContext, Dictionary<string, Dictionary<string, string>> deviceDatas)
-    {
-        var data = await GlobalData.RpcService.InvokeDeviceMethodAsync($"Management[{(callContext.Caller is ITcpSession tcpSession ? tcpSession.GetIPPort() : string.Empty)}]", deviceDatas, callContext.Token).ConfigureAwait(false);
+    public Task<bool> BatchEditChannelAsync(List<Channel> models, Channel oldModel, Channel model, bool restart) =>
+        App.GetService<IChannelPageService>().BatchEditChannelAsync(models, oldModel, model, restart);
 
-        return data.ToDictionary(a => a.Key, a => a.Value.ToDictionary(b => b.Key, b => b.Value.GetOperResult()));
-    }
+    public Task<bool> BatchEditDeviceAsync(List<Device> models, Device oldModel, Device model, bool restart) =>
+        App.GetService<IDevicePageService>().BatchEditDeviceAsync(models, oldModel, model, restart);
 
-    public Task DeleteRpcLogAsync() => App.GetService<IRpcLogService>().DeleteRpcLogAsync();
+    public Task<bool> BatchEditVariableAsync(List<Variable> models, Variable oldModel, Variable model, bool restart) =>
+        App.GetService<IVariablePageService>().BatchEditVariableAsync(models, oldModel, model, restart);
 
-    public Task<List<RpcLog>> GetNewRpcLogAsync() => App.GetService<IRpcLogService>().GetNewRpcLogAsync();
+    public Task<bool> BatchSaveVariableAsync(List<Variable> input, ItemChangedType type, bool restart) =>
+        App.GetService<IVariablePageService>().BatchSaveVariableAsync(input, type, restart);
 
-    public Task<QueryData<RpcLog>> RpcLogPageAsync(QueryPageOptions option) => App.GetService<IRpcLogService>().RpcLogPageAsync(option);
-
-    public Task<List<RpcLogDayStatisticsOutput>> RpcLogStatisticsByDayAsync(int day) => App.GetService<IRpcLogService>().RpcLogStatisticsByDayAsync(day);
-
-    public Task RestartServerAsync() => App.GetService<IRestartService>().RestartServerAsync();
-
-    public Task<string> UUIDAsync() => App.GetService<IAuthenticationService>().UUIDAsync();
-
-    public Task<AuthorizeInfo> TryAuthorizeAsync(string password) => App.GetService<IAuthenticationService>().TryAuthorizeAsync(password);
-
-    public Task<AuthorizeInfo> TryGetAuthorizeInfoAsync() => App.GetService<IAuthenticationService>().TryGetAuthorizeInfoAsync();
-
-    public Task UnAuthorizeAsync() => App.GetService<IAuthenticationService>().UnAuthorizeAsync();
-
-    public Task<bool> StartBusinessChannelEnableAsync() => App.GetService<IChannelEnableService>().StartBusinessChannelEnableAsync();
-
-
-    public Task<bool> StartCollectChannelEnableAsync() => App.GetService<IChannelEnableService>().StartCollectChannelEnableAsync();
-
-    public Task StartRedundancyTaskAsync() => App.GetService<IRedundancyHostedService>().StartRedundancyTaskAsync();
-
-    public Task StopRedundancyTaskAsync() => App.GetService<IRedundancyHostedService>().StopRedundancyTaskAsync();
-
-    public Task RedundancyForcedSync() => App.GetService<IRedundancyHostedService>().RedundancyForcedSync();
-
-
-    public Task EditRedundancyOptionAsync(RedundancyOptions input) => App.GetService<IRedundancyService>().EditRedundancyOptionAsync(input);
-
-    public Task<RedundancyOptions> GetRedundancyAsync() => App.GetService<IRedundancyService>().GetRedundancyAsync();
-
-    public Task<LogLevel> RedundancyLogLevelAsync() => App.GetService<IRedundancyHostedService>().RedundancyLogLevelAsync();
-
-
-    public Task SetRedundancyLogLevelAsync(LogLevel logLevel) => App.GetService<IRedundancyHostedService>().SetRedundancyLogLevelAsync(logLevel);
-
-    public Task<string> RedundancyLogPathAsync() => App.GetService<IRedundancyHostedService>().RedundancyLogPathAsync();
-
-    public Task<OperResult<List<string>>> GetLogFilesAsync(string directoryPath) => App.GetService<ITextFileReadService>().GetLogFilesAsync(directoryPath);
-
-    public Task<OperResult<List<LogData>>> LastLogDataAsync(string file, int lineCount = 200) => App.GetService<ITextFileReadService>().LastLogDataAsync(file, lineCount);
-
-    public Task<List<PluginInfo>> GetPluginsAsync(PluginTypeEnum? pluginType = null) => App.GetService<IPluginPageService>().GetPluginsAsync(pluginType);
-
-    public Task<QueryData<PluginInfo>> PluginPageAsync(QueryPageOptions options, PluginTypeEnum? pluginTypeEnum = null) => App.GetService<IPluginPageService>().PluginPageAsync(options, pluginTypeEnum);
-
-    public Task ReloadPluginAsync() => App.GetService<IPluginPageService>().ReloadPluginAsync();
-
-
-
-    public Task SavePluginByPathAsync(PluginAddPathInput plugin) => App.GetService<IPluginPageService>().SavePluginByPathAsync(plugin);
-
-    public Task<IEnumerable<AlarmVariable>> GetCurrentUserRealAlarmVariablesAsync() => App.GetService<IRealAlarmService>().GetCurrentUserRealAlarmVariablesAsync();
-
-    public Task<IEnumerable<SelectedItem>> GetCurrentUserDeviceSelectedItemsAsync(string searchText, int startIndex, int count) => App.GetService<IGlobalDataService>().GetCurrentUserDeviceSelectedItemsAsync(searchText, startIndex, count);
-
-    public Task<QueryData<SelectedItem>> GetCurrentUserDeviceVariableSelectedItemsAsync(string deviceText, string searchText, int startIndex, int count) => App.GetService<IGlobalDataService>().GetCurrentUserDeviceVariableSelectedItemsAsync(deviceText, searchText, startIndex, count);
-
-    public Task<TouchSocket.Core.LogLevel> RulesLogLevelAsync(long rulesId) => App.GetService<IRulesEngineHostedService>().RulesLogLevelAsync(rulesId);
-    public Task SetRulesLogLevelAsync(long rulesId, TouchSocket.Core.LogLevel logLevel) => App.GetService<IRulesEngineHostedService>().SetRulesLogLevelAsync(rulesId, logLevel);
-    public Task<string> RulesLogPathAsync(long rulesId) => App.GetService<IRulesEngineHostedService>().RulesLogPathAsync(rulesId);
-    public Task<Rules> GetRuleRuntimesAsync(long rulesId) => App.GetService<IRulesEngineHostedService>().GetRuleRuntimesAsync(rulesId);
-
-
-    public Task DeleteRuleRuntimesAsync(List<long> ids) => App.GetService<IRulesEngineHostedService>().DeleteRuleRuntimesAsync(ids);
-
-    public Task EditRuleRuntimesAsync(Rules rules) => App.GetService<IRulesEngineHostedService>().EditRuleRuntimesAsync(rules);
-
-    public Task ClearRulesAsync() => App.GetService<IRulesService>().ClearRulesAsync();
-
-
-    public Task<bool> DeleteRulesAsync(List<long> ids) => App.GetService<IRulesService>().DeleteRulesAsync(ids);
-
-    public Task<List<Rules>> GetAllAsync() => App.GetService<IRulesService>().GetAllAsync();
-
-
-    public Task<QueryData<Rules>> RulesPageAsync(QueryPageOptions option, FilterKeyValueAction filterKeyValueAction = null) => App.GetService<IRulesService>().RulesPageAsync(option, filterKeyValueAction);
-
-
-    public Task<bool> SaveRulesAsync(Rules input, ItemChangedType type) => App.GetService<IRulesService>().SaveRulesAsync(input, type);
-
-    public Task<string> GetPluginNameAsync(long channelId) => App.GetService<IChannelPageService>().GetPluginNameAsync(channelId);
-
-    public Task RestartChannelAsync(long channelId) =>
-    App.GetService<IChannelPageService>().RestartChannelAsync(channelId);
-    public Task RestartChannelsAsync() =>
-    App.GetService<IChannelPageService>().RestartChannelsAsync();
     public Task<LogLevel> ChannelLogLevelAsync(long id) =>
         App.GetService<IChannelPageService>().ChannelLogLevelAsync(id);
 
-    public Task SetChannelLogLevelAsync(long id, LogLevel logLevel) =>
-        App.GetService<IChannelPageService>().SetChannelLogLevelAsync(id, logLevel);
+    public Task<bool> ClearChannelAsync(bool restart) =>
+        App.GetService<IChannelPageService>().ClearChannelAsync(restart);
+
+    public Task<bool> ClearDeviceAsync(bool restart) =>
+        App.GetService<IDevicePageService>().ClearDeviceAsync(restart);
+
+    public Task ClearRulesAsync() => App.GetService<IRulesService>().ClearRulesAsync();
+
+    public Task<bool> ClearVariableAsync(bool restart) =>
+        App.GetService<IVariablePageService>().ClearVariableAsync(restart);
 
     public Task CopyChannelAsync(int copyCount, string copyChannelNamePrefix, int copyChannelNameSuffixNumber,
         string copyDeviceNamePrefix, int copyDeviceNameSuffixNumber, long channelId, bool restart) =>
         App.GetService<IChannelPageService>().CopyChannelAsync(copyCount, copyChannelNamePrefix, copyChannelNameSuffixNumber,
             copyDeviceNamePrefix, copyDeviceNameSuffixNumber, channelId, restart);
 
-    public Task<QueryData<ChannelRuntime>> OnChannelQueryAsync(QueryPageOptions options) =>
-        App.GetService<IChannelPageService>().OnChannelQueryAsync(options);
-
-    public Task<List<Channel>> GetChannelListAsync(QueryPageOptions options, int max = 0) =>
-        App.GetService<IChannelPageService>().GetChannelListAsync(options, max);
-
-    public Task<bool> SaveChannelAsync(Channel input, ItemChangedType type, bool restart) =>
-        App.GetService<IChannelPageService>().SaveChannelAsync(input, type, restart);
-
-    public Task<bool> BatchEditChannelAsync(List<Channel> models, Channel oldModel, Channel model, bool restart) =>
-        App.GetService<IChannelPageService>().BatchEditChannelAsync(models, oldModel, model, restart);
-
-    public Task<bool> DeleteChannelAsync(List<long> ids, bool restart) =>
-        App.GetService<IChannelPageService>().DeleteChannelAsync(ids, restart);
-
-    public Task<bool> ClearChannelAsync(bool restart) =>
-        App.GetService<IChannelPageService>().ClearChannelAsync(restart);
-
-    public Task ImportChannelAsync(List<Channel> upData, List<Channel> insertData, bool restart) =>
-        App.GetService<IChannelPageService>().ImportChannelAsync(upData, insertData, restart);
-
-    public Task<Dictionary<string, ImportPreviewOutputBase>> ImportChannelUSheetDatasAsync(USheetDatas input, bool restart) =>
-        App.GetService<IChannelPageService>().ImportChannelUSheetDatasAsync(input, restart);
-
-    public Task<Dictionary<string, ImportPreviewOutputBase>> ImportChannelFileAsync(string filePath, bool restart) =>
-        App.GetService<IChannelPageService>().ImportChannelFileAsync(filePath, restart);
-
-    public Task<USheetDatas> ExportChannelAsync(List<Channel> channels) =>
-        App.GetService<IChannelPageService>().ExportChannelAsync(channels);
-
-    public Task<QueryData<SelectedItem>> OnChannelSelectedItemQueryAsync(VirtualizeQueryOption option) =>
-        App.GetService<IChannelPageService>().OnChannelSelectedItemQueryAsync(option);
-
-    public Task<Dictionary<string, ImportPreviewOutputBase>> ImportChannelAsync(IBrowserFile file, bool restart) =>
-        App.GetService<IChannelPageService>().ImportChannelAsync(file, restart);
-
-    public Task<string> ExportChannelFileAsync(GatewayExportFilter exportFilter) =>
-        App.GetService<IChannelPageService>().ExportChannelFileAsync(exportFilter);
-
-    public Task<string> GetChannelNameAsync(long id) =>
-        App.GetService<IChannelPageService>().GetChannelNameAsync(id);
-
-    public Task SetDeviceLogLevelAsync(long id, LogLevel logLevel) =>
-        App.GetService<IDevicePageService>().SetDeviceLogLevelAsync(id, logLevel);
-
     public Task CopyDeviceAsync(int CopyCount, string CopyDeviceNamePrefix, int CopyDeviceNameSuffixNumber, long deviceId, bool AutoRestartThread) =>
     App.GetService<IDevicePageService>().CopyDeviceAsync(CopyCount, CopyDeviceNamePrefix, CopyDeviceNameSuffixNumber, deviceId, AutoRestartThread);
 
-    public Task<LogLevel> DeviceLogLevelAsync(long id) =>
-        App.GetService<IDevicePageService>().DeviceLogLevelAsync(id);
+    public Task CopyVariableAsync(List<Variable> model, int copyCount, string copyVariableNamePrefix, int copyVariableNameSuffixNumber, bool restart) =>
+        App.GetService<IVariablePageService>().CopyVariableAsync(model, copyCount, copyVariableNamePrefix, copyVariableNameSuffixNumber, restart);
 
-    public Task<bool> BatchEditDeviceAsync(List<Device> models, Device oldModel, Device model, bool restart) =>
-        App.GetService<IDevicePageService>().BatchEditDeviceAsync(models, oldModel, model, restart);
-
-    public Task<bool> SaveDeviceAsync(Device input, ItemChangedType type, bool restart) =>
-        App.GetService<IDevicePageService>().SaveDeviceAsync(input, type, restart);
+    public Task DeleteBackendLogAsync() => App.GetService<IBackendLogService>().DeleteBackendLogAsync();
+    public Task<bool> DeleteChannelAsync(List<long> ids, bool restart) =>
+        App.GetService<IChannelPageService>().DeleteChannelAsync(ids, restart);
 
     public Task<bool> DeleteDeviceAsync(List<long> ids, bool restart) =>
         App.GetService<IDevicePageService>().DeleteDeviceAsync(ids, restart);
 
-    public Task<Dictionary<string, ImportPreviewOutputBase>> ImportDeviceUSheetDatasAsync(USheetDatas input, bool restart) =>
-        App.GetService<IDevicePageService>().ImportDeviceUSheetDatasAsync(input, restart);
+    public Task DeleteRpcLogAsync() => App.GetService<IRpcLogService>().DeleteRpcLogAsync();
+
+    public Task DeleteRuleRuntimesAsync(List<long> ids) => App.GetService<IRulesEngineHostedService>().DeleteRuleRuntimesAsync(ids);
+
+    public Task<bool> DeleteRulesAsync(List<long> ids) => App.GetService<IRulesService>().DeleteRulesAsync(ids);
+
+    public Task<bool> DeleteVariableAsync(List<long> ids, bool restart) =>
+    App.GetService<IVariablePageService>().DeleteVariableAsync(ids, restart);
+
+    public Task<LogLevel> DeviceLogLevelAsync(long id) =>
+        App.GetService<IDevicePageService>().DeviceLogLevelAsync(id);
+
+    public Task DeviceRedundantThreadAsync(long id) =>
+        App.GetService<IDevicePageService>().DeviceRedundantThreadAsync(id);
+
+    public Task EditRedundancyOptionAsync(RedundancyOptions input) => App.GetService<IRedundancyService>().EditRedundancyOptionAsync(input);
+
+    public Task EditRuleRuntimesAsync(Rules rules) => App.GetService<IRulesEngineHostedService>().EditRuleRuntimesAsync(rules);
+
+    public Task<USheetDatas> ExportChannelAsync(List<Channel> channels) =>
+        App.GetService<IChannelPageService>().ExportChannelAsync(channels);
+
+    public Task<string> ExportChannelFileAsync(GatewayExportFilter exportFilter) =>
+        App.GetService<IChannelPageService>().ExportChannelFileAsync(exportFilter);
 
     public Task<USheetDatas> ExportDeviceAsync(List<Device> devices) =>
         App.GetService<IDevicePageService>().ExportDeviceAsync(devices);
@@ -214,80 +102,72 @@ public partial class ManagementRpcServer : IRpcServer, IManagementRpcServer, IBa
     public Task<string> ExportDeviceFileAsync(GatewayExportFilter exportFilter) =>
         App.GetService<IDevicePageService>().ExportDeviceFileAsync(exportFilter);
 
-    public Task<QueryData<SelectedItem>> OnRedundantDevicesQueryAsync(VirtualizeQueryOption option, long deviceId, long channelId) =>
-        App.GetService<IDevicePageService>().OnRedundantDevicesQueryAsync(option, deviceId, channelId);
+    public Task<USheetDatas> ExportVariableAsync(List<Variable> models, string? sortName, SortOrder sortOrder) =>
+        App.GetService<IVariablePageService>().ExportVariableAsync(models, sortName, sortOrder);
 
-    public Task<Dictionary<string, ImportPreviewOutputBase>> ImportDeviceFileAsync(string filePath, bool restart) =>
-        App.GetService<IDevicePageService>().ImportDeviceFileAsync(filePath, restart);
+    public Task<string> ExportVariableFileAsync(GatewayExportFilter exportFilter) => App.GetService<IVariablePageService>().ExportVariableFileAsync(exportFilter);
 
-    public Task DeviceRedundantThreadAsync(long id) =>
-        App.GetService<IDevicePageService>().DeviceRedundantThreadAsync(id);
+    public Task<List<Rules>> GetAllRulesAsync() => App.GetService<IRulesService>().GetAllRulesAsync();
 
-    public Task RestartDeviceAsync(long id, bool deleteCache) =>
-        App.GetService<IDevicePageService>().RestartDeviceAsync(id, deleteCache);
+    public Task<List<Channel>> GetChannelListAsync(QueryPageOptions options, int max = 0) =>
+        App.GetService<IChannelPageService>().GetChannelListAsync(options, max);
 
-    public Task PauseThreadAsync(long id) =>
-        App.GetService<IDevicePageService>().PauseThreadAsync(id);
+    public Task<string> GetChannelNameAsync(long id) =>
+        App.GetService<IChannelPageService>().GetChannelNameAsync(id);
 
-    public Task<QueryData<DeviceRuntime>> OnDeviceQueryAsync(QueryPageOptions options) =>
-        App.GetService<IDevicePageService>().OnDeviceQueryAsync(options);
+    public Task<IEnumerable<SelectedItem>> GetCurrentUserDeviceSelectedItemsAsync(string searchText, int startIndex, int count) => App.GetService<IGlobalDataService>().GetCurrentUserDeviceSelectedItemsAsync(searchText, startIndex, count);
+
+    public Task<QueryData<SelectedItem>> GetCurrentUserDeviceVariableSelectedItemsAsync(string deviceText, string searchText, int startIndex, int count) => App.GetService<IGlobalDataService>().GetCurrentUserDeviceVariableSelectedItemsAsync(deviceText, searchText, startIndex, count);
+
+    public Task<IEnumerable<AlarmVariable>> GetCurrentUserRealAlarmVariablesAsync() => App.GetService<IRealAlarmService>().GetCurrentUserRealAlarmVariablesAsync();
+
+    public Task<Dictionary<long, Tuple<string, string>>> GetDeviceIdNamesAsync() => App.GetService<IDevicePageService>().GetDeviceIdNamesAsync();
 
     public Task<List<Device>> GetDeviceListAsync(QueryPageOptions option, int v) =>
         App.GetService<IDevicePageService>().GetDeviceListAsync(option, v);
 
-    public Task<bool> ClearDeviceAsync(bool restart) =>
-        App.GetService<IDevicePageService>().ClearDeviceAsync(restart);
-
-    public Task<bool> IsRedundantDeviceAsync(long id) =>
-        App.GetService<IDevicePageService>().IsRedundantDeviceAsync(id);
-
     public Task<string> GetDeviceNameAsync(long redundantDeviceId) =>
         App.GetService<IDevicePageService>().GetDeviceNameAsync(redundantDeviceId);
-
-    public Task<Dictionary<string, ImportPreviewOutputBase>> ImportDeviceAsync(IBrowserFile file, bool restart) =>
-        App.GetService<IDevicePageService>().ImportDeviceAsync(file, restart);
-
-    public Task<QueryData<SelectedItem>> OnDeviceSelectedItemQueryAsync(VirtualizeQueryOption option, bool isCollect) =>
-        App.GetService<IDevicePageService>().OnDeviceSelectedItemQueryAsync(option, isCollect);
 
     public Task<string> GetDevicePluginNameAsync(long id) =>
         App.GetService<IDevicePageService>().GetDevicePluginNameAsync(id);
 
-    public Task<bool> BatchEditVariableAsync(List<Variable> models, Variable oldModel, Variable model, bool restart) =>
-        App.GetService<IVariablePageService>().BatchEditVariableAsync(models, oldModel, model, restart);
+    public Task<OperResult<List<string>>> GetLogFilesAsync(string directoryPath) => App.GetService<ITextFileReadService>().GetLogFilesAsync(directoryPath);
 
-    public Task<bool> DeleteVariableAsync(List<long> ids, bool restart) =>
-    App.GetService<IVariablePageService>().DeleteVariableAsync(ids, restart);
+    public Task<List<BackendLog>> GetNewBackendLogAsync() => App.GetService<IBackendLogService>().GetNewBackendLogAsync();
+    public Task<List<RpcLog>> GetNewRpcLogAsync() => App.GetService<IRpcLogService>().GetNewRpcLogAsync();
 
-    public Task<bool> ClearVariableAsync(bool restart) =>
-        App.GetService<IVariablePageService>().ClearVariableAsync(restart);
+    public Task<string> GetPluginNameAsync(long channelId) => App.GetService<IChannelPageService>().GetPluginNameAsync(channelId);
 
-    public Task InsertTestDataAsync(int testVariableCount, int testDeviceCount, string slaveUrl, bool businessEnable, bool restart) =>
-        App.GetService<IVariablePageService>().InsertTestDataAsync(testVariableCount, testDeviceCount, slaveUrl, businessEnable, restart);
+    public Task<List<PluginInfo>> GetPluginsAsync(PluginTypeEnum? pluginType = null) => App.GetService<IPluginPageService>().GetPluginsAsync(pluginType);
 
-    public Task<bool> BatchSaveVariableAsync(List<Variable> input, ItemChangedType type, bool restart) =>
-        App.GetService<IVariablePageService>().BatchSaveVariableAsync(input, type, restart);
+    public Task<RedundancyOptions> GetRedundancyAsync() => App.GetService<IRedundancyService>().GetRedundancyAsync();
 
-    public Task<bool> SaveVariableAsync(Variable input, ItemChangedType type, bool restart) =>
-        App.GetService<IVariablePageService>().SaveVariableAsync(input, type, restart);
-
-    public Task CopyVariableAsync(List<Variable> model, int copyCount, string copyVariableNamePrefix, int copyVariableNameSuffixNumber, bool restart) =>
-        App.GetService<IVariablePageService>().CopyVariableAsync(model, copyCount, copyVariableNamePrefix, copyVariableNameSuffixNumber, restart);
-
-    public Task<QueryData<VariableRuntime>> OnVariableQueryAsync(QueryPageOptions options) =>
-        App.GetService<IVariablePageService>().OnVariableQueryAsync(options);
+    public Task<Rules> GetRuleRuntimesAsync(long rulesId) => App.GetService<IRulesEngineHostedService>().GetRuleRuntimesAsync(rulesId);
 
     public Task<List<Variable>> GetVariableListAsync(QueryPageOptions option, int v) =>
         App.GetService<IVariablePageService>().GetVariableListAsync(option, v);
 
-    public Task<USheetDatas> ExportVariableAsync(List<Variable> models, string? sortName, SortOrder sortOrder) =>
-        App.GetService<IVariablePageService>().ExportVariableAsync(models, sortName, sortOrder);
+    public Task ImportChannelAsync(List<Channel> upData, List<Channel> insertData, bool restart) =>
+        App.GetService<IChannelPageService>().ImportChannelAsync(upData, insertData, restart);
 
-    public Task<Dictionary<string, ImportPreviewOutputBase>> ImportVariableUSheetDatasAsync(USheetDatas data, bool restart) =>
-        App.GetService<IVariablePageService>().ImportVariableUSheetDatasAsync(data, restart);
+    public Task<Dictionary<string, ImportPreviewOutputBase>> ImportChannelAsync(IBrowserFile file, bool restart) =>
+        App.GetService<IChannelPageService>().ImportChannelAsync(file, restart);
 
-    public Task<OperResult<object>> OnWriteVariableAsync(long id, string writeData) =>
-        App.GetService<IVariablePageService>().OnWriteVariableAsync(id, writeData);
+    public Task<Dictionary<string, ImportPreviewOutputBase>> ImportChannelFileAsync(string filePath, bool restart) =>
+        App.GetService<IChannelPageService>().ImportChannelFileAsync(filePath, restart);
+
+    public Task<Dictionary<string, ImportPreviewOutputBase>> ImportChannelUSheetDatasAsync(USheetDatas input, bool restart) =>
+        App.GetService<IChannelPageService>().ImportChannelUSheetDatasAsync(input, restart);
+
+    public Task<Dictionary<string, ImportPreviewOutputBase>> ImportDeviceAsync(IBrowserFile file, bool restart) =>
+        App.GetService<IDevicePageService>().ImportDeviceAsync(file, restart);
+
+    public Task<Dictionary<string, ImportPreviewOutputBase>> ImportDeviceFileAsync(string filePath, bool restart) =>
+        App.GetService<IDevicePageService>().ImportDeviceFileAsync(filePath, restart);
+
+    public Task<Dictionary<string, ImportPreviewOutputBase>> ImportDeviceUSheetDatasAsync(USheetDatas input, bool restart) =>
+        App.GetService<IDevicePageService>().ImportDeviceUSheetDatasAsync(input, restart);
 
     public Task<Dictionary<string, ImportPreviewOutputBase>> ImportVariableAsync(IBrowserFile a, bool restart) =>
         App.GetService<IVariablePageService>().ImportVariableAsync(a, restart);
@@ -295,7 +175,113 @@ public partial class ManagementRpcServer : IRpcServer, IManagementRpcServer, IBa
     public Task<Dictionary<string, ImportPreviewOutputBase>> ImportVariableFileAsync(string filePath, bool restart) =>
         App.GetService<IVariablePageService>().ImportVariableFileAsync(filePath, restart);
 
-    public Task<string> ExportVariableFileAsync(GatewayExportFilter exportFilter) => App.GetService<IVariablePageService>().ExportVariableFileAsync(exportFilter);
+    public Task<Dictionary<string, ImportPreviewOutputBase>> ImportVariableUSheetDatasAsync(USheetDatas data, bool restart) =>
+        App.GetService<IVariablePageService>().ImportVariableUSheetDatasAsync(data, restart);
 
-    public Task<Dictionary<long, Tuple<string, string>>> GetDeviceIdNamesAsync() => App.GetService<IDevicePageService>().GetDeviceIdNamesAsync();
+    public Task InsertTestDataAsync(int testVariableCount, int testDeviceCount, string slaveUrl, bool businessEnable, bool restart) =>
+        App.GetService<IVariablePageService>().InsertTestDataAsync(testVariableCount, testDeviceCount, slaveUrl, businessEnable, restart);
+
+    public Task<bool> IsRedundantDeviceAsync(long id) =>
+        App.GetService<IDevicePageService>().IsRedundantDeviceAsync(id);
+
+    public Task<OperResult<List<LogData>>> LastLogDataAsync(string file, int lineCount = 200) => App.GetService<ITextFileReadService>().LastLogDataAsync(file, lineCount);
+
+    public Task<QueryData<ChannelRuntime>> OnChannelQueryAsync(QueryPageOptions options) =>
+        App.GetService<IChannelPageService>().OnChannelQueryAsync(options);
+
+    public Task<QueryData<SelectedItem>> OnChannelSelectedItemQueryAsync(VirtualizeQueryOption option) =>
+        App.GetService<IChannelPageService>().OnChannelSelectedItemQueryAsync(option);
+
+    public Task<QueryData<DeviceRuntime>> OnDeviceQueryAsync(QueryPageOptions options) =>
+        App.GetService<IDevicePageService>().OnDeviceQueryAsync(options);
+
+    public Task<QueryData<SelectedItem>> OnDeviceSelectedItemQueryAsync(VirtualizeQueryOption option, bool isCollect) =>
+        App.GetService<IDevicePageService>().OnDeviceSelectedItemQueryAsync(option, isCollect);
+
+    public Task<QueryData<SelectedItem>> OnRedundantDevicesQueryAsync(VirtualizeQueryOption option, long deviceId, long channelId) =>
+        App.GetService<IDevicePageService>().OnRedundantDevicesQueryAsync(option, deviceId, channelId);
+
+    public Task<QueryData<VariableRuntime>> OnVariableQueryAsync(QueryPageOptions options) =>
+        App.GetService<IVariablePageService>().OnVariableQueryAsync(options);
+
+    public Task<OperResult<object>> OnWriteVariableAsync(long id, string writeData) =>
+        App.GetService<IVariablePageService>().OnWriteVariableAsync(id, writeData);
+
+    public Task PauseThreadAsync(long id) =>
+        App.GetService<IDevicePageService>().PauseThreadAsync(id);
+
+    public Task<QueryData<PluginInfo>> PluginPageAsync(QueryPageOptions options, PluginTypeEnum? pluginTypeEnum = null) => App.GetService<IPluginPageService>().PluginPageAsync(options, pluginTypeEnum);
+
+    public Task RedundancyForcedSync() => App.GetService<IRedundancyHostedService>().RedundancyForcedSync();
+
+    public Task<LogLevel> RedundancyLogLevelAsync() => App.GetService<IRedundancyHostedService>().RedundancyLogLevelAsync();
+
+    public Task<string> RedundancyLogPathAsync() => App.GetService<IRedundancyHostedService>().RedundancyLogPathAsync();
+
+    public Task ReloadPluginAsync() => App.GetService<IPluginPageService>().ReloadPluginAsync();
+
+    public Task RestartChannelAsync(long channelId) =>
+    App.GetService<IChannelPageService>().RestartChannelAsync(channelId);
+
+    public Task RestartChannelsAsync() =>
+    App.GetService<IChannelPageService>().RestartChannelsAsync();
+
+    public Task RestartDeviceAsync(long id, bool deleteCache) =>
+        App.GetService<IDevicePageService>().RestartDeviceAsync(id, deleteCache);
+
+    public Task RestartServerAsync() => App.GetService<IRestartService>().RestartServerAsync();
+
+    public async Task<Dictionary<string, Dictionary<string, OperResult<object>>>> RpcAsync(ICallContext callContext, Dictionary<string, Dictionary<string, string>> deviceDatas)
+    {
+        var data = await GlobalData.RpcService.InvokeDeviceMethodAsync($"Management[{(callContext.Caller is ITcpSession tcpSession ? tcpSession.GetIPPort() : string.Empty)}]", deviceDatas, callContext.Token).ConfigureAwait(false);
+
+        return data.ToDictionary(a => a.Key, a => a.Value.ToDictionary(b => b.Key, b => b.Value.GetOperResult()));
+    }
+    public Task<QueryData<RpcLog>> RpcLogPageAsync(QueryPageOptions option) => App.GetService<IRpcLogService>().RpcLogPageAsync(option);
+
+    public Task<List<RpcLogDayStatisticsOutput>> RpcLogStatisticsByDayAsync(int day) => App.GetService<IRpcLogService>().RpcLogStatisticsByDayAsync(day);
+    public Task<TouchSocket.Core.LogLevel> RulesLogLevelAsync(long rulesId) => App.GetService<IRulesEngineHostedService>().RulesLogLevelAsync(rulesId);
+
+    public Task<string> RulesLogPathAsync(long rulesId) => App.GetService<IRulesEngineHostedService>().RulesLogPathAsync(rulesId);
+
+    public Task<QueryData<Rules>> RulesPageAsync(QueryPageOptions option, FilterKeyValueAction filterKeyValueAction = null) => App.GetService<IRulesService>().RulesPageAsync(option, filterKeyValueAction);
+
+    public Task<bool> SaveChannelAsync(Channel input, ItemChangedType type, bool restart) =>
+        App.GetService<IChannelPageService>().SaveChannelAsync(input, type, restart);
+
+    public Task<bool> SaveDeviceAsync(Device input, ItemChangedType type, bool restart) =>
+        App.GetService<IDevicePageService>().SaveDeviceAsync(input, type, restart);
+
+    public Task SavePluginByPathAsync(PluginAddPathInput plugin) => App.GetService<IPluginPageService>().SavePluginByPathAsync(plugin);
+
+    public Task<bool> SaveRulesAsync(Rules input, ItemChangedType type) => App.GetService<IRulesService>().SaveRulesAsync(input, type);
+
+    public Task<bool> SaveVariableAsync(Variable input, ItemChangedType type, bool restart) =>
+        App.GetService<IVariablePageService>().SaveVariableAsync(input, type, restart);
+
+    public Task SetChannelLogLevelAsync(long id, LogLevel logLevel) =>
+        App.GetService<IChannelPageService>().SetChannelLogLevelAsync(id, logLevel);
+
+    public Task SetDeviceLogLevelAsync(long id, LogLevel logLevel) =>
+        App.GetService<IDevicePageService>().SetDeviceLogLevelAsync(id, logLevel);
+
+    public Task SetRedundancyLogLevelAsync(LogLevel logLevel) => App.GetService<IRedundancyHostedService>().SetRedundancyLogLevelAsync(logLevel);
+
+    public Task SetRulesLogLevelAsync(long rulesId, TouchSocket.Core.LogLevel logLevel) => App.GetService<IRulesEngineHostedService>().SetRulesLogLevelAsync(rulesId, logLevel);
+
+    public Task<bool> StartBusinessChannelEnableAsync() => App.GetService<IChannelEnableService>().StartBusinessChannelEnableAsync();
+
+    public Task<bool> StartCollectChannelEnableAsync() => App.GetService<IChannelEnableService>().StartCollectChannelEnableAsync();
+
+    public Task StartRedundancyTaskAsync() => App.GetService<IRedundancyHostedService>().StartRedundancyTaskAsync();
+
+    public Task StopRedundancyTaskAsync() => App.GetService<IRedundancyHostedService>().StopRedundancyTaskAsync();
+
+    public Task<AuthorizeInfo> TryAuthorizeAsync(string password) => App.GetService<IAuthenticationService>().TryAuthorizeAsync(password);
+
+    public Task<AuthorizeInfo> TryGetAuthorizeInfoAsync() => App.GetService<IAuthenticationService>().TryGetAuthorizeInfoAsync();
+
+    public Task UnAuthorizeAsync() => App.GetService<IAuthenticationService>().UnAuthorizeAsync();
+
+    public Task<string> UUIDAsync() => App.GetService<IAuthenticationService>().UUIDAsync();
 }

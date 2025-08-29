@@ -39,7 +39,7 @@ internal sealed class RulesService : BaseService<Rules>, IRulesService
 
         using var db = GetDB();
 
-        var data = (await GetAllAsync().ConfigureAwait(false))
+        var data = (await GetAllRulesAsync().ConfigureAwait(false))
               .WhereIf(dataScope != null && dataScope?.Count > 0, u => dataScope.Contains(u.CreateOrgId))//在指定机构列表查询
             .WhereIf(dataScope?.Count == 0, u => u.CreateUserId == UserManager.UserId)
             .Select(a => a.Id).ToList();
@@ -75,7 +75,7 @@ internal sealed class RulesService : BaseService<Rules>, IRulesService
     /// 从缓存/数据库获取全部信息
     /// </summary>
     /// <returns>列表</returns>
-    public async Task<List<Rules>> GetAllAsync()
+    public async Task<List<Rules>> GetAllRulesAsync()
     {
         var channels = App.CacheService.Get<List<Rules>>(cacheKey);
         if (channels == null)

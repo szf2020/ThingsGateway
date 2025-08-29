@@ -14,7 +14,7 @@
 	<Import Project="targets\Admin.targets" Condition=" '$(SolutionName)' == 'ThingsGatewayRelease' " />
 
 	<Import Project="targets\PluginContext.targets" Condition=" '$(SolutionName)' == 'ThingsGatewayPro' AND  '$(Configuration)' != 'Debug' " />
-	
+
 	<!--nuget包解压复制文件，上下文动态加载-->
 	<Import Project="targets\PluginContext.targets" Condition=" '$(SolutionName)' != 'ThingsGatewayPro' AND  '$(Configuration)' != 'Debug' " />
 	<!--直接引用-->
@@ -31,7 +31,7 @@
 
 
 	<Import Project="targets\ProPluginDebug.targets" Condition=" '$(SolutionName)' == 'ThingsGatewayPro' AND '$(Configuration)' == 'Debug'" />
-	
+
 	<!--<Import Project="targets\Pro3.targets" Condition=" '$(SolutionName)' == 'ThingsGatewayPro' " />
 	<Import Project="targets\Pro5.targets" Condition=" '$(SolutionName)' == 'ThingsGatewayPro' " />-->
 	<!--<Import Project="targets\Pro6.targets" Condition=" '$(SolutionName)' == 'ThingsGatewayPro' AND '$(Configuration)' != 'Debug'" />-->
@@ -42,7 +42,7 @@
 	<PropertyGroup>
 
 		<GenerateDocumentationFile>false</GenerateDocumentationFile>
-		
+
 		<TargetFrameworks>net8.0;net9.0;</TargetFrameworks>
 		<CustomTargetFramework>$(TargetFramework)</CustomTargetFramework>
 		<OpenApiGenerateDocuments>false</OpenApiGenerateDocuments>
@@ -57,10 +57,10 @@
 		<CETCompat>false</CETCompat>
 
 
-		
-		
+
+
 		<!--<TieredCompilation>false</TieredCompilation>-->
-		
+
 		<!--使用自托管线程池-->
 		<!--<UseWindowsThreadPool>false</UseWindowsThreadPool> -->
 
@@ -92,7 +92,7 @@
 		<None Include="Layout\BlazorAppNet8.razor" />
 	</ItemGroup>
 
-	
+
 	<!--安装服务守护-->
 	<ItemGroup Condition=" '$(TargetFramework)' == 'net8.0' ">
 
@@ -114,7 +114,7 @@
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
 		<None Update="ThingsGateway.pfx">
-		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
 		<None Update="WindowsService">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -136,7 +136,7 @@
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
 		<None Update="WindowsWebDisable.bat">
-		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
 		<None Update="WindowsServiceCreate.bat">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

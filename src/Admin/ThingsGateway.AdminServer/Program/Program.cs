@@ -15,6 +15,7 @@ using System.Text;
 
 using ThingsGateway.Admin.Application;
 using ThingsGateway.DB;
+using ThingsGateway.NewLife;
 using ThingsGateway.NewLife.Log;
 
 namespace ThingsGateway.AdminServer;
@@ -64,7 +65,7 @@ public class Program
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
                 builder.Host.UseSystemd();
 
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            if (Runtime.IsLegacyWindows)
                 builder.Logging.ClearProviders(); //去除默认的事件日志提供者，某些情况下会日志输出异常，导致程序崩溃
         }).ConfigureBuilder(builder =>
         {
