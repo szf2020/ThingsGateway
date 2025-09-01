@@ -145,7 +145,6 @@ public static class ByteExtensions
 
         // 如果是奇数，自动补齐 0
         int evenLen = (len % 2 == 0) ? len : len + 1;
-        if (evenLen == len) return inBytes;
 
         Span<byte> result = new byte[evenLen];
         inBytes.CopyTo(result);
@@ -177,7 +176,6 @@ public static class ByteExtensions
 
         // 如果是奇数，自动补齐 0
         int evenLen = (len % 2 == 0) ? len : len + 1;
-        if (evenLen == len) return inBytes;
 
         byte[] result = new byte[evenLen];
         inBytes.CopyTo(result);

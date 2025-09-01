@@ -37,7 +37,7 @@ public partial class SqlHistoryAlarm : BusinessBaseWithCacheAlarm
         get
         {
 #if !Management
-            if (_driverPropertys.BigTextScriptHistoryTable.IsNullOrEmpty())
+            if (_driverPropertys.VariableAlarmEnable && _driverPropertys.BigTextScriptHistoryTable.IsNullOrEmpty())
                 return typeof(HistoryAlarmPage);
             else
                 return null;
