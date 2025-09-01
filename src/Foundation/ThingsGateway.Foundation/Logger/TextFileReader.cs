@@ -51,6 +51,7 @@ public class LogDataCache
 /// <summary>高性能日志文件读取器（支持倒序读取）</summary>
 public static class TextFileReader
 {
+
     private static readonly MemoryCache _cache = new() { Expire = 30 };
     private static readonly MemoryCache _fileLocks = new();
     private static readonly ArrayPool<byte> _bytePool = ArrayPool<byte>.Shared;
@@ -59,7 +60,7 @@ public static class TextFileReader
     /// </summary>
     /// <param name="directoryPath">目录路径</param>
     /// <returns>包含文件信息的列表</returns>
-    public static OperResult<List<string>> GetLogFilesAsync(string directoryPath)
+    public static OperResult<List<string>> GetLogFiles(string directoryPath)
     {
         OperResult<List<string>> result = new(); // 初始化结果对象
         // 检查目录是否存在
@@ -81,17 +82,25 @@ public static class TextFileReader
             return result;
         }
 
+
         // 获取文件信息并按照最后写入时间降序排序
         var fileInfos = files.Select(filePath => new FileInfo(filePath))
                              .OrderByDescending(x => x.LastWriteTime)
-                             .Select(x => x.FullName)
+                             .Select(x =>
+                             {
+#if !NET6_0_OR_GREATER
+                                 return PathHelper.GetRelativePath(AppContext.BaseDirectory, x.FullName);
+#else
+                                 return Path.GetRelativePath(AppContext.BaseDirectory, x.FullName);
+#endif
+                             })
                              .ToList();
         result.OperCode = 0;
         result.Content = fileInfos;
         return result;
     }
 
-    public static OperResult<List<LogData>> LastLogDataAsync(string file, int lineCount = 200)
+    public static OperResult<List<LogData>> LastLogData(string file, int lineCount = 200)
     {
         if (!File.Exists(file))
             return new OperResult<List<LogData>>("The file path is invalid");
@@ -104,7 +113,7 @@ public static class TextFileReader
             {
                 var fileInfo = new FileInfo(file);
                 var length = fileInfo.Length;
-                var cacheKey = $"{nameof(TextFileReader)}_{nameof(LastLogDataAsync)}_{file})";
+                var cacheKey = $"{nameof(TextFileReader)}_{nameof(LastLogData)}_{file})";
                 if (_cache.TryGetValue<LogDataCache>(cacheKey, out var cachedData))
                 {
                     if (cachedData != null && cachedData.Length == length)

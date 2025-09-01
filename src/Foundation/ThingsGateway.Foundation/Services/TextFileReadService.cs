@@ -14,7 +14,7 @@ namespace ThingsGateway.Foundation;
 
 public class TextFileReadService : ITextFileReadService
 {
-    public Task<OperResult<List<string>>> GetLogFilesAsync(string directoryPath) => Task.FromResult(TextFileReader.GetLogFilesAsync(directoryPath));
+    public Task<OperResult<List<string>>> GetLogFilesAsync(string directoryPath) => Task.FromResult(TextFileReader.GetLogFiles(directoryPath));
 
-    public Task<OperResult<List<LogData>>> LastLogDataAsync(string file, int lineCount = 200) => Task.FromResult(TextFileReader.LastLogDataAsync(file, lineCount));
+    public Task<OperResult<List<LogData>>> LastLogDataAsync(string file, int lineCount = 200) => Task.FromResult(TextFileReader.LastLogData(file, lineCount));
 }

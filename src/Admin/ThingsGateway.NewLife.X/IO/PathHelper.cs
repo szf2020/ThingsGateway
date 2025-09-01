@@ -76,6 +76,65 @@ public static class PathHelper
     #endregion
 
     #region 路径操作辅助
+
+    public static string GetRelativePath(string relativeTo, string path)
+    {
+        if (string.IsNullOrEmpty(relativeTo))
+            throw new ArgumentNullException(nameof(relativeTo));
+        if (string.IsNullOrEmpty(path))
+            throw new ArgumentNullException(nameof(path));
+
+        // 转为绝对路径
+        relativeTo = Path.GetFullPath(relativeTo);
+        path = Path.GetFullPath(path);
+
+        // 末尾确保有分隔符，便于处理目录
+        if (!relativeTo.EndsWith(Path.DirectorySeparatorChar.ToString()))
+            relativeTo += Path.DirectorySeparatorChar;
+
+        // 相同路径
+        if (string.Equals(relativeTo, path, StringComparison.OrdinalIgnoreCase))
+            return ".";
+
+        // 检查 UNC 或不同盘符
+        bool isUnc = relativeTo.StartsWith(@"\\") && path.StartsWith(@"\\");
+        if (!isUnc)
+        {
+            // 不同盘符直接返回绝对路径
+            if (!string.Equals(Path.GetPathRoot(relativeTo), Path.GetPathRoot(path), StringComparison.OrdinalIgnoreCase))
+                return path;
+        }
+
+        // 找到共同前缀长度
+        int length = Math.Min(relativeTo.Length, path.Length);
+        int lastSeparatorIndex = -1;
+        int i;
+        for (i = 0; i < length; i++)
+        {
+            if (char.ToLowerInvariant(relativeTo[i]) != char.ToLowerInvariant(path[i]))
+                break;
+            if (relativeTo[i] == Path.DirectorySeparatorChar)
+                lastSeparatorIndex = i;
+        }
+
+        // 计算上退的 ".."
+        string up = "";
+        for (int j = lastSeparatorIndex + 1; j < relativeTo.Length; j++)
+        {
+            if (relativeTo[j] == Path.DirectorySeparatorChar)
+                up += ".." + Path.DirectorySeparatorChar;
+        }
+
+        // 获取剩余下行部分
+        string down = path.Substring(lastSeparatorIndex + 1);
+
+        // 拼接结果
+        string result = up + down;
+
+        return result;
+    }
+
+
     private static String GetPath(String path, Int32 mode)
     {
         // 处理路径分隔符，兼容Windows和Linux

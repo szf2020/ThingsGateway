@@ -115,7 +115,7 @@ public partial class WebApiTask : AsyncDisposableObject
                {
                    a.UseTcpSessionCheckClear();
 
-                   a.Add(new AuthenticationPlugin(_webApiOptions));
+                   a.Add<AuthenticationPlugin>().SetCredentials(_webApiOptions.UserName, _webApiOptions.Password).SetRealm(nameof(ThingsGateway));
 
                    a.UseWebApi();
 
@@ -158,60 +158,69 @@ public partial class WebApiTask : AsyncDisposableObject
         TextLogger?.Dispose();
     }
 }
+
 /// <summary>
-/// 鉴权插件
+/// Basic auth 认证插件
 /// </summary>
-class AuthenticationPlugin : PluginBase, IHttpPlugin
+public sealed class AuthenticationPlugin : PluginBase, IHttpPlugin
 {
-    WebApiOptions _webApiOptions;
-    public AuthenticationPlugin(WebApiOptions webApiOptions)
+    public string UserName { get; set; } = "admin";
+    public string Password { get; set; } = "111111";
+    public string Realm { get; set; } = "Server";
+
+    public AuthenticationPlugin SetCredentials(string userName, string password)
     {
-        _webApiOptions = webApiOptions;
+        this.UserName = userName;
+        this.Password = password;
+        return this;
     }
+    public AuthenticationPlugin SetRealm(string realm = "Server")
+    {
+        this.Realm = realm;
+        return this;
+    }
+
+    private Task Challenge(HttpContextEventArgs e, string message)
+    {
+        e.Context.Response.Headers.Add("WWW-Authenticate", $"Basic realm=\"{Realm}\"");
+        return e.Context.Response
+            .SetStatus(401, message)
+            .AnswerAsync();
+    }
+
     public Task OnHttpRequest(IHttpSessionClient client, HttpContextEventArgs e)
     {
         string authorizationHeader = e.Context.Request.Headers["Authorization"];
-        if (string.IsNullOrEmpty(authorizationHeader))
-        {
 
-            e.Context.Response.Headers.Add("WWW-Authenticate", "Basic realm=\"ThingsGateway\"");
-            return e.Context.Response
-                     .SetStatus(401, "Empty Authorization Header")
-                     .AnswerAsync();
-        }
+        if (string.IsNullOrEmpty(authorizationHeader))
+            return Challenge(e, "Empty Authorization Header");
 
         if (!authorizationHeader.StartsWith("Basic ", StringComparison.OrdinalIgnoreCase))
+            return Challenge(e, "Invalid Authorization Header");
+
+        string authBase64 = authorizationHeader.Substring("Basic ".Length).Trim();
+
+        string authString;
+        try
         {
-            e.Context.Response.Headers.Add("WWW-Authenticate", "Basic realm=\"ThingsGateway\"");
-            return e.Context.Response
-     .SetStatus(401, "Invalid Authorization Header")
-     .AnswerAsync();
+            authString = Encoding.UTF8.GetString(Convert.FromBase64String(authBase64));
+        }
+        catch
+        {
+            return Challenge(e, "Invalid Base64 Authorization Header");
         }
 
-        var authBase64 = authorizationHeader.Substring("Basic ".Length).Trim();
-        var authBytes = Convert.FromBase64String(authBase64);
-        var authString = Encoding.UTF8.GetString(authBytes);
-        var credentials = authString.Split(':', 2);
-
+        var credentials = authString.Split(':');
         if (credentials.Length != 2)
-        {
-            e.Context.Response.Headers.Add("WWW-Authenticate", "Basic realm=\"ThingsGateway\"");
-            return e.Context.Response
-.SetStatus(401, "Invalid Authorization Header")
-.AnswerAsync();
-        }
+            return Challenge(e, "Invalid Authorization Header");
 
         var username = credentials[0];
         var password = credentials[1];
 
-        if (username != _webApiOptions.UserName || password != _webApiOptions.Password)
-        {
-            e.Context.Response.Headers.Add("WWW-Authenticate", "Basic realm=\"ThingsGateway\"");
-            return e.Context.Response
-.SetStatus(401, "Invalid Username or Password")
-.AnswerAsync();
-        }
+        if (username != UserName || password != Password)
+            return Challenge(e, "Invalid Username or Password");
 
+        // 验证通过，继续下一个中间件或处理器
         return e.InvokeNext();
     }
 }

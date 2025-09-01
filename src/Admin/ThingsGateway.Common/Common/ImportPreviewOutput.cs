@@ -36,7 +36,7 @@ public class ImportPreviewResult
 {
     public ImportPreviewResult()
     {
-        
+
     }
     public ImportPreviewResult(int row, bool success, string error)
     {
