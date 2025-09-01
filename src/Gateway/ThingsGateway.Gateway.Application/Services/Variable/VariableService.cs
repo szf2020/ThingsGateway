@@ -11,6 +11,7 @@
 using BootstrapBlazor.Components;
 
 using Microsoft.AspNetCore.Components.Forms;
+using Microsoft.AspNetCore.Http;
 
 using MiniExcelLibs;
 
@@ -588,7 +589,12 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
 
         return await PreviewAsync(path).ConfigureAwait(false);
     }
+    public async Task<Dictionary<string, ImportPreviewOutputBase>> PreviewAsync(IFormFile browserFile)
+    {
+        var path = await browserFile.StorageLocal().ConfigureAwait(false); // 上传文件并获取文件路径
 
+        return await PreviewAsync(path).ConfigureAwait(false);
+    }
     public async Task<Dictionary<string, ImportPreviewOutputBase>> PreviewAsync(string path)
     {
         // 上传文件并获取文件路径
@@ -675,7 +681,7 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
                     if (deviceId == null)
                     {
                         importPreviewOutput.HasError = true;
-                        importPreviewOutput.Results.Add((Interlocked.Increment(ref row), false, Localizer["NotNull", deviceName]));
+                        importPreviewOutput.Results.Add(new(Interlocked.Increment(ref row), false, Localizer["NotNull", deviceName]));
                         return;
                     }
                     // 手动补录变量ID和设备ID
@@ -698,7 +704,7 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
                     if (stringBuilder.Length > 0)
                     {
                         importPreviewOutput.HasError = true;
-                        importPreviewOutput.Results.Add((Interlocked.Increment(ref row), false, stringBuilder.ToString()));
+                        importPreviewOutput.Results.Add(new(Interlocked.Increment(ref row), false, stringBuilder.ToString()));
                         return;
                     }
 
@@ -717,19 +723,19 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
                     }
                     if (device.IsUp && ((dataScope != null && dataScope?.Count > 0 && !dataScope.Contains(variable.CreateOrgId)) || dataScope?.Count == 0 && variable.CreateUserId != UserManager.UserId))
                     {
-                        importPreviewOutput.Results.Add((Interlocked.Increment(ref row), false, "Operation not permitted"));
+                        importPreviewOutput.Results.Add(new(Interlocked.Increment(ref row), false, "Operation not permitted"));
                     }
                     else
                     {
                         variables.Add(variable);
-                        importPreviewOutput.Results.Add((Interlocked.Increment(ref row), true, null));
+                        importPreviewOutput.Results.Add(new(Interlocked.Increment(ref row), true, null));
                     }
                 }
                 catch (Exception ex)
                 {
                     // 捕获异常并添加错误信息到导入预览结果
                     importPreviewOutput.HasError = true;
-                    importPreviewOutput.Results.Add((Interlocked.Increment(ref row), false, ex.Message));
+                    importPreviewOutput.Results.Add(new(Interlocked.Increment(ref row), false, ex.Message));
                 }
             });
 
@@ -764,7 +770,7 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
                     if (alarm == null)
                     {
                         importPreviewOutput.HasError = true;
-                        importPreviewOutput.Results.Add((Interlocked.Increment(ref row), false, ImportNullError));
+                        importPreviewOutput.Results.Add(new(Interlocked.Increment(ref row), false, ImportNullError));
                         return;
                     }
 
@@ -776,13 +782,13 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
                     if (collectDevName == null || collectDevice == null)
                     {
                         importPreviewOutput.HasError = true;
-                        importPreviewOutput.Results.Add((Interlocked.Increment(ref row), false, DeviceNotNull));
+                        importPreviewOutput.Results.Add(new(Interlocked.Increment(ref row), false, DeviceNotNull));
                         return;
                     }
                     if (variableNameObj == null)
                     {
                         importPreviewOutput.HasError = true;
-                        importPreviewOutput.Results.Add((Interlocked.Increment(ref row), false, VariableNotNull));
+                        importPreviewOutput.Results.Add(new(Interlocked.Increment(ref row), false, VariableNotNull));
                         return;
                     }
 
@@ -805,7 +811,7 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
                     if (stringBuilder.Length > 0)
                     {
                         importPreviewOutput.HasError = true;
-                        importPreviewOutput.Results.Add((Interlocked.Increment(ref row), false, stringBuilder.ToString()));
+                        importPreviewOutput.Results.Add(new(Interlocked.Increment(ref row), false, stringBuilder.ToString()));
                         return;
                     }
 
@@ -815,12 +821,12 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
                     if (deviceImportPreview.Data.TryGetValue(collectDevice.Id.ToString(), out var deviceVariables) && deviceVariables.TryGetValue(variableName, out var deviceVariable))
                     {
                         deviceVariable.AlarmPropertys = alarm;
-                        importPreviewOutput.Results.Add((Interlocked.Increment(ref row), true, null));
+                        importPreviewOutput.Results.Add(new(Interlocked.Increment(ref row), true, null));
                     }
                     else
                     {
                         importPreviewOutput.HasError = true;
-                        importPreviewOutput.Results.Add((Interlocked.Increment(ref row), false, VariableNotNull));
+                        importPreviewOutput.Results.Add(new(Interlocked.Increment(ref row), false, VariableNotNull));
                         return;
                     }
                 }
@@ -828,7 +834,7 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
                 {
                     // 捕获异常并添加错误信息到导入预览结果
                     importPreviewOutput.HasError = true;
-                    importPreviewOutput.Results.Add((Interlocked.Increment(ref row), false, ex.Message));
+                    importPreviewOutput.Results.Add(new(Interlocked.Increment(ref row), false, ex.Message));
                 }
             });
 
@@ -848,7 +854,7 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
                 if (driverPluginType == null)
                 {
                     importPreviewOutput.HasError = true;
-                    importPreviewOutput.Results.Add((Interlocked.Increment(ref row), false, Localizer["NotNull", sheetName]));
+                    importPreviewOutput.Results.Add(new(Interlocked.Increment(ref row), false, Localizer["NotNull", sheetName]));
                     return deviceImportPreview;
                 }
 
@@ -885,7 +891,7 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
                         if (propertys.Item3?.Count == null || propertys.Item1 == null)
                         {
                             importPreviewOutput.HasError = true;
-                            importPreviewOutput.Results.Add((Interlocked.Increment(ref row), false, ImportNullError));
+                            importPreviewOutput.Results.Add(new(Interlocked.Increment(ref row), false, ImportNullError));
                             return;
                         }
 
@@ -896,7 +902,7 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
                         if (pluginProp == null)
                         {
                             importPreviewOutput.HasError = true;
-                            importPreviewOutput.Results.Add((Interlocked.Increment(ref row), false, ImportNullError));
+                            importPreviewOutput.Results.Add(new(Interlocked.Increment(ref row), false, ImportNullError));
                             return;
                         }
 
@@ -911,13 +917,13 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
                         if (businessDevName == null || businessDevice == null || collectDevName == null || collectDevice == null)
                         {
                             importPreviewOutput.HasError = true;
-                            importPreviewOutput.Results.Add((Interlocked.Increment(ref row), false, DeviceNotNull));
+                            importPreviewOutput.Results.Add(new(Interlocked.Increment(ref row), false, DeviceNotNull));
                             return;
                         }
                         if (variableNameObj == null)
                         {
                             importPreviewOutput.HasError = true;
-                            importPreviewOutput.Results.Add((Interlocked.Increment(ref row), false, VariableNotNull));
+                            importPreviewOutput.Results.Add(new(Interlocked.Increment(ref row), false, VariableNotNull));
                             return;
                         }
 
@@ -940,7 +946,7 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
                         if (stringBuilder.Length > 0)
                         {
                             importPreviewOutput.HasError = true;
-                            importPreviewOutput.Results.Add((Interlocked.Increment(ref row), false, stringBuilder.ToString()));
+                            importPreviewOutput.Results.Add(new(Interlocked.Increment(ref row), false, stringBuilder.ToString()));
                             return;
                         }
 
@@ -961,12 +967,12 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
                         {
                             deviceVariable.VariablePropertys ??= new();
                             deviceVariable.VariablePropertys?.AddOrUpdate(businessDevice.Id, dependencyProperties);
-                            importPreviewOutput.Results.Add((Interlocked.Increment(ref row), true, null));
+                            importPreviewOutput.Results.Add(new(Interlocked.Increment(ref row), true, null));
                         }
                         else
                         {
                             importPreviewOutput.HasError = true;
-                            importPreviewOutput.Results.Add((Interlocked.Increment(ref row), false, Localizer["VariableNotNull"]));
+                            importPreviewOutput.Results.Add(new(Interlocked.Increment(ref row), false, Localizer["VariableNotNull"]));
                             return;
                         }
                     }
@@ -974,7 +980,7 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
                     {
                         // 捕获异常并添加错误信息到导入预览结果
                         importPreviewOutput.HasError = true;
-                        importPreviewOutput.Results.Add((Interlocked.Increment(ref row), false, ex.Message));
+                        importPreviewOutput.Results.Add(new(Interlocked.Increment(ref row), false, ex.Message));
                     }
                 });
             }
@@ -982,7 +988,7 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
             {
                 // 捕获异常并添加错误信息到导入预览结果
                 importPreviewOutput.HasError = true;
-                importPreviewOutput.Results.Add((Interlocked.Increment(ref row), false, ex.Message));
+                importPreviewOutput.Results.Add(new(Interlocked.Increment(ref row), false, ex.Message));
             }
         }
 

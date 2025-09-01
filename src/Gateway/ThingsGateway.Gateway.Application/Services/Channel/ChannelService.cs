@@ -11,6 +11,7 @@
 using BootstrapBlazor.Components;
 
 using Microsoft.AspNetCore.Components.Forms;
+using Microsoft.AspNetCore.Http;
 
 using MiniExcelLibs;
 
@@ -409,10 +410,15 @@ internal sealed class ChannelService : BaseService<Channel>, IChannelService
 
 
 
-
-
     /// <inheritdoc/>
     public async Task<Dictionary<string, ImportPreviewOutputBase>> PreviewAsync(IBrowserFile browserFile)
+    {
+        var path = await browserFile.StorageLocal().ConfigureAwait(false);
+        return await PreviewAsync(path).ConfigureAwait(false);
+    }
+
+    /// <inheritdoc/>
+    public async Task<Dictionary<string, ImportPreviewOutputBase>> PreviewAsync(IFormFile browserFile)
     {
         var path = await browserFile.StorageLocal().ConfigureAwait(false);
         return await PreviewAsync(path).ConfigureAwait(false);
@@ -468,7 +474,7 @@ internal sealed class ChannelService : BaseService<Channel>, IChannelService
                     if (channel == null)
                     {
                         importPreviewOutput.HasError = true;
-                        importPreviewOutput.Results.Add((Interlocked.Increment(ref row), false, unportNull));
+                        importPreviewOutput.Results.Add(new(Interlocked.Increment(ref row), false, unportNull));
                         return;
                     }
 
@@ -491,7 +497,7 @@ internal sealed class ChannelService : BaseService<Channel>, IChannelService
                     if (stringBuilder.Length > 0)
                     {
                         importPreviewOutput.HasError = true;
-                        importPreviewOutput.Results.Add((Interlocked.Increment(ref row), false, stringBuilder.ToString()));
+                        importPreviewOutput.Results.Add(new(Interlocked.Increment(ref row), false, stringBuilder.ToString()));
                         return;
                     }
 
@@ -512,19 +518,19 @@ internal sealed class ChannelService : BaseService<Channel>, IChannelService
 
                     if (channel.IsUp && ((dataScope != null && dataScope?.Count > 0 && !dataScope.Contains(channel.CreateOrgId)) || dataScope?.Count == 0 && channel.CreateUserId != UserManager.UserId))
                     {
-                        importPreviewOutput.Results.Add((Interlocked.Increment(ref row), false, "Operation not permitted"));
+                        importPreviewOutput.Results.Add(new(Interlocked.Increment(ref row), false, "Operation not permitted"));
                     }
                     else
                     {
                         channels.Add(channel);
-                        importPreviewOutput.Results.Add((Interlocked.Increment(ref row), true, null));
+                        importPreviewOutput.Results.Add(new(Interlocked.Increment(ref row), true, null));
                     }
                     return;
                 }
                 catch (Exception ex)
                 {
                     importPreviewOutput.HasError = true;
-                    importPreviewOutput.Results.Add((Interlocked.Increment(ref row), false, ex.Message));
+                    importPreviewOutput.Results.Add(new(Interlocked.Increment(ref row), false, ex.Message));
                     return;
                 }
             });

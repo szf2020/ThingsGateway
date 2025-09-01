@@ -89,8 +89,8 @@ public partial class WebApiTask : AsyncDisposableObject
                        store.RegisterServer<RuntimeInfoController>();
                        store.RegisterServer<TestController>();
 
-                       store.RegisterServer<IManagementRpcServer>(new ManagementRpcServer());
-                       store.RegisterServer<IUpgradeRpcServer>(new UpgradeRpcServer());
+                       store.RegisterServer<ManagementController>();
+
 
                        foreach (var type in App.EffectiveTypes.Where(p => typeof(IPluginRpcServer).IsAssignableFrom(p) && !p.IsAbstract && p.IsClass))
                        {

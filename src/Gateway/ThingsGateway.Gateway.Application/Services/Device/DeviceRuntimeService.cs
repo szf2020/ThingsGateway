@@ -11,6 +11,7 @@
 using BootstrapBlazor.Components;
 
 using Microsoft.AspNetCore.Components.Forms;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 
 using ThingsGateway.Extension.Generic;
@@ -321,6 +322,42 @@ public class DeviceRuntimeService : IDeviceRuntimeService
     }
 
     public async Task<Dictionary<string, ImportPreviewOutputBase>> ImportDeviceAsync(IBrowserFile file, bool restart)
+    {
+        try
+        {
+            await WaitLock.WaitAsync().ConfigureAwait(false);
+
+            var data = await GlobalData.DeviceService.PreviewAsync(file).ConfigureAwait(false);
+
+            if (data.Any(a => a.Value.HasError)) return data;
+
+            var deviceids = await GlobalData.DeviceService.ImportDeviceAsync(data).ConfigureAwait(false);
+
+            var newDeviceRuntimes = await RuntimeServiceHelper.GetNewDeviceRuntimesAsync(deviceids).ConfigureAwait(false);
+
+            if (restart)
+            {
+                var newDeciceIds = newDeviceRuntimes.Select(a => a.Id).ToHashSet();
+                await RuntimeServiceHelper.RemoveDeviceAsync(newDeciceIds).ConfigureAwait(false);
+            }
+
+            //批量修改之后，需要重新加载通道
+            RuntimeServiceHelper.Init(newDeviceRuntimes);
+
+            //根据条件重启通道线程
+            if (restart)
+            {
+                await RuntimeServiceHelper.RestartDeviceAsync(newDeviceRuntimes).ConfigureAwait(false);
+            }
+
+            return data;
+        }
+        finally
+        {
+            WaitLock.Release();
+        }
+    }
+    public async Task<Dictionary<string, ImportPreviewOutputBase>> ImportDeviceAsync(IFormFile file, bool restart)
     {
         try
         {

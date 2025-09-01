@@ -11,6 +11,7 @@
 using BootstrapBlazor.Components;
 
 using Microsoft.AspNetCore.Components.Forms;
+using Microsoft.AspNetCore.Http;
 
 using System.Collections.Concurrent;
 using System.Linq.Expressions;
@@ -121,4 +122,5 @@ internal interface IDeviceService
     Task UpdateLogAsync(long deviceId, TouchSocket.Core.LogLevel logLevel);
     Task<HashSet<long>> ImportDeviceAsync(List<Device> upData, List<Device> insertData);
     Task<Dictionary<string, ImportPreviewOutputBase>> PreviewAsync(string path);
+    Task<Dictionary<string, ImportPreviewOutputBase>> PreviewAsync(IFormFile browserFile);
 }

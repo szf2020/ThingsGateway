@@ -14,7 +14,6 @@ using System.Runtime.InteropServices;
 using ThingsGateway.NewLife;
 
 using TouchSocket.Dmtp;
-using TouchSocket.Dmtp.Rpc;
 using TouchSocket.Rpc;
 
 namespace ThingsGateway.Gateway.Application;
@@ -22,14 +21,12 @@ namespace ThingsGateway.Gateway.Application;
 public partial class UpgradeRpcServer : IRpcServer, IUpgradeRpcServer
 {
 
-    [DmtpRpc]
     public async Task UpgradeAsync(ICallContext callContext, UpdateZipFile updateZipFile)
     {
         if (callContext.Caller is IDmtpActorObject dmtpActorObject)
             await Update(dmtpActorObject.DmtpActor, updateZipFile).ConfigureAwait(false);
     }
-    [DmtpRpc]
-    public Task<UpdateZipFileInput> GetUpdateZipFileInputAsync(ICallContext callContext)
+    public Task<UpdateZipFileInput> GetUpdateZipFileInputAsync()
     {
         return Task.FromResult(new UpdateZipFileInput()
         {

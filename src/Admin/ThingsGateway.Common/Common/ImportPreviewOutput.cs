@@ -30,9 +30,27 @@ public class ImportPreviewOutputBase
     /// <summary>
     /// 返回状态
     /// </summary>
-    public ConcurrentList<(int Row, bool Success, string? ErrorMessage)> Results { get; set; } = new();
+    public ConcurrentList<ImportPreviewResult> Results { get; set; } = new();
 }
+public class ImportPreviewResult
+{
+    public ImportPreviewResult()
+    {
+        
+    }
+    public ImportPreviewResult(int row, bool success, string error)
+    {
+        this.Row = row;
+        this.Success = success;
+        this.ErrorMessage = error;
+    }
 
+    public int Row { get; set; }
+
+    public bool Success { get; set; }
+
+    public string? ErrorMessage { get; set; }
+}
 /// <summary>
 /// 导入预览
 /// </summary>

@@ -9,6 +9,7 @@
 // ------------------------------------------------------------------------------
 
 using Microsoft.AspNetCore.Components.Forms;
+using Microsoft.AspNetCore.Http;
 
 namespace ThingsGateway.Gateway.Application
 {
@@ -21,5 +22,6 @@ namespace ThingsGateway.Gateway.Application
         Task<Dictionary<string, ImportPreviewOutputBase>> PreviewAsync(IBrowserFile browserFile);
 
         Task<MemoryStream> ExportMemoryStream(List<Variable> data, string devName);
+        Task<Dictionary<string, ImportPreviewOutputBase>> ImportVariableAsync(IFormFile file, bool restart);
     }
 }

@@ -11,6 +11,7 @@
 using BootstrapBlazor.Components;
 
 using Microsoft.AspNetCore.Components.Forms;
+using Microsoft.AspNetCore.Http;
 
 namespace ThingsGateway.Gateway.Application;
 
@@ -38,7 +39,5 @@ public interface IChannelRuntimeService : IChannelPageService
     Task<bool> CopyAsync(List<Channel> models, Dictionary<Device, List<Variable>> devices, bool restart);
     Task<bool> UpdateAsync(List<Channel> models, List<Device> devices, List<Variable> variables, bool restart);
     Task<bool> InsertAsync(List<Channel> models, List<Device> devices, List<Variable> variables, bool restart);
-
-
-
+    Task<Dictionary<string, ImportPreviewOutputBase>> ImportChannelAsync(IFormFile file, bool restart);
 }

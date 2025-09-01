@@ -11,6 +11,7 @@
 using BootstrapBlazor.Components;
 
 using Microsoft.AspNetCore.Components.Forms;
+using Microsoft.AspNetCore.Http;
 
 using System.Linq.Expressions;
 
@@ -105,4 +106,5 @@ internal interface IChannelService
     Task<HashSet<long>> ImportChannelAsync(List<Channel> upData, List<Channel> insertData);
 
     Task<Dictionary<string, ImportPreviewOutputBase>> PreviewAsync(string path);
+    Task<Dictionary<string, ImportPreviewOutputBase>> PreviewAsync(IFormFile browserFile);
 }

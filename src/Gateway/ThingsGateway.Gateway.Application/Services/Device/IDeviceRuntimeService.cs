@@ -11,6 +11,7 @@
 using BootstrapBlazor.Components;
 
 using Microsoft.AspNetCore.Components.Forms;
+using Microsoft.AspNetCore.Http;
 
 namespace ThingsGateway.Gateway.Application
 {
@@ -24,5 +25,6 @@ namespace ThingsGateway.Gateway.Application
         Task ImportDeviceAsync(Dictionary<string, ImportPreviewOutputBase> input, bool restart);
         Task<bool> BatchSaveDeviceAsync(List<Device> input, ItemChangedType type, bool restart);
         Task<Dictionary<string, ImportPreviewOutputBase>> PreviewAsync(IBrowserFile browserFile);
+        Task<Dictionary<string, ImportPreviewOutputBase>> ImportDeviceAsync(IFormFile file, bool restart);
     }
 }

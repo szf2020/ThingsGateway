@@ -10,8 +10,6 @@
 
 using BootstrapBlazor.Components;
 
-using LogLevel = Microsoft.Extensions.Logging.LogLevel;
-
 namespace ThingsGateway.Gateway.Application;
 
 /// <summary>
@@ -35,7 +33,7 @@ public class BackendLog : PrimaryIdEntity
     /// </summary>
     [SugarColumn(ColumnDescription = "日志级别", IsNullable = false)]
     [AutoGenerateColumn(Visible = true, Filterable = true, Sortable = true)]
-    public LogLevel LogLevel { get; set; }
+    public Microsoft.Extensions.Logging.LogLevel LogLevel { get; set; }
 
     /// <summary>
     /// 日志来源

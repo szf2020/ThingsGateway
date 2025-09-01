@@ -11,6 +11,7 @@
 using BootstrapBlazor.Components;
 
 using Microsoft.AspNetCore.Components.Forms;
+using Microsoft.AspNetCore.Http;
 
 using System.Collections.Concurrent;
 using System.Reflection;
@@ -110,4 +111,5 @@ internal interface IVariableService
     List<VariableRuntime> GetAllVariableRuntime();
     Task<Dictionary<string, ImportPreviewOutputBase>> PreviewAsync(string filePath);
     Task<HashSet<long>> ImportVariableAsync(List<Variable> upData, List<Variable> insertData);
+    Task<Dictionary<string, ImportPreviewOutputBase>> PreviewAsync(IFormFile browserFile);
 }

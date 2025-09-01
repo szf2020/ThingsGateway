@@ -9,6 +9,7 @@
 // ------------------------------------------------------------------------------
 
 using Microsoft.AspNetCore.Components.Forms;
+using Microsoft.AspNetCore.Http;
 
 namespace ThingsGateway.DB;
 
@@ -41,4 +42,31 @@ public static class FileExtensions
         }
         return fileName;
     }
+    /// <summary>
+    /// 存储本地文件
+    /// </summary>
+    /// <param name="pPath">存储的第一层目录</param>
+    /// <param name="file"></param>
+    /// <returns>文件全路径</returns>
+    public static async Task<string> StorageLocal(this IFormFile file, string pPath = "imports")
+    {
+        string uploadFileFolder = App.WebHostEnvironment?.WebRootPath ?? "wwwroot"!;//赋值路径
+        var now = CommonUtils.GetSingleId();
+        var filePath = Path.Combine(uploadFileFolder, pPath);
+        if (!Directory.Exists(filePath))//如果不存在就创建文件夹
+            Directory.CreateDirectory(filePath);
+        //var fileSuffix = Path.GetExtension(file.Name).ToLower();// 文件后缀
+        var fileObjectName = $"{now}{file.Name}";//存储后的文件名
+        var fileName = Path.Combine(filePath, fileObjectName);//获取文件全路径
+        fileName = fileName.Replace("\\", "/");//格式化一系
+        //存储文件
+        using (var stream = File.Create(Path.Combine(filePath, fileObjectName)))
+        {
+            await file.CopyToAsync(stream).ConfigureAwait(false);
+        }
+        return fileName;
+    }
+
+
+
 }

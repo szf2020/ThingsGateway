@@ -11,6 +11,7 @@
 using BootstrapBlazor.Components;
 
 using Microsoft.AspNetCore.Components.Forms;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 
 using ThingsGateway.Extension.Generic;
@@ -401,6 +402,33 @@ public class ChannelRuntimeService : IChannelRuntimeService
         }
     }
 
+    public async Task<Dictionary<string, ImportPreviewOutputBase>> ImportChannelAsync(IFormFile file, bool restart)
+    {
+        try
+        {
+            await WaitLock.WaitAsync().ConfigureAwait(false);
+
+            var data = await GlobalData.ChannelService.PreviewAsync(file).ConfigureAwait(false);
+
+            if (data.Any(a => a.Value.HasError)) return data;
+            var result = await GlobalData.ChannelService.ImportChannelAsync(data).ConfigureAwait(false);
+
+            var newChannelRuntimes = await RuntimeServiceHelper.GetNewChannelRuntimesAsync(result).ConfigureAwait(false);
+
+            RuntimeServiceHelper.Init(newChannelRuntimes);
+
+            //根据条件重启通道线程
+            if (restart)
+                await GlobalData.ChannelThreadManage.RestartChannelAsync(newChannelRuntimes).ConfigureAwait(false);
+
+            return data;
+        }
+
+        finally
+        {
+            WaitLock.Release();
+        }
+    }
 
     public async Task ImportChannelAsync(Dictionary<string, ImportPreviewOutputBase> input, bool restart)
     {

@@ -254,6 +254,8 @@ public static class SpecificationDocumentBuilder
     /// <param name="configure">自定义配置</param>
     internal static void BuildGen(SwaggerGenOptions swaggerGenOptions, Action<SwaggerGenOptions> configure = null)
     {
+
+
         // 创建分组文档
         CreateSwaggerDocs(swaggerGenOptions);
 
@@ -411,7 +413,7 @@ public static class SpecificationDocumentBuilder
         // 本地函数
         static string DefaultSchemaIdSelector(Type modelType)
         {
-            var modelName = modelType.Name;
+            var modelName = modelType.FullName;
 
             // 处理泛型类型问题
             if (modelType.IsConstructedGenericType)

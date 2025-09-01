@@ -11,6 +11,7 @@
 using BootstrapBlazor.Components;
 
 using Microsoft.AspNetCore.Components.Forms;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 
 using ThingsGateway.Extension.Generic;
@@ -311,6 +312,42 @@ public class VariableRuntimeService : IVariableRuntimeService
             //WaitLock.Release();
         }
     }
+
+    public async Task<Dictionary<string, ImportPreviewOutputBase>> ImportVariableAsync(IFormFile file, bool restart)
+    {
+        try
+        {
+            // await WaitLock.WaitAsync().ConfigureAwait(false);
+
+            var data = await GlobalData.VariableService.PreviewAsync(file).ConfigureAwait(false);
+
+            if (data.Any(a => a.Value.HasError)) return data;
+
+            var result = await GlobalData.VariableService.ImportVariableAsync(data).ConfigureAwait(false);
+
+            using var db = DbContext.GetDB<Variable>();
+            var newVariableRuntimes = (await db.Queryable<Variable>().Where(a => result.Contains(a.Id)).ToListAsync().ConfigureAwait(false)).AdaptListVariableRuntime();
+
+            var variableIds = newVariableRuntimes.Select(a => a.Id).ToHashSet();
+
+            ConcurrentHashSet<IDriver> changedDriver = new();
+            RuntimeServiceHelper.VariableRuntimesDispose(variableIds);
+            RuntimeServiceHelper.AddCollectChangedDriver(newVariableRuntimes, changedDriver);
+            RuntimeServiceHelper.AddBusinessChangedDriver(variableIds, changedDriver);
+
+            if (restart)
+            {
+                //根据条件重启通道线程
+                await RuntimeServiceHelper.ChangedDriverAsync(changedDriver, _logger).ConfigureAwait(false);
+            }
+            return data;
+        }
+        finally
+        {
+            //WaitLock.Release();
+        }
+    }
+
     public async Task<Dictionary<string, ImportPreviewOutputBase>> ImportVariableFileAsync(string filePath, bool restart)
     {
         try

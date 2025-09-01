@@ -15,6 +15,32 @@ namespace ThingsGateway.Gateway.Application;
 [ThingsGateway.DependencyInjection.SuppressSniffer]
 public static class GatewayResourceUtil
 {
+
+    /// <summary>
+    /// 存储本地文件
+    /// </summary>
+    /// <param name="pPath">存储的第一层目录</param>
+    /// <param name="file"></param>
+    /// <returns>文件全路径</returns>
+    public static async Task<string> StorageLocalExcel(this TouchSocket.Http.HttpRequest file, string pPath = "imports")
+    {
+        string uploadFileFolder = App.WebHostEnvironment?.WebRootPath ?? "wwwroot"!;//赋值路径
+        var now = CommonUtils.GetSingleId();
+        var filePath = Path.Combine(uploadFileFolder, pPath);
+        if (!Directory.Exists(filePath))//如果不存在就创建文件夹
+            Directory.CreateDirectory(filePath);
+        //var fileSuffix = Path.GetExtension(file.Name).ToLower();// 文件后缀
+        var fileObjectName = $"{now}.xlsx";//存储后的文件名
+        var fileName = Path.Combine(filePath, fileObjectName);//获取文件全路径
+        fileName = fileName.Replace("\\", "/");//格式化一系
+        //存储文件
+        using (var stream = File.Create(Path.Combine(filePath, fileObjectName)))
+        {
+            await file.ReadCopyToAsync(stream).ConfigureAwait(false);
+        }
+        return fileName;
+    }
+
     /// <summary>
     /// 构造选择项，ID/Name
     /// </summary>
