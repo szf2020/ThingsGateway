@@ -48,6 +48,8 @@ public partial class ManagementTask : AsyncDisposableObject
         _logger?.Log_Out(logLevel, source, message, exception);
     }
     private bool success = true;
+
+    private IScheduledTask _scheduledTask;
     public async Task StartAsync(CancellationToken cancellationToken)
     {
         if (!_managementOptions.Enable) return;
@@ -60,25 +62,23 @@ public partial class ManagementTask : AsyncDisposableObject
         {
             _tcpDmtpClient ??= await GetTcpDmtpClient().ConfigureAwait(false);
         }
-        while (!cancellationToken.IsCancellationRequested)
+        _scheduledTask = ScheduledTaskHelper.GetTask("10000", OpenTask, null, LogMessage, cancellationToken);
+        _scheduledTask.Start();
+    }
+
+    private async Task OpenTask(object? state, CancellationToken cancellationToken)
+    {
+        try
         {
-            try
-            {
-                await EnsureChannelOpenAsync(cancellationToken).ConfigureAwait(false);
-                success = true;
-            }
-            catch (Exception ex)
-            {
-                if (success)
-                    LogMessage?.LogWarning(ex, "Start");
+            await EnsureChannelOpenAsync(cancellationToken).ConfigureAwait(false);
+            success = true;
+        }
+        catch (Exception ex)
+        {
+            if (success)
+                LogMessage?.LogWarning(ex, "Start");
 
-                success = false;
-            }
-            finally
-            {
-                await Task.Delay(10000, cancellationToken).ConfigureAwait(false);
-            }
-
+            success = false;
         }
     }
 
@@ -223,6 +223,7 @@ public partial class ManagementTask : AsyncDisposableObject
 
     protected override async Task DisposeAsync(bool disposing)
     {
+        _scheduledTask?.SafeDispose();
         if (_tcpDmtpClient != null)
         {
             await _tcpDmtpClient.CloseAsync().ConfigureAwait(false);

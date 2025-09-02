@@ -8,7 +8,7 @@ public class ExpiringDictionary<TKey, TValue> : IDisposable
     private readonly ConcurrentDictionary<TKey, TValue> _dict = new();
     private readonly TimerX _cleanupTimer;
 
-    public ExpiringDictionary(int cleanupInterval = 60000)
+    public ExpiringDictionary(int cleanupInterval = 600000)
     {
         _cleanupTimer = new TimerX(Clear, null, cleanupInterval, cleanupInterval) { Async = true };
     }

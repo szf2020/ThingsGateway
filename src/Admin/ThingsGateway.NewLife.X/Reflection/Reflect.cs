@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Diagnostics;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 
 namespace ThingsGateway.NewLife.Reflection;
 
@@ -553,7 +554,10 @@ public static class Reflect
     //}
 
 
-    private static readonly ExpiringDictionary<(MethodInfo, Type, object?), Delegate> _delegateCache = new();
+    private static class DelegateCache<TFunc>
+    {
+        public static readonly ExpiringDictionary<DelegateCacheKey, TFunc> Cache = new();
+    }
 
     /// <summary>把一个方法转为泛型委托，便于快速反射调用</summary>
     /// <typeparam name="TFunc"></typeparam>
@@ -564,17 +568,50 @@ public static class Reflect
     {
         if (method == null) return default;
 
-        var key = (method, typeof(TFunc), target);
+        var key = new DelegateCacheKey(method, typeof(TFunc), target);
 
-        if (_delegateCache.TryGetValue(key, out var del))
-            return (TFunc)(object)del;
+        var func = DelegateCache<TFunc>.Cache.GetOrAdd(
+             key,
+             _ => (TFunc)(object)(
+                     target == null
+                         ? Delegate.CreateDelegate(typeof(TFunc), method, true)
+                         : Delegate.CreateDelegate(typeof(TFunc), target, method, true)));
 
-        del = target == null
-            ? Delegate.CreateDelegate(typeof(TFunc), method, true)
-            : Delegate.CreateDelegate(typeof(TFunc), target, method, true);
-
-        return (TFunc)(object)_delegateCache.GetOrAdd(key, del);
+        return func;
     }
 
+    private readonly struct DelegateCacheKey : IEquatable<DelegateCacheKey>
+    {
+        public readonly MethodInfo Method;
+        public readonly Type FuncType;
+        public readonly object? Target;
+
+        public DelegateCacheKey(MethodInfo method, Type funcType, object? target)
+        {
+            Method = method;
+            FuncType = funcType;
+            Target = target;
+        }
+
+        public bool Equals(DelegateCacheKey other) =>
+            Method.Equals(other.Method)
+            && FuncType.Equals(other.FuncType)
+            && ReferenceEquals(Target, other.Target);
+
+        public override bool Equals(object? obj) =>
+            obj is DelegateCacheKey other && Equals(other);
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                int hash = Method.GetHashCode();
+                hash = (hash * 397) ^ FuncType.GetHashCode();
+                if (Target != null)
+                    hash = (hash * 397) ^ RuntimeHelpers.GetHashCode(Target); // 不受对象重写 GetHashCode 影响
+                return hash;
+            }
+        }
+    }
     #endregion
 }

@@ -219,7 +219,7 @@ public static class ChannelOptionsExtensions
 #if NETSTANDARD || NET6_0_OR_GREATER
                 if (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows))
                 {
-                    config.UseUdpConnReset();
+                    config.SetUdpConnReset(true);
                 }
 #endif
                 return ddpUdp;
@@ -231,7 +231,7 @@ public static class ChannelOptionsExtensions
 #if NETSTANDARD || NET6_0_OR_GREATER
                 if (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows))
                 {
-                    config.UseUdpConnReset();
+                    config.SetUdpConnReset(true);
                 }
 #endif
                 return udpSessionChannel;

@@ -1,6 +1,6 @@
 ﻿namespace ThingsGateway.Gateway.Application
 {
-    public interface IScheduledTask
+    public interface IScheduledTask : IDisposable
     {
         bool Change(int dueTime, int period);
         void SetNext(int interval);

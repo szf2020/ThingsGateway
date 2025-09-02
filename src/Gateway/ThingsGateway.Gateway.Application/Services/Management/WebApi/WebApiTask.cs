@@ -17,7 +17,6 @@ using TouchSocket.Core;
 using TouchSocket.Http;
 using TouchSocket.Rpc;
 using TouchSocket.Sockets;
-using TouchSocket.WebApi.Swagger;
 
 namespace ThingsGateway.Gateway.Application;
 
@@ -119,12 +118,13 @@ public partial class WebApiTask : AsyncDisposableObject
 
                    a.UseWebApi();
 
-#if DEBUG
-                   a.UseSwagger().SetPrefix("api");
-#else
-                   if (App.WebHostEnvironment.IsDevelopment())
-                       a.UseSwagger().SetPrefix("api");
-#endif
+                   //#if DEBUG
+                   //                   a.UseSwagger().SetPrefix("api");
+                   //#else
+                   //                   if (App.WebHostEnvironment.IsDevelopment())
+                   //                       a.UseSwagger().SetPrefix("api");
+                   //#endif
+
                    a.UseDefaultHttpServicePlugin();
                });
 

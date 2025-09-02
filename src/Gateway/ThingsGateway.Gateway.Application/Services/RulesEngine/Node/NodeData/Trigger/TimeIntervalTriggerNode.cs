@@ -26,6 +26,7 @@ public class TimeIntervalTriggerNode : TextNode, ITriggerNode, IDisposable
                 Text = "500";
         }
         _task = ScheduledTaskHelper.GetTask(Text, Timer, null, Logger, cancellationToken);
+        _task.Start();
         return Task.CompletedTask;
     }
 

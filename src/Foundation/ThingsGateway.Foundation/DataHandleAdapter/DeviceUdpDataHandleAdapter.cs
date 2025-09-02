@@ -124,12 +124,12 @@ public class DeviceUdpDataHandleAdapter<TRequest> : UdpDataHandlingAdapter, IDev
             }
             request1 = request;
 
-            var byteBlock = new ByteBlockReader(memory);
+            var byteBlock = new ClassBytesReader(memory);
             byteBlock.BytesRead = 0;
 
             var pos = byteBlock.BytesRead;
 
-            if (request.HeaderLength > byteBlock.CanReadLength)
+            if (request.HeaderLength > byteBlock.BytesRead + byteBlock.BytesRemaining)
             {
                 return false;//当头部都无法解析时，直接缓存
             }
@@ -147,7 +147,7 @@ public class DeviceUdpDataHandleAdapter<TRequest> : UdpDataHandlingAdapter, IDev
                     Logger?.LogWarning($"{ToString()} {request.ErrorMessage}");
                     return false;
                 }
-                if (request.BodyLength + request.HeaderLength > byteBlock.CanReadLength)
+                if (request.BodyLength + request.HeaderLength > byteBlock.BytesRead + byteBlock.BytesRemaining)
                 {
                     return false;
                 }

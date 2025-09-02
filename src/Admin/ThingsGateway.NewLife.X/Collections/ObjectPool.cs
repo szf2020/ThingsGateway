@@ -60,6 +60,9 @@ public class ObjectPool<T> : DisposeBase, IPool<T> where T : notnull
             Name = str;
         else
             Name = $"Pool<{typeof(T).Name}>";
+
+        // 启动定期清理的定时器
+        StartTimer();
     }
 
     /// <summary>销毁</summary>
@@ -227,8 +230,7 @@ public class ObjectPool<T> : DisposeBase, IPool<T> where T : notnull
 
         Interlocked.Increment(ref _FreeCount);
 
-        // 启动定期清理的定时器
-        StartTimer();
+
 
         return true;
     }
