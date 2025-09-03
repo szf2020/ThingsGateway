@@ -56,8 +56,8 @@
         </Side>
         <Main>
 
-            <Tab @ref=_tab ClickTabToNavigation="true" ShowToolbar="true" ShowContextMenu="true"  ShowContextMenuFullScreen="true" ShowExtendButtons="false" ShowClose="true" AllowDrag=true
-                     AdditionalAssemblies="@App.RazorAssemblies" Menus="@MenuService.AllOwnMenuItems"
+            <Tab @ref=_tab ClickTabToNavigation="true" ShowToolbar="true" ShowContextMenu="true"  ShowExtendButtons="false" ShowClose="true" AllowDrag=true
+                      ShowFullscreenToolbarButton=false ShowContextMenuFullScreen=false ShowFullScreen=false  AdditionalAssemblies="@App.RazorAssemblies" Menus="@MenuService.AllOwnMenuItems"
                      DefaultUrl=@("/") Body=@(Body!) OnCloseTabItemAsync=@((a)=>
                      {
                      return Task.FromResult(!(a.Url=="/"||a.Url.IsNullOrEmpty()));

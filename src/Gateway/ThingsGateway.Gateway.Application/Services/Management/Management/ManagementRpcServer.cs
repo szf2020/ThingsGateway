@@ -185,7 +185,7 @@ public partial class ManagementRpcServer : IRpcServer, IManagementRpcServer, IBa
         App.GetService<IDevicePageService>().IsRedundantDeviceAsync(id);
 
     public Task<OperResult<List<LogData>>> LastLogDataAsync(string file, int lineCount = 200) => App.GetService<ITextFileReadService>().LastLogDataAsync(file, lineCount);
-
+    public Task DeleteLogDataAsync(string path) => App.GetService<ITextFileReadService>().DeleteLogDataAsync(path);
     public Task<QueryData<ChannelRuntime>> OnChannelQueryAsync(QueryPageOptions options) =>
         App.GetService<IChannelPageService>().OnChannelQueryAsync(options);
 

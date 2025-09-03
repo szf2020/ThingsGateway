@@ -10,6 +10,8 @@
 
 
 
+using ThingsGateway.NewLife;
+
 namespace ThingsGateway.Foundation;
 
 public class TextFileReadService : ITextFileReadService
@@ -17,4 +19,37 @@ public class TextFileReadService : ITextFileReadService
     public Task<OperResult<List<string>>> GetLogFilesAsync(string directoryPath) => Task.FromResult(TextFileReader.GetLogFiles(directoryPath));
 
     public Task<OperResult<List<LogData>>> LastLogDataAsync(string file, int lineCount = 200) => Task.FromResult(TextFileReader.LastLogData(file, lineCount));
+
+
+    public async Task DeleteLogDataAsync(string path)
+    {
+        if (path != null)
+        {
+            var files = TextFileReader.GetLogFiles(path);
+            if (files.IsSuccess)
+            {
+                foreach (var item in files.Content)
+                {
+                    if (File.Exists(item))
+                    {
+                        int error = 0;
+                        while (error < 3)
+                        {
+                            try
+                            {
+                                FileUtil.DeleteFile(item);
+                                break;
+                            }
+                            catch
+                            {
+                                await Task.Delay(3000).ConfigureAwait(false);
+                                error++;
+                            }
+                        }
+                    }
+                }
+            }
+
+        }
+    }
 }

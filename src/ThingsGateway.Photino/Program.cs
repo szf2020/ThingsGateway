@@ -102,7 +102,7 @@ internal sealed class Program
         hybridApp.MainWindow.SetUseOsDefaultLocation(false);
         hybridApp.MainWindow.SetUseOsDefaultSize(false);
         hybridApp.MainWindow.SetSize(new System.Drawing.Size(1920, 1080));
-        hybridApp.MainWindow.SetTitle("ThingsGateway.Photino");
+        hybridApp.MainWindow.SetTitle("ThingsGateway边缘网关");
         hybridApp.MainWindow.SetIconFile("favicon.ico");
 
         AppDomain.CurrentDomain.UnhandledException += (sender, error) =>

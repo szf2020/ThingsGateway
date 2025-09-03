@@ -13,6 +13,8 @@ namespace ThingsGateway.Foundation;
 
 public interface ITextFileReadService
 {
+    Task DeleteLogDataAsync(string path);
+
     /// <summary>
     /// 获取指定目录下所有文件信息
     /// </summary>

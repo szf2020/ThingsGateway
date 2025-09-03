@@ -75,6 +75,8 @@ public interface IManagementRpcServer : IRpcServer
 
     [DmtpRpc]
     Task<bool> DeleteDeviceAsync(List<long> ids, bool restart);
+    [DmtpRpc]
+    Task DeleteLogDataAsync(string path);
 
     /// <summary>
     /// 删除 RpcLog 表中的所有记录

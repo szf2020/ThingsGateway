@@ -34,7 +34,8 @@
         <TableColumn Field="@context.DeviceName" FieldExpression=@(() => context.DeviceName) ShowTips=true Filterable=true Sortable=true Visible=true />
         <TableColumn @bind-Field="@context.Name" ShowTips=true Filterable=true Sortable=true Visible=true />
         <TableColumn @bind-Field="@context.Description" ShowTips=true Filterable=true Sortable=true Visible=true />
-        <TableColumn @bind-Field="@context.BusinessGroup" ShowTips=true Filterable=true Sortable=true Visible=true />
+        <TableColumn @bind-Field="@context.CollectGroup" ShowTips=true Filterable=true Sortable=true Visible=false />
+        <TableColumn @bind-Field="@context.BusinessGroup" ShowTips=true Filterable=true Sortable=true Visible=false />
         <TableColumn @bind-Field="@context.BusinessGroupUpdateTrigger" ShowTips=true Filterable=true Sortable=true Visible=false />
         <TableColumn @bind-Field="@context.RpcWriteCheck" ShowTips=true Filterable=true Sortable=true Visible=false />
 
@@ -51,7 +52,7 @@
 
         <TableColumn @bind-Field="@context.SaveValue" Filterable=true Sortable=true Visible=false />
         <TableColumn @bind-Field="@context.DataType" Filterable=true Sortable=true Visible=false />
-        <TableColumn Field="@context.RuntimeType" ShowTips=true FieldExpression=@(() => context.RuntimeType) Filterable=true Sortable=true Visible=true />
+        <TableColumn Field="@context.RuntimeType" ShowTips=true FieldExpression=@(() => context.RuntimeType) Filterable=true Sortable=true Visible=false />
 
         <TableColumn @bind-Field="@context.RegisterAddress" Filterable=true Sortable=true Visible=true />
         <TableColumn @bind-Field="@context.ArrayLength" Filterable=true Sortable=true Visible=false />
@@ -60,7 +61,7 @@
         <TableColumn @bind-Field="@context.IntervalTime" Filterable=true Sortable=true Visible="false" />
         <TableColumn @bind-Field="@context.OtherMethod" Filterable=true Sortable=true Visible="false" />
         <TableColumn @bind-Field="@context.RpcWriteEnable" Filterable=true Sortable=true Visible="false" />
-        <TableColumn @bind-Field="@context.ReadExpressions" Filterable=true Sortable=true Visible="false" />
+        <TableColumn @bind-Field="@context.ReadExpressions" Filterable=true Sortable=true Visible="true" />
         <TableColumn @bind-Field="@context.WriteExpressions" Filterable=true Sortable=true Visible="false" />
         <TableColumn @bind-Field="@context.Unit" Filterable=true Sortable=true Visible="false" />
 

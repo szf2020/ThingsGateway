@@ -8,6 +8,7 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
+
 namespace ThingsGateway.Foundation;
 
 /// <summary>
@@ -60,6 +61,8 @@ public class VariableClass : IVariable
     /// <summary>
     /// IVariableSource
     /// </summary>
+    [System.Text.Json.Serialization.JsonIgnore]
+    [Newtonsoft.Json.JsonIgnore]
     public IVariableSource? VariableSource { get; set; }
     public object? RawValue { get; private set; }
 

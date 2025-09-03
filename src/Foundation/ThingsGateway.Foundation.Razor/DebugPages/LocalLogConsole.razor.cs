@@ -21,7 +21,7 @@ using TouchSocket.Core;
 
 namespace ThingsGateway.Debug;
 
-public partial class LogConsole : IDisposable
+public partial class LocalLogConsole : IDisposable
 {
     private bool Pause;
 
@@ -78,7 +78,7 @@ public partial class LogConsole : IDisposable
     [Inject]
     private ToastService ToastService { get; set; }
     [Inject]
-    ITextFileReadService TextFileReadService { get; set; }
+    TextFileReadService TextFileReadService { get; set; }
     public void Dispose()
     {
         Disposed = true;

@@ -111,6 +111,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "foundation", "foundation", 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "debug", "debug", "{053AB5FA-9742-96EC-76A1-2AEC739860C6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ThingsGateway.Foundation.Demo", "Foundation\ThingsGateway.Foundation.Demo\ThingsGateway.Foundation.Demo.csproj", "{520DEEAA-1CBD-C0CB-2363-EB190D7DE4EA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -281,6 +283,10 @@ Global
 		{EAEE6A03-D2E7-7283-0F7A-F15B6261EE96}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EAEE6A03-D2E7-7283-0F7A-F15B6261EE96}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EAEE6A03-D2E7-7283-0F7A-F15B6261EE96}.Release|Any CPU.Build.0 = Release|Any CPU
+		{520DEEAA-1CBD-C0CB-2363-EB190D7DE4EA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{520DEEAA-1CBD-C0CB-2363-EB190D7DE4EA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{520DEEAA-1CBD-C0CB-2363-EB190D7DE4EA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{520DEEAA-1CBD-C0CB-2363-EB190D7DE4EA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -327,10 +333,11 @@ Global
 		{1D9CD7A3-9700-A851-0ABD-183347D9CC33} = {36510D70-161F-4241-B8D0-781E21032816}
 		{E6EF2033-F02A-CDAD-5A72-EE397A89742E} = {36510D70-161F-4241-B8D0-781E21032816}
 		{053AB5FA-9742-96EC-76A1-2AEC739860C6} = {36510D70-161F-4241-B8D0-781E21032816}
+		{520DEEAA-1CBD-C0CB-2363-EB190D7DE4EA} = {2AC600BB-4325-4E0A-93A7-B1F53C8E2CA7}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {199B1B96-4F56-4828-9531-813BA02DB282}
-		RESX_NeutralResourcesLanguage = zh-Hans
 		RESX_Rules = {"EnabledRules":[]}
+		RESX_NeutralResourcesLanguage = zh-Hans
 	EndGlobalSection
 EndGlobal

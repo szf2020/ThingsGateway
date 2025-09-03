@@ -254,8 +254,6 @@ public static class SpecificationDocumentBuilder
     /// <param name="configure">自定义配置</param>
     internal static void BuildGen(SwaggerGenOptions swaggerGenOptions, Action<SwaggerGenOptions> configure = null)
     {
-
-
         // 创建分组文档
         CreateSwaggerDocs(swaggerGenOptions);
 

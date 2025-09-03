@@ -34,5 +34,6 @@ public class Startup : AppStartup
 
         services.AddScoped<IPlatformService, PlatformService>();
         services.AddSingleton<ITextFileReadService, TextFileReadService>();
+        services.AddSingleton<TextFileReadService, TextFileReadService>();
     }
 }
