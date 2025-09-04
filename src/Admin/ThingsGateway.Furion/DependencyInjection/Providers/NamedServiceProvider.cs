@@ -50,9 +50,9 @@ internal sealed class NamedServiceProvider<TService> : INamedServiceProvider<TSe
 #pragma warning disable CA1851
         if (services
             .OfType<AspectDispatchProxy>()
-            .FirstOrDefault(u => ResovleServiceName(((dynamic)u).Target.GetType()) == serviceName) is not TService service)
+            .FirstOrDefault(u => ResolveServiceName(((dynamic)u).Target.GetType()) == serviceName) is not TService service)
         {
-            service = services.FirstOrDefault(u => ResovleServiceName(u.GetType()) == serviceName);
+            service = services.FirstOrDefault(u => ResolveServiceName(u.GetType()) == serviceName);
         }
 #pragma warning restore CA1851
 
@@ -85,9 +85,9 @@ internal sealed class NamedServiceProvider<TService> : INamedServiceProvider<TSe
 #pragma warning disable CA1851
         if (services
             .OfType<AspectDispatchProxy>()
-            .FirstOrDefault(u => ResovleServiceName(((dynamic)u).Target.GetType()) == serviceName) is not TService service)
+            .FirstOrDefault(u => ResolveServiceName(((dynamic)u).Target.GetType()) == serviceName) is not TService service)
         {
-            service = services.FirstOrDefault(u => ResovleServiceName(u.GetType()) == serviceName);
+            service = services.FirstOrDefault(u => ResolveServiceName(u.GetType()) == serviceName);
         }
 #pragma warning restore CA1851
 
@@ -116,7 +116,7 @@ internal sealed class NamedServiceProvider<TService> : INamedServiceProvider<TSe
     /// </summary>
     /// <param name="type"></param>
     /// <returns></returns>
-    private static string ResovleServiceName(Type type)
+    private static string ResolveServiceName(Type type)
     {
         if (type.IsDefined(typeof(InjectionAttribute)))
         {

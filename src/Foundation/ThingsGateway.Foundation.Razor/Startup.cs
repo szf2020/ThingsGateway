@@ -33,6 +33,8 @@ public class Startup : AppStartup
         }
 
         services.AddScoped<IPlatformService, PlatformService>();
+        services.AddScoped<IDownloadPlatformService, DownloadPlatformService>();
+        services.AddScoped<PlatformService, PlatformService>();
         services.AddSingleton<ITextFileReadService, TextFileReadService>();
         services.AddSingleton<TextFileReadService, TextFileReadService>();
     }

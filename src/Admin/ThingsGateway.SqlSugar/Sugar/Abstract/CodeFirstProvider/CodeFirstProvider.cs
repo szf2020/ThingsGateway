@@ -107,6 +107,8 @@ namespace ThingsGateway.SqlSugar
         /// <param name="entityType">实体类型</param>
         public virtual void InitTables(Type entityType)
         {
+            var oldSlave = this.Context.CurrentConnectionConfig.SlaveConnectionConfigs;
+            this.Context.CurrentConnectionConfig.SlaveConnectionConfigs = null;
             var splitTableAttribute = entityType.GetCustomAttribute<SplitTableAttribute>();
             if (splitTableAttribute != null)
             {
@@ -143,6 +145,7 @@ namespace ThingsGateway.SqlSugar
 
                 RestMappingTables(oldTableList);
             }
+            this.Context.CurrentConnectionConfig.SlaveConnectionConfigs = oldSlave;
         }
 
         /// <summary>
@@ -285,7 +288,14 @@ namespace ThingsGateway.SqlSugar
             TableDifferenceProvider result = new TableDifferenceProvider();
             foreach (var type in types)
             {
-                GetDifferenceTables(result, type);
+                try
+                {
+                    GetDifferenceTables(result, type);
+                }
+                catch (Exception ex)
+                {
+                    Check.ExceptionEasy($"实体{type.Name} 出错,具体错误:" + ex.Message, $" {type.Name} error." + ex.Message);
+                }
             }
             return result;
         }
@@ -302,6 +312,7 @@ namespace ThingsGateway.SqlSugar
             var tempTableName = "TempDiff" + DateTime.Now.ToString("yyMMssHHmmssfff");
             var oldTableName = this.Context.EntityMaintenance.GetEntityInfo(type).DbTableName;
             var db = new SqlSugarProvider(UtilMethods.CopyConfig(this.Context.CurrentConnectionConfig));
+            db.CurrentConnectionConfig.SlaveConnectionConfigs = null;
             db.CurrentConnectionConfig.ConfigureExternalServices = UtilMethods.IsNullReturnNew(db.CurrentConnectionConfig.ConfigureExternalServices);
             db.CurrentConnectionConfig.ConfigureExternalServices.EntityNameService += (x, p) =>
             {

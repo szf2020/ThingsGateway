@@ -24,10 +24,8 @@
 	<ItemGroup>
 		<None Remove="FriendlyException\Assets\error.html" />
 		<None Remove="SpecificationDocument\Assets\index.html" />
-		<None Remove="Schedule\Dashboard\frontend\**\*" />
 		<EmbeddedResource Include="FriendlyException\Assets\error.html" />
 		<EmbeddedResource Include="SpecificationDocument\Assets\index.html" />
-		<EmbeddedResource Include="Schedule\Dashboard\frontend\**\*" />
 	</ItemGroup>
 
 	<ItemGroup>

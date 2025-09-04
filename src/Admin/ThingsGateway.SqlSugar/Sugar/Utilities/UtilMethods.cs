@@ -16,6 +16,22 @@ namespace ThingsGateway.SqlSugar
 {
     public static class UtilMethods
     {
+        internal static void SetDefaultValueForBoolean(EntityColumnInfo item, Type propertyType)
+        {
+            if (propertyType == UtilConstants.BoolType && item.DefaultValue?.EqualCase("true") == true)
+            {
+                item.DefaultValue = "1";
+            }
+            else if (propertyType == UtilConstants.BoolType && item.DefaultValue?.EqualCase("false") == true)
+            {
+                item.DefaultValue = "0";
+            }
+        }
+
+        public static void UpdateQueryBuilderByClone<TResult>(QueryBuilder queryBuilder, ISugarQueryable<TResult> clone)
+        {
+            queryBuilder.MappingKeys = clone.QueryBuilder.MappingKeys;
+        }
         public static bool IsKeyValuePairType(Type type)
         {
             return type.IsGenericType && type.GetGenericTypeDefinition() == typeof(KeyValuePair<,>);
@@ -63,6 +79,19 @@ namespace ThingsGateway.SqlSugar
 
             return finalTable;
         }
+
+        public static string EscapeLikeValue(ISqlSugarClient db, string value, params char[] wildcards)
+        {
+            if (wildcards != null)
+            {
+                foreach (var item in wildcards)
+                {
+                    value = EscapeLikeValue(db, value, item);
+                }
+            }
+            return value;
+        }
+
         public static string EscapeLikeValue(ISqlSugarClient db, string value, char wildcard = '%')
         {
             var dbType = db.CurrentConnectionConfig.DbType;
@@ -82,6 +111,21 @@ namespace ThingsGateway.SqlSugar
                     //case DbType.Access:
                     //case DbType.Odbc:
                     //case DbType.TDSQLForPGODBC:
+
+                    if (wildcard == ']' || wildcard == '[')
+                    {
+                        var keyLeft2 = "[[]";
+                        var keyRight2 = "[]]";
+                        var leftGuid2 = Guid.NewGuid().ToString();
+                        var rightGuid2 = Guid.NewGuid().ToString();
+                        value = value.Replace(keyLeft2, leftGuid2)
+                                     .Replace(keyRight2, rightGuid2);
+
+                        value = value.Replace(wildcard + "", $"[{wildcard}]");
+                        value = value.Replace(leftGuid2, keyLeft2)
+                                   .Replace(rightGuid2, keyRight2);
+                        break;
+                    }
                     // SQL Server 使用中括号转义 %, _ 等
                     var keyLeft = "[[]";
                     var keyRight = "[]]";
@@ -937,7 +981,8 @@ namespace ThingsGateway.SqlSugar
                     EnableILike = it.MoreSettings.EnableILike,
                     ClickHouseEnableFinal = it.MoreSettings.ClickHouseEnableFinal,
                     PgSqlIsAutoToLowerSchema = it.MoreSettings.PgSqlIsAutoToLowerSchema,
-                    EnableJsonb = it.MoreSettings.EnableJsonb
+                    EnableJsonb = it.MoreSettings.EnableJsonb,
+                    PostgresIdentityStrategy = it.MoreSettings.PostgresIdentityStrategy
                 },
                 SqlMiddle = it.SqlMiddle == null ? null : new SqlMiddle
                 {

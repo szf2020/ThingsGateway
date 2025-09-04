@@ -118,6 +118,17 @@ namespace ThingsGateway.SqlSugar
                 }
                 return this.Clone().Select<int>(" COUNT(1) ").ToList().FirstOrDefault();
             }
+            if (this.QueryBuilder.AsTables?.Count > 0)
+            {
+                var tableName = this.QueryBuilder.AsTables.FirstOrDefault().Value;
+                if (tableName.StartsWith(" (SELECT * FROM  ("))
+                {
+                    var copyDb = this.Clone();
+                    copyDb.QueryBuilder.OrderByValue = null;
+                    var list = copyDb.Select<int>(" COUNT(1) ").ToList();
+                    return list.FirstOrDefault();
+                }
+            }
             MappingTableList expMapping;
             int result;
             _CountBegin(out expMapping, out result);

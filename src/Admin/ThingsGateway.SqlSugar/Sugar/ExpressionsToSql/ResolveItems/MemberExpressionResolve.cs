@@ -314,7 +314,7 @@ namespace ThingsGateway.SqlSugar
                     DefaultOneToOne(parameter, baseParameter, isLeft, isSetTempData, nav);
                 }
             }
-            else if (navN.IsNavgate(expression))
+            else if (navN.IsNavgate(expression) && ExpressionTool.GetParameters(expression).Count != 0)
             {
                 DefaultOneToOneN(parameter, baseParameter, isLeft, isSetTempData, navN);
             }
@@ -612,6 +612,10 @@ namespace ThingsGateway.SqlSugar
                 else if (parameter.CommonTempData != null && parameter.CommonTempData?.GetType()?.FullName == "System.DateOnly")
                 {
                     parameter.CommonTempData = base.AppendParameter(parameter.CommonTempData);
+                }
+                else if (parameter.CommonTempData is MapperSql mapperSql)
+                {
+                    parameter.CommonTempData = mapperSql.Sql;
                 }
                 var result = this.Context.DbMehtods.DateValue(new MethodCallExpressionModel()
                 {

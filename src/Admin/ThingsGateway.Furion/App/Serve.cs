@@ -701,7 +701,7 @@ public static class Serve
         var applicationPartManager = app.Services.GetService<ApplicationPartManager>();
 
         applicationPartManager?.ApplicationParts?.RemoveWhere(p => App.BakImageNames.Any(b => b == p.Name));
-        // 配置所有 Starup Configure
+        // 配置所有 Startup Configure
         UseStartups(app);
         UseStartups(app.Services);
 
@@ -820,7 +820,7 @@ public static class Serve
         var applicationPartManager = app.Services.GetService<ApplicationPartManager>();
 
         applicationPartManager?.ApplicationParts?.RemoveWhere(p => App.BakImageNames.Any(b => b == p.Name));
-        // 配置所有 Starup Configure
+        // 配置所有 Startup Configure
         UseStartups(app.Services);
         // 释放内存
         App.AppStartups.Clear();
@@ -943,7 +943,7 @@ public static class Serve
         var applicationPartManager = app.Services.GetService<ApplicationPartManager>();
 
         applicationPartManager?.ApplicationParts?.RemoveWhere(p => App.BakImageNames.Any(b => b == p.Name));
-        // 配置所有 Starup Configure
+        // 配置所有 Startup Configure
         UseStartups(app.Services);
         // 释放内存
         App.AppStartups.Clear();
@@ -1005,7 +1005,7 @@ public static class Serve
         var applicationPartManager = app.Services.GetService<ApplicationPartManager>();
         applicationPartManager?.ApplicationParts?.RemoveWhere(p => App.BakImageNames.Any(b => b == p.Name));
 
-        // 配置所有 Starup Configure
+        // 配置所有 Startup Configure
         UseStartups(app.Services);
         // 释放内存
         App.AppStartups.Clear();

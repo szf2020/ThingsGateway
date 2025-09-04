@@ -374,14 +374,14 @@ public static class ObjectContainerHelper
     {
         if (container == null) throw new ArgumentNullException(nameof(container));
 
-        var provider = container.Resolve(typeof(IServiceProvider)) as IServiceProvider;
+        var provider = container.GetService<IServiceProvider>();
         if (provider != null) return provider;
 
         var provider2 = new ServiceProvider(container, innerServiceProvider);
 
         container.TryAddSingleton(provider2);
 
-        provider = container.Resolve(typeof(IServiceProvider)) as IServiceProvider;
+        provider = container.GetService<IServiceProvider>();
         if (provider != null) return provider;
 
         return provider2;
@@ -390,24 +390,26 @@ public static class ObjectContainerHelper
     /// <summary>从对象容器创建应用主机</summary>
     /// <param name="container"></param>
     /// <returns></returns>
-    public static IHost BuildHost(this IObjectContainer container)
+    public static IHost BuildHost(this IObjectContainer container) => BuildHost(container, null);
+
+    /// <summary>从对象容器创建应用主机</summary>
+    /// <param name="container"></param>
+    /// <param name="innerServiceProvider">内部服务提供者，常用于NETCore的IoC</param>
+    /// <returns></returns>
+    public static IHost BuildHost(this IObjectContainer container, IServiceProvider? innerServiceProvider)
     {
         // 尝试注册应用主机，如果前面已经注册，则这里无效
         container.TryAddSingleton<IHost, Host>();
 
-        //return new Host(container.BuildServiceProvider());
-
-        var provider = container.BuildServiceProvider();
+        var provider = container.BuildServiceProvider(innerServiceProvider);
         return provider.GetRequiredService<IHost>();
     }
+
+    /// <summary>获取指定类型的服务对象</summary>
+    /// <typeparam name="TService"></typeparam>
+    /// <param name="container"></param>
+    /// <returns></returns>
+    public static TService? GetService<TService>(this IObjectContainer container) => (TService?)container.GetService(typeof(TService));
     #endregion
 
-    #region 旧版方法
-    /// <summary>解析类型的实例</summary>
-    /// <typeparam name="TService">接口类型</typeparam>
-    /// <param name="container">对象容器</param>
-    /// <returns></returns>
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    public static TService? Resolve<TService>(this IObjectContainer container) => (TService?)container.Resolve(typeof(TService));
-    #endregion
 }

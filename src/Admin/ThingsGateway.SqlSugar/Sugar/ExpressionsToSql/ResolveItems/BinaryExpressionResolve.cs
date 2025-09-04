@@ -163,6 +163,11 @@ namespace ThingsGateway.SqlSugar
             base.ExactExpression = expression;
             var leftExpression = ExpressionTool.RemoveConvert(expression.Left);
             var rightExpression = ExpressionTool.RemoveConvert(expression.Right);
+            if (leftExpression.Type == typeof(char))
+            {
+                leftExpression = expression.Left;
+                rightExpression = expression.Right;
+            }
             if (operatorValue.IsIn("AND", "OR") && leftExpression is BinaryExpression exp)
             {
                 if (exp?.Left is BinaryExpression expChild)

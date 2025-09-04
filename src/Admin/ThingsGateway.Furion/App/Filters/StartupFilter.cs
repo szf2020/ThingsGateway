@@ -47,7 +47,7 @@ public class StartupFilter : IStartupFilter
                 else
                 {
                     // 输出当前环境标识
-                    context.Response.Headers["environment"] = envName;
+                    context.Response.Headers["Environment"] = envName;
 
                     // 输出框架版本
                     context.Response.Headers[nameof(ThingsGateway)] = version;

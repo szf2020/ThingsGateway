@@ -9,6 +9,8 @@
 // 许可证的完整文本可以在源代码树根目录中的 LICENSE-APACHE 和 LICENSE-MIT 文件中找到。
 // ------------------------------------------------------------------------
 
+using Microsoft.Extensions.DependencyInjection;
+
 namespace ThingsGateway.Schedule;
 
 /// <summary>
@@ -152,7 +154,31 @@ public abstract class JobExecutionContext
             writer.WriteEndObject();
         });
     }
+    /// <summary>
+    /// 检查作业任务是否处于正常状态
+    /// </summary>
+    /// <param name="schedulerFactory"><see cref="ISchedulerFactory"/></param>
+    /// <returns><see cref="bool"/></returns>
+    public bool IsNormalStatus(ISchedulerFactory schedulerFactory = null)
+    {
+        // 解析作业计划工厂服务
+        schedulerFactory ??= ServiceProvider.GetRequiredService<ISchedulerFactory>();
 
+        // 情况 1：检查作业是否存在
+        if (schedulerFactory.TryGetJob(JobId, out var scheduler) != ScheduleResult.Succeed)
+        {
+            return false;
+        }
+
+        // 情况 2：检查作业触发器是否存在
+        if (scheduler.TryGetTrigger(TriggerId, out var trigger) != ScheduleResult.Succeed)
+        {
+            return false;
+        }
+
+        // 情况 3：检查作业触发器是否正常运行
+        return trigger.IsNormalStatus();
+    }
     /// <summary>
     /// 作业执行上下文转字符串输出输出
     /// </summary>

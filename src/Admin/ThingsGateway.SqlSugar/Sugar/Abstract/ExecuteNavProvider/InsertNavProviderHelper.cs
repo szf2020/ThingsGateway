@@ -276,7 +276,7 @@
                 {
                     foreach (var item in insertData)
                     {
-                        this._Context.Insertable(insertData).ExecuteCommandIdentityIntoEntity();
+                        this._Context.InsertableT(item).ExecuteCommandIdentityIntoEntity();
                     }
                 }
                 else

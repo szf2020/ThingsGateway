@@ -1,3 +1,3 @@
-﻿https://gitee.com/dotnetchina/SqlSugar/commit/b8a1e3320a72fb075633845ce2fba2d14f86affe
+﻿https://gitee.com/dotnetchina/SqlSugar/commit/97019ee72fc54a859c914f8a9b72fd66a32bfb0f
 
 修改大部分CA规则，后期优化减少字符串操作

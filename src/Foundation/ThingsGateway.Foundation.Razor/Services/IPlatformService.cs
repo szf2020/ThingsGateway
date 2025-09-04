@@ -19,3 +19,7 @@ public interface IPlatformService
     /// <returns></returns>
     public Task OnLogExport(string logPath);
 }
+public interface IDownloadPlatformService
+{
+    public Task DownloadFile(IEnumerable<string> path);
+}

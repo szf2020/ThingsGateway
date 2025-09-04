@@ -486,7 +486,16 @@ namespace ThingsGateway.SqlSugar
                     else if (IsJsonList(readerValues, item))
                     {
                         var json = readerValues.First(y => y.Key.EqualCase(item.Name)).Value.ToString();
-                        result.Add(name, DeserializeObject<List<Dictionary<string, object>>>(json));
+                        if (IsMongoDb())
+                        {
+                            var q = InstanceFactory.GetInsertBuilder(this.Context.CurrentConnectionConfig);
+                            var qv = q.DeserializeObjectFunc(json, item.PropertyType);
+                            result.Add(name, qv);
+                        }
+                        else
+                        {
+                            result.Add(name, DeserializeObject<List<Dictionary<string, object>>>(json));
+                        }
                     }
                     else if (IsBytes(readerValues, item))
                     {
@@ -529,6 +538,10 @@ namespace ThingsGateway.SqlSugar
                             if (ignoreColumns.Count != 0)
                             {
                                 ignorePropertyNames = ignoreColumns;
+                            }
+                            if (ignorePropertyNames?.Contains(name) == true)
+                            {
+                                continue;
                             }
                         }
                         result.Add(name, DataReaderToDynamicList_Part(readerValues, item, reval, mappingKeys, ignorePropertyNames));
@@ -656,15 +669,26 @@ namespace ThingsGateway.SqlSugar
             return isArray || isListItem;
         }
 
-        private static bool IsJsonList(Dictionary<string, object> readerValues, PropertyInfo item)
+        private bool IsJsonList(Dictionary<string, object> readerValues, PropertyInfo item)
         {
+            if (IsMongoDb())
+            {
+                return item.PropertyType.FullName.IsCollectionsList() &&
+                            readerValues.Any(y => y.Key.EqualCase(item.Name)) &&
+                            readerValues.First(y => y.Key.EqualCase(item.Name)).Value?.GetType().FullName == "MongoDB.Bson.BsonArray" &&
+                            Regex.IsMatch(readerValues.First(y => y.Key.EqualCase(item.Name)).Value.ToString(), @"^\[{.+\}]$");
+            }
             return item.PropertyType.FullName.IsCollectionsList() &&
                                         readerValues.Any(y => y.Key.EqualCase(item.Name)) &&
                                         readerValues.First(y => y.Key.EqualCase(item.Name)).Value != null &&
                                         readerValues.First(y => y.Key.EqualCase(item.Name)).Value.GetType() == UtilConstants.StringType &&
                                         Regex.IsMatch(readerValues.First(y => y.Key.EqualCase(item.Name)).Value.ToString(), @"^\[{.+\}]$");
         }
-
+        private bool IsMongoDb()
+        {
+            return false;
+            //return this.Context?.CurrentConnectionConfig?.DbType == DbType.MongoDb;
+        }
         private Dictionary<string, object> DataReaderToDynamicList_Part<T>(Dictionary<string, object> readerValues, PropertyInfo item, List<T> reval, Dictionary<string, string> mappingKeys = null, List<string> ignoreColumns = null)
         {
             Dictionary<string, object> result = new Dictionary<string, object>();
@@ -776,6 +800,10 @@ namespace ThingsGateway.SqlSugar
                         else if (UtilMethods.GetUnderType(prop.PropertyType) == UtilConstants.IntType && addItem != null)
                         {
                             addItem = addItem.ObjToInt();
+                        }
+                        else if (underType == UtilConstants.LongType && addItem != null)
+                        {
+                            addItem = addItem.ObjToLong();
                         }
                         else if (addItem != null && underType?.FullName == "System.DateOnly")
                         {
@@ -1318,6 +1346,12 @@ namespace ThingsGateway.SqlSugar
         {
             return UtilMethods.EscapeLikeValue(this.Context, value, wildcard);
         }
+
+        public string EscapeLikeValue(string value, char[] wildcards)
+        {
+            return UtilMethods.EscapeLikeValue(this.Context, value, wildcards);
+        }
+
         #endregion
     }
 }

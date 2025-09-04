@@ -59,6 +59,7 @@ namespace ThingsGateway.SqlSugar
         object GetScalar(string sql, params IReadOnlyCollection<SugarParameter> parameters);
 
         Task<object> GetScalarAsync(string sql, object parameters);
+        Task<object> GetScalarAsync(string sql, object parameters, CancellationToken cancellationToken);
         Task<object> GetScalarAsync(string sql, params IReadOnlyCollection<SugarParameter> parameters);
 
         int ExecuteCommandWithGo(string sql, params IReadOnlyCollection<SugarParameter> parameters);
@@ -72,12 +73,14 @@ namespace ThingsGateway.SqlSugar
         string GetString(string sql, object parameters);
         string GetString(string sql, params IReadOnlyCollection<SugarParameter> parameters);
         Task<string> GetStringAsync(string sql, object parameters);
+        Task<string> GetStringAsync(string sql, object parameters, CancellationToken cancellationToken);
         Task<string> GetStringAsync(string sql, params IReadOnlyCollection<SugarParameter> parameters);
 
         int GetInt(string sql, object pars);
         int GetInt(string sql, params IReadOnlyCollection<SugarParameter> parameters);
 
         Task<int> GetIntAsync(string sql, object pars);
+        Task<int> GetIntAsync(string sql, object pars, CancellationToken cancellationToken);
         Task<int> GetIntAsync(string sql, params IReadOnlyCollection<SugarParameter> parameters);
 
         long GetLong(string sql, object pars = null);
@@ -88,6 +91,7 @@ namespace ThingsGateway.SqlSugar
         Double GetDouble(string sql, params IReadOnlyCollection<SugarParameter> parameters);
 
         Task<Double> GetDoubleAsync(string sql, object parameters);
+        Task<Double> GetDoubleAsync(string sql, object parameters, CancellationToken cancellationToken);
         Task<Double> GetDoubleAsync(string sql, params IReadOnlyCollection<SugarParameter> parameters);
 
         decimal GetDecimal(string sql, object parameters);

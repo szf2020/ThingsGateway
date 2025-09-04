@@ -373,10 +373,38 @@ WHERE table_name = '" + tableName + "'");
         {
             if (this.Context.Ado.IsValidConnection())
             {
+                CreateSchemaIfNotExists(this.Context);
                 return true;
             }
-            Check.ExceptionEasy("dm no support create database ", "达梦不支持建库方法，请写有效连接字符串可以正常运行该方法。");
+            Check.ExceptionEasy("dm no support create database ,only create schema", "达梦只支持创建Schema但不能创建数据库保证这个连接字符串数据库存在并能用。");
             return true;
+        }
+        public void CreateSchemaIfNotExists(ISqlSugarClient db)
+        {
+            if (!db.CurrentConnectionConfig.ConnectionString.Replace(" ", "").Contains("SCHEMA=", StringComparison.OrdinalIgnoreCase))
+            {
+                return;
+            }
+            DbConnectionStringBuilder dbConnection = new DbConnectionStringBuilder();
+            dbConnection.ConnectionString = db.CurrentConnectionConfig.ConnectionString;
+            object schemaName = string.Empty;
+            if (dbConnection.TryGetValue("schema", out schemaName) && !string.IsNullOrEmpty(schemaName?.ToString()))
+            {
+                var newConn = dbConnection.Remove("schema");
+                var newddb = new SqlSugarClient(new ConnectionConfig()
+                {
+                    ConnectionString =
+                    dbConnection.ToString(),
+                    DbType = DbType.Dm,
+                    IsAutoCloseConnection = true
+                });
+                // 检查 Schema 是否存在，不存在则创建
+                var schemaExists = newddb.Ado.GetInt($"SELECT COUNT(*) FROM SYSOBJECTS WHERE TYPE$ = 'SCH' AND Upper(NAME) = '{schemaName?.ToString()?.ToUpper()}'") > 0;
+                if (!schemaExists)
+                {
+                    newddb.Ado.ExecuteCommand($"CREATE SCHEMA {schemaName}");
+                }
+            }
         }
         public override bool CreateDatabase(string databaseName, string databaseDirectory = null)
         {

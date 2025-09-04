@@ -15,32 +15,32 @@ using ThingsGateway.Foundation;
 
 namespace ThingsGateway.Debug;
 
-public class PlatformService : IPlatformService
+public class PlatformService(IDownloadPlatformService downloadPlatformService) : IPlatformService
 {
-    public PlatformService(IJSRuntime jSRuntime)
-    {
-        JSRuntime = jSRuntime;
-    }
-
-    private IJSRuntime JSRuntime { get; set; }
-
-    public async Task OnLogExport(string logPath)
+    public Task OnLogExport(string logPath)
     {
         var files = TextFileReader.GetLogFiles(logPath);
         if (!files.IsSuccess)
         {
-            return;
+            return Task.CompletedTask; ;
         }
-        //打开文件夹
-
-        string url = "api/file/download";
-        //统一web下载
-        foreach (var item in files.Content)
-        {
-            await using var jSObject = await JSRuntime.InvokeAsync<IJSObjectReference>("import", $"{WebsiteConst.DefaultResourceUrl}js/downloadFile.js");
-            var path = Path.GetRelativePath("wwwroot", item);
-            string fileName = DateTime.Now.ToFileDateTimeFormat();
-            await jSObject.InvokeAsync<bool>("blazor_downloadFile", url, fileName, new { FileName = path });
-        }
+        return downloadPlatformService.DownloadFile(files.Content);
     }
 }
+public class DownloadPlatformService(IJSRuntime JSRuntime) : IDownloadPlatformService
+{
+    public async Task DownloadFile(IEnumerable<string> path)
+    {
+        string url = "api/file/download";
+        //统一web下载
+        foreach (var item in path)
+        {
+            await using var jSObject = await JSRuntime.InvokeAsync<IJSObjectReference>("import", $"{WebsiteConst.DefaultResourceUrl}js/downloadFile.js");
+            var path1 = Path.GetRelativePath("wwwroot", item);
+            string fileName = DateTime.Now.ToFileDateTimeFormat();
+            await jSObject.InvokeAsync<bool>("blazor_downloadFile", url, fileName, new { FileName = path1 });
+        }
+    }
+
+}
+

@@ -106,6 +106,9 @@ public partial class DeviceRuntimeInfo1 : IDisposable
     private async Task PauseThreadAsync()
     {
         await DevicePageService.PauseThreadAsync(DeviceRuntime.Id);
+#if Management
+        DeviceRuntime.Pause = !DeviceRuntime.Pause;
+#endif
     }
 
     protected override void OnInitialized()

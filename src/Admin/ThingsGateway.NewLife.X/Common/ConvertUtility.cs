@@ -241,20 +241,14 @@ public class DefaultConvert
 
         if (value is Byte[] buf)
         {
-            if (buf == null || buf.Length <= 0) return defaultValue;
+            if (buf.Length == 0) return defaultValue;
 
             switch (buf.Length)
             {
-                case 1:
-                    return buf[0];
-                case 2:
-                    return BitConverter.ToInt16(buf, 0);
-                case 3:
-                    return BitConverter.ToInt32([buf[0], buf[1], buf[2], 0], 0);
-                case 4:
-                    return BitConverter.ToInt32(buf, 0);
-                default:
-                    break;
+                case 1: return buf[0];
+                case 2: return BitConverter.ToInt16(buf, 0);
+                case 3: return BitConverter.ToInt32([buf[0], buf[1], buf[2], (Byte)0], 0);
+                case 4: return BitConverter.ToInt32(buf, 0);
             }
         }
 
@@ -325,22 +319,14 @@ public class DefaultConvert
 
         if (value is Byte[] buf)
         {
-            if (buf == null || buf.Length <= 0) return defaultValue;
-
+            if (buf.Length == 0) return defaultValue;
             switch (buf.Length)
             {
-                case 1:
-                    return buf[0];
-                case 2:
-                    return BitConverter.ToInt16(buf, 0);
-                case 3:
-                    return BitConverter.ToInt32([buf[0], buf[1], buf[2], 0], 0);
-                case 4:
-                    return BitConverter.ToInt32(buf, 0);
-                case 8:
-                    return BitConverter.ToInt64(buf, 0);
-                default:
-                    break;
+                case 1: return buf[0];
+                case 2: return BitConverter.ToInt16(buf, 0);
+                case 3: return BitConverter.ToInt32([buf[0], buf[1], buf[2], (Byte)0], 0);
+                case 4: return BitConverter.ToInt32(buf, 0);
+                case 8: return BitConverter.ToInt64(buf, 0);
             }
         }
 
@@ -391,8 +377,7 @@ public class DefaultConvert
 #endif
         }
 
-        if (value is Byte[] buf && buf.Length <= 8)
-            return BitConverter.ToDouble(buf, 0);
+        if (value is Byte[] buf && buf.Length <= 8) return BitConverter.ToDouble(buf, 0);
 
         try
         {
@@ -443,46 +428,29 @@ public class DefaultConvert
 
         if (value is Byte[] buf)
         {
-            if (buf == null || buf.Length <= 0) return defaultValue;
-
+            if (buf.Length == 0) return defaultValue;
             switch (buf.Length)
             {
-                case 1:
-                    return buf[0];
-                case 2:
-                    return BitConverter.ToInt16(buf, 0);
-                case 3:
-                    return BitConverter.ToInt32([buf[0], buf[1], buf[2], 0], 0);
-                case 4:
-                    return BitConverter.ToInt32(buf, 0);
+                case 1: return buf[0];
+                case 2: return BitConverter.ToInt16(buf, 0);
+                case 3: return BitConverter.ToInt32([buf[0], buf[1], buf[2], (Byte)0], 0);
+                case 4: return BitConverter.ToInt32(buf, 0);
                 default:
                     // 凑够8字节
                     if (buf.Length < 8)
                     {
                         var bts = Pool.Shared.Rent(8);
                         Buffer.BlockCopy(buf, 0, bts, 0, buf.Length);
-
                         var dec = BitConverter.ToDouble(bts, 0).ToDecimal();
-
                         Pool.Shared.Return(bts);
-
                         return dec;
                     }
                     return BitConverter.ToDouble(buf, 0).ToDecimal();
             }
         }
 
-        if (value is Double d)
-        {
-            try
-            {
-                return Double.IsNaN(d) ? defaultValue : (Decimal)d;
-            }
-            catch
-            {
-                return defaultValue;
-            }
-        }
+        if (value is Double d) return Double.IsNaN(d) ? defaultValue : (Decimal)d;
+
 
         try
         {
@@ -665,13 +633,10 @@ public class DefaultConvert
             if (str.IsNullOrEmpty()) return defaultValue;
 
             if (DateTimeOffset.TryParse(str, out var dt)) return dt;
-            return str.Contains('-') && DateTimeOffset.TryParseExact(str, "yyyy-M-d", null, DateTimeStyles.None, out dt)
-                ? dt
-                : str.Contains('/') && DateTimeOffset.TryParseExact(str, "yyyy/M/d", null, DateTimeStyles.None, out dt)
-                ? dt
-                : DateTimeOffset.TryParseExact(str, "yyyyMMddHHmmss", null, DateTimeStyles.None, out dt)
-                ? dt
-                : DateTimeOffset.TryParseExact(str, "yyyyMMdd", null, DateTimeStyles.None, out dt) ? dt : defaultValue;
+            return str.Contains('-') && DateTimeOffset.TryParseExact(str, "yyyy-M-d", null, DateTimeStyles.None, out dt) ? dt :
+                     str.Contains('/') && DateTimeOffset.TryParseExact(str, "yyyy/M/d", null, DateTimeStyles.None, out dt) ? dt :
+                     DateTimeOffset.TryParseExact(str, "yyyyMMddHHmmss", null, DateTimeStyles.None, out dt) ? dt :
+                     DateTimeOffset.TryParseExact(str, "yyyyMMdd", null, DateTimeStyles.None, out dt) ? dt : defaultValue;
         }
 
         // 特殊处理整数，Unix秒，绝对时间差，不考虑UTC时间和本地时间。

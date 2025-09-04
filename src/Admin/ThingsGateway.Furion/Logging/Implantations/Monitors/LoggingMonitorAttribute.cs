@@ -38,6 +38,7 @@ using ThingsGateway;
 using ThingsGateway.DataValidation;
 using ThingsGateway.Extensions;
 using ThingsGateway.FriendlyException;
+using ThingsGateway.JsonSerialization;
 using ThingsGateway.Logging;
 using ThingsGateway.Templates;
 using ThingsGateway.UnifyResult;
@@ -638,6 +639,11 @@ public sealed class LoggingMonitorAttribute : Attribute, IAsyncActionFilter, IAs
 
             // 解决 JsonElement 序列化问题
             jsonSerializerSettings.Converters.Add(new JsonElementConverter());
+
+            // 解决 JsonObject 和 JsonArray 序列化问题
+            jsonSerializerSettings.Converters.Add(new NewtonsoftJsonJsonObjectJsonConverter());
+            jsonSerializerSettings.Converters.Add(new NewtonsoftJsonJsonArrayJsonConverter());
+
 
             // 解决 DateTimeOffset 序列化/反序列化问题
             if (obj is DateTimeOffset)

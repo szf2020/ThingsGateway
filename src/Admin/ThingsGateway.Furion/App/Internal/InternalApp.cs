@@ -215,6 +215,10 @@ internal static class InternalApp
         // 获取环境变量名，如果没找到，则读取 NETCORE_ENVIRONMENT 环境变量信息识别（用于非 Web 环境）
         var envName = hostEnvironment?.EnvironmentName ?? Environment.GetEnvironmentVariable("NETCORE_ENVIRONMENT") ?? "Unknown";
 
+        // 获取 JSON 文件扫描配置（2025.07.25），修复 docker 中挂载大文件数据卷导致启动缓慢的问题
+        var jsonFileScanner = configuration.GetSection("AppSettings:JsonFileScanner")
+            .Get<JsonFileScanner>() ?? new JsonFileScanner();
+
         // 读取忽略的配置文件
         var ignoreConfigurationFiles = (configuration.GetSection("IgnoreConfigurationFiles")
                 .Get<string[]>()
@@ -240,7 +244,7 @@ internal static class InternalApp
             // 循环加载
             foreach (var jsonFile in files)
             {
-                configurationBuilder.AddJsonFile(jsonFile, optional: true, reloadOnChange: true);
+                configurationBuilder.AddJsonFile(jsonFile, optional: jsonFileScanner.Optional, reloadOnChange: jsonFileScanner.ReloadOnChange);
             }
         }
     }

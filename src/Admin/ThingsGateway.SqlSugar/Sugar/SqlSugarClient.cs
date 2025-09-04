@@ -1193,6 +1193,7 @@ namespace ThingsGateway.SqlSugar
                 }
                 var newDb = new SqlSugarClient(connections, _configAction);
                 newDb.QueryFilter = this.QueryFilter;
+                newDb.Ado.CommandTimeOut = this.Ado.CommandTimeOut;
                 return newDb;
             }
 

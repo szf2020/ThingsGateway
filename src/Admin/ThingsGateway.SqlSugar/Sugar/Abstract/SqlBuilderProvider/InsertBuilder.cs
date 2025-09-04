@@ -1,6 +1,8 @@
 ﻿using System.Globalization;
 using System.Linq.Expressions;
 using System.Text;
+
+using ThingsGateway.SqlSugar.DbConvert;
 namespace ThingsGateway.SqlSugar
 {
     public partial class InsertBuilder : IDMLBuilder
@@ -287,7 +289,7 @@ namespace ThingsGateway.SqlSugar
             {
                 return LambdaExpressions.DbMehtods.GetDate();
             }
-            else if (UtilMethods.IsErrorDecimalString() == true)
+            else if ((columnInfo.Value is decimal || columnInfo.Value is double || columnInfo.Value is float) && UtilMethods.IsErrorDecimalString() == true)
             {
                 var pname = Builder.SqlParameterKeyWord + "Decimal" + GetDbColumnIndex;
                 var p = new SugarParameter(pname, columnInfo.Value);
@@ -316,6 +318,15 @@ namespace ThingsGateway.SqlSugar
                 if (IsNoParameterConvert(columnInfo))
                 {
                     return p.ParameterName;
+                }
+                else if (dbType == typeof(EnumToStringConvert) && this.Context?.CurrentConnectionConfig?.MoreSettings?.TableEnumIsString == true)
+
+                {
+                    var pname = Builder.SqlParameterKeyWord + $"{columnInfo.PropertyName}_str" + GetDbColumnIndex;
+                    var p1 = new SugarParameter(pname, columnInfo.Value);
+                    this.Parameters.Add(p1);
+                    GetDbColumnIndex++;
+                    return pname;
                 }
                 else
                 {

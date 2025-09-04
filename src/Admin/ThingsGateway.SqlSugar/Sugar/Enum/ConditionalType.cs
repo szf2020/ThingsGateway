@@ -18,6 +18,7 @@
         NoLike = 13,
         EqualNull = 14,
         InLike = 15,
-        Range = 16
+        Range = 16,
+        RangeDate = 17
     }
 }

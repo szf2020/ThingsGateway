@@ -27,6 +27,7 @@ class MyServiceScope : IServiceScope, IServiceProvider
         {
             if (item.Value is IDisposable dsp) dsp.Dispose();
         }
+        _cache.Clear();
     }
 
     public Object? GetService(Type serviceType)

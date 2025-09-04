@@ -1,5 +1,7 @@
 ﻿using System.Drawing;
 
+using ThingsGateway.NewLife.Collections;
+
 namespace ThingsGateway.NewLife.Serialization;
 
 /// <summary>颜色处理器。</summary>
@@ -35,13 +37,18 @@ public class BinaryColor : BinaryHandlerBase
     {
         if (type != typeof(Color)) return false;
 
-        var a = Host.ReadByte();
-        var r = Host.ReadByte();
-        var g = Host.ReadByte();
-        var b = Host.ReadByte();
+        var buf = Pool.Shared.Rent(4);
+        if (Host.ReadBytes(buf, 0, 4) < 4) return false;
+
+        var a = buf[0];
+        var r = buf[1];
+        var g = buf[2];
+        var b = buf[3];
         var color = Color.FromArgb(a, r, g, b);
         WriteLog("ReadColor {0}", color);
         value = color;
+
+        Pool.Shared.Return(buf);
 
         return true;
     }

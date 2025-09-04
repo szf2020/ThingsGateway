@@ -6,6 +6,7 @@
         OneToMany = 2,
         ManyToOne = 3,
         ManyToMany = 4,
-        Dynamic = 5
+        Dynamic = 5,
+        OneToManyByArrayList
     }
 }

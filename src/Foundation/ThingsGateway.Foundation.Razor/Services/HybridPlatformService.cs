@@ -8,15 +8,21 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
+
 namespace ThingsGateway.Debug;
 
-public class HybridPlatformService : IPlatformService
+public class HybridPlatformService(IDownloadPlatformService downloadPlatformService) : IPlatformService
 {
     public Task OnLogExport(string logPath)
     {
-        OpenFolder(logPath);
-        return Task.CompletedTask;
+        return downloadPlatformService.DownloadFile([logPath]);
     }
+
+}
+
+
+public class HybridDownloadPlatformService : IDownloadPlatformService
+{
 
     private static void OpenFolder(string path)
     {
@@ -35,5 +41,15 @@ public class HybridPlatformService : IPlatformService
         {
             System.Diagnostics.Process.Start("open", path);
         }
+    }
+
+    public Task DownloadFile(IEnumerable<string> path)
+    {
+        foreach (var item in path.ToHashSet())
+        {
+            OpenFolder(item);
+        }
+
+        return Task.CompletedTask;
     }
 }

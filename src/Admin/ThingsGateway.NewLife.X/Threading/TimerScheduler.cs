@@ -2,15 +2,21 @@
 
 using ThingsGateway.NewLife.Collections;
 using ThingsGateway.NewLife.Log;
+using ThingsGateway.NewLife.Model;
 using ThingsGateway.NewLife.Reflection;
 
 namespace ThingsGateway.NewLife.Threading;
 
 /// <summary>定时器调度器</summary>
-public class TimerScheduler : ILogFeature
+public class TimerScheduler : IDisposable, ILogFeature
 {
+
+    static TimerScheduler()
+    {
+        Host.RegisterExit(ClearAll);
+    }
+
     #region 静态
-    private TimerScheduler(String name) => Name = name;
 
     private static readonly Dictionary<String, TimerScheduler> _cache = [];
 
@@ -19,18 +25,34 @@ public class TimerScheduler : ILogFeature
     /// <returns></returns>
     public static TimerScheduler Create(String name)
     {
-        if (_cache.TryGetValue(name, out var ts)) return ts;
+        if (_cache.TryGetValue(name, out var scheduler)) return scheduler;
         lock (_cache)
         {
-            if (_cache.TryGetValue(name, out ts)) return ts;
+            if (_cache.TryGetValue(name, out scheduler)) return scheduler;
 
-            ts = new TimerScheduler(name);
-            _cache[name] = ts;
+            scheduler = new TimerScheduler(name);
+            _cache[name] = scheduler;
 
-            return ts;
+            // 跟随默认调度器使用日志
+            if (_cache.TryGetValue("Default", out var def) && def.Log != null)
+                scheduler.Log = def.Log;
+
+            return scheduler;
         }
     }
+    private static void ClearAll()
+    {
+        var schedulers = _cache;
+        if (schedulers == null || schedulers.Count == 0) return;
 
+        XTrace.WriteLine("TimerScheduler.ClearAll [{0}]", schedulers.Count);
+        foreach (var item in schedulers)
+        {
+            item.Value.Dispose();
+        }
+
+        schedulers.Clear();
+    }
     /// <summary>默认调度器</summary>
     public static TimerScheduler Default { get; } = Create("Default");
 
@@ -42,7 +64,54 @@ public class TimerScheduler : ILogFeature
     /// <summary>全局时间提供者。影响所有调度器</summary>
     public static TimeProvider GlobalTimeProvider { get; set; } = TimeProvider.System;
     #endregion
+    #region 构造
+    private TimerScheduler(String name) => Name = name;
 
+    /// <summary>销毁</summary>
+    public void Dispose()
+    {
+        if (_disposing) return;
+        _disposing = true;
+
+        WriteLog("正在销毁定时调度器：{0}", Name);
+
+        // 先设置退出标志，然后唤醒调度线程
+        Wake();
+
+        // 等待调度线程退出，最多等待5秒
+        var th = thread;
+        if (th?.IsAlive == true)
+        {
+            if (!th.Join(5000))
+            {
+#if NETFRAMEWORK
+                try
+                {
+                    WriteLog("调度线程未能在5秒内退出，强制终止");
+                    // 在.NET Framework中可以使用Abort，但在现代.NET中已移除
+                    th.Abort();
+                }
+                catch { }
+#endif
+            }
+        }
+
+        var ts = Timers?.ToList();
+        if (ts?.Count > 0)
+        {
+            XTrace.WriteLine("{0}Timer.ClearAll [{1}]", Name, ts.Count);
+            foreach (var item in ts)
+            {
+                item.Dispose();
+            }
+        }
+
+        // 清理资源
+        _waitForTimer?.Dispose();
+        _waitForTimer = null;
+        thread = null;
+    }
+    #endregion
     #region 属性
     /// <summary>名称</summary>
     public String Name { get; private set; }
@@ -58,7 +127,7 @@ public class TimerScheduler : ILogFeature
 
     private Thread? thread;
     private Int32 _tid;
-
+    private volatile Boolean _disposing;
     private TimerX[] Timers = [];
     #endregion
 
@@ -68,8 +137,8 @@ public class TimerScheduler : ILogFeature
     public void Add(TimerX timer)
     {
         if (timer == null) throw new ArgumentNullException(nameof(timer));
-
-        using var span = DefaultTracer.Instance?.NewSpan("timer:Add", timer.ToString());
+        if (_disposing) throw new ObjectDisposedException(nameof(TimerScheduler));
+        using var span = DefaultTracer.Instance?.NewSpan("timer:Add", new { Name, timer = timer.ToString() });
 
         timer.Id = Interlocked.Increment(ref _tid);
         WriteLog("Timer.Add {0}", timer);
@@ -107,7 +176,7 @@ public class TimerScheduler : ILogFeature
     {
         if (timer == null || timer.Id == 0) return;
 
-        using var span = DefaultTracer.Instance?.NewSpan("timer:Remove", reason + " " + timer);
+        using var span = DefaultTracer.Instance?.NewSpan("timer:Remove", new { Name, timer = timer.ToString(), reason });
         WriteLog("Timer.Remove {0} reason:{1}", timer, reason);
 
         lock (lockThis)
@@ -143,7 +212,7 @@ public class TimerScheduler : ILogFeature
     private void Process(Object? state)
     {
         //Current = this;
-        while (true)
+        while (!_disposing)
         {
             // 准备好定时器列表
             var arr = Timers;
@@ -168,6 +237,8 @@ public class TimerScheduler : ILogFeature
                 _period = 60_000;
                 foreach (var timer in arr)
                 {
+                    // 如果正在销毁，跳出循环
+                    if (_disposing) break;
                     if ((timer.Reentrant || !timer.Calling) && CheckTime(timer, now))
                     {
                         // 必须在主线程设置状态，否则可能异步线程还没来得及设置开始状态，主线程又开始了新的一轮调度
@@ -197,10 +268,13 @@ public class TimerScheduler : ILogFeature
             catch (ThreadAbortException) { break; }
             catch (ThreadInterruptedException) { break; }
             catch { }
-
+            // 如果正在销毁，立即退出
+            if (_disposing) break;
             _waitForTimer ??= new AutoResetEvent(false);
             if (_period > 0) _waitForTimer.WaitOne(_period, true);
         }
+
+        WriteLog("调度线程已退出：{0}", Name);
     }
 
     /// <summary>检查定时器是否到期</summary>

@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Data;
 using System.Data.Common;
+using System.IO.Compression;
 using System.Reflection;
 using System.Runtime.Serialization;
 using System.Xml;
@@ -31,6 +32,9 @@ public class DbTable : IEnumerable<DbRow>, ICloneable, IAccessor
 
     /// <summary>总行数</summary>
     public Int32 Total { get; set; }
+    #endregion
+
+    #region 构造
     #endregion
 
     #region 从数据库读取
@@ -213,82 +217,117 @@ public class DbTable : IEnumerable<DbRow>, ICloneable, IAccessor
     private const Byte _Ver = 3;
     private const String MAGIC = "NewLifeDbTable";
 
+    /// <summary>创建二进制序列化器</summary>
+    /// <param name="stream">数据流</param>
+    /// <returns></returns>
+    public Binary CreateBinary(Stream stream) => new(stream) { FullTime = true, EncodeInt = true };
+
     /// <summary>从数据流读取</summary>
     /// <param name="stream"></param>
-    public void Read(Stream stream)
+    public Int64 Read(Stream stream)
     {
-        var bn = new Binary
-        {
-            FullTime = true,
-            EncodeInt = true,
-            Stream = stream,
-        };
+        var bn = CreateBinary(stream);
 
         // 读取头部
-        ReadHeader(bn);
+        var rs = ReadHeader(bn);
 
         // 读取全部数据
-        ReadData(bn, Total);
+        rs += ReadData(bn, Total);
+
+        return rs;
     }
 
-    /// <summary>读取头部</summary>
-    /// <param name="bn"></param>
-    public void ReadHeader(Binary bn)
+    /// <summary>读取头部。获取列名、类型和行数等信息</summary>
+    /// <param name="binary">二进制序列化器</param>
+    public Int64 ReadHeader(Binary binary)
     {
+        var pStart = binary.Total;
+
         // 头部，幻数、版本和标记
-        var magic = bn.ReadBytes(MAGIC.Length).ToStr();
+        var magic = binary.ReadBytes(MAGIC.Length).ToStr();
         if (magic != MAGIC) throw new InvalidDataException();
 
-        var ver = bn.Read<Byte>();
-        _ = bn.Read<Byte>();
+        var ver = binary.Read<Byte>();
+        _ = binary.Read<Byte>();
 
         // 版本兼容
         if (ver > _Ver) throw new InvalidDataException($"DbTable[ver={_Ver}] Unable to support newer versions [{ver}]");
 
         // v3开始支持FullTime
-        if (ver < 3) bn.FullTime = false;
+        if (ver < 3) binary.FullTime = false;
 
         // 读取头部
-        var count = bn.Read<Int32>();
+        var count = binary.Read<Int32>();
         var cs = new String[count];
         var ts = new Type[count];
         for (var i = 0; i < count; i++)
         {
-            cs[i] = bn.Read<String>() + string.Empty;
+            cs[i] = binary.Read<String>() + "";
 
             // 复杂类型写入类型字符串
-            var tc = (TypeCode)bn.Read<Byte>();
+            var tc = (TypeCode)binary.Read<Byte>();
             if (tc != TypeCode.Object)
                 ts[i] = Type.GetType("System." + tc) ?? typeof(Object);
             else if (ver >= 2)
-                ts[i] = Type.GetType(bn.Read<String>() + "") ?? typeof(Object);
+                ts[i] = Type.GetType(binary.Read<String>() + "") ?? typeof(Object);
         }
         Columns = cs;
         Types = ts;
 
-        Total = bn.ReadBytes(4).ToInt();
+        Total = binary.ReadBytes(4).ToInt();
+
+        return binary.Total - pStart;
     }
 
     /// <summary>读取数据</summary>
-    /// <param name="bn"></param>
-    /// <param name="rows"></param>
+    /// <param name="binary">二进制序列化器</param>
+    /// <param name="rows">行数</param>
     /// <returns></returns>
-    public void ReadData(Binary bn, Int32 rows)
+    public Int64 ReadData(Binary binary, Int32 rows)
     {
-        if (rows <= 0) return;
+        if (rows <= 0) return 0;
+
+        var pStart = binary.Total;
+
+        Rows = ReadRows(binary, rows).ToList();
+
+        return binary.Total - pStart;
+    }
+
+    /// <summary>使用迭代器模式读取行数据。调用者可以一边读取一边处理数据</summary>
+    /// <param name="binary">二进制序列化器</param>
+    /// <param name="rows">行数。传入-1时，循环遍历数据流</param>
+    /// <returns></returns>
+    /// <exception cref="ArgumentNullException"></exception>
+    public IEnumerable<Object?[]> ReadRows(Binary binary, Int32 rows)
+    {
+        if (rows == 0) yield break;
 
         var ts = Types ?? throw new ArgumentNullException(nameof(Types));
-        var rs = new List<Object?[]>(rows);
-        for (var k = 0; k < rows; k++)
+        if (rows > 0)
         {
-            var row = new Object?[ts.Length];
-            for (var i = 0; i < ts.Length; i++)
+            for (var k = 0; k < rows; k++)
             {
-                row[i] = bn.Read(ts[i]);
+                var row = new Object?[ts.Length];
+                for (var i = 0; i < ts.Length; i++)
+                {
+                    row[i] = binary.Read(ts[i]);
+                }
+                yield return row;
             }
-            rs.Add(row);
         }
-        Rows = rs;
+        else
+        {
+            while (!binary.EndOfStream)
+            {
+                var row = new Object?[ts.Length];
+                for (var i = 0; i < ts.Length; i++)
+                {
+                    row[i] = binary.Read(ts[i]);
+                }
+                yield return row;
+            }
+        }
     }
 
     /// <summary>读取</summary>
@@ -319,10 +358,34 @@ public class DbTable : IEnumerable<DbRow>, ICloneable, IAccessor
     }
 
     /// <summary>从文件加载</summary>
-    /// <param name="file"></param>
+    /// <param name="file">文件路径</param>
     /// <param name="compressed">是否压缩</param>
     /// <returns></returns>
     public Int64 LoadFile(String file, Boolean compressed = false) => file.AsFile().OpenRead(compressed, s => Read(s));
+
+    /// <summary>使用迭代器模式加载文件数据。调用者可以一边读取一边处理数据</summary>
+    /// <param name="file">文件路径。gz文件自动使用压缩</param>
+    /// <returns></returns>
+    /// <exception cref="ArgumentNullException"></exception>
+    public IEnumerable<Object?[]> LoadRows(String file)
+    {
+        if (file.IsNullOrEmpty()) throw new ArgumentNullException(nameof(file));
+
+        using var fs = file.AsFile().OpenRead();
+        var bn = CreateBinary(fs);
+
+        // 解压缩
+        if (file.EndsWithIgnoreCase(".gz"))
+            bn.Stream = new GZipStream(fs, CompressionMode.Decompress);
+
+        ReadHeader(bn);
+
+        // 有些场景生成db文件时，无法在开始写入长度。
+        var rows = Total;
+        if (rows == 0 && fs.Length > 0) rows = -1;
+
+        return ReadRows(bn, rows);
+    }
 
     Boolean IAccessor.Read(Stream stream, Object? context)
     {
@@ -334,82 +397,89 @@ public class DbTable : IEnumerable<DbRow>, ICloneable, IAccessor
     #region 二进制写入
     /// <summary>写入数据流</summary>
     /// <param name="stream"></param>
-    public void Write(Stream stream)
+    public Int64 Write(Stream stream)
     {
-        var bn = new Binary
-        {
-            FullTime = true,
-            EncodeInt = true,
-            Stream = stream,
-        };
+        var bn = CreateBinary(stream);
 
         // 写入数据体
         var rs = Rows;
         if (Total == 0 && rs != null) Total = rs.Count;
 
         // 写入头部
-        WriteHeader(bn);
+        var bs = WriteHeader(bn);
 
         // 写入数据行
-        WriteData(bn);
+        bs += WriteData(bn);
+
+        return bs;
     }
 
     /// <summary>写入头部到数据流</summary>
-    /// <param name="bn"></param>
-    public void WriteHeader(Binary bn)
+    /// <param name="binary">二进制序列化器</param>
+    public Int64 WriteHeader(Binary binary)
     {
         var cs = Columns ?? throw new ArgumentNullException(nameof(Columns));
         var ts = Types ?? throw new ArgumentNullException(nameof(Types));
 
+        var pStart = binary.Total;
+
         // 头部，幻数、版本和标记
         var buf = MAGIC.GetBytes();
-        bn.Write(buf, 0, buf.Length);
-        bn.Write(_Ver);
-        bn.Write(0);
+        binary.Write(buf, 0, buf.Length);
+        binary.Write(_Ver);
+        binary.Write(0);
 
         // 写入头部
         var count = cs.Length;
-        bn.Write(count);
+        binary.Write(count);
         for (var i = 0; i < count; i++)
         {
-            bn.Write(cs[i]);
+            binary.Write(cs[i]);
 
             // 复杂类型写入类型字符串
             var code = ts[i].GetTypeCode();
-            bn.Write((Byte)code);
-            if (code == TypeCode.Object) bn.Write(ts[i].FullName);
+            binary.Write((Byte)code);
+            if (code == TypeCode.Object) binary.Write(ts[i].FullName);
         }
 
         // 数据行数
-        bn.Write(Total.GetBytes(), 0, 4);
+        binary.Write(Total.GetBytes(), 0, 4);
+
+        return binary.Total - pStart;
     }
 
     /// <summary>写入数据部分到数据流</summary>
-    /// <param name="bn"></param>
-    public void WriteData(Binary bn)
+    /// <param name="binary">二进制序列化器</param>
+    public Int64 WriteData(Binary binary)
     {
         var ts = Types ?? throw new ArgumentNullException(nameof(Types));
         var rs = Rows;
-        if (rs == null) return;
+        if (rs == null) return 0;
+
+        var pStart = binary.Total;
 
         // 写入数据
         foreach (var row in rs)
         {
             for (var i = 0; i < row.Length; i++)
             {
-                bn.Write(row[i], ts[i]);
+                binary.Write(row[i], ts[i]);
             }
         }
+
+        return binary.Total - pStart;
     }
 
     /// <summary>写入数据部分到数据流</summary>
-    /// <param name="bn"></param>
+    /// <param name="binary">二进制序列化器</param>
     /// <param name="fields">要写入的字段序列</param>
-    public void WriteData(Binary bn, Int32[] fields)
+    public Int64 WriteData(Binary binary, Int32[] fields)
     {
         var ts = Types ?? throw new ArgumentNullException(nameof(Types));
         var rs = Rows;
-        if (rs == null) return;
+        if (rs == null) return 0;
+
+        var pStart = binary.Total;
 
         // 写入数据，按照指定的顺序
         foreach (var row in rs)
@@ -419,11 +489,71 @@ public class DbTable : IEnumerable<DbRow>, ICloneable, IAccessor
                 // 找到目标顺序，实际上几乎不可能出现-1
                 var idx = fields[i];
                 if (idx >= 0)
-                    bn.Write(row[idx], ts[idx]);
+                    binary.Write(row[idx], ts[idx]);
                 else
-                    bn.Write(null, ts[idx]);
+                    binary.Write(null, ts[idx]);
             }
         }
+
+        return binary.Total - pStart;
+    }
+
+    /// <summary>使用迭代器模式写入数据。调用方可以一边处理数据一边写入</summary>
+    /// <param name="binary">二进制序列化器</param>
+    /// <param name="rows">数据源</param>
+    /// <param name="fields">要写入的字段序列</param>
+    /// <exception cref="ArgumentNullException"></exception>
+    public Int32 WriteRows(Binary binary, IEnumerable<Object?[]> rows, Int32[]? fields = null)
+    {
+        if (rows == null) throw new ArgumentNullException(nameof(rows));
+        var ts = Types ?? throw new ArgumentNullException(nameof(Types));
+
+        // 写入数据
+        var count = 0;
+        foreach (var row in rows)
+        {
+            WriteRow(binary, row, fields);
+
+            count++;
+        }
+
+        return count;
+    }
+
+    /// <summary>写入一行数据</summary>
+    /// <param name="binary"></param>
+    /// <param name="row"></param>
+    /// <param name="fields"></param>
+    /// <exception cref="ArgumentNullException"></exception>
+    public Int64 WriteRow(Binary binary, Object?[] row, Int32[]? fields = null)
+    {
+        if (row == null) throw new ArgumentNullException(nameof(row));
+        var ts = Types ?? throw new ArgumentNullException(nameof(Types));
+
+        var pStart = binary.Total;
+
+        // 写入数据
+        if (fields == null)
+        {
+            for (var i = 0; i < row.Length; i++)
+            {
+                binary.Write(row[i], ts[i]);
+            }
+        }
+        else
+        {
+            for (var i = 0; i < fields.Length; i++)
+            {
+                // 找到目标顺序，实际上几乎不可能出现-1
+                var idx = fields[i];
+                if (idx >= 0)
+                    binary.Write(row[idx], ts[idx]);
+                else
+                    binary.Write(null, ts[idx]);
+            }
+        }
+
+        return binary.Total - pStart;
     }
 
     /// <summary>转数据包</summary>
@@ -449,7 +579,33 @@ public class DbTable : IEnumerable<DbRow>, ICloneable, IAccessor
     /// <param name="file"></param>
     /// <param name="compressed">是否压缩</param>
     /// <returns></returns>
-    public void SaveFile(String file, Boolean compressed = false) => file.AsFile().OpenWrite(compressed, s => Write(s));
+    public Int64 SaveFile(String file, Boolean compressed = false) => file.AsFile().OpenWrite(compressed, s => Write(s));
+
+    /// <summary>使用迭代器模式写入多行数据到文件。调用者可以一边处理数据一边写入</summary>
+    /// <param name="file">文件路径。gz文件自动使用压缩</param>
+    /// <param name="rows">数据源</param>
+    /// <param name="fields">要写入的字段序列</param>
+    /// <exception cref="ArgumentNullException"></exception>
+    public Int32 SaveRows(String file, IEnumerable<Object?[]> rows, Int32[]? fields = null)
+    {
+        if (file.IsNullOrEmpty()) throw new ArgumentNullException(nameof(file));
+
+        file = file.GetFullPath().EnsureDirectory(true);
+        using var fs = new FileStream(file, FileMode.OpenOrCreate, FileAccess.Write, FileShare.ReadWrite);
+        var bn = CreateBinary(fs);
+
+        // 压缩
+        if (file.EndsWithIgnoreCase(".gz"))
+            bn.Stream = new GZipStream(fs, CompressionMode.Compress);
+
+        WriteHeader(bn);
+        var count = WriteRows(bn, rows, fields);
+
+        // 如果文件已存在，此处截掉多余部分
+        fs.SetLength(fs.Position);
+
+        return count;
+    }
 
     Boolean IAccessor.Write(Stream stream, Object? context)
     {
@@ -511,7 +667,7 @@ public class DbTable : IEnumerable<DbRow>, ICloneable, IAccessor
         //    for (var i = 0; i < Columns.Length; i++)
         //    {
         //        var elm = doc.CreateElement(Columns[i]);
-        //        elm.InnerText = row[i] + string.Empty;
+        //        elm.InnerText = row[i] + "";
         //        dr.AppendChild(elm);
         //    }
         //    root.AppendChild(dr);
@@ -600,26 +756,38 @@ public class DbTable : IEnumerable<DbRow>, ICloneable, IAccessor
     }
     #endregion
 
-    #region 反射
+    #region 读写模型
     /// <summary>写入模型列表</summary>
     /// <typeparam name="T"></typeparam>
     /// <param name="models"></param>
     public void WriteModels<T>(IEnumerable<T> models)
     {
         // 可用属性
-        var pis = typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance);
+        var pis = typeof(T).GetProperties(true);
         pis = pis.Where(e => e.PropertyType.IsBaseType()).ToArray();
 
-        Rows = [];
+        // 头部
+        if (Columns == null || Columns.Length == 0)
+        {
+            Columns = pis.Select(e => SerialHelper.GetName(e)).ToArray();
+            Types = pis.Select(e => e.PropertyType).ToArray();
+        }
+
+        Rows = Cast<T>(models).ToList();
+    }
+
+    /// <summary>模型列表转为对象数组行。支持WriteRows/SaveRows实现一边处理一边写入</summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="models"></param>
+    /// <returns></returns>
+    public IEnumerable<Object?[]> Cast<T>(IEnumerable<T> models)
+    {
+        // 可用属性
+        var pis = typeof(T).GetProperties(true);
+        pis = pis.Where(e => e.PropertyType.IsBaseType()).ToArray();
+
         foreach (var item in models)
         {
-            // 头部
-            if (Columns == null || Columns.Length == 0)
-            {
-                Columns = pis.Select(e => SerialHelper.GetName(e)).ToArray();
-                Types = pis.Select(e => e.PropertyType).ToArray();
-            }
-
             var row = new Object?[Columns.Length];
             for (var i = 0; i < row.Length; i++)
             {
@@ -632,7 +800,7 @@ public class DbTable : IEnumerable<DbRow>, ICloneable, IAccessor
                         row[i] = item.GetValue(pis[i]);
                 }
             }
-            Rows.Add(row);
+            yield return row;
         }
     }
 
@@ -780,9 +948,9 @@ public class DbTable : IEnumerable<DbRow>, ICloneable, IAccessor
     {
         var dt = new DbTable
         {
-            Columns = Columns,
-            Types = Types,
-            Rows = Rows,
+            Columns = Columns.ToArray(),
+            Types = Types.ToArray(),
+            Rows = Rows.ToList(),
             Total = Total
         };
 

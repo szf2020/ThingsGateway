@@ -77,7 +77,7 @@ public class WriteLogEventArgs : EventArgs
 
     void Init()
     {
-        // todo: 如果系统使用utc时间，可以把日志时间转换为本地时间
+        //如果系统使用utc时间，可以把日志时间转换为本地时间
         Time = DateTime.Now.AddHours(Setting.Current.UtcIntervalHours);
         var thread = Thread.CurrentThread;
         ThreadID = thread.ManagedThreadId;
@@ -124,10 +124,10 @@ public class WriteLogEventArgs : EventArgs
 
         var name = ThreadName;
         if (name.IsNullOrEmpty()) name = TaskID >= 0 ? TaskID + "" : "-";
-        if (name.EqualIgnoreCase("Threadpool worker", ".NET ThreadPool Worker")) name = TaskID >= 0 ? TaskID + "" : "P";
+        if (name.EqualIgnoreCase("Threadpool worker", ".NET ThreadPool Worker", ".NET TP Worker", "Thread Pool Worker")) name = TaskID >= 0 ? TaskID + "" : "TP";
         if (name.EqualIgnoreCase("IO Threadpool worker")) name = "IO";
         if (name.EqualIgnoreCase(".NET Long Running Task")) name = "LongTask";
-        if (name.EqualIgnoreCase(".NET TP Worker")) name = "TP";
+        //if (name.EqualIgnoreCase(".NET TP Worker")) name = "TP";
 
         //return $"{Time:HH:mm:ss.fff} {ThreadID,2} {(IsPool ? (IsWeb ? 'W' : 'Y') : 'N')} {name} {Message}";
 

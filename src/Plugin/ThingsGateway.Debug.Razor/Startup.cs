@@ -18,8 +18,9 @@ public class Startup : AppStartup
     public void ConfigureApp(IServiceCollection services)
     {
         services.AddScoped<IPlatformService, HybridPlatformService>()
-   .AddScoped<IAppVersionService, VersionService>()
-   .AddScoped<IMenuService, DefaultMenuService>();
+           .AddScoped<IDownloadPlatformService, HybridDownloadPlatformService>()
+           .AddScoped<IAppVersionService, VersionService>()
+           .AddScoped<IMenuService, DefaultMenuService>();
     }
 
     public void Use(IServiceProvider serviceProvider)

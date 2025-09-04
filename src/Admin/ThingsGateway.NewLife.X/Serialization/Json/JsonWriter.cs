@@ -38,8 +38,6 @@ public class JsonWriter
     ///// <summary>智能缩进，内层不换行。默认false</summary>
     //public Boolean SmartIndented { get; set; }
 
-    /// <summary>长整型作为字符串序列化。避免长整型传输给前端时精度丢失，只有值真的超过前端接受范围时才会进行转换，默认false</summary>
-    public Boolean Int64AsString { get; set; }
 
     ///// <summary>整数序列化为十六进制</summary>
     //public Boolean IntAsHex { get; set; }
@@ -70,13 +68,7 @@ public class JsonWriter
     /// <returns></returns>
     public static String ToJson(Object obj, Boolean indented = false, Boolean nullValue = true, Boolean camelCase = false)
     {
-        var jw = new JsonWriter
-        {
-            //IgnoreNullValues = !nullValue,
-            //CamelCase = camelCase,
-            //Indented = indented,
-            //SmartIndented = indented,
-        };
+        var jw = new JsonWriter();
         jw.Options.IgnoreNullValues = !nullValue;
         jw.Options.CamelCase = camelCase;
         jw.Options.WriteIndented = indented;
@@ -94,14 +86,7 @@ public class JsonWriter
     /// <returns></returns>
     public static String ToJson(Object obj, JsonOptions jsonOptions)
     {
-        var jw = new JsonWriter
-        {
-            //IgnoreNullValues = jsonOptions.IgnoreNullValues,
-            //CamelCase = jsonOptions.CamelCase,
-            //Indented = jsonOptions.WriteIndented,
-            //IgnoreCycles = jsonOptions.IgnoreCycles,
-            Options = jsonOptions,
-        };
+        var jw = new JsonWriter { Options = jsonOptions };
 
         jw.WriteValue(obj);
 
@@ -132,9 +117,9 @@ public class JsonWriter
             WriteStringFast(obj + "");
         else if (obj is Boolean)
             _Builder.Append((obj + "").ToLower());
-        else if ((obj is Int64 vInt64) && Int64AsString && (vInt64 > 9007199254740991 || vInt64 < -9007199254740991))
+        else if ((obj is Int64 vInt64) && Options.Int64AsString && (vInt64 > 9007199254740991 || vInt64 < -9007199254740991))
             WriteStringFast(obj + "");
-        else if ((obj is UInt64 vUInt64) && Int64AsString && vUInt64 > 9007199254740991)
+        else if ((obj is UInt64 vUInt64) && Options.Int64AsString && vUInt64 > 9007199254740991)
             WriteStringFast(obj + "");
         else if (
             obj is Int32 or Int64 or Double or

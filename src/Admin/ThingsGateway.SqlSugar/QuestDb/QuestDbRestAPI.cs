@@ -5,6 +5,7 @@ using CsvHelper.TypeConversion;
 using Newtonsoft.Json;
 
 using System.Collections;
+using System.Data;
 using System.Data.Common;
 using System.Globalization;
 using System.Net.Http.Headers;
@@ -114,6 +115,57 @@ namespace ThingsGateway.SqlSugar
         }
 
         private static readonly HttpClient client = new HttpClient();
+
+
+        /// <summary>
+        /// 批量快速插入异步（DataTable重载）
+        /// </summary>
+        /// <param name="dataTable">要插入的数据表</param>
+        /// <param name="tableName">目标表名</param>
+        /// <param name="dateFormat">导入时，时间格式 默认:yyyy/M/d H:mm:ss</param>
+        /// <returns></returns>
+        public Task<int> BulkCopyAsync(string tableName, DataTable dataTable, string dateFormat = "yyyy/M/d H:mm:ss")
+        {
+            Check.ExceptionEasy(string.IsNullOrEmpty(tableName), "need tablaeName ", "需要 tablaeNam  设置表名");
+            var className = "QuestDbBulkMerge_" + false + tableName.GetNonNegativeHashCodeString();
+            var builder = this.db.DynamicBuilder().CreateClass(className, new SugarTable()
+            {
+                TableName = tableName
+            });
+            foreach (DataColumn item in dataTable.Columns)
+            {
+                var propertyType = item.DataType;
+                builder.CreateProperty(item.ColumnName, propertyType, new SugarColumn()
+                {
+                    IsNullable = true,
+                });
+            }
+            var dicList = this.db.Utilities.DataTableToDictionaryList(dataTable);
+            var type = builder.WithCache().BuilderType();
+            var value = this.db.DynamicBuilder().CreateObjectByType(type, dicList);
+            var newValue = UtilMethods.ConvertToObjectList(type, value); ;
+            var bulkCopyMethods = this.GetType().GetMethods().Where(s => s.Name == "BulkCopyAsync");
+            // 替换原来的 bulkCopyMethods.Last() 逻辑
+            var bulkCopyMethod = bulkCopyMethods.FirstOrDefault(m =>
+            {
+                var parameters = m.GetParameters();
+                return parameters.Length > 0 &&
+                       parameters[0].ParameterType.IsGenericType &&
+                       parameters[0].ParameterType.GetGenericTypeDefinition() == typeof(List<>);
+            });
+            if (bulkCopyMethod == null)
+                throw new InvalidOperationException("未找到第一个参数为集合的 BulkCopyAsync 方法");
+            var task = (Task<int>)bulkCopyMethod.MakeGenericMethod(type).Invoke(this, new object[] { newValue, dateFormat });
+            return task;
+        }
+
+        /// <summary>
+        /// 批量快速插入
+        /// </summary>
+        public int BulkCopy(string tableName, DataTable dataTable, string dateFormat = "yyyy/M/d H:mm:ss")
+        {
+            return BulkCopyAsync(tableName, dataTable, dateFormat).GetAwaiter().GetResult();
+        }
 
         /// <summary>
         /// 异步批量快速插入数据

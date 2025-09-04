@@ -1,4 +1,4 @@
-﻿<!-- HTML for static distribution bundle build -->
+<!-- HTML for static distribution bundle build -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -394,7 +394,9 @@
             if (loginObject && loginObject.Enabled === true) {
                 var loginForm = document.getElementById("login-form");
                 var userName = document.getElementById("userName");
+                userName.value = loginObject.DefaultUsername;
                 var password = document.getElementById("password");
+                password.value = loginObject.DefaultPassword;
                 var submit = document.getElementById("submit");
                 var loginError = document.getElementById("login-error");
                 loginForm.style.display = "block";

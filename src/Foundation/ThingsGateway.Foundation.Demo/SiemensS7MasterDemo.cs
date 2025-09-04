@@ -13,7 +13,6 @@ using ThingsGateway.NewLife.Json.Extension;
 
 namespace ThingsGateway.Foundation.Demo;
 
-#pragma warning disable CA2007 // 考虑对等待的任务调用 ConfigureAwait
 #pragma warning disable CA1861 // 不要将常量数组作为参数
 
 /// <summary>

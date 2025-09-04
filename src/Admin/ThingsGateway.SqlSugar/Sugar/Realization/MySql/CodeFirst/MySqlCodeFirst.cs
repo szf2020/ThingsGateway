@@ -31,6 +31,7 @@
         protected override DbColumnInfo EntityColumnToDbColumn(EntityInfo entityInfo, string tableName, EntityColumnInfo item)
         {
             var propertyType = UtilMethods.GetUnderType(item.PropertyInfo);
+            UtilMethods.SetDefaultValueForBoolean(item, propertyType);
             var result = new DbColumnInfo()
             {
                 TableId = entityInfo.Columns.IndexOf(item),

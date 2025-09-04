@@ -1177,7 +1177,7 @@ internal sealed partial class SchedulerFactory
     }
 
     /// <summary>
-    /// 立即执行作业
+    /// 手动执行作业
     /// </summary>
     /// <param name="jobId">作业 Id</param>
     /// <param name="scheduler">作业计划</param>
@@ -1204,7 +1204,7 @@ internal sealed partial class SchedulerFactory
     }
 
     /// <summary>
-    /// 立即执行作业
+    /// 手动执行作业
     /// </summary>
     /// <param name="jobIds">作业 Id 集合</param>
     public void RunJob(params string[] jobIds)
@@ -1219,7 +1219,7 @@ internal sealed partial class SchedulerFactory
     }
 
     /// <summary>
-    /// 立即执行作业
+    /// 手动执行作业
     /// </summary>
     /// <param name="scheduler">作业计划</param>
     /// <param name="triggerId">作业触发器 Id</param>
@@ -1230,7 +1230,7 @@ internal sealed partial class SchedulerFactory
     }
 
     /// <summary>
-    /// 立即执行作业
+    /// 手动执行作业
     /// </summary>
     /// <param name="schedulers">作业计划集合</param>
     public void RunJob(params IScheduler[] schedulers)

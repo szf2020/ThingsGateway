@@ -33,7 +33,7 @@ public class Pool<T> : IPool<T> where T : class
     public Pool(Int32 max = 0)
     {
         if (max <= 0) max = Environment.ProcessorCount * 2;
-
+        if (max < 8) max = 8;
         Max = max;
     }
 

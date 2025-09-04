@@ -285,7 +285,10 @@ public static partial class HttpRemoteExtensions
         // 获取内容编码
         var charset = httpContent.Headers.ContentType?.CharSet ?? "utf-8";
         var partialContent = Encoding.GetEncoding(charset).GetString(buffer, 0, bytesToShow);
-
+        // 解决退格导致显示不全问题：保留 \n 和 \r，仅过滤其他 ASCII 控制字符（ASCII < 32 且不是 \n 或 \r）
+        partialContent = new string(partialContent
+            .Where(c => c >= 32 || c == '\n' || c == '\r')
+            .ToArray());
         // 解决退格导致显示不全问题：保留 \n 和 \r，仅过滤其他 ASCII 控制字符（ASCII < 32 且不是 \n 或 \r）
         partialContent = new string(partialContent
             .Where(c => c >= 32 || c == '\n' || c == '\r')

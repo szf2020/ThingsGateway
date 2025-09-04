@@ -79,12 +79,32 @@ namespace ThingsGateway.SqlSugar
         /// <param name="firstName">关联属性名</param>
         /// <param name="lastName">关联属性名</param>
         /// <returns>当前实例</returns>
-        public EntityColumnable<T> OneToMany(Expression<Func<T, object>> propertyExpression, string firstName, string lastName)
+        public EntityColumnable<T> ManyToOne(Expression<Func<T, object>> propertyExpression, string firstName, string lastName = null)
+        {
+            var name = ExpressionTool.GetMemberName(propertyExpression);
+            if (entityColumnInfo.PropertyName == name && IsTable)
+            {
+                entityColumnInfo.Navigat = new Navigate(NavigateType.ManyToOne, firstName, lastName);
+                entityColumnInfo.IsIgnore = true;
+            }
+            return this;
+        }
+        public EntityColumnable<T> OneToMany(Expression<Func<T, object>> propertyExpression, string firstName, string lastName = null)
         {
             var name = ExpressionTool.GetMemberName(propertyExpression);
             if (entityColumnInfo.PropertyName == name && IsTable)
             {
                 entityColumnInfo.Navigat = new Navigate(NavigateType.OneToMany, firstName, lastName);
+                entityColumnInfo.IsIgnore = true;
+            }
+            return this;
+        }
+        public EntityColumnable<T> OneToManyByArrayList(Expression<Func<T, object>> propertyExpression, string firstName, string lastName = null)
+        {
+            var name = ExpressionTool.GetMemberName(propertyExpression);
+            if (entityColumnInfo.PropertyName == name && IsTable)
+            {
+                entityColumnInfo.Navigat = new Navigate(NavigateType.OneToManyByArrayList, firstName, lastName);
                 entityColumnInfo.IsIgnore = true;
             }
             return this;

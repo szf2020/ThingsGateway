@@ -13,7 +13,6 @@ using ThingsGateway.NewLife.Json.Extension;
 
 namespace ThingsGateway.Foundation.Demo;
 
-#pragma warning disable CA2007 // 考虑对等待的任务调用 ConfigureAwait
 #pragma warning disable CA1861 // 不要将常量数组作为参数
 
 /// <summary>
@@ -205,10 +204,6 @@ public class ModbusMasterDemo
 [GeneratorVariable]
 public partial class TestModbusObject : VariableObject
 {
-    public TestModbusObject(IDevice device, int maxPack) : base(device, maxPack)
-    {
-    }
-
     [VariableRuntime(RegisterAddress = "400001")]
     public double Double1 { get; set; }
     [VariableRuntime(RegisterAddress = "400005")]
@@ -218,4 +213,9 @@ public partial class TestModbusObject : VariableObject
     public ushort UShort3 { get; set; }
     [VariableRuntime(RegisterAddress = "4000010")]
     public ushort UShort4 { get; set; }
+
+    public TestModbusObject(IDevice device, int maxPack) : base(device, maxPack)
+    {
+    }
+
 }

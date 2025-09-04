@@ -60,8 +60,10 @@ public partial class LocalLogConsole : IDisposable
     private ICollection<LogMessage> PauseMessagesText { get; set; } = new List<LogMessage>();
 
     [Inject]
-    private IPlatformService PlatformService { get; set; }
+    private PlatformService PlatformService { get; set; }
 
+    [Inject]
+    private IDownloadPlatformService DownloadPlatformService { get; set; }
     private string logPath;
     protected override async Task OnParametersSetAsync()
     {
@@ -168,8 +170,16 @@ public partial class LocalLogConsole : IDisposable
             }
             else
             {
-                if (PlatformService != null)
-                    await PlatformService.OnLogExport(LogPath);
+                if (DownloadPlatformService is HybridDownloadPlatformService)
+                {
+                    await DownloadPlatformService.DownloadFile([LogPath]);
+                }
+                else
+                {
+                    if (PlatformService != null)
+                        await PlatformService.OnLogExport(LogPath);
+                }
+
             }
         }
         catch (Exception ex)

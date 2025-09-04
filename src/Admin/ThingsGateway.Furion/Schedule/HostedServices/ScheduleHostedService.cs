@@ -259,7 +259,9 @@ internal sealed class ScheduleHostedService : BackgroundService
                                 {
                                     // 输出重试日志
                                     _logger.LogWarning("Retrying {times}/{total} times for {jobExecutingContext}", times, total, jobExecutingContext);
-                                }).ConfigureAwait(false);
+                                }
+                                , shouldExit: () => !jobExecutingContext.IsNormalStatus(_schedulerFactory)).ConfigureAwait(false); // 处理作业或触发器不正常的情况
+
                             }
                             else
                             {
@@ -377,14 +379,15 @@ internal sealed class ScheduleHostedService : BackgroundService
                             // 记录作业触发器运行信息
                             await trigger.RecordTimelineAsync(_schedulerFactory, jobId, executionException?.ToString()).ConfigureAwait(false);
 
-                            // 重置触发模式：0:定时，1:手动
-                            trigger.Mode = 0;
 
-                            // 处理临时作业，执行完成后移除
-                            if (jobDetail.Temporary)
+                            // 处理临时作业，执行完成后移除（手动执行不会移除）
+                            if (jobDetail.Temporary && trigger.Mode == 0)
                             {
                                 scheduler.Remove();
                             }
+
+                            // 重置触发模式：0:定时，1:手动
+                            trigger.Mode = 0;
 
                             // 清空存储作业执行过程中传递的数据
                             jobExecutingContext.Items?.Clear();

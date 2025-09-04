@@ -49,6 +49,14 @@ namespace ThingsGateway.SqlSugar
                 {
                     value = AppendUnaryExp(parameter, isLeft, value, oppoSiteExpression);
                 }
+                else if (oppoSiteExpression?.Type == UtilConstants.BoolType && value is bool boolValue && parameter?.BaseParameter?.OperatorValue?.IsIn("AND", "OR") == true)
+                {
+                    value = AppendOtherBool(parameter, isLeft, boolValue ? " 1=1 " : " 1=2 ");
+                }
+                else if (isLeft == true && value is bool isTrue && parameter?.BaseParameter?.BaseExpression is BinaryExpression binaryExpression && binaryExpression.Left is UnaryExpression unaryExpression && unaryExpression.NodeType == ExpressionType.Not && ExpressionTool.GetParameters(unaryExpression).Count == 0)
+                {
+                    value = AppendOtherBool(parameter, isLeft, isTrue ? " (1=1) " : " (1=2) ");
+                }
                 else
                 {
                     value = AppendOther(parameter, isLeft, value);
@@ -87,6 +95,29 @@ namespace ThingsGateway.SqlSugar
 
             return value;
         }
+
+        private object AppendOtherBool(ExpressionParameter parameter, bool? isLeft, object value)
+        {
+            //var appendValue = this.Context.SqlParameterKeyWord + ExpressionConst.Const + Context.ParameterIndex;
+            Context.ParameterIndex++;
+            //this.Context.Parameters.Add(new SugarParameter(appendValue, value));
+            var appendValue = value + "";
+            if (isLeft == true)
+            {
+                appendValue += ExpressionConst.ExpressionReplace + parameter.BaseParameter.Index;
+            }
+            if (this.Context.Result.Contains(ExpressionConst.FormatSymbol))
+            {
+                this.Context.Result.Replace(ExpressionConst.FormatSymbol, appendValue);
+            }
+            else
+            {
+                this.Context.Result.Append(appendValue);
+            }
+
+            return value;
+        }
+
         private object AppendUnaryExp(ExpressionParameter parameter, bool? isLeft, object value, Expression oppoSiteExpression)
         {
             string appendValue = Context.SqlParameterKeyWord
@@ -241,6 +272,15 @@ namespace ThingsGateway.SqlSugar
             string parameterName = this.Context.SqlParameterKeyWord + "constant" + this.Context.ParameterIndex;
             this.Context.ParameterIndex++;
             this.Context.Parameters.Add(new SugarParameter(parameterName, paramterValue));
+            if (this.BaseParameter?.OppsiteExpression is MemberExpression member && this.BaseParameter?.BaseExpression is BinaryExpression binary && ExpressionTool.IsEqualOrLtOrGt(binary))
+            {
+                if (ExpressionTool.IsSqlParameterDbType(this.Context, member))
+                {
+                    var p = ExpressionTool.GetParameterBySqlParameterDbType(this.Context.ParameterIndex, paramterValue, this.Context, member);
+                    this.Context.Parameters.Last().DbType = p.DbType;
+                }
+            }
+
             return parameterName;
         }
         protected string AppendParameter(SugarParameter p)

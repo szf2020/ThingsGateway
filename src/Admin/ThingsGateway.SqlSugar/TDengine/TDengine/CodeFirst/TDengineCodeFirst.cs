@@ -92,6 +92,8 @@ namespace ThingsGateway.SqlSugar
             //this.Context.DbMaintenance.AddIndex(entityInfo);
             //base.CreateIndex(entityInfo);
             this.Context.DbMaintenance.AddDefaultValue(entityInfo);
+
+            STable.Tags = null;
         }
 
         /// <summary>

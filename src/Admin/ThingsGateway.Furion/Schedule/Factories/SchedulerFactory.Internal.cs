@@ -63,12 +63,6 @@ internal sealed partial class SchedulerFactory : ISchedulerFactory
     private CancellationTokenSource _sleepCancellationTokenSource;
 
     /// <summary>
-    /// GC 垃圾回收间隔
-    /// </summary>
-    /// <remarks>单位毫秒</remarks>
-    private const int GC_COLLECT_INTERVAL_MILLISECONDS = 3000;
-
-    /// <summary>
     /// 作业计划集合
     /// </summary>
     private readonly ConcurrentDictionary<string, Scheduler> _schedulers = new();
@@ -149,7 +143,8 @@ internal sealed partial class SchedulerFactory : ISchedulerFactory
 
         // 标记是否启用作业持久化
         var isSetPersistence = Persistence is not null;
-
+        // 记录保存失败的作业个数
+        var failCount = 0;
         try
         {
             // 获取持久化预设的作业计划
@@ -171,8 +166,18 @@ internal sealed partial class SchedulerFactory : ISchedulerFactory
                 {
                     schedulerBuilderObj = await Persistence.OnLoadingAsync(schedulerBuilder, stoppingToken).ConfigureAwait(false);
                 }
+                schedulerBuilderObj ??= schedulerBuilder;
 
-                _ = TrySaveJob(schedulerBuilderObj ?? schedulerBuilder, out _, false);
+                // 出现异常不应终止循环
+                try
+                {
+                    _ = TrySaveJob(schedulerBuilderObj, out _, false);
+                }
+                catch (Exception ex)
+                {
+                    failCount++;
+                    _logger.LogError(ex, "The scheduler of <{JobId}> appended failed.", schedulerBuilderObj.JobBuilder.JobId);
+                }
             }
         }
         catch (Exception ex)
@@ -190,7 +195,18 @@ internal sealed partial class SchedulerFactory : ISchedulerFactory
         //GCCollect();
 
         // 输出作业调度器初始化日志
-        if (!preloadSucceed) _logger.LogWarning("Schedule hosted service preload completed, and a total of <{Count}> schedulers are appended.", _schedulers.Count);
+        if (preloadSucceed)
+        {
+            // 输出保存失败作业的总数信息
+            if (failCount > 0)
+            {
+                _logger.LogError(new InvalidDataException($"A total of <{failCount}> failed to be appended."), "Schedule hosted service preload completed, and a total of <{Count}> schedulers are appended.", _schedulers.Count);
+            }
+            else
+            {
+                _logger.LogWarning("Schedule hosted service preload completed, and a total of <{Count}> schedulers are appended.", _schedulers.Count);
+            }
+        }
     }
 
     /// <summary>
@@ -284,7 +300,7 @@ internal sealed partial class SchedulerFactory : ISchedulerFactory
         catch (Exception ex)
         {
             // 输出非任务取消异常日志
-            if (!(ex is TaskCanceledException || (ex is AggregateException aggEx && aggEx.InnerExceptions.Count == 1 && aggEx.InnerExceptions[0] is TaskCanceledException)))
+            if (!(ex is OperationCanceledException || (ex is AggregateException aggEx && aggEx.InnerExceptions.Count == 1 && aggEx.InnerExceptions[0] is TaskCanceledException)))
             {
                 _logger.LogError(ex, ex.Message);
             }
@@ -306,15 +322,14 @@ internal sealed partial class SchedulerFactory : ISchedulerFactory
                 // 取消休眠，如果存在错误立即抛出
                 _sleepCancellationTokenSource.Cancel(true);
             }
-            // 非任务取消异常日志
-            catch (Exception ex) when (!(ex is OperationCanceledException ||
-                ex is ObjectDisposedException ||
-                (ex is AggregateException aggEx && aggEx.InnerExceptions.All(e => e is OperationCanceledException || e is ObjectDisposedException))))
+            catch (Exception ex)
             {
-                _logger.LogError(ex, $"Error canceling sleep. {ex.Message}");
-            }
-            finally
-            {
+                // 输出非任务取消异常日志
+                if (!(ex is OperationCanceledException || (ex is AggregateException aggEx && aggEx.InnerExceptions.Count == 1 && aggEx.InnerExceptions[0] is TaskCanceledException)))
+                {
+                    _logger.LogError(ex, $"Error canceling sleep. {ex.Message}");
+                }
+
                 // 重新初始化作业调度器取消休眠 Token
                 CreateCancellationTokenSource();
             }

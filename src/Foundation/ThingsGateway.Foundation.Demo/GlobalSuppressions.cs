@@ -5,5 +5,4 @@
 
 using System.Diagnostics.CodeAnalysis;
 
-[assembly: SuppressMessage("Reliability", "CA2007:考虑对等待的任务调用 ConfigureAwait", Justification = "<挂起>", Scope = "member", Target = "~M:ThingsGateway.Foundation.Demo.Program.Main(System.String[])~System.Threading.Tasks.Task")]
-[assembly: SuppressMessage("Reliability", "CA2007:考虑对等待的任务调用 ConfigureAwait", Justification = "<挂起>", Scope = "member", Target = "~M:ThingsGateway.Foundation.Demo.ModbusMasterDemo.TestRead~System.Threading.Tasks.Task")]
+[assembly: SuppressMessage("Reliability", "CA2007", Justification = "<挂起>", Scope = "module")]

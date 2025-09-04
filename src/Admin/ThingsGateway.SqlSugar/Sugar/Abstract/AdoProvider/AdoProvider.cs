@@ -1145,7 +1145,11 @@ namespace ThingsGateway.SqlSugar
         {
             return Convert.ToString(GetScalar(sql, parameters));
         }
-
+        public virtual Task<string> GetStringAsync(string sql, object parameters, CancellationToken cancellationToken)
+        {
+            this.CancellationToken = cancellationToken;
+            return GetStringAsync(sql, this.GetParameters(parameters));
+        }
         /// <summary>
         /// 异步获取字符串结果(使用对象参数)
         /// </summary>
@@ -1193,7 +1197,11 @@ namespace ThingsGateway.SqlSugar
         {
             return GetScalar(sql, parameters).ObjToInt();
         }
-
+        public virtual Task<int> GetIntAsync(string sql, object parameters, CancellationToken cancellationToken)
+        {
+            this.CancellationToken = cancellationToken;
+            return GetIntAsync(sql, this.GetParameters(parameters));
+        }
         /// <summary>
         /// 异步获取整型结果(使用对象参数)
         /// </summary>
@@ -1226,7 +1234,11 @@ namespace ThingsGateway.SqlSugar
         {
             return GetScalar(sql, parameters).ObjToMoney();
         }
-
+        public virtual Task<Double> GetDoubleAsync(string sql, object parameters, CancellationToken cancellationToken)
+        {
+            this.CancellationToken = cancellationToken;
+            return GetDoubleAsync(sql, this.GetParameters(parameters));
+        }
         /// <summary>
         /// 异步获取双精度浮点数结果(使用对象参数)
         /// </summary>
@@ -1404,7 +1416,7 @@ namespace ThingsGateway.SqlSugar
         /// <summary>
         /// 执行SQL查询并返回七个结果集
         /// </summary>
-        public Tuple<List<T>, List<T2>, List<T3>, List<T4>, List<T5>, List<T6>, List<T7>> SqlQuery<T, T2, T3, T4, T5, T6, T7>(string sql, object parameters = null)
+        public virtual Tuple<List<T>, List<T2>, List<T3>, List<T4>, List<T5>, List<T6>, List<T7>> SqlQuery<T, T2, T3, T4, T5, T6, T7>(string sql, object parameters = null)
         {
             var parsmeterArray = this.GetParameters(parameters);
             this.Context.InitMappingInfo<T>();
@@ -1557,7 +1569,7 @@ namespace ThingsGateway.SqlSugar
         /// <summary>
         /// 异步执行SQL查询并返回七个结果集
         /// </summary>
-        public async Task<Tuple<List<T>, List<T2>, List<T3>, List<T4>, List<T5>, List<T6>, List<T7>>> SqlQueryAsync<T, T2, T3, T4, T5, T6, T7>(string sql, object parameters = null)
+        public virtual async Task<Tuple<List<T>, List<T2>, List<T3>, List<T4>, List<T5>, List<T6>, List<T7>>> SqlQueryAsync<T, T2, T3, T4, T5, T6, T7>(string sql, object parameters = null)
         {
             var parsmeterArray = this.GetParameters(parameters);
             this.Context.InitMappingInfo<T>();
@@ -1759,7 +1771,11 @@ namespace ThingsGateway.SqlSugar
         {
             return GetScalar(sql, this.GetParameters(parameters));
         }
-
+        public virtual Task<object> GetScalarAsync(string sql, object parameters, CancellationToken cancellationToken)
+        {
+            this.CancellationToken = cancellationToken;
+            return GetScalarAsync(sql, this.GetParameters(parameters));
+        }
         /// <summary>
         /// 异步获取标量值(使用对象参数)
         /// </summary>
@@ -1878,7 +1894,7 @@ namespace ThingsGateway.SqlSugar
         /// <summary>
         /// 安全地移动到下一个结果集
         /// </summary>
-        private static bool NextResult(IDataReader dataReader)
+        protected bool NextResult(IDataReader dataReader)
         {
             try
             {
@@ -2243,7 +2259,7 @@ namespace ThingsGateway.SqlSugar
         /// <param name="entityType">实体类型</param>
         /// <param name="dataReader">数据读取器</param>
         /// <returns>结果列表</returns>
-        private List<TResult> GetData<TResult>(Type entityType, IDataReader dataReader)
+        protected List<TResult> GetData<TResult>(Type entityType, IDataReader dataReader)
         {
             List<TResult> result;
             if (entityType == UtilConstants.DynamicType)
@@ -2280,7 +2296,7 @@ namespace ThingsGateway.SqlSugar
         /// <param name="entityType">实体类型</param>
         /// <param name="dataReader">数据读取器</param>
         /// <returns>结果列表任务</returns>
-        private async Task<List<TResult>> GetDataAsync<TResult>(Type entityType, IDataReader dataReader)
+        protected async Task<List<TResult>> GetDataAsync<TResult>(Type entityType, IDataReader dataReader)
         {
             List<TResult> result;
             if (entityType == UtilConstants.DynamicType)

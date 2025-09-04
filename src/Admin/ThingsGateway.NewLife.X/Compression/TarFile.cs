@@ -222,7 +222,7 @@ public class TarFile : DisposeBase
             var entry = CreateEntryFromFile(fi.FullName, relativePath);
         }
 
-        Write(_stream);
+        Write(_stream!);
     }
 
     /// <summary>创建一个 Tar 归档文件，将指定目录中的所有文件打包。</summary>
@@ -474,7 +474,9 @@ public class TarEntry
         }
         else
         {
-            var buf = stream.ReadBytes(FileSize);
+            var buf = new Byte[FileSize];
+            stream.ReadExactly(buf, 0, buf.Length);
+            //var buf = stream.ReadBytes(FileSize);
             _stream = new MemoryStream(buf);
             _position = 0;
 

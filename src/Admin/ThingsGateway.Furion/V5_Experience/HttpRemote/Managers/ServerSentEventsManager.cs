@@ -220,7 +220,7 @@ internal sealed class ServerSentEventsManager
             }
 
             // 获取 HTTP 响应体中的内容流
-            using var contentStream = await httpResponseMessage.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
+            using var contentStream = (await httpResponseMessage.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false));
 
             // 初始化 StreamReader 实例
             using var streamReader = new StreamReader(contentStream, Encoding.UTF8);

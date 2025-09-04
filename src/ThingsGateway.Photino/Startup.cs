@@ -52,6 +52,7 @@ public class Startup : AppStartup
         services.AddSingleton<IClaimsPrincipalService, HybridClaimsPrincipalService>();
 
         services.AddScoped<IPlatformService, HybridPlatformService>();
+        services.AddScoped<IDownloadPlatformService, HybridDownloadPlatformService>();
         services.AddScoped<IGatewayExportService, HybridGatewayExportService>();
     }
 

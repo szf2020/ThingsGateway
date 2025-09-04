@@ -1,4 +1,6 @@
-﻿namespace ThingsGateway.NewLife.Model;
+﻿using ThingsGateway.NewLife.Data;
+
+namespace ThingsGateway.NewLife.Model;
 
 /// <summary>模型扩展</summary>
 public static class ModelExtension
@@ -80,8 +82,29 @@ public static class ModelExtension
     /// <summary>创建范围作用域，该作用域内提供者解析一份数据</summary>
     /// <param name="provider">服务提供者</param>
     /// <returns></returns>
-    public static IServiceScope? CreateScope(this IServiceProvider provider) => provider.GetService<IServiceScopeFactory>()?.CreateScope();
+    public static IServiceScope? CreateScope(this IServiceProvider provider)
+    {
+        var factory = provider.GetService<IServiceScopeFactory>();
 
+        // 如果工厂内提供者不是现在的提供者，则重新设置
+        if (factory == null || factory is IServiceScopeFactory scopeFactory && scopeFactory != provider)
+        {
+            if (provider is IExtend extend)
+            {
+#pragma warning disable CA1859
+                if (extend["__IServiceScopeFactory"] is not IServiceScopeFactory factory2)
+                {
+                    factory2 = new MyServiceScopeFactory { ServiceProvider = provider };
+                    extend["__IServiceScopeFactory"] = factory2;
+                }
+#pragma warning restore CA1859
+
+                return factory2.CreateScope();
+            }
+        }
+
+        return factory?.CreateScope();
+    }
     /// <summary>创建服务对象，使用服务提供者来填充构造函数</summary>
     /// <param name="provider">服务提供者</param>
     /// <param name="serviceType">服务类型</param>

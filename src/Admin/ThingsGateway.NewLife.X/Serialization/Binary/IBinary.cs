@@ -31,6 +31,10 @@ public interface IBinary : IFormatterX
     /// <param name="count">要写入的字节数。</param>
     void Write(Byte[] buffer, Int32 offset, Int32 count);
 
+    /// <summary>写入数据</summary>
+    /// <param name="buffer"></param>
+    void Write(ReadOnlySpan<Byte> buffer);
+
     /// <summary>写入大小</summary>
     /// <param name="size">要写入的大小值</param>
     /// <returns>返回特性指定的固定长度，如果没有则返回-1</returns>
@@ -42,14 +46,37 @@ public interface IBinary : IFormatterX
     /// <returns></returns>
     Byte ReadByte();
 
+    /// <summary>尝试从当前流中读取一个字节</summary>
+    /// <param name="value"></param>
+    /// <returns></returns>
+    Boolean TryReadByte(out Byte value);
+
     /// <summary>从当前流中将 count 个字节读入字节数组</summary>
     /// <param name="count">要读取的字节数。</param>
     /// <returns></returns>
     Byte[] ReadBytes(Int32 count);
 
+#if NETCOREAPP || NETSTANDARD2_1
+    /// <summary>从当前流中读取字节数组</summary>
+    /// <param name="span">字节数组</param>
+    /// <returns></returns>
+    Int32 ReadBytes(Span<Byte> span);
+#endif
+
+    /// <summary>从当前流中读取字节数组</summary>
+    /// <param name="buffer">字节数组</param>
+    /// <param name="offset">偏移量</param>
+    /// <param name="count">个数</param>
+    /// <returns></returns>
+    Int32 ReadBytes(Byte[] buffer, Int32 offset, Int32 count);
+
     /// <summary>读取大小</summary>
     /// <returns></returns>
     Int32 ReadSize();
+
+    /// <summary>读取大小</summary>
+    /// <returns></returns>
+    Boolean TryReadSize(out Int32 value);
     #endregion
 }
 

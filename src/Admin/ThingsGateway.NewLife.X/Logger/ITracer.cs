@@ -191,7 +191,7 @@ public class DefaultTracer : DisposeBase, ITracer, ILogFeature
         }
     }
 
-    private static Char[] _seps = ['?', '#', '&'];
+    private static readonly Char[] _seps = ['?', '#', '&'];
     /// <summary>建立Span构建器</summary>
     /// <param name="name"></param>
     /// <returns></returns>

@@ -730,6 +730,10 @@ namespace ThingsGateway.SqlSugar
             {
                 try
                 {
+                    if (string.IsNullOrEmpty(customDllName) && CustomAssemblies?.Length > 0)
+                    {
+                        customDllName = CustomAssemblies.First().GetName().Name;
+                    }
                     if (CustomAssemblies?.Any(it => it.FullName.StartsWith(customDllName)) == true)
                     {
                         return CustomAssemblies?.First(it => it.FullName.StartsWith(customDllName));

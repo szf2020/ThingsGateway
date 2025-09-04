@@ -355,7 +355,7 @@ public class NetSession : DisposeBase, INetSession, IServiceProvider, IExtend
         if (serviceType == typeof(ISocketSession)) return Session;
         if (serviceType == typeof(ISocketServer)) return Server;
 
-        return ServiceProvider!.GetService(serviceType)!;
+        return ServiceProvider?.GetService(serviceType)!;
     }
     #endregion
 }
