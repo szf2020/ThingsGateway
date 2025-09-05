@@ -23,7 +23,7 @@ public partial class RulesPage : ThingsGatewayModuleComponentBase
 {
     [Inject]
     [NotNull]
-    private IRulesService? RulesService { get; set; }
+    private IRulesPageService? RulesService { get; set; }
 
 
     protected override async Task InvokeInitAsync()

@@ -234,13 +234,31 @@ internal sealed class RulesEngineHostedService : BackgroundService, IRulesEngine
     {
         await Task.Yield();
 
+        await RestartRuleRuntimeAsync().ConfigureAwait(false);
+
+        while (!cancellationToken.IsCancellationRequested)
+        {
+            foreach (var item in Diagrams?.Values?.SelectMany(a => a.Nodes) ?? new List<NodeModel>())
+            {
+                if (item is IExexcuteExpressionsBase)
+                {
+                    CSharpScriptEngineExtension.SetExpire((item as TextNode).Text);
+                }
+            }
+            await Task.Delay(60000, cancellationToken).ConfigureAwait(false);
+        }
+    }
+
+    public async Task RestartRuleRuntimeAsync()
+    {
         try
         {
-            await RestartLock.WaitAsync(cancellationToken).ConfigureAwait(false); // 等待获取锁，以确保只有一个线程可以执行以下代码
-            TokenSource ??= new CancellationTokenSource();
+            await RestartLock.WaitAsync().ConfigureAwait(false);
+            Cancel();
             Clear();
+            TokenSource ??= new CancellationTokenSource();
 
-            Rules = await App.GetService<IRulesService>().GetAllRulesAsync().ConfigureAwait(false);
+            Rules = await App.GetService<IRulesService>().GetFromDBAsync(a => a).ConfigureAwait(false);
             Diagrams = new();
             foreach (var rules in Rules.Where(a => a.Status))
             {
@@ -258,18 +276,6 @@ internal sealed class RulesEngineHostedService : BackgroundService, IRulesEngine
         finally
         {
             RestartLock.Release(); // 释放锁
-        }
-
-        while (!cancellationToken.IsCancellationRequested)
-        {
-            foreach (var item in Diagrams?.Values?.SelectMany(a => a.Nodes) ?? new List<NodeModel>())
-            {
-                if (item is IExexcuteExpressionsBase)
-                {
-                    CSharpScriptEngineExtension.SetExpire((item as TextNode).Text);
-                }
-            }
-            await Task.Delay(60000, cancellationToken).ConfigureAwait(false);
         }
     }
 

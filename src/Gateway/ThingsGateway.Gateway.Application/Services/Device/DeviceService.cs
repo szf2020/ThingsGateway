@@ -63,8 +63,6 @@ internal sealed class DeviceService : BaseService<Device>, IDeviceService
         }).ConfigureAwait(false);
         if (result.IsSuccess)//如果成功了
         {
-            DeleteDeviceFromCache();
-            App.GetService<IVariableService>().DeleteVariableCache();
             return true;
         }
         else
@@ -87,7 +85,7 @@ internal sealed class DeviceService : BaseService<Device>, IDeviceService
         }).ConfigureAwait(false);
         if (result.IsSuccess)//如果成功了
         {
-            DeleteDeviceFromCache();
+
         }
         else
         {
@@ -112,8 +110,7 @@ internal sealed class DeviceService : BaseService<Device>, IDeviceService
              .WhereIf(dataScope?.Count == 0, u => u.CreateUserId == UserManager.UserId)
              .ToList();
             var result = (await db.Updateable(data).UpdateColumns(differences.Select(a => a.Key).ToArray()).ExecuteCommandAsync().ConfigureAwait(false)) > 0;
-            if (result)
-                DeleteDeviceFromCache();
+
             return result;
         }
         else
@@ -141,7 +138,7 @@ internal sealed class DeviceService : BaseService<Device>, IDeviceService
         }).ConfigureAwait(false);
         if (result.IsSuccess)//如果成功了
         {
-            DeleteDeviceFromCache();
+
         }
         else
         {
@@ -169,7 +166,7 @@ internal sealed class DeviceService : BaseService<Device>, IDeviceService
         }).ConfigureAwait(false);
         if (result.IsSuccess)//如果成功了
         {
-            DeleteDeviceFromCache();
+
             return true;
         }
         else
@@ -177,12 +174,6 @@ internal sealed class DeviceService : BaseService<Device>, IDeviceService
             //写日志
             throw new(result.ErrorMessage, result.ErrorException);
         }
-    }
-
-    /// <inheritdoc />
-    public void DeleteDeviceFromCache()
-    {
-        //App.CacheService.Remove(ThingsGatewayCacheConst.Cache_Device);//删除设备缓存
     }
 
     /// <summary>
@@ -274,7 +265,7 @@ internal sealed class DeviceService : BaseService<Device>, IDeviceService
 
         if (await base.SaveAsync(input, type).ConfigureAwait(false))
         {
-            DeleteDeviceFromCache();
+
             return true;
         }
         return false;
@@ -290,7 +281,7 @@ internal sealed class DeviceService : BaseService<Device>, IDeviceService
 
         if (await base.SaveAsync(input, type).ConfigureAwait(false))
         {
-            DeleteDeviceFromCache();
+
             return true;
         }
         return false;
@@ -400,7 +391,7 @@ internal sealed class DeviceService : BaseService<Device>, IDeviceService
             await db.BulkCopyAsync(insertData, 200000).ConfigureAwait(false);
             await db.BulkUpdateAsync(upData, 200000).ConfigureAwait(false);
         }
-        DeleteDeviceFromCache();
+
         return upData.Select(a => a.Id).Concat(insertData.Select(a => a.Id)).ToHashSet();
     }
 

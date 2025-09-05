@@ -15,7 +15,7 @@ namespace ThingsGateway.Foundation;
 /// <summary>
 /// 终端通道
 /// </summary>
-public interface IClientChannel : IChannel, ISender, IClient, IClientSender, IOnlineClient
+public interface IClientChannel : IChannel, ISender, IClient, IClientSender, IOnlineClient, IDependencyClient
 {
     /// <summary>
     /// 当前通道的数据处理适配器

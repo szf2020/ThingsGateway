@@ -51,10 +51,6 @@ internal interface IDeviceService
     /// <returns>删除是否成功的异步任务</returns>
     Task<bool> DeleteDeviceAsync(IEnumerable<long> ids);
 
-    /// <summary>
-    /// 删除设备缓存信息。
-    /// </summary>
-    void DeleteDeviceFromCache();
 
     /// <summary>
     /// 导出设备信息到文件流。

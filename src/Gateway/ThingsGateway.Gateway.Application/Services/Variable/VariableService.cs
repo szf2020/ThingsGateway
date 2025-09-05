@@ -226,9 +226,7 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
         }).ConfigureAwait(false);
         if (result.IsSuccess)//如果成功了
         {
-            _channelService.DeleteChannelFromCache();//刷新缓存
-            _deviceService.DeleteDeviceFromCache();
-            DeleteVariableCache();
+
         }
         else
         {
@@ -265,7 +263,7 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
 
             if (result > 0)
             {
-                DeleteVariableCache();
+
                 return true;
             }
         }
@@ -277,7 +275,7 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
 
             if (result > 0)
             {
-                DeleteVariableCache();
+
                 return true;
             }
         }
@@ -300,8 +298,7 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
              .ToList();
 
             var result = (await db.Updateable(data).UpdateColumns(differences.Select(a => a.Key).ToArray()).ExecuteCommandAsync().ConfigureAwait(false)) > 0;
-            if (result)
-                DeleteVariableCache();
+
             return result;
         }
         else
@@ -320,8 +317,6 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
              .WhereIF(dataScope?.Count == 0, u => u.CreateUserId == UserManager.UserId)
             .ExecuteCommandAsync().ConfigureAwait(false);
 
-        if (result > 0)
-            DeleteVariableCache();
     }
 
     [OperDesc("DeleteVariable", isRecordPar: false, localizerType: typeof(Variable))]
@@ -335,8 +330,6 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
              .WhereIF(dataScope?.Count == 0, u => u.CreateUserId == UserManager.UserId)
              .ExecuteCommandAsync().ConfigureAwait(false)) > 0;
 
-        if (result)
-            DeleteVariableCache();
         return result;
     }
 
@@ -441,16 +434,13 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
 
         if (await base.SaveAsync(input, type).ConfigureAwait(false))
         {
-            DeleteVariableCache();
+
             return true;
         }
         return false;
     }
 
-    public void DeleteVariableCache()
-    {
-        //App.CacheService.Remove(ThingsGatewayCacheConst.Cache_Variable);
-    }
+
 
     public List<VariableRuntime> GetAllVariableRuntime()
     {
@@ -579,7 +569,7 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
             await db.BulkCopyAsync(insertData, 200000).ConfigureAwait(false);
             await db.BulkUpdateAsync(upData, 200000).ConfigureAwait(false);
         }
-        DeleteVariableCache();
+
         return upData.Select(a => a.Id).Concat(insertData.Select(a => a.Id)).ToHashSet();
     }
 

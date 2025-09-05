@@ -25,6 +25,7 @@ public class Startup : AppStartup
         #region R
 
         services.AddSingleton<IRulesService, RulesService>();
+        services.AddSingleton<IRulesPageService>(a => a.GetService<IRulesService>());
         services.AddGatewayHostedService<IRulesEngineHostedService, RulesEngineHostedService>();
 
         #endregion

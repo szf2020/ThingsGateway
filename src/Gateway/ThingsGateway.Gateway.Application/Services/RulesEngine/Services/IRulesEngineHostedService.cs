@@ -8,6 +8,7 @@
 // QQ群：605534569
 // ------------------------------------------------------------------------------
 
+
 namespace ThingsGateway.Gateway.Application;
 
 public interface IRulesEngineHostedService
@@ -18,4 +19,6 @@ public interface IRulesEngineHostedService
     Task<Rules> GetRuleRuntimesAsync(long rulesId);
     Task DeleteRuleRuntimesAsync(List<long> ids);
     Task EditRuleRuntimesAsync(Rules rules);
+    Task RestartRuleRuntimeAsync();
 }
+

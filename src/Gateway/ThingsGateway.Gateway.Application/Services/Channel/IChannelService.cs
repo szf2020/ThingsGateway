@@ -39,11 +39,6 @@ internal interface IChannelService
     Task<bool> DeleteChannelAsync(IEnumerable<long> ids);
 
     /// <summary>
-    /// 从缓存中删除通道
-    /// </summary>
-    void DeleteChannelFromCache();
-
-    /// <summary>
     /// 导出通道为文件流结果
     /// </summary>
     /// <returns>文件流结果</returns>

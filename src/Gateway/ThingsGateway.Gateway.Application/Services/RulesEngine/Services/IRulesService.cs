@@ -10,9 +10,11 @@
 
 using BootstrapBlazor.Components;
 
+using System.Linq.Expressions;
+
 namespace ThingsGateway.Gateway.Application;
 
-public interface IRulesService
+public interface IRulesPageService
 {
     /// <summary>
     /// 清除所有规则
@@ -24,12 +26,6 @@ public interface IRulesService
     /// </summary>
     /// <param name="ids">待删除规则的ID列表</param>
     Task<bool> DeleteRulesAsync(List<long> ids);
-
-    /// <summary>
-    /// 从缓存/数据库获取全部信息
-    /// </summary>
-    /// <returns>规则列表</returns>
-    Task<List<Rules>> GetAllRulesAsync();
 
     /// <summary>
     /// 报表查询
@@ -44,4 +40,14 @@ public interface IRulesService
     /// <param name="input">规则对象</param>
     /// <param name="type">保存类型</param>
     Task<bool> SaveRulesAsync(Rules input, ItemChangedType type);
+}
+public interface IRulesService : IRulesPageService
+{
+
+    /// <summary>
+    /// 从缓存/数据库获取全部信息
+    /// </summary>
+    /// <returns>规则列表</returns>
+    Task<List<TResult>> GetFromDBAsync<TResult>(Expression<Func<Rules, TResult>> slct, Expression<Func<Rules, bool>> expression = null, SqlSugarClient db = null);
+
 }

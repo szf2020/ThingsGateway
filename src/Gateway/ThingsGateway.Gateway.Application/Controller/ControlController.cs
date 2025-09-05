@@ -48,18 +48,6 @@ public class ControlController : ControllerBase, IRpcServer
         App.CacheService.Clear();
     }
 
-    /// <summary>
-    /// 删除通道/设备缓存
-    /// </summary>
-    /// <returns></returns>
-    [HttpPost("removeCache")]
-    [DisplayName("删除通道/设备缓存")]
-    [TouchSocket.WebApi.WebApi(Method = TouchSocket.WebApi.HttpMethodType.Post)]
-    public void RemoveCache()
-    {
-        App.GetService<IDeviceService>().DeleteDeviceFromCache();
-        App.GetService<IChannelService>().DeleteChannelFromCache();
-    }
 
     /// <summary>
     /// 控制设备线程暂停

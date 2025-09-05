@@ -10,9 +10,7 @@
 
 using BootstrapBlazor.Components;
 
-using System.Data;
-
-using ThingsGateway.Extension.Generic;
+using System.Linq.Expressions;
 
 using TouchSocket.Core;
 
@@ -38,15 +36,12 @@ internal sealed class RulesService : BaseService<Rules>, IRulesService
         var dataScope = await GlobalData.SysUserService.GetCurrentUserDataScopeAsync().ConfigureAwait(false);
 
         using var db = GetDB();
+        var ids = await db.Queryable<Rules>().WhereIF(dataScope != null && dataScope?.Count > 0, u => dataScope.Contains(u.CreateOrgId))//在指定机构列表查询
+            .WhereIF(dataScope?.Count == 0, u => u.CreateUserId == UserManager.UserId)
+            .Select(a => a.Id).ToListAsync().ConfigureAwait(false);
+        await db.Deleteable<Rules>(a => ids.Contains(a.Id)).ExecuteCommandAsync().ConfigureAwait(false);
 
-        var data = (await GetAllRulesAsync().ConfigureAwait(false))
-              .WhereIf(dataScope != null && dataScope?.Count > 0, u => dataScope.Contains(u.CreateOrgId))//在指定机构列表查询
-            .WhereIf(dataScope?.Count == 0, u => u.CreateUserId == UserManager.UserId)
-            .Select(a => a.Id).ToList();
-        await db.Deleteable<Rules>(a => data.Contains(a.Id)).ExecuteCommandAsync().ConfigureAwait(false);
-
-        DeleteRulesFromCache();
-        await RulesEngineHostedService.DeleteRuleRuntimesAsync(data).ConfigureAwait(false);
+        await RulesEngineHostedService.DeleteRuleRuntimesAsync(ids).ConfigureAwait(false);
     }
 
     [OperDesc("DeleteRules", localizerType: typeof(Rules))]
@@ -60,30 +55,20 @@ internal sealed class RulesService : BaseService<Rules>, IRulesService
 
 .ExecuteCommandAsync().ConfigureAwait(false);
 
-        DeleteRulesFromCache();
         await RulesEngineHostedService.DeleteRuleRuntimesAsync(ids).ConfigureAwait(false);
         return true;
     }
-    private const string cacheKey = "ThingsGateway:Cache_RulesEngines:List";
-    /// <inheritdoc />
-    public void DeleteRulesFromCache()
-    {
-        App.CacheService.Remove(cacheKey);//删除通道缓存
-    }
+
 
     /// <summary>
     /// 从缓存/数据库获取全部信息
     /// </summary>
     /// <returns>列表</returns>
-    public async Task<List<Rules>> GetAllRulesAsync()
+    public async Task<List<TResult>> GetFromDBAsync<TResult>(Expression<Func<Rules, TResult>> slct, Expression<Func<Rules, bool>> expression = null, SqlSugarClient db = null)
     {
-        var channels = App.CacheService.Get<List<Rules>>(cacheKey);
-        if (channels == null)
-        {
-            using var db = GetDB();
-            channels = await db.Queryable<Rules>().ToListAsync().ConfigureAwait(false);
-            App.CacheService.Set(cacheKey, channels);
-        }
+        db ??= GetDB();
+        var channels = await db.Queryable<Rules>().WhereIF(expression != null, expression).OrderBy(a => a.Id).Select(slct).ToListAsync().ConfigureAwait(false);
+
         return channels;
     }
 
@@ -117,7 +102,6 @@ internal sealed class RulesService : BaseService<Rules>, IRulesService
 
         if (await base.SaveAsync(input, type).ConfigureAwait(false))
         {
-            DeleteRulesFromCache();
             await RulesEngineHostedService.EditRuleRuntimesAsync(input).ConfigureAwait(false);
             return true;
         }

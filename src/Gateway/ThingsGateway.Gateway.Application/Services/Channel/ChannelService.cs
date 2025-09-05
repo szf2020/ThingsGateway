@@ -58,9 +58,7 @@ internal sealed class ChannelService : BaseService<Channel>, IChannelService
         }).ConfigureAwait(false);
         if (result.IsSuccess)//如果成功了
         {
-            DeleteChannelFromCache();
-            App.GetService<IDeviceService>().DeleteDeviceFromCache();
-            App.GetService<IVariableService>().DeleteVariableCache();
+
             return true;
         }
         else
@@ -87,9 +85,7 @@ internal sealed class ChannelService : BaseService<Channel>, IChannelService
         }).ConfigureAwait(false);
         if (result.IsSuccess)//如果成功了
         {
-            DeleteChannelFromCache();
-            App.GetService<IDeviceService>().DeleteDeviceFromCache();
-            App.GetService<IVariableService>().DeleteVariableCache();
+
             return true;
         }
         else
@@ -124,9 +120,7 @@ internal sealed class ChannelService : BaseService<Channel>, IChannelService
         }).ConfigureAwait(false);
         if (result.IsSuccess)//如果成功了
         {
-            DeleteChannelFromCache();
-            App.GetService<IDeviceService>().DeleteDeviceFromCache();
-            App.GetService<IVariableService>().DeleteVariableCache();
+
             return true;
         }
         else
@@ -149,7 +143,7 @@ internal sealed class ChannelService : BaseService<Channel>, IChannelService
         }).ConfigureAwait(false);
         if (result.IsSuccess)//如果成功了
         {
-            DeleteChannelFromCache();
+
         }
         else
         {
@@ -181,7 +175,7 @@ internal sealed class ChannelService : BaseService<Channel>, IChannelService
             }).ConfigureAwait(false);
             if (result.IsSuccess)//如果成功了
             {
-                DeleteChannelFromCache();
+
                 return true;
             }
             else
@@ -214,7 +208,7 @@ internal sealed class ChannelService : BaseService<Channel>, IChannelService
         }).ConfigureAwait(false);
         if (result.IsSuccess)//如果成功了
         {
-            DeleteChannelFromCache();
+
             return true;
         }
         else
@@ -224,11 +218,6 @@ internal sealed class ChannelService : BaseService<Channel>, IChannelService
         }
     }
 
-    /// <inheritdoc />
-    public void DeleteChannelFromCache()
-    {
-        //App.CacheService.Remove(ThingsGatewayCacheConst.Cache_Channel);//删除通道缓存
-    }
 
 
 
@@ -299,7 +288,7 @@ internal sealed class ChannelService : BaseService<Channel>, IChannelService
 
         if (await base.SaveAsync(input, type).ConfigureAwait(false))
         {
-            DeleteChannelFromCache();
+
             return true;
         }
         return false;
@@ -320,7 +309,7 @@ internal sealed class ChannelService : BaseService<Channel>, IChannelService
 
         if (await base.SaveAsync(input, type).ConfigureAwait(false))
         {
-            DeleteChannelFromCache();
+
             return true;
         }
         return false;
@@ -404,7 +393,7 @@ internal sealed class ChannelService : BaseService<Channel>, IChannelService
             await db.BulkUpdateAsync(upData, 200000).ConfigureAwait(false);
 
         }
-        DeleteChannelFromCache();
+
         return upData.Select(a => a.Id).Concat(insertData.Select(a => a.Id)).ToHashSet();
     }
 

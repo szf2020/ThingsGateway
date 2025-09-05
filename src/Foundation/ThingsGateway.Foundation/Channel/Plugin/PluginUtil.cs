@@ -34,7 +34,7 @@ public static class PluginUtil
 
             if (channelOptions.ChannelType == ChannelTypeEnum.TcpClient)
             {
-                action += a => a.UseReconnection<ITcpClient>();
+                action += a => a.UseReconnection<IClientChannel>();
             }
             return action;
         }

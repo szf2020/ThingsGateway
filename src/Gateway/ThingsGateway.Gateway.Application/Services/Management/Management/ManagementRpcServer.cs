@@ -48,7 +48,7 @@ public partial class ManagementRpcServer : IRpcServer, IManagementRpcServer, IBa
     public Task<bool> ClearDeviceAsync(bool restart) =>
         App.GetService<IDevicePageService>().ClearDeviceAsync(restart);
 
-    public Task ClearRulesAsync() => App.GetService<IRulesService>().ClearRulesAsync();
+    public Task ClearRulesAsync() => App.GetService<IRulesPageService>().ClearRulesAsync();
 
     public Task<bool> ClearVariableAsync(bool restart) =>
         App.GetService<IVariablePageService>().ClearVariableAsync(restart);
@@ -75,7 +75,7 @@ public partial class ManagementRpcServer : IRpcServer, IManagementRpcServer, IBa
 
     public Task DeleteRuleRuntimesAsync(List<long> ids) => App.GetService<IRulesEngineHostedService>().DeleteRuleRuntimesAsync(ids);
 
-    public Task<bool> DeleteRulesAsync(List<long> ids) => App.GetService<IRulesService>().DeleteRulesAsync(ids);
+    public Task<bool> DeleteRulesAsync(List<long> ids) => App.GetService<IRulesPageService>().DeleteRulesAsync(ids);
 
     public Task<bool> DeleteVariableAsync(List<long> ids, bool restart) =>
     App.GetService<IVariablePageService>().DeleteVariableAsync(ids, restart);
@@ -106,8 +106,6 @@ public partial class ManagementRpcServer : IRpcServer, IManagementRpcServer, IBa
         App.GetService<IVariablePageService>().ExportVariableAsync(models, sortName, sortOrder);
 
     public Task<string> ExportVariableFileAsync(GatewayExportFilter exportFilter) => App.GetService<IVariablePageService>().ExportVariableFileAsync(exportFilter);
-
-    public Task<List<Rules>> GetAllRulesAsync() => App.GetService<IRulesService>().GetAllRulesAsync();
 
     public Task<List<Channel>> GetChannelListAsync(QueryPageOptions options, int max = 0) =>
         App.GetService<IChannelPageService>().GetChannelListAsync(options, max);
@@ -244,7 +242,7 @@ public partial class ManagementRpcServer : IRpcServer, IManagementRpcServer, IBa
 
     public Task<string> RulesLogPathAsync(long rulesId) => App.GetService<IRulesEngineHostedService>().RulesLogPathAsync(rulesId);
 
-    public Task<QueryData<Rules>> RulesPageAsync(QueryPageOptions option, FilterKeyValueAction filterKeyValueAction = null) => App.GetService<IRulesService>().RulesPageAsync(option, filterKeyValueAction);
+    public Task<QueryData<Rules>> RulesPageAsync(QueryPageOptions option, FilterKeyValueAction filterKeyValueAction = null) => App.GetService<IRulesPageService>().RulesPageAsync(option, filterKeyValueAction);
 
     public Task<bool> SaveChannelAsync(Channel input, ItemChangedType type, bool restart) =>
         App.GetService<IChannelPageService>().SaveChannelAsync(input, type, restart);
@@ -254,7 +252,7 @@ public partial class ManagementRpcServer : IRpcServer, IManagementRpcServer, IBa
 
     public Task SavePluginByPathAsync(PluginAddPathInput plugin) => App.GetService<IPluginPageService>().SavePluginByPathAsync(plugin);
 
-    public Task<bool> SaveRulesAsync(Rules input, ItemChangedType type) => App.GetService<IRulesService>().SaveRulesAsync(input, type);
+    public Task<bool> SaveRulesAsync(Rules input, ItemChangedType type) => App.GetService<IRulesPageService>().SaveRulesAsync(input, type);
 
     public Task<bool> SaveVariableAsync(Variable input, ItemChangedType type, bool restart) =>
         App.GetService<IVariablePageService>().SaveVariableAsync(input, type, restart);
@@ -284,4 +282,7 @@ public partial class ManagementRpcServer : IRpcServer, IManagementRpcServer, IBa
     public Task UnAuthorizeAsync() => App.GetService<IAuthenticationService>().UnAuthorizeAsync();
 
     public Task<string> UUIDAsync() => App.GetService<IAuthenticationService>().UUIDAsync();
+
+    public Task RestartRuleRuntimeAsync() => App.GetService<IRulesEngineHostedService>().RestartRuleRuntimeAsync();
+
 }

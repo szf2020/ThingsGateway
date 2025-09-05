@@ -134,12 +134,6 @@ public interface IManagementRpcServer : IRpcServer
     [DmtpRpc]
     Task<string> ExportVariableFileAsync(GatewayExportFilter exportFilter);
 
-    /// <summary>
-    /// 从缓存/数据库获取全部信息
-    /// </summary>
-    /// <returns>规则列表</returns>
-    [DmtpRpc]
-    Task<List<Rules>> GetAllRulesAsync();
 
     [DmtpRpc]
     Task<List<Channel>> GetChannelListAsync(QueryPageOptions options, int max = 0);
@@ -287,6 +281,8 @@ public interface IManagementRpcServer : IRpcServer
 
     [DmtpRpc]
     Task RestartDeviceAsync(long id, bool deleteCache);
+    [DmtpRpc]
+    Task RestartRuleRuntimeAsync();
 
     [DmtpRpc]
     Task RestartServerAsync();

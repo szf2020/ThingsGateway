@@ -77,7 +77,7 @@ public partial class ManagementController : ControllerBase, IRpcServer
         App.GetService<IDevicePageService>().ClearDeviceAsync(restart);
     [HttpPost]
     [TouchSocket.WebApi.WebApi(Method = TouchSocket.WebApi.HttpMethodType.Post)]
-    public Task ClearRulesAsync() => App.GetService<IRulesService>().ClearRulesAsync();
+    public Task ClearRulesAsync() => App.GetService<IRulesPageService>().ClearRulesAsync();
     [HttpPost]
     [TouchSocket.WebApi.WebApi(Method = TouchSocket.WebApi.HttpMethodType.Post)]
     public Task<bool> ClearVariableAsync(bool restart) =>
@@ -140,7 +140,7 @@ public partial class ManagementController : ControllerBase, IRpcServer
     public Task DeleteRuleRuntimesAsync(List<long> ids) => App.GetService<IRulesEngineHostedService>().DeleteRuleRuntimesAsync(ids);
     [HttpPost]
     [TouchSocket.WebApi.WebApi(Method = TouchSocket.WebApi.HttpMethodType.Post)]
-    public Task<bool> DeleteRulesAsync(List<long> ids) => App.GetService<IRulesService>().DeleteRulesAsync(ids);
+    public Task<bool> DeleteRulesAsync(List<long> ids) => App.GetService<IRulesPageService>().DeleteRulesAsync(ids);
 
     [HttpPost]
     [TouchSocket.WebApi.WebApi(Method = TouchSocket.WebApi.HttpMethodType.Post)]
@@ -199,13 +199,6 @@ public partial class ManagementController : ControllerBase, IRpcServer
     [TouchSocket.WebApi.WebApi(Method = TouchSocket.WebApi.HttpMethodType.Post)]
     public Task<List<Variable>> GetVariableListAsync([FromBody] GetListRequest<QueryPageOptions> request) =>
         App.GetService<IVariablePageService>().GetVariableListAsync(request.Options, request.Max);
-
-
-
-    [HttpGet]
-    [TouchSocket.WebApi.WebApi(Method = TouchSocket.WebApi.HttpMethodType.Get)]
-    public Task<List<Rules>> GetAllRulesAsync() => App.GetService<IRulesService>().GetAllRulesAsync();
-
 
     [HttpGet]
     [TouchSocket.WebApi.WebApi(Method = TouchSocket.WebApi.HttpMethodType.Get)]
@@ -458,7 +451,7 @@ public partial class ManagementController : ControllerBase, IRpcServer
     [HttpPost]
     [TouchSocket.WebApi.WebApi(Method = TouchSocket.WebApi.HttpMethodType.Post)]
     public Task<QueryData<Rules>> RulesPageAsync([FromBody] KVQueryPageOptions option) =>
-        App.GetService<IRulesService>().RulesPageAsync(option.Options, option.FilterKeyValueAction);
+        App.GetService<IRulesPageService>().RulesPageAsync(option.Options, option.FilterKeyValueAction);
 
     [HttpPost]
     [TouchSocket.WebApi.WebApi(Method = TouchSocket.WebApi.HttpMethodType.Post)]
@@ -478,7 +471,7 @@ public partial class ManagementController : ControllerBase, IRpcServer
     [HttpPost]
     [TouchSocket.WebApi.WebApi(Method = TouchSocket.WebApi.HttpMethodType.Post)]
     public Task<bool> SaveRulesAsync([FromBody] Rules input, ItemChangedType type) =>
-        App.GetService<IRulesService>().SaveRulesAsync(input, type);
+        App.GetService<IRulesPageService>().SaveRulesAsync(input, type);
 
     [HttpPost]
     [TouchSocket.WebApi.WebApi(Method = TouchSocket.WebApi.HttpMethodType.Post)]
