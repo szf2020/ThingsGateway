@@ -738,7 +738,7 @@ namespace ThingsGateway.SqlSugar
                .Where(it => it.Name == "Insertable")
                .Where(it => it.GetGenericArguments().Length != 0)
                .Where(it => it.GetParameters().Any(z => z.ParameterType.Name.StartsWith("IReadOnlyCollection")))
-               .Where(it => it.Name == "Insertable");
+               ;
                 var method = methods.Single().MakeGenericMethod(newList.GetType().GetGenericArguments().First());
                 InsertMethodInfo result = new InsertMethodInfo()
                 {
@@ -751,11 +751,11 @@ namespace ThingsGateway.SqlSugar
             else
             {
                 var methods = this.Context.GetType().GetMethods()
-                    .Where(it => it.Name == "Insertable")
+                    .Where(it => it.Name == "InsertableT" || it.Name == "Insertable")
                     .Where(it => it.GetGenericArguments().Length != 0)
-                    .Where(it => it.GetParameters().Any(z => z.ParameterType.Name == "T"))
-                    .Where(it => it.Name == "Insertable");
+                    .Where(it => it.GetParameters().Any(z => z.ParameterType.Name == "T"));
                 var method = methods.Single().MakeGenericMethod(singleEntityObjectOrListObject.GetType());
+
                 InsertMethodInfo result = new InsertMethodInfo()
                 {
                     Context = this.Context,
@@ -826,8 +826,7 @@ namespace ThingsGateway.SqlSugar
                 var methods = this.Context.GetType().GetMethods()
                .Where(it => it.Name == "Deleteable")
                .Where(it => it.GetGenericArguments().Length != 0)
-               .Where(it => it.GetParameters().Any(z => z.Name != "pkValue" && z.ParameterType.Name.StartsWith("IReadOnlyCollection")))
-               .Where(it => it.Name == "Deleteable");
+               .Where(it => it.GetParameters().Any(z => z.Name != "pkValue" && z.ParameterType.Name.StartsWith("IReadOnlyCollection")));
                 var method = methods.FirstOrDefault().MakeGenericMethod(newList.GetType().GetGenericArguments().FirstOrDefault());
                 DeleteMethodInfo result = new DeleteMethodInfo()
                 {
@@ -840,10 +839,9 @@ namespace ThingsGateway.SqlSugar
             else
             {
                 var methods = this.Context.GetType().GetMethods()
-                    .Where(it => it.Name == "Deleteable")
+                    .Where(it => it.Name == "Deleteable" || it.Name == "DeleteableT")
                     .Where(it => it.GetGenericArguments().Length != 0)
-                    .Where(it => it.GetParameters().Any(z => z.ParameterType.Name == "T"))
-                    .Where(it => it.Name == "Deleteable");
+                    .Where(it => it.GetParameters().Any(z => z.ParameterType.Name == "T"));
                 var method = methods.Single().MakeGenericMethod(singleEntityObjectOrListObject.GetType());
                 DeleteMethodInfo result = new DeleteMethodInfo()
                 {
@@ -911,8 +909,7 @@ namespace ThingsGateway.SqlSugar
                 var methods = this.Context.GetType().GetMethods()
                .Where(it => it.Name == "Updateable")
                .Where(it => it.GetGenericArguments().Length != 0)
-               .Where(it => it.GetParameters().Any(z => z.ParameterType.Name.StartsWith("IReadOnlyCollection")))
-               .Where(it => it.Name == "Updateable");
+               .Where(it => it.GetParameters().Any(z => z.ParameterType.Name.StartsWith("IReadOnlyCollection")));
                 var method = methods.Single().MakeGenericMethod(newList.GetType().GetGenericArguments().First());
                 UpdateMethodInfo result = new UpdateMethodInfo()
                 {
@@ -925,10 +922,9 @@ namespace ThingsGateway.SqlSugar
             else
             {
                 var methods = this.Context.GetType().GetMethods()
-                    .Where(it => it.Name == "Updateable")
+                    .Where(it => it.Name == "UpdateableT" || it.Name == "Updateable")
                     .Where(it => it.GetGenericArguments().Length != 0)
-                    .Where(it => it.GetParameters().Any(z => z.ParameterType.Name == "T"))
-                    .Where(it => it.Name == "Updateable");
+                    .Where(it => it.GetParameters().Any(z => z.ParameterType.Name == "T"));
                 var method = methods.Single().MakeGenericMethod(singleEntityObjectOrListObject.GetType());
                 UpdateMethodInfo result = new UpdateMethodInfo()
                 {
@@ -943,10 +939,9 @@ namespace ThingsGateway.SqlSugar
         {
             UpdateExpressionMethodInfo result = new UpdateExpressionMethodInfo();
             var methods = this.Context.GetType().GetMethods()
-             .Where(it => it.Name == "Updateable")
+             .Where(it => it.Name == "UpdateableT" || it.Name == "Updateable")
              .Where(it => it.GetGenericArguments().Length != 0)
-             .Where(it => it.GetParameters().Length == 0)
-             .Where(it => it.Name == "Updateable");
+             .Where(it => it.GetParameters().Length == 0);
             var method = methods.Single().MakeGenericMethod(entityType);
             result.Context = this.Context;
             result.MethodInfo = method;
@@ -1109,8 +1104,7 @@ namespace ThingsGateway.SqlSugar
                 var methods = this.Context.GetType().GetMethods()
                .Where(it => it.Name == "Storageable")
                .Where(it => it.GetGenericArguments().Length != 0)
-               .Where(it => it.GetParameters().Any(z => z.ParameterType.Name.StartsWith("IEnumerable")))
-               .Where(it => it.Name == "Storageable");
+               .Where(it => it.GetParameters().Any(z => z.ParameterType.Name.StartsWith("IEnumerable")));
                 var method = methods.Single().MakeGenericMethod(newList.GetType().GetGenericArguments().First());
                 StorageableMethodInfo result = new StorageableMethodInfo()
                 {
@@ -1123,10 +1117,9 @@ namespace ThingsGateway.SqlSugar
             else
             {
                 var methods = this.Context.GetType().GetMethods()
-                    .Where(it => it.Name == "Storageable")
+                    .Where(it => it.Name == "StorageableT" || it.Name == "Storageable")
                     .Where(it => it.GetGenericArguments().Length != 0)
-                    .Where(it => it.GetParameters().Any(z => z.ParameterType.Name == "T"))
-                    .Where(it => it.Name == "Storageable");
+                    .Where(it => it.GetParameters().Any(z => z.ParameterType.Name == "T"));
                 var method = methods.Single().MakeGenericMethod(singleEntityObjectOrList.GetType());
                 StorageableMethodInfo result = new StorageableMethodInfo()
                 {
