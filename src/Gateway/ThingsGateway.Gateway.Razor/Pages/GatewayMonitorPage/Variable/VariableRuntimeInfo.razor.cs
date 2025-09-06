@@ -481,6 +481,32 @@ finally
         }
     }
 
+
+    private async Task InsertTestDtuDataAsync()
+    {
+        try
+        {
+            try
+            {
+                await Task.Run(() => VariablePageService.InsertTestDtuDataAsync(TestDeviceCount, SlaveUrl, AutoRestartThread));
+            }
+            finally
+            {
+                await InvokeAsync(async () =>
+                {
+                    await ToastService.Default();
+                    await table.QueryAsync();
+                    StateHasChanged();
+                });
+            }
+        }
+        catch (Exception ex)
+        {
+            await InvokeAsync(async () => await ToastService.Warn(ex));
+        }
+    }
+
+
     [Parameter]
     public bool AutoRestartThread { get; set; }
 

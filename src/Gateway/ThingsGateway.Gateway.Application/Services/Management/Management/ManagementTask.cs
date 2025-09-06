@@ -134,7 +134,7 @@ public partial class ManagementTask : AsyncDisposableObject
                    .SetTick(TimeSpan.FromMilliseconds(_managementOptions.HeartbeatInterval))
                    .SetMaxFailCount(3);
 
-                   a.AddDmtpHandshakedPlugin(async () =>
+                   a.AddDmtpCreatedChannelPlugin(async () =>
                    {
                        try
                        {

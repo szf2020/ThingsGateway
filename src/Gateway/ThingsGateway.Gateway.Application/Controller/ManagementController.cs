@@ -338,6 +338,14 @@ public partial class ManagementController : ControllerBase, IRpcServer
     public Task InsertTestDataAsync([FromBody] InsertTestDataInput input) =>
         App.GetService<IVariablePageService>().InsertTestDataAsync(input.TestVariableCount, input.TestDeviceCount, input.SlaveUrl, input.BusinessEnable, input.Restart);
 
+
+
+    [HttpPost]
+    [TouchSocket.WebApi.WebApi(Method = TouchSocket.WebApi.HttpMethodType.Post)]
+    public Task InsertTestDtuDataAsync([FromBody] InsertTestDtuDataInput input) =>
+        App.GetService<IVariablePageService>().InsertTestDtuDataAsync(input.TestDeviceCount, input.SlaveUrl, input.Restart);
+
+
     [HttpPost]
     [TouchSocket.WebApi.WebApi(Method = TouchSocket.WebApi.HttpMethodType.Post)]
     public Task<bool> IsRedundantDeviceAsync(long id) =>
@@ -628,7 +636,12 @@ public class InsertTestDataInput
     public bool BusinessEnable { get; set; }
     public bool Restart { get; set; }
 }
-
+public class InsertTestDtuDataInput
+{
+    public int TestDeviceCount { get; set; }
+    public string SlaveUrl { get; set; }
+    public bool Restart { get; set; }
+}
 public class LastLogDataInput
 {
     public string File { get; set; }

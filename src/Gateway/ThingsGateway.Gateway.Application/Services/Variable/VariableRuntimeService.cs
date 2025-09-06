@@ -423,6 +423,45 @@ public class VariableRuntimeService : IVariableRuntimeService
         }
     }
 
+    public async Task InsertTestDtuDataAsync(int deviceCount, string slaveUrl, bool restart)
+    {
+        try
+        {
+            // await WaitLock.WaitAsync().ConfigureAwait(false);
+
+            var datas = await GlobalData.VariableService.InsertTestDtuDataAsync(deviceCount, slaveUrl).ConfigureAwait(false);
+
+            {
+                var newChannelRuntimes = datas.Item1.AdaptListChannelRuntime();
+
+                //批量修改之后，需要重新加载通道
+                RuntimeServiceHelper.Init(newChannelRuntimes);
+
+                {
+                    var newDeviceRuntimes = datas.Item2.AdaptListDeviceRuntime();
+
+                    RuntimeServiceHelper.Init(newDeviceRuntimes);
+                }
+                {
+                    var newVariableRuntimes = datas.Item3.AdaptListVariableRuntime();
+                    RuntimeServiceHelper.Init(newVariableRuntimes);
+                }
+                //根据条件重启通道线程
+
+                if (restart)
+                {
+                    await GlobalData.ChannelThreadManage.RestartChannelAsync(newChannelRuntimes).ConfigureAwait(false);
+
+                    await RuntimeServiceHelper.ChangedDriverAsync(_logger).ConfigureAwait(false);
+                }
+            }
+        }
+        finally
+        {
+            //WaitLock.Release();
+        }
+    }
+
     public Task<Dictionary<string, ImportPreviewOutputBase>> PreviewAsync(IBrowserFile browserFile)
     {
         return GlobalData.VariableService.PreviewAsync(browserFile);

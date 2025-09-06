@@ -111,4 +111,5 @@ internal interface IVariableService
     Task<Dictionary<string, ImportPreviewOutputBase>> PreviewAsync(string filePath);
     Task<HashSet<long>> ImportVariableAsync(List<Variable> upData, List<Variable> insertData);
     Task<Dictionary<string, ImportPreviewOutputBase>> PreviewAsync(IFormFile browserFile);
+    Task<(List<Channel>, List<Device>, List<Variable>)> InsertTestDtuDataAsync(int deviceCount, string slaveUrl = "127.0.0.1:502");
 }

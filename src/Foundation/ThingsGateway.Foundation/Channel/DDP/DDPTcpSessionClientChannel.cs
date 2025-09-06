@@ -49,12 +49,11 @@ public class DDPTcpSessionClientChannel : TcpSessionClientChannel
         this.ThrowIfDisposed();
         this.ThrowIfClientNotConnected();
 
-
         if (!await this.OnTcpSending(memory).ConfigureAwait(false)) return;
 
         var transport = this.Transport;
         var adapter = this.DataHandlingAdapter;
-        var locker = transport.SemaphoreSlimForWriter;
+        var locker = transport.WriteLocker;
 
         await locker.WaitAsync(token).ConfigureAwait(false);
         try
@@ -62,7 +61,7 @@ public class DDPTcpSessionClientChannel : TcpSessionClientChannel
             // 如果数据处理适配器未设置，则使用默认发送方式。
             if (adapter == null)
             {
-                await transport.Output.WriteAsync(memory, token).ConfigureAwait(false);
+                await transport.Writer.WriteAsync(memory, token).ConfigureAwait(false);
             }
             else
             {
@@ -70,7 +69,7 @@ public class DDPTcpSessionClientChannel : TcpSessionClientChannel
                 var ddpSend = new DDPSend(memory, Id, true);
                 ddpSend.Build(ref byteBlock);
                 var newMemory = byteBlock.Memory;
-                var writer = new PipeBytesWriter(transport.Output);
+                var writer = new PipeBytesWriter(transport.Writer);
                 adapter.SendInput(ref writer, in newMemory);
                 await writer.FlushAsync(token).ConfigureAwait(false);
             }
@@ -100,7 +99,7 @@ public class DDPTcpSessionClientChannel : TcpSessionClientChannel
 
         var transport = this.Transport;
         var adapter = this.DataHandlingAdapter;
-        var locker = transport.SemaphoreSlimForWriter;
+        var locker = transport.WriteLocker;
 
         await locker.WaitAsync(token).ConfigureAwait(false);
         try
@@ -113,7 +112,7 @@ public class DDPTcpSessionClientChannel : TcpSessionClientChannel
             requestInfoBuilder.Build(ref byteBlock);
             var ddpSend = new DDPSend(byteBlock.Memory, Id, true);
 
-            var writer = new PipeBytesWriter(transport.Output);
+            var writer = new PipeBytesWriter(transport.Writer);
             adapter.SendInput(ref writer, ddpSend);
             await writer.FlushAsync(token).ConfigureAwait(false);
         }

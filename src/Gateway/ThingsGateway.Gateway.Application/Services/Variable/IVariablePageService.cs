@@ -35,5 +35,6 @@ namespace ThingsGateway.Gateway.Application
         Task<OperResult<object>> OnWriteVariableAsync(long id, string writeData);
         Task<Dictionary<string, ImportPreviewOutputBase>> ImportVariableAsync(IBrowserFile a, bool restart);
         Task<Dictionary<string, ImportPreviewOutputBase>> ImportVariableFileAsync(string filePath, bool restart);
+        Task InsertTestDtuDataAsync(int deviceCount, string slaveUrl, bool restart);
     }
 }

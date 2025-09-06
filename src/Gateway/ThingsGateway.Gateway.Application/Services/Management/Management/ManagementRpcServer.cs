@@ -179,6 +179,10 @@ public partial class ManagementRpcServer : IRpcServer, IManagementRpcServer, IBa
     public Task InsertTestDataAsync(int testVariableCount, int testDeviceCount, string slaveUrl, bool businessEnable, bool restart) =>
         App.GetService<IVariablePageService>().InsertTestDataAsync(testVariableCount, testDeviceCount, slaveUrl, businessEnable, restart);
 
+    public Task InsertTestDtuDataAsync(int testDeviceCount, string slaveUrl, bool restart) =>
+        App.GetService<IVariablePageService>().InsertTestDtuDataAsync(testDeviceCount, slaveUrl, restart);
+
+
     public Task<bool> IsRedundantDeviceAsync(long id) =>
         App.GetService<IDevicePageService>().IsRedundantDeviceAsync(id);
 

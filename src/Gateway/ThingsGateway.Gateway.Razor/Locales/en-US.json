@@ -243,6 +243,7 @@
     "BusinessEnable": "BusinessEnable",
     "SlaveUrl": "SlaveUrl",
     "Test": "Addition of test variables",
+    "TestDtu": "Addition of test dtu variables",
     "TestDeviceCount": "TestDeviceCount",
     "TestVariableCount": "TestVariableCount",
     "WriteValue": "WriteValue",

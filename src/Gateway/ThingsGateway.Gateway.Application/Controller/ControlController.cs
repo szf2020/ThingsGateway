@@ -215,6 +215,17 @@ public class ControlController : ControllerBase, IRpcServer
     }
 
     /// <summary>
+    /// 增加测试Dtu数据
+    /// </summary>
+    [HttpPost("insertTestDtuData")]
+    [DisplayName("增加测试Dtu数据")]
+    [TouchSocket.WebApi.WebApi(Method = TouchSocket.WebApi.HttpMethodType.Post)]
+    public Task InsertTestDtuDataAsync(int testDeviceCount, string slaveUrl, bool restart = true)
+    {
+        return GlobalData.VariableRuntimeService.InsertTestDtuDataAsync(testDeviceCount, slaveUrl, restart);
+    }
+
+    /// <summary>
     /// 确认实时报警
     /// </summary>
     /// <returns></returns>

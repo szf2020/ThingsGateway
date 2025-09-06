@@ -127,12 +127,22 @@
         @if (WebsiteOption.Value.Demo || App.HostEnvironment.IsDevelopment())
         {
             <PopConfirmButton Color=Color.Warning Text="@Localizer["Test"]" IsKeepDisabled=@(!AuthorizeButton(AdminOperConst.Add))
-                              IsAsync OnConfirm=@(InsertTestDataAsync)>
+                              IsAsync OnConfirm=@(InsertTestDataAsync) class="me-1">
 
                 <BodyTemplate>
                     <BootstrapInput @bind-Value=TestVariableCount ShowLabel="true" ShowLabelTooltip="true" />
                     <BootstrapInput @bind-Value=TestDeviceCount ShowLabel="true" ShowLabelTooltip="true" />
                     <Checkbox @bind-Value=BusinessEnable ShowLabel="true" ShowLabelTooltip="true" />
+                </BodyTemplate>
+
+            </PopConfirmButton>
+
+
+            <PopConfirmButton Color=Color.Warning Text="@Localizer["TestDtu"]" IsKeepDisabled=@(!AuthorizeButton(AdminOperConst.Add))
+                              IsAsync OnConfirm=@(InsertTestDtuDataAsync)>
+
+                <BodyTemplate>
+                    <BootstrapInput @bind-Value=TestDeviceCount ShowLabel="true" ShowLabelTooltip="true" />
                 </BodyTemplate>
 
             </PopConfirmButton>

@@ -235,6 +235,144 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
         return (newChannels, newDevices, newVariables);
     }
 
+
+    public async Task<(List<Channel>, List<Device>, List<Variable>)> InsertTestDtuDataAsync(int deviceCount, string slaveUrl = "127.0.0.1:502")
+    {
+        if (slaveUrl.IsNullOrWhiteSpace()) slaveUrl = "127.0.0.1:502";
+        List<Channel> newChannels = new();
+        List<Device> newDevices = new();
+        List<Variable> newVariables = new();
+
+        ManageHelper.CheckChannelCount(deviceCount);
+        ManageHelper.CheckDeviceCount(deviceCount);
+        ManageHelper.CheckVariableCount(deviceCount);
+
+
+        //DTU
+
+        for (int i = 0; i < deviceCount; i++)
+        {
+
+            Channel serviceChannel = new Channel();
+            Device serviceDevice = new Device();
+
+            {
+                var id = CommonUtils.GetSingleId();
+                var name = $"modbusSlaveChannel{id}";
+                serviceChannel.ChannelType = ChannelTypeEnum.TcpClient;
+                serviceChannel.Name = name;
+                serviceChannel.Enable = true;
+                serviceChannel.Id = id;
+                serviceChannel.CreateUserId = UserManager.UserId;
+                serviceChannel.CreateOrgId = UserManager.OrgId;
+                serviceChannel.RemoteUrl = "127.0.0.1:502";
+                serviceChannel.DtuId = name;
+                serviceChannel.Heartbeat = "ThingsGateway.Plugin.Modbus";
+                serviceChannel.PluginName = "ThingsGateway.Plugin.Modbus.ModbusSlave";
+                newChannels.Add(serviceChannel);
+            }
+            {
+                var id = CommonUtils.GetSingleId();
+                var name = $"modbusSlaveDevice{id}";
+                serviceDevice.Name = name;
+                serviceDevice.Id = id;
+                serviceDevice.CreateUserId = UserManager.UserId;
+                serviceDevice.CreateOrgId = UserManager.OrgId;
+                serviceDevice.ChannelId = serviceChannel.Id;
+                serviceDevice.IntervalTime = "1000";
+                newDevices.Add(serviceDevice);
+            }
+
+        }
+
+
+        //SERVICE
+        var dtuids = newChannels.Select(a => a.Name).ToList();
+        Channel channel = new Channel();
+        {
+            var id = CommonUtils.GetSingleId();
+            var name = $"modbusChannel{id}";
+            channel.ChannelType = ChannelTypeEnum.TcpService;
+            channel.Name = name;
+            channel.Id = id;
+            channel.CreateUserId = UserManager.UserId;
+            channel.CreateOrgId = UserManager.OrgId;
+            channel.BindUrl = slaveUrl;
+            channel.Heartbeat = "ThingsGateway.Plugin.Modbus";
+            channel.PluginName = "ThingsGateway.Plugin.Modbus.ModbusMaster";
+            //动态插件属性默认
+            newChannels.Add(channel);
+        }
+
+        foreach (var item in dtuids)
+        {
+
+            Device device = new Device();
+            {
+                var id = CommonUtils.GetSingleId();
+                var name = $"modbusDevice{id}";
+                device.Name = name;
+                device.Id = id;
+                device.ChannelId = channel.Id;
+                device.CreateUserId = UserManager.UserId;
+                device.CreateOrgId = UserManager.OrgId;
+                device.IntervalTime = "1000";
+                device.DevicePropertys = new Dictionary<string, string>()
+                {
+                    {
+                        nameof(CollectFoundationDtuPackPropertyBase.DtuId),item
+                    }
+                };
+                //动态插件属性默认
+                newDevices.Add(device);
+            }
+            {
+                var address = $"400001";
+                var id = CommonUtils.GetSingleId();
+                var name = $"modbus{address}";
+                Variable variable = new Variable();
+                variable.DataType = DataTypeEnum.Int16;
+                variable.Name = name;
+                variable.Id = id;
+                variable.CreateOrgId = UserManager.OrgId;
+                variable.CreateUserId = UserManager.UserId;
+                variable.DeviceId = device.Id;
+                variable.RegisterAddress = address;
+                newVariables.Add(variable);
+            }
+        }
+
+
+        using var db = GetDB();
+
+        var result = await db.UseTranAsync(async () =>
+        {
+            if (GlobalData.HardwareJob.HardwareInfo.MachineInfo.AvailableMemory < 2 * 1024 * 1024 || WebEnableVariable.WebEnable == false)
+            {
+                await db.BulkCopyAsync(newChannels, 10000).ConfigureAwait(false);
+                await db.BulkCopyAsync(newDevices, 10000).ConfigureAwait(false);
+                await db.BulkCopyAsync(newVariables, 10000).ConfigureAwait(false);
+            }
+            else
+            {
+                await db.BulkCopyAsync(newChannels, 200000).ConfigureAwait(false);
+                await db.BulkCopyAsync(newDevices, 200000).ConfigureAwait(false);
+                await db.BulkCopyAsync(newVariables, 200000).ConfigureAwait(false);
+
+            }
+        }).ConfigureAwait(false);
+        if (result.IsSuccess)//如果成功了
+        {
+
+        }
+        else
+        {
+            throw new(result.ErrorMessage, result.ErrorException);
+        }
+        return (newChannels, newDevices, newVariables);
+    }
+
+
     #endregion 测试
 
     /// <summary>

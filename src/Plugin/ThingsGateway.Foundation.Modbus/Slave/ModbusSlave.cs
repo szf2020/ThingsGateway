@@ -10,6 +10,7 @@
 
 using System.Buffers;
 using System.Collections.Concurrent;
+using System.Runtime.InteropServices;
 
 using TouchSocket.Sockets;
 
@@ -184,10 +185,28 @@ public class ModbusSlave : DeviceBase, IModbusAddress
     /// <inheritdoc/>
     private void Init(ModbusRequest mAddress)
     {
+        //自动扩容
         ModbusServer01ByteBlocks.GetOrAdd(mAddress.Station, a =>
         {
-            var bytes = new ByteBlock(ushort.MaxValue * 2);
-            bytes.SetLength(ushort.MaxValue * 2);
+            var bytes = new ByteBlock(256,
+            (c) =>
+            {
+                var data= ArrayPool<byte>.Shared.Rent(c);
+                for (int i = 0; i < data.Length; i++)
+                {
+                    data[i] = 0;
+                }
+                return data;
+            },
+            (m) =>
+            {
+                if (MemoryMarshal.TryGetArray((ReadOnlyMemory<byte>)m, out var result))
+                {
+                    ArrayPool<byte>.Shared.Return(result.Array);
+                }
+            }
+            );
+            bytes.SetLength(256);
             for (int i = 0; i < bytes.Length; i++)
             {
                 bytes.WriteByte(0);
@@ -197,8 +216,25 @@ public class ModbusSlave : DeviceBase, IModbusAddress
         });
         ModbusServer02ByteBlocks.GetOrAdd(mAddress.Station, a =>
         {
-            var bytes = new ByteBlock(ushort.MaxValue * 2);
-            bytes.SetLength(ushort.MaxValue * 2);
+            var bytes = new ByteBlock(256,
+            (c) =>
+            {
+                var data = ArrayPool<byte>.Shared.Rent(c);
+                for (int i = 0; i < data.Length; i++)
+                {
+                    data[i] = 0;
+                }
+                return data;
+            },
+            (m) =>
+            {
+                if (MemoryMarshal.TryGetArray((ReadOnlyMemory<byte>)m, out var result))
+                {
+                    ArrayPool<byte>.Shared.Return(result.Array);
+                }
+            }
+            );
+            bytes.SetLength(256);
             for (int i = 0; i < bytes.Length; i++)
             {
                 bytes.WriteByte(0);
@@ -208,8 +244,25 @@ public class ModbusSlave : DeviceBase, IModbusAddress
         });
         ModbusServer03ByteBlocks.GetOrAdd(mAddress.Station, a =>
         {
-            var bytes = new ByteBlock(ushort.MaxValue * 2);
-            bytes.SetLength(ushort.MaxValue * 2);
+            var bytes = new ByteBlock(256,
+            (c) =>
+            {
+                var data = ArrayPool<byte>.Shared.Rent(c);
+                for (int i = 0; i < data.Length; i++)
+                {
+                    data[i] = 0;
+                }
+                return data;
+            },
+            (m) =>
+            {
+                if (MemoryMarshal.TryGetArray((ReadOnlyMemory<byte>)m, out var result))
+                {
+                    ArrayPool<byte>.Shared.Return(result.Array);
+                }
+            }
+            );
+            bytes.SetLength(256);
             for (int i = 0; i < bytes.Length; i++)
             {
                 bytes.WriteByte(0);
@@ -219,8 +272,25 @@ public class ModbusSlave : DeviceBase, IModbusAddress
         });
         ModbusServer04ByteBlocks.GetOrAdd(mAddress.Station, a =>
         {
-            var bytes = new ByteBlock(ushort.MaxValue * 2);
-            bytes.SetLength(ushort.MaxValue * 2);
+            var bytes = new ByteBlock(256,
+            (c) =>
+            {
+                var data = ArrayPool<byte>.Shared.Rent(c);
+                for (int i = 0; i < data.Length; i++)
+                {
+                    data[i] = 0;
+                }
+                return data;
+            },
+            (m) =>
+            {
+                if (MemoryMarshal.TryGetArray((ReadOnlyMemory<byte>)m, out var result))
+                {
+                    ArrayPool<byte>.Shared.Return(result.Array);
+                }
+            }
+            );
+            bytes.SetLength(256);
             for (int i = 0; i < bytes.Length; i++)
             {
                 bytes.WriteByte(0);
@@ -278,16 +348,20 @@ public class ModbusSlave : DeviceBase, IModbusAddress
                     switch (f)
                     {
                         case 1:
-                            return OperResult.CreateSuccessResult(ModbusServer01ByteBlock.Memory.Slice(mAddress.StartAddress, len));
+                            ModbusServer01ByteBlock.Position = mAddress.StartAddress;
+                            return OperResult.CreateSuccessResult((ReadOnlyMemory<byte>)ModbusServer01ByteBlock.GetMemory(len).Slice(0, len));
 
                         case 2:
-                            return OperResult.CreateSuccessResult(ModbusServer02ByteBlock.Memory.Slice(mAddress.StartAddress, len));
+                            ModbusServer02ByteBlock.Position = mAddress.StartAddress;
+                            return OperResult.CreateSuccessResult((ReadOnlyMemory<byte>)ModbusServer02ByteBlock.GetMemory(len).Slice(0, len));
 
                         case 3:
-                            return OperResult.CreateSuccessResult(ModbusServer03ByteBlock.Memory.Slice(mAddress.StartAddress * RegisterByteLength, len));
+                            ModbusServer03ByteBlock.Position = mAddress.StartAddress * RegisterByteLength;
+                            return OperResult.CreateSuccessResult((ReadOnlyMemory<byte>)ModbusServer03ByteBlock.GetMemory(len).Slice(0, len));
 
                         case 4:
-                            return OperResult.CreateSuccessResult(ModbusServer04ByteBlock.Memory.Slice(mAddress.StartAddress * RegisterByteLength, len));
+                            ModbusServer04ByteBlock.Position = mAddress.StartAddress * RegisterByteLength;
+                            return OperResult.CreateSuccessResult((ReadOnlyMemory<byte>)ModbusServer04ByteBlock.GetMemory(len).Slice(0, len));
                     }
                 }
             }

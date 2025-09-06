@@ -34,7 +34,26 @@ public static class PluginUtil
 
             if (channelOptions.ChannelType == ChannelTypeEnum.TcpClient)
             {
-                action += a => a.UseReconnection<IClientChannel>();
+                action += a => a.UseReconnection<IClientChannel>().SetActionForCheck((channel, failCount) =>
+                {
+                    if (channel.Online)
+                    {
+                        return Task.FromResult(ConnectionCheckResult.Alive);
+                    }
+                    else
+                    {
+                        if (failCount > 3)
+                        {
+                            return Task.FromResult(ConnectionCheckResult.Dead);
+                        }
+                        return Task.FromResult(ConnectionCheckResult.Skip);
+                    }
+
+
+                })
+                .SetPollingTick(TimeSpan.FromSeconds(5)
+
+                );
             }
             return action;
         }

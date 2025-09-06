@@ -221,7 +221,8 @@ public interface IManagementRpcServer : IRpcServer
 
     [DmtpRpc]
     Task InsertTestDataAsync(int testVariableCount, int testDeviceCount, string slaveUrl, bool businessEnable, bool restart);
-
+    [DmtpRpc]
+    Task InsertTestDtuDataAsync(int testDeviceCount, string slaveUrl, bool restart);
     [DmtpRpc]
     Task<bool> IsRedundantDeviceAsync(long id);
 

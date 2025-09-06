@@ -243,6 +243,7 @@
     "BusinessEnable": "添加业务设备",
     "SlaveUrl": "服务端Url",
     "Test": "一键添加测试变量",
+    "TestDtu": "一键添加Dtu测试变量",
     "TestDeviceCount": "采集设备数量",
     "TestVariableCount": "变量数量",
     "WriteValue": "写入值",
