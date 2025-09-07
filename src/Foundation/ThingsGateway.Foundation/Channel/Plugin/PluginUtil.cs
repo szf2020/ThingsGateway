@@ -42,7 +42,7 @@ public static class PluginUtil
                     }
                     else
                     {
-                        if (failCount > 3)
+                        if (failCount > 1)
                         {
                             return Task.FromResult(ConnectionCheckResult.Dead);
                         }
