@@ -332,7 +332,7 @@ internal sealed class RedundancyTask : IRpcDriver, IAsyncDisposable
         var config = new TouchSocketConfig()
                .SetRemoteIPHost(redundancy.MasterUri)
                .SetAdapterOption(new AdapterOption() { MaxPackageSize = 0x20000000 })
-               .SetDmtpOption(new DmtpOption() { VerifyToken = redundancy.VerifyToken })
+               .SetDmtpOption(a => a.VerifyToken = redundancy.VerifyToken)
                .ConfigureContainer(a =>
                {
                    a.AddLogger(LogMessage);
@@ -377,7 +377,7 @@ internal sealed class RedundancyTask : IRpcDriver, IAsyncDisposable
         var config = new TouchSocketConfig()
                .SetListenIPHosts(redundancy.MasterUri)
                .SetAdapterOption(new AdapterOption() { MaxPackageSize = 0x20000000 })
-               .SetDmtpOption(new DmtpOption() { VerifyToken = redundancy.VerifyToken })
+               .SetDmtpOption(a => a.VerifyToken = redundancy.VerifyToken)
                .ConfigureContainer(a =>
                {
                    a.AddLogger(LogMessage);

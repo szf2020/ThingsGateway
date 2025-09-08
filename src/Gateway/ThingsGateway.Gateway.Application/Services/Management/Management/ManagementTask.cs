@@ -93,7 +93,7 @@ public partial class ManagementTask : AsyncDisposableObject
         var config = new TouchSocketConfig()
                .SetRemoteIPHost(_managementOptions.ServerUri)
                .SetAdapterOption(new AdapterOption() { MaxPackageSize = 1024 * 1024 * 1024 })
-               .SetDmtpOption(new DmtpOption() { VerifyToken = _managementOptions.VerifyToken })
+               .SetDmtpOption(a => a.VerifyToken = _managementOptions.VerifyToken)
                .ConfigureContainer(a =>
                {
                    a.AddDmtpRouteService();//添加路由策略
@@ -157,7 +157,7 @@ public partial class ManagementTask : AsyncDisposableObject
         var config = new TouchSocketConfig()
                .SetListenIPHosts(_managementOptions.ServerUri)
                    .SetAdapterOption(new AdapterOption() { MaxPackageSize = 1024 * 1024 * 1024 })
-               .SetDmtpOption(new DmtpOption() { VerifyToken = _managementOptions.VerifyToken })
+               .SetDmtpOption(a => a.VerifyToken = _managementOptions.VerifyToken)
                .ConfigureContainer(a =>
                {
                    a.AddDmtpRouteService();//添加路由策略

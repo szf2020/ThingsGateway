@@ -191,7 +191,7 @@ public class ModbusSlave : DeviceBase, IModbusAddress
             var bytes = new ByteBlock(256,
             (c) =>
             {
-                var data= ArrayPool<byte>.Shared.Rent(c);
+                var data = ArrayPool<byte>.Shared.Rent(c);
                 for (int i = 0; i < data.Length; i++)
                 {
                     data[i] = 0;
