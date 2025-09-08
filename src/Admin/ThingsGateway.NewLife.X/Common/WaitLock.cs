@@ -8,6 +8,8 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
+using ThingsGateway.NewLife.Log;
+
 namespace ThingsGateway.NewLife;
 
 /// <summary>
@@ -50,24 +52,21 @@ public sealed class WaitLock : IDisposable
     public int CurrentCount => _waiterLock.CurrentCount;
     public bool Waitting => _waiterLock.CurrentCount < MaxCount;
 
-    private object m_lockObj = new();
     /// <summary>
     /// 离开锁
     /// </summary>
     public void Release()
     {
         if (DisposedValue) return;
-        lock (m_lockObj)
+        //if (Waitting)
         {
-            if (Waitting)
+            try
             {
-                try
-                {
-                    _waiterLock.Release();
-                }
-                catch (SemaphoreFullException)
-                {
-                }
+                _waiterLock.Release();
+            }
+            catch (SemaphoreFullException)
+            {
+                XTrace.WriteException(new Exception($"WaitLock {_name} 释放失败，当前信号量无需释放"));
             }
         }
     }

@@ -10,8 +10,6 @@
 
 using System.Text;
 
-using ThingsGateway.NewLife.Collections;
-
 namespace ThingsGateway.Foundation;
 
 /// <summary>
@@ -59,13 +57,6 @@ public class DeviceSingleStreamDataHandleAdapter<TRequest> : CustomDataHandlingA
     /// <inheritdoc />
     public void SetRequest(ISendMessage sendMessage)
     {
-        if (IsSingleThread)
-        {
-            if (Request != null)
-            {
-                _requestPool.Return(Request);
-            }
-        }
         var request = GetInstance();
         request.Sign = sendMessage.Sign;
         request.SendInfo(sendMessage);
@@ -165,25 +156,13 @@ public class DeviceSingleStreamDataHandleAdapter<TRequest> : CustomDataHandlingA
         }
     }
 
-    private static ObjectPool<TRequest> _requestPool { get; } = new ObjectPool<TRequest>();
-
     /// <summary>
     /// 获取泛型实例。
     /// </summary>
     /// <returns></returns>
     protected virtual TRequest GetInstance()
     {
-        if (IsSingleThread)
-        {
-            var request = _requestPool.Get();
-            request.OperCode = -1;
-            request.Sign = -1;
-            return request;
-        }
-        else
-        {
-            return new TRequest() { OperCode = -1, Sign = -1 };
-        }
+        return new TRequest() { OperCode = -1, Sign = -1 };
     }
 
     public override void SendInput<TWriter>(ref TWriter writer, in ReadOnlyMemory<byte> memory)

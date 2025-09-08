@@ -554,10 +554,7 @@ public static class Reflect
     //}
 
 
-    private static class DelegateCache<TFunc>
-    {
-        public static readonly ExpiringDictionary<DelegateCacheKey, TFunc> Cache = new();
-    }
+
 
     /// <summary>把一个方法转为泛型委托，便于快速反射调用</summary>
     /// <typeparam name="TFunc"></typeparam>
@@ -580,38 +577,42 @@ public static class Reflect
         return func;
     }
 
-    private readonly struct DelegateCacheKey : IEquatable<DelegateCacheKey>
+    #endregion
+}
+public static class DelegateCache<TFunc>
+{
+    public static readonly ExpiringDictionary<DelegateCacheKey, TFunc> Cache = new();
+}
+public readonly struct DelegateCacheKey : IEquatable<DelegateCacheKey>
+{
+    public readonly MethodInfo Method;
+    public readonly Type FuncType;
+    public readonly object? Target;
+
+    public DelegateCacheKey(MethodInfo method, Type funcType, object? target)
     {
-        public readonly MethodInfo Method;
-        public readonly Type FuncType;
-        public readonly object? Target;
+        Method = method;
+        FuncType = funcType;
+        Target = target;
+    }
 
-        public DelegateCacheKey(MethodInfo method, Type funcType, object? target)
+    public bool Equals(DelegateCacheKey other) =>
+        Method.Equals(other.Method)
+        && FuncType.Equals(other.FuncType)
+        && ReferenceEquals(Target, other.Target);
+
+    public override bool Equals(object? obj) =>
+        obj is DelegateCacheKey other && Equals(other);
+
+    public override int GetHashCode()
+    {
+        unchecked
         {
-            Method = method;
-            FuncType = funcType;
-            Target = target;
-        }
-
-        public bool Equals(DelegateCacheKey other) =>
-            Method.Equals(other.Method)
-            && FuncType.Equals(other.FuncType)
-            && ReferenceEquals(Target, other.Target);
-
-        public override bool Equals(object? obj) =>
-            obj is DelegateCacheKey other && Equals(other);
-
-        public override int GetHashCode()
-        {
-            unchecked
-            {
-                int hash = Method.GetHashCode();
-                hash = (hash * 397) ^ FuncType.GetHashCode();
-                if (Target != null)
-                    hash = (hash * 397) ^ RuntimeHelpers.GetHashCode(Target); // 不受对象重写 GetHashCode 影响
-                return hash;
-            }
+            int hash = Method.GetHashCode();
+            hash = (hash * 397) ^ FuncType.GetHashCode();
+            if (Target != null)
+                hash = (hash * 397) ^ RuntimeHelpers.GetHashCode(Target); // 不受对象重写 GetHashCode 影响
+            return hash;
         }
     }
-    #endregion
 }

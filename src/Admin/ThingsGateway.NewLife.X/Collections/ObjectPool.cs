@@ -64,7 +64,10 @@ public class ObjectPool<T> : DisposeBase, IPool<T> where T : notnull
         // 启动定期清理的定时器
         StartTimer();
     }
-
+    ~ObjectPool()
+    {
+        this.TryDispose();
+    }
     /// <summary>销毁</summary>
     /// <param name="disposing"></param>
     protected override void Dispose(Boolean disposing)

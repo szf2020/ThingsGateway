@@ -134,7 +134,7 @@ public static partial class DeviceExtension
     /// <summary>
     /// 当状态不是<see cref="WaitDataStatus.Success"/>时返回异常。
     /// </summary>
-    public static OperResult Check(this AsyncWaitData<MessageBase> waitDataAsync, CancellationToken cancellationToken)
+    public static OperResult Check(this AsyncWaitData<MessageBase> waitDataAsync, bool timeout)
     {
         switch (waitDataAsync.Status)
         {
@@ -142,7 +142,7 @@ public static partial class DeviceExtension
                 return new();
 
             case WaitDataStatus.Canceled:
-                if (cancellationToken.IsCancellationRequested)
+                if (timeout)
                 {
                     if (waitDataAsync.CompletedData != null)
                     {

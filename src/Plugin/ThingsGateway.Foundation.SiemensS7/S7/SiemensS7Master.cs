@@ -139,156 +139,191 @@ public partial class SiemensS7Master : DeviceBase
     /// <summary>
     /// 此方法并不会智能分组以最大化效率，减少传输次数，因为返回值是byte[]，所以一切都按地址数组的顺序执行，最后合并数组
     /// </summary>
-    public async ValueTask<OperResult<ReadOnlyMemory<byte>>> S7ReadAsync(SiemensS7Address[] sAddresss, CancellationToken cancellationToken = default)
+    public async ValueTask<OperResult<ReadOnlyMemory<byte>>> S7ReadAsync(
+        SiemensS7Address[] addresses,
+        CancellationToken cancellationToken = default)
     {
+        var byteBuffer = new ValueByteBlock(512);
+
+        try
         {
-            var byteBlock = new ValueByteBlock(2048);
-            try
+            foreach (var address in addresses)
             {
-                foreach (var sAddress in sAddresss)
+                int readCount = 0;
+                int totalLength = address.Length == 0 ? 1 : address.Length;
+                int originalStart = address.AddressStart;
+
+                try
                 {
-                    int num = 0;
-                    var addressLen = sAddress.Length == 0 ? 1 : sAddress.Length;
-                    var start = sAddress.AddressStart;
-                    try
+                    while (readCount < totalLength)
                     {
-                        while (num < addressLen)
+                        // 每次读取的 PDU 长度，循环直到读取完整
+                        int chunkLength = Math.Min(totalLength - readCount, PduLength);
+                        address.Length = chunkLength;
+
+                        var result = await SendThenReturnAsync(
+                            new S7Send([address], true),
+                            cancellationToken: cancellationToken
+                        ).ConfigureAwait(false);
+
+                        if (!result.IsSuccess)
+                            return result;
+
+                        byteBuffer.Write(result.Content.Span);
+
+                        if (readCount + chunkLength >= totalLength)
                         {
-                            //pdu长度，重复生成报文，直至全部生成
-                            int len = Math.Min(addressLen - num, PduLength);
-                            sAddress.Length = len;
-                            var result = await SendThenReturnAsync(new S7Send([sAddress], true), cancellationToken: cancellationToken).ConfigureAwait(false);
-                            if (!result.IsSuccess) return result;
-
-                            byteBlock.Write(result.Content.Span);
-                            num += len;
-
-                            if (sAddress.DataCode == S7Area.TM || sAddress.DataCode == S7Area.CT)
+                            if (addresses.Length == 1)
                             {
-                                sAddress.AddressStart += len / 2;
+                                return result;
                             }
-                            else
-                            {
-                                sAddress.AddressStart += len * 8;
-                            }
+                            break;
                         }
-                    }
-                    finally
-                    {
-                        sAddress.AddressStart = start;
+
+                        readCount += chunkLength;
+
+                        // 更新地址起点
+                        if (address.DataCode == S7Area.TM || address.DataCode == S7Area.CT)
+                            address.AddressStart += chunkLength / 2;
+                        else
+                            address.AddressStart += chunkLength * 8;
                     }
                 }
+                finally
+                {
+                    address.AddressStart = originalStart;
+                }
+            }
 
-                return new OperResult<ReadOnlyMemory<byte>>() { Content = byteBlock.ToArray() };
-            }
-            catch (Exception ex)
-            {
-                return new OperResult<ReadOnlyMemory<byte>>(ex);
-            }
-            finally
-            {
-                byteBlock.SafeDispose();
-            }
+            return new OperResult<ReadOnlyMemory<byte>> { Content = byteBuffer.ToArray() };
+        }
+        catch (Exception ex)
+        {
+            return new OperResult<ReadOnlyMemory<byte>>(ex);
+        }
+        finally
+        {
+            byteBuffer.SafeDispose();
         }
     }
+
+
     /// <summary>
     /// 此方法并不会智能分组以最大化效率，减少传输次数，因为返回值是byte[]，所以一切都按地址数组的顺序执行，最后合并数组
     /// </summary>
-    public async ValueTask<Dictionary<SiemensS7Address, OperResult>> S7WriteAsync(SiemensS7Address[] sAddresss, CancellationToken cancellationToken = default)
+    public async ValueTask<Dictionary<SiemensS7Address, OperResult>> S7WriteAsync(
+    SiemensS7Address[] addresses,
+    CancellationToken cancellationToken = default)
     {
         var dictOperResult = new Dictionary<SiemensS7Address, OperResult>();
 
         void SetFailOperResult(OperResult operResult)
         {
-            foreach (var item in sAddresss)
+            foreach (var address in addresses)
             {
-                dictOperResult.TryAdd(item, operResult);
+                dictOperResult.TryAdd(address, operResult);
             }
         }
 
+        var firstAddress = addresses[0];
+
+        // 单位写入（位写入）
+        if (addresses.Length <= 1 && firstAddress.IsBit)
         {
-            var sAddress = sAddresss[0];
-            if (sAddresss.Length <= 1 && sAddress.IsBit)
+            var byteBuffer = new ValueByteBlock(512);
+            try
             {
-                var byteBlock = new ValueByteBlock(2048);
+                var writeResult = await SendThenReturnAsync(
+                    new S7Send([firstAddress], false),
+                    cancellationToken: cancellationToken
+                ).ConfigureAwait(false);
+
+                dictOperResult.TryAdd(firstAddress, writeResult);
+                return dictOperResult;
+            }
+            catch (Exception ex)
+            {
+                SetFailOperResult(new OperResult(ex));
+                return dictOperResult;
+            }
+            finally
+            {
+                byteBuffer.SafeDispose();
+            }
+        }
+        else
+        {
+            // 多写入
+            var addressChunks = new List<List<SiemensS7Address>>();
+            ushort dataLength = 0;
+            ushort itemCount = 1;
+            var currentChunk = new List<SiemensS7Address>();
+
+            for (int i = 0; i < addresses.Length; i++)
+            {
+                var address = addresses[i];
+                dataLength += (ushort)(address.Data.Length + 4);
+                ushort telegramLength = (ushort)(itemCount * 12 + 19 + dataLength);
+
+                if (telegramLength < PduLength)
+                {
+                    currentChunk.Add(address);
+                    itemCount++;
+
+                    if (i == addresses.Length - 1)
+                        addressChunks.Add(currentChunk);
+                }
+                else
+                {
+                    addressChunks.Add(currentChunk);
+                    currentChunk = new List<SiemensS7Address>();
+                    dataLength = 0;
+                    itemCount = 1;
+
+                    dataLength += (ushort)(address.Data.Length + 4);
+                    telegramLength = (ushort)(itemCount * 12 + 19 + dataLength);
+
+                    if (telegramLength < PduLength)
+                    {
+                        currentChunk.Add(address);
+                        itemCount++;
+
+                        if (i == addresses.Length - 1)
+                            addressChunks.Add(currentChunk);
+                    }
+                    else
+                    {
+                        SetFailOperResult(new OperResult("Write length exceeds limit"));
+                        return dictOperResult;
+                    }
+                }
+            }
+
+            foreach (var chunk in addressChunks)
+            {
                 try
                 {
-                    var wresult = await SendThenReturnAsync(new S7Send([sAddress], false), cancellationToken: cancellationToken).ConfigureAwait(false);
-                    dictOperResult.TryAdd(sAddress, wresult);
-                    return dictOperResult;
+                    var result = await SendThenReturnAsync(
+                        new S7Send(chunk.ToArray(), false),
+                        cancellationToken: cancellationToken
+                    ).ConfigureAwait(false);
+
+                    foreach (var addr in chunk)
+                    {
+                        dictOperResult.TryAdd(addr, result);
+                    }
                 }
                 catch (Exception ex)
                 {
                     SetFailOperResult(new OperResult(ex));
                     return dictOperResult;
                 }
-                finally
-                {
-                    byteBlock.SafeDispose();
-                }
             }
-            else
-            {
-                //多写
-                List<List<SiemensS7Address>> siemensS7Addresses = new();
-                ushort dataLen = 0;
-                ushort itemLen = 1;
-                List<SiemensS7Address> addresses = new();
-                for (int i = 0; i < sAddresss.Length; i++)
-                {
-                    var item = sAddresss[i];
-                    dataLen = (ushort)(dataLen + item.Data.Length + 4);
-                    ushort telegramLen = (ushort)(itemLen * 12 + 19 + dataLen);
-                    if (telegramLen < PduLength)
-                    {
-                        addresses.Add(item);
-                        itemLen++;
-                        if (i == sAddresss.Length - 1)
-                            siemensS7Addresses.Add(addresses);
-                    }
-                    else
-                    {
-                        siemensS7Addresses.Add(addresses);
-                        addresses = new();
-                        dataLen = 0;
-                        itemLen = 1;
-                        dataLen = (ushort)(dataLen + item.Data.Length + 4);
-                        telegramLen = (ushort)(itemLen * 12 + 19 + dataLen);
-                        if (telegramLen < PduLength)
-                        {
-                            addresses.Add(item);
-                            itemLen++;
-                            if (i == sAddresss.Length - 1)
-                                siemensS7Addresses.Add(addresses);
-                        }
-                        else
-                        {
-                            SetFailOperResult(new OperResult("Write length exceeds limit"));
-                            return dictOperResult;
-                        }
-                    }
-                }
 
-                foreach (var item in siemensS7Addresses)
-                {
-                    try
-                    {
-                        var result = await SendThenReturnAsync(new S7Send(item.ToArray(), false), cancellationToken: cancellationToken).ConfigureAwait(false);
-                        foreach (var i1 in item)
-                        {
-                            dictOperResult.TryAdd(i1, result);
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        SetFailOperResult(new OperResult(ex));
-                        return dictOperResult;
-                    }
-                }
-                return dictOperResult;
-            }
+            return dictOperResult;
         }
     }
+
 
     #region 读写
 
