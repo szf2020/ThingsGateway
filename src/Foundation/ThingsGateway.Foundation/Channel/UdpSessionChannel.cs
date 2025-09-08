@@ -26,16 +26,14 @@ public class UdpSessionChannel : UdpSession, IClientChannel
         ResetSign();
     }
     public override TouchSocketConfig Config => base.Config ?? ChannelOptions.Config;
-    private IDeviceDataHandleAdapter _deviceDataHandleAdapter;
+    private bool logSet;
+    /// <inheritdoc/>
     public void SetDataHandlingAdapterLogger(ILog log)
     {
-        if (_deviceDataHandleAdapter != DataHandlingAdapter && DataHandlingAdapter is IDeviceDataHandleAdapter handleAdapter)
+        if (!logSet && DataHandlingAdapter is IDeviceDataHandleAdapter handleAdapter)
         {
-            _deviceDataHandleAdapter = handleAdapter;
-        }
-        if (_deviceDataHandleAdapter != null)
-        {
-            _deviceDataHandleAdapter.Logger = log;
+            logSet = true;
+            handleAdapter.Logger = log;
         }
     }
     /// <inheritdoc/>
@@ -43,9 +41,11 @@ public class UdpSessionChannel : UdpSession, IClientChannel
     {
         if (adapter is UdpDataHandlingAdapter udpDataHandlingAdapter)
             SetAdapter(udpDataHandlingAdapter);
-        if (adapter is IDeviceDataHandleAdapter deviceDataHandleAdapter)
-            _deviceDataHandleAdapter = deviceDataHandleAdapter;
+
+        logSet = false;
     }
+
+
     public void ResetSign(int minSign = 0, int maxSign = ushort.MaxValue)
     {
         var pool = WaitHandlePool;

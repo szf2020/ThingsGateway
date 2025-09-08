@@ -47,16 +47,15 @@ public class SerialPortChannel : SerialPortClient, IClientChannel
 
     /// <inheritdoc/>
     public DataHandlingAdapter ReadOnlyDataHandlingAdapter => ProtectedDataHandlingAdapter;
-    private IDeviceDataHandleAdapter _deviceDataHandleAdapter;
+
+    private bool logSet;
+    /// <inheritdoc/>
     public void SetDataHandlingAdapterLogger(ILog log)
     {
-        if (_deviceDataHandleAdapter != ProtectedDataHandlingAdapter && ProtectedDataHandlingAdapter is IDeviceDataHandleAdapter handleAdapter)
+        if (!logSet && ProtectedDataHandlingAdapter is IDeviceDataHandleAdapter handleAdapter)
         {
-            _deviceDataHandleAdapter = handleAdapter;
-        }
-        if (_deviceDataHandleAdapter != null)
-        {
-            _deviceDataHandleAdapter.Logger = log;
+            logSet = true;
+            handleAdapter.Logger = log;
         }
     }
     /// <inheritdoc/>
@@ -64,9 +63,10 @@ public class SerialPortChannel : SerialPortClient, IClientChannel
     {
         if (adapter is SingleStreamDataHandlingAdapter singleStreamDataHandlingAdapter)
             SetAdapter(singleStreamDataHandlingAdapter);
-        if (adapter is IDeviceDataHandleAdapter deviceDataHandleAdapter)
-            _deviceDataHandleAdapter = deviceDataHandleAdapter;
+
+        logSet = false;
     }
+
 
     /// <inheritdoc/>
     public ChannelEventHandler Started { get; } = new();

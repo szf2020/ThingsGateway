@@ -30,16 +30,13 @@ public class TcpClientChannel : TcpClient, IClientChannel
         WaitHandlePool = new WaitHandlePool<MessageBase>(minSign, maxSign);
         pool?.CancelAll();
     }
-    private IDeviceDataHandleAdapter _deviceDataHandleAdapter;
+    private bool logSet;
     public void SetDataHandlingAdapterLogger(ILog log)
     {
-        if (_deviceDataHandleAdapter != DataHandlingAdapter && DataHandlingAdapter is IDeviceDataHandleAdapter handleAdapter)
+        if (!logSet && DataHandlingAdapter is IDeviceDataHandleAdapter handleAdapter)
         {
-            _deviceDataHandleAdapter = handleAdapter;
-        }
-        if (_deviceDataHandleAdapter != null)
-        {
-            _deviceDataHandleAdapter.Logger = log;
+            logSet = true;
+            handleAdapter.Logger = log;
         }
     }
     /// <inheritdoc/>
@@ -47,8 +44,8 @@ public class TcpClientChannel : TcpClient, IClientChannel
     {
         if (adapter is SingleStreamDataHandlingAdapter singleStreamDataHandlingAdapter)
             SetAdapter(singleStreamDataHandlingAdapter);
-        if (adapter is IDeviceDataHandleAdapter deviceDataHandleAdapter)
-            _deviceDataHandleAdapter = deviceDataHandleAdapter;
+
+        logSet = false;
     }
     /// <inheritdoc/>
     public ChannelReceivedEventHandler ChannelReceived { get; } = new();

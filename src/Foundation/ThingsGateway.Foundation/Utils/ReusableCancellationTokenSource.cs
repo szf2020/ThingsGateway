@@ -18,7 +18,6 @@ using System.Threading;
 public sealed class ReusableCancellationTokenSource : IDisposable
 {
     private readonly Timer _timer;
-    private readonly object _lock = new();
     private CancellationTokenSource? _cts;
 
     public ReusableCancellationTokenSource()
@@ -30,59 +29,29 @@ public sealed class ReusableCancellationTokenSource : IDisposable
 
     private void OnTimeout(object? state)
     {
-        lock (_lock)
-        {
-            TimeoutStatus = true;
+        TimeoutStatus = true;
 
-            if (_cts?.IsCancellationRequested == false)
-                _cts?.Cancel();
+        if (_cts?.IsCancellationRequested == false)
+            _cts?.Cancel();
 
-        }
     }
-    /// <summary>
-    /// 获取一个 CTS，并启动超时
-    /// </summary>
-    public CancellationTokenSource GetTokenSource(long timeout, CancellationToken external1 = default)
-    {
-        lock (_lock)
-        {
-            TimeoutStatus = false;
 
-            // 如果已有 CTS，先 Dispose
-            _cts?.SafeCancel();
-            _cts?.SafeDispose();
-
-            // 创建新的 CTS
-            _cts = CancellationTokenSource.CreateLinkedTokenSource(external1);
-
-            // 启动 Timer
-            _timer.Change(timeout, Timeout.Infinite);
-
-            return _cts;
-        }
-    }
+    private readonly LinkedCancellationTokenSourceCache _linkedCtsCache = new();
 
     /// <summary>
     /// 获取一个 CTS，并启动超时
     /// </summary>
     public CancellationTokenSource GetTokenSource(long timeout, CancellationToken external1 = default, CancellationToken external2 = default, CancellationToken external3 = default)
     {
-        lock (_lock)
-        {
-            TimeoutStatus = false;
+        TimeoutStatus = false;
 
-            // 如果已有 CTS，先 Dispose
-            _cts?.SafeCancel();
-            _cts?.SafeDispose();
+        // 创建新的 CTS
+        _cts = _linkedCtsCache.GetLinkedTokenSource(external1, external2, external3);
 
-            // 创建新的 CTS
-            _cts = CancellationTokenSource.CreateLinkedTokenSource(external1, external2, external3);
+        // 启动 Timer
+        _timer.Change(timeout, Timeout.Infinite);
 
-            // 启动 Timer
-            _timer.Change(timeout, Timeout.Infinite);
-
-            return _cts;
-        }
+        return _cts;
     }
 
 
@@ -96,20 +65,15 @@ public sealed class ReusableCancellationTokenSource : IDisposable
     /// </summary>
     public void Cancel()
     {
-        lock (_lock)
-        {
-            _cts?.SafeCancel();
-        }
+        _cts?.SafeCancel();
     }
 
     public void Dispose()
     {
-        lock (_lock)
-        {
-            _cts?.SafeCancel();
-            _cts?.SafeDispose();
-            _timer.SafeDispose();
-        }
+        _cts?.SafeCancel();
+        _cts?.SafeDispose();
+        _linkedCtsCache.SafeDispose();
+        _timer.SafeDispose();
     }
 }
 

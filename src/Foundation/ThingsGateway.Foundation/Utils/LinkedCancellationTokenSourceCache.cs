@@ -8,35 +8,48 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-namespace ThingsGateway.Gateway.Application;
+namespace ThingsGateway.Foundation;
 
 public class LinkedCancellationTokenSourceCache : IDisposable
 {
     private CancellationTokenSource? _cachedCts;
     private CancellationToken _token1;
     private CancellationToken _token2;
+    private CancellationToken _token3;
     private readonly object _lock = new();
     ~LinkedCancellationTokenSourceCache()
     {
         Dispose();
     }
+
     /// <summary>
     /// 获取一个 CancellationTokenSource，它是由两个 token 链接而成的。
     /// 会尝试复用之前缓存的 CTS，前提是两个 token 仍然相同且未取消。
     /// </summary>
-    public CancellationTokenSource GetLinkedTokenSource(CancellationToken token1, CancellationToken token2)
+    public CancellationTokenSource GetLinkedTokenSource(CancellationToken token1, CancellationToken token2, CancellationToken token3 = default)
     {
         lock (_lock)
         {
             // 如果缓存的 CTS 已经取消或 Dispose，或者 token 不同，重新创建
             if (_cachedCts?.IsCancellationRequested != false ||
-                !_token1.Equals(token1) || !_token2.Equals(token2))
+                !_token1.Equals(token1) || !_token2.Equals(token2) || !_token3.Equals(token3))
             {
+#if NET6_0_OR_GREATER
+                if (_cachedCts?.TryReset() != true)
+                {
+                    _cachedCts?.Dispose();
+                    _cachedCts = CancellationTokenSource.CreateLinkedTokenSource(token1, token2, token3);
+                }
+#else
                 _cachedCts?.Dispose();
 
-                _cachedCts = CancellationTokenSource.CreateLinkedTokenSource(token1, token2);
+                _cachedCts = CancellationTokenSource.CreateLinkedTokenSource(token1, token2, token3);
+#endif
+
+
                 _token1 = token1;
                 _token2 = token2;
+                _token3 = token3;
             }
 
             return _cachedCts;

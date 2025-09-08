@@ -331,34 +331,23 @@ public abstract class DeviceBase : AsyncAndSyncDisposableObject, IDevice
     }
     public bool AutoConnect { get; protected set; } = true;
     /// <inheritdoc/>
-    private async ValueTask<OperResult> SendAsync(ISendMessage sendMessage, IClientChannel channel, CancellationToken token = default)
+    private async Task SendAsync(ISendMessage sendMessage, IClientChannel channel, CancellationToken token = default)
     {
-        try
+
+        if (SendDelayTime != 0)
+            await Task.Delay(SendDelayTime, token).ConfigureAwait(false);
+
+        if (channel is IDtuUdpSessionChannel udpSession)
         {
+            EndPoint? endPoint = GetUdpEndpoint();
+            await udpSession.SendAsync(endPoint, sendMessage, token).ConfigureAwait(false);
 
-            if (SendDelayTime != 0)
-                await Task.Delay(SendDelayTime, token).ConfigureAwait(false);
-
-            if (token.IsCancellationRequested)
-                return new OperResult(new OperationCanceledException());
-
-            if (channel is IDtuUdpSessionChannel udpSession)
-            {
-                EndPoint? endPoint = GetUdpEndpoint();
-                await udpSession.SendAsync(endPoint, sendMessage, token).ConfigureAwait(false);
-
-            }
-            else
-            {
-                await channel.SendAsync(sendMessage, token).ConfigureAwait(false);
-            }
-
-            return OperResult.Success;
         }
-        catch (Exception ex)
+        else
         {
-            return new(ex);
+            await channel.SendAsync(sendMessage, token).ConfigureAwait(false);
         }
+
     }
 
     private Task BeforeSendAsync(IClientChannel channel, CancellationToken token)
@@ -417,7 +406,8 @@ public abstract class DeviceBase : AsyncAndSyncDisposableObject, IDevice
                 channelResult.Content.SetDataHandlingAdapterLogger(Logger);
 
 
-                return await SendAsync(sendMessage, channelResult.Content, cancellationToken).ConfigureAwait(false);
+                await SendAsync(sendMessage, channelResult.Content, cancellationToken).ConfigureAwait(false);
+                return OperResult.Success;
             }
             finally
             {
@@ -426,8 +416,6 @@ public abstract class DeviceBase : AsyncAndSyncDisposableObject, IDevice
         }
         catch (Exception ex)
         {
-            if (!cancellationToken.IsCancellationRequested)
-                await Task.Delay(1000, cancellationToken).ConfigureAwait(false);
             return new(ex);
         }
     }
@@ -538,7 +526,6 @@ public abstract class DeviceBase : AsyncAndSyncDisposableObject, IDevice
     }
 
     private ObjectPool<ReusableCancellationTokenSource> _reusableTimeouts = new();
-
     /// <summary>
     /// 发送并等待数据
     /// </summary>
@@ -548,6 +535,8 @@ public abstract class DeviceBase : AsyncAndSyncDisposableObject, IDevice
         int timeout = 3000,
         CancellationToken cancellationToken = default)
     {
+
+
         var waitData = clientChannel.WaitHandlePool.GetWaitDataAsync(out var sign);
         command.Sign = sign;
         WaitLock? waitLock = null;
@@ -557,13 +546,12 @@ public abstract class DeviceBase : AsyncAndSyncDisposableObject, IDevice
             await BeforeSendAsync(clientChannel, cancellationToken).ConfigureAwait(false);
 
             waitLock = GetWaitLock(clientChannel);
+
             await waitLock.WaitAsync(cancellationToken).ConfigureAwait(false);
 
             clientChannel.SetDataHandlingAdapterLogger(Logger);
 
-            var sendResult = await SendAsync(command, clientChannel, cancellationToken).ConfigureAwait(false);
-            if (!sendResult.IsSuccess)
-                return new MessageBase(sendResult);
+            await SendAsync(command, clientChannel, cancellationToken).ConfigureAwait(false);
 
             if (waitData.Status == WaitDataStatus.Success)
                 return waitData.CompletedData;
@@ -573,6 +561,7 @@ public abstract class DeviceBase : AsyncAndSyncDisposableObject, IDevice
             var reusableTimeout = _reusableTimeouts.Get();
             try
             {
+
                 var cts = reusableTimeout.GetTokenSource(timeout, cancellationToken, Channel.ClosedToken);
                 await waitData.WaitAsync(cts.Token).ConfigureAwait(false);
             }
@@ -606,6 +595,7 @@ public abstract class DeviceBase : AsyncAndSyncDisposableObject, IDevice
         {
             waitLock?.Release();
             waitData?.SafeDispose();
+
         }
     }
 

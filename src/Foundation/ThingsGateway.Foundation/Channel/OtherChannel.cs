@@ -29,17 +29,7 @@ public class OtherChannel : SetupConfigObject, IClientChannel
     }
 
     public override TouchSocketConfig Config => base.Config ?? ChannelOptions.Config;
-    public void SetDataHandlingAdapterLogger(ILog log)
-    {
-        if (_deviceDataHandleAdapter != ReadOnlyDataHandlingAdapter && ReadOnlyDataHandlingAdapter is IDeviceDataHandleAdapter handleAdapter)
-        {
-            _deviceDataHandleAdapter = handleAdapter;
-        }
-        if (_deviceDataHandleAdapter != null)
-        {
-            _deviceDataHandleAdapter.Logger = log;
-        }
-    }
+
 
     public void ResetSign(int minSign = 0, int maxSign = ushort.MaxValue)
     {
@@ -83,16 +73,27 @@ public class OtherChannel : SetupConfigObject, IClientChannel
 
     //private readonly WaitLock _connectLock = new WaitLock();
 
-    private IDeviceDataHandleAdapter _deviceDataHandleAdapter;
 
+
+    private bool logSet;
+    /// <inheritdoc/>
+    public void SetDataHandlingAdapterLogger(ILog log)
+    {
+        if (!logSet && ReadOnlyDataHandlingAdapter is IDeviceDataHandleAdapter handleAdapter)
+        {
+            logSet = true;
+            handleAdapter.Logger = log;
+        }
+    }
     /// <inheritdoc/>
     public void SetDataHandlingAdapter(DataHandlingAdapter adapter)
     {
         if (adapter is SingleStreamDataHandlingAdapter singleStreamDataHandlingAdapter)
             SetAdapter(singleStreamDataHandlingAdapter);
-        if (adapter is IDeviceDataHandleAdapter deviceDataHandleAdapter)
-            _deviceDataHandleAdapter = deviceDataHandleAdapter;
+
+        logSet = false;
     }
+
     /// <summary>
     /// 设置数据处理适配器。
     /// </summary>

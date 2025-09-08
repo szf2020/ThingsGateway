@@ -1,5 +1,4 @@
 ﻿using System.Collections.Concurrent;
-using System.Diagnostics;
 
 using ThingsGateway.NewLife.Log;
 using ThingsGateway.NewLife.Reflection;
@@ -76,7 +75,7 @@ public class ObjectPool<T> : DisposeBase, IPool<T> where T : notnull
 
         _timer.TryDispose();
 
-        WriteLog($"Dispose {typeof(T).FullName} FreeCount={FreeCount:n0} BusyCount={BusyCount:n0} Total={Total:n0}");
+        WriteLog($"Dispose {typeof(T).FullName} FreeCount={FreeCount:n0} BusyCount={BusyCount:n0}");
 
         Clear();
     }
@@ -112,10 +111,6 @@ public class ObjectPool<T> : DisposeBase, IPool<T> where T : notnull
     /// <returns></returns>
     public virtual T Get()
     {
-        var sw = Log == null || Log == Logger.Null ? null : Stopwatch.StartNew();
-        Interlocked.Increment(ref _Total);
-
-        var success = false;
         Item? pi = null;
         do
         {
@@ -123,8 +118,6 @@ public class ObjectPool<T> : DisposeBase, IPool<T> where T : notnull
             if (_free.TryPop(out pi) || _free2.TryDequeue(out pi))
             {
                 Interlocked.Decrement(ref _FreeCount);
-
-                success = true;
             }
             else
             {
@@ -150,8 +143,6 @@ public class ObjectPool<T> : DisposeBase, IPool<T> where T : notnull
                 WriteLog("Acquire Create Free={0} Busy={1}", FreeCount, count + 1);
 #endif
 
-                Interlocked.Increment(ref _NewCount);
-                success = false;
             }
 
             // 借出时如果不可用，再次借取
@@ -164,17 +155,6 @@ public class ObjectPool<T> : DisposeBase, IPool<T> where T : notnull
         _busy.TryAdd(pi.Value, pi);
 
         Interlocked.Increment(ref _BusyCount);
-        if (success) Interlocked.Increment(ref _Success);
-        if (sw != null)
-        {
-            sw.Stop();
-            var ms = sw.Elapsed.TotalMilliseconds;
-
-            if (Cost < 0.001)
-                Cost = ms;
-            else
-                Cost = (Cost * 3 + ms) / 4;
-        }
 
         return pi.Value;
     }
@@ -200,7 +180,6 @@ public class ObjectPool<T> : DisposeBase, IPool<T> where T : notnull
 #if DEBUG
             WriteLog("Return Error");
 #endif
-            Interlocked.Increment(ref _ReleaseCount);
 
             return false;
         }
@@ -210,13 +189,11 @@ public class ObjectPool<T> : DisposeBase, IPool<T> where T : notnull
         // 是否可用
         if (!OnReturn(value))
         {
-            Interlocked.Increment(ref _ReleaseCount);
             return false;
         }
 
         if (value is DisposeBase db && db.Disposed)
         {
-            Interlocked.Increment(ref _ReleaseCount);
             return false;
         }
 
@@ -373,37 +350,12 @@ public class ObjectPool<T> : DisposeBase, IPool<T> where T : notnull
             }
         }
 
-        var ncount = _NewCount;
-        var fcount = _ReleaseCount;
-        if (count > 0 || ncount > 0 || fcount > 0)
+        if (count > 0)
         {
-            Interlocked.Add(ref _NewCount, -ncount);
-            Interlocked.Add(ref _ReleaseCount, -fcount);
 
-            var p = Total == 0 ? 0 : (Double)Success / Total;
-
-            WriteLog("Release New={6:n0} Release={7:n0} Free={0} Busy={1} 清除过期资源 {2:n0} 项。总请求 {3:n0} 次，命中 {4:p2}，平均 {5:n2}us", FreeCount, BusyCount, count, Total, p, Cost * 1000, ncount, fcount);
+            WriteLog("Release New={6:n0} Release={7:n0} Free={0} Busy={1} 清除过期资源 {2:n0} 项。", FreeCount, BusyCount, count);
         }
     }
-    #endregion
-
-    #region 统计
-    private Int32 _Total;
-    /// <summary>总请求数</summary>
-    public Int32 Total => _Total;
-
-    private Int32 _Success;
-    /// <summary>成功数</summary>
-    public Int32 Success => _Success;
-
-    /// <summary>新创建数</summary>
-    private Int32 _NewCount;
-
-    /// <summary>释放数</summary>
-    private Int32 _ReleaseCount;
-
-    /// <summary>平均耗时。单位ms</summary>
-    private Double Cost;
     #endregion
 
     #region 日志
