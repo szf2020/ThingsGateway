@@ -15,6 +15,7 @@ using BenchmarkDotNet.Diagnosers;
 
 using HslCommunication.ModBus;
 
+using System.IO.Pipelines;
 using System.Net.Sockets;
 
 using ThingsGateway.Foundation.Modbus;
@@ -34,6 +35,13 @@ public class ModbusBenchmark : IDisposable
     private List<IModbusMaster> nmodbuss = new();
     private List<ModbusTcpNet> modbusTcpNets = new();
     private List<ModbusTcpMaster> modbusTcpMasters = new();
+    private PipeOptions GetNoDelayPipeOptions()
+    {
+        return new PipeOptions(
+            readerScheduler: PipeScheduler.Inline,
+            writerScheduler: PipeScheduler.Inline,
+            useSynchronizationContext: false);
+    }
 
     public ModbusBenchmark()
     {
@@ -41,6 +49,11 @@ public class ModbusBenchmark : IDisposable
         {
 
             var clientConfig = new TouchSocket.Core.TouchSocketConfig();
+            //clientConfig.SetTransportOption(new TouchSocket.Sockets.TransportOption()
+            //{
+            //    ReceivePipeOptions = GetNoDelayPipeOptions(),
+            //    SendPipeOptions = GetNoDelayPipeOptions(),
+            //}).SetNoDelay(true);
             var clientChannel = clientConfig.GetTcpClientWithIPHost(new ChannelOptions() { RemoteUrl = "127.0.0.1:502", MaxConcurrentCount = 10 });
             var thingsgatewaymodbus = new ModbusMaster()
             {

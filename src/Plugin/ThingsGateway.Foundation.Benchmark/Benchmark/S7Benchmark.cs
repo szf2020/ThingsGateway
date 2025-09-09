@@ -17,6 +17,8 @@ using HslCommunication.Profinet.Siemens;
 
 using S7.Net;
 
+using System.IO.Pipelines;
+
 using ThingsGateway.Foundation.SiemensS7;
 
 using TouchSocket.Core;
@@ -30,7 +32,13 @@ public class S7Benchmark : IDisposable
 
     private List<Plc> plcs = new();
     private List<SiemensS7Net> siemensS7Nets = new();
-
+    private PipeOptions GetNoDelayPipeOptions()
+    {
+        return new PipeOptions(
+            readerScheduler: PipeScheduler.Inline,
+            writerScheduler: PipeScheduler.Inline,
+            useSynchronizationContext: false);
+    }
     public S7Benchmark()
 
     {
@@ -38,6 +46,11 @@ public class S7Benchmark : IDisposable
             for (int i = 0; i < Program.ClientCount; i++)
             {
                 var clientConfig = new TouchSocket.Core.TouchSocketConfig();
+                clientConfig.SetTransportOption(new TouchSocket.Sockets.TransportOption()
+                {
+                    ReceivePipeOptions = GetNoDelayPipeOptions(),
+                    SendPipeOptions = GetNoDelayPipeOptions(),
+                }).SetNoDelay(true);
                 var clientChannel = clientConfig.GetTcpClientWithIPHost(new ChannelOptions() { RemoteUrl = "127.0.0.1:102" });
                 var siemensS7 = new SiemensS7Master()
                 {
