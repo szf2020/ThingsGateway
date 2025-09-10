@@ -49,10 +49,10 @@ namespace BenchmarkConsoleApp
        ManualConfig.Create(DefaultConfig.Instance)
            .WithOptions(ConfigOptions.DisableOptimizationsValidator)
    );
-//            BenchmarkRunner.Run<S7Benchmark>(
-//ManualConfig.Create(DefaultConfig.Instance)
-//.WithOptions(ConfigOptions.DisableOptimizationsValidator)
-//);
+            //            BenchmarkRunner.Run<S7Benchmark>(
+            //ManualConfig.Create(DefaultConfig.Instance)
+            //.WithOptions(ConfigOptions.DisableOptimizationsValidator)
+            //);
 
         }
     }
