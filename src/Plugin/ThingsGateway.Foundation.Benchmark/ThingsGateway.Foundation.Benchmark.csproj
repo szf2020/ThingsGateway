@@ -42,12 +42,12 @@
 
 	<ItemGroup>
 		<PackageReference Include="BenchmarkDotNet" Version="0.15.2" />
-		<PackageReference Include="HslCommunication" Version="12.3.3" />
+		<PackageReference Include="HslCommunication" Version="12.5.0" />
 		<PackageReference Include="NModbus" Version="3.0.81" />
 		<PackageReference Include="NModbus.Serial" Version="3.0.81" />
 		<PackageReference Include="S7netplus" Version="0.20.0" />
-		<PackageReference Include="ThingsGateway.Foundation.Modbus" Version="10.11.33" />
-		<PackageReference Include="ThingsGateway.Foundation.SiemensS7" Version="10.11.33" />
+		<PackageReference Include="ThingsGateway.Foundation.Modbus" Version="$(DefaultVersion)" />
+		<PackageReference Include="ThingsGateway.Foundation.SiemensS7" Version="$(DefaultVersion)" />
 		<PackageReference Include="TouchSocket.Modbus" Version="4.0.0-beta.25" />
 	</ItemGroup>
 

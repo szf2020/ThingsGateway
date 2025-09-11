@@ -409,7 +409,7 @@ internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
                  // 查找具有指定设备ID的驱动程序对象
                  if (Drivers.TryRemove(deviceId, out var driver))
                  {
-                     driver.CurrentDevice.SetDeviceStatus(now, false, "Communication connection has been removed");
+                     driver.CurrentDevice.SetDeviceStatus(now, true, "Communication connection has been removed");
                      if (IsCollectChannel == true)
                      {
                          foreach (var a in driver.IdVariableRuntimes)

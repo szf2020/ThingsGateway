@@ -12,6 +12,7 @@ using Microsoft.Extensions.Logging;
 
 using Newtonsoft.Json.Linq;
 
+using System;
 using System.Collections.Concurrent;
 
 using ThingsGateway.Common.Extension;
@@ -55,7 +56,15 @@ public abstract partial class CollectBase : DriverBase
     /// 特殊方法
     /// </summary>
     public List<DriverMethodInfo>? DriverMethodInfos { get; private set; }
-
+    protected virtual bool IsRuntimeSourceValid(VariableRuntime a)
+    {
+        //筛选特殊变量地址
+        //1、DeviceStatus
+        return !a.RegisterAddress.Equals(nameof(DeviceRuntime.DeviceStatus), StringComparison.OrdinalIgnoreCase) &&
+        !a.RegisterAddress.Equals("Script", StringComparison.OrdinalIgnoreCase) &&
+        !a.RegisterAddress.Equals("ScriptRead", StringComparison.OrdinalIgnoreCase)
+        ;
+    }
     public override async Task AfterVariablesChangedAsync(CancellationToken cancellationToken)
     {
         LogMessage?.LogInformation("Refresh variable");
@@ -84,21 +93,13 @@ public abstract partial class CollectBase : DriverBase
             && string.IsNullOrEmpty(it.OtherMethod)
             && !string.IsNullOrEmpty(it.RegisterAddress));
 
-        //筛选特殊变量地址
-        //1、DeviceStatus
-        Func<VariableRuntime, bool> source = (a =>
-        {
-            return !a.RegisterAddress.Equals(nameof(DeviceRuntime.DeviceStatus), StringComparison.OrdinalIgnoreCase) &&
-            !a.RegisterAddress.Equals("Script", StringComparison.OrdinalIgnoreCase) &&
-            !a.RegisterAddress.Equals("ScriptRead", StringComparison.OrdinalIgnoreCase)
-            ;
-        });
+
         var now = DateTime.Now;
 #pragma warning disable CA1851
         try
         {
 
-            currentDevice.VariableScriptReads = tags.Where(a => !source(a)).Select(a =>
+            currentDevice.VariableScriptReads = tags.Where(a => !IsRuntimeSourceValid(a)).Select(a =>
             {
                 var data = new VariableScriptRead();
                 data.VariableRuntime = a;
@@ -111,9 +112,9 @@ public abstract partial class CollectBase : DriverBase
             // 如果出现异常，记录日志并初始化 VariableSourceReads 属性为新实例
             currentDevice.VariableScriptReads = new();
             LogMessage?.LogWarning(ex, string.Format(AppResource.VariablePackError, ex.Message));
-            tags.Where(a => !source(a)).ForEach(a => a.SetValue(null, now, isOnline: false));
+            tags.Where(a => !IsRuntimeSourceValid(a)).ForEach(a => a.SetValue(null, now, isOnline: false));
         }
-        var variableReads = tags.Where(source).ToList();
+        var variableReads = tags.Where(IsRuntimeSourceValid).ToList();
         try
         {
             // 将打包后的结果存储在当前设备的 VariableSourceReads 属性中
@@ -482,6 +483,7 @@ public abstract partial class CollectBase : DriverBase
 
     protected virtual Task TestOnline(object? state, CancellationToken cancellationToken)
     {
+        CurrentDevice.SetDeviceStatus(TimerX.Now, false, null);
         return Task.CompletedTask;
     }
 
