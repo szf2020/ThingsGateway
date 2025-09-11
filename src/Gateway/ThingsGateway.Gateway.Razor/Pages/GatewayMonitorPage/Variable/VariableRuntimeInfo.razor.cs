@@ -28,15 +28,7 @@ public partial class VariableRuntimeInfo : IDisposable
 
     [Parameter]
     public IEnumerable<VariableRuntime>? Items { get; set; } = Enumerable.Empty<VariableRuntime>();
-    private IEnumerable<VariableRuntime>? _previousItemsRef;
-    protected override async Task OnParametersSetAsync()
-    {
-        if (!ReferenceEquals(_previousItemsRef, Items))
-        {
-            _previousItemsRef = Items;
-            await Refresh(null);
-        }
-    }
+
 #endif
 
     private static void BeforeShowEditDialogCallback(ITableEditDialogOption<VariableRuntime> tableEditDialogOption)

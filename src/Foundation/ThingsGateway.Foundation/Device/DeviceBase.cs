@@ -629,7 +629,7 @@ public abstract class DeviceBase : AsyncAndSyncDisposableObject, IDevice
             DataTypeEnum.UInt32 => await ReadUInt32Async(address, length, cancellationToken: cancellationToken).ConfigureAwait(false),
             DataTypeEnum.Int64 => await ReadInt64Async(address, length, cancellationToken: cancellationToken).ConfigureAwait(false),
             DataTypeEnum.UInt64 => await ReadUInt64Async(address, length, cancellationToken: cancellationToken).ConfigureAwait(false),
-            DataTypeEnum.Single => await ReadSingleAsync(address, length, cancellationToken: cancellationToken).ConfigureAwait(false),
+            DataTypeEnum.Float => await ReadSingleAsync(address, length, cancellationToken: cancellationToken).ConfigureAwait(false),
             DataTypeEnum.Double => await ReadDoubleAsync(address, length, cancellationToken: cancellationToken).ConfigureAwait(false),
             DataTypeEnum.Decimal => await ReadDecimalAsync(address, length, cancellationToken: cancellationToken).ConfigureAwait(false),
             _ => new OperResult<Array>(string.Format(AppResource.DataTypeNotSupported, dataType)),
@@ -655,7 +655,7 @@ public abstract class DeviceBase : AsyncAndSyncDisposableObject, IDevice
                     DataTypeEnum.UInt32 => await WriteAsync(address, jArray.ToObject<UInt32[]>().AsMemory(), cancellationToken: cancellationToken).ConfigureAwait(false),
                     DataTypeEnum.Int64 => await WriteAsync(address, jArray.ToObject<Int64[]>().AsMemory(), cancellationToken: cancellationToken).ConfigureAwait(false),
                     DataTypeEnum.UInt64 => await WriteAsync(address, jArray.ToObject<UInt64[]>().AsMemory(), cancellationToken: cancellationToken).ConfigureAwait(false),
-                    DataTypeEnum.Single => await WriteAsync(address, jArray.ToObject<Single[]>().AsMemory(), cancellationToken: cancellationToken).ConfigureAwait(false),
+                    DataTypeEnum.Float => await WriteAsync(address, jArray.ToObject<Single[]>().AsMemory(), cancellationToken: cancellationToken).ConfigureAwait(false),
                     DataTypeEnum.Double => await WriteAsync(address, jArray.ToObject<Double[]>().AsMemory(), cancellationToken: cancellationToken).ConfigureAwait(false),
                     DataTypeEnum.Decimal => await WriteAsync(address, jArray.ToObject<Decimal[]>().AsMemory(), cancellationToken: cancellationToken).ConfigureAwait(false),
                     _ => new OperResult(string.Format(AppResource.DataTypeNotSupported, dataType)),
@@ -674,7 +674,7 @@ public abstract class DeviceBase : AsyncAndSyncDisposableObject, IDevice
                     DataTypeEnum.UInt32 => await WriteAsync(address, value.ToObject<UInt32>(), bitConverter, cancellationToken).ConfigureAwait(false),
                     DataTypeEnum.Int64 => await WriteAsync(address, value.ToObject<Int64>(), bitConverter, cancellationToken).ConfigureAwait(false),
                     DataTypeEnum.UInt64 => await WriteAsync(address, value.ToObject<UInt64>(), bitConverter, cancellationToken).ConfigureAwait(false),
-                    DataTypeEnum.Single => await WriteAsync(address, value.ToObject<Single>(), bitConverter, cancellationToken).ConfigureAwait(false),
+                    DataTypeEnum.Float => await WriteAsync(address, value.ToObject<Single>(), bitConverter, cancellationToken).ConfigureAwait(false),
                     DataTypeEnum.Double => await WriteAsync(address, value.ToObject<Double>(), bitConverter, cancellationToken).ConfigureAwait(false),
                     DataTypeEnum.Decimal => await WriteAsync(address, value.ToObject<Decimal>(), bitConverter, cancellationToken).ConfigureAwait(false),
                     _ => new OperResult(string.Format(AppResource.DataTypeNotSupported, dataType)),
@@ -864,7 +864,7 @@ public abstract class DeviceBase : AsyncAndSyncDisposableObject, IDevice
     public virtual ValueTask<OperResult> WriteAsync(string address, float value, IThingsGatewayBitConverter bitConverter = null, CancellationToken cancellationToken = default)
     {
         bitConverter ??= ThingsGatewayBitConverter.GetTransByAddress(address);
-        return WriteAsync(address, bitConverter.GetBytes(value), DataTypeEnum.Single, cancellationToken);
+        return WriteAsync(address, bitConverter.GetBytes(value), DataTypeEnum.Float, cancellationToken);
     }
 
     /// <inheritdoc/>
@@ -937,7 +937,7 @@ public abstract class DeviceBase : AsyncAndSyncDisposableObject, IDevice
     public virtual ValueTask<OperResult> WriteAsync(string address, ReadOnlyMemory<float> value, IThingsGatewayBitConverter bitConverter = null, CancellationToken cancellationToken = default)
     {
         bitConverter ??= ThingsGatewayBitConverter.GetTransByAddress(address);
-        return WriteAsync(address, bitConverter.GetBytes(value.Span), DataTypeEnum.Single, cancellationToken);
+        return WriteAsync(address, bitConverter.GetBytes(value.Span), DataTypeEnum.Float, cancellationToken);
     }
 
     /// <inheritdoc/>

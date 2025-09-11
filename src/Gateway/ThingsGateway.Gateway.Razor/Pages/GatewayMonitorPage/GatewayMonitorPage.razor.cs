@@ -48,8 +48,22 @@ public partial class GatewayMonitorPage
             }
             else
             {
-                VariableRuntimes = deviceRuntime.Driver?.IdVariableRuntimes?.Where(a => a.Value != null)
+                if (deviceRuntime.Driver == null)
+                {
+                    _ = Task.Run(async () =>
+                    {
+                        await Task.Delay(2000);
+                        VariableRuntimes = deviceRuntime.Driver?.IdVariableRuntimes?.Where(a => a.Value != null)
 .Select(a => a.Value) ?? Enumerable.Empty<VariableRuntime>();
+                        await InvokeAsync(StateHasChanged);
+                    });
+                }
+                else
+                {
+                    VariableRuntimes = deviceRuntime.Driver?.IdVariableRuntimes?.Where(a => a.Value != null)
+.Select(a => a.Value) ?? Enumerable.Empty<VariableRuntime>();
+                }
+
             }
             ChannelRuntimes = Enumerable.Repeat(deviceRuntime.ChannelRuntime, 1);
             DeviceRuntimes = Enumerable.Repeat(deviceRuntime, 1);

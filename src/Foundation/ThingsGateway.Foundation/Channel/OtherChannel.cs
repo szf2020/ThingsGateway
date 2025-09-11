@@ -19,6 +19,11 @@ namespace ThingsGateway.Foundation;
 /// </summary>
 public class OtherChannel : SetupConfigObject, IClientChannel
 {
+    ~OtherChannel()
+    {
+        this.SafeDispose();
+    }
+
     private SingleStreamDataHandlingAdapter m_dataHandlingAdapter;
     public DataHandlingAdapter ReadOnlyDataHandlingAdapter => m_dataHandlingAdapter;
 

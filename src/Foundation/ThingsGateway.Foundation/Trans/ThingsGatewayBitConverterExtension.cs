@@ -56,7 +56,7 @@ public static class ThingsGatewayBitConverterExtension
                 case DataTypeEnum.UInt64:
                     return byteConverter.GetBytes(value.ToObject<UInt64[]>());
 
-                case DataTypeEnum.Single:
+                case DataTypeEnum.Float:
                     return byteConverter.GetBytes(value.ToObject<Single[]>());
 
                 case DataTypeEnum.Double:
@@ -107,7 +107,7 @@ public static class ThingsGatewayBitConverterExtension
                 case DataTypeEnum.UInt64:
                     return byteConverter.GetBytes(value.ToObject<UInt64>());
 
-                case DataTypeEnum.Single:
+                case DataTypeEnum.Float:
                     return byteConverter.GetBytes(value.ToObject<Single>());
 
                 case DataTypeEnum.Double:
@@ -333,7 +333,7 @@ public static class ThingsGatewayBitConverterExtension
                     return true;
                 }
 
-            case DataTypeEnum.Single:
+            case DataTypeEnum.Float:
                 if (arrayLength > 1)
                 {
                     var newVal = byteConverter.ToSingle(buffer, index, arrayLength);

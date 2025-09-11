@@ -6,7 +6,7 @@
 
     <Table TItem="TItem" IsBordered="true" IsStriped="true" TableSize="TableSize.Compact" IsMultipleSelect="IsMultipleSelect" @ref="Instance" SearchTemplate="SearchTemplate"
            DataService="DataService" CreateItemCallback="CreateItemCallback!"
-           IsPagination="IsPagination" PageItemsSource="PageItemsSource" IsFixedHeader="IsFixedHeader" IndentSize=24 RowHeight=RowHeight ShowSearchText="ShowSearchText" ShowSearchButton="ShowSearchButton" BeforeShowEditDialogCallback="BeforeShowEditDialogCallback!"
+           IsPagination="IsPagination" PageItemsSource="PageItemsSource" IsFixedHeader="IsFixedHeader" IndentSize=24 RowHeight=RowHeight ShowSearchText="ShowSearchText" ShowSearchButton="ShowSearchButton" DisableEditButtonCallback="DisableEditButtonCallback" DisableDeleteButtonCallback="DisableDeleteButtonCallback" BeforeShowEditDialogCallback=" BeforeShowEditDialogCallback!"
            IsTree="IsTree" OnTreeExpand="OnTreeExpand!" TreeNodeConverter="TreeNodeConverter!" TreeIcon="fa-solid fa-circle-chevron-right" TreeExpandIcon="fa-solid fa-circle-chevron-right fa-rotate-90" IsAutoQueryFirstRender=IsAutoQueryFirstRender
            ShowDefaultButtons="ShowDefaultButtons" ShowAdvancedSearch="ShowAdvancedSearch" ShowResetButton=ShowResetButton
            ShowEmpty="ShowEmpty" EmptyText="@EmptyText" EmptyImage="@($"{WebsiteConst.DefaultResourceUrl}images/empty.svg")" SortString="@SortString" EditDialogSize="EditDialogSize"
@@ -14,7 +14,7 @@
            ShowSkeleton="true" ShowLoading="ShowLoading" ShowSearch="ShowSearch" SearchModel=@SearchModel ShowLineNo
            SearchMode=SearchMode ShowExportPdfButton=ShowExportPdfButton ExportButtonText=@ExportButtonText
            ShowExportButton=@ShowExportButton Items=Items ClickToSelect=ClickToSelect ScrollMode=ScrollMode
-           ShowExportCsvButton=@ShowExportCsvButton SelectedRowsChanged=SelectedRowsChanged ShowCardView=ShowCardView
+           ShowExportCsvButton=@ShowExportCsvButton ShowCardView=ShowCardView
            FixedExtendButtonsColumn=FixedExtendButtonsColumn FixedMultipleColumn=FixedMultipleColumn FixedDetailRowHeaderColumn=FixedDetailRowHeaderColumn FixedLineNoColumn=FixedLineNoColumn
            IsAutoRefresh=IsAutoRefresh AutoRefreshInterval=AutoRefreshInterval
            AllowDragColumn=@AllowDragColumn Height=@Height ShowRefresh=ShowRefresh
@@ -29,7 +29,7 @@
            ShowMultiFilterHeader=ShowMultiFilterHeader
            ShowFilterHeader=ShowFilterHeader
            ShowColumnList=ShowColumnList ExtendButtonColumnWidth="@ExtendButtonColumnWidth"
-           CustomerSearchModel="CustomerSearchModel" SelectedRows="SelectedRows" ModelEqualityComparer="ModelEqualityComparer!"
+           CustomerSearchModel="CustomerSearchModel" ModelEqualityComparer="ModelEqualityComparer!"
            ShowExtendEditButtonCallback="ShowExtendEditButtonCallback!" ShowExtendDeleteButtonCallback="ShowExtendDeleteButtonCallback!"
            DisableExtendEditButton="DisableExtendEditButton!" DisableExtendDeleteButton="DisableExtendDeleteButton!"
            DisableExtendEditButtonCallback="DisableExtendEditButtonCallback!" DisableExtendDeleteButtonCallback="DisableExtendDeleteButtonCallback!"

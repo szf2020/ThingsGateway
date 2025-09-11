@@ -54,7 +54,7 @@ public class ModbusBenchmark : IDisposable
             //    ReceivePipeOptions = GetNoDelayPipeOptions(),
             //    SendPipeOptions = GetNoDelayPipeOptions(),
             //}).SetNoDelay(true);
-            var clientChannel = clientConfig.GetTcpClientWithIPHost(new ChannelOptions() { RemoteUrl = "127.0.0.1:502", MaxConcurrentCount = 10 });
+            var clientChannel = clientConfig.GetTcpClient(new ChannelOptions() { RemoteUrl = "127.0.0.1:502", MaxConcurrentCount = 10 });
             var thingsgatewaymodbus = new ModbusMaster()
             {
                 //modbus协议格式

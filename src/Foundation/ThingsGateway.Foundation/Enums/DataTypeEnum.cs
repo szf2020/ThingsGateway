@@ -45,12 +45,16 @@ public enum DataTypeEnum
     /// <inheritdoc/>
     UInt64,
 
-    /// <inheritdoc/>
-    Single,
+    /// <summary>
+    /// 大部分人并不认识Single，但都认识Float
+    /// </summary>
+    Float,
 
     /// <inheritdoc/>
     Double,
 
     /// <inheritdoc/>
     Decimal,
+
+
 }

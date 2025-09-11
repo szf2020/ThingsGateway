@@ -18,6 +18,11 @@ namespace ThingsGateway.Foundation;
 /// <typeparam name="TClient"></typeparam>
 public abstract class TcpServiceChannelBase<TClient> : TcpService<TClient>, ITcpService<TClient> where TClient : TcpSessionClientChannel, new()
 {
+
+    ~TcpServiceChannelBase()
+    {
+        this.SafeDispose();
+    }
     /// <inheritdoc/>
     public ConcurrentList<IDevice> Collects { get; } = new();
 

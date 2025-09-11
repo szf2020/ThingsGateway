@@ -17,6 +17,10 @@ namespace ThingsGateway.Foundation;
 /// </summary>
 public class UdpSessionChannel : UdpSession, IClientChannel
 {
+    ~UdpSessionChannel()
+    {
+        this.SafeDispose();
+    }
     private readonly WaitLock _connectLock = new WaitLock(nameof(UdpSessionChannel));
 
     /// <inheritdoc/>

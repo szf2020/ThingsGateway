@@ -51,7 +51,7 @@ public class S7Benchmark : IDisposable
                     ReceivePipeOptions = GetNoDelayPipeOptions(),
                     SendPipeOptions = GetNoDelayPipeOptions(),
                 }).SetNoDelay(true);
-                var clientChannel = clientConfig.GetTcpClientWithIPHost(new ChannelOptions() { RemoteUrl = "127.0.0.1:102" });
+                var clientChannel = clientConfig.GetTcpClient(new ChannelOptions() { RemoteUrl = "127.0.0.1:102" });
                 var siemensS7 = new SiemensS7Master()
                 {
                     //modbus协议格式

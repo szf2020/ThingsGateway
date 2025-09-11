@@ -186,14 +186,6 @@ public partial class DefaultTable<TItem> where TItem : class, new()
     [Parameter]
     public RenderFragment<TItem>? SearchTemplate { get; set; }
 
-    /// <inheritdoc cref="Table{TItem}.SelectedRows"/>
-    [Parameter]
-    public List<TItem>? SelectedRows { get; set; } = new List<TItem>();
-
-    /// <inheritdoc cref="Table{TItem}.SelectedRowsChanged"/>
-    [Parameter]
-    public EventCallback<List<TItem>> SelectedRowsChanged { get; set; }
-
     /// <inheritdoc cref="Table{TItem}.SetRowClassFormatter"/>
     [Parameter]
     public Func<TItem, string?>? SetRowClassFormatter { get; set; }

@@ -37,6 +37,7 @@ public static class ChannelOptionsExtensions
             for (int i = 0; i < funcs.Count; i++)
             {
                 var func = funcs[i];
+                if (func == null) continue;
                 await func.Invoke(clientChannel, e, i == funcs.Count - 1).ConfigureAwait(false);
                 if (e.Handled)
                 {
@@ -65,6 +66,7 @@ public static class ChannelOptionsExtensions
                 for (int i = 0; i < funcs.Count; i++)
                 {
                     var func = funcs[i];
+                    if (func == null) continue;
                     var handled = await func.Invoke(clientChannel, i == funcs.Count - 1).ConfigureAwait(false);
                     if (handled)
                     {
@@ -99,16 +101,16 @@ public static class ChannelOptionsExtensions
         switch (channelType)
         {
             case ChannelTypeEnum.TcpClient:
-                return config.GetTcpClientWithIPHost(channelOptions);
+                return config.GetTcpClient(channelOptions);
 
             case ChannelTypeEnum.TcpService:
-                return config.GetTcpServiceWithBindIPHost(channelOptions);
+                return config.GetTcpService(channelOptions);
 
             case ChannelTypeEnum.SerialPort:
-                return config.GetSerialPortWithOption(channelOptions);
+                return config.GetSerialPort(channelOptions);
 
             case ChannelTypeEnum.UdpSession:
-                return config.GetUdpSessionWithIPHost(channelOptions);
+                return config.GetUdpSession(channelOptions);
             case ChannelTypeEnum.Other:
                 channelOptions.Config = config;
                 OtherChannel otherChannel = new OtherChannel(channelOptions);
@@ -123,13 +125,12 @@ public static class ChannelOptionsExtensions
     /// <param name="config">配置</param>
     /// <param name="channelOptions">串口配置</param>
     /// <returns></returns>
-    public static SerialPortChannel GetSerialPortWithOption(this TouchSocketConfig config, IChannelOptions channelOptions)
+    public static SerialPortChannel GetSerialPort(this TouchSocketConfig config, IChannelOptions channelOptions)
     {
         var serialPortOption = channelOptions.Map<SerialPortOption>();
         serialPortOption.ThrowIfNull(nameof(SerialPortOption));
         channelOptions.Config = config;
         config.SetSerialPortOption(serialPortOption);
-
         //载入配置
         SerialPortChannel serialPortChannel = new SerialPortChannel(channelOptions);
         return serialPortChannel;
@@ -142,7 +143,7 @@ public static class ChannelOptionsExtensions
     /// <param name="channelOptions">通道配置</param>
     /// <returns></returns>
     /// <exception cref="ArgumentNullException"></exception>
-    public static TcpClientChannel GetTcpClientWithIPHost(this TouchSocketConfig config, IChannelOptions channelOptions)
+    public static TcpClientChannel GetTcpClient(this TouchSocketConfig config, IChannelOptions channelOptions)
     {
         var remoteUrl = channelOptions.RemoteUrl;
         var bindUrl = channelOptions.BindUrl;
@@ -164,7 +165,7 @@ public static class ChannelOptionsExtensions
     /// <param name="channelOptions">通道配置</param>
     /// <returns></returns>
     /// <exception cref="ArgumentNullException"></exception>
-    public static IChannel GetTcpServiceWithBindIPHost(this TouchSocketConfig config, IChannelOptions channelOptions)
+    public static IChannel GetTcpService(this TouchSocketConfig config, IChannelOptions channelOptions)
     {
         var bindUrl = channelOptions.BindUrl;
         bindUrl.ThrowIfNull(nameof(bindUrl));
@@ -192,7 +193,7 @@ public static class ChannelOptionsExtensions
     /// <param name="channelOptions">通道配置</param>
     /// <returns></returns>
     /// <exception cref="ArgumentNullException"></exception>
-    public static UdpSessionChannel GetUdpSessionWithIPHost(this TouchSocketConfig config, IChannelOptions channelOptions)
+    public static UdpSessionChannel GetUdpSession(this TouchSocketConfig config, IChannelOptions channelOptions)
     {
         var remoteUrl = channelOptions.RemoteUrl;
         var bindUrl = channelOptions.BindUrl;

@@ -17,6 +17,10 @@ namespace ThingsGateway.Foundation;
 /// </summary>
 public class TcpClientChannel : TcpClient, IClientChannel
 {
+    ~TcpClientChannel()
+    {
+        this.SafeDispose();
+    }
     /// <inheritdoc/>
     public TcpClientChannel(IChannelOptions channelOptions)
     {

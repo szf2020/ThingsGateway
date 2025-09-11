@@ -19,6 +19,10 @@ namespace ThingsGateway.Foundation;
 /// </summary>
 public class SerialPortChannel : SerialPortClient, IClientChannel
 {
+    ~SerialPortChannel()
+    {
+        this.SafeDispose();
+    }
     public SerialPortChannel(IChannelOptions channelOptions)
     {
         ChannelOptions = channelOptions;
