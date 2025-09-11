@@ -48,7 +48,7 @@
 }
     /*切换高度*/
     .quickactions-list.is-open {
-        height: 300px;
+        height: 200px;
     }
 
 .quickactions-header {

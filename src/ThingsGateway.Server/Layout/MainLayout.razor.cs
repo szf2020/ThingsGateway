@@ -126,7 +126,7 @@ public partial class MainLayout : IDisposable
         if (context is TabItem tabItem)
         {
             await WinboxRender(tabItem.ChildContent, tabItem.Text);
-            await _tab.RemoveTab(tabItem);
+            //await _tab.RemoveTab(tabItem);
         }
     }
     [Inject]

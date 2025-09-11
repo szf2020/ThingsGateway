@@ -76,18 +76,34 @@ public partial class DeviceRuntimeInfo1 : IDisposable
         {
             return;
         }
-        await DialogService.Show(new DialogOption()
-        {
-            IsScrolling = false,
-            ShowMaximizeButton = true,
-            Size = Size.ExtraExtraLarge,
-            Title = DeviceRuntime.Name,
-            Component = BootstrapDynamicComponent.CreateComponent(driver, new Dictionary<string, object?>()
+        var renderFragment = BootstrapDynamicComponent.CreateComponent(driver, new Dictionary<string, object?>()
         {
             {nameof(IDriverUIBase.Driver),DeviceRuntime.Driver},
-        })
-        });
+        }).Render();
+        if (renderFragment != null)
+        {
+            var option = new WinBoxOption()
+            {
+                Title = DeviceRuntime.Name,
+                ContentTemplate = renderFragment,
+                Max = false,
+                Width = "80%",
+                Height = "80%",
+                Top = "0%",
+                Left = "10%",
+                Background = "var(--bb-primary-color)",
+                Overflow = true
+            };
+            await WinBoxService.Show(option);
+        }
+
     }
+
+    [Inject]
+    [NotNull]
+    private WinBoxService? WinBoxService { get; set; }
+
+
 #endif
 
     [Inject]
