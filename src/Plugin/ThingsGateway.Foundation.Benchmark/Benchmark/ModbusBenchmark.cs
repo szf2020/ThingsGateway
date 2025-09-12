@@ -13,7 +13,11 @@ using BenchmarkConsoleApp;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Diagnosers;
 
-using HslCommunication.ModBus;
+
+using Longbow.Modbus;
+using Longbow.TcpSocket;
+
+using Microsoft.Extensions.DependencyInjection;
 
 using System.IO.Pipelines;
 using System.Net.Sockets;
@@ -31,9 +35,10 @@ namespace ThingsGateway.Foundation;
 [MemoryDiagnoser]
 public class ModbusBenchmark : IDisposable
 {
+    private readonly List<IModbusClient> _lgbModbusClients = [];
     private List<ModbusMaster> thingsgatewaymodbuss = new();
     private List<IModbusMaster> nmodbuss = new();
-    private List<ModbusTcpNet> modbusTcpNets = new();
+    //private List<ModbusTcpNet> modbusTcpNets = new();
     private List<ModbusTcpMaster> modbusTcpMasters = new();
     private PipeOptions GetNoDelayPipeOptions()
     {
@@ -77,15 +82,15 @@ public class ModbusBenchmark : IDisposable
             nmodbus.ReadHoldingRegistersAsync(1, 0, 100).GetFalseAwaitResult();
             nmodbuss.Add(nmodbus);
         }
-        for (int i = 0; i < Program.ClientCount; i++)
-        {
-            ModbusTcpNet modbusTcpNet = new();
-            modbusTcpNet.IpAddress = "127.0.0.1";
-            modbusTcpNet.Port = 502;
-            modbusTcpNet.ConnectServer();
-            modbusTcpNet.ReadAsync("0", 100).GetFalseAwaitResult();
-            modbusTcpNets.Add(modbusTcpNet);
-        }
+        //for (int i = 0; i < Program.ClientCount; i++)
+        //{
+        //    ModbusTcpNet modbusTcpNet = new();
+        //    modbusTcpNet.IpAddress = "127.0.0.1";
+        //    modbusTcpNet.Port = 502;
+        //    modbusTcpNet.ConnectServer();
+        //    modbusTcpNet.ReadAsync("0", 100).GetFalseAwaitResult();
+        //    modbusTcpNets.Add(modbusTcpNet);
+        //}
 
         for (int i = 0; i < Program.ClientCount; i++)
         {
@@ -96,8 +101,46 @@ public class ModbusBenchmark : IDisposable
             client.ReadHoldingRegistersAsync(0, 100).GetFalseAwaitResult();
             modbusTcpMasters.Add(client);
         }
-    }
 
+
+        {
+            var sc = new ServiceCollection();
+            sc.AddTcpSocketFactory();
+            sc.AddModbusFactory();
+
+            var provider = sc.BuildServiceProvider();
+            var factory = provider.GetRequiredService<IModbusFactory>();
+
+            for (int i = 0; i < Program.ClientCount; i++)
+            {
+                var client = factory.GetOrCreateTcpMaster();
+                client.ConnectAsync("127.0.0.1", 502).GetAwaiter().GetResult();
+                client.ReadHoldingRegistersAsync(0x01, 0x00, 10).GetAwaiter().GetResult();
+
+                _lgbModbusClients.Add(client);
+            }
+        }
+    }
+    [Benchmark]
+    public async Task LongbowModbus()
+    {
+        List<Task> tasks = new List<Task>();
+        foreach (var _lgbModbusClient in _lgbModbusClients)
+        {
+
+            for (int i = 0; i < Program.TaskNumberOfItems; i++)
+            {
+                tasks.Add(Task.Run(async () =>
+                {
+                    for (int i = 0; i < Program.NumberOfItems; i++)
+                    {
+                        var task = await _lgbModbusClient.ReadHoldingRegistersAsync(1, 0, 10);
+                    }
+                }));
+            }
+        }
+        await Task.WhenAll(tasks);
+    }
     [Benchmark]
     public async Task ThingsGateway()
     {
@@ -117,6 +160,7 @@ public class ModbusBenchmark : IDisposable
                         {
                             throw new Exception(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss ffff") + result.ToString());
                         }
+                        var data = TouchSocketBitConverter.ConvertValues<byte, ushort>(result.Content.Span, EndianType.Little);
                     }
                 }));
             }
@@ -139,6 +183,7 @@ public class ModbusBenchmark : IDisposable
                     for (int i = 0; i < Program.NumberOfItems; i++)
                     {
                         var result = await modbusTcpMaster.ReadHoldingRegistersAsync(0, 100);
+                        var data = TouchSocketBitConverter.ConvertValues<byte, ushort>(result.Data.Span, EndianType.Little);
                         if (!result.IsSuccess)
                         {
                             throw new Exception(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss ffff") + result.ToString());
@@ -199,9 +244,12 @@ public class ModbusBenchmark : IDisposable
 
     public void Dispose()
     {
+
         thingsgatewaymodbuss?.ForEach(a => a.Channel.SafeDispose());
         thingsgatewaymodbuss?.ForEach(a => a.SafeDispose());
         nmodbuss?.ForEach(a => a.SafeDispose());
-        modbusTcpNets?.ForEach(a => a.SafeDispose());
+        //modbusTcpNets?.ForEach(a => a.SafeDispose());
+        _lgbModbusClients?.ForEach(a => a.DisposeAsync().GetAwaiter().GetResult());
     }
+
 }
