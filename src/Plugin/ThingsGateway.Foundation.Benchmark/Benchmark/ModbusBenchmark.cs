@@ -134,7 +134,7 @@ public class ModbusBenchmark : IDisposable
                 {
                     for (int i = 0; i < Program.NumberOfItems; i++)
                     {
-                        var task = await _lgbModbusClient.ReadHoldingRegistersAsync(1, 0, 10);
+                        var task = await _lgbModbusClient.ReadHoldingRegistersAsync(1, 0, 100);
                     }
                 }));
             }
@@ -144,7 +144,7 @@ public class ModbusBenchmark : IDisposable
     [Benchmark]
     public async Task ThingsGateway()
     {
-        ModbusAddress addr = new ModbusAddress() { FunctionCode = 3, StartAddress = 0, Length = 100 };
+        //ModbusAddress addr = new ModbusAddress() { FunctionCode = 3, StartAddress = 0, Length = 100 };
         List<Task> tasks = new List<Task>();
         foreach (var thingsgatewaymodbus in thingsgatewaymodbuss)
         {
@@ -155,7 +155,7 @@ public class ModbusBenchmark : IDisposable
                 {
                     for (int i = 0; i < Program.NumberOfItems; i++)
                     {
-                        var result = await thingsgatewaymodbus.ModbusReadAsync(addr);
+                        var result = await thingsgatewaymodbus.ModbusReadAsync(new ModbusAddress() { FunctionCode = 3, StartAddress = 0, Length = 100 });
                         if (!result.IsSuccess)
                         {
                             throw new Exception(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss ffff") + result.ToString());
