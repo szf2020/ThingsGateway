@@ -13,6 +13,23 @@ namespace ThingsGateway.Razor;
 [CascadingTypeParameter(nameof(TItem))]
 public partial class DefaultTable<TItem> where TItem : class, new()
 {
+
+    /// <inheritdoc cref="Table{TItem}.SelectedRowsChanged"/>
+    [Parameter]
+    public EventCallback<List<TItem>> SelectedRowsChanged { get; set; }
+
+    /// <inheritdoc cref="Table{TItem}.SelectedRows"/>
+    [Parameter]
+    public List<TItem> SelectedRows { get; set; } = new();
+
+    private async Task privateSelectedRowsChanged(List<TItem> items)
+    {
+        SelectedRows = items;
+        if (SelectedRowsChanged.HasDelegate)
+            await SelectedRowsChanged.InvokeAsync(items);
+    }
+
+
     /// <inheritdoc cref="Table{TItem}.AllowDragColumn"/>
     [Parameter]
     public bool AllowDragColumn { get; set; } = false;
