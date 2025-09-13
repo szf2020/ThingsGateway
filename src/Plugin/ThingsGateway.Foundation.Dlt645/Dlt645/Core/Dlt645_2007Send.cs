@@ -186,7 +186,7 @@ public class Dlt645_2007Send : ISendMessage
         }
 
         var lenSpan = writerLenAnchor.Rewind(ref byteBlock, out var length);
-        lenSpan.WriteValue<byte>((byte)(length - 1));//数据域长度
+        lenSpan.WriteValue<byte>((byte)(length));//数据域长度
 
         int num = 0;
         for (int index = 0; index < byteBlock.WrittenCount - SendHeadCodeIndex; ++index)
