@@ -69,7 +69,6 @@ public class ModbusRtuSend : ISendMessage
         else if (wf == 15 || wf == 16)
         {
             var data = ModbusAddress.MasterWriteDatas.ArrayExpandToLengthEven().Span;
-            WriterExtension.WriteValue(ref byteBlock, (ushort)(data.Length + 7), EndianType.Big);
             WriterExtension.WriteValue(ref byteBlock, (byte)ModbusAddress.Station);
             WriterExtension.WriteValue(ref byteBlock, (byte)ModbusAddress.WriteFunctionCode);
             WriterExtension.WriteValue(ref byteBlock, (ushort)ModbusAddress.StartAddress, EndianType.Big);
