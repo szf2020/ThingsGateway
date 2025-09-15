@@ -76,4 +76,8 @@ public class MqttServerProperty : BusinessPropertyWithCacheIntervalScript
     [DynamicProperty]
     [AutoGenerateColumn(Visible = true, IsVisibleWhenEdit = false, IsVisibleWhenAdd = false)]
     public string? BigTextScriptRpc { get; set; }
+
+    [DynamicProperty]
+    [AutoGenerateColumn(Visible = true, IsVisibleWhenEdit = false, IsVisibleWhenAdd = false)]
+    public override string? BigTextScriptPluginEventDataModel { get; set; }
 }

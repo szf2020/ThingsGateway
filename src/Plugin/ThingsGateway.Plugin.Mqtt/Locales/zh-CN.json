@@ -1,5 +1,6 @@
 ﻿{
   "ThingsGateway.Plugin.Mqtt.MqttClientProperty": {
+    "BigTextScriptPluginEventDataModel": "插件事件上传脚本",
     "CAFile_BrowserFile": "CA文件",
     "ClientCertificateFile_BrowserFile": "客户端证书",
     "ClientKeyFile_BrowserFile": "客户端key文件",
@@ -40,6 +41,7 @@
     "WebSocketUrl": "WebSocketUrl"
   },
   "ThingsGateway.Plugin.Mqtt.MqttServerProperty": {
+    "BigTextScriptPluginEventDataModel": "插件事件上传脚本",
     "AnonymousEnable": "允许匿名登录",
     "DeviceRpcEnable": "允许Rpc写入",
     "IP": "IP",

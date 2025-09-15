@@ -48,6 +48,14 @@
                                     @Localizer["Check"]
                                 </Button>
                             </div>
+
+                        </div>
+
+
+                         <div class="col-12  col-md-12 min-height-500">
+                            <BootstrapLabel Value=@PropertyComponentLocalizer["BigTextScriptPluginEventDataModel"] ShowLabelTooltip="true" />
+                            <CodeEditor IsReadonly=@(!CanWrite) ShowLineNo @bind-Value=@businessProperty.BigTextScriptPluginEventDataModel Language="csharp" Theme="vs-dark" />
+
                         </div>
 
                     </EditTemplate>

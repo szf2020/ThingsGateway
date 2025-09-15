@@ -1,5 +1,6 @@
 ﻿{
   "ThingsGateway.Plugin.Mqtt.MqttClientProperty": {
+    "BigTextScriptPluginEventDataModel": "BigTextScriptPluginEventDataModel",
     "CAFile_BrowserFile": "CAFile",
     "ClientCertificateFile_BrowserFile": "ClientCertificateFile",
     "ClientKeyFile_BrowserFile": "ClientKeyFile",
@@ -40,6 +41,7 @@
     "WebSocketUrl": "WebSocketUrl"
   },
   "ThingsGateway.Plugin.Mqtt.MqttServerProperty": {
+    "BigTextScriptPluginEventDataModel": "BigTextScriptPluginEventDataModel",
     "AnonymousEnable": "AnonymousEnable",
     "DeviceRpcEnable": "DeviceRpcEnable",
     "IP": "IP",
