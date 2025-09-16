@@ -98,6 +98,19 @@ public static class ChannelOptionsExtensions
 
         if (channelOptions.MaxClientCount > 0)
             config.SetMaxCount(channelOptions.MaxClientCount);
+
+        config.SetTransportOption(new TouchSocket.Sockets.TransportOption()
+        {
+            SendPipeOptions = new System.IO.Pipelines.PipeOptions(
+             minimumSegmentSize: 1024,
+             useSynchronizationContext: false),
+            ReceivePipeOptions = new System.IO.Pipelines.PipeOptions(
+             minimumSegmentSize: 1024,
+                pauseWriterThreshold: 1024 * 1024,
+                resumeWriterThreshold: 1024 * 512,
+                useSynchronizationContext: false)
+        });
+
         switch (channelType)
         {
             case ChannelTypeEnum.TcpClient:
@@ -125,7 +138,7 @@ public static class ChannelOptionsExtensions
     /// <param name="config">配置</param>
     /// <param name="channelOptions">串口配置</param>
     /// <returns></returns>
-    public static SerialPortChannel GetSerialPort(this TouchSocketConfig config, IChannelOptions channelOptions)
+    private static SerialPortChannel GetSerialPort(this TouchSocketConfig config, IChannelOptions channelOptions)
     {
         var serialPortOption = channelOptions.Map<SerialPortOption>();
         serialPortOption.ThrowIfNull(nameof(SerialPortOption));
@@ -143,7 +156,7 @@ public static class ChannelOptionsExtensions
     /// <param name="channelOptions">通道配置</param>
     /// <returns></returns>
     /// <exception cref="ArgumentNullException"></exception>
-    public static TcpClientChannel GetTcpClient(this TouchSocketConfig config, IChannelOptions channelOptions)
+    private static TcpClientChannel GetTcpClient(this TouchSocketConfig config, IChannelOptions channelOptions)
     {
         var remoteUrl = channelOptions.RemoteUrl;
         var bindUrl = channelOptions.BindUrl;
@@ -165,7 +178,7 @@ public static class ChannelOptionsExtensions
     /// <param name="channelOptions">通道配置</param>
     /// <returns></returns>
     /// <exception cref="ArgumentNullException"></exception>
-    public static IChannel GetTcpService(this TouchSocketConfig config, IChannelOptions channelOptions)
+    private static IChannel GetTcpService(this TouchSocketConfig config, IChannelOptions channelOptions)
     {
         var bindUrl = channelOptions.BindUrl;
         bindUrl.ThrowIfNull(nameof(bindUrl));
@@ -193,7 +206,7 @@ public static class ChannelOptionsExtensions
     /// <param name="channelOptions">通道配置</param>
     /// <returns></returns>
     /// <exception cref="ArgumentNullException"></exception>
-    public static UdpSessionChannel GetUdpSession(this TouchSocketConfig config, IChannelOptions channelOptions)
+    private static UdpSessionChannel GetUdpSession(this TouchSocketConfig config, IChannelOptions channelOptions)
     {
         var remoteUrl = channelOptions.RemoteUrl;
         var bindUrl = channelOptions.BindUrl;
