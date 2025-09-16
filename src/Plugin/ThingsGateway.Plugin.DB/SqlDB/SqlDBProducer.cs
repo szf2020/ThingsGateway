@@ -112,7 +112,6 @@ public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariable
     {
         _db.DbMaintenance.CreateDatabase();
 
-        //必须为间隔上传
         if (!_driverPropertys.BigTextScriptHistoryTable.IsNullOrEmpty())
         {
             var hisModel = CSharpScriptEngineExtension.Do<DynamicSQLBase>(_driverPropertys.BigTextScriptHistoryTable);

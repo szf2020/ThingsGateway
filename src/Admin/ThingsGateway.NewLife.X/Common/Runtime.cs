@@ -106,6 +106,17 @@ public static class Runtime
 
 #if NET6_0_OR_GREATER
 
+
+    public static Boolean IsSystemd
+    {
+        get
+        {
+            var id = Environment.GetEnvironmentVariable("INVOCATION_ID");
+            return !string.IsNullOrEmpty(id);
+        }
+    }
+
+
     public static Boolean? isLegacyWindows;
 
     /// <summary>

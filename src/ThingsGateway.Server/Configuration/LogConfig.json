@@ -1,7 +1,4 @@
 {
-  "Debug": "true",
-  "LogPath": "Logs/XLog",
   "LogFileMaxBytes": "5", //5mb最大日志文件
-  "LogFileBackups": "50", //50个日志文件
-  "LogFileFormat": "{0:yyyy_MM_dd}.log"
+  "LogFileBackups": "50" //50个日志文件
 }

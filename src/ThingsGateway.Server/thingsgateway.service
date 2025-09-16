@@ -25,6 +25,14 @@ Environment=DOTNET_PRINT_TELEMETRY_MESSAGE=false
 [Install]
 WantedBy=multi-user.target
 
+# 文件配置
+# [Journal]
+# SystemMaxUse=200M      # 日志最大占用200MB磁盘空间
+# SystemMaxFileSize=50M  # 单个日志文件最大50MB
+# MaxRetentionSec=1month # 日志只保留1个月
+# RuntimeMaxUse=100M     # 内存中最多缓存100MB日志
+
+
 
 # 加载服务配置文件
 # systemctl daemon-reload

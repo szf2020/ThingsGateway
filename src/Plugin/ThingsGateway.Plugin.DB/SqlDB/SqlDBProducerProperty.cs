@@ -69,13 +69,13 @@ public class SqlDBProducerProperty : BusinessPropertyWithCacheInterval
     /// <summary>
     /// 实时表脚本
     /// </summary>
-    [DynamicProperty(Remark = "必须为间隔上传，才生效")]
+    [DynamicProperty]
     [AutoGenerateColumn(Visible = true, IsVisibleWhenEdit = false, IsVisibleWhenAdd = false)]
     public string? BigTextScriptRealTable { get; set; }
     /// <summary>
     /// 历史表脚本
     /// </summary>
-    [DynamicProperty(Remark = "必须为间隔上传，才生效")]
+    [DynamicProperty]
     [AutoGenerateColumn(Visible = true, IsVisibleWhenEdit = false, IsVisibleWhenAdd = false)]
     public string? BigTextScriptHistoryTable { get; set; }
 }

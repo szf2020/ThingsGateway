@@ -36,6 +36,7 @@ public class Program
         ClaimConst.Scheme = $"{typeof(Program).Assembly.GetName().Name}{SchemeHelper.GetOrCreate()}";
 
         Runtime.CreateConfigOnMissing = true;
+
         #region 控制台输出Logo
 
         Console.Write(Environment.NewLine);
@@ -72,8 +73,17 @@ public class Program
 
                 if (Runtime.IsLegacyWindows)
                     builder.Logging.ClearProviders(); //去除默认的事件日志提供者，某些情况下会日志输出异常，导致程序崩溃
+
+
             }).ConfigureBuilder(builder =>
                {
+
+                   if (Runtime.IsSystemd)
+                   {
+                       builder.Logging.SetMinimumLevel(Microsoft.Extensions.Logging.LogLevel.Warning);
+                   }
+
+
                    if (!builder.Environment.IsDevelopment())
                    {
                        builder.Services.AddResponseCompression(
@@ -108,6 +118,8 @@ public class Program
 
 #endif
 
+
+
                     ReflectionInoHelper.RemoveAllCache();
                     InstanceFactory.RemoveCache();
                 })
@@ -136,6 +148,12 @@ public class Program
 
             }).ConfigureBuilder(builder =>
             {
+
+                if (Runtime.IsSystemd)
+                {
+                    builder.ConfigureLogging(a => a.SetMinimumLevel(Microsoft.Extensions.Logging.LogLevel.Warning));
+                }
+
                 // 设置接口超时时间和上传大小-Kestrel
                 builder.ConfigureKestrel(u =>
                 {
@@ -144,11 +162,7 @@ public class Program
                     u.Limits.MaxRequestBodySize = null;
                 }).UseKestrel().Configure(app =>
                 {
-                    // ✅ 最小中间件
-                    app.Run(context =>
-                    {
-                        return context.Response.WriteAsync("web is disable");
-                    });
+                    app.Run(context => context.Response.WriteAsync("web is disable"));
                 });
             })
                 .Configure(app =>

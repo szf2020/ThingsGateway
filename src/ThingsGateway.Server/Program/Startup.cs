@@ -73,7 +73,6 @@ public class Startup : AppStartup
 
             services.AddRazorPages();
 
-
             services.AddMvcFilter<RequestAuditFilter>();
 
             services.AddControllers()

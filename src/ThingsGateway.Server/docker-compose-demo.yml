@@ -1,5 +1,5 @@
 
-#docker run -d --name tg  --restart always -p 127.0.0.1:5000:5000 -e ASPNETCORE_ENVIRONMENT=Demo -v /thingsgateway/Keys:/app/Keys -v /thingsgateway/DB:/app/DB  --memory="512m" registry.cn-shenzhen.aliyuncs.com/thingsgateway/thingsgateway:latest
+#docker run -d --log-driver json-file --log-opt max-size=50m --log-opt max-file=5 --name tg --restart always -p 127.0.0.1:5000:5000 -p 502:502 -e ASPNETCORE_ENVIRONMENT=Demo -v /thingsgateway/Keys:/app/Keys -v /thingsgateway/DB:/app/DB --memory="512m" registry.cn-shenzhen.aliyuncs.com/thingsgateway/thingsgateway:latest
 
 version: "latest"    # Docker Compose 配置版本
 

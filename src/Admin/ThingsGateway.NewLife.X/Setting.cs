@@ -21,6 +21,7 @@ public class Setting : Config<Setting>
     #region 属性
     /// <summary>是否启用全局调试。默认启用</summary>
     [Description("全局调试。XTrace.Debug")]
+    [XmlIgnore, IgnoreDataMember]
     public Boolean Debug { get; set; } = true;
 
     /// <summary>日志等级，只输出大于等于该级别的日志，All/Debug/Info/Warn/Error/Fatal，默认Info</summary>
@@ -30,6 +31,7 @@ public class Setting : Config<Setting>
 
     /// <summary>文件日志目录。默认Log子目录</summary>
     [Description("文件日志目录。默认Log子目录")]
+    [XmlIgnore, IgnoreDataMember]
     public String LogPath { get; set; } = "Logs/XLog";
 
     /// <summary>日志文件上限。超过上限后拆分新日志文件，默认5MB，0表示不限制大小</summary>
@@ -42,6 +44,7 @@ public class Setting : Config<Setting>
 
     /// <summary>日志文件格式。默认{0:yyyy_MM_dd}.log，支持日志等级如 {1}_{0:yyyy_MM_dd}.log</summary>
     [Description("日志文件格式。默认{0:yyyy_MM_dd}.log，支持日志等级如 {1}_{0:yyyy_MM_dd}.log")]
+    [XmlIgnore, IgnoreDataMember]
     public String LogFileFormat { get; set; } = "{0:yyyy_MM_dd}.log";
 
     /// <summary>日志行格式。默认Time|ThreadId|Kind|Name|Message，还支持Level</summary>
