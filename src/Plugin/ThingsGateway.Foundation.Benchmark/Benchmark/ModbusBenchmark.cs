@@ -19,7 +19,6 @@ using Longbow.TcpSocket;
 
 using Microsoft.Extensions.DependencyInjection;
 
-using System.IO.Pipelines;
 using System.Net.Sockets;
 
 using ThingsGateway.Foundation.Modbus;

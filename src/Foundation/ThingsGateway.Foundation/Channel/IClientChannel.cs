@@ -30,6 +30,7 @@ public interface IClientChannel : IChannel, ISender, IClient, IClientSender, IOn
     WaitHandlePool<MessageBase> WaitHandlePool { get; }
 
     WaitLock GetLock(string key);
+    void LogSeted(bool logSeted);
 
     /// <summary>
     /// 设置数据处理适配器

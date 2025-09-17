@@ -210,7 +210,7 @@ public class TcpServiceChannel<TClient> : TcpServiceChannelBase<TClient>, IChann
     }
     public int MinSign { get; private set; } = 0;
     public int MaxSign { get; private set; } = ushort.MaxValue;
-    public void ResetSign(int minSign = 0, int maxSign = ushort.MaxValue)
+    public void ResetSign(int minSign = 1, int maxSign = ushort.MaxValue - 1)
     {
         MinSign = minSign;
         MaxSign = maxSign;

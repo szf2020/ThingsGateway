@@ -29,8 +29,8 @@ public class SiemensS7Test
 
 
     [Theory]
-    [InlineData("M100", true, "03 00 00 1B 02 F0 80 32 03 00 00 00 01 00 02 00 06 00 00 04 01 FF 04 00 10 00 00")]
-    [InlineData("M100", false, "03 00 00 16 02 F0 80 32 03 00 00 00 01 00 02 00 01 00 00 05 01 FF", "1", DataTypeEnum.UInt16)]
+    [InlineData("M100", true, "03 00 00 1B 02 F0 80 32 03 00 00 00 02 00 02 00 06 00 00 04 01 FF 04 00 10 00 00")]
+    [InlineData("M100", false, "03 00 00 16 02 F0 80 32 03 00 00 00 02 00 02 00 01 00 00 05 01 FF", "1", DataTypeEnum.UInt16)]
     public async Task SiemensS7_ReadWrite_OK(string address, bool read, string data, string writeData = null, DataTypeEnum dataTypeEnum = DataTypeEnum.UInt16)
     {
         var siemensS7Channel = new TouchSocketConfig().GetChannel(new ChannelOptions()

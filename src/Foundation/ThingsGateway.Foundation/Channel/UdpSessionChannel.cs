@@ -40,6 +40,10 @@ public class UdpSessionChannel : UdpSession, IClientChannel
             handleAdapter.Logger = log;
         }
     }
+    public void LogSeted(bool logSeted)
+    {
+        logSet = logSeted;
+    }
     /// <inheritdoc/>
     public void SetDataHandlingAdapter(DataHandlingAdapter adapter)
     {
@@ -50,7 +54,7 @@ public class UdpSessionChannel : UdpSession, IClientChannel
     }
 
 
-    public void ResetSign(int minSign = 0, int maxSign = ushort.MaxValue)
+    public void ResetSign(int minSign = 1, int maxSign = ushort.MaxValue - 1)
     {
         var pool = WaitHandlePool;
         WaitHandlePool = new WaitHandlePool<MessageBase>(minSign, maxSign);
@@ -89,7 +93,7 @@ public class UdpSessionChannel : UdpSession, IClientChannel
     /// <summary>
     /// 等待池
     /// </summary>
-    public WaitHandlePool<MessageBase> WaitHandlePool { get; set; } = new(0, ushort.MaxValue);
+    public WaitHandlePool<MessageBase> WaitHandlePool { get; internal set; } = new(1, ushort.MaxValue - 1);
 
     /// <inheritdoc/>
     public WaitLock WaitLock => ChannelOptions.WaitLock;

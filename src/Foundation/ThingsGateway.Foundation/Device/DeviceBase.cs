@@ -569,7 +569,7 @@ public abstract class DeviceBase : AsyncAndSyncDisposableObject, IDevice
             {
                 timeoutStatus = reusableTimeout.TimeoutStatus;
                 return timeoutStatus
-                    ? new MessageBase(new TimeoutException())
+                    ? new MessageBase(new TimeoutException()) { ErrorMessage = $"Timeout, sign: {sign}" }
                     : new MessageBase(new OperationCanceledException());
             }
             catch (Exception ex)
@@ -583,9 +583,15 @@ public abstract class DeviceBase : AsyncAndSyncDisposableObject, IDevice
                 _reusableTimeouts.Return(reusableTimeout);
             }
 
-            return waitData.Status == WaitDataStatus.Success
-                ? waitData.CompletedData
-                : new MessageBase(waitData.Check(timeoutStatus));
+            if (waitData.Status == WaitDataStatus.Success)
+            {
+                return waitData.CompletedData;
+            }
+            else
+            {
+                var operResult = waitData.Check(timeoutStatus);
+                return new MessageBase(operResult) { ErrorMessage = $"{operResult.ErrorMessage}, sign: {sign}" };
+            }
         }
         catch (Exception ex)
         {
@@ -978,6 +984,7 @@ public abstract class DeviceBase : AsyncAndSyncDisposableObject, IDevice
         {
             lock (Channel)
             {
+
                 Channel.Starting.Remove(ChannelStarting);
                 Channel.Stoped.Remove(ChannelStoped);
                 Channel.Started.Remove(ChannelStarted);
@@ -1018,6 +1025,11 @@ public abstract class DeviceBase : AsyncAndSyncDisposableObject, IDevice
                 }
 
                 Channel.Collects.Remove(this);
+                if (Channel is IClientChannel clientChannel)
+                {
+                    clientChannel.LogSeted(false);
+                }
+
             }
         }
         _reusableTimeouts?.SafeDispose();
@@ -1070,6 +1082,12 @@ public abstract class DeviceBase : AsyncAndSyncDisposableObject, IDevice
             }
 
             Channel.Collects.Remove(this);
+
+            if (Channel is IClientChannel clientChannel)
+            {
+                clientChannel.LogSeted(false);
+            }
+
         }
 
         _reusableTimeouts?.SafeDispose();

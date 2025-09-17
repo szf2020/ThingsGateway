@@ -57,7 +57,7 @@ public interface IChannel : ISetupConfigObject, IDisposable, IClosableClient, IC
     /// </summary>
     public ChannelEventHandler Stoping { get; }
 
-    void ResetSign(int minSign = 0, int maxSign = ushort.MaxValue);
+    void ResetSign(int minSign = 1, int maxSign = ushort.MaxValue - 1);
 
 
 }

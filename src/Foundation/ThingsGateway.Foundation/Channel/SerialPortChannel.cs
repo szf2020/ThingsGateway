@@ -31,7 +31,7 @@ public class SerialPortChannel : SerialPortClient, IClientChannel
 
     public override TouchSocketConfig Config => base.Config ?? ChannelOptions.Config;
 
-    public void ResetSign(int minSign = 0, int maxSign = ushort.MaxValue)
+    public void ResetSign(int minSign = 1, int maxSign = ushort.MaxValue - 1)
     {
         var pool = WaitHandlePool;
         WaitHandlePool = new WaitHandlePool<MessageBase>(minSign, maxSign);
@@ -71,6 +71,11 @@ public class SerialPortChannel : SerialPortClient, IClientChannel
         logSet = false;
     }
 
+    public void LogSeted(bool logSeted)
+    {
+        logSet = logSeted;
+    }
+
 
     /// <inheritdoc/>
     public ChannelEventHandler Started { get; } = new();
@@ -86,7 +91,7 @@ public class SerialPortChannel : SerialPortClient, IClientChannel
     /// <summary>
     /// 等待池
     /// </summary>
-    public WaitHandlePool<MessageBase> WaitHandlePool { get; internal set; } = new(0, ushort.MaxValue);
+    public WaitHandlePool<MessageBase> WaitHandlePool { get; internal set; } = new(1, ushort.MaxValue - 1);
 
     /// <inheritdoc/>
     public WaitLock WaitLock => ChannelOptions.WaitLock;

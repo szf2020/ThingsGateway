@@ -43,8 +43,11 @@ public class TcpSessionClientChannel : TcpSessionClient, IClientChannel
 
         logSet = false;
     }
-
-    public void ResetSign(int minSign = 0, int maxSign = ushort.MaxValue)
+    public void LogSeted(bool logSeted)
+    {
+        logSet = logSeted;
+    }
+    public void ResetSign(int minSign = 1, int maxSign = ushort.MaxValue - 1)
     {
         var pool = WaitHandlePool;
         WaitHandlePool = new WaitHandlePool<MessageBase>(minSign, maxSign);
@@ -79,7 +82,7 @@ public class TcpSessionClientChannel : TcpSessionClient, IClientChannel
     /// <summary>
     /// 等待池
     /// </summary>
-    public WaitHandlePool<MessageBase> WaitHandlePool { get; private set; } = new(0, ushort.MaxValue);
+    public WaitHandlePool<MessageBase> WaitHandlePool { get; private set; } = new(1, ushort.MaxValue - 1);
 
     /// <inheritdoc/>
     public WaitLock WaitLock { get; internal set; } = new(nameof(TcpSessionClientChannel));

@@ -49,7 +49,7 @@
 		<PackageReference Include="S7netplus" Version="0.20.0" />
 		<!--<PackageReference Include="ThingsGateway.Foundation.Modbus" Version="$(DefaultVersion)" />
 		<PackageReference Include="ThingsGateway.Foundation.SiemensS7" Version="$(DefaultVersion)" />-->
-		<PackageReference Include="TouchSocket.Modbus" Version="4.0.0-beta.27" />
+		<PackageReference Include="TouchSocket.Modbus" Version="4.0.0-beta.28" />
 	</ItemGroup>
 
 	<ItemGroup>

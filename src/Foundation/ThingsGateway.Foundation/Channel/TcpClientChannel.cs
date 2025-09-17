@@ -28,7 +28,7 @@ public class TcpClientChannel : TcpClient, IClientChannel
         ResetSign();
     }
     public override TouchSocketConfig Config => base.Config ?? ChannelOptions.Config;
-    public void ResetSign(int minSign = 0, int maxSign = ushort.MaxValue)
+    public void ResetSign(int minSign = 1, int maxSign = ushort.MaxValue - 1)
     {
         var pool = WaitHandlePool;
         WaitHandlePool = new WaitHandlePool<MessageBase>(minSign, maxSign);
@@ -50,6 +50,10 @@ public class TcpClientChannel : TcpClient, IClientChannel
             SetAdapter(singleStreamDataHandlingAdapter);
 
         logSet = false;
+    }
+    public void LogSeted(bool logSeted)
+    {
+        logSet = logSeted;
     }
     /// <inheritdoc/>
     public ChannelReceivedEventHandler ChannelReceived { get; } = new();
@@ -79,7 +83,7 @@ public class TcpClientChannel : TcpClient, IClientChannel
     /// <summary>
     /// 等待池
     /// </summary>
-    public WaitHandlePool<MessageBase> WaitHandlePool { get; internal set; } = new(0, ushort.MaxValue);
+    public WaitHandlePool<MessageBase> WaitHandlePool { get; internal set; } = new(1, ushort.MaxValue - 1);
     public virtual WaitLock GetLock(string key) => WaitLock;
 
     /// <inheritdoc/>

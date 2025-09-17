@@ -482,7 +482,6 @@ public abstract partial class CollectBase : DriverBase
 
     protected virtual Task TestOnline(object? state, CancellationToken cancellationToken)
     {
-        CurrentDevice.SetDeviceStatus(TimerX.Now, false, null);
         return Task.CompletedTask;
     }
 

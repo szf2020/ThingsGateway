@@ -17,8 +17,6 @@ using HslCommunication.Profinet.Siemens;
 
 using S7.Net;
 
-using System.IO.Pipelines;
-
 using ThingsGateway.Foundation.SiemensS7;
 
 using TouchSocket.Core;
