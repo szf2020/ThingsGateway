@@ -114,7 +114,8 @@ public class ModbusSlave : BusinessBase
 
         try
         {
-            await _plc.ConnectAsync(cancellationToken).ConfigureAwait(false);
+            if (channel.ChannelType == ChannelTypeEnum.TcpService)
+                await _plc.ConnectAsync(cancellationToken).ConfigureAwait(false);
         }
         catch
         {

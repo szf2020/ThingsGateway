@@ -52,7 +52,7 @@ public class ModbusRequest
     /// <summary>
     /// 站号
     /// </summary>
-    public byte Station { get; set; }
+    public byte Station { get; set; } = 1;
 
     #endregion Request
 }

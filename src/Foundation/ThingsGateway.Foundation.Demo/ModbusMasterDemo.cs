@@ -68,6 +68,7 @@ public class ModbusMasterDemo
 
         bytes = await device.ModbusReadAsync(new ModbusAddress()
         {
+            Station = 1,
             StartAddress = 0,
             FunctionCode = 3,
             Length = 10,
@@ -92,6 +93,7 @@ public class ModbusMasterDemo
 
         write = await device.ModbusRequestAsync(new ModbusAddress()
         {
+            Station = 1,
             StartAddress = 0,
             FunctionCode = 3,
             MasterWriteDatas = device.ThingsGatewayBitConverter.GetBytes(new double[] { 123.456, 123.456 })

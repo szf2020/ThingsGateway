@@ -97,7 +97,9 @@ public class ModbusSlave : DeviceBase, IModbusAddress
     {
         return $"{base.GetAddressDescription()}{Environment.NewLine}{ModbusHelper.GetAddressDescription()}";
     }
-
+    protected override void SetChannel()
+    {
+    }
     /// <inheritdoc/>
     public override DataHandlingAdapter GetDataAdapter()
     {

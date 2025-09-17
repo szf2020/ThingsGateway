@@ -15,23 +15,19 @@ public class ExpiringDictionary<TKey, TValue> : IDisposable
 
     public void TryAdd(TKey key, TValue value)
     {
-        if (_cleanupTimer.Disposed) throw new ObjectDisposedException(nameof(ExpiringDictionary<TKey, TValue>));
         _dict.TryAdd(key, value);
     }
 
     public bool TryGetValue(TKey key, out TValue value)
     {
-        if (_cleanupTimer.Disposed) throw new ObjectDisposedException(nameof(ExpiringDictionary<TKey, TValue>));
         return _dict.TryGetValue(key, out value);
     }
     public TValue GetOrAdd(TKey key, Func<TKey, TValue> func)
     {
-        if (_cleanupTimer.Disposed) throw new ObjectDisposedException(nameof(ExpiringDictionary<TKey, TValue>));
         return _dict.GetOrAdd(key, func);
     }
     public TValue GetOrAdd(TKey key, TValue value)
     {
-        if (_cleanupTimer.Disposed) throw new ObjectDisposedException(nameof(ExpiringDictionary<TKey, TValue>));
         return _dict.GetOrAdd(key, value);
     }
 

@@ -43,17 +43,17 @@
 	<ItemGroup>
 		<PackageReference Include="BenchmarkDotNet" Version="0.15.2" />
 		<PackageReference Include="HslCommunication" Version="12.5.0" />
-		<PackageReference Include="Longbow.Modbus" Version="9.0.5" />
+		<PackageReference Include="Longbow.Modbus" Version="9.0.6" />
 		<PackageReference Include="NModbus" Version="3.0.81" />
 		<PackageReference Include="NModbus.Serial" Version="3.0.81" />
 		<PackageReference Include="S7netplus" Version="0.20.0" />
-		<PackageReference Include="ThingsGateway.Foundation.Modbus" Version="$(DefaultVersion)" />
-		<PackageReference Include="ThingsGateway.Foundation.SiemensS7" Version="$(DefaultVersion)" />
+		<!--<PackageReference Include="ThingsGateway.Foundation.Modbus" Version="$(DefaultVersion)" />
+		<PackageReference Include="ThingsGateway.Foundation.SiemensS7" Version="$(DefaultVersion)" />-->
 		<PackageReference Include="TouchSocket.Modbus" Version="4.0.0-beta.27" />
 	</ItemGroup>
 
 	<ItemGroup>
-		<!--<ProjectReference Include="..\..\Plugin\ThingsGateway.Foundation.Modbus\ThingsGateway.Foundation.Modbus.csproj" />
-		<ProjectReference Include="..\..\Plugin\ThingsGateway.Foundation.SiemensS7\ThingsGateway.Foundation.SiemensS7.csproj" />-->
+		<ProjectReference Include="..\..\Plugin\ThingsGateway.Foundation.Modbus\ThingsGateway.Foundation.Modbus.csproj" />
+		<ProjectReference Include="..\..\Plugin\ThingsGateway.Foundation.SiemensS7\ThingsGateway.Foundation.SiemensS7.csproj" />
 	</ItemGroup>
 </Project>

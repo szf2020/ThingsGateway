@@ -20,9 +20,9 @@ namespace BenchmarkConsoleApp
 {
     internal class Program
     {
-        public static int ClientCount = 30;
-        public static int TaskNumberOfItems = 10;
-        public static int NumberOfItems = 30;
+        public static int ClientCount = 50;
+        public static int TaskNumberOfItems = 1;
+        public static int NumberOfItems = 50;
 
         private static async Task Main(string[] args)
         {

@@ -110,26 +110,7 @@ public class ModbusBenchmark : IDisposable
             }
         }
     }
-    [Benchmark]
-    public async Task LongbowModbus()
-    {
-        List<Task> tasks = new List<Task>();
-        foreach (var _lgbModbusClient in _lgbModbusClients)
-        {
 
-            for (int i = 0; i < Program.TaskNumberOfItems; i++)
-            {
-                tasks.Add(Task.Run(async () =>
-                {
-                    for (int i = 0; i < Program.NumberOfItems; i++)
-                    {
-                        var task = await _lgbModbusClient.ReadHoldingRegistersAsync(1, 0, 100);
-                    }
-                }));
-            }
-        }
-        await Task.WhenAll(tasks);
-    }
     [Benchmark]
     public async Task ThingsGateway()
     {
@@ -144,7 +125,7 @@ public class ModbusBenchmark : IDisposable
                 {
                     for (int i = 0; i < Program.NumberOfItems; i++)
                     {
-                        var result = await thingsgatewaymodbus.ModbusReadAsync(new ModbusAddress() { FunctionCode = 3, StartAddress = 0, Length = 100 });
+                        var result = await thingsgatewaymodbus.ModbusReadAsync(new ModbusAddress() { Station = 1, FunctionCode = 3, StartAddress = 0, Length = 100 }).ConfigureAwait(false);
                         if (!result.IsSuccess)
                         {
                             throw new Exception(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss ffff") + result.ToString());
@@ -157,7 +138,27 @@ public class ModbusBenchmark : IDisposable
         await Task.WhenAll(tasks);
     }
 
+    [Benchmark]
+    public async Task LongbowModbus()
+    {
+        List<Task> tasks = new List<Task>();
+        foreach (var _lgbModbusClient in _lgbModbusClients)
+        {
 
+            for (int i = 0; i < Program.TaskNumberOfItems; i++)
+            {
+                tasks.Add(Task.Run(async () =>
+                {
+                    for (int i = 0; i < Program.NumberOfItems; i++)
+                    {
+                        using var cts = new CancellationTokenSource(3000);
+                        var task = await _lgbModbusClient.ReadHoldingRegistersAsync(1, 0, 100, cts.Token).ConfigureAwait(false);
+                    }
+                }));
+            }
+        }
+        await Task.WhenAll(tasks);
+    }
 
     [Benchmark]
     public async Task TouchSocket()
@@ -171,7 +172,7 @@ public class ModbusBenchmark : IDisposable
                 {
                     for (int i = 0; i < Program.NumberOfItems; i++)
                     {
-                        var result = await modbusTcpMaster.ReadHoldingRegistersAsync(0, 100);
+                        var result = await modbusTcpMaster.ReadHoldingRegistersAsync(0, 100).ConfigureAwait(false);
                         var data = TouchSocketBitConverter.ConvertValues<byte, ushort>(result.Data.Span, EndianType.Little);
                         if (!result.IsSuccess)
                         {
@@ -197,7 +198,7 @@ public class ModbusBenchmark : IDisposable
                 {
                     for (int i = 0; i < Program.NumberOfItems; i++)
                     {
-                        var result = await nmodbus.ReadHoldingRegistersAsync(1, 0, 100);
+                        var result = await nmodbus.ReadHoldingRegistersAsync(1, 0, 100).ConfigureAwait(false);
                     }
                 }));
             }
