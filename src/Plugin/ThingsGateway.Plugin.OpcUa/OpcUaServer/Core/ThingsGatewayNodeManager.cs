@@ -19,6 +19,7 @@ using System.Globalization;
 
 using ThingsGateway.Foundation.OpcUa;
 using ThingsGateway.Gateway.Application;
+using ThingsGateway.NewLife.Json.Extension;
 using ThingsGateway.NewLife.Reflection;
 
 using TouchSocket.Core;
@@ -300,7 +301,7 @@ public class ThingsGatewayNodeManager : CustomNodeManager2
             {
                 SetDataType(tag, value);
             }
-            var jToken = JToken.FromObject(value);
+            var jToken = (value).GetJTokenFromObj();
             var dataValue = JsonUtils.DecoderObject(
                Server.MessageContext,
            tag.DataType,

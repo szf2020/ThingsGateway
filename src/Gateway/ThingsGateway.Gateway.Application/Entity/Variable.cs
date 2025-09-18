@@ -15,6 +15,8 @@ using Riok.Mapperly.Abstractions;
 using System.Collections.Concurrent;
 using System.ComponentModel.DataAnnotations;
 
+using ThingsGateway.NewLife.Json.Extension;
+
 namespace ThingsGateway.Gateway.Application;
 
 /// <summary>

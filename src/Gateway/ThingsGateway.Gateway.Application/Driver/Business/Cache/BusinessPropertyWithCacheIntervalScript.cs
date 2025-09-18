@@ -105,5 +105,6 @@ public class BusinessPropertyWithCacheIntervalScript : BusinessPropertyWithCache
     /// 报警实体脚本
     /// </summary>
     [DynamicProperty]
+    [AutoGenerateColumn(Visible = true, IsVisibleWhenEdit = false, IsVisibleWhenAdd = false)]
     public virtual string? BigTextScriptPluginEventDataModel { get; set; }
 }

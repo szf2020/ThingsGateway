@@ -41,9 +41,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="BenchmarkDotNet" Version="0.15.2" />
-		<PackageReference Include="HslCommunication" Version="12.5.0" />
-		<PackageReference Include="Longbow.Modbus" Version="9.0.6" />
+		<PackageReference Include="BenchmarkDotNet" Version="0.15.3" />
+		<PackageReference Include="HslCommunication" Version="12.5.1" />
+		<PackageReference Include="Longbow.Modbus" Version="9.0.7" />
 		<PackageReference Include="NModbus" Version="3.0.81" />
 		<PackageReference Include="NModbus.Serial" Version="3.0.81" />
 		<PackageReference Include="S7netplus" Version="0.20.0" />

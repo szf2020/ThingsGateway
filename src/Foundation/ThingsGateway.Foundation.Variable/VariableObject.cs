@@ -14,6 +14,7 @@ using Newtonsoft.Json.Linq;
 using System.Linq.Expressions;
 
 using ThingsGateway.Gateway.Application.Extensions;
+using ThingsGateway.NewLife.Json.Extension;
 using ThingsGateway.NewLife.Reflection;
 
 namespace ThingsGateway.Foundation;
@@ -68,12 +69,12 @@ public abstract class VariableObject
     /// <returns></returns>
     public virtual JToken GetExpressionsValue(object value, VariableRuntimeProperty variableRuntimeProperty)
     {
-        var jToken = JToken.FromObject(value);
+        var jToken = value.GetJTokenFromObj();
         if (!string.IsNullOrEmpty(variableRuntimeProperty.Attribute.WriteExpressions))
         {
             object rawdata = jToken.GetObjectFromJToken();
             object data = variableRuntimeProperty.Attribute.WriteExpressions.GetExpressionsResult(rawdata, Device?.Logger);
-            jToken = JToken.FromObject(data);
+            jToken = data.GetJTokenFromObj();
         }
 
         return jToken;

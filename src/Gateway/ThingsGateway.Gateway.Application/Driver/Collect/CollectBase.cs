@@ -594,7 +594,7 @@ public abstract partial class CollectBase : DriverBase
                     // 根据写入表达式转换数据
                     object data = deviceVariable.WriteExpressions.GetExpressionsResult(rawdata, LogMessage);
                     // 将转换后的数据重新赋值给写入信息列表
-                    writeInfoLists[deviceVariable] = JToken.FromObject(data);
+                    writeInfoLists[deviceVariable] = JTokenUtil.GetJTokenFromObj(data);
                 }
                 catch (Exception ex)
                 {
@@ -662,7 +662,7 @@ public abstract partial class CollectBase : DriverBase
                     // 根据写入表达式转换数据
                     object data = deviceVariable.WriteExpressions.GetExpressionsResult(rawdata, LogMessage);
                     // 将转换后的数据重新赋值给写入信息列表
-                    writeInfoLists[deviceVariable] = JToken.FromObject(data);
+                    writeInfoLists[deviceVariable] = JTokenUtil.GetJTokenFromObj(data);
                 }
                 catch (Exception ex)
                 {

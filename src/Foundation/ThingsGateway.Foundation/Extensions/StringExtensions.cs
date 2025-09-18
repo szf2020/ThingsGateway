@@ -12,6 +12,7 @@ using System.Globalization;
 using System.Net;
 
 using ThingsGateway.NewLife.Extension;
+using ThingsGateway.NewLife.Json.Extension;
 
 namespace ThingsGateway.Foundation.Extension.String;
 

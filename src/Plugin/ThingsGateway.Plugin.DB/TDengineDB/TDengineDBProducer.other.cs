@@ -8,13 +8,12 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-using Newtonsoft.Json.Linq;
-
 using System.Diagnostics;
 using System.Text;
 
 using ThingsGateway.Extension.Generic;
 using ThingsGateway.Foundation;
+using ThingsGateway.NewLife.Json.Extension;
 using ThingsGateway.Plugin.DB;
 using ThingsGateway.SqlSugar;
 using ThingsGateway.SqlSugar.TDengine;
@@ -155,7 +154,7 @@ public partial class TDengineDBProducer : BusinessBaseWithCacheIntervalVariable
 
                 foreach (var item in variableGroup)
                 {
-                    stringBuilder.Append($"""(NOW,"{item.CollectTime.ToString("yyyy-MM-dd HH:mm:ss.fff")}",{item.Id},{item.IsOnline},"{GetValue(item)}"),""");
+                    stringBuilder.Append($"""(NOW,"{item.CollectTime.ToString("yyyy-MM-dd HH:mm:ss.fff")}",{item.Id},{item.IsOnline},"{JsonElementExtensions.GetValue(item.Value, true)}"),""");
                 }
                 stringBuilder.Remove(stringBuilder.Length - 1, 1);
             }
@@ -172,28 +171,6 @@ public partial class TDengineDBProducer : BusinessBaseWithCacheIntervalVariable
         //if (result > 0)
         {
             LogMessage?.Trace($"TableName：{tableName}，Count：{result}，watchTime:  {stopwatch.ElapsedMilliseconds} ms");
-        }
-    }
-    private string GetValue(VariableBasicData src)
-    {
-        if (src.Value != null)
-        {
-            if (src.Value is string strValue)
-            {
-                return strValue;
-            }
-            else if (src.Value is bool boolValue)
-            {
-                return boolValue ? "1" : "0";
-            }
-            else
-            {
-                return JToken.FromObject(src.Value).ToString();
-            }
-        }
-        else
-        {
-            return string.Empty;
         }
     }
     #endregion 方法

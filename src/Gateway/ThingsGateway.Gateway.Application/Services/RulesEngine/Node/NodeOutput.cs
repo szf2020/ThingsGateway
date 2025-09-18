@@ -1,5 +1,7 @@
 ﻿using Newtonsoft.Json.Linq;
 
+using ThingsGateway.NewLife.Json.Extension;
+
 namespace ThingsGateway.Gateway.Application;
 
 public class NodeOutput
@@ -9,7 +11,7 @@ public class NodeOutput
     {
         get
         {
-            return JToken.FromObject(output);
+            return (output).GetJTokenFromObj();
         }
     }
 

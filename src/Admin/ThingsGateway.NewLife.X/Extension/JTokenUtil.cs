@@ -10,7 +10,7 @@
 
 using Newtonsoft.Json.Linq;
 
-namespace ThingsGateway.Foundation;
+namespace ThingsGateway.NewLife.Json.Extension;
 
 /// <summary>
 /// JTokenUtil
@@ -130,6 +130,63 @@ public static class JTokenUtil
                 return token.ToString();
         }
     }
+
+
+
+    /// <summary>
+    /// 把任意对象转换为 JToken。
+    /// 支持 JsonElement、JToken、本地 CLR 类型。
+    /// </summary>
+    public static JToken GetJTokenFromObj(this object value)
+    {
+        if (value == null)
+            return JValue.CreateNull();
+
+        switch (value)
+        {
+            case JToken jt:
+                return jt;
+#if NET6_0_OR_GREATER
+            case System.Text.Json.JsonElement elem:
+                return elem.ToJToken();
+#endif
+            case string s:
+                return new JValue(s);
+
+            case bool b:
+                return new JValue(b);
+
+            case int i:
+                return new JValue(i);
+
+            case long l:
+                return new JValue(l);
+
+            case double d:
+                return new JValue(d);
+
+            case float f:
+                return new JValue(f);
+
+            case decimal m:
+                return new JValue(m);
+
+            case DateTime dt:
+                return new JValue(dt);
+
+            case DateTimeOffset dto:
+                return new JValue(dto);
+
+            case Guid g:
+                return new JValue(g);
+
+            default:
+                // 兜底：用 Newtonsoft 来包装成 JToken
+                return JToken.FromObject(value);
+        }
+    }
+
+
 
     #region json
 

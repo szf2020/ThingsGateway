@@ -8,9 +8,8 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-using Newtonsoft.Json.Linq;
-
 using ThingsGateway.NewLife.Extension;
+using ThingsGateway.NewLife.Json.Extension;
 using ThingsGateway.Plugin.QuestDB;
 using ThingsGateway.Plugin.SqlDB;
 
@@ -23,7 +22,7 @@ internal static class Helper
     {
         var dest = new SQLHistoryValue();
         dest.Id = src.Id;
-        dest.Value = GetValue(src.Value);
+        dest.Value = JsonElementExtensions.GetValue(src.Value, true);
         dest.CreateTime = DateTime.Now;
 
         dest.CollectTime = src.CollectTime;
@@ -43,7 +42,7 @@ internal static class Helper
     {
         var dest = new SQLHistoryValue();
         dest.Id = src.Id;
-        dest.Value = GetValue(src.Value);
+        dest.Value = JsonElementExtensions.GetValue(src.Value, true);
         dest.CreateTime = DateTime.Now;
 
         dest.CollectTime = src.CollectTime;
@@ -121,8 +120,9 @@ internal static class Helper
     {
         var dest = new SQLRealValue();
         dest.Id = src.Id;
-        dest.Value = GetValue(src.Value);
+        dest.Value = JsonElementExtensions.GetValue(src.Value, true);
         dest.CollectTime = src.CollectTime;
+        //dest.UpdateTime = DateTime.Now;
         dest.DeviceName = src.DeviceName;
         dest.IsOnline = src.IsOnline;
         dest.Name = src.Name;
@@ -145,8 +145,9 @@ internal static class Helper
     {
         var dest = new SQLRealValue();
         dest.Id = src.Id;
-        dest.Value = GetValue(src.Value);
+        dest.Value = JsonElementExtensions.GetValue(src.Value, true);
         dest.CollectTime = src.CollectTime;
+        //dest.UpdateTime = DateTime.Now;
         dest.DeviceName = src.DeviceName;
         dest.IsOnline = src.IsOnline;
         dest.Name = src.Name;
@@ -172,7 +173,7 @@ internal static class Helper
     {
         var dest = new QuestDBHistoryValue();
         dest.Id = src.Id;
-        dest.Value = GetValue(src.Value);
+        dest.Value = JsonElementExtensions.GetValue(src.Value, true);
         dest.CreateTime = DateTime.UtcNow;
 
         dest.CollectTime = src.CollectTime < DateTime.MinValue ? UtcTime1970 : src.CollectTime;
@@ -192,7 +193,7 @@ internal static class Helper
     {
         var dest = new QuestDBHistoryValue();
         dest.Id = src.Id;
-        dest.Value = GetValue(src.Value);
+        dest.Value = JsonElementExtensions.GetValue(src.Value, true);
         dest.CreateTime = DateTime.UtcNow;
 
         dest.CollectTime = src.CollectTime < DateTime.MinValue ? UtcTime1970 : src.CollectTime;
@@ -252,26 +253,4 @@ internal static class Helper
 
     #endregion
 
-    private static string GetValue(object src)
-    {
-        if (src != null)
-        {
-            if (src is string strValue)
-            {
-                return strValue;
-            }
-            else if (src is bool boolValue)
-            {
-                return boolValue ? "1" : "0";
-            }
-            else
-            {
-                return JToken.FromObject(src).ToString();
-            }
-        }
-        else
-        {
-            return string.Empty;
-        }
-    }
 }

@@ -1,7 +1,5 @@
 <Project>
 
-
-
 	<Target Name="PostPublish" AfterTargets="Publish">
 		<ItemGroup>
 			<!-- setting up the variable for convenience -->
@@ -30,5 +28,5 @@
 		<Delete Files="@(XmlFilesToDelete)" />
 	</Target>
 
-	
+
 </Project>

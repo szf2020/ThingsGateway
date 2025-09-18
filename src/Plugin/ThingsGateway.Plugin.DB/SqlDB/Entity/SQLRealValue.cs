@@ -58,4 +58,9 @@ public class SQLRealValue : IPrimaryIdEntity
     [AutoGenerateColumn(Order = 22, Visible = true, Sortable = true, Filterable = false)]
     [SugarColumn(ColumnDescription = "采集时间")]
     public DateTime CollectTime { get; set; }
+
+
+    //[AutoGenerateColumn(Order = 23, Visible = true, Sortable = true, Filterable = false)]
+    //[SugarColumn(ColumnDescription = "更新时间")]
+    //public DateTime UpdateTime { get; set; }
 }

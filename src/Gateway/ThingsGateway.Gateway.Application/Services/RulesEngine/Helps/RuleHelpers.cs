@@ -18,6 +18,7 @@ using ThingsGateway.Blazor.Diagrams.Core;
 using ThingsGateway.Blazor.Diagrams.Core.Anchors;
 using ThingsGateway.Blazor.Diagrams.Core.Geometry;
 using ThingsGateway.Blazor.Diagrams.Core.Models;
+using ThingsGateway.NewLife.Json.Extension;
 
 namespace ThingsGateway.Gateway.Application;
 
@@ -88,7 +89,7 @@ public static class RuleHelpers
         var propertyInfos = nodeModel.GetType().GetRuntimeProperties().Where(a => a.GetCustomAttribute<ModelValue>() != null);
         foreach (var item in propertyInfos)
         {
-            jtokens.Add(item.Name, JToken.FromObject(item.GetValue(nodeModel) ?? JValue.CreateNull()));
+            jtokens.Add(item.Name, (item.GetValue(nodeModel) ?? JValue.CreateNull()).GetJTokenFromObj());
         }
         return jtokens;
     }

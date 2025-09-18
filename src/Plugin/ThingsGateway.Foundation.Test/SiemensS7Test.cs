@@ -10,6 +10,7 @@
 
 using ThingsGateway.Foundation.Extension.String;
 using ThingsGateway.Foundation.SiemensS7;
+using ThingsGateway.NewLife.Json.Extension;
 
 using TouchSocket.Core;
 

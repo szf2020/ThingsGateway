@@ -10,8 +10,6 @@
 
 using Microsoft.Extensions.Localization;
 
-using Newtonsoft.Json.Linq;
-
 using System.Collections.Concurrent;
 
 using ThingsGateway.Foundation.Modbus;
@@ -185,11 +183,11 @@ public class ModbusSlave : BusinessBase
             var type = variableRuntime.GetPropertyValue(CurrentDevice.Id, nameof(ModbusSlaveVariableProperty.DataType));
             if (Enum.TryParse(type, out DataTypeEnum result))
             {
-                await _plc.WriteJTokenAsync(item.Key, JToken.FromObject(variableRuntime.Value), result, cancellationToken).ConfigureAwait(false);
+                await _plc.WriteJTokenAsync(item.Key, (variableRuntime.Value).GetJTokenFromObj(), result, cancellationToken).ConfigureAwait(false);
             }
             else
             {
-                await _plc.WriteJTokenAsync(item.Key, JToken.FromObject(variableRuntime.Value), variableRuntime.DataType, cancellationToken).ConfigureAwait(false);
+                await _plc.WriteJTokenAsync(item.Key, (variableRuntime.Value).GetJTokenFromObj(), variableRuntime.DataType, cancellationToken).ConfigureAwait(false);
             }
         }
     }

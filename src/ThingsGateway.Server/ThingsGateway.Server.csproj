@@ -69,6 +69,8 @@
 		<!--<ServerGarbageCollection>true</ServerGarbageCollection>-->
 
 		<!--<PlatformTarget>x86</PlatformTarget>-->
+		<!--editbin /LARGEADDRESSAWARE:NO ThingsGateway.Server.exe-->
+
 	</PropertyGroup>
 
 

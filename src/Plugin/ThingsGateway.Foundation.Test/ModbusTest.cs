@@ -10,6 +10,7 @@
 
 using ThingsGateway.Foundation.Extension.String;
 using ThingsGateway.Foundation.Modbus;
+using ThingsGateway.NewLife.Json.Extension;
 
 using TouchSocket.Core;
 
