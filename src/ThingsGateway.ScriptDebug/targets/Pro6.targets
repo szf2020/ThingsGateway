@@ -1,0 +1,28 @@
+<Project>
+
+	<ItemGroup>
+		<!--MqttYINGKE 插件-->
+		<PackageReference Include="ThingsGateway.Plugin.IXCom29s" Version="$(ProPluginVersion)" GeneratePathProperty="true" Private="false"  IncludeAssets="native;" />
+	</ItemGroup>
+
+	<Target Name="CopyOtherPlugin6NugetPackages" AfterTargets="Build">
+		<PropertyGroup>
+			<PluginTargetFramework>net8.0</PluginTargetFramework>
+		</PropertyGroup>
+		<ItemGroup>
+			<!-- setting up the variable for convenience -->
+			<PkgThingsGateway_Plugin_IXCom29sPackageFiles Include="$(PkgThingsGateway_Plugin_IXCom29s)\Content\$(PluginTargetFramework)\**\*.*" />
+
+		</ItemGroup>
+		<PropertyGroup>
+			<PluginFolder>$(TargetDir)GatewayPlugins\</PluginFolder>
+		</PropertyGroup>
+		<Message Text="将IXCom29s插件复制到插件目录 $(PluginFolder)" Importance="high" />
+
+		<Copy SourceFiles="@(PkgThingsGateway_Plugin_IXCom29sPackageFiles)" DestinationFolder="$(PluginFolder)ThingsGateway.Plugin.IXCom29s%(RecursiveDir)" />
+
+
+	</Target>
+
+
+</Project>
