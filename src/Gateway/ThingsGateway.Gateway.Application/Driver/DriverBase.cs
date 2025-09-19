@@ -37,6 +37,8 @@ public abstract class DriverBase : AsyncDisposableObject, IDriver
 
     #region 属性
 
+    public virtual bool RefreshRuntimeAlways { get; set; } = false;
+
     /// <summary>
     /// 调试UI Type，如果不存在，返回null
     /// </summary>

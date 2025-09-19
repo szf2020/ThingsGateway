@@ -240,6 +240,11 @@ internal static class RuntimeServiceHelper
             if (group.Key != null)
                 await group.Key.RestartDeviceAsync(group.Value, false).ConfigureAwait(false);
         }
+        foreach (var group in GlobalData.GetAllVariableBusinessDeviceRuntime().Where(a => a.Driver?.DeviceThreadManage != null).GroupBy(a => a.Driver.DeviceThreadManage))
+        {
+            if (group.Key != null)
+                await group.Key.RestartDeviceAsync(group.ToArray(), false).ConfigureAwait(false);
+        }
     }
     public static async Task RemoveDeviceAsync(HashSet<long> newDeciceIds)
     {
@@ -255,11 +260,18 @@ internal static class RuntimeServiceHelper
             if (group.Key != null)
                 await group.Key.RemoveDeviceAsync(group.Value.Select(a => a.Id).ToArray()).ConfigureAwait(false);
         }
+
+        foreach (var group in GlobalData.GetAllVariableBusinessDeviceRuntime().Where(a => a.Driver?.DeviceThreadManage != null).GroupBy(a => a.Driver.DeviceThreadManage))
+        {
+            if (group.Key != null)
+                await group.Key.RestartDeviceAsync(group.ToArray(), false).ConfigureAwait(false);
+        }
+
     }
 
     public static async Task ChangedDriverAsync(ILogger logger)
     {
-        var channelDevice = GlobalData.IdDevices.Where(a => a.Value.Driver?.DriverProperties is IBusinessPropertyAllVariableBase property && property.IsAllVariable).Select(a => a.Value).ToArray();
+        var channelDevice = GlobalData.GetAllVariableBusinessDeviceRuntime();
 
         await channelDevice.ParallelForEachAsync(async (item, token) =>
          {
@@ -275,7 +287,7 @@ internal static class RuntimeServiceHelper
     }
     public static async Task ChangedDriverAsync(ConcurrentHashSet<IDriver> changedDriver, ILogger logger)
     {
-        var drivers = GlobalData.IdDevices.Where(a => a.Value.Driver?.DriverProperties is IBusinessPropertyAllVariableBase property && property.IsAllVariable).Select(a => a.Value.Driver);
+        var drivers = GlobalData.GetAllVariableBusinessDriver();
 
         var changedDrivers = drivers.Concat(changedDriver).Where(a => a.DisposedValue == false).Distinct().ToArray();
         await changedDrivers.ParallelForEachAsync(async (driver, token) =>

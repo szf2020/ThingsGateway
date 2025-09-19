@@ -125,9 +125,14 @@ public static class GlobalData
     {
         if (GlobalData.IdDevices.TryGetValue(businessDeviceId, out var deviceRuntime))
         {
-            if (deviceRuntime.Driver?.DriverProperties is IBusinessPropertyAllVariableBase property)
+
+            if (deviceRuntime.Driver is BusinessBase businessBase)
             {
-                if (property.IsAllVariable)
+                if (businessBase.DriverProperties is IBusinessPropertyAllVariableBase property && property.IsAllVariable)
+                {
+                    return true;
+                }
+                else if (businessBase.RefreshRuntimeAlways)
                 {
                     return true;
                 }
@@ -141,7 +146,46 @@ public static class GlobalData
 
         return a.VariablePropertys?.ContainsKey(businessDeviceId) == true;
     }
+    public static DeviceRuntime[] GetAllVariableBusinessDeviceRuntime()
+    {
+        var channelDevice = GlobalData.IdDevices.Where(a =>
+          {
+              if (a.Value.Driver is BusinessBase businessBase)
+              {
+                  if (businessBase.DriverProperties is IBusinessPropertyAllVariableBase property && property.IsAllVariable)
+                  {
+                      return true;
+                  }
+                  else if (businessBase.RefreshRuntimeAlways)
+                  {
+                      return true;
+                  }
+              }
+              return false;
 
+          }).Select(a => a.Value).ToArray();
+        return channelDevice;
+    }
+    public static IDriver[] GetAllVariableBusinessDriver()
+    {
+        var channelDevice = GlobalData.IdDevices.Where(a =>
+        {
+            if (a.Value.Driver is BusinessBase businessBase)
+            {
+                if (businessBase.DriverProperties is IBusinessPropertyAllVariableBase property && property.IsAllVariable)
+                {
+                    return true;
+                }
+                else if (businessBase.RefreshRuntimeAlways)
+                {
+                    return true;
+                }
+            }
+            return false;
+
+        }).Select(a => a.Value.Driver).ToArray();
+        return channelDevice;
+    }
     /// <summary>
     /// 只读的通道字典，提供对通道的只读访问
     /// </summary>

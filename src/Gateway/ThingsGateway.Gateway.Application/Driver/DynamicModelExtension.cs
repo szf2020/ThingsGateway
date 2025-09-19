@@ -64,26 +64,36 @@ public static class DynamicModelExtension
 
         if (GlobalData.IdDevices.TryGetValue(businessId, out var deviceRuntime))
         {
-            if (deviceRuntime.Driver is BusinessBase businessBase && businessBase.DriverProperties is IBusinessPropertyAllVariableBase property)
+            if (deviceRuntime.Driver is BusinessBase businessBase)
             {
-                if (property.IsAllVariable)
+                if (businessBase.DriverProperties is IBusinessPropertyAllVariableBase property && property.IsAllVariable)
                 {
-                    // 检查是否存在对应的业务设备Id
-                    if (variableRuntime.VariablePropertys?.ContainsKey(businessId) == true)
-                    {
-                        variableRuntime.VariablePropertys[businessId].TryGetValue(propertyName, out var value);
-                        return value; // 返回属性值
-                    }
-                    else
-                    {
-                        return ThingsGatewayStringConverter.Default.Serialize(null, businessBase.VariablePropertys.GetValue(propertyName, false));
-                    }
+                    return GetVariableProperty(variableRuntime, businessId, propertyName, businessBase);
                 }
+                else if (businessBase.RefreshRuntimeAlways)
+                {
+                    return GetVariableProperty(variableRuntime, businessId, propertyName, businessBase);
+                }
+
             }
         }
 
 
         return null; // 未找到对应的业务设备Id，返回null
+
+        static string? GetVariableProperty(VariableRuntime variableRuntime, long businessId, string propertyName, BusinessBase businessBase)
+        {
+            // 检查是否存在对应的业务设备Id
+            if (variableRuntime.VariablePropertys?.ContainsKey(businessId) == true)
+            {
+                variableRuntime.VariablePropertys[businessId].TryGetValue(propertyName, out var value);
+                return value; // 返回属性值
+            }
+            else
+            {
+                return ThingsGatewayStringConverter.Default.Serialize(null, businessBase.VariablePropertys.GetValue(propertyName, false));
+            }
+        }
     }
 
 #endif

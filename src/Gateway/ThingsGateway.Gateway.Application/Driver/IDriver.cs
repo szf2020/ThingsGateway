@@ -43,6 +43,7 @@ namespace ThingsGateway.Gateway.Application
         string PluginDirectory { get; }
         Dictionary<long, VariableRuntime> IdVariableRuntimes { get; }
         IDeviceThreadManage DeviceThreadManage { get; }
+        bool RefreshRuntimeAlways { get; set; }
 
         bool IsConnected();
         void PauseThread(bool pause);

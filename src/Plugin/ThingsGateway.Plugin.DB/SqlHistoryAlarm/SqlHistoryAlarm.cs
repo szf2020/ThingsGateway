@@ -30,7 +30,7 @@ public partial class SqlHistoryAlarm : BusinessBaseWithCacheAlarm
 {
     internal readonly SqlHistoryAlarmProperty _driverPropertys = new();
     private readonly SqlHistoryAlarmVariableProperty _variablePropertys = new();
-
+    public override bool RefreshRuntimeAlways { get; set; } = true;
     /// <inheritdoc/>
     public override Type DriverUIType
     {
