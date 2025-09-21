@@ -26,6 +26,8 @@
     <link rel="stylesheet" href=@($"_content/BootstrapBlazor/css/motronic.min.css?v={this.GetType().Assembly.GetName().Version}") />
     <link rel="stylesheet" href=@($"ThingsGateway.AdminServer.styles.css?v={this.GetType().Assembly.GetName().Version}") />
     <link rel="stylesheet" href=@($"{WebsiteConst.DefaultResourceUrl}css/site.css?v={this.GetType().Assembly.GetName().Version}") />
+    <link rel="stylesheet" href=@($"{WebsiteConst.DefaultResourceUrl}css/devui.css?v={this.GetType().Assembly.GetName().Version}") />
+
     @* <script src=@($"{WebsiteConst.DefaultResourceUrl}js/theme.js") type="module"></script><!-- 初始主题 --> *@
     <!-- PWA Manifest -->
     <link rel="manifest" href="./manifest.json" />
@@ -44,6 +46,7 @@
     <!-- PWA Service Worker -->
     <script type="text/javascript">'serviceWorker' in navigator && navigator.serviceWorker.register('./service-worker.js')</script>
 
+    <script src="pwa-install.js"></script>
 </body>
 
 </html>

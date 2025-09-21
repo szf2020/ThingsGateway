@@ -92,7 +92,7 @@ public partial class ManagementTask : AsyncDisposableObject
         var tcpDmtpClient = new TcpDmtpClient();
         var config = new TouchSocketConfig()
                .SetRemoteIPHost(_managementOptions.ServerUri)
-               .SetAdapterOption(new AdapterOption() { MaxPackageSize = 1024 * 1024 * 1024 })
+               .SetAdapterOption(a => a.MaxPackageSize = 1024 * 1024 * 1024)
                .SetDmtpOption(a => a.VerifyToken = _managementOptions.VerifyToken)
                .ConfigureContainer(a =>
                {
@@ -156,7 +156,7 @@ public partial class ManagementTask : AsyncDisposableObject
         var tcpDmtpService = new TcpDmtpService();
         var config = new TouchSocketConfig()
                .SetListenIPHosts(_managementOptions.ServerUri)
-                   .SetAdapterOption(new AdapterOption() { MaxPackageSize = 1024 * 1024 * 1024 })
+                   .SetAdapterOption(a => a.MaxPackageSize = 1024 * 1024 * 1024)
                .SetDmtpOption(a => a.VerifyToken = _managementOptions.VerifyToken)
                .ConfigureContainer(a =>
                {

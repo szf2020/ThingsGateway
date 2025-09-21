@@ -136,6 +136,9 @@ public static class CSharpScriptEngineExtension
                     }
                     catch (NullReferenceException)
                     {
+                        //如果编译失败，应该不重复编译，避免oom
+                        Instance.Set<T>(field, null, TimeSpan.FromHours(1));
+
                         string exString = string.Format(CSScriptResource.CSScriptResource.Error1, typeof(T).FullName);
                         throw new(exString);
                     }

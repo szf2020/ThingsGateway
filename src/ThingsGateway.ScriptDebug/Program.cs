@@ -8,17 +8,6 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-using Microsoft.AspNetCore.ResponseCompression;
-
-using System.Runtime.InteropServices;
-using System.Text;
-
-using ThingsGateway.Admin.Application;
-using ThingsGateway.DB;
-using ThingsGateway.NewLife;
-using ThingsGateway.NewLife.Log;
-using ThingsGateway.SqlSugar;
-
 namespace ThingsGateway.Server;
 
 public class Program
@@ -26,7 +15,7 @@ public class Program
 
     public static async Task Main(string[] args)
     {
-       
+
         await Task.Delay(2000).ConfigureAwait(false);
 
 
