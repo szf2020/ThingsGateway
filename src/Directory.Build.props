@@ -1,11 +1,11 @@
 <Project>
 
 	<PropertyGroup>
-		<PluginVersion>10.11.58</PluginVersion>
-		<ProPluginVersion>10.11.58</ProPluginVersion>
-		<DefaultVersion>10.11.58</DefaultVersion>
-		<AuthenticationVersion>10.11.5</AuthenticationVersion>
-		<SourceGeneratorVersion>10.11.4</SourceGeneratorVersion>
+		<PluginVersion>10.11.62</PluginVersion>
+		<ProPluginVersion>10.11.62</ProPluginVersion>
+		<DefaultVersion>10.11.62</DefaultVersion>
+		<AuthenticationVersion>10.11.6</AuthenticationVersion>
+		<SourceGeneratorVersion>10.11.6</SourceGeneratorVersion>
 		<NET8Version>8.0.20</NET8Version>
 		<NET9Version>9.0.9</NET9Version>
 		<SatelliteResourceLanguages>zh-Hans;en-US</SatelliteResourceLanguages>

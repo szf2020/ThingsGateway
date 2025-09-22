@@ -11,7 +11,7 @@
 		<ProjectReference Include="..\..\Gateway\ThingsGateway.Gateway.Application\ThingsGateway.Gateway.Application.csproj">
 		</ProjectReference>
 		<PackageReference Include="Confluent.Kafka" Version="2.11.1" GeneratePathProperty="true">
-			<PrivateAssets>contentFiles;compile;build;buildMultitargeting;buildTransitive;analyzers;</PrivateAssets>
+			<PrivateAssets>contentFiles;build;buildMultitargeting;buildTransitive;analyzers;</PrivateAssets>
 		</PackageReference>
 	</ItemGroup>
 
