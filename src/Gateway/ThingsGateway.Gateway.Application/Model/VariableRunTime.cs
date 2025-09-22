@@ -14,6 +14,7 @@ using Newtonsoft.Json.Linq;
 
 using Riok.Mapperly.Abstractions;
 
+
 #if !Management
 using ThingsGateway.Gateway.Application.Extensions;
 #endif
@@ -32,6 +33,13 @@ public partial class VariableRuntime : Variable
     IDisposable
 #endif
 {
+
+
+    [AutoGenerateColumn(Ignore = true)]
+    public virtual bool IsMemoryVariable { get => _isMemoryVariable; set => _isMemoryVariable = value; }
+    [AutoGenerateColumn(Ignore = true)]
+    public virtual bool IsInternalMemoryVariable { get => _isInternalMemoryVariable; set => _isInternalMemoryVariable = value; }
+
     [AutoGenerateColumn(Ignore = true)]
     public bool ValueInited { get => _valueInited; set => _valueInited = value; }
 
@@ -74,7 +82,14 @@ public partial class VariableRuntime : Variable
     public object RawValue { get => rawValue; set => rawValue = value; }
 
 
+
 #if !Management
+
+
+    [Newtonsoft.Json.JsonIgnore]
+    [System.Text.Json.Serialization.JsonIgnore]
+    [AutoGenerateColumn(Ignore = true)]
+    public TouchSocket.Core.ILog? LogMessage => DeviceRuntime?.Driver?.LogMessage;
 
     /// <summary>
     /// 所在采集设备
@@ -82,7 +97,7 @@ public partial class VariableRuntime : Variable
     [Newtonsoft.Json.JsonIgnore]
     [System.Text.Json.Serialization.JsonIgnore]
     [AutoGenerateColumn(Ignore = true)]
-    public DeviceRuntime? DeviceRuntime { get => deviceRuntime; set => deviceRuntime = value; }
+    public DeviceRuntime? DeviceRuntime { get => deviceRuntime; private set => deviceRuntime = value; }
 
     /// <summary>
     /// VariableSource
@@ -239,6 +254,8 @@ public partial class VariableRuntime : Variable
 #pragma warning restore CS0169
 #pragma warning restore CS0414
     private bool _valueInited;
+    private bool _isMemoryVariable;
+    private bool _isInternalMemoryVariable;
 
     private object _value;
     private object lastSetValue;
@@ -272,7 +289,7 @@ public partial class VariableRuntime : Variable
         {
             try
             {
-                var data = ReadExpressions.GetExpressionsResult(RawValue, DeviceRuntime?.Driver?.LogMessage);
+                var data = ReadExpressions.GetExpressionsResult(RawValue, LogMessage);
                 Set(data, dateTime);
             }
             catch (Exception ex)
@@ -291,7 +308,7 @@ public partial class VariableRuntime : Variable
                 }
                 if (oldMessage != _lastErrorMessage)
                 {
-                    DeviceRuntime?.Driver?.LogMessage?.LogWarning(_lastErrorMessage);
+                    LogMessage?.LogWarning(_lastErrorMessage);
                 }
                 return new($"{Name} Conversion expression failed", ex);
             }
@@ -394,6 +411,12 @@ public partial class VariableRuntime : Variable
 
         DeviceRuntime = deviceRuntime;
 
+        if (deviceRuntime == null)
+        {
+            GlobalData.MemoryVariables.Remove(Name);
+            GlobalData.MemoryVariables.TryAdd(Name, this);
+        }
+
         DeviceRuntime?.VariableRuntimes?.TryAdd(Name, this);
         GlobalData.IdVariables.Remove(Id);
         GlobalData.IdVariables.TryAdd(Id, this);
@@ -407,7 +430,10 @@ public partial class VariableRuntime : Variable
     public void Dispose()
     {
         DeviceRuntime?.VariableRuntimes?.Remove(Name);
-
+        if (DeviceRuntime == null)
+        {
+            GlobalData.MemoryVariables.Remove(Name);
+        }
         GlobalData.IdVariables.Remove(Id);
 
         GlobalData.AlarmEnableIdVariables.Remove(Id);
@@ -422,7 +448,7 @@ public partial class VariableRuntime : Variable
     }
 
     /// <inheritdoc/>
-    public async ValueTask<IOperResult> RpcAsync(string value, string executive = "brower", CancellationToken cancellationToken = default)
+    public virtual async ValueTask<IOperResult> RpcAsync(string value, string executive = "brower", CancellationToken cancellationToken = default)
     {
         var data = await GlobalData.RpcService.InvokeDeviceMethodAsync(executive, new Dictionary<string, Dictionary<string, string>>()
         {

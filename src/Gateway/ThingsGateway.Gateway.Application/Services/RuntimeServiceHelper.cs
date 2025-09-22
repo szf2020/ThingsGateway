@@ -35,7 +35,7 @@ internal static class RuntimeServiceHelper
                 {
                     newDeviceRuntime.Init(newChannelRuntime);
 
-                    var newVariableRuntimes = (await GlobalData.VariableService.GetAllAsync(newDeviceRuntime.Id).ConfigureAwait(false)).AdaptListVariableRuntime();
+                    var newVariableRuntimes = (await GlobalData.VariableService.GetAllAsync(newDeviceRuntime.Id).ConfigureAwait(false)).AdaptEnumerableVariableRuntime();
 
                     newVariableRuntimes.ParallelForEach(item => item.Init(newDeviceRuntime));
                 }
@@ -79,7 +79,7 @@ internal static class RuntimeServiceHelper
                 {
                     newDeviceRuntime.Init(newChannelRuntime);
 
-                    var newVariableRuntimes = (await GlobalData.VariableService.GetAllAsync(newDeviceRuntime.Id).ConfigureAwait(false)).AdaptListVariableRuntime();
+                    var newVariableRuntimes = (await GlobalData.VariableService.GetAllAsync(newDeviceRuntime.Id).ConfigureAwait(false)).AdaptEnumerableVariableRuntime();
 
                     newVariableRuntimes.ParallelForEach(item => item.Init(newDeviceRuntime));
                 }
@@ -113,8 +113,7 @@ internal static class RuntimeServiceHelper
             }
             if (deviceRuntime != null)
             {
-                var list = deviceRuntime.VariableRuntimes.Select(a => a.Value).ToArray();
-                list.ParallelForEach(a => a.Init(newDeviceRuntime));
+                deviceRuntime.VariableRuntimes.ParallelForEach(a => a.Value.Init(newDeviceRuntime));
             }
         }
 
@@ -141,7 +140,7 @@ internal static class RuntimeServiceHelper
     {
         var channels = oldChannelRuntimes.ToArray();
         var devs = channels.SelectMany(a => a.DeviceRuntimes).Select(a => a.Value).ToArray();
-        devs.SelectMany(a => a.VariableRuntimes).Select(a => a.Value).ToArray().ParallelForEach(a => a.Dispose());
+        devs.SelectMany(a => a.VariableRuntimes).Select(a => a.Value).ParallelForEach(a => a.Dispose());
         devs.ParallelForEach(a => a.Dispose());
         channels.ParallelForEach(a => a.Dispose());
 
@@ -168,7 +167,7 @@ internal static class RuntimeServiceHelper
         foreach (var deviceRuntime in deviceRuntimes)
         {
             //也需要删除变量
-            var vars = deviceRuntime.VariableRuntimes.Select(a => a.Value).ToArray();
+            var vars = deviceRuntime.VariableRuntimes.Select(a => a.Value);
             vars.ParallelForEach(v =>
             {
                 //需要重启业务线程
@@ -205,7 +204,7 @@ internal static class RuntimeServiceHelper
                 //也需要删除设备和变量
                 devs.ParallelForEach((a =>
                 {
-                    var vars = a.VariableRuntimes.Select(b => b.Value).ToArray();
+                    var vars = a.VariableRuntimes.Select(b => b.Value);
                     ParallelExtensions.ParallelForEach(vars, (v =>
                     {
                         //需要重启业务线程
@@ -305,7 +304,7 @@ internal static class RuntimeServiceHelper
 
     public static void AddBusinessChangedDriver(HashSet<long> variableIds, ConcurrentHashSet<IDriver> changedDriver)
     {
-        var data = GlobalData.IdVariables.FilterByKeys(variableIds).GroupBy(a => a.Value.DeviceRuntime);
+        var data = GlobalData.IdVariables.FilterByKeys(variableIds).GroupBy(a => a.Value.DeviceRuntime).Where(a => a.Key != null);
 
         foreach (var group in data)
         {

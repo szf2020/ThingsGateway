@@ -27,10 +27,15 @@ public abstract class PrimaryIdEntity : IPrimaryIdEntity
     public virtual long Id { get; set; }
 }
 
+public interface IPrimaryKeyEntity
+{
+    string ExtJson { get; set; }
+}
+
 /// <summary>
 /// 主键实体基类
 /// </summary>
-public abstract class PrimaryKeyEntity : PrimaryIdEntity
+public abstract class PrimaryKeyEntity : PrimaryIdEntity, IPrimaryKeyEntity
 {
     /// <summary>
     /// 拓展信息

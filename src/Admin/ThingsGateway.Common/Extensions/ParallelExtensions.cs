@@ -24,7 +24,7 @@ public static class ParallelExtensions
     /// <typeparam name="T">集合元素类型</typeparam>
     /// <param name="source">要操作的集合</param>
     /// <param name="body">要执行的操作</param>
-    public static void ParallelForEach<T>(this IList<T> source, Action<T> body)
+    public static void ParallelForEach<T>(this IEnumerable<T> source, Action<T> body)
     {
         ParallelOptions options = new();
         options.MaxDegreeOfParallelism = Environment.ProcessorCount;
@@ -38,7 +38,7 @@ public static class ParallelExtensions
     /// <typeparam name="T">集合元素类型</typeparam>
     /// <param name="source">要操作的集合</param>
     /// <param name="body">要执行的操作</param>
-    public static void ParallelForEach<T>(this IList<T> source, Action<T, ParallelLoopState, long> body)
+    public static void ParallelForEach<T>(this IEnumerable<T> source, Action<T, ParallelLoopState, long> body)
     {
         ParallelOptions options = new();
         options.MaxDegreeOfParallelism = Environment.ProcessorCount;
@@ -53,7 +53,7 @@ public static class ParallelExtensions
     /// <param name="source">要操作的集合</param>
     /// <param name="body">要执行的操作</param>
     /// <param name="parallelCount">最大并行度</param>
-    public static void ParallelForEach<T>(this IList<T> source, Action<T> body, int parallelCount)
+    public static void ParallelForEach<T>(this IEnumerable<T> source, Action<T> body, int parallelCount)
     {
         // 创建并行操作的选项对象，设置最大并行度为指定的值
         var options = new ParallelOptions();
@@ -109,7 +109,7 @@ public static class ParallelExtensions
     /// <param name="parallelCount">最大并行度</param>
     /// <param name="cancellationToken">取消操作的标志</param>
     /// <returns>表示异步操作的任务</returns>
-    public static Task ParallelForEachAsync<T>(this IList<T> source, Func<T, CancellationToken, ValueTask> body, int parallelCount, CancellationToken cancellationToken = default)
+    public static Task ParallelForEachAsync<T>(this IEnumerable<T> source, Func<T, CancellationToken, ValueTask> body, int parallelCount, CancellationToken cancellationToken = default)
     {
         // 创建并行操作的选项对象，设置最大并行度和取消标志
         var options = new ParallelOptions();
@@ -126,7 +126,7 @@ public static class ParallelExtensions
     /// <param name="body">异步执行的操作</param>
     /// <param name="cancellationToken">取消操作的标志</param>
     /// <returns>表示异步操作的任务</returns>
-    public static Task ParallelForEachAsync<T>(this IList<T> source, Func<T, CancellationToken, ValueTask> body, CancellationToken cancellationToken = default)
+    public static Task ParallelForEachAsync<T>(this IEnumerable<T> source, Func<T, CancellationToken, ValueTask> body, CancellationToken cancellationToken = default)
     {
         return ParallelForEachAsync(source, body, Environment.ProcessorCount, cancellationToken);
     }

@@ -131,8 +131,10 @@ public class VariableBasicData
     //[System.Text.Json.Serialization.JsonIgnore]
     //[Newtonsoft.Json.JsonIgnore]
     //public DeviceBasicData DeviceRuntime { get; set; }
+
     /// <inheritdoc cref="Variable.DeviceId"/>
     public long DeviceId { get; set; }
+
     /// <inheritdoc cref="VariableRuntime.LastErrorMessage"/>
     [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
     [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
@@ -141,6 +143,11 @@ public class VariableBasicData
     [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
     [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
     public string? RegisterAddress { get; set; }
+
+    /// <inheritdoc cref="Variable.OtherMethod"/>
+    [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public string? OtherMethod { get; set; }
 
     /// <inheritdoc cref="Variable.Unit"/>
     [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
@@ -190,5 +197,6 @@ public class VariableBasicData
 
     /// <inheritdoc cref="VariableRuntime.ValueInited"/>
     public bool ValueInited { get; set; }
-
+    /// <inheritdoc cref="VariableRuntime.IsMemoryVariable"/>
+    public bool IsMemoryVariable { get; set; }
 }

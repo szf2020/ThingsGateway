@@ -23,5 +23,5 @@ public enum PluginTypeEnum
     /// <summary>
     /// 业务
     /// </summary>
-    Business,
+    Business
 }

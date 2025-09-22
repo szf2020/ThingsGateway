@@ -29,6 +29,7 @@ public delegate void DelegateOnDeviceChanged(DeviceRuntime deviceRuntime, Device
 /// <param name="variableRuntime">变量运行时对象</param>
 /// <param name="variableData">变量数据对象</param>
 public delegate void VariableChangeEventHandler(VariableRuntime variableRuntime, VariableBasicData variableData);
+
 /// <summary>
 /// 变量采集事件委托，用于通知变量进行采集时的事件
 /// </summary>
@@ -100,10 +101,11 @@ public static class GlobalData
         return ReadOnlyIdDevices.WhereIf(dataScope != null && dataScope?.Count > 0, u => dataScope.Contains(u.Value.CreateOrgId))//在指定机构列表查询
           .WhereIf(dataScope?.Count == 0, u => u.Value.CreateUserId == UserManager.UserId).Select(a => a.Value);
     }
+
     public static async Task<IEnumerable<VariableRuntime>> GetCurrentUserIdVariables()
     {
         var dataScope = await GlobalData.SysUserService.GetCurrentUserDataScopeAsync().ConfigureAwait(false);
-        return IdVariables.WhereIf(dataScope != null && dataScope?.Count > 0, u => dataScope.Contains(u.Value.CreateOrgId))//在指定机构列表查询
+        return IdVariables.Where(a => a.Value.IsInternalMemoryVariable == false).WhereIf(dataScope != null && dataScope?.Count > 0, u => dataScope.Contains(u.Value.CreateOrgId))//在指定机构列表查询
           .WhereIf(dataScope?.Count == 0, u => u.Value.CreateUserId == UserManager.UserId).Select(a => a.Value);
     }
 
@@ -117,7 +119,7 @@ public static class GlobalData
     public static async Task<IEnumerable<VariableRuntime>> GetCurrentUserAlarmEnableVariables()
     {
         var dataScope = await GlobalData.SysUserService.GetCurrentUserDataScopeAsync().ConfigureAwait(false);
-        return AlarmEnableIdVariables.WhereIf(dataScope != null && dataScope?.Count > 0, u => dataScope.Contains(u.Value.CreateOrgId))//在指定机构列表查询
+        return AlarmEnableIdVariables.Where(a => a.Value.IsInternalMemoryVariable == false).WhereIf(dataScope != null && dataScope?.Count > 0, u => dataScope.Contains(u.Value.CreateOrgId))//在指定机构列表查询
           .WhereIf(dataScope?.Count == 0, u => u.Value.CreateUserId == UserManager.UserId).Select(a => a.Value);
     }
 
@@ -130,7 +132,8 @@ public static class GlobalData
             {
                 if (businessBase.DriverProperties is IBusinessPropertyAllVariableBase property && property.IsAllVariable)
                 {
-                    return true;
+                    if (a.IsInternalMemoryVariable == false)
+                        return true;
                 }
                 else if (businessBase.RefreshRuntimeAlways)
                 {
@@ -206,6 +209,32 @@ public static class GlobalData
         return null;
     }
 
+    public static VariableRuntime GetVariable(string variableName)
+    {
+
+        if (string.IsNullOrEmpty(variableName))
+            return null;
+        var names = variableName.Split('.');
+        if (names.Length > 2)
+            return null;
+
+        if (names.Length == 1)
+        {
+            if (MemoryVariables.TryGetValue(names[0], out var variable))
+            {
+                return variable;
+            }
+        }
+        else if (Devices.TryGetValue(names[0], out var device))
+        {
+            if (device.VariableRuntimes.TryGetValue(names[1], out var variable))
+            {
+                return variable;
+            }
+        }
+        return null;
+    }
+
     public static IEnumerable<DeviceRuntime> GetEnableDevices()
     {
         var idSet = GetRedundantDeviceIds();
@@ -233,7 +262,7 @@ public static class GlobalData
 
     public static IEnumerable<VariableRuntime> GetEnableVariables()
     {
-        return IdDevices.SelectMany(a => a.Value.VariableRuntimes).Where(a => a.Value?.Enable == true).Select(a => a.Value);
+        return IdVariables.Where(a => a.Value.DeviceRuntime?.Enable != false && a.Value.DeviceRuntime?.ChannelRuntime?.Enable != false && a.Value?.Enable == true).Select(a => a.Value);
     }
 
     public static bool TryGetDeviceThreadManage(DeviceRuntime deviceRuntime, out IDeviceThreadManage deviceThreadManage)
@@ -526,6 +555,9 @@ public static class GlobalData
     /// 内部使用的变量字典，用于存储变量对象
     /// </summary>
     internal static ConcurrentDictionary<long, VariableRuntime> IdVariables { get; } = new();
+
+    internal static ConcurrentDictionary<string, VariableRuntime> MemoryVariables { get; } = new();
+    public static IReadOnlyDictionary<string, VariableRuntime> ReadOnlyMemoryVariables => MemoryVariables;
 
     /// <summary>
     /// 实时报警列表

@@ -435,5 +435,311 @@ public static class ThingsGatewayBitConverterExtension
         }
     }
 
+
+    /// <summary>
+    /// 根据数据类型获取实际值
+    /// </summary>
+    public static bool GetChangedDataFormJToken(
+        JToken jToken,
+        DataTypeEnum dataType,
+        int arrayLength,
+        object? oldValue,
+        out object? result)
+    {
+        switch (dataType)
+        {
+            case DataTypeEnum.Boolean:
+                if (arrayLength > 1)
+                {
+                    var newVal = jToken.ToObject<Boolean[]>();
+                    if (oldValue is bool[] oldArr && newVal.SequenceEqual(oldArr))
+                    {
+                        result = oldValue;
+                        return false;
+                    }
+                    result = newVal;
+                    return true;
+                }
+                else
+                {
+                    var newVal = jToken.ToObject<Boolean>();
+                    if (oldValue is bool oldVal && oldVal == newVal)
+                    {
+                        result = oldValue;
+                        return false;
+                    }
+                    result = newVal;
+                    return true;
+                }
+
+            case DataTypeEnum.Byte:
+                if (arrayLength > 1)
+                {
+                    var newVal = jToken.ToObject<Byte[]>();
+                    if (oldValue is byte[] oldArr && newVal.SequenceEqual(oldArr))
+                    {
+                        result = oldValue;
+                        return false;
+                    }
+                    result = newVal;
+                    return true;
+                }
+                else
+                {
+                    var newVal = jToken.ToObject<Byte>();
+                    if (oldValue is byte oldVal && oldVal == newVal)
+                    {
+                        result = oldValue;
+                        return false;
+                    }
+                    result = newVal;
+                    return true;
+                }
+
+            case DataTypeEnum.Int16:
+                if (arrayLength > 1)
+                {
+                    var newVal = jToken.ToObject<Int16[]>();
+                    if (oldValue is short[] oldArr && newVal.SequenceEqual(oldArr))
+                    {
+                        result = oldValue;
+                        return false;
+                    }
+                    result = newVal;
+                    return true;
+                }
+                else
+                {
+                    var newVal = jToken.ToObject<Int16>();
+                    if (oldValue is short oldVal && oldVal == newVal)
+                    {
+                        result = oldValue;
+                        return false;
+                    }
+                    result = newVal;
+                    return true;
+                }
+
+            case DataTypeEnum.UInt16:
+                if (arrayLength > 1)
+                {
+                    var newVal = jToken.ToObject<UInt16[]>();
+                    if (oldValue is ushort[] oldArr && newVal.SequenceEqual(oldArr))
+                    {
+                        result = oldValue;
+                        return false;
+                    }
+                    result = newVal;
+                    return true;
+                }
+                else
+                {
+                    var newVal = jToken.ToObject<UInt16>();
+                    if (oldValue is ushort oldVal && oldVal == newVal)
+                    {
+                        result = oldValue;
+                        return false;
+                    }
+                    result = newVal;
+                    return true;
+                }
+
+            case DataTypeEnum.Int32:
+                if (arrayLength > 1)
+                {
+                    var newVal = jToken.ToObject<Int32[]>();
+                    if (oldValue is int[] oldArr && newVal.SequenceEqual(oldArr))
+                    {
+                        result = oldValue;
+                        return false;
+                    }
+                    result = newVal;
+                    return true;
+                }
+                else
+                {
+                    var newVal = jToken.ToObject<Int32>();
+                    if (oldValue is int oldVal && oldVal == newVal)
+                    {
+                        result = oldValue;
+                        return false;
+                    }
+                    result = newVal;
+                    return true;
+                }
+
+            case DataTypeEnum.UInt32:
+                if (arrayLength > 1)
+                {
+                    var newVal = jToken.ToObject<UInt32[]>();
+                    if (oldValue is uint[] oldArr && newVal.SequenceEqual(oldArr))
+                    {
+                        result = oldValue;
+                        return false;
+                    }
+                    result = newVal;
+                    return true;
+                }
+                else
+                {
+                    var newVal = jToken.ToObject<UInt32>();
+                    if (oldValue is uint oldVal && oldVal == newVal)
+                    {
+                        result = oldValue;
+                        return false;
+                    }
+                    result = newVal;
+                    return true;
+                }
+
+            case DataTypeEnum.Int64:
+                if (arrayLength > 1)
+                {
+                    var newVal = jToken.ToObject<Int64[]>();
+                    if (oldValue is long[] oldArr && newVal.SequenceEqual(oldArr))
+                    {
+                        result = oldValue;
+                        return false;
+                    }
+                    result = newVal;
+                    return true;
+                }
+                else
+                {
+                    var newVal = jToken.ToObject<Int64>();
+                    if (oldValue is long oldVal && oldVal == newVal)
+                    {
+                        result = oldValue;
+                        return false;
+                    }
+                    result = newVal;
+                    return true;
+                }
+
+            case DataTypeEnum.UInt64:
+                if (arrayLength > 1)
+                {
+                    var newVal = jToken.ToObject<UInt64[]>();
+                    if (oldValue is ulong[] oldArr && newVal.SequenceEqual(oldArr))
+                    {
+                        result = oldValue;
+                        return false;
+                    }
+                    result = newVal;
+                    return true;
+                }
+                else
+                {
+                    var newVal = jToken.ToObject<UInt64>();
+                    if (oldValue is ulong oldVal && oldVal == newVal)
+                    {
+                        result = oldValue;
+                        return false;
+                    }
+                    result = newVal;
+                    return true;
+                }
+
+            case DataTypeEnum.Float:
+                if (arrayLength > 1)
+                {
+                    var newVal = jToken.ToObject<Single[]>();
+                    if (oldValue is float[] oldArr && newVal.SequenceEqual(oldArr))
+                    {
+                        result = oldValue;
+                        return false;
+                    }
+                    result = newVal;
+                    return true;
+                }
+                else
+                {
+                    var newVal = jToken.ToObject<Single>();
+                    if (oldValue is float oldVal && oldVal == newVal)
+                    {
+                        result = oldValue;
+                        return false;
+                    }
+                    result = newVal;
+                    return true;
+                }
+
+            case DataTypeEnum.Double:
+                if (arrayLength > 1)
+                {
+                    var newVal = jToken.ToObject<Double[]>();
+                    if (oldValue is double[] oldArr && newVal.SequenceEqual(oldArr))
+                    {
+                        result = oldValue;
+                        return false;
+                    }
+                    result = newVal;
+                    return true;
+                }
+                else
+                {
+                    var newVal = jToken.ToObject<Double>();
+                    if (oldValue is double oldVal && oldVal == newVal)
+                    {
+                        result = oldValue;
+                        return false;
+                    }
+                    result = newVal;
+                    return true;
+                }
+            case DataTypeEnum.Decimal:
+                if (arrayLength > 1)
+                {
+                    var newVal = jToken.ToObject<Decimal[]>();
+                    if (oldValue is decimal[] oldArr && newVal.SequenceEqual(oldArr))
+                    {
+                        result = oldValue;
+                        return false;
+                    }
+                    result = newVal;
+                    return true;
+                }
+                else
+                {
+                    var newVal = jToken.ToObject<Decimal>();
+                    if (oldValue is decimal oldVal && oldVal == newVal)
+                    {
+                        result = oldValue;
+                        return false;
+                    }
+                    result = newVal;
+                    return true;
+                }
+            case DataTypeEnum.String:
+            default:
+                if (arrayLength > 1)
+                {
+                    var newArr = new string[arrayLength];
+                    for (int i = 0; i < arrayLength; i++)
+                    {
+                        newArr[i] = jToken.ToObject<string>();
+                    }
+
+                    if (oldValue is string[] oldArr && newArr.SequenceEqual(oldArr))
+                    {
+                        result = oldValue;
+                        return false;
+                    }
+                    result = newArr;
+                    return true;
+                }
+                else
+                {
+                    var str = jToken.ToObject<string>();
+                    if (oldValue is string oldStr && oldStr == str)
+                    {
+                        result = oldStr;
+                        return false;
+                    }
+                    result = str;
+                    return true;
+                }
+        }
+    }
     #endregion 获取对应数据类型的数据
 }

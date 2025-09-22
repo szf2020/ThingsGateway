@@ -10,7 +10,6 @@
 
 using Microsoft.Extensions.Logging;
 
-using ThingsGateway.Common.Extension;
 using ThingsGateway.Gateway.Application.Extensions;
 using ThingsGateway.NewLife.Extension;
 
@@ -110,7 +109,7 @@ internal sealed class AlarmTask : IDisposable
         if (tag.AlarmPropertys.CustomAlarmEnable) // 检查是否启用了自定义报警功能
         {
             // 调用变量的CustomAlarmCode属性的GetExpressionsResult方法，传入变量的值，获取报警表达式的计算结果
-            var result = tag.AlarmPropertys.CustomAlarmCode.GetExpressionsResult(tag.Value, tag.DeviceRuntime?.Driver?.LogMessage);
+            var result = tag.AlarmPropertys.CustomAlarmCode.GetExpressionsResult(tag.Value, tag.LogMessage);
 
             if (result is bool boolResult) // 检查计算结果是否为布尔类型
             {
@@ -227,7 +226,7 @@ internal sealed class AlarmTask : IDisposable
             if (!string.IsNullOrEmpty(ex))
             {
                 // 如果存在报警约束表达式，则计算表达式结果，以确定是否触发报警事件
-                var data = ex.GetExpressionsResult(item.Value, item.DeviceRuntime?.Driver?.LogMessage);
+                var data = ex.GetExpressionsResult(item.Value, item.LogMessage);
                 if (data is bool result)
                 {
                     if (result)
@@ -487,6 +486,11 @@ internal sealed class AlarmTask : IDisposable
 
     #endregion 核心实现
 
+    ParallelOptions ParallelOptions = new()
+    {
+        MaxDegreeOfParallelism = Math.Max(1, Environment.ProcessorCount / 2)
+    };
+
     /// <summary>
     /// 执行工作任务，对设备变量进行报警分析。
     /// </summary>
@@ -499,32 +503,36 @@ internal sealed class AlarmTask : IDisposable
             if (!GlobalData.StartBusinessChannelEnable)
                 return;
 
-            //Stopwatch stopwatch = Stopwatch.StartNew();
-            // 遍历设备变量列表
+            //System.Diagnostics.Stopwatch stopwatch = System.Diagnostics.Stopwatch.StartNew();
 
+            if (scheduledTask.Period < 100 && scheduledTask.Period > 1 && GlobalData.AlarmEnableIdVariables.Count > 50000)
+            {
+                scheduledTask.Change(100, 100);
+            }
+
+            // 遍历设备变量列表
             if (!GlobalData.AlarmEnableIdVariables.IsEmpty)
             {
-                var list = GlobalData.AlarmEnableIdVariables.Select(a => a.Value).ToArray();
-                list.ParallelForEach((item, state, index) =>
+                // 使用 Parallel.ForEach 执行指定的操作
+                Parallel.ForEach(GlobalData.AlarmEnableIdVariables, ParallelOptions, (item, state, index) =>
             {
-                {
-                    // 如果取消请求已经被触发，则结束任务
-                    if (cancellation.IsCancellationRequested)
-                        return;
+                // 如果取消请求已经被触发，则结束任务
+                if (cancellation.IsCancellationRequested)
+                    return;
 
-                    // 如果该变量的报警功能未启用，则跳过该变量
-                    if (!item.AlarmEnable)
-                        return;
+                // 如果该变量的报警功能未启用，则跳过该变量
+                if (!item.Value.AlarmEnable)
+                    return;
 
-                    // 如果该变量离线，则跳过该变量
-                    if (!item.IsOnline)
-                        return;
+                // 如果该变量离线，则跳过该变量
+                if (!item.Value.IsOnline)
+                    return;
 
-                    // 对该变量进行报警分析
-                    AlarmAnalysis(item);
-                }
+                // 对该变量进行报警分析
+                AlarmAnalysis(item.Value);
             });
             }
+
             else
             {
                 //if (scheduledTask.Period != 5000)

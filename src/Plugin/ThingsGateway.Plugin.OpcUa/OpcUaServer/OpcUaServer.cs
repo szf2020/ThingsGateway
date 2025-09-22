@@ -74,7 +74,7 @@ public partial class OpcUaServer : BusinessBase
         {
             LogMessage?.LogInformation("Refresh variable");
             IdVariableRuntimes.Clear();
-            IdVariableRuntimes.AddRange(GlobalData.GetEnableVariables().ToDictionary(a => a.Id));
+            IdVariableRuntimes.AddRange(GlobalData.GetEnableVariables().Where(a => a.IsInternalMemoryVariable == false).ToDictionary(a => a.Id));
 
             CollectDevices = GlobalData.GetEnableDevices().Where(a => a.IsCollect == true).ToDictionary(a => a.Id);
         }

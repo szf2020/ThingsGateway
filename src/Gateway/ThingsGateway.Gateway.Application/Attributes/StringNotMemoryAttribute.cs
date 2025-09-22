@@ -8,17 +8,23 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-namespace ThingsGateway.Razor;
+using System.ComponentModel.DataAnnotations;
 
-public partial class SpinnerComponent
+namespace ThingsGateway.Gateway.Application;
+
+[AttributeUsage(AttributeTargets.Property, Inherited = true, AllowMultiple = false)]
+public class StringNotMemoryAttribute : ValidationAttribute
 {
-    public void SetRun(bool run)
+    public StringNotMemoryAttribute()
+      : base("The field {0} cannot be 'Memory'.")
     {
-        show = run;
-        StateHasChanged();
     }
-    private bool show;
 
-    [Parameter]
-    public Size Size { get; set; } = Size.Small;
+    public override bool IsValid(object value)
+    {
+        var str = value as string;
+        return !string.Equals(str, "Memory", StringComparison.OrdinalIgnoreCase);
+    }
+
+
 }

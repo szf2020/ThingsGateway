@@ -15,8 +15,8 @@ public partial class DragAndDrop
 {
     private readonly BlazorDiagram _blazorDiagram = new(new BlazorDiagramOptions
     {
-        GridSize = 75,
-        GridSnapToCenter = true,
+        GridSize = null,
+        GridSnapToCenter = false,
     });
     private string? _draggedType;
     [Inject]

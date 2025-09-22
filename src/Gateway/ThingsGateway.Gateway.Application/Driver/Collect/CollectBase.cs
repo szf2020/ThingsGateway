@@ -540,7 +540,7 @@ public abstract partial class CollectBase : DriverBase
             // 如果成功，每个变量都读取一次最新值，再次比较写入值
             var successfulWriteNames = operResults.Where(a => a.Value.IsSuccess).Select(a => a.Key).ToHashSet();
 
-            var groups = writeInfoLists.Select(a => a.Key).Where(a => a.RpcWriteCheck && a.ProtectType != ProtectTypeEnum.WriteOnly && successfulWriteNames.Contains(a.Name) && a.VariableSource != null).GroupBy(a => a.VariableSource as VariableSourceRead).Where(a => a.Key != null).ToList();
+            var groups = writeInfoLists.Select(a => a.Key).Where(a => a.RpcWriteCheck && a.ProtectType != ProtectTypeEnum.WriteOnly && successfulWriteNames.Contains(a.Name) && a.VariableSource != null).GroupBy(a => a.VariableSource as VariableSourceRead).Where(a => a.Key != null).ToArray();
 
             await groups.ParallelForEachAsync(async (varRead, token) =>
             {
@@ -610,7 +610,7 @@ public abstract partial class CollectBase : DriverBase
         using var writeLock = await ReadWriteLock.WriterLockAsync(cancellationToken).ConfigureAwait(false);
         var list = writeInfoLists
         .Where(a => !results.Any(b => b.Key == a.Key.Name))
-        .ToDictionary(item => item.Key, item => item.Value).ToArray();
+        .ToArray();
         // 使用并发方式遍历写入信息列表，并进行异步写入操作
         await list.ParallelForEachAsync(async (writeInfo, cancellationToken) =>
         {

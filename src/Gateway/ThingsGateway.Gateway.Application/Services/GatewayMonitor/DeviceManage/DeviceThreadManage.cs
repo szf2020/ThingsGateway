@@ -573,8 +573,7 @@ internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
     {
         //传入变量
         //newDeviceRuntime.VariableRuntimes.ParallelForEach(a => a.Value.SafeDispose());
-        var list = deviceRuntime.VariableRuntimes.Select(a => a.Value).ToArray();
-        list.ParallelForEach(a => a.Init(newDeviceRuntime));
+        deviceRuntime.VariableRuntimes.ParallelForEach(a => a.Value.Init(newDeviceRuntime));
         GlobalData.VariableRuntimeDispatchService.Dispatch(null);
     }
 

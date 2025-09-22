@@ -10,13 +10,11 @@
 
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Components.Web;
-using Microsoft.JSInterop;
 
 using ThingsGateway.Admin.Application;
 using ThingsGateway.Admin.Razor;
 using ThingsGateway.NewLife.Extension;
 using ThingsGateway.NewLife.Json.Extension;
-using ThingsGateway.Razor.Extension;
 using ThingsGateway.SqlSugar;
 
 namespace ThingsGateway.Gateway.Razor;
@@ -39,31 +37,257 @@ public partial class ChannelDeviceTree : IDisposable
         return AppContext.IsHasButtonWithRole(RouteName, operate);
     }
 
-    [Parameter]
-    public EventCallback<ShowTypeEnum?> ShowTypeChanged { get; set; }
-    [Parameter]
-    public ShowTypeEnum? ShowType { get; set; }
-    [Inject]
-    IJSRuntime JSRuntime { get; set; }
-    private async Task OnShowTypeChanged(ShowTypeEnum? showType)
+#if !Management
+    private async Task ShowChannelRuntimeTable(ChannelDeviceTreeItem channelDeviceTreeItem)
     {
-        ShowType = showType;
-        if (showType != null)
-            await JSRuntime.SetLocalStorage("showType", ShowType);
-        if (ShowTypeChanged.HasDelegate)
-            await ShowTypeChanged.InvokeAsync(showType);
+        if (channelDeviceTreeItem.TryGetChannelRuntime(out var channelRuntime))
+        {
+            var ChannelRuntimes = Enumerable.Repeat(channelRuntime, 1);
+            await ShowChannelTable(ChannelRuntimes);
+
+        }
+        else if (channelDeviceTreeItem.TryGetDeviceRuntime(out var deviceRuntime))
+        {
+
+            var ChannelRuntimes = Enumerable.Repeat(deviceRuntime.ChannelRuntime, 1);
+            await ShowChannelTable(ChannelRuntimes);
+
+        }
+        else if (channelDeviceTreeItem.TryGetPluginName(out var pluginName))
+        {
+
+            var channels = await GlobalData.GetCurrentUserChannels().ConfigureAwait(false);
+            var ChannelRuntimes = channels.Where(a => a.PluginName == pluginName);
+            await ShowChannelTable(ChannelRuntimes);
+
+        }
+        else
+        {
+            var channels = await GlobalData.GetCurrentUserChannels().ConfigureAwait(false);
+
+            if (channelDeviceTreeItem.TryGetPluginType(out var pluginTypeEnum))
+            {
+                if (pluginTypeEnum != null)
+                {
+                    var ChannelRuntimes = channels.Where(a => a.PluginType == pluginTypeEnum);
+                    await ShowChannelTable(ChannelRuntimes);
+
+                }
+                else
+                {
+                    var ChannelRuntimes = channels;
+                    await ShowChannelTable(ChannelRuntimes);
+                }
+            }
+        }
+
     }
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+
+    private async Task ShowDeviceRuntimeTable(ChannelDeviceTreeItem channelDeviceTreeItem)
     {
-        if (firstRender)
+
+
+        if (channelDeviceTreeItem.TryGetChannelRuntime(out var channelRuntime))
         {
-            var showType = await JSRuntime!.GetLocalStorage<ShowTypeEnum>("showType");
-            await OnShowTypeChanged(showType);
-            StateHasChanged();
+
+            var DeviceRuntimes = channelRuntime.ReadDeviceRuntimes.Select(a => a.Value);
+
+            await ShowDeviceTable(DeviceRuntimes);
+
         }
-        await base.OnAfterRenderAsync(firstRender);
+        else if (channelDeviceTreeItem.TryGetDeviceRuntime(out var deviceRuntime))
+        {
+
+            var DeviceRuntimes = Enumerable.Repeat(deviceRuntime, 1);
+            await ShowDeviceTable(DeviceRuntimes);
+
+
+        }
+        else if (channelDeviceTreeItem.TryGetPluginName(out var pluginName))
+        {
+            var devices = await GlobalData.GetCurrentUserDevices().ConfigureAwait(false);
+
+            var DeviceRuntimes = devices.Where(a => a.PluginName == pluginName);
+            await ShowDeviceTable(DeviceRuntimes);
+
+        }
+        else
+        {
+
+            if (channelDeviceTreeItem.TryGetPluginType(out var pluginTypeEnum))
+            {
+                if (pluginTypeEnum != null)
+                {
+                    var devices = await GlobalData.GetCurrentUserDevices().ConfigureAwait(false);
+
+                    var DeviceRuntimes = devices.Where(a => a.PluginType == pluginTypeEnum);
+                    await ShowDeviceTable(DeviceRuntimes);
+
+                }
+                else
+                {
+                    var devices = await GlobalData.GetCurrentUserDevices().ConfigureAwait(false);
+                    var DeviceRuntimes = devices;
+                    await ShowDeviceTable(DeviceRuntimes);
+                }
+            }
+        }
+
+
     }
+
+    private async Task ShowLogInfo(ChannelDeviceTreeItem channelDeviceTreeItem)
+    {
+
+        if (channelDeviceTreeItem.TryGetChannelRuntime(out var channelRuntime))
+        {
+            await ShowLogInfo(channelRuntime);
+        }
+        else if (channelDeviceTreeItem.TryGetDeviceRuntime(out var deviceRuntime))
+        {
+
+            await ShowLogInfo(deviceRuntime);
+
+
+        }
+
+
+    }
+    private async Task ShowLogInfo(ChannelRuntime channel)
+    {
+
+        var renderFragment = BootstrapDynamicComponent.CreateComponent(typeof(ChannelRuntimeInfo), new Dictionary<string, object?>()
+        {
+            {nameof(ChannelRuntimeInfo.ChannelRuntime),channel},
+        }).Render();
+        if (renderFragment != null)
+        {
+            var option = new WinBoxOption()
+            {
+                Title = Localizer["LogInfo"],
+                ContentTemplate = renderFragment,
+                Max = false,
+                Width = "60%",
+                Height = "80%",
+                Top = "0%",
+                Left = "10%",
+                Background = "var(--bb-primary-color)",
+                Overflow = true
+            };
+            await WinBoxService.Show(option);
+        }
+
+
+
+    }
+    private async Task ShowLogInfo(DeviceRuntime device)
+    {
+        var renderFragment = BootstrapDynamicComponent.CreateComponent(typeof(DeviceRuntimeInfo), new Dictionary<string, object?>()
+        {
+            {nameof(DeviceRuntimeInfo.DeviceRuntime),device},
+        }).Render();
+        if (renderFragment != null)
+        {
+            var option = new WinBoxOption()
+            {
+                Title = Localizer["LogInfo"],
+                ContentTemplate = renderFragment,
+                Max = false,
+                Width = "60%",
+                Height = "80%",
+                Top = "0%",
+                Left = "10%",
+                Background = "var(--bb-primary-color)",
+                Overflow = true
+            };
+            await WinBoxService.Show(option);
+        }
+
+
+    }
+
+
+    private async Task ShowChannelTable(IEnumerable<ChannelRuntime> ChannelRuntimes)
+    {
+        var renderFragment = BootstrapDynamicComponent.CreateComponent(typeof(ChannelTable), new Dictionary<string, object?>()
+        {
+            {nameof(ChannelTable.SelectModel),SelectModel},
+            {nameof(ChannelTable.Items),ChannelRuntimes},
+            {nameof(ChannelTable.AutoRestartThread),AutoRestartThread},
+        }).Render();
+        if (renderFragment != null)
+        {
+            var option = new WinBoxOption()
+            {
+                Title = Localizer["ChannelTable"],
+                ContentTemplate = renderFragment,
+                Max = false,
+                Width = "60%",
+                Height = "60%",
+                Top = "0%",
+                Left = "10%",
+                Background = "var(--bb-primary-color)",
+                Overflow = true
+            };
+            await WinBoxService.Show(option);
+        }
+    }
+    private async Task ShowDeviceTable(IEnumerable<DeviceRuntime> DeviceRuntimes)
+    {
+        var renderFragment = BootstrapDynamicComponent.CreateComponent(typeof(DeviceTable), new Dictionary<string, object?>()
+        {
+            {nameof(DeviceTable.SelectModel),SelectModel},
+            {nameof(DeviceTable.Items),DeviceRuntimes},
+            {nameof(DeviceTable.AutoRestartThread),AutoRestartThread},
+        }).Render();
+        if (renderFragment != null)
+        {
+            var option = new WinBoxOption()
+            {
+                Title = Localizer["DeviceTable"],
+                ContentTemplate = renderFragment,
+                Max = false,
+                Width = "60%",
+                Height = "60%",
+                Top = "0%",
+                Left = "10%",
+                Background = "var(--bb-primary-color)",
+                Overflow = true
+            };
+            await WinBoxService.Show(option);
+        }
+    }
+
+    [Inject]
+    WinBoxService WinBoxService { get; set; }
+#endif
+
+    //[Parameter]
+    //public EventCallback<ShowTypeEnum?> ShowTypeChanged { get; set; }
+    //[Parameter]
+    //public ShowTypeEnum? ShowType { get; set; }
+    //[Inject]
+    //IJSRuntime JSRuntime { get; set; }
+    //private async Task OnShowTypeChanged(ShowTypeEnum? showType)
+    //{
+    //    ShowType = showType;
+    //    if (showType != null)
+    //        await JSRuntime.SetLocalStorage("showType", ShowType);
+    //    if (ShowTypeChanged.HasDelegate)
+    //        await ShowTypeChanged.InvokeAsync(showType);
+    //}
+
+    //protected override async Task OnAfterRenderAsync(bool firstRender)
+    //{
+    //    if (firstRender)
+    //    {
+    //        var showType = await JSRuntime!.GetLocalStorage<ShowTypeEnum>("showType");
+    //        await OnShowTypeChanged(showType);
+    //        StateHasChanged();
+    //    }
+    //    await base.OnAfterRenderAsync(firstRender);
+    //}
 
 
     [Parameter]
@@ -99,8 +323,6 @@ public partial class ChannelDeviceTree : IDisposable
     [Inject]
     DialogService DialogService { get; set; }
 
-    [Inject]
-    WinBoxService WinBoxService { get; set; }
 
     [Inject]
     [NotNull]

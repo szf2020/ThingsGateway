@@ -479,7 +479,7 @@ internal sealed class RedundancyTask : IRpcDriver, IAsyncDisposable
     {
         int maxBatchSize = GetBatchSize() / 10;
 
-        var groups = GlobalData.IdVariables.Select(a => a.Value).GroupBy(a => a.DeviceRuntime);
+        var groups = GlobalData.IdVariables.Select(a => a.Value).GroupBy(a => a.DeviceRuntime).Where(a => a.Key != null);
 
         var channelBatch = new HashSet<Channel>();
         var deviceBatch = new HashSet<Device>();

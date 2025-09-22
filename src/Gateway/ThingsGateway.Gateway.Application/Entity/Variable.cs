@@ -304,13 +304,11 @@ public class Variable : BaseDataEntity, IValidatableObject
 
     #endregion 备用字段
 
-    public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+    public virtual IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {
         if (string.IsNullOrEmpty(RegisterAddress) && string.IsNullOrEmpty(OtherMethod))
         {
             yield return new ValidationResult("Both RegisterAddress and OtherMethod cannot be empty or null.", new[] { nameof(OtherMethod), nameof(RegisterAddress) });
         }
-
-
     }
 }

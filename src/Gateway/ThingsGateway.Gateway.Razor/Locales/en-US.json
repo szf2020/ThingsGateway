@@ -167,7 +167,9 @@
     "Date": "Date"
   },
   "ThingsGateway.Gateway.Razor.ChannelDeviceTree": {
-    "ShowType": "ShowType"
+    "ChannelTable": "ChannelTable",
+    "DeviceTable": "DeviceTable",
+    "LogInfo": "LogInfo"
   },
   "ThingsGateway.Gateway.Razor.GatewayAbout": {
     "AuthName": "AuthName",

@@ -70,7 +70,7 @@ public class TestKafkaDynamicModel1 : DynamicModelBase
             var sourceName = opcAeEventData.SourceID;
             if (variableRuntimes.TryGetValue(sourceName, out var variableRuntime))
             {
-                
+
                 var ack = opcAeEventData.EventType != Opc.Ae.EventType.Condition ? false : ((Opc.Ae.ConditionState)opcAeEventData.NewState).HasFlag(Opc.Ae.ConditionState.Acknowledged);
 
                 bool isRecover = opcAeEventData.EventType != Opc.Ae.EventType.Condition ? false : !((Opc.Ae.ConditionState)opcAeEventData.NewState).HasFlag(Opc.Ae.ConditionState.Active);

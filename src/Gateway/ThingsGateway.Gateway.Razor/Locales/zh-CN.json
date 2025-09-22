@@ -167,7 +167,9 @@
     "Date": "日期"
   },
   "ThingsGateway.Gateway.Razor.ChannelDeviceTree": {
-    "ShowType": "显示类型"
+    "ChannelTable": "通道表格",
+    "DeviceTable": "设备表格",
+    "LogInfo": "日志信息"
   },
   "ThingsGateway.Gateway.Razor.GatewayAbout": {
     "AuthName": "公司名称",

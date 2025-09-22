@@ -54,7 +54,7 @@ internal sealed class GatewayMonitorHostedService : BackgroundService, IGatewayM
                     {
                         item.Init(channelRuntime);
 
-                        var varRuntimes = variableRuntimes.Where(x => x.DeviceId == item.Id).ToArray();
+                        var varRuntimes = variableRuntimes.Where(x => x.DeviceId == item.Id);
 
                         varRuntimes.ParallelForEach(varItem => varItem.Init(item));
                     }

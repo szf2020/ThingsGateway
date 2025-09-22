@@ -18,15 +18,15 @@ public partial class GatewayMonitorPage
 
     private async Task TreeChangedAsync(ChannelDeviceTreeItem channelDeviceTreeItem)
     {
-        ShowChannelRuntime = 0;
-        ShowDeviceRuntime = 0;
+        //ShowChannelRuntime = 0;
+        //ShowDeviceRuntime = 0;
         SelectModel = channelDeviceTreeItem;
         var variables = await GlobalData.GetCurrentUserIdVariables().ConfigureAwait(false);
         var channels = await GlobalData.GetCurrentUserChannels().ConfigureAwait(false);
         var devices = await GlobalData.GetCurrentUserDevices().ConfigureAwait(false);
         if (channelDeviceTreeItem.TryGetChannelRuntime(out var channelRuntime))
         {
-            ShowChannelRuntime = channelRuntime.Id;
+            //ShowChannelRuntime = channelRuntime.Id;
 
             if (channelRuntime.IsCollect == true)
             {
@@ -36,12 +36,12 @@ public partial class GatewayMonitorPage
             {
                 VariableRuntimes = channelRuntime.ReadDeviceRuntimes.Where(a => a.Value?.Driver?.IdVariableRuntimes != null).SelectMany(a => a.Value?.Driver?.IdVariableRuntimes?.Where(a => a.Value != null)?.Select(a => a.Value)).Where(a => a != null);
             }
-            ChannelRuntimes = Enumerable.Repeat(channelRuntime, 1);
-            DeviceRuntimes = channelRuntime.ReadDeviceRuntimes.Select(a => a.Value);
+            //ChannelRuntimes = Enumerable.Repeat(channelRuntime, 1);
+            //DeviceRuntimes = channelRuntime.ReadDeviceRuntimes.Select(a => a.Value);
         }
         else if (channelDeviceTreeItem.TryGetDeviceRuntime(out var deviceRuntime))
         {
-            ShowDeviceRuntime = deviceRuntime.Id;
+            //ShowDeviceRuntime = deviceRuntime.Id;
             if (deviceRuntime.IsCollect == true)
             {
                 VariableRuntimes = deviceRuntime.ReadOnlyVariableRuntimes.Select(a => a.Value).Where(a => a != null);
@@ -65,8 +65,8 @@ public partial class GatewayMonitorPage
                 }
 
             }
-            ChannelRuntimes = Enumerable.Repeat(deviceRuntime.ChannelRuntime, 1);
-            DeviceRuntimes = Enumerable.Repeat(deviceRuntime, 1);
+            //ChannelRuntimes = Enumerable.Repeat(deviceRuntime.ChannelRuntime, 1);
+            //DeviceRuntimes = Enumerable.Repeat(deviceRuntime, 1);
         }
         else if (channelDeviceTreeItem.TryGetPluginName(out var pluginName))
         {
@@ -80,26 +80,26 @@ public partial class GatewayMonitorPage
                 VariableRuntimes = channels.Where(a => a.PluginName == pluginName).SelectMany(a => a.ReadDeviceRuntimes).Where(a => a.Value.Driver?.IdVariableRuntimes != null).SelectMany(a => a.Value.Driver?.IdVariableRuntimes).Select(a => a.Value);
             }
 
-            ChannelRuntimes = channels.Where(a => a.PluginName == pluginName);
-            DeviceRuntimes = devices.Where(a => a.PluginName == pluginName);
+            //ChannelRuntimes = channels.Where(a => a.PluginName == pluginName);
+            //DeviceRuntimes = devices.Where(a => a.PluginName == pluginName);
         }
         else
         {
             VariableRuntimes = variables.Where(a => a != null);
 
-            if (channelDeviceTreeItem.TryGetPluginType(out var pluginTypeEnum))
-            {
-                if (pluginTypeEnum != null)
-                {
-                    ChannelRuntimes = channels.Where(a => a.PluginType == pluginTypeEnum);
-                    DeviceRuntimes = devices.Where(a => a.PluginType == pluginTypeEnum);
-                }
-                else
-                {
-                    ChannelRuntimes = channels;
-                    DeviceRuntimes = devices;
-                }
-            }
+            //if (channelDeviceTreeItem.TryGetPluginType(out var pluginTypeEnum))
+            //{
+            //    if (pluginTypeEnum != null)
+            //    {
+            //        ChannelRuntimes = channels.Where(a => a.PluginType == pluginTypeEnum);
+            //        DeviceRuntimes = devices.Where(a => a.PluginType == pluginTypeEnum);
+            //    }
+            //    else
+            //    {
+            //        ChannelRuntimes = channels;
+            //        DeviceRuntimes = devices;
+            //    }
+            //}
         }
         await InvokeAsync(StateHasChanged);
     }
@@ -113,11 +113,11 @@ public partial class GatewayMonitorPage
     }
     public IEnumerable<VariableRuntime> VariableRuntimes { get; set; } = Enumerable.Empty<VariableRuntime>();
 
-    public IEnumerable<ChannelRuntime> ChannelRuntimes { get; set; } = Enumerable.Empty<ChannelRuntime>();
-    public IEnumerable<DeviceRuntime> DeviceRuntimes { get; set; } = Enumerable.Empty<DeviceRuntime>();
+    //public IEnumerable<ChannelRuntime> ChannelRuntimes { get; set; } = Enumerable.Empty<ChannelRuntime>();
+    //public IEnumerable<DeviceRuntime> DeviceRuntimes { get; set; } = Enumerable.Empty<DeviceRuntime>();
 
-    private long ShowChannelRuntime { get; set; }
-    private long ShowDeviceRuntime { get; set; }
-    public ShowTypeEnum? ShowType { get; set; }
+    //private long ShowChannelRuntime { get; set; }
+    //private long ShowDeviceRuntime { get; set; }
+    //public ShowTypeEnum? ShowType { get; set; }
     private bool AutoRestartThread { get; set; } = true;
 }

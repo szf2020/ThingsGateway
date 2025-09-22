@@ -472,7 +472,29 @@ public class ThingsGatewayNodeManager : CustomNodeManager2
 
             return folder;
         }
-        return null;
+        else
+        {
+            var name = "Memory";
+            var description = "Memory";
+            FolderState folder = new(parent)
+            {
+                SymbolicName = name,
+                ReferenceTypeId = ReferenceTypes.Organizes,
+                TypeDefinitionId = ObjectTypeIds.FolderType,
+                Description = description,
+                NodeId = new NodeId(name, NamespaceIndex),
+                BrowseName = new QualifiedName(name, NamespaceIndex),
+                DisplayName = new LocalizedText(name),
+                WriteMask = AttributeWriteMask.None,
+                UserWriteMask = AttributeWriteMask.None,
+                EventNotifier = EventNotifiers.None
+            };
+
+
+            parent?.AddChild(folder);
+
+            return folder;
+        }
     }
 
     /// <summary>

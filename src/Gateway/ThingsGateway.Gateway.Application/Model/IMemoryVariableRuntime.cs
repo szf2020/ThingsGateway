@@ -8,17 +8,9 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-namespace ThingsGateway.Razor;
+namespace ThingsGateway.Gateway.Application;
 
-public partial class SpinnerComponent
+public interface IMemoryVariableRuntime
 {
-    public void SetRun(bool run)
-    {
-        show = run;
-        StateHasChanged();
-    }
-    private bool show;
-
-    [Parameter]
-    public Size Size { get; set; } = Size.Small;
+    OperResult MemoryVariableRpc(string value, CancellationToken cancellationToken = default);
 }
