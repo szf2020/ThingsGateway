@@ -6,62 +6,62 @@
 		<!--Modbus 插件-->
 		<PackageReference Include="ThingsGateway.Plugin.Modbus" Version="$(PluginVersion)" GeneratePathProperty="true">
 			<Private>false</Private>
-			<IncludeAssets> native;</IncludeAssets>
+			<IncludeAssets> all;</IncludeAssets>
 		</PackageReference>
 
 		<!--SiemensS7 插件-->
 		<PackageReference Include="ThingsGateway.Plugin.SiemensS7" Version="$(PluginVersion)" GeneratePathProperty="true">
 			<Private>false</Private>
-			<IncludeAssets> native;</IncludeAssets>
+			<IncludeAssets> all;</IncludeAssets>
 		</PackageReference>
 
 		<!--Dlt645 插件-->
 		<PackageReference Include="ThingsGateway.Plugin.Dlt645" Version="$(PluginVersion)" GeneratePathProperty="true">
 			<Private>false</Private>
-			<IncludeAssets> native;</IncludeAssets>
+			<IncludeAssets> all;</IncludeAssets>
 		</PackageReference>
 
 		<!--OpcDa 插件-->
 		<PackageReference Include="ThingsGateway.Plugin.OpcDa" Version="$(PluginVersion)" GeneratePathProperty="true">
 			<Private>false</Private>
-			<IncludeAssets> native;</IncludeAssets>
+			<IncludeAssets> all;</IncludeAssets>
 		</PackageReference>
 
 		<!--OpcUa 插件-->
 		<PackageReference Include="ThingsGateway.Plugin.OpcUa" Version="$(PluginVersion)" GeneratePathProperty="true">
 			<Private>false</Private>
-			<IncludeAssets> native;</IncludeAssets>
+			<IncludeAssets> all;</IncludeAssets>
 		</PackageReference>
 
 		<!--DB 插件-->
 		<PackageReference Include="ThingsGateway.Plugin.DB" Version="$(PluginVersion)" GeneratePathProperty="true">
 			<Private>false</Private>
-			<IncludeAssets> native;</IncludeAssets>
+			<IncludeAssets> all;</IncludeAssets>
 		</PackageReference>
 
 		<!--Kafka 插件-->
 		<PackageReference Include="ThingsGateway.Plugin.Kafka" Version="$(PluginVersion)" GeneratePathProperty="true">
 			<Private>false</Private>
-			<IncludeAssets> native;</IncludeAssets>
+			<IncludeAssets> all;</IncludeAssets>
 		</PackageReference>
 
 		<!--Mqtt 插件-->
 		<PackageReference Include="ThingsGateway.Plugin.Mqtt" Version="$(PluginVersion)" GeneratePathProperty="true">
 			<Private>false</Private>
-			<IncludeAssets> native;</IncludeAssets>
+			<IncludeAssets> all;</IncludeAssets>
 		</PackageReference>
 
 		<!--RabbitMQ 插件-->
 		<PackageReference Include="ThingsGateway.Plugin.RabbitMQ" Version="$(PluginVersion)" GeneratePathProperty="true">
 			<Private>false</Private>
-			<IncludeAssets> native;</IncludeAssets>
+			<IncludeAssets> all;</IncludeAssets>
 		</PackageReference>
 
 
 		<!--webhook 插件-->
 		<PackageReference Include="ThingsGateway.Plugin.Http" Version="$(PluginVersion)" GeneratePathProperty="true">
 			<Private>false</Private>
-			<IncludeAssets> native;</IncludeAssets>
+			<IncludeAssets> all;</IncludeAssets>
 		</PackageReference>
 
 

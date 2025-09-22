@@ -1,8 +1,8 @@
 <Project>
 
 	<ItemGroup>
-		<PackageReference Include="ThingsGateway.Plugin.ModbusC1" Version="$(ProPluginVersion)" GeneratePathProperty="true" Private="false"  IncludeAssets="native;" />
-		<PackageReference Include="ThingsGateway.Plugin.ModbusGY" Version="$(ProPluginVersion)" GeneratePathProperty="true" Private="false"  IncludeAssets="native;" />
+		<PackageReference Include="ThingsGateway.Plugin.ModbusC1" Version="$(ProPluginVersion)" GeneratePathProperty="true" Private="false"  IncludeAssets="all;" />
+		<PackageReference Include="ThingsGateway.Plugin.ModbusGY" Version="$(ProPluginVersion)" GeneratePathProperty="true" Private="false"  IncludeAssets="all;" />
 
 	</ItemGroup>
 

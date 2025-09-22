@@ -2,9 +2,9 @@
 
 	<ItemGroup>
 		<!--HUANANSFSK 插件-->
-		<PackageReference Include="ThingsGateway.Plugin.HUANANSFSK" Version="$(ProPluginVersion)" GeneratePathProperty="true" Private="false"  IncludeAssets="native;" />
+		<PackageReference Include="ThingsGateway.Plugin.HUANANSFSK" Version="$(ProPluginVersion)" GeneratePathProperty="true" Private="false"  IncludeAssets="all;" />
 		<!--YPSFSK 插件-->
-		<PackageReference Include="ThingsGateway.Plugin.YPSFSK" Version="$(ProPluginVersion)" GeneratePathProperty="true" Private="false"  IncludeAssets="native;" />
+		<PackageReference Include="ThingsGateway.Plugin.YPSFSK" Version="$(ProPluginVersion)" GeneratePathProperty="true" Private="false"  IncludeAssets="all;" />
 	</ItemGroup>
 
 	<Target Name="CopyOtherPlugin3NugetPackages" AfterTargets="Build">

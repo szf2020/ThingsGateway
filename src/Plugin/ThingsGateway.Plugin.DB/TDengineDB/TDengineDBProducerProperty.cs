@@ -18,7 +18,7 @@ public class TDengineDBProducerProperty : RealDBProducerProperty
 
     public TDengineDBProducerProperty()
     {
-        BigTextConnectStr = "protocol=WebSocket;host=localhost;port=6041;useSSL=false;username=root;password=taosdata;db=power";
+        BigTextConnectStr = "protocol=WebSocket;host=localhost;port=6041;useSSL=false;username=root;password=taosdata;db=power;autoReconnect=true";
     }
 
 }

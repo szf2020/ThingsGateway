@@ -2,7 +2,7 @@
 
 	<ItemGroup>
 		<!--MqttYINGKE 插件-->
-		<PackageReference Include="ThingsGateway.Plugin.IXCom29s" Version="$(ProPluginVersion)" GeneratePathProperty="true" Private="false"  IncludeAssets="native;" />
+		<PackageReference Include="ThingsGateway.Plugin.IXCom29s" Version="$(ProPluginVersion)" GeneratePathProperty="true" Private="false"  IncludeAssets="all;" />
 	</ItemGroup>
 
 	<Target Name="CopyOtherPlugin6NugetPackages" AfterTargets="Build">

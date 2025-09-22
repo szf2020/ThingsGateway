@@ -2,7 +2,7 @@
 
 	<ItemGroup>
 		<!--MqttYINGKE 插件-->
-		<PackageReference Include="ThingsGateway.Plugin.OpcAe" Version="$(ProPluginVersion)" GeneratePathProperty="true" Private="false"  IncludeAssets="native;" />
+		<PackageReference Include="ThingsGateway.Plugin.OpcAe" Version="$(ProPluginVersion)" GeneratePathProperty="true" Private="false"  IncludeAssets="all;" />
 	</ItemGroup>
 
 	<Target Name="CopyOtherPlugin7NugetPackages" AfterTargets="Build">

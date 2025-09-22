@@ -14,6 +14,13 @@
 
 	<Import Project="targets\ProPluginDebug.targets" Condition=" '$(SolutionName)' == 'ThingsGatewayPro' "/>
 
+
+
+	<!--nuget包解压复制文件，上下文动态加载，Pro插件-->
+	<Import Project="targets\Pro2.targets" Condition=" '$(SolutionName)' != 'ThingsGatewayPro'" />
+
+	<Import Project="targets\Pro7.targets" Condition=" '$(SolutionName)' != 'ThingsGatewayPro'" />
+
 	<PropertyGroup>
 
 		<GenerateDocumentationFile>false</GenerateDocumentationFile>

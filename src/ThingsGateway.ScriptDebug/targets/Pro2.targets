@@ -3,39 +3,39 @@
 	<ItemGroup>
 		<PackageReference Include="ThingsGateway.Plugin.SyncBridge" Version="$(ProPluginVersion)" GeneratePathProperty="true">
 			<Private>false</Private>
-			<IncludeAssets> native;</IncludeAssets>
+			<IncludeAssets> all;</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="ThingsGateway.Plugin.Inovance" Version="$(ProPluginVersion)" GeneratePathProperty="true" Private="false"  IncludeAssets=" native;" />
-		<PackageReference Include="ThingsGateway.Plugin.TIANXIN" Version="$(ProPluginVersion)" GeneratePathProperty="true" Private="false"  IncludeAssets=" native;" />
-		<PackageReference Include="ThingsGateway.Plugin.HJ212" Version="$(ProPluginVersion)" GeneratePathProperty="true" Private="false"  IncludeAssets=" native;" />
-		<PackageReference Include="ThingsGateway.Plugin.BACnet" Version="$(ProPluginVersion)" GeneratePathProperty="true" Private="false"  IncludeAssets=" native;" />
+		<PackageReference Include="ThingsGateway.Plugin.Inovance" Version="$(ProPluginVersion)" GeneratePathProperty="true" Private="false"  IncludeAssets="all;" />
+		<PackageReference Include="ThingsGateway.Plugin.TIANXIN" Version="$(ProPluginVersion)" GeneratePathProperty="true" Private="false"  IncludeAssets="all;" />
+		<PackageReference Include="ThingsGateway.Plugin.HJ212" Version="$(ProPluginVersion)" GeneratePathProperty="true" Private="false"  IncludeAssets="all;" />
+		<PackageReference Include="ThingsGateway.Plugin.BACnet" Version="$(ProPluginVersion)" GeneratePathProperty="true" Private="false"  IncludeAssets="all;" />
 		<!--AllenBradleyCip 插件-->
-		<PackageReference Include="ThingsGateway.Plugin.AllenBradleyCip" Version="$(ProPluginVersion)" GeneratePathProperty="true" Private="false"  IncludeAssets=" native;" />
+		<PackageReference Include="ThingsGateway.Plugin.AllenBradleyCip" Version="$(ProPluginVersion)" GeneratePathProperty="true" Private="false"  IncludeAssets="all;" />
 		<!--DCON 插件-->
-		<PackageReference Include="ThingsGateway.Plugin.DCON" Version="$(ProPluginVersion)" GeneratePathProperty="true" Private="false"  IncludeAssets=" native;" />
+		<PackageReference Include="ThingsGateway.Plugin.DCON" Version="$(ProPluginVersion)" GeneratePathProperty="true" Private="false"  IncludeAssets="all;" />
 		<!--EDPF_NT 插件-->
-		<PackageReference Include="ThingsGateway.Plugin.EDPF_NT" Version="$(ProPluginVersion)" GeneratePathProperty="true" Private="false"  IncludeAssets=" native;" />
+		<PackageReference Include="ThingsGateway.Plugin.EDPF_NT" Version="$(ProPluginVersion)" GeneratePathProperty="true" Private="false"  IncludeAssets="all;" />
 		<!--KELID2008 插件-->
-		<PackageReference Include="ThingsGateway.Plugin.KELID2008" Version="$(ProPluginVersion)" GeneratePathProperty="true" Private="false"  IncludeAssets=" native;" />
+		<PackageReference Include="ThingsGateway.Plugin.KELID2008" Version="$(ProPluginVersion)" GeneratePathProperty="true" Private="false"  IncludeAssets="all;" />
 		<!--LKSIS 插件-->
-		<PackageReference Include="ThingsGateway.Plugin.LKSIS" Version="$(ProPluginVersion)" GeneratePathProperty="true" Private="false"  IncludeAssets=" native;" />
+		<PackageReference Include="ThingsGateway.Plugin.LKSIS" Version="$(ProPluginVersion)" GeneratePathProperty="true" Private="false"  IncludeAssets="all;" />
 		<!--Melsec 插件-->
-		<PackageReference Include="ThingsGateway.Plugin.Melsec" Version="$(ProPluginVersion)" GeneratePathProperty="true" Private="false"  IncludeAssets=" native;" />
+		<PackageReference Include="ThingsGateway.Plugin.Melsec" Version="$(ProPluginVersion)" GeneratePathProperty="true" Private="false"  IncludeAssets="all;" />
 		<!--Omron 插件-->
-		<PackageReference Include="ThingsGateway.Plugin.Omron" Version="$(ProPluginVersion)" GeneratePathProperty="true" Private="false"  IncludeAssets=" native;" />
+		<PackageReference Include="ThingsGateway.Plugin.Omron" Version="$(ProPluginVersion)" GeneratePathProperty="true" Private="false"  IncludeAssets="all;" />
 		<!--DKQ_A16D 插件-->
-		<!--<PackageReference Include="ThingsGateway.Plugin.DKQ_A16D" Version="$(ProPluginVersion)" GeneratePathProperty="true" Private="false"  IncludeAssets=" native;" />-->
+		<!--<PackageReference Include="ThingsGateway.Plugin.DKQ_A16D" Version="$(ProPluginVersion)" GeneratePathProperty="true" Private="false"  IncludeAssets="all;" />-->
 		<!--IDR210 插件-->
-		<!--<PackageReference Include="ThingsGateway.Plugin.IDR210" Version="$(ProPluginVersion)" GeneratePathProperty="true" Private="false"  IncludeAssets=" native;" />-->
+		<!--<PackageReference Include="ThingsGateway.Plugin.IDR210" Version="$(ProPluginVersion)" GeneratePathProperty="true" Private="false"  IncludeAssets="all;" />-->
 		<!--URF_R330 插件-->
-		<!--<PackageReference Include="ThingsGateway.Plugin.URF_R330" Version="$(ProPluginVersion)" GeneratePathProperty="true" Private="false"  IncludeAssets=" native;" />-->
+		<!--<PackageReference Include="ThingsGateway.Plugin.URF_R330" Version="$(ProPluginVersion)" GeneratePathProperty="true" Private="false"  IncludeAssets="all;" />-->
 		<!--USBScaner 插件-->
-		<PackageReference Include="ThingsGateway.Plugin.USBScaner" Version="$(ProPluginVersion)" GeneratePathProperty="true" Private="false"  IncludeAssets=" native;" />
+		<PackageReference Include="ThingsGateway.Plugin.USBScaner" Version="$(ProPluginVersion)" GeneratePathProperty="true" Private="false"  IncludeAssets="all;" />
 
 
-		<PackageReference Include="ThingsGateway.Plugin.SECS" Version="$(ProPluginVersion)" GeneratePathProperty="true" Private="false"  IncludeAssets=" native;" />
-		<PackageReference Include="ThingsGateway.Plugin.TS550" Version="$(ProPluginVersion)" GeneratePathProperty="true" Private="false"  IncludeAssets=" native;" />
-		<PackageReference Include="ThingsGateway.Plugin.Vigor" Version="$(ProPluginVersion)" GeneratePathProperty="true" Private="false"  IncludeAssets=" native;" />
+		<PackageReference Include="ThingsGateway.Plugin.SECS" Version="$(ProPluginVersion)" GeneratePathProperty="true" Private="false"  IncludeAssets="all;" />
+		<PackageReference Include="ThingsGateway.Plugin.TS550" Version="$(ProPluginVersion)" GeneratePathProperty="true" Private="false"  IncludeAssets="all;" />
+		<PackageReference Include="ThingsGateway.Plugin.Vigor" Version="$(ProPluginVersion)" GeneratePathProperty="true" Private="false"  IncludeAssets="all;" />
 
 	</ItemGroup>
 
