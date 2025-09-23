@@ -47,7 +47,7 @@ public partial class RedundancyOptionsPage
             LogLevel = logLevel;
             if (LogLevelChanged != null)
             {
-                await LogLevelChanged?.Invoke(LogLevel);
+                await LogLevelChanged.Invoke(LogLevel);
             }
             await InvokeAsync(StateHasChanged);
         }

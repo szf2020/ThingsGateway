@@ -130,6 +130,12 @@ public partial class TDengineDBProducer : BusinessBaseWithCacheIntervalVariable
                 `value` DOUBLE    ) TAGS(`devicename`  VARCHAR(100) ,`name`  VARCHAR(100))
                 """;
             await _db.Ado.ExecuteCommandAsync(sql, default, cancellationToken: cancellationToken).ConfigureAwait(false);
+
+
+
+            await _db.Ado.ExecuteCommandAsync($"ALTER STABLE `{_driverPropertys.StringTableNameLow}` KEEP 10;", default, cancellationToken: cancellationToken).ConfigureAwait(false);
+            await _db.Ado.ExecuteCommandAsync($"ALTER STABLE `{_driverPropertys.NumberTableNameLow}` KEEP 10;", default, cancellationToken: cancellationToken).ConfigureAwait(false);
+
         }
         await base.ProtectedStartAsync(cancellationToken).ConfigureAwait(false);
     }

@@ -23,6 +23,10 @@ public class SqlHistoryAlarmProperty : BusinessPropertyWithCache
 {
     [DynamicProperty]
     public DbType DbType { get; set; } = DbType.SqlServer;
+
+    [DynamicProperty]
+    public int SaveDays { get; set; } = 3650;
+
     [DynamicProperty]
     [Required]
     public string TableName { get; set; } = "historyAlarm";

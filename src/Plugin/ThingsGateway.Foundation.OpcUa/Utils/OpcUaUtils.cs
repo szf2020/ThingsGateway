@@ -57,133 +57,6 @@ public static class OpcUaUtils
     }
 
     /// <summary>
-    /// Browses the address space and returns the references found.
-    /// </summary>
-    /// <param name="session">The session.</param>
-    /// <param name="nodesToBrowse">The set of browse operations to perform.</param>
-    /// <param name="throwOnError">if set to <c>true</c> a exception will be thrown on an error.</param>
-    /// <returns>
-    /// The references found. Null if an error occurred.
-    /// </returns>
-    public static ReferenceDescriptionCollection Browse(ISession session, BrowseDescriptionCollection nodesToBrowse, bool throwOnError)
-    {
-        try
-        {
-            ReferenceDescriptionCollection references = new();
-            BrowseDescriptionCollection unprocessedOperations = new();
-
-            while (nodesToBrowse.Count > 0)
-            {
-                // start the browse operation.
-
-                session.Browse(
-                    null,
-                    null,
-                    0,
-                    nodesToBrowse,
-                    out BrowseResultCollection results,
-                    out DiagnosticInfoCollection diagnosticInfos);
-
-                ClientBase.ValidateResponse(results, nodesToBrowse);
-                ClientBase.ValidateDiagnosticInfos(diagnosticInfos, nodesToBrowse);
-
-                ByteStringCollection continuationPoints = new();
-
-                for (int ii = 0; ii < nodesToBrowse.Count; ii++)
-                {
-                    // check for error.
-                    if (StatusCode.IsBad(results[ii].StatusCode))
-                    {
-                        // this error indicates that the server does not have enough simultaneously active
-                        // continuation points. This request will need to be resent after the other operations
-                        // have been completed and their continuation points released.
-                        if (results[ii].StatusCode == StatusCodes.BadNoContinuationPoints)
-                        {
-                            unprocessedOperations.Add(nodesToBrowse[ii]);
-                        }
-
-                        continue;
-                    }
-
-                    // check if all references have been fetched.
-                    if (results[ii].References.Count == 0)
-                    {
-                        continue;
-                    }
-
-                    // save results.
-                    references.AddRange(results[ii].References);
-
-                    // check for continuation point.
-                    if (results[ii].ContinuationPoint != null)
-                    {
-                        continuationPoints.Add(results[ii].ContinuationPoint);
-                    }
-                }
-
-                // process continuation points.
-                ByteStringCollection revisedContiuationPoints = new();
-
-                while (continuationPoints.Count > 0)
-                {
-                    // continue browse operation.
-                    session.BrowseNext(
-                        null,
-                        true,
-                        continuationPoints,
-                        out results,
-                        out diagnosticInfos);
-
-                    ClientBase.ValidateResponse(results, continuationPoints);
-                    ClientBase.ValidateDiagnosticInfos(diagnosticInfos, continuationPoints);
-
-                    for (int ii = 0; ii < continuationPoints.Count; ii++)
-                    {
-                        // check for error.
-                        if (StatusCode.IsBad(results[ii].StatusCode))
-                        {
-                            continue;
-                        }
-
-                        // check if all references have been fetched.
-                        if (results[ii].References.Count == 0)
-                        {
-                            continue;
-                        }
-
-                        // save results.
-                        references.AddRange(results[ii].References);
-
-                        // check for continuation point.
-                        if (results[ii].ContinuationPoint != null)
-                        {
-                            revisedContiuationPoints.Add(results[ii].ContinuationPoint);
-                        }
-                    }
-
-                    // check if browsing must continue;
-                    revisedContiuationPoints = continuationPoints;
-                }
-
-                // check if unprocessed results exist.
-                nodesToBrowse = unprocessedOperations;
-            }
-
-            // return complete list.
-            return references;
-        }
-        catch (Exception exception)
-        {
-            if (throwOnError)
-            {
-                throw new ServiceResultException(exception, StatusCodes.BadUnexpectedError);
-            }
-
-            return null;
-        }
-    }
-
-    /// <summary>
     /// 浏览地址空间
     /// </summary>
     /// <param name="session"></param>
@@ -570,7 +443,7 @@ public static class OpcUaUtils
     /// </summary>
     /// <param name="configuration">The configuration.</param>
     /// <returns>A list of server urls.</returns>
-    public static IList<string> DiscoverServers(ApplicationConfiguration configuration)
+    public static async Task<IList<string>> DiscoverServers(ApplicationConfiguration configuration)
     {
         List<string> serverUrls = new();
 
@@ -581,7 +454,7 @@ public static class OpcUaUtils
         // Connect to the local discovery server and find the available servers.
         using (DiscoveryClient client = DiscoveryClient.Create(new Uri("opc.tcp://localhost:4840"), endpointConfiguration))
         {
-            ApplicationDescriptionCollection servers = client.FindServers(null);
+            ApplicationDescriptionCollection servers = await client.FindServersAsync(null).ConfigureAwait(false);
 
             // populate the drop down list with the discovery URLs for the available servers.
             for (int ii = 0; ii < servers.Count; ii++)
@@ -641,7 +514,7 @@ public static class OpcUaUtils
     /// <summary>
     /// 指定的属性的显示文本。
     /// </summary>
-    public static string GetAttributeDisplayText(ISession session, uint attributeId, Variant value)
+    public static async Task<string> GetAttributeDisplayTextAsync(ISession session, uint attributeId, Variant value)
     {
         if (value == Variant.Null)
         {
@@ -677,7 +550,7 @@ public static class OpcUaUtils
 
             case Attributes.DataType:
                 {
-                    return session.NodeCache.GetDisplayText(value.Value as NodeId);
+                    return await session.NodeCache.GetDisplayTextAsync(value.Value as NodeId).ConfigureAwait(false);
                 }
 
             case Attributes.ValueRank:
@@ -725,102 +598,6 @@ public static class OpcUaUtils
 
         // use default format.
         return value.ToString();
-    }
-
-    /// <summary>
-    /// Finds the endpoint that best matches the current settings.
-    /// </summary>
-    /// <param name="discoveryUrl">The discovery URL.</param>
-    /// <param name="useSecurity">if set to <c>true</c> select an endpoint that uses security.</param>
-    /// <returns>The best available endpoint.</returns>
-    public static EndpointDescription SelectEndpoint(string discoveryUrl, bool useSecurity)
-    {
-        // needs to add the '/discovery' back onto non-UA TCP URLs.
-        if (!discoveryUrl.StartsWith(Utils.UriSchemeOpcTcp))
-        {
-            if (!discoveryUrl.EndsWith("/discovery"))
-            {
-                discoveryUrl += "/discovery";
-            }
-        }
-
-        // parse the selected URL.
-        Uri uri = new(discoveryUrl);
-
-        // set a short timeout because this is happening in the drop down event.
-        EndpointConfiguration configuration = EndpointConfiguration.Create();
-        configuration.OperationTimeout = 5000;
-
-        EndpointDescription selectedEndpoint = null;
-
-        // Connect to the server's discovery endpoint and find the available configuration.
-        using (DiscoveryClient client = DiscoveryClient.Create(uri, configuration))
-        {
-            EndpointDescriptionCollection endpoints = client.GetEndpoints(null);
-
-            // select the best endpoint to use based on the selected URL and the UseSecurity checkbox.
-            for (int ii = 0; ii < endpoints.Count; ii++)
-            {
-                EndpointDescription endpoint = endpoints[ii];
-
-                // check for a match on the URL scheme.
-                if (endpoint.EndpointUrl.StartsWith(uri.Scheme))
-                {
-                    // check if security was requested.
-                    if (useSecurity)
-                    {
-                        if (endpoint.SecurityMode == MessageSecurityMode.None)
-                        {
-                            continue;
-                        }
-                    }
-                    else
-                    {
-                        if (endpoint.SecurityMode != MessageSecurityMode.None)
-                        {
-                            continue;
-                        }
-                    }
-
-                    // pick the first available endpoint by default.
-                    selectedEndpoint ??= endpoint;
-
-                    // The security level is a relative measure assigned by the server to the
-                    // endpoints that it returns. Clients should always pick the highest level
-                    // unless they have a reason not too.
-                    if (endpoint.SecurityLevel > selectedEndpoint.SecurityLevel)
-                    {
-                        selectedEndpoint = endpoint;
-                    }
-                }
-            }
-
-            // pick the first available endpoint by default.
-            if (selectedEndpoint == null && endpoints.Count > 0)
-            {
-                selectedEndpoint = endpoints[0];
-            }
-        }
-
-        // if a server is behind a firewall it may return URLs that are not accessible to the client.
-        // This problem can be avoided by assuming that the domain in the URL used to call
-        // GetEndpoints can be used to access any of the endpoints. This code makes that conversion.
-        // Note that the conversion only makes sense if discovery uses the same protocol as the endpoint.
-
-        Uri endpointUrl = Utils.ParseUri(selectedEndpoint.EndpointUrl);
-
-        if (endpointUrl != null && endpointUrl.Scheme == uri.Scheme)
-        {
-            UriBuilder builder = new(endpointUrl)
-            {
-                Host = uri.DnsSafeHost,
-                Port = uri.Port
-            };
-            selectedEndpoint.EndpointUrl = builder.ToString();
-        }
-
-        // return the selected endpoint.
-        return selectedEndpoint;
     }
 
     /// <summary>

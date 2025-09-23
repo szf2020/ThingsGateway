@@ -31,6 +31,15 @@ public abstract class DynamicSQLBase
     /// <returns></returns>
     public virtual Task DBInsertable(ISqlSugarClient db, IEnumerable<object> datas, CancellationToken cancellationToken)
     {
-        throw new NotSupportedException();
+        return Task.CompletedTask;
+    }
+
+    /// <summary>
+    /// 删除n天前数据
+    /// </summary>
+    /// <returns></returns>
+    public virtual Task<int> DBDeleteable(ISqlSugarClient db, int days, CancellationToken cancellationToken)
+    {
+        return Task.FromResult(0);
     }
 }

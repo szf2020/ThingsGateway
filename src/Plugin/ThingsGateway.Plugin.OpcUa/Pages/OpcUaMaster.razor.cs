@@ -24,7 +24,7 @@ using TouchSocket.Core;
 
 namespace ThingsGateway.Debug;
 
-public partial class OpcUaMaster : IDisposable
+public partial class OpcUaMaster : IAsyncDisposable
 {
     public LoggerGroup? LogMessage;
     private readonly OpcUaProperty OpcUaProperty = new();
@@ -37,7 +37,8 @@ public partial class OpcUaMaster : IDisposable
     /// <inheritdoc/>
     ~OpcUaMaster()
     {
-        this.SafeDispose();
+        if (_plc != null)
+            _ = _plc.SafeDisposeAsync();
     }
 
     private DeviceComponent DeviceComponent { get; set; }
@@ -49,9 +50,10 @@ public partial class OpcUaMaster : IDisposable
     private IStringLocalizer<OpcUaProperty> OpcUaPropertyLocalizer { get; set; }
 
     /// <inheritdoc/>
-    public void Dispose()
+    public async ValueTask DisposeAsync()
     {
-        _plc?.SafeDispose();
+        if (_plc != null)
+            await _plc.SafeDisposeAsync();
         GC.SuppressFinalize(this);
     }
     [Inject]
@@ -129,11 +131,11 @@ public partial class OpcUaMaster : IDisposable
         }
     }
 
-    private void Disconnect()
+    private async Task DisconnectAsync()
     {
         try
         {
-            _plc.Disconnect();
+            await _plc.DisconnectAsync().ConfigureAwait(false);
         }
         catch (Exception ex)
         {

@@ -250,7 +250,7 @@ public class ThingsGatewayNodeManager : CustomNodeManager2
     /// <param name="disposing"></param>
     protected override void Dispose(bool disposing)
     {
-        NodeIdTags.Clear();
+        NodeIdTags?.Clear();
         base.Dispose(disposing);
     }
 
@@ -972,7 +972,7 @@ public class ThingsGatewayNodeManager : CustomNodeManager2
     {
         var str = variableRuntime.GetPropertyValue(_businessBase.DeviceId, nameof(OpcUaServerVariableProperty.DataType)) ?? "";
         Type tp;
-        if (Enum.TryParse(str, out DataTypeEnum result))
+        if (Enum.TryParse(str, out DataTypeEnum result) && result != DataTypeEnum.Object)
         {
             tp = result.GetSystemType();
             return DataNodeType(tp);

@@ -10,7 +10,7 @@
 
 namespace ThingsGateway.Gateway.Application;
 
-public interface IMemoryVariableRuntime
+public interface IMemoryVariableRpc
 {
     OperResult MemoryVariableRpc(string value, CancellationToken cancellationToken = default);
 }

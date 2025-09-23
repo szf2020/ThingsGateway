@@ -16,6 +16,7 @@ using ThingsGateway.Debug;
 using ThingsGateway.Foundation;
 using ThingsGateway.NewLife;
 using ThingsGateway.NewLife.Extension;
+using ThingsGateway.NewLife.Threading;
 using ThingsGateway.Plugin.DB;
 using ThingsGateway.SqlSugar;
 
@@ -68,6 +69,56 @@ public partial class QuestDBProducer : BusinessBaseWithCacheIntervalVariable
     }
 
 #if !Management
+
+
+    protected override List<IScheduledTask> ProtectedGetTasks(CancellationToken cancellationToken)
+    {
+        var list = base.ProtectedGetTasks(cancellationToken);
+        list.Add(ScheduledTaskHelper.GetTask("0 0 * * *", DeleteByDayAsync, null, LogMessage, cancellationToken));
+
+        return list;
+    }
+    private async Task DeleteByDayAsync(object? state, CancellationToken cancellationToken)
+    {
+        try
+        {
+            using var db = BusinessDatabaseUtil.GetDb(_driverPropertys.DbType, _driverPropertys.BigTextConnectStr);
+            if (!_driverPropertys.BigTextScriptHistoryTable.IsNullOrEmpty())
+            {
+                var hisModel = CSharpScriptEngineExtension.Do<DynamicSQLBase>(_driverPropertys.BigTextScriptHistoryTable);
+
+                await hisModel.DBDeleteable(db, _driverPropertys.SaveDays, cancellationToken).ConfigureAwait(false);
+            }
+            else
+            {
+                {
+                    var time = TimerX.Now - TimeSpan.FromDays(-_driverPropertys.SaveDays);
+
+                    string sql = $"""
+                                        ALTER TABLE {_driverPropertys.NumberTableNameLow}
+                                        DROP PARTITION
+                                        WHERE createtime < to_timestamp('{time.ToString("yyyy-MM-dd:HH:mm:ss")}', 'yyyy-MM-dd:HH:mm:ss');
+                                        """;
+                    await db.Ado.ExecuteCommandAsync("", default, cancellationToken: cancellationToken).ConfigureAwait(false);
+                    sql = $"""
+                                        ALTER TABLE {_driverPropertys.StringTableNameLow}
+                                        DROP PARTITION
+                                        WHERE createtime < to_timestamp('{time.ToString("yyyy-MM-dd:HH:mm:ss")}', 'yyyy-MM-dd:HH:mm:ss');
+                                        """;
+                    await db.Ado.ExecuteCommandAsync("", default, cancellationToken: cancellationToken).ConfigureAwait(false);
+                    LogMessage?.LogInformation($"Clean up historical data from {_driverPropertys.SaveDays} days ago");
+
+                }
+
+            }
+
+        }
+        catch (Exception ex)
+        {
+            LogMessage?.LogWarning(ex, "Clearing historical data error");
+        }
+    }
+
 
     protected override async Task InitChannelAsync(IChannel? channel, CancellationToken cancellationToken)
     {

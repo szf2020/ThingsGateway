@@ -59,6 +59,9 @@ public class SqlDBProducerProperty : BusinessPropertyWithCacheInterval
     public DbType DbType { get; set; } = DbType.SqlServer;
 
     [DynamicProperty]
+    public int SaveDays { get; set; } = 3650;
+
+    [DynamicProperty]
     public SqlDBSplitType SqlDBSplitType { get; set; } = SqlDBSplitType.Week;
 
     [DynamicProperty]

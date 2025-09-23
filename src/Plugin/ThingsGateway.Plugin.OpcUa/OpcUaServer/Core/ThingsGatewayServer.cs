@@ -57,7 +57,7 @@ public partial class ThingsGatewayServer : StandardServer
     /// <inheritdoc/>
     protected override ResourceManager CreateResourceManager(IServerInternal server, ApplicationConfiguration configuration)
     {
-        ResourceManager resourceManager = new(server, configuration);
+        ResourceManager resourceManager = new(configuration);
 
         System.Reflection.FieldInfo[] fields = typeof(StatusCodes).GetFields(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
 
@@ -117,7 +117,6 @@ public partial class ThingsGatewayServer : StandardServer
 
         // 由应用程序决定如何验证用户身份令牌。
         // 此函数为 X509 身份令牌创建验证器。
-        CreateUserIdentityValidators(configuration);
     }
 
     /// <inheritdoc/>
@@ -127,7 +126,7 @@ public partial class ThingsGatewayServer : StandardServer
         base.OnServerStopping();
     }
 
-    private void CreateUserIdentityValidators(ApplicationConfiguration configuration)
+    public async Task CreateUserIdentityValidators(ApplicationConfiguration configuration)
     {
         for (int ii = 0; ii < configuration.ServerConfiguration.UserTokenPolicies.Count; ii++)
         {
@@ -141,7 +140,7 @@ public partial class ThingsGatewayServer : StandardServer
                     configuration.SecurityConfiguration.UserIssuerCertificates != null)
                 {
                     CertificateValidator certificateValidator = new();
-                    certificateValidator.Update(configuration).GetAwaiter().GetResult();
+                    await certificateValidator.UpdateAsync(configuration).ConfigureAwait(false);
                     certificateValidator.Update(configuration.SecurityConfiguration.UserIssuerCertificates,
                         configuration.SecurityConfiguration.TrustedUserCertificates,
                         configuration.SecurityConfiguration.RejectedCertificateStore);
@@ -153,7 +152,7 @@ public partial class ThingsGatewayServer : StandardServer
         }
     }
 
-    private void SessionManager_ImpersonateUser(Session session, ImpersonateEventArgs args)
+    private void SessionManager_ImpersonateUser(ISession session, ImpersonateEventArgs args)
     {
         // check for a user name cancellationToken.
 
@@ -226,7 +225,7 @@ public partial class ThingsGatewayServer : StandardServer
                 "Security cancellationToken is not a valid username cancellationToken. An empty password is not accepted.");
         }
         var sysUserService = App.RootServices.GetService<ISysUserService>();
-        var userInfo = sysUserService.GetUserByAccountAsync(userName, null).ConfigureAwait(true).GetAwaiter().GetResult();//获取用户信息
+        var userInfo = sysUserService.GetUserByAccountAsync(userName, null).ConfigureAwait(false).GetAwaiter().GetResult();//获取用户信息
         if (userInfo == null)
         {
             // construct translation object with default text.

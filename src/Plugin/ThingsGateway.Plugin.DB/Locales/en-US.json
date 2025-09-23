@@ -1,6 +1,7 @@
 ﻿{
   "ThingsGateway.Plugin.DB.RealDBProducerProperty": {
     "BigTextConnectStr": "ConnectString",
+    "SaveDays": "SaveDays",
     "BigTextScriptHistoryTable": "DynamicScriptHistoryTable",
     "RealTableBusinessInterval": "RealTableBusinessInterval",
     "StringTableName": "StringTableName",
@@ -25,6 +26,7 @@
     "Value": "Value"
   },
   "ThingsGateway.Plugin.SqlDB.SqlDBProducerProperty": {
+    "SaveDays": "SaveDays",
     "BigTextConnectStr": "ConnectString",
     "BigTextScriptHistoryTable": "DynamicScriptHistoryTable",
     "BigTextScriptRealTable": "DynamicScriptRealTable",
@@ -87,6 +89,7 @@
     "Remark5": "Remark5"
   },
   "ThingsGateway.Plugin.DB.SQLHistoryAlarmProperty": {
+    "SaveDays": "SaveDays",
     "BigTextConnectStr": "ConnectString",
     "DbType": "DbType",
     "TableName": "TableName",

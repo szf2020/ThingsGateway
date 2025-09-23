@@ -18,6 +18,7 @@ using ThingsGateway.Foundation;
 using ThingsGateway.NewLife;
 using ThingsGateway.NewLife.DictionaryExtensions;
 using ThingsGateway.NewLife.Extension;
+using ThingsGateway.NewLife.Threading;
 using ThingsGateway.Plugin.DB;
 using ThingsGateway.SqlSugar;
 
@@ -70,7 +71,82 @@ public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariable
         return $" {nameof(SqlDBProducer)}";
     }
 
+
+
+
 #if !Management
+    protected override List<IScheduledTask> ProtectedGetTasks(CancellationToken cancellationToken)
+    {
+        var list = base.ProtectedGetTasks(cancellationToken);
+        list.Add(ScheduledTaskHelper.GetTask("0/10 * * * * *", DeleteByDayAsync, null, LogMessage, cancellationToken));
+
+        return list;
+    }
+
+    private async Task DeleteByDayAsync(object? state, CancellationToken cancellationToken)
+    {
+        try
+        {
+            using var db = SqlDBBusinessDatabaseUtil.GetDb(_driverPropertys);
+            if (!_driverPropertys.BigTextScriptHistoryTable.IsNullOrEmpty())
+            {
+                var hisModel = CSharpScriptEngineExtension.Do<DynamicSQLBase>(_driverPropertys.BigTextScriptHistoryTable);
+
+                if (_driverPropertys.IsHistoryDB)
+                {
+                    await hisModel.DBDeleteable(db, _driverPropertys.SaveDays, cancellationToken).ConfigureAwait(false);
+
+                }
+            }
+            else
+            {
+                if (_driverPropertys.IsHistoryDB)
+                {
+                    {
+                        var time = TimerX.Now - TimeSpan.FromDays(-_driverPropertys.SaveDays);
+                        var tableNames = db.SplitHelper<SQLHistoryValue>().GetTables();//根据时间获取表名
+                        var filtered = tableNames.Where(a => a.Date < time).ToList();
+                        // 去掉最后一个
+                        var oldTable = filtered.Take(filtered.Count - 1);
+
+                        foreach (var table in oldTable)
+                        {
+                            db.DbMaintenance.DropTable(table.TableName);
+                        }
+                        var deldata = filtered.LastOrDefault();
+                        if (deldata != null)
+                        {
+                            await db.Deleteable<SQLHistoryValue>().AS(deldata.TableName).Where(a => a.CreateTime < time).ExecuteCommandAsync(cancellationToken).ConfigureAwait(false);
+                        }
+                    }
+
+                    {
+                        var time = TimerX.Now - TimeSpan.FromDays(-_driverPropertys.SaveDays);
+                        var tableNames = db.SplitHelper<SQLNumberHistoryValue>().GetTables();//根据时间获取表名
+                        var filtered = tableNames.Where(a => a.Date < time).ToList();
+                        // 去掉最后一个
+                        var oldTable = filtered.Take(filtered.Count - 1);
+
+                        foreach (var table in oldTable)
+                        {
+                            db.DbMaintenance.DropTable(table.TableName);
+                        }
+                        var deldata = filtered.LastOrDefault();
+                        if (deldata != null)
+                        {
+                            await db.Deleteable<SQLNumberHistoryValue>().AS(deldata.TableName).Where(a => a.CreateTime < time).ExecuteCommandAsync(cancellationToken).ConfigureAwait(false);
+                        }
+                    }
+                }
+                LogMessage?.LogInformation($"Clean up historical data from {_driverPropertys.SaveDays} days ago");
+            }
+
+        }
+        catch (Exception ex)
+        {
+            LogMessage?.LogWarning(ex, "Clearing historical data error");
+        }
+    }
 
     public async Task<SqlSugarPagedList<IDBHistoryValue>> GetDBHistoryValuePagesAsync(DBHistoryValuePageInput input)
     {

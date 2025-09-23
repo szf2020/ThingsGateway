@@ -46,6 +46,8 @@ public partial class OpcUaImportVariable
     private IEnumerable<OpcUaTagModel> Nodes;
     private bool ShowSkeleton = true;
 
+
+
     /// <summary>
     /// Opc对象
     /// </summary>
@@ -76,6 +78,17 @@ public partial class OpcUaImportVariable
         }
         await base.OnAfterRenderAsync(firstRender);
     }
+
+    private async Task OnTreeItemClick(TreeViewItem<OpcUaTagModel> item)
+    {
+        if (item?.Value?.Tag?.NodeId != null && Plc != null)
+        {
+            ClickItem = item;
+            NodeAttributes = await Plc.ReadNoteAttributesAsync(ClickItem.Value.NodeId.ToString(), default).ConfigureAwait(false);
+        }
+        await InvokeAsync(StateHasChanged);
+    }
+
 
     /// <summary>
     /// 构建树节点，传入的列表已经是树结构

@@ -16,6 +16,7 @@ using ThingsGateway.Debug;
 using ThingsGateway.Foundation;
 using ThingsGateway.NewLife;
 using ThingsGateway.NewLife.Extension;
+using ThingsGateway.NewLife.Threading;
 using ThingsGateway.SqlSugar;
 
 namespace ThingsGateway.Plugin.DB;
@@ -65,6 +66,44 @@ public partial class SqlHistoryAlarm : BusinessBaseWithCacheAlarm
     }
 
 #if !Management
+    protected override List<IScheduledTask> ProtectedGetTasks(CancellationToken cancellationToken)
+    {
+        var list = base.ProtectedGetTasks(cancellationToken);
+        list.Add(ScheduledTaskHelper.GetTask("0 0 * * *", DeleteByDayAsync, null, LogMessage, cancellationToken));
+
+        return list;
+    }
+    private async Task DeleteByDayAsync(object? state, CancellationToken cancellationToken)
+    {
+        try
+        {
+            using var db = BusinessDatabaseUtil.GetDb((DbType)_driverPropertys.DbType, _driverPropertys.BigTextConnectStr);
+            if (!_driverPropertys.BigTextScriptHistoryTable.IsNullOrEmpty())
+            {
+                var hisModel = CSharpScriptEngineExtension.Do<DynamicSQLBase>(_driverPropertys.BigTextScriptHistoryTable);
+
+                await hisModel.DBDeleteable(db, _driverPropertys.SaveDays, cancellationToken).ConfigureAwait(false);
+            }
+            else
+            {
+                {
+                    var time = TimerX.Now - TimeSpan.FromDays(-_driverPropertys.SaveDays);
+
+                    await db.Deleteable<HistoryAlarm>().Where(a => a.EventTime < time).ExecuteCommandAsync(cancellationToken).ConfigureAwait(false);
+
+                    LogMessage?.LogInformation($"Clean up historical data from {_driverPropertys.SaveDays} days ago");
+                }
+
+            }
+
+        }
+        catch (Exception ex)
+        {
+            LogMessage?.LogWarning(ex, "Clearing historical data error");
+        }
+    }
+
+
     protected override async Task InitChannelAsync(IChannel? channel, CancellationToken cancellationToken)
     {
 

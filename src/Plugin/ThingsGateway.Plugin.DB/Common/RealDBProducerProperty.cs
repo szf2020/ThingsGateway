@@ -33,6 +33,9 @@ public class RealDBProducerProperty : BusinessPropertyWithCacheInterval
     [Required]
     public string StringTableName { get; set; } = "historyStringValue";
 
+    [DynamicProperty]
+    public int SaveDays { get; set; } = 3650;
+
     public string NumberTableNameLow => NumberTableName.ToLower();
     public string StringTableNameLow => StringTableName.ToLower();
 

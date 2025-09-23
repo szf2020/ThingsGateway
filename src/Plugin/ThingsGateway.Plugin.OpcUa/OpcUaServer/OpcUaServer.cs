@@ -112,8 +112,8 @@ public partial class OpcUaServer : BusinessBase
 
         //Utils.SetLogger(new OpcUaLogger(LogMessage)); //调试用途
         m_application = new ApplicationInstance();
-        m_configuration = GetDefaultConfiguration();
-        await m_configuration.Validate(ApplicationType.Server).ConfigureAwait(false);
+        m_configuration = await GetDefaultConfigurationAsync().ConfigureAwait(false);
+        await m_configuration.ValidateAsync(ApplicationType.Server).ConfigureAwait(false);
         m_application.ApplicationConfiguration = m_configuration;
         if (m_configuration.SecurityConfiguration.AutoAcceptUntrustedCertificates)
         {
@@ -121,6 +121,7 @@ public partial class OpcUaServer : BusinessBase
         }
 
         m_server = new(this);
+        await m_server.CreateUserIdentityValidators(m_configuration).ConfigureAwait(false);
     }
     private void UaDispose()
     {
@@ -142,7 +143,7 @@ public partial class OpcUaServer : BusinessBase
                 typeof(EncodeableFactory).GetField("s_globalFactory", BindingFlags.NonPublic | BindingFlags.Static)?.SetValue(null, new EncodeableFactory());
                 typeof(ServiceMessageContext).GetField("s_globalContext", BindingFlags.NonPublic | BindingFlags.Static)?.SetValue(null, typeof(ServiceMessageContext).GetConstructor(BindingFlags.NonPublic | BindingFlags.Instance, null, new Type[] { typeof(bool) }, null).Invoke(new object[] { true }));
 
-                var listeners = m_server.GetValue("m_listeners") as List<ITransportListener>;
+                var listeners = m_server.GetValue("TransportListeners") as List<ITransportListener>;
                 if (listeners != null)
                 {
                     foreach (var item in listeners)
@@ -189,9 +190,9 @@ public partial class OpcUaServer : BusinessBase
     protected override async Task ProtectedStartAsync(CancellationToken cancellationToken)
     {
         // 启动服务器。
-        await m_application.CheckApplicationInstanceCertificates(true, 1200, cancellationToken).ConfigureAwait(false);
+        await m_application.CheckApplicationInstanceCertificatesAsync(true, 1200, cancellationToken).ConfigureAwait(false);
 
-        await m_application.Start(m_server).ConfigureAwait(false);
+        await m_application.StartAsync(m_server).ConfigureAwait(false);
         IdVariableRuntimes.ForEach(a => VariableValueChange(a.Value, a.Value.AdaptVariableBasicData()));
         await base.ProtectedStartAsync(cancellationToken).ConfigureAwait(false);
     }
@@ -205,8 +206,8 @@ public partial class OpcUaServer : BusinessBase
                 try
                 {
                     await Task.Delay(2000, cancellationToken).ConfigureAwait(false);
-                    await m_application.CheckApplicationInstanceCertificates(true, 1200, cancellationToken).ConfigureAwait(false);
-                    await m_application.Start(m_server).ConfigureAwait(false);
+                    await m_application.CheckApplicationInstanceCertificatesAsync(true, 1200, cancellationToken).ConfigureAwait(false);
+                    await m_application.StartAsync(m_server).ConfigureAwait(false);
                     connect_success = true;
                     await Task.Delay(2000, cancellationToken).ConfigureAwait(false);
                     IdVariableRuntimes.ForEach(a => VariableValueChange(a.Value, a.Value.AdaptVariableBasicData()));
@@ -249,7 +250,7 @@ public partial class OpcUaServer : BusinessBase
         }
     }
 
-    private ApplicationConfiguration GetDefaultConfiguration()
+    private async Task<ApplicationConfiguration> GetDefaultConfigurationAsync()
     {
         ApplicationConfiguration config = new();
         var urls = _driverPropertys.OpcUaStringUrl.Split(separator, StringSplitOptions.RemoveEmptyEntries);
@@ -428,7 +429,7 @@ public partial class OpcUaServer : BusinessBase
         config.TraceConfiguration = new TraceConfiguration();
 
         config.CertificateValidator = new CertificateValidator();
-        config.CertificateValidator.Update(config).ConfigureAwait(false);
+        await config.CertificateValidator.UpdateAsync(config).ConfigureAwait(false);
         config.Extensions = new XmlElementCollection();
 
         return config;

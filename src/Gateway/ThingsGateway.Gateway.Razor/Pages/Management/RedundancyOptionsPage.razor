@@ -23,7 +23,7 @@
     LogLevel=a;
     if(LogLevelChanged!=null)
     {
-    await LogLevelChanged?.Invoke(a);
+    await LogLevelChanged.Invoke(a);
     }
     }" LogPath=@LogPath HeaderText=@HeaderText></ThingsGateway.Debug.LogConsole>
 

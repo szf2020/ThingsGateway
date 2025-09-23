@@ -11,6 +11,9 @@
 //修改自https://github.com/dathlin/OpcUaHelper 与OPC基金会net库
 
 using System.Collections.Concurrent;
+#if NET8_0_OR_GREATER
+using System.Collections.Frozen;
+#endif
 
 namespace ThingsGateway.Foundation.OpcUa;
 
@@ -28,7 +31,7 @@ public delegate void LogEventHandler(byte level, object sender, string message, 
 /// <summary>
 /// OpcUaMaster
 /// </summary>
-public class OpcUaMaster : IDisposable, IAsyncDisposable
+public class OpcUaMaster : IAsyncDisposable
 {
     #region 属性，变量等
 
@@ -157,9 +160,9 @@ public class OpcUaMaster : IDisposable, IAsyncDisposable
             },
         };
 
-        certificateValidator.Update(m_configuration);
+        Task.Run(() => certificateValidator.UpdateAsync(m_configuration)).GetAwaiter().GetResult();
 
-        m_configuration.Validate(ApplicationType.Client);
+        Task.Run(() => m_configuration.ValidateAsync(ApplicationType.Client)).GetAwaiter().GetResult();
         m_application.ApplicationConfiguration = m_configuration;
     }
 
@@ -367,19 +370,21 @@ public class OpcUaMaster : IDisposable, IAsyncDisposable
     /// </summary>
     /// <param name="tagParent">方法的父节点tag</param>
     /// <param name="tag">方法的节点tag</param>
+    /// <param name="cancellationToken">cancellationToken</param>
     /// <param name="args">传递的参数</param>
     /// <returns>输出的结果值</returns>
-    public object[] CallMethodByNodeId(string tagParent, string tag, params object[] args)
+    public async Task<IList<object>> CallMethodByNodeIdAsync(string tagParent, string tag, CancellationToken cancellationToken, params object[] args)
     {
         if (m_session == null)
         {
             return null;
         }
 
-        IList<object> outputArguments = m_session.Call(
+        IList<object> outputArguments = await m_session.CallAsync(
             new NodeId(tagParent),
             new NodeId(tag),
-            args);
+            cancellationToken,
+            args).ConfigureAwait(false);
 
         return outputArguments.ToArray();
     }
@@ -395,19 +400,6 @@ public class OpcUaMaster : IDisposable, IAsyncDisposable
     /// <summary>
     /// 断开连接。
     /// </summary>
-    public void Disconnect()
-    {
-        PrivateDisconnect();
-        // disconnect any existing session.
-        if (m_session != null)
-        {
-            m_session = null;
-        }
-    }
-
-    /// <summary>
-    /// 断开连接。
-    /// </summary>
     public async Task DisconnectAsync()
     {
         await PrivateDisconnectAsync().ConfigureAwait(false);
@@ -417,14 +409,7 @@ public class OpcUaMaster : IDisposable, IAsyncDisposable
             m_session = null;
         }
     }
-    /// <inheritdoc/>
-    public void Dispose()
-    {
-        Disconnect();
-        _variableDicts?.Clear();
-        _subscriptionDicts?.Clear();
-        waitLock?.Dispose();
-    }
+
     public async ValueTask DisposeAsync()
     {
         await DisconnectAsync().ConfigureAwait(false);
@@ -573,8 +558,9 @@ public class OpcUaMaster : IDisposable, IAsyncDisposable
     /// 读取一个节点的所有属性
     /// </summary>
     /// <param name="tag">节点信息</param>
+    /// <param name="cancellationToken">cancellationToken</param>
     /// <returns>节点的特性值</returns>
-    public OPCNodeAttribute[] ReadNoteAttributes(string tag)
+    public async Task<OPCNodeAttribute[]> ReadNoteAttributesAsync(string tag, CancellationToken cancellationToken)
     {
         NodeId sourceId = new(tag);
         ReadValueIdCollection nodesToRead = new();
@@ -608,7 +594,7 @@ public class OpcUaMaster : IDisposable, IAsyncDisposable
         };
 
         // fetch property references from the server.
-        ReferenceDescriptionCollection references = OpcUaUtils.Browse(m_session, nodesToBrowse, false);
+        ReferenceDescriptionCollection references = await OpcUaUtils.BrowseAsync(m_session, nodesToBrowse, false, cancellationToken).ConfigureAwait(false);
 
         if (references == null)
         {
@@ -631,15 +617,15 @@ public class OpcUaMaster : IDisposable, IAsyncDisposable
             nodesToRead.Add(nodeToRead);
         }
 
-        // read all values.
-
-        m_session.Read(
-            null,
-            0,
-            TimestampsToReturn.Neither,
-            nodesToRead,
-            out DataValueCollection results,
-            out DiagnosticInfoCollection diagnosticInfos);
+        // 读取当前的值
+        var result = await m_session.ReadAsync(
+             null,
+             0,
+             TimestampsToReturn.Neither,
+             nodesToRead,
+             cancellationToken).ConfigureAwait(false);
+        var results = result.Results;
+        var diagnosticInfos = result.DiagnosticInfos;
 
         ClientBase.ValidateResponse(results, nodesToRead);
         ClientBase.ValidateDiagnosticInfos(diagnosticInfos, nodesToRead);
@@ -661,7 +647,7 @@ public class OpcUaMaster : IDisposable, IAsyncDisposable
                 }
 
                 // get the name of the attribute.
-                item.Name = Attributes.GetBrowseName(nodesToRead[ii].AttributeId);
+                item.Name = GetBrowseName(nodesToRead[ii].AttributeId);
 
                 // display any unexpected error.
                 if (StatusCode.IsBad(results[ii].StatusCode))
@@ -726,7 +712,34 @@ public class OpcUaMaster : IDisposable, IAsyncDisposable
 
         return nodeAttribute.ToArray();
     }
+    /// <summary>
+    /// Returns the browse name for the attribute.
+    /// </summary>
+    public static string GetBrowseName(uint identifier)
+    {
+        return s_attributesIdToName.Value.TryGetValue(identifier, out string name)
+            ? name : string.Empty;
+    }
+    /// <summary>
+    /// Creates a dictionary of identifiers to browse names for the attributes.
+    /// </summary>
+    private static readonly Lazy<IReadOnlyDictionary<long, string>> s_attributesIdToName =
+        new(() =>
+        {
+            System.Reflection.FieldInfo[] fields = typeof(Attributes).GetFields(
+                System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
 
+            var keyValuePairs = new Dictionary<long, string>();
+            foreach (System.Reflection.FieldInfo field in fields)
+            {
+                keyValuePairs.TryAdd(Convert.ToInt64(field.GetValue(typeof(Attributes))), field.Name);
+            }
+#if NET8_0_OR_GREATER
+            return keyValuePairs.ToFrozenDictionary();
+#else
+            return new System.Collections.ObjectModel.ReadOnlyDictionary<long, string>(keyValuePairs);
+#endif
+        });
     /// <summary>
     /// 移除所有的订阅消息
     /// </summary>
@@ -825,7 +838,7 @@ public class OpcUaMaster : IDisposable, IAsyncDisposable
             {
                 foreach (var value in monitoreditem.DequeueValues())
                 {
-                    var variableNode = ReadNode(monitoreditem.StartNodeId.ToString(), false, StatusCode.IsGood(value.StatusCode));
+                    var variableNode = ReadNode(monitoreditem.StartNodeId.ToString(), false, StatusCode.IsGood(value.StatusCode)).GetAwaiter().GetResult();
 
                     if (value.Value != null)
                     {
@@ -861,7 +874,7 @@ public class OpcUaMaster : IDisposable, IAsyncDisposable
     /// <returns></returns>
     public async Task CheckApplicationInstanceCertificate()
     {
-        await m_application.CheckApplicationInstanceCertificates(true, 1200).ConfigureAwait(false);
+        await m_application.CheckApplicationInstanceCertificatesAsync(true, 1200).ConfigureAwait(false);
     }
 
     SemaphoreSlim waitLock = new(1, 1);
@@ -910,11 +923,12 @@ public class OpcUaMaster : IDisposable, IAsyncDisposable
             }
             //创建本地证书
             if (useSecurity)
-                await m_application.CheckApplicationInstanceCertificates(true, 1200, cancellationToken).ConfigureAwait(false);
+                await m_application.CheckApplicationInstanceCertificatesAsync(true, 1200, cancellationToken).ConfigureAwait(false);
 
-            m_session = await Opc.Ua.Client.Session.Create(
-
+            m_session = await Opc.Ua.Client.Session.CreateAsync(
+                DefaultSessionFactory.Instance,
             m_configuration,
+            (ITransportWaitingConnection)null,
             endpoint,
             false,
             OpcUaProperty.CheckDomain,
@@ -940,29 +954,6 @@ public class OpcUaMaster : IDisposable, IAsyncDisposable
         }
     }
 
-    private void PrivateDisconnect()
-    {
-        bool state = m_session?.Connected == true;
-
-        if (m_reConnectHandler != null)
-        {
-            try { m_reConnectHandler.Dispose(); } catch { }
-            m_reConnectHandler = null;
-        }
-        if (m_session != null)
-        {
-            m_session.KeepAlive -= Session_KeepAlive;
-            m_session.Close(10000);
-            m_session.Dispose();
-            m_session = null;
-        }
-
-        if (state)
-        {
-            Log(2, null, "Disconnected");
-            DoConnectComplete(false);
-        }
-    }
     private async Task PrivateDisconnectAsync()
     {
         bool state = m_session?.Connected == true;
@@ -1035,7 +1026,7 @@ public class OpcUaMaster : IDisposable, IAsyncDisposable
     /// <summary>
     /// 从服务器或缓存读取节点
     /// </summary>
-    private VariableNode ReadNode(string nodeIdStr, bool isOnlyServer = true, bool cache = true)
+    private async Task<VariableNode> ReadNode(string nodeIdStr, bool isOnlyServer = true, bool cache = true, CancellationToken cancellationToken = default)
     {
         if (!isOnlyServer)
         {
@@ -1061,16 +1052,17 @@ public class OpcUaMaster : IDisposable, IAsyncDisposable
         }
 
         // read from server.
-        DataValueCollection values = null;
-        DiagnosticInfoCollection diagnosticInfos = null;
 
-        ResponseHeader responseHeader = m_session.Read(
-            null,
-            0,
-            TimestampsToReturn.Neither,
-            itemsToRead,
-            out values,
-            out diagnosticInfos);
+        var result = await m_session.ReadAsync(
+             null,
+             0,
+             TimestampsToReturn.Neither,
+             itemsToRead,
+             cancellationToken).ConfigureAwait(false);
+        var values = result.Results;
+        var diagnosticInfos = result.DiagnosticInfos;
+        var responseHeader = result.ResponseHeader;
+
 
         VariableNode variableNode = GetVariableNodes(itemsToRead, values, diagnosticInfos, responseHeader).FirstOrDefault();
 
@@ -1121,7 +1113,7 @@ public class OpcUaMaster : IDisposable, IAsyncDisposable
         VariableNode variableNode = GetVariableNodes(itemsToRead, values, diagnosticInfos, responseHeader).FirstOrDefault();
 
         if (OpcUaProperty.LoadType && variableNode.DataType != NodeId.Null && (await TypeInfo.GetBuiltInTypeAsync(variableNode.DataType, m_session.SystemContext.TypeTable, cancellationToken).ConfigureAwait(false)) == BuiltInType.ExtensionObject)
-            await typeSystem.LoadType(variableNode.DataType, ct: cancellationToken).ConfigureAwait(false);
+            await typeSystem.LoadTypeAsync(variableNode.DataType, ct: cancellationToken).ConfigureAwait(false);
 
         if (cache)
             _variableDicts.AddOrUpdate(nodeIdStr, a => variableNode, (a, b) => variableNode);
@@ -1222,7 +1214,7 @@ public class OpcUaMaster : IDisposable, IAsyncDisposable
                         _variableDicts.AddOrUpdate(nodeIdStrs[i], a => node, (a, b) => node);
                     if (node.DataType != NodeId.Null && (await TypeInfo.GetBuiltInTypeAsync(node.DataType, m_session.SystemContext.TypeTable, cancellationToken).ConfigureAwait(false)) == BuiltInType.ExtensionObject)
                     {
-                        await typeSystem.LoadType(node.DataType, ct: cancellationToken).ConfigureAwait(false);
+                        await typeSystem.LoadTypeAsync(node.DataType, ct: cancellationToken).ConfigureAwait(false);
                     }
                 }
                 result.Add(node);
@@ -1314,7 +1306,7 @@ public class OpcUaMaster : IDisposable, IAsyncDisposable
                     continue;
                 }
 
-                item.Name = Attributes.GetBrowseName(nodesToRead[ii].AttributeId);
+                item.Name = GetBrowseName(nodesToRead[ii].AttributeId);
                 if (StatusCode.IsBad(nodeValue.StatusCode))
                 {
                     item.Type = Utils.Format("{0}", Attributes.GetDataTypeId(nodesToRead[ii].AttributeId));
