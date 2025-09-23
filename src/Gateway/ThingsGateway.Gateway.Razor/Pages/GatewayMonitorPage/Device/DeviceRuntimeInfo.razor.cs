@@ -12,6 +12,13 @@ namespace ThingsGateway.Gateway.Razor;
 
 public partial class DeviceRuntimeInfo
 {
+
+#if !Management
+    private string Height { get; set; } = "calc(100% - 300px)";
+#else
+    private string Height { get; set; } = "calc(100% - 330px)";
+#endif
+
     [Parameter, EditorRequired]
     public DeviceRuntime DeviceRuntime { get; set; }
 
