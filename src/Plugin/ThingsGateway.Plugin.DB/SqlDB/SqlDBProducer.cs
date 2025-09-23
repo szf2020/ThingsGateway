@@ -78,7 +78,7 @@ public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariable
     protected override List<IScheduledTask> ProtectedGetTasks(CancellationToken cancellationToken)
     {
         var list = base.ProtectedGetTasks(cancellationToken);
-        list.Add(ScheduledTaskHelper.GetTask("0/10 * * * * *", DeleteByDayAsync, null, LogMessage, cancellationToken));
+        list.Add(ScheduledTaskHelper.GetTask("0 0 * * *", DeleteByDayAsync, null, LogMessage, cancellationToken));
 
         return list;
     }
