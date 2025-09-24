@@ -212,10 +212,13 @@ public class OpcUaMaster : IAsyncDisposable
     /// </summary>
     public ApplicationConfiguration AppConfig => m_configuration;
 
+
     /// <summary>
     /// 连接状态
     /// </summary>
-    public bool Connected => m_session?.Connected == true;
+    public bool Connected => m_session?.Connected == true && connected;
+
+    private bool connected = false;
 
     /// <summary>
     /// OpcUaMaster
@@ -403,11 +406,7 @@ public class OpcUaMaster : IAsyncDisposable
     public async Task DisconnectAsync()
     {
         await PrivateDisconnectAsync().ConfigureAwait(false);
-        // disconnect any existing session.
-        if (m_session != null)
-        {
-            m_session = null;
-        }
+
     }
 
     public async ValueTask DisposeAsync()
@@ -937,6 +936,7 @@ public class OpcUaMaster : IAsyncDisposable
             userIdentity,
             null, cancellationToken
             ).ConfigureAwait(false);
+            connected = true;
 
             m_session.KeepAliveInterval = OpcUaProperty.KeepAliveInterval == 0 ? 60000 : OpcUaProperty.KeepAliveInterval;
             m_session.KeepAlive += Session_KeepAlive;
@@ -958,6 +958,7 @@ public class OpcUaMaster : IAsyncDisposable
     {
         bool state = m_session?.Connected == true;
 
+        connected = false;
         if (m_reConnectHandler != null)
         {
             try { m_reConnectHandler.Dispose(); } catch { }
@@ -1353,6 +1354,8 @@ public class OpcUaMaster : IAsyncDisposable
     {
         try
         {
+            Log(2, null, "Reconnected : success");
+
             if (!Object.ReferenceEquals(sender, m_reConnectHandler))
             {
                 return;
@@ -1366,6 +1369,8 @@ public class OpcUaMaster : IAsyncDisposable
                 {
                     var session = m_session;
                     m_session = m_reConnectHandler.Session;
+                    connected = true;
+
                     Utils.SilentDispose(session);
                 }
             }
@@ -1393,6 +1398,8 @@ public class OpcUaMaster : IAsyncDisposable
 
             if (ServiceResult.IsBad(e.Status))
             {
+                connected = false;
+
                 if (m_reConnectHandler == null)
                 {
                     Log(3, null, "Reconnecting : {0}", e.Status.ToString());
