@@ -330,6 +330,12 @@ internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
                         driver.IsInitSuccess = false;
                     LogMessage?.LogWarning(ex, string.Format(AppResource.InitFail, CurrentChannel.PluginName, driver?.DeviceName));
                 }
+                if (driver == null)
+                {
+                    LogMessage?.LogWarning(string.Format(AppResource.InitFail, CurrentChannel.PluginName, driver?.DeviceName));
+                    return;
+                }
+
                 if (driver?.DeviceId > 0)
                 {
                     if (CancellationTokenSources.TryGetValue(driver.DeviceId, out var oldCts))

@@ -121,7 +121,7 @@ public class Device : BaseDataEntity, IValidatableObject
     /// </summary>
     [SugarColumn(ColumnDescription = "冗余扫描间隔")]
     [AutoGenerateColumn(Visible = true, Filterable = true, Sortable = true)]
-    [MinValue(30000)]
+    [MinValue(10000)]
     public virtual int RedundantScanIntervalTime { get; set; } = 30000;
 
     /// <summary>

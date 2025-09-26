@@ -27,8 +27,6 @@ namespace ThingsGateway.Foundation;
 [SimpleJob(RuntimeMoniker.Net80)]
 //[SimpleJob(RuntimeMoniker.Net10_0)]
 [MemoryDiagnoser]
-[BaselineColumn]
-[RankColumn]
 public class S7Benchmark : IDisposable
 {
     private List<SiemensS7Master> siemensS7s = new();
