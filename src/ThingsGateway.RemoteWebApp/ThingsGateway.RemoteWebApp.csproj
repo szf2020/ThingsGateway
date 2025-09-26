@@ -28,7 +28,7 @@
 
 
 	<PropertyGroup>
-		<TargetFrameworks>net8.0;net9.0;</TargetFrameworks>
+		<TargetFrameworks>net8.0;$(OtherTargetFrameworks);</TargetFrameworks>
 		<CustomTargetFramework>$(TargetFramework)</CustomTargetFramework>
 		<OutputType>WinExe</OutputType>
 		<OpenApiGenerateDocuments>false</OpenApiGenerateDocuments>

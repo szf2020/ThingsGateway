@@ -10,6 +10,7 @@
 
 
 namespace ThingsGateway.Gateway.Razor;
+
 public enum ChannelDevicePluginTypeEnum
 {
     PluginType,

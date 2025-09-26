@@ -282,6 +282,7 @@ public class OpcDaMaster : IDisposable
         {
             if (IsExit == 1) return;
             var opcGroups = Groups.Where(it => it.OpcItems.Any(a => a.ItemID == item));
+
             foreach (var opcGroup in opcGroups.ToArray())
             {
                 var tag = opcGroup.OpcItems.Where(a => item == a.ItemID);

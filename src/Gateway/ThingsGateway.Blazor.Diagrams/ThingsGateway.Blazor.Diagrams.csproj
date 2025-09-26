@@ -3,7 +3,7 @@
 	<Import Project="..\..\PackNuget.props" />
 
 	<PropertyGroup>
-		<TargetFrameworks>net8.0;net9.0</TargetFrameworks>
+		<TargetFrameworks>net8.0;$(OtherTargetFrameworks);</TargetFrameworks>
 		
 		<!--<UseRazorSourceGenerator>false</UseRazorSourceGenerator>-->
 	</PropertyGroup>
@@ -22,9 +22,9 @@
 		<PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="$(NET8Version)" />
 		<PackageReference Include="Microsoft.AspNetCore.Components" Version="$(NET8Version)" />
 	</ItemGroup>
-	<ItemGroup Condition=" '$(TargetFramework)' == 'net9.0' ">
-		<PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="$(NET9Version)" />
-		<PackageReference Include="Microsoft.AspNetCore.Components" Version="$(NET9Version)" />
+	<ItemGroup Condition=" '$(TargetFramework)' == 'net10.0' ">
+		<PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="$(NET10Version)" />
+		<PackageReference Include="Microsoft.AspNetCore.Components" Version="$(NET10Version)" />
 
 	</ItemGroup>
 	<ItemGroup>

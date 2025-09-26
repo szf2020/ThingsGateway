@@ -13,6 +13,7 @@ using System.ComponentModel.DataAnnotations;
 using ThingsGateway.ConfigurableOptions;
 
 namespace ThingsGateway.Gateway.Application;
+
 public class ManagementOptions
 {
     public bool Enable { get; set; }

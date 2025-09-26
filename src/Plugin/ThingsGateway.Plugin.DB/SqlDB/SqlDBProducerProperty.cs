@@ -13,6 +13,7 @@ using BootstrapBlazor.Components;
 using System.ComponentModel.DataAnnotations;
 
 namespace ThingsGateway.Plugin.SqlDB;
+
 public enum DbType
 {
     MySql = 0,

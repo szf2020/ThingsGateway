@@ -817,7 +817,7 @@ namespace ThingsGateway.SqlSugar
         {
             if (whereClassTypes.HasValue())
             {
-                var columns = this.Context.EntityMaintenance.GetEntityInfo<T>().Columns.Where(it => whereColumns.Any(x => x == it.PropertyName) || whereColumns.Any(x => x.EqualCase(it.DbColumnName)));
+                var columns = this.Context.EntityMaintenance.GetEntityInfo<T>().Columns.Where(it => whereColumns.Contains(it.PropertyName) || whereColumns.Contains(it.DbColumnName));
                 Check.Exception(columns?.Any() != true, "{0} no primary key, Can not use whereColumns ", typeof(T).Name);
                 Check.Exception(this.QueryBuilder.IsSingle() == false, "No support join query");
                 List<IConditionalModel> whereModels = new List<IConditionalModel>();
@@ -1482,8 +1482,9 @@ namespace ThingsGateway.SqlSugar
             }
             if (sql.StartsWith("*,"))
             {
+                var propertys = typeof(TResult).GetProperties().Select(a => a.Name).ToHashSet(StringComparer.OrdinalIgnoreCase);
                 var columns = this.Context.EntityMaintenance.GetEntityInfo<T>()
-                         .Columns.Where(it => typeof(TResult).GetProperties().Any(s => s.Name.EqualCase(it.PropertyName))).Where(it => it.IsIgnore == false);
+                         .Columns.Where(it => propertys.Contains(it.PropertyName) && it.IsIgnore == false);
                 if (columns.Any())
                 {
                     sql = string.Join(",", columns.Select(it => $"{SqlBuilder.GetTranslationColumnName(it.DbColumnName)} AS  {SqlBuilder.GetTranslationColumnName(it.PropertyName)} "))
@@ -1528,7 +1529,8 @@ namespace ThingsGateway.SqlSugar
                     {
                         var columnAarray = this.Context.EntityMaintenance.GetEntityInfo<T>().Columns;
                         var sql = string.Empty;
-                        var columns = columnAarray.Where(it => typeof(TResult).GetProperties().Any(s => s.Name.EqualCase(it.PropertyName))).Where(it => it.IsIgnore == false);
+                        var propertys = typeof(TResult).GetProperties().Select(a => a.Name).ToHashSet(StringComparer.OrdinalIgnoreCase);
+                        var columns = columnAarray.Where(it => propertys.Contains(it.PropertyName) && it.IsIgnore == false);
                         if (columns.Any())
                         {
                             sql = string.Join(",", columns.Select(it => $"{SqlBuilder.GetTranslationColumnName(it.DbColumnName)} AS  {SqlBuilder.GetTranslationColumnName(it.PropertyName)} "));

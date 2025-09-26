@@ -79,16 +79,20 @@ public class SqlDBDateSplitTableService : DateSplitTableService
     #endregion Private Models
 
     #region Common Helper
+    private static readonly Regex _yearRegex = new Regex(@"\{year\}");
+    private static readonly Regex _monthRegex = new Regex(@"\{month\}");
+    private static readonly Regex _dayRegex = new Regex(@"\{day\}");
+    private static readonly Regex _regex = new Regex(@"\d\{|\}\d");
 
     private static void CheckTableName(string dbTableName)
     {
         Check.Exception(!dbTableName.Contains("{year}"), "table name need {{year}}", "分表表名需要占位符 {{year}}");
         Check.Exception(!dbTableName.Contains("{month}"), "table name need {{month}}", "分表表名需要占位符 {{month}} ");
         Check.Exception(!dbTableName.Contains("{day}"), "table name need {{day}}", "分表表名需要占位符{{day}}");
-        Check.Exception(Regex.Matches(dbTableName, @"\{year\}").Count > 1, " There can only be one {{year}}", " 只能有一个 {{year}}");
-        Check.Exception(Regex.Matches(dbTableName, @"\{month\}").Count > 1, "There can only be one {{month}}", "只能有一个 {{month}} ");
-        Check.Exception(Regex.Matches(dbTableName, @"\{day\}").Count > 1, "There can only be one {{day}}", "只能有一个{{day}}");
-        Check.Exception(Regex.IsMatch(dbTableName, @"\d\{|\}\d"), " '{{' or  '}}'  can't be numbers nearby", "占位符相令一位不能是数字,比如 : 1{{day}}2 错误 , 正确: 1_{{day}}_2");
+        Check.Exception(_yearRegex.Count(dbTableName) > 1, " There can only be one {{year}}", " 只能有一个 {{year}}");
+        Check.Exception(_monthRegex.Count(dbTableName) > 1, "There can only be one {{month}}", "只能有一个 {{month}} ");
+        Check.Exception(_dayRegex.Count(dbTableName) > 1, "There can only be one {{day}}", "只能有一个{{day}}");
+        Check.Exception(_regex.IsMatch(dbTableName), " '{{' or  '}}'  can't be numbers nearby", "占位符相令一位不能是数字,比如 : 1{{day}}2 错误 , 正确: 1_{{day}}_2");
     }
 
     private static DateTime GetDate(string group1, string group2, string group3, string dbTableName)

@@ -377,7 +377,7 @@ namespace ThingsGateway.SqlSugar
         }
         private static string GetTreeKey(EntityInfo entity)
         {
-            Check.Exception(entity.Columns.Where(it => it.IsPrimarykey || it.IsTreeKey).Any(), "need IsPrimary=true Or IsTreeKey=true");
+            Check.Exception(entity.Columns.Any(it => it.IsPrimarykey || it.IsTreeKey), "need IsPrimary=true Or IsTreeKey=true");
             string pk = entity.Columns.Where(it => it.IsTreeKey).FirstOrDefault()?.PropertyName;
             if (pk == null)
                 pk = entity.Columns.Where(it => it.IsPrimarykey).FirstOrDefault()?.PropertyName;
@@ -640,7 +640,7 @@ namespace ThingsGateway.SqlSugar
                 {
                     navName = ExpressionTool.GetFirstTypeNameFromExpression(FirstExp);
                 }
-                var navColumn = entityColumns.Where(it => it.IsPrimarykey == false).Where(it => it.Navigat != null).FirstOrDefault(it => it.PropertyName == navName);
+                var navColumn = entityColumns.Where(it => it.IsPrimarykey == false && it.Navigat != null).FirstOrDefault(it => it.PropertyName == navName);
                 if (navColumn != null && navColumn.Navigat.NavigatType != NavigateType.ManyToMany)
                 {
                     var name1 = navColumn.Navigat.Name;

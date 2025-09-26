@@ -25,7 +25,7 @@
 
 		<GenerateDocumentationFile>false</GenerateDocumentationFile>
 
-		<TargetFrameworks>net8.0;net9.0;</TargetFrameworks>
+		<TargetFrameworks>net8.0;$(OtherTargetFrameworks);</TargetFrameworks>
 		<CustomTargetFramework>$(TargetFramework)</CustomTargetFramework>
 		<OpenApiGenerateDocuments>false</OpenApiGenerateDocuments>
 		<SatelliteResourceLanguages>zh-Hans;en-US</SatelliteResourceLanguages>

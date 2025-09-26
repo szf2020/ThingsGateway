@@ -716,7 +716,7 @@ namespace ThingsGateway.SqlSugar
         #region Insertable
         public IInsertable<Dictionary<string, object>> InsertableByDynamic(object insertDynamicObject)
         {
-            return this.Insertable<Dictionary<string, object>>(insertDynamicObject);
+            return this.InsertableT<Dictionary<string, object>>(insertDynamicObject);
         }
         public InsertMethodInfo InsertableByObject(object singleEntityObjectOrListObject)
         {
@@ -735,9 +735,7 @@ namespace ThingsGateway.SqlSugar
                 }
 
                 var methods = this.Context.GetType().GetMethods()
-               .Where(it => it.Name == "Insertable")
-               .Where(it => it.GetGenericArguments().Length != 0)
-               .Where(it => it.GetParameters().Any(z => z.ParameterType.Name.StartsWith("IReadOnlyCollection")))
+               .Where(it => it.Name == "Insertable" && it.GetGenericArguments().Length != 0 && it.GetParameters().Any(z => z.ParameterType.Name.StartsWith("IReadOnlyCollection")))
                ;
                 var method = methods.Single().MakeGenericMethod(newList.GetType().GetGenericArguments().First());
                 InsertMethodInfo result = new InsertMethodInfo()
@@ -751,9 +749,7 @@ namespace ThingsGateway.SqlSugar
             else
             {
                 var methods = this.Context.GetType().GetMethods()
-                    .Where(it => it.Name == "InsertableT" || it.Name == "Insertable")
-                    .Where(it => it.GetGenericArguments().Length != 0)
-                    .Where(it => it.GetParameters().Any(z => z.ParameterType.Name == "T"));
+                    .Where(it => (it.Name == "InsertableT" || it.Name == "Insertable") && it.GetGenericArguments().Length != 0 && it.GetParameters().Any(z => z.ParameterType.Name == "T"));
                 var method = methods.Single().MakeGenericMethod(singleEntityObjectOrListObject.GetType());
 
                 InsertMethodInfo result = new InsertMethodInfo()
@@ -790,7 +786,7 @@ namespace ThingsGateway.SqlSugar
             var columns = columnDictionary.Select(it => it.Key).ToList();
             return this.Context.InsertableT(insertObject).InsertColumns(columns);
         }
-        public virtual IInsertable<T> Insertable<T>(dynamic insertDynamicObject) where T : class, new()
+        public virtual IInsertable<T> InsertableT<T>(object insertDynamicObject) where T : class, new()
         {
             InitMappingInfo<T>();
             if (insertDynamicObject is T)
@@ -799,7 +795,7 @@ namespace ThingsGateway.SqlSugar
             }
             else
             {
-                var columns = ((object)insertDynamicObject).GetType().GetProperties().Select(it => it.Name).ToList();
+                var columns = (insertDynamicObject).GetType().GetProperties().Select(it => it.Name).ToList();
                 Check.Exception(columns.IsNullOrEmpty(), "Insertable.updateDynamicObject can't be null");
                 T insertObject = this.Context.Utilities.DeserializeObject<T>(this.Context.Utilities.SerializeObject(insertDynamicObject));
                 return this.Context.InsertableT(insertObject).InsertColumns(columns);
@@ -824,9 +820,7 @@ namespace ThingsGateway.SqlSugar
                     newList.Add(item);
                 }
                 var methods = this.Context.GetType().GetMethods()
-               .Where(it => it.Name == "Deleteable")
-               .Where(it => it.GetGenericArguments().Length != 0)
-               .Where(it => it.GetParameters().Any(z => z.Name != "pkValue" && z.ParameterType.Name.StartsWith("IReadOnlyCollection")));
+               .Where(it => it.Name == "Deleteable" && it.GetGenericArguments().Length != 0 && it.GetParameters().Any(z => z.Name != "pkValue" && z.ParameterType.Name.StartsWith("IReadOnlyCollection")));
                 var method = methods.FirstOrDefault().MakeGenericMethod(newList.GetType().GetGenericArguments().FirstOrDefault());
                 DeleteMethodInfo result = new DeleteMethodInfo()
                 {
@@ -839,9 +833,7 @@ namespace ThingsGateway.SqlSugar
             else
             {
                 var methods = this.Context.GetType().GetMethods()
-                    .Where(it => it.Name == "Deleteable" || it.Name == "DeleteableT")
-                    .Where(it => it.GetGenericArguments().Length != 0)
-                    .Where(it => it.GetParameters().Any(z => z.ParameterType.Name == "T"));
+                    .Where(it => (it.Name == "Deleteable" || it.Name == "DeleteableT") && it.GetGenericArguments().Length != 0 && it.GetParameters().Any(z => z.ParameterType.Name == "T"));
                 var method = methods.Single().MakeGenericMethod(singleEntityObjectOrListObject.GetType());
                 DeleteMethodInfo result = new DeleteMethodInfo()
                 {
@@ -867,17 +859,36 @@ namespace ThingsGateway.SqlSugar
             InitMappingInfo<T>();
             return this.Context.Deleteable<T>().Where(expression);
         }
-        public virtual IDeleteable<T> DeleteableById<T>(dynamic primaryKeyValue) where T : class, new()
+        public virtual IDeleteable<T> DeleteableById<T>(object primaryKeyValue) where T : class, new()
         {
             InitMappingInfo<T>();
-            return this.Context.Deleteable<T>().In(primaryKeyValue);
+            return this.Context.Deleteable<T>().In([primaryKeyValue]);
         }
 
-        public virtual IDeleteable<T> DeleteableById<T>(IReadOnlyCollection<dynamic> pkValue) where T : class, new()
+        public virtual IDeleteable<T> DeleteableById<T>(IReadOnlyCollection<object> pkValue) where T : class, new()
         {
             InitMappingInfo<T>();
             return this.Context.Deleteable<T>().In(pkValue);
         }
+
+        public virtual IDeleteable<T> DeleteableById<T>(Expression<Func<T, object>> inField, object primaryKeyValue) where T : class, new()
+        {
+            InitMappingInfo<T>();
+            return this.Context.Deleteable<T>().InT(inField, primaryKeyValue);
+        }
+        public virtual IDeleteable<T> DeleteableById<T>(Expression<Func<T, object>> inField, IReadOnlyCollection<object> primaryKeyValue) where T : class, new()
+        {
+            InitMappingInfo<T>();
+            return this.Context.Deleteable<T>().In(inField, primaryKeyValue);
+        }
+        public virtual IDeleteable<T> DeleteableById<T>(Expression<Func<T, object>> inField, ISugarQueryable<object> primaryKeyValue) where T : class, new()
+        {
+            InitMappingInfo<T>();
+            return this.Context.Deleteable<T>().In(inField, primaryKeyValue);
+        }
+
+
+
         public virtual IDeleteable<T> DeleteableT<T>(T deleteObj) where T : class, new()
         {
             InitMappingInfo<T>();
@@ -907,9 +918,7 @@ namespace ThingsGateway.SqlSugar
                     newList.Add(item);
                 }
                 var methods = this.Context.GetType().GetMethods()
-               .Where(it => it.Name == "Updateable")
-               .Where(it => it.GetGenericArguments().Length != 0)
-               .Where(it => it.GetParameters().Any(z => z.ParameterType.Name.StartsWith("IReadOnlyCollection")));
+               .Where(it => it.Name == "Updateable" && it.GetGenericArguments().Length != 0 && it.GetParameters().Any(z => z.ParameterType.Name.StartsWith("IReadOnlyCollection")));
                 var method = methods.Single().MakeGenericMethod(newList.GetType().GetGenericArguments().First());
                 UpdateMethodInfo result = new UpdateMethodInfo()
                 {
@@ -922,9 +931,7 @@ namespace ThingsGateway.SqlSugar
             else
             {
                 var methods = this.Context.GetType().GetMethods()
-                    .Where(it => it.Name == "UpdateableT" || it.Name == "Updateable")
-                    .Where(it => it.GetGenericArguments().Length != 0)
-                    .Where(it => it.GetParameters().Any(z => z.ParameterType.Name == "T"));
+                    .Where(it => (it.Name == "UpdateableT" || it.Name == "Updateable") && it.GetGenericArguments().Length != 0 && it.GetParameters().Any(z => z.ParameterType.Name == "T"));
                 var method = methods.Single().MakeGenericMethod(singleEntityObjectOrListObject.GetType());
                 UpdateMethodInfo result = new UpdateMethodInfo()
                 {
@@ -939,9 +946,7 @@ namespace ThingsGateway.SqlSugar
         {
             UpdateExpressionMethodInfo result = new UpdateExpressionMethodInfo();
             var methods = this.Context.GetType().GetMethods()
-             .Where(it => it.Name == "UpdateableT" || it.Name == "Updateable")
-             .Where(it => it.GetGenericArguments().Length != 0)
-             .Where(it => it.GetParameters().Length == 0);
+             .Where(it => (it.Name == "UpdateableT" || it.Name == "Updateable") && it.GetGenericArguments().Length != 0 && it.GetParameters().Length == 0);
             var method = methods.Single().MakeGenericMethod(entityType);
             result.Context = this.Context;
             result.MethodInfo = method;
@@ -993,7 +998,7 @@ namespace ThingsGateway.SqlSugar
 
         public IUpdateable<Dictionary<string, object>> UpdateableByDynamic(object updateDynamicObject)
         {
-            return this.Updateable<Dictionary<string, object>>(updateDynamicObject);
+            return this.UpdateableT<Dictionary<string, object>>(updateDynamicObject);
         }
 
         public virtual IUpdateable<T> Updateable<T>(Dictionary<string, object> columnDictionary) where T : class, new()
@@ -1004,7 +1009,7 @@ namespace ThingsGateway.SqlSugar
             var columns = columnDictionary.Select(it => it.Key).ToList();
             return this.Context.UpdateableT(updateObject).UpdateColumns(columns);
         }
-        public virtual IUpdateable<T> Updateable<T>(dynamic updateDynamicObject) where T : class, new()
+        public virtual IUpdateable<T> UpdateableT<T>(object updateDynamicObject) where T : class, new()
         {
             InitMappingInfo<T>();
             if (updateDynamicObject is T)
@@ -1013,7 +1018,7 @@ namespace ThingsGateway.SqlSugar
             }
             else
             {
-                var columns = ((object)updateDynamicObject).GetType().GetProperties().Select(it => it.Name).ToList();
+                var columns = (updateDynamicObject).GetType().GetProperties().Select(it => it.Name).ToList();
                 Check.Exception(columns.IsNullOrEmpty(), "Updateable.updateDynamicObject can't be null");
                 T updateObject = this.Context.Utilities.DeserializeObject<T>(this.Context.Utilities.SerializeObject(updateDynamicObject));
                 return this.Context.UpdateableT(updateObject).UpdateColumns(columns);
@@ -1102,9 +1107,7 @@ namespace ThingsGateway.SqlSugar
                     newList.Add(item);
                 }
                 var methods = this.Context.GetType().GetMethods()
-               .Where(it => it.Name == "Storageable")
-               .Where(it => it.GetGenericArguments().Length != 0)
-               .Where(it => it.GetParameters().Any(z => z.ParameterType.Name.StartsWith("IEnumerable")));
+               .Where(it => it.Name == "Storageable" && it.GetGenericArguments().Length != 0 && it.GetParameters().Any(z => z.ParameterType.Name.StartsWith("IEnumerable")));
                 var method = methods.Single().MakeGenericMethod(newList.GetType().GetGenericArguments().First());
                 StorageableMethodInfo result = new StorageableMethodInfo()
                 {
@@ -1117,9 +1120,7 @@ namespace ThingsGateway.SqlSugar
             else
             {
                 var methods = this.Context.GetType().GetMethods()
-                    .Where(it => it.Name == "StorageableT" || it.Name == "Storageable")
-                    .Where(it => it.GetGenericArguments().Length != 0)
-                    .Where(it => it.GetParameters().Any(z => z.ParameterType.Name == "T"));
+                    .Where(it => (it.Name == "StorageableT" || it.Name == "Storageable") && it.GetGenericArguments().Length != 0 && it.GetParameters().Any(z => z.ParameterType.Name == "T"));
                 var method = methods.Single().MakeGenericMethod(singleEntityObjectOrList.GetType());
                 StorageableMethodInfo result = new StorageableMethodInfo()
                 {

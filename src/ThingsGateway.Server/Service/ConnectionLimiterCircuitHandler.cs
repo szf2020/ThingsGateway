@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Components.Server.Circuits;
 using ThingsGateway.Common;
 
 namespace ThingsGateway.Server;
+
 public class ConnectionLimiterCircuitHandler : CircuitHandler
 {
     private int _currentConnectionCount = 0;

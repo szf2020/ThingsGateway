@@ -4,7 +4,7 @@
 	<Import Project="..\..\PackNuget.props" />
 
 	<PropertyGroup>
-		<TargetFrameworks>net462;netstandard2.0;net6.0;net6.0-windows;net8.0;net8.0-windows;</TargetFrameworks>
+		<TargetFrameworks>net462;netstandard2.0;net6.0;net6.0-windows;net8.0;$(OtherTargetFrameworks);net8.0-windows;</TargetFrameworks>
 		<AssemblyName>ThingsGateway.NewLife.X</AssemblyName>
 		<RootNamespace>ThingsGateway.NewLife</RootNamespace>
 		<AssemblyTitle>工具核心库</AssemblyTitle>

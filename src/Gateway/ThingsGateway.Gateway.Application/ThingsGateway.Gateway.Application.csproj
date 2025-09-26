@@ -3,17 +3,16 @@
 	<Import Project="..\..\Version.props" />
 	<Import Project="..\..\PackNuget.props" />
 	<PropertyGroup>
-		<TargetFrameworks>net8.0;</TargetFrameworks>
+		<TargetFrameworks>net8.0;$(OtherTargetFrameworks);</TargetFrameworks>
 		
 	</PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="Portable.BouncyCastle" Version="1.9.0" />
 		<PackageReference Include="Riok.Mapperly" Version="4.2.1" ExcludeAssets="runtime" PrivateAssets="all" />
 		<PackageReference Include="Rougamo.Fody" Version="5.0.1" />
-		<PackageReference Include="System.Linq.Async" Version="6.0.3" />
-		<PackageReference Include="TouchSocket.Dmtp" Version="4.0.0-beta.57" />
-		<!--<PackageReference Include="TouchSocket.WebApi.Swagger" Version="4.0.0-beta.57" />-->
-		<PackageReference Include="TouchSocket.WebApi" Version="4.0.0-beta.57" />
+		<PackageReference Include="TouchSocket.Dmtp" Version="$(TSVersion)" />
+		<!--<PackageReference Include="TouchSocket.WebApi.Swagger" Version="$(TSVersion)" />-->
+		<PackageReference Include="TouchSocket.WebApi" Version="$(TSVersion)" />
 		<PackageReference Include="ThingsGateway.Authentication" Version="$(AuthenticationVersion)" />
 		<!--<ProjectReference Include="..\..\PluginPro\ThingsGateway.Authentication\ThingsGateway.Authentication.csproj" />-->
 
@@ -52,4 +51,9 @@
 		<ProjectReference Include="..\ThingsGateway.Blazor.Diagrams.Core\ThingsGateway.Blazor.Diagrams.Core.csproj" />
 	</ItemGroup>
 
+
+	<ItemGroup Condition=" '$(TargetFramework)' != 'net10.0' ">
+		<PackageReference Include="System.Linq.Async" Version="6.0.3" />
+	</ItemGroup>
+	
 </Project>

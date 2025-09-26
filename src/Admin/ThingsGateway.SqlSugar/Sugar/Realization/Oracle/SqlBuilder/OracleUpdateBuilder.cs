@@ -12,15 +12,16 @@ namespace ThingsGateway.SqlSugar
                 return " select 0 from dual";
             }
             StringBuilder sb = new StringBuilder();
+            var keys = this.PrimaryKeys.ToHashSet(StringComparer.OrdinalIgnoreCase);
             sb.AppendLine("Begin");
             sb.AppendLine(string.Join("\r\n", groupList.Select(t =>
             {
                 var updateTable = string.Format("UPDATE {0} SET", base.GetTableNameStringNoWith);
-                var setValues = string.Join(",", t.Where(s => !s.IsPrimarykey).Where(s => OldPrimaryKeys?.Contains(s.DbColumnName) != true).Select(m => GetOracleUpdateColumns(m)));
+                var setValues = string.Join(",", t.Where(s => !s.IsPrimarykey && OldPrimaryKeys?.Contains(s.DbColumnName) != true).Select(m => GetOracleUpdateColumns(m)));
                 var pkList = t.Where(s => s.IsPrimarykey);
                 if (this.IsWhereColumns && this.PrimaryKeys?.Count > 0)
                 {
-                    var whereColumns = pkList.Where(it => this.PrimaryKeys?.Any(p => p.EqualCase(it.PropertyName) || p.EqualCase(it.DbColumnName)) == true);
+                    var whereColumns = pkList.Where(it => keys?.Contains(it.PropertyName) == true || keys?.Contains(it.DbColumnName) == true);
                     if (whereColumns.Any())
                     {
                         pkList = whereColumns;

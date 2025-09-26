@@ -49,8 +49,7 @@ namespace ThingsGateway.SqlSugar
                 var entity = type.GenericTypeArguments[0];
                 var columnNames = this.Context.SugarContext.Context.EntityMaintenance.GetEntityInfo(entity).Columns;
                 var columnsString = string.Join(",", columnNames
-                    .Where(it => it.IsIgnore == false)
-                    .Where(it => it.DbColumnName.HasValue())
+                    .Where(it => it.IsIgnore == false && it.DbColumnName.HasValue())
                     .Select(it => this.Context.GetTranslationColumnName(it.DbColumnName)));
                 return $"{columnsString},@sugarIndex as sugarIndex";
             }
@@ -141,8 +140,7 @@ namespace ThingsGateway.SqlSugar
             var builder = this.Context.SugarContext.QueryBuilder.Builder;
             var columnInfos = db.EntityMaintenance.GetEntityInfo(bodyExp.Type);
             var autoColumns = columnInfos.Columns
-                          .Where(it => !dic.ContainsKey(it.PropertyName))
-                          .Where(it => it.IsIgnore == false)
+                          .Where(it => !dic.ContainsKey(it.PropertyName) && it.IsIgnore == false)
                           ;
             List<string> appendColumns = new List<string>();
             List<string> completeColumnColumns = new List<string>();

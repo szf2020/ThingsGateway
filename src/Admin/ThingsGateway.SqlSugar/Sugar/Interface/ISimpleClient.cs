@@ -27,9 +27,9 @@ namespace ThingsGateway.SqlSugar
         bool Delete(List<IConditionalModel> conditionalModels);
         bool Delete(T deleteObj);
         bool Delete(List<T> deleteObjs);
-        bool DeleteById(dynamic id);
-        bool DeleteByIds(dynamic[] ids);
-        T GetById(dynamic id);
+        bool DeleteById(object id);
+        bool DeleteByIds(IReadOnlyCollection<object> ids);
+        T GetById(object id);
         List<T> GetList();
         List<T> GetList(Expression<Func<T, bool>> whereExpression);
         List<T> GetList(List<IConditionalModel> conditionalList);
@@ -68,9 +68,9 @@ namespace ThingsGateway.SqlSugar
         Task<bool> DeleteAsync(Expression<Func<T, bool>> whereExpression);
         Task<bool> DeleteAsync(T deleteObj);
         Task<bool> DeleteAsync(List<T> deleteObjs);
-        Task<bool> DeleteByIdAsync(dynamic id);
-        Task<bool> DeleteByIdsAsync(dynamic[] ids);
-        Task<T> GetByIdAsync(dynamic id);
+        Task<bool> DeleteByIdAsync(object id);
+        Task<bool> DeleteByIdsAsync(IReadOnlyCollection<object> ids);
+        Task<T> GetByIdAsync(object id);
         Task<List<T>> GetListAsync();
         Task<List<T>> GetListAsync(Expression<Func<T, bool>> whereExpression);
         Task<List<T>> GetPageListAsync(Expression<Func<T, bool>> whereExpression, PageModel page);
@@ -98,9 +98,9 @@ namespace ThingsGateway.SqlSugar
         Task<bool> DeleteAsync(Expression<Func<T, bool>> whereExpression, CancellationToken cancellationToken);
         Task<bool> DeleteAsync(T deleteObj, CancellationToken cancellationToken);
         Task<bool> DeleteAsync(List<T> deleteObjs, CancellationToken cancellationToken);
-        Task<bool> DeleteByIdAsync(dynamic id, CancellationToken cancellationToken);
-        Task<bool> DeleteByIdsAsync(dynamic[] ids, CancellationToken cancellationToken);
-        Task<T> GetByIdAsync(dynamic id, CancellationToken cancellationToken);
+        Task<bool> DeleteByIdAsync(object id, CancellationToken cancellationToken);
+        Task<bool> DeleteByIdsAsync(IReadOnlyCollection<object> ids, CancellationToken cancellationToken);
+        Task<T> GetByIdAsync(object id, CancellationToken cancellationToken);
         Task<List<T>> GetListAsync(CancellationToken cancellationToken);
         Task<List<T>> GetListAsync(Expression<Func<T, bool>> whereExpression, CancellationToken cancellationToken);
         Task<List<T>> GetPageListAsync(Expression<Func<T, bool>> whereExpression, PageModel page, CancellationToken cancellationToken);

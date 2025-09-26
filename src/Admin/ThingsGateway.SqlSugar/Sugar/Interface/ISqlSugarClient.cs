@@ -30,9 +30,12 @@ namespace ThingsGateway.SqlSugar
         #region Deleteable
         DeleteMethodInfo DeleteableByObject(object singleEntityObjectOrListObject);
         IDeleteable<T> Deleteable<T>() where T : class, new();
-        IDeleteable<T> DeleteableById<T>(dynamic primaryKeyValue) where T : class, new();
+        IDeleteable<T> DeleteableById<T>(object primaryKeyValue) where T : class, new();
+        IDeleteable<T> DeleteableById<T>(Expression<Func<T, object>> inField, object primaryKeyValue) where T : class, new();
+        IDeleteable<T> DeleteableById<T>(Expression<Func<T, object>> inField, IReadOnlyCollection<object> primaryKeyValue) where T : class, new();
+        IDeleteable<T> DeleteableById<T>(Expression<Func<T, object>> inField, ISugarQueryable<object> primaryKeyValue) where T : class, new();
         IDeleteable<T> Deleteable<T>(Expression<Func<T, bool>> expression) where T : class, new();
-        IDeleteable<T> DeleteableById<T>(IReadOnlyCollection<dynamic> pkValue) where T : class, new();
+        IDeleteable<T> DeleteableById<T>(IReadOnlyCollection<object> pkValue) where T : class, new();
         IDeleteable<T> Deleteable<T>(IReadOnlyCollection<T> deleteObjs) where T : class, new();
         IDeleteable<T> DeleteableT<T>(T deleteObj) where T : class, new();
         #endregion
@@ -63,7 +66,6 @@ namespace ThingsGateway.SqlSugar
 
         #region Insertable
         IInsertable<T> Insertable<T>(Dictionary<string, object> columnDictionary) where T : class, new();
-        IInsertable<T> Insertable<T>(dynamic insertDynamicObject) where T : class, new();
         IInsertable<T> Insertable<T>(IReadOnlyCollection<T> insertObjs) where T : class, new();
         IInsertable<T> InsertableT<T>(T insertObj) where T : class, new();
         InsertMethodInfo InsertableByObject(object singleEntityObjectOrListObject);
@@ -183,7 +185,6 @@ namespace ThingsGateway.SqlSugar
         UpdateExpressionMethodInfo UpdateableByObject(Type entityType);
         IUpdateable<T> Updateable<T>() where T : class, new();
         IUpdateable<T> Updateable<T>(Dictionary<string, object> columnDictionary) where T : class, new();
-        IUpdateable<T> Updateable<T>(dynamic updateDynamicObject) where T : class, new();
         IUpdateable<T> Updateable<T>(Expression<Func<T, bool>> columns) where T : class, new();
         IUpdateable<T> Updateable<T>(Expression<Func<T, T>> columns) where T : class, new();
         IUpdateable<T> Updateable<T>(IReadOnlyCollection<T> UpdateObjs) where T : class, new();
@@ -224,6 +225,7 @@ namespace ThingsGateway.SqlSugar
         UpdateNavTaskInit<T, T> UpdateNav<T>(List<T> datas) where T : class, new();
         UpdateNavTaskInit<T, T> UpdateNav<T>(T data, UpdateNavRootOptions rootOptions) where T : class, new();
         UpdateNavTaskInit<T, T> UpdateNav<T>(List<T> datas, UpdateNavRootOptions rootOptions) where T : class, new();
+
         #endregion
 
     }

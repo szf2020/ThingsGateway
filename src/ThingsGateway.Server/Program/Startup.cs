@@ -41,7 +41,6 @@ public class Startup : AppStartup
     public void ConfigBlazorServer(IServiceCollection services)
     {
 
-
         // 增加中文编码支持网页源码显示汉字
         services.AddSingleton(HtmlEncoder.Create(UnicodeRanges.All));
         //并发启动/停止host
@@ -154,7 +153,11 @@ public class Startup : AppStartup
             services.Configure<ForwardedHeadersOptions>(options =>
             {
                 options.ForwardedHeaders = ForwardedHeaders.All;
+#if NET10_0_OR_GREATER
+                options.KnownIPNetworks.Clear();
+#else
                 options.KnownNetworks.Clear();
+#endif
                 options.KnownProxies.Clear();
             });
 
@@ -263,7 +266,16 @@ public class Startup : AppStartup
 
             var app = (WebApplication)applicationBuilder;
 
-            app.UseForwardedHeaders(new ForwardedHeadersOptions { ForwardedHeaders = ForwardedHeaders.All, KnownNetworks = { }, KnownProxies = { } });
+            app.UseForwardedHeaders(new ForwardedHeadersOptions
+            {
+                ForwardedHeaders = ForwardedHeaders.All,
+#if NET10_0_OR_GREATER
+                KnownIPNetworks = { },
+#else
+                KnownNetworks = { },
+#endif
+                KnownProxies = { }
+            });
 
             app.UseBootstrapBlazor();
 

@@ -128,9 +128,13 @@ namespace ThingsGateway.SqlSugar
         {
             if (SetColumnsIndex > 0)
             {
-                var keys = UpdateBuilder.SetValues.Select(it => SqlBuilder.GetNoTranslationColumnName(it.Key));
-                var addKeys = keys.Where(k => !this.UpdateBuilder.DbColumnInfoList.Any(it => it.PropertyName.Equals(k, StringComparison.CurrentCultureIgnoreCase) || it.DbColumnName.Equals(k, StringComparison.CurrentCultureIgnoreCase))).ToList();
-                var addItems = this.EntityInfo.Columns.Where(it => !GetPrimaryKeys().Any(p => p.Equals(it.PropertyName, StringComparison.CurrentCultureIgnoreCase) || p.Equals(it.DbColumnName, StringComparison.CurrentCultureIgnoreCase)) && addKeys.Any(k => it.PropertyName?.Equals(k, StringComparison.OrdinalIgnoreCase) == true || it.DbColumnName?.Equals(k, StringComparison.OrdinalIgnoreCase) == true));
+                var keys = UpdateBuilder.SetValues.Select(it => SqlBuilder.GetNoTranslationColumnName(it.Key)).ToArray();
+                var nameKeys = this.UpdateBuilder.DbColumnInfoList.Select(a => a.PropertyName).ToHashSet(StringComparer.OrdinalIgnoreCase);
+                var dbnameKeys = this.UpdateBuilder.DbColumnInfoList.Select(a => a.DbColumnName).ToHashSet(StringComparer.OrdinalIgnoreCase);
+                var pkeys = GetPrimaryKeys().ToHashSet();
+
+                var addKeys = keys.Where(k => !nameKeys.Contains(k) || dbnameKeys.Contains(k)).ToHashSet(StringComparer.OrdinalIgnoreCase);
+                var addItems = this.EntityInfo.Columns.Where(it => !pkeys.Contains(it.PropertyName) || pkeys.Contains(it.DbColumnName) && addKeys.Contains(it.PropertyName) || addKeys.Contains(it.DbColumnName)).ToArray();
                 this.UpdateBuilder.DbColumnInfoList.AddRange(addItems.Select(it => new DbColumnInfo() { PropertyName = it.PropertyName, DbColumnName = it.DbColumnName }));
             }
             SetColumnsIndex++;
@@ -464,12 +468,13 @@ namespace ThingsGateway.SqlSugar
             if (this.UpdateBuilder.UpdateColumns.HasValue())
             {
                 var columns = this.UpdateBuilder.UpdateColumns;
-                this.UpdateBuilder.DbColumnInfoList = this.UpdateBuilder.DbColumnInfoList.Where(it => GetPrimaryKeys().Contains(it.DbColumnName, StringComparer.OrdinalIgnoreCase)
+                var keys = GetPrimaryKeys().ToHashSet();
+                this.UpdateBuilder.DbColumnInfoList = this.UpdateBuilder.DbColumnInfoList.Where(it => keys.Contains(it.DbColumnName, StringComparer.OrdinalIgnoreCase)
                 || columns.Contains(it.PropertyName, StringComparer.OrdinalIgnoreCase)
                 || columns.Contains(it.DbColumnName, StringComparer.OrdinalIgnoreCase)).ToList();
             }
             UpdateBuilder.EntityInfo = this.EntityInfo;
-            UpdateBuilder.PrimaryKeys = GetPrimaryKeys();
+            UpdateBuilder.PrimaryKeys = GetPrimaryKeys().ToList();
             if (this.IsWhereColumns)
             {
                 foreach (var pkName in UpdateBuilder.PrimaryKeys)
@@ -485,8 +490,8 @@ namespace ThingsGateway.SqlSugar
             #region IgnoreColumns
             if (this.Context.IgnoreColumns?.Any() == true)
             {
-                var currentIgnoreColumns = this.Context.IgnoreColumns.Where(it => it.EntityName == this.EntityInfo.EntityName).ToList();
-                this.UpdateBuilder.DbColumnInfoList = this.UpdateBuilder.DbColumnInfoList.Where(it => !currentIgnoreColumns.Any(i => it.PropertyName.Equals(i.PropertyName, StringComparison.CurrentCulture))).ToList();
+                var currentIgnoreColumns = this.Context.IgnoreColumns.Where(it => it.EntityName == this.EntityInfo.EntityName).Select(a => a.PropertyName).ToHashSet(StringComparer.OrdinalIgnoreCase);
+                this.UpdateBuilder.DbColumnInfoList = this.UpdateBuilder.DbColumnInfoList.Where(it => !currentIgnoreColumns.Contains(it.PropertyName)).ToList();
             }
             #endregion
             if (this.IsSingle)
@@ -547,8 +552,8 @@ namespace ThingsGateway.SqlSugar
                 });
             }
             #endregion
-            List<string> primaryKey = GetPrimaryKeys();
-            if (primaryKey?.Count > 0)
+            var primaryKey = GetPrimaryKeys();
+            if (primaryKey?.Any() == true)
             {
                 this.UpdateBuilder.DbColumnInfoList.ForEach(it =>
                 {
@@ -615,7 +620,7 @@ namespace ThingsGateway.SqlSugar
                 return mappInfo == null ? propertyName : mappInfo.DbColumnName;
             }
         }
-        protected List<string> GetPrimaryKeys()
+        protected IEnumerable<string> GetPrimaryKeys()
         {
             if (this.WhereColumnList.HasValue())
             {
@@ -623,7 +628,7 @@ namespace ThingsGateway.SqlSugar
             }
             else
             {
-                return this.EntityInfo.Columns.Where(it => it.IsPrimarykey).Select(it => it.DbColumnName).ToList();
+                return this.EntityInfo.Columns.Where(it => it.IsPrimarykey).Select(it => it.DbColumnName);
             }
         }
         protected virtual List<string> GetIdentityKeys()
@@ -727,7 +732,7 @@ namespace ThingsGateway.SqlSugar
             }
             data.Value = newValue;
             var pks = GetPrimaryKeys();
-            Check.ExceptionEasy(pks.Count == 0, "need primary key or WhereColumn", "需要主键或者WhereColumn");
+            Check.ExceptionEasy(pks?.Any() != true, "need primary key or WhereColumn", "需要主键或者WhereColumn");
             this.Where(verColumn.DbColumnName, "=", oldValue);
             foreach (var p in pks)
             {
@@ -752,9 +757,9 @@ namespace ThingsGateway.SqlSugar
                 this.Ado.IsDisableMasterSlaveSeparation = isDisableMasterSlaveSeparation;
             }
         }
-        private bool IsPrimaryKey(DbColumnInfo it)
+        private bool IsPrimaryKey(HashSet<string> keys, DbColumnInfo it)
         {
-            var result = GetPrimaryKeys().Any(p => p.Equals(it.DbColumnName, StringComparison.CurrentCultureIgnoreCase) || p.Equals(it.PropertyName, StringComparison.CurrentCultureIgnoreCase));
+            var result = keys.Contains(it.DbColumnName) || keys.Contains(it.PropertyName);
             return result;
         }
 

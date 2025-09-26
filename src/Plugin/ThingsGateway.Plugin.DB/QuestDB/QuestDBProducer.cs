@@ -14,6 +14,7 @@ using ThingsGateway.Common;
 using ThingsGateway.DB;
 using ThingsGateway.Debug;
 using ThingsGateway.Foundation;
+using ThingsGateway.Gateway.Application;
 using ThingsGateway.NewLife;
 using ThingsGateway.NewLife.Extension;
 using ThingsGateway.NewLife.Threading;
@@ -60,6 +61,16 @@ public partial class QuestDBProducer : BusinessBaseWithCacheIntervalVariable
     protected override Task DisposeAsync(bool disposing)
     {
         _db?.TryDispose();
+
+        try
+        {
+            var exexcuteExpressions = CSharpScriptEngineExtension.Do<DynamicSQLBase>(_driverPropertys.BigTextScriptHistoryTable);
+            exexcuteExpressions?.TryDispose();
+        }
+        catch
+        {
+        }
+
         return base.DisposeAsync(disposing);
     }
     /// <inheritdoc/>

@@ -394,7 +394,7 @@ WHERE tgrelid = '" + tableName + "'::regclass");
             }
             var oldDatabaseName = this.Context.Ado.Connection.Database;
             var connection = this.Context.CurrentConnectionConfig.ConnectionString;
-            if (Regex.Matches(connection, oldDatabaseName).Count > 1)
+            if (Regex.Count(connection, oldDatabaseName) > 1)
             {
                 var builder = new Npgsql.NpgsqlConnectionStringBuilder(connection);
                 builder.Database = "postgres";

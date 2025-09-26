@@ -11,9 +11,12 @@
 using System.Text;
 using System.Text.RegularExpressions;
 
+using ThingsGateway.NewLife;
 using ThingsGateway.NewLife.Json.Extension;
 
 using TouchSocket.Core;
+
+using static System.Net.Mime.MediaTypeNames;
 
 namespace ThingsGateway.Gateway.Application;
 
@@ -31,12 +34,48 @@ public abstract partial class BusinessBaseWithCacheIntervalScript : BusinessBase
 #if !Management
     protected internal override Task InitChannelAsync(IChannel? channel, CancellationToken cancellationToken)
     {
-        CSharpScriptEngineExtension.Remove(_businessPropertyWithCacheIntervalScript.BigTextScriptAlarmModel);
-        CSharpScriptEngineExtension.Remove(_businessPropertyWithCacheIntervalScript.BigTextScriptDeviceModel);
-        CSharpScriptEngineExtension.Remove(_businessPropertyWithCacheIntervalScript.BigTextScriptPluginEventDataModel);
-        CSharpScriptEngineExtension.Remove(_businessPropertyWithCacheIntervalScript.BigTextScriptVariableModel);
+
         return base.InitChannelAsync(channel, cancellationToken);
     }
+
+
+    protected override Task DisposeAsync(bool disposing)
+    {
+        try
+        {
+            var exexcuteExpressions = CSharpScriptEngineExtension.Do<IDynamicModel>(_businessPropertyWithCacheIntervalScript.BigTextScriptAlarmModel);
+            exexcuteExpressions?.TryDispose();
+        }
+        catch
+        {
+        }
+        try
+        {
+            var exexcuteExpressions = CSharpScriptEngineExtension.Do<IDynamicModel>(_businessPropertyWithCacheIntervalScript.BigTextScriptDeviceModel);
+            exexcuteExpressions?.TryDispose();
+        }
+        catch
+        {
+        }
+        try
+        {
+            var exexcuteExpressions = CSharpScriptEngineExtension.Do<IDynamicModel>(_businessPropertyWithCacheIntervalScript.BigTextScriptPluginEventDataModel);
+            exexcuteExpressions?.TryDispose();
+        }
+        catch
+        {
+        }
+        try
+        {
+            var exexcuteExpressions = CSharpScriptEngineExtension.Do<IDynamicModel>(_businessPropertyWithCacheIntervalScript.BigTextScriptVariableModel);
+            exexcuteExpressions?.TryDispose();
+        }
+        catch
+        {
+        }
+        return base.DisposeAsync(disposing);
+    }
+
     public virtual string[] Match(string input)
     {
         // 生成缓存键，以确保缓存的唯一性

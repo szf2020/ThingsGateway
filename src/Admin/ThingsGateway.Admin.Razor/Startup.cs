@@ -20,5 +20,6 @@ public class Startup : AppStartup
         services.AddScoped<IMenuService, MenuService>();
         services.AddScoped<IAuthRazorService, AuthRazorService>();
         services.AddBootstrapBlazorTableExportService();
+        services.AddBootstrapBlazorWinBoxService();
     }
 }

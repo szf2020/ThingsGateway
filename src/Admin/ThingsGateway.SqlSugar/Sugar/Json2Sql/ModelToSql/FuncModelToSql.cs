@@ -65,8 +65,7 @@ namespace ThingsGateway.SqlSugar
         private static System.Reflection.MethodInfo GetMethod(IDbMethods dbMethods, string methodName)
         {
             return dbMethods.GetType().GetMethods()
-                            .Where(it => it.Name == methodName)
-                            .Where(it => it.Name != "Equals" || it.GetParameters().Length == 1 && it.GetParameters().First().ParameterType == typeof(MethodCallExpressionModel))
+                            .Where(it => it.Name == methodName && (it.Name != "Equals" || it.GetParameters().Length == 1 && it.GetParameters().First().ParameterType == typeof(MethodCallExpressionModel)))
                             .FirstOrDefault();
         }
         private static string GetMethodName(string name, List<string> methods)

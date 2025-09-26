@@ -2,7 +2,7 @@
 
 	<PropertyGroup>
 		<OutputType>Exe</OutputType>
-		<TargetFramework>net8.0</TargetFramework>
+		<TargetFrameworks>net8.0;$(OtherTargetFrameworks);</TargetFrameworks>
 
 	</PropertyGroup>
 
@@ -22,7 +22,7 @@
 		<AnalysisModeStyle>None</AnalysisModeStyle>
 
 
-		<TargetFrameworks>net8.0;</TargetFrameworks>
+		<TargetFrameworks>net8.0;$(OtherTargetFrameworks);</TargetFrameworks>
 		<LangVersion>13.0</LangVersion>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
@@ -41,15 +41,15 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="BenchmarkDotNet" Version="0.15.3" />
+		<PackageReference Include="BenchmarkDotNet" Version="0.15.4" />
 		<PackageReference Include="HslCommunication" Version="12.5.1" />
-		<PackageReference Include="Longbow.Modbus" Version="9.0.9" />
+		<PackageReference Include="Longbow.Modbus" Version="9.1.0" />
 		<PackageReference Include="NModbus" Version="3.0.81" />
 		<PackageReference Include="NModbus.Serial" Version="3.0.81" />
 		<PackageReference Include="S7netplus" Version="0.20.0" />
 		<!--<PackageReference Include="ThingsGateway.Foundation.Modbus" Version="$(DefaultVersion)" />
 		<PackageReference Include="ThingsGateway.Foundation.SiemensS7" Version="$(DefaultVersion)" />-->
-		<PackageReference Include="TouchSocket.Modbus" Version="4.0.0-beta.57" />
+		<PackageReference Include="TouchSocket.Modbus" Version="$(TSVersion)" />
 	</ItemGroup>
 
 	<ItemGroup>

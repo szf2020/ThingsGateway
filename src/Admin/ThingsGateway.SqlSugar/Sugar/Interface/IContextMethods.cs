@@ -28,7 +28,7 @@ namespace ThingsGateway.SqlSugar
         T DeserializeObject<T>(string value);
         T TranslateCopy<T>(T sourceObject);
         SqlSugarProvider CopyContext(bool isCopyEvents = false);
-        dynamic DataTableToDynamic(DataTable table);
+        object DataTableToDynamic(DataTable table);
         List<T> DataTableToList<T>(DataTable table);
         DataTable ListToDataTable<T>(List<T> list);
         DataTable ListToDataTableWithAttr<T>(List<T> list);

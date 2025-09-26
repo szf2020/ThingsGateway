@@ -618,7 +618,7 @@ ParameterT parameter)
             var keyName = QueryBuilder.GetExpressionValue(key, ResolveExpressType.FieldSingle).GetResultString();
             var valueName = QueryBuilder.GetExpressionValue(value, ResolveExpressType.FieldSingle).GetResultString();
             var list = await Select<KeyValuePair<string, object>>(keyName + "," + valueName).ToListAsync().ConfigureAwait(false);
-            var isJson = this.Context.EntityMaintenance.GetEntityInfo<T>().Columns.Where(it => it.IsJson && it.PropertyName == ExpressionTool.GetMemberName(value)).Any();
+            var isJson = this.Context.EntityMaintenance.GetEntityInfo<T>().Columns.Any(it => it.IsJson && it.PropertyName == ExpressionTool.GetMemberName(value));
             if (isJson)
             {
                 var result = (await this.Select<T>(keyName + "," + valueName).ToListAsync().ConfigureAwait(false)).ToDictionary(ExpressionTool.GetMemberName(key), ExpressionTool.GetMemberName(value));
@@ -672,7 +672,7 @@ ParameterT parameter)
             {
                 return await _ToParentListByTreeKeyAsync(parentIdExpression, primaryKeyValue).ConfigureAwait(false);
             }
-            Check.Exception(entity.Columns.Where(it => it.IsPrimarykey).Any(), "No Primary key");
+            Check.Exception(entity.Columns.Any(it => it.IsPrimarykey), "No Primary key");
             var parentIdName = UtilConvert.ToMemberExpression((parentIdExpression as LambdaExpression).Body).Member.Name;
             var ParentInfo = entity.Columns.First(it => it.PropertyName == parentIdName);
             var parentPropertyName = ParentInfo.DbColumnName;
@@ -714,7 +714,7 @@ ParameterT parameter)
             {
                 return await _ToParentListByTreeKeyAsync(parentIdExpression, primaryKeyValue, parentWhereExpression).ConfigureAwait(false);
             }
-            Check.Exception(entity.Columns.Where(it => it.IsPrimarykey).Any(), "No Primary key");
+            Check.Exception(entity.Columns.Any(it => it.IsPrimarykey), "No Primary key");
             var parentIdName = UtilConvert.ToMemberExpression((parentIdExpression as LambdaExpression).Body).Member.Name;
             var ParentInfo = entity.Columns.First(it => it.PropertyName == parentIdName);
             var parentPropertyName = ParentInfo.DbColumnName;

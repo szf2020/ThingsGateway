@@ -73,9 +73,7 @@
 
 		<RemoveDir Directories="$(PluginFolder)" />
 		<RemoveDir Directories="$(GatewayPluginFolder)" />
-		<PropertyGroup>
-			<PluginTargetFramework>net8.0</PluginTargetFramework>
-		</PropertyGroup>
+
 
 		<ItemGroup>
 			<!-- setting up the variable for convenience -->

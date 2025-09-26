@@ -15,6 +15,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Runtime.InteropServices;
 
 namespace ThingsGateway.Gateway.Application;
+
 public class UpdateZipFileAddInput1
 {
     /// <summary>

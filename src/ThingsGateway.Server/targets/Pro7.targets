@@ -6,9 +6,7 @@
 	</ItemGroup>
 
 	<Target Name="CopyOtherPlugin7NugetPackages" AfterTargets="Build">
-		<PropertyGroup>
-			<PluginTargetFramework>net8.0</PluginTargetFramework>
-		</PropertyGroup>
+
 		<ItemGroup>
 			<!-- setting up the variable for convenience -->
 			<PkgThingsGateway_Plugin_OpcAePackageFiles Include="$(PkgThingsGateway_Plugin_OpcAe)\Content\$(PluginTargetFramework)\**\*.*" />

@@ -340,7 +340,6 @@ public static class StringHelper
 
         return str + end;
     }
-
     /// <summary>从当前字符串开头移除另一字符串，不区分大小写，循环多次匹配前缀</summary>
     /// <param name="str">当前字符串</param>
     /// <param name="starts">另一字符串</param>

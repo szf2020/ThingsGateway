@@ -1,13 +1,15 @@
 ﻿@{
 #if !Management
+
 }
 @page "/gateway/rules"
 @attribute [Authorize]
 @attribute [RolePermission]
- 
+
 
 @{
 #endif
+
 }
 
 @inherits ThingsGatewayModuleComponentBase
@@ -17,81 +19,77 @@
 @using ThingsGateway.Admin.Razor
 @using ThingsGateway.Gateway.Application
 
-
-@if (ShowDesign)
+@if(ModuleInitTask?.Task?.IsCompleted == true)
 {
-
-    <div class="h-100">
-        <DragAndDrop @ref=dragAndDrop OnCancel="()=>ShowDesign=false" Value="Value.RulesJson" ValueChanged=@(async(v)=>{
-                 try
-                 {
-                 Value.RulesJson = v;
-                 await RulesService.SaveRulesAsync(Value, ItemChangedType.Update);
-                 ShowDesign=false;
-                 }
-                 catch (Exception ex)
-                 {
-                 await ToastService.Warn(ex);
-                 }
-                 }) />
-    </div>
+<div class=@($"h-100 {(!(ShowDesign && Value?.RulesJson != null) ? "d-none" : "")}")>
+	<DragAndDrop @ref=dragAndDrop OnCancel="() => ShowDesign = false" Value="Value?.RulesJson ?? new()" ValueChanged=@(async(v)=>{
+			try
+			{
+				Value.RulesJson = v;
+				await RulesService.SaveRulesAsync(Value, ItemChangedType.Update);
+				ShowDesign = false;
+			}
+			catch (Exception ex)
+			{
+				await ToastService.Warn(ex);
+			}
+			}) />
+</div>
 }
-else
-{
-    <div class="row g-0 h-100">
-        <div class="col-12 col-sm-6 h-100">
 
-            <AdminTable @ref=table TItem="Rules"
-                        AutoGenerateColumns="true"
-                        ShowAdvancedSearch=false
-                        AllowResizing="true"
-                        IsFixedHeader=true
-                        IsMultipleSelect=true
-                        EditDialogSize="Size.ExtraLarge"
-                        ShowSearch="false"
-                        ShowExtendButtons=true
-                        ShowDefaultButtons=true
-                        ExtendButtonColumnWidth=200
-                        ShowExportButton="false"
-                        OnQueryAsync="OnQueryAsync"
-                        IsPagination=true
-                        OnClickRowCallback="a=>{RulesId=a.Id;StateHasChanged(); return Task.CompletedTask;}"
-                        OnSaveAsync="Save"
-                        OnDeleteAsync="Delete">
+<div class=@($"row g-0 h-100 {(ShowDesign ? "d-none" : "")}")>
+	<div class="col-12 col-sm-6 h-100">
 
-                <TableToolbarTemplate>
+		<AdminTable @ref=table TItem="Rules"
+					AutoGenerateColumns="true"
+					ShowAdvancedSearch=false
+					AllowResizing="true"
+					IsFixedHeader=true
+					IsMultipleSelect=true
+					EditDialogSize="Size.ExtraLarge"
+					ShowSearch="false"
+					ShowExtendButtons=true
+					ShowDefaultButtons=true
+					ExtendButtonColumnWidth=200
+					ShowExportButton="false"
+					OnQueryAsync="OnQueryAsync"
+					IsPagination=true
+					OnClickRowCallback="a=>{RulesId=a.Id;StateHasChanged(); return Task.CompletedTask;}"
+					OnSaveAsync="Save"
+					OnDeleteAsync="Delete">
 
-                    <TableToolbarPopConfirmButton TItem="Rules" IsShow=@(AuthorizeButton("清空"))
-                                                  Color=Color.Warning Text="@StringLocalizer["Clear"]"
-                                                  IsAsync OnConfirm=@(ClearRulesAsync) />
+			<TableToolbarTemplate>
+
+				<TableToolbarPopConfirmButton TItem="Rules" IsShow=@(AuthorizeButton("清空"))
+											  Color=Color.Warning Text="@StringLocalizer["Clear"]"
+											  IsAsync OnConfirm=@(ClearRulesAsync) />
 
 
-                </TableToolbarTemplate>
-                <RowButtonTemplate>
+			</TableToolbarTemplate>
+			<RowButtonTemplate>
 
-                    <TableCellButton IsShow=@(AuthorizeButton(AdminOperConst.Edit)) Size="Size.ExtraSmall" Color="Color.Warning" Icon="fa-solid fa-bars" Text="@StringLocalizer["Design"]" OnClick="()=>{
+				<TableCellButton IsShow=@(AuthorizeButton(AdminOperConst.Edit)) Size="Size.ExtraSmall" Color="Color.Warning" Icon="fa-solid fa-bars" Text="@StringLocalizer["Design"]" OnClick="()=>{
 
-Value=context;
-Value.RulesJson ??= new();
-ShowDesign=true;}" />
-                </RowButtonTemplate>
-            </AdminTable>
-        </div>
-        <div class="col-12 col-sm-6 h-100 ps-2">
+																																										   Value = context;
+																																										   Value.RulesJson ??= new();
+																																										   ShowDesign = true;}" />
+			</RowButtonTemplate>
+		</AdminTable>
+	</div>
+	<div class="col-12 col-sm-6 h-100 ps-2">
 
-            <RulesStatus RulesId="RulesId"></RulesStatus>
-        </div>
-    </div>
+		<RulesStatus RulesId="RulesId"></RulesStatus>
+	</div>
+</div>
 
-}
 
 
 
 
 @code {
-    private long RulesId { get; set; }
-    private Rules Value;
-    private bool ShowDesign = false;
-    DragAndDrop dragAndDrop;
-    AdminTable<Rules> table;
+	private long RulesId { get; set; }
+	private Rules Value;
+	private bool ShowDesign = false;
+	DragAndDrop dragAndDrop;
+	AdminTable<Rules> table;
 }

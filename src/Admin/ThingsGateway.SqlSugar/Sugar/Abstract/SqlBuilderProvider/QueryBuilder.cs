@@ -392,7 +392,7 @@ namespace ThingsGateway.SqlSugar
                         AppendTableFilter(item);
                     }
                 }
-                foreach (var item in gobalFilterList.Where(it => it.GetType().Name == "SqlFilterItem").Where(it => it.IsJoinQuery == !IsSingle()))
+                foreach (var item in gobalFilterList.Where(it => it.GetType().Name == "SqlFilterItem" && it.IsJoinQuery == !IsSingle()))
                 {
                     var filterResult = item.FilterValue(this.Context);
                     WhereInfos.Add(this.Builder.AppendWhereOrAnd(this.WhereInfos.IsNullOrEmpty(), filterResult.Sql + UtilConstants.Space));
@@ -439,7 +439,7 @@ namespace ThingsGateway.SqlSugar
             }
             else if (isEasyJoin && ChildType.IsInterface && this.JoinExpression != null && (this.JoinExpression as LambdaExpression)?.Parameters?.Any(it => it.Type.GetInterfaces().Any(z => z == ChildType)) == true)
             {
-                var parameters = (this.JoinExpression as LambdaExpression).Parameters.Where(it => it.Type.GetInterfaces().Any(z => z == ChildType));
+                var parameters = (this.JoinExpression as LambdaExpression).Parameters.Where(it => it.Type.GetInterfaces().Contains(ChildType));
                 foreach (var parameter in parameters)
                 {
                     var shortName = this.Builder.GetTranslationColumnName(parameter.Name) + ".";
@@ -460,7 +460,7 @@ namespace ThingsGateway.SqlSugar
                     var mysql = GetSql(exp, isSingle);
                     if (ChildType.IsInterface && item.IsJoinQuery == true)
                     {
-                        foreach (var joinInfoItem in this.JoinQueryInfos.Where(it => it.EntityType.GetInterfaces().Any(z => z == ChildType)))
+                        foreach (var joinInfoItem in this.JoinQueryInfos.Where(it => it.EntityType.GetInterfaces().Contains(ChildType)))
                         {
                             var addSql = mysql.Replace(itName, this.Builder.GetTranslationColumnName(joinInfoItem.ShortName) + ".");
                             addSql = ReplaceFilterColumnName(addSql, joinInfoItem.EntityType, joinInfoItem.ShortName);
@@ -475,7 +475,7 @@ namespace ThingsGateway.SqlSugar
                             var andOrWhere = this.WhereInfos.Count != 0 ? " AND " : "WHERE";
                             this.WhereInfos.Add(andOrWhere + Regex.Replace(addSql, "^ (WHERE|AND) ", ""));
                         }
-                        foreach (var joinInfoItem in this.JoinQueryInfos.Where(it => it.EntityType.GetInterfaces().Any(z => z == ChildType)))
+                        foreach (var joinInfoItem in this.JoinQueryInfos.Where(it => it.EntityType.GetInterfaces().Contains(ChildType)))
                         {
                             var addSql = mysql.Replace(itName, this.Builder.GetTranslationColumnName(joinInfoItem.ShortName) + ".");
                             addSql = ReplaceFilterColumnName(addSql, joinInfoItem.EntityType, joinInfoItem.ShortName);
@@ -559,7 +559,7 @@ namespace ThingsGateway.SqlSugar
                     var isInterface = ChildType.IsInterface && joinInfo.EntityType?.GetInterfaces().Any(it => it == ChildType) == true;
                     if (isInterface
                         && isSameName == false
-                        && this.JoinQueryInfos.Where(it => it.EntityType != null).Count(it => it.EntityType.GetInterfaces().Any(z => z == ChildType)) > 1)
+                        && this.JoinQueryInfos.Where(it => it.EntityType != null).Count(it => it.EntityType.GetInterfaces().Contains(ChildType)) > 1)
                     {
                         sql = GetSql(exp, false);
                         var shortName = this.Builder.GetTranslationColumnName(joinInfo.ShortName.Trim()) + ".";
@@ -792,7 +792,7 @@ namespace ThingsGateway.SqlSugar
                     var regex = $@"\{Builder.SqlTranslationLeft}[\w]{{1,20}}?\{Builder.SqlTranslationRight}\.\{Builder.SqlTranslationLeft}.{{1,50}}?\{Builder.SqlTranslationRight}";
                     var matches = Regex
                         .Matches(paramter.Value.ObjToString(), regex, RegexOptions.IgnoreCase).Cast<Match>()
-                        .Where(it => allShortName.Any(z => it.Value.ObjToString().Contains(z, StringComparison.CurrentCultureIgnoreCase)))
+                        .Where(it => allShortName.Any(z => it.Value.Contains(z, StringComparison.CurrentCultureIgnoreCase)))
                         .Select(it => it.Value);
                     names.AddRange(matches);
                 }

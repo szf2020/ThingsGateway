@@ -61,6 +61,22 @@ public partial class SqlHistoryAlarm : BusinessBaseWithCacheAlarm
 
     protected override Task DisposeAsync(bool disposing)
     {
+        try
+        {
+            var exexcuteExpressions = CSharpScriptEngineExtension.Do<DynamicSQLBase>(_driverPropertys.BigTextScriptHistoryTable);
+            exexcuteExpressions?.TryDispose();
+        }
+        catch
+        {
+        }
+        try
+        {
+            var exexcuteExpressions = CSharpScriptEngineExtension.Do<DynamicSQLBase>(_driverPropertys.BigTextScriptPluginEventDataHistoryTable);
+            exexcuteExpressions?.TryDispose();
+        }
+        catch
+        {
+        }
         _db?.TryDispose();
         return base.DisposeAsync(disposing);
     }

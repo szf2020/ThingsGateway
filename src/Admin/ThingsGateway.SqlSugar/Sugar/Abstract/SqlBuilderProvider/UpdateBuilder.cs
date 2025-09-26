@@ -258,14 +258,14 @@ namespace ThingsGateway.SqlSugar
             {
                 if (SetValues.IsValuable())
                 {
-                    var setValue = SetValues.Where(sv => it.IsPrimarykey == false && (it.IsIdentity == false || (IsOffIdentity && it.IsIdentity))).Where(sv => sv.Key == Builder.GetTranslationColumnName(it.DbColumnName) || sv.Key == Builder.GetTranslationColumnName(it.PropertyName));
+                    var setValue = SetValues.Where(sv => it.IsPrimarykey == false && (it.IsIdentity == false || (IsOffIdentity && it.IsIdentity)) && (sv.Key == Builder.GetTranslationColumnName(it.DbColumnName) || sv.Key == Builder.GetTranslationColumnName(it.PropertyName)));
                     if (setValue?.Any() == true)
                     {
                         return setValue.First().Value;
                     }
                     else if (JoinInfos != null && JoinInfos.Count != 0)
                     {
-                        setValue = SetValues.Where(sv => it.IsPrimarykey == false && (it.IsIdentity == false || (IsOffIdentity && it.IsIdentity))).Where(sv => sv.Key == Builder.GetNoTranslationColumnName(it.DbColumnName) || sv.Key == Builder.GetNoTranslationColumnName(it.PropertyName));
+                        setValue = SetValues.Where(sv => it.IsPrimarykey == false && (it.IsIdentity == false || (IsOffIdentity && it.IsIdentity)) && (sv.Key == Builder.GetNoTranslationColumnName(it.DbColumnName) || sv.Key == Builder.GetNoTranslationColumnName(it.PropertyName)));
                         return Builder.GetTranslationColumnName(this.ShortName) + "." + Builder.GetTranslationColumnName(setValue.First().Key) + "=" + setValue.First().Value;
                     }
                 }

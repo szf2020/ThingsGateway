@@ -73,12 +73,7 @@ namespace ThingsGateway.SqlSugar
             Check.Exception(this.entityInfo.Columns.Any(it => it.OracleSequenceName.HasValue()), "The BulkMerge method cannot be used for  sequence", "BulkMerge方法不能用序列");
             var sqlBuilder = this.Context.Queryable<object>().SqlBuilder;
             var insertColumns = entityInfo.Columns
-                .Where(it => it.IsIgnore == false)
-                .Where(it => it.IsIdentity == false)
-                .Where(it => it.InsertServerTime == false)
-                .Where(it => it.InsertSql == null)
-                .Where(it => it.OracleSequenceName == null)
-                .Where(it => it.IsOnlyIgnoreInsert == false);
+                .Where(it => it.IsIgnore == false && it.IsIdentity == false && it.InsertServerTime == false && it.InsertSql == null && it.OracleSequenceName == null && it.IsOnlyIgnoreInsert == false);
             var whereSql = string.Join("  AND  ", whereColumns.Select(it => $"tgt.{sqlBuilder.GetTranslationColumnName(it)}=src.{sqlBuilder.GetTranslationColumnName(it)}"));
             var updateColumnsSql = string.Join(" , ", updateColumns.Select(it => $"tgt.{sqlBuilder.GetTranslationColumnName(it)}=src.{sqlBuilder.GetTranslationColumnName(it)}"));
             var insertColumnsSqlTgt = string.Join(" , ", insertColumns.Select(it => "tgt." + sqlBuilder.GetTranslationColumnName(it.DbColumnName)));

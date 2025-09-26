@@ -31,6 +31,14 @@ public partial class RulesPage : ThingsGatewayModuleComponentBase
         await InvokeVoidAsync("initJS", DiagramsJS, "./_content/ThingsGateway.Blazor.Diagrams/diagram.js");
         await InvokeVoidAsync("initCSS", DiagramsCSS, "./_content/ThingsGateway.Blazor.Diagrams/diagram.css");
     }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+        if (firstRender) {
+            StateHasChanged();
+        }
+    }
     protected override async ValueTask DisposeAsync(bool disposing)
     {
         RulesDispatchService.UnSubscribe(Notify);

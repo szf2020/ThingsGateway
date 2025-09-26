@@ -6,6 +6,10 @@ namespace ThingsGateway.SqlSugar
 {
     public class DateSplitTableService : ISplitTableService
     {
+        private static readonly Regex _yearRegex = new Regex(@"\{year\}");
+        private static readonly Regex _monthRegex = new Regex(@"\{month\}");
+        private static readonly Regex _dayRegex = new Regex(@"\{day\}");
+        private static readonly Regex _regex = new Regex(@"\d\{|\}\d");
         #region Core
         public virtual List<SplitTableInfo> GetAllTables(ISqlSugarClient db, EntityInfo EntityInfo, List<DbTableInfo> tableInfos)
         {
@@ -187,10 +191,10 @@ namespace ThingsGateway.SqlSugar
             Check.Exception(!dbTableName.Contains("{year}"), ErrorMessage.GetThrowMessage("table name need {{year}}", "分表表名需要占位符 {{year}}"));
             Check.Exception(!dbTableName.Contains("{month}"), ErrorMessage.GetThrowMessage("table name need {{month}}", "分表表名需要占位符 {{month}} "));
             Check.Exception(!dbTableName.Contains("{day}"), ErrorMessage.GetThrowMessage("table name need {{day}}", "分表表名需要占位符{{day}}"));
-            Check.Exception(Regex.Matches(dbTableName, @"\{year\}").Count > 1, ErrorMessage.GetThrowMessage(" There can only be one {{year}}", " 只能有一个 {{year}}"));
-            Check.Exception(Regex.Matches(dbTableName, @"\{month\}").Count > 1, ErrorMessage.GetThrowMessage("There can only be one {{month}}", "只能有一个 {{month}} "));
-            Check.Exception(Regex.Matches(dbTableName, @"\{day\}").Count > 1, ErrorMessage.GetThrowMessage("There can only be one {{day}}", "只能有一个{{day}}"));
-            Check.Exception(Regex.IsMatch(dbTableName, @"\d\{|\}\d"), ErrorMessage.GetThrowMessage(" '{{' or  '}}'  can't be numbers nearby", "占位符相令一位不能是数字,比如 : 1{{day}}2 错误 , 正确: 1_{{day}}_2"));
+            Check.Exception(_yearRegex.Count(dbTableName) > 1, ErrorMessage.GetThrowMessage(" There can only be one {{year}}", " 只能有一个 {{year}}"));
+            Check.Exception(_monthRegex.Count(dbTableName) > 1, ErrorMessage.GetThrowMessage("There can only be one {{month}}", "只能有一个 {{month}} "));
+            Check.Exception(_dayRegex.Count(dbTableName) > 1, ErrorMessage.GetThrowMessage("There can only be one {{day}}", "只能有一个{{day}}"));
+            Check.Exception(_regex.IsMatch(dbTableName), ErrorMessage.GetThrowMessage(" '{{' or  '}}'  can't be numbers nearby", "占位符相令一位不能是数字,比如 : 1{{day}}2 错误 , 正确: 1_{{day}}_2"));
         }
         #endregion
 

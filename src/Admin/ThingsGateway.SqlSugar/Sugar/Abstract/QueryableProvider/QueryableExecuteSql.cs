@@ -233,11 +233,11 @@ namespace ThingsGateway.SqlSugar
         {
             return this.ToList().ToPivotTable(columnSelector, rowSelector, dataSelector);
         }
-        public virtual List<dynamic> ToPivotList<TColumn, TRow, TData>(Func<T, TColumn> columnSelector, Expression<Func<T, TRow>> rowSelector, Func<IEnumerable<T>, TData> dataSelector)
+        public virtual List<IDictionary<string, object>> ToPivotList<TColumn, TRow, TData>(Func<T, TColumn> columnSelector, Expression<Func<T, TRow>> rowSelector, Func<IEnumerable<T>, TData> dataSelector)
         {
             return ToPivotEnumerable(columnSelector, rowSelector, dataSelector).ToList();
         }
-        public virtual IEnumerable<dynamic> ToPivotEnumerable<TColumn, TRow, TData>(Func<T, TColumn> columnSelector, Expression<Func<T, TRow>> rowSelector, Func<IEnumerable<T>, TData> dataSelector)
+        public virtual IEnumerable<IDictionary<string, object>> ToPivotEnumerable<TColumn, TRow, TData>(Func<T, TColumn> columnSelector, Expression<Func<T, TRow>> rowSelector, Func<IEnumerable<T>, TData> dataSelector)
         {
             return this.ToList().ToPivotList(columnSelector, rowSelector, dataSelector);
         }
@@ -253,11 +253,11 @@ namespace ThingsGateway.SqlSugar
         {
             return (await ToListAsync().ConfigureAwait(false)).ToPivotTable(columnSelector, rowSelector, dataSelector);
         }
-        public virtual async Task<List<dynamic>> ToPivotListAsync<TColumn, TRow, TData>(Func<T, TColumn> columnSelector, Expression<Func<T, TRow>> rowSelector, Func<IEnumerable<T>, TData> dataSelector)
+        public virtual async Task<List<IDictionary<string, object>>> ToPivotListAsync<TColumn, TRow, TData>(Func<T, TColumn> columnSelector, Expression<Func<T, TRow>> rowSelector, Func<IEnumerable<T>, TData> dataSelector)
         {
             return (await ToPivotEnumerableAsync(columnSelector, rowSelector, dataSelector).ConfigureAwait(false)).ToList();
         }
-        public virtual async Task<IEnumerable<dynamic>> ToPivotEnumerableAsync<TColumn, TRow, TData>(Func<T, TColumn> columnSelector, Expression<Func<T, TRow>> rowSelector, Func<IEnumerable<T>, TData> dataSelector)
+        public virtual async Task<IEnumerable<IDictionary<string, object>>> ToPivotEnumerableAsync<TColumn, TRow, TData>(Func<T, TColumn> columnSelector, Expression<Func<T, TRow>> rowSelector, Func<IEnumerable<T>, TData> dataSelector)
         {
             return (await ToListAsync().ConfigureAwait(false)).ToPivotList(columnSelector, rowSelector, dataSelector);
         }
@@ -298,7 +298,7 @@ namespace ThingsGateway.SqlSugar
                 return _ToParentListByTreeKey(parentIdExpression, primaryKeyValue);
             }
             List<T> result = new List<T>();
-            Check.Exception(entity.Columns.Where(it => it.IsPrimarykey).Any(), "No Primary key");
+            Check.Exception(entity.Columns.Any(it => it.IsPrimarykey), "No Primary key");
             var parentIdName = UtilConvert.ToMemberExpression((parentIdExpression as LambdaExpression).Body).Member.Name;
             var ParentInfo = entity.Columns.First(it => it.PropertyName == parentIdName);
             var parentPropertyName = ParentInfo.DbColumnName;
@@ -340,7 +340,7 @@ namespace ThingsGateway.SqlSugar
                 return _ToParentListByTreeKey(parentIdExpression, primaryKeyValue, parentWhereExpression);
             }
             List<T> result = new List<T>();
-            Check.Exception(entity.Columns.Where(it => it.IsPrimarykey).Any(), "No Primary key");
+            Check.Exception(entity.Columns.Any(it => it.IsPrimarykey), "No Primary key");
             var parentIdName = UtilConvert.ToMemberExpression((parentIdExpression as LambdaExpression).Body).Member.Name;
             var ParentInfo = entity.Columns.First(it => it.PropertyName == parentIdName);
             var parentPropertyName = ParentInfo.DbColumnName;
@@ -524,7 +524,7 @@ namespace ThingsGateway.SqlSugar
                 keyName = this.QueryBuilder.TableShortName + "." + keyName;
                 valueName = this.QueryBuilder.TableShortName + "." + valueName;
             }
-            var isJson = this.Context.EntityMaintenance.GetEntityInfo<T>().Columns.Where(it => it.IsJson && it.PropertyName == ExpressionTool.GetMemberName(value)).Any();
+            var isJson = this.Context.EntityMaintenance.GetEntityInfo<T>().Columns.Any(it => it.IsJson && it.PropertyName == ExpressionTool.GetMemberName(value));
             if (isJson)
             {
                 var result = this.Select<T>(keyName + "," + valueName).ToList().ToDictionary(ExpressionTool.GetMemberName(key), ExpressionTool.GetMemberName(value));

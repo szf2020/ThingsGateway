@@ -1938,7 +1938,10 @@ namespace ThingsGateway.SqlSugar
                 }
             }
         }
-
+        private static readonly HashSet<ParameterDirection> Keys = new HashSet<ParameterDirection>()
+        {
+            ParameterDirection.Output, ParameterDirection.InputOutput, ParameterDirection.ReturnValue
+        };
         /// <summary>
         /// 执行后的操作
         /// </summary>
@@ -1948,7 +1951,7 @@ namespace ThingsGateway.SqlSugar
             var hasParameter = parameters.HasValue();
             if (hasParameter)
             {
-                foreach (var outputParameter in parameters.Where(it => it.Direction.IsIn(ParameterDirection.Output, ParameterDirection.InputOutput, ParameterDirection.ReturnValue)))
+                foreach (var outputParameter in parameters.Where(it => Keys.Contains(it.Direction)))
                 {
                     var gobalOutputParamter = this.OutputParameters.FirstOrDefault(it => it.ParameterName == outputParameter.ParameterName);
                     if (gobalOutputParamter == null)

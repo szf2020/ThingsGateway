@@ -18,6 +18,5 @@ public class Startup : AppStartup
     public void Configure(IServiceCollection services)
     {
         services.AddScoped<IGatewayExportService, GatewayExportService>();
-        services.AddBootstrapBlazorWinBoxService();
     }
 }

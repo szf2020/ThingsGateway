@@ -61,6 +61,14 @@ public partial class TDengineDBProducer : BusinessBaseWithCacheIntervalVariable
 
     protected override Task DisposeAsync(bool disposing)
     {
+        try
+        {
+            var exexcuteExpressions = CSharpScriptEngineExtension.Do<DynamicSQLBase>(_driverPropertys.BigTextScriptHistoryTable);
+            exexcuteExpressions?.TryDispose();
+        }
+        catch
+        {
+        }
         _db?.TryDispose();
         return base.DisposeAsync(disposing);
     }

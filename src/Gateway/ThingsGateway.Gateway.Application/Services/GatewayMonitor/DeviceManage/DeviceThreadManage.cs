@@ -656,7 +656,7 @@ internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
             channelRuntime.DeviceThreadManage.LogMessage?.LogInformation($"Device {newDeviceRuntime.Name} switched to primary channel");
 
             //需要重启业务线程
-            var businessDeviceRuntimes = GlobalData.IdDevices.Where(a => a.Value.Driver is BusinessBase).Where(a => ((BusinessBase)a.Value.Driver).CollectDevices.ContainsKey(a.Key) == true).Select(a => a.Value).ToArray();
+            var businessDeviceRuntimes = GlobalData.IdDevices.Where(a => a.Value.Driver is BusinessBase && ((BusinessBase)a.Value.Driver).CollectDevices.ContainsKey(a.Key) == true).Select(a => a.Value).ToArray();
             await businessDeviceRuntimes.ParallelForEachAsync(async (businessDeviceRuntime, token) =>
               {
                   if (businessDeviceRuntime.Driver != null)

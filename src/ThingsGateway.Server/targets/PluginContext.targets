@@ -75,9 +75,7 @@
 
 		<RemoveDir Directories="$(PluginFolder)" />
 		<RemoveDir Directories="$(GatewayPluginFolder)" />
-		<PropertyGroup>
-			<PluginTargetFramework>net8.0</PluginTargetFramework>
-		</PropertyGroup>
+	
 		<ItemGroup>
 			<!-- setting up the variable for convenience -->
 			<PkgThingsGateway_Plugin_ModbusPackageFiles Include="$(PkgThingsGateway_Plugin_Modbus)\Content\$(PluginTargetFramework)\**\*.*" />

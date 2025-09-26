@@ -8,6 +8,7 @@ namespace ThingsGateway.SqlSugar
         protected override string TomultipleSqlString(List<IGrouping<int, DbColumnInfo>> groupList)
         {
             StringBuilder sb = new StringBuilder();
+            var keys = this.PrimaryKeys.ToHashSet(StringComparer.OrdinalIgnoreCase);
             int i = 0;
             sb.AppendJoin("\r\n", groupList.Select(t =>
             {
@@ -16,7 +17,7 @@ namespace ThingsGateway.SqlSugar
                 var pkList = t.Where(s => s.IsPrimarykey);
                 if (this.IsWhereColumns && this.PrimaryKeys?.Count > 0)
                 {
-                    var whereColumns = pkList.Where(it => this.PrimaryKeys?.Any(p => p.EqualCase(it.PropertyName) || p.EqualCase(it.DbColumnName)) == true);
+                    var whereColumns = pkList.Where(it => keys?.Contains(it.PropertyName) == true || keys?.Contains(it.DbColumnName) == true);
                     if (whereColumns.Any())
                     {
                         pkList = whereColumns;

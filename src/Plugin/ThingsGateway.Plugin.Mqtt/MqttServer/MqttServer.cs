@@ -11,10 +11,12 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
 using MQTTnet.AspNetCore;
 
 using ThingsGateway.Foundation;
+using ThingsGateway.NewLife;
 
 using TouchSocket.Core;
 
@@ -47,6 +49,24 @@ public partial class MqttServer : BusinessBaseWithCacheIntervalScriptAll
         var configuration = new ConfigurationBuilder()
          .SetBasePath(PluginDirectory)
          .Build();
+#if NET10_0_OR_GREATER
+        var webBuilder =
+             new Microsoft.Extensions.Hosting.HostBuilder()
+    .ConfigureWebHost(webHostBuilder =>
+    {
+        webHostBuilder
+                 .UseKestrel(
+                             o =>
+                             {
+                                 o.ListenAnyIP(_driverPropertys.Port, l => l.UseMqtt());
+                                 o.ListenAnyIP(_driverPropertys.WebSocketPort);
+                             }).UseStartup<MqttServerStartup>().UseConfiguration(configuration);
+    });
+
+        _webHost = webBuilder.Build();
+        _mqttServer = _webHost.Services.GetRequiredService<MqttHostedServer>();
+        await _webHost.StartAsync(cancellationToken).ConfigureAwait(false);
+#else
         var webBuilder = new WebHostBuilder()
      .UseKestrel(
                              o =>
@@ -59,6 +79,7 @@ public partial class MqttServer : BusinessBaseWithCacheIntervalScriptAll
            .Build();
         _mqttServer = _webHost.Services.GetRequiredService<MqttHostedServer>();
         await _webHost.StartAsync(cancellationToken).ConfigureAwait(false);
+#endif
 
         #endregion 初始化
         await base.InitChannelAsync(channel, cancellationToken).ConfigureAwait(false);
@@ -72,6 +93,16 @@ public partial class MqttServer : BusinessBaseWithCacheIntervalScriptAll
     /// <inheritdoc/>
     protected override async Task DisposeAsync(bool disposing)
     {
+
+        try
+        {
+            var exexcuteExpressions = CSharpScriptEngineExtension.Do<DynamicMqttServerRpcBase>(_driverPropertys.BigTextScriptRpc);
+            exexcuteExpressions?.TryDispose();
+        }
+        catch
+        {
+        }
+
         await base.DisposeAsync(disposing).ConfigureAwait(false);
         if (_mqttServer != null)
         {

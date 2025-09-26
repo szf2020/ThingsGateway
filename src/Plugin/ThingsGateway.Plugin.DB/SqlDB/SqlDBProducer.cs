@@ -61,6 +61,22 @@ public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariable
     private SqlSugarClient _db;
     protected override Task DisposeAsync(bool disposing)
     {
+        try
+        {
+            var exexcuteExpressions = CSharpScriptEngineExtension.Do<DynamicSQLBase>(_driverPropertys.BigTextScriptHistoryTable);
+            exexcuteExpressions?.TryDispose();
+        }
+        catch
+        {
+        }
+        try
+        {
+            var exexcuteExpressions = CSharpScriptEngineExtension.Do<DynamicSQLBase>(_driverPropertys.BigTextScriptRealTable);
+            exexcuteExpressions?.TryDispose();
+        }
+        catch
+        {
+        }
         _db?.TryDispose();
         return base.DisposeAsync(disposing);
     }

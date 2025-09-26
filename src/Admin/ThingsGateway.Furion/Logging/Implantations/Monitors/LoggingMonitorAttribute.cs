@@ -151,7 +151,7 @@ public sealed class LoggingMonitorAttribute : Attribute, IAsyncActionFilter, IAs
             return;
         }
 
-        await MonitorAsync(actionMethod, context.ActionArguments, context, next).ConfigureAwait(false);
+        await MonitorAsync(actionMethod, context.ActionArguments, context, () => next()).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -183,7 +183,7 @@ public sealed class LoggingMonitorAttribute : Attribute, IAsyncActionFilter, IAs
             return;
         }
 
-        await MonitorAsync(actionMethod, context.HandlerArguments, context, next).ConfigureAwait(false);
+        await MonitorAsync(actionMethod, context.HandlerArguments, context, () => next()).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -789,12 +789,12 @@ public sealed class LoggingMonitorAttribute : Attribute, IAsyncActionFilter, IAs
         return typeName;
     }
 
-    private async Task MonitorAsync(MethodInfo actionMethod, IDictionary<string, object> parameterValues, FilterContext context, dynamic next)
+    private async Task MonitorAsync<T>(MethodInfo actionMethod, IDictionary<string, object> parameterValues, FilterContext context, Func<Task<T>> next)
     {
         // 排除 WebSocket 请求处理
         if (context.HttpContext.IsWebSocketRequest())
         {
-            _ = await next();
+            _ = await next().ConfigureAwait(false);
             return;
         }
 
@@ -805,14 +805,14 @@ public sealed class LoggingMonitorAttribute : Attribute, IAsyncActionFilter, IAs
         if (actionMethod.IsDefined(typeof(SuppressMonitorAttribute), true)
             || actionMethod.DeclaringType.IsDefined(typeof(SuppressMonitorAttribute), true))
         {
-            _ = await next();
+            _ = await next().ConfigureAwait(false);
             return;
         }
 
         // 判断是否自定义了日志筛选器，如果是则检查是否符合条件
         if (LoggingMonitorSettings.InternalWriteFilter?.Invoke(context) == false)
         {
-            _ = await next();
+            _ = await next().ConfigureAwait(false);
             return;
         }
 
@@ -825,7 +825,7 @@ public sealed class LoggingMonitorAttribute : Attribute, IAsyncActionFilter, IAs
         // 解决局部和全局触发器同时配置触发两次问题
         if (isDefinedScopedAttribute && Settings.FromGlobalFilter == true)
         {
-            _ = await next();
+            _ = await next().ConfigureAwait(false);
             return;
         }
 
@@ -839,7 +839,7 @@ public sealed class LoggingMonitorAttribute : Attribute, IAsyncActionFilter, IAs
                     && !Settings.IncludeOfMethods.Contains(methodFullName, StringComparer.OrdinalIgnoreCase))
                 {
                     // 查找是否包含匹配，忽略大小写
-                    _ = await next();
+                    _ = await next().ConfigureAwait(false);
                     return;
                 }
 
@@ -847,7 +847,7 @@ public sealed class LoggingMonitorAttribute : Attribute, IAsyncActionFilter, IAs
                 if (Settings.GlobalEnabled
                     && Settings.ExcludeOfMethods.Contains(methodFullName, StringComparer.OrdinalIgnoreCase))
                 {
-                    _ = await next();
+                    _ = await next().ConfigureAwait(false);
                     return;
                 }
             }
@@ -958,7 +958,8 @@ public sealed class LoggingMonitorAttribute : Attribute, IAsyncActionFilter, IAs
 
         // 计算接口执行时间
         var timeOperation = Stopwatch.StartNew();
-        var resultContext = await next();
+
+        var resultContext = await next().ConfigureAwait(false);
         timeOperation.Stop();
         writer.WriteNumber("timeOperationElapsedMilliseconds", timeOperation.ElapsedMilliseconds);
 
@@ -1014,8 +1015,13 @@ public sealed class LoggingMonitorAttribute : Attribute, IAsyncActionFilter, IAs
         var environment = httpContext.RequestServices.GetRequiredService<IWebHostEnvironment>().EnvironmentName;
         writer.WriteString(nameof(environment), environment);
 
+        Exception exception = null;
         // 获取异常对象情况
-        Exception exception = resultContext.Exception;
+        if (resultContext is PageHandlerExecutedContext pageHandlerExecutedContext)
+            exception = pageHandlerExecutedContext.Exception;
+        else if (resultContext is ActionExecutedContext actionExecutedContext)
+            exception = actionExecutedContext.Exception;
+
         if (exception == null)
         {
             // 解析存储的验证信息

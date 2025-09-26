@@ -5,6 +5,8 @@ namespace ThingsGateway.SqlSugar
 {
     public class SubWhereIF : ISubOperation
     {
+        private static readonly Regex _regex = new Regex("Subqueryable");
+
         public bool HasWhere
         {
             get; set;
@@ -45,7 +47,7 @@ namespace ThingsGateway.SqlSugar
             {
                 Check.Exception(true, ErrorMessage.WhereIFCheck, exp.Arguments[0].ToString());
             }
-            if (Regex.Matches(expression.ToString(), "Subqueryable").Count >= 2)
+            if (_regex.Count(expression.ToString()) >= 2)
             {
                 new SubSelect() { Context = this.Context }.SetShortNameNext(exp, "+");
             }

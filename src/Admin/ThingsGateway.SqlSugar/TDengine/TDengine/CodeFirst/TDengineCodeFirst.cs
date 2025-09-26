@@ -128,12 +128,10 @@ namespace ThingsGateway.SqlSugar
                     }
                 }
                 var dropColumns = dbColumns
-                                          .Where(dc => !entityColumns.Any(ec => dc.DbColumnName.Equals(ec.OldDbColumnName, StringComparison.CurrentCultureIgnoreCase)))
-                                          .Where(dc => !entityColumns.Any(ec => dc.DbColumnName.Equals(ec.DbColumnName, StringComparison.CurrentCultureIgnoreCase)))
+                                          .Where(dc => !entityColumns.Any(ec => dc.DbColumnName.Equals(ec.OldDbColumnName, StringComparison.CurrentCultureIgnoreCase)) && !entityColumns.Any(ec => dc.DbColumnName.Equals(ec.DbColumnName, StringComparison.CurrentCultureIgnoreCase)))
                                           ;
                 var addColumns = entityColumns
-                                          .Where(ec => ec.OldDbColumnName.IsNullOrEmpty() || !dbColumns.Any(dc => dc.DbColumnName.Equals(ec.OldDbColumnName, StringComparison.CurrentCultureIgnoreCase)))
-                                          .Where(ec => !dbColumns.Any(dc => ec.DbColumnName.Equals(dc.DbColumnName, StringComparison.CurrentCultureIgnoreCase)));
+                                          .Where(ec => (ec.OldDbColumnName.IsNullOrEmpty() || !dbColumns.Any(dc => dc.DbColumnName.Equals(ec.OldDbColumnName, StringComparison.CurrentCultureIgnoreCase))) && !dbColumns.Any(dc => ec.DbColumnName.Equals(dc.DbColumnName, StringComparison.CurrentCultureIgnoreCase)));
 
                 var renameColumns = entityColumns
                     .Where(it => !string.IsNullOrEmpty(it.OldDbColumnName))
@@ -178,7 +176,7 @@ namespace ThingsGateway.SqlSugar
         public override void NoExistLogic(EntityInfo entityInfo)
         {
             List<DbColumnInfo> dbColumns = new List<DbColumnInfo>();
-            foreach (var item in entityInfo.Columns.Where(it => it.IsIgnore != true).Where(it => it.PropertyName != "TagsTypeId").OrderBy(it => it.UnderType == typeof(DateTime) ? 0 : 1))
+            foreach (var item in entityInfo.Columns.Where(it => it.IsIgnore != true && it.PropertyName != "TagsTypeId").OrderBy(it => it.UnderType == typeof(DateTime) ? 0 : 1))
             {
                 var addItem = EntityColumnToDbColumn(entityInfo, entityInfo.DbTableName, item);
                 dbColumns.Add(addItem);

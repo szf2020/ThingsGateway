@@ -127,7 +127,9 @@
  
 
 
-@{#else}
+@{
+    #else
+}
 
 <AdminTable @ref=table BeforeShowEditDialogCallback="BeforeShowEditDialogCallback"
             TItem="DeviceRuntime"
@@ -237,7 +239,9 @@
     </TableToolbarTemplate>
 </AdminTable>
 
-@{#endif}
+@{
+    #endif
+}
 
 
 @code {

@@ -169,7 +169,7 @@ namespace ThingsGateway.SqlSugar
         /// </summary>
         private bool IsIdEntity(EntityInfo entity)
         {
-            return entity.Columns.Where(it => it.IsIdentity || it.OracleSequenceName.HasValue()).Any();
+            return entity.Columns.Any(it => it.IsIdentity || it.OracleSequenceName.HasValue());
         }
 
         /// <summary>

@@ -951,7 +951,7 @@ namespace ThingsGateway.SqlSugar
                 var groups = indexColumns.SelectMany(it => it.IndexGroupNameList).GroupBy(it => it).Select(it => it.Key);
                 foreach (var item in groups)
                 {
-                    var columnNames = indexColumns.Where(it => it.IndexGroupNameList.Any(i => i.Equals(item, StringComparison.CurrentCultureIgnoreCase))).Select(it => it.DbColumnName).ToArray();
+                    var columnNames = indexColumns.Where(it => it.IndexGroupNameList.Contains(item)).Select(it => it.DbColumnName).ToArray();
                     var indexName = string.Format("Index_{0}_{1}" + this.Context.CurrentConnectionConfig.IndexSuffix, entityInfo.DbTableName, string.Join("_", columnNames));
                     if (!IsAnyIndex(indexName))
                     {
@@ -966,7 +966,7 @@ namespace ThingsGateway.SqlSugar
                 var groups = uIndexColumns.SelectMany(it => it.UIndexGroupNameList).GroupBy(it => it).Select(it => it.Key);
                 foreach (var item in groups)
                 {
-                    var columnNames = uIndexColumns.Where(it => it.UIndexGroupNameList.Any(i => i.Equals(item, StringComparison.CurrentCultureIgnoreCase))).Select(it => it.DbColumnName).ToArray();
+                    var columnNames = uIndexColumns.Where(it => it.UIndexGroupNameList.Contains(item)).Select(it => it.DbColumnName).ToArray();
                     var indexName = string.Format("Index_{0}_{1}_Unique" + this.Context.CurrentConnectionConfig.IndexSuffix, entityInfo.DbTableName, string.Join("_", columnNames));
                     if (!IsAnyIndex(indexName))
                     {

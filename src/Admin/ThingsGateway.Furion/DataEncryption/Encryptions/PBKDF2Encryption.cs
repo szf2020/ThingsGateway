@@ -10,6 +10,7 @@
 // ------------------------------------------------------------------------
 
 using System.Security.Cryptography;
+using System.Text;
 
 namespace ThingsGateway.DataEncryption;
 
@@ -34,9 +35,12 @@ public static class PBKDF2Encryption
         using var rng = RandomNumberGenerator.Create();
         var salt = new byte[saltSize];
         rng.GetBytes(salt);
-
+#if NET10_0_OR_GREATER
+         var hash = Rfc2898DeriveBytes.Pbkdf2(Encoding.UTF8.GetBytes(text), salt, iterationCount, HashAlgorithmName.SHA256, derivedKeyLength);
+#else
         using var pbkdf2 = new Rfc2898DeriveBytes(text, salt, iterationCount, HashAlgorithmName.SHA256);
         var hash = pbkdf2.GetBytes(derivedKeyLength);
+#endif
 
         // 分别编码盐和哈希，并用分隔符拼接
         return Convert.ToBase64String(salt) + SaltHashSeparator + Convert.ToBase64String(hash);
@@ -65,8 +69,12 @@ public static class PBKDF2Encryption
             if (saltBytes.Length != saltSize || storedHashBytes.Length != derivedKeyLength)
                 return false;
 
-            using var pbkdf2 = new Rfc2898DeriveBytes(text, saltBytes, iterationCount, HashAlgorithmName.SHA256);
-            var computedHash = pbkdf2.GetBytes(derivedKeyLength);
+#if NET10_0_OR_GREATER
+            var computedHash = Rfc2898DeriveBytes.Pbkdf2(Encoding.UTF8.GetBytes(text), saltBytes, iterationCount, HashAlgorithmName.SHA256, derivedKeyLength);
+#else
+        using var pbkdf2 = new Rfc2898DeriveBytes(text, saltBytes, iterationCount, HashAlgorithmName.SHA256);
+        var computedHash = pbkdf2.GetBytes(derivedKeyLength);
+#endif
 
             return computedHash.SequenceEqual(storedHashBytes);
         }

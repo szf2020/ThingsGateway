@@ -166,15 +166,6 @@ namespace ThingsGateway.SqlSugar
             return this.Context.Insertable<T>(columnDictionary);
         }
 
-        public IInsertable<T> Insertable<T>(dynamic insertDynamicObject) where T : class, new()
-        {
-            if (insertDynamicObject is IReadOnlyCollection<T>)
-            {
-                return this.Context.Insertable<T>((insertDynamicObject as IReadOnlyCollection<T>).ToList());
-            }
-            return this.Context.Insertable<T>(insertDynamicObject);
-        }
-
         public IInsertable<T> Insertable<T>(IReadOnlyCollection<T> insertObjs) where T : class, new()
         {
             return this.Context.Insertable<T>(insertObjs);
@@ -187,7 +178,7 @@ namespace ThingsGateway.SqlSugar
             {
                 Check.ExceptionEasy("Object type use db.InsertableByObject(obj).ExecuteCommand()", "检测到T为Object类型，请使用 db.InsertableByObject(obj).ExecuteCommand()，Insertable不支持object，InsertableByObject可以(缺点：功能比较少)");
             }
-            return this.Context.Insertable<T>(insertObj);
+            return this.Context.InsertableT<T>(insertObj);
         }
 
         #endregion
@@ -695,15 +686,6 @@ namespace ThingsGateway.SqlSugar
             return this.Context.Updateable<T>(columnDictionary);
         }
 
-        public IUpdateable<T> Updateable<T>(dynamic updateDynamicObject) where T : class, new()
-        {
-            if (updateDynamicObject is IReadOnlyCollection<T>)
-            {
-                return this.Context.Updateable<T>((updateDynamicObject as IReadOnlyCollection<T>).ToList());
-            }
-            return this.Context.Updateable<T>(updateDynamicObject);
-        }
-
         public IUpdateable<T> Updateable<T>(Expression<Func<T, bool>> columns) where T : class, new()
         {
             return this.Context.Updateable<T>(columns);
@@ -721,7 +703,7 @@ namespace ThingsGateway.SqlSugar
 
         public IUpdateable<T> UpdateableT<T>(T UpdateObj) where T : class, new()
         {
-            return this.Context.Updateable<T>(UpdateObj);
+            return this.Context.UpdateableT<T>(UpdateObj);
         }
 
         #endregion
@@ -741,11 +723,24 @@ namespace ThingsGateway.SqlSugar
             return this.Context.Deleteable<T>();
         }
 
-        public IDeleteable<T> DeleteableById<T>(dynamic primaryKeyValue) where T : class, new()
+        public IDeleteable<T> DeleteableById<T>(object primaryKeyValue) where T : class, new()
         {
             return this.Context.DeleteableById<T>(primaryKeyValue);
         }
+        public IDeleteable<T> DeleteableById<T>(Expression<Func<T, object>> inField, object primaryKeyValue) where T : class, new()
+        {
+            return this.Context.DeleteableById<T>(inField, primaryKeyValue);
+        }
 
+        public IDeleteable<T> DeleteableById<T>(Expression<Func<T, object>> inField, IReadOnlyCollection<object> primaryKeyValue) where T : class, new()
+        {
+            return this.Context.DeleteableById<T>(inField, primaryKeyValue);
+        }
+
+        public IDeleteable<T> DeleteableById<T>(Expression<Func<T, object>> inField, ISugarQueryable<object> primaryKeyValue) where T : class, new()
+        {
+            return this.Context.DeleteableById<T>(inField, primaryKeyValue);
+        }
 
 
         public IDeleteable<T> Deleteable<T>(Expression<Func<T, bool>> expression) where T : class, new()
@@ -753,7 +748,7 @@ namespace ThingsGateway.SqlSugar
             return this.Context.Deleteable(expression);
         }
 
-        public IDeleteable<T> DeleteableById<T>(IReadOnlyCollection<dynamic> pkValue) where T : class, new()
+        public IDeleteable<T> DeleteableById<T>(IReadOnlyCollection<object> pkValue) where T : class, new()
         {
             return this.Context.DeleteableById<T>(pkValue);
         }
@@ -812,7 +807,7 @@ namespace ThingsGateway.SqlSugar
         {
             return new SqlSugarTransaction(this);
         }
-        public void RemoveConnection(dynamic configId)
+        public void RemoveConnection(object configId)
         {
             var removeData = this._AllClients.FirstOrDefault(it => ((object)it.ConnectionConfig.ConfigId).ObjToString() == ((object)configId).ObjToString());
             object currentId = this.CurrentConnectionConfig.ConfigId;
@@ -1560,6 +1555,8 @@ namespace ThingsGateway.SqlSugar
         {
             return this.GetConnectionWithAttr<T>().Deleteable(deleteObjects);
         }
+
+
         #endregion
     }
 }

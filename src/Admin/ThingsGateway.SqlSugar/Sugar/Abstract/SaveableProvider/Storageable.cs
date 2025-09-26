@@ -484,11 +484,11 @@ namespace ThingsGateway.SqlSugar
             }
             else
             {
-                var list = GetExpressionValue(columns, ResolveExpressType.ArraySingle).GetResultArray().Select(it => Builder.GetNoTranslationColumnName(it));
+                var list = GetExpressionValue(columns, ResolveExpressType.ArraySingle).GetResultArray().Select(it => Builder.GetNoTranslationColumnName(it)).ToHashSet(StringComparer.OrdinalIgnoreCase);
                 var dbColumns = this.Context.EntityMaintenance.GetEntityInfo<T>().Columns.Where(it => it.IsIgnore == false).ToArray();
-                var whereColumns = dbColumns.Where(it => list.Any(y =>
-                                      it.DbColumnName.Equals(y, StringComparison.CurrentCultureIgnoreCase) ||
-                                      it.PropertyName.Equals(y, StringComparison.CurrentCultureIgnoreCase))
+                var whereColumns = dbColumns.Where(it => list.Contains(
+                                      it.DbColumnName) || list.Contains(
+                                      it.PropertyName)
                                   ).ToList();
                 wherecolumnList = whereColumns;
                 if (whereColumns.Count == 0)

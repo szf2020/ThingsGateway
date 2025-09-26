@@ -12,6 +12,7 @@ using BenchmarkConsoleApp;
 
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Diagnosers;
+using BenchmarkDotNet.Jobs;
 
 using HslCommunication.Profinet.Siemens;
 
@@ -23,7 +24,11 @@ using TouchSocket.Core;
 
 namespace ThingsGateway.Foundation;
 
+//[SimpleJob(RuntimeMoniker.Net80)]
+[SimpleJob(RuntimeMoniker.Net10_0)]
 [MemoryDiagnoser]
+[BaselineColumn]
+[RankColumn]
 public class S7Benchmark : IDisposable
 {
     private List<SiemensS7Master> siemensS7s = new();
@@ -31,7 +36,8 @@ public class S7Benchmark : IDisposable
     private List<Plc> plcs = new();
     private List<SiemensS7Net> siemensS7Nets = new();
 
-    public S7Benchmark()
+    [GlobalSetup]
+    public async Task Init()
 
     {
         {
@@ -46,24 +52,24 @@ public class S7Benchmark : IDisposable
                     SiemensS7Type = SiemensTypeEnum.S1500
                 };
                 siemensS7.InitChannel(clientChannel);
-                clientChannel.SetupAsync(clientChannel.Config).GetFalseAwaitResult();
+                await clientChannel.SetupAsync(clientChannel.Config);
                 clientChannel.Logger.LogLevel = LogLevel.Warning;
-                siemensS7.ConnectAsync(CancellationToken.None).GetFalseAwaitResult();
-                siemensS7.ReadAsync("M1", 100).GetAwaiter().GetResult();
+                await siemensS7.ConnectAsync(CancellationToken.None);
+                await siemensS7.ReadAsync("M1", 100);
                 siemensS7s.Add(siemensS7);
             }
             for (int i = 0; i < Program.ClientCount; i++)
             {
                 var siemensS7Net = new SiemensS7Net(SiemensPLCS.S1500, "127.0.0.1");
-                siemensS7Net.ConnectServer();
-                siemensS7Net.ReadAsync("M0", 100).GetFalseAwaitResult();
+                await siemensS7Net.ConnectServerAsync();
+                await siemensS7Net.ReadAsync("M0", 100);
                 siemensS7Nets.Add(siemensS7Net);
             }
             for (int i = 0; i < Program.ClientCount; i++)
             {
                 var plc = new Plc(CpuType.S7300, "127.0.0.1", 102, 0, 0);
-                plc.Open();//打开plc连接
-                plc.ReadAsync(DataType.Memory, 1, 0, VarType.Byte, 100).GetFalseAwaitResult();
+                await plc.OpenAsync();//打开plc连接
+                await plc.ReadAsync(DataType.Memory, 1, 0, VarType.Byte, 100);
                 plcs.Add(plc);
             }
         }

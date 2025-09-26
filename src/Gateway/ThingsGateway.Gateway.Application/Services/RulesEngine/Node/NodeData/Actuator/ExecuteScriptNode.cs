@@ -95,7 +95,6 @@ public class ExecuteScriptNode : TextNode, IActuatorNode, IExexcuteExpressionsBa
                 catch
                 {
                 }
-                CSharpScriptEngineExtension.Remove(text);
             }
 #endif
             text = value;
@@ -141,7 +140,6 @@ public class ExecuteScriptNode : TextNode, IActuatorNode, IExexcuteExpressionsBa
             catch
             {
             }
-            CSharpScriptEngineExtension.Remove(text);
         }
 #endif
         GC.SuppressFinalize(this);

@@ -104,7 +104,7 @@ namespace ThingsGateway.SqlSugar
                 Type dynamicType = typeof(T);
 
                 ParameterExpression sourceItem = Expression.Parameter(sourceType, "t");
-                IEnumerable<MemberBinding> bindings = dynamicType.GetProperties().Where(it => sourceProperties.Any(s => s.Key == it.Name)).Select(p => Expression.Bind(p, Expression.Property(sourceItem, sourceProperties[p.Name]))).OfType<MemberBinding>();
+                IEnumerable<MemberBinding> bindings = dynamicType.GetProperties().Where(it => sourceProperties.ContainsKey(it.Name)).Select(p => Expression.Bind(p, Expression.Property(sourceItem, sourceProperties[p.Name]))).OfType<MemberBinding>();
 
                 return Expression.Lambda<Func<T, object>>(Expression.MemberInit(
                     Expression.New(dynamicType.GetConstructor(Type.EmptyTypes)), bindings), sourceItem);

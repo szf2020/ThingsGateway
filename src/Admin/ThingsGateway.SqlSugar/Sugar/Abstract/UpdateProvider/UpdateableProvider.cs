@@ -625,16 +625,6 @@ namespace ThingsGateway.SqlSugar
                 this.UpdateBuilder.UpdateColumns = new List<string>();
             }
             this.UpdateBuilder.UpdateColumns.AddRange(updateColumns);
-            //List<string> primaryKeys = GetPrimaryKeys();
-            //foreach (var item in this.UpdateBuilder.DbColumnInfoList)
-            //{
-            //    var mappingInfo = primaryKeys.SingleOrDefault(i => item.DbColumnName.Equals(i, StringComparison.CurrentCultureIgnoreCase));
-            //    if (mappingInfo != null && mappingInfo.Any())
-            //    {
-            //        item.IsPrimarykey = true;
-            //    }
-            //}
-            //this.UpdateBuilder.DbColumnInfoList = this.UpdateBuilder.DbColumnInfoList.Where(it => updateColumns.Any(uc => uc.Equals(it.PropertyName, StringComparison.CurrentCultureIgnoreCase) || uc.Equals(it.DbColumnName, StringComparison.CurrentCultureIgnoreCase)) || it.IsPrimarykey || it.IsIdentity).ToList();
             return this;
         }
         public IUpdateable<T> UpdateColumns(IReadOnlyCollection<string> columns, bool appendColumnsByDataFilter)
@@ -756,7 +746,9 @@ namespace ThingsGateway.SqlSugar
             {
                 UpdateBuilder.SetValues.Add(new KeyValuePair<string, string>(SqlBuilder.GetTranslationColumnName(fieldName), $"{SqlBuilder.GetTranslationColumnName(fieldName)}={parameterName}"));
             }
-            this.UpdateBuilder.DbColumnInfoList = this.UpdateBuilder.DbColumnInfoList.Where(it => (UpdateParameterIsNull == false && IsPrimaryKey(it)) || UpdateBuilder.SetValues.Any(v => SqlBuilder.GetNoTranslationColumnName(v.Key).Equals(it.DbColumnName, StringComparison.CurrentCultureIgnoreCase) || SqlBuilder.GetNoTranslationColumnName(v.Key).Equals(it.PropertyName, StringComparison.CurrentCultureIgnoreCase)) || it.IsPrimarykey == true).ToList();
+            var keys = GetPrimaryKeys().ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+            this.UpdateBuilder.DbColumnInfoList = this.UpdateBuilder.DbColumnInfoList.Where(it => (UpdateParameterIsNull == false && IsPrimaryKey(keys, it)) || UpdateBuilder.SetValues.Any(v => SqlBuilder.GetNoTranslationColumnName(v.Key).Equals(it.DbColumnName, StringComparison.CurrentCultureIgnoreCase) || SqlBuilder.GetNoTranslationColumnName(v.Key).Equals(it.PropertyName, StringComparison.CurrentCultureIgnoreCase)) || it.IsPrimarykey == true).ToList();
             if (!this.UpdateBuilder.DbColumnInfoList.Any(it => it.DbColumnName.EqualCase(fieldName)))
             {
                 this.UpdateBuilder.DbColumnInfoList.Add(new DbColumnInfo()
@@ -795,7 +787,8 @@ namespace ThingsGateway.SqlSugar
             var value = UpdateBuilder.GetExpressionValue(exp, ResolveExpressType.WhereSingle).GetString();
             value = $" {name}={value} ";
             this.UpdateBuilder.SetValues.Add(new KeyValuePair<string, string>(name, value));
-            this.UpdateBuilder.DbColumnInfoList = this.UpdateBuilder.DbColumnInfoList.Where(it => (UpdateParameterIsNull == false && IsPrimaryKey(it)) || UpdateBuilder.SetValues.Any(v => SqlBuilder.GetNoTranslationColumnName(v.Key).Equals(it.DbColumnName, StringComparison.CurrentCultureIgnoreCase) || SqlBuilder.GetNoTranslationColumnName(v.Key).Equals(it.PropertyName, StringComparison.CurrentCultureIgnoreCase)) || it.IsPrimarykey == true).ToList();
+            var keys = GetPrimaryKeys().ToHashSet(StringComparer.OrdinalIgnoreCase);
+            this.UpdateBuilder.DbColumnInfoList = this.UpdateBuilder.DbColumnInfoList.Where(it => (UpdateParameterIsNull == false && IsPrimaryKey(keys, it)) || UpdateBuilder.SetValues.Any(v => SqlBuilder.GetNoTranslationColumnName(v.Key).Equals(it.DbColumnName, StringComparison.CurrentCultureIgnoreCase) || SqlBuilder.GetNoTranslationColumnName(v.Key).Equals(it.PropertyName, StringComparison.CurrentCultureIgnoreCase)) || it.IsPrimarykey == true).ToList();
             AppendSets();
             if (typeof(T) == UtilConstants.ObjType)
             {
@@ -834,7 +827,8 @@ namespace ThingsGateway.SqlSugar
                     UpdateBuilder.SetValues.Add(new KeyValuePair<string, string>(SqlBuilder.GetTranslationColumnName(key), value));
                 }
             }
-            this.UpdateBuilder.DbColumnInfoList = UpdateBuilder.DbColumnInfoList.Where(it => it.UpdateServerTime == true || it.UpdateSql.HasValue() || (UpdateParameterIsNull == false && IsPrimaryKey(it)) || UpdateBuilder.SetValues.Any(v => SqlBuilder.GetNoTranslationColumnName(v.Key).Equals(it.DbColumnName, StringComparison.CurrentCultureIgnoreCase) || SqlBuilder.GetNoTranslationColumnName(v.Key).Equals(it.PropertyName, StringComparison.CurrentCultureIgnoreCase)) || it.IsPrimarykey == true).ToList();
+            var pkeys = GetPrimaryKeys().ToHashSet(StringComparer.OrdinalIgnoreCase);
+            this.UpdateBuilder.DbColumnInfoList = UpdateBuilder.DbColumnInfoList.Where(it => it.UpdateServerTime == true || it.UpdateSql.HasValue() || (UpdateParameterIsNull == false && IsPrimaryKey(pkeys, it)) || UpdateBuilder.SetValues.Any(v => SqlBuilder.GetNoTranslationColumnName(v.Key).Equals(it.DbColumnName, StringComparison.CurrentCultureIgnoreCase) || SqlBuilder.GetNoTranslationColumnName(v.Key).Equals(it.PropertyName, StringComparison.CurrentCultureIgnoreCase)) || it.IsPrimarykey == true).ToList();
             CheckTranscodeing(false);
             AppendSets();
             return this;
@@ -894,7 +888,8 @@ namespace ThingsGateway.SqlSugar
                     }
                 }
             }
-            this.UpdateBuilder.DbColumnInfoList = UpdateBuilder.DbColumnInfoList.Where(it => it.UpdateServerTime || it.UpdateSql.HasValue() || (UpdateParameterIsNull == false && IsPrimaryKey(it)) || UpdateBuilder.SetValues.Any(v => SqlBuilder.GetNoTranslationColumnName(v.Key).Equals(it.DbColumnName, StringComparison.CurrentCultureIgnoreCase) || SqlBuilder.GetNoTranslationColumnName(v.Key).Equals(it.PropertyName, StringComparison.CurrentCultureIgnoreCase)) || it.IsPrimarykey == true).ToList();
+            var pkeys = GetPrimaryKeys().ToHashSet(StringComparer.OrdinalIgnoreCase);
+            this.UpdateBuilder.DbColumnInfoList = UpdateBuilder.DbColumnInfoList.Where(it => it.UpdateServerTime || it.UpdateSql.HasValue() || (UpdateParameterIsNull == false && IsPrimaryKey(pkeys, it)) || UpdateBuilder.SetValues.Any(v => SqlBuilder.GetNoTranslationColumnName(v.Key).Equals(it.DbColumnName, StringComparison.CurrentCultureIgnoreCase) || SqlBuilder.GetNoTranslationColumnName(v.Key).Equals(it.PropertyName, StringComparison.CurrentCultureIgnoreCase)) || it.IsPrimarykey == true).ToList();
             CheckTranscodeing(false);
             AppendSets();
             return this;
@@ -935,7 +930,10 @@ namespace ThingsGateway.SqlSugar
                 key = this.EntityInfo.Columns.First(it => it.PropertyName == member.Member.Name).DbColumnName;
                 expResult = $" {this.SqlBuilder.GetTranslationColumnName(key)}={expResult} ";
             }
-            if (EntityInfo.Columns.Where(it => it.IsJson || it.IsTranscoding).Any(it => it.DbColumnName.EqualCase(key) || it.PropertyName.EqualCase(key)))
+
+            var isonPropertyNames = EntityInfo.Columns.Where(it => it.IsJson || it.IsTranscoding).Select(a => a.PropertyName).ToHashSet(StringComparer.OrdinalIgnoreCase);
+            var isonDbColumnNames = EntityInfo.Columns.Where(it => it.IsJson || it.IsTranscoding).Select(a => a.DbColumnName).ToHashSet(StringComparer.OrdinalIgnoreCase);
+            if (isonPropertyNames.Contains(key) || isonDbColumnNames.Contains(key))
             {
                 CheckTranscodeing();
             }
@@ -944,9 +942,10 @@ namespace ThingsGateway.SqlSugar
             {
                 expResult = expResult.Replace(this.SqlBuilder.GetTranslationColumnName((ExpressionTool.RemoveConvert(binaryExp.Left) as MemberExpression).Expression + "") + ".", this.UpdateBuilder.GetTableNameString.TrimEnd() + ".");
             }
+            var pkeys = GetPrimaryKeys().ToHashSet(StringComparer.OrdinalIgnoreCase);
 
             UpdateBuilder.SetValues.Add(new KeyValuePair<string, string>(SqlBuilder.GetTranslationColumnName(key), expResult));
-            this.UpdateBuilder.DbColumnInfoList = this.UpdateBuilder.DbColumnInfoList.Where(it => (UpdateParameterIsNull == false && IsPrimaryKey(it)) || UpdateBuilder.SetValues.Any(v => SqlBuilder.GetNoTranslationColumnName(v.Key).Equals(it.DbColumnName, StringComparison.CurrentCultureIgnoreCase) || SqlBuilder.GetNoTranslationColumnName(v.Key).Equals(it.PropertyName, StringComparison.CurrentCultureIgnoreCase)) || it.IsPrimarykey == true).ToList();
+            this.UpdateBuilder.DbColumnInfoList = this.UpdateBuilder.DbColumnInfoList.Where(it => (UpdateParameterIsNull == false && IsPrimaryKey(pkeys, it)) || UpdateBuilder.SetValues.Any(v => SqlBuilder.GetNoTranslationColumnName(v.Key).Equals(it.DbColumnName, StringComparison.CurrentCultureIgnoreCase) || SqlBuilder.GetNoTranslationColumnName(v.Key).Equals(it.PropertyName, StringComparison.CurrentCultureIgnoreCase)) || it.IsPrimarykey == true).ToList();
             AppendSets();
             return this;
         }

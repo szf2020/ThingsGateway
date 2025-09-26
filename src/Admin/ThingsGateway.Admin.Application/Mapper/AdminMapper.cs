@@ -11,6 +11,7 @@
 using Riok.Mapperly.Abstractions;
 
 namespace ThingsGateway.Admin.Application;
+
 [Mapper(UseDeepCloning = true, EnumMappingStrategy = EnumMappingStrategy.ByName, RequiredMappingStrategy = RequiredMappingStrategy.None)]
 public static partial class AdminMapper
 {

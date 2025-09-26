@@ -7,9 +7,7 @@
 	</ItemGroup>
 
 	<Target Name="CopyOtherPlugin1NugetPackages" AfterTargets="Build">
-		<PropertyGroup>
-			<PluginTargetFramework>net8.0</PluginTargetFramework>
-		</PropertyGroup>
+
 		<ItemGroup>
 			<!-- setting up the variable for convenience -->
 			<PkgThingsGateway_Plugin_ModbusC1PackageFiles Include="$(PkgThingsGateway_Plugin_ModbusC1)\Content\$(PluginTargetFramework)\**\*.*" />

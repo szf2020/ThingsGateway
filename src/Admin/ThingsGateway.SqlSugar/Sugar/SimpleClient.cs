@@ -192,7 +192,7 @@ namespace ThingsGateway.SqlSugar
         }
         public virtual IInsertable<T> AsInsertableT(T insertObj)
         {
-            return Context.Insertable<T>(insertObj);
+            return Context.InsertableT<T>(insertObj);
         }
 
         public virtual IInsertable<T> AsInsertable(IReadOnlyCollection<T> insertObjs)
@@ -201,7 +201,7 @@ namespace ThingsGateway.SqlSugar
         }
         public virtual IUpdateable<T> AsUpdateableT(T updateObj)
         {
-            return Context.Updateable<T>(updateObj);
+            return Context.UpdateableT<T>(updateObj);
         }
 
         public virtual IUpdateable<T> AsUpdateable(IReadOnlyCollection<T> updateObjs)
@@ -219,7 +219,7 @@ namespace ThingsGateway.SqlSugar
         #endregion
 
         #region Method
-        public virtual T GetById(dynamic id)
+        public virtual T GetById(object id)
         {
             return Context.Queryable<T>().InSingle(id);
         }
@@ -354,18 +354,29 @@ namespace ThingsGateway.SqlSugar
         {
             return this.Context.Deleteable<T>().Where(whereExpression).ExecuteCommand() > 0;
         }
-        public virtual bool DeleteById(dynamic id)
+        public virtual bool DeleteById<PKType>(PKType id)
         {
-            return this.Context.Deleteable<T>().In(id).ExecuteCommand() > 0;
+            return this.Context.Deleteable<T>().InT(id).ExecuteCommand() > 0;
         }
-        public virtual bool DeleteByIds(dynamic[] ids)
+
+        public virtual bool DeleteByIds<PKType>(IReadOnlyCollection<PKType> ids)
         {
             return this.Context.Deleteable<T>().In(ids).ExecuteCommand() > 0;
         }
+        public virtual bool DeleteById(object id)
+        {
+            return this.Context.Deleteable<T>().InT(id).ExecuteCommand() > 0;
+        }
+
+        public virtual bool DeleteByIds(IReadOnlyCollection<object> ids)
+        {
+            return this.Context.Deleteable<T>().In(ids).ExecuteCommand() > 0;
+        }
+
         #endregion
 
         #region Async Method
-        public virtual Task<T> GetByIdAsync(dynamic id)
+        public virtual Task<T> GetByIdAsync(object id)
         {
             return Context.Queryable<T>().InSingleAsync(id);
         }
@@ -481,11 +492,11 @@ namespace ThingsGateway.SqlSugar
         {
             return await Context.Deleteable<T>().Where(whereExpression).ExecuteCommandAsync().ConfigureAwait(false) > 0;
         }
-        public virtual async Task<bool> DeleteByIdAsync(dynamic id)
+        public virtual async Task<bool> DeleteByIdAsync(object id)
         {
-            return await this.Context.Deleteable<T>().In(id).ExecuteCommandAsync() > 0;
+            return await this.Context.Deleteable<T>().InT(id).ExecuteCommandAsync().ConfigureAwait(false) > 0;
         }
-        public virtual async Task<bool> DeleteByIdsAsync(dynamic[] ids)
+        public virtual async Task<bool> DeleteByIdsAsync(IReadOnlyCollection<object> ids)
         {
             return await Context.Deleteable<T>().In(ids).ExecuteCommandAsync().ConfigureAwait(false) > 0;
         }
@@ -503,7 +514,7 @@ namespace ThingsGateway.SqlSugar
             return this.Context.Insertable(insertObjs).ExecuteReturnSnowflakeIdListAsync(cancellationToken);
         }
 
-        public virtual Task<T> GetByIdAsync(dynamic id, CancellationToken cancellationToken)
+        public virtual Task<T> GetByIdAsync(object id, CancellationToken cancellationToken)
         {
             this.Context.Ado.CancellationToken = cancellationToken;
             return Context.Queryable<T>().InSingleAsync(id);
@@ -643,12 +654,12 @@ namespace ThingsGateway.SqlSugar
             this.Context.Ado.CancellationToken = cancellationToken;
             return await Context.Deleteable<T>().Where(whereExpression).ExecuteCommandAsync(cancellationToken).ConfigureAwait(false) > 0;
         }
-        public virtual async Task<bool> DeleteByIdAsync(dynamic id, CancellationToken cancellationToken)
+        public virtual async Task<bool> DeleteByIdAsync(object id, CancellationToken cancellationToken)
         {
             this.Context.Ado.CancellationToken = cancellationToken;
-            return await this.Context.Deleteable<T>().In(id).ExecuteCommandAsync() > 0;
+            return await this.Context.Deleteable<T>().InT(id).ExecuteCommandAsync(cancellationToken).ConfigureAwait(false) > 0;
         }
-        public virtual async Task<bool> DeleteByIdsAsync(dynamic[] ids, CancellationToken cancellationToken)
+        public virtual async Task<bool> DeleteByIdsAsync(IReadOnlyCollection<object> ids, CancellationToken cancellationToken)
         {
             this.Context.Ado.CancellationToken = cancellationToken;
             return await Context.Deleteable<T>().In(ids).ExecuteCommandAsync(cancellationToken).ConfigureAwait(false) > 0;
@@ -719,6 +730,8 @@ namespace ThingsGateway.SqlSugar
         {
             return Context.Queryable<T>().Where(conditionalModels).OrderBy(orderByModels).First();
         }
+
+
 
         #endregion
 

@@ -36,19 +36,12 @@ namespace ThingsGateway.SqlSugar
 
             // 获取映射表主键列(排除关联字段)
             var mappingPk = mappingEntity.Columns
-                   .Where(it => it.PropertyName != mappingA.PropertyName)
-                   .Where(it => it.PropertyName != mappingB.PropertyName)
-                   .Where(it => it.IsPrimarykey && !it.IsIdentity && it.OracleSequenceName.IsNullOrEmpty())
+                   .Where(it => it.PropertyName != mappingA.PropertyName && it.PropertyName != mappingB.PropertyName && it.IsPrimarykey && !it.IsIdentity && it.OracleSequenceName.IsNullOrEmpty())
                    .FirstOrDefault();
 
             // 获取映射表其他列(排除关联字段和主键)        
             var mappingOthers = mappingEntity.Columns
-                   .Where(it => it.PropertyName != mappingA.PropertyName)
-                   .Where(it => it.PropertyName != mappingB.PropertyName)
-                   .Where(it => !it.IsIdentity)
-                   .Where(it => !it.IsPrimarykey)
-                   .Where(it => !it.IsOnlyIgnoreInsert)
-                   .Where(it => !it.IsIgnore);
+                   .Where(it => it.PropertyName != mappingA.PropertyName && it.PropertyName != mappingB.PropertyName && !it.IsIdentity && !it.IsPrimarykey && !it.IsOnlyIgnoreInsert && !it.IsIgnore);
 
             // 准备映射表数据
             List<Dictionary<string, object>> mappgingTables = new List<Dictionary<string, object>>();

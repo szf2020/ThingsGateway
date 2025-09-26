@@ -12,7 +12,7 @@ using BenchmarkConsoleApp;
 
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Diagnosers;
-
+using BenchmarkDotNet.Jobs;
 
 using Longbow.Modbus;
 using Longbow.TcpSocket;
@@ -31,6 +31,8 @@ using ModbusMaster = ThingsGateway.Foundation.Modbus.ModbusMaster;
 
 namespace ThingsGateway.Foundation;
 
+[SimpleJob(RuntimeMoniker.Net80)]
+[SimpleJob(RuntimeMoniker.Net10_0)]
 [MemoryDiagnoser]
 public class ModbusBenchmark : IDisposable
 {
@@ -40,7 +42,8 @@ public class ModbusBenchmark : IDisposable
     //private List<ModbusTcpNet> modbusTcpNets = new();
     private List<ModbusTcpMaster> modbusTcpMasters = new();
 
-    public ModbusBenchmark()
+    [GlobalSetup]
+    public async Task Init()
     {
         for (int i = 0; i < Program.ClientCount; i++)
         {
@@ -54,10 +57,10 @@ public class ModbusBenchmark : IDisposable
                 ModbusType = ModbusTypeEnum.ModbusTcp,
             };
             thingsgatewaymodbus.InitChannel(clientChannel);
-            clientChannel.SetupAsync(clientChannel.Config).GetFalseAwaitResult();
+         await   clientChannel.SetupAsync(clientChannel.Config);
             clientChannel.Logger.LogLevel = LogLevel.Warning;
-            thingsgatewaymodbus.ConnectAsync(CancellationToken.None).GetFalseAwaitResult();
-            thingsgatewaymodbus.ReadAsync("40001", 100).GetAwaiter().GetResult();
+         await   thingsgatewaymodbus.ConnectAsync(CancellationToken.None);
+        await    thingsgatewaymodbus.ReadAsync("40001", 100);
             thingsgatewaymodbuss.Add(thingsgatewaymodbus);
         }
 
@@ -67,7 +70,7 @@ public class ModbusBenchmark : IDisposable
 
             var factory = new NModbus.ModbusFactory();
             var nmodbus = factory.CreateMaster(new TcpClient("127.0.0.1", 502));
-            nmodbus.ReadHoldingRegistersAsync(1, 0, 100).GetFalseAwaitResult();
+       await     nmodbus.ReadHoldingRegistersAsync(1, 0, 100);
             nmodbuss.Add(nmodbus);
         }
         //for (int i = 0; i < Program.ClientCount; i++)
@@ -76,20 +79,19 @@ public class ModbusBenchmark : IDisposable
         //    modbusTcpNet.IpAddress = "127.0.0.1";
         //    modbusTcpNet.Port = 502;
         //    modbusTcpNet.ConnectServer();
-        //    modbusTcpNet.ReadAsync("0", 100).GetFalseAwaitResult();
+        //    modbusTcpNet.ReadAsync("0", 100);
         //    modbusTcpNets.Add(modbusTcpNet);
         //}
 
         for (int i = 0; i < Program.ClientCount; i++)
         {
             var client = new ModbusTcpMaster();
-            client.SetupAsync(new TouchSocketConfig()
-    .SetRemoteIPHost("127.0.0.1:502")).GetFalseAwaitResult();
-            client.ConnectAsync(CancellationToken.None).GetFalseAwaitResult();
-            client.ReadHoldingRegistersAsync(0, 100).GetFalseAwaitResult();
+      await      client.SetupAsync(new TouchSocketConfig()
+    .SetRemoteIPHost("127.0.0.1:502"));
+        await    client.ConnectAsync(CancellationToken.None);
+      await      client.ReadHoldingRegistersAsync(0, 100);
             modbusTcpMasters.Add(client);
         }
-
 
         {
             var sc = new ServiceCollection();
@@ -102,8 +104,8 @@ public class ModbusBenchmark : IDisposable
             for (int i = 0; i < Program.ClientCount; i++)
             {
                 var client = factory.GetOrCreateTcpMaster();
-                client.ConnectAsync("127.0.0.1", 502).GetAwaiter().GetResult();
-                client.ReadHoldingRegistersAsync(0x01, 0x00, 10).GetAwaiter().GetResult();
+            await    client.ConnectAsync("127.0.0.1", 502);
+             await   client.ReadHoldingRegistersAsync(0x01, 0x00, 10);
 
                 _lgbModbusClients.Add(client);
             }
@@ -113,7 +115,7 @@ public class ModbusBenchmark : IDisposable
     [Benchmark]
     public async Task ThingsGateway()
     {
-        //ModbusAddress addr = new ModbusAddress() { FunctionCode = 3, StartAddress = 0, Length = 100 };
+        ModbusAddress addr = new ModbusAddress() { FunctionCode = 3, StartAddress = 0, Length = 100 };
         List<Task> tasks = new List<Task>();
         foreach (var thingsgatewaymodbus in thingsgatewaymodbuss)
         {
@@ -124,7 +126,7 @@ public class ModbusBenchmark : IDisposable
                 {
                     for (int i = 0; i < Program.NumberOfItems; i++)
                     {
-                        var result = await thingsgatewaymodbus.ModbusReadAsync(new ModbusAddress() { Station = 1, FunctionCode = 3, StartAddress = 0, Length = 100 }).ConfigureAwait(false);
+                        var result = await thingsgatewaymodbus.ModbusReadAsync(addr).ConfigureAwait(false);
                         if (!result.IsSuccess)
                         {
                             throw new Exception(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss ffff") + result.ToString());
@@ -238,7 +240,7 @@ public class ModbusBenchmark : IDisposable
         thingsgatewaymodbuss?.ForEach(a => a.SafeDispose());
         nmodbuss?.ForEach(a => a.SafeDispose());
         //modbusTcpNets?.ForEach(a => a.SafeDispose());
-        _lgbModbusClients?.ForEach(a => a.DisposeAsync().GetAwaiter().GetResult());
+        _lgbModbusClients?.ForEach(a => a.DisposeAsync());
     }
 
 }

@@ -12,6 +12,7 @@ using CSScripting;
 
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
 using MQTTnet;
 using MQTTnet.Internal;
@@ -39,7 +40,15 @@ public partial class MqttServer : BusinessBaseWithCacheIntervalScriptAll
 #if !Management
     private static readonly CompositeFormat RpcTopic = CompositeFormat.Parse("{0}/+");
     private MQTTnet.Server.MqttServer _mqttServer;
+
+#if NET10_0_OR_GREATER
+
+    private IHost _webHost { get; set; }
+
+#else
     private IWebHost _webHost { get; set; }
+
+#endif
 
 
 

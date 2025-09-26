@@ -18,6 +18,7 @@ using System.Text;
 
 using ThingsGateway.Common;
 using ThingsGateway.Gateway.Razor;
+using ThingsGateway.NewLife;
 using ThingsGateway.Plugin.DB;
 using ThingsGateway.Plugin.SqlDB;
 using ThingsGateway.Plugin.TDengineDB;
@@ -82,6 +83,7 @@ namespace ThingsGateway.Debug
                     using    var db = SqlDBBusinessDatabaseUtil.GetDb(businessProperty);
                 await getDeviceModel.DBInit(db,default);
               await getDeviceModel.DBInsertable(db,data,default);
+            getDeviceModel?.TryDispose();
               return stringBuilder.ToString();
         }},
 
@@ -207,6 +209,7 @@ namespace ThingsGateway.Debug
 
                 await getDeviceModel.DBInit(db,default);
               await getDeviceModel.DBInsertable(db,data,default);
+            getDeviceModel?.TryDispose();
               return stringBuilder.ToString();
         }},
 

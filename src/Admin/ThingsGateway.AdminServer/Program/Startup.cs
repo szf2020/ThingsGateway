@@ -132,7 +132,11 @@ public class Startup : AppStartup
         services.Configure<ForwardedHeadersOptions>(options =>
         {
             options.ForwardedHeaders = ForwardedHeaders.All;
+#if NET10_0_OR_GREATER
+            options.KnownIPNetworks.Clear();
+#else
             options.KnownNetworks.Clear();
+#endif
             options.KnownProxies.Clear();
         });
 
@@ -204,7 +208,16 @@ public class Startup : AppStartup
     public void Use(IApplicationBuilder applicationBuilder, IWebHostEnvironment env)
     {
         var app = (WebApplication)applicationBuilder;
-        app.UseForwardedHeaders(new ForwardedHeadersOptions { ForwardedHeaders = ForwardedHeaders.All, KnownNetworks = { }, KnownProxies = { } });
+        app.UseForwardedHeaders(new ForwardedHeadersOptions
+        {
+            ForwardedHeaders = ForwardedHeaders.All,
+#if NET10_0_OR_GREATER
+            KnownIPNetworks = { },
+#else
+            KnownNetworks = { },
+#endif
+            KnownProxies = { }
+        });
         app.UseBootstrapBlazor();
 
         // 启用本地化

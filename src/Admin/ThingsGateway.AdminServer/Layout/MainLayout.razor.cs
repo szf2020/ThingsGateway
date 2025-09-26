@@ -120,6 +120,38 @@ public partial class MainLayout : IDisposable
 
     #endregion 注销
 
+
+    private async Task WinboxRender(ContextMenuItem item, object? context)
+    {
+        if (context is TabItem tabItem)
+        {
+            await WinboxRender(tabItem.ChildContent, tabItem.Text);
+            //await _tab.RemoveTab(tabItem);
+        }
+    }
+    [Inject]
+    [NotNull]
+    private WinBoxService? WinBoxService { get; set; }
+
+    private async Task WinboxRender(RenderFragment item, string title)
+    {
+        if (item != null)
+        {
+            var option = new WinBoxOption()
+            {
+                Title = title,
+                ContentTemplate = item,
+                Max = false,
+                Width = "80%",
+                Height = "80%",
+                Top = "0%",
+                Left = "10%",
+                Background = "var(--bb-primary-color)",
+                Overflow = true
+            };
+            await WinBoxService.Show(option);
+        }
+    }
     private string _versionString = string.Empty;
     [Inject]
     [NotNull]

@@ -202,11 +202,11 @@ namespace ThingsGateway.SqlSugar
                     pageIndex++;
                     batchInsetrSql.Append("\r\n;\r\n");
                 }
-                var result = batchInsetrSql.ToString();
                 if (this.Context.CurrentConnectionConfig.DbType == DbType.SqlServer)
                 {
-                    result += "select @@identity;";
+                    batchInsetrSql.Append("select @@identity;");
                 }
+                var result = batchInsetrSql.ToString();
                 return result;
             }
         }

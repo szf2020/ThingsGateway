@@ -109,11 +109,7 @@ namespace ThingsGateway.SqlSugar
         {
             whereColumns = whereColumns.Select(x => this.entityInfo.Columns.FirstOrDefault(it => it.PropertyName.EqualCase(x) || it.DbColumnName.EqualCase(x))?.DbColumnName ?? x).ToArray();
             var updateColumns = this.entityInfo.Columns
-                 .Where(it => !whereColumns.Any(z => z.EqualCase(it.DbColumnName)))
-                 .Where(it => !it.IsIdentity)
-                 .Where(it => !it.IsPrimarykey)
-                 .Where(it => !it.IsOnlyIgnoreUpdate)
-                 .Where(it => !it.IsIgnore)
+                 .Where(it => !whereColumns.Contains(it.DbColumnName) && !it.IsIdentity && !it.IsPrimarykey && !it.IsOnlyIgnoreUpdate && !it.IsIgnore)
                 .Select(it => it.DbColumnName)
                 .ToArray();
             return await BulkUpdateAsync(datas, whereColumns, updateColumns).ConfigureAwait(true);
@@ -147,16 +143,16 @@ namespace ThingsGateway.SqlSugar
         /// <summary>批量更新DataTable数据</summary>
         public int BulkUpdate(DataTable dataTable, string[] whereColumns)
         {
-            string[] updateColumns = dataTable.Columns.Cast<DataColumn>().Select(it => it.ColumnName).Where(it => !whereColumns.Any(z => z.EqualCase(it))).ToArray();
-            whereColumns = dataTable.Columns.Cast<DataColumn>().Select(it => it.ColumnName).Where(it => whereColumns.Any(z => z.EqualCase(it))).ToArray();
+            string[] updateColumns = dataTable.Columns.Cast<DataColumn>().Select(it => it.ColumnName).Where(it => !whereColumns.Contains(it)).ToArray();
+            whereColumns = dataTable.Columns.Cast<DataColumn>().Select(it => it.ColumnName).Where(it => whereColumns.Contains(it)).ToArray();
             Check.ExceptionEasy(this.AsName.IsNullOrEmpty(), "need .AS(tablaeName) ", "需要 .AS(tablaeName) 设置表名");
             return BulkUpdateAsync(this.AsName, dataTable, whereColumns, updateColumns).ConfigureAwait(true).GetAwaiter().GetResult();
         }
         /// <summary>异步批量更新DataTable数据</summary>
         public Task<int> BulkUpdateAsync(DataTable dataTable, string[] whereColumns)
         {
-            string[] updateColumns = dataTable.Columns.Cast<DataColumn>().Select(it => it.ColumnName).Where(it => !whereColumns.Any(z => z.EqualCase(it))).ToArray();
-            whereColumns = dataTable.Columns.Cast<DataColumn>().Select(it => it.ColumnName).Where(it => whereColumns.Any(z => z.EqualCase(it))).ToArray();
+            string[] updateColumns = dataTable.Columns.Cast<DataColumn>().Select(it => it.ColumnName).Where(it => !whereColumns.Contains(it)).ToArray();
+            whereColumns = dataTable.Columns.Cast<DataColumn>().Select(it => it.ColumnName).Where(it => whereColumns.Contains(it)).ToArray();
             Check.ExceptionEasy(this.AsName.IsNullOrEmpty(), "need .AS(tablaeName) ", "需要 .AS(tablaeName) 设置表名");
             return BulkUpdateAsync(this.AsName, dataTable, whereColumns, updateColumns);
         }
@@ -417,8 +413,7 @@ namespace ThingsGateway.SqlSugar
             if (entityInfo.Columns.Where(it => it.IsIgnore == false).Count() > whereColumns.Length + updateColumns.Length && IsActionUpdateColumns)
             {
                 var ignoreColumns = dt.Columns.Cast<DataColumn>()
-                .Where(it => !whereColumns.Any(y => y.EqualCase(it.ColumnName)))
-                .Where(it => !updateColumns.Any(y => y.EqualCase(it.ColumnName))).ToList();
+                .Where(it => !whereColumns.Contains(it.ColumnName) && !updateColumns.Contains(it.ColumnName)).ToList();
                 foreach (DataRow item in dt.Rows)
                 {
                     foreach (var col in ignoreColumns)

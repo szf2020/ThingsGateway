@@ -44,7 +44,7 @@
 
 		<GenerateDocumentationFile>false</GenerateDocumentationFile>
 
-		<TargetFrameworks>net8.0;net9.0;</TargetFrameworks>
+		<TargetFrameworks>net8.0;$(OtherTargetFrameworks);</TargetFrameworks>
 		<CustomTargetFramework>$(TargetFramework)</CustomTargetFramework>
 		<OpenApiGenerateDocuments>false</OpenApiGenerateDocuments>
 		<SatelliteResourceLanguages>zh-Hans;en-US</SatelliteResourceLanguages>
@@ -96,6 +96,7 @@
 	</ItemGroup>
 
 
+	
 	<!--安装服务守护-->
 	<ItemGroup Condition=" '$(TargetFramework)' == 'net8.0' ">
 
@@ -104,9 +105,9 @@
 		<Content Remove="Layout\BlazorApp.razor" />
 		<Content Update="Layout\BlazorAppNet8.razor" />
 	</ItemGroup>
-	<ItemGroup Condition=" '$(TargetFramework)' == 'net9.0' ">
-		<PackageReference Include="Microsoft.Extensions.Hosting.Systemd" Version="$(NET9Version)" />
-		<PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" Version="$(NET9Version)" />
+	<ItemGroup Condition=" '$(TargetFramework)' == 'net10.0' ">
+		<PackageReference Include="Microsoft.Extensions.Hosting.Systemd" Version="$(NET10Version)" />
+		<PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" Version="$(NET10Version)" />
 		<Content Remove="Layout\BlazorAppNet8.razor" />
 		<Content Update="Layout\BlazorApp.razor" />
 	</ItemGroup>

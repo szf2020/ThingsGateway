@@ -4,7 +4,7 @@
     {
         public static IEnumerable<SplitTableInfo> InTableNames(this List<SplitTableInfo> tables, params string[] tableNames)
         {
-            return tables.Where(it => tableNames.Any(y => y.Equals(it.TableName, StringComparison.OrdinalIgnoreCase)));
+            return tables.Where(it => tableNames.Contains(it.TableName));
         }
         public static IEnumerable<SplitTableInfo> ContainsTableNames(this List<SplitTableInfo> tables, params string[] tableNames)
         {

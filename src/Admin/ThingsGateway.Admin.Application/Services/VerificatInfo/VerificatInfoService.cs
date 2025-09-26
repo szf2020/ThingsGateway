@@ -119,7 +119,7 @@ internal sealed class VerificatInfoService : BaseService<VerificatInfo>, IVerifi
     public void Add(VerificatInfo verificatInfo)
     {
         using var db = GetDB();
-        db.Insertable<VerificatInfo>(verificatInfo).ExecuteCommand();
+        db.InsertableT<VerificatInfo>(verificatInfo).ExecuteCommand();
         VerificatInfoService.RemoveCache(verificatInfo.Id);
         if (verificatInfo != null)
             VerificatInfoService.SetCahce(verificatInfo);
@@ -132,7 +132,7 @@ internal sealed class VerificatInfoService : BaseService<VerificatInfo>, IVerifi
     public void Update(VerificatInfo verificatInfo)
     {
         using var db = GetDB();
-        db.Updateable<VerificatInfo>(verificatInfo).ExecuteCommand();
+        db.UpdateableT<VerificatInfo>(verificatInfo).ExecuteCommand();
         VerificatInfoService.RemoveCache(verificatInfo.Id);
         if (verificatInfo != null)
             VerificatInfoService.SetCahce(verificatInfo);

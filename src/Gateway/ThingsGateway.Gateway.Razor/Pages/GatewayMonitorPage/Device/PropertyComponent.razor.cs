@@ -15,6 +15,7 @@ using ThingsGateway.NewLife.Json.Extension;
 using TouchSocket.Core;
 
 namespace ThingsGateway.Gateway.Razor;
+
 public partial class PropertyComponent : IPropertyUIBase
 {
     [Parameter, EditorRequired]

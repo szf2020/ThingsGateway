@@ -1084,16 +1084,17 @@ namespace ThingsGateway.SqlSugar
         {
             return (T)To(value, typeof(T));
         }
+        public static readonly DateTime MinDate = Convert.ToDateTime("1900-01-01");
 
         internal static DateTime GetMinDate(ConnectionConfig currentConnectionConfig)
         {
             if (currentConnectionConfig.MoreSettings == null)
             {
-                return Convert.ToDateTime("1900-01-01");
+                return MinDate;
             }
             else if (currentConnectionConfig.MoreSettings.DbMinDate == null)
             {
-                return Convert.ToDateTime("1900-01-01");
+                return MinDate;
             }
             else
             {

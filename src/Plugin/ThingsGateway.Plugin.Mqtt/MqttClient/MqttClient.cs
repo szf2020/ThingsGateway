@@ -12,6 +12,8 @@ using MQTTnet;
 
 
 
+
+
 #if !Management
 
 #endif
@@ -19,6 +21,7 @@ using System.Security.Cryptography.X509Certificates;
 
 using ThingsGateway.Extension;
 using ThingsGateway.Foundation;
+using ThingsGateway.NewLife;
 
 using TouchSocket.Core;
 
@@ -45,6 +48,17 @@ public partial class MqttClient : BusinessBaseWithCacheIntervalScriptAll
     /// <inheritdoc/>
     protected override async Task DisposeAsync(bool disposing)
     {
+
+        try
+        {
+            var exexcuteExpressions = CSharpScriptEngineExtension.Do<DynamicMqttClientRpcBase>(_driverPropertys.BigTextScriptRpc);
+            exexcuteExpressions?.TryDispose();
+        }
+        catch
+        {
+        }
+
+
         await base.DisposeAsync(disposing).ConfigureAwait(false);
 
         if (_mqttClient != null)
@@ -61,8 +75,11 @@ public partial class MqttClient : BusinessBaseWithCacheIntervalScriptAll
     /// </summary>
     private static X509Certificate2 LoadCertificate(string certPath, string keyPath)
     {
+#if NET10_0_OR_GREATER
+        var cert = X509CertificateLoader.LoadCertificateFromFile(certPath);
+#else
         var cert = new X509Certificate2(certPath);
-
+#endif
         using var reader = new StreamReader(keyPath);
         var pemReader = new Org.BouncyCastle.OpenSsl.PemReader(reader);
         var keyPair = pemReader.ReadObject() as Org.BouncyCastle.Crypto.AsymmetricCipherKeyPair;
@@ -95,7 +112,11 @@ public partial class MqttClient : BusinessBaseWithCacheIntervalScriptAll
 
         if (_driverPropertys.TLS)
         {
+#if NET10_0_OR_GREATER
+            var caCert = X509CertificateLoader.LoadCertificateFromFile(_driverPropertys.CAFile);
+#else
             var caCert = new X509Certificate2(_driverPropertys.CAFile);
+#endif
             var clientCert = LoadCertificate(_driverPropertys.ClientCertificateFile, _driverPropertys.ClientKeyFile);
             mqttClientOptionsBuilder = mqttClientOptionsBuilder.WithTlsOptions(a => a
                     .WithTrustChain(new X509Certificate2Collection(caCert))

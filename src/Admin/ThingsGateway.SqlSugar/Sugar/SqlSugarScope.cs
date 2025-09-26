@@ -129,19 +129,32 @@ namespace ThingsGateway.SqlSugar
             return ScopedContext.Deleteable<T>();
         }
 
-        public IDeleteable<T> DeleteableById<T>(dynamic primaryKeyValue) where T : class, new()
+        public IDeleteable<T> DeleteableById<T>(object primaryKeyValue) where T : class, new()
         {
             return ScopedContext.DeleteableById<T>(primaryKeyValue);
         }
 
+        public IDeleteable<T> DeleteableById<T>(Expression<Func<T, object>> inField, object primaryKeyValue) where T : class, new()
+        {
+            return ScopedContext.DeleteableById<T>(inField, primaryKeyValue);
+        }
 
+        public IDeleteable<T> DeleteableById<T>(Expression<Func<T, object>> inField, IReadOnlyCollection<object> primaryKeyValue) where T : class, new()
+        {
+            return ScopedContext.DeleteableById<T>(inField, primaryKeyValue);
+        }
+
+        public IDeleteable<T> DeleteableById<T>(Expression<Func<T, object>> inField, ISugarQueryable<object> primaryKeyValue) where T : class, new()
+        {
+            return ScopedContext.DeleteableById<T>(inField, primaryKeyValue);
+        }
 
         public IDeleteable<T> Deleteable<T>(Expression<Func<T, bool>> expression) where T : class, new()
         {
             return ScopedContext.Deleteable(expression);
         }
 
-        public IDeleteable<T> DeleteableById<T>(IReadOnlyCollection<dynamic> pkValue) where T : class, new()
+        public IDeleteable<T> DeleteableById<T>(IReadOnlyCollection<object> pkValue) where T : class, new()
         {
             return ScopedContext.DeleteableById<T>(pkValue);
         }
@@ -218,10 +231,6 @@ namespace ThingsGateway.SqlSugar
             return ScopedContext.Insertable<T>(columnDictionary);
         }
 
-        public IInsertable<T> Insertable<T>(dynamic insertDynamicObject) where T : class, new()
-        {
-            return ScopedContext.Insertable<T>((object)insertDynamicObject);
-        }
 
         public IInsertable<T> Insertable<T>(IReadOnlyCollection<T> insertObjs) where T : class, new()
         {
@@ -629,10 +638,6 @@ namespace ThingsGateway.SqlSugar
             return ScopedContext.Updateable<T>(columnDictionary);
         }
 
-        public IUpdateable<T> Updateable<T>(dynamic updateDynamicObject) where T : class, new()
-        {
-            return ScopedContext.Updateable<T>((object)updateDynamicObject);
-        }
 
         public IUpdateable<T> Updateable<T>(Expression<Func<T, bool>> columns) where T : class, new()
         {
@@ -838,7 +843,7 @@ namespace ThingsGateway.SqlSugar
         {
             ScopedContext.Tracking(datas);
         }
-        public void RemoveConnection(dynamic configId)
+        public void RemoveConnection(object configId)
         {
             ScopedContext.RemoveConnection(configId);
         }

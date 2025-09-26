@@ -2,7 +2,7 @@
 	<Import Project="..\..\Version.props" />
 	<Import Project="..\..\PackNuget.props" />
 	<PropertyGroup>
-		<TargetFrameworks>net8.0;</TargetFrameworks>
+		<TargetFrameworks>net8.0;$(OtherTargetFrameworks);</TargetFrameworks>
 
 		<OutputPath>bin\$(Configuration)</OutputPath>
 		<IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>

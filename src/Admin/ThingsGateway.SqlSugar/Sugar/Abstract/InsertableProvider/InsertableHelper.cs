@@ -95,10 +95,12 @@ namespace ThingsGateway.SqlSugar
             #region Identities
             if (!IsOffIdentity)
             {
-                List<string> identities = GetIdentityKeys();
-                if (identities != null && identities.Count != 0)
+                var identitySet = GetIdentityKeys()?.ToHashSet(StringComparer.OrdinalIgnoreCase);
+                if (identitySet?.Count > 0)
                 {
-                    this.InsertBuilder.DbColumnInfoList = this.InsertBuilder.DbColumnInfoList.Where(it => !identities.Any(i => it.DbColumnName.Equals(i, StringComparison.CurrentCultureIgnoreCase))).ToList();
+                    this.InsertBuilder.DbColumnInfoList = this.InsertBuilder.DbColumnInfoList
+                        .Where(it => !identitySet.Contains(it.DbColumnName))
+                        .ToList();
                 }
             }
             #endregion
@@ -106,14 +108,15 @@ namespace ThingsGateway.SqlSugar
             #region IgnoreColumns
             if (this.Context.IgnoreColumns?.Any() == true)
             {
-                var currentIgnoreColumns = this.Context.IgnoreColumns.Where(it => it.EntityName == this.EntityInfo.EntityName).ToList();
-                this.InsertBuilder.DbColumnInfoList = this.InsertBuilder.DbColumnInfoList.Where(it => !currentIgnoreColumns.Any(i => it.PropertyName.Equals(i.PropertyName, StringComparison.CurrentCulture))).ToList();
+                var currentIgnoreColumns = this.Context.IgnoreColumns.Where(it => it.EntityName == this.EntityInfo.EntityName).Select(a => a.PropertyName).ToHashSet(StringComparer.OrdinalIgnoreCase);
+                this.InsertBuilder.DbColumnInfoList = this.InsertBuilder.DbColumnInfoList.Where(it => !currentIgnoreColumns.Contains(it.PropertyName)).ToList();
             }
 
             if (this.Context.IgnoreInsertColumns?.Any() == true)
             {
-                var currentIgnoreColumns = this.Context.IgnoreInsertColumns.Where(it => it.EntityName == this.EntityInfo.EntityName).ToList();
-                this.InsertBuilder.DbColumnInfoList = this.InsertBuilder.DbColumnInfoList.Where(it => !currentIgnoreColumns.Any(i => it.PropertyName.Equals(i.PropertyName, StringComparison.CurrentCulture))).ToList();
+                var currentIgnoreColumns = this.Context.IgnoreInsertColumns.Where(it => it.EntityName == this.EntityInfo.EntityName).Select(a => a.PropertyName).ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+                this.InsertBuilder.DbColumnInfoList = this.InsertBuilder.DbColumnInfoList.Where(it => !currentIgnoreColumns.Contains(it.PropertyName)).ToList();
             }
             #endregion
             if (this.IsSingle)
@@ -443,9 +446,9 @@ namespace ThingsGateway.SqlSugar
         /// <summary>
         /// 获取主键列表
         /// </summary>
-        protected virtual List<string> GetPrimaryKeys()
+        protected virtual HashSet<string> GetPrimaryKeys()
         {
-            return this.EntityInfo.Columns.Where(it => it.IsPrimarykey).Select(it => it.DbColumnName).ToList();
+            return this.EntityInfo.Columns.Where(it => it.IsPrimarykey).Select(it => it.DbColumnName).ToHashSet(StringComparer.OrdinalIgnoreCase);
         }
         /// <summary>
         /// 获取标识键列表
@@ -622,7 +625,7 @@ namespace ThingsGateway.SqlSugar
             }
             else
             {
-                foreach (var item in this.EntityInfo.Columns.Where(it => it.IsIgnore == false && GetPrimaryKeys().Any(pk => pk.Equals(it.DbColumnName, StringComparison.CurrentCultureIgnoreCase))))
+                foreach (var item in this.EntityInfo.Columns.Where(it => it.IsIgnore == false && GetPrimaryKeys().Contains(it.DbColumnName)))
                 {
                     var fielddName = item.DbColumnName;
                     var fieldObject = this.EntityInfo.Columns.FirstOrDefault(it => it.PropertyName == item.PropertyName).PropertyInfo.GetValue(this.InsertObjs.Last(), null);

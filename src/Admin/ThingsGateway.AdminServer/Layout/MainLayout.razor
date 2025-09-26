@@ -89,12 +89,19 @@
                     </div>
                 </Side>
                 <Main>
-                        <Tab @ref=_tab ClickTabToNavigation="true" ShowToolbar="true" ShowContextMenu="true" ShowExtendButtons="false" ShowClose="true" AllowDrag=true
+                    <Tab @ref=_tab ClickTabToNavigation="true" ShowToolbar="true" ShowContextMenu="true" ShowExtendButtons="false" ShowClose="true" AllowDrag=true
                          ShowFullscreenToolbarButton=false ShowContextMenuFullScreen=false ShowFullScreen=false AdditionalAssemblies="@App.RazorAssemblies" Menus="@MenuService.AllOwnMenuItems"
-                             DefaultUrl=@("/") Body=@(Body!) OnCloseTabItemAsync=@((a)=>
-                             {
-                             return Task.FromResult(!(a.Url=="/"||a.Url.IsNullOrEmpty()));
-                             })>
+                         DefaultUrl=@("/") Body=@(Body!) OnCloseTabItemAsync=@((a)=>
+                                                                                  {
+                                                                                      return Task.FromResult(!(a.Url == "/" || a.Url.IsNullOrEmpty()));
+                                                                                  })
+                                                                                  >
+                        <BeforeContextMenuTemplate>
+
+                                                     <ContextMenuItem Icon="fa fa-window-restore" Text="@Localizer["WindowRestore"]" OnClick="WinboxRender"></ContextMenuItem>
+                                                     <ContextMenuDivider></ContextMenuDivider>
+
+                                                 </BeforeContextMenuTemplate>
                         </Tab>
                 </Main>
                 <NotAuthorized>

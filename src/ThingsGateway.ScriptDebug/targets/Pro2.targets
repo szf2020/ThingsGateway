@@ -40,9 +40,7 @@
 	</ItemGroup>
 
 	<Target Name="CopyCustomPluginNugetPackages" AfterTargets="Build">
-		<PropertyGroup>
-			<PluginTargetFramework>net8.0</PluginTargetFramework>
-		</PropertyGroup>
+
 		<ItemGroup>
 			<!-- setting up the variable for convenience -->
 

@@ -118,7 +118,9 @@
 </AdminTable>
 
 
-@{#else}
+@{
+#else
+}
 <AdminTable @ref=table BeforeShowEditDialogCallback="BeforeShowEditDialogCallback"
             TItem="ChannelRuntime"
             EditDialogSize="Size.ExtraLarge"
@@ -223,7 +225,9 @@
     </TableToolbarTemplate>
 </AdminTable>
 
-@{#endif}
+@{
+#endif
+}
 
 @code {
     AdminTable<ChannelRuntime> table;

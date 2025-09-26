@@ -1,101 +1,92 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
-using Newtonsoft.Json.Serialization;
+
+using JsonProperty = Newtonsoft.Json.Serialization.JsonProperty;
 
 namespace ThingsGateway.SqlSugar
 {
     public class SerializeService : ISerializeService
     {
+        private static readonly JsonSerializerSettings _newtonsoftSettings = new()
+        {
+            NullValueHandling = NullValueHandling.Ignore,
+
+            ContractResolver = new MyContractResolver()
+        };
+
         public string SerializeObject(object value)
         {
-            if (value?.GetType().FullName.StartsWith("System.Text.Json.") == true)
+            if (value == null) return "null";
+
+            // 精准类型检查（避免反射）
+            return value switch
             {
-                // 动态创建一个 JsonSerializer 实例
-                Type serializerType = value.GetType().Assembly.GetType("System.Text.Json.JsonSerializer");
-
-                var methods = serializerType
-                    .GetMyMethod("Serialize", 2);
-
-                // 调用 SerializeObject 方法序列化对象
-                string json = (string)methods.MakeGenericMethod(value.GetType())
-                    .Invoke(null, new object[] { value, null });
-                return json;
-            }
-            return JsonConvert.SerializeObject(value);
+                System.Text.Json.JsonElement element => System.Text.Json.JsonSerializer.Serialize(element),
+                System.Text.Json.JsonDocument document => System.Text.Json.JsonSerializer.Serialize(document),
+                System.Text.Json.Nodes.JsonValue valueType => System.Text.Json.JsonSerializer.Serialize(valueType),
+                _ => JsonConvert.SerializeObject(value, _newtonsoftSettings)
+            };
         }
 
         public string SugarSerializeObject(object value)
         {
-            return JsonConvert.SerializeObject(value, new JsonSerializerSettings()
-            {
-                ContractResolver = new MyContractResolver()
-            });
+            return JsonConvert.SerializeObject(value, _newtonsoftSettings);
         }
-
+        private static readonly Type JsonElementType = typeof(System.Text.Json.JsonElement);
+        private static readonly Type JsonDocumentType = typeof(System.Text.Json.JsonDocument);
+        private static readonly Type JsonValueType = typeof(System.Text.Json.Nodes.JsonValue);
         public T DeserializeObject<T>(string value)
         {
-            if (typeof(T).FullName.StartsWith("System.Text.Json."))
-            {
-                // 动态创建一个 JsonSerializer 实例
-                Type serializerType = typeof(T).Assembly.GetType("System.Text.Json.JsonSerializer");
-
-                var methods = serializerType
-                    .GetMethods().Where(it => it.Name == "Deserialize")
-                    .Where(it => it.GetParameters().Any(z => z.ParameterType == typeof(string))).First();
-
-                // 调用 SerializeObject 方法序列化对象
-                T json = (T)methods.MakeGenericMethod(typeof(T))
-                    .Invoke(null, new object[] { value, null });
-                return json;
-            }
-            var jSetting = new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore };
-            return JsonConvert.DeserializeObject<T>(value, jSetting);
+            var type = typeof(T);
+            if (type == JsonElementType)
+                return System.Text.Json.JsonSerializer.Deserialize<T>(value);
+            else if (type == JsonDocumentType)
+                return System.Text.Json.JsonSerializer.Deserialize<T>(value);
+            else if (type == JsonValueType)
+                return System.Text.Json.JsonSerializer.Deserialize<T>(value);
+            else
+                return JsonConvert.DeserializeObject<T>(value, _newtonsoftSettings);
         }
     }
+
     public class MyContractResolver : Newtonsoft.Json.Serialization.DefaultContractResolver
     {
-        public MyContractResolver()
-        {
-        }
-
         protected override IList<JsonProperty> CreateProperties(Type type, MemberSerialization memberSerialization)
         {
-            if (type.IsAnonymousType() || type == UtilConstants.ObjType || type.Namespace == $"{SugarConst.StartName}SqlSugar" || type.IsClass() == false)
-            {
-                return base.CreateProperties(type, memberSerialization);
-            }
-            else
-            {
-                var list = type.GetProperties()
-                            .Where(x => !x.GetCustomAttributes(true).Any(a => (a is SugarColumn) && ((SugarColumn)a).NoSerialize == true))
-                            .Select(p => new JsonProperty()
-                            {
-                                PropertyName = p.Name,
-                                PropertyType = p.PropertyType,
-                                Readable = true,
-                                Writable = true,
-                                ValueProvider = base.CreateMemberValueProvider(p)
-                            }).ToList();
-                foreach (var item in list)
+            // 先用基类得到完整属性列表（包含 JsonPropertyAttribute 等配置）
+            var props = base.CreateProperties(type, memberSerialization);
+
+            // 1. 忽略 SugarColumn.NoSerialize
+            props = props
+                .Where(p =>
                 {
-                    if (UtilMethods.GetUnderType(item.PropertyType) == UtilConstants.DateType)
-                    {
-                        CreateDateProperty(type, item);
-                    }
+                    var pi = type.GetProperty(p.UnderlyingName);
+                    if (pi == null) return true;
+                    var sugarAttr = pi.GetCustomAttributes(typeof(SugarColumn), true)
+                                      .OfType<SugarColumn>()
+                                      .FirstOrDefault();
+                    return sugarAttr == null || sugarAttr.NoSerialize != true;
+                })
+                .ToList();
+
+            // 2. DateTime 自定义格式
+            foreach (var p in props)
+            {
+                var pi = type.GetProperty(p.UnderlyingName);
+                if (pi == null) continue;
+                var sugarAttr = pi.GetCustomAttributes(typeof(SugarColumn), true)
+                                  .OfType<SugarColumn>()
+                                  .FirstOrDefault();
+                if (sugarAttr?.SerializeDateTimeFormat?.Length > 0 &&
+                    UtilMethods.GetUnderType(pi) == UtilConstants.DateType)
+                {
+                    p.Converter = new IsoDateTimeConverter { DateTimeFormat = sugarAttr.SerializeDateTimeFormat };
                 }
-                return list;
             }
+
+            return props;
         }
 
-        private static void CreateDateProperty(Type type, JsonProperty item)
-        {
-            var property = type.GetProperties().Where(it => it.Name == item.PropertyName).First();
-            var itemType = UtilMethods.GetUnderType(property);
-            if (property.GetCustomAttributes(true).Any(it => it is SugarColumn))
-            {
-                var sugarAttribute = (SugarColumn)property.GetCustomAttributes(true).First(it => it is SugarColumn);
-                item.Converter = new IsoDateTimeConverter() { DateTimeFormat = sugarAttribute.SerializeDateTimeFormat };
-            }
-        }
+
     }
 }

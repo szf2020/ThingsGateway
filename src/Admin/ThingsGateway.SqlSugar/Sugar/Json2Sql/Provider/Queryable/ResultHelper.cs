@@ -48,7 +48,7 @@
         {
             if (SqlList != null)
             {
-                result.Data = this.context.Ado.SqlQuery<dynamic>(SqlList.Sql, SqlList.Parameters);
+                result.Data = this.context.Ado.SqlQuery<object>(SqlList.Sql, SqlList.Parameters);
             }
         }
 

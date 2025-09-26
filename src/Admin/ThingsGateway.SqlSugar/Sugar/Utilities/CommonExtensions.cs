@@ -58,8 +58,7 @@ namespace ThingsGateway.SqlSugar
         }
         public static MethodInfo GetMyMethod(this Type type, string name, int argCount, bool isList)
         {
-            var methods = type.GetMethods().Where(it => it.Name == name).Where(it =>
-            it.GetParameters().Length == argCount &&
+            var methods = type.GetMethods().Where(it => it.Name == name && it.GetParameters().Length == argCount &&
             it.GetParameters()[0].ToString().Contains("List`") == isList);
             return methods.First();
         }

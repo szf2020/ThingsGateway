@@ -550,7 +550,7 @@ internal sealed class SysUserService : BaseService<SysUser>, ISysUserService
         if (sysUser != null)
         {
             var resources = await _sysResourceService.GetAllAsync().ConfigureAwait(false);
-            var menusList = resources.Where(a => a.Category == ResourceCategoryEnum.Menu).Where(a => menuIds.Contains(a.Id));
+            var menusList = resources.Where(a => a.Category == ResourceCategoryEnum.Menu && menuIds.Contains(a.Id));
 
             #region 用户模块处理
 

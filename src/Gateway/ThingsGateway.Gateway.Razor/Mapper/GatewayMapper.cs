@@ -13,6 +13,7 @@ using Riok.Mapperly.Abstractions;
 using ThingsGateway.Foundation;
 
 namespace ThingsGateway.Gateway.Razor;
+
 [Mapper(UseDeepCloning = true, EnumMappingStrategy = EnumMappingStrategy.ByName, RequiredMappingStrategy = RequiredMappingStrategy.None)]
 public static partial class GatewayMapper
 {

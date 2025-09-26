@@ -17,6 +17,8 @@ namespace ThingsGateway.SqlSugar
         private bool hasWhere;
         private bool isXmlPath = false;
         private bool isAsAttr = false;
+        private static readonly Regex _regex = new Regex("Subquery");
+
         public SubResolve(MethodCallExpression expression, ExpressionContext context, Expression oppsiteExpression)
         {
             this.context = context;
@@ -218,7 +220,7 @@ namespace ThingsGateway.SqlSugar
 
         private List<string> GetSubItems()
         {
-            var isSubSubQuery = this.allMethods.Select(it => it.ToString()).Any(it => Regex.Matches(it, "Subquery").Count > 1);
+            var isSubSubQuery = this.allMethods.Select(it => it.ToString()).Any(it => _regex.Count(it) > 1);
             var isubList = this.allMethods.Select(exp =>
             {
                 if (isSubSubQuery)
@@ -283,7 +285,7 @@ namespace ThingsGateway.SqlSugar
                 }
             }
             isubList = isubList.OrderBy(it => it.Sort).ToList();
-            var isHasWhere = isubList.Where(it => it is SubWhere).Any();
+            var isHasWhere = isubList.Any(it => it is SubWhere);
             var isJoin = isubList.Any(it => it is SubInnerJoin || it is SubLeftJoin);
             if (isJoin)
             {

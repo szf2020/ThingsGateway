@@ -1,9 +1,9 @@
 {
   "profiles": {
-    "ThingsGateway.Debug.Photino": {
+    "ThingsGateway.Foundation.Benchmark": {
       "commandName": "Project",
       "environmentVariables": {
-        "DOTNET_RuntimeAsync": "1"
+        //"DOTNET_RuntimeAsync": "1"
       }
     }
   }

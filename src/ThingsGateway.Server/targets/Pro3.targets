@@ -8,9 +8,7 @@
 	</ItemGroup>
 
 	<Target Name="CopyOtherPlugin3NugetPackages" AfterTargets="Build">
-		<PropertyGroup>
-			<PluginTargetFramework>net8.0</PluginTargetFramework>
-		</PropertyGroup>
+
 		<ItemGroup>
 			<!-- setting up the variable for convenience -->
 			<PkgThingsGateway_Plugin_HUANANSFSKPackageFiles Include="$(PkgThingsGateway_Plugin_HUANANSFSK)\Content\$(PluginTargetFramework)\**\*.*" />

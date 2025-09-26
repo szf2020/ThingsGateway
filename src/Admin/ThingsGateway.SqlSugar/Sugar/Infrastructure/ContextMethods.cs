@@ -477,7 +477,7 @@ namespace ThingsGateway.SqlSugar
                 {
                     if (item.PropertyType.FullName == "Newtonsoft.Json.Linq.JObject")
                     {
-                        result.Add(name, DeserializeObject<dynamic>(readerValues[item.Name].ToString()));
+                        result.Add(name, DeserializeObject<object>(readerValues[item.Name].ToString()));
                     }
                     else if (IsJsonItem(readerValues, name))
                     {
@@ -882,7 +882,7 @@ namespace ThingsGateway.SqlSugar
                 }
                 else if (jsonString.ToString().Replace(" ", "") != "[]" && !jsonString.ToString().Contains('{') && !jsonString.ToString().Contains('}'))
                 {
-                    result.Add(name, this.DeserializeObject<dynamic>(jsonString + ""));
+                    result.Add(name, this.DeserializeObject<object>(jsonString + ""));
                 }
                 else
                 {
@@ -1006,7 +1006,7 @@ namespace ThingsGateway.SqlSugar
 
             return result;
         }
-        public dynamic DataTableToDynamic(DataTable table)
+        public object DataTableToDynamic(DataTable table)
         {
             List<Dictionary<string, object>> deserializeObject = new List<Dictionary<string, object>>();
             Dictionary<string, object> childRow;
@@ -1022,8 +1022,9 @@ namespace ThingsGateway.SqlSugar
                 }
                 deserializeObject.Add(childRow);
             }
-            return this.DeserializeObject<dynamic>(this.SerializeObject(deserializeObject));
+            return this.DeserializeObject<object>(this.SerializeObject(deserializeObject));
         }
+
         public List<T> DataTableToList<T>(DataTable table)
         {
             List<Dictionary<string, object>> deserializeObject = new List<Dictionary<string, object>>();

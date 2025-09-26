@@ -64,7 +64,7 @@ namespace ThingsGateway.SqlSugar
             return table;
         }
 
-        public static IEnumerable<dynamic> ToPivotList<T, TColumn, TRow, TData>(
+        public static IEnumerable<IDictionary<string, object>> ToPivotList<T, TColumn, TRow, TData>(
             this IReadOnlyCollection<T> source,
             Func<T, TColumn> columnSelector,
             Expression<Func<T, TRow>> rowSelector,
