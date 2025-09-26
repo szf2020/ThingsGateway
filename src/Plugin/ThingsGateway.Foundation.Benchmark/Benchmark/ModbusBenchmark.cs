@@ -32,7 +32,7 @@ using ModbusMaster = ThingsGateway.Foundation.Modbus.ModbusMaster;
 namespace ThingsGateway.Foundation;
 
 [SimpleJob(RuntimeMoniker.Net80)]
-[SimpleJob(RuntimeMoniker.Net10_0)]
+//[SimpleJob(RuntimeMoniker.Net10_0)]
 [MemoryDiagnoser]
 public class ModbusBenchmark : IDisposable
 {

@@ -179,7 +179,12 @@ public class DeviceSingleStreamDataHandleAdapter<TRequest> : CustomDataHandlingA
         {
             throw new Exception($"Unable to convert {nameof(requestInfo)} to {nameof(ISendMessage)}");
         }
-        var span = writer.GetSpan(sendMessage.MaxLength);
+        Span<byte> span = default;
+        if (Logger?.LogLevel <= LogLevel.Trace)
+        {
+            span  = writer.GetSpan(sendMessage.MaxLength);
+        }
+
         sendMessage.Build(ref writer);
         if (Logger?.LogLevel <= LogLevel.Trace)
         {

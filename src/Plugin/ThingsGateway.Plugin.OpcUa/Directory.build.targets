@@ -12,6 +12,7 @@
 			<PkgOPCFoundation_NetStandard_Opc_Ua_ClientPackageFiles Include="$(PkgOPCFoundation_NetStandard_Opc_Ua_Client)\lib\net8.0\*.*" />
 			<PkgOPCFoundation_NetStandard_Opc_Ua_Client_ComplexTypesPackageFiles Include="$(PkgOPCFoundation_NetStandard_Opc_Ua_Client_ComplexTypes)\lib\net8.0\*.*" />
 			<PkgSystem_Formats_Asn1PackageFiles Include="$(PkgSystem_Formats_Asn1)\lib\net8.0\*.*" />
+			<PkgBitFaster_CachingPackageFiles Include="$(PkgBitFaster_Caching)\lib\net6.0\*.*" />
 		</ItemGroup>
 
 		<PropertyGroup>
@@ -23,6 +24,7 @@
 		<Copy SourceFiles="@(PkgOPCFoundation_NetStandard_Opc_Ua_ServerPackageFiles)" DestinationFolder="$(ApplicationFolder)%(RecursiveDir)" />
 		<Copy SourceFiles="@(PkgOPCFoundation_NetStandard_Opc_Ua_Security_CertificatesPackageFiles)" DestinationFolder="$(ApplicationFolder)%(RecursiveDir)" />
 		<Copy SourceFiles="@(PkgSystem_Formats_Asn1PackageFiles)" DestinationFolder="$(ApplicationFolder)%(RecursiveDir)" />
+		<Copy SourceFiles="@(PkgBitFaster_CachingPackageFiles)" DestinationFolder="$(ApplicationFolder)%(RecursiveDir)" />
 		<!--<Copy SourceFiles="@(PkgThingsGateway_Foundation_OpcUaPackageFiles)" DestinationFolder="$(ApplicationFolder)%(RecursiveDir)" />-->
 		<Copy SourceFiles="@(PkgOPCFoundation_NetStandard_Opc_Ua_ClientPackageFiles)" DestinationFolder="$(ApplicationFolder)%(RecursiveDir)" />
 		<Copy SourceFiles="@(PkgOPCFoundation_NetStandard_Opc_Ua_Client_ComplexTypesPackageFiles)" DestinationFolder="$(ApplicationFolder)%(RecursiveDir)" />
@@ -33,6 +35,10 @@
 	<Target Name="IncludeAllFilesInTargetDir" AfterTargets="Build">
 		<ItemGroup>
 			<Content Include="$(ProjectDir)$(OutputPath)\$(TargetFramework)\**\*Opc*.dll">
+				<Pack>true</Pack>
+				<PackagePath>Content</PackagePath>
+			</Content>
+			<Content Include="$(ProjectDir)$(OutputPath)\$(TargetFramework)\**\*BitFaster*.dll">
 				<Pack>true</Pack>
 				<PackagePath>Content</PackagePath>
 			</Content>

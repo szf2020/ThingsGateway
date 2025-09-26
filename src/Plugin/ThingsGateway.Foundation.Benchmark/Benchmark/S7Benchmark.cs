@@ -24,8 +24,8 @@ using TouchSocket.Core;
 
 namespace ThingsGateway.Foundation;
 
-//[SimpleJob(RuntimeMoniker.Net80)]
-[SimpleJob(RuntimeMoniker.Net10_0)]
+[SimpleJob(RuntimeMoniker.Net80)]
+//[SimpleJob(RuntimeMoniker.Net10_0)]
 [MemoryDiagnoser]
 [BaselineColumn]
 [RankColumn]
@@ -67,7 +67,7 @@ public class S7Benchmark : IDisposable
             }
             for (int i = 0; i < Program.ClientCount; i++)
             {
-                var plc = new Plc(CpuType.S7300, "127.0.0.1", 102, 0, 0);
+                var plc = new Plc(CpuType.S71500, "127.0.0.1", 102, 0, 0);
                 await plc.OpenAsync();//打开plc连接
                 await plc.ReadAsync(DataType.Memory, 1, 0, VarType.Byte, 100);
                 plcs.Add(plc);
@@ -95,30 +95,29 @@ public class S7Benchmark : IDisposable
         await Task.WhenAll(tasks);
     }
 
-    //并发失败
-    //[Benchmark]
-    //public async Task HslCommunication()
-    //{
-    //    List<Task> tasks = new List<Task>();
-    //    foreach (var siemensS7Net in siemensS7Nets)
-    //    {
-    //        for (int i = 0; i < Program.TaskNumberOfItems; i++)
-    //        {
-    //            tasks.Add(Task.Run(async () =>
-    //            {
-    //                for (int i = 0; i < Program.NumberOfItems; i++)
-    //                {
-    //                    var result = await siemensS7Net.ReadAsync("M0", 100);
-    //                    if (!result.IsSuccess)
-    //                    {
-    //                        throw new Exception(result.Message);
-    //                    }
-    //                }
-    //            }));
-    //        }
-    //    }
-    //    await Task.WhenAll(tasks);
-    //}
+    [Benchmark]
+    public async Task HslCommunication()
+    {
+        List<Task> tasks = new List<Task>();
+        foreach (var siemensS7Net in siemensS7Nets)
+        {
+            for (int i = 0; i < Program.TaskNumberOfItems; i++)
+            {
+                tasks.Add(Task.Run(async () =>
+                {
+                    for (int i = 0; i < Program.NumberOfItems; i++)
+                    {
+                        var result = await siemensS7Net.ReadAsync("M0", 100);
+                        if (!result.IsSuccess)
+                        {
+                            throw new Exception(result.Message);
+                        }
+                    }
+                }));
+            }
+        }
+        await Task.WhenAll(tasks);
+    }
 
 
 

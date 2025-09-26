@@ -48,6 +48,10 @@
 		<PackageReference Include="OPCFoundation.NetStandard.Opc.Ua.Security.Certificates" Version="1.5.377.21" GeneratePathProperty="true">
 			<PrivateAssets>contentFiles;build;buildMultitargeting;buildTransitive;analyzers;</PrivateAssets>
 		</PackageReference>
+		
+		<PackageReference Include="BitFaster.Caching" Version="2.5.4" GeneratePathProperty="true">
+			<PrivateAssets>contentFiles;build;buildMultitargeting;buildTransitive;analyzers;</PrivateAssets>
+		</PackageReference>
 
 		<!--<PackageReference Include="System.Formats.Asn1" Version="8.0.2" GeneratePathProperty="true">
 			<PrivateAssets>contentFiles;build;buildMultitargeting;buildTransitive;analyzers;</PrivateAssets>
