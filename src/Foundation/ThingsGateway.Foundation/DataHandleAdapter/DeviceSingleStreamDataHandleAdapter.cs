@@ -182,7 +182,7 @@ public class DeviceSingleStreamDataHandleAdapter<TRequest> : CustomDataHandlingA
         Span<byte> span = default;
         if (Logger?.LogLevel <= LogLevel.Trace)
         {
-            span  = writer.GetSpan(sendMessage.MaxLength);
+            span = writer.GetSpan(sendMessage.MaxLength);
         }
 
         sendMessage.Build(ref writer);

@@ -57,10 +57,10 @@ public class ModbusBenchmark : IDisposable
                 ModbusType = ModbusTypeEnum.ModbusTcp,
             };
             thingsgatewaymodbus.InitChannel(clientChannel);
-         await   clientChannel.SetupAsync(clientChannel.Config);
+            await clientChannel.SetupAsync(clientChannel.Config);
             clientChannel.Logger.LogLevel = LogLevel.Warning;
-         await   thingsgatewaymodbus.ConnectAsync(CancellationToken.None);
-        await    thingsgatewaymodbus.ReadAsync("40001", 100);
+            await thingsgatewaymodbus.ConnectAsync(CancellationToken.None);
+            await thingsgatewaymodbus.ReadAsync("40001", 100);
             thingsgatewaymodbuss.Add(thingsgatewaymodbus);
         }
 
@@ -70,7 +70,7 @@ public class ModbusBenchmark : IDisposable
 
             var factory = new NModbus.ModbusFactory();
             var nmodbus = factory.CreateMaster(new TcpClient("127.0.0.1", 502));
-       await     nmodbus.ReadHoldingRegistersAsync(1, 0, 100);
+            await nmodbus.ReadHoldingRegistersAsync(1, 0, 100);
             nmodbuss.Add(nmodbus);
         }
         //for (int i = 0; i < Program.ClientCount; i++)
@@ -86,10 +86,10 @@ public class ModbusBenchmark : IDisposable
         for (int i = 0; i < Program.ClientCount; i++)
         {
             var client = new ModbusTcpMaster();
-      await      client.SetupAsync(new TouchSocketConfig()
-    .SetRemoteIPHost("127.0.0.1:502"));
-        await    client.ConnectAsync(CancellationToken.None);
-      await      client.ReadHoldingRegistersAsync(0, 100);
+            await client.SetupAsync(new TouchSocketConfig()
+          .SetRemoteIPHost("127.0.0.1:502"));
+            await client.ConnectAsync(CancellationToken.None);
+            await client.ReadHoldingRegistersAsync(0, 100);
             modbusTcpMasters.Add(client);
         }
 
@@ -104,8 +104,8 @@ public class ModbusBenchmark : IDisposable
             for (int i = 0; i < Program.ClientCount; i++)
             {
                 var client = factory.GetOrCreateTcpMaster();
-            await    client.ConnectAsync("127.0.0.1", 502);
-             await   client.ReadHoldingRegistersAsync(0x01, 0x00, 10);
+                await client.ConnectAsync("127.0.0.1", 502);
+                await client.ReadHoldingRegistersAsync(0x01, 0x00, 10);
 
                 _lgbModbusClients.Add(client);
             }

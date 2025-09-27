@@ -72,11 +72,7 @@ public interface IChannelOptions
     /// </summary>
     bool RtsEnable { get; set; }
 
-    /// <summary>
-    /// StreamAsync
-    /// </summary>
-    bool StreamAsync { get; set; }
-
+    Handshake Handshake { get; set; }
     #endregion
     /// <summary>
     /// 最大并发数量

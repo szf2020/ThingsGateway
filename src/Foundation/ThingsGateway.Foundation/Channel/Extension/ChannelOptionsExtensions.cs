@@ -9,7 +9,6 @@
 //------------------------------------------------------------------------------
 
 using ThingsGateway.Foundation.Extension.String;
-using ThingsGateway.NewLife;
 
 using TouchSocket.SerialPorts;
 
@@ -141,10 +140,19 @@ public static class ChannelOptionsExtensions
     /// <returns></returns>
     private static SerialPortChannel GetSerialPort(this TouchSocketConfig config, IChannelOptions channelOptions)
     {
-        var serialPortOption = FastMapper.Mapper<IChannelOptions,SerialPortOption>(channelOptions);
-        serialPortOption.ThrowIfNull(nameof(SerialPortOption));
+        channelOptions.ThrowIfNull(nameof(SerialPortOption));
         channelOptions.Config = config;
-        config.SetSerialPortOption(serialPortOption);
+        config.SetSerialPortOption(options =>
+        {
+            options.PortName = channelOptions.PortName;
+            options.BaudRate = channelOptions.BaudRate;
+            options.DataBits = channelOptions.DataBits;
+            options.Parity = channelOptions.Parity;
+            options.StopBits = channelOptions.StopBits;
+            options.DtrEnable = channelOptions.DtrEnable;
+            options.RtsEnable = channelOptions.RtsEnable;
+            options.Handshake = channelOptions.Handshake;
+        });
         //载入配置
         SerialPortChannel serialPortChannel = new SerialPortChannel(channelOptions);
         return serialPortChannel;

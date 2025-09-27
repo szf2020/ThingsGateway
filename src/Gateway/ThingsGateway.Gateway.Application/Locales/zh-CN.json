@@ -306,7 +306,7 @@
     "PortName": "COM口",
     "RemoteUrl": "远程url",
     "RtsEnable": "Rts",
-    "StreamAsync": "串口流读写",
+    "Handshake": "Handshake",
     "SaveChannel": "添加/修改通道",
     "SortCode": "排序",
     "StopBits": "停止位",

@@ -36,7 +36,7 @@
                                                             <EditorItem @bind-Field="@context.StopBits" Ignore=@(context.ChannelType != ChannelTypeEnum.SerialPort) />
                                                             <EditorItem @bind-Field="@context.DtrEnable" Ignore=@(context.ChannelType != ChannelTypeEnum.SerialPort) />
                                                             <EditorItem @bind-Field="@context.RtsEnable" Ignore=@(context.ChannelType != ChannelTypeEnum.SerialPort) />
-                                                            <EditorItem @bind-Field="@context.StreamAsync" Ignore=@(context.ChannelType != ChannelTypeEnum.SerialPort) />
+                                                            <EditorItem @bind-Field="@context.Handshake" Ignore=@(context.ChannelType != ChannelTypeEnum.SerialPort) />
 
 
                                                             <EditorItem @bind-Field="@context.CacheTimeout" Ignore=@(context.ChannelType == ChannelTypeEnum.UdpSession || context.ChannelType == ChannelTypeEnum.Other) />

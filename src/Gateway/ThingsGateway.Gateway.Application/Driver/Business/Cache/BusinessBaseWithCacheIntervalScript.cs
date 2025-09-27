@@ -16,8 +16,6 @@ using ThingsGateway.NewLife.Json.Extension;
 
 using TouchSocket.Core;
 
-using static System.Net.Mime.MediaTypeNames;
-
 namespace ThingsGateway.Gateway.Application;
 
 /// <summary>

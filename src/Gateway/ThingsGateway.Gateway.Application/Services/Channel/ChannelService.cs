@@ -110,7 +110,11 @@ internal sealed class ChannelService : BaseService<Channel>, IChannelService
 
             var device = devices.Keys.ToList();
             ManageHelper.CheckDeviceCount(device.Count);
-
+            foreach (var item in device)
+            {
+                item.RedundantEnable = false;
+                item.RedundantDeviceId = null;
+            }
             await db.Insertable(device).ExecuteCommandAsync().ConfigureAwait(false);
 
             var variable = devices.SelectMany(a => a.Value).ToList();

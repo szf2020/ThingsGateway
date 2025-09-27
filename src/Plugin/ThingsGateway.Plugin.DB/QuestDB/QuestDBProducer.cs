@@ -14,7 +14,6 @@ using ThingsGateway.Common;
 using ThingsGateway.DB;
 using ThingsGateway.Debug;
 using ThingsGateway.Foundation;
-using ThingsGateway.Gateway.Application;
 using ThingsGateway.NewLife;
 using ThingsGateway.NewLife.Extension;
 using ThingsGateway.NewLife.Threading;

@@ -18,8 +18,6 @@ using ThingsGateway.NewLife;
 using ThingsGateway.NewLife.Collections;
 using ThingsGateway.NewLife.Extension;
 
-using TouchSocket.SerialPorts;
-
 namespace ThingsGateway.Foundation;
 
 /// <summary>

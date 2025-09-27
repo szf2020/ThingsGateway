@@ -53,7 +53,11 @@ internal sealed class DeviceService : BaseService<Device>, IDeviceService
         {
             var device = devices.Keys.ToList();
             ManageHelper.CheckDeviceCount(device.Count);
-
+            foreach (var item in device)
+            {
+                item.RedundantEnable = false;
+                item.RedundantDeviceId = null;
+            }
             await db.Insertable(device).ExecuteCommandAsync().ConfigureAwait(false);
 
             var variable = devices.SelectMany(a => a.Value).ToList();
@@ -262,6 +266,9 @@ internal sealed class DeviceService : BaseService<Device>, IDeviceService
             await GlobalData.SysUserService.CheckApiDataScopeAsync(input.CreateOrgId, input.CreateUserId).ConfigureAwait(false);
         else
             ManageHelper.CheckDeviceCount(1);
+
+        if (input.RedundantEnable && GlobalData.IsRedundant(input.RedundantDeviceId ?? 0))
+            throw Oops.Bah($"Redundancy configuration error, backup device has been planned into another redundancy group");
 
         if (await base.SaveAsync(input, type).ConfigureAwait(false))
         {

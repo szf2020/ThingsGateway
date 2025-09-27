@@ -10,7 +10,6 @@
 // ------------------------------------------------------------------------
 
 using System.Security.Cryptography;
-using System.Text;
 
 namespace ThingsGateway.DataEncryption;
 
@@ -72,8 +71,8 @@ public static class PBKDF2Encryption
 #if NET10_0_OR_GREATER
             var computedHash = Rfc2898DeriveBytes.Pbkdf2(Encoding.UTF8.GetBytes(text), saltBytes, iterationCount, HashAlgorithmName.SHA256, derivedKeyLength);
 #else
-        using var pbkdf2 = new Rfc2898DeriveBytes(text, saltBytes, iterationCount, HashAlgorithmName.SHA256);
-        var computedHash = pbkdf2.GetBytes(derivedKeyLength);
+            using var pbkdf2 = new Rfc2898DeriveBytes(text, saltBytes, iterationCount, HashAlgorithmName.SHA256);
+            var computedHash = pbkdf2.GetBytes(derivedKeyLength);
 #endif
 
             return computedHash.SequenceEqual(storedHashBytes);

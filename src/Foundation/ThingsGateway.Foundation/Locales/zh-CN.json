@@ -22,7 +22,7 @@
     "PortName": "COM口",
     "RemoteUrl": "远程url",
     "RtsEnable": "Rts",
-    "StreamAsync": "串口流读写",
+    "Handshake": "Handshake",
     "StopBits": "停止位"
   },
   "ThingsGateway.Foundation.ConverterConfig": {

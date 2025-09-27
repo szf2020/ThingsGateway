@@ -49,12 +49,12 @@ namespace BenchmarkConsoleApp
             BenchmarkRunner.Run<MapperBench>(
 ManualConfig.Create(DefaultConfig.Instance)
 .WithOptions(ConfigOptions.DisableOptimizationsValidator)
-); 
+);
 
-   //         BenchmarkRunner.Run<ModbusBenchmark>(
-   //    ManualConfig.Create(DefaultConfig.Instance)
-   //        .WithOptions(ConfigOptions.DisableOptimizationsValidator)
-   //); 
+            //         BenchmarkRunner.Run<ModbusBenchmark>(
+            //    ManualConfig.Create(DefaultConfig.Instance)
+            //        .WithOptions(ConfigOptions.DisableOptimizationsValidator)
+            //); 
             //            BenchmarkRunner.Run<S7Benchmark>(
             //ManualConfig.Create(DefaultConfig.Instance)
             //.WithOptions(ConfigOptions.DisableOptimizationsValidator)

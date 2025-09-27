@@ -35,7 +35,8 @@ public partial class RulesPage : ThingsGatewayModuleComponentBase
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         await base.OnAfterRenderAsync(firstRender);
-        if (firstRender) {
+        if (firstRender)
+        {
             StateHasChanged();
         }
     }
