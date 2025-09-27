@@ -84,7 +84,8 @@ public partial class DragAndDrop
         {
             var data = await upload.GetBytesAsync(1024 * 1024);
             var str = Encoding.UTF8.GetString(data);
-            await Load(str.FromJsonNetString<RulesJson>());
+            Load(str.FromJsonNetString<RulesJson>());
+            Load(Value);
         }
         catch (Exception ex)
         {
@@ -92,21 +93,16 @@ public partial class DragAndDrop
         }
     }
 
-    protected override async Task OnParametersSetAsync()
+    protected override void OnParametersSet()
     {
-        await Load(Value);
+        Load(Value);
     }
-    public async Task Load(RulesJson value)
+    private void Load(RulesJson value)
     {
-        try
-        {
-            Value = value;
-            RuleHelpers.Load(_blazorDiagram, Value);
-        }
-        catch (Exception ex)
-        {
-            await ToastService.Warn(ex);
-        }
+
+        Value = value;
+        RuleHelpers.Load(_blazorDiagram, Value);
+
     }
 
     [Inject]
