@@ -398,22 +398,22 @@ public class VariableRuntimeService : IVariableRuntimeService
                 //批量修改之后，需要重新加载通道
                 RuntimeServiceHelper.Init(newChannelRuntimes);
 
-                {
-                    var newDeviceRuntimes = datas.Item2.AdaptListDeviceRuntime();
 
-                    RuntimeServiceHelper.Init(newDeviceRuntimes);
-                }
-                {
-                    var newVariableRuntimes = datas.Item3.AdaptListVariableRuntime();
-                    RuntimeServiceHelper.Init(newVariableRuntimes);
-                }
+                var newDeviceRuntimes = datas.Item2.AdaptListDeviceRuntime();
+
+                RuntimeServiceHelper.Init(newDeviceRuntimes);
+
+
+                var newVariableRuntimes = datas.Item3.AdaptListVariableRuntime();
+                RuntimeServiceHelper.Init(newVariableRuntimes);
+
                 //根据条件重启通道线程
 
                 if (restart)
                 {
                     await GlobalData.ChannelThreadManage.RestartChannelAsync(newChannelRuntimes).ConfigureAwait(false);
 
-                    await RuntimeServiceHelper.ChangedDriverAsync(_logger).ConfigureAwait(false);
+                    await RuntimeServiceHelper.ChangedDriverAsync(GlobalData.GetAllVariableBusinessDeviceRuntime().Where(a => !newDeviceRuntimes.Contains(a)).ToArray(), _logger).ConfigureAwait(false);
                 }
             }
         }
@@ -437,22 +437,21 @@ public class VariableRuntimeService : IVariableRuntimeService
                 //批量修改之后，需要重新加载通道
                 RuntimeServiceHelper.Init(newChannelRuntimes);
 
-                {
-                    var newDeviceRuntimes = datas.Item2.AdaptListDeviceRuntime();
 
-                    RuntimeServiceHelper.Init(newDeviceRuntimes);
-                }
-                {
-                    var newVariableRuntimes = datas.Item3.AdaptListVariableRuntime();
-                    RuntimeServiceHelper.Init(newVariableRuntimes);
-                }
+                var newDeviceRuntimes = datas.Item2.AdaptListDeviceRuntime();
+
+                RuntimeServiceHelper.Init(newDeviceRuntimes);
+
+                var newVariableRuntimes = datas.Item3.AdaptListVariableRuntime();
+                RuntimeServiceHelper.Init(newVariableRuntimes);
+
                 //根据条件重启通道线程
 
                 if (restart)
                 {
                     await GlobalData.ChannelThreadManage.RestartChannelAsync(newChannelRuntimes).ConfigureAwait(false);
 
-                    await RuntimeServiceHelper.ChangedDriverAsync(_logger).ConfigureAwait(false);
+                    await RuntimeServiceHelper.ChangedDriverAsync(GlobalData.GetAllVariableBusinessDeviceRuntime().Where(a => !newDeviceRuntimes.Contains(a)).ToArray(), _logger).ConfigureAwait(false);
                 }
             }
         }

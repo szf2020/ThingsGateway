@@ -145,6 +145,7 @@ public class TextFileLogger : ThingsGateway.NewLife.Log.TextFileLog, TouchSocket
         }
         WriteLog(logLevel, source, message, exception);
     }
+
     protected override void Dispose(bool disposing)
     {
         cache.Remove(CacheKey);

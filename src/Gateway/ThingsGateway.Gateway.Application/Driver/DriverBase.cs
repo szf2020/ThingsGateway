@@ -378,6 +378,8 @@ public abstract class DriverBase : AsyncDisposableObject, IDriver
                     // 记录设备线程已停止的信息
                     LogMessage?.LogInformation(string.Format(AppResource.DeviceTaskStop, DeviceName));
 
+                    await Task.Delay(1000).ConfigureAwait(false);
+
                     // 执行资源释放操作
                     await this.SafeDisposeAsync().ConfigureAwait(false);
 

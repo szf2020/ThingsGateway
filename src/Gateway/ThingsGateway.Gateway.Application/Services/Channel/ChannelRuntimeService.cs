@@ -176,8 +176,8 @@ public class ChannelRuntimeService : IChannelRuntimeService
             if (restart)
             {
                 await GlobalData.ChannelThreadManage.RestartChannelAsync(newChannelRuntimes).ConfigureAwait(false);
-
-                await RuntimeServiceHelper.ChangedDriverAsync(_logger).ConfigureAwait(false);
+                
+                await RuntimeServiceHelper.ChangedDriverAsync(GlobalData.GetAllVariableBusinessDeviceRuntime().Where(a=> !newDeviceRuntimes.Contains(a)).ToArray(),_logger).ConfigureAwait(false);
             }
 
             return true;
@@ -209,7 +209,7 @@ public class ChannelRuntimeService : IChannelRuntimeService
             {
                 await GlobalData.ChannelThreadManage.RestartChannelAsync(newChannelRuntimes).ConfigureAwait(false);
 
-                await RuntimeServiceHelper.ChangedDriverAsync(_logger).ConfigureAwait(false);
+                await RuntimeServiceHelper.ChangedDriverAsync(GlobalData.GetAllVariableBusinessDeviceRuntime().Where(a => !newDeviceRuntimes.Contains(a)).ToArray(),_logger).ConfigureAwait(false);
             }
 
             return true;
@@ -241,7 +241,7 @@ public class ChannelRuntimeService : IChannelRuntimeService
             {
                 await GlobalData.ChannelThreadManage.RestartChannelAsync(newChannelRuntimes).ConfigureAwait(false);
 
-                await RuntimeServiceHelper.ChangedDriverAsync(_logger).ConfigureAwait(false);
+                await RuntimeServiceHelper.ChangedDriverAsync(GlobalData.GetAllVariableBusinessDeviceRuntime().Where(a => !newDeviceRuntimes.Contains(a)).ToArray(),_logger).ConfigureAwait(false);
             }
 
             return true;
