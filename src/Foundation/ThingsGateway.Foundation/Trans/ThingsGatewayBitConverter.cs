@@ -73,7 +73,7 @@ public partial class ThingsGatewayBitConverter : IThingsGatewayBitConverter
         get => endianType; set
         {
             endianType = value;
-            TouchSocketBitConverter = new TouchSocketBitConverter(endianType);
+            TouchSocketBitConverter = TouchSocketBitConverter.GetBitConverter(endianType);
         }
     }
 
@@ -188,13 +188,13 @@ public partial class ThingsGatewayBitConverter : IThingsGatewayBitConverter
 
         // 更新设备地址为去除附加信息后的地址
         registerAddress = sb.ToString();
-        var converter = (IThingsGatewayBitConverter)FastMapper.Mapper(this, type);
         // 如果没有解析出任何附加信息，则直接返回默认的数据转换器
         if (bcdFormat == null && stringlength == null && encoding == null && dataFormat == null && wstring == null)
         {
             //MemoryCache.Set(cacheKey, this!, 3600);
-            return converter;
+            return this;
         }
+        var converter = (IThingsGatewayBitConverter)FastMapper.Mapper(this, type);
 
         // 根据默认的数据转换器创建新的数据转换器实例
 

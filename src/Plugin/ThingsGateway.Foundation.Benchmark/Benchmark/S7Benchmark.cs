@@ -29,6 +29,10 @@ namespace ThingsGateway.Foundation;
 [MemoryDiagnoser]
 public class S7Benchmark : IDisposable
 {
+    public static int ClientCount = 5;
+    public static int TaskNumberOfItems = 1;
+    public static int NumberOfItems = 5;
+
     private List<SiemensS7Master> siemensS7s = new();
 
     private List<Plc> plcs = new();
@@ -39,7 +43,7 @@ public class S7Benchmark : IDisposable
 
     {
         {
-            for (int i = 0; i < Program.ClientCount; i++)
+            for (int i = 0; i < ClientCount; i++)
             {
                 var clientConfig = new TouchSocket.Core.TouchSocketConfig();
 
@@ -56,14 +60,14 @@ public class S7Benchmark : IDisposable
                 await siemensS7.ReadAsync("M1", 100);
                 siemensS7s.Add(siemensS7);
             }
-            for (int i = 0; i < Program.ClientCount; i++)
+            for (int i = 0; i < ClientCount; i++)
             {
                 var siemensS7Net = new SiemensS7Net(SiemensPLCS.S1500, "127.0.0.1");
                 await siemensS7Net.ConnectServerAsync();
                 await siemensS7Net.ReadAsync("M0", 100);
                 siemensS7Nets.Add(siemensS7Net);
             }
-            for (int i = 0; i < Program.ClientCount; i++)
+            for (int i = 0; i < ClientCount; i++)
             {
                 var plc = new Plc(CpuType.S71500, "127.0.0.1", 102, 0, 0);
                 await plc.OpenAsync();//打开plc连接
@@ -79,11 +83,11 @@ public class S7Benchmark : IDisposable
         List<Task> tasks = new List<Task>();
         foreach (var plc in plcs)
         {
-            for (int i = 0; i < Program.TaskNumberOfItems; i++)
+            for (int i = 0; i < TaskNumberOfItems; i++)
             {
                 tasks.Add(Task.Run(async () =>
                 {
-                    for (int i = 0; i < Program.NumberOfItems; i++)
+                    for (int i = 0; i < NumberOfItems; i++)
                     {
                         var result = await plc.ReadAsync(DataType.Memory, 1, 0, VarType.Byte, 100);
                     }
@@ -99,11 +103,11 @@ public class S7Benchmark : IDisposable
         List<Task> tasks = new List<Task>();
         foreach (var siemensS7Net in siemensS7Nets)
         {
-            for (int i = 0; i < Program.TaskNumberOfItems; i++)
+            for (int i = 0; i < TaskNumberOfItems; i++)
             {
                 tasks.Add(Task.Run(async () =>
                 {
-                    for (int i = 0; i < Program.NumberOfItems; i++)
+                    for (int i = 0; i < NumberOfItems; i++)
                     {
                         var result = await siemensS7Net.ReadAsync("M0", 100);
                         if (!result.IsSuccess)
@@ -129,11 +133,11 @@ public class S7Benchmark : IDisposable
         List<Task> tasks = new List<Task>();
         foreach (var siemensS7 in siemensS7s)
         {
-            for (int i = 0; i < Program.TaskNumberOfItems; i++)
+            for (int i = 0; i < TaskNumberOfItems; i++)
             {
                 tasks.Add(Task.Run(async () =>
                 {
-                    for (int i = 0; i < Program.NumberOfItems; i++)
+                    for (int i = 0; i < NumberOfItems; i++)
                     {
                         var result = await siemensS7.S7ReadAsync(siemensS7Address);
                         if (!result.IsSuccess)

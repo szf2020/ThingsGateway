@@ -45,7 +45,7 @@ public class SQLHistoryValue : IPrimaryIdEntity
     ///<summary>
     ///实时值
     ///</summary>
-    [SugarColumn(ColumnDescription = "实时值")]
+    [SugarColumn(ColumnDescription = "实时值", ColumnDataType = StaticConfig.CodeFirst_BigString, IsNullable = true)]
     [AutoGenerateColumn(Order = 23, Visible = true, Sortable = true, Filterable = false)]
     public string Value { get; set; }
 

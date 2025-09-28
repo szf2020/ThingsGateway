@@ -251,7 +251,7 @@ public class DeviceRuntime : Device
     [Newtonsoft.Json.JsonIgnore]
     [MapperIgnore]
     [AutoGenerateColumn(Ignore = true)]
-    internal ConcurrentDictionary<string, VariableRuntime>? VariableRuntimes { get; } = new(Environment.ProcessorCount, 1000);
+    internal ConcurrentDictionary<string, VariableRuntime>? VariableRuntimes { get; } = new();
 
     /// <summary>
     /// 特殊方法变量

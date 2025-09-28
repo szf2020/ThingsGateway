@@ -20,14 +20,11 @@ namespace BenchmarkConsoleApp
 {
     internal class Program
     {
-        public static int ClientCount = 50;
-        public static int TaskNumberOfItems = 6;
-        public static int NumberOfItems = 50;
+
 
         private static async Task Main(string[] args)
         {
             Console.WriteLine("开始测试前，请先启动ModbusSlave，建议使用本项目自带的ThingsGateway.Debug.Photino软件开启，S7可以用KEPSERVER的S7模拟服务");
-            Console.WriteLine($"多客户端({ClientCount}),多线程({TaskNumberOfItems})并发读取({NumberOfItems})测试，共{ClientCount * TaskNumberOfItems * NumberOfItems}次");
             await Task.CompletedTask;
             //ModbusBenchmark modbusBenchmark = new ModbusBenchmark();
             //System.Diagnostics.Stopwatch stopwatch = new();
@@ -46,15 +43,15 @@ namespace BenchmarkConsoleApp
             //.WithOptions(ConfigOptions.DisableOptimizationsValidator)
             //);
 
-            BenchmarkRunner.Run<MapperBench>(
-ManualConfig.Create(DefaultConfig.Instance)
-.WithOptions(ConfigOptions.DisableOptimizationsValidator)
-);
+            //            BenchmarkRunner.Run<MapperBench>(
+            //ManualConfig.Create(DefaultConfig.Instance)
+            //.WithOptions(ConfigOptions.DisableOptimizationsValidator)
+            //);
 
-            //         BenchmarkRunner.Run<ModbusBenchmark>(
-            //    ManualConfig.Create(DefaultConfig.Instance)
-            //        .WithOptions(ConfigOptions.DisableOptimizationsValidator)
-            //); 
+            BenchmarkRunner.Run<ModbusBenchmark>(
+       ManualConfig.Create(DefaultConfig.Instance)
+           .WithOptions(ConfigOptions.DisableOptimizationsValidator)
+   );
             //            BenchmarkRunner.Run<S7Benchmark>(
             //ManualConfig.Create(DefaultConfig.Instance)
             //.WithOptions(ConfigOptions.DisableOptimizationsValidator)
