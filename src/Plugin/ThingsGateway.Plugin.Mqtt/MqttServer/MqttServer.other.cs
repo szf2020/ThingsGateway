@@ -42,7 +42,7 @@ public partial class MqttServer : BusinessBaseWithCacheIntervalScriptAll
 
 #if NET10_0_OR_GREATER
 
-    private IHost _webHost { get; set; }
+    private Microsoft.Extensions.Hosting.IHost _webHost { get; set; }
 
 #else
     private IWebHost _webHost { get; set; }

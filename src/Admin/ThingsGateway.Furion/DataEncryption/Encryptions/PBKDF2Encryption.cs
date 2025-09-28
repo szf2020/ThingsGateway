@@ -35,7 +35,7 @@ public static class PBKDF2Encryption
         var salt = new byte[saltSize];
         rng.GetBytes(salt);
 #if NET10_0_OR_GREATER
-         var hash = Rfc2898DeriveBytes.Pbkdf2(Encoding.UTF8.GetBytes(text), salt, iterationCount, HashAlgorithmName.SHA256, derivedKeyLength);
+        var hash = Rfc2898DeriveBytes.Pbkdf2(System.Text.Encoding.UTF8.GetBytes(text), salt, iterationCount, HashAlgorithmName.SHA256, derivedKeyLength);
 #else
         using var pbkdf2 = new Rfc2898DeriveBytes(text, salt, iterationCount, HashAlgorithmName.SHA256);
         var hash = pbkdf2.GetBytes(derivedKeyLength);
@@ -69,7 +69,7 @@ public static class PBKDF2Encryption
                 return false;
 
 #if NET10_0_OR_GREATER
-            var computedHash = Rfc2898DeriveBytes.Pbkdf2(Encoding.UTF8.GetBytes(text), saltBytes, iterationCount, HashAlgorithmName.SHA256, derivedKeyLength);
+            var computedHash = Rfc2898DeriveBytes.Pbkdf2(System.Text.Encoding.UTF8.GetBytes(text), saltBytes, iterationCount, HashAlgorithmName.SHA256, derivedKeyLength);
 #else
             using var pbkdf2 = new Rfc2898DeriveBytes(text, saltBytes, iterationCount, HashAlgorithmName.SHA256);
             var computedHash = pbkdf2.GetBytes(derivedKeyLength);

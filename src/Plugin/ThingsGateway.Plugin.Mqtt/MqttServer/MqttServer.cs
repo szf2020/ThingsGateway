@@ -12,6 +12,11 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
+#if NET10_0_OR_GREATER
+
+using Microsoft.Extensions.Hosting;
+
+#endif
 using MQTTnet.AspNetCore;
 
 using ThingsGateway.Foundation;
