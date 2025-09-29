@@ -22,7 +22,7 @@ using TouchSocket.Core;
 
 namespace ThingsGateway.Foundation;
 
-[SimpleJob(RuntimeMoniker.Net80)]
+//[SimpleJob(RuntimeMoniker.Net80)]
 //[SimpleJob(RuntimeMoniker.Net10_0)]
 [MemoryDiagnoser]
 public class S7Benchmark : IDisposable

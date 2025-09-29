@@ -18,14 +18,20 @@ public static class JSRuntimeExtensions
         {
             await jsRuntime.InvokeVoidAsync("BlazorDiagrams.observe", element, reference, element.Id).ConfigureAwait(false);
         }
-        catch (ObjectDisposedException)
+        catch
         {
-            // Ignore, DotNetObjectReference was likely disposed
         }
     }
 
     public static async Task UnobserveResizes(this IJSRuntime jsRuntime, ElementReference element)
     {
-        await jsRuntime.InvokeVoidAsync("BlazorDiagrams.unobserve", element, element.Id).ConfigureAwait(false);
+        try
+        {
+            await jsRuntime.InvokeVoidAsync("BlazorDiagrams.unobserve", element, element.Id).ConfigureAwait(false);
+        }
+        catch
+        {
+
+        }
     }
 }

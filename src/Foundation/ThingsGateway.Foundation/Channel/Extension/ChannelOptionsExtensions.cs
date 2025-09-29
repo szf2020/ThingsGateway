@@ -8,6 +8,8 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
+using System.Buffers;
+
 using ThingsGateway.Foundation.Extension.String;
 
 using TouchSocket.SerialPorts;
@@ -101,13 +103,17 @@ public static class ChannelOptionsExtensions
 
         config.SetTransportOption(a =>
         {
+            a.MaxBufferSize = 1024;
+            a.MinBufferSize = 512;
             a.SendPipeOptions = new System.IO.Pipelines.PipeOptions(
-             minimumSegmentSize: 1024,
+             minimumSegmentSize: 512,
+             pauseWriterThreshold: 1024,
+             resumeWriterThreshold: 512,
              useSynchronizationContext: false);
             a.ReceivePipeOptions = new System.IO.Pipelines.PipeOptions(
-                pauseWriterThreshold: 1024 * 1024,
-                resumeWriterThreshold: 1024 * 512,
-             minimumSegmentSize: 1024,
+            minimumSegmentSize: 512,
+             pauseWriterThreshold: 1024,
+             resumeWriterThreshold: 512,
                 useSynchronizationContext: false);
         });
 

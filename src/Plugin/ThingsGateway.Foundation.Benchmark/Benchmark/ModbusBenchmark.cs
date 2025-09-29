@@ -10,7 +10,6 @@
 
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Diagnosers;
-using BenchmarkDotNet.Jobs;
 
 using Longbow.Modbus;
 using Longbow.TcpSocket;
@@ -29,14 +28,14 @@ using ModbusMaster = ThingsGateway.Foundation.Modbus.ModbusMaster;
 
 namespace ThingsGateway.Foundation;
 
-[SimpleJob(RuntimeMoniker.Net80)]
+//[SimpleJob(RuntimeMoniker.Net80)]
 //[SimpleJob(RuntimeMoniker.Net10_0)]
 [MemoryDiagnoser]
 public class ModbusBenchmark : IDisposable
 {
-    public static int ClientCount = 2;
+    public static int ClientCount = 1;
     public static int TaskNumberOfItems = 4;
-    public static int NumberOfItems = 4;
+    public static int NumberOfItems = 40;
 
     private readonly List<IModbusClient> _lgbModbusClients = [];
     private List<ModbusMaster> thingsgatewaymodbuss = new();
@@ -62,7 +61,7 @@ public class ModbusBenchmark : IDisposable
             await clientChannel.SetupAsync(clientChannel.Config);
             clientChannel.Logger.LogLevel = LogLevel.Warning;
             await thingsgatewaymodbus.ConnectAsync(CancellationToken.None);
-            await thingsgatewaymodbus.ReadAsync("40001", 100);
+            await thingsgatewaymodbus.ModbusReadAsync(new ModbusAddress() { FunctionCode = 3, StartAddress = 0, Length = 100 });
             thingsgatewaymodbuss.Add(thingsgatewaymodbus);
         }
 
@@ -145,7 +144,7 @@ public class ModbusBenchmark : IDisposable
     public async Task LongbowModbus()
     {
         List<Task> tasks = new List<Task>();
-        foreach (var _lgbModbusClient in _lgbModbusClients)
+        foreach (var client in _lgbModbusClients)
         {
 
             for (int i = 0; i < TaskNumberOfItems; i++)
@@ -155,7 +154,12 @@ public class ModbusBenchmark : IDisposable
                     for (int i = 0; i < NumberOfItems; i++)
                     {
                         using var cts = new CancellationTokenSource(3000);
-                        var task = await _lgbModbusClient.ReadHoldingRegistersAsync(1, 0, 100, cts.Token).ConfigureAwait(false);
+                        var result = await client.ReadHoldingRegistersAsync(1, 0, 100, cts.Token).ConfigureAwait(false);
+                        var data = result.ReadUShortValues(100);
+                        if (!result.IsSuccess)
+                        {
+                            throw new Exception(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss ffff") + result.Exception);
+                        }
                     }
                 }));
             }
