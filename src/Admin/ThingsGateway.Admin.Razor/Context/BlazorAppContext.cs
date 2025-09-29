@@ -125,13 +125,22 @@ public class BlazorAppContext
             var ownMenus = OwnMenus.Where(a => a.Module == CurrentModuleId);
             OwnMenuItems = AdminResourceUtil.BuildMenuTrees(ownMenus).ToList();
             AllOwnMenuItems = AdminResourceUtil.BuildMenuTrees(OwnMenus).ToList();
-            OwnSameLevelMenuItems = ownMenus.Where(a => !a.Href.IsNullOrWhiteSpace()).Select(item => new MenuItem()
+            OwnSameLevelMenuItems = ownMenus.Where(a => !a.Href.IsNullOrWhiteSpace()).Select(item =>
             {
-                Match = item.NavLinkMatch ?? Microsoft.AspNetCore.Components.Routing.NavLinkMatch.All,
-                Text = item.Title,
-                Icon = item.Icon,
-                Url = item.Href,
-                Target = item.Target.ToString(),
+                var menu = new MenuItem()
+                {
+                    Match = item.NavLinkMatch ?? Microsoft.AspNetCore.Components.Routing.NavLinkMatch.Prefix,
+                    Text = item.Title,
+                    Icon = item.Icon,
+                    Url = item.Href,
+                    Target = item.Target.ToString(),
+                };
+                if (menu.Url.IsNullOrEmpty())
+                {
+                    menu.Match = Microsoft.AspNetCore.Components.Routing.NavLinkMatch.Prefix;
+                }
+                return menu;
+
             }).ToList();
             UserWorkbenchOutputs = AllMenus.Where(it => UserWorkBench.Shortcuts.Contains(it.Id)).ToList();
         }

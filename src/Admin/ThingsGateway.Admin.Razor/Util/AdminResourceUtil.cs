@@ -41,15 +41,22 @@ public static class AdminResourceUtil
         return items
         .Where(it => it.ParentId == parentId)
         .Select((item, index) =>
-            new MenuItem()
+        {
+            var menu = new MenuItem()
             {
-                Match = item.NavLinkMatch ?? Microsoft.AspNetCore.Components.Routing.NavLinkMatch.All,
+                Match = item.NavLinkMatch ?? Microsoft.AspNetCore.Components.Routing.NavLinkMatch.Prefix,
                 Text = item.Title,
                 Icon = item.Icon,
                 Url = item.Href,
                 Target = item.Target.ToString(),
                 Items = BuildMenuTrees(items, item.Id).ToList()
+            };
+            if(menu.Url.IsNullOrEmpty())
+            {
+                menu.Match = Microsoft.AspNetCore.Components.Routing.NavLinkMatch.Prefix;
             }
+            return menu;
+        }
         );
     }
 

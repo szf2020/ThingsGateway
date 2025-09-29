@@ -1412,29 +1412,20 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
 
         await base.OnInitializedAsync();
     }
-    WaitLock WaitLock = new(nameof(ChannelDeviceTree));
     private async Task Notify(CancellationToken cancellationToken)
     {
         if (cancellationToken.IsCancellationRequested) return;
         if (Disposed) return;
-        try
+
+        await OnClickSearch(SearchText);
+
+        Value = GetValue(Value);
+        if (ChannelDeviceChanged != null)
         {
-            await WaitLock.WaitAsync(cancellationToken);
-
-            await OnClickSearch(SearchText);
-
-            Value = GetValue(Value);
-            if (ChannelDeviceChanged != null)
-            {
-                await ChannelDeviceChanged.Invoke(Value);
-            }
-            await InvokeAsync(StateHasChanged);
-
+            await ChannelDeviceChanged.Invoke(Value);
         }
-        finally
-        {
-            WaitLock.Release();
-        }
+        await InvokeAsync(StateHasChanged);
+
     }
 
     private static ChannelDeviceTreeItem GetValue(ChannelDeviceTreeItem channelDeviceTreeItem)
