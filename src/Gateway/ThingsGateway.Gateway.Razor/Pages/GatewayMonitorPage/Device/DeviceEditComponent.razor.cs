@@ -120,6 +120,7 @@ public partial class DeviceEditComponent
 
     private string ChannelName;
     private string DeviceName;
+    private bool _initialized;
     public override async Task SetParametersAsync(ParameterView parameters)
     {
         if (ChannelName.IsNullOrEmpty())
@@ -127,11 +128,22 @@ public partial class DeviceEditComponent
             parameters.SetParameterProperties(this);
             ChannelName = await ChannelPageService.GetChannelNameAsync(Model?.ChannelId ?? 0);
             DeviceName = await DevicePageService.GetDeviceNameAsync(Model?.RedundantDeviceId ?? 0);
-            OnInitialized();
-            await OnInitializedAsync();
-            OnParametersSet();
-            StateHasChanged();
-            await OnParametersSetAsync();
+            if (!_initialized)
+            {
+                _initialized = true;
+
+                OnInitialized();
+                await OnInitializedAsync();
+                OnParametersSet();
+                StateHasChanged();
+                await OnParametersSetAsync();
+            }
+            else
+            {
+                OnParametersSet();
+                StateHasChanged();
+                await OnParametersSetAsync();
+            }
         }
         else
         {

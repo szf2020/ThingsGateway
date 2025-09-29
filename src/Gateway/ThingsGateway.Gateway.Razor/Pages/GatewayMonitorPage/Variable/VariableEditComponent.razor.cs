@@ -49,6 +49,11 @@ public partial class VariableEditComponent
     private string DeviceName;
     private string ChoiceBusinessDeviceName;
     private bool first = false;
+
+
+    private bool _initialized;
+
+
     public override async Task SetParametersAsync(ParameterView parameters)
     {
         if (DeviceName.IsNullOrEmpty() && first == false)
@@ -56,14 +61,31 @@ public partial class VariableEditComponent
             first = true;
             parameters.SetParameterProperties(this);
             DeviceName = await DevicePageService.GetDeviceNameAsync(Model?.DeviceId ?? 0);
-            OnInitialized();
-            await OnInitializedAsync();
-            OnParametersSet();
+            if (!_initialized)
+            {
+                _initialized = true;
 
-            ChoiceBusinessDeviceId = ChoiceBusinessDeviceId > 0 ? ChoiceBusinessDeviceId : (await DevicePageService.OnDeviceSelectedItemQueryAsync(new VirtualizeQueryOption() { Count = 1 }, false).ConfigureAwait(false)).Items.FirstOrDefault()?.Value?.ToLong() ?? 0;
-            ChoiceBusinessDeviceName = (await DevicePageService.GetDeviceNameAsync(ChoiceBusinessDeviceId)) ?? string.Empty;
+                OnInitialized();
+                await OnInitializedAsync();
+                OnParametersSet();
 
-            await InvokeAsync(StateHasChanged);
+                ChoiceBusinessDeviceId = ChoiceBusinessDeviceId > 0 ? ChoiceBusinessDeviceId : (await DevicePageService.OnDeviceSelectedItemQueryAsync(new VirtualizeQueryOption() { Count = 1 }, false).ConfigureAwait(false)).Items.FirstOrDefault()?.Value?.ToLong() ?? 0;
+                ChoiceBusinessDeviceName = (await DevicePageService.GetDeviceNameAsync(ChoiceBusinessDeviceId)) ?? string.Empty;
+
+                await InvokeAsync(StateHasChanged);
+                await OnParametersSetAsync();
+            }
+            else
+            {
+                OnParametersSet();
+
+                ChoiceBusinessDeviceId = ChoiceBusinessDeviceId > 0 ? ChoiceBusinessDeviceId : (await DevicePageService.OnDeviceSelectedItemQueryAsync(new VirtualizeQueryOption() { Count = 1 }, false).ConfigureAwait(false)).Items.FirstOrDefault()?.Value?.ToLong() ?? 0;
+                ChoiceBusinessDeviceName = (await DevicePageService.GetDeviceNameAsync(ChoiceBusinessDeviceId)) ?? string.Empty;
+                await InvokeAsync(StateHasChanged);
+
+                await OnParametersSetAsync();
+            }
+
 
             await OnParametersSetAsync();
 

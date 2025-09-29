@@ -93,6 +93,8 @@ public partial class SqlHistoryAlarm : BusinessBaseWithCacheAlarm
     {
         try
         {
+            if (_driverPropertys.VariableAlarmEnable == false) return;
+
             using var db = BusinessDatabaseUtil.GetDb((DbType)_driverPropertys.DbType, _driverPropertys.BigTextConnectStr);
             if (!_driverPropertys.BigTextScriptHistoryTable.IsNullOrEmpty())
             {

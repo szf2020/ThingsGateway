@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Components.Web;
 
 using ThingsGateway.Admin.Application;
 using ThingsGateway.Admin.Razor;
+using ThingsGateway.NewLife;
 using ThingsGateway.NewLife.Extension;
 using ThingsGateway.NewLife.Json.Extension;
 using ThingsGateway.SqlSugar;
@@ -1319,17 +1320,26 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
     private TreeViewItem<ChannelDeviceTreeItem> UnknownTreeViewItem;
 
     SmartTriggerScheduler? scheduler;
-
+    private bool _initialized;
     public override async Task SetParametersAsync(ParameterView parameters)
     {
-
         parameters.SetParameterProperties(this);
-        OnInitialized();
-        await OnInitializedAsync();
-        OnParametersSet();
-        StateHasChanged();
-        await OnParametersSetAsync();
+        if (!_initialized)
+        {
+            _initialized = true;
 
+            OnInitialized();
+            await OnInitializedAsync();
+            OnParametersSet();
+            StateHasChanged();
+            await OnParametersSetAsync();
+        }
+        else
+        {
+            OnParametersSet();
+            StateHasChanged();
+            await OnParametersSetAsync();
+        }
     }
 
     protected override async Task OnInitializedAsync()
@@ -1402,19 +1412,29 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
 
         await base.OnInitializedAsync();
     }
-
+    WaitLock WaitLock = new(nameof(ChannelDeviceTree));
     private async Task Notify(CancellationToken cancellationToken)
     {
         if (cancellationToken.IsCancellationRequested) return;
         if (Disposed) return;
-        await OnClickSearch(SearchText);
-
-        Value = GetValue(Value);
-        if (ChannelDeviceChanged != null)
+        try
         {
-            await ChannelDeviceChanged.Invoke(Value);
+            await WaitLock.WaitAsync(cancellationToken);
+
+            await OnClickSearch(SearchText);
+
+            Value = GetValue(Value);
+            if (ChannelDeviceChanged != null)
+            {
+                await ChannelDeviceChanged.Invoke(Value);
+            }
+            await InvokeAsync(StateHasChanged);
+
         }
-        await InvokeAsync(StateHasChanged);
+        finally
+        {
+            WaitLock.Release();
+        }
     }
 
     private static ChannelDeviceTreeItem GetValue(ChannelDeviceTreeItem channelDeviceTreeItem)

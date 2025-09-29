@@ -820,6 +820,7 @@ internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
 
             LogMessage?.LogInformation(string.Format(AppResource.ChannelDispose, CurrentChannel?.Name ?? string.Empty));
 
+            await Task.Delay(50).ConfigureAwait(false);
             LogMessage?.Logs?.ForEach(a => a.TryDispose());
         }
         finally

@@ -239,7 +239,7 @@ internal static class RuntimeServiceHelper
             if (group.Key != null)
                 await group.Key.RestartDeviceAsync(group.Value, false).ConfigureAwait(false);
         }
-        foreach (var group in GlobalData.GetAllVariableBusinessDeviceRuntime().Where(a=>!newDeviceRuntimes.Contains(a)).Where(a => a.Driver?.DeviceThreadManage != null).GroupBy(a => a.Driver.DeviceThreadManage))
+        foreach (var group in GlobalData.GetAllVariableBusinessDeviceRuntime().Where(a => !newDeviceRuntimes.Contains(a)).Where(a => a.Driver?.DeviceThreadManage != null).GroupBy(a => a.Driver.DeviceThreadManage))
         {
             if (group.Key != null)
                 await group.Key.RestartDeviceAsync(group.ToArray(), false).ConfigureAwait(false);
@@ -268,9 +268,9 @@ internal static class RuntimeServiceHelper
 
     }
 
-    public static async Task ChangedDriverAsync(DeviceRuntime[] channelDevice,  ILogger logger)
+    public static async Task ChangedDriverAsync(DeviceRuntime[] channelDevice, ILogger logger)
     {
-       
+
 
         await channelDevice.ParallelForEachAsync(async (item, token) =>
          {

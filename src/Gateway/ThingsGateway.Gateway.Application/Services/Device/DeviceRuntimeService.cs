@@ -205,7 +205,7 @@ public class DeviceRuntimeService : IDeviceRuntimeService
             if (restart)
             {
                 await RuntimeServiceHelper.RestartDeviceAsync(newDeviceRuntimes).ConfigureAwait(false);
-                await RuntimeServiceHelper.ChangedDriverAsync(GlobalData.GetAllVariableBusinessDeviceRuntime().Where(a => !newDeviceRuntimes.Contains(a)).ToArray(),_logger).ConfigureAwait(false);
+                await RuntimeServiceHelper.ChangedDriverAsync(GlobalData.GetAllVariableBusinessDeviceRuntime().Where(a => !newDeviceRuntimes.Contains(a)).ToArray(), _logger).ConfigureAwait(false);
             }
 
             return true;

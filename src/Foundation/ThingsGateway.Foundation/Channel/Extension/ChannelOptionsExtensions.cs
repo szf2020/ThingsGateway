@@ -99,16 +99,16 @@ public static class ChannelOptionsExtensions
         if (channelOptions.MaxClientCount > 0)
             config.SetMaxCount(channelOptions.MaxClientCount);
 
-        config.SetTransportOption(new TouchSocket.Sockets.TransportOption()
+        config.SetTransportOption(a =>
         {
-            SendPipeOptions = new System.IO.Pipelines.PipeOptions(
+            a.SendPipeOptions = new System.IO.Pipelines.PipeOptions(
              minimumSegmentSize: 1024,
-             useSynchronizationContext: false),
-            ReceivePipeOptions = new System.IO.Pipelines.PipeOptions(
-             minimumSegmentSize: 1024,
+             useSynchronizationContext: false);
+            a.ReceivePipeOptions = new System.IO.Pipelines.PipeOptions(
                 pauseWriterThreshold: 1024 * 1024,
                 resumeWriterThreshold: 1024 * 512,
-                useSynchronizationContext: false)
+             minimumSegmentSize: 1024,
+                useSynchronizationContext: false);
         });
 
         switch (channelType)
