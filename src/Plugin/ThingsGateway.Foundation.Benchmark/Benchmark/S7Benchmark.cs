@@ -10,7 +10,6 @@
 
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Diagnosers;
-using BenchmarkDotNet.Jobs;
 
 using HslCommunication.Profinet.Siemens;
 

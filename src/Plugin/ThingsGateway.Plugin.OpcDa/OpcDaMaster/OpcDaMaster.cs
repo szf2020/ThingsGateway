@@ -206,7 +206,9 @@ public class OpcDaMaster : CollectBase
             if (TaskSchedulerLoop?.Stoped == true) return;
             if (DisposedValue)
                 return;
-            LogMessage?.Trace($"{ToString()} Change:{Environment.NewLine} {values?.ToSystemTextJsonString()}");
+
+            if (LogMessage.LogLevel <= LogLevel.Trace)
+                LogMessage?.Trace($"{ToString()} Change:{Environment.NewLine} {values?.ToSystemTextJsonString()}");
 
             foreach (var data in values)
             {
@@ -215,11 +217,13 @@ public class OpcDaMaster : CollectBase
                 if (TaskSchedulerLoop?.Stoped == true) return;
                 if (DisposedValue)
                     return;
-                var type = data.Value.GetType();
-                if (data.Value is Array)
-                {
-                    type = type.GetElementType();
-                }
+
+                //var type = data.Value.GetType();
+                //if (data.Value is Array)
+                //{
+                //    type = type.GetElementType();
+                //}
+
                 if (!VariableAddresDicts.TryGetValue(data.Name, out var itemReads)) return;
 
                 foreach (var item in itemReads)

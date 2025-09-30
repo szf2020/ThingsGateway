@@ -267,7 +267,7 @@ internal sealed class DeviceService : BaseService<Device>, IDeviceService
         else
             ManageHelper.CheckDeviceCount(1);
 
-        if (input.RedundantEnable && GlobalData.IsRedundant(input.RedundantDeviceId ?? 0))
+        if (input.RedundantEnable && GlobalData.IsRedundantEnable(input.RedundantDeviceId ?? 0))
             throw Oops.Bah($"Redundancy configuration error, backup device has been planned into another redundancy group");
 
         if (await base.SaveAsync(input, type).ConfigureAwait(false))

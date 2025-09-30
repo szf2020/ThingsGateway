@@ -34,8 +34,8 @@ namespace ThingsGateway.Foundation;
 public class ModbusBenchmark : IDisposable
 {
     public static int ClientCount = 1;
-    public static int TaskNumberOfItems = 4;
-    public static int NumberOfItems = 40;
+    public static int TaskNumberOfItems = 1;
+    public static int NumberOfItems = 1000;
 
     private readonly List<IModbusClient> _lgbModbusClients = [];
     private List<ModbusMaster> thingsgatewaymodbuss = new();

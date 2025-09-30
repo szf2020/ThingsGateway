@@ -235,7 +235,7 @@ public class AuthService : IAuthService
         var logingEvent = new LoginEvent
         {
             Ip = _appService.RemoteIpAddress,
-            Device = _appService.UserAgent?.Platform,
+            Device = _appService.UserAgent?.Platform ?? "Unknown",
             Expire = expire,
             SysUser = sysUser,
             VerificatId = verificatId
@@ -344,7 +344,7 @@ public class AuthService : IAuthService
         //生成verificat信息
         var verificatInfo = new VerificatInfo
         {
-            Device = loginEvent.Device,
+            Device = loginEvent.Device ?? "Unknown",
             Expire = loginEvent.Expire,
             VerificatTimeout = tokenTimeout,
             Id = loginEvent.VerificatId,

@@ -533,8 +533,6 @@ public abstract class DeviceBase : AsyncAndSyncDisposableObject, IDevice
         int timeout = 3000,
         CancellationToken cancellationToken = default)
     {
-
-
         var waitData = clientChannel.WaitHandlePool.GetWaitDataAsync(out var sign);
         command.Sign = sign;
         WaitLock? waitLock = null;
@@ -554,19 +552,17 @@ public abstract class DeviceBase : AsyncAndSyncDisposableObject, IDevice
             if (waitData.Status == WaitDataStatus.Success)
                 return waitData.CompletedData;
 
-            bool timeoutStatus = false;
-
             var reusableTimeout = _reusableTimeouts.Get();
             try
             {
-
                 var cts = reusableTimeout.GetTokenSource(timeout, cancellationToken, Channel.ClosedToken);
+
                 await waitData.WaitAsync(cts.Token).ConfigureAwait(false);
+
             }
             catch (OperationCanceledException)
             {
-                timeoutStatus = reusableTimeout.TimeoutStatus;
-                return timeoutStatus
+                return reusableTimeout.TimeoutStatus
                     ? new MessageBase(new TimeoutException()) { ErrorMessage = $"Timeout, sign: {sign}" }
                     : new MessageBase(new OperationCanceledException());
             }
@@ -577,7 +573,6 @@ public abstract class DeviceBase : AsyncAndSyncDisposableObject, IDevice
             finally
             {
                 reusableTimeout.Set();
-                timeoutStatus = reusableTimeout.TimeoutStatus;
                 _reusableTimeouts.Return(reusableTimeout);
             }
 
@@ -587,7 +582,7 @@ public abstract class DeviceBase : AsyncAndSyncDisposableObject, IDevice
             }
             else
             {
-                var operResult = waitData.Check(timeoutStatus);
+                var operResult = waitData.Check(reusableTimeout.TimeoutStatus);
                 return new MessageBase(operResult) { ErrorMessage = $"{operResult.ErrorMessage}, sign: {sign}" };
             }
         }

@@ -164,8 +164,10 @@ public class OpcUaMaster : CollectBase
                         //如果是订阅模式，连接时添加订阅组
                         if (_plc.OpcUaProperty?.ActiveSubscribe == true && CurrentDevice.VariableSourceReads.Count > 0 && _plc.Session.SubscriptionCount < CurrentDevice.VariableSourceReads.Count)
                         {
+                            if (cancellationToken.IsCancellationRequested) return;
                             foreach (var variableSourceRead in CurrentDevice.VariableSourceReads)
                             {
+                                if (cancellationToken.IsCancellationRequested) return;
                                 try
                                 {
                                     if (_plc.Session.Subscriptions.FirstOrDefault(a => a.DisplayName == variableSourceRead.RegisterAddress) == null)
@@ -186,8 +188,8 @@ public class OpcUaMaster : CollectBase
                                     checkLog = false;
                                 }
 
-                                LogMessage?.LogInformation("AddSubscriptions done");
                             }
+                            LogMessage?.LogInformation("AddSubscriptions done");
                         }
                     }
                 }
@@ -329,6 +331,7 @@ public class OpcUaMaster : CollectBase
 
     private void DataChangedHandler((Opc.Ua.VariableNode variableNode, MonitoredItem monitoredItem, DataValue dataValue, JToken jToken) data)
     {
+
         DateTime time = DateTime.Now;
         try
         {
@@ -338,14 +341,15 @@ public class OpcUaMaster : CollectBase
                 return;
             if (TaskSchedulerLoop?.Stoped == true) return;
 
-            LogMessage?.Trace($"Change: {Environment.NewLine} {data.monitoredItem.StartNodeId} : {data.jToken?.ToString()}");
+            if (LogMessage.LogLevel <= LogLevel.Trace)
+                LogMessage?.Trace($"Change: {Environment.NewLine} {data.monitoredItem.StartNodeId} : {data.jToken?.ToString() ?? data.dataValue?.Value?.ToJsonString()}");
 
             //尝试固定点位的数据类型
-            var type = TypeInfo.GetSystemType(TypeInfo.GetBuiltInType(data.variableNode.DataType, _plc.Session.SystemContext.TypeTable), data.variableNode.ValueRank);
+            //var type = TypeInfo.GetSystemType(TypeInfo.GetBuiltInType(data.variableNode.DataType, _plc.Session.SystemContext.TypeTable), data.variableNode.ValueRank);
 
             if (!VariableAddresDicts.TryGetValue(data.monitoredItem.StartNodeId.ToString(), out var itemReads)) return;
 
-            object value = data.jToken.GetObjectFromJToken();
+            object value = data.jToken?.GetObjectFromJToken() ?? data.dataValue?.Value;
 
             var isGood = StatusCode.IsGood(data.dataValue.StatusCode);
             if (_driverProperties.SourceTimestampEnable)
@@ -382,6 +386,8 @@ public class OpcUaMaster : CollectBase
                 LogMessage?.LogWarning(ex);
             success = false;
         }
+
+
     }
 
 #endif

@@ -259,7 +259,15 @@ public static class GlobalData
         }
         return false;
     }
-
+    public static bool IsRedundantEnable(long deviceId)
+    {
+        if (GlobalData.IdDevices.TryGetValue(deviceId, out var deviceRuntime))
+        {
+            if (deviceRuntime.RedundantEnable && deviceRuntime.RedundantDeviceId != null)
+                return true;
+        }
+        return false;
+    }
     public static IEnumerable<VariableRuntime> GetEnableVariables()
     {
         return IdVariables.Where(a => a.Value.DeviceRuntime?.Enable != false && a.Value.DeviceRuntime?.ChannelRuntime?.Enable != false && a.Value?.Enable == true).Select(a => a.Value);

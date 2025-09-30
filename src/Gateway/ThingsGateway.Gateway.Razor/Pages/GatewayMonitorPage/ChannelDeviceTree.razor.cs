@@ -13,7 +13,6 @@ using Microsoft.AspNetCore.Components.Web;
 
 using ThingsGateway.Admin.Application;
 using ThingsGateway.Admin.Razor;
-using ThingsGateway.NewLife;
 using ThingsGateway.NewLife.Extension;
 using ThingsGateway.NewLife.Json.Extension;
 using ThingsGateway.SqlSugar;

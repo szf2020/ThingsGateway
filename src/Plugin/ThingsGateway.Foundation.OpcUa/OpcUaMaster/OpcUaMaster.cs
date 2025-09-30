@@ -837,10 +837,16 @@ public class OpcUaMaster : IAsyncDisposable
             {
                 foreach (var value in monitoreditem.DequeueValues())
                 {
-                    var variableNode = ReadNode(monitoreditem.StartNodeId.ToString(), false, StatusCode.IsGood(value.StatusCode)).GetAwaiter().GetResult();
 
+                    var variableNode = ReadNode(monitoreditem.StartNodeId.ToString(), false, StatusCode.IsGood(value.StatusCode)).GetAwaiter().GetResult();
                     if (value.Value != null)
                     {
+                        if (value.Value.GetType().IsRichPrimitive())
+                        {
+                            DataChangedHandler?.Invoke((variableNode, monitoreditem, value, null));
+                            continue;
+                        }
+
                         var data = JsonUtils.Encode(m_session.MessageContext, TypeInfo.GetBuiltInType(variableNode.DataType, m_session.SystemContext.TypeTable), value.Value);
                         if (data == null && value.Value != null)
                         {

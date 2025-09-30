@@ -145,7 +145,7 @@ public class AdminOAuthHandler<TOptions>(
         var loginEvent = new LoginEvent
         {
             Ip = appService.RemoteIpAddress,
-            Device = appService.UserAgent?.Platform,
+            Device = appService.UserAgent?.Platform ?? "Unknown",
             Expire = expire,
             SysUser = sysUser,
             VerificatId = CommonUtils.GetSingleId()
@@ -156,7 +156,7 @@ public class AdminOAuthHandler<TOptions>(
         //生成verificat信息
         var verificatInfo = new VerificatInfo
         {
-            Device = loginEvent.Device,
+            Device = loginEvent.Device ?? "Unknown",
             Expire = loginEvent.Expire,
             VerificatTimeout = tokenTimeout,
             Id = loginEvent.VerificatId,

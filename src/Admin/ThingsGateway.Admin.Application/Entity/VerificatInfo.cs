@@ -45,6 +45,7 @@ public class VerificatInfo : PrimaryIdEntity
     /// 登录IP
     /// </summary>
     [AutoGenerateColumn(Filterable = true, Sortable = true, Width = 200)]
+    [SugarColumn(IsNullable = true)]
     public string LoginIp { get; set; }
 
     /// <summary>
@@ -78,5 +79,6 @@ public class VerificatInfo : PrimaryIdEntity
     /// 登录设备
     /// </summary>
     [AutoGenerateColumn(Filterable = true, Sortable = true, Width = 100)]
+    [SugarColumn(IsNullable = true)]
     public string Device { get; set; }
 }

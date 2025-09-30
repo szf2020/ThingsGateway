@@ -51,7 +51,7 @@ public static class AdminResourceUtil
                 Target = item.Target.ToString(),
                 Items = BuildMenuTrees(items, item.Id).ToList()
             };
-            if(menu.Url.IsNullOrEmpty())
+            if (menu.Url.IsNullOrEmpty())
             {
                 menu.Match = Microsoft.AspNetCore.Components.Routing.NavLinkMatch.Prefix;
             }
