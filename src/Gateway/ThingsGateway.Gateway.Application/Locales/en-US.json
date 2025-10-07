@@ -307,6 +307,7 @@
     "PortName": "PortName",
     "RemoteUrl": "RemoteUrl",
     "RtsEnable": "RtsEnable",
+    "StreamAsync": "StreamAsync",
     "Handshake": "Handshake",
     "SaveChannel": "Add/Modify Channel",
     "SortCode": "SortCode",

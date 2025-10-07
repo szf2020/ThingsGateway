@@ -348,7 +348,7 @@ public abstract class DeviceBase : AsyncAndSyncDisposableObject, IDevice
 
     }
 
-    private Task BeforeSendAsync(IClientChannel channel, CancellationToken token)
+    private ValueTask BeforeSendAsync(IClientChannel channel, CancellationToken token)
     {
         SetDataAdapter(channel);
         if (AutoConnect && Channel != null && Channel?.Online != true)
@@ -357,13 +357,13 @@ public abstract class DeviceBase : AsyncAndSyncDisposableObject, IDevice
         }
         else
         {
-            return Task.CompletedTask;
+            return EasyValueTask.CompletedTask;
         }
     }
 
     private WaitLock connectWaitLock = new(nameof(DeviceBase));
 
-    public async Task ConnectAsync(CancellationToken token)
+    public async ValueTask ConnectAsync(CancellationToken token)
     {
         if (AutoConnect && Channel != null && Channel?.Online != true)
         {

@@ -35,7 +35,7 @@ public class ModbusBenchmark : IDisposable
 {
     public static int ClientCount = 1;
     public static int TaskNumberOfItems = 1;
-    public static int NumberOfItems = 1000;
+    public static int NumberOfItems = 10;
 
     private readonly List<IModbusClient> _lgbModbusClients = [];
     private List<ModbusMaster> thingsgatewaymodbuss = new();

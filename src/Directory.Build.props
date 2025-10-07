@@ -1,9 +1,9 @@
 <Project>
 
 	<PropertyGroup>
-		<PluginVersion>10.11.83</PluginVersion>
-		<ProPluginVersion>10.11.83</ProPluginVersion>
-		<DefaultVersion>10.11.83</DefaultVersion>
+		<PluginVersion>10.11.84</PluginVersion>
+		<ProPluginVersion>10.11.84</ProPluginVersion>
+		<DefaultVersion>10.11.84</DefaultVersion>
 		<AuthenticationVersion>10.11.6</AuthenticationVersion>
 		<SourceGeneratorVersion>10.11.6</SourceGeneratorVersion>
 		<NET8Version>8.0.20</NET8Version>
@@ -12,7 +12,7 @@
 		<IsTrimmable>false</IsTrimmable>
 		<ManagementProPluginVersion>10.11.70</ManagementProPluginVersion>
 		<ManagementPluginVersion>10.11.70</ManagementPluginVersion>
-		<TSVersion>4.0.0-beta.80</TSVersion>
+		<TSVersion>4.0.0-beta.96</TSVersion>
 		
 		
 	</PropertyGroup>
@@ -73,7 +73,7 @@
 		<EmbedAllSources>True</EmbedAllSources>
 	</PropertyGroup>
 	<ItemGroup>
-		<PackageReference Include="Roslynator.Analyzers" Version="4.14.0">
+		<PackageReference Include="Roslynator.Analyzers" Version="4.14.1">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>

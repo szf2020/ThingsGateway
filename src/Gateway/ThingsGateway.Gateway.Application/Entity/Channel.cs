@@ -138,6 +138,13 @@ public class Channel : ChannelOptionsBase, IPrimaryIdEntity, IBaseDataEntity, IB
     public override bool RtsEnable { get; set; }
 
     /// <summary>
+    /// StreamAsync
+    /// </summary>
+    [SugarColumn(ColumnDescription = "StreamAsync", IsNullable = true)]
+    [AutoGenerateColumn(Visible = false, Filterable = true, Sortable = true)]
+    public override bool StreamAsync { get; set; }
+    
+    /// <summary>
     /// Handshake
     /// </summary>
     [SugarColumn(ColumnDescription = "Handshake", IsNullable = true)]

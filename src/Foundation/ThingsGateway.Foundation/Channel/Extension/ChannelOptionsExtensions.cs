@@ -172,6 +172,7 @@ public static class ChannelOptionsExtensions
             options.DtrEnable = channelOptions.DtrEnable;
             options.RtsEnable = channelOptions.RtsEnable;
             options.Handshake = channelOptions.Handshake;
+            options.StreamAsync = channelOptions.StreamAsync;
         });
         //载入配置
         SerialPortChannel serialPortChannel = new SerialPortChannel(channelOptions);

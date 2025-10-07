@@ -467,5 +467,5 @@ public interface IDevice : IDisposable, IDisposableObject, IAsyncDisposable
     /// <param name="deviceLog">单独设备日志</param>
     void InitChannel(IChannel channel, ILog? deviceLog = null);
     ValueTask<OperResult<ReadOnlyMemory<byte>>> ReadAsync(object state, CancellationToken cancellationToken = default);
-    Task ConnectAsync(CancellationToken token);
+    ValueTask ConnectAsync(CancellationToken token);
 }

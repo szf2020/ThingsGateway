@@ -22,6 +22,7 @@
     "PortName": "PortName",
     "RemoteUrl": "RemoteUrl",
     "RtsEnable": "RtsEnable",
+    "StreamAsync": "StreamAsync",
     "Handshake": "Handshake",
     "StopBits": "StopBits"
   },

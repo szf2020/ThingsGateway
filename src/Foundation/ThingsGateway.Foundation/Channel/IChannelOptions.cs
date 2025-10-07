@@ -72,6 +72,8 @@ public interface IChannelOptions
     /// </summary>
     bool RtsEnable { get; set; }
 
+    bool StreamAsync { get; set; }
+    
     Handshake Handshake { get; set; }
     #endregion
     /// <summary>

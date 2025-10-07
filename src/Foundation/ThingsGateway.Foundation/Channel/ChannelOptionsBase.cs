@@ -78,6 +78,8 @@ namespace ThingsGateway.Foundation
         /// </summary>
         public virtual bool RtsEnable { get; set; } = true;
 
+        public virtual bool StreamAsync { get; set; } = true;
+
         /// <inheritdoc/>
         [MinValue(1)]
         public virtual int MaxConcurrentCount { get; set; } = 1;
