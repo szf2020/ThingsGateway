@@ -16,7 +16,7 @@
             {
                 try
                 {
-                    new SerializeService().SerializeObject(new { });
+                    DefaultServices.Serialize.SerializeObject(new { });
                     IsTryJsonNet = true;
                 }
                 catch

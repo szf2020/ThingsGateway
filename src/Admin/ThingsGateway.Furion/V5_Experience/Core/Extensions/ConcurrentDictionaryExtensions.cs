@@ -11,7 +11,7 @@
 
 using System.Collections.Concurrent;
 
-namespace ThingsGateway.Extensions;
+namespace ThingsGateway.Extension;
 
 /// <summary>
 ///     <see cref="ConcurrentDictionary{TKey, TValue}" /> 拓展类

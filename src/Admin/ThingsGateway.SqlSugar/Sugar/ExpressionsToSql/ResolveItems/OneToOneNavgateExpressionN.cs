@@ -62,7 +62,7 @@ namespace ThingsGateway.SqlSugar
                     }
                 }
                 var navColum = item.ParentEntityInfo.Columns.FirstOrDefault(it => it.PropertyName == item.Nav.Name);
-                Check.ExceptionEasy(pkColumn == null, $"{item.ThisEntityInfo.EntityName} need PrimayKey", $"使用导航属性{item.ThisEntityInfo.EntityName} 缺少主键");
+                if (pkColumn == null) { throw new SqlSugarLangException($"{item.ThisEntityInfo.EntityName} need PrimayKey", $"使用导航属性{item.ThisEntityInfo.EntityName} 缺少主键"); }
                 var on = $" {ToShortName(shortName)}.{queryable.SqlBuilder.GetTranslationColumnName(pkColumn.DbColumnName)}={ToShortName(formInfo.ThisEntityInfo.DbTableName + (i - 1))}.{queryable.SqlBuilder.GetTranslationColumnName(navColum.DbColumnName)}";
                 if (item.Nav.WhereSql.HasValue())
                 {
@@ -90,9 +90,9 @@ namespace ThingsGateway.SqlSugar
                     FirstPkColumn = nav2;
                 }
             }
-            Check.ExceptionEasy(FirstPkColumn == null, $"{last.ThisEntityInfo.EntityName} need PrimayKey", $"使用导航属性{last.ThisEntityInfo.EntityName} 缺少主键");
+            if (FirstPkColumn == null) { throw new SqlSugarLangException($"{last.ThisEntityInfo.EntityName} need PrimayKey", $"使用导航属性{last.ThisEntityInfo.EntityName} 缺少主键"); }
             var PkColumn = last.ParentEntityInfo.Columns.FirstOrDefault(it => it.PropertyName == last.Nav.Name);
-            Check.ExceptionEasy(PkColumn == null, $"{last.ParentEntityInfo.EntityName} no found {last.Nav.Name}", $"{last.ParentEntityInfo.EntityName} 不存在 {last.Nav.Name}");
+            if (PkColumn == null) { throw new SqlSugarLangException($"{last.ParentEntityInfo.EntityName} no found {last.Nav.Name}", $"{last.ParentEntityInfo.EntityName} 不存在 {last.Nav.Name}"); }
             queryable.Where($" {ToShortName(this.shorName)}.{queryable.SqlBuilder.GetTranslationColumnName(PkColumn.DbColumnName)} = {ToShortName(masterShortName)}.{queryable.SqlBuilder.GetTranslationColumnName(FirstPkColumn.DbColumnName)} ");
             MapperSql.Sql = "( " + queryable.ToSql().Key + " ) ";
             return MapperSql;

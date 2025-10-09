@@ -15,7 +15,7 @@ namespace ThingsGateway.SqlSugar
         {
             List<string> result = new List<string>();
             var attribute = typeof(T).GetCustomAttribute<SplitTableAttribute>() as SplitTableAttribute;
-            Check.Exception(attribute == null, $" {typeof(T).Name} need SplitTableAttribute");
+            if (attribute == null) { throw new SqlSugarException($" {typeof(T).Name} need SplitTableAttribute"); }
             foreach (var item in Items)
             {
                 result.Add(Helper.GetTableName(Helper.GetValue(attribute.SplitType, item)));
@@ -93,7 +93,7 @@ namespace ThingsGateway.SqlSugar
         public string GetTableName(object fieldValue)
         {
             var attribute = EntityInfo.Type.GetCustomAttribute<SplitTableAttribute>() as SplitTableAttribute;
-            Check.Exception(attribute == null, $" {EntityInfo.EntityName} need SplitTableAttribute");
+            if (attribute == null) { throw new SqlSugarException($" {EntityInfo.EntityName} need SplitTableAttribute"); }
             return Service.GetTableName(this.Context, EntityInfo, attribute.SplitType, fieldValue);
         }
         public object GetValue(SplitType splitType, object entityValue)
@@ -102,7 +102,7 @@ namespace ThingsGateway.SqlSugar
         }
         internal void CheckPrimaryKey()
         {
-            Check.Exception(EntityInfo.Columns.Any(it => it.IsIdentity == true), ErrorMessage.GetThrowMessage("Split table can't IsIdentity=true", "分表禁止使用自增列"));
+            if (EntityInfo.Columns.Any(it => it.IsIdentity == true)) { throw new SqlSugarException(ErrorMessage.GetThrowMessage("Split table can't IsIdentity=true", "分表禁止使用自增列")); }
         }
     }
 }

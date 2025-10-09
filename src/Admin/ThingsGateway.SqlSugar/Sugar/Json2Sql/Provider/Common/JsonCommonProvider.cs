@@ -62,7 +62,7 @@ namespace ThingsGateway.SqlSugar
         public KeyValuePair<string, IReadOnlyCollection<SugarParameter>> GetWhere(JToken item, SqlSugarProvider context)
         {
             var value = item.First().ToString();
-            Check.ExceptionEasy(item.First().Type != JTokenType.Array, "Where format error " + item, "Where格式错误" + item);
+            if (item.First().Type != JTokenType.Array) { throw new SqlSugarLangException("Where format error " + item, "Where格式错误" + item); }
             if (!IsConditionalModel(value))
             {
                 var obj = context.Utilities.JsonToSqlFuncModels(value);

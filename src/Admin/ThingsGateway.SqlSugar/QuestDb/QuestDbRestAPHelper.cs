@@ -28,19 +28,16 @@ namespace ThingsGateway.SqlSugar
         /// </summary>
         /// <param name="text"></param>
         /// <returns></returns>
-        public static List<string> SplitByLine(string text)
+        public static IEnumerable<string> SplitByLine(string text)
         {
-            List<string> lines = new List<string>();
             using (var sr = new StringReader(text))
             {
                 string line = sr.ReadLine();
                 while (line != null)
                 {
-                    lines.Add(line);
-                    line = sr.ReadLine();
+                    yield return sr.ReadLine();
                 }
             }
-            return lines;
         }
     }
 }

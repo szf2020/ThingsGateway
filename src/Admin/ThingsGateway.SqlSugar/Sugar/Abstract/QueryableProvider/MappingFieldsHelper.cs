@@ -155,7 +155,7 @@ namespace ThingsGateway.SqlSugar
             }
             else
             {
-                Check.ExceptionEasy("MappingField max value  is  5", "MappingField最大数量不能超过5");
+                Check.ExceptionLang("MappingField max value  is  5", "MappingField最大数量不能超过5");
             }
 
             return setList;

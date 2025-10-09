@@ -9,17 +9,11 @@ namespace ThingsGateway.SqlSugar
         private static readonly CompositeFormat privateEObjNotExistCompositeFormat = CompositeFormat.Parse("{0} does not exist.");
         private static readonly CompositeFormat privateCObjNotExistCompositeFormat = CompositeFormat.Parse("{0}不存在。");
 
-        internal static CompositeFormat EntityMappingErrorCompositeFormat => SugarLanguageType == LanguageType.English ? privateEEntityMappingErrorCompositeFormat : privateCEntityMappingErrorCompositeFormat;
-        private static readonly CompositeFormat privateEEntityMappingErrorCompositeFormat = CompositeFormat.Parse("Entity mapping error.{0}");
-        private static readonly CompositeFormat privateCEntityMappingErrorCompositeFormat = CompositeFormat.Parse("Select 实体与表映射出错,可以注释实体类中的字段排查具体哪一个字段。【注意：如果用CodeFirt先配置禁止删列或更新】 {0}");
+        internal const string EntityMappingErrorCompositeFormat = "Select entity and table mapping error, you can annotate the fields in the entity class to investigate which specific field. [Note: If CodeFirt is used, configure to prohibit column deletion or updates first] . ";
 
-        internal static CompositeFormat NotSupportedDictionaryCompositeFormat => SugarLanguageType == LanguageType.English ? privateENotSupportedDictionaryCompositeFormat : privateCNotSupportedDictionaryCompositeFormat;
-        private static readonly CompositeFormat privateENotSupportedDictionaryCompositeFormat = CompositeFormat.Parse("This type of Dictionary is not supported for the time being. You can try Dictionary<string, string>, or contact the author!");
-        private static readonly CompositeFormat privateCNotSupportedDictionaryCompositeFormat = CompositeFormat.Parse("暂时不支持该类型的Dictionary 你可以试试 Dictionary<string ,string>或者联系作者！");
+        internal const string NotSupportedDictionaryCompositeFormat = "This type of Dictionary is not supported for the time being. You can try Dictionary<string, string>";
 
-        internal static CompositeFormat NotSupportedArrayCompositeFormat => SugarLanguageType == LanguageType.English ? privateENotSupportedArrayCompositeFormat : privateCNotSupportedArrayCompositeFormat;
-        private static readonly CompositeFormat privateENotSupportedArrayCompositeFormat = CompositeFormat.Parse("This type of Array is not supported for the time being. You can try object[] or contact the author!");
-        private static readonly CompositeFormat privateCNotSupportedArrayCompositeFormat = CompositeFormat.Parse("暂时不支持该类型的Array 你可以试试 object[] 或者联系作者！");
+        internal const string NotSupportedArrayCompositeFormat = "This type of Array is not supported for the time being. You can try object[]";
 
         internal static string GetThrowMessage(string enMessage, string cnMessage, params string[] args)
         {

@@ -19,7 +19,7 @@ using System.Net.Mime;
 using System.Reflection;
 using System.Web;
 
-using ThingsGateway.Extensions;
+using ThingsGateway.Extension;
 
 namespace ThingsGateway.Shapeless;
 

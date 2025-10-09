@@ -11,7 +11,7 @@
 
 using System.Data;
 
-namespace ThingsGateway.Extensions;
+namespace ThingsGateway.Extension;
 
 /// <summary>
 ///     <see cref="DataTable" /> 和 <see cref="DataSet" /> 拓展类

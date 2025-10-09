@@ -195,7 +195,7 @@
                 this.DeleteBuilder.WhereInfos.Add(whereItem);
             }
 
-            Check.ExceptionEasy(DeleteBuilder.GetWhereString == null, "Logical Delete requires a Where condition", "逻辑删除需要加Where条件");
+            if (DeleteBuilder.GetWhereString == null) { throw new SqlSugarLangException("Logical Delete requires a Where condition", "逻辑删除需要加Where条件"); }
 
             where = DeleteBuilder.GetWhereString.Substring(5);
             pars = DeleteBuilder.Parameters;
@@ -211,9 +211,10 @@
                     LogicFieldName = column.DbColumnName;
                 }
             }
-            Check.Exception(LogicFieldName == null, ErrorMessage.GetThrowMessage(
-                 $"{entityInfo.EntityName} is not isdelete or isdeleted"
-                , $"{entityInfo.EntityName} 没有IsDelete或者IsDeleted 的属性, 你也可以用 IsLogic().ExecuteCommand(\"列名\")"));
+            if (LogicFieldName == null)
+                throw new SqlSugarException(ErrorMessage.GetThrowMessage(
+                   $"{entityInfo.EntityName} is not isdelete or isdeleted"
+                  , $"{entityInfo.EntityName} 没有IsDelete或者IsDeleted 的属性, 你也可以用 IsLogic().ExecuteCommand(\"列名\")"));
             return LogicFieldName;
         }
     }

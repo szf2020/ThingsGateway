@@ -61,16 +61,16 @@ namespace ThingsGateway.SqlSugar
             {
                 if (ex.Message == "The used command is not allowed with this MySQL version")
                 {
-                    Check.ExceptionEasy("connection string add : AllowLoadLocalInfile=true", "BulkCopy MySql连接字符串需要添加 AllowLoadLocalInfile=true; 添加后如果还不行Mysql数据库执行一下 SET GLOBAL local_infile=1 ");
+                    Check.ExceptionLang("connection string add : AllowLoadLocalInfile=true", "BulkCopy MySql连接字符串需要添加 AllowLoadLocalInfile=true; 添加后如果还不行Mysql数据库执行一下 SET GLOBAL local_infile=1 ");
                 }
                 else if (ex.Message.Contains("To use MySqlBulkLoader.Local=true, set Allo"))
                 {
-                    Check.ExceptionEasy("connection string add : AllowLoadLocalInfile=true", "BulkCopy MySql连接字符串需要添加 AllowLoadLocalInfile=true; 添加后如果还不行Mysql数据库执行一下 SET GLOBAL local_infile=1 ");
+                    Check.ExceptionLang("connection string add : AllowLoadLocalInfile=true", "BulkCopy MySql连接字符串需要添加 AllowLoadLocalInfile=true; 添加后如果还不行Mysql数据库执行一下 SET GLOBAL local_infile=1 ");
                 }
                 else if (ex.Message == "Loading local data is disabled; this must be enabled on both the client and server sides")
                 {
                     await this.Context.Ado.ExecuteCommandAsync("SET GLOBAL local_infile=1").ConfigureAwait(false);
-                    Check.ExceptionEasy(ex.Message, " 检测到你没有开启文件，AllowLoadLocalInfile=true加到自符串上，已自动执行 SET GLOBAL local_infile=1 在试一次");
+                    Check.ExceptionLang(ex.Message, " 检测到你没有开启文件，AllowLoadLocalInfile=true加到自符串上，已自动执行 SET GLOBAL local_infile=1 在试一次");
                 }
                 else
                 {

@@ -8,6 +8,7 @@
 // 项目主要遵循 MIT 许可证和 Apache 许可证（版本 2.0）进行分发和使用。
 // 许可证的完整文本可以在源代码树根目录中的 LICENSE-APACHE 和 LICENSE-MIT 文件中找到。
 // ------------------------------------------------------------------------
+#if NET6_0_OR_GREATER
 
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -15,15 +16,14 @@ using System.Text.Json.Serialization;
 namespace ThingsGateway.JsonSerialization;
 
 /// <summary>
-/// TimeOnly 类型序列化
+/// DateOnly 类型序列化
 /// </summary>
-[SuppressSniffer]
-public class SystemTextJsonTimeOnlyJsonConverter : JsonConverter<TimeOnly>
+public class SystemTextJsonDateOnlyJsonConverter : JsonConverter<DateOnly>
 {
     /// <summary>
     /// 构造函数
     /// </summary>
-    public SystemTextJsonTimeOnlyJsonConverter()
+    public SystemTextJsonDateOnlyJsonConverter()
         : this(default)
     {
     }
@@ -32,13 +32,13 @@ public class SystemTextJsonTimeOnlyJsonConverter : JsonConverter<TimeOnly>
     /// 构造函数
     /// </summary>
     /// <param name="format"></param>
-    public SystemTextJsonTimeOnlyJsonConverter(string format = "HH:mm:ss")
+    public SystemTextJsonDateOnlyJsonConverter(string format = "yyyy-MM-dd")
     {
         Format = format;
     }
 
     /// <summary>
-    /// 时间格式化格式
+    /// 日期格式化格式
     /// </summary>
     public string Format { get; private set; }
 
@@ -49,9 +49,9 @@ public class SystemTextJsonTimeOnlyJsonConverter : JsonConverter<TimeOnly>
     /// <param name="typeToConvert"></param>
     /// <param name="options"></param>
     /// <returns></returns>
-    public override TimeOnly Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    public override DateOnly Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
-        return TimeOnly.Parse(reader.GetString());
+        return DateOnly.Parse(reader.GetString());
     }
 
     /// <summary>
@@ -60,22 +60,21 @@ public class SystemTextJsonTimeOnlyJsonConverter : JsonConverter<TimeOnly>
     /// <param name="writer"></param>
     /// <param name="value"></param>
     /// <param name="options"></param>
-    public override void Write(Utf8JsonWriter writer, TimeOnly value, JsonSerializerOptions options)
+    public override void Write(Utf8JsonWriter writer, DateOnly value, JsonSerializerOptions options)
     {
         writer.WriteStringValue(value.ToString(Format));
     }
 }
 
 /// <summary>
-/// TimeOnly? 类型序列化
+/// DateOnly? 类型序列化
 /// </summary>
-[SuppressSniffer]
-public class SystemTextJsonNullableTimeOnlyJsonConverter : JsonConverter<TimeOnly?>
+public class SystemTextJsonNullableDateOnlyJsonConverter : JsonConverter<DateOnly?>
 {
     /// <summary>
-    /// 默认构造函数
+    /// 构造函数
     /// </summary>
-    public SystemTextJsonNullableTimeOnlyJsonConverter()
+    public SystemTextJsonNullableDateOnlyJsonConverter()
         : this(default)
     {
     }
@@ -84,13 +83,13 @@ public class SystemTextJsonNullableTimeOnlyJsonConverter : JsonConverter<TimeOnl
     /// 构造函数
     /// </summary>
     /// <param name="format"></param>
-    public SystemTextJsonNullableTimeOnlyJsonConverter(string format = "HH:mm:ss")
+    public SystemTextJsonNullableDateOnlyJsonConverter(string format = "yyyy-MM-dd")
     {
         Format = format;
     }
 
     /// <summary>
-    /// 时间格式化格式
+    /// 日期格式化格式
     /// </summary>
     public string Format { get; private set; }
 
@@ -101,9 +100,9 @@ public class SystemTextJsonNullableTimeOnlyJsonConverter : JsonConverter<TimeOnl
     /// <param name="typeToConvert"></param>
     /// <param name="options"></param>
     /// <returns></returns>
-    public override TimeOnly? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    public override DateOnly? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
-        return TimeOnly.TryParse(reader.GetString(), out var time) ? time : null;
+        return DateOnly.TryParse(reader.GetString(), out var date) ? date : null;
     }
 
     /// <summary>
@@ -112,9 +111,11 @@ public class SystemTextJsonNullableTimeOnlyJsonConverter : JsonConverter<TimeOnl
     /// <param name="writer"></param>
     /// <param name="value"></param>
     /// <param name="options"></param>
-    public override void Write(Utf8JsonWriter writer, TimeOnly? value, JsonSerializerOptions options)
+    public override void Write(Utf8JsonWriter writer, DateOnly? value, JsonSerializerOptions options)
     {
         if (value == null) writer.WriteNullValue();
         else writer.WriteStringValue(value.Value.ToString(Format));
     }
 }
+
+#endif

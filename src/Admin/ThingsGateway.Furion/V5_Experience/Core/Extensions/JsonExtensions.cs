@@ -18,7 +18,7 @@ using System.Text.RegularExpressions;
 using System.Xml;
 using System.Xml.Linq;
 
-namespace ThingsGateway.Extensions;
+namespace ThingsGateway.Extension;
 
 /// <summary>
 ///     System.Text.Json 拓展类

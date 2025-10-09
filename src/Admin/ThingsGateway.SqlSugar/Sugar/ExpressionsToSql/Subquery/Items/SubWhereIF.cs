@@ -45,7 +45,7 @@ namespace ThingsGateway.SqlSugar
             }
             catch
             {
-                Check.Exception(true, ErrorMessage.WhereIFCheck, exp.Arguments[0].ToString());
+                { throw new SqlSugarException(ErrorMessage.WhereIFCheck, exp.Arguments[0].ToString()); }
             }
             if (_regex.Count(expression.ToString()) >= 2)
             {

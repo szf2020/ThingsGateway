@@ -13,7 +13,7 @@ using System.Globalization;
 using System.Net.Http.Headers;
 using System.Text;
 
-using ThingsGateway.Extensions;
+using ThingsGateway.Extension;
 
 namespace ThingsGateway.HttpRemote;
 

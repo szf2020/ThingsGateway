@@ -15,7 +15,7 @@ namespace ThingsGateway.SqlSugar
             }
             set
             {
-                Check.Exception(value != null && IsLockCurrentParameter, "CurrentParameter is locked.");
+                if (value != null && IsLockCurrentParameter) { throw new SqlSugarException("CurrentParameter is locked."); }
                 this._CurrentParameter = value;
                 this.IsLockCurrentParameter = false;
             }

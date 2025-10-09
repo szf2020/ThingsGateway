@@ -24,7 +24,7 @@
         }
         internal static string GetWord(string key)
         {
-            Check.ExceptionEasy(words.ContainsKey(key) == false, $"{key} is error", $"{key} 不存在 ");
+            if (words.ContainsKey(key) == false) { throw new SqlSugarLangException($"{key} is error", $"{key} 不存在 "); }
             return words[key];
         }
     }

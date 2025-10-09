@@ -100,7 +100,7 @@
             {
                 if (item.IsPrimarykey || item.IsIdentity)
                 {
-                    Check.ExceptionEasy("Multiple primary keys cannot be modified", "多主键不能修改");
+                    Check.ExceptionLang("Multiple primary keys cannot be modified", "多主键不能修改");
                 }
                 this.Context.DbMaintenance.AddColumn(tableName2, EntityColumnToDbColumn(entityInfo, tableName2, item));
             }
@@ -110,7 +110,7 @@
         {
             var tableName = GetTableName(entityInfo);
             string backupName = tableName + DateTime.Now.ToString("yyyyMMddHHmmss");
-            //Check.Exception(entityInfo.Columns.Where(it => it.IsPrimarykey).Count() > 1, "Use Code First ,The primary key must not exceed 1");
+            //if(entityInfo.Columns.Where(it => it.IsPrimarykey).Count() > 1){throw new SqlSugarException("Use Code First ,The primary key must not exceed 1");}
             List<DbColumnInfo> columns = new List<DbColumnInfo>();
             if (entityInfo.Columns.HasValue())
             {

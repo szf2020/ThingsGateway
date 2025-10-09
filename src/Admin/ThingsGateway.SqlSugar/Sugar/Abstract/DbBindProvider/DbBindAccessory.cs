@@ -56,7 +56,7 @@ namespace ThingsGateway.SqlSugar
             {
                 if (ex.Message == "Common Language Runtime detected an invalid program.")
                 {
-                    Check.Exception(true, ErrorMessage.EntityMappingErrorCompositeFormat, ex.Message);
+                    { throw new SqlSugarException($"{ErrorMessage.EntityMappingErrorCompositeFormat}{ex.Message}"); }
                 }
                 else
                 {
@@ -108,7 +108,7 @@ namespace ThingsGateway.SqlSugar
             {
                 if (ex.Message == "Common Language Runtime detected an invalid program.")
                 {
-                    Check.Exception(true, ErrorMessage.EntityMappingErrorCompositeFormat, ex.Message);
+                    { throw new SqlSugarException($"{ErrorMessage.EntityMappingErrorCompositeFormat}{ex.Message}"); }
                 }
                 else
                 {
@@ -409,7 +409,7 @@ namespace ThingsGateway.SqlSugar
             }
             else
             {
-                Check.Exception(true, ErrorMessage.NotSupportedDictionaryCompositeFormat);
+                { throw new SqlSugarException(ErrorMessage.NotSupportedDictionaryCompositeFormat); }
             }
         }
 
@@ -484,7 +484,7 @@ namespace ThingsGateway.SqlSugar
             else if (childType == UtilConstants.IntType)
                 result.Add((T)Convert.ChangeType(array.Select(it => it.ObjToInt()).ToArray(), type));
             else
-                Check.Exception(true, ErrorMessage.NotSupportedArrayCompositeFormat);
+            { throw new SqlSugarException(ErrorMessage.NotSupportedArrayCompositeFormat); }
         }
 
         /// <summary>

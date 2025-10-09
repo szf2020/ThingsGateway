@@ -286,12 +286,12 @@ namespace ThingsGateway.SqlSugar
             {
                 if (this.TableShortName?.StartsWith('\"') == true)
                 {
-                    Check.Exception(!string.IsNullOrEmpty(this.TableShortName) && resolveExpress.SingleTableNameSubqueryShortName != this.TableShortName.TrimEnd('\"').TrimStart('\"'), "{0} and {1} need same name", resolveExpress.SingleTableNameSubqueryShortName, this.TableShortName);
+                    if (!string.IsNullOrEmpty(this.TableShortName) && resolveExpress.SingleTableNameSubqueryShortName != this.TableShortName.TrimEnd('\"').TrimStart('\"')) { throw new SqlSugarException("{0} and {1} need same name", resolveExpress.SingleTableNameSubqueryShortName, this.TableShortName); }
                     this.TableShortName = resolveExpress.SingleTableNameSubqueryShortName;
                 }
                 else
                 {
-                    Check.Exception(!string.IsNullOrEmpty(this.TableShortName) && resolveExpress.SingleTableNameSubqueryShortName != this.TableShortName, "{0} and {1} need same name", resolveExpress.SingleTableNameSubqueryShortName, this.TableShortName);
+                    if (!string.IsNullOrEmpty(this.TableShortName) && resolveExpress.SingleTableNameSubqueryShortName != this.TableShortName) { throw new SqlSugarException("{0} and {1} need same name", resolveExpress.SingleTableNameSubqueryShortName, this.TableShortName); }
                     this.TableShortName = resolveExpress.SingleTableNameSubqueryShortName;
                 }
             }
@@ -778,7 +778,7 @@ namespace ThingsGateway.SqlSugar
             }
             else if (this.EasyJoinInfos != null && this.EasyJoinInfos.Count != 0)
             {
-                Check.ExceptionEasy("No Supprt Subquery.ToList(), Inner Join Or  Left Join", "Subquery.ToList请使用Inner方式联表");
+                Check.ExceptionLang("No Supprt Subquery.ToList(), Inner Join Or  Left Join", "Subquery.ToList请使用Inner方式联表");
             }
             if (this.TableShortName == null)
             {
@@ -1131,7 +1131,7 @@ namespace ThingsGateway.SqlSugar
                         var index = currentParameters.IndexOf(item);
                         var name = item.Name;
                         var joinName = jsoinParameters[index].Name;
-                        Check.Exception(!name.Equals(joinName, StringComparison.CurrentCultureIgnoreCase), ErrorMessage.ExpressionCheck, joinName, methodName, name);
+                        if (!name.Equals(joinName, StringComparison.CurrentCultureIgnoreCase)) { throw new SqlSugarException(ErrorMessage.ExpressionCheck, joinName, methodName, name); }
                     }
                 }
             }
@@ -1159,7 +1159,7 @@ namespace ThingsGateway.SqlSugar
                         var index = currentParameters.IndexOf(item);
                         var name = item.Name;
                         var joinName = jsoinParameters[index].Name;
-                        Check.Exception(!name.Equals(joinName, StringComparison.CurrentCultureIgnoreCase), ErrorMessage.ExpressionCheck, joinName, methodName, name);
+                        if (!name.Equals(joinName, StringComparison.CurrentCultureIgnoreCase)) { throw new SqlSugarException(ErrorMessage.ExpressionCheck, joinName, methodName, name); }
                     }
                 }
             }

@@ -43,9 +43,9 @@ namespace ThingsGateway.SqlSugar
                 if (type == UtilConstants.DateType)
                 {
                     var date = value.ObjToDate();
-                    if (date < Convert.ToDateTime("1900-1-1"))
+                    if (date < UtilMethods.MinDate)
                     {
-                        date = Convert.ToDateTime("1900-1-1");
+                        date = UtilMethods.MinDate;
                     }
                     return "'" + date.ToString("yyyy-MM-dd HH:mm:ss.fff") + "'";
                 }

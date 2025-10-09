@@ -24,15 +24,15 @@ namespace ThingsGateway.SqlSugar
             var thisPkColumn = thisEntity.Columns.FirstOrDefault(it => it.IsPrimarykey == true);
 
             // 检查主键是否存在
-            Check.ExceptionEasy(thisPkColumn == null, $"{thisPkColumn.EntityName} need primary key", $"{thisPkColumn.EntityName}需要主键");
-            Check.ExceptionEasy(parentPkColumn == null, $"{parentPkColumn.EntityName} need primary key", $"{parentPkColumn.EntityName}需要主键");
+            if (thisPkColumn == null) { throw new SqlSugarLangException($"{thisPkColumn.EntityName} need primary key", $"{thisPkColumn.EntityName}需要主键"); }
+            if (parentPkColumn == null) { throw new SqlSugarLangException($"{parentPkColumn.EntityName} need primary key", $"{parentPkColumn.EntityName}需要主键"); }
 
             // 获取映射表信息
             var mappingType = parentNavigateProperty.Navigat.MappingType;
             var mappingEntity = this._Context.EntityMaintenance.GetEntityInfo(mappingType);
             var mappingA = mappingEntity.Columns.FirstOrDefault(x => x.PropertyName == parentNavigateProperty.Navigat.MappingAId);
             var mappingB = mappingEntity.Columns.FirstOrDefault(x => x.PropertyName == parentNavigateProperty.Navigat.MappingBId);
-            Check.ExceptionEasy(mappingA == null || mappingB == null, $"Navigate property {name} error ", $"导航属性{name}配置错误");
+            if (mappingA == null || mappingB == null) { throw new SqlSugarLangException($"Navigate property {name} error ", $"导航属性{name}配置错误"); }
 
             // 获取映射表主键列(排除关联字段)
             var mappingPk = mappingEntity.Columns
@@ -120,10 +120,11 @@ namespace ThingsGateway.SqlSugar
             {
                 // 逻辑删除原有映射关系
                 var locgicColumn = thisEntity.Columns.FirstOrDefault(it => it.PropertyName.EqualCase("IsDeleted") || it.PropertyName.EqualCase("IsDelete"));
-                Check.ExceptionEasy(
-                     locgicColumn == null,
-                     thisEntity.EntityName + "Logical deletion requires the entity to have the IsDeleted property",
-                     thisEntity.EntityName + "假删除需要实体有IsDeleted属性");
+                if (locgicColumn == null)
+                {
+                    throw new SqlSugarLangException(thisEntity.EntityName + "Logical deletion requires the entity to have the IsDeleted property",
+                        thisEntity.EntityName + "假删除需要实体有IsDeleted属性");
+                }
 
                 List<IConditionalModel> conditionalModels = new List<IConditionalModel>();
                 conditionalModels.Add(new ConditionalModel()
@@ -249,7 +250,7 @@ namespace ThingsGateway.SqlSugar
             else
             {
                 var name = mappingPk.EntityName + " " + mappingPk.DbColumnName;
-                Check.ExceptionEasy($"The field {name} is not an autoassignment type and requires an assignment",
+                Check.ExceptionLang($"The field {name} is not an autoassignment type and requires an assignment",
                     $" 中间表主键字段{name}不是可自动赋值类型， 可赋值类型有 自增、long、Guid、string。你也可以删掉主键 用双主键");
             }
         }

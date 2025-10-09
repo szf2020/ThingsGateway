@@ -43,7 +43,11 @@ namespace ThingsGateway.SqlSugar
             if (thisValue == null || thisValue == DBNull.Value) return true;
             return string.IsNullOrEmpty(thisValue.ToString());
         }
-
+        public static bool IsNullOrEmpty(this string thisValue)
+        {
+            if (thisValue == null) return true;
+            return string.IsNullOrEmpty(thisValue);
+        }
         public static bool IsNullOrEmpty(this Guid? thisValue)
         {
             if (thisValue == null) return true;

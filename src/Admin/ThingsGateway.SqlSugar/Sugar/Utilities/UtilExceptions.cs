@@ -12,7 +12,8 @@ namespace ThingsGateway.SqlSugar
 
         public SqlSugarException(string message)
             : base(message) { }
-
+        public SqlSugarException(string message, params object[] strings)
+    : base(string.Format(message, strings)) { }
         public SqlSugarException(SqlSugarProvider context, string message, string sql)
             : base(message)
         {
@@ -77,6 +78,36 @@ namespace ThingsGateway.SqlSugar
         }
 
         public VersionExceptions(string? message, Exception? innerException) : base(message, innerException)
+        {
+        }
+    }
+
+    public class SqlSugarLangException : SqlSugarException
+    {
+        public SqlSugarLangException(string enmessage, string cnMessage)
+            : base(ErrorMessage.GetThrowMessage(enmessage, cnMessage)) { }
+
+        public SqlSugarLangException(SqlSugarProvider context, string message, string sql) : base(context, message, sql)
+        {
+        }
+
+        public SqlSugarLangException(SqlSugarProvider context, string message, string sql, IReadOnlyCollection<SugarParameter> pars) : base(context, message, sql, pars)
+        {
+        }
+
+        public SqlSugarLangException(SqlSugarProvider context, Exception ex, string sql, IReadOnlyCollection<SugarParameter> pars) : base(context, ex, sql, pars)
+        {
+        }
+
+        public SqlSugarLangException(SqlSugarProvider context, string message, IReadOnlyCollection<SugarParameter> pars) : base(context, message, pars)
+        {
+        }
+
+        public SqlSugarLangException() : base()
+        {
+        }
+
+        public SqlSugarLangException(string? message, Exception? innerException) : base(message, innerException)
         {
         }
     }

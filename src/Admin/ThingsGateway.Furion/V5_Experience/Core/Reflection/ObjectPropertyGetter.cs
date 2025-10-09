@@ -13,7 +13,7 @@ using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 
-using ThingsGateway.Extensions;
+using ThingsGateway.Extension;
 
 namespace ThingsGateway.Reflection;
 

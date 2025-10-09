@@ -8,22 +8,22 @@
 // 项目主要遵循 MIT 许可证和 Apache 许可证（版本 2.0）进行分发和使用。
 // 许可证的完整文本可以在源代码树根目录中的 LICENSE-APACHE 和 LICENSE-MIT 文件中找到。
 // ------------------------------------------------------------------------
+#if NET6_0_OR_GREATER
 
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace ThingsGateway.JsonSerialization;
 
 /// <summary>
 /// TimeOnly 类型序列化
 /// </summary>
-[SuppressSniffer]
-public class NewtonsoftJsonTimeOnlyJsonConverter : JsonConverter<TimeOnly>
+public class SystemTextJsonTimeOnlyJsonConverter : JsonConverter<TimeOnly>
 {
     /// <summary>
     /// 构造函数
     /// </summary>
-    public NewtonsoftJsonTimeOnlyJsonConverter()
+    public SystemTextJsonTimeOnlyJsonConverter()
         : this(default)
     {
     }
@@ -32,7 +32,7 @@ public class NewtonsoftJsonTimeOnlyJsonConverter : JsonConverter<TimeOnly>
     /// 构造函数
     /// </summary>
     /// <param name="format"></param>
-    public NewtonsoftJsonTimeOnlyJsonConverter(string format = "HH:mm:ss")
+    public SystemTextJsonTimeOnlyJsonConverter(string format = "HH:mm:ss")
     {
         Format = format;
     }
@@ -46,15 +46,12 @@ public class NewtonsoftJsonTimeOnlyJsonConverter : JsonConverter<TimeOnly>
     /// 反序列化
     /// </summary>
     /// <param name="reader"></param>
-    /// <param name="objectType"></param>
-    /// <param name="existingValue"></param>
-    /// <param name="hasExistingValue"></param>
-    /// <param name="serializer"></param>
+    /// <param name="typeToConvert"></param>
+    /// <param name="options"></param>
     /// <returns></returns>
-    public override TimeOnly ReadJson(JsonReader reader, Type objectType, TimeOnly existingValue, bool hasExistingValue, JsonSerializer serializer)
+    public override TimeOnly Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
-        var value = JValue.ReadFrom(reader).Value<string>();
-        return TimeOnly.Parse(value);
+        return TimeOnly.Parse(reader.GetString());
     }
 
     /// <summary>
@@ -62,23 +59,22 @@ public class NewtonsoftJsonTimeOnlyJsonConverter : JsonConverter<TimeOnly>
     /// </summary>
     /// <param name="writer"></param>
     /// <param name="value"></param>
-    /// <param name="serializer"></param>
-    public override void WriteJson(JsonWriter writer, TimeOnly value, JsonSerializer serializer)
+    /// <param name="options"></param>
+    public override void Write(Utf8JsonWriter writer, TimeOnly value, JsonSerializerOptions options)
     {
-        writer.WriteValue(value.ToString(Format));
+        writer.WriteStringValue(value.ToString(Format));
     }
 }
 
 /// <summary>
 /// TimeOnly? 类型序列化
 /// </summary>
-[SuppressSniffer]
-public class NewtonsoftJsonNullableTimeOnlyJsonConverter : JsonConverter<TimeOnly?>
+public class SystemTextJsonNullableTimeOnlyJsonConverter : JsonConverter<TimeOnly?>
 {
     /// <summary>
-    /// 构造函数
+    /// 默认构造函数
     /// </summary>
-    public NewtonsoftJsonNullableTimeOnlyJsonConverter()
+    public SystemTextJsonNullableTimeOnlyJsonConverter()
         : this(default)
     {
     }
@@ -87,7 +83,7 @@ public class NewtonsoftJsonNullableTimeOnlyJsonConverter : JsonConverter<TimeOnl
     /// 构造函数
     /// </summary>
     /// <param name="format"></param>
-    public NewtonsoftJsonNullableTimeOnlyJsonConverter(string format = "HH:mm:ss")
+    public SystemTextJsonNullableTimeOnlyJsonConverter(string format = "HH:mm:ss")
     {
         Format = format;
     }
@@ -101,15 +97,12 @@ public class NewtonsoftJsonNullableTimeOnlyJsonConverter : JsonConverter<TimeOnl
     /// 反序列化
     /// </summary>
     /// <param name="reader"></param>
-    /// <param name="objectType"></param>
-    /// <param name="existingValue"></param>
-    /// <param name="hasExistingValue"></param>
-    /// <param name="serializer"></param>
+    /// <param name="typeToConvert"></param>
+    /// <param name="options"></param>
     /// <returns></returns>
-    public override TimeOnly? ReadJson(JsonReader reader, Type objectType, TimeOnly? existingValue, bool hasExistingValue, JsonSerializer serializer)
+    public override TimeOnly? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
-        var value = JValue.ReadFrom(reader).Value<string>();
-        return !string.IsNullOrWhiteSpace(value) ? TimeOnly.Parse(value) : null;
+        return TimeOnly.TryParse(reader.GetString(), out var time) ? time : null;
     }
 
     /// <summary>
@@ -117,10 +110,11 @@ public class NewtonsoftJsonNullableTimeOnlyJsonConverter : JsonConverter<TimeOnl
     /// </summary>
     /// <param name="writer"></param>
     /// <param name="value"></param>
-    /// <param name="serializer"></param>
-    public override void WriteJson(JsonWriter writer, TimeOnly? value, JsonSerializer serializer)
+    /// <param name="options"></param>
+    public override void Write(Utf8JsonWriter writer, TimeOnly? value, JsonSerializerOptions options)
     {
-        if (value == null) writer.WriteNull();
-        else writer.WriteValue(value.Value.ToString(Format));
+        if (value == null) writer.WriteNullValue();
+        else writer.WriteStringValue(value.Value.ToString(Format));
     }
 }
+#endif

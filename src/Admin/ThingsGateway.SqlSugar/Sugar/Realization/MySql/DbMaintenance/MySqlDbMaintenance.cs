@@ -348,7 +348,7 @@ WHERE EVENT_OBJECT_TABLE = '" + tableName + "'");
             {
                 if (SugarCompatible.IsFramework && ex.Message == "Invalid attempt to Read when reader is closed.")
                 {
-                    Check.ExceptionEasy($"To upgrade the MySql.Data. Error:{ex.Message}", $" 请先升级MySql.Data 。 详细错误:{ex.Message}");
+                    Check.ExceptionLang($"To upgrade the MySql.Data. Error:{ex.Message}", $" 请先升级MySql.Data 。 详细错误:{ex.Message}");
                     return true;
                 }
                 else
@@ -389,7 +389,7 @@ WHERE EVENT_OBJECT_TABLE = '" + tableName + "'");
             //    DataType = ""VARCHAR(30) NOT NULL COMMENT 'xxxxx'"",
             //    DbColumnName = ""columnname""
             //}})" ;
-            //Check.Exception(true,"MySql no support AddColumnRemark , use " + message);
+            //{throw new SqlSugarException("MySql no support AddColumnRemark , use " + message);}
             return true;
         }
         /// <summary>
@@ -423,7 +423,7 @@ WHERE EVENT_OBJECT_TABLE = '" + tableName + "'");
                 }
                 else
                 {
-                    Check.ExceptionEasy("Failed to create the database. The database name has a keyword. Please change the name", "建库失败，库名存在关键字，请换一个名字");
+                    Check.ExceptionLang("Failed to create the database. The database name has a keyword. Please change the name", "建库失败，库名存在关键字，请换一个名字");
                 }
             }
             else
@@ -526,7 +526,7 @@ WHERE EVENT_OBJECT_TABLE = '" + tableName + "'");
         protected override string GetCreateTableSql(string tableName, List<DbColumnInfo> columns)
         {
             List<string> columnArray = new List<string>();
-            Check.Exception(columns.IsNullOrEmpty(), "No columns found ");
+            if (columns.IsNullOrEmpty()) { throw new SqlSugarException("No columns found "); }
             foreach (var item in columns)
             {
                 ConvertCreateColumnInfo(item);
@@ -727,7 +727,7 @@ WHERE EVENT_OBJECT_TABLE = '" + tableName + "'");
                 }
                 catch (Exception)
                 {
-                    Check.ExceptionEasy("Need MySqlBackup.NET.MySqlConnector", "需要安装:MySqlBackup.NET.MySqlConnector");
+                    Check.ExceptionLang("Need MySqlBackup.NET.MySqlConnector", "需要安装:MySqlBackup.NET.MySqlConnector");
                     throw;
                 }
 

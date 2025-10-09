@@ -130,13 +130,13 @@ namespace ThingsGateway.SqlSugar
                 var entityInfo = this.Context.GetEntityNoCacheInitMappingInfo(entityType);
                 if (!this.Context.DbMaintenance.IsAnySystemTablePermissions())
                 {
-                    Check.Exception(true, "Dbfirst and  Codefirst requires system table permissions");
+                    { throw new SqlSugarException("Dbfirst and  Codefirst requires system table permissions"); }
                 }
 
                 if (this.Context.Ado.Transaction == null)
                 {
                     var executeResult = Context.Ado.UseTran(() => Execute(entityType, entityInfo));
-                    Check.Exception(!executeResult.IsSuccess, executeResult.ErrorMessage);
+                    if (!executeResult.IsSuccess) { throw new SqlSugarException(executeResult.ErrorMessage); }
                 }
                 else
                 {
@@ -294,7 +294,7 @@ namespace ThingsGateway.SqlSugar
                 }
                 catch (Exception ex)
                 {
-                    Check.ExceptionEasy($"实体{type.Name} 出错,具体错误:" + ex.Message, $" {type.Name} error." + ex.Message);
+                    Check.ExceptionLang($"实体{type.Name} 出错,具体错误:" + ex.Message, $" {type.Name} error." + ex.Message);
                 }
             }
             return result;
@@ -362,7 +362,7 @@ namespace ThingsGateway.SqlSugar
             //var entityInfo = this.Context.EntityMaintenance.GetEntityInfoNoCache(entityType);
             if (entityInfo.Discrimator.HasValue())
             {
-                Check.ExceptionEasy(!Regex.IsMatch(entityInfo.Discrimator, @"^(?:\w+:\w+)(?:,\w+:\w+)*$"), "The format should be type:cat for this type, and if there are multiple, it can be FieldName:cat,FieldName2:dog ", "格式错误应该是type:cat这种格式，如果是多个可以FieldName:cat,FieldName2:dog，不要有空格");
+                if (!Regex.IsMatch(entityInfo.Discrimator, @"^(?:\w+:\w+)(?:,\w+:\w+)*$")) { throw new SqlSugarLangException("The format should be type:cat for this type, and if there are multiple, it can be FieldName:cat,FieldName2:dog ", "格式错误应该是type:cat这种格式，如果是多个可以FieldName:cat,FieldName2:dog，不要有空格"); }
                 var array = entityInfo.Discrimator.Split(',');
                 foreach (var disItem in array)
                 {
@@ -490,7 +490,7 @@ namespace ThingsGateway.SqlSugar
                                 var dbColumn = entityInfo.Columns.FirstOrDefault(z => z.PropertyName == it.Key);
                                 if (dbColumn == null && entityInfo.Discrimator == null)
                                 {
-                                    Check.ExceptionEasy($"{entityInfo.EntityName} no   SugarIndex[ {it.Key} ]  found", $"类{entityInfo.EntityName} 索引特性没找到列 ：{it.Key}");
+                                    Check.ExceptionLang($"{entityInfo.EntityName} no   SugarIndex[ {it.Key} ]  found", $"类{entityInfo.EntityName} 索引特性没找到列 ：{it.Key}");
                                 }
                                 return new KeyValuePair<string, OrderByType>(dbColumn.DbColumnName, it.Value);
                             })
@@ -508,7 +508,7 @@ namespace ThingsGateway.SqlSugar
         public virtual void NoExistLogic(EntityInfo entityInfo)
         {
             var tableName = GetTableName(entityInfo);
-            //Check.Exception(entityInfo.Columns.Where(it => it.IsPrimarykey).Count() > 1, "Use Code First ,The primary key must not exceed 1");
+            //if(entityInfo.Columns.Where(it => it.IsPrimarykey).Count() > 1){throw new SqlSugarException("Use Code First ,The primary key must not exceed 1");}
             List<DbColumnInfo> columns = new List<DbColumnInfo>();
             if (entityInfo.Columns.HasValue())
             {
@@ -533,7 +533,7 @@ namespace ThingsGateway.SqlSugar
         {
             if (entityInfo.Columns.HasValue() && entityInfo.IsDisabledUpdateAll == false)
             {
-                //Check.Exception(entityInfo.Columns.Where(it => it.IsPrimarykey).Count() > 1, "Multiple primary keys do not support modifications");
+                //if(entityInfo.Columns.Where(it => it.IsPrimarykey).Count() > 1){throw new SqlSugarException("Multiple primary keys do not support modifications");}
 
                 var tableName = GetTableName(entityInfo);
                 var dbColumns = this.Context.DbMaintenance.GetColumnInfosByTableName(tableName, false);
@@ -645,13 +645,13 @@ namespace ThingsGateway.SqlSugar
                         }
                         catch (Exception ex)
                         {
-                            Check.Exception(true, ErrorMessage.GetThrowMessage("The current database does not support changing multiple primary keys. " + ex.Message, "当前数据库不支持修改多主键," + ex.Message));
+                            { throw new SqlSugarException(ErrorMessage.GetThrowMessage("The current database does not support changing multiple primary keys. " + ex.Message, "当前数据库不支持修改多主键," + ex.Message)); }
                             throw;
                         }
                     }
                     else if (!Enumerable.SequenceEqual(oldPkNames, newPkNames))
                     {
-                        Check.Exception(true, ErrorMessage.GetThrowMessage("Modification of multiple primary key tables is not supported. Delete tables while creating", "不支持修改多主键表，请删除表在创建"));
+                        { throw new SqlSugarException(ErrorMessage.GetThrowMessage("Modification of multiple primary key tables is not supported. Delete tables while creating", "不支持修改多主键表，请删除表在创建")); }
                     }
                 }
                 if (isChange && IsBackupTable)

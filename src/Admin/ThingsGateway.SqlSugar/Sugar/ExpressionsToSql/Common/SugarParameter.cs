@@ -1,5 +1,8 @@
 using System.Data;
 using System.Data.Common;
+using System.Numerics;
+
+using ThingsGateway.NewLife.Reflection;
 namespace ThingsGateway.SqlSugar
 {
     public class SugarParameter : DbParameter
@@ -227,8 +230,20 @@ namespace ThingsGateway.SqlSugar
                         _Size = -1;
                     else
                     {
-                        var length = Value.ToString().Length;
-                        _Size = length < 4000 ? 4000 : -1;
+                        if (Value is DateTime)
+                        {
+                            _Size = 4000;
+                        }
+                        else if (Value.GetType().IsNumber())
+                        {
+                            _Size = 4000;
+                        }
+                        else
+                        {
+                            var length = Value.ToString().Length;
+                            _Size = length < 4000 ? 4000 : -1;
+                        }
+
                     }
                 }
                 if (_Size == 0)

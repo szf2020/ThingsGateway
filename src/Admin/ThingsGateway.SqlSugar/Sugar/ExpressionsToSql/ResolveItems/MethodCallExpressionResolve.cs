@@ -47,7 +47,7 @@ namespace ThingsGateway.SqlSugar
             }
             else if (IsSubMethod(express, methodName))
             {
-                //Check.Exception(!(parameter.BaseExpression is BinaryExpression), "Current expressions are not supported");
+                //if(!(parameter.BaseExpression is BinaryExpression)){throw new SqlSugarException("Current expressions are not supported");}
                 SubResolve subResolve = new SubResolve(express, this.Context, parameter.OppsiteExpression);
                 var appendSql = subResolve.GetSql();
                 if (this.Context.ResolveType.IsIn(ResolveExpressType.SelectMultiple, ResolveExpressType.SelectSingle) || (parameter.BaseParameter != null && parameter.BaseParameter.CommonTempData?.Equals(CommonTempDataType.Result) == true))
@@ -180,7 +180,7 @@ namespace ThingsGateway.SqlSugar
                 {
                     case ResolveExpressType.WhereSingle:
                     case ResolveExpressType.WhereMultiple:
-                        Check.Exception(name == "GetSelfAndAutoFill", "SqlFunc.GetSelfAndAutoFill can only be used in Select.");
+                        if (name == "GetSelfAndAutoFill") { throw new SqlSugarException("SqlFunc.GetSelfAndAutoFill can only be used in Select."); }
                         if (name == "CharIndexNew" && args.Count == 1)
                         {
                             args.Insert(0, express.Object);

@@ -24,7 +24,7 @@ namespace ThingsGateway.SqlSugar
                 var addList = item.Select(it => it.Item).ToList();
                 if (IsVersion())
                 {
-                    //Check.ExceptionEasy(addList.Count > 1, "The version number can only be used for single record updates", "版本号只能用于单条记录更新");
+                    //if(addList.Count > 1){throw new SqlSugarLangException("The version number can only be used for single record updates", "版本号只能用于单条记录更新");}
                     result += this.Context.UpdateableT(addList[0])
                     .WhereColumns(this.WhereColumns)
                     .EnableDiffLogEventIF(this.IsEnableDiffLogEvent, this.BusinessData)
@@ -97,7 +97,7 @@ namespace ThingsGateway.SqlSugar
                 var addList = item.Select(it => it.Item).ToList();
                 if (IsVersion())
                 {
-                    //Check.ExceptionEasy(addList.Count > 1, "The version number can only be used for single record updates", "版本号只能用于单条记录更新");
+                    //if(addList.Count > 1){throw new SqlSugarLangException("The version number can only be used for single record updates", "版本号只能用于单条记录更新");}
                     result += await Context.UpdateableT(addList[0])
                       .WhereColumns(WhereColumns)
                       .EnableDiffLogEventIF(IsEnableDiffLogEvent, BusinessData)
@@ -134,7 +134,7 @@ namespace ThingsGateway.SqlSugar
         private IEnumerable<GroupModel> GroupDataList(IEnumerable<T> datas)
         {
             var attribute = typeof(T).GetCustomAttribute<SplitTableAttribute>() as SplitTableAttribute;
-            Check.Exception(attribute == null, $"{typeof(T).Name} need SplitTableAttribute");
+            if (attribute == null) { throw new SqlSugarException($"{typeof(T).Name} need SplitTableAttribute"); }
 
             var db = this.Context;
             var context = db.SplitHelper<T>();

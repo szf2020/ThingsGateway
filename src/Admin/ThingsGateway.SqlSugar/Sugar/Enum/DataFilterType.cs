@@ -29,7 +29,7 @@ namespace ThingsGateway.SqlSugar
             }
             catch (Exception ex)
             {
-                Check.ExceptionEasy($" SetValue error in DataExecuting {EntityName} . {ex.Message}", $" DataExecuting 中 SetValue出错 {EntityName} 。 {ex.Message}");
+                Check.ExceptionLang($" SetValue error in DataExecuting {EntityName} . {ex.Message}", $" DataExecuting 中 SetValue出错 {EntityName} 。 {ex.Message}");
             }
         }
         public bool IsAnyAttribute<T>() where T : Attribute
@@ -49,13 +49,13 @@ namespace ThingsGateway.SqlSugar
         public object GetValue(string propertyName)
         {
             var property = EntityColumnInfos.FirstOrDefault(it => it.PropertyName == propertyName);
-            Check.ExceptionEasy(property == null, $"Aop.DataExecuted error . {Entity.EntityName} no property {propertyName}.", $"Aop.DataExecuted 出错 {Entity.EntityName}不存在属性{propertyName}");
+            if (property == null) { throw new SqlSugarLangException($"Aop.DataExecuted error . {Entity.EntityName} no property {propertyName}.", $"Aop.DataExecuted 出错 {Entity.EntityName}不存在属性{propertyName}"); }
             return property.PropertyInfo.GetValue(EntityValue);
         }
         public void SetValue(string propertyName, object value)
         {
             var property = EntityColumnInfos.FirstOrDefault(it => it.PropertyName == propertyName);
-            Check.ExceptionEasy(property == null, $"Aop.DataExecuted error . {Entity.EntityName} no property {propertyName}.", $"Aop.DataExecuted 出错 {Entity.EntityName}不存在属性{propertyName}");
+            if (property == null) { throw new SqlSugarLangException($"Aop.DataExecuted error . {Entity.EntityName} no property {propertyName}.", $"Aop.DataExecuted 出错 {Entity.EntityName}不存在属性{propertyName}"); }
             property.PropertyInfo.SetValue(EntityValue, value);
         }
     }

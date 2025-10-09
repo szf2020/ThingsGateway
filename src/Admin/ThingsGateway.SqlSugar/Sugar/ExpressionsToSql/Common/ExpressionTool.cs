@@ -307,7 +307,7 @@ namespace ThingsGateway.SqlSugar
             var exp = caseExp as NewExpression;
             if (exp == null)
             {
-                Check.ExceptionEasy("Use Select(it=>new class(){})", "导航查询请使用Select(it=>new class(){})");
+                Check.ExceptionLang("Use Select(it=>new class(){})", "导航查询请使用Select(it=>new class(){})");
             }
             var dict = new Dictionary<string, Expression>();
 
@@ -419,15 +419,15 @@ namespace ThingsGateway.SqlSugar
             var navObjectName2 = navObjectName;
             var navObjectNameProperty = listItemType.GetProperty(navObjectName);
             var navObjectNameColumnInfo = listItemEntity.Columns.First(it => it.PropertyName == navObjectName2);
-            Check.ExceptionEasy(navObjectNameColumnInfo.Navigat == null, $"{navObjectName} not [Navigat(..)] ", $"{navObjectName} 没有导航特性 [Navigat(..)] ");
-            Check.ExceptionEasy(navObjectNameColumnInfo.Navigat.NavigatType != NavigateType.OneToOne, $"IncludeLeftJoin can only be one-on-one ", $"IncludeLeftJoin 只能是一对一 ");
+            if (navObjectNameColumnInfo.Navigat == null) { throw new SqlSugarLangException($"{navObjectName} not [Navigat(..)] ", $"{navObjectName} 没有导航特性 [Navigat(..)] "); }
+            if (navObjectNameColumnInfo.Navigat.NavigatType != NavigateType.OneToOne) { throw new SqlSugarLangException($"IncludeLeftJoin can only be one-on-one ", $"IncludeLeftJoin 只能是一对一 "); }
             navColumn = listItemEntity.Columns.FirstOrDefault(it => it.PropertyName == navObjectNameColumnInfo.Navigat.Name);
-            Check.ExceptionEasy(navColumn == null, "OneToOne navigation configuration error", $"OneToOne导航配置错误： 实体{listItemEntity.EntityName} 不存在{navObjectNameColumnInfo.Navigat.Name}");
+            if (navColumn == null) { throw new SqlSugarLangException("OneToOne navigation configuration error", $"OneToOne导航配置错误： 实体{listItemEntity.EntityName} 不存在{navObjectNameColumnInfo.Navigat.Name}"); }
             var navType = navObjectNameProperty.PropertyType;
             navEntityInfo = context.EntityMaintenance.GetEntityInfo(navType);
             context.InitMappingInfo(navEntityInfo.Type);
             navPkColumn = navEntityInfo.Columns.Where(it => it.IsPrimarykey).FirstOrDefault();
-            Check.ExceptionEasy(navPkColumn == null && navObjectNameColumnInfo.Navigat.Name2 == null, navEntityInfo.EntityName + "need primarykey", navEntityInfo.EntityName + " 需要主键");
+            if (navPkColumn == null && navObjectNameColumnInfo.Navigat.Name2 == null) { throw new SqlSugarLangException(navEntityInfo.EntityName + "need primarykey", navEntityInfo.EntityName + " 需要主键"); }
             if (navObjectNameColumnInfo.Navigat.Name2.HasValue())
             {
                 navPkColumn = navEntityInfo.Columns.Where(it => it.PropertyName == navObjectNameColumnInfo.Navigat.Name2).FirstOrDefault();
@@ -707,7 +707,7 @@ namespace ThingsGateway.SqlSugar
             }
             object reval = null;
             FieldInfo field = (FieldInfo)memberExpr.Member;
-            Check.Exception(field.IsPrivate, string.Format(" Field \"{0}\" can't be private ", field.Name));
+            if (field.IsPrivate) { throw new SqlSugarException(string.Format(" Field \"{0}\" can't be private ", field.Name)); }
             reval = field.GetValue(memberExpr.Member);
             if (reval?.GetType().IsClass() == true && reval.GetType() != UtilConstants.StringType)
             {
@@ -724,7 +724,7 @@ namespace ThingsGateway.SqlSugar
                 }
                 if (fieInfo == null && proInfo == null)
                 {
-                    Check.Exception(field.IsPrivate, string.Format(" Field \"{0}\" can't be private ", field.Name));
+                    if (field.IsPrivate) { throw new SqlSugarException(string.Format(" Field \"{0}\" can't be private ", field.Name)); }
                 }
             }
             return reval;
@@ -775,7 +775,7 @@ namespace ThingsGateway.SqlSugar
                 }
                 if (fieInfo == null && proInfo == null && !reval.GetType().FullName.IsCollectionsList())
                 {
-                    Check.Exception(true, string.Format(" Property \"{0}\" can't be private ", pro.Name));
+                    { throw new SqlSugarException(string.Format(" Property \"{0}\" can't be private ", pro.Name)); }
                 }
             }
             return reval;

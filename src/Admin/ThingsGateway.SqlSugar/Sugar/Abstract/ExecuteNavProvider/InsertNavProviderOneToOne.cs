@@ -23,10 +23,10 @@
             EntityColumnInfo thisPkColumn = GetPkColumnByNav(thisEntity, nav);
 
             // 检查主键列是否存在
-            Check.ExceptionEasy(thisPkColumn == null, $" Navigate {parentEntity.EntityName} : {name} is error ", $"导航实体 {parentEntity.EntityName} 属性 {name} 配置错误");
+            if (thisPkColumn == null) { throw new SqlSugarLangException($" Navigate {parentEntity.EntityName} : {name} is error ", $"导航实体 {parentEntity.EntityName} 属性 {name} 配置错误"); }
 
             // 检查是否配置了WhereSql(不支持插入)
-            Check.ExceptionEasy(nav.Navigat.WhereSql.HasValue(), $" {name} Navigate(NavType,WhereSql) no support insert ", $"导航一对一 {name} 配置了 Sql变量 不支持插入");
+            if (nav.Navigat.WhereSql.HasValue()) { throw new SqlSugarLangException($" {name} Navigate(NavType,WhereSql) no support insert ", $"导航一对一 {name} 配置了 Sql变量 不支持插入"); }
 
             List<TChild> childList = new List<TChild>();
 

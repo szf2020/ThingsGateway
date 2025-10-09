@@ -71,7 +71,7 @@ namespace ThingsGateway.SqlSugar
             var isTreeChild = GetIsTreeChild(parentEntity, thisEntity);
 
             // 检查子实体是否有主键
-            Check.ExceptionEasy(thisPkColumn == null, $"{thisEntity.EntityName}need primary key", $"实体{thisEntity.EntityName}需要主键");
+            if (thisPkColumn == null) { throw new SqlSugarLangException($"{thisEntity.EntityName}need primary key", $"实体{thisEntity.EntityName}需要主键"); }
 
             // 根据条件决定是否插入数据
             if (NotAny(name) || isTreeChild)

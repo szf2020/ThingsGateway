@@ -42,7 +42,7 @@ namespace ThingsGateway.SqlSugar
             }
             catch
             {
-                Check.Exception(true, ErrorMessage.WhereIFCheck, exp.Arguments[0].ToString());
+                { throw new SqlSugarException(ErrorMessage.WhereIFCheck, exp.Arguments[0].ToString()); }
             }
             var isWhere = Convert.ToBoolean(value);
             if (!Convert.ToBoolean(isWhere))

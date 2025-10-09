@@ -206,7 +206,7 @@ namespace ThingsGateway.SqlSugar
         /// </summary>
         public virtual bool IsAnyTable(string tableName, bool isCache = true)
         {
-            Check.Exception(string.IsNullOrEmpty(tableName), "IsAnyTable tableName is not null");
+            if (string.IsNullOrEmpty(tableName)) { throw new SqlSugarException("IsAnyTable tableName is not null"); }
             tableName = this.SqlBuilder.GetNoTranslationColumnName(tableName);
             var tables = GetTableInfoList(isCache);
             if (tables == null) return false;
@@ -220,7 +220,7 @@ namespace ThingsGateway.SqlSugar
             columnName = this.SqlBuilder.GetNoTranslationColumnName(columnName);
             tableName = this.SqlBuilder.GetNoTranslationColumnName(tableName);
             var isAny = IsAnyTable(tableName, isCache);
-            Check.Exception(!isAny, string.Format("Table {0} does not exist", tableName));
+            if (!isAny) { throw new SqlSugarException(string.Format("Table {0} does not exist", tableName)); }
             var columns = GetColumnInfosByTableName(tableName, isCache);
             if (columns.IsNullOrEmpty()) return false;
             return columns.Any(it => it.DbColumnName.Equals(columnName, StringComparison.CurrentCultureIgnoreCase));
@@ -232,7 +232,7 @@ namespace ThingsGateway.SqlSugar
         {
             columnName = this.SqlBuilder.GetNoTranslationColumnName(columnName);
             var isAny = IsAnyTable(tableName);
-            Check.Exception(!isAny, string.Format("Table {0} does not exist", tableName));
+            if (!isAny) { throw new SqlSugarException(string.Format("Table {0} does not exist", tableName)); }
             var columns = GetColumnInfosByTableName(tableName);
             if (columns.IsNullOrEmpty()) return false;
             var result = columns.Any(it => it.IsPrimarykey && it.DbColumnName.Equals(columnName, StringComparison.CurrentCultureIgnoreCase));
@@ -245,7 +245,7 @@ namespace ThingsGateway.SqlSugar
         {
             columnName = this.SqlBuilder.GetNoTranslationColumnName(columnName);
             var isAny = IsAnyTable(tableName, isCache);
-            Check.Exception(!isAny, string.Format("Table {0} does not exist", tableName));
+            if (!isAny) { throw new SqlSugarException(string.Format("Table {0} does not exist", tableName)); }
             var columns = GetColumnInfosByTableName(tableName, isCache);
             if (columns.IsNullOrEmpty()) return false;
             var result = columns.Any(it => it.IsPrimarykey && it.DbColumnName.Equals(columnName, StringComparison.CurrentCultureIgnoreCase));
@@ -258,7 +258,7 @@ namespace ThingsGateway.SqlSugar
         {
             columnName = this.SqlBuilder.GetNoTranslationColumnName(columnName);
             var isAny = IsAnyTable(tableName);
-            Check.Exception(!isAny, string.Format("Table {0} does not exist", tableName));
+            if (!isAny) { throw new SqlSugarException(string.Format("Table {0} does not exist", tableName)); }
             var columns = GetColumnInfosByTableName(tableName);
             if (columns.IsNullOrEmpty()) return false;
             return columns.Any(it => it.IsIdentity && it.DbColumnName.Equals(columnName, StringComparison.CurrentCultureIgnoreCase));
@@ -360,7 +360,6 @@ namespace ThingsGateway.SqlSugar
         /// </summary>
         public virtual bool CreateDatabase(string databaseDirectory = null)
         {
-            var seChar = Path.DirectorySeparatorChar.ToString();
             if (databaseDirectory.HasValue())
             {
                 databaseDirectory = databaseDirectory.TrimEnd('\\').TrimEnd('/');
@@ -1061,7 +1060,7 @@ namespace ThingsGateway.SqlSugar
         protected virtual string GetCreateTableSql(string tableName, List<DbColumnInfo> columns)
         {
             List<string> columnArray = new List<string>();
-            Check.Exception(columns.IsNullOrEmpty(), "No columns found ");
+            if (columns.IsNullOrEmpty()) { throw new SqlSugarException("No columns found "); }
             foreach (var item in columns)
             {
                 string columnName = this.SqlBuilder.GetTranslationTableName(item.DbColumnName);

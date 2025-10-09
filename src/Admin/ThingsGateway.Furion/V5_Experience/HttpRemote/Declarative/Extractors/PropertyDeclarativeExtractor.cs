@@ -11,7 +11,7 @@
 
 using System.Reflection;
 
-using ThingsGateway.Extensions;
+using ThingsGateway.Extension;
 using ThingsGateway.Utilities;
 
 namespace ThingsGateway.HttpRemote;

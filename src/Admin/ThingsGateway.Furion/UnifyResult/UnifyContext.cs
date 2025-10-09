@@ -22,7 +22,7 @@ using Microsoft.Extensions.Options;
 using System.Collections.Concurrent;
 using System.Reflection;
 
-using ThingsGateway.Extensions;
+using ThingsGateway.Extension;
 using ThingsGateway.FriendlyException;
 
 namespace ThingsGateway.UnifyResult;

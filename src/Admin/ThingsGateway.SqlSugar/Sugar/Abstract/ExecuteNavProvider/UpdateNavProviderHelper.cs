@@ -113,7 +113,7 @@ namespace ThingsGateway.SqlSugar
         private void InsertDatas<TChild>(List<TChild> children, EntityColumnInfo pkColumn, EntityColumnInfo NavColumn = null) where TChild : class, new()
         {
             children = children.Distinct().ToList();
-            Check.ExceptionEasy(pkColumn == null, typeof(TChild).Name + " has no primary key", typeof(TChild).Name + "没有主键");
+            if (pkColumn == null) { throw new SqlSugarLangException(typeof(TChild).Name + " has no primary key", typeof(TChild).Name + "没有主键"); }
             var whereName = pkColumn.PropertyName;
             if (_Options?.OneToOneSaveByPrimaryKey == true && pkColumn.IsPrimarykey == false)
             {
@@ -126,12 +126,12 @@ namespace ThingsGateway.SqlSugar
             var x = this._Context.Storageable(children).WhereColumns(new string[] { whereName }).ToStorage();
             var insertData = x.InsertList.Select(it => it.Item).ToList();
             var updateData = x.UpdateList.Select(it => it.Item).ToList();
-            Check.ExceptionEasy(pkColumn == null && NavColumn == null, $"The entity is invalid", $"实体错误无法使用导航");
+            if (pkColumn == null && NavColumn == null) { throw new SqlSugarLangException($"The entity is invalid", $"实体错误无法使用导航"); }
             if (_Options?.CurrentFunc != null)
             {
                 var updateable = x.AsUpdateable;
                 var exp = _Options.CurrentFunc as Expression<Action<IUpdateable<TChild>>>;
-                Check.ExceptionEasy(exp == null, "UpdateOptions.CurrentFunc is error", "UpdateOptions.CurrentFunc参数设置错误");
+                if (exp == null) { throw new SqlSugarLangException("UpdateOptions.CurrentFunc is error", "UpdateOptions.CurrentFunc参数设置错误"); }
                 var com = exp.Compile();
                 com(updateable);
                 if (IsDeleted)
@@ -254,7 +254,7 @@ namespace ThingsGateway.SqlSugar
                 if (IsDefaultValue(pkColumn.PropertyInfo.GetValue(child)))
                 {
                     var name = pkColumn.EntityName + " " + pkColumn.DbColumnName;
-                    Check.ExceptionEasy($"The field {name} is not an autoassignment type and requires an assignment", $"字段{name}不是可自动赋值类型，需要赋值 , 可赋值类型有 自增、long、Guid、string");
+                    Check.ExceptionLang($"The field {name} is not an autoassignment type and requires an assignment", $"字段{name}不是可自动赋值类型，需要赋值 , 可赋值类型有 自增、long、Guid、string");
                 }
             }
             this._Context.Insertable(UpdateData).ExecuteCommand();

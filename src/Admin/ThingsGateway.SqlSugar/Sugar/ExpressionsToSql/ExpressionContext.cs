@@ -155,7 +155,7 @@ namespace ThingsGateway.SqlSugar
         public virtual string GetLimit() { return null; }
         public virtual string GetTranslationTableName(string entityName, bool isMapping = true)
         {
-            Check.ArgumentNullException(entityName, string.Format(null, ErrorMessage.ObjNotExistCompositeFormat, "Table Name"));
+            if (entityName == null) { throw new SqlSugarException(string.Format(null, ErrorMessage.ObjNotExistCompositeFormat, "Table Name")); }
             if (IsTranslationText(entityName)) return entityName;
             isMapping = isMapping && this.MappingTables.HasValue();
             var isComplex = entityName.Contains(UtilConstants.Dot);
@@ -197,7 +197,7 @@ namespace ThingsGateway.SqlSugar
         }
         public virtual string GetTranslationColumnName(string columnName)
         {
-            Check.ArgumentNullException(columnName, string.Format(null, ErrorMessage.ObjNotExistCompositeFormat, "Column Name"));
+            if (columnName == null) { throw new SqlSugarException(string.Format(null, ErrorMessage.ObjNotExistCompositeFormat, "Column Name")); }
             if (columnName.Substring(0, 1) == this.SqlParameterKeyWord || columnName.Substring(0, 1) == "@")
             {
                 return columnName;

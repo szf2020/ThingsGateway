@@ -11,7 +11,7 @@
 
 using System.Diagnostics.CodeAnalysis;
 
-using ThingsGateway.Extensions;
+using ThingsGateway.Extension;
 
 namespace ThingsGateway.Utilities;
 

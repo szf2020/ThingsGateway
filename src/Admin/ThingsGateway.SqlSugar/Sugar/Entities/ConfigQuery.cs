@@ -34,7 +34,7 @@ namespace ThingsGateway.SqlSugar
                 }
                 else
                 {
-                    Check.Exception(true, "SetKeyValue error , entity & uniqueCode already exist");
+                    { throw new SqlSugarException("SetKeyValue error , entity & uniqueCode already exist"); }
                 }
             }
         }

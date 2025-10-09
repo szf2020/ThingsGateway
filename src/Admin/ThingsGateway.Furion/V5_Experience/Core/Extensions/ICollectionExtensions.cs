@@ -11,7 +11,7 @@
 
 using System.Diagnostics.CodeAnalysis;
 
-namespace ThingsGateway.Extensions;
+namespace ThingsGateway.Extension;
 
 /// <summary>
 ///     <see cref="ICollection{T}" /> 拓展类

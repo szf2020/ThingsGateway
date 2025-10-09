@@ -433,7 +433,7 @@ namespace ThingsGateway.SqlSugar
             }
             catch
             {
-                Check.Exception(true, "Not Support {0}", expression.ToString());
+                { throw new SqlSugarException("Not Support {0}", expression.ToString()); }
             }
         }
 

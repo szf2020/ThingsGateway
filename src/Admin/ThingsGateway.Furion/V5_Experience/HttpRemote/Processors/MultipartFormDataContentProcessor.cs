@@ -12,7 +12,7 @@
 using System.Net.Mime;
 using System.Text;
 
-using ThingsGateway.Extensions;
+using ThingsGateway.Extension;
 
 namespace ThingsGateway.HttpRemote;
 

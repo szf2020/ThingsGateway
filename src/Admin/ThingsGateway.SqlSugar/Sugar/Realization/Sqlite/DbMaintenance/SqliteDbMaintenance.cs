@@ -274,7 +274,7 @@ namespace ThingsGateway.SqlSugar
             {
                 if (column.IsPrimarykey)
                 {
-                    Check.ExceptionEasy("Sqlite no support alter column primary key", "Sqlite不支持修改主键");
+                    Check.ExceptionLang("Sqlite no support alter column primary key", "Sqlite不支持修改主键");
                 }
 
                 if (isTran)
@@ -541,7 +541,7 @@ AND sql LIKE '%" + tableName + "%'");
                     //}
                     if (item.IsIdentity && !item.IsPrimarykey)
                     {
-                        Check.Exception(true, "Identity only primary key");
+                        { throw new SqlSugarException("Identity only primary key"); }
                     }
                 }
             }
@@ -567,7 +567,7 @@ AND sql LIKE '%" + tableName + "%'");
         protected override string GetCreateTableSql(string tableName, List<DbColumnInfo> columns)
         {
             List<string> columnArray = new List<string>();
-            Check.Exception(columns.IsNullOrEmpty(), "No columns found ");
+            if (columns.IsNullOrEmpty()) { throw new SqlSugarException("No columns found "); }
             foreach (var item in columns)
             {
                 string columnName = item.DbColumnName;

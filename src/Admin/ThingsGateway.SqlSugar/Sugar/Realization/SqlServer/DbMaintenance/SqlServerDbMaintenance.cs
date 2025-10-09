@@ -649,7 +649,7 @@ AND syscomments.text LIKE '%" + tableName + "%'");
                 }
                 else
                 {
-                    Check.ExceptionEasy("Failed to create the database. The database name has a keyword. Please change the name", "建库失败，库名存在关键字，请换一个名字");
+                    Check.ExceptionLang("Failed to create the database. The database name has a keyword. Please change the name", "建库失败，库名存在关键字，请换一个名字");
                 }
             }
             else

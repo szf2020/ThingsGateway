@@ -9,7 +9,7 @@ namespace ThingsGateway.SqlSugar
         {
             if (StaticConfig.DynamicExpressionParserType == null)
             {
-                Check.ExceptionEasy("Please at program startup assignment: StaticConfig DynamicExpressionParserType = typeof (DynamicExpressionParser); NUGET is required to install Dynamic.Core", "请在程序启动时赋值: StaticConfig.DynamicExpressionParserType = typeof(DynamicExpressionParser); 需要NUGET安装 Dynamic.Core");
+                Check.ExceptionLang("Please at program startup assignment: StaticConfig DynamicExpressionParserType = typeof (DynamicExpressionParser); NUGET is required to install Dynamic.Core", "请在程序启动时赋值: StaticConfig.DynamicExpressionParserType = typeof(DynamicExpressionParser); 需要NUGET安装 Dynamic.Core");
             }
 
             if (StaticConfig.DynamicExpressionParsingConfig != null)

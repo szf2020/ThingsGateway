@@ -27,8 +27,8 @@ namespace ThingsGateway.SqlSugar
                 this.Context.Ado.IsDisableMasterSlaveSeparation = true;
                 List<T> result = new List<T>();
                 var pks = GetPrimaryKeys();
-                Check.Exception(pks.IsNullOrEmpty(), "Need primary key");
-                Check.Exception(pks.Count > 1, "Multiple primary keys are not supported");
+                if (pks.IsNullOrEmpty()) { throw new SqlSugarException("Need primary key"); }
+                if (pks.Count > 1) { throw new SqlSugarException("Multiple primary keys are not supported"); }
                 var pkInfo = this.EntityInfo.Columns.Where(it => it.IsIgnore == false && it.DbColumnName.Equals(pks[0], StringComparison.CurrentCultureIgnoreCase)).First();
                 var pkValues = saveObjects.Select(it => it.GetType().GetProperty(pkInfo.PropertyName).GetValue(it, null));
                 if (existsObjects == null)
@@ -49,8 +49,8 @@ namespace ThingsGateway.SqlSugar
                 this.Context.Ado.IsDisableMasterSlaveSeparation = true;
                 List<T> result = new List<T>();
                 var pks = GetPrimaryKeys();
-                Check.Exception(pks.IsNullOrEmpty(), "Need primary key");
-                Check.Exception(pks.Count > 1, "Multiple primary keys are not supported");
+                if (pks.IsNullOrEmpty()) { throw new SqlSugarException("Need primary key"); }
+                if (pks.Count > 1) { throw new SqlSugarException("Multiple primary keys are not supported"); }
                 var pkInfo = this.EntityInfo.Columns.Where(it => it.IsIgnore == false && it.DbColumnName.Equals(pks[0], StringComparison.CurrentCultureIgnoreCase)).First();
                 var pkValues = saveObjects.Select(it => it.GetType().GetProperty(pkInfo.PropertyName).GetValue(it, null));
                 if (existsObjects == null)

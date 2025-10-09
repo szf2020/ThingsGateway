@@ -11,8 +11,9 @@ namespace ThingsGateway.SqlSugar
         private bool IsUpdate = false;
         public string CharacterSet { get; set; }
         private DataTable UpdateDataTable { get; set; }
+        private Dictionary<string, (Type, List<DataInfos>)> UpdateDataInfos { get; set; }
         public bool IsActionUpdateColumns { get; set; }
-        public DbFastestProperties DbFastestProperties { get; set; } = new DbFastestProperties() { IsNoCopyDataTable = true };
+        public DbFastestProperties DbFastestProperties { get; set; } = new DbFastestProperties() { IsNoCopyDataTable = true, IsDataTable = false };
         public SqliteFastBuilder(EntityInfo entityInfo)
         {
             this.entityInfo = entityInfo;
@@ -28,12 +29,12 @@ namespace ThingsGateway.SqlSugar
             }
         }
 
-        public async Task CreateTempAsync<T>(DataTable dt) where T : class, new()
+        public Task CreateTempAsync<T>(DataTable dt) where T : class, new()
         {
-            await Task.Delay(0).ConfigureAwait(false);
-            IsUpdate = true;
-        }
 
+            IsUpdate = true;
+            return Task.CompletedTask;
+        }
         public async Task<int> ExecuteBulkCopyAsync(DataTable dt)
         {
             if (dt.Rows.Count == 0 || IsUpdate)
@@ -68,6 +69,44 @@ namespace ThingsGateway.SqlSugar
             }
             return result;
         }
+
+        public async Task<int> ExecuteBulkCopyAsync(string tableName, Dictionary<string, (Type, List<DataInfos>)> list)
+        {
+            if (list.Count == 0 || IsUpdate)
+            {
+                this.UpdateDataInfos = list;
+                return 0;
+            }
+            foreach (var item in this.entityInfo.Columns)
+            {
+                if (item.IsIdentity)
+                {
+                    list.Remove(item.DbColumnName);
+                }
+            }
+            int result = 0;
+            var cn = this.Context.Ado.Connection as SqliteConnection;
+            Open(cn);
+            if (this.Context.Ado.Transaction == null)
+            {
+#pragma warning disable CA2007 // 考虑对等待的任务调用 ConfigureAwait
+                await using (var transaction = await cn.BeginTransactionAsync().ConfigureAwait(false))
+                {
+                    result = await _BulkCopy(tableName, list, result, cn).ConfigureAwait(false);
+                    await transaction.CommitAsync().ConfigureAwait(false);
+                }
+#pragma warning restore CA2007 // 考虑对等待的任务调用 ConfigureAwait
+            }
+            else
+            {
+                result = await _BulkCopy(tableName, list, result, cn).ConfigureAwait(false);
+            }
+            return result;
+        }
+
+
+
+
 
         private async Task<int> _BulkCopy(DataTable dt, List<Dictionary<string, object>> dictionary, int i, SqliteConnection cn)
         {
@@ -110,6 +149,67 @@ namespace ThingsGateway.SqlSugar
             }
             return i;
         }
+
+        private async Task<int> _BulkCopy(string tableName, Dictionary<string, (Type, List<DataInfos>)> list, int i, SqliteConnection cn)
+        {
+            using (var cmd = cn.CreateCommand())
+            {
+                if (this.Context?.CurrentConnectionConfig?.MoreSettings?.IsCorrectErrorSqlParameterName == true)
+                {
+                    var count = list.FirstOrDefault().Value.Item2?.Count;
+                    if (count > 0)
+                    {
+                        for (int index = 0; index < count; index++)
+                        {
+                            var row = list.GetRows(index).ToDictionary(a => a.ColumnName, a => a.Value);
+                            cmd.CommandText = this.Context.InsertableT(row).AS(tableName).ToSqlString().Replace(";SELECT LAST_INSERT_ROWID();", "");
+                            TransformInsertCommand(cmd);
+                            i += await cmd.ExecuteNonQueryAsync().ConfigureAwait(false);
+                        }
+                    }
+                }
+                else
+                {
+                    var count = list.FirstOrDefault().Value.Item2?.Count;
+                    if (count > 0)
+                    {
+                        var row = list.GetRows(0).ToDictionary(a => a.ColumnName, a => a.Value);
+                        cmd.CommandText = this.Context.InsertableT(row).AS(tableName).ToSql().Key.Replace(";SELECT LAST_INSERT_ROWID();", "");
+                    }
+                    TransformInsertCommand(cmd);
+                    if (count > 0)
+                    {
+                        for (int index = 0; index < count; index++)
+                        {
+                            var row = list.GetRows(index);
+                            foreach (var item in row)
+                            {
+
+                                if (IsBoolTrue(item))
+                                {
+                                    cmd.Parameters.AddWithValue("@" + item.ColumnName, true);
+                                }
+                                else if (IsBoolFalse(item))
+                                {
+                                    cmd.Parameters.AddWithValue("@" + item.ColumnName, false);
+                                }
+                                else
+                                {
+                                    cmd.Parameters.AddWithValue("@" + item.ColumnName, item.Value);
+                                }
+                            }
+
+
+                            i += await cmd.ExecuteNonQueryAsync().ConfigureAwait(false);
+                            cmd.Parameters.Clear();
+                        }
+                    }
+
+                }
+            }
+            return i;
+        }
+
         private void TransformInsertCommand(SqliteCommand cmd)
         {
             if (this.DbFastestProperties?.IsIgnoreInsertError == true)
@@ -168,17 +268,87 @@ namespace ThingsGateway.SqlSugar
             }
             return i;
         }
+        private async Task<int> _BulkUpdate(string tableName, Dictionary<string, (Type, List<DataInfos>)> list, int i, string[] whereColumns, string[] updateColumns, SqliteConnection cn)
+        {
+            using (var cmd = cn.CreateCommand())
+            {
+                if (this.Context?.CurrentConnectionConfig?.MoreSettings?.IsCorrectErrorSqlParameterName == true)
+                {
+                    var count = list.FirstOrDefault().Value.Item2?.Count;
+                    if (count > 0)
+                    {
+                        for (int index = 0; index < count; index++)
+                        {
+                            var row = list.GetRows(index).ToDictionary(a => a.ColumnName, a => a.Value);
+                            cmd.CommandText = this.Context.UpdateableT(row)
+                             .WhereColumns(whereColumns)
+                             .UpdateColumns(updateColumns)
+                             .AS(tableName).ToSqlString();
+                            i += await cmd.ExecuteNonQueryAsync().ConfigureAwait(false);
+                        }
+                    }
+
+                }
+                else
+                {
+                    var count = list.FirstOrDefault().Value.Item2?.Count;
+                    if (count > 0)
+                    {
+                        var row = list.GetRows(0).ToDictionary(a => a.ColumnName, a => a.Value);
+                        cmd.CommandText = this.Context.UpdateableT(row)
+                        .WhereColumns(whereColumns)
+                        .UpdateColumns(updateColumns)
+                        .AS(tableName).ToSql().Key;
+                    }
+
+                    if (count > 0)
+                    {
+                        for (int index = 0; index < count; index++)
+                        {
+                            var row = list.GetRows(index);
+                            foreach (var item in row)
+                            {
+
+                                if (IsBoolTrue(item))
+                                {
+                                    cmd.Parameters.AddWithValue("@" + item.ColumnName, true);
+                                }
+                                else if (IsBoolFalse(item))
+                                {
+                                    cmd.Parameters.AddWithValue("@" + item.ColumnName, false);
+                                }
+                                else
+                                {
+                                    cmd.Parameters.AddWithValue("@" + item.ColumnName, item.Value);
+                                }
+                            }
+
+
+                            i += await cmd.ExecuteNonQueryAsync().ConfigureAwait(false);
+                            cmd.Parameters.Clear();
+                        }
+                    }
+                }
+            }
+            return i;
+        }
 
         private static bool IsBoolFalse(DataRow dataRow, DataColumn item)
         {
             return dataRow[item.ColumnName] != null && dataRow[item.ColumnName] is string && dataRow[item.ColumnName].ToString() == ("isSqliteCore_False");
         }
-
+        private static bool IsBoolFalse(DataInfos dataRow)
+        {
+            return dataRow.Value != null && dataRow.Value is string str && str == ("isSqliteCore_False");
+        }
         private static bool IsBoolTrue(DataRow dataRow, DataColumn item)
         {
             return dataRow[item.ColumnName] != null && dataRow[item.ColumnName] is string && dataRow[item.ColumnName].ToString() == ("isSqliteCore_True");
         }
-
+        private static bool IsBoolTrue(DataInfos dataRow)
+        {
+            return dataRow.Value != null && dataRow.Value is string str && str == ("isSqliteCore_True");
+        }
         private static void Open(SqliteConnection cn)
         {
             if (cn.State != ConnectionState.Open)
@@ -188,32 +358,76 @@ namespace ThingsGateway.SqlSugar
         public async Task<int> UpdateByTempAsync(string tableName, string tempName, string[] updateColumns, string[] whereColumns)
         {
             var dt = UpdateDataTable;
-            if (dt.Rows.Count == 0)
+            if (dt != null)
             {
-                return 0;
-            }
-            var dictionary = this.Context.Utilities.DataTableToDictionaryList(dt.Rows.Cast<DataRow>().Take(1).CopyToDataTable());
-            int result = 0;
-            var cn = this.Context.Ado.Connection as SqliteConnection;
-            Open(cn);
-            if (this.Context.Ado.Transaction == null)
-            {
+
+                if (dt.Rows.Count == 0)
+                {
+                    return 0;
+                }
+                var dictionary = this.Context.Utilities.DataTableToDictionaryList(dt.Rows.Cast<DataRow>().Take(1).CopyToDataTable());
+                int result = 0;
+                var cn = this.Context.Ado.Connection as SqliteConnection;
+                Open(cn);
+                if (this.Context.Ado.Transaction == null)
+                {
 #pragma warning disable CA2007 // 考虑对等待的任务调用 ConfigureAwait
-                await using (var transaction = await cn.BeginTransactionAsync().ConfigureAwait(false))
+                    await using (var transaction = await cn.BeginTransactionAsync().ConfigureAwait(false))
+                    {
+                        result = await _BulkUpdate(dt, dictionary, result, whereColumns, updateColumns, cn).ConfigureAwait(false);
+                        await transaction.CommitAsync().ConfigureAwait(false);
+                    }
+#pragma warning restore CA2007 // 考虑对等待的任务调用 ConfigureAwait
+                }
+                else
                 {
                     result = await _BulkUpdate(dt, dictionary, result, whereColumns, updateColumns, cn).ConfigureAwait(false);
-                    await transaction.CommitAsync().ConfigureAwait(false);
                 }
-#pragma warning restore CA2007 // 考虑对等待的任务调用 ConfigureAwait
+                return result;
             }
+
             else
             {
-                result = await _BulkUpdate(dt, dictionary, result, whereColumns, updateColumns, cn).ConfigureAwait(false);
+
+                if (UpdateDataInfos.FirstOrDefault().Value.Item2 == null || UpdateDataInfos.FirstOrDefault().Value.Item2?.Count == 0)
+                {
+                    return 0;
+                }
+                int result = 0;
+                var cn = this.Context.Ado.Connection as SqliteConnection;
+                Open(cn);
+                if (this.Context.Ado.Transaction == null)
+                {
+#pragma warning disable CA2007 // 考虑对等待的任务调用 ConfigureAwait
+                    await using (var transaction = await cn.BeginTransactionAsync().ConfigureAwait(false))
+                    {
+                        result = await _BulkUpdate(tableName, UpdateDataInfos, result, whereColumns, updateColumns, cn).ConfigureAwait(false);
+                        await transaction.CommitAsync().ConfigureAwait(false);
+                    }
+#pragma warning restore CA2007 // 考虑对等待的任务调用 ConfigureAwait
+                }
+                else
+                {
+                    result = await _BulkUpdate(tableName, UpdateDataInfos, result, whereColumns, updateColumns, cn).ConfigureAwait(false);
+                }
+                return result;
             }
-            return result;
         }
 
         public async Task<int> Merge<T>(string tableName, DataTable dt, EntityInfo entityInfo, string[] whereColumns, string[] updateColumns, IEnumerable<T> datas) where T : class, new()
+        {
+            var result = 0;
+            await Context.Utilities.PageEachAsync(datas, 2000, async pageItems =>
+            {
+                var x = await Context.Storageable(pageItems).AS(tableName).WhereColumns(whereColumns).ToStorageAsync().ConfigureAwait(false);
+                result += await x.BulkCopyAsync().ConfigureAwait(false);
+                result += await x.BulkUpdateAsync(updateColumns).ConfigureAwait(false);
+                return result;
+            }).ConfigureAwait(false);
+            return result;
+        }
+
+        public async Task<int> Merge<T>(string tableName, IEnumerable<DataInfos> list, EntityInfo entityInfo, string[] whereColumns, string[] updateColumns, IEnumerable<T> datas) where T : class, new()
         {
             var result = 0;
             await Context.Utilities.PageEachAsync(datas, 2000, async pageItems =>

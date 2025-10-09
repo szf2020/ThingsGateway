@@ -57,11 +57,11 @@ namespace ThingsGateway.SqlSugar
             {
                 if (ex is SqlSugarException)
                 {
-                    Check.Exception(true, string.Format(ex.Message, express.Method.Name));
+                    { throw new SqlSugarException(string.Format(ex.Message, express.Method.Name)); }
                 }
                 else
                 {
-                    Check.Exception(true, ErrorMessage.MethodError, express.Method.Name);
+                    { throw new SqlSugarException(ErrorMessage.MethodError, express.Method.Name); }
                 }
             }
         }
@@ -369,7 +369,7 @@ namespace ThingsGateway.SqlSugar
         }
         private void AppendModelByIIFBinary(ExpressionParameter parameter, MethodCallExpressionModel model, Expression item)
         {
-            Check.Exception(true, "The SqlFunc.IIF(arg1,arg2,arg3) , {0} argument  do not support ", item.ToString());
+            { throw new SqlSugarException("The SqlFunc.IIF(arg1,arg2,arg3) , {0} argument  do not support ", item.ToString()); }
         }
         private void AppendModelByIIFMethod(ExpressionParameter parameter, MethodCallExpressionModel model, Expression item)
         {
@@ -385,7 +385,7 @@ namespace ThingsGateway.SqlSugar
             }
             else
             {
-                Check.Exception(true, "The SqlFunc.IIF(arg1,arg2,arg3) , {0} argument  do not support ", item.ToString());
+                { throw new SqlSugarException("The SqlFunc.IIF(arg1,arg2,arg3) , {0} argument  do not support ", item.ToString()); }
             }
         }
 
@@ -549,7 +549,7 @@ namespace ThingsGateway.SqlSugar
                 code = ExpressionTool.GetExpressionValue(express.Arguments[1]) + "";
             }
             var entityDb = SqlFuncExtendsion.TableInfos.FirstOrDefault(y => y.Type.Name == name && y.Code == code);
-            Check.Exception(entityDb == null, string.Format("GetConfigValue no configuration  Entity={0} UniqueCode={1}", name, code));
+            if (entityDb == null) { throw new SqlSugarException(string.Format("GetConfigValue no configuration  Entity={0} UniqueCode={1}", name, code)); }
             var entity = new ConfigTableInfo()
             {
                 Code = entityDb.Code,
@@ -798,7 +798,7 @@ namespace ThingsGateway.SqlSugar
                             if (dateString2 != null) return dateString2;
                             return GeDateFormat(model.Args.Last().MemberValue.ObjToString(), model.Args[0].MemberName.ObjToString());
                         }
-                        //Check.Exception(model.Args.Count > 1, "ToString (Format) is not supported, Use ToString().If time formatting can be used it.Date.Year+\"-\"+it.Data.Month+\"-\"+it.Date.Day ");
+                        //if(model.Args.Count > 1){throw new SqlSugarException("ToString (Format) is not supported, Use ToString().If time formatting can be used it.Date.Year+\"-\"+it.Data.Month+\"-\"+it.Date.Day ");}
                         return this.Context.DbMehtods.ToString(model);
                     case "ToVarchar":
                         return this.Context.DbMehtods.ToVarchar(model);
@@ -847,7 +847,7 @@ namespace ThingsGateway.SqlSugar
                             return model.Args[0].MemberName.ObjToString().TrimStart('\'').TrimEnd('\'');
                         }
                         var isValid = model.Args[0].IsMember && model.Args[1].IsMember == false;
-                        //Check.Exception(!isValid, "SqlFunc.MappingColumn parameters error, The property name on the left, string value on the right");
+                        //if(!isValid){throw new SqlSugarException("SqlFunc.MappingColumn parameters error, The property name on the left, string value on the right");}
                         if (model.Args.Count > 1)
                         {
                             this.Context.Parameters.RemoveAll(it => it.ParameterName == model.Args[1].MemberName.ObjToString());
@@ -1077,7 +1077,7 @@ namespace ThingsGateway.SqlSugar
         {
             if (expression?.Object?.Type?.Name?.StartsWith("ISugarQueryable`") == true)
             {
-                Check.ExceptionEasy("Sublookup is implemented using SqlFunc.Subquery<Order>(); Queryable objects cannot be used", "子查请使用SqlFunc.Subquery<Order>()来实现，不能用Queryable对象");
+                Check.ExceptionLang("Sublookup is implemented using SqlFunc.Subquery<Order>(); Queryable objects cannot be used", "子查请使用SqlFunc.Subquery<Order>()来实现，不能用Queryable对象");
             }
             if (expression.Method.Name == "SelectAll")
             {

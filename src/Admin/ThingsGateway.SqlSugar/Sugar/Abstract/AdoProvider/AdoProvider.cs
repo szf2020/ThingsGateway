@@ -267,9 +267,9 @@ namespace ThingsGateway.SqlSugar
         /// <summary>
         /// 异步打开连接
         /// </summary>
-        public virtual async Task OpenAsync()
+        public virtual Task OpenAsync()
         {
-            await CheckConnectionAsync().ConfigureAwait(false);
+            return CheckConnectionAsync();
         }
 
         /// <summary>
@@ -356,9 +356,9 @@ namespace ThingsGateway.SqlSugar
                 {
                     if (this.Context.CurrentConnectionConfig?.DbType == DbType.SqlServer && ex.Message?.Contains("provider: SSL") == true)
                     {
-                        Check.ExceptionEasy(true, ex.Message, "SSL出错，因为升级了驱动,字符串增加Encrypt=True;TrustServerCertificate=True;即可。详细错误：" + ex.Message);
+                        if (true) { throw new SqlSugarLangException(ex.Message, "SSL出错，因为升级了驱动,字符串增加Encrypt=True;TrustServerCertificate=True;即可。详细错误：" + ex.Message); }
                     }
-                    Check.Exception(true, ErrorMessage.ConnnectionOpen, ex.Message + $"DbType=\"{this.Context.CurrentConnectionConfig.DbType}\";ConfigId=\"{this.Context.CurrentConnectionConfig.ConfigId}\"");
+                    { throw new SqlSugarException($"{ErrorMessage.ConnnectionOpen}{ex.Message}DbType=\"{this.Context.CurrentConnectionConfig.DbType}\";ConfigId=\"{this.Context.CurrentConnectionConfig.ConfigId}\""); }
                 }
             }
             this.CheckConnectionAfter(this.Connection);
@@ -383,7 +383,7 @@ namespace ThingsGateway.SqlSugar
                 }
                 catch (Exception ex)
                 {
-                    Check.Exception(true, ErrorMessage.ConnnectionOpen, ex.Message + $"DbType=\"{this.Context.CurrentConnectionConfig.DbType}\";ConfigId=\"{this.Context.CurrentConnectionConfig.ConfigId}\"");
+                    { throw new SqlSugarException($"{ErrorMessage.ConnnectionOpen}{ex.Message}DbType=\"{this.Context.CurrentConnectionConfig.DbType}\";ConfigId=\"{this.Context.CurrentConnectionConfig.ConfigId}\""); }
                 }
             }
             this.CheckConnectionAfter(this.Connection);
@@ -1868,7 +1868,7 @@ namespace ThingsGateway.SqlSugar
         {
             if (sql?.Contains("{year}{month}{day}") == true)
             {
-                Check.ExceptionEasy("need .SplitTable() message:" + ex.Message, "当前代码是否缺少 .SplitTable() ,可以看文档 [分表]  , 详细错误:" + ex.Message);
+                Check.ExceptionLang("need .SplitTable() message:" + ex.Message, "当前代码是否缺少 .SplitTable() ,可以看文档 [分表]  , 详细错误:" + ex.Message);
             }
         }
 

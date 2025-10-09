@@ -13,7 +13,7 @@ using Microsoft.AspNetCore.Http;
 
 using System.Reflection;
 
-using ThingsGateway.Extensions;
+using ThingsGateway.Extension;
 using ThingsGateway.UnifyResult;
 
 namespace Microsoft.AspNetCore.Mvc;

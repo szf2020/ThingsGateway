@@ -32,7 +32,7 @@ namespace ThingsGateway.SqlSugar
         {
             this.Columns = names;
             var queryable = this.Context.Queryable<object>();
-            Check.Exception(Columns == null || Columns.Count == 0, "need WhereColumns");
+            if (Columns == null || Columns.Count == 0) { throw new SqlSugarException("need WhereColumns"); }
             var tableName = queryable.SqlBuilder.GetTranslationTableName(DataTable.TableName);
             this.Context.Utilities.PageEach(DataTable.Rows.Cast<DataRow>(), 200, itemList =>
             {
@@ -91,9 +91,9 @@ namespace ThingsGateway.SqlSugar
             }
             foreach (DataRow row in DataTable.Rows)
             {
-                foreach (var item in whereFuncs.OrderByDescending(it => (int)it.key))
+                foreach (var item in whereFuncs.OrderByDescending(it => (int)it.Key))
                 {
-                    SplitMethod(item.value1, item.key, row, item.value2);
+                    SplitMethod(item.Value, item.Key, row, item.Value2);
                 }
                 if (row[SugarGroupId] == null || row[SugarGroupId] == DBNull.Value)
                 {

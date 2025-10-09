@@ -125,7 +125,7 @@ namespace ThingsGateway.SqlSugar
                 }
                 else
                 {
-                    Check.ExceptionEasy("I'm sorry I can't parse the current expression", "不支持当前表达式");
+                    Check.ExceptionLang("I'm sorry I can't parse the current expression", "不支持当前表达式");
                 }
             }
             var subIndex = this.context.SubQueryIndex;

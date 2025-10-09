@@ -309,7 +309,7 @@ namespace ThingsGateway.SqlSugar
         {
             if (viewNameFomat?.Contains("{0}") != true)
             {
-                Check.ExceptionEasy("need{0}", "需要{0}表名的占位符");
+                Check.ExceptionLang("need{0}", "需要{0}表名的占位符");
             }
             var entityInfo = this.Context.EntityMaintenance.GetEntityInfo(EntityType);
             var viewName = string.Format(viewNameFomat, entityInfo.DbTableName);

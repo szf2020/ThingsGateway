@@ -57,8 +57,8 @@
         //}
         public override string GetTranslationColumnName(string entityName, string propertyName)
         {
-            Check.ArgumentNullException(entityName, string.Format(null, ErrorMessage.ObjNotExistCompositeFormat, "Table Name"));
-            Check.ArgumentNullException(propertyName, string.Format(null, ErrorMessage.ObjNotExistCompositeFormat, "Column Name"));
+            if (entityName == null) { throw new SqlSugarException(string.Format(null, ErrorMessage.ObjNotExistCompositeFormat, "Table Name")); }
+            if (propertyName == null) { throw new SqlSugarException(string.Format(null, ErrorMessage.ObjNotExistCompositeFormat, "Column Name")); }
             var context = this.Context;
             var mappingInfo = context
                  .MappingColumns
@@ -70,7 +70,7 @@
 
         public override string GetTranslationTableName(string name)
         {
-            Check.ArgumentNullException(name, string.Format(null, ErrorMessage.ObjNotExistCompositeFormat, "Table Name"));
+            if (name == null) { throw new SqlSugarException(string.Format(null, ErrorMessage.ObjNotExistCompositeFormat, "Table Name")); }
             var context = this.Context;
 
             var mappingInfo = context

@@ -376,7 +376,7 @@ WHERE table_name = '" + tableName + "'");
                 CreateSchemaIfNotExists(this.Context);
                 return true;
             }
-            Check.ExceptionEasy("dm no support create database ,only create schema", "达梦只支持创建Schema但不能创建数据库保证这个连接字符串数据库存在并能用。");
+            Check.ExceptionLang("dm no support create database ,only create schema", "达梦只支持创建Schema但不能创建数据库保证这个连接字符串数据库存在并能用。");
             return true;
         }
         public void CreateSchemaIfNotExists(ISqlSugarClient db)
@@ -412,7 +412,7 @@ WHERE table_name = '" + tableName + "'");
             {
                 return true;
             }
-            Check.ExceptionEasy("dm no support create database ", "达梦不支持建库方法，请写有效连接字符串可以正常运行该方法。");
+            Check.ExceptionLang("dm no support create database ", "达梦不支持建库方法，请写有效连接字符串可以正常运行该方法。");
             return true;
         }
         public override bool AddRemark(EntityInfo entity)

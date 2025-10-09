@@ -10,7 +10,7 @@ namespace ThingsGateway.SqlSugar
         #region Root
         private string GetSqlPart(object value, List<SugarParameter> pars)
         {
-            Check.Exception(value == null, $" FieldName is error ");
+            if (value == null) { throw new SqlSugarException($" FieldName is error "); }
             if (IsSqlSplicingOperator(value))
             {
                 return GetSqlSplicingOperator(value);
@@ -52,7 +52,7 @@ namespace ThingsGateway.SqlSugar
         }
         private static string GetSqlPartError(object value)
         {
-            Check.Exception(value == null, $" {value} is error ");
+            if (value == null) { throw new SqlSugarException($" {value} is error "); }
             return null;
         }
         private string GetSqlPartByObjectFuncModel(object value, List<SugarParameter> pars)
@@ -71,7 +71,7 @@ namespace ThingsGateway.SqlSugar
             }
             else
             {
-                Check.Exception(value == null, $" {value} is error ");
+                if (value == null) { throw new SqlSugarException($" {value} is error "); }
                 return null;
             }
         }
@@ -101,7 +101,7 @@ namespace ThingsGateway.SqlSugar
             }
             else
             {
-                Check.ExceptionEasy($"{valueString} is error ", $"{valueString} 不是有效的拼接符号,拼接符号有:and、or、>=、<=、>、<、=、(、)");
+                Check.ExceptionLang($"{valueString} is error ", $"{valueString} 不是有效的拼接符号,拼接符号有:and、or、>=、<=、>、<、=、(、)");
             }
             return parvalue;
         }

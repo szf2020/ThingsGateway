@@ -12,7 +12,7 @@
 using System.ComponentModel;
 using System.Reflection;
 
-namespace ThingsGateway.Extensions;
+namespace ThingsGateway.Extension;
 
 /// <summary>
 ///     枚举拓展类

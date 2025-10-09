@@ -32,7 +32,7 @@ namespace ThingsGateway.SqlSugar
             var provider = (InsertableProvider<T>)thisValue;
             var inserObjects = provider.InsertObjs;
             var attr = GetCommonSTableAttribute(typeof(T).GetCustomAttribute<STableAttribute>());
-            Check.ExceptionEasy(attr == null || attr?.Tag1 == null, $"", $"{nameof(T)}缺少特性STableAttribute和Tag1");
+            if (attr == null || attr?.Tag1 == null) { throw new SqlSugarLangException($"", $"{nameof(T)}缺少特性STableAttribute和Tag1"); }
             // 根据所有非空的 Tag 进行分组
             var groups = GetGroupInfos(inserObjects, attr);
             foreach (var item in groups)
@@ -61,7 +61,7 @@ namespace ThingsGateway.SqlSugar
             var provider = (InsertableProvider<T>)thisValue;
             var inserObjects = provider.InsertObjs;
             var attr = GetCommonSTableAttribute(typeof(T).GetCustomAttribute<STableAttribute>());
-            Check.ExceptionEasy(attr == null || attr?.Tag1 == null, $"", $"{nameof(T)}缺少特性STableAttribute和Tag1");
+            if (attr == null || attr?.Tag1 == null) { throw new SqlSugarLangException($"", $"{nameof(T)}缺少特性STableAttribute和Tag1"); }
             // 根据所有非空的 Tag 进行分组
             var groups = GetGroupInfos(inserObjects, attr);
             foreach (var item in groups)

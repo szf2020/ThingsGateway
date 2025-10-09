@@ -123,12 +123,12 @@ namespace ThingsGateway.SqlSugar
             StringBuilder sbAllSql = new StringBuilder();
             var sqlTemp = ($" UPDATE {tableWithString} SET {{0}}  WHERE {{1}};\r\n");
             List<SugarParameter> parameters = new List<SugarParameter>();
-            Check.ExceptionEasy(wheres?.Count == 0, "Updates cannot be without a primary key or condition", "更新不能没有主键或者条件");
+            if (wheres?.Count == 0) { throw new SqlSugarLangException("Updates cannot be without a primary key or condition", "更新不能没有主键或者条件"); }
             var sqlDb = this.Context.CopyNew();
             sqlDb.Aop.DataExecuting = null;
             foreach (var list in sqlDb.Updateable(updateObjects).UpdateBuilder.DbColumnInfoList.GroupBy(it => it.TableId))
             {
-                Check.ExceptionEasy(list?.Any() != true, "Set has no columns", "更新Set没有列");
+                if (list?.Any() != true) { throw new SqlSugarLangException("Set has no columns", "更新Set没有列"); }
                 StringBuilder setString = new StringBuilder();
                 foreach (var setItem in list)
                 {

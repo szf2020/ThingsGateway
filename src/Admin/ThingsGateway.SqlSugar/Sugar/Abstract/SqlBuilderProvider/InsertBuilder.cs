@@ -231,7 +231,7 @@ namespace ThingsGateway.SqlSugar
                     {
                         date = UtilMethods.GetMinDate(this.Context.CurrentConnectionConfig);
                     }
-                    return "'" + date.ToString("yyyy-MM-dd HH:mm:ss.fff") + "'";
+                    return $"'{date.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)}'";
                 }
                 else if (type == UtilConstants.ByteArrayType)
                 {

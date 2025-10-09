@@ -273,7 +273,7 @@
         }
         public Navigate(NavigateType navigatType, string ifSingleMasterTableColumn_IfListChildTableColumn, string ifSingleChildTableColumn_IfListMasterTableColumn)
         {
-            Check.ExceptionEasy(navigatType == NavigateType.ManyToMany, "Correct usage [Navigate(typeof(ABMapping), nameof(abmapping.aid), nameof(abmapp.bid))], incorrect usage: [Navigate(Navigate.ManyToMany, nameof(ABMapping.Aid), nameof(ABMapping.BId))]", "多对多第一个参数是Type不是NavigateType，正确用法[Navigate(typeof(ABMapping), nameof(ABMapping.Aid), nameof(ABMapping.BId))],错误用法：[Navigate(Navigate.ManyToMany, nameof(ABMapping.Aid), nameof(ABMapping.BId))]");
+            if (navigatType == NavigateType.ManyToMany) { throw new SqlSugarLangException("Correct usage [Navigate(typeof(ABMapping), nameof(abmapping.aid), nameof(abmapp.bid))], incorrect usage: [Navigate(Navigate.ManyToMany, nameof(ABMapping.Aid), nameof(ABMapping.BId))]", "多对多第一个参数是Type不是NavigateType，正确用法[Navigate(typeof(ABMapping), nameof(ABMapping.Aid), nameof(ABMapping.BId))],错误用法：[Navigate(Navigate.ManyToMany, nameof(ABMapping.Aid), nameof(ABMapping.BId))]"); }
             this.Name = ifSingleMasterTableColumn_IfListChildTableColumn;
             this.Name2 = ifSingleChildTableColumn_IfListMasterTableColumn;
             this.NavigatType = navigatType;
@@ -285,7 +285,7 @@
             this.Name2 = ifSingleChildTableColumn_IfListMasterTableColumn;
             this.NavigatType = navigatType;
             this.WhereSql = whereSql;
-            //Check.ExceptionEasy(navigatType != NavigateType.OneToOne, "Currently, only one-to-one navigation configuration Sql conditions are supported", "目前导航配置Sql条件只支持一对一");
+            //if(navigatType != NavigateType.OneToOne){throw new SqlSugarLangException("Currently, only one-to-one navigation configuration Sql conditions are supported", "目前导航配置Sql条件只支持一对一");}
         }
 
         public Navigate(Type MappingTableType, string typeAId, string typeBId)
@@ -440,7 +440,7 @@
         {
             if (fieldNames.Length != sortTypes.Length)
             {
-                Check.ExceptionEasy($"SugarIndexAttribute {indexName} fieldNames.Length!=sortTypes.Length 检查索引特性", $"SugarIndexAttribute {indexName} fieldNames.Length!=sortTypes.Length");
+                Check.ExceptionLang($"SugarIndexAttribute {indexName} fieldNames.Length!=sortTypes.Length 检查索引特性", $"SugarIndexAttribute {indexName} fieldNames.Length!=sortTypes.Length");
             }
             this.IndexName = indexName;
             IndexFields = new Dictionary<string, OrderByType>();

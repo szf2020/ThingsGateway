@@ -30,7 +30,7 @@ namespace ThingsGateway.SqlSugar
                     }
                     catch (Exception ex)
                     {
-                        Check.Exception(true, ErrorMessage.ConnnectionOpen, ex.Message);
+                        { throw new SqlSugarException(ErrorMessage.ConnnectionOpen, ex.Message); }
                     }
                 }
                 return base._DbConnection;
@@ -172,7 +172,7 @@ namespace ThingsGateway.SqlSugar
             }
             else
             {
-                Check.Exception(true, sqlParameter.Value.GetType().Name + " No Support");
+                { throw new SqlSugarException(sqlParameter.Value.GetType().Name + " No Support"); }
             }
         }
 
@@ -234,7 +234,7 @@ namespace ThingsGateway.SqlSugar
             }
             if (it.Message?.StartsWith("42883: function uuid_generate_v4() does not exist") == true)
             {
-                Check.ExceptionEasy(it.Message, $"使用uuid_generate_v4()函数需要创建 CREATE EXTENSION IF NOT EXISTS pgcrypto;CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\" ");
+                Check.ExceptionLang(it.Message, $"使用uuid_generate_v4()函数需要创建 CREATE EXTENSION IF NOT EXISTS pgcrypto;CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\" ");
             }
         };
 

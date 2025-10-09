@@ -16,7 +16,7 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Channels;
 
-using ThingsGateway.Extensions;
+using ThingsGateway.Extension;
 using ThingsGateway.Utilities;
 
 namespace ThingsGateway.HttpRemote;

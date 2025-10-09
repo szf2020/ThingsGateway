@@ -11,7 +11,7 @@
 
 using Microsoft.Extensions.DependencyInjection;
 
-using ThingsGateway.Extensions;
+using ThingsGateway.Extension;
 
 namespace ThingsGateway.HttpRemote;
 

@@ -119,7 +119,7 @@ namespace ThingsGateway.SqlSugar
         private IEnumerable<GroupModel> GroupDataList(IEnumerable<T> datas)
         {
             var attribute = typeof(T).GetCustomAttribute<SplitTableAttribute>() as SplitTableAttribute;
-            Check.Exception(attribute == null, $"{typeof(T).Name} need SplitTableAttribute");
+            if (attribute == null) { throw new SqlSugarException($"{typeof(T).Name} need SplitTableAttribute"); }
 
             var db = FastestProvider.context;
             var hasSplitField = typeof(T).GetProperties().Any(it => it.GetCustomAttribute<SplitFieldAttribute>() != null);

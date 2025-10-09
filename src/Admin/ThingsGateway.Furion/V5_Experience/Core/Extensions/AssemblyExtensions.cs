@@ -11,7 +11,7 @@
 
 using System.Reflection;
 
-namespace ThingsGateway.Extensions;
+namespace ThingsGateway.Extension;
 
 /// <summary>
 ///     <see cref="Assembly" /> 拓展类

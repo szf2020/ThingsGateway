@@ -54,7 +54,7 @@ namespace ThingsGateway.SqlSugar
                     FieldName = treeKey.DbColumnName
                 } }).Any())
                 {
-                    Check.Exception(i > 100, ErrorMessage.GetThrowMessage("Dead cycle", "出现死循环或超出循环上限（100），检查最顶层的ParentId是否是null或者0"));
+                    if (i > 100) { throw new SqlSugarException(ErrorMessage.GetThrowMessage("Dead cycle", "出现死循环或超出循环上限（100），检查最顶层的ParentId是否是null或者0")); }
                     var parent = this.Context.Queryable<T>().AS(tableName).Filter(null, this.QueryBuilder.IsDisabledGobalFilter).Where(new List<IConditionalModel>() {
                 new ConditionalModel()
                 {
@@ -112,7 +112,7 @@ namespace ThingsGateway.SqlSugar
                     FieldName = treeKey.DbColumnName
                 } }).Any())
                 {
-                    Check.Exception(i > 100, ErrorMessage.GetThrowMessage("Dead cycle", "出现死循环或超出循环上限（100），检查最顶层的ParentId是否是null或者0"));
+                    if (i > 100) { throw new SqlSugarException(ErrorMessage.GetThrowMessage("Dead cycle", "出现死循环或超出循环上限（100），检查最顶层的ParentId是否是null或者0")); }
                     var parent = this.Context.Queryable<T>().AS(tableName).WhereIF(parentWhereExpression != default, parentWhereExpression).Filter(null, this.QueryBuilder.IsDisabledGobalFilter).Where(new List<IConditionalModel>() {
                 new ConditionalModel()
                 {
@@ -171,7 +171,7 @@ namespace ThingsGateway.SqlSugar
                     FieldName = treeKey.DbColumnName
                 } }).AnyAsync().ConfigureAwait(false))
                 {
-                    Check.Exception(i > 100, ErrorMessage.GetThrowMessage("Dead cycle", "出现死循环或超出循环上限（100），检查最顶层的ParentId是否是null或者0"));
+                    if (i > 100) { throw new SqlSugarException(ErrorMessage.GetThrowMessage("Dead cycle", "出现死循环或超出循环上限（100），检查最顶层的ParentId是否是null或者0")); }
                     var parent = await Context.Queryable<T>().AS(tableName).Filter(null, QueryBuilder.IsDisabledGobalFilter).Where(new List<IConditionalModel>() {
                 new ConditionalModel()
                 {
@@ -230,7 +230,7 @@ namespace ThingsGateway.SqlSugar
                     FieldName = treeKey.DbColumnName
                 } }).AnyAsync().ConfigureAwait(false))
                 {
-                    Check.Exception(i > 100, ErrorMessage.GetThrowMessage("Dead cycle", "出现死循环或超出循环上限（100），检查最顶层的ParentId是否是null或者0"));
+                    if (i > 100) { throw new SqlSugarException(ErrorMessage.GetThrowMessage("Dead cycle", "出现死循环或超出循环上限（100），检查最顶层的ParentId是否是null或者0")); }
                     var parent = await Context.Queryable<T>().AS(tableName).WhereIF(parentWhereExpression != default, parentWhereExpression).Filter(null, QueryBuilder.IsDisabledGobalFilter).Where(new List<IConditionalModel>() {
                 new ConditionalModel()
                 {
@@ -377,7 +377,7 @@ namespace ThingsGateway.SqlSugar
         }
         private static string GetTreeKey(EntityInfo entity)
         {
-            Check.Exception(entity.Columns.Any(it => it.IsPrimarykey || it.IsTreeKey), "need IsPrimary=true Or IsTreeKey=true");
+            if (entity.Columns.Any(it => it.IsPrimarykey || it.IsTreeKey)) { throw new SqlSugarException("need IsPrimary=true Or IsTreeKey=true"); }
             string pk = entity.Columns.Where(it => it.IsTreeKey).FirstOrDefault()?.PropertyName;
             if (pk == null)
                 pk = entity.Columns.Where(it => it.IsPrimarykey).FirstOrDefault()?.PropertyName;
@@ -794,7 +794,7 @@ namespace ThingsGateway.SqlSugar
                         catch (Exception ex)
                         {
                             var errorExp = item.Value.ExpressionList.Last().ToString();
-                            Check.ExceptionEasy($"{errorExp} no support，{ex.Message}", $"{errorExp}语法不支持，请查SqlSugar文档询导航DTO用法，{ex.Message}");
+                            Check.ExceptionLang($"{errorExp} no support，{ex.Message}", $"{errorExp}语法不支持，请查SqlSugar文档询导航DTO用法，{ex.Message}");
                         }
                         // // 重新构造Lambda表达式，将参数替换为新的参数，方法调用替换为新的方法调用
                         // var newExpression = Expression.Lambda<Func<X, List<int>>>(newMethodCallExpr, paramExpr);
@@ -892,7 +892,7 @@ namespace ThingsGateway.SqlSugar
                     }
                     else
                     {
-                        Check.Exception(true, "{0} and {1} are not a type, Try .select().mapper().ToList", typeof(TResult).FullName, typeof(T).FullName);
+                        { throw new SqlSugarException($"{typeof(TResult).FullName} and {typeof(T).FullName} are not a type, Try .select().mapper().ToList"); }
                     }
                 }
             }
@@ -909,7 +909,7 @@ namespace ThingsGateway.SqlSugar
                     }
                     else
                     {
-                        Check.Exception(true, "{0} and {1} are not a type, Try .select().mapper().ToList", typeof(TResult).FullName, typeof(T).FullName);
+                        { throw new SqlSugarException($"{typeof(TResult).FullName} and {typeof(T).FullName} are not a type, Try .select().mapper().ToList"); }
                     }
                 }
             }
@@ -927,7 +927,7 @@ namespace ThingsGateway.SqlSugar
                 }
                 else
                 {
-                    Check.Exception(true, "{0} and {1} are not a type, Try .select().mapper().ToList", typeof(TResult).FullName, typeof(T).FullName);
+                    { throw new SqlSugarException($"{typeof(TResult).FullName} and {typeof(T).FullName} are not a type, Try .select().mapper().ToList"); }
                 }
             }
         }
@@ -949,13 +949,13 @@ namespace ThingsGateway.SqlSugar
             {
                 mapperField = (mapperField as LambdaExpression).Body;
             }
-            Check.Exception(mapperObject is MemberExpression == false || mapperField is MemberExpression == false, ".Mapper() parameter error");
+            if (mapperObject is MemberExpression == false || mapperField is MemberExpression == false) { throw new SqlSugarException(".Mapper() parameter error"); }
             var mapperObjectExp = mapperObject as MemberExpression;
             var mapperFieldExp = mapperField as MemberExpression;
-            Check.Exception(mapperFieldExp.Type.IsClass(), ".Mapper() parameter error");
+            if (mapperFieldExp.Type.IsClass()) { throw new SqlSugarException(".Mapper() parameter error"); }
             var objType = mapperObjectExp.Type;
             var fieldType = mapperFieldExp.Expression.Type;
-            Check.Exception(objType != typeof(TObject) && objType != typeof(List<TObject>), ".Mapper() parameter error");
+            if (objType != typeof(TObject) && objType != typeof(List<TObject>)) { throw new SqlSugarException(".Mapper() parameter error"); }
             if (objType == typeof(List<TObject>))
             {
                 objType = typeof(TObject);
@@ -992,7 +992,7 @@ namespace ThingsGateway.SqlSugar
                     }
                     if (whereCol == null)
                     {
-                        Check.Exception(true, ".Mapper() parameter error");
+                        { throw new SqlSugarException(".Mapper() parameter error"); }
                     }
                     var inValues = entitys.Select(it => it.GetType().GetProperty(fieldName).GetValue(it, null).ObjToString());
                     if (inValues?.Any() == true && UtilMethods.GetUnderType(entitys[0].GetType().GetProperty(fieldName).PropertyType) == UtilConstants.GuidType)
@@ -1053,7 +1053,7 @@ namespace ThingsGateway.SqlSugar
                     }
                     if (whereCol == null)
                     {
-                        Check.Exception(true, ".Mapper() parameter error");
+                        { throw new SqlSugarException(".Mapper() parameter error"); }
                     }
                     var inValues = entitys.Select(it => it.GetType().GetProperty(whereCol.PropertyName).GetValue(it, null).ObjToString());
                     var dbColumnName = fieldEntity.Columns.FirstOrDefault(it => it.PropertyName == fieldName).DbColumnName;
@@ -1113,15 +1113,15 @@ namespace ThingsGateway.SqlSugar
             {
                 childField = (childField as LambdaExpression).Body;
             }
-            Check.Exception(mapperObject is MemberExpression == false || mainField is MemberExpression == false, ".Mapper() parameter error");
+            if (mapperObject is MemberExpression == false || mainField is MemberExpression == false) { throw new SqlSugarException(".Mapper() parameter error"); }
             var mapperObjectExp = mapperObject as MemberExpression;
             var mainFieldExp = mainField as MemberExpression;
             var childFieldExp = childField as MemberExpression;
-            Check.Exception(mainFieldExp.Type.IsClass(), ".Mapper() parameter error");
-            Check.Exception(childFieldExp.Type.IsClass(), ".Mapper() parameter error");
+            if (mainFieldExp.Type.IsClass()) { throw new SqlSugarException(".Mapper() parameter error"); }
+            if (childFieldExp.Type.IsClass()) { throw new SqlSugarException(".Mapper() parameter error"); }
             var objType = mapperObjectExp.Type;
             var fieldType = mainFieldExp.Expression.Type;
-            Check.Exception(objType != typeof(TObject) && objType != typeof(List<TObject>), ".Mapper() parameter error");
+            if (objType != typeof(TObject) && objType != typeof(List<TObject>)) { throw new SqlSugarException(".Mapper() parameter error"); }
             if (objType == typeof(List<TObject>))
             {
                 objType = typeof(TObject);
@@ -1159,7 +1159,7 @@ namespace ThingsGateway.SqlSugar
                     }
                     if (whereCol == null)
                     {
-                        Check.Exception(true, ".Mapper() parameter error");
+                        { throw new SqlSugarException(".Mapper() parameter error"); }
                     }
                     var inValues = entitys.Select(it => it.GetType().GetProperty(mainFieldName).GetValue(it, null).ObjToString());
                     List<IConditionalModel> wheres = new List<IConditionalModel>()
@@ -1215,7 +1215,7 @@ namespace ThingsGateway.SqlSugar
                     }
                     if (whereCol == null)
                     {
-                        Check.Exception(true, ".Mapper() parameter error");
+                        { throw new SqlSugarException(".Mapper() parameter error"); }
                     }
                     var inValues = entitys.Select(it => it.GetType().GetProperty(whereCol.PropertyName).GetValue(it, null).ObjToString());
                     var dbColumnName = fieldEntity.Columns.FirstOrDefault(it => it.PropertyName == mainFieldName).DbColumnName;
@@ -1321,7 +1321,7 @@ namespace ThingsGateway.SqlSugar
             }
             else
             {
-                Check.ExceptionEasy($"OrderByPropertyName error.{orderPropertyName} does not exist in the entity class", $"OrderByPropertyName出错实体类中不存在{orderPropertyName}");
+                Check.ExceptionLang($"OrderByPropertyName error.{orderPropertyName} does not exist in the entity class", $"OrderByPropertyName出错实体类中不存在{orderPropertyName}");
             }
         }
 
@@ -1601,7 +1601,7 @@ namespace ThingsGateway.SqlSugar
                     this.QueryBuilder.SelectValue = this.SqlBuilder.GetTranslationColumnName(this.QueryBuilder.TableShortName) + ".*";
                 }
             }
-            Check.Exception(result.JoinIndex > 10, ErrorMessage.GetThrowMessage("只支持12个表", "Only 12 tables are supported"));
+            if (result.JoinIndex > 10) { throw new SqlSugarException(ErrorMessage.GetThrowMessage("只支持12个表", "Only 12 tables are supported")); }
             return result;
         }
         protected ISugarQueryable<TResult> _Select<TResult>(Expression expression)
@@ -1799,9 +1799,9 @@ namespace ThingsGateway.SqlSugar
             {
                 if (this.QueryBuilder.JoinQueryInfos.Count(it => it.TableName.EqualCase(tableName)) > 1)
                 {
-                    Check.ExceptionEasy($"if same entity name ,.LeftJoin(db.Queryable<{entityName}>,(x,y..)=>....).AS(\"{tableName}\")", $"存在相同实体，请使用.LeftJoin(db.Queryable<{entityName}>).AS(\"{tableName}\",(x,y..)=>...)");
+                    Check.ExceptionLang($"if same entity name ,.LeftJoin(db.Queryable<{entityName}>,(x,y..)=>....).AS(\"{tableName}\")", $"存在相同实体，请使用.LeftJoin(db.Queryable<{entityName}>).AS(\"{tableName}\",(x,y..)=>...)");
                 }
-                Check.Exception(true, ErrorMessage.GetThrowMessage($"use AS<{tableName}>(\"{tableName}\")", $"请把 AS(\"{tableName}\"), 改成 AS<{tableName}实体>(\"{tableName}\")"));
+                { throw new SqlSugarException(ErrorMessage.GetThrowMessage($"use AS<{tableName}>(\"{tableName}\")", $"请把 AS(\"{tableName}\"), 改成 AS<{tableName}实体>(\"{tableName}\")")); }
             }
             else
             {
@@ -2214,9 +2214,9 @@ namespace ThingsGateway.SqlSugar
             clone.QueryBuilder.AppendValues = null;
             clone.QueryBuilder.SubToListParameters = null;
             clone.QueryBuilder.AppendColumns = null;
-            Check.Exception(this.MapperAction != null || this.MapperActionWithCache != null, ErrorMessage.GetThrowMessage("'Mapper’ needs to be written after ‘MergeTable’ ", "Mapper 只能在 MergeTable 之后使用"));
-            //Check.Exception(this.QueryBuilder.SelectValue.IsNullOrEmpty(),ErrorMessage.GetThrowMessage( "MergeTable need to use Queryable.Select Method .", "使用MergeTable之前必须要有Queryable.Select方法"));
-            //Check.Exception(this.QueryBuilder.Skip > 0 || this.QueryBuilder.Take > 0 || this.QueryBuilder.OrderByValue.HasValue(),ErrorMessage.GetThrowMessage( "MergeTable  Queryable cannot Take Skip OrderBy PageToList  ", "使用 MergeTable不能有 Take Skip OrderBy PageToList 等操作,你可以在Mergetable之后操作"));
+            if (this.MapperAction != null || this.MapperActionWithCache != null) { throw new SqlSugarException(ErrorMessage.GetThrowMessage("'Mapper’ needs to be written after ‘MergeTable’ ", "Mapper 只能在 MergeTable 之后使用")); }
+            //if(this.QueryBuilder.SelectValue.IsNullOrEmpty()){throw new SqlSugarException(ErrorMessage.GetThrowMessage( "MergeTable need to use Queryable.Select Method .", "使用MergeTable之前必须要有Queryable.Select方法"));}
+            //if(this.QueryBuilder.Skip > 0 || this.QueryBuilder.Take > 0 || this.QueryBuilder.OrderByValue.HasValue()){throw new SqlSugarException(ErrorMessage.GetThrowMessage( "MergeTable  Queryable cannot Take Skip OrderBy PageToList  ", "使用 MergeTable不能有 Take Skip OrderBy PageToList 等操作,你可以在Mergetable之后操作"));}
             var sqlobj = clone.ToSql();
             var index = QueryBuilder.WhereIndex + 1;
             var result = this.Context.Queryable<T>().AS(SqlBuilder.GetPackTable(sqlobj.Key, "MergeTable")).AddParameters(sqlobj.Value).Select("*").With(SqlWith.Null);
@@ -2240,9 +2240,9 @@ namespace ThingsGateway.SqlSugar
             clone.QueryBuilder.AppendValues = null;
             clone.QueryBuilder.SubToListParameters = null;
             clone.QueryBuilder.AppendColumns = null;
-            Check.Exception(this.MapperAction != null || this.MapperActionWithCache != null, ErrorMessage.GetThrowMessage("'Mapper’ needs to be written after ‘MergeTable’ ", "Mapper 只能在 MergeTable 之后使用"));
-            //Check.Exception(this.QueryBuilder.SelectValue.IsNullOrEmpty(),ErrorMessage.GetThrowMessage( "MergeTable need to use Queryable.Select Method .", "使用MergeTable之前必须要有Queryable.Select方法"));
-            //Check.Exception(this.QueryBuilder.Skip > 0 || this.QueryBuilder.Take > 0 || this.QueryBuilder.OrderByValue.HasValue(),ErrorMessage.GetThrowMessage( "MergeTable  Queryable cannot Take Skip OrderBy PageToList  ", "使用 MergeTable不能有 Take Skip OrderBy PageToList 等操作,你可以在Mergetable之后操作"));
+            if (this.MapperAction != null || this.MapperActionWithCache != null) { throw new SqlSugarException(ErrorMessage.GetThrowMessage("'Mapper’ needs to be written after ‘MergeTable’ ", "Mapper 只能在 MergeTable 之后使用")); }
+            //if(this.QueryBuilder.SelectValue.IsNullOrEmpty()){throw new SqlSugarException(ErrorMessage.GetThrowMessage( "MergeTable need to use Queryable.Select Method .", "使用MergeTable之前必须要有Queryable.Select方法"));}
+            //if(this.QueryBuilder.Skip > 0 || this.QueryBuilder.Take > 0 || this.QueryBuilder.OrderByValue.HasValue()){throw new SqlSugarException(ErrorMessage.GetThrowMessage( "MergeTable  Queryable cannot Take Skip OrderBy PageToList  ", "使用 MergeTable不能有 Take Skip OrderBy PageToList 等操作,你可以在Mergetable之后操作"));}
             var sqlobj = clone.ToSql();
             var index = QueryBuilder.WhereIndex + 1;
             var result = this.Context.Queryable<T>().AS(SqlBuilder.GetPackTable(sqlobj.Key, "MergeTable")).AddParameters(sqlobj.Value).Select("*").With(SqlWith.Null);

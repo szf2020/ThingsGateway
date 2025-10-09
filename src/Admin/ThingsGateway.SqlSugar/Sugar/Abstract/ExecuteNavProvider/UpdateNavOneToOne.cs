@@ -23,8 +23,8 @@
             var thisEntity = this._Context.EntityMaintenance.GetEntityInfo<TChild>();
             IsDeleted = thisEntity.Columns.Any(it => it.PropertyName.EqualCase("isdeleted") || it.PropertyName.EqualCase("isdelete"));
             EntityColumnInfo thisPkColumn = GetPkColumnByNav(thisEntity, nav);
-            Check.ExceptionEasy(thisPkColumn == null, $" Navigate {parentEntity.EntityName} : {name} is error ", $"导航实体 {parentEntity.EntityName} 属性 {name} 配置错误");
-            Check.ExceptionEasy(nav.Navigat.WhereSql.HasValue(), $" {name} Navigate(NavType,WhereSql)  no support update ", $"导航一对一 {name} 配置了 Sql变量 不支持更新");
+            if (thisPkColumn == null) { throw new SqlSugarLangException($" Navigate {parentEntity.EntityName} : {name} is error ", $"导航实体 {parentEntity.EntityName} 属性 {name} 配置错误"); }
+            if (nav.Navigat.WhereSql.HasValue()) { throw new SqlSugarLangException($" {name} Navigate(NavType,WhereSql)  no support update ", $"导航一对一 {name} 配置了 Sql变量 不支持更新"); }
             List<TChild> childList = new List<TChild>();
             foreach (var parent in parentList)
             {

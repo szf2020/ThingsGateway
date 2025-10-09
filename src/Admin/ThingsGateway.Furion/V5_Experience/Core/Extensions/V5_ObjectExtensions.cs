@@ -16,7 +16,7 @@ using System.Text.Json;
 
 using ThingsGateway.Utilities;
 
-namespace ThingsGateway.Extensions;
+namespace ThingsGateway.Extension;
 
 /// <summary>
 ///     <see cref="object" /> 拓展类

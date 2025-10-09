@@ -24,7 +24,7 @@ namespace ThingsGateway.SqlSugar
                     }
                     catch (Exception ex)
                     {
-                        Check.Exception(true, ErrorMessage.ConnnectionOpen, ex.Message);
+                        { throw new SqlSugarException(ErrorMessage.ConnnectionOpen, ex.Message); }
                     }
                 }
                 return base._DbConnection;

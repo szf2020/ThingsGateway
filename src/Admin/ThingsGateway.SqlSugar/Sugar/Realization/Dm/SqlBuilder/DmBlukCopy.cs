@@ -35,13 +35,13 @@ namespace ThingsGateway.SqlSugar
             return DbColumnInfoList.Count;
         }
 
-        public async Task<int> ExecuteBulkCopyAsync()
+        public Task<int> ExecuteBulkCopyAsync()
         {
-            if (DbColumnInfoList == null || DbColumnInfoList.Count == 0) return 0;
+            if (DbColumnInfoList == null || DbColumnInfoList.Count == 0) return Task.FromResult(0);
 
             if (Inserts[0].GetType() == typeof(DataTable))
             {
-                return WriteToServer();
+                return Task.FromResult(WriteToServer());
             }
             DataTable dt = GetCopyData();
             DmBulkCopy bulkCopy = GetBulkCopyInstance();
@@ -49,7 +49,6 @@ namespace ThingsGateway.SqlSugar
             try
             {
                 bulkCopy.WriteToServer(dt);
-                await Task.Delay(0).ConfigureAwait(false);
             }
             catch (Exception)
             {
@@ -57,7 +56,7 @@ namespace ThingsGateway.SqlSugar
                 throw;
             }
             CloseDb();
-            return DbColumnInfoList.Count;
+            return Task.FromResult(DbColumnInfoList.Count);
         }
 
         private int WriteToServer()
@@ -65,7 +64,7 @@ namespace ThingsGateway.SqlSugar
             var dt = this.Inserts[0] as DataTable;
             if (dt == null)
                 return 0;
-            Check.Exception(dt.TableName == "Table", "dt.TableName can't be null ");
+            if (dt.TableName == "Table") { throw new SqlSugarException("dt.TableName can't be null "); }
             dt = GetCopyWriteDataTable(dt);
             DmBulkCopy copy = GetBulkCopyInstance();
             copy.DestinationTableName = this.Builder.GetTranslationColumnName(dt.TableName);
@@ -125,7 +124,7 @@ namespace ThingsGateway.SqlSugar
                     {
                         if (value.Value != null && value.Value.ToString() == DateTime.MinValue.ToString())
                         {
-                            value.Value = Convert.ToDateTime("1753/01/01");
+                            value.Value = UtilMethods.ToDate("1753-01-01");
                         }
                     }
                     if (value.Value == null)

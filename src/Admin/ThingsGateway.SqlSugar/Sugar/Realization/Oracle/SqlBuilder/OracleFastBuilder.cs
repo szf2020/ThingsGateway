@@ -39,8 +39,8 @@ namespace ThingsGateway.SqlSugar
         public override async Task<int> UpdateByTempAsync(string tableName, string tempName, string[] updateColumns, string[] whereColumns)
         {
             var sqlBuilder = this.Context.Queryable<object>().SqlBuilder;
-            Check.ArgumentNullException(updateColumns.Length == 0, "update columns count is 0");
-            Check.ArgumentNullException(whereColumns.Length == 0, "where columns count is 0");
+            if (updateColumns.Length == 0) { throw new SqlSugarException("update columns count is 0"); }
+            if (whereColumns.Length == 0) { throw new SqlSugarException("where columns count is 0"); }
             var sets = string.Join(",", updateColumns.Select(it => $"TM{it}=TE{it}"));
             var wheres = string.Join(" AND ", whereColumns.Select(it => $"TM.{sqlBuilder.GetTranslationColumnName(it)}=TE.{sqlBuilder.GetTranslationColumnName(it)}"));
             var forms = string.Join(",", updateColumns.Select(it => $" TM.{sqlBuilder.GetTranslationColumnName(it)} TM{it},TE.{sqlBuilder.GetTranslationColumnName(it)} TE{it}"));
@@ -70,7 +70,7 @@ namespace ThingsGateway.SqlSugar
 
         public override Task<int> Merge<T>(string tableName, DataTable dt, EntityInfo entityInfo, string[] whereColumns, string[] updateColumns, IEnumerable<T> datas) where T : class
         {
-            Check.Exception(this.entityInfo.Columns.Any(it => it.OracleSequenceName.HasValue()), "The BulkMerge method cannot be used for  sequence", "BulkMerge方法不能用序列");
+            if (this.entityInfo.Columns.Any(it => it.OracleSequenceName.HasValue())) { throw new SqlSugarException("The BulkMerge method cannot be used for  sequence"); }
             var sqlBuilder = this.Context.Queryable<object>().SqlBuilder;
             var insertColumns = entityInfo.Columns
                 .Where(it => it.IsIgnore == false && it.IsIdentity == false && it.InsertServerTime == false && it.InsertSql == null && it.OracleSequenceName == null && it.IsOnlyIgnoreInsert == false);

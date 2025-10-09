@@ -8,22 +8,22 @@
 // 项目主要遵循 MIT 许可证和 Apache 许可证（版本 2.0）进行分发和使用。
 // 许可证的完整文本可以在源代码树根目录中的 LICENSE-APACHE 和 LICENSE-MIT 文件中找到。
 // ------------------------------------------------------------------------
+#if NET6_0_OR_GREATER
 
-using System.Text.Json;
-using System.Text.Json.Serialization;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace ThingsGateway.JsonSerialization;
 
 /// <summary>
 /// DateOnly 类型序列化
 /// </summary>
-[SuppressSniffer]
-public class SystemTextJsonDateOnlyJsonConverter : JsonConverter<DateOnly>
+public class NewtonsoftJsonDateOnlyJsonConverter : JsonConverter<DateOnly>
 {
     /// <summary>
     /// 构造函数
     /// </summary>
-    public SystemTextJsonDateOnlyJsonConverter()
+    public NewtonsoftJsonDateOnlyJsonConverter()
         : this(default)
     {
     }
@@ -32,7 +32,7 @@ public class SystemTextJsonDateOnlyJsonConverter : JsonConverter<DateOnly>
     /// 构造函数
     /// </summary>
     /// <param name="format"></param>
-    public SystemTextJsonDateOnlyJsonConverter(string format = "yyyy-MM-dd")
+    public NewtonsoftJsonDateOnlyJsonConverter(string format = "yyyy-MM-dd")
     {
         Format = format;
     }
@@ -46,12 +46,15 @@ public class SystemTextJsonDateOnlyJsonConverter : JsonConverter<DateOnly>
     /// 反序列化
     /// </summary>
     /// <param name="reader"></param>
-    /// <param name="typeToConvert"></param>
-    /// <param name="options"></param>
+    /// <param name="objectType"></param>
+    /// <param name="existingValue"></param>
+    /// <param name="hasExistingValue"></param>
+    /// <param name="serializer"></param>
     /// <returns></returns>
-    public override DateOnly Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    public override DateOnly ReadJson(JsonReader reader, Type objectType, DateOnly existingValue, bool hasExistingValue, JsonSerializer serializer)
     {
-        return DateOnly.Parse(reader.GetString());
+        var value = JValue.ReadFrom(reader).Value<string>();
+        return DateOnly.Parse(value);
     }
 
     /// <summary>
@@ -59,23 +62,22 @@ public class SystemTextJsonDateOnlyJsonConverter : JsonConverter<DateOnly>
     /// </summary>
     /// <param name="writer"></param>
     /// <param name="value"></param>
-    /// <param name="options"></param>
-    public override void Write(Utf8JsonWriter writer, DateOnly value, JsonSerializerOptions options)
+    /// <param name="serializer"></param>
+    public override void WriteJson(JsonWriter writer, DateOnly value, JsonSerializer serializer)
     {
-        writer.WriteStringValue(value.ToString(Format));
+        writer.WriteValue(value.ToString(Format));
     }
 }
 
 /// <summary>
 /// DateOnly? 类型序列化
 /// </summary>
-[SuppressSniffer]
-public class SystemTextJsonNullableDateOnlyJsonConverter : JsonConverter<DateOnly?>
+public class NewtonsoftJsonNullableDateOnlyJsonConverter : JsonConverter<DateOnly?>
 {
     /// <summary>
     /// 构造函数
     /// </summary>
-    public SystemTextJsonNullableDateOnlyJsonConverter()
+    public NewtonsoftJsonNullableDateOnlyJsonConverter()
         : this(default)
     {
     }
@@ -84,7 +86,7 @@ public class SystemTextJsonNullableDateOnlyJsonConverter : JsonConverter<DateOnl
     /// 构造函数
     /// </summary>
     /// <param name="format"></param>
-    public SystemTextJsonNullableDateOnlyJsonConverter(string format = "yyyy-MM-dd")
+    public NewtonsoftJsonNullableDateOnlyJsonConverter(string format = "yyyy-MM-dd")
     {
         Format = format;
     }
@@ -98,12 +100,15 @@ public class SystemTextJsonNullableDateOnlyJsonConverter : JsonConverter<DateOnl
     /// 反序列化
     /// </summary>
     /// <param name="reader"></param>
-    /// <param name="typeToConvert"></param>
-    /// <param name="options"></param>
+    /// <param name="objectType"></param>
+    /// <param name="existingValue"></param>
+    /// <param name="hasExistingValue"></param>
+    /// <param name="serializer"></param>
     /// <returns></returns>
-    public override DateOnly? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    public override DateOnly? ReadJson(JsonReader reader, Type objectType, DateOnly? existingValue, bool hasExistingValue, JsonSerializer serializer)
     {
-        return DateOnly.TryParse(reader.GetString(), out var date) ? date : null;
+        var value = JValue.ReadFrom(reader).Value<string>();
+        return !string.IsNullOrWhiteSpace(value) ? DateOnly.Parse(value) : null;
     }
 
     /// <summary>
@@ -111,10 +116,12 @@ public class SystemTextJsonNullableDateOnlyJsonConverter : JsonConverter<DateOnl
     /// </summary>
     /// <param name="writer"></param>
     /// <param name="value"></param>
-    /// <param name="options"></param>
-    public override void Write(Utf8JsonWriter writer, DateOnly? value, JsonSerializerOptions options)
+    /// <param name="serializer"></param>
+    public override void WriteJson(JsonWriter writer, DateOnly? value, JsonSerializer serializer)
     {
-        if (value == null) writer.WriteNullValue();
-        else writer.WriteStringValue(value.Value.ToString(Format));
+        if (value == null) writer.WriteNull();
+        else writer.WriteValue(value.Value.ToString(Format));
     }
 }
+
+#endif

@@ -19,7 +19,7 @@ namespace ThingsGateway.SqlSugar
             {
                 case ResolveExpressType.WhereSingle:
                 case ResolveExpressType.WhereMultiple:
-                    Check.Exception(name == "GetSelfAndAutoFill", "SqlFunc.GetSelfAndAutoFill can only be used in Select.");
+                    if (name == "GetSelfAndAutoFill") { throw new SqlSugarException("SqlFunc.GetSelfAndAutoFill can only be used in Select."); }
                     base.Where(parameter, isLeft, name, args, model);
                     break;
                 case ResolveExpressType.SelectSingle:

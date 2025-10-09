@@ -22,7 +22,6 @@ namespace ThingsGateway.SqlSugar
         internal string url = string.Empty;
         internal string authorization = string.Empty;
         internal static Random random = new Random();
-        // 可修改的数据库客户端
         ISqlSugarClient db;
 
         /// <summary>
@@ -126,7 +125,7 @@ namespace ThingsGateway.SqlSugar
         /// <returns></returns>
         public Task<int> BulkCopyAsync(string tableName, DataTable dataTable, string dateFormat = "yyyy/M/d H:mm:ss")
         {
-            Check.ExceptionEasy(string.IsNullOrEmpty(tableName), "need tablaeName ", "需要 tablaeNam  设置表名");
+            if (string.IsNullOrEmpty(tableName)) { throw new SqlSugarLangException("need tablaeName ", "需要 tablaeNam  设置表名"); }
             var className = "QuestDbBulkMerge_" + false + tableName.GetNonNegativeHashCodeString();
             var builder = this.db.DynamicBuilder().CreateClass(className, new SugarTable()
             {

@@ -239,7 +239,7 @@ namespace ThingsGateway.SqlSugar
                 {
                     if (!columnInfo.Type.EqualCase("SYMBOL"))
                     {
-                        Check.ExceptionEasy(true, "Only the SYMBOL type can be indexed", $"字段{columnInfo.Column} 不是SYMBOL并且实体是string才能添加索引,CodeFirst需要指定类型： SYMBOL");
+                        if (true) { throw new SqlSugarLangException("Only the SYMBOL type can be indexed", $"字段{columnInfo.Column} 不是SYMBOL并且实体是string才能添加索引,CodeFirst需要指定类型： SYMBOL"); }
                     }
                     if (columnInfo.Indexed == false)
                     {
@@ -403,7 +403,7 @@ namespace ThingsGateway.SqlSugar
         protected override string GetCreateTableSql(string tableName, List<DbColumnInfo> columns)
         {
             List<string> columnArray = new List<string>();
-            Check.Exception(columns.IsNullOrEmpty(), "No columns found ");
+            if (columns.IsNullOrEmpty()) { throw new SqlSugarException("No columns found "); }
             foreach (var item in columns)
             {
                 string columnName = item.DbColumnName;

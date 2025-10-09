@@ -36,7 +36,7 @@ using System.Text.Json;
 
 using ThingsGateway;
 using ThingsGateway.DataValidation;
-using ThingsGateway.Extensions;
+using ThingsGateway.Extension;
 using ThingsGateway.FriendlyException;
 using ThingsGateway.JsonSerialization;
 using ThingsGateway.Logging;

@@ -19,7 +19,7 @@ namespace ThingsGateway.SqlSugar
             this.Context = this;
             this.CurrentConnectionConfig = config;
             this.ContextID = Guid.NewGuid();
-            Check.ArgumentNullException(config, "config is null");
+            if (config == null) { throw new SqlSugarException("config is null"); }
             CheckDbDependency(config);
             if (StaticConfig.CompleteDbFunc != null)
             {
@@ -130,7 +130,7 @@ namespace ThingsGateway.SqlSugar
         /// </summary>
         public virtual ISugarQueryable<T> Queryable<T>(string shortName)
         {
-            Check.Exception(shortName.HasValue() && shortName.Length > 40, ErrorMessage.GetThrowMessage("shortName参数长度不能超过40，你可能是想用这个方法 db.SqlQueryable(sql)而不是db.Queryable(shortName)", "Queryable.shortName max length 20"));
+            if (shortName.HasValue() && shortName.Length > 40) { throw new SqlSugarException(ErrorMessage.GetThrowMessage("shortName参数长度不能超过40，你可能是想用这个方法 db.SqlQueryable(sql)而不是db.Queryable(shortName)", "Queryable.shortName max length 20")); }
             var queryable = Queryable<T>();
             queryable.SqlBuilder.QueryBuilder.TableShortName = shortName;
             return queryable;
@@ -456,8 +456,8 @@ namespace ThingsGateway.SqlSugar
         public virtual ISugarQueryable<T, T2> Queryable<T, T2>(
              ISugarQueryable<T> joinQueryable1, ISugarQueryable<T2> joinQueryable2, JoinType joinType, Expression<Func<T, T2, bool>> joinExpression) where T : class, new() where T2 : class, new()
         {
-            Check.Exception(joinQueryable1.QueryBuilder.Take != null || joinQueryable1.QueryBuilder.Skip != null || joinQueryable1.QueryBuilder.OrderByValue.HasValue(), "joinQueryable1 Cannot have 'Skip' 'ToPageList' 'Take' Or 'OrderBy'");
-            Check.Exception(joinQueryable2.QueryBuilder.Take != null || joinQueryable2.QueryBuilder.Skip != null || joinQueryable2.QueryBuilder.OrderByValue.HasValue(), "joinQueryable2 Cannot have 'Skip' 'ToPageList' 'Take' Or 'OrderBy'");
+            if (joinQueryable1.QueryBuilder.Take != null || joinQueryable1.QueryBuilder.Skip != null || joinQueryable1.QueryBuilder.OrderByValue.HasValue()) { throw new SqlSugarException("joinQueryable1 Cannot have 'Skip' 'ToPageList' 'Take' Or 'OrderBy'"); }
+            if (joinQueryable2.QueryBuilder.Take != null || joinQueryable2.QueryBuilder.Skip != null || joinQueryable2.QueryBuilder.OrderByValue.HasValue()) { throw new SqlSugarException("joinQueryable2 Cannot have 'Skip' 'ToPageList' 'Take' Or 'OrderBy'"); }
 
             var sqlBuilder = InstanceFactory.GetSqlbuilder(this.Context.CurrentConnectionConfig);
 
@@ -500,9 +500,9 @@ namespace ThingsGateway.SqlSugar
                 JoinType joinType2, Expression<Func<T, T2, T3, bool>> joinExpression2
             ) where T : class, new() where T2 : class, new() where T3 : class, new()
         {
-            Check.Exception(joinQueryable1.QueryBuilder.Take != null || joinQueryable1.QueryBuilder.Skip != null || joinQueryable1.QueryBuilder.OrderByValue.HasValue(), "joinQueryable1 Cannot have 'Skip' 'ToPageList' 'Take' Or 'OrderBy'");
-            Check.Exception(joinQueryable2.QueryBuilder.Take != null || joinQueryable2.QueryBuilder.Skip != null || joinQueryable2.QueryBuilder.OrderByValue.HasValue(), "joinQueryable2 Cannot have 'Skip' 'ToPageList' 'Take' Or 'OrderBy'");
-            Check.Exception(joinQueryable3.QueryBuilder.Take != null || joinQueryable3.QueryBuilder.Skip != null || joinQueryable3.QueryBuilder.OrderByValue.HasValue(), "joinQueryable3 Cannot have 'Skip' 'ToPageList' 'Take' Or 'OrderBy'");
+            if (joinQueryable1.QueryBuilder.Take != null || joinQueryable1.QueryBuilder.Skip != null || joinQueryable1.QueryBuilder.OrderByValue.HasValue()) { throw new SqlSugarException("joinQueryable1 Cannot have 'Skip' 'ToPageList' 'Take' Or 'OrderBy'"); }
+            if (joinQueryable2.QueryBuilder.Take != null || joinQueryable2.QueryBuilder.Skip != null || joinQueryable2.QueryBuilder.OrderByValue.HasValue()) { throw new SqlSugarException("joinQueryable2 Cannot have 'Skip' 'ToPageList' 'Take' Or 'OrderBy'"); }
+            if (joinQueryable3.QueryBuilder.Take != null || joinQueryable3.QueryBuilder.Skip != null || joinQueryable3.QueryBuilder.OrderByValue.HasValue()) { throw new SqlSugarException("joinQueryable3 Cannot have 'Skip' 'ToPageList' 'Take' Or 'OrderBy'"); }
 
             var sqlBuilder = InstanceFactory.GetSqlbuilder(this.Context.CurrentConnectionConfig);
 
@@ -554,10 +554,10 @@ namespace ThingsGateway.SqlSugar
                JoinType joinType3, Expression<Func<T, T2, T3, T4, bool>> joinExpression3
           ) where T : class, new() where T2 : class, new() where T3 : class, new() where T4 : class, new()
         {
-            Check.Exception(joinQueryable1.QueryBuilder.Take != null || joinQueryable1.QueryBuilder.Skip != null || joinQueryable1.QueryBuilder.OrderByValue.HasValue(), "joinQueryable1 Cannot have 'Skip' 'ToPageList' 'Take' Or 'OrderBy'");
-            Check.Exception(joinQueryable2.QueryBuilder.Take != null || joinQueryable2.QueryBuilder.Skip != null || joinQueryable2.QueryBuilder.OrderByValue.HasValue(), "joinQueryable2 Cannot have 'Skip' 'ToPageList' 'Take' Or 'OrderBy'");
-            Check.Exception(joinQueryable3.QueryBuilder.Take != null || joinQueryable3.QueryBuilder.Skip != null || joinQueryable3.QueryBuilder.OrderByValue.HasValue(), "joinQueryable3 Cannot have 'Skip' 'ToPageList' 'Take' Or 'OrderBy'");
-            Check.Exception(joinQueryable4.QueryBuilder.Take != null || joinQueryable4.QueryBuilder.Skip != null || joinQueryable4.QueryBuilder.OrderByValue.HasValue(), "joinQueryable4 Cannot have 'Skip' 'ToPageList' 'Take' Or 'OrderBy'");
+            if (joinQueryable1.QueryBuilder.Take != null || joinQueryable1.QueryBuilder.Skip != null || joinQueryable1.QueryBuilder.OrderByValue.HasValue()) { throw new SqlSugarException("joinQueryable1 Cannot have 'Skip' 'ToPageList' 'Take' Or 'OrderBy'"); }
+            if (joinQueryable2.QueryBuilder.Take != null || joinQueryable2.QueryBuilder.Skip != null || joinQueryable2.QueryBuilder.OrderByValue.HasValue()) { throw new SqlSugarException("joinQueryable2 Cannot have 'Skip' 'ToPageList' 'Take' Or 'OrderBy'"); }
+            if (joinQueryable3.QueryBuilder.Take != null || joinQueryable3.QueryBuilder.Skip != null || joinQueryable3.QueryBuilder.OrderByValue.HasValue()) { throw new SqlSugarException("joinQueryable3 Cannot have 'Skip' 'ToPageList' 'Take' Or 'OrderBy'"); }
+            if (joinQueryable4.QueryBuilder.Take != null || joinQueryable4.QueryBuilder.Skip != null || joinQueryable4.QueryBuilder.OrderByValue.HasValue()) { throw new SqlSugarException("joinQueryable4 Cannot have 'Skip' 'ToPageList' 'Take' Or 'OrderBy'"); }
             var sqlBuilder = InstanceFactory.GetSqlbuilder(this.Context.CurrentConnectionConfig);
 
             sqlBuilder.Context = this;
@@ -615,7 +615,7 @@ namespace ThingsGateway.SqlSugar
         internal ISugarQueryable<T> _UnionAll<T>(IReadOnlyCollection<ISugarQueryable<T>> queryables)
         {
             var sqlBuilder = InstanceFactory.GetSqlbuilder(this.Context.CurrentConnectionConfig);
-            Check.Exception(queryables.IsNullOrEmpty(), "UnionAll.queryables is null ");
+            if (queryables.IsNullOrEmpty()) { throw new SqlSugarException("UnionAll.queryables is null "); }
             int i = 1;
             var allItems = new List<KeyValuePair<string, IReadOnlyCollection<SugarParameter>>>();
             foreach (var item in queryables)
@@ -656,14 +656,14 @@ namespace ThingsGateway.SqlSugar
 
         public virtual ISugarQueryable<T> UnionAll<T>(IReadOnlyCollection<ISugarQueryable<T>> queryables) where T : class
         {
-            Check.Exception(queryables.IsNullOrEmpty(), "UnionAll.queryables is null ");
+            if (queryables.IsNullOrEmpty()) { throw new SqlSugarException("UnionAll.queryables is null "); }
             return _UnionAll(queryables);
         }
 
         public virtual ISugarQueryable<T> Union<T>(IReadOnlyCollection<ISugarQueryable<T>> queryables) where T : class
         {
             var sqlBuilder = InstanceFactory.GetSqlbuilder(this.Context.CurrentConnectionConfig);
-            Check.Exception(queryables.IsNullOrEmpty(), "UnionAll.queryables is null ");
+            if (queryables.IsNullOrEmpty()) { throw new SqlSugarException("UnionAll.queryables is null "); }
             int i = 1;
             var allItems = new List<KeyValuePair<string, IReadOnlyCollection<SugarParameter>>>();
             foreach (var item in queryables)
@@ -776,12 +776,12 @@ namespace ThingsGateway.SqlSugar
         }
         public virtual IInsertable<T> InsertableT<T>(T insertObj) where T : class, new()
         {
-            return this.Context.Insertable(new T[] { insertObj });
+            return this.Context.Insertable([insertObj]);
         }
         public virtual IInsertable<T> Insertable<T>(Dictionary<string, object> columnDictionary) where T : class, new()
         {
             InitMappingInfo<T>();
-            Check.Exception(columnDictionary == null || columnDictionary.Count == 0, "Insertable.columnDictionary can't be null");
+            if (columnDictionary == null || columnDictionary.Count == 0) { throw new SqlSugarException("Insertable.columnDictionary can't be null"); }
             var insertObject = this.Context.Utilities.DeserializeObject<T>(this.Context.Utilities.SerializeObject(columnDictionary));
             var columns = columnDictionary.Select(it => it.Key).ToList();
             return this.Context.InsertableT(insertObject).InsertColumns(columns);
@@ -796,7 +796,7 @@ namespace ThingsGateway.SqlSugar
             else
             {
                 var columns = (insertDynamicObject).GetType().GetProperties().Select(it => it.Name).ToList();
-                Check.Exception(columns.IsNullOrEmpty(), "Insertable.updateDynamicObject can't be null");
+                if (columns.IsNullOrEmpty()) { throw new SqlSugarException("Insertable.updateDynamicObject can't be null"); }
                 T insertObject = this.Context.Utilities.DeserializeObject<T>(this.Context.Utilities.SerializeObject(insertDynamicObject));
                 return this.Context.InsertableT(insertObject).InsertColumns(columns);
             }
@@ -957,7 +957,7 @@ namespace ThingsGateway.SqlSugar
 
         public virtual IUpdateable<T> Updateable<T>(IReadOnlyCollection<T> UpdateObjs) where T : class, new()
         {
-            //Check.ArgumentNullException(UpdateObjs, "Updateable.UpdateObjs can't be null");
+            //if(UpdateObjs ==null){throw new SqlSugarException("Updateable.UpdateObjs can't be null");}
             if (UpdateObjs == null)
             {
                 UpdateObjs = new List<T>();
@@ -1004,7 +1004,7 @@ namespace ThingsGateway.SqlSugar
         public virtual IUpdateable<T> Updateable<T>(Dictionary<string, object> columnDictionary) where T : class, new()
         {
             InitMappingInfo<T>();
-            Check.Exception(columnDictionary == null || columnDictionary.Count == 0, "Updateable.columnDictionary can't be null");
+            if (columnDictionary == null || columnDictionary.Count == 0) { throw new SqlSugarException("Updateable.columnDictionary can't be null"); }
             var updateObject = this.Context.Utilities.DeserializeObject<T>(this.Context.Utilities.SerializeObject(columnDictionary));
             var columns = columnDictionary.Select(it => it.Key).ToList();
             return this.Context.UpdateableT(updateObject).UpdateColumns(columns);
@@ -1019,7 +1019,7 @@ namespace ThingsGateway.SqlSugar
             else
             {
                 var columns = (updateDynamicObject).GetType().GetProperties().Select(it => it.Name).ToList();
-                Check.Exception(columns.IsNullOrEmpty(), "Updateable.updateDynamicObject can't be null");
+                if (columns.IsNullOrEmpty()) { throw new SqlSugarException("Updateable.updateDynamicObject can't be null"); }
                 T updateObject = this.Context.Utilities.DeserializeObject<T>(this.Context.Utilities.SerializeObject(updateDynamicObject));
                 return this.Context.UpdateableT(updateObject).UpdateColumns(columns);
             }
@@ -1029,9 +1029,9 @@ namespace ThingsGateway.SqlSugar
         #region Saveable
         public GridSaveProvider<T> GridSave<T>(List<T> saveList) where T : class, new()
         {
-            Check.ExceptionEasy(saveList == null, "saveList is null", "saveList 不能是 null");
+            if (saveList == null) { throw new SqlSugarLangException("saveList is null", "saveList 不能是 null"); }
             var isTran = this.Context.TempItems?.Any(it => it.Key == "OldData_" + saveList.GetHashCode()) == true;
-            Check.ExceptionEasy(isTran == false, "saveList no tracking", "saveList 没有使用跟踪");
+            if (isTran == false) { throw new SqlSugarLangException("saveList no tracking", "saveList 没有使用跟踪"); }
             var oldList = (List<T>)this.Context.TempItems.FirstOrDefault(it => it.Key == "OldData_" + saveList.GetHashCode()).Value;
             return GridSave(oldList, saveList);
         }
@@ -1082,7 +1082,7 @@ namespace ThingsGateway.SqlSugar
         public StorageableDataTable Storageable(DataTable data)
         {
             var result = new StorageableDataTable();
-            Check.Exception(data.TableName.IsNullOrEmpty() || data.TableName == "Table", ErrorMessage.GetThrowMessage("DataTable data.TableName is null", "参数DataTable没有设置TableName ，参数.TableName=表名"));
+            if (data.TableName.IsNullOrEmpty() || data.TableName == "Table") { throw new SqlSugarException(ErrorMessage.GetThrowMessage("DataTable data.TableName is null", "参数DataTable没有设置TableName ，参数.TableName=表名")); }
             result.DataTable = data;
             result.Context = this;
             data.Columns.Add(new DataColumn("SugarGroupId", typeof(StorageType)));
@@ -1327,12 +1327,12 @@ namespace ThingsGateway.SqlSugar
         #region SimpleClient
         public T CreateContext<T>(bool isTran) where T : SugarUnitOfWork, new()
         {
-            Check.ExceptionEasy(" var childDb=Db.GetConnection(configId);  use Db.CreateContext ", " 例如 var childDb=Db.GetConnection(configId);其中Db才能使用CreateContext，childDb不能使用");
+            Check.ExceptionLang(" var childDb=Db.GetConnection(configId);  use Db.CreateContext ", " 例如 var childDb=Db.GetConnection(configId);其中Db才能使用CreateContext，childDb不能使用");
             return null;
         }
         public SugarUnitOfWork CreateContext(bool isTran = true)
         {
-            Check.ExceptionEasy(" var childDb=Db.GetConnection(configId);  use Db.CreateContext ", " 例如 var childDb=Db.GetConnection(configId);其中Db才能使用CreateContext，childDb不能使用");
+            Check.ExceptionLang(" var childDb=Db.GetConnection(configId);  use Db.CreateContext ", " 例如 var childDb=Db.GetConnection(configId);其中Db才能使用CreateContext，childDb不能使用");
             return null;
         }
 
@@ -1727,8 +1727,7 @@ namespace ThingsGateway.SqlSugar
             }
             else
             {
-                Check.Exception(true, ErrorMessage.GetThrowMessage("Child objects do not support tenant methods, var childDb= Db.GetConnection(confid)  ,Db is master  ", "Db子对象不支持租户方法，请使用主对象,例如：var childDb= Db.GetConnection(confid)  Db是主对象，childDb是子对象 "));
-                return null;
+                { throw new SqlSugarException(ErrorMessage.GetThrowMessage("Child objects do not support tenant methods, var childDb= Db.GetConnection(confid)  ,Db is master  ", "Db子对象不支持租户方法，请使用主对象,例如：var childDb= Db.GetConnection(confid)  Db是主对象，childDb是子对象 ")); }
             }
         }
 
@@ -1784,7 +1783,7 @@ namespace ThingsGateway.SqlSugar
             }
             if (datas != null)
             {
-                Check.ExceptionEasy(this.Context.TempItems.ContainsKey("OldData_" + datas.GetHashCode()), "The object already has a trace", "对象已存在跟踪,如果要在跟踪可以先清除 db.ClearTracking() ");
+                if (this.Context.TempItems.ContainsKey("OldData_" + datas.GetHashCode())) { throw new SqlSugarLangException("The object already has a trace", "对象已存在跟踪,如果要在跟踪可以先清除 db.ClearTracking() "); }
                 this.Context.TempItems.Add("OldData_" + datas.GetHashCode(), datas.Cast<T>().ToList());
             }
         }

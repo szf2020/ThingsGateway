@@ -8,39 +8,12 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-#if NET6_0_OR_GREATER
-using System.Text.Json.Serialization;
-using System.Text.Json;
-
-#endif
-
 using Newtonsoft.Json;
 
 using System.Text;
 
 namespace ThingsGateway.Foundation;
 
-#if NET6_0_OR_GREATER
-
-/// <inheritdoc/>
-public class EncodingConverter : System.Text.Json.Serialization.JsonConverter<Encoding>
-{
-    /// <inheritdoc/>
-    public override Encoding? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
-    {
-        // 从 JSON 中读取编码名称，并创建对应的 Encoding 对象
-        string? encodingName = reader.GetString();
-        return Encoding.GetEncoding(encodingName ?? Encoding.UTF8.WebName);
-    }
-
-    /// <inheritdoc/>
-    public override void Write(Utf8JsonWriter writer, Encoding value, JsonSerializerOptions options)
-    {
-        // 将 Encoding 对象的编码名称作为字符串写入 JSON
-        writer.WriteStringValue(value?.WebName);
-    }
-}
-#endif
 
 /// <inheritdoc/>
 public class NewtonsoftEncodingConverter : Newtonsoft.Json.JsonConverter<Encoding>

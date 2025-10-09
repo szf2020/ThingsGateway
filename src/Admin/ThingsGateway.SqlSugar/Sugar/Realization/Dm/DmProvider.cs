@@ -69,7 +69,7 @@ namespace ThingsGateway.SqlSugar
                     }
                     catch (Exception ex)
                     {
-                        Check.Exception(true, ErrorMessage.ConnnectionOpen, ex.Message);
+                        { throw new SqlSugarException(ErrorMessage.ConnnectionOpen, ex.Message); }
                     }
                 }
                 return base._DbConnection;
@@ -246,7 +246,7 @@ namespace ThingsGateway.SqlSugar
             }
             if (it.Message?.Contains("Detail redacted as it may contain sensitive data.") == true)
             {
-                Check.ExceptionEasy(it.Message, $"错误：可能是字段太小超出,详细错误：{it.Message} ");
+                Check.ExceptionLang(it.Message, $"错误：可能是字段太小超出,详细错误：{it.Message} ");
             }
         };
     }

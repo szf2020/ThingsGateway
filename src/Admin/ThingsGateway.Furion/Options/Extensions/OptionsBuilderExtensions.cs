@@ -16,7 +16,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using System.Linq.Expressions;
 using System.Reflection;
 
-using ThingsGateway.Extensions;
+using ThingsGateway.Extension;
 using ThingsGateway.Options;
 
 namespace Microsoft.Extensions.Options;

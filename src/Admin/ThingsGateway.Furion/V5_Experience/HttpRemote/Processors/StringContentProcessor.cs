@@ -20,7 +20,7 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 
-using ThingsGateway.Extensions;
+using ThingsGateway.Extension;
 
 namespace ThingsGateway.HttpRemote;
 

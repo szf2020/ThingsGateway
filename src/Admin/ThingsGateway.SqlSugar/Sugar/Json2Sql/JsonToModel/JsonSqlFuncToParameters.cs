@@ -31,8 +31,7 @@ namespace ThingsGateway.SqlSugar
         #region Level1
         private static List<object> GetObjectErrorParameters(JToken parameters)
         {
-            Check.Exception(true, ErrorMessage.GetThrowMessage($" {parameters.ToString()} format is error ", $" {parameters.ToString()} 格式错误"));
-            return null;
+            { throw new SqlSugarException(ErrorMessage.GetThrowMessage($" {parameters.ToString()} format is error ", $" {parameters.ToString()} 格式错误")); }
         }
 
         public List<object> GetArrayParameters(JToken parameters)

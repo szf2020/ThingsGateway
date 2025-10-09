@@ -101,7 +101,7 @@ namespace ThingsGateway.SqlSugar
 
         protected override string TomultipleSqlString(List<IGrouping<int, DbColumnInfo>> groupList)
         {
-            Check.Exception(PrimaryKeys == null || PrimaryKeys.Count == 0, " Update List<T> need Primary key");
+            if (PrimaryKeys == null || PrimaryKeys.Count == 0) { throw new SqlSugarException(" Update List<T> need Primary key"); }
             int pageSize = 200;
             int pageIndex = 1;
             int totalRecord = groupList.Count;

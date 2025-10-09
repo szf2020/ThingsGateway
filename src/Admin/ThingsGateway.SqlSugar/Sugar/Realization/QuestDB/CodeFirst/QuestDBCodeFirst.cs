@@ -17,7 +17,7 @@ namespace ThingsGateway.SqlSugar
         public override void NoExistLogic(EntityInfo entityInfo)
         {
             var tableName = GetTableName(entityInfo);
-            //Check.Exception(entityInfo.Columns.Where(it => it.IsPrimarykey).Count() > 1, "Use Code First ,The primary key must not exceed 1");
+            //if(entityInfo.Columns.Where(it => it.IsPrimarykey).Count() > 1){throw new SqlSugarException("Use Code First ,The primary key must not exceed 1");}
             List<DbColumnInfo> columns = new List<DbColumnInfo>();
             if (entityInfo.Columns.HasValue())
             {

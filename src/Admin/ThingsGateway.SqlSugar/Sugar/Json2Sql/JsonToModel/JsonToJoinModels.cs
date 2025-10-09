@@ -11,7 +11,7 @@ namespace ThingsGateway.SqlSugar
         {
             JoinModel conditionalModels = new JoinModel();
             var array = JArray.Parse(json);
-            Check.Exception(array.Count != 3, json + " format error");
+            if (array.Count != 3) { throw new SqlSugarException(json + " format error"); }
             var tableName = array[0];
             var shortName = array[1];
             var onWhere = array[2];

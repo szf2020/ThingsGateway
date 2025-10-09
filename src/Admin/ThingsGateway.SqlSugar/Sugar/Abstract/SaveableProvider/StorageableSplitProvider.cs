@@ -153,7 +153,7 @@ namespace ThingsGateway.SqlSugar
         private IEnumerable<GroupModel> GroupDataList(IEnumerable<T> datas)
         {
             var attribute = typeof(T).GetCustomAttribute<SplitTableAttribute>() as SplitTableAttribute;
-            Check.Exception(attribute == null, $"{typeof(T).Name} need SplitTableAttribute");
+            if (attribute == null) { throw new SqlSugarException($"{typeof(T).Name} need SplitTableAttribute"); }
 
             var db = this.Context;
             var context = db.SplitHelper<T>();

@@ -13,7 +13,7 @@ using System.Buffers;
 using System.Text;
 using System.Text.Json;
 
-namespace ThingsGateway.Extensions;
+namespace ThingsGateway.Extension;
 
 /// <summary>
 ///     <see cref="Utf8JsonReader" /> 拓展类

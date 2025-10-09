@@ -138,7 +138,7 @@ namespace ThingsGateway.SqlSugar
             var nav = this._ParentEntity.Columns.FirstOrDefault(x => x.PropertyName == name);
             if (nav.Navigat == null)
             {
-                Check.ExceptionEasy($"{name} no navigate attribute", $"{this._ParentEntity.EntityName}的属性{name}没有导航属性");
+                Check.ExceptionLang($"{name} no navigate attribute", $"{this._ParentEntity.EntityName}的属性{name}没有导航属性");
             }
             if (_RootOptions?.IsDisableUpdateRoot == true)
             {
@@ -184,7 +184,7 @@ namespace ThingsGateway.SqlSugar
             var nav = this._ParentEntity.Columns.FirstOrDefault(x => x.PropertyName == name);
             if (nav.Navigat == null)
             {
-                Check.ExceptionEasy($"{name} no navigate attribute", $"{this._ParentEntity.EntityName}的属性{name}没有导航属性");
+                Check.ExceptionLang($"{name} no navigate attribute", $"{this._ParentEntity.EntityName}的属性{name}没有导航属性");
             }
             UpdateRoot(isRoot, nav);
             IsFirst = false;
@@ -241,7 +241,7 @@ namespace ThingsGateway.SqlSugar
             {
                 var updateable = this._Context.Updateable<Root>(_Roots);
                 var exp = _Options.RootFunc as Expression<Action<IUpdateable<Root>>>;
-                Check.ExceptionEasy(exp == null, "UpdateOptions.RootFunc is error", "UpdateOptions.RootFunc");
+                if (exp == null) { throw new SqlSugarLangException("UpdateOptions.RootFunc is error", "UpdateOptions.RootFunc"); }
                 var com = exp.Compile();
                 com(updateable);
                 updateable.ExecuteCommand();

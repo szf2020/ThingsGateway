@@ -8,13 +8,14 @@
 // 项目主要遵循 MIT 许可证和 Apache 许可证（版本 2.0）进行分发和使用。
 // 许可证的完整文本可以在源代码树根目录中的 LICENSE-APACHE 和 LICENSE-MIT 文件中找到。
 // ------------------------------------------------------------------------
-
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
+#if NET6_0_OR_GREATER
 using System.Text.Json;
+#endif
 
-using ThingsGateway.Extensions;
+using ThingsGateway.Extension;
 
 namespace ThingsGateway.JsonSerialization;
 
@@ -23,6 +24,7 @@ namespace ThingsGateway.JsonSerialization;
 /// </summary>
 internal static class Penetrates
 {
+#if NET6_0_OR_GREATER
     /// <summary>
     /// 转换
     /// </summary>
@@ -35,7 +37,6 @@ internal static class Penetrates
         {
             return longValue.ConvertToDateTime();
         }
-
         var stringValue = reader.GetString();
 
         // 处理时间戳自动转换
@@ -46,6 +47,9 @@ internal static class Penetrates
 
         return Convert.ToDateTime(stringValue);
     }
+#endif
+
+
 
     /// <summary>
     /// 转换
@@ -69,4 +73,6 @@ internal static class Penetrates
 
         return Convert.ToDateTime(stringValue);
     }
+
 }
+

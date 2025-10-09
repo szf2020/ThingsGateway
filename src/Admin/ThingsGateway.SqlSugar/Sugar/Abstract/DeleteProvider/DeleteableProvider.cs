@@ -188,7 +188,7 @@ namespace ThingsGateway.SqlSugar
             var primaryFields = this.GetPrimaryKeys();
             var isSinglePrimaryKey = primaryFields.Count == 1;
             var isNvarchar = false;
-            Check.Exception(primaryFields.IsNullOrEmpty(), string.Format("Table {0} with no primarykey", tableName));
+            if (primaryFields.IsNullOrEmpty()) { throw new SqlSugarException(string.Format("Table {0} with no primarykey", tableName)); }
             if (isSinglePrimaryKey)
             {
                 List<object> primaryKeyValues = new List<object>();
@@ -334,7 +334,7 @@ namespace ThingsGateway.SqlSugar
         {
             if (DeleteBuilder.WhereInfos.Count != 0 != true)
             {
-                Check.ExceptionEasy(!StaticConfig.EnableAllWhereIF, "Need to program startup configuration StaticConfig. EnableAllWhereIF = true; Tip: This operation is very risky if there are no conditions it is easy to update the entire table", " 需要程序启动时配置StaticConfig.EnableAllWhereIF=true; 提示：该操作存在很大的风险如果没有条件很容易将整个表全部更新");
+                if (!StaticConfig.EnableAllWhereIF) { throw new SqlSugarLangException("Need to program startup configuration StaticConfig. EnableAllWhereIF = true; Tip: This operation is very risky if there are no conditions it is easy to update the entire table", " 需要程序启动时配置StaticConfig.EnableAllWhereIF=true; 提示：该操作存在很大的风险如果没有条件很容易将整个表全部更新"); }
             }
             if (isWhere)
             {
@@ -383,7 +383,7 @@ namespace ThingsGateway.SqlSugar
         /// </summary>
         public IDeleteable<T> WhereT(T deleteObj)
         {
-            Check.Exception(GetPrimaryKeys().IsNullOrEmpty(), "Where(entity) Primary key required");
+            if (GetPrimaryKeys().IsNullOrEmpty()) { throw new SqlSugarException("Where(entity) Primary key required"); }
             Where([deleteObj]);
             return this;
         }
@@ -606,7 +606,7 @@ namespace ThingsGateway.SqlSugar
             UtilMethods.StartCustomSplitTable(this.Context, typeof(T));
             SplitTableDeleteByObjectProvider<T> result = new SplitTableDeleteByObjectProvider<T>();
             result.Context = this.Context;
-            Check.ExceptionEasy(this.DeleteObjects == null, "SplitTable() +0  only List<T> can be deleted", "SplitTable()无参数重载只支持根据实体集合删除");
+            if (this.DeleteObjects == null) { throw new SqlSugarLangException("SplitTable() +0  only List<T> can be deleted", "SplitTable()无参数重载只支持根据实体集合删除"); }
             result.deleteObjects = this.DeleteObjects;
             SplitTableContext helper = new SplitTableContext((SqlSugarProvider)Context)
             {
@@ -653,7 +653,7 @@ namespace ThingsGateway.SqlSugar
             string tableName = this.Context.EntityMaintenance.GetTableName<T>();
             string primaryField = null;
             primaryField = GetPrimaryKeys().FirstOrDefault();
-            Check.ArgumentNullException(primaryField, "Table " + tableName + " with no primarykey");
+            if (primaryField == null) { throw new SqlSugarException("Table " + tableName + " with no primarykey"); }
             if (primaryKeyValues.Count < 10000)
             {
                 Where(string.Format(DeleteBuilder.WhereInTemplate, SqlBuilder.GetTranslationColumnName(primaryField), primaryKeyValues.ToJoinSqlInVals()));
@@ -741,7 +741,7 @@ namespace ThingsGateway.SqlSugar
         /// </summary>
         public DeleteablePage<T> PageSize(int pageSize)
         {
-            Check.ExceptionEasy(this.DeleteObjects == null, "PageSize can only be deleted as a List<Class> entity collection", "Deleteable.PageSize()只能是List<Class>实体集合方式删除,并且集合不能为null");
+            if (this.DeleteObjects == null) { throw new SqlSugarLangException("PageSize can only be deleted as a List<Class> entity collection", "Deleteable.PageSize()只能是List<Class>实体集合方式删除,并且集合不能为null"); }
             DeleteablePage<T> result = new DeleteablePage<T>();
             result.DataList = this.DeleteObjects;
             result.Context = this.Context;

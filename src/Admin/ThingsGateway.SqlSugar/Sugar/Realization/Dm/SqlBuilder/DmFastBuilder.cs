@@ -56,14 +56,14 @@ namespace ThingsGateway.SqlSugar
         }
         public override string UpdateSql { get; set; } = @"UPDATE  {1} TM    INNER JOIN {2} TE  ON {3} SET {0} ";
 
-        private async Task<int> _Execute(DataTable dt)
+        private Task<int> _Execute(DataTable dt)
         {
             DmBulkCopy bulkCopy = GetBulkCopyInstance();
             bulkCopy.DestinationTableName = dt.TableName;
             try
             {
                 bulkCopy.WriteToServer(dt);
-                await Task.Delay(0).ConfigureAwait(false);//No Support Async
+
             }
             catch (Exception)
             {
@@ -71,7 +71,7 @@ namespace ThingsGateway.SqlSugar
                 throw;
             }
             CloseDb();
-            return dt.Rows.Count;
+            return Task.FromResult(dt.Rows.Count);
         }
 
         public DmBulkCopy GetBulkCopyInstance()

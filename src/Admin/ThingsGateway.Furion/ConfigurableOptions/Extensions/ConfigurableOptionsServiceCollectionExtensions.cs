@@ -18,7 +18,7 @@ using System.Reflection;
 
 using ThingsGateway;
 using ThingsGateway.ConfigurableOptions;
-using ThingsGateway.Extensions;
+using ThingsGateway.Extension;
 
 namespace Microsoft.Extensions.DependencyInjection;
 

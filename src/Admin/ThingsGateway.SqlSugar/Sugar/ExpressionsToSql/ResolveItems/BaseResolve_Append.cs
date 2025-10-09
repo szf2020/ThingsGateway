@@ -179,7 +179,7 @@ namespace ThingsGateway.SqlSugar
                 }
                 else if (parameter?.BaseParameter?.CommonTempData.ObjToString() == "IsJson=true")
                 {
-                    this.Context.Parameters.Add(new SugarParameter(appendValue, new SerializeService().SerializeObject(value)) { IsJson = true });
+                    this.Context.Parameters.Add(new SugarParameter(appendValue, DefaultServices.Serialize.SerializeObject(value)) { IsJson = true });
                 }
                 else if (parameter?.BaseParameter?.CommonTempData.ObjToString() == "IsArray=true")
                 {

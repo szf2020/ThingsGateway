@@ -81,10 +81,11 @@ namespace ThingsGateway.SqlSugar
                 if (this._Options?.OneToManyEnableLogicDelete == true)
                 {
                     var locgicColumn = thisEntity.Columns.FirstOrDefault(it => it.PropertyName.EqualCase("IsDeleted") || it.PropertyName.EqualCase("IsDelete"));
-                    Check.ExceptionEasy(
-                         locgicColumn == null,
-                         thisEntity.EntityName + "Logical deletion requires the entity to have the IsDeleted property",
-                         thisEntity.EntityName + "假删除需要实体有IsDeleted属性");
+                    if (locgicColumn == null)
+                    {
+                        throw new SqlSugarLangException(thisEntity.EntityName + "Logical deletion requires the entity to have the IsDeleted property",
+                            thisEntity.EntityName + "假删除需要实体有IsDeleted属性");
+                    }
                     List<IConditionalModel> conditionalModels = new List<IConditionalModel>();
                     conditionalModels.Add(new ConditionalModel()
                     {
@@ -177,10 +178,11 @@ namespace ThingsGateway.SqlSugar
                 if (this._Options?.OneToManyEnableLogicDelete == true)
                 {
                     var locgicColumn = thisEntity.Columns.FirstOrDefault(it => it.PropertyName.EqualCase("IsDeleted") || it.PropertyName.EqualCase("IsDelete"));
-                    Check.ExceptionEasy(
-                         locgicColumn == null,
-                         thisEntity.EntityName + "Logical deletion requires the entity to have the IsDeleted property",
-                         thisEntity.EntityName + "假删除需要实体有IsDeleted属性");
+                    if (locgicColumn == null)
+                    {
+                        throw new SqlSugarLangException(thisEntity.EntityName + "Logical deletion requires the entity to have the IsDeleted property",
+                              thisEntity.EntityName + "假删除需要实体有IsDeleted属性");
+                    }
                     List<IConditionalModel> conditionalModels = new List<IConditionalModel>();
                     conditionalModels.Add(new ConditionalModel()
                     {
@@ -325,7 +327,7 @@ namespace ThingsGateway.SqlSugar
             childIndex++;
             if (childIndex > 4)
             {
-                Check.ExceptionEasy("Removing too many levels", "安全机制限制删除脏数据层级不能超过7层");
+                Check.ExceptionLang("Removing too many levels", "安全机制限制删除脏数据层级不能超过7层");
             }
             foreach (var columnInfo in childs)
             {

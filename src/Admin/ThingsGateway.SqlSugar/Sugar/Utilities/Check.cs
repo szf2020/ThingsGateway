@@ -1,43 +1,20 @@
-﻿using System.Text;
-namespace ThingsGateway.SqlSugar
+﻿namespace ThingsGateway.SqlSugar
 {
     public static class Check
     {
         public static void ThrowNotSupportedException(string message)
         {
             message = message.IsNullOrEmpty() ? new NotSupportedException().Message : message;
-            throw new SqlSugarException("SqlSugarException.NotSupportedException：" + message);
+            throw new SqlSugarException($"SqlSugarException.NotSupportedException：{message}");
         }
 
-        public static void ArgumentNullException(object checkObj, string message)
-        {
-            if (checkObj == null)
-                throw new SqlSugarException("SqlSugarException.ArgumentNullException：" + message);
-        }
 
-        public static void ArgumentNullException(object[] checkObj, string message)
-        {
-            if (checkObj == null || checkObj.Length == 0)
-                throw new SqlSugarException("SqlSugarException.ArgumentNullException：" + message);
-        }
-        public static void Exception(bool isException, CompositeFormat compositeFormat, params string[] args)
-        {
-            if (isException)
-                throw new SqlSugarException(string.Format(null, compositeFormat, args));
-        }
-        public static void Exception(bool isException, string message, params string[] args)
-        {
-            if (isException)
-                throw new SqlSugarException(string.Format(message, args));
-        }
-        public static void ExceptionEasy(string enMessage, string cnMessage)
+
+        public static void ExceptionLang(string enMessage, string cnMessage)
         {
             throw new SqlSugarException(ErrorMessage.GetThrowMessage(enMessage, cnMessage));
         }
-        public static void ExceptionEasy(bool isException, string enMessage, string cnMessage)
-        {
-            if (isException)
-                throw new SqlSugarException(ErrorMessage.GetThrowMessage(enMessage, cnMessage));
-        }
+
+
     }
 }

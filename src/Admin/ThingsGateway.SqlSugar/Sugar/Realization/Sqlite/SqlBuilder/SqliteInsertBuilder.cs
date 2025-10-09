@@ -4,163 +4,124 @@ namespace ThingsGateway.SqlSugar
 {
     public class SqliteInsertBuilder : InsertBuilder
     {
-        public override string SqlTemplate
-        {
-            get
-            {
-                if (IsReturnIdentity)
-                {
-                    return @"INSERT INTO {0} 
-           ({1})
-     VALUES
-           ({2}) ;SELECT LAST_INSERT_ROWID();";
-                }
-                else
-                {
-                    return @"INSERT INTO {0} 
-           ({1})
-     VALUES
-           ({2}) ;";
-                }
-            }
-        }
+        private const string InsertPrefix = "INSERT INTO ";
+        private const string InsertIgnorePrefix = "INSERT OR IGNORE  INTO  ";
 
-        public override string SqlTemplateBatch
-        {
-            get
-            {
-                return "INSERT INTO {0} ({1})";
-            }
-        }
+        public override string SqlTemplate =>
+            IsReturnIdentity
+                ? @"INSERT INTO {0} ({1}) VALUES ({2});SELECT LAST_INSERT_ROWID();"
+                : @"INSERT INTO {0} ({1}) VALUES ({2});";
+
+        public override string SqlTemplateBatch => "INSERT INTO {0} ({1})";
+
         public override string ToSqlString()
         {
+            // 过滤掉 null 值
             if (IsNoInsertNull)
-            {
                 DbColumnInfoList = DbColumnInfoList.Where(it => it.Value != null).ToList();
-            }
+
+            // 按 TableId 分组
             var groupList = DbColumnInfoList.GroupBy(it => it.TableId).ToList();
-            var isSingle = groupList.Count == 1;
-            string columnsString = string.Join(",", groupList[0].Select(it => Builder.GetTranslationColumnName(it.DbColumnName)));
-            if (isSingle)
+            var firstGroup = groupList[0];
+
+            // 列名缓存
+            var columnNames = string.Join(",", firstGroup.Select(it => Builder.GetTranslationColumnName(it.DbColumnName)));
+
+            if (groupList.Count == 1)
             {
-                string columnParametersString = string.Join(",", this.DbColumnInfoList.Select(it => base.GetDbColumn(it, Builder.SqlParameterKeyWord + it.DbColumnName)));
+                // 单条插入
+                var columnValues = string.Join(",", DbColumnInfoList.Select(it =>
+                    base.GetDbColumn(it, Builder.SqlParameterKeyWord + it.DbColumnName)));
+
                 ActionMinDate();
-                return string.Format(SqlTemplate, GetTableNameString, columnsString, columnParametersString);
+                return string.Format(SqlTemplate, GetTableNameString, columnNames, columnValues);
             }
-            else
+
+            // 批量插入
+            var sb = new StringBuilder(256 + groupList.Count * 64);
+            sb.Append(InsertPrefix).Append(GetTableNameString).Append(" (").Append(columnNames).Append(") VALUES");
+
+            var groupCount = groupList.Count;
+            int i = 0;
+
+            foreach (var group in groupList)
             {
-                StringBuilder batchInsetrSql = new StringBuilder();
-                batchInsetrSql.Append("INSERT INTO " + GetTableNameString + " ");
-                batchInsetrSql.Append('(');
-                batchInsetrSql.Append(columnsString);
-                batchInsetrSql.Append(") VALUES");
-                string insertColumns = "";
-                int i = 0;
-                foreach (var item in groupList)
+                sb.Append('(');
+
+                int itemCount = 0;
+                foreach (var col in group)
                 {
-                    batchInsetrSql.Append('(');
-                    insertColumns = string.Join(",", item.Select(it => base.GetDbColumn(it, FormatValue(i, it.DbColumnName, it.Value))));
-                    batchInsetrSql.Append(insertColumns);
-                    if (groupList.Last() == item)
-                    {
-                        batchInsetrSql.Append(") ");
-                    }
-                    else
-                    {
-                        batchInsetrSql.Append("),  ");
-                    }
-                    i++;
+                    if (itemCount++ > 0) sb.Append(',');
+                    sb.Append(base.GetDbColumn(col, FormatValue(i, col.DbColumnName, col.Value)));
                 }
 
-                batchInsetrSql.AppendLine(";SELECT LAST_INSERT_ROWID();");
-                if (MySqlIgnore)
-                {
-                    batchInsetrSql.Remove(0, "INSERT INTO `".Length);
-                    batchInsetrSql.Insert(0, "INSERT OR IGNORE  INTO  `");
-                }
-                var result = batchInsetrSql.ToString();
-                return result;
+                sb.Append(i == groupCount - 1 ? ") " : "), ");
+                i++;
             }
+
+            sb.AppendLine(";SELECT LAST_INSERT_ROWID();");
+
+            if (MySqlIgnore)
+            {
+                sb.Remove(0, InsertPrefix.Length);
+                sb.Insert(0, InsertIgnorePrefix);
+            }
+
+            return sb.ToString();
         }
-        public object FormatValue(int i, string name, object value)
+
+        public object FormatValue(int index, string name, object value)
         {
             if (value == null)
-            {
                 return "NULL";
-            }
-            else
+
+            var type = UtilMethods.GetUnderType(value.GetType());
+
+            if (type == UtilConstants.DateType)
             {
-                var type = UtilMethods.GetUnderType(value.GetType());
-                if (type == UtilConstants.DateType)
-                {
-                    var date = value.ObjToDate();
-                    if (date < UtilMethods.GetMinDate(this.Context.CurrentConnectionConfig))
-                    {
-                        date = UtilMethods.GetMinDate(this.Context.CurrentConnectionConfig);
-                    }
-                    if (this.Context.CurrentConnectionConfig?.MoreSettings?.DisableMillisecond == true)
-                    {
-                        return "'" + date.ToString("yyyy-MM-dd HH:mm:ss") + "'";
-                    }
-                    else
-                    {
-                        return "'" + date.ToString("yyyy-MM-dd HH:mm:ss.fff") + "'";
-                    }
-                }
-                else if (type.IsEnum())
-                {
-                    if (this.Context.CurrentConnectionConfig.MoreSettings?.TableEnumIsString == true)
-                    {
-                        return value.ToSqlValue();
-                    }
-                    else
-                    {
-                        return Convert.ToInt64(value);
-                    }
-                }
-                else if (type == UtilConstants.DateTimeOffsetType)
-                {
-                    return GetDateTimeOffsetString(value);
-                }
-                else if (type == UtilConstants.ByteArrayType)
-                {
-                    var parameterName = this.Builder.SqlParameterKeyWord + name + i;
-                    this.Parameters.Add(new SugarParameter(parameterName, value));
-                    return parameterName;
-                }
-                else if (type == UtilConstants.BoolType)
-                {
-                    return value.ObjToBool() ? "1" : "0";
-                }
-                else if (type == UtilConstants.StringType || type == UtilConstants.ObjType)
-                {
-                    return "'" + value.ToString().ToSqlFilter() + "'";
-                }
-                else
-                {
-                    return "'" + value.ToString() + "'";
-                }
+                var date = value.ObjToDate();
+                var minDate = UtilMethods.GetMinDate(Context.CurrentConnectionConfig);
+                if (date < minDate) date = minDate;
+
+                var format = Context.CurrentConnectionConfig?.MoreSettings?.DisableMillisecond == true
+                    ? "yyyy-MM-dd HH:mm:ss"
+                    : "yyyy-MM-dd HH:mm:ss.fff";
+                return $"'{date.ToString(format)}'";
             }
+
+            if (type.IsEnum())
+            {
+                if (Context.CurrentConnectionConfig.MoreSettings?.TableEnumIsString == true)
+                    return value.ToSqlValue();
+                else
+                    return Convert.ToInt64(value);
+            }
+
+            if (type == UtilConstants.DateTimeOffsetType)
+                return GetDateTimeOffsetString(value);
+
+            if (type == UtilConstants.ByteArrayType)
+            {
+                var parameterName = $"{Builder.SqlParameterKeyWord}{name}{index}";
+                Parameters.Add(new SugarParameter(parameterName, value));
+                return parameterName;
+            }
+
+            if (type == UtilConstants.BoolType)
+                return ((bool)value) ? "1" : "0";
+
+            if (type == UtilConstants.StringType || type == UtilConstants.ObjType)
+                return $"'{value.ToString().ToSqlFilter()}'";
+
+            return $"'{value}'";
         }
 
-        private object GetDateTimeOffsetString(object value)
+        private string GetDateTimeOffsetString(object value)
         {
             var date = UtilMethods.ConvertFromDateTimeOffset((DateTimeOffset)value);
-            if (date < UtilMethods.GetMinDate(this.Context.CurrentConnectionConfig))
-            {
-                date = UtilMethods.GetMinDate(this.Context.CurrentConnectionConfig);
-            }
-            return "'" + date.ToString("yyyy-MM-dd HH:mm:ss.fffffff") + "'";
-        }
-
-        private object GetDateTimeString(object value)
-        {
-            var date = value.ObjToDate();
-            if (date < UtilMethods.GetMinDate(this.Context.CurrentConnectionConfig))
-            {
-                date = UtilMethods.GetMinDate(this.Context.CurrentConnectionConfig);
-            }
-            return "'" + date.ToString("yyyy-MM-dd HH:mm:ss.fff") + "'";
+            var minDate = UtilMethods.GetMinDate(Context.CurrentConnectionConfig);
+            if (date < minDate) date = minDate;
+            return $"'{date:yyyy-MM-dd HH:mm:ss.fffffff}'";
         }
     }
 }

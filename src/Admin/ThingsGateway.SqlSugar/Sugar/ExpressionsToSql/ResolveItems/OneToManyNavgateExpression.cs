@@ -146,10 +146,9 @@ namespace ThingsGateway.SqlSugar
         {
             if (Navigat.Name == null)
             {
-                Check.ExceptionEasy(
-                   true,
-                   " NavigateType.Dynamic User-defined navigation objects need to be configured with json to be used in expressions .  " + this.ProPertyEntity.Type.Name,
-                   " NavigateType.Dynamic 自定义导航对象需要配置json才能在表达式中使用。 " + this.ProPertyEntity.Type.Name);
+                throw new SqlSugarLangException(
+                    " NavigateType.Dynamic User-defined navigation objects need to be configured with json to be used in expressions .  " + this.ProPertyEntity.Type.Name,
+                    " NavigateType.Dynamic 自定义导航对象需要配置json才能在表达式中使用。 " + this.ProPertyEntity.Type.Name);
             }
             MapperSql mapper = new MapperSql();
             var queryable = this.context.Queryable<object>();
@@ -212,14 +211,14 @@ namespace ThingsGateway.SqlSugar
             {
                 aPk = this.EntityInfo.Columns.FirstOrDefault(it => it.PropertyName == Navigat.AClassId)?.DbColumnName;
             }
-            Check.ExceptionEasy(aPk.IsNullOrEmpty(), $"{this.EntityInfo.EntityName}need primary key", $"{this.EntityInfo.EntityName}需要主键");
-            Check.ExceptionEasy(bPk.IsNullOrEmpty(), $"{this.ProPertyEntity.EntityName}need primary key", $"{this.ProPertyEntity.EntityName}需要主键");
+            if (aPk.IsNullOrEmpty()) { throw new SqlSugarLangException($"{this.EntityInfo.EntityName}need primary key", $"{this.EntityInfo.EntityName}需要主键"); }
+            if (bPk.IsNullOrEmpty()) { throw new SqlSugarLangException($"{this.ProPertyEntity.EntityName}need primary key", $"{this.ProPertyEntity.EntityName}需要主键"); }
             MapperSql mapper = new MapperSql();
             var queryable = this.context.Queryable<object>();
             bPk = queryable.QueryBuilder.Builder.GetTranslationColumnName(bPk);
             aPk = queryable.QueryBuilder.Builder.GetTranslationColumnName(aPk);
             var mappingType = Navigat.MappingType;
-            Check.ExceptionEasy(mappingType == null, "ManyToMany misconfiguration", "多对多配置错误");
+            if (mappingType == null) { throw new SqlSugarLangException("ManyToMany misconfiguration", "多对多配置错误"); }
             var mappingEntity = this.context.EntityMaintenance.GetEntityInfo(mappingType);
             var mappingTableName = queryable.QueryBuilder.Builder.GetTranslationTableName(mappingEntity.DbTableName);
             var mappingA = mappingEntity.Columns.First(it => it.PropertyName == Navigat.MappingAId).DbColumnName;
@@ -276,8 +275,12 @@ namespace ThingsGateway.SqlSugar
             {
                 pkColumn = this.EntityInfo.Columns.FirstOrDefault(it => it.PropertyName == Navigat.Name2);
             }
-            Check.ExceptionEasy(pkColumn == null, $"{this.EntityInfo.EntityName} need primary key ",
-                $"导航属性 {this.EntityInfo.EntityName}需要主键");
+
+            if (pkColumn == null)
+            {
+                throw new SqlSugarLangException($"{this.EntityInfo.EntityName} need primary key ",
+                    $"导航属性 {this.EntityInfo.EntityName}需要主键");
+            }
             var pk = pkColumn.DbColumnName;
             var name = this.ProPertyEntity.Columns.First(it => it.PropertyName == Navigat.Name).DbColumnName;
             //var selectName = this.ProPertyEntity.Columns.First(it => it.PropertyName == MemberName).DbColumnName;

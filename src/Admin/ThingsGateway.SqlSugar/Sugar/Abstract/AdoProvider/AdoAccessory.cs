@@ -45,8 +45,8 @@ namespace ThingsGateway.SqlSugar
                 else
                 {
                     // 如果不是匿名对象，抛异常
-                    Check.Exception(!entityType.IsAnonymousType(),
-                        "参数格式错误。\n请使用 new{xx=xx, xx2=xx2} 或 \nDictionary<string, object> 或 \nSugarParameter [] ");
+                    if (!entityType.IsAnonymousType())
+                        throw new SqlSugarException("参数格式错误。{\n}请使用 new{xx=xx, xx2=xx2} 或 \nDictionary<string, object> 或 \nSugarParameter [] ");
 
                     // 反射对象属性转参数
                     return PropertyToParameter(parameters, propertyInfo, sqlParameterKeyWord, entityType).ToArray();
@@ -75,7 +75,7 @@ namespace ThingsGateway.SqlSugar
                     value = DBNull.Value;
 
                 // 特殊处理 HIERARCHYID 类型
-                if (propertyty.Name.Contains("hierarchyid", StringComparison.CurrentCultureIgnoreCase))
+                if (propertyty.Name.Contains("hierarchyid", StringComparison.OrdinalIgnoreCase))
                 {
                     var parameter = new SugarParameter(sqlParameterKeyWord + propertyty.Name, SqlDbType.Udt)
                     {

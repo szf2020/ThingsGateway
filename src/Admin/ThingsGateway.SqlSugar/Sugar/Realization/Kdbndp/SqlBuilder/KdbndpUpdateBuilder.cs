@@ -43,9 +43,9 @@ namespace ThingsGateway.SqlSugar
                 if (type == UtilConstants.DateType)
                 {
                     var date = value.ObjToDate();
-                    if (date < Convert.ToDateTime("1900-1-1"))
+                    if (date < UtilMethods.MinDate)
                     {
-                        date = Convert.ToDateTime("1900-1-1");
+                        date = UtilMethods.MinDate;
                     }
                     return "'" + date.ToString("yyyy-MM-dd HH:mm:ss.fff") + "'";
                 }
@@ -87,7 +87,7 @@ namespace ThingsGateway.SqlSugar
 
         protected override string TomultipleSqlString(List<IGrouping<int, DbColumnInfo>> groupList)
         {
-            Check.Exception(PrimaryKeys == null || PrimaryKeys.Count == 0, " Update List<T> need Primary key");
+            if (PrimaryKeys == null || PrimaryKeys.Count == 0) { throw new SqlSugarException(" Update List<T> need Primary key"); }
             int pageSize = 200;
             int pageIndex = 1;
             int totalRecord = groupList.Count;

@@ -331,10 +331,9 @@ namespace ThingsGateway.SqlSugar
         /// <returns>是否成功</returns>
         public async Task<bool> ExecuteCommandAsync()
         {
-            await Task.Run(async () =>
+            await Task.Run(() =>
             {
                 ExecuteCommand();
-                await Task.Delay(0).ConfigureAwait(false);
             }).ConfigureAwait(false);
             return true;
         }

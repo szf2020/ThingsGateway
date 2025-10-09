@@ -53,12 +53,16 @@ public static class LinqExtensions
     /// <inheritdoc/>
     public static void RemoveWhere<T>(this ICollection<T> @this, Func<T, bool> @where)
     {
-        foreach (var obj in @this.Where(where).ToList())
+        var del = new List<T>();
+        foreach (var obj in @this.Where(where))
+        {
+            del.Add(obj);
+        }
+        foreach (var obj in del)
         {
             @this.Remove(obj);
         }
     }
-
     /// <inheritdoc/>
     public static IEnumerable<T> WhereIf<T>(this IEnumerable<T> thisValue, bool isOk, Func<T, bool> predicate)
     {

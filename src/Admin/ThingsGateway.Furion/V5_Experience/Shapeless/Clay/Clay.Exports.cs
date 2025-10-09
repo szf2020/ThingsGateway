@@ -17,7 +17,7 @@ using System.Text.Json.Nodes;
 using System.Xml;
 using System.Xml.Linq;
 
-using ThingsGateway.Extensions;
+using ThingsGateway.Extension;
 
 namespace ThingsGateway.Shapeless;
 

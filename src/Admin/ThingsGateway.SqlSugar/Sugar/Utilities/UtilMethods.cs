@@ -1084,8 +1084,21 @@ namespace ThingsGateway.SqlSugar
         {
             return (T)To(value, typeof(T));
         }
-        public static readonly DateTime MinDate = Convert.ToDateTime("1900-01-01");
-
+        public static readonly DateTime MinDate = ToDate("1900-01-01");
+        internal static DateTime ToDateTime(string dateTime)
+        {
+            var format = "yyyy-MM-dd HH:mm:ss";
+            var provider = CultureInfo.InvariantCulture;
+            DateTime dt = DateTime.ParseExact(dateTime, format, provider);
+            return dt;
+        }
+        internal static DateTime ToDate(string dateTime)
+        {
+            var format = "yyyy-MM-dd";
+            var provider = CultureInfo.InvariantCulture;
+            DateTime dt = DateTime.ParseExact(dateTime, format, provider);
+            return dt;
+        }
         internal static DateTime GetMinDate(ConnectionConfig currentConnectionConfig)
         {
             if (currentConnectionConfig.MoreSettings == null)
@@ -1868,7 +1881,7 @@ namespace ThingsGateway.SqlSugar
                     }
                     else if (item.IsArray)
                     {
-                        result = result.Replace(item.ParameterName, "'{" + new SerializeService().SerializeObject(item.Value).TrimStart('[').TrimEnd(']') + "}'");
+                        result = result.Replace(item.ParameterName, "'{" + DefaultServices.Serialize.SerializeObject(item.Value).TrimStart('[').TrimEnd(']') + "}'");
                     }
                     else if (item.Value is byte[] && connectionConfig.DbType == DbType.PostgreSQL)
                     {
@@ -1992,7 +2005,7 @@ namespace ThingsGateway.SqlSugar
             var entityInfo = queryable.Context?.EntityMaintenance?.GetEntityInfoWithAttr(type);
             if (entityInfo?.Discrimator.HasValue() == true)
             {
-                Check.ExceptionEasy(!Regex.IsMatch(entityInfo.Discrimator, @"^(?:\w+:\w+)(?:,\w+:\w+)*$"), "The format should be type:cat for this type, and if there are multiple, it can be FieldName:cat,FieldName2:dog ", "格式错误应该是type:cat这种格式，如果是多个可以FieldName:cat,FieldName2:dog，不要有空格");
+                if (!Regex.IsMatch(entityInfo.Discrimator, @"^(?:\w+:\w+)(?:,\w+:\w+)*$")) { throw new SqlSugarLangException("The format should be type:cat for this type, and if there are multiple, it can be FieldName:cat,FieldName2:dog ", "格式错误应该是type:cat这种格式，如果是多个可以FieldName:cat,FieldName2:dog，不要有空格"); }
                 var array = entityInfo.Discrimator.Split(',');
                 foreach (var disItem in array)
                 {
@@ -2007,7 +2020,7 @@ namespace ThingsGateway.SqlSugar
             List<string> wheres = new List<string>();
             if (entityInfo?.Discrimator.HasValue() == true)
             {
-                Check.ExceptionEasy(!Regex.IsMatch(entityInfo.Discrimator, @"^(?:\w+:\w+)(?:,\w+:\w+)*$"), "The format should be type:cat for this type, and if there are multiple, it can be FieldName:cat,FieldName2:dog ", "格式错误应该是type:cat这种格式，如果是多个可以FieldName:cat,FieldName2:dog，不要有空格");
+                if (!Regex.IsMatch(entityInfo.Discrimator, @"^(?:\w+:\w+)(?:,\w+:\w+)*$")) { throw new SqlSugarLangException("The format should be type:cat for this type, and if there are multiple, it can be FieldName:cat,FieldName2:dog ", "格式错误应该是type:cat这种格式，如果是多个可以FieldName:cat,FieldName2:dog，不要有空格"); }
                 var array = entityInfo.Discrimator.Split(',');
                 foreach (var disItem in array)
                 {

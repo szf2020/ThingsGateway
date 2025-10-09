@@ -12,7 +12,7 @@
 using Microsoft.AspNetCore.Hosting;
 
 using ThingsGateway;
-using ThingsGateway.Extensions;
+using ThingsGateway.Extension;
 using ThingsGateway.Reflection;
 
 namespace Microsoft.Extensions.Hosting;

@@ -66,7 +66,7 @@ namespace ThingsGateway.SqlSugar
                 }
                 catch (Exception ex)
                 {
-                    Check.Exception(true, ErrorMessage.ConnnectionOpen, ex.Message);
+                    { throw new SqlSugarException(ErrorMessage.ConnnectionOpen, ex.Message); }
                 }
                 return base._DbConnection;
             }
@@ -157,7 +157,7 @@ namespace ThingsGateway.SqlSugar
                         }
                         else if (Parameter.ParameterName.IsContainsInCase(KeyWord))
                         {
-                            Check.ExceptionEasy($" {Parameter.ParameterName} is key word", $"{Parameter.ParameterName}是关键词");
+                            Check.ExceptionLang($" {Parameter.ParameterName} is key word", $"{Parameter.ParameterName}是关键词");
                         }
                     }
                 }
@@ -191,7 +191,7 @@ namespace ThingsGateway.SqlSugar
             }
             if (it.Message?.Contains("无效的主机/绑定变量名") == true)
             {
-                Check.ExceptionEasy(it.Message, $"错误：{it.Message}，出现这个错的原因： 1.可能是参数名为关键词（例如 @user ）2. SQL错误。");
+                Check.ExceptionLang(it.Message, $"错误：{it.Message}，出现这个错的原因： 1.可能是参数名为关键词（例如 @user ）2. SQL错误。");
             }
         };
         public override void SetCommandToAdapter(IDataAdapter dataAdapter, DbCommand command)

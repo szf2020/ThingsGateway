@@ -16,7 +16,7 @@ using System.Globalization;
 using System.Net.Http.Headers;
 using System.Net.Mime;
 
-using ThingsGateway.Extensions;
+using ThingsGateway.Extension;
 
 using CacheControlHeaderValue = System.Net.Http.Headers.CacheControlHeaderValue;
 using StringWithQualityHeaderValue = System.Net.Http.Headers.StringWithQualityHeaderValue;

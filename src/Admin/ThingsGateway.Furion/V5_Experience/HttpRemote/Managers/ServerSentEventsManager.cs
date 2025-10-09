@@ -16,7 +16,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using System.Threading.Channels;
 
-using ThingsGateway.Extensions;
+using ThingsGateway.Extension;
 
 namespace ThingsGateway.HttpRemote;
 

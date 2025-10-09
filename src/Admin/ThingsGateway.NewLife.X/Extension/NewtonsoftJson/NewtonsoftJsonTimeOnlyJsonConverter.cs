@@ -8,22 +8,21 @@
 // 项目主要遵循 MIT 许可证和 Apache 许可证（版本 2.0）进行分发和使用。
 // 许可证的完整文本可以在源代码树根目录中的 LICENSE-APACHE 和 LICENSE-MIT 文件中找到。
 // ------------------------------------------------------------------------
-
+#if NET6_0_OR_GREATER
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace ThingsGateway.JsonSerialization;
 
 /// <summary>
-/// DateOnly 类型序列化
+/// TimeOnly 类型序列化
 /// </summary>
-[SuppressSniffer]
-public class NewtonsoftJsonDateOnlyJsonConverter : JsonConverter<DateOnly>
+public class NewtonsoftJsonTimeOnlyJsonConverter : JsonConverter<TimeOnly>
 {
     /// <summary>
     /// 构造函数
     /// </summary>
-    public NewtonsoftJsonDateOnlyJsonConverter()
+    public NewtonsoftJsonTimeOnlyJsonConverter()
         : this(default)
     {
     }
@@ -32,13 +31,13 @@ public class NewtonsoftJsonDateOnlyJsonConverter : JsonConverter<DateOnly>
     /// 构造函数
     /// </summary>
     /// <param name="format"></param>
-    public NewtonsoftJsonDateOnlyJsonConverter(string format = "yyyy-MM-dd")
+    public NewtonsoftJsonTimeOnlyJsonConverter(string format = "HH:mm:ss")
     {
         Format = format;
     }
 
     /// <summary>
-    /// 日期格式化格式
+    /// 时间格式化格式
     /// </summary>
     public string Format { get; private set; }
 
@@ -51,10 +50,10 @@ public class NewtonsoftJsonDateOnlyJsonConverter : JsonConverter<DateOnly>
     /// <param name="hasExistingValue"></param>
     /// <param name="serializer"></param>
     /// <returns></returns>
-    public override DateOnly ReadJson(JsonReader reader, Type objectType, DateOnly existingValue, bool hasExistingValue, JsonSerializer serializer)
+    public override TimeOnly ReadJson(JsonReader reader, Type objectType, TimeOnly existingValue, bool hasExistingValue, JsonSerializer serializer)
     {
         var value = JValue.ReadFrom(reader).Value<string>();
-        return DateOnly.Parse(value);
+        return TimeOnly.Parse(value);
     }
 
     /// <summary>
@@ -63,22 +62,21 @@ public class NewtonsoftJsonDateOnlyJsonConverter : JsonConverter<DateOnly>
     /// <param name="writer"></param>
     /// <param name="value"></param>
     /// <param name="serializer"></param>
-    public override void WriteJson(JsonWriter writer, DateOnly value, JsonSerializer serializer)
+    public override void WriteJson(JsonWriter writer, TimeOnly value, JsonSerializer serializer)
     {
         writer.WriteValue(value.ToString(Format));
     }
 }
 
 /// <summary>
-/// DateOnly? 类型序列化
+/// TimeOnly? 类型序列化
 /// </summary>
-[SuppressSniffer]
-public class NewtonsoftJsonNullableDateOnlyJsonConverter : JsonConverter<DateOnly?>
+public class NewtonsoftJsonNullableTimeOnlyJsonConverter : JsonConverter<TimeOnly?>
 {
     /// <summary>
     /// 构造函数
     /// </summary>
-    public NewtonsoftJsonNullableDateOnlyJsonConverter()
+    public NewtonsoftJsonNullableTimeOnlyJsonConverter()
         : this(default)
     {
     }
@@ -87,13 +85,13 @@ public class NewtonsoftJsonNullableDateOnlyJsonConverter : JsonConverter<DateOnl
     /// 构造函数
     /// </summary>
     /// <param name="format"></param>
-    public NewtonsoftJsonNullableDateOnlyJsonConverter(string format = "yyyy-MM-dd")
+    public NewtonsoftJsonNullableTimeOnlyJsonConverter(string format = "HH:mm:ss")
     {
         Format = format;
     }
 
     /// <summary>
-    /// 日期格式化格式
+    /// 时间格式化格式
     /// </summary>
     public string Format { get; private set; }
 
@@ -106,10 +104,10 @@ public class NewtonsoftJsonNullableDateOnlyJsonConverter : JsonConverter<DateOnl
     /// <param name="hasExistingValue"></param>
     /// <param name="serializer"></param>
     /// <returns></returns>
-    public override DateOnly? ReadJson(JsonReader reader, Type objectType, DateOnly? existingValue, bool hasExistingValue, JsonSerializer serializer)
+    public override TimeOnly? ReadJson(JsonReader reader, Type objectType, TimeOnly? existingValue, bool hasExistingValue, JsonSerializer serializer)
     {
         var value = JValue.ReadFrom(reader).Value<string>();
-        return !string.IsNullOrWhiteSpace(value) ? DateOnly.Parse(value) : null;
+        return !string.IsNullOrWhiteSpace(value) ? TimeOnly.Parse(value) : null;
     }
 
     /// <summary>
@@ -118,9 +116,11 @@ public class NewtonsoftJsonNullableDateOnlyJsonConverter : JsonConverter<DateOnl
     /// <param name="writer"></param>
     /// <param name="value"></param>
     /// <param name="serializer"></param>
-    public override void WriteJson(JsonWriter writer, DateOnly? value, JsonSerializer serializer)
+    public override void WriteJson(JsonWriter writer, TimeOnly? value, JsonSerializer serializer)
     {
         if (value == null) writer.WriteNull();
         else writer.WriteValue(value.Value.ToString(Format));
     }
 }
+
+#endif

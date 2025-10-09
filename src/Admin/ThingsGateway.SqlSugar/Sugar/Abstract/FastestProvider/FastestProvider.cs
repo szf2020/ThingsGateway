@@ -29,13 +29,13 @@ namespace ThingsGateway.SqlSugar
         /// <summary>批量插入DataTable数据</summary>
         public int BulkCopy(DataTable dt)
         {
-            Check.ExceptionEasy(this.AsName.IsNullOrEmpty(), "need .AS(tablaeName) ", "需要 .AS(tablaeName) 设置表名");
+            if (this.AsName.IsNullOrEmpty()) { throw new SqlSugarLangException("need .AS(tablaeName) ", "需要 .AS(tablaeName) 设置表名"); }
             return BulkCopyAsync(this.AsName, dt).ConfigureAwait(true).GetAwaiter().GetResult();
         }
         /// <summary>异步批量插入DataTable数据</summary>
         public Task<int> BulkCopyAsync(DataTable dt)
         {
-            Check.ExceptionEasy(this.AsName.IsNullOrEmpty(), "need .AS(tablaeName) ", "需要 .AS(tablaeName) 设置表名");
+            if (this.AsName.IsNullOrEmpty()) { throw new SqlSugarLangException("need .AS(tablaeName) ", "需要 .AS(tablaeName) 设置表名"); }
             return BulkCopyAsync(this.AsName, dt);
         }
         /// <summary>异步批量插入DataTable数据</summary>
@@ -137,7 +137,7 @@ namespace ThingsGateway.SqlSugar
         /// <summary>批量更新DataTable数据</summary>
         public int BulkUpdate(DataTable dataTable, string[] whereColumns, string[] updateColumns)
         {
-            Check.ExceptionEasy(this.AsName.IsNullOrEmpty(), "need .AS(tablaeName) ", "需要 .AS(tablaeName) 设置表名");
+            if (this.AsName.IsNullOrEmpty()) { throw new SqlSugarLangException("need .AS(tablaeName) ", "需要 .AS(tablaeName) 设置表名"); }
             return BulkUpdateAsync(this.AsName, dataTable, whereColumns, updateColumns).ConfigureAwait(true).GetAwaiter().GetResult();
         }
         /// <summary>批量更新DataTable数据</summary>
@@ -145,7 +145,7 @@ namespace ThingsGateway.SqlSugar
         {
             string[] updateColumns = dataTable.Columns.Cast<DataColumn>().Select(it => it.ColumnName).Where(it => !whereColumns.Contains(it)).ToArray();
             whereColumns = dataTable.Columns.Cast<DataColumn>().Select(it => it.ColumnName).Where(it => whereColumns.Contains(it)).ToArray();
-            Check.ExceptionEasy(this.AsName.IsNullOrEmpty(), "need .AS(tablaeName) ", "需要 .AS(tablaeName) 设置表名");
+            if (this.AsName.IsNullOrEmpty()) { throw new SqlSugarLangException("need .AS(tablaeName) ", "需要 .AS(tablaeName) 设置表名"); }
             return BulkUpdateAsync(this.AsName, dataTable, whereColumns, updateColumns).ConfigureAwait(true).GetAwaiter().GetResult();
         }
         /// <summary>异步批量更新DataTable数据</summary>
@@ -153,7 +153,7 @@ namespace ThingsGateway.SqlSugar
         {
             string[] updateColumns = dataTable.Columns.Cast<DataColumn>().Select(it => it.ColumnName).Where(it => !whereColumns.Contains(it)).ToArray();
             whereColumns = dataTable.Columns.Cast<DataColumn>().Select(it => it.ColumnName).Where(it => whereColumns.Contains(it)).ToArray();
-            Check.ExceptionEasy(this.AsName.IsNullOrEmpty(), "need .AS(tablaeName) ", "需要 .AS(tablaeName) 设置表名");
+            if (this.AsName.IsNullOrEmpty()) { throw new SqlSugarLangException("need .AS(tablaeName) ", "需要 .AS(tablaeName) 设置表名"); }
             return BulkUpdateAsync(this.AsName, dataTable, whereColumns, updateColumns);
         }
         /// <summary>异步批量更新DataTable数据</summary>
@@ -254,26 +254,49 @@ namespace ThingsGateway.SqlSugar
             try
             {
                 Begin(datas, false, true);
-                Check.Exception(whereColumns == null || whereColumns.Length == 0, "where columns count=0 or need primary key");
-                Check.Exception(whereColumns == null || whereColumns.Length == 0, "where columns count=0 or need primary key");
+                if (whereColumns == null || whereColumns.Length == 0) { throw new SqlSugarException("where columns count=0 or need primary key"); }
+                if (whereColumns == null || whereColumns.Length == 0) { throw new SqlSugarException("where columns count=0 or need primary key"); }
                 var isAuto = this.context.CurrentConnectionConfig.IsAutoCloseConnection;
                 this.context.CurrentConnectionConfig.IsAutoCloseConnection = false;
                 var old = this.context.Ado.IsDisableMasterSlaveSeparation;
                 this.context.Ado.IsDisableMasterSlaveSeparation = true;
-                DataTable dt = ToDdateTable(datas);
                 IFastBuilder buider = GetBuider();
                 buider.Context = context;
-                if (buider?.DbFastestProperties?.IsMerge == true)
+                int result = 0;
+                if (buider?.DbFastestProperties?.IsDataTable == true)
                 {
-                    await buider.CreateTempAsync<T>(dt).ConfigureAwait(false);
-                    await buider.ExecuteBulkCopyAsync(dt).ConfigureAwait(false);
+                    var dt = ToDdateTable(datas);
+                    if (buider?.DbFastestProperties?.IsMerge == true)
+                    {
+                        await buider.CreateTempAsync<T>(dt).ConfigureAwait(false);
+                        await buider.ExecuteBulkCopyAsync(dt).ConfigureAwait(false);
+                    }
+                    result = await buider.Merge(GetTableName(), dt, entityInfo, whereColumns, updateColumns, datas).ConfigureAwait(false);
+                    //var queryTemp = this.context.Queryable<T>().AS(dt.TableName).ToList();//test
+                    //var result = await buider.UpdateByTempAsync(GetTableName(), dt.TableName, updateColumns, whereColumns);
+                    if (buider?.DbFastestProperties?.IsMerge == true && this.context.CurrentConnectionConfig.DbType != DbType.Sqlite)
+                    {
+                        this.context.DbMaintenance.DropTable(dt.TableName);
+                    }
                 }
-                var result = await buider.Merge(GetTableName(), dt, entityInfo, whereColumns, updateColumns, datas).ConfigureAwait(false);
-                //var queryTemp = this.context.Queryable<T>().AS(dt.TableName).ToList();//test
-                //var result = await buider.UpdateByTempAsync(GetTableName(), dt.TableName, updateColumns, whereColumns);
-                if (buider?.DbFastestProperties?.IsMerge == true && this.context.CurrentConnectionConfig.DbType != DbType.Sqlite)
+                else
                 {
-                    this.context.DbMaintenance.DropTable(dt.TableName);
+                    var dict = ToDdict(datas);
+                    string? tempName = string.Empty;
+                    var tableName = GetTableName();
+                    if (buider?.DbFastestProperties?.IsMerge == true)
+                    {
+
+                        tempName = await buider.CreateTempAsync<T>(dict).ConfigureAwait(false);
+                        await buider.ExecuteBulkCopyAsync(tableName, dict).ConfigureAwait(false);
+                    }
+                    result = await buider.Merge(tableName, dict, entityInfo, whereColumns, updateColumns, datas).ConfigureAwait(false);
+                    //var queryTemp = this.context.Queryable<T>().AS(dt.TableName).ToList();//test
+                    //var result = await buider.UpdateByTempAsync(GetTableName(), dt.TableName, updateColumns, whereColumns);
+                    if (buider?.DbFastestProperties?.IsMerge == true && this.context.CurrentConnectionConfig.DbType != DbType.Sqlite && !string.IsNullOrEmpty(tempName))
+                    {
+                        this.context.DbMaintenance.DropTable(tempName);
+                    }
                 }
                 this.context.CurrentConnectionConfig.IsAutoCloseConnection = isAuto;
                 buider.CloseDb();
@@ -293,7 +316,7 @@ namespace ThingsGateway.SqlSugar
         /// <summary>准备批量合并操作</summary>
         private void _BulkMerge(DataTable dataTable, string[] whereColumns, out object newValue, out object fastestMethod, out MethodInfo bulkCopyMethod, bool isAsync, bool isIdentity)
         {
-            Check.ExceptionEasy(this.AsName.IsNullOrEmpty(), "need .AS(tablaeName) ", "需要 .AS(tablaeName) 设置表名");
+            if (this.AsName.IsNullOrEmpty()) { throw new SqlSugarLangException("need .AS(tablaeName) ", "需要 .AS(tablaeName) 设置表名"); }
             var className = "BulkMerge_" + isIdentity + this.AsName.GetNonNegativeHashCodeString();
             var builder = this.context.DynamicBuilder().CreateClass(className, new SugarTable()
             {
@@ -327,7 +350,7 @@ namespace ThingsGateway.SqlSugar
         /// <summary>准备批量合并操作</summary>
         private void _BulkMerge(DataTable dataTable, string[] whereColumns, string[] updateColumns, out object newValue, out object fastestMethod, out MethodInfo bulkCopyMethod, bool isAsync, bool isIdentity)
         {
-            Check.ExceptionEasy(this.AsName.IsNullOrEmpty(), "need .AS(tablaeName) ", "需要 .AS(tablaeName) 设置表名");
+            if (this.AsName.IsNullOrEmpty()) { throw new SqlSugarLangException("need .AS(tablaeName) ", "需要 .AS(tablaeName) 设置表名"); }
             var className = "BulkMerge_" + isIdentity + this.AsName.GetNonNegativeHashCodeString();
             var builder = this.context.DynamicBuilder().CreateClass(className, new SugarTable()
             {
@@ -369,21 +392,44 @@ namespace ThingsGateway.SqlSugar
             try
             {
                 Begin(datas, false);
-                Check.Exception(whereColumns == null || whereColumns.Length == 0, "where columns count=0 or need primary key");
-                Check.Exception(updateColumns == null || updateColumns.Length == 0, "set columns count=0");
+                if (whereColumns == null || whereColumns.Length == 0) { throw new SqlSugarException("where columns count=0 or need primary key"); }
+                if (updateColumns == null || updateColumns.Length == 0) { throw new SqlSugarException("set columns count=0"); }
                 this.context.CurrentConnectionConfig.IsAutoCloseConnection = false;
                 this.context.Ado.IsDisableMasterSlaveSeparation = true;
-                DataTable dt = ToDdateTable(datas);
+
+                int result = 0;
                 IFastBuilder buider = GetBuider();
-                ActionIgnoreColumns(whereColumns, updateColumns, dt, buider.IsActionUpdateColumns);
                 buider.Context = context;
-                await buider.CreateTempAsync<T>(dt).ConfigureAwait(false);
-                await buider.ExecuteBulkCopyAsync(dt).ConfigureAwait(false);
-                //var queryTemp = this.context.Queryable<T>().AS(dt.TableName).ToList();//test
-                var result = await buider.UpdateByTempAsync(GetTableName(), dt.TableName, updateColumns, whereColumns).ConfigureAwait(false);
-                if (this.context.CurrentConnectionConfig.DbType != DbType.Sqlite)
+                if (buider?.DbFastestProperties?.IsDataTable == true)
                 {
-                    this.context.DbMaintenance.DropTable(dt.TableName);
+                    DataTable dt = ToDdateTable(datas);
+
+                    ActionIgnoreColumns(whereColumns, updateColumns, dt, buider.IsActionUpdateColumns);
+
+                    await buider.CreateTempAsync<T>(dt).ConfigureAwait(false);
+                    await buider.ExecuteBulkCopyAsync(dt).ConfigureAwait(false);
+                    //var queryTemp = this.context.Queryable<T>().AS(dt.TableName).ToList();//test
+                    result = await buider.UpdateByTempAsync(GetTableName(), dt.TableName, updateColumns, whereColumns).ConfigureAwait(false);
+                    if (this.context.CurrentConnectionConfig.DbType != DbType.Sqlite)
+                    {
+                        this.context.DbMaintenance.DropTable(dt.TableName);
+                    }
+                }
+                else
+                {
+                    var dict = ToDdict(datas);
+                    ActionIgnoreColumns(whereColumns, updateColumns, dict, buider.IsActionUpdateColumns);
+                    var tableName = GetTableName();
+
+                    var tempName = await buider.CreateTempAsync<T>(dict).ConfigureAwait(false);
+                    await buider.ExecuteBulkCopyAsync(tableName, dict).ConfigureAwait(false);
+                    //var queryTemp = this.context.Queryable<T>().AS(dt.TableName).ToList();//test
+                    result = await buider.UpdateByTempAsync(tableName, tempName, updateColumns, whereColumns).ConfigureAwait(false);
+                    if (this.context.CurrentConnectionConfig.DbType != DbType.Sqlite)
+                    {
+                        this.context.DbMaintenance.DropTable(tempName);
+                    }
+
                 }
                 this.context.CurrentConnectionConfig.IsAutoCloseConnection = isAuto;
                 isAutoOk = true;
@@ -441,14 +487,59 @@ namespace ThingsGateway.SqlSugar
                 }
             }
         }
+        /// <summary>处理忽略列</summary>
+        private void ActionIgnoreColumns(string[] whereColumns, string[] updateColumns, Dictionary<string, (Type, List<DataInfos>)> list, bool IsActionUpdateColumns)
+        {
+            if (entityInfo.Columns.Where(it => it.IsIgnore == false).Count() > whereColumns.Length + updateColumns.Length && IsActionUpdateColumns)
+            {
+                var ignoreColumns = list
+                .Where(it => !whereColumns.Contains(it.Key) && !updateColumns.Contains(it.Key));
+                foreach (var col in ignoreColumns)
+                {
+                    if (col.Value.IsNullOrEmpty())
+                    {
+                        if (col.Value.Item1 == UtilConstants.StringType)
+                        {
+                            foreach (var dataInfos in col.Value.Item2)
+                            {
+
+                                dataInfos.Value = string.Empty;
+                                if (this.queryable?.SqlBuilder?.SqlParameterKeyWord == ":")
+                                {
+                                    dataInfos.Value = " ";
+                                }
+                            }
+                        }
+                        else if (col.Value.Item1 == UtilConstants.DateType)
+                        {
+                            foreach (var dataInfos in col.Value.Item2)
+                            {
+
+                                dataInfos.Value = UtilMethods.GetMinDate(this.context.CurrentConnectionConfig);
+
+                            }
+                        }
+                        else
+                        {
+                            foreach (var dataInfos in col.Value.Item2)
+                            {
+
+                                dataInfos.Value = Activator.CreateInstance(col.Value.Item1);
+
+                            }
+                        }
+                    }
+                }
+            }
+        }
 
         /// <summary>执行批量更新操作</summary>
         private async Task<int> _BulkUpdate(string tableName, DataTable dataTable, string[] whereColumns, string[] updateColumns)
         {
             var datas = new string[dataTable.Rows.Count];
             Begin(datas, false);
-            Check.Exception(whereColumns == null || whereColumns.Length == 0, "where columns count=0 or need primary key");
-            Check.Exception(updateColumns == null || updateColumns.Length == 0, "set columns count=0");
+            if (whereColumns == null || whereColumns.Length == 0) { throw new SqlSugarException("where columns count=0 or need primary key"); }
+            if (updateColumns == null || updateColumns.Length == 0) { throw new SqlSugarException("set columns count=0"); }
             var isAuto = this.context.CurrentConnectionConfig.IsAutoCloseConnection;
             this.context.CurrentConnectionConfig.IsAutoCloseConnection = false;
             var old = this.context.Ado.IsDisableMasterSlaveSeparation;
@@ -484,10 +575,23 @@ namespace ThingsGateway.SqlSugar
         private async Task<int> _BulkCopy(IReadOnlyCollection<T> datas)
         {
             Begin(datas, true);
-            DataTable dt = ToDdateTable(datas);
             IFastBuilder buider = GetBuider();
             buider.Context = context;
-            var result = await buider.ExecuteBulkCopyAsync(dt).ConfigureAwait(false);
+            int result = 0;
+            if (buider?.DbFastestProperties?.IsDataTable == true)
+            {
+                DataTable dt = ToDdateTable(datas);
+                result = await buider.ExecuteBulkCopyAsync(dt).ConfigureAwait(false);
+
+
+            }
+            else
+            {
+                var dict = ToDdict(datas);
+                var tableName = GetTableName();
+                result = await buider.ExecuteBulkCopyAsync(tableName, dict).ConfigureAwait(false);
+
+            }
             End(datas, true);
             return result;
         }
@@ -566,4 +670,36 @@ namespace ThingsGateway.SqlSugar
         #endregion
 
     }
+
+    public class DataInfos
+    {
+        public DataInfos()
+        {
+
+        }
+        public DataInfos(string name, object? value)
+        {
+            ColumnName = name;
+            Value = value;
+        }
+
+        public string ColumnName { get; set; }
+        public object Value { get; set; }
+    }
+
+    public static class DataInfosHelpers
+    {
+        public static IEnumerable<DataInfos> GetRows(this Dictionary<string, (Type, List<DataInfos>)> table, int rowIndex)
+        {
+            var enumerator = table.GetEnumerator();
+            while (enumerator.MoveNext())
+            {
+                var cur = enumerator.Current;
+                yield return cur.Value.Item2[rowIndex];
+            }
+
+        }
+    }
 }
+
+

@@ -18,7 +18,7 @@ namespace ThingsGateway.SqlSugar
                         var SQLiteConnectionString = base.Context.CurrentConnectionConfig.ConnectionString;
                         if (SQLiteConnectionString?.Contains('=') == false)
                         {
-                            Check.ExceptionEasy("ConnString format error . Correct format DataSource=...", "字符串格式错误，应该是DataSource=...");
+                            Check.ExceptionLang("ConnString format error . Correct format DataSource=...", "字符串格式错误，应该是DataSource=...");
                         }
                         base._DbConnection = new SqliteConnection(SQLiteConnectionString);
                     }
@@ -26,11 +26,11 @@ namespace ThingsGateway.SqlSugar
                     {
                         if (ex.InnerException != null)
                         {
-                            Check.Exception(true, ErrorMessage.ConnnectionOpen, ex.Message + "\r\n" + ex.InnerException.Message);
+                            { throw new SqlSugarException(ErrorMessage.ConnnectionOpen, ex.Message + "\r\n" + ex.InnerException.Message); }
                         }
                         else
                         {
-                            Check.Exception(true, ErrorMessage.ConnnectionOpen, ex.Message);
+                            { throw new SqlSugarException(ErrorMessage.ConnnectionOpen, ex.Message); }
                         }
                     }
                 }

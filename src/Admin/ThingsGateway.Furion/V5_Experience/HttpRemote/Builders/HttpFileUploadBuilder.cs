@@ -12,7 +12,7 @@
 using System.Net.Http.Headers;
 using System.Threading.Channels;
 
-using ThingsGateway.Extensions;
+using ThingsGateway.Extension;
 using ThingsGateway.Utilities;
 
 namespace ThingsGateway.HttpRemote;

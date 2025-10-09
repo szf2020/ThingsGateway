@@ -9,21 +9,20 @@
 // 许可证的完整文本可以在源代码树根目录中的 LICENSE-APACHE 和 LICENSE-MIT 文件中找到。
 // ------------------------------------------------------------------------
 
-using System.Text.Json;
-using System.Text.Json.Serialization;
+using Newtonsoft.Json;
 
 namespace ThingsGateway.JsonSerialization;
 
 /// <summary>
 /// DateTime 类型序列化
 /// </summary>
-[SuppressSniffer]
-public class SystemTextJsonDateTimeJsonConverter : JsonConverter<DateTime>
+
+public class NewtonsoftJsonDateTimeJsonConverter : JsonConverter<DateTime>
 {
     /// <summary>
     /// 默认构造函数
     /// </summary>
-    public SystemTextJsonDateTimeJsonConverter()
+    public NewtonsoftJsonDateTimeJsonConverter()
         : this(default)
     {
     }
@@ -32,7 +31,7 @@ public class SystemTextJsonDateTimeJsonConverter : JsonConverter<DateTime>
     /// 构造函数
     /// </summary>
     /// <param name="format"></param>
-    public SystemTextJsonDateTimeJsonConverter(string format = "yyyy-MM-dd HH:mm:ss")
+    public NewtonsoftJsonDateTimeJsonConverter(string format = "yyyy-MM-dd HH:mm:ss")
     {
         Format = format;
     }
@@ -42,7 +41,7 @@ public class SystemTextJsonDateTimeJsonConverter : JsonConverter<DateTime>
     /// </summary>
     /// <param name="format"></param>
     /// <param name="outputToLocalDateTime"></param>
-    public SystemTextJsonDateTimeJsonConverter(string format = "yyyy-MM-dd HH:mm:ss", bool outputToLocalDateTime = false)
+    public NewtonsoftJsonDateTimeJsonConverter(string format = "yyyy-MM-dd HH:mm:ss", bool outputToLocalDateTime = false)
         : this(format)
     {
         Localized = outputToLocalDateTime;
@@ -62,10 +61,13 @@ public class SystemTextJsonDateTimeJsonConverter : JsonConverter<DateTime>
     /// 反序列化
     /// </summary>
     /// <param name="reader"></param>
-    /// <param name="typeToConvert"></param>
-    /// <param name="options"></param>
+    /// <param name="objectType"></param>
+    /// <param name="existingValue"></param>
+    /// <param name="hasExistingValue"></param>
+    /// <param name="serializer"></param>
     /// <returns></returns>
-    public override DateTime Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    /// <exception cref="NotImplementedException"></exception>
+    public override DateTime ReadJson(JsonReader reader, Type objectType, DateTime existingValue, bool hasExistingValue, JsonSerializer serializer)
     {
         return Penetrates.ConvertToDateTime(ref reader);
     }
@@ -75,25 +77,26 @@ public class SystemTextJsonDateTimeJsonConverter : JsonConverter<DateTime>
     /// </summary>
     /// <param name="writer"></param>
     /// <param name="value"></param>
-    /// <param name="options"></param>
-    public override void Write(Utf8JsonWriter writer, DateTime value, JsonSerializerOptions options)
+    /// <param name="serializer"></param>
+    /// <exception cref="NotImplementedException"></exception>
+    public override void WriteJson(JsonWriter writer, DateTime value, JsonSerializer serializer)
     {
         // 判断是否序列化成当地时间
         var formatDateTime = Localized ? value.ToLocalTime() : value;
-        writer.WriteStringValue(formatDateTime.ToString(Format));
+        writer.WriteValue(formatDateTime.ToString(Format));
     }
 }
 
 /// <summary>
-/// DateTime? 类型序列化
+/// DateTime 类型序列化
 /// </summary>
-[SuppressSniffer]
-public class SystemTextJsonNullableDateTimeJsonConverter : JsonConverter<DateTime?>
+
+public class NewtonsoftNullableJsonDateTimeJsonConverter : JsonConverter<DateTime?>
 {
     /// <summary>
     /// 默认构造函数
     /// </summary>
-    public SystemTextJsonNullableDateTimeJsonConverter()
+    public NewtonsoftNullableJsonDateTimeJsonConverter()
         : this(default)
     {
     }
@@ -102,7 +105,7 @@ public class SystemTextJsonNullableDateTimeJsonConverter : JsonConverter<DateTim
     /// 构造函数
     /// </summary>
     /// <param name="format"></param>
-    public SystemTextJsonNullableDateTimeJsonConverter(string format = "yyyy-MM-dd HH:mm:ss")
+    public NewtonsoftNullableJsonDateTimeJsonConverter(string format = "yyyy-MM-dd HH:mm:ss")
     {
         Format = format;
     }
@@ -112,7 +115,7 @@ public class SystemTextJsonNullableDateTimeJsonConverter : JsonConverter<DateTim
     /// </summary>
     /// <param name="format"></param>
     /// <param name="outputToLocalDateTime"></param>
-    public SystemTextJsonNullableDateTimeJsonConverter(string format = "yyyy-MM-dd HH:mm:ss", bool outputToLocalDateTime = false)
+    public NewtonsoftNullableJsonDateTimeJsonConverter(string format = "yyyy-MM-dd HH:mm:ss", bool outputToLocalDateTime = false)
         : this(format)
     {
         Localized = outputToLocalDateTime;
@@ -132,10 +135,13 @@ public class SystemTextJsonNullableDateTimeJsonConverter : JsonConverter<DateTim
     /// 反序列化
     /// </summary>
     /// <param name="reader"></param>
-    /// <param name="typeToConvert"></param>
-    /// <param name="options"></param>
+    /// <param name="objectType"></param>
+    /// <param name="existingValue"></param>
+    /// <param name="hasExistingValue"></param>
+    /// <param name="serializer"></param>
     /// <returns></returns>
-    public override DateTime? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    /// <exception cref="NotImplementedException"></exception>
+    public override DateTime? ReadJson(JsonReader reader, Type objectType, DateTime? existingValue, bool hasExistingValue, JsonSerializer serializer)
     {
         return Penetrates.ConvertToDateTime(ref reader);
     }
@@ -145,15 +151,16 @@ public class SystemTextJsonNullableDateTimeJsonConverter : JsonConverter<DateTim
     /// </summary>
     /// <param name="writer"></param>
     /// <param name="value"></param>
-    /// <param name="options"></param>
-    public override void Write(Utf8JsonWriter writer, DateTime? value, JsonSerializerOptions options)
+    /// <param name="serializer"></param>
+    /// <exception cref="NotImplementedException"></exception>
+    public override void WriteJson(JsonWriter writer, DateTime? value, JsonSerializer serializer)
     {
-        if (value == null) writer.WriteNullValue();
+        if (value == null) writer.WriteNull();
         else
         {
             // 判断是否序列化成当地时间
             var formatDateTime = Localized ? value.Value.ToLocalTime() : value.Value;
-            writer.WriteStringValue(formatDateTime.ToString(Format));
+            writer.WriteValue(formatDateTime.ToString(Format));
         }
     }
 }

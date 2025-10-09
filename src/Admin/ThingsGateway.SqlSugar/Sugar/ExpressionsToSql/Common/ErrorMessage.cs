@@ -25,13 +25,7 @@
             }
         }
 
-        public static string ConnnectionOpen
-        {
-            get
-            {
-                return ErrorMessage.GetThrowMessage("Connection open error . {0} ", " 连接数据库过程中发生错误，检查服务器是否正常连接字符串是否正确，错误信息：{0}.");
-            }
-        }
+        public const string ConnnectionOpen = "Connection open error . ";
         public static string ExpressionCheck
         {
             get

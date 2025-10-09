@@ -1,4 +1,5 @@
-﻿using System.Linq.Expressions;
+﻿using System.Diagnostics;
+using System.Linq.Expressions;
 namespace ThingsGateway.SqlSugar
 {
     public interface IStorageable<T> where T : class, new()
@@ -94,17 +95,26 @@ namespace ThingsGateway.SqlSugar
         Other = 4,
         Ignore = 5,
     }
-    internal struct KeyValuePair<TKey, TValue, TValue2>
+    public readonly struct KeyValuePair<TKey, TValue, TValue2>
     {
-        public TKey key;
-        public TValue value1;
-        public TValue2 value2;
-        public KeyValuePair(TKey key, TValue value1, TValue2 value2)
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private readonly TKey key; // Do not rename (binary serialization)
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private readonly TValue value; // Do not rename (binary serialization)
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private readonly TValue2 value2; // Do not rename (binary serialization)
+        public KeyValuePair(TKey key, TValue value, TValue2 value2)
         {
             this.key = key;
-            this.value1 = value1;
+            this.value = value;
             this.value2 = value2;
         }
+
+        public TKey Key => key;
+
+        public TValue Value => value;
+        public TValue2 Value2 => value2;
+
     }
 
     public class StorageableResult<T> where T : class, new()
@@ -160,7 +170,7 @@ namespace ThingsGateway.SqlSugar
         }
         public int BulkUpdate(params string[] UpdateColumns)
         {
-            Check.Exception(UpdateColumns == null, "UpdateColumns is null");
+            if (UpdateColumns == null) { throw new SqlSugarException("UpdateColumns is null"); }
             if (_WhereColumnList != null && _WhereColumnList.Count != 0)
             {
                 return this._Context.Fastest<T>().AS(_AsName).BulkUpdate(UpdateList.Select(it => it.Item).ToList(), _WhereColumnList.Select(it => it.DbColumnName).ToArray(), UpdateColumns);
@@ -168,13 +178,13 @@ namespace ThingsGateway.SqlSugar
             else
             {
                 var pkColumns = this._Context.EntityMaintenance.GetEntityInfo<T>().Columns.Where(it => it.IsPrimarykey).Select(it => it.DbColumnName).ToArray();
-                Check.Exception(pkColumns.Length == 0, "need primary key");
+                if (pkColumns.Length == 0) { throw new SqlSugarException("need primary key"); }
                 return this._Context.Fastest<T>().AS(_AsName).BulkUpdate(UpdateList.Select(it => it.Item).ToList(), pkColumns, UpdateColumns);
             }
         }
         public async Task<int> BulkUpdateAsync(params string[] UpdateColumns)
         {
-            Check.Exception(UpdateColumns == null, "UpdateColumns is null");
+            if (UpdateColumns == null) { throw new SqlSugarException("UpdateColumns is null"); }
             if (_WhereColumnList != null && _WhereColumnList.Count != 0)
             {
                 return await _Context.Fastest<T>().AS(_AsName).BulkUpdateAsync(UpdateList.Select(it => it.Item).ToList(), _WhereColumnList.Select(it => it.DbColumnName).ToArray(), UpdateColumns).ConfigureAwait(false);
@@ -182,7 +192,7 @@ namespace ThingsGateway.SqlSugar
             else
             {
                 var pkColumns = this._Context.EntityMaintenance.GetEntityInfo<T>().Columns.Where(it => it.IsPrimarykey).Select(it => it.DbColumnName).ToArray();
-                Check.Exception(pkColumns.Length == 0, "need primary key");
+                if (pkColumns.Length == 0) { throw new SqlSugarException("need primary key"); }
                 return await _Context.Fastest<T>().AS(_AsName).BulkUpdateAsync(UpdateList.Select(it => it.Item).ToList(), pkColumns, UpdateColumns).ConfigureAwait(false);
             }
         }

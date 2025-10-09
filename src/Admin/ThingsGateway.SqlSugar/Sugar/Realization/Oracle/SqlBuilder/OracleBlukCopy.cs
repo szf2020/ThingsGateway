@@ -94,7 +94,7 @@ namespace ThingsGateway.SqlSugar
             if (dt == null)
                 return 0;
 
-            Check.Exception(dt.TableName == "Table", "dt.TableName can't be null ");
+            if (dt.TableName == "Table") { throw new SqlSugarException("dt.TableName can't be null "); }
 
             dt = GetCopyWriteDataTable(dt);
 
@@ -197,7 +197,7 @@ namespace ThingsGateway.SqlSugar
                             if (value.Value != null && value.Value.ToString() == DateTime.MinValue.ToString())
 
                             {
-                                value.Value = Convert.ToDateTime("1900/01/01");
+                                value.Value = UtilMethods.MinDate;
                             }
                         }
 

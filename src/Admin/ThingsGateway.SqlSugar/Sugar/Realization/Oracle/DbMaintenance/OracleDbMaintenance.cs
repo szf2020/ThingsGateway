@@ -390,7 +390,7 @@ WHERE table_name = '" + tableName + "'");
             {
                 return true;
             }
-            Check.ExceptionEasy("Oracle no support create database ", "Oracle不支持建库方法，请写有效连接字符串可以正常运行该方法。");
+            Check.ExceptionLang("Oracle no support create database ", "Oracle不支持建库方法，请写有效连接字符串可以正常运行该方法。");
             return true;
         }
         public override bool CreateDatabase(string databaseName, string databaseDirectory = null)
@@ -399,7 +399,7 @@ WHERE table_name = '" + tableName + "'");
             {
                 return true;
             }
-            Check.ExceptionEasy("Oracle no support create database ", "Oracle不支持建库方法，请写有效连接字符串可以正常运行该方法。");
+            Check.ExceptionLang("Oracle no support create database ", "Oracle不支持建库方法，请写有效连接字符串可以正常运行该方法。");
             return true;
         }
         public override bool AddRemark(EntityInfo entity)

@@ -14,7 +14,7 @@ using Microsoft.Extensions.Options;
 
 using System.Threading.Channels;
 
-using ThingsGateway.Extensions;
+using ThingsGateway.Extension;
 
 namespace ThingsGateway.HttpRemote;
 

@@ -573,7 +573,7 @@ WHERE tgrelid = '" + tableName + "'::regclass");
         protected override string GetCreateTableSql(string tableName, List<DbColumnInfo> columns)
         {
             List<string> columnArray = new List<string>();
-            Check.Exception(columns.IsNullOrEmpty(), "No columns found ");
+            if (columns.IsNullOrEmpty()) { throw new SqlSugarException("No columns found "); }
             foreach (var item in columns)
             {
                 string columnName = item.DbColumnName;

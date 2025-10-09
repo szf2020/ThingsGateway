@@ -18,7 +18,7 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Text.RegularExpressions;
 
-using ThingsGateway.Extensions;
+using ThingsGateway.Extension;
 using ThingsGateway.Utilities;
 
 using StringWithQualityHeaderValue = System.Net.Http.Headers.StringWithQualityHeaderValue;

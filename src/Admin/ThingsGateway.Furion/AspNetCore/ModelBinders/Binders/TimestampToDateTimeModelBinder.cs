@@ -11,7 +11,7 @@
 
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
-using ThingsGateway.Extensions;
+using ThingsGateway.Extension;
 
 namespace ThingsGateway.AspNetCore;
 

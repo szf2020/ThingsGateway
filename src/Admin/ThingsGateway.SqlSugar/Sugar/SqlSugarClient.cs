@@ -28,13 +28,13 @@ namespace ThingsGateway.SqlSugar
         #region Constructor
         public SqlSugarClient(ConnectionConfig config)
         {
-            Check.Exception(config == null, "ConnectionConfig config is null");
+            if (config == null) { throw new SqlSugarException("ConnectionConfig config is null"); }
             InitContext(config);
         }
 
         public SqlSugarClient(List<ConnectionConfig> configs)
         {
-            Check.Exception(configs.IsNullOrEmpty(), "List<ConnectionConfig> configs is null or count=0");
+            if (configs.IsNullOrEmpty()) { throw new SqlSugarException("List<ConnectionConfig> configs is null or count=0"); }
             InitConfigs(configs);
             var config = configs[0];
             InitContext(config);
@@ -44,7 +44,7 @@ namespace ThingsGateway.SqlSugar
         public SqlSugarClient(ConnectionConfig config, Action<SqlSugarClient> configAction)
         {
             _configAction = configAction;
-            Check.Exception(config == null, "ConnectionConfig config is null");
+            if (config == null) { throw new SqlSugarException("ConnectionConfig config is null"); }
             InitContext(config);
             configAction(this);
         }
@@ -52,7 +52,11 @@ namespace ThingsGateway.SqlSugar
         public SqlSugarClient(List<ConnectionConfig> configs, Action<SqlSugarClient> configAction)
         {
             _configAction = configAction;
-            Check.Exception(configs.IsNullOrEmpty(), "List<ConnectionConfig> configs is null or count=0");
+
+            if (configs.IsNullOrEmpty())
+            {
+                throw new SqlSugarException("List<ConnectionConfig> configs is null or count=0");
+            }
             InitConfigs(configs);
             var config = configs[0];
             InitContext(config);
@@ -173,10 +177,10 @@ namespace ThingsGateway.SqlSugar
 
         public IInsertable<T> InsertableT<T>(T insertObj) where T : class, new()
         {
-            Check.ExceptionEasy(typeof(T).FullName.Contains("System.Collections.Generic.List`"), "  need  where T: class, new() ", "需要Class,new()约束，并且类属性中不能有required修饰符");
+            if (typeof(T).FullName.Contains("System.Collections.Generic.List`")) { throw new SqlSugarLangException("  need  where T: class, new() ", "需要Class,new()约束，并且类属性中不能有required修饰符"); }
             if (typeof(T).Name == "Object")
             {
-                Check.ExceptionEasy("Object type use db.InsertableByObject(obj).ExecuteCommand()", "检测到T为Object类型，请使用 db.InsertableByObject(obj).ExecuteCommand()，Insertable不支持object，InsertableByObject可以(缺点：功能比较少)");
+                Check.ExceptionLang("Object type use db.InsertableByObject(obj).ExecuteCommand()", "检测到T为Object类型，请使用 db.InsertableByObject(obj).ExecuteCommand()，Insertable不支持object，InsertableByObject可以(缺点：功能比较少)");
             }
             return this.Context.InsertableT<T>(insertObj);
         }
@@ -544,7 +548,7 @@ namespace ThingsGateway.SqlSugar
 
         public IStorageable<T> StorageableT<T>(T data) where T : class, new()
         {
-            Check.Exception(typeof(T).FullName.Contains("System.Collections.Generic.List`"), "  need  where T: class, new() ");
+            if (typeof(T).FullName.Contains("System.Collections.Generic.List`")) { throw new SqlSugarException("  need  where T: class, new() "); }
             return this.Context.Storageable(new List<T> { data });
         }
 
@@ -815,18 +819,18 @@ namespace ThingsGateway.SqlSugar
             {
                 if (removeData.Context.Ado.IsAnyTran())
                 {
-                    Check.ExceptionEasy("RemoveConnection error  has tran", $"删除失败{removeData.ConnectionConfig.ConfigId}存在未提交事务");
+                    Check.ExceptionLang("RemoveConnection error  has tran", $"删除失败{removeData.ConnectionConfig.ConfigId}存在未提交事务");
                 }
                 else if (((object)removeData.ConnectionConfig.ConfigId).ObjToString() == currentId.ObjToString())
                 {
-                    Check.ExceptionEasy("Default ConfigId cannot be deleted", $"默认库不能删除{removeData.ConnectionConfig.ConfigId}");
+                    Check.ExceptionLang("Default ConfigId cannot be deleted", $"默认库不能删除{removeData.ConnectionConfig.ConfigId}");
                 }
                 this._AllClients.Remove(removeData);
             }
         }
         public void AddConnection(ConnectionConfig connection)
         {
-            Check.ArgumentNullException(connection, "AddConnection.connection can't be null");
+            if (connection == null) { throw new SqlSugarException("AddConnection.connection can't be null"); }
             InitTenant();
             var db = this._AllClients.FirstOrDefault(it => ((object)it.ConnectionConfig.ConfigId).ObjToString() == ((object)connection.ConfigId).ObjToString());
             if (db == null)
@@ -877,7 +881,7 @@ namespace ThingsGateway.SqlSugar
             var db = this._AllClients.FirstOrDefault(it => Convert.ToString(it.ConnectionConfig.ConfigId) == Convert.ToString(configId));
             if (db == null)
             {
-                Check.Exception(true, "ConfigId was not found {0}", configId + "");
+                { throw new SqlSugarException($"ConfigId was not found {configId}"); }
             }
             if (db.Context == null)
             {
@@ -915,7 +919,7 @@ namespace ThingsGateway.SqlSugar
         {
             configId = Convert.ToString(configId);
             var isLog = _Context.Ado.IsEnableLogEvent;
-            Check.Exception(!_AllClients.Any(it => Convert.ToString(it.ConnectionConfig.ConfigId) == Convert.ToString(configId)), "ConfigId was not found {0}", configId + "");
+            if (!_AllClients.Any(it => Convert.ToString(it.ConnectionConfig.ConfigId) == Convert.ToString(configId))) { throw new SqlSugarException($"ConfigId was not found {configId}"); }
             InitTenant(_AllClients.First(it => Convert.ToString(it.ConnectionConfig.ConfigId) == Convert.ToString(configId)));
             if (this._IsAllTran)
                 this.Ado.BeginTran();
@@ -929,7 +933,7 @@ namespace ThingsGateway.SqlSugar
         {
             var isLog = _Context.Ado.IsEnableLogEvent;
             var allConfigs = _AllClients.Select(it => it.ConnectionConfig);
-            Check.Exception(!allConfigs.Any(changeExpression), "changeExpression was not found {0}", changeExpression.ToString());
+            if (!allConfigs.Any(changeExpression)) { throw new SqlSugarException("changeExpression was not found {0}", changeExpression.ToString()); }
             InitTenant(_AllClients.First(it => it.ConnectionConfig == allConfigs.First(changeExpression)));
             if (this._IsAllTran)
                 this.Ado.BeginTran();

@@ -187,7 +187,7 @@ namespace ThingsGateway.SqlSugar
             InsertBuilder.OracleSeqInfoList = new Dictionary<string, int>();
             if ((identities.HasValue() && insertCount > 1) || InsertBuilder.IsBlukCopy)
             {
-                Check.Exception(identities.Count != identities.Distinct().Count(), "The field sequence needs to be unique");
+                if (identities.Count != identities.Distinct().Count()) { throw new SqlSugarException("The field sequence needs to be unique"); }
                 foreach (var seqName in identities)
                 {
                     int seqBeginValue = 0;

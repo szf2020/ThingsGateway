@@ -156,8 +156,8 @@ namespace ThingsGateway.SqlSugar
         public virtual List<Type> ExecuteReturnPkList<Type>()
         {
             var pkInfo = this.EntityInfo.Columns.FirstOrDefault(it => it.IsPrimarykey == true);
-            Check.ExceptionEasy(pkInfo == null, "ExecuteReturnPkList need primary key", "ExecuteReturnPkList需要主键");
-            Check.ExceptionEasy(this.EntityInfo.Columns.Count(it => it.IsPrimarykey == true) > 1, "ExecuteReturnPkList ，Only support technology single primary key", "ExecuteReturnPkList只支技单主键");
+            if (pkInfo == null) { throw new SqlSugarLangException("ExecuteReturnPkList need primary key", "ExecuteReturnPkList需要主键"); }
+            if (this.EntityInfo.Columns.Count(it => it.IsPrimarykey == true) > 1) { throw new SqlSugarLangException("ExecuteReturnPkList ，Only support technology single primary key", "ExecuteReturnPkList只支技单主键"); }
             var isIdEntity = pkInfo.IsIdentity || (pkInfo.OracleSequenceName.HasValue() && this.Context.CurrentConnectionConfig.DbType == DbType.Oracle);
             if (isIdEntity && this.InsertObjs.Count == 1)
             {
@@ -267,8 +267,8 @@ namespace ThingsGateway.SqlSugar
             var id = SnowFlakeSingle.instance.getID();
             var entity = this.Context.EntityMaintenance.GetEntityInfo<T>();
             var snowProperty = entity.Columns.FirstOrDefault(it => it.IsPrimarykey && it.PropertyInfo.PropertyType == UtilConstants.LongType);
-            Check.Exception(snowProperty == null, "The entity sets the primary key and is long");
-            Check.Exception(snowProperty.IsIdentity == true, "SnowflakeId IsIdentity can't true");
+            if (snowProperty == null) { throw new SqlSugarException("The entity sets the primary key and is long"); }
+            if (snowProperty.IsIdentity == true) { throw new SqlSugarException("SnowflakeId IsIdentity can't true"); }
             foreach (var item in this.InsertBuilder.DbColumnInfoList.Where(it => it.PropertyName == snowProperty.PropertyName))
             {
                 item.Value = id;
@@ -286,8 +286,8 @@ namespace ThingsGateway.SqlSugar
             List<long> result = new List<long>();
             var entity = this.Context.EntityMaintenance.GetEntityInfo<T>();
             var snowProperty = entity.Columns.FirstOrDefault(it => it.IsPrimarykey && it.PropertyInfo.PropertyType == UtilConstants.LongType);
-            Check.Exception(snowProperty == null, "The entity sets the primary key and is long");
-            Check.Exception(snowProperty.IsIdentity == true, "SnowflakeId IsIdentity can't true");
+            if (snowProperty == null) { throw new SqlSugarException("The entity sets the primary key and is long"); }
+            if (snowProperty.IsIdentity == true) { throw new SqlSugarException("SnowflakeId IsIdentity can't true"); }
             foreach (var item in this.InsertBuilder.DbColumnInfoList.Where(it => it.PropertyName == snowProperty.PropertyName))
             {
                 var id = SnowFlakeSingle.instance.getID();
@@ -321,8 +321,8 @@ namespace ThingsGateway.SqlSugar
             var id = SnowFlakeSingle.instance.getID();
             var entity = this.Context.EntityMaintenance.GetEntityInfo<T>();
             var snowProperty = entity.Columns.FirstOrDefault(it => it.IsPrimarykey && it.PropertyInfo.PropertyType == UtilConstants.LongType);
-            Check.Exception(snowProperty == null, "The entity sets the primary key and is long");
-            Check.Exception(snowProperty.IsIdentity == true, "SnowflakeId IsIdentity can't true");
+            if (snowProperty == null) { throw new SqlSugarException("The entity sets the primary key and is long"); }
+            if (snowProperty.IsIdentity == true) { throw new SqlSugarException("SnowflakeId IsIdentity can't true"); }
             foreach (var item in this.InsertBuilder.DbColumnInfoList.Where(it => it.PropertyName == snowProperty.PropertyName))
             {
                 item.Value = id;
@@ -340,8 +340,8 @@ namespace ThingsGateway.SqlSugar
             List<long> result = new List<long>();
             var entity = this.Context.EntityMaintenance.GetEntityInfo<T>();
             var snowProperty = entity.Columns.FirstOrDefault(it => it.IsPrimarykey && it.PropertyInfo.PropertyType == UtilConstants.LongType);
-            Check.Exception(snowProperty == null, "The entity sets the primary key and is long");
-            Check.Exception(snowProperty.IsIdentity == true, "SnowflakeId IsIdentity can't true");
+            if (snowProperty == null) { throw new SqlSugarException("The entity sets the primary key and is long"); }
+            if (snowProperty.IsIdentity == true) { throw new SqlSugarException("SnowflakeId IsIdentity can't true"); }
             foreach (var item in this.InsertBuilder.DbColumnInfoList.Where(it => it.PropertyName == snowProperty.PropertyName))
             {
                 var id = SnowFlakeSingle.instance.getID();
@@ -415,7 +415,7 @@ namespace ThingsGateway.SqlSugar
                 }
             }
             var idValue = ExecuteReturnBigIdentity();
-            Check.Exception(identityKeys.Count > 1, "ExecuteCommandIdentityIntoEntity does not support multiple identity keys");
+            if (identityKeys.Count > 1) { throw new SqlSugarException("ExecuteCommandIdentityIntoEntity does not support multiple identity keys"); }
             var identityKey = identityKeys[0];
             object setValue = 0;
             if (idValue > int.MaxValue)
@@ -585,7 +585,7 @@ namespace ThingsGateway.SqlSugar
                 }
             }
             var idValue = await ExecuteReturnBigIdentityAsync().ConfigureAwait(false);
-            Check.Exception(identityKeys.Count > 1, "ExecuteCommandIdentityIntoEntity does not support multiple identity keys");
+            if (identityKeys.Count > 1) { throw new SqlSugarException("ExecuteCommandIdentityIntoEntity does not support multiple identity keys"); }
             var identityKey = identityKeys[0];
             object setValue = 0;
             if (idValue > int.MaxValue)
@@ -746,7 +746,7 @@ namespace ThingsGateway.SqlSugar
         {
             if (isIgnoreNull)
             {
-                Check.Exception(this.InsertObjs.Count > 1, ErrorMessage.GetThrowMessage("ignoreNullColumn NoSupport batch insert, use .PageSize(1).IgnoreColumnsNull().ExecuteCommand()", "ignoreNullColumn 不支持批量操作,你可以用PageSzie(1).IgnoreColumnsNull().ExecuteCommand()"));
+                if (this.InsertObjs.Count > 1) { throw new SqlSugarException(ErrorMessage.GetThrowMessage("ignoreNullColumn NoSupport batch insert, use .PageSize(1).IgnoreColumnsNull().ExecuteCommand()", "ignoreNullColumn 不支持批量操作,你可以用PageSzie(1).IgnoreColumnsNull().ExecuteCommand()")); }
                 this.InsertBuilder.IsNoInsertNull = true;
             }
             return this;
@@ -863,7 +863,7 @@ namespace ThingsGateway.SqlSugar
         /// <returns>可插入对象</returns>
         public IInsertable<T> IgnoreColumns(bool ignoreNullColumn, bool isOffIdentity = false)
         {
-            Check.Exception(this.InsertObjs.Count > 1 && ignoreNullColumn, ErrorMessage.GetThrowMessage("ignoreNullColumn NoSupport batch insert, use .PageSize(1).IgnoreColumnsNull().ExecuteCommand()", "ignoreNullColumn 不支持批量操作, 你可以使用 .PageSize(1).IgnoreColumnsNull().ExecuteCommand()"));
+            if (this.InsertObjs.Count > 1 && ignoreNullColumn) { throw new SqlSugarException(ErrorMessage.GetThrowMessage("ignoreNullColumn NoSupport batch insert, use .PageSize(1).IgnoreColumnsNull().ExecuteCommand()", "ignoreNullColumn 不支持批量操作, 你可以使用 .PageSize(1).IgnoreColumnsNull().ExecuteCommand()")); }
             this.IsOffIdentity = isOffIdentity;
             this.InsertBuilder.IsOffIdentity = isOffIdentity;
             if (this.InsertBuilder.LambdaExpressions == null)
@@ -915,7 +915,7 @@ namespace ThingsGateway.SqlSugar
         {
             PreToSql();
             var currentType = this.Context.CurrentConnectionConfig.DbType;
-            Check.Exception(currentType != DbType.SqlServer, "UseSqlServer no support " + currentType);
+            if (currentType != DbType.SqlServer) { throw new SqlSugarException($"UseSqlServer no support {currentType}"); }
             SqlServerBlukCopy result = new SqlServerBlukCopy();
             result.DbColumnInfoList = this.InsertBuilder.DbColumnInfoList.GroupBy(it => it.TableId).ToList();
             result.InsertBuilder = this.InsertBuilder;
@@ -936,7 +936,7 @@ namespace ThingsGateway.SqlSugar
 
             var currentType = this.Context.CurrentConnectionConfig.DbType;
 
-            Check.Exception(currentType != DbType.Oracle, "UseSqlServer no support " + currentType);
+            if (currentType != DbType.Oracle) { throw new SqlSugarException($"UseSqlServer no support {currentType}"); }
 
             OracleBlukCopy result = new OracleBlukCopy();
 
@@ -975,7 +975,7 @@ namespace ThingsGateway.SqlSugar
         /// <returns>可插入对象</returns>
         public IInsertable<T> EnableDiffLogEvent(object businessData = null)
         {
-            //Check.Exception(this.InsertObjs.HasValue() && this.InsertObjs.Count() > 1, "DiffLog does not support batch operations");
+            //if(this.InsertObjs.HasValue() && this.InsertObjs.Count() > 1){throw new SqlSugarException("DiffLog does not support batch operations");}
             DiffModel = new DiffLogModel();
             this.IsEnableDiffLogEvent = true;
             DiffModel.BusinessData = businessData;
@@ -990,10 +990,10 @@ namespace ThingsGateway.SqlSugar
         /// <returns>可子插入对象</returns>
         public ISubInsertable<T> AddSubList(Expression<Func<T, object>> items)
         {
-            Check.Exception(GetPrimaryKeys().Count == 0, typeof(T).Name + " need Primary key");
-            Check.Exception(GetPrimaryKeys().Count > 1, typeof(T).Name + "Multiple primary keys are not supported");
-            //Check.Exception(this.InsertObjs.Count() > 1, "SubInserable No Support Insertable(List<T>)");
-            //Check.Exception(items.ToString().Contains(".First().")==false, items.ToString()+ " not supported ");
+            if (GetPrimaryKeys().Count == 0) { throw new SqlSugarException($"{typeof(T).Name} need Primary key"); }
+            if (GetPrimaryKeys().Count > 1) { throw new SqlSugarException($"{typeof(T).Name}Multiple primary keys are not supported"); }
+            //if(this.InsertObjs.Count() > 1){throw new SqlSugarException("SubInserable No Support Insertable(List<T>)");}
+            //if(items.ToString().Contains(".First().")==false){throw new SqlSugarException(items.ToString()+ " not supported ");}
             if (this.InsertObjs == null || this.InsertObjs.Count == 0)
             {
                 return new SubInsertable<T>();
@@ -1015,10 +1015,11 @@ namespace ThingsGateway.SqlSugar
         /// <returns>可子插入对象</returns>
         public ISubInsertable<T> AddSubList(Expression<Func<T, SubInsertTree>> tree)
         {
-            Check.Exception(GetPrimaryKeys().Count == 0, typeof(T).Name + " need Primary key");
-            Check.Exception(GetPrimaryKeys().Count > 1, typeof(T).Name + "Multiple primary keys are not supported");
-            //Check.Exception(this.InsertObjs.Count() > 1, "SubInserable No Support Insertable(List<T>)");
-            //Check.Exception(items.ToString().Contains(".First().")==false, items.ToString()+ " not supported ");
+            if (GetPrimaryKeys().Count == 0)
+            { throw new SqlSugarException($"{typeof(T).Name} need Primary key"); }
+            if (GetPrimaryKeys().Count > 1) { throw new SqlSugarException($"{typeof(T).Name}Multiple primary keys are not supported"); }
+            //if(this.InsertObjs.Count() > 1){throw new SqlSugarException("SubInserable No Support Insertable(List<T>)");}
+            //if(items.ToString().Contains(".First().")==false){throw new SqlSugarException(items.ToString()+ " not supported ");}
             if (this.InsertObjs == null || this.InsertObjs.Count == 0)
             {
                 return new SubInsertable<T>();
@@ -1077,8 +1078,7 @@ namespace ThingsGateway.SqlSugar
             }
             else
             {
-                Check.Exception(true, $" {typeof(T).Name} need SplitTableAttribute");
-                return null;
+                { throw new SqlSugarException($" {typeof(T).Name} need SplitTableAttribute"); }
             }
         }
 

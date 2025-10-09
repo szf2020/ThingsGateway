@@ -28,8 +28,8 @@
             var thisPkColumn = thisEntity.Columns.FirstOrDefault(it => it.IsPrimarykey == true);
 
             // 检查主键是否存在
-            Check.ExceptionEasy(thisPkColumn == null, $"{thisPkColumn.EntityName} need primary key", $"{thisPkColumn.EntityName}需要主键");
-            Check.ExceptionEasy(parentPkColumn == null, $"{parentPkColumn.EntityName} need primary key", $"{parentPkColumn.EntityName}需要主键");
+            if (thisPkColumn == null) { throw new SqlSugarLangException($"{thisPkColumn.EntityName} need primary key", $"{thisPkColumn.EntityName}需要主键"); }
+            if (parentPkColumn == null) { throw new SqlSugarLangException($"{parentPkColumn.EntityName} need primary key", $"{parentPkColumn.EntityName}需要主键"); }
 
             // 获取映射表信息
             var mappingType = parentNavigateProperty.Navigat.MappingType;
@@ -38,7 +38,7 @@
             var mappingB = mappingEntity.Columns.FirstOrDefault(x => x.PropertyName == parentNavigateProperty.Navigat.MappingBId);
 
             // 检查映射配置是否正确
-            Check.ExceptionEasy(mappingA == null || mappingB == null, $"Navigate property {name} error ", $"导航属性{name}配置错误");
+            if (mappingA == null || mappingB == null) { throw new SqlSugarLangException($"Navigate property {name} error ", $"导航属性{name}配置错误"); }
 
             // 获取映射表主键列(排除关联字段)
             var mappingPk = mappingEntity.Columns

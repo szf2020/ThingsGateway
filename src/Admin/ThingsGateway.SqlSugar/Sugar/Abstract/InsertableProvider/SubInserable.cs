@@ -65,7 +65,7 @@ namespace ThingsGateway.SqlSugar
             }
             catch
             {
-                Check.Exception(true, tree.ToString() + " format error ");
+                { throw new SqlSugarException($"{tree} format error "); }
             }
             return this;
         }
@@ -346,7 +346,7 @@ namespace ThingsGateway.SqlSugar
             if (id.ObjToInt() == 0)
             {
                 var primaryProperty = entityInfo.Columns.FirstOrDefault(it => it.IsPrimarykey);
-                Check.Exception(primaryProperty == null, entityInfo.EntityName + " no primarykey");
+                if (primaryProperty == null) { throw new SqlSugarException($"{entityInfo.EntityName} no primarykey"); }
                 pkValue = primaryProperty.PropertyInfo.GetValue(InsertObject);
             }
             else

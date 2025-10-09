@@ -192,18 +192,18 @@ namespace ThingsGateway.SqlSugar
         internal void Init()
         {
             InsertBuilder.EntityInfo = this.EntityInfo;
-            Check.Exception(InsertObjs == null || InsertObjs.Count == 0, "InsertObjs is null");
+            if (InsertObjs == null || InsertObjs.Count == 0) { throw new SqlSugarException("InsertObjs is null"); }
             int i = 0;
             foreach (var item in InsertObjs)
             {
                 List<DbColumnInfo> insertItem = new List<DbColumnInfo>();
                 if (item is Dictionary<string, string>)
                 {
-                    Check.ExceptionEasy("To use Insertable dictionary, use string or object", "Insertable字典请使用string,object类型");
+                    Check.ExceptionLang("To use Insertable dictionary, use string or object", "Insertable字典请使用string,object类型");
                 }
-                if (item is Dictionary<string, object>)
+                if (item is Dictionary<string, object> dict)
                 {
-                    SetInsertItemByDic(i, item, insertItem);
+                    SetInsertItemByDic(i, dict, insertItem);
                 }
                 else
                 {
@@ -284,9 +284,9 @@ namespace ThingsGateway.SqlSugar
         /// <summary>
         /// 通过字典设置插入项
         /// </summary>
-        private void SetInsertItemByDic(int i, T item, List<DbColumnInfo> insertItem)
+        private void SetInsertItemByDic(int i, Dictionary<string, object> item, List<DbColumnInfo> insertItem)
         {
-            foreach (var column in (item as Dictionary<string, object>).OrderBy(it => it.Key))
+            foreach (var column in item)
             {
                 var columnInfo = new DbColumnInfo()
                 {
@@ -389,7 +389,7 @@ namespace ThingsGateway.SqlSugar
             }
             if (EntityInfo.Discrimator.HasValue())
             {
-                Check.ExceptionEasy(!Regex.IsMatch(EntityInfo.Discrimator, @"^(?:\w+:\w+)(?:,\w+:\w+)*$"), "The format should be type:cat for this type, and if there are multiple, it can be FieldName:cat,FieldName2:dog ", "格式错误应该是type:cat这种格式，如果是多个可以FieldName:cat,FieldName2:dog，不要有空格");
+                if (!Regex.IsMatch(EntityInfo.Discrimator, @"^(?:\w+:\w+)(?:,\w+:\w+)*$")) { throw new SqlSugarLangException("The format should be type:cat for this type, and if there are multiple, it can be FieldName:cat,FieldName2:dog ", "格式错误应该是type:cat这种格式，如果是多个可以FieldName:cat,FieldName2:dog，不要有空格"); }
                 var array = EntityInfo.Discrimator.Split(',');
                 foreach (var disItem in array)
                 {
@@ -459,7 +459,7 @@ namespace ThingsGateway.SqlSugar
             {
                 if (StaticConfig.Check_StringIdentity)
                 {
-                    Check.ExceptionEasy(it.IsIdentity && it.UnderType == typeof(string), "Auto-incremented is not a string, how can I use a executable startup configuration: StaticConfig.Check_StringIdentity=false ", "自增不是能string,如何非要用可以程序启动配置：StaticConfig.Check_StringIdentity=false");
+                    if (it.IsIdentity && it.UnderType == typeof(string)) { throw new SqlSugarLangException("Auto-incremented is not a string, how can I use a executable startup configuration: StaticConfig.Check_StringIdentity=false ", "自增不是能string,如何非要用可以程序启动配置：StaticConfig.Check_StringIdentity=false"); }
                 }
                 return it.IsIdentity;
             }).Select(it => it.DbColumnName).ToList();
@@ -468,7 +468,7 @@ namespace ThingsGateway.SqlSugar
         //{
         //    if (this.Context.CurrentConnectionConfig.IsShardSameThread)
         //    {
-        //        Check.Exception(true, "IsShardSameThread=true can't be used async method");
+        //        {throw new SqlSugarException("IsShardSameThread=true can't be used async method");}
         //    }
         //    result.Start();
         //}
@@ -640,7 +640,7 @@ namespace ThingsGateway.SqlSugar
                     }
                 }
             }
-            Check.Exception(cons.IsNullOrEmpty(), "Insertable.EnableDiffLogEvent need primary key");
+            if (cons.IsNullOrEmpty()) { throw new SqlSugarException("Insertable.EnableDiffLogEvent need primary key"); }
             var sqlable = this.SqlBuilder.ConditionalModelToSql(cons);
             whereSql = sqlable.Key;
             parameters.AddRange(sqlable.Value);
@@ -693,7 +693,7 @@ namespace ThingsGateway.SqlSugar
             {
                 var oldColumns = this.InsertBuilder.DbColumnInfoList.Select(it => it.PropertyName).ToHashSet();
                 var expression = (LambdaExpression.Lambda(method).Body as LambdaExpression).Body;
-                Check.Exception(!(expression is MethodCallExpression), method.ToString() + " is not method");
+                if (!(expression is MethodCallExpression)) { throw new SqlSugarException($"{method} is not method"); }
                 var callExpresion = expression as MethodCallExpression;
                 UtilMethods.DataInoveByExpresson(this.InsertObjs, callExpresion);
                 this.InsertBuilder.DbColumnInfoList = new List<DbColumnInfo>();
@@ -774,7 +774,7 @@ namespace ThingsGateway.SqlSugar
             }
             catch
             {
-                Check.ExceptionEasy($"long to ExecuteReturnPkList<{typeof(Type).Name}> error ", $" long 转换成ExecuteReturnPkList<{typeof(Type).Name}>失败");
+                Check.ExceptionLang($"long to ExecuteReturnPkList<{typeof(Type).Name}> error ", $" long 转换成ExecuteReturnPkList<{typeof(Type).Name}>失败");
                 return null;
             }
         }
@@ -784,7 +784,7 @@ namespace ThingsGateway.SqlSugar
         /// </summary>
         private List<Type> InsertPkListGuid<Type>(EntityColumnInfo pkInfo)
         {
-            Check.ExceptionEasy(pkInfo.UnderType.Name != typeof(Type).Name, $"{pkInfo.UnderType.Name} to ExecuteReturnPkList<{typeof(Type).Name}> error ", $" {pkInfo.UnderType.Name} 转换成ExecuteReturnPkList<{typeof(Type).Name}>失败");
+            if (pkInfo.UnderType.Name != typeof(Type).Name) { throw new SqlSugarLangException($"{pkInfo.UnderType.Name} to ExecuteReturnPkList<{typeof(Type).Name}> error ", $" {pkInfo.UnderType.Name} 转换成ExecuteReturnPkList<{typeof(Type).Name}>失败"); }
             this.ExecuteCommand();
             List<Type> result = new List<Type>();
             if (InsertBuilder.DbColumnInfoList.HasValue())

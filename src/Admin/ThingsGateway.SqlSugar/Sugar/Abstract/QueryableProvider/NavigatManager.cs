@@ -151,7 +151,7 @@ namespace ThingsGateway.SqlSugar
             var navObjectName = memberExpression.Member.Name;
             var navObjectNameProperty = listItemType.GetProperty(navObjectName);
             var navObjectNameColumnInfo = listItemEntity.Columns.First(it => it.PropertyName == navObjectName);
-            Check.ExceptionEasy(navObjectNameColumnInfo.Navigat == null, $"{navObjectName} not [Navigat(..)] ", $"{navObjectName} 没有导航特性 [Navigat(..)] ");
+            if (navObjectNameColumnInfo.Navigat == null) { throw new SqlSugarLangException($"{navObjectName} not [Navigat(..)] ", $"{navObjectName} 没有导航特性 [Navigat(..)] "); }
 
             if (navObjectNameColumnInfo.Navigat.NavigatType == NavigateType.OneToOne)
             {
@@ -208,7 +208,7 @@ namespace ThingsGateway.SqlSugar
             {
                 bPkColumn = bEntityInfo.Columns.FirstOrDefault(it => it.PropertyName == navObjectNameColumnInfo.Navigat.BClassId);
             }
-            Check.ExceptionEasy(bPkColumn == null, $"{bEntityInfo.EntityName} need primary key", $"{bEntityInfo.EntityName} 实体需要配置主键");
+            if (bPkColumn == null) { throw new SqlSugarLangException($"{bEntityInfo.EntityName} need primary key", $"{bEntityInfo.EntityName} 实体需要配置主键"); }
             var bDb = this.Context;
             bDb = GetCrossDatabase(bDb, bEntity);
             bDb.InitMappingInfo(bEntity);
@@ -217,7 +217,7 @@ namespace ThingsGateway.SqlSugar
             {
                 listItemPkColumn = listItemEntity.Columns.FirstOrDefault(it => it.PropertyName == navObjectNameColumnInfo.Navigat.AClassId);
             }
-            Check.ExceptionEasy(listItemPkColumn == null, $"{listItemEntity.EntityName} need primary key", $"{listItemEntity.EntityName} 实体需要配置主键");
+            if (listItemPkColumn == null) { throw new SqlSugarLangException($"{listItemEntity.EntityName} need primary key", $"{listItemEntity.EntityName} 实体需要配置主键"); }
             var ids = list.Select(it => it.GetType().GetProperty(listItemPkColumn.PropertyName).GetValue(it)).Select(it => it == null ? "null" : it).Distinct().ToList();
             var mappingEntity = this.Context.EntityMaintenance.GetEntityInfo(navObjectNameColumnInfo.Navigat.MappingType);
             var aColumn = mappingEntity.Columns.First(it => it.PropertyName == navObjectNameColumnInfo.Navigat.MappingAId);
@@ -336,7 +336,7 @@ namespace ThingsGateway.SqlSugar
         private void OneToOne(List<object> list, Func<ISugarQueryable<object>, List<object>> selector, EntityInfo listItemEntity, System.Reflection.PropertyInfo navObjectNameProperty, EntityColumnInfo navObjectNameColumnInfo)
         {
             var navColumn = listItemEntity.Columns.FirstOrDefault(it => it.PropertyName == navObjectNameColumnInfo.Navigat.Name);
-            Check.ExceptionEasy(navColumn == null, "OneToOne navigation configuration error", $"OneToOne导航配置错误： 实体{listItemEntity.EntityName} 不存在{navObjectNameColumnInfo.Navigat.Name}");
+            if (navColumn == null) { throw new SqlSugarLangException("OneToOne navigation configuration error", $"OneToOne导航配置错误： 实体{listItemEntity.EntityName} 不存在{navObjectNameColumnInfo.Navigat.Name}"); }
             var navType = navObjectNameProperty.PropertyType;
             var db = this.Context;
             db = GetCrossDatabase(db, navType);
@@ -344,14 +344,14 @@ namespace ThingsGateway.SqlSugar
             db.InitMappingInfo(navEntityInfo.Type);
             var navPkColumn = navEntityInfo.Columns.Where(it => it.IsPrimarykey).FirstOrDefault();
             var navPkCount = navEntityInfo.Columns.Where(it => it.IsPrimarykey).Count();
-            Check.ExceptionEasy(navPkColumn == null && navObjectNameColumnInfo.Navigat.Name2 == null, navEntityInfo.EntityName + "need primarykey", navEntityInfo.EntityName + " 需要主键");
+            if (navPkColumn == null && navObjectNameColumnInfo.Navigat.Name2 == null) { throw new SqlSugarLangException(navEntityInfo.EntityName + "need primarykey", navEntityInfo.EntityName + " 需要主键"); }
             if (navObjectNameColumnInfo.Navigat.Name2.HasValue())
             {
                 navPkColumn = navEntityInfo.Columns.Where(it => it.PropertyName == navObjectNameColumnInfo.Navigat.Name2).FirstOrDefault();
             }
             if (navPkColumn == null && navType.FullName.IsCollectionsList())
             {
-                Check.ExceptionEasy($"{navObjectNameProperty.Name} type error ", $"一对一不能是List对象 {navObjectNameProperty.Name} ");
+                Check.ExceptionLang($"{navObjectNameProperty.Name} type error ", $"一对一不能是List对象 {navObjectNameProperty.Name} ");
             }
             List<object> ids = null;
             var isOwnsOneProperty = IsOwnsOneProperty(listItemEntity, navObjectNameColumnInfo);
@@ -510,7 +510,7 @@ namespace ThingsGateway.SqlSugar
 
         private void OneToMany(List<object> list, Func<ISugarQueryable<object>, List<object>> selector, EntityInfo listItemEntity, System.Reflection.PropertyInfo navObjectNameProperty, EntityColumnInfo navObjectNameColumnInfo)
         {
-            Check.ExceptionEasy(navObjectNameColumnInfo.PropertyInfo.PropertyType.GetGenericArguments().Length == 0, navObjectNameProperty?.Name + "Navigation configuration error one to many should be List<T>", navObjectNameProperty?.Name + "导航配置错误一对多应该是List<T>");
+            if (navObjectNameColumnInfo.PropertyInfo.PropertyType.GetGenericArguments().Length == 0) { throw new SqlSugarLangException(navObjectNameProperty?.Name + "Navigation configuration error one to many should be List<T>", navObjectNameProperty?.Name + "导航配置错误一对多应该是List<T>"); }
 
             var navEntity = navObjectNameColumnInfo.PropertyInfo.PropertyType.GetGenericArguments()[0];
             var navEntityInfo = this.Context.EntityMaintenance.GetEntityInfo(navEntity);
@@ -518,14 +518,14 @@ namespace ThingsGateway.SqlSugar
             childDb = GetCrossDatabase(childDb, navEntityInfo.Type);
             childDb.InitMappingInfo(navEntityInfo.Type);
             var navColumn = navEntityInfo.Columns.FirstOrDefault(it => it.PropertyName == navObjectNameColumnInfo.Navigat.Name);
-            Check.ExceptionEasy(navColumn == null, $"{navEntityInfo.EntityName} not found {navObjectNameColumnInfo.Navigat.Name} ", $"实体 {navEntityInfo.EntityName} 未找到导航配置列 {navObjectNameColumnInfo.Navigat.Name} ");
+            if (navColumn == null) { throw new SqlSugarLangException($"{navEntityInfo.EntityName} not found {navObjectNameColumnInfo.Navigat.Name} ", $"实体 {navEntityInfo.EntityName} 未找到导航配置列 {navObjectNameColumnInfo.Navigat.Name} "); }
             //var navType = navObjectNameProperty.PropertyType;
             var listItemPkColumn = listItemEntity.Columns.Where(it => it.IsPrimarykey).FirstOrDefault();
-            Check.ExceptionEasy(listItemPkColumn == null && navObjectNameColumnInfo.Navigat.Name2 == null, listItemEntity.EntityName + " not primary key", listItemEntity.EntityName + "没有主键");
+            if (listItemPkColumn == null && navObjectNameColumnInfo.Navigat.Name2 == null) { throw new SqlSugarLangException(listItemEntity.EntityName + " not primary key", listItemEntity.EntityName + "没有主键"); }
             if (navObjectNameColumnInfo.Navigat.Name2.HasValue())
             {
                 listItemPkColumn = listItemEntity.Columns.Where(it => it.PropertyName == navObjectNameColumnInfo.Navigat.Name2).FirstOrDefault();
-                Check.ExceptionEasy(listItemPkColumn == null, $"{navObjectNameColumnInfo.PropertyName} Navigate is error ", $"{navObjectNameColumnInfo.PropertyName}导航配置错误,可能顺序反了。");
+                if (listItemPkColumn == null) { throw new SqlSugarLangException($"{navObjectNameColumnInfo.PropertyName} Navigate is error ", $"{navObjectNameColumnInfo.PropertyName}导航配置错误,可能顺序反了。"); }
             }
             var ids = list.Select(it => it.GetType().GetProperty(listItemPkColumn.PropertyName).GetValue(it)).Select(it => it == null ? "null" : it).Distinct().ToList();
             List<IConditionalModel> conditionalModels = new List<IConditionalModel>();
@@ -648,7 +648,7 @@ namespace ThingsGateway.SqlSugar
                     sqlObj.WhereString = navObjectNameColumnInfo?.Navigat?.Name2;
                 }
             }
-            Check.ExceptionEasy(sqlObj.MappingExpressions.IsNullOrEmpty(), $"{expression} error,dynamic need MappingField ,Demo: Includes(it => it.Books.MappingField(z=>z.studenId,()=>it.StudentId).ToList())", $"{expression} 解析出错,自定义映射需要 MappingField ,例子: Includes(it => it.Books.MappingField(z=>z.studenId,()=>it.StudentId).ToList())");
+            if (sqlObj.MappingExpressions.IsNullOrEmpty()) { throw new SqlSugarLangException($"{expression} error,dynamic need MappingField ,Demo: Includes(it => it.Books.MappingField(z=>z.studenId,()=>it.StudentId).ToList())", $"{expression} 解析出错,自定义映射需要 MappingField ,例子: Includes(it => it.Books.MappingField(z=>z.studenId,()=>it.StudentId).ToList())"); }
             if (list.Count != 0 && navObjectNameProperty.GetValue(list[0]) == null)
             {
                 MappingFieldsHelper<T> helper = new MappingFieldsHelper<T>();
@@ -670,7 +670,7 @@ namespace ThingsGateway.SqlSugar
 
         private void OneToManyByArrayList(List<object> list, Func<ISugarQueryable<object>, List<object>> selector, EntityInfo listItemEntity, System.Reflection.PropertyInfo navObjectNamePropety, EntityColumnInfo navObjectNameColumnInfo)
         {
-            Check.ExceptionEasy(navObjectNameColumnInfo.PropertyInfo.PropertyType.GetGenericArguments().Length == 0, navObjectNamePropety?.Name + "Navigation configuration error one to many should be List<T>", navObjectNamePropety?.Name + "导航配置错误一对多应该是List<T>");
+            if (navObjectNameColumnInfo.PropertyInfo.PropertyType.GetGenericArguments().Length == 0) { throw new SqlSugarLangException(navObjectNamePropety?.Name + "Navigation configuration error one to many should be List<T>", navObjectNamePropety?.Name + "导航配置错误一对多应该是List<T>"); }
 
             var navEntity = navObjectNameColumnInfo.PropertyInfo.PropertyType.GetGenericArguments()[0];
             var navEntityInfo = this.Context.EntityMaintenance.GetEntityInfo(navEntity);
@@ -678,15 +678,15 @@ namespace ThingsGateway.SqlSugar
             childDb = GetCrossDatabase(childDb, navEntityInfo.Type);
             childDb.InitMappingInfo(navEntityInfo.Type);
             var navColumn = listItemEntity.Columns.FirstOrDefault(it => it.PropertyName == navObjectNameColumnInfo.Navigat.Name);
-            Check.ExceptionEasy(navColumn == null, $"{navEntityInfo.EntityName} not found {navObjectNameColumnInfo.Navigat.Name} ", $"实体 {navEntityInfo.EntityName} 未找到导航配置列 {navObjectNameColumnInfo.Navigat.Name} ");
-            Check.ExceptionEasy(navColumn.IsJson == false && navColumn.IsArray == false, $"Entity {navEntityInfo.EntityName} navigation configuration errors {navObjectNameColumnInfo.Navigat.Name}, needs to array and IsJson = true or Pgsql IsArray = true ", $"实体 {navEntityInfo.EntityName} 导航配置错误 {navObjectNameColumnInfo.Navigat.Name} ，需要IsJson=true的数组或者pgsql如果是数组类型用 IsArray=true");
+            if (navColumn == null) { throw new SqlSugarLangException($"{navEntityInfo.EntityName} not found {navObjectNameColumnInfo.Navigat.Name} ", $"实体 {navEntityInfo.EntityName} 未找到导航配置列 {navObjectNameColumnInfo.Navigat.Name} "); }
+            if (navColumn.IsJson == false && navColumn.IsArray == false) { throw new SqlSugarLangException($"Entity {navEntityInfo.EntityName} navigation configuration errors {navObjectNameColumnInfo.Navigat.Name}, needs to array and IsJson = true or Pgsql IsArray = true ", $"实体 {navEntityInfo.EntityName} 导航配置错误 {navObjectNameColumnInfo.Navigat.Name} ，需要IsJson=true的数组或者pgsql如果是数组类型用 IsArray=true"); }
             //var navType = navObjectNamePropety.PropertyType;
             var listItemPkColumn = navEntityInfo.Columns.Where(it => it.IsPrimarykey).FirstOrDefault();
-            Check.ExceptionEasy(listItemPkColumn == null && navObjectNameColumnInfo.Navigat.Name2 == null, listItemEntity.EntityName + " not primary key", listItemEntity.EntityName + "没有主键");
+            if (listItemPkColumn == null && navObjectNameColumnInfo.Navigat.Name2 == null) { throw new SqlSugarLangException(listItemEntity.EntityName + " not primary key", listItemEntity.EntityName + "没有主键"); }
             if (navObjectNameColumnInfo.Navigat.Name2.HasValue())
             {
                 listItemPkColumn = listItemEntity.Columns.Where(it => it.PropertyName == navObjectNameColumnInfo.Navigat.Name2).FirstOrDefault();
-                Check.ExceptionEasy(listItemPkColumn == null, $"{navObjectNameColumnInfo.PropertyName} Navigate is error ", $"{navObjectNameColumnInfo.PropertyName}导航配置错误,可能顺序反了。");
+                if (listItemPkColumn == null) { throw new SqlSugarLangException($"{navObjectNameColumnInfo.PropertyName} Navigate is error ", $"{navObjectNameColumnInfo.PropertyName}导航配置错误,可能顺序反了。"); }
             }
             var ids = list.Select(it => it.GetType().GetProperty(navColumn.PropertyName).GetValue(it)).SelectMany(it => (it as IEnumerable).Cast<object>()).Distinct().ToList();
             List<IConditionalModel> conditionalModels = new List<IConditionalModel>();
@@ -805,7 +805,7 @@ namespace ThingsGateway.SqlSugar
                     sqlObj.WhereString = navObjectNameColumnInfo?.Navigat?.Name2;
                 }
             }
-            Check.ExceptionEasy(sqlObj.MappingExpressions.IsNullOrEmpty(), $"{expression} error，dynamic need MappingField ,Demo: Includes(it => it.Books.MappingField(z=>z.studenId,()=>it.StudentId).ToList())", $"{expression}解析出错， 自定义映射需要 MappingField ,例子: Includes(it => it.Books.MappingField(z=>z.studenId,()=>it.StudentId).ToList())");
+            if (sqlObj.MappingExpressions.IsNullOrEmpty()) { throw new SqlSugarLangException($"{expression} error，dynamic need MappingField ,Demo: Includes(it => it.Books.MappingField(z=>z.studenId,()=>it.StudentId).ToList())", $"{expression}解析出错， 自定义映射需要 MappingField ,例子: Includes(it => it.Books.MappingField(z=>z.studenId,()=>it.StudentId).ToList())"); }
             if (list.Count != 0 && navObjectNameProperty.GetValue(list[0]) == null)
             {
                 MappingFieldsHelper<T> helper = new MappingFieldsHelper<T>();
@@ -941,24 +941,24 @@ namespace ThingsGateway.SqlSugar
                 }
                 else
                 {
-                    Check.ExceptionEasy($"no support {item}", $"不支持表达式{item} 不支持方法{method.Method.Name}");
+                    Check.ExceptionLang($"no support {item}", $"不支持表达式{item} 不支持方法{method.Method.Name}");
                 }
                 if (queryable.QueryBuilder.Parameters != null)
                     result.Parameters.AddRange(queryable.QueryBuilder.Parameters);
             }
             if (where.Count != 0)
             {
-                Check.ExceptionEasy(isList == false, $"{_ListCallFunc[0]} need is ToList()", $"{_ListCallFunc[0]} 需要ToList");
+                if (isList == false) { throw new SqlSugarLangException($"{_ListCallFunc[0]} need is ToList()", $"{_ListCallFunc[0]} 需要ToList"); }
                 result.WhereString = String.Join(" AND ", where);
             }
             if (orderBy.Count != 0)
             {
-                Check.ExceptionEasy(isList == false, $"{_ListCallFunc[0]} need is ToList()", $"{_ListCallFunc[0]} 需要ToList");
+                if (isList == false) { throw new SqlSugarLangException($"{_ListCallFunc[0]} need is ToList()", $"{_ListCallFunc[0]} 需要ToList"); }
                 result.OrderByString = String.Join(" , ", orderBy);
             }
             if (result.SelectString.HasValue())
             {
-                Check.ExceptionEasy(isList == false, $"{_ListCallFunc[0]} need is ToList()", $"{_ListCallFunc[0]} 需要ToList");
+                if (isList == false) { throw new SqlSugarLangException($"{_ListCallFunc[0]} need is ToList()", $"{_ListCallFunc[0]} 需要ToList"); }
                 result.OrderByString = String.Join(" , ", orderBy);
             }
             return result;
@@ -979,7 +979,7 @@ namespace ThingsGateway.SqlSugar
                 var type = types[0];
                 var entityInfo = this.Context.EntityMaintenance.GetEntityInfo(type);
                 this.Context.InitMappingInfo(type);
-                Check.ExceptionEasy(newExp.Type != entityInfo.Type, $" new {newExp.Type.Name}is error ,use Select(it=>new {entityInfo.Type.Name})", $"new {newExp.Type.Name}是错误的，请使用Select(it=>new {entityInfo.Type.Name})");
+                if (newExp.Type != entityInfo.Type) { throw new SqlSugarLangException($" new {newExp.Type.Name}is error ,use Select(it=>new {entityInfo.Type.Name})", $"new {newExp.Type.Name}是错误的，请使用Select(it=>new {entityInfo.Type.Name})"); }
                 if (!entityInfo.Columns.Any(x => x.Navigat != null))
                 {
                     result.SelectString = (" " + queryable.QueryBuilder.GetExpressionValue(exp, ResolveExpressType.SelectSingle).GetString());
@@ -1101,11 +1101,11 @@ namespace ThingsGateway.SqlSugar
             var rootShortName = GetShortName(rootExpression);
             if (rootShortName.HasValue() && childExpression.ToString().Contains($" {rootShortName}."))
             {
-                Check.ExceptionEasy($".Where({childExpression}) no support {rootShortName}.Field, Use .MappingField", $".Where({childExpression})禁止出{rootShortName}.字段 , 你可以使用.MappingField(z=>z.字段,()=>{rootShortName}.字段) 与主表字段进行过滤");
+                Check.ExceptionLang($".Where({childExpression}) no support {rootShortName}.Field, Use .MappingField", $".Where({childExpression})禁止出{rootShortName}.字段 , 你可以使用.MappingField(z=>z.字段,()=>{rootShortName}.字段) 与主表字段进行过滤");
             }
             else if (rootShortName.HasValue() && childExpression.ToString().Contains($"({rootShortName}."))
             {
-                Check.ExceptionEasy($".Where({childExpression}) no support {rootShortName}.Field, Use .MappingField", $".Where({childExpression})禁止出{rootShortName}.字段 , 你可以使用.MappingField(z=>z.字段,()=>{rootShortName}.字段) 与主表字段进行过滤");
+                Check.ExceptionLang($".Where({childExpression}) no support {rootShortName}.Field, Use .MappingField", $".Where({childExpression})禁止出{rootShortName}.字段 , 你可以使用.MappingField(z=>z.字段,()=>{rootShortName}.字段) 与主表字段进行过滤");
             }
         }
 
@@ -1182,11 +1182,11 @@ namespace ThingsGateway.SqlSugar
             {
                 string m = item["m"] + "";
                 string c = item["c"] + "";
-                Check.ExceptionEasy(m.IsNullOrEmpty() || c.IsNullOrEmpty(), $"{name} Navigation json format error, see documentation", $"{name}导航json格式错误,请看文档");
+                if (m.IsNullOrEmpty() || c.IsNullOrEmpty()) { throw new SqlSugarLangException($"{name} Navigation json format error, see documentation", $"{name}导航json格式错误,请看文档"); }
                 var cColumn = navEntityInfo.Columns.FirstOrDefault(it => it.PropertyName.EqualCase(c));
-                Check.ExceptionEasy(cColumn == null, $"{c} does not exist in {navEntityInfo.EntityName}", $"{c}不存在于{navEntityInfo.EntityName}");
+                if (cColumn == null) { throw new SqlSugarLangException($"{c} does not exist in {navEntityInfo.EntityName}", $"{c}不存在于{navEntityInfo.EntityName}"); }
                 var mColumn = listItemEntity.Columns.FirstOrDefault(it => it.PropertyName.EqualCase(m));
-                Check.ExceptionEasy(cColumn == null, $"{m} does not exist in {listItemEntity.EntityName}", $"{m}不存在于{listItemEntity.EntityName}");
+                if (cColumn == null) { throw new SqlSugarLangException($"{m} does not exist in {listItemEntity.EntityName}", $"{m}不存在于{listItemEntity.EntityName}"); }
                 sqlObj.MappingExpressions.Add(new MappingFieldsExpression()
                 {
                     LeftEntityColumn = cColumn,

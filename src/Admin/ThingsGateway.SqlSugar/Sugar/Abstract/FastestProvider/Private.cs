@@ -155,6 +155,110 @@ namespace ThingsGateway.SqlSugar
 
             return dt;
         }
+        /// <summary>将实体列表转换为DataTable</summary>
+        private Dictionary<string, ValueTuple<Type, List<DataInfos>>> ToDdict(IEnumerable<T> datas)
+        {
+            var builder = GetBuider();
+            DataTable tempDataTable = ReflectionInoCore<DataTable>.GetInstance().GetOrCreate("BulkCopyAsync" + typeof(T).GetHashCode(),
+            () =>
+            {
+                if (AsName == null)
+                {
+                    return queryable.Where(it => false).Select("*").ToDataTable();
+                }
+                else
+                {
+                    return queryable.AS(AsName).Where(it => false).Select("*").ToDataTable();
+                }
+            }
+            );
+            HashSet<string> uInt64TypeName = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            Dictionary<string, ValueTuple<Type, List<DataInfos>>> results = new(StringComparer.OrdinalIgnoreCase);
+            foreach (DataColumn item in tempDataTable.Columns)
+            {
+                if (item.DataType == typeof(UInt64))
+                {
+                    uInt64TypeName.Add(item.ColumnName);
+                }
+                if (item.DataType.Name == "ClickHouseDecimal")
+                {
+                    results.Add(item.ColumnName, (typeof(decimal), new()));
+                }
+                else
+                {
+                    results.Add(item.ColumnName, (item.DataType, new()));
+                }
+            }
+            var columns = entityInfo.Columns;
+            if (columns.Where(it => !it.IsIgnore).Count() > tempDataTable.Columns.Count)
+            {
+                var tempColumns = tempDataTable.Columns.Cast<DataColumn>().Select(it => it.ColumnName);
+                columns = columns.Where(it => tempColumns.Contains(it.DbColumnName)).ToList();
+            }
+            var isMySql = this.context.CurrentConnectionConfig.DbType.IsIn(DbType.MySql, DbType.MySqlConnector);
+            var isSqliteCore = SugarCompatible.IsFramework == false && this.context.CurrentConnectionConfig.DbType.IsIn(DbType.Sqlite);
+            foreach (var item in datas)
+            {
+                foreach (var column in columns)
+                {
+                    if (column.IsIgnore)
+                    {
+                        continue;
+                    }
+                    var name = column.DbColumnName;
+                    if (name == null)
+                    {
+                        name = column.PropertyName;
+                    }
+                    var value = ValueConverter(column, GetValue(item, column));
+                    if (column.SqlParameterDbType != null && column.SqlParameterDbType is Type && UtilMethods.HasInterface((Type)column.SqlParameterDbType, typeof(ISugarDataConverter)))
+                    {
+                        var columnInfo = column;
+                        var p = UtilMethods.GetParameterConverter(0, value, columnInfo);
+                        value = p.Value;
+                    }
+                    else if (isMySql && column.UnderType == UtilConstants.BoolType)
+                    {
+                        if (value.ObjToBool() == false && uInt64TypeName.Any(z => z.EqualCase(column.DbColumnName)))
+                        {
+                            value = DBNull.Value;
+                        }
+                    }
+                    else if (isSqliteCore && column.UnderType == UtilConstants.StringType && value is bool)
+                    {
+                        value = "isSqliteCore_" + value.ObjToString();
+                    }
+                    else if (isSqliteCore && column.UnderType == UtilConstants.BoolType && value is bool)
+                    {
+                        value = Convert.ToBoolean(value) ? 1 : 0;
+                    }
+                    else if (column.UnderType == UtilConstants.DateTimeOffsetType && value != null && value != DBNull.Value)
+                    {
+                        if (builder.DbFastestProperties?.HasOffsetTime == true)
+                        {
+                            //Don't need to deal with
+                        }
+                        else
+                        {
+                            value = UtilMethods.ConvertFromDateTimeOffset((DateTimeOffset)value);
+                        }
+                    }
+                    else if (value != DBNull.Value && value != null && column.UnderType?.FullName == "System.TimeOnly")
+                    {
+                        value = UtilMethods.TimeOnlyToTimeSpan(value);
+                    }
+                    else if (value != DBNull.Value && value != null && column.UnderType?.FullName == "System.DateOnly")
+                    {
+                        value = UtilMethods.DateOnlyToDateTime(value);
+                    }
+                    var dr = new DataInfos();
+                    dr.ColumnName = column.DbColumnName;
+                    dr.Value = value;
+                    results[column.DbColumnName].Item2.Add(dr);
+                }
+            }
+            return results;
+        }
 
         /// <summary>获取实体属性值</summary>
         private static object GetValue(T item, EntityColumnInfo column)
@@ -189,7 +293,7 @@ namespace ThingsGateway.SqlSugar
                 return DBNull.Value;
             if (value is DateTime && (DateTime)value == DateTime.MinValue)
             {
-                value = Convert.ToDateTime("1900-01-01");
+                return UtilMethods.MinDate;
             }
             else if (columnInfo.UnderType.IsEnum())
             {
@@ -316,7 +420,7 @@ namespace ThingsGateway.SqlSugar
         {
             if (!string.IsNullOrEmpty(CacheKey) || !string.IsNullOrEmpty(CacheKeyLike))
             {
-                Check.Exception(this.context.CurrentConnectionConfig.ConfigureExternalServices?.DataInfoCacheService == null, "ConnectionConfig.ConfigureExternalServices.DataInfoCacheService is null");
+                if (this.context.CurrentConnectionConfig.ConfigureExternalServices?.DataInfoCacheService == null) { throw new SqlSugarException("ConnectionConfig.ConfigureExternalServices.DataInfoCacheService is null"); }
                 var service = this.context.CurrentConnectionConfig.ConfigureExternalServices?.DataInfoCacheService;
                 if (!string.IsNullOrEmpty(CacheKey))
                 {

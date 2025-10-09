@@ -17,7 +17,7 @@ using System.Net.Mime;
 using System.Text;
 using System.Text.Json;
 
-using ThingsGateway.Extensions;
+using ThingsGateway.Extension;
 using ThingsGateway.Utilities;
 
 using MediaTypeHeaderValue = System.Net.Http.Headers.MediaTypeHeaderValue;

@@ -28,8 +28,7 @@ namespace ThingsGateway.SqlSugar
             }
             else if (result.Count >= 2)
             {
-                Check.Exception(true, ErrorMessage.GetThrowMessage(".Single()  result must not exceed one . You can use.First()", "使用single查询结果集不能大于1，适合主键查询，如果大于1你可以使用Queryable.First"));
-                return default(T);
+                { throw new SqlSugarException(ErrorMessage.GetThrowMessage(".Single()  result must not exceed one . You can use.First()", "使用single查询结果集不能大于1，适合主键查询，如果大于1你可以使用Queryable.First")); }
             }
             else
             {
@@ -298,7 +297,7 @@ namespace ThingsGateway.SqlSugar
                 return _ToParentListByTreeKey(parentIdExpression, primaryKeyValue);
             }
             List<T> result = new List<T>();
-            Check.Exception(entity.Columns.Any(it => it.IsPrimarykey), "No Primary key");
+            if (entity.Columns.Any(it => it.IsPrimarykey)) { throw new SqlSugarException("No Primary key"); }
             var parentIdName = UtilConvert.ToMemberExpression((parentIdExpression as LambdaExpression).Body).Member.Name;
             var ParentInfo = entity.Columns.First(it => it.PropertyName == parentIdName);
             var parentPropertyName = ParentInfo.DbColumnName;
@@ -322,7 +321,7 @@ namespace ThingsGateway.SqlSugar
                 int i = 0;
                 while (parentId != null && this.Context.Queryable<T>().AS(tableName).WithCacheIF(this.IsCache, this.CacheTime).Filter(null, this.QueryBuilder.IsDisabledGobalFilter).ClearFilter(this.QueryBuilder.RemoveFilters).In([parentId]).Any())
                 {
-                    Check.Exception(i > 200, ErrorMessage.GetThrowMessage("Dead cycle", "出现死循环或超出循环上限（200），检查最顶层的ParentId是否是null或者0"));
+                    if (i > 200) { throw new SqlSugarException(ErrorMessage.GetThrowMessage("Dead cycle", "出现死循环或超出循环上限（200），检查最顶层的ParentId是否是null或者0")); }
                     var parent = this.Context.Queryable<T>().AS(tableName).WithCacheIF(this.IsCache, this.CacheTime).Filter(null, this.QueryBuilder.IsDisabledGobalFilter).InSingle(parentId);
                     result.Add(parent);
                     parentId = ParentInfo.PropertyInfo.GetValue(parent, null);
@@ -340,7 +339,7 @@ namespace ThingsGateway.SqlSugar
                 return _ToParentListByTreeKey(parentIdExpression, primaryKeyValue, parentWhereExpression);
             }
             List<T> result = new List<T>();
-            Check.Exception(entity.Columns.Any(it => it.IsPrimarykey), "No Primary key");
+            if (entity.Columns.Any(it => it.IsPrimarykey)) { throw new SqlSugarException("No Primary key"); }
             var parentIdName = UtilConvert.ToMemberExpression((parentIdExpression as LambdaExpression).Body).Member.Name;
             var ParentInfo = entity.Columns.First(it => it.PropertyName == parentIdName);
             var parentPropertyName = ParentInfo.DbColumnName;
@@ -364,7 +363,7 @@ namespace ThingsGateway.SqlSugar
                 int i = 0;
                 while (parentId != null && this.Context.Queryable<T>().AS(tableName).WhereIF(parentWhereExpression != default, parentWhereExpression).Filter(null, this.QueryBuilder.IsDisabledGobalFilter).In([parentId]).Any())
                 {
-                    Check.Exception(i > 200, ErrorMessage.GetThrowMessage("Dead cycle", "出现死循环或超出循环上限（200），检查最顶层的ParentId是否是null或者0"));
+                    if (i > 200) { throw new SqlSugarException(ErrorMessage.GetThrowMessage("Dead cycle", "出现死循环或超出循环上限（200），检查最顶层的ParentId是否是null或者0")); }
                     var parent = this.Context.Queryable<T>().AS(tableName).WhereIF(parentWhereExpression != default, parentWhereExpression).Filter(null, this.QueryBuilder.IsDisabledGobalFilter).InSingle(parentId);
                     result.Add(parent);
                     parentId = ParentInfo.PropertyInfo.GetValue(parent, null);
@@ -814,7 +813,7 @@ namespace ThingsGateway.SqlSugar
         }
         public virtual void ForEach(Action<T> action, int singleMaxReads = 300, System.Threading.CancellationTokenSource cancellationTokenSource = null)
         {
-            Check.Exception(this.QueryBuilder.Skip > 0 || this.QueryBuilder.Take > 0, ErrorMessage.GetThrowMessage("no support Skip take, use PageForEach", "不支持Skip Take,请使用 Queryale.PageForEach"));
+            if (this.QueryBuilder.Skip > 0 || this.QueryBuilder.Take > 0) { throw new SqlSugarException(ErrorMessage.GetThrowMessage("no support Skip take, use PageForEach", "不支持Skip Take,请使用 Queryale.PageForEach")); }
             var totalNumber = 0;
             var totalPage = 1;
             for (int i = 1; i <= totalPage; i++)

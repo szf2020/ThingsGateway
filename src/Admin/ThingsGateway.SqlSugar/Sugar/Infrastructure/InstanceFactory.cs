@@ -573,7 +573,7 @@ namespace ThingsGateway.SqlSugar
                             type = Type.GetType(className + '`' + types.Length, true).MakeGenericType(types);
                         }
                     }
-                    Check.ArgumentNullException(type, string.Format(null, ErrorMessage.ObjNotExistCompositeFormat, className));
+                    if (type == null) { throw new SqlSugarException(string.Format(null, ErrorMessage.ObjNotExistCompositeFormat, className)); }
                     typeCache.TryAdd(cacheKey, type);
                 }
             }
@@ -653,7 +653,7 @@ namespace ThingsGateway.SqlSugar
                     {
                         type = GetCustomDbType(className, type);
                     }
-                    Check.ArgumentNullException(type, string.Format(null, ErrorMessage.ObjNotExistCompositeFormat, className));
+                    if (type == null) { throw new SqlSugarException(string.Format(null, ErrorMessage.ObjNotExistCompositeFormat, className)); }
                     typeCache.TryAdd(className, type);
                 }
             }
@@ -755,8 +755,7 @@ namespace ThingsGateway.SqlSugar
                 catch
                 {
                     var message = "Not Found " + customDllName + ".dll";
-                    Check.Exception(true, message);
-                    return null;
+                    { throw new SqlSugarException(message); }
                 }
             });
             Type type = newAssembly.GetType(className);
@@ -810,8 +809,7 @@ namespace ThingsGateway.SqlSugar
                 catch
                 {
                     var message = "Not Found " + customDllName + ".dll";
-                    Check.Exception(true, message);
-                    return null;
+                    { throw new SqlSugarException(message); }
                 }
             });
             Type typeArgument = typeof(T);

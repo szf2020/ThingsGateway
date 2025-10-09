@@ -11,7 +11,7 @@
 
 using System.Text;
 
-using ThingsGateway.Extensions;
+using ThingsGateway.Extension;
 
 namespace ThingsGateway.Utilities;
 

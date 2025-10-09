@@ -155,7 +155,7 @@ public static class DateExtensions
     /// </summary>
     /// <param name="timestamp"></param>
     /// <returns></returns>
-    internal static DateTime ConvertToDateTime(this long timestamp)
+    public static DateTime ConvertToDateTime(this long timestamp)
     {
         var timeStampDateTime = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
         var digitCount = (int)Math.Floor(Math.Log10(timestamp) + 1);
@@ -169,4 +169,5 @@ public static class DateExtensions
             ? timeStampDateTime.AddMilliseconds(timestamp)  // 13 位时间戳
             : timeStampDateTime.AddSeconds(timestamp)).ToLocalTime();   // 10 位时间戳
     }
+
 }

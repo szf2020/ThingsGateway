@@ -7,6 +7,7 @@
         public bool IsOffIdentity { get; set; }
         public bool IsMerge { get; set; }
         public bool IsNoCopyDataTable { get; set; }
+        public bool IsDataTable { get; set; } = true;
         public bool IsConvertDateTimeOffsetToDateTime { get; set; }
         public bool NoPage { get; set; }
 

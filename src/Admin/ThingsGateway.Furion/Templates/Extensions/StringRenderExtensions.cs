@@ -11,7 +11,7 @@
 
 using System.Text.RegularExpressions;
 
-using ThingsGateway.Extensions;
+using ThingsGateway.Extension;
 
 namespace ThingsGateway.Templates.Extensions;
 

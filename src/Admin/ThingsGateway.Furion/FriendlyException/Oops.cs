@@ -17,7 +17,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.Reflection;
 
-using ThingsGateway.Extensions;
+using ThingsGateway.Extension;
 using ThingsGateway.Templates.Extensions;
 
 namespace ThingsGateway.FriendlyException;

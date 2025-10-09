@@ -112,7 +112,7 @@ namespace ThingsGateway.SqlSugar
             this.Context.Utilities.RemoveCacheAll();
             if (!this.Context.DbMaintenance.IsAnySystemTablePermissions())
             {
-                Check.Exception(true, "Dbfirst and  Codefirst requires system table permissions");
+                { throw new SqlSugarException("Dbfirst and  Codefirst requires system table permissions"); }
             }
             this.TableInfoList = this.Context.Utilities.TranslateCopy(this.Context.DbMaintenance.GetTableInfoList());
             var viewList = this.Context.Utilities.TranslateCopy(this.Context.DbMaintenance.GetViewInfoList());
@@ -239,7 +239,7 @@ namespace ThingsGateway.SqlSugar
             }
             else
             {
-                Check.Exception(true, ErrorMessage.GetThrowMessage("Need to achieve ConnectionConfig.ConfigureExternal Services.RazorService", "需要实现 ConnectionConfig.ConfigureExternal Services.RazorService接口"));
+                { throw new SqlSugarException(ErrorMessage.GetThrowMessage("Need to achieve ConnectionConfig.ConfigureExternal Services.RazorService", "需要实现 ConnectionConfig.ConfigureExternal Services.RazorService接口")); }
             }
             this.Context.Utilities.RemoveCacheAll();
             result.FormatFileNameFunc = this.FormatFileNameFunc;
@@ -371,7 +371,7 @@ namespace ThingsGateway.SqlSugar
                     }
                     catch (Exception ex)
                     {
-                        Check.Exception(true, "Table '{0}' error,You can filter it with Db.DbFirst.Where(name=>name!=\"{0}\" ) \r\n Error message:{1}", tableInfo.Name, ex.Message);
+                        { throw new SqlSugarException($"Table '{0}' error,You can filter it with Db.DbFirst.Where(name=>name!=\"{tableInfo.Name}\" ) {Environment.NewLine} Error message:{ex.Message}"); }
                     }
                 }
             }
@@ -525,7 +525,7 @@ namespace ThingsGateway.SqlSugar
         public void CreateClassFile(string directoryPath, string nameSpace = "Models")
         {
             var seChar = Path.DirectorySeparatorChar.ToString();
-            Check.ArgumentNullException(directoryPath, "directoryPath can't null");
+            if (directoryPath == null) { throw new SqlSugarException("directoryPath can't null"); }
             var classStringList = ToClassStringList(nameSpace);
             if (classStringList.IsValuable())
             {

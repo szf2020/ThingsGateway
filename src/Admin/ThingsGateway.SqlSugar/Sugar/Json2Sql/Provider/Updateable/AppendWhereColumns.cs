@@ -7,7 +7,7 @@ namespace ThingsGateway.SqlSugar
         private void AppendWhereColumns(JToken item)
         {
             var columns = item.First().ToObject<string[]>();
-            Check.ExceptionEasy(columns.IsNullOrEmpty(), "need WhereColumns", "WhereColumns 需要设置列名");
+            if (columns.IsNullOrEmpty()) { throw new SqlSugarLangException("need WhereColumns", "WhereColumns 需要设置列名"); }
             this.sugarUpdateable.WhereColumns(columns);
         }
     }

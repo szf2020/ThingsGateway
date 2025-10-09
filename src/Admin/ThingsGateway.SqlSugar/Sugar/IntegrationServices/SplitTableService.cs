@@ -188,13 +188,13 @@ namespace ThingsGateway.SqlSugar
 
         private static void CheckTableName(string dbTableName)
         {
-            Check.Exception(!dbTableName.Contains("{year}"), ErrorMessage.GetThrowMessage("table name need {{year}}", "分表表名需要占位符 {{year}}"));
-            Check.Exception(!dbTableName.Contains("{month}"), ErrorMessage.GetThrowMessage("table name need {{month}}", "分表表名需要占位符 {{month}} "));
-            Check.Exception(!dbTableName.Contains("{day}"), ErrorMessage.GetThrowMessage("table name need {{day}}", "分表表名需要占位符{{day}}"));
-            Check.Exception(_yearRegex.Count(dbTableName) > 1, ErrorMessage.GetThrowMessage(" There can only be one {{year}}", " 只能有一个 {{year}}"));
-            Check.Exception(_monthRegex.Count(dbTableName) > 1, ErrorMessage.GetThrowMessage("There can only be one {{month}}", "只能有一个 {{month}} "));
-            Check.Exception(_dayRegex.Count(dbTableName) > 1, ErrorMessage.GetThrowMessage("There can only be one {{day}}", "只能有一个{{day}}"));
-            Check.Exception(_regex.IsMatch(dbTableName), ErrorMessage.GetThrowMessage(" '{{' or  '}}'  can't be numbers nearby", "占位符相令一位不能是数字,比如 : 1{{day}}2 错误 , 正确: 1_{{day}}_2"));
+            if (!dbTableName.Contains("{year}")) { throw new SqlSugarException(ErrorMessage.GetThrowMessage("table name need {{year}}", "分表表名需要占位符 {{year}}")); }
+            if (!dbTableName.Contains("{month}")) { throw new SqlSugarException(ErrorMessage.GetThrowMessage("table name need {{month}}", "分表表名需要占位符 {{month}} ")); }
+            if (!dbTableName.Contains("{day}")) { throw new SqlSugarException(ErrorMessage.GetThrowMessage("table name need {{day}}", "分表表名需要占位符{{day}}")); }
+            if (_yearRegex.Count(dbTableName) > 1) { throw new SqlSugarException(ErrorMessage.GetThrowMessage(" There can only be one {{year}}", " 只能有一个 {{year}}")); }
+            if (_monthRegex.Count(dbTableName) > 1) { throw new SqlSugarException(ErrorMessage.GetThrowMessage("There can only be one {{month}}", "只能有一个 {{month}} ")); }
+            if (_dayRegex.Count(dbTableName) > 1) { throw new SqlSugarException(ErrorMessage.GetThrowMessage("There can only be one {{day}}", "只能有一个{{day}}")); }
+            if (_regex.IsMatch(dbTableName)) { throw new SqlSugarException(ErrorMessage.GetThrowMessage(" '{{' or  '}}'  can't be numbers nearby", "占位符相令一位不能是数字,比如 : 1{{day}}2 错误 , 正确: 1_{{day}}_2")); }
         }
         #endregion
 
@@ -204,43 +204,34 @@ namespace ThingsGateway.SqlSugar
             switch (type)
             {
                 case SplitType.Day:
-                    return Convert.ToDateTime(time.ToString("yyyy-MM-dd"));
+                    return new DateTime(time.Year, time.Month, time.Day);
+
                 case SplitType.Week:
                     return GetMondayDate(time);
+
                 case SplitType.Month:
-                    return Convert.ToDateTime(time.ToString("yyyy-MM-01"));
+                    return new DateTime(time.Year, time.Month, 1);
+
                 case SplitType.Season:
-                    if (time.Month <= 3)
                     {
-                        return Convert.ToDateTime(time.ToString("yyyy-01-01"));
+                        int quarterStartMonth = time.Month - (time.Month - 1) % 3;
+                        return new DateTime(time.Year, quarterStartMonth, 1);
                     }
-                    else if (time.Month <= 6)
-                    {
-                        return Convert.ToDateTime(time.ToString("yyyy-04-01"));
-                    }
-                    else if (time.Month <= 9)
-                    {
-                        return Convert.ToDateTime(time.ToString("yyyy-07-01"));
-                    }
-                    else
-                    {
-                        return Convert.ToDateTime(time.ToString("yyyy-10-01"));
-                    }
+
                 case SplitType.Year:
-                    return Convert.ToDateTime(time.ToString("yyyy-01-01"));
+                    return new DateTime(time.Year, 1, 1);
+
                 case SplitType.Month_6:
-                    if (time.Month <= 6)
                     {
-                        return Convert.ToDateTime(time.ToString("yyyy-01-01"));
+                        int halfYearStartMonth = time.Month <= 6 ? 1 : 7;
+                        return new DateTime(time.Year, halfYearStartMonth, 1);
                     }
-                    else
-                    {
-                        return Convert.ToDateTime(time.ToString("yyyy-07-01"));
-                    }
+
                 default:
-                    throw new Exception($"SplitType parameter error ");
+                    throw new ArgumentOutOfRangeException(nameof(type), $"SplitType parameter error: {type}");
             }
         }
+
         private DateTime GetMondayDate()
         {
             return GetMondayDate(DateTime.Now);

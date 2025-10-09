@@ -144,8 +144,8 @@ namespace ThingsGateway.SqlSugar
             CheckWhere();
             PreToSql();
             AutoRemoveDataCache();
-            Check.ExceptionEasy(this.UpdateParameterIsNull && this.UpdateBuilder.DbColumnInfoList.Count == this.UpdateObjs.Count && this.UpdateObjs.Count == this.UpdateBuilder.DbColumnInfoList.Count(it => it.IsPrimarykey), "The primary key cannot be updated", "主键不能更新，更新主键会对代码逻辑存在未知隐患,如果非要更新：建议你删除在插入或者新建一个没主键的类。");
-            Check.Exception(UpdateBuilder.WhereValues.IsNullOrEmpty() && GetPrimaryKeys().IsNullOrEmpty(), "You cannot have no primary key and no conditions");
+            if (this.UpdateParameterIsNull && this.UpdateBuilder.DbColumnInfoList.Count == this.UpdateObjs.Count && this.UpdateObjs.Count == this.UpdateBuilder.DbColumnInfoList.Count(it => it.IsPrimarykey)) { throw new SqlSugarLangException("The primary key cannot be updated", "主键不能更新，更新主键会对代码逻辑存在未知隐患,如果非要更新：建议你删除在插入或者新建一个没主键的类。"); }
+            if (UpdateBuilder.WhereValues.IsNullOrEmpty() && GetPrimaryKeys().IsNullOrEmpty()) { throw new SqlSugarException("You cannot have no primary key and no conditions"); }
             string sql = UpdateBuilder.ToSqlString();
             ValidateVersion();
             RestoreMapping();
@@ -157,7 +157,7 @@ namespace ThingsGateway.SqlSugar
         {
             if (UpdateParameterIsNull && UpdateBuilder.WhereValues.IsNullOrEmpty())
             {
-                Check.ExceptionEasy("Update requires conditions", "更新需要条件 Where");
+                Check.ExceptionLang("Update requires conditions", "更新需要条件 Where");
             }
         }
 
@@ -190,7 +190,7 @@ namespace ThingsGateway.SqlSugar
                     this.UpdateBuilder.TableName = mappingInfo.DbTableName;
                 }
             }
-            //Check.Exception(UpdateObjs == null || UpdateObjs.Any(), "UpdateObjs is null");
+            //if(UpdateObjs == null || UpdateObjs.Any()){throw new SqlSugarException("UpdateObjs is null");}
             int i = 0;
             if (this.EntityInfo.Columns.Any(it => it.IsPrimarykey))
             {
@@ -202,7 +202,7 @@ namespace ThingsGateway.SqlSugar
                 var isDic = item is Dictionary<string, object>;
                 if (item is Dictionary<string, string>)
                 {
-                    Check.ExceptionEasy("To use Updateable dictionary, use string or object", "Updateable字典请使用string,object类型");
+                    Check.ExceptionLang("To use Updateable dictionary, use string or object", "Updateable字典请使用string,object类型");
                 }
                 if (isDic)
                 {
@@ -334,15 +334,15 @@ namespace ThingsGateway.SqlSugar
         {
             if (this.EntityInfo.Columns.Any(it => it.IsTranscoding))
             {
-                Check.Exception(true, ErrorMessage.GetThrowMessage("UpdateColumns no support IsTranscoding", "SetColumns方式更新不支持IsTranscoding，你可以使用db.Updateable(实体)的方式更新"));
+                { throw new SqlSugarException(ErrorMessage.GetThrowMessage("UpdateColumns no support IsTranscoding", "SetColumns方式更新不支持IsTranscoding，你可以使用db.Updateable(实体)的方式更新")); }
             }
             //if (checkIsJson && this.EntityInfo.Columns.Any(it => it.IsJson))
             //{
-            //    Check.Exception(true, ErrorMessage.GetThrowMessage("UpdateColumns no support IsJson", "SetColumns方式更新不支持IsJson，你可以使用db.Updateable(实体)的方式更新"));
+            //    {throw new SqlSugarException(ErrorMessage.GetThrowMessage("UpdateColumns no support IsJson", "SetColumns方式更新不支持IsJson，你可以使用db.Updateable(实体)的方式更新"));}
             //}
             //if (this.EntityInfo.Columns.Any(it => it.IsArray))
             //{
-            //    Check.Exception(true, ErrorMessage.GetThrowMessage("UpdateColumns no support IsArray", "SetColumns方式更新不支持IsArray，你可以使用db.Updateable(实体)的方式更新"));
+            //    {throw new SqlSugarException(ErrorMessage.GetThrowMessage("UpdateColumns no support IsArray", "SetColumns方式更新不支持IsArray，你可以使用db.Updateable(实体)的方式更新"));}
             //}
         }
         private void SetUpdateItemByDic(int i, T item, List<DbColumnInfo> updateItem)
@@ -378,7 +378,7 @@ namespace ThingsGateway.SqlSugar
             foreach (var column in EntityInfo.Columns)
             {
                 if (column.IsIgnore) continue;
-                Check.ExceptionEasy(item == null, "db.Updateable(data) data is required ", "db.Updateable(data) data不能是null");
+                if (item == null) { throw new SqlSugarLangException("db.Updateable(data) data is required ", "db.Updateable(data) data不能是null"); }
                 var columnInfo = new DbColumnInfo()
                 {
                     Value = GetValue(item, column),
@@ -484,7 +484,7 @@ namespace ThingsGateway.SqlSugar
                         continue;
                     }
                     var isContains = this.UpdateBuilder.DbColumnInfoList.Select(it => it.DbColumnName).Contains(pkName, StringComparer.OrdinalIgnoreCase);
-                    Check.Exception(isContains == false, "Use UpdateColumns().WhereColumn() ,UpdateColumns need {0}", pkName);
+                    if (isContains == false) { throw new SqlSugarException("Use UpdateColumns().WhereColumn() ,UpdateColumns need {0}", pkName); }
                 }
             }
             #region IgnoreColumns
@@ -649,7 +649,7 @@ namespace ThingsGateway.SqlSugar
             var pks = this.UpdateBuilder.DbColumnInfoList.Where(it => it.IsPrimarykey);
             if (versionColumn != null && this.IsVersionValidation)
             {
-                Check.Exception(pks.IsNullOrEmpty(), "UpdateVersionValidation the primary key is required.");
+                if (pks.IsNullOrEmpty()) { throw new SqlSugarException("UpdateVersionValidation the primary key is required."); }
                 List<IConditionalModel> conModels = new List<IConditionalModel>();
                 foreach (var item in pks)
                 {
@@ -660,8 +660,8 @@ namespace ThingsGateway.SqlSugar
                 {
                     var currentVersion = this.EntityInfo.Type.GetProperty(versionColumn.PropertyName).GetValue(UpdateObjs.Last(), null);
                     var dbVersion = this.EntityInfo.Type.GetProperty(versionColumn.PropertyName).GetValue(dbInfo, null);
-                    Check.Exception(currentVersion == null, "UpdateVersionValidation entity property {0} is not null", versionColumn.PropertyName);
-                    Check.Exception(dbVersion == null, "UpdateVersionValidation database column {0} is not null", versionColumn.DbColumnName);
+                    if (currentVersion == null) { throw new SqlSugarException("UpdateVersionValidation entity property {0} is not null", versionColumn.PropertyName); }
+                    if (dbVersion == null) { throw new SqlSugarException("UpdateVersionValidation database column {0} is not null", versionColumn.DbColumnName); }
                     if (versionColumn.PropertyInfo.PropertyType.IsIn(UtilConstants.IntType, UtilConstants.LongType))
                     {
                         if (Convert.ToInt64(dbVersion) != Convert.ToInt64(currentVersion))
@@ -714,11 +714,11 @@ namespace ThingsGateway.SqlSugar
         }
         private string _ExecuteCommandWithOptLock(T updateData, ref object oldVerValue)
         {
-            Check.ExceptionEasy(UpdateParameterIsNull == true, "Optimistic lock can only be an entity update method", "乐观锁只能是实体更新方式");
+            if (UpdateParameterIsNull == true) { throw new SqlSugarLangException("Optimistic lock can only be an entity update method", "乐观锁只能是实体更新方式"); }
             var verColumn = this.EntityInfo.Columns.FirstOrDefault(it => it.IsEnableUpdateVersionValidation);
-            Check.ExceptionEasy(verColumn == null, $" {this.EntityInfo.EntityName} need  IsEnableUpdateVersionValidation=true ", $"实体{this.EntityInfo.EntityName}没有找到版本标识特性 IsEnableUpdateVersionValidation");
-            Check.ExceptionEasy(UpdateObjs.Count > 1, $"Optimistic lock can only handle a single update ", $"乐观锁只能处理单条更新");
-            Check.ExceptionEasy(!verColumn.UnderType.IsIn(UtilConstants.StringType, UtilConstants.LongType, UtilConstants.GuidType, UtilConstants.DateType), $"Optimistic locks can only be guid, long, and string types", $"乐观锁只能是Guid、Long和字符串类型");
+            if (verColumn == null) { throw new SqlSugarLangException($" {this.EntityInfo.EntityName} need  IsEnableUpdateVersionValidation=true ", $"实体{this.EntityInfo.EntityName}没有找到版本标识特性 IsEnableUpdateVersionValidation"); }
+            if (UpdateObjs.Count > 1) { throw new SqlSugarLangException($"Optimistic lock can only handle a single update ", $"乐观锁只能处理单条更新"); }
+            if (!verColumn.UnderType.IsIn(UtilConstants.StringType, UtilConstants.LongType, UtilConstants.GuidType, UtilConstants.DateType)) { throw new SqlSugarLangException($"Optimistic locks can only be guid, long, and string types", $"乐观锁只能是Guid、Long和字符串类型"); }
             var oldValue = verColumn.PropertyInfo.GetValue(updateData);
             oldVerValue = oldValue;
             var newValue = UtilMethods.GetRandomByType(verColumn.UnderType);
@@ -732,7 +732,7 @@ namespace ThingsGateway.SqlSugar
             }
             data.Value = newValue;
             var pks = GetPrimaryKeys();
-            Check.ExceptionEasy(pks?.Any() != true, "need primary key or WhereColumn", "需要主键或者WhereColumn");
+            if (pks?.Any() != true) { throw new SqlSugarLangException("need primary key or WhereColumn", "需要主键或者WhereColumn"); }
             this.Where(verColumn.DbColumnName, "=", oldValue);
             foreach (var p in pks)
             {
@@ -789,7 +789,7 @@ namespace ThingsGateway.SqlSugar
                         }
                         catch (Exception ex)
                         {
-                            Check.ExceptionEasy(col.ColumnName + " No corresponding entity attribute found in difference log ." + ex.Message, col.ColumnName + "在差异日志中可能没有找到相应的实体属性,详细:" + ex.Message);
+                            Check.ExceptionLang(col.ColumnName + " No corresponding entity attribute found in difference log ." + ex.Message, col.ColumnName + "在差异日志中可能没有找到相应的实体属性,详细:" + ex.Message);
                         }
                     }
                     result.Add(item);
@@ -862,7 +862,7 @@ namespace ThingsGateway.SqlSugar
                         }
                         catch (Exception ex)
                         {
-                            Check.ExceptionEasy(col.ColumnName + " No corresponding entity attribute found in difference log ." + ex.Message, col.ColumnName + "在差异日志中可能没有找到相应的实体属性,详细:" + ex.Message);
+                            Check.ExceptionLang(col.ColumnName + " No corresponding entity attribute found in difference log ." + ex.Message, col.ColumnName + "在差异日志中可能没有找到相应的实体属性,详细:" + ex.Message);
                         }
                     }
                     result.Add(item);
@@ -882,19 +882,19 @@ namespace ThingsGateway.SqlSugar
 
         protected void ThrowUpdateByExpression()
         {
-            Check.Exception(UpdateParameterIsNull == true, ErrorMessage.GetThrowMessage(" no support UpdateColumns and WhereColumns", "根据表达式更新 db.Updateable<T>() 禁止使用 UpdateColumns和WhereColumns,你可以使用 SetColumns Where 等。更新分为2种方式 1.根据表达式更新 2.根据实体或者集合更新， 具体用法请查看文档 "));
+            if (UpdateParameterIsNull == true) { throw new SqlSugarException(ErrorMessage.GetThrowMessage(" no support UpdateColumns and WhereColumns", "根据表达式更新 db.Updateable<T>() 禁止使用 UpdateColumns和WhereColumns,你可以使用 SetColumns Where 等。更新分为2种方式 1.根据表达式更新 2.根据实体或者集合更新， 具体用法请查看文档 ")); }
         }
         protected void ThrowUpdateByObject()
         {
-            Check.Exception(UpdateParameterIsNull == false, ErrorMessage.GetThrowMessage(" no support SetColumns and Where", "根据对像更新 db.Updateabe(对象) 禁止使用 SetColumns和Where ,你可以使用WhereColumns 和  UpdateColumns。 更新分为2种方式 1.根据表达式更新 2.根据实体或者集合更新 ， 具体用法请查看文档 "));
+            if (UpdateParameterIsNull == false) { throw new SqlSugarException(ErrorMessage.GetThrowMessage(" no support SetColumns and Where", "根据对像更新 db.Updateabe(对象) 禁止使用 SetColumns和Where ,你可以使用WhereColumns 和  UpdateColumns。 更新分为2种方式 1.根据表达式更新 2.根据实体或者集合更新 ， 具体用法请查看文档 ")); }
         }
         protected void ThrowUpdateByExpressionByMesage(string message)
         {
-            Check.Exception(UpdateParameterIsNull == true, ErrorMessage.GetThrowMessage(" no support " + message, "根据表达式更新 db.Updateable<T>()禁止使用 " + message + "。 更新分为2种方式 1.根据表达式更新 2.根据实体或者集合更新 ， 具体用法请查看文档 "));
+            if (UpdateParameterIsNull == true) { throw new SqlSugarException(ErrorMessage.GetThrowMessage(" no support " + message, "根据表达式更新 db.Updateable<T>()禁止使用 " + message + "。 更新分为2种方式 1.根据表达式更新 2.根据实体或者集合更新 ， 具体用法请查看文档 ")); }
         }
         private void ThrowUpdateByObjectByMesage(string message)
         {
-            Check.Exception(UpdateParameterIsNull == false, ErrorMessage.GetThrowMessage(" no support " + message, "根据对象更新 db.Updateable(对象)禁止使用 " + message + "。 更新分为2种方式 1.根据表达式更新 2.根据实体或者集合更新 ， 具体用法请查看文档 "));
+            if (UpdateParameterIsNull == false) { throw new SqlSugarException(ErrorMessage.GetThrowMessage(" no support " + message, "根据对象更新 db.Updateable(对象)禁止使用 " + message + "。 更新分为2种方式 1.根据表达式更新 2.根据实体或者集合更新 ， 具体用法请查看文档 ")); }
         }
     }
 }

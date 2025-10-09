@@ -15,7 +15,7 @@ using Microsoft.Extensions.Hosting;
 
 using System.Reflection;
 
-namespace ThingsGateway.Extensions;
+namespace ThingsGateway.Extension;
 
 /// <summary>
 ///     核心模块 <see cref="IServiceCollection" /> 拓展类

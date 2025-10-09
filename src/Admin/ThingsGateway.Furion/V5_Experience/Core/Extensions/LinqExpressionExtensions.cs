@@ -12,7 +12,7 @@
 using System.Linq.Expressions;
 using System.Reflection;
 
-namespace ThingsGateway.Extensions;
+namespace ThingsGateway.Extension;
 
 /// <summary>
 ///     <see cref="Expression" /> 拓展类

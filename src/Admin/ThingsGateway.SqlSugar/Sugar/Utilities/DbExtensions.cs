@@ -118,15 +118,15 @@ namespace ThingsGateway.SqlSugar
                 }
                 else if (IsUpdateSql(value, "/", "/"))
                 {
-                    Check.ExceptionEasy($"{value} format error  ", value + "不能存在  /+【update drop 等】+/ ");
+                    Check.ExceptionLang($"{value} format error  ", value + "不能存在  /+【update drop 等】+/ ");
                 }
                 else if (IsUpdateSql(value, "/", " "))
                 {
-                    Check.ExceptionEasy($"{value} format error  ", value + "不能存在  /+【update drop 等】+空格 ");
+                    Check.ExceptionLang($"{value} format error  ", value + "不能存在  /+【update drop 等】+空格 ");
                 }
                 else if (IsUpdateSql(value, " ", "/"))
                 {
-                    Check.ExceptionEasy($"{value} format error  ", value + "不能存在  空格+【update drop 等】+/ ");
+                    Check.ExceptionLang($"{value} format error  ", value + "不能存在  空格+【update drop 等】+/ ");
                 }
                 else if (value.Contains(" update ", StringComparison.CurrentCultureIgnoreCase)
                     || value.Contains(" delete ", StringComparison.CurrentCultureIgnoreCase)
@@ -135,7 +135,7 @@ namespace ThingsGateway.SqlSugar
                     || value.Contains(" create ", StringComparison.CurrentCultureIgnoreCase)
                     || value.Contains(" insert ", StringComparison.CurrentCultureIgnoreCase))
                 {
-                    Check.ExceptionEasy($"{value} format error  ", value + "不能存在  空格+【update drop 等】+空格 ");
+                    Check.ExceptionLang($"{value} format error  ", value + "不能存在  空格+【update drop 等】+空格 ");
                 }
             }
             return value;

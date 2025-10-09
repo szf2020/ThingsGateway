@@ -461,12 +461,12 @@ namespace ThingsGateway.SqlSugar
             //A
             var aEntity = this.Context.EntityMaintenance.GetEntityInfo(aType);
             var aPropertyName = aEntity.Columns.FirstOrDefault(it => it.IsPrimarykey == true)?.PropertyName;
-            Check.Exception(aPropertyName == null, aEntity.EntityName + " no primary key");
+            if (aPropertyName == null) { throw new SqlSugarException($"{aEntity.EntityName} no primary key"); }
 
             //B
             var bEntity = this.Context.EntityMaintenance.GetEntityInfo(bType);
             var bProperty = bEntity.Columns.FirstOrDefault(it => it.IsPrimarykey == true)?.PropertyName;
-            Check.Exception(bProperty == null, bEntity.EntityName + " no primary key");
+            if (bProperty == null) { throw new SqlSugarException($"{bEntity.EntityName} no primary key"); }
             var bDbField = bEntity.Columns.FirstOrDefault(it => it.IsPrimarykey == true).DbColumnName;
             this.Mapper((it, cache) =>
             {
@@ -535,7 +535,7 @@ namespace ThingsGateway.SqlSugar
         }
         public ISugarQueryable<T> Mapper<TObject>(Expression<Func<T, TObject>> mapperObject, Expression<Func<T, object>> mainField, Expression<Func<T, object>> childField)
         {
-            Check.Exception(mapperObject.ReturnType.Name == "IList`1", "Mapper no support IList , Use List<T>");
+            if (mapperObject.ReturnType.Name == "IList`1") { throw new SqlSugarException("Mapper no support IList , Use List<T>"); }
             if (CallContext.MapperExpression.Value == null)
             {
                 CallContext.MapperExpression.Value = new List<MapperExpression>();
@@ -549,7 +549,7 @@ namespace ThingsGateway.SqlSugar
         }
         public virtual ISugarQueryable<T> Mapper<TObject>(Expression<Func<T, List<TObject>>> mapperObject, Expression<Func<T, object>> mapperField)
         {
-            Check.Exception(mapperObject.ReturnType.Name == "IList`1", "Mapper no support IList , Use List<T>");
+            if (mapperObject.ReturnType.Name == "IList`1") { throw new SqlSugarException("Mapper no support IList , Use List<T>"); }
             if (CallContext.MapperExpression.Value == null)
             {
                 CallContext.MapperExpression.Value = new List<MapperExpression>();
@@ -663,8 +663,8 @@ namespace ThingsGateway.SqlSugar
         public ISugarQueryable<T> TranLock(DbLockType? LockType = DbLockType.Wait)
         {
             if (LockType == null) return this;
-            Check.ExceptionEasy(this.Context.Ado.Transaction == null, "need BeginTran", "需要事务才能使用TranLock");
-            Check.ExceptionEasy(this.QueryBuilder.IsSingle() == false, "TranLock, can only be used for single table query", "TranLock只能用在单表查询");
+            if (this.Context.Ado.Transaction == null) { throw new SqlSugarLangException("need BeginTran", "需要事务才能使用TranLock"); }
+            if (this.QueryBuilder.IsSingle() == false) { throw new SqlSugarLangException("TranLock, can only be used for single table query", "TranLock只能用在单表查询"); }
             if (this.Context.CurrentConnectionConfig.DbType == DbType.SqlServer)
             {
                 if (LockType == DbLockType.Wait)
@@ -748,8 +748,8 @@ namespace ThingsGateway.SqlSugar
             if (whereClassTypes.HasValue())
             {
                 var columns = this.Context.EntityMaintenance.GetEntityInfo<T>().Columns.Where(it => it.IsIgnore == false && it.IsPrimarykey == true);
-                Check.Exception(columns?.Any() != true, "{0} no primary key, Can not use WhereClassByPrimaryKey ", typeof(T).Name);
-                Check.Exception(this.QueryBuilder.IsSingle() == false, "No support join query");
+                if (columns?.Any() != true) { throw new SqlSugarException("{typeof(T).Name} no primary key, Can not use WhereClassByPrimaryKey "); }
+                if (this.QueryBuilder.IsSingle() == false) { throw new SqlSugarException("No support join query"); }
                 List<IConditionalModel> whereModels = new List<IConditionalModel>();
                 foreach (var item in whereClassTypes)
                 {
@@ -818,8 +818,8 @@ namespace ThingsGateway.SqlSugar
             if (whereClassTypes.HasValue())
             {
                 var columns = this.Context.EntityMaintenance.GetEntityInfo<T>().Columns.Where(it => whereColumns.Contains(it.PropertyName) || whereColumns.Contains(it.DbColumnName));
-                Check.Exception(columns?.Any() != true, "{0} no primary key, Can not use whereColumns ", typeof(T).Name);
-                Check.Exception(this.QueryBuilder.IsSingle() == false, "No support join query");
+                if (columns?.Any() != true) { throw new SqlSugarException("{ typeof(T).Name} no primary key, Can not use whereColumns "); }
+                if (this.QueryBuilder.IsSingle() == false) { throw new SqlSugarException("No support join query"); }
                 List<IConditionalModel> whereModels = new List<IConditionalModel>();
                 foreach (var item in whereClassTypes)
                 {
@@ -1067,7 +1067,7 @@ namespace ThingsGateway.SqlSugar
             {
                 pkValue = -1;
             }
-            Check.Exception(this.QueryBuilder.SelectValue.HasValue(), "'InSingle' and' Select' can't be used together,You can use .Select(it=>...).Single(it.id==1)");
+            if (this.QueryBuilder.SelectValue.HasValue()) { throw new SqlSugarException("'InSingle' and' Select' can't be used together,You can use .Select(it=>...).Single(it.id==1)"); }
             var list = In([pkValue]).ToList();
             if (list == null) return default(T);
             else return list.SingleOrDefault();
@@ -1108,7 +1108,7 @@ namespace ThingsGateway.SqlSugar
                 return In(newValues);
             }
             var pks = GetPrimaryKeys().Select(it => SqlBuilder.GetTranslationTableName(it)).ToList();
-            Check.Exception(pks == null || pks.Count != 1, "Queryable.In(params object[] pkValues): Only one primary key");
+            if (pks == null || pks.Count != 1) { throw new SqlSugarException("Queryable.In(params object[] pkValues): Only one primary key"); }
             string field = pks.FirstOrDefault();
             string shortName = QueryBuilder.TableShortName == null ? null : (QueryBuilder.TableShortName + ".");
             field = shortName + field;
@@ -1277,7 +1277,7 @@ namespace ThingsGateway.SqlSugar
                 }
                 else
                 {
-                    Check.ExceptionEasy($"OrderByPropertyName error.{orderPropertyName} does not exist in the entity class", $"OrderByPropertyName出错实体类中不存在{orderPropertyName}");
+                    Check.ExceptionLang($"OrderByPropertyName error.{orderPropertyName} does not exist in the entity class", $"OrderByPropertyName出错实体类中不存在{orderPropertyName}");
                 }
             }
             return this;
@@ -1516,7 +1516,7 @@ namespace ThingsGateway.SqlSugar
             {
                 if (typeof(TResult).IsInterface && this.QueryBuilder.AsType == null)
                 {
-                    Check.ExceptionEasy("Select< interface > requires a full example of AsType(type) db.Queryable<object>().AsType(type).Select<Interface>().ToList()"
+                    Check.ExceptionLang("Select< interface > requires a full example of AsType(type) db.Queryable<object>().AsType(type).Select<Interface>().ToList()"
                         , "Select<接口>需要AsType(type)完整示例db.Queryable<object>().AsType(type).Select<Interface>().ToList()");
                 }
                 if (this.QueryBuilder.SelectValue.HasValue() && this.QueryBuilder.SelectValue.ObjToString().Contains(nameof(QueryMethodInfo.AS)))
@@ -1611,9 +1611,9 @@ namespace ThingsGateway.SqlSugar
             {
                 return MergeTableWithSubToList();
             }
-            Check.Exception(this.MapperAction != null || this.MapperActionWithCache != null, ErrorMessage.GetThrowMessage("'Mapper’ needs to be written after ‘MergeTable’ ", "Mapper 只能在 MergeTable 之后使用"));
-            //Check.Exception(this.QueryBuilder.SelectValue.IsNullOrEmpty(),ErrorMessage.GetThrowMessage( "MergeTable need to use Queryable.Select Method .", "使用MergeTable之前必须要有Queryable.Select方法"));
-            //Check.Exception(this.QueryBuilder.Skip > 0 || this.QueryBuilder.Take > 0 || this.QueryBuilder.OrderByValue.HasValue(),ErrorMessage.GetThrowMessage( "MergeTable  Queryable cannot Take Skip OrderBy PageToList  ", "使用 MergeTable不能有 Take Skip OrderBy PageToList 等操作,你可以在Mergetable之后操作"));
+            if (this.MapperAction != null || this.MapperActionWithCache != null) { throw new SqlSugarException(ErrorMessage.GetThrowMessage("'Mapper’ needs to be written after ‘MergeTable’ ", "Mapper 只能在 MergeTable 之后使用")); }
+            //if(this.QueryBuilder.SelectValue.IsNullOrEmpty()){throw new SqlSugarException(ErrorMessage.GetThrowMessage( "MergeTable need to use Queryable.Select Method .", "使用MergeTable之前必须要有Queryable.Select方法"));}
+            //if(this.QueryBuilder.Skip > 0 || this.QueryBuilder.Take > 0 || this.QueryBuilder.OrderByValue.HasValue()){throw new SqlSugarException(ErrorMessage.GetThrowMessage( "MergeTable  Queryable cannot Take Skip OrderBy PageToList  ", "使用 MergeTable不能有 Take Skip OrderBy PageToList 等操作,你可以在Mergetable之后操作"));}
             var sqlobj = this._ToSql();
             if (IsSubToList())
             {
@@ -1648,14 +1648,14 @@ namespace ThingsGateway.SqlSugar
         {
             UtilMethods.StartCustomSplitTable(this.Context, typeof(T));
             var splitColumn = this.EntityInfo.Columns.FirstOrDefault(it => it.PropertyInfo.GetCustomAttribute<SplitFieldAttribute>() != null);
-            Check.ExceptionEasy(splitColumn == null, "[SplitFieldAttribute] need to be added to the table field", "需要在分表字段加上属性[SplitFieldAttribute]");
+            if (splitColumn == null) { throw new SqlSugarLangException("[SplitFieldAttribute] need to be added to the table field", "需要在分表字段加上属性[SplitFieldAttribute]"); }
             var columnName = this.SqlBuilder.GetTranslationColumnName(splitColumn.DbColumnName);
             var sqlParameterKeyWord = this.SqlBuilder.SqlParameterKeyWord;
             var resultQueryable = this.Where($" {columnName}>={sqlParameterKeyWord}spBeginTime AND {columnName}<= {sqlParameterKeyWord}spEndTime", new { spBeginTime = beginTime, spEndTime = endTime }).SplitTable(tas =>
             {
                 var result = tas;
                 var type = this.EntityInfo.Type.GetCustomAttribute<SplitTableAttribute>();
-                Check.ExceptionEasy(type == null, $"{this.EntityInfo.EntityName}need SplitTableAttribute", $"{this.EntityInfo.EntityName}需要特性 SplitTableAttribute");
+                if (type == null) { throw new SqlSugarLangException($"{this.EntityInfo.EntityName}need SplitTableAttribute", $"{this.EntityInfo.EntityName}需要特性 SplitTableAttribute"); }
                 if (SplitType.Month == type.SplitType)
                 {
                     result = result.Where(y => y.Date >= beginTime.ToString("yyyy-MM").ObjToDate() && y.Date <= endTime.Date.ToString("yyyy-MM").ObjToDate().AddMonths(1).AddDays(-1)).ToList();
@@ -1680,8 +1680,13 @@ namespace ThingsGateway.SqlSugar
                 }
                 else if (SplitType.Season == type.SplitType)
                 {
-                    var beginSeason = Convert.ToDateTime(beginTime.AddMonths(0 - ((beginTime.Month - 1) % 3)).ToString("yyyy-MM-01")).Date;
-                    var endSeason = DateTime.Parse(endTime.AddMonths(3 - ((endTime.Month - 1) % 3)).ToString("yyyy-MM-01")).AddDays(-1).Date;
+                    var beginSeason = new DateTime(beginTime.Year, beginTime.Month - (beginTime.Month - 1) % 3, 1);
+
+                    var endQuarterStartMonth = endTime.Month - (endTime.Month - 1) % 3;
+                    var endSeason = new DateTime(endTime.Year, endQuarterStartMonth, 1)
+                        .AddMonths(3)
+                        .AddDays(-1);
+
                     result = result.Where(y =>
                         y.Date >= beginSeason && y.Date <= endSeason).ToList();
                 }
@@ -1750,7 +1755,7 @@ namespace ThingsGateway.SqlSugar
         public ISugarQueryable<T> WithCache(string cacheKey, int cacheDurationInSeconds = int.MaxValue)
         {
             cacheDurationInSeconds = SetCacheTime(cacheDurationInSeconds);
-            Check.ArgumentNullException(this.Context.CurrentConnectionConfig.ConfigureExternalServices.DataInfoCacheService, "Use Cache ConnectionConfig.ConfigureExternalServices.DataInfoCacheService is required ");
+            if (this.Context.CurrentConnectionConfig.ConfigureExternalServices.DataInfoCacheService == null) { throw new SqlSugarException("Use Cache ConnectionConfig.ConfigureExternalServices.DataInfoCacheService is required "); }
             this.IsCache = true;
             this.CacheTime = cacheDurationInSeconds;
             this.CacheKey = cacheKey;
@@ -1759,7 +1764,7 @@ namespace ThingsGateway.SqlSugar
         public ISugarQueryable<T> WithCache(int cacheDurationInSeconds = int.MaxValue)
         {
             cacheDurationInSeconds = SetCacheTime(cacheDurationInSeconds);
-            Check.ArgumentNullException(this.Context.CurrentConnectionConfig.ConfigureExternalServices.DataInfoCacheService, "Use Cache ConnectionConfig.ConfigureExternalServices.DataInfoCacheService is required ");
+            if (this.Context.CurrentConnectionConfig.ConfigureExternalServices.DataInfoCacheService == null) { throw new SqlSugarException("Use Cache ConnectionConfig.ConfigureExternalServices.DataInfoCacheService is required "); }
             this.IsCache = true;
             this.CacheTime = cacheDurationInSeconds;
             return this;

@@ -16,7 +16,7 @@ using Microsoft.AspNetCore.SignalR;
 using System.Reflection;
 
 using ThingsGateway;
-using ThingsGateway.Extensions;
+using ThingsGateway.Extension;
 using ThingsGateway.InstantMessaging;
 
 namespace Microsoft.AspNetCore.Builder;

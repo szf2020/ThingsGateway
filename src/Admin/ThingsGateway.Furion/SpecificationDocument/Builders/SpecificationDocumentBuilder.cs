@@ -31,7 +31,7 @@ using System.Xml.Linq;
 using System.Xml.XPath;
 
 using ThingsGateway.DynamicApiController;
-using ThingsGateway.Extensions;
+using ThingsGateway.Extension;
 using ThingsGateway.Reflection;
 
 namespace ThingsGateway.SpecificationDocument;

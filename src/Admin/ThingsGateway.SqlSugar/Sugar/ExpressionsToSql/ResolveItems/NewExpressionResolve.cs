@@ -21,11 +21,11 @@ namespace ThingsGateway.SqlSugar
                     Check.ThrowNotSupportedException(expression.ToString());
                     break;
                 case ResolveExpressType.SelectSingle:
-                    Check.Exception(expression.Type == UtilConstants.DateType, "ThrowNotSupportedException {0} ", expression.ToString());
+                    if (expression.Type == UtilConstants.DateType) { throw new SqlSugarException("ThrowNotSupportedException {0} ", expression.ToString()); }
                     Select(expression, parameter, true);
                     break;
                 case ResolveExpressType.SelectMultiple:
-                    Check.Exception(expression.Type == UtilConstants.DateType, "ThrowNotSupportedException {0} ", expression.ToString());
+                    if (expression.Type == UtilConstants.DateType) { throw new SqlSugarException("ThrowNotSupportedException {0} ", expression.ToString()); }
                     Select(expression, parameter, false);
                     break;
                 case ResolveExpressType.FieldSingle:
@@ -128,7 +128,7 @@ namespace ThingsGateway.SqlSugar
             }
             catch (Exception ex)
             {
-                Check.Exception(expression.Type == UtilConstants.DateType, "ThrowNotSupportedException {0} ", ex.ToString());
+                if (expression.Type == UtilConstants.DateType) { throw new SqlSugarException("ThrowNotSupportedException {0} ", ex.ToString()); }
             }
         }
 

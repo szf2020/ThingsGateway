@@ -18,7 +18,7 @@ using System.Net;
 using System.Reflection;
 using System.Text.RegularExpressions;
 
-using ThingsGateway.Extensions;
+using ThingsGateway.Extension;
 
 namespace ThingsGateway.HttpRemote;
 

@@ -8,7 +8,7 @@
 // 项目主要遵循 MIT 许可证和 Apache 许可证（版本 2.0）进行分发和使用。
 // 许可证的完整文本可以在源代码树根目录中的 LICENSE-APACHE 和 LICENSE-MIT 文件中找到。
 // ------------------------------------------------------------------------
-
+#if NET6_0_OR_GREATER
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -18,7 +18,6 @@ namespace ThingsGateway.JsonSerialization;
 /// <summary>
 /// <see cref="System.Text.Json.Nodes.JsonObject"/> 类型序列化
 /// </summary>
-[SuppressSniffer]
 public class NewtonsoftJsonJsonObjectJsonConverter : JsonConverter<System.Text.Json.Nodes.JsonObject>
 {
     /// <summary>
@@ -50,7 +49,6 @@ public class NewtonsoftJsonJsonObjectJsonConverter : JsonConverter<System.Text.J
 /// <summary>
 /// <see cref="System.Text.Json.Nodes.JsonArray"/> 类型序列化
 /// </summary>
-[SuppressSniffer]
 public class NewtonsoftJsonJsonArrayJsonConverter : JsonConverter<System.Text.Json.Nodes.JsonArray>
 {
     /// <summary>
@@ -78,3 +76,5 @@ public class NewtonsoftJsonJsonArrayJsonConverter : JsonConverter<System.Text.Js
         writer.WriteRawValue(value.ToJsonString());
     }
 }
+
+#endif

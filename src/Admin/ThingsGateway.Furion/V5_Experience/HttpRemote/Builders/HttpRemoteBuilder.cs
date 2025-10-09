@@ -16,7 +16,7 @@ using Microsoft.Extensions.Logging;
 using System.Reflection;
 using System.Text;
 
-using ThingsGateway.Extensions;
+using ThingsGateway.Extension;
 
 namespace ThingsGateway.HttpRemote;
 

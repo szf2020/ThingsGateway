@@ -78,7 +78,7 @@ namespace ThingsGateway.SqlSugar
             var nav = this._ParentEntity.Columns.FirstOrDefault(x => x.PropertyName == name);
             if (nav.Navigat == null)
             {
-                Check.ExceptionEasy($"{name} no navigate attribute", $"{this._ParentEntity.EntityName}的属性{name}没有导航属性");
+                Check.ExceptionLang($"{name} no navigate attribute", $"{this._ParentEntity.EntityName}的属性{name}没有导航属性");
             }
             if (nav.Navigat.NavigatType == NavigateType.OneToOne || nav.Navigat.NavigatType == NavigateType.ManyToOne)
             {
@@ -111,7 +111,7 @@ namespace ThingsGateway.SqlSugar
             var nav = this._ParentEntity.Columns.FirstOrDefault(x => x.PropertyName == name);
             if (nav.Navigat == null)
             {
-                Check.ExceptionEasy($"{name} no navigate attribute", $"{this._ParentEntity.EntityName}的属性{name}没有导航属性");
+                Check.ExceptionLang($"{name} no navigate attribute", $"{this._ParentEntity.EntityName}的属性{name}没有导航属性");
             }
             if (nav.Navigat.NavigatType == NavigateType.OneToOne || nav.Navigat.NavigatType == NavigateType.ManyToOne)
             {
@@ -143,7 +143,7 @@ namespace ThingsGateway.SqlSugar
                 ActionMethodCallExpression(callMethod);
                 newExp = callMethod.Arguments[0];
                 i++;
-                Check.Exception(i > 10000, expression + "  is error");
+                if (i > 10000) { throw new SqlSugarException($"{expression}  is error"); }
             }
             return newExp;
         }

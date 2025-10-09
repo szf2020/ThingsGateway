@@ -122,9 +122,9 @@ namespace ThingsGateway.SqlSugar
             var last = subInfos[0];
             var FirstPkColumn = last.ThisEntityInfo.Columns.FirstOrDefault(it => it.IsPrimarykey);
             FirstPkColumn = GetFirstPkColumn(last, FirstPkColumn);
-            Check.ExceptionEasy(FirstPkColumn == null, $"{last.ThisEntityInfo.EntityName} need PrimayKey", $"使用导航属性{last.ThisEntityInfo.EntityName} 缺少主键");
+            if (FirstPkColumn == null) { throw new SqlSugarLangException($"{last.ThisEntityInfo.EntityName} need PrimayKey", $"使用导航属性{last.ThisEntityInfo.EntityName} 缺少主键"); }
             var PkColumn = last.ParentEntityInfo.Columns.FirstOrDefault(it => it.PropertyName == last.Nav.Name);
-            Check.ExceptionEasy(PkColumn == null, $"{last.ParentEntityInfo.EntityName} no found {last.Nav.Name}", $"{last.ParentEntityInfo.EntityName} 不存在 {last.Nav.Name}");
+            if (PkColumn == null) { throw new SqlSugarLangException($"{last.ParentEntityInfo.EntityName} no found {last.Nav.Name}", $"{last.ParentEntityInfo.EntityName} 不存在 {last.Nav.Name}"); }
             queryable.Where($" {queryable.SqlBuilder.GetTranslationColumnName(this.shorName)}.{queryable.SqlBuilder.GetTranslationColumnName(PkColumn.DbColumnName)} = {queryable.SqlBuilder.GetTranslationColumnName(masterShortName)}.{queryable.SqlBuilder.GetTranslationColumnName(FirstPkColumn.DbColumnName)} ");
             queryable.WhereIF(this.whereSql.HasValue(), GetWhereSql1(this.whereSql, lastShortName, joinInfos, queryable.SqlBuilder));
             MapperSql.Sql = $"( {queryable.ToSql().Key} ) ";
@@ -175,7 +175,7 @@ namespace ThingsGateway.SqlSugar
             //    pkColumn = item.ThisEntityInfo.Columns.FirstOrDefault(it => it.IsPrimarykey);
             //    navColum = item.ParentEntityInfo.Columns.FirstOrDefault(it => it.PropertyName == item.Nav.Name);
             //}
-            Check.ExceptionEasy(pkColumn == null, $"{item.ThisEntityInfo.EntityName} need PrimayKey", $"使用导航属性{item.ThisEntityInfo.EntityName} 缺少主键");
+            if (pkColumn == null) { throw new SqlSugarLangException($"{item.ThisEntityInfo.EntityName} need PrimayKey", $"使用导航属性{item.ThisEntityInfo.EntityName} 缺少主键"); }
             var on = $" {queryable.SqlBuilder.GetTranslationColumnName(shortName)}.{queryable.SqlBuilder.GetTranslationColumnName(pkColumn.DbColumnName)}={queryable.SqlBuilder.GetTranslationColumnName(formInfo.ThisEntityInfo.DbTableName + (i - 1))}.{queryable.SqlBuilder.GetTranslationColumnName(navColum.DbColumnName)}";
             queryable.AddJoinInfo(item.ThisEntityInfo.DbTableName, shortName, on, JoinType.Inner);
             ++i;
@@ -205,7 +205,7 @@ namespace ThingsGateway.SqlSugar
                 pkColumn = item.ThisEntityInfo.Columns.FirstOrDefault(it => it.PropertyName == item.Nav.Name2);
             }
             //}
-            Check.ExceptionEasy(pkColumn == null, $"{item.ThisEntityInfo.EntityName} need PrimayKey", $"使用导航属性{item.ThisEntityInfo.EntityName} 缺少主键");
+            if (pkColumn == null) { throw new SqlSugarLangException($"{item.ThisEntityInfo.EntityName} need PrimayKey", $"使用导航属性{item.ThisEntityInfo.EntityName} 缺少主键"); }
             var on = $" {shortName}.{queryable.SqlBuilder.GetTranslationColumnName(pkColumn.DbColumnName)}={formInfo.ThisEntityInfo.DbTableName + (i - 1)}.{queryable.SqlBuilder.GetTranslationColumnName(navColum.DbColumnName)}";
             queryable.AddJoinInfo(item.ThisEntityInfo.DbTableName, shortName, on, JoinType.Inner);
             ++i;
@@ -229,8 +229,8 @@ namespace ThingsGateway.SqlSugar
             var Ab_Aid = abEntity.Columns.FirstOrDefault(it => item.Nav.MappingAId == it.PropertyName);
             var Ab_Bid = abEntity.Columns.FirstOrDefault(it => item.Nav.MappingBId == it.PropertyName);
 
-            Check.ExceptionEasy(AidColumn == null, $" {AidColumn.EntityName} need primary key ", $"{AidColumn.EntityName}需要主键");
-            Check.ExceptionEasy(AidColumn == null, $" {BidColumn.EntityName} need primary key ", $"{BidColumn.EntityName}需要主键");
+            if (AidColumn == null) { throw new SqlSugarLangException($" {AidColumn.EntityName} need primary key ", $"{AidColumn.EntityName}需要主键"); }
+            if (AidColumn == null) { throw new SqlSugarLangException($" {BidColumn.EntityName} need primary key ", $"{BidColumn.EntityName}需要主键"); }
 
             var abShort = abEntity.EntityName + "_1";
             var abOn = $" {queryable.SqlBuilder.GetTranslationColumnName(abShort)}.{queryable.SqlBuilder.GetTranslationColumnName(Ab_Aid.DbColumnName)}={formInfo.ThisEntityInfo.DbTableName + (i - 1)}.{queryable.SqlBuilder.GetTranslationColumnName(AidColumn.DbColumnName)}";

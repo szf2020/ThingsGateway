@@ -20,7 +20,7 @@ namespace ThingsGateway.SqlSugar
                     }
                     catch (Exception ex)
                     {
-                        Check.Exception(true, ErrorMessage.ConnnectionOpen, ex.Message);
+                        { throw new SqlSugarException(ErrorMessage.ConnnectionOpen, ex.Message); }
                     }
                 }
                 return base._DbConnection;
@@ -104,7 +104,7 @@ namespace ThingsGateway.SqlSugar
                     }
                     else
                     {
-                        Check.Exception(true, sqlParameter.Value.GetType().Name + " No Support");
+                        { throw new SqlSugarException(sqlParameter.Value.GetType().Name + " No Support"); }
                     }
                 }
                 if (sqlParameter.Direction == 0)

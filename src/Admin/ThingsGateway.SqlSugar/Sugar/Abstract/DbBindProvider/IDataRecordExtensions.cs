@@ -466,7 +466,7 @@ namespace ThingsGateway.SqlSugar
                 obj = dr.GetString(i);
             }
             var value = obj.ObjToString();
-            return new SerializeService().DeserializeObject<T>(value);
+            return DefaultServices.Serialize.DeserializeObject<T>(value);
         }
 
         /// <summary>

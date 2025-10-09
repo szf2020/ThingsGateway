@@ -9,7 +9,7 @@ namespace ThingsGateway.SqlSugar
         public SqlSugarProvider Context { get; set; }
         public ISugarQueryable<T> CreateMapping<T>() where T : class, new()
         {
-            Check.ArgumentNullException(Context, "Please use Sqlugar.ModelContext");
+            if (Context == null) { throw new SqlSugarException("Please use Sqlugar.ModelContext"); }
             using (Context)
             {
                 return Context.Queryable<T>();

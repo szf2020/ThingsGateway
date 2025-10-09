@@ -147,7 +147,7 @@
             children = children.Distinct().ToList();
             if (pkColumn == null)
             {
-                Check.ExceptionEasy($"{typeof(TChild).Name} need primary key ", $"{typeof(TChild).Name}需要主键");
+                Check.ExceptionLang($"{typeof(TChild).Name} need primary key ", $"{typeof(TChild).Name}需要主键");
             }
             var x = this._Context.Storageable(children).WhereColumns(new string[] { pkColumn.PropertyName }).GetStorageableResult();
             var insertData = children = x.InsertList.Select(it => it.Item).ToList();
@@ -165,7 +165,7 @@
                 var updateData = x.UpdateList.Select(it => it.Item);
                 children.AddRange(updateData);
             }
-            Check.ExceptionEasy(pkColumn == null && NavColumn == null, $"The entity is invalid", $"实体错误无法使用导航");
+            if (pkColumn == null && NavColumn == null) { throw new SqlSugarLangException($"The entity is invalid", $"实体错误无法使用导航"); }
             InitData(pkColumn, insertData);
             this._ParentList = children.Cast<object>().ToList();
         }
@@ -258,7 +258,7 @@
                 if (IsDefaultValue(pkColumn.PropertyInfo.GetValue(child)))
                 {
                     var name = pkColumn.EntityName + " " + pkColumn.DbColumnName;
-                    Check.ExceptionEasy($"The field {name} is not an autoassignment type and requires an assignment", $"字段{name}不是可自动赋值类型需要赋值（并且不能是已存在值） , 可赋值类型有 自增、long、Guid、string");
+                    Check.ExceptionLang($"The field {name} is not an autoassignment type and requires an assignment", $"字段{name}不是可自动赋值类型需要赋值（并且不能是已存在值） , 可赋值类型有 自增、long、Guid、string");
                 }
             }
             if (IsFirst && _RootOptions != null)

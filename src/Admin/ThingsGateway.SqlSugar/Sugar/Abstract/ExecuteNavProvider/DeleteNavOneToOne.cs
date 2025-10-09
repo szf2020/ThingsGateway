@@ -26,7 +26,7 @@
             EntityColumnInfo thisPkColumn = GetPkColumnByNav(thisEntity, nav);
 
             // 检查主键列是否存在
-            Check.Exception(thisPkColumn == null, $" Navigate {parentEntity.EntityName} : {name} is error ", $"导航实体 {parentEntity.EntityName} 属性 {name} 配置错误");
+            if (thisPkColumn == null) { throw new SqlSugarException($" Navigate {parentEntity.EntityName} : {name} is error ", $"导航实体 {parentEntity.EntityName} 属性 {name} 配置错误"); }
 
             // 删除父表数据(如果尚未删除)
             if (!_IsDeletedParant)
@@ -35,7 +35,7 @@
                 .ExecuteCommand());
 
             // 检查导航列是否存在
-            Check.ExceptionEasy(parentColumn == null, "The one-to-one navigation configuration is incorrect", "一对一导航配置错误");
+            if (parentColumn == null) { throw new SqlSugarLangException("The one-to-one navigation configuration is incorrect", "一对一导航配置错误"); }
 
             // 获取父表导航列值列表
             var ids = _ParentList.Select(it => parentColumn.PropertyInfo.GetValue(it)).ToList();

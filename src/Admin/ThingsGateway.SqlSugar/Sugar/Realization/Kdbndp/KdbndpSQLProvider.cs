@@ -23,7 +23,7 @@ namespace ThingsGateway.SqlSugar
                     }
                     catch (Exception ex)
                     {
-                        Check.Exception(true, ErrorMessage.ConnnectionOpen, ex.Message);
+                        { throw new SqlSugarException(ErrorMessage.ConnnectionOpen, ex.Message); }
                     }
                 }
                 return base._DbConnection;
@@ -43,7 +43,7 @@ namespace ThingsGateway.SqlSugar
             {
                 if (ex.Message.Contains("Version string portion was too short or too long"))
                 {
-                    Check.Exception(true, "人大金仓R6请安装 Nuget:SqlSugarCore.Kdbndp到最新版本");
+                    { throw new SqlSugarException("人大金仓R6请安装 Nuget:SqlSugarCore.Kdbndp到最新版本"); }
                 }
                 throw;
             }
@@ -124,7 +124,7 @@ namespace ThingsGateway.SqlSugar
                     }
                     else
                     {
-                        Check.Exception(true, sqlParameter.Value.GetType().Name + " No Support");
+                        { throw new SqlSugarException(sqlParameter.Value.GetType().Name + " No Support"); }
                     }
                 }
                 if (sqlParameter.Direction == 0)
@@ -164,7 +164,7 @@ namespace ThingsGateway.SqlSugar
             }
             if (it.Message?.StartsWith("42883: function uuid_generate_v4() does not exist") == true)
             {
-                Check.ExceptionEasy(it.Message, $"使用uuid_generate_v4()函数需要创建 CREATE EXTENSION IF NOT EXISTS kbcrypto;CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\" ");
+                Check.ExceptionLang(it.Message, $"使用uuid_generate_v4()函数需要创建 CREATE EXTENSION IF NOT EXISTS kbcrypto;CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\" ");
             }
         };
 

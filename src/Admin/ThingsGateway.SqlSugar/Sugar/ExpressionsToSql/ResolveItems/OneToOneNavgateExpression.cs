@@ -67,7 +67,7 @@ namespace ThingsGateway.SqlSugar
         {
             if (this.ProPertyEntity.Type.Name.StartsWith("List`"))
             {
-                Check.ExceptionEasy(true, " expression error ", "导航查询出错，比如.Count要改成 .Count()");
+                if (true) { throw new SqlSugarLangException(" expression error ", "导航查询出错，比如.Count要改成 .Count()"); }
             }
             else if (Navigat.NavigatType == NavigateType.Dynamic)
             {
@@ -80,8 +80,7 @@ namespace ThingsGateway.SqlSugar
             }
             if (pk == null)
             {
-                Check.ExceptionEasy(
-                  true,
+                throw new SqlSugarLangException(
                   $"{this.ProPertyEntity.EntityName} naviate config error",
                   $"{this.ProPertyEntity.EntityName} 导航配置错误");
             }
@@ -153,8 +152,7 @@ namespace ThingsGateway.SqlSugar
         {
             if (Navigat.Name == null)
             {
-                Check.ExceptionEasy(
-                   true,
+                throw new SqlSugarLangException(
                    " NavigateType.Dynamic User-defined navigation objects need to be configured with json to be used in expressions .  " + this.ProPertyEntity.Type.Name,
                    " NavigateType.Dynamic 自定义导航对象需要配置json才能在表达式中使用。 " + this.ProPertyEntity.Type.Name);
             }

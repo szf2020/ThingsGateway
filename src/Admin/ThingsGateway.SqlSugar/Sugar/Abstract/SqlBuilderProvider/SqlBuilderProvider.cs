@@ -37,7 +37,7 @@ namespace ThingsGateway.SqlSugar
         }
         public virtual string GetTranslationTableName(string name)
         {
-            Check.ArgumentNullException(name, string.Format(null, ErrorMessage.ObjNotExistCompositeFormat, "Table Name"));
+            if (name == null) { throw new SqlSugarException(string.Format(null, ErrorMessage.ObjNotExistCompositeFormat, "Table Name")); }
             if (!name.Contains("<>f__AnonymousType") && name.IsContainsIn("(", ")", SqlTranslationLeft) && name != "Dictionary`2")
             {
                 var tableInfo = this.Context
@@ -73,8 +73,8 @@ namespace ThingsGateway.SqlSugar
         }
         public virtual string GetTranslationColumnName(string entityName, string propertyName)
         {
-            Check.ArgumentNullException(entityName, string.Format(null, ErrorMessage.ObjNotExistCompositeFormat, "Table Name"));
-            Check.ArgumentNullException(propertyName, string.Format(null, ErrorMessage.ObjNotExistCompositeFormat, "Column Name"));
+            if (entityName == null) { throw new SqlSugarException(string.Format(null, ErrorMessage.ObjNotExistCompositeFormat, "Table Name")); }
+            if (propertyName == null) { throw new SqlSugarException(string.Format(null, ErrorMessage.ObjNotExistCompositeFormat, "Column Name")); }
             var context = this.Context;
             var mappingInfo = context
                  .MappingColumns

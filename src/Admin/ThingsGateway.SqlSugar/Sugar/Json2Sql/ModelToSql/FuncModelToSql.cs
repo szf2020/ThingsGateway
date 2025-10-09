@@ -26,7 +26,7 @@ namespace ThingsGateway.SqlSugar
             {
                 if (!(this.Context?.CurrentConnectionConfig?.MoreSettings?.EnableModelFuncMappingColumn == true))
                 {
-                    Check.ExceptionEasy("Enable MappingColumn need in ConnectionConfig - > MoreSettings - > EnableModelFuncMappingColumn set to true", "MappingColumn考虑到风险情况需要开启才能使用，请在 ConnectionConfig->MoreSettings->EnableModelFuncMappingColumn设置为true");
+                    Check.ExceptionLang("Enable MappingColumn need in ConnectionConfig - > MoreSettings - > EnableModelFuncMappingColumn set to true", "MappingColumn考虑到风险情况需要开启才能使用，请在 ConnectionConfig->MoreSettings->EnableModelFuncMappingColumn设置为true");
                 }
                 resSql = parameters[0] + "";
             }
@@ -71,7 +71,7 @@ namespace ThingsGateway.SqlSugar
         private static string GetMethodName(string name, List<string> methods)
         {
             var result = methods.FirstOrDefault(it => name.EqualCase("SqlFunc_" + it) || name.EqualCase(it));
-            Check.Exception(result == null, $" {name} is error ");
+            if (result == null) { throw new SqlSugarException($" {name} is error "); }
             return result;
         }
         private static List<string> GetAllMethods(IDbMethods dbMethods)

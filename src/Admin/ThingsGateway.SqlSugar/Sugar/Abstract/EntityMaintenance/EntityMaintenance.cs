@@ -191,7 +191,7 @@ namespace ThingsGateway.SqlSugar
         public string GetDbColumnName(string propertyName, Type entityType)
         {
             var isAny = this.GetEntityInfo(entityType).Columns.Any(it => it.PropertyName.Equals(propertyName, StringComparison.CurrentCultureIgnoreCase));
-            Check.Exception(!isAny, "Property " + propertyName + " is Invalid");
+            if (!isAny) { throw new SqlSugarException("Property " + propertyName + " is Invalid"); }
             var typeName = entityType.Name;
             if (this.Context.MappingColumns == null || this.Context.MappingColumns.Count == 0 || !this.Context.MappingColumns.Any(it => it.EntityName == typeName && it.PropertyName == propertyName))
             {
@@ -309,7 +309,7 @@ namespace ThingsGateway.SqlSugar
             }
             catch
             {
-                Check.ExceptionEasy("ORM error reading entity class XML, check entity XML or disable reading XML: MoreSettings IsNoReadXmlDescription set to true (same place to set DbType)", "ORM读取实体类的XML出现错误,检查实体XML或者禁用读取XML: MoreSettings里面的IsNoReadXmlDescription设为true （设置DbType的同一个地方）");
+                Check.ExceptionLang("ORM error reading entity class XML, check entity XML or disable reading XML: MoreSettings IsNoReadXmlDescription set to true (same place to set DbType)", "ORM读取实体类的XML出现错误,检查实体XML或者禁用读取XML: MoreSettings里面的IsNoReadXmlDescription设为true （设置DbType的同一个地方）");
                 throw;
             }
         }
@@ -523,14 +523,14 @@ namespace ThingsGateway.SqlSugar
         {
             column.IsIgnore = true;
             column.IsOwnsOne = true;
-            Check.ExceptionEasy(property.PropertyType.IsClass() == false, column.PropertyName + " IsOwnsOne必须用在类上面", column.PropertyName + "IsOwnsOne must be used on the class");
-            Check.ExceptionEasy(property.PropertyType.FullName.IsCollectionsList() == true, column.PropertyName + " IsOwnsOne必须用在类上面", column.PropertyName + "IsOwnsOne must be used on the class");
+            if (property.PropertyType.IsClass() == false) { throw new SqlSugarLangException(column.PropertyName + " IsOwnsOne必须用在类上面", column.PropertyName + "IsOwnsOne must be used on the class"); }
+            if (property.PropertyType.FullName.IsCollectionsList() == true) { throw new SqlSugarLangException(column.PropertyName + " IsOwnsOne必须用在类上面", column.PropertyName + "IsOwnsOne must be used on the class"); }
             var ownsOne = this.GetEntityInfoNoCache(property.PropertyType);
             foreach (var item in ownsOne.Columns)
             {
                 if (result.Columns.Any(it => it.PropertyName.EqualCase(item.PropertyName) || it.DbColumnName.EqualCase(item.DbColumnName)))
                 {
-                    Check.ExceptionEasy($" {result.EntityName} " + item.PropertyName + " 存在重复定义 (IsOwnsOne) ", $" {result.EntityName} " + item.PropertyName + " Duplicate definition exists (IsOwnsOne)");
+                    Check.ExceptionLang($" {result.EntityName} " + item.PropertyName + " 存在重复定义 (IsOwnsOne) ", $" {result.EntityName} " + item.PropertyName + " Duplicate definition exists (IsOwnsOne)");
                 }
                 item.ForOwnsOnePropertyInfo = column.PropertyInfo;
                 result.Columns.Add(item);

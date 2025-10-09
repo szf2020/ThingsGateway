@@ -13,7 +13,7 @@ using System.Dynamic;
 using System.Reflection;
 using System.Text.Json;
 
-using ThingsGateway.Extensions;
+using ThingsGateway.Extension;
 using ThingsGateway.Shapeless.Extensions;
 
 using Binder = Microsoft.CSharp.RuntimeBinder.Binder;

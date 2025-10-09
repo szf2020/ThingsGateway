@@ -16,6 +16,8 @@ using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 
+using ThingsGateway.Extension;
+
 namespace ThingsGateway.Common.Extension;
 /// <summary>
 /// 对象拓展类
@@ -48,113 +50,7 @@ public static class ObjectExtensions
         bool IsTheRawGenericType(Type type) => generic == (type.IsGenericType ? type.GetGenericTypeDefinition() : type);
     }
 
-    /// <summary>
-    /// 将 DateTimeOffset 转换成本地 DateTime
-    /// </summary>
-    /// <param name="dateTime"></param>
-    /// <returns></returns>
-    public static DateTime ConvertToDateTime(this DateTimeOffset dateTime)
-    {
-        if (dateTime.Offset.Equals(TimeSpan.Zero))
-            return dateTime.UtcDateTime;
-        if (dateTime.Offset.Equals(TimeZoneInfo.Local.GetUtcOffset(dateTime.DateTime)))
-            return dateTime.ToLocalTime().DateTime;
-        else
-            return dateTime.DateTime;
-    }
 
-    /// <summary>
-    /// 将 DateTimeOffset? 转换成本地 DateTime?
-    /// </summary>
-    /// <param name="dateTime"></param>
-    /// <returns></returns>
-    public static DateTime? ConvertToDateTime(this DateTimeOffset? dateTime)
-    {
-        return dateTime.HasValue ? dateTime.Value.ConvertToDateTime() : null;
-    }
-
-    /// <summary>
-    /// 将 DateTime 转换成 DateTimeOffset
-    /// </summary>
-    /// <param name="dateTime"></param>
-    /// <returns></returns>
-    public static DateTimeOffset ConvertToDateTimeOffset(this DateTime dateTime)
-    {
-        return DateTime.SpecifyKind(dateTime, DateTimeKind.Local);
-    }
-
-    /// <summary>
-    /// 将 DateTime? 转换成 DateTimeOffset?
-    /// </summary>
-    /// <param name="dateTime"></param>
-    /// <returns></returns>
-    public static DateTimeOffset? ConvertToDateTimeOffset(this DateTime? dateTime)
-    {
-        return dateTime.HasValue ? dateTime.Value.ConvertToDateTimeOffset() : null;
-    }
-
-    /// <summary>
-    /// 将流保存到本地磁盘
-    /// </summary>
-    /// <param name="stream"></param>
-    /// <param name="path"></param>
-    /// <returns></returns>
-    public static void CopyToSave(this Stream stream, string path)
-    {
-        // 空检查
-        if (string.IsNullOrWhiteSpace(path)) throw new ArgumentNullException(nameof(path));
-
-        using var fileStream = File.Create(path);
-        stream.CopyTo(fileStream);
-    }
-
-    /// <summary>
-    /// 将字节数组保存到本地磁盘
-    /// </summary>
-    /// <param name="bytes"></param>
-    /// <param name="path"></param>
-    /// <returns></returns>
-    public static void CopyToSave(this byte[] bytes, string path)
-    {
-        using var stream = new MemoryStream(bytes);
-        stream.CopyToSave(path);
-    }
-
-    /// <summary>
-    /// 将流保存到本地磁盘
-    /// </summary>
-    /// <param name="stream"></param>
-    /// <param name="path">需包含文件名完整路径</param>
-    /// <returns></returns>
-    public static async Task CopyToSaveAsync(this Stream stream, string path)
-    {
-        // 空检查
-        if (string.IsNullOrWhiteSpace(path))
-        {
-            throw new ArgumentNullException(nameof(path));
-        }
-
-        // 文件名判断
-        if (string.IsNullOrWhiteSpace(Path.GetFileName(path)))
-        {
-            throw new ArgumentException("The parameter of <path> parameter must include the complete file name.");
-        }
-
-        using var fileStream = File.Create(path);
-        await stream.CopyToAsync(fileStream).ConfigureAwait(false);
-    }
-
-    /// <summary>
-    /// 将字节数组保存到本地磁盘
-    /// </summary>
-    /// <param name="bytes"></param>
-    /// <param name="path"></param>
-    /// <returns></returns>
-    public static async Task CopyToSaveAsync(this byte[] bytes, string path)
-    {
-        using var stream = new MemoryStream(bytes);
-        await stream.CopyToSaveAsync(path).ConfigureAwait(false);
-    }
 
     /// <summary>
     /// 合并两个字典

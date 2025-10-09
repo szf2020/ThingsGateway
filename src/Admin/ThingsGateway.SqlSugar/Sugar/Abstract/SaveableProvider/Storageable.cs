@@ -100,7 +100,7 @@ namespace ThingsGateway.SqlSugar
         {
             if (PageSize > 10000)
             {
-                Check.ExceptionEasy("Advanced save page Settings should not exceed 10,000, and the reasonable number of pages is about 2000", "高级保存分页设置不要超过1万，合理分页数在2000左右");
+                Check.ExceptionLang("Advanced save page Settings should not exceed 10,000, and the reasonable number of pages is about 2000", "高级保存分页设置不要超过1万，合理分页数在2000左右");
             }
             StorageablePage<T> page = new StorageablePage<T>();
             page.Context = this.Context;
@@ -125,7 +125,7 @@ namespace ThingsGateway.SqlSugar
         public IStorageable<T> DefaultAddElseUpdate()
         {
             var column = this.Context.EntityMaintenance.GetEntityInfo<T>().Columns.FirstOrDefault(it => it.IsPrimarykey);
-            if (column == null) Check.ExceptionEasy("DefaultAddElseUpdate() need primary key", "DefaultAddElseUpdate()这个方法只能用于主键");
+            if (column == null) Check.ExceptionLang("DefaultAddElseUpdate() need primary key", "DefaultAddElseUpdate()这个方法只能用于主键");
             return this.SplitUpdate(it =>
             {
                 var itemPkValue = column.PropertyInfo.GetValue(it.Item);
@@ -226,7 +226,7 @@ namespace ThingsGateway.SqlSugar
             var pkInfos = this.Context.EntityMaintenance.GetEntityInfo<T>().Columns.Where(it => it.IsPrimarykey).ToArray();
             if (whereExpression == null && pkInfos.Length == 0)
             {
-                Check.ExceptionEasy(true, "Need primary key or WhereColumn", "使用Storageable实体需要主键或者使用WhereColumn指定条件列");
+                if (true) { throw new SqlSugarLangException("Need primary key or WhereColumn", "使用Storageable实体需要主键或者使用WhereColumn指定条件列"); }
             }
             if (whereExpression == null && pkInfos.Length != 0)
             {
@@ -243,15 +243,15 @@ namespace ThingsGateway.SqlSugar
                 Database = dbDataList,
                 PkFields = pkProperties
             }).ToList();
-            foreach (var item in whereFuncs.OrderByDescending(it => (int)it.key))
+            foreach (var item in whereFuncs.OrderByDescending(it => (int)it.Key))
             {
                 var whereList = messageList.Where(it => it.StorageType == null);
-                Func<StorageableMessage<T>, bool> exp = item.value1;
+                Func<StorageableMessage<T>, bool> exp = item.Value;
                 var list = whereList.Where(exp).ToList();
                 foreach (var it in list)
                 {
-                    it.StorageType = item.key;
-                    it.StorageMessage = item.value2;
+                    it.StorageType = item.Key;
+                    it.StorageMessage = item.Value2;
                 }
             }
             var delete = messageList.Where(it => it.StorageType == StorageType.Delete).ToList();
@@ -315,7 +315,7 @@ namespace ThingsGateway.SqlSugar
             var pkInfos = this.Context.EntityMaintenance.GetEntityInfo<T>().Columns.Where(it => it.IsPrimarykey).ToArray();
             if (whereExpression == null && pkInfos.Length == 0)
             {
-                Check.ExceptionEasy(true, "Need primary key or WhereColumn", "使用Storageable实体需要主键或者使用WhereColumn指定条件列");
+                if (true) { throw new SqlSugarLangException("Need primary key or WhereColumn", "使用Storageable实体需要主键或者使用WhereColumn指定条件列"); }
             }
             if (whereExpression == null && pkInfos.Length != 0)
             {
@@ -332,15 +332,15 @@ namespace ThingsGateway.SqlSugar
                 Database = dbDataList,
                 PkFields = pkProperties
             }).ToList();
-            foreach (var item in whereFuncs.OrderByDescending(it => (int)it.key))
+            foreach (var item in whereFuncs.OrderByDescending(it => (int)it.Key))
             {
                 var whereList = messageList.Where(it => it.StorageType == null);
-                Func<StorageableMessage<T>, bool> exp = item.value1;
+                Func<StorageableMessage<T>, bool> exp = item.Value;
                 var list = whereList.Where(exp).ToList();
                 foreach (var it in list)
                 {
-                    it.StorageType = item.key;
-                    it.StorageMessage = item.value2;
+                    it.StorageType = item.Key;
+                    it.StorageMessage = item.Value2;
                 }
             }
             var delete = messageList.Where(it => it.StorageType == StorageType.Delete).ToList();
@@ -397,7 +397,7 @@ namespace ThingsGateway.SqlSugar
             var pkInfos = this.Context.EntityMaintenance.GetEntityInfo<T>().Columns.Where(it => it.IsPrimarykey).ToArray();
             if (whereExpression == null && pkInfos.Length == 0)
             {
-                Check.Exception(true, "Need primary key or WhereColumn");
+                { throw new SqlSugarException("Need primary key or WhereColumn"); }
             }
             if (whereExpression == null && pkInfos.Length != 0)
             {
@@ -414,15 +414,15 @@ namespace ThingsGateway.SqlSugar
                 Database = dbDataList,
                 PkFields = pkProperties
             }).ToList();
-            foreach (var item in whereFuncs.OrderByDescending(it => (int)it.key))
+            foreach (var item in whereFuncs.OrderByDescending(it => (int)it.Key))
             {
                 var whereList = messageList.Where(it => it.StorageType == null);
-                Func<StorageableMessage<T>, bool> exp = item.value1;
+                Func<StorageableMessage<T>, bool> exp = item.Value;
                 var list = whereList.Where(exp).ToList();
                 foreach (var it in list)
                 {
-                    it.StorageType = item.key;
-                    it.StorageMessage = item.value2;
+                    it.StorageType = item.Key;
+                    it.StorageMessage = item.Value2;
                 }
             }
             var delete = messageList.Where(it => it.StorageType == StorageType.Delete).ToList();

@@ -12,7 +12,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 
-namespace ThingsGateway.Extensions;
+namespace ThingsGateway.Extension;
 
 /// <summary>
 ///     <see cref="MethodInfo" /> 拓展类

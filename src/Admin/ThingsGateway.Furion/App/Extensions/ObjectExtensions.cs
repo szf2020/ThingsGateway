@@ -20,7 +20,7 @@ using System.Text.RegularExpressions;
 
 using ThingsGateway.NewLife;
 
-namespace ThingsGateway.Extensions;
+namespace ThingsGateway.Extension;
 
 /// <summary>
 /// 对象拓展类
@@ -28,70 +28,10 @@ namespace ThingsGateway.Extensions;
 [SuppressSniffer]
 public static class ObjectExtensions
 {
-    /// <summary>
-    /// 将 DateTimeOffset 转换成本地 DateTime
-    /// </summary>
-    /// <param name="dateTime"></param>
-    /// <returns></returns>
-    public static DateTime ConvertToDateTime(this DateTimeOffset dateTime)
-    {
-        if (dateTime.Offset.Equals(TimeSpan.Zero))
-            return dateTime.UtcDateTime;
-        if (dateTime.Offset.Equals(TimeZoneInfo.Local.GetUtcOffset(dateTime.DateTime)))
-            return dateTime.ToLocalTime().DateTime;
-        else
-            return dateTime.DateTime;
-    }
 
-    /// <summary>
-    /// 将 DateTimeOffset? 转换成本地 DateTime?
-    /// </summary>
-    /// <param name="dateTime"></param>
-    /// <returns></returns>
-    public static DateTime? ConvertToDateTime(this DateTimeOffset? dateTime)
-    {
-        return dateTime.HasValue ? dateTime.Value.ConvertToDateTime() : null;
-    }
 
-    /// <summary>
-    /// 将 DateTime 转换成 DateTimeOffset
-    /// </summary>
-    /// <param name="dateTime"></param>
-    /// <returns></returns>
-    public static DateTimeOffset ConvertToDateTimeOffset(this DateTime dateTime)
-    {
-        return DateTime.SpecifyKind(dateTime, DateTimeKind.Local);
-    }
 
-    /// <summary>
-    /// 将 DateTime? 转换成 DateTimeOffset?
-    /// </summary>
-    /// <param name="dateTime"></param>
-    /// <returns></returns>
-    public static DateTimeOffset? ConvertToDateTimeOffset(this DateTime? dateTime)
-    {
-        return dateTime.HasValue ? dateTime.Value.ConvertToDateTimeOffset() : null;
-    }
 
-    /// <summary>
-    /// 将时间戳转换为 DateTime
-    /// </summary>
-    /// <param name="timestamp"></param>
-    /// <returns></returns>
-    internal static DateTime ConvertToDateTime(this long timestamp)
-    {
-        var timeStampDateTime = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-        var digitCount = (int)Math.Floor(Math.Log10(timestamp) + 1);
-
-        if (digitCount != 13 && digitCount != 10)
-        {
-            throw new ArgumentException("Data is not a valid timestamp format.");
-        }
-
-        return (digitCount == 13
-            ? timeStampDateTime.AddMilliseconds(timestamp)  // 13 位时间戳
-            : timeStampDateTime.AddSeconds(timestamp)).ToLocalTime();   // 10 位时间戳
-    }
 
     /// <summary>
     /// 将 IFormFile 转换成 byte[]

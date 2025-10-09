@@ -100,9 +100,11 @@ namespace ThingsGateway.SqlSugar
         /// <returns>插入导航任务</returns>
         public InsertNavTask<Root, TChild> Include<TChild>(Expression<Func<Root, TChild>> expression) where TChild : class, new()
         {
-            Check.ExceptionEasy(typeof(TChild).FullName.Contains("System.Collections.Generic.List`"),
-                "  need  where T: class, new() ",
-                "需要Class,new()约束，并且类属性中不能有required修饰符");
+            if (typeof(TChild).FullName.Contains("System.Collections.Generic.List`"))
+            {
+                throw new SqlSugarLangException("  need  where T: class, new() ",
+                   "需要Class,new()约束，并且类属性中不能有required修饰符");
+            }
             this.Context = insertNavProvider._Context;
             insertNavProvider.NavContext = this.NavContext;
             InsertNavTask<Root, TChild> result = new InsertNavTask<Root, TChild>();
@@ -140,9 +142,11 @@ namespace ThingsGateway.SqlSugar
         /// <returns>插入导航任务</returns>
         public InsertNavTask<Root, TChild> Include<TChild>(Expression<Func<Root, TChild>> expression, InsertNavOptions options) where TChild : class, new()
         {
-            Check.ExceptionEasy(typeof(TChild).FullName.Contains("System.Collections.Generic.List`"),
-                "  need  where T: class, new() ",
-                "需要Class,new()约束，并且类属性中不能有required修饰符");
+            if (typeof(TChild).FullName.Contains("System.Collections.Generic.List`"))
+            {
+                throw new SqlSugarLangException("  need  where T: class, new() ",
+                     "需要Class,new()约束，并且类属性中不能有required修饰符");
+            }
             this.Context = insertNavProvider._Context;
             insertNavProvider.NavContext = this.NavContext;
             InsertNavTask<Root, TChild> result = new InsertNavTask<Root, TChild>();
@@ -343,10 +347,9 @@ namespace ThingsGateway.SqlSugar
         public async Task<Root> ExecuteReturnEntityAsync()
         {
             Root result = null;
-            await Task.Run(async () =>
+            await Task.Run(() =>
             {
                 result = ExecuteReturnEntity();
-                await Task.Delay(0).ConfigureAwait(false);
             }).ConfigureAwait(false);
             return result;
         }
@@ -375,10 +378,9 @@ namespace ThingsGateway.SqlSugar
         /// <returns>是否成功</returns>
         public async Task<bool> ExecuteCommandAsync()
         {
-            await Task.Run(async () =>
+            await Task.Run(() =>
             {
                 ExecuteCommand();
-                await Task.Delay(0).ConfigureAwait(false);
             }).ConfigureAwait(false);
             return true;
         }

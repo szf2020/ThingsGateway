@@ -203,7 +203,7 @@ namespace ThingsGateway.SqlSugar
             var valueArray = (value + "").Split(',');
             if (valueArray.Length != 2)
             {
-                Check.ExceptionEasy($"The {item.FieldName} value is not a valid format, but is properly separated by a comma (1,2)", $"{item.FieldName} 值不是有效格式，正确是 1,2 这种中间逗号隔开");
+                Check.ExceptionLang($"The {item.FieldName} value is not a valid format, but is properly separated by a comma (1,2)", $"{item.FieldName} 值不是有效格式，正确是 1,2 这种中间逗号隔开");
             }
             var firstValue = GetFieldValue(new ConditionalModel() { CSharpTypeName = item.CSharpTypeName, FieldValue = valueArray.FirstOrDefault() });
             var lastValue = GetFieldValue(new ConditionalModel() { CSharpTypeName = item.CSharpTypeName, FieldValue = valueArray.LastOrDefault() });
@@ -219,7 +219,7 @@ namespace ThingsGateway.SqlSugar
             var valueArray = (value + "").Split(',');
             if (valueArray.Length != 2)
             {
-                Check.ExceptionEasy($"The {item.FieldName} value is not a valid format, but is properly separated by a comma (1,2)", $"{item.FieldName} 值不是有效格式，正确是 1,2 这种中间逗号隔开");
+                Check.ExceptionLang($"The {item.FieldName} value is not a valid format, but is properly separated by a comma (1,2)", $"{item.FieldName} 值不是有效格式，正确是 1,2 这种中间逗号隔开");
             }
             var times = GetDateRange(valueArray.FirstOrDefault(), valueArray.LastOrDefault());
             var parameterNameFirst = parameterName + "_01";
@@ -250,10 +250,10 @@ namespace ThingsGateway.SqlSugar
                 date2Str = date2Str + ":00:00";
             }
             if (!DateTime.TryParse(date1Str, out var date1))
-                Check.ExceptionEasy("date1 format is incorrect.(yyyy-MM-dd | yyyy | yyyy-MM | yyyy-MM-dd HH | yyyy-MM-dd HH:mm |yyyy-MM-dd HH:mm:ss)", "date1 格式不正确，支持格式 yyyy-MM-dd | yyyy | yyyy-MM | yyyy-MM-dd HH | yyyy-MM-dd HH:mm|yyyy-MM-dd HH:mm:ss");
+                Check.ExceptionLang("date1 format is incorrect.(yyyy-MM-dd | yyyy | yyyy-MM | yyyy-MM-dd HH | yyyy-MM-dd HH:mm |yyyy-MM-dd HH:mm:ss)", "date1 格式不正确，支持格式 yyyy-MM-dd | yyyy | yyyy-MM | yyyy-MM-dd HH | yyyy-MM-dd HH:mm|yyyy-MM-dd HH:mm:ss");
 
             if (!DateTime.TryParse(date2Str, out var date2))
-                Check.ExceptionEasy("date2 format is incorrect.", "date2 格式不正确");
+                Check.ExceptionLang("date2 format is incorrect.", "date2 格式不正确");
 
             if (len == 4) // yyyy
                 date2 = date2.AddYears(1);
@@ -268,7 +268,7 @@ namespace ThingsGateway.SqlSugar
             else if (len == 19) // yyyy-MM-dd HH:mm
                 date2 = date2.AddSeconds(1);
             else
-                Check.ExceptionEasy("date format is incorrect.(yyyy-MM-dd | yyyy | yyyy-MM | yyyy-MM-dd HH | yyyy-MM-dd HH:mm|yyyy-MM-dd HH:mm:ss)", "date 格式不正确，支持格式 yyyy-MM-dd | yyyy | yyyy-MM | yyyy-MM-dd HH | yyyy-MM-dd HH:mm|yyyy-MM-dd HH:mm:ss");
+                Check.ExceptionLang("date format is incorrect.(yyyy-MM-dd | yyyy | yyyy-MM | yyyy-MM-dd HH | yyyy-MM-dd HH:mm|yyyy-MM-dd HH:mm:ss)", "date 格式不正确，支持格式 yyyy-MM-dd | yyyy | yyyy-MM | yyyy-MM-dd HH | yyyy-MM-dd HH:mm|yyyy-MM-dd HH:mm:ss");
 
             return new DateTime[] { date1, date2 };
         }

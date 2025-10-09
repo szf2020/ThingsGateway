@@ -20,7 +20,7 @@ using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 
-using ThingsGateway.Extensions;
+using ThingsGateway.Extension;
 
 namespace ThingsGateway.SpecificationDocument;
 

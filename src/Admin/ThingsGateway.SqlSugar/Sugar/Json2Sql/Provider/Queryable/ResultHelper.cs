@@ -16,7 +16,7 @@
             {
                 AddDefaultSql(result);
             }
-            Check.ExceptionEasy(jsonQueryParameter.JoinNoSelect, "join query need Select", "联表查询需要设置Select");
+            if (jsonQueryParameter.JoinNoSelect) { throw new SqlSugarLangException("join query need Select", "联表查询需要设置Select"); }
             return result;
         }
 

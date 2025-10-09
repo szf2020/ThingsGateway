@@ -16,7 +16,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Reflection;
 using System.Text.RegularExpressions;
 
-using ThingsGateway.Extensions;
+using ThingsGateway.Extension;
 using ThingsGateway.Templates.Extensions;
 
 namespace ThingsGateway.DataValidation;

@@ -22,7 +22,7 @@ namespace ThingsGateway.SqlSugar
                     try
                     {
                         var mySqlConnectionString = base.Context.CurrentConnectionConfig.ConnectionString;
-                        Check.ExceptionEasy(String.IsNullOrEmpty(mySqlConnectionString), "ConnectionString is not null", "连接字符串ConnectionString不能为Null");
+                        if (String.IsNullOrEmpty(mySqlConnectionString)) { throw new SqlSugarLangException("ConnectionString is not null", "连接字符串ConnectionString不能为Null"); }
                         if (!mySqlConnectionString.Contains("charset", StringComparison.CurrentCultureIgnoreCase) && !mySqlConnectionString.Contains("character", StringComparison.CurrentCultureIgnoreCase))
                         {
                             mySqlConnectionString = mySqlConnectionString.Trim().TrimEnd(';') + ";charset=utf8;";
@@ -41,7 +41,7 @@ namespace ThingsGateway.SqlSugar
                         }
                         else
                         {
-                            Check.Exception(true, ErrorMessage.ConnnectionOpen, ex.Message);
+                            { throw new SqlSugarException(ErrorMessage.ConnnectionOpen, ex.Message); }
                         }
                     }
                 }
@@ -164,7 +164,7 @@ namespace ThingsGateway.SqlSugar
 
             if (ex is NullReferenceException && SugarCompatible.IsFramework)
             {
-                Check.ExceptionEasy($"To upgrade the MySql.Data. Error:{ex.Message}", $" 请先升级MySql.Data 。 详细错误:{ex.Message}");
+                Check.ExceptionLang($"To upgrade the MySql.Data. Error:{ex.Message}", $" 请先升级MySql.Data 。 详细错误:{ex.Message}");
             }
         }
 
@@ -191,7 +191,7 @@ namespace ThingsGateway.SqlSugar
                 }
                 catch (Exception ex)
                 {
-                    Check.Exception(true, ex.Message);
+                    { throw new SqlSugarException(ex.Message); }
                 }
             }
             return sqlCommand;
