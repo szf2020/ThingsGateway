@@ -66,7 +66,7 @@ public sealed class WaitLock : IDisposable
             }
             catch (SemaphoreFullException)
             {
-                XTrace.WriteException(new Exception($"WaitLock {_name} 释放失败，当前信号量无需释放"));
+                //XTrace.WriteException(new Exception($"WaitLock {_name} 释放失败，当前信号量无需释放"));
             }
         }
     }
