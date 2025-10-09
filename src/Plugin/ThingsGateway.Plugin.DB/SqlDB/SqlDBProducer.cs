@@ -119,7 +119,7 @@ public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariable
                 if (_driverPropertys.IsHistoryDB)
                 {
                     {
-                        var time = TimerX.Now - TimeSpan.FromDays(-_driverPropertys.SaveDays);
+                        var time = TimerX.Now - TimeSpan.FromDays(_driverPropertys.SaveDays);
                         var tableNames = db.SplitHelper<SQLHistoryValue>().GetTables();//根据时间获取表名
                         var filtered = tableNames.Where(a => a.Date < time).ToList();
                         // 去掉最后一个
@@ -137,7 +137,7 @@ public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariable
                     }
 
                     {
-                        var time = TimerX.Now - TimeSpan.FromDays(-_driverPropertys.SaveDays);
+                        var time = TimerX.Now - TimeSpan.FromDays(_driverPropertys.SaveDays);
                         var tableNames = db.SplitHelper<SQLNumberHistoryValue>().GetTables();//根据时间获取表名
                         var filtered = tableNames.Where(a => a.Date < time).ToList();
                         // 去掉最后一个

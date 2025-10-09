@@ -105,7 +105,7 @@ public partial class SqlHistoryAlarm : BusinessBaseWithCacheAlarm
             else
             {
                 {
-                    var time = TimerX.Now - TimeSpan.FromDays(-_driverPropertys.SaveDays);
+                    var time = TimerX.Now - TimeSpan.FromDays(_driverPropertys.SaveDays);
 
                     await db.Deleteable<HistoryAlarm>().Where(a => a.EventTime < time).ExecuteCommandAsync(cancellationToken).ConfigureAwait(false);
 

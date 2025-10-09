@@ -102,7 +102,7 @@ public partial class QuestDBProducer : BusinessBaseWithCacheIntervalVariable
             else
             {
                 {
-                    var time = TimerX.Now - TimeSpan.FromDays(-_driverPropertys.SaveDays);
+                    var time = TimerX.Now - TimeSpan.FromDays(_driverPropertys.SaveDays);
 
                     string sql = $"""
                                         ALTER TABLE {_driverPropertys.NumberTableNameLow}

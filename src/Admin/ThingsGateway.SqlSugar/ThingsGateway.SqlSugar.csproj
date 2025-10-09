@@ -34,7 +34,7 @@
 		<PackageReference Include="Oracle.ManagedDataAccess.Core" Version="23.9.1" />
 		<PackageReference Include="Oscar.Data.SqlClient" Version="4.2.27" />
 		<PackageReference Include="System.Data.Common" Version="4.3.0" />
-		<PackageReference Include="Microsoft.Data.SqlClient" Version="6.1.1" />
+		<PackageReference Include="Microsoft.Data.SqlClient" Version="6.1.2" />
 		<PackageReference Include="System.Reflection.Emit.Lightweight" Version="4.7.0" />
 		<PackageReference Include="System.Text.RegularExpressions" Version="4.3.1" />
 		<PackageReference Include="System.Formats.Asn1" Version="8.0.2" />
