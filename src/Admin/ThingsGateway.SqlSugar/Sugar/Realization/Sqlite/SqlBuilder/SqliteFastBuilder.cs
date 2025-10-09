@@ -171,11 +171,21 @@ namespace ThingsGateway.SqlSugar
                 else
                 {
                     var count = list.FirstOrDefault().Value.Item2?.Count;
+                    if(count==1)
+                    {
+                        var row = list.GetRows(0).ToDictionary(a => a.ColumnName, a => a.Value);
+                        cmd.CommandText = this.Context.InsertableT(row).AS(tableName).ToSqlString().Replace(";SELECT LAST_INSERT_ROWID();", "");
+                        TransformInsertCommand(cmd);
+                        i += await cmd.ExecuteNonQueryAsync().ConfigureAwait(false);
+                        return i;
+                    }
+
                     if (count > 0)
                     {
                         var row = list.GetRows(0).ToDictionary(a => a.ColumnName, a => a.Value);
                         cmd.CommandText = this.Context.InsertableT(row).AS(tableName).ToSql().Key.Replace(";SELECT LAST_INSERT_ROWID();", "");
                     }
+
                     TransformInsertCommand(cmd);
                     if (count > 0)
                     {
@@ -292,6 +302,18 @@ namespace ThingsGateway.SqlSugar
                 else
                 {
                     var count = list.FirstOrDefault().Value.Item2?.Count;
+
+                    if (count == 1)
+                    {
+                        var row = list.GetRows(0).ToDictionary(a => a.ColumnName, a => a.Value);
+                        cmd.CommandText = this.Context.UpdateableT(row)
+                         .WhereColumns(whereColumns)
+                         .UpdateColumns(updateColumns)
+                         .AS(tableName).ToSqlString();
+                        i += await cmd.ExecuteNonQueryAsync().ConfigureAwait(false);
+                        return i;
+                    }
+
                     if (count > 0)
                     {
                         var row = list.GetRows(0).ToDictionary(a => a.ColumnName, a => a.Value);

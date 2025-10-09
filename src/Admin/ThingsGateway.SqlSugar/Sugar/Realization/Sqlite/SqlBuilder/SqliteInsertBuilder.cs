@@ -31,7 +31,7 @@ namespace ThingsGateway.SqlSugar
             {
                 // 单条插入
                 var columnValues = string.Join(",", DbColumnInfoList.Select(it =>
-                    base.GetDbColumn(it, Builder.SqlParameterKeyWord + it.DbColumnName)));
+                    base.GetDbColumn(it, $"{Builder.SqlParameterKeyWord}{it.DbColumnName}")));
 
                 ActionMinDate();
                 return string.Format(SqlTemplate, GetTableNameString, columnNames, columnValues);
