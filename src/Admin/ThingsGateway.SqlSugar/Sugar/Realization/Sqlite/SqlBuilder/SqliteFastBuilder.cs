@@ -28,7 +28,11 @@ namespace ThingsGateway.SqlSugar
                 this.Context.Close();
             }
         }
-
+        Task<string> CreateTempAsync<T>(Dictionary<string, (Type, List<DataInfos>)> list) where T : class, new()
+        {
+            IsUpdate = true;
+            return Task.FromResult(string.Empty);
+        }
         public Task CreateTempAsync<T>(DataTable dt) where T : class, new()
         {
 

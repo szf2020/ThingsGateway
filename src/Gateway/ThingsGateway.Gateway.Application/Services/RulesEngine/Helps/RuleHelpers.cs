@@ -104,7 +104,14 @@ public static class RuleHelpers
         {
             if (propertyInfos.TryGetValue(item.Key, out var propertyInfo))
             {
-                propertyInfo.SetValue(nodeModel, item.Value?.ToObject(propertyInfo.PropertyType));
+                try
+                {
+                    propertyInfo.SetValue(nodeModel, item.Value?.ToObject(propertyInfo.PropertyType));
+                }
+                catch (Exception)
+                {
+                    propertyInfo.SetValue(nodeModel, null);
+                }
             }
         }
     }
