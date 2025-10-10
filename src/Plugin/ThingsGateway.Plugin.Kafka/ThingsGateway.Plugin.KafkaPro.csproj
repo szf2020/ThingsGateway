@@ -17,13 +17,13 @@
 		<AssemblyName>ThingsGateway.Plugin.Kafka</AssemblyName>
 		<PackageId>$(MSBuildProjectName)</PackageId>
 	</PropertyGroup>
-	
+
 	<ItemGroup>
-		<ProjectReference Include="..\..\PluginPro\ThingsGateway.Management.Razor\ThingsGateway.Management.Razor.csproj" >
+		<ProjectReference Include="..\..\PluginPro\ThingsGateway.Management.Razor\ThingsGateway.Management.Razor.csproj">
 			<PrivateAssets>contentFiles;compile;build;buildMultitargeting;buildTransitive;analyzers;</PrivateAssets>
 		</ProjectReference>
-		
-		<PackageReference Include="Confluent.Kafka" Version="2.11.1" GeneratePathProperty="true">
+
+		<PackageReference Include="Confluent.Kafka" Version="2.12.0" GeneratePathProperty="true">
 			<PrivateAssets>contentFiles;compile;build;buildMultitargeting;buildTransitive;analyzers;</PrivateAssets>
 		</PackageReference>
 	</ItemGroup>
@@ -34,6 +34,6 @@
 			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
 		</EmbeddedResource>
 	</ItemGroup>
-	
+
 </Project>
 

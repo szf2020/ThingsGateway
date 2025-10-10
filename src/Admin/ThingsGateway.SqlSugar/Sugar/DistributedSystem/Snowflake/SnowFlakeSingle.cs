@@ -2,7 +2,7 @@
 {
     public sealed class SnowFlakeSingle
     {
-        private static object LockObject = new object();
+        private static readonly object LockObject = new object();
         private static DistributedSystem.Snowflake.IdWorker worker;
         public static int WorkId = 1;
         public static int DatacenterId = 1;

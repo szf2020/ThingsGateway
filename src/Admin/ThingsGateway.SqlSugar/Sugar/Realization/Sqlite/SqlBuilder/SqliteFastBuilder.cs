@@ -28,11 +28,12 @@ namespace ThingsGateway.SqlSugar
                 this.Context.Close();
             }
         }
-        Task<string> CreateTempAsync<T>(Dictionary<string, (Type, List<DataInfos>)> list) where T : class, new()
+        public Task<string> CreateTempAsync<T>(Dictionary<string, (Type, List<DataInfos>)> list) where T : class, new()
         {
             IsUpdate = true;
             return Task.FromResult(string.Empty);
         }
+
         public Task CreateTempAsync<T>(DataTable dt) where T : class, new()
         {
 
@@ -175,7 +176,7 @@ namespace ThingsGateway.SqlSugar
                 else
                 {
                     var count = list.FirstOrDefault().Value.Item2?.Count;
-                    if(count==1)
+                    if (count == 1)
                     {
                         var row = list.GetRows(0).ToDictionary(a => a.ColumnName, a => a.Value);
                         cmd.CommandText = this.Context.InsertableT(row).AS(tableName).ToSqlString().Replace(";SELECT LAST_INSERT_ROWID();", "");

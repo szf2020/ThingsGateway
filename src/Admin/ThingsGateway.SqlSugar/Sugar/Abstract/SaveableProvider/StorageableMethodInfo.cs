@@ -6,7 +6,7 @@ namespace ThingsGateway.SqlSugar
     {
         internal SqlSugarProvider Context { get; set; }
         internal MethodInfo MethodInfo { get; set; }
-        internal object objectValue { get; set; }
+        internal object ObjValue { get; set; }
         public int ExecuteCommand()
         {
             if (Context == null) return 0;
@@ -20,16 +20,14 @@ namespace ThingsGateway.SqlSugar
         {
             get
             {
-                var type = "AsInsertable";
-                return GetAs(type);
+                return GetAs(nameof(AsInsertable));
             }
         }
         public StorageableAsMethodInfo AsUpdateable
         {
             get
             {
-                var type = "AsUpdateable";
-                return GetAs(type);
+                return GetAs(nameof(AsUpdateable));
             }
         }
 
@@ -48,9 +46,9 @@ namespace ThingsGateway.SqlSugar
 
         private MethodInfo GetSaveMethod(ref object callValue)
         {
-            if (objectValue == null)
+            if (ObjValue == null)
                 return null;
-            callValue = MethodInfo.Invoke(Context, new object[] { objectValue });
+            callValue = MethodInfo.Invoke(Context, new object[] { ObjValue });
             return callValue.GetType().GetMyMethod(nameof(ExecuteCommand), 0);
         }
 

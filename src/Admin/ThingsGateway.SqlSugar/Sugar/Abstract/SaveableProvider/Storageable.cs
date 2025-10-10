@@ -8,7 +8,7 @@ namespace ThingsGateway.SqlSugar
         SqlSugarProvider Context { get; set; }
         internal ISqlBuilder Builder;
         List<SugarParameter> Parameters;
-        IEnumerable<StorageableInfo<T>> allDatas;
+        StorageableInfo<T>[] allDatas;
         List<T> dbDataList = new List<T>();
         List<KeyValuePair<StorageType, Func<StorageableInfo<T>, bool>, string>> whereFuncs = new List<KeyValuePair<StorageType, Func<StorageableInfo<T>, bool>, string>>();
         Expression<Func<T, object>> whereExpression;
@@ -24,7 +24,7 @@ namespace ThingsGateway.SqlSugar
             this.allDatas = datas.Select(it => new StorageableInfo<T>()
             {
                 Item = it
-            });
+            }).ToArray();
         }
 
         Expression<Func<T, bool>> queryableWhereExp;
@@ -209,7 +209,7 @@ namespace ThingsGateway.SqlSugar
             {
                 return this.Saveable().ToStorage();
             }
-            if (!this.allDatas.Any())
+            if (this.allDatas.Length == 0)
                 return new StorageableResult<T>()
                 {
                     AsDeleteable = this.Context.Deleteable<T>().AS(asname).Where(it => false),
@@ -298,7 +298,7 @@ namespace ThingsGateway.SqlSugar
             {
                 return this.Saveable().GetStorageableResult();
             }
-            if (!this.allDatas.Any())
+            if (this.allDatas.Length == 0)
                 return new StorageableResult<T>()
                 {
                     //AsDeleteable = this.Context.Deleteable<T>().AS(asname).Where(it => false),
@@ -380,7 +380,7 @@ namespace ThingsGateway.SqlSugar
             {
                 return await Saveable().ToStorageAsync().ConfigureAwait(false);
             }
-            if (!this.allDatas.Any())
+            if (this.allDatas.Length == 0)
                 return new StorageableResult<T>()
                 {
                     AsDeleteable = this.Context.Deleteable<T>().AS(asname).Where(it => false),

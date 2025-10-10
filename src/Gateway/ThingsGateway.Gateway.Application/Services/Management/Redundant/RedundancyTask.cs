@@ -346,7 +346,7 @@ internal sealed class RedundancyTask : IRpcDriver, IAsyncDisposable
                {
                    a.UseTcpSessionCheckClear();
 
-                   a.UseDmtpRpc().ConfigureDefaultSerializationSelector(b =>
+                   a.UseDmtpRpc(a => a.ConfigureDefaultSerializationSelector(b =>
                    {
                        b.UseSystemTextJson(json =>
                        {
@@ -356,7 +356,7 @@ internal sealed class RedundancyTask : IRpcDriver, IAsyncDisposable
                            json.Converters.Add(new JObjectSystemTextJsonConverter());
                            json.Converters.Add(new JArraySystemTextJsonConverter());
                        });
-                   });
+                   }));
                    a.UseDmtpHeartbeat()//使用Dmtp心跳
                    .SetTick(TimeSpan.FromMilliseconds(redundancy.HeartbeatInterval))
                    .SetMaxFailCount(redundancy.MaxErrorCount);
@@ -390,7 +390,7 @@ internal sealed class RedundancyTask : IRpcDriver, IAsyncDisposable
                .ConfigurePlugins(a =>
                {
                    a.UseTcpSessionCheckClear();
-                   a.UseDmtpRpc().ConfigureDefaultSerializationSelector(b =>
+                   a.UseDmtpRpc(a => a.ConfigureDefaultSerializationSelector(b =>
                    {
                        b.UseSystemTextJson(json =>
                        {
@@ -400,7 +400,7 @@ internal sealed class RedundancyTask : IRpcDriver, IAsyncDisposable
                            json.Converters.Add(new JObjectSystemTextJsonConverter());
                            json.Converters.Add(new JArraySystemTextJsonConverter());
                        });
-                   });
+                   }));
                    a.UseDmtpHeartbeat()//使用Dmtp心跳
                    .SetTick(TimeSpan.FromMilliseconds(redundancy.HeartbeatInterval))
                    .SetMaxFailCount(redundancy.MaxErrorCount);

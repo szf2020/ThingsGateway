@@ -31,61 +31,6 @@ namespace ThingsGateway.SqlSugar
         /// 数据记录器
         /// </summary>
         private IDataRecord DataRecord;
-        /// <summary>
-        /// IsDBNull方法
-        /// </summary>
-        private static readonly MethodInfo isDBNullMethod = typeof(IDataRecord).GetMethod(nameof(IDataRecord.IsDBNull), new Type[] { typeof(int) });
-        /// <summary>
-        /// GetBoolean方法
-        /// </summary>
-        private static readonly MethodInfo getBoolean = typeof(IDataRecord).GetMethod(nameof(IDataRecord.GetBoolean), new Type[] { typeof(int) });
-        /// <summary>
-        /// GetByte方法
-        /// </summary>
-        private static readonly MethodInfo getByte = typeof(IDataRecord).GetMethod(nameof(IDataRecord.GetByte), new Type[] { typeof(int) });
-        /// <summary>
-        /// GetDateTime方法
-        /// </summary>
-        private static readonly MethodInfo getDateTime = typeof(IDataRecord).GetMethod(nameof(IDataRecord.GetDateTime), new Type[] { typeof(int) });
-        private static readonly MethodInfo getDecimal = typeof(IDataRecord).GetMethod(nameof(IDataRecord.GetDecimal), new[] { typeof(int) });
-        private static readonly MethodInfo getDouble = typeof(IDataRecord).GetMethod(nameof(IDataRecord.GetDouble), new[] { typeof(int) });
-        private static readonly MethodInfo getFloat = typeof(IDataRecord).GetMethod(nameof(IDataRecord.GetFloat), new[] { typeof(int) });
-        private static readonly MethodInfo getGuid = typeof(IDataRecord).GetMethod(nameof(IDataRecord.GetGuid), new[] { typeof(int) });
-        private static readonly MethodInfo getInt16 = typeof(IDataRecord).GetMethod(nameof(IDataRecord.GetInt16), new[] { typeof(int) });
-        private static readonly MethodInfo getInt32 = typeof(IDataRecord).GetMethod(nameof(IDataRecord.GetInt32), new[] { typeof(int) });
-        private static readonly MethodInfo getInt64 = typeof(IDataRecord).GetMethod(nameof(IDataRecord.GetInt64), new[] { typeof(int) });
-        private static readonly MethodInfo getString = typeof(IDataRecord).GetMethod(nameof(IDataRecord.GetString), new[] { typeof(int) });
-        private static readonly MethodInfo getdatetimeoffset = typeof(IDataRecordExtensions).GetMethod(nameof(IDataRecordExtensions.GetDateTimeOffset));
-        private static readonly MethodInfo getdatetimeoffsetDate = typeof(IDataRecordExtensions).GetMethod(nameof(IDataRecordExtensions.GetDateTimeOffsetDate));
-        private static readonly MethodInfo getStringGuid = typeof(IDataRecordExtensions).GetMethod(nameof(IDataRecordExtensions.GetStringGuid));
-        private static readonly MethodInfo getXelement = typeof(IDataRecordExtensions).GetMethod(nameof(IDataRecordExtensions.GetXelement));
-        private static readonly MethodInfo getConvertStringGuid = typeof(IDataRecordExtensions).GetMethod(nameof(IDataRecordExtensions.GetConvertStringGuid));
-        private static readonly MethodInfo getEnum = typeof(IDataRecordExtensions).GetMethod(nameof(IDataRecordExtensions.GetEnum));
-        private static readonly MethodInfo getConvertString = typeof(IDataRecordExtensions).GetMethod(nameof(IDataRecordExtensions.GetConvertString));
-        private static readonly MethodInfo getConvertFloat = typeof(IDataRecordExtensions).GetMethod(nameof(IDataRecordExtensions.GetConvertFloat));
-        private static readonly MethodInfo getConvertBoolean = typeof(IDataRecordExtensions).GetMethod(nameof(IDataRecordExtensions.GetConvertBoolean));
-        private static readonly MethodInfo getConvertByte = typeof(IDataRecordExtensions).GetMethod(nameof(IDataRecordExtensions.GetConvertByte));
-        private static readonly MethodInfo getConvertChar = typeof(IDataRecordExtensions).GetMethod(nameof(IDataRecordExtensions.GetConvertChar));
-        private static readonly MethodInfo getConvertDateTime = typeof(IDataRecordExtensions).GetMethod(nameof(IDataRecordExtensions.GetConvertDateTime));
-        private static readonly MethodInfo getConvertTime = typeof(IDataRecordExtensions).GetMethod(nameof(IDataRecordExtensions.GetConvertTime));
-        private static readonly MethodInfo getTime = typeof(IDataRecordExtensions).GetMethod(nameof(IDataRecordExtensions.GetTime));
-        private static readonly MethodInfo getConvertDecimal = typeof(IDataRecordExtensions).GetMethod(nameof(IDataRecordExtensions.GetConvertDecimal));
-        private static readonly MethodInfo getConvertDouble = typeof(IDataRecordExtensions).GetMethod(nameof(IDataRecordExtensions.GetConvertDouble));
-        private static readonly MethodInfo getConvertDoubleToFloat = typeof(IDataRecordExtensions).GetMethod(nameof(IDataRecordExtensions.GetConvertDoubleToFloat));
-        private static readonly MethodInfo getConvertGuid = typeof(IDataRecordExtensions).GetMethod(nameof(IDataRecordExtensions.GetConvertGuid));
-        private static readonly MethodInfo getConvertInt16 = typeof(IDataRecordExtensions).GetMethod(nameof(IDataRecordExtensions.GetConvertInt16));
-        private static readonly MethodInfo getConvertInt32 = typeof(IDataRecordExtensions).GetMethod(nameof(IDataRecordExtensions.GetConvertInt32));
-        private static readonly MethodInfo getConvertInt64 = typeof(IDataRecordExtensions).GetMethod(nameof(IDataRecordExtensions.GetConvertInt64));
-        private static readonly MethodInfo getConvertEnum_Null = typeof(IDataRecordExtensions).GetMethod(nameof(IDataRecordExtensions.GetConvertEnum_Null));
-        private static readonly MethodInfo getConvertdatetimeoffset = typeof(IDataRecordExtensions).GetMethod(nameof(IDataRecordExtensions.GetConvertdatetimeoffset));
-        private static readonly MethodInfo getConvertdatetimeoffsetDate = typeof(IDataRecordExtensions).GetMethod(nameof(IDataRecordExtensions.GetConvertdatetimeoffsetDate));
-        private static readonly MethodInfo getOtherNull = typeof(IDataRecordExtensions).GetMethod(nameof(IDataRecordExtensions.GetOtherNull));
-        private static readonly MethodInfo getOther = typeof(IDataRecordExtensions).GetMethod(nameof(IDataRecordExtensions.GetOther));
-        private static readonly MethodInfo getJson = typeof(IDataRecordExtensions).GetMethod(nameof(IDataRecordExtensions.GetJson));
-        private static readonly MethodInfo getArray = typeof(IDataRecordExtensions).GetMethod(nameof(IDataRecordExtensions.GetArray));
-        private static readonly MethodInfo getEntity = typeof(IDataRecordExtensions).GetMethod(nameof(IDataRecordExtensions.GetEntity), new[] { typeof(SqlSugarProvider) });
-        private static readonly MethodInfo getMyIntNull = typeof(IDataRecordExtensions).GetMethod(nameof(IDataRecordExtensions.GetMyIntNull));
-        private static readonly MethodInfo getMyInt = typeof(IDataRecordExtensions).GetMethod(nameof(IDataRecordExtensions.GetMyInt));
 
         /// <summary>
         /// 加载委托
@@ -219,7 +164,7 @@ namespace ThingsGateway.SqlSugar
             Label endIfLabel = generator.DefineLabel();
             generator.Emit(OpCodes.Ldarg_0);
             generator.Emit(OpCodes.Ldc_I4, i);
-            generator.Emit(OpCodes.Callvirt, isDBNullMethod);
+            generator.Emit(OpCodes.Callvirt, IDataReaderEntityBuilderHelpers.isDBNullMethod);
             generator.Emit(OpCodes.Brtrue, endIfLabel);
             generator.Emit(OpCodes.Ldloc, result);
             var method = (columnInfo.SqlParameterDbType as Type).GetMethod(nameof(ISugarDataConverter.QueryConverter));
@@ -253,12 +198,12 @@ namespace ThingsGateway.SqlSugar
 
             if (columnInfo.IsJson)
             {
-                MethodInfo jsonMethod = getJson.MakeGenericMethod(columnInfo.PropertyInfo.PropertyType);
+                MethodInfo jsonMethod = IDataReaderEntityBuilderHelpers.getJson.MakeGenericMethod(columnInfo.PropertyInfo.PropertyType);
                 int i = DataRecord.GetOrdinal(fieldName);
                 Label endIfLabel = generator.DefineLabel();
                 generator.Emit(OpCodes.Ldarg_0);
                 generator.Emit(OpCodes.Ldc_I4, i);
-                generator.Emit(OpCodes.Callvirt, isDBNullMethod);
+                generator.Emit(OpCodes.Callvirt, IDataReaderEntityBuilderHelpers.isDBNullMethod);
                 generator.Emit(OpCodes.Brtrue, endIfLabel);
                 generator.Emit(OpCodes.Ldloc, result);
                 generator.Emit(OpCodes.Ldarg_0);
@@ -278,12 +223,12 @@ namespace ThingsGateway.SqlSugar
             }
             if (columnInfo.IsArray)
             {
-                MethodInfo arrayMehtod = getArray.MakeGenericMethod(columnInfo.PropertyInfo.PropertyType);
+                MethodInfo arrayMehtod = IDataReaderEntityBuilderHelpers.getArray.MakeGenericMethod(columnInfo.PropertyInfo.PropertyType);
                 int i = DataRecord.GetOrdinal(fieldName);
                 Label endIfLabel = generator.DefineLabel();
                 generator.Emit(OpCodes.Ldarg_0);
                 generator.Emit(OpCodes.Ldc_I4, i);
-                generator.Emit(OpCodes.Callvirt, isDBNullMethod);
+                generator.Emit(OpCodes.Callvirt, IDataReaderEntityBuilderHelpers.isDBNullMethod);
                 generator.Emit(OpCodes.Brtrue, endIfLabel);
                 generator.Emit(OpCodes.Ldloc, result);
                 generator.Emit(OpCodes.Ldarg_0);
@@ -298,7 +243,7 @@ namespace ThingsGateway.SqlSugar
                 Label endIfLabel = generator.DefineLabel();
                 generator.Emit(OpCodes.Ldarg_0);
                 generator.Emit(OpCodes.Ldc_I4, i);
-                generator.Emit(OpCodes.Callvirt, isDBNullMethod);
+                generator.Emit(OpCodes.Callvirt, IDataReaderEntityBuilderHelpers.isDBNullMethod);
                 generator.Emit(OpCodes.Brtrue, endIfLabel);
                 generator.Emit(OpCodes.Ldloc, result);
                 generator.Emit(OpCodes.Ldarg_0);
@@ -332,7 +277,7 @@ namespace ThingsGateway.SqlSugar
 
             generator.Emit(OpCodes.Ldarg_0);
             generator.Emit(OpCodes.Ldc_I4, i);
-            generator.Emit(OpCodes.Callvirt, isDBNullMethod);
+            generator.Emit(OpCodes.Callvirt, IDataReaderEntityBuilderHelpers.isDBNullMethod);
             generator.Emit(OpCodes.Brtrue, endIfLabel);
             generator.Emit(OpCodes.Ldloc, result);
             generator.Emit(OpCodes.Ldarg_0);
@@ -378,7 +323,7 @@ namespace ThingsGateway.SqlSugar
             {
                 if (provider.IsNoSql)
                 {
-                    method = isNullableType ? getOtherNull.MakeGenericMethod(bindPropertyType) : getOther.MakeGenericMethod(bindPropertyType);
+                    method = isNullableType ? IDataReaderEntityBuilderHelpers.getOtherNull.MakeGenericMethod(bindPropertyType) : IDataReaderEntityBuilderHelpers.getOther.MakeGenericMethod(bindPropertyType);
                     if (method.IsVirtual)
                         generator.Emit(OpCodes.Callvirt, method);
                     else
@@ -393,39 +338,39 @@ namespace ThingsGateway.SqlSugar
             {
                 if (bindPropertyType.IsEnum())
                 {
-                    method = isNullableType ? getConvertEnum_Null.MakeGenericMethod(bindPropertyType) : getEnum.MakeGenericMethod(bindPropertyType);
+                    method = isNullableType ? IDataReaderEntityBuilderHelpers.getConvertEnum_Null.MakeGenericMethod(bindPropertyType) : IDataReaderEntityBuilderHelpers.getEnum.MakeGenericMethod(bindPropertyType);
                 }
                 else if (bindPropertyType == UtilConstants.IntType)
                 {
-                    method = isNullableType ? getConvertInt32 : getInt32;
+                    method = isNullableType ? IDataReaderEntityBuilderHelpers.getConvertInt32 : IDataReaderEntityBuilderHelpers.getInt32;
                 }
                 else if (bindPropertyType == UtilConstants.DateTimeOffsetType && SugarCompatible.IsFramework)
                 {
-                    method = isNullableType ? getConvertdatetimeoffset : getdatetimeoffset;
+                    method = isNullableType ? IDataReaderEntityBuilderHelpers.getConvertdatetimeoffset : IDataReaderEntityBuilderHelpers.getdatetimeoffset;
                 }
                 else if (bindPropertyType == UtilConstants.ByteType)
                 {
-                    method = isNullableType ? getConvertByte : getByte;
+                    method = isNullableType ? IDataReaderEntityBuilderHelpers.getConvertByte : IDataReaderEntityBuilderHelpers.getByte;
                 }
                 else if (bindPropertyType == UtilConstants.StringType && dbTypeName.EqualCase("timestamp"))
                 {
-                    method = isNullableType ? getOtherNull.MakeGenericMethod(bindPropertyType) : getOther.MakeGenericMethod(bindPropertyType);
+                    method = isNullableType ? IDataReaderEntityBuilderHelpers.getOtherNull.MakeGenericMethod(bindPropertyType) : IDataReaderEntityBuilderHelpers.getOther.MakeGenericMethod(bindPropertyType);
                 }
                 else if (dbTypeName.EqualCase("STRING"))
                 {
-                    method = isNullableType ? getOtherNull.MakeGenericMethod(bindPropertyType) : getOther.MakeGenericMethod(bindPropertyType);
+                    method = isNullableType ? IDataReaderEntityBuilderHelpers.getOtherNull.MakeGenericMethod(bindPropertyType) : IDataReaderEntityBuilderHelpers.getOther.MakeGenericMethod(bindPropertyType);
                 }
                 else if (bindPropertyType == UtilConstants.StringType && validPropertyName == "int")
                 {
-                    method = isNullableType ? getOtherNull.MakeGenericMethod(bindPropertyType) : getOther.MakeGenericMethod(bindPropertyType);
+                    method = isNullableType ? IDataReaderEntityBuilderHelpers.getOtherNull.MakeGenericMethod(bindPropertyType) : IDataReaderEntityBuilderHelpers.getOther.MakeGenericMethod(bindPropertyType);
                 }
                 else if (bindPropertyType == UtilConstants.StringType)
                 {
-                    method = getString;
+                    method = IDataReaderEntityBuilderHelpers.getString;
                 }
                 else
                 {
-                    method = isNullableType ? getOtherNull.MakeGenericMethod(bindPropertyType) : getOther.MakeGenericMethod(bindPropertyType);
+                    method = isNullableType ? IDataReaderEntityBuilderHelpers.getOtherNull.MakeGenericMethod(bindPropertyType) : IDataReaderEntityBuilderHelpers.getOther.MakeGenericMethod(bindPropertyType);
                 }
                 if (method.IsVirtual)
                     generator.Emit(OpCodes.Callvirt, method);
@@ -445,13 +390,13 @@ namespace ThingsGateway.SqlSugar
                 case CSharpDataType.@int:
                     CheckType(bind.IntThrow, bindPropertyTypeName, validPropertyName, propertyName);
                     if (bindPropertyTypeName.IsContainsIn("int", "int32"))
-                        method = isNullableType ? getConvertInt32 : getInt32;
+                        method = isNullableType ? IDataReaderEntityBuilderHelpers.getConvertInt32 : IDataReaderEntityBuilderHelpers.getInt32;
                     if (bindPropertyTypeName.IsContainsIn("int64"))
                         method = null;
                     if (bindPropertyTypeName.IsContainsIn("byte"))
-                        method = isNullableType ? getConvertByte : getByte;
+                        method = isNullableType ? IDataReaderEntityBuilderHelpers.getConvertByte : IDataReaderEntityBuilderHelpers.getByte;
                     if (bindPropertyTypeName.IsContainsIn("int16"))
-                        method = isNullableType ? getConvertInt16 : getInt16;
+                        method = isNullableType ? IDataReaderEntityBuilderHelpers.getConvertInt16 : IDataReaderEntityBuilderHelpers.getInt16;
                     if (bindPropertyTypeName == "uint32" && this.Context.CurrentConnectionConfig.DbType.IsIn(DbType.MySql, DbType.MySqlConnector))
                         method = null;
                     if (bindPropertyTypeName == "int16")
@@ -459,21 +404,21 @@ namespace ThingsGateway.SqlSugar
                     break;
                 case CSharpDataType.@bool:
                     if (bindPropertyTypeName == "bool" || bindPropertyTypeName == "boolean")
-                        method = isNullableType ? getConvertBoolean : getBoolean;
+                        method = isNullableType ? IDataReaderEntityBuilderHelpers.getConvertBoolean : IDataReaderEntityBuilderHelpers.getBoolean;
                     break;
                 case CSharpDataType.@string:
                     if (this.Context.CurrentConnectionConfig.DbType != DbType.Oracle)
                     {
                         CheckType(bind.StringThrow, bindPropertyTypeName, validPropertyName, propertyName);
                     }
-                    method = getString;
+                    method = IDataReaderEntityBuilderHelpers.getString;
                     if (bindPropertyTypeName == "guid")
                     {
-                        method = isNullableType ? getConvertStringGuid : getStringGuid;
+                        method = isNullableType ? IDataReaderEntityBuilderHelpers.getConvertStringGuid : IDataReaderEntityBuilderHelpers.getStringGuid;
                     }
                     else if (bindPropertyTypeName == "xelement")
                     {
-                        method = getXelement;
+                        method = IDataReaderEntityBuilderHelpers.getXelement;
                     }
                     else if (dbTypeName == "CHAR" && DataRecord.GetDataTypeName(ordinal) == "CHAR(36)")
                     {
@@ -487,35 +432,35 @@ namespace ThingsGateway.SqlSugar
                 case CSharpDataType.DateTime:
                     CheckType(bind.DateThrow, bindPropertyTypeName, validPropertyName, propertyName);
                     if (bindPropertyTypeName == "datetime")
-                        method = isNullableType ? getConvertDateTime : getDateTime;
+                        method = isNullableType ? IDataReaderEntityBuilderHelpers.getConvertDateTime : IDataReaderEntityBuilderHelpers.getDateTime;
                     if (bindPropertyTypeName == "datetime" && dbTypeName.Equals("time", StringComparison.CurrentCultureIgnoreCase))
-                        method = isNullableType ? getConvertTime : getTime;
+                        method = isNullableType ? IDataReaderEntityBuilderHelpers.getConvertTime : IDataReaderEntityBuilderHelpers.getTime;
                     if (bindPropertyTypeName == "datetimeoffset")
-                        method = isNullableType ? getConvertdatetimeoffset : getdatetimeoffset;
+                        method = isNullableType ? IDataReaderEntityBuilderHelpers.getConvertdatetimeoffset : IDataReaderEntityBuilderHelpers.getdatetimeoffset;
                     break;
                 case CSharpDataType.@decimal:
                     CheckType(bind.DecimalThrow, bindPropertyTypeName, validPropertyName, propertyName);
                     if (bindPropertyTypeName == "decimal")
-                        method = isNullableType ? getConvertDecimal : getDecimal;
+                        method = isNullableType ? IDataReaderEntityBuilderHelpers.getConvertDecimal : IDataReaderEntityBuilderHelpers.getDecimal;
                     break;
                 case CSharpDataType.@float:
                 case CSharpDataType.@double:
                     CheckType(bind.DoubleThrow, bindPropertyTypeName, validPropertyName, propertyName);
                     if (bindPropertyTypeName.IsIn("double", "single") && dbTypeName != "real")
-                        method = isNullableType ? getConvertDouble : getDouble;
+                        method = isNullableType ? IDataReaderEntityBuilderHelpers.getConvertDouble : IDataReaderEntityBuilderHelpers.getDouble;
                     else
-                        method = isNullableType ? getConvertFloat : getFloat;
+                        method = isNullableType ? IDataReaderEntityBuilderHelpers.getConvertFloat : IDataReaderEntityBuilderHelpers.getFloat;
                     if (dbTypeName.Equals("float", StringComparison.CurrentCultureIgnoreCase) && isNullableType && bindPropertyTypeName.Equals("single", StringComparison.CurrentCultureIgnoreCase))
                     {
-                        method = getConvertDoubleToFloat;
+                        method = IDataReaderEntityBuilderHelpers.getConvertDoubleToFloat;
                     }
                     if (bindPropertyType == UtilConstants.DecType)
                     {
-                        method = isNullableType ? getOtherNull.MakeGenericMethod(bindPropertyType) : getOther.MakeGenericMethod(bindPropertyType);
+                        method = isNullableType ? IDataReaderEntityBuilderHelpers.getOtherNull.MakeGenericMethod(bindPropertyType) : IDataReaderEntityBuilderHelpers.getOther.MakeGenericMethod(bindPropertyType);
                     }
                     if (bindPropertyType == UtilConstants.IntType)
                     {
-                        method = isNullableType ? getOtherNull.MakeGenericMethod(bindPropertyType) : getOther.MakeGenericMethod(bindPropertyType);
+                        method = isNullableType ? IDataReaderEntityBuilderHelpers.getOtherNull.MakeGenericMethod(bindPropertyType) : IDataReaderEntityBuilderHelpers.getOther.MakeGenericMethod(bindPropertyType);
                     }
                     if (bindPropertyTypeName == "string")
                     {
@@ -525,45 +470,45 @@ namespace ThingsGateway.SqlSugar
                 case CSharpDataType.Guid:
                     CheckType(bind.GuidThrow, bindPropertyTypeName, validPropertyName, propertyName);
                     if (bindPropertyTypeName == "guid")
-                        method = isNullableType ? getConvertGuid : getGuid;
+                        method = isNullableType ? IDataReaderEntityBuilderHelpers.getConvertGuid : IDataReaderEntityBuilderHelpers.getGuid;
                     break;
                 case CSharpDataType.@byte:
                     if (bindPropertyTypeName == "byte")
-                        method = isNullableType ? getConvertByte : getByte;
+                        method = isNullableType ? IDataReaderEntityBuilderHelpers.getConvertByte : IDataReaderEntityBuilderHelpers.getByte;
                     break;
                 case CSharpDataType.@enum:
-                    method = isNullableType ? getConvertEnum_Null.MakeGenericMethod(bindPropertyType) : getEnum.MakeGenericMethod(bindPropertyType);
+                    method = isNullableType ? IDataReaderEntityBuilderHelpers.getConvertEnum_Null.MakeGenericMethod(bindPropertyType) : IDataReaderEntityBuilderHelpers.getEnum.MakeGenericMethod(bindPropertyType);
                     break;
                 case CSharpDataType.@short:
                     CheckType(bind.ShortThrow, bindPropertyTypeName, validPropertyName, propertyName);
                     if (bindPropertyTypeName == "int16" || bindPropertyTypeName == "short")
-                        method = isNullableType ? getConvertInt16 : getInt16;
+                        method = isNullableType ? IDataReaderEntityBuilderHelpers.getConvertInt16 : IDataReaderEntityBuilderHelpers.getInt16;
                     break;
                 case CSharpDataType.@long:
                     if (bindPropertyTypeName == "int64" || bindPropertyTypeName == "long")
-                        method = isNullableType ? getConvertInt64 : getInt64;
+                        method = isNullableType ? IDataReaderEntityBuilderHelpers.getConvertInt64 : IDataReaderEntityBuilderHelpers.getInt64;
                     break;
                 case CSharpDataType.DateTimeOffset:
-                    method = isNullableType ? getConvertdatetimeoffset : getdatetimeoffset;
+                    method = isNullableType ? IDataReaderEntityBuilderHelpers.getConvertdatetimeoffset : IDataReaderEntityBuilderHelpers.getdatetimeoffset;
                     if (bindPropertyTypeName == "datetime")
-                        method = isNullableType ? getConvertdatetimeoffsetDate : getdatetimeoffsetDate;
+                        method = isNullableType ? IDataReaderEntityBuilderHelpers.getConvertdatetimeoffsetDate : IDataReaderEntityBuilderHelpers.getdatetimeoffsetDate;
                     break;
                 case CSharpDataType.Single:
                     break;
                 default:
-                    method = isNullableType ? getOtherNull.MakeGenericMethod(bindPropertyType) : getOther.MakeGenericMethod(bindPropertyType);
+                    method = isNullableType ? IDataReaderEntityBuilderHelpers.getOtherNull.MakeGenericMethod(bindPropertyType) : IDataReaderEntityBuilderHelpers.getOther.MakeGenericMethod(bindPropertyType);
                     break;
             }
             if (method == null && bindPropertyType == UtilConstants.StringType)
             {
-                method = getConvertString;
+                method = IDataReaderEntityBuilderHelpers.getConvertString;
             }
             if (bindPropertyType == UtilConstants.ObjType)
             {
-                method = isNullableType ? getOtherNull.MakeGenericMethod(bindPropertyType) : getOther.MakeGenericMethod(bindPropertyType);
+                method = isNullableType ? IDataReaderEntityBuilderHelpers.getOtherNull.MakeGenericMethod(bindPropertyType) : IDataReaderEntityBuilderHelpers.getOther.MakeGenericMethod(bindPropertyType);
             }
             if (method == null)
-                method = isNullableType ? getOtherNull.MakeGenericMethod(bindPropertyType) : getOther.MakeGenericMethod(bindPropertyType);
+                method = isNullableType ? IDataReaderEntityBuilderHelpers.getOtherNull.MakeGenericMethod(bindPropertyType) : IDataReaderEntityBuilderHelpers.getOther.MakeGenericMethod(bindPropertyType);
 
             if (method.IsVirtual)
                 generator.Emit(OpCodes.Callvirt, method);

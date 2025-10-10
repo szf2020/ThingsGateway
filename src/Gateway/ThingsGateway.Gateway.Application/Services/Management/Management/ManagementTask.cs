@@ -113,7 +113,7 @@ public partial class ManagementTask : AsyncDisposableObject
                .ConfigurePlugins(a =>
                {
                    a.UseTcpSessionCheckClear();
-                   a.UseDmtpRpc().ConfigureDefaultSerializationSelector(b =>
+                   a.UseDmtpRpc(a => a.ConfigureDefaultSerializationSelector(b =>
                    {
                        b.UseSystemTextJson(json =>
                        {
@@ -123,7 +123,7 @@ public partial class ManagementTask : AsyncDisposableObject
                            json.Converters.Add(new JObjectSystemTextJsonConverter());
                            json.Converters.Add(new JArraySystemTextJsonConverter());
                        });
-                   });
+                   }));
 
                    a.UseDmtpFileTransfer();//必须添加文件传输插件
 
@@ -176,7 +176,7 @@ public partial class ManagementTask : AsyncDisposableObject
                .ConfigurePlugins(a =>
                {
                    a.UseTcpSessionCheckClear();
-                   a.UseDmtpRpc().ConfigureDefaultSerializationSelector(b =>
+                   a.UseDmtpRpc(a => a.ConfigureDefaultSerializationSelector(b =>
                    {
                        b.UseSystemTextJson(json =>
                        {
@@ -186,7 +186,7 @@ public partial class ManagementTask : AsyncDisposableObject
                            json.Converters.Add(new JObjectSystemTextJsonConverter());
                            json.Converters.Add(new JArraySystemTextJsonConverter());
                        });
-                   });
+                   }));
 
                    a.UseDmtpFileTransfer();//必须添加文件传输插件
 

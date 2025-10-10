@@ -463,7 +463,7 @@ public static class ProcessHelper
                 StandardOutputEncoding = outputEncoding,
                 StandardErrorEncoding = outputEncoding,
             };
-            var process = Process.Start(psi);
+            using var process = Process.Start(psi);
             if (process == null) return null;
 
             if (msWait > 0 && !process.WaitForExit(msWait))

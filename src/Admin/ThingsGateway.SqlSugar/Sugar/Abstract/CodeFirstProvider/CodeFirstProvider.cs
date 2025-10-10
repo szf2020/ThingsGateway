@@ -13,7 +13,7 @@ namespace ThingsGateway.SqlSugar
         /// <summary>
         /// 用于同步操作的锁对象
         /// </summary>
-        internal static object LockObject = new object();
+        internal static readonly object LockObject = new object();
         /// <summary>
         /// SqlSugar提供者实例
         /// </summary>

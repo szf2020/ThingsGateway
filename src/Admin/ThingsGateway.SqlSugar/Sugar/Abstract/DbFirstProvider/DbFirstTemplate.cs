@@ -11,7 +11,7 @@ namespace ThingsGateway.SqlSugar
         /// <summary>
         /// 类模板
         /// </summary>
-        public static string ClassTemplate = "{using}\r\n" +
+        public const string ClassTemplate = "{using}\r\n" +
                                                "namespace {Namespace}\r\n" +
                                                "{\r\n" +
                                                "{ClassDescription}{SugarTable}\r\n" +
@@ -26,7 +26,7 @@ namespace ThingsGateway.SqlSugar
         /// <summary>
         /// 类描述模板
         /// </summary>
-        public static string ClassDescriptionTemplate =
+        public const string ClassDescriptionTemplate =
                                                 ClassSpace + "///<summary>\r\n" +
                                                 ClassSpace + "///{ClassDescription}" +
                                                 ClassSpace + "///</summary>";
@@ -34,13 +34,13 @@ namespace ThingsGateway.SqlSugar
         /// <summary>
         /// 属性模板
         /// </summary>
-        public static string PropertyTemplate = PropertySpace + "{SugarColumn}\r\n" +
+        public const string PropertyTemplate = PropertySpace + "{SugarColumn}\r\n" +
                                                 PropertySpace + "public {PropertyType} {PropertyName} {get;set;}\r\n";
 
         /// <summary>
         /// 属性描述模板
         /// </summary>
-        public static string PropertyDescriptionTemplate =
+        public const string PropertyDescriptionTemplate =
                                                 PropertySpace + "/// <summary>\r\n" +
                                                 PropertySpace + "/// Desc:{PropertyDescription}\r\n" +
                                                 PropertySpace + "/// Default:{DefaultValue}\r\n" +
@@ -50,12 +50,12 @@ namespace ThingsGateway.SqlSugar
         /// <summary>
         /// 构造函数模板
         /// </summary>
-        public static string ConstructorTemplate = PropertySpace + " this.{PropertyName} ={DefaultValue};\r\n";
+        public const string ConstructorTemplate = PropertySpace + " this.{PropertyName} ={DefaultValue};\r\n";
 
         /// <summary>
         /// 命名空间模板
         /// </summary>
-        public static string UsingTemplate = "using System;\r\n" +
+        public const string UsingTemplate = "using System;\r\n" +
                                                "using System.Linq;\r\n" +
                                                "using System.Text;" + "\r\n";
         #endregion

@@ -19,7 +19,7 @@ namespace ThingsGateway.SqlSugar
         /// <summary>
         /// 默认Razor类模板
         /// </summary>
-        public static string DefaultRazorClassTemplate =
+        public const string DefaultRazorClassTemplate =
 @"using System;
 using System.Linq;
 using System.Text;

@@ -99,10 +99,7 @@ namespace ThingsGateway.SqlSugar
 
         public void RemoveAllCache()
         {
-            foreach (var key in GetAllKey())
-            {
-                this.Remove(key);
-            }
+            this.InstanceCache.Clear();
         }
 
         public IEnumerable<string> GetAllKey()

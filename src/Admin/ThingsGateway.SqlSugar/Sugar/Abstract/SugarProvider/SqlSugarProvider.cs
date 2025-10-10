@@ -1113,7 +1113,7 @@ namespace ThingsGateway.SqlSugar
                 {
                     Context = this.Context,
                     MethodInfo = method,
-                    objectValue = newList
+                    ObjValue = newList
                 };
                 return result;
             }
@@ -1126,7 +1126,7 @@ namespace ThingsGateway.SqlSugar
                 {
                     Context = this.Context,
                     MethodInfo = method,
-                    objectValue = singleEntityObjectOrList
+                    ObjValue = singleEntityObjectOrList
                 };
                 return result;
             }
