@@ -263,7 +263,7 @@ namespace ThingsGateway.SqlSugar
                 IFastBuilder buider = GetBuider();
                 buider.Context = context;
                 int result = 0;
-                if (buider?.DbFastestProperties?.IsDataTable == true)
+                if (buider?.DbFastestProperties?.IsDataTable != false)
                 {
                     var dt = ToDdateTable(datas);
                     if (buider?.DbFastestProperties?.IsMerge == true)
@@ -400,7 +400,7 @@ namespace ThingsGateway.SqlSugar
                 int result = 0;
                 IFastBuilder buider = GetBuider();
                 buider.Context = context;
-                if (buider?.DbFastestProperties?.IsDataTable == true)
+                if (buider?.DbFastestProperties?.IsDataTable != false)
                 {
                     DataTable dt = ToDdateTable(datas);
 
@@ -578,7 +578,7 @@ namespace ThingsGateway.SqlSugar
             IFastBuilder buider = GetBuider();
             buider.Context = context;
             int result = 0;
-            if (buider?.DbFastestProperties?.IsDataTable == true)
+            if (buider?.DbFastestProperties?.IsDataTable != false)
             {
                 DataTable dt = ToDdateTable(datas);
                 result = await buider.ExecuteBulkCopyAsync(dt).ConfigureAwait(false);

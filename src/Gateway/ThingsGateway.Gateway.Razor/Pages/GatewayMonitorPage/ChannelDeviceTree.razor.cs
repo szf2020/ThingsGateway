@@ -1423,7 +1423,6 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
         {
             await ChannelDeviceChanged.Invoke(Value);
         }
-        await InvokeAsync(StateHasChanged);
 
     }
 

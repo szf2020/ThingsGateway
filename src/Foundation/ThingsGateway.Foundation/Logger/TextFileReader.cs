@@ -63,11 +63,12 @@ public static class TextFileReader
     public static OperResult<List<string>> GetLogFiles(string directoryPath)
     {
         OperResult<List<string>> result = new(); // 初始化结果对象
+        directoryPath = AppContext.BaseDirectory.CombinePath(directoryPath);
         // 检查目录是否存在
         if (!Directory.Exists(directoryPath))
         {
             result.OperCode = 999;
-            result.ErrorMessage = "Directory not exists";
+            result.ErrorMessage = $"Directory {directoryPath} not exists";
             return result;
         }
 

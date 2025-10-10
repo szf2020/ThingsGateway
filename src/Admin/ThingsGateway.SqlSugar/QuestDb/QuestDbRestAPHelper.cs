@@ -24,7 +24,7 @@ namespace ThingsGateway.SqlSugar
         }
 
         /// <summary>
-        /// 逐行读取，包含空行
+        /// 逐行读取
         /// </summary>
         /// <param name="text"></param>
         /// <returns></returns>
@@ -35,7 +35,8 @@ namespace ThingsGateway.SqlSugar
                 string line = sr.ReadLine();
                 while (line != null)
                 {
-                    yield return sr.ReadLine();
+                    yield return line;
+                    line = sr.ReadLine();
                 }
             }
         }

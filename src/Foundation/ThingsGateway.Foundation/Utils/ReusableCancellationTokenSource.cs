@@ -29,11 +29,17 @@ public sealed class ReusableCancellationTokenSource : IDisposable
 
     private void OnTimeout(object? state)
     {
-        TimeoutStatus = true;
+        try
+        {
+            TimeoutStatus = true;
 
-        if (_cts?.IsCancellationRequested == false)
-            _cts?.Cancel();
+            if (_cts?.IsCancellationRequested == false)
+                _cts?.Cancel();
+        }
+        catch
+        {
 
+        }
     }
 
     private readonly LinkedCancellationTokenSourceCache _linkedCtsCache = new();

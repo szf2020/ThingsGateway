@@ -45,7 +45,7 @@ public static class LoggerExtensions
     /// </summary>
     public static string GetDebugLogBasePath()
     {
-        return "Logs/DebugLog";
+        return PathExtensions.CombinePathWithOs("Logs", "DebugLog");
     }
 
     /// <summary>
@@ -55,7 +55,7 @@ public static class LoggerExtensions
     /// <returns></returns>
     public static string GetDebugLogPath(this long channelId)
     {
-        return GetDebugLogBasePath().CombinePath(channelId.ToString());
+        return GetDebugLogBasePath().CombinePathWithOs(channelId.ToString());
     }
 
     /// <summary>
@@ -65,7 +65,7 @@ public static class LoggerExtensions
     /// <returns></returns>
     public static string GetDebugLogPath(this string channelId)
     {
-        return GetDebugLogBasePath().CombinePath(channelId.SanitizeFileName());
+        return GetDebugLogBasePath().CombinePathWithOs(channelId.SanitizeFileName());
     }
 
     /// <summary>
@@ -73,7 +73,7 @@ public static class LoggerExtensions
     /// </summary>
     public static string GetChannelLogBasePath()
     {
-        return "Logs/ChannelLog";
+        return PathExtensions.CombinePathWithOs("Logs", "ChannelLog");
     }
 
     /// <summary>
@@ -83,7 +83,7 @@ public static class LoggerExtensions
     /// <returns></returns>
     public static string GetChannelLogPath(this long channelId)
     {
-        return GetChannelLogBasePath().CombinePath(channelId.ToString());
+        return GetChannelLogBasePath().CombinePathWithOs(channelId.ToString());
     }
     /// <summary>
     /// 获取日志路径
@@ -92,7 +92,7 @@ public static class LoggerExtensions
     /// <returns></returns>
     public static string GetChannelLogPath(this string channelId)
     {
-        return GetChannelLogBasePath().CombinePath(channelId.SanitizeFileName());
+        return GetChannelLogBasePath().CombinePathWithOs(channelId.SanitizeFileName());
     }
 
     /// <summary>
@@ -100,7 +100,7 @@ public static class LoggerExtensions
     /// </summary>
     public static string GetDeviceLogBasePath()
     {
-        return "Logs/DeviceLog";
+        return PathExtensions.CombinePathWithOs("Logs","DeviceLog");
     }
 
     /// <summary>
@@ -110,7 +110,7 @@ public static class LoggerExtensions
     /// <returns></returns>
     public static string GetDeviceLogPath(this long DeviceId)
     {
-        return GetDeviceLogBasePath().CombinePath(DeviceId.ToString());
+        return GetDeviceLogBasePath().CombinePathWithOs(DeviceId.ToString());
     }
     /// <summary>
     /// 获取日志路径
@@ -119,7 +119,7 @@ public static class LoggerExtensions
     /// <returns></returns>
     public static string GetDeviceLogPath(this string DeviceId)
     {
-        return GetDeviceLogBasePath().CombinePath(DeviceId.SanitizeFileName());
+        return GetDeviceLogBasePath().CombinePathWithOs(DeviceId.SanitizeFileName());
     }
 
     #region 日志

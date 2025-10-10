@@ -8,6 +8,8 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
+using ThingsGateway.NewLife;
+
 namespace ThingsGateway;
 
 /// <inheritdoc/>
@@ -38,10 +40,8 @@ public static class PathExtensions
                 path = Path.Combine(path, text);
             }
         }
-        // 处理路径分隔符，兼容Windows和Linux
-        var sep = Path.DirectorySeparatorChar;
-        var sep2 = sep == '/' ? '\\' : '/';
-        path = path.Replace(sep2, sep);
+
+        path = path.Replace('\\', '/');
         return path;
     }
 }
