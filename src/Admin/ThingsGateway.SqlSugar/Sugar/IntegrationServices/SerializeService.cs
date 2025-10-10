@@ -8,6 +8,8 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
 
+using ThingsGateway.NewLife.Json.Extension;
+
 using JsonProperty = Newtonsoft.Json.Serialization.JsonProperty;
 
 namespace ThingsGateway.SqlSugar
@@ -23,8 +25,10 @@ namespace ThingsGateway.SqlSugar
 
         private static readonly JsonSerializerOptions _systemTextJsonSettings = new()
         {
+            Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
             DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+            NumberHandling = JsonNumberHandling.AllowNamedFloatingPointLiterals,
         };
 
         private static readonly ConcurrentDictionary<Type, SugarColumn> _typeInfoCache = new();
@@ -52,6 +56,11 @@ namespace ThingsGateway.SqlSugar
 
                         }
                     });
+
+            _systemTextJsonSettings.Converters.Add(new JTokenSystemTextJsonConverter());
+            _systemTextJsonSettings.Converters.Add(new JValueSystemTextJsonConverter());
+            _systemTextJsonSettings.Converters.Add(new JObjectSystemTextJsonConverter());
+            _systemTextJsonSettings.Converters.Add(new JArraySystemTextJsonConverter());
             _systemTextJsonSettings.TypeInfoResolver = resolver;
         }
         public static bool UseNewtonsoftJson = false;
