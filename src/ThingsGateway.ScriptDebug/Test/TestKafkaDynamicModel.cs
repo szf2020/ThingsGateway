@@ -11,26 +11,7 @@ public class TestKafkaDynamicModel1 : DynamicModelBase
 
     public TestKafkaDynamicModel1()
     {
-        var name = "测试MqttServer";
-        if (GlobalData.ReadOnlyDevices.TryGetValue(name, out var kafka1))
-        {
-            id = kafka1.Id;
 
-            foreach (var item in kafka1.Driver?.IdVariableRuntimes)
-            {
-                //变量备注1作为Key(AE报警SourceId)
-                var data1 = item.Value.GetPropertyValue(id, nameof(BusinessVariableProperty.Data1));
-                if (!data1.IsNullOrEmpty())
-                {
-                    variableRuntimes.Add(data1, item.Value);
-                }
-            }
-
-        }
-        else
-        {
-            throw new Exception($"找不到设备 {name}");
-        }
 
     }
 
@@ -38,6 +19,48 @@ public class TestKafkaDynamicModel1 : DynamicModelBase
 
     public override IEnumerable<dynamic> GetList(IEnumerable<object> datas)
     {
+        if (id == 0)
+        {
+
+            var name = "kafka_DA"; Logger?.LogInformation("进来了10000");
+            if (GlobalData.ReadOnlyDevices.TryGetValue(name, out var kafka1))
+            {
+                id = kafka1.Id;
+
+                if (kafka1.Driver != null)
+                {
+                    foreach (var item in kafka1.Driver?.IdVariableRuntimes)
+                    {
+                        //变量备注1作为Key(AE报警SourceId)
+                        var data1 = item.Value.GetPropertyValue(id, nameof(BusinessVariableProperty.Data1));
+                        if (!data1.IsNullOrEmpty())
+                        {
+                            variableRuntimes.Add(data1, item.Value);
+                        }
+                    }
+                }
+                else
+                {
+                    foreach (var item in kafka1.ReadOnlyVariableRuntimes)
+                    {
+                        //变量备注1作为Key(AE报警SourceId)
+                        var data1 = item.Value.GetPropertyValue(id, nameof(BusinessVariableProperty.Data1));
+                        if (!data1.IsNullOrEmpty())
+                        {
+                            variableRuntimes.Add(data1, item.Value);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                throw new Exception($"找不到设备 {name}");
+            }
+
+        }
+
+
+
         if (datas == null) return null;
         var pluginEventDatas = datas.Cast<PluginEventData>();
         var opcDatas = pluginEventDatas.Select(
@@ -67,13 +90,14 @@ public class TestKafkaDynamicModel1 : DynamicModelBase
             //重连时触发的事件，可以跳过不处理
             //if(opcAeEventData.Refresh)
             //    continue;
+            Logger?.LogInformation("进来了");
             var sourceName = opcAeEventData.SourceID;
             if (variableRuntimes.TryGetValue(sourceName, out var variableRuntime))
             {
-
                 var ack = opcAeEventData.EventType != Opc.Ae.EventType.Condition ? false : ((Opc.Ae.ConditionState)opcAeEventData.NewState).HasFlag(Opc.Ae.ConditionState.Acknowledged);
 
                 bool isRecover = opcAeEventData.EventType != Opc.Ae.EventType.Condition ? false : !((Opc.Ae.ConditionState)opcAeEventData.NewState).HasFlag(Opc.Ae.ConditionState.Active);
+
                 if (opcAeEventData.EventType != Opc.Ae.EventType.Condition)
                 {
                     bool alarm = (opcAeEventData.Message).Contains("raised");
@@ -92,6 +116,71 @@ public class TestKafkaDynamicModel1 : DynamicModelBase
                     isRecover = !alarm;
                 }
 
+
+                //判断报警类型
+                string _alarmInfo = "";
+                Logger.LogDebug($"opcAeEventData.ConditionName:{opcAeEventData.ConditionName}");
+                Logger.LogDebug($"opcAeEventData.NewState:{opcAeEventData.NewState}");
+                // 处理特定条件名称
+                if (opcAeEventData.ConditionName == "CiAdvancedAlarmState" ||
+                    opcAeEventData.ConditionName == "CiDigitalAlarmState")
+                {
+                    string _data8 = variableRuntime.GetPropertyValue(id, nameof(BusinessVariableProperty.Data8));
+                    string[] data8Parts = _data8?.Split(',', StringSplitOptions.RemoveEmptyEntries) ?? Array.Empty<string>();
+                    _alarmInfo = opcAeEventData.NewState switch
+                    {
+                        3 when data8Parts.Length > 0 => data8Parts[0],
+                        1 when data8Parts.Length > 1 => data8Parts[1],
+                        7 => "确认",
+                        _ => ""
+                    };
+                    Logger.LogDebug($"_alarmInfo:{_alarmInfo}");
+                }
+                else
+                {
+                    // 处理确认状态
+                    if (opcAeEventData.NewState == 7)
+                    {
+                        _alarmInfo = "确认";
+                    }
+                    else
+                    {
+                        // 处理其他状态
+                        _alarmInfo = string.IsNullOrEmpty(opcAeEventData.SubConditionName)
+                            ? "恢复"
+                            : opcAeEventData.SubConditionName switch
+                            {
+                                "CiAnalogAlarmHighHigh" => "高高限报警",
+                                "CiAnalogAlarmHigh" => "高限报警",
+                                "CiAnalogAlarmLow" => "低限报警",
+                                "CiAnalogAlarmLowLow" => "低低限报警",
+                                "CiDigitalAlarmOn" => "合闸",
+                                "CiAdvancedAlarmOn" => "通讯中断",
+                                _ => "恢复" // 默认值
+                            };
+                    }
+                }
+
+
+                //处理报警等级
+                string _alarmLevel = opcAeEventData.Severity switch
+                {
+                    997 => "1",
+                    993 => "2",
+                    989 => "3",
+                    985 => "4",
+                    _ => "0"
+                };
+
+                //处理报警内容
+                string content = "";
+                string _msg = opcAeEventData.Message;
+                string[] parts = _msg.Split('-', StringSplitOptions.RemoveEmptyEntries);
+                if (parts.Length >= 2)
+                {
+                    content = parts[1];
+                }
+
                 //构建告警实体
                 KafkaAlarmEntity alarmEntity = new KafkaAlarmEntity
                 {
@@ -100,14 +189,15 @@ public class TestKafkaDynamicModel1 : DynamicModelBase
                     resourceName = variableRuntime.GetPropertyValue(id, nameof(BusinessVariableProperty.Data4)), //资源名称  
                     metricCode = variableRuntime.GetPropertyValue(id, nameof(BusinessVariableProperty.Data5)), //指标编码
                     metricName = variableRuntime.GetPropertyValue(id, nameof(BusinessVariableProperty.Data6)), //指标名称
-                    content = $"{variableRuntime.GetPropertyValue(id, nameof(BusinessVariableProperty.Data4))}{variableRuntime.GetPropertyValue(id, nameof(BusinessVariableProperty.Data6))}{opcAeEventData.Message}", //告警内容，设备名称+告警内容（包含阈值信息），可能opcae里没有带阈值信息，那么就需要录入固定值，可选Data10
+                    content = $"{variableRuntime.GetPropertyValue(id, nameof(BusinessVariableProperty.Data4))}{variableRuntime.GetPropertyValue(id, nameof(BusinessVariableProperty.Data6))}{content}_{_alarmInfo}", //告警内容，设备名称+告警内容（包含阈值信息），可能opcae里没有带阈值信息，那么就需要录入固定值，可选Data10
                     alarmType = variableRuntime.GetPropertyValue(id, nameof(BusinessVariableProperty.Data7)), // opcAeEventData.Severity 告警类型，子系统产生告警的类型，可能需要固定备注值
 
                     confirmedTime = ack ? opcAeEventData.Time.DateTimeToUnixTimestamp() : null, //告警确认时间
                     fixTime = isRecover ? opcAeEventData.Time : null, //解除告警时间
                     lastTime = opcAeEventData.AlarmTime, //产生告警时间
                     status = isRecover ? "FIXED" : "UNFIXED", //告警状态
-                    alarmLevel = variableRuntime.GetPropertyValue(id, nameof(BusinessVariableProperty.Data8)), //opcAeEventData.Severity.ToString(), //告警等级,可能需要固定备注值
+                    alarmLevel = _alarmLevel,
+                    // alarmLevel = variableRuntime.GetPropertyValue(id, nameof(BusinessVariableProperty.Data8)), //opcAeEventData.Severity.ToString(), //告警等级,可能需要固定备注值
                     subSystemCode = variableRuntime.GetPropertyValue(id, nameof(BusinessVariableProperty.Data9)), //子系统编码
                     type = "SUB_SYSTEM_ALARM", //默认填写字段
                     confirmAccount = opcAeEventData.ActorID, //告警确认人

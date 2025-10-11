@@ -28,8 +28,6 @@ public partial class GatewayIndexComponent : IDisposable
 
     [Parameter]
     [EditorRequired]
-    [NotNull]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public IStringLocalizer Localizer { get; set; }
 
     private Chart AlarmPie { get; set; }
@@ -44,7 +42,6 @@ public partial class GatewayIndexComponent : IDisposable
     public void Dispose()
     {
         Disposed = true;
-        GC.SuppressFinalize(this);
     }
 
     protected override void OnInitialized()
@@ -68,11 +65,14 @@ public partial class GatewayIndexComponent : IDisposable
                 if (AlarmPieInit)
                     await AlarmPie.Update(ChartAction.Update);
                 await InvokeAsync(StateHasChanged);
-                await Task.Delay(5000);
             }
             catch (Exception ex)
             {
                 NewLife.Log.XTrace.WriteException(ex);
+            }
+            finally
+            {
+                await Task.Delay(5000);
             }
         }
     }
