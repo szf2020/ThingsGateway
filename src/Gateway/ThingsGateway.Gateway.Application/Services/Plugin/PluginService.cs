@@ -711,7 +711,7 @@ internal sealed class PluginService : IPluginService
         {
             using var fs = new FileStream(item, FileMode.Open);
             //var cachePath = Path.GetDirectoryName(item).CombinePathWithOs($"Cache{cacheId}").CombinePath(Path.GetFileName(item));
-            if (item == path)
+            if (Path.GetFullPath(item) == Path.GetFullPath(path))
             {
                 assembly = assemblyLoadContext.LoadFromStream(fs); //加载主程序集，并获取
 
