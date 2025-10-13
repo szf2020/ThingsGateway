@@ -553,9 +553,9 @@ public abstract class DeviceBase : AsyncAndSyncDisposableObject, IDevice
                 return waitData.CompletedData;
 
             var reusableTimeout = _reusableTimeouts.Get();
+            var cts = reusableTimeout.GetTokenSource(timeout, cancellationToken, Channel.ClosedToken);
             try
             {
-                var cts = reusableTimeout.GetTokenSource(timeout, cancellationToken, Channel.ClosedToken);
 
                 await waitData.WaitAsync(cts.Token).ConfigureAwait(false);
 
@@ -583,7 +583,9 @@ public abstract class DeviceBase : AsyncAndSyncDisposableObject, IDevice
             else
             {
                 var operResult = waitData.Check(reusableTimeout.TimeoutStatus);
-                return new MessageBase(operResult) { ErrorMessage = $"{operResult.ErrorMessage}, sign: {sign}" };
+                waitData.CompletedData.ErrorMessage = $"{operResult.ErrorMessage}, sign: {sign}";
+                return waitData.CompletedData;
+                //return new MessageBase(operResult) { ErrorMessage = $"{operResult.ErrorMessage}, sign: {sign}" };
             }
         }
         catch (Exception ex)
