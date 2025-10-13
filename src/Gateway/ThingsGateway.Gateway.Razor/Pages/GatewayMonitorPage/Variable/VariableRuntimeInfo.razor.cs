@@ -55,11 +55,11 @@ public partial class VariableRuntimeInfo : IDisposable
         scheduler = new SmartTriggerScheduler(Notify, TimeSpan.FromMilliseconds(1000));
 
 #if !Management
-        _ = RunTimerAsync();
+        //timer = new TimerX(RunTimerAsync, null, 1000, 1000) { Async = true };
 #endif
         base.OnInitialized();
     }
-
+    //private TimerX timer;
     /// <summary>
     /// IntFormatter
     /// </summary>
@@ -92,27 +92,23 @@ public partial class VariableRuntimeInfo : IDisposable
             await InvokeAsync(table.QueryAsync);
     }
 
-    private async Task RunTimerAsync()
-    {
-        while (!Disposed)
-        {
-            try
-            {
-                //if (table != null)
-                //    await table.QueryAsync();
+    //private async Task RunTimerAsync(object? state)
+    //{
+    //    try
+    //    {
+    //        //if (table != null)
+    //        //    await InvokeAsync(() => table.RowElementRefresh());
 
-                await InvokeAsync(StateHasChanged);
-            }
-            catch (Exception ex)
-            {
-                NewLife.Log.XTrace.WriteException(ex);
-            }
-            finally
-            {
-                await Task.Delay(1000);
-            }
-        }
-    }
+    //        await InvokeAsync(StateHasChanged);
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        NewLife.Log.XTrace.WriteException(ex);
+    //    }
+    //    finally
+    //    {
+    //    }
+    //}
 
     #region 查询
 
@@ -126,7 +122,7 @@ public partial class VariableRuntimeInfo : IDisposable
         return data;
 #else
         var data = Items
-                .WhereIf(!options.SearchText.IsNullOrWhiteSpace(), a => a.Name.Contains(options.SearchText))
+                .WhereIf(!string.IsNullOrWhiteSpace(options.SearchText), a => a.Name.Contains(options.SearchText))
                 .GetQueryData(options);
         _option = options;
         return Task.FromResult(data);
@@ -354,7 +350,7 @@ public partial class VariableRuntimeInfo : IDisposable
 #if !Management
 
         var models = Items
-                .WhereIf(!_option.SearchText.IsNullOrWhiteSpace(), a => a.Name.Contains(_option.SearchText)).GetData(_option, out var total).Cast<Variable>().ToList();
+                .WhereIf(!string.IsNullOrWhiteSpace(_option.SearchText), a => a.Name.Contains(_option.SearchText)).GetData(_option, out var total).Cast<Variable>().ToList();
 
 #else
 

@@ -1,9 +1,9 @@
 <Project>
 
 	<PropertyGroup>
-		<PluginVersion>10.11.97</PluginVersion>
-		<ProPluginVersion>10.11.97</ProPluginVersion>
-		<DefaultVersion>10.11.97</DefaultVersion>
+		<PluginVersion>10.11.98</PluginVersion>
+		<ProPluginVersion>10.11.98</ProPluginVersion>
+		<DefaultVersion>10.11.98</DefaultVersion>
 		<AuthenticationVersion>10.11.6</AuthenticationVersion>
 		<SourceGeneratorVersion>10.11.6</SourceGeneratorVersion>
 		<NET8Version>8.0.20</NET8Version>
@@ -12,7 +12,7 @@
 		<IsTrimmable>false</IsTrimmable>
 		<ManagementProPluginVersion>10.11.87</ManagementProPluginVersion>
 		<ManagementPluginVersion>10.11.87</ManagementPluginVersion>
-		<TSVersion>4.0.0-beta.115</TSVersion>
+		<TSVersion>4.0.0-beta.120</TSVersion>
 		
 		
 	</PropertyGroup>

@@ -561,7 +561,7 @@ public static class Reflect
     /// <param name="method"></param>
     /// <param name="target"></param>
     /// <returns></returns>
-    public static TFunc? As<TFunc>(this MethodInfo method, object? target = null)
+    public static TFunc? As<TFunc>(this MethodInfo method, object? target = null) where TFunc : class
     {
         if (method == null) return default;
 
@@ -569,10 +569,14 @@ public static class Reflect
 
         var func = DelegateCache<TFunc>.Cache.GetOrAdd(
              key,
-             _ => (TFunc)(object)(
+             _ =>
+             {
+                 return (
                      target == null
-                         ? Delegate.CreateDelegate(typeof(TFunc), method, true)
-                         : Delegate.CreateDelegate(typeof(TFunc), target, method, true)));
+                         ? Delegate.CreateDelegate(typeof(TFunc), method, true) as TFunc
+                         : Delegate.CreateDelegate(typeof(TFunc), target, method, true) as TFunc
+                 );
+             });
 
         return func;
     }

@@ -391,11 +391,7 @@ public class TimerX : ITimer, ITimerx, IDisposable
         // 释放非托管资源
         Scheduler?.Remove(this, disposing ? "Dispose" : "GC");
 
-        DelegateCache<TimerCallback>.Cache.Clear();
-#if NET6_0_OR_GREATER
-        DelegateCache<Func<Object?, ValueTask>>.Cache.Clear();
-#endif
-        DelegateCache<Func<Object?, Task>>.Cache.Clear();
+
 
     }
 
