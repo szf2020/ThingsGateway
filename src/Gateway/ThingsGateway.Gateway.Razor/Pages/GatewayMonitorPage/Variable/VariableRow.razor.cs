@@ -57,7 +57,7 @@ public partial class VariableRow : IDisposable
     /// <param name="col"></param>
     /// <param name="item"></param>
     /// <returns></returns>
-    protected RenderFragment GetValue(ITableColumn col, VariableRuntime item) => builder =>
+    protected static RenderFragment GetValue(ITableColumn col, VariableRuntime item) => builder =>
     {
         if (col.Template != null)
         {

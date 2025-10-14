@@ -1,4 +1,5 @@
 ﻿using System.Collections.Concurrent;
+using System.Runtime.CompilerServices;
 
 using ThingsGateway.NewLife.Threading;
 namespace ThingsGateway.NewLife;
@@ -51,17 +52,19 @@ public class ExpiringDictionary<TKey, TValue> : IDisposable
             return rs;
         }
     }
+    private ConcurrentDictionary<TKey, CacheItem> _dict;
 
-    private ConcurrentDictionary<TKey, CacheItem> _dict = new();
     private readonly TimerX _cleanupTimer;
     private int defaultExpire = 60;
-    public ExpiringDictionary(int expire = 60)
+    IEqualityComparer<TKey>? comparer;
+    public ExpiringDictionary(int expire = 60, IEqualityComparer<TKey>? comparer = null)
     {
         defaultExpire = expire;
+        this.comparer = comparer;
+        _dict = new ConcurrentDictionary<TKey, CacheItem>(comparer);
+
         _cleanupTimer = new TimerX(TimerClear, null, 10000, 10000) { Async = true };
     }
-
-
 
     public bool TryAdd(TKey key, TValue value)
     {
@@ -109,7 +112,7 @@ public class ExpiringDictionary<TKey, TValue> : IDisposable
     private void Clear(object? state)
     {
         var data = _dict;
-        _dict = new();
+        _dict = new(comparer);
         data.Clear();
     }
     private void TimerClear(object? state)
@@ -143,3 +146,4 @@ public class ExpiringDictionary<TKey, TValue> : IDisposable
         _cleanupTimer.Dispose();
     }
 }
+
