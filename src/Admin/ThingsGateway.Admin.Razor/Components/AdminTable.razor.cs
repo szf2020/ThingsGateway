@@ -14,6 +14,10 @@ namespace ThingsGateway.Admin.Razor;
 public partial class AdminTable<TItem> where TItem : class, new()
 {
 
+    /// <inheritdoc cref="Table{TItem}.RenderMode"/>
+    [Parameter]
+    public TableRenderMode RenderMode { get; set; }
+
     public List<ITableColumn> Columns => Instance?.Columns;
 
 

@@ -143,7 +143,7 @@ public class Channel : ChannelOptionsBase, IPrimaryIdEntity, IBaseDataEntity, IB
     [SugarColumn(ColumnDescription = "StreamAsync", IsNullable = true)]
     [AutoGenerateColumn(Visible = false, Filterable = true, Sortable = true)]
     public override bool StreamAsync { get; set; }
-    
+
     /// <summary>
     /// Handshake
     /// </summary>

@@ -16,25 +16,33 @@ using TouchSocket.Core;
 
 namespace ThingsGateway.Gateway.Razor;
 
-public partial class VariableRow<TItem> : IDisposable
+public partial class VariableRow : IDisposable
 {
     [Parameter]
-    public TableRowContext<TItem>? RowContent { get; set; }
-
+    public TableRowContext<VariableRuntime>? RowContent { get; set; }
+    private bool Disposed;
     public void Dispose()
     {
+        Disposed = true;
         timer?.SafeDispose();
         GC.SuppressFinalize(this);
     }
     TimerX? timer;
-    protected override void OnInitialized()
+    protected override void OnAfterRender(bool firstRender)
     {
-        timer = new TimerX(Refresh, null, 1000, 1000, "VariableRow");
-        base.OnInitialized();
+        if (firstRender)
+        {
+            timer = new TimerX(Refresh, null, 1000, 1000, "VariableRow");
+        }
+        base.OnAfterRender(firstRender);
     }
+
     private Task Refresh(object? state)
     {
-        return InvokeAsync(StateHasChanged);
+        if (!Disposed)
+            return InvokeAsync(StateHasChanged);
+        else
+            return Task.CompletedTask;
     }
 
     protected override void OnParametersSet()
@@ -49,7 +57,7 @@ public partial class VariableRow<TItem> : IDisposable
     /// <param name="col"></param>
     /// <param name="item"></param>
     /// <returns></returns>
-    protected RenderFragment GetValue(ITableColumn col, TItem item) => builder =>
+    protected RenderFragment GetValue(ITableColumn col, VariableRuntime item) => builder =>
     {
         if (col.Template != null)
         {
@@ -66,9 +74,9 @@ public partial class VariableRow<TItem> : IDisposable
         }
     };
 
-    internal static string? GetDoubleClickCellClassString(bool trigger) => CssBuilder.Default()
-.AddClass("is-dbcell", trigger)
-.Build();
+    //    internal static string? GetDoubleClickCellClassString(bool trigger) => CssBuilder.Default()
+    //.AddClass("is-dbcell", trigger)
+    //.Build();
 
     /// <summary>
     /// 获得指定列头固定列样式
@@ -160,16 +168,29 @@ public partial class VariableRow<TItem> : IDisposable
     /// <param name="hasChildren"></param>
     /// <param name="inCell"></param>
     /// <returns></returns>
-    protected string? GetCellClassString(ITableColumn col, bool hasChildren, bool inCell) => CellClassStringCache.GetOrAdd(col, col => CssBuilder.Default("table-cell")
-        .AddClass(col.GetAlign().ToDescriptionString(), col.Align == Alignment.Center || col.Align == Alignment.Right)
-        .AddClass("is-wrap", col.GetTextWrap())
-        .AddClass("is-ellips", col.GetTextEllipsis())
-        .AddClass("is-tips", col.GetShowTips())
-        .AddClass("is-resizable", AllowResizing)
-        .AddClass("is-tree", IsTree && hasChildren)
-        .AddClass("is-incell", inCell)
-        .AddClass(col.CssClass)
-        .Build());
+    protected string? GetCellClassString(ITableColumn col, bool hasChildren, bool inCell)
+    {
+        if (CellClassStringCache.TryGetValue(col, out var cached))
+        {
+            return cached;
+        }
+        else
+        {
+            bool trigger = false;
+            return CellClassStringCache.GetOrAdd(col, col => CssBuilder.Default("table-cell")
+ .AddClass(col.GetAlign().ToDescriptionString(), col.Align == Alignment.Center || col.Align == Alignment.Right)
+ .AddClass("is-wrap", col.GetTextWrap())
+ .AddClass("is-ellips", col.GetTextEllipsis())
+ .AddClass("is-tips", col.GetShowTips())
+ .AddClass("is-resizable", AllowResizing)
+ .AddClass("is-tree", IsTree && hasChildren)
+ .AddClass("is-incell", inCell)
+.AddClass("is-dbcell", trigger)
+ .AddClass(col.CssClass)
+ .Build());
+        }
+
+    }
 
     private bool AllowResizing = true;
     private bool IsTree = false;
@@ -180,12 +201,24 @@ public partial class VariableRow<TItem> : IDisposable
     /// </summary>
     /// <param name="col"></param>
     /// <returns></returns>
-    protected string? GetFixedCellClassString(ITableColumn col) => FixedCellClassStringCache.GetOrAdd(col, col => CssBuilder.Default()
-        .AddClass("fixed", col.Fixed)
-        .AddClass("fixed-right", col.Fixed && IsTail(col))
-        .AddClass("fr", IsLastColumn(col))
-        .AddClass("fl", IsFirstColumn(col))
-        .Build());
+    protected string? GetFixedCellClassString(ITableColumn col)
+    {
+        if (FixedCellClassStringCache.TryGetValue(col, out var cached))
+        {
+            return cached;
+        }
+        else
+        {
+            return FixedCellClassStringCache.GetOrAdd(col, col => CssBuilder.Default()
+    .AddClass("fixed", col.Fixed)
+    .AddClass("fixed-right", col.Fixed && IsTail(col))
+    .AddClass("fr", IsLastColumn(col))
+    .AddClass("fl", IsFirstColumn(col))
+    .Build());
+
+        }
+
+    }
 
 
     [Parameter]
@@ -193,33 +226,53 @@ public partial class VariableRow<TItem> : IDisposable
     public List<ITableColumn> Columns => ColumnsFunc();
 
     private ConcurrentDictionary<ITableColumn, bool> LastFixedColumnCache { get; } = new(ReferenceEqualityComparer.Instance);
-    private bool IsLastColumn(ITableColumn col) => LastFixedColumnCache.GetOrAdd(col, col =>
+    private bool IsLastColumn(ITableColumn col)
     {
-        var ret = false;
-        if (col.Fixed && !IsTail(col))
+        if (LastFixedColumnCache.TryGetValue(col, out var cached))
         {
-            var index = Columns.IndexOf(col) + 1;
-            ret = index < Columns.Count && Columns[index].Fixed == false;
+            return cached;
         }
-        return ret;
-    });
-    private ConcurrentDictionary<ITableColumn, bool> FirstFixedColumnCache { get; } = new(ReferenceEqualityComparer.Instance);
-    private bool IsFirstColumn(ITableColumn col) => FirstFixedColumnCache.GetOrAdd(col, col =>
-    {
-        var ret = false;
-        if (col.Fixed && IsTail(col))
+        else
         {
-            // 查找前一列是否固定
-            var index = Columns.IndexOf(col) - 1;
-            if (index > 0)
+            return LastFixedColumnCache.GetOrAdd(col, col =>
             {
-                ret = !Columns[index].Fixed;
-            }
+                var ret = false;
+                if (col.Fixed && !IsTail(col))
+                {
+                    var index = Columns.IndexOf(col) + 1;
+                    ret = index < Columns.Count && Columns[index].Fixed == false;
+                }
+                return ret;
+            });
+
         }
-        return ret;
-    });
+    }
+    private ConcurrentDictionary<ITableColumn, bool> FirstFixedColumnCache { get; } = new(ReferenceEqualityComparer.Instance);
+    private bool IsFirstColumn(ITableColumn col)
+    {
+        if (FirstFixedColumnCache.TryGetValue(col, out var cached))
+        {
+            return cached;
+        }
+        else
+        {
+            return FirstFixedColumnCache.GetOrAdd(col, col =>
+            {
+                var ret = false;
+                if (col.Fixed && IsTail(col))
+                {
+                    // 查找前一列是否固定
+                    var index = Columns.IndexOf(col) - 1;
+                    if (index > 0)
+                    {
+                        ret = !Columns[index].Fixed;
+                    }
+                }
+                return ret;
+            });
 
-
+        }
+    }
 
 
 

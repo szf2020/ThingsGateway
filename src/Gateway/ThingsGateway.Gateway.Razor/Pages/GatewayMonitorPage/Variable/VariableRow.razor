@@ -5,7 +5,6 @@
 @using ThingsGateway.Admin.Razor
 @using ThingsGateway.Gateway.Application
 @inherits ComponentDefault
-@typeparam TItem
 
 
 @foreach (var col in RowContent.Columns)
@@ -14,13 +13,7 @@
         <DynamicElement TagName="div" TriggerClick="@false"
                         StopPropagation="false"
                         class="@GetCellClassString(col, false, false)">
-            @{
-                <DynamicElement TagName="div" TriggerDoubleClick="false" GenerateElement="false"
-                                StopPropagation="true"
-                                class="@GetDoubleClickCellClassString(false)">
-                    @GetValue(col, RowContent.Row)
-                </DynamicElement>
-            }
+            @GetValue(col, RowContent.Row)
         </DynamicElement>
     </td>
 }

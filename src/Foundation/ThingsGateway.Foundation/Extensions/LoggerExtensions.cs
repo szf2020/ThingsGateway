@@ -100,7 +100,7 @@ public static class LoggerExtensions
     /// </summary>
     public static string GetDeviceLogBasePath()
     {
-        return PathExtensions.CombinePathWithOs("Logs","DeviceLog");
+        return PathExtensions.CombinePathWithOs("Logs", "DeviceLog");
     }
 
     /// <summary>
