@@ -13,6 +13,10 @@ namespace ThingsGateway.Admin.Razor;
 [CascadingTypeParameter(nameof(TItem))]
 public partial class AdminTable<TItem> where TItem : class, new()
 {
+
+    public List<ITableColumn> Columns => Instance?.Columns;
+
+
     /// <inheritdoc cref="Table{TItem}.SelectedRowsChanged"/>
     [Parameter]
     public EventCallback<List<TItem>> SelectedRowsChanged { get; set; }
@@ -40,6 +44,10 @@ public partial class AdminTable<TItem> where TItem : class, new()
     /// <inheritdoc cref="Table{TItem}.OnDoubleClickRowCallback"/>
     [Parameter]
     public Func<TItem, Task>? OnDoubleClickRowCallback { get; set; }
+    /// <inheritdoc cref="Table{TItem}.RowContentTemplate"/>
+    [Parameter]
+    public RenderFragment<TableRowContext<TItem>>? RowContentTemplate { get; set; }
+
     /// <inheritdoc cref="Table{TItem}.OnClickRowCallback"/>
     [Parameter]
     public Func<TItem, Task>? OnClickRowCallback { get; set; }

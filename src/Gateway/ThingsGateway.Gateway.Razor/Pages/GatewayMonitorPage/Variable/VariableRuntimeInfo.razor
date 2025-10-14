@@ -20,8 +20,7 @@
             ShowExtendButtons=true
             ShowToolbar="true"
             ShowExportButton
-            IsAutoRefresh
-            AutoRefreshInterval="1000"
+
             ShowDefaultButtons=true
             ShowSearch=false
             ExtendButtonColumnWidth=220
@@ -85,6 +84,11 @@
         <VariableEditComponent Model=@(context) AutoRestartThread="AutoRestartThread"></VariableEditComponent>
     </EditTemplate>
 
+    <RowContentTemplate Context="context">
+
+        <VariableRow RowContent="@context" ColumnsFunc="ColumnsFunc"></VariableRow>
+
+    </RowContentTemplate>
 
     <ExportButtonDropdownTemplate Context="ExportContext">
         @if ((AuthorizeButton("导出")))

@@ -15,13 +15,17 @@ using ThingsGateway.Admin.Application;
 using ThingsGateway.Admin.Razor;
 using ThingsGateway.DB;
 using ThingsGateway.Extension.Generic;
-using ThingsGateway.NewLife.Extension;
 using ThingsGateway.NewLife.Json.Extension;
 
 namespace ThingsGateway.Gateway.Razor;
 
 public partial class VariableRuntimeInfo : IDisposable
 {
+    public List<ITableColumn> ColumnsFunc()
+    {
+        return table?.Columns;
+    }
+
 #if !Management
     [Parameter]
     public ChannelDeviceTreeItem SelectModel { get; set; }
@@ -82,6 +86,12 @@ public partial class VariableRuntimeInfo : IDisposable
     {
         scheduler.Trigger();
         return Task.CompletedTask;
+    }
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        scheduler?.Trigger();
     }
 
     private async Task Notify(CancellationToken cancellationToken)
