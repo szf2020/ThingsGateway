@@ -23,7 +23,7 @@ public class DnsResolver : IDnsResolver
     /// <summary>缓存超时时间</summary>
     public TimeSpan Expire { set; get; } = TimeSpan.FromMinutes(5);
 
-    private readonly ConcurrentDictionary<String, DnsItem> _cache = new();
+    private readonly NonBlockingDictionary<String, DnsItem> _cache = new();
 
     /// <summary>解析域名</summary>
     /// <param name="host"></param>

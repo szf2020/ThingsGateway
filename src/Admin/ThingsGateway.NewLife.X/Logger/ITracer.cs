@@ -109,7 +109,7 @@ public class DefaultTracer : DisposeBase, ITracer, ILogFeature
     public IPool<ISpan> SpanPool => _SpanPool ??= new MySpanPool();
 
     /// <summary>Span构建器集合</summary>
-    protected ConcurrentDictionary<String, ISpanBuilder> _builders = new();
+    protected NonBlockingDictionary<String, ISpanBuilder> _builders = new();
 
     /// <summary>采样定时器</summary>
     protected TimerX? _timer;
@@ -292,7 +292,7 @@ public class DefaultTracer : DisposeBase, ITracer, ILogFeature
         var bs = _builders;
         if (bs.IsEmpty) return [];
 
-        _builders = new ConcurrentDictionary<String, ISpanBuilder>();
+        _builders = new NonBlockingDictionary<String, ISpanBuilder>();
 
         var bs2 = bs.Values.Where(e => e.Total > 0).ToArray();
 

@@ -323,7 +323,7 @@ public class SystemJson : IJsonHost
 
     #region IJsonHost 成员
 
-    private static readonly ConcurrentDictionary<string, JsonSerializerOptions> _optionsCache = new();
+    private static readonly NonBlockingDictionary<string, JsonSerializerOptions> _optionsCache = new();
 
     private static JsonSerializerOptions GetOptions(JsonSerializerOptions jsonSerializerOptions, bool indented, bool nullValue, bool camelCase)
     {

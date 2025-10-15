@@ -20,9 +20,9 @@ public class DeferredQueue : DisposeBase
     /// <summary>名称</summary>
     public String Name { get; set; }
 
-    private volatile ConcurrentDictionary<String, Object> _Entities = new();
+    private volatile NonBlockingDictionary<String, Object> _Entities = new();
     /// <summary>实体字典</summary>
-    public ConcurrentDictionary<String, Object> Entities => _Entities;
+    public NonBlockingDictionary<String, Object> Entities => _Entities;
 
     /// <summary>跟踪数。达到该值时输出跟踪日志，默认1000</summary>
     public Int32 TraceCount { get; set; } = 1000;
@@ -206,7 +206,7 @@ public class DeferredQueue : DisposeBase
         var es = _Entities;
         if (es.IsEmpty) return;
 
-        _Entities = new ConcurrentDictionary<String, Object>();
+        _Entities = new NonBlockingDictionary<String, Object>();
         var times = _Times;
 
         Interlocked.Add(ref _count, -es.Count);

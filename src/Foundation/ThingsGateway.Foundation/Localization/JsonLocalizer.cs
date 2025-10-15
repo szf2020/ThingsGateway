@@ -23,7 +23,7 @@ namespace ThingsGateway.Foundation;
 /// </summary>
 public class JsonLocalizer : IStringLocalizer
 {
-    private readonly ConcurrentDictionary<string, JObject> _resources = new();
+    private readonly NonBlockingDictionary<string, JObject> _resources = new();
     private string _folderName;
     private Type _type;
 

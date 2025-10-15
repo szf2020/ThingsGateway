@@ -199,7 +199,7 @@ public abstract class CollectFoundationBase : CollectBase
             throw new NotSupportedException();
 
         // 创建用于存储操作结果的并发字典
-        ConcurrentDictionary<string, OperResult> operResults = new();
+        NonBlockingDictionary<string, OperResult> operResults = new();
         // 使用并发方式遍历写入信息列表，并进行异步写入操作
         await writeInfoLists.ParallelForEachAsync(async (writeInfo, cancellationToken) =>
         {

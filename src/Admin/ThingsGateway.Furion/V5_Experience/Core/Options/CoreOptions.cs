@@ -21,20 +21,20 @@ internal sealed class CoreOptions
     /// <summary>
     ///     已注册的组件元数据集合
     /// </summary>
-    internal readonly ConcurrentDictionary<string, ComponentMetadata> _metadataOfRegistered;
+    internal readonly NonBlockingDictionary<string, ComponentMetadata> _metadataOfRegistered;
 
     /// <summary>
     ///     子选项集合
     /// </summary>
-    internal readonly ConcurrentDictionary<Type, object> _optionsInstances;
+    internal readonly NonBlockingDictionary<Type, object> _optionsInstances;
 
     /// <summary>
     ///     <inheritdoc cref="CoreOptions" />
     /// </summary>
     internal CoreOptions()
     {
-        _optionsInstances = new ConcurrentDictionary<Type, object>();
-        _metadataOfRegistered = new ConcurrentDictionary<string, ComponentMetadata>(StringComparer.OrdinalIgnoreCase);
+        _optionsInstances = new NonBlockingDictionary<Type, object>();
+        _metadataOfRegistered = new NonBlockingDictionary<string, ComponentMetadata>(StringComparer.OrdinalIgnoreCase);
 
         EntryComponentTypes = [];
     }

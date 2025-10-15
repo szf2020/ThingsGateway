@@ -32,7 +32,7 @@ public sealed class ObjectPropertySetter<T> where T : class
     /// <summary>
     ///     对象类型实例属性值设置器集合
     /// </summary>
-    internal readonly ConcurrentDictionary<string, Action<object, object?>> _propertySetters = new();
+    internal readonly NonBlockingDictionary<string, Action<object, object?>> _propertySetters = new();
 
     /// <summary>
     ///     <inheritdoc cref="ObjectPropertySetter{T}" />

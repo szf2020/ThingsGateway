@@ -13,8 +13,8 @@ public class FastMapperOption
 public static class FastMapper
 {
     // 泛型 + 非泛型共用缓存
-    private static readonly ConcurrentDictionary<(Type Source, Type Target), Delegate> _mapCache
-        = new ConcurrentDictionary<(Type, Type), Delegate>();
+    private static readonly NonBlockingDictionary<(Type Source, Type Target), Delegate> _mapCache
+        = new NonBlockingDictionary<(Type, Type), Delegate>();
 
     #region 泛型入口
     public static TTarget Mapper<TSource, TTarget>(TSource source, FastMapperOption option = null)

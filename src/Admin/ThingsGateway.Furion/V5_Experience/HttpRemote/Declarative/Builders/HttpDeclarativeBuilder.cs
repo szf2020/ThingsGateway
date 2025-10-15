@@ -27,7 +27,7 @@ public sealed class HttpDeclarativeBuilder
     /// <summary>
     ///     HTTP 声明式 <see cref="IHttpDeclarativeExtractor" /> 提取器集合
     /// </summary>
-    internal static readonly ConcurrentDictionary<Type, IHttpDeclarativeExtractor> _extractors = new([
+    internal static readonly NonBlockingDictionary<Type, IHttpDeclarativeExtractor> _extractors = new([
         new(typeof(BaseAddressDeclarativeExtractor), new BaseAddressDeclarativeExtractor()),
         new(typeof(ValidationDeclarativeExtractor), new ValidationDeclarativeExtractor()),
         new(typeof(AutoSetHostHeaderDeclarativeExtractor), new AutoSetHostHeaderDeclarativeExtractor()),
@@ -56,7 +56,7 @@ public sealed class HttpDeclarativeBuilder
     ///     HTTP 声明式 <see cref="IHttpDeclarativeExtractor" /> 提取器集合（冻结）
     /// </summary>
     /// <remarks>该集合用于确保某些 HTTP 声明式提取器始终位于最后。</remarks>
-    internal static readonly ConcurrentDictionary<Type, IFrozenHttpDeclarativeExtractor> _frozenExtractors = new([
+    internal static readonly NonBlockingDictionary<Type, IFrozenHttpDeclarativeExtractor> _frozenExtractors = new([
         new(typeof(MultipartDeclarativeExtractor), new MultipartDeclarativeExtractor()),
         new(typeof(HttpMultipartFormDataBuilderDeclarativeExtractor),
             new HttpMultipartFormDataBuilderDeclarativeExtractor()),

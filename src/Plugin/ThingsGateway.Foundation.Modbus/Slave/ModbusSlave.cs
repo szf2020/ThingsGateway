@@ -27,22 +27,22 @@ public class ModbusSlave : DeviceBase, IModbusAddress
     /// <summary>
     /// 继电器
     /// </summary>
-    private ConcurrentDictionary<byte, ByteBlock> ModbusServer01ByteBlocks = new();
+    private NonBlockingDictionary<byte, ByteBlock> ModbusServer01ByteBlocks = new();
 
     /// <summary>
     /// 开关输入
     /// </summary>
-    private ConcurrentDictionary<byte, ByteBlock> ModbusServer02ByteBlocks = new();
+    private NonBlockingDictionary<byte, ByteBlock> ModbusServer02ByteBlocks = new();
 
     /// <summary>
     /// 输入寄存器
     /// </summary>
-    private ConcurrentDictionary<byte, ByteBlock> ModbusServer03ByteBlocks = new();
+    private NonBlockingDictionary<byte, ByteBlock> ModbusServer03ByteBlocks = new();
 
     /// <summary>
     /// 保持寄存器
     /// </summary>
-    private ConcurrentDictionary<byte, ByteBlock> ModbusServer04ByteBlocks = new();
+    private NonBlockingDictionary<byte, ByteBlock> ModbusServer04ByteBlocks = new();
 
     /// <inheritdoc/>
     public override void InitChannel(IChannel channel, ILog? deviceLog = null)

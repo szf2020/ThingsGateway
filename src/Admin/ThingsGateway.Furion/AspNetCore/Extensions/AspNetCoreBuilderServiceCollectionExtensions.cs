@@ -94,7 +94,7 @@ public static class AspNetCoreBuilderServiceCollectionExtensions
     /// <param name="mvcBuilder"></param>
     /// <param name="configure"></param>
     /// <returns></returns>
-    public static IMvcBuilder AddFromConvertBinding(this IMvcBuilder mvcBuilder, Action<ConcurrentDictionary<Type, Type>> configure = default)
+    public static IMvcBuilder AddFromConvertBinding(this IMvcBuilder mvcBuilder, Action<NonBlockingDictionary<Type, Type>> configure = default)
     {
         mvcBuilder.Services.AddFromConvertBinding(configure);
 
@@ -107,13 +107,13 @@ public static class AspNetCoreBuilderServiceCollectionExtensions
     /// <param name="services"></param>
     /// <param name="configure"></param>
     /// <returns></returns>
-    public static IServiceCollection AddFromConvertBinding(this IServiceCollection services, Action<ConcurrentDictionary<Type, Type>> configure = default)
+    public static IServiceCollection AddFromConvertBinding(this IServiceCollection services, Action<NonBlockingDictionary<Type, Type>> configure = default)
     {
         // 非 Web 环境跳过注册
         if (App.WebHostEnvironment == default) return services;
 
         // 定义模型绑定转换器集合
-        var modelBinderConverts = new ConcurrentDictionary<Type, Type>();
+        var modelBinderConverts = new NonBlockingDictionary<Type, Type>();
         modelBinderConverts.TryAdd(typeof(DateTime), typeof(DateTimeModelConvertBinder));
         modelBinderConverts.TryAdd(typeof(DateTimeOffset), typeof(DateTimeOffsetModelConvertBinder));
 

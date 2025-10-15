@@ -11,7 +11,7 @@ public static class DictionaryExtensions
     /// <param name="dict"></param>
     /// <param name="key"></param>
     /// <returns></returns>
-    public static Boolean Remove<TKey, TValue>(this ConcurrentDictionary<TKey, TValue> dict, TKey key) where TKey : notnull => dict.TryRemove(key, out _);
+    public static Boolean Remove<TKey, TValue>(this NonBlockingDictionary<TKey, TValue> dict, TKey key) where TKey : notnull => dict.TryRemove(key, out _);
 
 #if !NET6_0_OR_GREATER
     public static bool TryAdd<TKey, TValue>(this IDictionary<TKey, TValue> pairs, TKey key, TValue value)
@@ -77,7 +77,7 @@ public static class DictionaryExtensions
     /// <summary>
     /// 批量出队
     /// </summary>
-    public static List<T> ToListWithDequeue<TKEY, T>(this ConcurrentDictionary<TKEY, T> values, int maxCount = 0)
+    public static List<T> ToListWithDequeue<TKEY, T>(this NonBlockingDictionary<TKEY, T> values, int maxCount = 0)
     {
         if (maxCount <= 0)
         {
@@ -105,7 +105,7 @@ public static class DictionaryExtensions
     /// <summary>
     /// 批量出队
     /// </summary>
-    public static Dictionary<TKEY, T> ToDictWithDequeue<TKEY, T>(this ConcurrentDictionary<TKEY, T> values, int maxCount = 0)
+    public static Dictionary<TKEY, T> ToDictWithDequeue<TKEY, T>(this NonBlockingDictionary<TKEY, T> values, int maxCount = 0)
     {
         if (maxCount <= 0)
         {
@@ -135,7 +135,7 @@ public static class DictionaryExtensions
     /// <summary>
     /// 批量出队
     /// </summary>
-    public static IEnumerable<KeyValuePair<TKEY, T>> ToIEnumerableKVWithDequeue<TKEY, T>(this ConcurrentDictionary<TKEY, T> values, int maxCount = 0)
+    public static IEnumerable<KeyValuePair<TKEY, T>> ToIEnumerableKVWithDequeue<TKEY, T>(this NonBlockingDictionary<TKEY, T> values, int maxCount = 0)
     {
         if (values.IsEmpty) yield break;
 

@@ -81,8 +81,8 @@ public class DeviceSingleStreamDataHandleAdapter<TRequest> : CustomDataHandlingA
                 request = Request == null ? Request = GetInstance() : Request;
             else
             {
-                if (!beCached)
-                    request = GetInstance();
+                //if (!beCached)
+                request = GetInstance();
             }
 
             var pos = byteBlock.BytesRead;

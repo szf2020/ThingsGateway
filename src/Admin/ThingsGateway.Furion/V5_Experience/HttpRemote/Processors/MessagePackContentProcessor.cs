@@ -27,7 +27,7 @@ public class MessagePackContentProcessor : HttpContentProcessorBase
     /// <summary>
     ///     MessagePack 序列化器委托字典缓存
     /// </summary>
-    internal static readonly ConcurrentDictionary<Type, Func<object, byte[]>> _serializerCache = new();
+    internal static readonly NonBlockingDictionary<Type, Func<object, byte[]>> _serializerCache = new();
 
     /// <summary>
     ///     初始化 MessagePack 序列化器委托

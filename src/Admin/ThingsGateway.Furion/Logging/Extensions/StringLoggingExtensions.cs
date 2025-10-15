@@ -82,7 +82,7 @@ public static class StringLoggingExtensions
     /// 配置日志上下文
     /// </summary>
     /// <param name="message"></param>
-    /// <param name="properties">建议使用 ConcurrentDictionary 类型</param>
+    /// <param name="properties">建议使用 NonBlockingDictionary 类型</param>
     /// <returns></returns>
     public static StringLoggingPart ScopeContext(this string message, IDictionary<string, object> properties)
     {

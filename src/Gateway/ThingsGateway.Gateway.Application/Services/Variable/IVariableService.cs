@@ -106,7 +106,7 @@ internal interface IVariableService
     Task UpdateInitValueAsync(List<Variable> variables);
 
     Task<List<Variable>> GetByDeviceIdAsync(List<long> deviceIds);
-    ImportPreviewOutput<Dictionary<string, Variable>> SetVariableData(HashSet<long>? dataScope, IReadOnlyDictionary<string, DeviceRuntime> deviceDicts, Dictionary<string, ImportPreviewOutputBase> ImportPreviews, ImportPreviewOutput<Dictionary<string, Variable>> deviceImportPreview, Dictionary<string, PluginInfo> driverPluginNameDict, ConcurrentDictionary<string, (Type, Dictionary<string, PropertyInfo>, Dictionary<string, PropertyInfo>)> propertysDict, string sheetName, IEnumerable<IDictionary<string, object>> rows);
+    ImportPreviewOutput<Dictionary<string, Variable>> SetVariableData(HashSet<long>? dataScope, IReadOnlyDictionary<string, DeviceRuntime> deviceDicts, Dictionary<string, ImportPreviewOutputBase> ImportPreviews, ImportPreviewOutput<Dictionary<string, Variable>> deviceImportPreview, Dictionary<string, PluginInfo> driverPluginNameDict, NonBlockingDictionary<string, (Type, Dictionary<string, PropertyInfo>, Dictionary<string, PropertyInfo>)> propertysDict, string sheetName, IEnumerable<IDictionary<string, object>> rows);
     List<VariableRuntime> GetAllVariableRuntime();
     Task<Dictionary<string, ImportPreviewOutputBase>> PreviewAsync(string filePath);
     Task<HashSet<long>> ImportVariableAsync(List<Variable> upData, List<Variable> insertData);

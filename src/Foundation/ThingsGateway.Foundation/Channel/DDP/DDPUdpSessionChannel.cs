@@ -64,7 +64,7 @@ public class DDPUdpSessionChannel : UdpSessionChannel, IClientChannel, IDtuUdpSe
 
     public EndPoint DefaultEndpoint => RemoteIPHost?.EndPoint;
 
-    ConcurrentDictionary<string, WaitLock> WaitLocks { get; } = new();
+    NonBlockingDictionary<string, WaitLock> WaitLocks { get; } = new();
 
     public override WaitLock GetLock(string key)
     {

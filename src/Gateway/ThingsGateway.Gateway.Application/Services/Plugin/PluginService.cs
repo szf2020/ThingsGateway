@@ -62,7 +62,7 @@ internal sealed class PluginService : IPluginService
     /// <summary>
     /// 插件文件名称/插件域
     /// </summary>
-    private ConcurrentDictionary<string, (AssemblyLoadContext AssemblyLoadContext, Assembly Assembly)> _assemblyLoadContextDict { get; } = new();
+    private NonBlockingDictionary<string, (AssemblyLoadContext AssemblyLoadContext, Assembly Assembly)> _assemblyLoadContextDict { get; } = new();
 
     /// <summary>
     /// 主程序上下文中的插件FullName/插件Type
@@ -73,7 +73,7 @@ internal sealed class PluginService : IPluginService
     /// <summary>
     /// 插件FullName/插件Type
     /// </summary>
-    private ConcurrentDictionary<string, Type> _driverBaseDict { get; } = new();
+    private NonBlockingDictionary<string, Type> _driverBaseDict { get; } = new();
 
     #region public
 
@@ -615,7 +615,7 @@ internal sealed class PluginService : IPluginService
                 // 获取私有字段
                 FieldInfo fieldInfo = typeof(ResourceManagerStringLocalizerFactory).GetField("_localizerCache", BindingFlags.Instance | BindingFlags.NonPublic);
                 // 获取字段的值
-                var dictionary = (ConcurrentDictionary<string, ResourceManagerStringLocalizer>)fieldInfo.GetValue(App.StringLocalizerFactory);
+                var dictionary = (NonBlockingDictionary<string, ResourceManagerStringLocalizer>)fieldInfo.GetValue(App.StringLocalizerFactory);
                 foreach (var item in _assemblyLoadContextDict)
                 {
                     var ids = item.Value.Assembly.ExportedTypes.Select(b => b.AssemblyQualifiedName).ToHashSet();

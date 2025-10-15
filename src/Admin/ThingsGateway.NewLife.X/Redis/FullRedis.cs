@@ -212,7 +212,7 @@ public class FullRedis : Redis
         }
     }
 
-    private ConcurrentDictionary<String, IPool<RedisClient>> _pools = new();
+    private NonBlockingDictionary<String, IPool<RedisClient>> _pools = new();
     /// <summary>获取指定节点的连接池</summary>
     /// <param name="node"></param>
     /// <returns></returns>

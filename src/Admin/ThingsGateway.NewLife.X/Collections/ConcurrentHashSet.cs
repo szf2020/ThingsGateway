@@ -9,7 +9,7 @@ namespace ThingsGateway.NewLife.Collections;
 /// </remarks>
 public class ConcurrentHashSet<T> : IEnumerable<T> where T : notnull
 {
-    private readonly ConcurrentDictionary<T, Byte> _dic = new();
+    private readonly NonBlockingDictionary<T, Byte> _dic = new();
 
     /// <summary>是否空集合</summary>
     public Boolean IsEmpty => _dic.IsEmpty;

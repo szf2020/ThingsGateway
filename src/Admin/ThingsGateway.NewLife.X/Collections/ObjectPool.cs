@@ -44,7 +44,7 @@ public class ObjectPool<T> : DisposeBase, IPool<T> where T : notnull
     private readonly ConcurrentQueue<Item> _free2 = new();
 
     /// <summary>借出去的放在这</summary>
-    private readonly ConcurrentDictionary<T, Item> _busy = new();
+    private readonly NonBlockingDictionary<T, Item> _busy = new();
 
     //private readonly Object SyncRoot = new();
     #endregion

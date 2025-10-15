@@ -14,7 +14,7 @@ namespace ThingsGateway.Gateway.Application;
 
 public interface IChannelThreadManage : IAsyncDisposable
 {
-    ConcurrentDictionary<long, IDeviceThreadManage> DeviceThreadManages { get; }
+    NonBlockingDictionary<long, IDeviceThreadManage> DeviceThreadManages { get; }
 
     Task RestartChannelAsync(ChannelRuntime channelRuntime);
     Task RestartChannelAsync(IList<ChannelRuntime> channelRuntimes);

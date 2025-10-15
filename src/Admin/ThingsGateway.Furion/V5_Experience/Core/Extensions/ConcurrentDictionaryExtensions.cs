@@ -14,7 +14,7 @@ using System.Collections.Concurrent;
 namespace ThingsGateway.Extension;
 
 /// <summary>
-///     <see cref="ConcurrentDictionary{TKey, TValue}" /> 拓展类
+///     <see cref="NonBlockingDictionary{TKey, TValue}" /> 拓展类
 /// </summary>
 internal static class ConcurrentDictionaryExtensions
 {
@@ -24,7 +24,7 @@ internal static class ConcurrentDictionaryExtensions
     /// <typeparam name="TKey">字典键类型</typeparam>
     /// <typeparam name="TValue">字典值类型</typeparam>
     /// <param name="dictionary">
-    ///     <see cref="ConcurrentDictionary{TKey, TValue}" />
+    ///     <see cref="NonBlockingDictionary{TKey, TValue}" />
     /// </param>
     /// <param name="key">
     ///     <typeparamref name="TKey" />
@@ -36,7 +36,7 @@ internal static class ConcurrentDictionaryExtensions
     /// <returns>
     ///     <see cref="bool" />
     /// </returns>
-    internal static bool TryUpdate<TKey, TValue>(this ConcurrentDictionary<TKey, TValue> dictionary
+    internal static bool TryUpdate<TKey, TValue>(this NonBlockingDictionary<TKey, TValue> dictionary
         , TKey key
         , Func<TValue, TValue> updateFactory
         , out TValue? value)

@@ -205,7 +205,7 @@ public static class ObjectExtensions
     /// <typeparam name="T"></typeparam>
     /// <param name="dic">字典</param>
     /// <param name="newDic">新字典</param>
-    internal static void AddOrUpdate<T>(this ConcurrentDictionary<string, T> dic, Dictionary<string, T> newDic)
+    internal static void AddOrUpdate<T>(this NonBlockingDictionary<string, T> dic, Dictionary<string, T> newDic)
     {
         foreach (var (key, value) in newDic)
         {

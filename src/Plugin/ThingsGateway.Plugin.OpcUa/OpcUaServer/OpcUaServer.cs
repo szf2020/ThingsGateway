@@ -50,7 +50,7 @@ public partial class OpcUaServer : BusinessBase
 #if !Management
     private ThingsGatewayServer m_server;
     protected IStringLocalizer Localizer { get; private set; }
-    private ConcurrentDictionary<long, VariableBasicData> CollectVariableRuntimes { get; set; } = new();
+    private NonBlockingDictionary<long, VariableBasicData> CollectVariableRuntimes { get; set; } = new();
 
     private static readonly string[] separator = new string[] { ";" };
 

@@ -146,7 +146,7 @@ public class NetServer : DisposeBase, IServer, IExtend, ILogFeature
     /// </remarks>
     public IServiceProvider? ServiceProvider { get; set; }
 
-    private ConcurrentDictionary<String, Object?>? _items;
+    private NonBlockingDictionary<String, Object?>? _items;
     /// <summary>数据项</summary>
     public IDictionary<String, Object?> Items => _items ??= new();
 
@@ -486,7 +486,7 @@ public class NetServer : DisposeBase, IServer, IExtend, ILogFeature
     #endregion
 
     #region 会话
-    private readonly ConcurrentDictionary<Int32, INetSession> _Sessions = new();
+    private readonly NonBlockingDictionary<Int32, INetSession> _Sessions = new();
     /// <summary>会话集合。用自增的数字ID作为标识，业务应用自己维持ID与业务主键的对应关系。</summary>
     public IDictionary<Int32, INetSession> Sessions => _Sessions;
 

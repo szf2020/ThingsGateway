@@ -22,8 +22,8 @@ namespace ThingsGateway.SqlSugar
     }
     public static class PropertyCallAdapterProvider<TThis>
     {
-        private static readonly System.Collections.Concurrent.ConcurrentDictionary<string, IPropertyCallAdapter<TThis>> _instances =
-            new System.Collections.Concurrent.ConcurrentDictionary<string, IPropertyCallAdapter<TThis>>();
+        private static readonly System.Collections.Concurrent.NonBlockingDictionary<string, IPropertyCallAdapter<TThis>> _instances =
+            new System.Collections.Concurrent.NonBlockingDictionary<string, IPropertyCallAdapter<TThis>>();
 
         public static IPropertyCallAdapter<TThis> GetInstance(string forPropertyName)
         {

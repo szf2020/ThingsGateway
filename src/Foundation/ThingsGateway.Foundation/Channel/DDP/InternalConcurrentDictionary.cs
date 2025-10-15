@@ -19,7 +19,7 @@ namespace ThingsGateway.Foundation;
 [DebuggerDisplay("Count={Count}")]
 internal class InternalConcurrentDictionary<TKey, TValue> : IEnumerable<TValue>
 {
-    private readonly ConcurrentDictionary<TKey, TValue> m_clients = new();
+    private readonly NonBlockingDictionary<TKey, TValue> m_clients = new();
 
     public int Count => m_clients.Count;
 

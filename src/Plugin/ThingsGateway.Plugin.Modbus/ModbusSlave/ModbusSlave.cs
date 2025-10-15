@@ -28,7 +28,7 @@ public class ModbusSlave : BusinessBase
 {
     private readonly ModbusSlaveProperty _driverPropertys = new();
 
-    private readonly ConcurrentDictionary<string, long> ModbusVariableQueue = new();
+    private readonly NonBlockingDictionary<string, long> ModbusVariableQueue = new();
 
     private readonly ModbusSlaveVariableProperty _variablePropertys = new();
 

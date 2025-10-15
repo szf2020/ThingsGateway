@@ -61,7 +61,7 @@ internal sealed class EventBusHostedService : BackgroundService
     /// <summary>
     /// 事件处理程序集合
     /// </summary>
-    private readonly ConcurrentDictionary<EventHandlerWrapper, EventHandlerWrapper> _eventHandlers = new();
+    private readonly NonBlockingDictionary<EventHandlerWrapper, EventHandlerWrapper> _eventHandlers = new();
 
     /// <summary>
     /// 构造函数

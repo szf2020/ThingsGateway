@@ -54,7 +54,7 @@ internal sealed class RpcService : IRpcService
         Dictionary<VariableRuntime, string> memoryVariables = new();
 
         // 用于存储结果的并发字典
-        ConcurrentDictionary<string, Dictionary<string, IOperResult>> results = new();
+        NonBlockingDictionary<string, Dictionary<string, IOperResult>> results = new();
         deviceDatas.ForEach(a => results.TryAdd(a.Key, new()));
 
         // 对每个要操作的变量进行检查和处理（内存变量）

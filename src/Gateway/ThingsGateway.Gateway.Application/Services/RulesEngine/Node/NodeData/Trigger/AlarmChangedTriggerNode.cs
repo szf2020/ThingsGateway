@@ -41,9 +41,9 @@ public class AlarmChangedTriggerNode : VariableNode, ITriggerNode, IDisposable
         return Task.CompletedTask;
     }
 
-    public static ConcurrentDictionary<string, ConcurrentDictionary<string, ConcurrentList<AlarmChangedTriggerNode>>> AlarmChangedTriggerNodeDict = new();
+    public static NonBlockingDictionary<string, NonBlockingDictionary<string, ConcurrentList<AlarmChangedTriggerNode>>> AlarmChangedTriggerNodeDict = new();
 
-    public static ConcurrentDictionary<AlarmChangedTriggerNode, Func<NodeOutput, CancellationToken, Task>> FuncDict = new();
+    public static NonBlockingDictionary<AlarmChangedTriggerNode, Func<NodeOutput, CancellationToken, Task>> FuncDict = new();
 
     public static BlockingCollection<AlarmVariable> AlarmVariables = new();
     static AlarmChangedTriggerNode()

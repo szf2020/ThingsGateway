@@ -94,7 +94,7 @@ IReadOnlyDictionary<long, ChannelRuntime> channelDicts)
     string? deviceName = null)
     {
         var sheets = new Dictionary<string, object>();
-        var propertysDict = new ConcurrentDictionary<string, (VariablePropertyBase, Dictionary<string, PropertyInfo>)>();
+        var propertysDict = new NonBlockingDictionary<string, (VariablePropertyBase, Dictionary<string, PropertyInfo>)>();
 
         // 主变量页
         sheets.Add(GatewayExportString.VariableName, GetVariableSheets(data, deviceDicts, deviceName));
@@ -198,7 +198,7 @@ string? deviceName)
     IReadOnlyDictionary<long, ChannelRuntime> channelDicts,
     string plugin,
     Dictionary<string, VariablePropertyBase> pluginDrivers,
-    ConcurrentDictionary<string, (VariablePropertyBase, Dictionary<string, PropertyInfo>)> propertysDict)
+    NonBlockingDictionary<string, (VariablePropertyBase, Dictionary<string, PropertyInfo>)> propertysDict)
     {
         if (!pluginDrivers.TryGetValue(plugin, out var variablePropertyBase))
             yield break;
@@ -271,7 +271,7 @@ string? deviceName)
     string? deviceName = null)
     {
         var sheets = new Dictionary<string, object>();
-        var propertysDict = new ConcurrentDictionary<string, (VariablePropertyBase, Dictionary<string, PropertyInfo>)>();
+        var propertysDict = new NonBlockingDictionary<string, (VariablePropertyBase, Dictionary<string, PropertyInfo>)>();
 
         // 主变量页
         sheets.Add(GatewayExportString.VariableName, GetVariableSheets(data, deviceDicts, deviceName));
@@ -315,7 +315,7 @@ string? deviceName)
     IReadOnlyDictionary<long, ChannelRuntime> channelDicts,
     string plugin,
     Dictionary<string, VariablePropertyBase> pluginDrivers,
-    ConcurrentDictionary<string, (VariablePropertyBase, Dictionary<string, PropertyInfo>)> propertysDict)
+    NonBlockingDictionary<string, (VariablePropertyBase, Dictionary<string, PropertyInfo>)> propertysDict)
     {
         if (!pluginDrivers.TryGetValue(plugin, out var variablePropertyBase))
             yield break;
@@ -370,8 +370,8 @@ string? deviceName)
         ConcurrentList<Dictionary<string, object>> variableExports = new();
         ConcurrentList<Dictionary<string, object>> alarmExports = new();
         //变量附加属性，转成Dict<表名,List<Dict<列名，列数据>>>的形式
-        ConcurrentDictionary<string, ConcurrentList<Dictionary<string, object>>> devicePropertys = new();
-        ConcurrentDictionary<string, (VariablePropertyBase, Dictionary<string, PropertyInfo>)> propertysDict = new();
+        NonBlockingDictionary<string, ConcurrentList<Dictionary<string, object>>> devicePropertys = new();
+        NonBlockingDictionary<string, (VariablePropertyBase, Dictionary<string, PropertyInfo>)> propertysDict = new();
 
         #region 列名称
 
@@ -596,7 +596,7 @@ string? deviceName)
         // 获取驱动插件的全名和名称的字典
         var driverPluginFullNameDict = plugins.ToDictionary(a => a.FullName);
         var driverPluginNameDict = plugins.ToDictionary(a => a.Name);
-        ConcurrentDictionary<string, (Type, Dictionary<string, PropertyInfo>, Dictionary<string, PropertyInfo>)> propertysDict = new();
+        NonBlockingDictionary<string, (Type, Dictionary<string, PropertyInfo>, Dictionary<string, PropertyInfo>)> propertysDict = new();
 
         var sheetNames = uSheetDatas.sheets.Keys.ToList();
         foreach (var sheetName in sheetNames)

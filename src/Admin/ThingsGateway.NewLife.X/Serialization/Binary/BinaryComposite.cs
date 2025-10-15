@@ -243,7 +243,7 @@ public class BinaryComposite : BinaryHandlerBase
         throw new NotSupportedException();
     }
 
-    private static readonly ConcurrentDictionary<MemberInfo, IMemberAccessor?> _cache = new();
+    private static readonly NonBlockingDictionary<MemberInfo, IMemberAccessor?> _cache = new();
     private static Boolean TryGetAccessor(MemberInfo member, [NotNullWhen(true)] out IMemberAccessor? acc)
     {
         if (_cache.TryGetValue(member, out acc)) return acc != null;

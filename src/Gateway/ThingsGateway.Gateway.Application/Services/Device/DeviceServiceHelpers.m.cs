@@ -45,7 +45,7 @@ HashSet<string> pluginSheetNames,
 
         var result = new Dictionary<string, object>();
         result.Add(GatewayExportString.DeviceName, GetDeviceSheets(data, deviceDicts, channelDicts, channelName));
-        ConcurrentDictionary<string, (object, Dictionary<string, PropertyInfo>)> propertysDict = new();
+        NonBlockingDictionary<string, (object, Dictionary<string, PropertyInfo>)> propertysDict = new();
 
         foreach (var plugin in pluginSheetNames)
         {
@@ -130,7 +130,7 @@ string? channelName)
 
     static IEnumerable<Dictionary<string, object>> GetPluginSheets(
     IEnumerable<Device> data,
-    ConcurrentDictionary<string, (object, Dictionary<string, PropertyInfo>)> propertysDict,
+    NonBlockingDictionary<string, (object, Dictionary<string, PropertyInfo>)> propertysDict,
     string? plugin)
     {
         foreach (var device in data)
@@ -145,7 +145,7 @@ string? channelName)
 
 
 
-    static Dictionary<string, object> GetPluginRows(Device device, string? plugin, ConcurrentDictionary<string, (object, Dictionary<string, PropertyInfo>)> propertysDict)
+    static Dictionary<string, object> GetPluginRows(Device device, string? plugin, NonBlockingDictionary<string, (object, Dictionary<string, PropertyInfo>)> propertysDict)
     {
         Dictionary<string, object> driverInfo = new();
         var propDict = device.DevicePropertys;

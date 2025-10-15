@@ -94,7 +94,7 @@ public sealed partial class StringLoggingPart
     /// <summary>
     /// 配置日志上下文
     /// </summary>
-    /// <param name="properties">建议使用 ConcurrentDictionary 类型</param>
+    /// <param name="properties">建议使用 NonBlockingDictionary 类型</param>
     /// <returns></returns>
     public StringLoggingPart ScopeContext(IDictionary<string, object> properties)
     {

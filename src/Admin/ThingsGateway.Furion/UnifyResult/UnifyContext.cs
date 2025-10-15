@@ -51,12 +51,12 @@ public static class UnifyContext
     /// <summary>
     /// 规范化结果提供器
     /// </summary>
-    internal static ConcurrentDictionary<string, UnifyMetadata> UnifyProviders = new();
+    internal static NonBlockingDictionary<string, UnifyMetadata> UnifyProviders = new();
 
     /// <summary>
     /// 规范化序列化配置
     /// </summary>
-    internal static ConcurrentDictionary<string, object> UnifySerializerSettings = new();
+    internal static NonBlockingDictionary<string, object> UnifySerializerSettings = new();
 
     /// <summary>
     /// 获取异常元数据

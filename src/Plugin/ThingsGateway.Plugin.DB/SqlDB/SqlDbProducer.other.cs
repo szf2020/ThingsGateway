@@ -26,7 +26,7 @@ public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariable
 {
 #if !Management
     private volatile bool _initRealData;
-    private ConcurrentDictionary<long, VariableBasicData> RealTimeVariables { get; } = new ConcurrentDictionary<long, VariableBasicData>();
+    private NonBlockingDictionary<long, VariableBasicData> RealTimeVariables { get; } = new NonBlockingDictionary<long, VariableBasicData>();
 
     protected override ValueTask<OperResult> UpdateVarModel(List<CacheDBItem<VariableBasicData>> item, CancellationToken cancellationToken)
     {

@@ -42,51 +42,60 @@ public class ModbusTcpMessage : MessageBase, IResultMessage
 
     public override FilterResult CheckBody<TByteBlock>(ref TByteBlock byteBlock)
     {
-        var f = Response.FunctionCode > 0x30 ? Response.FunctionCode - 0x30 : Response.FunctionCode;
-        if (error)
+        try
         {
-            Response.ErrorCode = ReaderExtension.ReadValue<TByteBlock, byte>(ref byteBlock);
-            OperCode = Response.ErrorCode;
-            ErrorMessage = ModbusHelper.GetDescriptionByErrorCode(Response.ErrorCode.Value);
-            ErrorType = ErrorTypeEnum.DeviceError;
-        }
-        else
-        {
-            Response.ErrorCode = null;
-        }
-        if (Response.ErrorCode != null)
-        {
-            return FilterResult.Success;
-        }
 
-        if (f <= 4)
-        {
-            OperCode = 0;
-            Response.Length = ReaderExtension.ReadValue<TByteBlock, byte>(ref byteBlock);
-            Content = byteBlock.ToArrayTake(BodyLength - 1);
-            Response.MasterWriteDatas = Content;
-            return FilterResult.Success;
+            var f = Response.FunctionCode > 0x30 ? Response.FunctionCode - 0x30 : Response.FunctionCode;
+            if (error)
+            {
+                Response.ErrorCode = ReaderExtension.ReadValue<TByteBlock, byte>(ref byteBlock);
+                OperCode = Response.ErrorCode;
+                ErrorMessage = ModbusHelper.GetDescriptionByErrorCode(Response.ErrorCode.Value);
+                ErrorType = ErrorTypeEnum.DeviceError;
+            }
+            else
+            {
+                Response.ErrorCode = null;
+            }
+            if (Response.ErrorCode != null)
+            {
+                return FilterResult.Success;
+            }
+
+            if (f <= 4)
+            {
+                OperCode = 0;
+                Response.Length = ReaderExtension.ReadValue<TByteBlock, byte>(ref byteBlock);
+                Content = byteBlock.ToArrayTake(BodyLength - 1);
+                Response.MasterWriteDatas = Content;
+                return FilterResult.Success;
+            }
+            else if (f == 5 || f == 6)
+            {
+                Response.StartAddress = ReaderExtension.ReadValue<TByteBlock, ushort>(ref byteBlock, EndianType.Big);
+                OperCode = 0;
+                Content = byteBlock.ToArrayTake(BodyLength - 2);
+                Response.MasterWriteDatas = Content;
+                return FilterResult.Success;
+            }
+            else if (f == 15 || f == 16)
+            {
+                Response.StartAddress = ReaderExtension.ReadValue<TByteBlock, ushort>(ref byteBlock, EndianType.Big);
+                OperCode = 0;
+                Response.Length = ReaderExtension.ReadValue<TByteBlock, ushort>(ref byteBlock, EndianType.Big);
+                Content = Array.Empty<byte>();
+                return FilterResult.Success;
+            }
+            else
+            {
+                OperCode = 999;
+                ErrorMessage = AppResource.ModbusError1;
+            }
+
         }
-        else if (f == 5 || f == 6)
+        catch (Exception ex)
         {
-            Response.StartAddress = ReaderExtension.ReadValue<TByteBlock, ushort>(ref byteBlock, EndianType.Big);
-            OperCode = 0;
-            Content = byteBlock.ToArrayTake(BodyLength - 2);
-            Response.MasterWriteDatas = Content;
-            return FilterResult.Success;
-        }
-        else if (f == 15 || f == 16)
-        {
-            Response.StartAddress = ReaderExtension.ReadValue<TByteBlock, ushort>(ref byteBlock, EndianType.Big);
-            OperCode = 0;
-            Response.Length = ReaderExtension.ReadValue<TByteBlock, ushort>(ref byteBlock, EndianType.Big);
-            Content = Array.Empty<byte>();
-            return FilterResult.Success;
-        }
-        else
-        {
-            OperCode = 999;
-            ErrorMessage = AppResource.ModbusError1;
+            throw new Exception($"Data length:{byteBlock.TotalSequence.Length} bodyLength:{BodyLength} BytesRead:{byteBlock.BytesRead} BytesRemaining:{byteBlock.BytesRemaining}", ex);
         }
         return FilterResult.GoOn;
     }

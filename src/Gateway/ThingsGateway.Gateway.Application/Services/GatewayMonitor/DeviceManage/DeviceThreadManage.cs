@@ -152,18 +152,18 @@ internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
     /// <summary>
     /// 任务
     /// </summary>
-    internal ConcurrentDictionary<long, TaskSchedulerLoop> DriverTasks { get; } = new();
+    internal NonBlockingDictionary<long, TaskSchedulerLoop> DriverTasks { get; } = new();
 
     public int TaskCount => DriverTasks.Count;
     /// <summary>
     /// 取消令箭列表
     /// </summary>
-    private ConcurrentDictionary<long, CancellationTokenSource> CancellationTokenSources { get; set; } = new();
+    private NonBlockingDictionary<long, CancellationTokenSource> CancellationTokenSources { get; set; } = new();
 
     /// <summary>
     /// 插件列表
     /// </summary>
-    private ConcurrentDictionary<long, DriverBase> Drivers { get; set; } = new();
+    private NonBlockingDictionary<long, DriverBase> Drivers { get; set; } = new();
 
     public IChannelThreadManage ChannelThreadManage { get; internal set; }
 

@@ -32,7 +32,7 @@ public sealed class ObjectPropertyGetter<T> where T : class
     /// <summary>
     ///     对象类型实例属性值访问器集合
     /// </summary>
-    internal readonly ConcurrentDictionary<string, Func<object, object?>> _propertyGetters = new();
+    internal readonly NonBlockingDictionary<string, Func<object, object?>> _propertyGetters = new();
 
     /// <summary>
     ///     <inheritdoc cref="ObjectPropertyGetter{T}" />

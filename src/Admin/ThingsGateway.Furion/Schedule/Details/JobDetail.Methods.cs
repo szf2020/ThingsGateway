@@ -167,7 +167,7 @@ public partial class JobDetail
     /// <summary>
     /// 带命名规则的数据库列名
     /// </summary>
-    private readonly ConcurrentDictionary<NamingConventions, string[]> _namingColumnNames = new();
+    private readonly NonBlockingDictionary<NamingConventions, string[]> _namingColumnNames = new();
 
     /// <summary>
     /// 获取数据库列名

@@ -64,7 +64,7 @@ public class TextFileLog : Logger, IDisposable
         _Timer = new TimerX(DoWriteAndClose, null, 0_000, 5_000) { Async = true };
     }
 
-    private static readonly ConcurrentDictionary<String, TextFileLog> cache = new(StringComparer.OrdinalIgnoreCase);
+    private static readonly NonBlockingDictionary<String, TextFileLog> cache = new(StringComparer.OrdinalIgnoreCase);
     /// <summary>每个目录的日志实例应该只有一个，所以采用静态创建</summary>
     /// <param name="path">日志目录或日志文件路径</param>
     /// <param name="fileFormat"></param>
@@ -257,7 +257,7 @@ public class TextFileLog : Logger, IDisposable
                 {
                     // 删除最旧的文件
                     var retain = fis.Length - Backups;
-                    fis = fis.OrderBy(e => e.CreationTime).Take(retain).ToArray();
+                    fis = fis.OrderBy(e => e.LastWriteTimeUtc).Take(retain).ToArray();
                     foreach (var item in fis)
                     {
                         OnWrite(LogLevel.Info, "The log file has reached the maximum limit of {0}, delete {1}, size {2: n0} Byte", Backups, item.Name, item.Length);

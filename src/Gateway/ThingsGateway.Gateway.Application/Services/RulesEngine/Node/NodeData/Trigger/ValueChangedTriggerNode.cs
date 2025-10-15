@@ -40,8 +40,8 @@ public class ValueChangedTriggerNode : VariableNode, ITriggerNode, IDisposable
         }
         return Task.CompletedTask;
     }
-    public static ConcurrentDictionary<string, ConcurrentDictionary<string, ConcurrentList<ValueChangedTriggerNode>>> ValueChangedTriggerNodeDict = new();
-    public static ConcurrentDictionary<ValueChangedTriggerNode, Func<NodeOutput, CancellationToken, Task>> FuncDict = new();
+    public static NonBlockingDictionary<string, NonBlockingDictionary<string, ConcurrentList<ValueChangedTriggerNode>>> ValueChangedTriggerNodeDict = new();
+    public static NonBlockingDictionary<ValueChangedTriggerNode, Func<NodeOutput, CancellationToken, Task>> FuncDict = new();
 
     public static BlockingCollection<VariableBasicData> VariableBasicDatas = new();
     static ValueChangedTriggerNode()

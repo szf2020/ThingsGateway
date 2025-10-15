@@ -10,7 +10,7 @@ namespace ThingsGateway.NewLife.Net;
 internal class SessionCollection : DisposeBase, IDictionary<String, ISocketSession>
 {
     #region 属性
-    private readonly ConcurrentDictionary<String, ISocketSession> _dic = new();
+    private readonly NonBlockingDictionary<String, ISocketSession> _dic = new();
 
     /// <summary>服务端</summary>
     public ISocketServer Server { get; private set; }

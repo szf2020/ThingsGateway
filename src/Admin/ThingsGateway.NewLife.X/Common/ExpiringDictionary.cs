@@ -1,5 +1,4 @@
 ﻿using System.Collections.Concurrent;
-using System.Runtime.CompilerServices;
 
 using ThingsGateway.NewLife.Threading;
 namespace ThingsGateway.NewLife;
@@ -52,7 +51,7 @@ public class ExpiringDictionary<TKey, TValue> : IDisposable
             return rs;
         }
     }
-    private ConcurrentDictionary<TKey, CacheItem> _dict;
+    private NonBlockingDictionary<TKey, CacheItem> _dict;
 
     private readonly TimerX _cleanupTimer;
     private int defaultExpire = 60;
@@ -61,7 +60,7 @@ public class ExpiringDictionary<TKey, TValue> : IDisposable
     {
         defaultExpire = expire;
         this.comparer = comparer;
-        _dict = new ConcurrentDictionary<TKey, CacheItem>(comparer);
+        _dict = new NonBlockingDictionary<TKey, CacheItem>(comparer);
 
         _cleanupTimer = new TimerX(TimerClear, null, 10000, 10000) { Async = true };
     }

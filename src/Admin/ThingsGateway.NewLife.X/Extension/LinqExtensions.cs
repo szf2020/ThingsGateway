@@ -101,7 +101,7 @@ public static class LinqExtensions
     /// <summary>
     /// 从并发字典中删除
     /// </summary>
-    public static bool Remove<TKey, TValue>(this ConcurrentDictionary<TKey, TValue> dict, TKey key) where TKey : notnull
+    public static bool Remove<TKey, TValue>(this NonBlockingDictionary<TKey, TValue> dict, TKey key) where TKey : notnull
     {
         return dict.TryRemove(key, out TValue? _);
     }

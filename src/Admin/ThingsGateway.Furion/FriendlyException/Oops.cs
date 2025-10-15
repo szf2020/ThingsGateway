@@ -31,7 +31,7 @@ public static class Oops
     /// <summary>
     /// 方法错误异常特性
     /// </summary>
-    private static readonly ConcurrentDictionary<MethodBase, MethodIfException> _errorMethods;
+    private static readonly NonBlockingDictionary<MethodBase, MethodIfException> _errorMethods;
 
     /// <summary>
     /// 错误代码类型
@@ -41,7 +41,7 @@ public static class Oops
     /// <summary>
     /// 错误消息字典
     /// </summary>
-    private static readonly ConcurrentDictionary<string, string> _errorCodeMessages;
+    private static readonly NonBlockingDictionary<string, string> _errorCodeMessages;
 
     /// <summary>
     /// 友好异常设置
@@ -53,7 +53,7 @@ public static class Oops
     /// </summary>
     static Oops()
     {
-        _errorMethods = new ConcurrentDictionary<MethodBase, MethodIfException>();
+        _errorMethods = new NonBlockingDictionary<MethodBase, MethodIfException>();
         _friendlyExceptionSettings = App.GetConfig<FriendlyExceptionSettingsOptions>("FriendlyExceptionSettings", true);
         _errorCodeTypes = GetErrorCodeTypes();
         _errorCodeMessages = GetErrorCodeMessages();
@@ -258,9 +258,9 @@ public static class Oops
     /// 获取所有错误消息
     /// </summary>
     /// <returns></returns>
-    private static ConcurrentDictionary<string, string> GetErrorCodeMessages()
+    private static NonBlockingDictionary<string, string> GetErrorCodeMessages()
     {
-        var defaultErrorCodeMessages = new ConcurrentDictionary<string, string>();
+        var defaultErrorCodeMessages = new NonBlockingDictionary<string, string>();
 
         // 查找所有 [ErrorCodeType] 类型中的 [ErrorCodeMetadata] 元数据定义
         var errorCodeMessages = _errorCodeTypes.SelectMany(u => u.GetFields().Where(u => u.IsDefined(typeof(ErrorCodeItemMetadataAttribute))))

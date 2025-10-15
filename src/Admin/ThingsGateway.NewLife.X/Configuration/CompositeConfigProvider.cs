@@ -168,8 +168,8 @@ public class CompositeConfigProvider : IConfigProvider
     #endregion
 
     #region 绑定
-    private readonly ConcurrentDictionary<Object, String> _models = [];
-    private readonly ConcurrentDictionary<Object, ModelWrap> _models2 = [];
+    private readonly NonBlockingDictionary<Object, String> _models = [];
+    private readonly NonBlockingDictionary<Object, ModelWrap> _models2 = [];
     /// <summary>绑定模型，使能热更新，配置存储数据改变时同步修改模型属性</summary>
     /// <typeparam name="T">模型。可通过实现IConfigMapping接口来自定义映射配置到模型实例</typeparam>
     /// <param name="model">模型实例</param>

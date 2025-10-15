@@ -159,7 +159,7 @@ public partial class VariableRow : IDisposable
         var index = Columns.IndexOf(col);
         return middle < index;
     }
-    private ConcurrentDictionary<ITableColumn, string> CellClassStringCache { get; } = new(ReferenceEqualityComparer.Instance);
+    private NonBlockingDictionary<ITableColumn, string> CellClassStringCache { get; } = new(ReferenceEqualityComparer.Instance);
 
     /// <summary>
     /// 获得 Cell 文字样式
@@ -195,7 +195,7 @@ public partial class VariableRow : IDisposable
     private bool AllowResizing = true;
     private bool IsTree = false;
 
-    private ConcurrentDictionary<ITableColumn, string> FixedCellClassStringCache { get; } = new(ReferenceEqualityComparer.Instance);
+    private NonBlockingDictionary<ITableColumn, string> FixedCellClassStringCache { get; } = new(ReferenceEqualityComparer.Instance);
     /// <summary>
     /// 获得指定列头固定列样式
     /// </summary>
@@ -225,7 +225,7 @@ public partial class VariableRow : IDisposable
     public Func<List<ITableColumn>> ColumnsFunc { get; set; }
     public List<ITableColumn> Columns => ColumnsFunc();
 
-    private ConcurrentDictionary<ITableColumn, bool> LastFixedColumnCache { get; } = new(ReferenceEqualityComparer.Instance);
+    private NonBlockingDictionary<ITableColumn, bool> LastFixedColumnCache { get; } = new(ReferenceEqualityComparer.Instance);
     private bool IsLastColumn(ITableColumn col)
     {
         if (LastFixedColumnCache.TryGetValue(col, out var cached))
@@ -247,7 +247,7 @@ public partial class VariableRow : IDisposable
 
         }
     }
-    private ConcurrentDictionary<ITableColumn, bool> FirstFixedColumnCache { get; } = new(ReferenceEqualityComparer.Instance);
+    private NonBlockingDictionary<ITableColumn, bool> FirstFixedColumnCache { get; } = new(ReferenceEqualityComparer.Instance);
     private bool IsFirstColumn(ITableColumn col)
     {
         if (FirstFixedColumnCache.TryGetValue(col, out var cached))

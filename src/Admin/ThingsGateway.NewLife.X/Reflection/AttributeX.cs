@@ -10,7 +10,7 @@ namespace ThingsGateway.NewLife;
 public static class AttributeX
 {
     #region 静态方法
-    private static readonly ConcurrentDictionary<String, Object> _asmCache = new();
+    private static readonly NonBlockingDictionary<String, Object> _asmCache = new();
 
     /// <summary>获取自定义属性，带有缓存功能，避免因.Net内部GetCustomAttributes没有缓存而带来的损耗</summary>
     /// <typeparam name="TAttribute"></typeparam>

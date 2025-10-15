@@ -18,7 +18,7 @@ class MyServiceScope : IServiceScope, IServiceProvider
 
     public IServiceProvider ServiceProvider => this;
 
-    private readonly ConcurrentDictionary<Type, Object?> _cache = new();
+    private readonly NonBlockingDictionary<Type, Object?> _cache = new();
 
     public void Dispose()
     {

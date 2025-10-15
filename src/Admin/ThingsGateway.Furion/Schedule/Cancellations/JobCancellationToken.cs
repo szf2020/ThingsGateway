@@ -21,7 +21,7 @@ internal sealed class JobCancellationToken : IJobCancellationToken
     /// <summary>
     /// 取消作业执行 Token 集合
     /// </summary>
-    private readonly ConcurrentDictionary<string, CancellationTokenSource> _cancellationTokenSources;
+    private readonly NonBlockingDictionary<string, CancellationTokenSource> _cancellationTokenSources;
 
     /// <summary>
     /// 作业调度器日志服务

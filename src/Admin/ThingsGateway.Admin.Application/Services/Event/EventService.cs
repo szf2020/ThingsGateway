@@ -20,7 +20,7 @@ namespace ThingsGateway.Admin.Application;
 /// <typeparam name="TEntry"></typeparam>
 public class EventService<TEntry> : IEventService<TEntry>, IDisposable
 {
-    private ConcurrentDictionary<string, Func<TEntry, Task>> Cache = new();
+    private NonBlockingDictionary<string, Func<TEntry, Task>> Cache = new();
 
     public void Dispose()
     {

@@ -60,14 +60,19 @@ public partial class ModbusMaster : DtuServiceDeviceBase, IModbusAddress
                         return new DeviceSingleStreamDataHandleAdapter<ModbusTcpMessage>()
                         {
                             CacheTimeout = TimeSpan.FromMilliseconds(Channel.ChannelOptions.CacheTimeout),
+                            IsSingleThread = false
                         };
 
                     case ChannelTypeEnum.UdpSession:
-                        return new DeviceUdpDataHandleAdapter<ModbusTcpMessage>();
+                        return new DeviceUdpDataHandleAdapter<ModbusTcpMessage>()
+                        {
+                            IsSingleThread = false
+                        };
                 }
                 return new DeviceSingleStreamDataHandleAdapter<ModbusTcpMessage>()
                 {
                     CacheTimeout = TimeSpan.FromMilliseconds(Channel.ChannelOptions.CacheTimeout),
+                    IsSingleThread = false
                 };
 
             case ModbusTypeEnum.ModbusRtu:

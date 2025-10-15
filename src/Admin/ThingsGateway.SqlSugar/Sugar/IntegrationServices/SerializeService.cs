@@ -31,7 +31,7 @@ namespace ThingsGateway.SqlSugar
             NumberHandling = JsonNumberHandling.AllowNamedFloatingPointLiterals,
         };
 
-        private static readonly ConcurrentDictionary<Type, SugarColumn> _typeInfoCache = new();
+        private static readonly NonBlockingDictionary<Type, SugarColumn> _typeInfoCache = new();
 
         static SerializeService()
         {

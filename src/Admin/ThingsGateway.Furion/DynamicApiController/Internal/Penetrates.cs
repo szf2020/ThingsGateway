@@ -28,21 +28,21 @@ internal static class Penetrates
     /// <summary>
     /// 请求动词映射字典
     /// </summary>
-    internal static ConcurrentDictionary<string, string> VerbToHttpMethods { get; private set; }
+    internal static NonBlockingDictionary<string, string> VerbToHttpMethods { get; private set; }
 
     /// <summary>
     /// 控制器排序集合
     /// </summary>
-    internal static ConcurrentDictionary<string, (string, int, Type)> ControllerOrderCollection { get; set; }
+    internal static NonBlockingDictionary<string, (string, int, Type)> ControllerOrderCollection { get; set; }
 
     /// <summary>
     /// 构造函数
     /// </summary>
     static Penetrates()
     {
-        ControllerOrderCollection = new ConcurrentDictionary<string, (string, int, Type)>();
+        ControllerOrderCollection = new NonBlockingDictionary<string, (string, int, Type)>();
 
-        VerbToHttpMethods = new ConcurrentDictionary<string, string>
+        VerbToHttpMethods = new NonBlockingDictionary<string, string>
         {
             ["post"] = "POST",
             ["add"] = "POST",
@@ -67,13 +67,13 @@ internal static class Penetrates
             ["patch"] = "PATCH"
         };
 
-        //IsApiControllerCached = new ConcurrentDictionary<Type, bool>();
+        //IsApiControllerCached = new NonBlockingDictionary<Type, bool>();
     }
 
     ///// <summary>
     ///// <see cref="IsApiController(Type)"/> 缓存集合
     ///// </summary>
-    //private static readonly ConcurrentDictionary<Type, bool> IsApiControllerCached;
+    //private static readonly NonBlockingDictionary<Type, bool> IsApiControllerCached;
 
     /// <summary>
     /// 是否是Api控制器

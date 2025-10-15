@@ -34,7 +34,7 @@ string? channelName = null)
 
         var result = new Dictionary<string, object>();
         result.Add(GatewayExportString.DeviceName, GetDeviceSheets(data1, deviceDicts, channelDicts, channelName));
-        ConcurrentDictionary<string, (object, Dictionary<string, PropertyInfo>)> propertysDict = new();
+        NonBlockingDictionary<string, (object, Dictionary<string, PropertyInfo>)> propertysDict = new();
 
         foreach (var plugin in pluginSheetNames)
         {
@@ -93,7 +93,7 @@ IReadOnlyDictionary<long, DeviceRuntime>? deviceDicts,
 
     static async IAsyncEnumerable<Dictionary<string, object>> GetPluginSheets(
     IAsyncEnumerable<Device> data,
-    ConcurrentDictionary<string, (object, Dictionary<string, PropertyInfo>)> propertysDict,
+    NonBlockingDictionary<string, (object, Dictionary<string, PropertyInfo>)> propertysDict,
     string? plugin)
     {
         var enumerator = data.GetAsyncEnumerator();
@@ -129,7 +129,7 @@ IReadOnlyDictionary<long, DeviceRuntime>? deviceDicts,
 
         // 获取所有驱动程序，并将驱动程序名称作为键构建字典
         var driverPluginNameDict = GlobalData.PluginService.GetPluginList().DistinctBy(a => a.Name).ToDictionary(a => a.Name);
-        ConcurrentDictionary<string, (Type, Dictionary<string, PropertyInfo>, Dictionary<string, PropertyInfo>)> propertysDict = new();
+        NonBlockingDictionary<string, (Type, Dictionary<string, PropertyInfo>, Dictionary<string, PropertyInfo>)> propertysDict = new();
 
         var sheetNames = uSheetDatas.sheets.Keys.ToList();
         foreach (var sheetName in sheetNames)

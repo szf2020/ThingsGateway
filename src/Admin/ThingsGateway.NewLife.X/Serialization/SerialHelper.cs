@@ -11,7 +11,7 @@ namespace ThingsGateway.NewLife.Serialization;
 /// <summary>序列化助手</summary>
 public static class SerialHelper
 {
-    private static readonly ConcurrentDictionary<PropertyInfo, String> _cache = new();
+    private static readonly NonBlockingDictionary<PropertyInfo, String> _cache = new();
     /// <summary>获取序列化名称</summary>
     /// <param name="pi"></param>
     /// <returns></returns>

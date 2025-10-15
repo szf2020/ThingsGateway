@@ -8,7 +8,7 @@ namespace ThingsGateway.SqlSugar
 {
     internal static class FastCopy
     {
-        static ConcurrentDictionary<string, object> copiers = new ConcurrentDictionary<string, object>();
+        static NonBlockingDictionary<string, object> copiers = new NonBlockingDictionary<string, object>();
 
         /// <summary>
         /// 复制两个对象同名属性值

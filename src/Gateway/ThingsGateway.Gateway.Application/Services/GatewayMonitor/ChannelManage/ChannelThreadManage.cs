@@ -26,7 +26,7 @@ internal sealed class ChannelThreadManage : IChannelThreadManage
         _logger = App.RootServices.GetService<Microsoft.Extensions.Logging.ILoggerFactory>().CreateLogger($"ChannelThreadService");
     }
 
-    public ConcurrentDictionary<long, IDeviceThreadManage> DeviceThreadManages { get; } = new();
+    public NonBlockingDictionary<long, IDeviceThreadManage> DeviceThreadManages { get; } = new();
 
     #region 设备管理
 

@@ -59,7 +59,7 @@ public interface IEventHandler<TEvent>
 /// </remarks>
 public class EventBus<TEvent> : DisposeBase, IEventBus<TEvent>
 {
-    private readonly ConcurrentDictionary<String, IEventHandler<TEvent>> _handlers = [];
+    private readonly NonBlockingDictionary<String, IEventHandler<TEvent>> _handlers = [];
     /// <summary>已订阅的事件处理器集合</summary>
     public IDictionary<String, IEventHandler<TEvent>> Handlers => _handlers;
 

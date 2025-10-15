@@ -129,8 +129,8 @@ public partial class VariableEditComponent
     [CascadingParameter]
     private Func<Task>? OnCloseAsync { get; set; }
 
-    private ConcurrentDictionary<long, IEnumerable<IEditorItem>>? VariablePropertyEditors { get; set; } = new();
-    private ConcurrentDictionary<long, RenderFragment>? VariablePropertyRenderFragments { get; set; } = new();
+    private NonBlockingDictionary<long, IEnumerable<IEditorItem>>? VariablePropertyEditors { get; set; } = new();
+    private NonBlockingDictionary<long, RenderFragment>? VariablePropertyRenderFragments { get; set; } = new();
 
     public async Task ValidSubmit(EditContext editContext)
     {

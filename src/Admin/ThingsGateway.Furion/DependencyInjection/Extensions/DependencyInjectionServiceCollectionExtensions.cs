@@ -353,7 +353,7 @@ public static class DependencyInjectionServiceCollectionExtensions
     /// <summary>
     /// 类型名称集合
     /// </summary>
-    private static readonly ConcurrentDictionary<string, Type> TypeNamedCollection;
+    private static readonly NonBlockingDictionary<string, Type> TypeNamedCollection;
 
     /// <summary>
     /// 创建代理方法
@@ -374,7 +374,7 @@ public static class DependencyInjectionServiceCollectionExtensions
         GlobalServiceProxyType = App.EffectiveTypes
             .FirstOrDefault(u => typeof(AspectDispatchProxy).IsAssignableFrom(u) && typeof(IGlobalDispatchProxy).IsAssignableFrom(u) && u.IsClass && !u.IsInterface && !u.IsAbstract);
 
-        TypeNamedCollection = new ConcurrentDictionary<string, Type>();
+        TypeNamedCollection = new NonBlockingDictionary<string, Type>();
         DispatchCreateMethod = typeof(AspectDispatchProxy).GetMethod(nameof(AspectDispatchProxy.Create));
     }
 }

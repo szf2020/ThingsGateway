@@ -524,11 +524,11 @@ public static class GlobalData
     /// <summary>
     /// 内部使用的通道字典，用于存储通道对象
     /// </summary>
-    internal static ConcurrentDictionary<long, ChannelRuntime> IdChannels { get; } = new();
+    internal static NonBlockingDictionary<long, ChannelRuntime> IdChannels { get; } = new();
     /// <summary>
     /// 内部使用的通道字典，用于存储通道对象
     /// </summary>
-    internal static ConcurrentDictionary<string, ChannelRuntime> Channels { get; } = new();
+    internal static NonBlockingDictionary<string, ChannelRuntime> Channels { get; } = new();
 
     /// <summary>
     /// 只读的设备字典，提供对设备的只读访问
@@ -543,28 +543,28 @@ public static class GlobalData
     /// <summary>
     /// 内部使用的设备字典，用于存储设备对象
     /// </summary>
-    internal static ConcurrentDictionary<string, DeviceRuntime> Devices { get; } = new();
+    internal static NonBlockingDictionary<string, DeviceRuntime> Devices { get; } = new();
     /// <summary>
     /// 内部使用的设备字典，用于存储设备对象
     /// </summary>
-    internal static ConcurrentDictionary<long, DeviceRuntime> IdDevices { get; } = new();
+    internal static NonBlockingDictionary<long, DeviceRuntime> IdDevices { get; } = new();
 
     /// <summary>
     /// 内部使用的报警配置变量字典
     /// </summary>
-    internal static ConcurrentDictionary<long, VariableRuntime> AlarmEnableIdVariables { get; } = new();
+    internal static NonBlockingDictionary<long, VariableRuntime> AlarmEnableIdVariables { get; } = new();
 
     /// <summary>
     /// 内部使用的报警配置变量字典
     /// </summary>
-    internal static ConcurrentDictionary<long, AlarmVariable> RealAlarmIdVariables { get; } = new();
+    internal static NonBlockingDictionary<long, AlarmVariable> RealAlarmIdVariables { get; } = new();
 
     /// <summary>
     /// 内部使用的变量字典，用于存储变量对象
     /// </summary>
-    internal static ConcurrentDictionary<long, VariableRuntime> IdVariables { get; } = new();
+    internal static NonBlockingDictionary<long, VariableRuntime> IdVariables { get; } = new();
 
-    internal static ConcurrentDictionary<string, VariableRuntime> MemoryVariables { get; } = new();
+    internal static NonBlockingDictionary<string, VariableRuntime> MemoryVariables { get; } = new();
     public static IReadOnlyDictionary<string, VariableRuntime> ReadOnlyMemoryVariables => MemoryVariables;
 
     /// <summary>

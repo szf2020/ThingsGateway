@@ -93,7 +93,7 @@ public class Variable : BaseDataEntity, IValidatableObject
     [System.Text.Json.Serialization.JsonIgnore]
     [Newtonsoft.Json.JsonIgnore]
     [MapperIgnore]
-    public ConcurrentDictionary<long, ModelValueValidateForm>? VariablePropertyModels;
+    public NonBlockingDictionary<long, ModelValueValidateForm>? VariablePropertyModels;
 
     /// <summary>
     /// 设备

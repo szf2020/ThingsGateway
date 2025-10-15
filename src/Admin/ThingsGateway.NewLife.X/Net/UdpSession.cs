@@ -400,7 +400,7 @@ public class UdpSession : DisposeBase, ISocketSession, ITransport, ILogFeature
     #endregion
 
     #region 扩展接口
-    private ConcurrentDictionary<String, Object?>? _items;
+    private NonBlockingDictionary<String, Object?>? _items;
     /// <summary>数据项</summary>
     public IDictionary<String, Object?> Items => _items ??= new();
 

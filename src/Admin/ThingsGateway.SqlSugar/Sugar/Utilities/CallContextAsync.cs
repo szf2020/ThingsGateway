@@ -4,7 +4,7 @@ namespace ThingsGateway.SqlSugar
 {
     public static class CallContextAsync<T>
     {
-        static ConcurrentDictionary<string, AsyncLocal<T>> state = new ConcurrentDictionary<string, AsyncLocal<T>>();
+        static NonBlockingDictionary<string, AsyncLocal<T>> state = new NonBlockingDictionary<string, AsyncLocal<T>>();
         public static void SetData(string name, T data) =>
             state.GetOrAdd(name, _ => new AsyncLocal<T>()).Value = data;
         public static T GetData(string name) =>
@@ -13,7 +13,7 @@ namespace ThingsGateway.SqlSugar
 
     public static class CallContextThread<T>
     {
-        static ConcurrentDictionary<string, ThreadLocal<T>> state = new ConcurrentDictionary<string, ThreadLocal<T>>();
+        static NonBlockingDictionary<string, ThreadLocal<T>> state = new NonBlockingDictionary<string, ThreadLocal<T>>();
         public static void SetData(string name, T data) =>
             state.GetOrAdd(name, _ => new ThreadLocal<T>()).Value = data;
         public static T GetData(string name) =>

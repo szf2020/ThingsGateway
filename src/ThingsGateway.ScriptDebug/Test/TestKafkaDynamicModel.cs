@@ -15,7 +15,7 @@ public class TestKafkaDynamicModel1 : DynamicModelBase
 
     }
 
-    private ConcurrentDictionary<Tuple<string, string, int>, DateTime> EventKeyTimes = new();
+    private NonBlockingDictionary<Tuple<string, string, int>, DateTime> EventKeyTimes = new();
 
     public override IEnumerable<dynamic> GetList(IEnumerable<object> datas)
     {

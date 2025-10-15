@@ -743,7 +743,7 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
             ImportPreviewOutput<Dictionary<string, Variable>> deviceImportPreview = new();
 
             var driverPluginNameDict = _pluginService.GetPluginList().ToDictionary(a => a.Name);
-            ConcurrentDictionary<string, (Type, Dictionary<string, PropertyInfo>, Dictionary<string, PropertyInfo>)> propertysDict = new();
+            NonBlockingDictionary<string, (Type, Dictionary<string, PropertyInfo>, Dictionary<string, PropertyInfo>)> propertysDict = new();
 
             // 遍历每个工作表
             foreach (var sheetName in sheetNames)
@@ -765,7 +765,7 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
         }
     }
 
-    public ImportPreviewOutput<Dictionary<string, Variable>> SetVariableData(HashSet<long>? dataScope, IReadOnlyDictionary<string, DeviceRuntime> deviceDicts, Dictionary<string, ImportPreviewOutputBase> ImportPreviews, ImportPreviewOutput<Dictionary<string, Variable>> deviceImportPreview, Dictionary<string, PluginInfo> driverPluginNameDict, ConcurrentDictionary<string, (Type, Dictionary<string, PropertyInfo>, Dictionary<string, PropertyInfo>)> propertysDict, string sheetName, IEnumerable<IDictionary<string, object>> rows)
+    public ImportPreviewOutput<Dictionary<string, Variable>> SetVariableData(HashSet<long>? dataScope, IReadOnlyDictionary<string, DeviceRuntime> deviceDicts, Dictionary<string, ImportPreviewOutputBase> ImportPreviews, ImportPreviewOutput<Dictionary<string, Variable>> deviceImportPreview, Dictionary<string, PluginInfo> driverPluginNameDict, NonBlockingDictionary<string, (Type, Dictionary<string, PropertyInfo>, Dictionary<string, PropertyInfo>)> propertysDict, string sheetName, IEnumerable<IDictionary<string, object>> rows)
     {
         string ImportNullError = Localizer["ImportNullError"];
         string RedundantDeviceError = Localizer["RedundantDeviceError"];

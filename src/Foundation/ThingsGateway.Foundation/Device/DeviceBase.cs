@@ -583,8 +583,16 @@ public abstract class DeviceBase : AsyncAndSyncDisposableObject, IDevice
             else
             {
                 var operResult = waitData.Check(reusableTimeout.TimeoutStatus);
-                waitData.CompletedData.ErrorMessage = $"{operResult.ErrorMessage}, sign: {sign}";
-                return waitData.CompletedData;
+                if(waitData.CompletedData!=null)
+                {
+                    waitData.CompletedData.ErrorMessage = $"{operResult.ErrorMessage}, sign: {sign}";
+                    return waitData.CompletedData;
+                }
+                else
+                {
+                    return new MessageBase(new OperationCanceledException());
+                }
+
                 //return new MessageBase(operResult) { ErrorMessage = $"{operResult.ErrorMessage}, sign: {sign}" };
             }
         }

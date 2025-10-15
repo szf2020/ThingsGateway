@@ -317,8 +317,8 @@ public class DefaultReflect : IReflect
     #endregion
 
     #region 反射获取 字段/属性
-    private readonly ConcurrentDictionary<Type, IList<FieldInfo>> _cache1 = new();
-    private readonly ConcurrentDictionary<Type, IList<FieldInfo>> _cache2 = new();
+    private readonly NonBlockingDictionary<Type, IList<FieldInfo>> _cache1 = new();
+    private readonly NonBlockingDictionary<Type, IList<FieldInfo>> _cache2 = new();
     /// <summary>获取字段</summary>
     /// <param name="type"></param>
     /// <param name="baseFirst"></param>
@@ -353,8 +353,8 @@ public class DefaultReflect : IReflect
         return list;
     }
 
-    private readonly ConcurrentDictionary<Type, IList<PropertyInfo>> _cache3 = new();
-    private readonly ConcurrentDictionary<Type, IList<PropertyInfo>> _cache4 = new();
+    private readonly NonBlockingDictionary<Type, IList<PropertyInfo>> _cache3 = new();
+    private readonly NonBlockingDictionary<Type, IList<PropertyInfo>> _cache4 = new();
     /// <summary>获取属性</summary>
     /// <param name="type"></param>
     /// <param name="baseFirst"></param>
@@ -805,7 +805,7 @@ public class DefaultReflect : IReflect
     #endregion
 
     #region 插件
-    //private readonly ConcurrentDictionary<Type, ConcurrentDictionary<Type, Boolean>> _as_cache = new ConcurrentDictionary<Type, ConcurrentDictionary<Type, Boolean>>();
+    //private readonly NonBlockingDictionary<Type, NonBlockingDictionary<Type, Boolean>> _as_cache = new NonBlockingDictionary<Type, NonBlockingDictionary<Type, Boolean>>();
     /// <summary>是否子类</summary>
     /// <param name="type"></param>
     /// <param name="baseType"></param>
@@ -832,7 +832,7 @@ public class DefaultReflect : IReflect
         //var key = $"{type.FullName}_{baseType.FullName}";
         //if (!_as_cache.TryGetValue(type, out var dic))
         //{
-        //    dic = new ConcurrentDictionary<Type, Boolean>();
+        //    dic = new NonBlockingDictionary<Type, Boolean>();
         //    _as_cache.TryAdd(type, dic);
         //}
 

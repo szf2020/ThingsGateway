@@ -27,13 +27,13 @@ public class FromConvertBinder : IModelBinder
     /// <summary>
     /// 定义模型绑定转换器集合
     /// </summary>
-    private readonly ConcurrentDictionary<Type, Type> _modelBinderConverts;
+    private readonly NonBlockingDictionary<Type, Type> _modelBinderConverts;
 
     /// <summary>
     /// 构造函数
     /// </summary>
     /// <param name="modelBinderConverts">定义模型绑定转换器集合</param>
-    public FromConvertBinder(ConcurrentDictionary<Type, Type> modelBinderConverts)
+    public FromConvertBinder(NonBlockingDictionary<Type, Type> modelBinderConverts)
     {
         _modelBinderConverts = modelBinderConverts;
     }

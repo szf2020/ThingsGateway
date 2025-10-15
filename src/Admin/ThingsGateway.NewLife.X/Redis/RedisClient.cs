@@ -1106,10 +1106,10 @@ public class RedisClient : DisposeBase
     #endregion
 
     #region 辅助
-    private static readonly ConcurrentDictionary<String, String> _cache0 = new();
-    private static readonly ConcurrentDictionary<String, String> _cache1 = new();
-    private static readonly ConcurrentDictionary<String, String> _cache2 = new();
-    private static readonly ConcurrentDictionary<String, String> _cache3 = new();
+    private static readonly NonBlockingDictionary<String, String> _cache0 = new();
+    private static readonly NonBlockingDictionary<String, String> _cache1 = new();
+    private static readonly NonBlockingDictionary<String, String> _cache2 = new();
+    private static readonly NonBlockingDictionary<String, String> _cache3 = new();
     /// <summary>获取命令对应的字节数组，全局缓存</summary>
     /// <param name="cmd"></param>
     /// <param name="args"></param>

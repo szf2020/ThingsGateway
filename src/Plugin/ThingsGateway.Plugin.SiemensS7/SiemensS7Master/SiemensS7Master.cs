@@ -128,7 +128,7 @@ public class SiemensS7Master : CollectFoundationBase
             throw new NotSupportedException();
 
         // 创建用于存储操作结果的并发字典
-        ConcurrentDictionary<string, OperResult> operResults = new();
+        NonBlockingDictionary<string, OperResult> operResults = new();
 
         //转换
         Dictionary<VariableRuntime, SiemensS7Address> addresses = new();

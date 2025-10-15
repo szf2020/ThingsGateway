@@ -44,7 +44,7 @@ public sealed class FileLoggerProvider : ILoggerProvider, ISupportExternalScope
     /// 记录日志所有滚动文件名
     /// </summary>
     /// <remarks>只有 MaxRollingFiles 和 FileSizeLimitBytes 大于 0 有效</remarks>
-    internal readonly ConcurrentDictionary<string, FileInfo> _rollingFileNames = new();
+    internal readonly NonBlockingDictionary<string, FileInfo> _rollingFileNames = new();
 
     /// <summary>
     /// 文件日志写入器

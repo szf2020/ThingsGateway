@@ -40,7 +40,7 @@ public static class DataValidator
     /// <summary>
     /// 验证类型正则表达式
     /// </summary>
-    private static readonly ConcurrentDictionary<string, ValidationItemMetadataAttribute> ValidationItemMetadatas;
+    private static readonly NonBlockingDictionary<string, ValidationItemMetadataAttribute> ValidationItemMetadatas;
 
     /// <summary>
     /// 构造函数
@@ -57,7 +57,7 @@ public static class DataValidator
         ValidationItemMetadatas = GetValidationValidationItemMetadatas();
 
         // 缓存所有正则表达式
-        GetValidationTypeValidationItemMetadataCached = new ConcurrentDictionary<object, (string, ValidationItemMetadataAttribute)>();
+        GetValidationTypeValidationItemMetadataCached = new NonBlockingDictionary<object, (string, ValidationItemMetadataAttribute)>();
     }
 
     /// <summary>
@@ -203,7 +203,7 @@ public static class DataValidator
     /// <summary>
     /// 获取验证类型验证Item集合
     /// </summary>
-    private static readonly ConcurrentDictionary<object, (string, ValidationItemMetadataAttribute)> GetValidationTypeValidationItemMetadataCached;
+    private static readonly NonBlockingDictionary<object, (string, ValidationItemMetadataAttribute)> GetValidationTypeValidationItemMetadataCached;
 
     /// <summary>
     /// 获取验证类型正则表达式（需要缓存）
@@ -267,9 +267,9 @@ public static class DataValidator
     /// 获取验证类型所有有效的正则表达式
     /// </summary>
     /// <returns></returns>
-    private static ConcurrentDictionary<string, ValidationItemMetadataAttribute> GetValidationValidationItemMetadatas()
+    private static NonBlockingDictionary<string, ValidationItemMetadataAttribute> GetValidationValidationItemMetadatas()
     {
-        var vaidationItems = new ConcurrentDictionary<string, ValidationItemMetadataAttribute>();
+        var vaidationItems = new NonBlockingDictionary<string, ValidationItemMetadataAttribute>();
 
         // 查找所有 [ValidationMessageType] 类型中的 [ValidationMessage] 消息定义
         var customErrorMessages = ValidationMessageTypes.SelectMany(u => u.GetFields()

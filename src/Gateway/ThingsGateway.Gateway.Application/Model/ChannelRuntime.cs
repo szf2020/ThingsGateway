@@ -84,7 +84,7 @@ public class ChannelRuntime : Channel
     [Newtonsoft.Json.JsonIgnore]
     [MapperIgnore]
     [AutoGenerateColumn(Ignore = true)]
-    internal ConcurrentDictionary<long, DeviceRuntime>? DeviceRuntimes { get; } = new();
+    internal NonBlockingDictionary<long, DeviceRuntime>? DeviceRuntimes { get; } = new();
 
     /// <summary>
     /// 设备数量

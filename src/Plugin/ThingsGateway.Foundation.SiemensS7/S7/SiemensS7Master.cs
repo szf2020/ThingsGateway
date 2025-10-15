@@ -117,16 +117,21 @@ public partial class SiemensS7Master : DeviceBase
             case ChannelTypeEnum.SerialPort:
                 return new DeviceSingleStreamDataHandleAdapter<S7Message>
                 {
-                    CacheTimeout = TimeSpan.FromMilliseconds(Channel.ChannelOptions.CacheTimeout)
+                    CacheTimeout = TimeSpan.FromMilliseconds(Channel.ChannelOptions.CacheTimeout),
+                    IsSingleThread = false
                 };
 
             case ChannelTypeEnum.UdpSession:
-                return new DeviceUdpDataHandleAdapter<S7Message>();
+                return new DeviceUdpDataHandleAdapter<S7Message>()
+                {
+                    IsSingleThread = false
+                };
         }
 
         return new DeviceSingleStreamDataHandleAdapter<S7Message>
         {
-            CacheTimeout = TimeSpan.FromMilliseconds(Channel.ChannelOptions.CacheTimeout)
+            CacheTimeout = TimeSpan.FromMilliseconds(Channel.ChannelOptions.CacheTimeout),
+            IsSingleThread = false
         };
     }
 

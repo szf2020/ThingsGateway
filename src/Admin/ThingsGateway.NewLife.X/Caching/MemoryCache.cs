@@ -23,7 +23,7 @@ public class MemoryCache : Cache
 {
     #region 属性
     /// <summary>缓存核心</summary>
-    protected ConcurrentDictionary<String, CacheItem> _cache = new();
+    protected NonBlockingDictionary<String, CacheItem> _cache = new();
 
     /// <summary>容量。容量超标时，采用LRU机制删除，默认100_000</summary>
     public Int32 Capacity { get; set; } = 100_000;
@@ -379,7 +379,7 @@ public class MemoryCache : Cache
     /// <returns></returns>
     public override IDictionary<String, T> GetDictionary<T>(String key)
     {
-        var item = GetOrAddItem(key, k => new ConcurrentDictionary<String, T>());
+        var item = GetOrAddItem(key, k => new NonBlockingDictionary<String, T>());
         return item.Visit<IDictionary<String, T>>() ??
          throw new InvalidCastException($"Unable to convert the value of [{key}] from {item.TypeCode} to {typeof(IDictionary<String, T>)}");
     }

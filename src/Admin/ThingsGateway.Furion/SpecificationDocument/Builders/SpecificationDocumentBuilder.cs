@@ -83,11 +83,11 @@ public static class SpecificationDocumentBuilder
 
         // 初始化常量
         _groupOrderRegex = new Regex(@"@(?<order>[0-9]+$)");
-        GetActionGroupsCached = new ConcurrentDictionary<MethodInfo, IEnumerable<GroupExtraInfo>>();
-        GetControllerGroupsCached = new ConcurrentDictionary<Type, IEnumerable<GroupExtraInfo>>();
-        GetGroupOpenApiInfoCached = new ConcurrentDictionary<string, SpecificationOpenApiInfo>();
-        GetControllerTagCached = new ConcurrentDictionary<ControllerActionDescriptor, string>();
-        GetActionTagCached = new ConcurrentDictionary<ApiDescription, string>();
+        GetActionGroupsCached = new NonBlockingDictionary<MethodInfo, IEnumerable<GroupExtraInfo>>();
+        GetControllerGroupsCached = new NonBlockingDictionary<Type, IEnumerable<GroupExtraInfo>>();
+        GetGroupOpenApiInfoCached = new NonBlockingDictionary<string, SpecificationOpenApiInfo>();
+        GetControllerTagCached = new NonBlockingDictionary<ControllerActionDescriptor, string>();
+        GetActionTagCached = new NonBlockingDictionary<ApiDescription, string>();
 
         // 默认分组，支持多个逗号分割
         DocumentGroupExtras = new List<GroupExtraInfo> { ResolveGroupExtraInfo(_specificationDocumentSettings.DefaultGroupName) };
@@ -143,7 +143,7 @@ public static class SpecificationDocumentBuilder
     /// <summary>
     /// 获取分组信息缓存集合
     /// </summary>
-    private static readonly ConcurrentDictionary<string, SpecificationOpenApiInfo> GetGroupOpenApiInfoCached;
+    private static readonly NonBlockingDictionary<string, SpecificationOpenApiInfo> GetGroupOpenApiInfoCached;
 
     /// <summary>
     /// 获取分组配置信息
@@ -738,7 +738,7 @@ public static class SpecificationDocumentBuilder
     /// <summary>
     /// 获取控制器组缓存集合
     /// </summary>
-    private static readonly ConcurrentDictionary<Type, IEnumerable<GroupExtraInfo>> GetControllerGroupsCached;
+    private static readonly NonBlockingDictionary<Type, IEnumerable<GroupExtraInfo>> GetControllerGroupsCached;
 
     /// <summary>
     /// 获取控制器分组列表
@@ -773,7 +773,7 @@ public static class SpecificationDocumentBuilder
     /// <summary>
     /// <see cref="GetActionGroups(MethodInfo)"/> 缓存集合
     /// </summary>
-    private static readonly ConcurrentDictionary<MethodInfo, IEnumerable<GroupExtraInfo>> GetActionGroupsCached;
+    private static readonly NonBlockingDictionary<MethodInfo, IEnumerable<GroupExtraInfo>> GetActionGroupsCached;
 
     /// <summary>
     /// 获取动作方法分组列表
@@ -808,7 +808,7 @@ public static class SpecificationDocumentBuilder
     /// <summary>
     /// <see cref="GetActionTag(ApiDescription)"/> 缓存集合
     /// </summary>
-    private static readonly ConcurrentDictionary<ControllerActionDescriptor, string> GetControllerTagCached;
+    private static readonly NonBlockingDictionary<ControllerActionDescriptor, string> GetControllerTagCached;
 
     /// <summary>
     /// 获取控制器标签
@@ -835,7 +835,7 @@ public static class SpecificationDocumentBuilder
     /// <summary>
     /// <see cref="GetActionTag(ApiDescription)"/> 缓存集合
     /// </summary>
-    private static readonly ConcurrentDictionary<ApiDescription, string> GetActionTagCached;
+    private static readonly NonBlockingDictionary<ApiDescription, string> GetActionTagCached;
 
     /// <summary>
     /// 获取动作方法标签

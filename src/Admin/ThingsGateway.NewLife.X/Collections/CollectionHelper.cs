@@ -44,7 +44,7 @@ public static class CollectionHelper
     {
         //if (collection == null) return null;
 
-        if (collection is ConcurrentDictionary<TKey, TValue> cdiv && cdiv.Keys is IList<TKey> list) return list;
+        if (collection is NonBlockingDictionary<TKey, TValue> cdiv && cdiv.Keys is IList<TKey> list) return list;
 
         if (collection.Count == 0) return [];
         lock (collection)
@@ -65,8 +65,8 @@ public static class CollectionHelper
     {
         //if (collection == null) return null;
 
-        //if (collection is ConcurrentDictionary<TKey, TValue> cdiv) return cdiv.Values as IList<TValue>;
-        if (collection is ConcurrentDictionary<TKey, TValue> cdiv && cdiv.Values is IList<TValue> list) return list;
+        //if (collection is NonBlockingDictionary<TKey, TValue> cdiv) return cdiv.Values as IList<TValue>;
+        if (collection is NonBlockingDictionary<TKey, TValue> cdiv && cdiv.Values is IList<TValue> list) return list;
 
         if (collection.Count == 0) return [];
         lock (collection)

@@ -97,7 +97,7 @@ public class ConsoleLog : Logger
         }
     }
 
-    static readonly ConcurrentDictionary<Int32, ConsoleColor> dic = new();
+    static readonly NonBlockingDictionary<Int32, ConsoleColor> dic = new();
     static readonly ConsoleColor[] colors = [
         ConsoleColor.Green, ConsoleColor.Cyan, ConsoleColor.Magenta, ConsoleColor.White, ConsoleColor.Yellow,
         ConsoleColor.DarkGreen, ConsoleColor.DarkCyan, ConsoleColor.DarkMagenta, ConsoleColor.DarkRed, ConsoleColor.DarkYellow ];

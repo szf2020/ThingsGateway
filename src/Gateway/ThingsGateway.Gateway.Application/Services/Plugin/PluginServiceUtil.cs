@@ -102,7 +102,7 @@ public static class PluginServiceUtil
     /// <summary>
     /// 通过实体赋值到字典中
     /// </summary>
-    public static Dictionary<long, Dictionary<string, string>> SetDict(ConcurrentDictionary<long, ModelValueValidateForm>? models)
+    public static Dictionary<long, Dictionary<string, string>> SetDict(NonBlockingDictionary<long, ModelValueValidateForm>? models)
     {
         Dictionary<long, Dictionary<string, string>> results = new();
         models ??= new();

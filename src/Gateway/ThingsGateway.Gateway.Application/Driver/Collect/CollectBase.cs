@@ -533,7 +533,7 @@ public abstract partial class CollectBase : DriverBase
     {
         throw new NotImplementedException();
     }
-    protected async Task Check(Dictionary<VariableRuntime, JToken> writeInfoLists, ConcurrentDictionary<string, OperResult> operResults, CancellationToken cancellationToken)
+    protected async Task Check(Dictionary<VariableRuntime, JToken> writeInfoLists, NonBlockingDictionary<string, OperResult> operResults, CancellationToken cancellationToken)
     {
         if (VariableSourceReadsEnable)
         {
@@ -604,7 +604,7 @@ public abstract partial class CollectBase : DriverBase
             }
         }
 
-        ConcurrentDictionary<string, OperResult<object>> operResults = new();
+        NonBlockingDictionary<string, OperResult<object>> operResults = new();
 
 
         using var writeLock = await ReadWriteLock.WriterLockAsync(cancellationToken).ConfigureAwait(false);

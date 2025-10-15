@@ -65,7 +65,7 @@ internal sealed partial class SchedulerFactory : ISchedulerFactory
     /// <summary>
     /// 作业计划集合
     /// </summary>
-    private readonly ConcurrentDictionary<string, Scheduler> _schedulers = new();
+    private readonly NonBlockingDictionary<string, Scheduler> _schedulers = new();
 
     /// <summary>
     /// 作业计划构建器集合
