@@ -350,6 +350,7 @@ internal sealed class RedundancyTask : IRpcDriver, IAsyncDisposable
                    {
                        b.UseSystemTextJson(json =>
                        {
+                           json.NumberHandling = System.Text.Json.Serialization.JsonNumberHandling.AllowNamedFloatingPointLiterals;
                            json.Converters.Add(new ByteArrayToNumberArrayConverterSystemTextJson());
                            json.Converters.Add(new JTokenSystemTextJsonConverter());
                            json.Converters.Add(new JValueSystemTextJsonConverter());
@@ -394,6 +395,9 @@ internal sealed class RedundancyTask : IRpcDriver, IAsyncDisposable
                    {
                        b.UseSystemTextJson(json =>
                        {
+
+
+                           json.NumberHandling = System.Text.Json.Serialization.JsonNumberHandling.AllowNamedFloatingPointLiterals;
                            json.Converters.Add(new ByteArrayToNumberArrayConverterSystemTextJson());
                            json.Converters.Add(new JTokenSystemTextJsonConverter());
                            json.Converters.Add(new JValueSystemTextJsonConverter());

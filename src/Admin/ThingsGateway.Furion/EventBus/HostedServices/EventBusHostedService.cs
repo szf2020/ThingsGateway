@@ -295,7 +295,8 @@ internal sealed class EventBusHostedService : BackgroundService
                         , retryAction: (total, times) =>
                         {
                             // 输出重试日志
-                            _logger.LogWarning("Retrying {times}/{total} times for {EventId}", times, total, eventSource.EventId);
+                            if (_logger?.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Warning) == true)
+                                _logger.LogWarning("Retrying {times}/{total} times for {EventId}", times, total, eventSource.EventId);
                         }).ConfigureAwait(false);
                     }
                     else

@@ -57,6 +57,7 @@ namespace ThingsGateway.SqlSugar
                         }
                     });
 
+            _systemTextJsonSettings.NumberHandling = JsonNumberHandling.AllowNamedFloatingPointLiterals;
             _systemTextJsonSettings.Converters.Add(new JTokenSystemTextJsonConverter());
             _systemTextJsonSettings.Converters.Add(new JValueSystemTextJsonConverter());
             _systemTextJsonSettings.Converters.Add(new JObjectSystemTextJsonConverter());

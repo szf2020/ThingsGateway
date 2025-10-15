@@ -251,7 +251,8 @@ public sealed class ProfilerDelegatingHandler(ILogger<Logging> logger, IOptions<
         // 检查是否配置（注册）了日志程序
         if (remoteOptions.IsLoggingRegistered)
         {
-            logger.Log(remoteOptions.ProfilerLogLevel, "{message}", message);
+            if (logger?.IsEnabled(remoteOptions.ProfilerLogLevel) == true)
+                logger.Log(remoteOptions.ProfilerLogLevel, "{message}", message);
         }
         else
         {

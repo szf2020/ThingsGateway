@@ -136,7 +136,8 @@ internal sealed class PluginService : IPluginService
                 if (driverType != null)
                 {
                     var driver = (DriverBase)Activator.CreateInstance(driverType);
-                    _logger?.LogInformation(string.Format(AppResource.LoadTypeSuccess, pluginName));
+                    if (_logger?.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Information) == true)
+                        _logger?.LogInformation(string.Format(AppResource.LoadTypeSuccess, pluginName));
                     _driverBaseDict.TryAdd(pluginName, driverType);
                     return driver;
                 }
@@ -440,7 +441,8 @@ internal sealed class PluginService : IPluginService
                         catch (Exception ex)
                         {
                             // 加载失败时记录警告信息
-                            _logger?.LogWarning(ex, string.Format(AppResource.LoadOtherFileFail, item));
+                            if (_logger?.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Warning) == true)
+                                _logger?.LogWarning(ex, string.Format(AppResource.LoadOtherFileFail, item));
                         }
                     }
                 }
@@ -679,7 +681,8 @@ internal sealed class PluginService : IPluginService
                 }
                 //添加到全局对象
                 _assemblyLoadContextDict.TryAdd(fileName, (assemblyLoadContext, assembly));
-                _logger?.LogInformation(string.Format(AppResource.AddPluginFile, path));
+                if (_logger?.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Information) == true)
+                    _logger?.LogInformation(string.Format(AppResource.AddPluginFile, path));
             }
             return assembly;
         }
@@ -728,7 +731,8 @@ internal sealed class PluginService : IPluginService
                 }
                 catch (Exception ex)
                 {
-                    _logger?.LogWarning(ex, string.Format(AppResource.LoadOtherFileFail, item));
+                    if (_logger?.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Warning) == true)
+                        _logger?.LogWarning(ex, string.Format(AppResource.LoadOtherFileFail, item));
                 }
             }
         }
@@ -827,7 +831,8 @@ internal sealed class PluginService : IPluginService
                             {
                                 //添加到字典
                                 _driverBaseDict.TryAdd($"{driverMainName}.{type.Name}", type);
-                                _logger?.LogInformation(string.Format(AppResource.LoadTypeSuccess, PluginInfoUtil.GetFullName(driverMainName, type.Name)));
+                                if (_logger?.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Information) == true)
+                                    _logger?.LogInformation(string.Format(AppResource.LoadTypeSuccess, PluginInfoUtil.GetFullName(driverMainName, type.Name)));
                             }
                             var plugin = new PluginInfo()
                             {
@@ -847,7 +852,8 @@ internal sealed class PluginService : IPluginService
                 catch (Exception ex)
                 {
                     // 记录加载插件失败的日志
-                    _logger?.LogWarning(ex, string.Format(AppResource.LoadPluginFail, Path.GetRelativePath(AppContext.BaseDirectory.CombinePathWithOs(tempDir), folderPath)));
+                    if (_logger?.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Warning) == true)
+                        _logger?.LogWarning(ex, string.Format(AppResource.LoadPluginFail, Path.GetRelativePath(AppContext.BaseDirectory.CombinePathWithOs(tempDir), folderPath)));
                 }
             }
             return plugins.DistinctBy(a => a.FullName).OrderBy(a => a.EducationPlugin);

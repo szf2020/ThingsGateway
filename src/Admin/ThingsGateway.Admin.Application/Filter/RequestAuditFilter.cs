@@ -251,11 +251,13 @@ public class RequestAuditFilter : IAsyncActionFilter, IOrderedFilter
 
         if (exception == null)
         {
-            logger.Log(LogLevel.Information, $"{logData.Method}:{logData.Path}-{logData.Operation}");
+            if (logger.IsEnabled(LogLevel.Information))
+                logger.Log(LogLevel.Information, $"{logData.Method}:{logData.Path}-{logData.Operation}");
         }
         else
         {
-            logger.Log(LogLevel.Warning, $"{logData.Method}:{logData.Path}-{logData.Operation}{Environment.NewLine}{logData.Exception?.ToSystemTextJsonString()}{Environment.NewLine}{logData.Validation?.ToSystemTextJsonString()}");
+            if (logger.IsEnabled(LogLevel.Warning))
+                logger.Log(LogLevel.Warning, $"{logData.Method}:{logData.Path}-{logData.Operation}{Environment.NewLine}{logData.Exception?.ToSystemTextJsonString()}{Environment.NewLine}{logData.Validation?.ToSystemTextJsonString()}");
         }
     }
 

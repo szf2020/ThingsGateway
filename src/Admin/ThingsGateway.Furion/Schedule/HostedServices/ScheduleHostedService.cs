@@ -369,11 +369,13 @@ internal sealed class ScheduleHostedService : BackgroundService
                             // 写入作业执行详细日志
                             if (executionException == null)
                             {
-                                jobLogger?.LogInformation("{jobExecutingContext}", jobExecutingContext);
+                                if (jobLogger?.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Information) == true)
+                                    jobLogger?.LogInformation("{jobExecutingContext}", jobExecutingContext);
                             }
                             else
                             {
-                                jobLogger?.LogError(executionException, "{jobExecutingContext}", jobExecutingContext);
+                                if (jobLogger?.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Error) == true)
+                                    jobLogger?.LogError(executionException, "{jobExecutingContext}", jobExecutingContext);
                             }
 
                             // 记录作业触发器运行信息

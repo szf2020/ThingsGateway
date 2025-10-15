@@ -66,7 +66,8 @@ internal class JsonStringLocalizer(Assembly assembly, string typeName, string ba
                 }
                 catch (Exception ex)
                 {
-                    Logger.LogError(ex, "{JsonStringLocalizerName} searched for '{Name}' in '{typeName}' with culture '{CultureName}' throw exception.", nameof(JsonStringLocalizer), name, typeName, CultureInfo.CurrentUICulture.Name);
+                    if (Logger?.IsEnabled(LogLevel.Error) == true)
+                        Logger.LogError(ex, "{JsonStringLocalizerName} searched for '{Name}' in '{typeName}' with culture '{CultureName}' throw exception.", nameof(JsonStringLocalizer), name, typeName, CultureInfo.CurrentUICulture.Name);
                 }
                 return ret;
             }
@@ -176,7 +177,8 @@ internal class JsonStringLocalizer(Assembly assembly, string typeName, string ba
         localizationMissingItemHandler.HandleMissingItem(name, typeName, CultureInfo.CurrentUICulture.Name);
         if (jsonLocalizationOptions.IgnoreLocalizerMissing == false)
         {
-            Logger.LogInformation("{JsonStringLocalizerName} searched for '{Name}' in '{TypeName}' with culture '{CultureName}' not found.", nameof(JsonStringLocalizer), name, typeName, CultureInfo.CurrentUICulture.Name);
+            if (Logger?.IsEnabled(LogLevel.Information) == true)
+                Logger.LogInformation("{JsonStringLocalizerName} searched for '{Name}' in '{TypeName}' with culture '{CultureName}' not found.", nameof(JsonStringLocalizer), name, typeName, CultureInfo.CurrentUICulture.Name);
         }
         _missingManifestCache.TryAdd($"name={name}&culture={CultureInfo.CurrentUICulture.Name}");
     }

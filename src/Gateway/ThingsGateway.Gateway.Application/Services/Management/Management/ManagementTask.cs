@@ -117,6 +117,7 @@ public partial class ManagementTask : AsyncDisposableObject
                    {
                        b.UseSystemTextJson(json =>
                        {
+                           json.NumberHandling = System.Text.Json.Serialization.JsonNumberHandling.AllowNamedFloatingPointLiterals;
                            json.Converters.Add(new ByteArrayToNumberArrayConverterSystemTextJson());
                            json.Converters.Add(new JTokenSystemTextJsonConverter());
                            json.Converters.Add(new JValueSystemTextJsonConverter());
@@ -180,6 +181,7 @@ public partial class ManagementTask : AsyncDisposableObject
                    {
                        b.UseSystemTextJson(json =>
                        {
+                           json.NumberHandling = System.Text.Json.Serialization.JsonNumberHandling.AllowNamedFloatingPointLiterals;
                            json.Converters.Add(new ByteArrayToNumberArrayConverterSystemTextJson());
                            json.Converters.Add(new JTokenSystemTextJsonConverter());
                            json.Converters.Add(new JValueSystemTextJsonConverter());
