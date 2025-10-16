@@ -10,40 +10,36 @@
 
 using System.Collections.Concurrent;
 
-using ThingsGateway.NewLife.Threading;
-
-using TouchSocket.Core;
-
 namespace ThingsGateway.Gateway.Razor;
 
-public partial class VariableRow : IDisposable
+public partial class VariableRow
 {
     [Parameter]
     public TableRowContext<VariableRuntime>? RowContent { get; set; }
-    private bool Disposed;
-    public void Dispose()
-    {
-        Disposed = true;
-        timer?.SafeDispose();
-        GC.SuppressFinalize(this);
-    }
-    TimerX? timer;
-    protected override void OnAfterRender(bool firstRender)
-    {
-        if (firstRender)
-        {
-            timer = new TimerX(Refresh, null, 1000, 1000, "VariableRow");
-        }
-        base.OnAfterRender(firstRender);
-    }
+    //private bool Disposed;
+    //public void Dispose()
+    //{
+    //    Disposed = true;
+    //    timer?.SafeDispose();
+    //    GC.SuppressFinalize(this);
+    //}
+    //TimerX? timer;
+    //protected override void OnAfterRender(bool firstRender)
+    //{
+    //    if (firstRender)
+    //    {
+    //        timer = new TimerX(Refresh, null, 1000, 1000, "VariableRow");
+    //    }
+    //    base.OnAfterRender(firstRender);
+    //}
 
-    private Task Refresh(object? state)
-    {
-        if (!Disposed)
-            return InvokeAsync(StateHasChanged);
-        else
-            return Task.CompletedTask;
-    }
+    //private Task Refresh(object? state)
+    //{
+    //    if (!Disposed)
+    //        return InvokeAsync(StateHasChanged);
+    //    else
+    //        return Task.CompletedTask;
+    //}
 
     protected override void OnParametersSet()
     {
@@ -51,32 +47,6 @@ public partial class VariableRow : IDisposable
         CellClassStringCache?.Clear();
         base.OnParametersSet();
     }
-    /// <summary>
-    /// 获得 指定单元格数据方法
-    /// </summary>
-    /// <param name="col"></param>
-    /// <param name="item"></param>
-    /// <returns></returns>
-    protected static RenderFragment GetValue(ITableColumn col, VariableRuntime item) => builder =>
-    {
-        if (col.Template != null)
-        {
-            builder.AddContent(0, col.Template(item));
-        }
-        else if (col.ComponentType == typeof(ColorPicker))
-        {
-            // 自动化处理 ColorPicker 组件
-            builder.AddContent(10, col.RenderColor(item));
-        }
-        else
-        {
-            builder.AddContent(20, col.RenderValue(item));
-        }
-    };
-
-    //    internal static string? GetDoubleClickCellClassString(bool trigger) => CssBuilder.Default()
-    //.AddClass("is-dbcell", trigger)
-    //.Build();
 
     /// <summary>
     /// 获得指定列头固定列样式
@@ -209,7 +179,7 @@ public partial class VariableRow : IDisposable
         }
         else
         {
-            return FixedCellClassStringCache.GetOrAdd(col, col => CssBuilder.Default()
+            return FixedCellClassStringCache.GetOrAdd(col, col => CssBuilder.Default(col.GetFieldName())
     .AddClass("fixed", col.Fixed)
     .AddClass("fixed-right", col.Fixed && IsTail(col))
     .AddClass("fr", IsLastColumn(col))

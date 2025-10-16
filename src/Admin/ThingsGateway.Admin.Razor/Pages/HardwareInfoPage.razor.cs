@@ -72,7 +72,7 @@ public partial class HardwareInfoPage : IDisposable
             ChartDataSource.Options.Title = Localizer[nameof(HistoryHardwareInfo)];
             ChartDataSource.Options.X.Title = Localizer["DateTime"];
             ChartDataSource.Options.Y.Title = Localizer["Data"];
-            ChartDataSource.Labels = hisHardwareInfos.Select(a => a.Date.ToString("dd HH:mm zz"));
+            ChartDataSource.Labels = hisHardwareInfos.Select(a => a.Date.ToString("dd-HH:mm"));
             ChartDataSource.Data.Add(new ChartDataset()
             {
                 Tension = 0.4f,
@@ -116,7 +116,7 @@ public partial class HardwareInfoPage : IDisposable
         else
         {
             var hisHardwareInfos = await HardwareJob.GetHistoryHardwareInfos();
-            ChartDataSource.Labels = hisHardwareInfos.Select(a => a.Date.ToString("dd HH:mm zz"));
+            ChartDataSource.Labels = hisHardwareInfos.Select(a => a.Date.ToString("dd-HH:mm"));
             ChartDataSource.Data[0].Data = hisHardwareInfos.Select(a => (object)a.CpuUsage);
             ChartDataSource.Data[1].Data = hisHardwareInfos.Select(a => (object)a.MemoryUsage);
             ChartDataSource.Data[2].Data = hisHardwareInfos.Select(a => (object)a.DriveUsage);

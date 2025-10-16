@@ -9,11 +9,18 @@
 
 @foreach (var col in RowContent.Columns)
 {
-    <td class="@GetFixedCellClassString(col)" style="@GetFixedCellStyleString(col)">
-        <DynamicElement TagName="div" TriggerClick="@false"
-                        StopPropagation="false"
-                        class="@GetCellClassString(col, false, false)">
-            @GetValue(col, RowContent.Row)
-        </DynamicElement>
+    <td class="@GetFixedCellClassString(col)" style="@GetFixedCellStyleString(col)" @key=col>
+        <div class="@GetCellClassString(col, false, false)" @key=col>
+            @if(col.GetShowTips())
+            {
+                <Tooltip @key=col Title="@VariableModelUtils.GetValue(RowContent.Row, col.GetFieldName())" class="text-truncate d-block">
+                    @VariableModelUtils.GetValue(RowContent.Row, col.GetFieldName())
+                </Tooltip>
+            }
+            else
+            {
+                @VariableModelUtils.GetValue(RowContent.Row, col.GetFieldName())
+            }
+        </div>
     </td>
 }

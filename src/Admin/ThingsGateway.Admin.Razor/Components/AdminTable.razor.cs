@@ -13,12 +13,21 @@ namespace ThingsGateway.Admin.Razor;
 [CascadingTypeParameter(nameof(TItem))]
 public partial class AdminTable<TItem> where TItem : class, new()
 {
+    /// <inheritdoc cref="Table{TItem}.OnColumnVisibleChanged"/>
+    [Parameter]
+    public Func<string,bool, Task> OnColumnVisibleChanged { get; set; }
 
+    /// <inheritdoc cref="Table{TItem}.OnColumnCreating"/>
+    [Parameter]
+    public Func<List<ITableColumn>,Task> OnColumnCreating { get; set; }
     /// <inheritdoc cref="Table{TItem}.RenderMode"/>
     [Parameter]
     public TableRenderMode RenderMode { get; set; }
 
     public List<ITableColumn> Columns => Instance?.Columns;
+
+    public IEnumerable<ITableColumn> GetVisibleColumns => Instance?.GetVisibleColumns();
+    public List<TItem> Rows => Instance?.Rows;
 
 
     /// <inheritdoc cref="Table{TItem}.SelectedRowsChanged"/>
@@ -157,6 +166,9 @@ public partial class AdminTable<TItem> where TItem : class, new()
     /// <inheritdoc cref="Table{TItem}.DataService"/>
     [Parameter]
     public IDataService<TItem> DataService { get; set; }
+
+    [Parameter]
+    public string? Id { get; set; }
 
     /// <inheritdoc cref="Table{TItem}.CreateItemCallback"/>
     [Parameter]

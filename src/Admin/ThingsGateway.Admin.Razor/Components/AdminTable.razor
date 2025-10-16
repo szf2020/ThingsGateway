@@ -4,8 +4,8 @@
 
 <div class="tg-table h-100">
 
-    <Table TItem="TItem" IsBordered="true" IsStriped="true" TableSize="TableSize.Compact" SelectedRows=SelectedRows SelectedRowsChanged=privateSelectedRowsChanged IsMultipleSelect="IsMultipleSelect" @ref="Instance" SearchTemplate="SearchTemplate"
-           DataService="DataService" CreateItemCallback="CreateItemCallback!" RenderMode=RenderMode
+    <Table Id=@Id TItem="TItem" IsBordered="true" IsStriped="true" TableSize="TableSize.Compact" SelectedRows=SelectedRows SelectedRowsChanged=privateSelectedRowsChanged IsMultipleSelect="IsMultipleSelect" @ref="Instance" SearchTemplate="SearchTemplate"
+           DataService="DataService" CreateItemCallback="CreateItemCallback!" RenderMode=RenderMode OnColumnCreating=OnColumnCreating
            IsPagination="IsPagination" PageItemsSource="PageItemsSource" IsFixedHeader="IsFixedHeader" IndentSize=24 RowHeight=RowHeight ShowSearchText="ShowSearchText" ShowSearchButton="ShowSearchButton" DisableEditButtonCallback="DisableEditButtonCallback" DisableDeleteButtonCallback="DisableDeleteButtonCallback" BeforeShowEditDialogCallback=" BeforeShowEditDialogCallback!"
            IsTree="IsTree" OnTreeExpand="OnTreeExpand!" TreeNodeConverter="TreeNodeConverter!" TreeIcon="fa-solid fa-circle-chevron-right" TreeExpandIcon="fa-solid fa-circle-chevron-right fa-rotate-90" IsAutoQueryFirstRender=IsAutoQueryFirstRender
            ShowDefaultButtons="ShowDefaultButtons" ShowAdvancedSearch="ShowAdvancedSearch" ShowResetButton=ShowResetButton
@@ -14,7 +14,7 @@
            ShowSkeleton="true" ShowLoading="ShowLoading" ShowSearch="ShowSearch" SearchModel=@SearchModel ShowLineNo
            SearchMode=SearchMode ShowExportPdfButton=ShowExportPdfButton ExportButtonText=@ExportButtonText
            ShowExportButton=@ShowExportButton Items=Items ClickToSelect=ClickToSelect ScrollMode=ScrollMode
-           ShowExportCsvButton=@ShowExportCsvButton ShowCardView=ShowCardView
+           ShowExportCsvButton=@ShowExportCsvButton ShowCardView=ShowCardView OnColumnVisibleChanged=OnColumnVisibleChanged
            FixedExtendButtonsColumn=FixedExtendButtonsColumn FixedMultipleColumn=FixedMultipleColumn FixedDetailRowHeaderColumn=FixedDetailRowHeaderColumn FixedLineNoColumn=FixedLineNoColumn
            IsAutoRefresh=IsAutoRefresh AutoRefreshInterval=AutoRefreshInterval
            AllowDragColumn=@AllowDragColumn Height=@Height ShowRefresh=ShowRefresh

@@ -4,10 +4,16 @@
 @using ThingsGateway.Admin.Application
 @using ThingsGateway.Admin.Razor
 @using ThingsGateway.Gateway.Application
-@inherits ComponentDefault
+@attribute [JSModuleAutoLoader("Pages/GatewayMonitorPage/Variable/VariableRuntimeInfo.razor.js", AutoInvokeInit = true, AutoInvokeDispose = false, JSObjectReference = true)]
+@inherits ThingsGatewayModuleComponentBase
 
-<AdminTable @ref=table BeforeShowEditDialogCallback="BeforeShowEditDialogCallback"
+@* RenderMode="TableRenderMode.Table"
+      ShowCardView=false *@
+
+<AdminTable Id=@Id @ref=table BeforeShowEditDialogCallback="BeforeShowEditDialogCallback"
             TItem="VariableRuntime"
+            RenderMode="TableRenderMode.Table"
+            ShowCardView=false
             EditDialogSize="Size.ExtraLarge"
             AutoGenerateColumns="true"
             ShowAdvancedSearch=false
@@ -15,13 +21,13 @@
             AllowResizing="true"
             OnAdd="OnAdd"
             IsFixedHeader=true
-            ShowCardView=false
             IsMultipleSelect=true
             SearchMode=SearchMode.Top
             ShowExtendButtons=true
             ShowToolbar="true"
             ShowExportButton
-            RenderMode="TableRenderMode.Table"
+            OnColumnCreating="OnColumnCreating"
+            OnColumnVisibleChanged=OnColumnVisibleChanged
             ShowDefaultButtons=true
             ShowSearch=false
             ExtendButtonColumnWidth=220
@@ -40,8 +46,8 @@
         <TableColumn @bind-Field="@context.RpcWriteCheck" ShowTips=true Filterable=true Sortable=true Visible=false />
 
         <TableColumn @bind-Field="@context.Enable" Filterable=true Sortable=true Visible="false" />
-        <TableColumn Field="@context.ChangeTime" ShowTips=true FieldExpression=@(() => context.ChangeTime) Filterable=true Sortable=true Visible=false />
-        <TableColumn Field="@context.CollectTime" ShowTips=true FieldExpression=@(() => context.CollectTime) Filterable=true Sortable=true Visible=true />
+        <TableColumn Field="@context.ChangeTime" Width=120 ShowTips=true FieldExpression=@(() => context.ChangeTime) Filterable=true Sortable=true Visible=false />
+        <TableColumn Field="@context.CollectTime" Width=120 ShowTips =true FieldExpression=@(() => context.CollectTime) Filterable=true Sortable=true Visible=true />
         <TableColumn Field="@context.IsOnline" FieldExpression=@(() => context.IsOnline) Filterable=true Sortable=true Visible=true />
         <TableColumn Field="@context.LastErrorMessage" ShowTips=true FieldExpression=@(() => context.LastErrorMessage) Filterable=true Sortable=true Visible=false />
 

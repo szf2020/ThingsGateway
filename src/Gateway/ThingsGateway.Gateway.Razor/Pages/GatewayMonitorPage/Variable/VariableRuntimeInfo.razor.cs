@@ -10,6 +10,7 @@
 
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.Extensions.Options;
+using Microsoft.JSInterop;
 
 using ThingsGateway.Admin.Application;
 using ThingsGateway.Admin.Razor;
@@ -19,11 +20,107 @@ using ThingsGateway.NewLife.Json.Extension;
 
 namespace ThingsGateway.Gateway.Razor;
 
-public partial class VariableRuntimeInfo : IDisposable
+public partial class VariableRuntimeInfo
 {
-    public List<ITableColumn> ColumnsFunc()
+
+    [Inject]
+    [NotNull]
+    protected BlazorAppContext? AppContext { get; set; }
+
+    [Inject]
+    [NotNull]
+    private NavigationManager? NavigationManager { get; set; }
+
+    public string RouteName => NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
+
+    protected bool AuthorizeButton(string operate)
     {
-        return table?.Columns;
+        return AppContext.IsHasButtonWithRole(RouteName, operate);
+    }
+    [Inject]
+    [NotNull]
+    public IStringLocalizer<ThingsGateway.Razor._Imports>? RazorLocalizer { get; set; }
+
+    [Inject]
+    [NotNull]
+    public IStringLocalizer<ThingsGateway.Admin.Razor._Imports>? AdminLocalizer { get; set; }
+
+    [Inject]
+    [NotNull]
+    public DialogService? DialogService { get; set; }
+
+    [NotNull]
+    public IStringLocalizer? Localizer { get; set; }
+
+    [Inject]
+    [NotNull]
+    public IStringLocalizer<OperDescAttribute>? OperDescLocalizer { get; set; }
+
+    [Inject]
+    [NotNull]
+    public ToastService? ToastService { get; set; }
+
+    #region js
+    private List<ITableColumn> ColumnsFunc()
+    {
+        return table.Columns;
+    }
+    protected override Task InvokeInitAsync() => InvokeVoidAsync("init", Id, Interop, new { Method = nameof(TriggerStateChanged) });
+
+    private Task OnColumnVisibleChanged(string name, bool visible)
+    {
+        _cachedFields = table.GetVisibleColumns.ToArray();
+        return Task.CompletedTask;
+    }
+    private Task OnColumnCreating(List<ITableColumn> columns)
+    {
+        foreach (var column in columns)
+        {
+            column.OnCellRender = a =>
+            {
+                a.Class = $"{column.GetFieldName()}";
+            };
+        }
+        return Task.CompletedTask;
+    }
+
+    private ITableColumn[] _cachedFields = Array.Empty<ITableColumn>();
+
+    [JSInvokable]
+    public List<CellValue> TriggerStateChanged(int rowIndex)
+    {
+        try
+        {
+
+            if (table == null) return null;
+            var row = table.Rows[rowIndex];
+            if (_cachedFields.Length == 0) _cachedFields = table.GetVisibleColumns.ToArray();
+            var list = new List<CellValue>(_cachedFields.Length);
+            foreach (var col in _cachedFields)
+            {
+                var fieldName = col.GetFieldName();
+                list.Add(new(fieldName, VariableModelUtils.GetValue(row,fieldName)));
+            }
+
+            return list;
+
+        }
+        catch (Exception)
+        {
+            return new();
+        }
+    }
+
+
+    #endregion
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender || _cachedFields.Length == 0)
+        {
+            _cachedFields = table.GetVisibleColumns.ToArray();
+        }
+        base.OnAfterRender(firstRender);
     }
 
 #if !Management
@@ -43,17 +140,16 @@ public partial class VariableRuntimeInfo : IDisposable
     [Inject]
     private IOptions<WebsiteOptions>? WebsiteOption { get; set; }
     public bool Disposed { get; set; }
-
-
-    public void Dispose()
+    protected override ValueTask DisposeAsync(bool disposing)
     {
         Disposed = true;
         VariableRuntimeDispatchService.UnSubscribe(Refresh);
-        GC.SuppressFinalize(this);
+        return base.DisposeAsync(disposing);
     }
 
     protected override void OnInitialized()
     {
+        Localizer = App.CreateLocalizerByType(GetType());
         VariableRuntimeDispatchService.Subscribe(Refresh);
 
         scheduler = new SmartTriggerScheduler(Notify, TimeSpan.FromMilliseconds(1000));
