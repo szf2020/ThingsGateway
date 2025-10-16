@@ -93,7 +93,8 @@ public class ScheduledAsyncTask : DisposeBase, IScheduledTask, IScheduledIntInte
         {
             if (!Check() && IntervalMS > 8)
             {
-                SetNext(next);
+                int nextValue = next;
+                SetNext(nextValue);
             }
         }
     }

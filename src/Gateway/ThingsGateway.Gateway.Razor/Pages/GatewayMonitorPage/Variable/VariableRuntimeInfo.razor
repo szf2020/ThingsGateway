@@ -47,7 +47,7 @@
 
         <TableColumn @bind-Field="@context.Enable" Filterable=true Sortable=true Visible="false" />
         <TableColumn Field="@context.ChangeTime" Width=120 ShowTips=true FieldExpression=@(() => context.ChangeTime) Filterable=true Sortable=true Visible=false />
-        <TableColumn Field="@context.CollectTime" Width=120 ShowTips =true FieldExpression=@(() => context.CollectTime) Filterable=true Sortable=true Visible=true />
+        <TableColumn Field="@context.CollectTime" Width=120 ShowTips=true FieldExpression=@(() => context.CollectTime) Filterable=true Sortable=true Visible=true />
         <TableColumn Field="@context.IsOnline" FieldExpression=@(() => context.IsOnline) Filterable=true Sortable=true Visible=true />
         <TableColumn Field="@context.LastErrorMessage" ShowTips=true FieldExpression=@(() => context.LastErrorMessage) Filterable=true Sortable=true Visible=false />
 
@@ -93,7 +93,24 @@
 
     <RowContentTemplate Context="context">
 
-        <VariableRow RowContent="@context" ColumnsFunc="ColumnsFunc"></VariableRow>
+
+        @foreach (var col in context.Columns)
+        {
+            <td class="@GetFixedCellClassString(col, context)" style="@GetFixedCellStyleString(col, context)" @key=col>
+                <div class="@GetCellClassString(col, false, false)" @key=col>
+                    @if (col.GetShowTips())
+                    {
+                        <Tooltip @key=col Title="@VariableModelUtils.GetValue(context.Row, col.GetFieldName())" class="text-truncate d-block">
+                            @VariableModelUtils.GetValue(context.Row, col.GetFieldName())
+                        </Tooltip>
+                    }
+                    else
+                    {
+                        @VariableModelUtils.GetValue(context.Row, col.GetFieldName())
+                    }
+                </div>
+            </td>
+        }
 
     </RowContentTemplate>
 

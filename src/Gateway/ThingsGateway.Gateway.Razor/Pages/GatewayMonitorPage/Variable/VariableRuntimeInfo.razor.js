@@ -1,11 +1,16 @@
-﻿export function init(id, invoke, options) {
+﻿let handlers = {};
+
+export function init(id, invoke, options) {
     //function getCellByClass(row, className) {
     //    // 直接用 querySelector 精确查找
     //    return row.querySelector(`td.${className}`);
     //}
-
     var variableHandler = setInterval(async () => {
         var admintable = document.getElementById(id);
+        if (!admintable) {
+            clearInterval(variableHandler);
+            return;
+        }
 
         var tables = admintable.getElementsByTagName('table');
 
@@ -16,10 +21,13 @@
         var table = tables[tables.length - 1];
 
         if (!table) {
-            clearInterval(variableHandler)
+            clearInterval(variableHandler);
             return;
         }
+
         var { method } = options;
+
+        if (!invoke) return;
         var valss = await invoke.invokeMethodAsync(method);
         if (valss == null) return;
         for (let rowIndex = 0; rowIndex < valss.length; rowIndex++) {
@@ -48,14 +56,21 @@
                     var tooltipSpan = cell.querySelector('.bb-tooltip');
                     if (tooltipSpan) {
 
-                        tooltipSpan.innerText = cellValue ?? '';      // 更新显示文字
-                        tooltipSpan.setAttribute('data-bs-original-title', cellValue ?? '');  // 同步 tooltip 提示
+                        if (tooltipSpan.innerText != cellValue) {
+
+                            tooltipSpan.innerText = cellValue ?? '';      // 更新显示文字
+                            tooltipSpan.setAttribute('data-bs-original-title', cellValue ?? '');  // 同步 tooltip 提示
+
+                        }
                         continue;
 
 
                     }
                     else {
-                        cellDiv.innerText = cellValue ?? '';
+                        if (cellDiv.innerText != cellValue) {
+
+                            cellDiv.innerText = cellValue ?? '';
+                        }
                     }
                 }
 
@@ -93,5 +108,14 @@
     }
         , 500) //1000ms刷新一次
 
-}
+    handlers[id] = { variableHandler, invoke };
 
+}
+export function dispose(id) {
+    const handler = handlers[id];
+    if (handler) {
+        clearInterval(handler.timer);
+        handler.invoke = null;
+        delete handlers[id];
+    }
+}

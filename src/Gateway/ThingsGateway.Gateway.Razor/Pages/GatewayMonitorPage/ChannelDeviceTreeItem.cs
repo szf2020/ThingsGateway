@@ -141,4 +141,77 @@ public class ChannelDeviceTreeItem : IEqualityComparer<ChannelDeviceTreeItem>
     {
         return HashCode.Combine(obj.ChannelDevicePluginType, obj.DeviceRuntimeId, obj.ChannelRuntimeId, obj.PluginName, obj.PluginType);
     }
+
+
+
+    public static string ToJSString(ChannelDeviceTreeItem channelDeviceTreeItem)
+    {
+        return $"{channelDeviceTreeItem.ChannelDevicePluginType}.{channelDeviceTreeItem.DeviceRuntimeId}.{channelDeviceTreeItem.ChannelRuntimeId}.{channelDeviceTreeItem.PluginName}.{channelDeviceTreeItem.PluginType}";
+    }
+
+    public static ChannelDeviceTreeItem FromJSString(string jsString)
+    {
+        if (string.IsNullOrWhiteSpace(jsString))
+            throw new ArgumentNullException(nameof(jsString));
+
+        ReadOnlySpan<char> span = jsString.AsSpan();
+        Span<Range> ranges = stackalloc Range[5];
+
+        // 手动分割
+        int partIndex = 0;
+        int start = 0;
+        while (partIndex < 4) // 只找前4个分隔符
+        {
+            int idx = span[start..].IndexOf('.');
+            if (idx == -1)
+                throw new FormatException($"Invalid format: expected 5 parts, got {partIndex + 1}");
+
+            ranges[partIndex] = new Range(start, start + idx);
+            start += idx + 1;
+            partIndex++;
+        }
+
+        // 最后一段
+        ranges[partIndex] = new Range(start, span.Length);
+
+        // 校验段数
+        if (partIndex != 4)
+            throw new FormatException($"Invalid format: expected 5 parts, got {partIndex + 1}");
+
+        var part0 = span[ranges[0]];
+        var part1 = span[ranges[1]];
+        var part2 = span[ranges[2]];
+        var part3 = span[ranges[3]];
+        var part4 = span[ranges[4]];
+
+        // 解析 Enum 和 long
+        if (!Enum.TryParse(part0, out ChannelDevicePluginTypeEnum pluginType))
+            throw new FormatException($"Invalid {nameof(ChannelDevicePluginTypeEnum)}: {part0.ToString()}");
+
+        if (!long.TryParse(part1, out long deviceRuntimeId))
+            throw new FormatException($"Invalid DeviceRuntimeId: {part1.ToString()}");
+
+        if (!long.TryParse(part2, out long channelRuntimeId))
+            throw new FormatException($"Invalid ChannelRuntimeId: {part2.ToString()}");
+
+        string pluginName = part3.ToString();
+
+        PluginTypeEnum? parsedPluginType = null;
+        if (!part4.IsEmpty)
+        {
+            if (!Enum.TryParse(part4, out PluginTypeEnum tmp))
+                throw new FormatException($"Invalid {nameof(PluginTypeEnum)}: {part4.ToString()}");
+            parsedPluginType = tmp;
+        }
+
+        return new ChannelDeviceTreeItem
+        {
+            ChannelDevicePluginType = pluginType,
+            DeviceRuntimeId = deviceRuntimeId,
+            ChannelRuntimeId = channelRuntimeId,
+            PluginName = pluginName,
+            PluginType = parsedPluginType
+        };
+    }
+
 }

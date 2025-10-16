@@ -26,24 +26,65 @@ public static class ChannelOptionsExtensions
     /// <param name="e">接收数据</param>
     /// <param name="funcs">事件</param>
     /// <returns></returns>
-    internal static async Task OnChannelReceivedEvent(this IClientChannel clientChannel, ReceivedDataEventArgs e, ChannelReceivedEventHandler funcs)
+    internal static ValueTask OnChannelReceivedEvent(
+    this IClientChannel clientChannel,
+    ReceivedDataEventArgs e,
+    ChannelReceivedEventHandler funcs)
     {
         clientChannel.ThrowIfNull(nameof(IClientChannel));
         e.ThrowIfNull(nameof(ReceivedDataEventArgs));
         funcs.ThrowIfNull(nameof(ChannelReceivedEventHandler));
 
-        if (funcs.Count > 0)
+        if (funcs.Count == 0) return EasyValueTask.CompletedTask;
+
+        return InvokeHandlersSequentially(clientChannel, e, funcs);
+    }
+
+    private static ValueTask InvokeHandlersSequentially(
+        IClientChannel clientChannel, ReceivedDataEventArgs e, ChannelReceivedEventHandler funcs)
+    {
+        var enumerator = new HandlerEnumerator(clientChannel, e, funcs);
+        return enumerator.MoveNextAsync();
+    }
+
+    private struct HandlerEnumerator
+    {
+        private readonly IClientChannel _channel;
+        private readonly ReceivedDataEventArgs _e;
+        private readonly ChannelReceivedEventHandler _funcs;
+        private int _index;
+
+        public HandlerEnumerator(IClientChannel channel, ReceivedDataEventArgs e, ChannelReceivedEventHandler funcs)
         {
-            for (int i = 0; i < funcs.Count; i++)
+            _channel = channel;
+            _e = e;
+            _funcs = funcs;
+            _index = -1;
+        }
+
+        public ValueTask MoveNextAsync()
+        {
+            _index++;
+            if (_index >= _funcs.Count) return default;
+
+            var func = _funcs[_index];
+            if (func == null) return MoveNextAsync();
+
+            bool isLast = _index == _funcs.Count - 1;
+            var vt = func.Invoke(_channel, _e, isLast);
+            if (vt.IsCompletedSuccessfully)
             {
-                var func = funcs[i];
-                if (func == null) continue;
-                await func.Invoke(clientChannel, e, i == funcs.Count - 1).ConfigureAwait(false);
-                if (e.Handled)
-                {
-                    break;
-                }
+                if (_e.Handled) return default;
+                return MoveNextAsync();
             }
+            return Awaited(vt);
+        }
+
+        private async ValueTask Awaited(ValueTask vt)
+        {
+            await vt.ConfigureAwait(false);
+            if (!_e.Handled)
+                await MoveNextAsync().ConfigureAwait(false);
         }
     }
 
@@ -53,7 +94,7 @@ public static class ChannelOptionsExtensions
     /// <param name="clientChannel">通道</param>
     /// <param name="funcs">事件</param>
     /// <returns></returns>
-    internal static async Task OnChannelEvent(this IClientChannel clientChannel, ChannelEventHandler funcs)
+    internal static async ValueTask OnChannelEvent(this IClientChannel clientChannel, ChannelEventHandler funcs)
     {
         try
         {

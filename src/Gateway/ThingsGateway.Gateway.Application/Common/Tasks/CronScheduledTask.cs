@@ -107,7 +107,8 @@ public class CronScheduledTask : DisposeBase, IScheduledTask
         {
             if (!Check())
             {
-                SetNext(next);
+                int nextValue = next;
+                SetNext(nextValue);
             }
         }
     }
@@ -149,7 +150,8 @@ public class CronScheduledTask : DisposeBase, IScheduledTask
         {
             if (!Check())
             {
-                SetNext(next);
+                int nextValue = next;
+                SetNext(nextValue);
             }
         }
     }

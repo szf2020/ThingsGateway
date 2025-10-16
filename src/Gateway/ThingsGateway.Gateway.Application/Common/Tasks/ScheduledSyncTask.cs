@@ -80,7 +80,8 @@ public class ScheduledSyncTask : DisposeBase, IScheduledTask, IScheduledIntInter
         {
             if (!Check() && IntervalMS > 8)
             {
-                SetNext(next);
+                int nextValue = next;
+                SetNext(nextValue);
             }
         }
     }

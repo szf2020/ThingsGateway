@@ -27,22 +27,22 @@ public class ModbusSlave : DeviceBase, IModbusAddress
     /// <summary>
     /// 继电器
     /// </summary>
-    private NonBlockingDictionary<byte, ByteBlock> ModbusServer01ByteBlocks = new();
+    private ConcurrentDictionary<int, ByteBlock> ModbusServer01ByteBlocks = new();
 
     /// <summary>
     /// 开关输入
     /// </summary>
-    private NonBlockingDictionary<byte, ByteBlock> ModbusServer02ByteBlocks = new();
+    private ConcurrentDictionary<int, ByteBlock> ModbusServer02ByteBlocks = new();
 
     /// <summary>
     /// 输入寄存器
     /// </summary>
-    private NonBlockingDictionary<byte, ByteBlock> ModbusServer03ByteBlocks = new();
+    private ConcurrentDictionary<int, ByteBlock> ModbusServer03ByteBlocks = new();
 
     /// <summary>
     /// 保持寄存器
     /// </summary>
-    private NonBlockingDictionary<byte, ByteBlock> ModbusServer04ByteBlocks = new();
+    private ConcurrentDictionary<int, ByteBlock> ModbusServer04ByteBlocks = new();
 
     /// <inheritdoc/>
     public override void InitChannel(IChannel channel, ILog? deviceLog = null)
@@ -157,7 +157,7 @@ public class ModbusSlave : DeviceBase, IModbusAddress
     {
         return PackHelper.LoadSourceRead<T>(this, deviceVariables, maxPack, defaultIntervalTime);
     }
-
+    
     /// <inheritdoc/>
     protected override Task DisposeAsync(bool disposing)
     {
@@ -187,8 +187,42 @@ public class ModbusSlave : DeviceBase, IModbusAddress
     /// <inheritdoc/>
     private void Init(ModbusRequest mAddress)
     {
-        //自动扩容
-        ModbusServer01ByteBlocks.GetOrAdd(mAddress.Station, a =>
+        if (ModbusServer01ByteBlocks.ContainsKey(mAddress.Station))
+            return;
+        else
+            ModbusServer01ByteBlocks.GetOrAdd(mAddress.Station, a =>
+            {
+                var bytes = new ByteBlock(256,
+                (c) =>
+                {
+                    var data = ArrayPool<byte>.Shared.Rent(c);
+                    for (int i = 0; i < data.Length; i++)
+                    {
+                        data[i] = 0;
+                    }
+                    return data;
+                },
+                (m) =>
+                {
+                    if (MemoryMarshal.TryGetArray((ReadOnlyMemory<byte>)m, out var result))
+                    {
+                        ArrayPool<byte>.Shared.Return(result.Array);
+                    }
+                }
+                );
+                bytes.SetLength(256);
+                for (int i = 0; i < bytes.Length; i++)
+                {
+                    bytes.WriteByte(0);
+                }
+                bytes.Position = 0;
+                return bytes;
+            });
+
+        if (ModbusServer02ByteBlocks.ContainsKey(mAddress.Station))
+            return;
+        else
+            ModbusServer02ByteBlocks.GetOrAdd(mAddress.Station, a =>
         {
             var bytes = new ByteBlock(256,
             (c) =>
@@ -216,7 +250,11 @@ public class ModbusSlave : DeviceBase, IModbusAddress
             bytes.Position = 0;
             return bytes;
         });
-        ModbusServer02ByteBlocks.GetOrAdd(mAddress.Station, a =>
+
+        if (ModbusServer03ByteBlocks.ContainsKey(mAddress.Station))
+            return;
+        else
+            ModbusServer03ByteBlocks.GetOrAdd(mAddress.Station, a =>
         {
             var bytes = new ByteBlock(256,
             (c) =>
@@ -244,35 +282,11 @@ public class ModbusSlave : DeviceBase, IModbusAddress
             bytes.Position = 0;
             return bytes;
         });
-        ModbusServer03ByteBlocks.GetOrAdd(mAddress.Station, a =>
-        {
-            var bytes = new ByteBlock(256,
-            (c) =>
-            {
-                var data = ArrayPool<byte>.Shared.Rent(c);
-                for (int i = 0; i < data.Length; i++)
-                {
-                    data[i] = 0;
-                }
-                return data;
-            },
-            (m) =>
-            {
-                if (MemoryMarshal.TryGetArray((ReadOnlyMemory<byte>)m, out var result))
-                {
-                    ArrayPool<byte>.Shared.Return(result.Array);
-                }
-            }
-            );
-            bytes.SetLength(256);
-            for (int i = 0; i < bytes.Length; i++)
-            {
-                bytes.WriteByte(0);
-            }
-            bytes.Position = 0;
-            return bytes;
-        });
-        ModbusServer04ByteBlocks.GetOrAdd(mAddress.Station, a =>
+
+        if (ModbusServer04ByteBlocks.ContainsKey(mAddress.Station))
+            return;
+        else
+            ModbusServer04ByteBlocks.GetOrAdd(mAddress.Station, a =>
         {
             var bytes = new ByteBlock(256,
             (c) =>
@@ -337,10 +351,11 @@ public class ModbusSlave : DeviceBase, IModbusAddress
                 }
                 Init(mAddress);
             }
-            var ModbusServer01ByteBlock = ModbusServer01ByteBlocks[mAddress.Station];
-            var ModbusServer02ByteBlock = ModbusServer02ByteBlocks[mAddress.Station];
-            var ModbusServer03ByteBlock = ModbusServer03ByteBlocks[mAddress.Station];
-            var ModbusServer04ByteBlock = ModbusServer04ByteBlocks[mAddress.Station];
+
+            ModbusServer01ByteBlocks.TryGetValue(mAddress.Station,out var ModbusServer01ByteBlock);
+            ModbusServer02ByteBlocks.TryGetValue(mAddress.Station,out var ModbusServer02ByteBlock);
+            ModbusServer03ByteBlocks.TryGetValue(mAddress.Station,out var ModbusServer03ByteBlock);
+            ModbusServer04ByteBlocks.TryGetValue(mAddress.Station,out var ModbusServer04ByteBlock);
             if (read)
             {
                 using (new ReadLock(_lockSlim))
@@ -516,12 +531,12 @@ public class ModbusSlave : DeviceBase, IModbusAddress
             return new OperResult(ex);
         }
     }
-    protected override Task ChannelReceived(IClientChannel client, ReceivedDataEventArgs e, bool last)
+    protected override ValueTask ChannelReceived(IClientChannel client, ReceivedDataEventArgs e, bool last)
     {
         return HandleChannelReceivedAsync(client, e, last);
     }
 
-    private async Task HandleChannelReceivedAsync(IClientChannel client, ReceivedDataEventArgs e, bool last)
+    private async ValueTask HandleChannelReceivedAsync(IClientChannel client, ReceivedDataEventArgs e, bool last)
     {
         if (!TryParseRequest(e.RequestInfo, out var modbusRequest, out var sequences, out var modbusRtu))
             return;

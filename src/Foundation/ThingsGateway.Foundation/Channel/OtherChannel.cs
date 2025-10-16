@@ -131,10 +131,10 @@ public class OtherChannel : SetupConfigObject, IClientChannel
         m_dataHandlingAdapter = adapter;
     }
 
-    private Task PrivateHandleReceivedData(ReadOnlyMemory<byte> byteBlock, IRequestInfo requestInfo)
+    private async Task PrivateHandleReceivedData(ReadOnlyMemory<byte> byteBlock, IRequestInfo requestInfo)
     {
         LastReceivedTime = DateTime.Now;
-        return this.OnChannelReceivedEvent(new ReceivedDataEventArgs(byteBlock, requestInfo), ChannelReceived);
+        await this.OnChannelReceivedEvent(new ReceivedDataEventArgs(byteBlock, requestInfo), ChannelReceived).ConfigureAwait(false);
     }
 
     /// <summary>

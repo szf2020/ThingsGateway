@@ -308,7 +308,7 @@ public abstract class DeviceBase : AsyncAndSyncDisposableObject, IDevice
     /// <summary>
     /// 接收,非主动发送的情况，重写实现非主从并发通讯协议，如果通道存在其他设备并且不希望其他设备处理时，设置<see cref="TouchSocketEventArgs.Handled"/> 为true
     /// </summary>
-    protected virtual Task ChannelReceived(IClientChannel client, ReceivedDataEventArgs e, bool last)
+    protected virtual ValueTask ChannelReceived(IClientChannel client, ReceivedDataEventArgs e, bool last)
     {
         if (e.RequestInfo is MessageBase response)
         {
@@ -325,7 +325,7 @@ public abstract class DeviceBase : AsyncAndSyncDisposableObject, IDevice
             }
         }
 
-        return EasyTask.CompletedTask;
+        return EasyValueTask.CompletedTask;
     }
     public bool AutoConnect { get; protected set; } = true;
     /// <inheritdoc/>

@@ -234,7 +234,7 @@ public class TextFileLog : Logger, IDisposable
         if (!_isFile && Backups > 0)
         {
             // 判断日志目录是否已存在
-            var di = LogPath.GetBasePath().AsDirectory();
+            DirectoryInfo? di = new DirectoryInfo(LogPath);
             if (di.Exists)
             {
                 // 删除*.del

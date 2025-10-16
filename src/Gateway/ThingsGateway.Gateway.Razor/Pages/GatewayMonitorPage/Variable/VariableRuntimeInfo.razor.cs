@@ -60,11 +60,163 @@ public partial class VariableRuntimeInfo
     [NotNull]
     public ToastService? ToastService { get; set; }
 
-    #region js
-    private List<ITableColumn> ColumnsFunc()
+    #region row
+
+
+    /// <summary>
+    /// 获得指定列头固定列样式
+    /// </summary>
+    protected string? GetFixedCellStyleString(ITableColumn col, TableRowContext<VariableRuntime> row, int margin = 0)
     {
-        return table.Columns;
+        string? ret = null;
+        if (col.Fixed)
+        {
+            ret = IsTail(col,row) ? GetRightStyle(col,row, margin) : GetLeftStyle(col, row);
+        }
+        return ret;
     }
+
+    private string? GetLeftStyle(ITableColumn col, TableRowContext<VariableRuntime> row)
+    {
+        var columns = row.Columns.ToList();
+        var defaultWidth = 200;
+        var width = 0;
+        var start = 0;
+        var index = columns.IndexOf(col);
+        //if (GetFixedDetailRowHeaderColumn)
+        //{
+        //    width += DetailColumnWidth;
+        //}
+        //if (GetFixedMultipleSelectColumn)
+        //{
+        //    width += MultiColumnWidth;
+        //}
+        if (GetFixedLineNoColumn)
+        {
+            width += LineNoColumnWidth;
+        }
+        while (index > start)
+        {
+            var column = columns[start++];
+            width += column.Width ?? defaultWidth;
+        }
+        return $"left: {width}px;";
+    }
+    private bool GetFixedLineNoColumn = false;
+
+    private string? GetRightStyle(ITableColumn col, TableRowContext<VariableRuntime> row, int margin)
+    {
+        var columns = row.Columns.ToList();
+        var defaultWidth = 200;
+        var width = 0;
+        var index = columns.IndexOf(col);
+
+        // after
+        while (index + 1 < columns.Count)
+        {
+            var column = columns[index++];
+            width += column.Width ?? defaultWidth;
+        }
+        //if (ShowExtendButtons && FixedExtendButtonsColumn)
+        {
+            width += ExtendButtonColumnWidth;
+        }
+
+        // 如果是固定表头时增加滚动条位置
+        if (IsFixedHeader && (index + 1) == columns.Count)
+        {
+            width += margin;
+        }
+        return $"right: {width}px;";
+    }
+    private bool IsFixedHeader = true;
+
+    public int LineNoColumnWidth { get; set; } = 60;
+    public int ExtendButtonColumnWidth { get; set; } = 220;
+
+
+    private bool IsTail(ITableColumn col,TableRowContext<VariableRuntime> row)
+    {
+        var middle = Math.Floor(row.Columns.Count() * 1.0 / 2);
+        var index = Columns.IndexOf(col);
+        return middle < index;
+    }
+
+    /// <summary>
+    /// 获得 Cell 文字样式
+    /// </summary>
+    /// <param name="col"></param>
+    /// <param name="hasChildren"></param>
+    /// <param name="inCell"></param>
+    /// <returns></returns>
+    protected string? GetCellClassString(ITableColumn col, bool hasChildren, bool inCell)
+    {
+
+            bool trigger = false;
+        return CssBuilder.Default("table-cell")
+.AddClass(col.GetAlign().ToDescriptionString(), col.Align == Alignment.Center || col.Align == Alignment.Right)
+.AddClass("is-wrap", col.GetTextWrap())
+.AddClass("is-ellips", col.GetTextEllipsis())
+.AddClass("is-tips", col.GetShowTips())
+.AddClass("is-resizable", AllowResizing)
+.AddClass("is-tree", IsTree && hasChildren)
+.AddClass("is-incell", inCell)
+.AddClass("is-dbcell", trigger)
+.AddClass(col.CssClass)
+.Build();
+
+    }
+
+    private bool AllowResizing = true;
+    private bool IsTree = false;
+
+    /// <summary>
+    /// 获得指定列头固定列样式
+    /// </summary>
+    protected string? GetFixedCellClassString(ITableColumn col, TableRowContext<VariableRuntime> row)
+    {
+        return CssBuilder.Default()
+      .AddClass("fixed", col.Fixed)
+      .AddClass("fixed-right", col.Fixed && IsTail(col,row))
+      .AddClass("fr", IsLastColumn(col, row))
+      .AddClass("fl", IsFirstColumn(col, row))
+      .Build();
+
+    }
+
+    public List<ITableColumn> Columns=> table?.Columns;
+
+    private bool IsLastColumn(ITableColumn col, TableRowContext<VariableRuntime> row)
+    {
+                var ret = false;
+                if (col.Fixed && !IsTail(col, row))
+                {
+                    var index = Columns.IndexOf(col) + 1;
+                    ret = index < Columns.Count && Columns[index].Fixed == false;
+                }
+                return ret;
+  
+    }
+    private bool IsFirstColumn(ITableColumn col, TableRowContext<VariableRuntime> row)
+    {
+        
+                var ret = false;
+                if (col.Fixed && IsTail(col, row))
+                {
+                    // 查找前一列是否固定
+                    var index = Columns.IndexOf(col) - 1;
+                    if (index > 0)
+                    {
+                        ret = !Columns[index].Fixed;
+                    }
+                }
+                return ret;
+    }
+
+    #endregion
+
+    #region js
+ 
     protected override Task InvokeInitAsync() => InvokeVoidAsync("init", Id, Interop, new { Method = nameof(TriggerStateChanged) });
 
     private Task OnColumnVisibleChanged(string name, bool visible)
@@ -143,11 +295,15 @@ public partial class VariableRuntimeInfo
     [Inject]
     private IOptions<WebsiteOptions>? WebsiteOption { get; set; }
     public bool Disposed { get; set; }
-    protected override ValueTask DisposeAsync(bool disposing)
+    protected override async ValueTask DisposeAsync(bool disposing)
     {
+
         Disposed = true;
         VariableRuntimeDispatchService.UnSubscribe(Refresh);
-        return base.DisposeAsync(disposing);
+
+        await Module.InvokeVoidAsync("dispose", Id);
+
+        await base.DisposeAsync(disposing);
     }
 
     protected override void OnInitialized()

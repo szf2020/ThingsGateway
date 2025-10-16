@@ -10,6 +10,7 @@
 
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Components.Web;
+using Microsoft.JSInterop;
 
 using ThingsGateway.Admin.Application;
 using ThingsGateway.Admin.Razor;
@@ -19,7 +20,7 @@ using ThingsGateway.SqlSugar;
 
 namespace ThingsGateway.Gateway.Razor;
 
-public partial class ChannelDeviceTree : IDisposable
+public partial class ChannelDeviceTree
 {
     SpinnerComponent Spinner;
     [Inject]
@@ -297,7 +298,7 @@ public partial class ChannelDeviceTree : IDisposable
     {
         if (item.TryGetChannelRuntime(out var channelRuntime))
         {
-            return channelRuntime.DeviceThreadManage != null ? "enable--text" : "disabled--text";
+            return channelRuntime.DeviceThreadManage != null ? " enable--text" : " disabled--text ";
         }
         else if (item.TryGetDeviceRuntime(out var deviceRuntime))
         {
@@ -1391,24 +1392,6 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
 
         scheduler = new SmartTriggerScheduler(Notify, TimeSpan.FromMilliseconds(3000));
 
-        _ = Task.Run(async () =>
-        {
-            while (!Disposed)
-            {
-                try
-                {
-                    await InvokeAsync(StateHasChanged);
-                }
-                catch
-                {
-                }
-                finally
-                {
-                    await Task.Delay(5000);
-                }
-            }
-        });
-
         await base.OnInitializedAsync();
     }
     private async Task Notify(CancellationToken cancellationToken)
@@ -1423,7 +1406,7 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
         {
             await ChannelDeviceChanged.Invoke(Value);
         }
-
+        await InvokeAsync(StateHasChanged);
     }
 
     private static ChannelDeviceTreeItem GetValue(ChannelDeviceTreeItem channelDeviceTreeItem)
@@ -1595,10 +1578,16 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
         }
     }
     private bool Disposed;
-    public void Dispose()
+
+    protected override async ValueTask DisposeAsync(bool disposing)
     {
+
         Disposed = true;
         ChannelRuntimeDispatchService.UnSubscribe(Refresh);
+
+        await Module.InvokeVoidAsync("dispose", Id);
+
+        await base.DisposeAsync(disposing);
     }
 
     ChannelDeviceTreeItem? SelectModel = default;
@@ -1616,5 +1605,28 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
         return Task.CompletedTask;
     }
 
+    #region js
 
+    protected override Task InvokeInitAsync() => InvokeVoidAsync("init", Id, Interop, new { Method = nameof(TriggerStateChanged) });
+
+
+
+    [JSInvokable]
+    public List<string> TriggerStateChanged(List<string> jsstring)
+    {
+        List<string> ret = new(jsstring.Count);
+        foreach (var str in jsstring)
+        {
+            var item = ChannelDeviceTreeItem.FromJSString(str);
+            ret.Add(GetClass(item));
+        }
+        return ret;
+    }
+
+    private static string GetId(ChannelDeviceTreeItem channelDeviceTreeItem)
+    {
+        return ChannelDeviceTreeItem.ToJSString(channelDeviceTreeItem);
+    }
+
+    #endregion
 }

@@ -2,7 +2,8 @@
 @using ThingsGateway.Admin.Application
 @using ThingsGateway.Admin.Razor
 @using ThingsGateway.Gateway.Application
-
+@attribute [JSModuleAutoLoader("Pages/GatewayMonitorPage/ChannelDeviceTree.razor.js", AutoInvokeInit = true, AutoInvokeDispose = false, JSObjectReference = true)]
+@inherits ThingsGatewayModuleComponentBase
 <div class="listtree-view">
 
     <div class="d-flex align-items-center">
@@ -13,7 +14,7 @@
 
 
     <ContextMenuZone>
-        <TreeView TItem="ChannelDeviceTreeItem" Items="Items" ShowIcon="false" ShowSearch IsAccordion=false IsVirtualize="true" OnTreeItemClick="OnTreeItemClick" OnSearchAsync="OnClickSearch" ModelEqualityComparer=ModelEqualityComparer ShowToolbar="true" >
+        <TreeView Id=@Id TItem="ChannelDeviceTreeItem" Items="Items" ShowIcon="false" ShowSearch IsAccordion=false IsVirtualize="true" OnTreeItemClick="OnTreeItemClick" OnSearchAsync="OnClickSearch" ModelEqualityComparer=ModelEqualityComparer ShowToolbar="true" >
             <ToolbarTemplate>
 
                 <div class="tree-node-toolbar-edit" @onclick:preventDefault @onclick:stopPropagation>
@@ -137,6 +138,6 @@
 @code {
     RenderFragment<ChannelDeviceTreeItem> RenderTreeItem = (item) =>
 
-    @<span class=@(GetClass(item))>@item.ToString()</span> ;
+    @<span class=@(GetClass(item)) id=@(GetId(item))>@item.ToString()</span> ;
 
 }

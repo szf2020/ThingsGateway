@@ -65,7 +65,7 @@ public interface IChannel : ISetupConfigObject, IDisposable, IClosableClient, IC
 /// <summary>
 /// 接收事件回调类
 /// </summary>
-public class ChannelReceivedEventHandler : List<Func<IClientChannel, ReceivedDataEventArgs, bool, Task>>
+public class ChannelReceivedEventHandler : List<Func<IClientChannel, ReceivedDataEventArgs, bool, ValueTask>>
 {
 }
 

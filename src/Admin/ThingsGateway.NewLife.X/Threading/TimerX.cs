@@ -542,6 +542,12 @@ public class TimerX : ITimer, ITimerx, IDisposable
         }
     }
 
+    public Func<object?, Task>? TaskCachedDelegate { get; internal set; }
+#if NET6_0_OR_GREATER
+    public Func<object?, ValueTask>? ValueTaskCachedDelegate { get; internal set; }
+#endif
+    public TimerCallback? TimerCallbackCachedDelegate { get; internal set; }
+
     private static void CopyNow(Object? state) => _Now = TimerScheduler.Default.GetNow();
     #endregion
 

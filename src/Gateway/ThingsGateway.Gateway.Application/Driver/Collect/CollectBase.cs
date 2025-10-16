@@ -359,123 +359,313 @@ public abstract partial class CollectBase : DriverBase
     private readonly LinkedCancellationTokenSourceCache _linkedCtsCache = new();
 
     #region 执行默认读取
-    async ValueTask ReadVariableSource(object? state, CancellationToken cancellationToken)
+    //async ValueTask ReadVariableSource(object? state, CancellationToken cancellationToken)
+    //{
+
+    //    if (state is not VariableSourceRead variableSourceRead) return;
+
+    //    if (Pause) return;
+    //    if (cancellationToken.IsCancellationRequested) return;
+    //    CancellationToken readToken = default;
+    //    var readerLockTask = ReadWriteLock.ReaderLockAsync(cancellationToken);
+    //    if (!readerLockTask.IsCompleted)
+    //    {
+    //        readToken = await readerLockTask.ConfigureAwait(false);
+    //    }
+    //    else
+    //    {
+    //        readToken = readerLockTask.Result;
+    //    }
+
+    //    if (readToken.IsCancellationRequested)
+    //    {
+    //        await ReadVariableSource(state, cancellationToken).ConfigureAwait(false);
+    //        return;
+    //    }
+
+    //    var allTokenSource = _linkedCtsCache.GetLinkedTokenSource(cancellationToken, readToken);
+    //    var allToken = allTokenSource.Token;
+
+    //    //if (LogMessage?.LogLevel <= TouchSocket.Core.LogLevel.Trace)
+    //    //    LogMessage?.Trace(string.Format("{0} - Collecting [{1} - {2}]", DeviceName, variableSourceRead?.RegisterAddress, variableSourceRead?.Length));
+
+    //    OperResult<ReadOnlyMemory<byte>> readResult = default;
+    //    var readTask = ReadSourceAsync(variableSourceRead, allToken);
+    //    if (!readTask.IsCompleted)
+    //    {
+    //        readResult = await readTask.ConfigureAwait(false);
+    //    }
+    //    else
+    //    {
+    //        readResult = readTask.Result;
+    //    }
+
+    //    var readErrorCount = 0;
+
+    //    // 读取失败时重试一定次数
+    //    while (!readResult.IsSuccess && readErrorCount < CollectProperties.RetryCount)
+    //    {
+    //        if (Pause)
+    //            return;
+    //        if (cancellationToken.IsCancellationRequested)
+    //            return;
+
+    //        if (readToken.IsCancellationRequested)
+    //        {
+    //            await ReadVariableSource(state, cancellationToken).ConfigureAwait(false);
+    //            return;
+    //        }
+
+    //        readErrorCount++;
+    //        if (LogMessage?.LogLevel <= TouchSocket.Core.LogLevel.Trace)
+    //            LogMessage?.Trace(string.Format("{0} - Collection [{1} - {2}] failed - {3}", DeviceName, variableSourceRead?.RegisterAddress, variableSourceRead?.Length, readResult.ErrorMessage));
+
+    //        //if (LogMessage?.LogLevel <= TouchSocket.Core.LogLevel.Trace)
+    //        //    LogMessage?.Trace(string.Format("{0} - Collecting [{1} - {2}]", DeviceName, variableSourceRead?.RegisterAddress, variableSourceRead?.Length));
+    //        var readTask1 = ReadSourceAsync(variableSourceRead, allToken);
+    //        if (!readTask1.IsCompleted)
+    //        {
+    //            readResult = await readTask1.ConfigureAwait(false);
+    //        }
+    //        else
+    //        {
+    //            readResult = readTask1.Result;
+    //        }
+
+    //    }
+
+    //    if (readResult.IsSuccess)
+    //    {
+    //        // 读取成功时记录日志并增加成功计数器
+    //        if (LogMessage?.LogLevel <= TouchSocket.Core.LogLevel.Trace)
+    //            LogMessage?.Trace(string.Format("{0} - Collection [{1} - {2}] data succeeded {3}", DeviceName, variableSourceRead?.RegisterAddress, variableSourceRead?.Length, readResult.Content.Span.ToHexString(' ')));
+    //        CurrentDevice.SetDeviceStatus(TimerX.Now, null);
+    //    }
+    //    else
+    //    {
+    //        if (cancellationToken.IsCancellationRequested)
+    //            return;
+
+    //        if (readToken.IsCancellationRequested)
+    //        {
+    //            await ReadVariableSource(state, cancellationToken).ConfigureAwait(false);
+    //            return;
+    //        }
+
+    //        // 读取失败时记录日志并增加失败计数器，更新错误信息并清除变量状态
+    //        if (variableSourceRead.LastErrorMessage != readResult.ErrorMessage)
+    //        {
+    //            if (!cancellationToken.IsCancellationRequested)
+    //                LogMessage?.LogWarning(readResult.Exception, string.Format(AppResource.CollectFail, DeviceName, variableSourceRead?.RegisterAddress, variableSourceRead?.Length, readResult.ErrorMessage));
+    //        }
+    //        else
+    //        {
+    //            if (!cancellationToken.IsCancellationRequested)
+    //            {
+    //                if (LogMessage?.LogLevel <= TouchSocket.Core.LogLevel.Trace)
+    //                    LogMessage?.Trace(string.Format("{0} - Collection [{1} - {2}] data failed - {3}", DeviceName, variableSourceRead?.RegisterAddress, variableSourceRead?.Length, readResult.ErrorMessage));
+    //            }
+    //        }
+
+    //        variableSourceRead.LastErrorMessage = readResult.ErrorMessage;
+    //        CurrentDevice.SetDeviceStatus(TimerX.Now, null, readResult.ErrorMessage);
+    //        var time = DateTime.Now;
+    //        foreach (var item in variableSourceRead.VariableRuntimes)
+    //        {
+    //            item.SetValue(null, time, isOnline: false);
+    //        }
+    //    }
+    //}
+
+
+
+    private ValueTask ReadVariableSource(object? state, CancellationToken cancellationToken)
     {
+        var enumerator = new ReadVariableSourceEnumerator(this, state, cancellationToken);
+        return enumerator.MoveNextAsync();
+    }
 
-        if (state is not VariableSourceRead variableSourceRead) return;
+    private struct ReadVariableSourceEnumerator
+    {
+        private readonly CollectBase _owner;
+        private readonly object? _state;
+        private readonly CancellationToken _cancellationToken;
 
-        if (Pause) return;
-        if (cancellationToken.IsCancellationRequested) return;
-        CancellationToken readToken = default;
-        var readerLockTask = ReadWriteLock.ReaderLockAsync(cancellationToken);
-        if (!readerLockTask.IsCompleted)
+        private VariableSourceRead _variableSourceRead;
+        private CancellationToken _readToken;
+        private CancellationToken _allToken;
+        private OperResult<ReadOnlyMemory<byte>> _readResult;
+        private int _readErrorCount;
+        private ValueTask<CancellationToken> _readerLockTask;
+        private ValueTask<OperResult<ReadOnlyMemory<byte>>> _readTask;
+        private int _step;
+
+        public ReadVariableSourceEnumerator(CollectBase owner, object? state, CancellationToken cancellationToken)
         {
-            readToken = await readerLockTask.ConfigureAwait(false);
-        }
-        else
-        {
-            readToken = readerLockTask.Result;
-        }
+            _owner = owner;
+            _state = state;
+            _cancellationToken = cancellationToken;
 
-        if (readToken.IsCancellationRequested)
-        {
-            await ReadVariableSource(state, cancellationToken).ConfigureAwait(false);
-            return;
-        }
-
-        var allTokenSource = _linkedCtsCache.GetLinkedTokenSource(cancellationToken, readToken);
-        var allToken = allTokenSource.Token;
-
-        //if (LogMessage?.LogLevel <= TouchSocket.Core.LogLevel.Trace)
-        //    LogMessage?.Trace(string.Format("{0} - Collecting [{1} - {2}]", DeviceName, variableSourceRead?.RegisterAddress, variableSourceRead?.Length));
-
-        OperResult<ReadOnlyMemory<byte>> readResult = default;
-        var readTask = ReadSourceAsync(variableSourceRead, allToken);
-        if (!readTask.IsCompleted)
-        {
-            readResult = await readTask.ConfigureAwait(false);
-        }
-        else
-        {
-            readResult = readTask.Result;
+            _variableSourceRead = default!;
+            _readToken = default;
+            _allToken = default;
+            _readResult = default;
+            _readErrorCount = 0;
+            _readerLockTask = default;
+            _readTask = default;
+            _step = 0;
         }
 
-        var readErrorCount = 0;
-
-        // 读取失败时重试一定次数
-        while (!readResult.IsSuccess && readErrorCount < CollectProperties.RetryCount)
+        public ValueTask MoveNextAsync()
         {
-            if (Pause)
-                return;
-            if (cancellationToken.IsCancellationRequested)
-                return;
-
-            if (readToken.IsCancellationRequested)
+            switch (_step)
             {
-                await ReadVariableSource(state, cancellationToken).ConfigureAwait(false);
-                return;
+                case 0:
+                    if (_state is not VariableSourceRead vsr) return default;
+                    _variableSourceRead = vsr;
+
+                    if (_owner.Pause) return default;
+                    if (_cancellationToken.IsCancellationRequested) return default;
+
+#pragma warning disable CA2012 // 正确使用 ValueTask
+                    _readerLockTask = _owner.ReadWriteLock.ReaderLockAsync(_cancellationToken);
+#pragma warning restore CA2012 // 正确使用 ValueTask
+                    if (!_readerLockTask.IsCompleted)
+                    {
+                        _step = 1;
+                        return AwaitReaderLock();
+                    }
+                    _readToken = _readerLockTask.Result;
+                    goto case 2;
+
+                case 1:
+                    _readToken = _readerLockTask.Result;
+                    goto case 2;
+
+                case 2:
+                    if (_readToken.IsCancellationRequested)
+                    {
+                        return _owner.ReadVariableSource(_state, _cancellationToken);
+                    }
+
+                    var allTokenSource = _owner._linkedCtsCache.GetLinkedTokenSource(_cancellationToken, _readToken);
+                    _allToken = allTokenSource.Token;
+
+#pragma warning disable CA2012 // 正确使用 ValueTask
+                    _readTask = _owner.ReadSourceAsync(_variableSourceRead, _allToken);
+#pragma warning restore CA2012 // 正确使用 ValueTask
+                    if (!_readTask.IsCompleted)
+                    {
+                        _step = 3;
+                        return AwaitRead();
+                    }
+                    _readResult = _readTask.Result;
+                    goto case 4;
+
+                case 3:
+                    _readResult = _readTask.Result;
+                    goto case 4;
+
+                case 4:
+                    while (!_readResult.IsSuccess && _readErrorCount < _owner.CollectProperties.RetryCount)
+                    {
+                        if (_owner.Pause) return default;
+                        if (_cancellationToken.IsCancellationRequested) return default;
+
+                        if (_readToken.IsCancellationRequested)
+                        {
+                            return _owner.ReadVariableSource(_state, _cancellationToken);
+                        }
+
+                        _readErrorCount++;
+                        if (_owner.LogMessage?.LogLevel <= TouchSocket.Core.LogLevel.Trace)
+                            _owner.LogMessage?.Trace(string.Format("{0} - Collection [{1} - {2}] failed - {3}",
+                                _owner.DeviceName, _variableSourceRead?.RegisterAddress, _variableSourceRead?.Length, _readResult.ErrorMessage));
+
+#pragma warning disable CA2012 // 正确使用 ValueTask
+                        _readTask = _owner.ReadSourceAsync(_variableSourceRead, _allToken);
+#pragma warning restore CA2012 // 正确使用 ValueTask
+                        if (!_readTask.IsCompleted)
+                        {
+                            _step = 5;
+                            return AwaitReadRetry();
+                        }
+                        _readResult = _readTask.Result;
+                    }
+
+                    goto case 6;
+
+                case 5:
+                    _readResult = _readTask.Result;
+                    _step = 4;
+                    return MoveNextAsync();
+
+                case 6:
+                    if (_readResult.IsSuccess)
+                    {
+                        if (_owner.LogMessage?.LogLevel <= TouchSocket.Core.LogLevel.Trace)
+                            _owner.LogMessage?.Trace(string.Format("{0} - Collection [{1} - {2}] data succeeded {3}",
+                                _owner.DeviceName, _variableSourceRead?.RegisterAddress, _variableSourceRead?.Length, _readResult.Content.Span.ToHexString(' ')));
+
+                        _owner.CurrentDevice.SetDeviceStatus(TimerX.Now, null);
+                    }
+                    else
+                    {
+                        if (_cancellationToken.IsCancellationRequested) return default;
+                        if (_readToken.IsCancellationRequested)
+                        {
+                            return _owner.ReadVariableSource(_state, _cancellationToken);
+                        }
+
+                        if (_variableSourceRead.LastErrorMessage != _readResult.ErrorMessage)
+                        {
+                            if (!_cancellationToken.IsCancellationRequested)
+                                _owner.LogMessage?.LogWarning(_readResult.Exception, string.Format(AppResource.CollectFail, _owner.DeviceName,
+                                    _variableSourceRead?.RegisterAddress, _variableSourceRead?.Length, _readResult.ErrorMessage));
+                        }
+                        else
+                        {
+                            if (!_cancellationToken.IsCancellationRequested && _owner.LogMessage?.LogLevel <= TouchSocket.Core.LogLevel.Trace)
+                                _owner.LogMessage?.Trace(string.Format("{0} - Collection [{1} - {2}] data failed - {3}",
+                                    _owner.DeviceName, _variableSourceRead?.RegisterAddress, _variableSourceRead?.Length, _readResult.ErrorMessage));
+                        }
+
+                        _variableSourceRead.LastErrorMessage = _readResult.ErrorMessage;
+                        _owner.CurrentDevice.SetDeviceStatus(TimerX.Now, null, _readResult.ErrorMessage);
+                        var time = DateTime.Now;
+                        foreach (var item in _variableSourceRead.VariableRuntimes)
+                        {
+                            item.SetValue(null, time, isOnline: false);
+                        }
+                    }
+                    break;
             }
 
-            readErrorCount++;
-            if (LogMessage?.LogLevel <= TouchSocket.Core.LogLevel.Trace)
-                LogMessage?.Trace(string.Format("{0} - Collection [{1} - {2}] failed - {3}", DeviceName, variableSourceRead?.RegisterAddress, variableSourceRead?.Length, readResult.ErrorMessage));
-
-            //if (LogMessage?.LogLevel <= TouchSocket.Core.LogLevel.Trace)
-            //    LogMessage?.Trace(string.Format("{0} - Collecting [{1} - {2}]", DeviceName, variableSourceRead?.RegisterAddress, variableSourceRead?.Length));
-            var readTask1 = ReadSourceAsync(variableSourceRead, allToken);
-            if (!readTask1.IsCompleted)
-            {
-                readResult = await readTask1.ConfigureAwait(false);
-            }
-            else
-            {
-                readResult = readTask1.Result;
-            }
-
+            return default;
         }
 
-        if (readResult.IsSuccess)
+        private async ValueTask AwaitReaderLock()
         {
-            // 读取成功时记录日志并增加成功计数器
-            if (LogMessage?.LogLevel <= TouchSocket.Core.LogLevel.Trace)
-                LogMessage?.Trace(string.Format("{0} - Collection [{1} - {2}] data succeeded {3}", DeviceName, variableSourceRead?.RegisterAddress, variableSourceRead?.Length, readResult.Content.Span.ToHexString(' ')));
-            CurrentDevice.SetDeviceStatus(TimerX.Now, null);
+            await _readerLockTask.ConfigureAwait(false);
+            _step = 1;
+            await MoveNextAsync().ConfigureAwait(false);
         }
-        else
+
+        private async ValueTask AwaitRead()
         {
-            if (cancellationToken.IsCancellationRequested)
-                return;
+            await _readTask.ConfigureAwait(false);
+            _step = 3;
+            await MoveNextAsync().ConfigureAwait(false);
+        }
 
-            if (readToken.IsCancellationRequested)
-            {
-                await ReadVariableSource(state, cancellationToken).ConfigureAwait(false);
-                return;
-            }
-
-            // 读取失败时记录日志并增加失败计数器，更新错误信息并清除变量状态
-            if (variableSourceRead.LastErrorMessage != readResult.ErrorMessage)
-            {
-                if (!cancellationToken.IsCancellationRequested)
-                    LogMessage?.LogWarning(readResult.Exception, string.Format(AppResource.CollectFail, DeviceName, variableSourceRead?.RegisterAddress, variableSourceRead?.Length, readResult.ErrorMessage));
-            }
-            else
-            {
-                if (!cancellationToken.IsCancellationRequested)
-                {
-                    if (LogMessage?.LogLevel <= TouchSocket.Core.LogLevel.Trace)
-                        LogMessage?.Trace(string.Format("{0} - Collection [{1} - {2}] data failed - {3}", DeviceName, variableSourceRead?.RegisterAddress, variableSourceRead?.Length, readResult.ErrorMessage));
-                }
-            }
-
-            variableSourceRead.LastErrorMessage = readResult.ErrorMessage;
-            CurrentDevice.SetDeviceStatus(TimerX.Now, null, readResult.ErrorMessage);
-            var time = DateTime.Now;
-            foreach (var item in variableSourceRead.VariableRuntimes)
-            {
-                item.SetValue(null, time, isOnline: false);
-            }
+        private async ValueTask AwaitReadRetry()
+        {
+            await _readTask.ConfigureAwait(false);
+            _step = 5;
+            await MoveNextAsync().ConfigureAwait(false);
         }
     }
+
 
     #endregion
 

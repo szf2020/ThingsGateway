@@ -318,7 +318,9 @@ public class TimerScheduler : IDisposable, ILogFeature
 
         timer.hasSetNext = false;
 
-        using var span = timer.Tracer?.NewSpan(timer.TracerName ?? $"timer:Execute", timer.Timers + "");
+        string tracerName = timer.TracerName ?? "timer:ExecuteAsync";
+        string timerArg = timer.Timers.ToString();
+        using var span = timer.Tracer?.NewSpan(tracerName, timerArg);
         var sw = _stopwatchPool.Get();
         sw.Restart();
         try
@@ -331,9 +333,12 @@ public class TimerScheduler : IDisposable, ILogFeature
                 timer.Dispose();
                 return;
             }
-
-            var func = timer.Method.As<TimerCallback>(target);
-            func!(timer.State);
+            if (timer.TimerCallbackCachedDelegate == null)
+            {
+                timer.TimerCallbackCachedDelegate = timer.Method.As<TimerCallback>(target);
+            }
+            //var func = timer.Method.As<TimerCallback>(target);
+            timer.TimerCallbackCachedDelegate!(timer.State);
         }
         catch (ThreadAbortException) { throw; }
         catch (ThreadInterruptedException) { throw; }
@@ -367,7 +372,9 @@ public class TimerScheduler : IDisposable, ILogFeature
 
         timer.hasSetNext = false;
 
-        using var span = timer.Tracer?.NewSpan(timer.TracerName ?? $"timer:ExecuteAsync", timer.Timers + "");
+        string tracerName = timer.TracerName ?? "timer:ExecuteAsync";
+        string timerArg = timer.Timers.ToString();
+        using var span = timer.Tracer?.NewSpan(tracerName, timerArg);
         var sw = _stopwatchPool.Get();
         sw.Restart();
         try
@@ -381,19 +388,31 @@ public class TimerScheduler : IDisposable, ILogFeature
                 return;
             }
 
+
+
 #if NET6_0_OR_GREATER
             if (timer.IsValueTask)
             {
-                var func = timer.Method.As<Func<Object?, ValueTask>>(target);
-                var task = func!(timer.State);
+                if (timer.ValueTaskCachedDelegate == null)
+                {
+                    timer.ValueTaskCachedDelegate = timer.Method.As<Func<Object?, ValueTask>>(target);
+                }
+
+                //var func = timer.Method.As<Func<Object?, ValueTask>>(target);
+                var task = timer.ValueTaskCachedDelegate!(timer.State);
                 if (!task.IsCompleted)
                     await task.ConfigureAwait(false);
             }
             else
 #endif
             {
-                var func = timer.Method.As<Func<Object?, Task>>(target);
-                var task = func!(timer.State);
+                if (timer.TaskCachedDelegate == null)
+                {
+                    timer.TaskCachedDelegate = timer.Method.As<Func<Object?, Task>>(target);
+                }
+
+                //var func = timer.Method.As<Func<Object?, Task>>(target);
+                var task = timer.TaskCachedDelegate!(timer.State);
                 if (!task.IsCompleted)
                     await task.ConfigureAwait(false);
             }
