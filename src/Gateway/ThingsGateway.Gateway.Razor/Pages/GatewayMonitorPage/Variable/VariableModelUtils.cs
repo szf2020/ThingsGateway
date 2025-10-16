@@ -32,11 +32,11 @@ public static class VariableModelUtils
         switch (fieldName)
         {
             case nameof(VariableRuntime.Value):
-             return row.Value?.ToSystemTextJsonString() ?? string.Empty;
+             return row.Value?.ToSystemTextJsonString(false) ?? string.Empty;
             case nameof(VariableRuntime.RawValue):
-             return row.RawValue?.ToSystemTextJsonString() ?? string.Empty;
+             return row.RawValue?.ToSystemTextJsonString(false) ?? string.Empty;
             case nameof(VariableRuntime.LastSetValue):
-             return row.LastSetValue?.ToSystemTextJsonString() ?? string.Empty;
+             return row.LastSetValue?.ToSystemTextJsonString(false) ?? string.Empty;
             case nameof(VariableRuntime.ChangeTime):
                 return row.ChangeTime.ToString("dd-HH:mm:ss.fff");
 
