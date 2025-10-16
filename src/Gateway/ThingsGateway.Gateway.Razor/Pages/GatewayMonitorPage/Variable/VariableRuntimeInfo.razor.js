@@ -1,8 +1,8 @@
 ﻿export function init(id, invoke, options) {
-    function getCellByClass(row, className) {
-        // 直接用 querySelector 精确查找
-        return row.querySelector(`td.${className}`);
-    }
+    //function getCellByClass(row, className) {
+    //    // 直接用 querySelector 精确查找
+    //    return row.querySelector(`td.${className}`);
+    //}
 
     var variableHandler = setInterval(async () => {
         var admintable = document.getElementById(id);
@@ -19,24 +19,26 @@
             clearInterval(variableHandler)
             return;
         }
-        var rowCount = table.rows.length;
         var { method } = options;
+        var valss = await invoke.invokeMethodAsync(method);
+        if (valss == null) return;
+        for (let rowIndex = 0; rowIndex < valss.length; rowIndex++) {
 
-        for (let rowIndex = 0; rowIndex < rowCount; rowIndex++) {
+            const vals = valss[rowIndex];
+            if (vals == null) continue;
 
 
             var row = table.rows[rowIndex];
             if (!row) continue;
 
-            var vals = await invoke.invokeMethodAsync(method, rowIndex);
-            if (vals == null) continue;
 
             for (let i = 0; i < vals.length; i++) {
-                const cellName = vals[i].field;
-                const cellValue = vals[i].value;
+
+                const cellValue = vals[i];
                 if (cellValue == null) continue;
 
-                var cell = getCellByClass(row, cellName)
+                //var cell = getCellByClass(row, cellName)
+                var cell = row.cells[i + 2]
 
                 if (!cell) continue;
 
@@ -81,12 +83,13 @@
                 //    continue;
                 //}
                 //// 默认情况（普通单元格）
-                //getCellByClass(row, cellName).innerText = cellValue;
+                //cell.innerText = cellValue;
 
 
             }
 
         }
+
     }
         , 500) //1000ms刷新一次
 

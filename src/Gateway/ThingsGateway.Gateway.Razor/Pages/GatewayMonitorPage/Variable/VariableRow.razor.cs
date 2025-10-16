@@ -179,7 +179,7 @@ public partial class VariableRow
         }
         else
         {
-            return FixedCellClassStringCache.GetOrAdd(col, col => CssBuilder.Default(col.GetFieldName())
+            return FixedCellClassStringCache.GetOrAdd(col, col => CssBuilder.Default()
     .AddClass("fixed", col.Fixed)
     .AddClass("fixed-right", col.Fixed && IsTail(col))
     .AddClass("fr", IsLastColumn(col))

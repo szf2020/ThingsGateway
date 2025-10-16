@@ -87,22 +87,25 @@ public partial class VariableRuntimeInfo
     private ITableColumn[] _cachedFields = Array.Empty<ITableColumn>();
 
     [JSInvokable]
-    public List<CellValue> TriggerStateChanged(int rowIndex)
+    public List<List<string>> TriggerStateChanged()
     {
         try
         {
-
             if (table == null) return null;
-            var row = table.Rows[rowIndex];
+            List<List<string>> ret = new();
             if (_cachedFields.Length == 0) _cachedFields = table.GetVisibleColumns.ToArray();
-            var list = new List<CellValue>(_cachedFields.Length);
-            foreach (var col in _cachedFields)
+            foreach (var row in table.Rows)
             {
-                var fieldName = col.GetFieldName();
-                list.Add(new(fieldName, VariableModelUtils.GetValue(row,fieldName)));
+                var list = new List<string>(_cachedFields.Length);
+                foreach (var col in _cachedFields)
+                {
+                    var fieldName = col.GetFieldName();
+                    list.Add(VariableModelUtils.GetValue(row, fieldName));
+                }
+                ret.Add(list);
             }
 
-            return list;
+            return ret;
 
         }
         catch (Exception)
