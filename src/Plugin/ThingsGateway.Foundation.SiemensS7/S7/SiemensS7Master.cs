@@ -118,20 +118,20 @@ public partial class SiemensS7Master : DeviceBase
                 return new DeviceSingleStreamDataHandleAdapter<S7Message>
                 {
                     CacheTimeout = TimeSpan.FromMilliseconds(Channel.ChannelOptions.CacheTimeout),
-                    IsSingleThread = false
+                    //IsSingleThread = false
                 };
 
             case ChannelTypeEnum.UdpSession:
                 return new DeviceUdpDataHandleAdapter<S7Message>()
                 {
-                    IsSingleThread = false
+                    //IsSingleThread = false
                 };
         }
 
         return new DeviceSingleStreamDataHandleAdapter<S7Message>
         {
             CacheTimeout = TimeSpan.FromMilliseconds(Channel.ChannelOptions.CacheTimeout),
-            IsSingleThread = false
+            //IsSingleThread = false
         };
     }
 
