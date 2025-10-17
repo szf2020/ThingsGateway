@@ -71,7 +71,7 @@ public partial class VariableRuntimeInfo
         string? ret = null;
         if (col.Fixed)
         {
-            ret = IsTail(col,row) ? GetRightStyle(col,row, margin) : GetLeftStyle(col, row);
+            ret = IsTail(col, row) ? GetRightStyle(col, row, margin) : GetLeftStyle(col, row);
         }
         return ret;
     }
@@ -135,7 +135,7 @@ public partial class VariableRuntimeInfo
     public int ExtendButtonColumnWidth { get; set; } = 220;
 
 
-    private bool IsTail(ITableColumn col,TableRowContext<VariableRuntime> row)
+    private bool IsTail(ITableColumn col, TableRowContext<VariableRuntime> row)
     {
         var middle = Math.Floor(row.Columns.Count() * 1.0 / 2);
         var index = Columns.IndexOf(col);
@@ -145,16 +145,13 @@ public partial class VariableRuntimeInfo
     /// <summary>
     /// 获得 Cell 文字样式
     /// </summary>
-    /// <param name="col"></param>
-    /// <param name="hasChildren"></param>
-    /// <param name="inCell"></param>
-    /// <returns></returns>
-    protected string? GetCellClassString(ITableColumn col, bool hasChildren, bool inCell)
+    protected string? GetCellClassString(ITableColumn col, string data, bool hasChildren, bool inCell)
     {
-
-            bool trigger = false;
+        bool trigger = false;
         return CssBuilder.Default("table-cell")
 .AddClass(col.GetAlign().ToDescriptionString(), col.Align == Alignment.Center || col.Align == Alignment.Right)
+.AddClass("green--text", data == "Online")
+.AddClass("red--text", data == "Offline")
 .AddClass("is-wrap", col.GetTextWrap())
 .AddClass("is-ellips", col.GetTextEllipsis())
 .AddClass("is-tips", col.GetShowTips())
@@ -177,46 +174,46 @@ public partial class VariableRuntimeInfo
     {
         return CssBuilder.Default()
       .AddClass("fixed", col.Fixed)
-      .AddClass("fixed-right", col.Fixed && IsTail(col,row))
+      .AddClass("fixed-right", col.Fixed && IsTail(col, row))
       .AddClass("fr", IsLastColumn(col, row))
       .AddClass("fl", IsFirstColumn(col, row))
       .Build();
 
     }
 
-    public List<ITableColumn> Columns=> table?.Columns;
+    public List<ITableColumn> Columns => table?.Columns;
 
     private bool IsLastColumn(ITableColumn col, TableRowContext<VariableRuntime> row)
     {
-                var ret = false;
-                if (col.Fixed && !IsTail(col, row))
-                {
-                    var index = Columns.IndexOf(col) + 1;
-                    ret = index < Columns.Count && Columns[index].Fixed == false;
-                }
-                return ret;
-  
+        var ret = false;
+        if (col.Fixed && !IsTail(col, row))
+        {
+            var index = Columns.IndexOf(col) + 1;
+            ret = index < Columns.Count && Columns[index].Fixed == false;
+        }
+        return ret;
+
     }
     private bool IsFirstColumn(ITableColumn col, TableRowContext<VariableRuntime> row)
     {
-        
-                var ret = false;
-                if (col.Fixed && IsTail(col, row))
-                {
-                    // 查找前一列是否固定
-                    var index = Columns.IndexOf(col) - 1;
-                    if (index > 0)
-                    {
-                        ret = !Columns[index].Fixed;
-                    }
-                }
-                return ret;
+
+        var ret = false;
+        if (col.Fixed && IsTail(col, row))
+        {
+            // 查找前一列是否固定
+            var index = Columns.IndexOf(col) - 1;
+            if (index > 0)
+            {
+                ret = !Columns[index].Fixed;
+            }
+        }
+        return ret;
     }
 
     #endregion
 
     #region js
- 
+
     protected override Task InvokeInitAsync() => InvokeVoidAsync("init", Id, Interop, new { Method = nameof(TriggerStateChanged) });
 
     private Task OnColumnVisibleChanged(string name, bool visible)

@@ -72,6 +72,19 @@ export function init(id, invoke, options) {
                             cellDiv.innerText = cellValue ?? '';
                         }
                     }
+                    if (cellValue == "Online") {
+                        cellDiv.classList.remove('red--text');
+                        cellDiv.classList.add('green--text');
+                    }
+                    else if (cellValue == "Offline") {
+                        cellDiv.classList.remove('green--text');
+                        cellDiv.classList.add('red--text');
+                    }
+                    else {
+                        cellDiv.classList.remove('red--text');
+                        cellDiv.classList.remove('green--text');
+
+                    }
                 }
 
                 //// 查找 switch

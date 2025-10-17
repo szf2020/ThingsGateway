@@ -11,7 +11,7 @@ namespace ThingsGateway.Gateway.Razor;
 public static class VariableModelUtils
 {
     static MemoryCache MemoryCache = new();
-    public static object GetPropertyValue(VariableRuntime model, string fieldName)
+    private static object GetPropertyValue(VariableRuntime model, string fieldName)
     {
         if (model == null)
         {
@@ -31,6 +31,7 @@ public static class VariableModelUtils
             return ret;
         }
     }
+
     /// <summary>
     /// 获取属性方法 Lambda 表达式
     /// </summary>
@@ -38,7 +39,7 @@ public static class VariableModelUtils
     /// <typeparam name="TResult"></typeparam>
     /// <param name="propertyName"></param>
     /// <returns></returns>
-    public static Expression<Func<TModel, TResult>> GetPropertyValueLambda<TModel, TResult>(string propertyName) where TModel : class, new()
+    private static Expression<Func<TModel, TResult>> GetPropertyValueLambda<TModel, TResult>(string propertyName) where TModel : class, new()
     {
 
         var type = typeof(TModel);
@@ -99,26 +100,26 @@ public static class VariableModelUtils
         switch (fieldName)
         {
             case nameof(VariableRuntime.Value):
-             return row.Value?.ToSystemTextJsonString(false) ?? string.Empty;
+                return row.Value?.ToSystemTextJsonString(false) ?? string.Empty;
             case nameof(VariableRuntime.RawValue):
-             return row.RawValue?.ToSystemTextJsonString(false) ?? string.Empty;
+                return row.RawValue?.ToSystemTextJsonString(false) ?? string.Empty;
             case nameof(VariableRuntime.LastSetValue):
-             return row.LastSetValue?.ToSystemTextJsonString(false) ?? string.Empty;
+                return row.LastSetValue?.ToSystemTextJsonString(false) ?? string.Empty;
             case nameof(VariableRuntime.ChangeTime):
-                return row.ChangeTime.ToString("dd-HH:mm:ss.fff");
+                return row.ChangeTime.ToString("MM-dd HH:mm:ss.fff");
 
             case nameof(VariableRuntime.CollectTime):
-                return row.CollectTime.ToString("dd-HH:mm:ss.fff");
+                return row.CollectTime.ToString("MM-dd HH:mm:ss.fff");
 
             case nameof(VariableRuntime.IsOnline):
-                return row.IsOnline.ToString();
+                return row.IsOnline ? "Online" : "Offline";
 
             case nameof(VariableRuntime.LastErrorMessage):
-              return row.LastErrorMessage;
+                return row.LastErrorMessage;
 
 
             case nameof(VariableRuntime.RuntimeType):
-              return row.RuntimeType;
+                return row.RuntimeType;
             default:
 
                 var ret = VariableModelUtils.GetPropertyValue(row, fieldName);
@@ -136,7 +137,7 @@ public static class VariableModelUtils
                         }
                     }
                 }
-                return  ret is string str ? str : ret?.ToString() ?? string.Empty;
+                return ret is string str ? str : ret?.ToString() ?? string.Empty;
         }
     }
 

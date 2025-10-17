@@ -97,16 +97,20 @@
         @foreach (var col in context.Columns)
         {
             <td class="@GetFixedCellClassString(col, context)" style="@GetFixedCellStyleString(col, context)" @key=col>
-                <div class="@GetCellClassString(col, false, false)" @key=col>
+                @{
+                    var name = col.GetFieldName();
+                    var data = VariableModelUtils.GetValue(context.Row, name);
+                }
+                <div class="@GetCellClassString(col, data, false, false)" @key=col>
                     @if (col.GetShowTips())
                     {
-                        <Tooltip @key=col Title="@VariableModelUtils.GetValue(context.Row, col.GetFieldName())" class="text-truncate d-block">
-                            @VariableModelUtils.GetValue(context.Row, col.GetFieldName())
+                        <Tooltip @key=col Title="@VariableModelUtils.GetValue(context.Row, name)" class="text-truncate d-block">
+                            @data
                         </Tooltip>
                     }
                     else
                     {
-                        @VariableModelUtils.GetValue(context.Row, col.GetFieldName())
+                        @data
                     }
                 </div>
             </td>
