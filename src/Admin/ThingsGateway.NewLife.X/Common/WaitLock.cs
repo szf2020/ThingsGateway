@@ -90,15 +90,50 @@ public sealed class WaitLock : IDisposable
     /// </summary>
     public Task WaitAsync(CancellationToken cancellationToken = default)
     {
-        return _waiterLock.WaitAsync(cancellationToken);
+#if NET6_0_OR_GREATER
+        if (cancellationToken.CanBeCanceled)
+            return WaitUntilCountOrTimeoutAsync(_waiterLock.WaitAsync(Timeout.Infinite, CancellationToken.None), Timeout.Infinite, cancellationToken);
+        else
+            return _waiterLock.WaitAsync(Timeout.Infinite, CancellationToken.None);
+
+#else
+        return _waiterLock.WaitAsync(Timeout.Infinite,cancellationToken);
+#endif
     }
+
+#if NET6_0_OR_GREATER
+    /// <summary>Performs the asynchronous wait.</summary>
+    /// <param name="asyncWaiter">The asynchronous waiter.</param>
+    /// <param name="millisecondsTimeout">The timeout.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>The task to return to the caller.</returns>
+    private Task<bool> WaitUntilCountOrTimeoutAsync(Task<bool> asyncWaiter, int millisecondsTimeout, CancellationToken cancellationToken)
+    {
+        if (millisecondsTimeout == Timeout.Infinite)
+        {
+            return (asyncWaiter.WaitAsync(cancellationToken));
+        }
+        else
+        {
+            return (asyncWaiter.WaitAsync(TimeSpan.FromMilliseconds(millisecondsTimeout), cancellationToken));
+        }
+    }
+#endif
 
     /// <summary>
     /// 进入锁
     /// </summary>
     public Task<bool> WaitAsync(int millisecondsTimeout, CancellationToken cancellationToken = default)
     {
-        return _waiterLock.WaitAsync(millisecondsTimeout, cancellationToken);
+#if NET6_0_OR_GREATER
+        if (cancellationToken.CanBeCanceled || millisecondsTimeout != Timeout.Infinite)
+            return WaitUntilCountOrTimeoutAsync(_waiterLock.WaitAsync(Timeout.Infinite, CancellationToken.None), millisecondsTimeout, cancellationToken);
+        else
+            return _waiterLock.WaitAsync(Timeout.Infinite, CancellationToken.None);
+
+#else
+        return _waiterLock.WaitAsync(millisecondsTimeout,cancellationToken);
+#endif
     }
 
     bool DisposedValue;

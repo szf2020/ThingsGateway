@@ -62,7 +62,7 @@ public class ExpiringDictionary<TKey, TValue> : IDisposable
         this.comparer = comparer;
         _dict = new NonBlockingDictionary<TKey, CacheItem>(comparer);
 
-        _cleanupTimer = new TimerX(TimerClear, null, 10000, 10000) { Async = true };
+        _cleanupTimer = new TimerX(TimerClear, null, 60000, 60000) { Async = true };
     }
 
     public bool TryAdd(TKey key, TValue value)

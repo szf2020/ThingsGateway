@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+﻿using PooledAwait;
 
 using ThingsGateway.NewLife.Collections;
 using ThingsGateway.NewLife.Log;
@@ -244,7 +244,7 @@ public class TimerScheduler : IDisposable, ILogFeature
                         // 必须在主线程设置状态，否则可能异步线程还没来得及设置开始状态，主线程又开始了新的一轮调度
                         timer.Calling = true;
                         if (timer.IsAsyncTask)
-                            ExecuteAsync(timer);
+                            _ = ExecuteAsync(timer);
                         //Task.Factory.StartNew(ExecuteAsync, timer, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
                         else if (!timer.Async)
                             Execute(timer);
@@ -321,8 +321,7 @@ public class TimerScheduler : IDisposable, ILogFeature
         string tracerName = timer.TracerName ?? "timer:ExecuteAsync";
         string timerArg = timer.Timers.ToString();
         using var span = timer.Tracer?.NewSpan(tracerName, timerArg);
-        var sw = _stopwatchPool.Get();
-        sw.Restart();
+        var sw = ValueStopwatch.StartNew();
         try
         {
             // 弱引用判断
@@ -350,92 +349,89 @@ public class TimerScheduler : IDisposable, ILogFeature
         }
         finally
         {
-            sw.Stop();
-
-            OnExecuted(timer, (Int32)sw.ElapsedMilliseconds);
-
-            _stopwatchPool.Return(sw);
+            var ms = sw.GetElapsedTime().TotalMilliseconds;
+            OnExecuted(timer, (Int32)ms);
         }
     }
-    private static ObjectPool<Stopwatch> _stopwatchPool { get; } = new ObjectPool<Stopwatch>();
 
     /// <summary>处理每一个定时器</summary>
     /// <param name="state"></param>
-    private async void ExecuteAsync(Object? state)
+    private Task ExecuteAsync(Object? state)
     {
-        if (state is not TimerX timer) return;
-
-        //TimerX.Current = timer;
-
-        // 控制日志显示
-        //WriteLogEventArgs.CurrentThreadName = Name == "Default" ? "T" : Name;
-
-        timer.hasSetNext = false;
-
-        string tracerName = timer.TracerName ?? "timer:ExecuteAsync";
-        string timerArg = timer.Timers.ToString();
-        using var span = timer.Tracer?.NewSpan(tracerName, timerArg);
-        var sw = _stopwatchPool.Get();
-        sw.Restart();
-        try
+        return ExecuteAsync(this, state);
+        static async PooledTask ExecuteAsync(TimerScheduler @this, Object? state)
         {
-            // 弱引用判断
-            var target = timer.Target.Target;
-            if (target == null && !timer.Method.IsStatic)
+            if (state is not TimerX timer) return;
+
+            //TimerX.Current = timer;
+
+            // 控制日志显示
+            //WriteLogEventArgs.CurrentThreadName = Name == "Default" ? "T" : Name;
+
+            timer.hasSetNext = false;
+
+            string tracerName = timer.TracerName ?? "timer:ExecuteAsync";
+            string timerArg = timer.Timers.ToString();
+            using var span = timer.Tracer?.NewSpan(tracerName, timerArg);
+            var sw = ValueStopwatch.StartNew();
+            try
             {
-                Remove(timer, "委托已不存在（GC回收委托所在对象）");
-                timer.Dispose();
-                return;
-            }
+                // 弱引用判断
+                var target = timer.Target.Target;
+                if (target == null && !timer.Method.IsStatic)
+                {
+                    @this.Remove(timer, "委托已不存在（GC回收委托所在对象）");
+                    timer.Dispose();
+                    return;
+                }
 
 
 
 #if NET6_0_OR_GREATER
-            if (timer.IsValueTask)
-            {
-                if (timer.ValueTaskCachedDelegate == null)
+                if (timer.IsValueTask)
                 {
-                    timer.ValueTaskCachedDelegate = timer.Method.As<Func<Object?, ValueTask>>(target);
-                }
+                    if (timer.ValueTaskCachedDelegate == null)
+                    {
+                        timer.ValueTaskCachedDelegate = timer.Method.As<Func<Object?, ValueTask>>(target);
+                    }
 
-                //var func = timer.Method.As<Func<Object?, ValueTask>>(target);
-                var task = timer.ValueTaskCachedDelegate!(timer.State);
-                if (!task.IsCompleted)
-                    await task.ConfigureAwait(false);
-            }
-            else
+                    //var func = timer.Method.As<Func<Object?, ValueTask>>(target);
+                    var task = timer.ValueTaskCachedDelegate!(timer.State);
+                    if (!task.IsCompleted)
+                        await task.ConfigureAwait(false);
+                }
+                else
 #endif
-            {
-                if (timer.TaskCachedDelegate == null)
                 {
-                    timer.TaskCachedDelegate = timer.Method.As<Func<Object?, Task>>(target);
+                    if (timer.TaskCachedDelegate == null)
+                    {
+                        timer.TaskCachedDelegate = timer.Method.As<Func<Object?, Task>>(target);
+                    }
+
+                    //var func = timer.Method.As<Func<Object?, Task>>(target);
+                    var task = timer.TaskCachedDelegate!(timer.State);
+                    if (!task.IsCompleted)
+                        await task.ConfigureAwait(false);
                 }
 
-                //var func = timer.Method.As<Func<Object?, Task>>(target);
-                var task = timer.TaskCachedDelegate!(timer.State);
-                if (!task.IsCompleted)
-                    await task.ConfigureAwait(false);
             }
+            catch (ThreadAbortException) { throw; }
+            catch (ThreadInterruptedException) { throw; }
+            // 如果用户代码没有拦截错误，则这里拦截，避免出错了都不知道怎么回事
+            catch (Exception ex)
+            {
+                span?.SetError(ex, null);
+                XTrace.WriteException(ex);
+            }
+            finally
+            {
+                var ms = sw.GetElapsedTime().TotalMilliseconds;
 
-        }
-        catch (ThreadAbortException) { throw; }
-        catch (ThreadInterruptedException) { throw; }
-        // 如果用户代码没有拦截错误，则这里拦截，避免出错了都不知道怎么回事
-        catch (Exception ex)
-        {
-            span?.SetError(ex, null);
-            XTrace.WriteException(ex);
-        }
-        finally
-        {
-            sw.Stop();
+                @this.OnExecuted(timer, (Int32)ms);
 
-            OnExecuted(timer, (Int32)sw.ElapsedMilliseconds);
-
-            _stopwatchPool.Return(sw);
+            }
         }
     }
-
     private void OnExecuted(TimerX timer, Int32 ms)
     {
         timer.Cost = timer.Cost == 0 ? ms : (timer.Cost + ms) / 2;

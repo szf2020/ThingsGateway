@@ -35,11 +35,11 @@ public class TimeoutBenchmark
             }
     }
 
-    private ObjectPool<ReusableCancellationTokenSource> _reusableTimeouts;
+    private ObjectPoolLock<ReusableCancellationTokenSource> _reusableTimeouts;
     [Benchmark]
     public async ValueTask ReusableTimeoutWaitAsync()
     {
-        _reusableTimeouts ??= new();
+        _reusableTimeouts ??= new ObjectPoolLock<ReusableCancellationTokenSource>();
         using var otherCts = new CancellationTokenSource();
         for (int i1 = 0; i1 < 10; i1++)
             for (int i = 0; i < 10; i++)

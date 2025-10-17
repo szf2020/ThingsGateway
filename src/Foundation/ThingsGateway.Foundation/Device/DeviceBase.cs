@@ -10,6 +10,8 @@
 
 using Newtonsoft.Json.Linq;
 
+using PooledAwait;
+
 using System.Net;
 
 using ThingsGateway.Foundation.Extension.Generic;
@@ -496,16 +498,21 @@ public abstract class DeviceBase : AsyncAndSyncDisposableObject, IDevice
     }
 
     /// <inheritdoc/>
-    public virtual async ValueTask<OperResult<ReadOnlyMemory<byte>>> SendThenReturnAsync(ISendMessage sendMessage, IClientChannel channel, CancellationToken cancellationToken = default)
+    public virtual ValueTask<OperResult<ReadOnlyMemory<byte>>> SendThenReturnAsync(ISendMessage sendMessage, IClientChannel channel, CancellationToken cancellationToken = default)
     {
-        try
+        return SendThenReturn(this, sendMessage, channel, cancellationToken);
+
+        static async PooledValueTask<OperResult<ReadOnlyMemory<byte>>> SendThenReturn(DeviceBase @this, ISendMessage sendMessage, IClientChannel channel, CancellationToken cancellationToken)
         {
-            var result = await SendThenReturnMessageAsync(sendMessage, channel, cancellationToken).ConfigureAwait(false);
-            return new OperResult<ReadOnlyMemory<byte>>(result) { Content = result.Content };
-        }
-        catch (Exception ex)
-        {
-            return new(ex);
+            try
+            {
+                var result = await @this.SendThenReturnMessageAsync(sendMessage, channel, cancellationToken).ConfigureAwait(false);
+                return new OperResult<ReadOnlyMemory<byte>>(result) { Content = result.Content };
+            }
+            catch (Exception ex)
+            {
+                return new(ex);
+            }
         }
     }
 
@@ -523,48 +530,83 @@ public abstract class DeviceBase : AsyncAndSyncDisposableObject, IDevice
         return GetResponsedDataAsync(command, clientChannel, Timeout, cancellationToken);
     }
 
-    private ObjectPool<ReusableCancellationTokenSource> _reusableTimeouts = new();
+    private ObjectPoolLock<ReusableCancellationTokenSource> _reusableTimeouts = new();
+    
     /// <summary>
     /// 发送并等待数据
     /// </summary>
-    protected async ValueTask<MessageBase> GetResponsedDataAsync(
+    protected ValueTask<MessageBase> GetResponsedDataAsync(
         ISendMessage command,
         IClientChannel clientChannel,
         int timeout = 3000,
         CancellationToken cancellationToken = default)
     {
-        var waitData = clientChannel.WaitHandlePool.GetWaitDataAsync(out var sign);
-        command.Sign = sign;
-        WaitLock? waitLock = null;
+        return GetResponsedDataAsync(this, command, clientChannel, timeout, cancellationToken);
 
-        try
+        static async PooledValueTask<MessageBase> GetResponsedDataAsync(DeviceBase @this, ISendMessage command, IClientChannel clientChannel, int timeout, CancellationToken cancellationToken)
         {
-            await BeforeSendAsync(clientChannel, cancellationToken).ConfigureAwait(false);
+            var waitData = clientChannel.WaitHandlePool.GetWaitDataAsync(out var sign);
+            command.Sign = sign;
+            WaitLock? waitLock = null;
 
-            waitLock = GetWaitLock(clientChannel);
-
-            await waitLock.WaitAsync(cancellationToken).ConfigureAwait(false);
-
-            clientChannel.SetDataHandlingAdapterLogger(Logger);
-
-            await SendAsync(command, clientChannel, cancellationToken).ConfigureAwait(false);
-
-            if (waitData.Status == WaitDataStatus.Success)
-                return waitData.CompletedData;
-
-            var reusableTimeout = _reusableTimeouts.Get();
-            var cts = reusableTimeout.GetTokenSource(timeout, cancellationToken, Channel.ClosedToken);
             try
             {
+                await @this.BeforeSendAsync(clientChannel, cancellationToken).ConfigureAwait(false);
 
-                await waitData.WaitAsync(cts.Token).ConfigureAwait(false);
+                waitLock = @this.GetWaitLock(clientChannel);
 
-            }
-            catch (OperationCanceledException)
-            {
-                return reusableTimeout.TimeoutStatus
-                    ? new MessageBase(new TimeoutException()) { ErrorMessage = $"Timeout, sign: {sign}" }
-                    : new MessageBase(new OperationCanceledException());
+                await waitLock.WaitAsync(cancellationToken).ConfigureAwait(false);
+
+                clientChannel.SetDataHandlingAdapterLogger(@this.Logger);
+
+                await @this.SendAsync(command, clientChannel, cancellationToken).ConfigureAwait(false);
+
+                if (waitData.Status == WaitDataStatus.Success)
+                    return waitData.CompletedData;
+
+                var reusableTimeout = @this._reusableTimeouts.Get();
+                try
+                {
+
+                    var cts = reusableTimeout.GetTokenSource(timeout, cancellationToken, @this.Channel.ClosedToken);
+                    await waitData.WaitAsync(cts.Token).ConfigureAwait(false);
+
+                }
+                catch (OperationCanceledException)
+                {
+                    return reusableTimeout.TimeoutStatus
+                        ? new MessageBase(new TimeoutException()) { ErrorMessage = $"Timeout, sign: {sign}" }
+                        : new MessageBase(new OperationCanceledException());
+                }
+                catch (Exception ex)
+                {
+                    return new MessageBase(ex);
+                }
+                finally
+                {
+                    reusableTimeout.Set();
+                    @this._reusableTimeouts.Return(reusableTimeout);
+                }
+
+                if (waitData.Status == WaitDataStatus.Success)
+                {
+                    return waitData.CompletedData;
+                }
+                else
+                {
+                    var operResult = waitData.Check(reusableTimeout.TimeoutStatus);
+                    if (waitData.CompletedData != null)
+                    {
+                        waitData.CompletedData.ErrorMessage = $"{operResult.ErrorMessage}, sign: {sign}";
+                        return waitData.CompletedData;
+                    }
+                    else
+                    {
+                        return new MessageBase(new OperationCanceledException());
+                    }
+
+                    //return new MessageBase(operResult) { ErrorMessage = $"{operResult.ErrorMessage}, sign: {sign}" };
+                }
             }
             catch (Exception ex)
             {
@@ -572,39 +614,10 @@ public abstract class DeviceBase : AsyncAndSyncDisposableObject, IDevice
             }
             finally
             {
-                reusableTimeout.Set();
-                _reusableTimeouts.Return(reusableTimeout);
-            }
+                waitLock?.Release();
+                waitData?.SafeDispose();
 
-            if (waitData.Status == WaitDataStatus.Success)
-            {
-                return waitData.CompletedData;
             }
-            else
-            {
-                var operResult = waitData.Check(reusableTimeout.TimeoutStatus);
-                if(waitData.CompletedData!=null)
-                {
-                    waitData.CompletedData.ErrorMessage = $"{operResult.ErrorMessage}, sign: {sign}";
-                    return waitData.CompletedData;
-                }
-                else
-                {
-                    return new MessageBase(new OperationCanceledException());
-                }
-
-                //return new MessageBase(operResult) { ErrorMessage = $"{operResult.ErrorMessage}, sign: {sign}" };
-            }
-        }
-        catch (Exception ex)
-        {
-            return new MessageBase(ex);
-        }
-        finally
-        {
-            waitLock?.Release();
-            waitData?.SafeDispose();
-
         }
     }
 

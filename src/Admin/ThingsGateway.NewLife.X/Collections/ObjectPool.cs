@@ -31,8 +31,8 @@ public class ObjectPool<T> : DisposeBase, IPool<T> where T : notnull
     /// <summary>最小个数。默认1</summary>
     public Int32 Min { get; set; } = 1;
 
-    /// <summary>空闲清理时间。最小个数之上的资源超过空闲时间时被清理，默认10s</summary>
-    public Int32 IdleTime { get; set; } = 10;
+    /// <summary>空闲清理时间。最小个数之上的资源超过空闲时间时被清理，默认60s</summary>
+    public Int32 IdleTime { get; set; } = 60;
 
     /// <summary>完全空闲清理时间。最小个数之下的资源超过空闲时间时被清理，默认0s永不清理</summary>
     public Int32 AllIdleTime { get; set; } = 0;
@@ -126,9 +126,7 @@ public class ObjectPool<T> : DisposeBase, IPool<T> where T : notnull
                 if (Max > 0 && count >= Max)
                 {
                     var msg = $"申请失败，已有 {count:n0} 达到或超过最大值 {Max:n0}";
-
                     WriteLog("Acquire Max " + msg);
-
                     throw new Exception(Name + " " + msg);
                 }
 
@@ -268,7 +266,7 @@ public class ObjectPool<T> : DisposeBase, IPool<T> where T : notnull
         {
             if (_timer != null) return;
 
-            _timer = new TimerX(Work, null, 5000, 5000) { Async = true };
+            _timer = new TimerX(Work, null, 60000, 60000) { Async = true };
         }
     }
 
@@ -281,7 +279,7 @@ public class ObjectPool<T> : DisposeBase, IPool<T> where T : notnull
         var count = 0;
 
         // 清理过期不还。避免有借没还
-        if (!_busy.IsEmpty)
+        if (AllIdleTime > 0 && !_busy.IsEmpty)
         {
             var exp = TimerX.Now.AddSeconds(-AllIdleTime);
             foreach (var item in _busy)

@@ -48,10 +48,14 @@ namespace BenchmarkConsoleApp
             //.WithOptions(ConfigOptions.DisableOptimizationsValidator)
             //);
 
-            BenchmarkRunner.Run<ModbusBenchmark>(
+            BenchmarkRunner.Run<SemaphoreBenchmark>(
        ManualConfig.Create(DefaultConfig.Instance)
            .WithOptions(ConfigOptions.DisableOptimizationsValidator)
    );
+//            BenchmarkRunner.Run<ModbusBenchmark>(
+//ManualConfig.Create(DefaultConfig.Instance)
+//.WithOptions(ConfigOptions.DisableOptimizationsValidator)
+//);
             //            BenchmarkRunner.Run<S7Benchmark>(
             //ManualConfig.Create(DefaultConfig.Instance)
             //.WithOptions(ConfigOptions.DisableOptimizationsValidator)

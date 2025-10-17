@@ -1,4 +1,6 @@
-﻿using ThingsGateway.NewLife;
+﻿using PooledAwait;
+
+using ThingsGateway.NewLife;
 using ThingsGateway.NewLife.Threading;
 
 using TouchSocket.Core;
@@ -67,48 +69,52 @@ public class CronScheduledTask : DisposeBase, IScheduledTask
             _timer = new TimerX(TimerCallbackAsync, _state, _interval, nameof(CronScheduledTask)) { Async = true, Reentrant = false };
     }
 
-    private async ValueTask TimerCallbackAsync(object? state)
+    private ValueTask TimerCallbackAsync(object? state)
     {
-        if (Check()) return;
-        if (_taskFunc == null && _valueTaskFunc == null)
+        return TimerCallbackAsync(this, state);
+        static async PooledValueTask TimerCallbackAsync(CronScheduledTask @this, object? state)
         {
-            Dispose();
-            return;
-        }
-
-        Interlocked.Increment(ref _pendingTriggers);
-
-        if (Interlocked.Exchange(ref _isRunning, 1) == 1)
-            return;
-
-        // 减少一个触发次数
-        Interlocked.Decrement(ref _pendingTriggers);
-
-        try
-        {
-            if (_taskFunc != null)
-                await _taskFunc(state, _token).ConfigureAwait(false);
-            else if (_valueTaskFunc != null)
-                await _valueTaskFunc(state, _token).ConfigureAwait(false);
-        }
-        catch (OperationCanceledException)
-        {
-        }
-        catch (Exception ex)
-        {
-            LogMessage?.LogWarning(ex);
-        }
-        finally
-        {
-            Interlocked.Exchange(ref _isRunning, 0);
-        }
-
-        if (Interlocked.Exchange(ref _pendingTriggers, 0) >= 1)
-        {
-            if (!Check())
+            if (@this.Check()) return;
+            if (@this._taskFunc == null && @this._valueTaskFunc == null)
             {
-                int nextValue = next;
-                SetNext(nextValue);
+                @this.Dispose();
+                return;
+            }
+
+            Interlocked.Increment(ref @this._pendingTriggers);
+
+            if (Interlocked.Exchange(ref @this._isRunning, 1) == 1)
+                return;
+
+            // 减少一个触发次数
+            Interlocked.Decrement(ref @this._pendingTriggers);
+
+            try
+            {
+                if (@this._taskFunc != null)
+                    await @this._taskFunc(state, @this._token).ConfigureAwait(false);
+                else if (@this._valueTaskFunc != null)
+                    await @this._valueTaskFunc(state, @this._token).ConfigureAwait(false);
+            }
+            catch (OperationCanceledException)
+            {
+            }
+            catch (Exception ex)
+            {
+                @this.LogMessage?.LogWarning(ex);
+            }
+            finally
+            {
+                Interlocked.Exchange(ref @this._isRunning, 0);
+            }
+
+            if (Interlocked.Exchange(ref @this._pendingTriggers, 0) >= 1)
+            {
+                if (!@this.Check())
+                {
+                    int nextValue = @this.next;
+                    @this.SetNext(nextValue);
+                }
             }
         }
     }

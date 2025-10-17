@@ -102,33 +102,77 @@ public static partial class DeviceExtension
     public static OperResult PraseStructContent<T>(this IEnumerable<T> variables, IDevice device, ReadOnlySpan<byte> buffer, bool exWhenAny) where T : IVariable
     {
         var time = DateTime.Now;
-        var result = OperResult.Success;
-        foreach (var variable in variables)
+        if (variables is IList<T> collection)
         {
-            IThingsGatewayBitConverter byteConverter = variable.ThingsGatewayBitConverter;
-            var dataType = variable.DataType;
-            int index = variable.Index;
-            try
-            {
-                var changed = byteConverter.GetChangedDataFormBytes(device, variable.RegisterAddress, buffer, index, dataType, variable.ArrayLength ?? 1, variable.RawValue, out var data);
-                if (changed)
-                {
-                    result = variable.SetValue(data, time);
-                    if (exWhenAny)
-                        if (!result.IsSuccess)
-                            return result;
-                }
-                else
-                {
-                    variable.SetNoChangedValue(time);
-                }
-            }
-            catch (Exception ex)
-            {
-                return new OperResult($"Error parsing byte array, address: {variable.RegisterAddress}, array length: {buffer.Length}, index: {index}, type: {dataType}", ex);
-            }
+            return PraseCollection(collection, device, buffer, exWhenAny, time);
         }
-        return result;
+        else
+        {
+            return PraseEnumerable(variables, device, buffer, exWhenAny, time);
+
+        }
+        static OperResult PraseEnumerable(IEnumerable<T> variables, IDevice device, ReadOnlySpan<byte> buffer, bool exWhenAny, DateTime time)
+        {
+            foreach (var variable in variables)
+            {
+                IThingsGatewayBitConverter byteConverter = variable.ThingsGatewayBitConverter;
+                var dataType = variable.DataType;
+                int index = variable.Index;
+                try
+                {
+                    var changed = byteConverter.GetChangedDataFormBytes(device, variable.RegisterAddress, buffer, index, dataType, variable.ArrayLength ?? 1, variable.RawValue, out var data);
+                    if (changed)
+                    {
+                        var result = variable.SetValue(data, time);
+                        if (exWhenAny)
+                            if (!result.IsSuccess)
+                                return result;
+                    }
+                    else
+                    {
+                        variable.SetNoChangedValue(time);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    return new OperResult($"Error parsing byte array, address: {variable.RegisterAddress}, array length: {buffer.Length}, index: {index}, type: {dataType}", ex);
+                }
+            }
+
+            return OperResult.Success;
+        }
+        static OperResult PraseCollection(IList<T> variables, IDevice device, ReadOnlySpan<byte> buffer, bool exWhenAny, DateTime time)
+        {
+            for (int i = 0; i < variables.Count; i++)
+            {
+                var variable = variables[i];
+
+                IThingsGatewayBitConverter byteConverter = variable.ThingsGatewayBitConverter;
+                var dataType = variable.DataType;
+                int index = variable.Index;
+                try
+                {
+                    var changed = byteConverter.GetChangedDataFormBytes(device, variable.RegisterAddress, buffer, index, dataType, variable.ArrayLength ?? 1, variable.RawValue, out var data);
+                    if (changed)
+                    {
+                        var result = variable.SetValue(data, time);
+                        if (exWhenAny)
+                            if (!result.IsSuccess)
+                                return result;
+                    }
+                    else
+                    {
+                        variable.SetNoChangedValue(time);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    return new OperResult($"Error parsing byte array, address: {variable.RegisterAddress}, array length: {buffer.Length}, index: {index}, type: {dataType}", ex);
+                }
+            }
+
+            return OperResult.Success;
+        }
     }
 
     /// <summary>
