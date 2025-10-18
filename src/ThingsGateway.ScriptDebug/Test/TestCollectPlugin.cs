@@ -162,7 +162,7 @@ public class TestCollectPlugin1 : CollectBase
     /// <param name="state"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    protected override Task TestOnline(object? state, CancellationToken cancellationToken)
+    protected override ValueTask TestOnline(object? state, CancellationToken cancellationToken)
     {
         return base.TestOnline(state, cancellationToken);
     }

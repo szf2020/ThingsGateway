@@ -8,6 +8,8 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
+using PooledAwait;
+
 using System.Diagnostics;
 
 using ThingsGateway.Extension.Generic;
@@ -81,91 +83,101 @@ public partial class QuestDBProducer : BusinessBaseWithCacheIntervalVariable
             AddQueueVarModel(new CacheDBItem<VariableBasicData>(variable));
         }
     }
-    private async ValueTask<OperResult> UpdateVarModel(IEnumerable<VariableBasicData> item, CancellationToken cancellationToken)
+    private ValueTask<OperResult> UpdateVarModel(IEnumerable<VariableBasicData> item, CancellationToken cancellationToken)
     {
-        var result = await InserableAsync(item.WhereIf(_driverPropertys.OnlineFilter, a => a.IsOnline == true).ToList(), cancellationToken).ConfigureAwait(false);
-        if (success != result.IsSuccess)
-        {
-            if (!result.IsSuccess)
-                LogMessage?.LogWarning(result.ToString());
-            success = result.IsSuccess;
-        }
+        return UpdateVarModel(this, item, cancellationToken);
 
-        return result;
+        static async PooledValueTask<OperResult> UpdateVarModel(QuestDBProducer @this, IEnumerable<VariableBasicData> item, CancellationToken cancellationToken)
+        {
+            var result = await @this.InserableAsync(item.WhereIf(@this._driverPropertys.OnlineFilter, a => a.IsOnline == true).ToList(), cancellationToken).ConfigureAwait(false);
+            if (@this.success != result.IsSuccess)
+            {
+                if (!result.IsSuccess)
+                    @this.LogMessage?.LogWarning(result.ToString());
+                @this.success = result.IsSuccess;
+            }
+
+            return result;
+        }
     }
 
     #region 方法
 
-    private async ValueTask<OperResult> InserableAsync(List<VariableBasicData> dbInserts, CancellationToken cancellationToken)
+    private ValueTask<OperResult> InserableAsync(List<VariableBasicData> dbInserts, CancellationToken cancellationToken)
     {
-        try
+        return InserableAsync(this, dbInserts, cancellationToken);
+
+        static async PooledValueTask<OperResult> InserableAsync(QuestDBProducer @this, List<VariableBasicData> dbInserts, CancellationToken cancellationToken)
         {
-            _db.Ado.CancellationToken = cancellationToken;
-            if (!_driverPropertys.BigTextScriptHistoryTable.IsNullOrEmpty())
+            try
             {
-                var getDeviceModel = CSharpScriptEngineExtension.Do<DynamicSQLBase>(_driverPropertys.BigTextScriptHistoryTable);
-                getDeviceModel.Logger = LogMessage;
-
-                await getDeviceModel.DBInsertable(_db, dbInserts, cancellationToken).ConfigureAwait(false);
-            }
-            else
-            {
-                var stringData = dbInserts.Where(a => (!a.IsNumber && a.Value is not bool));
-                var numberData = dbInserts.Where(a => (a.IsNumber || a.Value is bool));
-
-                if (numberData.Any())
+                @this._db.Ado.CancellationToken = cancellationToken;
+                if (!@this._driverPropertys.BigTextScriptHistoryTable.IsNullOrEmpty())
                 {
-                    Stopwatch stopwatch = new();
-                    stopwatch.Start();
-                    var data = numberData.AdaptListQuestDBNumberHistoryValue();
-                    int result = 0;
-                    if (_driverPropertys.RestApi)
-                    {
-                        result = await _db.RestApi(_driverPropertys.HttpPort).BulkCopyAsync(data, _driverPropertys.NumberTableName).ConfigureAwait(false);//不要加分表
-                    }
-                    else
-                    {
-                        result = await _db.Insertable(data).AS(_driverPropertys.NumberTableName).ExecuteCommandAsync(cancellationToken).ConfigureAwait(false);//不要加分表
-                    }
-                    stopwatch.Stop();
+                    var getDeviceModel = CSharpScriptEngineExtension.Do<DynamicSQLBase>(@this._driverPropertys.BigTextScriptHistoryTable);
+                    getDeviceModel.Logger = @this.LogMessage;
 
-                    //var result = await db.Insertable(dbInserts).SplitTable().ExecuteCommandAsync().ConfigureAwait(false);
-                    if (result > 0)
+                    await getDeviceModel.DBInsertable(@this._db, dbInserts, cancellationToken).ConfigureAwait(false);
+                }
+                else
+                {
+                    var stringData = dbInserts.Where(a => (!a.IsNumber && a.Value is not bool));
+                    var numberData = dbInserts.Where(a => (a.IsNumber || a.Value is bool));
+
+                    if (numberData.Any())
                     {
-                        LogMessage?.Trace($"TableName：{_driverPropertys.NumberTableName}，Count：{result}，watchTime:  {stopwatch.ElapsedMilliseconds} ms");
+                        Stopwatch stopwatch = new();
+                        stopwatch.Start();
+                        var data = numberData.AdaptListQuestDBNumberHistoryValue();
+                        int result = 0;
+                        if (@this._driverPropertys.RestApi)
+                        {
+                            result = await @this._db.RestApi(@this._driverPropertys.HttpPort).BulkCopyAsync(data, @this._driverPropertys.NumberTableName).ConfigureAwait(false);//不要加分表
+                        }
+                        else
+                        {
+                            result = await @this._db.Insertable(data).AS(@this._driverPropertys.NumberTableName).ExecuteCommandAsync(cancellationToken).ConfigureAwait(false);//不要加分表
+                        }
+                        stopwatch.Stop();
+
+                        //var result = await db.Insertable(dbInserts).SplitTable().ExecuteCommandAsync().ConfigureAwait(false);
+                        if (result > 0)
+                        {
+                            @this.LogMessage?.Trace($"TableName：{@this._driverPropertys.NumberTableName}，Count：{result}，watchTime:  {stopwatch.ElapsedMilliseconds} ms");
+                        }
+                    }
+
+                    if (stringData.Any())
+                    {
+                        Stopwatch stopwatch = new();
+                        stopwatch.Start();
+                        var data = stringData.AdaptListQuestDBHistoryValue();
+                        int result = 0;
+                        if (@this._driverPropertys.RestApi)
+                        {
+                            result = await @this._db.RestApi(@this._driverPropertys.HttpPort).BulkCopyAsync(data, @this._driverPropertys.StringTableName).ConfigureAwait(false);//不要加分表
+                        }
+                        else
+                        {
+                            result = await @this._db.Insertable(data).AS(@this._driverPropertys.StringTableName).ExecuteCommandAsync(cancellationToken).ConfigureAwait(false);//不要加分表
+                        }
+
+                        stopwatch.Stop();
+
+                        //var result = await db.Insertable(dbInserts).SplitTable().ExecuteCommandAsync().ConfigureAwait(false);
+                        if (result > 0)
+                        {
+                            @this.LogMessage?.Trace($"TableName：{@this._driverPropertys.StringTableName}，Count：{result}，watchTime:  {stopwatch.ElapsedMilliseconds} ms");
+                        }
                     }
                 }
 
-                if (stringData.Any())
-                {
-                    Stopwatch stopwatch = new();
-                    stopwatch.Start();
-                    var data = stringData.AdaptListQuestDBHistoryValue();
-                    int result = 0;
-                    if (_driverPropertys.RestApi)
-                    {
-                        result = await _db.RestApi(_driverPropertys.HttpPort).BulkCopyAsync(data, _driverPropertys.StringTableName).ConfigureAwait(false);//不要加分表
-                    }
-                    else
-                    {
-                        result = await _db.Insertable(data).AS(_driverPropertys.StringTableName).ExecuteCommandAsync(cancellationToken).ConfigureAwait(false);//不要加分表
-                    }
-
-                    stopwatch.Stop();
-
-                    //var result = await db.Insertable(dbInserts).SplitTable().ExecuteCommandAsync().ConfigureAwait(false);
-                    if (result > 0)
-                    {
-                        LogMessage?.Trace($"TableName：{_driverPropertys.StringTableName}，Count：{result}，watchTime:  {stopwatch.ElapsedMilliseconds} ms");
-                    }
-                }
+                return OperResult.Success;
             }
-
-            return OperResult.Success;
-        }
-        catch (Exception ex)
-        {
-            return new OperResult(ex);
+            catch (Exception ex)
+            {
+                return new OperResult(ex);
+            }
         }
     }
 

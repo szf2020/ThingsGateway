@@ -321,6 +321,33 @@ public partial class ChannelDeviceTree
         return "enable--text";
     }
 
+    private static string GetClass(ChannelDeviceTreeItemStruct item)
+    {
+        if (item.TryGetChannelRuntime(out var channelRuntime))
+        {
+            return channelRuntime.DeviceThreadManage != null ? " enable--text" : " disabled--text ";
+        }
+        else if (item.TryGetDeviceRuntime(out var deviceRuntime))
+        {
+            if (deviceRuntime.Driver?.DeviceThreadManage != null)
+            {
+                if (deviceRuntime.DeviceStatus == DeviceStatusEnum.OnLine)
+                {
+                    return "green--text";
+                }
+                else
+                {
+                    return "red--text";
+                }
+            }
+            else
+            {
+                return "disabled--text";
+            }
+        }
+        return "enable--text";
+    }
+
     [Inject]
     DialogService DialogService { get; set; }
 
@@ -1617,7 +1644,7 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
         List<string> ret = new(jsstring.Count);
         foreach (var str in jsstring)
         {
-            var item = ChannelDeviceTreeItem.FromJSString(str);
+            var item = ChannelDeviceTreeItemStruct.FromJSString(str);
             ret.Add(GetClass(item));
         }
         return ret;

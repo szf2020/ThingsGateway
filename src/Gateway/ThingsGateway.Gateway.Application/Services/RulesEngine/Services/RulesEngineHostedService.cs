@@ -13,6 +13,8 @@ using BootstrapBlazor.Components;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
+using PooledAwait;
+
 using ThingsGateway.Blazor.Diagrams.Core;
 using ThingsGateway.Blazor.Diagrams.Core.Models;
 using ThingsGateway.NewLife;
@@ -139,68 +141,76 @@ internal sealed class RulesEngineHostedService : BackgroundService, IRulesEngine
         }
     }
 
-    private static async Task Analysis(NodeModel targetNode, NodeInput input, RulesLog rulesLog, CancellationToken cancellationToken)
+    private static Task Analysis(NodeModel targetNode, NodeInput input, RulesLog rulesLog, CancellationToken cancellationToken)
     {
-        if (targetNode is INode node)
-        {
-            node.Logger = rulesLog.Log;
-            node.RulesEngineName = rulesLog.Rules.Name;
-        }
+        return Analysis(targetNode, input, rulesLog, cancellationToken);
 
-        try
+
+        static async PooledTask Analysis(NodeModel targetNode, NodeInput input, RulesLog rulesLog, CancellationToken cancellationToken)
         {
-            if (targetNode == null)
-                return;
-            if (targetNode is IConditionNode conditionNode)
+            if (targetNode is INode node)
             {
-                var next = await conditionNode.ExecuteAsync(input, cancellationToken).ConfigureAwait(false);
-                if (next)
+                node.Logger = rulesLog.Log;
+                node.RulesEngineName = rulesLog.Rules.Name;
+            }
+
+            try
+            {
+                if (targetNode == null)
+                    return;
+                if (targetNode is IConditionNode conditionNode)
                 {
-                    foreach (var link in targetNode.PortLinks.Where(a => ((a.Target.Model as PortModel)?.Parent) != targetNode))
+                    var next = await conditionNode.ExecuteAsync(input, cancellationToken).ConfigureAwait(false);
+                    if (next)
                     {
-                        await Analysis((link.Target.Model as PortModel)?.Parent, input, rulesLog, cancellationToken).ConfigureAwait(false);
+                        foreach (var link in targetNode.PortLinks.Where(a => ((a.Target.Model as PortModel)?.Parent) != targetNode))
+                        {
+                            await RulesEngineHostedService.Analysis((link.Target.Model as PortModel)?.Parent, input, rulesLog, cancellationToken).ConfigureAwait(false);
+                        }
                     }
                 }
-            }
-            else if (targetNode is IExpressionNode expressionNode)
-            {
-                var nodeOutput = await expressionNode.ExecuteAsync(input, cancellationToken).ConfigureAwait(false);
-                if (nodeOutput.IsSuccess)
+                else if (targetNode is IExpressionNode expressionNode)
                 {
-                    foreach (var link in targetNode.PortLinks.Where(a => ((a.Target.Model as PortModel)?.Parent) != targetNode))
+                    var nodeOutput = await expressionNode.ExecuteAsync(input, cancellationToken).ConfigureAwait(false);
+                    if (nodeOutput.IsSuccess)
                     {
-                        await Analysis((link.Target.Model as PortModel)?.Parent, new NodeInput() { Value = nodeOutput.Content.Value, }, rulesLog, cancellationToken).ConfigureAwait(false);
+                        foreach (var link in targetNode.PortLinks.Where(a => ((a.Target.Model as PortModel)?.Parent) != targetNode))
+                        {
+                            await RulesEngineHostedService.Analysis((link.Target.Model as PortModel)?.Parent, new NodeInput() { Value = nodeOutput.Content.Value, }, rulesLog, cancellationToken).ConfigureAwait(false);
+                        }
                     }
                 }
-            }
-            else if (targetNode is IActuatorNode actuatorNode)
-            {
-                var nodeOutput = await actuatorNode.ExecuteAsync(input, cancellationToken).ConfigureAwait(false);
-                if (nodeOutput.IsSuccess)
+                else if (targetNode is IActuatorNode actuatorNode)
                 {
-                    foreach (var link in targetNode.PortLinks.Where(a => ((a.Target.Model as PortModel)?.Parent) != targetNode))
+                    var nodeOutput = await actuatorNode.ExecuteAsync(input, cancellationToken).ConfigureAwait(false);
+                    if (nodeOutput.IsSuccess)
                     {
-                        await Analysis((link.Target.Model as PortModel)?.Parent, new NodeInput() { Value = nodeOutput.Content.Value }, rulesLog, cancellationToken).ConfigureAwait(false);
+                        foreach (var link in targetNode.PortLinks.Where(a => ((a.Target.Model as PortModel)?.Parent) != targetNode))
+                        {
+                            await RulesEngineHostedService.Analysis((link.Target.Model as PortModel)?.Parent, new NodeInput() { Value = nodeOutput.Content.Value }, rulesLog, cancellationToken).ConfigureAwait(false);
+                        }
                     }
                 }
-            }
-            else if (targetNode is ITriggerNode triggerNode)
-            {
-                Func<NodeOutput, CancellationToken, Task> func = (async (a, token) =>
+                else if (targetNode is ITriggerNode triggerNode)
                 {
-                    foreach (var link in targetNode.PortLinks.Where(a => ((a.Target.Model as PortModel)?.Parent) != targetNode))
+                    Func<NodeOutput, CancellationToken, Task> func = (async (a, token) =>
                     {
-                        await Analysis((link.Target.Model as PortModel)?.Parent, new NodeInput() { Value = a.Value }, rulesLog, token).ConfigureAwait(false);
-                    }
-                });
-                await triggerNode.StartAsync(func, cancellationToken).ConfigureAwait(false);
+                        foreach (var link in targetNode.PortLinks.Where(a => ((a.Target.Model as PortModel)?.Parent) != targetNode))
+                        {
+                            await RulesEngineHostedService.Analysis((link.Target.Model as PortModel)?.Parent, new NodeInput() { Value = a.Value }, rulesLog, token).ConfigureAwait(false);
+                        }
+                    });
+                    await triggerNode.StartAsync(func, cancellationToken).ConfigureAwait(false);
+                }
             }
-        }
-        catch (TaskCanceledException) { }
-        catch (OperationCanceledException) { }
-        catch (Exception ex)
-        {
-            rulesLog.Log?.LogWarning(ex);
+            catch (TaskCanceledException) { }
+            catch (OperationCanceledException) { }
+            catch (Exception ex)
+            {
+                rulesLog.Log?.LogWarning(ex);
+            }
+
+            return;
         }
     }
 

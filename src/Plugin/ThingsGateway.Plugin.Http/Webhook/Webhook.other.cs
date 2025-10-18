@@ -10,6 +10,8 @@
 
 using BootstrapBlazor.Components;
 
+using PooledAwait;
+
 using ThingsGateway.Extension.Generic;
 using ThingsGateway.Foundation;
 
@@ -148,70 +150,80 @@ public partial class Webhook : BusinessBaseWithCacheIntervalScriptAll
 
     private readonly HttpClient client = new HttpClient();
 
-    private async Task<OperResult> WebhookUpAsync(TopicArray topicArray, CancellationToken cancellationToken)
+    private Task<OperResult> WebhookUpAsync(TopicArray topicArray, CancellationToken cancellationToken)
     {
-        // 设置请求内容
-        //var content = new StringContent(json, Encoding.UTF8, "application/json");
-        using var content = new ByteArrayContent(topicArray.Payload);
-        content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/json");
+        return WebhookUpAsync(this, topicArray, cancellationToken);
 
-        try
+        static async PooledTask<OperResult> WebhookUpAsync(Webhook @this, TopicArray topicArray, CancellationToken cancellationToken)
         {
-            // 发送POST请求
-            HttpResponseMessage response = await client.PostAsync(topicArray.Topic, content, cancellationToken).ConfigureAwait(false);
+            // 设置请求内容
+            //var content = new StringContent(json, Encoding.UTF8, "application/json");
+            var content = new ByteArrayContent(topicArray.Payload);
+            content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/json");
 
-            // 检查响应状态
-            if (response.IsSuccessStatusCode)
+            try
             {
-                if (_driverPropertys.DetailLog)
+                // 发送POST请求
+                HttpResponseMessage response = await @this.client.PostAsync(topicArray.Topic, content, cancellationToken).ConfigureAwait(false);
+
+                // 检查响应状态
+                if (response.IsSuccessStatusCode)
                 {
-                    if (LogMessage?.LogLevel <= TouchSocket.Core.LogLevel.Trace)
-                        LogMessage?.LogTrace(GetDetailLogString(topicArray, _memoryVarModelQueue.Count));
-                    else if (LogMessage?.LogLevel <= TouchSocket.Core.LogLevel.Debug)
-                        LogMessage?.LogDebug(GetCountLogString(topicArray, _memoryVarModelQueue.Count));
+                    if (@this._driverPropertys.DetailLog)
+                    {
+                        if (@this.LogMessage?.LogLevel <= TouchSocket.Core.LogLevel.Trace)
+                            @this.LogMessage?.LogTrace(@this.GetDetailLogString(topicArray, @this._memoryVarModelQueue.Count));
+                        else if (@this.LogMessage?.LogLevel <= TouchSocket.Core.LogLevel.Debug)
+                            @this.LogMessage?.LogDebug(@this.GetCountLogString(topicArray, @this._memoryVarModelQueue.Count));
+                    }
+                    else
+                    {
+                        if (@this.LogMessage?.LogLevel <= TouchSocket.Core.LogLevel.Debug)
+                            @this.LogMessage?.LogDebug(@this.GetCountLogString(topicArray, @this._memoryVarModelQueue.Count));
+                    }
+                    return new();
                 }
                 else
                 {
-                    if (LogMessage?.LogLevel <= TouchSocket.Core.LogLevel.Debug)
-                        LogMessage?.LogDebug(GetCountLogString(topicArray, _memoryVarModelQueue.Count));
+                    return new($"Failed to trigger webhook. Status code: {response.StatusCode}");
                 }
-                return new();
             }
-            else
+            catch (Exception ex)
             {
-                return new($"Failed to trigger webhook. Status code: {response.StatusCode}");
+                return new(ex);
             }
-        }
-        catch (Exception ex)
-        {
-            return new(ex);
         }
     }
 
     #region private
 
-    private async ValueTask<OperResult> Update(IEnumerable<TopicArray> topicArrayList, CancellationToken cancellationToken)
+    private ValueTask<OperResult> Update(IEnumerable<TopicArray> topicArrayList, CancellationToken cancellationToken)
     {
-        foreach (var topicArray in topicArrayList)
-        {
-            var result = await WebhookUpAsync(topicArray, cancellationToken).ConfigureAwait(false);
+        return Update(this, topicArrayList, cancellationToken);
 
-            if (cancellationToken.IsCancellationRequested)
-                return result;
-            if (success != result.IsSuccess)
+        static async PooledValueTask<OperResult> Update(Webhook @this, IEnumerable<TopicArray> topicArrayList, CancellationToken cancellationToken)
+        {
+            foreach (var topicArray in topicArrayList)
             {
+                var result = await @this.WebhookUpAsync(topicArray, cancellationToken).ConfigureAwait(false);
+
+                if (cancellationToken.IsCancellationRequested)
+                    return result;
+                if (@this.success != result.IsSuccess)
+                {
+                    if (!result.IsSuccess)
+                    {
+                        @this.LogMessage?.LogWarning(result.ToString());
+                    }
+                    @this.success = result.IsSuccess;
+                }
                 if (!result.IsSuccess)
                 {
-                    LogMessage?.LogWarning(result.ToString());
+                    return result;
                 }
-                success = result.IsSuccess;
             }
-            if (!result.IsSuccess)
-            {
-                return result;
-            }
+            return OperResult.Success;
         }
-        return OperResult.Success;
     }
 
 

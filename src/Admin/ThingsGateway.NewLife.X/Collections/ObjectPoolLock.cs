@@ -118,7 +118,7 @@ public class ObjectPoolLock<T> : DisposeBase, IPool<T> where T : class
                     if (count == 0) Init();
 
 #if DEBUG
-                WriteLog("Acquire Create Free={0} Busy={1}", FreeCount, count + 1);
+                    WriteLog("Acquire Create Free={0} Busy={1}", FreeCount, count + 1);
 #endif
                 }
             }
@@ -156,7 +156,7 @@ public class ObjectPoolLock<T> : DisposeBase, IPool<T> where T : class
             if (!_busy.Remove(value))
             {
 #if DEBUG
-            WriteLog("Return Error");
+                WriteLog("Return Error");
 #endif
 
                 return false;

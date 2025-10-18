@@ -8,6 +8,8 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
+using PooledAwait;
+
 using System.Runtime.CompilerServices;
 
 using TouchSocket.Resources;
@@ -138,82 +140,86 @@ public class DDPTcpSessionClientChannel : TcpSessionClientChannel
 
     private DeviceSingleStreamDataHandleAdapter<DDPTcpMessage> DDPAdapter = new();
 
-    protected override async ValueTask<bool> OnTcpReceiving(IBytesReader byteBlock)
+    protected override ValueTask<bool> OnTcpReceiving(IBytesReader byteBlock)
     {
 
         if (DDPAdapter.TryParseRequest(ref byteBlock, out var message))
         {
-            return true;
+            return EasyValueTask.FromResult(true);
         }
+        return OnTcpReceiving(this, message);
 
-        if (message != null)
+        static async PooledValueTask<bool> OnTcpReceiving(DDPTcpSessionClientChannel @this, DDPTcpMessage message)
         {
-            if (message.IsSuccess)
+            if (message != null)
             {
-                var id = $"ID={message.Id}";
-                if (message.Type == 0x09)
+                if (message.IsSuccess)
                 {
-                    var reader = new ClassBytesReader(message.Content);
-
-                    if (this.DataHandlingAdapter == null)
+                    var id = $"ID={message.Id}";
+                    if (message.Type == 0x09)
                     {
-                        await this.OnTcpReceived(new ReceivedDataEventArgs(message.Content, default)).ConfigureAwait(false);
+                        var reader = new ClassBytesReader(message.Content);
+
+                        if (@this.DataHandlingAdapter == null)
+                        {
+                            await @this.OnTcpReceived(new ReceivedDataEventArgs(message.Content, default)).ConfigureAwait(false);
+                        }
+                        else
+                        {
+                            await @this.DataHandlingAdapter.ReceivedInputAsync(reader).ConfigureAwait(false);
+                        }
+
+                        return true;
                     }
                     else
                     {
-                        await this.DataHandlingAdapter.ReceivedInputAsync(reader).ConfigureAwait(false);
-                    }
-
-                    return true;
-                }
-                else
-                {
-                    if (message.Type == 0x01)
-                    {
-                        bool log = false;
-                        if (id != Id) log = true;
-
-                        //注册ID
-                        if (Service is ITcpServiceChannel tcpService && tcpService.TryGetClient(id, out var oldClient) && oldClient != this)
+                        if (message.Type == 0x01)
                         {
-                            Logger?.Debug($"Old socket connections with the same ID {id} will be closed");
-                            try
+                            bool log = false;
+                            if (id != @this.Id) log = true;
+
+                            //注册ID
+                            if (@this.Service is ITcpServiceChannel tcpService && tcpService.TryGetClient(id, out var oldClient) && oldClient != @this)
                             {
-                                //await oldClient.ShutdownAsync(System.Net.Sockets.SocketShutdown.Both).ConfigureAwait(false);
-                                await oldClient.CloseAsync().ConfigureAwait(false);
+                                @this.Logger?.Debug($"Old socket connections with the same ID {id} will be closed");
+                                try
+                                {
+                                    //await oldClient.ShutdownAsync(System.Net.Sockets.SocketShutdown.Both).ConfigureAwait(false);
+                                    await oldClient.CloseAsync().ConfigureAwait(false);
+                                }
+                                catch
+                                {
+                                }
+                                try
+                                {
+                                    oldClient.Dispose();
+                                }
+                                catch
+                                {
+                                }
                             }
-                            catch
-                            {
-                            }
-                            try
-                            {
-                                oldClient.Dispose();
-                            }
-                            catch
-                            {
-                            }
+
+                            await @this.ResetIdAsync(id, @this.ClosedToken).ConfigureAwait(false);
+
+                            //发送成功
+                            await @this.ProtectedSendAsync(new DDPSend(ReadOnlyMemory<byte>.Empty, id, true, 0x81), @this.ClosedToken).ConfigureAwait(false);
+                            if (log)
+                                @this.Logger?.Info(string.Format(AppResource.DtuConnected, @this.Id));
                         }
-
-                        await ResetIdAsync(id, ClosedToken).ConfigureAwait(false);
-
-                        //发送成功
-                        await base.ProtectedSendAsync(new DDPSend(ReadOnlyMemory<byte>.Empty, id, true, 0x81), ClosedToken).ConfigureAwait(false);
-                        if (log)
-                            Logger?.Info(string.Format(AppResource.DtuConnected, Id));
-                    }
-                    else if (message.Type == 0x02)
-                    {
-                        await base.ProtectedSendAsync(new DDPSend(ReadOnlyMemory<byte>.Empty, Id, true, 0x82), ClosedToken).ConfigureAwait(false);
-                        Logger?.Info(string.Format(AppResource.DtuDisconnecting, Id));
-                        await Task.Delay(100).ConfigureAwait(false);
-                        await this.CloseAsync().ConfigureAwait(false);
-                        this.SafeDispose();
+                        else if (message.Type == 0x02)
+                        {
+                            await @this.ProtectedSendAsync(new DDPSend(ReadOnlyMemory<byte>.Empty, @this.Id, true, 0x82), @this.ClosedToken).ConfigureAwait(false);
+                            @this.Logger?.Info(string.Format(AppResource.DtuDisconnecting, @this.Id));
+                            await Task.Delay(100).ConfigureAwait(false);
+                            await @this.CloseAsync().ConfigureAwait(false);
+                            @this.SafeDispose();
+                        }
                     }
                 }
             }
-        }
 
-        return true;
+            return true;
+        }
     }
 
     #region Throw

@@ -8,6 +8,8 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
+using PooledAwait;
+
 using TouchSocket.Core;
 
 namespace ThingsGateway.Gateway.Application;
@@ -51,42 +53,47 @@ public class VariableMethod
     /// <param name="value">以,逗号分割的参数</param>
     /// <param name="cancellationToken">取消令箭</param>
     /// <returns></returns>
-    public async ValueTask<IOperResult> InvokeMethodAsync(object driverBase, string? value = null, CancellationToken cancellationToken = default)
+    public ValueTask<IOperResult> InvokeMethodAsync(object driverBase, string? value = null, CancellationToken cancellationToken = default)
     {
-        try
+        return InvokeMethodAsync(this, driverBase, value, cancellationToken);
+
+        static async PooledValueTask<IOperResult> InvokeMethodAsync(VariableMethod @this, object driverBase, string? value, CancellationToken cancellationToken)
         {
-            object?[]? os = null;
-            if (value == null && OS == null)
+            try
             {
-                //默认的参数
-                var addresss = Variable.RegisterAddress.SplitOS();
-                //通过逗号分割，并且合并参数
-                var strs = addresss;
+                object?[]? os = null;
+                if (value == null && @this.OS == null)
+                {
+                    //默认的参数
+                    var addresss = @this.Variable.RegisterAddress.SplitOS();
+                    //通过逗号分割，并且合并参数
+                    var strs = addresss;
 
-                OS = GetOS(strs, cancellationToken);
-                os = OS;
+                    @this.OS = @this.GetOS(strs, cancellationToken);
+                    os = @this.OS;
+                }
+                else
+                {
+                    var addresss = @this.Variable.RegisterAddress.SplitOS();
+                    var values = value.SplitOS();
+                    //通过分号分割，并且合并参数
+                    var strs = addresss.Concat(values).ToList();
+                    os = @this.GetOS(strs, cancellationToken);
+                }
+
+                dynamic result;
+
+                result = await @this.MethodInfo.InvokeAsync(driverBase, os).ConfigureAwait(false);
+                if (@this.MethodInfo.HasReturn)
+                {
+                    return result;
+                }
+                return OperResult.Success;
             }
-            else
+            catch (Exception ex)
             {
-                var addresss = Variable.RegisterAddress.SplitOS();
-                var values = value.SplitOS();
-                //通过分号分割，并且合并参数
-                var strs = addresss.Concat(values).ToList();
-                os = GetOS(strs, cancellationToken);
+                return new OperResult(ex);
             }
-
-            dynamic result;
-
-            result = await MethodInfo.InvokeAsync(driverBase, os).ConfigureAwait(false);
-            if (MethodInfo.HasReturn)
-            {
-                return result;
-            }
-            return OperResult.Success;
-        }
-        catch (Exception ex)
-        {
-            return new OperResult(ex);
         }
     }
 

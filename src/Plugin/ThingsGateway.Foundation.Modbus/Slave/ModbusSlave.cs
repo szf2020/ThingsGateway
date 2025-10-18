@@ -8,6 +8,8 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
+using PooledAwait;
+
 using System.Buffers;
 using System.Collections.Concurrent;
 using System.Runtime.InteropServices;
@@ -157,7 +159,7 @@ public class ModbusSlave : DeviceBase, IModbusAddress
     {
         return PackHelper.LoadSourceRead<T>(this, deviceVariables, maxPack, defaultIntervalTime);
     }
-    
+
     /// <inheritdoc/>
     protected override Task DisposeAsync(bool disposing)
     {
@@ -352,10 +354,10 @@ public class ModbusSlave : DeviceBase, IModbusAddress
                 Init(mAddress);
             }
 
-            ModbusServer01ByteBlocks.TryGetValue(mAddress.Station,out var ModbusServer01ByteBlock);
-            ModbusServer02ByteBlocks.TryGetValue(mAddress.Station,out var ModbusServer02ByteBlock);
-            ModbusServer03ByteBlocks.TryGetValue(mAddress.Station,out var ModbusServer03ByteBlock);
-            ModbusServer04ByteBlocks.TryGetValue(mAddress.Station,out var ModbusServer04ByteBlock);
+            ModbusServer01ByteBlocks.TryGetValue(mAddress.Station, out var ModbusServer01ByteBlock);
+            ModbusServer02ByteBlocks.TryGetValue(mAddress.Station, out var ModbusServer02ByteBlock);
+            ModbusServer03ByteBlocks.TryGetValue(mAddress.Station, out var ModbusServer03ByteBlock);
+            ModbusServer04ByteBlocks.TryGetValue(mAddress.Station, out var ModbusServer04ByteBlock);
             if (read)
             {
                 using (new ReadLock(_lockSlim))
@@ -475,33 +477,31 @@ public class ModbusSlave : DeviceBase, IModbusAddress
         return mAddress;
     }
     /// <inheritdoc/>
-    public override async ValueTask<OperResult> WriteAsync(string address, ReadOnlyMemory<byte> value, DataTypeEnum dataType, CancellationToken cancellationToken = default)
+    public override ValueTask<OperResult> WriteAsync(string address, ReadOnlyMemory<byte> value, DataTypeEnum dataType, CancellationToken cancellationToken = default)
     {
         try
         {
-            await EasyValueTask.CompletedTask.ConfigureAwait(false);
             var mAddress = GetModbusAddress(address, Station);
             mAddress.SlaveWriteDatas = new(value);
-            return ModbusRequest(mAddress, false, cancellationToken);
+            return EasyValueTask.FromResult<OperResult>(ModbusRequest(mAddress, false, cancellationToken));
         }
         catch (Exception ex)
         {
-            return new OperResult(ex);
+            return EasyValueTask.FromResult(new OperResult(ex));
         }
     }
 
     /// <inheritdoc/>
-    public override async ValueTask<OperResult> WriteAsync(string address, ReadOnlyMemory<bool> value, CancellationToken cancellationToken = default)
+    public override ValueTask<OperResult> WriteAsync(string address, ReadOnlyMemory<bool> value, CancellationToken cancellationToken = default)
     {
         try
         {
-            await EasyValueTask.CompletedTask.ConfigureAwait(false);
             var mAddress = GetModbusAddress(address, Station);
             if (mAddress.IsBitFunction)
             {
                 mAddress.SlaveWriteDatas = new(value.Span.BoolToByte());
                 ModbusRequest(mAddress, false, cancellationToken);
-                return OperResult.Success;
+                return EasyValueTask.FromResult(OperResult.Success);
             }
             else
             {
@@ -509,7 +509,7 @@ public class ModbusSlave : DeviceBase, IModbusAddress
                 {
                     mAddress.Length = 2;
                     var readData = ModbusRequest(mAddress, true, cancellationToken);
-                    if (!readData.IsSuccess) return readData;
+                    if (!readData.IsSuccess) return EasyValueTask.FromResult<OperResult>(readData);
                     var writeData = TouchSocketBitConverter.BigEndian.To<ushort>(readData.Content.Span);
                     var span = value.Span;
                     for (int i = 0; i < value.Length; i++)
@@ -518,17 +518,17 @@ public class ModbusSlave : DeviceBase, IModbusAddress
                     }
                     mAddress.SlaveWriteDatas = new(ThingsGatewayBitConverter.GetBytes(writeData));
                     ModbusRequest(mAddress, false, cancellationToken);
-                    return OperResult.Success;
+                    return EasyValueTask.FromResult<OperResult>(OperResult.Success);
                 }
                 else
                 {
-                    return new OperResult(string.Format(AppResource.ValueOverlimit, nameof(mAddress.BitIndex), 16));
+                    return EasyValueTask.FromResult<OperResult>(new OperResult(string.Format(AppResource.ValueOverlimit, nameof(mAddress.BitIndex), 16)));
                 }
             }
         }
         catch (Exception ex)
         {
-            return new OperResult(ex);
+            return EasyValueTask.FromResult<OperResult>(new OperResult(ex));
         }
     }
     protected override ValueTask ChannelReceived(IClientChannel client, ReceivedDataEventArgs e, bool last)
@@ -536,20 +536,26 @@ public class ModbusSlave : DeviceBase, IModbusAddress
         return HandleChannelReceivedAsync(client, e, last);
     }
 
-    private async ValueTask HandleChannelReceivedAsync(IClientChannel client, ReceivedDataEventArgs e, bool last)
+    private ValueTask HandleChannelReceivedAsync(IClientChannel client, ReceivedDataEventArgs e, bool last)
     {
-        if (!TryParseRequest(e.RequestInfo, out var modbusRequest, out var sequences, out var modbusRtu))
+        return HandleChannelReceivedAsync(this, client, e);
+
+        static async PooledValueTask HandleChannelReceivedAsync(ModbusSlave @this, IClientChannel client, ReceivedDataEventArgs e)
+        {
+            if (!TryParseRequest(e.RequestInfo, out var modbusRequest, out var sequences, out var modbusRtu))
+                return;
+
+            if (!@this.MulStation && modbusRequest.Station != @this.Station)
+                return;
+
+            var function = NormalizeFunctionCode(modbusRequest.FunctionCode);
+
+            if (function <= 4)
+                await @this.HandleReadRequestAsync(client, e, modbusRequest, sequences, modbusRtu).ConfigureAwait(false);
+            else
+                await @this.HandleWriteRequestAsync(client, e, modbusRequest, sequences, modbusRtu, function).ConfigureAwait(false);
             return;
-
-        if (!MulStation && modbusRequest.Station != Station)
-            return;
-
-        var function = NormalizeFunctionCode(modbusRequest.FunctionCode);
-
-        if (function <= 4)
-            await HandleReadRequestAsync(client, e, modbusRequest, sequences, modbusRtu).ConfigureAwait(false);
-        else
-            await HandleWriteRequestAsync(client, e, modbusRequest, sequences, modbusRtu, function).ConfigureAwait(false);
+        }
     }
 
     private static bool TryParseRequest(object requestInfo, out ModbusRequest modbusRequest, out ReadOnlySequence<byte> sequences, out bool modbusRtu)
@@ -580,7 +586,7 @@ public class ModbusSlave : DeviceBase, IModbusAddress
     private static byte NormalizeFunctionCode(byte funcCode)
         => funcCode > 0x30 ? (byte)(funcCode - 0x30) : funcCode;
 
-    private async Task HandleReadRequestAsync(
+    private Task HandleReadRequestAsync(
         IClientChannel client,
         ReceivedDataEventArgs e,
         ModbusRequest modbusRequest,
@@ -590,27 +596,31 @@ public class ModbusSlave : DeviceBase, IModbusAddress
         var data = ModbusRequest(modbusRequest, true);
         if (!data.IsSuccess)
         {
-            await WriteError(modbusRtu, client, sequences, e).ConfigureAwait(false);
-            return;
+            return WriteError(modbusRtu, client, sequences, e);
         }
 
-        ValueByteBlock byteBlock = new(1024);
-        try
+        return Write(this, client, e, modbusRequest, sequences, modbusRtu, data);
+
+        static async PooledTask Write(ModbusSlave @this, IClientChannel client, ReceivedDataEventArgs e, ModbusRequest modbusRequest, ReadOnlySequence<byte> sequences, bool modbusRtu, OperResult<ReadOnlyMemory<byte>> data)
         {
-            WriteReadResponse(modbusRequest, sequences, data.Content, ref byteBlock, modbusRtu);
-            await ReturnData(client, byteBlock.Memory, e).ConfigureAwait(false);
-        }
-        catch
-        {
-            await WriteError(modbusRtu, client, sequences, e).ConfigureAwait(false);
-        }
-        finally
-        {
-            byteBlock.SafeDispose();
+            ValueByteBlock byteBlock = new(1024);
+            try
+            {
+                WriteReadResponse(modbusRequest, sequences, data.Content, ref byteBlock, modbusRtu);
+                await @this.ReturnData(client, byteBlock.Memory, e).ConfigureAwait(false);
+            }
+            catch
+            {
+                await @this.WriteError(modbusRtu, client, sequences, e).ConfigureAwait(false);
+            }
+            finally
+            {
+                byteBlock.SafeDispose();
+            }
         }
     }
 
-    private async Task HandleWriteRequestAsync(
+    private Task HandleWriteRequestAsync(
         IClientChannel client,
         ReceivedDataEventArgs e,
         ModbusRequest modbusRequest,
@@ -618,50 +628,62 @@ public class ModbusSlave : DeviceBase, IModbusAddress
         bool modbusRtu,
         byte f)
     {
-        var modbusAddress = new ModbusAddress(modbusRequest);
-        bool isSuccess;
+        return HandleWriteRequestAsync(this, client, e, modbusRequest, sequences, modbusRtu, f);
 
-        switch (f)
+
+        static async PooledTask HandleWriteRequestAsync(ModbusSlave @this, IClientChannel client, ReceivedDataEventArgs e, ModbusRequest modbusRequest, ReadOnlySequence<byte> sequences, bool modbusRtu, byte f)
         {
-            case 5:
-            case 15:
-                modbusAddress.WriteFunctionCode = modbusRequest.FunctionCode;
-                modbusAddress.FunctionCode = 1;
-                isSuccess = await HandleWriteCoreAsync(modbusAddress, client, modbusRequest).ConfigureAwait(false);
-                break;
+            var modbusAddress = new ModbusAddress(modbusRequest);
+            bool isSuccess;
 
-            case 6:
-            case 16:
-                modbusAddress.WriteFunctionCode = modbusRequest.FunctionCode;
-                modbusAddress.FunctionCode = 3;
-                isSuccess = await HandleWriteCoreAsync(modbusAddress, client, modbusRequest).ConfigureAwait(false);
-                break;
+            switch (f)
+            {
+                case 5:
+                case 15:
+                    modbusAddress.WriteFunctionCode = modbusRequest.FunctionCode;
+                    modbusAddress.FunctionCode = 1;
+                    isSuccess = await @this.HandleWriteCoreAsync(modbusAddress, client, modbusRequest).ConfigureAwait(false);
+                    break;
 
-            default:
-                return;
+                case 6:
+                case 16:
+                    modbusAddress.WriteFunctionCode = modbusRequest.FunctionCode;
+                    modbusAddress.FunctionCode = 3;
+                    isSuccess = await @this.HandleWriteCoreAsync(modbusAddress, client, modbusRequest).ConfigureAwait(false);
+                    break;
+
+                default:
+                    return;
+            }
+
+            if (isSuccess)
+                await @this.WriteSuccess(modbusRtu, client, sequences, e).ConfigureAwait(false);
+            else
+                await @this.WriteError(modbusRtu, client, sequences, e).ConfigureAwait(false);
+            return;
         }
-
-        if (isSuccess)
-            await WriteSuccess(modbusRtu, client, sequences, e).ConfigureAwait(false);
-        else
-            await WriteError(modbusRtu, client, sequences, e).ConfigureAwait(false);
     }
 
-    private async Task<bool> HandleWriteCoreAsync(ModbusAddress address, IClientChannel client, ModbusRequest modbusRequest)
+    private Task<bool> HandleWriteCoreAsync(ModbusAddress address, IClientChannel client, ModbusRequest modbusRequest)
     {
-        if (WriteData != null)
-        {
-            var result = await WriteData(address, ThingsGatewayBitConverter, client).ConfigureAwait(false);
-            if (!result.IsSuccess) return false;
-        }
+        return HandleWriteCoreAsync(this, address, client, modbusRequest);
 
-        if (IsWriteMemory)
+        static async PooledTask<bool> HandleWriteCoreAsync(ModbusSlave @this, ModbusAddress address, IClientChannel client, ModbusRequest modbusRequest)
         {
-            var memResult = ModbusRequest(modbusRequest, false);
-            return memResult.IsSuccess;
-        }
+            if (@this.WriteData != null)
+            {
+                var result = await @this.WriteData(address, @this.ThingsGatewayBitConverter, client).ConfigureAwait(false);
+                if (!result.IsSuccess) return false;
+            }
 
-        return true;
+            if (@this.IsWriteMemory)
+            {
+                var memResult = @this.ModbusRequest(modbusRequest, false);
+                return memResult.IsSuccess;
+            }
+
+            return true;
+        }
     }
 
     private static void WriteReadResponse(
@@ -696,63 +718,78 @@ public class ModbusSlave : DeviceBase, IModbusAddress
             ByteBlockExtension.WriteBackValue(ref byteBlock, (byte)(byteBlock.Length - 6), EndianType.Big, 5);
     }
 
-    private async Task ReturnData(IClientChannel client, ReadOnlyMemory<byte> sendData, ReceivedDataEventArgs e)
+    private Task ReturnData(IClientChannel client, ReadOnlyMemory<byte> sendData, ReceivedDataEventArgs e)
     {
-        if (SendDelayTime > 0)
-            await Task.Delay(SendDelayTime).ConfigureAwait(false);
-        if (client is IUdpClientSender udpClientSender)
-            await udpClientSender.SendAsync(((UdpReceivedDataEventArgs)e).EndPoint, sendData).ConfigureAwait(false);
-        else
-            await client.SendAsync(sendData, client.ClosedToken).ConfigureAwait(false);
-    }
+        return ReturnData(SendDelayTime, client, sendData, e);
 
-    private async Task WriteError(bool modbusRtu, IClientChannel client, ReadOnlySequence<byte> bytes, ReceivedDataEventArgs e)
-    {
-        ValueByteBlock byteBlock = new(20);
-        try
+        static async PooledTask ReturnData(int deley, IClientChannel client, ReadOnlyMemory<byte> sendData, ReceivedDataEventArgs e)
         {
-            if (modbusRtu)
-            {
-                ByteBlockExtension.Write(ref byteBlock, bytes.Slice(0, 2));
-                WriterExtension.WriteValue(ref byteBlock, (byte)1);
-                byteBlock.Write(CRC16Utils.Crc16Only(byteBlock.Span));
-                ByteBlockExtension.WriteBackValue(ref byteBlock, (byte)(byteBlock.Span[1] + 128), EndianType.Big, 1);
-            }
+            if (deley > 0)
+                await Task.Delay(deley).ConfigureAwait(false);
+            if (client is IUdpClientSender udpClientSender)
+                await udpClientSender.SendAsync(((UdpReceivedDataEventArgs)e).EndPoint, sendData).ConfigureAwait(false);
             else
-            {
-                ByteBlockExtension.Write(ref byteBlock, bytes.Slice(0, 8));
-                WriterExtension.WriteValue(ref byteBlock, (byte)1);
-                ByteBlockExtension.WriteBackValue(ref byteBlock, (byte)(byteBlock.Length - 6), EndianType.Big, 5);
-                ByteBlockExtension.WriteBackValue(ref byteBlock, (byte)(byteBlock.Span[7] + 128), EndianType.Big, 7);
-            }
-            await ReturnData(client, byteBlock.Memory, e).ConfigureAwait(false);
-        }
-        finally
-        {
-            byteBlock.SafeDispose();
+                await client.SendAsync(sendData, client.ClosedToken).ConfigureAwait(false);
         }
     }
 
-    private async Task WriteSuccess(bool modbusRtu, IClientChannel client, ReadOnlySequence<byte> bytes, ReceivedDataEventArgs e)
+    private Task WriteError(bool modbusRtu, IClientChannel client, ReadOnlySequence<byte> bytes, ReceivedDataEventArgs e)
     {
-        ValueByteBlock byteBlock = new(20);
-        try
+        return WriteError(this, modbusRtu, client, bytes, e);
+
+        static async PooledTask WriteError(ModbusSlave @this, bool modbusRtu, IClientChannel client, ReadOnlySequence<byte> bytes, ReceivedDataEventArgs e)
         {
-            if (modbusRtu)
+            ValueByteBlock byteBlock = new(20);
+            try
             {
-                ByteBlockExtension.Write(ref byteBlock, bytes.Slice(0, 6));
-                byteBlock.Write(CRC16Utils.Crc16Only(byteBlock.Span));
+                if (modbusRtu)
+                {
+                    ByteBlockExtension.Write(ref byteBlock, bytes.Slice(0, 2));
+                    WriterExtension.WriteValue(ref byteBlock, (byte)1);
+                    byteBlock.Write(CRC16Utils.Crc16Only(byteBlock.Span));
+                    ByteBlockExtension.WriteBackValue(ref byteBlock, (byte)(byteBlock.Span[1] + 128), EndianType.Big, 1);
+                }
+                else
+                {
+                    ByteBlockExtension.Write(ref byteBlock, bytes.Slice(0, 8));
+                    WriterExtension.WriteValue(ref byteBlock, (byte)1);
+                    ByteBlockExtension.WriteBackValue(ref byteBlock, (byte)(byteBlock.Length - 6), EndianType.Big, 5);
+                    ByteBlockExtension.WriteBackValue(ref byteBlock, (byte)(byteBlock.Span[7] + 128), EndianType.Big, 7);
+                }
+                await @this.ReturnData(client, byteBlock.Memory, e).ConfigureAwait(false);
             }
-            else
+            finally
             {
-                ByteBlockExtension.Write(ref byteBlock, bytes.Slice(0, 12));
-                ByteBlockExtension.WriteBackValue(ref byteBlock, (byte)(byteBlock.Length - 6), EndianType.Big, 5);
+                byteBlock.SafeDispose();
             }
-            await ReturnData(client, byteBlock.Memory, e).ConfigureAwait(false);
         }
-        finally
+    }
+
+    private Task WriteSuccess(bool modbusRtu, IClientChannel client, ReadOnlySequence<byte> bytes, ReceivedDataEventArgs e)
+    {
+        return WriteSuccess(this, modbusRtu, client, bytes, e);
+
+        static async PooledTask WriteSuccess(ModbusSlave @this, bool modbusRtu, IClientChannel client, ReadOnlySequence<byte> bytes, ReceivedDataEventArgs e)
         {
-            byteBlock.SafeDispose();
+            ValueByteBlock byteBlock = new(20);
+            try
+            {
+                if (modbusRtu)
+                {
+                    ByteBlockExtension.Write(ref byteBlock, bytes.Slice(0, 6));
+                    byteBlock.Write(CRC16Utils.Crc16Only(byteBlock.Span));
+                }
+                else
+                {
+                    ByteBlockExtension.Write(ref byteBlock, bytes.Slice(0, 12));
+                    ByteBlockExtension.WriteBackValue(ref byteBlock, (byte)(byteBlock.Length - 6), EndianType.Big, 5);
+                }
+                await @this.ReturnData(client, byteBlock.Memory, e).ConfigureAwait(false);
+            }
+            finally
+            {
+                byteBlock.SafeDispose();
+            }
         }
     }
 

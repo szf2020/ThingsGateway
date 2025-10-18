@@ -8,6 +8,8 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
+using PooledAwait;
+
 using System.Diagnostics;
 using System.Text;
 
@@ -85,66 +87,80 @@ public partial class TDengineDBProducer : BusinessBaseWithCacheIntervalVariable
             AddQueueVarModel(new CacheDBItem<VariableBasicData>(variable));
         }
     }
-    private async ValueTask<OperResult> UpdateVarModel(IEnumerable<VariableBasicData> item, CancellationToken cancellationToken)
+    private ValueTask<OperResult> UpdateVarModel(IEnumerable<VariableBasicData> item, CancellationToken cancellationToken)
     {
-        var result = await InserableAsync(item.WhereIf(_driverPropertys.OnlineFilter, a => a.IsOnline == true).ToList(), cancellationToken).ConfigureAwait(false);
-        if (success != result.IsSuccess)
-        {
-            if (!result.IsSuccess)
-                LogMessage?.LogWarning(result.ToString());
-            success = result.IsSuccess;
-        }
+        return UpdateVarModel(this, item, cancellationToken);
 
-        return result;
+        static async PooledValueTask<OperResult> UpdateVarModel(TDengineDBProducer @this, IEnumerable<VariableBasicData> item, CancellationToken cancellationToken)
+        {
+            var result = await @this.InserableAsync(item.WhereIf(@this._driverPropertys.OnlineFilter, a => a.IsOnline == true).ToList(), cancellationToken).ConfigureAwait(false);
+            if (@this.success != result.IsSuccess)
+            {
+                if (!result.IsSuccess)
+                    @this.LogMessage?.LogWarning(result.ToString());
+                @this.success = result.IsSuccess;
+            }
+
+            return result;
+        }
     }
 
     #region 方法
 
-    private async ValueTask<OperResult> InserableAsync(List<VariableBasicData> dbInserts, CancellationToken cancellationToken)
+    private ValueTask<OperResult> InserableAsync(List<VariableBasicData> dbInserts, CancellationToken cancellationToken)
     {
-        try
+        return InserableAsync(this, dbInserts, cancellationToken);
+
+        static async PooledValueTask<OperResult> InserableAsync(TDengineDBProducer @this, List<VariableBasicData> dbInserts, CancellationToken cancellationToken)
         {
-            _db.Ado.CancellationToken = cancellationToken;
-
-            if (!_driverPropertys.BigTextScriptHistoryTable.IsNullOrEmpty())
+            try
             {
-                var getDeviceModel = CSharpScriptEngineExtension.Do<DynamicSQLBase>(_driverPropertys.BigTextScriptHistoryTable);
-                getDeviceModel.Logger = LogMessage;
-                await getDeviceModel.DBInsertable(_db, dbInserts, cancellationToken).ConfigureAwait(false);
+                @this._db.Ado.CancellationToken = cancellationToken;
+
+                if (!@this._driverPropertys.BigTextScriptHistoryTable.IsNullOrEmpty())
+                {
+                    var getDeviceModel = CSharpScriptEngineExtension.Do<DynamicSQLBase>(@this._driverPropertys.BigTextScriptHistoryTable);
+                    getDeviceModel.Logger = @this.LogMessage;
+                    await getDeviceModel.DBInsertable(@this._db, dbInserts, cancellationToken).ConfigureAwait(false);
+                }
+                else
+                {
+                    var stringData = dbInserts.Where(a => (!a.IsNumber && a.Value is not bool));
+                    var numberData = dbInserts.Where(a => (a.IsNumber || a.Value is bool));
+
+                    await @this.InserableAsync(numberData, @this._driverPropertys.NumberTableNameLow, cancellationToken).ConfigureAwait(false);
+
+                    await @this.InserableAsync(stringData, @this._driverPropertys.StringTableNameLow, cancellationToken).ConfigureAwait(false);
+                }
+                return OperResult.Success;
             }
-            else
+            catch (Exception ex)
             {
-                var stringData = dbInserts.Where(a => (!a.IsNumber && a.Value is not bool));
-                var numberData = dbInserts.Where(a => (a.IsNumber || a.Value is bool));
-
-                await InserableAsync(numberData, _driverPropertys.NumberTableNameLow, cancellationToken).ConfigureAwait(false);
-
-                await InserableAsync(stringData, _driverPropertys.StringTableNameLow, cancellationToken).ConfigureAwait(false);
+                return new OperResult(ex);
             }
-            return OperResult.Success;
-        }
-        catch (Exception ex)
-        {
-            return new OperResult(ex);
         }
     }
 
-    private async Task InserableAsync(IEnumerable<VariableBasicData> dbInserts, string tableName, CancellationToken cancellationToken)
+    private Task InserableAsync(IEnumerable<VariableBasicData> dbInserts, string tableName, CancellationToken cancellationToken)
     {
+        return InserableAsync(this, dbInserts, tableName, cancellationToken);
 
-        Stopwatch stopwatch = new();
-        stopwatch.Start();
 
-        StringBuilder stringBuilder = new();
-        stringBuilder.Append($"INSERT INTO");
-        bool any = false;
-        //(`id`,`createtime`,`collecttime`,`isonline`,`value`) 
-        foreach (var deviceGroup in dbInserts.GroupBy(a => a.DeviceName))
+        static async PooledTask InserableAsync(TDengineDBProducer @this, IEnumerable<VariableBasicData> dbInserts, string tableName, CancellationToken cancellationToken)
         {
-            foreach (var variableGroup in deviceGroup.GroupBy(a => a.Name))
+            Stopwatch stopwatch = new();
+            stopwatch.Start();
+
+            StringBuilder stringBuilder = new();
+            stringBuilder.Append($"INSERT INTO");
+            bool any = false;
+            //(`id`,`createtime`,`collecttime`,`isonline`,`value`) 
+            foreach (var deviceGroup in dbInserts.GroupBy(a => a.DeviceName))
             {
-                any = true;
-                stringBuilder.Append($"""
+                foreach (var variableGroup in deviceGroup.GroupBy(a => a.Name))
+                {
+                    any = true;
+                    stringBuilder.Append($"""
 
                      `{tableName}_{deviceGroup.Key}_{variableGroup.Key}` 
                      USING `{tableName}` TAGS ("{deviceGroup.Key}", "{variableGroup.Key}") 
@@ -152,25 +168,28 @@ public partial class TDengineDBProducer : BusinessBaseWithCacheIntervalVariable
 
                     """);
 
-                foreach (var item in variableGroup)
-                {
-                    stringBuilder.Append($"""(NOW,"{item.CollectTime.ToString("yyyy-MM-dd HH:mm:ss.fff")}",{item.Id},{item.IsOnline},"{JsonElementExtensions.GetValue(item.Value, true)}"),""");
+                    foreach (var item in variableGroup)
+                    {
+                        stringBuilder.Append($"""(NOW,"{item.CollectTime.ToString("yyyy-MM-dd HH:mm:ss.fff")}",{item.Id},{item.IsOnline},"{JsonElementExtensions.GetValue(item.Value, true)}"),""");
+                    }
+                    stringBuilder.Remove(stringBuilder.Length - 1, 1);
                 }
-                stringBuilder.Remove(stringBuilder.Length - 1, 1);
             }
-        }
 
-        if (!any) return;
+            if (!any) return;
 
-        stringBuilder.Append(';');
-        stringBuilder.AppendLine();
+            stringBuilder.Append(';');
+            stringBuilder.AppendLine();
 
-        var result = await _db.Ado.ExecuteCommandAsync(stringBuilder.ToString(), default, cancellationToken: cancellationToken).ConfigureAwait(false);
+            var result = await @this._db.Ado.ExecuteCommandAsync(stringBuilder.ToString(), default, cancellationToken: cancellationToken).ConfigureAwait(false);
 
-        stopwatch.Stop();
-        //if (result > 0)
-        {
-            LogMessage?.Trace($"TableName：{tableName}，Count：{result}，watchTime:  {stopwatch.ElapsedMilliseconds} ms");
+            stopwatch.Stop();
+            //if (result > 0)
+            {
+                @this.LogMessage?.Trace($"TableName：{tableName}，Count：{result}，watchTime:  {stopwatch.ElapsedMilliseconds} ms");
+            }
+
+            return;
         }
     }
     #endregion 方法

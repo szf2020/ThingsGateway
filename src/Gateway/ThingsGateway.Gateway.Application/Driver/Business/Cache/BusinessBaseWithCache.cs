@@ -8,6 +8,8 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
+using PooledAwait;
+
 using System.Collections.Concurrent;
 
 using ThingsGateway.Extension;
@@ -64,51 +66,56 @@ public abstract class BusinessBaseWithCache : BusinessBase
 
         return base.InitChannelAsync(channel, cancellationToken);
     }
-    protected override async Task ProtectedExecuteAsync(object? state, CancellationToken cancellationToken)
+    protected override Task ProtectedExecuteAsync(object? state, CancellationToken cancellationToken)
     {
-        await Update(cancellationToken).ConfigureAwait(false);
+        return Update(cancellationToken);
     }
-    protected virtual async Task Update(CancellationToken cancellationToken)
+    protected virtual Task Update(CancellationToken cancellationToken)
     {
-        if (VarModelEnable)
-        {
-            await UpdateVarModelMemory(cancellationToken).ConfigureAwait(false);
-            await UpdateVarModelsMemory(cancellationToken).ConfigureAwait(false);
-        }
+        return Update(this, cancellationToken);
 
-        if (DevModelEnable)
+        static async PooledTask Update(BusinessBaseWithCache @this, CancellationToken cancellationToken)
         {
-            await UpdateDevModelMemory(cancellationToken).ConfigureAwait(false);
-        }
+            if (@this.VarModelEnable)
+            {
+                await @this.UpdateVarModelMemory(cancellationToken).ConfigureAwait(false);
+                await @this.UpdateVarModelsMemory(cancellationToken).ConfigureAwait(false);
+            }
 
-        if (AlarmModelEnable)
-        {
-            await UpdateAlarmModelMemory(cancellationToken).ConfigureAwait(false);
-        }
-        if (PluginEventDataModelEnable)
-        {
-            await UpdatePluginEventDataModelMemory(cancellationToken).ConfigureAwait(false);
-        }
-        if (VarModelEnable)
-        {
-            await UpdateVarModelCache(cancellationToken).ConfigureAwait(false);
-            await UpdateVarModelsCache(cancellationToken).ConfigureAwait(false);
-        }
+            if (@this.DevModelEnable)
+            {
+                await @this.UpdateDevModelMemory(cancellationToken).ConfigureAwait(false);
+            }
 
-        if (DevModelEnable)
-        {
-            await UpdateDevModelCache(cancellationToken).ConfigureAwait(false);
-        }
+            if (@this.AlarmModelEnable)
+            {
+                await @this.UpdateAlarmModelMemory(cancellationToken).ConfigureAwait(false);
+            }
+            if (@this.PluginEventDataModelEnable)
+            {
+                await @this.UpdatePluginEventDataModelMemory(cancellationToken).ConfigureAwait(false);
+            }
+            if (@this.VarModelEnable)
+            {
+                await @this.UpdateVarModelCache(cancellationToken).ConfigureAwait(false);
+                await @this.UpdateVarModelsCache(cancellationToken).ConfigureAwait(false);
+            }
 
-        if (AlarmModelEnable)
-        {
-            await UpdateAlarmModelCache(cancellationToken).ConfigureAwait(false);
+            if (@this.DevModelEnable)
+            {
+                await @this.UpdateDevModelCache(cancellationToken).ConfigureAwait(false);
+            }
 
-        }
-        if (PluginEventDataModelEnable)
-        {
-            await UpdatePluginEventDataModelCache(cancellationToken).ConfigureAwait(false);
+            if (@this.AlarmModelEnable)
+            {
+                await @this.UpdateAlarmModelCache(cancellationToken).ConfigureAwait(false);
 
+            }
+            if (@this.PluginEventDataModelEnable)
+            {
+                await @this.UpdatePluginEventDataModelCache(cancellationToken).ConfigureAwait(false);
+
+            }
         }
     }
     #endregion
@@ -349,46 +356,156 @@ public abstract class BusinessBaseWithCache : BusinessBase
     protected abstract ValueTask<OperResult> UpdatePluginEventDataModel(List<CacheDBItem<PluginEventData>> item, CancellationToken cancellationToken);
 
 
-    protected async Task UpdateAlarmModelCache(CancellationToken cancellationToken)
+    protected Task UpdateAlarmModelCache(CancellationToken cancellationToken)
     {
-        if (_businessPropertyWithCache.CacheEnable)
-        {
-            #region //成功上传时，补上传缓存数据
+        return UpdateAlarmModelCache(this, cancellationToken);
 
-            if (IsConnected())
+        static async PooledTask UpdateAlarmModelCache(BusinessBaseWithCache @this, CancellationToken cancellationToken)
+        {
+            if (@this._businessPropertyWithCache.CacheEnable)
             {
-                try
+                #region //成功上传时，补上传缓存数据
+
+                if (@this.IsConnected())
                 {
-                    while (!cancellationToken.IsCancellationRequested)
+                    try
                     {
-                        //循环获取，固定读最大行数量，执行完成需删除行
-                        var varList = await DBCacheAlarm.DBProvider.Queryable<CacheDBItem<AlarmVariable>>().Take(_businessPropertyWithCache.SplitSize).ToListAsync(cancellationToken).ConfigureAwait(false);
-                        if (varList.Count != 0)
+                        while (!cancellationToken.IsCancellationRequested)
                         {
-                            try
+                            //循环获取，固定读最大行数量，执行完成需删除行
+                            var varList = await @this.DBCacheAlarm.DBProvider.Queryable<CacheDBItem<AlarmVariable>>().Take(@this._businessPropertyWithCache.SplitSize).ToListAsync(cancellationToken).ConfigureAwait(false);
+                            if (varList.Count != 0)
                             {
-                                if (!cancellationToken.IsCancellationRequested)
+                                try
                                 {
-                                    var result = await UpdateAlarmModel(varList, cancellationToken).ConfigureAwait(false);
-                                    if (result.IsSuccess)
+                                    if (!cancellationToken.IsCancellationRequested)
                                     {
-                                        //删除缓存
-                                        await DBCacheAlarm.DBProvider.Deleteable<CacheDBItem<AlarmVariable>>(varList).ExecuteCommandAsync(cancellationToken).ConfigureAwait(false);
+                                        var result = await @this.UpdateAlarmModel(varList, cancellationToken).ConfigureAwait(false);
+                                        if (result.IsSuccess)
+                                        {
+                                            //删除缓存
+                                            await @this.DBCacheAlarm.DBProvider.Deleteable<CacheDBItem<AlarmVariable>>(varList).ExecuteCommandAsync(cancellationToken).ConfigureAwait(false);
+                                        }
+                                        else
+                                            break;
                                     }
                                     else
+                                    {
                                         break;
+                                    }
                                 }
-                                else
+                                catch (Exception ex)
                                 {
+                                    if (@this.success)
+                                        @this.LogMessage?.LogWarning(ex);
+                                    @this.success = false;
                                     break;
                                 }
                             }
-                            catch (Exception ex)
+                            else
                             {
-                                if (success)
-                                    LogMessage?.LogWarning(ex);
-                                success = false;
                                 break;
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        if (@this.success)
+                            @this.LogMessage?.LogWarning(ex);
+                        @this.success = false;
+                    }
+                }
+
+
+                #endregion //成功上传时，补上传缓存数据
+            }
+        }
+    }
+    protected Task UpdatePluginEventDataModelCache(CancellationToken cancellationToken)
+    {
+        return UpdatePluginEventDataModelCache(this, cancellationToken);
+
+        static async PooledTask UpdatePluginEventDataModelCache(BusinessBaseWithCache @this, CancellationToken cancellationToken)
+        {
+            if (@this._businessPropertyWithCache.CacheEnable)
+            {
+                #region //成功上传时，补上传缓存数据
+
+                if (@this.IsConnected())
+                {
+                    try
+                    {
+                        while (!cancellationToken.IsCancellationRequested)
+                        {
+                            //循环获取，固定读最大行数量，执行完成需删除行
+                            var varList = await @this.DBCachePluginEventData.DBProvider.Queryable<CacheDBItem<PluginEventData>>().Take(@this._businessPropertyWithCache.SplitSize).ToListAsync(cancellationToken).ConfigureAwait(false);
+                            if (varList.Count != 0)
+                            {
+                                try
+                                {
+                                    if (!cancellationToken.IsCancellationRequested)
+                                    {
+                                        var result = await @this.UpdatePluginEventDataModel(varList, cancellationToken).ConfigureAwait(false);
+                                        if (result.IsSuccess)
+                                        {
+                                            //删除缓存
+                                            await @this.DBCachePluginEventData.DBProvider.Deleteable<CacheDBItem<PluginEventData>>(varList).ExecuteCommandAsync(cancellationToken).ConfigureAwait(false);
+                                        }
+                                        else
+                                            break;
+                                    }
+                                    else
+                                    {
+                                        break;
+                                    }
+                                }
+                                catch (Exception ex)
+                                {
+                                    if (@this.success)
+                                        @this.LogMessage?.LogWarning(ex);
+                                    @this.success = false;
+                                    break;
+                                }
+                            }
+                            else
+                            {
+                                break;
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        if (@this.success)
+                            @this.LogMessage?.LogWarning(ex);
+                        @this.success = false;
+                    }
+                }
+
+                #endregion //成功上传时，补上传缓存数据
+            }
+        }
+    }
+    protected Task UpdateAlarmModelMemory(CancellationToken cancellationToken)
+    {
+        return UpdateAlarmModelMemory(this, cancellationToken);
+
+        static async PooledTask UpdateAlarmModelMemory(BusinessBaseWithCache @this, CancellationToken cancellationToken)
+        {
+            #region //上传设备内存队列中的数据
+
+            try
+            {
+                var list = @this._memoryAlarmModelQueue.ToListWithDequeue().ChunkBetter(@this._businessPropertyWithCache.SplitSize);
+                foreach (var item in list)
+                {
+                    try
+                    {
+                        if (!cancellationToken.IsCancellationRequested)
+                        {
+                            var result = await @this.UpdateAlarmModel(item, cancellationToken).ConfigureAwait(false);
+                            if (!result.IsSuccess)
+                            {
+                                @this.AddCache(item);
                             }
                         }
                         else
@@ -396,59 +513,46 @@ public abstract class BusinessBaseWithCache : BusinessBase
                             break;
                         }
                     }
-                }
-                catch (Exception ex)
-                {
-                    if (success)
-                        LogMessage?.LogWarning(ex);
-                    success = false;
+                    catch (Exception ex)
+                    {
+                        if (@this.success)
+                            @this.LogMessage?.LogWarning(ex);
+                        @this.success = false;
+                    }
                 }
             }
+            catch (Exception ex)
+            {
+                if (@this.success)
+                    @this.LogMessage?.LogWarning(ex);
+                @this.success = false;
+            }
 
-
-            #endregion //成功上传时，补上传缓存数据
+            #endregion //上传设备内存队列中的数据
         }
     }
-    protected async Task UpdatePluginEventDataModelCache(CancellationToken cancellationToken)
+    protected Task UpdatePluginEventDataModelMemory(CancellationToken cancellationToken)
     {
-        if (_businessPropertyWithCache.CacheEnable)
-        {
-            #region //成功上传时，补上传缓存数据
+        return UpdatePluginEventDataModelMemory(this, cancellationToken);
 
-            if (IsConnected())
+        static async PooledTask UpdatePluginEventDataModelMemory(BusinessBaseWithCache @this, CancellationToken cancellationToken)
+        {
+            #region //上传设备内存队列中的数据
+
+
+            try
             {
-                try
+                var list = @this._memoryPluginEventDataModelQueue.ToListWithDequeue().ChunkBetter(@this._businessPropertyWithCache.SplitSize);
+                foreach (var item in list)
                 {
-                    while (!cancellationToken.IsCancellationRequested)
+                    try
                     {
-                        //循环获取，固定读最大行数量，执行完成需删除行
-                        var varList = await DBCachePluginEventData.DBProvider.Queryable<CacheDBItem<PluginEventData>>().Take(_businessPropertyWithCache.SplitSize).ToListAsync(cancellationToken).ConfigureAwait(false);
-                        if (varList.Count != 0)
+                        if (!cancellationToken.IsCancellationRequested)
                         {
-                            try
+                            var result = await @this.UpdatePluginEventDataModel(item, cancellationToken).ConfigureAwait(false);
+                            if (!result.IsSuccess)
                             {
-                                if (!cancellationToken.IsCancellationRequested)
-                                {
-                                    var result = await UpdatePluginEventDataModel(varList, cancellationToken).ConfigureAwait(false);
-                                    if (result.IsSuccess)
-                                    {
-                                        //删除缓存
-                                        await DBCachePluginEventData.DBProvider.Deleteable<CacheDBItem<PluginEventData>>(varList).ExecuteCommandAsync(cancellationToken).ConfigureAwait(false);
-                                    }
-                                    else
-                                        break;
-                                }
-                                else
-                                {
-                                    break;
-                                }
-                            }
-                            catch (Exception ex)
-                            {
-                                if (success)
-                                    LogMessage?.LogWarning(ex);
-                                success = false;
-                                break;
+                                @this.AddCache(item);
                             }
                         }
                         else
@@ -456,99 +560,22 @@ public abstract class BusinessBaseWithCache : BusinessBase
                             break;
                         }
                     }
-                }
-                catch (Exception ex)
-                {
-                    if (success)
-                        LogMessage?.LogWarning(ex);
-                    success = false;
+                    catch (Exception ex)
+                    {
+                        if (@this.success)
+                            @this.LogMessage?.LogWarning(ex);
+                        @this.success = false;
+                    }
                 }
             }
-
-            #endregion //成功上传时，补上传缓存数据
-        }
-    }
-    protected async Task UpdateAlarmModelMemory(CancellationToken cancellationToken)
-    {
-        #region //上传设备内存队列中的数据
-
-        try
-        {
-            var list = _memoryAlarmModelQueue.ToListWithDequeue().ChunkBetter(_businessPropertyWithCache.SplitSize);
-            foreach (var item in list)
+            catch (Exception ex)
             {
-                try
-                {
-                    if (!cancellationToken.IsCancellationRequested)
-                    {
-                        var result = await UpdateAlarmModel(item, cancellationToken).ConfigureAwait(false);
-                        if (!result.IsSuccess)
-                        {
-                            AddCache(item);
-                        }
-                    }
-                    else
-                    {
-                        break;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    if (success)
-                        LogMessage?.LogWarning(ex);
-                    success = false;
-                }
+                if (@this.success)
+                    @this.LogMessage?.LogWarning(ex);
+                @this.success = false;
             }
+            #endregion //上传设备内存队列中的数据
         }
-        catch (Exception ex)
-        {
-            if (success)
-                LogMessage?.LogWarning(ex);
-            success = false;
-        }
-
-        #endregion //上传设备内存队列中的数据
-    }
-    protected async Task UpdatePluginEventDataModelMemory(CancellationToken cancellationToken)
-    {
-        #region //上传设备内存队列中的数据
-
-
-        try
-        {
-            var list = _memoryPluginEventDataModelQueue.ToListWithDequeue().ChunkBetter(_businessPropertyWithCache.SplitSize);
-            foreach (var item in list)
-            {
-                try
-                {
-                    if (!cancellationToken.IsCancellationRequested)
-                    {
-                        var result = await UpdatePluginEventDataModel(item, cancellationToken).ConfigureAwait(false);
-                        if (!result.IsSuccess)
-                        {
-                            AddCache(item);
-                        }
-                    }
-                    else
-                    {
-                        break;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    if (success)
-                        LogMessage?.LogWarning(ex);
-                    success = false;
-                }
-            }
-        }
-        catch (Exception ex)
-        {
-            if (success)
-                LogMessage?.LogWarning(ex);
-            success = false;
-        }
-        #endregion //上传设备内存队列中的数据
     }
 
     #endregion
@@ -672,46 +699,92 @@ public abstract class BusinessBaseWithCache : BusinessBase
     /// <returns></returns>
     protected abstract ValueTask<OperResult> UpdateDevModel(List<CacheDBItem<DeviceBasicData>> item, CancellationToken cancellationToken);
 
-    protected async Task UpdateDevModelCache(CancellationToken cancellationToken)
+    protected Task UpdateDevModelCache(CancellationToken cancellationToken)
     {
-        if (_businessPropertyWithCache.CacheEnable)
-        {
-            #region //成功上传时，补上传缓存数据
+        return UpdateDevModelCache(this, cancellationToken);
 
-            if (IsConnected())
+        static async PooledTask UpdateDevModelCache(BusinessBaseWithCache @this, CancellationToken cancellationToken)
+        {
+            if (@this._businessPropertyWithCache.CacheEnable)
             {
-                try
+                #region //成功上传时，补上传缓存数据
+
+                if (@this.IsConnected())
                 {
-                    while (!cancellationToken.IsCancellationRequested)
+                    try
                     {
-                        //循环获取
-                        var varList = await DBCacheDev.DBProvider.Queryable<CacheDBItem<DeviceBasicData>>().Take(_businessPropertyWithCache.SplitSize).ToListAsync(cancellationToken).ConfigureAwait(false);
-                        if (varList.Count != 0)
+                        while (!cancellationToken.IsCancellationRequested)
                         {
-                            try
+                            //循环获取
+                            var varList = await @this.DBCacheDev.DBProvider.Queryable<CacheDBItem<DeviceBasicData>>().Take(@this._businessPropertyWithCache.SplitSize).ToListAsync(cancellationToken).ConfigureAwait(false);
+                            if (varList.Count != 0)
                             {
-                                if (!cancellationToken.IsCancellationRequested)
+                                try
                                 {
-                                    var result = await UpdateDevModel(varList, cancellationToken).ConfigureAwait(false);
-                                    if (result.IsSuccess)
+                                    if (!cancellationToken.IsCancellationRequested)
                                     {
-                                        //删除缓存
-                                        await DBCacheDev.DBProvider.Deleteable<CacheDBItem<DeviceBasicData>>(varList).ExecuteCommandAsync(cancellationToken).ConfigureAwait(false);
+                                        var result = await @this.UpdateDevModel(varList, cancellationToken).ConfigureAwait(false);
+                                        if (result.IsSuccess)
+                                        {
+                                            //删除缓存
+                                            await @this.DBCacheDev.DBProvider.Deleteable<CacheDBItem<DeviceBasicData>>(varList).ExecuteCommandAsync(cancellationToken).ConfigureAwait(false);
+                                        }
+                                        else
+                                            break;
                                     }
                                     else
+                                    {
                                         break;
+                                    }
                                 }
-                                else
+                                catch (Exception ex)
                                 {
+                                    if (@this.success)
+                                        @this.LogMessage?.LogWarning(ex);
+                                    @this.success = false;
                                     break;
                                 }
                             }
-                            catch (Exception ex)
+                            else
                             {
-                                if (success)
-                                    LogMessage?.LogWarning(ex);
-                                success = false;
                                 break;
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        if (@this.success)
+                            @this.LogMessage?.LogWarning(ex);
+                        @this.success = false;
+                    }
+                }
+
+                #endregion //成功上传时，补上传缓存数据
+            }
+        }
+    }
+
+    protected Task UpdateDevModelMemory(CancellationToken cancellationToken)
+    {
+        return UpdateDevModelMemory(this, cancellationToken);
+
+        static async PooledTask UpdateDevModelMemory(BusinessBaseWithCache @this, CancellationToken cancellationToken)
+        {
+            #region //上传设备内存队列中的数据
+
+            try
+            {
+                var list = @this._memoryDevModelQueue.ToListWithDequeue().ChunkBetter(@this._businessPropertyWithCache.SplitSize);
+                foreach (var item in list)
+                {
+                    try
+                    {
+                        if (!cancellationToken.IsCancellationRequested)
+                        {
+                            var result = await @this.UpdateDevModel(item, cancellationToken).ConfigureAwait(false);
+                            if (!result.IsSuccess)
+                            {
+                                @this.AddCache(item);
                             }
                         }
                         else
@@ -719,59 +792,23 @@ public abstract class BusinessBaseWithCache : BusinessBase
                             break;
                         }
                     }
-                }
-                catch (Exception ex)
-                {
-                    if (success)
-                        LogMessage?.LogWarning(ex);
-                    success = false;
+                    catch (Exception ex)
+                    {
+                        if (@this.success)
+                            @this.LogMessage?.LogWarning(ex);
+                        @this.success = false;
+                    }
                 }
             }
-
-            #endregion //成功上传时，补上传缓存数据
-        }
-    }
-
-    protected async Task UpdateDevModelMemory(CancellationToken cancellationToken)
-    {
-        #region //上传设备内存队列中的数据
-
-        try
-        {
-            var list = _memoryDevModelQueue.ToListWithDequeue().ChunkBetter(_businessPropertyWithCache.SplitSize);
-            foreach (var item in list)
+            catch (Exception ex)
             {
-                try
-                {
-                    if (!cancellationToken.IsCancellationRequested)
-                    {
-                        var result = await UpdateDevModel(item, cancellationToken).ConfigureAwait(false);
-                        if (!result.IsSuccess)
-                        {
-                            AddCache(item);
-                        }
-                    }
-                    else
-                    {
-                        break;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    if (success)
-                        LogMessage?.LogWarning(ex);
-                    success = false;
-                }
+                if (@this.success)
+                    @this.LogMessage?.LogWarning(ex);
+                @this.success = false;
             }
-        }
-        catch (Exception ex)
-        {
-            if (success)
-                LogMessage?.LogWarning(ex);
-            success = false;
-        }
 
-        #endregion //上传设备内存队列中的数据
+            #endregion //上传设备内存队列中的数据
+        }
     }
 
     #endregion
@@ -1010,192 +1047,158 @@ public abstract class BusinessBaseWithCache : BusinessBase
     /// <returns></returns>
     protected abstract ValueTask<OperResult> UpdateVarModels(List<VariableBasicData> item, CancellationToken cancellationToken);
 
-    protected async Task UpdateVarModelCache(CancellationToken cancellationToken)
+    protected Task UpdateVarModelCache(CancellationToken cancellationToken)
     {
-        if (_businessPropertyWithCache.CacheEnable)
+        return UpdateVarModelCache(this, cancellationToken);
+
+        static async PooledTask UpdateVarModelCache(BusinessBaseWithCache @this, CancellationToken cancellationToken)
         {
-            #region //成功上传时，补上传缓存数据
-
-            if (IsConnected())
+            if (@this._businessPropertyWithCache.CacheEnable)
             {
-                try
-                {
-                    while (!cancellationToken.IsCancellationRequested)
-                    {
-                        //循环获取
+                #region //成功上传时，补上传缓存数据
 
-                        var varList = await DBCacheVar.DBProvider.Queryable<CacheDBItem<VariableBasicData>>().Take(_businessPropertyWithCache.SplitSize).ToListAsync(cancellationToken).ConfigureAwait(false);
-                        if (varList.Count != 0)
+                if (@this.IsConnected())
+                {
+                    try
+                    {
+                        while (!cancellationToken.IsCancellationRequested)
                         {
-                            try
+                            //循环获取
+
+                            var varList = await @this.DBCacheVar.DBProvider.Queryable<CacheDBItem<VariableBasicData>>().Take(@this._businessPropertyWithCache.SplitSize).ToListAsync(cancellationToken).ConfigureAwait(false);
+                            if (varList.Count != 0)
                             {
-                                if (!cancellationToken.IsCancellationRequested)
+                                try
                                 {
-                                    var result = await UpdateVarModel(varList, cancellationToken).ConfigureAwait(false);
-                                    if (result.IsSuccess)
+                                    if (!cancellationToken.IsCancellationRequested)
                                     {
-                                        //删除缓存
-                                        await DBCacheVar.DBProvider.Deleteable<CacheDBItem<VariableBasicData>>(varList).ExecuteCommandAsync(cancellationToken).ConfigureAwait(false);
+                                        var result = await @this.UpdateVarModel(varList, cancellationToken).ConfigureAwait(false);
+                                        if (result.IsSuccess)
+                                        {
+                                            //删除缓存
+                                            await @this.DBCacheVar.DBProvider.Deleteable<CacheDBItem<VariableBasicData>>(varList).ExecuteCommandAsync(cancellationToken).ConfigureAwait(false);
+                                        }
+                                        else
+                                            break;
                                     }
                                     else
+                                    {
                                         break;
+                                    }
                                 }
-                                else
+                                catch (Exception ex)
                                 {
+                                    if (@this.success)
+                                        @this.LogMessage?.LogWarning(ex);
+                                    @this.success = false;
                                     break;
                                 }
                             }
-                            catch (Exception ex)
+                            else
                             {
-                                if (success)
-                                    LogMessage?.LogWarning(ex);
-                                success = false;
                                 break;
                             }
                         }
-                        else
-                        {
-                            break;
-                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        if (@this.success)
+                            @this.LogMessage?.LogWarning(ex);
+                        @this.success = false;
                     }
                 }
-                catch (Exception ex)
-                {
-                    if (success)
-                        LogMessage?.LogWarning(ex);
-                    success = false;
-                }
-            }
 
-            #endregion //成功上传时，补上传缓存数据
+                #endregion //成功上传时，补上传缓存数据
+            }
         }
     }
 
-    protected async Task UpdateVarModelsCache(CancellationToken cancellationToken)
+    protected Task UpdateVarModelsCache(CancellationToken cancellationToken)
     {
-        if (_businessPropertyWithCache.CacheEnable)
-        {
-            #region //成功上传时，补上传缓存数据
+        return UpdateVarModelsCache(this, cancellationToken);
 
-            if (IsConnected())
+        static async PooledTask UpdateVarModelsCache(BusinessBaseWithCache @this, CancellationToken cancellationToken)
+        {
+            if (@this._businessPropertyWithCache.CacheEnable)
             {
-                try
+                #region //成功上传时，补上传缓存数据
+
+                if (@this.IsConnected())
                 {
-                    while (!cancellationToken.IsCancellationRequested)
+                    try
                     {
-                        //循环获取
-                        var varList = await DBCacheVars.DBProvider.Queryable<CacheDBItem<List<VariableBasicData>>>().FirstAsync(cancellationToken).ConfigureAwait(false);
-                        if (varList?.Value?.Count > 0)
+                        while (!cancellationToken.IsCancellationRequested)
                         {
-                            try
+                            //循环获取
+                            var varList = await @this.DBCacheVars.DBProvider.Queryable<CacheDBItem<List<VariableBasicData>>>().FirstAsync(cancellationToken).ConfigureAwait(false);
+                            if (varList?.Value?.Count > 0)
                             {
-                                if (!cancellationToken.IsCancellationRequested)
+                                try
                                 {
-                                    var result = await UpdateVarModels(varList.Value, cancellationToken).ConfigureAwait(false);
-                                    if (result.IsSuccess)
+                                    if (!cancellationToken.IsCancellationRequested)
                                     {
-                                        //删除缓存
-                                        await DBCacheVars.DBProvider.DeleteableT<CacheDBItem<List<VariableBasicData>>>(varList).ExecuteCommandAsync(cancellationToken).ConfigureAwait(false);
+                                        var result = await @this.UpdateVarModels(varList.Value, cancellationToken).ConfigureAwait(false);
+                                        if (result.IsSuccess)
+                                        {
+                                            //删除缓存
+                                            await @this.DBCacheVars.DBProvider.DeleteableT<CacheDBItem<List<VariableBasicData>>>(varList).ExecuteCommandAsync(cancellationToken).ConfigureAwait(false);
+                                        }
+                                        else
+                                            break;
                                     }
                                     else
+                                    {
                                         break;
+                                    }
                                 }
-                                else
+                                catch (Exception ex)
                                 {
+                                    if (@this.success)
+                                        @this.LogMessage?.LogWarning(ex);
+                                    @this.success = false;
                                     break;
                                 }
                             }
-                            catch (Exception ex)
+                            else
                             {
-                                if (success)
-                                    LogMessage?.LogWarning(ex);
-                                success = false;
                                 break;
                             }
                         }
-                        else
-                        {
-                            break;
-                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        if (@this.success)
+                            @this.LogMessage?.LogWarning(ex);
+                        @this.success = false;
                     }
                 }
-                catch (Exception ex)
-                {
-                    if (success)
-                        LogMessage?.LogWarning(ex);
-                    success = false;
-                }
-            }
 
-            #endregion //成功上传时，补上传缓存数据
+                #endregion //成功上传时，补上传缓存数据
+            }
         }
     }
 
-    protected async Task UpdateVarModelMemory(CancellationToken cancellationToken)
+    protected Task UpdateVarModelMemory(CancellationToken cancellationToken)
     {
-        #region //上传变量内存队列中的数据
+        return UpdateVarModelMemory(this, cancellationToken);
 
-        try
+        static async PooledTask UpdateVarModelMemory(BusinessBaseWithCache @this, CancellationToken cancellationToken)
         {
-            var list = _memoryVarModelQueue.ToListWithDequeue().ChunkBetter(_businessPropertyWithCache.SplitSize);
-            foreach (var item in list)
+            #region //上传变量内存队列中的数据
+
+            try
             {
-                try
-                {
-                    if (!cancellationToken.IsCancellationRequested)
-                    {
-                        var result = await UpdateVarModel(item, cancellationToken).ConfigureAwait(false);
-                        if (!result.IsSuccess)
-                        {
-                            AddCache(item);
-                        }
-                    }
-                    else
-                    {
-                        break;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    if (success)
-                        LogMessage?.LogWarning(ex);
-                    success = false;
-                }
-            }
-        }
-        catch (Exception ex)
-        {
-            if (success)
-                LogMessage?.LogWarning(ex);
-            success = false;
-        }
-
-        #endregion //上传变量内存队列中的数据
-    }
-
-    protected async Task UpdateVarModelsMemory(CancellationToken cancellationToken)
-    {
-        #region //上传变量内存队列中的数据
-
-        try
-        {
-            var queues = _memoryVarModelsQueue.ToListWithDequeue();
-            foreach (var cacheDBItem in queues)
-            {
-                if (cancellationToken.IsCancellationRequested)
-                    break;
-                var list = cacheDBItem.Value;
-                var data = list.ChunkBetter(_businessPropertyWithCache.SplitSize);
-                foreach (var item in data)
+                var list = @this._memoryVarModelQueue.ToListWithDequeue().ChunkBetter(@this._businessPropertyWithCache.SplitSize);
+                foreach (var item in list)
                 {
                     try
                     {
                         if (!cancellationToken.IsCancellationRequested)
                         {
-                            var result = await UpdateVarModels(item, cancellationToken).ConfigureAwait(false);
+                            var result = await @this.UpdateVarModel(item, cancellationToken).ConfigureAwait(false);
                             if (!result.IsSuccess)
                             {
-                                AddCache(new List<CacheDBItem<List<VariableBasicData>>>() { new CacheDBItem<List<VariableBasicData>>(item) });
+                                @this.AddCache(item);
                             }
                         }
                         else
@@ -1205,21 +1208,75 @@ public abstract class BusinessBaseWithCache : BusinessBase
                     }
                     catch (Exception ex)
                     {
-                        if (success)
-                            LogMessage?.LogWarning(ex);
-                        success = false;
+                        if (@this.success)
+                            @this.LogMessage?.LogWarning(ex);
+                        @this.success = false;
                     }
                 }
             }
-        }
-        catch (Exception ex)
-        {
-            if (success)
-                LogMessage?.LogWarning(ex);
-            success = false;
-        }
+            catch (Exception ex)
+            {
+                if (@this.success)
+                    @this.LogMessage?.LogWarning(ex);
+                @this.success = false;
+            }
 
-        #endregion //上传变量内存队列中的数据
+            #endregion //上传变量内存队列中的数据
+        }
+    }
+
+    protected Task UpdateVarModelsMemory(CancellationToken cancellationToken)
+    {
+        return UpdateVarModelsMemory(this, cancellationToken);
+
+        static async PooledTask UpdateVarModelsMemory(BusinessBaseWithCache @this, CancellationToken cancellationToken)
+        {
+            #region //上传变量内存队列中的数据
+
+            try
+            {
+                var queues = @this._memoryVarModelsQueue.ToListWithDequeue();
+                foreach (var cacheDBItem in queues)
+                {
+                    if (cancellationToken.IsCancellationRequested)
+                        break;
+                    var list = cacheDBItem.Value;
+                    var data = list.ChunkBetter(@this._businessPropertyWithCache.SplitSize);
+                    foreach (var item in data)
+                    {
+                        try
+                        {
+                            if (!cancellationToken.IsCancellationRequested)
+                            {
+                                var result = await @this.UpdateVarModels(item, cancellationToken).ConfigureAwait(false);
+                                if (!result.IsSuccess)
+                                {
+                                    @this.AddCache(new List<CacheDBItem<List<VariableBasicData>>>() { new CacheDBItem<List<VariableBasicData>>(item) });
+                                }
+                            }
+                            else
+                            {
+                                break;
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            if (@this.success)
+                                @this.LogMessage?.LogWarning(ex);
+                            @this.success = false;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                if (@this.success)
+                    @this.LogMessage?.LogWarning(ex);
+                @this.success = false;
+            }
+
+            #endregion //上传变量内存队列中的数据
+        }
     }
 
     #endregion

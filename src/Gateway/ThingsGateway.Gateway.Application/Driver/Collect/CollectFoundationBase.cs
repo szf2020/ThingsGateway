@@ -81,72 +81,77 @@ public abstract class CollectFoundationBase : CollectBase
     }
 
 
-    protected override async Task TestOnline(object? state, CancellationToken cancellationToken)
+    protected override ValueTask TestOnline(object? state, CancellationToken cancellationToken)
     {
-        if (FoundationDevice != null)
+        return TestOnline(this, cancellationToken);
+
+
+        static async PooledValueTask TestOnline(CollectFoundationBase @this, CancellationToken cancellationToken)
         {
-            if (!FoundationDevice.OnLine)
+            if (@this.FoundationDevice != null)
             {
-                if (!FoundationDevice.DisposedValue || FoundationDevice.Channel?.DisposedValue != false) return;
-                Exception exception = null;
-                try
+                if (!@this.FoundationDevice.OnLine)
                 {
-                    if (!cancellationToken.IsCancellationRequested)
+                    if (!@this.FoundationDevice.DisposedValue || @this.FoundationDevice.Channel?.DisposedValue != false) return;
+                    Exception exception = null;
+                    try
                     {
-                        if (!FoundationDevice.DisposedValue || FoundationDevice.Channel?.DisposedValue != false) return;
-
-                        await FoundationDevice.ConnectAsync(cancellationToken).ConfigureAwait(false);
-
-                        if (CurrentDevice.DeviceStatusChangeTime < TimerX.Now.AddMinutes(-1))
+                        if (!cancellationToken.IsCancellationRequested)
                         {
-                            await Task.Delay(30000, cancellationToken).ConfigureAwait(false);
+                            if (!@this.FoundationDevice.DisposedValue || @this.FoundationDevice.Channel?.DisposedValue != false) return;
+
+                            await @this.FoundationDevice.ConnectAsync(cancellationToken).ConfigureAwait(false);
+
+                            if (@this.CurrentDevice.DeviceStatusChangeTime < TimerX.Now.AddMinutes(-1))
+                            {
+                                await Task.Delay(30000, cancellationToken).ConfigureAwait(false);
+                            }
                         }
                     }
-                }
-                catch (OperationCanceledException)
-                {
-                }
-                catch (Exception ex)
-                {
-                    exception = ex;
-                }
-                if (cancellationToken.IsCancellationRequested)
-                {
-                    return;
-                }
-                if (FoundationDevice.OnLine == false && exception != null)
-                {
-                    foreach (var item in CurrentDevice.VariableSourceReads)
+                    catch (OperationCanceledException)
                     {
-                        if (item.LastErrorMessage != exception.Message)
-                        {
-                            if (!cancellationToken.IsCancellationRequested)
-                                LogMessage?.LogWarning(exception, string.Format(AppResource.CollectFail, DeviceName, item?.RegisterAddress, item?.Length, exception.Message));
-                        }
-                        item.LastErrorMessage = exception.Message;
-                        CurrentDevice.SetDeviceStatus(TimerX.Now, null, exception.Message);
-                        var time = DateTime.Now;
-                        item.VariableRuntimes.ForEach(a => a.SetValue(null, time, isOnline: false));
                     }
-                    foreach (var item in CurrentDevice.ReadVariableMethods)
+                    catch (Exception ex)
                     {
-                        if (item.LastErrorMessage != exception.Message)
-                        {
-                            if (!cancellationToken.IsCancellationRequested)
-                                LogMessage?.LogWarning(exception, string.Format(AppResource.MethodFail, DeviceName, item.MethodInfo.Name, exception.Message));
-                        }
-                        item.LastErrorMessage = exception.Message;
-                        CurrentDevice.SetDeviceStatus(TimerX.Now, null, exception.Message);
-                        var time = DateTime.Now;
-                        item.Variable.SetValue(null, time, isOnline: false);
+                        exception = ex;
                     }
+                    if (cancellationToken.IsCancellationRequested)
+                    {
+                        return;
+                    }
+                    if (@this.FoundationDevice.OnLine == false && exception != null)
+                    {
+                        foreach (var item in @this.CurrentDevice.VariableSourceReads)
+                        {
+                            if (item.LastErrorMessage != exception.Message)
+                            {
+                                if (!cancellationToken.IsCancellationRequested)
+                                    @this.LogMessage?.LogWarning(exception, string.Format(AppResource.CollectFail, @this.DeviceName, item?.RegisterAddress, item?.Length, exception.Message));
+                            }
+                            item.LastErrorMessage = exception.Message;
+                            @this.CurrentDevice.SetDeviceStatus(TimerX.Now, null, exception.Message);
+                            var time = DateTime.Now;
+                            item.VariableRuntimes.ForEach(a => a.SetValue(null, time, isOnline: false));
+                        }
+                        foreach (var item in @this.CurrentDevice.ReadVariableMethods)
+                        {
+                            if (item.LastErrorMessage != exception.Message)
+                            {
+                                if (!cancellationToken.IsCancellationRequested)
+                                    @this.LogMessage?.LogWarning(exception, string.Format(AppResource.MethodFail, @this.DeviceName, item.MethodInfo.Name, exception.Message));
+                            }
+                            item.LastErrorMessage = exception.Message;
+                            @this.CurrentDevice.SetDeviceStatus(TimerX.Now, null, exception.Message);
+                            var time = DateTime.Now;
+                            item.Variable.SetValue(null, time, isOnline: false);
+                        }
 
-                    return;
+                    }
                 }
             }
+
         }
 
-        return;
     }
 
 
@@ -309,46 +314,51 @@ public abstract class CollectFoundationBase : CollectBase
     /// 批量写入变量值,需返回变量名称/结果，注意非通用设备需重写
     /// </summary>
     /// <returns></returns>
-    protected override async ValueTask<Dictionary<string, OperResult>> WriteValuesAsync(Dictionary<VariableRuntime, JToken> writeInfoLists, CancellationToken cancellationToken)
+    protected override ValueTask<Dictionary<string, OperResult>> WriteValuesAsync(Dictionary<VariableRuntime, JToken> writeInfoLists, CancellationToken cancellationToken)
     {
-        using var writeLock = await ReadWriteLock.WriterLockAsync(cancellationToken).ConfigureAwait(false);
-        // 检查协议是否为空，如果为空则抛出异常
-        if (FoundationDevice == null)
-            throw new NotSupportedException();
+        return WriteValuesAsync(this, writeInfoLists, cancellationToken);
 
-        // 创建用于存储操作结果的并发字典
-        NonBlockingDictionary<string, OperResult> operResults = new();
-        // 使用并发方式遍历写入信息列表，并进行异步写入操作
-        await writeInfoLists.ParallelForEachAsync(async (writeInfo, cancellationToken) =>
+        static async PooledValueTask<Dictionary<string, OperResult>> WriteValuesAsync(CollectFoundationBase @this, Dictionary<VariableRuntime, JToken> writeInfoLists, CancellationToken cancellationToken)
         {
-            try
+            using var writeLock = await @this.ReadWriteLock.WriterLockAsync(cancellationToken).ConfigureAwait(false);
+            // 检查协议是否为空，如果为空则抛出异常
+            if (@this.FoundationDevice == null)
+                throw new NotSupportedException();
+
+            // 创建用于存储操作结果的并发字典
+            NonBlockingDictionary<string, OperResult> operResults = new();
+            // 使用并发方式遍历写入信息列表，并进行异步写入操作
+            await writeInfoLists.ParallelForEachAsync(async (writeInfo, cancellationToken) =>
             {
-
-                // 调用协议的写入方法，将写入信息中的数据写入到对应的寄存器地址，并获取操作结果
-                var result = await FoundationDevice.WriteJTokenAsync(writeInfo.Key.RegisterAddress, writeInfo.Value, writeInfo.Key.DataType, cancellationToken).ConfigureAwait(false);
-
-                if (result.IsSuccess)
+                try
                 {
-                    if (LogMessage?.LogLevel <= TouchSocket.Core.LogLevel.Debug)
-                        LogMessage?.Debug(string.Format("{0} - Write [{1} - {2} - {3}] data succeeded", DeviceName, writeInfo.Key.RegisterAddress, writeInfo.Value, writeInfo.Key.DataType));
+
+                    // 调用协议的写入方法，将写入信息中的数据写入到对应的寄存器地址，并获取操作结果
+                    var result = await @this.FoundationDevice.WriteJTokenAsync(writeInfo.Key.RegisterAddress, writeInfo.Value, writeInfo.Key.DataType, cancellationToken).ConfigureAwait(false);
+
+                    if (result.IsSuccess)
+                    {
+                        if (@this.LogMessage?.LogLevel <= TouchSocket.Core.LogLevel.Debug)
+                            @this.LogMessage?.Debug(string.Format("{0} - Write [{1} - {2} - {3}] data succeeded", @this.DeviceName, writeInfo.Key.RegisterAddress, writeInfo.Value, writeInfo.Key.DataType));
+                    }
+                    else
+                    {
+                        @this.LogMessage?.Warning(string.Format("{0} - Write [{1} - {2} - {3}] data failed {4}", @this.DeviceName, writeInfo.Key.RegisterAddress, writeInfo.Value, writeInfo.Key.DataType, result.ToString()));
+                    }
+                    // 将操作结果添加到结果字典中，使用变量名称作为键
+                    operResults.TryAdd(writeInfo.Key.Name, result);
                 }
-                else
+                catch (Exception ex)
                 {
-                    LogMessage?.Warning(string.Format("{0} - Write [{1} - {2} - {3}] data failed {4}", DeviceName, writeInfo.Key.RegisterAddress, writeInfo.Value, writeInfo.Key.DataType, result.ToString()));
+                    operResults.TryAdd(writeInfo.Key.Name, new(ex));
                 }
-                // 将操作结果添加到结果字典中，使用变量名称作为键
-                operResults.TryAdd(writeInfo.Key.Name, result);
-            }
-            catch (Exception ex)
-            {
-                operResults.TryAdd(writeInfo.Key.Name, new(ex));
-            }
-        }, CollectProperties.MaxConcurrentCount, cancellationToken).ConfigureAwait(false);
+            }, @this.CollectProperties.MaxConcurrentCount, cancellationToken).ConfigureAwait(false);
 
-        await Check(writeInfoLists, operResults, cancellationToken).ConfigureAwait(false);
+            await @this.Check(writeInfoLists, operResults, cancellationToken).ConfigureAwait(false);
 
-        // 返回包含操作结果的字典
-        return new Dictionary<string, OperResult>(operResults);
+            // 返回包含操作结果的字典
+            return new Dictionary<string, OperResult>(operResults);
+        }
     }
 
 

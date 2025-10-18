@@ -20,6 +20,8 @@ using MQTTnet.Server;
 
 using Newtonsoft.Json.Linq;
 
+using PooledAwait;
+
 using System.Text;
 
 using ThingsGateway.Admin.Application;
@@ -165,25 +167,30 @@ public partial class MqttServer : BusinessBaseWithCacheIntervalScriptAll
     }
     #region private
 
-    private async ValueTask<OperResult> Update(IEnumerable<TopicArray> topicArrayList, CancellationToken cancellationToken)
+    private ValueTask<OperResult> Update(IEnumerable<TopicArray> topicArrayList, CancellationToken cancellationToken)
     {
-        foreach (var topicArray in topicArrayList)
+        return Update(this, topicArrayList, cancellationToken);
+
+        static async PooledValueTask<OperResult> Update(MqttServer @this, IEnumerable<TopicArray> topicArrayList, CancellationToken cancellationToken)
         {
-            var result = await MqttUpAsync(topicArray, cancellationToken).ConfigureAwait(false);
-            if (success != result.IsSuccess)
+            foreach (var topicArray in topicArrayList)
             {
+                var result = await @this.MqttUpAsync(topicArray, cancellationToken).ConfigureAwait(false);
+                if (@this.success != result.IsSuccess)
+                {
+                    if (!result.IsSuccess)
+                    {
+                        @this.LogMessage?.LogWarning(result.ToString());
+                    }
+                    @this.success = result.IsSuccess;
+                }
                 if (!result.IsSuccess)
                 {
-                    LogMessage?.LogWarning(result.ToString());
+                    return result;
                 }
-                success = result.IsSuccess;
             }
-            if (!result.IsSuccess)
-            {
-                return result;
-            }
+            return OperResult.Success;
         }
-        return OperResult.Success;
     }
 
     private ValueTask<OperResult> UpdateAlarmModel(IEnumerable<AlarmVariable> item, CancellationToken cancellationToken)
@@ -207,65 +214,70 @@ public partial class MqttServer : BusinessBaseWithCacheIntervalScriptAll
 
     #endregion private
 
-    private async ValueTask<Dictionary<string, Dictionary<string, IOperResult>>> GetRpcResult(string clientId, Dictionary<string, Dictionary<string, JToken>> rpcDatas)
+    private ValueTask<Dictionary<string, Dictionary<string, IOperResult>>> GetRpcResult(string clientId, Dictionary<string, Dictionary<string, JToken>> rpcDatas)
     {
-        var mqttRpcResult = new Dictionary<string, Dictionary<string, IOperResult>>();
-        rpcDatas.ForEach(a => mqttRpcResult.Add(a.Key, new()));
-        try
+        return GetRpcResult(this, clientId, rpcDatas);
+
+        static async PooledValueTask<Dictionary<string, Dictionary<string, IOperResult>>> GetRpcResult(MqttServer @this, string clientId, Dictionary<string, Dictionary<string, JToken>> rpcDatas)
         {
-            foreach (var rpcData in rpcDatas)
+            var mqttRpcResult = new Dictionary<string, Dictionary<string, IOperResult>>();
+            rpcDatas.ForEach(a => mqttRpcResult.Add(a.Key, new()));
+            try
             {
-                if (GlobalData.ReadOnlyDevices.TryGetValue(rpcData.Key, out var device))
+                foreach (var rpcData in rpcDatas)
                 {
-                    foreach (var item in rpcData.Value)
+                    if (GlobalData.ReadOnlyDevices.TryGetValue(rpcData.Key, out var device))
                     {
-                        if (device.ReadOnlyVariableRuntimes.TryGetValue(item.Key, out var variable) && IdVariableRuntimes.TryGetValue(variable.Id, out var tag))
+                        foreach (var item in rpcData.Value)
                         {
-                            var rpcEnable = tag.GetPropertyValue(DeviceId, nameof(_variablePropertys.VariableRpcEnable))?.ToBoolean();
-                            if (rpcEnable == false)
+                            if (device.ReadOnlyVariableRuntimes.TryGetValue(item.Key, out var variable) && @this.IdVariableRuntimes.TryGetValue(variable.Id, out var tag))
                             {
-                                mqttRpcResult[rpcData.Key].Add(item.Key, new OperResult("RPCEnable is False"));
+                                var rpcEnable = tag.GetPropertyValue(@this.DeviceId, nameof(_variablePropertys.VariableRpcEnable))?.ToBoolean();
+                                if (rpcEnable == false)
+                                {
+                                    mqttRpcResult[rpcData.Key].Add(item.Key, new OperResult("RPCEnable is False"));
+                                }
+                            }
+                            else
+                            {
+                                mqttRpcResult[rpcData.Key].Add(item.Key, new OperResult("The variable does not exist"));
                             }
                         }
-                        else
+                    }
+                }
+
+                Dictionary<string, Dictionary<string, string>> writeData = new();
+                foreach (var item in rpcDatas)
+                {
+                    writeData.Add(item.Key, new());
+
+                    foreach (var kv in item.Value)
+                    {
+                        if (!mqttRpcResult[item.Key].ContainsKey(kv.Key))
                         {
-                            mqttRpcResult[rpcData.Key].Add(item.Key, new OperResult("The variable does not exist"));
+                            writeData[item.Key].Add(kv.Key, kv.Value?.ToString());
                         }
                     }
                 }
-            }
 
-            Dictionary<string, Dictionary<string, string>> writeData = new();
-            foreach (var item in rpcDatas)
-            {
-                writeData.Add(item.Key, new());
+                var result = await GlobalData.RpcService.InvokeDeviceMethodAsync(@this.ToString() + "-" + clientId,
+                    writeData).ConfigureAwait(false);
 
-                foreach (var kv in item.Value)
+                foreach (var dictKv in result)
                 {
-                    if (!mqttRpcResult[item.Key].ContainsKey(kv.Key))
+                    foreach (var item in dictKv.Value)
                     {
-                        writeData[item.Key].Add(kv.Key, kv.Value?.ToString());
+                        mqttRpcResult[dictKv.Key].TryAdd(item.Key, item.Value);
                     }
                 }
             }
-
-            var result = await GlobalData.RpcService.InvokeDeviceMethodAsync(ToString() + "-" + clientId,
-                writeData).ConfigureAwait(false);
-
-            foreach (var dictKv in result)
+            catch (Exception ex)
             {
-                foreach (var item in dictKv.Value)
-                {
-                    mqttRpcResult[dictKv.Key].TryAdd(item.Key, item.Value);
-                }
+                @this.LogMessage?.LogWarning(ex);
             }
-        }
-        catch (Exception ex)
-        {
-            LogMessage?.LogWarning(ex);
-        }
 
-        return mqttRpcResult;
+            return mqttRpcResult;
+        }
     }
 
     private List<MqttApplicationMessage> GetRetainedMessages()
@@ -328,14 +340,19 @@ public partial class MqttServer : BusinessBaseWithCacheIntervalScriptAll
         return Task.CompletedTask;
     }
 
-    private async Task MqttServer_InterceptingPublishAsync(InterceptingPublishEventArgs args)
+    private Task MqttServer_InterceptingPublishAsync(InterceptingPublishEventArgs args)
     {
-        try
+        return MqttServer_InterceptingPublishAsync(this, args);
+
+
+        static async PooledTask MqttServer_InterceptingPublishAsync(MqttServer @this, InterceptingPublishEventArgs args)
         {
+            try
+            {
 #if NET8_0_OR_GREATER
 
-            var payload = args.ApplicationMessage.Payload;
-            var payloadCount = payload.Length;
+                var payload = args.ApplicationMessage.Payload;
+                var payloadCount = payload.Length;
 #else
 
         var payload = args.ApplicationMessage.PayloadSegment;
@@ -343,53 +360,56 @@ public partial class MqttServer : BusinessBaseWithCacheIntervalScriptAll
 
 #endif
 
-            if (args.ApplicationMessage.Topic == _driverPropertys.RpcQuestTopic && payloadCount > 0)
-            {
-                var data = GetRetainedMessages();
-
-                foreach (var item in data)
+                if (args.ApplicationMessage.Topic == @this._driverPropertys.RpcQuestTopic && payloadCount > 0)
                 {
-                    await _mqttServer.InjectApplicationMessage(new InjectedMqttApplicationMessage(item)).ConfigureAwait(false);
-                }
-                return;
-            }
+                    var data = @this.GetRetainedMessages();
 
-            if (!_driverPropertys.DeviceRpcEnable || string.IsNullOrEmpty(args.ClientId))
-                return;
-
-            if (!_driverPropertys.BigTextScriptRpc.IsNullOrEmpty())
-            {
-                var rpcBase = CSharpScriptEngineExtension.Do<DynamicMqttServerRpcBase>(_driverPropertys.BigTextScriptRpc);
-
-                await rpcBase.RPCInvokeAsync(LogMessage, args, _driverPropertys, _mqttServer, GetRpcResult, CancellationToken.None).ConfigureAwait(false);
-            }
-            else
-            {
-                if (_driverPropertys.RpcWriteTopic.IsNullOrWhiteSpace()) return;
-
-                var t = string.Format(null, RpcTopic, _driverPropertys.RpcWriteTopic);
-                if (MqttTopicFilterComparer.Compare(args.ApplicationMessage.Topic, t) != MqttTopicFilterCompareResult.IsMatch)
+                    foreach (var item in data)
+                    {
+                        await @this._mqttServer.InjectApplicationMessage(new InjectedMqttApplicationMessage(item)).ConfigureAwait(false);
+                    }
                     return;
-                var rpcDatas = Encoding.UTF8.GetString(payload).FromJsonNetString<Dictionary<string, Dictionary<string, JToken>>>();
-                if (rpcDatas == null)
-                    return;
-                var mqttRpcResult = await GetRpcResult(args.ClientId, rpcDatas).ConfigureAwait(false);
-
-                try
-                {
-                    var variableMessage = new MqttApplicationMessageBuilder()
-        .WithTopic($"{args.ApplicationMessage.Topic}/Response")
-        .WithPayload(mqttRpcResult.ToSystemTextJsonString(_driverPropertys.JsonFormattingIndented)).Build();
-                    await _mqttServer.InjectApplicationMessage(new InjectedMqttApplicationMessage(variableMessage)).ConfigureAwait(false);
                 }
-                catch
+
+                if (!@this._driverPropertys.DeviceRpcEnable || string.IsNullOrEmpty(args.ClientId))
+                    return;
+
+                if (!@this._driverPropertys.BigTextScriptRpc.IsNullOrEmpty())
                 {
+                    var rpcBase = CSharpScriptEngineExtension.Do<DynamicMqttServerRpcBase>(@this._driverPropertys.BigTextScriptRpc);
+
+                    await rpcBase.RPCInvokeAsync(@this.LogMessage, args, @this._driverPropertys, @this._mqttServer, @this.GetRpcResult, CancellationToken.None).ConfigureAwait(false);
+                }
+                else
+                {
+                    if (@this._driverPropertys.RpcWriteTopic.IsNullOrWhiteSpace()) return;
+
+                    var t = string.Format(null, RpcTopic, @this._driverPropertys.RpcWriteTopic);
+                    if (MqttTopicFilterComparer.Compare(args.ApplicationMessage.Topic, t) != MqttTopicFilterCompareResult.IsMatch)
+                        return;
+                    var rpcDatas = Encoding.UTF8.GetString(payload).FromJsonNetString<Dictionary<string, Dictionary<string, JToken>>>();
+                    if (rpcDatas == null)
+                        return;
+                    var mqttRpcResult = await @this.GetRpcResult(args.ClientId, rpcDatas).ConfigureAwait(false);
+
+                    try
+                    {
+                        var variableMessage = new MqttApplicationMessageBuilder()
+            .WithTopic($"{args.ApplicationMessage.Topic}/Response")
+            .WithPayload(mqttRpcResult.ToSystemTextJsonString(@this._driverPropertys.JsonFormattingIndented)).Build();
+                        await @this._mqttServer.InjectApplicationMessage(new InjectedMqttApplicationMessage(variableMessage)).ConfigureAwait(false);
+                    }
+                    catch
+                    {
+                    }
                 }
             }
-        }
-        catch (Exception ex)
-        {
-            LogMessage?.LogWarning(ex, $"MqttServer_InterceptingPublishAsync error");
+            catch (Exception ex)
+            {
+                @this.LogMessage?.LogWarning(ex, $"MqttServer_InterceptingPublishAsync error");
+            }
+
+            return;
         }
     }
 
@@ -432,33 +452,38 @@ public partial class MqttServer : BusinessBaseWithCacheIntervalScriptAll
     /// <summary>
     /// 上传mqtt，返回上传结果
     /// </summary>
-    public async ValueTask<OperResult> MqttUpAsync(TopicArray topicArray, CancellationToken cancellationToken = default)
+    public ValueTask<OperResult> MqttUpAsync(TopicArray topicArray, CancellationToken cancellationToken = default)
     {
-        try
-        {
-            var message = new MqttApplicationMessageBuilder()
-.WithTopic(topicArray.Topic).WithQualityOfServiceLevel(_driverPropertys.MqttQualityOfServiceLevel).WithRetainFlag()
-.WithPayload(topicArray.Payload).Build();
-            await _mqttServer.InjectApplicationMessage(
-                    new InjectedMqttApplicationMessage(message), cancellationToken).ConfigureAwait(false);
+        return MqttUpAsync(this, topicArray, cancellationToken);
 
-            if (_driverPropertys.DetailLog)
-            {
-                if (LogMessage?.LogLevel <= TouchSocket.Core.LogLevel.Trace)
-                    LogMessage?.LogTrace(GetDetailLogString(topicArray, _memoryVarModelQueue.Count));
-                else if (LogMessage?.LogLevel <= TouchSocket.Core.LogLevel.Debug)
-                    LogMessage?.LogDebug(GetCountLogString(topicArray, _memoryVarModelQueue.Count));
-            }
-            else
-            {
-                if (LogMessage?.LogLevel <= TouchSocket.Core.LogLevel.Debug)
-                    LogMessage?.LogDebug(GetCountLogString(topicArray, _memoryVarModelQueue.Count));
-            }
-            return OperResult.Success;
-        }
-        catch (Exception ex)
+        static async PooledValueTask<OperResult> MqttUpAsync(MqttServer @this, TopicArray topicArray, CancellationToken cancellationToken)
         {
-            return new OperResult("Upload fail", ex);
+            try
+            {
+                var message = new MqttApplicationMessageBuilder()
+    .WithTopic(topicArray.Topic).WithQualityOfServiceLevel(@this._driverPropertys.MqttQualityOfServiceLevel).WithRetainFlag()
+    .WithPayload(topicArray.Payload).Build();
+                await @this._mqttServer.InjectApplicationMessage(
+                        new InjectedMqttApplicationMessage(message), cancellationToken).ConfigureAwait(false);
+
+                if (@this._driverPropertys.DetailLog)
+                {
+                    if (@this.LogMessage?.LogLevel <= TouchSocket.Core.LogLevel.Trace)
+                        @this.LogMessage?.LogTrace(@this.GetDetailLogString(topicArray, @this._memoryVarModelQueue.Count));
+                    else if (@this.LogMessage?.LogLevel <= TouchSocket.Core.LogLevel.Debug)
+                        @this.LogMessage?.LogDebug(@this.GetCountLogString(topicArray, @this._memoryVarModelQueue.Count));
+                }
+                else
+                {
+                    if (@this.LogMessage?.LogLevel <= TouchSocket.Core.LogLevel.Debug)
+                        @this.LogMessage?.LogDebug(@this.GetCountLogString(topicArray, @this._memoryVarModelQueue.Count));
+                }
+                return OperResult.Success;
+            }
+            catch (Exception ex)
+            {
+                return new OperResult("Upload fail", ex);
+            }
         }
     }
 

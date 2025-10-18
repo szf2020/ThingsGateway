@@ -8,6 +8,8 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
+using ThingsGateway.NewLife.Collections;
+
 namespace ThingsGateway.NewLife;
 
 /// <summary>
@@ -93,15 +95,20 @@ public sealed class WaitLock : IDisposable
 #if NET6_0_OR_GREATER
         if (cancellationToken.CanBeCanceled)
             return WaitUntilCountOrTimeoutAsync(_waiterLock.WaitAsync(Timeout.Infinite, CancellationToken.None), Timeout.Infinite, cancellationToken);
+        //return WaitUntilAsync2(_waiterLock.WaitAsync(Timeout.Infinite, CancellationToken.None), Timeout.Infinite, cancellationToken);
         else
             return _waiterLock.WaitAsync(Timeout.Infinite, CancellationToken.None);
 
 #else
-        return _waiterLock.WaitAsync(Timeout.Infinite,cancellationToken);
+        return _waiterLock.WaitAsync(Timeout.Infinite, cancellationToken);
 #endif
     }
 
 #if NET6_0_OR_GREATER
+
+
+    //private ObjectPoolLock<ReusableCancellationTokenSource> _reusableTimeouts = new();
+
     /// <summary>Performs the asynchronous wait.</summary>
     /// <param name="asyncWaiter">The asynchronous waiter.</param>
     /// <param name="millisecondsTimeout">The timeout.</param>
@@ -118,6 +125,61 @@ public sealed class WaitLock : IDisposable
             return (asyncWaiter.WaitAsync(TimeSpan.FromMilliseconds(millisecondsTimeout), cancellationToken));
         }
     }
+
+    //private Task WaitUntilAsync2(Task task, int timeoutMs, CancellationToken token)
+    //{
+    //    if (task.IsCompleted) return task;
+
+    //    var tcs = new TaskCompletionSource<object?>(TaskCreationOptions.RunContinuationsAsynchronously);
+    //    var reusableTimeout = _reusableTimeouts.Get();
+
+    //    CancellationTokenRegistration ctr = default;
+
+    //    // 超时 + 取消 Token
+    //    if (timeoutMs != Timeout.Infinite || token.CanBeCanceled)
+    //    {
+    //        var ctsToken = reusableTimeout.GetTokenSource(timeoutMs, token);
+
+    //        ctr = ctsToken.Register(static (state, token2) =>
+    //        {
+    //            var (tcs2, ctoken) = ((TaskCompletionSource<object?>, CancellationToken))state!;
+    //            if (ctoken.IsCancellationRequested)
+    //                tcs2.TrySetCanceled(ctoken);
+    //            else
+    //                tcs2.TrySetException(new TimeoutException("The operation has timed out."));
+    //        }, (tcs, token));
+    //    }
+
+    //    if (task.IsCompleted)
+    //    {
+    //        _reusableTimeouts.Return(reusableTimeout);
+    //        ctr.Dispose();
+    //        return task;
+    //    }
+
+    //    // 监听原始任务
+    //    task.ContinueWith(static (t, state) =>
+    //    {
+    //        var (tcs2, ctr2, ctsPool, cts) = ((TaskCompletionSource<object?>, CancellationTokenRegistration, ObjectPoolLock<ReusableCancellationTokenSource>, ReusableCancellationTokenSource))state!;
+    //        try
+    //        {
+    //            if (t.IsCanceled)
+    //                tcs2.TrySetCanceled();
+    //            else if (t.IsFaulted)
+    //                tcs2.TrySetException(t.Exception!.InnerExceptions);
+    //            else
+    //                tcs2.TrySetResult(null);
+    //        }
+    //        finally
+    //        {
+    //            ctsPool.Return(cts);
+    //            ctr2.Dispose();
+    //        }
+    //    }, (tcs, ctr, _reusableTimeouts, reusableTimeout), CancellationToken.None, TaskContinuationOptions.ExecuteSynchronously, TaskScheduler.Default);
+
+    //    return tcs.Task;
+    //}
+
 #endif
 
     /// <summary>
@@ -132,7 +194,7 @@ public sealed class WaitLock : IDisposable
             return _waiterLock.WaitAsync(Timeout.Infinite, CancellationToken.None);
 
 #else
-        return _waiterLock.WaitAsync(millisecondsTimeout,cancellationToken);
+        return _waiterLock.WaitAsync(millisecondsTimeout, cancellationToken);
 #endif
     }
 
@@ -140,6 +202,9 @@ public sealed class WaitLock : IDisposable
     public void Dispose()
     {
         DisposedValue = true;
+#if NET6_0_OR_GREATER
+        //_reusableTimeouts?.TryDispose();
+#endif
         _waiterLock?.TryDispose();
         GC.SuppressFinalize(this);
     }

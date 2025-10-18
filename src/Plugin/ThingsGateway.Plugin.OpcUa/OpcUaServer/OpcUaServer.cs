@@ -15,6 +15,8 @@ using Opc.Ua;
 using Opc.Ua.Bindings;
 using Opc.Ua.Configuration;
 
+using PooledAwait;
+
 using System.Collections.Concurrent;
 using System.Reflection;
 
@@ -197,56 +199,61 @@ public partial class OpcUaServer : BusinessBase
         await base.ProtectedStartAsync(cancellationToken).ConfigureAwait(false);
     }
 
-    protected override async Task ProtectedExecuteAsync(object? state, CancellationToken cancellationToken)
+    protected override Task ProtectedExecuteAsync(object? state, CancellationToken cancellationToken)
     {
-        try
+        return ProtectedExecuteAsync(this, cancellationToken);
+
+        static async PooledTask ProtectedExecuteAsync(OpcUaServer @this, CancellationToken cancellationToken)
         {
-            if (!IsConnected())
+            try
             {
-                try
+                if (!@this.IsConnected())
                 {
-                    await Task.Delay(2000, cancellationToken).ConfigureAwait(false);
-                    await m_application.CheckApplicationInstanceCertificatesAsync(true, 1200, cancellationToken).ConfigureAwait(false);
-                    await m_application.StartAsync(m_server).ConfigureAwait(false);
-                    connect_success = true;
-                    await Task.Delay(2000, cancellationToken).ConfigureAwait(false);
-                    IdVariableRuntimes.ForEach(a => VariableValueChange(a.Value, a.Value.AdaptVariableBasicData()));
-                }
-                catch (Exception ex)
-                {
-                    if (connect_success)
-                        LogMessage?.LogWarning(ex, "Failed to start service");
-                    connect_success = false;
-                    await Task.Delay(10000, cancellationToken).ConfigureAwait(false);
-                }
-            }
-            var varList = CollectVariableRuntimes.ToListWithDequeue();
-            foreach (var item in varList)
-            {
-                try
-                {
-                    if (!cancellationToken.IsCancellationRequested)
+                    try
                     {
-                        m_server?.NodeManager?.UpVariable(item);
+                        await Task.Delay(2000, cancellationToken).ConfigureAwait(false);
+                        await @this.m_application.CheckApplicationInstanceCertificatesAsync(true, 1200, cancellationToken).ConfigureAwait(false);
+                        await @this.m_application.StartAsync(@this.m_server).ConfigureAwait(false);
+                        @this.connect_success = true;
+                        await Task.Delay(2000, cancellationToken).ConfigureAwait(false);
+                        @this.IdVariableRuntimes.ForEach(a => @this.VariableValueChange(a.Value, a.Value.AdaptVariableBasicData()));
                     }
-                    else
+                    catch (Exception ex)
                     {
-                        break;
+                        if (@this.connect_success)
+                            @this.LogMessage?.LogWarning(ex, "Failed to start service");
+                        @this.connect_success = false;
+                        await Task.Delay(10000, cancellationToken).ConfigureAwait(false);
                     }
                 }
-                catch (Exception ex)
+                var varList = @this.CollectVariableRuntimes.ToListWithDequeue();
+                foreach (var item in varList)
                 {
-                    LogMessage?.LogWarning(ex);
+                    try
+                    {
+                        if (!cancellationToken.IsCancellationRequested)
+                        {
+                            @this.m_server?.NodeManager?.UpVariable(item);
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        @this.LogMessage?.LogWarning(ex);
+                    }
                 }
+                @this.success = true;
             }
-            success = true;
-        }
-        catch (OperationCanceledException) { }
-        catch (Exception ex)
-        {
-            if (success)
-                LogMessage?.LogWarning(ex);
-            success = false;
+            catch (OperationCanceledException) { }
+            catch (Exception ex)
+            {
+                if (@this.success)
+                    @this.LogMessage?.LogWarning(ex);
+                @this.success = false;
+            }
         }
     }
 

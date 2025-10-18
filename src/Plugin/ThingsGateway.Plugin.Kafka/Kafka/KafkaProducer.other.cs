@@ -10,6 +10,8 @@
 
 using Confluent.Kafka;
 
+using PooledAwait;
+
 using ThingsGateway.Extension.Generic;
 using ThingsGateway.Foundation;
 using ThingsGateway.Foundation.Extension.Generic;
@@ -145,117 +147,128 @@ public partial class KafkaProducer : BusinessBaseWithCacheIntervalScriptAll
 
     #region private
 
-    private async ValueTask<OperResult> Update(IEnumerable<TopicArray> topicArrayList, CancellationToken cancellationToken)
+    private ValueTask<OperResult> Update(IEnumerable<TopicArray> topicArrayList, CancellationToken cancellationToken)
     {
-        foreach (var topicArray in topicArrayList)
+        return Update(this, topicArrayList, cancellationToken);
+
+        static async PooledValueTask<OperResult> Update(KafkaProducer @this, IEnumerable<TopicArray> topicArrayList, CancellationToken cancellationToken)
         {
-            var result = await KafKaUpAsync(topicArray, cancellationToken).ConfigureAwait(false);
-            if (success != result.IsSuccess)
+            foreach (var topicArray in topicArrayList)
             {
+                var result = await @this.KafKaUpAsync(topicArray, cancellationToken).ConfigureAwait(false);
+                if (@this.success != result.IsSuccess)
+                {
+                    if (!result.IsSuccess)
+                    {
+                        @this.LogMessage?.LogWarning(result.ToString());
+                    }
+                    @this.success = result.IsSuccess;
+                }
                 if (!result.IsSuccess)
                 {
-                    LogMessage?.LogWarning(result.ToString());
+                    return result;
                 }
-                success = result.IsSuccess;
             }
-            if (!result.IsSuccess)
-            {
-                return result;
-            }
+            return OperResult.Success;
         }
-        return OperResult.Success;
     }
 
-    private async ValueTask<OperResult> UpdateAlarmModel(IEnumerable<AlarmVariable> item, CancellationToken cancellationToken)
+    private ValueTask<OperResult> UpdateAlarmModel(IEnumerable<AlarmVariable> item, CancellationToken cancellationToken)
     {
         var topicArrayList = GetAlarmTopicArrays(item);
-        return await Update(topicArrayList, cancellationToken).ConfigureAwait(false);
+        return Update(topicArrayList, cancellationToken);
     }
 
-    private async ValueTask<OperResult> UpdateDevModel(IEnumerable<DeviceBasicData> item, CancellationToken cancellationToken)
+    private ValueTask<OperResult> UpdateDevModel(IEnumerable<DeviceBasicData> item, CancellationToken cancellationToken)
     {
         var topicArrayList = GetDeviceTopicArray(item);
-        return await Update(topicArrayList, cancellationToken).ConfigureAwait(false);
+        return Update(topicArrayList, cancellationToken);
     }
 
-    private async ValueTask<OperResult> UpdateVarModel(IEnumerable<VariableBasicData> item, CancellationToken cancellationToken)
+    private ValueTask<OperResult> UpdateVarModel(IEnumerable<VariableBasicData> item, CancellationToken cancellationToken)
     {
         var topicArrayList = GetVariableBasicDataTopicArray(item.WhereIf(_driverPropertys.OnlineFilter, a => a.IsOnline == true));
-        return await Update(topicArrayList, cancellationToken).ConfigureAwait(false);
+        return Update(topicArrayList, cancellationToken);
     }
 
     #endregion private
 
     #region 方法
 
+
     private async Task AllPublishAsync(CancellationToken cancellationToken)
     {
         //保留消息
         //分解List，避免超出字节大小限制
-        var varData = IdVariableRuntimes.Select(a => a.Value).AdaptIEnumerableVariableBasicData().ChunkBetter(_driverPropertys.SplitSize);
-        var devData = CollectDevices?.Select(a => a.Value).AdaptIEnumerableDeviceBasicData().ChunkBetter(_driverPropertys.SplitSize);
-        var alramData = GlobalData.ReadOnlyRealAlarmIdVariables.Select(a => a.Value).ChunkBetter(_driverPropertys.SplitSize);
+        var varData = this.IdVariableRuntimes.Select(a => a.Value).AdaptIEnumerableVariableBasicData().ChunkBetter(this._driverPropertys.SplitSize);
+        var devData = this.CollectDevices?.Select(a => a.Value).AdaptIEnumerableDeviceBasicData().ChunkBetter(this._driverPropertys.SplitSize);
+        var alramData = GlobalData.ReadOnlyRealAlarmIdVariables.Select(a => a.Value).ChunkBetter(this._driverPropertys.SplitSize);
         foreach (var item in varData)
         {
-            if (!success)
+            if (!this.success)
                 break;
-            await UpdateVarModel(item, cancellationToken).ConfigureAwait(false);
+            await this.UpdateVarModel(item, cancellationToken).ConfigureAwait(false);
         }
         if (devData != null)
         {
             foreach (var item in devData)
             {
-                if (!success)
+                if (!this.success)
                     break;
-                await UpdateDevModel(item, cancellationToken).ConfigureAwait(false);
+                await this.UpdateDevModel(item, cancellationToken).ConfigureAwait(false);
             }
         }
         foreach (var item in alramData)
         {
-            if (!success)
+            if (!this.success)
                 break;
-            await UpdateAlarmModel(item, cancellationToken).ConfigureAwait(false);
+            await this.UpdateAlarmModel(item, cancellationToken).ConfigureAwait(false);
         }
     }
 
     /// <summary>
     /// kafka上传，返回上传结果
     /// </summary>
-    public async ValueTask<OperResult> KafKaUpAsync(TopicArray topicArray, CancellationToken cancellationToken)
+    public ValueTask<OperResult> KafKaUpAsync(TopicArray topicArray, CancellationToken cancellationToken)
     {
-        try
+        return KafKaUpAsync(this, topicArray, cancellationToken);
+
+        static async PooledValueTask<OperResult> KafKaUpAsync(KafkaProducer @this, TopicArray topicArray, CancellationToken cancellationToken)
         {
-            using CancellationTokenSource cancellationTokenSource = new(_driverPropertys.Timeout);
-            using CancellationTokenSource stoppingToken = CancellationTokenSource.CreateLinkedTokenSource(cancellationTokenSource.Token, cancellationToken);
-            var result = await _producer.ProduceAsync(topicArray.Topic, new Message<Null, byte[]> { Value = topicArray.Payload }, stoppingToken.Token).ConfigureAwait(false);
-            if (result.Status != PersistenceStatus.Persisted)
+            try
             {
-                return new OperResult("Upload fail");
-            }
-            else
-            {
-                if (_driverPropertys.DetailLog)
+                using CancellationTokenSource cancellationTokenSource = new(@this._driverPropertys.Timeout);
+                using CancellationTokenSource stoppingToken = CancellationTokenSource.CreateLinkedTokenSource(cancellationTokenSource.Token, cancellationToken);
+                var result = await @this._producer.ProduceAsync(topicArray.Topic, new Message<Null, byte[]> { Value = topicArray.Payload }, stoppingToken.Token).ConfigureAwait(false);
+                if (result.Status != PersistenceStatus.Persisted)
                 {
-                    if (LogMessage?.LogLevel <= TouchSocket.Core.LogLevel.Trace)
-                        LogMessage?.LogTrace(GetDetailLogString(topicArray, _memoryVarModelQueue.Count));
-                    else if (LogMessage?.LogLevel <= TouchSocket.Core.LogLevel.Debug)
-                        LogMessage?.LogDebug(GetCountLogString(topicArray, _memoryVarModelQueue.Count));
+                    return new OperResult("Upload fail");
                 }
                 else
                 {
-                    if (LogMessage?.LogLevel <= TouchSocket.Core.LogLevel.Debug)
-                        LogMessage?.LogDebug(GetCountLogString(topicArray, _memoryVarModelQueue.Count));
+                    if (@this._driverPropertys.DetailLog)
+                    {
+                        if (@this.LogMessage?.LogLevel <= TouchSocket.Core.LogLevel.Trace)
+                            @this.LogMessage?.LogTrace(@this.GetDetailLogString(topicArray, @this._memoryVarModelQueue.Count));
+                        else if (@this.LogMessage?.LogLevel <= TouchSocket.Core.LogLevel.Debug)
+                            @this.LogMessage?.LogDebug(@this.GetCountLogString(topicArray, @this._memoryVarModelQueue.Count));
+                    }
+                    else
+                    {
+                        if (@this.LogMessage?.LogLevel <= TouchSocket.Core.LogLevel.Debug)
+                            @this.LogMessage?.LogDebug(@this.GetCountLogString(topicArray, @this._memoryVarModelQueue.Count));
+                    }
+                    return OperResult.Success;
                 }
-                return OperResult.Success;
             }
-        }
-        catch (OperationCanceledException)
-        {
-            return new OperResult("Timeout");
-        }
-        catch (Exception ex)
-        {
-            return new OperResult(ex);
+            catch (OperationCanceledException)
+            {
+                return new OperResult("Timeout");
+            }
+            catch (Exception ex)
+            {
+                return new OperResult(ex);
+            }
         }
     }
 

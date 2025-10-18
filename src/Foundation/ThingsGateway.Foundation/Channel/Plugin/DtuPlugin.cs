@@ -8,6 +8,8 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
+using PooledAwait;
+
 using System.Text;
 
 using ThingsGateway.Foundation.Extension.String;
@@ -59,64 +61,71 @@ public class DtuPlugin : PluginBase, ITcpReceivingPlugin
     public bool DtuIdHex { get; set; }
 
     /// <inheritdoc/>
-    public async Task OnTcpReceiving(ITcpSession client, BytesReaderEventArgs e)
+    public Task OnTcpReceiving(ITcpSession client, BytesReaderEventArgs e)
     {
-        var len = HeartbeatByte.Length;
-        if (client is TcpSessionClientChannel socket && socket.Service is ITcpServiceChannel tcpServiceChannel)
+        return OnTcpReceiving(this, client, e);
+
+
+        static async PooledTask OnTcpReceiving(DtuPlugin @this, ITcpSession client, BytesReaderEventArgs e)
         {
-            if (!socket.Id.StartsWith("ID="))
+            var len = @this.HeartbeatByte.Length;
+            if (client is TcpSessionClientChannel socket && socket.Service is ITcpServiceChannel tcpServiceChannel)
             {
-                var id = DtuIdHex ? $"ID={e.Reader.ToHexString()}" : $"ID={e.Reader.TotalSequence.ToString(Encoding.UTF8)}";
-                if (tcpServiceChannel.TryGetClient(id, out var oldClient))
+                if (!socket.Id.StartsWith("ID="))
+                {
+                    var id = @this.DtuIdHex ? $"ID={e.Reader.ToHexString()}" : $"ID={e.Reader.TotalSequence.ToString(Encoding.UTF8)}";
+                    if (tcpServiceChannel.TryGetClient(id, out var oldClient))
+                    {
+                        try
+                        {
+                            await oldClient.CloseAsync().ConfigureAwait(false);
+                            oldClient.Dispose();
+                        }
+                        catch
+                        {
+                        }
+                    }
+                    await socket.ResetIdAsync(id, client.ClosedToken).ConfigureAwait(false);
+                    client.Logger?.Info(string.Format(AppResource.DtuConnected, id));
+                    e.Reader.Advance((int)e.Reader.BytesRemaining);
+                    e.Handled = true;
+                }
+
+                if (!socket.Service.ClientExists(socket.Id))
                 {
                     try
                     {
-                        await oldClient.CloseAsync().ConfigureAwait(false);
-                        oldClient.Dispose();
+                        await socket.CloseAsync().ConfigureAwait(false);
+                        socket.Dispose();
                     }
                     catch
                     {
                     }
-                }
-                await socket.ResetIdAsync(id, client.ClosedToken).ConfigureAwait(false);
-                client.Logger?.Info(string.Format(AppResource.DtuConnected, id));
-                e.Reader.Advance((int)e.Reader.BytesRemaining);
-                e.Handled = true;
-            }
 
-            if (!socket.Service.ClientExists(socket.Id))
-            {
-                try
-                {
-                    await socket.CloseAsync().ConfigureAwait(false);
-                    socket.Dispose();
-                }
-                catch
-                {
+                    await e.InvokeNext().ConfigureAwait(false);//如果本插件无法处理当前数据，请将数据转至下一个插件。
+                    return;
                 }
 
-                await e.InvokeNext().ConfigureAwait(false);//如果本插件无法处理当前数据，请将数据转至下一个插件。
-                return;
-            }
-
-            if (len > 0)
-            {
-                if (HeartbeatByte.Span.SequenceEqual(e.Reader.TotalSequence.Slice(0, (int)Math.Min(len, e.Reader.BytesRemaining + e.Reader.BytesRead)).First.Span))
+                if (len > 0)
                 {
-                    if (DateTimeOffset.Now - socket.LastSentTime < TimeSpan.FromMilliseconds(200))
+                    if (@this.HeartbeatByte.Span.SequenceEqual(e.Reader.TotalSequence.Slice(0, (int)Math.Min(len, e.Reader.BytesRemaining + e.Reader.BytesRead)).First.Span))
                     {
-                        await Task.Delay(200, client.ClosedToken).ConfigureAwait(false);
+                        if (DateTimeOffset.Now - socket.LastSentTime < TimeSpan.FromMilliseconds(200))
+                        {
+                            await Task.Delay(200, client.ClosedToken).ConfigureAwait(false);
+                        }
+                        //回应心跳包
+                        await socket.SendAsync(@this.HeartbeatByte, socket.ClosedToken).ConfigureAwait(false);
+                        e.Reader.Advance((int)Math.Min(len, e.Reader.BytesRemaining));
+                        e.Handled = true;
+                        if (socket.Logger?.LogLevel <= LogLevel.Trace)
+                            socket.Logger?.Trace($"{socket}- Heartbeat");
                     }
-                    //回应心跳包
-                    await socket.SendAsync(HeartbeatByte, socket.ClosedToken).ConfigureAwait(false);
-                    e.Reader.Advance((int)Math.Min(len, e.Reader.BytesRemaining));
-                    e.Handled = true;
-                    if (socket.Logger?.LogLevel <= LogLevel.Trace)
-                        socket.Logger?.Trace($"{socket}- Heartbeat");
                 }
             }
+            await e.InvokeNext().ConfigureAwait(false);//如果本插件无法处理当前数据，请将数据转至下一个插件。
+            return;
         }
-        await e.InvokeNext().ConfigureAwait(false);//如果本插件无法处理当前数据，请将数据转至下一个插件。
     }
 
 

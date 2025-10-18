@@ -13,6 +13,8 @@ using Newtonsoft.Json.Linq;
 using Opc.Ua;
 using Opc.Ua.Client;
 
+using PooledAwait;
+
 using System.Collections.Concurrent;
 
 using ThingsGateway.Foundation.Extension.Generic;
@@ -150,50 +152,58 @@ public class OpcUaMaster : CollectBase
     }
 
     private volatile bool checkLog;
-    private async Task CheckAsync(object? state, CancellationToken cancellationToken)
+    private Task CheckAsync(object? state, CancellationToken cancellationToken)
     {
-        if (_plc.Session != null)
+        return CheckAsync(this, cancellationToken);
+
+
+        static async PooledTask CheckAsync(OpcUaMaster @this, CancellationToken cancellationToken)
         {
-            if (_driverProperties.ActiveSubscribe)
+            if (@this._plc.Session != null)
             {
-                //获取设备连接状态
-                if (IsConnected())
+                if (@this._driverProperties.ActiveSubscribe)
                 {
-                    //更新设备活动时间
+                    //获取设备连接状态
+                    if (@this.IsConnected())
                     {
-                        //如果是订阅模式，连接时添加订阅组
-                        if (_plc.OpcUaProperty?.ActiveSubscribe == true && CurrentDevice.VariableSourceReads.Count > 0 && _plc.Session.SubscriptionCount < CurrentDevice.VariableSourceReads.Count)
+                        //更新设备活动时间
                         {
-                            if (cancellationToken.IsCancellationRequested) return;
-                            foreach (var variableSourceRead in CurrentDevice.VariableSourceReads)
+                            //如果是订阅模式，连接时添加订阅组
+                            if (@this._plc.OpcUaProperty?.ActiveSubscribe == true && @this.CurrentDevice.VariableSourceReads.Count > 0 && @this._plc.Session.SubscriptionCount < @this.CurrentDevice.VariableSourceReads.Count)
                             {
                                 if (cancellationToken.IsCancellationRequested) return;
-                                try
+                                foreach (var variableSourceRead in @this.CurrentDevice.VariableSourceReads)
                                 {
-                                    if (_plc.Session.Subscriptions.FirstOrDefault(a => a.DisplayName == variableSourceRead.RegisterAddress) == null)
+                                    if (cancellationToken.IsCancellationRequested) return;
+                                    try
                                     {
-                                        await _plc.AddSubscriptionAsync(variableSourceRead.RegisterAddress, variableSourceRead.VariableRuntimes.Where(a => !a.RegisterAddress.IsNullOrEmpty()).Select(a => a.RegisterAddress!).ToHashSet().ToArray(), _plc.OpcUaProperty.LoadType, cancellationToken).ConfigureAwait(false);
+                                        if (@this._plc.Session.Subscriptions.FirstOrDefault(a => a.DisplayName == variableSourceRead.RegisterAddress) == null)
+                                        {
+                                            await @this._plc.AddSubscriptionAsync(variableSourceRead.RegisterAddress, variableSourceRead.VariableRuntimes.Where(a => !a.RegisterAddress.IsNullOrEmpty()).Select(a => a.RegisterAddress!).ToHashSet().ToArray(), @this._plc.OpcUaProperty.LoadType, cancellationToken).ConfigureAwait(false);
 
-                                        LogMessage?.LogInformation($"AddSubscription index  {CurrentDevice.VariableSourceReads.IndexOf(variableSourceRead)}  done");
+                                            @this.LogMessage?.LogInformation($"AddSubscription index  {@this.CurrentDevice.VariableSourceReads.IndexOf(variableSourceRead)}  done");
+                                        }
+
+                                        await Task.Delay(100, cancellationToken).ConfigureAwait(false); // allow for subscription to be finished on server?
+
+                                        @this.checkLog = true;
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        if (!@this.checkLog)
+                                            @this.LogMessage?.LogWarning(ex, "AddSubscriptions error");
+                                        @this.checkLog = false;
                                     }
 
-                                    await Task.Delay(100, cancellationToken).ConfigureAwait(false); // allow for subscription to be finished on server?
-
-                                    checkLog = true;
                                 }
-                                catch (Exception ex)
-                                {
-                                    if (!checkLog)
-                                        LogMessage?.LogWarning(ex, "AddSubscriptions error");
-                                    checkLog = false;
-                                }
-
+                                @this.LogMessage?.LogInformation("AddSubscriptions done");
                             }
-                            LogMessage?.LogInformation("AddSubscriptions done");
                         }
                     }
                 }
             }
+
+            return;
         }
     }
 
@@ -230,51 +240,56 @@ public class OpcUaMaster : CollectBase
     }
 
     /// <inheritdoc/>
-    protected override async ValueTask<OperResult<ReadOnlyMemory<byte>>> ReadSourceAsync(VariableSourceRead deviceVariableSourceRead, CancellationToken cancellationToken)
+    protected override ValueTask<OperResult<ReadOnlyMemory<byte>>> ReadSourceAsync(VariableSourceRead deviceVariableSourceRead, CancellationToken cancellationToken)
     {
-        DateTime time = DateTime.Now;
-        var addresss = deviceVariableSourceRead.VariableRuntimes.Where(a => !a.RegisterAddress.IsNullOrEmpty()).Select(a => a.RegisterAddress!).ToArray();
-        try
+        return ReadSourceAsync(this, deviceVariableSourceRead, cancellationToken);
+
+        static async PooledValueTask<OperResult<ReadOnlyMemory<byte>>> ReadSourceAsync(OpcUaMaster @this, VariableSourceRead deviceVariableSourceRead, CancellationToken cancellationToken)
         {
-            var result = await _plc.ReadJTokenValueAsync(addresss, cancellationToken).ConfigureAwait(false);
-            foreach (var data in result)
+            DateTime time = DateTime.Now;
+            var addresss = deviceVariableSourceRead.VariableRuntimes.Where(a => !a.RegisterAddress.IsNullOrEmpty()).Select(a => a.RegisterAddress!).ToArray();
+            try
             {
-                if (!cancellationToken.IsCancellationRequested)
+                var result = await @this._plc.ReadJTokenValueAsync(addresss, cancellationToken).ConfigureAwait(false);
+                foreach (var data in result)
                 {
-                    var data1 = deviceVariableSourceRead.VariableRuntimes.Where(a => a.RegisterAddress == data.Item1);
-
-                    foreach (var item in data1)
+                    if (!cancellationToken.IsCancellationRequested)
                     {
-                        object value = data.Item3.GetObjectFromJToken();
+                        var data1 = deviceVariableSourceRead.VariableRuntimes.Where(a => a.RegisterAddress == data.Item1);
 
-                        var isGood = StatusCode.IsGood(data.Item2.StatusCode);
-                        if (_driverProperties.SourceTimestampEnable)
+                        foreach (var item in data1)
                         {
-                            time = data.Item2.SourceTimestamp.ToLocalTime();
-                        }
-                        if (isGood)
-                        {
-                            item.SetValue(value, time);
-                        }
-                        else
-                        {
-                            if (item is VariableRuntime variable && (variable.IsOnline || variable.CollectTime == DateTime.UnixEpoch.ToLocalTime()))
+                            object value = data.Item3.GetObjectFromJToken();
+
+                            var isGood = StatusCode.IsGood(data.Item2.StatusCode);
+                            if (@this._driverProperties.SourceTimestampEnable)
                             {
-                                LogMessage?.LogWarning($"OPC quality bad:{Environment.NewLine}{data.Item1}");
+                                time = data.Item2.SourceTimestamp.ToLocalTime();
                             }
-                            item.SetValue(null, time, false);
-                            item.VariableSource.LastErrorMessage = data.Item2.StatusCode.ToString();
+                            if (isGood)
+                            {
+                                item.SetValue(value, time);
+                            }
+                            else
+                            {
+                                if (item is VariableRuntime variable && (variable.IsOnline || variable.CollectTime == DateTime.UnixEpoch.ToLocalTime()))
+                                {
+                                    @this.LogMessage?.LogWarning($"OPC quality bad:{Environment.NewLine}{data.Item1}");
+                                }
+                                item.SetValue(null, time, false);
+                                item.VariableSource.LastErrorMessage = data.Item2.StatusCode.ToString();
+                            }
                         }
+                        @this.LogMessage?.Trace($"Change:{Environment.NewLine}{data.Item1} : {data.Item3}");
                     }
-                    LogMessage?.Trace($"Change:{Environment.NewLine}{data.Item1} : {data.Item3}");
                 }
-            }
 
-            return OperResult.CreateSuccessResult<ReadOnlyMemory<byte>>(null);
-        }
-        catch (Exception ex)
-        {
-            return new OperResult<ReadOnlyMemory<byte>>($"ReadSourceAsync {addresss.ToSystemTextJsonString()}：{Environment.NewLine}{ex}");
+                return OperResult.CreateSuccessResult<ReadOnlyMemory<byte>>(null);
+            }
+            catch (Exception ex)
+            {
+                return new OperResult<ReadOnlyMemory<byte>>($"ReadSourceAsync {addresss.ToSystemTextJsonString()}：{Environment.NewLine}{ex}");
+            }
         }
     }
 

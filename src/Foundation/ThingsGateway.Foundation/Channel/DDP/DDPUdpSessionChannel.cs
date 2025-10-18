@@ -8,6 +8,8 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
+using PooledAwait;
+
 using System.Collections.Concurrent;
 using System.Net;
 using System.Runtime.CompilerServices;
@@ -80,73 +82,78 @@ public class DDPUdpSessionChannel : UdpSessionChannel, IClientChannel, IDtuUdpSe
     }
 
 
-    protected override async ValueTask<bool> OnUdpReceiving(UdpReceiveingEventArgs e)
+    protected override ValueTask<bool> OnUdpReceiving(UdpReceiveingEventArgs e)
     {
         var byteBlock = e.Memory;
         var endPoint = e.EndPoint;
 
         if (!DDPAdapter.TryParseRequest(endPoint, byteBlock, out var message))
-            return true;
+            return EasyValueTask.FromResult(true);
 
-        if (message != null)
+        return OnUdpReceiving(this, endPoint, message);
+
+        static async PooledValueTask<bool> OnUdpReceiving(DDPUdpSessionChannel @this, EndPoint endPoint, DDPUdpMessage message)
         {
-            if (message.IsSuccess)
+            if (message != null)
             {
-                var id = $"ID={message.Id}";
-                if (message.Type == 0x09)
+                if (message.IsSuccess)
                 {
-                    if (this.DataHandlingAdapter == null)
+                    var id = $"ID={message.Id}";
+                    if (message.Type == 0x09)
                     {
-                        await this.OnUdpReceived(new UdpReceivedDataEventArgs(endPoint, message.Content, default)).ConfigureAwait(false);
+                        if (@this.DataHandlingAdapter == null)
+                        {
+                            await @this.OnUdpReceived(new UdpReceivedDataEventArgs(endPoint, message.Content, default)).ConfigureAwait(false);
+                        }
+                        else
+                        {
+                            await @this.DataHandlingAdapter.ReceivedInputAsync(endPoint, message.Content).ConfigureAwait(false);
+                        }
+
+                        return true;
                     }
                     else
                     {
-                        await this.DataHandlingAdapter.ReceivedInputAsync(endPoint, message.Content).ConfigureAwait(false);
-                    }
+                        if (message.Type == 0x01)
+                        {
+                            bool log = false;
 
-                    return true;
-                }
-                else
-                {
-                    if (message.Type == 0x01)
-                    {
-                        bool log = false;
+                            //注册ID
+                            if (!@this.IdDict.TryAdd(endPoint, id))
+                            {
+                                @this.IdDict[endPoint] = id;
+                            }
+                            else
+                            {
+                                log = true;
+                            }
+                            if (!@this.EndPointDcit.TryAdd(id, endPoint))
+                            {
+                                @this.EndPointDcit[id] = endPoint;
+                            }
+                            else
+                            {
+                                log = true;
+                            }
 
-                        //注册ID
-                        if (!IdDict.TryAdd(endPoint, id))
-                        {
-                            IdDict[endPoint] = id;
+                            //发送成功
+                            await @this.DDPAdapter.SendInputAsync(endPoint, new DDPSend(ReadOnlyMemory<byte>.Empty, id, false, 0x81), @this.ClosedToken).ConfigureAwait(false);
+                            if (log)
+                                @this.Logger?.Info(string.Format(AppResource.DtuConnected, id));
                         }
-                        else
+                        else if (message.Type == 0x02)
                         {
-                            log = true;
+                            await @this.DDPAdapter.SendInputAsync(endPoint, new DDPSend(ReadOnlyMemory<byte>.Empty, id, false, 0x82), @this.ClosedToken).ConfigureAwait(false);
+                            @this.Logger?.Info(string.Format(AppResource.DtuDisconnecting, id));
+                            await Task.Delay(100).ConfigureAwait(false);
+                            @this.IdDict.TryRemove(endPoint, out _);
+                            @this.EndPointDcit.TryRemove(id, out _);
                         }
-                        if (!EndPointDcit.TryAdd(id, endPoint))
-                        {
-                            EndPointDcit[id] = endPoint;
-                        }
-                        else
-                        {
-                            log = true;
-                        }
-
-                        //发送成功
-                        await DDPAdapter.SendInputAsync(endPoint, new DDPSend(ReadOnlyMemory<byte>.Empty, id, false, 0x81), ClosedToken).ConfigureAwait(false);
-                        if (log)
-                            Logger?.Info(string.Format(AppResource.DtuConnected, id));
-                    }
-                    else if (message.Type == 0x02)
-                    {
-                        await DDPAdapter.SendInputAsync(endPoint, new DDPSend(ReadOnlyMemory<byte>.Empty, id, false, 0x82), ClosedToken).ConfigureAwait(false);
-                        Logger?.Info(string.Format(AppResource.DtuDisconnecting, id));
-                        await Task.Delay(100).ConfigureAwait(false);
-                        IdDict.TryRemove(endPoint, out _);
-                        EndPointDcit.TryRemove(id, out _);
                     }
                 }
             }
+            return true;
         }
-        return true;
     }
 
     #region Throw

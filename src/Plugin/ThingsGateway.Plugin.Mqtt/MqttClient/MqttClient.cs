@@ -10,6 +10,9 @@
 
 using MQTTnet;
 
+using PooledAwait;
+
+
 
 
 
@@ -202,31 +205,38 @@ public partial class MqttClient : BusinessBaseWithCacheIntervalScriptAll
         }
     }
 
-    protected override async Task ProtectedExecuteAsync(object? state, CancellationToken cancellationToken)
+    protected override Task ProtectedExecuteAsync(object? state, CancellationToken cancellationToken)
     {
-        var clientResult = await TryMqttClientAsync(cancellationToken).ConfigureAwait(false);
-        if (!clientResult.IsSuccess)
+        return ProtectedExecuteAsync(this, cancellationToken);
+
+
+        static async PooledTask ProtectedExecuteAsync(MqttClient @this, CancellationToken cancellationToken)
         {
-            if (cancellationToken.IsCancellationRequested)
-                return;
-            if (success != clientResult.IsSuccess)
+            var clientResult = await @this.TryMqttClientAsync(cancellationToken).ConfigureAwait(false);
+            if (!clientResult.IsSuccess)
             {
-                if (!clientResult.IsSuccess)
-                    LogMessage?.LogWarning(clientResult.Exception, clientResult.ErrorMessage);
-                success = clientResult.IsSuccess;
+                if (cancellationToken.IsCancellationRequested)
+                    return;
+                if (@this.success != clientResult.IsSuccess)
+                {
+                    if (!clientResult.IsSuccess)
+                        @this.LogMessage?.LogWarning(clientResult.Exception, clientResult.ErrorMessage);
+                    @this.success = clientResult.IsSuccess;
+                }
+                await Task.Delay(10000, cancellationToken).ConfigureAwait(false);
+                //return;
             }
-            await Task.Delay(10000, cancellationToken).ConfigureAwait(false);
-            //return;
-        }
-        //TD设备上线
+            //TD设备上线
 
-        var data = ThingsBoardDeviceConnectQueue.ToListWithDequeue();
-        foreach (var item in data)
-        {
-            await UpdateThingsBoardDeviceConnect(item).ConfigureAwait(false);
-        }
+            var data = @this.ThingsBoardDeviceConnectQueue.ToListWithDequeue();
+            foreach (var item in data)
+            {
+                await @this.UpdateThingsBoardDeviceConnect(item).ConfigureAwait(false);
+            }
 
-        await Update(cancellationToken).ConfigureAwait(false);
+            await @this.Update(cancellationToken).ConfigureAwait(false);
+            return;
+        }
     }
 
 

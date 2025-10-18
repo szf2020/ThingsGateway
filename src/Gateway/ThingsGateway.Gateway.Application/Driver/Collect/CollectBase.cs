@@ -20,6 +20,8 @@ using ThingsGateway.Common.Extension;
 using ThingsGateway.Extension.Generic;
 #if !Management
 using ThingsGateway.Gateway.Application.Extensions;
+using ThingsGateway.NewLife;
+
 #endif
 using ThingsGateway.NewLife.Json.Extension;
 using ThingsGateway.NewLife.Threading;
@@ -292,69 +294,75 @@ public abstract partial class CollectBase : DriverBase
 
 
     #region 执行方法
-    async ValueTask ReadVariableMed(object? state, CancellationToken cancellationToken)
+    ValueTask ReadVariableMed(object? state, CancellationToken cancellationToken)
     {
-        if (state is not VariableMethod readVariableMethods) return;
+        if (state is not VariableMethod readVariableMethods)
+            return ValueTask.CompletedTask;
         if (Pause)
-            return;
+            return ValueTask.CompletedTask;
         if (cancellationToken.IsCancellationRequested)
-            return;
+            return ValueTask.CompletedTask;
+        return ReadVariableMed(this, readVariableMethods, cancellationToken);
 
-        var readErrorCount = 0;
-
-        //if (LogMessage?.LogLevel <= TouchSocket.Core.LogLevel.Trace)
-        //    LogMessage?.Trace(string.Format("{0} - Executing method [{1}]", DeviceName, readVariableMethods.MethodInfo.Name));
-        var readResult = await InvokeMethodAsync(readVariableMethods, cancellationToken: cancellationToken).ConfigureAwait(false);
-
-        // 方法调用失败时重试一定次数
-        while (!readResult.IsSuccess && readErrorCount < CollectProperties.RetryCount)
+        static async PooledValueTask ReadVariableMed(CollectBase @this, VariableMethod readVariableMethods, CancellationToken cancellationToken)
         {
-            if (Pause)
-                return;
-            if (cancellationToken.IsCancellationRequested)
-                return;
 
-            readErrorCount++;
-            if (LogMessage?.LogLevel <= TouchSocket.Core.LogLevel.Trace)
-                LogMessage?.Trace(string.Format("{0} - Execute method [{1}] - failed - {2}", DeviceName, readVariableMethods.MethodInfo.Name, readResult.ErrorMessage));
+            var readErrorCount = 0;
 
             //if (LogMessage?.LogLevel <= TouchSocket.Core.LogLevel.Trace)
             //    LogMessage?.Trace(string.Format("{0} - Executing method [{1}]", DeviceName, readVariableMethods.MethodInfo.Name));
-            readResult = await InvokeMethodAsync(readVariableMethods, cancellationToken: cancellationToken).ConfigureAwait(false);
-        }
+            var readResult = await @this.InvokeMethodAsync(readVariableMethods, cancellationToken: cancellationToken).ConfigureAwait(false);
 
-        if (readResult.IsSuccess)
-        {
-            // 方法调用成功时记录日志并增加成功计数器
-            if (LogMessage?.LogLevel <= TouchSocket.Core.LogLevel.Trace)
-                LogMessage?.Trace(string.Format("{0} - Execute method [{1}] - Succeeded {2}", DeviceName, readVariableMethods.MethodInfo.Name, readResult.Content?.ToSystemTextJsonString()));
-            CurrentDevice.SetDeviceStatus(TimerX.Now, null);
-        }
-        else
-        {
-            if (cancellationToken.IsCancellationRequested)
-                return;
-
-            // 方法调用失败时记录日志并增加失败计数器，更新错误信息
-            if (readVariableMethods.LastErrorMessage != readResult.ErrorMessage)
+            // 方法调用失败时重试一定次数
+            while (!readResult.IsSuccess && readErrorCount < @this.CollectProperties.RetryCount)
             {
-                if (!cancellationToken.IsCancellationRequested)
-                    LogMessage?.LogWarning(readResult.Exception, string.Format(AppResource.MethodFail, DeviceName, readVariableMethods.MethodInfo.Name, readResult.ErrorMessage));
+                if (@this.Pause)
+                    return;
+                if (cancellationToken.IsCancellationRequested)
+                    return;
+
+                readErrorCount++;
+                if (@this.LogMessage?.LogLevel <= TouchSocket.Core.LogLevel.Trace)
+                    @this.LogMessage?.Trace(string.Format("{0} - Execute method [{1}] - failed - {2}", @this.DeviceName, readVariableMethods.MethodInfo.Name, readResult.ErrorMessage));
+
+                //if (LogMessage?.LogLevel <= TouchSocket.Core.LogLevel.Trace)
+                //    LogMessage?.Trace(string.Format("{0} - Executing method [{1}]", DeviceName, readVariableMethods.MethodInfo.Name));
+                readResult = await @this.InvokeMethodAsync(readVariableMethods, cancellationToken: cancellationToken).ConfigureAwait(false);
+            }
+
+            if (readResult.IsSuccess)
+            {
+                // 方法调用成功时记录日志并增加成功计数器
+                if (@this.LogMessage?.LogLevel <= TouchSocket.Core.LogLevel.Trace)
+                    @this.LogMessage?.Trace(string.Format("{0} - Execute method [{1}] - Succeeded {2}", @this.DeviceName, readVariableMethods.MethodInfo.Name, readResult.Content?.ToSystemTextJsonString()));
+                @this.CurrentDevice.SetDeviceStatus(TimerX.Now, null);
             }
             else
             {
-                if (!cancellationToken.IsCancellationRequested)
+                if (cancellationToken.IsCancellationRequested)
+                    return;
+
+                // 方法调用失败时记录日志并增加失败计数器，更新错误信息
+                if (readVariableMethods.LastErrorMessage != readResult.ErrorMessage)
                 {
-                    if (LogMessage?.LogLevel <= TouchSocket.Core.LogLevel.Trace)
-                        LogMessage?.Trace(string.Format("{0} - Execute method [{1}] - failed - {2}", DeviceName, readVariableMethods.MethodInfo.Name, readResult.ErrorMessage));
+                    if (!cancellationToken.IsCancellationRequested)
+                        @this.LogMessage?.LogWarning(readResult.Exception, string.Format(AppResource.MethodFail, @this.DeviceName, readVariableMethods.MethodInfo.Name, readResult.ErrorMessage));
                 }
+                else
+                {
+                    if (!cancellationToken.IsCancellationRequested)
+                    {
+                        if (@this.LogMessage?.LogLevel <= TouchSocket.Core.LogLevel.Trace)
+                            @this.LogMessage?.Trace(string.Format("{0} - Execute method [{1}] - failed - {2}", @this.DeviceName, readVariableMethods.MethodInfo.Name, readResult.ErrorMessage));
+                    }
+                }
+
+                readVariableMethods.LastErrorMessage = readResult.ErrorMessage;
+                @this.CurrentDevice.SetDeviceStatus(TimerX.Now, null);
             }
 
-            readVariableMethods.LastErrorMessage = readResult.ErrorMessage;
-            CurrentDevice.SetDeviceStatus(TimerX.Now, null);
+            return;
         }
-
-        return;
     }
 
     #endregion
@@ -674,9 +682,9 @@ public abstract partial class CollectBase : DriverBase
     #endregion
 
 
-    protected virtual Task TestOnline(object? state, CancellationToken cancellationToken)
+    protected virtual ValueTask TestOnline(object? state, CancellationToken cancellationToken)
     {
-        return Task.CompletedTask;
+        return ValueTask.CompletedTask;
     }
 
     protected void ScriptVariableRun(object? state, CancellationToken cancellationToken)
@@ -727,38 +735,43 @@ public abstract partial class CollectBase : DriverBase
     {
         throw new NotImplementedException();
     }
-    protected async Task Check(Dictionary<VariableRuntime, JToken> writeInfoLists, NonBlockingDictionary<string, OperResult> operResults, CancellationToken cancellationToken)
+    protected Task Check(Dictionary<VariableRuntime, JToken> writeInfoLists, NonBlockingDictionary<string, OperResult> operResults, CancellationToken cancellationToken)
     {
-        if (VariableSourceReadsEnable)
+        return Check(this, writeInfoLists, operResults, cancellationToken);
+
+        static async PooledTask Check(CollectBase @this, Dictionary<VariableRuntime, JToken> writeInfoLists, NonBlockingDictionary<string, OperResult> operResults, CancellationToken cancellationToken)
         {
-            // 如果成功，每个变量都读取一次最新值，再次比较写入值
-            var successfulWriteNames = operResults.Where(a => a.Value.IsSuccess).Select(a => a.Key).ToHashSet();
-
-            var groups = writeInfoLists.Select(a => a.Key).Where(a => a.RpcWriteCheck && a.ProtectType != ProtectTypeEnum.WriteOnly && successfulWriteNames.Contains(a.Name) && a.VariableSource != null).GroupBy(a => a.VariableSource as VariableSourceRead).Where(a => a.Key != null).ToArray();
-
-            await groups.ParallelForEachAsync(async (varRead, token) =>
+            if (@this.VariableSourceReadsEnable)
             {
-                var result = await ReadSourceAsync(varRead.Key, token).ConfigureAwait(false);
-                if (result.IsSuccess)
+                // 如果成功，每个变量都读取一次最新值，再次比较写入值
+                var successfulWriteNames = operResults.Where(a => a.Value.IsSuccess).Select(a => a.Key).ToHashSet();
+
+                var groups = writeInfoLists.Select(a => a.Key).Where(a => a.RpcWriteCheck && a.ProtectType != ProtectTypeEnum.WriteOnly && successfulWriteNames.Contains(a.Name) && a.VariableSource != null).GroupBy(a => a.VariableSource as VariableSourceRead).Where(a => a.Key != null).ToArray();
+
+                await groups.ParallelForEachAsync(async (varRead, token) =>
                 {
-                    foreach (var item in varRead)
+                    var result = await @this.ReadSourceAsync(varRead.Key, token).ConfigureAwait(false);
+                    if (result.IsSuccess)
                     {
-                        if (!item.Value.Equals(writeInfoLists[item].ToObject(item.Value?.GetType())))
+                        foreach (var item in varRead)
                         {
-                            // 如果写入值与读取值不同，则更新操作结果为失败
-                            operResults[item.Name] = new OperResult($"The write value is inconsistent with the read value,  Write value: {writeInfoLists[item].ToObject(item.Value?.GetType())}, read value: {item.Value}");
+                            if (!item.Value.Equals(writeInfoLists[item].ToObject(item.Value?.GetType())))
+                            {
+                                // 如果写入值与读取值不同，则更新操作结果为失败
+                                operResults[item.Name] = new OperResult($"The write value is inconsistent with the read value,  Write value: {writeInfoLists[item].ToObject(item.Value?.GetType())}, read value: {item.Value}");
+                            }
                         }
                     }
-                }
-                else
-                {
-                    foreach (var item in varRead)
+                    else
                     {
-                        // 如果写入值与读取值不同，则更新操作结果为失败
-                        operResults[item.Name] = new OperResult($"Reading and rechecking resulted in an error: {result.ErrorMessage}", result.Exception);
+                        foreach (var item in varRead)
+                        {
+                            // 如果写入值与读取值不同，则更新操作结果为失败
+                            operResults[item.Name] = new OperResult($"Reading and rechecking resulted in an error: {result.ErrorMessage}", result.Exception);
+                        }
                     }
-                }
-            }, cancellationToken).ConfigureAwait(false);
+                }, cancellationToken).ConfigureAwait(false);
+            }
         }
     }
 
@@ -770,66 +783,71 @@ public abstract partial class CollectBase : DriverBase
     /// <param name="writeInfoLists">要写入的变量及其对应的数据</param>
     /// <param name="cancellationToken">取消操作的通知</param>
     /// <returns>写入操作的结果字典</returns>
-    public async ValueTask<Dictionary<string, Dictionary<string, IOperResult>>> InvokeMethodAsync(Dictionary<VariableRuntime, JToken> writeInfoLists, CancellationToken cancellationToken)
+    public ValueTask<Dictionary<string, Dictionary<string, IOperResult>>> InvokeMethodAsync(Dictionary<VariableRuntime, JToken> writeInfoLists, CancellationToken cancellationToken)
     {
-        // 初始化结果字典
-        Dictionary<string, OperResult<object>> results = new Dictionary<string, OperResult<object>>();
+        return InvokeMethodAsync(this, writeInfoLists, cancellationToken);
 
-        // 遍历写入信息列表
-        foreach (var (deviceVariable, jToken) in writeInfoLists)
+        static async PooledValueTask<Dictionary<string, Dictionary<string, IOperResult>>> InvokeMethodAsync(CollectBase @this, Dictionary<VariableRuntime, JToken> writeInfoLists, CancellationToken cancellationToken)
         {
-            // 检查是否有写入表达式
-            if (!string.IsNullOrEmpty(deviceVariable.WriteExpressions))
+            // 初始化结果字典
+            Dictionary<string, OperResult<object>> results = new Dictionary<string, OperResult<object>>();
+
+            // 遍历写入信息列表
+            foreach (var (deviceVariable, jToken) in writeInfoLists)
             {
-                // 提取原始数据
-                object rawdata = jToken.GetObjectFromJToken();
+                // 检查是否有写入表达式
+                if (!string.IsNullOrEmpty(deviceVariable.WriteExpressions))
+                {
+                    // 提取原始数据
+                    object rawdata = jToken.GetObjectFromJToken();
+                    try
+                    {
+                        // 根据写入表达式转换数据
+                        object data = deviceVariable.WriteExpressions.GetExpressionsResult(rawdata, @this.LogMessage);
+                        // 将转换后的数据重新赋值给写入信息列表
+                        writeInfoLists[deviceVariable] = JTokenUtil.GetJTokenFromObj(data);
+                    }
+                    catch (Exception ex)
+                    {
+                        // 如果转换失败，则记录错误信息
+                        results.Add(deviceVariable.Name, new OperResult<object>(string.Format(AppResource.WriteExpressionsError, deviceVariable.Name, deviceVariable.WriteExpressions, ex.Message), ex));
+                    }
+                }
+            }
+
+            NonBlockingDictionary<string, OperResult<object>> operResults = new();
+
+
+            using var writeLock = await @this.ReadWriteLock.WriterLockAsync(cancellationToken).ConfigureAwait(false);
+            var list = writeInfoLists
+            .Where(a => !results.Any(b => b.Key == a.Key.Name))
+            .ToArray();
+            // 使用并发方式遍历写入信息列表，并进行异步写入操作
+            await list.ParallelForEachAsync(async (writeInfo, cancellationToken) =>
+            {
                 try
                 {
-                    // 根据写入表达式转换数据
-                    object data = deviceVariable.WriteExpressions.GetExpressionsResult(rawdata, LogMessage);
-                    // 将转换后的数据重新赋值给写入信息列表
-                    writeInfoLists[deviceVariable] = JTokenUtil.GetJTokenFromObj(data);
+                    // 调用协议的写入方法，将写入信息中的数据写入到对应的寄存器地址，并获取操作结果
+                    var result = await @this.InvokeMethodAsync(writeInfo.Key.VariableMethod, writeInfo.Value?.ToString(), false, cancellationToken).ConfigureAwait(false);
+
+                    // 将操作结果添加到结果字典中，使用变量名称作为键
+                    operResults.TryAdd(writeInfo.Key.Name, result);
                 }
                 catch (Exception ex)
                 {
-                    // 如果转换失败，则记录错误信息
-                    results.Add(deviceVariable.Name, new OperResult<object>(string.Format(AppResource.WriteExpressionsError, deviceVariable.Name, deviceVariable.WriteExpressions, ex.Message), ex));
+                    operResults.TryAdd(writeInfo.Key.Name, new(ex));
                 }
-            }
-        }
+            }, @this.CollectProperties.MaxConcurrentCount, cancellationToken).ConfigureAwait(false);
 
-        NonBlockingDictionary<string, OperResult<object>> operResults = new();
-
-
-        using var writeLock = await ReadWriteLock.WriterLockAsync(cancellationToken).ConfigureAwait(false);
-        var list = writeInfoLists
-        .Where(a => !results.Any(b => b.Key == a.Key.Name))
-        .ToArray();
-        // 使用并发方式遍历写入信息列表，并进行异步写入操作
-        await list.ParallelForEachAsync(async (writeInfo, cancellationToken) =>
-        {
-            try
-            {
-                // 调用协议的写入方法，将写入信息中的数据写入到对应的寄存器地址，并获取操作结果
-                var result = await InvokeMethodAsync(writeInfo.Key.VariableMethod, writeInfo.Value?.ToString(), false, cancellationToken).ConfigureAwait(false);
-
-                // 将操作结果添加到结果字典中，使用变量名称作为键
-                operResults.TryAdd(writeInfo.Key.Name, result);
-            }
-            catch (Exception ex)
-            {
-                operResults.TryAdd(writeInfo.Key.Name, new(ex));
-            }
-        }, CollectProperties.MaxConcurrentCount, cancellationToken).ConfigureAwait(false);
-
-        // 将转换失败的变量和写入成功的变量的操作结果合并到结果字典中
-        return new Dictionary<string, Dictionary<string, IOperResult>>()
+            // 将转换失败的变量和写入成功的变量的操作结果合并到结果字典中
+            return new Dictionary<string, Dictionary<string, IOperResult>>()
         {
             {
-             DeviceName ,
+             @this.DeviceName ,
              results.Concat(operResults).ToDictionary(a => a.Key, a => (IOperResult)a.Value)
             }
         };
+        }
     }
 
     /// <summary>
@@ -838,58 +856,63 @@ public abstract partial class CollectBase : DriverBase
     /// <param name="writeInfoLists">要写入的变量及其对应的数据</param>
     /// <param name="cancellationToken">取消操作的通知</param>
     /// <returns>写入操作的结果字典</returns>
-    public async ValueTask<Dictionary<string, Dictionary<string, IOperResult>>> InVokeWriteAsync(Dictionary<VariableRuntime, JToken> writeInfoLists, CancellationToken cancellationToken)
+    public ValueTask<Dictionary<string, Dictionary<string, IOperResult>>> InVokeWriteAsync(Dictionary<VariableRuntime, JToken> writeInfoLists, CancellationToken cancellationToken)
     {
-        // 初始化结果字典
-        Dictionary<string, OperResult> results = new Dictionary<string, OperResult>();
+        return InVokeWriteAsync(this, writeInfoLists, cancellationToken);
 
-        // 遍历写入信息列表
-        foreach (var (deviceVariable, jToken) in writeInfoLists)
+        static async PooledValueTask<Dictionary<string, Dictionary<string, IOperResult>>> InVokeWriteAsync(CollectBase @this, Dictionary<VariableRuntime, JToken> writeInfoLists, CancellationToken cancellationToken)
         {
-            // 检查是否有写入表达式
-            if (!string.IsNullOrEmpty(deviceVariable.WriteExpressions))
+            // 初始化结果字典
+            Dictionary<string, OperResult> results = new Dictionary<string, OperResult>();
+
+            // 遍历写入信息列表
+            foreach (var (deviceVariable, jToken) in writeInfoLists)
             {
-                // 提取原始数据
-                object rawdata = jToken.GetObjectFromJToken();
-                try
+                // 检查是否有写入表达式
+                if (!string.IsNullOrEmpty(deviceVariable.WriteExpressions))
                 {
-                    // 根据写入表达式转换数据
-                    object data = deviceVariable.WriteExpressions.GetExpressionsResult(rawdata, LogMessage);
-                    // 将转换后的数据重新赋值给写入信息列表
-                    writeInfoLists[deviceVariable] = JTokenUtil.GetJTokenFromObj(data);
-                }
-                catch (Exception ex)
-                {
-                    // 如果转换失败，则记录错误信息
-                    results.Add(deviceVariable.Name, new OperResult(string.Format(AppResource.WriteExpressionsError, deviceVariable.Name, deviceVariable.WriteExpressions, ex.Message), ex));
+                    // 提取原始数据
+                    object rawdata = jToken.GetObjectFromJToken();
+                    try
+                    {
+                        // 根据写入表达式转换数据
+                        object data = deviceVariable.WriteExpressions.GetExpressionsResult(rawdata, @this.LogMessage);
+                        // 将转换后的数据重新赋值给写入信息列表
+                        writeInfoLists[deviceVariable] = JTokenUtil.GetJTokenFromObj(data);
+                    }
+                    catch (Exception ex)
+                    {
+                        // 如果转换失败，则记录错误信息
+                        results.Add(deviceVariable.Name, new OperResult(string.Format(AppResource.WriteExpressionsError, deviceVariable.Name, deviceVariable.WriteExpressions, ex.Message), ex));
+                    }
                 }
             }
-        }
 
-        var writePList = writeInfoLists.Where(a => !CurrentDevice.VariableScriptReads.Select(a => a.VariableRuntime).Any(b => a.Key.Name == b.Name));
-        var writeSList = writeInfoLists.Where(a => CurrentDevice.VariableScriptReads.Select(a => a.VariableRuntime).Any(b => a.Key.Name == b.Name));
+            var writePList = writeInfoLists.Where(a => !@this.CurrentDevice.VariableScriptReads.Select(a => a.VariableRuntime).Any(b => a.Key.Name == b.Name));
+            var writeSList = writeInfoLists.Where(a => @this.CurrentDevice.VariableScriptReads.Select(a => a.VariableRuntime).Any(b => a.Key.Name == b.Name));
 
-        DateTime now = DateTime.Now;
-        foreach (var item in writeSList)
-        {
-            results.TryAdd(item.Key.Name, item.Key.SetValue(item.Value, now));
-        }
+            DateTime now = DateTime.Now;
+            foreach (var item in writeSList)
+            {
+                results.TryAdd(item.Key.Name, item.Key.SetValue(item.Value, now));
+            }
 
-        // 过滤掉转换失败的变量，只保留写入成功的变量进行写入操作
-        var results1 = await WriteValuesAsync(writePList
-            .Where(a => !results.Any(b => b.Key == a.Key.Name))
-            .ToDictionary(item => item.Key, item => item.Value),
-            cancellationToken).ConfigureAwait(false);
+            // 过滤掉转换失败的变量，只保留写入成功的变量进行写入操作
+            var results1 = await @this.WriteValuesAsync(writePList
+                .Where(a => !results.Any(b => b.Key == a.Key.Name))
+                .ToDictionary(item => item.Key, item => item.Value),
+                cancellationToken).ConfigureAwait(false);
 
-        // 将转换失败的变量和写入成功的变量的操作结果合并到结果字典中
+            // 将转换失败的变量和写入成功的变量的操作结果合并到结果字典中
 
-        return new Dictionary<string, Dictionary<string, IOperResult>>()
+            return new Dictionary<string, Dictionary<string, IOperResult>>()
         {
             {
-                DeviceName ,
+               @this. DeviceName ,
                 results.Concat(results1).ToDictionary(a => a.Key, a => (IOperResult)a.Value)
             }
         };
+        }
     }
 
     /// <summary>
@@ -900,56 +923,61 @@ public abstract partial class CollectBase : DriverBase
     /// <param name="isRead">指示是否为读取操作</param>
     /// <param name="cancellationToken">取消操作的通知</param>
     /// <returns>操作结果，包含执行方法的结果</returns>
-    protected virtual async ValueTask<OperResult<object>> InvokeMethodAsync(VariableMethod variableMethod, string? value = null, bool isRead = true, CancellationToken cancellationToken = default)
+    protected virtual ValueTask<OperResult<object>> InvokeMethodAsync(VariableMethod variableMethod, string? value = null, bool isRead = true, CancellationToken cancellationToken = default)
     {
-        try
+        return InvokeMethodAsync(this, variableMethod, value, isRead, cancellationToken);
+
+        static async PooledValueTask<OperResult<object>> InvokeMethodAsync(CollectBase @this, VariableMethod variableMethod, string? value, bool isRead, CancellationToken cancellationToken)
         {
-            // 初始化操作结果
-            OperResult<object> result = new OperResult<object>();
-
-            // 获取要执行的方法
-            var method = variableMethod.MethodInfo;
-
-            // 如果方法未找到，则返回错误结果
-            if (method == null)
+            try
             {
-                result.OperCode = 999;
-                result.ErrorMessage = string.Format(AppResource.MethodNotNull, variableMethod.Variable.Name, variableMethod.Variable.OtherMethod);
-                return result;
-            }
-            else
-            {
-                // 调用方法并获取结果
-                var data = await variableMethod.InvokeMethodAsync(this, value, cancellationToken).ConfigureAwait(false);
+                // 初始化操作结果
+                OperResult<object> result = new OperResult<object>();
 
-                result = data.GetOperResult();
+                // 获取要执行的方法
+                var method = variableMethod.MethodInfo;
 
-                // 如果方法有返回值，并且是读取操作
-                if (method.HasReturn && isRead)
+                // 如果方法未找到，则返回错误结果
+                if (method == null)
                 {
-                    var time = DateTime.Now;
-                    if (result.IsSuccess == true)
-                    {
-                        // 将结果序列化并设置到变量中
-                        var variableResult = variableMethod.Variable.SetValue(result.Content, time);
-                        if (!variableResult.IsSuccess)
-                            variableMethod.LastErrorMessage = result.ErrorMessage;
-                    }
-                    else
-                    {
-                        // 如果读取操作失败，则将变量标记为离线
-                        var variableResult = variableMethod.Variable.SetValue(null, time, isOnline: false);
-                        if (!variableResult.IsSuccess)
-                            variableMethod.LastErrorMessage = result.ErrorMessage;
-                    }
+                    result.OperCode = 999;
+                    result.ErrorMessage = string.Format(AppResource.MethodNotNull, variableMethod.Variable.Name, variableMethod.Variable.OtherMethod);
+                    return result;
                 }
-                return result;
+                else
+                {
+                    // 调用方法并获取结果
+                    var data = await variableMethod.InvokeMethodAsync(@this, value, cancellationToken).ConfigureAwait(false);
+
+                    result = data.GetOperResult();
+
+                    // 如果方法有返回值，并且是读取操作
+                    if (method.HasReturn && isRead)
+                    {
+                        var time = DateTime.Now;
+                        if (result.IsSuccess == true)
+                        {
+                            // 将结果序列化并设置到变量中
+                            var variableResult = variableMethod.Variable.SetValue(result.Content, time);
+                            if (!variableResult.IsSuccess)
+                                variableMethod.LastErrorMessage = result.ErrorMessage;
+                        }
+                        else
+                        {
+                            // 如果读取操作失败，则将变量标记为离线
+                            var variableResult = variableMethod.Variable.SetValue(null, time, isOnline: false);
+                            if (!variableResult.IsSuccess)
+                                variableMethod.LastErrorMessage = result.ErrorMessage;
+                        }
+                    }
+                    return result;
+                }
             }
-        }
-        catch (Exception ex)
-        {
-            // 捕获异常并返回错误结果
-            return new OperResult<object>(ex);
+            catch (Exception ex)
+            {
+                // 捕获异常并返回错误结果
+                return new OperResult<object>(ex);
+            }
         }
     }
 

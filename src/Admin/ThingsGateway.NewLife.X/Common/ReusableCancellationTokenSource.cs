@@ -10,13 +10,18 @@
 //  感谢您的下载和使用
 //------------------------------------------------------------------------------
 
-namespace ThingsGateway.Foundation;
+namespace ThingsGateway.NewLife;
 
 using System;
 using System.Threading;
 
 public sealed class ReusableCancellationTokenSource : IDisposable
 {
+    ~ReusableCancellationTokenSource()
+    {
+        Dispose();
+    }
+
     private readonly Timer _timer;
     private CancellationTokenSource? _cts;
 
@@ -47,7 +52,7 @@ public sealed class ReusableCancellationTokenSource : IDisposable
     /// <summary>
     /// 获取一个 CTS，并启动超时
     /// </summary>
-    public CancellationTokenSource GetTokenSource(long timeout, CancellationToken external1 = default, CancellationToken external2 = default, CancellationToken external3 = default)
+    public CancellationToken GetTokenSource(long timeout, CancellationToken external1 = default, CancellationToken external2 = default, CancellationToken external3 = default)
     {
         TimeoutStatus = false;
 
@@ -57,7 +62,7 @@ public sealed class ReusableCancellationTokenSource : IDisposable
         // 启动 Timer
         _timer.Change(timeout, Timeout.Infinite);
 
-        return _cts;
+        return _cts.Token;
     }
 
 
@@ -71,15 +76,16 @@ public sealed class ReusableCancellationTokenSource : IDisposable
     /// </summary>
     public void Cancel()
     {
-        _cts?.SafeCancel();
+        try { _cts?.Cancel(); } catch { }
     }
 
     public void Dispose()
     {
-        _cts?.SafeCancel();
-        _cts?.SafeDispose();
-        _linkedCtsCache.SafeDispose();
-        _timer.SafeDispose();
+        try { _cts?.Cancel(); } catch { }
+        try { _cts?.Dispose(); } catch { }
+        try { _linkedCtsCache?.Dispose(); } catch { }
+        try { _timer?.Dispose(); } catch { }
+        GC.SuppressFinalize(this);
     }
 }
 

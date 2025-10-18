@@ -11,6 +11,8 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
+using PooledAwait;
+
 using System.Linq.Expressions;
 
 using ThingsGateway.Gateway.Application.Extensions;
@@ -139,18 +141,27 @@ public abstract class VariableObject
     /// <summary>
     /// <see cref="VariableRuntimeAttribute"/>特性连读，反射赋值到继承类中的属性
     /// </summary>
-    public virtual async ValueTask<OperResult> MultiReadAsync(CancellationToken cancellationToken = default)
+    public virtual ValueTask<OperResult> MultiReadAsync(CancellationToken cancellationToken = default)
     {
         try
         {
             GetVariableSources();
             //连读
-            foreach (var item in DeviceVariableSourceReads)
+            return MultiReadAsync(this, cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            return EasyValueTask.FromResult(new OperResult(ex));
+        }
+
+        static async PooledValueTask<OperResult> MultiReadAsync(VariableObject @this, CancellationToken cancellationToken)
+        {
+            foreach (var item in @this.DeviceVariableSourceReads)
             {
-                var result = await Device.ReadAsync(item.RegisterAddress, item.Length, cancellationToken).ConfigureAwait(false);
+                var result = await @this.Device.ReadAsync(item.RegisterAddress, item.Length, cancellationToken).ConfigureAwait(false);
                 if (result.IsSuccess)
                 {
-                    var result1 = item.VariableRuntimes.PraseStructContent(Device, result.Content.Span, exWhenAny: true);
+                    var result1 = item.VariableRuntimes.PraseStructContent(@this.Device, result.Content.Span, exWhenAny: true);
                     if (!result1.IsSuccess)
                     {
                         item.LastErrorMessage = result1.ErrorMessage;
@@ -168,12 +179,8 @@ public abstract class VariableObject
                 }
             }
 
-            SetValue();
+            @this.SetValue();
             return OperResult.Success;
-        }
-        catch (Exception ex)
-        {
-            return new OperResult(ex);
         }
     }
 
@@ -205,30 +212,31 @@ public abstract class VariableObject
     /// <param name="propertyName">属性名称，必须使用<see cref="VariableRuntimeAttribute"/>特性</param>
     /// <param name="value">写入值</param>
     /// <param name="cancellationToken">取消令箭</param>
-    public virtual async ValueTask<OperResult> WriteValueAsync(string propertyName, object value, CancellationToken cancellationToken = default)
+    public virtual ValueTask<OperResult> WriteValueAsync(string propertyName, object value, CancellationToken cancellationToken = default)
     {
         try
         {
             GetVariableSources();
             if (string.IsNullOrEmpty(propertyName))
             {
-                return new OperResult($"PropertyName cannot be null or empty.");
+                return EasyValueTask.FromResult(new OperResult($"PropertyName cannot be null or empty."));
             }
 
             if (!VariableRuntimePropertyDict.TryGetValue(propertyName, out var variableRuntimeProperty))
             {
-                return new OperResult($"This attribute is not recognized and may not have been identified using the {typeof(VariableRuntimeAttribute)} attribute");
+                return EasyValueTask.FromResult(new OperResult($"This attribute is not recognized and may not have been identified using the {typeof(VariableRuntimeAttribute)} attribute"));
             }
 
             JToken jToken = GetExpressionsValue(value, variableRuntimeProperty);
 
-            var result = await Device.WriteJTokenAsync(variableRuntimeProperty.VariableClass.RegisterAddress, jToken, variableRuntimeProperty.VariableClass.DataType, cancellationToken).ConfigureAwait(false);
-            return result;
+            return Device.WriteJTokenAsync(variableRuntimeProperty.VariableClass.RegisterAddress, jToken, variableRuntimeProperty.VariableClass.DataType, cancellationToken);
         }
         catch (Exception ex)
         {
-            return new OperResult(ex);
+            return EasyValueTask.FromResult(new OperResult(ex));
         }
+
+
     }
 
     /// <summary>

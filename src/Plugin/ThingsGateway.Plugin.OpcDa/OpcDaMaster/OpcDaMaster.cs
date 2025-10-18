@@ -160,7 +160,6 @@ public class OpcDaMaster : CollectBase
     protected override async ValueTask<Dictionary<string, OperResult>> WriteValuesAsync(Dictionary<VariableRuntime, JToken> writeInfoLists, CancellationToken cancellationToken)
     {
         using var writeLock = await ReadWriteLock.WriterLockAsync(cancellationToken).ConfigureAwait(false);
-        await ValueTask.CompletedTask.ConfigureAwait(false);
         var result = _plc.WriteItem(writeInfoLists.ToDictionary(a => a.Key.RegisterAddress!, a => a.Value.GetObjectFromJToken()!));
         var results = new NonBlockingDictionary<string, OperResult>(result.ToDictionary<KeyValuePair<string, Tuple<bool, string>>, string, OperResult>(a => writeInfoLists.Keys.FirstOrDefault(b => b.RegisterAddress == a.Key).Name, a =>
         {

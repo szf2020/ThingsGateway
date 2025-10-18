@@ -149,7 +149,75 @@ public class ChannelDeviceTreeItem : IEqualityComparer<ChannelDeviceTreeItem>
         return $"{channelDeviceTreeItem.ChannelDevicePluginType}.{channelDeviceTreeItem.DeviceRuntimeId}.{channelDeviceTreeItem.ChannelRuntimeId}.{channelDeviceTreeItem.PluginName}.{channelDeviceTreeItem.PluginType}";
     }
 
-    public static ChannelDeviceTreeItem FromJSString(string jsString)
+
+}
+
+public struct ChannelDeviceTreeItemStruct
+{
+    public long Id { get; set; }
+    public ChannelDevicePluginTypeEnum ChannelDevicePluginType { get; set; }
+
+    public long DeviceRuntimeId { get; set; }
+
+    public long ChannelRuntimeId { get; set; }
+    public string PluginName { get; set; }
+    public PluginTypeEnum? PluginType { get; set; }
+
+
+    public bool TryGetDeviceRuntime(out DeviceRuntime deviceRuntime)
+    {
+        if (ChannelDevicePluginType == ChannelDevicePluginTypeEnum.Device && DeviceRuntimeId > 0)
+        {
+            if (GlobalData.ReadOnlyIdDevices.TryGetValue(DeviceRuntimeId, out deviceRuntime))
+            {
+                return true;
+            }
+        }
+        deviceRuntime = null;
+        return false;
+    }
+
+    public bool TryGetPluginName(out string pluginName)
+    {
+        if (ChannelDevicePluginType == ChannelDevicePluginTypeEnum.PluginName)
+        {
+            pluginName = PluginName;
+            return true;
+        }
+        else
+        {
+            pluginName = default;
+            return false;
+        }
+    }
+
+    public bool TryGetPluginType(out PluginTypeEnum? pluginType)
+    {
+        if (ChannelDevicePluginType == ChannelDevicePluginTypeEnum.PluginType)
+        {
+            pluginType = PluginType;
+            return true;
+        }
+        else
+        {
+            pluginType = default;
+            return false;
+        }
+    }
+    public bool TryGetChannelRuntime(out ChannelRuntime channelRuntime)
+    {
+        if (ChannelDevicePluginType == ChannelDevicePluginTypeEnum.Channel && ChannelRuntimeId > 0)
+        {
+            if (GlobalData.ReadOnlyIdChannels.TryGetValue(ChannelRuntimeId, out channelRuntime))
+            {
+                return true;
+            }
+        }
+        channelRuntime = null;
+        return false;
+    }
+
+    public static ChannelDeviceTreeItemStruct FromJSString(string jsString)
     {
         if (string.IsNullOrWhiteSpace(jsString))
             throw new ArgumentNullException(nameof(jsString));
@@ -204,7 +272,7 @@ public class ChannelDeviceTreeItem : IEqualityComparer<ChannelDeviceTreeItem>
             parsedPluginType = tmp;
         }
 
-        return new ChannelDeviceTreeItem
+        return new ChannelDeviceTreeItemStruct
         {
             ChannelDevicePluginType = pluginType,
             DeviceRuntimeId = deviceRuntimeId,
@@ -215,3 +283,4 @@ public class ChannelDeviceTreeItem : IEqualityComparer<ChannelDeviceTreeItem>
     }
 
 }
+

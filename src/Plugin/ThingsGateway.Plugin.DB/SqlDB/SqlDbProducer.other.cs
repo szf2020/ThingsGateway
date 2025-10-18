@@ -8,6 +8,8 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
+using PooledAwait;
+
 using System.Collections.Concurrent;
 using System.Diagnostics;
 
@@ -97,131 +99,146 @@ public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariable
         }
     }
 
-    private async ValueTask<OperResult> UpdateVarModel(IEnumerable<VariableBasicData> item, CancellationToken cancellationToken)
+    private ValueTask<OperResult> UpdateVarModel(IEnumerable<VariableBasicData> item, CancellationToken cancellationToken)
     {
-        var result = await InserableAsync(item.WhereIf(_driverPropertys.OnlineFilter, a => a.IsOnline == true).ToList(), cancellationToken).ConfigureAwait(false);
-        if (success != result.IsSuccess)
-        {
-            if (!result.IsSuccess)
-                LogMessage?.LogWarning(result.ToString());
-            success = result.IsSuccess;
-        }
+        return UpdateVarModel(this, item, cancellationToken);
 
-        return result;
+        static async PooledValueTask<OperResult> UpdateVarModel(SqlDBProducer @this, IEnumerable<VariableBasicData> item, CancellationToken cancellationToken)
+        {
+            var result = await @this.InserableAsync(item.WhereIf(@this._driverPropertys.OnlineFilter, a => a.IsOnline == true).ToList(), cancellationToken).ConfigureAwait(false);
+            if (@this.success != result.IsSuccess)
+            {
+                if (!result.IsSuccess)
+                    @this.LogMessage?.LogWarning(result.ToString());
+                @this.success = result.IsSuccess;
+            }
+
+            return result;
+        }
     }
 
     #region 方法
 
-    private async ValueTask<OperResult> InserableAsync(List<VariableBasicData> dbInserts, CancellationToken cancellationToken)
+    private ValueTask<OperResult> InserableAsync(List<VariableBasicData> dbInserts, CancellationToken cancellationToken)
     {
-        try
+        return InserableAsync(this, dbInserts, cancellationToken);
+
+        static async PooledValueTask<OperResult> InserableAsync(SqlDBProducer @this, List<VariableBasicData> dbInserts, CancellationToken cancellationToken)
         {
-            _db.Ado.CancellationToken = cancellationToken;
-            if (!_driverPropertys.BigTextScriptHistoryTable.IsNullOrEmpty())
+            try
             {
-                var getDeviceModel = CSharpScriptEngineExtension.Do<DynamicSQLBase>(_driverPropertys.BigTextScriptHistoryTable);
-
-                getDeviceModel.Logger = LogMessage;
-
-                await getDeviceModel.DBInsertable(_db, dbInserts, cancellationToken).ConfigureAwait(false);
-            }
-            else
-            {
-                var stringData = dbInserts.Where(a => (!a.IsNumber && a.Value is not bool));
-                var numberData = dbInserts.Where(a => (a.IsNumber || a.Value is bool));
-
-                if (numberData.Any())
+                @this._db.Ado.CancellationToken = cancellationToken;
+                if (!@this._driverPropertys.BigTextScriptHistoryTable.IsNullOrEmpty())
                 {
-                    var data = numberData.AdaptEnumerableSQLNumberHistoryValue();
-                    Stopwatch stopwatch = new();
-                    stopwatch.Start();
-                    var result = await _db.Fastest<SQLNumberHistoryValue>().SplitTable().BulkCopyAsync(data).ConfigureAwait(false);
-                    stopwatch.Stop();
+                    var getDeviceModel = CSharpScriptEngineExtension.Do<DynamicSQLBase>(@this._driverPropertys.BigTextScriptHistoryTable);
 
-                    //var result = await db.Insertable(dbInserts).SplitTable().ExecuteCommandAsync().ConfigureAwait(false);
-                    if (result > 0)
-                    {
-                        LogMessage?.Trace($"TableName：{_driverPropertys.NumberTableName}，Count：{result}，watchTime:  {stopwatch.ElapsedMilliseconds} ms");
-                    }
+                    getDeviceModel.Logger = @this.LogMessage;
+
+                    await getDeviceModel.DBInsertable(@this._db, dbInserts, cancellationToken).ConfigureAwait(false);
                 }
-
-                if (stringData.Any())
+                else
                 {
-                    Stopwatch stopwatch = new();
-                    stopwatch.Start();
-                    var data = stringData.AdaptEnumerableSQLHistoryValue();
-                    var result = await _db.Fastest<SQLHistoryValue>().SplitTable().BulkCopyAsync(data).ConfigureAwait(false);
-                    stopwatch.Stop();
+                    var stringData = dbInserts.Where(a => (!a.IsNumber && a.Value is not bool));
+                    var numberData = dbInserts.Where(a => (a.IsNumber || a.Value is bool));
 
-                    //var result = await db.Insertable(dbInserts).SplitTable().ExecuteCommandAsync().ConfigureAwait(false);
-                    if (result > 0)
+                    if (numberData.Any())
                     {
-                        LogMessage?.Trace($"TableName：{_driverPropertys.StringTableName}，Count：{result}，watchTime:  {stopwatch.ElapsedMilliseconds} ms");
+                        var data = numberData.AdaptEnumerableSQLNumberHistoryValue();
+                        Stopwatch stopwatch = new();
+                        stopwatch.Start();
+                        var result = await @this._db.Fastest<SQLNumberHistoryValue>().SplitTable().BulkCopyAsync(data).ConfigureAwait(false);
+                        stopwatch.Stop();
+
+                        //var result = await db.Insertable(dbInserts).SplitTable().ExecuteCommandAsync().ConfigureAwait(false);
+                        if (result > 0)
+                        {
+                            @this.LogMessage?.Trace($"TableName：{@this._driverPropertys.NumberTableName}，Count：{result}，watchTime:  {stopwatch.ElapsedMilliseconds} ms");
+                        }
                     }
-                }
-            }
 
-            return OperResult.Success;
-        }
-        catch (Exception ex)
-        {
-            return new OperResult(ex);
-        }
-    }
-
-    private async ValueTask<OperResult> UpdateAsync(List<VariableBasicData> datas, CancellationToken cancellationToken)
-    {
-        try
-        {
-            _db.Ado.CancellationToken = cancellationToken;
-
-            if (!_driverPropertys.BigTextScriptRealTable.IsNullOrEmpty())
-            {
-                var getDeviceModel = CSharpScriptEngineExtension.Do<DynamicSQLBase>(_driverPropertys.BigTextScriptRealTable);
-                getDeviceModel.Logger = LogMessage;
-
-                await getDeviceModel.DBInsertable(_db, datas, cancellationToken).ConfigureAwait(false);
-                return OperResult.Success;
-            }
-            else
-            {
-                if (!_initRealData)
-                {
-                    Stopwatch stopwatch = new();
-                    stopwatch.Start();
-                    var ids = (await _db.Queryable<SQLRealValue>().AS(_driverPropertys.ReadDBTableName).Select(a => a.Id).ToListAsync(cancellationToken).ConfigureAwait(false)).ToHashSet();
-                    var InsertData = IdVariableRuntimes.Where(a => !ids.Contains(a.Key)).Select(a => a.Value).AdaptEnumerableSQLRealValue();
-                    var result = await _db.Fastest<SQLRealValue>().AS(_driverPropertys.ReadDBTableName).BulkCopyAsync(InsertData).ConfigureAwait(false);
-                    _initRealData = true;
-                    stopwatch.Stop();
-                    if (result > 0)
-                    {
-                        LogMessage?.Trace($"RealTable Insert Data Count：{result}，watchTime:  {stopwatch.ElapsedMilliseconds} ms");
-                    }
-                }
-                {
-                    if (datas?.Count > 0)
+                    if (stringData.Any())
                     {
                         Stopwatch stopwatch = new();
                         stopwatch.Start();
+                        var data = stringData.AdaptEnumerableSQLHistoryValue();
+                        var result = await @this._db.Fastest<SQLHistoryValue>().SplitTable().BulkCopyAsync(data).ConfigureAwait(false);
+                        stopwatch.Stop();
 
-                        var data = datas.AdaptEnumerableSQLRealValue();
-                        var result = await _db.Fastest<SQLRealValue>().AS(_driverPropertys.ReadDBTableName).BulkUpdateAsync(data).ConfigureAwait(false);
+                        //var result = await db.Insertable(dbInserts).SplitTable().ExecuteCommandAsync().ConfigureAwait(false);
+                        if (result > 0)
+                        {
+                            @this.LogMessage?.Trace($"TableName：{@this._driverPropertys.StringTableName}，Count：{result}，watchTime:  {stopwatch.ElapsedMilliseconds} ms");
+                        }
+                    }
+                }
 
+                return OperResult.Success;
+            }
+            catch (Exception ex)
+            {
+                return new OperResult(ex);
+            }
+        }
+    }
+
+    private ValueTask<OperResult> UpdateAsync(List<VariableBasicData> datas, CancellationToken cancellationToken)
+    {
+        return UpdateAsync(this, datas, cancellationToken);
+
+        static async PooledValueTask<OperResult> UpdateAsync(SqlDBProducer @this, List<VariableBasicData> datas, CancellationToken cancellationToken)
+        {
+            try
+            {
+                @this._db.Ado.CancellationToken = cancellationToken;
+
+                if (!@this._driverPropertys.BigTextScriptRealTable.IsNullOrEmpty())
+                {
+                    var getDeviceModel = CSharpScriptEngineExtension.Do<DynamicSQLBase>(@this._driverPropertys.BigTextScriptRealTable);
+                    getDeviceModel.Logger = @this.LogMessage;
+
+                    await getDeviceModel.DBInsertable(@this._db, datas, cancellationToken).ConfigureAwait(false);
+                    return OperResult.Success;
+                }
+                else
+                {
+                    if (!@this._initRealData)
+                    {
+                        Stopwatch stopwatch = new();
+                        stopwatch.Start();
+                        var ids = (await @this._db.Queryable<SQLRealValue>().AS(@this._driverPropertys.ReadDBTableName).Select(a => a.Id).ToListAsync(cancellationToken).ConfigureAwait(false)).ToHashSet();
+                        var InsertData = @this.IdVariableRuntimes.Where(a => !ids.Contains(a.Key)).Select(a => a.Value).AdaptEnumerableSQLRealValue();
+                        var result = await @this._db.Fastest<SQLRealValue>().AS(@this._driverPropertys.ReadDBTableName).BulkCopyAsync(InsertData).ConfigureAwait(false);
+                        @this._initRealData = true;
                         stopwatch.Stop();
                         if (result > 0)
                         {
-                            LogMessage?.Trace($"RealTable Data Count：{result}，watchTime:  {stopwatch.ElapsedMilliseconds} ms");
+                            @this.LogMessage?.Trace($"RealTable Insert Data Count：{result}，watchTime:  {stopwatch.ElapsedMilliseconds} ms");
+                        }
+                    }
+                    {
+                        if (datas?.Count > 0)
+                        {
+                            Stopwatch stopwatch = new();
+                            stopwatch.Start();
+
+                            var data = datas.AdaptEnumerableSQLRealValue();
+                            var result = await @this._db.Fastest<SQLRealValue>().AS(@this._driverPropertys.ReadDBTableName).BulkUpdateAsync(data).ConfigureAwait(false);
+
+                            stopwatch.Stop();
+                            if (result > 0)
+                            {
+                                @this.LogMessage?.Trace($"RealTable Data Count：{result}，watchTime:  {stopwatch.ElapsedMilliseconds} ms");
+                            }
+                            return OperResult.Success;
                         }
                         return OperResult.Success;
                     }
-                    return OperResult.Success;
                 }
             }
-        }
-        catch (Exception ex)
-        {
-            return new OperResult(ex);
+            catch (Exception ex)
+            {
+                return new OperResult(ex);
+            }
         }
     }
 

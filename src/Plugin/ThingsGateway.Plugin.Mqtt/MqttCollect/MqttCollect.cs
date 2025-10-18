@@ -10,6 +10,9 @@
 
 using MQTTnet;
 
+using PooledAwait;
+
+
 #if NET6_0
 using MQTTnet.Client;
 #endif
@@ -272,21 +275,29 @@ public partial class MqttCollect : CollectBase
 
         return list;
     }
-    private async Task CheckAsync(object? state, CancellationToken cancellationToken)
+    private Task CheckAsync(object? state, CancellationToken cancellationToken)
     {
-        var clientResult = await TryMqttClientAsync(cancellationToken).ConfigureAwait(false);
-        if (!clientResult.IsSuccess)
+        return CheckAsync(this, cancellationToken);
+
+
+        static async PooledTask CheckAsync(MqttCollect @this, CancellationToken cancellationToken)
         {
-            if (cancellationToken.IsCancellationRequested)
-                return;
-            if (success != clientResult.IsSuccess)
+            var clientResult = await @this.TryMqttClientAsync(cancellationToken).ConfigureAwait(false);
+            if (!clientResult.IsSuccess)
             {
-                if (!clientResult.IsSuccess)
-                    LogMessage?.LogWarning(clientResult.Exception, clientResult.ErrorMessage);
-                success = clientResult.IsSuccess;
+                if (cancellationToken.IsCancellationRequested)
+                    return;
+                if (@this.success != clientResult.IsSuccess)
+                {
+                    if (!clientResult.IsSuccess)
+                        @this.LogMessage?.LogWarning(clientResult.Exception, clientResult.ErrorMessage);
+                    @this.success = clientResult.IsSuccess;
+                }
+                await Task.Delay(10000, cancellationToken).ConfigureAwait(false);
+                //return;
             }
-            await Task.Delay(10000, cancellationToken).ConfigureAwait(false);
-            //return;
+
+            return;
         }
     }
 

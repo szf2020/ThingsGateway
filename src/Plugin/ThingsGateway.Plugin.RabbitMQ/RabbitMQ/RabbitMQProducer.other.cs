@@ -8,6 +8,8 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
+using PooledAwait;
+
 using RabbitMQ.Client;
 
 using ThingsGateway.Extension.Generic;
@@ -148,26 +150,30 @@ public partial class RabbitMQProducer : BusinessBaseWithCacheIntervalScriptAll
 
     #region private
 
-    private async ValueTask<OperResult> Update(IEnumerable<TopicArray> topicArrayList, CancellationToken cancellationToken)
+    private ValueTask<OperResult> Update(IEnumerable<TopicArray> topicArrayList, CancellationToken cancellationToken)
     {
-        foreach (var topicArray in topicArrayList)
+        return Update(this, topicArrayList, cancellationToken);
+
+        static async PooledValueTask<OperResult> Update(RabbitMQProducer @this, IEnumerable<TopicArray> topicArrayList, CancellationToken cancellationToken)
         {
-            var result = await RabbitMQUpAsync(topicArray, cancellationToken).ConfigureAwait(false);
-            if (success != result.IsSuccess)
+            foreach (var topicArray in topicArrayList)
             {
+                var result = await @this.RabbitMQUpAsync(topicArray, cancellationToken).ConfigureAwait(false);
+                if (@this.success != result.IsSuccess)
+                {
+                    if (!result.IsSuccess)
+                    {
+                        @this.LogMessage?.LogWarning(result.ToString());
+                    }
+                    @this.success = result.IsSuccess;
+                }
                 if (!result.IsSuccess)
                 {
-                    LogMessage?.LogWarning(result.ToString());
+                    return result;
                 }
-                success = result.IsSuccess;
             }
-            if (!result.IsSuccess)
-            {
-                return result;
-            }
+            return OperResult.Success;
         }
-        OperResult operResult = OperResult.Success;
-        return operResult;
     }
 
     private ValueTask<OperResult> UpdateAlarmModel(IEnumerable<AlarmVariable> item, CancellationToken cancellationToken)
@@ -226,36 +232,41 @@ public partial class RabbitMQProducer : BusinessBaseWithCacheIntervalScriptAll
     /// <summary>
     /// 上传，返回上传结果
     /// </summary>
-    public async Task<OperResult> RabbitMQUpAsync(TopicArray topicArray, CancellationToken cancellationToken)
+    public Task<OperResult> RabbitMQUpAsync(TopicArray topicArray, CancellationToken cancellationToken)
     {
-        try
-        {
-            if (_channel != null)
-            {
-                await _channel.BasicPublishAsync(_driverPropertys.ExchangeName, topicArray.Topic, topicArray.Payload, cancellationToken).ConfigureAwait(false);
+        return RabbitMQUpAsync(this, topicArray, cancellationToken);
 
-                if (_driverPropertys.DetailLog)
+        static async PooledTask<OperResult> RabbitMQUpAsync(RabbitMQProducer @this, TopicArray topicArray, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (@this._channel != null)
                 {
-                    if (LogMessage?.LogLevel <= TouchSocket.Core.LogLevel.Trace)
-                        LogMessage?.LogTrace(GetDetailLogString(topicArray, _memoryVarModelQueue.Count));
-                    else if (LogMessage?.LogLevel <= TouchSocket.Core.LogLevel.Debug)
-                        LogMessage?.LogDebug(GetCountLogString(topicArray, _memoryVarModelQueue.Count));
+                    await @this._channel.BasicPublishAsync(@this._driverPropertys.ExchangeName, topicArray.Topic, topicArray.Payload, cancellationToken).ConfigureAwait(false);
+
+                    if (@this._driverPropertys.DetailLog)
+                    {
+                        if (@this.LogMessage?.LogLevel <= TouchSocket.Core.LogLevel.Trace)
+                            @this.LogMessage?.LogTrace(@this.GetDetailLogString(topicArray, @this._memoryVarModelQueue.Count));
+                        else if (@this.LogMessage?.LogLevel <= TouchSocket.Core.LogLevel.Debug)
+                            @this.LogMessage?.LogDebug(@this.GetCountLogString(topicArray, @this._memoryVarModelQueue.Count));
+                    }
+                    else
+                    {
+                        if (@this.LogMessage?.LogLevel <= TouchSocket.Core.LogLevel.Debug)
+                            @this.LogMessage?.LogDebug(@this.GetCountLogString(topicArray, @this._memoryVarModelQueue.Count));
+                    }
+                    return OperResult.Success;
                 }
                 else
                 {
-                    if (LogMessage?.LogLevel <= TouchSocket.Core.LogLevel.Debug)
-                        LogMessage?.LogDebug(GetCountLogString(topicArray, _memoryVarModelQueue.Count));
+                    return new OperResult("Upload fail");
                 }
-                return OperResult.Success;
             }
-            else
+            catch (Exception ex)
             {
-                return new OperResult("Upload fail");
+                return new OperResult(ex);
             }
-        }
-        catch (Exception ex)
-        {
-            return new OperResult(ex);
         }
     }
 

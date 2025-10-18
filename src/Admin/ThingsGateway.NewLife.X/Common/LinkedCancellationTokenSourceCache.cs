@@ -8,7 +8,7 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-namespace ThingsGateway.Foundation;
+namespace ThingsGateway.NewLife;
 
 public class LinkedCancellationTokenSourceCache : IDisposable
 {
@@ -63,6 +63,7 @@ public class LinkedCancellationTokenSourceCache : IDisposable
             _cachedCts?.Dispose();
             _cachedCts = null!;
         }
+        GC.SuppressFinalize(this);
     }
 }
 

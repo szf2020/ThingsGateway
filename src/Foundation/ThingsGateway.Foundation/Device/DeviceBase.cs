@@ -331,21 +331,25 @@ public abstract class DeviceBase : AsyncAndSyncDisposableObject, IDevice
     }
     public bool AutoConnect { get; protected set; } = true;
     /// <inheritdoc/>
-    private async Task SendAsync(ISendMessage sendMessage, IClientChannel channel, CancellationToken token = default)
+    private Task SendAsync(ISendMessage sendMessage, IClientChannel channel, CancellationToken token = default)
     {
+        return SendAsync(this, sendMessage, channel, token);
 
-        if (SendDelayTime != 0)
-            await Task.Delay(SendDelayTime, token).ConfigureAwait(false);
-
-        if (channel is IDtuUdpSessionChannel udpSession)
+        static async PooledTask SendAsync(DeviceBase @this, ISendMessage sendMessage, IClientChannel channel, CancellationToken token)
         {
-            EndPoint? endPoint = GetUdpEndpoint();
-            await udpSession.SendAsync(endPoint, sendMessage, token).ConfigureAwait(false);
+            if (@this.SendDelayTime != 0)
+                await Task.Delay(@this.SendDelayTime, token).ConfigureAwait(false);
 
-        }
-        else
-        {
-            await channel.SendAsync(sendMessage, token).ConfigureAwait(false);
+            if (channel is IDtuUdpSessionChannel udpSession)
+            {
+                EndPoint? endPoint = @this.GetUdpEndpoint();
+                await udpSession.SendAsync(endPoint, sendMessage, token).ConfigureAwait(false);
+
+            }
+            else
+            {
+                await channel.SendAsync(sendMessage, token).ConfigureAwait(false);
+            }
         }
 
     }
@@ -365,58 +369,68 @@ public abstract class DeviceBase : AsyncAndSyncDisposableObject, IDevice
 
     private WaitLock connectWaitLock = new(nameof(DeviceBase));
 
-    public async ValueTask ConnectAsync(CancellationToken token)
+    public ValueTask ConnectAsync(CancellationToken token)
     {
-        if (AutoConnect && Channel != null && Channel?.Online != true)
+        return ConnectAsync(this, token);
+
+        static async PooledValueTask ConnectAsync(DeviceBase @this, CancellationToken token)
         {
-            try
+            if (@this.AutoConnect && @this.Channel != null && @this.Channel?.Online != true)
             {
-                await connectWaitLock.WaitAsync(token).ConfigureAwait(false);
-                if (AutoConnect && Channel != null && Channel?.Online != true)
+                try
                 {
-                    if (Channel.PluginManager == null)
-                        await Channel.SetupAsync(Channel.Config.Clone()).ConfigureAwait(false);
-                    await Channel.CloseAsync().ConfigureAwait(false);
-                    using var ctsTime = new CancellationTokenSource(Channel.ChannelOptions.ConnectTimeout);
-                    using var cts = CancellationTokenSource.CreateLinkedTokenSource(ctsTime.Token, token);
-                    await Channel.ConnectAsync(cts.Token).ConfigureAwait(false);
+                    await @this.connectWaitLock.WaitAsync(token).ConfigureAwait(false);
+                    if (@this.AutoConnect && @this.Channel != null && @this.Channel?.Online != true)
+                    {
+                        if (@this.Channel.PluginManager == null)
+                            await @this.Channel.SetupAsync(@this.Channel.Config.Clone()).ConfigureAwait(false);
+                        await @this.Channel.CloseAsync().ConfigureAwait(false);
+                        using var ctsTime = new CancellationTokenSource(@this.Channel.ChannelOptions.ConnectTimeout);
+                        using var cts = CancellationTokenSource.CreateLinkedTokenSource(ctsTime.Token, token);
+                        await @this.Channel.ConnectAsync(cts.Token).ConfigureAwait(false);
+                    }
                 }
-            }
-            finally
-            {
-                connectWaitLock.Release();
+                finally
+                {
+                    @this.connectWaitLock.Release();
+                }
             }
         }
     }
 
     /// <inheritdoc/>
-    public virtual async ValueTask<OperResult> SendAsync(ISendMessage sendMessage, CancellationToken cancellationToken)
+    public virtual ValueTask<OperResult> SendAsync(ISendMessage sendMessage, CancellationToken cancellationToken)
     {
-        try
-        {
-            var channelResult = GetChannel();
-            if (!channelResult.IsSuccess) return new OperResult<byte[]>(channelResult);
-            WaitLock? waitLock = GetWaitLock(channelResult.Content);
+        return SendAsync(this, sendMessage, cancellationToken);
 
+        static async PooledValueTask<OperResult> SendAsync(DeviceBase @this, ISendMessage sendMessage, CancellationToken cancellationToken)
+        {
             try
             {
-                await BeforeSendAsync(channelResult.Content, cancellationToken).ConfigureAwait(false);
+                var channelResult = @this.GetChannel();
+                if (!channelResult.IsSuccess) return new OperResult<byte[]>(channelResult);
+                WaitLock? waitLock = @this.GetWaitLock(channelResult.Content);
 
-                await waitLock.WaitAsync(cancellationToken).ConfigureAwait(false);
-                channelResult.Content.SetDataHandlingAdapterLogger(Logger);
+                try
+                {
+                    await @this.BeforeSendAsync(channelResult.Content, cancellationToken).ConfigureAwait(false);
+
+                    await waitLock.WaitAsync(cancellationToken).ConfigureAwait(false);
+                    channelResult.Content.SetDataHandlingAdapterLogger(@this.Logger);
 
 
-                await SendAsync(sendMessage, channelResult.Content, cancellationToken).ConfigureAwait(false);
-                return OperResult.Success;
+                    await @this.SendAsync(sendMessage, channelResult.Content, cancellationToken).ConfigureAwait(false);
+                    return OperResult.Success;
+                }
+                finally
+                {
+                    waitLock.Release();
+                }
             }
-            finally
+            catch (Exception ex)
             {
-                waitLock.Release();
+                return new(ex);
             }
-        }
-        catch (Exception ex)
-        {
-            return new(ex);
         }
     }
 
@@ -531,7 +545,7 @@ public abstract class DeviceBase : AsyncAndSyncDisposableObject, IDevice
     }
 
     private ObjectPoolLock<ReusableCancellationTokenSource> _reusableTimeouts = new();
-    
+
     /// <summary>
     /// 发送并等待数据
     /// </summary>
@@ -568,8 +582,8 @@ public abstract class DeviceBase : AsyncAndSyncDisposableObject, IDevice
                 try
                 {
 
-                    var cts = reusableTimeout.GetTokenSource(timeout, cancellationToken, @this.Channel.ClosedToken);
-                    await waitData.WaitAsync(cts.Token).ConfigureAwait(false);
+                    var ctsToken = reusableTimeout.GetTokenSource(timeout, cancellationToken, @this.Channel.ClosedToken);
+                    await waitData.WaitAsync(ctsToken).ConfigureAwait(false);
 
                 }
                 catch (OperationCanceledException)
@@ -659,53 +673,58 @@ public abstract class DeviceBase : AsyncAndSyncDisposableObject, IDevice
     }
 
     /// <inheritdoc/>
-    public virtual async ValueTask<OperResult> WriteJTokenAsync(string address, JToken value, DataTypeEnum dataType, CancellationToken cancellationToken = default)
+    public virtual ValueTask<OperResult> WriteJTokenAsync(string address, JToken value, DataTypeEnum dataType, CancellationToken cancellationToken = default)
     {
-        try
+        return WriteJTokenAsync(this, address, value, dataType, cancellationToken);
+
+        static async PooledValueTask<OperResult> WriteJTokenAsync(DeviceBase @this, string address, JToken value, DataTypeEnum dataType, CancellationToken cancellationToken)
         {
-            var bitConverter = ThingsGatewayBitConverter.GetTransByAddress(address);
-            if (value is JArray jArray)
+            try
             {
-                return dataType switch
+                var bitConverter = @this.ThingsGatewayBitConverter.GetTransByAddress(address);
+                if (value is JArray jArray)
                 {
-                    DataTypeEnum.String => await WriteAsync(address, jArray.ToObject<String[]>().AsMemory(), cancellationToken: cancellationToken).ConfigureAwait(false),
-                    DataTypeEnum.Boolean => await WriteAsync(address, jArray.ToObject<Boolean[]>().AsMemory(), cancellationToken).ConfigureAwait(false),
-                    DataTypeEnum.Byte => await WriteAsync(address, jArray.ToObject<Byte[]>().AsMemory(), dataType, cancellationToken).ConfigureAwait(false),
-                    DataTypeEnum.Int16 => await WriteAsync(address, jArray.ToObject<Int16[]>().AsMemory(), cancellationToken: cancellationToken).ConfigureAwait(false),
-                    DataTypeEnum.UInt16 => await WriteAsync(address, jArray.ToObject<UInt16[]>().AsMemory(), cancellationToken: cancellationToken).ConfigureAwait(false),
-                    DataTypeEnum.Int32 => await WriteAsync(address, jArray.ToObject<Int32[]>().AsMemory(), cancellationToken: cancellationToken).ConfigureAwait(false),
-                    DataTypeEnum.UInt32 => await WriteAsync(address, jArray.ToObject<UInt32[]>().AsMemory(), cancellationToken: cancellationToken).ConfigureAwait(false),
-                    DataTypeEnum.Int64 => await WriteAsync(address, jArray.ToObject<Int64[]>().AsMemory(), cancellationToken: cancellationToken).ConfigureAwait(false),
-                    DataTypeEnum.UInt64 => await WriteAsync(address, jArray.ToObject<UInt64[]>().AsMemory(), cancellationToken: cancellationToken).ConfigureAwait(false),
-                    DataTypeEnum.Float => await WriteAsync(address, jArray.ToObject<Single[]>().AsMemory(), cancellationToken: cancellationToken).ConfigureAwait(false),
-                    DataTypeEnum.Double => await WriteAsync(address, jArray.ToObject<Double[]>().AsMemory(), cancellationToken: cancellationToken).ConfigureAwait(false),
-                    DataTypeEnum.Decimal => await WriteAsync(address, jArray.ToObject<Decimal[]>().AsMemory(), cancellationToken: cancellationToken).ConfigureAwait(false),
-                    _ => new OperResult(string.Format(AppResource.DataTypeNotSupported, dataType)),
-                };
+                    return dataType switch
+                    {
+                        DataTypeEnum.String => await @this.WriteAsync(address, jArray.ToObject<String[]>().AsMemory(), cancellationToken: cancellationToken).ConfigureAwait(false),
+                        DataTypeEnum.Boolean => await @this.WriteAsync(address, jArray.ToObject<Boolean[]>().AsMemory(), cancellationToken).ConfigureAwait(false),
+                        DataTypeEnum.Byte => await @this.WriteAsync(address, jArray.ToObject<Byte[]>().AsMemory(), dataType, cancellationToken).ConfigureAwait(false),
+                        DataTypeEnum.Int16 => await @this.WriteAsync(address, jArray.ToObject<Int16[]>().AsMemory(), cancellationToken: cancellationToken).ConfigureAwait(false),
+                        DataTypeEnum.UInt16 => await @this.WriteAsync(address, jArray.ToObject<UInt16[]>().AsMemory(), cancellationToken: cancellationToken).ConfigureAwait(false),
+                        DataTypeEnum.Int32 => await @this.WriteAsync(address, jArray.ToObject<Int32[]>().AsMemory(), cancellationToken: cancellationToken).ConfigureAwait(false),
+                        DataTypeEnum.UInt32 => await @this.WriteAsync(address, jArray.ToObject<UInt32[]>().AsMemory(), cancellationToken: cancellationToken).ConfigureAwait(false),
+                        DataTypeEnum.Int64 => await @this.WriteAsync(address, jArray.ToObject<Int64[]>().AsMemory(), cancellationToken: cancellationToken).ConfigureAwait(false),
+                        DataTypeEnum.UInt64 => await @this.WriteAsync(address, jArray.ToObject<UInt64[]>().AsMemory(), cancellationToken: cancellationToken).ConfigureAwait(false),
+                        DataTypeEnum.Float => await @this.WriteAsync(address, jArray.ToObject<Single[]>().AsMemory(), cancellationToken: cancellationToken).ConfigureAwait(false),
+                        DataTypeEnum.Double => await @this.WriteAsync(address, jArray.ToObject<Double[]>().AsMemory(), cancellationToken: cancellationToken).ConfigureAwait(false),
+                        DataTypeEnum.Decimal => await @this.WriteAsync(address, jArray.ToObject<Decimal[]>().AsMemory(), cancellationToken: cancellationToken).ConfigureAwait(false),
+                        _ => new OperResult(string.Format(AppResource.DataTypeNotSupported, dataType)),
+                    };
+                }
+                else
+                {
+                    return dataType switch
+                    {
+                        DataTypeEnum.String => await @this.WriteAsync(address, value.ToObject<String>(), bitConverter, cancellationToken).ConfigureAwait(false),
+                        DataTypeEnum.Boolean => await @this.WriteAsync(address, value.ToObject<Boolean>(), bitConverter, cancellationToken).ConfigureAwait(false),
+                        DataTypeEnum.Byte => await @this.WriteAsync(address, value.ToObject<Byte>(), bitConverter, cancellationToken).ConfigureAwait(false),
+                        DataTypeEnum.Int16 => await @this.WriteAsync(address, value.ToObject<Int16>(), bitConverter, cancellationToken).ConfigureAwait(false),
+                        DataTypeEnum.UInt16 => await @this.WriteAsync(address, value.ToObject<UInt16>(), bitConverter, cancellationToken).ConfigureAwait(false),
+                        DataTypeEnum.Int32 => await @this.WriteAsync(address, value.ToObject<Int32>(), bitConverter, cancellationToken).ConfigureAwait(false),
+                        DataTypeEnum.UInt32 => await @this.WriteAsync(address, value.ToObject<UInt32>(), bitConverter, cancellationToken).ConfigureAwait(false),
+                        DataTypeEnum.Int64 => await @this.WriteAsync(address, value.ToObject<Int64>(), bitConverter, cancellationToken).ConfigureAwait(false),
+                        DataTypeEnum.UInt64 => await @this.WriteAsync(address, value.ToObject<UInt64>(), bitConverter, cancellationToken).ConfigureAwait(false),
+                        DataTypeEnum.Float => await @this.WriteAsync(address, value.ToObject<Single>(), bitConverter, cancellationToken).ConfigureAwait(false),
+                        DataTypeEnum.Double => await @this.WriteAsync(address, value.ToObject<Double>(), bitConverter, cancellationToken).ConfigureAwait(false),
+                        DataTypeEnum.Decimal => await @this.WriteAsync(address, value.ToObject<Decimal>(), bitConverter, cancellationToken).ConfigureAwait(false),
+                        _ => new OperResult(string.Format(AppResource.DataTypeNotSupported, dataType)),
+                    };
+                }
             }
-            else
+            catch (Exception ex)
             {
-                return dataType switch
-                {
-                    DataTypeEnum.String => await WriteAsync(address, value.ToObject<String>(), bitConverter, cancellationToken).ConfigureAwait(false),
-                    DataTypeEnum.Boolean => await WriteAsync(address, value.ToObject<Boolean>(), bitConverter, cancellationToken).ConfigureAwait(false),
-                    DataTypeEnum.Byte => await WriteAsync(address, value.ToObject<Byte>(), bitConverter, cancellationToken).ConfigureAwait(false),
-                    DataTypeEnum.Int16 => await WriteAsync(address, value.ToObject<Int16>(), bitConverter, cancellationToken).ConfigureAwait(false),
-                    DataTypeEnum.UInt16 => await WriteAsync(address, value.ToObject<UInt16>(), bitConverter, cancellationToken).ConfigureAwait(false),
-                    DataTypeEnum.Int32 => await WriteAsync(address, value.ToObject<Int32>(), bitConverter, cancellationToken).ConfigureAwait(false),
-                    DataTypeEnum.UInt32 => await WriteAsync(address, value.ToObject<UInt32>(), bitConverter, cancellationToken).ConfigureAwait(false),
-                    DataTypeEnum.Int64 => await WriteAsync(address, value.ToObject<Int64>(), bitConverter, cancellationToken).ConfigureAwait(false),
-                    DataTypeEnum.UInt64 => await WriteAsync(address, value.ToObject<UInt64>(), bitConverter, cancellationToken).ConfigureAwait(false),
-                    DataTypeEnum.Float => await WriteAsync(address, value.ToObject<Single>(), bitConverter, cancellationToken).ConfigureAwait(false),
-                    DataTypeEnum.Double => await WriteAsync(address, value.ToObject<Double>(), bitConverter, cancellationToken).ConfigureAwait(false),
-                    DataTypeEnum.Decimal => await WriteAsync(address, value.ToObject<Decimal>(), bitConverter, cancellationToken).ConfigureAwait(false),
-                    _ => new OperResult(string.Format(AppResource.DataTypeNotSupported, dataType)),
-                };
+                return new OperResult(ex);
             }
-        }
-        catch (Exception ex)
-        {
-            return new OperResult(ex);
         }
     }
 

@@ -12,6 +12,8 @@ using BootstrapBlazor.Components;
 
 using Newtonsoft.Json.Linq;
 
+using PooledAwait;
+
 using Riok.Mapperly.Abstractions;
 
 
@@ -448,13 +450,18 @@ public partial class VariableRuntime : Variable
     }
 
     /// <inheritdoc/>
-    public virtual async ValueTask<IOperResult> RpcAsync(string value, string executive = "brower", CancellationToken cancellationToken = default)
+    public virtual ValueTask<IOperResult> RpcAsync(string value, string executive = "brower", CancellationToken cancellationToken = default)
     {
-        var data = await GlobalData.RpcService.InvokeDeviceMethodAsync(executive, new Dictionary<string, Dictionary<string, string>>()
+        return RpcAsync(DeviceName, Name, value, executive, cancellationToken);
+
+        static async PooledValueTask<IOperResult> RpcAsync(string deviceName, string name, string value, string executive, CancellationToken cancellationToken)
         {
-            { DeviceName, new Dictionary<string, string>()  {   { Name,value} }  }
+            var data = await GlobalData.RpcService.InvokeDeviceMethodAsync(executive, new Dictionary<string, Dictionary<string, string>>()
+        {
+            { deviceName, new Dictionary<string, string>()  {   { name,value} }  }
         }, cancellationToken).ConfigureAwait(false);
-        return data.FirstOrDefault().Value.FirstOrDefault().Value;
+            return data.FirstOrDefault().Value.FirstOrDefault().Value;
+        }
     }
 
     public void SetErrorMessage(string lastErrorMessage)

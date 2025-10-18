@@ -167,14 +167,14 @@ internal sealed class HeartbeatAndReceivePlugin : PluginBase, ITcpConnectedPlugi
         await e.InvokeNext().ConfigureAwait(false);
     }
 
-    public async Task OnTcpReceiving(ITcpSession client, BytesReaderEventArgs e)
+    public Task OnTcpReceiving(ITcpSession client, BytesReaderEventArgs e)
     {
         if (client is ITcpSessionClient)
         {
-            return;//此处可判断，如果为服务器，则不用使用心跳。
+            return Task.CompletedTask;//此处可判断，如果为服务器，则不用使用心跳。
         }
 
-        if (DtuId.IsNullOrWhiteSpace()) return;
+        if (DtuId.IsNullOrWhiteSpace()) return Task.CompletedTask;
 
         if (client is ITcpClient tcpClient)
         {
@@ -187,8 +187,9 @@ internal sealed class HeartbeatAndReceivePlugin : PluginBase, ITcpConnectedPlugi
                     e.Handled = true;
                 }
             }
-            await e.InvokeNext().ConfigureAwait(false);//如果本插件无法处理当前数据，请将数据转至下一个插件。
+            return e.InvokeNext();//如果本插件无法处理当前数据，请将数据转至下一个插件。
         }
+        return Task.CompletedTask;
     }
 
 

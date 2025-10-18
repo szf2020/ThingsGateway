@@ -395,18 +395,17 @@ public class OpcUaMaster : IAsyncDisposable
     /// <summary>
     /// 连接到服务器
     /// </summary>
-    public async Task ConnectAsync(CancellationToken cancellationToken)
+    public Task ConnectAsync(CancellationToken cancellationToken)
     {
-        await ConnectAsync(OpcUaProperty.OpcUrl, cancellationToken).ConfigureAwait(false);
+        return ConnectAsync(OpcUaProperty.OpcUrl, cancellationToken);
     }
 
     /// <summary>
     /// 断开连接。
     /// </summary>
-    public async Task DisconnectAsync()
+    public Task DisconnectAsync()
     {
-        await PrivateDisconnectAsync().ConfigureAwait(false);
-
+        return PrivateDisconnectAsync();
     }
 
     public async ValueTask DisposeAsync()

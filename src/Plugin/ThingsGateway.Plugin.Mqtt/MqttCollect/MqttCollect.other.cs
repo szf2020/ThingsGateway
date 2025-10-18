@@ -10,6 +10,9 @@
 
 using MQTTnet;
 
+using PooledAwait;
+
+
 #if NET6_0
 using MQTTnet.Client;
 #endif
@@ -129,32 +132,34 @@ public partial class MqttCollect : CollectBase
         }
     }
 
-    private async ValueTask<OperResult> TryMqttClientAsync(CancellationToken cancellationToken)
+    private ValueTask<OperResult> TryMqttClientAsync(CancellationToken cancellationToken)
     {
-        if (_mqttClient?.IsConnected == true)
-            return OperResult.Success;
-        return await Client().ConfigureAwait(false);
+        if (DisposedValue || _mqttClient == null) return TouchSocket.Core.EasyValueTask.FromResult(new OperResult("MqttClient is disposed"));
 
-        async ValueTask<OperResult> Client()
+        if (_mqttClient?.IsConnected == true)
+            return TouchSocket.Core.EasyValueTask.FromResult(OperResult.Success);
+        return Client(this, cancellationToken);
+
+        static async PooledValueTask<OperResult> Client(MqttCollect @this, CancellationToken cancellationToken)
         {
-            if (_mqttClient?.IsConnected == true)
+            if (@this._mqttClient?.IsConnected == true)
                 return OperResult.Success;
             try
             {
-                await ConnectLock.WaitAsync(cancellationToken).ConfigureAwait(false);
+                await @this.ConnectLock.WaitAsync(cancellationToken).ConfigureAwait(false);
                 await Task.Delay(100, cancellationToken).ConfigureAwait(false);
-                if (_mqttClient?.IsConnected == true)
+                if (@this._mqttClient?.IsConnected == true)
                     return OperResult.Success;
-                using var timeoutToken = new CancellationTokenSource(TimeSpan.FromMilliseconds(_driverPropertys.ConnectTimeout));
+                using var timeoutToken = new CancellationTokenSource(TimeSpan.FromMilliseconds(@this._driverPropertys.ConnectTimeout));
                 using CancellationTokenSource stoppingToken = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, timeoutToken.Token);
-                if (_mqttClient?.IsConnected == true)
+                if (@this._mqttClient?.IsConnected == true)
                     return OperResult.Success;
-                if (_mqttClient == null)
+                if (@this._mqttClient == null)
                 {
                     return new OperResult("mqttClient is null");
                 }
-                var result = await _mqttClient.ConnectAsync(_mqttClientOptions, stoppingToken.Token).ConfigureAwait(false);
-                if (_mqttClient.IsConnected)
+                var result = await @this._mqttClient.ConnectAsync(@this._mqttClientOptions, stoppingToken.Token).ConfigureAwait(false);
+                if (@this._mqttClient.IsConnected)
                 {
                     return OperResult.Success;
                 }
@@ -172,7 +177,7 @@ public partial class MqttCollect : CollectBase
             }
             finally
             {
-                ConnectLock.Release();
+                @this.ConnectLock.Release();
             }
         }
     }

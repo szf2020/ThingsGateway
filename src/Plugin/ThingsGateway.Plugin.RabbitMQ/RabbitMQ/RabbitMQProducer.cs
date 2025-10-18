@@ -8,6 +8,8 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
+using PooledAwait;
+
 using RabbitMQ.Client;
 
 using ThingsGateway.Foundation;
@@ -64,38 +66,43 @@ public partial class RabbitMQProducer : BusinessBaseWithCacheIntervalScriptAll
         await base.DisposeAsync(disposing).ConfigureAwait(false);
     }
 
-    protected override async Task ProtectedExecuteAsync(object? state, CancellationToken cancellationToken)
+    protected override Task ProtectedExecuteAsync(object? state, CancellationToken cancellationToken)
     {
-        if (_channel == null)
+        return ProtectedExecuteAsync(this, cancellationToken);
+
+        static async PooledTask ProtectedExecuteAsync(RabbitMQProducer @this, CancellationToken cancellationToken)
         {
-            try
+            if (@this._channel == null)
             {
-                // 创建连接
-                _connection ??= await _connectionFactory.CreateConnectionAsync(cancellationToken).ConfigureAwait(false);
-                // 创建通道
-                _channel ??= await _connection.CreateChannelAsync(cancellationToken: cancellationToken).ConfigureAwait(false);
-                // 声明路由队列
-                if (_driverPropertys.IsQueueDeclare)
+                try
                 {
-                    await (_channel?.QueueDeclareAsync(_driverPropertys.VariableTopic, true, false, false, cancellationToken: cancellationToken)).ConfigureAwait(false);
-                    await (_channel?.QueueDeclareAsync(_driverPropertys.DeviceTopic, true, false, false, cancellationToken: cancellationToken)).ConfigureAwait(false);
-                    await (_channel?.QueueDeclareAsync(_driverPropertys.AlarmTopic, true, false, false, cancellationToken: cancellationToken)).ConfigureAwait(false);
+                    // 创建连接
+                    @this._connection ??= await @this._connectionFactory.CreateConnectionAsync(cancellationToken).ConfigureAwait(false);
+                    // 创建通道
+                    @this._channel ??= await @this._connection.CreateChannelAsync(cancellationToken: cancellationToken).ConfigureAwait(false);
+                    // 声明路由队列
+                    if (@this._driverPropertys.IsQueueDeclare)
+                    {
+                        await (@this._channel?.QueueDeclareAsync(@this._driverPropertys.VariableTopic, true, false, false, cancellationToken: cancellationToken)).ConfigureAwait(false);
+                        await (@this._channel?.QueueDeclareAsync(@this._driverPropertys.DeviceTopic, true, false, false, cancellationToken: cancellationToken)).ConfigureAwait(false);
+                        await (@this._channel?.QueueDeclareAsync(@this._driverPropertys.AlarmTopic, true, false, false, cancellationToken: cancellationToken)).ConfigureAwait(false);
+                    }
+                    @this.success = true;
                 }
-                success = true;
+                catch (Exception ex)
+                {
+                    if (@this.success)
+                    {
+                        @this.LogMessage?.LogWarning(ex);
+                        @this.success = false;
+                    }
+                    await Task.Delay(10000, cancellationToken).ConfigureAwait(false);
+                }
             }
-            catch (Exception ex)
+            else
             {
-                if (success)
-                {
-                    LogMessage?.LogWarning(ex);
-                    success = false;
-                }
-                await Task.Delay(10000, cancellationToken).ConfigureAwait(false);
+                await @this.Update(cancellationToken).ConfigureAwait(false);
             }
-        }
-        else
-        {
-            await Update(cancellationToken).ConfigureAwait(false);
         }
     }
 

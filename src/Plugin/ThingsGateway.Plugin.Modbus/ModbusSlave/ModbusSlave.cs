@@ -10,6 +10,8 @@
 
 using Microsoft.Extensions.Localization;
 
+using PooledAwait;
+
 using System.Collections.Concurrent;
 
 using ThingsGateway.Foundation.Modbus;
@@ -151,95 +153,108 @@ public class ModbusSlave : BusinessBase
         await base.DisposeAsync(disposing).ConfigureAwait(false);
     }
 
-    protected override async Task ProtectedExecuteAsync(object? state, CancellationToken cancellationToken)
+    protected override Task ProtectedExecuteAsync(object? state, CancellationToken cancellationToken)
     {
-        //获取设备连接状态
-        if (!IsConnected())
+        return ProtectedExecuteAsync(this, cancellationToken);
+
+
+        static async PooledTask ProtectedExecuteAsync(ModbusSlave @this, CancellationToken cancellationToken)
         {
-            try
+            //获取设备连接状态
+            if (!@this.IsConnected())
+            {
+                try
+                {
+                    if (cancellationToken.IsCancellationRequested)
+                        return;
+                    await @this._plc.ConnectAsync(cancellationToken).ConfigureAwait(false);
+                    @this.success = true;
+                }
+                catch (ObjectDisposedException) { }
+                catch (Exception ex)
+                {
+                    if (@this.success)
+                        @this.LogMessage?.LogWarning(ex, "Failed to start service");
+                    @this.success = false;
+                    await Task.Delay(10000, cancellationToken).ConfigureAwait(false);
+                }
+            }
+            var list = @this.ModbusVariableQueue.ToDictWithDequeue();
+            foreach (var item in list)
             {
                 if (cancellationToken.IsCancellationRequested)
-                    return;
-                await _plc.ConnectAsync(cancellationToken).ConfigureAwait(false);
-                success = true;
-            }
-            catch (ObjectDisposedException) { }
-            catch (Exception ex)
-            {
-                if (success)
-                    LogMessage?.LogWarning(ex, "Failed to start service");
-                success = false;
-                await Task.Delay(10000, cancellationToken).ConfigureAwait(false);
-            }
-        }
-        var list = ModbusVariableQueue.ToDictWithDequeue();
-        foreach (var item in list)
-        {
-            if (cancellationToken.IsCancellationRequested)
-                break;
-            if (!IdVariableRuntimes.TryGetValue(item.Value, out var variableRuntime))
-                break;
+                    break;
+                if (!@this.IdVariableRuntimes.TryGetValue(item.Value, out var variableRuntime))
+                    break;
 
-            var type = variableRuntime.GetPropertyValue(CurrentDevice.Id, nameof(ModbusSlaveVariableProperty.DataType));
-            if (Enum.TryParse(type, out DataTypeEnum result))
-            {
-                await _plc.WriteJTokenAsync(item.Key, (variableRuntime.Value).GetJTokenFromObj(), result, cancellationToken).ConfigureAwait(false);
+                var type = variableRuntime.GetPropertyValue(@this.CurrentDevice.Id, nameof(ModbusSlaveVariableProperty.DataType));
+                if (Enum.TryParse(type, out DataTypeEnum result))
+                {
+                    await @this._plc.WriteJTokenAsync(item.Key, (variableRuntime.Value).GetJTokenFromObj(), result, cancellationToken).ConfigureAwait(false);
+                }
+                else
+                {
+                    await @this._plc.WriteJTokenAsync(item.Key, (variableRuntime.Value).GetJTokenFromObj(), variableRuntime.DataType, cancellationToken).ConfigureAwait(false);
+                }
             }
-            else
-            {
-                await _plc.WriteJTokenAsync(item.Key, (variableRuntime.Value).GetJTokenFromObj(), variableRuntime.DataType, cancellationToken).ConfigureAwait(false);
-            }
+
+            return;
         }
     }
 
     /// <summary>
     /// RPC写入
     /// </summary>
-    private async ValueTask<IOperResult> OnWriteData(ModbusRequest modbusRequest, IThingsGatewayBitConverter bitConverter, IChannel channel)
+    private ValueTask<IOperResult> OnWriteData(ModbusRequest modbusRequest, IThingsGatewayBitConverter bitConverter, IChannel channel)
     {
-        try
+        return OnWriteData(this, modbusRequest, bitConverter, channel);
+
+        static async PooledValueTask<IOperResult> OnWriteData(ModbusSlave @this, ModbusRequest modbusRequest, IThingsGatewayBitConverter bitConverter, IChannel channel)
         {
-            var tag = ModbusVariables.Where(a => a.Key?.StartAddress == modbusRequest.StartAddress && a.Key?.Station == modbusRequest.Station && a.Key?.FunctionCode == modbusRequest.FunctionCode).ToArray();
-            if (tag.Length == 0) return OperResult.Success;
-
-
-            foreach (var item in tag)
+            try
             {
-                if (!(item.Value.GetPropertyValue(DeviceId, nameof(_variablePropertys.VariableRpcEnable)).ToBoolean(false) && _driverPropertys.DeviceRpcEnable))
-                    return new OperResult("Not Permitted to Write");
+                var tag = @this.ModbusVariables.Where(a => a.Key?.StartAddress == modbusRequest.StartAddress && a.Key?.Station == modbusRequest.Station && a.Key?.FunctionCode == modbusRequest.FunctionCode).ToArray();
+                if (tag.Length == 0) return OperResult.Success;
 
-                var type = item.Value.GetPropertyValue(DeviceId, nameof(ModbusSlaveVariableProperty.DataType));
-                var dType = Enum.TryParse(type, out DataTypeEnum dataType) ? dataType : item.Value.DataType;
-                var addressStr = item.Value.GetPropertyValue(DeviceId, nameof(ModbusSlaveVariableProperty.ServiceAddress));
 
-                var thingsGatewayBitConverter = bitConverter.GetTransByAddress(addressStr);
-
-                var bitIndex = _plc.GetBitOffset(addressStr);
-                if (modbusRequest.FunctionCode == 0x03 && dType == DataTypeEnum.Boolean && bitIndex != null)
+                foreach (var item in tag)
                 {
-                    var int16Data = thingsGatewayBitConverter.ToUInt16(modbusRequest.MasterWriteDatas.Span, 0);
-                    var wData = BitHelper.GetBit(int16Data, bitIndex.Value);
+                    if (!(item.Value.GetPropertyValue(@this.DeviceId, nameof(_variablePropertys.VariableRpcEnable)).ToBoolean(false) && @this._driverPropertys.DeviceRpcEnable))
+                        return new OperResult("Not Permitted to Write");
 
-                    var result = await item.Value.RpcAsync(wData.ToSystemTextJsonString(), $"{nameof(ModbusSlave)}-{CurrentDevice.Name}-{$"{channel}"}").ConfigureAwait(false);
+                    var type = item.Value.GetPropertyValue(@this.DeviceId, nameof(ModbusSlaveVariableProperty.DataType));
+                    var dType = Enum.TryParse(type, out DataTypeEnum dataType) ? dataType : item.Value.DataType;
+                    var addressStr = item.Value.GetPropertyValue(@this.DeviceId, nameof(ModbusSlaveVariableProperty.ServiceAddress));
 
-                    if (!result.IsSuccess)
-                        return result;
+                    var thingsGatewayBitConverter = bitConverter.GetTransByAddress(addressStr);
+
+                    var bitIndex = @this._plc.GetBitOffset(addressStr);
+                    if (modbusRequest.FunctionCode == 0x03 && dType == DataTypeEnum.Boolean && bitIndex != null)
+                    {
+                        var int16Data = thingsGatewayBitConverter.ToUInt16(modbusRequest.MasterWriteDatas.Span, 0);
+                        var wData = BitHelper.GetBit(int16Data, bitIndex.Value);
+
+                        var result = await item.Value.RpcAsync(wData.ToSystemTextJsonString(), $"{nameof(ModbusSlave)}-{@this.CurrentDevice.Name}-{$"{channel}"}").ConfigureAwait(false);
+
+                        if (!result.IsSuccess)
+                            return result;
+                    }
+                    else
+                    {
+                        _ = thingsGatewayBitConverter.GetChangedDataFormBytes(@this._plc, addressStr, modbusRequest.MasterWriteDatas.Span, 0, dType, item.Value.ArrayLength ?? 1, null, out var data);
+
+                        var result = await item.Value.RpcAsync(data.ToSystemTextJsonString(), $"{nameof(ModbusSlave)}-{@this.CurrentDevice.Name}-{$"{channel}"}").ConfigureAwait(false);
+
+                        if (!result.IsSuccess)
+                            return result;
+                    }
                 }
-                else
-                {
-                    _ = thingsGatewayBitConverter.GetChangedDataFormBytes(_plc, addressStr, modbusRequest.MasterWriteDatas.Span, 0, dType, item.Value.ArrayLength ?? 1, null, out var data);
-
-                    var result = await item.Value.RpcAsync(data.ToSystemTextJsonString(), $"{nameof(ModbusSlave)}-{CurrentDevice.Name}-{$"{channel}"}").ConfigureAwait(false);
-
-                    if (!result.IsSuccess)
-                        return result;
-                }
+                return OperResult.Success;
             }
-            return OperResult.Success;
-        }
-        catch (Exception ex)
-        {
-            return new OperResult(ex);
+            catch (Exception ex)
+            {
+                return new OperResult(ex);
+            }
         }
     }
 

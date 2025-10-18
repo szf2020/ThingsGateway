@@ -10,6 +10,8 @@
 
 using BootstrapBlazor.Components;
 
+using PooledAwait;
+
 using System.Collections.Concurrent;
 
 using ThingsGateway.Extension.Generic;
@@ -89,38 +91,63 @@ public static class GlobalData
 
     public static event PluginEventHandler? PluginEventHandler;
 
-    public static async Task<IEnumerable<ChannelRuntime>> GetCurrentUserChannels()
+    public static Task<IEnumerable<ChannelRuntime>> GetCurrentUserChannels()
     {
-        var dataScope = await GlobalData.SysUserService.GetCurrentUserDataScopeAsync().ConfigureAwait(false);
-        return ReadOnlyIdChannels.WhereIf(dataScope != null && dataScope?.Count > 0, u => dataScope.Contains(u.Value.CreateOrgId))//在指定机构列表查询
-          .WhereIf(dataScope?.Count == 0, u => u.Value.CreateUserId == UserManager.UserId).Select(a => a.Value);
+        return GetCurrentUserChannels();
+
+        static async PooledTask<IEnumerable<ChannelRuntime>> GetCurrentUserChannels()
+        {
+            var dataScope = await GlobalData.SysUserService.GetCurrentUserDataScopeAsync().ConfigureAwait(false);
+            return ReadOnlyIdChannels.WhereIf(dataScope != null && dataScope?.Count > 0, u => dataScope.Contains(u.Value.CreateOrgId))//在指定机构列表查询
+              .WhereIf(dataScope?.Count == 0, u => u.Value.CreateUserId == UserManager.UserId).Select(a => a.Value);
+        }
     }
-    public static async Task<IEnumerable<DeviceRuntime>> GetCurrentUserDevices()
+    public static Task<IEnumerable<DeviceRuntime>> GetCurrentUserDevices()
     {
-        var dataScope = await GlobalData.SysUserService.GetCurrentUserDataScopeAsync().ConfigureAwait(false);
-        return ReadOnlyIdDevices.WhereIf(dataScope != null && dataScope?.Count > 0, u => dataScope.Contains(u.Value.CreateOrgId))//在指定机构列表查询
-          .WhereIf(dataScope?.Count == 0, u => u.Value.CreateUserId == UserManager.UserId).Select(a => a.Value);
+        return GetCurrentUserDevices();
+
+        static async PooledTask<IEnumerable<DeviceRuntime>> GetCurrentUserDevices()
+        {
+            var dataScope = await GlobalData.SysUserService.GetCurrentUserDataScopeAsync().ConfigureAwait(false);
+            return ReadOnlyIdDevices.WhereIf(dataScope != null && dataScope?.Count > 0, u => dataScope.Contains(u.Value.CreateOrgId))//在指定机构列表查询
+              .WhereIf(dataScope?.Count == 0, u => u.Value.CreateUserId == UserManager.UserId).Select(a => a.Value);
+        }
     }
 
-    public static async Task<IEnumerable<VariableRuntime>> GetCurrentUserIdVariables()
+    public static Task<IEnumerable<VariableRuntime>> GetCurrentUserIdVariables()
     {
-        var dataScope = await GlobalData.SysUserService.GetCurrentUserDataScopeAsync().ConfigureAwait(false);
-        return IdVariables.Where(a => a.Value.IsInternalMemoryVariable == false).WhereIf(dataScope != null && dataScope?.Count > 0, u => dataScope.Contains(u.Value.CreateOrgId))//在指定机构列表查询
-          .WhereIf(dataScope?.Count == 0, u => u.Value.CreateUserId == UserManager.UserId).Select(a => a.Value);
+        return GetCurrentUserIdVariables();
+
+        static async PooledTask<IEnumerable<VariableRuntime>> GetCurrentUserIdVariables()
+        {
+            var dataScope = await GlobalData.SysUserService.GetCurrentUserDataScopeAsync().ConfigureAwait(false);
+            return IdVariables.Where(a => a.Value.IsInternalMemoryVariable == false).WhereIf(dataScope != null && dataScope?.Count > 0, u => dataScope.Contains(u.Value.CreateOrgId))//在指定机构列表查询
+              .WhereIf(dataScope?.Count == 0, u => u.Value.CreateUserId == UserManager.UserId).Select(a => a.Value);
+        }
     }
 
-    public static async Task<IEnumerable<AlarmVariable>> GetCurrentUserRealAlarmVariablesAsync()
+    public static Task<IEnumerable<AlarmVariable>> GetCurrentUserRealAlarmVariablesAsync()
     {
-        var dataScope = await GlobalData.SysUserService.GetCurrentUserDataScopeAsync().ConfigureAwait(false);
-        return RealAlarmIdVariables.WhereIf(dataScope != null && dataScope?.Count > 0, u => dataScope.Contains(u.Value.CreateOrgId))//在指定机构列表查询
-          .WhereIf(dataScope?.Count == 0, u => u.Value.CreateUserId == UserManager.UserId).Select(a => a.Value);
+        return GetCurrentUserRealAlarmVariablesAsync();
+
+        static async PooledTask<IEnumerable<AlarmVariable>> GetCurrentUserRealAlarmVariablesAsync()
+        {
+            var dataScope = await GlobalData.SysUserService.GetCurrentUserDataScopeAsync().ConfigureAwait(false);
+            return RealAlarmIdVariables.WhereIf(dataScope != null && dataScope?.Count > 0, u => dataScope.Contains(u.Value.CreateOrgId))//在指定机构列表查询
+              .WhereIf(dataScope?.Count == 0, u => u.Value.CreateUserId == UserManager.UserId).Select(a => a.Value);
+        }
     }
 
-    public static async Task<IEnumerable<VariableRuntime>> GetCurrentUserAlarmEnableVariables()
+    public static Task<IEnumerable<VariableRuntime>> GetCurrentUserAlarmEnableVariables()
     {
-        var dataScope = await GlobalData.SysUserService.GetCurrentUserDataScopeAsync().ConfigureAwait(false);
-        return AlarmEnableIdVariables.Where(a => a.Value.IsInternalMemoryVariable == false).WhereIf(dataScope != null && dataScope?.Count > 0, u => dataScope.Contains(u.Value.CreateOrgId))//在指定机构列表查询
-          .WhereIf(dataScope?.Count == 0, u => u.Value.CreateUserId == UserManager.UserId).Select(a => a.Value);
+        return GetCurrentUserAlarmEnableVariables();
+
+        static async PooledTask<IEnumerable<VariableRuntime>> GetCurrentUserAlarmEnableVariables()
+        {
+            var dataScope = await GlobalData.SysUserService.GetCurrentUserDataScopeAsync().ConfigureAwait(false);
+            return AlarmEnableIdVariables.Where(a => a.Value.IsInternalMemoryVariable == false).WhereIf(dataScope != null && dataScope?.Count > 0, u => dataScope.Contains(u.Value.CreateOrgId))//在指定机构列表查询
+              .WhereIf(dataScope?.Count == 0, u => u.Value.CreateUserId == UserManager.UserId).Select(a => a.Value);
+        }
     }
 
     public static bool ContainsVariable(long businessDeviceId, VariableRuntime a)

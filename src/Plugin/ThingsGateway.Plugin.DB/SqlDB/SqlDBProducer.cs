@@ -10,6 +10,8 @@
 
 using BootstrapBlazor.Components;
 
+using PooledAwait;
+
 using ThingsGateway.Common;
 using ThingsGateway.DB;
 using ThingsGateway.Debug;
@@ -239,38 +241,43 @@ public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariable
         await base.ProtectedStartAsync(cancellationToken).ConfigureAwait(false);
     }
 
-    protected override async Task ProtectedExecuteAsync(object? state, CancellationToken cancellationToken)
+    protected override Task ProtectedExecuteAsync(object? state, CancellationToken cancellationToken)
     {
-        if (_driverPropertys.IsReadDB)
+        return ProtectedExecuteAsync(this, cancellationToken);
+
+        static async PooledTask ProtectedExecuteAsync(SqlDBProducer @this, CancellationToken cancellationToken)
         {
-            var list = RealTimeVariables.ToListWithDequeue();
-            try
+            if (@this._driverPropertys.IsReadDB)
             {
-                var varLists = list.Batch(_driverPropertys.SplitSize);
-                foreach (var varList in varLists)
+                var list = @this.RealTimeVariables.ToListWithDequeue();
+                try
                 {
-                    var result = await UpdateAsync(varList, cancellationToken).ConfigureAwait(false);
-                    if (success != result.IsSuccess)
+                    var varLists = list.Batch(@this._driverPropertys.SplitSize);
+                    foreach (var varList in varLists)
                     {
-                        if (!result.IsSuccess)
-                            LogMessage?.LogWarning(result.ToString());
-                        success = result.IsSuccess;
+                        var result = await @this.UpdateAsync(varList, cancellationToken).ConfigureAwait(false);
+                        if (@this.success != result.IsSuccess)
+                        {
+                            if (!result.IsSuccess)
+                                @this.LogMessage?.LogWarning(result.ToString());
+                            @this.success = result.IsSuccess;
+                        }
                     }
                 }
+                catch (Exception ex)
+                {
+                    if (@this.success)
+                        @this.LogMessage?.LogWarning(ex);
+                    @this.success = false;
+
+                    list.ForEach(variable => @this.RealTimeVariables.AddOrUpdate(variable.Id, variable, (key, oldValue) => variable));
+                }
             }
-            catch (Exception ex)
+
+            if (@this._driverPropertys.IsHistoryDB)
             {
-                if (success)
-                    LogMessage?.LogWarning(ex);
-                success = false;
-
-                list.ForEach(variable => RealTimeVariables.AddOrUpdate(variable.Id, variable, (key, oldValue) => variable));
+                await @this.Update(cancellationToken).ConfigureAwait(false);
             }
-        }
-
-        if (_driverPropertys.IsHistoryDB)
-        {
-            await Update(cancellationToken).ConfigureAwait(false);
         }
     }
 

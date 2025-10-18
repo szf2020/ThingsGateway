@@ -8,6 +8,8 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
+using PooledAwait;
+
 using TouchSocket.Core;
 
 namespace ThingsGateway.Gateway.Application;
@@ -28,22 +30,26 @@ public class AsyncReadWriteLock : IAsyncDisposable
     /// <summary>
     /// 获取读锁，支持多个线程并发读取，但写入时会阻止所有读取。
     /// </summary>
-    public async ValueTask<CancellationToken> ReaderLockAsync(CancellationToken cancellationToken)
+    public ValueTask<CancellationToken> ReaderLockAsync(CancellationToken cancellationToken)
     {
+        return ReaderLockAsync(this, cancellationToken);
 
-        if (Interlocked.Read(ref _writerCount) > 0)
+        static async PooledValueTask<CancellationToken> ReaderLockAsync(AsyncReadWriteLock @this, CancellationToken cancellationToken)
         {
-            Interlocked.Increment(ref _readerCount);
+            if (Interlocked.Read(ref @this._writerCount) > 0)
+            {
+                Interlocked.Increment(ref @this._readerCount);
 
 
 
-            // 第一个读者需要获取写入锁，防止写操作
-            await _readerLock.WaitOneAsync(cancellationToken).ConfigureAwait(false);
+                // 第一个读者需要获取写入锁，防止写操作
+                await @this._readerLock.WaitOneAsync(cancellationToken).ConfigureAwait(false);
 
-            Interlocked.Decrement(ref _readerCount);
+                Interlocked.Decrement(ref @this._readerCount);
 
+            }
+            return @this._cancellationTokenSource.Token;
         }
-        return _cancellationTokenSource.Token;
     }
 
     public bool WriteWaited => _writerCount > 0;
@@ -51,21 +57,25 @@ public class AsyncReadWriteLock : IAsyncDisposable
     /// <summary>
     /// 获取写锁，阻止所有读取。
     /// </summary>
-    public async ValueTask<IDisposable> WriterLockAsync(CancellationToken cancellationToken)
+    public ValueTask<IDisposable> WriterLockAsync(CancellationToken cancellationToken)
     {
+        return WriterLockAsync(this);
 
-        if (Interlocked.Increment(ref _writerCount) == 1)
+        static async PooledValueTask<IDisposable> WriterLockAsync(AsyncReadWriteLock @this)
         {
-            if (_writePriority)
+            if (Interlocked.Increment(ref @this._writerCount) == 1)
             {
-                var cancellationTokenSource = _cancellationTokenSource;
-                _cancellationTokenSource = new();
-                await cancellationTokenSource.SafeCancelAsync().ConfigureAwait(false); // 取消读取
-                cancellationTokenSource.SafeDispose();
+                if (@this._writePriority)
+                {
+                    var cancellationTokenSource = @this._cancellationTokenSource;
+                    @this._cancellationTokenSource = new();
+                    await cancellationTokenSource.SafeCancelAsync().ConfigureAwait(false); // 取消读取
+                    cancellationTokenSource.SafeDispose();
+                }
             }
-        }
 
-        return new Writer(this);
+            return new Writer(@this);
+        }
     }
     private object lockObject = new();
     private void ReleaseWriter()

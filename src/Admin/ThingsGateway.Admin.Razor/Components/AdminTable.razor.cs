@@ -15,11 +15,11 @@ public partial class AdminTable<TItem> where TItem : class, new()
 {
     /// <inheritdoc cref="Table{TItem}.OnColumnVisibleChanged"/>
     [Parameter]
-    public Func<string,bool, Task> OnColumnVisibleChanged { get; set; }
+    public Func<string, bool, Task> OnColumnVisibleChanged { get; set; }
 
     /// <inheritdoc cref="Table{TItem}.OnColumnCreating"/>
     [Parameter]
-    public Func<List<ITableColumn>,Task> OnColumnCreating { get; set; }
+    public Func<List<ITableColumn>, Task> OnColumnCreating { get; set; }
     /// <inheritdoc cref="Table{TItem}.RenderMode"/>
     [Parameter]
     public TableRenderMode RenderMode { get; set; }

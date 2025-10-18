@@ -20,6 +20,8 @@ using MQTTnet.Client;
 
 using Newtonsoft.Json.Linq;
 
+using PooledAwait;
+
 using System.Collections.Concurrent;
 using System.Text;
 
@@ -29,6 +31,7 @@ using ThingsGateway.Foundation.Extension.Generic;
 using ThingsGateway.NewLife;
 using ThingsGateway.NewLife.Extension;
 using ThingsGateway.NewLife.Json.Extension;
+
 
 namespace ThingsGateway.Plugin.Mqtt;
 
@@ -222,27 +225,32 @@ public partial class MqttClient : BusinessBaseWithCacheIntervalScriptAll
 
     #region private
 
-    private async ValueTask<OperResult> Update(IEnumerable<TopicArray> topicArrayList, CancellationToken cancellationToken)
+    private ValueTask<OperResult> Update(IEnumerable<TopicArray> topicArrayList, CancellationToken cancellationToken)
     {
-        foreach (TopicArray topicArray in topicArrayList)
+        return Update(this, topicArrayList, cancellationToken);
+
+        static async PooledValueTask<OperResult> Update(MqttClient @this, IEnumerable<TopicArray> topicArrayList, CancellationToken cancellationToken)
         {
-            var result = await MqttUpAsync(topicArray, cancellationToken).ConfigureAwait(false);
-            if (cancellationToken.IsCancellationRequested)
-                return result;
-            if (success != result.IsSuccess)
+            foreach (TopicArray topicArray in topicArrayList)
             {
+                var result = await @this.MqttUpAsync(topicArray, cancellationToken).ConfigureAwait(false);
+                if (cancellationToken.IsCancellationRequested)
+                    return result;
+                if (@this.success != result.IsSuccess)
+                {
+                    if (!result.IsSuccess)
+                    {
+                        @this.LogMessage?.LogWarning(result.ToString());
+                    }
+                    @this.success = result.IsSuccess;
+                }
                 if (!result.IsSuccess)
                 {
-                    LogMessage?.LogWarning(result.ToString());
+                    return result;
                 }
-                success = result.IsSuccess;
             }
-            if (!result.IsSuccess)
-            {
-                return result;
-            }
+            return OperResult.Success;
         }
-        return OperResult.Success;
     }
 
     private ValueTask<OperResult> UpdateAlarmModel(IEnumerable<AlarmVariable> item, CancellationToken cancellationToken)
@@ -265,96 +273,102 @@ public partial class MqttClient : BusinessBaseWithCacheIntervalScriptAll
 
     #endregion private
 
-    private async ValueTask AllPublishAsync(CancellationToken cancellationToken)
+    private async Task AllPublishAsync(CancellationToken cancellationToken)
     {
+
         //保留消息
         //分解List，避免超出mqtt字节大小限制
-        var varData = IdVariableRuntimes.Select(a => a.Value).AdaptIEnumerableVariableBasicData().ChunkBetter(_driverPropertys.SplitSize);
-        var devData = CollectDevices?.Select(a => a.Value).AdaptIEnumerableDeviceBasicData().ChunkBetter(_driverPropertys.SplitSize);
-        var alramData = GlobalData.ReadOnlyRealAlarmIdVariables.Select(a => a.Value).ChunkBetter(_driverPropertys.SplitSize);
+        var varData = this.IdVariableRuntimes.Select(a => a.Value).AdaptIEnumerableVariableBasicData().ChunkBetter(this._driverPropertys.SplitSize);
+        var devData = this.CollectDevices?.Select(a => a.Value).AdaptIEnumerableDeviceBasicData().ChunkBetter(this._driverPropertys.SplitSize);
+        var alramData = GlobalData.ReadOnlyRealAlarmIdVariables.Select(a => a.Value).ChunkBetter(this._driverPropertys.SplitSize);
         foreach (var item in varData)
         {
-            if (!success)
+            if (!this.success)
                 break;
-            await UpdateVarModel(item, cancellationToken).ConfigureAwait(false);
+            await this.UpdateVarModel(item, cancellationToken).ConfigureAwait(false);
         }
         if (devData != null)
         {
             foreach (var item in devData)
             {
-                if (!success)
+                if (!this.success)
                     break;
-                await UpdateDevModel(item, cancellationToken).ConfigureAwait(false);
+                await this.UpdateDevModel(item, cancellationToken).ConfigureAwait(false);
             }
         }
 
         foreach (var item in alramData)
         {
-            if (!success)
+            if (!this.success)
                 break;
-            await UpdateAlarmModel(item, cancellationToken).ConfigureAwait(false);
+            await this.UpdateAlarmModel(item, cancellationToken).ConfigureAwait(false);
         }
     }
 
-    private async ValueTask<Dictionary<string, Dictionary<string, IOperResult>>> GetRpcResult(string clientId, Dictionary<string, Dictionary<string, JToken>> rpcDatas)
+    private ValueTask<Dictionary<string, Dictionary<string, IOperResult>>> GetRpcResult(string clientId, Dictionary<string, Dictionary<string, JToken>> rpcDatas)
     {
-        var mqttRpcResult = new Dictionary<string, Dictionary<string, IOperResult>>();
-        rpcDatas.ForEach(a => mqttRpcResult.Add(a.Key, new()));
-        try
+        return GetRpcResult(this, clientId, rpcDatas);
+
+        static async PooledValueTask<Dictionary<string, Dictionary<string, IOperResult>>> GetRpcResult(MqttClient @this, string clientId, Dictionary<string, Dictionary<string, JToken>> rpcDatas)
         {
-            foreach (var rpcData in rpcDatas)
+            var mqttRpcResult = new Dictionary<string, Dictionary<string, IOperResult>>();
+            rpcDatas.ForEach(a => mqttRpcResult.Add(a.Key, new()));
+            try
             {
-                if (GlobalData.ReadOnlyDevices.TryGetValue(rpcData.Key, out var device))
+                foreach (var rpcData in rpcDatas)
                 {
-                    foreach (var item in rpcData.Value)
+                    if (GlobalData.ReadOnlyDevices.TryGetValue(rpcData.Key, out var device))
                     {
-                        if (device.ReadOnlyVariableRuntimes.TryGetValue(item.Key, out var variable) && IdVariableRuntimes.TryGetValue(variable.Id, out var tag))
+                        foreach (var item in rpcData.Value)
                         {
-                            var rpcEnable = tag.GetPropertyValue(DeviceId, nameof(_variablePropertys.VariableRpcEnable))?.ToBoolean();
-                            if (rpcEnable == false)
+                            if (device.ReadOnlyVariableRuntimes.TryGetValue(item.Key, out var variable) && @this.IdVariableRuntimes.TryGetValue(variable.Id, out var tag))
                             {
-                                mqttRpcResult[rpcData.Key].Add(item.Key, new OperResult("RPCEnable is False"));
+                                var rpcEnable = tag.GetPropertyValue(@this.DeviceId, nameof(_variablePropertys.VariableRpcEnable))?.ToBoolean();
+                                if (rpcEnable == false)
+                                {
+                                    mqttRpcResult[rpcData.Key].Add(item.Key, new OperResult("RPCEnable is False"));
+                                }
+                            }
+                            else
+                            {
+                                mqttRpcResult[rpcData.Key].Add(item.Key, new OperResult("The variable does not exist"));
                             }
                         }
-                        else
+                    }
+                }
+
+                Dictionary<string, Dictionary<string, string>> writeData = new();
+                foreach (var item in rpcDatas)
+                {
+                    writeData.Add(item.Key, new());
+
+                    foreach (var kv in item.Value)
+                    {
+                        if (!mqttRpcResult[item.Key].ContainsKey(kv.Key))
                         {
-                            mqttRpcResult[rpcData.Key].Add(item.Key, new OperResult("The variable does not exist"));
+                            writeData[item.Key].Add(kv.Key, kv.Value?.ToString());
                         }
                     }
                 }
-            }
 
-            Dictionary<string, Dictionary<string, string>> writeData = new();
-            foreach (var item in rpcDatas)
-            {
-                writeData.Add(item.Key, new());
+                var result = await GlobalData.RpcService.InvokeDeviceMethodAsync(@this.ToString() + "-" + clientId,
+                    writeData).ConfigureAwait(false);
 
-                foreach (var kv in item.Value)
+                foreach (var dictKv in result)
                 {
-                    if (!mqttRpcResult[item.Key].ContainsKey(kv.Key))
+                    foreach (var item in dictKv.Value)
                     {
-                        writeData[item.Key].Add(kv.Key, kv.Value?.ToString());
+                        mqttRpcResult[dictKv.Key].TryAdd(item.Key, item.Value);
                     }
                 }
             }
-
-            var result = await GlobalData.RpcService.InvokeDeviceMethodAsync(ToString() + "-" + clientId,
-                writeData).ConfigureAwait(false);
-
-            foreach (var dictKv in result)
+            catch (Exception ex)
             {
-                foreach (var item in dictKv.Value)
-                {
-                    mqttRpcResult[dictKv.Key].TryAdd(item.Key, item.Value);
-                }
+                @this.LogMessage?.LogWarning(ex);
             }
-        }
-        catch (Exception ex)
-        {
-            LogMessage?.LogWarning(ex);
-        }
 
-        return mqttRpcResult;
+            return mqttRpcResult;
+        }
     }
 
     private async Task MqttClient_ApplicationMessageReceivedAsync(MqttApplicationMessageReceivedEventArgs args)
@@ -482,77 +496,82 @@ public partial class MqttClient : BusinessBaseWithCacheIntervalScriptAll
     /// <summary>
     /// 上传mqtt，返回上传结果
     /// </summary>
-    public async ValueTask<OperResult> MqttUpAsync(TopicArray topicArray, CancellationToken cancellationToken = default)
+    public ValueTask<OperResult> MqttUpAsync(TopicArray topicArray, CancellationToken cancellationToken = default)
     {
-        try
+        return MqttUpAsync(this, topicArray, cancellationToken);
+
+        static async PooledValueTask<OperResult> MqttUpAsync(MqttClient @this, TopicArray topicArray, CancellationToken cancellationToken)
         {
-            var isConnect = await TryMqttClientAsync(cancellationToken).ConfigureAwait(false);
-            if (isConnect.IsSuccess)
+            try
             {
-                var variableMessage = new MqttApplicationMessageBuilder()
-    .WithTopic(topicArray.Topic).WithQualityOfServiceLevel(_driverPropertys.MqttQualityOfServiceLevel).WithRetainFlag()
-    .WithPayload(topicArray.Payload).Build();
-                var result = await _mqttClient.PublishAsync(variableMessage, cancellationToken).ConfigureAwait(false);
-                if (result.IsSuccess)
+                var isConnect = await @this.TryMqttClientAsync(cancellationToken).ConfigureAwait(false);
+                if (isConnect.IsSuccess)
                 {
-                    if (_driverPropertys.DetailLog)
+                    var variableMessage = new MqttApplicationMessageBuilder()
+        .WithTopic(topicArray.Topic).WithQualityOfServiceLevel(@this._driverPropertys.MqttQualityOfServiceLevel).WithRetainFlag()
+        .WithPayload(topicArray.Payload).Build();
+                    var result = await @this._mqttClient.PublishAsync(variableMessage, cancellationToken).ConfigureAwait(false);
+                    if (result.IsSuccess)
                     {
-                        if (LogMessage?.LogLevel <= TouchSocket.Core.LogLevel.Trace)
-                            LogMessage?.LogTrace(GetDetailLogString(topicArray, _memoryVarModelQueue.Count));
-                        else if (LogMessage?.LogLevel <= TouchSocket.Core.LogLevel.Debug)
-                            LogMessage?.LogDebug(GetCountLogString(topicArray, _memoryVarModelQueue.Count));
+                        if (@this._driverPropertys.DetailLog)
+                        {
+                            if (@this.LogMessage?.LogLevel <= TouchSocket.Core.LogLevel.Trace)
+                                @this.LogMessage?.LogTrace(@this.GetDetailLogString(topicArray, @this._memoryVarModelQueue.Count));
+                            else if (@this.LogMessage?.LogLevel <= TouchSocket.Core.LogLevel.Debug)
+                                @this.LogMessage?.LogDebug(@this.GetCountLogString(topicArray, @this._memoryVarModelQueue.Count));
+                        }
+                        else
+                        {
+                            if (@this.LogMessage?.LogLevel <= TouchSocket.Core.LogLevel.Debug)
+                                @this.LogMessage?.LogDebug(@this.GetCountLogString(topicArray, @this._memoryVarModelQueue.Count));
+                        }
+                        return OperResult.Success;
                     }
                     else
                     {
-                        if (LogMessage?.LogLevel <= TouchSocket.Core.LogLevel.Debug)
-                            LogMessage?.LogDebug(GetCountLogString(topicArray, _memoryVarModelQueue.Count));
+                        return new OperResult($"Upload fail{result.ReasonString}");
                     }
-                    return OperResult.Success;
                 }
                 else
                 {
-                    return new OperResult($"Upload fail{result.ReasonString}");
+                    return isConnect;
                 }
             }
-            else
+            catch (Exception ex)
             {
-                return isConnect;
+                return new OperResult($"Upload fail", ex);
             }
-        }
-        catch (Exception ex)
-        {
-            return new OperResult($"Upload fail", ex);
         }
     }
 
-    private async ValueTask<OperResult> TryMqttClientAsync(CancellationToken cancellationToken)
+    private ValueTask<OperResult> TryMqttClientAsync(CancellationToken cancellationToken)
     {
-        if (DisposedValue || _mqttClient == null) return new OperResult("MqttClient is disposed");
+        if (DisposedValue || _mqttClient == null) return TouchSocket.Core.EasyValueTask.FromResult(new OperResult("MqttClient is disposed"));
 
         if (_mqttClient?.IsConnected == true)
-            return OperResult.Success;
-        return await Client().ConfigureAwait(false);
+            return TouchSocket.Core.EasyValueTask.FromResult(OperResult.Success);
+        return Client(this, cancellationToken);
 
-        async ValueTask<OperResult> Client()
+        static async PooledValueTask<OperResult> Client(MqttClient @this, CancellationToken cancellationToken)
         {
-            if (_mqttClient?.IsConnected == true)
+            if (@this._mqttClient?.IsConnected == true)
                 return OperResult.Success;
             try
             {
-                await ConnectLock.WaitAsync(cancellationToken).ConfigureAwait(false);
+                await @this.ConnectLock.WaitAsync(cancellationToken).ConfigureAwait(false);
                 await Task.Delay(100, cancellationToken).ConfigureAwait(false);
-                if (_mqttClient?.IsConnected == true)
+                if (@this._mqttClient?.IsConnected == true)
                     return OperResult.Success;
-                using var timeoutToken = new CancellationTokenSource(TimeSpan.FromMilliseconds(_driverPropertys.ConnectTimeout));
+                using var timeoutToken = new CancellationTokenSource(TimeSpan.FromMilliseconds(@this._driverPropertys.ConnectTimeout));
                 using CancellationTokenSource stoppingToken = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, timeoutToken.Token);
-                if (_mqttClient?.IsConnected == true)
+                if (@this._mqttClient?.IsConnected == true)
                     return OperResult.Success;
-                if (_mqttClient == null)
+                if (@this._mqttClient == null)
                 {
                     return new OperResult("mqttClient is null");
                 }
-                var result = await _mqttClient.ConnectAsync(_mqttClientOptions, stoppingToken.Token).ConfigureAwait(false);
-                if (_mqttClient.IsConnected)
+                var result = await @this._mqttClient.ConnectAsync(@this._mqttClientOptions, stoppingToken.Token).ConfigureAwait(false);
+                if (@this._mqttClient.IsConnected)
                 {
                     return OperResult.Success;
                 }
@@ -570,7 +589,7 @@ public partial class MqttClient : BusinessBaseWithCacheIntervalScriptAll
             }
             finally
             {
-                ConnectLock.Release();
+                @this.ConnectLock.Release();
             }
         }
     }
