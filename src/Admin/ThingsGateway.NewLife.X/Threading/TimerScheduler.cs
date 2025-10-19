@@ -191,6 +191,13 @@ public class TimerScheduler : IDisposable, ILogFeature
                 Count--;
             }
         }
+
+        timer.Method.RemoveCache<TimerCallback>(timer.Target.Target);
+#if NET6_0_OR_GREATER
+        timer.Method.RemoveCache<Func<Object?, ValueTask>>(timer.Target.Target);
+#endif
+        timer.Method.RemoveCache<Func<Object?, Task>>(timer.Target.Target);
+
     }
 
     private AutoResetEvent? _waitForTimer;

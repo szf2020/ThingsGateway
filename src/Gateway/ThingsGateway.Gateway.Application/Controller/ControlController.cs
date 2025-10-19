@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 using System.ComponentModel;
+using ThingsGateway.NewLife.DictionaryExtensions;
 
 using ThingsGateway.FriendlyException;
 
@@ -122,16 +123,11 @@ public class ControlController : ControllerBase, IRpcServer
     [TouchSocket.WebApi.WebApi(Method = TouchSocket.WebApi.HttpMethodType.Post)]
     public async Task<Dictionary<string, Dictionary<string, OperResult>>> WriteVariablesAsync([FromBody][TouchSocket.WebApi.FromBody] Dictionary<string, Dictionary<string, string>> deviceDatas)
     {
-        foreach (var deviceData in deviceDatas)
-        {
-            if (GlobalData.Devices.TryGetValue(deviceData.Key, out var device))
-            {
-                var data = device.VariableRuntimes.Where(a => deviceData.Value.ContainsKey(a.Key)).ToList();
-                await GlobalData.SysUserService.CheckApiDataScopeAsync(data.Select(a => a.Value.CreateOrgId), data.Select(a => a.Value.CreateUserId)).ConfigureAwait(false);
-            }
-        }
+        await GlobalData.CheckByDeviceNames(deviceDatas.Select(a => a.Key)).ConfigureAwait(false);
 
         return (await GlobalData.RpcService.InvokeDeviceMethodAsync($"WebApi-{UserManager.UserAccount}-{App.HttpContext?.GetRemoteIpAddressToIPv4()}", deviceDatas).ConfigureAwait(false)).ToDictionary(a => a.Key, a => a.Value.ToDictionary(b => b.Key, b => (OperResult)b.Value));
+
+
     }
 
     /// <summary>

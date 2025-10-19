@@ -11,6 +11,7 @@
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Diagnosers;
 
+using ThingsGateway.NewLife;
 using ThingsGateway.NewLife.Collections;
 
 namespace ThingsGateway.Foundation;
@@ -47,7 +48,7 @@ public class TimeoutBenchmark
                 var _reusableTimeout = _reusableTimeouts.Get();
                 try
                 {
-                    await Task.Delay(5, _reusableTimeout.GetTokenSource(10, otherCts.Token).Token).ConfigureAwait(false); // 模拟工作
+                    await Task.Delay(5, _reusableTimeout.GetTokenSource(10, otherCts.Token)).ConfigureAwait(false); // 模拟工作
                 }
                 finally
                 {

@@ -66,11 +66,6 @@ public partial class VariableRuntime : Variable
     [AutoGenerateColumn(Visible = true, Filterable = true, Sortable = true, Order = 5)]
     public DateTime CollectTime { get => collectTime; set => collectTime = value; }
 
-    [SugarColumn(ColumnDescription = "排序码", IsNullable = true)]
-    [AutoGenerateColumn(Visible = false, DefaultSort = false, Sortable = true)]
-    [IgnoreExcel]
-    public override int SortCode { get => sortCode; set => sortCode = value; }
-
     /// <summary>
     /// 上次值
     /// </summary>
@@ -245,7 +240,6 @@ public partial class VariableRuntime : Variable
 
 
     private int index;
-    private int sortCode;
     private DateTime changeTime = DateTime.UnixEpoch.ToLocalTime();
 
     private DateTime collectTime = DateTime.UnixEpoch.ToLocalTime();

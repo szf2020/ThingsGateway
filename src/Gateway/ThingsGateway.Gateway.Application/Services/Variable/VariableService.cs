@@ -22,7 +22,6 @@ using System.Text;
 
 using ThingsGateway.Common.Extension;
 using ThingsGateway.Common.Extension.Generic;
-using ThingsGateway.Extension.Generic;
 using ThingsGateway.Foundation.Extension.Dynamic;
 
 using TouchSocket.Core;
@@ -107,8 +106,6 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
                 variable.DataType = DataTypeEnum.Int16;
                 variable.Name = name;
                 variable.Id = id;
-                variable.CreateOrgId = UserManager.OrgId;
-                variable.CreateUserId = UserManager.UserId;
                 variable.DeviceId = device.Id;
                 variable.RegisterAddress = address;
                 newVariables.Add(variable);
@@ -334,8 +331,6 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
                 variable.DataType = DataTypeEnum.Int16;
                 variable.Name = name;
                 variable.Id = id;
-                variable.CreateOrgId = UserManager.OrgId;
-                variable.CreateUserId = UserManager.UserId;
                 variable.DeviceId = device.Id;
                 variable.RegisterAddress = address;
                 newVariables.Add(variable);
@@ -428,12 +423,9 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
         differences.Remove(nameof(Variable.VariablePropertys));
         if (differences?.Count > 0)
         {
+            var data = models.ToList();
+            await  GlobalData.CheckByDeviceIds(data.Select(a => a.DeviceId)).ConfigureAwait(false);
             using var db = GetDB();
-            var dataScope = await GlobalData.SysUserService.GetCurrentUserDataScopeAsync().ConfigureAwait(false);
-            var data = models
-                            .WhereIf(dataScope != null && dataScope?.Count > 0, u => dataScope.Contains(u.CreateOrgId))//在指定机构列表查询
-             .WhereIf(dataScope?.Count == 0, u => u.CreateUserId == UserManager.UserId)
-             .ToList();
 
             var result = (await db.Updateable(data).UpdateColumns(differences.Select(a => a.Key).ToArray()).ExecuteCommandAsync().ConfigureAwait(false)) > 0;
 
@@ -448,24 +440,20 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
     [OperDesc("DeleteVariable", isRecordPar: false, localizerType: typeof(Variable))]
     public async Task DeleteByDeviceIdAsync(IEnumerable<long> input, SqlSugarClient db)
     {
-        var dataScope = await GlobalData.SysUserService.GetCurrentUserDataScopeAsync().ConfigureAwait(false);
         var ids = input.ToList();
-        var result = await db.Deleteable<Variable>().Where(a => ids.Contains(a.DeviceId))
-                          .WhereIF(dataScope != null && dataScope?.Count > 0, u => dataScope.Contains(u.CreateOrgId))//在指定机构列表查询
-             .WhereIF(dataScope?.Count == 0, u => u.CreateUserId == UserManager.UserId)
-            .ExecuteCommandAsync().ConfigureAwait(false);
+        await GlobalData.CheckByDeviceIds(ids).ConfigureAwait(false);
 
+        var result = await db.Deleteable<Variable>().Where(a => ids.Contains(a.DeviceId))
+            .ExecuteCommandAsync().ConfigureAwait(false);
     }
 
     [OperDesc("DeleteVariable", isRecordPar: false, localizerType: typeof(Variable))]
     public async Task<bool> DeleteVariableAsync(IEnumerable<long> input)
     {
         using var db = GetDB();
-        var dataScope = await GlobalData.SysUserService.GetCurrentUserDataScopeAsync().ConfigureAwait(false);
         var ids = input?.ToList();
+        await GlobalData.CheckByVariableIds(ids).ConfigureAwait(false);
         var result = (await db.Deleteable<Variable>().WhereIF(input != null, a => ids.Contains(a.Id))
-                          .WhereIF(dataScope != null && dataScope?.Count > 0, u => dataScope.Contains(u.CreateOrgId))//在指定机构列表查询
-             .WhereIF(dataScope?.Count == 0, u => u.CreateUserId == UserManager.UserId)
              .ExecuteCommandAsync().ConfigureAwait(false)) > 0;
 
         return result;
@@ -505,6 +493,11 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
     private async Task<Func<ISugarQueryable<Variable>, ISugarQueryable<Variable>>> GetWhereQueryFunc(GatewayExportFilter exportFilter)
     {
         var dataScope = await GlobalData.SysUserService.GetCurrentUserDataScopeAsync().ConfigureAwait(false);
+        List<long>? filterDeviceIds= null;
+        if(dataScope!=null)
+        {
+            filterDeviceIds= GlobalData.GetCurrentUserDeviceIds(dataScope).ToList();
+        }
         HashSet<long>? deviceId = null;
         if (!exportFilter.PluginName.IsNullOrWhiteSpace())
         {
@@ -520,8 +513,7 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
         .WhereIF(exportFilter.PluginType == PluginTypeEnum.Collect, a => a.DeviceId == exportFilter.DeviceId)
         .WhereIF(deviceId != null, a => deviceId.Contains(a.DeviceId))
 
-        .WhereIF(dataScope != null && dataScope?.Count > 0, u => dataScope.Contains(u.CreateOrgId))//在指定机构列表查询
-        .WhereIF(dataScope?.Count == 0, u => u.CreateUserId == UserManager.UserId)
+        .WhereIF(filterDeviceIds != null , u => filterDeviceIds.Contains(u.DeviceId))//在指定机构列表查询
 
         .WhereIF(exportFilter.PluginType == PluginTypeEnum.Business, u => SqlFunc.JsonLike(u.VariablePropertys, exportFilter.DeviceId.ToString()));
         return whereQuery;
@@ -530,6 +522,13 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
     private async Task<Func<IEnumerable<Variable>, IEnumerable<Variable>>> GetWhereEnumerableFunc(GatewayExportFilter exportFilter, bool sql = false)
     {
         var dataScope = await GlobalData.SysUserService.GetCurrentUserDataScopeAsync().ConfigureAwait(false);
+        List<long>? filterDeviceIds = null;
+        if (dataScope != null)
+        {
+            filterDeviceIds = GlobalData.GetCurrentUserDeviceIds(dataScope).ToList();
+        }
+        
+        
         HashSet<long>? deviceId = null;
         if (!exportFilter.PluginName.IsNullOrWhiteSpace())
         {
@@ -545,8 +544,7 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
         .WhereIF(exportFilter.PluginType == PluginTypeEnum.Collect, a => a.DeviceId == exportFilter.DeviceId)
         .WhereIF(deviceId != null, a => deviceId.Contains(a.DeviceId))
 
-                .WhereIF(dataScope != null && dataScope?.Count > 0, u => dataScope.Contains(u.CreateOrgId))//在指定机构列表查询
-        .WhereIF(dataScope?.Count == 0, u => u.CreateUserId == UserManager.UserId)
+        .WhereIF(filterDeviceIds != null, u => filterDeviceIds.Contains(u.DeviceId))//在指定机构列表查询
 
         .WhereIF(sql && exportFilter.PluginType == PluginTypeEnum.Business, u => SqlFunc.JsonLike(u.VariablePropertys, exportFilter.DeviceId.ToString()))
         .WhereIF(!sql && exportFilter.PluginType == PluginTypeEnum.Business && exportFilter.DeviceId > 0, u =>
@@ -566,7 +564,7 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
     public async Task<bool> SaveVariableAsync(Variable input, ItemChangedType type)
     {
         if (type == ItemChangedType.Update)
-            await GlobalData.SysUserService.CheckApiDataScopeAsync(input.CreateOrgId, input.CreateUserId).ConfigureAwait(false);
+            await GlobalData.CheckByVariableId(input.Id).ConfigureAwait(false);
         else
             ManageHelper.CheckVariableCount(1);
 
@@ -767,6 +765,13 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
 
     public ImportPreviewOutput<Dictionary<string, Variable>> SetVariableData(HashSet<long>? dataScope, IReadOnlyDictionary<string, DeviceRuntime> deviceDicts, Dictionary<string, ImportPreviewOutputBase> ImportPreviews, ImportPreviewOutput<Dictionary<string, Variable>> deviceImportPreview, Dictionary<string, PluginInfo> driverPluginNameDict, NonBlockingDictionary<string, (Type, Dictionary<string, PropertyInfo>, Dictionary<string, PropertyInfo>)> propertysDict, string sheetName, IEnumerable<IDictionary<string, object>> rows)
     {
+
+        List<long>? filterDeviceIds = null;
+        if (dataScope != null)
+        {
+            filterDeviceIds = GlobalData.GetCurrentUserDeviceIds(dataScope).ToList();
+        }
+
         string ImportNullError = Localizer["ImportNullError"];
         string RedundantDeviceError = Localizer["RedundantDeviceError"];
 
@@ -839,17 +844,14 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
                     if (GlobalData.IdDevices.TryGetValue(variable.DeviceId, out var dbvar1s) && dbvar1s.VariableRuntimes.TryGetValue(variable.Name, out var dbvar1))
                     {
                         variable.Id = dbvar1.Id;
-                        variable.CreateOrgId = dbvar1.CreateOrgId;
-                        variable.CreateUserId = dbvar1.CreateUserId;
                         variable.IsUp = true;
                     }
                     else
                     {
                         variable.IsUp = false;
-                        variable.CreateOrgId = UserManager.OrgId;
-                        variable.CreateUserId = UserManager.UserId;
                     }
-                    if (device.IsUp && ((dataScope != null && dataScope?.Count > 0 && !dataScope.Contains(variable.CreateOrgId)) || dataScope?.Count == 0 && variable.CreateUserId != UserManager.UserId))
+           
+                    if (device.IsUp && (filterDeviceIds?.Contains(variable.DeviceId) != false))
                     {
                         importPreviewOutput.Results.Add(new(Interlocked.Increment(ref row), false, "Operation not permitted"));
                     }

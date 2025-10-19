@@ -26,6 +26,8 @@ public static partial class GatewayMapper
     [MapProperty($"{nameof(VariableRuntime.AlarmRuntimePropertys)}.{nameof(AlarmRuntimePropertys.EventTime)}", nameof(AlarmVariable.EventTime))]
     [MapProperty($"{nameof(VariableRuntime.AlarmRuntimePropertys)}.{nameof(AlarmRuntimePropertys.AlarmType)}", nameof(AlarmVariable.AlarmType))]
     [MapProperty($"{nameof(VariableRuntime.AlarmRuntimePropertys)}.{nameof(AlarmRuntimePropertys.EventType)}", nameof(AlarmVariable.EventType))]
+    [MapProperty($"{nameof(VariableRuntime.DeviceRuntime)}.{nameof(DeviceRuntime.CreateOrgId)}", nameof(AlarmVariable.CreateOrgId))]
+    [MapProperty($"{nameof(VariableRuntime.DeviceRuntime)}.{nameof(DeviceRuntime.CreateUserId)}", nameof(AlarmVariable.CreateUserId))]
     public static partial AlarmVariable AdaptAlarmVariable(this VariableRuntime src);
 
     public static partial VariableDataWithValue AdaptVariableDataWithValue(this VariableBasicData src);

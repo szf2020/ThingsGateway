@@ -15,6 +15,7 @@ using PooledAwait;
 using System.Collections.Concurrent;
 
 using ThingsGateway.Extension.Generic;
+using ThingsGateway.NewLife.DictionaryExtensions;
 
 namespace ThingsGateway.Gateway.Application;
 
@@ -109,11 +110,15 @@ public static class GlobalData
         static async PooledTask<IEnumerable<DeviceRuntime>> GetCurrentUserDevices()
         {
             var dataScope = await GlobalData.SysUserService.GetCurrentUserDataScopeAsync().ConfigureAwait(false);
-            return ReadOnlyIdDevices.WhereIf(dataScope != null && dataScope?.Count > 0, u => dataScope.Contains(u.Value.CreateOrgId))//在指定机构列表查询
+            return IdDevices.WhereIf(dataScope != null && dataScope?.Count > 0, u => dataScope.Contains(u.Value.CreateOrgId))//在指定机构列表查询
               .WhereIf(dataScope?.Count == 0, u => u.Value.CreateUserId == UserManager.UserId).Select(a => a.Value);
         }
     }
-
+    public static IEnumerable<long> GetCurrentUserDeviceIds(HashSet<long> dataScope)
+    {
+        return IdDevices.WhereIf(dataScope != null && dataScope?.Count > 0, u => dataScope.Contains(u.Value.CreateOrgId))//在指定机构列表查询
+          .WhereIf(dataScope?.Count == 0, u => u.Value.CreateUserId == UserManager.UserId).Select(a => a.Key);
+    }
     public static Task<IEnumerable<VariableRuntime>> GetCurrentUserIdVariables()
     {
         return GetCurrentUserIdVariables();
@@ -121,11 +126,53 @@ public static class GlobalData
         static async PooledTask<IEnumerable<VariableRuntime>> GetCurrentUserIdVariables()
         {
             var dataScope = await GlobalData.SysUserService.GetCurrentUserDataScopeAsync().ConfigureAwait(false);
-            return IdVariables.Where(a => a.Value.IsInternalMemoryVariable == false).WhereIf(dataScope != null && dataScope?.Count > 0, u => dataScope.Contains(u.Value.CreateOrgId))//在指定机构列表查询
-              .WhereIf(dataScope?.Count == 0, u => u.Value.CreateUserId == UserManager.UserId).Select(a => a.Value);
+
+            return IdVariables.Where(a => a.Value.IsInternalMemoryVariable == false)
+                .WhereIf(dataScope != null && dataScope?.Count > 0, u => dataScope.Contains(u.Value.DeviceRuntime.CreateOrgId))//在指定机构列表查询
+              .WhereIf(dataScope?.Count == 0, u => u.Value.DeviceRuntime.CreateUserId == UserManager.UserId).Select(a => a.Value);
         }
     }
 
+    public static async Task CheckByDeviceNames(IEnumerable<string> deviceNames)
+    {
+        List<long> orgids = new();
+        List<long> userIds = new();
+        foreach (var deviceData in GlobalData.Devices.FilterByKeys(deviceNames))
+        {
+            orgids.Add(deviceData.Value.CreateOrgId);
+            userIds.Add(deviceData.Value.CreateUserId);
+        }
+        await GlobalData.SysUserService.CheckApiDataScopeAsync(orgids, userIds).ConfigureAwait(false);
+    }
+    public static async Task CheckByDeviceIds(IEnumerable<long> deviceIds)
+    {
+        List<long> orgids = new();
+        List<long> userIds = new();
+        foreach (var deviceData in GlobalData.IdDevices.FilterByKeys(deviceIds))
+        {
+            orgids.Add(deviceData.Value.CreateOrgId);
+            userIds.Add(deviceData.Value.CreateUserId);
+        }
+        await GlobalData.SysUserService.CheckApiDataScopeAsync(orgids, userIds).ConfigureAwait(false);
+    }
+    public static async Task CheckByVariableIds(IEnumerable<long> variableIds)
+    {
+        List<long> orgids = new();
+        List<long> userIds = new();
+        foreach (var deviceData in GlobalData.IdVariables.FilterByKeys(variableIds))
+        {
+            orgids.Add(deviceData.Value.DeviceRuntime.CreateOrgId);
+            userIds.Add(deviceData.Value.DeviceRuntime.CreateUserId);
+        }
+        await GlobalData.SysUserService.CheckApiDataScopeAsync(orgids, userIds).ConfigureAwait(false);
+    }
+    public static async Task CheckByVariableId(long variableId)
+    {
+        if (GlobalData.IdVariables.TryGetValue(variableId, out var variable))
+        {
+            await GlobalData.SysUserService.CheckApiDataScopeAsync(variable.DeviceRuntime.CreateOrgId, variable.DeviceRuntime.CreateUserId).ConfigureAwait(false);
+        }
+    }
     public static Task<IEnumerable<AlarmVariable>> GetCurrentUserRealAlarmVariablesAsync()
     {
         return GetCurrentUserRealAlarmVariablesAsync();
@@ -133,7 +180,8 @@ public static class GlobalData
         static async PooledTask<IEnumerable<AlarmVariable>> GetCurrentUserRealAlarmVariablesAsync()
         {
             var dataScope = await GlobalData.SysUserService.GetCurrentUserDataScopeAsync().ConfigureAwait(false);
-            return RealAlarmIdVariables.WhereIf(dataScope != null && dataScope?.Count > 0, u => dataScope.Contains(u.Value.CreateOrgId))//在指定机构列表查询
+            return RealAlarmIdVariables
+                .WhereIf(dataScope != null && dataScope?.Count > 0, u => dataScope.Contains(u.Value.CreateOrgId))//在指定机构列表查询
               .WhereIf(dataScope?.Count == 0, u => u.Value.CreateUserId == UserManager.UserId).Select(a => a.Value);
         }
     }
@@ -145,8 +193,8 @@ public static class GlobalData
         static async PooledTask<IEnumerable<VariableRuntime>> GetCurrentUserAlarmEnableVariables()
         {
             var dataScope = await GlobalData.SysUserService.GetCurrentUserDataScopeAsync().ConfigureAwait(false);
-            return AlarmEnableIdVariables.Where(a => a.Value.IsInternalMemoryVariable == false).WhereIf(dataScope != null && dataScope?.Count > 0, u => dataScope.Contains(u.Value.CreateOrgId))//在指定机构列表查询
-              .WhereIf(dataScope?.Count == 0, u => u.Value.CreateUserId == UserManager.UserId).Select(a => a.Value);
+            return AlarmEnableIdVariables.Where(a => a.Value.IsInternalMemoryVariable == false).WhereIf(dataScope != null && dataScope?.Count > 0, u => dataScope.Contains(u.Value.DeviceRuntime.CreateOrgId))//在指定机构列表查询
+              .WhereIf(dataScope?.Count == 0, u => u.Value.DeviceRuntime.CreateUserId == UserManager.UserId).Select(a => a.Value);
         }
     }
 

@@ -28,7 +28,7 @@ namespace ThingsGateway.Gateway.Application;
 [SugarIndex("index_device", nameof(Variable.DeviceId), OrderByType.Asc)]
 [SugarIndex("unique_deviceid_variable_name", nameof(Variable.Name), OrderByType.Asc, nameof(Variable.DeviceId), OrderByType.Asc, true)]
 #endif
-public class Variable : BaseDataEntity, IValidatableObject
+public class Variable : PrimaryKeyEntity, IValidatableObject
 {
     /// <summary>
     /// 主键Id

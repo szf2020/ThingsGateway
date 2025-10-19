@@ -580,7 +580,19 @@ public static class Reflect
 
         return func;
     }
+    /// <summary>把一个方法转为泛型委托，便于快速反射调用</summary>
+    /// <typeparam name="TFunc"></typeparam>
+    /// <param name="method"></param>
+    /// <param name="target"></param>
+    /// <returns></returns>
+    public static void RemoveCache<TFunc>(this MethodInfo method, object? target = null) where TFunc : class
+    {
+        if (method == null) return;
 
+        var key = new DelegateCacheKey(method, typeof(TFunc), target);
+
+        DelegateCache<TFunc>.Cache.TryRemove(key);
+    }
     #endregion
 }
 public static class DelegateCache<TFunc>
