@@ -1610,9 +1610,10 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
     {
 
         Disposed = true;
-        ChannelRuntimeDispatchService.UnSubscribe(Refresh);
+        ChannelRuntimeDispatchService?.UnSubscribe(Refresh);
 
-        await Module.InvokeVoidAsync("dispose", Id);
+        if (Module != null)
+            await Module.InvokeVoidAsync("dispose", Id);
 
         await base.DisposeAsync(disposing);
     }

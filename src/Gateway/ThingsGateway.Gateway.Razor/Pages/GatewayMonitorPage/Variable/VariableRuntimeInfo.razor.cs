@@ -296,9 +296,10 @@ public partial class VariableRuntimeInfo
     {
 
         Disposed = true;
-        VariableRuntimeDispatchService.UnSubscribe(Refresh);
+        VariableRuntimeDispatchService?.UnSubscribe(Refresh);
 
-        await Module.InvokeVoidAsync("dispose", Id);
+        if (Module != null)
+            await Module.InvokeVoidAsync("dispose", Id);
 
         await base.DisposeAsync(disposing);
     }
