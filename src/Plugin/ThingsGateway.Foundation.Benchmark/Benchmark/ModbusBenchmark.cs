@@ -33,14 +33,12 @@ namespace ThingsGateway.Foundation;
 [MemoryDiagnoser]
 public class ModbusBenchmark : IDisposable
 {
-    public static int ClientCount = 1;
+    public static int ClientCount = 10;
     public static int TaskNumberOfItems = 1;
-    public static int NumberOfItems = 10;
+    public static int NumberOfItems = 100;
 
-    private readonly List<IModbusClient> _lgbModbusClients = [];
     private List<ModbusMaster> thingsgatewaymodbuss = new();
     private List<IModbusMaster> nmodbuss = new();
-    //private List<ModbusTcpNet> modbusTcpNets = new();
     private List<ModbusTcpMaster> modbusTcpMasters = new();
 
     [GlobalSetup]
@@ -74,15 +72,7 @@ public class ModbusBenchmark : IDisposable
             await nmodbus.ReadHoldingRegistersAsync(1, 0, 100);
             nmodbuss.Add(nmodbus);
         }
-        //for (int i = 0; i < ClientCount; i++)
-        //{
-        //    ModbusTcpNet modbusTcpNet = new();
-        //    modbusTcpNet.IpAddress = "127.0.0.1";
-        //    modbusTcpNet.Port = 502;
-        //    modbusTcpNet.ConnectServer();
-        //    modbusTcpNet.ReadAsync("0", 100);
-        //    modbusTcpNets.Add(modbusTcpNet);
-        //}
+
 
         for (int i = 0; i < ClientCount; i++)
         {
@@ -94,23 +84,6 @@ public class ModbusBenchmark : IDisposable
             modbusTcpMasters.Add(client);
         }
 
-        {
-            var sc = new ServiceCollection();
-            sc.AddTcpSocketFactory();
-            sc.AddModbusFactory();
-
-            var provider = sc.BuildServiceProvider();
-            var factory = provider.GetRequiredService<IModbusFactory>();
-
-            for (int i = 0; i < ClientCount; i++)
-            {
-                var client = factory.GetOrCreateTcpMaster();
-                await client.ConnectAsync("127.0.0.1", 502);
-                await client.ReadHoldingRegistersAsync(0x01, 0x00, 10);
-
-                _lgbModbusClients.Add(client);
-            }
-        }
     }
 
     [Benchmark]
@@ -133,33 +106,6 @@ public class ModbusBenchmark : IDisposable
                             throw new Exception(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss ffff") + result.ToString());
                         }
                         var data = TouchSocketBitConverter.ConvertValues<byte, ushort>(result.Content.Span, EndianType.Little);
-                    }
-                }));
-            }
-        }
-        await Task.WhenAll(tasks);
-    }
-
-    [Benchmark]
-    public async Task LongbowModbus()
-    {
-        List<Task> tasks = new List<Task>();
-        foreach (var client in _lgbModbusClients)
-        {
-
-            for (int i = 0; i < TaskNumberOfItems; i++)
-            {
-                tasks.Add(Task.Run(async () =>
-                {
-                    for (int i = 0; i < NumberOfItems; i++)
-                    {
-                        using var cts = new CancellationTokenSource(3000);
-                        var result = await client.ReadHoldingRegistersAsync(1, 0, 100, cts.Token).ConfigureAwait(false);
-                        var data = result.ReadUShortValues(100);
-                        if (!result.IsSuccess)
-                        {
-                            throw new Exception(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss ffff") + result.Exception);
-                        }
                     }
                 }));
             }
@@ -214,39 +160,12 @@ public class ModbusBenchmark : IDisposable
     }
 
 
-    //并发失败
-    //[Benchmark]
-    //public async Task HslCommunication()
-    //{
-    //    List<Task> tasks = new List<Task>();
-    //    foreach (var modbusTcpNet in modbusTcpNets)
-    //    {
-    //        for (int i = 0; i < TaskNumberOfItems; i++)
-    //        {
-    //            tasks.Add(Task.Run(async () =>
-    //            {
-    //                for (int i = 0; i < NumberOfItems; i++)
-    //                {
-    //                    var result = await modbusTcpNet.ReadAsync("0", 100);
-    //                    if (!result.IsSuccess)
-    //                    {
-    //                        throw new Exception(result.Message);
-    //                    }
-    //                }
-    //            }));
-    //        }
-    //    }
-    //    await Task.WhenAll(tasks);
-    //}
-
     public void Dispose()
     {
 
         thingsgatewaymodbuss?.ForEach(a => a.Channel.SafeDispose());
         thingsgatewaymodbuss?.ForEach(a => a.SafeDispose());
         nmodbuss?.ForEach(a => a.SafeDispose());
-        //modbusTcpNets?.ForEach(a => a.SafeDispose());
-        _lgbModbusClients?.ForEach(a => a.DisposeAsync());
     }
 
 }

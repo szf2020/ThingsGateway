@@ -11,8 +11,6 @@
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Diagnosers;
 
-using HslCommunication.Profinet.Siemens;
-
 using S7.Net;
 
 using ThingsGateway.Foundation.SiemensS7;
@@ -33,7 +31,6 @@ public class S7Benchmark : IDisposable
     private List<SiemensS7Master> siemensS7s = new();
 
     private List<Plc> plcs = new();
-    private List<SiemensS7Net> siemensS7Nets = new();
 
     [GlobalSetup]
     public async Task Init()
@@ -57,13 +54,7 @@ public class S7Benchmark : IDisposable
                 await siemensS7.ReadAsync("M1", 100);
                 siemensS7s.Add(siemensS7);
             }
-            for (int i = 0; i < ClientCount; i++)
-            {
-                var siemensS7Net = new SiemensS7Net(SiemensPLCS.S1500, "127.0.0.1");
-                await siemensS7Net.ConnectServerAsync();
-                await siemensS7Net.ReadAsync("M0", 100);
-                siemensS7Nets.Add(siemensS7Net);
-            }
+
             for (int i = 0; i < ClientCount; i++)
             {
                 var plc = new Plc(CpuType.S71500, "127.0.0.1", 102, 0, 0);
@@ -94,34 +85,6 @@ public class S7Benchmark : IDisposable
         await Task.WhenAll(tasks);
     }
 
-    [Benchmark]
-    public async Task HslCommunication()
-    {
-        List<Task> tasks = new List<Task>();
-        foreach (var siemensS7Net in siemensS7Nets)
-        {
-            for (int i = 0; i < TaskNumberOfItems; i++)
-            {
-                tasks.Add(Task.Run(async () =>
-                {
-                    for (int i = 0; i < NumberOfItems; i++)
-                    {
-                        var result = await siemensS7Net.ReadAsync("M0", 100);
-                        if (!result.IsSuccess)
-                        {
-                            throw new Exception(result.Message);
-                        }
-                    }
-                }));
-            }
-        }
-        await Task.WhenAll(tasks);
-    }
-
-
-
-
-
 
     [Benchmark]
     public async Task ThingsGateway()
@@ -151,7 +114,6 @@ public class S7Benchmark : IDisposable
     public void Dispose()
     {
         plcs.ForEach(a => a.SafeDispose());
-        siemensS7Nets.ForEach(a => a.SafeDispose());
         siemensS7s.ForEach(a => a.Channel.SafeDispose());
         siemensS7s.ForEach(a => a.SafeDispose());
     }

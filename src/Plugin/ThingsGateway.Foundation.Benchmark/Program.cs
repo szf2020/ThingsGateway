@@ -14,7 +14,7 @@
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Running;
 
-namespace BenchmarkConsoleApp
+namespace ThingsGateway.Foundation
 {
     internal class Program
     {
@@ -45,18 +45,18 @@ namespace BenchmarkConsoleApp
             //ManualConfig.Create(DefaultConfig.Instance)
             //.WithOptions(ConfigOptions.DisableOptimizationsValidator)
             //);
-            BenchmarkRunner.Run<BenchmarkAsyncWaitData>(
-ManualConfig.Create(DefaultConfig.Instance)
-.WithOptions(ConfigOptions.DisableOptimizationsValidator)
-);
+            //            BenchmarkRunner.Run<BenchmarkAsyncWaitData>(
+            //ManualConfig.Create(DefaultConfig.Instance)
+            //.WithOptions(ConfigOptions.DisableOptimizationsValidator)
+            //);
             //         BenchmarkRunner.Run<SemaphoreBenchmark>(
             //    ManualConfig.Create(DefaultConfig.Instance)
             //        .WithOptions(ConfigOptions.DisableOptimizationsValidator)
             //);
-            //            BenchmarkRunner.Run<ModbusBenchmark>(
-            //ManualConfig.Create(DefaultConfig.Instance)
-            //.WithOptions(ConfigOptions.DisableOptimizationsValidator)
-            //);
+            BenchmarkRunner.Run<ModbusBenchmark>(
+ManualConfig.Create(DefaultConfig.Instance)
+.WithOptions(ConfigOptions.DisableOptimizationsValidator)
+);
             //            BenchmarkRunner.Run<S7Benchmark>(
             //ManualConfig.Create(DefaultConfig.Instance)
             //.WithOptions(ConfigOptions.DisableOptimizationsValidator)
