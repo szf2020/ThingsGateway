@@ -11,11 +11,6 @@
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Diagnosers;
 
-using Longbow.Modbus;
-using Longbow.TcpSocket;
-
-using Microsoft.Extensions.DependencyInjection;
-
 using System.Net.Sockets;
 
 using ThingsGateway.Foundation.Modbus;
