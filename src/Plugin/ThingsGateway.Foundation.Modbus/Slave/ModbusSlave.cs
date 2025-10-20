@@ -558,7 +558,7 @@ public class ModbusSlave : DeviceBase, IModbusAddress
         }
     }
 
-    private static bool TryParseRequest(object requestInfo, out ModbusRequest modbusRequest, out ReadOnlySequence<byte> sequences, out bool modbusRtu)
+    private static bool TryParseRequest(IRequestInfo requestInfo, out ModbusRequest modbusRequest, out ReadOnlySequence<byte> sequences, out bool modbusRtu)
     {
         modbusRequest = default;
         sequences = default;
