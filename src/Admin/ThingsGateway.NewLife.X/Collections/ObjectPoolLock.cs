@@ -25,16 +25,10 @@ public class ObjectPoolLock<T> : DisposeBase, IPool<T> where T : class
     /// <summary>最大个数。默认0，0表示无上限</summary>
     public Int32 Max { get; set; } = 0;
 
-    /// <summary>最小个数。默认1</summary>
-    public Int32 Min { get; set; } = 1;
-
     private readonly object _syncRoot = new();
 
     /// <summary>基础空闲集合。只保存最小个数，最热部分</summary>
     private readonly Stack<T> _free = new();
-
-    /// <summary>扩展空闲集合。保存最小个数以外部分</summary>
-    private readonly Queue<T> _free2 = new();
 
     /// <summary>借出去的放在这</summary>
     private readonly HashSet<T> _busy = new();
@@ -79,7 +73,7 @@ public class ObjectPoolLock<T> : DisposeBase, IPool<T> where T : class
             if (_inited) return;
             _inited = true;
 
-            WriteLog($"Init {typeof(T).FullName} Min={Min} Max={Max}");
+            WriteLog($"Init {typeof(T).FullName} Max={Max}");
         }
     }
     #endregion
@@ -99,26 +93,20 @@ public class ObjectPoolLock<T> : DisposeBase, IPool<T> where T : class
                     pi = _free.Pop();
                     _FreeCount--;
                 }
-                else if (_free2.Count > 0)
-                {
-                    pi = _free2.Dequeue();
-                    _FreeCount--;
-                }
                 else
                 {
-                    var count = BusyCount;
-                    if (Max > 0 && count >= Max)
+                    if (Max > 0 && BusyCount >= Max)
                     {
-                        var msg = $"申请失败，已有 {count:n0} 达到或超过最大值 {Max:n0}";
+                        var msg = $"申请失败，已有 {BusyCount:n0} 达到或超过最大值 {Max:n0}";
                         WriteLog("Acquire Max " + msg);
                         throw new Exception(Name + " " + msg);
                     }
 
                     pi = OnCreate();
-                    if (count == 0) Init();
+                    if (BusyCount == 0) Init();
 
 #if DEBUG
-                    WriteLog("Acquire Create Free={0} Busy={1}", FreeCount, count + 1);
+                    WriteLog("Acquire Create Free={0} Busy={1}", FreeCount, BusyCount + 1);
 #endif
                 }
             }
@@ -177,10 +165,7 @@ public class ObjectPoolLock<T> : DisposeBase, IPool<T> where T : class
         }
         lock (_syncRoot)
         {
-            if (_FreeCount < Min)
-                _free.Push(value);
-            else
-                _free2.Enqueue(value);
+            _free.Push(value);
             _FreeCount++;
         }
 
@@ -211,12 +196,6 @@ public class ObjectPoolLock<T> : DisposeBase, IPool<T> where T : class
             while (_free.Count > 0)
             {
                 var pi = _free.Pop();
-                OnDispose(pi);
-            }
-
-            while (_free2.Count > 0)
-            {
-                var pi = _free2.Dequeue();
                 OnDispose(pi);
             }
 

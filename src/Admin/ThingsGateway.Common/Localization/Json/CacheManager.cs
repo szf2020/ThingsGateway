@@ -27,7 +27,7 @@ internal class CacheManager
 {
     private IMemoryCache Cache { get; set; }
 
-    private IServiceProvider Provider { get; set; }
+    private static IServiceProvider Provider => App.RootServices;
 
     [NotNull]
     private static CacheManager? Instance { get; set; }
@@ -40,8 +40,7 @@ internal class CacheManager
     static CacheManager()
     {
         Instance = new();
-        Instance.Provider = App.RootServices;
-        Instance.Cache = Instance.Provider.GetRequiredService<IMemoryCache>();
+        Instance.Cache = Provider.GetRequiredService<IMemoryCache>();
         Options = App.RootServices.GetRequiredService<IOptions<BootstrapBlazorOptions>>().Value;
     }
 
@@ -236,7 +235,7 @@ internal class CacheManager
     /// <returns></returns>
     public static IStringLocalizer? CreateLocalizerByType(Type resourceSource) => resourceSource.Assembly.IsDynamic
         ? null
-        : Instance.Provider.GetRequiredService<IStringLocalizerFactory>().Create(resourceSource);
+        : Provider.GetRequiredService<IStringLocalizerFactory>().Create(resourceSource);
 
     /// <summary>
     /// 获得 <see cref="JsonLocalizationOptions"/> 值
@@ -244,7 +243,7 @@ internal class CacheManager
     /// <returns></returns>
     private static JsonLocalizationOptions GetJsonLocalizationOption()
     {
-        var localizationOptions = Instance.Provider.GetRequiredService<IOptions<JsonLocalizationOptions>>();
+        var localizationOptions = Provider.GetRequiredService<IOptions<JsonLocalizationOptions>>();
         return localizationOptions.Value;
     }
     /// <summary>
@@ -253,7 +252,7 @@ internal class CacheManager
     /// <returns></returns>
     private static BootstrapBlazorOptions GetBootstrapBlazorOption()
     {
-        var localizationOptions = Instance.Provider.GetRequiredService<IOptions<BootstrapBlazorOptions>>();
+        var localizationOptions = Provider.GetRequiredService<IOptions<BootstrapBlazorOptions>>();
         return localizationOptions.Value;
     }
     /// <summary>
@@ -269,7 +268,7 @@ internal class CacheManager
             return null;
         }
         IStringLocalizer? ret = null;
-        var factories = Instance.Provider.GetServices<IStringLocalizerFactory>();
+        var factories = Provider.GetServices<IStringLocalizerFactory>();
         var factory = factories.LastOrDefault(a => a is not JsonStringLocalizerFactory);
         if (factory != null)
         {
@@ -345,7 +344,7 @@ internal class CacheManager
     /// <param name="typeName"></param>
     /// <param name="includeParentCultures"></param>
     /// <returns></returns>
-    public static IEnumerable<LocalizedString> GetTypeStringsFromResolve(string typeName, bool includeParentCultures = true) => Instance.Provider.GetRequiredService<ILocalizationResolve>().GetAllStringsByType(typeName, includeParentCultures);
+    public static IEnumerable<LocalizedString> GetTypeStringsFromResolve(string typeName, bool includeParentCultures = true) => Provider.GetRequiredService<ILocalizationResolve>().GetAllStringsByType(typeName, includeParentCultures);
     #endregion
 
     #region DisplayName

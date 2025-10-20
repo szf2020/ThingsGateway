@@ -12,18 +12,13 @@ namespace PooledAwait
     {
         private static ObjectPoolLock<T> pool = new();
 
-        [ThreadStatic]
-        private static T? ts_local;
-
         /// <summary>
         /// Gets an instance from the pool if possible
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static T? TryGet()
         {
-            var tmp = ts_local;
-            ts_local = null;
-            return tmp ?? pool.Get();
+            return pool.Get();
         }
 
         /// <summary>
@@ -34,11 +29,6 @@ namespace PooledAwait
         {
             if (value != null)
             {
-                if (ts_local == null)
-                {
-                    ts_local = value;
-                    return;
-                }
                 pool.Return(value);
             }
         }
