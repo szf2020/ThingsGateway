@@ -111,7 +111,8 @@ public class Startup : AppStartup
                  options.RootComponents.MaxJSRootComponents = 500;
                  options.JSInteropDefaultCallTimeout = TimeSpan.FromMinutes(2);
                  options.MaxBufferedUnacknowledgedRenderBatches = 20;
-                 options.DisconnectedCircuitRetentionPeriod = TimeSpan.FromMinutes(10);
+                 options.DisconnectedCircuitMaxRetained = 1;
+                 options.DisconnectedCircuitRetentionPeriod = TimeSpan.FromSeconds(10);
              })
              .AddHubOptions(options =>
              {
@@ -131,7 +132,8 @@ public class Startup : AppStartup
                         options.RootComponents.MaxJSRootComponents = 500;
                         options.JSInteropDefaultCallTimeout = TimeSpan.FromMinutes(2);
                         options.MaxBufferedUnacknowledgedRenderBatches = 20;
-                        options.DisconnectedCircuitRetentionPeriod = TimeSpan.FromMinutes(10);
+                        options.DisconnectedCircuitMaxRetained = 1;
+                        options.DisconnectedCircuitRetentionPeriod = TimeSpan.FromSeconds(10);
                     }).AddHubOptions(options =>
                     {
                         //单个传入集线器消息的最大大小。默认 32 KB

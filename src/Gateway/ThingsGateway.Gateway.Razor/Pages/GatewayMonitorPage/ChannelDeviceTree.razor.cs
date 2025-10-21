@@ -1347,27 +1347,7 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
     private TreeViewItem<ChannelDeviceTreeItem> UnknownTreeViewItem;
 
     SmartTriggerScheduler? scheduler;
-    private bool _initialized;
-    public override async Task SetParametersAsync(ParameterView parameters)
-    {
-        parameters.SetParameterProperties(this);
-        if (!_initialized)
-        {
-            _initialized = true;
 
-            OnInitialized();
-            await OnInitializedAsync();
-            OnParametersSet();
-            StateHasChanged();
-            await OnParametersSetAsync();
-        }
-        else
-        {
-            OnParametersSet();
-            StateHasChanged();
-            await OnParametersSetAsync();
-        }
-    }
 
     protected override async Task OnInitializedAsync()
     {

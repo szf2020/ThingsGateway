@@ -1,5 +1,9 @@
 ﻿{
   "configProperties": {
-    "System.Runtime.EnableWriteXorExecute": false
+    "System.Runtime.EnableWriteXorExecute": false,
+    "System.GC.HeapHardLimitPercent": 95, //堆限制百分比
+    "System.GC.HighMemoryPercent": 90, //高内存百分比
+    "System.GC.DynamicAdaptationMode": 1, //动态适应模式
+    //"System.GC.RegionRange": 549755813888 //8GB, 区域范围，保留的虚拟内存，如出现OOM，可以调大，一般是进程内存限制的2倍
   }
 }

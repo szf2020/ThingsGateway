@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Razor">
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
 
 	<Import Project="..\Version.props" />
 	
@@ -37,17 +37,15 @@
 		<ApplicationIcon>favicon.ico</ApplicationIcon>
 		<!--<PublishAot>true</PublishAot>-->
 		<CETCompat>false</CETCompat>
+		<ServerGarbageCollection>true</ServerGarbageCollection>
+		<!--动态适用GC-->
+		<GarbageCollectionAdaptationMode>1</GarbageCollectionAdaptationMode>
 
 		<PublishAot>true</PublishAot>
 		<DebugType>none</DebugType>
 		<EmbedAllSources>false</EmbedAllSources>
 		<EmitDebugInformation>false</EmitDebugInformation>
 		
-		<!--动态适用GC-->
-		<GarbageCollectionAdaptationMode>1</GarbageCollectionAdaptationMode>
-		
-		<!--使用工作站GC-->
-		<!--<ServerGarbageCollection>true</ServerGarbageCollection>-->
 		<!--<PlatformTarget>x86</PlatformTarget>-->
 	</PropertyGroup>
 

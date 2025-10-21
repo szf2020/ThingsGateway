@@ -51,25 +51,10 @@
 		<PublishReadyToRunComposite>true</PublishReadyToRunComposite>
 		<ApplicationIcon>favicon.ico</ApplicationIcon>
 
+		<CETCompat>false</CETCompat>
+		<ServerGarbageCollection>true</ServerGarbageCollection>
 		<!--动态适用GC-->
 		<GarbageCollectionAdaptationMode>1</GarbageCollectionAdaptationMode>
-
-
-		<CETCompat>false</CETCompat>
-
-
-
-
-		<!--<TieredCompilation>false</TieredCompilation>-->
-
-		<!--使用自托管线程池-->
-		<!--<UseWindowsThreadPool>false</UseWindowsThreadPool> -->
-
-		<!--使用工作站GC-->
-		<!--<ServerGarbageCollection>true</ServerGarbageCollection>-->
-
-		<!--<PlatformTarget>x86</PlatformTarget>-->
-		<!--editbin /LARGEADDRESSAWARE:NO ThingsGateway.Server.exe-->
 
 	</PropertyGroup>
 

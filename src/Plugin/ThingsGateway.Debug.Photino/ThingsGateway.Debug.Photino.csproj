@@ -7,15 +7,13 @@
 		<OutputType>WinExe</OutputType>
 		<ApplicationIcon>favicon.ico</ApplicationIcon>
 		<TargetFrameworks>net8.0;$(OtherTargetFrameworks);</TargetFrameworks>
-
-		<!--动态适用GC-->
-		<GarbageCollectionAdaptationMode>true</GarbageCollectionAdaptationMode>
 		
-		<!--使用自托管线程池-->
-		<!--<UseWindowsThreadPool>false</UseWindowsThreadPool> -->
+		
+		<CETCompat>false</CETCompat>
+		<ServerGarbageCollection>true</ServerGarbageCollection>
+		<!--动态适用GC-->
+		<GarbageCollectionAdaptationMode>1</GarbageCollectionAdaptationMode>
 
-		<!--使用工作站GC-->
-		<!--<ServerGarbageCollection>true</ServerGarbageCollection>-->
 	</PropertyGroup>
 
 	<ItemGroup>
