@@ -61,7 +61,8 @@ public class TextFileLog : Logger, IDisposable
         MaxBytes = set.LogFileMaxBytes;
         Backups = set.LogFileBackups;
 
-        _Timer = new TimerX(DoWriteAndClose, null, 0_000, 5_000) { Async = true };
+        _Timer = new TimerX(DoWriteAndClose, null, 0_000, 5_000, nameof(TextFileLog)) { Async = true };
+        _WriteTimer = new TimerX(DoWrite, null, 0_000, 1000, nameof(TextFileLog)) { Async = true };
     }
 
     private static readonly NonBlockingDictionary<String, TextFileLog> cache = new(StringComparer.OrdinalIgnoreCase);
@@ -96,6 +97,7 @@ public class TextFileLog : Logger, IDisposable
     protected virtual void Dispose(Boolean disposing)
     {
         _Timer.TryDispose();
+        _WriteTimer.TryDispose();
 
         // 销毁前把队列日志输出
         if (Interlocked.CompareExchange(ref _writing, 1, 0) == 0) WriteAndClose(DateTime.MinValue);
@@ -176,6 +178,7 @@ public class TextFileLog : Logger, IDisposable
 
     #region 异步写日志
     private readonly TimerX? _Timer;
+    private readonly TimerX? _WriteTimer;
     private readonly ConcurrentQueue<String> _Logs = new();
     private volatile Int32 _logCount;
     private Int32 _writing;
@@ -223,7 +226,10 @@ public class TextFileLog : Logger, IDisposable
         // 连续5秒没日志，就关闭
         _NextClose = now.AddSeconds(5);
     }
-
+    private void DoWrite(Object? state)
+    {
+        WriteLog();
+    }
     /// <summary>关闭文件</summary>
     private void DoWriteAndClose(Object? state)
     {
@@ -323,7 +329,6 @@ public class TextFileLog : Logger, IDisposable
         // 推入队列
         Enqueue($"{e.GetAndReset()}");
 
-        WriteLog();
     }
 
     protected bool Check()
@@ -340,35 +345,17 @@ public class TextFileLog : Logger, IDisposable
     }
     protected void WriteLog()
     {
-        // 异步写日志，实时。即使这里错误，定时器那边仍然会补上
+        // 写日志，实时。即使这里错误，定时器那边仍然会补上
         if (Interlocked.CompareExchange(ref _writing, 1, 0) == 0)
         {
             // 调试级别 或 致命错误 同步写日志
-            if (Setting.Current.LogLevel <= LogLevel.Debug || Level >= LogLevel.Error)
+            try
             {
-                try
-                {
-                    WriteFile();
-                }
-                finally
-                {
-                    _writing = 0;
-                }
+                if (!_Logs.IsEmpty) WriteFile();
             }
-            else
+            finally
             {
-                ThreadPool.UnsafeQueueUserWorkItem(s =>
-                {
-                    try
-                    {
-                        WriteFile();
-                    }
-                    catch { }
-                    finally
-                    {
-                        _writing = 0;
-                    }
-                }, null);
+                _writing = 0;
             }
         }
     }

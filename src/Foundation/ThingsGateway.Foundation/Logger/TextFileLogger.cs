@@ -128,7 +128,6 @@ public class TextFileLogger : ThingsGateway.NewLife.Log.TextFileLog, TouchSocket
         // 推入队列
         Enqueue(stringBuilder.ToString());
 
-        WriteLog();
     }
 
     /// <inheritdoc/>
