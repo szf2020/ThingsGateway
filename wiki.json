@@ -1,17 +1,4 @@
 {
-  "supported_ languages": {
-    "en": "English",
-    "ja": "Japanese (日本語)",
-    "zh": "Mandarin Chinese (中文)",
-    "zh-tw": "Traditional Chinese (繁 體中文)",
-    "es": "Spanish (Espano1)",
-    "kr": "Korean (就30)",
-    "vi": "Vietnamese (Tieng Viet)",
-    "pt-br": "Brazilian Portuguese (Portugues Brasileiro)",
-    "fr": "Francais (French)",
-    "ru": "PyccKmi (Russian)"
-  },
-  "default": "zh",
   "repo_notes": [
     {
       "content": ""
