@@ -380,7 +380,7 @@ public abstract partial class CollectBase : DriverBase
             if (cancellationToken.IsCancellationRequested) return;
             CancellationToken readToken = default;
             var readerLockTask = @this.ReadWriteLock.ReaderLockAsync(cancellationToken);
-            if (!readerLockTask.IsCompleted)
+            if (!readerLockTask.IsCompletedSuccessfully)
             {
                 readToken = await readerLockTask.ConfigureAwait(false);
             }
@@ -403,7 +403,7 @@ public abstract partial class CollectBase : DriverBase
 
             OperResult<ReadOnlyMemory<byte>> readResult = default;
             var readTask = @this.ReadSourceAsync(variableSourceRead, allToken);
-            if (!readTask.IsCompleted)
+            if (!readTask.IsCompletedSuccessfully)
             {
                 readResult = await readTask.ConfigureAwait(false);
             }
@@ -435,7 +435,7 @@ public abstract partial class CollectBase : DriverBase
                 //if (LogMessage?.LogLevel <= TouchSocket.Core.LogLevel.Trace)
                 //    LogMessage?.Trace(string.Format("{0} - Collecting [{1} - {2}]", DeviceName, variableSourceRead?.RegisterAddress, variableSourceRead?.Length));
                 var readTask1 = @this.ReadSourceAsync(variableSourceRead, allToken);
-                if (!readTask1.IsCompleted)
+                if (!readTask1.IsCompletedSuccessfully)
                 {
                     readResult = await readTask1.ConfigureAwait(false);
                 }
@@ -489,195 +489,6 @@ public abstract partial class CollectBase : DriverBase
             }
         }
     }
-
-
-    //    private ValueTask ReadVariableSource(object? state, CancellationToken cancellationToken)
-    //    {
-    //        var enumerator = new ReadVariableSourceEnumerator(this, state, cancellationToken);
-    //        return enumerator.MoveNextAsync();
-    //    }
-
-    //    private struct ReadVariableSourceEnumerator
-    //    {
-    //        private readonly CollectBase _owner;
-    //        private readonly object? _state;
-    //        private readonly CancellationToken _cancellationToken;
-
-    //        private VariableSourceRead _variableSourceRead;
-    //        private CancellationToken _readToken;
-    //        private CancellationToken _allToken;
-    //        private OperResult<ReadOnlyMemory<byte>> _readResult;
-    //        private int _readErrorCount;
-    //        private ValueTask<CancellationToken> _readerLockTask;
-    //        private ValueTask<OperResult<ReadOnlyMemory<byte>>> _readTask;
-    //        private int _step;
-
-    //        public ReadVariableSourceEnumerator(CollectBase owner, object? state, CancellationToken cancellationToken)
-    //        {
-    //            _owner = owner;
-    //            _state = state;
-    //            _cancellationToken = cancellationToken;
-
-    //            _variableSourceRead = default!;
-    //            _readToken = default;
-    //            _allToken = default;
-    //            _readResult = default;
-    //            _readErrorCount = 0;
-    //            _readerLockTask = default;
-    //            _readTask = default;
-    //            _step = 0;
-    //        }
-
-    //        public ValueTask MoveNextAsync()
-    //        {
-    //            switch (_step)
-    //            {
-    //                case 0:
-    //                    if (_state is not VariableSourceRead vsr) return default;
-    //                    _variableSourceRead = vsr;
-
-    //                    if (_owner.Pause) return default;
-    //                    if (_cancellationToken.IsCancellationRequested) return default;
-
-    //#pragma warning disable CA2012 // 正确使用 ValueTask
-    //                    _readerLockTask = _owner.ReadWriteLock.ReaderLockAsync(_cancellationToken);
-    //#pragma warning restore CA2012 // 正确使用 ValueTask
-    //                    if (!_readerLockTask.IsCompleted)
-    //                    {
-    //                        _step = 1;
-    //                        return AwaitReaderLock();
-    //                    }
-    //                    _readToken = _readerLockTask.Result;
-    //                    goto case 2;
-
-    //                case 1:
-    //                    _readToken = _readerLockTask.Result;
-    //                    goto case 2;
-
-    //                case 2:
-    //                    if (_readToken.IsCancellationRequested)
-    //                    {
-    //                        return _owner.ReadVariableSource(_state, _cancellationToken);
-    //                    }
-
-    //                    var allTokenSource = _owner._linkedCtsCache.GetLinkedTokenSource(_cancellationToken, _readToken);
-    //                    _allToken = allTokenSource.Token;
-
-    //#pragma warning disable CA2012 // 正确使用 ValueTask
-    //                    _readTask = _owner.ReadSourceAsync(_variableSourceRead, _allToken);
-    //#pragma warning restore CA2012 // 正确使用 ValueTask
-    //                    if (!_readTask.IsCompleted)
-    //                    {
-    //                        _step = 3;
-    //                        return AwaitRead();
-    //                    }
-    //                    _readResult = _readTask.Result;
-    //                    goto case 4;
-
-    //                case 3:
-    //                    _readResult = _readTask.Result;
-    //                    goto case 4;
-
-    //                case 4:
-    //                    while (!_readResult.IsSuccess && _readErrorCount < _owner.CollectProperties.RetryCount)
-    //                    {
-    //                        if (_owner.Pause) return default;
-    //                        if (_cancellationToken.IsCancellationRequested) return default;
-
-    //                        if (_readToken.IsCancellationRequested)
-    //                        {
-    //                            return _owner.ReadVariableSource(_state, _cancellationToken);
-    //                        }
-
-    //                        _readErrorCount++;
-    //                        if (_owner.LogMessage?.LogLevel <= TouchSocket.Core.LogLevel.Trace)
-    //                            _owner.LogMessage?.Trace(string.Format("{0} - Collection [{1} - {2}] failed - {3}",
-    //                                _owner.DeviceName, _variableSourceRead?.RegisterAddress, _variableSourceRead?.Length, _readResult.ErrorMessage));
-
-    //#pragma warning disable CA2012 // 正确使用 ValueTask
-    //                        _readTask = _owner.ReadSourceAsync(_variableSourceRead, _allToken);
-    //#pragma warning restore CA2012 // 正确使用 ValueTask
-    //                        if (!_readTask.IsCompleted)
-    //                        {
-    //                            _step = 5;
-    //                            return AwaitReadRetry();
-    //                        }
-    //                        _readResult = _readTask.Result;
-    //                    }
-
-    //                    goto case 6;
-
-    //                case 5:
-    //                    _readResult = _readTask.Result;
-    //                    _step = 4;
-    //                    return MoveNextAsync();
-
-    //                case 6:
-    //                    if (_readResult.IsSuccess)
-    //                    {
-    //                        if (_owner.LogMessage?.LogLevel <= TouchSocket.Core.LogLevel.Trace)
-    //                            _owner.LogMessage?.Trace(string.Format("{0} - Collection [{1} - {2}] data succeeded {3}",
-    //                                _owner.DeviceName, _variableSourceRead?.RegisterAddress, _variableSourceRead?.Length, _readResult.Content.Span.ToHexString(' ')));
-
-    //                        _owner.CurrentDevice.SetDeviceStatus(TimerX.Now, null);
-    //                    }
-    //                    else
-    //                    {
-    //                        if (_cancellationToken.IsCancellationRequested) return default;
-    //                        if (_readToken.IsCancellationRequested)
-    //                        {
-    //                            return _owner.ReadVariableSource(_state, _cancellationToken);
-    //                        }
-
-    //                        if (_variableSourceRead.LastErrorMessage != _readResult.ErrorMessage)
-    //                        {
-    //                            if (!_cancellationToken.IsCancellationRequested)
-    //                                _owner.LogMessage?.LogWarning(_readResult.Exception, string.Format(AppResource.CollectFail, _owner.DeviceName,
-    //                                    _variableSourceRead?.RegisterAddress, _variableSourceRead?.Length, _readResult.ErrorMessage));
-    //                        }
-    //                        else
-    //                        {
-    //                            if (!_cancellationToken.IsCancellationRequested && _owner.LogMessage?.LogLevel <= TouchSocket.Core.LogLevel.Trace)
-    //                                _owner.LogMessage?.Trace(string.Format("{0} - Collection [{1} - {2}] data failed - {3}",
-    //                                    _owner.DeviceName, _variableSourceRead?.RegisterAddress, _variableSourceRead?.Length, _readResult.ErrorMessage));
-    //                        }
-
-    //                        _variableSourceRead.LastErrorMessage = _readResult.ErrorMessage;
-    //                        _owner.CurrentDevice.SetDeviceStatus(TimerX.Now, null, _readResult.ErrorMessage);
-    //                        var time = DateTime.Now;
-    //                        foreach (var item in _variableSourceRead.VariableRuntimes)
-    //                        {
-    //                            item.SetValue(null, time, isOnline: false);
-    //                        }
-    //                    }
-    //                    break;
-    //            }
-
-    //            return default;
-    //        }
-
-    //        private async ValueTask AwaitReaderLock()
-    //        {
-    //            await _readerLockTask.ConfigureAwait(false);
-    //            _step = 1;
-    //            await MoveNextAsync().ConfigureAwait(false);
-    //        }
-
-    //        private async ValueTask AwaitRead()
-    //        {
-    //            await _readTask.ConfigureAwait(false);
-    //            _step = 3;
-    //            await MoveNextAsync().ConfigureAwait(false);
-    //        }
-
-    //        private async ValueTask AwaitReadRetry()
-    //        {
-    //            await _readTask.ConfigureAwait(false);
-    //            _step = 5;
-    //            await MoveNextAsync().ConfigureAwait(false);
-    //        }
-    //    }
-
 
     #endregion
 

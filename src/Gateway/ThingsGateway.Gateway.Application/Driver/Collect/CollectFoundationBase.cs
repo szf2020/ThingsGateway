@@ -172,7 +172,7 @@ public abstract class CollectFoundationBase : CollectBase
                 // 从协议读取数据
                 OperResult<ReadOnlyMemory<byte>> read = default;
                 var readTask = @this.FoundationDevice.ReadAsync(variableSourceRead.AddressObject, cancellationToken);
-                if (!readTask.IsCompleted)
+                if (!readTask.IsCompletedSuccessfully)
                 {
                     read = await readTask.ConfigureAwait(false);
                 }
@@ -199,116 +199,6 @@ public abstract class CollectFoundationBase : CollectBase
         }
 
     }
-
-    ///// <summary>
-    ///// 采集驱动读取，读取成功后直接赋值变量，失败不做处理，注意非通用设备需重写
-    ///// </summary>
-    //    protected override ValueTask<OperResult<ReadOnlyMemory<byte>>> ReadSourceAsync(VariableSourceRead variableSourceRead, CancellationToken cancellationToken)
-    //    {
-    //        if (cancellationToken.IsCancellationRequested)
-    //            return new ValueTask<OperResult<ReadOnlyMemory<byte>>>( new OperResult<ReadOnlyMemory<byte>>(new OperationCanceledException()));
-
-    //        // 值类型状态机
-    //        var stateMachine = new ReadSourceStateMachine(this, variableSourceRead, cancellationToken);
-    //        return stateMachine.MoveNextAsync();
-    //    }
-
-    //    private struct ReadSourceStateMachine
-    //    {
-    //        private readonly VariableSourceRead _variableSourceRead;
-    //        private readonly CancellationToken _cancellationToken;
-    //        private readonly CollectFoundationBase _owner;
-    //        private OperResult<ReadOnlyMemory<byte>> _result;
-    //        private ValueTask<OperResult<ReadOnlyMemory<byte>>> _readTask;
-
-    //        public ReadSourceStateMachine(CollectFoundationBase owner, VariableSourceRead variableSourceRead, CancellationToken cancellationToken)
-    //        {
-    //            _owner = owner;
-    //            _variableSourceRead = variableSourceRead;
-    //            _cancellationToken = cancellationToken;
-    //            _result = default;
-    //            State = 0;
-    //        }
-
-    //        public int State { get; private set; }
-
-    //        public ValueTask<OperResult<ReadOnlyMemory<byte>>> MoveNextAsync()
-    //        {
-    //            try
-    //            {
-    //                switch (State)
-    //                {
-    //                    case 0:
-    //                        // 异步读取
-    //                        if (_cancellationToken.IsCancellationRequested)
-    //                        {
-    //                            _result = new OperResult<ReadOnlyMemory<byte>>(new OperationCanceledException());
-    //                            return new ValueTask<OperResult<ReadOnlyMemory<byte>>>(_result);
-    //                        }
-
-    //#pragma warning disable CA2012 // 正确使用 ValueTask
-    //                        _readTask = _owner.FoundationDevice.ReadAsync(_variableSourceRead.AddressObject, _cancellationToken);
-    //#pragma warning restore CA2012 // 正确使用 ValueTask
-
-    //                        // 检查是否任务已完成
-    //                        if (_readTask.IsCompleted)
-    //                        {
-    //                            _result = _readTask.Result;
-    //                            State = 1;
-    //                            return MoveNextAsync();
-    //                        }
-
-    //                        // 如果任务尚未完成，继续等待
-    //                        State = 2;
-    //                        return Awaited(_readTask);
-
-    //                    case 1:
-    //                        // 解析结构化内容
-    //                        if (_result.IsSuccess)
-    //                        {
-    //                            var parsedResult = _variableSourceRead.VariableRuntimes.PraseStructContent(_owner.FoundationDevice, _result.Content.Span, false);
-    //                            return new ValueTask<OperResult<ReadOnlyMemory<byte>>>(new OperResult<ReadOnlyMemory<byte>>(parsedResult));
-    //                        }
-
-    //                        return new ValueTask<OperResult<ReadOnlyMemory<byte>>>(_result);
-
-    //                    case 2:
-    //                        // 完成任务后，解析内容
-    //                        _result = _readTask.Result;
-
-    //                        if (_result.IsSuccess)
-    //                        {
-    //                            var parsedResult = _variableSourceRead.VariableRuntimes.PraseStructContent(_owner.FoundationDevice, _result.Content.Span, false);
-    //                            return new ValueTask<OperResult<ReadOnlyMemory<byte>>>(new OperResult<ReadOnlyMemory<byte>>(parsedResult));
-    //                        }
-
-    //                        return new ValueTask<OperResult<ReadOnlyMemory<byte>>>(_result);
-
-    //                    default:
-    //                        throw new InvalidOperationException("Unexpected state.");
-    //                }
-    //            }
-    //            catch (Exception ex)
-    //            {
-    //                return new ValueTask<OperResult<ReadOnlyMemory<byte>>>(new OperResult<ReadOnlyMemory<byte>>(ex));
-    //            }
-    //        }
-
-    //        private async ValueTask<OperResult<ReadOnlyMemory<byte>>> Awaited(ValueTask<OperResult<ReadOnlyMemory<byte>>> vt)
-    //        {
-    //            try
-    //            {
-
-
-    //                await vt.ConfigureAwait(false);
-    //                return await MoveNextAsync().ConfigureAwait(false);
-    //            }
-    //            catch (Exception ex)
-    //            {
-    //                return new OperResult<ReadOnlyMemory<byte>>(ex);
-    //            }
-    //        }
-    //    }
 
     /// <summary>
     /// 批量写入变量值,需返回变量名称/结果，注意非通用设备需重写

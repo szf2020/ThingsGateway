@@ -43,6 +43,16 @@ public struct OperResult<T> : IOperResult<T>
         Exception = operResult.Exception;
         ErrorType = operResult.ErrorType;
     }
+    /// <summary>
+    /// 从另一个操作对象中赋值信息
+    /// </summary>
+    public OperResult(OperResult operResult)
+    {
+        OperCode = operResult.OperCode;
+        ErrorMessage = operResult.ErrorMessage;
+        Exception = operResult.Exception;
+        ErrorType = operResult.ErrorType;
+    }
 
     /// <summary>
     /// 传入错误信息
@@ -162,7 +172,13 @@ public struct OperResult<T, T2> : IOperResult<T, T2>
         Exception = operResult.Exception;
         ErrorType = operResult.ErrorType;
     }
-
+    public OperResult(OperResult operResult)
+    {
+        OperCode = operResult.OperCode;
+        ErrorMessage = operResult.ErrorMessage;
+        Exception = operResult.Exception;
+        ErrorType = operResult.ErrorType;
+    }
     /// <summary>
     /// 传入错误信息
     /// </summary>
@@ -275,7 +291,13 @@ public struct OperResult<T, T2, T3> : IOperResult<T, T2, T3>
         Exception = operResult.Exception;
         ErrorType = operResult.ErrorType;
     }
-
+    public OperResult(OperResult operResult)
+    {
+        OperCode = operResult.OperCode;
+        ErrorMessage = operResult.ErrorMessage;
+        Exception = operResult.Exception;
+        ErrorType = operResult.ErrorType;
+    }
     /// <summary>
     /// 传入错误信息
     /// </summary>
@@ -389,7 +411,13 @@ public struct OperResult : IOperResult
         Exception = operResult.Exception;
         ErrorType = operResult.ErrorType;
     }
-
+    public OperResult(OperResult operResult)
+    {
+        OperCode = operResult.OperCode;
+        ErrorMessage = operResult.ErrorMessage;
+        Exception = operResult.Exception;
+        ErrorType = operResult.ErrorType;
+    }
     /// <summary>
     /// 传入错误信息
     /// </summary>
