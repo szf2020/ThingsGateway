@@ -139,8 +139,15 @@ public struct OperResult<T> : IOperResult<T>
     /// <param name="operResult"></param>
     public static implicit operator OperResult(OperResult<T> operResult)
     {
-        return new OperResult(operResult);
+        return new OperResult
+        {
+            OperCode = operResult.OperCode,
+            ErrorMessage = operResult.ErrorMessage,
+            Exception = operResult.Exception,
+            ErrorType = operResult.ErrorType
+        };
     }
+
 }
 
 /// <inheritdoc/>

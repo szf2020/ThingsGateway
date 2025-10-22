@@ -327,9 +327,12 @@ public static class GlobalData
         {
             if (deviceRuntime.RedundantEnable && deviceRuntime.RedundantDeviceId != null)
                 return true;
-            else if (GlobalData.IdDevices.Any(a => a.Value.RedundantDeviceId == deviceRuntime.Id))
+
+            var id = deviceRuntime.Id;
+            foreach (var kv in GlobalData.IdDevices)
             {
-                return true;
+                if (kv.Value.RedundantDeviceId == id)
+                    return true;
             }
         }
         return false;

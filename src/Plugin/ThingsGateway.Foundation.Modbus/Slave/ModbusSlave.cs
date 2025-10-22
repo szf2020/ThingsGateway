@@ -599,25 +599,29 @@ public class ModbusSlave : DeviceBase, IModbusAddress
             return WriteError(modbusRtu, client, sequences, e);
         }
 
-        return Write(this, client, e, modbusRequest, sequences, modbusRtu, data);
-
-        static async PooledTask Write(ModbusSlave @this, IClientChannel client, ReceivedDataEventArgs e, ModbusRequest modbusRequest, ReadOnlySequence<byte> sequences, bool modbusRtu, OperResult<ReadOnlyMemory<byte>> data)
+        ValueByteBlock byteBlock = new(1024);
+        try
         {
-            ValueByteBlock byteBlock = new(1024);
+            WriteReadResponse(modbusRequest, sequences, data.Content, ref byteBlock, modbusRtu);
+            return SendAndDisposeAsync(this, client, e, modbusRtu, byteBlock);
+        }
+        catch
+        {
+            byteBlock.SafeDispose();
+            return WriteError(modbusRtu, client, sequences, e);
+        }
+        static async PooledTask SendAndDisposeAsync(ModbusSlave @this, IClientChannel client, ReceivedDataEventArgs e, bool modbusRtu, ValueByteBlock byteBlock)
+        {
             try
             {
-                WriteReadResponse(modbusRequest, sequences, data.Content, ref byteBlock, modbusRtu);
                 await @this.ReturnData(client, byteBlock.Memory, e).ConfigureAwait(false);
-            }
-            catch
-            {
-                await @this.WriteError(modbusRtu, client, sequences, e).ConfigureAwait(false);
             }
             finally
             {
-                byteBlock.SafeDispose();
+                byteBlock.SafeDispose(); //即使 ValueByteBlock 是 struct，内部仍持有同一块 Memory<byte> 引用，可以安全释放
             }
         }
+
     }
 
     private Task HandleWriteRequestAsync(

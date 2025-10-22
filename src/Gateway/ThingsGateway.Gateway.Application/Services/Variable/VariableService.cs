@@ -424,7 +424,7 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
         if (differences?.Count > 0)
         {
             var data = models.ToList();
-            await  GlobalData.CheckByDeviceIds(data.Select(a => a.DeviceId)).ConfigureAwait(false);
+            await GlobalData.CheckByDeviceIds(data.Select(a => a.DeviceId)).ConfigureAwait(false);
             using var db = GetDB();
 
             var result = (await db.Updateable(data).UpdateColumns(differences.Select(a => a.Key).ToArray()).ExecuteCommandAsync().ConfigureAwait(false)) > 0;
@@ -493,10 +493,10 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
     private async Task<Func<ISugarQueryable<Variable>, ISugarQueryable<Variable>>> GetWhereQueryFunc(GatewayExportFilter exportFilter)
     {
         var dataScope = await GlobalData.SysUserService.GetCurrentUserDataScopeAsync().ConfigureAwait(false);
-        List<long>? filterDeviceIds= null;
-        if(dataScope!=null)
+        List<long>? filterDeviceIds = null;
+        if (dataScope != null)
         {
-            filterDeviceIds= GlobalData.GetCurrentUserDeviceIds(dataScope).ToList();
+            filterDeviceIds = GlobalData.GetCurrentUserDeviceIds(dataScope).ToList();
         }
         HashSet<long>? deviceId = null;
         if (!exportFilter.PluginName.IsNullOrWhiteSpace())
@@ -513,7 +513,7 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
         .WhereIF(exportFilter.PluginType == PluginTypeEnum.Collect, a => a.DeviceId == exportFilter.DeviceId)
         .WhereIF(deviceId != null, a => deviceId.Contains(a.DeviceId))
 
-        .WhereIF(filterDeviceIds != null , u => filterDeviceIds.Contains(u.DeviceId))//在指定机构列表查询
+        .WhereIF(filterDeviceIds != null, u => filterDeviceIds.Contains(u.DeviceId))//在指定机构列表查询
 
         .WhereIF(exportFilter.PluginType == PluginTypeEnum.Business, u => SqlFunc.JsonLike(u.VariablePropertys, exportFilter.DeviceId.ToString()));
         return whereQuery;
@@ -527,8 +527,8 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
         {
             filterDeviceIds = GlobalData.GetCurrentUserDeviceIds(dataScope).ToList();
         }
-        
-        
+
+
         HashSet<long>? deviceId = null;
         if (!exportFilter.PluginName.IsNullOrWhiteSpace())
         {
@@ -850,7 +850,7 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
                     {
                         variable.IsUp = false;
                     }
-           
+
                     if (device.IsUp && (filterDeviceIds?.Contains(variable.DeviceId) != false))
                     {
                         importPreviewOutput.Results.Add(new(Interlocked.Increment(ref row), false, "Operation not permitted"));

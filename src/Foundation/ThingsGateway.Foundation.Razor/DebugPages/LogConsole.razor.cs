@@ -10,12 +10,11 @@
 
 using Microsoft.AspNetCore.Components.Web;
 
-using System.Diagnostics;
 using System.Text.RegularExpressions;
 
 using ThingsGateway.Extension;
 using ThingsGateway.Foundation;
-using ThingsGateway.NewLife;
+using ThingsGateway.NewLife.Threading;
 
 using TouchSocket.Core;
 
@@ -23,6 +22,24 @@ namespace ThingsGateway.Debug;
 
 public partial class LogConsole : IDisposable
 {
+
+    private string PlayText { get; set; }
+    private string PauseText { get; set; }
+    private string ExportText { get; set; }
+    private string DeleteText { get; set; }
+
+    protected override void OnInitialized()
+    {
+        PlayText = RazorLocalizer["Play"];
+        PauseText = RazorLocalizer["Pause"];
+        ExportText = RazorLocalizer["Export"];
+        DeleteText = RazorLocalizer["Delete"];
+
+        _Timer = new TimerX(RunTimerAsync, null, 1_000, 1_000, nameof(LogConsole)) { Async = true };
+        base.OnInitialized();
+    }
+    private TimerX _Timer;
+
     private bool Pause;
 
     public bool Disposed { get; set; }
@@ -69,7 +86,7 @@ public partial class LogConsole : IDisposable
         {
             logPath = LogPath;
             Messages = new List<LogMessage>();
-            await ExecuteAsync();
+            _Timer?.SetNext(0);
         }
 
         await base.OnParametersSetAsync();
@@ -82,63 +99,38 @@ public partial class LogConsole : IDisposable
     public void Dispose()
     {
         Disposed = true;
+        _Timer?.SafeDispose();
         GC.SuppressFinalize(this);
     }
-    private WaitLock WaitLock = new(nameof(LogConsole));
-    protected async Task ExecuteAsync()
+    protected async ValueTask ExecuteAsync()
     {
-        if (WaitLock.Waited) return;
-        try
-        {
-            await WaitLock.WaitAsync();
-            await Task.Delay(1000);
 
-            if (LogPath != null)
+        if (LogPath != null)
+        {
+            var files = await TextFileReadService.GetLogFilesAsync(LogPath);
+            if (!files.IsSuccess)
             {
-                var files = await TextFileReadService.GetLogFilesAsync(LogPath);
-                if (!files.IsSuccess)
+                Messages = new List<LogMessage>();
+                await Task.Delay(1000);
+            }
+            else
+            {
+
+                var result = await TextFileReadService.LastLogDataAsync(files.Content.FirstOrDefault());
+                if (result.IsSuccess)
                 {
-                    Messages = new List<LogMessage>();
-                    await Task.Delay(1000);
+                    Messages = result.Content.Where(a => a.LogLevel >= LogLevel).Select(a => new LogMessage((int)a.LogLevel, $"{a.LogTime} - {a.Message}{(a.ExceptionString.IsNullOrWhiteSpace() ? null : $"{Environment.NewLine}{a.ExceptionString}")}")).ToArray();
                 }
                 else
                 {
-                    await Task.Run(async () =>
-                    {
-                        Stopwatch sw = Stopwatch.StartNew();
-                        var result = await TextFileReadService.LastLogDataAsync(files.Content.FirstOrDefault());
-                        if (result.IsSuccess)
-                        {
-                            Messages = result.Content.Where(a => a.LogLevel >= LogLevel).Select(a => new LogMessage((int)a.LogLevel, $"{a.LogTime} - {a.Message}{(a.ExceptionString.IsNullOrWhiteSpace() ? null : $"{Environment.NewLine}{a.ExceptionString}")}")).ToList();
-                        }
-                        else
-                        {
-                            Messages = new List<LogMessage>();
-                        }
-                        sw.Stop();
-                        if (sw.ElapsedMilliseconds > 500)
-                        {
-                            await Task.Delay(1000);
-                        }
-                    });
+                    Messages = Array.Empty<LogMessage>();
                 }
+
             }
         }
-        catch (Exception ex)
-        {
-            NewLife.Log.XTrace.WriteException(ex);
-        }
-        finally
-        {
-            WaitLock.Release();
-        }
+
     }
 
-    protected override void OnInitialized()
-    {
-        _ = RunTimerAsync();
-        base.OnInitialized();
-    }
 
     private async Task Delete()
     {
@@ -185,19 +177,9 @@ public partial class LogConsole : IDisposable
         return Task.CompletedTask;
     }
 
-    private async Task RunTimerAsync()
+    private async Task RunTimerAsync(object? state)
     {
-        while (!Disposed)
-        {
-            try
-            {
-                await ExecuteAsync();
-                await InvokeAsync(StateHasChanged);
-            }
-            catch (Exception ex)
-            {
-                NewLife.Log.XTrace.WriteException(ex);
-            }
-        }
+        await ExecuteAsync();
+        await InvokeAsync(StateHasChanged);
     }
 }

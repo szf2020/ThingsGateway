@@ -28,7 +28,7 @@ public static class ChannelOptionsExtensions
     /// <param name="e">接收数据</param>
     /// <param name="funcs">事件</param>
     /// <returns></returns>
-    internal static  ValueTask OnChannelReceivedEvent(this IClientChannel clientChannel, ReceivedDataEventArgs e, ChannelReceivedEventHandler funcs)
+    internal static ValueTask OnChannelReceivedEvent(this IClientChannel clientChannel, ReceivedDataEventArgs e, ChannelReceivedEventHandler funcs)
     {
         clientChannel.ThrowIfNull(nameof(IClientChannel));
         e.ThrowIfNull(nameof(ReceivedDataEventArgs));
@@ -44,8 +44,8 @@ public static class ChannelOptionsExtensions
                 {
                     var func = funcs[i];
                     if (func == null) continue;
-                    var taskResult= func.Invoke(clientChannel, e, i == funcs.Count - 1);
-                    if(!taskResult.IsCompletedSuccessfully)
+                    var taskResult = func.Invoke(clientChannel, e, i == funcs.Count - 1);
+                    if (!taskResult.IsCompletedSuccessfully)
                     {
                         await taskResult.ConfigureAwait(false);
                     }

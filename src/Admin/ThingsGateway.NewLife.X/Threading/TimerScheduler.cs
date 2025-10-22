@@ -65,8 +65,21 @@ public class TimerScheduler : IDisposable, ILogFeature
     public static TimeProvider GlobalTimeProvider { get; set; } = TimeProvider.System;
     #endregion
     #region 构造
-    private TimerScheduler(String name) => Name = name;
-
+    private TimerScheduler(String name)
+    {
+        Name = name;
+        _processCallback = state =>
+        {
+            try
+            {
+                Execute(state);
+            }
+            catch (Exception ex)
+            {
+                XTrace.WriteException(ex, "Timer执行错误");
+            }
+        };
+    }
     /// <summary>销毁</summary>
     public void Dispose()
     {
@@ -258,17 +271,7 @@ public class TimerScheduler : IDisposable, ILogFeature
                         else
                             //Task.Factory.StartNew(() => ProcessItem(timer));
                             // 不需要上下文流动，捕获所有异常
-                            ThreadPool.UnsafeQueueUserWorkItem(s =>
-                            {
-                                try
-                                {
-                                    Execute(s);
-                                }
-                                catch (Exception ex)
-                                {
-                                    XTrace.WriteException(ex);
-                                }
-                            }, timer);
+                            ThreadPool.UnsafeQueueUserWorkItem(_processCallback, timer);
                     }
                 }
             }
@@ -283,7 +286,7 @@ public class TimerScheduler : IDisposable, ILogFeature
 
         WriteLog("调度线程已退出：{0}", Name);
     }
-
+    private readonly WaitCallback _processCallback;
     /// <summary>检查定时器是否到期</summary>
     /// <param name="timer"></param>
     /// <param name="now"></param>
@@ -325,9 +328,9 @@ public class TimerScheduler : IDisposable, ILogFeature
 
         timer.hasSetNext = false;
 
-        string tracerName = timer.TracerName ?? "timer:ExecuteAsync";
-        string timerArg = timer.Timers.ToString();
-        using var span = timer.Tracer?.NewSpan(tracerName, timerArg);
+        //string tracerName = timer.TracerName ?? "timer:ExecuteAsync";
+        //string timerArg = timer.Timers.ToString();
+        //using var span = timer.Tracer?.NewSpan(tracerName, timerArg);
         var sw = ValueStopwatch.StartNew();
         try
         {
@@ -351,7 +354,7 @@ public class TimerScheduler : IDisposable, ILogFeature
         // 如果用户代码没有拦截错误，则这里拦截，避免出错了都不知道怎么回事
         catch (Exception ex)
         {
-            span?.SetError(ex, null);
+            //span?.SetError(ex, null);
             XTrace.WriteException(ex);
         }
         finally
@@ -377,9 +380,9 @@ public class TimerScheduler : IDisposable, ILogFeature
 
             timer.hasSetNext = false;
 
-            string tracerName = timer.TracerName ?? "timer:ExecuteAsync";
-            string timerArg = timer.Timers.ToString();
-            using var span = timer.Tracer?.NewSpan(tracerName, timerArg);
+            //string tracerName = timer.TracerName ?? "timer:ExecuteAsync";
+            //string timerArg = timer.Timers.ToString();
+            //using var span = timer.Tracer?.NewSpan(tracerName, timerArg);
             var sw = ValueStopwatch.StartNew();
             try
             {
@@ -427,7 +430,7 @@ public class TimerScheduler : IDisposable, ILogFeature
             // 如果用户代码没有拦截错误，则这里拦截，避免出错了都不知道怎么回事
             catch (Exception ex)
             {
-                span?.SetError(ex, null);
+                //span?.SetError(ex, null);
                 XTrace.WriteException(ex);
             }
             finally

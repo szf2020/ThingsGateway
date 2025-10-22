@@ -61,7 +61,7 @@ public class TextFileLog : Logger, IDisposable
         MaxBytes = set.LogFileMaxBytes;
         Backups = set.LogFileBackups;
 
-        _Timer = new TimerX(DoWriteAndClose, null, 0_000, 5_000, nameof(TextFileLog)) { Async = true };
+        _Timer = new TimerX(DoWriteAndClose, null, 0_000, 60_000, nameof(TextFileLog)) { Async = true };
         _WriteTimer = new TimerX(DoWrite, null, 0_000, 1000, nameof(TextFileLog)) { Async = true };
     }
 
@@ -149,31 +149,67 @@ public class TextFileLog : Logger, IDisposable
 
     /// <summary>获取日志文件路径</summary>
     /// <returns></returns>
-    private String? GetLogFile()
+    private string? GetLogFile()
     {
         // 单日志文件
         if (_isFile) return LogPath.GetBasePath();
 
         // 目录多日志文件
-        var logfile = LogPath.CombinePath(String.Format(FileFormat, TimerX.Now.AddHours(Setting.Current.UtcIntervalHours), Level)).GetBasePath();
+        var baseFile = LogPath.CombinePath(
+            string.Format(FileFormat, TimerX.Now.AddHours(Setting.Current.UtcIntervalHours), Level)
+        ).GetBasePath();
 
-        // 是否限制文件大小
-        if (MaxBytes == 0) return logfile;
+        // 不限制大小
+        if (MaxBytes == 0) return baseFile;
 
-        // 找到今天第一个未达到最大上限的文件
         var max = MaxBytes * 1024L * 1024L;
-        var ext = Path.GetExtension(logfile);
-        var name = logfile.TrimEnd(ext);
+        var ext = Path.GetExtension(FileFormat);
+
+        string? latestFile = null;
+        DateTime latestTime = DateTime.MinValue;
+
+        foreach (var path in Directory.EnumerateFiles(LogPath, $"*{ext}", SearchOption.TopDirectoryOnly))
+        {
+            try
+            {
+                var lastWrite = File.GetLastWriteTimeUtc(path);
+                if (lastWrite > latestTime)
+                {
+                    latestTime = lastWrite;
+                    latestFile = path;
+                }
+            }
+            catch { }
+        }
+
+        if (latestFile != null)
+        {
+            try
+            {
+                var len = new FileInfo(latestFile).Length;
+                if (len < max)
+                    return latestFile;
+            }
+            catch { }
+        }
+
+        var fileNameWithoutExt = Path.Combine(
+            Path.GetDirectoryName(baseFile)!,
+            Path.GetFileNameWithoutExtension(baseFile)
+        );
+
+        // 依序找下一个可用文件
         for (var i = 1; i < 1024; i++)
         {
-            if (i > 1) logfile = $"{name}_{i}{ext}";
+            var nextFile = i == 1 ? $"{fileNameWithoutExt}{ext}" : $"{fileNameWithoutExt}_{i}{ext}";
+            if (!File.Exists(nextFile))
+                return nextFile;
 
-            var fi = logfile.AsFile();
-            if (!fi.Exists || fi.Length < max) return logfile;
         }
 
         return null;
     }
+
     #endregion
 
     #region 异步写日志
@@ -189,9 +225,9 @@ public class TextFileLog : Logger, IDisposable
     {
         var writer = LogWriter;
 
-        var now = TimerX.Now.AddHours(Setting.Current.UtcIntervalHours);
         var logFile = GetLogFile();
         if (logFile.IsNullOrEmpty()) return;
+        var now = TimerX.Now.AddHours(Setting.Current.UtcIntervalHours);
 
         if (!_isFile && logFile != CurrentLogFile)
         {
@@ -243,43 +279,36 @@ public class TextFileLog : Logger, IDisposable
             DirectoryInfo? di = new DirectoryInfo(LogPath);
             if (di.Exists)
             {
-                // 删除*.del
+                // 删除 *.del
                 try
                 {
-                    var dels = di.GetFiles("*.del");
-                    if (dels?.Length > 0)
+                    foreach (var item in di.EnumerateFiles("*.del"))
                     {
-                        foreach (var item in dels)
-                        {
-                            item.Delete();
-                        }
+                        item.Delete();
                     }
                 }
                 catch { }
 
                 var ext = Path.GetExtension(FileFormat);
-                var fis = di.GetFiles("*" + ext);
-                if (fis != null && fis.Length > Backups)
+                var fis = di.EnumerateFiles($"*{ext}")
+                           .OrderByDescending(e => e.LastWriteTimeUtc)
+                           .Skip(Backups);
+
+                foreach (var item in fis)
                 {
-                    // 删除最旧的文件
-                    var retain = fis.Length - Backups;
-                    fis = fis.OrderBy(e => e.LastWriteTimeUtc).Take(retain).ToArray();
-                    foreach (var item in fis)
+                    OnWrite(LogLevel.Info, "The log file has reached the maximum limit of {0}, delete {1}, size {2: n0} Byte", Backups, item.Name, item.Length);
+                    try
                     {
-                        OnWrite(LogLevel.Info, "The log file has reached the maximum limit of {0}, delete {1}, size {2: n0} Byte", Backups, item.Name, item.Length);
+                        item.Delete();
+                    }
+                    catch
+                    {
                         try
                         {
-                            item.Delete();
+                            item.MoveTo(item.FullName + ".del");
                         }
                         catch
                         {
-                            try
-                            {
-                                item.MoveTo(item.FullName + ".del");
-                            }
-                            catch
-                            {
-                            }
                         }
                     }
                 }

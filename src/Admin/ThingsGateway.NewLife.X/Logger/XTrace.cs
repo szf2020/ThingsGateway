@@ -80,7 +80,14 @@ public static class XTrace
 
         Log.Error("{0}", ex);
     }
+    public static void WriteException(Exception ex, string message)
+    {
+        if (!InitLog()) return;
 
+        WriteVersion();
+
+        Log.Error("{0}, {1}", message, ex);
+    }
     #endregion 写日志
 
     #region 构造
