@@ -225,97 +225,97 @@ public class ModbusSlave : DeviceBase, IModbusAddress
             return;
         else
             ModbusServer02ByteBlocks.GetOrAdd(mAddress.Station, a =>
-        {
-            var bytes = new ByteBlock(256,
-            (c) =>
             {
-                var data = ArrayPool<byte>.Shared.Rent(c);
-                for (int i = 0; i < data.Length; i++)
+                var bytes = new ByteBlock(256,
+                (c) =>
                 {
-                    data[i] = 0;
-                }
-                return data;
-            },
-            (m) =>
-            {
-                if (MemoryMarshal.TryGetArray((ReadOnlyMemory<byte>)m, out var result))
+                    var data = ArrayPool<byte>.Shared.Rent(c);
+                    for (int i = 0; i < data.Length; i++)
+                    {
+                        data[i] = 0;
+                    }
+                    return data;
+                },
+                (m) =>
                 {
-                    ArrayPool<byte>.Shared.Return(result.Array);
+                    if (MemoryMarshal.TryGetArray((ReadOnlyMemory<byte>)m, out var result))
+                    {
+                        ArrayPool<byte>.Shared.Return(result.Array);
+                    }
                 }
-            }
-            );
-            bytes.SetLength(256);
-            for (int i = 0; i < bytes.Length; i++)
-            {
-                bytes.WriteByte(0);
-            }
-            bytes.Position = 0;
-            return bytes;
-        });
+                );
+                bytes.SetLength(256);
+                for (int i = 0; i < bytes.Length; i++)
+                {
+                    bytes.WriteByte(0);
+                }
+                bytes.Position = 0;
+                return bytes;
+            });
 
         if (ModbusServer03ByteBlocks.ContainsKey(mAddress.Station))
             return;
         else
             ModbusServer03ByteBlocks.GetOrAdd(mAddress.Station, a =>
-        {
-            var bytes = new ByteBlock(256,
-            (c) =>
             {
-                var data = ArrayPool<byte>.Shared.Rent(c);
-                for (int i = 0; i < data.Length; i++)
+                var bytes = new ByteBlock(256,
+                (c) =>
                 {
-                    data[i] = 0;
-                }
-                return data;
-            },
-            (m) =>
-            {
-                if (MemoryMarshal.TryGetArray((ReadOnlyMemory<byte>)m, out var result))
+                    var data = ArrayPool<byte>.Shared.Rent(c);
+                    for (int i = 0; i < data.Length; i++)
+                    {
+                        data[i] = 0;
+                    }
+                    return data;
+                },
+                (m) =>
                 {
-                    ArrayPool<byte>.Shared.Return(result.Array);
+                    if (MemoryMarshal.TryGetArray((ReadOnlyMemory<byte>)m, out var result))
+                    {
+                        ArrayPool<byte>.Shared.Return(result.Array);
+                    }
                 }
-            }
-            );
-            bytes.SetLength(256);
-            for (int i = 0; i < bytes.Length; i++)
-            {
-                bytes.WriteByte(0);
-            }
-            bytes.Position = 0;
-            return bytes;
-        });
+                );
+                bytes.SetLength(256);
+                for (int i = 0; i < bytes.Length; i++)
+                {
+                    bytes.WriteByte(0);
+                }
+                bytes.Position = 0;
+                return bytes;
+            });
 
         if (ModbusServer04ByteBlocks.ContainsKey(mAddress.Station))
             return;
         else
             ModbusServer04ByteBlocks.GetOrAdd(mAddress.Station, a =>
-        {
-            var bytes = new ByteBlock(256,
-            (c) =>
             {
-                var data = ArrayPool<byte>.Shared.Rent(c);
-                for (int i = 0; i < data.Length; i++)
+                var bytes = new ByteBlock(256,
+                (c) =>
                 {
-                    data[i] = 0;
-                }
-                return data;
-            },
-            (m) =>
-            {
-                if (MemoryMarshal.TryGetArray((ReadOnlyMemory<byte>)m, out var result))
+                    var data = ArrayPool<byte>.Shared.Rent(c);
+                    for (int i = 0; i < data.Length; i++)
+                    {
+                        data[i] = 0;
+                    }
+                    return data;
+                },
+                (m) =>
                 {
-                    ArrayPool<byte>.Shared.Return(result.Array);
+                    if (MemoryMarshal.TryGetArray((ReadOnlyMemory<byte>)m, out var result))
+                    {
+                        ArrayPool<byte>.Shared.Return(result.Array);
+                    }
                 }
-            }
-            );
-            bytes.SetLength(256);
-            for (int i = 0; i < bytes.Length; i++)
-            {
-                bytes.WriteByte(0);
-            }
-            bytes.Position = 0;
-            return bytes;
-        });
+                );
+                bytes.SetLength(256);
+                for (int i = 0; i < bytes.Length; i++)
+                {
+                    bytes.WriteByte(0);
+                }
+                bytes.Position = 0;
+                return bytes;
+            });
     }
 
     public override Action<IPluginManager> ConfigurePlugins(TouchSocketConfig config)
@@ -599,29 +599,25 @@ public class ModbusSlave : DeviceBase, IModbusAddress
             return WriteError(modbusRtu, client, sequences, e);
         }
 
-        ValueByteBlock byteBlock = new(1024);
-        try
+        return Write(this, client, e, modbusRequest, sequences, modbusRtu, data);
+
+        static async PooledTask Write(ModbusSlave @this, IClientChannel client, ReceivedDataEventArgs e, ModbusRequest modbusRequest, ReadOnlySequence<byte> sequences, bool modbusRtu, OperResult<ReadOnlyMemory<byte>> data)
         {
-            WriteReadResponse(modbusRequest, sequences, data.Content, ref byteBlock, modbusRtu);
-            return SendAndDisposeAsync(this, client, e, modbusRtu, byteBlock);
-        }
-        catch
-        {
-            byteBlock.SafeDispose();
-            return WriteError(modbusRtu, client, sequences, e);
-        }
-        static async PooledTask SendAndDisposeAsync(ModbusSlave @this, IClientChannel client, ReceivedDataEventArgs e, bool modbusRtu, ValueByteBlock byteBlock)
-        {
+            ValueByteBlock byteBlock = new(1024);
             try
             {
+                WriteReadResponse(modbusRequest, sequences, data.Content, ref byteBlock, modbusRtu);
                 await @this.ReturnData(client, byteBlock.Memory, e).ConfigureAwait(false);
+            }
+            catch
+            {
+                await @this.WriteError(modbusRtu, client, sequences, e).ConfigureAwait(false);
             }
             finally
             {
-                byteBlock.SafeDispose(); //即使 ValueByteBlock 是 struct，内部仍持有同一块 Memory<byte> 引用，可以安全释放
+                byteBlock.SafeDispose();
             }
         }
-
     }
 
     private Task HandleWriteRequestAsync(

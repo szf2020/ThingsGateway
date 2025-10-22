@@ -153,7 +153,7 @@ public class TextFileLog : Logger, IDisposable
     {
         // 单日志文件
         if (_isFile) return LogPath.GetBasePath();
-
+        Directory.CreateDirectory(LogPath);
         // 目录多日志文件
         var baseFile = LogPath.CombinePath(
             string.Format(FileFormat, TimerX.Now.AddHours(Setting.Current.UtcIntervalHours), Level)
