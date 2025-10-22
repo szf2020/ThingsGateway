@@ -14,10 +14,16 @@ using ThingsGateway.NewLife.Reflection;
 using ThingsGateway.NewLife.Serialization;
 using ThingsGateway.NewLife.Windows;
 
+using System.Diagnostics;
+using System.Runtime;
+
+
 #if NETFRAMEWORK
 using System.Management;
 
 using Microsoft.VisualBasic.Devices;
+
+
 #endif
 #if NETFRAMEWORK || NET6_0_OR_GREATER
 using Microsoft.Win32;
@@ -42,7 +48,7 @@ public interface IMachineInfo
 /// 
 /// 刷新信息成本较高，建议采用单例模式
 /// </remarks>
-public class MachineInfo : IExtend
+public class MachineInfo
 {
     #region 属性
     /// <summary>系统名称</summary>
@@ -88,11 +94,11 @@ public class MachineInfo : IExtend
     [DisplayName("磁盘序列号")]
     public String? DiskID { get; set; }
 
-    /// <summary>内存总量。单位KB</summary>
+    /// <summary>内存总量。单位MB</summary>
     [DisplayName("内存总量")]
     public UInt64 Memory { get; set; }
 
-    /// <summary>可用内存。单位KB</summary>
+    /// <summary>可用内存。单位MB</summary>
     [DisplayName("可用内存")]
     public UInt64 AvailableMemory { get; set; }
 
@@ -116,13 +122,98 @@ public class MachineInfo : IExtend
     [DisplayName("电池剩余")]
     public Double Battery { get; set; }
 
-    private readonly Dictionary<String, Object?> _items = [];
-    IDictionary<String, Object?> IExtend.Items => _items;
+#if NET6_0_OR_GREATER
+    #region GC与进程内存信息
 
-    /// <summary>获取 或 设置 扩展属性数据</summary>
-    /// <param name="key"></param>
-    /// <returns></returns>
-    public Object? this[String key] { get => _items.TryGetValue(key, out var obj) ? obj : null; set => _items[key] = value; }
+    /// <summary>GC 认为“内存吃紧”的阈值。单位：MB</summary>
+    [DisplayName("GC高内存阈值")]
+    public UInt64 HighMemoryLoadThreshold { get; set; }
+
+    /// <summary>GC 可用内存上限。单位：MB</summary>
+    [DisplayName("GC可用内存上限")]
+    public UInt64 TotalAvailableMemory { get; set; }
+
+    /// <summary>当前托管堆容量。单位：MB</summary>
+    [DisplayName("托管堆容量")]
+    public UInt64 HeapSize { get; set; }
+
+    /// <summary>托管堆已用内存。单位：MB</summary>
+    [DisplayName("托管堆已用")]
+    public UInt64 TotalMemory { get; set; }
+
+    /// <summary>托管堆碎片大小。单位：MB</summary>
+    [DisplayName("托管堆碎片")]
+    public UInt64 FragmentedBytes { get; set; }
+
+    /// <summary>GC识别可用内存。单位：MB</summary>
+    [DisplayName("GC识别可用内存")]
+    public UInt64 GCAvailableMemory { get; set; }
+
+    /// <summary>GC 已提交的内存。单位：MB</summary>
+    [DisplayName("GC已提交内存")]
+    public UInt64 CommittedBytes { get; set; }
+
+    /// <summary>GC 累计分配的托管内存。单位：MB</summary>
+    [DisplayName("GC累计分配")]
+    public UInt64 TotalAllocatedBytes { get; set; }
+#if NET8_0_OR_GREATER
+    /// <summary>GC 暂停累计时间。单位：毫秒</summary>
+    [DisplayName("GC累计暂停时间")]
+    public UInt64 TotalPauseDurationMs { get; set; }
+#endif
+    /// <summary>GC 代0收集次数</summary>
+    [DisplayName("GC Gen0 次数")]
+    public Int32 GcGen0Count { get; set; }
+
+    /// <summary>GC 代1收集次数</summary>
+    [DisplayName("GC Gen1 次数")]
+    public Int32 GcGen1Count { get; set; }
+
+    /// <summary>GC 代2收集次数</summary>
+    [DisplayName("GC Gen2 次数")]
+    public Int32 GcGen2Count { get; set; }
+
+    /// <summary>Server GC 是否启用</summary>
+    [DisplayName("是否使用Server GC")]
+    public Boolean IsServerGC { get; set; }
+
+    /// <summary>GC 延迟模式</summary>
+    [DisplayName("GC延迟模式")]
+    public GCLatencyMode? GCLatencyMode { get; set; }
+
+    /// <summary>GC 固定对象数</summary>
+    [DisplayName("固定对象数")]
+    public Int64 PinnedObjectsCount { get; set; }
+
+    /// <summary>终结队列挂起对象数</summary>
+    [DisplayName("终结挂起数")]
+    public Int64 FinalizationPendingCount { get; set; }
+
+    #endregion
+
+    #region 进程内存信息
+
+    /// <summary>进程虚拟内存使用量。单位：MB</summary>
+    [DisplayName("虚拟内存")]
+    public UInt64 VirtualMemory { get; set; }
+
+    /// <summary>进程私有内存使用量。单位：MB</summary>
+    [DisplayName("私有内存")]
+    public UInt64 PrivateMemory { get; set; }
+
+    /// <summary>进程峰值工作集。单位：MB</summary>
+    [DisplayName("峰值工作集")]
+    public UInt64 PeakWorkingSet { get; set; }
+
+    /// <summary>进程当前工作集。单位：MB</summary>
+    [DisplayName("当前工作集")]
+    public UInt64 WorkingSet { get; set; }
+
+    #endregion
+
+#endif
+
+
     #endregion
 
     #region 全局静态
@@ -569,9 +660,49 @@ public class MachineInfo : IExtend
         else if (Runtime.Linux)
             RefreshLinux();
 
+        // 刷新 GC 与进程内存信息
+        RefreshMemoryInfo();
+
         RefreshSpeed();
 
         Provider?.Refresh(this);
+    }
+    /// <summary>
+    /// 刷新 GC 与进程内存相关信息
+    /// </summary>
+    private void RefreshMemoryInfo()
+    {
+#if NET6_0_OR_GREATER
+        var info = GC.GetGCMemoryInfo();
+        var proc = Process.GetCurrentProcess();
+
+        // GC 信息（单位：MB）
+        HighMemoryLoadThreshold = (ulong)(info.HighMemoryLoadThresholdBytes / 1024 / 1024);
+        TotalAvailableMemory = (ulong)(info.TotalAvailableMemoryBytes / 1024 / 1024);
+        HeapSize = (ulong)(info.HeapSizeBytes / 1024 / 1024);
+        TotalMemory = (ulong)(GC.GetTotalMemory(false) / 1024 / 1024);
+        FragmentedBytes = (ulong)(info.FragmentedBytes / 1024 / 1024);
+        GCAvailableMemory = (ulong)(info.TotalAvailableMemoryBytes - info.MemoryLoadBytes) / 1024 / 1024;
+        CommittedBytes = (ulong)(info.TotalCommittedBytes / 1024 / 1024);
+        TotalAllocatedBytes = (ulong)(GC.GetTotalAllocatedBytes(false) / 1024 / 1024);
+#if NET8_0_OR_GREATER
+        TotalPauseDurationMs = (ulong)GC.GetTotalPauseDuration().TotalMilliseconds;
+#endif
+        GcGen0Count = GC.CollectionCount(0);
+        GcGen1Count = GC.CollectionCount(1);
+        GcGen2Count = GC.CollectionCount(2);
+        IsServerGC = System.Runtime.GCSettings.IsServerGC;
+        GCLatencyMode = System.Runtime.GCSettings.LatencyMode;
+        PinnedObjectsCount = info.PinnedObjectsCount;
+        FinalizationPendingCount = info.FinalizationPendingCount;
+
+        // 进程信息（单位：MB）
+        VirtualMemory = (ulong)(proc.VirtualMemorySize64 / 1024 / 1024);
+        PrivateMemory = (ulong)(proc.PrivateMemorySize64 / 1024 / 1024);
+        PeakWorkingSet = (ulong)(proc.PeakWorkingSet64 / 1024 / 1024);
+        WorkingSet = (ulong)(proc.WorkingSet64 / 1024 / 1024);
+
+#endif
     }
 
     private void RefreshWindows()
@@ -580,8 +711,8 @@ public class MachineInfo : IExtend
         ms.Init();
         if (GlobalMemoryStatusEx(ref ms))
         {
-            Memory = (ulong)(ms.ullTotalPhys / 1024.0);
-            AvailableMemory = (ulong)(ms.ullAvailPhys / 1024.0);
+            Memory = ms.ullTotalPhys / 1024 / 1024;
+            AvailableMemory = ms.ullAvailPhys / 1024 / 1024;
         }
 
         GetSystemTimes(out var idleTime, out var kernelTime, out var userTime);
@@ -675,28 +806,87 @@ public class MachineInfo : IExtend
 #endif
     }
 
+
+    /// <summary>
+    /// 🐳 容器内存使用
+    /// </summary>
+    /// <returns></returns>
+    private static (ulong Total, ulong Used) GetCGroupMemoryUsage()
+    {
+        try
+        {
+
+            string[] limitPaths = {
+            "/sys/fs/cgroup/memory/memory.limit_in_bytes", // cgroup v1
+            "/sys/fs/cgroup/memory.max"                    // cgroup v2
+        };
+
+            string[] usagePaths = {
+            "/sys/fs/cgroup/memory/memory.usage_in_bytes",  // cgroup v1
+            "/sys/fs/cgroup/memory.current"                 // cgroup v2
+        };
+
+            ulong total = ReadFirstAvailable(limitPaths);
+            ulong used = ReadFirstAvailable(usagePaths);
+
+            // 容器无内存限制时 total 通常是 2^63-1，忽略
+            if (total > (1UL << 60)) total = 0;
+
+            return (total, used);
+
+
+        }
+        catch (Exception)
+        {
+            return (0, 0);
+        }
+        static ulong ReadFirstAvailable(string[] paths)
+        {
+            foreach (var path in paths)
+            {
+                if (File.Exists(path))
+                {
+                    var content = File.ReadAllText(path).Trim();
+                    if (content == "max") return ulong.MaxValue;
+                    if (ulong.TryParse(content, out var value)) return value;
+                }
+            }
+            return 0;
+        }
+
+    }
+
     private void RefreshLinux()
     {
-        var dic = ReadInfo("/proc/meminfo");
-        if (dic != null)
+        var (totalMemory, usedMemory) = GetCGroupMemoryUsage();
+        if (totalMemory > 0 && usedMemory > 0 && totalMemory < ulong.MaxValue / 2)
         {
-            if (dic.TryGetValue("MemTotal", out var str) && !str.IsNullOrEmpty())
-                Memory = (UInt64)str.TrimEnd(" kB").ToLong();
-
-            ulong ma = 0;
-            if (dic.TryGetValue("MemAvailable", out str) && !str.IsNullOrEmpty())
+            Memory = totalMemory / 1024 / 1024;
+            AvailableMemory = (totalMemory - usedMemory) / 1024 / 1024;
+        }
+        else
+        {
+            var dic = ReadInfo("/proc/meminfo");
+            if (dic != null)
             {
-                ma = (UInt64)(str.TrimEnd(" kB").ToLong());
+                if (dic.TryGetValue("MemTotal", out var str) && !str.IsNullOrEmpty())
+                    Memory = (UInt64)str.TrimEnd(" kB").ToLong();
+
+                ulong ma = 0;
+                if (dic.TryGetValue("MemAvailable", out str) && !str.IsNullOrEmpty())
+                {
+                    ma = (UInt64)(str.TrimEnd(" kB").ToLong() / 1024);
+                }
+
+                //低于3.14内核的版本用 free+cache
+                var mf = (UInt64)(dic["MemFree"]?.TrimEnd(" kB").ToLong() / 1024 ?? 0);
+                var mc = (UInt64)(dic["Cached"]?.TrimEnd(" kB").ToLong() / 1024 ?? 0);
+                var bf = (UInt64)(dic["Buffers"]?.TrimEnd(" kB").ToLong() / 1024 ?? 0);
+
+                var free = mf + mc + bf;
+
+                AvailableMemory = ma > free ? ma : free;
             }
-
-            //低于3.14内核的版本用 free+cache
-            var mf = (UInt64)(dic["MemFree"]?.TrimEnd(" kB").ToLong() ?? 0);
-            var mc = (UInt64)(dic["Cached"]?.TrimEnd(" kB").ToLong() ?? 0);
-            var bf = (UInt64)(dic["Buffers"]?.TrimEnd(" kB").ToLong() ?? 0);
-
-            var free = mf + mc + bf;
-
-            AvailableMemory = ma > free ? ma : free;
         }
 
         // A2/A4温度获取，Buildroot，CPU温度和主板温度

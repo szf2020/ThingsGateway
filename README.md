@@ -1,11 +1,18 @@
 # ThingsGateway
 
-﻿
+[![star](https://gitee.com/ThingsGateway/ThingsGateway/badge/star.svg?theme=gvp)](https://gitee.com/ThingsGateway/ThingsGateway/stargazers) 
+[![star](https://img.shields.io/github/stars/ThingsGateway/ThingsGateway?logo=github)](https://github.com/ThingsGateway/ThingsGateway)
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/ThingsGateway/ThingsGateway)﻿
+[![NuGet(ThingsGateway)](https://img.shields.io/nuget/v/ThingsGateway.Foundation.svg?label=ThingsGateway)](https://www.nuget.org/packages/ThingsGateway.Foundation/)
+[![NuGet(ThingsGateway)](https://img.shields.io/nuget/dt/ThingsGateway.Foundation.svg)](https://www.nuget.org/packages/ThingsGateway.Foundation/)
+[![License](https://img.shields.io/badge/license-Apache%202-4EB1BA.svg)](https://thingsgateway.cn/docs/1)
+<a href="http://qm.qq.com/cgi-bin/qm/qr?_wv=1027&k=NnBjPO-8kcNFzo_RzSbdICflb97u2O1i&authKey=V1MI3iJtpDMHc08myszP262kDykbx2Yev6ebE4Me0elTe0P0IFAmtU5l7Sy5w0jx&noverify=0&group_code=605534569">
+<img src="https://img.shields.io/badge/QQ群-605534569-red" alt="QQ">
+</a>
 
 ## Introduction
-
 ﻿
-A cross-platform, high-performance edge data collection gateway based on net9.
+A cross-platform, high-performance edge data collection gateway based on net8/10.
 ﻿
 
 ## Documentation
@@ -29,7 +36,6 @@ Account: **SuperAdmin**
 Password: **111111**
 
 ﻿
-**In the upper-right corner, switch to the IoT Gateway module in the personal popup box**
 
 ## Docker
 

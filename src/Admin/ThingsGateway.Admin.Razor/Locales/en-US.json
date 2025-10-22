@@ -22,6 +22,9 @@
     "SetDefaultModule": "Set as default module"
   },
   "ThingsGateway.Admin.Razor.HardwareInfoPage": {
+    "GCMemoryInfoConfig": "GCMemoryInfoConfig(MB)",
+    "GCMemoryInfo": "GCMemoryInfo(MB)",
+    "GCAnalyzeInfo": "GCAnalyzeInfo",
     "AvailableDisk": "Available Disk",
     "AvailableMemory": "Available Memory",
     "CpuUsage": "CPU Usage",

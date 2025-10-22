@@ -94,6 +94,7 @@ public static class XTrace
 
     static XTrace()
     {
+        _ = Runtime.AppTickCount64;
         AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
         TaskScheduler.UnobservedTaskException += TaskScheduler_UnobservedTaskException;
         AppDomain.CurrentDomain.ProcessExit += OnProcessExit;

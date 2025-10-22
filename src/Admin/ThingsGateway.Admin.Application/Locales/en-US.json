@@ -21,7 +21,7 @@
     "UserNoModule": "This account has not been assigned a module. Please contact the administrator",
     "UserNull": "User {0} does not exist"
   },
-  
+
   "ThingsGateway.Admin.Application.BlazorAuthenticationHandler": {
     "UserExpire": "User expired, please login again"
   },
@@ -46,12 +46,44 @@
     "FileTypeError": "Not supported format {0}"
   },
   "ThingsGateway.Admin.Application.HardwareInfo": {
-    "Environment": "HostEnvironment",
-    "FrameworkDescription": ".NETFramework",
-    "OsArchitecture": "System Architecture",
-    "UpdateTime": "UpdateTime",
-    "UUID": "UUID"
+    "DriveInfo": "Current Disk Info",
+    "AppRunTotalMinute": "AppRunTotalMinute(min)",
+    "SystemRunTotalMinute": "SystemRunTotalMinute(min)",
+    "Environment": "Host Environment",
+    "FrameworkDescription": ".NET Framework",
+    "OsArchitecture": "OS Architecture",
+    "OSName": "OS Name",
+    "OSVersion": "OS Version",
+    "UUID": "UUID",
+    "Memory": "Total Memory",
+    "AvailableMemory": "Available Memory",
+    "CpuRate": "CPU Usage",
+    "Battery": "Battery Level",
+    "Temperature": "Temperature",
+    "Processor": "Processor Model",
+    "HighMemoryLoadThreshold": "GC High Memory Threshold",
+    "TotalAvailableMemory": "GC Total Available Memory",
+    "HeapSize": "Managed Heap Size",
+    "TotalMemory": "Managed Heap Used",
+    "FragmentedBytes": "Managed Heap Fragmented",
+    "GCAvailableMemory": "GC Available Memory",
+    "CommittedBytes": "GC Committed Bytes",
+    "TotalAllocatedBytes": "GC Total Allocated (MB)",
+    "TotalPauseDurationMs": "GC Total Pause Duration (ms)",
+    "GcGen0Count": "GC Gen0 Count",
+    "GcGen1Count": "GC Gen1 Count",
+    "GcGen2Count": "GC Gen2 Count",
+    "IsServerGC": "Server GC",
+    "GCLatencyMode": "GC Latency Mode",
+    "PinnedObjectsCount": "Pinned Objects Count",
+    "FinalizationPendingCount": "Finalization Pending Count",
+    "VirtualMemory": "Virtual Memory",
+    "PrivateMemory": "Private Memory",
+    "PeakWorkingSet": "Peak Working Set",
+    "WorkingSet": "Current Working Set",
+    "UpdateTime": "Update Time"
   },
+
   "ThingsGateway.Admin.Application.HardwareJob": {
     "GetHardwareInfoFail": "Get Hardwareinfo Fail"
   },

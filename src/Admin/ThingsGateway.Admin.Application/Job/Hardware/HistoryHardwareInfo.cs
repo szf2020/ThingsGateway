@@ -21,7 +21,7 @@ public class HistoryHardwareInfo
 
     /// <inheritdoc/>
     [SugarColumn(ColumnDescription = "内存")]
-    public int MemoryUsage { get; set; }
+    public UInt64 MemoryUsage { get; set; }
 
     /// <inheritdoc/>
     [SugarColumn(ColumnDescription = "CPU使用率")]

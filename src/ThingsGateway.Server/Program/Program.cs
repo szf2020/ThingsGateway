@@ -16,6 +16,7 @@ using System.Text;
 using ThingsGateway.Admin.Application;
 using ThingsGateway.DB;
 using ThingsGateway.NewLife;
+using ThingsGateway.NewLife.Json.Extension;
 using ThingsGateway.NewLife.Log;
 using ThingsGateway.SqlSugar;
 
@@ -27,6 +28,24 @@ public class Program
 
     public static async Task Main(string[] args)
     {
+        AppDomain.CurrentDomain.UnhandledException += (sender, e) =>
+        {
+            if (e.ExceptionObject is OutOfMemoryException)
+            {
+                try
+                {
+                    XTrace.WriteLine($"[OOM DETECTED]");
+                    XTrace.WriteLine(MachineInfo.GetCurrent().ToJsonNetString());
+                }
+                catch
+                {
+
+                }
+                
+            }
+        };
+
+
         await Task.Delay(2000).ConfigureAwait(false);
         //当前工作目录设为程序集的基目录
         System.IO.Directory.SetCurrentDirectory(AppContext.BaseDirectory);

@@ -8,12 +8,10 @@
 // QQ群：605534569
 // ------------------------------------------------------------------------------
 
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
 using System.Runtime.InteropServices;
 
-using ThingsGateway.Extension;
 using ThingsGateway.NewLife;
 using ThingsGateway.NewLife.Caching;
 using ThingsGateway.NewLife.Threading;
@@ -43,7 +41,7 @@ public class HardwareJob : IJob, IHardwareJob
     /// <summary>
     /// 运行信息获取
     /// </summary>
-    public HardwareInfo HardwareInfo { get; } = new();
+    public HardwareInfo HardwareInfo { get; private set; }
 
     /// <inheritdoc/>
     public HardwareInfoOptions HardwareInfoOptions { get; private set; }
@@ -76,9 +74,10 @@ public class HardwareJob : IJob, IHardwareJob
         {
             try
             {
-                if (HardwareInfo.MachineInfo == null)
+                    var machine = MachineInfo.GetCurrent();
+                if (HardwareInfo == null)
                 {
-                    HardwareInfo.MachineInfo = MachineInfo.GetCurrent();
+                    HardwareInfo=machine.AdaptHardwareInfo();
 
                     string currentPath = Directory.GetCurrentDirectory();
                     DriveInfo drive = new(Path.GetPathRoot(currentPath));
@@ -88,10 +87,9 @@ public class HardwareJob : IJob, IHardwareJob
                     HardwareInfo.DriveInfo = drive;
                     HardwareInfo.OsArchitecture = Environment.OSVersion.Platform.ToString() + " " + RuntimeInformation.OSArchitecture.ToString(); // 系统架构
                     HardwareInfo.FrameworkDescription = RuntimeInformation.FrameworkDescription; // NET框架
-                    HardwareInfo.Environment = App.HostEnvironment.IsDevelopment() ? "Development" : "Production";
-                    HardwareInfo.UUID = HardwareInfo.MachineInfo.UUID;
+                    HardwareInfo.Environment = App.HostEnvironment.EnvironmentName;
 
-                    HardwareInfo.UpdateTime = TimerX.Now.ToDefaultDateTimeFormat();
+                    HardwareInfo.UpdateTime = TimerX.Now;
                 }
             }
             catch
@@ -99,9 +97,12 @@ public class HardwareJob : IJob, IHardwareJob
             }
             try
             {
-                HardwareInfo.MachineInfo.Refresh();
-                HardwareInfo.UpdateTime = TimerX.Now.ToDefaultDateTimeFormat();
-                HardwareInfo.WorkingSet = (Environment.WorkingSet / 1024.0 / 1024.0).ToInt();
+                var machine = MachineInfo.GetCurrent();
+                machine.Refresh();
+                machine.AdaptHardwareInfo(HardwareInfo);
+                HardwareInfo.AppRunTotalMinute = (ulong)Runtime.AppTickCount64 / 1000 /60;
+                HardwareInfo.SystemRunTotalMinute = (ulong)Runtime.TickCount64 / 1000 /60;
+                HardwareInfo.UpdateTime = TimerX.Now;
                 error = false;
             }
             catch (Exception ex)
@@ -123,10 +124,10 @@ public class HardwareJob : IJob, IHardwareJob
                             {
                                 Date = TimerX.Now,
                                 DriveUsage = (100 - (HardwareInfo.DriveInfo.TotalFreeSpace * 100.00 / HardwareInfo.DriveInfo.TotalSize)).ToInt(),
-                                Battery = (HardwareInfo.MachineInfo.Battery * 100).ToInt(),
+                                Battery = (HardwareInfo.Battery * 100).ToInt(),
                                 MemoryUsage = (HardwareInfo.WorkingSet),
-                                CpuUsage = (HardwareInfo.MachineInfo.CpuRate * 100).ToInt(),
-                                Temperature = (HardwareInfo.MachineInfo.Temperature).ToInt(),
+                                CpuUsage = (HardwareInfo.CpuRate * 100).ToInt(),
+                                Temperature = (HardwareInfo.Temperature).ToInt(),
                             };
                             await _db.InsertableT(his).ExecuteCommandAsync(stoppingToken).ConfigureAwait(false);
                             MemoryCache.Remove(CacheKey);

@@ -105,37 +105,6 @@ internal class CacheManager
     }
 
     /// <summary>
-    /// 设置 App 开始时间
-    /// </summary>
-    public void SetStartTime() => SetStartTime(DateTimeOffset.Now);
-
-    /// <summary>
-    /// 设置 App 开始时间
-    /// </summary>
-    private void SetStartTime(DateTimeOffset startDateTimeOffset)
-    {
-        GetOrCreate("BootstrapBlazor_StartTime", entry =>
-        {
-            entry.Priority = CacheItemPriority.NeverRemove;
-            return startDateTimeOffset;
-        });
-    }
-
-    /// <summary>
-    /// 获取 App 开始时间
-    /// </summary>
-    /// <returns></returns>
-    public DateTimeOffset GetStartTime()
-    {
-        var ret = DateTimeOffset.MinValue;
-        if (Cache.TryGetValue("BootstrapBlazor_StartTime", out var v) && v is DateTimeOffset d)
-        {
-            ret = d;
-        }
-        return ret;
-    }
-
-    /// <summary>
     /// 获得 缓存数量
     /// </summary>
     public long Count

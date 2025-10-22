@@ -22,6 +22,10 @@
     "SetDefaultModule": "设置为默认模块"
   },
   "ThingsGateway.Admin.Razor.HardwareInfoPage": {
+    "GCMemoryInfoConfig": "GC配置信息(MB)",
+    "GCMemoryInfo": "GC内存信息(MB)",
+    "GCAnalyzeInfo": "GC统计",
+
     "AvailableDisk": "可用磁盘",
     "AvailableMemory": "可用内存",
     "CpuUsage": "CPU使用率",

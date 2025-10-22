@@ -180,6 +180,12 @@ public static class Runtime
     #endregion
 
     #region 扩展
+
+    public static Int64 AppStartTick = TickCount64;
+
+    /// <summary>软件启动以来的毫秒数</summary>
+    public static Int64 AppTickCount64 => TickCount64-AppStartTick;
+
 #if NETCOREAPP3_1_OR_GREATER
     /// <summary>系统启动以来的毫秒数</summary>
     public static Int64 TickCount64 => Environment.TickCount64;
@@ -195,6 +201,8 @@ public static class Runtime
         }
     }
 #endif
+
+
 
     /// <summary>获取当前UTC时间。基于全局时间提供者，在星尘应用中会屏蔽服务器时间差</summary>
     /// <returns></returns>
@@ -248,7 +256,7 @@ public static class Runtime
 
         return dic;
     }
-    #endregion
+#endregion
 
     #region 设置
     private static Boolean? _createConfigOnMissing;
