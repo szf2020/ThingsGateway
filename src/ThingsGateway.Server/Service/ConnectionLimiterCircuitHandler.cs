@@ -10,6 +10,8 @@
 
 using Microsoft.AspNetCore.Components.Server.Circuits;
 
+using System.Runtime;
+
 using ThingsGateway.Common;
 
 namespace ThingsGateway.Server;
@@ -22,6 +24,10 @@ public class ConnectionLimiterCircuitHandler : CircuitHandler
 
     public override Task OnCircuitOpenedAsync(Circuit circuit, CancellationToken cancellationToken)
     {
+        //主动触发垃圾回收，释放上个链路资源
+        GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
+        GC.Collect(2, GCCollectionMode.Forced, true, true);
+
         WebsiteOptions ??= App.GetOptions<WebsiteOptions>();
 
         if (!WebsiteOptions.BlazorConnectionLimitEnable)
