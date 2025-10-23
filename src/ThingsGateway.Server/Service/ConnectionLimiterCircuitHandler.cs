@@ -26,7 +26,10 @@ public class ConnectionLimiterCircuitHandler : CircuitHandler
     {
         //主动触发垃圾回收，释放上个链路资源
         GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
-        GC.Collect(2, GCCollectionMode.Forced, true, true);
+        GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, true, true);
+        GC.WaitForPendingFinalizers();
+        GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, true, true);
+
 
         WebsiteOptions ??= App.GetOptions<WebsiteOptions>();
 
