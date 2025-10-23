@@ -1,18 +1,18 @@
 <Project>
 
 	<PropertyGroup>
-		<PluginVersion>10.12.10</PluginVersion>
-		<ProPluginVersion>10.12.10</ProPluginVersion>
-		<DefaultVersion>10.12.10</DefaultVersion>
-		<AuthenticationVersion>10.11.6</AuthenticationVersion>
-		<SourceGeneratorVersion>10.11.6</SourceGeneratorVersion>
+		<PluginVersion>10.12.11</PluginVersion>
+		<ProPluginVersion>10.12.11</ProPluginVersion>
+		<DefaultVersion>10.12.11</DefaultVersion>
+		<AuthenticationVersion>10.11.7</AuthenticationVersion>
+		<SourceGeneratorVersion>10.11.7</SourceGeneratorVersion>
 		<NET8Version>8.0.21</NET8Version>
 		<NET10Version>10.0.0-rc.2.25502.107</NET10Version>
 		<SatelliteResourceLanguages>zh-Hans;en-US</SatelliteResourceLanguages>
 		<IsTrimmable>false</IsTrimmable>
 		<ManagementProPluginVersion>10.11.87</ManagementProPluginVersion>
 		<ManagementPluginVersion>10.11.87</ManagementPluginVersion>
-		<TSVersion>4.0.0-beta.140</TSVersion>
+		<TSVersion>4.0.0-rc.1</TSVersion>
 		
 		
 	</PropertyGroup>

@@ -113,6 +113,28 @@ public partial class ManagementTask : AsyncDisposableObject
                .ConfigurePlugins(a =>
                {
                    a.UseTcpSessionCheckClear();
+
+
+                   a.UseReconnection<TcpDmtpClient>(options =>
+                   {
+                       options.TryCount = -1;
+                       options.PollingInterval = TimeSpan.FromMilliseconds(_managementOptions.HeartbeatInterval);
+                       options.PrintLog = true;
+                       options.CheckAction = async (c, count) =>
+                       {
+                           using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+                           if ((await c.PingAsync(cts.Token).ConfigureAwait(false)).IsSuccess)
+                           {
+                               return ConnectionCheckResult.Alive;
+                           }
+                           else
+                           {
+                               return ConnectionCheckResult.Dead;
+                           }
+                       };
+
+                   });
+
                    a.UseDmtpRpc(a => a.ConfigureDefaultSerializationSelector(b =>
                    {
                        b.UseSystemTextJson(json =>
@@ -130,10 +152,6 @@ public partial class ManagementTask : AsyncDisposableObject
 
                    a.Add<FilePlugin>();
 
-
-                   a.UseDmtpHeartbeat()//使用Dmtp心跳
-                   .SetTick(TimeSpan.FromMilliseconds(_managementOptions.HeartbeatInterval))
-                   .SetMaxFailCount(3);
 
                    a.AddDmtpCreatedChannelPlugin(async () =>
                    {
@@ -194,9 +212,6 @@ public partial class ManagementTask : AsyncDisposableObject
 
                    a.Add<FilePlugin>();
 
-                   a.UseDmtpHeartbeat()//使用Dmtp心跳
-                   .SetTick(TimeSpan.FromMilliseconds(_managementOptions.HeartbeatInterval))
-                   .SetMaxFailCount(3);
                });
 
         await tcpDmtpService.SetupAsync(config).ConfigureAwait(false);

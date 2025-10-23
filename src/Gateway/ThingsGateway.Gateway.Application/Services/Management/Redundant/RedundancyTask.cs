@@ -345,7 +345,25 @@ internal sealed class RedundancyTask : IRpcDriver, IAsyncDisposable
                .ConfigurePlugins(a =>
                {
                    a.UseTcpSessionCheckClear();
+                   a.UseReconnection<TcpDmtpClient>(options =>
+                   {
+                       options.TryCount = -1;
+                       options.PollingInterval = TimeSpan.FromMilliseconds(redundancy.HeartbeatInterval);
+                       options.PrintLog = true;
+                       options.CheckAction = async (c, count) =>
+                       {
+                           using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+                           if ((await c.PingAsync(cts.Token).ConfigureAwait(false)).IsSuccess)
+                           {
+                               return ConnectionCheckResult.Alive;
+                           }
+                           else
+                           {
+                               return ConnectionCheckResult.Dead;
+                           }
+                       };
 
+                   });
                    a.UseDmtpRpc(a => a.ConfigureDefaultSerializationSelector(b =>
                    {
                        b.UseSystemTextJson(json =>
@@ -358,9 +376,7 @@ internal sealed class RedundancyTask : IRpcDriver, IAsyncDisposable
                            json.Converters.Add(new JArraySystemTextJsonConverter());
                        });
                    }));
-                   a.UseDmtpHeartbeat()//使用Dmtp心跳
-                   .SetTick(TimeSpan.FromMilliseconds(redundancy.HeartbeatInterval))
-                   .SetMaxFailCount(redundancy.MaxErrorCount);
+
 
                });
 
@@ -405,9 +421,7 @@ internal sealed class RedundancyTask : IRpcDriver, IAsyncDisposable
                            json.Converters.Add(new JArraySystemTextJsonConverter());
                        });
                    }));
-                   a.UseDmtpHeartbeat()//使用Dmtp心跳
-                   .SetTick(TimeSpan.FromMilliseconds(redundancy.HeartbeatInterval))
-                   .SetMaxFailCount(redundancy.MaxErrorCount);
+
                });
 
         await tcpDmtpService.SetupAsync(config).ConfigureAwait(false);

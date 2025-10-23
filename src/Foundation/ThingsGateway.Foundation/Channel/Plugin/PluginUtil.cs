@@ -97,13 +97,15 @@ public static class PluginUtil
         {
             action += a =>
             {
-                a.UseTcpSessionCheckClear()
-        .SetCheckClearType(CheckClearType.All)
-        .SetTick(TimeSpan.FromMilliseconds(channelOptions.CheckClearTime))
-        .SetOnClose((c, t) =>
-        {
-            return c.CloseAsync($"{channelOptions.CheckClearTime}ms Timeout");
-        });
+                a.UseTcpSessionCheckClear(options =>
+                {
+                    options.CheckClearType = CheckClearType.All;
+                    options.Tick = TimeSpan.FromMilliseconds(channelOptions.CheckClearTime);
+                    options.OnClose = (c, t) =>
+                    {
+                        return c.CloseAsync($"{channelOptions.CheckClearTime}ms Timeout");
+                    };
+                });
             };
         }
         return action;
