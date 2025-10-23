@@ -7,7 +7,6 @@ using System.Runtime.Versioning;
 using System.Security;
 
 using ThingsGateway.NewLife.Collections;
-using ThingsGateway.NewLife.Data;
 using ThingsGateway.NewLife.Log;
 using ThingsGateway.NewLife.Model;
 using ThingsGateway.NewLife.Reflection;
@@ -682,7 +681,7 @@ public class MachineInfo
         HeapSize = (ulong)(info.HeapSizeBytes / 1024 / 1024);
         TotalMemory = (ulong)(GC.GetTotalMemory(false) / 1024 / 1024);
         FragmentedBytes = (ulong)(info.FragmentedBytes / 1024 / 1024);
-        GCAvailableMemory = (ulong)(info.TotalAvailableMemoryBytes - info.MemoryLoadBytes) / 1024 / 1024;
+        GCAvailableMemory = (ulong)Math.Max(0, (info.TotalAvailableMemoryBytes - info.MemoryLoadBytes) / 1024 / 1024);
         CommittedBytes = (ulong)(info.TotalCommittedBytes / 1024 / 1024);
         TotalAllocatedBytes = (ulong)(GC.GetTotalAllocatedBytes(false) / 1024 / 1024);
 #if NET8_0_OR_GREATER

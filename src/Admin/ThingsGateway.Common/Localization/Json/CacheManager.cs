@@ -14,6 +14,9 @@ using System.ComponentModel.DataAnnotations;
 
 using ThingsGateway.Common.Extension;
 
+using Swashbuckle.AspNetCore.SwaggerGen;
+
+
 #if NET8_0_OR_GREATER
 using System.Collections.Frozen;
 #endif
@@ -255,8 +258,15 @@ internal class CacheManager
     /// </summary>
     /// <param name="assembly">Assembly 程序集实例</param>
     /// <param name="typeName">类型名称</param>
-    public static IEnumerable<LocalizedString>? GetAllStringsByTypeName(Assembly assembly, string typeName)
+    public static FrozenSet<LocalizedString>? GetAllStringsByTypeName(Assembly assembly, string typeName)
         => GetJsonStringByTypeName(GetJsonLocalizationOption(), assembly, typeName, CultureInfo.CurrentUICulture.Name);
+    /// <summary>
+    /// 获取指定文化本地化资源集合
+    /// </summary>
+    /// <param name="assembly">Assembly 程序集实例</param>
+    /// <param name="typeName">类型名称</param>
+    public static FrozenDictionary<string, string>? GetAllHasValueStringsByTypeName(Assembly assembly, string typeName)
+        => GetHasValueJsonStringByTypeName(GetJsonLocalizationOption(), assembly, typeName, CultureInfo.CurrentUICulture.Name);
 
     /// <summary>
     /// 通过指定程序集获取所有本地化信息键值集合
@@ -267,7 +277,7 @@ internal class CacheManager
     /// <param name="cultureName">cultureName 未空时使用 CultureInfo.CurrentUICulture.Name</param>
     /// <param name="forceLoad">默认 false 使用缓存值 设置 true 时内部强制重新加载</param>
     /// <returns></returns>
-    public static IEnumerable<LocalizedString>? GetJsonStringByTypeName(JsonLocalizationOptions option, Assembly assembly, string typeName, string? cultureName = null, bool forceLoad = false)
+    public static FrozenSet<LocalizedString>? GetJsonStringByTypeName(JsonLocalizationOptions option, Assembly assembly, string typeName, string? cultureName = null, bool forceLoad = false)
     {
         if (assembly.IsDynamic)
         {
@@ -277,13 +287,15 @@ internal class CacheManager
         cultureName ??= CultureInfo.CurrentUICulture.Name;
         if (string.IsNullOrEmpty(cultureName))
         {
-            return [];
+            return null;
         }
 
         var key = $"{CacheKeyPrefix}-{nameof(GetJsonStringByTypeName)}-{assembly.GetUniqueName()}-{cultureName}";
+        var typeKey = $"{CacheKeyPrefix}-{nameof(GetJsonStringByTypeName)}-{assembly.GetUniqueName()}-{typeName}-{cultureName}";
         if (forceLoad)
         {
             Instance.Cache.Remove(key);
+            Instance.Cache.Remove(typeKey);
         }
 
         var localizedItems = Instance.GetOrCreate(key, entry =>
@@ -304,16 +316,77 @@ internal class CacheManager
             return items.ToHashSet();
 #endif
         });
-        return localizedItems.Where(item => item.SearchedLocation!.Equals(typeName, StringComparison.OrdinalIgnoreCase));
-    }
 
+        var typeLocalizedItems = Instance.GetOrCreate(typeKey, entry =>
+        {
+            return localizedItems.Where(item => item.SearchedLocation!.Equals(typeName, StringComparison.OrdinalIgnoreCase)).ToFrozenSet();
+        });
+        return typeLocalizedItems;
+    }
     /// <summary>
-    /// 通过 ILocalizationResolve 接口实现类获得本地化键值集合
+    /// 通过指定程序集获取所有本地化信息键值集合
     /// </summary>
-    /// <param name="typeName"></param>
-    /// <param name="includeParentCultures"></param>
+    /// <param name="option">JsonLocalizationOptions 实例</param>
+    /// <param name="assembly">Assembly 程序集实例</param>
+    /// <param name="typeName">类型名称</param>
+    /// <param name="cultureName">cultureName 未空时使用 CultureInfo.CurrentUICulture.Name</param>
+    /// <param name="forceLoad">默认 false 使用缓存值 设置 true 时内部强制重新加载</param>
     /// <returns></returns>
-    public static IEnumerable<LocalizedString> GetTypeStringsFromResolve(string typeName, bool includeParentCultures = true) => Provider.GetRequiredService<ILocalizationResolve>().GetAllStringsByType(typeName, includeParentCultures);
+    public static FrozenDictionary<string, string>? GetHasValueJsonStringByTypeName(JsonLocalizationOptions option, Assembly assembly, string typeName, string? cultureName = null, bool forceLoad = false)
+    {
+        if (assembly.IsDynamic)
+        {
+            return null;
+        }
+
+        cultureName ??= CultureInfo.CurrentUICulture.Name;
+        if (string.IsNullOrEmpty(cultureName))
+        {
+            return null;
+        }
+
+        var key = $"{CacheKeyPrefix}-{nameof(GetJsonStringByTypeName)}-{assembly.GetUniqueName()}-{cultureName}";
+
+
+        var typeKey = $"{CacheKeyPrefix}-{nameof(GetHasValueJsonStringByTypeName)}-{assembly.GetUniqueName()}-{typeName}-{cultureName}";
+        if (forceLoad)
+        {
+            Instance.Cache.Remove(key);
+            Instance.Cache.Remove(typeKey);
+        }
+
+        var localizedItems = Instance.GetOrCreate(key, entry =>
+        {
+            var sections = option.GetJsonStringFromAssembly(assembly, cultureName);
+            var items = sections.SelectMany(section => section.GetChildren().Select(kv =>
+            {
+                var value = kv.Value;
+                if (value == null && option.UseKeyWhenValueIsNull == true)
+                {
+                    value = kv.Key;
+                }
+                return new LocalizedString(kv.Key, value ?? "", false, section.Key);
+            }));
+#if NET8_0_OR_GREATER
+            return items.ToFrozenSet();
+#else
+            return items.ToHashSet();
+#endif
+        });
+
+        var typeLocalizedItems = Instance.GetOrCreate(typeKey, entry =>
+        {
+            return localizedItems.Where(item => item.SearchedLocation!.Equals(typeName, StringComparison.OrdinalIgnoreCase) && !item.ResourceNotFound).ToFrozenDictionary(a => a.Name, a => a.Value);
+        });
+        return typeLocalizedItems;
+    }
+    ///// <summary>
+    ///// 通过 ILocalizationResolve 接口实现类获得本地化键值集合
+    ///// </summary>
+    ///// <param name="typeName"></param>
+    ///// <param name="includeParentCultures"></param>
+    ///// <returns></returns>
+    //public static IEnumerable<LocalizedString> GetTypeStringsFromResolve(string typeName, bool includeParentCultures = true) => Provider.GetRequiredService<ILocalizationResolve>().GetAllStringsByType(typeName, includeParentCultures);
     #endregion
 
     #region DisplayName
