@@ -694,8 +694,12 @@ namespace ThingsGateway.SqlSugar
             var enumerator = table.GetEnumerator();
             while (enumerator.MoveNext())
             {
-                var cur = enumerator.Current;
-                yield return cur.Value.Item2[rowIndex];
+                var kvp = enumerator.Current;
+                var list = kvp.Value.Item2;
+                if (list != null && rowIndex < list.Count)
+                    yield return list[rowIndex];
+                else
+                    yield return new DataInfos { ColumnName = kvp.Key, Value = null };
             }
 
         }

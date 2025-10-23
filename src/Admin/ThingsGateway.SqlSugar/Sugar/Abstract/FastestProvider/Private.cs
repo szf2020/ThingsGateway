@@ -201,6 +201,7 @@ namespace ThingsGateway.SqlSugar
             {
                 foreach (var column in columns)
                 {
+
                     if (column.IsIgnore)
                     {
                         continue;
@@ -210,6 +211,12 @@ namespace ThingsGateway.SqlSugar
                     {
                         name = column.PropertyName;
                     }
+                    if (!results.TryGetValue(name, out var tuple) || tuple.Item2 == null)
+                    {
+                        // 某些列可能不在 DataTable 中（例如数据库多了列）
+                        continue;
+                    }
+
                     var value = ValueConverter(column, GetValue(item, column));
                     if (column.SqlParameterDbType != null && column.SqlParameterDbType is Type && UtilMethods.HasInterface((Type)column.SqlParameterDbType, typeof(ISugarDataConverter)))
                     {
