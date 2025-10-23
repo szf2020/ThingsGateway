@@ -699,7 +699,7 @@ namespace ThingsGateway.SqlSugar
                 if (list != null && rowIndex < list.Count)
                     yield return list[rowIndex];
                 else
-                    yield return new DataInfos { ColumnName = kvp.Key, Value = null };
+                    yield return new DataInfos { ColumnName = kvp.Key, Value = DBNull.Value };
             }
 
         }
