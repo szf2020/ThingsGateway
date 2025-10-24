@@ -25,13 +25,11 @@ public class TcpSessionClientChannel : TcpSessionClient, IClientChannel
     public TcpSessionClientChannel()
     {
     }
-    private bool logSet;
     /// <inheritdoc/>
     public void SetDataHandlingAdapterLogger(ILog log)
     {
-        if (!logSet && DataHandlingAdapter is IDeviceDataHandleAdapter handleAdapter)
+        if (DataHandlingAdapter is IDeviceDataHandleAdapter handleAdapter)
         {
-            logSet = true;
             handleAdapter.Logger = log;
         }
     }
@@ -41,12 +39,8 @@ public class TcpSessionClientChannel : TcpSessionClient, IClientChannel
         if (adapter is SingleStreamDataHandlingAdapter singleStreamDataHandlingAdapter)
             SetAdapter(singleStreamDataHandlingAdapter);
 
-        logSet = false;
     }
-    public void LogSeted(bool logSeted)
-    {
-        logSet = logSeted;
-    }
+
     public void ResetSign(int minSign = 1, int maxSign = ushort.MaxValue - 1)
     {
         var pool = WaitHandlePool;

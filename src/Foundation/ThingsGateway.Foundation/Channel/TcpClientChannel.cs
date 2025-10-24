@@ -34,12 +34,10 @@ public class TcpClientChannel : TcpClient, IClientChannel
         WaitHandlePool = new WaitHandlePool<MessageBase>(minSign, maxSign);
         pool?.CancelAll();
     }
-    private bool logSet;
     public void SetDataHandlingAdapterLogger(ILog log)
     {
-        if (!logSet && DataHandlingAdapter is IDeviceDataHandleAdapter handleAdapter)
+        if (DataHandlingAdapter is IDeviceDataHandleAdapter handleAdapter)
         {
-            logSet = true;
             handleAdapter.Logger = log;
         }
     }
@@ -49,12 +47,8 @@ public class TcpClientChannel : TcpClient, IClientChannel
         if (adapter is SingleStreamDataHandlingAdapter singleStreamDataHandlingAdapter)
             SetAdapter(singleStreamDataHandlingAdapter);
 
-        logSet = false;
     }
-    public void LogSeted(bool logSeted)
-    {
-        logSet = logSeted;
-    }
+
     /// <inheritdoc/>
     public ChannelReceivedEventHandler ChannelReceived { get; } = new();
 

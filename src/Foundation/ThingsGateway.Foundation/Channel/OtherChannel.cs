@@ -80,13 +80,11 @@ public class OtherChannel : SetupConfigObject, IClientChannel
 
 
 
-    private bool logSet;
     /// <inheritdoc/>
     public void SetDataHandlingAdapterLogger(ILog log)
     {
-        if (!logSet && ReadOnlyDataHandlingAdapter is IDeviceDataHandleAdapter handleAdapter)
+        if (ReadOnlyDataHandlingAdapter is IDeviceDataHandleAdapter handleAdapter)
         {
-            logSet = true;
             handleAdapter.Logger = log;
         }
     }
@@ -96,12 +94,8 @@ public class OtherChannel : SetupConfigObject, IClientChannel
         if (adapter is SingleStreamDataHandlingAdapter singleStreamDataHandlingAdapter)
             SetAdapter(singleStreamDataHandlingAdapter);
 
-        logSet = false;
     }
-    public void LogSeted(bool logSeted)
-    {
-        logSet = logSeted;
-    }
+
     /// <summary>
     /// 设置数据处理适配器。
     /// </summary>

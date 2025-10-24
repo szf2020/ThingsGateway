@@ -52,13 +52,11 @@ public class SerialPortChannel : SerialPortClient, IClientChannel
     /// <inheritdoc/>
     public DataHandlingAdapter ReadOnlyDataHandlingAdapter => ProtectedDataHandlingAdapter;
 
-    private bool logSet;
     /// <inheritdoc/>
     public void SetDataHandlingAdapterLogger(ILog log)
     {
-        if (!logSet && ProtectedDataHandlingAdapter is IDeviceDataHandleAdapter handleAdapter)
+        if (ProtectedDataHandlingAdapter is IDeviceDataHandleAdapter handleAdapter)
         {
-            logSet = true;
             handleAdapter.Logger = log;
         }
     }
@@ -68,13 +66,9 @@ public class SerialPortChannel : SerialPortClient, IClientChannel
         if (adapter is SingleStreamDataHandlingAdapter singleStreamDataHandlingAdapter)
             SetAdapter(singleStreamDataHandlingAdapter);
 
-        logSet = false;
     }
 
-    public void LogSeted(bool logSeted)
-    {
-        logSet = logSeted;
-    }
+
 
 
     /// <inheritdoc/>

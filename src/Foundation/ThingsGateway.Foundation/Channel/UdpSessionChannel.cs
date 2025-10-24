@@ -30,27 +30,21 @@ public class UdpSessionChannel : UdpSession, IClientChannel
         ResetSign();
     }
     public override TouchSocketConfig Config => base.Config ?? ChannelOptions.Config;
-    private bool logSet;
     /// <inheritdoc/>
     public void SetDataHandlingAdapterLogger(ILog log)
     {
-        if (!logSet && DataHandlingAdapter is IDeviceDataHandleAdapter handleAdapter)
+        if (DataHandlingAdapter is IDeviceDataHandleAdapter handleAdapter)
         {
-            logSet = true;
             handleAdapter.Logger = log;
         }
     }
-    public void LogSeted(bool logSeted)
-    {
-        logSet = logSeted;
-    }
+
     /// <inheritdoc/>
     public void SetDataHandlingAdapter(DataHandlingAdapter adapter)
     {
         if (adapter is UdpDataHandlingAdapter udpDataHandlingAdapter)
             SetAdapter(udpDataHandlingAdapter);
 
-        logSet = false;
     }
 
 

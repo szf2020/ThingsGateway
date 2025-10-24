@@ -1060,10 +1060,6 @@ public abstract class DeviceBase : AsyncAndSyncDisposableObject, IDevice
                 }
 
                 Channel.Collects.Remove(this);
-                if (Channel is IClientChannel clientChannel)
-                {
-                    clientChannel.LogSeted(false);
-                }
 
             }
         }
@@ -1118,10 +1114,6 @@ public abstract class DeviceBase : AsyncAndSyncDisposableObject, IDevice
 
             Channel.Collects.Remove(this);
 
-            if (Channel is IClientChannel clientChannel)
-            {
-                clientChannel.LogSeted(false);
-            }
 
         }
 
