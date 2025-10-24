@@ -28,8 +28,7 @@ public class ConnectionLimiterCircuitHandler : CircuitHandler
         GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
         GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, true, true);
         GC.WaitForPendingFinalizers();
-        GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, true, true);
-
+        GC.Collect(1, GCCollectionMode.Optimized, blocking: false, compacting: false);
 
         WebsiteOptions ??= App.GetOptions<WebsiteOptions>();
 
