@@ -14,8 +14,6 @@ using System.ComponentModel.DataAnnotations;
 
 using ThingsGateway.Common.Extension;
 
-using Swashbuckle.AspNetCore.SwaggerGen;
-
 
 #if NET8_0_OR_GREATER
 using System.Collections.Frozen;

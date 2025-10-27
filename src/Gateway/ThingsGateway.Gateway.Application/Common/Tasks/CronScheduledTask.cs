@@ -59,14 +59,15 @@ public class CronScheduledTask : DisposeBase, IScheduledTask
         }
         return false;
     }
+    private static volatile int NextId = 0;
     public void Start()
     {
         _timer?.Dispose();
         if (Check()) return;
         if (_taskAction != null)
-            _timer = new TimerX(TimerCallback, _state, _interval, nameof(CronScheduledTask)) { Async = true, Reentrant = false };
+            _timer = new TimerX(TimerCallback, _state, _interval, $"{nameof(CronScheduledTask)}{(Interlocked.Increment(ref NextId) / 100)}") { Async = true, Reentrant = false };
         else if (_taskFunc != null || _valueTaskFunc != null)
-            _timer = new TimerX(TimerCallbackAsync, _state, _interval, nameof(CronScheduledTask)) { Async = true, Reentrant = false };
+            _timer = new TimerX(TimerCallbackAsync, _state, _interval, $"{nameof(CronScheduledTask)}{(Interlocked.Increment(ref NextId) / 100)}") { Async = true, Reentrant = false };
     }
 
     private ValueTask TimerCallbackAsync(object? state)

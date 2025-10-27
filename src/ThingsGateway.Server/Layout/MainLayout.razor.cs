@@ -239,4 +239,33 @@ public partial class MainLayout : IDisposable
         };
         await DialogService.Show(op);
     }
+
+
+    /// <summary>
+    /// 显示投票弹窗
+    /// </summary>
+    /// <returns></returns>
+    public async Task ShowGitee()
+    {
+
+        await DialogService.Show(new DialogOption()
+        {
+            IsScrolling = false,
+            ShowFooter = false,
+            Title = "Gitee 评选活动",
+            BodyTemplate = BootstrapDynamicComponent.CreateComponent<Gitee2025opensource>().Render(),
+            ShowCloseButton = false,
+            ShowHeaderCloseButton = false,
+            Size = Size.Small,
+        });
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (WebsiteOption.Value.Demo)
+        {
+            await ShowGitee();
+        }
+        await base.OnAfterRenderAsync(firstRender);
+    }
 }

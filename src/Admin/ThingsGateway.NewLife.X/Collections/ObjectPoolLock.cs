@@ -8,7 +8,7 @@ namespace ThingsGateway.NewLife.Collections;
 /// 文档 https://newlifex.com/core/object_pool
 /// </remarks>
 /// <typeparam name="T"></typeparam>
-public class ObjectPoolLock<T> : DisposeBase, IPool<T> where T : class
+public class ObjectPoolLock<T> : DisposeBase where T : class
 {
     #region 属性
     /// <summary>名称</summary>
@@ -21,11 +21,6 @@ public class ObjectPoolLock<T> : DisposeBase, IPool<T> where T : class
     private Int32 _BusyCount;
     /// <summary>繁忙个数</summary>
     public Int32 BusyCount => _BusyCount;
-
-    /// <summary>最大个数。默认0，0表示无上限</summary>
-    public Int32 Max { get; set; } = 0;
-
-    private readonly object _syncRoot = new();
 
     /// <summary>基础空闲集合。只保存最小个数，最热部分</summary>
     private readonly Stack<T> _free = new();
@@ -73,7 +68,7 @@ public class ObjectPoolLock<T> : DisposeBase, IPool<T> where T : class
             if (_inited) return;
             _inited = true;
 
-            WriteLog($"Init {typeof(T).FullName} Max={Max}");
+            WriteLog($"Init {typeof(T).FullName}");
         }
     }
     #endregion
@@ -86,7 +81,7 @@ public class ObjectPoolLock<T> : DisposeBase, IPool<T> where T : class
         T? pi = null;
         do
         {
-            lock (_syncRoot)
+            lock (lockThis)
             {
                 if (_free.Count > 0)
                 {
@@ -95,13 +90,6 @@ public class ObjectPoolLock<T> : DisposeBase, IPool<T> where T : class
                 }
                 else
                 {
-                    if (Max > 0 && BusyCount >= Max)
-                    {
-                        var msg = $"申请失败，已有 {BusyCount:n0} 达到或超过最大值 {Max:n0}";
-                        WriteLog("Acquire Max " + msg);
-                        throw new Exception(Name + " " + msg);
-                    }
-
                     pi = OnCreate();
                     if (BusyCount == 0) Init();
 
@@ -114,7 +102,7 @@ public class ObjectPoolLock<T> : DisposeBase, IPool<T> where T : class
             // 如果拿到的对象不可用，则重新借
         } while (pi == null || !OnGet(pi));
 
-        lock (_syncRoot)
+        lock (lockThis)
         {
             // 加入繁忙集合
             _busy.Add(pi);
@@ -129,16 +117,12 @@ public class ObjectPoolLock<T> : DisposeBase, IPool<T> where T : class
     /// <returns></returns>
     protected virtual Boolean OnGet(T value) => true;
 
-    /// <summary>申请资源包装项，Dispose时自动归还到池中</summary>
-    /// <returns></returns>
-    public PoolItem<T> GetItem() => new(this, Get());
-
     /// <summary>归还</summary>
     /// <param name="value"></param>
     public virtual Boolean Return(T value)
     {
         if (value == null) return false;
-        lock (_syncRoot)
+        lock (lockThis)
         {
             // 从繁忙队列找到并移除缓存项
             if (!_busy.Remove(value))
@@ -163,7 +147,7 @@ public class ObjectPoolLock<T> : DisposeBase, IPool<T> where T : class
         {
             return false;
         }
-        lock (_syncRoot)
+        lock (lockThis)
         {
             _free.Push(value);
             _FreeCount++;
@@ -180,18 +164,9 @@ public class ObjectPoolLock<T> : DisposeBase, IPool<T> where T : class
     /// <summary>清空已有对象</summary>
     public virtual Int32 Clear()
     {
-        var count = _FreeCount + _BusyCount;
-
-        //_busy.Clear();
-        //_BusyCount = 0;
-
-        //_free.Clear();
-        //while (_free2.TryDequeue(out var rs)) ;
-        //_FreeCount = 0;
-
-        lock (_syncRoot)
+        lock (lockThis)
         {
-            count = _FreeCount + _BusyCount;
+            var count = _FreeCount + _BusyCount;
 
             while (_free.Count > 0)
             {
@@ -207,9 +182,9 @@ public class ObjectPoolLock<T> : DisposeBase, IPool<T> where T : class
             }
             _busy.Clear();
             _BusyCount = 0;
+            return count;
         }
 
-        return count;
     }
 
     /// <summary>销毁</summary>

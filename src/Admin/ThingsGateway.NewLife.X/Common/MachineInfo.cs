@@ -1,7 +1,9 @@
 ﻿using System.ComponentModel;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Net.NetworkInformation;
 using System.Reflection;
+using System.Runtime;
 using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 using System.Security;
@@ -12,9 +14,6 @@ using ThingsGateway.NewLife.Model;
 using ThingsGateway.NewLife.Reflection;
 using ThingsGateway.NewLife.Serialization;
 using ThingsGateway.NewLife.Windows;
-
-using System.Diagnostics;
-using System.Runtime;
 
 
 #if NETFRAMEWORK

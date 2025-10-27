@@ -208,7 +208,7 @@ public class Startup : AppStartup
 
             var websiteOptions = App.GetConfig<WebsiteOptions>("Website");
 
-             services.AddSingleton<CircuitHandler, ConnectionLimiterCircuitHandler>();
+            services.AddSingleton<CircuitHandler, ConnectionLimiterCircuitHandler>();
             if (websiteOptions.Demo)
             {
                 authenticationBuilder.AddOAuth<GiteeOAuthOptions, AdminOAuthHandler<GiteeOAuthOptions>>("Gitee", "Gitee", options =>

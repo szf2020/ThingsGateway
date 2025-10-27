@@ -430,7 +430,7 @@ public abstract partial class CollectBase : DriverBase
 
                 readErrorCount++;
                 if (@this.LogMessage?.LogLevel <= TouchSocket.Core.LogLevel.Trace)
-                    @this.LogMessage?.Trace(string.Format("{0} - Collection [{1} - {2}] failed - {3}", @this.DeviceName, variableSourceRead?.RegisterAddress, variableSourceRead?.Length, readResult.ErrorMessage));
+                    @this.LogMessage?.Trace(string.Format("{0} - Failed to collect data [{1} - {2}] - {3}", @this.DeviceName, variableSourceRead?.RegisterAddress, variableSourceRead?.Length, readResult.ErrorMessage));
 
                 //if (LogMessage?.LogLevel <= TouchSocket.Core.LogLevel.Trace)
                 //    LogMessage?.Trace(string.Format("{0} - Collecting [{1} - {2}]", DeviceName, variableSourceRead?.RegisterAddress, variableSourceRead?.Length));
@@ -450,7 +450,7 @@ public abstract partial class CollectBase : DriverBase
             {
                 // 读取成功时记录日志并增加成功计数器
                 if (@this.LogMessage?.LogLevel <= TouchSocket.Core.LogLevel.Trace)
-                    @this.LogMessage?.Trace(string.Format("{0} - Collection [{1} - {2}] data succeeded {3}", @this.DeviceName, variableSourceRead?.RegisterAddress, variableSourceRead?.Length, readResult.Content.Span.ToHexString(' ')));
+                    @this.LogMessage?.Trace(string.Format("{0} - Collected [{1} - {2}] data successfully {3}", @this.DeviceName, variableSourceRead?.RegisterAddress, variableSourceRead?.Length, readResult.Content.Span.ToHexString(' ')));
                 @this.CurrentDevice.SetDeviceStatus(TimerX.Now, null);
             }
             else
@@ -475,7 +475,7 @@ public abstract partial class CollectBase : DriverBase
                     if (!cancellationToken.IsCancellationRequested)
                     {
                         if (@this.LogMessage?.LogLevel <= TouchSocket.Core.LogLevel.Trace)
-                            @this.LogMessage?.Trace(string.Format("{0} - Collection [{1} - {2}] data failed - {3}", @this.DeviceName, variableSourceRead?.RegisterAddress, variableSourceRead?.Length, readResult.ErrorMessage));
+                            @this.LogMessage?.Trace(string.Format("{0} - Failed to collect data [{1} - {2}] - {3}", @this.DeviceName, variableSourceRead?.RegisterAddress, variableSourceRead?.Length, readResult.ErrorMessage));
                     }
                 }
 
@@ -566,10 +566,24 @@ public abstract partial class CollectBase : DriverBase
                     {
                         foreach (var item in varRead)
                         {
-                            if (!item.Value.Equals(writeInfoLists[item].ToObject(item.Value?.GetType())))
+                            var cValue = writeInfoLists[item].ToObject(item.RawValue?.GetType());
+                            if (!item.RawValue.Equals(cValue))
                             {
                                 // 如果写入值与读取值不同，则更新操作结果为失败
-                                operResults[item.Name] = new OperResult($"The write value is inconsistent with the read value,  Write value: {writeInfoLists[item].ToObject(item.Value?.GetType())}, read value: {item.Value}");
+                                if (cValue is IComparable)
+                                {
+                                    operResults[item.Name] = new OperResult($"The write value is inconsistent with the read value,  Write value: {writeInfoLists[item].ToObject(item.Value?.GetType())}, read value: {item.Value}");
+                                }
+                                else
+                                {
+                                    if (cValue != null)
+                                    {
+                                        if (item.RawValue.ToSystemTextJsonString(false) != cValue.ToSystemTextJsonString(false))
+                                            operResults[item.Name] = new OperResult($"The write value is inconsistent with the read value,  Write value: {writeInfoLists[item].ToObject(item.Value?.GetType())}, read value: {item.Value}");
+                                    }
+                                    else
+                                        operResults[item.Name] = new OperResult($"The write value is inconsistent with the read value,  Write value: {writeInfoLists[item].ToObject(item.Value?.GetType())}, read value: {item.Value}");
+                                }
                             }
                         }
                     }

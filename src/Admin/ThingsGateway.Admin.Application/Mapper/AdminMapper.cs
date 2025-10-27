@@ -8,8 +8,6 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-using BootstrapBlazor.Components;
-
 using Riok.Mapperly.Abstractions;
 
 using ThingsGateway.NewLife;
@@ -20,7 +18,7 @@ namespace ThingsGateway.Admin.Application;
 public static partial class AdminMapper
 {
     public static partial HardwareInfo AdaptHardwareInfo(this MachineInfo src);
-        public static partial void AdaptHardwareInfo(this MachineInfo src, HardwareInfo dto);
+    public static partial void AdaptHardwareInfo(this MachineInfo src, HardwareInfo dto);
 
     public static partial LoginInput AdaptLoginInput(this OpenApiLoginInput src);
     public static partial OpenApiLoginOutput AdaptOpenApiLoginOutput(this LoginOutput src);

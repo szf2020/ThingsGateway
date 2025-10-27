@@ -11,8 +11,6 @@
 using System.ComponentModel;
 using System.Runtime;
 
-using ThingsGateway.NewLife;
-
 namespace ThingsGateway.Admin.Application;
 
 /// <inheritdoc/>
@@ -22,7 +20,7 @@ public class HardwareInfo
     /// 当前磁盘信息
     /// </summary>
     public DriveInfo DriveInfo { get; set; }
- 
+
 
     /// <summary>
     /// 主机环境
@@ -151,6 +149,6 @@ public class HardwareInfo
     /// 更新时间
     /// </summary>
     public DateTime UpdateTime { get; set; }
-    public ulong AppRunTotalMinute { get;  set; }
-    public ulong SystemRunTotalMinute { get;  set; }
+    public ulong AppRunTotalMinute { get; set; }
+    public ulong SystemRunTotalMinute { get; set; }
 }

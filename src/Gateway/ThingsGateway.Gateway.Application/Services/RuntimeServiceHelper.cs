@@ -26,7 +26,7 @@ internal static class RuntimeServiceHelper
     public static async Task InitAsync(List<ChannelRuntime> newChannelRuntimes, List<DeviceRuntime> newDeviceRuntimes, ILogger logger)
     {
         //批量修改之后，需要重新加载通道
-        foreach (var newChannelRuntime in newChannelRuntimes)
+        await newChannelRuntimes.ParallelForEachAsync(async (newChannelRuntime, token) =>
         {
             try
             {
@@ -44,7 +44,7 @@ internal static class RuntimeServiceHelper
             {
                 logger.LogWarning(ex, "Init Channel");
             }
-        }
+        }).ConfigureAwait(false);
         GlobalData.ChannelDeviceRuntimeDispatchService.Dispatch(null);
         GlobalData.VariableRuntimeDispatchService.Dispatch(null);
     }
@@ -71,28 +71,28 @@ internal static class RuntimeServiceHelper
 
     public static async Task InitAsync(List<DeviceRuntime> newDeviceRuntimes, ILogger logger)
     {
-        foreach (var newDeviceRuntime in newDeviceRuntimes)
-        {
-            try
+        await newDeviceRuntimes.ParallelForEachAsync(async (newDeviceRuntime, token) =>
             {
-                if (GlobalData.IdChannels.TryGetValue(newDeviceRuntime.ChannelId, out var newChannelRuntime))
+                try
                 {
-                    newDeviceRuntime.Init(newChannelRuntime);
+                    if (GlobalData.IdChannels.TryGetValue(newDeviceRuntime.ChannelId, out var newChannelRuntime))
+                    {
+                        newDeviceRuntime.Init(newChannelRuntime);
 
-                    var newVariableRuntimes = (await GlobalData.VariableService.GetAllAsync(newDeviceRuntime.Id).ConfigureAwait(false)).AdaptEnumerableVariableRuntime();
+                        var newVariableRuntimes = (await GlobalData.VariableService.GetAllAsync(newDeviceRuntime.Id).ConfigureAwait(false)).AdaptEnumerableVariableRuntime();
 
-                    newVariableRuntimes.ParallelForEach(item => item.Init(newDeviceRuntime));
+                        newVariableRuntimes.ParallelForEach(item => item.Init(newDeviceRuntime));
+                    }
+                    else
+                    {
+                        logger.LogWarning("Channel not found");
+                    }
                 }
-                else
+                catch (Exception ex)
                 {
-                    logger.LogWarning("Channel not found");
+                    logger.LogWarning(ex, "Init Device");
                 }
-            }
-            catch (Exception ex)
-            {
-                logger.LogWarning(ex, "Init Device");
-            }
-        }
+            }).ConfigureAwait(false);
 
         GlobalData.ChannelDeviceRuntimeDispatchService.Dispatch(null);
         GlobalData.VariableRuntimeDispatchService.Dispatch(null);
@@ -234,16 +234,16 @@ internal static class RuntimeServiceHelper
     public static async Task RestartDeviceAsync(List<DeviceRuntime> newDeviceRuntimes)
     {
         var groups = GlobalData.GetDeviceThreadManages(newDeviceRuntimes);
-        foreach (var group in groups)
+        await groups.ParallelForEachAsync(async (group, token) =>
         {
             if (group.Key != null)
                 await group.Key.RestartDeviceAsync(group.Value, false).ConfigureAwait(false);
-        }
-        foreach (var group in GlobalData.GetAllVariableBusinessDeviceRuntime().Where(a => !newDeviceRuntimes.Contains(a)).Where(a => a.Driver?.DeviceThreadManage != null).GroupBy(a => a.Driver.DeviceThreadManage))
+        }).ConfigureAwait(false);
+        await GlobalData.GetAllVariableBusinessDeviceRuntime().Where(a => !newDeviceRuntimes.Contains(a)).Where(a => a.Driver?.DeviceThreadManage != null).GroupBy(a => a.Driver.DeviceThreadManage).ParallelForEachAsync(async (group, token) =>
         {
             if (group.Key != null)
                 await group.Key.RestartDeviceAsync(group.ToArray(), false).ConfigureAwait(false);
-        }
+        }).ConfigureAwait(false);
     }
     public static async Task RemoveDeviceAsync(HashSet<long> newDeciceIds)
     {
@@ -254,17 +254,17 @@ internal static class RuntimeServiceHelper
     public static async Task RemoveDeviceAsync(IEnumerable<DeviceRuntime> deviceRuntimes)
     {
         var groups = GlobalData.GetDeviceThreadManages(deviceRuntimes);
-        foreach (var group in groups)
-        {
-            if (group.Key != null)
-                await group.Key.RemoveDeviceAsync(group.Value.Select(a => a.Id).ToArray()).ConfigureAwait(false);
-        }
+        await groups.ParallelForEachAsync(async (group, token) =>
+         {
+             if (group.Key != null)
+                 await group.Key.RemoveDeviceAsync(group.Value.Select(a => a.Id).ToArray()).ConfigureAwait(false);
+         }).ConfigureAwait(false);
 
-        foreach (var group in GlobalData.GetAllVariableBusinessDeviceRuntime().Where(a => !deviceRuntimes.Contains(a)).Where(a => a.Driver?.DeviceThreadManage != null).GroupBy(a => a.Driver.DeviceThreadManage))
+        await GlobalData.GetAllVariableBusinessDeviceRuntime().Where(a => !deviceRuntimes.Contains(a)).Where(a => a.Driver?.DeviceThreadManage != null).GroupBy(a => a.Driver.DeviceThreadManage).ParallelForEachAsync(async (group, token) =>
         {
             if (group.Key != null)
                 await group.Key.RestartDeviceAsync(group.ToArray(), false).ConfigureAwait(false);
-        }
+        }).ConfigureAwait(false);
 
     }
 

@@ -74,10 +74,10 @@ public class HardwareJob : IJob, IHardwareJob
         {
             try
             {
-                    var machine = MachineInfo.GetCurrent();
+                var machine = MachineInfo.GetCurrent();
                 if (HardwareInfo == null)
                 {
-                    HardwareInfo=machine.AdaptHardwareInfo();
+                    HardwareInfo = machine.AdaptHardwareInfo();
 
                     string currentPath = Directory.GetCurrentDirectory();
                     DriveInfo drive = new(Path.GetPathRoot(currentPath));
@@ -100,8 +100,8 @@ public class HardwareJob : IJob, IHardwareJob
                 var machine = MachineInfo.GetCurrent();
                 machine.Refresh();
                 machine.AdaptHardwareInfo(HardwareInfo);
-                HardwareInfo.AppRunTotalMinute = (ulong)Runtime.AppTickCount64 / 1000 /60;
-                HardwareInfo.SystemRunTotalMinute = (ulong)Runtime.TickCount64 / 1000 /60;
+                HardwareInfo.AppRunTotalMinute = (ulong)Runtime.AppTickCount64 / 1000 / 60;
+                HardwareInfo.SystemRunTotalMinute = (ulong)Runtime.TickCount64 / 1000 / 60;
                 HardwareInfo.UpdateTime = TimerX.Now;
                 error = false;
             }

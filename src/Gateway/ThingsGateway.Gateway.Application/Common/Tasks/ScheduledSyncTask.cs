@@ -36,11 +36,12 @@ public class ScheduledSyncTask : DisposeBase, IScheduledTask, IScheduledIntInter
         }
         return false;
     }
+    private static volatile int NextId = 0;
     public void Start()
     {
         _timer?.Dispose();
         if (!Check())
-            _timer = new TimerX(TimerCallback, _state, IntervalMS, IntervalMS, nameof(ScheduledSyncTask)) { Async = true, Reentrant = false };
+            _timer = new TimerX(TimerCallback, _state, IntervalMS, IntervalMS, $"{nameof(ScheduledSyncTask)}{(Interlocked.Increment(ref NextId) / 100)}") { Async = true, Reentrant = false };
     }
 
     private void TimerCallback(object? state)
