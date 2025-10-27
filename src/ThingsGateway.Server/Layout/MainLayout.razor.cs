@@ -262,9 +262,12 @@ public partial class MainLayout : IDisposable
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (WebsiteOption.Value.Demo)
+        if (firstRender)
         {
-            await ShowGitee();
+            if (WebsiteOption.Value.Demo)
+            {
+                await ShowGitee();
+            }
         }
         await base.OnAfterRenderAsync(firstRender);
     }

@@ -412,7 +412,7 @@ public class MachineInfo
 #if NETFRAMEWORK || WINDOWS
         {
             var ci = new Microsoft.VisualBasic.Devices.ComputerInfo();
-            Memory = (ulong)(ci.TotalPhysicalMemory / 1024.0);
+            Memory = (ulong)(ci.TotalPhysicalMemory / 1024.0 / 1024.0);
         }
 #endif
 
@@ -632,7 +632,7 @@ public class MachineInfo
             //if (dic2.TryGetValue("Model Name", out str)) Product = str;
             if (dic.TryGetValue("Model Identifier", out var str)) Product = str;
             if (dic.TryGetValue("Processor Name", out str)) Processor = str;
-            if (dic.TryGetValue("Memory", out str)) Memory = (UInt64)str.TrimEnd("GB").Trim().ToLong() * 1024 * 1024;
+            if (dic.TryGetValue("Memory", out str)) Memory = (UInt64)str.TrimEnd("GB").Trim().ToLong() * 1024;
             if (dic.TryGetValue("Serial Number (system)", out str)) Serial = str;
             if (dic.TryGetValue("Hardware UUID", out str)) UUID = str;
             if (dic.TryGetValue("Processor Name", out str)) Processor = str;
@@ -868,7 +868,7 @@ public class MachineInfo
             if (dic != null)
             {
                 if (dic.TryGetValue("MemTotal", out var str) && !str.IsNullOrEmpty())
-                    Memory = (UInt64)str.TrimEnd(" kB").ToLong();
+                    Memory = (UInt64)(str.TrimEnd(" kB").ToLong() / 1024.0);
 
                 ulong ma = 0;
                 if (dic.TryGetValue("MemAvailable", out str) && !str.IsNullOrEmpty())
