@@ -333,6 +333,10 @@ public abstract class DeviceBase : AsyncAndSyncDisposableObject, IDevice
     /// <inheritdoc/>
     private Task SendAsync(ISendMessage sendMessage, IClientChannel channel, CancellationToken token = default)
     {
+        if(!channel.Online)
+        {
+            throw new InvalidOperationException("Channel is offline");
+        }
         return SendAsync(this, sendMessage, channel, token);
 
         static async PooledTask SendAsync(DeviceBase @this, ISendMessage sendMessage, IClientChannel channel, CancellationToken token)
