@@ -35,6 +35,8 @@ using ThingsGateway.Razor;
 
 using TouchSocket.Core;
 
+using ThingsGateway.Common;
+
 namespace ThingsGateway.Debug;
 
 /// <summary>
@@ -73,7 +75,7 @@ public partial class OpcUaImportVariable
             {
                 Items = BuildTreeItemList(await PopulateBranchAsync(ObjectIds.ObjectsFolder), RenderTreeItem).ToList();
                 ShowSkeleton = false;
-                await InvokeAsync(StateHasChanged);
+                return InvokeAsync(StateHasChanged);
             });
         }
         await base.OnAfterRenderAsync(firstRender);

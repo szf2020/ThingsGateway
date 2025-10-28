@@ -19,7 +19,7 @@ using System.Reflection;
 
 using ThingsGateway.Common.Extension;
 
-namespace ThingsGateway.DB;
+namespace ThingsGateway.Common;
 
 /// <summary>
 /// 导出excel扩展

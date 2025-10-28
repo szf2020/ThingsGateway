@@ -11,7 +11,7 @@
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Http;
 
-namespace ThingsGateway.DB;
+namespace ThingsGateway.Common;
 
 /// <inheritdoc/>
 [ThingsGateway.DependencyInjection.SuppressSniffer]

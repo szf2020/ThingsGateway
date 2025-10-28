@@ -171,10 +171,10 @@ public partial class MqttCollect : CollectBase
                     mqttClientSubscribeOptionsBuilder = mqttClientSubscribeOptionsBuilder.WithTopicFilter(
                         f => f.WithTopic(item));
                 }
-                var mqttClientSubscribeOptions = mqttClientSubscribeOptionsBuilder.Build();
-                if (mqttClientSubscribeOptions.TopicFilters.Count > 0)
-                    _mqttSubscribeOptions = mqttClientSubscribeOptions;
             }
+            var mqttClientSubscribeOptions = mqttClientSubscribeOptionsBuilder.Build();
+            if (mqttClientSubscribeOptions.TopicFilters.Count > 0)
+                _mqttSubscribeOptions = mqttClientSubscribeOptions;
 
             return Task.FromResult(dataResult);
         }

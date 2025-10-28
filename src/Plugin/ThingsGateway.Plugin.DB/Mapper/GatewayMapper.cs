@@ -10,6 +10,7 @@
 
 using Riok.Mapperly.Abstractions;
 
+using ThingsGateway.Common;
 using ThingsGateway.DB;
 
 namespace ThingsGateway.Plugin.DB;

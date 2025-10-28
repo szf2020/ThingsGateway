@@ -20,6 +20,8 @@ using System.Diagnostics.CodeAnalysis;
 using ThingsGateway.Extension;
 using ThingsGateway.Foundation.OpcDa;
 using ThingsGateway.Foundation.OpcDa.Rcw;
+using ThingsGateway.Common;
+
 
 #if Plugin
 
