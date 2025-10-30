@@ -1,4 +1,7 @@
-# ThingsGateway
+
+<p align="center">
+<img src="logo.svg" width = "400" height = "200" alt="The name of the image" align=center />
+</p>
 
 [![star](https://gitee.com/ThingsGateway/ThingsGateway/badge/star.svg?theme=gvp)](https://gitee.com/ThingsGateway/ThingsGateway/stargazers) 
 [![star](https://img.shields.io/github/stars/ThingsGateway/ThingsGateway?logo=github)](https://github.com/ThingsGateway/ThingsGateway)
@@ -11,31 +14,31 @@
 </a>
 
 ## Introduction
-﻿
+
 A cross-platform, high-performance edge data collection gateway based on net8/10.
-﻿
+
 
 ## Documentation
 
-﻿
+
 [Documentation](https://thingsgateway.cn/).
-﻿
+
 [NuGet](https://www.nuget.org/packages?q=Tags%3A%22ThingsGateway%22)
-﻿
+
 
 
 ## Demo
 
-﻿
+
 [Demo](https://demo.thingsgateway.cn/)
 
-﻿
+
 Account: **SuperAdmin**
 
-﻿
+
 Password: **111111**
 
-﻿
+
 
 ## Docker
 
@@ -50,7 +53,7 @@ docker pull registry.cn-shenzhen.aliyuncs.com/thingsgateway/thingsgateway_arm64
 
 ### Plugin List
 
-﻿
+
 
 #### Data Collection Plugins
 
@@ -80,28 +83,28 @@ docker pull registry.cn-shenzhen.aliyuncs.com/thingsgateway/thingsgateway_arm64
 | TDengineDB       | Time-series database storage                                                                      |
 | QuestDB          | Time-series database storage                                                                      |
 
-﻿
+
 
 ## License
 
-﻿
+
 [License](https://thingsgateway.cn/docs/1)
-﻿
-﻿
+
+
 
 ## Sponsorship
 
-﻿
+
 [Sponsorship Approach](https://thingsgateway.cn/docs/1000)
-﻿
+
 
 ## Community
 
-﻿
+
 QQ Group: 605534569 [Jump](http://qm.qq.com/cgi-bin/qm/qr?_wv=1027&k=NnBjPO-8kcNFzo_RzSbdICflb97u2O1i&authKey=V1MI3iJtpDMHc08myszP262kDykbx2Yev6ebE4Me0elTe0P0IFAmtU5l7Sy5w0jx&noverify=0&group_code=605534569)
-﻿
+
 
 ## Pro Plugins
 
-﻿
+
 [Plugin List](https://thingsgateway.cn/docs/1001)
