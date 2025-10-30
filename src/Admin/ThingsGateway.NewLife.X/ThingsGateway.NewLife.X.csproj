@@ -4,7 +4,7 @@
 	<Import Project="..\..\PackNuget.props" />
 
 	<PropertyGroup>
-		<TargetFrameworks>net47;netstandard2.0;net6.0;net6.0-windows;net8.0;$(OtherTargetFrameworks);net8.0-windows;</TargetFrameworks>
+		<TargetFrameworks>net462;netstandard2.0;net6.0;net6.0-windows;net8.0;$(OtherTargetFrameworks);net8.0-windows;</TargetFrameworks>
 		<AssemblyName>ThingsGateway.NewLife.X</AssemblyName>
 		<RootNamespace>ThingsGateway.NewLife</RootNamespace>
 		<AssemblyTitle>工具核心库</AssemblyTitle>
@@ -12,9 +12,10 @@
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<SignAssembly>True</SignAssembly>
 		<AssemblyOriginatorKeyFile>newlife.snk</AssemblyOriginatorKeyFile>
-		
+	</PropertyGroup>
 
-
+	<PropertyGroup>
+		<RestoreEnablePackagePruning Condition="'$(TargetFramework)' == 'net462' "> false</RestoreEnablePackagePruning>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -24,7 +25,7 @@
 		<None Remove="..\..\..\README.zh-CN.md" Pack="false" PackagePath="\" />
 	</ItemGroup>
 
-	<PropertyGroup Condition="'$(TargetFramework)'=='net47' or '$(TargetFramework)'=='net5.0-windows' or '$(TargetFramework)'=='net6.0-windows' or '$(TargetFramework)'=='net7.0-windows' or '$(TargetFramework)'=='net8.0-windows'">
+	<PropertyGroup Condition="'$(TargetFramework)'=='net462' or '$(TargetFramework)'=='net5.0-windows' or '$(TargetFramework)'=='net6.0-windows' or '$(TargetFramework)'=='net7.0-windows' or '$(TargetFramework)'=='net8.0-windows'">
 		<DefineConstants>__WIN__</DefineConstants>
 	</PropertyGroup>
 
@@ -35,11 +36,12 @@
 	<ItemGroup Condition="'$(TargetFramework)'=='netstandard2.0'">
 		<PackageReference Include="System.Memory" Version="4.6.3" />
 	</ItemGroup>
-	<ItemGroup Condition="'$(TargetFramework)'=='net47'">
+	<ItemGroup Condition="'$(TargetFramework)'=='net462'">
 		<PackageReference Include="System.Memory" Version="4.6.3" />
+		<PackageReference Include="System.ValueTuple" Version="4.6.1" />
 	</ItemGroup>
 
-	<ItemGroup Condition="'$(TargetFramework)'=='net47'">
+	<ItemGroup Condition="'$(TargetFramework)'=='net462'">
 		<Using Include="System.Net.Http" />
 		<Reference Include="Microsoft.VisualBasic" />
 		<Reference Include="System.Management" />
@@ -54,10 +56,10 @@
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
 	</ItemGroup>
 
-	<PropertyGroup Condition="$(TargetFramework)=='net6.0'">
+	<PropertyGroup Condition="$(TargetFramework)=='net6.0' OR $(TargetFramework)=='net6.0-windows'">
 		<DefineConstants>$(DefineConstants);PLAT_THREADPOOLWORKITEM;PLAT_MRVTSC</DefineConstants>
 	</PropertyGroup>
-	<PropertyGroup Condition="$(TargetFramework)=='net8.0'">
+	<PropertyGroup Condition="$(TargetFramework)=='net8.0' OR $(TargetFramework)=='net8.0-windows'">
 		<DefineConstants>$(DefineConstants);PLAT_THREADPOOLWORKITEM;PLAT_MRVTSC</DefineConstants>
 	</PropertyGroup>
 
@@ -66,7 +68,7 @@
 		<IncludeAsyncInterfaces>true</IncludeAsyncInterfaces>
 	</PropertyGroup>
 
-	<PropertyGroup Condition="$(TargetFramework)=='net47'">
+	<PropertyGroup Condition="$(TargetFramework)=='net462'">
 		<DefineConstants>$(DefineConstants);PLAT_MRVTSC</DefineConstants>
 		<IncludeAsyncInterfaces>true</IncludeAsyncInterfaces>
 	</PropertyGroup>
@@ -88,6 +90,6 @@
 		<PackageReference Include="Microsoft.Extensions.Options" Version="8.0.2" />
 	</ItemGroup>-->
 
-	
+
 
 </Project>

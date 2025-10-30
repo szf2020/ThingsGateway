@@ -509,34 +509,16 @@ internal sealed class AlarmTask : IDisposable
             {
                 scheduledTask.Change(100, 100);
             }
-
+            ParallelOptions.CancellationToken = cancellation;
             // 遍历设备变量列表
             if (!GlobalData.AlarmEnableIdVariables.IsEmpty)
             {
                 // 使用 Parallel.ForEach 执行指定的操作
-                Parallel.ForEach(GlobalData.AlarmEnableIdVariables, ParallelOptions, (item, state, index) =>
-            {
-                // 如果取消请求已经被触发，则结束任务
-                if (cancellation.IsCancellationRequested)
-                    return;
-
-                // 如果该变量的报警功能未启用，则跳过该变量
-                if (!item.Value.AlarmEnable)
-                    return;
-
-                // 如果该变量离线，则跳过该变量
-                if (!item.Value.IsOnline)
-                    return;
-
-                // 对该变量进行报警分析
-                AlarmAnalysis(item.Value);
-            });
+                Parallel.ForEach(GlobalData.AlarmEnableIdVariables, ParallelOptions, Analysis);
             }
 
             else
             {
-                //if (scheduledTask.Period != 5000)
-                //    scheduledTask.Change(0, 5000); // 如果没有启用报警的变量，则设置下次执行时间为5秒后
                 scheduledTask.SetNext(5000); // 如果没有启用报警的变量，则设置下次执行时间为5秒后
             }
 
@@ -552,6 +534,21 @@ internal sealed class AlarmTask : IDisposable
         }
     }
 
+    private static void Analysis(KeyValuePair<long, VariableRuntime> item, ParallelLoopState state, long index)
+    {
+        // 如果取消请求已经被触发，则结束任务
+        if (state.ShouldExitCurrentIteration)
+            return;
 
+        // 如果该变量的报警功能未启用，则跳过该变量
+        if (!item.Value.AlarmEnable)
+            return;
 
+        // 如果该变量离线，则跳过该变量
+        if (!item.Value.IsOnline)
+            return;
+
+        // 对该变量进行报警分析
+        AlarmAnalysis(item.Value);
+    }
 }

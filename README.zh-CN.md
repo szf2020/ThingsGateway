@@ -1,4 +1,7 @@
-# ThingsGateway
+
+<p align="center">
+<img src="logo.svg" width = "400" height = "200" alt="The name of the image" align=center />
+</p>
 
 [![star](https://gitee.com/ThingsGateway/ThingsGateway/badge/star.svg?theme=gvp)](https://gitee.com/ThingsGateway/ThingsGateway/stargazers) 
 [![star](https://img.shields.io/github/stars/ThingsGateway/ThingsGateway?logo=github)](https://github.com/ThingsGateway/ThingsGateway)
