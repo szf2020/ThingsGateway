@@ -22,7 +22,9 @@
 		<OtherTargetFrameworks>net10.0</OtherTargetFrameworks>
 	</PropertyGroup>
 
-
+	<PropertyGroup>
+		<RestoreEnablePackagePruning Condition="'$(TargetFramework)' == 'net462' "> false</RestoreEnablePackagePruning>
+	</PropertyGroup>
 
 	<PropertyGroup Condition=" '$(TargetFramework)' != 'net8.0' ">
 		<PluginTargetFramework>net10.0</PluginTargetFramework>

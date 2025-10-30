@@ -14,10 +14,6 @@
 		<AssemblyOriginatorKeyFile>newlife.snk</AssemblyOriginatorKeyFile>
 	</PropertyGroup>
 
-	<PropertyGroup>
-		<RestoreEnablePackagePruning Condition="'$(TargetFramework)' == 'net462' "> false</RestoreEnablePackagePruning>
-	</PropertyGroup>
-
 	<ItemGroup>
 		<None Include="README.md" Pack="true" PackagePath="\" />
 		<None Include="README.zh-CN.md" Pack="true" PackagePath="\" />

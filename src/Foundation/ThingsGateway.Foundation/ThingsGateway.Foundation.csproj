@@ -21,7 +21,7 @@
 			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
 		</EmbeddedResource>
 	</ItemGroup>
-	
+
 
 	<ItemGroup>
 		<ProjectReference Include="..\..\Admin\ThingsGateway.NewLife.X\ThingsGateway.NewLife.X.csproj" />
