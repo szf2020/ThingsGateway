@@ -41,7 +41,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="BenchmarkDotNet" Version="0.15.4" />
+		<PackageReference Include="BenchmarkDotNet" Version="0.15.5" />
 		<PackageReference Include="NModbus" Version="3.0.81" />
 		<PackageReference Include="S7netplus" Version="0.20.0" />
 		<!--<PackageReference Include="ThingsGateway.Foundation.Modbus" Version="$(DefaultVersion)" />

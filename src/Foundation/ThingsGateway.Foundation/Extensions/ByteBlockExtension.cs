@@ -428,8 +428,9 @@ where TWriter : IByteBlockWriter
     }
 
 
-    public static int WriteNormalString(this Span<byte> span, string value, Encoding encoding)
+    public static int WriteNormalString(this Span<byte> span, string value, Encoding encoding=null)
     {
+        encoding ??= Encoding.UTF8;
         var maxSize = encoding.GetMaxByteCount(value.Length);
         var chars = value.AsSpan();
 
@@ -439,7 +440,7 @@ where TWriter : IByteBlockWriter
             {
                 fixed (byte* p1 = &span[0])
                 {
-                    var len = Encoding.UTF8.GetBytes(p, chars.Length, p1, maxSize);
+                    var len = encoding.GetBytes(p, chars.Length, p1, maxSize);
                     return len;
                 }
             }
