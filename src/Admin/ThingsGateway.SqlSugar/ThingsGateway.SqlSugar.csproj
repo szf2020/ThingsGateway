@@ -24,7 +24,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="SqlSugarCore.Dm" Version="8.8.2" />
-		<PackageReference Include="SqlSugarCore.Kdbndp" Version="9.3.7.1031" />
+		<PackageReference Include="SqlSugarCore.Kdbndp" Version="9.3.7.1032" />
 		<PackageReference Include="Microsoft.Data.Sqlite" Version="7.0.20" />
 		<!--<PackageReference Include="Microsoft.Data.Sqlite" Version="$(NET10Version)" />-->
 		<PackageReference Include="MySqlConnector" Version="2.4.0" />

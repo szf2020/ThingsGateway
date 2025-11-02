@@ -55,6 +55,7 @@ public class SiemensS7MasterDemo
 
         //获取协议对象
         using var device = GetDevice(channel);
+        await channel.SetupAsync(channel.Config);
 
         //读取具体类型数据
         var data = await device.ReadDoubleAsync("V1"); //通过字符串转化地址，读取v1

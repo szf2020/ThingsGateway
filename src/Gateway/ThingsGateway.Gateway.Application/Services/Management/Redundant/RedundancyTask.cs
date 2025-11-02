@@ -295,6 +295,7 @@ internal sealed class RedundancyTask : IRpcDriver, IAsyncDisposable
             catch
             {
             }
+            _tcpDmtpService.TryDispose();
         }
         if (_tcpDmtpClient != null)
         {
@@ -305,6 +306,7 @@ internal sealed class RedundancyTask : IRpcDriver, IAsyncDisposable
             catch
             {
             }
+            _tcpDmtpClient.TryDispose();
         }
     }
 

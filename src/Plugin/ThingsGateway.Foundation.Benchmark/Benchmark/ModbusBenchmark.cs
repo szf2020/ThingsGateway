@@ -58,7 +58,6 @@ public class ModbusBenchmark : IDisposable
             thingsgatewaymodbuss.Add(thingsgatewaymodbus);
         }
 
-
         for (int i = 0; i < ClientCount; i++)
         {
 
@@ -67,7 +66,6 @@ public class ModbusBenchmark : IDisposable
             await nmodbus.ReadHoldingRegistersAsync(1, 0, 100);
             nmodbuss.Add(nmodbus);
         }
-
 
         for (int i = 0; i < ClientCount; i++)
         {

@@ -11,6 +11,8 @@
 using ThingsGateway.Foundation.Modbus;
 using ThingsGateway.NewLife.Json.Extension;
 
+using TouchSocket.Sockets;
+
 namespace ThingsGateway.Foundation.Demo;
 
 #pragma warning disable CA1861 // 不要将常量数组作为参数
@@ -55,6 +57,7 @@ public class ModbusMasterDemo
 
         //获取协议对象
         using var device = GetDevice(channel);
+        await channel.SetupAsync(channel.Config);
 
         //读取具体类型数据
         var data = await device.ReadDoubleAsync("400001"); //通过字符串转化地址，读取保持寄存器地址0
