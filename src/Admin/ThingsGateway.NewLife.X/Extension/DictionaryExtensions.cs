@@ -65,6 +65,7 @@ public static class DictionaryExtensions
         this IDictionary<TKey, TValue> dictionary,
         IEnumerable<TKey> keys)
     {
+        if(keys==null) yield break;
         foreach (var key in keys)
         {
             if (dictionary.TryGetValue(key, out var value))

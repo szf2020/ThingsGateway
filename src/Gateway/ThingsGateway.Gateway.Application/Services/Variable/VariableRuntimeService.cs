@@ -189,7 +189,7 @@ public class VariableRuntimeService : IVariableRuntimeService
         {
             // await WaitLock.WaitAsync().ConfigureAwait(false);
 
-            var result = await GlobalData.VariableService.DeleteVariableAsync(null).ConfigureAwait(false);
+            var result = await GlobalData.VariableService.DeleteVariableAsync(GlobalData.IdVariables.Keys).ConfigureAwait(false);
 
             ConcurrentHashSet<IDriver> changedDriver = new();
             var variableIds = GlobalData.IdVariables.Select(a => a.Key).ToHashSet();
