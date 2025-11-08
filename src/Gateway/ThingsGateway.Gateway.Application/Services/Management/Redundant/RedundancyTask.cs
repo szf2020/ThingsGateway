@@ -349,10 +349,9 @@ internal sealed class RedundancyTask : IRpcDriver, IAsyncDisposable
                    a.UseTcpSessionCheckClear();
                    a.UseReconnection<TcpDmtpClient>(options =>
                    {
-                       options.TryCount = -1;
                        options.PollingInterval = TimeSpan.FromMilliseconds(redundancy.HeartbeatInterval);
-                       options.PrintLog = true;
-                       options.CheckAction = async (c, count) =>
+                       options.LogReconnection = true;
+                       options.CheckAction = async (c) =>
                        {
                            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
                            if ((await c.PingAsync(cts.Token).ConfigureAwait(false)).IsSuccess)

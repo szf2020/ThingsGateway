@@ -105,16 +105,6 @@ public class MapperBench
         return bars;
     }
 
-    [Benchmark]
-    public List<Bar> ReflectionCachedMap100_000()
-    {
-        var bars = new List<Bar>(foos.Count);
-        foreach (var f in foos)
-        {
-            bars.Add(f.Map<Bar>());
-        }
-        return bars;
-    }
 
 
     private static Bar OriginalMapper(Foo source)

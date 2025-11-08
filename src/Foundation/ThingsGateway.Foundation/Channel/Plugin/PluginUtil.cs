@@ -36,7 +36,7 @@ public static class PluginUtil
             {
                 action += a => a.UseReconnection<IClientChannel>(a =>
                 {
-                    a.CheckAction = (channel, failCount) =>
+                    a.CheckAction = (channel) =>
                     {
                         if (channel.Online)
                         {
@@ -44,11 +44,7 @@ public static class PluginUtil
                         }
                         else
                         {
-                            if (failCount > 1)
-                            {
                                 return Task.FromResult(ConnectionCheckResult.Dead);
-                            }
-                            return Task.FromResult(ConnectionCheckResult.Skip);
                         }
 
 
