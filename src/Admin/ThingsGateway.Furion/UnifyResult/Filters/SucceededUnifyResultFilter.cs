@@ -104,7 +104,23 @@ public class SucceededUnifyResultFilter : IAsyncActionFilter, IOrderedFilter
             || UnifyContext.CheckHttpContextNonUnify(context.HttpContext)) return;
 
         // 判断是否跳过规范化处理
-        if (UnifyContext.CheckSucceededNonUnify(actionDescriptor.MethodInfo, out var unifyResult)) return;
+        if (UnifyContext.CheckSucceededNonUnify(actionDescriptor.MethodInfo, out var unifyResult))
+        {
+            // 处理禁用规范化处理但配置了 JSON 序列化情况
+            var (extractedValue, serializerSettings, isTargetType) = actionExecutedContext.Result switch
+            {
+                ObjectResult objectResult => (objectResult.Value, UnifyContext.GetSerializerSettings(context), true),
+                JsonResult jsonResult => (jsonResult.Value, jsonResult.SerializerSettings ?? UnifyContext.GetSerializerSettings(context), true),
+                _ => (null, null, false)
+            };
+
+            if (isTargetType)
+            {
+                actionExecutedContext.Result = new JsonResult(extractedValue, serializerSettings);
+            }
+
+            return;
+        }
 
         // 处理 BadRequestObjectResult 类型规范化处理
         if (actionExecutedContext.Result is BadRequestObjectResult badRequestObjectResult)

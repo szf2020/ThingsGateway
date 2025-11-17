@@ -158,7 +158,8 @@ public class DDPTcpSessionClientChannel : TcpSessionClientChannel
                     var id = $"ID={message.Id}";
                     if (message.Type == 0x09)
                     {
-                        var reader = new ClassBytesReader(message.Content);
+                        using var reader = new PooledBytesReader();
+                        reader.Reset(message.Content);
 
                         if (@this.DataHandlingAdapter == null)
                         {

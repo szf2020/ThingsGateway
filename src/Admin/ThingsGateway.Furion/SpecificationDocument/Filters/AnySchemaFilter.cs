@@ -9,7 +9,7 @@
 // 许可证的完整文本可以在源代码树根目录中的 LICENSE-APACHE 和 LICENSE-MIT 文件中找到。
 // ------------------------------------------------------------------------
 
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 
 using Swashbuckle.AspNetCore.SwaggerGen;
 
@@ -25,15 +25,18 @@ public class AnySchemaFilter : ISchemaFilter
     /// <summary>
     /// 实现过滤器方法
     /// </summary>
-    /// <param name="model"></param>
+    /// <param name="schema"></param>
     /// <param name="context"></param>
-    public void Apply(OpenApiSchema model, SchemaFilterContext context)
+    public void Apply(IOpenApiSchema schema, SchemaFilterContext context)
     {
-        var type = context.Type;
-
-        if (type == typeof(object))
+        if (schema is OpenApiSchema concrete)
         {
-            model.AdditionalPropertiesAllowed = false;
+            var type = context.Type;
+
+            if (type == typeof(object))
+            {
+                concrete.AdditionalPropertiesAllowed = false;
+            }
         }
     }
 }

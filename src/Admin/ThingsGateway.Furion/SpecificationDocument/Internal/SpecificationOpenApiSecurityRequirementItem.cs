@@ -9,7 +9,7 @@
 // 许可证的完整文本可以在源代码树根目录中的 LICENSE-APACHE 和 LICENSE-MIT 文件中找到。
 // ------------------------------------------------------------------------
 
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 
 namespace ThingsGateway.SpecificationDocument;
 
@@ -24,7 +24,7 @@ public sealed class SpecificationOpenApiSecurityRequirementItem
     /// </summary>
     public SpecificationOpenApiSecurityRequirementItem()
     {
-        Accesses = System.Array.Empty<string>();
+        Accesses = [];
     }
 
     /// <summary>
@@ -35,5 +35,5 @@ public sealed class SpecificationOpenApiSecurityRequirementItem
     /// <summary>
     /// 权限
     /// </summary>
-    public string[] Accesses { get; set; }
+    public List<string> Accesses { get; set; }
 }

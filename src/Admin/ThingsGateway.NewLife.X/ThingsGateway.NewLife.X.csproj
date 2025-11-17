@@ -67,7 +67,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="9.0.10" Condition="$(IncludeAsyncInterfaces)=='true'" />
+		<PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="10.0.0" Condition="$(IncludeAsyncInterfaces)=='true'" />
 	</ItemGroup>
 
 	<!--<ItemGroup Condition="'$(TargetFramework)'=='net6.0-windows' or '$(TargetFramework)'=='net6.0' ">

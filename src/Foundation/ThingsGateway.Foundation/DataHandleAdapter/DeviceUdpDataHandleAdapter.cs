@@ -89,6 +89,7 @@ public class DeviceUdpDataHandleAdapter<TRequest> : UdpDataHandlingAdapter, IDev
     protected virtual bool ParseRequestCore(EndPoint remoteEndPoint, ReadOnlyMemory<byte> memory, out TRequest request1)
     {
         request1 = null;
+            var byteBlock = new PooledBytesReader();
         try
         {
             if (Logger?.LogLevel <= LogLevel.Trace)
@@ -103,7 +104,7 @@ public class DeviceUdpDataHandleAdapter<TRequest> : UdpDataHandlingAdapter, IDev
             }
             request1 = request;
 
-            var byteBlock = new ClassBytesReader(memory);
+            byteBlock.Reset(memory);
             byteBlock.BytesRead = 0;
 
             var pos = byteBlock.BytesRead;
@@ -163,6 +164,10 @@ public class DeviceUdpDataHandleAdapter<TRequest> : UdpDataHandlingAdapter, IDev
         {
             Logger?.LogWarning(ex, $"{ToString()} Received parsing error");
             return false;
+        }
+        finally
+        {
+            byteBlock.Dispose();
         }
     }
 

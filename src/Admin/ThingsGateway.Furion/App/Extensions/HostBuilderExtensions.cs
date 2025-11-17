@@ -48,6 +48,19 @@ public static class HostBuilderExtensions
         hostBuilder.UseStartup<FakeStartup>();
         return hostBuilder;
     }
+    /// <summary>
+    /// Web 主机注入
+    /// </summary>
+    /// <param name="hostBuilder">Web主机构建器</param>
+    /// <param name="autoRegisterBackgroundService"></param>
+    /// <returns>IWebHostBuilder</returns>
+    public static IWebHostBuilder Inject(this IWebHostBuilder hostBuilder, bool autoRegisterBackgroundService)
+    {
+        return hostBuilder.Inject((_, options) =>
+        {
+            options.AutoRegisterBackgroundService = autoRegisterBackgroundService;
+        });
+    }
 
     /// <summary>
     /// 泛型主机注入
@@ -64,6 +77,19 @@ public static class HostBuilderExtensions
         InternalApp.ConfigureApplication(hostBuilder, configureOptions.AutoRegisterBackgroundService);
 
         return hostBuilder;
+    }
+    /// <summary>
+    /// 泛型主机注入
+    /// </summary>
+    /// <param name="hostBuilder">泛型主机注入构建器</param>
+    /// <param name="autoRegisterBackgroundService"></param>
+    /// <returns>IHostBuilder</returns>
+    public static IHostBuilder Inject(this IHostBuilder hostBuilder, bool autoRegisterBackgroundService)
+    {
+        return hostBuilder.Inject((_, options) =>
+        {
+            options.AutoRegisterBackgroundService = autoRegisterBackgroundService;
+        });
     }
 
     /// <summary>

@@ -52,7 +52,8 @@ public class SingleStreamDataHandlingAdapterTest
         {
             var readResult = await this.m_pipe.Reader.ReadAsync(token).ConfigureAwait(false);
             var sequence = readResult.Buffer;
-            var reader = new ClassBytesReader(sequence);
+            var reader = new PooledBytesReader();
+            reader.Reset(sequence);
             await adapter.ReceivedInputAsync(reader).ConfigureAwait(EasyTask.ContinueOnCapturedContext);
             var position = sequence.GetPosition(reader.BytesRead);
             // 通知PipeReader已消费

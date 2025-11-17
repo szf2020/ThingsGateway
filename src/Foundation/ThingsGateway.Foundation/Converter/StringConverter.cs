@@ -29,7 +29,7 @@ public class StringToClassConverter<TState> : ISerializerFormatter<string, TStat
     }
 
     /// <inheritdoc/>
-    public bool TrySerialize(TState state, in object target, out string source)
+    public bool TrySerialize<TTarget>(TState state, in TTarget target, out string source)
     {
         if (target != null)
         {

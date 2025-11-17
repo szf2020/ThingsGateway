@@ -38,7 +38,7 @@ public class JsonToClassConverter<TState> : ISerializerFormatter<string, TState>
     }
 
     /// <inheritdoc/>
-    public bool TrySerialize(TState state, in object target, out string source)
+    public bool TrySerialize<TTarget>(TState state, in TTarget target, out string source)
     {
         try
         {
@@ -51,4 +51,6 @@ public class JsonToClassConverter<TState> : ISerializerFormatter<string, TState>
             return false;
         }
     }
+
+
 }

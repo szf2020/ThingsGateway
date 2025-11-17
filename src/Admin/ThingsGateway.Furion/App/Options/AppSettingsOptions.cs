@@ -55,6 +55,13 @@ public sealed class AppSettingsOptions : IConfigurableOptions<AppSettingsOptions
     /// JSON 文件扫描配置
     /// </summary>
     public JsonFileScanner JsonFileScanner { get; set; }
+
+    /// <summary>
+    /// 是否禁用 AppStartup 自动扫描
+    /// </summary>
+    public bool? DisableAppStartupScan { get; set; }
+
+
     /// <summary>
     /// 后期配置
     /// </summary>
@@ -68,6 +75,7 @@ public sealed class AppSettingsOptions : IConfigurableOptions<AppSettingsOptions
         options.ExcludeAssemblies ??= Array.Empty<string>();
         options.SupportPackageNamePrefixs ??= Array.Empty<string>();
         options.VirtualPath ??= string.Empty;
+        options.DisableAppStartupScan ??= false;
     }
 }
 

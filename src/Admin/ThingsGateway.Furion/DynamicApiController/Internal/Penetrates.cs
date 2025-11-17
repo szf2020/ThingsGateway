@@ -10,6 +10,7 @@
 // ------------------------------------------------------------------------
 
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ApplicationModels;
 
 using System.Collections.Concurrent;
 
@@ -82,8 +83,9 @@ internal static class Penetrates
     /// <returns></returns>
     internal static bool IsApiController(Type type)
     {
-        //return IsApiControllerCached.GetOrAdd(type, Function);
-        return Function(type);
+        //return IsApiControllerCached.GetOrAdd(type, Function) && (ControllerFilter == null || ControllerFilter.Invoke(type));
+        return Function(type) && (ControllerFilter?.Invoke(type) != false);
+
         // 本地静态方法
         static bool Function(Type type)
         {
@@ -115,4 +117,16 @@ internal static class Penetrates
             return false;
         }
     }
+
+    /// <summary>
+    /// 提供生成控制器过滤器
+    /// </summary>
+    /// <remarks>返回 <c>true</c> 将生成控制器，否则跳过。</remarks>
+    internal static Func<Type, bool> ControllerFilter { get; set; }
+
+    /// <summary>
+    /// 添加 Action 自定义配置
+    /// </summary>
+    /// <remarks>返回 <c>true</c> 将生成 Action，否则跳过。</remarks>
+    internal static Action<ActionModel> ActionConfigure { get; set; }
 }

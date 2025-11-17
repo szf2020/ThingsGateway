@@ -12,9 +12,9 @@
 	</PropertyGroup>
 	
 	<ItemGroup>
-		<PackageReference Include="BootstrapBlazor.TableExport" Version="9.2.7" />
+		<PackageReference Include="BootstrapBlazor.TableExport" Version="10.0.0" />
 		<PackageReference Include="Yitter.IdGenerator" Version="1.0.14" />
-		<PackageReference Include="BootstrapBlazor" Version="9.12.1" />
+		<PackageReference Include="BootstrapBlazor" Version="10.0.1" />
 	</ItemGroup>
 
 	<ItemGroup>

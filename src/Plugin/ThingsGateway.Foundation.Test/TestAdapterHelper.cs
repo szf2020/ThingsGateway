@@ -28,7 +28,8 @@ internal static class TestAdapterHelper
                 break;
             }
             var sliceMemory = memory.Slice(offset, Math.Min(remainingLength, 1));
-            var reader = new ClassBytesReader(sliceMemory);
+            var reader = new PooledBytesReader();
+            reader.Reset(sliceMemory);
             await adapter.ReceivedInputAsync(reader).ConfigureAwait(false);
             offset += sliceMemory.Length;
         }

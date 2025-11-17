@@ -9,7 +9,7 @@
 // 许可证的完整文本可以在源代码树根目录中的 LICENSE-APACHE 和 LICENSE-MIT 文件中找到。
 // ------------------------------------------------------------------------
 
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 
 using Swashbuckle.AspNetCore.SwaggerGen;
 
@@ -37,7 +37,7 @@ public class TagsOrderDocumentFilter : IDocumentFilter
             .Select(c => new OpenApiTag
             {
                 Name = c.Value.Item1,
-                Description = swaggerDoc.Tags.FirstOrDefault(m => m.Name == c.Key)?.Description
-            }).ToList();
+                Description = swaggerDoc.Tags?.FirstOrDefault(m => m.Name == c.Key)?.Description
+            }).ToHashSet();
     }
 }
