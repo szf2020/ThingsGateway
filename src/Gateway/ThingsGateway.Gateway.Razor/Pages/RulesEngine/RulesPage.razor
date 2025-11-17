@@ -37,7 +37,7 @@
 </div>
 }
 
-<div class=@($"row g-0 h-100 {(ShowDesign ? "d-none" : "")}")>
+<div class=@($"row g-0 {(ShowDesign ? "d-none" : "")}") style="height: calc(100% - 80px);">
 	<div class="col-12 col-sm-6 h-100">
 
 		<AdminTable @ref=table TItem="Rules"

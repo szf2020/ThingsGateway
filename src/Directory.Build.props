@@ -1,9 +1,9 @@
 <Project>
 
 	<PropertyGroup>
-		<PluginVersion>10.12.35</PluginVersion>
-		<ProPluginVersion>10.12.35</ProPluginVersion>
-		<DefaultVersion>10.12.35</DefaultVersion>
+		<PluginVersion>10.12.36</PluginVersion>
+		<ProPluginVersion>10.12.36</ProPluginVersion>
+		<DefaultVersion>10.12.36</DefaultVersion>
 		<AuthenticationVersion>10.11.8</AuthenticationVersion>
 		<SourceGeneratorVersion>10.11.8</SourceGeneratorVersion>
 		<NET8Version>8.0.22</NET8Version>
