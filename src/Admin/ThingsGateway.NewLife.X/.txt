@@ -1,3 +1,0 @@
-﻿https://gitee.com/NewLifeX/X/commit/6df21822422ac26eb9cdfb290d5793a4dd8cff24
-
-修改大部分CA规则，后期优化减少字符串操作

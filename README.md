@@ -1,4 +1,4 @@
-
+﻿
 <p align="center">
 <img src="logo.svg" width = "400" height = "200" alt="The name of the image" align=center />
 </p>
@@ -13,98 +13,32 @@
 <img src="https://img.shields.io/badge/QQ群-605534569-red" alt="QQ">
 </a>
 
-## Introduction
+## 介绍
 
-A cross-platform, high-performance edge data collection gateway based on net8/10.
+ThingsGateway 是一个开源的工业物联网边缘计算网关，致力于为用户提供简单易用、高性能、可扩展的物联网边缘计算解决方案。<br/>
 
+## 文档
 
-## Documentation
+[官网地址](https://thingsgateway.cn/)
 
+## 演示
 
-[Documentation](https://thingsgateway.cn/).
+[演示地址](https://demo.thingsgateway.cn/)
 
-[NuGet](https://www.nuget.org/packages?q=Tags%3A%22ThingsGateway%22)
+## 协议
 
+[版权声明](https://thingsgateway.cn/docs/1)
 
+## 赞助
 
-## Demo
+[赞助途径](https://thingsgateway.cn/docs/1000)
 
+## 商业化
 
-[Demo](https://demo.thingsgateway.cn/)
+[Pro版本](https://thingsgateway.cn/docs/1001)
 
+## 特别声明
 
-Account: **SuperAdmin**
+ThingsGateway 项目已加入 [dotNET China](https://gitee.com/dotnetchina)  组织。<br/>
 
-
-Password: **111111**
-
-
-
-## Docker
-
-```shell
-
-docker pull registry.cn-shenzhen.aliyuncs.com/thingsgateway/thingsgateway
-
-docker pull registry.cn-shenzhen.aliyuncs.com/thingsgateway/thingsgateway_arm64
-```
-
-
-
-### Plugin List
-
-
-
-#### Data Collection Plugins
-
-
-| Plugin Name | Remarks                                                       |
-| ----------- | ------------------------------------------------------------- |
-| Modbus      | Supports Rtu/Tcp message formats, with Serial/Tcp/Udp links   |
-| SiemensS7   | Siemens PLC S7 series                                         |
-| Dlt6452007  | Supports Serial/Tcp/Udp links                                 |
-| OpcDaMaster | Compiled for 64-bit                                           |
-| OpcUaMaster | Supports certificate login, object extension, Json read/write |
-| Webhook          | Webhook                                             |
-
-#### Business Plugins
-
-
-| Plugin Name      | Remarks                                                                                           |
-| ---------------- | ------------------------------------------------------------------------------------------------- |
-| ModbusSlave      | Supports Rtu/Tcp message formats, with Serial/Tcp/Udp links, supports Rpc reverse writing         |
-| OpcUaServer      | OpcUa server, supports Rpc reverse writing                                                        |
-| MqttClient       | Mqtt client, supports Rpc reverse writing, script-customizable upload content                     |
-| MqttServer       | Mqtt server, supports WebSocket, supports Rpc reverse writing, script-customizable upload content |
-| KafkaProducer    | Script-customizable upload content                                                                |
-| RabbitMQProducer | Script-customizable upload content                                                                |
-| SqlDB            | Relational database storage, supports historical storage and real-time data updates               |
-| SqlHistoryAlarm      | Alarm historical data relational database storage                                                 |
-| TDengineDB       | Time-series database storage                                                                      |
-| QuestDB          | Time-series database storage                                                                      |
-
-
-
-## License
-
-
-[License](https://thingsgateway.cn/docs/1)
-
-
-
-## Sponsorship
-
-
-[Sponsorship Approach](https://thingsgateway.cn/docs/1000)
-
-
-## Community
-
-
-QQ Group: 605534569 [Jump](http://qm.qq.com/cgi-bin/qm/qr?_wv=1027&k=NnBjPO-8kcNFzo_RzSbdICflb97u2O1i&authKey=V1MI3iJtpDMHc08myszP262kDykbx2Yev6ebE4Me0elTe0P0IFAmtU5l7Sy5w0jx&noverify=0&group_code=605534569)
-
-
-## Pro Plugins
-
-
-[Plugin List](https://thingsgateway.cn/docs/1001)
+![dotnetchina](https://gitee.com/dotnetchina/home/raw/master/assets/dotnetchina-raw.png "dotNET China LOGO")

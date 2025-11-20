@@ -1,9 +1,0 @@
-<Project>
-  <PropertyGroup>
-    <Version>$(DefaultVersion)</Version>
-  </PropertyGroup>
-
-  <ItemGroup>
-    <None Include="$(MSBuildThisFileDirectory)Version.props" Pack="true" PackagePath="\" />
-  </ItemGroup>
-</Project>

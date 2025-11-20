@@ -19,7 +19,7 @@ using Microsoft.Extensions.Localization;
 
 using ThingsGateway.Admin.Application;
 using ThingsGateway.Admin.Razor;
-using ThingsGateway.Extension;
+using ThingsGateway.Foundation.Common.Extension;
 using ThingsGateway.Gateway.Application;
 
 namespace ThingsGateway.Server;

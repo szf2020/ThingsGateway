@@ -1,25 +1,16 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
-	<Import Project="..\Version.props" />
-
-
 	<ItemGroup>
-		<ProjectReference Include="..\Gateway\ThingsGateway.Gateway.Application\ThingsGateway.Gateway.Application.csproj" />
-		<ProjectReference Include="..\Gateway\ThingsGateway.Gateway.Razor\ThingsGateway.Gateway.Razor.csproj" />
+		<ProjectReference Include="..\ThingsGateway.Gateway.Application\ThingsGateway.Gateway.Application.csproj" />
+		<ProjectReference Include="..\ThingsGateway.Gateway.Razor\ThingsGateway.Gateway.Razor.csproj" />
 	</ItemGroup>
 
-	<!--直接引用-->
-	<Import Project="targets\PluginDebug.targets"/>
+	<Import Project="targets\PluginContext.targets" />
 
-
-	<Import Project="targets\ProPluginDebug.targets" Condition=" '$(SolutionName)' == 'ThingsGatewayPro' "/>
-
-
-
-	<!--nuget包解压复制文件，上下文动态加载，Pro插件-->
+	<!--nuget包解压复制文件，上下文动态加载，Pro插件--><!--
 	<Import Project="targets\Pro2.targets" Condition=" '$(SolutionName)' != 'ThingsGatewayPro'" />
 
-	<Import Project="targets\Pro7.targets" Condition=" '$(SolutionName)' != 'ThingsGatewayPro'" />
+	<Import Project="targets\Pro7.targets" Condition=" '$(SolutionName)' != 'ThingsGatewayPro'" />-->
 
 	<PropertyGroup>
 

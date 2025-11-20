@@ -15,10 +15,9 @@ using System.Text;
 
 using ThingsGateway.Admin.Application;
 using ThingsGateway.DB;
-using ThingsGateway.NewLife;
-using ThingsGateway.NewLife.Json.Extension;
-using ThingsGateway.NewLife.Log;
-using ThingsGateway.SqlSugar;
+using ThingsGateway.Foundation.Common;
+using ThingsGateway.Foundation.Common.Json.Extension;
+using ThingsGateway.Foundation.Common.Log;
 
 namespace ThingsGateway.Server;
 
@@ -80,7 +79,7 @@ public class Program
 
         #endregion 控制台输出Logo
 
-        if (WebEnableVariable.WebEnable)
+        if (Runtime.WebEnable)
         {
 
             await Serve.RunAsync(RunOptions.Default.ConfigureFirstActionBuilder(builder =>
@@ -137,10 +136,6 @@ public class Program
 
 #endif
 
-
-
-                    ReflectionInoHelper.RemoveAllCache();
-                    InstanceFactory.RemoveCache();
                 })
                 ).ConfigureAwait(false);
         }
@@ -186,8 +181,6 @@ public class Program
             })
                 .Configure(app =>
                 {
-                    ReflectionInoHelper.RemoveAllCache();
-                    InstanceFactory.RemoveCache();
                 })
                 ).ConfigureAwait(false);
 

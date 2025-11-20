@@ -10,7 +10,7 @@
 
 using System.Dynamic;
 
-using ThingsGateway.Foundation;
+using ThingsGateway.Foundation.Common.Extension;
 using ThingsGateway.Gateway.Application;
 public class TestDynamicModel : IDynamicModel
 {

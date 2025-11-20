@@ -15,7 +15,7 @@ using Newtonsoft.Json.Linq;
 using System.Text;
 
 using ThingsGateway.Foundation;
-using ThingsGateway.NewLife.Json.Extension;
+using ThingsGateway.Foundation.Common.Json.Extension;
 using ThingsGateway.Plugin.Mqtt;
 
 using TouchSocket.Core;

@@ -1,0 +1,37 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
+	<Import Project="..\..\PackNuget.props" />
+
+	<PropertyGroup>
+		<TargetFrameworks>net8.0;$(OtherTargetFrameworks);</TargetFrameworks>
+	</PropertyGroup>
+	<ItemGroup>
+		<PackageReference Include="ThingsGateway.Blazor.Diagrams" Version="$(AdminVersion)" />
+		<ProjectReference Include="..\ThingsGateway.Foundation.Razor\ThingsGateway.Foundation.Razor.csproj" />
+		<ProjectReference Include="..\ThingsGateway.Gateway.Application\ThingsGateway.Gateway.Application.csproj" />
+		<PackageReference Include="Riok.Mapperly" Version="4.3.0" ExcludeAssets="runtime" PrivateAssets="all">
+		  <IncludeAssets>compile; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="ThingsGateway.Admin.Razor" Version="$(AdminVersion)" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Content Remove="Locales\*.json" />
+		<EmbeddedResource Include="Locales\*.json">
+			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</EmbeddedResource>
+	</ItemGroup>
+
+
+	<PropertyGroup>
+		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+	</PropertyGroup>
+	
+	<ItemGroup>
+		<PackageReference Include="BlazorSetParametersAsyncGenerator" Version="$(AdminVersion)" PrivateAssets="all" OutputItemType="Analyzer" />
+	</ItemGroup>
+
+
+
+</Project>
+
+

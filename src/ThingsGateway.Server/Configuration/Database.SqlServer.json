@@ -1,18 +1,17 @@
 ﻿{
 
 
-  // 详细数据库配置见SqlSugar官网
+
   // 数据库连接字符串参考地址：https://www.connectionstrings.com/
 
-  //Sqlsugar数据库配置
-  "SqlSugar": [
+  //数据库配置
+  "SqlOrm": [
     {
       "ConfigId": "DB_Admin", //ID
       //"ConnectionString": "server=localhost;Database=test;Uid=root;Pwd=111111;AllowLoadLocalInfile=true;", //连接字符串
-      //"DbType": "MySql", //数据库类型
+      //"DatabaseType": "MySql", //数据库类型
       "ConnectionString": "server=.;uid=sa;pwd=111111;database=ThingsGateway;Encrypt=True;TrustServerCertificate=True;", //连接字符串
-      "DbType": "SqlServer ", //数据库类型
-      "LanguageType": "Chinese", //中文提示
+      "DatabaseType": "SqlServer ", //数据库类型
       "IsAutoCloseConnection": true, //是否自动释放
       "InitDatabase": true, //是否初始化数据库,适用于codefirst
       "InitTable": true, //是否初始化表,适用于codefirst
@@ -23,10 +22,9 @@
     {
       "ConfigId": "DB_Log", //ID
       //"ConnectionString": "server=localhost;Database=test;Uid=root;Pwd=111111;AllowLoadLocalInfile=true;", //连接字符串
-      //"DbType": "MySql", //数据库类型
+      //"DatabaseType": "MySql", //数据库类型
       "ConnectionString": "server=.;uid=sa;pwd=111111;database=ThingsGateway;Encrypt=True;TrustServerCertificate=True;", //连接字符串
-      "DbType": "SqlServer ", //数据库类型
-      "LanguageType": "Chinese", //中文提示
+      "DatabaseType": "SqlServer ", //数据库类型
       "IsAutoCloseConnection": true, //是否自动释放
       "InitDatabase": true, //是否初始化数据库,适用于codefirst
       "InitTable": true, //是否初始化表,适用于codefirst
@@ -37,10 +35,9 @@
     {
       "ConfigId": "DB_TokenCache", //ID
       //"ConnectionString": "server=localhost;Database=test;Uid=root;Pwd=111111;AllowLoadLocalInfile=true;", //连接字符串
-      //"DbType": "MySql", //数据库类型
+      //"DatabaseType": "MySql", //数据库类型
       "ConnectionString": "server=.;uid=sa;pwd=111111;database=ThingsGateway;Encrypt=True;TrustServerCertificate=True;", //连接字符串
-      "DbType": "SqlServer ", //数据库类型
-      "LanguageType": "Chinese", //中文提示
+      "DatabaseType": "SqlServer ", //数据库类型
       "IsAutoCloseConnection": true, //是否自动释放
       "InitDatabase": true, //是否初始化数据库,适用于codefirst
       "InitTable": true, //是否初始化表,适用于codefirst
@@ -51,10 +48,9 @@
     {
       "ConfigId": "DB_HardwareInfo", //ID
       //"ConnectionString": "server=localhost;Database=test;Uid=root;Pwd=111111;AllowLoadLocalInfile=true;", //连接字符串
-      //"DbType": "MySql", //数据库类型
+      //"DatabaseType": "MySql", //数据库类型
       "ConnectionString": "server=.;uid=sa;pwd=111111;database=ThingsGateway;Encrypt=True;TrustServerCertificate=True;", //连接字符串
-      "DbType": "SqlServer ", //数据库类型
-      "LanguageType": "Chinese", //中文提示
+      "DatabaseType": "SqlServer ", //数据库类型
       "IsAutoCloseConnection": true, //是否自动释放
       "InitDatabase": true, //是否初始化数据库,适用于codefirst
       "InitTable": true, //是否初始化表,适用于codefirst
@@ -65,10 +61,9 @@
     {
       "ConfigId": "DB_Custom", //ID
       //"ConnectionString": "server=localhost;Database=test;Uid=root;Pwd=111111;AllowLoadLocalInfile=true;", //连接字符串
-      //"DbType": "MySql", //数据库类型
+      //"DatabaseType": "MySql", //数据库类型
       "ConnectionString": "server=.;uid=sa;pwd=111111;database=ThingsGateway;Encrypt=True;TrustServerCertificate=True;", //连接字符串
-      "DbType": "SqlServer ", //数据库类型
-      "LanguageType": "Chinese", //中文提示
+      "DatabaseType": "SqlServer ", //数据库类型
       "IsAutoCloseConnection": true, //是否自动释放
       "InitDatabase": true, //是否初始化数据库,适用于codefirst
       "InitTable": true, //是否初始化表,适用于codefirst

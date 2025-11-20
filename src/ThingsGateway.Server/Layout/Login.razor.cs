@@ -22,7 +22,7 @@ using ThingsGateway.Admin.Application;
 using ThingsGateway.Admin.Razor;
 using ThingsGateway.Common;
 using ThingsGateway.DataEncryption;
-using ThingsGateway.NewLife.Extension;
+using ThingsGateway.Foundation.Common.StringExtension;
 using ThingsGateway.Razor;
 
 namespace ThingsGateway.Server;

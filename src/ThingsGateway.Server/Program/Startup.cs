@@ -31,6 +31,7 @@ using ThingsGateway.Admin.Application;
 using ThingsGateway.Admin.Razor;
 using ThingsGateway.Common;
 using ThingsGateway.DB;
+using ThingsGateway.Foundation.Common;
 using ThingsGateway.VirtualFileServer;
 
 namespace ThingsGateway.Server;
@@ -62,7 +63,7 @@ public class Startup : AppStartup
         // 允许跨域
         services.AddCorsAccessor();
 
-        if (!WebEnableVariable.WebEnable)
+        if (!Runtime.WebEnable)
         {
             services.AddScoped<IJSRuntime, UnsupportedJavaScriptRuntime>();
             services.AddScoped<NavigationManager, UnsupportedNavigationManager>();
@@ -193,7 +194,7 @@ public class Startup : AppStartup
 
             return appContext;
         });
-        if (WebEnableVariable.WebEnable)
+        if (Runtime.WebEnable)
         {
 
             services.AddHttpContextAccessor();
@@ -238,7 +239,7 @@ public class Startup : AppStartup
             services.AddScoped<AuthenticationStateProvider, BlazorServerAuthenticationStateProvider>();
 
 
-            if (!NewLife.Runtime.IsLegacyWindows)
+            if (!Runtime.IsLegacyWindows)
             {
 #if NET9_0_OR_GREATER
                 var certificate = X509CertificateLoader.LoadPkcs12FromFile("ThingsGateway.pfx", "ThingsGateway", X509KeyStorageFlags.EphemeralKeySet);
@@ -261,7 +262,7 @@ public class Startup : AppStartup
     public void Use(IApplicationBuilder applicationBuilder, IWebHostEnvironment env)
     {
 
-        if (WebEnableVariable.WebEnable)
+        if (Runtime.WebEnable)
         {
 
             var app = (WebApplication)applicationBuilder;

@@ -1,0 +1,70 @@
+﻿@inherits LayoutComponentBase
+@layout BaseLayout
+@namespace ThingsGateway.Debug
+@using BootstrapBlazor.Components
+@using ThingsGateway.Extension
+@using ThingsGateway.Common.Extension
+@using ThingsGateway.Foundation.Common.StringExtension
+@using ThingsGateway.Razor
+@inject NavigationManager NavigationManager
+
+<div class="mainlayout">
+
+    <Layout SideWidth="0" IsPage="true" IsFullSide="true" IsFixedHeader="true"
+            ShowGotoTop="true" ShowCollapseBar="true" Menus="@MenuService.MenuItems"
+            AllowDragTab=true AdditionalAssemblies="@App.RazorAssemblies"
+            UseTabSet="false" TabDefaultUrl="/">
+        <Header>
+
+            <div class="flex-fill"></div>
+            @* 搜索框 *@
+            <GlobalSearch Menus=@(MenuService.SameLevelMenuItems) />
+            @* 语言选择 *@
+
+            <div class="d-none d-xl-flex ">
+                <CultureChooser />
+            </div>
+
+
+
+
+            @* 全屏按钮 *@
+            <FullScreenButton class="layout-header-bar d-none d-lg-flex px-2" Icon="fa fa-arrows-alt"
+                              TooltipPlacement=Placement.Bottom TooltipText="@Localizer[nameof(FullScreenButton)]" />
+            @if (WebsiteOption.Value.IsShowAbout)
+            {
+                <Button OnClick="ShowAbout" class="layout-header-bar d-none d-lg-flex px-2" Icon="fa fa-info" Color="Color.None" TooltipText="@Localizer[nameof(About)]" />
+            }
+            @* 版本号 *@
+            <div class="px-1 navbar-header-text text-nowrap d-none d-lg-block">@_versionString</div>
+
+            @* 主题切换 *@
+            @* <ThemeToggle /> *@
+            <ThemeProvider class="layout-header-bar d-none d-lg-flex px-0"></ThemeProvider>
+
+        </Header>
+        <Side>
+            <div class="layout-banner">
+                <img src="appLogo.svg" style="width: 190px;padding-top: 10px;" />
+            </div>
+        </Side>
+        <Main>
+
+            <Tab @ref=_tab ClickTabToNavigation="true" ShowToolbar="true" ShowContextMenu="true"  ShowExtendButtons="false" ShowClose="true" AllowDrag=true
+                      ShowFullscreenToolbarButton=false ShowContextMenuFullScreen=false ShowFullScreen=false  AdditionalAssemblies="@App.RazorAssemblies" Menus="@MenuService.AllOwnMenuItems"
+                     DefaultUrl=@("/") Body=@(Body!) OnCloseTabItemAsync=@((a)=>
+                     {
+                     return Task.FromResult(!(a.Url=="/"||a.Url.IsNullOrEmpty()));
+                     })>
+                </Tab>
+ 
+
+        </Main>
+        <NotAuthorized>
+            <Redirect />
+        </NotAuthorized>
+    </Layout>
+
+</div>
+
+

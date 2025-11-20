@@ -1,9 +1,0 @@
-﻿{
-  "ThingsGateway.Plugin.SiemensS7.SiemensS7MasterProperty": {
-    "SiemensS7Type": "协议类型",
-    "Rack": "机架号",
-    "LocalTSAP": "本地TSAP",
-    "Slot": "槽号"
-
-  }
-}

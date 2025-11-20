@@ -9,22 +9,22 @@
 //// ------------------------------------------------------------------------------
 
 //using ThingsGateway.Gateway.Application;
-//using ThingsGateway.NewLife.Json.Extension;
+//using ThingsGateway.Foundation.Common.Json.Extension;
 //using ThingsGateway.Plugin.DB;
-//using ThingsGateway.SqlSugar;
+//using ThingsGateway.SqlOrm;
 
 //using TouchSocket.Core;
 
 //public class TestSQL : DynamicSQLBase
 //{
-//    public override Task DBInit(ISqlSugarClient db, CancellationToken cancellationToken)
+//    public override Task DBInit(ISqlOrmClient db, CancellationToken cancellationToken)
 //    {
 //        db.DbMaintenance.CreateDatabase();
 //        db.CodeFirst.InitTables<ThingsGateway.Plugin.OpcAe.OpcAeEventData>();
 //        return Task.CompletedTask;
 //    }
 
-//    public override async Task DBInsertable(ISqlSugarClient db, IEnumerable<object> datas, CancellationToken cancellationToken)
+//    public override async Task DBInsertable(ISqlOrmClient db, IEnumerable<object> datas, CancellationToken cancellationToken)
 //    {
 //        var pluginEventDatas = datas.Cast<PluginEventData>();
 //        var opcDatas = pluginEventDatas.Select(

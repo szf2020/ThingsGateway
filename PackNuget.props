@@ -1,0 +1,49 @@
+<Project>
+
+	<PropertyGroup>
+
+		<GenerateDocumentationFile>True</GenerateDocumentationFile>
+		<PackageOutputPath>$(MSBuildThisFileDirectory)..\nupkgs</PackageOutputPath>
+		<PackageVersion>$(Version)</PackageVersion>
+		<PackageTags>ThingsGateway;Diego;Blazor;IOT;设备采集;边缘网关;物联网</PackageTags>
+		<PackageProjectUrl>https://gitee.com/diego2098/ThingsGateway</PackageProjectUrl>
+		<PackageIcon>icon.png</PackageIcon>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+
+
+		<SignAssembly>True</SignAssembly>
+		<AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)ThingsGateway.snk</AssemblyOriginatorKeyFile>
+		
+	</PropertyGroup>
+	
+	<!--Condition="'$(Configuration)' == 'Release'"-->
+	<PropertyGroup>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+	</PropertyGroup>
+
+
+	<ItemGroup>
+		<PackageReference Include="Roslynator.Analyzers" Version="4.14.1">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+
+		<PackageReference Include="PolySharp" Version="1.15.0">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+
+	</ItemGroup>
+	
+	
+	<ItemGroup>
+		<None Include="$(MSBuildThisFileDirectory)PackNuget.props" Pack="true" PackagePath="\" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Include="$(MSBuildThisFileDirectory)README.md" Pack="true" PackagePath="\" />
+		<None Include="$(MSBuildThisFileDirectory)LICENSE" Pack="true" PackagePath="\" />
+		<None Include="$(MSBuildThisFileDirectory)icon.png" Pack="true" PackagePath="\" />
+	</ItemGroup>
+</Project>

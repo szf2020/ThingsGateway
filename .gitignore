@@ -361,8 +361,3 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
-
-/src/*Pro*/
-/src/*Pro*
-/src/ThingsGateway.Server/Configuration/GiteeOAuthSettings.json
-/src/.idea/

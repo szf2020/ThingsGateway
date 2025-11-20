@@ -32,6 +32,7 @@ using ThingsGateway.Admin.Application;
 using ThingsGateway.Admin.Razor;
 using ThingsGateway.DB;
 using ThingsGateway.Debug;
+using ThingsGateway.Foundation.Common;
 using ThingsGateway.Gateway.Razor;
 using ThingsGateway.VirtualFileServer;
 
@@ -171,7 +172,7 @@ public class Startup : AppStartup
         services.AddSignalR();
         #endregion
 
-        if (!NewLife.Runtime.IsLegacyWindows)
+        if (!Runtime.IsLegacyWindows)
         {
 #if NET9_0_OR_GREATER
             var certificate = X509CertificateLoader.LoadPkcs12FromFile("ThingsGateway.pfx", "ThingsGateway", X509KeyStorageFlags.EphemeralKeySet);

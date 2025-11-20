@@ -10,7 +10,7 @@
 
 //using ThingsGateway.Foundation;
 //using ThingsGateway.Gateway.Application;
-//using ThingsGateway.NewLife.Extension;
+//using ThingsGateway.Foundation.Common.Extension;
 //public class TestKafkaDynamicModel : DynamicModelBase
 //{
 //    private Dictionary<string, VariableRuntime> variableRuntimes = new();

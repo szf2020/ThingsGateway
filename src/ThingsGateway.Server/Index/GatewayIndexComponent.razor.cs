@@ -65,7 +65,7 @@ public partial class GatewayIndexComponent : IDisposable
             }
             catch (Exception ex)
             {
-                NewLife.Log.XTrace.WriteException(ex);
+                Foundation.Common.Log.XTrace.WriteException(ex);
             }
             finally
             {

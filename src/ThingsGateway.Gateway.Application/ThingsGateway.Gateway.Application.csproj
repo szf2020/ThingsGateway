@@ -1,0 +1,68 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<Import Project="..\..\PackNuget.props" />
+	<PropertyGroup>
+		<TargetFrameworks>net8.0;$(OtherTargetFrameworks);</TargetFrameworks>
+
+	</PropertyGroup>
+	<ItemGroup>
+		<PackageReference Include="Portable.BouncyCastle" Version="1.9.0" />
+		<PackageReference Include="Riok.Mapperly" Version="4.3.0" ExcludeAssets="runtime" PrivateAssets="all">
+			<IncludeAssets>compile; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="Rougamo.Fody" Version="5.0.2" />
+		<PackageReference Include="TouchSocket.Dmtp" Version="$(TouchSocketVersion)" />
+		<PackageReference Include="TouchSocket.WebApi" Version="$(TouchSocketVersion)" />
+		<PackageReference Include="ThingsGateway.Authentication" Version="$(AuthenticationVersion)" />
+
+	</ItemGroup>
+
+	<!--<ItemGroup>
+		<Content Remove="SeedData\Gateway\*.json" />
+		<Content Include="SeedData\Gateway\*.json" Pack="true" PackagePath="\Content\SeedData\Gateway\">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+
+		<Content Remove="SeedData\Management\*.json" />
+		<Content Include="SeedData\Management\*.json" Pack="true" PackagePath="\Content\SeedData\Management\">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+
+		<Content Remove="SeedData\RulesEngine\*.json" />
+		<Content Include="SeedData\RulesEngine\*.json" Pack="true" PackagePath="\Content\SeedData\RulesEngine\">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+
+	</ItemGroup>-->
+
+
+	<ItemGroup>
+		<Content Remove="SeedData\Gateway\*.json" />
+		<EmbeddedResource Include="SeedData\Gateway\*.json" />
+		<Content Remove="SeedData\Management\*.json" />
+		<EmbeddedResource Include="SeedData\Management\*.json" />
+		<Content Remove="SeedData\RulesEngine\*.json" />
+		<EmbeddedResource Include="SeedData\RulesEngine\*.json" />
+	</ItemGroup>
+	
+
+	<ItemGroup>
+		<Content Remove="Locales\*.json" />
+		<EmbeddedResource Include="Locales\*.json">
+			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</EmbeddedResource>
+	</ItemGroup>
+
+
+	<ItemGroup>
+		<PackageReference Include="ThingsGateway.Admin.Application" Version="$(AdminVersion)" />
+		<PackageReference Include="ThingsGateway.Blazor.Diagrams.Core" Version="$(AdminVersion)" />
+		<PackageReference Include="ThingsGateway.CSScript" Version="$(FoundationVersion)" />
+		<PackageReference Include="ThingsGateway.Foundation" Version="$(FoundationVersion)" />
+	</ItemGroup>
+
+	<ItemGroup Condition="'$(TargetFramework)'=='net8.0'">
+		<PackageReference Include="System.Linq.Async" Version="6.0.3" />
+	</ItemGroup>
+
+</Project>

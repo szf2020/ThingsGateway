@@ -17,9 +17,9 @@ using Photino.Blazor;
 
 using System.Text;
 
-using ThingsGateway.NewLife;
-using ThingsGateway.NewLife.Json.Extension;
-using ThingsGateway.NewLife.Log;
+using ThingsGateway.Foundation.Common;
+using ThingsGateway.Foundation.Common.Json.Extension;
+using ThingsGateway.Foundation.Common.Log;
 
 namespace ThingsGateway.Server;
 

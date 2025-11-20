@@ -1,9 +1,0 @@
-<Project>
-	<PropertyGroup>
-		<TargetFrameworks>net462;netstandard2.0;net6.0;net8.0;$(OtherTargetFrameworks);</TargetFrameworks>
-	</PropertyGroup>
-
-	<ItemGroup>
-		<None Include="$(MSBuildThisFileDirectory)Foundation.props" Pack="true" PackagePath="\" />
-	</ItemGroup>
-</Project>

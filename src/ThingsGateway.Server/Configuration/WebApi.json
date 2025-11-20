@@ -1,7 +1,7 @@
 {
   "WebApi": {
     "Enable": false,
-    "ServerUri": "127.0.0.1:7999",
+    "ServerUri": "127.0.0.1:8999",
     "UserName": "Admin",
     "Password": "111111"
   }

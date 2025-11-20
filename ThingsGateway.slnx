@@ -1,0 +1,19 @@
+<Solution>
+  <Folder Name="/Benchmark/" />
+  <Folder Name="/src/">
+    <Project Path="src/ThingsGateway.Foundation.Razor/ThingsGateway.Foundation.Razor.csproj" />
+    <Project Path="src/ThingsGateway.Gateway.Application/ThingsGateway.Gateway.Application.csproj" />
+    <Project Path="src/ThingsGateway.Gateway.Razor/ThingsGateway.Gateway.Razor.csproj" />
+  </Folder>
+  <Folder Name="/Test/" />
+  <Folder Name="/解决方案项/">
+    <File Path=".gitignore" />
+    <File Path="Directory.Build.props" />
+    <File Path="PackNuget.props" />
+    <File Path="README.md" />
+  </Folder>
+  <Project Path="src/ThingsGateway.Debug.Photino/ThingsGateway.Debug.Photino.csproj" />
+  <Project Path="src/ThingsGateway.Photino/ThingsGateway.Photino.csproj" />
+  <Project Path="src/ThingsGateway.ScriptDebug/ThingsGateway.ScriptDebug.csproj" />
+  <Project Path="src/ThingsGateway.Server/ThingsGateway.Server.csproj" />
+</Solution>

@@ -18,11 +18,11 @@
 ///// <summary>
 ///// 解密数据库连接字符串demo，需注入服务
 ///// </summary>
-//internal sealed class SugarConfigAopService : ISugarConfigAopService
+//internal sealed class OrmConfigAopService : IOrmConfigAopService
 //{
-//    public SqlSugarOptions Config(SqlSugarOptions sqlSugarOptions)
+//    public SqlOrmOptions Config(SqlOrmOptions sqlOrmOptions)
 //    {
-//        foreach (var item in sqlSugarOptions)
+//        foreach (var item in sqlOrmOptions)
 //        {
 //            //解密连接字符串,自定 算法方式，例如RSA
 //            RSA rsa = RSA.Create();
@@ -39,6 +39,6 @@
 //            item.ConnectionString = Encoding.UTF8.GetString(decryptedData);
 
 //        }
-//        return sqlSugarOptions;
+//        return sqlOrmOptions;
 //    }
 //}

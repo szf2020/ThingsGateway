@@ -1,0 +1,184 @@
+﻿// ------------------------------------------------------------------------------
+// 此代码版权声明为全文件覆盖，如有原作者特别声明，会在下方手动补充
+// 此代码版权（除特别声明外的代码）归作者本人Diego所有
+// 源代码使用协议遵循本仓库的开源协议及附加协议
+// Gitee源代码仓库：https://gitee.com/diego2098/ThingsGateway
+// Github源代码仓库：https://github.com/kimdiego2098/ThingsGateway
+// 使用文档：https://thingsgateway.cn/
+// QQ群：605534569
+// ------------------------------------------------------------------------------
+
+using BootstrapBlazor.Components;
+
+using System.Reflection;
+using System.Text.Json;
+using System.Text.Json.Nodes;
+
+using ThingsGateway.Blazor.Diagrams.Core;
+using ThingsGateway.Blazor.Diagrams.Core.Anchors;
+using ThingsGateway.Blazor.Diagrams.Core.Geometry;
+using ThingsGateway.Blazor.Diagrams.Core.Models;
+
+namespace ThingsGateway.Gateway.Application;
+
+public static class RuleHelpers
+{
+    /// <summary>
+    /// 构造选择项，ID/Name
+    /// </summary>
+    /// <param name="items"></param>
+    /// <returns></returns>
+    public static IEnumerable<SelectedItem> BuildRulesSelectList(this IEnumerable<Rules> items)
+    {
+        var data = items
+        .Select((item, index) =>
+            new SelectedItem(item.Id.ToString(), item.Name)
+        ).ToList();
+        return data;
+    }
+
+    public static readonly Dictionary<Type, CategoryNode> CategoryNodeDict = new();
+    public static List<IGrouping<string, KeyValuePair<Type, CategoryNode>>> CategoryNodeGroups = new();
+    static RuleHelpers()
+    {
+        GetDict();
+    }
+    private static void GetDict()
+    {
+        foreach (var item in App.EffectiveTypes)
+        {
+            var categoryNode = item.GetCustomAttribute<CategoryNode>();
+            if (categoryNode != null)
+            {
+                categoryNode.StringLocalizer = App.CreateLocalizerByType(categoryNode.LocalizerType);
+                CategoryNodeDict.Add(item, categoryNode);
+            }
+        }
+        CategoryNodeGroups = RuleHelpers.CategoryNodeDict.GroupBy(a => a.Value.Category).ToList();
+    }
+
+    public static NodeModel GetNodeModel(string key, string id, Point point)
+    {
+#if Management
+        key = key.Replace(",ThingsGateway.Gateway.Application", ",ThingsGateway.Management.Application");
+#endif
+        var type = Type.GetType(key.Contains('.') ? key : $"ThingsGateway.Gateway.Application.{key}");
+        if (type != null)
+        {
+            var node = Activator.CreateInstance(type, id, point) as NodeModel;
+            if (node is IStartNode)
+            {
+                node.AddPort(PortAlignment.Bottom);
+            }
+            else
+            {
+                node.AddPort(PortAlignment.Top);
+                node.AddPort(PortAlignment.Bottom);
+            }
+            return node;
+        }
+        else
+        {
+            return null;
+        }
+    }
+    public static Dictionary<string, JsonNode> GetModelValue(NodeModel nodeModel)
+    {
+        Dictionary<string, JsonNode> jtokens = new();
+        var propertyInfos = nodeModel.GetType().GetRuntimeProperties().Where(a => a.GetCustomAttribute<ModelValue>() != null);
+        foreach (var item in propertyInfos)
+        {
+            jtokens.Add(item.Name, JsonUtil.GetJsonNodeFromObj(item.GetValue(nodeModel)));
+        }
+        return jtokens;
+    }
+    public static void SetModelValue(NodeModel nodeModel, JsonObject jobject)
+    {
+        if (nodeModel == null)
+            return;
+        if (jobject == null)
+            return;
+        var propertyInfos = nodeModel?.GetType().GetRuntimeProperties().ToDictionary(a => a.Name);
+        foreach (var item in jobject ?? new())
+        {
+            if (propertyInfos.TryGetValue(item.Key, out var propertyInfo))
+            {
+                try
+                {
+                    propertyInfo.SetValue(nodeModel, item.Value?.Deserialize(propertyInfo.PropertyType));
+                }
+                catch (Exception)
+                {
+                    propertyInfo.SetValue(nodeModel, null);
+                }
+            }
+        }
+    }
+
+    public static NodeModel OnNodeJson(Diagram blazorDiagram, string draggedType, string id, Point point)
+    {
+        NodeModel node = RuleHelpers.GetNodeModel(draggedType, id, point);
+        if (node != null)
+            blazorDiagram.Nodes.Add(node);
+        return node;
+    }
+
+    public static RulesJson Save(Diagram blazorDiagram)
+    {
+        var rules = new RulesJson();
+        foreach (var item in blazorDiagram.Nodes)
+        {
+            NodeJson nodeJson = new();
+            rules.NodeJsons.Add(nodeJson);
+#if Management
+
+            nodeJson.DraggedType = $"{item.GetType().FullName},ThingsGateway.Gateway.Application";
+#else
+
+            nodeJson.DraggedType = $"{item.GetType().FullName},{item.GetType().Assembly.GetName().Name}";
+
+#endif
+            nodeJson.Point = item.Position;
+            nodeJson.Id = item.Id;
+            foreach (var keyValuePair in GetModelValue(item))
+            {
+                nodeJson.CValues.Add(keyValuePair.Key, keyValuePair.Value);
+            }
+        }
+        foreach (var item in blazorDiagram.Links)
+        {
+            LinkJson linkJson = new();
+            rules.LinkJsons.Add(linkJson);
+
+            linkJson.SourcePortAnchor.PortAlignment = ((PortModel)item.Source.Model).Alignment;
+            linkJson.SourcePortAnchor.NodelId = ((PortModel)item.Source.Model).Parent.Id;
+            linkJson.TargetPortAnchor.PortAlignment = ((PortModel)item.Target.Model).Alignment;
+            linkJson.TargetPortAnchor.NodelId = ((PortModel)item.Target.Model).Parent.Id;
+        }
+        return rules;
+    }
+
+    public static void Load(Diagram blazorDiagram, RulesJson rules)
+    {
+        blazorDiagram.Nodes.Clear();
+        blazorDiagram.Links.Clear();
+        foreach (var item in rules.NodeJsons)
+        {
+            var nodeModel = OnNodeJson(blazorDiagram, item.DraggedType, item.Id, item.Point);
+
+            SetModelValue(nodeModel, item.CValues);
+        }
+        foreach (var item in rules.LinkJsons)
+        {
+            var source = blazorDiagram.Nodes.FirstOrDefault(a => a.Id == item.SourcePortAnchor.NodelId).Ports.FirstOrDefault(a => a.Alignment == item.SourcePortAnchor.PortAlignment);
+            var target = blazorDiagram.Nodes.FirstOrDefault(a => a.Id == item.TargetPortAnchor.NodelId).Ports.FirstOrDefault(a => a.Alignment == item.TargetPortAnchor.PortAlignment);
+
+            var linkModel = blazorDiagram.Options.Links.Factory(blazorDiagram, source, new SinglePortAnchor(target));
+            if (linkModel == null)
+                continue;
+            blazorDiagram.Links.Add(linkModel);
+        }
+
+        blazorDiagram.Refresh();
+    }
+}

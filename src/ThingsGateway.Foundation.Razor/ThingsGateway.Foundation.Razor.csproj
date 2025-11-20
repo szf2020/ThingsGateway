@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+	<Import Project="..\..\PackNuget.props" />
+	<PropertyGroup>
+		<TargetFrameworks>net8.0;$(OtherTargetFrameworks);</TargetFrameworks>
+
+	</PropertyGroup>
+	<ItemGroup>
+		<PackageReference Include="BlazorSetParametersAsyncGenerator"  Version="$(AdminVersion)" PrivateAssets="all" OutputItemType="Analyzer" />
+		<PackageReference Include="ThingsGateway.Razor" Version="$(AdminVersion)" />
+		<PackageReference Include="ThingsGateway.Foundation" Version="$(FoundationVersion)" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Content Remove="Locales\*.json" />
+		<EmbeddedResource Include="Locales\*.json">
+			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</EmbeddedResource>
+	</ItemGroup>
+
+</Project>
+
+
