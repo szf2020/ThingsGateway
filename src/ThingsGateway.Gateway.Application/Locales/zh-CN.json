@@ -321,7 +321,13 @@
     "PluginName.Required": "{0} 插件名称不可为空",
     "PluginType": "插件类型"
   },
-
+  "ThingsGateway.Management.Application.ChannelRuntime": {
+    "DeviceRuntimeCount": "设备数量",
+    "MaxConcurrentCount": "最大并发数量",
+    "Name.Required": " {0} 不可为空",
+    "PluginName.Required": "{0} 插件名称不可为空",
+    "PluginType": "插件类型"
+  },
   "ThingsGateway.Gateway.Application.CollectFoundationDtuPackPropertyBase": {
     "DtuId": "Dtu注册包"
   },
@@ -401,6 +407,23 @@
     "SaveDevice": "添加/修改设备"
   },
   "ThingsGateway.Gateway.Application.DeviceRuntime": {
+    "ActiveTime": "活跃时间",
+    "ChannelId.MinValue": " {0} 不可为空",
+    "ChannelId.Required": " {0} 不可为空",
+    "ChannelName": "通道",
+    "DeviceStatus": "设备状态",
+    "DeviceVariableCount": "变量数量",
+    "IntervalTime.MinValue": " {0} 值太小",
+    "LastErrorMessage": "离线原因",
+    "MethodVariableCount": "方法数量",
+    "Name.Required": " {0} 不可为空",
+    "PluginName": "插件名称",
+    "PluginName.Required": "{0} 插件名称不可为空",
+    "RedundantType": "冗余状态",
+    "SourceVariableCount": "打包数量"
+  },
+
+  "ThingsGateway.Gateway.Management.DeviceRuntime": {
     "ActiveTime": "活跃时间",
     "ChannelId.MinValue": " {0} 不可为空",
     "ChannelId.Required": " {0} 不可为空",
@@ -593,6 +616,34 @@
   },
 
   "ThingsGateway.Gateway.Application.VariableRuntime": {
+    "AlarmCode": "报警值",
+    "AlarmEnable": "报警使能",
+    "AlarmLimit": "报警限值",
+    "AlarmText": "报警文本",
+    "AlarmTime": "报警时间",
+    "AlarmType": "报警类型",
+    "ChangeTime": "变化时间",
+    "CollectTime": "采集时间",
+    "DeviceId.MinValue": " {0} 不可为空",
+    "DeviceId.Required": " {0} 不可为空",
+    "DeviceName": "设备名称",
+    "DynamicVariable": "动态变量",
+    "EventTime": "事件时间",
+    "ConfirmTime": "确认时间",
+    "FinishTime": "恢复时间",
+    "EventType": "事件类型",
+    "IntervalTime.MinValue": " {0} 值太小",
+    "IsOnline": "在线",
+    "LastErrorMessage": "离线原因",
+    "LastSetValue": "上次值",
+    "Name.Required": " {0} 不可为空",
+    "RawValue": "原始值",
+    "RecoveryCode": "恢复值",
+    "RuntimeType": "动态类型",
+    "SortCode": "排序",
+    "Value": "实时值"
+  },
+  "ThingsGateway.Management.Application.VariableRuntime": {
     "AlarmCode": "报警值",
     "AlarmEnable": "报警使能",
     "AlarmLimit": "报警限值",

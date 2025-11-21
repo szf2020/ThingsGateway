@@ -322,7 +322,13 @@
     "PluginName.Required": "{0} cannot be empty",
     "PluginType": "PluginType"
   },
-
+  "ThingsGateway.Management.Application.ChannelRuntime": {
+    "DeviceRuntimeCount": "DeviceRuntimeCount",
+    "MaxConcurrentCount": "MaxConcurrentCount",
+    "Name.Required": "{0} cannot be empty",
+    "PluginName.Required": "{0} cannot be empty",
+    "PluginType": "PluginType"
+  },
   "ThingsGateway.Gateway.Application.CollectFoundationDtuPackPropertyBase": {
     "DtuId": "DtuId"
   },
@@ -402,6 +408,20 @@
     "SaveDevice": "Add/Modify Device"
   },
   "ThingsGateway.Gateway.Application.DeviceRuntime": {
+    "ActiveTime": "ActiveTime",
+    "ChannelName": "ChannelName",
+    "DeviceStatus": "DeviceStatus",
+    "DeviceVariableCount": "DeviceVariableCount",
+    "IntervalTime.MinValue": " {0} value is too small",
+    "LastErrorMessage": "LastErrorMessage",
+    "MethodVariableCount": "MethodVariableCount",
+    "Name.Required": " {0}  cannot be empty",
+    "PluginName": "PluginName",
+    "PluginName.Required": "{0} cannot be empty",
+    "RedundantType": "RedundantType",
+    "SourceVariableCount": "SourceVariableCount"
+  },
+  "ThingsGateway.Management.Application.DeviceRuntime": {
     "ActiveTime": "ActiveTime",
     "ChannelName": "ChannelName",
     "DeviceStatus": "DeviceStatus",
@@ -569,6 +589,33 @@
     "LRestrainExpressions": "LRestrainExpressions"
   },
   "ThingsGateway.Gateway.Application.VariableRuntime": {
+    "AlarmCode": "AlarmCode",
+    "AlarmEnable": "AlarmEnable",
+    "AlarmLimit": "AlarmLimit",
+    "AlarmText": "AlarmText",
+    "AlarmTime": "AlarmTime",
+    "AlarmType": "AlarmType",
+    "ChangeTime": "ChangeTime",
+    "CollectTime": "CollectTime",
+    "DeviceId.MinValue": "{0} cannot be empty",
+    "DeviceId.Required": "{0} cannot be empty",
+    "DeviceName": "DeviceName",
+    "DynamicVariable": "DynamicVariable",
+    "EventTime": "EventTime",
+    "ConfirmTime": "ConfirmTime",
+    "FinishTime": "FinishTime",
+    "EventType": "EventType",
+    "IntervalTime.MinValue": "{0} value is too small",
+    "IsOnline": "IsOnline",
+    "LastErrorMessage": "LastErrorMessage",
+    "LastSetValue": "LastSetValue",
+    "RawValue": "RawValue",
+    "RecoveryCode": "RecoveryCode",
+    "RuntimeType": "RuntimeType",
+    "Value": "Value"
+  },
+
+  "ThingsGateway.Management.Application.VariableRuntime": {
     "AlarmCode": "AlarmCode",
     "AlarmEnable": "AlarmEnable",
     "AlarmLimit": "AlarmLimit",
