@@ -36,9 +36,6 @@ public partial class PropertyComponent : IPropertyUIBase
         return base.OnParametersSetAsync();
     }
 
-    [Inject]
-    private IStringLocalizer<DeviceEditComponent> Localizer { get; set; }
-
     public static async Task CheckScript(BusinessPropertyWithCacheIntervalScript businessProperty, string pname, string title, object receiver, DialogService dialogService)
     {
         string script = null;

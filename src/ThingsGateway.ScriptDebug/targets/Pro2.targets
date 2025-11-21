@@ -30,7 +30,7 @@
 		<!--URF_R330 插件-->
 		<!--<PackageReference Include="ThingsGateway.Plugin.URF_R330" Version="$(ProPluginVersion)" GeneratePathProperty="true" Private="false"  IncludeAssets="all;" />-->
 		<!--USBScaner 插件-->
-		<PackageReference Include="ThingsGateway.Plugin.USBScaner" Version="$(ProPluginVersion)" GeneratePathProperty="true" Private="false"  IncludeAssets="all;" />
+		<!--<PackageReference Include="ThingsGateway.Plugin.USBScaner" Version="$(ProPluginVersion)" GeneratePathProperty="true" Private="false"  IncludeAssets="all;" />-->
 
 
 		<PackageReference Include="ThingsGateway.Plugin.SECS" Version="$(ProPluginVersion)" GeneratePathProperty="true" Private="false"  IncludeAssets="all;" />

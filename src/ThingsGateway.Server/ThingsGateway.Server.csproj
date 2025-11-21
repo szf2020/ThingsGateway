@@ -1,23 +1,24 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
 
-	<ItemGroup Condition=" '$(SolutionName)' != 'ThingsGatewayRelease'">
-		<ProjectReference Include="..\ThingsGateway.Gateway.Application\ThingsGateway.Gateway.Application.csproj" />
+	<ItemGroup>
 		<ProjectReference Include="..\ThingsGateway.Gateway.Razor\ThingsGateway.Gateway.Razor.csproj" />
 	</ItemGroup>
 
 
-	<!--发布版-->
-	<Import Project="targets\Gateway.targets" Condition=" '$(SolutionName)' == 'ThingsGatewayRelease' " />
-	<Import Project="targets\Admin.targets" Condition=" '$(SolutionName)' == 'ThingsGatewayRelease' " />
-
-	<Import Project="targets\PluginContext.targets" Condition=" '$(SolutionName)' == 'ThingsGatewayPro' AND  '$(Configuration)' != 'Debug' " />
 
 	<!--nuget包解压复制文件，上下文动态加载-->
-	<Import Project="targets\PluginContext.targets" Condition=" '$(SolutionName)' != 'ThingsGatewayPro'" />
+	<Import Project="targets\PluginContext.targets" Condition=" '$(SolutionName)' != 'ThingsGatewayAll' OR '$(Configuration)' == 'Release' " />
 
 	<!--nuget包解压复制文件，上下文动态加载，Pro插件-->
-	<Import Project="targets\Pro2.targets" Condition=" '$(SolutionName)' != 'ThingsGatewayPro'" />
+	<Import Project="targets\Pro2.targets" Condition=" '$(SolutionName)' != 'ThingsGatewayAll' OR '$(Configuration)' == 'Release' " />
+
+
+	<!--nuget包解压复制文件，上下文动态加载-->
+	<Import Project="targets\PluginDebug.targets" Condition=" '$(SolutionName)' == 'ThingsGatewayAll' AND '$(Configuration)' != 'Release' " />
+
+	<!--nuget包解压复制文件，上下文动态加载，Pro插件-->
+	<Import Project="targets\ProPluginDebug.targets" Condition=" '$(SolutionName)' == 'ThingsGatewayAll' AND '$(Configuration)' != 'Release' " />
 
 	<!--打包复制-->
 	<Import Project="targets\PluginPublish.targets" />

@@ -1,4 +1,4 @@
-docker pull mcr.microsoft.com/dotnet/aspnet:8.0-noble
+docker pull mcr.microsoft.com/dotnet/aspnet:10.0-noble-amd64
 
 docker build -t registry.cn-shenzhen.aliyuncs.com/thingsgateway/thingsgateway:latest .
 

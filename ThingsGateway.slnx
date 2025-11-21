@@ -3,6 +3,7 @@
   <Folder Name="/src/">
     <Project Path="src/ThingsGateway.Foundation.Razor/ThingsGateway.Foundation.Razor.csproj" />
     <Project Path="src/ThingsGateway.Gateway.Application/ThingsGateway.Gateway.Application.csproj" />
+    <Project Path="src/ThingsGateway.Gateway.Razor.Common/ThingsGateway.Gateway.Razor.Common.csproj" />
     <Project Path="src/ThingsGateway.Gateway.Razor/ThingsGateway.Gateway.Razor.csproj" />
   </Folder>
   <Folder Name="/Test/" />

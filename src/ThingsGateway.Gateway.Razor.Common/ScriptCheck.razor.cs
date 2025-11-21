@@ -44,8 +44,6 @@ public partial class ScriptCheck
             Output = ex.ToString();
         }
     }
-    [Inject]
-    private IStringLocalizer<DeviceEditComponent> Localizer { get; set; }
 
     private async Task GetDemo(Microsoft.AspNetCore.Components.Web.MouseEventArgs args)
     {

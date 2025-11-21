@@ -6,11 +6,21 @@
 
 	</PropertyGroup>
 	<ItemGroup>
+
+	</ItemGroup>
+
+	<ItemGroup Condition=" '$(SolutionName)' != 'ThingsGatewayAll' OR '$(Configuration)' == 'Release' ">
 		<PackageReference Include="BlazorSetParametersAsyncGenerator"  Version="$(AdminVersion)" PrivateAssets="all" OutputItemType="Analyzer" />
 		<PackageReference Include="ThingsGateway.Razor" Version="$(AdminVersion)" />
 		<PackageReference Include="ThingsGateway.Foundation" Version="$(FoundationVersion)" />
 	</ItemGroup>
 
+	<ItemGroup Condition=" '$(SolutionName)' == 'ThingsGatewayAll' AND '$(Configuration)' != 'Release' ">
+		<ProjectReference Include="..\..\..\ThingsGateway.Foundation\src\ThingsGateway.Foundation\ThingsGateway.Foundation.csproj" />
+		<ProjectReference Include="..\..\..\ThingsGateway.Admin\src\ThingsGateway.Razor\ThingsGateway.Razor.csproj" />
+		<ProjectReference Include="..\..\..\ThingsGateway.Admin\src\BlazorSetParametersAsyncGenerator\BlazorSetParametersAsyncGenerator.csproj" PrivateAssets="all" OutputItemType="Analyzer" />
+	</ItemGroup>
+	
 	<ItemGroup>
 		<Content Remove="Locales\*.json" />
 		<EmbeddedResource Include="Locales\*.json">

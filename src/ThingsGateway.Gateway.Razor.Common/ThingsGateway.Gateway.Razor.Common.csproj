@@ -4,27 +4,14 @@
 	<PropertyGroup>
 		<TargetFrameworks>net8.0;$(OtherTargetFrameworks);</TargetFrameworks>
 	</PropertyGroup>
+	
 	<ItemGroup>
 		<ProjectReference Include="..\ThingsGateway.Foundation.Razor\ThingsGateway.Foundation.Razor.csproj" />
 		<ProjectReference Include="..\ThingsGateway.Gateway.Application\ThingsGateway.Gateway.Application.csproj" />
-		<ProjectReference Include="..\ThingsGateway.Gateway.Razor.Common\ThingsGateway.Gateway.Razor.Common.csproj" />
 		<PackageReference Include="Riok.Mapperly" Version="4.3.0" ExcludeAssets="runtime" PrivateAssets="all">
 		  <IncludeAssets>compile; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
 	</ItemGroup>
-
-	<ItemGroup>
-		<Content Remove="Locales\*.json" />
-		<EmbeddedResource Include="Locales\*.json">
-			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
-		</EmbeddedResource>
-	</ItemGroup>
-
-
-	<PropertyGroup>
-		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
-	</PropertyGroup>
-
 
 
 	<ItemGroup Condition=" '$(SolutionName)' != 'ThingsGatewayAll' OR '$(Configuration)' == 'Release' ">
@@ -39,6 +26,8 @@
 		<ProjectReference Include="..\..\..\ThingsGateway.Admin\src\ThingsGateway.Blazor.Diagrams\ThingsGateway.Blazor.Diagrams.csproj" />
 		<ProjectReference Include="..\..\..\ThingsGateway.Admin\src\BlazorSetParametersAsyncGenerator\BlazorSetParametersAsyncGenerator.csproj" PrivateAssets="all" OutputItemType="Analyzer" />
 	</ItemGroup>
+
+
 
 
 
