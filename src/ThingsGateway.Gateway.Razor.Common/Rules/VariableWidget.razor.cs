@@ -15,7 +15,7 @@ namespace ThingsGateway.Gateway.Razor
     public partial class VariableWidget
     {
         [Inject]
-        IStringLocalizer<ThingsGateway.Gateway.Razor._Imports> Localizer { get; set; }
+        IStringLocalizer<ThingsGateway.Gateway.Razor.Common._Imports> Localizer { get; set; }
 
         [Parameter]
         public VariableNode Node { get; set; }

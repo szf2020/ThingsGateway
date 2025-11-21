@@ -17,17 +17,10 @@ global using System.Diagnostics.CodeAnalysis;
 
 global using ThingsGateway.Common;
 global using ThingsGateway.Foundation;
-global using ThingsGateway.Foundation.Common;
-global using ThingsGateway.Foundation.Common.Extension;
 global using ThingsGateway.Gateway.Application;
 global using ThingsGateway.Razor;
 
 #if !Management
-global using ChannelRuntime = ThingsGateway.Gateway.Application.ChannelRuntime;
-global using DeviceRuntime = ThingsGateway.Gateway.Application.DeviceRuntime;
-global using VariableRuntime = ThingsGateway.Gateway.Application.VariableRuntime;
-global using IVariablePageService = ThingsGateway.Gateway.Application.IVariablePageService;
-global using IDevicePageService = ThingsGateway.Gateway.Application.IDevicePageService;
 #else
 global using ChannelRuntime = ThingsGateway.Management.Application.ChannelRuntime;
 global using DeviceRuntime = ThingsGateway.Management.Application.DeviceRuntime;

@@ -22,7 +22,7 @@ namespace ThingsGateway.Gateway.Razor
     public partial class CSharpScriptWidget
     {
         [Inject]
-        IStringLocalizer<ThingsGateway.Gateway.Razor._Imports> Localizer { get; set; }
+        IStringLocalizer<ThingsGateway.Gateway.Razor.Common._Imports> Localizer { get; set; }
 
         [Parameter]
         public TextNode Node { get; set; }

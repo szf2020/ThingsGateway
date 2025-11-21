@@ -42,5 +42,5 @@ public partial class ScriptEdit
     }
 
     [Inject]
-    IStringLocalizer<ThingsGateway.Gateway.Razor._Imports> Localizer { get; set; }
+    IStringLocalizer<ThingsGateway.Gateway.Razor.Common._Imports> Localizer { get; set; }
 }
