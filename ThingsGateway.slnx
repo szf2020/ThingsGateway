@@ -6,7 +6,9 @@
     <Project Path="src/ThingsGateway.Gateway.Razor.Common/ThingsGateway.Gateway.Razor.Common.csproj" />
     <Project Path="src/ThingsGateway.Gateway.Razor/ThingsGateway.Gateway.Razor.csproj" />
   </Folder>
-  <Folder Name="/Test/" />
+  <Folder Name="/Test/">
+    <Project Path="test/ThingsGateway.Gateway.Test/ThingsGateway.Gateway.Test.csproj" />
+  </Folder>
   <Folder Name="/解决方案项/">
     <File Path=".gitignore" />
     <File Path="Directory.Build.props" />
