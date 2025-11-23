@@ -54,7 +54,7 @@
 
 
 	<ItemGroup Condition=" '$(SolutionName)' != 'ThingsGatewayAll' OR '$(Configuration)' == 'Release' ">
-		<PackageReference Include="ThingsGateway.Authentication" Version="$(AuthenticationVersion)" />
+		<PackageReference Include="ThingsGateway.Authentication" Version="$(ManagementvVersion)" />
 		<PackageReference Include="ThingsGateway.Admin.Application" Version="$(AdminVersion)" />
 		<PackageReference Include="ThingsGateway.Blazor.Diagrams.Core" Version="$(AdminVersion)" />
 		<PackageReference Include="ThingsGateway.CSScript" Version="$(FoundationVersion)" />
@@ -72,7 +72,7 @@
 
 
 	<ItemGroup Condition="'$(TargetFramework)'=='net8.0'">
-		<PackageReference Include="System.Linq.Async" Version="6.0.3" />
+		<PackageReference Include="System.Linq.Async" Version="7.0.0" />
 	</ItemGroup>
 
 
