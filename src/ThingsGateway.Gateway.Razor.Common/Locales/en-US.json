@@ -1,5 +1,5 @@
 ﻿{
-  "ThingsGateway.Gateway.Razor._Imports": {
+  "ThingsGateway.Gateway.Razor.Common._Imports": {
 
     "Actuator": "Actuator",
     "AlarmChangedTriggerNode": "AlarmStateTrigger",
@@ -109,5 +109,5 @@
     "UpdateDevice": "Edit Device",
     "VariableInformation": "Variable Information"
   }
- 
+
 }

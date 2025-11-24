@@ -1,7 +1,7 @@
 ﻿{
- 
 
-  "ThingsGateway.Gateway.Razor._Imports": {
+
+  "ThingsGateway.Gateway.Razor.Common._Imports": {
 
     "Actuator": "执行",
     "AlarmChangedTriggerNode": "报警状态触发器",
