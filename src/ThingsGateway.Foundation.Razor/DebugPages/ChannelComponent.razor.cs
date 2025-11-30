@@ -27,6 +27,9 @@ public partial class ChannelComponent : ComponentBase
     [Parameter]
     public EventCallback OnDisConnectClick { get; set; }
 
+    [Parameter]
+    public Func<TouchSocketConfig,IChannelOptions, IChannel> OnCreateClick { get; set; }
+
     public ChannelOptionsDefault? Model { get; set; } = new();
 
     public void PublicStateHasChanged()
@@ -81,7 +84,11 @@ public partial class ChannelComponent : ComponentBase
                 logMessage.AddLogger(logger);
                 config.ConfigureContainer(a => a.RegisterSingleton<ILog>(logMessage));
                 Model.Config = config;
-                Channel = config.GetChannel(Model);
+
+                if(OnCreateClick!=null)
+                    Channel = OnCreateClick(config,Model);
+                else
+                    Channel = config.GetChannel(Model);
 
                 if (OnConfimClick.HasDelegate)
                     await OnConfimClick.InvokeAsync((Channel, path));

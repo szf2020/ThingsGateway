@@ -1,5 +1,5 @@
 {
-  "Debug": "true",
+  "Debug": true,
   "LogLevel": "Info",
   "LogPath": "Logs/XTrace",
   "LogFileMaxMegabytes": "5",

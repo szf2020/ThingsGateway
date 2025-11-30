@@ -572,12 +572,12 @@ internal sealed class PluginService : IPluginService
     /// <summary>
     /// 设置插件的属性值。
     /// </summary>
-    /// <param name="driver">插件实例。</param>
+    /// <param name="protperties">插件属性实例。</param>
     /// <param name="deviceProperties">插件属性，检索相同名称的属性后写入。</param>
-    public void SetDriverProperties(IDriver driver, Dictionary<string, string> deviceProperties)
+    public void SetDriverProperties(object protperties, Dictionary<string, string> deviceProperties)
     {
         // 获取插件的属性信息列表
-        var pluginProperties = driver.DriverProperties?.GetType().GetRuntimeProperties()
+        var pluginProperties = protperties?.GetType().GetRuntimeProperties()
             // 筛选出带有 DynamicPropertyAttribute 特性的属性
             .Where(a => a.GetCustomAttribute<DynamicPropertyAttribute>(false) != null);
 
@@ -592,7 +592,7 @@ internal sealed class PluginService : IPluginService
             // 获取设备属性的值，如果设备属性值为空，则将其转换为当前属性类型的默认值
             var value = ThingsGatewayStringConverter.Default.Deserialize(null, deviceProperty, propertyInfo.PropertyType);
             // 设置插件属性的值
-            propertyInfo.SetValue(driver.DriverProperties, value);
+            propertyInfo.SetValue(protperties, value);
         }
     }
 

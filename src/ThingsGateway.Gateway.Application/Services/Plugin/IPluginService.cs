@@ -66,7 +66,5 @@ public interface IPluginService
     /// <summary>
     /// 设置插件动态属性
     /// </summary>
-    /// <param name="driver"></param>
-    /// <param name="deviceProperties"></param>
-    void SetDriverProperties(IDriver driver, Dictionary<string, string> deviceProperties);
+    void SetDriverProperties(object protperties, Dictionary<string, string> deviceProperties);
 }

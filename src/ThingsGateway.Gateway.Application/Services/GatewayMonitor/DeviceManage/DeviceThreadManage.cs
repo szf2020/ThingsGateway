@@ -47,7 +47,15 @@ internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
         LogMessage?.AddLogger(new EasyLogger(_logger.Log_Out) { LogLevel = TouchSocket.Core.LogLevel.Trace });
 
         // 根据配置获取通道实例
-        Channel = channelRuntime.GetChannel(config);
+        var driver = GlobalData.PluginService.GetDriver(channelRuntime.PluginName);
+        if(driver is CollectFoundationBase collectFoundationBase&& collectFoundationBase.FoundationDevice!=null)
+        {
+            Channel = collectFoundationBase.FoundationDevice.CreateChannel(config, channelRuntime);
+        }
+        else
+        {
+            Channel = channelRuntime.GetChannel(config);
+        }
 
         //初始设置输出文本日志
         SetLog(CurrentChannel.LogLevel);
@@ -496,7 +504,7 @@ internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
         driver.InitDevice(deviceRuntime);
 
         // 设置设备属性到插件实例
-        pluginService.SetDriverProperties(driver, deviceRuntime.DevicePropertys);
+        pluginService.SetDriverProperties(driver.DriverProperties, deviceRuntime.DevicePropertys);
 
         return driver;
     }

@@ -115,8 +115,11 @@
       {
         "Url": "/OpcAeMaster",
         "Text": "OpcAeMaster"
+      },
+      {
+        "Url": "/IEC104Slave",
+        "Text": "IEC104Slave"
       }
-
     ]
   }
 }
