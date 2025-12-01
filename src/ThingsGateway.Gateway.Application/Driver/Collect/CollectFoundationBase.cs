@@ -22,7 +22,7 @@ namespace ThingsGateway.Gateway.Application;
 /// 采集插件，继承实现不同PLC通讯
 /// <para></para>
 /// </summary>
-public abstract class CollectFoundationBase : CollectBase
+public abstract class CollectFoundationBase : CollectBase, IFoundationDevice
 {
     /// <summary>
     /// 底层驱动，有可能为null

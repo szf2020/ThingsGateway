@@ -56,4 +56,12 @@ namespace ThingsGateway.Gateway.Application
         string GetAuthString();
         bool GetAuthentication(out DateTime? expireTime);
     }
+
+    public interface IFoundationDevice
+    {
+        public IDevice? FoundationDevice { get; }
+    }
+
+
+
 }

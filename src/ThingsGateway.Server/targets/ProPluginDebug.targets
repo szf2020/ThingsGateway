@@ -1,6 +1,7 @@
 <Project>
 
 	<ItemGroup>
+		<ProjectReference Include="..\..\..\ThingsGateway.ProPlugin\src\ThingsGateway.Plugin.IEC104\ThingsGateway.Plugin.IEC104.csproj" />
 		<ProjectReference Include="..\..\..\ThingsGateway.ProPlugin\src\ThingsGateway.Plugin.SyncBridge\ThingsGateway.Plugin.SyncBridge.csproj" />
 
 		<ProjectReference Include="..\..\..\ThingsGateway.ProPlugin\src\ThingsGateway.Plugin.AllenBradleyCip\ThingsGateway.Plugin.AllenBradleyCip.csproj" />
