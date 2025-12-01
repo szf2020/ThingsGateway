@@ -65,9 +65,6 @@
 		<Content Include="..\ThingsGateway.Server\Layout\MainLayout.razor" Link="Layout\MainLayout.razor" />
 		<Compile Include="..\ThingsGateway.Server\Layout\MainLayout.razor.cs" Link="Layout\MainLayout.razor.cs" />
 		<Content Include="..\ThingsGateway.Server\Layout\MainLayout.razor.css" Link="Layout\MainLayout.razor.css" />
-		<Content Include="..\ThingsGateway.Server\Layout\Gitee2025opensource.razor" Link="Layout\Gitee2025opensource.razor" />
-		<Compile Include="..\ThingsGateway.Server\Layout\Gitee2025opensource.razor.cs" Link="Layout\Gitee2025opensource.razor.cs" />
-		<Content Include="..\ThingsGateway.Server\Layout\Gitee2025opensource.razor.css" Link="Layout\Gitee2025opensource.razor.css" />
 		<Content Include="..\ThingsGateway.Server\Layout\AccessDenied.razor" Link="Layout\AccessDenied.razor" />
 		<Compile Include="..\ThingsGateway.Server\Layout\AccessDenied.razor.cs" Link="Layout\AccessDenied.razor.cs" />
 		<Content Include="..\ThingsGateway.Server\Layout\Login.razor" Link="Layout\Login.razor" />

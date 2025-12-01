@@ -43,7 +43,7 @@
     "ExpireTime": "过期时间",
     "Password": "注册码",
     "Register": "注册",
-    "RegisterStatus": "注册状态",
+    "RegisterStatus": "注册状态(只影响PRO插件)",
     "Unauthorized": "未授权",
     "Unregister": "取消注册",
     "UUID": "唯一编码",
@@ -178,7 +178,7 @@
     "ExpireTime": "过期时间",
     "Password": "注册码",
     "Register": "注册",
-    "RegisterStatus": "注册状态",
+    "RegisterStatus": "注册状态(只影响PRO插件)",
     "Unauthorized": "未授权",
     "Unregister": "取消注册",
     "UUID": "唯一编码"

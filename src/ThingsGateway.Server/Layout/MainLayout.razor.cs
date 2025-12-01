@@ -14,7 +14,7 @@ using BootstrapBlazor.Components;
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
-
+using Microsoft.JSInterop;
 using System.Diagnostics.CodeAnalysis;
 
 using ThingsGateway.Admin.Application;
@@ -25,7 +25,7 @@ using ThingsGateway.Razor;
 
 namespace ThingsGateway.Server;
 
-public partial class MainLayout : IDisposable
+public partial class MainLayout : IAsyncDisposable
 {
     [Inject]
     IStringLocalizer<ThingsGateway.Razor._Imports> RazorLocalizer { get; set; }
@@ -187,11 +187,6 @@ public partial class MainLayout : IDisposable
     [NotNull]
     private IOptions<WebsiteOptions>? WebsiteOption { get; set; }
 
-    public void Dispose()
-    {
-        Dispose(true);
-        GC.SuppressFinalize(this);
-    }
 
     protected override async Task OnInitializedAsync()
     {
@@ -205,13 +200,7 @@ public partial class MainLayout : IDisposable
 
     [Inject]
     IServiceProvider ServiceProvider { get; set; }
-    private void Dispose(bool disposing)
-    {
-        if (disposing)
-        {
-            DispatchService.UnSubscribe(Dispatch);
-        }
-    }
+
 
     private async Task ReloadMenu(long? moduleId = null)
     {
@@ -239,36 +228,93 @@ public partial class MainLayout : IDisposable
         };
         await DialogService.Show(op);
     }
-
+    [CascadingParameter]
+    [NotNull]
+    private BootstrapBlazorRoot? Root { get; set; }
+    private ToastOption _option;
+    [Inject]
+    [NotNull]
+    private IOptionsMonitor<BootstrapBlazorOptions>? Options { get; set; }
 
     /// <summary>
     /// 显示投票弹窗
     /// </summary>
     /// <returns></returns>
-    public async Task ShowGitee()
+    [JSInvokable]
+    public async Task ShowVoteToast()
     {
-
-        await DialogService.Show(new DialogOption()
+        if (!WebsiteOption.Value.Demo)
         {
-            IsScrolling = false,
-            ShowFooter = false,
-            Title = "Gitee 评选活动",
-            BodyTemplate = BootstrapDynamicComponent.CreateComponent<Gitee2025opensource>().Render(),
-            ShowCloseButton = false,
-            ShowHeaderCloseButton = false,
-            Size = Size.Small,
-        });
-    }
+            return;
+        }
+        Root.ToastContainer.SetPlacement(Placement.BottomEnd);
+        _option = new ToastOption()
+        {
+            Category = ToastCategory.Information,
+            Title = "邀请您支持 ThingsGateway 参与 Gitee 项目评选活动",
+            IsAutoHide = false,
+            ChildContent = RenderVote,
+            PreventDuplicates = true,
+            OnCloseAsync = () =>
+            {
+                Root.ToastContainer.SetPlacement(Options.CurrentValue.ToastPlacement ?? Placement.BottomEnd);
+                return Task.CompletedTask;
+            }
+        };
 
+        await Toast.Show(_option);
+    }
+    [Inject]
+    ToastService Toast { get; set; }
+    private JSModule? _module;
+    private DotNetObjectReference<MainLayout>? _interop;
+    [Inject]
+    [NotNull]
+    private IJSRuntime? JSRuntime { get; set; }
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
+        await base.OnAfterRenderAsync(firstRender);
+
         if (firstRender)
         {
-            if (WebsiteOption.Value.Demo)
+            if (!WebsiteOption.Value.Demo)
             {
-                await ShowGitee();
+                return;
+            }
+            _module = await JSRuntime.LoadModule("/Layout/MainLayout.razor.js");
+            _interop = DotNetObjectReference.Create(this);
+            await _module.InvokeVoidAsync("doTask", _interop);
+            StateHasChanged();
+        }
+    }
+
+
+    /// <summary>
+    /// 释放资源
+    /// </summary>
+    /// <param name="disposing"></param>
+    private async ValueTask DisposeAsync(bool disposing)
+    {
+        if (disposing)
+        {
+            DispatchService.UnSubscribe(Dispatch);
+
+            if (_module != null)
+            {
+                await _module.InvokeVoidAsync("dispose");
+                await _module.DisposeAsync();
             }
         }
-        await base.OnAfterRenderAsync(firstRender);
     }
+
+    /// <summary>
+    /// 释放资源
+    /// </summary>
+    public async ValueTask DisposeAsync()
+    {
+        await DisposeAsync(true);
+        GC.SuppressFinalize(this);
+    }
+
+
 }
