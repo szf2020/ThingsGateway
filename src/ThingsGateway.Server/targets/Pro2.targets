@@ -1,6 +1,10 @@
 <Project>
 
 	<ItemGroup>
+		<PackageReference Include="ThingsGateway.Plugin.IEC104" Version="$(ProPluginVersion)" GeneratePathProperty="true">
+			<Private>false</Private>
+			<IncludeAssets> native;</IncludeAssets>
+		</PackageReference>
 		<PackageReference Include="ThingsGateway.Plugin.SyncBridge" Version="$(ProPluginVersion)" GeneratePathProperty="true">
 			<Private>false</Private>
 			<IncludeAssets> native;</IncludeAssets>
@@ -63,6 +67,7 @@
 			<PkgThingsGateway_Plugin_TS550PackageFiles Include="$(PkgThingsGateway_Plugin_TS550)\Content\$(PluginTargetFramework)\**\*.*" />
 			<PkgThingsGateway_Plugin_VigorPackageFiles Include="$(PkgThingsGateway_Plugin_Vigor)\Content\$(PluginTargetFramework)\**\*.*" />
 			<PkgThingsGateway_Plugin_SyncBridgePackageFiles Include="$(PkgThingsGateway_Plugin_SyncBridge)\Content\$(PluginTargetFramework)\**\*.*" />
+			<PkgThingsGateway_Plugin_IEC104PackageFiles Include="$(PkgThingsGateway_Plugin_IEC104)\Content\$(PluginTargetFramework)\**\*.*" />
 
 		</ItemGroup>
 		<PropertyGroup>
@@ -90,6 +95,7 @@
 		<Copy SourceFiles="@(PkgThingsGateway_Plugin_VigorPackageFiles)" DestinationFolder="$(PluginFolder)ThingsGateway.Plugin.Vigor%(RecursiveDir)" />
 
 		<Copy SourceFiles="@(PkgThingsGateway_Plugin_SyncBridgePackageFiles)" DestinationFolder="$(PluginFolder)ThingsGateway.Plugin.SyncBridge%(RecursiveDir)" />
+		<Copy SourceFiles="@(PkgThingsGateway_Plugin_IEC104PackageFiles)" DestinationFolder="$(PluginFolder)ThingsGateway.Plugin.IEC104%(RecursiveDir)" />
 	</Target>
 
 </Project>
