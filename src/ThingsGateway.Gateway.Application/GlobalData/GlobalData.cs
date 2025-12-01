@@ -12,8 +12,6 @@ using BootstrapBlazor.Components;
 
 using System.Collections.Concurrent;
 
-using ThingsGateway.Admin.Application;
-
 namespace ThingsGateway.Gateway.Application;
 
 /// <summary>

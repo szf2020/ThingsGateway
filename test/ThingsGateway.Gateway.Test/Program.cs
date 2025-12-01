@@ -16,9 +16,9 @@ namespace ThingsGateway.Gateway.Test
 
             await opcUaMaster.ConnectAsync(default).ConfigureAwait(false);
 
-            var read = await opcUaMaster.WriteNodeAsync( new Dictionary<string, JsonNode>()
+            var read = await opcUaMaster.WriteNodeAsync(new Dictionary<string, JsonNode>()
             {
-                {"ns=2;s=modbusDevice743916562268229.modbus41",21 }, 
+                {"ns=2;s=modbusDevice743916562268229.modbus41",21 },
                 {"ns=2;s=modbusDevice743916562268232.modbus41",12 },
             }).ConfigureAwait(false);
 

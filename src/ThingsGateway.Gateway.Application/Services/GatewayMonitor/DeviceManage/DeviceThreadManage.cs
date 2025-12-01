@@ -48,7 +48,7 @@ internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
 
         // 根据配置获取通道实例
         var driver = GlobalData.PluginService.GetDriver(channelRuntime.PluginName);
-        if(driver is CollectFoundationBase collectFoundationBase&& collectFoundationBase.FoundationDevice!=null)
+        if (driver is CollectFoundationBase collectFoundationBase && collectFoundationBase.FoundationDevice != null)
         {
             Channel = collectFoundationBase.FoundationDevice.CreateChannel(config, channelRuntime);
         }

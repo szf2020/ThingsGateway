@@ -20,7 +20,7 @@ using TouchSocket.Sockets;
 
 namespace ThingsGateway.Gateway.Application;
 
-public partial class ManagementRpcServer : IRpcServer, IManagementRpcServer,IHardwarePageService, IBackendLogService, IRpcLogService, IRestartService, IAuthenticationService, IChannelEnableService, IRedundancyHostedService, IRedundancyService, ITextFileReadService, IPluginPageService, IRealAlarmService, IChannelPageService, IDevicePageService, IVariablePageService
+public partial class ManagementRpcServer : IRpcServer, IManagementRpcServer, IHardwarePageService, IBackendLogService, IRpcLogService, IRestartService, IAuthenticationService, IChannelEnableService, IRedundancyHostedService, IRedundancyService, ITextFileReadService, IPluginPageService, IRealAlarmService, IChannelPageService, IDevicePageService, IVariablePageService
 {
     public Task<HardwareInfo> GetRealTimeHardwareInfo() => App.GetService<IHardwarePageService>().GetRealTimeHardwareInfo();
     public Task<List<HistoryHardwareInfo>> GetHistoryHardwareInfos() => App.GetService<IHardwarePageService>().GetHistoryHardwareInfos();
