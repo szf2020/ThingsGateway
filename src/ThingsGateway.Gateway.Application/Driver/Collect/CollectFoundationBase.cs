@@ -22,29 +22,13 @@ namespace ThingsGateway.Gateway.Application;
 /// 采集插件，继承实现不同PLC通讯
 /// <para></para>
 /// </summary>
-public abstract class CollectFoundationBase : CollectBase, IFoundationDevice
+public abstract class CollectFoundationBase : CollectReceivedFoundationBase, IFoundationDevice
 {
     /// <summary>
     /// 底层驱动，有可能为null
     /// </summary>
-    public virtual IDevice? FoundationDevice { get; }
-
-
-
-    public override string ToString()
-    {
-        return FoundationDevice?.ToString() ?? base.ToString();
-    }
-
-    /// <inheritdoc/>
-    protected override async Task DisposeAsync(bool disposing)
-    {
-        if (FoundationDevice != null)
-            await FoundationDevice.SafeDisposeAsync().ConfigureAwait(false);
-        await base.DisposeAsync(disposing).ConfigureAwait(false);
-    }
-
-
+    public abstract IDevice? FoundationDevice { get; }
+    public override IReceivedDevice? ReceivedFoundationDevice => FoundationDevice;
 
 
     public override string GetAddressDescription()
@@ -52,103 +36,6 @@ public abstract class CollectFoundationBase : CollectBase, IFoundationDevice
         return FoundationDevice?.GetAddressDescription();
     }
 #if !Management
-
-    /// <summary>
-    /// 是否连接成功
-    /// </summary>
-    public override bool IsConnected()
-    {
-        return FoundationDevice?.OnLine == true;
-    }
-
-    /// <summary>
-    /// 开始通讯执行的方法
-    /// </summary>
-    /// <param name="cancellationToken"></param>
-    /// <returns></returns>
-    protected override async Task ProtectedStartAsync(CancellationToken cancellationToken)
-    {
-        if (FoundationDevice != null)
-        {
-            await FoundationDevice.ConnectAsync(cancellationToken).ConfigureAwait(false);
-        }
-    }
-
-
-    protected override ValueTask TestOnline(object? state, CancellationToken cancellationToken)
-    {
-        return TestOnline(this, cancellationToken);
-
-
-        static async PooledValueTask TestOnline(CollectFoundationBase @this, CancellationToken cancellationToken)
-        {
-            if (@this.FoundationDevice != null)
-            {
-                if (!@this.FoundationDevice.OnLine)
-                {
-                    if (!@this.FoundationDevice.DisposedValue || @this.FoundationDevice.Channel?.DisposedValue != false) return;
-                    Exception exception = null;
-                    try
-                    {
-                        if (!cancellationToken.IsCancellationRequested)
-                        {
-                            if (!@this.FoundationDevice.DisposedValue || @this.FoundationDevice.Channel?.DisposedValue != false) return;
-
-                            await @this.FoundationDevice.ConnectAsync(cancellationToken).ConfigureAwait(false);
-
-                            if (@this.CurrentDevice.DeviceStatusChangeTime < TimerX.Now.AddMinutes(-1))
-                            {
-                                await Task.Delay(30000, cancellationToken).ConfigureAwait(false);
-                            }
-                        }
-                    }
-                    catch (OperationCanceledException)
-                    {
-                    }
-                    catch (Exception ex)
-                    {
-                        exception = ex;
-                    }
-                    if (cancellationToken.IsCancellationRequested)
-                    {
-                        return;
-                    }
-                    if (@this.FoundationDevice.OnLine == false && exception != null)
-                    {
-                        foreach (var item in @this.CurrentDevice.VariableSourceReads)
-                        {
-                            if (item.LastErrorMessage != exception.Message)
-                            {
-                                if (!cancellationToken.IsCancellationRequested)
-                                    @this.LogMessage?.LogWarning(exception, string.Format(AppResource.CollectFail, @this.DeviceName, item?.RegisterAddress, item?.Length, exception.Message));
-                            }
-                            item.LastErrorMessage = exception.Message;
-                            @this.CurrentDevice.SetDeviceStatus(TimerX.Now, null, exception.Message);
-                            var time = DateTime.Now;
-                            item.Variables.ForEach(a => a.SetValue(null, time, isOnline: false));
-                        }
-                        foreach (var item in @this.CurrentDevice.ReadVariableMethods)
-                        {
-                            if (item.LastErrorMessage != exception.Message)
-                            {
-                                if (!cancellationToken.IsCancellationRequested)
-                                    @this.LogMessage?.LogWarning(exception, string.Format(AppResource.MethodFail, @this.DeviceName, item.MethodInfo.Name, exception.Message));
-                            }
-                            item.LastErrorMessage = exception.Message;
-                            @this.CurrentDevice.SetDeviceStatus(TimerX.Now, null, exception.Message);
-                            var time = DateTime.Now;
-                            item.Variable.SetValue(null, time, isOnline: false);
-                        }
-
-                    }
-                }
-            }
-
-        }
-
-    }
-
-
 
     protected override ValueTask<OperResult<ReadOnlyMemory<byte>>> ReadSourceAsync(VariableSourceRead variableSourceRead, CancellationToken cancellationToken)
     {

@@ -1,0 +1,49 @@
+﻿@using Microsoft.AspNetCore.Components.Web;
+@using Microsoft.JSInterop;
+@using ThingsGateway.Extension
+@using ThingsGateway.Foundation
+@using BootstrapBlazor.Components
+@using ThingsGateway.Foundation.Common.Json.Extension
+@using ThingsGateway.Common.Extension
+@namespace ThingsGateway.Debug
+@inherits ReceivedDeviceComponentBase
+
+<div class=@($"{ClassString} row my-2 mx-2 min-height-500 h-50")>
+
+    <div class="col-12 col-md-5 h-100">
+        <Tab class="h-100">
+            <TabItem Text=@Localizer["CommonFunctions"]>
+                @if (ReadWriteContent != null)
+                {
+                    @ReadWriteContent
+                }
+            </TabItem>
+
+
+            <TabItem Text=@Localizer["SpecialFunctions"]>
+                @if (OtherContent != null)
+                {
+                    @OtherContent
+                }
+            </TabItem>
+
+        </Tab>
+
+    </div>
+    <div class="col-12 col-md-7 ">
+        <LogConsole HeightString="500px" LogLevel=@((Plc?.Logger ?? Logger)?.LogLevel ?? TouchSocket.Core.LogLevel.Trace)
+                    LogLevelChanged="(a)=>
+                            {
+                                var log = Plc?.Logger ?? Logger;
+                                if (log != null)
+                                    log.LogLevel = a;
+                            }"
+                    LogPath=@LogPath HeaderText=@HeaderText></LogConsole>
+    </div>
+</div>
+
+
+
+
+
+

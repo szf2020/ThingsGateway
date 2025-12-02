@@ -88,6 +88,7 @@ public class ExecuteScriptNode : TextNode, IActuatorNode, IExexcuteExpressionsBa
                 {
                     var exexcuteExpressions = CSharpScriptEngineExtension.Do<IExexcuteExpressions>(text);
                     exexcuteExpressions?.TryDispose();
+                    CSharpScriptEngineExtension.Remove(text);
                 }
                 catch
                 {
@@ -133,6 +134,7 @@ public class ExecuteScriptNode : TextNode, IActuatorNode, IExexcuteExpressionsBa
             {
                 var exexcuteExpressions = CSharpScriptEngineExtension.Do<IExexcuteExpressions>(text);
                 exexcuteExpressions.TryDispose();
+                CSharpScriptEngineExtension.Remove(text);
             }
             catch
             {

@@ -40,7 +40,6 @@ public abstract partial class CollectBase : DriverBase
     /// </summary>
     public abstract CollectPropertyBase CollectProperties { get; }
 
-
     public sealed override object DriverProperties => CollectProperties;
 
     public virtual string GetAddressDescription()

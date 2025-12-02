@@ -40,6 +40,7 @@ public abstract partial class BusinessBaseWithCacheIntervalScript : BusinessBase
         {
             var exexcuteExpressions = CSharpScriptEngineExtension.Do<IDynamicModel>(_businessPropertyWithCacheIntervalScript.BigTextScriptAlarmModel);
             exexcuteExpressions?.TryDispose();
+            CSharpScriptEngineExtension.Remove(_businessPropertyWithCacheIntervalScript.BigTextScriptAlarmModel);
         }
         catch
         {
@@ -48,6 +49,7 @@ public abstract partial class BusinessBaseWithCacheIntervalScript : BusinessBase
         {
             var exexcuteExpressions = CSharpScriptEngineExtension.Do<IDynamicModel>(_businessPropertyWithCacheIntervalScript.BigTextScriptDeviceModel);
             exexcuteExpressions?.TryDispose();
+            CSharpScriptEngineExtension.Remove(_businessPropertyWithCacheIntervalScript.BigTextScriptDeviceModel);
         }
         catch
         {
@@ -56,6 +58,7 @@ public abstract partial class BusinessBaseWithCacheIntervalScript : BusinessBase
         {
             var exexcuteExpressions = CSharpScriptEngineExtension.Do<IDynamicModel>(_businessPropertyWithCacheIntervalScript.BigTextScriptPluginEventDataModel);
             exexcuteExpressions?.TryDispose();
+            CSharpScriptEngineExtension.Remove(_businessPropertyWithCacheIntervalScript.BigTextScriptPluginEventDataModel);
         }
         catch
         {
@@ -64,6 +67,7 @@ public abstract partial class BusinessBaseWithCacheIntervalScript : BusinessBase
         {
             var exexcuteExpressions = CSharpScriptEngineExtension.Do<IDynamicModel>(_businessPropertyWithCacheIntervalScript.BigTextScriptVariableModel);
             exexcuteExpressions?.TryDispose();
+            CSharpScriptEngineExtension.Remove(_businessPropertyWithCacheIntervalScript.BigTextScriptVariableModel);
         }
         catch
         {

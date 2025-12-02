@@ -57,11 +57,6 @@ namespace ThingsGateway.Gateway.Application
         bool GetAuthentication(out DateTime? expireTime);
     }
 
-    public interface IFoundationDevice
-    {
-        public IDevice? FoundationDevice { get; }
-    }
-
 
 
 }

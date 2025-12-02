@@ -41,6 +41,7 @@ public abstract class BusinessBase : DriverBase
             return pluginVariablePropertyEditorItems;
         }
     }
+
     /// <summary>
     /// 插件配置项 ，继承实现<see cref="VariablePropertyBase"/>后，返回继承类，如果不存在，返回null
     /// </summary>
