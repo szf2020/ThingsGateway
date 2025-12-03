@@ -80,7 +80,7 @@ public partial class DeviceComponent : DeviceComponentBase
             var deviceVariableSourceReads = Plc.LoadSourceRead<VariableSourceClass, VariableClass>(VariableRuntimes, MaxPack, "1000");
             foreach (var item in deviceVariableSourceReads)
             {
-                var result = await Plc.ReadByteAsync(item.RegisterAddress, item.Length);
+                var result = await Plc.ReadAsync(item.RegisterAddress, item.Length);
                 if (result.IsSuccess)
                 {
                     try
