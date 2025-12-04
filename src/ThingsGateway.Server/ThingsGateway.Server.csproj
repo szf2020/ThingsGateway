@@ -3,7 +3,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\ThingsGateway.Gateway.Razor\ThingsGateway.Gateway.Razor.csproj" />
-		<PackageReference Include="BootstrapBlazor" Version="10.0.1" />
+		<PackageReference Include="BootstrapBlazor" Version="10.1.0" />
 	</ItemGroup>
 
 

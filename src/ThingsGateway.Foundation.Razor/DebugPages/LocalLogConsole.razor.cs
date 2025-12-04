@@ -106,7 +106,7 @@ public partial class LocalLogConsole : IDisposable
                 {
                     await Task.Run(async () =>
                     {
-                        ValueStopwatch sw = new();
+                        var sw = ValueStopwatch.StartNew();
                         var result = await TextFileReadService.LastLogDataAsync(files.Content.FirstOrDefault());
                         if (result.IsSuccess)
                         {

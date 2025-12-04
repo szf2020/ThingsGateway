@@ -11,7 +11,7 @@
 using Microsoft.AspNetCore.Components.Web;
 
 using System.Text.RegularExpressions;
-
+using System.Threading.Tasks.Sources;
 using ThingsGateway.Foundation;
 using ThingsGateway.Foundation.Common;
 using ThingsGateway.Foundation.Common.Extension;
@@ -104,33 +104,42 @@ public partial class LogConsole : IDisposable
     }
     protected async ValueTask ExecuteAsync()
     {
-
-        if (LogPath != null)
+        try
         {
-            var files = await TextFileReadService.GetLogFilesAsync(LogPath);
-            if (!files.IsSuccess)
-            {
-                Messages = new List<LogMessage>();
-                await Task.Delay(1000);
-            }
-            else
-            {
 
-                var result = await TextFileReadService.LastLogDataAsync(files.Content.FirstOrDefault());
-                if (result.IsSuccess)
+            if (LogPath != null)
+            {
+                var files = await TextFileReadService.GetLogFilesAsync(LogPath);
+                if (!files.IsSuccess)
                 {
-                    Messages = result.Content.Where(a => a.LogLevel >= LogLevel).Select(a => new LogMessage((int)a.LogLevel, $"{a.LogTime} - {a.Message}{(a.ExceptionString.IsNullOrWhiteSpace() ? null : $"{Environment.NewLine}{a.ExceptionString}")}")).ToArray();
+                    Messages = new List<LogMessage>();
+                    await Task.Delay(1000);
                 }
                 else
                 {
-                    Messages = Array.Empty<LogMessage>();
+                    var sw = ValueStopwatch.StartNew();
+                    var result = await TextFileReadService.LastLogDataAsync(files.Content.FirstOrDefault());
+                    if (result.IsSuccess)
+                    {
+                        Messages = result.Content.Where(a => a.LogLevel >= LogLevel).Select(a => new LogMessage((int)a.LogLevel, $"{a.LogTime} - {a.Message}{(a.ExceptionString.IsNullOrWhiteSpace() ? null : $"{Environment.NewLine}{a.ExceptionString}")}")).ToList();
+                    }
+                    else
+                    {
+                        Messages = Array.Empty<LogMessage>();
+                    }
+                    if (sw.GetElapsedTime().TotalMilliseconds > 500)
+                    {
+                        await Task.Delay(1000);
+                    }
                 }
-
             }
+        }
+        catch (Exception ex)
+        {
+            Foundation.Common.Log.XTrace.WriteException(ex);
         }
 
     }
-
 
     private async Task Delete()
     {

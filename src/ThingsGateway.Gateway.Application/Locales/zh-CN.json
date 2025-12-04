@@ -423,7 +423,7 @@
     "SourceVariableCount": "打包数量"
   },
 
-  "ThingsGateway.Gateway.Management.DeviceRuntime": {
+  "ThingsGateway.Management.Application.DeviceRuntime": {
     "ActiveTime": "活跃时间",
     "ChannelId.MinValue": " {0} 不可为空",
     "ChannelId.Required": " {0} 不可为空",
