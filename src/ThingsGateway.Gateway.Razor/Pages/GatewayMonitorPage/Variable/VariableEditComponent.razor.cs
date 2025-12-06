@@ -18,6 +18,7 @@ using ThingsGateway.Foundation.Common.Json.Extension;
 using ThingsGateway.Foundation.Common.StringExtension;
 
 
+
 namespace ThingsGateway.Gateway.Razor;
 
 public partial class VariableEditComponent
@@ -172,6 +173,7 @@ public partial class VariableEditComponent
     }
 
     Dictionary<string, string> OtherMethods = new Dictionary<string, string>();
+    Dictionary<string, string> OtherMethodRemarks = new Dictionary<string, string>();
     public IEnumerable<SelectedItem> OtherMethodSelectedItems { get; set; }
 
     private async Task OnDeviceChanged(SelectedItem selectedItem)
@@ -189,6 +191,7 @@ public partial class VariableEditComponent
             if (!pluginName.IsNullOrWhiteSpace())
             {
                 OtherMethods = PluginService.GetDriverMethodInfos(pluginName).ToDictionary(a => a.Name, a => a.Description);
+                OtherMethodRemarks = PluginService.GetDriverMethodInfos(pluginName).ToDictionary(a => a.Name, a => a.Remark);
                 OtherMethodSelectedItems = OtherMethods.Select(a => new SelectedItem(a.Key, a.Value));
                 AddressDesc = PluginService.GetDriver(pluginName) is CollectBase collectBase ? collectBase.GetAddressDescription() : string.Empty;
                 AddressUIType = PluginService.GetAddressUI(pluginName);
@@ -199,7 +202,12 @@ public partial class VariableEditComponent
             await ToastService.Warn(ex);
         }
     }
+    private async Task OnOtherMethodChanged(SelectedItem selectedItem)
+    {
 
+        if (OtherMethodRemarks.TryGetValue(selectedItem.Value, out var remark))
+            AddressDesc = remark;
+    }
     private BootstrapDynamicComponent AddressDynamicComponent;
     private Type AddressUIType;
     private string AddressDesc;

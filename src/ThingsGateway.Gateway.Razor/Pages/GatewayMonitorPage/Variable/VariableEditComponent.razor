@@ -90,7 +90,7 @@
                 <EditorItem @bind-Field="@context.OtherMethod">
                     <EditTemplate Context="value">
                         <div class="col-12  col-md-6">
-                            <Select IsVirtualize DefaultVirtualizeItemText=@(OtherMethods.TryGetValue(value.OtherMethod ?? string.Empty, out var desc) ? desc : value.OtherMethod) @bind-Value="@value.OtherMethod" Items="@OtherMethodSelectedItems" ShowSearch="true" />
+                            <Select IsVirtualize IsClearable DefaultVirtualizeItemText=@(OtherMethods.TryGetValue(value.OtherMethod ?? string.Empty, out var desc) ? desc : value.OtherMethod) @bind-Value="@value.OtherMethod" Items="@OtherMethodSelectedItems" OnSelectedItemChanged=OnOtherMethodChanged ShowSearch="true" />
                         </div>
                     </EditTemplate>
                 </EditorItem>
