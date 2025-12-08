@@ -69,7 +69,7 @@
 
 
 	<ItemGroup Condition="'$(SolutionName)' != 'ThingsGatewayAll'  OR '$(Configuration)' == 'Release' ">
-		<PackageReference Include="ThingsGateway.Authentication" Version="$(ManagementvVersion)" />
+		<PackageReference Include="ThingsGateway.Authentication" Version="$(ManagementVersion)" />
 	</ItemGroup>
 	<ItemGroup Condition="'$(SolutionName)' == 'ThingsGatewayAll'  AND '$(Configuration)' != 'Release' ">
 		<ProjectReference Include="..\..\..\ThingsGateway.Management\src\ThingsGateway.Authentication\ThingsGateway.Authentication.csproj" />
