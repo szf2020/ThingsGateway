@@ -612,7 +612,7 @@ internal sealed class PluginService : IPluginService
                 // 获取私有字段
                 FieldInfo fieldInfo = typeof(ResourceManagerStringLocalizerFactory).GetField("_localizerCache", BindingFlags.Instance | BindingFlags.NonPublic);
                 // 获取字段的值
-                var dictionary = (NonBlockingDictionary<string, ResourceManagerStringLocalizer>)fieldInfo.GetValue(App.StringLocalizerFactory);
+                var dictionary = (ConcurrentDictionary<string, ResourceManagerStringLocalizer>)fieldInfo.GetValue(App.StringLocalizerFactory);
                 foreach (var item in _assemblyLoadContextDict)
                 {
                     var ids = item.Value.Assembly.ExportedTypes.Select(b => b.AssemblyQualifiedName).ToHashSet();
