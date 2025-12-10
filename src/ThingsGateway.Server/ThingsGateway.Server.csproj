@@ -3,7 +3,6 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\ThingsGateway.Gateway.Razor\ThingsGateway.Gateway.Razor.csproj" />
-		<PackageReference Include="BootstrapBlazor" Version="10.1.1" />
 	</ItemGroup>
 
 	<!--<Import Project="targets\Pro8.targets" />-->

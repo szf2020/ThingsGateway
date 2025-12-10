@@ -78,7 +78,7 @@ public static class GlobalData
     /// <summary>
     /// 变量采集事件，当变量进行采集时触发该事件
     /// </summary>
-    internal static event VariableCollectEventHandler? VariableCollectChangeEvent;
+    public static event VariableCollectEventHandler? VariableCollectChangeEvent;
 
     /// <summary>
     /// 报警变化事件
