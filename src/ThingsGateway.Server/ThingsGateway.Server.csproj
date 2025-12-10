@@ -5,7 +5,6 @@
 		<ProjectReference Include="..\ThingsGateway.Gateway.Razor\ThingsGateway.Gateway.Razor.csproj" />
 	</ItemGroup>
 
-	<!--<Import Project="targets\Pro8.targets" />-->
 
 	<!--nuget包解压复制文件，上下文动态加载-->
 	<Import Project="targets\PluginContext.targets" Condition=" ! $([System.String]::Copy('$(SolutionName)').StartsWith('ThingsGatewayAll'))  OR '$(Configuration)' == 'Release' " />
@@ -19,6 +18,8 @@
 
 	<!--nuget包解压复制文件，上下文动态加载，Pro插件-->
 	<Import Project="targets\ProPluginDebug.targets" Condition=" '$(SolutionName)' == 'ThingsGatewayAll'  AND '$(Configuration)' != 'Release' " />
+	
+	<!--<Import Project="targets\Pro8.targets" />-->
 
 	<!--打包复制-->
 	<Import Project="targets\PluginPublish.targets" />

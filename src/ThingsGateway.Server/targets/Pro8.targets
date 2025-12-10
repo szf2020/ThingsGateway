@@ -12,11 +12,11 @@
 			<PkgThingsGateway_Plugin_ModbusC20PackageFiles Include="$(PkgThingsGateway_Plugin_ModbusC20)\Content\$(PluginTargetFramework)\**\*.*" />
 		</ItemGroup>
 		<PropertyGroup>
-			<PluginFolder>$(TargetDir)Plugins\</PluginFolder>
+			<PluginFolder>$(TargetDir)GatewayPlugins\</PluginFolder>
 		</PropertyGroup>
-		<Message Text="将Modbus定制插件复制到插件目录 $(PluginFolder)" Importance="high" />
+		<Message Text="将ModbusC20插件复制到插件目录 $(PluginFolder)" Importance="high" />
 
-		<Copy SourceFiles="@(PkgThingsGateway_Plugin_ModbusC20PackageFiles)" DestinationFolder="$(PluginFolder)%(RecursiveDir)" />
+		<Copy SourceFiles="@(PkgThingsGateway_Plugin_ModbusC20PackageFiles)" DestinationFolder="$(PluginFolder)ThingsGateway.Plugin.ModbusC20%(RecursiveDir)" />
 
 	</Target>
 
