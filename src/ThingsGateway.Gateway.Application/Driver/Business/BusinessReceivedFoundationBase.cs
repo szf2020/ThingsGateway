@@ -13,7 +13,7 @@ namespace ThingsGateway.Gateway.Application;
 /// <summary>
 /// 业务插件
 /// </summary>
-public abstract class BusinessReceivedFoundationBase : BusinessBase
+public abstract class BusinessReceivedFoundationBase : BusinessBase, IReceivedFoundationDevice
 {
 
     /// <summary>
