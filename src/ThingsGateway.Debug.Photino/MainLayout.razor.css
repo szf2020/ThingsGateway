@@ -1,4 +1,13 @@
-﻿::deep .avatar {
+﻿.mainlayout ::deep .layout-header {
+    z-index: 5;
+}
+
+.mainlayout ::deep .menu-icon {
+    width: 16px;
+}
+
+
+::deep .avatar {
     border-radius: 1.5rem;
     width: 28px;
     height: 28px;

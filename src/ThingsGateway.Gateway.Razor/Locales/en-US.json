@@ -22,6 +22,7 @@
     "RpcLogPage": "Rpc",
     "SystemConfigPage": "SystemConfig",
     "PluginPage": "Plugin",
+    "PluginDebugPage": "PluginDebug",
     "RealAlarmPage": "RealAlarm",
     "RulesPage": "Rules",
     "ChannelTable": "Channel",

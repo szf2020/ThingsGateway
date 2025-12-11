@@ -31,8 +31,10 @@ public partial class DeviceRuntimeInfo1 : IDisposable
 #if !Management
     private IDriver Driver => DeviceRuntime?.Driver;
     private bool IsRedundant => GlobalData.IsRedundant(DeviceRuntime.Id);
+    private Type DriverUIType => Driver?.DriverUIType;
 #else
     private IDriver Driver { get; set; }
+    private Type DriverUIType { get; set; }
     private bool IsRedundant { get; set; }
 #endif
     protected override async Task OnParametersSetAsync()
@@ -40,6 +42,7 @@ public partial class DeviceRuntimeInfo1 : IDisposable
 #if Management
 
         IsRedundant = await DevicePageService.IsRedundantDeviceAsync(DeviceRuntime.Id);
+        DriverUIType = PluginService.GetDriver(DeviceRuntime.PluginName)?.DriverUIType;
 
 #endif
         await base.OnParametersSetAsync();
@@ -74,17 +77,16 @@ public partial class DeviceRuntimeInfo1 : IDisposable
     }
 
 
-#if !Management
     private async Task ShowDriverUI()
     {
-        var driver = DeviceRuntime.Driver?.DriverUIType;
-        if (driver == null)
+
+        if (DriverUIType == null)
         {
             return;
         }
-        var renderFragment = BootstrapDynamicComponent.CreateComponent(driver, new Dictionary<string, object?>()
+        var renderFragment = BootstrapDynamicComponent.CreateComponent(DriverUIType, new Dictionary<string, object?>()
         {
-            {nameof(IDriverUIBase.Driver),DeviceRuntime.Driver},
+            {nameof(IDriverUIBase.DeviceId),DeviceRuntime.Id},
         }).Render();
         if (renderFragment != null)
         {
@@ -109,8 +111,6 @@ public partial class DeviceRuntimeInfo1 : IDisposable
     [NotNull]
     private WinBoxService? WinBoxService { get; set; }
 
-
-#endif
 
     [Inject]
     IDevicePageService DevicePageService { get; set; }

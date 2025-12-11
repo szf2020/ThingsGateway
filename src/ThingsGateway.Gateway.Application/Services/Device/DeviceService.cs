@@ -383,7 +383,7 @@ internal sealed class DeviceService : BaseService<Device>, IDeviceService
         ManageHelper.CheckDeviceCount(insertData.Count);
 
         using var db = GetDB();
-        if (GlobalData.HardwareJob.HardwareInfo.AvailableMemory < 2 * 1024 * 1024 || Runtime.WebEnable == false)
+        if (GlobalData.HardwareJob.HardwareInfo.AvailableMemory < 2048)
         {
             await db.BulkCopyAsync(insertData, 10000).ConfigureAwait(false);
             await db.BulkUpdateAsync(upData, 10000).ConfigureAwait(false);

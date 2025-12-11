@@ -22,6 +22,7 @@
     "RpcLogPage": "Rpc日志",
     "SystemConfigPage": "系统管理",
     "PluginPage": "插件管理",
+    "PluginDebugPage": "插件调试",
     "RealAlarmPage": "实时报警",
     "RulesPage": "规则引擎",
     "ChannelTable": "通道信息",

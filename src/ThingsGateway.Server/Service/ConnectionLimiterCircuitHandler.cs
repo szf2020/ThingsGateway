@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Components.Server.Circuits;
 using System.Runtime;
 
 using ThingsGateway.Common;
+using ThingsGateway.Foundation.Common;
 
 namespace ThingsGateway.Server;
 
@@ -24,11 +25,14 @@ public class ConnectionLimiterCircuitHandler : CircuitHandler
 
     public override Task OnCircuitOpenedAsync(Circuit circuit, CancellationToken cancellationToken)
     {
-        //主动触发垃圾回收，释放上个链路资源
-        GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
-        GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, true, true);
-        GC.WaitForPendingFinalizers();
-        GC.Collect(1, GCCollectionMode.Optimized, blocking: false, compacting: false);
+        if (MachineInfo.GetCurrent().AvailableMemory < 2048)
+        {
+            //主动触发垃圾回收，释放上个链路资源
+            GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
+            GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, true, true);
+            GC.WaitForPendingFinalizers();
+            GC.Collect(1, GCCollectionMode.Optimized, blocking: false, compacting: false);
+        }
 
         WebsiteOptions ??= App.GetOptions<WebsiteOptions>();
 

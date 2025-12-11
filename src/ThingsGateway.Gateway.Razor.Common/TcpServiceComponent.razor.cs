@@ -17,7 +17,9 @@ namespace ThingsGateway.Gateway.Razor;
 public partial class TcpServiceComponent : IDriverUIBase
 {
     [Parameter, EditorRequired]
-    public object Driver { get; set; }
+    public long DeviceId { get; set; }
+
+    public ITcpServiceChannel? TcpServiceChannel => GlobalData.ReadOnlyIdDevices.TryGetValue(DeviceId, out DeviceRuntime deviceRuntime) ? deviceRuntime.Driver?.Channel as ITcpServiceChannel : null;
 
     [Inject]
     private ToastService ToastService { get; set; }
@@ -26,6 +28,7 @@ public partial class TcpServiceComponent : IDriverUIBase
 
     private async Task<bool> OnDeleteAsync(IEnumerable<TcpSessionClientDto> tcpSessionClientDtos)
     {
+        if (TcpServiceChannel == null) return false;
         try
         {
             foreach (var item in tcpSessionClientDtos)
@@ -82,5 +85,4 @@ public partial class TcpServiceComponent : IDriverUIBase
         }
     }
 
-    public ITcpServiceChannel? TcpServiceChannel => (((DriverBase)Driver)?.Channel as ITcpServiceChannel);
 }

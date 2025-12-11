@@ -206,7 +206,7 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
 
         var result = await db.UseTranAsync(async () =>
         {
-            if (GlobalData.HardwareJob.HardwareInfo.AvailableMemory < 2 * 1024 * 1024 || Runtime.WebEnable == false)
+            if (GlobalData.HardwareJob.HardwareInfo.AvailableMemory < 2048)
             {
                 await db.BulkCopyAsync(newChannels, 10000).ConfigureAwait(false);
                 await db.BulkCopyAsync(newDevices, 10000).ConfigureAwait(false);
@@ -341,7 +341,7 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
 
         var result = await db.UseTranAsync(async () =>
         {
-            if (GlobalData.HardwareJob.HardwareInfo.AvailableMemory < 2 * 1024 * 1024 || Runtime.WebEnable == false)
+            if (GlobalData.HardwareJob.HardwareInfo.AvailableMemory < 2048)
             {
                 await db.BulkCopyAsync(newChannels, 10000).ConfigureAwait(false);
                 await db.BulkCopyAsync(newDevices, 10000).ConfigureAwait(false);
@@ -619,7 +619,7 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
     [OperDesc("ExportVariable", isRecordPar: false, localizerType: typeof(Variable))]
     public async Task<Dictionary<string, object>> ExportVariableAsync(GatewayExportFilter exportFilter)
     {
-        if (GlobalData.HardwareJob.HardwareInfo.AvailableMemory < 4 * 1024 * 1024 || Runtime.WebEnable == false)
+        if (GlobalData.HardwareJob.HardwareInfo.AvailableMemory < 2048)
         {
             var whereQuery = await GetWhereEnumerableFunc(exportFilter).ConfigureAwait(false);
             //导出
@@ -693,7 +693,7 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
     {
         ManageHelper.CheckVariableCount(insertData.Count);
         using var db = GetDB();
-        if (GlobalData.HardwareJob.HardwareInfo.AvailableMemory < 2 * 1024 * 1024 || Runtime.WebEnable == false)
+        if (GlobalData.HardwareJob.HardwareInfo.AvailableMemory < 2048)
         {
             await db.BulkCopyAsync(insertData, 10000).ConfigureAwait(false);
             await db.BulkUpdateAsync(upData, 10000).ConfigureAwait(false);

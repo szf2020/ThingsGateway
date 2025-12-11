@@ -25,23 +25,16 @@
             <div style="flex-grow: 1;"></div>
 
             @{
-            #if !Management
-                if (DeviceRuntime.Driver != null)
+                if (DriverUIType != null)
                 {
-                    var driver = DeviceRuntime.Driver;
-                    if (driver?.DriverUIType != null)
-                    {
+
+                    <Tooltip Title="@GatewayLocalizer["GatewayDeviceShowDriverUI"]" Placement="Placement.Bottom">
+
+                        <Button OnClick=@(ShowDriverUI) IsDisabled=@(!AuthorizeButton("插件页面")) class="mx-2" Color="Color.None" style="color: var(--bs-card-titlecolor);" Icon=@("fab fa-simplybuilt") />
+                    </Tooltip>
 
 
-                        <Tooltip Title="@GatewayLocalizer["GatewayDeviceShowDriverUI"]" Placement="Placement.Bottom">
-
-                            <Button OnClick=@(ShowDriverUI) IsDisabled=@(!AuthorizeButton("插件页面")) class="mx-2" Color="Color.None" style="color: var(--bs-card-titlecolor);" Icon=@("fab fa-simplybuilt") />
-                        </Tooltip>
-
-
-                    }
                 }
-            #endif
 
             }
 

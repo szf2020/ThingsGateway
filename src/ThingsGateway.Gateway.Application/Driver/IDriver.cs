@@ -9,7 +9,6 @@
 // ------------------------------------------------------------------------------
 
 using BootstrapBlazor.Components;
-
 using TouchSocket.Core;
 
 namespace ThingsGateway.Gateway.Application
@@ -44,6 +43,7 @@ namespace ThingsGateway.Gateway.Application
         Dictionary<long, VariableRuntime> IdVariableRuntimes { get; }
         IDeviceThreadManage DeviceThreadManage { get; }
         bool RefreshRuntimeAlways { get; set; }
+        IChannel? Channel { get; }
 
         bool IsConnected();
         void PauseThread(bool pause);
