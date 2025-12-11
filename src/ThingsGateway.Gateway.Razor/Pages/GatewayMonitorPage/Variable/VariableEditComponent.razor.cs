@@ -57,6 +57,7 @@ public partial class VariableEditComponent
 
     public override async Task SetParametersAsync(ParameterView parameters)
     {
+        await base.SetParametersAsync(parameters);
         if (DeviceName.IsNullOrEmpty() && first == false)
         {
             first = true;
@@ -90,10 +91,6 @@ public partial class VariableEditComponent
 
             await OnParametersSetAsync();
 
-        }
-        else
-        {
-            await base.SetParametersAsync(parameters);
         }
     }
 

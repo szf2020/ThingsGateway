@@ -127,6 +127,7 @@ public partial class DeviceEditComponent
     private bool _initialized;
     public override async Task SetParametersAsync(ParameterView parameters)
     {
+        await base.SetParametersAsync(parameters);
         if (ChannelName.IsNullOrEmpty())
         {
             parameters.SetParameterProperties(this);
@@ -149,10 +150,7 @@ public partial class DeviceEditComponent
                 await OnParametersSetAsync();
             }
         }
-        else
-        {
-            await base.SetParametersAsync(parameters);
-        }
+
     }
 
 
