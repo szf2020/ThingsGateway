@@ -308,9 +308,12 @@ public class ChannelRuntimeService : IChannelRuntimeService
 
     public Task<Dictionary<string, object>> ExportChannelAsync(GatewayExportFilter exportFilter) => GlobalData.ChannelService.ExportChannelAsync(exportFilter);
 
-    public Task<MemoryStream> ExportMemoryStream(IEnumerable<Channel> data) =>
-      GlobalData.ChannelService.ExportMemoryStream(data);
+    public async Task<string> ExportChannelDataFileAsync(List<Channel> data)
+    {
+        var sheets =await GlobalData.ChannelService.ExportDictionary(data).ConfigureAwait(false);
+        return await App.GetService<IImportExportService>().CreateFileAsync<Channel>(sheets, "Channel", false).ConfigureAwait(false);
 
+    }
     public async Task<Dictionary<string, ImportPreviewOutputBase>> ImportChannelUSheetDatasAsync(USheetDatas input, bool restart)
     {
         try

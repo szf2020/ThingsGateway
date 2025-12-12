@@ -289,4 +289,12 @@ public partial class ManagementRpcServer : IRpcServer, IManagementRpcServer, IHa
 
     public Task RestartRuleRuntimeAsync() => App.GetService<IRulesEngineHostedService>().RestartRuleRuntimeAsync();
 
+    public Task<string> ExportChannelDataFileAsync(List<Channel> data) => App.GetService<IChannelPageService>().ExportChannelDataFileAsync(data);
+
+
+    public Task<string> ExportDeviceDataFileAsync(List<Device> data, string channelName, string plugin) => App.GetService<IDevicePageService>().ExportDeviceDataFileAsync(data, channelName, plugin);
+
+
+    public Task<string> ExportVariableDataFileAsync(List<Variable> data, string devName) => App.GetService<IVariablePageService>().ExportVariableDataFileAsync(data, devName);
+
 }

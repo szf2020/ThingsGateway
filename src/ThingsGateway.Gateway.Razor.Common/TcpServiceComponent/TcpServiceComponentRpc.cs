@@ -8,44 +8,45 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
+using System.ComponentModel;
+
 using ThingsGateway.Foundation.Common.Json.Extension;
 
 using TouchSocket.Core;
+using TouchSocket.Dmtp.Rpc;
+using TouchSocket.Rpc;
 
 namespace ThingsGateway.Gateway.Razor;
 
-public partial class TcpServiceComponent : IDriverUIBase
+[GeneratorRpcProxy(GeneratorFlag = GeneratorFlag.ExtensionAsync)]
+internal interface ITcpServiceComponentRpc: IRpcServer
 {
-    [Parameter, EditorRequired]
-    public long DeviceId { get; set; }
+    [DmtpRpc]
+    Task<bool> OnDeleteAsync(long deviceId, List<TcpSessionClientDto> tcpSessionClientDtos);
+    [DmtpRpc]
+    Task<QueryData<TcpSessionClientDto>> OnQueryAsync(long deviceId, QueryPageOptions options);
+}
+public partial class TcpServiceComponentRpc : SingletonRpcServer,IPluginRpcServer, ITcpServiceComponentRpc
+{
 
-    public ITcpServiceChannel? TcpServiceChannel => GlobalData.ReadOnlyIdDevices.TryGetValue(DeviceId, out DeviceRuntime deviceRuntime) ? deviceRuntime.Driver?.Channel as ITcpServiceChannel : null;
-
-    [Inject]
-    private ToastService ToastService { get; set; }
-
-    public TcpSessionClientDto SearchModel { get; set; } = new TcpSessionClientDto();
-
-    private async Task<bool> OnDeleteAsync(IEnumerable<TcpSessionClientDto> tcpSessionClientDtos)
+    [DmtpRpc]
+    public async Task<bool> OnDeleteAsync(long deviceId, List<TcpSessionClientDto> tcpSessionClientDtos)
     {
+        ITcpServiceChannel? TcpServiceChannel = GlobalData.ReadOnlyIdDevices.TryGetValue(deviceId, out DeviceRuntime deviceRuntime) ? deviceRuntime.Driver?.Channel as ITcpServiceChannel : null;
         if (TcpServiceChannel == null) return false;
-        try
+
+        foreach (var item in tcpSessionClientDtos)
         {
-            foreach (var item in tcpSessionClientDtos)
-            {
-                await TcpServiceChannel.ClientDisposeAsync(item.Id);
-            }
-            return true;
+            await TcpServiceChannel.ClientDisposeAsync(item.Id);
         }
-        catch (Exception ex)
-        {
-            await ToastService.Warn(ex);
-            return false;
-        }
+        return true;
+
     }
 
-    private Task<QueryData<TcpSessionClientDto>> OnQueryAsync(QueryPageOptions options)
+    [DmtpRpc]
+    public Task<QueryData<TcpSessionClientDto>> OnQueryAsync(long deviceId, QueryPageOptions options)
     {
+        ITcpServiceChannel? TcpServiceChannel = GlobalData.ReadOnlyIdDevices.TryGetValue(deviceId, out DeviceRuntime deviceRuntime) ? deviceRuntime.Driver?.Channel as ITcpServiceChannel : null;
         if (TcpServiceChannel != null)
         {
             var clients = TcpServiceChannel.Clients.ToList();
@@ -84,5 +85,4 @@ public partial class TcpServiceComponent : IDriverUIBase
             return Task.FromResult(new QueryData<TcpSessionClientDto>());
         }
     }
-
 }

@@ -18,26 +18,9 @@ namespace ThingsGateway.Gateway.Application;
 namespace ThingsGateway.Management.Application;
 #endif
 
-public interface IVariablePageService
+public interface IVariablePageService: IVariableModelPageService
 {
-    Task<bool> BatchEditVariableAsync(List<Variable> models, Variable oldModel, Variable model, bool restart);
-    Task<bool> DeleteVariableAsync(List<long> ids, bool restart);
-    Task<bool> ClearVariableAsync(bool restart);
-    Task InsertTestDataAsync(int testVariableCount, int testDeviceCount, string slaveUrl, bool businessEnable, bool restart);
-
-    Task<bool> BatchSaveVariableAsync(List<Variable> input, ItemChangedType type, bool restart);
-
-    Task<bool> SaveVariableAsync(Variable input, ItemChangedType type, bool restart);
-    Task CopyVariableAsync(List<Variable> Model, int CopyCount, string CopyVariableNamePrefix, int CopyVariableNameSuffixNumber, bool AutoRestartThread);
     Task<QueryData<VariableRuntime>> OnVariableQueryAsync(QueryPageOptions options);
-    Task<List<Variable>> GetVariableListAsync(QueryPageOptions option, int v);
-    Task<USheetDatas> ExportVariableAsync(List<Variable> models, string? sortName, SortOrder sortOrder);
-    Task<Dictionary<string, ImportPreviewOutputBase>> ImportVariableUSheetDatasAsync(USheetDatas data, bool restart);
 
-    Task<string> ExportVariableFileAsync(GatewayExportFilter exportFilter);
 
-    Task<OperResult<object>> OnWriteVariableAsync(long id, string writeData);
-    Task<Dictionary<string, ImportPreviewOutputBase>> ImportVariableAsync(IBrowserFile a, bool restart);
-    Task<Dictionary<string, ImportPreviewOutputBase>> ImportVariableFileAsync(string filePath, bool restart);
-    Task InsertTestDtuDataAsync(int deviceCount, string slaveUrl, bool restart);
 }

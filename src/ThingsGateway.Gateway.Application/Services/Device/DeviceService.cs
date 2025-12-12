@@ -332,8 +332,7 @@ internal sealed class DeviceService : BaseService<Device>, IDeviceService
     /// <summary>
     /// 导出文件
     /// </summary>
-    [OperDesc("ExportDevice", isRecordPar: false, localizerType: typeof(Device))]
-    public async Task<MemoryStream> ExportMemoryStream(List<Device>? models, string channelName = null, string plugin = null)
+    public async Task<Dictionary<string, object>> ExportDictionary(List<Device>? models, string channelName = null, string plugin = null)
     {
         var deviceDicts = GlobalData.IdDevices;
         var channelDicts = GlobalData.IdChannels;
@@ -345,10 +344,7 @@ internal sealed class DeviceService : BaseService<Device>, IDeviceService
         }).ToHashSet();
 
         var sheets = DeviceServiceHelpers.ExportSheets(models, deviceDicts, channelDicts, pluginSheetNames, channelName);
-        var memoryStream = new MemoryStream();
-        await memoryStream.SaveAsAsync(sheets).ConfigureAwait(false);
-        memoryStream.Seek(0, SeekOrigin.Begin);
-        return memoryStream;
+        return sheets;
     }
 
     #endregion 导出

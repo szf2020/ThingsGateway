@@ -73,7 +73,11 @@ internal sealed class PluginService : IPluginService
     private NonBlockingDictionary<string, Type> _driverBaseDict { get; } = new();
 
     #region public
-
+    public List<Assembly> GetLoadContextAssemblyList()
+    {
+        GetPluginList();
+        return _assemblyLoadContextDict.Select(a=>a.Value.Assembly).ToList();
+    }
     public Type GetDebugUI(string pluginName)
     {
         var driver = GetDriver(pluginName);

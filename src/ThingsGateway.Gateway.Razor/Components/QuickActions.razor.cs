@@ -79,7 +79,7 @@ public partial class QuickActions
 
 #if Management
     [Inject]
-    Management.Application.DmtpActorContext DmtpActorContext { get; set; }
+    DmtpActorContext DmtpActorContext { get; set; }
 #endif
     private async Task Restart()
     {

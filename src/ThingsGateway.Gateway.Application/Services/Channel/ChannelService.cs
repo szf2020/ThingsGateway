@@ -341,15 +341,11 @@ internal sealed class ChannelService : BaseService<Channel>, IChannelService
     }
 
     /// <inheritdoc/>
-    [OperDesc("ExportChannel", isRecordPar: false, localizerType: typeof(Channel))]
-    public async Task<MemoryStream> ExportMemoryStream(IEnumerable<Channel> channels)
+    public async Task<Dictionary<string, object>> ExportDictionary(List<Channel> channels)
     {
         var rows = ChannelServiceHelpers.ExportRows(channels); // IEnumerable 延迟执行
         var sheets = ChannelServiceHelpers.WrapAsSheet(GatewayExportString.ChannelName, rows);
-        var memoryStream = new MemoryStream();
-        await memoryStream.SaveAsAsync(sheets).ConfigureAwait(false);
-        memoryStream.Seek(0, SeekOrigin.Begin);
-        return memoryStream;
+        return sheets;
     }
 
     #endregion 导出

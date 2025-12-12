@@ -55,9 +55,9 @@ internal interface IVariableService
     /// <summary>
     /// 异步导出变量数据到内存流中。
     /// </summary>
-    /// <param name="data">要导出的变量数据。</param>
+    /// <param name="variables">要导出的变量数据。</param>
     /// <param name="deviceName">设备名称（可选）。</param>
-    Task<MemoryStream> ExportMemoryStream(List<Variable> data, string deviceName = null);
+    Task<Dictionary<string, object>> ExportDictionary(List<Variable> variables, string deviceName = null);
 
     /// <summary>
     /// 异步导出变量数据到文件流中。

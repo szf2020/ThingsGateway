@@ -12,6 +12,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
 using System.Text.Json.Nodes;
+using System.Text.Json.Serialization.Metadata;
 
 using ThingsGateway.Foundation.Common.Json.Extension;
 
@@ -354,6 +355,7 @@ internal sealed class RedundancyTask : IRpcDriver, IAsyncDisposable
                            json.Converters.Add(new JValueSystemTextJsonConverter());
                            json.Converters.Add(new JObjectSystemTextJsonConverter());
                            json.Converters.Add(new JArraySystemTextJsonConverter());
+                           json.TypeInfoResolver = new DefaultJsonTypeInfoResolver();
                        });
                    }));
 
@@ -399,6 +401,7 @@ internal sealed class RedundancyTask : IRpcDriver, IAsyncDisposable
                            json.Converters.Add(new JValueSystemTextJsonConverter());
                            json.Converters.Add(new JObjectSystemTextJsonConverter());
                            json.Converters.Add(new JArraySystemTextJsonConverter());
+                           json.TypeInfoResolver = new DefaultJsonTypeInfoResolver();
                        });
                    }));
 

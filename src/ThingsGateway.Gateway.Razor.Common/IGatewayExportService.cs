@@ -8,21 +8,14 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-using BootstrapBlazor.Components;
+namespace ThingsGateway.Gateway.Razor;
 
-using Microsoft.AspNetCore.Components.Forms;
-
-using TouchSocket.Core;
-
-#if !Management
-namespace ThingsGateway.Gateway.Application;
-#else
-namespace ThingsGateway.Management.Application;
-#endif
-
-public interface IDevicePageService : IDeviceModelPageService
+public interface IGatewayExportService
 {
-
-    Task<QueryData<DeviceRuntime>> OnDeviceQueryAsync(QueryPageOptions options);
-
+    Task<bool> OnChannelExport(List<Channel> data);
+    Task<bool> OnDeviceExport(List<Device> data, string channelName, string plugin);
+    Task<bool> OnVariableExport(List<Variable> data, string devName);
+    Task<bool> OnChannelExport(GatewayExportFilter exportFilter);
+    Task<bool> OnDeviceExport(GatewayExportFilter exportFilter);
+    Task<bool> OnVariableExport(GatewayExportFilter exportFilter);
 }

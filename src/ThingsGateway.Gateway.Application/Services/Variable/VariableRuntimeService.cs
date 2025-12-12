@@ -495,8 +495,11 @@ public class VariableRuntimeService : IVariableRuntimeService
         }
     }
 
-    public Task<MemoryStream> ExportMemoryStream(List<Variable> data, string deviceName) => GlobalData.VariableService.ExportMemoryStream(data, deviceName);
-
+    public async Task<string> ExportVariableDataFileAsync(List<Variable> data, string deviceName)
+    {
+        var sheets = await GlobalData.VariableService.ExportDictionary(data,deviceName).ConfigureAwait(false);
+        return await App.GetService<IImportExportService>().CreateFileAsync<Variable>(sheets, "Variable", false).ConfigureAwait(false);
+    }
     public async Task<string> ExportVariableFileAsync(GatewayExportFilter exportFilter)
     {
         var sheets = await GlobalData.VariableService.ExportVariableAsync(exportFilter).ConfigureAwait(false);

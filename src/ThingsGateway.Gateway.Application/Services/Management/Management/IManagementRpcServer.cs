@@ -399,4 +399,18 @@ internal interface IManagementRpcServer : IRpcServer
 
     [DmtpRpc]
     Task<string> UUIDAsync();
+
+
+
+    [DmtpRpc]
+    Task<string> ExportChannelDataFileAsync(List<Channel> data);
+
+
+    [DmtpRpc]
+    Task<string> ExportDeviceDataFileAsync(List<Device> data, string channelName, string plugin);
+
+
+    [DmtpRpc]
+    Task<string> ExportVariableDataFileAsync(List<Variable> data, string devName);
+
 }

@@ -281,8 +281,7 @@ public class DeviceRuntimeService : IDeviceRuntimeService
 
     public Task<Dictionary<string, object>> ExportDeviceAsync(GatewayExportFilter exportFilter) => GlobalData.DeviceService.ExportDeviceAsync(exportFilter);
     public Task<Dictionary<string, ImportPreviewOutputBase>> PreviewAsync(IBrowserFile browserFile) => GlobalData.DeviceService.PreviewAsync(browserFile);
-    public Task<MemoryStream> ExportMemoryStream(List<Device> data, string channelName, string plugin) =>
-          GlobalData.DeviceService.ExportMemoryStream(data, channelName, plugin);
+
 
     public async Task ImportDeviceAsync(Dictionary<string, ImportPreviewOutputBase> input, bool restart)
     {
@@ -523,5 +522,11 @@ public class DeviceRuntimeService : IDeviceRuntimeService
 
     }
 
+    public async Task<string> ExportDeviceDataFileAsync(List<Device> data, string channelName, string plugin)
+    {
+        var sheets = await GlobalData.DeviceService.ExportDictionary(data,channelName,plugin).ConfigureAwait(false);
+        return await App.GetService<IImportExportService>().CreateFileAsync<Device>(sheets, "Device", false).ConfigureAwait(false);
+
+    }
 
 }

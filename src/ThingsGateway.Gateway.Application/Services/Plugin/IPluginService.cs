@@ -10,6 +10,8 @@
 
 using BootstrapBlazor.Components;
 
+using System.Reflection;
+
 namespace ThingsGateway.Gateway.Application;
 
 /// <summary>
@@ -67,4 +69,5 @@ public interface IPluginService
     /// 设置插件动态属性
     /// </summary>
     void SetDriverProperties(object protperties, Dictionary<string, string> deviceProperties);
+    List<Assembly> GetLoadContextAssemblyList();
 }

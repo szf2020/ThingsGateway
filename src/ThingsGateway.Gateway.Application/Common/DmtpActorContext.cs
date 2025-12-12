@@ -8,14 +8,22 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-#if !Management
-namespace ThingsGateway.Gateway.Razor;
-#else
-namespace ThingsGateway.Management.Razor;
-#endif
-public interface IGatewayExportService
+
+using TouchSocket.Core;
+using TouchSocket.Dmtp;
+
+namespace ThingsGateway.Gateway.Application;
+
+public class DmtpActorContext
 {
-    Task<bool> OnChannelExport(GatewayExportFilter exportFilter);
-    Task<bool> OnDeviceExport(GatewayExportFilter exportFilter);
-    Task<bool> OnVariableExport(GatewayExportFilter exportFilter);
+    public IDmtpActor? Current => CurrentDmtpActorObject?.DmtpActor;
+    public IDmtpActorObject? CurrentDmtpActorObject { get; set; }
+    public ILog? LogMessage { get; set; }
+
+    public void SetClient(IDmtpActorObject actor, ILog log)
+    {
+        CurrentDmtpActorObject = actor;
+        LogMessage = log;
+    }
+
 }

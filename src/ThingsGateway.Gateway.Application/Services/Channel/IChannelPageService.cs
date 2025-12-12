@@ -10,64 +10,14 @@
 
 
 using BootstrapBlazor.Components;
-
-using Microsoft.AspNetCore.Components.Forms;
 #if !Management
 namespace ThingsGateway.Gateway.Application;
 #else
 namespace ThingsGateway.Management.Application;
 #endif
-public interface IChannelPageService
+public interface IChannelPageService : IChannelModelPageService
 {
-    Task<string> GetPluginNameAsync(long channelId);
-
-    Task RestartChannelAsync(long channelId);
-    Task RestartChannelsAsync();
-
-    Task<TouchSocket.Core.LogLevel> ChannelLogLevelAsync(long id);
-    Task SetChannelLogLevelAsync(long id, TouchSocket.Core.LogLevel logLevel);
-    Task CopyChannelAsync(int CopyCount, string CopyChannelNamePrefix, int CopyChannelNameSuffixNumber, string CopyDeviceNamePrefix, int CopyDeviceNameSuffixNumber, long channelId, bool AutoRestartThread);
 
     Task<QueryData<ChannelRuntime>> OnChannelQueryAsync(QueryPageOptions options);
-    Task<List<Channel>> GetChannelListAsync(QueryPageOptions options, int max = 0);
-    Task<Dictionary<string, ImportPreviewOutputBase>> ImportChannelAsync(IBrowserFile file, bool restart);
 
-    /// <summary>
-    /// 保存通道
-    /// </summary>
-    /// <param name="input">通道对象</param>
-    /// <param name="type">保存类型</param>
-    /// <param name="restart">重启</param>
-    Task<bool> SaveChannelAsync(Channel input, ItemChangedType type, bool restart);
-
-    /// <summary>
-    /// 批量修改
-    /// </summary>
-    /// <param name="models">列表</param>
-    /// <param name="oldModel">旧数据</param>
-    /// <param name="model">新数据</param>
-    /// <param name="restart">重启</param>
-    /// <returns></returns>
-    Task<bool> BatchEditChannelAsync(List<Channel> models, Channel oldModel, Channel model, bool restart);
-
-    /// <summary>
-    /// 删除通道
-    /// </summary>
-    Task<bool> DeleteChannelAsync(List<long> ids, bool restart);
-    /// <summary>
-    /// 删除通道
-    /// </summary>
-    Task<bool> ClearChannelAsync(bool restart);
-    Task ImportChannelAsync(List<Channel> upData, List<Channel> insertData, bool restart);
-    Task<Dictionary<string, ImportPreviewOutputBase>> ImportChannelUSheetDatasAsync(USheetDatas input, bool restart);
-    Task<Dictionary<string, ImportPreviewOutputBase>> ImportChannelFileAsync(string filePath, bool restart);
-
-
-    Task<USheetDatas> ExportChannelAsync(List<Channel> channels);
-
-    Task<string> ExportChannelFileAsync(GatewayExportFilter exportFilter);
-
-
-    Task<QueryData<SelectedItem>> OnChannelSelectedItemQueryAsync(VirtualizeQueryOption option);
-    Task<string> GetChannelNameAsync(long channelId);
 }

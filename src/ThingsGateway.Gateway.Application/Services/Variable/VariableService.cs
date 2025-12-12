@@ -587,11 +587,7 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
     }
     #region 导出
 
-    /// <summary>
-    /// 导出文件
-    /// </summary>
-    [OperDesc("ExportVariable", isRecordPar: false, localizerType: typeof(Variable))]
-    public async Task<MemoryStream> ExportMemoryStream(List<Variable> variables, string deviceName = null)
+    public async Task<Dictionary<string, object>> ExportDictionary(List<Variable> variables, string deviceName = null)
     {
         var deviceDicts = GlobalData.IdDevices;
         var channelDicts = GlobalData.IdChannels;
@@ -605,12 +601,9 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
             }
             return new KeyValuePair<string, VariablePropertyBase>(string.Empty, null);
         }).Where(a => a.Value != null).DistinctBy(a => a.Key).ToDictionary();
-        var sheets = VariableServiceHelpers.ExportSheets(variables, deviceDicts, channelDicts, pluginSheetNames); // IEnumerable 延迟执行
+        Dictionary<string, object>? sheets = VariableServiceHelpers.ExportSheets(variables, deviceDicts, channelDicts, pluginSheetNames); // IEnumerable 延迟执行
 
-        var memoryStream = new MemoryStream();
-        await memoryStream.SaveAsAsync(sheets).ConfigureAwait(false);
-        memoryStream.Seek(0, SeekOrigin.Begin);
-        return memoryStream;
+        return sheets;
     }
 
     /// <summary>

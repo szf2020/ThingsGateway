@@ -552,16 +552,9 @@ public partial class VariableRuntimeInfo
 
     #region 导出
 
-
-#if Management
     [Inject]
     [NotNull]
-    private Management.Razor.IGatewayExportService? GatewayExportService { get; set; }
-#else
-    [Inject]
-    [NotNull]
-    private Gateway.Razor.IGatewayExportService? GatewayExportService { get; set; }
-#endif
+    private IGatewayExportService? GatewayExportService { get; set; }
 
     private async Task ExcelExportAsync(ITableExportContext<VariableRuntime> tableExportContext, bool all = false)
     {

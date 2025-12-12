@@ -71,13 +71,16 @@ public class Startup : AppStartup
         services.AddSingleton<IChannelThreadManage, ChannelThreadManage>();
         services.AddSingleton<IChannelService, ChannelService>();
         services.AddSingleton<IChannelPageService>(a => a.GetService<IChannelRuntimeService>());
+        services.AddSingleton<IChannelModelPageService>(a => a.GetService<IChannelRuntimeService>());
         services.AddSingleton<IChannelRuntimeService, ChannelRuntimeService>();
         services.AddSingleton<IVariableService, VariableService>();
         services.AddSingleton<IVariableRuntimeService, VariableRuntimeService>();
         services.AddSingleton<IVariablePageService>(a => a.GetService<IVariableRuntimeService>());
+        services.AddSingleton<IVariableModelPageService>(a => a.GetService<IVariableRuntimeService>());
         services.AddSingleton<IDeviceService, DeviceService>();
         services.AddSingleton<IDeviceRuntimeService, DeviceRuntimeService>();
         services.AddSingleton<IDevicePageService>(a => a.GetService<IDeviceRuntimeService>());
+        services.AddSingleton<IDeviceModelPageService>(a => a.GetService<IDeviceRuntimeService>());
         services.AddSingleton<IPluginService, PluginService>();
         services.AddSingleton<IPluginPageService>(a => a.GetService<IPluginService>());
 

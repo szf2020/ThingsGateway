@@ -91,10 +91,16 @@ public partial class WebApiTask : AsyncDisposableObject
                        store.RegisterServer<ManagementController>();
 
 
-                       foreach (var type in App.EffectiveTypes.Where(p => typeof(IPluginRpcServer).IsAssignableFrom(p) && !p.IsAbstract && p.IsClass))
+                       foreach (var targetType in App.EffectiveTypes.Where(p => typeof(IPluginRpcServer).IsAssignableFrom(p) && !p.IsAbstract && p.IsClass))
                        {
-                           store.RegisterServer(type);
+                           RegisterServer(store, targetType);
                        }
+
+                       foreach (var targetType in GlobalData.PluginService.GetLoadContextAssemblyList().SelectMany(a => a.ExportedTypes).Where(p => typeof(IPluginRpcServer).IsAssignableFrom(p) && !p.IsAbstract && p.IsClass))
+                       {
+                           RegisterServer(store, targetType);
+                       }
+
                    });
 
                    //添加跨域服务
@@ -132,6 +138,28 @@ public partial class WebApiTask : AsyncDisposableObject
         return httpService;
     }
 
+    private static void RegisterServer(RpcStore store, Type targetType)
+    {
+        var baseInterface = typeof(IRpcServer);
+        var result = targetType.GetInterfaces()
+// 1. 必须继承 IRpcServer
+.Where(i => baseInterface.IsAssignableFrom(i))
+
+.Where(i => targetType.GetInterfaceMap(i).TargetType == targetType)
+
+// 3. 接口上带有指定特性并符合 GeneratorFlag
+.Where(i =>
+{
+    var attr = i.GetCustomAttributes(inherit: false).Where(a => a.GetType().Name == nameof(GeneratorRpcProxyAttribute))
+                .FirstOrDefault();
+    return attr != null;
+})
+.ToList();
+        foreach (var item in result)
+        {
+            store.RegisterServer(item, targetType);
+        }
+    }
     private async Task EnsureChannelOpenAsync(CancellationToken cancellationToken)
     {
         if (_httpService.ServerState != ServerState.Running)

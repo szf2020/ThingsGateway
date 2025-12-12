@@ -353,15 +353,9 @@ public partial class ChannelDeviceTree
 
 
 
-#if Management
     [Inject]
     [NotNull]
-    private Management.Razor.IGatewayExportService? GatewayExportService { get; set; }
-#else
-    [Inject]
-    [NotNull]
-    private Gateway.Razor.IGatewayExportService? GatewayExportService { get; set; }
-#endif
+    private IGatewayExportService? GatewayExportService { get; set; }
     #region 通道
 
     Task EditChannel(ContextMenuItem item, object value, ItemChangedType itemChangedType)
@@ -757,12 +751,12 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
 
         if (channelDeviceTreeItem.TryGetChannelRuntime(out var channelRuntime))
         {
-            ret = await GatewayExportService.OnChannelExport(new() { QueryPageOptions = new(), DeviceId = channelRuntime.Id });
+            ret = await GatewayExportService.OnChannelExport(new GatewayExportFilter() { QueryPageOptions = new(), DeviceId = channelRuntime.Id });
         }
         else if (channelDeviceTreeItem.TryGetPluginName(out var pluginName))
         {
             //插件名称
-            ret = await GatewayExportService.OnChannelExport(new() { QueryPageOptions = new(), PluginName = pluginName });
+            ret = await GatewayExportService.OnChannelExport(new GatewayExportFilter() { QueryPageOptions = new(), PluginName = pluginName });
         }
         else if (channelDeviceTreeItem.TryGetPluginType(out var pluginType))
         {
@@ -780,7 +774,7 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
     async Task ExportAllChannel()
     {
         bool ret;
-        ret = await GatewayExportService.OnChannelExport(new() { QueryPageOptions = new() });
+        ret = await GatewayExportService.OnChannelExport(new GatewayExportFilter() { QueryPageOptions = new() });
 
         // 返回 true 时自动弹出提示框
         if (ret)

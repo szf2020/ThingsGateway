@@ -266,21 +266,15 @@ public partial class ChannelTable : IDisposable
 
     #region 导出
 
-#if Management
     [Inject]
     [NotNull]
-    private Management.Razor.IGatewayExportService? GatewayExportService { get; set; }
-#else
-    [Inject]
-    [NotNull]
-    private Gateway.Razor.IGatewayExportService? GatewayExportService { get; set; }
-#endif
+    private IGatewayExportService? GatewayExportService { get; set; }
     private async Task ExcelExportAsync(ITableExportContext<ChannelRuntime> tableExportContext, bool all = false)
     {
         bool ret;
         if (all)
         {
-            ret = await GatewayExportService.OnChannelExport(new() { QueryPageOptions = new() { SortName = _option.SortName, SortOrder = _option.SortOrder } });
+            ret = await GatewayExportService.OnChannelExport(new GatewayExportFilter() { QueryPageOptions = new() { SortName = _option.SortName, SortOrder = _option.SortOrder } });
         }
         else
         {
@@ -289,21 +283,21 @@ public partial class ChannelTable : IDisposable
             {
 
                 case ChannelDevicePluginTypeEnum.PluginName:
-                    ret = await GatewayExportService.OnChannelExport(new() { QueryPageOptions = new() { SortName = _option.SortName, SortOrder = _option.SortOrder }, PluginName = SelectModel.PluginName });
+                    ret = await GatewayExportService.OnChannelExport(new GatewayExportFilter() { QueryPageOptions = new() { SortName = _option.SortName, SortOrder = _option.SortOrder }, PluginName = SelectModel.PluginName });
                     break;
                 case ChannelDevicePluginTypeEnum.Channel:
-                    ret = await GatewayExportService.OnChannelExport(new() { QueryPageOptions = new() { SortName = _option.SortName, SortOrder = _option.SortOrder }, ChannelId = SelectModel.ChannelRuntimeId });
+                    ret = await GatewayExportService.OnChannelExport(new GatewayExportFilter() { QueryPageOptions = new() { SortName = _option.SortName, SortOrder = _option.SortOrder }, ChannelId = SelectModel.ChannelRuntimeId });
                     break;
                 case ChannelDevicePluginTypeEnum.Device:
-                    ret = await GatewayExportService.OnChannelExport(new() { QueryPageOptions = new() { SortName = _option.SortName, SortOrder = _option.SortOrder }, DeviceId = SelectModel.DeviceRuntimeId, PluginType = SelectModel.TryGetDeviceRuntime(out var deviceRuntime) ? deviceRuntime?.PluginType : null });
+                    ret = await GatewayExportService.OnChannelExport(new GatewayExportFilter() { QueryPageOptions = new() { SortName = _option.SortName, SortOrder = _option.SortOrder }, DeviceId = SelectModel.DeviceRuntimeId, PluginType = SelectModel.TryGetDeviceRuntime(out var deviceRuntime) ? deviceRuntime?.PluginType : null });
                     break;
                 default:
-                    ret = await GatewayExportService.OnChannelExport(new() { QueryPageOptions = new() });
+                    ret = await GatewayExportService.OnChannelExport(new GatewayExportFilter() { QueryPageOptions = new() });
 
                     break;
             }
 #else
-            ret = await GatewayExportService.OnChannelExport(new() { QueryPageOptions = _option });
+            ret = await GatewayExportService.OnChannelExport(new GatewayExportFilter() { QueryPageOptions = _option });
 #endif
         }
 

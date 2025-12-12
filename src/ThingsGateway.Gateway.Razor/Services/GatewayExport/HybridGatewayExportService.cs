@@ -8,7 +8,10 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
+
 using ThingsGateway.Admin.Application;
+
+using TouchSocket.Core;
 
 namespace ThingsGateway.Gateway.Razor;
 
@@ -97,6 +100,48 @@ public sealed class HybridGatewayExportService : IGatewayExportService
             exportFilter.QueryPageOptions.IsVirtualScroll = false;
             var sheets = await _variableService.ExportVariableAsync(exportFilter).ConfigureAwait(false);
             var path = await _importExportService.CreateFileAsync<Variable>(sheets, "Variable", false).ConfigureAwait(false);
+            Open(path);
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    public async Task<bool> OnChannelExport(List<Channel> data)
+    {
+        try
+        {
+            var path = await _channelService.ExportChannelDataFileAsync(data).ConfigureAwait(false);
+            Open(path);
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    public async Task<bool> OnDeviceExport(List<Device> data, string channelName, string plugin)
+    {
+        try
+        {
+            var path = await _deviceService.ExportDeviceDataFileAsync(data, channelName, plugin).ConfigureAwait(false);
+            Open(path);
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    public async Task<bool> OnVariableExport(List<Variable> data, string devName)
+    {
+        try
+        {
+            var path = await _variableService.ExportVariableDataFileAsync(data, devName).ConfigureAwait(false);
             Open(path);
             return true;
         }

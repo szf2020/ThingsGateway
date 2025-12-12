@@ -21,7 +21,6 @@ namespace ThingsGateway.Gateway.Application
 
         Task<Dictionary<string, ImportPreviewOutputBase>> PreviewAsync(IBrowserFile browserFile);
 
-        Task<MemoryStream> ExportMemoryStream(List<Variable> data, string devName);
         Task<Dictionary<string, ImportPreviewOutputBase>> ImportVariableAsync(IFormFile file, bool restart);
     }
 }
