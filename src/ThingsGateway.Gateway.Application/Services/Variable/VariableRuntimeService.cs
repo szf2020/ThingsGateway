@@ -497,7 +497,7 @@ public class VariableRuntimeService : IVariableRuntimeService
 
     public async Task<string> ExportVariableDataFileAsync(List<Variable> data, string deviceName)
     {
-        var sheets = await GlobalData.VariableService.ExportDictionary(data,deviceName).ConfigureAwait(false);
+        var sheets = await GlobalData.VariableService.ExportDictionary(data, deviceName).ConfigureAwait(false);
         return await App.GetService<IImportExportService>().CreateFileAsync<Variable>(sheets, "Variable", false).ConfigureAwait(false);
     }
     public async Task<string> ExportVariableFileAsync(GatewayExportFilter exportFilter)

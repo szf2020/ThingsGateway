@@ -354,7 +354,7 @@ public partial class ManagementController : ControllerBase, IRpcServer
     [HttpPost]
     [TouchSocket.WebApi.WebApi(Method = TouchSocket.WebApi.HttpMethodType.Post)]
     public Task<OperResult<LogData[]>> LastLogDataAsync([FromBody] LastLogDataInput input) =>
-        App.GetService<ITextFileReadService>().LastLogDataAsync(input.File, input.LineCount);
+        App.GetService<ITextFileReadService>().LastLogDataAsync(input.File, input.LogLevel, input.LineCount);
 
     [HttpPost]
     [TouchSocket.WebApi.WebApi(Method = TouchSocket.WebApi.HttpMethodType.Post)]
@@ -645,6 +645,7 @@ public class InsertTestDtuDataInput
 public class LastLogDataInput
 {
     public string File { get; set; }
+    public TouchSocket.Core.LogLevel LogLevel { get; set; }
     public int LineCount { get; set; } = 200;
 }
 

@@ -310,7 +310,7 @@ public class ChannelRuntimeService : IChannelRuntimeService
 
     public async Task<string> ExportChannelDataFileAsync(List<Channel> data)
     {
-        var sheets =await GlobalData.ChannelService.ExportDictionary(data).ConfigureAwait(false);
+        var sheets = await GlobalData.ChannelService.ExportDictionary(data).ConfigureAwait(false);
         return await App.GetService<IImportExportService>().CreateFileAsync<Channel>(sheets, "Channel", false).ConfigureAwait(false);
 
     }

@@ -10,6 +10,7 @@
 
 using Microsoft.AspNetCore.Components.Web;
 
+using System.Text;
 using System.Text.RegularExpressions;
 
 using ThingsGateway.Foundation;
@@ -44,9 +45,9 @@ public partial class LocalLogConsole : IDisposable
     /// <summary>
     /// 日志
     /// </summary>
-    public ICollection<LogMessage> Messages { get; set; } = new List<LogMessage>();
+    public ICollection<LogData> Messages { get; set; } = new List<LogData>();
 
-    private ICollection<LogMessage> CurrentMessages => Pause ? PauseMessagesText : Messages;
+    private ICollection<LogData> CurrentMessages => Pause ? PauseMessagesText : Messages;
 
     [Inject]
     private DownloadService DownloadService { get; set; }
@@ -56,8 +57,22 @@ public partial class LocalLogConsole : IDisposable
     /// <summary>
     /// 暂停缓存
     /// </summary>
-    private ICollection<LogMessage> PauseMessagesText { get; set; } = new List<LogMessage>();
-
+    private ICollection<LogData> PauseMessagesText { get; set; } = new List<LogData>();
+    private string GetStringMessage(LogData itemMessage)
+    {
+        using ValueStringBuilder valueStringBuilder = new();
+        valueStringBuilder.Append(itemMessage.LogTime);
+        valueStringBuilder.Append(' ');
+        valueStringBuilder.Append('-');
+        valueStringBuilder.Append(' ');
+        valueStringBuilder.Append(itemMessage.Message);
+        if (!string.IsNullOrWhiteSpace(itemMessage.ExceptionString))
+        {
+            valueStringBuilder.Append(Environment.NewLine);
+            valueStringBuilder.Append(itemMessage.ExceptionString);
+        }
+        return valueStringBuilder.AsSpan().Slice(0, Math.Min(valueStringBuilder.Length, 150)).ToString();
+    }
     [Inject]
     private PlatformService PlatformService { get; set; }
 
@@ -69,7 +84,7 @@ public partial class LocalLogConsole : IDisposable
         if (LogPath != logPath)
         {
             logPath = LogPath;
-            Messages = new List<LogMessage>();
+            Messages = new List<LogData>();
             await ExecuteAsync();
         }
 
@@ -99,7 +114,7 @@ public partial class LocalLogConsole : IDisposable
                 var files = await TextFileReadService.GetLogFilesAsync(LogPath);
                 if (!files.IsSuccess)
                 {
-                    Messages = new List<LogMessage>();
+                    Messages = new List<LogData>();
                     await Task.Delay(1000);
                 }
                 else
@@ -107,14 +122,14 @@ public partial class LocalLogConsole : IDisposable
                     await Task.Run(async () =>
                     {
                         var sw = ValueStopwatch.StartNew();
-                        var result = await TextFileReadService.LastLogDataAsync(files.Content.FirstOrDefault());
+                        var result = await TextFileReadService.LastLogDataAsync(files.Content.FirstOrDefault(), LogLevel);
                         if (result.IsSuccess)
                         {
-                            Messages = result.Content.Where(a => a.LogLevel >= LogLevel).Select(a => new LogMessage((int)a.LogLevel, $"{a.LogTime} - {a.Message}{(a.ExceptionString.IsNullOrWhiteSpace() ? null : $"{Environment.NewLine}{a.ExceptionString}")}")).ToList();
+                            Messages = result.Content;
                         }
                         else
                         {
-                            Messages = new List<LogMessage>();
+                            Messages = new List<LogData>();
                         }
                         if (sw.GetElapsedTime().TotalMilliseconds > 500)
                         {

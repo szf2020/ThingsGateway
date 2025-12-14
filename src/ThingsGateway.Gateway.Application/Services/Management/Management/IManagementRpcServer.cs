@@ -233,7 +233,7 @@ internal interface IManagementRpcServer : IRpcServer
     Task<bool> IsRedundantDeviceAsync(long id);
 
     [DmtpRpc]
-    Task<OperResult<LogData[]>> LastLogDataAsync(string file, int lineCount = 200);
+    Task<OperResult<LogData[]>> LastLogDataAsync(string file, TouchSocket.Core.LogLevel logLevel, int lineCount = 200);
 
 #if !Management
     [DmtpRpc]

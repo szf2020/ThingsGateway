@@ -40,14 +40,14 @@
         </HeaderTemplate>
         <BodyTemplate>
             <div style=@($"height:calc(100% - 50px);overflow-y:scroll;flex-fill;")>
-                <Virtualize Items="CurrentMessages ?? new List<LogMessage>()" Context="itemMessage" ItemSize="60" OverscanCount=2>
+                <Virtualize Items="CurrentMessages ?? new List<LogData>()" Context="itemMessage" ItemSize="60" OverscanCount=2>
                     <ItemContent>
                         @*       <Tooltip Placement="Placement.Bottom" Title=@itemMessage.Message.Substring(0, Math.Min(itemMessage.Message.Length, 500))> *@
-                        <div class=@(itemMessage.Level<(byte)Microsoft.Extensions.Logging.LogLevel.Information?"":
-                                                          itemMessage.Level >= (byte)Microsoft.Extensions.Logging.LogLevel.Warning ? " red--text text-truncate" : "green--text text-truncate")
-                             title=@itemMessage.Message.Substring(0, Math.Min(itemMessage.Message.Length, 500))>
-
-                            @itemMessage.Message.Substring(0, Math.Min(itemMessage.Message.Length, 150))
+                        <div class=@((byte)itemMessage.LogLevel<(byte)Microsoft.Extensions.Logging.LogLevel.Information?"":
+                                                          (byte)itemMessage.LogLevel >= (byte)Microsoft.Extensions.Logging.LogLevel.Warning ? " red--text text-truncate" : "green--text text-truncate")
+                             title=@(GetStringMessage(itemMessage))>
+ 
+                            @(GetStringMessage(itemMessage))
 
                         </div>
                         @* </Tooltip> *@

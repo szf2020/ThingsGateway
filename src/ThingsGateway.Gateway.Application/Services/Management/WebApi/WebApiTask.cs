@@ -167,7 +167,7 @@ public partial class WebApiTask : AsyncDisposableObject
             if (_httpService.ServerState != ServerState.Stopped)
                 await _httpService.StopAsync(cancellationToken).ConfigureAwait(false);
 
-            await _httpService.StartAsync().ConfigureAwait(false);
+            await _httpService.StartAsync(cancellationToken).ConfigureAwait(false);
         }
 
     }

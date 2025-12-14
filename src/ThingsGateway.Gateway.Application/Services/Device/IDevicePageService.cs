@@ -10,10 +10,6 @@
 
 using BootstrapBlazor.Components;
 
-using Microsoft.AspNetCore.Components.Forms;
-
-using TouchSocket.Core;
-
 #if !Management
 namespace ThingsGateway.Gateway.Application;
 #else

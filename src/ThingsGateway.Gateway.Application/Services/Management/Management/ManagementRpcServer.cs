@@ -188,7 +188,7 @@ public partial class ManagementRpcServer : IRpcServer, IManagementRpcServer, IHa
     public Task<bool> IsRedundantDeviceAsync(long id) =>
         App.GetService<IDevicePageService>().IsRedundantDeviceAsync(id);
 
-    public Task<OperResult<LogData[]>> LastLogDataAsync(string file, int lineCount = 200) => App.GetService<ITextFileReadService>().LastLogDataAsync(file, lineCount);
+    public Task<OperResult<LogData[]>> LastLogDataAsync(string file, TouchSocket.Core.LogLevel logLevel, int lineCount = 200) => App.GetService<ITextFileReadService>().LastLogDataAsync(file, logLevel, lineCount);
     public Task DeleteLogDataAsync(string path) => App.GetService<ITextFileReadService>().DeleteLogDataAsync(path);
     public Task<QueryData<ChannelRuntime>> OnChannelQueryAsync(QueryPageOptions options) =>
         App.GetService<IChannelPageService>().OnChannelQueryAsync(options);

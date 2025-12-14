@@ -8,8 +8,6 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-using System.ComponentModel;
-
 using ThingsGateway.Foundation.Common.Json.Extension;
 
 using TouchSocket.Core;
@@ -19,14 +17,14 @@ using TouchSocket.Rpc;
 namespace ThingsGateway.Gateway.Razor;
 
 [GeneratorRpcProxy(GeneratorFlag = GeneratorFlag.ExtensionAsync)]
-internal interface ITcpServiceComponentRpc: IRpcServer
+internal interface ITcpServiceComponentRpc : IRpcServer
 {
     [DmtpRpc]
     Task<bool> OnDeleteAsync(long deviceId, List<TcpSessionClientDto> tcpSessionClientDtos);
     [DmtpRpc]
     Task<QueryData<TcpSessionClientDto>> OnQueryAsync(long deviceId, QueryPageOptions options);
 }
-public partial class TcpServiceComponentRpc : SingletonRpcServer,IPluginRpcServer, ITcpServiceComponentRpc
+public partial class TcpServiceComponentRpc : SingletonRpcServer, IPluginRpcServer, ITcpServiceComponentRpc
 {
 
     [DmtpRpc]

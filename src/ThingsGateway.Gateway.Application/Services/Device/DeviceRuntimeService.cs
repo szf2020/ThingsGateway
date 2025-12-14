@@ -524,7 +524,7 @@ public class DeviceRuntimeService : IDeviceRuntimeService
 
     public async Task<string> ExportDeviceDataFileAsync(List<Device> data, string channelName, string plugin)
     {
-        var sheets = await GlobalData.DeviceService.ExportDictionary(data,channelName,plugin).ConfigureAwait(false);
+        var sheets = await GlobalData.DeviceService.ExportDictionary(data, channelName, plugin).ConfigureAwait(false);
         return await App.GetService<IImportExportService>().CreateFileAsync<Device>(sheets, "Device", false).ConfigureAwait(false);
 
     }

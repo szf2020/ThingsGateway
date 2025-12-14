@@ -10,15 +10,13 @@
 
 using BootstrapBlazor.Components;
 
-using Microsoft.AspNetCore.Components.Forms;
-
 #if !Management
 namespace ThingsGateway.Gateway.Application;
 #else
 namespace ThingsGateway.Management.Application;
 #endif
 
-public interface IVariablePageService: IVariableModelPageService
+public interface IVariablePageService : IVariableModelPageService
 {
     Task<QueryData<VariableRuntime>> OnVariableQueryAsync(QueryPageOptions options);
 

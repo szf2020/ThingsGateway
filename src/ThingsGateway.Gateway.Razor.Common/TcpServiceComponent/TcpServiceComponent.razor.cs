@@ -10,8 +10,6 @@
 
 using Microsoft.Extensions.DependencyInjection;
 
-using System.Text.Json;
-
 using ThingsGateway.Foundation.Common.Json.Extension;
 
 using TouchSocket.Core;
@@ -28,7 +26,7 @@ public partial class TcpServiceComponent : IDriverUIBase
 
     [Inject]
     private ToastService ToastService { get; set; }
-  
+
     public TcpSessionClientDto SearchModel { get; set; } = new TcpSessionClientDto();
 
     [Inject]

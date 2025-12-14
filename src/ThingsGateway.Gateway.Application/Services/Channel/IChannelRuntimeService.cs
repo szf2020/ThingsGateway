@@ -34,7 +34,7 @@ public interface IChannelRuntimeService : IChannelPageService
 
     Task<Dictionary<string, object>> ExportChannelAsync(GatewayExportFilter exportFilter);
     Task<Dictionary<string, ImportPreviewOutputBase>> PreviewAsync(IBrowserFile browserFile);
- 
+
     Task RestartChannelAsync(IEnumerable<ChannelRuntime> oldChannelRuntimes);
     Task<bool> CopyAsync(List<Channel> models, Dictionary<Device, List<Variable>> devices, bool restart);
     Task<bool> UpdateAsync(List<Channel> models, List<Device> devices, List<Variable> variables, bool restart);

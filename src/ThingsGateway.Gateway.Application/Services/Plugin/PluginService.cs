@@ -76,7 +76,7 @@ internal sealed class PluginService : IPluginService
     public List<Assembly> GetLoadContextAssemblyList()
     {
         GetPluginList();
-        return _assemblyLoadContextDict.Select(a=>a.Value.Assembly).ToList();
+        return _assemblyLoadContextDict.Select(a => a.Value.Assembly).ToList();
     }
     public Type GetDebugUI(string pluginName)
     {

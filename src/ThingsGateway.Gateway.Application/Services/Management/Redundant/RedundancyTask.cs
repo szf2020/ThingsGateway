@@ -682,7 +682,7 @@ internal sealed class RedundancyTask : IRpcDriver, IAsyncDisposable
                 if (_tcpDmtpService.ServerState != ServerState.Stopped)
                     await _tcpDmtpService.StopAsync(cancellationToken).ConfigureAwait(false);
 
-                await _tcpDmtpService.StartAsync().ConfigureAwait(false);
+                await _tcpDmtpService.StartAsync(cancellationToken).ConfigureAwait(false);
             }
         }
         else

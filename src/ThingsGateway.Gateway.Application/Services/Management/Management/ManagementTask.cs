@@ -183,7 +183,7 @@ public partial class ManagementTask : AsyncDisposableObject
                        }
                    });
 
-    })
+               })
                .ConfigurePlugins(a =>
                {
                    a.UseTcpSessionCheckClear();
@@ -223,7 +223,7 @@ public partial class ManagementTask : AsyncDisposableObject
 // 3. 接口上带有指定特性并符合 GeneratorFlag
 .Where(i =>
 {
-    var attr = i.GetCustomAttributes(inherit: false).Where(a=>a.GetType().Name==nameof(GeneratorRpcProxyAttribute))
+    var attr = i.GetCustomAttributes(inherit: false).Where(a => a.GetType().Name == nameof(GeneratorRpcProxyAttribute))
                 .FirstOrDefault();
     return attr != null;
 })
@@ -243,7 +243,7 @@ public partial class ManagementTask : AsyncDisposableObject
                 if (_tcpDmtpService.ServerState != ServerState.Stopped)
                     await _tcpDmtpService.StopAsync(cancellationToken).ConfigureAwait(false);
 
-                await _tcpDmtpService.StartAsync().ConfigureAwait(false);
+                await _tcpDmtpService.StartAsync(cancellationToken).ConfigureAwait(false);
             }
         }
         else

@@ -64,6 +64,6 @@ public interface IChannelModelPageService
     Task<string> ExportChannelFileAsync(GatewayExportFilter exportFilter);
     Task<string> ExportChannelDataFileAsync(List<Channel> data);
 
-    Task< QueryData<SelectedItem>> OnChannelSelectedItemQueryAsync(VirtualizeQueryOption option);
+    Task<QueryData<SelectedItem>> OnChannelSelectedItemQueryAsync(VirtualizeQueryOption option);
     Task<string> GetChannelNameAsync(long channelId);
 }
