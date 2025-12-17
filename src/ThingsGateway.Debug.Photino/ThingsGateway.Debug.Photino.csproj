@@ -53,10 +53,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<FrameworkReference Include="Microsoft.AspNetCore.App" />
 		<PackageReference Include="BootstrapBlazor.CherryMarkdown" Version="10.0.1" />
 	</ItemGroup>
-	
+
 	<ItemGroup Condition=" '$(TargetFramework)' == 'net8.0' ">
 		<PackageReference Include="Microsoft.AspNetCore.Components.WebView" Version="$(NET8Version)" />
 	</ItemGroup>

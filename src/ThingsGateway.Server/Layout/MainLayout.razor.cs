@@ -229,66 +229,6 @@ public partial class MainLayout : IAsyncDisposable
         };
         await DialogService.Show(op);
     }
-    [CascadingParameter]
-    [NotNull]
-    private BootstrapBlazorRoot? Root { get; set; }
-    private ToastOption _option;
-    [Inject]
-    [NotNull]
-    private IOptionsMonitor<BootstrapBlazorOptions>? Options { get; set; }
-
-    /// <summary>
-    /// 显示投票弹窗
-    /// </summary>
-    /// <returns></returns>
-    [JSInvokable]
-    public async Task ShowVoteToast()
-    {
-        if (!WebsiteOption.Value.Demo)
-        {
-            return;
-        }
-        Root.ToastContainer.SetPlacement(Placement.BottomEnd);
-        _option = new ToastOption()
-        {
-            Category = ToastCategory.Information,
-            Title = "邀请您支持 ThingsGateway 参与 Gitee 项目评选活动",
-            IsAutoHide = false,
-            ChildContent = RenderVote,
-            PreventDuplicates = true,
-            OnCloseAsync = () =>
-            {
-                Root.ToastContainer.SetPlacement(Options.CurrentValue.ToastPlacement ?? Placement.BottomEnd);
-                return Task.CompletedTask;
-            }
-        };
-
-        await Toast.Show(_option);
-    }
-    [Inject]
-    ToastService Toast { get; set; }
-    private JSModule? _module;
-    private DotNetObjectReference<MainLayout>? _interop;
-    [Inject]
-    [NotNull]
-    private IJSRuntime? JSRuntime { get; set; }
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        await base.OnAfterRenderAsync(firstRender);
-
-        if (firstRender)
-        {
-            if (!WebsiteOption.Value.Demo)
-            {
-                return;
-            }
-            _module = await JSRuntime.LoadModule("/Layout/MainLayout.razor.js");
-            _interop = DotNetObjectReference.Create(this);
-            await _module.InvokeVoidAsync("doTask", _interop);
-            StateHasChanged();
-        }
-    }
-
 
     /// <summary>
     /// 释放资源
@@ -296,16 +236,7 @@ public partial class MainLayout : IAsyncDisposable
     /// <param name="disposing"></param>
     private async ValueTask DisposeAsync(bool disposing)
     {
-        if (disposing)
-        {
-            DispatchService.UnSubscribe(Dispatch);
-
-            if (_module != null)
-            {
-                await _module.InvokeVoidAsync("dispose");
-                await _module.DisposeAsync();
-            }
-        }
+        DispatchService.UnSubscribe(Dispatch);
     }
 
     /// <summary>

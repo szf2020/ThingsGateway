@@ -17,10 +17,10 @@
 		<FoundationVersion>12.4.18</FoundationVersion>
 		<PluginVersion>12.4.18</PluginVersion>
 		<ProPluginVersion>12.4.16</ProPluginVersion>
-		<Version>12.4.25</Version>
+		<Version>12.4.26</Version>
 
 
-		<ManagementVersion>12.4.25</ManagementVersion>
+		<ManagementVersion>12.4.26</ManagementVersion>
 
 		
 		<LangVersion>preview</LangVersion>

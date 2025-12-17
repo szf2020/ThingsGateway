@@ -3,28 +3,6 @@
 <img src="logo.svg" width = "400" height = "200" alt="The name of the image" align=center />
 </p>
 
-
----
-
-<table>
-  <tr>
-    <td width="100%" align="center">
-      <a href="https://gitee.com/activity/2025opensource?ident=I4XWR9">
-        <img src="https://img.shields.io/badge/🔥_Gitee_2025-年度投票-FF4B2B?style=for-the-badge&logo=gitee&logoColor=white" height="40">
-      </a>
-      <br><br>
-      <strong>投出你宝贵的一票</strong><br>
-      <span style="font-size: 12px; color: #666;">凭投票截图，PRO授权可减免100元</span>
-      <br><br>
-      <a href="https://gitee.com/activity/2025opensource?ident=I4XWR9">
-         <img src="https://img.shields.io/badge/立即投票-点击跳转-FF416C?style=flat-square">
-      </a>
-    </td>
-  </tr>
-</table>
-
----
-
 [![star](https://gitee.com/ThingsGateway/ThingsGateway/badge/star.svg?theme=gvp)](https://gitee.com/ThingsGateway/ThingsGateway/stargazers) 
 [![star](https://img.shields.io/github/stars/ThingsGateway/ThingsGateway?logo=github)](https://github.com/ThingsGateway/ThingsGateway)
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/ThingsGateway/ThingsGateway)﻿
