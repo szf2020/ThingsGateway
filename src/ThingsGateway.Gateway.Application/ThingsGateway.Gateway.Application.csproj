@@ -13,7 +13,6 @@
 		<PackageReference Include="Rougamo.Fody" Version="5.0.2" />
 		<PackageReference Include="TouchSocket.Dmtp" Version="$(TouchSocketVersion)" />
 		<PackageReference Include="TouchSocket.WebApi" Version="$(TouchSocketVersion)" />
-
 	</ItemGroup>
 
 	<!--<ItemGroup>
