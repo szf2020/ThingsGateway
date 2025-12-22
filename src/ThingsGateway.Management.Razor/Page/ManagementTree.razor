@@ -1,0 +1,77 @@
+﻿@namespace ThingsGateway.Management.Razor
+@using ThingsGateway.Admin.Application
+@using ThingsGateway.Admin.Razor
+@using ThingsGateway.Gateway.Application
+
+<div class="listtree-view">
+
+    <div class="d-flex align-items-center">
+        <SpinnerComponent @ref=Spinner></SpinnerComponent>
+    </div>
+
+    <ContextMenuZone>
+        <TreeView TItem="ManagementTreeItem" Items="TreeItems" ShowIcon="false" ShowSearch IsAccordion=false IsVirtualize="true" OnTreeItemClick="OnTreeItemClick" OnSearchAsync="OnClickSearch" ModelEqualityComparer=ModelEqualityComparer ShowToolbar="true">
+
+            <ToolbarTemplate>
+
+                <div class="tree-node-toolbar-edit" @onclick:preventDefault @onclick:stopPropagation>
+
+                    @if (context != RootItem && (context.ParentName == null))
+                    {
+
+                        <Button Size=Size.ExtraSmall Icon="fa fa-cube" Color=Color.None OnClickWithoutRender=@(() => ShowLog(context))>
+                        </Button>
+
+                        @* <Tooltip Title=@(GatewayLocalizer["DeleteChannel"]) Placement="Placement.Bottom"> *@
+                        <Button Size=Size.ExtraSmall Icon="fas fa-check" Color=Color.None OnClickWithoutRender=@(() => StartAsync(context))>
+                        </Button>
+                        @* </Tooltip> *@
+                        @* <Tooltip Title=@(GatewayLocalizer["DeleteChannel"]) Placement="Placement.Bottom"> *@
+                        <Button Size=Size.ExtraSmall Icon="fa-solid fa-xmark" Color=Color.None OnClickWithoutRender=@(() => StopAsync(context))>
+                        </Button>
+                        @* </Tooltip> *@
+
+                    }
+                </div>
+            </ToolbarTemplate>
+
+
+        </TreeView>
+
+        <ContextMenu style="max-height:800px" class="tgTree" OnBeforeShowCallback="OnBeforeShowCallback">
+            @if (SelectModel != null && (SelectModel.ParentName == null))
+            {
+                <ContextMenuItem Icon="fa-solid fa-plus" Disabled="!AuthorizeButton(AdminOperConst.Add)" Text="@Localizer["AddManagementConfig"]" OnClick=@((a, b) => EditManagementConfig(a, b, ItemChangedType.Add))></ContextMenuItem>
+
+
+                <ContextMenuItem Icon="fa-regular fa-pen-to-square" Disabled="(!AuthorizeButton(AdminOperConst.Add))" Text="@Localizer["ExcelManagementConfig"]" OnClick=@((a, b) => ExcelManagementConfig(a, b))></ContextMenuItem>
+
+
+                <ContextMenuItem Icon="fa-regular fa-pen-to-square" Disabled="!AuthorizeButton(AdminOperConst.Edit)" Text="@Localizer["UpdateManagementConfig"]" OnClick=@((a, b) => EditManagementConfig(a, b, ItemChangedType.Update))></ContextMenuItem>
+
+
+                <ContextMenuItem Icon="fa-solid fa-xmark" Text="@Localizer["DeleteManagementConfig"]" Disabled="!AuthorizeButton(AdminOperConst.Delete)" OnClick="DeleteManagementConfig"></ContextMenuItem>
+
+                <ContextMenuItem Icon="fas fa-file-export" Text="@Localizer["ExportManagementConfig"]"
+                                 Disabled=@(!AuthorizeButton("导出"))
+                                 OnClick="ExportManagementConfig"></ContextMenuItem>
+
+                <ContextMenuItem Icon="fas fa-file-import" Disabled=@(!AuthorizeButton("导入")) Text="@Localizer["ImportManagementConfig"]" OnClick="ImportManagementConfig"></ContextMenuItem>
+
+                <ContextMenuDivider></ContextMenuDivider>
+
+
+            }
+
+        </ContextMenu>
+
+    </ContextMenuZone>
+
+
+</div>
+@code {
+    RenderFragment<ManagementTreeItem> RenderTreeItem = (item) =>
+
+    @<span class=@(GetClass(item))>@item.ToString()</span> ;
+
+}

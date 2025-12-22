@@ -1,0 +1,61 @@
+﻿{
+  "RECORDS": [
+    {
+      "Id": "6",
+      "ParentId": "0",
+      "Module": "0",
+      "Title": "远程网关",
+      "Icon": "fa-solid fa-house-user",
+      "Code": "System",
+      "Category": "0",
+      "Target": "0",
+      "CreateTime": "2025-01-14 20:16:18.361",
+      "CreateUserId": "0",
+      "IsDelete": "0",
+      "SortCode": "-100"
+    },
+    {
+      "Id": 6100001,
+      "ParentId": 0,
+      "Module": 6,
+      "Title": "远程网关",
+      "Icon": "fas fa-bug",
+      "Code": "System",
+      "Category": 1,
+      "Target": 0,
+      "NavLinkMatch": 1,
+      "Href": "/management/monitor",
+      "CreateTime": "5/11/2024 04:08:09.92",
+      "CreateUser": null,
+      "CreateUserId": 0,
+      "IsDelete": "0",
+      "UpdateTime": "5/11/2024 04:28:42.827",
+      "UpdateUser": null,
+      "UpdateUserId": null,
+      "SortCode": 0,
+      "ExtJson": null
+    },
+    {
+      "Id": 6100002,
+      "ParentId": 0,
+      "Module": 6,
+      "Title": "更新管理",
+      "Icon": "fas fa-history",
+      "Code": "System",
+      "Category": 1,
+      "Target": 0,
+      "NavLinkMatch": 1,
+      "Href": "/management/update",
+      "CreateTime": "5/11/2024 04:08:09.92",
+      "CreateUser": null,
+      "CreateUserId": 0,
+      "IsDelete": "0",
+      "UpdateTime": "5/11/2024 04:28:42.827",
+      "UpdateUser": null,
+      "UpdateUserId": null,
+      "SortCode": 0,
+      "ExtJson": null
+    }
+
+  ]
+}

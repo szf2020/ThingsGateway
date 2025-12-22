@@ -1,0 +1,8 @@
+﻿{
+  "ChannelThread": {
+    "CheckInterval": 1800000, //检查间隔
+    "MaxChannelCount": 50000, //最大通道数量
+    "MaxDeviceCount": 50000, //最大设备数量
+    "MaxVariableCount": 10000000 //最大变量数量
+  }
+}

@@ -339,7 +339,7 @@ internal sealed class DeviceService : BaseService<Device>, IDeviceService
         var pluginSheetNames = models.Select(a => a.ChannelId).Select(a =>
         {
             channelDicts.TryGetValue(a, out var channel);
-            var pluginKey = channel?.PluginName;
+            var pluginKey = channel?.PluginName ?? plugin;
             return pluginKey;
         }).ToHashSet();
 

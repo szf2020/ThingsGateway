@@ -1,0 +1,123 @@
+﻿#pragma warning disable CA2007 // 考虑对等待的任务调用 ConfigureAwait
+using Microsoft.AspNetCore.Components.Web;
+
+using System.Text;
+
+using ThingsGateway.Blazor.Diagrams;
+using ThingsGateway.Blazor.Diagrams.Core.Geometry;
+using ThingsGateway.Blazor.Diagrams.Core.Models;
+using ThingsGateway.Blazor.Diagrams.Options;
+using ThingsGateway.Foundation.Common.Json.Extension;
+
+namespace ThingsGateway.Gateway.Razor;
+
+public partial class DragAndDrop
+{
+    private readonly BlazorDiagram _blazorDiagram = new(new BlazorDiagramOptions
+    {
+        GridSize = null,
+        GridSnapToCenter = false,
+    });
+    private string? _draggedType;
+    [Inject]
+    IStringLocalizer<ThingsGateway.Gateway.Razor._Imports> Localizer { get; set; }
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        _blazorDiagram.Options.Links.EnableSnapping = true;
+        _blazorDiagram.Options.Zoom.Enabled = false;
+
+        foreach (var item in RuleHelpers.CategoryNodeDict)
+        {
+            var type = Type.GetType(item.Value.WidgetType);
+            if (type != null)
+            {
+                _blazorDiagram.RegisterComponent(item.Key, type);
+            }
+        }
+    }
+
+    private Task OnDragStart(string key)
+    {
+        _draggedType = key;
+        return Task.CompletedTask;
+    }
+
+    private void OnDrop(DragEventArgs e)
+    {
+        if (string.IsNullOrEmpty(_draggedType))
+            return;
+
+        Point? position = _blazorDiagram.GetRelativeMousePoint(e.ClientX, e.ClientY);
+        NodeModel node = RuleHelpers.GetNodeModel(_draggedType, Guid.NewGuid().ToString(), position);
+        _blazorDiagram.Nodes.Add(node);
+        _draggedType = null;
+    }
+    internal async Task OnSave()
+    {
+        try
+        {
+            Value = RuleHelpers.Save(_blazorDiagram);
+            if (ValueChanged.HasDelegate)
+            {
+                await ValueChanged.InvokeAsync(Value);
+            }
+        }
+        catch (Exception ex)
+        {
+            await ToastService.Warn(ex);
+        }
+    }
+
+    [Inject]
+    ToastService ToastService { get; set; }
+    [Parameter]
+    public EventCallback OnCancel { get; set; }
+    [Parameter]
+    public EventCallback<RulesJson?> ValueChanged { get; set; }
+    [Parameter]
+    public RulesJson Value { get; set; }
+    internal async Task Load(UploadFile upload)
+    {
+        try
+        {
+            var data = await upload.GetBytesAsync(1024 * 1024);
+            var str = Encoding.UTF8.GetString(data);
+            Load(str.FromJsonNetString<RulesJson>());
+            Load(Value);
+        }
+        catch (Exception ex)
+        {
+            await ToastService.Warn(ex);
+        }
+    }
+
+    protected override void OnParametersSet()
+    {
+        Load(Value);
+    }
+    private void Load(RulesJson value)
+    {
+
+        Value = value;
+        RuleHelpers.Load(_blazorDiagram, Value);
+
+    }
+
+    [Inject]
+    DownloadService DownloadService { get; set; }
+
+    internal async Task Download()
+    {
+        try
+        {
+            var data = RuleHelpers.Save(_blazorDiagram);
+            await DownloadService.DownloadFromStreamAsync("RulesJson.json", new MemoryStream(Encoding.UTF8.GetBytes(data.ToSystemTextJsonString())));
+        }
+        catch (Exception ex)
+        {
+            await ToastService.Warn(ex);
+        }
+    }
+}

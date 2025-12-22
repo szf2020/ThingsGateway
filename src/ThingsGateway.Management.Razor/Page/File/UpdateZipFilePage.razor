@@ -1,0 +1,42 @@
+﻿@page "/management/update"
+@attribute [Authorize]
+@attribute [RolePermission]
+@inherits ComponentDefault
+
+@namespace ThingsGateway.Management.Razor
+@using BootstrapBlazor.Components
+@using ThingsGateway.Admin.Application
+@using ThingsGateway.Admin.Razor
+@using ThingsGateway.Razor
+
+
+<div class="h-100">
+    <AdminTable @ref=table TItem="UpdateZipFile"
+                AutoGenerateColumns="true"
+                ShowDefaultButtons=true
+                EditDialogSize="Size.Large"
+                AllowResizing="true"
+                IsFixedHeader=true
+                ShowAddButton="false"
+                ShowSearch="false"
+                IsMultipleSelect=true
+                IsPagination=true
+                ShowExtendEditButton=false
+                ShowExtendButtons=true
+                ShowEditButton="false"
+                ShowAdvancedSearch=false
+                OnQueryAsync="OnQueryAsync"
+                OnDeleteAsync="OnDeleteAsync">
+
+        <TableToolbarBeforeTemplate>
+            <TableToolbarButton TItem="UpdateZipFile" Color="Color.Info" Icon="fa fa-plus" Text="@RazorLocalizer["Add"]"
+                                OnClickCallback="OnAdd"  />
+
+        </TableToolbarBeforeTemplate>
+
+    </AdminTable>
+</div>
+
+@code{
+    AdminTable<UpdateZipFile> table;
+}

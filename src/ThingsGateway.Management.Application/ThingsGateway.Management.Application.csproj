@@ -1,0 +1,62 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFrameworks>net8.0;$(OtherTargetFrameworks);</TargetFrameworks>
+		<DefineConstants>Management</DefineConstants>
+
+	</PropertyGroup>
+
+	<ItemGroup>
+		<EmbeddedResource Include="Locales\*.json">
+			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</EmbeddedResource>
+	</ItemGroup>
+
+
+	<ItemGroup>
+
+
+		<Content Remove="SeedData\Management\*.json" />
+		<EmbeddedResource Include="SeedData\Management\*.json">
+			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</EmbeddedResource>
+
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Riok.Mapperly" Version="4.3.0" ExcludeAssets="runtime" PrivateAssets="all">
+		  <IncludeAssets>compile; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+	</ItemGroup>
+
+
+	<ItemGroup>
+		<ProjectReference Include="..\ThingsGateway.Gateway.Application\ThingsGateway.Gateway.Application.csproj" />
+	</ItemGroup>
+
+
+
+
+	<ItemGroup>
+		<GatewayFiles Include="..\ThingsGateway.Gateway.Application\Locales\**\*.*" />
+	</ItemGroup>
+
+
+
+
+	<ItemGroup>
+	  <Compile Include="..\ThingsGateway.Gateway.Application\Model\ChannelRuntime.cs" Link="Model\ChannelRuntime.cs" />
+	  <Compile Include="..\ThingsGateway.Gateway.Application\Model\DeviceRunTime.cs" Link="Model\DeviceRunTime.cs" />
+	  <Compile Include="..\ThingsGateway.Gateway.Application\Model\VariableRunTime.cs" Link="Model\VariableRunTime.cs" />
+	  <Compile Include="..\ThingsGateway.Gateway.Application\Services\Channel\IChannelPageService.cs" Link="Services\IChannelPageService.cs" />
+	  <Compile Include="..\ThingsGateway.Gateway.Application\Services\Device\IDevicePageService.cs" Link="Services\IDevicePageService.cs" />
+	  <Compile Include="..\ThingsGateway.Gateway.Application\Services\Management\Management\IManagementRpcServer.cs" Link="Services\IManagementRpcServer.cs" />
+	  <Compile Include="..\ThingsGateway.Gateway.Application\Services\Management\Management\Update\Services\IUpgradeRpcServer.cs" Link="Services\IUpgradeRpcServer.cs" />
+	  <Compile Include="..\ThingsGateway.Gateway.Application\Services\Variable\IVariablePageService.cs" Link="Services\IVariablePageService.cs" />
+	</ItemGroup>
+
+	<Target Name="CopyGatewayFiles" BeforeTargets="BeforeBuild">
+		<Copy SourceFiles="@(GatewayFiles)" DestinationFiles="@(GatewayFiles->'Locales\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
+	</Target>
+
+</Project>

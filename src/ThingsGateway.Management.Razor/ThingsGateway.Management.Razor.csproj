@@ -1,0 +1,75 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+	<PropertyGroup>
+		<TargetFrameworks>net8.0;$(OtherTargetFrameworks);</TargetFrameworks>
+		<!--<UseRazorSourceGenerator>false</UseRazorSourceGenerator>-->
+		<DefineConstants>Management</DefineConstants>
+		
+	</PropertyGroup>
+
+
+	<ItemGroup>
+		<ProjectReference Include="..\ThingsGateway.Gateway.Razor.Common\ThingsGateway.Gateway.Razor.Common.csproj" />
+		<ProjectReference Include="..\ThingsGateway.Foundation.Razor\ThingsGateway.Foundation.Razor.csproj" />
+	</ItemGroup>
+
+
+
+	<ItemGroup>
+		<Content Remove="Locales\*.json" />
+		<EmbeddedResource Include="Locales\*.json">
+			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</EmbeddedResource>
+	</ItemGroup>
+
+
+
+	<ItemGroup Condition=" '$(SolutionName)' != 'ThingsGatewayAll' OR '$(Configuration)' == 'Release' ">
+		<PackageReference Include="ThingsGateway.Blazor.Diagrams" Version="$(AdminVersion)" />
+		<PackageReference Include="ThingsGateway.Admin.Razor" Version="$(AdminVersion)" />
+		<PackageReference Include="BlazorSetParametersAsyncGenerator" Version="$(AdminVersion)" PrivateAssets="all" OutputItemType="Analyzer" />
+	</ItemGroup>
+
+	<ItemGroup Condition=" '$(SolutionName)' == 'ThingsGatewayAll' AND '$(Configuration)' != 'Release' ">
+		<ProjectReference Include="..\..\..\ThingsGateway.Admin\src\ThingsGateway.Admin.Razor\ThingsGateway.Admin.Razor.csproj" />
+		<ProjectReference Include="..\..\..\ThingsGateway.Admin\src\ThingsGateway.Blazor.Diagrams\ThingsGateway.Blazor.Diagrams.csproj" />
+		<ProjectReference Include="..\..\..\ThingsGateway.Admin\src\BlazorSetParametersAsyncGenerator\BlazorSetParametersAsyncGenerator.csproj" PrivateAssets="all" OutputItemType="Analyzer" />
+	</ItemGroup>
+	
+
+	<ItemGroup>
+		<PackageReference Include="Riok.Mapperly" Version="4.3.0" ExcludeAssets="runtime" PrivateAssets="all">
+			<IncludeAssets>compile; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+	</ItemGroup>
+
+
+	<ItemGroup>
+	  <ProjectReference Include="..\ThingsGateway.Management.Application\ThingsGateway.Management.Application.csproj" />
+	</ItemGroup>
+
+
+	<ItemGroup>
+		<GatewayFiles Include="..\ThingsGateway.Gateway.Razor\Locales\**\*.*" />
+		<PagesFiles Include="..\ThingsGateway.Gateway.Razor\Pages\**\*.*" />
+		<!--<ImageFiles Include="..\ThingsGateway.Gateway.Razor\wwwroot\img\**\*.*" />-->
+	</ItemGroup>
+
+
+	<Target Name="CopyGatewayFiles" BeforeTargets="BeforeBuild">
+		<!--<Copy SourceFiles="@(ImageFiles)" DestinationFiles="@(ImageFiles->'wwwroot\img\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />-->
+		<Copy SourceFiles="@(GatewayFiles)" DestinationFiles="@(GatewayFiles->'Locales\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
+		<Copy SourceFiles="@(PagesFiles)" DestinationFiles="@(PagesFiles->'Pages\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
+
+		<Copy SourceFiles="..\ThingsGateway.Gateway.Razor\Components\QuickActions.razor" DestinationFiles="Components\QuickActions.razor" SkipUnchangedFiles="true" />
+		<Copy SourceFiles="..\ThingsGateway.Gateway.Razor\Components\QuickActions.razor.js" DestinationFiles="Components\QuickActions.razor.js" SkipUnchangedFiles="true" />
+		<Copy SourceFiles="..\ThingsGateway.Gateway.Razor\Components\QuickActions.razor.cs" DestinationFiles="Components\QuickActions.razor.cs" SkipUnchangedFiles="true" />
+		<Copy SourceFiles="..\ThingsGateway.Gateway.Razor\Components\QuickActions.razor.css" DestinationFiles="Components\QuickActions.razor.css" SkipUnchangedFiles="true" />
+
+	</Target>
+
+
+
+</Project>
+
+

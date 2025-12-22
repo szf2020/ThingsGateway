@@ -1,0 +1,66 @@
+﻿@inherits ComponentDefault
+@using ThingsGateway.Admin.Razor
+@using ThingsGateway.Gateway.Application
+@using ThingsGateway.Gateway.Razor
+@namespace ThingsGateway.Management.Razor
+
+<div class="appconfig">
+    <Tab class="h-100" IsOnlyRenderActiveTab>
+
+
+
+        <TabItem Text=@Localizer[nameof(ChannelTable)]>
+            <ChannelTable AutoRestartThread=AutoRestartThread />
+        </TabItem>
+
+        <TabItem Text=@Localizer[nameof(DeviceTable)]>
+            <DeviceTable AutoRestartThread=AutoRestartThread />
+        </TabItem>
+
+        <TabItem Text=@Localizer[nameof(VariableRuntimeInfo)]>
+            <VariableRuntimeInfo AutoRestartThread=AutoRestartThread />
+        </TabItem>
+
+
+        <TabItem Text=@Localizer[nameof(RulesPage)]>
+            <RulesPage />
+        </TabItem>
+
+
+
+        <TabItem Text=@Localizer[nameof(SystemConfigPage)]>
+            <SystemConfigPage />
+        </TabItem>
+
+        <TabItem Text=@Localizer[nameof(PluginPage)]>
+            <PluginPage />
+        </TabItem>
+        
+        <TabItem Text=@Localizer[nameof(PluginDebugPage)]>
+            <PluginDebugPage />
+        </TabItem>
+
+        <TabItem Text=@Localizer[nameof(RealAlarmPage)]>
+            <RealAlarmPage />
+        </TabItem>
+
+
+        <TabItem Text=@Localizer[nameof(BackendLogPage)]>
+            <BackendLogPage />
+        </TabItem>
+        <TabItem Text=@Localizer[nameof(RpcLogPage)]>
+            <RpcLogPage />
+        </TabItem>
+        <TabItem Text=@Localizer[nameof(HardwareInfoPage)]>
+            <HardwareInfoPage />
+        </TabItem>
+
+        <TabItem Text=@Localizer[nameof(GatewayUpdateZipFilePage)]>
+            <GatewayUpdateZipFilePage />
+        </TabItem>
+        
+    </Tab>
+
+</div>
+
+

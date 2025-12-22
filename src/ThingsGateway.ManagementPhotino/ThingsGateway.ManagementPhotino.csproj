@@ -1,0 +1,114 @@
+<Project Sdk="Microsoft.NET.Sdk.Razor">
+	<ItemGroup Condition=" '$(TargetFramework)' == 'net8.0' ">
+		<PackageReference Include="Microsoft.AspNetCore.Components.WebView" Version="$(NET8Version)" />
+	</ItemGroup>
+	<ItemGroup Condition=" '$(TargetFramework)' == 'net10.0' ">
+		<PackageReference Include="Microsoft.AspNetCore.Components.WebView" Version="$(NET10Version)" />
+	</ItemGroup>
+	<ItemGroup Condition=" '$(SolutionName)' != 'ThingsGatewayAll' OR '$(Configuration)' == 'Release' ">
+		<PackageReference Include="ThingsGateway.Photino.Blazor" Version="$(AdminVersion)" />
+	</ItemGroup>
+	<ItemGroup Condition=" '$(SolutionName)' == 'ThingsGatewayAll' AND '$(Configuration)' != 'Release' ">
+		<ProjectReference Include="..\..\..\ThingsGateway.Admin\src\ThingsGateway.Photino.Blazor\ThingsGateway.Photino.Blazor.csproj" />
+	</ItemGroup>
+	
+	<ItemGroup>
+		<ProjectReference Include="..\ThingsGateway.Management.Razor\ThingsGateway.Management.Razor.csproj" />
+	</ItemGroup>
+
+	<!--nuget包解压复制文件，上下文动态加载-->
+	<Import Project="..\ThingsGateway.ManagementServer\targets\PluginContext.targets" Condition=" '$(SolutionName)' != 'ThingsGatewayAll' OR '$(Configuration)' == 'Release' " />
+
+	<!--nuget包解压复制文件，上下文动态加载，Pro插件-->
+	<Import Project="..\ThingsGateway.ManagementServer\targets\Pro2.targets" Condition=" '$(SolutionName)' != 'ThingsGatewayAll' OR '$(Configuration)' == 'Release' " />
+
+
+	<!--nuget包解压复制文件，上下文动态加载-->
+	<Import Project="..\ThingsGateway.ManagementServer\targets\PluginDebug.targets" Condition=" '$(SolutionName)' == 'ThingsGatewayAll' AND '$(Configuration)' != 'Release' " />
+
+	<!--nuget包解压复制文件，上下文动态加载，Pro插件-->
+	<Import Project="..\ThingsGateway.ManagementServer\targets\ProPluginDebug.targets" Condition=" '$(SolutionName)' == 'ThingsGatewayAll' AND '$(Configuration)' != 'Release' " />
+
+	<!--打包复制-->
+	<Import Project="..\ThingsGateway.ManagementServer\targets\PluginPublish.targets" />
+
+	<PropertyGroup>
+		<TargetFrameworks>net8.0;$(OtherTargetFrameworks);</TargetFrameworks>
+		<CustomTargetFramework>$(TargetFramework)</CustomTargetFramework>
+		<OutputType>WinExe</OutputType>
+		<OpenApiGenerateDocuments>false</OpenApiGenerateDocuments>
+		<SatelliteResourceLanguages>zh-Hans;en-US</SatelliteResourceLanguages>
+		<PublishReadyToRunComposite>true</PublishReadyToRunComposite>
+		<ApplicationIcon>favicon.ico</ApplicationIcon>
+		<!--<PublishAot>true</PublishAot>-->
+		<CETCompat>false</CETCompat>
+		<ServerGarbageCollection>true</ServerGarbageCollection>
+		<!--动态适用GC-->
+		<GarbageCollectionAdaptationMode>1</GarbageCollectionAdaptationMode>
+
+		<!--<PlatformTarget>x86</PlatformTarget>-->
+	</PropertyGroup>
+
+
+
+
+	<ItemGroup>
+		<Content Include="..\ThingsGateway.ManagementServer\Layout\MainLayout.razor" Link="Layout\MainLayout.razor" />
+		<Compile Include="..\ThingsGateway.ManagementServer\Layout\MainLayout.razor.cs" Link="Layout\MainLayout.razor.cs" />
+		<Content Include="..\ThingsGateway.ManagementServer\Layout\MainLayout.razor.css" Link="Layout\MainLayout.razor.css" />
+		<Content Include="..\ThingsGateway.ManagementServer\Layout\AccessDenied.razor" Link="Layout\AccessDenied.razor" />
+		<Compile Include="..\ThingsGateway.ManagementServer\Layout\AccessDenied.razor.cs" Link="Layout\AccessDenied.razor.cs" />
+		<Content Include="..\ThingsGateway.ManagementServer\Layout\Login.razor" Link="Layout\Login.razor" />
+		<Compile Include="..\ThingsGateway.ManagementServer\Layout\Login.razor.cs" Link="Layout\Login.razor.cs" />
+		<Content Include="..\ThingsGateway.ManagementServer\Layout\Login.razor.css" Link="Layout\Login.razor.css" />
+		<Content Include="..\ThingsGateway.ManagementServer\Layout\NotFound404.razor" Link="Layout\NotFound404.razor" />
+		<Compile Include="..\ThingsGateway.ManagementServer\Layout\NotFound404.razor.cs" Link="Layout\NotFound404.razor.cs" />
+
+		<Content Include="..\ThingsGateway.ManagementServer\ThingsGateway.pfx" Link="ThingsGateway.pfx">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+
+
+		<Content Include="..\ThingsGateway.ManagementServer\wwwroot\favicon.ico" Link="wwwroot\favicon.ico" />
+		<Content Include="..\ThingsGateway.ManagementServer\wwwroot\favicon.png" Link="wwwroot\favicon.png" />
+		<Content Include="..\ThingsGateway.ManagementServer\appsettings.Development.json" Link="appsettings.Development.json">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+		<Content Include="..\ThingsGateway.ManagementServer\appsettings.json" Link="appsettings.json">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+
+		<Content Include="..\ThingsGateway.ManagementServer\Configuration\*" LinkBase="Configuration">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+
+		<EmbeddedResource Include="..\ThingsGateway.ManagementServer\Locales\en-US.json" Link="Locales\en-US.json" />
+		<EmbeddedResource Include="..\ThingsGateway.ManagementServer\Locales\zh-CN.json" Link="Locales\zh-CN.json" />
+
+
+		<Content Update="wwwroot\**">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
+
+	<ItemGroup>
+		<Content Remove="Locales\*.json" />
+		<EmbeddedResource Include="Locales\*.json">
+			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</EmbeddedResource>
+	</ItemGroup>
+
+
+	<ItemGroup>
+		<Content Remove="launchSettings.json" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Content Include="favicon.ico">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
+
+
+
+</Project>

@@ -1,0 +1,27 @@
+﻿
+.listtree-view {
+    height: 100%;
+}
+
+    .listtree-view ::deep .bb-cm-zone {
+        height: calc(100% - 60px);
+        /*margin-bottom: 2px;*/
+    }
+
+    .listtree-view ::deep .tree-view {
+        --bb-tree-search-height: 32px;
+        min-height: 300px;
+        height: 100%;
+    }
+
+        .listtree-view ::deep .tree-view .tree-root {
+            padding-right: 0px;
+        }
+
+.deviceEnable--text {
+    color: var(--bs-body-color);
+}
+
+.tree-node-toolbar-edit {
+    background-color: white;
+}

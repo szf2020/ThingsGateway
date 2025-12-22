@@ -5,6 +5,8 @@
     <Project Path="src/ThingsGateway.Gateway.Application/ThingsGateway.Gateway.Application.csproj" />
     <Project Path="src/ThingsGateway.Gateway.Razor.Common/ThingsGateway.Gateway.Razor.Common.csproj" />
     <Project Path="src/ThingsGateway.Gateway.Razor/ThingsGateway.Gateway.Razor.csproj" />
+    <Project Path="src/ThingsGateway.Management.Application/ThingsGateway.Management.Application.csproj" />
+    <Project Path="src/ThingsGateway.Management.Razor/ThingsGateway.Management.Razor.csproj" />
   </Folder>
   <Folder Name="/Test/">
     <Project Path="test/ThingsGateway.Gateway.Test/ThingsGateway.Gateway.Test.csproj" />
@@ -16,6 +18,8 @@
     <File Path="README.md" />
   </Folder>
   <Project Path="src/ThingsGateway.Debug.Photino/ThingsGateway.Debug.Photino.csproj" />
+  <Project Path="src/ThingsGateway.ManagementPhotino/ThingsGateway.ManagementPhotino.csproj" />
+  <Project Path="src/ThingsGateway.ManagementServer/ThingsGateway.ManagementServer.csproj" />
   <Project Path="src/ThingsGateway.Photino/ThingsGateway.Photino.csproj" />
   <Project Path="src/ThingsGateway.ScriptDebug/ThingsGateway.ScriptDebug.csproj" />
   <Project Path="src/ThingsGateway.Server/ThingsGateway.Server.csproj" />

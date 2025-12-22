@@ -1,0 +1,36 @@
+﻿@page "/management/monitor"
+@attribute [Authorize]
+@attribute [RolePermission]
+@inherits ComponentDefault
+@using ThingsGateway.Admin.Application
+@using ThingsGateway.Admin.Razor
+@using ThingsGateway.Gateway.Application
+@using ThingsGateway.Gateway.Razor
+@namespace ThingsGateway.Management.Razor
+
+<div class="row h-100 g-0">
+
+    <Split Basis="20%" ShowBarHandle=false>
+        <FirstPaneTemplate>
+
+
+            <Card IsShadow=true class="h-100 me-1" Color="Color.Primary">
+                <BodyTemplate>
+                    <ManagementTree DmtpActorObjectChanged="TreeChangedAsync"></ManagementTree>
+                </BodyTemplate>
+            </Card>
+
+
+        </FirstPaneTemplate>
+        <SecondPaneTemplate>
+            @if (DmtpActorObject != null)
+            {
+                <ManagementView AutoRestartThread="AutoRestartThread" />
+            }
+
+        </SecondPaneTemplate>
+    </Split>
+
+</div>
+
+<QuickActions @bind-AutoRestartThread=AutoRestartThread />

@@ -1,0 +1,14 @@
+﻿@namespace ThingsGateway.Gateway.Razor
+@using ThingsGateway.Admin.Application
+@using ThingsGateway.Debug
+@using ThingsGateway.Gateway.Application
+
+<ChannelRuntimeInfo1 ChannelRuntime="ChannelRuntime" />
+
+<LogConsole HeightString="@Height" LogLevel=@(LogLevel)
+            LogLevelChanged="async(logLevel)=>
+                                {
+                LogLevel = logLevel;
+                await ChannelPageService.SetChannelLogLevelAsync(ChannelRuntime?.Id ?? 0, logLevel);
+            }"
+            LogPath=@ChannelRuntime.LogPath></LogConsole>

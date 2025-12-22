@@ -1,0 +1,74 @@
+﻿@{
+#if !Management
+}
+@page "/gateway/system"
+@attribute [Authorize]
+@attribute [RolePermission]
+
+@{
+#endif
+}
+@inherits ComponentDefault
+@using BootstrapBlazor.Components
+@using Microsoft.AspNetCore.Authorization
+@using ThingsGateway.Admin.Razor
+@using ThingsGateway.Authentication
+@using ThingsGateway.Gateway.Application
+@using ThingsGateway.Admin.Application
+@using ThingsGateway.Razor
+@namespace ThingsGateway.Gateway.Razor
+
+
+<div class="appconfig">
+    <Tab class="h-100" @ref=tabComponent IsOnlyRenderActiveTab>
+
+        <TabItem Text=@RedundancyLocalizer[nameof(RedundancyOptions)]>
+
+            <Card class="h-100">
+
+                <HeaderTemplate>
+
+                    <RedundancyOptionsHeader />
+
+                </HeaderTemplate>
+
+                <BodyTemplate>
+
+                    <RedundancyOptionsPage LogLevel="LogLevel" LogLevelChanged=@(SetLogLevel) LogPath="@LogPath" />
+
+                </BodyTemplate>
+
+            </Card>
+
+        </TabItem>
+
+        <TabItem Text=@GatewayLocalizer["Restart"]>
+
+            <Card class="h-100">
+
+                <BodyTemplate>
+
+                    <Button OnClick="OnRestart" Text=@GatewayLocalizer["Restart"]></Button>
+
+                </BodyTemplate>
+
+            </Card>
+
+        </TabItem>
+
+        @if (WebsiteOption.Value.ShowAuthorize)
+        {
+            <TabItem Text=@GatewayLocalizer["Authentication"]>
+
+                <Authentication />
+
+            </TabItem>
+        }
+
+    </Tab>
+
+</div>
+
+@code {
+    Tab tabComponent;
+}

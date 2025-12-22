@@ -601,7 +601,7 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
             }
             return new KeyValuePair<string, VariablePropertyBase>(string.Empty, null);
         }).Where(a => a.Value != null).DistinctBy(a => a.Key).ToDictionary();
-        Dictionary<string, object>? sheets = VariableServiceHelpers.ExportSheets(variables, deviceDicts, channelDicts, pluginSheetNames); // IEnumerable 延迟执行
+        Dictionary<string, object>? sheets = VariableServiceHelpers.ExportSheets(variables, deviceDicts, channelDicts, pluginSheetNames, deviceName); // IEnumerable 延迟执行
 
         return sheets;
     }
@@ -631,7 +631,7 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
                 return new KeyValuePair<string, VariablePropertyBase>(string.Empty, null);
             }).Where(a => a.Value != null).DistinctBy(a => a.Key).ToDictionary();
 
-            var sheets = VariableServiceHelpers.ExportSheets(variables, deviceDicts, channelDicts, pluginSheetNames); // IEnumerable 延迟执行
+            var sheets = VariableServiceHelpers.ExportSheets(variables, deviceDicts, channelDicts, pluginSheetNames, null); // IEnumerable 延迟执行
 
             return sheets;
         }

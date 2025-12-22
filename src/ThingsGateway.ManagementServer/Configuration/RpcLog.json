@@ -1,0 +1,5 @@
+{
+  "RpcLog": {
+    "SuccessLog": true  //是否记录成功日志
+  }
+}

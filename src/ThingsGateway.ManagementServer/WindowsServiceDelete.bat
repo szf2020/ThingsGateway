@@ -1,0 +1,3 @@
+net stop ThingsGatewayManagementServer
+sc delete ThingsGatewayManagementServer
+pause

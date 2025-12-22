@@ -1,0 +1,33 @@
+﻿@inherits ThingsGatewayModuleComponentBase
+@attribute [JSModuleAutoLoader("Components/QuickActions.razor.js", AutoInvokeDispose = false, AutoInvokeInit = true)]
+@namespace ThingsGateway.Gateway.Razor
+
+<div id="@Id">
+    <PulseButton class="btn-quickactions" Color="Color.None" ImageUrl=@($"{WebsiteConst.DefaultResourceUrl}images/quickactions.svg")
+                 TooltipText="@TooltipText" TooltipPlacement="Placement.Left" OnClick=@(ToggleOpen) />
+    <div class="quickactions-list">
+        <div class="quickactions-header">
+            <div class="flex-fill">@HeaderText</div>
+            <button class="btn-close btn-close-white" type="button" aria-label="Close" onclick=@(async () => await ToggleOpen())></button>
+        </div>
+        <div class="mx-2 row g-0">
+
+            <div class="col-12 my-1">
+                <RadioList ShowLabel="true" TValue="bool" IsButton ValueExpression=@(() => AutoRestartThread) Value="AutoRestartThread" ValueChanged="OnAutoRestartThreadChanged" Items="AutoRestartThreadBoolItems" />
+            </div>
+        </div>
+
+        <PopConfirmButton Placement="Placement.Top"
+                          class="m-2"
+                          Color="Color.Danger"
+                          ConfirmIcon="fa-solid fa-triangle-exclamation text-danger"
+                          ConfirmButtonColor="Color.Danger"
+                          Text=@(ReloadServiceText)
+                          Content=@(ReloadServiceConfirmText)
+                          Icon="fas fa-rotate"
+                          IsAsync="true"
+                          OnConfirm="Restart" IsKeepDisabled=@(!AuthorizeButton("重启")) />
+
+
+    </div>
+</div>

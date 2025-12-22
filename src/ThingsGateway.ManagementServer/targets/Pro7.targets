@@ -1,0 +1,26 @@
+<Project>
+
+	<ItemGroup>
+		<!--MqttYINGKE 插件-->
+		<PackageReference Include="ThingsGateway.Plugin.OpcAe" Version="$(ProPluginVersion)" GeneratePathProperty="true" Private="false"  IncludeAssets="native;" />
+	</ItemGroup>
+
+	<Target Name="CopyOtherPlugin7NugetPackages" AfterTargets="Build">
+
+		<ItemGroup>
+			<!-- setting up the variable for convenience -->
+			<PkgThingsGateway_Plugin_OpcAePackageFiles Include="$(PkgThingsGateway_Plugin_OpcAe)\Content\$(PluginTargetFramework)\**\*.*" />
+
+		</ItemGroup>
+		<PropertyGroup>
+			<PluginFolder>$(TargetDir)Plugins\</PluginFolder>
+		</PropertyGroup>
+		<Message Text="将OpcAe插件复制到插件目录 $(PluginFolder)" Importance="high" />
+
+		<Copy SourceFiles="@(PkgThingsGateway_Plugin_OpcAePackageFiles)" DestinationFolder="$(PluginFolder)%(RecursiveDir)" />
+
+
+	</Target>
+
+
+</Project>

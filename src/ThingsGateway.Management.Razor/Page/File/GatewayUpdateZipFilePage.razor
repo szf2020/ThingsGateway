@@ -1,0 +1,39 @@
+﻿@inherits ComponentDefault
+
+@namespace ThingsGateway.Management.Razor
+@using BootstrapBlazor.Components
+@using ThingsGateway.Admin.Application
+@using ThingsGateway.Admin.Razor
+@using ThingsGateway.Razor
+
+
+<div class="h-100">
+    <AdminTable @ref=table TItem="UpdateZipFile"
+                AutoGenerateColumns="true"
+                ShowDefaultButtons=false
+                EditDialogSize="Size.Large"
+                AllowResizing="true"
+                IsFixedHeader=true
+                ShowAddButton="false"
+                ShowRefresh="true"
+                ShowEmpty="true"
+                ShowSearch="false"
+                IsMultipleSelect=false
+                ShowExtendEditButton=false
+                ShowExtendDeleteButton=false
+                ShowExtendButtons=true
+                ShowDeleteButton="false"
+                ShowEditButton="false"
+                ShowAdvancedSearch=false
+                Items="UpdateZipFiles">
+
+        <RowButtonTemplate>
+            <TableCellPopConfirmButton Size="Size.ExtraSmall" Color="Color.Success" Icon="fa-solid fa-people-roof" Text="@Localizer["Upgrade"]" OnConfirm="() => Upgrade(context)" />
+        </RowButtonTemplate>
+
+    </AdminTable>
+</div>
+
+@code{
+    AdminTable<UpdateZipFile> table;
+}

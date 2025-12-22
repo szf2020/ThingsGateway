@@ -1,0 +1,66 @@
+﻿
+@{
+#if !Management
+}
+@page "/gateway/realalarm"
+@attribute [Authorize]
+@attribute [RolePermission]
+
+@{
+#endif
+}
+
+@namespace ThingsGateway.Gateway.Razor
+@using ThingsGateway.Admin.Application
+@using ThingsGateway.Admin.Razor
+@using ThingsGateway.Gateway.Application
+@inherits ComponentDefault
+
+
+<div class="h-100">
+
+    <AdminTable @ref=table TItem="AlarmVariable"
+                AutoGenerateColumns="false"
+                ShowAdvancedSearch=false
+                EditDialogSize="Size.Large"
+                AllowResizing="true"
+                IsFixedHeader=true
+                IsMultipleSelect=false
+                ShowExtendButtons=false
+                ShowExportButton=false
+                ShowExtendDeleteButton=false
+                ShowExtendEditButton=false
+                ShowSearch="false"
+                ShowDefaultButtons=false
+                ExtendButtonColumnWidth=150
+                AutoRefreshInterval="2000"
+                IsAutoRefresh
+                OnQueryAsync="OnQueryAsync"
+                IsPagination=true>
+
+        <TableColumns>
+            <TableColumn @bind-Field="@context.Id" Filterable=true Sortable=true Visible=false />
+            <TableColumn Field="@context.DeviceName" FieldExpression=@(() => context.DeviceName) Filterable="true" Sortable="true" Visible="true" />
+            <TableColumn @bind-Field="@context.Name" Filterable=true Sortable=true Visible=true />
+            <TableColumn @bind-Field="@context.Description" Filterable=true Sortable=true Visible=true />
+            <TableColumn @bind-Field="@context.DataType" Filterable=true Sortable=true Visible=true />
+            <TableColumn @bind-Field="@context.AlarmTime" Filterable=true Sortable=true Visible=true />
+            <TableColumn @bind-Field="@context.AlarmCode" Filterable=true Sortable=true Visible=true />
+            <TableColumn @bind-Field="@context.AlarmLimit" Filterable=true Sortable=true Visible=true />
+            <TableColumn @bind-Field="@context.AlarmLevel" Filterable=true Sortable=true Visible=true />
+            <TableColumn @bind-Field="@context.AlarmText" Filterable=true Sortable=true Visible=true />
+            <TableColumn @bind-Field="@context.AlarmType" Filterable=true Sortable=true Visible=true />
+            <TableColumn @bind-Field="@context.RecoveryCode" Filterable=true Sortable=true Visible=true />
+            <TableColumn @bind-Field="@context.FinishTime" Filterable=true Sortable=true Visible=true />
+            <TableColumn @bind-Field="@context.ConfirmTime" Filterable=true Sortable=true Visible=true />
+            <TableColumn @bind-Field="@context.EventTime" Filterable=true Sortable=true Visible=true />
+            <TableColumn @bind-Field="@context.EventType" Filterable=true Sortable=true Visible=true />
+
+        </TableColumns>
+
+    </AdminTable>
+</div>
+
+@code {
+    AdminTable<AlarmVariable> table;
+}
