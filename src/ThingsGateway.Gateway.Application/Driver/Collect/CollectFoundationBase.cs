@@ -90,7 +90,7 @@ public abstract class CollectFoundationBase : CollectReceivedFoundationBase, IFo
 
         static async PooledValueTask<Dictionary<string, OperResult>> WriteValuesAsync(CollectFoundationBase @this, Dictionary<VariableRuntime, JsonNode> writeInfoLists, CancellationToken cancellationToken)
         {
-            using var writeLock = await @this.ReadWriteLock.WriterLockAsync(cancellationToken).ConfigureAwait(false);
+            using var writeLock = await @this.ReadWriteLock.WriterLockAsync().ConfigureAwait(false);
             // 检查协议是否为空，如果为空则抛出异常
             if (@this.FoundationDevice == null)
                 throw new NotSupportedException();

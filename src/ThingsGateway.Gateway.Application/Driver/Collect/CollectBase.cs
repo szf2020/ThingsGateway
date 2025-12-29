@@ -630,7 +630,7 @@ public abstract partial class CollectBase : DriverBase, IRpcDriver
             NonBlockingDictionary<string, OperResult<object>> operResults = new();
 
 
-            using var writeLock = await @this.ReadWriteLock.WriterLockAsync(cancellationToken).ConfigureAwait(false);
+            using var writeLock = await @this.ReadWriteLock.WriterLockAsync().ConfigureAwait(false);
             var list = writeInfoLists
             .Where(a => !results.Any(b => b.Key == a.Key.Name))
             .ToArray();
@@ -801,7 +801,7 @@ public abstract partial class CollectBase : DriverBase, IRpcDriver
         await base.DisposeAsync(disposing).ConfigureAwait(false);
         _linkedCtsCache?.TryDispose();
         if (ReadWriteLock != null)
-            await ReadWriteLock.SafeDisposeAsync().ConfigureAwait(false);
+            ReadWriteLock.Dispose();
     }
 
 }

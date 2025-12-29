@@ -13,7 +13,7 @@ using TouchSocket.Core;
 
 namespace ThingsGateway.Gateway.Application;
 
-public class AsyncReadWriteLock : IAsyncDisposable
+public class AsyncReadWriteLock : IDisposable
 {
     private readonly int _writeReadRatio = 3; // 写3次会允许1次读，但写入也不会被阻止，具体协议取决于插件协议实现
     public AsyncReadWriteLock(int writeReadRatio, bool writePriority)
@@ -22,7 +22,7 @@ public class AsyncReadWriteLock : IAsyncDisposable
         _writePriority = writePriority;
     }
     private bool _writePriority;
-    private AsyncAutoResetEvent _readerLock = new AsyncAutoResetEvent(false); // 控制读计数
+    private ThingsGateway.Gateway.Application.AsyncAutoResetEvent _readerGate = new ThingsGateway.Gateway.Application.AsyncAutoResetEvent(false); // 控制读计数
     private long _writerCount = 0; // 当前活跃的写线程数
     private long _readerCount = 0; // 当前被阻塞的读线程数
     private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
@@ -32,31 +32,47 @@ public class AsyncReadWriteLock : IAsyncDisposable
     public ValueTask<CancellationToken> ReaderLockAsync(CancellationToken cancellationToken)
     {
         return ReaderLockAsync(this, cancellationToken);
-
-        static async PooledValueTask<CancellationToken> ReaderLockAsync(AsyncReadWriteLock @this, CancellationToken cancellationToken)
+        static async PooledValueTask<CancellationToken> ReaderLockAsync(
+        AsyncReadWriteLock @this,
+        CancellationToken cancellationToken)
         {
             if (Interlocked.Read(ref @this._writerCount) > 0)
             {
-                Interlocked.Increment(ref @this._readerCount);
 
+                Task task = null;
+                lock (@this.lockObject)
+                {
+                    //AsyncAutoResetEvent加入队列是同步的，所以不会担心并发task未等待导致的问题
+                    if (Interlocked.Read(ref @this._writerCount) > 0)
+                        task = @this._readerGate.WaitOneAsync(cancellationToken);
+                }
 
-
-                // 第一个读者需要获取写入锁，防止写操作
-                await @this._readerLock.WaitOneAsync(cancellationToken).ConfigureAwait(false);
-
-                Interlocked.Decrement(ref @this._readerCount);
+                if (task != null)
+                {
+                    try
+                    {
+                        Interlocked.Increment(ref @this._readerCount);
+                        await task.ConfigureAwait(false);
+                        Interlocked.Decrement(ref @this._readerCount);
+                    }
+                    finally
+                    {
+                    }
+                }
 
             }
+
             return @this._cancellationTokenSource.Token;
         }
     }
 
     public bool WriteWaited => _writerCount > 0;
+    public bool ReadWaited => _readerCount > 0;
 
     /// <summary>
     /// 获取写锁，阻止所有读取。
     /// </summary>
-    public ValueTask<IDisposable> WriterLockAsync(CancellationToken cancellationToken)
+    public ValueTask<IDisposable> WriterLockAsync()
     {
         return WriterLockAsync(this);
 
@@ -76,54 +92,55 @@ public class AsyncReadWriteLock : IAsyncDisposable
             return new Writer(@this);
         }
     }
+
+
     private object lockObject = new();
     private void ReleaseWriter()
     {
-
         var writerCount = Interlocked.Decrement(ref _writerCount);
 
-        // 每次释放写时，总是唤醒至少一个读
-        _readerLock.Set();
-
-        if (writerCount == 0)
+        lock (lockObject)
         {
-            var resetEvent = _readerLock;
-            //_readerLock = new(false);
-            Interlocked.Exchange(ref _writeSinceLastReadCount, 0);
-            resetEvent.SetAll();
-        }
-        else
-        {
-            lock (lockObject)
+            if (writerCount == 0)
             {
+                _writeSinceLastReadCount = 0;
+
+                _readerGate.SetAll();
+            }
+            else
+            {
+
 
                 // 读写占空比， 用于控制写操作与读操作的比率。该比率 n 次写入操作会执行一次读取操作。即使在应用程序执行大量的连续写入操作时，也必须确保足够的读取数据处理时间。相对于更加均衡的读写数据流而言，该特点使得外部写入可连续无顾忌操作
                 if (_writeReadRatio > 0)
                 {
-                    var count = Interlocked.Increment(ref _writeSinceLastReadCount);
+
+                    var count = _writeSinceLastReadCount++;
                     if (count >= _writeReadRatio)
                     {
-                        Interlocked.Exchange(ref _writeSinceLastReadCount, 0);
-                        //_readerLock.Set();
+                        _writeSinceLastReadCount = 0;
+                        _readerGate.Set();
                     }
                 }
                 else
                 {
-                    //_readerLock.Set();
+                    _readerGate.Set();
                 }
             }
 
         }
     }
-
-    public async ValueTask DisposeAsync()
+    public void Dispose()
     {
-        if (_cancellationTokenSource != null)
+        lock (lockObject)
         {
-            await _cancellationTokenSource.SafeCancelAsync().ConfigureAwait(false);
-            _cancellationTokenSource.SafeDispose();
+            if (_cancellationTokenSource != null)
+            {
+                _cancellationTokenSource.SafeCancel();
+                _cancellationTokenSource.SafeDispose();
+            }
+            _readerGate.SetAll();
         }
-        _readerLock.SetAll();
     }
 
     private int _writeSinceLastReadCount = 0;

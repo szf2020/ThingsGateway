@@ -12,9 +12,7 @@ using Microsoft.AspNetCore.Components.Forms;
 
 using ThingsGateway.Admin.Application;
 using ThingsGateway.Admin.Razor;
-using ThingsGateway.Foundation.Common.LinqExtension;
 using ThingsGateway.Foundation.Common.Log;
-using ThingsGateway.Foundation.Common.StringExtension;
 
 namespace ThingsGateway.Gateway.Razor;
 
