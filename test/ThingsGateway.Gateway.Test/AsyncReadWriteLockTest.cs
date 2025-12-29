@@ -128,7 +128,7 @@ public class AsyncReadWriteLock1 : IAsyncDisposable
             {
                 Interlocked.Increment(ref @this._readerCount);
 
-                await Task.Delay(1000).ConfigureAwait(false);
+                await Task.Delay(1000, cancellationToken).ConfigureAwait(false);
 
                 // 第一个读者需要获取写入锁，防止写操作
                 await @this._readerLock.WaitOneAsync(cancellationToken).ConfigureAwait(false);
