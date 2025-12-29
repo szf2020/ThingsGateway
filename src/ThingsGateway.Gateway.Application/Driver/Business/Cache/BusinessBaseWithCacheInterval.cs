@@ -25,7 +25,6 @@ public abstract class BusinessBaseWithCacheInterval : BusinessBaseWithCache
     /// </summary>
     protected abstract BusinessPropertyWithCacheInterval _businessPropertyWithCacheInterval { get; }
 
-#if !Management
 
 
     protected internal override async Task InitChannelAsync(IChannel? channel, CancellationToken cancellationToken)
@@ -362,5 +361,4 @@ public abstract class BusinessBaseWithCacheInterval : BusinessBaseWithCache
             }
         }
     }
-#endif
 }

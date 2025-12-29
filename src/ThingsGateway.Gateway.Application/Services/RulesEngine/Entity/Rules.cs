@@ -8,11 +8,9 @@ using ThingsGateway.Blazor.Diagrams.Core.Models;
 
 namespace ThingsGateway.Gateway.Application;
 
-#if !Management
 [OrmTable("rules", TableDescription = "规则引擎")]
 [OrmIndex("unique_rules_name", nameof(Rules.Name), OrderByType.Asc, true)]
 [Tenant(SqlOrmConst.DB_Custom)]
-#endif
 public class Rules : BaseDataEntity
 {
     [OrmColumn(ColumnDescription = "名称", Length = 200)]

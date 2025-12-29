@@ -15,13 +15,10 @@ namespace ThingsGateway.Gateway.Application;
 /// </summary>
 public abstract partial class BusinessBaseWithCacheIntervalScriptAll : BusinessBaseWithCacheIntervalScript
 {
-#if !Management
     protected override bool PluginEventDataModelEnable => true;
     protected override bool AlarmModelEnable => true;
 
     protected override bool DevModelEnable => true;
 
     protected override bool VarModelEnable => true;
-
-#endif
 }

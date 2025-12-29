@@ -35,7 +35,6 @@ public abstract class CollectFoundationBase : CollectReceivedFoundationBase, IFo
     {
         return FoundationDevice?.GetAddressDescription();
     }
-#if !Management
 
     protected override ValueTask<OperResult<ReadOnlyMemory<byte>>> ReadSourceAsync(VariableSourceRead variableSourceRead, CancellationToken cancellationToken)
     {
@@ -133,5 +132,4 @@ public abstract class CollectFoundationBase : CollectReceivedFoundationBase, IFo
     }
 
 
-#endif
 }

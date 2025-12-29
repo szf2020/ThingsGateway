@@ -72,7 +72,6 @@ public static class PluginServiceUtil
         return type.GetRuntimeProperties().Any(a => a.GetCustomAttribute<DynamicPropertyAttribute>(false) != null);
     }
 
-#if !Management
     /// <summary>
     /// 插件是否支持平台
     /// </summary>
@@ -85,7 +84,6 @@ public static class PluginServiceUtil
 
         return true;
     }
-#endif
 
     /// <summary>
     /// 插件是否专业版

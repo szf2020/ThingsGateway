@@ -587,7 +587,7 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
     }
     #region 导出
 
-    public async Task<Dictionary<string, object>> ExportDictionary(List<Variable> variables, string deviceName = null)
+    public Dictionary<string, object> ExportDictionary(List<Variable> variables, string deviceName = null)
     {
         var deviceDicts = GlobalData.IdDevices;
         var channelDicts = GlobalData.IdChannels;

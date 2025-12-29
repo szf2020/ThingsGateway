@@ -22,7 +22,6 @@ public abstract class BusinessBaseWithCache : BusinessBase
 
     protected abstract BusinessPropertyWithCache _businessPropertyWithCache { get; }
 
-#if !Management
 
     protected override Task DisposeAsync(bool disposing)
     {
@@ -139,7 +138,7 @@ public abstract class BusinessBaseWithCache : BusinessBase
                 {
                     item.Id = CommonUtils.GetSingleId();
                 }
-                var dir = CacheDBUtil.GetCacheFilePath(CurrentDevice.Name.ToString());
+                var dir = CacheDBUtil.GetCacheFilePath(CurrentDevice.Name);
                 var fileStart = CacheDBUtil.GetFileName($"{CurrentDevice.PluginName}_{typeof(AlarmVariable).FullName}_{nameof(AlarmVariable)}");
                 var fullName = PathHelper.CombinePathReplace(dir, $"{fileStart}{CacheDBUtil.EX}");
 
@@ -187,7 +186,7 @@ public abstract class BusinessBaseWithCache : BusinessBase
                 {
                     item.Id = CommonUtils.GetSingleId();
                 }
-                var dir = CacheDBUtil.GetCacheFilePath(CurrentDevice.Name.ToString());
+                var dir = CacheDBUtil.GetCacheFilePath(CurrentDevice.Name);
                 var fileStart = CacheDBUtil.GetFileName($"{CurrentDevice.PluginName}_{typeof(PluginEventData).FullName}_{nameof(PluginEventData)}");
                 var fullName = PathHelper.CombinePathReplace(dir, $"{fileStart}{CacheDBUtil.EX}");
 
@@ -309,7 +308,7 @@ public abstract class BusinessBaseWithCache : BusinessBase
     /// </summary>
     protected virtual CacheDB LocalDBCacheAlarmModel()
     {
-        var cacheDb = CacheDBUtil.GetCache(typeof(CacheDBItem<AlarmVariable>), CurrentDevice.Name.ToString(), $"{CurrentDevice.PluginName}_{typeof(AlarmVariable).Name}");
+        var cacheDb = CacheDBUtil.GetCache(typeof(CacheDBItem<AlarmVariable>), CurrentDevice.Name, $"{CurrentDevice.PluginName}_{typeof(AlarmVariable).Name}");
 
         if (!LocalDBCacheAlarmModelInited)
         {
@@ -323,7 +322,7 @@ public abstract class BusinessBaseWithCache : BusinessBase
     /// </summary>
     protected virtual CacheDB LocalDBCachePluginEventDataModel()
     {
-        var cacheDb = CacheDBUtil.GetCache(typeof(CacheDBItem<PluginEventData>), CurrentDevice.Name.ToString(), $"{CurrentDevice.PluginName}_{typeof(PluginEventData).Name}");
+        var cacheDb = CacheDBUtil.GetCache(typeof(CacheDBItem<PluginEventData>), CurrentDevice.Name, $"{CurrentDevice.PluginName}_{typeof(PluginEventData).Name}");
 
         if (!LocalDBCachePluginEventDataModelInited)
         {
@@ -598,7 +597,7 @@ public abstract class BusinessBaseWithCache : BusinessBase
                 {
                     item.Id = CommonUtils.GetSingleId();
                 }
-                var dir = CacheDBUtil.GetCacheFilePath(CurrentDevice.Name.ToString());
+                var dir = CacheDBUtil.GetCacheFilePath(CurrentDevice.Name);
                 var fileStart = CacheDBUtil.GetFileName($"{CurrentDevice.PluginName}_{typeof(DeviceBasicData).FullName}_{nameof(DeviceBasicData)}");
                 var fullName = PathHelper.CombinePathReplace(dir, $"{fileStart}{CacheDBUtil.EX}");
 
@@ -677,7 +676,7 @@ public abstract class BusinessBaseWithCache : BusinessBase
     /// </summary>
     protected virtual CacheDB LocalDBCacheDevModel()
     {
-        var cacheDb = CacheDBUtil.GetCache(typeof(CacheDBItem<DeviceBasicData>), CurrentDevice.Name.ToString(), $"{CurrentDevice.PluginName}_{typeof(DeviceBasicData).Name}");
+        var cacheDb = CacheDBUtil.GetCache(typeof(CacheDBItem<DeviceBasicData>), CurrentDevice.Name, $"{CurrentDevice.PluginName}_{typeof(DeviceBasicData).Name}");
         if (!LocalDBCacheDevModelInited)
         {
             cacheDb.InitDb();
@@ -837,7 +836,7 @@ public abstract class BusinessBaseWithCache : BusinessBase
                 {
                     item.Id = CommonUtils.GetSingleId();
                 }
-                var dir = CacheDBUtil.GetCacheFilePath(CurrentDevice.Name.ToString());
+                var dir = CacheDBUtil.GetCacheFilePath(CurrentDevice.Name);
                 var fileStart = CacheDBUtil.GetFileName($"{CurrentDevice.PluginName}_{typeof(VariableBasicData).Name}");
                 var fullName = PathHelper.CombinePathReplace(dir, $"{fileStart}{CacheDBUtil.EX}");
 
@@ -884,7 +883,7 @@ public abstract class BusinessBaseWithCache : BusinessBase
                 {
                     item.Id = CommonUtils.GetSingleId();
                 }
-                var dir = CacheDBUtil.GetCacheFilePath(CurrentDevice.Name.ToString());
+                var dir = CacheDBUtil.GetCacheFilePath(CurrentDevice.Name);
                 var fileStart = CacheDBUtil.GetFileName($"{CurrentDevice.PluginName}_List_{typeof(VariableBasicData).Name}");
                 var fullName = PathHelper.CombinePathReplace(dir, $"{fileStart}{CacheDBUtil.EX}");
 
@@ -1003,7 +1002,7 @@ public abstract class BusinessBaseWithCache : BusinessBase
     /// </summary>
     protected virtual CacheDB LocalDBCacheVarModel()
     {
-        var cacheDb = CacheDBUtil.GetCache(typeof(CacheDBItem<VariableBasicData>), CurrentDevice.Name.ToString(), $"{CurrentDevice.PluginName}_{typeof(VariableBasicData).Name}");
+        var cacheDb = CacheDBUtil.GetCache(typeof(CacheDBItem<VariableBasicData>), CurrentDevice.Name, $"{CurrentDevice.PluginName}_{typeof(VariableBasicData).Name}");
         if (!LocalDBCacheVarModelInited)
         {
             cacheDb.InitDb();
@@ -1017,7 +1016,7 @@ public abstract class BusinessBaseWithCache : BusinessBase
     /// </summary>
     protected virtual CacheDB LocalDBCacheVarModels()
     {
-        var cacheDb = CacheDBUtil.GetCache(typeof(CacheDBItem<List<VariableBasicData>>), CurrentDevice.Name.ToString(), $"{CurrentDevice.PluginName}_List_{typeof(VariableBasicData).Name}");
+        var cacheDb = CacheDBUtil.GetCache(typeof(CacheDBItem<List<VariableBasicData>>), CurrentDevice.Name, $"{CurrentDevice.PluginName}_List_{typeof(VariableBasicData).Name}");
         if (!LocalDBCacheVarModelsInited)
         {
             cacheDb.InitDb();
@@ -1276,5 +1275,4 @@ public abstract class BusinessBaseWithCache : BusinessBase
 
     #endregion
 
-#endif
 }

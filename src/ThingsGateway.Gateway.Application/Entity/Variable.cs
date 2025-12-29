@@ -20,12 +20,10 @@ namespace ThingsGateway.Gateway.Application;
 /// <summary>
 /// 设备变量表
 /// </summary>
-#if !Management
 [OrmTable("variable", TableDescription = "设备变量表")]
 [Tenant(SqlOrmConst.DB_Custom)]
 [OrmIndex("index_device", nameof(Variable.DeviceId), OrderByType.Asc)]
 [OrmIndex("unique_deviceid_variable_name", nameof(Variable.Name), OrderByType.Asc, nameof(Variable.DeviceId), OrderByType.Asc, true)]
-#endif
 public class Variable : PrimaryKeyEntity, IValidatableObject
 {
     /// <summary>
@@ -42,11 +40,6 @@ public class Variable : PrimaryKeyEntity, IValidatableObject
     [System.Text.Json.Serialization.JsonIgnore]
     [Newtonsoft.Json.JsonIgnore]
     internal long Row;
-    private long deviceId;
-    private int? arrayLength;
-
-    private ProtectTypeEnum protectType = ProtectTypeEnum.ReadWrite;
-    private DataTypeEnum dataType = DataTypeEnum.Int16;
 
     /// <summary>
     /// 导入验证专用
@@ -54,31 +47,9 @@ public class Variable : PrimaryKeyEntity, IValidatableObject
     [System.Text.Json.Serialization.JsonIgnore]
     [Newtonsoft.Json.JsonIgnore]
     internal bool IsUp;
-    private bool enable = true;
     public bool DynamicVariable;
-    private bool rpcWriteEnable = true;
-    private bool saveValue = false;
-    private bool businessGroupUpdateTrigger = true;
-    private bool rpcWriteCheck;
 
     private object _value;
-    private string name;
-    private string collectGroup = string.Empty;
-    private string businessGroup;
-    private string description;
-    private string unit;
-    private string intervalTime;
-    private string registerAddress;
-    private string otherMethod;
-    private string readExpressions;
-    private string writeExpressions;
-
-    private Dictionary<long, Dictionary<string, string>>? variablePropertys;
-    private string remark1;
-    private string remark2;
-    private string remark3;
-    private string remark4;
-    private string remark5;
 
     [System.Text.Json.Serialization.JsonIgnore]
     [Newtonsoft.Json.JsonIgnore]
@@ -102,7 +73,7 @@ public class Variable : PrimaryKeyEntity, IValidatableObject
     [Required]
     [NotNull]
     [MinValue(1)]
-    public virtual long DeviceId { get => deviceId; set => deviceId = value; }
+    public virtual long DeviceId { get; set; }
 
     /// <summary>
     /// 变量名称
@@ -110,115 +81,115 @@ public class Variable : PrimaryKeyEntity, IValidatableObject
     [OrmColumn(ColumnDescription = "变量名称", IsNullable = false)]
     [AutoGenerateColumn(Visible = true, Filterable = true, Sortable = true, Order = 1)]
     [Required]
-    public virtual string Name { get => name; set => name = value; }
+    public virtual string Name { get; set; }
 
     /// <summary>
     /// 采集组
     /// </summary>
     [OrmColumn(ColumnDescription = "采集组", IsNullable = true)]
     [AutoGenerateColumn(Visible = true, Filterable = true, Sortable = true, Order = 1)]
-    public virtual string CollectGroup { get => collectGroup; set => collectGroup = value; }
+    public virtual string CollectGroup { get; set; } = string.Empty;
     /// <summary>
     /// 分组名称
     /// </summary>
     [OrmColumn(ColumnDescription = "分组名称", IsNullable = true)]
     [AutoGenerateColumn(Visible = true, Filterable = true, Sortable = true, Order = 1)]
-    public virtual string BusinessGroup { get => businessGroup; set => businessGroup = value; }
+    public virtual string BusinessGroup { get; set; }
 
     /// <summary>
     /// 分组上传触发变量
     /// </summary>
     [OrmColumn(ColumnDescription = "分组上传触发变量", IsNullable = true)]
     [AutoGenerateColumn(Visible = true, Filterable = true, Sortable = true, Order = 1)]
-    public virtual bool BusinessGroupUpdateTrigger { get => businessGroupUpdateTrigger; set => businessGroupUpdateTrigger = value; }
+    public virtual bool BusinessGroupUpdateTrigger { get; set; } = true;
 
     /// <summary>
     /// 写入后再次读取检查值是否一致
     /// </summary>
     [OrmColumn(ColumnDescription = "写入后再次读取检查值是否一致", IsNullable = true)]
     [AutoGenerateColumn(Visible = true, Filterable = true, Sortable = true, Order = 1)]
-    public virtual bool RpcWriteCheck { get => rpcWriteCheck; set => rpcWriteCheck = value; }
+    public virtual bool RpcWriteCheck { get; set; }
 
     /// <summary>
     /// 描述
     /// </summary>
     [OrmColumn(ColumnDescription = "描述", Length = 200, IsNullable = true)]
     [AutoGenerateColumn(Visible = true, Filterable = true, Sortable = true, Order = 2)]
-    public string Description { get => description; set => description = value; }
+    public string Description { get; set; }
 
     /// <summary>
     /// 单位
     /// </summary>
     [OrmColumn(ColumnDescription = "单位", Length = 200, IsNullable = true)]
     [AutoGenerateColumn(Visible = true, Filterable = true, Sortable = true, Order = 3)]
-    public virtual string Unit { get => unit; set => unit = value; }
+    public virtual string Unit { get; set; }
 
     /// <summary>
     /// 间隔时间
     /// </summary>
     [OrmColumn(ColumnDescription = "间隔时间", IsNullable = true)]
     [AutoGenerateColumn(Visible = true, Filterable = true, Sortable = true)]
-    public virtual string IntervalTime { get => intervalTime; set => intervalTime = value; }
+    public virtual string IntervalTime { get; set; }
 
     /// <summary>
     /// 变量地址，可能带有额外的信息，比如<see cref="DataFormatEnum"/> ，以;分割
     /// </summary>
     [OrmColumn(ColumnDescription = "变量地址", Length = 200, IsNullable = true)]
     [AutoGenerateColumn(Visible = true, Filterable = true, Sortable = true)]
-    public string RegisterAddress { get => registerAddress; set => registerAddress = value; }
+    public virtual string RegisterAddress { get; set; }
 
     /// <summary>
     /// 数组长度
     /// </summary>
     [OrmColumn(ColumnDescription = "数组长度", IsNullable = true)]
     [AutoGenerateColumn(Visible = true, Filterable = true, Sortable = true)]
-    public int? ArrayLength { get => arrayLength; set => arrayLength = value; }
+    public int? ArrayLength { get; set; }
 
     /// <summary>
     /// 其他方法，若不为空，此时RegisterAddress为方法参数
     /// </summary>
     [OrmColumn(ColumnDescription = "特殊方法", Length = 200, IsNullable = true)]
     [AutoGenerateColumn(Visible = true, Filterable = true, Sortable = true)]
-    public string OtherMethod { get => otherMethod; set => otherMethod = value; }
+    public virtual string OtherMethod { get; set; }
 
     /// <summary>
     /// 使能
     /// </summary>
     [OrmColumn(ColumnDescription = "使能")]
     [AutoGenerateColumn(Visible = true, Filterable = true, Sortable = true)]
-    public virtual bool Enable { get => enable; set => enable = value; }
+    public virtual bool Enable { get; set; } = true;
     /// <summary>
     /// 读写权限
     /// </summary>
     [OrmColumn(ColumnDescription = "读写权限", IsNullable = false)]
     [AutoGenerateColumn(Visible = true, Filterable = true, Sortable = true)]
-    public virtual ProtectTypeEnum ProtectType { get => protectType; set => protectType = value; }
+    public virtual ProtectTypeEnum ProtectType { get; set; } = ProtectTypeEnum.ReadWrite;
     /// <summary>
     /// 数据类型
     /// </summary>
     [OrmColumn(ColumnDescription = "数据类型")]
     [AutoGenerateColumn(Visible = true, Filterable = true, Sortable = true)]
-    public virtual DataTypeEnum DataType { get => dataType; set => dataType = value; }
+    public virtual DataTypeEnum DataType { get; set; } = DataTypeEnum.Int16;
     /// <summary>
     /// 读取表达式
     /// </summary>
     [OrmColumn(ColumnDescription = "读取表达式", Length = 1000, IsNullable = true)]
     [AutoGenerateColumn(Visible = true, Filterable = true, Sortable = true)]
-    public virtual string ReadExpressions { get => readExpressions; set => readExpressions = value; }
+    public virtual string ReadExpressions { get; set; }
 
     /// <summary>
     /// 写入表达式
     /// </summary>
     [OrmColumn(ColumnDescription = "写入表达式", Length = 1000, IsNullable = true)]
     [AutoGenerateColumn(Visible = true, Filterable = true, Sortable = true)]
-    public virtual string WriteExpressions { get => writeExpressions; set => writeExpressions = value; }
+    public virtual string WriteExpressions { get; set; }
 
     /// <summary>
     /// 是否允许远程Rpc写入
     /// </summary>
     [OrmColumn(ColumnDescription = "远程写入", IsNullable = true)]
     [AutoGenerateColumn(Visible = true, Filterable = true, Sortable = true)]
-    public virtual bool RpcWriteEnable { get => rpcWriteEnable; set => rpcWriteEnable = value; }
+    public virtual bool RpcWriteEnable { get; set; } = true;
     /// <summary>
     /// 初始值
     /// </summary>
@@ -244,14 +215,14 @@ public class Variable : PrimaryKeyEntity, IValidatableObject
     /// </summary>
     [OrmColumn(ColumnDescription = "保存初始值", IsNullable = true)]
     [AutoGenerateColumn(Visible = true, Filterable = true, Sortable = true)]
-    public virtual bool SaveValue { get => saveValue; set => saveValue = value; }
+    public virtual bool SaveValue { get; set; } = false;
     /// <summary>
     /// 变量额外属性Json
     /// </summary>
     [OrmColumn(IsJson = true, ColumnDataType = StaticConfig.CodeFirst_BigString, ColumnDescription = "变量属性Json", IsNullable = true)]
     [IgnoreExcel]
     [AutoGenerateColumn(Ignore = true)]
-    public Dictionary<long, Dictionary<string, string>>? VariablePropertys { get => variablePropertys; set => variablePropertys = value; }
+    public Dictionary<long, Dictionary<string, string>>? VariablePropertys { get; set; }
 
 
     /// <summary>
@@ -270,35 +241,35 @@ public class Variable : PrimaryKeyEntity, IValidatableObject
     /// </summary>
     [OrmColumn(ColumnDescription = "自定义1", Length = 200, IsNullable = true)]
     [AutoGenerateColumn(Visible = false, Filterable = true, Sortable = true)]
-    public string Remark1 { get => remark1; set => remark1 = value; }
+    public string Remark1 { get; set; }
 
     /// <summary>
     /// 自定义
     /// </summary>
     [OrmColumn(ColumnDescription = "自定义2", Length = 200, IsNullable = true)]
     [AutoGenerateColumn(Visible = false, Filterable = true, Sortable = true)]
-    public string Remark2 { get => remark2; set => remark2 = value; }
+    public string Remark2 { get; set; }
 
     /// <summary>
     /// 自定义
     /// </summary>
     [OrmColumn(ColumnDescription = "自定义3", Length = 200, IsNullable = true)]
     [AutoGenerateColumn(Visible = false, Filterable = true, Sortable = true)]
-    public string Remark3 { get => remark3; set => remark3 = value; }
+    public string Remark3 { get; set; }
 
     /// <summary>
     /// 自定义
     /// </summary>
     [OrmColumn(ColumnDescription = "自定义4", Length = 200, IsNullable = true)]
     [AutoGenerateColumn(Visible = false, Filterable = true, Sortable = true)]
-    public string Remark4 { get => remark4; set => remark4 = value; }
+    public string Remark4 { get; set; }
 
     /// <summary>
     /// 自定义
     /// </summary>
     [OrmColumn(ColumnDescription = "自定义5", Length = 200, IsNullable = true)]
     [AutoGenerateColumn(Visible = false, Filterable = true, Sortable = true)]
-    public string Remark5 { get => remark5; set => remark5 = value; }
+    public string Remark5 { get; set; }
 
     #endregion 备用字段
 

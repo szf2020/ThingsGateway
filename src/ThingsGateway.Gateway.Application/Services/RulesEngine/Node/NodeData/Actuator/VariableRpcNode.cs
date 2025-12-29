@@ -10,7 +10,6 @@ public class VariableRpcNode : VariableNode, IActuatorNode
     { Title = "VariableRpcNode"; }
 
 
-#if !Management
     async Task<OperResult<NodeOutput>> IActuatorNode.ExecuteAsync(NodeInput input, CancellationToken cancellationToken)
     {
         try
@@ -37,10 +36,4 @@ public class VariableRpcNode : VariableNode, IActuatorNode
             return new OperResult<NodeOutput>(ex);
         }
     }
-#else
-    Task<OperResult<NodeOutput>> IActuatorNode.ExecuteAsync(NodeInput input, CancellationToken cancellationToken)
-    {
-        return Task.FromResult(new OperResult<NodeOutput>());
-    }
-#endif
 }

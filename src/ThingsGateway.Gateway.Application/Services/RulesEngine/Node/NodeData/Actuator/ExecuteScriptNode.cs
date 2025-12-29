@@ -81,7 +81,6 @@ public class ExecuteScriptNode : TextNode, IActuatorNode, IExexcuteExpressionsBa
         }
         set
         {
-#if !Management
             if (text != value)
             {
                 try
@@ -94,11 +93,9 @@ public class ExecuteScriptNode : TextNode, IActuatorNode, IExexcuteExpressionsBa
                 {
                 }
             }
-#endif
             text = value;
         }
     }
-#if !Management
     async Task<OperResult<NodeOutput>> IActuatorNode.ExecuteAsync(NodeInput input, CancellationToken cancellationToken)
     {
         try
@@ -119,15 +116,9 @@ public class ExecuteScriptNode : TextNode, IActuatorNode, IExexcuteExpressionsBa
             return new OperResult<NodeOutput>(ex);
         }
     }
-#else
-    Task<OperResult<NodeOutput>> IActuatorNode.ExecuteAsync(NodeInput input, CancellationToken cancellationToken)
-    {
-        return Task.FromResult(new OperResult<NodeOutput>());
-    }
-#endif
+
     public void Dispose()
     {
-#if !Management
         if (!text.IsNullOrWhiteSpace())
         {
             try
@@ -140,7 +131,6 @@ public class ExecuteScriptNode : TextNode, IActuatorNode, IExexcuteExpressionsBa
             {
             }
         }
-#endif
         GC.SuppressFinalize(this);
     }
 }

@@ -84,7 +84,5 @@ public partial class AlarmRuntimePropertys
 
     internal object AlarmLockObject = new();
 
-#if !Management
     internal bool AlarmConfirm;
-#endif
 }

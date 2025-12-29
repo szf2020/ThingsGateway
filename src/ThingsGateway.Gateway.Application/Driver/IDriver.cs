@@ -25,8 +25,6 @@ namespace ThingsGateway.Gateway.Application
         Type DriverVariableAddressUIType { get; }
         List<IEditorItem> PluginPropertyEditorItems { get; }
 
-#if !Management
-
         bool? IsCollectDevice { get; }
         bool DisposedValue { get; }
         ChannelRuntime CurrentChannel { get; }
@@ -51,8 +49,6 @@ namespace ThingsGateway.Gateway.Application
         Task SetLogAsync(LogLevel? logLevel = null, bool upDataBase = true);
         Task AfterVariablesChangedAsync(CancellationToken cancellationToken);
 
-
-#endif
 
         string GetAuthString();
         bool GetAuthentication(out DateTime? expireTime);

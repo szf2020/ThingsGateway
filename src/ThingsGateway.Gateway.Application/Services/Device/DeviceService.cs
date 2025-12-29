@@ -332,7 +332,7 @@ internal sealed class DeviceService : BaseService<Device>, IDeviceService
     /// <summary>
     /// 导出文件
     /// </summary>
-    public async Task<Dictionary<string, object>> ExportDictionary(List<Device>? models, string channelName = null, string plugin = null)
+    public Dictionary<string, object> ExportDictionary(List<Device>? models, string channelName = null, string plugin = null)
     {
         var deviceDicts = GlobalData.IdDevices;
         var channelDicts = GlobalData.IdChannels;

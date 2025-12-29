@@ -255,7 +255,6 @@ internal sealed class PluginService : IPluginService
             }
         }
     }
-#if !Management
     /// <summary>
     /// 获取插件信息的方法，可以根据插件类型筛选插件列表。
     /// </summary>
@@ -300,7 +299,6 @@ internal sealed class PluginService : IPluginService
         return filteredPlugins;
     }
 
-#endif
 
     /// <summary>
     /// 获取变量的属性类型
@@ -332,7 +330,6 @@ internal sealed class PluginService : IPluginService
         }
     }
 
-#if !Management
     /// <summary>
     /// 分页显示插件
     /// </summary>
@@ -342,7 +339,6 @@ internal sealed class PluginService : IPluginService
         var query = (await GetPluginsAsync(pluginType).ConfigureAwait(false)).WhereIf(!options.SearchText.IsNullOrWhiteSpace(), a => a.FullName.Contains(options.SearchText)).GetQueryData(options);
         return query;
     }
-#endif
 
     /// <summary>
     /// 移除全部插件
@@ -739,7 +735,6 @@ internal sealed class PluginService : IPluginService
         }
         return assembly;
     }
-#if !Management
     /// <summary>
     /// 获取全部插件信息
     /// </summary>
@@ -860,7 +855,6 @@ internal sealed class PluginService : IPluginService
             return plugins.DistinctBy(a => a.FullName).OrderBy(a => a.EducationPlugin);
         }
     }
-#endif
     //public Task SavePlugin(PluginAddInput plugin)
     //{
     //    return PluginInfoUtil.SavePlugin(plugin);

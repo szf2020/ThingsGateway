@@ -1,9 +1,7 @@
 ﻿
 using ThingsGateway.Blazor.Diagrams.Core.Geometry;
-#if !Management
 using ThingsGateway.Gateway.Application.Extensions;
 
-#endif
 using TouchSocket.Core;
 
 namespace ThingsGateway.Gateway.Application;
@@ -16,19 +14,13 @@ public class ConditionNode : TextNode, IConditionNode
         Title = "ConditionNode"; Placeholder = "ConditionNode.Placeholder";
         Text = "return true;";
     }
-#if !Management
 
     Task<bool> IConditionNode.ExecuteAsync(NodeInput input, CancellationToken cancellationToken)
     {
-        var value = Text.GetExpressionsResult(input.Value, Logger);
+        var value = ExpressionEvaluatorExtension.GetExpressionsResult(Text, input.Value, Logger);
         var next = value.ToBoolean(false);
         Logger?.Trace($"Condition result: {next}");
         return Task.FromResult(next);
     }
-#else
-    Task<bool> IConditionNode.ExecuteAsync(NodeInput input, CancellationToken cancellationToken)
-    {
-        return Task.FromResult(true);
-    }
-#endif
+
 }

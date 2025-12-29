@@ -57,7 +57,7 @@ internal interface IVariableService
     /// </summary>
     /// <param name="variables">要导出的变量数据。</param>
     /// <param name="deviceName">设备名称（可选）。</param>
-    Task<Dictionary<string, object>> ExportDictionary(List<Variable> variables, string deviceName = null);
+    Dictionary<string, object> ExportDictionary(List<Variable> variables, string deviceName = null);
 
     /// <summary>
     /// 异步导出变量数据到文件流中。

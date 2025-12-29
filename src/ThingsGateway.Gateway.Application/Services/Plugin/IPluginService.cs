@@ -17,22 +17,17 @@ namespace ThingsGateway.Gateway.Application;
 /// <summary>
 /// 驱动插件服务
 /// </summary>
-public interface IPluginService
-#if !Management
-    : IPluginPageService
-#endif
+public interface IPluginService : IPluginPageService
 {
     Type GetDebugUI(string pluginName);
     Type GetAddressUI(string pluginName);
 
-#if !Management
     /// <summary>
     /// 根据插件类型获取信息
     /// </summary>
     /// <param name="pluginType"></param>
     /// <returns></returns>
     List<PluginInfo> GetPluginList(PluginTypeEnum? pluginType = null);
-#endif
 
     /// <summary>
     /// 根据插件全名称构建插件实例

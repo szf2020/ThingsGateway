@@ -61,7 +61,7 @@ public class LogJob : IJob
 
         //网关通道日志以通道id命名
         var rulesService = App.RootServices.GetService<IRulesService>();
-        var ruleNames = (await rulesService.GetFromDBAsync(a => a.Name.ToString()).ConfigureAwait(false)).ToHashSet();
+        var ruleNames = (await rulesService.GetFromDBAsync(a => a.Name).ConfigureAwait(false)).ToHashSet();
         var ruleBaseDir = RulesEngineHostedService.LogDir;
         Directory.CreateDirectory(ruleBaseDir);
 

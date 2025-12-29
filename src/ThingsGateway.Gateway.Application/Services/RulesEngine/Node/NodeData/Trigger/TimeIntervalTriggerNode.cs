@@ -13,7 +13,6 @@ public class TimeIntervalTriggerNode : TextNode, ITriggerNode, IDisposable
     }
     public TimeIntervalTriggerNode(string id, Point? position = null) : base(id, position) { Title = "TimeIntervalTriggerNode"; Placeholder = "TimeIntervalTriggerNode.Placeholder"; }
 
-#if !Management
     private IScheduledTask _task;
     private Func<NodeOutput, CancellationToken, Task> Func { get; set; }
     Task ITriggerNode.StartAsync(Func<NodeOutput, CancellationToken, Task> func, CancellationToken cancellationToken)
@@ -55,18 +54,5 @@ public class TimeIntervalTriggerNode : TextNode, ITriggerNode, IDisposable
 
 
 
-#else
 
-    Task ITriggerNode.StartAsync(Func<NodeOutput, CancellationToken, Task> func, CancellationToken cancellationToken)
-    {
-        return Task.CompletedTask;
-    }
-
-
-    public void Dispose()
-    {
-
-    }
-
-#endif
 }

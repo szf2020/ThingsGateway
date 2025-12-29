@@ -5,6 +5,7 @@ dotnet_diagnostic.RCS1163.severity = silent
 
 # IDE0079: 请删除不必要的忽略
 dotnet_diagnostic.IDE0079.severity = silent
+dotnet_diagnostic.CS1998.severity = warning
 
 [*.cs]
 #### 命名样式 ####

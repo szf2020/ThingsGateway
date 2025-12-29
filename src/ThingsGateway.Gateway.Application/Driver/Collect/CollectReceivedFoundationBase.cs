@@ -41,7 +41,6 @@ public abstract class CollectReceivedFoundationBase : CollectBase, IReceivedFoun
         return Task.FromResult(new List<VariableSourceRead>());
     }
 
-#if !Management
 
     /// <summary>
     /// 是否连接成功
@@ -138,5 +137,4 @@ public abstract class CollectReceivedFoundationBase : CollectBase, IReceivedFoun
 
     }
 
-#endif
 }

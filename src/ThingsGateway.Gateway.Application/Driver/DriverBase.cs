@@ -115,9 +115,6 @@ public abstract class DriverBase : AsyncDisposableObject, IDriver
 
 
 
-#if !Management
-
-
     /// <summary>
     /// 是否执行了Start方法
     /// </summary>
@@ -470,5 +467,4 @@ public abstract class DriverBase : AsyncDisposableObject, IDriver
     #endregion 插件重写
 
 
-#endif
 }

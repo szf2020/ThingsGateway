@@ -15,7 +15,6 @@ namespace ThingsGateway.Gateway.Application;
 /// </summary>
 public abstract class BusinessBaseWithCacheIntervalVariable : BusinessBaseWithCacheInterval
 {
-#if !Management
     protected override bool PluginEventDataModelEnable => false;
     protected override bool AlarmModelEnable => false;
 
@@ -35,5 +34,4 @@ public abstract class BusinessBaseWithCacheIntervalVariable : BusinessBaseWithCa
     {
         throw new NotImplementedException();
     }
-#endif
 }

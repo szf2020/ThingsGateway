@@ -98,6 +98,8 @@ public class VariableBasicData
     public bool BusinessGroupUpdateTrigger { get; set; }
 
     /// <inheritdoc cref="VariableRuntime.DeviceName"/>
+    [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
     public string DeviceName { get; set; }
 
     /// <inheritdoc cref="VariableRuntime.RuntimeType"/>
@@ -131,6 +133,8 @@ public class VariableBasicData
     //public DeviceBasicData DeviceRuntime { get; set; }
 
     /// <inheritdoc cref="Variable.DeviceId"/>
+    [JsonIgnore]
+    [System.Text.Json.Serialization.JsonIgnore]
     public long DeviceId { get; set; }
 
     /// <inheritdoc cref="VariableRuntime.LastErrorMessage"/>

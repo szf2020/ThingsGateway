@@ -18,10 +18,7 @@ using ThingsGateway.Common.Extension;
 using ThingsGateway.Foundation.Common.Json.Extension;
 
 
-#if !Management
 using ThingsGateway.Gateway.Application.Extensions;
-
-#endif
 
 namespace ThingsGateway.Gateway.Application;
 
@@ -30,10 +27,7 @@ namespace ThingsGateway.Gateway.Application;
 /// 采集插件，继承实现不同PLC通讯
 /// <para></para>
 /// </summary>
-public abstract partial class CollectBase : DriverBase
-#if !Management
-    , IRpcDriver
-#endif
+public abstract partial class CollectBase : DriverBase, IRpcDriver
 {
     /// <summary>
     /// 插件配置项
@@ -47,7 +41,6 @@ public abstract partial class CollectBase : DriverBase
         return string.Empty;
     }
 
-#if !Management
 
     /// <summary>
     /// 特殊方法
@@ -811,5 +804,4 @@ public abstract partial class CollectBase : DriverBase
             await ReadWriteLock.SafeDisposeAsync().ConfigureAwait(false);
     }
 
-#endif
 }

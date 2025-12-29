@@ -49,7 +49,7 @@ internal interface IChannelService
     /// </summary>
     /// <param name="channels">通道数据</param>
     /// <returns>内存流</returns>
-    Task<Dictionary<string, object>> ExportDictionary(List<Channel> channels);
+    Dictionary<string, object> ExportDictionary(List<Channel> channels);
 
     /// <summary>
     /// 从缓存/数据库获取全部信息

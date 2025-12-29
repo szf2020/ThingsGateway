@@ -12,7 +12,6 @@ public class AlarmChangedTriggerNode : VariableNode, ITriggerNode, IDisposable
 {
     public AlarmChangedTriggerNode(string id, Point? position = null) : base(id, position) { Title = "AlarmChangedTriggerNode"; }
 
-#if !Management
 
     private Func<NodeOutput, CancellationToken, Task> Func { get; set; }
     Task ITriggerNode.StartAsync(Func<NodeOutput, CancellationToken, Task> func, CancellationToken cancellationToken)
@@ -108,18 +107,6 @@ public class AlarmChangedTriggerNode : VariableNode, ITriggerNode, IDisposable
     }
 
 
-#else
 
-    Task ITriggerNode.StartAsync(Func<NodeOutput, CancellationToken, Task> func, CancellationToken cancellationToken)
-    {
-        return Task.CompletedTask;
-    }
-
-
-    public void Dispose()
-    {
-
-    }
-#endif
 
 }

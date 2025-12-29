@@ -15,10 +15,8 @@ namespace ThingsGateway.Gateway.Application;
 /// <summary>
 /// 后台日志表
 ///</summary>
-#if !Management
 [OrmTable("backend_log", TableDescription = "后台日志表")]
 [Tenant(SqlOrmConst.DB_Log)]
-#endif
 public class BackendLog : PrimaryIdEntity
 {
     /// <summary>

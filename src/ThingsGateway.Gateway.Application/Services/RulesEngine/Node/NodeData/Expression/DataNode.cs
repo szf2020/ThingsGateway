@@ -1,10 +1,8 @@
 ﻿
 using ThingsGateway.Blazor.Diagrams.Core.Geometry;
 
-#if !Management
 using ThingsGateway.Gateway.Application.Extensions;
 
-#endif
 using TouchSocket.Core;
 
 namespace ThingsGateway.Gateway.Application;
@@ -17,13 +15,12 @@ public class DataNode : TextNode, IExpressionNode
         Title = "DataNode"; Placeholder = "DataNode.Placeholder";
         Text = "return 1;";
     }
-#if !Management
 
     Task<OperResult<NodeOutput>> IExpressionNode.ExecuteAsync(NodeInput input, CancellationToken cancellationToken)
     {
         try
         {
-            var value = Text.GetExpressionsResult(input.Value, Logger);
+            var value = ExpressionEvaluatorExtension.GetExpressionsResult(Text, input.Value, Logger);
             NodeOutput nodeOutput = new();
             nodeOutput.Value = value;
             Logger?.Trace($"Data result: {nodeOutput.JToken?.ToJsonString()}");
@@ -35,10 +32,5 @@ public class DataNode : TextNode, IExpressionNode
             return Task.FromResult(new OperResult<NodeOutput>(ex));
         }
     }
-#else
-    Task<OperResult<NodeOutput>> IExpressionNode.ExecuteAsync(NodeInput input, CancellationToken cancellationToken)
-    {
-        return Task.FromResult(new OperResult<NodeOutput>());
-    }
-#endif
+
 }

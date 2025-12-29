@@ -34,11 +34,7 @@ public abstract class BusinessBase : DriverBase
     {
         get
         {
-            if (pluginVariablePropertyEditorItems == null)
-            {
-                pluginVariablePropertyEditorItems = PluginServiceUtil.GetEditorItems(VariablePropertys?.GetType()).ToList();
-            }
-            return pluginVariablePropertyEditorItems;
+            return pluginVariablePropertyEditorItems ??= PluginServiceUtil.GetEditorItems(VariablePropertys?.GetType()).ToList();
         }
     }
 
@@ -55,7 +51,6 @@ public abstract class BusinessBase : DriverBase
     protected Dictionary<string, List<VariableRuntime>> VariableRuntimeGroups { get; set; } = new();
 
 
-#if !Management
 
     public override Task AfterVariablesChangedAsync(CancellationToken cancellationToken)
     {
@@ -136,5 +131,4 @@ public abstract class BusinessBase : DriverBase
             CurrentDevice?.SetDeviceStatus(TimerX.Now, true);
         }
     }
-#endif
 }

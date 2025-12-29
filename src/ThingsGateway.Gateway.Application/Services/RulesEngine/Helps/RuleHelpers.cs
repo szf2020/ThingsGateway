@@ -59,9 +59,6 @@ public static class RuleHelpers
 
     public static NodeModel GetNodeModel(string key, string id, Point point)
     {
-#if Management
-        key = key.Replace(",ThingsGateway.Gateway.Application", ",ThingsGateway.Management.Application");
-#endif
         var type = Type.GetType(key.Contains('.') ? key : $"ThingsGateway.Gateway.Application.{key}");
         if (type != null)
         {
@@ -130,14 +127,9 @@ public static class RuleHelpers
         {
             NodeJson nodeJson = new();
             rules.NodeJsons.Add(nodeJson);
-#if Management
-
-            nodeJson.DraggedType = $"{item.GetType().FullName},ThingsGateway.Gateway.Application";
-#else
 
             nodeJson.DraggedType = $"{item.GetType().FullName},{item.GetType().Assembly.GetName().Name}";
 
-#endif
             nodeJson.Point = item.Position;
             nodeJson.Id = item.Id;
             foreach (var keyValuePair in GetModelValue(item))

@@ -43,12 +43,12 @@ public partial class VariableRuntime : Variable
 
 
     [AutoGenerateColumn(Ignore = true)]
-    public virtual bool IsMemoryVariable { get => _isMemoryVariable; set => _isMemoryVariable = value; }
+    public virtual bool IsMemoryVariable { get; set; }
     [AutoGenerateColumn(Ignore = true)]
-    public virtual bool IsInternalMemoryVariable { get => _isInternalMemoryVariable; set => _isInternalMemoryVariable = value; }
+    public virtual bool IsInternalMemoryVariable { get; set; }
 
     [AutoGenerateColumn(Ignore = true)]
-    public bool ValueInited { get => _valueInited; set => _valueInited = value; }
+    public bool ValueInited { get; set; }
 
     #region 属性
 
@@ -56,25 +56,25 @@ public partial class VariableRuntime : Variable
     /// 这个参数值由自动打包方法写入/>
     /// </summary>
     [AutoGenerateColumn(Visible = false)]
-    public int Index { get => index; set => index = value; }
+    public int Index { get; set; }
 
     /// <summary>
     /// 变化时间
     /// </summary>
     [AutoGenerateColumn(Visible = true, Filterable = true, Sortable = true, Order = 5)]
-    public DateTime ChangeTime { get => changeTime; set => changeTime = value; }
+    public DateTime ChangeTime { get; set; } = DateTime.UnixEpoch.ToLocalTime();
 
     /// <summary>
     /// 采集时间
     /// </summary>
     [AutoGenerateColumn(Visible = true, Filterable = true, Sortable = true, Order = 5)]
-    public DateTime CollectTime { get => collectTime; set => collectTime = value; }
+    public DateTime CollectTime { get; set; } = DateTime.UnixEpoch.ToLocalTime();
 
     /// <summary>
     /// 上次值
     /// </summary>
     [AutoGenerateColumn(Visible = false, Order = 6)]
-    public object LastSetValue { get => lastSetValue; set => lastSetValue = value; }
+    public object LastSetValue { get; set; }
 
     /// <summary>
     /// 原始值
@@ -94,7 +94,7 @@ public partial class VariableRuntime : Variable
     [Newtonsoft.Json.JsonIgnore]
     [System.Text.Json.Serialization.JsonIgnore]
     [AutoGenerateColumn(Ignore = true)]
-    public DeviceRuntime? DeviceRuntime { get => deviceRuntime; private set => deviceRuntime = value; }
+    public DeviceRuntime? DeviceRuntime { get; private set; }
 
     /// <summary>
     /// VariableSource
@@ -103,7 +103,7 @@ public partial class VariableRuntime : Variable
     [System.Text.Json.Serialization.JsonIgnore]
     [MapperIgnore]
     [AutoGenerateColumn(Ignore = true)]
-    public IVariableSource? VariableSource { get => variableSource; set => variableSource = value; }
+    public IVariableSource? VariableSource { get; set; }
 
     /// <summary>
     /// VariableMethod
@@ -112,7 +112,7 @@ public partial class VariableRuntime : Variable
     [System.Text.Json.Serialization.JsonIgnore]
     [MapperIgnore]
     [AutoGenerateColumn(Ignore = true)]
-    public VariableMethod? VariableMethod { get => variableMethod; set => variableMethod = value; }
+    public VariableMethod? VariableMethod { get; set; }
 
     /// <summary>
     /// 这个参数值由自动打包方法写入/>
@@ -120,7 +120,7 @@ public partial class VariableRuntime : Variable
     [Newtonsoft.Json.JsonIgnore]
     [System.Text.Json.Serialization.JsonIgnore]
     [AutoGenerateColumn(Ignore = true)]
-    public IThingsGatewayBitConverter? BitConverter { get => bitConverter; set => bitConverter = value; }
+    public IThingsGatewayBitConverter? BitConverter { get; set; }
 
 #endif
 
@@ -217,7 +217,7 @@ public partial class VariableRuntime : Variable
     /// 实时值
     /// </summary>
     [AutoGenerateColumn(Visible = true, Order = 6)]
-    public object Value { get => _value; set => _value = value; }
+    public object Value { get; set; }
 
     /// <summary>
     /// 报警使能
@@ -237,33 +237,13 @@ public partial class VariableRuntime : Variable
 
     #endregion
 
-
-
-    private int index;
-    private DateTime changeTime = DateTime.UnixEpoch.ToLocalTime();
-
-    private DateTime collectTime = DateTime.UnixEpoch.ToLocalTime();
-
 #pragma warning disable CS0414
 #pragma warning disable CS0169
     private bool _isOnlineChanged;
-#pragma warning restore CS0169
-#pragma warning restore CS0414
-    private bool _valueInited;
-    private bool _isMemoryVariable;
-    private bool _isInternalMemoryVariable;
-
-    private object _value;
-    private object lastSetValue;
     private object rawValue;
 #if !Management
 #pragma warning disable CS0649
     private string _lastErrorMessage;
-#pragma warning restore CS0649
-    private DeviceRuntime? deviceRuntime;
-    private IVariableSource? variableSource;
-    private VariableMethod? variableMethod;
-    private IThingsGatewayBitConverter? bitConverter;
 
 
     /// <summary>
@@ -344,7 +324,7 @@ public partial class VariableRuntime : Variable
         {
             if (IsOnline)
             {
-                changed = (_value != null);
+                changed = (Value != null);
             }
         }
         else
@@ -359,7 +339,7 @@ public partial class VariableRuntime : Variable
             }
             //判断变化，插件传入的Value可能是基础类型，也有可能是class，比较器无法识别是否变化，这里json处理序列化比较
             //检查IComparable
-            if (!data.Equals(_value))
+            if (!data.Equals(Value))
             {
                 if (data is IComparable)
                 {
@@ -367,8 +347,8 @@ public partial class VariableRuntime : Variable
                 }
                 else
                 {
-                    if (_value != null)
-                        changed = data.ToSystemTextJsonString(false) != _value.ToSystemTextJsonString(false);
+                    if (Value != null)
+                        changed = data.ToSystemTextJsonString(false) != Value.ToSystemTextJsonString(false);
                     else
                         changed = true;
                 }
@@ -382,13 +362,13 @@ public partial class VariableRuntime : Variable
         {
             ChangeTime = time;
 
-            LastSetValue = _value;
+            LastSetValue = Value;
 
             ValueInited = true;
 
             if (_isOnline == true)
             {
-                _value = data;
+                Value = data;
             }
 
             GlobalData.VariableValueChange(this);

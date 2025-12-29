@@ -15,10 +15,8 @@ namespace ThingsGateway.Gateway.Application;
 /// <summary>
 /// Rpc写入日志
 ///</summary>
-#if !Management
 [OrmTable("rpc_log", TableDescription = "RPC操作日志")]
 [Tenant(SqlOrmConst.DB_Log)]
-#endif
 public class RpcLog : PrimaryIdEntity
 {
     /// <summary>

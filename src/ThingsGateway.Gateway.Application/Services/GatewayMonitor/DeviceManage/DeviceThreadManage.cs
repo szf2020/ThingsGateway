@@ -229,7 +229,7 @@ internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
             {
                 var basePath = CacheDBUtil.GetCacheFileBasePath();
 
-                var strings = deviceRuntimes.Select(a => a.Name.ToString()).ToHashSet();
+                var strings = deviceRuntimes.Select(a => a.Name).ToHashSet();
                 var dirs = Directory.GetDirectories(basePath).Where(a => strings.Contains(Path.GetFileName(a)));
                 foreach (var dir in dirs)
                 {

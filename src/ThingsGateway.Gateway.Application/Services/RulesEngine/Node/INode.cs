@@ -2,13 +2,9 @@
 
 public interface INode
 {
-#if !Management
     public const string ModuleBasePath = "_content/ThingsGateway.Gateway.Razor.Common/";
     public const string FileModulePath = "ThingsGateway.Gateway.Razor.Common";
-#else
-    public const string ModuleBasePath = "_content/ThingsGateway.Management.Razor/";
-    public const string FileModulePath = "ThingsGateway.Management.Razor";
-#endif
+
     public TouchSocket.Core.ILog Logger { get; set; }
     string RulesEngineName { get; set; }
 }

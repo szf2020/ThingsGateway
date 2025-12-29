@@ -26,7 +26,7 @@ public static class DynamicModelExtension
         if (!string.IsNullOrEmpty(script))
         {
             //执行脚本，获取新实体
-            var getDeviceModel = CSharpScriptEngineExtension.Do<IDynamicModel>(script, timeSpan ?? TimeSpan.Zero);
+            var getDeviceModel = CSharpScriptEngineExtension.Do<IDynamicModel>(script, timeSpan ?? TimeSpan.FromDays(7));
             if (getDeviceModel is DynamicModelBase dynamicModelBase)
             {
                 dynamicModelBase.Logger = log;
@@ -39,7 +39,6 @@ public static class DynamicModelExtension
         }
     }
 
-#if !Management
     /// <summary>
     /// 获取变量的业务属性值
     /// </summary>
@@ -95,8 +94,6 @@ public static class DynamicModelExtension
             }
         }
     }
-
-#endif
 
     public static IEnumerable<IGrouping<object[], T>> GroupByKeys<T>(this IEnumerable<T> values, params string[] keys)
     {

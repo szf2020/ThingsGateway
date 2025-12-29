@@ -46,7 +46,6 @@ public static class BusinessDatabaseUtil
         return sqlOrmClient;
     }
 
-#if !Management
     /// <summary>
     /// 按条件获取DB插件中的全部历史报警(不分页)
     /// </summary>
@@ -147,5 +146,4 @@ public static class BusinessDatabaseUtil
         }
     }
 
-#endif
 }

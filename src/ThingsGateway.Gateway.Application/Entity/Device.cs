@@ -19,11 +19,9 @@ namespace ThingsGateway.Gateway.Application;
 /// <summary>
 /// 设备表
 /// </summary>
-#if !Management
 [OrmTable("device", TableDescription = "设备表")]
 [Tenant(SqlOrmConst.DB_Custom)]
 [OrmIndex("unique_device_name", nameof(Device.Name), OrderByType.Asc, true)]
-#endif
 public class Device : BaseDataEntity, IValidatableObject
 {
     public override string ToString()
@@ -170,16 +168,12 @@ public class Device : BaseDataEntity, IValidatableObject
 
     #endregion 备用字段
 
-#if !Management
     /// <summary>
     /// 导入验证专用
     /// </summary>
     [System.Text.Json.Serialization.JsonIgnore]
     [Newtonsoft.Json.JsonIgnore]
     internal bool IsUp;
-
-
-#endif
 
     /// <summary>
     /// 额外属性

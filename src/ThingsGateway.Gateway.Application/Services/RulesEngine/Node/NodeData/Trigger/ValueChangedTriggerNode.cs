@@ -14,7 +14,6 @@ public class ValueChangedTriggerNode : VariableNode, ITriggerNode, IDisposable
     public ValueChangedTriggerNode(string id, Point? position = null) : base(id, position) { Title = "ValueChangedTriggerNode"; }
 
 
-#if !Management
     private Func<NodeOutput, CancellationToken, Task> Func { get; set; }
     Task ITriggerNode.StartAsync(Func<NodeOutput, CancellationToken, Task> func, CancellationToken cancellationToken)
     {
@@ -105,18 +104,4 @@ public class ValueChangedTriggerNode : VariableNode, ITriggerNode, IDisposable
     }
 
 
-#else
-
-    Task ITriggerNode.StartAsync(Func<NodeOutput, CancellationToken, Task> func, CancellationToken cancellationToken)
-    {
-        return Task.CompletedTask;
-    }
-
-
-    public void Dispose()
-    {
-
-    }
-
-#endif
 }

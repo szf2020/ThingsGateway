@@ -32,9 +32,9 @@ internal sealed class RedundancyService : BaseService<SysDict>, IRedundancyServi
         List<SysDict> dicts = new List<SysDict>()
         {
             new SysDict() { DictType = DictTypeEnum.System, Category = nameof(RedundancyOptions), Name = nameof(RedundancyOptions.Enable), Code = input.Enable.ToString() },
-            new SysDict() { DictType = DictTypeEnum.System, Category = nameof(RedundancyOptions), Name = nameof(RedundancyOptions.MasterUri), Code = input.MasterUri.ToString() },
+            new SysDict() { DictType = DictTypeEnum.System, Category = nameof(RedundancyOptions), Name = nameof(RedundancyOptions.MasterUri), Code = input.MasterUri },
             new SysDict() { DictType = DictTypeEnum.System, Category = nameof(RedundancyOptions), Name = nameof(RedundancyOptions.IsMaster), Code = input.IsMaster.ToString() },
-            new SysDict() { DictType = DictTypeEnum.System, Category = nameof(RedundancyOptions), Name = nameof(RedundancyOptions.VerifyToken), Code = input.VerifyToken.ToString() },
+            new SysDict() { DictType = DictTypeEnum.System, Category = nameof(RedundancyOptions), Name = nameof(RedundancyOptions.VerifyToken), Code = input.VerifyToken },
             new SysDict() { DictType = DictTypeEnum.System, Category = nameof(RedundancyOptions), Name = nameof(RedundancyOptions.HeartbeatInterval), Code = input.HeartbeatInterval.ToString() },
             new SysDict() { DictType = DictTypeEnum.System, Category = nameof(RedundancyOptions), Name = nameof(RedundancyOptions.MaxErrorCount), Code = input.MaxErrorCount.ToString() },
             new SysDict() { DictType = DictTypeEnum.System, Category = nameof(RedundancyOptions), Name = nameof(RedundancyOptions.IsStartBusinessDevice), Code = input.IsStartBusinessDevice.ToString() },
@@ -70,9 +70,9 @@ internal sealed class RedundancyService : BaseService<SysDict>, IRedundancyServi
             redundancy = new RedundancyOptions();
 
             redundancy.Enable = sysDicts.FirstOrDefault(a => a.Category == nameof(RedundancyOptions) && a.Name == nameof(RedundancyOptions.Enable))?.Code.ToBoolean() ?? false;
-            redundancy.MasterUri = sysDicts.FirstOrDefault(a => a.Category == nameof(RedundancyOptions) && a.Name == nameof(RedundancyOptions.MasterUri))?.Code.ToString();
+            redundancy.MasterUri = sysDicts.FirstOrDefault(a => a.Category == nameof(RedundancyOptions) && a.Name == nameof(RedundancyOptions.MasterUri))?.Code;
             redundancy.IsMaster = sysDicts.FirstOrDefault(a => a.Category == nameof(RedundancyOptions) && a.Name == nameof(RedundancyOptions.IsMaster))?.Code.ToBoolean() ?? true;
-            redundancy.VerifyToken = sysDicts.FirstOrDefault(a => a.Category == nameof(RedundancyOptions) && a.Name == nameof(RedundancyOptions.VerifyToken))?.Code.ToString();
+            redundancy.VerifyToken = sysDicts.FirstOrDefault(a => a.Category == nameof(RedundancyOptions) && a.Name == nameof(RedundancyOptions.VerifyToken))?.Code;
             redundancy.HeartbeatInterval = sysDicts.FirstOrDefault(a => a.Category == nameof(RedundancyOptions) && a.Name == nameof(RedundancyOptions.HeartbeatInterval))?.Code.ToInt() ?? 3000;
             redundancy.MaxErrorCount = sysDicts.FirstOrDefault(a => a.Category == nameof(RedundancyOptions) && a.Name == nameof(RedundancyOptions.MaxErrorCount))?.Code.ToInt() ?? 3000;
             redundancy.IsStartBusinessDevice = sysDicts.FirstOrDefault(a => a.Category == nameof(RedundancyOptions) && a.Name == nameof(RedundancyOptions.IsStartBusinessDevice))?.Code.ToBoolean() ?? false;

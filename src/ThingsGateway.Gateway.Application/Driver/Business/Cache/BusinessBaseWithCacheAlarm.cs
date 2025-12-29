@@ -15,7 +15,6 @@ namespace ThingsGateway.Gateway.Application;
 /// </summary>
 public abstract class BusinessBaseWithCacheAlarm : BusinessBaseWithCache
 {
-#if !Management
     protected override bool PluginEventDataModelEnable => true;
     protected override bool AlarmModelEnable => true;
 
@@ -129,5 +128,4 @@ public abstract class BusinessBaseWithCacheAlarm : BusinessBaseWithCache
         }
     }
 
-#endif
 }

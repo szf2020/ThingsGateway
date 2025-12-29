@@ -26,7 +26,6 @@ public abstract partial class BusinessBaseWithCacheIntervalScript : BusinessBase
 
 
 
-#if !Management
     protected internal override Task InitChannelAsync(IChannel? channel, CancellationToken cancellationToken)
     {
 
@@ -489,5 +488,4 @@ public abstract partial class BusinessBaseWithCacheIntervalScript : BusinessBase
     #endregion 封装方法
 
 
-#endif
 }

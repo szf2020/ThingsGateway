@@ -14,7 +14,6 @@ public class PluginEventChangedTriggerNode : TextNode, ITriggerNode, IDisposable
     public PluginEventChangedTriggerNode(string id, Point? position = null) : base(id, position) { Title = "PluginEventChangedTriggerNode"; Placeholder = "Device.Placeholder"; }
 
 
-#if !Management
     private Func<NodeOutput, CancellationToken, Task> Func { get; set; }
     Task ITriggerNode.StartAsync(Func<NodeOutput, CancellationToken, Task> func, CancellationToken cancellationToken)
     {
@@ -95,18 +94,5 @@ public class PluginEventChangedTriggerNode : TextNode, ITriggerNode, IDisposable
             list.Remove(this);
         }
     }
-#else
 
-    Task ITriggerNode.StartAsync(Func<NodeOutput, CancellationToken, Task> func, CancellationToken cancellationToken)
-    {
-        return Task.CompletedTask;
-    }
-
-
-    public void Dispose()
-    {
-
-    }
-
-#endif
 }

@@ -85,7 +85,6 @@ public static class GatewayResourceUtil
         ).ToList();
         return data;
     }
-#if !Management
     /// <summary>
     /// 构建树节点，传入的列表已经是树结构
     /// </summary>
@@ -107,5 +106,4 @@ public static class GatewayResourceUtil
         }
         return trees;
     }
-#endif
 }

@@ -21,11 +21,9 @@ namespace ThingsGateway.Gateway.Application;
 /// <summary>
 /// 通道表
 /// </summary>
-#if !Management
 [OrmTable("channel", TableDescription = "通道表")]
 [Tenant(SqlOrmConst.DB_Custom)]
 [OrmIndex("unique_channel_name", nameof(Channel.Name), OrderByType.Asc, true)]
-#endif
 public class Channel : ChannelOptionsBase, IPrimaryIdEntity, IBaseDataEntity, IBaseEntity
 {
     /// <summary>

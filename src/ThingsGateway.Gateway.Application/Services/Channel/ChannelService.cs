@@ -341,7 +341,7 @@ internal sealed class ChannelService : BaseService<Channel>, IChannelService
     }
 
     /// <inheritdoc/>
-    public async Task<Dictionary<string, object>> ExportDictionary(List<Channel> channels)
+    public Dictionary<string, object> ExportDictionary(List<Channel> channels)
     {
         var rows = ChannelServiceHelpers.ExportRows(channels); // IEnumerable 延迟执行
         var sheets = ChannelServiceHelpers.WrapAsSheet(GatewayExportString.ChannelName, rows);
